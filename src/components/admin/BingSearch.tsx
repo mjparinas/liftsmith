@@ -11,6 +11,7 @@ import { dayNumber, nearMisses, pathOf } from "@/lib/searchConsole";
 
 import { Card, fmtDay, fmtInt, fmtPct, LineChart, Table, Tile } from "./charts";
 import { COLUMNS, delta, pos, rowsTable, shortDate } from "./SearchConsole";
+import { CardBones, Loading, TileBones } from "./Skeletons";
 
 function Report({ r }: { r: BingReport }) {
   const t = r.totals;
@@ -108,7 +109,10 @@ export function BingSearch({ days }: { days: number }) {
         </button>
       </div>
       {!part ? (
-        <p className="text-sm text-muted">Reading Bing Webmaster Tools…</p>
+        <Loading label="Reading Bing Webmaster Tools" className="space-y-4">
+          <TileBones />
+          <CardBones body="chart" />
+        </Loading>
       ) : part.state === "ok" ? (
         <Report r={part.report} />
       ) : part.state === "setup" ? (

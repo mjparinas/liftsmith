@@ -38,6 +38,7 @@
     "src/lib/readiness.ts",
     "src/lib/recovery.ts",
     "src/lib/reorder.ts",
+    "src/lib/sessions.ts",
     "src/lib/replan.ts",
     "src/lib/reps/barPath.ts",
     "src/lib/reps/barSpeed.ts",

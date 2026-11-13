@@ -155,6 +155,17 @@ export interface SiteText {
     termsAfter: string;
     endTitle: string;
     endBody: string;
+    /** Coach plans (src/lib/coachPlans.ts): Pro's few clients, Coach and Coach Plus. */
+    coach: {
+      title: string;
+      intro: string;
+      upTo: string;
+      noLimit: string;
+      inPro: string;
+      orMonthly: string;
+      free: string;
+      cta: string;
+    };
   };
   /** The page for coaches (/coaches/, CoachesView): trainer mode, what clients share, and what it costs. */
   coaches: {

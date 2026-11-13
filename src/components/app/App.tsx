@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
@@ -18,10 +18,11 @@ import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
-import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
+import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
+import { setLiteDemos } from "@/lib/liteDemos";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -32,7 +33,7 @@ import { refreshSocial, socialOn } from "@/lib/social";
 import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
-import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
+import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
 import { forgetNotes, refreshCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
@@ -40,7 +41,7 @@ import { watchWorkout } from "@/lib/workoutWatch";
 import type { MessageKey } from "@/locales/en";
 
 import { Account } from "./Account";
-import { Achievements } from "./Achievements";
+import { Achievements, useGame } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExercisePage } from "./ExercisePage";
@@ -96,13 +97,20 @@ const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
 
 export function App() {
-  const { ready, init, profile, active, stats, events } = useApp();
+  const { ready, init, profile, active, stats } = useApp();
+  // The first screen waits for the lifter's language to load (one at a time, i18n.ts), so it never flashes English.
+  // Later switches (Settings › Language) keep the screen and change its words when the language arrives.
+  const langWaiting = useSyncExternalStore(subscribeLang, languagePending, () => false);
+
   const { route, arg } = useRoute();
   const desktop = useDesktop();
   useEffect(() => applyLayout(desktop), [desktop]);
+  useEffect(() => setLiteDemos(!!profile.liteDemos), [profile.liteDemos]);
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
-  const unlockCtx = useMemo(() => unlockContext(events, stats, profile, now), [events, stats, profile, now]);
+  // The achievements come from the shared game result (useGame), not a second count of their own.
+  const achieved = useGame().achievements;
+  const unlockCtx = useMemo(() => unlockFrom(achieved, stats, now), [achieved, stats, now]);
   const theme = activeTheme(profile.delight?.theme, unlockCtx);
   const themeId = theme.id;
   // Colours, in order: Appearance (dark, light or match system), then the earned theme (only its
@@ -375,7 +383,7 @@ export function App() {
     };
   }, [ready, profile.onboarded]);
 
-  if (!ready) return <TodaySkeleton />;
+  if (!ready || langWaiting) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;
 
   const screens: Record<Route, ReactNode> = {

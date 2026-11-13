@@ -9,9 +9,11 @@ import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, workoutName, type YearMonth } from "@/lib/history";
 import { date, list, num, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
+import { joinStretches, partsOf, type PartView } from "@/lib/sessions";
 import { sessionShares } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
-import type { Unit } from "@/lib/types";
+import { stretch } from "@/lib/stretches";
+import type { StretchEvent, Unit } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
@@ -43,8 +45,33 @@ export function HistoryCalendar() {
   const [ym, setYm] = useState<YearMonth>(() => (sessions.length ? monthOf(sessions[0]!.start) : thisMonth));
   const inMonth = monthSessions(sessions, ym);
   const [picked, setPicked] = useState<string | null>(null);
+  // Warm-ups and cool-downs join the workout they were done with; the rest stand alone (sessions.ts).
+  const joined = useMemo(
+    () =>
+      joinStretches(
+        events.filter((e): e is StretchEvent => e.type === "stretch"),
+        sessions,
+      ),
+    [events, sessions],
+  );
+  const looseByDay = useMemo(() => {
+    const m = new Map<string, StretchEvent[]>();
+    for (const s of joined.loose) m.set(dayKey(s.at), [...(m.get(dayKey(s.at)) ?? []), s]);
+    return m;
+  }, [joined]);
+  const looseInMonth = joined.loose.filter((s) => {
+    const d = new Date(s.at);
+    return d.getFullYear() === ym.y && d.getMonth() === ym.m;
+  });
   // Opens on the month's latest workout day, so the last workout is one glance away.
-  const selected = picked && inMonth.some((s) => dayKey(s.start) === picked) ? picked : inMonth[0] ? dayKey(inMonth[0].start) : null;
+  const selected =
+    picked && (inMonth.some((s) => dayKey(s.start) === picked) || looseByDay.has(picked))
+      ? picked
+      : inMonth[0]
+        ? dayKey(inMonth[0].start)
+        : looseInMonth.length
+          ? dayKey(looseInMonth.at(-1)!.at)
+          : null;
 
   const muscles = useMemo(() => musclesByDay(events, sessions, (id) => EXERCISE_BY_ID.get(id)), [events, sessions]);
   const prIds = useMemo(() => prSetIds(events, stats.prs), [events, stats.prs]);
@@ -85,6 +112,11 @@ export function HistoryCalendar() {
     return FAMILIES.filter((f) => set.has(f));
   };
   const daySessions = selected ? [...(byDay.get(selected) ?? [])].reverse() : [];
+  const dayStretches = selected ? [...(looseByDay.get(selected) ?? [])].reverse() : [];
+  const pick = (key: string) => {
+    haptic("select");
+    setPicked(key);
+  };
 
   return (
     <>
@@ -132,12 +164,39 @@ export function HistoryCalendar() {
                   const isToday = d.key === todayKey;
                   const n = new Date(d.ms).getDate();
                   const ring = isToday ? "ring-2 ring-accent ring-inset" : "";
-                  if (!day)
+                  if (!day) {
+                    const loose = looseByDay.get(d.key);
+                    if (loose) {
+                      const on = selected === d.key;
+                      const label = [
+                        date(d.ms, { weekday: "long", month: "long", day: "numeric" }),
+                        t("hx.stretchDay"),
+                        t("hx.stretchCount", { count: loose.reduce((a, s) => a + s.ids.length, 0) }),
+                      ].join(", ");
+                      return (
+                        <td key={d.key}>
+                          <button
+                            type="button"
+                            aria-pressed={on}
+                            aria-label={label}
+                            onClick={() => pick(d.key)}
+                            className={`press flex h-11 w-full flex-col items-center justify-center gap-0.5 rounded-xl border ${on ? "border-accent" : "border-transparent"} ${ring}`}
+                            data-testid="stretch-day"
+                          >
+                            <span className="num text-sm">{n}</span>
+                            <span aria-hidden className="text-cyan">
+                              <Icon name="stretch" size={10} />
+                            </span>
+                          </button>
+                        </td>
+                      );
+                    }
                     return (
                       <td key={d.key}>
                         <div className={`num grid h-11 place-items-center rounded-xl text-sm text-faint ${ring}`}>{n}</div>
                       </td>
                     );
+                  }
                   const fams = familiesOn(d.key);
                   const sets = day.reduce((a, s) => a + s.sets, 0);
                   const prs = day.reduce((a, s) => a + s.prs, 0);
@@ -154,10 +213,7 @@ export function HistoryCalendar() {
                         type="button"
                         aria-pressed={on}
                         aria-label={label}
-                        onClick={() => {
-                          haptic("select");
-                          setPicked(d.key);
-                        }}
+                        onClick={() => pick(d.key)}
                         className={`press relative flex h-11 w-full flex-col items-center justify-center gap-0.5 rounded-xl border bg-accent/15 ${on ? "border-accent" : "border-transparent"} ${ring}`}
                       >
                         <span className="num text-sm font-semibold">{n}</span>
@@ -188,15 +244,68 @@ export function HistoryCalendar() {
           ))}
         </ul>
       </section>
-      {!inMonth.length && <p className="mt-3 px-1 text-sm text-muted">{t("progress.cal.none")}</p>}
+      {!inMonth.length && !looseInMonth.length && <p className="mt-3 px-1 text-sm text-muted">{t("progress.cal.none")}</p>}
       {daySessions.map((s) => (
-        <WorkoutCard key={s.sessionId} summary={s} unit={profile.unit} prIds={prIds} />
+        <WorkoutCard
+          key={s.sessionId}
+          summary={s}
+          unit={profile.unit}
+          prIds={prIds}
+          parts={partsOf(s, joined.bySession.get(s.sessionId))}
+        />
+      ))}
+      {dayStretches.map((s) => (
+        <StretchCard key={s.id} event={s} />
       ))}
     </>
   );
 }
 
-function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: Unit; prIds: Set<string> }) {
+const minutes = (seconds: number) => t("dash.min", { n: Math.max(1, Math.round(seconds / 60)) });
+
+/** A stretch done on its own (a rest day or the library), in the day's list under the calendar. */
+function StretchCard({ event }: { event: StretchEvent }) {
+  const names = event.ids.map((id) => stretch(id)?.name).filter((n): n is string => !!n);
+  return (
+    <article className="card rise mt-3 p-4" aria-label={t("hx.stretchTitle")} data-testid="stretch-card">
+      <h3 className="flex items-center gap-2 font-bold">
+        <span className="text-cyan" aria-hidden>
+          <Icon name="stretch" size={18} />
+        </span>
+        {t("hx.stretchTitle")}
+        <span className="num text-sm font-normal text-muted">{date(event.at, { hour: "numeric", minute: "2-digit" })}</span>
+      </h3>
+      <p className="num mt-0.5 text-sm text-muted">
+        {[minutes(event.seconds), t("hx.stretchCount", { count: event.ids.length })].join(" · ")}
+      </p>
+      {names.length > 0 && <p className="mt-2 text-sm">{list(names)}</p>}
+    </article>
+  );
+}
+
+/** "Warm-up: 5 min · Lifting: 42 min · Cool-down: 4 min", only when the workout had more than one part. */
+function PartsLine({ parts }: { parts: PartView[] }) {
+  if (parts.length < 2) return null;
+  return (
+    <p className="num mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-muted" data-testid="workout-parts">
+      {parts.map((p) => (
+        <span key={p.kind} className="inline-flex items-center gap-1">
+          {p.kind !== "lift" && (
+            <span className="text-cyan" aria-hidden>
+              <Icon name="stretch" size={14} />
+            </span>
+          )}
+          {t("hx.partTime", {
+            part: t(`hx.part.${p.kind === "warm" ? "warm" : p.kind === "cool" ? "cool" : "lift"}`),
+            time: minutes(p.seconds),
+          })}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+function WorkoutCard({ summary, unit, prIds, parts }: { summary: SessionSummary; unit: Unit; prIds: Set<string>; parts: PartView[] }) {
   const { events, stats, profile, active, repeatWorkout } = useApp();
   const detail = useMemo(() => sessionDetail(events, summary.sessionId), [events, summary.sessionId]);
   const ctx = useShareContext(useGame());
@@ -255,6 +364,7 @@ function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: 
         {facts.join(" · ")}
         {detail.manual ? t("dash.byHand") : ""}
       </p>
+      <PartsLine parts={parts} />
       {own?.text && (
         <p className="mt-2 whitespace-pre-line rounded-xl bg-raised px-3 py-2 text-sm" data-testid="workout-note">
           {own.text}

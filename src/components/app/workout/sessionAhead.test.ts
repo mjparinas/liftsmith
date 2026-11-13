@@ -51,6 +51,27 @@ describe("notification look-ahead", () => {
     }
   });
 
+  it("gives the same steps with a long history, which it skips for speed, as with none", () => {
+    const s = useApp.getState();
+    const a = s.active!;
+    const exId = a.plan.items[0]!.exerciseId;
+    // Two years of other workouts with the same exercises, none of them this workout.
+    const history = Array.from({ length: 400 }, (_, i) => ({
+      type: "set" as const,
+      id: `old-${i}`,
+      at: Date.now() - (i + 1) * 3600_000,
+      sessionId: `old-s${Math.floor(i / 20)}`,
+      exerciseId: i % 2 ? exId : a.plan.items.at(-1)!.exerciseId,
+      weight: 50,
+      reps: 8,
+      targetReps: 8,
+      rir: 2,
+    }));
+    const plain = aheadSteps(a, s.events, s.profile.unit, s.gyms[0]!, true);
+    const long = aheadSteps(a, [...history, ...s.events], s.profile.unit, s.gyms[0]!, true);
+    expect(long).toEqual(plain);
+  });
+
   it("works it out on a copy: nothing is logged and the workout doesn't move", () => {
     const s = useApp.getState();
     const before = s.active;

@@ -31,6 +31,7 @@ const CFG: StripeConfig = {
   secret: "sk_test_example",
   webhook: "whsec_example",
   prices: { monthly: "price_m", annual: "price_a" },
+  coachPrices: { coach: { monthly: "price_cm", annual: "price_ca" } },
   live: true,
 };
 

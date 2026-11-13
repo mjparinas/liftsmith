@@ -206,7 +206,7 @@ export const de: FeaturesText = {
     },
     "body-figure": {
       name: "Eine 3D-Figur in deiner Form",
-      body: "Schalte sie ein, und die Figur unter Gesundheit übernimmt deinen Körperbau aus Größe, Gewicht, Körperfett und Umfängen.",
+      body: "Schalte sie ein, und die Figuren unter Gesundheit, in der Erholungskarte und in den Übungsvorführungen übernehmen deinen Körperbau aus Größe, Gewicht, Körperfett und Umfängen.",
     },
     "health-twin": {
       name: "Gesundheitszwilling und Fitnessalter",
@@ -280,6 +280,39 @@ export const de: FeaturesText = {
       name: "Chat, Hinweise und Körperdaten",
       body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
       note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
+    },
+    physio: {
+      name: "Für Physiotherapie und Reha",
+      body: "Weise sanfte Reha-Programme mit Häufigkeit pro Woche zu, sieh, wie oft deine Klienten sie einhalten, und sieh Schmerzen und Verletzungen, die sie teilen, Übung für Übung, mit einer Benachrichtigung bei starken Schmerzen.",
+      note: "Liftsmith zeigt, was Klienten eintragen. Es stellt keine Diagnosen und behandelt nichts.",
+    },
+    "coach-nutrition": {
+      name: "Ernährungsziele für Kunden",
+      body: "Lege für jeden Kunden Kalorien und Protein pro Tag fest. Die Coach-Hinweise prüfen die Ernährungswoche daran, und du siehst, wie er isst, wenn er es teilt.",
+    },
+    "school-teams": {
+      name: "Kostenlos für Schulteams",
+      body: "Trainer an weiterführenden Schulen, die eine Schul-E-Mail-Adresse bestätigen, bekommen Pro kostenlos, ebenso die 13- bis 18-jährigen Sportler ihrer Teams, mit einer wöchentlichen Teamtabelle. Körperfett und öffentliche Profile bleiben für unter 18-Jährige aus.",
+    },
+    "coach-checkins": {
+      name: "Check-in-Formulare und Fragebögen",
+      body: "Schick Kunden einen wöchentlichen Check-in, einen Aufnahmefragebogen oder dein eigenes Formular, einmal oder jede Woche. Sie antworten mit wenigen Tipps, und ein niedriger Wert oder eine fehlende Antwort steht oben in ihrem Bericht.",
+    },
+    "coach-roles": {
+      name: "Für Personal Trainer und Coaches",
+      body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",
+    },
+    "coach-booking": {
+      name: "Termine buchen und planen",
+      body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
+    },
+    "coach-payments": {
+      name: "Kundenzahlungen über Stripe",
+      body: "Verbinde dein eigenes Stripe-Konto und leg für jeden Kunden einen Preis fest, pro Einheit oder monatlich. Kunden zahlen auf der sicheren Seite von Stripe, das Geld geht direkt an dich, und eine fehlgeschlagene Monatszahlung steht oben in ihrem Bericht.",
+    },
+    "coach-plans": {
+      name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
+      body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und Liftsmith behält nichts von dem ein, was sie dir zahlen.",
     },
     awards: {
       name: "Erfolge, Level und Serien",
@@ -360,6 +393,10 @@ export const de: FeaturesText = {
       name: "Schlichter Modus, Töne und Vibration",
       body: "Schalte Animationen und Konfetti, Töne oder Vibration ab, jeweils mit einem Schalter.",
     },
+    "lite-demos": {
+      name: "Akkusparen bei 3D-Figuren",
+      body: "Zeigt die Übungsdemos und die Erholungskarte mit geringerer Auflösung und Bildrate, für ältere Handys und mehr Akkulaufzeit.",
+    },
     desktop: {
       name: "Desktop-Ansicht",
       body: "Am Computer hat die Web-App eine Seitenleiste, breite Seiten, Tastenkürzel während des Trainings (L trägt den Satz ein) und einen breiten Routinen-Editor.",
@@ -429,6 +466,11 @@ export const de: FeaturesText = {
       name: "Sonos",
       body: "Steuere einen Sonos-Lautsprecher aus dem Training, mit einer Lautstärke für Sätze und einer anderen für Pausen.",
     },
+    "now-playing": {
+      name: "Musiksteuerung",
+      body: "Spiele, pausiere und überspringe deine Musik auf Heute und während des Trainings, mit dem Song und der App, die ihn spielt. Du kannst sie in den Einstellungen ausschalten.",
+      note: "iPhone: nur Apple Music, weil Apple Apps keine anderen Musik-Apps steuern lässt.",
+    },
   },
   connectionGroups: {
     health: "Gesundheits-Apps",
@@ -472,7 +514,11 @@ export const de: FeaturesText = {
     withings: { does: "Gewicht, Körperfett, Schlaf und Schritte rein" },
     polar: { does: "Nightly Recharge, HRV und Schlaf rein" },
     concept2: { does: "RowErg-, SkiErg- und BikeErg-Einheiten als Cardio-Trainings rein" },
-    music: { does: "Öffnet Musik passend zur heutigen Ansage" },
+    "music-apps": {
+      name: "Spotify, YouTube Music und andere Musik-Apps",
+      does: "Abspielen, pausieren und überspringen auf Heute und im Training, mit dem Songtitel",
+    },
+    "apple-music": { does: "Abspielen, pausieren und überspringen auf Heute und im Training, mit dem Songtitel" },
     sonos: { does: "Abspielen, Pause, Überspringen und Lautstärke aus dem Training; die Musik folgt Sätzen und Pausen" },
     calendar: {
       name: "Handykalender (Google, iCloud, Outlook)",

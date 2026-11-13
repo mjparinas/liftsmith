@@ -19,6 +19,7 @@ import { create } from "zustand";
 
 import { canSend, installId, platformStore, track } from "./analytics";
 import { accountPro, api, AuthError, readAccount, refreshAccountPro, useAccount, type AccountSub } from "./auth";
+import { COACH_STORE, type CoachTier } from "./coachPlans";
 import { activeCode, activeOffering, codeTrialDays, creatorHooks } from "./creator";
 import { flag } from "./flags";
 import { currentTag } from "./i18n";
@@ -65,6 +66,8 @@ interface BillingState {
   busy: boolean;
   /** Why the last attempt to load the plans failed, in the store SDK's own words (shown small on the paywall). */
   error: string | null;
+  /** The coach plan this device's store subscription is on (coachPlans.ts), once the store has said; Pro or none is "pro". */
+  coachTier?: CoachTier;
 }
 
 export const useBilling = create<BillingState>(() => ({ live: false, ent: null, offers: null, busy: false, error: null }));
@@ -231,6 +234,31 @@ function setEnt(ent: Entitlement | null) {
   useBilling.setState({ ent });
 }
 
+type InfoLike = {
+  entitlements: { all: Record<string, EntInfo | undefined>; active?: Record<string, unknown> };
+  managementURL?: string | null;
+};
+
+/** The coach plan tier in RevenueCat's CustomerInfo: its active `coach_plus` or `coach` entitlement, else Pro. */
+export function tierFromInfo(info: InfoLike): CoachTier {
+  const on = (id: string) => !!info.entitlements.all[id]?.isActive;
+  if (on(COACH_STORE.entitlement.coachPlus)) return "coachPlus";
+  if (on(COACH_STORE.entitlement.coach)) return "coach";
+  return "pro";
+}
+
+/** Takes the store's latest CustomerInfo: the Pro entitlement and the coach tier. Returns the Pro entitlement. */
+export function applyCustomerInfo(info: unknown): Entitlement | null {
+  const i = info as InfoLike;
+  const ent = entFromInfo(i);
+  setEnt(ent);
+  useBilling.setState({ coachTier: tierFromInfo(i) });
+  return ent;
+}
+
+/** The RevenueCat SDK once billing has started on a phone (coachBilling.ts sells the coach plans through it). */
+export const billingSdk = (): Sdk | null => sdk;
+
 /** Starts billing on a native app built with a RevenueCat key. Safe to call more than once. */
 export async function startBilling(): Promise<void> {
   if (!isNative()) return startWebBilling();
@@ -246,9 +274,9 @@ export async function startBilling(): Promise<void> {
     await Purchases.configure({ apiKey: key, appUserID: installId() });
     sdk = Purchases;
     useBilling.setState({ live: true });
-    await Purchases.addCustomerInfoUpdateListener((info) => setEnt(entFromInfo(info as never)));
+    await Purchases.addCustomerInfoUpdateListener((info) => applyCustomerInfo(info));
     const { customerInfo } = await Purchases.getCustomerInfo();
-    setEnt(entFromInfo(customerInfo as never));
+    applyCustomerInfo(customerInfo);
     await tagCreator(activeCode());
     await loadOffers();
   } catch (e) {
@@ -393,8 +421,7 @@ export async function buy(plan: Plan, from: string): Promise<BuyResult> {
   try {
     const option = codeOptions[plan];
     const r = option ? await sdk.purchaseSubscriptionOption({ subscriptionOption: option }) : await sdk.purchasePackage({ aPackage: p });
-    const ent = entFromInfo(r.customerInfo as never);
-    setEnt(ent);
+    const ent = applyCustomerInfo(r.customerInfo);
     const store = platformStore();
     if (ent?.trial) track("trial_start", { plan, store });
     else track("purchase", { plan, store, price: p.product.price, currency: p.product.currencyCode, trial: false });
@@ -425,8 +452,7 @@ export async function restore(): Promise<boolean> {
   useBilling.setState({ busy: true });
   try {
     const { customerInfo } = await sdk.restorePurchases();
-    const ent = entFromInfo(customerInfo as never);
-    setEnt(ent);
+    const ent = applyCustomerInfo(customerInfo);
     return entActive(ent, Date.now());
   } catch {
     return false;

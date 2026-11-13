@@ -65,6 +65,10 @@ describe("Today after training", () => {
     expect(screen.getByTestId("done-today")).toHaveTextContent(/1 set in \d+ min, .* lifted/);
     expect(screen.queryByRole("button", { name: "Start workout" })).toBeNull();
     expect(screen.queryByTestId("plan-list")).toBeNull();
+    // The rest of the page: today's lifts (each opens its page) and what they're recovering (2026-11-13).
+    expect(within(screen.getByTestId("done-lifts")).getAllByRole("button").length).toBeGreaterThan(0);
+    expect(screen.getByText(/1 set · /)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Recovering now/ })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Train again" }));
     expect(await screen.findByRole("button", { name: "Start workout" })).toBeInTheDocument();

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { dayNumber, nearMisses, pathOf, type SearchPart, type SearchReport, type SearchRow } from "@/lib/searchConsole";
 
 import { BarList, Card, fmtDay, fmtInt, fmtPct, LineChart, Table, Tile } from "./charts";
+import { CardBones, Loading, TileBones } from "./Skeletons";
 import { ago } from "./time";
 
 export const delta = (a: number, b: number) => (b > 0 ? (a - b) / b : null);
@@ -138,7 +139,10 @@ export function SearchConsole({ days }: { days: number }) {
         </button>
       </div>
       {!part ? (
-        <p className="text-sm text-muted">Reading Search Console…</p>
+        <Loading label="Reading Search Console" className="space-y-4">
+          <TileBones />
+          <CardBones body="chart" />
+        </Loading>
       ) : part.state === "ok" ? (
         <Report r={part.report} />
       ) : part.state === "setup" ? (

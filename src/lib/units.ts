@@ -35,6 +35,11 @@ export function fmtVolume(kg: number, unit: Unit): string {
   return t("progress.volumeK", { n: fmtNum(Math.round(v / 100) / 10), unit });
 }
 
+/** Body weight for display: to 0.1 kg or lb ("142 lb", "64.4 kg"). One rounding for every screen that shows it. */
+export function fmtBodyweight(kg: number, unit: Unit): string {
+  return `${fmtNum(Math.round(fromKg(kg, unit) * 10) / 10)} ${unit}`;
+}
+
 export function fmtWeight(kg: number, unit: Unit): string {
   return `${fmtNum(fromKg(kg, unit))} ${unit}`;
 }

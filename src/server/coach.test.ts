@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { deleteAccount } from "./accounts";
 import {
+  alertPain,
   alertQuiet,
   alertTrained,
   assignPlan,
@@ -17,15 +18,18 @@ import {
   overview,
   previewInvite,
   removePlan,
+  roleOf,
   saveSetup,
   sendMessage,
   setAlerts,
   setNote,
+  setRole,
   setShare,
+  setTargets,
   unlink,
   unreadFrom,
 } from "./coach";
-import { query, resetDb } from "./db";
+import { query, resetDb, run } from "./db";
 import { saveToken, setPushSender, type PushMessage } from "./push";
 import { sync } from "./sync";
 
@@ -420,6 +424,7 @@ describe("body data a client shares", () => {
         { at: NOW - DAY, kg: 80, bodyFat: 18.5 },
       ],
       measures: [{ at: NOW - DAY, site: "waist", cm: 84 }],
+      food: [],
     });
     expect(JSON.stringify(body)).not.toContain("private");
     expect((await overview("client", NOW)).bodyShared).toEqual(["coach"]);
@@ -469,6 +474,160 @@ describe("alerts to a coach", () => {
     await alertTrained("client", [{ type: "sessionEnd", at: NOW - 60_000 }], NOW);
     expect(await alertQuiet(NOW)).toBe(0);
     expect(sent).toEqual([]);
+    expect((await overview("coach", NOW)).alerts).toBe(false);
+  });
+});
+
+describe("physio support", () => {
+  beforeEach(async () => {
+    await push(
+      "client",
+      [
+        { id: "i1", at: NOW - 5 * DAY, type: "injury", injuryId: "knee1", part: "knee" },
+        { id: "r1", at: NOW - 5 * DAY, type: "injuryRule", injuryId: "knee1", action: "light", pct: 70, ack: true },
+        { id: "p1", at: NOW - DAY, type: "pain", injuryId: "knee1", score: 4, sessionId: "s1", exerciseId: "wall-sit" },
+        { id: "c1", at: NOW - DAY, type: "cycle", flow: "light" },
+      ],
+      { name: "Alex" },
+    );
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  });
+
+  it("sends pain and injuries only when the client shares them, and never the rest of the health side", async () => {
+    const types = async () => (await clientView("coach", "client", NOW))!.events.map((e) => e.type);
+    expect(await types()).toEqual([]);
+    expect((await clientView("coach", "client", NOW))!.pain).toBe(false);
+    expect(await setShare("client", "coach", true, NOW, "pain")).toBe(true);
+    const view = (await clientView("coach", "client", NOW))!;
+    expect(view.pain).toBe(true);
+    expect(view.body).toBeNull();
+    expect(view.events).toEqual([
+      { id: "i1", at: NOW - 5 * DAY, type: "injury", injuryId: "knee1", part: "knee" },
+      { id: "p1", at: NOW - DAY, type: "pain", injuryId: "knee1", score: 4, sessionId: "s1", exerciseId: "wall-sit" },
+    ]);
+    expect((await overview("client", NOW)).painShared).toEqual(["coach"]);
+    expect((await overview("coach", NOW)).sharesPain).toEqual(["client"]);
+    // Body data is its own switch.
+    await setShare("client", "coach", true, NOW, "body");
+    expect((await clientView("coach", "client", NOW))!.pain).toBe(true);
+    await setShare("client", "coach", false, NOW, "pain");
+    expect(await types()).toEqual([]);
+    expect((await clientView("coach", "client", NOW))!.body).not.toBeNull();
+  });
+
+  it("physio is one of the roles, and coaches who picked physio before keep it", async () => {
+    expect(await setRole("coach", "physio", NOW)).toBe("physio");
+    await setAlerts("coach", false, NOW);
+    expect((await overview("coach", NOW)).role).toBe("physio");
+    expect((await overview("coach", NOW)).alerts).toBe(false);
+    expect((await overview("client", NOW)).coaches[0]).toMatchObject({ id: "coach", role: "physio" });
+    // Picking another role leaves physio behind.
+    await setRole("coach", "coach", NOW);
+    expect(await roleOf("coach")).toBe("coach");
+    // A row from the old "I coach as" picker: physio there wins over a role.
+    await run("UPDATE coach_prefs SET kind = 'physio', role = 'trainer' WHERE account_id = ?", ["coach"]);
+    expect(await roleOf("coach")).toBe("physio");
+    await run("UPDATE coach_prefs SET kind = 'trainer', role = NULL WHERE account_id = ?", ["coach"]);
+    expect(await roleOf("coach")).toBeNull();
+  });
+
+  it("a routine can say how many times a week, and only 1 to 7", async () => {
+    const a = await assignPlan("coach", "client", "Knee", "r1~S25lZQ~wall-sit.3~rehab", NOW, "p1", 3);
+    expect(a).toMatchObject({ perWeek: 3, code: "r1~S25lZQ~wall-sit.3~rehab" });
+    const b = await assignPlan("coach", "client", "Other", "r1~S25lZQ~wall-sit.3", NOW, "p2", 9);
+    expect(b).not.toHaveProperty("perWeek");
+    const plans = (await clientView("coach", "client", NOW))!.plans;
+    expect(plans.find((p) => p.id === "p1")?.perWeek).toBe(3);
+    expect(plans.find((p) => p.id === "p2")).not.toHaveProperty("perWeek");
+  });
+
+  it("high pain pushes the coach once in a day, only when shared and with alerts on", async () => {
+    const sent: PushMessage[] = [];
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    await saveToken("coach", "tok-coach-0123456789abcdef", "android", "en", NOW);
+    const high = [{ type: "pain", at: NOW - 60_000, score: 7 }];
+    await alertPain("client", high, NOW);
+    expect(sent).toEqual([]);
+    await setShare("client", "coach", true, NOW, "pain");
+    await alertPain("client", [{ type: "pain", at: NOW - 60_000, score: 3 }], NOW);
+    await alertPain("client", [{ type: "pain", at: NOW - DAY, score: 9 }], NOW);
+    expect(sent).toEqual([]);
+    await alertPain("client", high, NOW);
+    await alertPain("client", high, NOW + 3_600_000);
+    expect(sent.map((m) => [m.kind, m.body, m.route])).toEqual([
+      ["coachPain", "Alex rated their pain 7/10. Worth checking in.", "#/trainer/c.client"],
+    ]);
+    await setAlerts("coach", false, NOW);
+    await alertPain("client", high, NOW + DAY);
+    expect(sent).toHaveLength(1);
+  });
+});
+
+describe("nutrition targets from the coach", () => {
+  beforeEach(async () => {
+    await push(
+      "client",
+      [
+        { id: "k1", at: NOW - 2 * DAY, type: "health", metric: "kcalIn", day: "2027-01-13", value: 2100 },
+        { id: "k2", at: NOW - DAY, type: "health", metric: "kcalIn", day: "2027-01-13", value: 2300 },
+        { id: "p1", at: NOW - DAY, type: "health", metric: "protein", day: "2027-01-13", value: 120 },
+        { id: "s1", at: NOW - DAY, type: "health", metric: "sleep", day: "2027-01-13", value: 400 },
+        { id: "old", at: NOW - 60 * DAY, type: "health", metric: "kcalIn", day: "2026-11-15", value: 2000 },
+      ],
+      { name: "Alex" },
+    );
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  });
+
+  it("only go to the coach's own clients, keep numbers in range, and both empty clears them", async () => {
+    expect(await setTargets("stranger", "client", 2400, 160, NOW)).toEqual({ error: "notClient" });
+    expect(await setTargets("coach", "client", 2400.4, 9999, NOW)).toEqual({
+      coachId: "coach",
+      clientId: "client",
+      kcal: 2400,
+      protein: null,
+      at: NOW,
+    });
+    expect(await setTargets("coach", "client", 2500, 150, NOW + 1)).toMatchObject({ kcal: 2500, protein: 150 });
+    expect((await overview("client", NOW)).targets).toEqual([
+      { coachId: "coach", clientId: "client", kcal: 2500, protein: 150, at: NOW + 1 },
+    ]);
+    expect((await clientView("coach", "client", NOW))?.targets).toMatchObject({ kcal: 2500, protein: 150 });
+    expect(await setTargets("coach", "client", null, "x", NOW)).toBeNull();
+    expect((await overview("client", NOW)).targets).toEqual([]);
+  });
+
+  it("the client's food days reach the coach only with body sharing on, newest number per day, last 30 days", async () => {
+    expect((await clientView("coach", "client", NOW))?.body).toBeNull();
+    await setShare("client", "coach", true, NOW);
+    expect((await clientView("coach", "client", NOW))?.body?.food).toEqual([{ day: "2027-01-13", kcal: 2300, protein: 120 }]);
+  });
+
+  it("go when the pair unlinks or an account is deleted", async () => {
+    await setTargets("coach", "client", 2400, 160, NOW);
+    await unlink("client", "coach");
+    expect(await query("SELECT * FROM coach_targets")).toEqual([]);
+    expect(coachCleanup("x").some((q) => q.sql.includes("coach_targets"))).toBe(true);
+  });
+});
+
+describe("personal trainer or coach", () => {
+  it("a coach picks a role, their clients see it, and alerts stay as they were", async () => {
+    await makeInvite("coach", NOW, "EEEEFFFF");
+    expect(((await previewInvite("client", "EEEEFFFF", NOW)) as { coach: { role?: string } }).coach.role).toBeUndefined();
+    await setAlerts("coach", false, NOW);
+    expect(await setRole("coach", "trainer", NOW)).toBe("trainer");
+    expect(await setRole("coach", "wizard", NOW)).toBeNull();
+    await setRole("coach", "coach", NOW);
+    expect(((await previewInvite("client", "EEEEFFFF", NOW)) as { coach: { role?: string } }).coach.role).toBe("coach");
+    await joinCoach("client", "EEEEFFFF", NOW);
+    expect((await overview("client", NOW)).coaches[0]).toMatchObject({ id: "coach", role: "coach" });
+    expect((await overview("coach", NOW)).role).toBe("coach");
     expect((await overview("coach", NOW)).alerts).toBe(false);
   });
 });

@@ -33,6 +33,13 @@ export const en = {
   "hx.saved": "Saved",
   "hx.again": "Do this again",
   "hx.againNone": "Nothing from this workout can be done at this gym.",
+  "hx.part.warm": "Warm-up",
+  "hx.part.lift": "Lifting",
+  "hx.part.cool": "Cool-down",
+  "hx.partTime": "{part}: {time}",
+  "hx.stretchTitle": "Stretches",
+  "hx.stretchCount": { one: "{count} stretch", other: "{count} stretches" },
+  "hx.stretchDay": "Stretched",
 } as const;
 
 type Key = keyof typeof en;
@@ -67,6 +74,13 @@ export const es: Partial<Record<Key, Message>> = {
   "hx.saved": "Guardado",
   "hx.again": "Repetir este entrenamiento",
   "hx.againNone": "Nada de este entrenamiento se puede hacer en este gimnasio.",
+  "hx.part.warm": "Calentamiento",
+  "hx.part.lift": "Pesas",
+  "hx.part.cool": "Vuelta a la calma",
+  "hx.partTime": "{part}: {time}",
+  "hx.stretchTitle": "Estiramientos",
+  "hx.stretchCount": { one: "{count} estiramiento", other: "{count} estiramientos" },
+  "hx.stretchDay": "Estiramientos",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -99,6 +113,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "hx.saved": "Enregistré",
   "hx.again": "Refaire cette séance",
   "hx.againNone": "Rien de cette séance n'est faisable dans cette salle.",
+  "hx.part.warm": "Échauffement",
+  "hx.part.lift": "Musculation",
+  "hx.part.cool": "Retour au calme",
+  "hx.partTime": "{part} : {time}",
+  "hx.stretchTitle": "Étirements",
+  "hx.stretchCount": { one: "{count} étirement", other: "{count} étirements" },
+  "hx.stretchDay": "Étirements",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -132,6 +153,13 @@ export const de: Partial<Record<Key, Message>> = {
   "hx.saved": "Gespeichert",
   "hx.again": "Das noch mal machen",
   "hx.againNone": "Nichts aus diesem Training geht in diesem Studio.",
+  "hx.part.warm": "Aufwärmen",
+  "hx.part.lift": "Krafttraining",
+  "hx.part.cool": "Cool-down",
+  "hx.partTime": "{part}: {time}",
+  "hx.stretchTitle": "Dehnen",
+  "hx.stretchCount": { one: "{count} Dehnübung", other: "{count} Dehnübungen" },
+  "hx.stretchDay": "Gedehnt",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -164,6 +192,13 @@ export const it: Partial<Record<Key, Message>> = {
   "hx.saved": "Salvato",
   "hx.again": "Rifai questo allenamento",
   "hx.againNone": "Niente di questo allenamento si può fare in questa palestra.",
+  "hx.part.warm": "Riscaldamento",
+  "hx.part.lift": "Pesi",
+  "hx.part.cool": "Defaticamento",
+  "hx.partTime": "{part}: {time}",
+  "hx.stretchTitle": "Stretching",
+  "hx.stretchCount": { one: "{count} allungamento", other: "{count} allungamenti" },
+  "hx.stretchDay": "Stretching",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -196,4 +231,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "hx.saved": "保存しました",
   "hx.again": "もう一度やる",
   "hx.againNone": "このジムではこのワークアウトの種目ができません。",
+  "hx.part.warm": "ウォームアップ",
+  "hx.part.lift": "筋トレ",
+  "hx.part.cool": "クールダウン",
+  "hx.partTime": "{part}：{time}",
+  "hx.stretchTitle": "ストレッチ",
+  "hx.stretchCount": { other: "ストレッチ{count}種目" },
+  "hx.stretchDay": "ストレッチ",
 };

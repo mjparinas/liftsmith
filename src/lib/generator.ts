@@ -66,6 +66,8 @@ export interface Plan {
   program?: { id: string; day: number; dayName: string; note: string; fixed: boolean };
   /** Set when the plan is a saved routine instead of the adaptive plan (routines.ts). */
   routineId?: string;
+  /** A rehab routine from the lifter's physio: injuries don't change it, and pain is asked after each exercise's sets. */
+  rehab?: boolean;
 }
 
 export interface GenerateInput {

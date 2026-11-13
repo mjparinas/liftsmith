@@ -3,7 +3,7 @@
 import { linkInstall } from "@/server/access";
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { accountAccess } from "@/server/accounts";
-import { alertTrained } from "@/server/coach";
+import { alertPain, alertTrained } from "@/server/coach";
 import { rateLimit } from "@/server/db";
 import { settleReferral } from "@/server/earnedPro";
 import { checkSync, MAX_BODY, sync, SyncFull } from "@/server/sync";
@@ -31,6 +31,9 @@ export async function POST(req: Request) {
       // A client's coaches hear about a workout just finished (trainer-mode.md).
       await alertTrained(s.accountId, c.body.events as { type?: unknown; at?: unknown }[]).catch(() => undefined);
     }
+    // A high pain rating reaches the coaches the client shares pain with (physio support, trainer-mode.md).
+    if (c.body.events.some((e) => (e as { type?: unknown }).type === "pain"))
+      await alertPain(s.accountId, c.body.events as { type?: unknown; at?: unknown; score?: unknown }[]).catch(() => undefined);
     const a = await accountAccess(s.accountId);
     return reply(req, 200, { ...out, pro: a.pro, proVia: a.proVia, sub: a.sub });
   } catch (e) {

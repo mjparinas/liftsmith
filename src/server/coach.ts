@@ -5,14 +5,17 @@
 // else in the event log ever leaves (health readings, body weight, measurements, cycle, pain, photos).
 // Either side can unlink at any time, which cuts access at once. Out of Labs (2026-11-12): a coach can also say what
 // their new clients start setup with (goal, experience, days a week), and leave each client one note.
+// Physio support (2026-11-13): a coach can work as a physio or rehab clinician, a client can share pain ratings and
+// injuries with one coach, and a routine can say how many times a week it's meant to be done (adherence).
 // Decision record: docs/decisions/trainer-mode.md.
 import { randomBytes } from "node:crypto";
 
+import { hasRoom } from "./coachPlan";
 import { batch, query, rateLimit, run } from "./db";
 import { notifyCoach } from "./push";
 
 export const COACH_LIMITS = {
-  /** Clients per coach, until there's a coach plan (docs/decisions/trainer-mode.md). */
+  /** Clients per coach while coach plans are off; with them on, the coach's plan decides (coachPlan.ts). */
   clients: 30,
   /** Coaches per client. */
   coaches: 3,
@@ -34,6 +37,11 @@ export const COACH_LIMITS = {
   page: 100,
   /** A client with no workout this long is "quiet", and their coach is told once. */
   quietMs: 7 * 86_400_000,
+  /** How far back a coach sees a sharing client's food days. */
+  foodMs: 30 * 86_400_000,
+  /** The range a coach can set for daily calories and grams of protein. */
+  kcal: [800, 6000] as const,
+  protein: [30, 400] as const,
 };
 
 /** No 0/O or 1/I, so a code read aloud or off a screen is typed right: 32 letters, 8 of them (40 bits). */
@@ -53,6 +61,8 @@ export interface Person {
   id: string;
   name: string;
   since: number;
+  /** A coach's role, in a client's list of coaches (absent until they pick). */
+  role?: Role;
 }
 export interface Invite {
   code: string;
@@ -60,7 +70,7 @@ export interface Invite {
 }
 
 /** The name on someone's synced profile, or "" (the app then says "No name yet"). */
-async function nameOf(accountId: string): Promise<string> {
+export async function nameOf(accountId: string): Promise<string> {
   const [r] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [accountId]);
   try {
     const name = (JSON.parse(String(r?.body ?? "{}")) as { name?: unknown }).name;
@@ -70,8 +80,15 @@ async function nameOf(accountId: string): Promise<string> {
   }
 }
 
-async function people(rows: { id: string; since: number }[]): Promise<Person[]> {
-  return Promise.all(rows.map(async (r) => ({ id: String(r.id), since: Number(r.since), name: await nameOf(String(r.id)) })));
+async function people(rows: { id: string; since: number }[], roles = false): Promise<Person[]> {
+  return Promise.all(
+    rows.map(async (r) => {
+      const p: Person = { id: String(r.id), since: Number(r.since), name: await nameOf(String(r.id)) };
+      // A lifter's coaches say whether they're a personal trainer or a coach, for the words around them.
+      const role = roles ? await roleOf(p.id) : null;
+      return role ? { ...p, role } : p;
+    }),
+  );
 }
 
 /** A routine a coach assigned to a client. `code` is a routine share code (src/lib/routineShare.ts). */
@@ -82,16 +99,34 @@ export interface Plan {
   name: string;
   code: string;
   at: number;
+  /** How many times a week the coach wants it done (1 to 7), for adherence. Unset when they didn't say. */
+  perWeek?: number;
 }
-type PlanRow = { id: string; coach_id: string; client_id: string; name: string; code: string; created_at: number };
-const plan = (r: PlanRow): Plan => ({
-  id: String(r.id),
-  coachId: String(r.coach_id),
-  clientId: String(r.client_id),
-  name: String(r.name),
-  code: String(r.code),
-  at: Number(r.created_at),
-});
+type PlanRow = {
+  id: string;
+  coach_id: string;
+  client_id: string;
+  name: string;
+  code: string;
+  created_at: number;
+  per_week?: number | null;
+};
+const plan = (r: PlanRow): Plan => {
+  const p: Plan = {
+    id: String(r.id),
+    coachId: String(r.coach_id),
+    clientId: String(r.client_id),
+    name: String(r.name),
+    code: String(r.code),
+    at: Number(r.created_at),
+  };
+  const w = cleanPerWeek(r.per_week === null || r.per_week === undefined ? undefined : Number(r.per_week));
+  if (w) p.perWeek = w;
+  return p;
+};
+/** Times a week, 1 to 7, or undefined for anything else. */
+export const cleanPerWeek = (x: unknown): number | undefined =>
+  typeof x === "number" && Number.isInteger(x) && x >= 1 && x <= 7 ? x : undefined;
 
 /** What a coach's new clients start setup with, so an invited client skips those questions. Any part may be unset. */
 export interface Setup {
@@ -197,6 +232,13 @@ export async function overview(
   sharesBody: string[];
   /** Whether this coach gets alerts about their clients. */
   alerts: boolean;
+  /** The coaches this client shares pain and injuries with, and the clients who share theirs with this coach. */
+  painShared: string[];
+  sharesPain: string[];
+  /** Daily nutrition targets this lifter's coaches set them, newest first. */
+  targets: Targets[];
+  /** How this account works with clients, once they've said. */
+  role: Role | null;
 }> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
@@ -217,7 +259,7 @@ export async function overview(
   return {
     invite: inv ? { code: String(inv.code), expiresAt: Number(inv.expires_at) } : null,
     clients: await people(clients),
-    coaches: await people(coaches),
+    coaches: await people(coaches, true),
     plans: plans.map(plan),
     notes: notes.map(note),
     setup: await setupOf(accountId),
@@ -229,6 +271,14 @@ export async function overview(
       (r) => String(r.id),
     ),
     alerts: await alertsOn(accountId),
+    painShared: (await query<{ id: string }>("SELECT coach_id AS id FROM coach_shares WHERE client_id = ? AND pain = 1", [accountId])).map(
+      (r) => String(r.id),
+    ),
+    sharesPain: (await query<{ id: string }>("SELECT client_id AS id FROM coach_shares WHERE coach_id = ? AND pain = 1", [accountId])).map(
+      (r) => String(r.id),
+    ),
+    targets: await targetsFor(accountId),
+    role: await roleOf(accountId),
   };
 }
 
@@ -272,7 +322,8 @@ export async function previewInvite(
   if (!inv) return { error: "unknown" };
   const coachId = String(inv.coach_id);
   if (coachId === accountId) return { error: "self" };
-  return { coach: { id: coachId, name: await nameOf(coachId), since: now }, setup: await setupOf(coachId) };
+  const [coach] = await people([{ id: coachId, since: now }], true);
+  return { coach: coach!, setup: await setupOf(coachId) };
 }
 
 /** The client agrees: links them to the code's coach. Joining twice is fine. */
@@ -291,8 +342,13 @@ export async function joinCoach(
   if (Number(had?.n ?? 0) > 0) return seen;
   const [mine] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE client_id = ?", [clientId]);
   if (Number(mine?.n ?? 0) >= COACH_LIMITS.coaches) return { error: "full" };
-  const [theirs] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ?", [coachId]);
-  if (Number(theirs?.n ?? 0) >= COACH_LIMITS.clients) return { error: "coachFull" };
+  if (!(await hasRoom(coachId, now))) {
+    // Tell the coach once a day, so they can make room or move to a coach plan (docs/decisions/money.md "Coach plans").
+    if (await rateLimit(`coachFull:${coachId}`, 1, 86_400_000).catch(() => false)) {
+      await notifyCoach(coachId, "coachFull", { name: await nameOf(clientId) }, "#/trainer");
+    }
+    return { error: "coachFull" };
+  }
   await run("INSERT OR IGNORE INTO coach_links (coach_id, client_id, created_at) VALUES (?, ?, ?)", [coachId, clientId, now]);
   return { ...seen, coach: { ...seen.coach, since: now } };
 }
@@ -308,6 +364,15 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
     { sql: "DELETE FROM coach_shares WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_alerts WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_reads WHERE (account_id = ? AND other_id = ?) OR (account_id = ? AND other_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_targets WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    // Check-ins (coachForms.ts): the pair's sent and answered ones, and the weekly one.
+    { sql: "DELETE FROM coach_checkins WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_checkin_repeats WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    // Sessions booked between them open again for the coach's other clients.
+    {
+      sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)",
+      args: pair,
+    },
   ]);
 }
 
@@ -324,6 +389,7 @@ export async function assignPlan(
   code: unknown,
   now = Date.now(),
   id = randomBytes(9).toString("base64url"),
+  perWeek?: unknown,
 ): Promise<Plan | { error: PlanError }> {
   if (!isAccountId(clientId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
   const title =
@@ -336,15 +402,17 @@ export async function assignPlan(
   if (!title || !isRoutineCode(code)) return { error: "bad" };
   const [c] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_plans WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
   if (Number(c?.n ?? 0) >= COACH_LIMITS.plans) return { error: "full" };
-  await run("INSERT INTO coach_plans (id, coach_id, client_id, name, code, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+  const w = cleanPerWeek(perWeek);
+  await run("INSERT INTO coach_plans (id, coach_id, client_id, name, code, created_at, per_week) VALUES (?, ?, ?, ?, ?, ?, ?)", [
     id,
     coachId,
     clientId,
     title,
     code,
     now,
+    w ?? null,
   ]);
-  return { id, coachId, clientId, name: title, code, at: now };
+  return w ? { id, coachId, clientId, name: title, code, at: now, perWeek: w } : { id, coachId, clientId, name: title, code, at: now };
 }
 
 /** The coach takes a routine back. */
@@ -384,14 +452,27 @@ const KEEP: Record<string, readonly string[]> = {
   effort: ["setId", "rir"],
   swap: ["sessionId", "from", "to"],
   customExercise: ["exercise"],
+  // Warm-ups, cool-downs and stretch homework (workouts with parts): which stretches and how long, nothing else.
+  stretch: ["moment", "ids", "seconds", "sessionId"],
 };
 export const COACH_TYPES = Object.keys(KEEP);
 
+// Pain and injuries, only for a coach the client shares them with (physio support, 2026-11-13): which body part,
+// when it was logged and healed, graded returns, and each 0 to 10 pain rating with the exercise it was rated on.
+// Never the lifter's per-exercise skip or lighter choices, and nothing else from the health side.
+const PAIN_KEEP: Record<string, readonly string[]> = {
+  injury: ["injuryId", "part"],
+  injuryHealed: ["injuryId"],
+  injuryReturn: ["injuryId"],
+  pain: ["injuryId", "score", "sessionId", "exerciseId"],
+};
+export const PAIN_TYPES = Object.keys(PAIN_KEEP);
+
 /** The coach's copy of one event: only training fields, or null for anything a coach doesn't see. */
-export function forCoach(e: unknown): Record<string, unknown> | null {
+export function forCoach(e: unknown, pain = false): Record<string, unknown> | null {
   if (!e || typeof e !== "object") return null;
   const ev = e as Record<string, unknown>;
-  const keep = typeof ev.type === "string" ? KEEP[ev.type] : undefined;
+  const keep = typeof ev.type === "string" ? (KEEP[ev.type] ?? (pain ? PAIN_KEEP[ev.type] : undefined)) : undefined;
   if (!keep || typeof ev.id !== "string" || typeof ev.at !== "number") return null;
   // A set done lighter for an injury says there's an injury; the coach sees the set, not why.
   const out: Record<string, unknown> = { id: ev.id, at: ev.at, type: ev.type };
@@ -409,6 +490,10 @@ export interface ClientView {
   note: Note | null;
   /** The client's body data, only when they share it with this coach. */
   body: BodyShare | null;
+  /** Whether the client shares pain and injuries with this coach (the events above then include them). */
+  pain: boolean;
+  /** This coach's daily nutrition targets for the client, if any. */
+  targets: Targets | null;
 }
 
 /** What a client shares when they turn on body data for a coach: enough to shape the 3D figure and see the trend. */
@@ -419,11 +504,14 @@ export interface BodyShare {
   weights: { at: number; kg: number; bodyFat?: number }[];
   /** Tape measurements in the last year, oldest first. */
   measures: { at: number; site: string; cm: number }[];
+  /** Calories and protein from the client's food app (through Health) for each of the last 30 days, oldest first. */
+  food?: { day: string; kcal?: number; protein?: number }[];
 }
 
 /** A client's training for their coach, or null when they aren't this coach's client (any more). */
 export async function clientView(coachId: string, clientId: string, now = Date.now()): Promise<ClientView | null> {
   if (!(await isClient(coachId, clientId))) return null;
+  const pain = await sharesPain(coachId, clientId);
   const rows = await query<{ body: string }>(
     `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND (at >= ? OR body LIKE '%"type":"customExercise"%')
      ORDER BY at DESC LIMIT ?`,
@@ -437,7 +525,7 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     } catch {
       continue;
     }
-    const kept = forCoach(e);
+    const kept = forCoach(e, pain);
     if (kept) events.push(kept);
   }
   const [p] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [clientId]);
@@ -460,6 +548,8 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     plans: plans.map(plan),
     note: n ? note(n) : null,
     body: (await sharesBody(coachId, clientId)) ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
+    pain,
+    targets: (await targetsFor(clientId, coachId))[0] ?? null,
   };
 }
 
@@ -470,17 +560,25 @@ export async function sharesBody(coachId: string, clientId: string): Promise<boo
   return Number(r?.body ?? 0) === 1;
 }
 
-/** The client turns body data on or off for one of their coaches. */
+export async function sharesPain(coachId: string, clientId: string): Promise<boolean> {
+  const [r] = await query<{ pain: number }>("SELECT pain FROM coach_shares WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
+  return Number(r?.pain ?? 0) === 1;
+}
+
+/** The client turns body data (or, with `what` "pain", pain and injuries) on or off for one of their coaches. */
 export async function setShare(
   clientId: string,
   coachId: unknown,
   on: unknown,
   now = Date.now(),
+  what: unknown = "body",
 ): Promise<boolean | { error: "notClient" }> {
   if (!isAccountId(coachId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
+  // One fixed column name per kind of share, never taken from the request.
+  const col = what === "pain" ? "pain" : "body";
   await run(
-    `INSERT INTO coach_shares (coach_id, client_id, body, updated_at) VALUES (?, ?, ?, ?)
-     ON CONFLICT (coach_id, client_id) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at`,
+    `INSERT INTO coach_shares (coach_id, client_id, ${col}, updated_at) VALUES (?, ?, ?, ?)
+     ON CONFLICT (coach_id, client_id) DO UPDATE SET ${col} = excluded.${col}, updated_at = excluded.updated_at`,
     [coachId, clientId, on === true ? 1 : 0, now],
   );
   return on === true;
@@ -497,11 +595,13 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
   }
   const rows = await query<{ body: string }>(
     `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND at >= ?
-       AND (body LIKE '%"type":"bodyweight"%' OR body LIKE '%"type":"measure"%') ORDER BY at`,
-    [clientId, now - COACH_LIMITS.historyMs],
+       AND (body LIKE '%"type":"bodyweight"%' OR body LIKE '%"type":"measure"%'
+         OR (at >= ? AND (body LIKE '%"metric":"kcalIn"%' OR body LIKE '%"metric":"protein"%'))) ORDER BY at`,
+    [clientId, now - COACH_LIMITS.historyMs, now - COACH_LIMITS.foodMs],
   );
   const weights: BodyShare["weights"] = [];
   const measures: BodyShare["measures"] = [];
+  const food = new Map<string, { day: string; kcal?: number; protein?: number }>();
   for (const r of rows) {
     let e: Record<string, unknown>;
     try {
@@ -518,6 +618,17 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
     } else if (e.type === "measure" && typeof e.site === "string" && /^[a-z]{2,12}$/.test(e.site)) {
       const cm = num(e.cm, 5, 300);
       if (cm !== null) measures.push({ at, site: e.site, cm });
+    } else if (e.type === "health" && typeof e.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(e.day)) {
+      // Rows come oldest first, so a day read again later keeps its newest number.
+      const d = food.get(e.day) ?? { day: e.day };
+      if (e.metric === "kcalIn") {
+        const v = num(e.value, 0, 15_000);
+        if (v !== null) d.kcal = Math.round(v);
+      } else if (e.metric === "protein") {
+        const v = num(e.value, 0, 1_000);
+        if (v !== null) d.protein = Math.round(v);
+      }
+      food.set(e.day, d);
     }
   }
   return {
@@ -525,7 +636,66 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
     heightCm: num(prof.heightCm, 100, 250),
     weights,
     measures,
+    food: [...food.values()].sort((a, b) => (a.day < b.day ? -1 : 1)),
   };
+}
+
+// ---------- Nutrition targets from the coach (2026-11-13) ----------
+
+export interface Targets {
+  coachId: string;
+  clientId: string;
+  /** Calories a day. */
+  kcal: number | null;
+  /** Grams of protein a day. */
+  protein: number | null;
+  at: number;
+}
+type TargetRow = { coach_id: string; client_id: string; kcal: number | null; protein: number | null; updated_at: number };
+const targets = (r: TargetRow): Targets => ({
+  coachId: String(r.coach_id),
+  clientId: String(r.client_id),
+  kcal: r.kcal == null ? null : Number(r.kcal),
+  protein: r.protein == null ? null : Number(r.protein),
+  at: Number(r.updated_at),
+});
+
+/** A whole number in range, or null for anything else (empty, junk or out of range). */
+const target = (x: unknown, [lo, hi]: readonly [number, number]) =>
+  typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi ? Math.round(x) : null;
+
+/**
+ * The coach sets (or, with both empty, clears) a client's daily calories and protein. Only for the coach's own
+ * clients; a number outside the range is left empty rather than refused.
+ */
+export async function setTargets(
+  coachId: string,
+  clientId: unknown,
+  kcal: unknown,
+  protein: unknown,
+  now = Date.now(),
+): Promise<Targets | null | { error: "notClient" }> {
+  if (!isAccountId(clientId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
+  const k = target(kcal, COACH_LIMITS.kcal);
+  const p = target(protein, COACH_LIMITS.protein);
+  if (k === null && p === null) {
+    await run("DELETE FROM coach_targets WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
+    return null;
+  }
+  await run(
+    `INSERT INTO coach_targets (coach_id, client_id, kcal, protein, updated_at) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT (coach_id, client_id) DO UPDATE SET kcal = excluded.kcal, protein = excluded.protein, updated_at = excluded.updated_at`,
+    [coachId, clientId, k, p, now],
+  );
+  return { coachId, clientId, kcal: k, protein: p, at: now };
+}
+
+/** A client's targets from their coaches, newest first (or from one coach). */
+export async function targetsFor(clientId: string, coachId?: string): Promise<Targets[]> {
+  const rows = coachId
+    ? await query<TargetRow>("SELECT * FROM coach_targets WHERE client_id = ? AND coach_id = ?", [clientId, coachId])
+    : await query<TargetRow>("SELECT * FROM coach_targets WHERE client_id = ? ORDER BY updated_at DESC", [clientId]);
+  return rows.map(targets);
 }
 
 // ---------- Chat between a coach and a client (2026-11-12) ----------
@@ -638,6 +808,37 @@ export async function setAlerts(coachId: string, on: unknown, now = Date.now()):
   return on !== false;
 }
 
+// ---------- Personal trainer, coach or physio (Melvin, 2026-11-13) ----------
+
+/**
+ * How someone works with clients. A personal trainer works one-on-one, mostly in person: sessions, booking and a price
+ * per session come first. A coach runs groups or teams, often remotely: check-ins, programs and a monthly fee come first.
+ * A physio or rehab clinician sees pain and injuries first and assigns rehab programs. It changes words and what's shown
+ * first, never which tools there are (docs/decisions/trainer-mode.md).
+ */
+export type Role = "trainer" | "coach" | "physio";
+export const ROLES: Role[] = ["trainer", "coach", "physio"];
+
+/**
+ * One choice since 2026-11-13. Physio used to be a separate `kind` column beside `role`; a coach who picked Physio
+ * there stays a physio (kind wins over role), so nobody's setting changes. Every save writes both columns.
+ */
+export async function roleOf(id: string): Promise<Role | null> {
+  const [r] = await query<{ role: string | null; kind: string | null }>("SELECT role, kind FROM coach_prefs WHERE account_id = ?", [id]);
+  if (r?.kind === "physio") return "physio";
+  return ROLES.find((x) => x === r?.role) ?? null;
+}
+
+export async function setRole(coachId: string, role: unknown, now = Date.now()): Promise<Role | null> {
+  const r = ROLES.find((x) => x === role) ?? null;
+  await run(
+    `INSERT INTO coach_prefs (account_id, alerts, role, kind, updated_at) VALUES (?, 1, ?, ?, ?)
+     ON CONFLICT (account_id) DO UPDATE SET role = excluded.role, kind = excluded.kind, updated_at = excluded.updated_at`,
+    [coachId, r, r === "physio" ? "physio" : "trainer", now],
+  );
+  return r;
+}
+
 /**
  * A client's phone synced a finished workout: tell each of their coaches who has alerts on. Called from sync with the
  * events it just stored; a workout logged long ago (an import, a backup) says nothing.
@@ -669,6 +870,45 @@ export async function alertTrained(clientId: string, events: readonly { type?: u
       { sql: "DELETE FROM coach_alerts WHERE coach_id = ? AND client_id = ? AND kind = 'quiet'", args: [id, clientId] },
     ]);
     if (await alertsOn(id)) await notifyCoach(id, "coachTrained", { name }, `#/trainer/c.${clientId}`);
+  }
+}
+
+/** Pain at or above this, synced from a client who shares pain with their coach, is pushed to the coach. */
+export const PAIN_ALERT = 5;
+
+/**
+ * A client's phone synced a pain rating of 5 or more, rated in the last 6 hours: tell each coach the client shares
+ * pain with and who has alerts on, at most once in 20 hours, so a workout of high ratings is one push.
+ */
+export async function alertPain(clientId: string, events: readonly { type?: unknown; at?: unknown; score?: unknown }[], now = Date.now()) {
+  const high = events.filter(
+    (e) =>
+      e.type === "pain" &&
+      typeof e.at === "number" &&
+      typeof e.score === "number" &&
+      e.score >= PAIN_ALERT &&
+      e.at > now - 6 * 3_600_000 &&
+      e.at <= now + 60_000,
+  );
+  if (!high.length) return;
+  const score = Math.min(10, Math.round(Math.max(...high.map((e) => e.score as number))));
+  const coaches = await query<{ id: string }>("SELECT coach_id AS id FROM coach_shares WHERE client_id = ? AND pain = 1", [clientId]);
+  if (!coaches.length) return;
+  const name = await nameOf(clientId);
+  for (const c of coaches) {
+    const id = String(c.id);
+    if (!(await isClient(id, clientId))) continue;
+    const [told] = await query<{ at: number }>("SELECT at FROM coach_alerts WHERE coach_id = ? AND client_id = ? AND kind = 'pain'", [
+      id,
+      clientId,
+    ]);
+    if (told && now - Number(told.at) < 20 * 3_600_000) continue;
+    await run(
+      `INSERT INTO coach_alerts (coach_id, client_id, kind, at) VALUES (?, ?, 'pain', ?)
+       ON CONFLICT (coach_id, client_id, kind) DO UPDATE SET at = excluded.at`,
+      [id, clientId, now],
+    );
+    if (await alertsOn(id)) await notifyCoach(id, "coachPain", { name, text: String(score) }, `#/trainer/c.${clientId}`);
   }
 }
 
@@ -707,4 +947,10 @@ export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_shares WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_alerts WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_prefs WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_targets WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_forms WHERE coach_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_slots WHERE coach_id = ?", args: [accountId] },
+  { sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE client_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_checkins WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

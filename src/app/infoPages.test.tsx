@@ -98,7 +98,9 @@ describe("info pages", () => {
   it("shows both plans and every row of the comparison table on the pricing page", () => {
     render(<Pricing />);
     expect(screen.getByRole("heading", { name: "Free" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: /^Pro/ })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /^Pro\b.+/ })).toBeTruthy();
+    // The coach plans sit under the Pro card.
+    expect(screen.getByRole("heading", { name: "Coach Plus" })).toBeTruthy();
     for (const g of PLAN_TABLE) for (const r of g.rows) expect(screen.getByRole("rowheader", { name: r.feature })).toBeTruthy();
     expect(document.body.textContent).toContain("$6.99");
     expect(document.body.textContent).toContain("$39.99");

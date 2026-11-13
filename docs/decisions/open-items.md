@@ -15,6 +15,11 @@ After launch, not blocking it:
 
 - **Play Data safety, gym listings** (2026-11-12, [Gym sharing](gym-sharing.md)): in App content › Data safety, add App functionality to Location › Approximate location's purposes, because a listed gym's area (about 1 km) is kept with the account. Do it before the release that carries gym listings reaches production.
 
+- **Coach plans: console steps** (2026-11-13, [Money](money.md) "Coach plans"). The code is in; these turn it on (Android and the web; the iPhone part is under iOS below):
+  1. *Play Console* › Monetize › Subscriptions: create `coach` (base plans `monthly` $19.99 and `annual` $199.99, auto-renewing) and `coach_plus` (`monthly` $39.99, `annual` $399.99). No free-trial offers. Activate them.
+  2. *RevenueCat*: import the four Play products; create entitlements `coach` (attach all four) and `coach_plus` (attach the two `coach_plus` ones), and attach all four to `pro` too; create an offering `coach` (not current) with custom packages `coach_monthly`, `coach_annual`, `coach_plus_monthly` and `coach_plus_annual`.
+  3. *Stripe* (live, then the sandbox): products "Liftsmith Coach" and "Liftsmith Coach Plus", tax code `txcd_10103000`, each a monthly and an annual USD price (lookup keys `coach_monthly`, `coach_annual`, `coach_plus_monthly`, `coach_plus_annual`); add both products to the customer portal's plan switching. Put the price ids in Vercel as `STRIPE_PRICE_COACH_MONTHLY`, `STRIPE_PRICE_COACH_ANNUAL`, `STRIPE_PRICE_COACH_PLUS_MONTHLY` and `STRIPE_PRICE_COACH_PLUS_ANNUAL` (Production live, Preview sandbox) and redeploy.
+  4. */admin/ › Flags*: turn **Coach plans** on. The 90-day grace for coaches over Pro's limit starts then.
 - Validate camera rep counting on real recorded lifts.
 - Creator program: add each creator in /admin/ › Creators (Android's 30-day offers exist); payouts are sent by hand from the CSV. The iPhone side is under iOS below.
 - Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials (samples never show on the live site).
@@ -25,6 +30,7 @@ After launch, not blocking it:
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
 
+- **Coach plans on iPhone** (2026-11-13, [Money](money.md) "Coach plans"): in App Store Connect, add `coach_monthly` ($19.99), `coach_annual` ($199.99), `coach_plus_monthly` ($39.99) and `coach_plus_annual` ($399.99) to the "Pro" subscription group, ranked Coach Plus, then Coach, then Pro (so moving up is an upgrade Apple prorates), no intro offers and no Family Sharing; import them into RevenueCat's App Store app and attach them to the `pro`, `coach` (and for Coach Plus `coach_plus`) entitlements and the `coach` offering's packages.
 - **Billing on iPhone:** App Store Connect Paid Apps agreement, banking and tax, the "Pro" group (`pro_monthly`, `pro_annual`, 14-day free intro offers, Family Sharing on annual) and sandbox testers; the App Store app in RevenueCat with Apple's server notification URL; a `creator30` offering with its own products for creator codes; then the GitHub secret `REVENUECAT_IOS_KEY`. App Store App Privacy and age rating answers from `docs/PRIVACY_LABELS.md` and [Friends](friends.md).
 
 - **Volume button logs a set on iPhone** (Labs, `VolumeKeysPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check that a press from the buttons and from earbuds logs once, music keeps playing, and no volume pop-up shows.

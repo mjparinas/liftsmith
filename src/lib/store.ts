@@ -10,6 +10,7 @@ import { defaultProfile } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { registerCustom } from "./exercises";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
+import { coolDownHome } from "./sessions";
 import { healthSlice, type HealthSlice } from "./store/health";
 import { historySlice, type HistorySlice } from "./store/history";
 import { injuriesSlice, type InjuriesSlice } from "./store/injuries";
@@ -17,6 +18,7 @@ import { planSlice, type PlanSlice } from "./store/plan";
 import { routinesSlice, type RoutinesSlice } from "./store/routines";
 import { ACTIVE_KEY, persistActive, uid, type Ctx } from "./store/shared";
 import { workoutSlice, type Active, type WorkoutSlice } from "./store/workout";
+import { lastWeighInKg } from "./tdee";
 import { minutesForToday } from "./training";
 import type { AppEvent, Gym, Profile, StretchEvent } from "./types";
 
@@ -49,11 +51,25 @@ export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSli
 }
 
 export const useApp = create<State>((set, get) => {
+  // `profile.bodyweight` is a copy of the newest weigh-in, for the plan and the tools that read the profile.
+  // Weigh-ins arrive by several roads (typed in, Health Connect and Apple Health, cloud apps, a CSV, sync from
+  // another device) and the profile syncs separately, last write wins, so another device's older copy could
+  // replace it. This puts it back whenever the events or the profile change. Saved on this device only (each
+  // device works it out from the same merged weigh-ins), so it never fights over sync.
+  const settleBodyweight = () => {
+    const { events, profile } = get();
+    const kg = lastWeighInKg(events);
+    if (kg === undefined || kg === profile.bodyweight) return;
+    const next = { ...profile, bodyweight: kg };
+    set({ profile: next });
+    void saveRecord("profile", next, { remote: true });
+  };
   const commit = (evs: AppEvent[]) => {
     registerCustom(evs);
     const events = [...get().events, ...evs];
     set({ events, stats: derive(events, Date.now()) });
     void appendEvents(evs);
+    if (evs.some((e) => e.type === "bodyweight")) settleBodyweight();
   };
   const gym = () => get().gyms.find((g) => g.id === get().profile.activeGymId) ?? get().gyms[0];
   const c: Ctx = { set, get, commit, gym };
@@ -92,6 +108,7 @@ export const useApp = create<State>((set, get) => {
         }
       } catch {}
       set({ ready: true, events: snap.events, profile, gyms: snap.gyms, stats: derive(snap.events, Date.now()), active });
+      settleBodyweight();
       if (!get().autoEnd()) get().replan();
       void get()
         .importHealthBody()
@@ -117,6 +134,7 @@ export const useApp = create<State>((set, get) => {
       void saveRecord("gyms", gyms);
       if (fresh.length) commit(fresh);
       else set({ stats: derive(get().events, Date.now()) });
+      settleBodyweight();
       get().replan();
       return fresh.length;
     },
@@ -141,6 +159,7 @@ export const useApp = create<State>((set, get) => {
         set({ profile, stats: derive(get().events, Date.now()) });
         void saveRecord("profile", profile, { remote: true });
       }
+      settleBodyweight();
       if (fresh.length || gone.size || gyms || profile) get().replan();
     },
 
@@ -158,7 +177,11 @@ export const useApp = create<State>((set, get) => {
 
     logStretch(moment, ids, seconds) {
       if (!ids.length) return;
-      commit([{ type: "stretch", id: uid(), at: Date.now(), moment, ids, seconds: Math.round(seconds) }]);
+      const now = Date.now();
+      const secs = Math.round(seconds);
+      // A cool-down belongs to the workout it follows (workouts with parts, sessions.ts).
+      const sessionId = moment === "cool" ? coolDownHome(get().stats.sessions, now, secs) : undefined;
+      commit([{ type: "stretch", id: uid(), at: now, moment, ids, seconds: secs, ...(sessionId ? { sessionId } : {}) }]);
       track("feature", { name: "stretch", detail: `${moment}:${ids.length}` });
     },
 

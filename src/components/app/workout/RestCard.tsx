@@ -113,7 +113,7 @@ export function RestCard({
       )}
       {lastSet && !active.tag && !TIMED.has(lastSet.exerciseId) && <ExtraSet lastSet={lastSet} onPick={s.extraSet} />}
       {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
-      {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} />}
+      {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} rehab={!!active.plan.rehab} />}
       <div className="mt-5 w-full border-t border-line/70 pt-4">
         <p className="text-center text-sm text-muted">
           {t("workout.nextUp")}{" "}
@@ -227,12 +227,13 @@ function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rp
 
 /**
  * Between sets, one optional pain check for an exercise trained despite an injury (lighter, marked
- * fine, or in a graded return): once per exercise per workout, never during a set.
+ * fine, or in a graded return): once per exercise per workout, never during a set. In a rehab routine from
+ * the lifter's physio, every exercise asks, for every injury, so the physio sees pain exercise by exercise.
  */
-function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: string }) {
+function PainCheck({ sessionId, exerciseId, rehab }: { sessionId: string; exerciseId: string; rehab: boolean }) {
   const { events, ratePain } = useApp();
   const ex = exercise(exerciseId);
-  const hurt = activeInjuries(events).filter((i) => effectFor(ex, [i]) && effectFor(ex, [i])!.action !== "skip");
+  const hurt = activeInjuries(events).filter((i) => rehab || (effectFor(ex, [i]) && effectFor(ex, [i])!.action !== "skip"));
   const asked = (id: string) =>
     events.some((e) => e.type === "pain" && e.injuryId === id && e.sessionId === sessionId && e.exerciseId === exerciseId);
   const todo = hurt.filter((i) => !asked(i.id));

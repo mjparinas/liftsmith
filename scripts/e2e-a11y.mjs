@@ -447,6 +447,7 @@ try {
     },
     search: { people: [{ handle: "casey", name: "Casey Stone", avatar: "av-leaf" }] },
     personPeople: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
+    likers: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
     training: {
       people: [
         {

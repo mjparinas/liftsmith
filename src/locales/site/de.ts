@@ -301,6 +301,17 @@ export const de: SiteText = {
     termsAfter: ".",
     endTitle: "Dein erstes Workout ist kostenlos",
     endBody: "Starte mit dem kostenlosen Tarif, teste Pro {days} Tage gratis, wenn du so weit bist, und kündige mit zwei Tippern.",
+    coach: {
+      title: "Kunden coachen",
+      intro:
+        "Pro enthält Coaching für ein paar Kunden, du kannst es also mit echten Menschen ausprobieren. Wenn deine Kundenliste wächst, wähle einen Coach-Plan. Jedes Coaching-Werkzeug funktioniert in jedem Plan.",
+      upTo: "Bis zu {n} Kunden",
+      noLimit: "Keine feste Grenze für Kunden",
+      inPro: "In Pro enthalten",
+      orMonthly: "oder {monthly} im Monat",
+      free: "Deine Kunden trainieren immer kostenlos, Schulsport-Coaches mit bestätigter Schuladresse bekommen Pro kostenlos, und {name} behält nichts von dem ein, was Kunden dir zahlen.",
+      cta: "Liftsmith für Coaches",
+    },
   },
   faqs: [
     {
@@ -450,8 +461,8 @@ export const de: SiteText = {
     },
     cost: {
       title: "Was es kostet",
-      body: "Kunden coachen ist Teil von {name} Pro ({annual} im Jahr oder {monthly} im Monat), für bis zu 30 Kunden. Kunde sein ist kostenlos, also kann jeder, den du einlädst, ohne zu zahlen starten.",
-      contactBefore: "Du coachst mehr Leute? ",
+      body: "Bis zu {proClients} Kunden coachen ist Teil von {name} Pro ({annual} im Jahr oder {monthly} im Monat), du kannst es also mit echten Kunden ausprobieren. Coach bietet Platz für {coachClients} Kunden ({coachAnnual} im Jahr oder {coachMonthly} im Monat) und Coach Plus hat keine feste Grenze ({coachPlusAnnual} im Jahr oder {coachPlusMonthly} im Monat). Jedes Coaching-Werkzeug funktioniert in jedem Plan. Kunde sein ist immer kostenlos, und wir behalten nichts von dem ein, was deine Kunden dir zahlen.",
+      contactBefore: "Fragen zu den Coach-Plänen? ",
       contactLink: "Sag uns, was du brauchst.",
     },
     faqTitle: "Fragen von Coaches",
@@ -466,7 +477,11 @@ export const de: SiteText = {
       },
       {
         q: "Kann ich ihre Herzfrequenz oder ihr Körpergewicht sehen?",
-        a: "Nein. Du siehst nur ihr Training. Gesundheitswerte, Körpermaße, Verletzungen und Notizen verlassen ihr Konto nie.",
+        a: "Nur, was sie freigeben. Du siehst ihr Training. Jeder Kunde kann seine Körperdaten oder seine Schmerzen und Verletzungen mit dir teilen; Gesundheitswerte und Notizen verlassen nie sein Konto.",
+      },
+      {
+        q: "Können Physiotherapeuten und Reha-Fachleute es nutzen?",
+        a: "Ja. Wähle unter Coaching „Physiotherapeut“, und jeder Kundenbericht beginnt mit den Schmerzen und Verletzungen, die geteilt werden, Übung für Übung. Weise sanfte Reha-Programme mit Häufigkeit pro Woche zu und sieh, wie oft sie eingehalten werden. Liftsmith zeigt, was Kunden eintragen; es stellt keine Diagnosen und behandelt nichts.",
       },
       {
         q: "Wie fange ich an?",

@@ -273,6 +273,17 @@ export const en: SiteText = {
     termsAfter: ".",
     endTitle: "Your first workout is free",
     endBody: "Start on the free plan, try Pro free for {days} days when you're ready, and cancel in two taps.",
+    coach: {
+      title: "Coaching clients",
+      intro:
+        "Pro includes coaching for a few clients, so you can try it with real people. When your client list grows, pick a coach plan. Every coaching tool works on every plan.",
+      upTo: "Up to {n} clients",
+      noLimit: "No set limit on clients",
+      inPro: "Included in Pro",
+      orMonthly: "or {monthly} a month",
+      free: "Your clients always train free, high school coaches who confirm a school email get Pro free, and {name} takes nothing from what clients pay you.",
+      cta: "Liftsmith for coaches",
+    },
   },
   faqs: FAQS,
   billing: HELP.find((g) => g.id === "billing")!.faqs,
@@ -331,8 +342,8 @@ export const en: SiteText = {
     },
     cost: {
       title: "What it costs",
-      body: "Coaching clients is part of {name} Pro ({annual} a year or {monthly} a month), for up to 30 clients. Being a client is free, so anyone you invite can start without paying.",
-      contactBefore: "Coaching more people than that? ",
+      body: "Coaching up to {proClients} clients is part of {name} Pro ({annual} a year or {monthly} a month), so you can try it with real clients. Coach makes room for {coachClients} clients ({coachAnnual} a year or {coachMonthly} a month) and Coach Plus has no set limit ({coachPlusAnnual} a year or {coachPlusMonthly} a month). Every coaching tool works on every plan. Being a client is always free, and we take nothing from what your clients pay you.",
+      contactBefore: "Questions about coach plans? ",
       contactLink: "Tell us what you need.",
     },
     faqTitle: "Questions from coaches",
@@ -347,7 +358,11 @@ export const en: SiteText = {
       },
       {
         q: "Can I see their heart rate or body weight?",
-        a: "No. You see their training only. Health readings, body measurements, injuries and notes never leave their account.",
+        a: "Only what they choose. You see their training. Each client can turn on sharing their body data, or their pain ratings and injuries, with you; health readings and notes never leave their account.",
+      },
+      {
+        q: "Can physios and rehab clinicians use it?",
+        a: "Yes. Pick Physio under Coaching and each client's report leads with the pain ratings and injuries they share, exercise by exercise. Assign gentle rehab programs with how many times a week, and see how often they keep to them. Liftsmith shows what clients log; it doesn't diagnose or treat anything.",
       },
       {
         q: "How do I start?",

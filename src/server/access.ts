@@ -4,15 +4,19 @@
 // - a web subscription through Stripe (stripe.ts), managed in Stripe's customer portal;
 // - months earned from invites, or coaching 3+ training clients (earnedPro.ts);
 // - a Google Play or App Store subscription (RevenueCat's webhook keeps `entitlements` per install), once a phone that
-//   holds it has synced while signed in to the account (account_installs, written by the sync route).
+//   holds it has synced while signed in to the account (account_installs, written by the sync route);
+// - a high school coach's proven school address, or a place on their team for an athlete aged 13 to 18 (teams.ts).
 // Sync sends the answer on every round, so a web subscription unlocks the phones and a store one unlocks the web app.
+import { isCoachTier } from "@/lib/coachPlans";
+
 import { hasLifetimePro } from "./creators";
 import { query, run } from "./db";
 import { coachEarnsPro, earnedUntil } from "./earnedPro";
 import { accountHasPro } from "./review";
 import { webSub, type WebSub } from "./stripe";
+import { schoolPro } from "./teams";
 
-export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach";
+export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach" | "school" | "team";
 
 export interface AccountSub extends WebSub {
   store: "web" | "play" | "appstore";
@@ -39,8 +43,14 @@ export async function linkInstall(accountId: string, installId: unknown, now = D
 
 /** The newest live store subscription on any install linked to the account. */
 async function storeSub(accountId: string, now: number): Promise<AccountSub | null> {
-  const rows = await query<{ plan: string | null; period: string | null; store: string | null; expires_at: number | null }>(
-    `SELECT e.plan, e.period, e.store, e.expires_at FROM account_installs ai JOIN entitlements e ON e.app_user_id = ai.install_id
+  const rows = await query<{
+    plan: string | null;
+    period: string | null;
+    store: string | null;
+    expires_at: number | null;
+    tier: string | null;
+  }>(
+    `SELECT e.plan, e.period, e.store, e.expires_at, e.tier FROM account_installs ai JOIN entitlements e ON e.app_user_id = ai.install_id
      WHERE ai.account_id = ? AND e.active = 1 AND (e.expires_at IS NULL OR e.expires_at > ?) ORDER BY e.expires_at DESC LIMIT 1`,
     [accountId, now],
   );
@@ -49,6 +59,7 @@ async function storeSub(accountId: string, now: number): Promise<AccountSub | nu
   return {
     store: r.store === "appstore" ? "appstore" : "play",
     plan: r.plan === "annual" || r.plan === "monthly" ? r.plan : null,
+    tier: isCoachTier(r.tier) ? r.tier : "pro",
     trial: r.period === "TRIAL",
     expiresAt: r.expires_at == null ? null : Number(r.expires_at),
     willRenew: true,
@@ -67,6 +78,9 @@ export async function accessFor(accountId: string, email: string | null, now = D
   const until = await earnedUntil(accountId);
   if (until != null && until > now) return { pro: true, via: "referral", sub: null };
   if (await coachEarnsPro(accountId, now)) return { pro: true, via: "coach", sub: null };
+  // School teams (teams.ts): free for verified high school coaches and their athletes aged 13 to 18.
+  const school = await schoolPro(accountId, now);
+  if (school) return { pro: true, via: school, sub: null };
   return { pro: false, via: null, sub: null };
 }
 

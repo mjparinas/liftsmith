@@ -121,6 +121,32 @@ export const FLAGS = {
     description:
       "In the Android and iOS apps, volume up on the phone or Bluetooth earbuds logs the set as planned while the workout is on screen.",
   },
+  /**
+   * Coach plans (src/lib/coachPlans.ts, docs/decisions/money.md "Coach plans"). Off: every coach keeps the old limit of 30
+   * clients and no plan is shown. Turn on once the store products and Stripe prices exist; the grace for coaches who
+   * already have more than Pro's limit starts then.
+   */
+  coachPlans: {
+    default: false,
+    options: [false, true] as const,
+    label: "Coach plans",
+    description:
+      "Pro covers a few clients and Coach and Coach Plus cover more. Turn on once the store products and Stripe prices exist. Coaches over the limit keep 30 for 90 days.",
+  },
+  /** Clients a coach can have with Pro, once coach plans are on. */
+  coachProClients: {
+    default: 3,
+    options: [3, 5, 10] as const,
+    label: "Clients with Pro",
+    description: "How many clients a coach can have on plain Pro before they need a coach plan.",
+  },
+  /** Clients a coach can have with the Coach plan (Coach Plus has no set limit). */
+  coachClients: {
+    default: 25,
+    options: [25, 15, 20, 30, 50] as const,
+    label: "Clients with Coach",
+    description: "How many clients the Coach plan allows. Coach Plus has no set limit.",
+  },
   /** Labs: Sonos speakers controlled from the workout, and music that follows it (src/lib/sonos.ts, docs/decisions/sonos.md). */
   labSonos: {
     default: false,

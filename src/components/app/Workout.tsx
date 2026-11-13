@@ -48,6 +48,8 @@ import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { clock, loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
+import { useMyShape } from "./myShape";
+import { NowPlayingBar } from "./NowPlaying";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { SetHints } from "./SetHints";
@@ -90,6 +92,7 @@ export const HR_NOTIFY_MS = 5_000;
 export function Workout() {
   const s = useApp();
   const { active, gyms, profile, events } = s;
+  const shape = useMyShape();
   const gym = gyms.find((g) => g.id === active?.plan.gymId) ?? gyms[0];
   // While hidden the clock stops (the native notification counts the rest down itself); the web has no
   // native alert, so it asks for one tick when rest ends, for its rest-over notification.
@@ -730,9 +733,11 @@ export function Workout() {
               <LiftDemo
                 exerciseId={ex.id}
                 body={bodyFor(profile.sex)}
+                shape={shape}
                 bpm={bpm}
                 hrTrend={active.hr}
-                paused={infoOpen || swapOpen || endOpen}
+                // Still during rest: the figure only moves while there's a set to do (docs/decisions/speed.md).
+                paused={infoOpen || swapOpen || endOpen || resting}
                 className="h-full"
               />
               {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}
@@ -826,7 +831,7 @@ export function Workout() {
         </>
       ) : null}
 
-      {!finished && sonosOn() && <SonosBar resting={resting} />}
+      {!finished && (sonosOn() ? <SonosBar resting={resting} /> : <NowPlayingBar className="mt-3" />)}
       {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
       <AddExercise />
 
@@ -961,7 +966,7 @@ export function Workout() {
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
-            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} controls />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} shape={shape} bpm={bpm} controls />
             <FavouriteButton exerciseId={ex.id} />
             <SetHints ex={ex} />
             <p className="text-muted">{ex.setup}</p>

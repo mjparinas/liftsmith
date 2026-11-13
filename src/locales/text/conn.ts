@@ -9,7 +9,7 @@ export const en = {
     "Samsung Health: in the Samsung Health app, open Settings › Health Connect and turn on what it shares. Its readings and workouts then come in here.",
   "conn.title": "Connected apps",
   "conn.row": "Connected apps",
-  "conn.rowNote": "Health, heart rate, Garmin, Strava, Oura, WHOOP and music",
+  "conn.rowNote": "Health, heart rate, Garmin, Strava, Oura, WHOOP and more",
   "conn.intro": "Bring your sleep, recovery and weigh-ins in, so Today's plan fits how you are. Send your workouts out.",
   "conn.offline": "You're offline. Try again when you're back online.",
   "conn.notReady": "This isn't switched on yet. It's coming soon.",
@@ -121,14 +121,6 @@ export const en = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Logged with Liftsmith",
-  "conn.music.title": "Music",
-  "conn.music.what":
-    "Today shows a playlist that fits the day: harder for a push day, steadier for a normal one, lighter for an easy one. It opens in your music app.",
-  "conn.music.none": "None",
-  "conn.music.play": "Play {mood} music",
-  "conn.music.push": "push day",
-  "conn.music.normal": "training",
-  "conn.music.recover": "easy day",
 } as const;
 
 type Key = keyof typeof en;
@@ -139,7 +131,7 @@ export const es: Partial<Record<Key, Message>> = {
     "Samsung Health: en la app Samsung Health, abre Ajustes › Health Connect y activa lo que comparte. Sus datos y entrenamientos llegarán aquí.",
   "conn.title": "Apps conectadas",
   "conn.row": "Apps conectadas",
-  "conn.rowNote": "Salud, frecuencia cardiaca, Garmin, Strava, Oura, WHOOP y música",
+  "conn.rowNote": "Salud, frecuencia cardiaca, Garmin, Strava, Oura, WHOOP y más",
   "conn.intro":
     "Trae tu sueño, tu recuperación y tus pesajes para que el plan de Hoy se ajuste a cómo estás. Envía tus entrenamientos fuera.",
   "conn.offline": "No tienes conexión. Vuelve a intentarlo cuando la recuperes.",
@@ -258,14 +250,6 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Registrado con Liftsmith",
-  "conn.music.title": "Música",
-  "conn.music.what":
-    "Hoy muestra una lista que encaja con el día: más intensa para un día fuerte, constante para uno normal y más suave para uno fácil. Se abre en tu app de música.",
-  "conn.music.none": "Ninguna",
-  "conn.music.play": "Música para {mood}",
-  "conn.music.push": "un día fuerte",
-  "conn.music.normal": "entrenar",
-  "conn.music.recover": "un día fácil",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -274,7 +258,7 @@ export const fr: Partial<Record<Key, Message>> = {
     "Samsung Health : dans l’app Samsung Health, ouvrez Paramètres › Health Connect et activez ce qu’elle partage. Ses mesures et séances arrivent alors ici.",
   "conn.title": "Apps connectées",
   "conn.row": "Apps connectées",
-  "conn.rowNote": "Santé, fréquence cardiaque, Garmin, Strava, Oura, WHOOP et musique",
+  "conn.rowNote": "Santé, fréquence cardiaque, Garmin, Strava, Oura, WHOOP et plus",
   "conn.intro":
     "Faites entrer votre sommeil, votre récupération et vos pesées pour que le plan d’Aujourd’hui colle à votre forme. Envoyez vos séances ailleurs.",
   "conn.offline": "Vous êtes hors ligne. Réessayez une fois reconnecté.",
@@ -393,14 +377,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name} : {sets}",
   "conn.strava.footer": "Enregistré avec Liftsmith",
-  "conn.music.title": "Musique",
-  "conn.music.what":
-    "Aujourd’hui propose une playlist adaptée au jour : plus intense pour un jour fort, régulière pour un jour normal, plus douce pour un jour léger. Elle s’ouvre dans votre app de musique.",
-  "conn.music.none": "Aucune",
-  "conn.music.play": "Musique pour {mood}",
-  "conn.music.push": "un jour fort",
-  "conn.music.normal": "s’entraîner",
-  "conn.music.recover": "un jour léger",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -409,7 +385,7 @@ export const de: Partial<Record<Key, Message>> = {
     "Samsung Health: Öffne in der Samsung-Health-App Einstellungen › Health Connect und schalte ein, was geteilt wird. Dann kommen ihre Messwerte und Workouts hier an.",
   "conn.title": "Verbundene Apps",
   "conn.row": "Verbundene Apps",
-  "conn.rowNote": "Gesundheit, Herzfrequenz, Garmin, Strava, Oura, WHOOP und Musik",
+  "conn.rowNote": "Gesundheit, Herzfrequenz, Garmin, Strava, Oura, WHOOP und mehr",
   "conn.intro":
     "Hol Schlaf, Erholung und Wiegungen herein, damit der heutige Plan zu deiner Verfassung passt. Schick deine Trainings hinaus.",
   "conn.offline": "Du bist offline. Versuch es wieder, wenn du online bist.",
@@ -527,14 +503,6 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Mit Liftsmith eingetragen",
-  "conn.music.title": "Musik",
-  "conn.music.what":
-    "Heute zeigt eine Playlist, die zum Tag passt: härter für einen Push-Tag, gleichmäßiger für einen normalen, leichter für einen lockeren. Sie öffnet sich in deiner Musik-App.",
-  "conn.music.none": "Keine",
-  "conn.music.play": "Musik für {mood} abspielen",
-  "conn.music.push": "Push-Tag",
-  "conn.music.normal": "Training",
-  "conn.music.recover": "lockeren Tag",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -543,7 +511,7 @@ export const it: Partial<Record<Key, Message>> = {
     "Samsung Health: nell’app Samsung Health apri Impostazioni › Health Connect e attiva ciò che condivide. I suoi dati e allenamenti arriveranno qui.",
   "conn.title": "App collegate",
   "conn.row": "App collegate",
-  "conn.rowNote": "Salute, frequenza cardiaca, Garmin, Strava, Oura, WHOOP e musica",
+  "conn.rowNote": "Salute, frequenza cardiaca, Garmin, Strava, Oura, WHOOP e altro",
   "conn.intro": "Porta dentro sonno, recupero e pesate, così il piano di oggi si adatta a come stai. Manda fuori i tuoi allenamenti.",
   "conn.offline": "Sei offline. Riprova quando torni online.",
   "conn.notReady": "Non è ancora attivo. Arriverà presto.",
@@ -663,14 +631,6 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Registrato con Liftsmith",
-  "conn.music.title": "Musica",
-  "conn.music.what":
-    "Oggi mostra una playlist adatta alla giornata: più dura per un giorno da spingere, più regolare per uno normale, più leggera per uno leggero. Si apre nella tua app di musica.",
-  "conn.music.none": "Nessuna",
-  "conn.music.play": "Riproduci musica da {mood}",
-  "conn.music.push": "giorno da spingere",
-  "conn.music.normal": "allenamento",
-  "conn.music.recover": "giorno leggero",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -679,7 +639,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "Samsung Health：Samsung Health アプリで［設定］›［ヘルスコネクト］を開き、共有する項目をオンにしてください。測定値とワークアウトがここに届きます。",
   "conn.title": "連携アプリ",
   "conn.row": "連携アプリ",
-  "conn.rowNote": "ヘルスケア、心拍数、Garmin、Strava、Oura、WHOOP、音楽",
+  "conn.rowNote": "ヘルスケア、心拍数、Garmin、Strava、Oura、WHOOPなど",
   "conn.intro": "睡眠、回復、体重を取り込めば、今日のプランが今の状態に合います。ワークアウトを外部に送ることもできます。",
   "conn.offline": "オフラインです。オンラインに戻ってからもう一度お試しください。",
   "conn.notReady": "まだ有効になっていません。近日公開予定です。",
@@ -791,12 +751,4 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}：{sets}",
   "conn.strava.footer": "Liftsmith で記録",
-  "conn.music.title": "音楽",
-  "conn.music.what":
-    "「今日」にその日に合ったプレイリストを表示します。プッシュデーは激しめ、通常の日は安定したテンポ、軽めの日はゆったりめ。音楽アプリで開きます。",
-  "conn.music.none": "なし",
-  "conn.music.play": "{mood}向けの音楽を再生",
-  "conn.music.push": "プッシュデー",
-  "conn.music.normal": "トレーニング",
-  "conn.music.recover": "軽めの日",
 };

@@ -41,6 +41,19 @@ export async function loadTwoFactor(): Promise<TwoFactorInfo | null> {
   return r?.ok ? ((await r.json()) as TwoFactorInfo) : null;
 }
 
+/**
+ * What a 404 from the panel's stats means: "signin" only when the server says there's no session at all (the
+ * two-step route answers 404 too), "twofactor" when the session still needs its code, and "error" for anything
+ * else (a network blip, a cold database), so a hiccup never shows the sign-in screen to someone still signed in.
+ */
+export async function sessionGate(): Promise<{ state: "signin" | "twofactor" | "error"; info: TwoFactorInfo | null }> {
+  const r = await fetch("/api/admin/2fa/").catch(() => null);
+  if (r?.status === 404) return { state: "signin", info: null };
+  if (!r?.ok) return { state: "error", info: null };
+  const info = (await r.json().catch(() => null)) as TwoFactorInfo | null;
+  return info && !info.ready ? { state: "twofactor", info } : { state: "error", info };
+}
+
 function CodeField({ id, value, set, label }: { id: string; value: string; set: (v: string) => void; label: string }) {
   return (
     <label htmlFor={id} className="block text-sm">

@@ -25,8 +25,17 @@ function commitSha(): string {
   }
 }
 
+// Production builds load each language on its own (docs/decisions/speed.md "One language at a time"): the app's
+// catalogue modules are swapped for one file per language that scripts/locales.mjs writes before the build. Dev
+// (`next dev`) reads the source, so text edits show at once.
+const building = process.env.NODE_ENV === "production";
+const LANG_FILES = ["en", "es", "fr", "de", "it", "ja"];
+
 const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),
+  ...(building
+    ? { turbopack: { resolveAlias: Object.fromEntries(LANG_FILES.map((l) => [`@/locales/load/${l}`, `./src/locales/gen/${l}.json`])) } }
+    : {}),
   trailingSlash: true,
   images: { unoptimized: true },
   // STILLS=1 adds the build-only /stills/ page that scripts/og-images.mjs draws preview images from.

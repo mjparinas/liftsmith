@@ -34,7 +34,7 @@ export interface PlanSlice {
   setTryAdaptive(on: boolean): void;
   /**
    * The pre-workout check-in on Today: merges the change into today's answer, saves it as a new "feel"
-   * event (the newest one today counts) and rebuilds the plan, so the call and the playlist follow.
+   * event (the newest one today counts) and rebuilds the plan, so the call follows.
    */
   feel(change: Partial<Pick<FeelEvent, "energy" | "sore" | "unwell">>): void;
   /** The gym last picked automatically by location, for the hint on Today. */
@@ -170,7 +170,11 @@ export function planSlice(c: Ctx): PlanSlice {
       const routine = profile.routines?.find((x) => x.id === get().routineId);
       // It isn't a program day, so the program's next day stays next.
       const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
-      if (fromRoutine) plan = { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
+      // A rehab routine from the lifter's physio stays as written: it's meant for the injured area (trainer-mode.md).
+      if (fromRoutine)
+        plan = routine?.rehab
+          ? { ...fromRoutine, program: undefined, rehab: true }
+          : { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
       // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
       if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
       set({ readiness: r, preview: relink({ ...plan, items: applyOrder(plan.items, get().order) }, get().links) });

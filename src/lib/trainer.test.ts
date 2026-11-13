@@ -2,7 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import { DAY, makeWorkout, NOW } from "@/test/factories";
 
-import { cleanEvents, clientReport, codeFrom, flagText, inviteUrl, planProgress, showCode, type Plan } from "./trainer";
+import {
+  cleanEvents,
+  clientReport,
+  codeFrom,
+  flagText,
+  inviteUrl,
+  painFlags,
+  planProgress,
+  rehabInjuries,
+  showCode,
+  type Plan,
+} from "./trainer";
 
 describe("invite codes on the phone", () => {
   it("shows a code in two halves and reads it back from a typed code or a link", () => {
@@ -83,5 +94,98 @@ describe("a coach's report on a client", () => {
     const r = clientReport(view(makeWorkout("w", NOW - DAY, [{ exerciseId: "deadlift" }]), null, [plan(NOW - 8 * DAY)]), NOW);
     expect(r.flags).toContainEqual({ kind: "planUnused", name: "Push day" });
     expect(r.plans[0]).toMatchObject({ done: 0 });
+  });
+});
+
+describe("physio support on a client's report", () => {
+  const hurt = [
+    { id: "i1", at: NOW - 20 * DAY, type: "injury", injuryId: "knee1", part: "knee" },
+    { id: "p1", at: NOW - 10 * DAY, type: "pain", injuryId: "knee1", score: 2 },
+    { id: "p2", at: NOW - 3 * DAY, type: "pain", injuryId: "knee1", score: 3, sessionId: "w", exerciseId: "wall-sit" },
+    { id: "p3", at: NOW - DAY, type: "pain", injuryId: "knee1", score: 6, sessionId: "w2", exerciseId: "glute-bridge" },
+  ];
+
+  it("keeps well-formed injury and pain events, and drops odd ones", () => {
+    const { events } = cleanEvents([
+      ...hurt,
+      { id: "x1", at: 1, type: "injury", injuryId: "a", part: "tail" },
+      { id: "x2", at: 1, type: "pain", injuryId: "knee1", score: 11 },
+      { id: "x3", at: 1, type: "pain", injuryId: "knee1", score: "bad" },
+    ]);
+    expect(events.map((e) => e.id)).toEqual(["i1", "p1", "p2", "p3"]);
+  });
+
+  it("shows each injury's trend and the latest rating on each exercise", () => {
+    const [knee] = rehabInjuries(cleanEvents(hurt).events, NOW);
+    expect(knee).toMatchObject({ part: "knee", latest: 6, change: 4, points: [2, 3, 6] });
+    expect(knee!.byExercise).toEqual([
+      { exerciseId: "glute-bridge", score: 6, at: NOW - DAY },
+      { exerciseId: "wall-sit", score: 3, at: NOW - 3 * DAY },
+    ]);
+  });
+
+  it("puts high pain first, and only when the client shares it", () => {
+    const shared = clientReport({ name: "Alex", daysPerWeek: null, events: hurt, plans: [], pain: true }, NOW);
+    expect(shared.flags[0]).toEqual({ kind: "painHigh", part: "knee", score: 6 });
+    expect(flagText(shared.flags[0]!, new Map()).title).toBe("Knee: pain 6/10 this week");
+    const notShared = clientReport({ name: "Alex", daysPerWeek: null, events: hurt, plans: [] }, NOW);
+    expect(notShared.rehab).toBeNull();
+    expect(notShared.flags.some((f) => f.kind === "painHigh")).toBe(false);
+  });
+
+  it("says when pain is rising or an injury is new", () => {
+    const rising = rehabInjuries(cleanEvents([...hurt.slice(0, 3), { ...hurt[3]!, score: 4 }]).events, NOW);
+    expect(painFlags(rising, NOW)).toEqual([{ kind: "painUp", part: "knee", from: 2, to: 4 }]);
+    const fresh = rehabInjuries(cleanEvents([{ ...hurt[0]!, at: NOW - 2 * DAY }]).events, NOW);
+    expect(painFlags(fresh, NOW)).toEqual([{ kind: "newInjury", part: "knee" }]);
+  });
+
+  it("measures adherence against times a week, and flags a routine done less than half as often as asked", () => {
+    const rehab: Plan = {
+      id: "p",
+      coachId: "c",
+      clientId: "x",
+      name: "Knee",
+      code: "r1~S25lZQ~wall-sit.3~glute-bridge.3",
+      at: NOW - 14 * DAY,
+      perWeek: 3,
+    };
+    const events = [
+      ...makeWorkout("a", NOW - 10 * DAY, [{ exerciseId: "wall-sit" }, { exerciseId: "glute-bridge" }]),
+      ...makeWorkout("b", NOW - 3 * DAY, [{ exerciseId: "wall-sit" }, { exerciseId: "glute-bridge" }]),
+    ];
+    const r = clientReport({ name: "Alex", daysPerWeek: null, events, plans: [rehab] }, NOW);
+    expect(r.plans[0]!.adherence).toEqual({ done: 2, want: 6, pct: 33 });
+    expect(r.flags).toContainEqual({ kind: "lowAdherence", name: "Knee", done: 2, want: 6 });
+    // No target, or given less than a week ago: no adherence yet.
+    expect(planProgress({ ...rehab, perWeek: undefined }, [], NOW).adherence).toBeUndefined();
+    expect(planProgress({ ...rehab, at: NOW - 3 * DAY }, [], NOW).adherence).toBeUndefined();
+  });
+});
+
+describe("food against a coach's targets", () => {
+  const day = (ago: number) => {
+    const d = new Date(NOW - ago * DAY);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const food = (kcal: number, protein?: number) => [1, 2, 3, 4].map((ago) => ({ day: day(ago), kcal, protein }));
+  const view = (kcal: number, protein: number | undefined, targets: { kcal: number | null; protein: number | null } | null) => ({
+    name: "Alex",
+    daysPerWeek: null,
+    events: makeWorkout("w1", NOW - DAY, [{}]),
+    plans: [],
+    body: { sex: null, heightCm: null, weights: [], measures: [], food: food(kcal, protein) },
+    targets: targets && { coachId: "me", clientId: "c1", at: NOW, ...targets },
+  });
+
+  it("flags calories 10% off the target and protein under 85% of it", () => {
+    const kinds = (v: ReturnType<typeof view>) => clientReport(v, NOW).flags.map((f) => f.kind);
+    expect(kinds(view(1800, 100, { kcal: 2400, protein: 160 }))).toEqual(expect.arrayContaining(["kcalOff", "proteinShort"]));
+    expect(kinds(view(2350, 150, { kcal: 2400, protein: 160 }))).not.toContain("kcalOff");
+    expect(kinds(view(2350, 150, { kcal: 2400, protein: 160 }))).not.toContain("proteinShort");
+    // No targets, nothing to judge against.
+    expect(kinds(view(1200, 50, null))).not.toContain("kcalOff");
+    const off = clientReport(view(1800, 100, { kcal: 2400, protein: null }), NOW).flags.find((f) => f.kind === "kcalOff")!;
+    expect(flagText(off, new Map()).title).toContain("1800");
   });
 });

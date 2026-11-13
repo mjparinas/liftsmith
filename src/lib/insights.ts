@@ -67,6 +67,8 @@ export interface InsightInput {
   now: number;
   /** The days-per-week streak (game.ts goalStreak), for the "streak at risk" note. */
   streak?: Pick<Streak, "needed" | "atRisk" | "weeks">;
+  /** Daily nutrition targets from the lifter's coach (trainer mode), which the food notes go by when set. */
+  coachTargets?: { kcal: number | null; protein: number | null; coach: string } | null;
 }
 
 const name = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
@@ -151,7 +153,7 @@ function slopePerWeek(points: { at: number; v: number }[]): number {
   return den ? (num / den) * WEEK : 0;
 }
 
-export function insights({ events, profile, now, streak }: InsightInput): Insight[] {
+export function insights({ events, profile, now, streak, coachTargets }: InsightInput): Insight[] {
   const out: Insight[] = [];
   const week = blockWeek(profile, now);
   const unit = profile.unit;
@@ -375,18 +377,39 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
   // tells the story (weight dropping fast, body fat or waist rising) the food numbers join it instead of a second note.
   const food = foodDays(events, now);
   if (food.length) {
-    const short = proteinShort(food, currentKg(events as AppEvent[], profile), now);
+    const coach = coachTargets ?? null;
+    const short = proteinShort(food, currentKg(events as AppEvent[], profile), now, coach?.protein);
     if (short) {
       out.push({
         id: `protein-short-${short.last}-${short.days}`,
         tone: "warn",
         title: t("ins.proteinShort.title", { count: short.days }),
-        why: t("ins.proteinShort.why", { avg: short.avg, target: short.target }),
+        why: coach?.protein
+          ? t("ins.proteinShort.whyCoach", { avg: short.avg, target: short.target, name: coach.coach || t("ins.yourCoach") })
+          : t("ins.proteinShort.why", { avg: short.avg, target: short.target }),
         advice: t("ins.proteinShort.advice", { gap: Math.max(10, Math.round((short.target - short.avg) / 5) * 5) }),
         action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
       });
     }
     const intake = weekIntake(food, now);
+    // With a calorie target from their coach, the lifter's week is judged against it alone: the coach set it on purpose.
+    if (intake && coach?.kcal && Math.abs(intake.avg - coach.kcal) >= coach.kcal * 0.1) {
+      const kcal = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
+      const under = intake.avg < coach.kcal;
+      out.push({
+        id: `coach-kcal-${intake.last}-${under ? "under" : "over"}`,
+        tone: "warn",
+        title: t(under ? "ins.coachKcalUnder.title" : "ins.coachKcalOver.title"),
+        why: t("ins.coachKcal.why", {
+          days: intake.days,
+          avg: kcal(intake.avg),
+          target: kcal(coach.kcal),
+          name: coach.coach || t("ins.yourCoach"),
+        }),
+        advice: t(under ? "ins.coachKcalUnder.advice" : "ins.coachKcalOver.advice", { gap: kcal(Math.abs(intake.avg - coach.kcal)) }),
+        action: { kind: "go", route: "trainer", label: t("ins.coachKcal.action") },
+      });
+    }
     const tdee =
       intake &&
       currentTdee(
@@ -395,7 +418,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         profile,
         now,
       ).result;
-    if (intake && tdee) {
+    if (intake && tdee && !coach?.kcal) {
       const kcal = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
       const gap = intake.avg - tdee.tdee;
       const nums = { days: intake.days, avg: kcal(intake.avg), gap: kcal(Math.abs(gap)), tdee: kcal(tdee.tdee) };

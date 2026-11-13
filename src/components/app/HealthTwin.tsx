@@ -10,23 +10,27 @@ import { BMI_COLOUR, BmiBar } from "@/components/BmiBar";
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
-import { canShape, shapeBody, statsFrom } from "@/lib/bodyShape";
+import { factors, type BodyStats } from "@/lib/bodyShape";
 import { useCloud } from "@/lib/connections";
 import { can, isPro } from "@/lib/entitlements";
 import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
 import type { Term } from "@/lib/glossary";
 import { askHealth, healthAvailable, openHealthPermissions, type HealthRead } from "@/lib/health";
-import { date, t } from "@/lib/i18n";
+import { date, list, t } from "@/lib/i18n";
 import { isNative } from "@/lib/juice";
 import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength } from "@/lib/strength";
 import { bmiBand, bmiCategory } from "@/lib/tdee";
+import { bodyCompOn, isTeen } from "@/lib/teen";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
+import { MEASURE_SITES, type Unit } from "@/lib/types";
+import { fmtHeight, fmtNum, fmtWeight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { openStats } from "./BodyStats";
 import { FitTestsCard } from "./FitTests";
+import { useMyShape, useMyStats } from "./myShape";
 import { go } from "./router";
 import { Button, EmptyState, ProTag, Section, Sheet, SwitchRow } from "./ui";
 import { WeighInForm } from "./WeighIn";
@@ -71,17 +75,66 @@ const TONE: Record<Status, { pill: string; text: string }> = {
 };
 
 const noSubscribe = () => () => {};
+
+/** Parts further than this from the average figure (as a fraction) make a change worth pointing out. */
+const NOTICEABLE = 0.05;
+
+/** What the shaped figure was made from, as list items in the lifter's units. */
+function shapeItems(s: BodyStats, unit: Unit): string[] {
+  const out: string[] = [];
+  if (s.heightCm && s.weightKg) out.push(fmtHeight(s.heightCm, unit), fmtWeight(s.weightKg, unit));
+  if (s.bodyFat != null) out.push(t("twin.shape.fat", { pct: fmtNum(s.bodyFat) }));
+  if (Object.values(s.measures ?? {}).some((v) => v != null && v > 0)) out.push(t("twin.shape.measures"));
+  return out;
+}
+
+/**
+ * "Shape the figure like me" (profile.shapeFigure). It reshapes every figure in the app (myShape.ts), so it
+ * always says what it did: without the numbers it needs, what to add and a button to each place; when on,
+ * what the figure was shaped from, and that the change is small when the lifter is close to the average build.
+ */
+function ShapeSwitch() {
+  const { profile, setProfile } = useApp();
+  const { stats: own, shapeable } = useMyStats();
+  const on = !!profile.shapeFigure;
+  const close = useMemo(() => {
+    if (!shapeable) return false;
+    const f = factors(bodyFor(profile.sex), own);
+    return MEASURE_SITES.every((k) => Math.abs(f[k] - 1) < NOTICEABLE);
+  }, [shapeable, profile.sex, own]);
+  const needHeight = !own.heightCm;
+  const hint = !shapeable
+    ? t("twin.shape.need")
+    : on
+      ? `${t("twin.shape.from", { items: list(shapeItems(own, profile.unit)) })}${close ? ` ${t("twin.shape.close")}` : ""}`
+      : t("twin.shape.hint");
+  return (
+    <>
+      <SwitchRow label={t("twin.shape.label")} hint={hint} on={on} onChange={(v) => setProfile({ shapeFigure: v })} />
+      {!shapeable && (
+        <div className="mt-2 flex flex-wrap gap-2" data-testid="shape-need">
+          {needHeight && (
+            <Button kind="ghost" onClick={openStats}>
+              {t("twin.shape.addHeight")} ›
+            </Button>
+          )}
+          <Button kind="ghost" onClick={() => go("photos")}>
+            {t("twin.shape.addBody")} ›
+          </Button>
+        </div>
+      )}
+    </>
+  );
+}
 const storeName = () => (typeof navigator !== "undefined" && /iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect");
 
 export function HealthTwin() {
   const { events, profile, stats, readiness: r, setCall, setProfile } = useApp();
-  // The figure shaped from the lifter's own numbers, when they turned it on (bodyShape.ts).
-  const own = useMemo(() => statsFrom(profile, events), [profile, events]);
-  const shapeable = canShape(own);
-  const shape = useMemo(
-    () => (profile.shapeFigure && shapeable ? shapeBody(bodyFor(profile.sex), own) : undefined),
-    [profile.shapeFigure, profile.sex, shapeable, own],
-  );
+  // Under 18, body fat and the shaped figure wait until they turn them on (teen.ts).
+  const teen = isTeen(profile);
+  const comp = bodyCompOn(profile);
+  // The figure shaped from the lifter's own numbers, when they turned it on (bodyShape.ts, myShape.ts).
+  const shape = useMyShape();
   const now = useNow(60_000);
   const native = useSyncExternalStore(noSubscribe, isNative, () => false);
   const pro = isPro();
@@ -172,17 +225,20 @@ export function HealthTwin() {
         <span className="sr-only">{t("twin.figure", { summary })}</span>
         <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
         <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
-        <Pin m={by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
+        <Pin m={comp && by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
         <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
         <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
       </div>
 
-      <SwitchRow
-        label={t("twin.shape.label")}
-        hint={shapeable ? t("twin.shape.hint") : t("twin.shape.need")}
-        on={!!profile.shapeFigure}
-        onChange={(v) => setProfile({ shapeFigure: v })}
-      />
+      {teen && (
+        <SwitchRow
+          label={t("team.bodyComp.label")}
+          hint={t("team.bodyComp.hint")}
+          on={!!profile.bodyComp}
+          onChange={(v) => setProfile({ bodyComp: v })}
+        />
+      )}
+      {comp && <ShapeSwitch />}
 
       <FitnessAgeCard native={native} store={store} />
       <FitTestsCard />

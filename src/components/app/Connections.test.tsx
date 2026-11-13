@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAccount } from "@/lib/auth";
@@ -30,15 +29,6 @@ describe("Connected apps on the web", () => {
     expect(screen.getByRole("button", { name: "Sign in or create an account" })).toBeInTheDocument();
     expect(screen.getByText("Strava")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Connect" })).toBeNull();
-  });
-
-  it("picking a music app saves it on the profile", async () => {
-    const user = userEvent.setup();
-    render(<Connections />);
-    await user.click(screen.getByRole("button", { name: "Spotify" }));
-    expect(useApp.getState().profile.connections?.music).toBe("spotify");
-    await user.click(screen.getByRole("button", { name: "None" }));
-    expect(useApp.getState().profile.connections?.music).toBeUndefined();
   });
 
   it("signed in: shows what's connected, what's coming soon, and the Strava switch", async () => {

@@ -68,6 +68,14 @@ describe("a gym's page", () => {
     expect(fr).toContain('lang="fr"');
   });
 
+  it("gives the owner's logo its own class, so the site header's logo keeps its look", async () => {
+    const p = (await placeBySlug("langley-bc", "planet-fitness"))!;
+    const html = gymHtml({ ...p, logo: "0123456789abcdef" }, [], "en");
+    expect(html).toContain('<img class="gym-logo"');
+    // The header's .logo rule comes from the site frame; the gym page's style must not redefine it.
+    expect(html.match(/\.logo\{/g)).toHaveLength(1);
+  });
+
   it("marks a studio's page noindex", async () => {
     const p = (await placeBySlug("langley-bc", "club-pilates"))!;
     expect(gymHtml(p, [], "en")).toContain('content="noindex"');

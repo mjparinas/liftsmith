@@ -254,6 +254,8 @@ export interface Profile {
   calendar?: CalendarPrefs;
   /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
   lean?: boolean;
+  /** Battery saver for the 3D figures: lower resolution and frame rate (Settings, src/lib/liteDemos.ts). */
+  liteDemos?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
   cosmetics?: { accent?: string; sound?: string; plates?: string; avatar?: string };
   /**
@@ -265,6 +267,8 @@ export interface Profile {
   sex?: "male" | "female";
   /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
+  /** Under 18 only: body fat and the shaped figure turned on in Body › Health (teen.ts). Off by default. */
+  bodyComp?: boolean;
   /** Body › Health's figure shaped from these numbers, body fat and tape measurements (bodyShape.ts). Off by default. */
   shapeFigure?: boolean;
   /** When height was entered by hand (ms), so an older health reading doesn't replace it. */
@@ -319,10 +323,10 @@ export interface Profile {
   /** Saved routines, newest first (routines.ts). */
   routines?: Routine[];
   /**
-   * Connected apps (connections.ts): the music app the playlist link on Today opens (missing means no
-   * link), and whether finished workouts go to Strava once it's connected (missing means yes).
+   * Connected apps (connections.ts): whether finished workouts go to Strava once it's connected (missing
+   * means yes).
    */
-  connections?: { music?: MusicApp; stravaPost?: boolean };
+  connections?: { stravaPost?: boolean };
   /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
   training?: TrainingPrefs;
   /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
@@ -330,9 +334,6 @@ export interface Profile {
   onboarded: boolean;
   updatedAt: number;
 }
-
-/** A music app the playlist link opens (connections.ts MUSIC). */
-export type MusicApp = "spotify" | "apple" | "youtube";
 
 /** How effort is shown: reps in reserve, or RPE (10 minus reps in reserve). Stored as RIR either way. */
 export type EffortScale = "rir" | "rpe";
@@ -368,6 +369,8 @@ export interface TrainingPrefs {
   restAlert?: RestAlert;
   /** Keep the screen on during a workout. Missing means on. */
   keepAwake?: boolean;
+  /** The Now playing control on Today and the workout screen (nowPlaying.ts). Missing means on. */
+  nowPlaying?: boolean;
   /** Start opens the day's warm-up stretches first (Stretch.tsx; skippable). Missing means off. */
   warmFirst?: boolean;
   /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
@@ -400,6 +403,11 @@ export interface Routine {
   items: RoutineItem[];
   createdAt: number;
   updatedAt: number;
+  /**
+   * A rehab program from the lifter's physio or coach (trainer-mode.md, physio support): injury mode keeps every
+   * exercise as written instead of skipping or lightening it, and asks about pain between sets.
+   */
+  rehab?: boolean;
 }
 
 export interface DelightPrefs {
@@ -536,6 +544,24 @@ export interface SessionEndEvent extends EventBase {
   restSec?: number;
   /** Ended automatically because the workout was left running (see AUTO_END_MS in store.ts). */
   auto?: boolean;
+  /**
+   * The parts done, in order (workouts with parts, docs/decisions/sessions-with-parts.md). Not written yet;
+   * missing means the whole workout was one lifting part, and sessions.ts reads it that way.
+   */
+  parts?: SessionPart[];
+}
+
+/** A piece of a workout: lifting, a warm-up or cool-down, rehab, cardio or a fitness test. */
+export type PartKind = "warm" | "lift" | "rehab" | "cardio" | "cool" | "stretch" | "test";
+
+export interface SessionPart {
+  /** Unique within the workout. */
+  id: string;
+  kind: PartKind;
+  start: number;
+  end: number;
+  /** Where it came from: a routine part, a rehab program, the stretch moment. */
+  ref?: string;
 }
 
 /** The whole heart rate stream of a session, saved once at the end. */
@@ -678,6 +704,11 @@ export interface StretchEvent extends EventBase {
   moment: "warm" | "cool" | "rest" | "pick";
   ids: string[];
   seconds: number;
+  /**
+   * The workout this was done with (workouts with parts, 2026-11-13): set on a cool-down logged soon after a
+   * workout ends. Missing on older and stand-alone stretches; sessions.ts then joins them by time.
+   */
+  sessionId?: string;
 }
 
 export interface CheckinEvent extends EventBase {

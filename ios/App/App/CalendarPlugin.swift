@@ -15,6 +15,7 @@ public class CalendarPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "removeTrainingDays", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "show", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "busy", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "addEvent", returnType: CAPPluginReturnPromise),
     ]
 
     private let store = EKEventStore()
@@ -63,6 +64,35 @@ public class CalendarPlugin: CAPPlugin, CAPBridgedPlugin {
             call.resolve(["saved": true, "calendar": calendar.title, "start": event.startDate.timeIntervalSince1970 * 1000])
         } catch {
             call.reject("Couldn't save", nil, error)
+        }
+    }
+
+    /// One booked coaching session, saved in the default calendar (asking for access first if needed).
+    @objc func addEvent(_ call: CAPPluginCall) {
+        let save = { [weak self] in
+            guard let self, self.granted, let calendar = self.store.defaultCalendarForNewEvents else { return call.resolve(["saved": false]) }
+            let event = EKEvent(eventStore: self.store)
+            event.calendar = calendar
+            event.title = call.getString("title") ?? "Liftsmith session"
+            event.notes = call.getString("notes")
+            let place = call.getString("place") ?? ""
+            if !place.isEmpty { event.location = place }
+            event.startDate = Date(timeIntervalSince1970: (call.getDouble("start") ?? Date().timeIntervalSince1970 * 1000) / 1000)
+            event.endDate = event.startDate.addingTimeInterval(TimeInterval((call.getInt("minutes") ?? 60) * 60))
+            event.availability = .busy
+            do {
+                try self.store.save(event, span: .thisEvent, commit: true)
+                call.resolve(["saved": true])
+            } catch {
+                call.reject("Couldn't save", nil, error)
+            }
+        }
+        if granted { return save() }
+        let done: (Bool, Error?) -> Void = { _, _ in DispatchQueue.main.async { save() } }
+        if #available(iOS 17.0, *) {
+            store.requestFullAccessToEvents(completion: done)
+        } else {
+            store.requestAccess(to: .event, completion: done)
         }
     }
 

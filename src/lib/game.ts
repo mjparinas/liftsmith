@@ -273,7 +273,14 @@ function prsIn(sets: SetEvent[], before: SetEvent[]): number {
   return n;
 }
 
+// Every set in time order, worked out once per event list. The store replaces the list on every change and
+// never edits it in place, so the list itself is the cache key. Leagues and quest XP read every week since the
+// first workout, and filtering and sorting the whole history for each week made two years of workouts take
+// about a second on a phone (2026-11-13).
+const SORTED_SETS = new WeakMap<readonly AppEvent[], SetEvent[]>();
 function setsOf(events: readonly AppEvent[]): SetEvent[] {
+  const hit = SORTED_SETS.get(events);
+  if (hit) return hit;
   const seen = new Set<string>();
   const out: SetEvent[] = [];
   for (const e of events)
@@ -281,7 +288,21 @@ function setsOf(events: readonly AppEvent[]): SetEvent[] {
       seen.add(e.id);
       out.push(e);
     }
-  return out.sort((a, b) => a.at - b.at);
+  out.sort((a, b) => a.at - b.at);
+  SORTED_SETS.set(events, out);
+  return out;
+}
+
+/** The index of the first set at or after `at` in a list sorted by time. */
+function firstFrom(sorted: readonly SetEvent[], at: number): number {
+  let lo = 0;
+  let hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (sorted[mid]!.at < at) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
 }
 
 function sessionsOf(sets: SetEvent[]): Session[] {
@@ -290,12 +311,21 @@ function sessionsOf(sets: SetEvent[]): Session[] {
   return [...by].map(([id, list]) => ({ id, at: list[0]!.at, sets: list }));
 }
 
-/** The three quests for the week starting on `monday`, with progress. */
-export function questsFor(events: readonly AppEvent[], profile: Profile, monday: number): Quest[] {
+type QuestProgress = { def: QuestDef; goal: number; have: number };
+// Each week's quest progress, per event list and goal days (the only part of the profile a goal reads).
+const PROGRESS = new WeakMap<readonly AppEvent[], Map<string, QuestProgress[]>>();
+
+function questProgress(events: readonly AppEvent[], profile: Profile, monday: number): QuestProgress[] {
+  let byWeek = PROGRESS.get(events);
+  if (!byWeek) PROGRESS.set(events, (byWeek = new Map()));
+  const key = `${monday}:${profile.daysPerWeek}`;
+  const hit = byWeek.get(key);
+  if (hit) return hit;
   const all = setsOf(events);
   const end = weekOf(monday + WEEK + DAY);
-  const sets = all.filter((s) => s.at >= monday && s.at < end);
-  const before = all.filter((s) => s.at < monday);
+  const from = firstFrom(all, monday);
+  const sets = all.slice(from, firstFrom(all, end));
+  const before = all.slice(0, from);
   const sessions = sessionsOf(sets);
   const r = rng(hash(`quests:${new Date(monday).toDateString()}`));
   // "Train your days" is always one of the three; the other two rotate.
@@ -305,11 +335,33 @@ export function questsFor(events: readonly AppEvent[], profile: Profile, monday:
     const q = pool.splice(Math.floor(r() * pool.length), 1)[0]!;
     picks.push(q);
   }
-  return picks.map((q) => {
-    const goal = q.goal(profile);
-    const have = Math.min(goal, q.have(sets, sessions, before));
-    return { id: q.id, title: q.title(goal), icon: q.icon, goal, have, xp: q.xp, done: have >= goal };
+  const out = picks.map((def) => {
+    const goal = def.goal(profile);
+    return { def, goal, have: Math.min(goal, def.have(sets, sessions, before)) };
   });
+  byWeek.set(key, out);
+  return out;
+}
+
+/** The three quests for the week starting on `monday`, with progress. */
+export function questsFor(events: readonly AppEvent[], profile: Profile, monday: number): Quest[] {
+  // Titles are built here, not cached, so they follow a language change.
+  return questProgress(events, profile, monday).map(({ def, goal, have }) => ({
+    id: def.id,
+    title: def.title(goal),
+    icon: def.icon,
+    goal,
+    have,
+    xp: def.xp,
+    done: have >= goal,
+  }));
+}
+
+/** XP from the week's finished quests. */
+function weekQuestXp(events: readonly AppEvent[], profile: Profile, monday: number): number {
+  let xp = 0;
+  for (const p of questProgress(events, profile, monday)) if (p.have >= p.goal) xp += p.def.xp;
+  return xp;
 }
 
 // ---------- Leagues: a tier for each week, earned by weekly XP against your own tier's bar.
@@ -341,8 +393,7 @@ export function weekXp(events: readonly AppEvent[], stats: Stats, profile: Profi
     if (s.start < monday || s.start >= end) continue;
     xp += s.sets * XP.set + XP.session + s.prs * XP.pr + (s.sets >= 12 ? XP.fullSession : 0);
   }
-  for (const q of questsFor(events, profile, monday)) if (q.done) xp += q.xp;
-  return xp;
+  return xp + weekQuestXp(events, profile, monday);
 }
 
 export function league(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number, streak?: Streak): LeagueState {
@@ -559,7 +610,8 @@ export function repsForPr(events: readonly AppEvent[], exerciseId: string, weigh
   if (weightKg <= 0 || TIMED.has(exerciseId)) return null;
   const b = bestBefore(events, exerciseId, now);
   if (b === null) return null;
-  const r = Math.floor(30 * (b / weightKg - 1)) + 1;
+  // The small nudge keeps an exact tie (8 reps when 8 equals the best) from rounding down a rep.
+  const r = Math.floor(30 * (b / weightKg - 1) + 1e-9) + 1;
   return r >= 1 && r <= 30 ? r : null;
 }
 
@@ -587,7 +639,7 @@ export function questXp(events: readonly AppEvent[], stats: Stats, profile: Prof
   if (!stats.sessions.length) return 0;
   const first = weekOf(Math.min(...stats.sessions.map((s) => s.start)));
   let xp = 0;
-  for (let w = first; w <= weekOf(now); w = weekOf(w + WEEK + DAY)) for (const q of questsFor(events, profile, w)) if (q.done) xp += q.xp;
+  for (let w = first; w <= weekOf(now); w = weekOf(w + WEEK + DAY)) xp += weekQuestXp(events, profile, w);
   return xp;
 }
 

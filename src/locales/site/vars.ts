@@ -1,5 +1,6 @@
 // The numbers the website's translated text fills in (see types.ts for the placeholders).
 import { BRAND } from "@/lib/brand";
+import { COACH_PLANS } from "@/lib/coachPlans";
 import { EXERCISES } from "@/lib/exercises";
 import type { Faq } from "@/lib/faqs";
 import { FLAGS } from "@/lib/flags";
@@ -15,6 +16,13 @@ export function siteVars(lang: SiteLang) {
     annual: usd(lang, annual),
     monthly: usd(lang, amountOf(PRICES.monthly.price)),
     perMonth: usd(lang, Math.floor((annual / 12) * 100) / 100),
+    // Coach plans (src/lib/coachPlans.ts).
+    proClients: COACH_PLANS.pro.clients,
+    coachClients: COACH_PLANS.coach.clients,
+    coachMonthly: usd(lang, COACH_PLANS.coach.usd.monthly),
+    coachAnnual: usd(lang, COACH_PLANS.coach.usd.annual),
+    coachPlusMonthly: usd(lang, COACH_PLANS.coachPlus.usd.monthly),
+    coachPlusAnnual: usd(lang, COACH_PLANS.coachPlus.usd.annual),
   };
 }
 

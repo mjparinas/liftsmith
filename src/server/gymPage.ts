@@ -155,7 +155,7 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     p.phone ? `<li>${icon("phone", 18)}<a href="tel:${esc(p.phone.replace(/[^\d+]/g, ""))}">${esc(p.phone)}</a></li>` : "",
   ].join("");
   const hero = `<section class="card hero" aria-labelledby="gym-h">
-${p.logo ? `<img class="logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="${esc(say(lang, "gp.logoAlt", { name: p.name }))}" width="64" height="64">` : ""}<p class="kicker">${esc(say(lang, "gp.kicker"))}</p>
+${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="${esc(say(lang, "gp.logoAlt", { name: p.name }))}" width="64" height="64">` : ""}<p class="kicker">${esc(say(lang, "gp.kicker"))}</p>
 <h1 id="gym-h"><span>${esc(p.name)}</span>${p.official ? officialMark(lang) : ""}</h1>
 <p class="muted where">${icon("pin", 18)}<span>${esc([p.address, city].filter(Boolean).join(", "))}</span></p>
 <p class="status ${p.official ? "on" : ""}">${esc(p.official ? say(lang, "gp.officialNote") : say(lang, "gp.unofficial"))}</p>
@@ -280,7 +280,7 @@ export function gymSitemapXml(entries: { path: string; lastModified: number }[])
 }
 
 const GYM_STYLE = `
-.logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
+.gym-logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
 .map{margin:12px 0 0}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
 .photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;list-style:none;margin:0;padding:0}.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

@@ -824,6 +824,135 @@ const SCHEMA = [
     alerts INTEGER NOT NULL DEFAULT 1,
     updated_at INTEGER NOT NULL
   )`,
+  // A coach's daily nutrition targets for one client (2026-11-13): calories and protein in grams, either may be empty.
+  `CREATE TABLE IF NOT EXISTS coach_targets (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    kcal INTEGER,
+    protein INTEGER,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_targets_client ON coach_targets (client_id)`,
+  // School teams (teams.ts, docs/decisions/school-teams.md): a coach's school address and where its proof stands,
+  // the school domains staff have trusted or blocked, each coach's teams, and the athletes on them.
+  `CREATE TABLE IF NOT EXISTS school_coaches (
+    account_id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    school TEXT NOT NULL,
+    domain TEXT NOT NULL,
+    status TEXT NOT NULL,
+    code_hash TEXT NOT NULL DEFAULT '',
+    expires_at INTEGER NOT NULL DEFAULT 0,
+    tries INTEGER NOT NULL DEFAULT 0,
+    verified_at INTEGER,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS school_coaches_domain ON school_coaches (domain)`,
+  `CREATE TABLE IF NOT EXISTS school_domains (
+    domain TEXT PRIMARY KEY,
+    status TEXT NOT NULL,
+    school TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS teams (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS teams_coach ON teams (coach_id)`,
+  `CREATE TABLE IF NOT EXISTS team_members (
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    birth_year INTEGER NOT NULL,
+    joined_at INTEGER NOT NULL,
+    PRIMARY KEY (team_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_members_account ON team_members (account_id)`,
+  // Check-in forms and questionnaires (2026-11-13): a coach's forms, each one sent to a client (with the questions as
+  // they were then), the client's answers, and at most one form per client that goes out again every week.
+  `CREATE TABLE IF NOT EXISTS coach_forms (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    questions TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_forms_coach ON coach_forms (coach_id)`,
+  `CREATE TABLE IF NOT EXISTS coach_checkins (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    form_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    questions TEXT NOT NULL,
+    sent_at INTEGER NOT NULL,
+    answers TEXT,
+    answered_at INTEGER
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_checkins_pair ON coach_checkins (coach_id, client_id, sent_at)`,
+  `CREATE INDEX IF NOT EXISTS coach_checkins_client ON coach_checkins (client_id, answered_at)`,
+  `CREATE TABLE IF NOT EXISTS coach_checkin_repeats (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    form_id TEXT NOT NULL,
+    next_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  // Booking (coachBooking.ts): a coach's open or booked session times, UTC ms.
+  `CREATE TABLE IF NOT EXISTS coach_slots (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    start_at INTEGER NOT NULL,
+    minutes INTEGER NOT NULL,
+    place TEXT NOT NULL DEFAULT '',
+    client_id TEXT,
+    booked_at INTEGER
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_slots_coach ON coach_slots (coach_id, start_at)",
+  "CREATE INDEX IF NOT EXISTS coach_slots_client ON coach_slots (client_id, start_at)",
+  // Client payments through Stripe Connect (coachPay.ts): each coach's Express account, the price each client pays,
+  // their monthly plan and the payments Stripe told us about.
+  `CREATE TABLE IF NOT EXISTS coach_stripe (
+    coach_id TEXT PRIMARY KEY,
+    stripe_id TEXT NOT NULL,
+    ready INTEGER NOT NULL DEFAULT 0,
+    currency TEXT NOT NULL DEFAULT 'cad',
+    updated_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_stripe_id ON coach_stripe (stripe_id)",
+  `CREATE TABLE IF NOT EXISTS coach_prices (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_prices_client ON coach_prices (client_id)",
+  `CREATE TABLE IF NOT EXISTS coach_subs (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    sub_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    until INTEGER,
+    ending INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS coach_payments (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_payments_pair ON coach_payments (coach_id, client_id, at)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (
@@ -860,6 +989,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["creators", "max_uses", "INTEGER"],
   // Friends stage 2: a public profile (social.ts, publicProfile.ts).
   ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
+  // Coaching: personal trainer or coach (Melvin, 2026-11-13: "differentiate between personal trainers and coaches").
+  ["coach_prefs", "role", "TEXT"],
   // Friends stage 2: which push notifications the lifter wants (push.ts). Likes start off.
   ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],
@@ -901,6 +1032,14 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
+  // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
+  ["entitlements", "tier", "TEXT"],
+  ["stripe_subscriptions", "tier", "TEXT"],
+  // Physio support (2026-11-13, docs/decisions/trainer-mode.md): a client shares pain and injuries with one coach;
+  // a coach works as a trainer or a physio; a routine can say how many times a week it's meant to be done.
+  ["coach_shares", "pain", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_prefs", "kind", "TEXT NOT NULL DEFAULT 'trainer'"],
+  ["coach_plans", "per_week", "INTEGER"],
 ];
 
 let client: Client | null = null;

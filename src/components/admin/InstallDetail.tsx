@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { installDetail } from "@/server/adminUsers";
 
 import { Card, fmtUsd, Table, Tile } from "./charts";
+import { LineBones, Loading, TileBones } from "./Skeletons";
 import { ago, when } from "./time";
 
 type Detail = NonNullable<Awaited<ReturnType<typeof installDetail>>>;
@@ -27,7 +28,15 @@ export function InstallDetail({ id, close }: { id: string; close: () => void }) 
       Close
     </button>
   );
-  if (d === null) return <Card title="Install">Loading…</Card>;
+  if (d === null)
+    return (
+      <Card title="Install">
+        <Loading label="Loading install" className="space-y-4">
+          <TileBones />
+          <LineBones n={5} />
+        </Loading>
+      </Card>
+    );
   if (d === "missing")
     return (
       <Card title="Install" right={closeBtn}>

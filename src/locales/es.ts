@@ -12,6 +12,7 @@ import * as advice from "./text/advice";
 import * as appearance from "./text/appearance";
 import * as awards from "./text/awards";
 import * as band from "./text/band";
+import * as bk from "./text/bk";
 import * as block from "./text/block";
 import * as bmi from "./text/bmi";
 import * as body from "./text/body";
@@ -23,10 +24,12 @@ import * as callText from "./text/callText";
 import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
+import * as chk from "./text/chk";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
 import * as count from "./text/count";
+import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
@@ -72,9 +75,11 @@ import * as muscle from "./text/muscle";
 import * as nav from "./text/nav";
 import * as note from "./text/note";
 import * as notes from "./text/notes";
+import * as now from "./text/now";
 import * as orm from "./text/orm";
 import * as part from "./text/part";
 import * as past from "./text/past";
+import * as pay from "./text/pay";
 import * as pgm from "./text/pgm";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
@@ -107,6 +112,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as team from "./text/team";
 import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
@@ -139,6 +145,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...appearance.es,
   ...awards.es,
   ...band.es,
+  ...bk.es,
   ...block.es,
   ...bmi.es,
   ...body.es,
@@ -150,10 +157,12 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...callText.es,
   ...category.es,
   ...cause.es,
+  ...chk.es,
   ...coach.es,
   ...conn.es,
   ...cos.es,
   ...count.es,
+  ...cpl.es,
   ...creator.es,
   ...cycle.es,
   ...dash.es,
@@ -197,9 +206,11 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...nav.es,
   ...note.es,
   ...notes.es,
+  ...now.es,
   ...orm.es,
   ...part.es,
   ...past.es,
+  ...pay.es,
   ...pgm.es,
   ...photos.es,
   ...plate.es,
@@ -235,6 +246,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...timer.es,
   ...tdee.es,
   ...theme.es,
+  ...team.es,
   ...tier.es,
   ...time.es,
   ...today.es,
