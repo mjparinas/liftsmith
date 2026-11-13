@@ -37,6 +37,7 @@ export const ROUTES = [
   "gymplace",
   "gymclaim",
   "gymedit",
+  "gymadd",
   "log",
 ] as const;
 export type Route = (typeof ROUTES)[number];

@@ -3,6 +3,7 @@
 import { linkInstall } from "@/server/access";
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { accountAccess } from "@/server/accounts";
+import { alertTrained } from "@/server/coach";
 import { rateLimit } from "@/server/db";
 import { settleReferral } from "@/server/earnedPro";
 import { checkSync, MAX_BODY, sync, SyncFull } from "@/server/sync";
@@ -25,7 +26,11 @@ export async function POST(req: Request) {
     // phone's store), so every device learns it or loses it on sync.
     const out = await sync(s.accountId, s.session, c.body);
     // A friend who joined through an invite may just have finished their third workout (earnedPro.ts).
-    if (c.body.events.some((e) => (e as { type?: unknown }).type === "sessionEnd")) await settleReferral(s.accountId).catch(() => false);
+    if (c.body.events.some((e) => (e as { type?: unknown }).type === "sessionEnd")) {
+      await settleReferral(s.accountId).catch(() => false);
+      // A client's coaches hear about a workout just finished (trainer-mode.md).
+      await alertTrained(s.accountId, c.body.events as { type?: unknown; at?: unknown }[]).catch(() => undefined);
+    }
     const a = await accountAccess(s.accountId);
     return reply(req, 200, { ...out, pro: a.pro, proVia: a.proVia, sub: a.sub });
   } catch (e) {

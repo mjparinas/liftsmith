@@ -155,7 +155,7 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     p.phone ? `<li>${icon("phone", 18)}<a href="tel:${esc(p.phone.replace(/[^\d+]/g, ""))}">${esc(p.phone)}</a></li>` : "",
   ].join("");
   const hero = `<section class="card hero" aria-labelledby="gym-h">
-<p class="kicker">${esc(say(lang, "gp.kicker"))}</p>
+${p.logo ? `<img class="logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="${esc(say(lang, "gp.logoAlt", { name: p.name }))}" width="64" height="64">` : ""}<p class="kicker">${esc(say(lang, "gp.kicker"))}</p>
 <h1 id="gym-h"><span>${esc(p.name)}</span>${p.official ? officialMark(lang) : ""}</h1>
 <p class="muted where">${icon("pin", 18)}<span>${esc([p.address, city].filter(Boolean).join(", "))}</span></p>
 <p class="status ${p.official ? "on" : ""}">${esc(p.official ? say(lang, "gp.officialNote") : say(lang, "gp.unofficial"))}</p>
@@ -163,7 +163,11 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
 <a class="btn btn-primary wide" href="${esc(appGymPath(p.id))}">${icon("plus", 18)}${esc(say(lang, "gp.add"))}</a>
 <p class="muted small add-note">${esc(say(lang, p.code ? "gp.addKit" : "gp.addNoKit"))}</p></section>`;
   const place = `<section class="card" aria-labelledby="addr-h"><h2 id="addr-h">${icon("pin", 16)}${esc(say(lang, "gp.address"))}</h2>
-<p>${esc([p.address, city].filter(Boolean).join(", "))}</p>
+<p>${esc([p.address, city].filter(Boolean).join(", "))}</p>${
+    p.map
+      ? `<figure class="map"><img src="${esc(p.map)}" alt="${esc(say(lang, "gp.mapAlt", { name: p.name }))}" width="640" height="320" loading="lazy"><figcaption>${esc(say(lang, "gp.mapCredit"))}</figcaption></figure>`
+      : ""
+  }
 <ul class="links"><li>${icon("pin", 18)}<a href="${esc(directions)}" rel="nofollow noopener">${esc(say(lang, "gp.directions"))}</a></li>
 <li>${icon("link", 18)}<a href="${esc(osm)}" rel="nofollow noopener">${esc(say(lang, "gp.map"))}</a></li>${contact}</ul></section>`;
   const hours = `<section class="card" aria-labelledby="hours-h"><h2 id="hours-h">${icon("clock", 16)}${esc(say(lang, "gp.hours"))}</h2>${hoursHtml(p.hours, lang)}</section>`;
@@ -172,6 +176,18 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     ? ""
     : `<section class="card claim" aria-labelledby="claim-h"><h2 id="claim-h">${icon("verified", 16)}${esc(say(lang, "gp.unofficial"))}</h2><p class="muted">${esc(say(lang, "gp.claim"))}</p></section>`;
   const poster = `<section class="card" aria-labelledby="poster-h"><h2 id="poster-h">${icon("flag", 16)}${esc(say(lang, "gp.posterTitle"))}</h2><p class="muted">${esc(say(lang, "gp.posterBody"))}</p><p><a href="${esc(`${gymPath(p)}poster/`)}" rel="nofollow">${esc(say(lang, "gp.posterLink"))}</a></p></section>`;
+  const photos = p.photos.length
+    ? `<section class="card" aria-labelledby="photos-h"><h2 id="photos-h">${icon("image", 16)}${esc(say(lang, "gp.photos"))}</h2><ul class="photos">${p.photos
+        .map(
+          (id, i) =>
+            `<li><img src="/api/gyms/photo/?id=${esc(id)}" alt="${esc(say(lang, "gp.photoAlt", { n: i + 1, name: p.name }))}" loading="lazy" width="800" height="600"></li>`,
+        )
+        .join("")}</ul></section>`
+    : "";
+  // The gym's own club and weekly leaderboard (social.ts gymClubStart), joined in the app.
+  const club = p.club
+    ? `<section class="card" aria-labelledby="club-h"><h2 id="club-h">${icon("trophy", 16)}${esc(say(lang, "gp.clubTitle"))}</h2><p class="muted">${esc(say(lang, "gp.clubBody"))}</p><p><a href="/app/#/club/${esc(encodeURIComponent(p.club))}">${esc(say(lang, "gp.clubJoin"))} ›</a></p></section>`
+    : "";
   const others = nearby.filter((x) => x.id !== p.id && x.kind === "gym").slice(0, 8);
   const more = others.length
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
@@ -184,7 +200,7 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${claim}${poster}</div><div class="col">${place}${hours}${kit}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${photos}${club}${claim}${poster}</div><div class="col">${place}${hours}${kit}${more}</div></div>${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
 
@@ -219,9 +235,12 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): stri
     [city, null],
   ])}
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.cityTitle", { city }))}</h1><p class="muted">${esc(desc)}</p></header>
-${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${credit}</main>`;
+${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${missing(lang)}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, gyms.length > 0), body, GYM_STYLE, "gym");
 }
+
+/** "Gym not listed? Add it in the app": the app's add form (GymAdd.tsx), which staff check. */
+const missing = (lang: MsgLang) => `<p><a class="quiet" href="/app/#/gymadd">${esc(say(lang, "gp.missing"))} ›</a></p>`;
 
 // --- Every city ---
 
@@ -240,7 +259,7 @@ export function indexHtml(list: City[], lang: MsgLang): string {
     .join("");
   const body = `<main id="main" class="wrap page narrow">
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.indexTitle"))}</h1><p class="muted">${esc(say(lang, "gp.indexBody"))}</p></header>
-${list.length ? `<section class="card"><ul class="list">${items}</ul></section>` : ""}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
+${list.length ? `<section class="card"><ul class="list">${items}</ul></section>` : ""}${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
   return framePage(lang, title, metaTags(title, desc, "/gyms/", ld), body, GYM_STYLE, "gym");
 }
 
@@ -261,6 +280,9 @@ export function gymSitemapXml(entries: { path: string; lastModified: number }[])
 }
 
 const GYM_STYLE = `
+.logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
+.map{margin:12px 0 0}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
+.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;list-style:none;margin:0;padding:0}.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .page{padding-top:20px;padding-bottom:48px}.narrow{max-width:48rem}
 .crumbs ol{display:flex;flex-wrap:wrap;gap:4px 8px;list-style:none;margin:0 0 16px;padding:0;font-size:.875rem;color:var(--muted)}

@@ -197,6 +197,10 @@ export const es: FeaturesText = {
       name: "Medidas con cinta",
       body: "Nueve zonas en centímetros o pulgadas. Una cintura que crece o se reduce se convierte en una nota del entrenador cuando no hay datos de grasa corporal.",
     },
+    "body-figure": {
+      name: "Una figura 3D con tu forma",
+      body: "Actívala y la figura de Salud toma tu complexión a partir de tu altura, peso, grasa corporal y medidas.",
+    },
     "health-twin": {
       name: "Gemelo de salud y edad física",
       body: "Sueño, VFC, pulso en reposo, pasos, frecuencia respiratoria y VO₂ máx en un solo lugar, con tu tendencia y una edad física a partir de tu VO₂ máx.",
@@ -241,7 +245,7 @@ export const es: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador y páginas de gimnasios",
-      body: "Encuentra gimnasios cerca de ti, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio.",
+      body: "Encuentra gimnasios cerca de ti, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal.",
     },
     "buy-next": {
       name: "Qué comprar después",
@@ -267,6 +271,11 @@ export const es: FeaturesText = {
     coaching: {
       name: "Entrena a clientes",
       body: "Vincula clientes, mira sus resultados y asígnales rutinas, en el teléfono o en una pantalla grande.",
+    },
+    "coach-chat": {
+      name: "Chat, avisos y datos corporales",
+      body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos.",
+      note: "Las notificaciones son para Android y iPhone. La app web muestra los mensajes nuevos cuando está abierta.",
     },
     awards: {
       name: "Logros, niveles y rachas",

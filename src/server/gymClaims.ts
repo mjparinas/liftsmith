@@ -218,12 +218,36 @@ export interface OwnedGym {
   /** The map's address, to start the stand's mailing address. */
   address: string;
   lifters: number;
+  /** The owner's results: lifters who added the gym in the last 30 days, and poster or stand scans (all time, 30 days). */
+  newLifters: number;
+  scans: number;
+  scans30: number;
+  /** The gym's own club's code (social.ts gymClubStart), '' before the owner starts it. */
+  club: string;
+  /** The logo's and photos' ids (gymMedia.ts). */
+  logo: string;
+  photos: string[];
 }
 
-export async function ownedGyms(accountId: string): Promise<OwnedGym[]> {
+/** "logo:ab12,photo:cd34" → the logo's id and the photos' ids, in order. */
+function pictures(list: string): { logo: string; photos: string[] } {
+  const all = list ? list.split(",").map((x) => x.split(":")) : [];
+  return { logo: all.find(([k]) => k === "logo")?.[1] ?? "", photos: all.filter(([k]) => k === "photo").map(([, id]) => id!) };
+}
+
+export async function ownedGyms(accountId: string, now = Date.now()): Promise<OwnedGym[]> {
+  // With the owner's results for the last 30 days: lifters who added the gym and poster or stand scans.
+  const since = now - 30 * 86_400_000;
   const rows = await query(
-    "SELECT id, name, city_slug, slug, address, city, region, hours, website, phone, description, code, lifters FROM gym_places WHERE claimed_by = ? ORDER BY name",
-    [accountId],
+    `SELECT p.id, p.name, p.city_slug, p.slug, p.address, p.city, p.region, p.hours, p.website, p.phone, p.description, p.code, p.lifters,
+       p.qr_scans,
+       (SELECT COUNT(*) FROM gym_place_lifters l WHERE l.place_id = p.id AND l.created_at > ?) AS new_lifters,
+       (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30,
+       (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
+       (SELECT group_concat(m.kind || ':' || m.id) FROM (SELECT kind, id FROM gym_photos WHERE place_id = p.id ORDER BY created_at, id) m)
+         AS pictures
+     FROM gym_places p WHERE p.claimed_by = ? ORDER BY p.name`,
+    [since, Math.floor(since / 86_400_000), accountId],
   );
   return rows.map((r) => ({
     id: s(r.id),
@@ -237,6 +261,11 @@ export async function ownedGyms(accountId: string): Promise<OwnedGym[]> {
     code: s(r.code),
     address: [s(r.address), [s(r.city), s(r.region)].filter(Boolean).join(" ")].filter(Boolean).join("\n"),
     lifters: n(r.lifters),
+    newLifters: n(r.new_lifters),
+    scans: n(r.qr_scans),
+    scans30: n(r.scans_30),
+    club: s(r.club),
+    ...pictures(s(r.pictures)),
   }));
 }
 
@@ -290,13 +319,15 @@ export async function editGym(accountId: string, body: Record<string, unknown>, 
 /** The owner gives the gym up: it goes back to unofficial, with the details they set. */
 export async function releaseGym(accountId: string, placeId: unknown, now = Date.now()): Promise<boolean> {
   if (!isPlaceId(placeId)) return false;
-  return (
+  const gone =
     (await run("UPDATE gym_places SET claimed_by = '', claimed_at = 0, updated_at = ? WHERE id = ? AND claimed_by = ?", [
       now,
       placeId,
       accountId,
-    ])) > 0
-  );
+    ])) > 0;
+  // The gym's club stays with its members as an ordinary club; the next owner starts the gym's own.
+  if (gone) await run("UPDATE clubs SET place_id = '' WHERE place_id = ?", [placeId]);
+  return gone;
 }
 
 // --- Staff: claims waiting on the Gyms tab ---

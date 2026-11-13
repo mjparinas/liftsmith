@@ -41,13 +41,16 @@ export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_c
 export const MAX_TOKENS = 10;
 const TIMEOUT_MS = 4000;
 
+/** Coaching pushes (trainer mode, 2026-11-12): a chat message, and the coach's alerts about a client. */
+export type CoachPushKind = "coachMsg" | "coachTrained" | "coachQuiet";
+
 export interface PushMessage {
   token: string;
   platform: "android" | "ios";
   body: string;
-  /** The app screen a tap opens (#/friends or #/routine/<code>). */
+  /** The app screen a tap opens (#/friends, #/routine/<code> or #/trainer…). */
   route: string;
-  kind: PushKind;
+  kind: PushKind | CoachPushKind;
 }
 /** Sends one message; "gone" means the token is dead and is deleted. */
 export type PushSender = (m: PushMessage) => Promise<"ok" | "gone" | "error">;
@@ -152,6 +155,38 @@ async function send(
       if (r === "gone") await run("DELETE FROM push_tokens WHERE token = ?", [t.token]);
     }),
   );
+}
+
+/**
+ * A coaching push: a message from a coach or client, or an alert to a coach about a client. Coaching doesn't need
+ * Friends, so the name is the sender's profile name and there's no Friends switch; the coach's alert switch is checked
+ * by the caller (coach.ts). Like `notify`, it never throws and gives up after a few seconds.
+ */
+export async function notifyCoach(to: string, kind: CoachPushKind, vars: { name: string; text?: string }, route: string) {
+  const sender = testSender ?? (pushConfigured().fcm || pushConfigured().apns ? networkSender : null);
+  if (!sender) return;
+  try {
+    await Promise.race([
+      (async () => {
+        const tokens = await query<{ token: string; platform: "android" | "ios"; lang: string }>(
+          "SELECT token, platform, lang FROM push_tokens WHERE account_id = ?",
+          [to],
+        );
+        const short = (s = "") => (s.length > 120 ? `${s.slice(0, 119)}…` : s);
+        await Promise.all(
+          tokens.map(async (t) => {
+            const lang: MsgLang = isMsgLang(t.lang) ? t.lang : "en";
+            const body = pushText(lang, `push.${kind}`, { name: vars.name || pushText(lang, "push.someone", {}), text: short(vars.text) });
+            const r = await sender({ token: String(t.token), platform: t.platform, body, route, kind });
+            if (r === "gone") await run("DELETE FROM push_tokens WHERE token = ?", [t.token]);
+          }),
+        );
+      })(),
+      new Promise((r) => setTimeout(r, TIMEOUT_MS)),
+    ]);
+  } catch (e) {
+    console.warn(`push ${kind}: ${e instanceof Error ? e.message : "failed"}`);
+  }
 }
 
 const networkSender: PushSender = (m) => (m.platform === "android" ? sendFcm(m) : sendApns(m));

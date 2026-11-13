@@ -204,6 +204,10 @@ export const de: FeaturesText = {
       name: "Körpermaße",
       body: "Neun Stellen in Zentimetern oder Zoll. Ein wachsender oder schrumpfender Bauchumfang wird zur Coach-Notiz, wenn es keinen Körperfettwert gibt.",
     },
+    "body-figure": {
+      name: "Eine 3D-Figur in deiner Form",
+      body: "Schalte sie ein, und die Figur unter Gesundheit übernimmt deinen Körperbau aus Größe, Gewicht, Körperfett und Umfängen.",
+    },
     "health-twin": {
       name: "Gesundheitszwilling und Fitnessalter",
       body: "Schlaf, HRV, Ruhepuls, Schritte, Atemfrequenz und VO₂max an einem Ort, mit deinem Trend und einem Fitnessalter aus deiner VO₂max.",
@@ -245,7 +249,7 @@ export const de: FeaturesText = {
     },
     "gym-finder": {
       name: "Studiosuche und Studioseiten",
-      body: "Finde Studios in deiner Nähe, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen.",
+      body: "Finde Studios in deiner Nähe, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen.",
     },
     "buy-next": {
       name: "Was du als Nächstes kaufst",
@@ -271,6 +275,11 @@ export const de: FeaturesText = {
     coaching: {
       name: "Kunden coachen",
       body: "Verknüpfe Kunden, sieh ihre Ergebnisse und weise ihnen Routinen zu, am Handy oder auf einem großen Bildschirm.",
+    },
+    "coach-chat": {
+      name: "Chat, Hinweise und Körperdaten",
+      body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
+      note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
     },
     awards: {
       name: "Erfolge, Level und Serien",

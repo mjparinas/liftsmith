@@ -41,6 +41,8 @@ export const VIEW_YAW: Record<Exclude<View, "orbit">, number> = { side: 0, three
 export interface DemoSettings {
   exerciseId: string | null;
   body: BodyKey;
+  /** A reshaped figure (bodyShape.ts) used instead of the average one for `body`. */
+  shape?: Body;
   view: View;
   skeleton: boolean;
   muscles: boolean;
@@ -166,7 +168,7 @@ export function startLoop(
 
   const setup = () => {
     motion = s.exerciseId === DANCE_ID ? danceMotion() : (stretchMotion(s.exerciseId) ?? motionFor(s.exerciseId));
-    body = BODIES[s.body];
+    body = s.shape ?? BODIES[s.body];
     place = placement(motion, body);
     frameBox = bounds(motion, body, place);
     const J0 = jointsAt(motion, body, 0);
@@ -324,7 +326,7 @@ export function startLoop(
       if (reduced) s.playing = false;
       const differs = (k: keyof DemoSettings) => k in p && p[k] !== prev[k];
       if (differs("exerciseId")) t = reduced ? 1.8 : 0;
-      if (differs("exerciseId") || differs("body") || differs("highlight") || differs("paint")) setup();
+      if (differs("exerciseId") || differs("body") || differs("shape") || differs("highlight") || differs("paint")) setup();
       if (differs("reps")) {
         t = 0;
         done = false;

@@ -58,6 +58,27 @@ export interface Overview {
   notes?: Note[];
   /** What this coach's new clients start setup with. */
   setup?: Setup;
+  /** Unread chat messages from each person, by id. */
+  unread?: Record<string, number>;
+  /** Coaches this client shares body data with; clients who share theirs with this coach. */
+  bodyShared?: string[];
+  sharesBody?: string[];
+  /** Whether this coach gets alerts about their clients (on unless turned off). */
+  alerts?: boolean;
+}
+/** A chat message between a coach and a client. */
+export interface Message {
+  id: string;
+  from: string;
+  text: string;
+  at: number;
+}
+/** A client's body data, when they share it with this coach (the server's BodyShare). */
+export interface BodyShare {
+  sex: "male" | "female" | null;
+  heightCm: number | null;
+  weights: { at: number; kg: number; bodyFat?: number }[];
+  measures: { at: number; site: string; cm: number }[];
 }
 export interface ClientView {
   name: string;
@@ -67,6 +88,8 @@ export interface ClientView {
   plans: Plan[];
   /** This coach's note to the client. */
   note?: Note | null;
+  /** The client's body data, when they share it. */
+  body?: BodyShare | null;
 }
 /** The longest note a coach can leave (the server's COACH_LIMITS.note). */
 export const NOTE_MAX = 500;
@@ -104,6 +127,22 @@ export const saveNote = async (client: string, text: string) =>
 export const assignPlan = async (client: string, name: string, code: string) =>
   (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code } })).plan;
 export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
+/** The longest chat message (the server's COACH_LIMITS.message). */
+export const MESSAGE_MAX = 1000;
+export const loadMessages = async (id: string, before?: number) =>
+  api<{ messages: Message[]; more: boolean; name?: string }>(
+    `/api/coach/?chat=${encodeURIComponent(id)}${before ? `&before=${before}` : ""}`,
+    { token: token() },
+  );
+export const sendMessage = async (id: string, text: string) =>
+  (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text } })).message;
+export const setBodyShare = async (coach: string, on: boolean) =>
+  (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
+export const setCoachAlerts = async (on: boolean) =>
+  (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "alerts", on } })).on;
+/** This phone's push token for coaching pushes, which don't need Friends (push.ts calls it). */
+export const coachPushToken = async (tokenValue: string, platform: string, lang: string) =>
+  void (await api("/api/coach/", { token: token(), body: { action: "pushToken", token: tokenValue, platform, lang } }));
 export const unlinkPerson = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unlink", id } }));
 
 /** A code as it's shown and read out: ABCD-EFGH. */
@@ -290,8 +329,16 @@ const EVERY = 15 * 60_000;
 export interface ShownNote extends Note {
   coach: string;
 }
+/** Someone with unread messages for this lifter. */
+export interface Unread {
+  id: string;
+  name: string;
+  count: number;
+}
 interface NotesState {
   notes: ShownNote[];
+  /** Coaches or clients with unread messages, for Today and the Coaching row. */
+  unread: Unread[];
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
   seen: string[];
 }
@@ -314,6 +361,7 @@ function writeJson(key: string, v: unknown) {
 
 export const useCoachNotes = create<NotesState>(() => ({
   notes: typeof window === "undefined" ? [] : readJson<ShownNote[]>(CACHE, []),
+  unread: [],
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
 }));
 
@@ -325,10 +373,19 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 }
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
-export function keepNotes(o: Pick<Overview, "notes" | "coaches">): void {
+export function keepNotes(o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread">>): void {
   const notes = shownNotes(o);
   writeJson(CACHE, notes);
-  useCoachNotes.setState({ notes });
+  const people = [...o.coaches, ...(o.clients ?? [])];
+  const unread = Object.entries(o.unread ?? {})
+    .filter(([, n]) => n > 0)
+    .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
+  useCoachNotes.setState({ notes, unread });
+}
+
+/** A chat was opened: its messages are read now. */
+export function markRead(id: string): void {
+  useCoachNotes.setState((s) => ({ unread: s.unread.filter((u) => u.id !== id) }));
 }
 
 let lastLook = 0;
@@ -353,5 +410,5 @@ export function dismissNote(n: Note): void {
 /** Signed out, or the lifter erased their data: nothing from a coach stays on the device. */
 export function forgetNotes(): void {
   writeJson(CACHE, []);
-  useCoachNotes.setState({ notes: [] });
+  useCoachNotes.setState({ notes: [], unread: [] });
 }

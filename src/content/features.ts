@@ -343,6 +343,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "body-figure",
+        name: "A 3D figure shaped like you",
+        body: "Turn it on and the figure on Health takes your build from your height, weight, body fat and tape measurements.",
+        tier: "free",
+        added: "2026-11-12",
+      },
+      {
         id: "health-twin",
         name: "Health twin and fitness age",
         body: "Sleep, HRV, resting heart rate, steps, breathing rate and VO₂ max in one place, with your trend and a fitness age from your VO₂ max.",
@@ -440,7 +447,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "gym-finder",
         name: "Gym finder and gym pages",
-        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym.",
+        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard.",
         tier: "free",
         added: "2026-11-12",
       },
@@ -507,6 +514,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "pro",
         pro: "coaching",
         added: "2026-11-11",
+      },
+      {
+        id: "coach-chat",
+        name: "Chat, alerts and body data",
+        body: "Message each client, get a notification when they train or go quiet for a week, and see their weigh-ins, measurements and a 3D figure shaped like them when they choose to share.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Notifications are on Android and iPhone. The web app shows new messages when it's open.",
+        added: "2026-11-12",
       },
     ],
   },
