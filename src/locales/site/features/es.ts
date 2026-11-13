@@ -356,6 +356,10 @@ export const es: FeaturesText = {
       name: "Modo ligero, sonidos y vibración",
       body: "Desactiva animaciones y confeti, sonidos o vibración, cada uno con un interruptor.",
     },
+    "lite-demos": {
+      name: "Ahorro de batería en las figuras 3D",
+      body: "Muestra las demostraciones de ejercicios y el mapa de recuperación con menos resolución y fotogramas, para teléfonos antiguos y más batería.",
+    },
     desktop: {
       name: "Diseño para ordenador",
       body: "En un ordenador la app web tiene barra lateral, páginas anchas, atajos de teclado durante el entrenamiento (L registra la serie) y un editor de rutinas amplio.",

@@ -695,6 +695,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "lite-demos",
+        name: "Battery saver for 3D figures",
+        body: "Draw the exercise demos and the recovery map at a lower resolution and frame rate, for older phones and longer battery.",
+        tier: "free",
+        added: "2026-11-13",
+      },
+      {
         id: "desktop",
         name: "Desktop layout",
         body: "On a computer the web app has a sidebar, wide pages, keyboard shortcuts during a workout (L logs the set) and a wide routine builder.",

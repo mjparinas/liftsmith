@@ -732,7 +732,8 @@ export function Workout() {
                 body={bodyFor(profile.sex)}
                 bpm={bpm}
                 hrTrend={active.hr}
-                paused={infoOpen || swapOpen || endOpen}
+                // Still during rest: the figure only moves while there's a set to do (docs/decisions/speed.md).
+                paused={infoOpen || swapOpen || endOpen || resting}
                 className="h-full"
               />
               {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}

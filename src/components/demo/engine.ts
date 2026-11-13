@@ -327,6 +327,8 @@ export function startLoop(
       const differs = (k: keyof DemoSettings) => k in p && p[k] !== prev[k];
       if (differs("exerciseId")) t = reduced ? 1.8 : 0;
       if (differs("exerciseId") || differs("body") || differs("shape") || differs("highlight") || differs("paint")) setup();
+      // A new pixel ratio cap (battery saver) redraws at the new resolution.
+      if (differs("maxDpr")) size = [0, 0];
       if (differs("reps")) {
         t = 0;
         done = false;

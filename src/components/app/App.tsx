@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
@@ -18,10 +18,11 @@ import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
-import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
+import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
+import { setLiteDemos } from "@/lib/liteDemos";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -97,9 +98,14 @@ const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setu
 
 export function App() {
   const { ready, init, profile, active, stats } = useApp();
+  // The first screen waits for the lifter's language to load (one at a time, i18n.ts), so it never flashes English.
+  // Later switches (Settings › Language) keep the screen and change its words when the language arrives.
+  const langWaiting = useSyncExternalStore(subscribeLang, languagePending, () => false);
+
   const { route, arg } = useRoute();
   const desktop = useDesktop();
   useEffect(() => applyLayout(desktop), [desktop]);
+  useEffect(() => setLiteDemos(!!profile.liteDemos), [profile.liteDemos]);
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
   // The achievements come from the shared game result (useGame), not a second count of their own.
@@ -377,7 +383,7 @@ export function App() {
     };
   }, [ready, profile.onboarded]);
 
-  if (!ready) return <TodaySkeleton />;
+  if (!ready || langWaiting) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;
 
   const screens: Record<Route, ReactNode> = {

@@ -34,19 +34,44 @@ every problem below, because the app's numbers are worked out from the whole eve
   same with and without a long history.
 - To check a change that touches history-wide code, seed a long history and time it, not only an empty account.
 
+## One language at a time (2026-11-13)
+
+Melvin picked it from the list. The six catalogues used to be one 3.5 MB script in the app's first load. Now:
+
+- `scripts/locales.mjs` (`npm run locales`, run before `build` and `build:static`) writes one JSON file per language
+  to `src/locales/gen/` (not committed) from the same catalogues. The source stays as it is, every language side by
+  side in `src/locales/text/<prefix>.ts`.
+- The app reads each language through `src/locales/load/<lang>.ts`, which re-exports the source; the production builds
+  swap those for the JSON files (`turbopack.resolveAlias` in `next.config.ts`). Dev and tests read the source.
+- `i18n.ts` keeps English loaded (the fallback) and loads another language the first time it's needed
+  (`loadLanguage`). The first screen waits for it behind the loading screen (`languagePending`, `App.tsx`), so a
+  French phone never flashes English; switching in Settings changes the words when the file arrives (a few
+  milliseconds, it's on the device). Tests load every language at the start (`src/test/setup.ts`).
+- Code that needs the English text whatever the language uses `english(key)` from `i18n.ts`; importing
+  `@/locales/en` (or any catalogue) at run time in app code would bring every language back.
+
+The app's first load went from 5.7 MB of script to about 2.7 MB.
+
+## Battery saver for 3D figures (2026-11-13)
+
+Melvin asked for "a slow phone mode" with a better name. **Settings › Look and feel › Battery saver for 3D figures**
+(`profile.liteDemos`, `src/lib/liteDemos.ts`, off by default) draws the exercise demos and the recovery map at one
+device pixel per CSS pixel (instead of up to two) and half the frame rate (15 instead of 30, 30 instead of 60 where
+the figure can be turned). Shared web code, so Android, iOS and the web app get it together.
+
+**The demo on the workout screen stands still during rest**, whatever the setting: it only moves while there's a set
+to do. The heart still beats with a live heart rate.
+
+## Maintenance check only where it matters (2026-11-13)
+
+The maintenance proxy (`src/proxy.api.ts`) runs only on API routes and the server-drawn pages, not on every page,
+because each page visit paid for a function call (about 70 ms, plus cold starts). Static pages stay up during
+maintenance; they never read the database. Melvin chose this.
+
 ## Found and not done yet (ranked)
 
-1. **Every language ships in the app's first load.** All six catalogues are one 3.5 MB script (960 KB gzipped) of
-   the app's 5.7 MB. Loading only the active language (English stays as the fallback) would cut about half the
-   JavaScript a phone has to load at start. Needs the first render to wait for the language, so it's its own change.
-2. **The exercise demo animates all the time on the workout screen**, including rest: about a quarter of the main
-   thread on a slowed phone. Pausing it during rest, or after a few loops, would save battery and keep taps quick.
-3. **The website's proxy runs on every page.** `src/proxy.api.ts` (maintenance mode) makes every public page go
-   through a function, which adds about 70 ms to each page and a cold start now and then. Limiting it to `/api/`
-   would leave pages up during maintenance, so it's Melvin's call.
-4. **All app screens are in one bundle** (about 1.1 MB). Loading rarely used screens (admin-like tools, trainer,
-   gyms, imports) on demand would help the web app's first visit; inside the phone apps the files are local, so the
-   gain there is small.
-5. **Vercel's per-route timings need Observability Plus**, which is off for the team, so slow API routes can't be
+1. **All app screens are in one bundle** (about 1.1 MB). Loading rarely used screens (trainer, gyms, imports, tools)
+   on demand would help the web app's first visit; inside the phone apps the files are local, so the gain is small.
+2. **Vercel's per-route timings need Observability Plus**, which is off for the team, so slow API routes can't be
    ranked from production data. The app is offline first, so API speed only shows on Friends (already cached,
    [Friends](friends.md) "Loading fast") and sign-in.
