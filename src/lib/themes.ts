@@ -1,6 +1,6 @@
 import type { MessageKey } from "@/locales/en";
 
-import { achievements, achName, context, TIER_LABEL, tierNames, type Tier } from "./achievements";
+import { achievements, achName, context, TIER_LABEL, tierNames, type Achievement, type Tier } from "./achievements";
 import type { Stats } from "./derive";
 import { goalStreak } from "./game";
 import { t } from "./i18n";
@@ -50,7 +50,11 @@ export interface UnlockContext {
 
 /** Everything unlocked() needs, from the event log. */
 export function unlockContext(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): UnlockContext {
-  const list = achievements(context(events, stats, profile, goalStreak(stats, profile, now).best));
+  return unlockFrom(achievements(context(events, stats, profile, goalStreak(stats, profile, now).best)), stats, now);
+}
+
+/** The same, from achievements already worked out (`game().achievements`), so the app doesn't count them twice. */
+export function unlockFrom(list: readonly Achievement[], stats: Stats, now: number): UnlockContext {
   return { stats, badges: new Map(list.map((a) => [a.id, a.level])), now };
 }
 
