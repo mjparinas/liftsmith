@@ -126,7 +126,7 @@ export const en = {
   "trn.newFrom": "New message from {name}",
   "trn.shareBody": "Share body data with {name}",
   "trn.shareBodyHint":
-    "Your weight, body fat, height, sex and tape measurements from the last year, and a 3D figure shaped from them. Never your photos. Turn it off any time.",
+    "Your weight, body fat, height, sex and tape measurements from the last year, and a 3D figure shaped from them. Also the calories and protein your food app logs, from the last 30 days. Never your photos. Turn it off any time.",
   "trn.consentBodyLater": "Body data stays private until you turn on sharing for a coach.",
   "trn.body": "Body",
   "trn.bodyFigure": "3D figure shaped from {name}'s body data",
@@ -139,6 +139,44 @@ export const en = {
   "trn.alerts": "Client alerts",
   "trn.alertsHint": "A notification when a client finishes a workout, or hasn't trained for a week.",
   "trn.whatYouSeeBody": "They share their body data with you. They can stop sharing at any time.",
+  "trn.targets": "Daily nutrition targets",
+  "trn.targetsHint":
+    "Calories and protein for each day. They see these under Coaching, and their coach's notes check their food week against them.",
+  "trn.targetsKcal": "Calories a day",
+  "trn.targetsProtein": "Protein a day (g)",
+  "trn.targetsSave": "Save targets",
+  "trn.targetsClear": "Clear targets",
+  "trn.targetsSaved": "Saved. They'll see these under Coaching.",
+  "trn.targetsCleared": "Targets cleared.",
+  "trn.targetsWeek": {
+    one: "This past week: {count} logged day, about {kcal} kcal a day.",
+    other: "This past week: {count} logged days, about {kcal} kcal a day.",
+  },
+  "trn.targetsWeekProtein": "Protein about {protein} g a day.",
+  "trn.targetsNoFood":
+    "No food logged this past week. Calories and protein show here once their food app writes them to Health Connect or Apple Health.",
+  "trn.targetsAskShare":
+    "To see what they eat, ask them to turn on Share body data for you. It includes the calories and protein their food app logs.",
+  "trn.targetsFrom": "Daily targets from {name}",
+  "trn.targetsKcalValue": "{kcal} kcal",
+  "trn.targetsProteinValue": "{protein} g protein",
+  "trn.targetsClientHint":
+    "Log food in your usual food app. Through Health Connect or Apple Health, your coach's notes check your week against these.",
+  "trn.f.kcalUnder": {
+    one: "Eating about {avg} kcal a day against {target} ({count} day logged)",
+    other: "Eating about {avg} kcal a day against {target} ({count} days logged)",
+  },
+  "trn.f.kcalUnderDo": "Ask what's getting in the way, or set a target they can reach.",
+  "trn.f.kcalOver": {
+    one: "Eating about {avg} kcal a day against {target} ({count} day logged)",
+    other: "Eating about {avg} kcal a day against {target} ({count} days logged)",
+  },
+  "trn.f.kcalOverDo": "Check in on their goal, and suggest one swap that saves calories each day.",
+  "trn.f.proteinShort": {
+    one: "Protein about {avg} g a day against {target} g ({count} day logged)",
+    other: "Protein about {avg} g a day against {target} g ({count} days logged)",
+  },
+  "trn.f.proteinShortDo": "Suggest a protein food at each meal.",
 };
 
 type Key = keyof typeof en;
@@ -267,7 +305,7 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.newFrom": "Nuevo mensaje de {name}",
   "trn.shareBody": "Compartir datos corporales con {name}",
   "trn.shareBodyHint":
-    "Tu peso, grasa corporal, altura, sexo y medidas con cinta del último año, y una figura 3D con esa forma. Nunca tus fotos. Desactívalo cuando quieras.",
+    "Tu peso, grasa corporal, altura, sexo y medidas con cinta del último año, y una figura 3D con esa forma. También las calorías y la proteína que registra tu app de comida en los últimos 30 días. Nunca tus fotos. Desactívalo cuando quieras.",
   "trn.consentBodyLater": "Tus datos corporales son privados hasta que actives compartirlos con un entrenador.",
   "trn.body": "Cuerpo",
   "trn.bodyFigure": "Figura 3D con la forma de los datos corporales de {name}",
@@ -280,6 +318,44 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.alerts": "Avisos de clientes",
   "trn.alertsHint": "Una notificación cuando un cliente termina un entrenamiento o lleva una semana sin entrenar.",
   "trn.whatYouSeeBody": "Comparte sus datos corporales contigo. Puede dejar de hacerlo cuando quiera.",
+  "trn.targets": "Objetivos diarios de nutrición",
+  "trn.targetsHint":
+    "Calorías y proteína de cada día. Los ve en Coaching, y las notas del entrenador comparan su semana de comida con ellos.",
+  "trn.targetsKcal": "Calorías al día",
+  "trn.targetsProtein": "Proteína al día (g)",
+  "trn.targetsSave": "Guardar objetivos",
+  "trn.targetsClear": "Borrar objetivos",
+  "trn.targetsSaved": "Guardado. Los verá en Coaching.",
+  "trn.targetsCleared": "Objetivos borrados.",
+  "trn.targetsWeek": {
+    one: "Esta última semana: {count} día registrado, unas {kcal} kcal al día.",
+    other: "Esta última semana: {count} días registrados, unas {kcal} kcal al día.",
+  },
+  "trn.targetsWeekProtein": "Proteína: unos {protein} g al día.",
+  "trn.targetsNoFood":
+    "Sin comidas registradas esta semana. Las calorías y la proteína aparecen aquí cuando su app de comida las escribe en Health Connect o Apple Health.",
+  "trn.targetsAskShare":
+    "Para ver lo que come, pídele que active Compartir datos corporales contigo. Incluye las calorías y la proteína que registra su app de comida.",
+  "trn.targetsFrom": "Objetivos diarios de {name}",
+  "trn.targetsKcalValue": "{kcal} kcal",
+  "trn.targetsProteinValue": "{protein} g de proteína",
+  "trn.targetsClientHint":
+    "Registra la comida en tu app de siempre. A través de Health Connect o Apple Health, las notas del entrenador comparan tu semana con estos objetivos.",
+  "trn.f.kcalUnder": {
+    one: "Come unas {avg} kcal al día frente a {target} ({count} día registrado)",
+    other: "Come unas {avg} kcal al día frente a {target} ({count} días registrados)",
+  },
+  "trn.f.kcalUnderDo": "Pregunta qué se lo impide o fija un objetivo que pueda alcanzar.",
+  "trn.f.kcalOver": {
+    one: "Come unas {avg} kcal al día frente a {target} ({count} día registrado)",
+    other: "Come unas {avg} kcal al día frente a {target} ({count} días registrados)",
+  },
+  "trn.f.kcalOverDo": "Repasa su objetivo y sugiere un cambio diario que ahorre calorías.",
+  "trn.f.proteinShort": {
+    one: "Proteína de unos {avg} g al día frente a {target} g ({count} día registrado)",
+    other: "Proteína de unos {avg} g al día frente a {target} g ({count} días registrados)",
+  },
+  "trn.f.proteinShortDo": "Sugiere un alimento con proteína en cada comida.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -408,7 +484,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.newFrom": "Nouveau message de {name}",
   "trn.shareBody": "Partager mes données corporelles avec {name}",
   "trn.shareBodyHint":
-    "Votre poids, masse grasse, taille, sexe et mensurations de la dernière année, et une silhouette 3D qui en reprend la forme. Jamais vos photos. Désactivable à tout moment.",
+    "Votre poids, masse grasse, taille, sexe et mensurations de la dernière année, et une silhouette 3D qui en reprend la forme. Aussi les calories et protéines de votre app de nutrition sur les 30 derniers jours. Jamais vos photos. Désactivable à tout moment.",
   "trn.consentBodyLater": "Vos données corporelles restent privées tant que vous n'activez pas le partage avec un coach.",
   "trn.body": "Corps",
   "trn.bodyFigure": "Silhouette 3D d'après les données corporelles de {name}",
@@ -421,6 +497,44 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.alerts": "Alertes clients",
   "trn.alertsHint": "Une notification quand un client termine une séance, ou n'a pas fait de séance depuis une semaine.",
   "trn.whatYouSeeBody": "Ce client partage ses données corporelles avec vous. Le partage peut s'arrêter à tout moment.",
+  "trn.targets": "Objectifs nutritionnels quotidiens",
+  "trn.targetsHint":
+    "Calories et protéines de chaque jour. Ils les voient sous Coaching, et les notes du coach comparent leur semaine à ces objectifs.",
+  "trn.targetsKcal": "Calories par jour",
+  "trn.targetsProtein": "Protéines par jour (g)",
+  "trn.targetsSave": "Enregistrer les objectifs",
+  "trn.targetsClear": "Effacer les objectifs",
+  "trn.targetsSaved": "Enregistré. Ils les verront sous Coaching.",
+  "trn.targetsCleared": "Objectifs effacés.",
+  "trn.targetsWeek": {
+    one: "Cette dernière semaine : {count} jour saisi, environ {kcal} kcal par jour.",
+    other: "Cette dernière semaine : {count} jours saisis, environ {kcal} kcal par jour.",
+  },
+  "trn.targetsWeekProtein": "Protéines : environ {protein} g par jour.",
+  "trn.targetsNoFood":
+    "Aucun repas saisi cette semaine. Les calories et protéines apparaissent ici quand leur app de nutrition les écrit dans Health Connect ou Apple Santé.",
+  "trn.targetsAskShare":
+    "Pour voir ce qu'ils mangent, demandez-leur d'activer le partage des données corporelles avec vous. Il comprend les calories et protéines de leur app de nutrition.",
+  "trn.targetsFrom": "Objectifs quotidiens de {name}",
+  "trn.targetsKcalValue": "{kcal} kcal",
+  "trn.targetsProteinValue": "{protein} g de protéines",
+  "trn.targetsClientHint":
+    "Saisissez vos repas dans votre app habituelle. Via Health Connect ou Apple Santé, les notes du coach comparent votre semaine à ces objectifs.",
+  "trn.f.kcalUnder": {
+    one: "Environ {avg} kcal par jour pour un objectif de {target} ({count} jour saisi)",
+    other: "Environ {avg} kcal par jour pour un objectif de {target} ({count} jours saisis)",
+  },
+  "trn.f.kcalUnderDo": "Demandez ce qui bloque, ou fixez un objectif atteignable.",
+  "trn.f.kcalOver": {
+    one: "Environ {avg} kcal par jour pour un objectif de {target} ({count} jour saisi)",
+    other: "Environ {avg} kcal par jour pour un objectif de {target} ({count} jours saisis)",
+  },
+  "trn.f.kcalOverDo": "Faites le point sur l'objectif et proposez un échange quotidien qui économise des calories.",
+  "trn.f.proteinShort": {
+    one: "Environ {avg} g de protéines par jour pour {target} g ({count} jour saisi)",
+    other: "Environ {avg} g de protéines par jour pour {target} g ({count} jours saisis)",
+  },
+  "trn.f.proteinShortDo": "Proposez un aliment riche en protéines à chaque repas.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -548,7 +662,7 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.newFrom": "Neue Nachricht von {name}",
   "trn.shareBody": "Körperdaten mit {name} teilen",
   "trn.shareBodyHint":
-    "Gewicht, Körperfett, Größe, Geschlecht und Umfänge des letzten Jahres, dazu eine danach geformte 3D-Figur. Nie deine Fotos. Jederzeit abschaltbar.",
+    "Gewicht, Körperfett, Größe, Geschlecht und Umfänge des letzten Jahres, dazu eine danach geformte 3D-Figur. Außerdem Kalorien und Protein aus deiner Ernährungs-App der letzten 30 Tage. Nie deine Fotos. Jederzeit abschaltbar.",
   "trn.consentBodyLater": "Deine Körperdaten bleiben privat, bis du das Teilen für einen Coach einschaltest.",
   "trn.body": "Körper",
   "trn.bodyFigure": "3D-Figur nach den Körperdaten von {name}",
@@ -561,6 +675,44 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.alerts": "Hinweise zu Kunden",
   "trn.alertsHint": "Eine Mitteilung, wenn ein Kunde ein Training beendet oder eine Woche nicht trainiert hat.",
   "trn.whatYouSeeBody": "Diese Person teilt ihre Körperdaten mit dir und kann das jederzeit beenden.",
+  "trn.targets": "Tägliche Ernährungsziele",
+  "trn.targetsHint":
+    "Kalorien und Protein pro Tag. Sie sehen sie unter Coaching, und die Hinweise des Coaches prüfen ihre Ernährungswoche daran.",
+  "trn.targetsKcal": "Kalorien pro Tag",
+  "trn.targetsProtein": "Protein pro Tag (g)",
+  "trn.targetsSave": "Ziele speichern",
+  "trn.targetsClear": "Ziele löschen",
+  "trn.targetsSaved": "Gespeichert. Sie sehen die Ziele unter Coaching.",
+  "trn.targetsCleared": "Ziele gelöscht.",
+  "trn.targetsWeek": {
+    one: "Letzte Woche: {count} erfasster Tag, etwa {kcal} kcal pro Tag.",
+    other: "Letzte Woche: {count} erfasste Tage, etwa {kcal} kcal pro Tag.",
+  },
+  "trn.targetsWeekProtein": "Protein etwa {protein} g pro Tag.",
+  "trn.targetsNoFood":
+    "Diese Woche nichts erfasst. Kalorien und Protein erscheinen hier, sobald ihre Ernährungs-App sie in Health Connect oder Apple Health schreibt.",
+  "trn.targetsAskShare":
+    "Um zu sehen, was sie essen, bitte sie, das Teilen der Körperdaten mit dir einzuschalten. Es enthält Kalorien und Protein aus ihrer Ernährungs-App.",
+  "trn.targetsFrom": "Tägliche Ziele von {name}",
+  "trn.targetsKcalValue": "{kcal} kcal",
+  "trn.targetsProteinValue": "{protein} g Protein",
+  "trn.targetsClientHint":
+    "Erfasse dein Essen in deiner gewohnten App. Über Health Connect oder Apple Health prüfen die Hinweise deines Coaches deine Woche daran.",
+  "trn.f.kcalUnder": {
+    one: "Etwa {avg} kcal pro Tag bei einem Ziel von {target} ({count} Tag erfasst)",
+    other: "Etwa {avg} kcal pro Tag bei einem Ziel von {target} ({count} Tage erfasst)",
+  },
+  "trn.f.kcalUnderDo": "Frag, was im Weg steht, oder setz ein erreichbares Ziel.",
+  "trn.f.kcalOver": {
+    one: "Etwa {avg} kcal pro Tag bei einem Ziel von {target} ({count} Tag erfasst)",
+    other: "Etwa {avg} kcal pro Tag bei einem Ziel von {target} ({count} Tage erfasst)",
+  },
+  "trn.f.kcalOverDo": "Sprich das Ziel durch und schlag einen täglichen Tausch vor, der Kalorien spart.",
+  "trn.f.proteinShort": {
+    one: "Etwa {avg} g Protein pro Tag bei {target} g Ziel ({count} Tag erfasst)",
+    other: "Etwa {avg} g Protein pro Tag bei {target} g Ziel ({count} Tage erfasst)",
+  },
+  "trn.f.proteinShortDo": "Schlag zu jeder Mahlzeit ein proteinreiches Lebensmittel vor.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -686,7 +838,7 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.newFrom": "Nuovo messaggio da {name}",
   "trn.shareBody": "Condividi i dati corporei con {name}",
   "trn.shareBodyHint":
-    "Peso, grasso corporeo, altezza, sesso e circonferenze dell'ultimo anno, e una figura 3D modellata su questi dati. Mai le tue foto. Disattivabile in qualsiasi momento.",
+    "Peso, grasso corporeo, altezza, sesso e circonferenze dell'ultimo anno, e una figura 3D modellata su questi dati. Anche calorie e proteine dalla tua app per l'alimentazione degli ultimi 30 giorni. Mai le tue foto. Disattivabile in qualsiasi momento.",
   "trn.consentBodyLater": "I tuoi dati corporei restano privati finché non attivi la condivisione con un coach.",
   "trn.body": "Corpo",
   "trn.bodyFigure": "Figura 3D modellata sui dati corporei di {name}",
@@ -699,6 +851,44 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.alerts": "Avvisi sui clienti",
   "trn.alertsHint": "Una notifica quando un cliente finisce un allenamento o non si allena da una settimana.",
   "trn.whatYouSeeBody": "Condivide con te i suoi dati corporei e può smettere in qualsiasi momento.",
+  "trn.targets": "Obiettivi nutrizionali giornalieri",
+  "trn.targetsHint":
+    "Calorie e proteine di ogni giorno. Li vede in Coaching, e le note del coach confrontano la sua settimana con questi obiettivi.",
+  "trn.targetsKcal": "Calorie al giorno",
+  "trn.targetsProtein": "Proteine al giorno (g)",
+  "trn.targetsSave": "Salva obiettivi",
+  "trn.targetsClear": "Cancella obiettivi",
+  "trn.targetsSaved": "Salvato. Li vedrà in Coaching.",
+  "trn.targetsCleared": "Obiettivi cancellati.",
+  "trn.targetsWeek": {
+    one: "Ultima settimana: {count} giorno registrato, circa {kcal} kcal al giorno.",
+    other: "Ultima settimana: {count} giorni registrati, circa {kcal} kcal al giorno.",
+  },
+  "trn.targetsWeekProtein": "Proteine circa {protein} g al giorno.",
+  "trn.targetsNoFood":
+    "Nessun pasto registrato questa settimana. Calorie e proteine compaiono qui quando la sua app per l'alimentazione le scrive in Health Connect o Apple Salute.",
+  "trn.targetsAskShare":
+    "Per vedere cosa mangia, chiedigli di attivare la condivisione dei dati corporei con te. Include calorie e proteine dalla sua app per l'alimentazione.",
+  "trn.targetsFrom": "Obiettivi giornalieri da {name}",
+  "trn.targetsKcalValue": "{kcal} kcal",
+  "trn.targetsProteinValue": "{protein} g di proteine",
+  "trn.targetsClientHint":
+    "Registra i pasti nella tua app di sempre. Tramite Health Connect o Apple Salute, le note del coach confrontano la tua settimana con questi obiettivi.",
+  "trn.f.kcalUnder": {
+    one: "Circa {avg} kcal al giorno rispetto a {target} ({count} giorno registrato)",
+    other: "Circa {avg} kcal al giorno rispetto a {target} ({count} giorni registrati)",
+  },
+  "trn.f.kcalUnderDo": "Chiedi cosa lo ostacola, o fissa un obiettivo raggiungibile.",
+  "trn.f.kcalOver": {
+    one: "Circa {avg} kcal al giorno rispetto a {target} ({count} giorno registrato)",
+    other: "Circa {avg} kcal al giorno rispetto a {target} ({count} giorni registrati)",
+  },
+  "trn.f.kcalOverDo": "Rivedi l'obiettivo e suggerisci uno scambio quotidiano che risparmi calorie.",
+  "trn.f.proteinShort": {
+    one: "Proteine circa {avg} g al giorno rispetto a {target} g ({count} giorno registrato)",
+    other: "Proteine circa {avg} g al giorno rispetto a {target} g ({count} giorni registrati)",
+  },
+  "trn.f.proteinShortDo": "Suggerisci un alimento proteico a ogni pasto.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -822,7 +1012,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.newFrom": "{name}さんから新着メッセージ",
   "trn.shareBody": "{name}さんと体のデータを共有",
   "trn.shareBodyHint":
-    "過去1年の体重、体脂肪率、身長、性別、メジャーで測ったサイズと、それをもとにした3Dの体。写真は共有されません。いつでもオフにできます。",
+    "過去1年の体重、体脂肪率、身長、性別、メジャーで測ったサイズと、それをもとにした3Dの体。食事アプリが記録した過去30日のカロリーとたんぱく質も含みます。写真は共有されません。いつでもオフにできます。",
   "trn.consentBodyLater": "体のデータは、コーチとの共有をオンにするまで非公開です。",
   "trn.body": "体",
   "trn.bodyFigure": "{name}さんの体のデータをもとにした3Dの体",
@@ -835,4 +1025,29 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.alerts": "クライアントの通知",
   "trn.alertsHint": "クライアントがワークアウトを終えたとき、または1週間トレーニングしていないときに通知します。",
   "trn.whatYouSeeBody": "このクライアントは体のデータをあなたと共有しています。共有はいつでも止められます。",
+  "trn.targets": "1日の栄養目標",
+  "trn.targetsHint": "1日のカロリーとたんぱく質。クライアントはコーチングで確認でき、コーチのメモが1週間の食事をこの目標と比べます。",
+  "trn.targetsKcal": "1日のカロリー",
+  "trn.targetsProtein": "1日のたんぱく質（g）",
+  "trn.targetsSave": "目標を保存",
+  "trn.targetsClear": "目標を消去",
+  "trn.targetsSaved": "保存しました。クライアントのコーチングに表示されます。",
+  "trn.targetsCleared": "目標を消去しました。",
+  "trn.targetsWeek": { other: "この1週間：記録{count}日、1日約{kcal} kcal。" },
+  "trn.targetsWeekProtein": "たんぱく質は1日約{protein} g。",
+  "trn.targetsNoFood":
+    "この1週間は食事の記録がありません。食事アプリがHealth ConnectやApple Healthに書き込むと、ここにカロリーとたんぱく質が表示されます。",
+  "trn.targetsAskShare":
+    "食事を見るには、体のデータの共有をオンにしてもらいましょう。食事アプリが記録したカロリーとたんぱく質も含まれます。",
+  "trn.targetsFrom": "{name}さんからの1日の目標",
+  "trn.targetsKcalValue": "{kcal} kcal",
+  "trn.targetsProteinValue": "たんぱく質{protein} g",
+  "trn.targetsClientHint":
+    "食事はいつもの食事アプリで記録してください。Health ConnectやApple Healthを通じて、コーチのメモが1週間をこの目標と比べます。",
+  "trn.f.kcalUnder": { other: "目標{target}に対して1日約{avg} kcal（記録{count}日）" },
+  "trn.f.kcalUnderDo": "何が妨げになっているか聞くか、届く目標に見直しましょう。",
+  "trn.f.kcalOver": { other: "目標{target}に対して1日約{avg} kcal（記録{count}日）" },
+  "trn.f.kcalOverDo": "目標を一緒に確認し、毎日カロリーを減らせる置き換えを1つ提案しましょう。",
+  "trn.f.proteinShort": { other: "たんぱく質は目標{target} gに対して1日約{avg} g（記録{count}日）" },
+  "trn.f.proteinShortDo": "毎食たんぱく質の多い食品を1品すすめましょう。",
 };

@@ -282,6 +282,10 @@ export const fr: FeaturesText = {
       body: "Écrivez à chaque client, recevez une notification quand il s'entraîne ou n'a pas fait de séance depuis une semaine, et voyez ses pesées, mensurations et une silhouette 3D à sa forme s'il choisit de les partager.",
       note: "Les notifications sont sur Android et iPhone. L'app web affiche les nouveaux messages quand elle est ouverte.",
     },
+    "coach-nutrition": {
+      name: "Objectifs nutritionnels pour les clients",
+      body: "Fixez les calories et protéines quotidiennes de chaque client. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange s'il le partage.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",

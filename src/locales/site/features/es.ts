@@ -277,6 +277,10 @@ export const es: FeaturesText = {
       body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos.",
       note: "Las notificaciones son para Android y iPhone. La app web muestra los mensajes nuevos cuando está abierta.",
     },
+    "coach-nutrition": {
+      name: "Objetivos de nutrición para clientes",
+      body: "Fija las calorías y la proteína diarias de cada cliente. Sus notas del entrenador comparan su semana de comida con ellas, y ves cómo come cuando lo comparte.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

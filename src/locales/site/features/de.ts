@@ -281,6 +281,10 @@ export const de: FeaturesText = {
       body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
       note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
     },
+    "coach-nutrition": {
+      name: "Ernährungsziele für Kunden",
+      body: "Lege für jeden Kunden Kalorien und Protein pro Tag fest. Die Coach-Hinweise prüfen die Ernährungswoche daran, und du siehst, wie er isst, wenn er es teilt.",
+    },
     awards: {
       name: "Erfolge, Level und Serien",
       body: "Abzeichen in Stufen, 50 Level mit Belohnungen, Wochenaufgaben, Serienschutz und ehrliche Ligen.",

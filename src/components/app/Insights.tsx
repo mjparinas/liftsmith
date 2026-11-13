@@ -10,6 +10,7 @@ import { haptic } from "@/lib/juice";
 import { dayKey } from "@/lib/random";
 import { trendShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
+import { useCoachNotes } from "@/lib/trainer";
 import { togglePriority } from "@/lib/training";
 import { trialNote } from "@/lib/trialNotes";
 import { useNow } from "@/lib/useNow";
@@ -49,11 +50,12 @@ export function useInsights(): Insight[] {
   const hour = Math.floor(now / 3_600_000);
   const friends = useFriendSignals(now);
   const trial = useTrial();
+  const coachTargets = useCoachNotes((s) => s.targets);
   // Recomputed when the log changes or once an hour, not every tick.
   const own = useMemo(
-    () => insights({ events, profile, now, streak: g.streak }),
+    () => insights({ events, profile, now, streak: g.streak, coachTargets }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks],
+    [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks, coachTargets],
   );
   // Friend nudges (friendNotes.ts) join by tone, after the lifter's own notes of the same tone.
   const notes = useMemo(() => {

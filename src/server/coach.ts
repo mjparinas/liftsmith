@@ -34,6 +34,11 @@ export const COACH_LIMITS = {
   page: 100,
   /** A client with no workout this long is "quiet", and their coach is told once. */
   quietMs: 7 * 86_400_000,
+  /** How far back a coach sees a sharing client's food days. */
+  foodMs: 30 * 86_400_000,
+  /** The range a coach can set for daily calories and grams of protein. */
+  kcal: [800, 6000] as const,
+  protein: [30, 400] as const,
 };
 
 /** No 0/O or 1/I, so a code read aloud or off a screen is typed right: 32 letters, 8 of them (40 bits). */
@@ -197,6 +202,8 @@ export async function overview(
   sharesBody: string[];
   /** Whether this coach gets alerts about their clients. */
   alerts: boolean;
+  /** Daily nutrition targets this lifter's coaches set them, newest first. */
+  targets: Targets[];
 }> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
@@ -229,6 +236,7 @@ export async function overview(
       (r) => String(r.id),
     ),
     alerts: await alertsOn(accountId),
+    targets: await targetsFor(accountId),
   };
 }
 
@@ -308,6 +316,7 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
     { sql: "DELETE FROM coach_shares WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_alerts WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_reads WHERE (account_id = ? AND other_id = ?) OR (account_id = ? AND other_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_targets WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
   ]);
 }
 
@@ -409,6 +418,8 @@ export interface ClientView {
   note: Note | null;
   /** The client's body data, only when they share it with this coach. */
   body: BodyShare | null;
+  /** This coach's daily nutrition targets for the client, if any. */
+  targets: Targets | null;
 }
 
 /** What a client shares when they turn on body data for a coach: enough to shape the 3D figure and see the trend. */
@@ -419,6 +430,8 @@ export interface BodyShare {
   weights: { at: number; kg: number; bodyFat?: number }[];
   /** Tape measurements in the last year, oldest first. */
   measures: { at: number; site: string; cm: number }[];
+  /** Calories and protein from the client's food app (through Health) for each of the last 30 days, oldest first. */
+  food?: { day: string; kcal?: number; protein?: number }[];
 }
 
 /** A client's training for their coach, or null when they aren't this coach's client (any more). */
@@ -460,6 +473,7 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     plans: plans.map(plan),
     note: n ? note(n) : null,
     body: (await sharesBody(coachId, clientId)) ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
+    targets: (await targetsFor(clientId, coachId))[0] ?? null,
   };
 }
 
@@ -497,11 +511,13 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
   }
   const rows = await query<{ body: string }>(
     `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND at >= ?
-       AND (body LIKE '%"type":"bodyweight"%' OR body LIKE '%"type":"measure"%') ORDER BY at`,
-    [clientId, now - COACH_LIMITS.historyMs],
+       AND (body LIKE '%"type":"bodyweight"%' OR body LIKE '%"type":"measure"%'
+         OR (at >= ? AND (body LIKE '%"metric":"kcalIn"%' OR body LIKE '%"metric":"protein"%'))) ORDER BY at`,
+    [clientId, now - COACH_LIMITS.historyMs, now - COACH_LIMITS.foodMs],
   );
   const weights: BodyShare["weights"] = [];
   const measures: BodyShare["measures"] = [];
+  const food = new Map<string, { day: string; kcal?: number; protein?: number }>();
   for (const r of rows) {
     let e: Record<string, unknown>;
     try {
@@ -518,6 +534,17 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
     } else if (e.type === "measure" && typeof e.site === "string" && /^[a-z]{2,12}$/.test(e.site)) {
       const cm = num(e.cm, 5, 300);
       if (cm !== null) measures.push({ at, site: e.site, cm });
+    } else if (e.type === "health" && typeof e.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(e.day)) {
+      // Rows come oldest first, so a day read again later keeps its newest number.
+      const d = food.get(e.day) ?? { day: e.day };
+      if (e.metric === "kcalIn") {
+        const v = num(e.value, 0, 15_000);
+        if (v !== null) d.kcal = Math.round(v);
+      } else if (e.metric === "protein") {
+        const v = num(e.value, 0, 1_000);
+        if (v !== null) d.protein = Math.round(v);
+      }
+      food.set(e.day, d);
     }
   }
   return {
@@ -525,7 +552,66 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
     heightCm: num(prof.heightCm, 100, 250),
     weights,
     measures,
+    food: [...food.values()].sort((a, b) => (a.day < b.day ? -1 : 1)),
   };
+}
+
+// ---------- Nutrition targets from the coach (2026-11-13) ----------
+
+export interface Targets {
+  coachId: string;
+  clientId: string;
+  /** Calories a day. */
+  kcal: number | null;
+  /** Grams of protein a day. */
+  protein: number | null;
+  at: number;
+}
+type TargetRow = { coach_id: string; client_id: string; kcal: number | null; protein: number | null; updated_at: number };
+const targets = (r: TargetRow): Targets => ({
+  coachId: String(r.coach_id),
+  clientId: String(r.client_id),
+  kcal: r.kcal == null ? null : Number(r.kcal),
+  protein: r.protein == null ? null : Number(r.protein),
+  at: Number(r.updated_at),
+});
+
+/** A whole number in range, or null for anything else (empty, junk or out of range). */
+const target = (x: unknown, [lo, hi]: readonly [number, number]) =>
+  typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi ? Math.round(x) : null;
+
+/**
+ * The coach sets (or, with both empty, clears) a client's daily calories and protein. Only for the coach's own
+ * clients; a number outside the range is left empty rather than refused.
+ */
+export async function setTargets(
+  coachId: string,
+  clientId: unknown,
+  kcal: unknown,
+  protein: unknown,
+  now = Date.now(),
+): Promise<Targets | null | { error: "notClient" }> {
+  if (!isAccountId(clientId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
+  const k = target(kcal, COACH_LIMITS.kcal);
+  const p = target(protein, COACH_LIMITS.protein);
+  if (k === null && p === null) {
+    await run("DELETE FROM coach_targets WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
+    return null;
+  }
+  await run(
+    `INSERT INTO coach_targets (coach_id, client_id, kcal, protein, updated_at) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT (coach_id, client_id) DO UPDATE SET kcal = excluded.kcal, protein = excluded.protein, updated_at = excluded.updated_at`,
+    [coachId, clientId, k, p, now],
+  );
+  return { coachId, clientId, kcal: k, protein: p, at: now };
+}
+
+/** A client's targets from their coaches, newest first (or from one coach). */
+export async function targetsFor(clientId: string, coachId?: string): Promise<Targets[]> {
+  const rows = coachId
+    ? await query<TargetRow>("SELECT * FROM coach_targets WHERE client_id = ? AND coach_id = ?", [clientId, coachId])
+    : await query<TargetRow>("SELECT * FROM coach_targets WHERE client_id = ? ORDER BY updated_at DESC", [clientId]);
+  return rows.map(targets);
 }
 
 // ---------- Chat between a coach and a client (2026-11-12) ----------
@@ -707,4 +793,5 @@ export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_shares WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_alerts WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_prefs WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_targets WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];
