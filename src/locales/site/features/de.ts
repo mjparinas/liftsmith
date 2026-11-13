@@ -255,6 +255,22 @@ export const de: FeaturesText = {
       name: "Studiosuche und Studioseiten",
       body: "Finde Studios in deiner Nähe auf einer Karte mit der Liste darunter, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen.",
     },
+    "gym-amenities": {
+      name: "Ausstattung und Preise auf Studioseiten",
+      body: "Betreiber zeigen, was es neben den Geräten gibt (Duschen, Parkplätze, Zugang rund um die Uhr, Frauenbereich und mehr) und was Tageskarte, Wochenkarte oder Mitgliedschaft kosten.",
+    },
+    "gym-news": {
+      name: "Ankündigungen deines Studios",
+      body: "Offizielle Studios veröffentlichen Feiertagszeiten, neue Geräte oder geänderte Kurse auf ihrer Seite, und die Mitglieder ihres Clubs bekommen eine Mitteilung.",
+    },
+    "gym-problems": {
+      name: "Kaputte Geräte melden",
+      body: "Sag deinem Studio, dass ein Gerät kaputt ist oder fehlt. Alle, die dort trainieren, bekommen einen Plan ohne es, und der Betreiber sieht es mit einem Knopf für Repariert.",
+    },
+    "gym-trainers": {
+      name: "Trainer auf Studioseiten",
+      body: "Coaches zeigen sich in den Studios, in denen sie ihre Kunden trainieren, mit einer Zeile über sich und einem Knopf, um mit ihnen zu trainieren. Bei einem offiziellen Studio gibt der Betreiber sie zuerst frei.",
+    },
     "buy-next": {
       name: "Was du als Nächstes kaufst",
       body: "Für Heimstudios: das eine Gerät, das die meisten neuen Übungen ermöglichen würde.",

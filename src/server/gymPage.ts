@@ -5,6 +5,7 @@
 //   /gyms/<city>/<gym>/         one gym: address, map links, opening hours, equipment, lifters, add it to the app
 // They're for search and for the QR posters (step 4), so the facts come first and every page says how to add the gym.
 // Text: src/locales/text/gp.ts (gp.*), in the reader's language. Map credit: OpenStreetMap (ODbL).
+import { money, PRICE_KINDS, type Prices } from "@/lib/gymExtras";
 import { decodeGym } from "@/lib/gymShare";
 import { isMsgLang, MSG_LANGS, type MsgLang } from "@/lib/messageText";
 import { allDay, parseHours } from "@/lib/openingHours";
@@ -140,6 +141,16 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     },
     ...(p.website ? { sameAs: [p.website] } : {}),
     ...(p.phone ? { telephone: p.phone } : {}),
+    ...(p.amenities.length
+      ? {
+          amenityFeature: p.amenities.map((a) => ({
+            "@type": "LocationFeatureSpecification",
+            name: say(lang, `gp.amen.${a}` as GpKey),
+            value: true,
+          })),
+        }
+      : {}),
+    ...(p.prices ? { priceRange: priceLines(p.prices, lang).join(" · ") } : {}),
     ...(week && p.hours
       ? {
           openingHours: p.hours
@@ -189,6 +200,35 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
   const club = p.club
     ? `<section class="card" aria-labelledby="club-h"><h2 id="club-h">${icon("trophy", 16)}${esc(say(lang, "gp.clubTitle"))}</h2><p class="muted">${esc(say(lang, "gp.clubBody"))}</p><p><a href="/app/#/club/${esc(encodeURIComponent(p.club))}">${esc(say(lang, "gp.clubJoin"))} ›</a></p></section>`
     : "";
+  // Round 3 (gymExtras.ts): the owner's announcements, amenities and prices, trainers, and equipment reported out of order.
+  const news = p.news.length
+    ? `<section class="card" aria-labelledby="news-h"><h2 id="news-h">${icon("chat", 16)}${esc(say(lang, "gp.newsTitle"))}</h2><ul class="news">${p.news
+        .map((x) => `<li><p>${esc(x.text)}</p><p class="muted small">${esc(dayName(x.at, lang))}</p></li>`)
+        .join("")}</ul></section>`
+    : "";
+  const amenities =
+    p.amenities.length || p.prices
+      ? `<section class="card" aria-labelledby="amen-h"><h2 id="amen-h">${icon("sparkle", 16)}${esc(say(lang, "gp.amenities"))}</h2>${
+          p.prices
+            ? `<ul class="prices">${priceLines(p.prices, lang)
+                .map((x) => `<li>${esc(x)}</li>`)
+                .join("")}</ul>`
+            : ""
+        }${p.amenities.length ? `<ul class="chips">${p.amenities.map((a) => `<li>${esc(say(lang, `gp.amen.${a}` as GpKey))}</li>`).join("")}</ul>` : ""}</section>`
+      : "";
+  const trainers = p.trainers.length
+    ? `<section class="card" aria-labelledby="trainers-h"><h2 id="trainers-h">${icon("people", 16)}${esc(say(lang, "gp.trainersTitle"))}</h2><p class="muted">${esc(say(lang, "gp.trainersBody"))}</p><ul class="trainers">${p.trainers
+        .map(
+          (x) =>
+            `<li><p class="li-name">${esc(x.name)}</p>${x.role ? `<p class="muted small">${esc(say(lang, `gp.role.${x.role}` as GpKey))}</p>` : ""}${x.bio ? `<p>${esc(x.bio)}</p>` : ""}<p><a href="/app/#/trainer/${esc(x.code)}" rel="nofollow">${esc(say(lang, "gp.trainWith", { name: x.name }))} ›</a></p></li>`,
+        )
+        .join("")}</ul>${p.official ? "" : `<p class="muted small">${esc(say(lang, "gp.trainersUnofficial"))}</p>`}</section>`
+    : "";
+  const issues = p.issues.length
+    ? `<section class="card" aria-labelledby="issues-h"><h2 id="issues-h">${icon("flag", 16)}${esc(say(lang, "gp.issuesTitle"))}</h2><ul class="chips">${p.issues
+        .map((x) => `<li>${esc(say(lang, `gp.issue.${x.kind}`, { item: equipName(lang, x.equipment) }))}</li>`)
+        .join("")}</ul><p class="muted small">${esc(say(lang, "gp.issuesNote"))}</p></section>`
+    : "";
   const others = nearby.filter((x) => x.id !== p.id && x.kind === "gym").slice(0, 8);
   const more = others.length
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
@@ -201,9 +241,19 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${photos}${club}${claim}${poster}</div><div class="col">${place}${hours}${kit}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${news}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
+
+/** "Day pass $15", "Membership from $49 a month": the prices the owner set, in the reader's language. */
+export function priceLines(prices: Prices, lang: MsgLang): string[] {
+  return PRICE_KINDS.flatMap((k) =>
+    prices[k] === undefined ? [] : [say(lang, `gp.price.${k}`, { price: money(prices[k], prices.currency, lang) })],
+  );
+}
+
+const dayName = (at: number, lang: MsgLang) =>
+  new Intl.DateTimeFormat(lang, { month: "short", day: "numeric", timeZone: "UTC" }).format(at);
 
 function listItem(p: Place, lang: MsgLang, pin?: number): string {
   const sub = [p.address, p.lifters > 0 ? liftersLine(p, lang) : ""].filter(Boolean).join(" · ");
@@ -313,6 +363,9 @@ const GYM_STYLE = `
 .hours{display:grid;gap:0;margin:0}.hours div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
 .hours div:first-child{border-top:0;padding-top:0}.hours dd{margin:0;font-variant-numeric:tabular-nums;text-align:right}
 .chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.news,.trainers,.prices{list-style:none;margin:0;padding:0;display:grid;gap:12px}.news p,.trainers p{margin:0}
+.trainers li{border-top:1px solid var(--line);padding-top:12px}.trainers li:first-child{border-top:0;padding-top:0}
+.trainers a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}.prices{gap:4px;margin-bottom:12px;font-weight:600}
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}
 .db{margin-top:12px}.claim{border-style:dashed}
 .credit{margin-top:24px;font-size:.75rem;color:var(--faint)}`;

@@ -251,6 +251,22 @@ export const es: FeaturesText = {
       name: "Buscador y páginas de gimnasios",
       body: "Encuentra gimnasios cerca de ti en un mapa con la lista debajo, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal.",
     },
+    "gym-amenities": {
+      name: "Servicios y precios en las páginas de gimnasios",
+      body: "Los dueños indican lo que hay además del equipo (duchas, aparcamiento, acceso 24/7, zona para mujeres y más) y cuánto cuesta un pase de día, de semana o la cuota.",
+    },
+    "gym-news": {
+      name: "Anuncios de tu gimnasio",
+      body: "Los gimnasios oficiales publican horarios de festivos, equipo nuevo o cambios de clase en su página, y los miembros de su club reciben un aviso.",
+    },
+    "gym-problems": {
+      name: "Avisa de equipo roto",
+      body: "Dile a tu gimnasio que una máquina está rota o falta. Todos los que entrenan allí reciben un plan que se adapta, y el dueño lo ve con un botón de Arreglado.",
+    },
+    "gym-trainers": {
+      name: "Entrenadores en las páginas de gimnasios",
+      body: "Los entrenadores aparecen en los gimnasios donde entrenan a sus clientes, con una línea sobre ellos y un botón para entrenar con ellos. En un gimnasio oficial, el dueño los aprueba antes.",
+    },
     "buy-next": {
       name: "Qué comprar después",
       body: "Para gimnasios en casa: la pieza de equipo que abriría más ejercicios.",

@@ -3,6 +3,7 @@
 // Claiming a gym and keeping its details, the app side (server: src/server/gymClaims.ts; docs/decisions/gyms.md
 // step 3). Everything here needs an account.
 import { api, AuthError, readAccount } from "./auth";
+import type { Amenity, Prices } from "./gymExtras";
 import { SITE_URL } from "./site";
 
 export type Role = "owner" | "manager" | "staff";
@@ -29,6 +30,10 @@ export interface OwnedGym {
   /** The logo's and photos' ids (gymMedia.ts). */
   logo: string;
   photos: string[];
+  /** What it has besides equipment and what a visit costs (gymExtras.ts); the country picks the starting currency. */
+  amenities: Amenity[];
+  prices: Prices | null;
+  country: string;
 }
 
 /** A claimed gym earns a mailed table stand at this many lifters (src/server/gymPosters.ts). */
@@ -98,7 +103,7 @@ export function ownedGyms(fresh = false): Promise<OwnedGym[] | null> {
 
 export async function editGym(
   place: string,
-  change: Partial<Omit<OwnedGym, "id" | "name" | "citySlug" | "slug" | "address" | "lifters">>,
+  change: Partial<Omit<OwnedGym, "id" | "name" | "citySlug" | "slug" | "address" | "lifters" | "country">>,
 ): Promise<true | string> {
   try {
     await api("/api/gyms/", { token: token(), body: { op: "edit", place, ...change } });

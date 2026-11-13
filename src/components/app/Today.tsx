@@ -12,6 +12,7 @@ import { can } from "@/lib/entitlements";
 import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
 import { freeAdaptiveLeft } from "@/lib/freeAdaptive";
 import { itemSeconds, planSeconds } from "@/lib/generator";
+import { useOutOfOrder } from "@/lib/gymExtrasApi";
 import { prSetIds } from "@/lib/history";
 import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
@@ -25,7 +26,7 @@ import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { useCoachNotes } from "@/lib/trainer";
 import { effortLabel } from "@/lib/training";
-import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { callWhy, itemWhy, whyContext } from "@/lib/why";
@@ -149,6 +150,9 @@ export function Today() {
   const againAt = useApp((st) => st.againAt);
   const trainAgain = useApp((st) => st.trainAgain);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
+  // Equipment reported broken or missing at this real gym: the plan leaves it out, and says so (gymExtrasApi.ts).
+  const outAt = useOutOfOrder((st) => (gym?.placeId ? st.byPlace[gym.placeId] : undefined));
+  const broken = [...new Set((outAt ?? []).map((x) => x.equipment))].filter((e) => gym?.equipment.includes(e));
   const moveExercise = useApp((st) => st.moveExercise);
   // Press and hold an exercise to drag it, or tap its number to move it with buttons (Reorder.tsx).
   const reorder = useReorder(moveExercise, { min: 0, max: (preview?.items.length ?? 1) - 1 });
@@ -242,6 +246,11 @@ export function Today() {
           {gym?.name ?? t("td.addGym")}
           {gym && pickedByLocation === gym.id ? t("td.here") : ""}
         </button>
+        {broken.length > 0 && (
+          <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">
+            {t("td.outOfOrder", { items: list(broken.map((e) => EQUIPMENT_LABEL[e])) })}
+          </span>
+        )}
         {preview?.program && (
           <button
             type="button"

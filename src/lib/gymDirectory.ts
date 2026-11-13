@@ -6,6 +6,7 @@
 import { api, AuthError, readAccount } from "./auth";
 import { makeGym } from "./defaults";
 import { locate } from "./geo";
+import type { Amenity, GymIssue, GymNews, GymTrainer, Prices } from "./gymExtras";
 import { decodeGym, encodeGym, kitOf, type GymKit } from "./gymShare";
 import type { Gym, Unit } from "./types";
 
@@ -47,6 +48,12 @@ export interface Place {
   /** Its logo's and photos' ids, pictures at /api/gyms/photo/?id=. */
   logo?: string;
   photos?: string[];
+  /** The owner's amenities and prices, and (one gym's own lookups) announcements, open equipment problems and trainers. */
+  amenities?: Amenity[];
+  prices?: Prices | null;
+  news?: GymNews[];
+  issues?: GymIssue[];
+  trainers?: GymTrainer[];
 }
 
 export interface MyListing {

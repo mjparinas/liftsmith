@@ -532,6 +532,40 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (place_id, who)
   )`,
+  // Round 3 (gymExtras.ts, 2026-11-13): the owner's announcements, equipment lifters reported broken or missing
+  // (`who` is the account or the one-way address code, like gym_place_lifters), and trainers listed at a gym.
+  `CREATE TABLE IF NOT EXISTS gym_news (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_news_place ON gym_news (place_id, created_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_issues (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    equipment TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    who TEXT NOT NULL DEFAULT '',
+    reports INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL,
+    last_at INTEGER NOT NULL,
+    fixed_at INTEGER NOT NULL DEFAULT 0,
+    fixed_by TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_issues_place ON gym_issues (place_id, fixed_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_trainers (
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    bio TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (place_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_trainers_account ON gym_trainers (account_id)`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -1032,6 +1066,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
+  // Amenities (a comma list from gymExtras.ts AMENITIES) and prices (JSON), set by the owner (2026-11-13).
+  ["gym_places", "amenities", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "prices", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],

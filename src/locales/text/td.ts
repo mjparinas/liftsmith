@@ -53,6 +53,7 @@ export const en = {
   "td.quote": "Quote of the day",
   "td.busy": "Busy at {at} · ",
   "td.fit": "Fit a {n}-minute workout",
+  "td.outOfOrder": "Planned without: {items} (out of order)",
 } as const;
 
 type Key = keyof typeof en;
@@ -109,6 +110,7 @@ export const es: Partial<Record<Key, Message>> = {
   "td.quote": "Frase del día",
   "td.busy": "Ocupado a las {at} · ",
   "td.fit": "Hacer un entrenamiento de {n} minutos",
+  "td.outOfOrder": "Plan sin: {items} (fuera de servicio)",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -163,6 +165,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "td.quote": "Citation du jour",
   "td.busy": "Occupé à {at} · ",
   "td.fit": "Faire une séance de {n} minutes",
+  "td.outOfOrder": "Plan sans : {items} (hors service)",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -217,6 +220,7 @@ export const de: Partial<Record<Key, Message>> = {
   "td.quote": "Zitat des Tages",
   "td.busy": "Beschäftigt um {at} ·",
   "td.fit": "Ein {n}-Minuten-Training einplanen",
+  "td.outOfOrder": "Plan ohne: {items} (außer Betrieb)",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -271,6 +275,7 @@ export const it: Partial<Record<Key, Message>> = {
   "td.quote": "Citazione del giorno",
   "td.busy": "Impegnato alle {at} ·",
   "td.fit": "Fai un allenamento da {n} minuti",
+  "td.outOfOrder": "Piano senza: {items} (fuori servizio)",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -323,4 +328,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "td.quote": "今日の名言",
   "td.busy": "{at}に予定あり ·",
   "td.fit": "{n}分のワークアウトにする",
+  "td.outOfOrder": "使用不可の器具を除外：{items}",
 };

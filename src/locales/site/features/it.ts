@@ -249,6 +249,22 @@ export const it: FeaturesText = {
       name: "Ricerca palestre e pagine delle palestre",
       body: "Trova palestre vicino a te su una mappa con l’elenco sotto, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra e aggiungere logo e foto. Manca una palestra? Aggiungila. I gestori vedono quanti atleti l’hanno aggiunta o hanno scansionato il poster, e cosa fare dopo. Le palestre ufficiali possono avere un club con classifica settimanale.",
     },
+    "gym-amenities": {
+      name: "Servizi e prezzi sulle pagine delle palestre",
+      body: "I titolari indicano cosa c’è oltre agli attrezzi (docce, parcheggio, accesso 24/7, area donne e altro) e quanto costano ingresso giornaliero, settimanale o abbonamento.",
+    },
+    "gym-news": {
+      name: "Annunci della tua palestra",
+      body: "Le palestre ufficiali pubblicano orari delle feste, attrezzi nuovi o cambi di corso sulla loro pagina, e i membri del loro club ricevono una notifica.",
+    },
+    "gym-problems": {
+      name: "Segnala attrezzi rotti",
+      body: "Di’ alla tua palestra che una macchina è rotta o manca. Chi si allena lì riceve un piano che ne fa a meno, e il titolare lo vede con un pulsante Riparato.",
+    },
+    "gym-trainers": {
+      name: "Trainer sulle pagine delle palestre",
+      body: "I coach compaiono nelle palestre dove allenano i loro clienti, con una riga su di sé e un pulsante per allenarsi con loro. In una palestra ufficiale, il titolare li approva prima.",
+    },
     "buy-next": {
       name: "Cosa comprare dopo",
       body: "Per le palestre in casa: l’attrezzo che aprirebbe più esercizi.",

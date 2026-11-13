@@ -322,7 +322,12 @@ export async function previewInvite(
   if (!(await rateLimit(`coach:${accountId}`, COACH_LIMITS.triesPerHour, 3_600_000, now))) return { error: "slow" };
   const code = cleanCode(raw);
   if (!code) return { error: "unknown" };
-  const [inv] = await query<{ coach_id: string }>("SELECT coach_id FROM coach_invites WHERE code = ? AND expires_at > ?", [code, now]);
+  // A coach's invite code, else the join code of their listing on a gym's page (gymExtras.ts), which doesn't run out.
+  const [inv] = await query<{ coach_id: string }>(
+    `SELECT coach_id FROM coach_invites WHERE code = ? AND expires_at > ?
+     UNION ALL SELECT account_id AS coach_id FROM gym_trainers WHERE code = ? AND status = 'listed' LIMIT 1`,
+    [code, now, code],
+  );
   if (!inv) return { error: "unknown" };
   const coachId = String(inv.coach_id);
   if (coachId === accountId) return { error: "self" };
