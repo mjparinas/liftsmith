@@ -65,7 +65,7 @@ export interface Invite {
 }
 
 /** The name on someone's synced profile, or "" (the app then says "No name yet"). */
-async function nameOf(accountId: string): Promise<string> {
+export async function nameOf(accountId: string): Promise<string> {
   const [r] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [accountId]);
   try {
     const name = (JSON.parse(String(r?.body ?? "{}")) as { name?: unknown }).name;

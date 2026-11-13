@@ -22,6 +22,7 @@ import { epley, KNOWN_LIFTS } from "@/lib/progression";
 import { keepStorage } from "@/lib/saving";
 import { notifyPermission } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
+import { tooYoung } from "@/lib/teen";
 import { declineTrial, startTrial } from "@/lib/trial";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
@@ -284,7 +285,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       unit,
       daysPerWeek: days,
       bodyweight: toKg(bw, unit),
-      birthYear: years >= 10 && years <= 100 ? new Date().getFullYear() - years : profile.birthYear,
+      birthYear: years >= 13 && years <= 100 ? new Date().getFullYear() - years : profile.birthYear,
       sex,
       knownMaxes: knownMaxes(maxes, unit, profile.knownMaxes),
       activeGymId: id,
@@ -563,6 +564,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               </div>
             </div>
             <p className="mt-2 text-sm text-muted">{t("setup.ageSex.note")}</p>
+            {/* Nobody under 13 sets the app up (teen.ts, docs/decisions/school-teams.md). */}
+            {tooYoung(age) && (
+              <p role="alert" className="card mt-3 border-warn/50 p-3 text-sm text-warn">
+                {t("team.tooYoung")}
+              </p>
+            )}
             <button
               type="button"
               aria-expanded={maxesOpen}
@@ -700,7 +707,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
           <Button
             className="flex-1 py-4 text-lg"
             onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())}
-            disabled={cur === "days" && bw < 25}
+            disabled={cur === "days" && (bw < 25 || tooYoung(age))}
           >
             {step < STEPS - 1 ? t("setup.continue") : t("setup.save")}
           </Button>

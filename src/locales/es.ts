@@ -108,6 +108,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as team from "./text/team";
 import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
@@ -237,6 +238,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...timer.es,
   ...tdee.es,
   ...theme.es,
+  ...team.es,
   ...tier.es,
   ...time.es,
   ...today.es,

@@ -834,6 +834,43 @@ const SCHEMA = [
     PRIMARY KEY (coach_id, client_id)
   )`,
   `CREATE INDEX IF NOT EXISTS coach_targets_client ON coach_targets (client_id)`,
+  // School teams (teams.ts, docs/decisions/school-teams.md): a coach's school address and where its proof stands,
+  // the school domains staff have trusted or blocked, each coach's teams, and the athletes on them.
+  `CREATE TABLE IF NOT EXISTS school_coaches (
+    account_id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    school TEXT NOT NULL,
+    domain TEXT NOT NULL,
+    status TEXT NOT NULL,
+    code_hash TEXT NOT NULL DEFAULT '',
+    expires_at INTEGER NOT NULL DEFAULT 0,
+    tries INTEGER NOT NULL DEFAULT 0,
+    verified_at INTEGER,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS school_coaches_domain ON school_coaches (domain)`,
+  `CREATE TABLE IF NOT EXISTS school_domains (
+    domain TEXT PRIMARY KEY,
+    status TEXT NOT NULL,
+    school TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS teams (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS teams_coach ON teams (coach_id)`,
+  `CREATE TABLE IF NOT EXISTS team_members (
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    birth_year INTEGER NOT NULL,
+    joined_at INTEGER NOT NULL,
+    PRIMARY KEY (team_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_members_account ON team_members (account_id)`,
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (

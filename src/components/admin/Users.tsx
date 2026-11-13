@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { AccountDetail, AccountRow, CoachTotals, Role } from "@/server/adminUsers";
 
 import { Card, fmtInt, Table, Tile } from "./charts";
+import { SchoolCoaches } from "./SchoolCoaches";
 import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
 import { ago, when } from "./time";
 
@@ -213,6 +214,7 @@ export function Users({
   return (
     <div className="space-y-4">
       {open && <Account id={open} admin={admin} me={me} close={() => setOpen(null)} />}
+      {!open && <SchoolCoaches admin={admin} />}
       {data && (
         <div className="grid grid-cols-3 gap-3">
           <Tile label="Accounts" value={fmtInt(data.totals.total)} />

@@ -2,6 +2,7 @@ import { Info } from "@/components/Info";
 import { t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { currentBodyFat } from "@/lib/tdee";
+import { bodyCompOn } from "@/lib/teen";
 
 import { BumpField } from "./ui";
 
@@ -12,6 +13,8 @@ import { BumpField } from "./ui";
 export function BodyFatField({ value, onChange, id }: { value: string; onChange: (v: string) => void; id: string }) {
   const { events, profile } = useApp();
   const last = currentBodyFat(events, profile);
+  // Under 18, body fat stays out of sight until they turn body composition on (teen.ts).
+  if (!bodyCompOn(profile)) return null;
   return (
     <div className="min-w-0 flex-1">
       <div className="flex items-center gap-1">
