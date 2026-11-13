@@ -582,8 +582,8 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
 .toast { background: var(--color-raised); color: var(--color-ink); border: 1px solid var(--color-line); border-radius: 999px; box-shadow: 0 8px 24px var(--shadow); }
 /* Covers the status bar so scrolled content doesn't run under the clock and icons (App.tsx StatusScrim). */
 /* The syncing ring (SyncSpinner.tsx, docs/decisions/background-sync.md): a thin circle outline with a gradient arc
-   turning around it, top right under the status bar, only while background sync runs. Never takes a tap. */
-.sync-spinner { position: fixed; z-index: 46; top: calc(env(safe-area-inset-top) + 0.5rem); right: 0.75rem; width: 1rem; height: 1rem; border-radius: 999px; pointer-events: none; opacity: 0.85; animation: sync-in 250ms ease both; }
+   turning around it, top centre under the status bar (clear of the headers' buttons), only while background sync runs. Never takes a tap. */
+.sync-spinner { position: fixed; z-index: 46; top: calc(env(safe-area-inset-top) + 0.375rem); left: calc(50% - 0.5rem); width: 1rem; height: 1rem; border-radius: 999px; pointer-events: none; opacity: 0.85; animation: sync-in 250ms ease both; }
 @keyframes sync-in { from { opacity: 0; } }
 .sync-spinner::before { content: ""; position: absolute; inset: 0; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--spin-ring) 30%, transparent); }
 .sync-spinner::after { content: ""; position: absolute; inset: 0; border-radius: 999px; background: conic-gradient(from 0deg, transparent 0turn 0.3turn, var(--grad-a) 0.65turn, var(--spin-ring) 1turn); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.75px), #000 calc(100% - 1.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 1.75px), #000 calc(100% - 1.5px)); animation: sync-spin 0.9s linear infinite; }

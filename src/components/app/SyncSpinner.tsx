@@ -10,7 +10,7 @@ export const SHOW_AFTER_MS = 300;
 export const MIN_SHOW_MS = 700;
 
 /**
- * The small syncing ring (Melvin, 2026-11-13: "a small white circle outline with a gradient that spins"): top right,
+ * The small syncing ring (Melvin, 2026-11-13: "a small white circle outline with a gradient that spins"): top centre,
  * under the status bar, while background sync or a screen's background refresh is on its way (net.ts `track`). It's
  * decoration only (screen readers aren't told every time the app syncs) and never takes a tap. It isn't drawn at all
  * while nothing runs, so it costs nothing then, and not during a workout, where nothing moves that the lifter didn't

@@ -21,30 +21,50 @@ describe("the syncing ring", () => {
   it("shows only while background work runs, after a short wait, and lingers a moment", () => {
     render(<SyncSpinner />);
     expect(ring()).toBeNull();
-    act(() => useNet.setState({ busy: 1 }));
+    act(() => {
+      useNet.setState({ busy: 1 });
+    });
     expect(ring()).toBeNull();
-    act(() => vi.advanceTimersByTime(SHOW_AFTER_MS));
+    act(() => {
+      vi.advanceTimersByTime(SHOW_AFTER_MS);
+    });
     expect(ring()).not.toBeNull();
     expect(ring()).toHaveAttribute("aria-hidden", "true");
-    act(() => useNet.setState({ busy: 0 }));
+    act(() => {
+      useNet.setState({ busy: 0 });
+    });
     expect(ring()).not.toBeNull();
-    act(() => vi.advanceTimersByTime(MIN_SHOW_MS));
+    act(() => {
+      vi.advanceTimersByTime(MIN_SHOW_MS);
+    });
     expect(ring()).toBeNull();
   });
 
   it("never flickers for a quick answer", () => {
     render(<SyncSpinner />);
-    act(() => useNet.setState({ busy: 1 }));
-    act(() => vi.advanceTimersByTime(SHOW_AFTER_MS - 50));
-    act(() => useNet.setState({ busy: 0 }));
-    act(() => vi.advanceTimersByTime(2000));
+    act(() => {
+      useNet.setState({ busy: 1 });
+    });
+    act(() => {
+      vi.advanceTimersByTime(SHOW_AFTER_MS - 50);
+    });
+    act(() => {
+      useNet.setState({ busy: 0 });
+    });
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
     expect(ring()).toBeNull();
   });
 
   it("stays out of the workout", () => {
     render(<SyncSpinner hidden />);
-    act(() => useNet.setState({ busy: 1 }));
-    act(() => vi.advanceTimersByTime(SHOW_AFTER_MS));
+    act(() => {
+      useNet.setState({ busy: 1 });
+    });
+    act(() => {
+      vi.advanceTimersByTime(SHOW_AFTER_MS);
+    });
     expect(ring()).toBeNull();
   });
 });
