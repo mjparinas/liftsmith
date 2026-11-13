@@ -33,6 +33,14 @@ export function TodayGame() {
             {LEAGUE_LABEL[g.league.league]} · <span className="num">{num(g.league.weekXp)} XP</span>
           </span>
         </div>
+        {/* How many more workouts start or keep the streak: here with the week's quests rather than as a chip on
+            Today's header (UX audit, 2026-11-13). */}
+        {s.needed > 0 && !s.atRisk && (
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+            <Icon name="target" size={14} className="shrink-0 text-ember" />
+            {s.weeks > 0 ? t("today.goalMore", { count: s.needed }) : t("today.streakStart", { count: s.needed })}
+          </p>
+        )}
         <ul className="mt-2 space-y-2">
           {(open.length ? open : g.quests).slice(0, 3).map((q) => (
             <li key={q.id} className="flex items-center gap-2 text-sm">
