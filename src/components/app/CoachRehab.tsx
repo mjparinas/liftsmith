@@ -12,52 +12,10 @@ import { date, t } from "@/lib/i18n";
 import { PART_LABEL } from "@/lib/injury";
 import { haptic, oops } from "@/lib/juice";
 import { REHAB_PROGRAMS, rehabBody, rehabName, type RehabProgram } from "@/lib/rehab";
-import { liftName, setCoachKind, setPainShare, trainerError, type CoachKind, type Person, type RehabInjury } from "@/lib/trainer";
+import { liftName, setPainShare, trainerError, type Person, type RehabInjury } from "@/lib/trainer";
 
 import { Sparkline } from "./Injuries";
 import { Chip, Section, SwitchRow } from "./ui";
-
-const KINDS: CoachKind[] = ["trainer", "physio"];
-
-/** "I coach as": trainer or physio. A physio's report puts pain first and their assign sheet opens on rehab programs. */
-export function CoachKindPicker({ kind, onChange }: { kind: CoachKind; onChange: () => void }) {
-  const [picked, setPicked] = useState<CoachKind>(kind);
-  const [note, setNote] = useState<string | null>(null);
-  const pick = async (k: CoachKind) => {
-    if (k === picked) return;
-    const before = picked;
-    setPicked(k);
-    try {
-      await setCoachKind(k);
-      track("feature", { name: "trainer", detail: k === "physio" ? "physio" : "trainerKind" });
-      onChange();
-    } catch (e) {
-      setPicked(before);
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  return (
-    <section className="card mt-3 p-4" aria-labelledby="trn-kind">
-      <p id="trn-kind" className="font-semibold">
-        {t("trn.kindTitle")}
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="trn-kind">
-        {KINDS.map((k) => (
-          <Chip key={k} active={picked === k} onClick={() => void pick(k)}>
-            {t(`trn.kind.${k}`)}
-          </Chip>
-        ))}
-      </div>
-      <p className="mt-2 text-sm text-muted">{t(picked === "physio" ? "trn.kindPhysioHint" : "trn.kindTrainerHint")}</p>
-      {note && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {note}
-        </p>
-      )}
-    </section>
-  );
-}
 
 /** The client's switch, one per coach: share pain ratings and injuries, off until they turn it on. */
 export function PainShareSwitch({ coach, on, onChange }: { coach: Person; on: boolean; onChange: () => void }) {
