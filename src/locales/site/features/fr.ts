@@ -315,6 +315,11 @@ export const fr: FeaturesText = {
       name: "Paiements des clients avec Stripe",
       body: "Connectez votre propre compte Stripe et fixez le prix de chaque client, à la séance ou au mois. Ils paient sur la page sécurisée de Stripe, l'argent vous arrive directement, et un paiement mensuel raté remonte en haut de leur rapport.",
     },
+    "coach-sharing": {
+      name: "Les clients choisissent ce que voit leur coach",
+      body: "L'entraînement est toujours partagé. Fréquence cardiaque, notes de séance, forme et récupération, données corporelles, douleurs et blessures, et cycle sont chacun un interrupteur que le client active pour chaque coach, à l'acceptation ou plus tard. Les photos et les salles ne sortent jamais.",
+      proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",

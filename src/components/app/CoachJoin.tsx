@@ -10,8 +10,11 @@ import { SCREEN_TITLE } from "@/components/titles";
 import { track } from "@/lib/analytics";
 import { t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
-import { joinInvite, previewInvite, trainerError, type Person, type Setup } from "@/lib/trainer";
+import { useApp } from "@/lib/store";
+import { bodyCompOn } from "@/lib/teen";
+import { JOIN_SHARES, joinInvite, previewInvite, shareKinds, trainerError, type Person, type Setup, type ShareKind } from "@/lib/trainer";
 
+import { ConsentShares } from "./CoachShare";
 import { Mascot } from "./Mascot";
 import { Button } from "./ui";
 
@@ -31,6 +34,8 @@ export function CoachJoin({
   const [coach, setCoach] = useState<{ coach: Person; setup?: Setup } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [picked, setPicked] = useState<ShareKind[]>([...JOIN_SHARES]);
+  const kinds = shareKinds(bodyCompOn(useApp((s) => s.profile)));
   useEffect(() => {
     let live = true;
     previewInvite(code)
@@ -43,7 +48,10 @@ export function CoachJoin({
   const agree = async () => {
     setBusy(true);
     try {
-      const r = await joinInvite(code);
+      const r = await joinInvite(
+        code,
+        picked.filter((k) => kinds.includes(k)),
+      );
       haptic("success");
       sound.done();
       track("feature", { name: "trainer", detail: "join" });
@@ -97,6 +105,7 @@ export function CoachJoin({
           <section className="card card-tint mt-6 p-4" style={{ ["--tint" as string]: "var(--color-accent)" }}>
             <p className="font-semibold">{t("trn.consentTitle", { name: who })}</p>
             <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
+            <ConsentShares name={who} picked={picked} onPick={setPicked} />
             <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
             <p className="mt-2 text-sm text-muted">{t("trn.consentStop")}</p>
           </section>

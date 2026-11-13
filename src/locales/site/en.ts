@@ -326,19 +326,24 @@ export const en: SiteText = {
     },
     see: {
       title: "What you see, and what you don't",
-      body: "Clients agree before anything is shared, and can stop sharing at any time. You lose access straight away.",
-      seesLabel: "You see",
+      body: "Clients agree before anything is shared, and choose what you see, item by item. They can change it or stop sharing at any time, and you lose access straight away.",
+      seesLabel: "You always see",
       sees: [
         "Workouts from the last year: exercises, sets, weights and reps",
         "How long they trained and how hard sets felt",
         "Their weekly goal and new bests",
       ],
-      neverLabel: "You never see",
-      never: [
-        "Heart rate, body weight, body fat or measurements",
-        "Health readings, readiness or cycle",
-        "Injuries, notes, gyms or photos",
+      optLabel: "Only if they switch it on",
+      opt: [
+        "Heart rate and calories for each workout",
+        "Their workout notes",
+        "Readiness and recovery: how they feel, sleep, HRV and resting heart rate",
+        "Body weight, body fat, measurements and food",
+        "Pain and injuries",
+        "Their cycle",
       ],
+      neverLabel: "You never see",
+      never: ["Progress photos", "Their gyms or where they train"],
     },
     cost: {
       title: "What it costs",
@@ -358,7 +363,7 @@ export const en: SiteText = {
       },
       {
         q: "Can I see their heart rate or body weight?",
-        a: "Only what they choose. You see their training. Each client can turn on sharing their body data, or their pain ratings and injuries, with you; health readings and notes never leave their account.",
+        a: "Only what they choose. You always see their training. Each client can switch on sharing their heart rate, workout notes, readiness and recovery, body data, pain and injuries, or cycle with you, one at a time, and switch any of it off again.",
       },
       {
         q: "Can physios and rehab clinicians use it?",

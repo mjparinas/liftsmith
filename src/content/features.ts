@@ -606,6 +606,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "coach-sharing",
+        name: "Clients choose what their coach sees",
+        body: "Training is always shared. Heart rate, workout notes, readiness and recovery, body data, pain and injuries, and cycle are each a switch the client flips for each coach, on the consent screen or any time after. Photos and gyms never leave.",
+        tier: "both",
+        proPart: "Being a client is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
+      {
         id: "coach-plans",
         name: "Coach plans that grow with your client list",
         body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and Liftsmith takes nothing from what they pay you.",

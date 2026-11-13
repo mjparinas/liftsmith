@@ -72,12 +72,18 @@ export function CoachesView({ lang }: { lang: SiteLang }) {
 
       <Section title={c.see.title} id="privacy">
         <p className="text-muted">{c.see.body}</p>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
           <section className="card p-5" aria-labelledby="coach-sees">
             <h3 id="coach-sees" className="text-lg font-semibold">
               {c.see.seesLabel}
             </h3>
             <Ticks items={c.see.sees} mark="✓" tone="text-good" />
+          </section>
+          <section className="card p-5" aria-labelledby="coach-opt">
+            <h3 id="coach-opt" className="text-lg font-semibold">
+              {c.see.optLabel}
+            </h3>
+            <Ticks items={c.see.opt} mark="○" tone="text-accent" />
           </section>
           <section className="card p-5" aria-labelledby="coach-never">
             <h3 id="coach-never" className="text-lg font-semibold">
