@@ -433,6 +433,11 @@ export const es: FeaturesText = {
       name: "Sonos",
       body: "Controla un altavoz Sonos desde el entrenamiento, con un volumen para las series y otro para el descanso.",
     },
+    "now-playing": {
+      name: "Controles de música",
+      body: "Reproduce, pausa y salta tu música desde Hoy y durante el entrenamiento, con la canción y la app que la reproduce. Puedes desactivarlo en Ajustes.",
+      note: "iPhone: solo Apple Music, porque Apple no deja que las apps controlen otras apps de música.",
+    },
   },
   connectionGroups: {
     health: "Apps de salud",
@@ -477,6 +482,11 @@ export const es: FeaturesText = {
     withings: { does: "Entran peso, grasa corporal, sueño y pasos" },
     polar: { does: "Entran recuperación nocturna, VFC y sueño" },
     concept2: { does: "Las sesiones de RowErg, SkiErg y BikeErg entran como entrenamientos de cardio" },
+    "music-apps": {
+      name: "Spotify, YouTube Music y otras apps de música",
+      does: "Reproducir, pausar y saltar desde Hoy y el entrenamiento, con el nombre de la canción",
+    },
+    "apple-music": { does: "Reproducir, pausar y saltar desde Hoy y el entrenamiento, con el nombre de la canción" },
     sonos: { does: "Reproducir, pausar, saltar y volumen desde el entrenamiento; la música sigue las series y el descanso" },
     calendar: {
       name: "Calendario del teléfono (Google, iCloud, Outlook)",

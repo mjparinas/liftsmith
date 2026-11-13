@@ -245,6 +245,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-10",
       },
+      {
+        id: "now-playing",
+        name: "Music controls",
+        body: "Play, pause and skip your music from Today and during a workout, with the song and the app playing it. You can turn it off in Settings.",
+        tier: "free",
+        where: "phones",
+        note: "iPhone: Apple Music only, because Apple doesn't let apps control other music apps.",
+        added: "2026-11-13",
+      },
     ],
   },
   {
@@ -1081,6 +1090,24 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
     id: "music",
     title: "Music and speakers",
     rows: [
+      {
+        id: "music-apps",
+        name: "Spotify, YouTube Music and other music apps",
+        does: "Play, pause and skip from Today and the workout, with the song's name",
+        android: "yes",
+        ios: "no",
+        web: "no",
+        tier: "free",
+      },
+      {
+        id: "apple-music",
+        name: "Apple Music",
+        does: "Play, pause and skip from Today and the workout, with the song's name",
+        android: "yes",
+        ios: "yes",
+        web: "no",
+        tier: "free",
+      },
       {
         id: "sonos",
         name: "Sonos",

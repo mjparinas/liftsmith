@@ -432,6 +432,11 @@ export const ja: FeaturesText = {
       name: "Sonos",
       body: "ワークアウト中に Sonos スピーカーを操作。セット用と休憩用で別々の音量にできます。",
     },
+    "now-playing": {
+      name: "音楽コントロール",
+      body: "今日の画面とワークアウト中に、曲名と再生中のアプリを見ながら音楽を再生、一時停止、スキップできます。設定でオフにできます。",
+      note: "iPhone：Apple Musicのみ。Appleは他の音楽アプリの操作をアプリに許可していないためです。",
+    },
   },
   connectionGroups: {
     health: "ヘルスケアアプリ",
@@ -477,6 +482,11 @@ export const ja: FeaturesText = {
     withings: { does: "体重、体脂肪、睡眠、歩数を取り込み" },
     polar: { does: "Nightly Recharge、HRV、睡眠を取り込み" },
     concept2: { does: "RowErg、SkiErg、BikeErg のセッションを有酸素ワークアウトとして取り込み" },
+    "music-apps": {
+      name: "Spotify、YouTube Musicなどの音楽アプリ",
+      does: "今日の画面とワークアウトから再生、一時停止、スキップ（曲名つき）",
+    },
+    "apple-music": { does: "今日の画面とワークアウトから再生、一時停止、スキップ（曲名つき）" },
     sonos: { does: "ワークアウト中に再生、一時停止、スキップ、音量。音楽がセットと休憩に合わせて変わります" },
     calendar: {
       name: "スマートフォンのカレンダー（Google、iCloud、Outlook）",

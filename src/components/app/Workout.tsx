@@ -48,6 +48,7 @@ import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { clock, loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
+import { NowPlayingBar } from "./NowPlaying";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { SetHints } from "./SetHints";
@@ -827,7 +828,7 @@ export function Workout() {
         </>
       ) : null}
 
-      {!finished && sonosOn() && <SonosBar resting={resting} />}
+      {!finished && (sonosOn() ? <SonosBar resting={resting} /> : <NowPlayingBar className="mt-3" />)}
       {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
       <AddExercise />
 

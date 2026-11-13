@@ -36,6 +36,7 @@ import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
 import { Mascot } from "./Mascot";
 import { NextUpCard } from "./NextUp";
+import { NowPlayingBar } from "./NowPlaying";
 import { programName } from "./Programs";
 import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
@@ -310,6 +311,8 @@ export function Today() {
           </button>
         )}
       </div>
+
+      <NowPlayingBar className="mt-3" />
 
       <TodayMoments />
 
