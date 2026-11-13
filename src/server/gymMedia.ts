@@ -164,3 +164,39 @@ export async function areaMapImage(
   if (!r?.ok) return null;
   return { bytes: await r.arrayBuffer(), type: r.headers.get("content-type") ?? "image/png" };
 }
+
+// --- Map tiles for the map you can drag and zoom (Melvin, 2026-11-13: "a map I can drag and zoom … keep it mapbox") ---
+
+/** Mapbox's own dark and light street styles, matching the app's appearance. */
+export type TileStyle = "dark" | "light";
+/** Deepest zoom a tile is passed through for: street level, plenty to tell gyms apart. */
+export const TILE_MAX_ZOOM = 18;
+/** Tiles one address may pull through us in an hour that the edge cache didn't already answer. */
+export const TILES_PER_HOUR = 1_500;
+
+/** Checks a tile's address: zoom 0 to TILE_MAX_ZOOM, x and y inside that zoom's grid. */
+export function tileOf(z: unknown, x: unknown, y: unknown, style: unknown): { z: number; x: number; y: number; style: TileStyle } | null {
+  const [zn, xn, yn] = [z, x, y].map((v) => (typeof v === "string" && /^\d{1,6}$/.test(v) ? Number(v) : NaN));
+  if (!Number.isInteger(zn) || zn! < 0 || zn! > TILE_MAX_ZOOM) return null;
+  const size = 2 ** zn!;
+  if (!Number.isInteger(xn) || !Number.isInteger(yn) || xn! >= size || yn! >= size) return null;
+  return { z: zn!, x: xn!, y: yn!, style: style === "light" ? "light" : "dark" };
+}
+
+/** Mapbox's address for one 256 px tile drawn at twice the pixels (512 px), so it's sharp on phones. */
+export function tileUrl(t: { z: number; x: number; y: number; style: TileStyle }, token: string): string {
+  return `https://api.mapbox.com/styles/v1/mapbox/${t.style}-v11/tiles/256/${t.z}/${t.x}/${t.y}@2x?access_token=${encodeURIComponent(token)}`;
+}
+
+/** One tile, fetched from Mapbox. Null when there's no token, the address is wrong, or Mapbox didn't answer. */
+export async function tileImage(
+  p: { z: unknown; x: unknown; y: unknown; style: unknown },
+  fetcher: typeof fetch = fetch,
+): Promise<{ bytes: ArrayBuffer; type: string } | null> {
+  const token = process.env.MAPBOX_TOKEN;
+  const t = tileOf(p.z, p.x, p.y, p.style);
+  if (!token || !t) return null;
+  const r = await fetcher(tileUrl(t, token)).catch(() => null);
+  if (!r?.ok) return null;
+  return { bytes: await r.arrayBuffer(), type: r.headers.get("content-type") ?? "image/png" };
+}

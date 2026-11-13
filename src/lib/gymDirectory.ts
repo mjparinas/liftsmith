@@ -72,7 +72,14 @@ const token = () => readAccount()?.token;
 /** Pins the map of nearby gyms carries, the list's first ones (the server's AREA_PINS in gymMedia.ts). */
 export const AREA_PINS = 20;
 
-export type Found = { gyms: Listing[]; places: Place[]; /** A map of the places' numbered pins ('' while maps are off). */ map: string };
+export type Found = {
+  gyms: Listing[];
+  places: Place[];
+  /** A map picture of the places' numbered pins, '' while maps are off (the draggable map shows only when it isn't). */
+  map: string;
+  /** The spot searched, rounded to about 1 km. */
+  at?: { lat: number; lon: number };
+};
 export type FindResult = Found | { error: "location" | "offline" | "slow" | "failed" };
 
 // The last search, kept on the device (2026-11-13, "Find a gym near me feels slow"): its spot, already rounded to
@@ -109,7 +116,7 @@ function keepLast(lat: number, lon: number, found: Found, now = Date.now()): voi
 async function searchAt(lat: number, lon: number): Promise<FindResult> {
   try {
     const r = await api<{ gyms: Listing[]; places?: Place[]; map?: string }>(`/api/gyms/?lat=${lat}&lon=${lon}`);
-    return { gyms: r.gyms, places: r.places ?? [], map: r.map ?? "" };
+    return { gyms: r.gyms, places: r.places ?? [], map: r.map ?? "", at: { lat, lon } };
   } catch (e) {
     return { error: problem(e) };
   }
