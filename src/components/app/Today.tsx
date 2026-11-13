@@ -343,9 +343,11 @@ export function Today() {
                   to={call.hue}
                   track="color-mix(in srgb, var(--color-ink) 8%, transparent)"
                 >
-                  <span className="display text-xl" aria-label={t("td.readinessN", { n: readiness.score })}>
+                  {/* aria-label is ignored on a plain span, so the spoken text is its own hidden span. */}
+                  <span className="display text-xl" aria-hidden>
                     {readiness.score}
                   </span>
+                  <span className="sr-only">{t("td.readinessN", { n: readiness.score })}</span>
                 </Ring>
                 <div className="min-w-0 flex-1">
                   <div

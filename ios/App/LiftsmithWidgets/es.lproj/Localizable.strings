@@ -12,3 +12,4 @@
 "Next: %@" = "Siguiente: %@";
 "Rest left" = "Descanso restante";
 "Rest over" = "Fin del descanso";
+"%lld of %lld sets done" = "%1$lld de %2$lld series hechas";

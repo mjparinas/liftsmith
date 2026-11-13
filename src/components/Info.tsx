@@ -7,6 +7,15 @@ import { useBack } from "@/lib/back";
 import { GLOSSARY, type Term } from "@/lib/glossary";
 import { currentLang, t } from "@/lib/i18n";
 
+/** "RIR: reps in reserve" → "RIR: reps in reserve", "Today's call" → "today's call": lower case mid-sentence, but an
+ * acronym keeps its capitals so a screen reader spells it rather than reading "rir" as a word. */
+export function inSentenceKeepCaps(s: string): string {
+  return s
+    .split(" ")
+    .map((w) => (/^[A-Z0-9]{2,}/.test(w) ? w : w.toLowerCase()))
+    .join(" ");
+}
+
 // The "i" button next to a label that isn't obvious (Melvin, 2026-11-09). Tapping it opens a short
 // plain-language explanation from the glossary. One component everywhere: the app and the web
 // dashboard. A 44 px tap target with a small visible circle, a labelled dialog, Escape or Got it to
@@ -44,7 +53,7 @@ export function Info({ term, also, className = "" }: { term: Term; also?: Term; 
       <button
         ref={btn}
         type="button"
-        aria-label={t("info.whatIs", { term: currentLang() === "en" ? title.toLowerCase() : title })}
+        aria-label={t("info.whatIs", { term: currentLang() === "en" ? inSentenceKeepCaps(title) : title })}
         aria-haspopup="dialog"
         onClick={(e) => {
           e.stopPropagation();

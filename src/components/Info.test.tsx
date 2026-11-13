@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { GLOSSARY } from "@/lib/glossary";
 
-import { Info } from "./Info";
+import { Info, inSentenceKeepCaps } from "./Info";
 
 describe("Info", () => {
   it("explains a term in a labelled dialog, and gives focus back when closed", async () => {
@@ -32,5 +32,13 @@ describe("Info", () => {
       expect(t.body.join(" ").length).toBeGreaterThan(60);
       expect(t.body.join(" ")).not.toMatch(/\bRPE\b|hypertrophy|CNS/);
     }
+  });
+});
+
+describe("inSentenceKeepCaps", () => {
+  it("lower-cases words but keeps acronyms", () => {
+    expect(inSentenceKeepCaps("RIR: reps in reserve")).toBe("RIR: reps in reserve");
+    expect(inSentenceKeepCaps("Today's call")).toBe("today's call");
+    expect(inSentenceKeepCaps("Estimated 1RM")).toBe("estimated 1RM");
   });
 });
