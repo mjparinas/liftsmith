@@ -566,6 +566,25 @@ const SCHEMA = [
     PRIMARY KEY (place_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS gym_trainers_account ON gym_trainers (account_id)`,
+  // Staff accounts for an official gym (gymStaff.ts, 2026-11-13): who besides the owner manages it, and the one-time
+  // invite links the owner made. `name` is what the person typed when joining, shown to the owner.
+  `CREATE TABLE IF NOT EXISTS gym_staff (
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    invited_by TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (place_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_staff_account ON gym_staff (account_id)`,
+  `CREATE TABLE IF NOT EXISTS gym_staff_invites (
+    code TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    created_by TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_staff_invites_place ON gym_staff_invites (place_id)`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -1070,6 +1089,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Amenities (a comma list from gymExtras.ts AMENITIES) and prices (JSON), set by the owner (2026-11-13).
   ["gym_places", "amenities", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "prices", "TEXT NOT NULL DEFAULT ''"],
+  // The gym's starter program for new members (2026-11-13): a routine share code (routineShare.ts), '' for none.
+  ["gym_places", "starter", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],

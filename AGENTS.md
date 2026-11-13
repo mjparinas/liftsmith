@@ -202,7 +202,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Growth: organic, the Hevy way](docs/decisions/growth.md) (strategy, segments and the ranked list of growth work; channels in Marketing and growth)
 - [Gym by location](docs/decisions/gym-by-location.md) (`src/lib/geo.ts`)
 - [Gym sharing](docs/decisions/gym-sharing.md) (`src/lib/gymShare.ts`, `SharedGym.tsx`, `Gym.tsx`, `src/lib/gymDirectory.ts`, `src/server/gymDirectory.ts`, `NearbyGyms.tsx`)
-- [Gyms: official gyms, the finder, gym pages and posters](docs/decisions/gyms.md) (`src/server/gymPlaces.ts`, `NearbyGyms.tsx`, `GymPlaces.tsx`, `gymClaims.ts`, `gymPosters.ts`, `gymPrint.ts`; amenities, announcements, equipment problems and trainers in `src/server/gymExtras.ts`, `GymExtras.tsx`)
+- [Gyms: official gyms, the finder, gym pages and posters](docs/decisions/gyms.md) (`src/server/gymPlaces.ts`, `NearbyGyms.tsx`, `GymPlaces.tsx`, `gymClaims.ts`, `gymPosters.ts`, `gymPrint.ts`; amenities, announcements, equipment problems and trainers in `src/server/gymExtras.ts`, `GymExtras.tsx`; staff accounts and the starter program in `src/server/gymStaff.ts`, `GymStaff.tsx`, `src/lib/gymStarter.ts`)
 - [Gym software: Mindbody, Glofox and others (researched, parked)](docs/decisions/gym-software.md)
 - [Gym machines](docs/decisions/gym-machines.md) (`src/lib/ftms.ts`, `machine.ts`, `machineLink.ts`, `workout/MachineCard.tsx`)
 - [Health twin](docs/decisions/health-twin.md) (`Recovery.tsx`, `HealthTwin.tsx`, `src/lib/twin.ts`, `readiness.ts`)

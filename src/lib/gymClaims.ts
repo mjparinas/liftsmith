@@ -6,7 +6,7 @@ import { api, AuthError, readAccount } from "./auth";
 import type { Amenity, Prices } from "./gymExtras";
 import { keepRead, readKept } from "./liveRead";
 import { track } from "./net";
-import { SITE_URL } from "./site";
+import { APP_PATH, SITE_URL } from "./site";
 
 export type Role = "owner" | "manager" | "staff";
 export const ROLES: readonly Role[] = ["owner", "manager", "staff"];
@@ -36,6 +36,10 @@ export interface OwnedGym {
   amenities: Amenity[];
   prices: Prices | null;
   country: string;
+  /** "owner" for the account that claimed it, "staff" for someone the owner invited (src/server/gymStaff.ts). */
+  role?: "owner" | "staff";
+  /** The gym's starter program for new members (a routine share code, gymStarter.ts), '' for none. */
+  starter?: string;
 }
 
 /** A claimed gym earns a mailed table stand at this many lifters (src/server/gymPosters.ts). */
@@ -109,7 +113,7 @@ export function ownedGyms(fresh = false): Promise<OwnedGym[] | null> {
 
 export async function editGym(
   place: string,
-  change: Partial<Omit<OwnedGym, "id" | "name" | "citySlug" | "slug" | "address" | "lifters" | "country">>,
+  change: Partial<Omit<OwnedGym, "id" | "name" | "citySlug" | "slug" | "address" | "lifters" | "country" | "role">>,
 ): Promise<true | string> {
   try {
     await api("/api/gyms/", { token: token(), body: { op: "edit", place, ...change } });
@@ -232,5 +236,78 @@ export async function removeGymPicture(place: string, id: string): Promise<boole
     return true;
   } catch {
     return false;
+  }
+}
+
+// --- Staff (src/server/gymStaff.ts, docs/decisions/gyms.md "Staff and the starter program") ---
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  at: number;
+  me: boolean;
+}
+
+export interface StaffView {
+  staff: StaffMember[];
+  invites: { code: string; expiresAt: number }[];
+}
+
+/** The link that opens the join screen for an invite. */
+export const staffLink = (code: string) => `${SITE_URL}${APP_PATH}#/gymstaff/${code}`;
+
+export async function staffOf(place: string): Promise<StaffView | null> {
+  try {
+    return await api<StaffView>("/api/gyms/", { token: token(), body: { op: "staff", place } });
+  } catch {
+    return null;
+  }
+}
+
+export async function inviteStaff(place: string): Promise<{ code: string; expiresAt: number } | { error: string }> {
+  try {
+    return await api<{ code: string; expiresAt: number }>("/api/gyms/", { token: token(), body: { op: "staffInvite", place } });
+  } catch (e) {
+    return { error: err(e) };
+  }
+}
+
+export async function cancelStaffInvite(place: string, code: string): Promise<boolean> {
+  try {
+    await api("/api/gyms/", { token: token(), body: { op: "staffCancel", place, code } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** The owner takes someone off (`id` from the list), or the person looking leaves (`id` omitted). */
+export async function removeStaff(place: string, id?: string): Promise<boolean> {
+  try {
+    await api("/api/gyms/", { token: token(), body: id ? { op: "staffRemove", place, id } : { op: "staffLeave", place } });
+    owned = null;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function staffInvite(code: string): Promise<{ place: string; name: string } | { error: string }> {
+  const t = token();
+  if (!t) return { error: "signedOut" };
+  try {
+    return await api<{ place: string; name: string }>("/api/gyms/", { token: t, body: { op: "staffPreview", code } });
+  } catch (e) {
+    return { error: err(e) };
+  }
+}
+
+export async function joinStaff(code: string, name: string): Promise<{ place: string; name: string } | { error: string }> {
+  try {
+    const r = await api<{ place: string; name: string }>("/api/gyms/", { token: token(), body: { op: "staffJoin", code, name } });
+    owned = null;
+    return r;
+  } catch (e) {
+    return { error: err(e) };
   }
 }

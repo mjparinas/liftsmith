@@ -11,6 +11,7 @@ import { randomBytes } from "node:crypto";
 
 import { query, rateLimit, run } from "./db";
 import { isPlaceId } from "./gymPlaces";
+import { canManage } from "./gymStaff";
 
 export const MEDIA_LIMITS = {
   /** Bytes of one JPEG. */
@@ -45,8 +46,7 @@ export type MediaResult = { ok: true; id: string } | { ok: false; error: "owner"
 export async function addMedia(accountId: string, body: Record<string, unknown>, now = Date.now()): Promise<MediaResult> {
   const kind: MediaKind | null = body.kind === "logo" ? "logo" : body.kind === "photo" ? "photo" : null;
   if (!kind || !isPlaceId(body.place)) return { ok: false, error: "image" };
-  const [p] = await query("SELECT id FROM gym_places WHERE id = ? AND claimed_by = ?", [body.place, accountId]);
-  if (!p) return { ok: false, error: "owner" };
+  if (!(await canManage(accountId, body.place))) return { ok: false, error: "owner" };
   const m = typeof body.image === "string" ? /^data:image\/jpeg;base64,([A-Za-z0-9+/=]+)$/.exec(body.image) : null;
   if (!m?.[1]) return { ok: false, error: "image" };
   const image = Buffer.from(m[1], "base64");
@@ -67,8 +67,7 @@ export async function addMedia(accountId: string, body: Record<string, unknown>,
 /** The owner takes one down. */
 export async function removeMedia(accountId: string, placeId: unknown, id: unknown): Promise<boolean> {
   if (!isPlaceId(placeId) || !isMediaId(id)) return false;
-  const [p] = await query("SELECT id FROM gym_places WHERE id = ? AND claimed_by = ?", [placeId, accountId]);
-  if (!p) return false;
+  if (!(await canManage(accountId, placeId))) return false;
   return (await run("DELETE FROM gym_photos WHERE id = ? AND place_id = ?", [id, placeId])) > 0;
 }
 

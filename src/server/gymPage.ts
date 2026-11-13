@@ -7,12 +7,14 @@
 // Text: src/locales/text/gp.ts (gp.*), in the reader's language. Map credit: OpenStreetMap (ODbL).
 import { money, PRICE_KINDS, type Prices } from "@/lib/gymExtras";
 import { decodeGym } from "@/lib/gymShare";
+import { readStarter } from "@/lib/gymStarter";
 import { isMsgLang, MSG_LANGS, type MsgLang } from "@/lib/messageText";
 import { allDay, parseHours } from "@/lib/openingHours";
 import { SHARE_PAGE_CSP } from "@/lib/securityHeaders";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { EQUIPMENT, type Equipment } from "@/lib/types";
 import * as equipment from "@/locales/text/equipment";
+import * as ex from "@/locales/text/ex";
 import * as gp from "@/locales/text/gp";
 
 import { AREA_PINS, areaMapPath } from "./gymMedia";
@@ -34,6 +36,20 @@ export const say = (lang: MsgLang, key: GpKey, vars: Record<string, string | num
   String(GP[lang][key] ?? gp.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => (k in vars ? String(vars[k]) : all));
 const equipName = (lang: MsgLang, e: Equipment) =>
   String(EQ[lang][`equipment.${e}`] ?? equipment.en[`equipment.${e}` as keyof typeof equipment.en] ?? e);
+
+const EX: Record<MsgLang, Partial<Record<string, unknown>>> = { en: ex.en, es: ex.es, fr: ex.fr, de: ex.de, it: ex.it, ja: ex.ja };
+const exName = (lang: MsgLang, id: string) => {
+  const m = EX[lang][`ex.${id}`] ?? (ex.en as Record<string, unknown>)[`ex.${id}`];
+  return typeof m === "string" ? m : id;
+};
+
+/** The gym's starter program (gymStarter.ts): its name, "3 × Goblet squat" lines, and Save it in the app. */
+function starterHtml(p: Place, lang: MsgLang): string {
+  const st = readStarter(p.starter);
+  if (!st) return "";
+  const lines = st.items.map((i) => `<li>${esc(`${i.sets} × ${exName(lang, i.id)}`)}</li>`).join("");
+  return `<section class="card" aria-labelledby="starter-h"><h2 id="starter-h">${icon("dumbbell", 16)}${esc(say(lang, "gp.starterTitle"))}</h2><p class="muted">${esc(say(lang, "gp.starterBody"))}</p>${st.name ? `<p class="li-name">${esc(st.name)}</p>` : ""}<ul class="starter">${lines}</ul><p><a href="${esc(`${APP_PATH}#/routine/${p.starter}`)}" rel="nofollow">${esc(say(lang, "gp.starterOpen"))} ›</a></p></section>`;
+}
 
 export const gymPath = (p: Pick<Place, "citySlug" | "slug">) => `/gyms/${p.citySlug}/${p.slug}/`;
 export const cityPath = (citySlug: string) => `/gyms/${citySlug}/`;
@@ -241,7 +257,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${news}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
 
@@ -363,7 +379,7 @@ const GYM_STYLE = `
 .hours{display:grid;gap:0;margin:0}.hours div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
 .hours div:first-child{border-top:0;padding-top:0}.hours dd{margin:0;font-variant-numeric:tabular-nums;text-align:right}
 .chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
-.news,.trainers,.prices{list-style:none;margin:0;padding:0;display:grid;gap:12px}.news p,.trainers p{margin:0}
+.news,.trainers,.prices{list-style:none;margin:0;padding:0;display:grid;gap:12px}.starter{margin:8px 0;padding-left:20px}.news p,.trainers p{margin:0}
 .trainers li{border-top:1px solid var(--line);padding-top:12px}.trainers li:first-child{border-top:0;padding-top:0}
 .trainers a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}.prices{gap:4px;margin-bottom:12px;font-weight:600}
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}

@@ -25,6 +25,7 @@ import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 
 import { AmenitiesSection, OwnerExtrasSections, priceDraft, pricesOf, type PriceDraft } from "./GymExtras";
+import { StaffSection, StarterSection } from "./GymStaff";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Skeleton, Switch, SwitchRow } from "./ui";
@@ -55,13 +56,15 @@ const errorText = (e: string) =>
   t(
     e === "hours"
       ? "gym.edit.err.hours"
-      : e === "website"
-        ? "gym.edit.err.website"
-        : e === "words" || e === "link"
-          ? "gym.claim.err.words"
-          : e === "offline"
-            ? "gym.near.offline"
-            : "gym.near.failed",
+      : e === "starter"
+        ? "gym.edit.err.starter"
+        : e === "website"
+          ? "gym.edit.err.website"
+          : e === "words" || e === "link"
+            ? "gym.claim.err.words"
+            : e === "offline"
+              ? "gym.near.offline"
+              : "gym.near.failed",
   );
 
 export function GymEdit({ id }: { id?: string }) {
@@ -75,6 +78,7 @@ export function GymEdit({ id }: { id?: string }) {
   const [kitFrom, setKitFrom] = useState<string | null>(null);
   const [amenities, setAmenities] = useState<OwnedGym["amenities"]>([]);
   const [prices, setPrices] = useState<PriceDraft>({ currency: "CAD", day: "", week: "", month: "" });
+  const [starter, setStarter] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [stand, setStand] = useState<StandOrder | null>(null);
   const [busy, setBusy] = useState(false);
@@ -93,6 +97,7 @@ export function GymEdit({ id }: { id?: string }) {
       setAbout(g.description);
       setAmenities(g.amenities ?? []);
       setPrices(priceDraft(g));
+      setStarter(g.starter ?? "");
       setKitFrom(gyms.find((x) => x.placeId === g.id)?.id ?? null);
     });
     return () => {
@@ -131,6 +136,7 @@ export function GymEdit({ id }: { id?: string }) {
       description: about.trim(),
       amenities,
       prices: pricesOf(prices),
+      starter,
       ...(source ? { code: encodeGym({ ...kitOf(source), name: gym.name }) } : {}),
     });
     setBusy(false);
@@ -192,6 +198,7 @@ export function GymEdit({ id }: { id?: string }) {
       </Section>
 
       <AmenitiesSection amenities={amenities} onAmenities={setAmenities} prices={prices} onPrices={setPrices} />
+      <StarterSection starter={starter} onStarter={setStarter} />
 
       <Section title={t("gym.edit.kit")}>
         <p className="mb-2 text-sm text-muted">{t("gym.edit.kitNote")}</p>
@@ -206,6 +213,7 @@ export function GymEdit({ id }: { id?: string }) {
       </Section>
 
       <PosterSection gym={gym} stand={stand} onAsked={setStand} />
+      <StaffSection gym={gym} />
 
       <Section title={t("gym.edit.contact")}>
         <div className="space-y-3">
@@ -258,16 +266,18 @@ export function GymEdit({ id }: { id?: string }) {
             ›
           </span>
         </a>
-        <Button
-          kind="quiet"
-          className="w-full"
-          onClick={() => {
-            if (!window.confirm(t("gym.edit.releaseAsk", { name: gym.name }))) return;
-            void releaseGym(gym.id).then((ok) => ok && go("today"));
-          }}
-        >
-          {t("gym.edit.release")}
-        </Button>
+        {gym.role !== "staff" && (
+          <Button
+            kind="quiet"
+            className="w-full"
+            onClick={() => {
+              if (!window.confirm(t("gym.edit.releaseAsk", { name: gym.name }))) return;
+              void releaseGym(gym.id).then((ok) => ok && go("today"));
+            }}
+          >
+            {t("gym.edit.release")}
+          </Button>
+        )}
       </div>
     </div>
   );

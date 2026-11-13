@@ -54,6 +54,7 @@ import {
 import { cleanCode, newCode } from "./coach";
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { recordAccept } from "./earnedPro";
+import { MANAGES } from "./gymStaff";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
 import { isMinor } from "./teams";
@@ -1931,7 +1932,12 @@ export async function gymClubStart(accountId: string, placeId: unknown, now = Da
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
   if (n(mine.suspended)) return fail(403, "suspended");
-  const [p] = await query("SELECT id, name FROM gym_places WHERE id = ? AND claimed_by = ?", [s(placeId), accountId]);
+  // The owner or one of the gym's staff (gymStaff.ts).
+  const [p] = await query(`SELECT p.id, p.name FROM gym_places p WHERE p.id = ? AND p.claimed_by <> '' AND ${MANAGES}`, [
+    s(placeId),
+    accountId,
+    accountId,
+  ]);
   if (!p) return fail(403, "owner");
   const [had] = await query("SELECT id, code FROM clubs WHERE place_id = ?", [s(p.id)]);
   if (had) return ok({ id: s(had.id), code: s(had.code) });

@@ -271,6 +271,14 @@ export const es: FeaturesText = {
       name: "Entrenadores en las páginas de gimnasios",
       body: "Los entrenadores aparecen en los gimnasios donde entrenan a sus clientes, con una línea sobre ellos y un botón para entrenar con ellos. En un gimnasio oficial, el dueño los aprueba antes.",
     },
+    "gym-staff": {
+      name: "Cuentas de personal para gimnasios",
+      body: "El propietario de un gimnasio oficial invita a gerentes y personal de recepción con un enlace de un solo uso. Cada uno usa su propia cuenta para mantener al día la página, los avisos y los problemas reportados.",
+    },
+    "gym-starter": {
+      name: "Programas de inicio de los gimnasios",
+      body: "Los gimnasios oficiales sugieren un programa a quienes empiezan en su página de la app y la web, y se guarda con un toque. Liftsmith pone los pesos de cada persona.",
+    },
     "buy-next": {
       name: "Qué comprar después",
       body: "Para gimnasios en casa: la pieza de equipo que abriría más ejercicios.",
