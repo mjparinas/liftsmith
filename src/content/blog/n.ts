@@ -2,8 +2,8 @@ import type { Article } from "../articles";
 
 // Blog, part fourteen: what shipped on 2026-11-12. Coaching chat, shared body data and alerts (PR 385), gyms lifters can
 // add, gym clubs and owners' results (PR 384), and a fuller import from other apps (PR 386). Other apps aren't named
-// (seo.test.ts): the switch pages under /import/ name them. Only what ships; the gym map waits on its key, so it isn't
-// mentioned.
+// (seo.test.ts): the switch pages under /import/ name them. Only what ships (the gym map's Mapbox key was set on
+// 2026-11-12).
 export const BLOG_N: Article[] = [
   {
     slug: "new-coaching-chat-gym-clubs-and-imports",
@@ -43,7 +43,7 @@ export const BLOG_N: Article[] = [
           "**Can't find your gym? Add it.** Give its name, street and city, and once we've checked it, it shows for everyone. Recreation and community centres with a gym inside now show up in the gym finder too, and we've added gyms across the major cities of Canada and the US.",
           "**A club for your gym.** An official gym's owner can start a club with one tap. Members join from the gym's page and get a weekly leaderboard, a crew goal and posts, with room for 1,000 people. Joining is always the lifter's choice.",
           "**Results for owners.** The owner's page now opens with the last 30 days: lifters in all, new lifters and poster scans. Then it gives one next step, like adding opening hours, setting the equipment or putting the poster up.",
-          "**Logo and photos.** Owners can add their logo and up to six photos, which show on the gym's page in the app and on the web.",
+          "**A map, a logo and photos.** Each gym's page now shows a street map with a pin, and owners can add their logo and up to six photos. They show on the gym's page in the app and on the web.",
         ],
       },
       {
