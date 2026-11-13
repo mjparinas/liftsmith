@@ -63,3 +63,15 @@ Melvin, 2026-11-12, agreeing to item 4 of the [growth plan](growth.md): start wi
 - **The gym's club** (Melvin, 2026-11-12, growth plan): an official gym's owner taps **Start the club** on the owner's page (`gymClubStart` in `social.ts`, op `gymClub`). It's a Friends club named after the gym and tied to it (`clubs.place_id`), so members get the same weekly leaderboard, crew goal and posts as any club, run from Friends, with room for 1,000 people (`gymClubMembers`) instead of 100. One per gym; asking again gives the same code. The gym's preview in the app and its web page then show **Gym club** with **Join the club** (`#/club/<code>`, the usual join screen, which says weekly totals are shared). Joining is opt-in and needs Friends, so the owner is sent to turn on Friends first. When the owner lets the gym go or staff delete it, the club stays with its members as an ordinary club.
 - Not built yet: hiding "N lifters train here" below about 10 lifters (Melvin didn't pick it, 2026-11-12). Pure web code, so Android, iOS and the web app get it together.
 
+## Map of the nearest gyms (2026-11-13)
+
+Melvin: "it should show a map of all the nearest gyms with a list beneath it". **Find gyms near you** (the app on
+Android, iOS and the web, setup wizard included) shows one map picture above the list with the first 20 gyms as
+numbered pins, the same numbers on the list's rows, and the searcher's rounded spot as a cyan dot. The website's **city
+pages** (`/gyms/<city>/`) show the same kind of map of the city's gyms above their list (no scripts, so it can't ask
+where the reader is). It's one Mapbox static picture through our own server (`areaMapPath`, `areaMapImage` in
+`src/server/gymMedia.ts`, `/api/gyms/map/?ids=<id>.<id>…&at=lat,lon`), not an interactive map: no map library to load,
+the gym pages' CSP holds, the token stays on the server, and it's cached a day at the edge. The pins go by the ids in
+the address, so pin 1 is always the list's first gym. Off with the other maps while `MAPBOX_TOKEN` isn't set. Pure web
+code, so Android, iOS and the web app get it together.
+

@@ -9,6 +9,7 @@ import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
 import { claimWithPosterCode, editGym, ownedGyms, releaseGym, startClaim, verifyClaim } from "@/server/gymClaims";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
+import { areaMapPath } from "@/server/gymMedia";
 import { joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
 import { latestOrder, requestPosters } from "@/server/gymPosters";
 import { gymClubStart } from "@/server/social";
@@ -19,19 +20,33 @@ const ipOf = (req: Request) => req.headers.get("x-forwarded-for")?.split(",")[0]
 
 export async function GET(req: Request) {
   if (!hasDb()) return reply(req, 503, { error: "The gym list isn't set up yet." });
-  if (!(await rateLimit(`gyms:search:${ipOf(req)}`, LIMITS.searchesPerHour, 3_600_000))) return reply(req, 429, { error: "slow" });
   const u = new URL(req.url).searchParams;
+  const allowed = rateLimit(`gyms:search:${ipOf(req)}`, LIMITS.searchesPerHour, 3_600_000);
   // ?place=<id>: one real gym, for its page in the app (GymPlace.tsx, the QR code's target).
   if (u.has("place")) {
-    const place = await placeById(u.get("place"));
+    const [ok, place] = await Promise.all([allowed, placeById(u.get("place"))]);
+    if (!ok) return reply(req, 429, { error: "slow" });
     return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
   }
   const lat = Number(u.get("lat") ?? NaN);
   const lon = Number(u.get("lon") ?? NaN);
-  const gyms = await nearby(lat, lon);
-  const places = await nearbyPlaces(lat, lon, { studios: u.get("studios") === "1" });
+  // The limit, the listed setups and the real gyms in one go: each is a trip to the database, and one after another
+  // they were most of the wait (2026-11-13, "Find a gym near me feels slow").
+  const [ok, gyms, places] = await Promise.all([allowed, nearby(lat, lon), nearbyPlaces(lat, lon, { studios: u.get("studios") === "1" })]);
+  if (!ok) return reply(req, 429, { error: "slow" });
   if (!gyms || !places) return reply(req, 400, { error: "Bad request." });
-  return reply(req, 200, { gyms, places });
+  // The same rounded spot asked again within two minutes (a second tap, the setup wizard then Gyms) comes from the
+  // phone's own cache. Private, because the answer carries the CORS header for the asking app.
+  const res = reply(req, 200, {
+    gyms,
+    places,
+    map: areaMapPath(
+      places.map((p) => p.id),
+      { lat, lon },
+    ),
+  });
+  res.headers.set("Cache-Control", "private, max-age=120");
+  return res;
 }
 
 export async function POST(req: Request) {

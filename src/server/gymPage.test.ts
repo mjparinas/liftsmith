@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { encodeGym, kitOf } from "@/lib/gymShare";
 import { makeTestGym } from "@/test/factories";
@@ -91,6 +91,8 @@ describe("a gym's page", () => {
 });
 
 describe("cities and the sitemap", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
   it("lists a city's gyms with studios apart, and every city", async () => {
     const html = cityHtml("langley-bc", await cityPlaces("langley-bc"), "en");
     expect(html).toContain("<h1>Gyms in Langley, BC</h1>");
@@ -101,6 +103,21 @@ describe("cities and the sitemap", () => {
     expect(list).toMatchObject([{ citySlug: "langley-bc", city: "Langley", region: "BC", gyms: 2 }]);
     expect(indexHtml(list, "en")).toContain('href="/gyms/langley-bc/"');
     expect(goneHtml("en")).toContain('content="noindex"');
+  });
+
+  it("shows a map of the city's gyms above the list, pins numbered as the gyms are, once maps are on", async () => {
+    expect(cityHtml("langley-bc", await cityPlaces("langley-bc"), "en")).not.toContain("/api/gyms/map/");
+    vi.stubEnv("MAPBOX_TOKEN", "pk.test");
+    const places = await cityPlaces("langley-bc");
+    const html = cityHtml("langley-bc", places, "en");
+    const gyms = places.filter((p) => p.kind === "gym");
+    expect(html).toContain(`<img src="/api/gyms/map/?ids=${gyms.map((p) => p.id).join(".")}"`);
+    expect(html).toContain('alt="Map of the gyms in Langley, BC, numbered as in the list"');
+    expect(html.indexOf("/api/gyms/map/")).toBeLessThan(html.indexOf('class="pin"'));
+    expect(html).toContain(`<span class="pin" aria-hidden="true">1</span>${gyms[0]!.name}`);
+    // Studios aren't on the map, so they carry no number.
+    expect(html.match(/class="pin"/g)).toHaveLength(gyms.length);
+    expect(html).not.toContain("pk.test");
   });
 
   it("puts gyms in the sitemap but not studios or hidden gyms", async () => {

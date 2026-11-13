@@ -249,7 +249,7 @@ export const es: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador y páginas de gimnasios",
-      body: "Encuentra gimnasios cerca de ti, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal.",
+      body: "Encuentra gimnasios cerca de ti en un mapa con la lista debajo, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal.",
     },
     "buy-next": {
       name: "Qué comprar después",

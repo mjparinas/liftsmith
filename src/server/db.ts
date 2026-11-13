@@ -1042,6 +1042,16 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["coach_plans", "per_week", "INTEGER"],
 ];
 
+/**
+ * Indexes on columns that COLUMNS adds, so they're made after the columns exist (on a fresh database SCHEMA's tables
+ * don't have them yet). Find gyms near you looks up each nearby gym's setup and club by place (2026-11-13): without
+ * these, every one of up to a thousand gyms scanned both tables.
+ */
+const LATE_SCHEMA = [
+  `CREATE INDEX IF NOT EXISTS public_gyms_for ON public_gyms (place_id)`,
+  `CREATE INDEX IF NOT EXISTS clubs_place ON clubs (place_id)`,
+];
+
 let client: Client | null = null;
 let ready: Promise<void> | null = null;
 
@@ -1092,6 +1102,7 @@ async function migrate(c: Client): Promise<void> {
       const cols = await c.execute(`PRAGMA table_info(${table})`);
       if (!cols.rows.some((r) => r.name === column)) await c.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
     }
+    for (const s of LATE_SCHEMA) await c.execute(s);
     return;
   }
   // Tables and indexes that aren't there yet, plus the one-off data fixes (UPDATE … statements, which make nothing
@@ -1103,7 +1114,8 @@ async function migrate(c: Client): Promise<void> {
   const alters = COLUMNS.filter(([table, column]) => !have.columns.has(`${table}.${column}`)).map(
     ([table, column, def]) => `ALTER TABLE ${table} ADD COLUMN ${column} ${def}`,
   );
-  if (alters.length) await c.batch(alters, "write");
+  const late = LATE_SCHEMA.filter((sql) => !have.names.has(schemaName(sql)));
+  if (alters.length || late.length) await c.batch([...alters, ...late], "write");
 }
 
 /** Every table and index in the database, and each table's columns as `table.column`, in one read. */

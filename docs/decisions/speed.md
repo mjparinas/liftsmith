@@ -68,6 +68,24 @@ The maintenance proxy (`src/proxy.api.ts`) runs only on API routes and the serve
 because each page visit paid for a function call (about 70 ms, plus cold starts). Static pages stay up during
 maintenance; they never read the database. Melvin chose this.
 
+## Find gyms near you (2026-11-13)
+
+Melvin: "Find a gym near me feels slow". The wait was the phone's position (up to 15 s on a cold fix, usually 1 to 3)
+followed by three database trips in a row on the server (the rate limit, listed setups, real gyms; about 0.5 s warm,
+1.3 s cold), and nothing on screen meanwhile but "Looking…". Now:
+
+- **The last answer shows at once** (`lastNearby` in `src/lib/gymDirectory.ts`, kept a week in localStorage with its
+  spot, already rounded to about 1 km like everything sent), with "Updating for where you are now…" under it.
+- **The server is asked for the last spot while the phone finds its position**; when the new fix rounds to the same
+  spot (most searches), that answer is used and the wait is the slower of the two rather than both in a row. A new
+  spot asks again.
+- **The server runs its three database trips at once** (`GET /api/gyms/`), and the answer stays in the phone's own
+  cache for two minutes (`private`, because it carries the asking app's CORS header).
+- **Two missing indexes**: each nearby gym's setup and club are looked up by place (`public_gyms.place_id`,
+  `clubs.place_id`), which scanned both tables for each of up to a thousand gyms. They're made after COLUMNS adds
+  those columns (`LATE_SCHEMA` in `db.ts`).
+- A first search shows a skeleton of the map and list instead of a bare button.
+
 ## Found and not done yet (ranked)
 
 1. **All app screens are in one bundle** (about 1.1 MB). Loading rarely used screens (trainer, gyms, imports, tools)
