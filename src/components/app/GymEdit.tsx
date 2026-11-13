@@ -24,6 +24,7 @@ import { DAYS, formatHours, parseHours, type Week } from "@/lib/openingHours";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 
+import { AmenitiesSection, OwnerExtrasSections, priceDraft, pricesOf, type PriceDraft } from "./GymExtras";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Skeleton, Switch, SwitchRow } from "./ui";
@@ -72,6 +73,8 @@ export function GymEdit({ id }: { id?: string }) {
   const [phone, setPhone] = useState("");
   const [about, setAbout] = useState("");
   const [kitFrom, setKitFrom] = useState<string | null>(null);
+  const [amenities, setAmenities] = useState<OwnedGym["amenities"]>([]);
+  const [prices, setPrices] = useState<PriceDraft>({ currency: "CAD", day: "", week: "", month: "" });
   const [status, setStatus] = useState<string | null>(null);
   const [stand, setStand] = useState<StandOrder | null>(null);
   const [busy, setBusy] = useState(false);
@@ -88,6 +91,8 @@ export function GymEdit({ id }: { id?: string }) {
       setWebsite(g.website);
       setPhone(g.phone);
       setAbout(g.description);
+      setAmenities(g.amenities ?? []);
+      setPrices(priceDraft(g));
       setKitFrom(gyms.find((x) => x.placeId === g.id)?.id ?? null);
     });
     return () => {
@@ -124,6 +129,8 @@ export function GymEdit({ id }: { id?: string }) {
       website: website.trim(),
       phone: phone.trim(),
       description: about.trim(),
+      amenities,
+      prices: pricesOf(prices),
       ...(source ? { code: encodeGym({ ...kitOf(source), name: gym.name }) } : {}),
     });
     setBusy(false);
@@ -141,6 +148,7 @@ export function GymEdit({ id }: { id?: string }) {
 
       <Results gym={gym} />
       <ClubSection gym={gym} />
+      <OwnerExtrasSections gym={gym} />
       <PicturesSection gym={gym} />
 
       <Section title={t("gp.hours")}>
@@ -182,6 +190,8 @@ export function GymEdit({ id }: { id?: string }) {
           </ul>
         )}
       </Section>
+
+      <AmenitiesSection amenities={amenities} onAmenities={setAmenities} prices={prices} onPrices={setPrices} />
 
       <Section title={t("gym.edit.kit")}>
         <p className="mb-2 text-sm text-muted">{t("gym.edit.kitNote")}</p>

@@ -16,6 +16,7 @@ import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator"
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
+import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
 import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
@@ -98,6 +99,7 @@ const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setu
 
 export function App() {
   const { ready, init, profile, active, stats } = useApp();
+  const gyms = useApp((s) => s.gyms);
   // The first screen waits for the lifter's language to load (one at a time, i18n.ts), so it never flashes English.
   // Later switches (Settings › Language) keep the screen and change its words when the language arrives.
   const langWaiting = useSyncExternalStore(subscribeLang, languagePending, () => false);
@@ -392,6 +394,19 @@ export function App() {
       off();
     };
   }, [ready, profile.onboarded]);
+
+  // Equipment reported out of order at the lifter's real gym (gymExtrasApi.ts): on open, on return to the app and when
+  // the gym changes, at most every 30 minutes per gym; Today's plan is rebuilt when the list changed.
+  const placeId = ready && profile.onboarded ? (gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0])?.placeId : undefined;
+  useEffect(() => {
+    if (!placeId) return;
+    const look = () => {
+      if (document.visibilityState === "visible") void refreshOutOfOrder(placeId).then((changed) => changed && useApp.getState().replan());
+    };
+    look();
+    document.addEventListener("visibilitychange", look);
+    return () => document.removeEventListener("visibilitychange", look);
+  }, [placeId]);
 
   if (!ready || langWaiting) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;

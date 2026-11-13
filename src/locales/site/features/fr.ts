@@ -256,6 +256,22 @@ export const fr: FeaturesText = {
       name: "Recherche de salles et pages de salle",
       body: "Trouvez des salles près de chez vous sur une carte avec la liste en dessous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire.",
     },
+    "gym-amenities": {
+      name: "Services et tarifs sur les pages des salles",
+      body: "Les propriétaires indiquent ce qu’il y a en plus de l’équipement (douches, stationnement, accès 24 h/24, espace femmes et plus) et le prix d’un accès à la journée, à la semaine ou de l’abonnement.",
+    },
+    "gym-news": {
+      name: "Annonces de votre salle",
+      body: "Les salles officielles publient horaires des fêtes, nouvel équipement ou changements de cours sur leur page, et les membres de leur club reçoivent une notification.",
+    },
+    "gym-problems": {
+      name: "Signalez un équipement en panne",
+      body: "Dites à votre salle qu’une machine est en panne ou manque. Tous ceux qui s’y entraînent ont un plan qui s’en passe, et le propriétaire le voit avec un bouton Réparé.",
+    },
+    "gym-trainers": {
+      name: "Coachs sur les pages des salles",
+      body: "Les coachs s’affichent dans les salles où ils entraînent leurs clients, avec une ligne sur eux et un bouton pour s’entraîner avec eux. Dans une salle officielle, le propriétaire les approuve d’abord.",
+    },
     "buy-next": {
       name: "Quoi acheter ensuite",
       body: "Pour les salles à la maison : l’équipement qui ouvrirait le plus d’exercices.",

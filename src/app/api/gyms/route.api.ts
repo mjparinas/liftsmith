@@ -3,14 +3,28 @@
 // app already rounded to about 1 km. Anyone, rate-limited. `gyms` stays as it was for older apps; `places` is new.
 // POST {op}: publish, unpublish, mine, suggest (add a gym the map doesn't have), the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release), gymClub and
 // the poster ops (posters, posterStatus)
-// need a signed-in account; added and report work signed out too.
+// need a signed-in account; added and report work signed out too. Round 3 (gymExtras.ts): issue, issueFixed and
+// issues (equipment problems) work signed out; news, newsDelete, extras (the owner's view), trainer, trainerLeave,
+// trainerGyms and trainerDecide need an account.
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
 import { claimWithPosterCode, editGym, ownedGyms, releaseGym, startClaim, verifyClaim } from "@/server/gymClaims";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
+import {
+  decideTrainer,
+  deleteNews,
+  fixIssue,
+  issuesOf,
+  joinAsTrainer,
+  leaveAsTrainer,
+  myTrainerGyms,
+  ownerExtras,
+  postNews,
+  reportIssue,
+} from "@/server/gymExtras";
 import { areaMapPath } from "@/server/gymMedia";
-import { joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
+import { isPlaceId, joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
 import { latestOrder, requestPosters } from "@/server/gymPosters";
 import { gymClubStart } from "@/server/social";
 
@@ -54,6 +68,22 @@ export async function POST(req: Request) {
   const body = await readJson(req, 24_000);
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
   const b = body as Record<string, unknown>;
+  // Equipment problems: anyone who trains there can report one or say it works again (gymExtras.ts).
+  if (b.op === "issue" || b.op === "issueFixed" || b.op === "issues") {
+    const s = await sessionOf(req).catch(() => null);
+    const who = s ? `acc:${s.accountId}` : addressKey(ipOf(req));
+    if (b.op === "issues") {
+      if (!(await rateLimit(`gyms:issues:${who}`, 120, 3_600_000))) return reply(req, 429, { error: "slow" });
+      return isPlaceId(b.place) ? reply(req, 200, { issues: await issuesOf(b.place) }) : reply(req, 400, { error: "Bad request." });
+    }
+    if (b.op === "issueFixed") {
+      if (!(await rateLimit(`gyms:fixed:${who}`, 30, 86_400_000))) return reply(req, 429, { error: "slow" });
+      return (await fixIssue(who, b.place, b.id)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
+    }
+    const r = await reportIssue(who, b);
+    if (r.ok) return reply(req, 200, r);
+    return reply(req, r.error === "slow" ? 429 : r.error === "gone" ? 404 : 400, { error: r.error });
+  }
   if (b.op === "added" || b.op === "report") {
     const s = await sessionOf(req).catch(() => null);
     const who = s ? `acc:${s.accountId}` : addressKey(ipOf(req));
@@ -116,6 +146,32 @@ export async function POST(req: Request) {
       const r = await gymClubStart(s.accountId, b.place);
       return reply(req, r.code, r.body);
     }
+    // The owner's announcements, problem reports and trainers (gymExtras.ts).
+    case "extras": {
+      const r = await ownerExtras(s.accountId, b.place);
+      return r ? reply(req, 200, r) : reply(req, 403, { error: "owner" });
+    }
+    case "news": {
+      const r = await postNews(s.accountId, b.place, b.text);
+      if (r.ok) return reply(req, 200, r);
+      return reply(req, r.error === "owner" ? 403 : r.error === "slow" ? 429 : 400, { error: r.error });
+    }
+    case "newsDelete":
+      return (await deleteNews(s.accountId, b.place, b.id)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
+    case "trainer": {
+      const r = await joinAsTrainer(s.accountId, b);
+      if (r.ok) return reply(req, 200, r);
+      return reply(req, r.error === "gone" ? 404 : r.error === "coach" ? 403 : r.error === "full" ? 409 : 400, { error: r.error });
+    }
+    case "trainerLeave":
+      await leaveAsTrainer(s.accountId, b.place);
+      return reply(req, 200, { ok: true });
+    case "trainerGyms":
+      return reply(req, 200, { gyms: await myTrainerGyms(s.accountId) });
+    case "trainerDecide":
+      return (await decideTrainer(s.accountId, b.place, b.code, b.approve === true))
+        ? reply(req, 200, { ok: true })
+        : reply(req, 403, { error: "owner" });
     case "posterStatus":
       return reply(req, 200, { order: await latestOrder(s.accountId, b.place) });
     default:

@@ -7,10 +7,21 @@
 // These are businesses on a public map, not anything about a lifter, so the position is kept as the map has it.
 import { randomBytes } from "node:crypto";
 
+import {
+  cleanAmenities,
+  cleanPrices,
+  currencyFor,
+  type Amenity,
+  type GymIssue,
+  type GymNews,
+  type GymTrainer,
+  type Prices,
+} from "@/lib/gymExtras";
 import { SHORT_REGION } from "@/lib/regions";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { distanceKm } from "./gymDirectory";
+import { issuesOf, newsOf, trainersOf } from "./gymExtras";
 import { checkText } from "./moderation";
 
 export const PLACE_LIMITS = {
@@ -58,6 +69,13 @@ export interface Place {
   /** Its logo's and photos' ids (/api/gyms/photo/?id=), added by the owner. Photos only on one gym's own lookups. */
   logo: string;
   photos: string[];
+  /** What it has besides equipment, and what a visit costs (the owner's, gymExtras.ts). */
+  amenities: Amenity[];
+  prices: Prices | null;
+  /** One gym's own lookups only (empty in lists): the owner's announcements, open equipment problems, its trainers. */
+  news: GymNews[];
+  issues: GymIssue[];
+  trainers: GymTrainer[];
 }
 
 const s = (x: unknown) => (typeof x === "string" ? x : "");
@@ -431,7 +449,7 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 // --- The finder ---
 
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
-  p.source, p.claimed_by, p.lifters, p.code, p.updated_at,
+  p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
   (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
   (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind = 'logo' LIMIT 1) AS logo`;
@@ -461,12 +479,22 @@ const toPlace = (r: Row, km: number): Place => ({
   map: process.env.MAPBOX_TOKEN ? `/api/gyms/map/?place=${s(r.id)}` : "",
   logo: s(r.logo),
   photos: [],
+  amenities: cleanAmenities(s(r.amenities)),
+  prices: cleanPrices(s(r.prices), currencyFor(s(r.country))),
+  news: [],
+  issues: [],
+  trainers: [],
 });
 
 /** One gym's photos, oldest first (gymMedia.ts). */
 async function withPhotos(p: Place): Promise<Place> {
-  const rows = await query("SELECT id FROM gym_photos WHERE place_id = ? AND kind = 'photo' ORDER BY created_at, id", [p.id]);
-  return { ...p, photos: rows.map((r) => s(r.id)) };
+  const [rows, news, issues, trainers] = await Promise.all([
+    query("SELECT id FROM gym_photos WHERE place_id = ? AND kind = 'photo' ORDER BY created_at, id", [p.id]),
+    newsOf(p.id),
+    issuesOf(p.id),
+    trainersOf(p.id),
+  ]);
+  return { ...p, photos: rows.map((r) => s(r.id)), news, issues, trainers };
 }
 
 /** Gyms within `PLACE_LIMITS.radiusKm`: official ones first, then nearest. Studios only when asked for. */
@@ -688,6 +716,7 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
         { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_photos WHERE place_id = ?", args: [id] },
+        ...["gym_news", "gym_issues", "gym_trainers"].map((t) => ({ sql: `DELETE FROM ${t} WHERE place_id = ?`, args: [id] })),
         { sql: "DELETE FROM gym_places WHERE id = ?", args: [id] },
       ]);
       return true;

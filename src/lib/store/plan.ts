@@ -6,6 +6,7 @@ import { can } from "../entitlements";
 import { freeAdaptiveLeft } from "../freeAdaptive";
 import { generate, injuryPass, type Plan } from "../generator";
 import { gymAt, locate, wantsLocation, type Fix } from "../geo";
+import { withoutBroken } from "../gymExtrasApi";
 import type { GymKit } from "../gymShare";
 import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
@@ -150,8 +151,10 @@ export function planSlice(c: Ctx): PlanSlice {
     },
 
     replan() {
-      const g = gym();
-      if (!g) return set({ preview: null });
+      const active = gym();
+      if (!active) return set({ preview: null });
+      // Equipment lifters reported broken or missing at this real gym is left out of the plan (gymExtrasApi.ts).
+      const g = withoutBroken(active);
       const { profile, events, callOverride } = get();
       const now = Date.now();
       // Health signals (sleep, HRV, resting HR, breathing rate) move the call for Pro only (AGENTS.md "Health twin").

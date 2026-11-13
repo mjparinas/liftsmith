@@ -57,6 +57,7 @@ import type { Experience, Goal } from "@/lib/types";
 
 import { ChatThread } from "./CoachChat";
 import { FormsScreen, PendingCheckins } from "./CoachCheckins";
+import { CoachGyms } from "./CoachGyms";
 import { PaySetup, YourPayments } from "./CoachPay";
 import { CoachPlanCard } from "./CoachPlan";
 import { CoachSessions, YourSessions } from "./CoachSessions";
@@ -875,6 +876,7 @@ function SetupPage({ data, onChange }: { data: Overview; onChange: () => void })
       <RolePick key={data.role ?? ""} saved={data.role ?? null} onChange={onChange} />
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
+      <CoachGyms />
       <div className="mt-3">
         <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
       </div>
