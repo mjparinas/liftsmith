@@ -20,10 +20,12 @@ import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
+import { useDesktop } from "@/lib/layout";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
+import { useCoachNotes } from "@/lib/trainer";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtBodyweight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -165,6 +167,8 @@ function AccountRow() {
 export function Settings() {
   const { profile } = useApp();
   const { arg } = useRoute();
+  const desktop = useDesktop();
+  const coaching = useCoachNotes((s) => s.coaching);
   const legacy = arg ? LEGACY[arg] : undefined;
   const group: Group | null = legacy ? legacy[0] : (GROUPS as readonly string[]).includes(arg ?? "") ? (arg as Group) : null;
   const anchor = legacy?.[1];
@@ -195,9 +199,12 @@ export function Settings() {
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
-      <div className="mt-2">
-        <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
-      </div>
+      {/* On desktop, an account that coaches or is coached has Coaching in the sidebar (App.tsx), so the row goes. */}
+      {!(desktop && coaching) && (
+        <div className="mt-2">
+          <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
+        </div>
+      )}
       <ul className="mt-3 space-y-2">
         {GROUPS.map((g) => (
           <li key={g}>

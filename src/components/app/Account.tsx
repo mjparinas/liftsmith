@@ -3,7 +3,7 @@
 // Optional account: sign in to back up and sync (auth.ts, sync.ts). `AccountPanel` is the sign-in and status
 // block, used on the Account screen (#/account), in Settings and on the welcome screen before
 // setup ("I already have an account").
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
 import {
@@ -23,7 +23,7 @@ import {
   type Method,
 } from "@/lib/auth";
 import { backupJson, saveFile, stamp } from "@/lib/exportData";
-import { relative, t } from "@/lib/i18n";
+import { currentLang, currentTag, relative, subscribeLang, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { listPhotos } from "@/lib/photos";
 import { signOutDevice } from "@/lib/signOutDevice";
@@ -72,9 +72,22 @@ const GoogleLogo = () => (
   </svg>
 );
 
+/** The locale Google's button takes: the app's language, with the region when the lifter's own tag is in that language. */
+export function googleLocale(lang: string, tag: string): string {
+  return tag.toLowerCase().startsWith(`${lang}-`) ? tag : lang;
+}
+
 /** Google's own button on the web (Google Identity Services draws it and returns the ID token). */
 function GoogleWebButton({ onDone, onError }: { onDone: () => void; onError: (m: string) => void }) {
   const box = useRef<HTMLDivElement>(null);
+  // Google draws its words in the browser's language unless told otherwise, so an English app in a Spanish-speaking
+  // browser (or an incognito window guessing from the address) showed "Continuar con Google". It follows the app's
+  // language instead, and redraws when Settings › Language changes it.
+  const locale = useSyncExternalStore(
+    subscribeLang,
+    () => googleLocale(currentLang(), currentTag()),
+    () => "en",
+  );
   useEffect(() => {
     let live = true;
     void (async () => {
@@ -99,6 +112,7 @@ function GoogleWebButton({ onDone, onError }: { onDone: () => void; onError: (m:
           size: "large",
           shape: "pill",
           text: "continue_with",
+          locale,
           width: Math.min(box.current.clientWidth || 320, 400),
         });
       } catch {
@@ -108,8 +122,10 @@ function GoogleWebButton({ onDone, onError }: { onDone: () => void; onError: (m:
     return () => {
       live = false;
     };
-  }, [onDone, onError]);
-  return <div ref={box} className="flex min-h-11 w-full justify-center" />;
+  }, [onDone, onError, locale]);
+  // Google's button is an iframe with a light colour scheme; on a page with a dark one Chrome paints an opaque white
+  // box behind it. Giving its box the same light scheme keeps the corners clear.
+  return <div ref={box} className="flex min-h-11 w-full justify-center [color-scheme:light]" />;
 }
 
 function EmailSignIn({ onDone }: { onDone: () => void }) {

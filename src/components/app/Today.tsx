@@ -195,7 +195,8 @@ export function Today() {
               type="button"
               aria-label={t("td.settings")}
               onClick={() => go("settings")}
-              className="press grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
+              // The desktop sidebar has Settings (App.tsx), so the gear would be a second way there.
+              className="press grid desk:hidden h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
             >
               <Icon name="settings" size={18} />
             </button>
