@@ -124,6 +124,9 @@ export const en = {
   "gloss.schoolTeams.title": "School teams",
   "gloss.schoolTeams.body":
     "High school coaches get Pro free once they confirm an email address from their school or district. Their athletes aged 13 to 18 get Pro free too, for as long as they're on the team.\nThe coach sees your workouts, not your body data. Teammates see only your first name and how many workouts and sets you did this week.",
+  "gloss.strengthStandards.title": "Strength standards",
+  "gloss.strengthStandards.body":
+    "Typical estimated one-rep maxes for trained lifters, scaled to body weight and adjusted for age and sex when you've added them, from the shape of published strength standards and masters coefficients.\nThe percentage is a rough share of trained lifters your estimate beats, not a ranking of real Liftsmith users. Height and BMI aren't used.",
 } as const;
 
 type Key = keyof typeof en;
@@ -249,6 +252,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.schoolTeams.title": "Equipos escolares",
   "gloss.schoolTeams.body":
     "Los entrenadores de secundaria tienen Pro gratis al confirmar una dirección de correo de su escuela o distrito. Sus atletas de 13 a 18 años también tienen Pro gratis mientras estén en el equipo.\nEl entrenador ve tus entrenamientos, no tus datos corporales. Tus compañeros solo ven tu nombre de pila y cuántos entrenamientos y series hiciste esta semana.",
+  "gloss.strengthStandards.title": "Estándares de fuerza",
+  "gloss.strengthStandards.body":
+    "Máximos estimados típicos de personas entrenadas, según el peso corporal y ajustados por edad y sexo si los has añadido, a partir de estándares de fuerza publicados y coeficientes de veteranos.\nEl porcentaje es una idea aproximada de a cuántas personas entrenadas superas, no una clasificación de usuarios reales de Liftsmith. No se usan la altura ni el IMC.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -372,6 +378,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.schoolTeams.title": "Équipes scolaires",
   "gloss.schoolTeams.body":
     "Les entraîneurs d’école secondaire ont Pro gratuitement après avoir confirmé une adresse courriel de leur école ou de leur district. Leurs athlètes de 13 à 18 ans ont aussi Pro gratuitement tant qu’ils font partie de l’équipe.\nL’entraîneur voit vos séances, pas vos données corporelles. Vos coéquipiers ne voient que votre prénom et le nombre de séances et de séries de la semaine.",
+  "gloss.strengthStandards.title": "Normes de force",
+  "gloss.strengthStandards.body":
+    "Maxima estimés typiques de personnes entraînées, selon le poids de corps et ajustés pour l'âge et le sexe si tu les as ajoutés, d'après des normes de force publiées et des coefficients masters.\nLe pourcentage est une part approximative des personnes entraînées que tu dépasses, pas un classement de vrais utilisateurs de Liftsmith. La taille et l'IMC ne sont pas utilisés.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -495,6 +504,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.schoolTeams.title": "Schulteams",
   "gloss.schoolTeams.body":
     "Trainer an weiterführenden Schulen bekommen Pro kostenlos, sobald sie eine E-Mail-Adresse ihrer Schule oder ihres Schulträgers bestätigen. Ihre Sportler von 13 bis 18 Jahren bekommen Pro ebenfalls kostenlos, solange sie im Team sind.\nDer Trainer sieht deine Trainings, nicht deine Körperdaten. Teamkollegen sehen nur deinen Vornamen und wie viele Trainings und Sätze du diese Woche gemacht hast.",
+  "gloss.strengthStandards.title": "Kraftstandards",
+  "gloss.strengthStandards.body":
+    "Typische geschätzte Maxima trainierter Menschen, nach Körpergewicht skaliert und nach Alter und Geschlecht angepasst, wenn du sie eingetragen hast, nach veröffentlichten Kraftstandards und Masters-Koeffizienten.\nDie Prozentzahl ist ein grober Anteil der Trainierten, die du übertriffst, keine Rangliste echter Liftsmith-Nutzer. Größe und BMI werden nicht verwendet.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -618,6 +630,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.schoolTeams.title": "Squadre scolastiche",
   "gloss.schoolTeams.body":
     "Gli allenatori delle superiori hanno Pro gratis dopo aver confermato un indirizzo email della loro scuola o del distretto. Anche i loro atleti dai 13 ai 18 anni hanno Pro gratis finché sono nella squadra.\nL’allenatore vede i tuoi allenamenti, non i tuoi dati corporei. I compagni vedono solo il tuo nome e quanti allenamenti e serie hai fatto questa settimana.",
+  "gloss.strengthStandards.title": "Standard di forza",
+  "gloss.strengthStandards.body":
+    "Massimali stimati tipici di persone allenate, in base al peso corporeo e corretti per età e sesso se li hai inseriti, secondo standard di forza pubblicati e coefficienti master.\nLa percentuale è una quota approssimativa di persone allenate che superi, non una classifica di veri utenti di Liftsmith. Altezza e IMC non vengono usati.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -741,4 +756,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.schoolTeams.title": "学校のチーム",
   "gloss.schoolTeams.body":
     "高校のコーチは、学校や教育委員会のメールアドレスを確認すると Pro が無料になります。チームにいる13〜18歳の選手も、チームにいる間は Pro が無料です。\nコーチに見えるのはワークアウトだけで、体のデータは見えません。チームメイトに見えるのは下の名前と今週のワークアウト数・セット数だけです。",
+  "gloss.strengthStandards.title": "筋力基準",
+  "gloss.strengthStandards.body":
+    "トレーニング経験者の典型的な推定最大重量を体重に合わせ、年齢と性別を入力していればそれも補正したもので、公表された筋力基準とマスターズ係数に基づきます。\nパーセンテージは、あなたの推定値が上回るトレーニング経験者のおおよその割合で、実際のLiftsmithユーザーの順位ではありません。身長とBMIは使いません。",
 };

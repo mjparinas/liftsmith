@@ -136,6 +136,63 @@ describe("the exercise page", () => {
   });
 });
 
+describe("exercise stats", () => {
+  /** A squat session a week for ten weeks, 2.5 kg heavier each time. */
+  function seedSquats() {
+    for (let i = 0; i < 10; i++) {
+      const w = 80 + i * 2.5;
+      useApp.getState().importWorkouts(
+        makeWorkout(`sq${i}`, Date.now() - ((10 - i) * 7 + 2) * 86_400_000, [
+          { exerciseId: "back-squat", weight: w, reps: 5 },
+          { exerciseId: "back-squat", weight: w, reps: 5 },
+        ]),
+      );
+    }
+  }
+
+  it("shows totals, a chart with ranges and how the lift compares", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    useApp.getState().setProfile({ bodyweight: 80, birthYear: new Date().getFullYear() - 34, sex: "male" });
+    seedSquats();
+    location.hash = "#/exercise/back-squat";
+    const totals = await screen.findByTestId("lift-totals");
+    expect(within(totals).getByText("20")).toBeInTheDocument();
+    expect(within(totals).getByText("10")).toBeInTheDocument();
+    expect(within(totals).getByText("Estimated max")).toBeInTheDocument();
+
+    const chart = screen.getByTestId("lift-chart");
+    expect(within(chart).getByRole("button", { name: "3 months" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("lift-change")).toHaveTextContent(/^Up \d+% across this range\.$/);
+    await user.click(within(chart).getByRole("button", { name: "Week" }));
+    expect(within(chart).getByText("No sessions in this range. Pick a longer one.")).toBeInTheDocument();
+    await user.click(within(chart).getByRole("button", { name: "Year" }));
+    await user.click(within(chart).getByRole("button", { name: "Heaviest set" }));
+    expect(within(chart).getByText(/Latest 102\.5 kg/)).toBeInTheDocument();
+
+    const compare = screen.getByTestId("lift-compare");
+    expect(compare).toHaveTextContent("Trained men in their 30s who weigh about 80 kg.");
+    expect(compare).toHaveTextContent(/Stronger than about \d+% of them/);
+    expect(compare).toHaveTextContent("not other Liftsmith users' data");
+  });
+
+  it("opens any exercise from the library on Progress", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    seedSquats();
+    location.hash = "#/stats";
+    await user.click(await screen.findByRole("button", { name: "All exercises ›" }));
+    const mine = await screen.findByTestId("lib-mine");
+    await user.click(within(mine).getByRole("button", { name: /Back squat/ }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Back squat" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "‹ Back" }));
+    await user.type(await screen.findByRole("searchbox"), "romanian");
+    await user.click((await screen.findAllByRole("button", { name: /Romanian deadlift/ }))[0]!);
+    expect(await screen.findByRole("heading", { level: 1, name: /Romanian deadlift/ })).toBeInTheDocument();
+    expect(screen.getByText("Not done yet")).toBeInTheDocument();
+  });
+});
+
 describe("the plate and warm-up calculators", () => {
   it("loads the bar from the gym's own plates", async () => {
     const user = userEvent.setup();

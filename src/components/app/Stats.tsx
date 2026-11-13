@@ -140,7 +140,16 @@ export function Stats() {
         <BodyweightCard />
       </div>
 
-      <Section title={t("progress.prs")} icon="trophy">
+      <Section
+        title={t("progress.prs")}
+        icon="trophy"
+        right={
+          // Every exercise's own page with its stats (ExerciseLibrary.tsx).
+          <button type="button" onClick={() => go("exercises")} className="press min-h-11 text-sm text-accent">
+            {t("lift.lib.open")} ›
+          </button>
+        }
+      >
         <ul className="card divide-y divide-line">
           {stats.prs.slice(0, 8).map((p) => (
             <li key={p.at + p.exerciseId}>

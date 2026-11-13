@@ -46,6 +46,7 @@ import { Account } from "./Account";
 import { Achievements, useGame } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
+import { ExerciseLibrary } from "./ExerciseLibrary";
 import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
 import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
@@ -445,6 +446,7 @@ export function App() {
     club: <ClubScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
+    exercises: <ExerciseLibrary />,
     gymlink: <SharedGym key={arg ?? ""} code={arg} />,
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
     gymclaim: <GymClaim key={arg ?? ""} id={arg} />,

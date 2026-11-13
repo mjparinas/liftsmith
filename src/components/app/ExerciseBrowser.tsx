@@ -26,6 +26,7 @@ export function ExerciseBrowser({
   startGroup = null,
   waitForFilter = false,
   groupLabel,
+  startHere = true,
 }: {
   /** Unique on the screen, for the search box's label. */
   id: string;
@@ -41,10 +42,12 @@ export function ExerciseBrowser({
   waitForFilter?: boolean;
   /** The chips' group name for screen readers, when the screen names it (default "Main muscle"). */
   groupLabel?: string;
+  /** Start with "Only what this gym has" on (off for the library, which shows every exercise). */
+  startHere?: boolean;
 }) {
   const [text, setText] = useState("");
   const [group, setGroup] = useState<Muscle | "cardio" | null>(startGroup);
-  const [here, setHere] = useState(!!gym);
+  const [here, setHere] = useState(!!gym && startHere);
   const list = useMemo(
     () => searchExercises({ text, group, equipment: here && gym ? gym.equipment : null, skip }),
     [text, group, here, gym, skip],

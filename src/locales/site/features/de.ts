@@ -199,6 +199,11 @@ export const de: FeaturesText = {
       name: "Vergangene Trainings bearbeiten und wiederholen",
       body: "Korrigiere einen Satz, füge eine Notiz hinzu, benenne ein Training oder mach es noch einmal, und jede Übung hat ihre eigene Seite mit ihrem Verlauf.",
     },
+    "exercise-stats": {
+      name: "Werte für jede Übung",
+      body: "Tippe in der Bibliothek auf eine Übung und sieh deine Sätze, das insgesamt bewegte Gewicht, dein geschätztes Maximum und deinen Vergleich mit Trainierten deines Gewichts, Alters und Geschlechts nach veröffentlichten Kraftstandards.",
+      proPart: "Die Diagramme von einer Woche bis zu einem Jahr gehören zu den erweiterten Statistiken von Pro.",
+    },
     "log-past": {
       name: "Vergangenes Training eintragen",
       body: "Handy vergessen? Trag das Training hinterher ein, und es zählt wie jedes andere.",
