@@ -22,6 +22,7 @@ import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength } from "@/lib/strength";
 import { bmiBand, bmiCategory } from "@/lib/tdee";
+import { bodyCompOn, isTeen } from "@/lib/teen";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { useNow } from "@/lib/useNow";
 
@@ -75,12 +76,15 @@ const storeName = () => (typeof navigator !== "undefined" && /iPhone|iPad/.test(
 
 export function HealthTwin() {
   const { events, profile, stats, readiness: r, setCall, setProfile } = useApp();
+  // Under 18, body fat and the shaped figure wait until they turn them on (teen.ts).
+  const teen = isTeen(profile);
+  const comp = bodyCompOn(profile);
   // The figure shaped from the lifter's own numbers, when they turned it on (bodyShape.ts).
   const own = useMemo(() => statsFrom(profile, events), [profile, events]);
   const shapeable = canShape(own);
   const shape = useMemo(
-    () => (profile.shapeFigure && shapeable ? shapeBody(bodyFor(profile.sex), own) : undefined),
-    [profile.shapeFigure, profile.sex, shapeable, own],
+    () => (profile.shapeFigure && comp && shapeable ? shapeBody(bodyFor(profile.sex), own) : undefined),
+    [profile.shapeFigure, comp, profile.sex, shapeable, own],
   );
   const now = useNow(60_000);
   const native = useSyncExternalStore(noSubscribe, isNative, () => false);
@@ -172,17 +176,27 @@ export function HealthTwin() {
         <span className="sr-only">{t("twin.figure", { summary })}</span>
         <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
         <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
-        <Pin m={by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
+        <Pin m={comp && by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
         <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
         <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
       </div>
 
-      <SwitchRow
-        label={t("twin.shape.label")}
-        hint={shapeable ? t("twin.shape.hint") : t("twin.shape.need")}
-        on={!!profile.shapeFigure}
-        onChange={(v) => setProfile({ shapeFigure: v })}
-      />
+      {teen && (
+        <SwitchRow
+          label={t("team.bodyComp.label")}
+          hint={t("team.bodyComp.hint")}
+          on={!!profile.bodyComp}
+          onChange={(v) => setProfile({ bodyComp: v })}
+        />
+      )}
+      {comp && (
+        <SwitchRow
+          label={t("twin.shape.label")}
+          hint={shapeable ? t("twin.shape.hint") : t("twin.shape.need")}
+          on={!!profile.shapeFigure}
+          onChange={(v) => setProfile({ shapeFigure: v })}
+        />
+      )}
 
       <FitnessAgeCard native={native} store={store} />
       <FitTestsCard />

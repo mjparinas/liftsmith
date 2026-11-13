@@ -279,6 +279,10 @@ export const it: FeaturesText = {
       name: "Obiettivi nutrizionali per i clienti",
       body: "Fissa calorie e proteine giornaliere per ogni cliente. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",
     },
+    "school-teams": {
+      name: "Gratis per le squadre delle superiori",
+      body: "Gli allenatori delle superiori che confermano un’email scolastica hanno Pro gratis, come gli atleti dai 13 ai 18 anni delle loro squadre, con una classifica settimanale della squadra. Massa grassa e profili pubblici restano disattivati per i minori di 18 anni.",
+    },
     awards: {
       name: "Obiettivi, livelli e serie di giorni",
       body: "Badge a livelli, 50 livelli con ricompense, missioni settimanali, protezioni della serie e leghe oneste.",

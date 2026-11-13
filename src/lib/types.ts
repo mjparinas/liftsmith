@@ -267,6 +267,8 @@ export interface Profile {
   sex?: "male" | "female";
   /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
+  /** Under 18 only: body fat and the shaped figure turned on in Body › Health (teen.ts). Off by default. */
+  bodyComp?: boolean;
   /** Body › Health's figure shaped from these numbers, body fat and tape measurements (bodyShape.ts). Off by default. */
   shapeFigure?: boolean;
   /** When height was entered by hand (ms), so an older health reading doesn't replace it. */

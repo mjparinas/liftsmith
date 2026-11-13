@@ -4,15 +4,17 @@
 // - a web subscription through Stripe (stripe.ts), managed in Stripe's customer portal;
 // - months earned from invites, or coaching 3+ training clients (earnedPro.ts);
 // - a Google Play or App Store subscription (RevenueCat's webhook keeps `entitlements` per install), once a phone that
-//   holds it has synced while signed in to the account (account_installs, written by the sync route).
+//   holds it has synced while signed in to the account (account_installs, written by the sync route);
+// - a high school coach's proven school address, or a place on their team for an athlete aged 13 to 18 (teams.ts).
 // Sync sends the answer on every round, so a web subscription unlocks the phones and a store one unlocks the web app.
 import { hasLifetimePro } from "./creators";
 import { query, run } from "./db";
 import { coachEarnsPro, earnedUntil } from "./earnedPro";
 import { accountHasPro } from "./review";
 import { webSub, type WebSub } from "./stripe";
+import { schoolPro } from "./teams";
 
-export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach";
+export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach" | "school" | "team";
 
 export interface AccountSub extends WebSub {
   store: "web" | "play" | "appstore";
@@ -67,6 +69,9 @@ export async function accessFor(accountId: string, email: string | null, now = D
   const until = await earnedUntil(accountId);
   if (until != null && until > now) return { pro: true, via: "referral", sub: null };
   if (await coachEarnsPro(accountId, now)) return { pro: true, via: "coach", sub: null };
+  // School teams (teams.ts): free for verified high school coaches and their athletes aged 13 to 18.
+  const school = await schoolPro(accountId, now);
+  if (school) return { pro: true, via: school, sub: null };
   return { pro: false, via: null, sub: null };
 }
 

@@ -9,6 +9,7 @@ import type { AccountDetail, AccountRow, CoachTotals, Role } from "@/server/admi
 
 import { Card, fmtInt, Table, Tile } from "./charts";
 import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
+import { SchoolCoaches } from "./SchoolCoaches";
 import { ago, when } from "./time";
 
 const PROVIDER: Record<string, string> = { google: "Google", apple: "Apple", email: "Email code" };
@@ -213,6 +214,7 @@ export function Users({
   return (
     <div className="space-y-4">
       {open && <Account id={open} admin={admin} me={me} close={() => setOpen(null)} />}
+      {!open && <SchoolCoaches admin={admin} />}
       {data && (
         <div className="grid grid-cols-3 gap-3">
           <Tile label="Accounts" value={fmtInt(data.totals.total)} />
