@@ -6,7 +6,7 @@ import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { startAppLinks } from "@/lib/appLinks";
-import { useAccount } from "@/lib/auth";
+import { readAccount, useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
@@ -363,9 +363,11 @@ export function App() {
   // up signed in on the welcome screen) opens Coaching with the code filled in.
   useEffect(() => {
     if (!ready || !profile.onboarded) return;
+    // Signed out, the code keeps waiting (Coaching asks to sign in and keeps it), and comes back once signed in below:
+    // a code used to be forgotten on the way through making an account (Melvin, 2026-11-13).
     const code = pendingCoach();
     if (code) {
-      savePendingCoach("");
+      if (readAccount()) savePendingCoach("");
       if (!location.hash.startsWith("#/trainer")) go("trainer", code);
     }
     const look = () => {
@@ -375,7 +377,15 @@ export function App() {
     document.addEventListener("visibilitychange", look);
     const off = useAccount.subscribe((now, before) => {
       if (before.account && !now.account) forgetNotes();
-      if (now.account && !before.account) void refreshCoachNotes(Date.now(), true);
+      if (now.account && !before.account) {
+        void refreshCoachNotes(Date.now(), true);
+        // Signed in (or just made an account) with a coach's code waiting: back to Coaching with it filled in.
+        const waiting = pendingCoach();
+        if (waiting) {
+          savePendingCoach("");
+          go("trainer", waiting);
+        }
+      }
     });
     return () => {
       document.removeEventListener("visibilitychange", look);

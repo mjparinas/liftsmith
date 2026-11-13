@@ -22,6 +22,7 @@ import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
+import { useCoachNotes } from "@/lib/trainer";
 import { effortLabel } from "@/lib/training";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
@@ -30,6 +31,7 @@ import { callWhy, itemWhy, whyContext } from "@/lib/why";
 import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
+import { CoachBadge } from "./CoachHome";
 import { PlanExtras, TodayMoments } from "./Extras";
 import { loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
@@ -179,7 +181,11 @@ export function Today() {
     <div className="pb-28">
       <header className="pt-3">
         <div className="flex items-center justify-between gap-3">
-          <p className="min-w-0 truncate text-sm font-medium text-muted">{hello}</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-muted">{hello}</p>
+            {/* "Coached by Sam" by the lifter's name (Melvin, 2026-11-13); a tap opens their coach. */}
+            <TodayCoachBadge />
+          </div>
           <div className="flex shrink-0 items-center gap-2">
             {/* No streak yet: the goal chip below says how many more days start one, rather than a flat 0 here. */}
             {(streak.weeks > 0 || streak.freezes > 0) && <Flame weeks={streak.weeks} freezes={streak.freezes} />}
@@ -829,6 +835,17 @@ function FitAroundCalendar() {
         {t("td.busy", { at })}
         <span className="font-semibold text-cyan">{t("td.fit", { n: fit })}</span>
       </span>
+    </button>
+  );
+}
+
+/** The coaching badge under the greeting, as the way to the lifter's coach (or to a coach's clients). */
+function TodayCoachBadge() {
+  const shown = useCoachNotes((s) => s.who.coaches.length > 0 || s.who.clients > 0);
+  if (!shown) return null;
+  return (
+    <button type="button" onClick={() => go("trainer")} className="press flex min-h-8 max-w-full items-center">
+      <CoachBadge />
     </button>
   );
 }

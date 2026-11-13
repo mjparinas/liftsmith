@@ -239,6 +239,8 @@ export async function overview(
   targets: Targets[];
   /** How this account works with clients, once they've said. */
   role: Role | null;
+  /** Whether this account has ever coached (its first invite made it a coach), so the app opens the coach's pages. */
+  coach: boolean;
 }> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
@@ -279,6 +281,8 @@ export async function overview(
     ),
     targets: await targetsFor(accountId),
     role: await roleOf(accountId),
+    coach:
+      Number((await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_accounts WHERE account_id = ?", [accountId]))[0]?.n ?? 0) > 0,
   };
 }
 
@@ -761,7 +765,7 @@ export async function messages(
   otherId: unknown,
   before: unknown,
   now = Date.now(),
-): Promise<{ messages: Message[]; more: boolean; name: string } | { error: "notLinked" }> {
+): Promise<{ messages: Message[]; more: boolean; name: string; them: "coach" | "client" } | { error: "notLinked" }> {
   if (!isAccountId(otherId)) return { error: "notLinked" };
   const pair = await pairOf(accountId, otherId);
   if (!pair) return { error: "notLinked" };
@@ -777,6 +781,8 @@ export async function messages(
     messages: page.map((r) => ({ id: String(r.id), from: String(r.from_id), text: String(r.body), at: Number(r.at) })),
     more,
     name: await nameOf(otherId),
+    // Which side the other person is on, so each side's empty thread says something that fits them.
+    them: pair.coach === otherId ? "coach" : "client",
   };
 }
 

@@ -10,6 +10,7 @@ import { useBack } from "@/lib/back";
 import { billingLive, useBilling, webBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { coachSignup, isCoachSignupHash, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
+import { savePicked } from "@/lib/coachMode";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
 import { markAdded, placeKit } from "@/lib/gymDirectory";
@@ -312,7 +313,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     // A coach signing up from the coaches page lands on the coaching screen, ready to send the first invite.
     if (coachingPath) {
       track("feature", { name: "trainer", detail: "coachSetup" });
-      return go("trainer");
+      // Coaching opens on the coach's pages (coachMode.ts), not the first page that asks which side they're on.
+      savePicked("coach");
+      return go("trainer", "clients");
     }
     // A first run that came in through the website's "Sign in" link (#/account), or a coach's invite link (#/trainer/<code>)
     // on the coach path, ends on Today, not on that screen.

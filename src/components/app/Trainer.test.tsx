@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -15,6 +15,12 @@ import { CoachNoteToday, Trainer } from "./Trainer";
 
 const calls: { url: string; body: unknown; auth?: string }[] = [];
 let linked = false;
+// Whether this account coaches (an invite out and a client). Client-side tests turn it off: a client sees only their coach.
+let coaching = true;
+const asClient = () => {
+  linked = true;
+  coaching = false;
+};
 let assigned: unknown[] = [];
 let note: unknown = null;
 let shared: unknown = null;
@@ -50,6 +56,7 @@ beforeEach(() => {
   localStorage.clear();
   calls.length = 0;
   linked = false;
+  coaching = true;
   assigned = [];
   note = null;
   shared = null;
@@ -85,11 +92,17 @@ beforeEach(() => {
       });
     if (url === "/api/coach/?checkin=ci1") return Response.json({ checkin: CHECKIN });
     if (url === "/api/coach/?chat=k1")
-      return Response.json({ name: "Sam", more: false, messages: [{ id: "m1", from: "k1", text: "How did squats feel?", at: NOW }] });
+      return Response.json({
+        name: "Sam",
+        them: "coach",
+        more: false,
+        messages: [{ id: "m1", from: "k1", text: "How did squats feel?", at: NOW }],
+      });
+    if (url === "/api/coach/?chat=c1") return Response.json({ name: "Alex", them: "client", more: false, messages: [] });
     if (url === "/api/coach/" && !body)
       return Response.json({
-        invite: { code: "ABCD2345", expiresAt: NOW + 7 * 86_400_000 },
-        clients: [{ id: "c1", name: "Alex", since: NOW }],
+        invite: coaching ? { code: "ABCD2345", expiresAt: NOW + 7 * 86_400_000 } : null,
+        clients: coaching ? [{ id: "c1", name: "Alex", since: NOW }] : [],
         coaches: linked ? [{ id: "k1", name: "Sam", since: NOW, ...(trainer ? { role: "trainer" } : {}) }] : [],
         plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
         notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
@@ -97,7 +110,7 @@ beforeEach(() => {
         targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
         forms: [FORM],
         checkins: linked ? [CHECKIN] : [],
-        slots: [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1" }],
+        slots: coaching ? [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1" }] : [],
         sessions: mySessions,
         pay: payOn
           ? {
@@ -121,7 +134,7 @@ beforeEach(() => {
     if (body?.action === "answer") return Response.json({ checkin: { ...CHECKIN, answers: body.answers, answeredAt: NOW } });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
-      linked = true;
+      asClient();
       return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     }
     if (body?.action === "send") return Response.json({ message: { id: "m2", from: "me", text: body.text, at: NOW + 1 } });
@@ -156,9 +169,10 @@ describe("trainer mode", () => {
   });
 
   it("a client checks a code, sees what the coach will see, and agrees", async () => {
+    coaching = false;
     const u = userEvent.setup();
     render(<Trainer />);
-    await u.type(screen.getByLabelText(/Got a code from your coach/), "abcd-2345");
+    await u.type(await screen.findByLabelText(/Got a code from your coach/), "abcd-2345");
     await u.click(screen.getByRole("button", { name: "Check code" }));
     expect(await screen.findByText("Share your workouts with Sam?")).toBeInTheDocument();
     expect(screen.getByText(/won't see your heart rate/)).toBeInTheDocument();
@@ -170,7 +184,8 @@ describe("trainer mode", () => {
       body: { code: "ABCD2345" },
       auth: "Bearer tok",
     });
-    expect(await screen.findByRole("button", { name: "Stop sharing" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Stop sharing with Sam" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Message Sam" })).toBeInTheDocument();
   });
 
   it("an invite link fills in the code and shows whose it is", async () => {
@@ -199,7 +214,7 @@ describe("trainer mode", () => {
   });
 
   it("a client sees the routines their coach gave them, and one opens the routine to save", async () => {
-    linked = true;
+    asClient();
     const u = userEvent.setup();
     render(<Trainer />);
     await u.click(await screen.findByRole("button", { name: "Open Push day" }));
@@ -208,7 +223,7 @@ describe("trainer mode", () => {
 
   it("a coach picks what new clients start setup with", async () => {
     const u = userEvent.setup();
-    render(<Trainer />);
+    render(<Trainer arg="setup" />);
     expect(await screen.findByText("New clients start with")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "3" })).toHaveAttribute("aria-pressed", "true");
     await u.click(screen.getByRole("button", { name: "Get stronger" }));
@@ -236,7 +251,7 @@ describe("trainer mode", () => {
   });
 
   it("a client sees their coach's note under Coaching and on Today until Got it", async () => {
-    linked = true;
+    asClient();
     const u = userEvent.setup();
     const { unmount } = render(<Trainer />);
     expect(await screen.findByText(/Deload this week/)).toBeInTheDocument();
@@ -268,9 +283,62 @@ describe("trainer mode", () => {
   });
 });
 
+describe("pages for each side", () => {
+  it("a client sees only their coach: Message first, no coach tools or school teams", async () => {
+    asClient();
+    render(<Trainer />);
+    expect(await screen.findByRole("button", { name: "Message Sam" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your coach" })).toBeInTheDocument();
+    expect(screen.getByText("Coached by Sam")).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Coaching pages" })).toBeNull();
+    expect(screen.queryByText("Your clients")).toBeNull();
+    expect(screen.queryByText("School teams")).toBeNull();
+    expect(screen.queryByText(/Coach a high school team/)).toBeNull();
+    expect(screen.queryByText("ABCD-2345")).toBeNull();
+    // What they share is theirs to choose, coach by coach.
+    expect(screen.getByRole("heading", { name: "What Sam sees" })).toBeInTheDocument();
+  });
+
+  it("a coach gets a page per job as tabs, and a tab replaces the page", async () => {
+    const u = userEvent.setup();
+    render(<Trainer />);
+    const nav = await screen.findByRole("navigation", { name: "Coaching pages" });
+    for (const name of ["Clients", "Messages", "Schedule", "Check-ins", "Setup"])
+      expect(within(nav).getByRole("button", { name })).toBeInTheDocument();
+    expect(within(nav).getByRole("button", { name: "Clients" })).toHaveAttribute("aria-current", "page");
+    // Sessions, setup and the forms are on their own pages, not under the client list.
+    expect(screen.queryByText("New clients start with")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Add times" })).toBeNull();
+    await u.click(within(nav).getByRole("button", { name: "Messages" }));
+    expect(location.hash).toBe("#/trainer/messages");
+  });
+
+  it("someone new to coaching picks a side first", async () => {
+    coaching = false;
+    render(<Trainer />);
+    expect(await screen.findByText("How will you use coaching?")).toBeInTheDocument();
+    expect(screen.getByText("I train with a coach")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /I coach clients/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /I coach a high school team/ })).toBeInTheDocument();
+  });
+
+  it("signed out, a coach's code waits through signing in or making an account", () => {
+    useAccount.setState({ account: null });
+    render(<Trainer arg="ABCD2345" />);
+    expect(screen.getByText("Sign in to join your coach")).toBeInTheDocument();
+    expect(screen.getByText(/ABCD-2345 is saved/)).toBeInTheDocument();
+    expect(localStorage.getItem("liftsmith.coachInvite")).toBe("ABCD2345");
+  });
+
+  it("each side's empty chat speaks to them", async () => {
+    render(<Trainer arg="m.c1" />);
+    expect(await screen.findByText("No messages yet. Say hello, or ask Alex how training is going.")).toBeInTheDocument();
+  });
+});
+
 describe("chat and body data", () => {
   it("a client reads their coach's message and replies", async () => {
-    linked = true;
+    asClient();
     const u = userEvent.setup();
     render(<Trainer arg="m.k1" />);
     expect(await screen.findByText("How did squats feel?")).toBeInTheDocument();
@@ -284,7 +352,7 @@ describe("chat and body data", () => {
   });
 
   it("body data stays private until the client turns sharing on for a coach", async () => {
-    linked = true;
+    asClient();
     const u = userEvent.setup();
     render(<Trainer />);
     const sw = await screen.findByRole("switch", { name: /Share body data with Sam/ });
@@ -350,7 +418,7 @@ describe("chat and body data", () => {
   });
 
   it("a client can share pain and injuries with each coach, off to start", async () => {
-    linked = true;
+    asClient();
     const u = userEvent.setup();
     render(<Trainer />);
     const sw = await screen.findByRole("switch", { name: /Share pain and injuries with Sam/ });
@@ -377,7 +445,7 @@ describe("nutrition targets", () => {
   });
 
   it("a client sees their coach's targets under Coaching", async () => {
-    linked = true;
+    asClient();
     render(<Trainer />);
     expect(await screen.findByText("Daily targets from Sam")).toBeInTheDocument();
     expect(screen.getByText("2400 kcal · 160 g protein")).toBeInTheDocument();
@@ -431,7 +499,7 @@ describe("check-ins", () => {
   });
 
   it("a client answers a check-in with taps, and anything can be skipped", async () => {
-    linked = true;
+    asClient();
     const u = userEvent.setup();
     render(<Trainer arg="f.ci1" />);
     expect(await screen.findByRole("heading", { name: "Weekly check-in" })).toBeInTheDocument();
@@ -446,7 +514,7 @@ describe("check-ins", () => {
   });
 
   it("a waiting check-in shows under Coaching and on Today", async () => {
-    linked = true;
+    asClient();
     const { unmount } = render(<Trainer />);
     expect(await screen.findByText("Check-in from Sam")).toBeInTheDocument();
     unmount();
@@ -458,7 +526,7 @@ describe("check-ins", () => {
 describe("personal trainer or coach", () => {
   it("a coach picks how they work", async () => {
     const u = userEvent.setup();
-    render(<Trainer />);
+    render(<Trainer arg="setup" />);
     await u.click(await screen.findByRole("button", { name: "Personal trainer" }));
     expect(calls.find((c) => (c.body as { action?: string })?.action === "role")).toMatchObject({ body: { role: "trainer" } });
     expect(screen.getByText(/One-on-one clients/)).toBeInTheDocument();
@@ -471,7 +539,7 @@ describe("personal trainer or coach", () => {
   });
 
   it("a client with a personal trainer sees the word trainer", async () => {
-    linked = true;
+    asClient();
     trainer = true;
     render(<Trainer />);
     expect(await screen.findByText("Your trainer")).toBeInTheDocument();
@@ -483,7 +551,7 @@ describe("personal trainer or coach", () => {
 describe("booking sessions", () => {
   it("a coach sees their next sessions and opens new times", async () => {
     const u = userEvent.setup();
-    render(<Trainer />);
+    render(<Trainer arg="schedule" />);
     expect(await screen.findByText("Sessions")).toBeInTheDocument();
     expect(screen.getAllByText(/Main gym/).length).toBeGreaterThan(0);
     await u.click(screen.getByRole("button", { name: "Add times" }));
@@ -508,7 +576,7 @@ describe("booking sessions", () => {
   });
 
   it("a client books an open time with their coach", async () => {
-    linked = true;
+    asClient();
     mySessions = { booked: [], open: [SLOT] };
     const u = userEvent.setup();
     render(<Trainer />);
@@ -518,7 +586,7 @@ describe("booking sessions", () => {
   });
 
   it("a client's booked session shows with Add to calendar and Cancel, and on Today", async () => {
-    linked = true;
+    asClient();
     mySessions = { booked: [{ ...SLOT, clientId: "me", start: Date.now() + 3_600_000 }], open: [] };
     const u = userEvent.setup();
     const { unmount } = render(<Trainer />);
@@ -533,9 +601,14 @@ describe("booking sessions", () => {
 
 describe("client payments", () => {
   it("stay hidden until the server has Stripe Connect", async () => {
-    render(<Trainer />);
+    const { unmount } = render(<Trainer />);
     expect(await screen.findByText("ABCD-2345")).toBeInTheDocument();
     expect(screen.queryByText("Payments")).toBeNull();
+    unmount();
+    // With Stripe Connect, payments get a page of their own.
+    payOn = true;
+    render(<Trainer />);
+    expect(await screen.findByRole("button", { name: "Payments" })).toBeInTheDocument();
   });
 
   it("a coach sets a client's price, and a failed monthly payment goes first", async () => {
@@ -552,7 +625,7 @@ describe("client payments", () => {
 
   it("a client pays for a session on Stripe's page", async () => {
     payOn = true;
-    linked = true;
+    asClient();
     const open = vi.fn();
     vi.stubGlobal("open", open);
     const u = userEvent.setup();

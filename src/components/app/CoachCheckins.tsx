@@ -173,7 +173,8 @@ let qn = 0;
 const newQ = (): Question => ({ id: `n${Date.now().toString(36)}${(qn++).toString(36)}`, kind: "scale", label: "" });
 
 /** #/trainer/forms: the coach's forms, new ones from a template, and the editor. */
-export function FormsScreen() {
+/** The coach's check-in forms: its own screen (#/trainer/forms), or the Check-ins page of Coaching (`embedded`). */
+export function FormsScreen({ embedded = false }: { embedded?: boolean }) {
   const [forms, setForms] = useState<Form[] | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -234,7 +235,7 @@ export function FormsScreen() {
 
   return (
     <div className="pb-2">
-      <ScreenHeader back={back} title={t("chk.formsTitle")} />
+      {!embedded && <ScreenHeader back={back} title={t("chk.formsTitle")} />}
       <p className="mt-2 text-muted">{t("chk.formsLead")}</p>
       {note && (
         <p className="mt-3 text-sm text-muted" role="status">

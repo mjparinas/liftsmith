@@ -14,12 +14,24 @@ import { haptic, oops, sound } from "@/lib/juice";
 import { startPush } from "@/lib/push";
 import { loadMessages, markRead, MESSAGE_MAX, sendMessage, trainerError, type Message } from "@/lib/trainer";
 
-import { go } from "./router";
+import { go, goBack, historyDepth } from "./router";
 import { Button, EmptyState, ScreenHeader } from "./ui";
 
 const POLL_MS = 20_000;
 
+/** Back to where the lifter came from in Coaching (a page of it), or Coaching itself when nothing is behind (a push). */
+export const backToCoaching = () => (historyDepth() > 0 ? goBack() : go("trainer"));
+
+/** The chat with one person on its own screen (#/trainer/m.<id>). */
 export function ChatScreen({ id }: { id: string }) {
+  return <ChatThread id={id} />;
+}
+
+/**
+ * One chat thread. On its own screen it has the header and a send box above the tab bar; `embedded` (the coach's
+ * Messages page on a desktop, beside the list of people) drops the header and scrolls inside its own box.
+ */
+export function ChatThread({ id, embedded = false }: { id: string; embedded?: boolean }) {
   const me = useAccount((s) => s.account?.id ?? "");
   const [list, setList] = useState<Message[] | null>(null);
   const [name, setName] = useState("");
@@ -28,13 +40,16 @@ export function ChatScreen({ id }: { id: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gone, setGone] = useState(false);
+  const [them, setThem] = useState<"coach" | "client" | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const box = useRef<HTMLOListElement>(null);
 
   const load = useCallback(
     () =>
       loadMessages(id).then(
         (r) => {
           setName(r.name ?? "");
+          setThem(r.them ?? null);
           setMore(r.more);
           // Keep any older page already shown; the newest page replaces its own part.
           setList((old) => {
@@ -69,8 +84,10 @@ export function ChatScreen({ id }: { id: string }) {
   // The newest message in view whenever the list grows at the bottom.
   const last = list?.[list.length - 1]?.id;
   useEffect(() => {
-    end.current?.scrollIntoView?.({ block: "end" });
-  }, [last]);
+    // Beside the list, only the thread's own box scrolls, so the page stays where it is.
+    if (embedded && box.current) box.current.scrollTop = box.current.scrollHeight;
+    else end.current?.scrollIntoView?.({ block: "end" });
+  }, [last, embedded]);
 
   const older = async () => {
     const first = list?.[0];
@@ -107,27 +124,36 @@ export function ChatScreen({ id }: { id: string }) {
     }
   };
 
-  const back = { label: t("trn.back"), onClick: () => go("trainer") };
+  const back = { label: t("trn.back"), onClick: backToCoaching };
+  const who = name || t("trn.noName");
   if (gone)
     return (
       <div className="pb-2">
-        <ScreenHeader back={back} title={t("trn.chat")} />
+        {!embedded && <ScreenHeader back={back} title={t("trn.chat")} />}
         <EmptyState icon="info" title={t("trn.err.gone")} action={<Button onClick={() => go("trainer")}>{t("trn.back")}</Button>} />
       </div>
     );
   return (
-    <div className="flex min-h-[70dvh] flex-col pb-2">
-      <ScreenHeader back={back} kicker={t("trn.chat")} title={name || t("trn.noName")} />
+    <div className={embedded ? "card flex h-[70dvh] flex-col p-4" : "flex min-h-[70dvh] flex-col pb-2"}>
+      {embedded ? (
+        <p className="font-semibold">{who}</p>
+      ) : (
+        <ScreenHeader back={back} kicker={them === "coach" ? t("trn.chatCoach") : t("trn.chat")} title={who} />
+      )}
       {more && (
         <Button kind="quiet" className="mt-2 self-center" onClick={() => void older()}>
           {t("trn.older")}
         </Button>
       )}
-      <ol className="mt-3 flex-1 space-y-2" aria-live="polite" aria-label={t("trn.chat")}>
+      <ol ref={box} className={`mt-3 flex-1 space-y-2 ${embedded ? "overflow-y-auto" : ""}`} aria-live="polite" aria-label={t("trn.chat")}>
         {list === null ? (
           <li className="text-sm text-muted">{t("trn.loading")}</li>
         ) : list.length === 0 ? (
-          <li className="px-1 text-sm text-muted">{t("trn.chatEmpty")}</li>
+          // Each side's empty thread speaks to them: a client is asked to tell their coach how training is going,
+          // a coach to ask (Melvin, 2026-11-13: the old line read as if it were for the coach on both sides).
+          <li className="px-1 text-sm text-muted">
+            {them === "coach" ? t("trn.chatEmptyClient", { name: who }) : t("trn.chatEmptyCoach", { name: who })}
+          </li>
         ) : (
           list.map((m) => {
             const mine = m.from === me;
@@ -136,7 +162,7 @@ export function ChatScreen({ id }: { id: string }) {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-2 ${mine ? "bg-accent/15 text-ink" : "card"}`}
                   aria-label={t("trn.chatLine", {
-                    who: mine ? t("trn.you") : name || t("trn.noName"),
+                    who: mine ? t("trn.you") : who,
                     date: date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }),
                   })}
                 >
@@ -156,18 +182,21 @@ export function ChatScreen({ id }: { id: string }) {
           {error}
         </p>
       )}
-      <form onSubmit={(e) => void send(e)} className="card sticky bottom-[var(--nav-h,0px)] mt-3 p-3">
-        <label htmlFor="trn-chat" className="sr-only">
+      <form
+        onSubmit={(e) => void send(e)}
+        className={embedded ? "mt-3 border-t border-line pt-3" : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-3"}
+      >
+        <label htmlFor={`trn-chat-${id}`} className="sr-only">
           {t("trn.chatLabel")}
         </label>
         <div className="flex items-end gap-2">
           <textarea
-            id="trn-chat"
+            id={`trn-chat-${id}`}
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, MESSAGE_MAX))}
             maxLength={MESSAGE_MAX}
             rows={2}
-            placeholder={t("trn.chatLabel")}
+            placeholder={them === "coach" ? t("trn.messageNamed", { name: who }) : t("trn.chatLabel")}
             className="min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2"
           />
           <Button submit disabled={busy || !text.trim()}>

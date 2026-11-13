@@ -32,6 +32,7 @@ import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
 
+import { CoachBadge } from "./CoachHome";
 import { go, historyDepth } from "./router";
 import { ShareLinks } from "./ShareLinks";
 import { Button, ScreenHeader, Section } from "./ui";
@@ -421,6 +422,8 @@ export function Account() {
       </Section>
       <Section title={t("settings.name")}>
         <NameField />
+        {/* "Coached by Sam" by the lifter's name: an account that joined a coach says so (Melvin, 2026-11-13). */}
+        <CoachBadge className="mt-2" />
       </Section>
       {account && (
         <Section title={t("link.yours")} icon="link">
