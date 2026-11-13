@@ -791,20 +791,56 @@ export async function backupsCheck(now = Date.now()): Promise<HealthCheck> {
 
 // ---------- Settings ----------
 
-export function settingsCheck(): HealthCheck {
-  const rows = settingRows(env);
+/** Which Vercel environments hold each variable, by name. Only keys and targets are kept: values never leave this function. */
+async function vercelTargets(): Promise<Map<string, string[]> | null> {
+  const token = env("VERCEL_TOKEN");
+  const project = env("VERCEL_PROJECT_ID");
+  if (!token || !project) return null;
+  const team = env("VERCEL_TEAM_ID");
+  const q = new URLSearchParams(team ? { teamId: team } : { slug: "melvins-projects-b69f55c3" });
+  const d = await getJson<{ envs?: { key: string; target?: string | string[] }[] }>(
+    "Vercel",
+    `https://api.vercel.com/v10/projects/${encodeURIComponent(project)}/env?${q}`,
+    { authorization: `Bearer ${token}` },
+  );
+  const map = new Map<string, string[]>();
+  for (const e of d.envs ?? []) {
+    const t = Array.isArray(e.target) ? e.target : e.target ? [e.target] : [];
+    map.set(e.key, [...new Set([...(map.get(e.key) ?? []), ...t])]);
+  }
+  return map;
+}
+
+export async function settingsCheck(): Promise<HealthCheck> {
+  // Without a token (or if Vercel can't be read) the card still says what this deployment has.
+  const targets = await vercelTargets().catch(() => null);
+  const rows = settingRows(env, targets ?? undefined);
   const site = env("NEXT_PUBLIC_SITE_URL");
   if (site) {
     const problem = siteAddressProblem(site);
-    rows.push({ label: "Site address format", value: problem ?? `Public address: ${new URL(site).host}`, state: problem ? "warn" : "ok" });
+    const at = rows.findIndex((r) => r.label === "Site address");
+    rows.splice(at + 1, 0, {
+      label: "Site address format",
+      value: problem ?? `Public address: ${new URL(site).host}`,
+      state: problem ? "warn" : "ok",
+      group: "Core",
+    });
   }
   const missing = rows.filter((r) => r.state === "down").length;
+  const here = env("VERCEL_ENV") ? `What this ${env("VERCEL_ENV")} deployment has.` : "What this server has.";
   return {
     id: "settings",
     title: "Settings",
     state: worst(rows.map((r) => r.state ?? "ok")),
-    summary: missing ? `${plural(missing, "required setting")} missing.` : "Every required setting is present. Values are never shown.",
+    summary: `${missing ? `${plural(missing, "required setting")} missing.` : "Every required setting is present."} ${here} Values are never shown.`,
     rows,
+    ...(targets
+      ? {}
+      : { setup: "Set VERCEL_TOKEN (read-only) to see which environments hold each setting and spot any the code doesn't read." }),
+    link: {
+      label: "Vercel environment variables",
+      href: "https://vercel.com/melvins-projects-b69f55c3/liftsmith/settings/environment-variables",
+    },
   };
 }
 
@@ -876,7 +912,7 @@ const RUNNERS: Record<CheckId, (now: number) => Promise<HealthCheck>> = {
   security: (now) => securityCheck(now),
   capacity: () => capacityCheck(),
   backups: (now) => backupsCheck(now),
-  settings: async () => settingsCheck(),
+  settings: () => settingsCheck(),
 };
 
 export const isCheckId = (id: string): id is CheckId => CHECKS.some((c) => c.id === id);
