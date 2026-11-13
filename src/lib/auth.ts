@@ -14,6 +14,7 @@ import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 import { forgetFriends } from "./socialCache";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
+import { readOwner, restartApp, writeOwner } from "./wipe";
 
 export interface Account {
   token: string;
@@ -149,8 +150,18 @@ interface SessionReply {
   account: { id: string; email: string | null; providers: string[] } & AccountAccess;
 }
 
-/** Saves the session and starts this device's sync from scratch: everything on it is pushed once. */
-function signedInAs(r: SessionReply, via: Method): Account {
+/** Saves the session and starts this device's sync from scratch: everything on it is pushed once. When the data on
+ *  the device belongs to another account (it was signed in as someone else, who was then signed out by the server),
+ *  that data is wiped first and the app starts again, so two people's workouts never mix. Data logged while never
+ *  signed in has no owner and comes along to the account. */
+async function signedInAs(r: SessionReply, via: Method): Promise<Account> {
+  const owner = readOwner();
+  const someoneElse = !!owner && owner !== r.account.id;
+  if (someoneElse) {
+    // Loaded here, not at the top: the store imports this file.
+    const { useApp } = await import("./store");
+    await useApp.getState().wipeLocal();
+  }
   const a: Account = {
     token: r.token,
     id: r.account.id,
@@ -163,7 +174,9 @@ function signedInAs(r: SessionReply, via: Method): Account {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a));
   } catch {}
   writeSync(emptySync());
+  writeOwner(a.id);
   useAccount.setState({ account: a, error: null });
+  if (someoneElse) restartApp();
   return a;
 }
 
@@ -292,14 +305,16 @@ export async function refreshAccountPro(): Promise<boolean> {
   return !!r.account.pro;
 }
 
-/** Signs this device out. Everything stays on the device; it just stops syncing. */
+/** Ends this device's session (the sign-in only). Signing out from the Account screen also wipes the device's data:
+ *  signOutDevice.ts. */
 export async function signOut(): Promise<void> {
   const a = readAccount();
   forgetAccount();
   if (a) await api("/api/auth/logout/", { body: {}, token: a.token }).catch(() => null);
 }
 
-/** Drops the session and sync state on this device only (also used by "Erase this device"). */
+/** Drops the session and sync state on this device only (also used by "Erase this device"). The owner mark stays, so
+ *  when the server ends a session, signing in as someone else still wipes the data first (signedInAs). */
 export function forgetAccount() {
   try {
     localStorage.removeItem(ACCOUNT_KEY);
@@ -317,5 +332,7 @@ export function deleteAccount(): Promise<void> {
     if (!a) return;
     await api("/api/account/", { method: "DELETE", token: a.token });
     forgetAccount();
+    // The copy left here is the lifter's own now, with no account behind it.
+    writeOwner(null);
   });
 }
