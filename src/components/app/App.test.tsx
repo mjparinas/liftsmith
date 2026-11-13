@@ -130,6 +130,12 @@ describe("Pro trial offer", () => {
 });
 
 describe("first run to finished workout", () => {
+  it("setup starts on New to lifting unless the lifter picks another level", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    expect(useApp.getState().profile.experience).toBe("new");
+  });
+
   it("onboards, plans, logs sets with rest, and saves the session", async () => {
     const user = userEvent.setup();
     await onboard(user);
@@ -615,6 +621,27 @@ describe("injury mode", () => {
 });
 
 describe("game layer", () => {
+  it("the rest card keeps bonus sets for the exercise's last set, and no PR in reach on a first workout", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    const first = useApp.getState().active!.plan.items[0]!;
+    await user.click(await screen.findByRole("button", { name: /Log set/ }));
+    // The first of several sets: no drop set or rest-pause offer, and nothing to beat yet.
+    expect(await screen.findByRole("timer")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Rest-pause" })).toBeNull();
+    expect(screen.queryByText(/PR in reach|would be a new best/i)).toBeNull();
+    expect(screen.getByRole("group", { name: "While you rest" })).toBeInTheDocument();
+    for (let i = 1; i < first.sets; i++) {
+      await user.click(screen.getByRole("button", { name: "Skip rest" }));
+      await user.click(await screen.findByRole("button", { name: /Log set/ }));
+    }
+    // The last planned set of the exercise: now a bonus set is offered.
+    expect(await screen.findByRole("button", { name: "Rest-pause" })).toBeInTheDocument();
+  });
+
   it("finishing a workout unlocks badges and a crate, and Awards shows quests, league and badges", async () => {
     const user = userEvent.setup();
     await onboard(user);
