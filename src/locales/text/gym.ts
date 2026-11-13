@@ -89,6 +89,7 @@ export const en = {
   "gym.near.looking": "Looking…",
   "gym.near.loading": "Finding where you are and the gyms around you…",
   "gym.near.updating": "Updating for where you are now…",
+  "gym.near.pin": "{n}: {name}. Shows it in the list",
   "gym.near.mapAlt": "Map of the gyms near you, numbered as in the list",
   "gym.near.note":
     "Gyms around you, and setups other lifters listed with their equipment and weights. Uses your approximate location once.",
@@ -394,6 +395,7 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.near.looking": "Buscando…",
   "gym.near.loading": "Buscando dónde estás y los gimnasios de tu zona…",
   "gym.near.updating": "Actualizando según dónde estás ahora…",
+  "gym.near.pin": "{n}: {name}. Lo muestra en la lista",
   "gym.near.mapAlt": "Mapa de los gimnasios cercanos, numerados como en la lista",
   "gym.near.note":
     "Gimnasios a tu alrededor y configuraciones que otras personas publicaron, con su equipamiento y pesos. Usa tu ubicación aproximada una vez.",
@@ -706,6 +708,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.near.looking": "Recherche…",
   "gym.near.loading": "Recherche de votre position et des salles autour de vous…",
   "gym.near.updating": "Mise à jour selon votre position actuelle…",
+  "gym.near.pin": "{n} : {name}. L’affiche dans la liste",
   "gym.near.mapAlt": "Carte des salles proches, numérotées comme dans la liste",
   "gym.near.note":
     "Les salles autour de vous, et les configurations publiées par d’autres sportifs avec leur équipement et leurs poids. Utilise votre position approximative une fois.",
@@ -1027,6 +1030,7 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.near.looking": "Suche…",
   "gym.near.loading": "Standort und Studios in deiner Nähe werden gesucht…",
   "gym.near.updating": "Wird für deinen jetzigen Standort aktualisiert…",
+  "gym.near.pin": "{n}: {name}. Zeigt es in der Liste",
   "gym.near.mapAlt": "Karte der Studios in deiner Nähe, nummeriert wie in der Liste",
   "gym.near.note":
     "Studios in deiner Umgebung und Einrichtungen, die andere mit Geräten und Gewichten eingetragen haben. Nutzt einmal deinen ungefähren Standort.",
@@ -1346,6 +1350,7 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.near.looking": "Cerco…",
   "gym.near.loading": "Cerco dove sei e le palestre vicine…",
   "gym.near.updating": "Aggiorno in base a dove sei ora…",
+  "gym.near.pin": "{n}: {name}. La mostra nella lista",
   "gym.near.mapAlt": "Mappa delle palestre vicine, numerate come nella lista",
   "gym.near.note":
     "Le palestre intorno a te e le configurazioni che altri hanno pubblicato, con attrezzi e pesi. Usa una volta la tua posizione approssimativa.",
@@ -1657,6 +1662,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.near.looking": "検索中…",
   "gym.near.loading": "現在地と近くのジムを探しています…",
   "gym.near.updating": "今いる場所で更新しています…",
+  "gym.near.pin": "{n}: {name}。リストで表示します",
   "gym.near.mapAlt": "近くのジムの地図(番号はリストと同じ)",
   "gym.near.note": "近くのジムと、ほかの人が器具と重量つきで公開した設定です。おおよその位置情報を一度だけ使います。",
   "gym.near.location": "位置情報がオフか、許可されていません。スマートフォンの設定でおおよその位置情報を許可できます。",

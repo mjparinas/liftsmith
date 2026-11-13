@@ -65,24 +65,19 @@ Melvin, 2026-11-12, agreeing to item 4 of the [growth plan](growth.md): start wi
 
 ## Map of the nearest gyms (2026-11-13)
 
-Melvin: "it should show a map of all the nearest gyms with a list beneath it". **Find gyms near you** (the app on
-Android, iOS and the web, setup wizard included) shows one map picture above the list with the first 20 gyms as
-numbered pins, the same numbers on the list's rows, and the searcher's rounded spot as a cyan dot. The website's **city
-pages** (`/gyms/<city>/`) show the same kind of map of the city's gyms above their list (no scripts, so it can't ask
-where the reader is). It's one Mapbox static picture through our own server (`areaMapPath`, `areaMapImage` in
-`src/server/gymMedia.ts`, `/api/gyms/map/?ids=<id>.<id>…&at=lat,lon`), not an interactive map: no map library to load,
-the gym pages' CSP holds, the token stays on the server, and it's cached a day at the edge. The pins go by the ids in
-the address, so pin 1 is always the list's first gym. Off with the other maps while `MAPBOX_TOKEN` isn't set. Pure web
-code, so Android, iOS and the web app get it together.
+Melvin: "it should show a map of all the nearest gyms with a list beneath it", then "make it a map I can drag and zoom"
+and "keep it mapbox". **Find gyms near you** (the app on Android, iOS and the web, setup wizard included) shows a map
+you can drag and zoom above the list (`GymsMap.tsx`): Mapbox's dark street map (its light one on a light screen), the
+first 20 gyms as numbered pins with the same numbers on the list's rows, and the searcher's rounded spot as a cyan dot.
+Tapping a pin scrolls to that gym's row and focuses it. The wheel zooms only once the map has been clicked or focused,
+so scrolling the page past it doesn't. Zoom buttons are 44 px. Drags on it are the map's, not the sheet's (`data-no-swipe`).
 
-
-## Round 3: amenities and prices, announcements, equipment problems, trainers (built)
-
-Melvin, 2026-11-13, picked 2, 3, 4 and 5 of the gap list from the thread "Assess gym features for gaps" (not 1, several staff per gym; 6, a house starter program; or 7, chains). Server: `src/server/gymExtras.ts`; shared lists and limits: `src/lib/gymExtras.ts`; app: `src/lib/gymExtrasApi.ts`, `GymExtras.tsx`, `CoachGyms.tsx`. Ops on `POST /api/gyms/`: `issue`, `issueFixed` and `issues` work signed out; `extras`, `news`, `newsDelete`, `trainer`, `trainerLeave`, `trainerGyms` and `trainerDecide` need an account. Pure web code (no native code), so Android, iOS and the web app get it together; pushes go through the existing Friends push (`notifyPlain` in `push.ts`).
-
-- **Amenities and prices** (owner's page, saved with the page's Save): fifteen fixed amenities as chips (`AMENITIES`: 24/7 member access, showers, lockers, towels, parking, wheelchair access, women's area, childcare, sauna, pool, classes, personal training, lifting platforms, turf, free first visit) and a day pass, week pass and "membership from" price, each a `BumpField`, in one of six currencies (CAD, USD, EUR, GBP, AUD, JPY; the gym's country picks the first one). Kept on `gym_places.amenities` (a comma list) and `prices` (JSON), tidied by `cleanAmenities` and `cleanPrices` on both sides. They show on the web page (with `amenityFeature` and `priceRange` in its structured data, for search) and in the app's gym view. Prices are shown as "$15", without the country (`narrowSymbol`), since the page already says where the gym is.
-- **Announcements** (`gym_news`): only the owner of an official gym, up to 280 characters through the same word and link check as the rest of the app, three a day per gym. One shows on the gym's page (web and app, "From the gym") for 60 days, newest three. Members of the gym's club who left Friends' workout pushes on (`push_posts`) get a push (`push.gymNews`, "Iron Works: …", opening the gym in the app). Lifters who only added the gym get nothing pushed: they never opted in to hear from it. The owner can delete one.
-- **Equipment problems** (`gym_issues`): from one of the lifter's own gyms that is a real gym (Settings › Gyms and equipment), **Report a problem**: pick the equipment from that gym's list, Broken or Missing, an optional note (200 characters, word and link check). Signed out works (who is the account or the same one-way address code as reports), ten a day. A second report of the same equipment adds to the open one and keeps it open. **The plan works around it**: the app keeps each real gym's open problems on the device (`liftsmith.outOfOrder`), fetched on open, on return to the app and when the gym changes, at most every 30 minutes per gym, and the plan is built from the gym without that equipment (`withoutBroken` in `replan`), for free and Pro lifters alike, programs included. Today says so in its chip row ("Planned without: Leg press (out of order)"), which is the reason line for the swap. The reporter's own plan changes at once. **It works again** (any lifter) or the owner's **Fixed** closes it for everyone; with neither, it runs out 14 days after the last report. The owner gets a push on the first report (`push.gymIssue`) and sees open problems on the owner's page with the count, kind, note and date. The web page and the app's gym view list them ("Out of order").
-- **Trainers** (`gym_trainers`): a coach (an account in `coach_accounts`, so one that has made an invite) with a name on their profile adds **Gyms you train at** in Coaching: one of their own gyms that is a real gym, with an optional line about themselves (200 characters, word and link check), up to five gyms. On a gym nobody has claimed they show at once; on an official one they wait until the owner approves them (owner's page, Approve or Remove; the owner gets a push, `push.gymTrainer`), and the owner can remove anyone listed, including those who listed themselves before the claim. The gym's page (web and app) shows each listed trainer's name, role (personal trainer, coach or physio, from Coaching) and line, with **Train with {name}**. Each listing has its own 8-character code in the coach invite alphabet; `#/trainer/<code>` opens the usual consent screen, and `previewInvite` in `coach.ts` reads a listed trainer's code like an invite code, without the invite's week limit (a code waiting for approval doesn't work). The coach's client limit still applies. Leaving, or deleting the account, deletes the listing.
-- **Privacy**: the privacy policy ("Gyms you share or list") and `docs/PRIVACY_LABELS.md` say what a report, an announcement and a trainer listing keep and show. Deleting an account deletes its announcements and listings and takes the account off its reports (`extrasDeletes`); staff deleting a gym deletes all three.
-- Not built (Melvin didn't pick them): several staff per gym, a house starter program for new members, chains with several locations. Gym software (Mindbody and others) stays parked ([Gym software](gym-software.md)).
+- **Drawn by Leaflet** (1.9, about 40 KB, bundled, loaded with `GymsMap.tsx` only once a search has gyms to show), not
+  Mapbox GL JS (about 1 MB, needs `blob:` workers our script policy doesn't allow, and its token on the device).
+- **Tiles come through our own server** (`/api/gyms/tile/?z=&x=&y=&style=`, `tileImage` in `src/server/gymMedia.ts`),
+  so the Mapbox token stays on the server: 256 px tiles at twice the pixels, zoom 0 to 18, kept a week on the device
+  and a month at the edge, and tiles the edge hasn't seen are limited to 1,500 an hour per address.
+- **The website's city pages** (`/gyms/<city>/`) show one map picture of the city's gyms above their list instead
+  (`areaMapPath`, `/api/gyms/map/?ids=<id>.<id>…`), because those pages run no scripts. Pins go by the ids in the
+  address, so pin 1 is always the list's first gym.
+- Off with the other maps while `MAPBOX_TOKEN` isn't set. Pure web code, so Android, iOS and the web app get it together.

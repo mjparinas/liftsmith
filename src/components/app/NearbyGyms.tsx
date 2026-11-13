@@ -1,18 +1,26 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- the map picture comes from our own API; the static export has no image optimizer */
-import { useState, type ReactNode } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
 import { AREA_PINS, findNearby, placeLine, type Found, type Listing, type Place } from "@/lib/gymDirectory";
 import { decodeGym } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
-import { SITE_URL } from "@/lib/site";
 import { fmtNum } from "@/lib/units";
 
 import { Icon } from "./icons";
 import { Button, Skeleton } from "./ui";
+
+// Leaflet and its CSS load only once a search has gyms to show, so the screens around it stay as light as before.
+const GymsMap = lazy(() => import("./GymsMap"));
+
+/** Takes the lifter from a pin on the map to that gym's row. */
+const showRow = (id: string) => {
+  const row = document.getElementById(`near-${id}`);
+  row?.scrollIntoView({ block: "center", behavior: "smooth" });
+  row?.focus({ preventScroll: true });
+};
 
 // "Find gyms near you": real gyms around here (gymPlaces.ts on the server; official ones first, with a check mark)
 // and setups other lifters listed (gymDirectory.ts), so a lifter whose gym is already set up can take its
@@ -86,6 +94,7 @@ export function NearbyGyms({
   const row = (key: string, active: boolean, onClick: () => void, title: ReactNode, line: string, pin?: number) => (
     <li key={key}>
       <button
+        id={`near-${key}`}
         type="button"
         aria-pressed={active}
         className={`press card w-full p-3 text-left ${active ? "border-accent" : ""}`}
@@ -112,7 +121,11 @@ export function NearbyGyms({
   return (
     <div className="grid gap-3">
       {status}
-      {state.map && state.places.length > 0 && <AreaMap src={`${SITE_URL}${state.map}`} />}
+      {state.map && state.places.length > 0 && (
+        <Suspense fallback={<Skeleton className="aspect-[16/9] w-full" />}>
+          <GymsMap pins={state.places.slice(0, AREA_PINS)} here={state.at} onPin={showRow} />
+        </Suspense>
+      )}
       {state.places.length > 0 && (
         <ul className="grid gap-2" aria-label={t("gym.near.title")}>
           {state.places.map((p, i) =>
@@ -168,24 +181,5 @@ export function NearbyGyms({
       {add}
       {state.places.some((p) => p.source === "osm") && <p className="text-xs text-faint">{t("gym.place.osm")}</p>}
     </div>
-  );
-}
-
-/** The nearest gyms as numbered pins (the list's numbers), drawn by our server from Mapbox. Gone if it can't load. */
-function AreaMap({ src }: { src: string }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) return null;
-  return (
-    <figure>
-      <img
-        src={src}
-        alt={t("gym.near.mapAlt")}
-        width={640}
-        height={360}
-        onError={() => setFailed(true)}
-        className="card aspect-[16/9] h-auto w-full overflow-hidden p-0"
-      />
-      <figcaption className="mt-1 text-xs text-faint">{t("gp.mapCredit")}</figcaption>
-    </figure>
   );
 }
