@@ -12,6 +12,7 @@ import { useAccount } from "@/lib/auth";
 import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { startPush } from "@/lib/push";
 import { encodeRoutine } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
@@ -35,10 +36,13 @@ import {
   removePlan,
   saveNote,
   saveSetup,
+  setBodyShare,
+  setCoachAlerts,
   showCode,
   trainerError,
   unlinkPerson,
   useCoachNotes,
+  type BodyShare,
   type Note,
   type Overview,
   type Person,
@@ -46,15 +50,19 @@ import {
   type PlanProgress,
   type Report,
   type Setup,
+  type ShownNote,
 } from "@/lib/trainer";
 import type { Experience, Goal, Routine } from "@/lib/types";
 import { fmtWeight } from "@/lib/units";
 
+import { ClientBody } from "./CoachBody";
+import { ChatScreen } from "./CoachChat";
 import { Icon } from "./icons";
 import { go } from "./router";
-import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet } from "./ui";
+import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
 
 const CLIENT = "c.";
+const CHAT = "m.";
 
 export function Trainer({ arg }: { arg?: string }) {
   const account = useAccount((s) => s.account);
@@ -71,6 +79,7 @@ export function Trainer({ arg }: { arg?: string }) {
       </div>
     );
   if (arg?.startsWith(CLIENT)) return <ClientScreen id={arg.slice(CLIENT.length)} />;
+  if (arg?.startsWith(CHAT)) return <ChatScreen id={arg.slice(CHAT.length)} />;
   return <Home code={arg ? codeFrom(arg) : ""} />;
 }
 
@@ -83,6 +92,8 @@ function Home({ code }: { code: string }) {
         setData(o);
         // Today shows the newest note from a coach; keep it in step with what this screen loaded.
         keepNotes(o);
+        // With a coach or a client, this phone takes coaching pushes (permission is asked on the first message).
+        if (o.coaches.length || o.clients.length) void startPush(false);
       })
       .catch((e: unknown) => {
         setData({ invite: null, clients: [], coaches: [], plans: [] });
@@ -100,7 +111,15 @@ function Home({ code }: { code: string }) {
         </p>
       )}
       <Section title={t("trn.yourCoach")} icon="flag">
-        <YourCoach coaches={data?.coaches ?? []} plans={data?.plans ?? []} notes={data?.notes ?? []} code={code} onChange={reload} />
+        <YourCoach
+          coaches={data?.coaches ?? []}
+          plans={data?.plans ?? []}
+          notes={data?.notes ?? []}
+          unread={data?.unread ?? {}}
+          shared={data?.bodyShared ?? []}
+          code={code}
+          onChange={reload}
+        />
       </Section>
       <Section title={t("trn.yourClients")} icon="target">
         <YourClients data={data} onChange={reload} />
@@ -115,12 +134,16 @@ function YourCoach({
   coaches,
   plans,
   notes,
+  unread,
+  shared,
   code,
   onChange,
 }: {
   coaches: Person[];
   plans: Plan[];
   notes: Note[];
+  unread: Record<string, number>;
+  shared: string[];
   code: string;
   onChange: () => void;
 }) {
@@ -173,6 +196,17 @@ function YourCoach({
       setNote(trainerError(e));
     } finally {
       setBusy(false);
+    }
+  };
+  const share = async (p: Person, on: boolean) => {
+    try {
+      await setBodyShare(p.id, on);
+      haptic("toggle");
+      track("feature", { name: "trainer", detail: on ? "shareBody" : "unshareBody" });
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
     }
   };
   const leave = async (p: Person) => {
@@ -232,6 +266,7 @@ function YourCoach({
                   {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
                 </span>
               </span>
+              <MessageButton id={c.id} name={c.name} unread={unread[c.id] ?? 0} />
               <Button kind="ghost" className="shrink-0 !px-3 !py-2 text-sm" onClick={() => void leave(c)}>
                 {t("trn.stopSharing")}
               </Button>
@@ -239,11 +274,22 @@ function YourCoach({
           ))}
         </ul>
       )}
+      {/* Body data is the client's choice, per coach, and off until they turn it on. */}
+      {coaches.map((c) => (
+        <SwitchRow
+          key={c.id}
+          label={t("trn.shareBody", { name: c.name || t("trn.noName") })}
+          hint={t("trn.shareBodyHint")}
+          on={shared.includes(c.id)}
+          onChange={(v) => void share(c, v)}
+        />
+      ))}
       {found ? (
         <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-accent)" }} aria-live="polite">
           <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
           <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
+          <p className="mt-2 text-sm text-muted">{t("trn.consentBodyLater")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentStop")}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button className="flex-1" disabled={busy} onClick={() => void agree()}>
@@ -285,6 +331,25 @@ function YourCoach({
   );
 }
 
+/** Opens the chat with one person, with how many of their messages are unread. */
+function MessageButton({ id, name, unread }: { id: string; name: string; unread: number }) {
+  return (
+    <Button
+      kind="ghost"
+      className="shrink-0 !px-3 !py-2 text-sm"
+      aria-label={
+        unread
+          ? `${t("trn.messageNamed", { name: name || t("trn.noName") })}, ${t("trn.unread", { count: unread })}`
+          : t("trn.messageNamed", { name: name || t("trn.noName") })
+      }
+      onClick={() => go("trainer", `${CHAT}${id}`)}
+    >
+      {t("trn.message")}
+      {unread > 0 && <span className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-bold text-accent-ink">{unread}</span>}
+    </Button>
+  );
+}
+
 /** A note from a coach: their words, who and when. Plain text, line breaks kept. */
 export function NoteCard({ note, coach }: { note: Note; coach: string }) {
   return (
@@ -304,8 +369,35 @@ export function NoteCard({ note, coach }: { note: Note; coach: string }) {
 export function CoachNoteToday() {
   const notes = useCoachNotes((s) => s.notes);
   const seen = useCoachNotes((s) => s.seen);
+  const unread = useCoachNotes((s) => s.unread);
   const n = notes.find((x) => !seen.includes(noteId(x)));
-  if (!n) return null;
+  const u = unread[0];
+  if (!n && !u) return null;
+  return (
+    <>
+      {u && (
+        <button
+          type="button"
+          onClick={() => go("trainer", `${CHAT}${u.id}`)}
+          className="press card card-tint mt-3 flex w-full items-center gap-3 px-4 py-3 text-left"
+          style={{ ["--tint" as string]: "var(--color-accent)" }}
+        >
+          <Icon name="chat" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">{t("trn.newFrom", { name: u.name || t("trn.noName") })}</span>
+            <span className="block text-sm text-muted">{t("trn.unread", { count: u.count })}</span>
+          </span>
+          <span aria-hidden className="text-faint">
+            ›
+          </span>
+        </button>
+      )}
+      {n && <NoteToday n={n} />}
+    </>
+  );
+}
+
+function NoteToday({ n }: { n: ShownNote }) {
   return (
     <Section title={t("trn.fromCoach")} icon="chat">
       <NoteCard note={n} coach={n.coach} />
@@ -372,6 +464,18 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       setNote(trainerError(e));
     }
   };
+  const alerts = async (on: boolean) => {
+    try {
+      await setCoachAlerts(on);
+      track("feature", { name: "trainer", detail: on ? "alerts" : "noAlerts" });
+      haptic("toggle");
+      if (on) void startPush(true);
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+  };
   const send = async () => {
     if (!invite) return;
     const url = inviteUrl(invite.code);
@@ -423,6 +527,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       )}
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
+      <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
       {data.clients.length ? (
         // Desktop layout: the client list is a grid of cards, so a coach sees more clients at once.
         <ul className="mt-3 space-y-2 desk:grid desk:grid-cols-2 desk:gap-3 desk:space-y-0 xl:desk:grid-cols-3">
@@ -438,6 +543,11 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
                   <span className="block text-sm text-muted">
                     {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
                   </span>
+                  {(data.unread?.[c.id] ?? 0) > 0 && (
+                    <span className="mt-0.5 block text-sm font-semibold text-accent">
+                      {t("trn.unread", { count: data.unread![c.id]! })}
+                    </span>
+                  )}
                 </span>
                 <span aria-hidden className="text-faint">
                   ›
@@ -698,6 +808,7 @@ function ClientScreen({ id }: { id: string }) {
   const lab = can("coaching");
   const [report, setReport] = useState<Report | null>(null);
   const [saved, setSaved] = useState<Note | null>(null);
+  const [body, setBody] = useState<BodyShare | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -709,6 +820,7 @@ function ClientScreen({ id }: { id: string }) {
         if (!live) return;
         setReport(clientReport(v, Date.now()));
         setSaved(v.note ?? null);
+        setBody(v.body ?? null);
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -752,6 +864,11 @@ function ClientScreen({ id }: { id: string }) {
     // Desktop layout: the report flows into two columns (.desk-cols), what to do first.
     <div className="desk-cols pb-2">
       <ScreenHeader className="desk-span" back={back} kicker={t("trn.client")} title={report.name || t("trn.noName")} />
+      <div className="desk-span mt-3">
+        <Button className="w-full" icon="chat" onClick={() => go("trainer", `${CHAT}${id}`)}>
+          {t("trn.messageNamed", { name: report.name || t("trn.noName") })}
+        </Button>
+      </div>
       <Section title={t("trn.todo")} icon="flag">
         <ul className="space-y-2">
           {report.flags.map((f, i) => {
@@ -806,6 +923,7 @@ function ClientScreen({ id }: { id: string }) {
         )}
       </Section>
       <ClientPlans clientId={id} plans={report.plans} onChange={() => setVersion((n) => n + 1)} />
+      {body && <ClientBody name={report.name} body={body} />}
       {report.prs.length > 0 && (
         <Section title={t("trn.bests")} icon="trophy">
           <ul className="card divide-y divide-line">
@@ -821,6 +939,7 @@ function ClientScreen({ id }: { id: string }) {
         </Section>
       )}
       <p className="mt-6 px-1 text-xs text-muted">{t("trn.whatYouSee")}</p>
+      {body && <p className="mt-2 px-1 text-xs text-muted">{t("trn.whatYouSeeBody")}</p>}
       <Button kind="danger" className="mt-4 w-full" onClick={() => void remove()}>
         {t("trn.remove")}
       </Button>

@@ -17,6 +17,7 @@ const calls: { url: string; body: unknown; auth?: string }[] = [];
 let linked = false;
 let assigned: unknown[] = [];
 let note: unknown = null;
+let shared: unknown = null;
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
@@ -25,6 +26,7 @@ beforeEach(() => {
   linked = false;
   assigned = [];
   note = null;
+  shared = null;
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -38,7 +40,10 @@ beforeEach(() => {
         events: makeWorkout("w1", NOW - 3600_000, [{}, { exerciseId: "custom-sled" }]),
         plans: assigned,
         note,
+        body: shared,
       });
+    if (url === "/api/coach/?chat=k1")
+      return Response.json({ name: "Sam", more: false, messages: [{ id: "m1", from: "k1", text: "How did squats feel?", at: NOW }] });
     if (url === "/api/coach/" && !body)
       return Response.json({
         invite: { code: "ABCD2345", expiresAt: NOW + 7 * 86_400_000 },
@@ -53,6 +58,8 @@ beforeEach(() => {
       linked = true;
       return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     }
+    if (body?.action === "send") return Response.json({ message: { id: "m2", from: "me", text: body.text, at: NOW + 1 } });
+    if (body?.action === "share") return Response.json({ on: body.on });
     if (body?.action === "setup") return Response.json({ setup: body.setup });
     if (body?.action === "note") {
       note = body.text ? { coachId: "me", clientId: body.client, text: body.text, at: NOW } : null;
@@ -190,5 +197,52 @@ describe("trainer mode", () => {
         "Done 1 time · last " + new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(NOW - 3600_000 + 60_000),
       ),
     ).toBeInTheDocument();
+  });
+});
+
+describe("chat and body data", () => {
+  it("a client reads their coach's message and replies", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    render(<Trainer arg="m.k1" />);
+    expect(await screen.findByText("How did squats feel?")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Sam" })).toBeInTheDocument();
+    await u.type(screen.getByLabelText("Write a message"), "Heavy but good");
+    await u.click(screen.getByRole("button", { name: "Send" }));
+    expect(await screen.findByText("Heavy but good")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "send")).toMatchObject({
+      body: { id: "k1", text: "Heavy but good" },
+    });
+  });
+
+  it("body data stays private until the client turns sharing on for a coach", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    render(<Trainer />);
+    const sw = await screen.findByRole("switch", { name: /Share body data with Sam/ });
+    expect(sw).toHaveAttribute("aria-checked", "false");
+    await u.click(sw);
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "share")).toMatchObject({ body: { id: "k1", on: true } });
+  });
+
+  it("a coach sees a sharing client's body data, and nothing when they don't share", async () => {
+    const { unmount } = render(<Trainer arg="c.c1" />);
+    expect(await screen.findByRole("heading", { name: "Alex" })).toBeInTheDocument();
+    expect(screen.queryByText("Body fat")).toBeNull();
+    unmount();
+    shared = {
+      sex: "female",
+      heightCm: 168,
+      weights: [
+        { at: NOW - 20 * 86_400_000, kg: 70 },
+        { at: NOW - 86_400_000, kg: 68.5, bodyFat: 24 },
+      ],
+      measures: [{ at: NOW - 86_400_000, site: "waist", cm: 74 }],
+    };
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Body fat")).toBeInTheDocument();
+    expect(screen.getByText("24%")).toBeInTheDocument();
+    expect(screen.getByText("Waist")).toBeInTheDocument();
+    expect(screen.getByText(/They share their body data with you/)).toBeInTheDocument();
   });
 });

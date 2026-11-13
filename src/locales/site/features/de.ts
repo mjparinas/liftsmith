@@ -204,6 +204,10 @@ export const de: FeaturesText = {
       name: "Körpermaße",
       body: "Neun Stellen in Zentimetern oder Zoll. Ein wachsender oder schrumpfender Bauchumfang wird zur Coach-Notiz, wenn es keinen Körperfettwert gibt.",
     },
+    "body-figure": {
+      name: "Eine 3D-Figur in deiner Form",
+      body: "Schalte sie ein, und die Figur unter Gesundheit übernimmt deinen Körperbau aus Größe, Gewicht, Körperfett und Umfängen.",
+    },
     "health-twin": {
       name: "Gesundheitszwilling und Fitnessalter",
       body: "Schlaf, HRV, Ruhepuls, Schritte, Atemfrequenz und VO₂max an einem Ort, mit deinem Trend und einem Fitnessalter aus deiner VO₂max.",
@@ -271,6 +275,11 @@ export const de: FeaturesText = {
     coaching: {
       name: "Kunden coachen",
       body: "Verknüpfe Kunden, sieh ihre Ergebnisse und weise ihnen Routinen zu, am Handy oder auf einem großen Bildschirm.",
+    },
+    "coach-chat": {
+      name: "Chat, Hinweise und Körperdaten",
+      body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
+      note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
     },
     awards: {
       name: "Erfolge, Level und Serien",
