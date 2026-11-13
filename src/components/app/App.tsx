@@ -532,7 +532,6 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
   "settings",
   "account",
   "connections",
-  "programs",
   "training",
   "feedback",
   "gym",
@@ -544,9 +543,9 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
 ]);
 
 // The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the phone's tabs down the left
-// side, then Coaching for accounts that coach or are coached, and Settings at the foot (Melvin, 2026-11-13). On the
-// phone those two stay one tap away from Today and Settings; on desktop the sidebar is their one control, so Today
-// hides its gear and Settings its Coaching row (one control, one destination). It sets --nav-h to 0 (nothing covers
+// side, then Programs and Tools, Coaching for accounts that coach or are coached, and Settings at the foot (Melvin,
+// 2026-11-13). On the phone these stay a tap away from Today, Progress and Settings; on desktop the sidebar is their
+// one control, so the other links to them hide there (one control, one destination). It sets --nav-h to 0 (nothing covers
 // the bottom of the page) and --side-w to its width, so bars pinned to the bottom of a screen and toasts start after it.
 function Sidebar({ route }: { route: Route }) {
   useEffect(() => {
@@ -583,6 +582,8 @@ function Sidebar({ route }: { route: Route }) {
             dot={tab.route === "friends" && waiting > 0 ? t("friends.openWaiting", { count: waiting }) : undefined}
           />
         ))}
+        <SideItem route="programs" label={t("prog.title")} icon="layers" on={route === "programs"} />
+        <SideItem route="tools" label={t("tools.title")} icon="bolt" on={route === "tools"} />
         {coaching && (
           <SideItem
             route="trainer"

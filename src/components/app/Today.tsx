@@ -16,6 +16,7 @@ import { prSetIds } from "@/lib/history";
 import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
+import { useDesktop } from "@/lib/layout";
 import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
 import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
@@ -140,6 +141,7 @@ export function Today() {
     toggleSuperset,
   } = useApp();
   const [lenKey, setLenKey] = useState(0);
+  const desktop = useDesktop();
   // Once today's workout is done, Today says so instead of offering the same plan again (polish pass, 2026-11-12).
   // "Train again", or picking a plan (a routine, "Same as last time", a past workout), brings the plan back.
   const againAt = useApp((st) => st.againAt);
@@ -238,7 +240,9 @@ export function Today() {
           <button
             type="button"
             onClick={() => go("programs")}
-            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5"
+            // On desktop the sidebar has Programs (App.tsx), so the chip only says which program and day it is.
+            disabled={desktop}
+            className="press inline-flex disabled:cursor-default items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5"
           >
             <Icon name="layers" size={15} className="text-accent" />
             {programName(preview.program.id)} · {preview.program.dayName}

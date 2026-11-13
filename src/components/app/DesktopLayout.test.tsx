@@ -136,4 +136,23 @@ describe("desktop layout", () => {
     await user.click(within(nav).getByRole("button", { name: /Coaching/ }));
     expect(within(nav).getByRole("button", { name: /Coaching/ })).toHaveAttribute("aria-current", "page");
   });
+
+  it("has Programs and Tools as screens of their own, with their other links gone on desktop", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const nav = screen.getByRole("navigation", { name: "Main" });
+    await user.click(within(nav).getByRole("button", { name: "Programs" }));
+    expect(within(nav).getByRole("button", { name: "Programs" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("heading", { name: "Programs" })).toBeInTheDocument();
+    // A top-level screen on desktop: no "‹ Settings" back link.
+    expect(screen.queryByRole("button", { name: /^‹/ })).toBeNull();
+
+    await user.click(within(nav).getByRole("button", { name: "Tools" }));
+    expect(within(nav).getByRole("button", { name: "Tools" })).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("button", { name: /^‹/ })).toBeNull();
+
+    await user.click(within(nav).getByRole("button", { name: "Progress" }));
+    const allTools = screen.queryByRole("button", { name: "All tools" });
+    if (allTools) expect(allTools.className).toContain("desk:hidden");
+  });
 });

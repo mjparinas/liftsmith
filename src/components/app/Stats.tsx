@@ -227,7 +227,8 @@ function TdeeCard() {
       title={t("progress.tdee")}
       icon="flame"
       right={
-        <button type="button" onClick={() => go("tools")} className="press text-sm text-accent">
+        // On desktop the sidebar has Tools (App.tsx), so this link is a phone thing.
+        <button type="button" onClick={() => go("tools")} className="press text-sm text-accent desk:hidden">
           {t("progress.allTools")}
         </button>
       }

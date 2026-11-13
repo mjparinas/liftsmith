@@ -301,15 +301,19 @@ function GroupPage({ group }: { group: Group }) {
 /** Training: what the plan is built for, when you train, injuries, and the rarer block options. */
 function TrainingGroup() {
   const { profile, setProfile } = useApp();
+  const desktop = useDesktop();
   return (
     <>
-      <Section title={t("settings.program")}>
-        <NavRow
-          title={programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}
-          sub={t("settings.change")}
-          onClick={() => go("programs")}
-        />
-      </Section>
+      {/* On desktop the sidebar has Programs (App.tsx), so the row is a phone thing. */}
+      {!desktop && (
+        <Section title={t("settings.program")}>
+          <NavRow
+            title={programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}
+            sub={t("settings.change")}
+            onClick={() => go("programs")}
+          />
+        </Section>
+      )}
       <Row<Goal>
         label={t("settings.goal")}
         value={profile.goal}
