@@ -544,6 +544,24 @@ export interface SessionEndEvent extends EventBase {
   restSec?: number;
   /** Ended automatically because the workout was left running (see AUTO_END_MS in store.ts). */
   auto?: boolean;
+  /**
+   * The parts done, in order (workouts with parts, docs/decisions/sessions-with-parts.md). Not written yet;
+   * missing means the whole workout was one lifting part, and sessions.ts reads it that way.
+   */
+  parts?: SessionPart[];
+}
+
+/** A piece of a workout: lifting, a warm-up or cool-down, rehab, cardio or a fitness test. */
+export type PartKind = "warm" | "lift" | "rehab" | "cardio" | "cool" | "stretch" | "test";
+
+export interface SessionPart {
+  /** Unique within the workout. */
+  id: string;
+  kind: PartKind;
+  start: number;
+  end: number;
+  /** Where it came from: a routine part, a rehab program, the stretch moment. */
+  ref?: string;
 }
 
 /** The whole heart rate stream of a session, saved once at the end. */
@@ -686,6 +704,11 @@ export interface StretchEvent extends EventBase {
   moment: "warm" | "cool" | "rest" | "pick";
   ids: string[];
   seconds: number;
+  /**
+   * The workout this was done with (workouts with parts, 2026-11-13): set on a cool-down logged soon after a
+   * workout ends. Missing on older and stand-alone stretches; sessions.ts then joins them by time.
+   */
+  sessionId?: string;
 }
 
 export interface CheckinEvent extends EventBase {

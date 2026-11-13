@@ -237,6 +237,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Workout data and coaching](docs/decisions/workout-data-and-coaching.md) (`src/lib/readiness.ts`, `progression.ts`)
 - [Workout history: editing, notes, doing it again and exercise pages](docs/decisions/workout-history.md) (`EditWorkout.tsx`, `src/lib/editHistory.ts`, `ExercisePage.tsx`, `src/lib/liftPage.ts`, `store/history.ts`)
 - [Workout screen](docs/decisions/workout-screen.md) (`sessionNotify.ts`, `TrainingSettings.tsx`, `src/lib/training.ts`, `derive.ts`)
+- [Workouts with parts: lifting, stretches, rehab and cardio in one session](docs/decisions/sessions-with-parts.md) (`sessions.ts`, `derive.ts`, `routineShare.ts`, `coach.ts`)
 - [Your stats](docs/decisions/your-stats.md) (`BodyStats.tsx`, `src/lib/health.ts`, `tdee.ts`, `HealthWorkoutPlugin.swift`)
 
 <!-- BEGIN:nextjs-agent-rules -->

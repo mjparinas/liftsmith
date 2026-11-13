@@ -462,6 +462,8 @@ const KEEP: Record<string, readonly string[]> = {
   effort: ["setId", "rir"],
   swap: ["sessionId", "from", "to"],
   customExercise: ["exercise"],
+  // Warm-ups, cool-downs and stretch homework (workouts with parts): which stretches and how long, nothing else.
+  stretch: ["moment", "ids", "seconds", "sessionId"],
 };
 export const COACH_TYPES = Object.keys(KEEP);
 

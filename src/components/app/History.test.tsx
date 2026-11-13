@@ -75,4 +75,20 @@ describe("history calendar", () => {
     await user.click(screen.getByRole("button", { name: "Next month" }));
     expect(screen.getByRole("heading", { name: /November 2026/ })).toBeInTheDocument();
   });
+
+  it("shows a warm-up done before a workout as its part, and a rest-day stretch on its own day", async () => {
+    const user = userEvent.setup({ advanceTimers: () => {} });
+    const base = useApp.getState().events;
+    seed([
+      ...base,
+      { type: "stretch", id: "warm-1", at: at(10, 18) - 2 * 60_000, moment: "warm", ids: ["march", "jacks"], seconds: 300 },
+      { type: "stretch", id: "rest-1", at: at(10, 15), moment: "rest", ids: ["march"], seconds: 480 },
+    ]);
+    render(<HistoryCalendar />);
+    const card = screen.getByRole("article");
+    expect(within(card).getByTestId("workout-parts")).toHaveTextContent("Warm-up: 5 min");
+    expect(within(card).getByTestId("workout-parts")).toHaveTextContent("Lifting: 3 min");
+    await user.click(screen.getByRole("button", { name: /Sunday, November 15, Stretched, 1 stretch/ }));
+    expect(screen.getByTestId("stretch-card")).toHaveTextContent("8 min · 1 stretch");
+  });
 });

@@ -10,6 +10,7 @@ import { defaultProfile } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { registerCustom } from "./exercises";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
+import { coolDownHome } from "./sessions";
 import { healthSlice, type HealthSlice } from "./store/health";
 import { historySlice, type HistorySlice } from "./store/history";
 import { injuriesSlice, type InjuriesSlice } from "./store/injuries";
@@ -176,7 +177,11 @@ export const useApp = create<State>((set, get) => {
 
     logStretch(moment, ids, seconds) {
       if (!ids.length) return;
-      commit([{ type: "stretch", id: uid(), at: Date.now(), moment, ids, seconds: Math.round(seconds) }]);
+      const now = Date.now();
+      const secs = Math.round(seconds);
+      // A cool-down belongs to the workout it follows (workouts with parts, sessions.ts).
+      const sessionId = moment === "cool" ? coolDownHome(get().stats.sessions, now, secs) : undefined;
+      commit([{ type: "stretch", id: uid(), at: now, moment, ids, seconds: secs, ...(sessionId ? { sessionId } : {}) }]);
       track("feature", { name: "stretch", detail: `${moment}:${ids.length}` });
     },
 
