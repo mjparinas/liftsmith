@@ -1,7 +1,7 @@
-import { en, type MessageKey } from "@/locales/en";
+import type { MessageKey } from "@/locales/en";
 
 import { fold } from "./exerciseSearch";
-import { inSentence, list, t } from "./i18n";
+import { english, inSentence, list, t } from "./i18n";
 import { dayKey, hash, rng } from "./random";
 import { MUSCLE_LABEL, MUSCLES, type Equipment, type Muscle } from "./types";
 
@@ -127,7 +127,7 @@ export function searchStretches(q: { text?: string; kind?: StretchKind | "all"; 
     if (q.kind && q.kind !== "all" && s.kind !== q.kind) return false;
     if (q.muscle && q.muscle !== "all" && !s.for.includes(q.muscle)) return false;
     if (!words.length) return true;
-    const hay = fold([s.name, en[s.textKey as MessageKey], ...s.for.map((m) => MUSCLE_LABEL[m])].join(" "));
+    const hay = fold([s.name, english(s.textKey as MessageKey), ...s.for.map((m) => MUSCLE_LABEL[m])].join(" "));
     return words.every((w) => hay.includes(w));
   });
 }

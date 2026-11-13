@@ -1,9 +1,5 @@
-import { de } from "@/locales/de";
-import { en, type MessageKey } from "@/locales/en";
-import { es } from "@/locales/es";
-import { fr } from "@/locales/fr";
-import { it } from "@/locales/it";
-import { ja } from "@/locales/ja";
+import type { MessageKey } from "@/locales/en";
+import en from "@/locales/load/en";
 
 import { setExerciseText } from "./exercises";
 import { isNative } from "./juice";
@@ -36,12 +32,51 @@ export const LANG_NAME: Record<Lang, string> = {
 
 type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
 export type Message = string | Plural;
-const CATALOG: Record<Lang, Partial<Record<MessageKey, Message>>> = { en, es, fr, de, it, ja };
+type Catalogue = Partial<Record<MessageKey, Message>>;
+// English is always here (it's the fallback); the others load when they're needed, so a phone loads one language,
+// not six (docs/decisions/speed.md "One language at a time"). Each is its own file in the production builds.
+const CATALOG: Partial<Record<Lang, Catalogue>> = { en };
+const LOADERS: Record<Exclude<Lang, "en">, () => Promise<{ default: Catalogue }>> = {
+  es: () => import("@/locales/load/es"),
+  fr: () => import("@/locales/load/fr"),
+  de: () => import("@/locales/load/de"),
+  it: () => import("@/locales/load/it"),
+  ja: () => import("@/locales/load/ja"),
+};
+const loading = new Map<Lang, Promise<void>>();
+
+/** Loads a language's text (once). The app switches to it when it arrives. */
+export function loadLanguage(l: Lang): Promise<void> {
+  if (l === "en" || CATALOG[l]) return Promise.resolve();
+  let p = loading.get(l);
+  if (!p) {
+    p = LOADERS[l]().then(
+      (m) => {
+        CATALOG[l] = m.default;
+      },
+      () => {
+        // Couldn't load (shouldn't happen: it's a local file). English shows, and the next change tries again.
+        failed.add(l);
+      },
+    );
+    loading.set(l, p);
+  }
+  return p;
+}
+const failed = new Set<Lang>();
+
+/** Adds a catalogue that's already loaded, so it's used at once (tests read every language from the source). */
+export function addCatalogue(l: Lang, c: Catalogue): void {
+  CATALOG[l] = c;
+}
+
+/** The English text for a key, whatever the app's language (search matches English names too). */
+export const english = (key: MessageKey): Message | undefined => en[key];
 
 // The exercise library is shared with the public website, so it reads its translations through this
 // lookup rather than importing the catalogues (exercises.ts, `setExerciseText`).
 setExerciseText((key) => {
-  const m = lang === "en" ? undefined : CATALOG[lang][key as MessageKey];
+  const m = lang === "en" ? undefined : CATALOG[lang]?.[key as MessageKey];
   return typeof m === "string" ? m : undefined;
 });
 
@@ -67,12 +102,32 @@ export function resolve(tags: readonly string[], choice: LangPref = "system"): {
 
 function update(): void {
   const r = resolve(phoneTags, pref);
+  if (!CATALOG[r.lang] && !failed.has(r.lang)) {
+    // Not loaded yet: keep showing the current language, and switch when it's here.
+    pending = r.lang;
+    void loadLanguage(r.lang).then(() => {
+      pending = null;
+      update();
+      for (const l of listeners) l();
+    });
+    return;
+  }
+  pending = null;
+  settled = true;
   if (r.lang === lang && r.tag === tag) return;
   lang = r.lang;
   tag = r.tag;
   if (typeof document !== "undefined") document.documentElement.lang = tag;
   for (const l of listeners) l();
 }
+let pending: Lang | null = null;
+let settled = false;
+
+/**
+ * True while the first language the app shows is still loading, so the first screen waits for it instead of
+ * flashing English. A later switch (Settings › Language) keeps the screen and changes its words on arrival.
+ */
+export const languagePending = () => pending !== null && !settled;
 
 /** Sets the language choice (Settings › Language), or follows the phone with "system". */
 export function setLanguage(choice: LangPref | undefined): void {
@@ -119,7 +174,7 @@ function plural(m: Plural, n: number): string {
  * formatted for the language (1 234,5 in French).
  */
 export function t(key: MessageKey, vars?: Record<string, string | number>): string {
-  const m = CATALOG[lang][key] ?? en[key];
+  const m = CATALOG[lang]?.[key] ?? en[key];
   const text = typeof m === "string" ? m : plural(m, Number(vars?.count ?? 0));
   if (!vars) return text;
   return text.replace(/\{(\w+)\}/g, (_, k: string) => {

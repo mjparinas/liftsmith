@@ -354,6 +354,10 @@ export const it: FeaturesText = {
       name: "Modalità essenziale, suoni e vibrazione",
       body: "Spegni animazioni e coriandoli, suoni o vibrazione, ognuno con un interruttore.",
     },
+    "lite-demos": {
+      name: "Risparmio batteria per le figure 3D",
+      body: "Mostra le dimostrazioni degli esercizi e la mappa del recupero con risoluzione e fotogrammi ridotti, per i telefoni meno recenti e una batteria più duratura.",
+    },
     desktop: {
       name: "Layout per computer",
       body: "Sul computer la web app ha una barra laterale, pagine larghe, scorciatoie da tastiera durante l’allenamento (L registra la serie) e un editor di routine ampio.",

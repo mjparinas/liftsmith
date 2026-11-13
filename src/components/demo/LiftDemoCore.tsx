@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { DANCE_ID, tapStreak } from "@/lib/demo/dance";
 import type { Body, BodyKey } from "@/lib/demo/rig";
 import { EXERCISES } from "@/lib/exercises";
+import { LITE, useLiteDemos } from "@/lib/liteDemos";
 import type { Muscle } from "@/lib/types";
 import { probeWebGL } from "@/lib/webgl";
 
@@ -195,6 +196,7 @@ export function LiftDemoCore({
     }
   };
 
+  const lite = useLiteDemos();
   const settings: DemoSettings = {
     exerciseId: dancing ? DANCE_ID : exerciseId,
     body,
@@ -208,8 +210,8 @@ export function LiftDemoCore({
     reps: dancing ? 1 : reps,
     highlight,
     bpm: bpm ?? null,
-    fps: fps ?? (controls ? 60 : 30),
-    maxDpr,
+    fps: lite ? Math.min(fps ?? 60, controls ? LITE.controlsFps : LITE.fps) : (fps ?? (controls ? 60 : 30)),
+    maxDpr: lite ? Math.min(maxDpr ?? 2, LITE.maxDpr) : maxDpr,
     follow: follow ?? null,
     lean: lean ?? 0,
   };

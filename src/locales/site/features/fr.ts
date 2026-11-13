@@ -361,6 +361,10 @@ export const fr: FeaturesText = {
       name: "Mode sobre, sons et vibrations",
       body: "Coupez les animations et les confettis, les sons ou les vibrations, chacun avec un interrupteur.",
     },
+    "lite-demos": {
+      name: "Économie de batterie pour les figures 3D",
+      body: "Affichez les démonstrations d'exercices et la carte de récupération avec une résolution et une fréquence d'images plus basses, pour les téléphones anciens et plus d'autonomie.",
+    },
     desktop: {
       name: "Affichage ordinateur",
       body: "Sur ordinateur, l’appli Web a une barre latérale, des pages larges, des raccourcis clavier pendant la séance (L valide la série) et un éditeur de routines large.",
