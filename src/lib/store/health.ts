@@ -91,15 +91,11 @@ export function healthSlice(c: Ctx): HealthSlice {
           ...(r.bodyFat ? { bodyFat: r.bodyFat } : {}),
         }))
         .filter((e) => !have.has(e.id));
+      // commit() moves profile.bodyweight to the newest weigh-in when one of these is newer.
       if (fresh.length) {
         commit(fresh);
-        const newest = fresh.reduce((a, b) => (b.at > a.at ? b : a));
-        const last = get()
-          .events.filter((e) => e.type === "bodyweight")
-          .reduce((t, e) => Math.max(t, e.at), 0);
-        if (newest.at >= last) get().setProfile({ bodyweight: newest.kg });
+        get().refreshTdee();
       }
-      if (fresh.length) get().refreshTdee();
       return fresh.length;
     },
 
@@ -130,12 +126,6 @@ export function healthSlice(c: Ctx): HealthSlice {
       const fresh = cloudReadingEvents(source, readings, have);
       if (fresh.length) {
         commit(fresh);
-        const weighIns = fresh.filter((e) => e.type === "bodyweight");
-        const newest = weighIns.reduce<(typeof weighIns)[number] | null>((a, b) => (!a || b.at > a.at ? b : a), null);
-        const last = get()
-          .events.filter((e) => e.type === "bodyweight" && !fresh.includes(e))
-          .reduce((t, e) => Math.max(t, e.at), 0);
-        if (newest && newest.type === "bodyweight" && newest.at >= last) get().setProfile({ bodyweight: newest.kg });
         if (!get().active) get().replan();
         if (fresh.some((e) => (e.type === "health" && e.metric === "steps") || e.type === "bodyweight")) get().refreshTdee();
       }

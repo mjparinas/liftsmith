@@ -13,7 +13,7 @@ import { inSentence, list, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
 import type { Profile } from "@/lib/types";
-import { cmToFtIn, fmtHeight, fmtNum, fromKg, ftInToCm } from "@/lib/units";
+import { cmToFtIn, fmtBodyweight, fmtHeight, ftInToCm } from "@/lib/units";
 
 import { go } from "./router";
 import { BumpField, Button, Chip, Section } from "./ui";
@@ -62,7 +62,7 @@ export function StatsSummary({ need }: { need: readonly Stat[] }) {
     [t("stats.sex"), profile.sex ? t(profile.sex === "female" ? "stats.female" : "stats.male") : undefined],
     [t("stats.age"), age !== undefined ? String(age) : undefined],
     [t("stats.height"), profile.heightCm ? fmtHeight(profile.heightCm, profile.unit) : undefined],
-    [t("stats.weight"), `${fmtNum(Math.round(fromKg(currentKg(events, profile), profile.unit) * 10) / 10)} ${profile.unit}`],
+    [t("stats.weight"), fmtBodyweight(currentKg(events, profile), profile.unit)],
   ];
   return (
     <div className="card p-4">

@@ -209,10 +209,19 @@ export function ageAt(birthYear: number | undefined, now: number): number | unde
 }
 
 /** Latest weigh-in, or the profile's body weight. */
-export function currentKg(events: AppEvent[], profile: Pick<Profile, "bodyweight">): number {
+/** The newest weigh-in (kg), by when it was measured, or undefined before the first one. */
+export function lastWeighInKg(events: readonly AppEvent[]): number | undefined {
   let last: { at: number; kg: number } | undefined;
   for (const e of events) if (e.type === "bodyweight" && (!last || e.at > last.at)) last = e;
-  return last?.kg ?? profile.bodyweight;
+  return last?.kg;
+}
+
+/**
+ * The lifter's body weight now (kg): the newest weigh-in, else the weight from setup. Every screen that shows
+ * or uses "your weight" reads this, so they can't disagree (the store keeps `profile.bodyweight` equal to it).
+ */
+export function currentKg(events: readonly AppEvent[], profile: Pick<Profile, "bodyweight">): number {
+  return lastWeighInKg(events) ?? profile.bodyweight;
 }
 
 export interface CurrentTdee {
