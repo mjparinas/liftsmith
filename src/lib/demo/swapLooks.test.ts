@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 252;
+  const LOOK_ALIKES = 243;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -267,5 +267,52 @@ describe("jumps and hops", () => {
     }
     const shrimp = at("shrimp-squat", 1);
     expect(Math.hypot(shrimp.handL[0] - shrimp.ankleL[0], shrimp.handL[1] - shrimp.ankleL[1])).toBeLessThan(0.2);
+  });
+});
+
+describe("hangs, one-leg squats and lifts", () => {
+  // Melvin, 2026-11-14 audit: these played a pull-up, a hanging knee raise, a two-leg squat, a back
+  // squat, a standing pulldown or a deadlift.
+  const m = (id: string) => motionFor(id);
+  const at = (id: string, d: number) => jointsAt(m(id), B, d);
+  it("gets over the bar on muscle-ups and turns the body around it on skin the cat and the tuck front lever", () => {
+    for (const id of ["muscle-up", "ring-muscle-up"]) {
+      const top = at(id, 1);
+      expect(top.shC[1], id).toBeGreaterThan(top.handR[1] + 0.4);
+    }
+    const inverted = at("skin-the-cat", 2 / 3);
+    expect(inverted.hipC[1]).toBeGreaterThan(inverted.shC[1] + 0.3);
+    const lever = at("tuck-front-lever", 1);
+    expect(Math.abs(lever.hipC[1] - lever.shC[1])).toBeLessThan(0.1);
+  });
+  it("swings the legs side to side on windshield wipers and moves over one hand on archer and typewriter pull-ups", () => {
+    expect(at("windshield-wiper", 1).ankleR[2]).toBeGreaterThan(0.6);
+    expect(at("windshield-wiper", 0).ankleL[2]).toBeLessThan(-0.6);
+    expect(at("archer-pull-up", 1).shC[2] - at("archer-pull-up", 0).shC[2]).toBeGreaterThan(0.35);
+    expect(at("typewriter-pull-up", 0.55).shC[2]).toBeGreaterThan(0.15);
+  });
+  it("pulls the power clean from the floor and holds the bar overhead on the overhead squat", () => {
+    expect(m("power-clean").pose(B, 2).bar![1]).toBeLessThan(0.3);
+    const ohs = at("overhead-squat", 1);
+    expect(ohs.handR[1]).toBeGreaterThan(ohs.head[1]);
+  });
+  it("squats on one leg on pistols and the one-leg wall sit, and holds still against the wall", () => {
+    for (const id of ["pistol-squat", "box-pistol-squat", "assisted-pistol-squat", "single-leg-wall-sit"]) {
+      const bottom = at(id, 1);
+      expect(bottom.ankleL[1], id).toBeGreaterThan(0.1);
+      expect(bottom.ankleL[0], id).toBeGreaterThan(bottom.kneeL[0]);
+    }
+    expect(m("wall-sit").phases.some((p) => p[3] === "Hold" && p[1] === p[2])).toBe(true);
+    const sissy = at("sissy-squat", 1);
+    expect(sissy.kneeR[0]).toBeGreaterThan(sissy.ankleR[0] + 0.3);
+    expect(sissy.shC[0]).toBeLessThan(sissy.kneeR[0]);
+  });
+  it("lies on a bench for pullovers and slams the ball into the floor", () => {
+    for (const id of ["db-pullover", "barbell-pullover", "kb-pullover"]) {
+      expect(Math.abs(at(id, 0).hipC[1] - at(id, 0).shC[1]), id).toBeLessThan(0.05);
+      expect(at(id, 1).handR[0], id).toBeLessThan(at(id, 1).shC[0]);
+    }
+    expect(at("med-ball-slam", 0).handR[1]).toBeGreaterThan(at("med-ball-slam", 0).head[1]);
+    expect(at("med-ball-slam", 1).handR[1]).toBeLessThan(0.4);
   });
 });
