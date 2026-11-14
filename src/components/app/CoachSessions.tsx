@@ -116,19 +116,21 @@ export function CoachSessions({
 
   return (
     <Section title={t("bk.title")} icon="calendar">
-      <div className="card p-4">
-        <p className="text-sm text-muted">{role === "coach" ? t("bk.hintCoach") : t("bk.hint")}</p>
-        <Button className="mt-3 w-full" icon="plus" onClick={() => setAdding(true)}>
-          {t("bk.add")}
-        </Button>
-        {note && (
-          <p className="mt-2 text-sm text-muted" role="status">
-            {note}
-          </p>
-        )}
-      </div>
-      <div className="mt-2 desk:grid desk:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] desk:items-start desk:gap-3">
-        <section className="card p-3" aria-label={month} data-testid="schedule-calendar" {...swipe}>
+      {/* Desktop: Add times and the calendar share the left column, and the picked day's times sit on the right, level
+          with the calendar's top. */}
+      <div className="desk:grid desk:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] desk:items-start desk:gap-x-3">
+        <div className="card p-4 desk:col-start-1 desk:row-start-1">
+          <p className="text-sm text-muted">{role === "coach" ? t("bk.hintCoach") : t("bk.hint")}</p>
+          <Button className="mt-3 w-full" icon="plus" onClick={() => setAdding(true)}>
+            {t("bk.add")}
+          </Button>
+          {note && (
+            <p className="mt-2 text-sm text-muted" role="status">
+              {note}
+            </p>
+          )}
+        </div>
+        <section className="card mt-2 p-3 desk:col-start-1 desk:row-start-2" aria-label={month} data-testid="schedule-calendar" {...swipe}>
           <div className="mb-2 flex items-center justify-between gap-2">
             <button
               type="button"
@@ -211,10 +213,16 @@ export function CoachSessions({
           </ul>
         </section>
         {selectedMs !== null && (
-          <div className="mt-3 desk:mt-0" data-testid="schedule-day">
-            <p className="mb-1 px-1 text-sm font-semibold">{dayLabel(selectedMs)}</p>
+          <section
+            className="card mt-3 desk:col-start-2 desk:row-start-2 desk:mt-2"
+            aria-labelledby="schedule-day-title"
+            data-testid="schedule-day"
+          >
+            <h3 id="schedule-day-title" className="px-4 pb-1 pt-3 font-semibold">
+              {dayLabel(selectedMs)}
+            </h3>
             {daySlots.length > 0 ? (
-              <ul key={selected} className="card fade divide-y divide-line">
+              <ul key={selected} className="fade divide-y divide-line">
                 {daySlots.map((s) => (
                   <li key={s.id} className="flex items-center gap-2 py-2 pl-4 pr-2">
                     <span className="min-w-0 flex-1 py-1">
@@ -235,9 +243,9 @@ export function CoachSessions({
                 ))}
               </ul>
             ) : (
-              <p className="card px-4 py-3 text-sm text-muted">{slots.length ? t("bk.dayNone") : t("bk.none")}</p>
+              <p className="px-4 pb-3 text-sm text-muted">{slots.length ? t("bk.dayNone") : t("bk.none")}</p>
             )}
-          </div>
+          </section>
         )}
       </div>
       {/* A fresh sheet each time it opens, so "Today" is today. */}
