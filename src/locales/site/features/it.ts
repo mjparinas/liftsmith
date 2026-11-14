@@ -298,6 +298,11 @@ export const it: FeaturesText = {
       name: "In allenamento ora e incitamenti",
       body: "Vedi chi si sta allenando adesso e manda un incitamento che sale fluttuando sulla sua schermata di allenamento.",
     },
+    "check-in": {
+      name: "Check-in in palestra",
+      body: "Un tocco su Oggi avvisa gli amici che scegli che sei in palestra. Ricevono una notifica e un avviso nell'app finché non lo chiudono.",
+      note: "Dai 18 anni in su. Le notifiche sono su Android e iPhone; l'app web mostra l'avviso quando è aperta.",
+    },
     challenges: {
       name: "Sfide, club e classifiche",
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",

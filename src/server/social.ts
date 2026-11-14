@@ -26,6 +26,7 @@ import {
   type BoardMetric,
   type BoardRow,
   type Challenge,
+  type CheckinIn,
   type Cheer,
   type CheerIn,
   type ClubDetail,
@@ -81,6 +82,7 @@ export const DAILY = {
   challenge: 10,
   club: 5,
   cheer: 300,
+  checkin: 10,
 };
 /** An invite link lasts 30 days and works for this many people. */
 export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
@@ -130,6 +132,7 @@ interface ProfileRow extends Row {
   push_likes: number;
   push_cheers: number;
   push_posts: number;
+  push_checkins: number;
   live: number;
   cheers: number;
   /** 0 fine, 1 suspended or banned, 2 shadow banned (socialModeration.ts). */
@@ -191,6 +194,7 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
     likes: !!n(r.push_likes),
     cheers: !!n(r.push_cheers ?? 1),
     posts: !!n(r.push_posts ?? 1),
+    checkins: !!n(r.push_checkins ?? 1),
   },
   avatar: avatarOf(r.avatar),
   audience: audienceOf(r.audience),
@@ -335,7 +339,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     await run(
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
          push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
-         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?, cheers = ?
+         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?, cheers = ?, push_checkins = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -359,6 +363,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         flag(push.cheers, p.push_cheers ?? 1),
         flag(push.posts, p.push_posts ?? 1),
         flag(b.cheers, p.cheers ?? 1),
+        flag(push.checkins, p.push_checkins ?? 1),
         accountId,
       ],
     );
@@ -401,6 +406,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM push_tokens WHERE account_id = ?", args: a },
     { sql: "DELETE FROM live_sessions WHERE account_id = ?", args: a },
     { sql: "DELETE FROM cheers WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
+    { sql: "DELETE FROM friend_checkins WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM suggest_hides WHERE account_id = ? OR hidden_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM social_profiles WHERE account_id = ?", args: a },
   ];
@@ -1652,6 +1658,75 @@ export async function send(accountId: string, b: Record<string, unknown>, now = 
   return ok();
 }
 
+// --- Check in (Melvin, 2026-11-14) ---
+
+/** How long a check-in waits as a toast before it's old news, and how many show at once. */
+export const CHECKIN_FOR = 24 * 3_600_000;
+export const CHECKIN_SHOWN = 5;
+const MUSCLE_RE = /^[A-Za-z_]{1,24}$/;
+
+/**
+ * "I'm at the gym" to mutual friends the lifter picked: a push (their check-ins switch) and a toast in their app until
+ * they dismiss it. Never from or to anyone under 18 (Melvin: "under age kids shouldnt be able to use this").
+ * The gym's name goes through the word filter; the muscles are ids, so each friend's app words them in its language.
+ */
+export async function checkIn(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  if (await isMinor(accountId, now)) return fail(403, "minor");
+  const to = await friendIds(accountId, b.handles, 50);
+  if (!to.length) return fail(403, "notFriends");
+  const rawGym = s(b.gym).trim().slice(0, 60);
+  const gym = rawGym ? checkText(rawGym, 60) : ({ ok: true, text: "" } as const);
+  const focus = [...new Set((Array.isArray(b.focus) ? b.focus : []).map(s).filter((m) => MUSCLE_RE.test(m)))].slice(0, 3);
+  if (!(await limit(accountId, "checkin", now))) return fail(429, "slow");
+  let sent = 0;
+  for (const id of to) {
+    if (await isMinor(id, now)) continue;
+    await run("INSERT INTO friend_checkins (id, from_id, to_id, gym, focus, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+      newId(),
+      accountId,
+      id,
+      gym.ok ? gym.text : "",
+      focus.join(","),
+      now,
+    ]);
+    await notify(id, accountId, "checkin", { text: gym.ok ? gym.text : "" });
+    sent++;
+  }
+  return ok({ sent });
+}
+
+/** Friends' check-ins from the last day the lifter hasn't dismissed, newest first, for the toast. */
+export async function checkinsIn(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const rows = await query(
+    `SELECT c.id AS id, c.gym AS gym, c.focus AS focus, c.created_at AS at, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar
+     FROM friend_checkins c JOIN social_profiles sp ON sp.account_id = c.from_id
+     WHERE c.to_id = ?1 AND c.dismissed = 0 AND c.created_at > ?2 AND sp.suspended = 0 AND ${NOT_BLOCKED("c.from_id", "?1")}
+       AND c.from_id NOT IN (SELECT muted_id FROM mutes WHERE muter_id = ?1)
+     ORDER BY c.created_at DESC LIMIT ${CHECKIN_SHOWN}`,
+    [accountId, now - CHECKIN_FOR],
+  );
+  const list: CheckinIn[] = rows.map((r) => ({
+    ...toRow(r),
+    id: s(r.id),
+    gym: s(r.gym),
+    focus: s(r.focus).split(",").filter(Boolean),
+    at: n(r.at),
+  }));
+  return ok({ checkins: list });
+}
+
+/** Dismisses one check-in toast (`id`), or all of them. */
+export async function checkinDismiss(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  if (b.all === true) await run("UPDATE friend_checkins SET dismissed = 1 WHERE to_id = ?", [accountId]);
+  else await run("UPDATE friend_checkins SET dismissed = 1 WHERE to_id = ? AND id = ?", [accountId, s(b.id)]);
+  return ok();
+}
+
 // --- Invite links ---
 
 /** The lifter's invite code: the live one, or a new one. Anyone who accepts it and the lifter follow each other. */
@@ -2243,6 +2318,9 @@ export const OPS: Record<string, Op> = {
   uncomment: (a, b) => uncomment(a, b),
   activity: (a, _b, now) => activity(a, now),
   send,
+  checkIn,
+  checkins: checkinsIn,
+  checkinDismiss: (a, b) => checkinDismiss(a, b),
   invite,
   inviteInfo,
   acceptInvite,

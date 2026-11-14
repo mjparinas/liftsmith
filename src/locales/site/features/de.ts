@@ -304,6 +304,11 @@ export const de: FeaturesText = {
       name: "Gerade am Trainieren und Anfeuern",
       body: "Sieh, wer gerade trainiert, und schick einen Anfeuerungsruf, der über den Trainingsbildschirm schwebt.",
     },
+    "check-in": {
+      name: "Im Studio einchecken",
+      body: "Ein Tipp unter Heute sagt den Freunden, die du auswählst, dass du im Studio bist. Sie bekommen eine Mitteilung und einen Hinweis in der App, bis sie ihn schließen.",
+      note: "Ab 18 Jahren. Mitteilungen gibt es auf Android und iPhone; die Web-App zeigt den Hinweis, wenn sie offen ist.",
+    },
     challenges: {
       name: "Challenges, Clubs und Bestenlisten",
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",

@@ -300,6 +300,11 @@ export const es: FeaturesText = {
       name: "Entrenando ahora y ánimos",
       body: "Mira quién está entrenando ahora mismo y envía un ánimo que sube flotando por su pantalla de entrenamiento.",
     },
+    "check-in": {
+      name: "Avisa desde el gimnasio",
+      body: "Un toque en Hoy avisa a los amigos que elijas de que estás en el gimnasio. Reciben una notificación y un aviso en la app hasta que lo cierren.",
+      note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra el aviso cuando está abierta.",
+    },
     challenges: {
       name: "Retos, clubes y clasificaciones",
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",

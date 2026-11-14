@@ -123,6 +123,8 @@ export interface PushPrefs {
   cheers: boolean;
   /** A workout from someone the lifter rang the bell for (on to start; nothing comes until a bell is on). */
   posts: boolean;
+  /** A friend checked in at the gym (Check in on Today; on to start). */
+  checkins: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -457,5 +459,16 @@ export interface CheerIn {
   name: string;
   avatar: string;
   emoji: Cheer;
+  at: number;
+}
+
+/** A friend's check-in ("I'm at the gym"), shown as a toast until dismissed. `focus` is muscle ids, worded on the phone. */
+export interface CheckinIn {
+  id: string;
+  handle: string;
+  name: string;
+  avatar: string;
+  gym: string;
+  focus: string[];
   at: number;
 }

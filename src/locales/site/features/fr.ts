@@ -305,6 +305,11 @@ export const fr: FeaturesText = {
       name: "En séance maintenant et encouragements",
       body: "Voyez qui s’entraîne en ce moment et envoyez un encouragement qui flotte sur son écran de séance.",
     },
+    "check-in": {
+      name: "Check-in à la salle",
+      body: "Un geste sur Aujourd'hui prévient les amis que vous choisissez que vous êtes à la salle. Ils reçoivent une notification, et un message dans l'app jusqu'à ce qu'ils le ferment.",
+      note: "Pour les 18 ans et plus. Les notifications sont sur Android et iPhone ; l'app web affiche le message quand elle est ouverte.",
+    },
     challenges: {
       name: "Défis, clubs et classements",
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
