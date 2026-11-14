@@ -2029,6 +2029,242 @@ function plankSaw(): Motion {
   };
 }
 
+// ---------- standing walks that travel ----------
+// Band walks, shuffles, squat walks and sled drags used to play cossack squats or squat reps in place
+// (Melvin, 2026-11-14: "an audit of all the other animations"). The feet step in turn and the hips ride
+// halfway between them, so the figure really travels, then walks back to where it started.
+
+type Foot = "L" | "R";
+interface FootStep {
+  foot: Foot;
+  by: Vec;
+  label: string;
+}
+type StandHands = "hips" | "guard" | "strap" | "front";
+
+/** `count` side steps one way (the lead foot out, the other foot in) and the same back. */
+function sideFootSteps(stride: number, count: number, labels: [string, string]): FootStep[] {
+  const steps: FootStep[] = [];
+  for (const [sgn, label] of [
+    [1, labels[0]],
+    [-1, labels[1]],
+  ] as const)
+    for (let k = 0; k < count; k++) {
+      const by = V(0, 0, sgn * stride);
+      steps.push({ foot: sgn > 0 ? "R" : "L", by, label }, { foot: sgn > 0 ? "L" : "R", by, label });
+    }
+  return steps;
+}
+
+/** Walking forward, one foot passing the other, then the same steps backwards. */
+function forwardFootSteps(stride: number, labels: [string, string], wide = 0): FootStep[] {
+  const out = (sgn: number) => sgn * wide;
+  const fwd: FootStep[] = [
+    { foot: "L", by: V(stride, 0, out(-1)), label: labels[0] },
+    { foot: "R", by: V(2 * stride, 0, out(1)), label: labels[0] },
+    { foot: "L", by: V(2 * stride, 0, -out(-1)), label: labels[0] },
+    { foot: "R", by: V(stride, 0, -out(1)), label: labels[0] },
+  ];
+  const back = [...fwd].reverse().map((s) => ({ ...s, by: mul(s.by, -1), label: labels[1] }));
+  return [...fwd, ...back];
+}
+
+function standWalk(o: {
+  steps: FootStep[];
+  /** Leg straightness at the hip (1 standing tall, lower sits deeper). */
+  bend: number;
+  /** Half the stance width. */
+  w: number;
+  lean: number;
+  hands: StandHands;
+  dur?: number;
+  lift?: number;
+  hop?: number;
+  props?: (B: Body) => Prop[];
+}): Motion {
+  const n = o.steps.length;
+  const keys: { L: Vec; R: Vec }[] = [];
+  let cur = { L: V(0, 0), R: V(0, 0) };
+  for (const s of o.steps) {
+    keys.push(cur);
+    cur = { ...cur, [s.foot]: add(cur[s.foot], s.by) };
+  }
+  keys.push(cur);
+  const mids = keys.map((k) => mul(add(k.L, k.R), 0.5));
+  const centre = V(
+    (Math.min(...mids.map((m) => m[0])) + Math.max(...mids.map((m) => m[0]))) / 2,
+    0,
+    (Math.min(...mids.map((m) => m[2])) + Math.max(...mids.map((m) => m[2]))) / 2,
+  );
+  return {
+    phases: o.steps.map((s, i): PhaseRow => [o.dur ?? 0.5, i / n, (i + 1) / n, s.label, 0.8]),
+    load: "none",
+    stance: o.w,
+    pose(B, d) {
+      const x = clamp(d, 0, 1) * n;
+      const i = Math.min(n - 1, Math.floor(x));
+      const t = x - i;
+      const a = keys[i]!;
+      const b = keys[i + 1]!;
+      const arc = Math.sin(Math.PI * t);
+      const off = { L: sub(lerpV(a.L, b.L, t), centre), R: sub(lerpV(a.R, b.R, t), centre) };
+      const mid = mul(add(off.L, off.R), 0.5);
+      const hip = V(-0.03 + mid[0], standY(B, 0.04, o.bend) + (o.hop ?? 0) * arc, mid[2]);
+      const sh = add(torsoAt(B, V(hip[0], hip[1]), o.lean), V(0, 0, hip[2]));
+      const leg = legMax(B) * 0.99;
+      const foot = (f: Foot): Vec => {
+        const sgn = f === "L" ? -1 : 1;
+        const lift = o.steps[i]!.foot === f ? arc * (o.lift ?? 0.07) : 0;
+        const at = add(V(0, ANKLE_H + lift, sgn * o.w), off[f]);
+        return within(V(hip[0], hip[1], hip[2] + sgn * B.hipW), at, leg);
+      };
+      const hand = (sgn: number): Vec => {
+        if (o.hands === "hips") return V(hip[0] + 0.02, hip[1] + 0.06, hip[2] + sgn * (B.hipW + 0.13));
+        if (o.hands === "guard") return V(sh[0] + 0.3, sh[1] - 0.12, sh[2] + sgn * 0.12);
+        if (o.hands === "strap") return V(sh[0] + 0.32, sh[1] - 0.4, sh[2] + sgn * 0.06);
+        return V(sh[0] + reach(B) * 0.85, sh[1] - 0.1, sh[2] + sgn * 0.15);
+      };
+      return {
+        hip,
+        sh,
+        ankle: per(foot("L"), foot("R")),
+        kneePole: per(V(1, 0, -0.45), V(1, 0, 0.45)),
+        hand: per(hand(-1), hand(1)),
+        elbowPole: o.hands === "hips" ? V(-0.4, 0, 1) : V(-0.3, -1, 0.5),
+        headBlend: 0.8,
+      };
+    },
+    props: o.props,
+  };
+}
+
+const kneeBand = (): Prop[] => [cable("kneeL", "kneeR")];
+
+function bandLateralWalk(): Motion {
+  return standWalk({
+    steps: sideFootSteps(0.22, 2, ["Step right", "Step back"]),
+    bend: 0.88,
+    w: 0.18,
+    lean: 14,
+    hands: "hips",
+    props: kneeBand,
+  });
+}
+function bandMonsterWalk(): Motion {
+  return standWalk({
+    steps: forwardFootSteps(0.2, ["Walk forward", "Walk back"], 0.06),
+    bend: 0.88,
+    w: 0.2,
+    lean: 14,
+    hands: "hips",
+    props: kneeBand,
+  });
+}
+function lateralSquatWalk(): Motion {
+  return standWalk({ steps: sideFootSteps(0.22, 2, ["Step right", "Step back"]), bend: 0.82, w: 0.2, lean: 24, hands: "hips" });
+}
+function lateralShuffle(): Motion {
+  return standWalk({
+    steps: sideFootSteps(0.26, 2, ["Shuffle right", "Shuffle back"]),
+    bend: 0.88,
+    w: 0.2,
+    lean: 20,
+    hands: "guard",
+    dur: 0.28,
+    lift: 0.04,
+    hop: 0.03,
+  });
+}
+function duckWalk(): Motion {
+  return standWalk({ steps: forwardFootSteps(0.14, ["Walk", "Walk back"]), bend: 0.66, w: 0.2, lean: 30, hands: "front", dur: 0.6 });
+}
+function sledLateralDrag(): Motion {
+  return standWalk({
+    steps: sideFootSteps(0.22, 2, ["Step away", "Step back"]),
+    bend: 0.86,
+    w: 0.2,
+    lean: 18,
+    hands: "strap",
+    dur: 0.65,
+    props: () => [cable(V(0.35, 0.2, -2.0), "hands"), { kind: "box", at: V(0.35, 0.12, -2.25), size: V(0.6, 0.25, 0.5) }],
+  });
+}
+
+/** Skater jumps and side bounds: from one leg, jump sideways and land on the other, the free leg sweeping behind. */
+function skater(o: { dist: number; height: number; label: [string, string] }): Motion {
+  return {
+    phases: [
+      [0.25, 0, 0, "Land", 0.6],
+      [0.55, 0, 1, o.label[0], 1],
+      [0.25, 1, 1, "Land", 0.6],
+      [0.55, 1, 0, o.label[1], 1],
+    ],
+    load: "none",
+    stance: 0.12,
+    pose(B, d) {
+      const k = d;
+      const air = Math.sin(Math.PI * k);
+      const z = lerp(-o.dist, o.dist, k);
+      const hip = V(-0.04, standY(B, 0.05, 0.86) + o.height * air, z);
+      const lean = 28 - 10 * air;
+      const sh = add(torsoAt(B, V(hip[0], hip[1]), lean), V(0, 0, z));
+      const stance = (sgn: number): Vec => V(0.02, ANKLE_H + 0.12 * air, z + sgn * 0.08);
+      const swept = (sgn: number): Vec => V(-0.34, 0.3 + 0.1 * air, z - sgn * 0.14);
+      // at d 0 the left leg stands and the right sweeps behind; at d 1 the other way round
+      const leg = legMax(B) * 0.99;
+      const ankleL = within(V(hip[0], hip[1], z - B.hipW), lerpV(stance(-1), swept(-1), k), leg);
+      const ankleR = within(V(hip[0], hip[1], z + B.hipW), lerpV(swept(1), stance(1), k), leg);
+      // the arms swing across the body, towards the landing side
+      const swingZ = lerp(-0.25, 0.25, k);
+      const hand = (sgn: number): Vec => V(sh[0] + 0.25, sh[1] - 0.38, z + sgn * 0.14 + swingZ);
+      return {
+        hip,
+        sh,
+        ankle: per(ankleL, ankleR),
+        foot: { L: lerp(0, 40, k), R: lerp(40, 0, k) },
+        kneePole: per(V(1, 0, -0.3), V(1, 0, 0.3)),
+        hand: per(hand(-1), hand(1)),
+        elbowPole: V(-0.4, -1, 0.4),
+        headBlend: 0.8,
+      };
+    },
+  };
+}
+
+/** Crab walk: hands behind and feet in front, hips lifted, opposite hand and foot stepping together. */
+function crabBase(B: Body): FourPoint {
+  const hip = V(0, 0.4);
+  const shY = 0.03 + reach(B) * 0.93;
+  const lean = -(Math.acos(clamp((shY - hip[1]) / B.torso, -1, 1)) * 180) / Math.PI;
+  const sh = torsoAt(B, hip, lean);
+  const ax = hip[0] + 0.5;
+  return {
+    hip,
+    sh,
+    handL: V(sh[0] - 0.06, 0.03, -0.2),
+    handR: V(sh[0] - 0.06, 0.03, 0.2),
+    ankleL: V(ax, ANKLE_H, -0.16),
+    ankleR: V(ax, ANKLE_H, 0.16),
+    foot: 0,
+    kneePole: V(0.4, 1, 0.2),
+    elbowPole: V(-1, 0.1, 0.3),
+    headBlend: 1,
+  };
+}
+function crabWalk(): Motion {
+  const stride = 0.16;
+  const steps: Step[] = [];
+  const pair = (a: Limb[], dx: number, label: string): Step => ({ limbs: a, by: V(dx, 0), label });
+  for (let k = 0; k < 2; k++) steps.push(pair(["handL", "ankleR"], stride, "Walk"), pair(["handR", "ankleL"], stride, "Walk"));
+  for (let k = 0; k < 2; k++) steps.push(pair(["handL", "ankleR"], -stride, "Walk back"), pair(["handR", "ankleL"], -stride, "Walk back"));
+  return stepper(crabBase, steps, { dur: 0.5, handLift: 0.05, footLift: 0.05 });
+}
+
+/** Plays a looping motion backwards (backward walking, the elliptical pedalled in reverse). */
+function backwards(m: Motion, label: string): Motion {
+  return { ...m, phases: m.phases.map(([dur, a, b, , eff]): PhaseRow => [dur, b, a, label, eff]) };
+}
+
 /** Battle ropes: a half squat with the hands making fast alternating waves. */
 function battleRopes(): Motion {
   return {
@@ -3154,7 +3390,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-deadlift": () => rdl({ load: "none" }),
   "band-good-morning": () => rdl({ load: "none" }),
   "band-glute-kickback": () => kickback({ band: true }),
-  "band-lateral-walk": cossack,
+  "band-lateral-walk": bandLateralWalk,
   "band-hip-abduction": () => seatedHip({ out: true, band: true }),
   "band-triceps-extension": () => overheadExtension({}),
   "band-hammer-curl": () => curl({ load: "none", grip: 0.2, cable: "band" }),
@@ -3466,7 +3702,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "side-lying-leg-raise": () => sidePlank({}),
   "fire-hydrant": () => allFours({ kind: "donkey" }),
   clamshell: () => sidePlank({}),
-  "band-monster-walk": cossack,
+  "band-monster-walk": bandMonsterWalk,
   "db-swing": kbSwing,
   "hip-airplane": () => rdl({ load: "none", single: true }),
   "db-curtsy-lunge": () => lunge({ step: "back", hands: "dumbbells" }),
@@ -3512,11 +3748,11 @@ const MOTIONS: Record<string, () => Motion> = {
   inchworm: pikePushUp,
   "broad-jump": jumpSquat,
   sprint: () => run({ lift: 0.7, lean: 12 }),
-  "skater-jumps": cossack,
+  "skater-jumps": () => skater({ dist: 0.42, height: 0.12, label: ["Jump right", "Jump left"] }),
   "tuck-jump": jumpSquat,
   "squat-thrust": burpee,
   "star-jump": jumpingJack,
-  "lateral-shuffle": cossack,
+  "lateral-shuffle": lateralShuffle,
   "butt-kicks": () => run({ lift: 0.3, lean: 2 }),
   "plank-jack": plankJack,
   // batch b2 (2026-11-11)
@@ -3657,7 +3893,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-calf-raise": () => calfRaise({ step: true, load: "kettlebell", hold: "each" }),
   "calf-raise-hold": () => calfRaise({ load: "none" }),
   "pogo-jumps": jumpSquat,
-  "lateral-bound": cossack,
+  "lateral-bound": () => skater({ dist: 0.6, height: 0.2, label: ["Bound right", "Bound left"] }),
   "depth-jump": boxJump,
   "single-leg-hop": jumpSquat,
   "trap-bar-jump": jumpSquat,
@@ -3724,7 +3960,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "stair-run": () => run({ lift: 0.45, lean: 10 }),
   "sled-drag": () => bentRow({ load: "handle", lean: 40 }),
   "battle-rope-slam": battleRopes,
-  "crab-walk": () => bridge({}),
+  "crab-walk": crabWalk,
   "lateral-bear-crawl": lateralBearCrawl,
   "backward-bear-crawl": backwardBearCrawl,
   sprawl: burpee,
@@ -3893,7 +4129,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "single-leg-seated-leg-curl": () => kneeMachine({ extend: false }),
   "squat-pulse": () => squat({ hold: "arms", depth: 0.4 }),
   "lunge-pulse": () => lunge({ hands: "hips" }),
-  "lateral-squat-walk": () => squat({ hold: "hips", depth: 0.3 }),
+  "lateral-squat-walk": lateralSquatWalk,
   "bw-lateral-step-up": stepUp,
   "glute-bridge-walkout": () => bridge({}),
   "single-leg-hamstring-bridge": () => bridge({ single: true }),
@@ -3958,7 +4194,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-half-get-up": turkishGetUp,
   "kb-overhead-swing": kbSwing,
   "sled-row": () => bentRow({ load: "handle", lean: 40 }),
-  "sled-lateral-drag": cossack,
+  "sled-lateral-drag": sledLateralDrag,
   "zercher-carry": () => carry({ hold: "centre", load: "barbell", at: "zercher" }),
   "front-rack-barbell-carry": () => carry({ hold: "centre", load: "barbell", at: "rack" }),
   "overhead-barbell-carry": () => carry({ hold: "centre", load: "barbell", at: "overhead" }),
@@ -3992,7 +4228,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "rower-intervals": erg,
   "ski-erg-intervals": () => pulldown({ straightArm: true }),
   "stair-climber-intervals": () => run({ lift: 0.45, lean: 10 }),
-  "backward-treadmill-walk": walk,
+  "backward-treadmill-walk": () => backwards(walk(), "Walk backwards"),
   "sled-sprint": sledPush,
   "jump-rope-crossover": () => calfRaise({ load: "none" }),
   "jump-rope-boxer-skip": () => calfRaise({ load: "none" }),
@@ -4009,14 +4245,14 @@ const MOTIONS: Record<string, () => Motion> = {
   "box-step-over": stepUp,
   "line-hops": jumpSquat,
   "lateral-plank-walk": lateralPlankWalk,
-  "duck-walk": () => squat({ hold: "hips", depth: 0.9 }),
+  "duck-walk": duckWalk,
   "jog-in-place": () => run({ lift: 0.4, lean: 2 }),
   "march-in-place": () => run({ lift: 0.6, lean: 0 }),
   "step-jack": jumpingJack,
   "boxer-shuffle": () => run({ lift: 0.2, lean: 3 }),
   "treadmill-intervals": run,
   "stair-climber-side-step": () => run({ lift: 0.45, lean: 5 }),
-  "elliptical-backward": elliptical,
+  "elliptical-backward": () => backwards(elliptical(), "Stride backwards"),
   "burpee-tuck-jump": burpee,
   "kb-burpee-deadlift": burpee,
   "med-ball-burpee": burpee,
