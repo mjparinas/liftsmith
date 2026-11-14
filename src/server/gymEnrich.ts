@@ -12,6 +12,8 @@
 // A claimed gym is never touched (its owner keeps its details), a field already set is never replaced, and every gym
 // read is stamped (`enriched_at`), so a run picks up where the last one stopped and a site is read again at most once
 // a month.
+import { randomBytes } from "node:crypto";
+
 import { DAYS, formatHours, type Week } from "@/lib/openingHours";
 
 import { query, run } from "./db";
@@ -26,6 +28,9 @@ export const ENRICH_LIMITS = {
   fetchMs: 8_000,
   /** Bytes of a page we read; the details are near the top or in the footer of any normal home page. */
   maxBytes: 1_500_000,
+  /** Bytes of a site's icon we keep at most, and the fewest that make a real one. */
+  iconBytes: 150_000,
+  iconMinBytes: 100,
   /** A site is read again after this long. */
   againMs: 30 * 86_400_000,
 };
@@ -202,11 +207,12 @@ export function publicHost(url: string): boolean {
   }
 }
 
-async function fetchText(
+async function fetchBytes(
   fetcher: typeof fetch,
   url: string,
   accept: string,
-): Promise<{ status: number; text: string; type: string } | null> {
+  maxBytes = ENRICH_LIMITS.maxBytes,
+): Promise<{ status: number; bytes: Uint8Array; type: string; over: boolean } | null> {
   try {
     // Redirects are followed by hand (http to https, to www), each one checked like the first.
     let r: Response | null = null;
@@ -224,16 +230,22 @@ async function fetchText(
       r = null;
     }
     if (!r) return null;
-    if (!r.body) return { status: r.status, text: "", type: r.headers.get("content-type") ?? "" };
+    const type = r.headers.get("content-type") ?? "";
+    if (!r.body) return { status: r.status, bytes: new Uint8Array(0), type, over: false };
     // Read at most maxBytes, then stop.
     const reader = r.body.getReader();
     const parts: Uint8Array[] = [];
     let size = 0;
-    while (size < ENRICH_LIMITS.maxBytes) {
+    let over = false;
+    for (;;) {
       const { done, value } = await reader.read();
       if (done || !value) break;
       parts.push(value);
       size += value.length;
+      if (size >= maxBytes) {
+        over = size > maxBytes;
+        break;
+      }
     }
     await reader.cancel().catch(() => undefined);
     const all = new Uint8Array(size);
@@ -242,18 +254,84 @@ async function fetchText(
       all.set(p, at);
       at += p.length;
     }
-    return { status: r.status, text: new TextDecoder().decode(all), type: r.headers.get("content-type") ?? "" };
+    return { status: r.status, bytes: all, type, over };
   } catch {
     return null;
   }
+}
+
+async function fetchText(
+  fetcher: typeof fetch,
+  url: string,
+  accept: string,
+): Promise<{ status: number; text: string; type: string } | null> {
+  const r = await fetchBytes(fetcher, url, accept);
+  return r && { status: r.status, text: new TextDecoder().decode(r.bytes), type: r.type };
+}
+
+// --- The site's icon ---
+
+/** Where a page's icons are, best first: the touch icon (usually 180 px), then the largest declared icon, then
+ * /favicon.ico. SVG is left out (it can carry script, and it's served from our own origin). */
+export function iconLinks(html: string, site: string): string[] {
+  const found: { url: string; size: number }[] = [];
+  for (const tag of html.match(/<link\b[^>]*>/gi) ?? []) {
+    const attr = (name: string) => new RegExp(`\\b${name}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, "i").exec(tag);
+    const value = (name: string) => {
+      const m = attr(name);
+      return decode(m?.[2] ?? m?.[3] ?? m?.[4] ?? "").trim();
+    };
+    const rel = value("rel").toLowerCase();
+    if (!/(^|\s)(icon|apple-touch-icon|apple-touch-icon-precomposed)(\s|$)/.test(rel)) continue;
+    const href = value("href");
+    if (!href || /^data:/i.test(href) || /svg/i.test(value("type")) || /\.svg(\?|#|$)/i.test(href)) continue;
+    let url = "";
+    try {
+      url = new URL(href, site).toString();
+    } catch {
+      continue;
+    }
+    const sizes = /(\d+)x\d+/i.exec(value("sizes"));
+    const size = sizes ? Number(sizes[1]) : rel.includes("apple-touch-icon") ? 180 : 16;
+    found.push({ url, size });
+  }
+  found.sort((a, b) => b.size - a.size);
+  let fallback = "";
+  try {
+    fallback = new URL("/favicon.ico", site).toString();
+  } catch {
+    // no fallback
+  }
+  return [...new Set([...found.map((f) => f.url), fallback].filter(Boolean))].slice(0, 4);
+}
+
+/** The image type from its first bytes: PNG, ICO, GIF, JPEG or WebP. Anything else (SVG, HTML) is refused. */
+export function imageType(b: Uint8Array): string {
+  if (b.length < 12) return "";
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "image/png";
+  if (b[0] === 0x00 && b[1] === 0x00 && b[2] === 0x01 && b[3] === 0x00) return "image/x-icon";
+  if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return "image/gif";
+  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "image/jpeg";
+  if (String.fromCharCode(...b.slice(0, 4)) === "RIFF" && String.fromCharCode(...b.slice(8, 12)) === "WEBP") return "image/webp";
+  return "";
+}
+
+/** The site's icon, as bytes we're willing to keep and serve, or null. */
+async function siteIcon(fetcher: typeof fetch, html: string, site: string): Promise<Uint8Array | null> {
+  for (const url of iconLinks(html, site)) {
+    const r = await fetchBytes(fetcher, url, "image/*", ENRICH_LIMITS.iconBytes);
+    if (!r || r.status >= 400 || r.over || r.bytes.length < ENRICH_LIMITS.iconMinBytes) continue;
+    if (imageType(r.bytes)) return r.bytes;
+  }
+  return null;
 }
 
 export interface EnrichOne {
   id: string;
   name: string;
   site: string;
-  /** What was filled in, by field. */
-  filled: (keyof SiteDetails)[];
+  /** What was filled in, by field, and "icon" when the site's icon was kept. */
+  filled: (keyof SiteDetails | "icon")[];
   /** Why nothing was read, when nothing was. */
   skipped: string;
   ms: number;
@@ -261,12 +339,12 @@ export interface EnrichOne {
 
 /** Reads one gym's website and fills its empty fields. */
 export async function enrichPlace(
-  p: { id: string; name: string; website: string } & Partial<SiteDetails>,
+  p: { id: string; name: string; website: string; hasIcon?: boolean } & Partial<SiteDetails>,
   fetcher: typeof fetch = fetch,
   now = Date.now(),
 ): Promise<EnrichOne> {
   const started = Date.now();
-  const done = async (filled: (keyof SiteDetails)[], skipped: string, set: Partial<SiteDetails> = {}) => {
+  const done = async (filled: EnrichOne["filled"], skipped: string, set: Partial<SiteDetails> = {}) => {
     const keys = Object.keys(set) as (keyof SiteDetails)[];
     // Empty fields only, unclaimed gyms only: the statement itself checks both, so a gym claimed meanwhile is safe.
     await run(
@@ -285,7 +363,22 @@ export async function enrichPlace(
   const found = detailsFromHtml(page.text, p.website);
   const set: Partial<SiteDetails> = {};
   for (const k of Object.keys(found) as (keyof SiteDetails)[]) if (found[k] && !p[k]) set[k] = found[k];
-  return done(Object.keys(set) as (keyof SiteDetails)[], Object.keys(set).length ? "" : "nothing new on the page", set);
+  const filled: EnrichOne["filled"] = Object.keys(set) as (keyof SiteDetails)[];
+  // The site's icon stands in for a logo until an owner adds one: kept only for an unclaimed gym with neither.
+  if (!p.hasIcon) {
+    const icon = await siteIcon(fetcher, page.text, p.website);
+    if (
+      icon &&
+      (await run(
+        `INSERT INTO gym_photos (id, place_id, kind, image, created_at)
+         SELECT ?, id, 'icon', ?, ? FROM gym_places WHERE id = ? AND claimed_by = ''
+           AND NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = ? AND m.kind IN ('logo', 'icon'))`,
+        [randomBytes(8).toString("hex"), icon, now, p.id, p.id],
+      )) > 0
+    )
+      filled.push("icon");
+  }
+  return done(filled, filled.length ? "" : "nothing new on the page", set);
 }
 
 // --- A batch, for Admin › Gyms ---
@@ -296,14 +389,15 @@ export interface EnrichBatch {
   left: number;
 }
 
+const NO_ICON = `NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = gym_places.id AND m.kind IN ('logo', 'icon'))`;
 const WAITING = `FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at < ?
-  AND (phone = '' OR email = '' OR hours = '' OR postcode = '' OR address = '' OR instagram = '' OR facebook = '')`;
+  AND (phone = '' OR email = '' OR hours = '' OR postcode = '' OR address = '' OR instagram = '' OR facebook = '' OR ${NO_ICON})`;
 
 /** Reads the next batch of gyms that have a website and miss something, several sites at once. */
 export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now()): Promise<EnrichBatch> {
   const since = now - ENRICH_LIMITS.againMs;
   const rows = await query(
-    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook ${WAITING} ORDER BY lifters DESC, enriched_at LIMIT ?`,
+    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, ${NO_ICON} AS no_icon ${WAITING} ORDER BY lifters DESC, enriched_at LIMIT ?`,
     [since, ENRICH_LIMITS.batch],
   );
   const gyms = rows.map((r) => ({
@@ -317,6 +411,7 @@ export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(
     postcode: String(r.postcode),
     instagram: String(r.instagram),
     facebook: String(r.facebook),
+    hasIcon: !Number(r.no_icon),
   }));
   const done: EnrichOne[] = [];
   let next = 0;

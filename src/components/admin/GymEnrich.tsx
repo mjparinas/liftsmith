@@ -18,6 +18,7 @@ const FIELD: Record<string, string> = {
   postcode: "postcode",
   instagram: "Instagram",
   facebook: "Facebook",
+  icon: "icon",
 };
 
 export function GymEnrich({ admin, changed }: { admin: boolean; changed: () => void }) {
@@ -61,12 +62,12 @@ export function GymEnrich({ admin, changed }: { admin: boolean; changed: () => v
   return (
     <Card
       title="Fill in details from gym websites"
-      subtitle="Hours, phone, email, address, postcode and social pages the map doesn't have."
+      subtitle="Hours, phone, email, address, postcode, social pages and the site's icon the map doesn't have."
     >
       <p className="text-sm text-muted">
         Reads the home page of each unclaimed gym that has a website and is missing something: its structured data first, then its phone,
-        email and social links. Only empty fields are filled, a claimed gym is never touched, and a gym is read at most once a month.
-        Directory and map sites are never read.
+        email and social links, and the site&apos;s icon, which shows as the gym&apos;s logo until an owner adds one. Only empty fields are
+        filled, a claimed gym is never touched, and a gym is read at most once a month. Directory and map sites are never read.
       </p>
       {admin && (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">

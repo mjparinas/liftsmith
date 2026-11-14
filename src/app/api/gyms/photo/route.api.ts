@@ -1,7 +1,8 @@
 // A gym's logo and photos (src/server/gymMedia.ts, docs/decisions/gyms.md). Server build only.
-// GET ?id=<id>: the JPEG, kept a year (an id is never reused; a new picture gets a new id).
+// GET ?id=<id>: the picture (an owner's JPEG or a website's icon), kept a year (an id is never reused; a new picture gets a new id).
 // POST {op: "add", place, kind: "logo" | "photo", image: data URL} or {op: "remove", place, id}: the gym's owner, signed in.
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
+import { imageType } from "@/server/gymEnrich";
 import { addMedia, MEDIA_BODY, mediaImage, removeMedia } from "@/server/gymMedia";
 
 export const dynamic = "force-dynamic";
@@ -9,9 +10,10 @@ export const OPTIONS = preflight;
 
 export async function GET(req: Request) {
   const image = await mediaImage(new URL(req.url).searchParams.get("id")).catch(() => null);
-  if (!image) return new Response("Not found", { status: 404 });
+  const type = image && imageType(image);
+  if (!image || !type) return new Response("Not found", { status: 404 });
   return new Response(new Uint8Array(image), {
-    headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable", "X-Content-Type-Options": "nosniff" },
+    headers: { "Content-Type": type, "Cache-Control": "public, max-age=31536000, immutable", "X-Content-Type-Options": "nosniff" },
   });
 }
 
