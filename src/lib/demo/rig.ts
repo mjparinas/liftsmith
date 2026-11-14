@@ -391,6 +391,8 @@ export interface Pose {
   /** How much the head stays upright (1) or follows the spine (0). */
   headBlend?: number;
   headBack?: number;
+  /** Tips the head toward the figure's right (+) or left (-): 0.05 is about 14 degrees (the dance's head snaps). */
+  headTilt?: number;
   /** Lifts the shoulder joints (shrugs). */
   shrug?: number;
   /** Barbell centre, when the lift uses one. */
@@ -446,7 +448,7 @@ export interface PoseOpts {
 export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
   const up = norm(sub(pose.sh, pose.hip));
   const blend = pose.headBlend ?? 0.45;
-  const headDir = norm(add(mul(up, 1 - blend * 0.5), mul([0, 1, 0], blend * 0.5)));
+  const headDir = norm(add(add(mul(up, 1 - blend * 0.5), mul([0, 1, 0], blend * 0.5)), V(0, 0, (pose.headTilt ?? 0) / 0.2)));
   const neck = add(pose.sh, mul(up, B.neck));
   const head = add(add(neck, mul(headDir, B.head[1] * 1.05)), V(pose.headBack ?? 0, 0));
   const J = { hipC: pose.hip, shC: pose.sh, neck, head, headDir, bar: pose.bar } as Joints;

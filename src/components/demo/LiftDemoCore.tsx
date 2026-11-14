@@ -73,7 +73,7 @@ export interface LiftDemoProps {
   onDone?: () => void;
   onClick?: () => void;
   /**
-   * The easter egg (on by default): five quick taps on the figure and it dances for ten seconds (lib/demo/dance.ts).
+   * The easter egg (on by default): five quick taps on the figure and it dances for sixteen seconds (lib/demo/dance.ts).
    * Off while it follows the lifter or replays reps, when still, and with reduced motion (the app's LiftDemo also
    * turns it off in Lean mode).
    */
