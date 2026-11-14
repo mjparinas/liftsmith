@@ -314,7 +314,7 @@ export const it: FeaturesText = {
     },
     share: {
       name: "Card e link da condividere",
-      body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima.",
+      body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima. Un nuovo record si illumina d’oro e si condivide subito dal recupero.",
     },
     coaching: {
       name: "Segui i clienti",

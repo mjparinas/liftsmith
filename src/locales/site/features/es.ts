@@ -316,7 +316,7 @@ export const es: FeaturesText = {
     },
     share: {
       name: "Tarjetas y enlaces para compartir",
-      body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa.",
+      body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa. Un nuevo récord brilla en dorado y se puede compartir desde el descanso al momento.",
     },
     coaching: {
       name: "Entrena a clientes",

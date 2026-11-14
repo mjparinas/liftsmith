@@ -591,7 +591,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "share",
         name: "Share cards and links",
-        body: "Share a workout, a new best or a milestone as an image, or as a public link with a preview.",
+        body: "Share a workout, a new best or a milestone as an image, or as a public link with a preview. A new best flashes gold and can be shared from the rest screen right away.",
         tier: "free",
         added: "2026-11-10",
       },

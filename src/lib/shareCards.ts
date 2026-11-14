@@ -3,9 +3,10 @@ import type { Pr, SessionSummary } from "./derive";
 import { exercise, EXERCISE_BY_ID } from "./exercises";
 import type { Game } from "./game";
 import { date, t } from "./i18n";
+import { epley } from "./progression";
 import type { CardData } from "./shareImage";
 import { SITE_URL } from "./site";
-import { MUSCLE_LABEL, type Muscle, type Unit } from "./types";
+import { MUSCLE_LABEL, type AppEvent, type Muscle, type SetEvent, type Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
 // What goes on each share card (Melvin, 2026-11-11: "opportunities to share workouts and/or milestones").
@@ -242,6 +243,18 @@ export function challengeShare(
       name: o.name,
     }),
   };
+}
+
+/** A set as a personal best, and the best before it on the same lift from the event log (for the rest screen's Share). */
+export function prOfSet(events: readonly AppEvent[], set: SetEvent): { pr: Pr; previous: Pr | null } {
+  const pr: Pr = { exerciseId: set.exerciseId, at: set.at, e1rm: epley(set.weight, set.reps), weight: set.weight, reps: set.reps };
+  let previous: Pr | null = null;
+  for (const e of events) {
+    if (e.type !== "set" || e.exerciseId !== set.exerciseId || e.id === set.id || e.at >= set.at || e.weight <= 0) continue;
+    const e1rm = epley(e.weight, e.reps);
+    if (!previous || e1rm > previous.e1rm) previous = { exerciseId: e.exerciseId, at: e.at, e1rm, weight: e.weight, reps: e.reps };
+  }
+  return { pr, previous };
 }
 
 /** The best before this one on the same lift (by estimated one-rep max), or null for a first best. */

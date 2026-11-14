@@ -7,8 +7,7 @@ export const BLOG_Z: Article[] = [
     slug: "small-touches-in-the-workout",
     kind: "blog",
     title: "Small touches that keep you in the workout",
-    description:
-      "A gentle buzz 10 seconds before rest ends, on your phone and your watch, so you're under the bar when the next set starts.",
+    description: "A gentle buzz 10 seconds before rest ends, and a gold flash with a card to share when you beat your best.",
     date: "2026-11-14",
     tag: "Training",
     cta: "plan",
@@ -32,6 +31,10 @@ export const BLOG_Z: Article[] = [
       { h2: "Turning it off" },
       {
         p: "It's on for everyone whose rest-over alert vibrates. To turn it off, open Settings › Workout and switch off Buzz 10 seconds before rest ends. Turning off vibration or the rest-over alert turns it off as well.",
+      },
+      { h2: "A gold flash for a new personal best" },
+      {
+        p: "When a set beats your best on a lift, the phone gives a celebratory buzz, a gold banner drops in and the edges of the screen glow gold for a moment. On the rest screen that follows, Share this PR opens a card with the lift, the weight and reps, your estimated max and how much it went up. Post it straight from your rest, or wait for the end of the workout, where the same card waits with the rest.",
       },
       {
         tip: "Rest a little longer on your heaviest sets. The heads-up makes it easy to take the full rest without staring at the clock.",
