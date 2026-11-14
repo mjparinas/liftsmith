@@ -6,13 +6,23 @@ import { CARDIO_FLOOR, hasOtherParts, LIFT_FLOOR, splitParts, splitSession, STRE
 
 describe("splitSession", () => {
   it("gives lifting the whole total when nothing else is on", () => {
-    expect(splitSession({ total: 45 })).toEqual({ total: 45, warm: 0, lift: 45, rehab: 0, cardio: 0, cool: 0, cardioCut: 0, over: 0 });
+    expect(splitSession({ total: 45 })).toEqual({
+      total: 45,
+      warm: 0,
+      lift: 45,
+      rehab: 0,
+      cardio: 0,
+      cool: 0,
+      cardioCut: 0,
+      over: 0,
+      noLift: false,
+    });
     expect(splitSession({ total: 10 }).lift).toBe(10);
   });
 
   it("takes each part's minutes out of lifting: 45 with everything on is 25 of lifting", () => {
     const s = splitSession({ total: 45, warm: 5, cardio: 10, cool: 5 });
-    expect(s).toEqual({ total: 45, warm: 5, lift: 25, rehab: 0, cardio: 10, cool: 5, cardioCut: 0, over: 0 });
+    expect(s).toEqual({ total: 45, warm: 5, lift: 25, rehab: 0, cardio: 10, cool: 5, cardioCut: 0, over: 0, noLift: false });
     expect(splitParts(s)).toEqual([
       { kind: "warm", minutes: 5 },
       { kind: "lift", minutes: 25 },
@@ -60,5 +70,29 @@ describe("splitSession", () => {
     expect(hasOtherParts(null)).toBe(false);
     expect(hasOtherParts(splitSession({ total: 45 }))).toBe(false);
     for (const k of ["warm", "rehab", "cardio", "cool"] as const) expect(hasOtherParts(splitSession({ total: 45, [k]: 5 }))).toBe(true);
+  });
+
+  it("gives the lifting's time to the cardio when lifting is off", () => {
+    const s = splitSession({ total: 45, lift: false, warm: 5, cardio: 10, cool: 5 });
+    expect(s).toEqual({ total: 45, warm: 5, lift: 0, rehab: 0, cardio: 35, cool: 5, cardioCut: 0, over: 0, noLift: true });
+    expect(splitParts(s).map((p) => p.kind)).toEqual(["warm", "cardio", "cool"]);
+  });
+
+  it("keeps the cardio's floor with lifting off, and runs over", () => {
+    expect(splitSession({ total: 15, lift: false, warm: 5, rehab: 10, cardio: 20, cool: 5 })).toMatchObject({
+      cardio: CARDIO_FLOOR,
+      total: 25,
+      over: 10,
+    });
+  });
+
+  it("is just its parts with lifting and cardio off", () => {
+    expect(splitSession({ total: 45, lift: false, rehab: 12, cool: 5 })).toMatchObject({
+      total: 17,
+      lift: 0,
+      cardio: 0,
+      over: 0,
+      noLift: true,
+    });
   });
 });

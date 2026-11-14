@@ -124,6 +124,8 @@ export interface LivePart {
 }
 
 export interface PartPicks {
+  /** False when lifting is off today (cardio, rehab and stretches only); on when missing. */
+  lift?: boolean;
   warm: boolean;
   cool: boolean;
   /** The rehab routine done beside the lifting, by id. */
@@ -139,7 +141,7 @@ export interface PartPicks {
 export function planParts(picks: PartPicks, rehab: boolean): LivePart[] {
   return [
     ...(picks.warm ? [{ kind: "warm" as const }] : []),
-    { kind: rehab ? ("rehab" as const) : ("lift" as const) },
+    ...(rehab || picks.lift !== false ? [{ kind: rehab ? ("rehab" as const) : ("lift" as const) }] : []),
     ...(picks.rehab && !rehab ? [{ kind: "rehab" as const, ref: picks.rehab }] : []),
     ...(picks.cardio ? [{ kind: "cardio" as const, ref: picks.cardio }] : []),
     ...(picks.cool ? [{ kind: "cool" as const }] : []),

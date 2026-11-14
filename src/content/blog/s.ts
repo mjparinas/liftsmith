@@ -216,6 +216,10 @@ export const BLOG_S: Article[] = [
       {
         p: "Under the slider, a thin bar split by colour shows each part: warm-up, lifting, rehab, cardio and cool-down, with the minutes written underneath, like Warm-up 5 min · Lifting 25 min · Cardio 10 min · Cool-down 5 min. It only appears when something besides lifting is on, and it moves as you slide.",
       },
+      { h2: "Cardio and stretching days" },
+      {
+        p: "Some days you only want cardio and a stretch. The Lifting row has its own switch: turn it off and the exercise list goes away, the cardio switches on if it wasn't already, and it takes the lifting's time. At 45 minutes with a warm-up and a cool-down, that's 35 minutes of cardio, set by the slider. Turn the lifting back on and everything goes back to how it was.",
+      },
       { h2: "Lifting keeps at least 15 minutes" },
       {
         p: "If the other parts would squeeze the lifting below 15 minutes, the cardio shrinks first, never below 5 minutes, and a short line under the bar says so. If that still isn't enough, the lifting keeps its 15 minutes and the line tells you the workout will run a little longer than the slider. You can always shorten the cardio yourself with its minute chips, and the lifting gets the time back.",

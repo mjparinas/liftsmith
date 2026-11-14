@@ -167,7 +167,7 @@ export const it: FeaturesText = {
     },
     "workout-length": {
       name: "La durata copre tutte le parti",
-      body: "Il cursore della durata su Oggi imposta l’intero allenamento. Riscaldamento, cardio, riabilitazione o defaticamento prendono i loro minuti dai pesi, e una barra sottile sotto il cursore mostra dove va il tempo. I pesi restano almeno 15 minuti: prima si accorcia il cardio, con una riga che spiega perché.",
+      body: "Il cursore della durata su Oggi imposta l’intero allenamento. Riscaldamento, cardio, riabilitazione o defaticamento prendono i loro minuti dai pesi, e una barra sottile sotto il cursore mostra dove va il tempo. I pesi restano almeno 15 minuti: prima si accorcia il cardio, con una riga che spiega perché. In un giorno di cardio e stretching, disattiva i pesi e il cardio prende il loro tempo.",
     },
     notes: {
       name: "Note del coach",

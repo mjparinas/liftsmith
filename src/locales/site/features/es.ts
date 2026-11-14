@@ -166,7 +166,7 @@ export const es: FeaturesText = {
     },
     "workout-length": {
       name: "La duración cubre todas las partes",
-      body: "El control de duración en Hoy fija el entrenamiento entero. Un calentamiento, cardio, rehabilitación o vuelta a la calma toma sus minutos de las pesas, y una barra fina bajo el control muestra adónde va el tiempo. Las pesas mantienen al menos 15 minutos: primero se acorta el cardio, con una línea que dice por qué.",
+      body: "El control de duración en Hoy fija el entrenamiento entero. Un calentamiento, cardio, rehabilitación o vuelta a la calma toma sus minutos de las pesas, y una barra fina bajo el control muestra adónde va el tiempo. Las pesas mantienen al menos 15 minutos: primero se acorta el cardio, con una línea que dice por qué. En un día de cardio y estiramientos, apaga las pesas y el cardio se queda con su tiempo.",
     },
     notes: {
       name: "Notas del entrenador",

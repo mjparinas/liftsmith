@@ -10,17 +10,18 @@ import { withoutBroken } from "../gymExtrasApi";
 import type { GymKit } from "../gymShare";
 import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
-import { extraOffer, rehabItems } from "../partExtras";
+import { rehabItems } from "../partExtras";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
 import { freeProgramFor, pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
-import { partDefaults, planFromRoutine } from "../routines";
+import { planFromRoutine } from "../routines";
 import { splitSession, STRETCH_PART_MIN, type SessionSplit } from "../sessionSplit";
 import type { State } from "../store";
 import { healthExternal } from "../twin";
 import type { FeelEvent, Gym, Profile } from "../types";
 import { relink, uid, type Ctx } from "./shared";
+import { partsOn } from "./workout";
 
 // The profile, gyms and Today's plan: settings, the push/easy call, superset links, plateau fixes and deloads.
 // One slice of the app's state (store.ts puts them together).
@@ -90,18 +91,17 @@ export function planSlice(c: Ctx): PlanSlice {
    * 5 each, the physio's rehab what its exercises take, and the cardio its minutes. The same picks Start uses.
    */
   const partSplit = (profile: Profile, g: Gym, events: State["events"], now: number): SessionSplit => {
+    const on = partsOn(get().partPicks, profile, undefined, {}, g, events, now);
+    const { offer } = on;
     const picks = get().partPicks;
-    const dflt = partDefaults(undefined, profile.training?.warmFirst);
-    const offer = extraOffer(profile, undefined, {}, g, events, now);
-    const rehabOn = !!offer.rehab && (picks.rehab ?? offer.rehab.due.due);
     const rehab =
-      rehabOn && offer.rehab ? Math.max(1, Math.round(planSeconds(rehabItems(offer.rehab.routine, g, events, profile, now)) / 60)) : 0;
-    const cardioOn = !!offer.cardio && (picks.cardio ?? offer.cardioOn);
-    const cardio = cardioOn && offer.cardio ? (picks.cardioMin ?? offer.cardio.minutes) : 0;
+      on.rehab && offer.rehab ? Math.max(1, Math.round(planSeconds(rehabItems(offer.rehab.routine, g, events, profile, now)) / 60)) : 0;
+    const cardio = on.cardio && offer.cardio ? (picks.cardioMin ?? offer.cardio.minutes) : 0;
     return splitSession({
       total: profile.minutes,
-      warm: (picks.warm ?? dflt.warm) ? STRETCH_PART_MIN : 0,
-      cool: (picks.cool ?? dflt.cool) ? STRETCH_PART_MIN : 0,
+      lift: on.lift,
+      warm: on.warm ? STRETCH_PART_MIN : 0,
+      cool: on.cool ? STRETCH_PART_MIN : 0,
       rehab,
       cardio,
     });
@@ -202,7 +202,8 @@ export function planSlice(c: Ctx): PlanSlice {
       // The slider is the whole workout (Melvin, 2026-11-14): the parts that are on take their minutes out of the
       // lifting, so the adaptive plan (and a split program's day) is sized to what's left. A routine runs as written.
       const split = routine ? null : partSplit(profile, g, events, now);
-      const sized = split ? { ...profile, minutes: split.lift } : profile;
+      // With lifting off the plan isn't run; it's kept at the full length for when lifting comes back on.
+      const sized = split && split.lift > 0 ? { ...profile, minutes: split.lift } : profile;
       const programDay =
         src?.kind === "program" ? programPlan({ src, gym: g, profile: sized, events, now, call, challenge: r.challenge }) : null;
       const fromProgram = programDay?.program?.fixed ? injuryPass(programDay, events, profile, g, now) : programDay;
