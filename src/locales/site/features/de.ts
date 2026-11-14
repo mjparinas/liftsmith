@@ -318,6 +318,11 @@ export const de: FeaturesText = {
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
     },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
+    "tagline-gym": {
+      name: "Motto und Stammstudio",
+      body: "Füge eine kurze Zeile unter deinem Namen hinzu und wähl dein Stammstudio aus der Studiosuche, damit deine Freunde wissen, wo du trainierst. Das sehen alle, die deine Workouts sehen, und es steht auf deiner öffentlichen Seite.",
+      note: "Das Stammstudio gibt es ab 18 Jahren.",
+    },
     safety: {
       name: "Blockieren, stummschalten und melden",
       body: "Blockiere oder schalte jeden stumm und melde einen Post, einen Kommentar oder ein Profil mit einem Tipp auf den Grund. Unser Team prüft jede Meldung und kann verwarnen, vorübergehend sperren oder ausschließen.",

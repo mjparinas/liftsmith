@@ -19,7 +19,7 @@ export const REASON_NAME: Record<string, string> = {
   sexual: "Sexual content",
   danger: "Dangerous advice",
   impersonation: "Pretending to be someone else",
-  name: "Offensive name or handle",
+  name: "Offensive name, handle or tagline",
   underage: "Under 13",
   cheating: "Fake lifts or cheating",
   other: "Something else",
@@ -45,6 +45,7 @@ const ACTION_NAME: Record<string, string> = {
   "mod.boardsOn": "Back on leaderboards",
   "mod.resetName": "Name reset",
   "mod.resetHandle": "Handle reset",
+  "mod.resetTagline": "Tagline cleared",
   "mod.dismiss": "Reports dismissed",
   "report.remove": "Removed (Reports tab)",
   "report.dismiss": "Dismissed (Reports tab)",
@@ -121,6 +122,7 @@ export function Moderation({
         {m.minor && <Badge tone="warn">Under 18</Badge>}
         {m.profile.public && <Badge tone="muted">Public profile</Badge>}
       </p>
+      {m.profile.tagline && <p className="mt-1 text-sm text-muted">Tagline: “{m.profile.tagline}”</p>}
       {m.minor && (
         <p className="mt-2 rounded-lg border border-warn/50 p-2 text-sm">
           Under 18: teen-safe defaults apply (no public profile, not suggested to strangers). Prefer a warning first, and if a report says
@@ -248,6 +250,11 @@ export function Moderation({
             <button type="button" className={btn} onClick={() => mod("resetHandle", "Handle replaced with a random one.")}>
               Reset handle
             </button>
+            {m.profile.tagline && (
+              <button type="button" className={btn} onClick={() => mod("resetTagline", "Tagline cleared.")}>
+                Clear tagline
+              </button>
+            )}
             {m.counts.open > 0 && (
               <button
                 type="button"

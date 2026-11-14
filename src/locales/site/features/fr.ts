@@ -319,6 +319,11 @@ export const fr: FeaturesText = {
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
     },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
+    "tagline-gym": {
+      name: "Devise et salle habituelle",
+      body: "Ajoutez une courte phrase sous votre nom et choisissez votre salle habituelle dans la recherche de salles, pour que vos amis sachent où vous vous entraînez. Elle s’affiche pour ceux qui voient vos entraînements, et sur votre page publique.",
+      note: "La salle habituelle est réservée aux 18 ans et plus.",
+    },
     safety: {
       name: "Bloquer, masquer et signaler",
       body: "Bloquez ou masquez qui vous voulez, et signalez une publication, un commentaire ou un profil en touchant un motif. Notre équipe vérifie chaque signalement et peut avertir, suspendre ou bannir.",

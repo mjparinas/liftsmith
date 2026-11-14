@@ -589,6 +589,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "tagline-gym",
+        name: "Tagline and home gym",
+        body: "Add a short line under your name and pick your home gym from the gym finder, so friends know where you train. It shows to the people who see your workouts, and on your public page.",
+        tier: "free",
+        note: "Home gym is for lifters 18 and over.",
+        added: "2026-11-14",
+      },
+      {
         id: "safety",
         name: "Block, mute and report",
         body: "Block or mute anyone, and report a post, comment or profile with one tap on a reason. Our team reviews every report and can warn, suspend or ban.",

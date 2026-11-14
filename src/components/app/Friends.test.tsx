@@ -8,10 +8,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAccount, type Account } from "@/lib/auth";
 import { noteOnline, useNet } from "@/lib/net";
 import { useSocial } from "@/lib/social";
+import { useApp } from "@/lib/store";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { query, resetDb } from "@/server/db";
+import { placesFromOsm, savePlaces } from "@/server/gymPlaces";
 import { handle } from "@/server/social";
 import { moderate } from "@/server/socialModeration";
+import { makeTestGym } from "@/test/factories";
 
 import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
 import { SendToFriend } from "./SendToFriend";
@@ -99,6 +102,44 @@ describe("Friends", () => {
     expect(r).toMatchObject({ reason: "other", note: "Copies my photos" });
   });
 
+  it("sets a tagline and a home gym from Friends settings, and a follower sees both", async () => {
+    const u = userEvent.setup();
+    await savePlaces(
+      placesFromOsm([{ type: "node", id: 1, lat: 49.1, lon: -122.6, tags: { leisure: "fitness_centre", name: "Iron Works" } }], {
+        city: "Langley",
+        region: "BC",
+        country: "CA",
+      }),
+    );
+    const place = String((await query("SELECT id FROM gym_places"))[0]!.id);
+    useApp.setState({
+      gyms: [
+        makeTestGym("commercial", "kg", { name: "Iron Works", placeId: place }),
+        makeTestGym("home", "kg", { id: "g2", name: "Garage" }),
+      ],
+    });
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true });
+    await handle("acc-b", { op: "follow", handle: "alex" });
+    signIn("tok-a");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Friends settings" }));
+    await u.type(screen.getByLabelText("Tagline"), "Early mornings");
+    expect(screen.getByText("A short line under your name. 46 characters left.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Save" }));
+    await screen.findByText("Saved.");
+    // Only gyms linked to a real gym can be picked; the garage can't.
+    expect(screen.queryByRole("button", { name: "Garage" })).toBeNull();
+    await u.click(screen.getByRole("button", { name: "Iron Works" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Iron Works" })).toHaveAttribute("aria-pressed", "true"));
+    cleanup();
+
+    signIn("tok-b");
+    render(<PersonScreen handle="alex" />);
+    expect(await screen.findByText("Early mornings")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Home gym: Iron Works, Langley" })).toBeInTheDocument();
+  });
+
   it("tells a warned lifter why, until Got it, and says nothing about a shadow ban", async () => {
     const u = userEvent.setup();
     await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
@@ -146,6 +187,8 @@ describe("Friends", () => {
         profile: {
           handle: "alex",
           name: "Alex",
+          tagline: "",
+          homeGym: null,
           open: true,
           autoPost: false,
           weights: true,

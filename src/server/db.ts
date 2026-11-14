@@ -1094,6 +1094,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
   // The switch for friends' check-ins (Check in on Today, 2026-11-14; on to start).
   ["social_profiles", "push_checkins", "INTEGER NOT NULL DEFAULT 1"],
+  // A tagline and a home gym (a gym_places id) on the profile (Melvin, 2026-11-14).
+  ["social_profiles", "tagline", "TEXT NOT NULL DEFAULT ''"],
+  ["social_profiles", "home_gym", "TEXT NOT NULL DEFAULT ''"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],

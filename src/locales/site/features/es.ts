@@ -314,6 +314,11 @@ export const es: FeaturesText = {
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
     },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
+    "tagline-gym": {
+      name: "Lema y gimnasio habitual",
+      body: "Añade una frase corta bajo tu nombre y elige tu gimnasio habitual en el buscador de gimnasios, para que tus amigos sepan dónde entrenas. Lo ve quien ve tus entrenamientos, y sale en tu página pública.",
+      note: "El gimnasio habitual es para mayores de 18 años.",
+    },
     safety: {
       name: "Bloquear, silenciar y denunciar",
       body: "Bloquea o silencia a quien quieras y denuncia una publicación, un comentario o un perfil con un toque en el motivo. Nuestro equipo revisa cada denuncia y puede avisar, suspender o expulsar.",

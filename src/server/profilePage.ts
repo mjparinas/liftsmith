@@ -250,6 +250,7 @@ export function profileHtml(p: PublicProfile | null, lang: MsgLang, unit: "kg" |
       alternateName: `@${p.handle}`,
       identifier: p.handle,
       url,
+      ...(p.tagline ? { description: p.tagline } : {}),
       interactionStatistic: [
         { "@type": "InteractionCounter", interactionType: "https://schema.org/FollowAction", userInteractionCount: p.followers },
         { "@type": "InteractionCounter", interactionType: "https://schema.org/WriteAction", userInteractionCount: p.posts },
@@ -269,6 +270,7 @@ export function profileHtml(p: PublicProfile | null, lang: MsgLang, unit: "kg" |
   const streak = p.streak > 0 ? `<li>${icon("flame", 16, "ember")}${esc(say(lang, "pub.streak"))}: ${n.format(p.streak)}</li>` : "";
   const profileCard = `<section class="card hero" aria-labelledby="name-h">${avatarHtml(p.name, p.avatar)}
 <p class="kicker">${esc(say(lang, "pub.kicker"))}</p><h1 id="name-h">${esc(p.name)}</h1><p class="muted handle">@${esc(p.handle)}</p>
+${p.tagline ? `<p class="tagline">${esc(p.tagline)}</p>` : ""}${homeGymHtml(p, lang)}
 <dl class="counts">${counts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${n.format(v)}</dd></div>`).join("")}</dl>
 ${level || streak ? `<ul class="chips">${level}${streak}</ul>` : ""}
 <a class="btn btn-ghost" href="${esc(follow)}">${icon("plus", 18)}${esc(say(lang, "pub.follow"))}</a></section>`;
@@ -286,6 +288,14 @@ ${level || streak ? `<ul class="chips">${level}${streak}</ul>` : ""}
   );
 }
 
+/** The home gym, linked to the gym's own page: "Home gym: Steve Nash Fitness World, Langley". */
+function homeGymHtml(p: PublicProfile, lang: MsgLang): string {
+  const g = p.homeGym;
+  if (!g) return "";
+  const where = g.city ? `${g.name}, ${g.city}` : g.name;
+  return `<p class="home-gym">${icon("pin", 16, "cyan")}<span class="muted">${esc(say(lang, "pub.homeGym"))}:</span> <a href="${esc(g.path)}">${esc(where)}</a></p>`;
+}
+
 const PROFILE_STYLE = `
 /* Layout */
 .layout{display:grid;gap:16px;padding-top:24px;padding-bottom:48px}
@@ -298,6 +308,8 @@ const PROFILE_STYLE = `
 background:color-mix(in srgb,var(--tint) 24%,var(--surface));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tint) 55%,transparent),0 10px 30px -10px color-mix(in srgb,var(--tint) 60%,transparent)}
 .avatar.letter{--tint:var(--accent);background:linear-gradient(135deg,rgb(91 156 255/.35),rgb(155 134 255/.35))}
 .hero h1{font-size:1.75rem;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin-top:6px;overflow-wrap:anywhere}.handle{margin-top:2px}
+.tagline{margin-top:10px;font-size:1rem;overflow-wrap:anywhere}
+.home-gym{margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;font-size:.875rem}.home-gym svg{flex:none}
 .counts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0 0}.counts div{background:var(--raised);border-radius:14px;padding:10px 4px}
 dt{font-size:.8125rem;color:var(--muted)}dd{margin:0;font-weight:800;font-size:1.375rem;font-variant-numeric:tabular-nums}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;list-style:none;padding:0;margin:14px 0 0}
