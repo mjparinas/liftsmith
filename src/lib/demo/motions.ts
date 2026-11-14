@@ -2978,21 +2978,88 @@ function backwards(m: Motion, label: string): Motion {
 }
 
 /** Battle ropes: a half squat with the hands making fast alternating waves. */
-function battleRopes(): Motion {
+type RopeStyle = "alternating" | "double" | "slam" | "circles" | "side";
+/**
+ * Battle ropes: an athletic half squat, a rope in each hand running to an anchor on the floor ahead,
+ * the hands circling so the ropes roll with travelling waves (`RopeProp`). Alternating waves move
+ * the hands out of step, double waves together, slams lift both hands high and drive them down with
+ * a dip of the hips, circles turn the hands outwards, and side slams swing both hands from side to
+ * side so the waves run sideways.
+ */
+function battleRopes(o: { style: RopeStyle }): Motion {
+  const st = o.style;
+  const r = st === "slam" ? 0.36 : st === "side" ? 0.3 : st === "circles" ? 0.16 : 0.13;
+  const stance = (B: Body) => {
+    const hip = V(-0.1, standY(B, 0.1, 0.86));
+    return { hip, sh: torsoAt(B, hip, 20) };
+  };
+  const centre = (B: Body, sgn: number): Vec => {
+    const { sh } = stance(B);
+    if (st === "side") return V(sh[0] + 0.26, sh[1] - 0.38, 0);
+    return V(sh[0] + 0.26, sh[1] - (st === "slam" ? 0.2 : 0.34), sgn * 0.2);
+  };
+  const label =
+    st === "alternating"
+      ? (["Right arm down", "Left arm down"] as const)
+      : st === "slam"
+        ? (["Arms up", "Slam"] as const)
+        : st === "side"
+          ? (["Slam to the right", "Slam to the left"] as const)
+          : st === "circles"
+            ? (["Circle out", "Circle out"] as const)
+            : (["Both arms up", "Both arms down"] as const);
+  const dur = st === "slam" || st === "side" ? 0.55 : 0.3;
   return {
     phases: [
-      [0.3, 0, 1, "Wave", 1],
-      [0.3, 1, 0, "Wave", 1],
+      [dur, 0, 0.5, label[0], 1],
+      [dur, 0.5, 1, label[1], 1],
     ],
     load: "none",
     stance: 0.2,
     pose(B, d) {
-      const hip = V(-0.1, standY(B, 0.1, 0.9));
-      const sh = torsoAt(B, hip, 22);
-      const at = (k: number, sgn: number): Vec => V(sh[0] + 0.3, sh[1] - 0.36 + 0.22 * (k - 0.5), sgn * 0.2);
-      return { hip, sh, hand: per(at(d, -1), at(1 - d, 1)), kneePole: V(1, 0, 0.4), elbowPole: V(-0.3, -1, 0.6), headBlend: 0.8 };
+      const { hip: hip0, sh: sh0 } = stance(B);
+      const phi = 2 * Math.PI * d;
+      // slams dip the hips as the hands come down
+      const dip = st === "slam" ? 0.08 * (1 - Math.sin(phi)) : st === "side" ? 0.04 * (1 - Math.cos(2 * phi)) : 0;
+      const hip = add(hip0, V(0, -dip));
+      const sh = add(sh0, V(0, -dip));
+      const handAt = (sgn: number, ph: number): Vec => {
+        const c = centre(B, sgn);
+        if (st === "side") return add(c, V(0.4 * r * Math.cos(ph), 0.12 * Math.cos(2 * ph), r * Math.sin(ph) + sgn * 0.08));
+        if (st === "circles") return add(c, V(0.4 * r * Math.cos(ph), r * Math.sin(ph), sgn * r * Math.cos(ph)));
+        return add(c, V(0.4 * r * Math.cos(ph), r * Math.sin(ph), 0));
+      };
+      const reachOf = (sgn: number, v: Vec) => within(V(sh[0], sh[1] - B.shDrop, sgn * B.shW), v, reach(B) * 0.97);
+      const hand = per(reachOf(-1, handAt(-1, st === "alternating" ? phi + Math.PI : phi)), reachOf(1, handAt(1, phi)));
+      return { hip, sh, hand, kneePole: V(1, 0, 0.4), elbowPole: V(-0.3, -1, 0.6), headBlend: 0.8 };
     },
-    props: () => [cable(V(2.6, 0.35, -0.2), "handL"), cable(V(2.6, 0.35, 0.2), "handR")],
+    props: (B) => [
+      {
+        kind: "rope",
+        from: "handL",
+        to: V(3.2, 0.25, -0.3),
+        centre: centre(B, -1),
+        radius: r,
+        waves: 1.6,
+        axis: st === "side" ? "z" : "y",
+      },
+      { kind: "rope", from: "handR", to: V(3.2, 0.25, 0.3), centre: centre(B, 1), radius: r, waves: 1.6, axis: st === "side" ? "z" : "y" },
+    ],
+  };
+}
+
+/** Battle rope jumping jacks: the jumping jack holding the ropes, the arms sweeping them up and down. */
+function ropeJack(): Motion {
+  const j = jumpingJack();
+  return {
+    ...j,
+    props: (B) => {
+      const c = (sgn: number) => V(0.1, standY(B) + B.torso * 0.6, sgn * 0.45);
+      return [
+        { kind: "rope", from: "handL", to: V(3.2, 0.25, -0.3), centre: c(-1), radius: 0.55, waves: 1.2 },
+        { kind: "rope", from: "handR", to: V(3.2, 0.25, 0.3), centre: c(1), radius: 0.55, waves: 1.2 },
+      ];
+    },
   };
 }
 
@@ -6142,7 +6209,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "stair-climber": () => run({ lift: 0.45, lean: 10 }),
   "jump-rope": () => hop({ dip: 0.06, air: 0.07, arms: "rope" }),
   "double-unders": () => hop({ dip: 0.1, air: 0.16, arms: "rope", turns: 2 }),
-  "battle-ropes": battleRopes,
+  "battle-ropes": () => battleRopes({ style: "alternating" }),
   "sled-push": sledPush,
   "sled-pull": () => sledPull({ kind: "pull" }),
   "shuttle-run": () => run({ lift: 0.6, lean: 14 }),
@@ -6555,7 +6622,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "hill-sprint": () => run({ lift: 0.75, lean: 15 }),
   "stair-run": () => run({ lift: 0.45, lean: 10 }),
   "sled-drag": () => sledPull({ kind: "drag" }),
-  "battle-rope-slam": battleRopes,
+  "battle-rope-slam": () => battleRopes({ style: "slam" }),
   "crab-walk": crabWalk,
   "lateral-bear-crawl": lateralBearCrawl,
   "backward-bear-crawl": backwardBearCrawl,
@@ -6829,11 +6896,11 @@ const MOTIONS: Record<string, () => Motion> = {
   "sled-sprint": sledPush,
   "jump-rope-crossover": () => hop({ dip: 0.08, air: 0.1, arms: "rope", cross: true, labels: ["Cross", "Open"] }),
   "jump-rope-boxer-skip": () => hop({ dip: 0.05, air: 0.04, arms: "rope", skip: true, labels: ["Skip", "Skip"] }),
-  "battle-rope-alternating-waves": battleRopes,
-  "battle-rope-double-waves": battleRopes,
-  "battle-rope-circles": battleRopes,
-  "battle-rope-side-slams": battleRopes,
-  "battle-rope-jumping-jack": jumpingJack,
+  "battle-rope-alternating-waves": () => battleRopes({ style: "alternating" }),
+  "battle-rope-double-waves": () => battleRopes({ style: "double" }),
+  "battle-rope-circles": () => battleRopes({ style: "circles" }),
+  "battle-rope-side-slams": () => battleRopes({ style: "side" }),
+  "battle-rope-jumping-jack": ropeJack,
   "squat-jump-180": () => hop({ dip: 0.6, air: 0.2, arms: "chest", turn: 180, labels: ["Jump and turn", "Jump and turn"] }),
   "lateral-hop": () => hop({ dip: 0.35, air: 0.15, arms: "swing", travel: { z: 0.45 }, labels: ["Hop right", "Hop left"] }),
   "single-leg-lateral-hop": () =>

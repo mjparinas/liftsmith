@@ -4,7 +4,7 @@ import { EXERCISES } from "../exercises";
 import { alternatives } from "../generator";
 import { jointsAt } from "./mesh";
 import { motionFor } from "./motions";
-import { BODIES } from "./rig";
+import { BODIES, ropePoints, type RopeProp } from "./rig";
 
 const B = BODIES.male;
 const props = (id: string) => motionFor(id).props?.(B) ?? [];
@@ -500,5 +500,33 @@ describe("moves that travel the way the name says", () => {
     const m = motionFor("walking-lunge");
     expect(m.yaw?.(0.45)).toBeCloseTo(90, 0);
     expect(m.yaw?.(0.7)).toBe(180);
+  });
+});
+
+describe("battle ropes", () => {
+  // Melvin, 2026-11-14: "the role is just a straight line … ropes moving like a real rope in a sine wave formation"
+  const ropes = (id: string) => props(id).filter((p): p is RopeProp => p.kind === "rope");
+  const heights = (id: string, d: number, side: 0 | 1) => ropePoints(ropes(id)[side]!, jointsAt(motionFor(id), B, d)).map((p) => p[1]);
+  it("gives every battle rope move two ropes that start in the hands and end at the anchor", () => {
+    const ids = EXERCISES.map((e) => e.id).filter((id) => id.startsWith("battle-rope"));
+    expect(ids.length).toBeGreaterThan(5);
+    for (const id of ids) {
+      expect(ropes(id), id).toHaveLength(2);
+      const J = jointsAt(motionFor(id), B, 0.3);
+      const pts = ropePoints(ropes(id)[1]!, J);
+      expect(Math.hypot(...pts[0]!.map((x, i) => x - J.handR[i]!)), id).toBeLessThan(0.01);
+      expect(Math.hypot(...pts.at(-1)!.map((x, i) => x - ropes(id)[1]!.to[i]!)), id).toBeLessThan(0.01);
+    }
+  });
+  it("rolls a wave down the rope, out of step on alternating waves and in step on double waves", () => {
+    const a = heights("battle-rope-double-waves", 0.1, 1),
+      b = heights("battle-rope-double-waves", 0.35, 1);
+    // the rope is curved, not straight, and the crest moves as the hands go round
+    expect(Math.max(...a.slice(5, 25)) - Math.min(...a.slice(5, 25))).toBeGreaterThan(0.1);
+    expect(Math.max(...a.slice(5, 25).map((y, i) => Math.abs(y - b[i + 5]!)))).toBeGreaterThan(0.1);
+    const same = (id: string) => heights(id, 0.2, 0).every((y, i) => Math.abs(y - heights(id, 0.2, 1)[i]!) < 0.01);
+    expect(same("battle-rope-double-waves")).toBe(true);
+    expect(same("battle-rope-alternating-waves")).toBe(false);
+    expect(ropes("battle-rope-side-slams")[0]!.axis).toBe("z");
   });
 });
