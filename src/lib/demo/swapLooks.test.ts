@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 286;
+  const LOOK_ALIKES = 282;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -132,5 +132,34 @@ describe("planks and crawls that move", () => {
     expect(down.elbowL[1]).toBeLessThan(0.12);
     expect(up.elbowL[1]).toBeGreaterThan(0.2);
     expect(at("high-plank", 0).elbowL[1]).toBeGreaterThan(0.2);
+  });
+});
+
+describe("walks that travel", () => {
+  // Melvin, 2026-11-14: the audit found band walks, shuffles and skaters playing cossack squats in place.
+  const span = (id: string, axis: 0 | 2) => {
+    const m = motionFor(id);
+    const v = Array.from({ length: 41 }, (_, i) => jointsAt(m, B, i / 40).hipC[axis]);
+    return Math.max(...v) - Math.min(...v);
+  };
+  it("moves sideways on side walks, shuffles, skaters and the sideways sled drag", () => {
+    for (const id of ["band-lateral-walk", "lateral-shuffle", "lateral-squat-walk", "sled-lateral-drag", "skater-jumps", "lateral-bound"])
+      expect(span(id, 2), id).toBeGreaterThan(0.3);
+  });
+  it("moves forward and back on the monster walk, squat walk and crab walk", () => {
+    for (const id of ["band-monster-walk", "duck-walk", "crab-walk"]) expect(span(id, 0), id).toBeGreaterThan(0.25);
+    // the crab walk faces up: hands behind the shoulders' line, feet in front
+    const J = jointsAt(motionFor("crab-walk"), B, 0);
+    expect(J.handL[0]).toBeLessThan(J.hipC[0] - 0.3);
+    expect(J.ankleL[0]).toBeGreaterThan(J.hipC[0] + 0.2);
+  });
+  it("lands skater jumps on one leg with the other swept behind", () => {
+    const J = jointsAt(motionFor("skater-jumps"), B, 1);
+    expect(J.ankleL[1]).toBeGreaterThan(J.ankleR[1] + 0.15);
+    expect(J.ankleL[0]).toBeLessThan(J.ankleR[0] - 0.2);
+  });
+  it("walks backwards on the backward treadmill walk and elliptical", () => {
+    expect(motionFor("backward-treadmill-walk").phases[0]![1]).toBe(1);
+    expect(motionFor("elliptical-backward").phases[0]![2]).toBe(0);
   });
 });
