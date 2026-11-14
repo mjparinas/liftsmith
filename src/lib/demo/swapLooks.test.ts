@@ -530,3 +530,97 @@ describe("battle ropes", () => {
     expect(ropes("battle-rope-side-slams")[0]!.axis).toBe("z");
   });
 });
+
+describe("incline and decline benches", () => {
+  // Melvin, 2026-11-14: "decline exercises don't look declined", and "Decline exercises still aren't declined"
+  const at = (id: string, d: number) => jointsAt(motionFor(id), B, d);
+  const tilt = (id: string, d = 0) => {
+    const j = at(id, d);
+    return deg(Math.atan2(j.shC[1] - j.hipC[1], j.hipC[0] - j.shC[0]));
+  };
+  const deg = (r: number) => (r * 180) / Math.PI;
+  it("puts the head below the hips on every decline move, knees hooked over a roller", () => {
+    for (const id of [
+      "decline-bench-press",
+      "db-decline-press",
+      "smith-decline-press",
+      "db-decline-fly",
+      "decline-sit-up",
+      "decline-crunch",
+    ]) {
+      expect(tilt(id), id).toBeLessThan(-10);
+      expect(at(id, 0).head[1], id).toBeGreaterThan(0.15);
+      expect(at(id, 0).kneeL[1], id).toBeGreaterThan(at(id, 0).hipC[1]);
+      expect(props(id).filter((p) => p.kind === "box").length, id).toBeGreaterThanOrEqual(3);
+    }
+    expect(tilt("decline-sit-up", 1)).toBeGreaterThan(50);
+  });
+  it("presses straight up over the shoulders on a decline", () => {
+    // Melvin, 2026-11-14: "The decline benches look messed up"
+    for (const id of ["decline-bench-press", "db-decline-press", "smith-decline-press"]) {
+      const j = at(id, 0);
+      expect(Math.abs(j.handR[0] - j.shR[0]), id).toBeLessThan(0.06);
+      expect(j.handR[1] - j.shR[1], id).toBeGreaterThan(0.4);
+    }
+  });
+  it("raises the shoulders on incline moves", () => {
+    for (const id of [
+      "incline-skull-crusher",
+      "db-incline-skull-crusher",
+      "db-incline-fly",
+      "incline-cable-fly",
+      "incline-bench-press",
+      "db-incline-press",
+    ])
+      expect(tilt(id), id).toBeGreaterThan(20);
+    expect(motionFor("db-incline-skull-crusher").load).toBe("dumbbell");
+    const up = (id: string) => at(id, 1).handR[1] - at(id, 0).handR[1];
+    expect(up("incline-machine-press")).toBeGreaterThan(0.15);
+    expect(at("incline-front-raise", 1).handR[1]).toBeGreaterThan(at("incline-front-raise", 1).head[1]);
+    const tread = props("incline-walk").find((p) => p.kind === "box");
+    expect(tread && "tilt" in tread ? tread.tilt : 0).toBeGreaterThan(5);
+  });
+  it("wraps the band around the upper back on banded presses", () => {
+    // Melvin, 2026-11-14: the band is supposed to go from one hand, across the back, to the other hand
+    for (const id of ["banded-push-up", "band-chest-press"])
+      expect(
+        cables(id).every((c) => c.kind === "cable" && c.from === "upperBack"),
+        id,
+      ).toBe(true);
+    expect(cables("band-pull-apart").some((c) => c.kind === "cable" && c.from === "upperBack")).toBe(false);
+  });
+});
+
+describe("wall walk", () => {
+  // Melvin, 2026-11-14: "Wall walks don't have the person walking, there is also no wall"
+  it("walks the feet up the wall one at a time and the hands in one at a time", () => {
+    const m = motionFor("wall-walk");
+    const wall = props("wall-walk").find((p) => p.kind === "box");
+    expect(wall).toBeDefined();
+    const j = jointsAt(m, B, 0.125 * 0.15);
+    expect(j.ankleL[1]).not.toBeCloseTo(j.ankleR[1], 2);
+    const k = jointsAt(m, B, 0.125 * 0.65);
+    expect(k.handL[1]).toBeGreaterThan(k.handR[1] + 0.02);
+  });
+  it("puts the balls of the feet on the wall, toes pointing down", () => {
+    // Melvin, 2026-11-14: "Feet are facing the wrong way on the wall walks"
+    const j = jointsAt(motionFor("wall-walk"), B, 0.9);
+    for (const s of ["L", "R"] as const) expect(j[`toe${s}`][1]).toBeLessThan(j[`ankle${s}`][1] - 0.1);
+  });
+});
+
+describe("single-leg hip thrust", () => {
+  // Melvin, 2026-11-14: the free leg looked backwards, the upper back should be higher on the bench, arms out flat on it
+  it("holds the free leg out in front, upper back on the bench and arms out along it", () => {
+    for (const id of ["single-leg-hip-thrust", "db-single-leg-hip-thrust"]) {
+      const j = jointsAt(motionFor(id), B, 0);
+      expect(j.ankleR[0], id).toBeGreaterThan(j.kneeR[0]);
+      expect(j.kneeR[0], id).toBeGreaterThan(j.hipC[0]);
+      expect(j.ankleR[1], id).toBeGreaterThan(0.1);
+      expect(j.shC[1], id).toBeGreaterThan(0.45);
+    }
+    const j = jointsAt(motionFor("single-leg-hip-thrust"), B, 0);
+    expect(Math.abs(j.handL[2])).toBeGreaterThan(0.5);
+    expect(Math.abs(j.handL[1] - j.shC[1])).toBeLessThan(0.08);
+  });
+});
