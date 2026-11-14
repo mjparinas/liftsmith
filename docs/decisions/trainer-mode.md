@@ -156,3 +156,13 @@ Melvin asked for "taking client payments, through Stripe Connect" in the same ro
 - **Ending**: unlinking ends the pair's monthly plan at once and forgets its price and history; deleting an account ends every plan it pays or is paid. Payments already made stay in the coach's Stripe account.
 - **Hidden until set up**: with `STRIPE_SECRET_KEY` and `STRIPE_CONNECT_WEBHOOK_SECRET` both set, payments show; until then nothing about them shows anywhere. Product names on Stripe's page are in English for now ("Training session with Sam").
 - Analytics: `feature` `trainer` with `payOnboard`, `payDashboard`, `price`, `unprice`, `payCheckout` and `payStop`.
+
+## Check in (Melvin, 2026-11-14)
+
+"The app already has messaging built in, can you make check in use the messaging system instead of using an external app. Under age kids shouldn't be able to use this. And check in should be in the pills at the top next to week 1 of 4 RIR."
+
+- **Through Liftsmith's messages.** Check in on Today sends "Hi Sam! I'm at the gym at Iron Den, training chest and triceps today." to the lifter's coach in the coach chat (`sendMessage`, the same as typing it in Coaching › Messages), so the coach gets the usual push and it sits in their thread. With more than one coach, chips pick who gets it (all picked to start); each coach gets their own greeting. It no longer opens the phone's share sheet, and the buddy names typed on the device are gone from the sheet. Sending records a `checkin` event with the coaches' names.
+- **Who sees it** (`canCheckIn` in `buddy.ts`): signed in, 18 or older by the profile's age (`isTeen`, so school team athletes and every other under 18 never see it, coach or not), and training with a coach (`useCoachNotes` `who.coaches`, the copy kept on the device). Lifters without a coach don't see the chip, because Friends has no direct messages to carry it; a check-in to friends would need friend messaging first.
+- **Where:** the top row of chips on Today, after the gym, program and "Week 1 of 4 · RIR 3" chips (`CheckInChip` in `Extras.tsx`), hidden during a workout and once the day's workout is done. "Same as last time" and Routines stay above the plan.
+- Shared web code, so Android, iOS and the web app get it together; the push to the coach is the coach chat's existing one on both phones.
+

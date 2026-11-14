@@ -35,7 +35,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { CoachBadge } from "./CoachHome";
-import { PlanExtras, TodayMoments } from "./Extras";
+import { CheckInChip, PlanExtras, TodayMoments } from "./Extras";
 import { loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
@@ -320,6 +320,8 @@ export function Today() {
             <Info term={preview.week.deload ? "deload" : profile.training?.effort === "rpe" ? "rpe" : "rir"} className="-ml-1.5 -mr-3.5" />
           </span>
         )}
+        {/* Check in sits with the gym and the week (Melvin, 2026-11-14): a message to the lifter's coach. */}
+        {!active && !resting && <CheckInChip />}
         {/* "Something hurts?" sits with How do you feel? in the readiness card when that's on screen; an injury
             being trained around stays up here, where it reads as today's status. */}
         {(hurt.length > 0 || !showCall) && (

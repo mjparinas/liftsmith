@@ -1,17 +1,17 @@
 "use client";
 
 import { inSentence, list, t } from "./i18n";
-import { isNative } from "./juice";
-import { SITE_URL } from "./site";
 
-// Gym buddy check-ins: one tap writes the check-in and opens the system share sheet with a short message,
-// so a friend hears about it in whatever app they already use. Accounts don't link lifters to each other,
-// so there's no in-app delivery; if friends are ever added, the same check-in event could drive a push
-// nudge on each buddy's phone (server side).
+// Check in (Melvin, 2026-11-14: "make check in use the messaging system instead of using an external app. under age
+// kids shouldnt be able to use this"): one tap on Today sends a short "I'm at the gym" to the lifter's coach as a
+// Liftsmith message (the coach chat, src/server/coach.ts sendMessage), which also reaches the coach's phone as a push.
+// It used to open the phone's share sheet for a list of buddy names typed on the device. Decision record:
+// docs/decisions/trainer-mode.md "Check in".
 
-export function checkinText(opts: { name?: string; gym?: string; focus?: string[]; buddies: string[] }): string {
-  const who = opts.buddies.length === 1 ? opts.buddies[0] : opts.buddies.length ? t("buddy.crew") : "";
-  const hi = who ? t("buddy.hi", { who }) : "";
+/** The check-in message: a greeting by first name, then where and what the lifter is training today. */
+export function checkinText(opts: { to?: string; gym?: string; focus?: string[] }): string {
+  const first = opts.to?.trim().split(/\s+/)[0] ?? "";
+  const hi = first ? t("buddy.hi", { who: first }) : "";
   const gym = opts.gym && opts.gym !== "My gym" ? opts.gym : "";
   const focus = opts.focus?.length ? list(opts.focus.map((f) => inSentence(f, true))) : "";
   const body =
@@ -25,27 +25,7 @@ export function checkinText(opts: { name?: string; gym?: string; focus?: string[
   return hi + body;
 }
 
-type Share = { share(o: { title?: string; text?: string; url?: string; dialogTitle?: string }): Promise<unknown> };
-
-/** Opens the share sheet (native plugin, Web Share, then the clipboard). Returns how it went. */
-export async function shareText(text: string): Promise<"shared" | "copied" | "cancelled" | "failed"> {
-  const url = `${SITE_URL}/`;
-  const p = (window as unknown as { Capacitor?: { Plugins?: { Share?: Share } } }).Capacitor?.Plugins?.Share;
-  try {
-    if (p && isNative()) {
-      await p.share({ text, url, dialogTitle: t("buddy.shareTitle") });
-      return "shared";
-    }
-    if (navigator.share) {
-      await navigator.share({ text, url });
-      return "shared";
-    }
-    await navigator.clipboard.writeText(`${text} ${url}`);
-    return "copied";
-  } catch (e) {
-    // Closing the share sheet isn't a failure.
-    if (e instanceof Error && e.name === "AbortError") return "cancelled";
-    if (e instanceof Error && /cancel/i.test(e.message)) return "cancelled";
-    return "failed";
-  }
+/** Whether Check in shows: signed in, 18 or older by the age on the profile, and training with a coach. */
+export function canCheckIn(opts: { signedIn: boolean; teen: boolean; coaches: number }): boolean {
+  return opts.signedIn && !opts.teen && opts.coaches > 0;
 }

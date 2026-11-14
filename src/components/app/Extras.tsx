@@ -1,26 +1,30 @@
 "use client";
 
 // Delightful extras on Today, Done and Progress: moments (anniversaries, comebacks, tonnage), seasonal
-// challenges, newly earned themes, "same as last time", the general warm-up, gym buddy check-ins, the
+// challenges, newly earned themes, "same as last time", the general warm-up, Check in with a coach, the
 // the strength score and the recap and photos entry. Kept here so the screens they sit on only
 // gain one line each.
 import { useMemo, useState } from "react";
 
-import { checkinText, shareText } from "@/lib/buddy";
+import { useAccount } from "@/lib/auth";
+import { canCheckIn, checkinText } from "@/lib/buddy";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
-import { date, t as tr } from "@/lib/i18n";
-import { haptic } from "@/lib/juice";
+import { date, list, t as tr } from "@/lib/i18n";
+import { haptic, oops } from "@/lib/juice";
 import { doneMoments, todayMoments, type Moment } from "@/lib/moments";
 import { suggestedPeriod } from "@/lib/recap";
 import { nextSeasonal, seasonalChallenges } from "@/lib/seasonal";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength, twins } from "@/lib/strength";
+import { isTeen } from "@/lib/teen";
 import { newlyUnlocked, unlockContext } from "@/lib/themes";
+import { sendMessage, trainerError, useCoachNotes } from "@/lib/trainer";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
+import { SECTION_LABEL } from "../titles";
 import { openStats } from "./BodyStats";
 import { Icon } from "./icons";
 import { go } from "./router";
@@ -146,7 +150,7 @@ export function TodayMoments() {
   );
 }
 
-/** "Same as last time", the general warm-up and gym buddy check-in, above the plan. */
+/** "Same as last time" and the routines chip, above the plan. */
 export function PlanExtras() {
   const { events, preview, profile, gyms, setPlan, replan, active, routineId } = useApp();
   const [routinesOpen, setRoutinesOpen] = useState(false);
@@ -155,7 +159,6 @@ export function PlanExtras() {
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const last = useMemo(() => lastWorkout(events), [events]);
   const [repeating, setRepeating] = useState(false);
-  const [buddyOpen, setBuddyOpen] = useState(false);
   if (active || !preview || !gym) return null;
   const toggleRepeat = () => {
     haptic("tick");
@@ -195,104 +198,118 @@ export function PlanExtras() {
         <Icon name="layers" size={15} />
         <span className="truncate">{routine ? routine.name : tr("x.routines")}</span>
       </button>
-      <button
-        type="button"
-        onClick={() => setBuddyOpen(true)}
-        className="press inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-muted"
-      >
-        <Icon name="chat" size={15} />
-        {tr("x.checkIn")}
-      </button>
       <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
-      <Sheet open={buddyOpen} onClose={() => setBuddyOpen(false)} title={tr("x.buddyTitle")}>
-        <BuddyCheckin
-          focus={[...new Set(preview.items.map((i) => i.focus))] as Muscle[]}
-          gymName={gym.name}
-          onDone={() => setBuddyOpen(false)}
-        />
-      </Sheet>
     </div>
   );
 }
 
-function BuddyCheckin({ focus, gymName, onDone }: { focus: Muscle[]; gymName: string; onDone: () => void }) {
-  const { profile, setProfile, checkin } = useApp();
-  const buddies = profile.delight?.buddies ?? [];
-  const [picked, setPicked] = useState<string[]>(buddies.map((b) => b.id));
-  const [name, setName] = useState("");
+/**
+ * Check in, in the top row of Today's chips (Melvin, 2026-11-14): sends "I'm at the gym" to the lifter's coach as a
+ * Liftsmith message. Only for adults who train with a coach (canCheckIn); nothing for anyone else.
+ */
+export function CheckInChip() {
+  const { profile, preview, gyms } = useApp();
+  const coaches = useCoachNotes((s) => s.who.coaches);
+  const signedIn = useAccount((s) => !!s.account);
+  const [open, setOpen] = useState(false);
+  if (!canCheckIn({ signedIn, teen: isTeen(profile), coaches: coaches.length })) return null;
+  const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
+  const focus = preview ? ([...new Set(preview.items.map((i) => i.focus))] as Muscle[]) : [];
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          haptic("tick");
+          setOpen(true);
+        }}
+        className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted"
+      >
+        <Icon name="chat" size={15} className="text-accent" />
+        {tr("x.checkIn")}
+      </button>
+      <Sheet open={open} onClose={() => setOpen(false)} title={tr("x.checkInTitle")}>
+        <CoachCheckIn coaches={coaches} focus={focus} gymName={gym?.name ?? ""} onDone={() => setOpen(false)} />
+      </Sheet>
+    </>
+  );
+}
+
+function CoachCheckIn({
+  coaches,
+  focus,
+  gymName,
+  onDone,
+}: {
+  coaches: readonly { id: string; name: string }[];
+  focus: Muscle[];
+  gymName: string;
+  onDone: () => void;
+}) {
+  const { checkin } = useApp();
+  const [picked, setPicked] = useState<string[]>(coaches.map((c) => c.id));
+  const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const add = () => {
-    const n = name.trim().slice(0, 30);
-    if (!n) return;
-    const b = { id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now()), name: n };
-    setProfile({ delight: { ...profile.delight, buddies: [...buddies, b] } });
-    setPicked([...picked, b.id]);
-    setName("");
-  };
-  const remove = (id: string) => setProfile({ delight: { ...profile.delight, buddies: buddies.filter((b) => b.id !== id) } });
-  const names = buddies.filter((b) => picked.includes(b.id)).map((b) => b.name);
-  const text = checkinText({ gym: gymName, focus: focus.slice(0, 3).map((m) => MUSCLE_LABEL[m]), buddies: names });
+  const focusLabels = focus.slice(0, 3).map((m) => MUSCLE_LABEL[m]);
+  const preview = checkinText({ to: coaches.length === 1 ? coaches[0]?.name : "", gym: gymName, focus: focusLabels });
+  const to = coaches.filter((c) => picked.includes(c.id));
   const send = async () => {
-    const r = await shareText(text);
-    if (r === "cancelled" || r === "failed") {
-      setNote(r === "failed" ? tr("x.shareFail") : null);
-      return;
+    if (!to.length || busy) return;
+    setBusy(true);
+    setNote(null);
+    const sent: string[] = [];
+    try {
+      for (const c of to) {
+        await sendMessage(c.id, checkinText({ to: c.name, gym: gymName, focus: focusLabels }));
+        sent.push(c.name || tr("trn.noName"));
+      }
+      checkin(sent);
+      haptic("success");
+      onDone();
+    } catch (e) {
+      oops();
+      setNote(sent.length ? `${tr("x.checkInSent", { names: list(sent) })} ${trainerError(e)}` : trainerError(e));
+      if (sent.length) checkin(sent);
+    } finally {
+      setBusy(false);
     }
-    checkin(names);
-    haptic("success");
-    if (r === "copied") setNote(tr("x.copied"));
-    else onDone();
   };
   return (
     <div>
-      <p className="text-sm text-muted">{tr("x.buddyIntro")}</p>
-      {buddies.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {buddies.map((b) => {
-            const on = picked.includes(b.id);
-            return (
-              <li key={b.id} className="flex items-center">
-                <button
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => setPicked(on ? picked.filter((x) => x !== b.id) : [...picked, b.id])}
-                  className={`press min-h-11 rounded-l-full border px-3.5 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
-                >
-                  {b.name}
-                </button>
-                <button
-                  type="button"
-                  aria-label={tr("x.removeBuddy", { name: b.name })}
-                  onClick={() => remove(b.id)}
-                  className="press min-h-11 rounded-r-full border border-l-0 border-line bg-surface px-2.5 text-faint"
-                >
-                  ✕
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+      <p className="text-sm text-muted">{tr("x.checkInIntro")}</p>
+      {coaches.length > 1 && (
+        <>
+          <p className={`mb-2 mt-4 px-1 ${SECTION_LABEL}`}>{tr("x.checkInTo")}</p>
+          <ul className="flex flex-wrap gap-2">
+            {coaches.map((c) => {
+              const on = picked.includes(c.id);
+              return (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => {
+                      haptic("select");
+                      setPicked(on ? picked.filter((x) => x !== c.id) : [...picked, c.id]);
+                    }}
+                    className={`press inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
+                  >
+                    {on && <Icon name="check" size={15} />}
+                    {c.name || tr("trn.noName")}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
-      <div className="mt-3 flex gap-2">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && add()}
-          placeholder={tr("x.addBuddy")}
-          aria-label={tr("x.buddyName")}
-          className="card min-w-0 flex-1 px-4 py-3"
-        />
-        <Button kind="ghost" onClick={add} disabled={!name.trim()}>
-          {tr("x.add")}
-        </Button>
-      </div>
-      <p className="mt-4 rounded-2xl bg-raised p-3 text-sm">{text}</p>
+      <p className="mt-4 whitespace-pre-line rounded-2xl bg-raised p-3 text-sm">{preview}</p>
       {note && (
-        <p className="mt-2 text-sm text-accent" role="status">
+        <p className="mt-2 text-sm text-bad" role="status">
           {note}
         </p>
       )}
-      <Button className="mt-4 w-full" onClick={() => void send()}>
+      <Button className="mt-4 w-full" onClick={() => void send()} disabled={!to.length || busy}>
         {tr("x.send")}
       </Button>
     </div>

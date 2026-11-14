@@ -1,16 +1,25 @@
 // @vitest-environment jsdom
 // The delightful extras in the real app: plate memory and ghost mode in a workout, "same as last time",
 // the rest timer extras, the recap and photos screens, buddy check-ins and earned themes.
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { useAccount } from "@/lib/auth";
 import { exercise } from "@/lib/exercises";
 import { useApp } from "@/lib/store";
+import { useCoachNotes } from "@/lib/trainer";
 
 import { App } from "./App";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
+
+/** Check-in messages "sent" to a coach: the chat's send, without a server. */
+const sent: { id: string; text: string }[] = [];
+vi.mock("@/lib/trainer", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/trainer")>()),
+  sendMessage: async (id: string, text: string) => (sent.push({ id, text }), { id: "m1", from: "me", text, at: 1 }),
+}));
 
 beforeEach(async () => {
   window.matchMedia ??= ((q: string) => ({
@@ -134,21 +143,34 @@ describe("Today and Progress extras", () => {
     expect(a.plan.items.at(-1)!.target.reps).toBe(1800);
   });
 
-  it("offers a buddy check-in that records the event", async () => {
+  it("checks in with the coach through Liftsmith's messages, and never for under 18s", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    await screen.findByRole("button", { name: "Check in" });
+    // No coach, no Check in: there's nobody in Liftsmith's messages to send it to.
+    expect(screen.queryByRole("button", { name: "Check in" })).not.toBeInTheDocument();
 
-    const writeText = vi.fn(async () => {});
-    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
-    await user.click(screen.getByRole("button", { name: "Check in" }));
-    const sheet = screen.getByRole("dialog", { name: "Tell your gym buddies" });
-    await user.type(within(sheet).getByLabelText("Buddy's name"), "Sam");
-    await user.click(within(sheet).getByRole("button", { name: "Add" }));
-    expect(useApp.getState().profile.delight?.buddies?.map((b) => b.name)).toEqual(["Sam"]);
-    await user.click(within(sheet).getByRole("button", { name: "Check in" }));
-    expect(writeText).toHaveBeenCalledWith(expect.stringMatching(/^Hey Sam! I'm at the gym/));
-    expect(useApp.getState().events.find((e) => e.type === "checkin")).toMatchObject({ buddies: ["Sam"] });
+    sent.length = 0;
+    try {
+      act(() => {
+        useAccount.setState({ account: { token: "t", id: "me", email: null, providers: [], via: "email" } });
+        useCoachNotes.setState({ who: { coaches: [{ id: "c1", name: "Sam Lee" }], clients: 0 } });
+      });
+      await user.click(await screen.findByRole("button", { name: "Check in" }));
+      const sheet = screen.getByRole("dialog", { name: "Check in with your coach" });
+      expect(sheet).toHaveTextContent(/Hi Sam! I'm at the gym/);
+      await user.click(within(sheet).getByRole("button", { name: "Check in" }));
+      await waitFor(() => expect(sent).toHaveLength(1));
+      expect(sent).toEqual([{ id: "c1", text: expect.stringMatching(/^Hi Sam! I'm at the gym/) as string }]);
+      expect(useApp.getState().events.find((e) => e.type === "checkin")).toMatchObject({ buddies: ["Sam Lee"] });
+
+      // A 16-year-old doesn't get it, coach or not (Melvin, 2026-11-14).
+      await act(async () => useApp.getState().setProfile({ birthYear: new Date().getFullYear() - 16 }));
+      expect(screen.queryByRole("button", { name: "Check in" })).not.toBeInTheDocument();
+    } finally {
+      vi.unstubAllGlobals();
+      useAccount.setState({ account: null });
+      useCoachNotes.setState({ who: { coaches: [], clients: 0 } });
+    }
   });
 
   it("shows the recap, body weight and themes", async () => {

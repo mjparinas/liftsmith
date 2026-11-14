@@ -315,7 +315,7 @@ export const es: FeaturesText = {
     },
     "coach-chat": {
       name: "Chat, avisos y datos corporales",
-      body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos.",
+      body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos. Los clientes mayores de 18 avisan con un toque desde Hoy al llegar al gimnasio.",
       note: "Las notificaciones son para Android y iPhone. La app web muestra los mensajes nuevos cuando está abierta.",
     },
     physio: {

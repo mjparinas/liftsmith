@@ -598,7 +598,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-chat",
         name: "Chat, alerts and body data",
-        body: "Message each client, get a notification when they train or go quiet for a week, and see their weigh-ins, measurements and a 3D figure shaped like them when they choose to share.",
+        body: "Message each client, get a notification when they train or go quiet for a week, and see their weigh-ins, measurements and a 3D figure shaped like them when they choose to share. Clients 18 and over can check in from Today with one tap when they get to the gym.",
         tier: "pro",
         pro: "coaching",
         note: "Notifications are on Android and iPhone. The web app shows new messages when it's open.",

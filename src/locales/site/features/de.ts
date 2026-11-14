@@ -319,7 +319,7 @@ export const de: FeaturesText = {
     },
     "coach-chat": {
       name: "Chat, Hinweise und Körperdaten",
-      body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
+      body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt. Kunden ab 18 checken mit einem Tipp unter Heute ein, wenn sie im Studio sind.",
       note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
     },
     physio: {

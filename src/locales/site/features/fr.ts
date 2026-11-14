@@ -320,7 +320,7 @@ export const fr: FeaturesText = {
     },
     "coach-chat": {
       name: "Messages, alertes et données corporelles",
-      body: "Écrivez à chaque client, recevez une notification quand il s'entraîne ou n'a pas fait de séance depuis une semaine, et voyez ses pesées, mensurations et une silhouette 3D à sa forme s'il choisit de les partager.",
+      body: "Écrivez à chaque client, recevez une notification quand il s'entraîne ou n'a pas fait de séance depuis une semaine, et voyez ses pesées, mensurations et une silhouette 3D à sa forme s'il choisit de les partager. Les clients de 18 ans et plus vous préviennent d'un geste depuis Aujourd'hui en arrivant à la salle.",
       note: "Les notifications sont sur Android et iPhone. L'app web affiche les nouveaux messages quand elle est ouverte.",
     },
     physio: {

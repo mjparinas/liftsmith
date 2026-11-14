@@ -4,7 +4,7 @@ import { boxPoint, plateQuiz } from "@/components/app/WorkoutExtras";
 import { makeSet } from "@/test/factories";
 
 import { ACHIEVEMENTS, achName, tierNames } from "./achievements";
-import { checkinText } from "./buddy";
+import { canCheckIn, checkinText } from "./buddy";
 import { defaultProfile, makeGym } from "./defaults";
 import { derive } from "./derive";
 import { generate } from "./generator";
@@ -215,8 +215,8 @@ describe("smart plate memory", () => {
   it("words check-ins, seasonal challenges and the strength band in Spanish", () => {
     setLanguage("es");
     try {
-      expect(checkinText({ gym: "Iron Den", focus: ["Pecho", "Tríceps"], buddies: ["Sam"] })).toBe(
-        "¡Hola, Sam! Estoy en el gimnasio, en Iron Den, hoy toca pecho y tríceps. Te toca 💪",
+      expect(checkinText({ gym: "Iron Den", focus: ["Pecho", "Tríceps"], to: "Sam" })).toBe(
+        "¡Hola, Sam! Estoy en el gimnasio, en Iron Den, hoy toca pecho y tríceps.",
       );
       expect(SEASONAL.find((d) => d.id === "halloween")!.name).toBe("Fuerza de miedo");
       expect(scoreBand(60)).toBe("Intermedio");
@@ -410,12 +410,18 @@ describe("rest extras", () => {
 });
 
 describe("buddies and photos", () => {
-  it("writes a friendly check-in", () => {
-    expect(checkinText({ gym: "Iron Den", focus: ["Chest", "Triceps"], buddies: ["Sam"] })).toBe(
-      "Hey Sam! I'm at the gym at Iron Den, training chest and triceps today. Your turn 💪",
+  it("writes a check-in for the coach", () => {
+    expect(checkinText({ gym: "Iron Den", focus: ["Chest", "Triceps"], to: "Sam Lee" })).toBe(
+      "Hi Sam! I'm at the gym at Iron Den, training chest and triceps today.",
     );
-    expect(checkinText({ gym: "My gym", buddies: [] })).toBe("I'm at the gym. Your turn 💪");
-    expect(checkinText({ buddies: ["A", "B"] })).toMatch(/^Hey crew!/);
+    expect(checkinText({ gym: "My gym" })).toBe("I'm at the gym.");
+    expect(checkinText({ focus: ["Legs"], to: " " })).toBe("I'm at the gym, training legs today.");
+  });
+  it("lets only signed-in adults with a coach check in", () => {
+    expect(canCheckIn({ signedIn: true, teen: false, coaches: 1 })).toBe(true);
+    expect(canCheckIn({ signedIn: true, teen: true, coaches: 1 })).toBe(false);
+    expect(canCheckIn({ signedIn: false, teen: false, coaches: 1 })).toBe(false);
+    expect(canCheckIn({ signedIn: true, teen: false, coaches: 0 })).toBe(false);
   });
   it("shrinks photos and pairs the first and latest of a pose", () => {
     expect(fitSize(4032, 3024)).toEqual({ w: 1440, h: 1080 });
