@@ -171,6 +171,13 @@ describe("Today and Progress extras", () => {
     expect(split.cardio + split.lift).toBe(split.total);
     expect(screen.getByTestId("split-cardio")).toHaveTextContent(`Cardio ${split.cardio} min`);
     expect(screen.getByTestId("split-lift")).toHaveTextContent(`Lifting ${split.lift} min`);
+    // Lifting can be switched off for a cardio-only day; the exercise list goes, and back on it returns.
+    const lift = within(screen.getByTestId("today-parts")).getByTestId("part-lift");
+    await user.click(within(lift).getByRole("switch", { name: /Lifting/ }));
+    expect(screen.queryByTestId("plan-list")).not.toBeInTheDocument();
+    expect(screen.getByTestId("split-why")).toHaveTextContent("No lifting today");
+    await user.click(within(lift).getByRole("switch", { name: /Lifting/ }));
+    expect(screen.getByTestId("plan-list")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Start workout" }));
     const a = useApp.getState().active!;
     expect(a.parts?.map((p) => p.kind)).toEqual(["lift", "cardio"]);

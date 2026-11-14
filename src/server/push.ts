@@ -154,7 +154,8 @@ async function send(
   vars: { text?: string; workout?: string; code?: string },
 ) {
   const pref = PUSH_PREF[kind];
-  const [who] = await query<{ name: string }>("SELECT name FROM social_profiles WHERE account_id = ?", [from]);
+  // Nothing goes out from a suspended or shadow-banned lifter (socialModeration.ts): a shadow ban would show otherwise.
+  const [who] = await query<{ name: string }>("SELECT name FROM social_profiles WHERE account_id = ? AND suspended = 0", [from]);
   const [prefs] = await query<Record<string, number>>(`SELECT ${pref} AS on_ FROM social_profiles WHERE account_id = ? AND suspended = 0`, [
     to,
   ]);

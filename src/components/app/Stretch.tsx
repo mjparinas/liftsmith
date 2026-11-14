@@ -677,8 +677,11 @@ const PART_HUE: Record<SplitPart, string> = {
  */
 export function SplitBar({ split }: { split: SessionSplit }) {
   const parts = splitParts(split);
-  const why =
-    split.over > 0
+  const why = split.noLift
+    ? split.over > 0 || split.cardio === 0
+      ? t("str.part.noLiftTotal", { total: split.total })
+      : t("str.part.noLift")
+    : split.over > 0
       ? t("str.part.over", { floor: LIFT_FLOOR, total: split.total })
       : split.cardioCut > 0
         ? t("str.part.cardioCut", { n: split.cardio, floor: LIFT_FLOOR })
@@ -746,12 +749,15 @@ export function TodayParts() {
     minutes: partPicks.cardioMin ?? offer.cardio.minutes,
   };
   const cardioOn = !!cardio && (partPicks.cardio ?? offer?.cardioOn ?? false);
+  // Lifting can be switched off when the plan follows the slider (Melvin, 2026-11-14: "some days i might want to
+  // only do cardio and stretch"); it stays on while there's no cardio or rehab to do instead.
+  const liftOn = !split || main !== "lift" || partPicks.lift !== false || (!rehabOn && !cardioOn);
   // When the plan follows the slider, each row shows what the split gave it (a cut cardio included).
   const minutesOf = (kind: SplitPart, own: number) => (split && split[kind] > 0 ? split[kind] : own);
-  const label = (icon: Parameters<typeof Icon>[0]["name"], hue: string, text: string, minutes: number) => (
+  const label = (icon: Parameters<typeof Icon>[0]["name"], hue: string, text: string, minutes: number | null) => (
     <span className="flex items-center gap-2 font-semibold">
       <Icon name={icon} size={16} className={hue} />
-      {text} <span className="num font-normal text-muted">· {t("str.part.minutes", { n: minutes })}</span>
+      {text} {minutes !== null && <span className="num font-normal text-muted">· {t("str.part.minutes", { n: minutes })}</span>}
     </span>
   );
   const row = (kind: "warm" | "cool", on: boolean) => (
@@ -777,6 +783,7 @@ export function TodayParts() {
   };
   const cardioWhy = () => {
     const name = exercise(cardio!.exerciseId).name;
+    if (cardioOn && !liftOn) return t("str.part.cardioWhyAlone", { name });
     if (routinePart(routine, "cardio")) return t("str.part.cardioWhyRoutine", { name });
     const before = events.some((e) => e.type === "set" && e.partId === "cardio");
     return t(before ? "str.part.cardioWhyLast" : "str.part.cardioWhyNew", { name });
@@ -784,11 +791,23 @@ export function TodayParts() {
   return (
     <section className="card mt-4 divide-y divide-line overflow-hidden" data-testid="today-parts" aria-label={t("str.part.title")}>
       {row("warm", warmOn)}
-      <div className="flex min-h-11 items-center gap-2 px-4 py-3">
-        <Icon name="dumbbell" size={16} className="text-accent" />
-        <span className="font-semibold">{partLabel(main)}</span>
-        <span className="num text-muted">· {t("str.part.minutes", { n: minutesOf("lift", preview.estMinutes) })}</span>
-      </div>
+      {split && main === "lift" && (offer?.cardio || offer?.rehab) ? (
+        <div data-testid="part-lift">
+          <InlineSwitch
+            label={label("dumbbell", "text-accent", partLabel("lift"), liftOn ? minutesOf("lift", preview.estMinutes) : null)}
+            hint={liftOn ? undefined : t("str.part.liftOff")}
+            on={liftOn}
+            onChange={(v) => pickPart("lift", v)}
+            className="px-4 py-3"
+          />
+        </div>
+      ) : (
+        <div className="flex min-h-11 items-center gap-2 px-4 py-3">
+          <Icon name="dumbbell" size={16} className="text-accent" />
+          <span className="font-semibold">{partLabel(main)}</span>
+          <span className="num text-muted">· {t("str.part.minutes", { n: minutesOf("lift", preview.estMinutes) })}</span>
+        </div>
+      )}
       {offer?.rehab && (
         <div data-testid="part-rehab">
           <InlineSwitch
@@ -810,7 +829,13 @@ export function TodayParts() {
             className="px-4 py-3"
           />
           {cardioOn && gym && (
-            <CardioPicker choices={cardioChoices(gym, events)} value={cardio} onPick={(c) => pickCardio(c)} className="px-4 pb-3" />
+            <CardioPicker
+              choices={cardioChoices(gym, events)}
+              value={cardio}
+              onPick={(c) => pickCardio(c)}
+              minutes={liftOn}
+              className="px-4 pb-3"
+            />
           )}
         </div>
       )}
@@ -824,11 +849,14 @@ export function CardioPicker({
   choices,
   value,
   onPick,
+  minutes = true,
   className = "",
 }: {
   choices: readonly string[];
   value: { exerciseId?: string; minutes?: number };
   onPick: (c: { exerciseId?: string; minutes?: number }) => void;
+  /** False when the slider sets the cardio's length (lifting off on Today), so there are no minute chips. */
+  minutes?: boolean;
   className?: string;
 }) {
   const ids = value.exerciseId && !choices.includes(value.exerciseId) ? [value.exerciseId, ...choices] : choices;
@@ -841,13 +869,15 @@ export function CardioPicker({
           </Chip>
         ))}
       </div>
-      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("str.part.cardioHowLong")}>
-        {CARDIO_MINUTES.map((m) => (
-          <Chip key={m} active={m === value.minutes} onClick={() => onPick({ minutes: m })}>
-            {t("str.part.cardioMin", { n: m })}
-          </Chip>
-        ))}
-      </div>
+      {minutes && (
+        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("str.part.cardioHowLong")}>
+          {CARDIO_MINUTES.map((m) => (
+            <Chip key={m} active={m === value.minutes} onClick={() => onPick({ minutes: m })}>
+              {t("str.part.cardioMin", { n: m })}
+            </Chip>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

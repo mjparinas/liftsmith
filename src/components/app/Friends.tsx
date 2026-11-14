@@ -14,7 +14,7 @@ import { challengeDays, challengeResult, markResultSeen, rematchHandles, unseenR
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { badgeForItem, COSMETICS, game, levelForItem } from "@/lib/game";
-import { list as fmtList, inSentence, t } from "@/lib/i18n";
+import { date as fmtDate, list as fmtList, inSentence, t } from "@/lib/i18n";
 import {
   acceptPending,
   boardNudge,
@@ -56,7 +56,8 @@ import {
   cleanHandle,
   CLUB_GOAL,
   HANDLE_RE,
-  REPORT_REASONS,
+  REASONS_FOR,
+  REPORT_NOTE_MAX,
   SOCIAL_LIMITS,
   type ActivityItem,
   type Audience,
@@ -71,6 +72,7 @@ import {
   type ClubSummary,
   type FeedPost,
   type Inviter,
+  type ModerationNotice,
   type Partner,
   type PersonCard,
   type PushPrefs,
@@ -493,6 +495,50 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
   );
 }
 
+/**
+ * What staff told the lifter (docs/decisions/moderation.md): a warning until Got it, or a suspension (with its end)
+ * or ban while it lasts, with the reason and how to say we got it wrong. A shadow ban never shows anything.
+ */
+export function NoticeCard({ notice }: { notice: ModerationNotice }) {
+  const [busy, setBusy] = useState(false);
+  const seen = async () => {
+    setBusy(true);
+    try {
+      const me = await social<SocialMe>("noticeSeen");
+      haptic("tick");
+      useSocial.setState({ me });
+    } catch (e) {
+      oops();
+      useSocial.setState({ error: socialError(e) });
+    }
+    setBusy(false);
+  };
+  const warn = notice.kind === "warn";
+  return (
+    <section
+      role={warn ? "status" : "alert"}
+      aria-labelledby="mod-notice"
+      className={`card mt-3 p-4 text-sm ${warn ? "border-warn/50" : "border-bad/50"}`}
+    >
+      <h2 id="mod-notice" className={`font-semibold ${warn ? "text-warn" : "text-bad"}`}>
+        {t(`friends.notice.${notice.kind}.title`)}
+      </h2>
+      <p className="mt-1">
+        {t(`friends.notice.${notice.kind}.body`, {
+          date: notice.until ? fmtDate(notice.until, { month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+        })}
+      </p>
+      {notice.reason && <p className="mt-1 text-muted">{t("friends.notice.reason", { reason: t(`friends.reason.${notice.reason}`) })}</p>}
+      <p className="mt-1 text-muted">{t("friends.notice.appeal")}</p>
+      {warn && (
+        <Button kind="ghost" className="mt-3" disabled={busy} onClick={() => void seen()}>
+          {t("friends.notice.gotIt")}
+        </Button>
+      )}
+    </section>
+  );
+}
+
 /** Report a post, comment or profile: one tap on a reason, then Send. */
 export function ReportSheet(props: { open: boolean; onClose: () => void; kind: ReportKind; id: string }) {
   // Mounted only while open, so every report starts fresh.
@@ -501,11 +547,12 @@ export function ReportSheet(props: { open: boolean; onClose: () => void; kind: R
 
 function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () => void; kind: ReportKind; id: string }) {
   const [reason, setReason] = useState<ReportReason | null>(null);
+  const [note, setNote] = useState("");
   const [done, setDone] = useState<string | null>(null);
   const send = async () => {
     if (!reason) return;
     try {
-      await social("report", { kind, id, reason });
+      await social("report", { kind, id, reason, note: reason === "other" ? note : "" });
       haptic("success");
       setDone(t("friends.report.thanks"));
       track("feature", { name: "social_report", detail: `${kind}:${reason}` });
@@ -526,14 +573,29 @@ function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () =>
       ) : (
         <>
           <p className="text-sm text-muted">{t("friends.report.why")}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {REPORT_REASONS.map((r) => (
+          <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("friends.report.why")}>
+            {REASONS_FOR[kind].map((r) => (
               <Chip key={r} active={reason === r} onClick={() => setReason(r)}>
                 {t(`friends.reason.${r}`)}
               </Chip>
             ))}
           </div>
-          <p className="mt-3 text-xs text-muted">{t("friends.report.hint")}</p>
+          {reason === "other" && (
+            <>
+              <label htmlFor="report-note" className="mt-3 block text-sm text-muted">
+                {t("friends.report.note")}
+              </label>
+              <textarea
+                id="report-note"
+                value={note}
+                maxLength={REPORT_NOTE_MAX}
+                rows={2}
+                onChange={(e) => setNote(e.target.value)}
+                className="card mt-1 w-full resize-none px-4 py-3"
+              />
+            </>
+          )}
+          <p className="mt-3 text-xs text-muted">{t(kind === "profile" ? "friends.report.hintProfile" : "friends.report.hint")}</p>
           <Button className="mt-4 w-full" disabled={!reason} onClick={() => void send()}>
             {t("friends.report.send")}
           </Button>
@@ -2427,7 +2489,11 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
   return (
     <div className="pb-8">
       {header}
-      {me.suspended && <p className="card mt-3 border-bad/40 p-3 text-sm text-bad">{t("friends.err.suspended")}</p>}
+      {me.notice ? (
+        <NoticeCard notice={me.notice} />
+      ) : (
+        me.suspended && <p className="card mt-3 border-bad/40 p-3 text-sm text-bad">{t("friends.err.suspended")}</p>
+      )}
       <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={t("friends.title")}>
         <Chip active={tab === "feed"} onClick={() => setTab("feed")}>
           {t("friends.tab.feed")}

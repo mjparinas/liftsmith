@@ -237,8 +237,45 @@ export interface ActivityItem {
 }
 
 export type ReportKind = "post" | "comment" | "profile";
-export const REPORT_REASONS = ["spam", "abuse", "hate", "sexual", "danger", "other"] as const;
+export const REPORT_REASONS = [
+  "spam",
+  "abuse",
+  "hate",
+  "sexual",
+  "danger",
+  "impersonation",
+  "name",
+  "underage",
+  "cheating",
+  "other",
+] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
+
+/**
+ * The fixed reasons offered for each kind of report (docs/decisions/moderation.md). A profile has its own list:
+ * pretending to be someone, an offensive name or handle, someone under 13 and fake lifts only make sense there
+ * (fake lifts on a post too). "Something else" is always last and is the one that asks for a note.
+ */
+export const REASONS_FOR: Record<ReportKind, readonly ReportReason[]> = {
+  post: ["spam", "abuse", "hate", "sexual", "danger", "cheating", "other"],
+  comment: ["spam", "abuse", "hate", "sexual", "danger", "other"],
+  profile: ["spam", "abuse", "hate", "impersonation", "name", "underage", "cheating", "other"],
+};
+/** A report's optional note (only staff read it). */
+export const REPORT_NOTE_MAX = 280;
+
+/**
+ * What the lifter is told after staff acted on their profile (moderation.md): a warning (until they say Got it), a
+ * suspension with its end, or a ban. A shadow ban is never told.
+ */
+export interface ModerationNotice {
+  kind: "warn" | "suspend" | "ban";
+  /** The report reason staff picked, or "" for none given. */
+  reason: ReportReason | "";
+  at: number;
+  /** When a suspension ends; null for a ban or a warning. */
+  until: number | null;
+}
 
 export const SOCIAL_LIMITS = {
   handleMin: 3,

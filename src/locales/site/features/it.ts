@@ -167,7 +167,7 @@ export const it: FeaturesText = {
     },
     "workout-length": {
       name: "La durata copre tutte le parti",
-      body: "Il cursore della durata su Oggi imposta l’intero allenamento. Riscaldamento, cardio, riabilitazione o defaticamento prendono i loro minuti dai pesi, e una barra sottile sotto il cursore mostra dove va il tempo. I pesi restano almeno 15 minuti: prima si accorcia il cardio, con una riga che spiega perché.",
+      body: "Il cursore della durata su Oggi imposta l’intero allenamento. Riscaldamento, cardio, riabilitazione o defaticamento prendono i loro minuti dai pesi, e una barra sottile sotto il cursore mostra dove va il tempo. I pesi restano almeno 15 minuti: prima si accorcia il cardio, con una riga che spiega perché. In un giorno di cardio e stretching, disattiva i pesi e il cardio prende il loro tempo.",
     },
     notes: {
       name: "Note del coach",
@@ -308,6 +308,10 @@ export const it: FeaturesText = {
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
+    safety: {
+      name: "Blocca, silenzia e segnala",
+      body: "Blocca o silenzia chiunque e segnala un post, un commento o un profilo con un tocco sul motivo. Il nostro team controlla ogni segnalazione e può avvisare, sospendere o bandire.",
+    },
     share: {
       name: "Card e link da condividere",
       body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima.",

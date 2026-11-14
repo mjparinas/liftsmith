@@ -173,7 +173,7 @@ export const de: FeaturesText = {
     },
     "workout-length": {
       name: "Die Trainingsdauer umfasst alle Teile",
-      body: "Der Dauer-Regler auf Heute legt das ganze Training fest. Aufwärmen, Cardio, Reha oder Cool-down nehmen ihre Minuten vom Krafttraining, und ein schmaler Balken unter dem Regler zeigt, wohin die Zeit geht. Krafttraining behält mindestens 15 Minuten: Zuerst wird das Cardio kürzer, mit einer Zeile, die sagt, warum.",
+      body: "Der Dauer-Regler auf Heute legt das ganze Training fest. Aufwärmen, Cardio, Reha oder Cool-down nehmen ihre Minuten vom Krafttraining, und ein schmaler Balken unter dem Regler zeigt, wohin die Zeit geht. Krafttraining behält mindestens 15 Minuten: Zuerst wird das Cardio kürzer, mit einer Zeile, die sagt, warum. An einem Tag mit Cardio und Dehnen schaltest du das Krafttraining aus, und Cardio bekommt seine Zeit.",
     },
     notes: {
       name: "Coach-Notizen",
@@ -314,6 +314,10 @@ export const de: FeaturesText = {
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
     },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
+    safety: {
+      name: "Blockieren, stummschalten und melden",
+      body: "Blockiere oder schalte jeden stumm und melde einen Post, einen Kommentar oder ein Profil mit einem Tipp auf den Grund. Unser Team prüft jede Meldung und kann verwarnen, vorübergehend sperren oder ausschließen.",
+    },
     share: {
       name: "Teilkarten und Links",
       body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau.",

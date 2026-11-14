@@ -262,7 +262,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "workout-length",
         name: "Workout length covers every part",
-        body: "The length slider on Today sets the whole workout. A warm-up, cardio, rehab or cool-down takes its minutes out of the lifting, and a thin bar under the slider shows where the time goes. Lifting keeps at least 15 minutes: the cardio shrinks first, with a line saying why.",
+        body: "The length slider on Today sets the whole workout. A warm-up, cardio, rehab or cool-down takes its minutes out of the lifting, and a thin bar under the slider shows where the time goes. Lifting keeps at least 15 minutes: the cardio shrinks first, with a line saying why. On a cardio and stretching day, switch lifting off and the cardio takes its time.",
         tier: "free",
         added: "2026-11-14",
       },
@@ -580,6 +580,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "An optional public page with your best lifts and workouts.",
         tier: "free",
         added: "2026-11-11",
+      },
+      {
+        id: "safety",
+        name: "Block, mute and report",
+        body: "Block or mute anyone, and report a post, comment or profile with one tap on a reason. Our team reviews every report and can warn, suspend or ban.",
+        tier: "free",
+        added: "2026-11-14",
       },
       {
         id: "share",

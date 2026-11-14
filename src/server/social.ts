@@ -17,7 +17,8 @@ import {
   cleanHandle,
   CLUB_GOAL,
   HANDLE_RE,
-  REPORT_REASONS,
+  REASONS_FOR,
+  REPORT_NOTE_MAX,
   RESULT_NOTE_DAYS,
   SOCIAL_LIMITS,
   type ActivityItem,
@@ -58,6 +59,7 @@ import { recordAccept } from "./earnedPro";
 import { MANAGES } from "./gymStaff";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
+import { emailBanned, liftIfOver, moderate, noticeOf } from "./socialModeration";
 import { isMinor } from "./teams";
 
 export type Result = { code: number; body: Record<string, unknown> };
@@ -133,7 +135,13 @@ interface ProfileRow extends Row {
   push_checkins: number;
   live: number;
   cheers: number;
+  /** 0 fine, 1 suspended or banned, 2 shadow banned (socialModeration.ts). */
   suspended: number;
+  suspended_until: number;
+  boards_off: number;
+  notice: string;
+  notice_reason: string;
+  notice_at: number;
   seen_at: number;
   avatar: string;
   audience: string;
@@ -236,8 +244,8 @@ function checkName(v: unknown, fallback: string): { ok: true; name: string } | {
  * The lifter's own state: their profile (null before joining), unread activity and waiting follow requests. The
  * profile and the counts are read side by side (the unread count reads `seen_at` itself), so this is one hop.
  */
-export async function me(accountId: string): Promise<Result> {
-  const [p, [counts]] = await Promise.all([
+export async function me(accountId: string, now = Date.now()): Promise<Result> {
+  const [row, [counts]] = await Promise.all([
     profileOf(accountId),
     query(
       `SELECT
@@ -249,10 +257,12 @@ export async function me(accountId: string): Promise<Result> {
       [accountId],
     ),
   ]);
-  if (!p) return ok({ profile: null });
+  if (!row) return ok({ profile: null });
+  const p = await liftIfOver(row, now);
   return ok({
     profile: toProfile(p),
-    suspended: !!n(p.suspended),
+    suspended: barred(p),
+    notice: noticeOf(p),
     followers: n(counts?.followers),
     following: n(counts?.following),
     requests: n(counts?.requests),
@@ -263,6 +273,8 @@ export async function me(accountId: string): Promise<Result> {
 export async function join(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   if (b.agree !== true) return fail(400, "agree");
   if (await profileOf(accountId)) return update(accountId, b);
+  // A ban follows the email, so deleting the account and signing up again doesn't undo it.
+  if (await emailBanned(accountId)) return fail(403, "suspended");
   const h = checkHandle(b.handle);
   if (!h.ok) return fail(400, h.error);
   const name = checkName(b.name, h.handle);
@@ -498,11 +510,16 @@ async function trainedDays(viewer: string, author: string, now: number): Promise
   return rows.map((r) => n(r.at));
 }
 
-async function joined(accountId: string): Promise<ProfileRow | Result> {
+async function joined(accountId: string, now = Date.now()): Promise<ProfileRow | Result> {
   const p = await profileOf(accountId);
   if (!p) return fail(403, "notJoined");
-  return p;
+  return liftIfOver(p, now);
 }
+/**
+ * Whether the lifter is stopped from posting, commenting and following: suspended or banned. A shadow-banned lifter
+ * (2) isn't: they carry on as usual and nobody else sees what they do.
+ */
+const barred = (p: { suspended: unknown }) => n(p.suspended) === 1;
 const isResult = (x: unknown): x is Result => !!x && typeof x === "object" && "code" in x && "body" in x;
 
 /** Exact handle only: there's no list of everyone to browse or scrape. */
@@ -654,7 +671,7 @@ export async function unsuggest(accountId: string, b: Record<string, unknown>, n
 export async function followOp(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const p = await byHandle(s(b.handle));
   const them = p ? s(p.account_id) : "";
   if (!p || them === accountId || n(p.suspended) || (await blockedEither(accountId, them))) return fail(404, "noOne");
@@ -813,8 +830,9 @@ export async function report(accountId: string, b: Record<string, unknown>, now 
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
   const kind = s(b.kind) as ReportKind;
-  const reason = REPORT_REASONS.find((r) => r === b.reason);
-  if (!REPORT_KINDS.has(kind) || !reason) return fail(400, "Bad request.");
+  if (!REPORT_KINDS.has(kind)) return fail(400, "Bad request.");
+  const reason = REASONS_FOR[kind].find((r) => r === b.reason);
+  if (!reason) return fail(400, "Bad request.");
   // Profiles are reported by handle and stored by account, so a new handle doesn't escape the report.
   let target = s(b.id);
   if (kind === "profile") {
@@ -829,7 +847,7 @@ export async function report(accountId: string, b: Record<string, unknown>, now 
   if (!(await limit(accountId, "report", now))) return fail(429, "slow");
   await run(
     `INSERT OR IGNORE INTO reports (reporter_id, kind, target_id, reason, note, created_at, status) VALUES (?, ?, ?, ?, ?, ?, 'open')`,
-    [accountId, kind, target, reason, tidy(b.note, 280), now],
+    [accountId, kind, target, reason, tidy(b.note, REPORT_NOTE_MAX), now],
   );
   if (kind !== "profile") {
     const [c] = await query("SELECT COUNT(DISTINCT reporter_id) AS n FROM reports WHERE kind = ? AND target_id = ? AND status = 'open'", [
@@ -931,7 +949,7 @@ function parseCaption(v: unknown): { text: string } | { error: string } {
 export async function post(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const p = parsePost(b, now);
   if ("error" in p) return fail(400, p.error);
   // The same workout posted twice (two taps, or two devices) is one post.
@@ -997,7 +1015,7 @@ export async function untag(accountId: string, b: Record<string, unknown>): Prom
 export async function editPost(accountId: string, b: Record<string, unknown>): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const [row] = await query("SELECT id, caption, audience FROM posts WHERE account_id = ? AND (id = ? OR workout_id = ?)", [
     accountId,
     s(b.id),
@@ -1139,14 +1157,14 @@ async function feedPage(accountId: string, before: unknown): Promise<{ posts: Fe
   const [cols, viewer] = POST_COLS(accountId);
   const rows = await query(
     `SELECT ${cols} FROM posts p JOIN social_profiles sp ON sp.account_id = p.account_id
-     WHERE p.hidden = 0 AND sp.suspended = 0 AND p.at < ?
+     WHERE p.hidden = 0 AND (sp.suspended = 0 OR (sp.suspended = 2 AND p.account_id = ?)) AND p.at < ?
        AND (p.account_id = ? OR p.account_id IN (SELECT followee_id FROM follows WHERE follower_id = ? AND accepted = 1))
        AND p.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)
        AND p.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?)
        AND p.account_id NOT IN (SELECT muted_id FROM mutes WHERE muter_id = ?)
        AND ${seesPost("?")}
      ORDER BY p.at DESC LIMIT ${PAGE}`,
-    [viewer!, cursor(before), accountId, accountId, accountId, accountId, accountId, accountId, accountId, accountId],
+    [viewer!, accountId, cursor(before), accountId, accountId, accountId, accountId, accountId, accountId, accountId, accountId],
   );
   const posts = await withPartners(
     accountId,
@@ -1211,8 +1229,8 @@ export async function personPosts(accountId: string, b: Record<string, unknown>)
 async function visiblePost(accountId: string, postId: string): Promise<{ author: string } | null> {
   const [r] = await query(
     `SELECT p.account_id AS author FROM posts p JOIN social_profiles sp ON sp.account_id = p.account_id
-     WHERE p.id = ? AND p.hidden = 0 AND sp.suspended = 0 AND ${seesPost("?")}`,
-    [postId, accountId, accountId, accountId],
+     WHERE p.id = ? AND p.hidden = 0 AND (sp.suspended = 0 OR (sp.suspended = 2 AND p.account_id = ?)) AND ${seesPost("?")}`,
+    [postId, accountId, accountId, accountId, accountId],
   );
   if (!r) return null;
   const author = s(r.author);
@@ -1235,11 +1253,11 @@ export async function thread(accountId: string, b: Record<string, unknown>): Pro
     `SELECT c.id AS id, c.account_id AS author, c.created_at AS at, c.body AS body, sp.handle AS handle, sp.name AS name,
        sp.avatar AS avatar, c.reply_to AS reply_to
      FROM post_comments c JOIN social_profiles sp ON sp.account_id = c.account_id
-     WHERE c.post_id = ? AND c.hidden = 0 AND sp.suspended = 0
+     WHERE c.post_id = ? AND c.hidden = 0 AND (sp.suspended = 0 OR (sp.suspended = 2 AND c.account_id = ?))
        AND c.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)
        AND c.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?)
      ORDER BY c.created_at LIMIT 300`,
-    [id, accountId, accountId],
+    [id, accountId, accountId, accountId],
   );
   const comments: FeedComment[] = rows.map((r) => ({
     id: s(r.id),
@@ -1291,7 +1309,7 @@ export function mentionsIn(text: string): string[] {
 export async function comment(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const id = s(b.id);
   const post = await visiblePost(accountId, id);
   if (!post) return fail(404, "gone");
@@ -1516,7 +1534,7 @@ async function trainingPeople(accountId: string, now: number): Promise<TrainingN
 export async function cheer(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const emoji = CHEERS.find((c) => c === b.emoji);
   const p = await byHandle(s(b.handle));
   if (!emoji || !p) return fail(404, "noOne");
@@ -1614,7 +1632,7 @@ const CODE_RE = /^r1~[A-Za-z0-9_-]{0,220}(~[A-Za-z0-9_-]{1,80}\.(10|[1-9])(\.s)?
 export async function send(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const code = s(b.code);
   if (!CODE_RE.test(code)) return fail(400, "code");
   // The name is read from the code itself, so what the friend sees when they open it went through the filter too.
@@ -1715,7 +1733,7 @@ export async function checkinDismiss(accountId: string, b: Record<string, unknow
 export async function invite(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const [live] = await query("SELECT code, expires_at FROM social_invites WHERE account_id = ? AND expires_at > ? AND uses < ?", [
     accountId,
     now,
@@ -1761,7 +1779,7 @@ export async function inviteInfo(accountId: string, b: Record<string, unknown>, 
 export async function acceptInvite(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const p = await inviter(accountId, s(b.code), now);
   if (!p) return fail(404, "invite");
   const them = s(p.account_id);
@@ -1788,6 +1806,13 @@ export async function acceptInvite(accountId: string, b: Record<string, unknown>
 // --- The friends leaderboard ---
 
 /**
+ * Who shows on a board seen by `viewer` (the friends board, a club's, a challenge's): anyone not suspended and not
+ * taken off boards by staff, and the viewer themselves unless suspended, so a lifter taken off boards (or shadow
+ * banned) still sees their own line and nothing looks different to them (moderation.md).
+ */
+const ON_BOARD = (viewer: string) => `((sp.suspended = 0 AND sp.boards_off = 0) OR (sp.account_id = ${viewer} AND sp.suspended != 1))`;
+
+/**
  * This week's board: the lifter and everyone they follow, with the workouts each has posted since `from` (the
  * week's start in the lifter's own time zone) that the lifter may see, and their sets, minutes and volume.
  * Built from posts only, so an unposted workout never shows, and each post's audience still holds.
@@ -1809,7 +1834,7 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
        COALESCE(SUM(json_extract(p.body, '$.prs')), 0) AS prs
      FROM social_profiles sp
      LEFT JOIN posts p ON p.account_id = sp.account_id AND p.hidden = 0 AND p.at >= ?2 AND p.at < ?3 AND ${seesPost("?1")}
-     WHERE sp.suspended = 0
+     WHERE ${ON_BOARD("?1")}
        AND (sp.account_id = ?1 OR sp.account_id IN (SELECT followee_id FROM follows WHERE follower_id = ?1 AND accepted = 1))
        AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)
        AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?1)
@@ -1850,7 +1875,7 @@ export const CHALLENGE_KEEP = 14 * day;
 export async function challengeCreate(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const name = checkText(b.name, SOCIAL_LIMITS.challengeName);
   if (!name.ok) return fail(400, `name.${name.error}`);
   if (!name.text) return fail(400, "Bad request.");
@@ -1905,7 +1930,7 @@ export async function challenges(accountId: string, _b: Record<string, unknown>,
          CASE WHEN cm.status = 'joined' THEN (SELECT ${SCORE[metric]} FROM posts p
            WHERE p.account_id = cm.account_id AND p.hidden = 0 AND p.audience != 'me' AND p.at >= ?2 AND p.at < ?3) ELSE 0 END AS value
        FROM challenge_members cm JOIN social_profiles sp ON sp.account_id = cm.account_id
-       WHERE cm.challenge_id = ?1 AND sp.suspended = 0
+       WHERE cm.challenge_id = ?1 AND ${ON_BOARD("?4")}
          AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?4)
          AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?4)`,
       [s(c.id), n(c.starts_at), n(c.ends_at), accountId],
@@ -1983,7 +2008,7 @@ async function clubCount(accountId: string): Promise<number> {
 export async function clubCreate(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const name = checkText(b.name, SOCIAL_LIMITS.clubName);
   if (!name.ok) return fail(400, `name.${name.error}`);
   if (!name.text) return fail(400, "Bad request.");
@@ -2006,7 +2031,7 @@ export async function clubCreate(accountId: string, b: Record<string, unknown>, 
 export async function gymClubStart(accountId: string, placeId: unknown, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   // The owner or one of the gym's staff (gymStaff.ts).
   const [p] = await query(`SELECT p.id, p.name FROM gym_places p WHERE p.id = ? AND p.claimed_by <> '' AND ${MANAGES}`, [
     s(placeId),
@@ -2076,7 +2101,7 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
        COALESCE(SUM(json_extract(p.body, '$.prs')), 0) AS prs
      FROM club_members cm JOIN social_profiles sp ON sp.account_id = cm.account_id
      LEFT JOIN posts p ON p.account_id = cm.account_id AND p.hidden = 0 AND p.audience != 'me' AND p.at >= ?3 AND p.at < ?4
-     WHERE cm.club_id = ?1 AND sp.suspended = 0
+     WHERE cm.club_id = ?1 AND ${ON_BOARD("?2")}
        AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?2)
        AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?2)
      GROUP BY sp.account_id LIMIT ${SOCIAL_LIMITS.gymClubMembers + 1}`,
@@ -2175,7 +2200,7 @@ export async function clubInfo(accountId: string, b: Record<string, unknown>, no
 export async function clubJoin(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  if (n(mine.suspended)) return fail(403, "suspended");
+  if (barred(mine)) return fail(403, "suspended");
   const c = await clubByCode(b.code);
   if (!c || (await blockedEither(accountId, s(c.owner_id)))) return fail(404, "club");
   const id = s(c.id);
@@ -2252,7 +2277,9 @@ export async function home(accountId: string, _b: Record<string, unknown>, now =
 }
 
 export const OPS: Record<string, Op> = {
-  me: (a) => me(a),
+  me: (a, _b, now) => me(a, now),
+  // "Got it" on a warning. A suspension or ban notice stays while it lasts.
+  noticeSeen: async (a) => (await run("UPDATE social_profiles SET notice = '' WHERE account_id = ? AND notice = 'warn'", [a]), me(a)),
   home,
   join,
   update: (a, b) => update(a, b),
@@ -2420,12 +2447,17 @@ export async function resolveReports(kind: ReportKind, targetId: string, action:
       return true;
     case "suspend":
     case "unsuspend":
+      // "Ban author" and "Unban" on the Reports tab, the same as on the Users tab (socialModeration.ts).
       if (!author) return false;
-      await batch([
-        { sql: "UPDATE social_profiles SET suspended = ? WHERE account_id = ?", args: [action === "suspend" ? 1 : 0, author] },
-        ...(action === "suspend" ? [close("suspended")] : []),
-      ]);
-      return true;
+      if (action === "unsuspend") return moderate(author, { action: "unban" });
+      {
+        const [top] = await query(
+          "SELECT reason FROM reports WHERE kind = ? AND target_id = ? AND status = 'open' GROUP BY reason ORDER BY COUNT(*) DESC LIMIT 1",
+          [kind, targetId],
+        );
+        await batch([close("suspended")]);
+        return moderate(author, { action: "ban", reason: s(top?.reason) });
+      }
     default:
       return false;
   }

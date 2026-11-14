@@ -1,52 +1,52 @@
 import type { Article } from "../articles";
 
-// Blog, part twenty-four: Check in at the gym (Melvin, 2026-11-14, docs/decisions/friends.md "Check in"). Only what
-// ships, and no other app named (seo.test.ts).
+// Blog, part twenty-four: reporting a profile and how the team reviews reports (Melvin, 2026-11-14,
+// docs/decisions/moderation.md). Only what ships, and no other app named (seo.test.ts).
 export const BLOG_X: Article[] = [
   {
-    slug: "check-in-at-the-gym",
+    slug: "keeping-friends-safe",
     kind: "blog",
-    title: "Check in at the gym and let your friends know",
+    title: "How we keep Friends safe",
     description:
-      "One tap on Today tells the friends you pick that you're at the gym. They get a notification and a note in the app until they close it.",
+      "Report a profile with one tap on a clear reason, and see what our team does with every report: warnings, suspensions and bans, explained.",
     date: "2026-11-14",
-    tag: "Training",
+    tag: "Workouts",
     cta: "plan",
     body: [
       {
-        p: "Training is easier when someone knows you showed up. Check in is a small button on Today, next to your gym and the week of your block. Tap it at the gym, pick the friends you want to tell, and they find out right away.",
+        p: "Friends is where you follow people, cheer them on and see their workouts. It only works if it feels like a good gym floor: friendly, focused and free of people who spoil it. Today we're making reporting clearer and explaining what happens after you report someone.",
       },
-      { h2: "What your friends see" },
+      { h2: "Report a profile in two taps" },
       {
-        p: "Each friend gets a notification on their phone, like Sam is at Iron Den, training chest and triceps today. Your turn. When they open Liftsmith, the same note waits at the top of the screen until they close it. Tap it to open your profile. It's written in their language, from your gym's name and the muscles in today's plan, so there's nothing to type.",
+        p: "Open someone's page, tap **…**, then **Report profile**. Pick one reason: spam or a scam, bullying or harassment, hate, pretending to be someone else, an offensive name or handle, someone under 13, fake lifts or cheating, or something else. If you pick **Something else**, you can add a short note for our team. Posts and comments have their own list, and fake lifts can be reported on a post too.",
+      },
+      {
+        p: "Reports are private. Nobody is told who reported them, and you can block or mute the person straight away from the same menu while we take a look.",
       },
       { cta: "plan" },
-      { h2: "Who it goes to" },
+      { h2: "What our team does" },
+      {
+        p: "A person on our team reads every report about a profile. Depending on what they find, they can:",
+      },
       {
         ul: [
-          "Only friends: people you follow who follow you back in the Friends tab.",
-          "Everyone is picked to start. Tap a name to leave someone out.",
-          "Blocking or muting someone stops their check-ins reaching you.",
-          "You can turn the notifications off in Friends with Friends checking in at the gym. The note still shows in the app.",
+          "**Warn** the lifter. They see a short note in Friends saying why, and that their profile may be suspended next time.",
+          "**Suspend** the profile for a day, three days, a week or a month. Nobody sees their profile, posts or comments until it ends, and they can't post, comment or follow.",
+          "**Ban** the profile from Friends. A ban follows their email address, so starting a new account doesn't get around it.",
+          "**Reset** an offensive name or handle, or take someone off leaderboards when their lifts don't add up.",
+          "**Dismiss** reports that turn out to be fine, so a post hidden by reports shows again.",
         ],
       },
-      { h2: "18 and over" },
       {
-        p: "Check in is for adults. Lifters under 18 don't see the button and don't get check-ins from anyone. Liftsmith goes by the age in your profile.",
+        p: "Anyone who is warned, suspended or banned is told why, and can tell us if they think we got it wrong through **Send feedback** in Settings.",
+      },
+      { h2: "Your training is never part of it" },
+      {
+        p: "Moderation only touches Friends. Even a banned lifter keeps every workout, setting and record they've logged, on Android, on iPhone and in the web app. We moderate the community, not your training.",
       },
       {
-        tip: "Check in before your warm-up. A friend who sees it on the way out the door is more likely to make it to the gym too.",
+        tip: "Teen athletes on school teams already get extra protection: their profiles can't be public and aren't suggested to strangers. Reports involving anyone under 18 are marked for our team so they get extra care.",
       },
-    ],
-    faq: [
-      [
-        "Can my friends reply?",
-        "Not yet. Check in sends one note and nothing more. There's no chat between friends in Liftsmith at the moment.",
-      ],
-      [
-        "Does it share my location?",
-        "No. It sends the name you gave your gym in Liftsmith, if you named it, and the muscles in today's plan. It never sends where you are.",
-      ],
     ],
   },
 ];

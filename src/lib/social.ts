@@ -22,6 +22,7 @@ import {
   SOCIAL_LIMITS,
   type Audience,
   type FeedPost,
+  type ModerationNotice,
   type PostBody,
   type PostExercise,
   type PostSet,
@@ -77,6 +78,8 @@ export function socialError(e: unknown): string {
 export interface SocialMe {
   profile: SocialProfile | null;
   suspended?: boolean;
+  /** A warning, suspension or ban staff want the lifter to know about (docs/decisions/moderation.md). */
+  notice?: ModerationNotice | null;
   followers?: number;
   following?: number;
   requests?: number;

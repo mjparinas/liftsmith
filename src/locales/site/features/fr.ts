@@ -174,7 +174,7 @@ export const fr: FeaturesText = {
     },
     "workout-length": {
       name: "La durée couvre toutes les parties",
-      body: "Le curseur de durée sur Aujourd’hui fixe toute la séance. Un échauffement, du cardio, de la rééducation ou un retour au calme prend ses minutes sur la musculation, et une fine barre sous le curseur montre où va le temps. La musculation garde au moins 15 minutes : le cardio raccourcit d’abord, avec une ligne qui dit pourquoi.",
+      body: "Le curseur de durée sur Aujourd’hui fixe toute la séance. Un échauffement, du cardio, de la rééducation ou un retour au calme prend ses minutes sur la musculation, et une fine barre sous le curseur montre où va le temps. La musculation garde au moins 15 minutes : le cardio raccourcit d’abord, avec une ligne qui dit pourquoi. Un jour de cardio et d’étirements, désactive la musculation et le cardio prend son temps.",
     },
     notes: {
       name: "Notes du coach",
@@ -315,6 +315,10 @@ export const fr: FeaturesText = {
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
     },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
+    safety: {
+      name: "Bloquer, masquer et signaler",
+      body: "Bloquez ou masquez qui vous voulez, et signalez une publication, un commentaire ou un profil en touchant un motif. Notre équipe vérifie chaque signalement et peut avertir, suspendre ou bannir.",
+    },
     share: {
       name: "Cartes et liens de partage",
       body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu.",
