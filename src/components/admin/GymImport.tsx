@@ -87,6 +87,19 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   const [recent, setRecent] = useState<ImportRow[] | null>(null);
   const [recentVersion, setRecentVersion] = useState(0);
   const stop = useRef(false);
+  const [countries, setCountries] = useState<{ code: string; name: string; cities: number }[]>([]);
+  const [country, setCountry] = useState("CA");
+  useEffect(() => {
+    let live = true;
+    fetch("/api/admin/gym-places/?countries=1")
+      .then(async (r) => (r.ok ? ((await r.json()) as { countries: typeof countries }) : { countries: [] }))
+      .then((j) => live && setCountries(j.countries))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
+  const allCities = countries.reduce((n, c) => n + c.cities, 0);
   const [stopping, setStopping] = useState(false);
   const running = !!run && !run.finished;
 
@@ -164,7 +177,7 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
     setRecentVersion((v) => v + 1);
   };
 
-  const importCountry = async (country: "CA" | "US") => {
+  const importCountry = async (country: string) => {
     const r = await fetch(`/api/admin/gym-places/?cities=${country}`);
     const { cities, last } = (await r.json().catch(() => ({ cities: [], last: {} }))) as { cities: string[]; last: Record<string, number> };
     const key = (c: string) =>
@@ -174,7 +187,8 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
         .replace(/\s+/g, " ")
         .replace(/\s*,\s*/g, ", ");
     const todo = skipRecent ? cities.filter((c) => !((last[key(c)] ?? 0) > Date.now() - RECENT_MS)) : cities;
-    await importMany(country === "CA" ? "Canada" : "the US", todo, cities.length - todo.length);
+    const label = country === "ALL" ? "every country" : (countries.find((c) => c.code === country)?.name ?? country);
+    await importMany(label, todo, cities.length - todo.length);
   };
 
   const failed = run?.done.filter((d) => !d.r.ok) ?? [];
@@ -235,21 +249,36 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
           <div className="mt-4 grid gap-2 text-sm">
             {!running && (
               <div className="flex flex-wrap items-center gap-2">
+                <label className="sr-only" htmlFor="gym-country">
+                  Country
+                </label>
+                <select
+                  id="gym-country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="rounded-lg border border-line bg-raised px-3 py-1.5"
+                >
+                  {countries.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name} ({c.cities} {c.cities === 1 ? "city" : "cities"})
+                    </option>
+                  ))}
+                </select>
                 <button
                   type="button"
-                  disabled={busy}
-                  onClick={() => void importCountry("CA")}
+                  disabled={busy || !countries.length}
+                  onClick={() => void importCountry(country)}
                   className="press rounded-lg border border-line px-3 py-1.5"
                 >
-                  Import Canada&apos;s major cities
+                  Import its major cities
                 </button>
                 <button
                   type="button"
-                  disabled={busy}
-                  onClick={() => void importCountry("US")}
+                  disabled={busy || !countries.length}
+                  onClick={() => void importCountry("ALL")}
                   className="press rounded-lg border border-line px-3 py-1.5"
                 >
-                  Import the US&apos;s major cities
+                  Import every country ({countries.length} countries, {allCities} cities)
                 </button>
                 <label className="flex items-center gap-2 text-muted">
                   <input type="checkbox" checked={skipRecent} onChange={(e) => setSkipRecent(e.target.checked)} />

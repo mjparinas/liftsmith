@@ -10,6 +10,13 @@ beforeEach(() => {
   posts.length = 0;
   vi.stubGlobal("fetch", async (url: string, init?: RequestInit) => {
     if (url.includes("?imports=1")) return Response.json({ imports: [] });
+    if (url.includes("?countries=1"))
+      return Response.json({
+        countries: [
+          { code: "CA", name: "Canada", cities: 3 },
+          { code: "JP", name: "Japan", cities: 1 },
+        ],
+      });
     if (url.includes("?cities=CA"))
       return Response.json({ cities: ["Langley, BC", "Surrey, BC", "Delta, BC"], last: { "delta, bc": Date.now() - 86_400_000 } });
     const body = JSON.parse(String(init?.body)) as { where: string; server: number };
@@ -45,7 +52,7 @@ describe("Admin › Gyms import", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const changed = vi.fn();
     render(<GymImport admin changed={changed} />);
-    await userEvent.click(screen.getByRole("button", { name: "Import Canada's major cities" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Import its major cities" }));
     await waitFor(() => expect(screen.getByText(/Done: Canada, 2 of 2 cities/)).toBeTruthy(), { timeout: 10_000 });
     expect(screen.getByText(/1 imported in the last 7 days skipped/)).toBeTruthy();
     expect(posts.map((p) => p.where).sort()).toEqual(["Langley, BC", "Surrey, BC"]);
