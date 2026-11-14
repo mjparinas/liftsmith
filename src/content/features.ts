@@ -260,6 +260,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "workout-length",
+        name: "Workout length covers every part",
+        body: "The length slider on Today sets the whole workout. A warm-up, cardio, rehab or cool-down takes its minutes out of the lifting, and a thin bar under the slider shows where the time goes. Lifting keeps at least 15 minutes: the cardio shrinks first, with a line saying why.",
+        tier: "free",
+        added: "2026-11-14",
+      },
+      {
         id: "now-playing",
         name: "Music controls",
         body: "Play, pause and skip your music from Today and during a workout, with the song and the app playing it. You can turn it off in Settings.",

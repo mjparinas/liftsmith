@@ -22,6 +22,7 @@ import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
 import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
+import { hasOtherParts } from "@/lib/sessionSplit";
 import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { useCoachNotes } from "@/lib/trainer";
@@ -46,7 +47,7 @@ import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CoolDownCard, TodayParts } from "./Stretch";
+import { CoolDownCard, SplitBar, TodayParts } from "./Stretch";
 import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
@@ -142,6 +143,7 @@ export function Today() {
     setCall,
     pickedByLocation,
     toggleSuperset,
+    split,
   } = useApp();
   const [lenKey, setLenKey] = useState(0);
   const desktop = useDesktop();
@@ -166,7 +168,10 @@ export function Today() {
   const hurt = useMemo(() => activeInjuries(events), [events]);
   const hello = greeting(new Date(now).getHours(), profile.name);
   const call = preview ? CALL_STYLE[preview.call] : null;
-  const fill = `${((profile.minutes - 15) / 75) * 100}%`;
+  // Where the thumb's centre sits: the browser keeps the 28 px thumb inside the track, so a value's spot is half a
+  // thumb in from each end (Melvin, 2026-11-14: 50 looked like 44 against a "45" placed at the middle).
+  const onTrack = (min: number) => `calc(14px + ${(min - 15) / 75} * (100% - 28px))`;
+  const fill = onTrack(profile.minutes);
   const fixed = !!preview?.program?.fixed;
   const tryAdaptive = useApp((st) => st.tryAdaptive);
   const setTryAdaptive = useApp((st) => st.setTryAdaptive);
@@ -485,11 +490,15 @@ export function Today() {
                 className="slider mt-4 w-full"
                 style={{ "--fill": fill } as CSSProperties}
               />
-              <div className="mt-1.5 flex justify-between text-xs text-faint num">
+              <div className="num relative mt-1.5 flex justify-between text-xs text-faint" data-testid="len-ticks">
                 <span>15</span>
-                <span>45</span>
+                <span className="absolute -translate-x-1/2" style={{ left: onTrack(45) }}>
+                  45
+                </span>
                 <span>90</span>
               </div>
+              {/* The slider is the whole workout: with other parts on, where its minutes go (sessionSplit.ts). */}
+              {hasOtherParts(split) && <SplitBar split={split} />}
               <FitAroundCalendar />
             </div>
           )}

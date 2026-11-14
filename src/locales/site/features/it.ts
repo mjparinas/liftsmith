@@ -165,6 +165,10 @@ export const it: FeaturesText = {
       name: "Allenamenti in parti",
       body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie. Le routine possono avere il proprio riscaldamento e defaticamento, anche nei link condivisi e da parte del tuo coach. Le note del coach leggono ogni parte: il dolore dopo la riabilitazione che cala o sale, e un battito che resta alto nel defaticamento. La riabilitazione del tuo fisioterapista può stare accanto ai pesi nello stesso allenamento nei giorni in cui tocca, e il cardio può seguire i pesi, con macchina e minuti scelti con un tocco.",
     },
+    "workout-length": {
+      name: "La durata copre tutte le parti",
+      body: "Il cursore della durata su Oggi imposta l’intero allenamento. Riscaldamento, cardio, riabilitazione o defaticamento prendono i loro minuti dai pesi, e una barra sottile sotto il cursore mostra dove va il tempo. I pesi restano almeno 15 minuti: prima si accorcia il cardio, con una riga che spiega perché.",
+    },
     notes: {
       name: "Note del coach",
       body: "Segnala fatica che si accumula, un esercizio fermo, un muscolo con poche serie, un obiettivo settimanale a rischio o massa grassa in aumento, ognuno con una cosa da fare, spesso con un solo tocco.",

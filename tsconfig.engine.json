@@ -41,6 +41,7 @@
     "src/lib/recovery.ts",
     "src/lib/reorder.ts",
     "src/lib/sessions.ts",
+    "src/lib/sessionSplit.ts",
     "src/lib/partMetrics.ts",
     "src/lib/partExtras.ts",
     "src/lib/replan.ts",

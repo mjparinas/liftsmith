@@ -194,4 +194,45 @@ export const BLOG_S: Article[] = [
       ["Do I need a physio to use cardio parts?", "No. Cardio is open to everyone, free."],
     ],
   },
+  {
+    slug: "workout-length-is-the-whole-workout",
+    kind: "blog",
+    title: "Workout length now means the whole workout",
+    description:
+      "Set 45 minutes and you get 45 minutes: the warm-up, cardio and cool-down now take their time out of the lifting, and a thin bar shows where it goes.",
+    date: "2026-11-14",
+    tag: "Workouts",
+    cta: "plan",
+    body: [
+      {
+        p: "The Workout length slider on Today used to size only the lifting. Set it to 25 minutes, turn on a warm-up, some cardio and a cool-down, and you were really in for about 45. That's not what anyone means by a 25-minute workout, so we changed it. The slider now sets the whole workout, from the first stretch to the last.",
+      },
+      { cta: "plan" },
+      { h2: "Parts take their minutes from the lifting" },
+      {
+        p: "Turn on a warm-up, cardio, your physio's rehab or a cool-down, and its minutes come out of the lifting. At 45 minutes with a 5-minute warm-up, 10 minutes of cardio and a 5-minute cool-down, the plan fills about 25 minutes with lifting. Turn the cardio off and the lifting gets those 10 minutes back. With nothing else on, the lifting gets the full length, as before.",
+      },
+      { h2: "A thin bar shows where the time goes" },
+      {
+        p: "Under the slider, a thin bar split by colour shows each part: warm-up, lifting, rehab, cardio and cool-down, with the minutes written underneath, like Warm-up 5 min · Lifting 25 min · Cardio 10 min · Cool-down 5 min. It only appears when something besides lifting is on, and it moves as you slide.",
+      },
+      { h2: "Lifting keeps at least 15 minutes" },
+      {
+        p: "If the other parts would squeeze the lifting below 15 minutes, the cardio shrinks first, never below 5 minutes, and a short line under the bar says so. If that still isn't enough, the lifting keeps its 15 minutes and the line tells you the workout will run a little longer than the slider. You can always shorten the cardio yourself with its minute chips, and the lifting gets the time back.",
+      },
+      {
+        tip: "Short on time today? Slide the length down first, then switch off the parts you can skip. The lifting is planned around what's left, so the most useful exercises stay in.",
+      },
+    ],
+    faq: [
+      [
+        "Does this change anything if I only lift?",
+        "No. With no warm-up, cardio, rehab or cool-down switched on, the lifting gets the whole length, as it always did.",
+      ],
+      [
+        "Do saved routines follow the slider?",
+        "No. A routine runs the exercises and sets you saved, so its length is what it is. The slider sizes the adaptive plan.",
+      ],
+    ],
+  },
 ];

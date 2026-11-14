@@ -372,6 +372,8 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
 
     pickPart(kind, on) {
       set({ partPicks: { ...get().partPicks, [kind]: on } });
+      // A part's minutes come out of the lifting (sessionSplit.ts), so the plan is sized again.
+      if (!get().active) get().replan();
     },
 
     pickCardio(change) {
@@ -383,6 +385,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           ...(change.minutes ? { cardioMin: change.minutes } : {}),
         },
       });
+      if (!get().active) get().replan();
     },
 
     toCoolDown() {
@@ -537,9 +540,11 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const { events, profile } = get();
       const offer = extraOffer(profile, routine, plan, g, events, now);
       const rehab = offer.rehab && (picks.rehab ?? offer.rehab.due.due) ? rehabItems(offer.rehab.routine, g, events, profile, now) : [];
+      // Today's split may have cut the cardio so lifting keeps its floor (sessionSplit.ts): that's what runs.
+      const split = given ? null : get().split;
       const cardioPick = offer.cardio && {
         exerciseId: picks.cardioId ?? offer.cardio.exerciseId,
-        minutes: picks.cardioMin ?? offer.cardio.minutes,
+        minutes: split?.cardio || (picks.cardioMin ?? offer.cardio.minutes),
       };
       const cardio = cardioPick && (picks.cardio ?? offer.cardioOn) ? cardioItem(cardioPick, g, events, profile, now) : null;
       if (rehab.length || cardio) plan = { ...plan, items: [...plan.items, ...rehab, ...(cardio ? [cardio] : [])] };
