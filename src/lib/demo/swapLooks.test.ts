@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 243;
+  const LOOK_ALIKES = 230;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -314,5 +314,68 @@ describe("hangs, one-leg squats and lifts", () => {
     }
     expect(at("med-ball-slam", 0).handR[1]).toBeGreaterThan(at("med-ball-slam", 0).head[1]);
     expect(at("med-ball-slam", 1).handR[1]).toBeLessThan(0.4);
+  });
+});
+
+describe("the rest of the audit", () => {
+  // Melvin, 2026-11-14 audit: these played a row, a carry, a calf raise, a donkey kick, a glute
+  // kickback, standing still, a mountain climber, a machine press, a dead bug, a burpee, a swing or
+  // a Pallof press.
+  const m = (id: string) => motionFor(id);
+  const at = (id: string, d: number) => jointsAt(m(id), B, d);
+  it("straightens the arm back on triceps kickbacks", () => {
+    for (const id of ["db-kickback", "band-kickback", "cable-triceps-kickback"]) {
+      expect(at(id, 1).handR[0], id).toBeLessThan(at(id, 1).elbowR[0] - 0.15);
+      expect(at(id, 0).handR[1], id).toBeLessThan(at(id, 0).elbowR[1] - 0.15);
+    }
+  });
+  it("pulls a sled on a strap, lifts the toes, and moves the leg out, across or up behind", () => {
+    for (const id of ["sled-drag", "sled-pull", "sled-row"])
+      expect(
+        m(id)
+          .props?.(B)
+          .some((p) => p.kind === "box"),
+        id,
+      ).toBe(true);
+    expect(m("tibialis-raise").pose(B, 1).foot).toBeLessThan(-20);
+    expect(at("fire-hydrant", 1).kneeR[2]).toBeGreaterThan(at("fire-hydrant", 0).kneeR[2] + 0.25);
+    expect(at("cable-hip-abduction", 1).ankleR[2]).toBeGreaterThan(0.45);
+    expect(at("cable-hip-adduction", 1).ankleR[2]).toBeLessThan(0);
+    expect(at("cable-standing-leg-curl", 1).ankleR[1]).toBeGreaterThan(at("cable-standing-leg-curl", 1).kneeR[1]);
+  });
+  it("bends sideways on side bends and lifts a knee to the side on the standing oblique crunch", () => {
+    for (const id of ["db-side-bend", "kb-side-bend"]) expect(at(id, 1).shC[2] - at(id, 1).hipC[2], id).toBeGreaterThan(0.15);
+    expect(at("cable-side-bend", 1).shC[2] - at("cable-side-bend", 0).shC[2]).toBeGreaterThan(0.25);
+    expect(at("standing-oblique-crunch", 1).kneeR[2]).toBeGreaterThan(0.3);
+  });
+  it("punches, tucks both knees, passes the ball and presses the dip handles down", () => {
+    expect(at("shadow-boxing", 0.25).handL[0]).toBeGreaterThan(at("shadow-boxing", 0).handL[0] + 0.3);
+    expect(at("shadow-boxing", 0.75).handR[0]).toBeGreaterThan(at("shadow-boxing", 0.5).handR[0] + 0.3);
+    for (const id of ["ring-knee-tuck", "slider-knee-tuck"]) {
+      const tuck = at(id, 1);
+      expect(Math.abs(tuck.ankleL[0] - tuck.ankleR[0]), id).toBeLessThan(0.02);
+      expect(tuck.ankleL[0], id).toBeGreaterThan(at(id, 0).ankleL[0] + 0.4);
+    }
+    expect(at("med-ball-chest-pass", 1).handR[0]).toBeGreaterThan(at("med-ball-chest-pass", 0).handR[0] + 0.3);
+    expect(at("seated-dip-machine", 1).handR[1]).toBeLessThan(at("seated-dip-machine", 0).handR[1] - 0.3);
+  });
+  it("slides a heel out, snatches the dumbbells overhead, figure-eights the bell and holds the Pallof press out", () => {
+    expect(at("heel-slide", 0.25).ankleL[0]).toBeGreaterThan(at("heel-slide", 0).ankleL[0] + 0.25);
+    expect(at("db-devil-press", 3 / 8).hipC[1]).toBeLessThan(0.5);
+    expect(at("db-devil-press", 7 / 8).handR[1]).toBeGreaterThan(at("db-devil-press", 7 / 8).head[1]);
+    expect(at("kb-figure-eight", 0.25).handR[2]).toBeGreaterThan(0.15);
+    expect(at("kb-figure-eight", 0.75).handR[2]).toBeLessThan(-0.05);
+    for (const id of ["pallof-squat", "pallof-reverse-lunge"]) {
+      expect(at(id, 1).hipC[1], id).toBeLessThan(at(id, 0).hipC[1] - 0.2);
+      expect(at(id, 1).handR[0] - at(id, 1).shC[0], id).toBeGreaterThan(0.4);
+    }
+  });
+  it("curls then presses, and leans back from the rings into a curl, a face pull, a Y and a reverse fly", () => {
+    const top = at("hammer-curl-to-press", 1);
+    expect(top.handR[1]).toBeGreaterThan(top.head[1]);
+    expect(at("ring-biceps-curl", 1).handR[1]).toBeGreaterThan(at("ring-biceps-curl", 1).shR[1]);
+    expect(at("ring-y-raise", 1).handR[2]).toBeGreaterThan(0.45);
+    expect(at("ring-reverse-fly", 1).handR[2]).toBeGreaterThan(0.6);
+    expect(at("ring-face-pull", 1).elbowR[2]).toBeGreaterThan(0.3);
   });
 });
