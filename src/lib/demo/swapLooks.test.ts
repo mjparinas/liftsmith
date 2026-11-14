@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 274;
+  const LOOK_ALIKES = 272;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -191,5 +191,35 @@ describe("floor positions", () => {
     expect(at("knee-plank").kneeL[1]).toBeLessThan(0.12);
     for (const id of ["ring-plank", "planche-lean", "plank-pull-through"]) expect(at(id).elbowL[1], id).toBeGreaterThan(0.2);
     expect(at("plank-to-pike", 1).hipC[1]).toBeGreaterThan(at("plank-to-pike", 0).hipC[1] + 0.3);
+  });
+});
+
+describe("push-up variations", () => {
+  // Melvin, 2026-11-14 audit: these all played the plain push-up.
+  const at = (id: string, d: number) => jointsAt(motionFor(id), B, d);
+  it("claps in the air, brings a knee to the elbow, shifts to one hand and slides across", () => {
+    const air = at("clap-push-up", -0.3);
+    expect(air.handL[1]).toBeGreaterThan(0.2);
+    expect(air.handR[2] - air.handL[2]).toBeLessThan(0.15);
+    const knee = at("spiderman-push-up", 0.5);
+    expect(knee.kneeL[2]).toBeLessThan(-0.3);
+    expect(knee.kneeL[0]).toBeGreaterThan(at("spiderman-push-up", 0).kneeL[0] + 0.2);
+    expect(Math.abs(at("archer-push-up", 0.5).shC[2])).toBeGreaterThan(0.15);
+    expect(Math.abs(at("typewriter-push-up", 0.375).shC[2])).toBeGreaterThan(0.15);
+  });
+  it("keeps one hand off the floor on the one-arm push-up and lifts both on hand-release push-ups", () => {
+    expect(at("one-arm-push-up", 0).handL[1]).toBeGreaterThan(0.3);
+    const off = at("hand-release-push-up", 1.4);
+    expect(Math.min(off.handL[1], off.handR[1])).toBeGreaterThan(0.08);
+    const tap = at("shoulder-tap-push-up", -0.5);
+    expect(tap.handL[1]).toBeGreaterThan(0.2);
+  });
+  it("opens the arms on ring flys and bends the elbows overhead on bodyweight skull crushers", () => {
+    const fly = at("ring-fly", 1);
+    expect(fly.handR[2] - fly.handL[2]).toBeGreaterThan(1);
+    const top = at("bodyweight-skull-crusher", 0),
+      bottom = at("bodyweight-skull-crusher", 1);
+    expect(bottom.head[1]).toBeLessThan(top.head[1] - 0.1);
+    expect(top.handR[1]).toBeGreaterThan(0.6);
   });
 });
