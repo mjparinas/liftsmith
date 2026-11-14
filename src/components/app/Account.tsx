@@ -288,7 +288,8 @@ function SignedOut() {
           {error}
         </p>
       )}
-      <p className="pt-1 text-xs text-faint">
+      <p className="pt-1 text-xs text-faint">{t("account.emailNote")}</p>
+      <p className="text-xs text-faint">
         {t("account.agree")}{" "}
         <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
           {t("account.terms")}

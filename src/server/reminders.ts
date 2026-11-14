@@ -4,26 +4,36 @@
 //
 // What the server keeps per subscription: the email address, which kinds of email are on, when the
 // lifter agreed, and the planner's numbers (training days and time, time zone, last and first workout
-// times, days trained this week, streak, Pro state). No workouts, weights or health data. Tokens are
+// times, days trained this week, streak, Pro state, the week's and month's totals, the newest best and the waiting workout's name). No
+// set-by-set workouts, body weight or health data. Tokens are
 // stored hashed. The subscription has its own table with a nullable account id, so accounts can claim
 // it later.
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 import {
+  addDays,
+  atTime,
   dateKey,
+  dayStart,
+  DEFAULT_ON,
   EMAIL_KINDS,
   KIND_INFO,
+  listOf,
   milestone,
+  parts,
   plan,
+  record,
   validTz,
   type Message,
   type MessageKind,
   type PlanInput,
   type ProState,
+  type Totals,
 } from "@/lib/messages";
-import { isMsgLang } from "@/lib/messageText";
+import { isMsgLang, say } from "@/lib/messageText";
 
 import { confirmMail, messageMail, welcomeMail, type Footer, type Mail } from "./reminderEmails";
+import { nextTour, tourMail } from "./tour";
 
 export type Status = "pending" | "confirmed" | "unsubscribed";
 export type PlanFields = Omit<PlanInput, "kinds">;
@@ -54,6 +64,15 @@ export interface Send {
   status: "scheduled" | "sent" | "cancelled";
 }
 
+/** Thursday at 18:00 local, the friend activity email. */
+export const FRIENDS_TIME = "18:00";
+
+/** A friend who trained in the last week, for the friend activity email. */
+export interface FriendActivity {
+  name: string;
+  workouts: number;
+}
+
 export interface Store {
   get(id: string): Promise<Sub | null>;
   put(s: Sub): Promise<void>;
@@ -62,6 +81,9 @@ export interface Store {
   sends(subId: string, since: number): Promise<Send[]>;
   putSend(s: Send): Promise<void>;
   removeSends(subId: string): Promise<void>;
+  /** Who this account follows (accepted, not blocked or suspended) and how many workouts each posted since `since`.
+   *  Missing where there's no Friends data (tests that don't need it). */
+  friendActivity?(accountId: string, since: number): Promise<FriendActivity[]>;
 }
 
 export interface Outgoing extends Mail {
@@ -185,9 +207,54 @@ export function checkBody(b: unknown): { ok: true; body: SubBody } | { ok: false
         pro,
         // Optional so older apps keep working; anything unknown reads as English.
         lang: isMsgLang(x.lang) ? x.lang : undefined,
+        teen: x.teen === true || undefined,
+        ...extras(x),
       },
     },
   };
+}
+
+const str = (v: unknown, max: number) => typeof v === "string" && v.length > 0 && v.length <= max;
+
+function totals(v: unknown): Totals | undefined {
+  if (!v || typeof v !== "object") return undefined;
+  const t = v as Record<string, unknown>;
+  const keys = ["start", "workouts", "sets", "volumeKg", "prs", "minutes"] as const;
+  if (!keys.every((k) => num(t[k]) && (t[k] as number) < 1e12)) return undefined;
+  return Object.fromEntries(keys.map((k) => [k, Math.round(t[k] as number)])) as unknown as Totals;
+}
+
+/** The optional fields only the emails use (recaps, bests, the first workout). Anything malformed is dropped, not
+ *  refused, so an older or newer app never loses its reminders over them. */
+function extras(x: Record<string, unknown>): Partial<PlanFields> {
+  const out: Partial<PlanFields> = {};
+  if (x.unit === "kg" || x.unit === "lb") out.unit = x.unit;
+  const week = totals(x.week);
+  if (week) out.week = week;
+  const month = totals(x.lastMonth);
+  if (month) out.lastMonth = month;
+  const b = x.best as Record<string, unknown> | null | undefined;
+  if (
+    b &&
+    num(b.at) &&
+    str(b.name, 80) &&
+    num(b.weightKg) &&
+    Number.isInteger(b.reps) &&
+    (b.reps as number) > 0 &&
+    (b.reps as number) < 1000
+  )
+    out.best = { at: b.at as number, name: b.name as string, weightKg: b.weightKg as number, reps: b.reps as number };
+  const n = x.next as Record<string, unknown> | null | undefined;
+  if (
+    n &&
+    Array.isArray(n.names) &&
+    n.names.length <= 8 &&
+    n.names.every((v) => str(v, 80)) &&
+    num(n.minutes) &&
+    (n.minutes as number) <= 300
+  )
+    out.next = { names: n.names as string[], minutes: Math.round(n.minutes as number) };
+  return out;
 }
 
 // --- Handlers ---
@@ -273,6 +340,12 @@ export async function subscribe(
       const done = (await store.sends(sub.id, 0)).some((s) => s.key === m.key);
       if (!done) await deliver(sub, { ...m, kind: "milestone", at: now, route: "stats" }, store, mail, env, now);
     }
+    // A new personal best: right away, at most one a week (the app already celebrates each one in the moment).
+    const r = record(prev.plan, sub.plan, now);
+    if (r && (sub.kinds.records ?? DEFAULT_ON.records)) {
+      const recent = (await store.sends(sub.id, now - 7 * DAY)).some((s) => s.kind === "records" && s.status !== "cancelled");
+      if (!recent) await deliver(sub, { ...r, kind: "records", at: now, route: "stats" }, store, mail, env, now);
+    }
     await schedule(sub, store, mail, env, now);
   }
   return { code: 200, body: { status: sub.status } };
@@ -285,7 +358,7 @@ async function activate(sub: Sub, store: Store, mail: Mailer, env: Env, now: num
   const sends = await store.sends(sub.id, 0);
   if (!sends.some((s) => s.key === "welcome")) {
     const r = await mail.send({
-      ...welcomeMail(footer(env, sub.id), sub.plan.lang),
+      ...welcomeMail(footer(env, sub.id), sub.plan.lang, sub.plan.firstWorkoutAt ? undefined : sub.plan.next),
       to: sub.email,
       idempotencyKey: `welcome-${sub.id}`,
       headers: listHeaders(env, sub.id),
@@ -346,7 +419,8 @@ export async function runDaily(store: Store, mail: Mailer, env: Env, now: number
 
 /** Whether a message would break a cap, given what was already sent or scheduled. */
 export function capped(m: Pick<Message, "kind" | "at">, sends: readonly Send[], tz: string): boolean {
-  const live = sends.filter((s) => s.status !== "cancelled" && s.kind !== "welcome");
+  // The welcome and the feature tour don't count: the tour makes way for anything else on its day (schedule()).
+  const live = sends.filter((s) => s.status !== "cancelled" && s.kind !== "welcome" && s.kind !== "tour");
   if (live.some((s) => dateKey(s.sendAt, tz) === dateKey(m.at, tz))) return true;
   if (live.filter((s) => s.sendAt > m.at - 7 * DAY && s.sendAt <= m.at).length >= CAPS.perWeek) return true;
   if (m.kind === "pro" && live.some((s) => s.kind === "pro" && Math.abs(m.at - s.sendAt) < CAPS.proEvery)) return true;
@@ -395,17 +469,70 @@ async function cancelScheduled(sub: Sub, store: Store, mail: Mailer, now: number
  */
 export async function schedule(sub: Sub, store: Store, mail: Mailer, env: Env, now: number): Promise<number> {
   if (sub.status !== "confirmed") return 0;
-  const msgs = plan({ ...sub.plan, kinds: sub.kinds }, now, now + WINDOW, "email").filter((m) => KIND_INFO[m.kind].email);
+  const tz = sub.plan.tz;
+  const msgs = plan({ ...sub.plan, kinds: sub.kinds }, now, now + WINDOW, "email").filter(
+    // No promotional email to under-18s (Pro offers; the tour below).
+    (m) => KIND_INFO[m.kind].email && !(sub.plan.teen && m.kind === "pro"),
+  );
   const keys = new Set(msgs.map((m) => m.key));
-  await cancelScheduled(sub, store, mail, now, (s) => !keys.has(s.key));
+  // The tour isn't planned here, so it's never cancelled for being missing from the plan (only to make way, below).
+  await cancelScheduled(sub, store, mail, now, (s) => s.kind !== "tour" && !keys.has(s.key));
   const sends = await store.sends(sub.id, now - 30 * DAY);
   let n = 0;
   for (const m of msgs) {
     if (sends.some((s) => s.key === m.key && s.status !== "cancelled")) continue;
-    if (capped(m, sends, sub.plan.tz)) continue;
+    if (capped(m, sends, tz)) continue;
+    // One email a day: a tour email already scheduled for that day steps aside and goes out on a later day.
+    const day = dateKey(m.at, tz);
+    await cancelScheduled(sub, store, mail, now, (s) => s.kind === "tour" && dateKey(s.sendAt, tz) === day);
+    for (const s of sends) if (s.kind === "tour" && s.status === "scheduled" && dateKey(s.sendAt, tz) === day) s.status = "cancelled";
     if (await deliver(sub, m, store, mail, env, now)) {
       sends.push({ subId: sub.id, key: m.key, kind: m.kind, sendAt: m.at, resendId: null, status: "scheduled" });
       n++;
+    }
+  }
+  // Friend activity: Thursday at 18:00, who the lifter follows trained this week, on a day with nothing else.
+  if ((sub.kinds.friends ?? DEFAULT_ON.friends) && sub.accountId && store.friendActivity) {
+    for (let day = dayStart(now, tz); day < now + WINDOW; day = addDays(day, 1, tz)) {
+      const at = atTime(day, FRIENDS_TIME, tz);
+      if (at < now || at >= now + WINDOW || parts(day + 12 * 3600_000, tz).wd !== 4) continue;
+      const key = `friends:${dateKey(at, tz)}`;
+      const all = await store.sends(sub.id, now - 30 * DAY);
+      if (all.some((s) => s.status !== "cancelled" && s.kind !== "tour" && dateKey(s.sendAt, tz) === dateKey(at, tz))) continue;
+      if (all.some((s) => s.key === key && s.status !== "cancelled")) continue;
+      const friends = await store.friendActivity(sub.accountId, at - 7 * DAY);
+      if (!friends.length) continue;
+      const lang = sub.plan.lang;
+      const names = friends.slice(0, 5).map((f) => say(lang, "rmd.friendLine", { name: f.name, count: f.workouts }));
+      if (friends.length > 5) names.push(say(lang, "rmd.friendsMore", { count: friends.length - 5 }));
+      await cancelScheduled(sub, store, mail, now, (s) => s.kind === "tour" && dateKey(s.sendAt, tz) === dateKey(at, tz));
+      const m = {
+        key,
+        kind: "friends" as const,
+        at,
+        title: say(lang, "rmd.friends"),
+        body: say(lang, "rmd.friendsBody", { list: listOf(lang, names) }),
+        route: "friends",
+      };
+      if (await deliver(sub, m, store, mail, env, now)) n++;
+    }
+  }
+  // The feature tour: the next email in the series, on a day with nothing else (tour.ts).
+  if ((sub.kinds.tour ?? DEFAULT_ON.tour) && !sub.plan.teen) {
+    const t = nextTour(await store.sends(sub.id, 0), tz, now, now + WINDOW);
+    if (t) {
+      const r = await mail.send({
+        ...tourMail(t, footer(env, sub.id), sub.plan.lang),
+        to: sub.email,
+        // Dated: a tour email that stepped aside is sent again on another day under the same key.
+        idempotencyKey: `${sub.id}-${t.key}-${dateKey(t.at, tz)}`,
+        scheduledAt: t.at - now > 60_000 ? t.at : undefined,
+        headers: listHeaders(env, sub.id),
+      });
+      if (r) {
+        await store.putSend({ subId: sub.id, key: t.key, kind: "tour", sendAt: t.at, resendId: r.id, status: "scheduled" });
+        n++;
+      }
     }
   }
   return n;
@@ -413,11 +540,16 @@ export async function schedule(sub: Sub, store: Store, mail: Mailer, env: Env, n
 
 // --- Implementations ---
 
-export function memoryStore(): Store & { subs: Map<string, Sub>; all: Send[] } {
+export function memoryStore(): Store & { subs: Map<string, Sub>; all: Send[]; friends: Map<string, FriendActivity[]> } {
   const subs = new Map<string, Sub>();
+  const friends = new Map<string, FriendActivity[]>();
   let all: Send[] = [];
   return {
     subs,
+    friends,
+    async friendActivity(accountId) {
+      return friends.get(accountId) ?? [];
+    },
     get all() {
       return all;
     },

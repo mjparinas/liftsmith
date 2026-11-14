@@ -164,7 +164,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "rest-timer",
         name: "Lock-screen rest timer",
-        body: "Starts itself after each set and counts down on the lock screen with the next set, the plates, heart rate, and Log set and +30 s buttons that work with the app closed.",
+        body: "Starts itself after each set and counts down on the lock screen with the next set, the plates, heart rate, and Log set and +30 s buttons that work with the app closed. A gentle buzz 10 seconds before the end gives you time to get set, on the phone and on your watch.",
         tier: "free",
         note: "Android: an ongoing notification, a Live Update on Android 16 and Samsung's Now Bar. iPhone: a Live Activity on the lock screen and in the Dynamic Island. Web: a notification while the page is open.",
         landing: "rest-timer",
@@ -357,6 +357,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "A short look back at your month, ready to share.",
         tier: "free",
         added: LAUNCH,
+      },
+      {
+        id: "anniversary",
+        name: "Your lifting anniversary",
+        body: "Each year on the day of your first workout, Today puts day one beside today: workouts, sets, total lifted and the lift that has grown most, with a card to share. It stays for a week.",
+        tier: "free",
+        added: "2026-11-14",
       },
     ],
   },
@@ -599,7 +606,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "share",
         name: "Share cards and links",
-        body: "Share a workout, a new best or a milestone as an image, or as a public link with a preview.",
+        body: "Share a workout, a new best or a milestone as an image, or as a public link with a preview. A new best flashes gold and can be shared from the rest screen right away.",
         tier: "free",
         added: "2026-11-10",
       },
@@ -780,6 +787,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "emails",
+        name: "Emails that keep you going",
+        body: "Eight getting-started tips with real screens, a weekly and monthly recap, new personal bests, which friends trained, and a nudge back after a break. Each kind has its own switch.",
+        tier: "free",
+        note: "On with an account, off for lifters under 18 unless they turn it on. Every email has a one-click unsubscribe.",
+        added: "2026-11-14",
+      },
+      {
         id: "cloud",
         name: "Fitness service connections",
         body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, WHOOP, Withings, Polar and Concept2.",
@@ -871,6 +886,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "Move the weight and rep buttons beside Log set, under your left or right thumb.",
         tier: "free",
         added: LAUNCH,
+      },
+      {
+        id: "big-numbers",
+        name: "Big numbers",
+        body: "During a set, the weight and reps get much bigger and Log set gets taller, and the music and what's next wait until you rest. Easy to read at arm's length, mid-set.",
+        tier: "free",
+        added: "2026-11-14",
       },
       {
         id: "lean",

@@ -1,58 +1,54 @@
 import type { Article } from "../articles";
 
-// Blog, part twenty-six: a tagline and a home gym on Friends profiles (Melvin, 2026-11-14, docs/decisions/friends.md
-// "Tagline and home gym"). Only what ships, and no other app named (seo.test.ts).
+// Blog, part twenty-six: small touches in the workout (Melvin, 2026-11-14, docs/decisions/workout-screen.md). Only
+// what ships, and no other app named (seo.test.ts). Later touches add a section here.
 export const BLOG_Z: Article[] = [
   {
-    slug: "tagline-and-home-gym",
+    slug: "small-touches-in-the-workout",
     kind: "blog",
-    title: "Say a little more on your profile: a tagline and your home gym",
+    title: "Small touches that keep you in the workout",
     description:
-      "Friends profiles now have a short tagline under your name and an optional home gym, picked from the gym finder so friends know where you train.",
+      "A gentle buzz 10 seconds before rest ends, a gold flash when you beat your best, a yearly look at day one against today, and big numbers for logging mid-set.",
     date: "2026-11-14",
     tag: "Training",
     cta: "plan",
     body: [
       {
-        p: "Your Friends profile has your name, your handle, your best lifts and your training calendar. Now it can say two more things: a short line about you, and the gym you call home.",
+        p: "Liftsmith tries to stay out of your way between sets. The rest timer starts itself, counts down on the lock screen and tells you when rest is over. Now it also gives you a heads-up before that happens.",
       },
-      { h2: "A tagline" },
+      { h2: "A buzz 10 seconds before rest ends" },
       {
-        p: "Open Friends, tap the gear for Friends settings, and write a line under Tagline, up to 60 characters. Early mornings, heavy squats. Training for my first meet. Back after a long break. It shows under your name on your profile, and on your public page if you have one.",
-      },
-      {
-        p: "Taglines follow the same community rules as names: no links and no words we don't allow. If someone's tagline crosses the line, report the profile and pick Offensive name, handle or tagline. Our team can clear it.",
-      },
-      { cta: "plan" },
-      { h2: "Your home gym" },
-      {
-        p: "Under Home gym in the same settings, tap one of your gyms. You can pick any gym you added from Find gyms near you, because those are real gyms with their own page. A gym you set up by hand, like a garage gym, isn't on the list, and there's nowhere to type a place. Pick None to take it off.",
+        p: "Ten seconds before the end of every rest, your phone gives a gentle double buzz. It's softer than the rest-over alert, so you can tell the two apart without looking. Use those seconds to chalk up, set your grip or walk back to the bench.",
       },
       {
         ul: [
-          "It shows to the people who can see your workouts: followers, or everyone if your profile is public.",
-          "On your public page it links to the gym's own page, with its hours and equipment.",
-          "On someone's profile in the app, tap their home gym to open that gym.",
-          "It's never your location. It's the gym's name and city, nothing about where you are.",
+          "On Android it comes from the workout notification, so you feel it with the phone locked or in your pocket.",
+          "On iPhone it buzzes while the app is open. Liftsmith keeps the screen on during a workout, so that's most of the time.",
+          "Your Wear OS watch, Apple Watch or Garmin watch taps your wrist too, phone locked or not.",
+          "After +30 s, the heads-up moves with the new end of rest.",
         ],
       },
-      { h2: "18 and over" },
+      { cta: "plan" },
+      { h2: "Turning it off" },
       {
-        p: "A home gym is for adults. Lifters under 18 don't see the option, and a home gym picked before doesn't show on their profile. Liftsmith goes by the age in your profile or your school team.",
+        p: "It's on for everyone whose rest-over alert vibrates. To turn it off, open Settings › Workout and switch off Buzz 10 seconds before rest ends. Turning off vibration or the rest-over alert turns it off as well.",
+      },
+      { h2: "A gold flash for a new personal best" },
+      {
+        p: "When a set beats your best on a lift, the phone gives a celebratory buzz, a gold banner drops in and the edges of the screen glow gold for a moment. On the rest screen that follows, Share this PR opens a card with the lift, the weight and reps, your estimated max and how much it went up. Post it straight from your rest, or wait for the end of the workout, where the same card waits with the rest.",
+      },
+      { h2: "Your lifting anniversary, day one against today" },
+      {
+        p: "A year after your first workout, Today shows a card that puts that first day beside today: how many workouts and sets you've done, how much you've lifted in total, and the lift from that first workout that has grown the most. Tap Share it for a card with the lot. It stays on Today for a week, so you won't miss it if you skip the gym that day, and it comes back every year.",
+      },
+      { h2: "Big numbers for logging mid-set" },
+      {
+        p: "Turn on Big numbers in Settings › Workout and the set screen keeps only what you need while you lift: the weight and reps in very large type, and a taller Log set. The music controls, what's coming up and Same as last time wait until you're resting. It pairs well with one-handed controls, which move the + and − buttons beside Log set under your thumb.",
       },
       {
-        tip: "Picking the same home gym as your training partners makes it easy for people at your gym to recognize you, and the gym's own club and leaderboard are one tap away on its page.",
+        tip: "Rest a little longer on your heaviest sets. The heads-up makes it easy to take the full rest without staring at the clock.",
       },
     ],
-    faq: [
-      [
-        "Can I type my city instead of a gym?",
-        "No. A home gym is always a real gym from the gym finder, and there's no free-text place on a profile.",
-      ],
-      [
-        "My gym isn't in the finder. What can I do?",
-        "Add it from Add a gym in Gyms and equipment. Once our team checks it, add it to your gyms from Find gyms near you and pick it as your home gym.",
-      ],
-    ],
+    faq: [["Does it make a sound?", "No. The heads-up is only a buzz. The sound, if you have it on, is saved for the end of rest."]],
   },
 ];

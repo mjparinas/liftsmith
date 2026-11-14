@@ -15,6 +15,7 @@ import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInv
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
+import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
@@ -27,7 +28,7 @@ import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
 import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
-import { onReminderTap, refreshReminders } from "@/lib/reminders";
+import { onReminderTap, provideNextPlan, refreshReminders, startDefaultEmail } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
@@ -35,7 +36,7 @@ import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { refreshSocial, socialOn } from "@/lib/social";
 import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
-import { startSync } from "@/lib/sync";
+import { startSync, useSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
 import { forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
@@ -61,6 +62,7 @@ import { GymStaffJoin } from "./GymStaff";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
+import { LogoEgg } from "./LogoEgg";
 import { LogPast } from "./LogPast";
 import { Onboarding } from "./Onboarding";
 import { Photos } from "./Photos";
@@ -310,8 +312,16 @@ export function App() {
   // the workouts or the profile change (reminders.ts). A tap on one opens the screen it points to.
   useEffect(() => {
     if (!ready) return;
+    // Today's plan, named in the app's language, for the welcome and first-workout emails (reminders.ts).
+    provideNextPlan(() => {
+      const p = useApp.getState().preview;
+      return p ? { names: p.items.map((i) => EXERCISE_BY_ID.get(i.exerciseId)?.name ?? "").filter(Boolean), minutes: p.estMinutes } : null;
+    });
     const refresh = () => {
       if (document.visibilityState !== "visible") return;
+      // Email is on by default for signed-in adults once this device has synced (reminders.ts autoEmailPrefs).
+      const { profile: now, setProfile } = useApp.getState();
+      if (startDefaultEmail(now, !!useSync.lastSync(), (messages) => setProfile({ messages }))) return; // the change refreshes
       refreshReminders(
         () => useApp.getState(),
         (status, address) => {
@@ -614,9 +624,8 @@ function Sidebar({ route }: { route: Route }) {
       aria-label={t("nav.main")}
     >
       <div className="flex items-center gap-2.5 px-3 text-lg font-extrabold tracking-tight text-ink">
-        {/* The app icon, like the site header's (SiteChrome BrandMark). */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />
+        {/* The app icon, like the site header's (SiteChrome BrandMark); seven quick taps open an easter egg (LogoEgg.tsx). */}
+        <LogoEgg size={32} />
         {BRAND.name}
       </div>
       <ul className="flex flex-col gap-1">

@@ -50,6 +50,59 @@ describe("each exercise's own gear in the demo", () => {
   });
 });
 
+describe("the gear each exercise needs is drawn", () => {
+  // Melvin, 2026-11-14: "Make sure exercises with walls have them, door frame exercises have a door frame,
+  // kettle bells, dumbbells, barbells, cables, etc have what they say they do"
+  /** Still drawn without their bench or box until their posture is redone (seated, side-lying, chest-down). */
+  const LATER = new Set(["copenhagen-plank", "short-copenhagen-plank"]);
+  function missing(id: string, needs: readonly string[]): string[] {
+    const m = motionFor(id);
+    const kinds = new Set(props(id).map((p) => p.kind));
+    const has = (q: string) => needs.includes(q);
+    const out: string[] = [];
+    const bar = m.load === "barbell" || m.load === "trapbar" || kinds.has("pole") || kinds.has("rail");
+    if (has("dumbbells") && m.load !== "dumbbell" && !kinds.has("pole")) out.push("dumbbells");
+    if (has("kettlebells") && m.load !== "kettlebell") out.push("kettlebells");
+    if ((has("barbell") || has("ezBar") || has("trapBar")) && !bar) out.push("bar");
+    if (has("medicineBall") && m.load !== "ball") out.push("ball");
+    if ((has("cable") || has("bands") || has("rings")) && !kinds.has("cable")) out.push("cable, band or straps");
+    if ((has("pullupBar") || has("dipBars")) && !kinds.has("rail")) out.push("bar or dip bars");
+    if ((has("bench") || has("inclineBench") || has("box") || has("sled")) && !kinds.has("box")) out.push("bench, box or sled");
+    if (has("battleRopes") && !kinds.has("rope")) out.push("ropes");
+    if (/(^|-)(wall|door)/.test(id) && !kinds.has("box")) out.push("wall or door");
+    if (m.load === "dumbbell" && !has("dumbbells")) out.push("draws dumbbells it doesn't use");
+    if (m.load === "kettlebell" && !has("kettlebells")) out.push("draws a kettlebell it doesn't use");
+    if ((m.load === "barbell" || m.load === "trapbar") && !["barbell", "ezBar", "trapBar", "smith"].some(has))
+      out.push("draws a bar it doesn't use");
+    return out;
+  }
+  it("draws every weight, cable, band, bar, bench, box, wall and rope the exercise needs, and nothing it doesn't", () => {
+    const wrong = EXERCISES.filter((e) => !LATER.has(e.id))
+      .map((e) => [e.id, missing(e.id, e.needs)] as const)
+      .filter(([, m]) => m.length);
+    expect(wrong).toEqual([]);
+  });
+  it("keeps the list of moves still waiting for their bench or box short", () => {
+    // remove an id from LATER once it draws its gear
+    const done = [...LATER].filter((id) => !missing(id, EXERCISES.find((e) => e.id === id)!.needs).length);
+    expect(done).toEqual([]);
+  });
+  it("draws a landmine bar from the floor to the hands, and cables from a pulley", () => {
+    for (const id of ["landmine-press", "landmine-row", "landmine-rotation", "landmine-squat"]) {
+      const pole = props(id).find((p) => p.kind === "pole");
+      expect(pole, id).toBeDefined();
+      expect(motionFor(id).load, id).toBe("none");
+    }
+    for (const id of ["cable-rdl", "cable-goblet-squat", "cable-split-squat", "standing-cable-press", "cable-dead-bug"])
+      expect(cables(id).length, id).toBeGreaterThan(0);
+    expect(cables("cable-reverse-crunch").map((c) => c.kind === "cable" && c.to)).toEqual(["ankles"]);
+    expect(motionFor("barbell-shrug").load).toBe("barbell");
+    expect(motionFor("trap-bar-shrug").load).toBe("trapbar");
+    expect(motionFor("seal-row").load).toBe("barbell");
+    expect(motionFor("machine-row").load).toBe("handle");
+  });
+});
+
 describe("variations the name gives", () => {
   it("curls one arm at a time on an alternating curl", () => {
     const m = motionFor("db-alternating-curl");
@@ -76,7 +129,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 206;
+  const LOOK_ALIKES = 146;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -622,5 +675,52 @@ describe("single-leg hip thrust", () => {
     const j = jointsAt(motionFor("single-leg-hip-thrust"), B, 0);
     expect(Math.abs(j.handL[2])).toBeGreaterThan(0.5);
     expect(Math.abs(j.handL[1] - j.shC[1])).toBeLessThan(0.08);
+  });
+});
+
+describe("kneeling, seated and chest-down moves, and machines", () => {
+  // Melvin, 2026-11-14: "kneeling cable flys don't have the person kneeling check all kneeling exercises",
+  // "machine shoulder press doesn't look like a machine especially the handles"
+  const at = (id: string, d = 0) => jointsAt(motionFor(id), B, d);
+  it("puts both knees on the floor for tall kneeling and one for half kneeling", () => {
+    for (const id of [
+      "kneeling-cable-fly",
+      "tall-kneeling-pallof",
+      "kneeling-lat-pulldown",
+      "db-tall-kneeling-press",
+      "kneeling-face-pull",
+    ]) {
+      const j = at(id);
+      expect(Math.max(j.kneeL[1], j.kneeR[1]), id).toBeLessThan(0.16);
+    }
+    for (const id of ["half-kneeling-pallof", "db-half-kneeling-press", "half-kneeling-cable-chop"]) {
+      const j = at(id);
+      expect(j.kneeR[1], id).toBeLessThan(0.16);
+      expect(j.kneeL[1], id).toBeGreaterThan(0.3);
+      expect(j.ankleL[0], id).toBeGreaterThan(j.hipC[0] + 0.2);
+    }
+  });
+  it("sits seated moves on a bench and lays spider curls chest-down", () => {
+    for (const id of ["seated-db-curl", "db-seated-calf-raise", "seated-calf-raise", "seated-good-morning", "db-seated-rear-delt-raise"]) {
+      expect(at(id).hipC[1], id).toBeLessThan(0.6);
+      expect(
+        props(id).some((p) => p.kind === "box"),
+        id,
+      ).toBe(true);
+    }
+    const sp = at("spider-curl");
+    expect(sp.shC[0] - sp.hipC[0]).toBeGreaterThan(0.3);
+    expect(at("seated-db-curl", 1).handR[1]).toBeGreaterThan(at("seated-db-curl", 0).handR[1] + 0.2);
+    expect(at("seated-good-morning", 1).shC[0]).toBeGreaterThan(at("seated-good-morning", 0).shC[0] + 0.3);
+    expect(at("feet-up-glute-bridge").ankleL[1]).toBeGreaterThan(0.4);
+    expect(at("bench-reverse-hyper", 1).ankleR[1]).toBeGreaterThan(at("bench-reverse-hyper", 0).ankleR[1] + 0.4);
+  });
+  it("draws a machine's lever arms to each handle, not a bar across the hands", () => {
+    for (const id of ["machine-shoulder-press", "machine-chest-press", "incline-machine-press", "machine-lateral-raise"]) {
+      expect(motionFor(id).load, id).toBe("none");
+      expect(props(id).filter((p) => p.kind === "pole").length, id).toBe(2);
+      expect(props(id).filter((p) => p.kind === "rail").length, id).toBeGreaterThanOrEqual(2);
+    }
+    expect(props("single-arm-shoulder-press-machine").filter((p) => p.kind === "pole")).toHaveLength(1);
   });
 });

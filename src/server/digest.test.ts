@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { saveAlertSettings } from "./alerts";
 import { resetDb, run } from "./db";
-import { digestData, digestDue, digestFrom, digestMail, localClock, sendDigest } from "./digest";
+import { digestData, digestDue, digestFrom, digestMail, digestRecipients, localClock, sendDigest } from "./digest";
 import { clearSystemCache } from "./systemHealth";
 
 // 2026-11-12 16:00 UTC is 8 AM Pacific (standard time).
@@ -118,5 +118,15 @@ describe("the morning digest", () => {
     expect(await sendDigest({ now: NOW + HOUR, mail: m.mail, force: true })).toBe(1);
     await saveAlertSettings({ instant: true, digest: false });
     expect(await sendDigest({ now: NOW + 24 * HOUR, mail: m.mail })).toBe(0);
+  });
+
+  it("also goes to DIGEST_TO, each address once, without making them admins", async () => {
+    vi.stubEnv("DIGEST_TO", " Me@Example.com, owner@example.com, not-an-address ");
+    expect(digestRecipients()).toEqual(["owner@example.com", "me@example.com"]);
+    const m = mailer();
+    expect(await sendDigest({ now: NOW, mail: m.mail })).toBe(2);
+    expect(m.sent.map((x) => x.to)).toEqual(["owner@example.com", "me@example.com"]);
+    const { roleOf } = await import("./adminAuth");
+    expect(roleOf("me@example.com")).toBeNull();
   });
 });

@@ -37,6 +37,7 @@ import * as delight from "./text/delight";
 import * as demo from "./text/demo";
 import * as done from "./text/done";
 import * as dots from "./text/dots";
+import * as egg from "./text/egg";
 import * as equipment from "./text/equipment";
 import * as ex from "./text/ex";
 import * as exp from "./text/exp";
@@ -251,6 +252,7 @@ export const de: Partial<Record<MessageKey, Message>> = {
   ...time.de,
   ...today.de,
   ...ton.de,
+  ...egg.de,
   ...hx.de,
   ...lift.de,
   ...tools.de,

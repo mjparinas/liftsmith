@@ -132,5 +132,23 @@ export function dbStore(): Store {
       await init();
       await run("DELETE FROM reminder_sends WHERE sub_id = ?", [subId]);
     },
+    async friendActivity(accountId, since) {
+      // People this account follows (accepted), not blocked either way and not suspended, with the workouts each
+      // posted to Friends since `since` (hidden posts left out). The Friends tables live in db.ts's schema.
+      const rows = await query(
+        `SELECT p.name AS name, COUNT(*) AS workouts
+           FROM follows f
+           JOIN social_profiles p ON p.account_id = f.followee_id AND p.suspended = 0
+           JOIN posts x ON x.account_id = f.followee_id AND x.at >= ? AND x.hidden = 0
+          WHERE f.follower_id = ? AND f.accepted = 1
+            AND NOT EXISTS (SELECT 1 FROM blocks b WHERE (b.blocker_id = f.follower_id AND b.blocked_id = f.followee_id)
+                                                     OR (b.blocker_id = f.followee_id AND b.blocked_id = f.follower_id))
+          GROUP BY f.followee_id, p.name
+          ORDER BY workouts DESC, p.name
+          LIMIT 20`,
+        [since, accountId],
+      ).catch(() => []);
+      return rows.map((r) => ({ name: String(r.name), workouts: Number(r.workouts) }));
+    },
   };
 }

@@ -20,6 +20,14 @@ export const en = {
   "mom.comebackBody": "First workout in {time}. The hardest one is done.",
   "mom.years": { one: "{count} year of lifting", other: "{count} years of lifting" },
   "mom.yearsBody": "You trained on your liftiversary. Fitting.",
+  "mom.dayOne": "Day one",
+  "mom.today": "Today",
+  "mom.firstOn": "Your first workout was on {date}.",
+  "mom.rowWorkouts": "Workouts",
+  "mom.rowSets": "Sets",
+  "mom.rowLifted": "Lifted",
+  "mom.liftUp": "{name} is up {pct}% since day one.",
+  "mom.compare": "Day one against today",
 } as const;
 
 type Key = keyof typeof en;
@@ -42,6 +50,14 @@ export const es: Partial<Record<Key, Message>> = {
   "mom.comebackBody": "Primer entrenamiento en {time}. Lo más difícil ya está hecho.",
   "mom.years": { one: "{count} año entrenando", other: "{count} años entrenando" },
   "mom.yearsBody": "Entrenaste en tu aniversario. Muy apropiado.",
+  "mom.dayOne": "Día uno",
+  "mom.today": "Hoy",
+  "mom.firstOn": "Tu primer entrenamiento fue el {date}.",
+  "mom.rowWorkouts": "Entrenamientos",
+  "mom.rowSets": "Series",
+  "mom.rowLifted": "Levantado",
+  "mom.liftUp": "{name} ha subido un {pct} % desde el día uno.",
+  "mom.compare": "El día uno frente a hoy",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -61,6 +77,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "mom.comebackBody": "Première séance depuis {time}. Le plus dur est fait.",
   "mom.years": { one: "{count} an d’entraînement", other: "{count} ans d’entraînement" },
   "mom.yearsBody": "Vous vous êtes entraîné le jour de votre anniversaire d’entraînement. Bien vu.",
+  "mom.dayOne": "Jour un",
+  "mom.today": "Aujourd’hui",
+  "mom.firstOn": "Votre première séance date du {date}.",
+  "mom.rowWorkouts": "Séances",
+  "mom.rowSets": "Séries",
+  "mom.rowLifted": "Soulevé",
+  "mom.liftUp": "{name} a progressé de {pct} % depuis le jour un.",
+  "mom.compare": "Le jour un face à aujourd’hui",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -81,6 +105,14 @@ export const de: Partial<Record<Key, Message>> = {
   "mom.comebackBody": "Erstes Training seit {time}. Das schwerste ist geschafft.",
   "mom.years": { one: "{count} Jahr Training", other: "{count} Jahre Training" },
   "mom.yearsBody": "Du hast an deinem Lift-Jahrestag trainiert. Passend.",
+  "mom.dayOne": "Tag eins",
+  "mom.today": "Heute",
+  "mom.firstOn": "Dein erstes Training war am {date}.",
+  "mom.rowWorkouts": "Trainings",
+  "mom.rowSets": "Sätze",
+  "mom.rowLifted": "Bewegt",
+  "mom.liftUp": "{name} ist seit Tag eins um {pct} % gestiegen.",
+  "mom.compare": "Tag eins im Vergleich zu heute",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -101,6 +133,14 @@ export const it: Partial<Record<Key, Message>> = {
   "mom.comebackBody": "Primo allenamento dopo {time}. Il più difficile è fatto.",
   "mom.years": { one: "{count} anno di allenamento", other: "{count} anni di allenamento" },
   "mom.yearsBody": "Ti sei allenato nel tuo anniversario. Perfetto.",
+  "mom.dayOne": "Giorno uno",
+  "mom.today": "Oggi",
+  "mom.firstOn": "Il tuo primo allenamento è stato il {date}.",
+  "mom.rowWorkouts": "Allenamenti",
+  "mom.rowSets": "Serie",
+  "mom.rowLifted": "Sollevato",
+  "mom.liftUp": "{name} è salito del {pct}% dal giorno uno.",
+  "mom.compare": "Il giorno uno a confronto con oggi",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -121,4 +161,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "mom.comebackBody": "{time}ぶりのワークアウト。一番大変な1回が終わりました。",
   "mom.years": { other: "トレーニング歴{count}年" },
   "mom.yearsBody": "トレーニング記念日にトレーニング。さすがです。",
+  "mom.dayOne": "初日",
+  "mom.today": "今日",
+  "mom.firstOn": "最初のワークアウトは{date}でした。",
+  "mom.rowWorkouts": "ワークアウト",
+  "mom.rowSets": "セット",
+  "mom.rowLifted": "総重量",
+  "mom.liftUp": "{name}は初日から{pct}%アップ。",
+  "mom.compare": "初日と今日の比較",
 };

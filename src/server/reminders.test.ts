@@ -280,6 +280,80 @@ describe("scheduling", () => {
     expect(capped({ kind: "missed", at: at(0) }, [{ ...s(0), status: "cancelled" }], TZ)).toBe(false);
   });
 
+  it("adds one getting-started email on a free day, never for under-18s, and only while its switch is on", async () => {
+    // Welcomed on Saturday; Sunday's run finds Sunday free (Monday has the 08:00 note): the tour goes out at 10:00.
+    const sun = addDays(MON, -1, TZ);
+    const { store, mail, sent } = await confirmed(addDays(MON, -2, TZ) + 3600_000);
+    await runDaily(store, mail, env, sun + 3600_000);
+    const tour = sent.filter((m) => m.idempotencyKey.includes("tour:"));
+    expect(tour).toHaveLength(1);
+    expect(tour[0].scheduledAt).toBe(atTime(sun, "10:00", TZ));
+    expect(tour[0].html).toContain("/email/en/01.jpg");
+
+    for (const p of [{ teen: true }, { kinds: { tour: false } }]) {
+      const store = memoryStore();
+      const f = fakeMail();
+      await subscribe(ok(body(p)), store, f.mail, env, addDays(MON, -2, TZ) + 3600_000);
+      await confirm(ID, confirmToken(f.sent[0]), store, f.mail, env, addDays(MON, -2, TZ) + 3600_000);
+      await runDaily(store, f.mail, env, sun + 3600_000);
+      expect(f.sent.some((m) => m.idempotencyKey.includes("tour:"))).toBe(false);
+    }
+  });
+
+  it("tells a signed-in lifter on Thursday evening which friends trained, on a day with nothing else", async () => {
+    const thu = addDays(MON, 3, TZ);
+    const store = memoryStore();
+    const f = fakeMail();
+    // Signed in, so the subscription has the account and starts at once.
+    await subscribe(ok(body({ lastWorkoutAt: thu - 3600_000, weekDays: 2 })), store, f.mail, env, MON - 3600_000, {
+      accountId: "acct",
+      email: "lifter@example.com",
+    });
+    store.friends.set("acct", [
+      { name: "Sam", workouts: 3 },
+      { name: "Alex", workouts: 1 },
+    ]);
+    await runDaily(store, f.mail, env, thu + 3600_000);
+    const m = f.sent.find((x) => x.subject === "Your friends this week");
+    expect(m?.scheduledAt).toBe(atTime(thu, "18:00", TZ));
+    expect(m?.text).toContain("Sam (3 times) and Alex (once) trained this week.");
+    // Turned off, nothing.
+    const g = fakeMail();
+    const off = memoryStore();
+    await subscribe(ok(body({ kinds: { friends: false } })), off, g.mail, env, MON - 3600_000, {
+      accountId: "acct",
+      email: "lifter@example.com",
+    });
+    off.friends.set("acct", [{ name: "Sam", workouts: 3 }]);
+    await runDaily(off, g.mail, env, thu + 3600_000);
+    expect(g.sent.some((x) => x.subject === "Your friends this week")).toBe(false);
+  });
+
+  it("emails a new best right away, at most once a week", async () => {
+    const { store, mail, sent } = await confirmed();
+    const best = (at: number) => ({ at, name: "Bench press", weightKg: 100, reps: 5 });
+    await subscribe(ok(body({ best: best(MON) })), store, mail, env, MON + 3600_000);
+    await subscribe(ok(body({ best: best(MON + 2 * 86_400_000) })), store, mail, env, MON + 2 * 86_400_000 + 3600_000);
+    const bests = sent.filter((m) => m.subject === "New best: Bench press");
+    expect(bests).toHaveLength(1);
+    expect(bests[0].text).toContain("You moved 100 kg for 5 on Bench press");
+  });
+
+  it("names the first workout in the welcome when there isn't one yet", async () => {
+    const store = memoryStore();
+    const f = fakeMail();
+    const fresh = { lastWorkoutAt: null, firstWorkoutAt: null, next: { names: ["Goblet squat", "Push-up", "Row"], minutes: 35 } };
+    await subscribe(ok(body(fresh)), store, f.mail, env, MON, { accountId: "acct", email: "lifter@example.com" });
+    expect(f.sent[0].subject).toBe("Welcome to Liftsmith");
+    expect(f.sent[0].text).toContain("Your first workout is already planned: Goblet squat, Push-up, and Row, about 35 minutes.");
+  });
+
+  it("drops malformed email extras instead of refusing the subscription", () => {
+    const c = checkBody(body({ week: { start: "x" }, best: { at: 1, name: "", weightKg: 1, reps: 1 }, next: { names: [1], minutes: 9 } }));
+    expect(c.ok).toBe(true);
+    if (c.ok) expect([c.body.plan.week, c.body.plan.best, c.body.plan.next]).toEqual([undefined, undefined, undefined]);
+  });
+
   it("sends nothing while a subscription is unconfirmed", async () => {
     const store = memoryStore();
     const { mail, sent } = fakeMail();
@@ -347,5 +421,53 @@ describe("database store", () => {
     await remove(ID, TOKEN, store, f.mail, MON);
     expect(await store.get(ID)).toBeNull();
     expect(await store.sends(ID, 0)).toEqual([]);
+  });
+
+  it("finds the friends an account follows who posted workouts, leaving out blocks, suspensions and hidden posts", async () => {
+    const { resetDb, run } = await import("./db");
+    const { dbStore } = await import("./remindersDb");
+    await resetDb();
+    const t = MON;
+    const profile = (id: string, name: string, suspended = 0) =>
+      run("INSERT INTO social_profiles (account_id, handle, name, agreed_at, created_at, suspended) VALUES (?, ?, ?, ?, ?, ?)", [
+        id,
+        id,
+        name,
+        t,
+        t,
+        suspended,
+      ]);
+    const follow = (b: string, accepted = 1) =>
+      run("INSERT INTO follows (follower_id, followee_id, accepted, created_at) VALUES ('me', ?, ?, ?)", [b, accepted, t]);
+    let n = 0;
+    const post = (who: string, at: number, hidden = 0) =>
+      run("INSERT INTO posts (id, account_id, workout_id, created_at, at, body, hidden) VALUES (?, ?, ?, ?, ?, '{}', ?)", [
+        `p${++n}`,
+        who,
+        `w${n}`,
+        at,
+        at,
+        hidden,
+      ]);
+    await profile("sam", "Sam");
+    await profile("alex", "Alex");
+    await profile("gone", "Gone", 1);
+    await profile("blocked", "Blocked");
+    await profile("pending", "Pending");
+    for (const f of ["sam", "alex", "gone", "blocked"]) await follow(f);
+    await follow("pending", 0);
+    await post("sam", t + 1);
+    await post("sam", t + 2);
+    await post("alex", t + 3);
+    await post("alex", t - 10 * 86_400_000); // too old
+    await post("alex", t + 4, 1); // hidden
+    await post("gone", t + 5);
+    await post("blocked", t + 6);
+    await post("pending", t + 7);
+    await run("INSERT INTO blocks (blocker_id, blocked_id, created_at) VALUES ('blocked', 'me', ?)", [t]);
+    expect(await dbStore().friendActivity!("me", t - 86_400_000)).toEqual([
+      { name: "Sam", workouts: 2 },
+      { name: "Alex", workouts: 1 },
+    ]);
   });
 });

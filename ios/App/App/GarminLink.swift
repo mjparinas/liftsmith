@@ -174,7 +174,7 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
 
 /// What goes to and comes from the Garmin watch (same keys as GarminMessages.java): "t" title, "s" set label, "n"
 /// the set, "p" plates, "r" seconds of rest left, "h" heart rate from a Bluetooth monitor, "v" vibrate when rest ends,
-/// "k" the set timer's phases as [seconds from now to its start, to its end or -1 for a count-up, label], "ki" which timer.
+/// "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its end or -1 for a count-up, label], "ki" which timer.
 enum GarminMessages {
     static let hrOnly: TimeInterval = 10
 
@@ -205,13 +205,14 @@ enum GarminMessages {
             "r": left > 0 ? Int(left.rounded(.up)) : 0,
             "h": s["hr"] as? Int ?? 0,
             "v": s["vibrate"] as? Bool ?? true,
+            "w": s["warn"] as? Bool ?? false,
         ]
     }
 
     static func worthSending(_ last: [String: Any]?, _ next: [String: Any], since: TimeInterval) -> Bool {
         guard let last else { return true }
         for k in ["t", "s", "n", "p", "ki"] where last[k] as? String != next[k] as? String { return true }
-        if last["v"] as? Bool != next["v"] as? Bool { return true }
+        if last["v"] as? Bool != next["v"] as? Bool || last["w"] as? Bool != next["w"] as? Bool { return true }
         let a = last["r"] as? Int ?? 0, b = next["r"] as? Int ?? 0
         if (a > 0) != (b > 0) || (b > 0 && abs(Double(b) + since - Double(a)) > 1.5) { return true }
         return last["h"] as? Int != next["h"] as? Int && since >= hrOnly

@@ -1,8 +1,10 @@
 import { track } from "../analytics";
 import { startDistance } from "../cardio";
 import { derive } from "../derive";
+import { markJoke, plateJoke, seenJokes } from "../eggs";
 import { exercise } from "../exercises";
 import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
+import { t } from "../i18n";
 import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
@@ -14,6 +16,7 @@ import { partDefaults } from "../routines";
 import { doneParts, enterPart, movePart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
+import { toast } from "../toast";
 import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine, SetTag } from "../types";
 import { WARMUP_REST, warmupFor } from "../warmup";
 import { persistActive, setsDone, uid, type Ctx } from "./shared";
@@ -681,6 +684,15 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       commit(r.evs);
       set({ active: r.next, undoable: { prev: a, ids: r.evs.map((e) => e.id), until: Math.max(now + UNDO_MS, r.next.restUntil ?? 0) } });
       persistActive(r.next);
+      // Plate math (an easter egg, eggs.ts): exactly 420 or 1,337 on a working set gets a joke, once per device.
+      const logged = r.evs.find((e) => e.type === "set");
+      if (logged?.type === "set" && !at) {
+        const joke = plateJoke(logged.weight, get().profile, seenJokes(), now);
+        if (joke) {
+          markJoke(joke);
+          toast(t(`egg.joke.${joke}`));
+        }
+      }
     },
 
     extraSet(kind) {

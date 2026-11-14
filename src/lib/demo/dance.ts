@@ -2,19 +2,27 @@ import { motionFor, type Motion } from "./motions";
 import { add, ANKLE_H, clamp, ease, len, lerp, mul, norm, rad, sub, V, type Body, type Pose, type Vec } from "./rig";
 
 // The dance easter egg (Melvin, 2026-11-11: "if you tap on it 5 times, can you get it to do a popular dance").
-// Five quick taps on the 3D figure make it dance for about ten seconds, then it goes back to what it was doing.
-// He suggested the famous zombie music video routine; its choreography, music and name belong to others, so
-// this is an original routine that only nods to that era: a slumped wake-up, stiff zombie arms with shoulder
-// shrugs, a side shuffle with straight-arm swings, a claw crouch, and a hip-pop finish that ends with the hands
-// back on the bar, so the squat picks up where it left off.
+// Five quick taps on the 3D figure make it dance for about sixteen seconds, then it goes back to what it was doing.
 //
-// The rig keeps the trunk in one piece (no side bend or twist), so the moves live in the arms, legs, hips,
-// shoulders and head. Frame: x forward, y up, z to the figure's right; the floor is y = 0.
+// The routine (Melvin, 2026-11-14: follow the famous zombie music video dance, as a parody) is a zombie-dance
+// homage: the signature, widely known moves of that routine in a similar order and feel, reinterpreted for our
+// wireframe lifter, not a frame-by-frame copy of anyone's choreography. No music, no footage, no names:
+//   1. the rise: slumped and limp, jerking upright with the head snapped to one side
+//   2. the zombie walk: lurching steps forward, arms dangling, head lolling with each step
+//   3. head snaps and the shoulder shimmy: wide stance, head snapping side to side on the beat
+//   4. the claw walk: claws up by one side of the head, step and drag sideways, then the other way
+//   5. the claw swipe: both claws sweeping from low on one side to high on the other
+//   6. the hip thrust: knees bent, claws by the hips, hips popping forward on the beat
+//   7. the group pose: one foot forward, leaning in, claws raised, then the hands go back to the bar,
+//      so the squat picks up where it left off.
+//
+// The rig keeps the trunk in one piece (no twist), so the moves live in the arms, legs, hips, shoulders and
+// head. Frame: x forward, y up, z to the figure's right; the floor is y = 0.
 
 /** The demo id that plays the dance (the engine looks it up before stretches and exercises). */
 export const DANCE_ID = "egg:dance";
 /** How long the routine lasts, in seconds. */
-export const DANCE_SECONDS = 10;
+export const DANCE_SECONDS = 16;
 /** Taps needed, and the most time allowed between two of them. */
 export const DANCE_TAPS = 5;
 export const DANCE_TAP_GAP_MS = 900;
@@ -46,16 +54,18 @@ function env(t: number, a: number, b: number, f = 0.25) {
 }
 
 // ---------- the routine, as keyframes ----------
-type Arm = [fwd: number, up: number, out: number]; // hand from its shoulder, in arm lengths
+type Arm = [fwd: number, up: number, out: number]; // hand from its shoulder, in arm lengths; out is away from the body
 type Foot = [x: number, z: number]; // ankle on the floor
 interface Key {
   t: number;
+  hx: number; // hips forward (the walk travels)
   hz: number; // hips sideways
   dip: number; // knees bent (metres the hips drop)
   lean: number; // trunk forward, degrees
   tilt: number; // shoulders over the hips sideways, metres
   shrug: number;
   head: number; // head forward (+) or back (-)
+  headTilt: number; // head tipped to the figure's right (+) or left (-)
   hL: Arm;
   hR: Arm;
   fL: Foot;
@@ -65,22 +75,29 @@ interface Key {
 
 const HANG: Arm = [0.06, -1, 0.07];
 const DANGLE: Arm = [0.3, -0.93, 0.02];
-const ZOMBIE: Arm = [1, -0.08, -0.05];
-const SWING_F: Arm = [0.62, -0.74, 0.02];
-const SWING_B: Arm = [-0.42, -0.88, 0.06];
-const CLAW: Arm = [0.42, 0.42, 0.12];
-const UP: Arm = [0.12, 1, 0.16];
+const LIMP: Arm = [0.24, -0.84, 0.3];
+const THRUST: Arm = [0.32, -0.7, 0.3];
+const RAISED: Arm = [0.55, 0.76, 0.16];
+// claws up by the right side of the head: the right hand out by the ear, the left one crossed in front of the face
+const CLAW_R = { hL: [0.58, 0.42, -0.34] as Arm, hR: [0.3, 0.56, 0.42] as Arm };
+const CLAW_L = { hL: CLAW_R.hR, hR: CLAW_R.hL };
+// the swipe: from low on the left to high on the right
+const LOW_L = { hL: [0.36, -0.64, 0.42] as Arm, hR: [0.52, -0.56, -0.36] as Arm };
+const HIGH_R = { hL: [0.52, 0.56, -0.3] as Arm, hR: [0.24, 0.76, 0.46] as Arm };
 const L0: Foot = [0.03, -0.14];
 const R0: Foot = [0.03, 0.14];
+const WIDE = (x: number): { fL: Foot; fR: Foot } => ({ fL: [x, -0.23], fR: [x, 0.23] });
 
 const base = (t: number, o: Partial<Key>): Key => ({
   t,
+  hx: 0,
   hz: 0,
   dip: 0,
   lean: 3,
   tilt: 0,
   shrug: 0,
   head: 0,
+  headTilt: 0,
   hL: HANG,
   hR: HANG,
   fL: L0,
@@ -89,28 +106,110 @@ const base = (t: number, o: Partial<Key>): Key => ({
   ...o,
 });
 
+// the walk ends this far forward; the claw walk drifts back to the start
+const FWD = 0.26;
 const KEYS: Key[] = [
-  // wake up: slumped, arms dangling, then a stiff jerk upright
-  base(0, { dip: 0.13, lean: 30, head: 0.03, hL: DANGLE, hR: DANGLE }),
-  base(1.1, { dip: 0.12, lean: 33, head: 0.04, hL: DANGLE, hR: [0.34, -0.9, 0] }),
-  base(1.6, { dip: 0, lean: 1, shrug: 0.05, head: -0.02 }),
-  // zombie arms up, straight out in front
-  base(2.3, { lean: 5, hL: ZOMBIE, hR: ZOMBIE }),
-  base(4.3, { lean: 5, dip: 0.03, hL: ZOMBIE, hR: ZOMBIE }),
-  // side shuffle: right, together, back left, together, out left, back in; stiff arms swing on every step
-  base(4.8, { hz: 0.12, dip: 0.04, tilt: -0.025, shrug: 0.05, fR: [0.03, 0.4], hL: SWING_F, hR: SWING_B }),
-  base(5.3, { hz: 0.26, dip: 0.02, fL: [0.03, 0.12], fR: [0.03, 0.4], hL: SWING_B, hR: SWING_F }),
-  base(5.8, { hz: 0.12, dip: 0.04, tilt: 0.025, shrug: 0.05, fL: L0, fR: [0.03, 0.4], hL: SWING_F, hR: SWING_B }),
-  base(6.3, { dip: 0.02, hL: SWING_B, hR: SWING_F }),
-  base(6.8, { hz: -0.13, dip: 0.04, tilt: 0.025, shrug: 0.05, fL: [0.03, -0.4], hL: SWING_F, hR: SWING_B }),
-  base(7.3, { dip: 0.02, hL: SWING_B, hR: SWING_F }),
-  // claw crouch: hands up by the head, knees bent, shoulders jerking
-  base(7.8, { dip: 0.11, lean: 14, head: 0.03, hL: CLAW, hR: CLAW, elbowUp: 1, fL: [0.03, -0.2], fR: [0.03, 0.2] }),
-  base(8.9, { dip: 0.09, lean: 12, head: 0.03, hL: CLAW, hR: CLAW, elbowUp: 1, fL: [0.03, -0.2], fR: [0.03, 0.2] }),
-  // hip pop, one arm up
-  base(9.3, { hz: 0.05, tilt: -0.04, head: -0.02, hR: UP, elbowUp: 0.3, fL: [0.03, -0.16], fR: [0.03, 0.16] }),
+  // 1. the rise: slumped, arms limp, head hanging; a half jerk up, then upright with the head snapped over
+  base(0, { dip: 0.13, lean: 32, head: 0.04, headTilt: -0.02, hL: DANGLE, hR: DANGLE }),
+  base(1.0, { dip: 0.13, lean: 34, head: 0.045, headTilt: -0.025, hL: DANGLE, hR: [0.34, -0.9, 0] }),
+  base(1.35, { dip: 0.07, lean: 16, head: 0.02, hL: DANGLE, hR: DANGLE }),
+  base(1.9, { dip: 0.02, lean: 6, shrug: 0.06, head: 0.015, headTilt: 0.05, hL: DANGLE, hR: DANGLE }),
+  // 2. the zombie walk: four lurching steps forward, the arms swinging dead from the shoulders
+  base(2.5, { hx: 0.07, dip: 0.05, lean: 9, shrug: 0.06, headTilt: -0.04, fR: [0.18, 0.14], hL: [0.42, -0.86, 0.04], hR: HANG }),
+  base(3.1, {
+    hx: 0.15,
+    dip: 0.04,
+    lean: 9,
+    shrug: 0.05,
+    headTilt: 0.04,
+    fL: [0.3, -0.14],
+    fR: [0.18, 0.14],
+    hL: HANG,
+    hR: [0.42, -0.86, 0.04],
+  }),
+  base(3.7, {
+    hx: 0.22,
+    dip: 0.05,
+    lean: 9,
+    shrug: 0.06,
+    headTilt: -0.04,
+    fL: [0.3, -0.14],
+    fR: [0.42, 0.14],
+    hL: [0.42, -0.86, 0.04],
+    hR: HANG,
+  }),
+  base(4.3, { hx: FWD, dip: 0.04, lean: 8, shrug: 0.05, headTilt: 0.03, fL: [0.3, -0.14], fR: [0.3, 0.14], hL: DANGLE, hR: DANGLE }),
+  // 3. head snaps and the shoulder shimmy (the snaps and the shimmy ride on the beat, below)
+  base(4.8, { hx: FWD, dip: 0.06, lean: 6, shrug: 0.03, hL: LIMP, hR: LIMP, elbowUp: 0.35, ...WIDE(0.3) }),
+  base(6.5, { hx: FWD, dip: 0.06, lean: 6, shrug: 0.03, hL: LIMP, hR: LIMP, elbowUp: 0.35, ...WIDE(0.3) }),
+  // 4. the claw walk: claws up on the right, step right and drag; then claws on the left, step left and drag
+  base(7.0, { hx: FWD, dip: 0.04, lean: 7, headTilt: 0.03, ...CLAW_R, elbowUp: 1, fL: [0.3, -0.14], fR: [0.3, 0.14] }),
+  base(7.5, {
+    hx: 0.2,
+    hz: 0.13,
+    dip: 0.08,
+    lean: 9,
+    tilt: -0.02,
+    headTilt: 0.04,
+    ...CLAW_R,
+    elbowUp: 1,
+    fL: [0.3, -0.14],
+    fR: [0.22, 0.42],
+  }),
+  base(8.0, { hx: 0.16, hz: 0.27, dip: 0.03, lean: 7, headTilt: 0.03, ...CLAW_R, elbowUp: 1, fL: [0.16, 0.14], fR: [0.22, 0.42] }),
+  base(8.5, { hx: 0.12, hz: 0.27, dip: 0.04, lean: 7, headTilt: -0.03, ...CLAW_L, elbowUp: 1, fL: [0.16, 0.14], fR: [0.22, 0.42] }),
+  base(9.0, {
+    hx: 0.08,
+    hz: 0.14,
+    dip: 0.08,
+    lean: 9,
+    tilt: 0.02,
+    headTilt: -0.04,
+    ...CLAW_L,
+    elbowUp: 1,
+    fL: [0.08, -0.14],
+    fR: [0.22, 0.42],
+  }),
+  base(9.5, { hx: 0.03, hz: 0, dip: 0.03, lean: 7, headTilt: -0.03, ...CLAW_L, elbowUp: 1, fL: [0.08, -0.14], fR: [0.05, 0.14] }),
+  // 5. the claw swipe, twice: low on the left, up and across to high on the right
+  base(9.9, { dip: 0.07, lean: 10, headTilt: -0.04, ...LOW_L, elbowUp: 0.5, ...WIDE(0.04) }),
+  base(10.35, { dip: 0.02, lean: 4, tilt: 0.02, headTilt: 0.05, ...HIGH_R, elbowUp: 0.8, ...WIDE(0.04) }),
+  base(10.8, { dip: 0.07, lean: 10, headTilt: -0.04, ...LOW_L, elbowUp: 0.5, ...WIDE(0.04) }),
+  base(11.25, { dip: 0.02, lean: 4, tilt: 0.02, headTilt: 0.05, ...HIGH_R, elbowUp: 0.8, ...WIDE(0.04) }),
+  // 6. the hip thrust (the thrusts ride on the beat, below)
+  base(11.7, { dip: 0.09, lean: 4, shrug: 0.02, hL: THRUST, hR: THRUST, elbowUp: 0.6, ...WIDE(0.04) }),
+  base(13.5, { dip: 0.09, lean: 4, shrug: 0.02, hL: THRUST, hR: THRUST, elbowUp: 0.6, ...WIDE(0.04) }),
+  // 7. the group pose: right foot forward, leaning in, claws raised high, head cocked
+  base(14.1, {
+    hx: 0.06,
+    dip: 0.07,
+    lean: 14,
+    head: 0.02,
+    headTilt: 0.04,
+    hL: RAISED,
+    hR: RAISED,
+    elbowUp: 1,
+    fL: [-0.04, -0.17],
+    fR: [0.24, 0.17],
+  }),
+  base(15.1, {
+    hx: 0.06,
+    dip: 0.08,
+    lean: 15,
+    head: 0.02,
+    headTilt: 0.045,
+    hL: RAISED,
+    hR: RAISED,
+    elbowUp: 1,
+    fL: [-0.04, -0.17],
+    fR: [0.24, 0.17],
+  }),
 ];
-const POSE_HOLD = 9.45; // then the last 0.55 s blends into the squat's first frame
+const POSE_HOLD = 15.2; // then the last 0.8 s blends into the squat's first frame
+/** Where each beat-driven move plays, in seconds into the routine. */
+const PARTS = { snaps: [4.8, 6.6], claws: [7.0, 9.6], thrust: [11.7, 13.6], pose: [14.1, 15.2] } as const;
+/** About 118 beats a minute: the tempo of that era's dance-floor pop. */
+const BEAT_HZ = 118 / 60;
 
 function keyAt(t: number): { a: Key; b: Key; u: number } {
   const first = KEYS[0]!;
@@ -126,6 +225,8 @@ function keyAt(t: number): { a: Key; b: Key; u: number } {
   return { a: last, b: last, u: 0 };
 }
 const mix3 = <T extends number[]>(a: T, b: T, u: number) => a.map((x, i) => lerp(x, b[i]!, u)) as T;
+/** A snap: holds at -1 or +1 and flips fast, instead of a smooth sine. */
+const snap = (x: number) => Math.tanh(7 * Math.sin(x));
 
 /** The dancing pose at `t` seconds into the routine. */
 function danceAt(B: Body, t: number): Pose {
@@ -135,25 +236,37 @@ function danceAt(B: Body, t: number): Pose {
   const footLift = (fa: Foot, fb: Foot) =>
     Math.min(0.09, Math.abs(fb[1] - fa[1]) * 0.35 + Math.abs(fb[0] - fa[0]) * 0.35) * Math.sin(Math.PI * u);
 
-  // beat overlays: a sway and shrug while the zombie arms are up, a jerky bounce in the claw crouch
-  const sway = env(t, 2.3, 4.4, 0.35);
-  const claw = env(t, 7.8, 9.0, 0.2);
-  const beat = Math.sin(2 * Math.PI * t * 2); // two beats a second
-  const pulse = Math.max(0, beat);
-  const swayZ = 0.08 * Math.sin(Math.PI * t) * sway;
+  const ph = 2 * Math.PI * BEAT_HZ * t;
+  const pulse = Math.max(0, Math.sin(ph));
+  const snaps = env(t, PARTS.snaps[0], PARTS.snaps[1], 0.2);
+  const claws = env(t, PARTS.claws[0], PARTS.claws[1], 0.2);
+  const thrust = env(t, PARTS.thrust[0], PARTS.thrust[1], 0.2);
+  const hold = env(t, PARTS.pose[0], PARTS.pose[1], 0.3);
+  // head snaps right and left, one side a beat; the shoulders shimmy twice as fast
+  const headSnap = 0.055 * snap(ph / 2) * snaps;
+  const shimmy = 0.03 * Math.sin(ph * 2) * snaps;
+  // the hips pop forward on every beat, the shoulders rocking back against them
+  const pop = Math.max(0, snap(ph)) * thrust;
 
-  const hz = k((x) => x.hz) + swayZ * 0.4;
-  const dip = Math.max(0, k((x) => x.dip) + 0.025 * pulse * claw);
-  const hip = V(0.02 - 0.02 * Math.sin(rad(k((x) => x.lean))), standY(B) - dip, hz);
-  const lean = rad(k((x) => x.lean));
-  const sh = add(hip, V(Math.sin(lean) * B.torso, Math.cos(lean) * B.torso, k((x) => x.tilt) - swayZ * 0.3));
-  const shrug = k((x) => x.shrug) + 0.04 * pulse * sway + 0.05 * pulse * claw;
+  const hx = k((x) => x.hx) + 0.075 * pop;
+  const dip = Math.max(0, k((x) => x.dip) + 0.02 * pulse * (claws + hold) - 0.02 * pop);
+  const leanDeg = k((x) => x.lean) - 14 * pop;
+  const lean = rad(leanDeg);
+  const hip = V(
+    0.02 - 0.02 * Math.sin(rad(Math.max(0, leanDeg))) + hx,
+    standY(B) - dip,
+    k((x) => x.hz),
+  );
+  const sh = add(hip, V(Math.sin(lean) * B.torso, Math.cos(lean) * B.torso, k((x) => x.tilt) + shimmy));
+  const shrug = k((x) => x.shrug) + 0.05 * Math.abs(Math.sin(ph * 2)) * snaps + 0.035 * pulse * (claws + thrust);
   const up = norm(sub(sh, hip));
+  // the claws shake on the beat
+  const shake = 0.035 * Math.sin(ph * 2) * (claws + hold);
 
   const hand = (sgn: number, arm: Arm): Vec => {
     const top = add(V(sh[0], sh[1] + shrug, sh[2] + sgn * B.shW), mul(up, -B.shDrop));
     const R = reach(B);
-    const target = add(top, V(arm[0] * R, arm[1] * R + 0.04 * beat * claw, sgn * arm[2] * R + swayZ));
+    const target = add(top, V(arm[0] * R, arm[1] * R + shake, sgn * arm[2] * R));
     return toward(top, target, R * 0.97);
   };
   const ankle = (sgn: number, fa: Foot, fb: Foot): Vec => {
@@ -170,10 +283,11 @@ function danceAt(B: Body, t: number): Pose {
     hand: { L: hand(-1, mix3(a.hL, b.hL, u)), R: hand(1, mix3(a.hR, b.hR, u)) },
     ankle: { L: ankle(-1, a.fL, b.fL), R: ankle(1, a.fR, b.fR) },
     foot: { L: 140 * footLift(a.fL, b.fL), R: 140 * footLift(a.fR, b.fR) }, // toes point down as a foot lifts
-    kneePole: { L: V(1, 0, -0.3), R: V(1, 0, 0.3) },
+    kneePole: { L: V(1, 0, -0.35), R: V(1, 0, 0.35) },
     elbowPole: { L: pole(-1), R: pole(1) },
     headBlend: lerp(0.9, 0.2, clamp(k((x) => x.lean) / 30, 0, 1)),
-    headBack: k((x) => x.head) + 0.012 * beat * (sway + claw),
+    headBack: k((x) => x.head),
+    headTilt: k((x) => x.headTilt) + headSnap,
   };
 }
 
@@ -186,6 +300,7 @@ type Full = Required<Pick<Pose, "hip" | "sh">> & {
   foot: { L: number; R: number };
   headBlend: number;
   headBack: number;
+  headTilt: number;
 };
 type Side = { L: Vec; R: Vec };
 function perSide(v: Pose["hand"] | undefined, defZ: number, fallback: Vec): Side {
@@ -208,6 +323,7 @@ function full(p: Pose, B: Body, stance: number, grip: number): Full {
     foot: typeof foot === "number" ? { L: foot, R: foot } : foot,
     headBlend: p.headBlend ?? 0.45,
     headBack: p.headBack ?? 0,
+    headTilt: p.headTilt ?? 0,
   };
 }
 const mixV = (a: Vec, b: Vec, u: number): Vec => [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
@@ -223,11 +339,12 @@ function blend(a: Full, b: Full, u: number): Pose {
     foot: { L: lerp(a.foot.L, b.foot.L, u), R: lerp(a.foot.R, b.foot.R, u) },
     headBlend: lerp(a.headBlend, b.headBlend, u),
     headBack: lerp(a.headBack, b.headBack, u),
+    headTilt: lerp(a.headTilt, b.headTilt, u),
   };
 }
 
 let cached: Motion | null = null;
-/** The dance as a demo motion: one ten-second pass (d runs 0 → 1 evenly), ending in the back squat's start. */
+/** The dance as a demo motion: one sixteen-second pass (d runs 0 → 1 evenly), ending in the back squat's start. */
 export function danceMotion(): Motion {
   if (cached) return cached;
   const squat = motionFor("back-squat");

@@ -291,15 +291,22 @@ export interface Profile {
    * the default (Pro offers off, the rest on). Email needs an address and a confirmed opt-in.
    */
   messages?: {
-    push: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
+    push: Partial<
+      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+    >;
     email?: {
       address: string;
       consentAt: number;
       status: "pending" | "confirmed" | "unsubscribed";
-      kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
+      kinds: Partial<
+        Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+      >;
     };
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
+    /** The lifter turned "Email me" off. Email is on by default for signed-in adults (Melvin, 2026-11-14), so this
+     *  is what keeps it off on every device. */
+    emailOff?: boolean;
   };
   /** One-rep max goals with a date (goals.ts). */
   goals?: import("./goals").LiftGoal[];
@@ -367,6 +374,8 @@ export interface TrainingPrefs {
   autoRest?: boolean;
   /** Missing means it follows Sounds and Vibration. */
   restAlert?: RestAlert;
+  /** A gentle buzz 10 seconds before rest ends (restWarnOn). Missing means on; it only buzzes when the rest-over alert vibrates. */
+  restWarn?: boolean;
   /** Keep the screen on during a workout. Missing means on. */
   keepAwake?: boolean;
   /** The Now playing control on Today and the workout screen (nowPlaying.ts). Missing means on. */

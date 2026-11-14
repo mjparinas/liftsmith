@@ -6,10 +6,12 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useCheckins } from "@/lib/buddy";
+import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
 import { useSocial } from "@/lib/social";
 import type { SocialProfile } from "@/lib/socialTypes";
 import { useApp } from "@/lib/store";
+import { makeSet } from "@/test/factories";
 
 import { App } from "./App";
 import { CheckinToasts } from "./CheckinToasts";
@@ -232,6 +234,28 @@ describe("Today and Progress extras", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByTestId("checkin-toasts")).not.toBeInTheDocument();
     expect(calls).toEqual([{ op: "checkinDismiss", body: { id: "k1" } }]);
+  });
+
+  it("shows the anniversary on Today: day one against today, its share card, and ✕ hides it for the week", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const now = Date.now();
+    const d = new Date(now);
+    d.setFullYear(d.getFullYear() - 1);
+    const lift = (at: number, weight: number, sessionId: string) =>
+      [0, 1, 2].map((i) => makeSet({ exerciseId: "bench-press", at: at + i * 120_000, weight, reps: 8, sessionId }));
+    const events = [...lift(d.getTime(), 40, "first"), ...lift(now - 3 * 86400_000, 60, "recent")];
+    act(() => useApp.setState({ events, stats: derive(events, now) }));
+    location.hash = "#/today";
+    const card = await screen.findByTestId("anniversary");
+    expect(within(card).getByText("1 year since your first workout")).toBeInTheDocument();
+    expect(within(card).getByRole("columnheader", { name: "Day one" })).toBeInTheDocument();
+    expect(within(card).getByText(/Bench press is up 50% since day one/i)).toBeInTheDocument();
+    await user.click(within(card).getByRole("button", { name: "Share it" }));
+    expect(await screen.findByRole("dialog", { name: "Share" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    await user.click(within(card).getByRole("button", { name: "Dismiss" }));
+    await waitFor(() => expect(screen.queryByTestId("anniversary")).not.toBeInTheDocument());
   });
 
   it("shows the recap, body weight and themes", async () => {

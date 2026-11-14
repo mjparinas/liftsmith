@@ -118,6 +118,14 @@ export function TipCard({ active, setsLogged }: { active: Active; setsLogged: nu
   );
 }
 
+/**
+ * The heads-up 10 seconds before rest ends (Workout preferences): a gentle double tap so the lifter can get set.
+ * Android's workout service does it natively, so it's felt with the phone locked.
+ */
+export function warnTick(on: boolean) {
+  if (on && platform() !== "android") haptic("double", true);
+}
+
 /** The phone feels the last three seconds of rest: a light tick each second. Android's service does it natively. */
 export function countdownTick(vibrate: boolean) {
   if (vibrate && platform() !== "android") haptic("select", true);

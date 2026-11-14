@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setBillingLive } from "@/lib/billing";
 import { exercise } from "@/lib/exercises";
 import { useApp } from "@/lib/store";
+import { makeSet } from "@/test/factories";
 
 import { App } from "./App";
 
@@ -218,6 +219,24 @@ describe("first run to finished workout", () => {
     expect(held).toBeGreaterThanOrEqual(start + 4);
     await act(() => new Promise((r) => setTimeout(r, 500)));
     expect(useApp.getState().active!.reps).toBe(held); // stops on release
+  });
+
+  it("big numbers: bigger weight and reps and a taller Log set during a set, the extras back during rest", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings/workout";
+    await user.click(await screen.findByRole("switch", { name: "Big numbers" }));
+    expect(useApp.getState().profile.a11y?.big).toBe(true);
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    await user.click(await screen.findByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    const logSet = await screen.findByRole("button", { name: /Log set/ });
+    expect(logSet.className).toContain("py-8");
+    expect(document.querySelector("[class*='text-[min(4.75rem']")).not.toBeNull();
+    expect(screen.queryByRole("heading", { name: "Coming up" })).not.toBeInTheDocument();
+    await user.click(logSet);
+    expect(await screen.findByRole("heading", { name: "Coming up" })).toBeInTheDocument();
   });
 
   it("switches language from Settings, for the app and the page", async () => {
@@ -816,5 +835,40 @@ describe("Labs", () => {
     const b = useApp.getState().active!;
     expect(b.restUntil).toBe(restStart + 108_000);
     expect(b.hrCut?.restStart).toBe(restStart);
+  });
+
+  it("buzzes gently once, 10 seconds before rest ends", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", { value: vibrate, configurable: true });
+    const user = userEvent.setup();
+    await onboard(user);
+    await startSquat(user);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    vibrate.mockClear();
+    const a = useApp.getState().active!;
+    act(() => useApp.setState({ active: { ...a, restUntil: Date.now() + 10_400 } }));
+    await waitFor(() => expect(vibrate).toHaveBeenCalledWith([22, 70, 22]), { timeout: 2500 });
+    expect(vibrate.mock.calls.filter((c) => JSON.stringify(c) === "[[22,70,22]]")).toHaveLength(1);
+    Reflect.deleteProperty(navigator, "vibrate");
+  });
+
+  it("a new personal best flashes gold and offers its share card on the rest screen", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await startSquat(user);
+    const st = useApp.getState();
+    const a = st.active!;
+    const exerciseId = a.plan.items[a.index]!.exerciseId;
+    // A lighter set of the same lift last week, so the set about to be logged is a new best.
+    const before = {
+      ...makeSet({ exerciseId, weight: Math.max(1, a.weight / 2), reps: 5, sessionId: "older" }),
+      at: Date.now() - 7 * 86400_000,
+    };
+    act(() => useApp.setState({ events: [before, ...st.events] }));
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    expect(await screen.findByText("New personal record")).toBeInTheDocument();
+    expect(screen.getByTestId("pr-flash")).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: "Share this PR" }));
+    expect(await screen.findByRole("dialog", { name: "Share" })).toBeInTheDocument();
   });
 });

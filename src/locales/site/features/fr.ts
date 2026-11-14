@@ -119,7 +119,7 @@ export const fr: FeaturesText = {
     },
     "rest-timer": {
       name: "Minuteur de repos sur l’écran verrouillé",
-      body: "Il démarre seul après chaque série et décompte sur l’écran verrouillé avec la série suivante, les disques, le pouls et des boutons Valider la série et +30 s qui marchent appli fermée.",
+      body: "Il démarre seul après chaque série et décompte sur l’écran verrouillé avec la série suivante, les disques, le pouls et des boutons Valider la série et +30 s qui marchent appli fermée. Une vibration douce 10 secondes avant la fin vous laisse le temps de vous mettre en place, sur le téléphone et la montre.",
       note: "Android : une notification permanente, une Live Update sur Android 16 et la Now Bar de Samsung. iPhone : une Activité en direct sur l’écran verrouillé et dans la Dynamic Island. Web : une notification tant que la page est ouverte.",
     },
     plates: {
@@ -214,6 +214,10 @@ export const fr: FeaturesText = {
       body: "Téléphone oublié ? Saisissez la séance après coup : elle compte comme les autres.",
     },
     recap: { name: "Bilan du mois", body: "Un court retour sur votre mois, prêt à partager." },
+    anniversary: {
+      name: "Votre anniversaire d’entraînement",
+      body: "Chaque année, le jour de votre première séance, Aujourd’hui met le jour un à côté d’aujourd’hui : séances, séries, total soulevé et l’exercice qui a le plus progressé, avec une carte à partager. Elle reste une semaine.",
+    },
     body: {
       name: "Pesées, masse grasse et photos",
       body: "Notez votre poids et votre masse grasse, ou laissez-les venir de votre balance via l’appli santé du téléphone, et gardez vos photos de progrès sur votre téléphone.",
@@ -326,7 +330,7 @@ export const fr: FeaturesText = {
     },
     share: {
       name: "Cartes et liens de partage",
-      body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu.",
+      body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu. Un nouveau record s’illumine en doré et se partage dès l’écran de repos.",
     },
     coaching: {
       name: "Coacher des clients",
@@ -411,6 +415,11 @@ export const fr: FeaturesText = {
       name: "Rappels",
       body: "De petits rappels les jours d’entraînement, en notifications sur les téléphones et par e-mail.",
     },
+    emails: {
+      name: "Des e-mails qui vous font avancer",
+      body: "Huit conseils pour bien démarrer avec de vrais écrans, un bilan de la semaine et du mois, vos nouveaux records, les amis qui se sont entraînés et un coup de pouce pour revenir après une pause. Chaque type a son propre interrupteur.",
+      note: "Activés avec un compte, désactivés pour les moins de 18 ans sauf s'ils les activent. Chaque e-mail a un désabonnement en un clic.",
+    },
     cloud: {
       name: "Connexions aux services de fitness",
       body: "Oura envoie sommeil, VFC, pouls au repos et pas, via un compte gratuit. Nous étudions Strava, WHOOP, Withings, Polar et Concept2.",
@@ -454,6 +463,10 @@ export const fr: FeaturesText = {
     "one-hand": {
       name: "Commandes à une main",
       body: "Placez les boutons de charge et de répétitions à côté de Valider la série, sous votre pouce gauche ou droit.",
+    },
+    "big-numbers": {
+      name: "Grands chiffres",
+      body: "Pendant une série, le poids et les répétitions sont bien plus grands et Valider la série est plus haut, et la musique et la suite attendent le repos. Lisible à bout de bras, en pleine série.",
     },
     lean: {
       name: "Mode sobre, sons et vibrations",

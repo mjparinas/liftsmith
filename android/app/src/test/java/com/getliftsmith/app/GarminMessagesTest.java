@@ -38,6 +38,8 @@ public class GarminMessagesTest {
         assertEquals(85, m.get("r"));
         assertEquals(120, m.get("h"));
         assertEquals(false, m.get("v"));
+        assertEquals(false, m.get("w"));
+        assertEquals(true, GarminMessages.state(lifting().put("warn", true), NOW).get("w"));
         assertEquals(0, GarminMessages.state(lifting(), NOW).get("r"));
         assertEquals(0, GarminMessages.state(lifting().put("restUntil", NOW - 5), NOW).get("r"));
     }

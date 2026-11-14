@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Card } from "./charts";
 import { CardBones, Loading } from "./Skeletons";
 
-type Data = { settings: { instant: boolean; digest: boolean }; recipients: string[]; canSend: boolean };
+type Data = { settings: { instant: boolean; digest: boolean }; recipients: string[]; digestTo?: string[]; canSend: boolean };
 
 function Toggle({
   label,
@@ -88,7 +88,7 @@ export function Automations({ admin }: { admin: boolean }) {
     <div className="space-y-4">
       <Card
         title="Alerts and the morning digest"
-        subtitle={`Sent to ${data.recipients.length ? data.recipients.join(", ") : "nobody yet (set ADMIN_EMAILS)"}. Never to support staff. Counts and links only, never a lifter's email or training.`}
+        subtitle={`Alerts go to ${data.recipients.length ? data.recipients.join(", ") : "nobody yet (set ADMIN_EMAILS)"}; the digest to ${data.digestTo?.length ? data.digestTo.join(", ") : "the same"} (ADMIN_EMAILS plus DIGEST_TO). Never to support staff. Counts and links only, never a lifter's email or training.`}
       >
         {!data.canSend && (
           <p className="mb-2 text-sm text-warn">Email isn&apos;t set up on the server (RESEND_API_KEY), so nothing can be sent.</p>
