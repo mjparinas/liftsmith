@@ -225,7 +225,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Pick weights: how the adaptive plan chooses exercises](docs/decisions/pick-weights.md) (`src/lib/pickWeights.ts`, `generator.ts`, `TrainingSettings.tsx`)
 - [Platform deltas](docs/decisions/platform-deltas.md)
 - [Programs](docs/decisions/programs.md) (`src/lib/programs.ts`, `routines.ts`, `exercises.ts`)
-- [Public pages and SEO](docs/decisions/public-pages-and-seo.md) (`src/lib/seo.ts`, `src/app/sitemap.ts`, `plates.ts`, `onerm.ts`)
+- [Public pages and SEO](docs/decisions/public-pages-and-seo.md) (`src/lib/seo.ts`, `src/app/sitemap.ts`, `plates.ts`, `onerm.ts`; the app's structured data is a `MobileApplication`, never a `Product`, in `src/lib/appSchema.ts`, 2026-11-14)
 - [Reminders and lifecycle messages](docs/decisions/reminders-and-lifecycle-messages.md) (`src/lib/messages.ts`, `src/lib/reminders.ts`, `src/server/reminders.ts`, `MessageSettings.tsx`)
 - [Saving and backup](docs/decisions/saving-and-backup.md) (`Saving.tsx`, `src/lib/saving.ts`, `src/lib/backup.ts`)
 - [Set timer for holds, carries and hangs](docs/decisions/set-timer.md) (`src/lib/setTimer.ts`, `workout/SetTimer.tsx`)
