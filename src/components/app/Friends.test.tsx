@@ -82,6 +82,21 @@ describe("Friends", () => {
     expect(await screen.findByText("@alex")).toBeInTheDocument();
   });
 
+  it("says whether a handle is free while it's typed, and won't join with a taken one", async () => {
+    const u = userEvent.setup();
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true });
+    signIn("tok-a");
+    render(<Friends />);
+    const box = await screen.findByLabelText("Handle");
+    await u.clear(box);
+    await u.type(box, "blair");
+    expect(await screen.findByText("That handle isn’t available. Try another.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Agree and join" })).toBeDisabled();
+    await u.type(box, "_lifts");
+    expect(await screen.findByText("@blair_lifts is available.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Agree and join" })).toBeEnabled();
+  });
+
   it("reports a profile from its menu", async () => {
     const u = userEvent.setup();
     await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });

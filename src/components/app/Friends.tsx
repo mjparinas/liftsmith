@@ -104,6 +104,48 @@ import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton,
 
 // --- Small pieces ---
 
+type HandleStatus = "free" | "mine" | "taken" | "invalid";
+
+/**
+ * Whether a handle is free, checked while the lifter types (Melvin, 2026-11-14): a moment after the last key, so a
+ * burst of typing asks once. Offline or on any error it says nothing and the save still checks.
+ */
+export function useHandleCheck(handle: string): HandleStatus | null {
+  const [seen, setSeen] = useState<{ handle: string; status: HandleStatus } | null>(null);
+  const valid = HANDLE_RE.test(handle);
+  useEffect(() => {
+    if (!valid) return;
+    let live = true;
+    const timer = setTimeout(() => {
+      social<{ handle: string; status: HandleStatus }>("handleCheck", { handle })
+        .then((r) => live && setSeen({ handle, status: r.status }))
+        .catch(() => undefined);
+    }, 400);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [handle, valid]);
+  if (!valid) return null;
+  return seen?.handle === handle ? seen.status : null;
+}
+
+/** The line under a handle box: the rules, then whether the handle is free once we know. */
+function HandleHint({ id, handle, status }: { id: string; handle: string; status: HandleStatus | null }) {
+  const free = status === "free";
+  const taken = status === "taken" || status === "invalid";
+  return (
+    <p
+      id={id}
+      className={`mt-1 flex items-center gap-1 px-1 text-xs ${free ? "text-good" : taken ? "text-bad" : "text-muted"}`}
+      aria-live="polite"
+    >
+      {free && <Icon name="check" size={14} className="shrink-0" />}
+      {free ? t("friends.handleFree", { handle }) : taken ? t("friends.err.handleTaken") : t("friends.handleHint")}
+    </p>
+  );
+}
+
 function Note({ text }: { text: string | null }) {
   if (!text) return null;
   return (
@@ -739,7 +781,8 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const h = cleanHandle(handle);
-  const valid = HANDLE_RE.test(h);
+  const status = useHandleCheck(h);
+  const valid = HANDLE_RE.test(h) && status !== "taken";
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!valid || busy) return;
@@ -780,9 +823,7 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
           aria-describedby="fr-handle-hint"
         />
       </div>
-      <p id="fr-handle-hint" className="mt-1 text-xs text-muted">
-        {t("friends.handleHint")}
-      </p>
+      <HandleHint id="fr-handle-hint" handle={h} status={status} />
       <label htmlFor="fr-name" className="mt-4 block text-sm text-muted">
         {t("friends.name")}
       </label>
@@ -1081,6 +1122,8 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
   const [tagline, setTagline] = useState(p?.tagline ?? "");
   const [note, setNote] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const h = cleanHandle(handle);
+  const checked = useHandleCheck(h === p?.handle ? "" : h);
   if (!p) return null;
   const save = async (change: Record<string, unknown>) => {
     try {
@@ -1147,8 +1190,10 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
           autoCorrect="off"
           spellCheck={false}
           className="card mt-1 w-full px-4 py-3"
+          aria-describedby="fr-set-handle-hint"
         />
-        <Button submit kind="ghost" className="mt-3 w-full" disabled={!HANDLE_RE.test(cleanHandle(handle))}>
+        {h !== p.handle && <HandleHint id="fr-set-handle-hint" handle={h} status={checked} />}
+        <Button submit kind="ghost" className="mt-3 w-full" disabled={!HANDLE_RE.test(h) || checked === "taken"}>
           {t("friends.save")}
         </Button>
       </form>

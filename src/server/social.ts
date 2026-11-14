@@ -85,6 +85,7 @@ export const DAILY = {
   club: 5,
   cheer: 300,
   checkin: 10,
+  handleCheck: 600,
 };
 /** An invite link lasts 30 days and works for this many people. */
 export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
@@ -237,6 +238,18 @@ export function checkHandle(v: unknown): { ok: true; handle: string } | { ok: fa
   if (RESERVED.has(handle) || handle.includes("liftsmith") || hasBlockedWord(handle.replace(/_/g, " ")) || hasBlockedWord(handle))
     return { ok: false, error: "handleTaken" };
   return { ok: true, handle };
+}
+
+/**
+ * Whether a handle is free, asked while the lifter types it (Melvin, 2026-11-14), on the Join screen and in Friends settings.
+ * Reserved and blocked handles read as taken, like on save; the save still checks, and the UNIQUE index settles a race.
+ */
+export async function handleCheck(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const h = checkHandle(b.handle);
+  if (!h.ok) return ok({ handle: cleanHandle(b.handle), status: h.error === "handle" ? "invalid" : "taken" });
+  if (!(await limit(accountId, "handleCheck", now))) return fail(429, "slow");
+  const p = await byHandle(h.handle);
+  return ok({ handle: h.handle, status: !p ? "free" : p.account_id === accountId ? "mine" : "taken" });
 }
 
 /** A tagline: "" clears it; otherwise the same filter as names (no links, no blocked words). */
@@ -2335,6 +2348,7 @@ export const OPS: Record<string, Op> = {
   home,
   join,
   update: (a, b) => update(a, b),
+  handleCheck,
   leave: (a) => leave(a),
   lookup,
   search,
