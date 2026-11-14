@@ -291,12 +291,16 @@ export interface Profile {
    * the default (Pro offers off, the rest on). Email needs an address and a confirmed opt-in.
    */
   messages?: {
-    push: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour", boolean>>;
+    push: Partial<
+      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+    >;
     email?: {
       address: string;
       consentAt: number;
       status: "pending" | "confirmed" | "unsubscribed";
-      kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour", boolean>>;
+      kinds: Partial<
+        Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+      >;
     };
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
