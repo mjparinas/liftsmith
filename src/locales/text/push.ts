@@ -34,6 +34,8 @@ export const en = {
   "push.coachBooked": "{name} booked a session: {text}",
   "push.coachCancelled": "{name} cancelled a session: {text}",
   "push.coachPaid": "{name} paid you {text}.",
+  "push.referralInviter": "{name} finished three workouts with your invite. You both have a month of Pro.",
+  "push.referralFriend": "You finished three workouts. You and {name} both have a month of Pro.",
 } as const;
 
 type Key = keyof typeof en;
@@ -68,6 +70,8 @@ export const es: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} reservó una sesión: {text}",
   "push.coachCancelled": "{name} canceló una sesión: {text}",
   "push.coachPaid": "{name} te pagó {text}.",
+  "push.referralInviter": "{name} terminó tres entrenamientos con tu invitación. Los dos tenéis un mes de Pro.",
+  "push.referralFriend": "Terminaste tres entrenamientos. Tú y {name} tenéis un mes de Pro.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -101,6 +105,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} a réservé une séance : {text}",
   "push.coachCancelled": "{name} a annulé une séance : {text}",
   "push.coachPaid": "{name} vous a payé {text}.",
+  "push.referralInviter": "{name} a terminé trois séances grâce à ton invitation. Vous avez tous les deux un mois de Pro.",
+  "push.referralFriend": "Tu as terminé trois séances. Toi et {name} avez tous les deux un mois de Pro.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -133,6 +139,8 @@ export const de: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} hat einen Termin gebucht: {text}",
   "push.coachCancelled": "{name} hat einen Termin abgesagt: {text}",
   "push.coachPaid": "{name} hat dir {text} bezahlt.",
+  "push.referralInviter": "{name} hat mit deiner Einladung drei Trainings geschafft. Ihr habt beide einen Monat Pro.",
+  "push.referralFriend": "Du hast drei Trainings geschafft. Du und {name} habt beide einen Monat Pro.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -166,6 +174,8 @@ export const it: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} ha prenotato una sessione: {text}",
   "push.coachCancelled": "{name} ha annullato una sessione: {text}",
   "push.coachPaid": "{name} ti ha pagato {text}.",
+  "push.referralInviter": "{name} ha finito tre allenamenti con il tuo invito. Avete entrambi un mese di Pro.",
+  "push.referralFriend": "Hai finito tre allenamenti. Tu e {name} avete entrambi un mese di Pro.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -199,4 +209,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name}さんがセッションを予約しました：{text}",
   "push.coachCancelled": "{name}さんがセッションをキャンセルしました：{text}",
   "push.coachPaid": "{name}さんから{text}の支払いがありました。",
+  "push.referralInviter": "{name}さんがあなたの招待で3回のワークアウトを終えました。2人ともProが1か月使えます。",
+  "push.referralFriend": "3回のワークアウトを終えました。あなたと{name}さんは2人ともProが1か月使えます。",
 };

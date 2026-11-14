@@ -4,6 +4,28 @@ import type { Message } from "@/lib/i18n";
 // docs/decisions/friends.md). English is the source: add a key here first.
 
 export const en = {
+  "friends.invites.title": "Your invites",
+  "friends.invites.joined": "Joined with your link",
+  "friends.invites.paid": "Finished three workouts. You both got a month of Pro.",
+  "friends.invites.left": {
+    one: "{done} of {needed} workouts done. {count} more and you both get a month of Pro.",
+    other: "{done} of {needed} workouts done. {count} more and you both get a month of Pro.",
+  },
+  "friends.invites.until": {
+    one: "You’ve earned {count} month of Pro from invites. Pro runs until {date}.",
+    other: "You’ve earned {count} months of Pro from invites. Pro runs until {date}.",
+  },
+  "friends.invites.cap": {
+    one: "That’s the most for this year ({count} month). Friends you invite still get theirs.",
+    other: "That’s the most for this year ({count} months). Friends you invite still get theirs.",
+  },
+  "friends.invites.yours": {
+    one: "You joined with {name}’s link. Finish {count} more workout and you both get a month of Pro.",
+    other: "You joined with {name}’s link. Finish {count} more workouts and you both get a month of Pro.",
+  },
+  "friends.invites.someone": "A friend",
+  "friends.invites.why": "A workout counts once it has three logged sets, so it goes to friends who really train.",
+  "friends.invites.done": "Invite a friend to train with you",
   "friends.invite.reward": "When a friend joins with your link and finishes three workouts, you both get a month of Pro.",
   "friends.invite.rewardFriend": "New here? Finish three workouts and you both get a month of Pro.",
   "friends.backPerson": "‹ Back",
@@ -329,6 +351,28 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "friends.invites.title": "Tus invitaciones",
+  "friends.invites.joined": "Se unió con tu enlace",
+  "friends.invites.paid": "Completó tres entrenamientos. Los dos recibisteis un mes de Pro.",
+  "friends.invites.left": {
+    one: "{done} de {needed} entrenamientos hechos. Falta {count} y los dos recibís un mes de Pro.",
+    other: "{done} de {needed} entrenamientos hechos. Faltan {count} y los dos recibís un mes de Pro.",
+  },
+  "friends.invites.until": {
+    one: "Has ganado {count} mes de Pro con invitaciones. Pro dura hasta el {date}.",
+    other: "Has ganado {count} meses de Pro con invitaciones. Pro dura hasta el {date}.",
+  },
+  "friends.invites.cap": {
+    one: "Es el máximo de este año ({count} mes). Los amigos que invites siguen recibiendo el suyo.",
+    other: "Es el máximo de este año ({count} meses). Los amigos que invites siguen recibiendo el suyo.",
+  },
+  "friends.invites.yours": {
+    one: "Te uniste con el enlace de {name}. Completa {count} entrenamiento más y los dos recibís un mes de Pro.",
+    other: "Te uniste con el enlace de {name}. Completa {count} entrenamientos más y los dos recibís un mes de Pro.",
+  },
+  "friends.invites.someone": "Un amigo",
+  "friends.invites.why": "Un entrenamiento cuenta cuando tiene tres series registradas, así que solo lo ganan quienes entrenan de verdad.",
+  "friends.invites.done": "Invita a un amigo a entrenar contigo",
   "friends.invite.reward": "Cuando un amigo se une con tu enlace y completa tres entrenamientos, los dos recibís un mes de Pro.",
   "friends.invite.rewardFriend": "¿Eres nuevo? Completa tres entrenamientos y los dos recibiréis un mes de Pro.",
   "friends.backPerson": "‹ Atrás",
@@ -656,6 +700,28 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "friends.invites.title": "Tes invitations",
+  "friends.invites.joined": "Inscrit avec ton lien",
+  "friends.invites.paid": "Trois séances terminées. Vous avez tous les deux reçu un mois de Pro.",
+  "friends.invites.left": {
+    one: "{done} séance sur {needed} faite. Encore {count} et vous recevez tous les deux un mois de Pro.",
+    other: "{done} séances sur {needed} faites. Encore {count} et vous recevez tous les deux un mois de Pro.",
+  },
+  "friends.invites.until": {
+    one: "Tu as gagné {count} mois de Pro grâce aux invitations. Pro dure jusqu’au {date}.",
+    other: "Tu as gagné {count} mois de Pro grâce aux invitations. Pro dure jusqu’au {date}.",
+  },
+  "friends.invites.cap": {
+    one: "C’est le maximum pour cette année ({count} mois). Les amis que tu invites reçoivent toujours le leur.",
+    other: "C’est le maximum pour cette année ({count} mois). Les amis que tu invites reçoivent toujours le leur.",
+  },
+  "friends.invites.yours": {
+    one: "Tu t’es inscrit avec le lien de {name}. Termine encore {count} séance et vous recevez tous les deux un mois de Pro.",
+    other: "Tu t’es inscrit avec le lien de {name}. Termine encore {count} séances et vous recevez tous les deux un mois de Pro.",
+  },
+  "friends.invites.someone": "Un ami",
+  "friends.invites.why": "Une séance compte dès qu’elle a trois séries enregistrées : le mois va aux amis qui s’entraînent vraiment.",
+  "friends.invites.done": "Invite un ami à s’entraîner avec toi",
   "friends.invite.reward": "Quand un ami vous rejoint avec votre lien et termine trois séances, vous recevez tous les deux un mois de Pro.",
   "friends.invite.rewardFriend": "Nouveau ici ? Terminez trois séances et vous recevrez tous les deux un mois de Pro.",
   "friends.backPerson": "‹ Retour",
@@ -987,6 +1053,29 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "friends.invites.title": "Deine Einladungen",
+  "friends.invites.joined": "Mit deinem Link dabei",
+  "friends.invites.paid": "Drei Trainings geschafft. Ihr habt beide einen Monat Pro bekommen.",
+  "friends.invites.left": {
+    one: "{done} von {needed} Trainings geschafft. Noch {count}, dann bekommt ihr beide einen Monat Pro.",
+    other: "{done} von {needed} Trainings geschafft. Noch {count}, dann bekommt ihr beide einen Monat Pro.",
+  },
+  "friends.invites.until": {
+    one: "Du hast mit Einladungen {count} Monat Pro verdient. Pro läuft bis zum {date}.",
+    other: "Du hast mit Einladungen {count} Monate Pro verdient. Pro läuft bis zum {date}.",
+  },
+  "friends.invites.cap": {
+    one: "Mehr geht in diesem Jahr nicht ({count} Monat). Freunde, die du einlädst, bekommen ihren trotzdem.",
+    other: "Mehr geht in diesem Jahr nicht ({count} Monate). Freunde, die du einlädst, bekommen ihren trotzdem.",
+  },
+  "friends.invites.yours": {
+    one: "Du bist über den Link von {name} dabei. Schaff noch {count} Training, dann bekommt ihr beide einen Monat Pro.",
+    other: "Du bist über den Link von {name} dabei. Schaff noch {count} Trainings, dann bekommt ihr beide einen Monat Pro.",
+  },
+  "friends.invites.someone": "Ein Freund",
+  "friends.invites.why":
+    "Ein Training zählt, sobald es drei eingetragene Sätze hat, damit der Monat an Freunde geht, die wirklich trainieren.",
+  "friends.invites.done": "Lade einen Freund zum gemeinsamen Training ein",
   "friends.invite.reward": "Wenn jemand über deinen Link beitritt und drei Workouts abschließt, bekommt ihr beide einen Monat Pro.",
   "friends.invite.rewardFriend": "Neu hier? Schließ drei Workouts ab, dann bekommt ihr beide einen Monat Pro.",
   "friends.backPerson": "‹ Zurück",
@@ -1312,6 +1401,28 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "friends.invites.title": "I tuoi inviti",
+  "friends.invites.joined": "Iscritto con il tuo link",
+  "friends.invites.paid": "Tre allenamenti finiti. Avete ricevuto entrambi un mese di Pro.",
+  "friends.invites.left": {
+    one: "{done} allenamento su {needed} fatto. Ancora {count} e ricevete entrambi un mese di Pro.",
+    other: "{done} allenamenti su {needed} fatti. Ancora {count} e ricevete entrambi un mese di Pro.",
+  },
+  "friends.invites.until": {
+    one: "Hai guadagnato {count} mese di Pro con gli inviti. Pro dura fino al {date}.",
+    other: "Hai guadagnato {count} mesi di Pro con gli inviti. Pro dura fino al {date}.",
+  },
+  "friends.invites.cap": {
+    one: "È il massimo per quest’anno ({count} mese). Gli amici che inviti ricevono comunque il loro.",
+    other: "È il massimo per quest’anno ({count} mesi). Gli amici che inviti ricevono comunque il loro.",
+  },
+  "friends.invites.yours": {
+    one: "Ti sei iscritto con il link di {name}. Finisci ancora {count} allenamento e ricevete entrambi un mese di Pro.",
+    other: "Ti sei iscritto con il link di {name}. Finisci ancora {count} allenamenti e ricevete entrambi un mese di Pro.",
+  },
+  "friends.invites.someone": "Un amico",
+  "friends.invites.why": "Un allenamento conta quando ha tre serie registrate, così il mese va a chi si allena davvero.",
+  "friends.invites.done": "Invita un amico ad allenarsi con te",
   "friends.invite.reward": "Quando un amico si unisce con il tuo link e completa tre allenamenti, ricevete entrambi un mese di Pro.",
   "friends.invite.rewardFriend": "Sei nuovo? Completa tre allenamenti e riceverete entrambi un mese di Pro.",
   "friends.backPerson": "‹ Indietro",
@@ -1637,6 +1748,18 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "friends.invites.title": "あなたの招待",
+  "friends.invites.joined": "あなたのリンクで参加",
+  "friends.invites.paid": "3回のワークアウトを達成。2人ともProを1か月獲得しました。",
+  "friends.invites.left": { other: "{needed}回中{done}回完了。あと{count}回で2人ともProが1か月もらえます。" },
+  "friends.invites.until": { other: "招待でProを{count}か月獲得しました。Proは{date}まで使えます。" },
+  "friends.invites.cap": { other: "今年の上限（{count}か月）に達しました。招待した友達は引き続き自分の分を受け取れます。" },
+  "friends.invites.yours": {
+    other: "{name}さんのリンクで参加しました。あと{count}回ワークアウトを終えると、2人ともProが1か月もらえます。",
+  },
+  "friends.invites.someone": "友達",
+  "friends.invites.why": "記録したセットが3つ以上あるワークアウトだけが数えられるので、本当にトレーニングする友達に届きます。",
+  "friends.invites.done": "友達を誘って一緒にトレーニング",
   "friends.invite.reward": "友だちがあなたのリンクから参加してワークアウトを3回終えると、2人とも Pro を1か月もらえます。",
   "friends.invite.rewardFriend": "はじめての方へ: ワークアウトを3回終えると、2人とも Pro を1か月もらえます。",
   "friends.backPerson": "‹ 戻る",

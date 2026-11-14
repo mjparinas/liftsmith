@@ -302,6 +302,11 @@ export const it: FeaturesText = {
       name: "In allenamento ora e incitamenti",
       body: "Vedi chi si sta allenando adesso e manda un incitamento che sale fluttuando sulla sua schermata di allenamento.",
     },
+    "invite-friends": {
+      name: "Invita amici, guadagna Pro",
+      body: "Condividi il tuo link d’invito da Amici, alla fine di un allenamento o da qualsiasi scheda. Un amico che si iscrive con il link ti segue a sua volta e, quando finisce tre allenamenti, ricevete entrambi un mese di Pro. I tuoi inviti mostra a che punto è ciascuno.",
+      note: "Fino a 12 mesi l’anno. Chi ha meno di 18 anni può invitare amici, ma la ricompensa non gli viene proposta.",
+    },
     "check-in": {
       name: "Check-in in palestra",
       body: "Un tocco su Oggi avvisa gli amici che scegli che sei in palestra. Ricevono una notifica e un avviso nell'app finché non lo chiudono.",
