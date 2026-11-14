@@ -419,3 +419,54 @@ describe("one-arm moves", () => {
     }
   });
 });
+
+describe("combos and Olympic lifts", () => {
+  // Melvin, 2026-11-14: "Clean and jerk doesn't have the jerk movement", "Split jerk doesn't split",
+  // and moves with two parts in the name should do both.
+  const at = (id: string, d: number) => jointsAt(motionFor(id), B, d);
+  const overhead = (id: string, d: number) => {
+    const j = at(id, d);
+    return Math.min(j.handL[1], j.handR[1]) > j.head[1] + 0.2;
+  };
+  it("splits the feet under the bar on the split jerk and the clean and jerk, and squats under on the push jerk", () => {
+    for (const id of ["split-jerk", "clean-and-jerk"]) {
+      const c = at(id, 0.5);
+      expect(c.ankleR[0] - c.ankleL[0], id).toBeGreaterThan(0.6);
+      expect(overhead(id, 0.5), id).toBe(true);
+      expect(overhead(id, 0), id).toBe(false);
+    }
+    const push = at("push-jerk", 0.5);
+    expect(Math.abs(push.ankleR[0] - push.ankleL[0])).toBeLessThan(0.1);
+    expect(push.hipC[1]).toBeLessThan(at("push-jerk", 0).hipC[1] - 0.08);
+    expect(overhead("push-jerk", 0.5)).toBe(true);
+  });
+  it("cleans from the floor before the jerk, and snatches straight overhead on a wide grip", () => {
+    expect(at("clean-and-jerk", 3).handR[1]).toBeLessThan(0.4);
+    for (const id of ["power-snatch", "hang-snatch"]) {
+      expect(overhead(id, 0.5), id).toBe(true);
+      expect(overhead(id, 1), id).toBe(false);
+      expect(motionFor(id).grip, id).toBeGreaterThan(0.35);
+    }
+    expect(at("power-snatch", 2).handR[1]).toBeLessThan(0.4);
+  });
+  it("presses after the clean, and the burpees do their own finish", () => {
+    for (const id of ["kb-clean-and-press", "db-clean-and-press"]) {
+      expect(at(id, -1).handR[1], id).toBeGreaterThan(at(id, -1).head[1] + 0.2);
+      expect(at(id, 0).handR[1], id).toBeLessThan(at(id, 0).head[1]);
+    }
+    expect(overhead("burpee-pull-up", 0.75)).toBe(true);
+    expect(at("burpee-pull-up", 1).head[1]).toBeGreaterThan(at("burpee-pull-up", 0.75).head[1] + 0.3);
+    expect(props("burpee-pull-up").some((p) => p.kind === "rail")).toBe(true);
+    const tuck = at("burpee-tuck-jump", 1);
+    expect(tuck.kneeL[1]).toBeGreaterThan(tuck.hipC[1] - 0.15);
+    expect(at("sprawl", 0).hipC[1]).toBeLessThan(0.3);
+    expect(at("half-burpee", 1).head[1]).toBeLessThan(at("burpee", 1).head[1] - 0.1);
+    expect(motionFor("kb-burpee-deadlift").load).toBe("kettlebell");
+    expect(cables("cable-squat-to-row")).toHaveLength(1);
+    expect(at("cable-squat-to-row", -1).handR[0]).toBeLessThan(at("cable-squat-to-row", 0).handR[0] - 0.25);
+  });
+  it("goes down, halfway up and back down on the one and a half squat", () => {
+    const ds = motionFor("one-and-a-half-squat").phases.map((p) => p[2]);
+    expect(ds).toEqual([0, 1, 0.5, 1, 0]);
+  });
+});
