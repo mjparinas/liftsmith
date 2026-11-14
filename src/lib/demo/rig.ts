@@ -294,7 +294,47 @@ export type Anchor = Vec | "hands" | "ankles" | "handL" | "handR" | "ankleL" | "
 export type Prop =
   | { kind: "box"; at: Vec; size: Vec; tilt?: number; follow?: Anchor } // centre (offset from `follow` when set), full size, tilt about z (degrees)
   | { kind: "rail"; at: Vec; length: number; axis?: "x" | "y" | "z" } // pull-up bar, dip bars, smith rails
-  | { kind: "cable"; from: Anchor; to: Anchor }; // pulley cable or band, follows the joints
+  | { kind: "cable"; from: Anchor; to: Anchor } // pulley cable or band, follows the joints
+  | RopeProp;
+
+/**
+ * A battle rope from a hand to an anchor on the floor ahead, drawn with a travelling sine wave. The
+ * hand circles `centre` (forward and back by 0.4 × `radius`, up and down, or side to side when `axis`
+ * is "z", by `radius`), and where it is on that circle sets the wave's phase, so the wave rolls down
+ * the rope as the hand moves with no clock of its own. The wave swells a little along the rope, the
+ * middle sags to the floor, and the far end stays on the anchor.
+ */
+export interface RopeProp {
+  kind: "rope";
+  from: Anchor;
+  to: Vec;
+  centre: Vec;
+  radius: number;
+  /** How many wavelengths fit along the rope. */
+  waves: number;
+  axis?: "y" | "z";
+}
+
+export function ropePoints(p: RopeProp, J: Joints, n = 32): Vec[] {
+  const h = anchorAt(J, p.from);
+  const ai = p.axis === "z" ? 2 : 1;
+  const r = p.radius || 0.1;
+  const sinP = Math.max(-1, Math.min(1, (h[ai] - p.centre[ai]) / r));
+  const phi = Math.atan2(sinP, (h[0] - p.centre[0]) / (0.4 * r));
+  const out: Vec[] = [];
+  for (let i = 0; i <= n; i++) {
+    const s = i / n;
+    const q = lerpV(h, p.to, s);
+    const env = Math.pow(1 - s, 0.7) * (1 + 1.5 * s);
+    // the hand's own offset fades linearly in the straight line; swap it for the wave
+    const wave = r * env * Math.sin(phi - 2 * Math.PI * p.waves * s) - (1 - s) * r * Math.sin(phi);
+    q[ai] += wave;
+    // the middle of the rope lies on the floor
+    q[1] = Math.max(0.02, q[1] - 0.3 * Math.sin(Math.PI * s));
+    out.push(q);
+  }
+  return out;
+}
 
 export interface Pose {
   /** Pelvis and shoulder centres. The torso runs between them in the x-y plane (shared z). */

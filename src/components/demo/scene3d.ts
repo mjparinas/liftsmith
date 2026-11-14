@@ -28,7 +28,7 @@ import {
 } from "three";
 
 import { partIndices, REGIONS } from "@/lib/demo/mesh";
-import { anchorAt, type Anchor, type Prop, type Vec } from "@/lib/demo/rig";
+import { anchorAt, ropePoints, type Anchor, type Prop, type RopeProp, type Vec } from "@/lib/demo/rig";
 
 import { DEMO_COLOURS } from "./colours";
 import type { Frame, Scene } from "./engine";
@@ -299,6 +299,8 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   fig.add(propGroup);
   let cables: { line: LineSegments; from: Anchor; to: Anchor }[] = [];
   let followers: { obj: LineSegments; at: Vec; follow: Anchor }[] = [];
+  let ropes: { line: LineSegments; p: RopeProp }[] = [];
+  const ROPE_N = 32;
   const buildProps = (props: Prop[]) => {
     for (const c of [...propGroup.children]) {
       propGroup.remove(c);
@@ -306,6 +308,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     }
     cables = [];
     followers = [];
+    ropes = [];
     for (const p of props) {
       if (p.kind === "box") {
         const e = new LineSegments(new EdgesGeometry(new BoxGeometry(p.size[0], p.size[1], p.size[2]), 1), propMat);
@@ -321,6 +324,13 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         g.dispose();
         e.position.set(...p.at);
         propGroup.add(e);
+      } else if (p.kind === "rope") {
+        const g = new BufferGeometry();
+        g.setAttribute("position", new BufferAttribute(new Float32Array(ROPE_N * 6), 3));
+        const line = new LineSegments(g, steelMat);
+        line.frustumCulled = false;
+        propGroup.add(line);
+        ropes.push({ line, p });
       } else {
         const g = new BufferGeometry();
         g.setAttribute("position", new BufferAttribute(new Float32Array(6), 3));
@@ -622,6 +632,15 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         a.set(anchorAt(J, c.from), 0);
         a.set(anchorAt(J, c.to), 3);
         c.line.geometry.attributes.position.needsUpdate = true;
+      }
+      for (const r of ropes) {
+        const a = r.line.geometry.attributes.position.array as Float32Array;
+        const pts = ropePoints(r.p, J, ROPE_N);
+        for (let i = 0; i < ROPE_N; i++) {
+          a.set(pts[i]!, i * 6);
+          a.set(pts[i + 1]!, i * 6 + 3);
+        }
+        r.line.geometry.attributes.position.needsUpdate = true;
       }
       for (const fl of followers) {
         const p = anchorAt(J, fl.follow);
