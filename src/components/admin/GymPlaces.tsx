@@ -8,6 +8,7 @@ import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces
 
 import { Card } from "./charts";
 import { GymClaims } from "./GymClaims";
+import { GymEnrich } from "./GymEnrich";
 import { GymImport } from "./GymImport";
 import { GymPosters } from "./GymPosters";
 import { Loading, TableBones } from "./Skeletons";
@@ -88,6 +89,7 @@ export function GymPlaces({ admin }: { admin: boolean }) {
         </Card>
       )}
       <GymImport admin={admin} changed={() => setVersion((v) => v + 1)} />
+      <GymEnrich admin={admin} changed={() => setVersion((v) => v + 1)} />
       {note && (
         <p className="text-sm text-muted" role="status">
           {note}

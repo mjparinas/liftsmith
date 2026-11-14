@@ -34,6 +34,7 @@ export const PLACE_LIMITS = {
 };
 
 export type PlaceKind = "gym" | "studio";
+export type Wheelchair = "yes" | "limited" | "no" | "";
 
 /** A real gym as the finder shows it. */
 export interface Place {
@@ -52,6 +53,13 @@ export interface Place {
   hours: string;
   website: string;
   phone: string;
+  /** Postal code, email, Instagram and Facebook pages, from the map or the gym's own website ('' when unknown). */
+  postcode: string;
+  email: string;
+  instagram: string;
+  facebook: string;
+  /** Wheelchair access as the map says it: yes, limited, no, or '' when nobody said. */
+  wheelchair: Wheelchair;
   country: string;
   updatedAt: number;
   /** Claimed by its owner. */
@@ -140,10 +148,40 @@ export interface PlaceDraft {
   hours: string;
   website: string;
   phone: string;
+  postcode: string;
+  email: string;
+  instagram: string;
+  facebook: string;
+  wheelchair: Wheelchair;
   /** True when the map gave no city and the import's own area filled it in. A gym near a border falls inside two
    * cities' areas, so a refresh keeps the city it already has instead of flipping it with each import. */
   guessed?: boolean;
 }
+
+/** A plain email address, or ''. */
+export const cleanEmail = (x: string | undefined) => {
+  const v = clean(x, 120).replace(/^mailto:/i, "");
+  return /^[^\s@<>"']+@[^\s@<>"']+\.[a-z]{2,}$/i.test(v) ? v.toLowerCase() : "";
+};
+
+/** A social page as a full https link: "liftsmithgym", "@liftsmithgym" or a link on that site. '' for anything else. */
+export function socialUrl(x: string | undefined, site: "instagram" | "facebook"): string {
+  const v = clean(x, 200);
+  if (!v) return "";
+  const host = site === "instagram" ? "instagram.com" : "facebook.com";
+  const link = /^https?:\/\/(?:www\.|m\.|web\.)?(instagram\.com|facebook\.com|fb\.com)\/([^?#\s]+)/i.exec(v);
+  if (link) {
+    const sameSite = (link[1]!.toLowerCase() === "fb.com" ? "facebook.com" : link[1]!.toLowerCase()) === host;
+    const path = link[2]!.replace(/\/+$/, "");
+    if (!sameSite || !path || /^(sharer|share|plugins|dialog|tr|p|reel|explore)(\/|$)/i.test(path)) return "";
+    return `https://www.${host}/${path}`;
+  }
+  const handle = v.replace(/^@/, "");
+  return /^[A-Za-z0-9._-]{2,60}$/.test(handle) ? `https://www.${host}/${handle}` : "";
+}
+
+const wheelchairOf = (x: string | undefined): Wheelchair =>
+  x === "yes" || x === "limited" || x === "no" ? x : x === "designated" ? "yes" : "";
 
 /** What an import left out, and why: for the admin's debug log. */
 export interface OsmSkips {
@@ -201,7 +239,10 @@ export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSki
       name,
       // A rec centre's sport tag lists everything it hosts (swimming, hockey), so only its name can make it a studio.
       kind: STUDIO.test(fitness ? about : name.toLowerCase()) ? "studio" : "gym",
-      address: clean([t["addr:housenumber"], t["addr:street"]].filter(Boolean).join(" "), 120),
+      address: clean(
+        [[t["addr:unit"] ? `${t["addr:unit"]}-` : "", t["addr:housenumber"]].join(""), t["addr:street"]].filter(Boolean).join(" "),
+        120,
+      ),
       city: mapCity || area.city,
       region: clean(t["addr:province"] ?? t["addr:state"], 60) || area.region,
       country: clean(t["addr:country"], 2).toUpperCase() || area.country,
@@ -209,7 +250,12 @@ export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSki
       lon: Math.round(lon * 1e5) / 1e5,
       hours: clean(t.opening_hours, 200),
       website: httpUrl(t.website ?? t["contact:website"]),
-      phone: clean(t.phone ?? t["contact:phone"], 40),
+      phone: clean(t.phone ?? t["contact:phone"] ?? t["contact:mobile"], 40),
+      postcode: clean(t["addr:postcode"], 20),
+      email: cleanEmail(t.email ?? t["contact:email"]),
+      instagram: socialUrl(t["contact:instagram"] ?? t.instagram, "instagram"),
+      facebook: socialUrl(t["contact:facebook"] ?? t.facebook, "facebook"),
+      wheelchair: wheelchairOf(t.wheelchair),
       guessed: !mapCity,
     });
   }
@@ -229,7 +275,25 @@ export interface SaveResult {
   statements: number;
 }
 
-const SAME_FIELDS = ["name", "address", "city", "region", "country", "lat", "lon", "hours", "website", "phone"] as const;
+const SAME_FIELDS = [
+  "name",
+  "address",
+  "city",
+  "region",
+  "country",
+  "lat",
+  "lon",
+  "hours",
+  "website",
+  "phone",
+  "postcode",
+  "email",
+  "instagram",
+  "facebook",
+  "wheelchair",
+] as const;
+/** Details the gym's own website may have filled in (gymEnrich.ts): the map never blanks one, only replaces it. */
+const KEEP_IF_MAP_EMPTY = ["address", "hours", "website", "phone", "postcode", "email", "instagram", "facebook", "wheelchair"] as const;
 
 /**
  * Writes imported places, keyed on the map's own id (`source_ref`, unique), so running an import again is safe: new
@@ -273,14 +337,16 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
         continue;
       }
       // The city came from the import's area, not the map: keep the one the gym already has.
-      const next = d.guessed ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) } : d;
+      const next = d.guessed ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) } : { ...d };
+      for (const f of KEEP_IF_MAP_EMPTY) if (!next[f] && s(old[f])) (next as Record<string, unknown>)[f] = s(old[f]);
       if (SAME_FIELDS.every((f) => String(next[f]) === String(old[f] ?? ""))) {
         out.unchanged++;
         continue;
       }
       stmts.push({
         sql: `UPDATE gym_places SET name = ?, address = ?, city = ?, region = ?, country = ?, lat = ?, lon = ?, hours = ?,
-           website = ?, phone = ?, updated_at = ? WHERE id = ? AND claimed_by = ''`,
+           website = ?, phone = ?, postcode = ?, email = ?, instagram = ?, facebook = ?, wheelchair = ?, updated_at = ?
+           WHERE id = ? AND claimed_by = ''`,
         args: [
           next.name,
           next.address,
@@ -292,6 +358,11 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
           next.hours,
           next.website,
           next.phone,
+          next.postcode,
+          next.email,
+          next.instagram,
+          next.facebook,
+          next.wheelchair,
           now,
           s(old.id),
         ],
@@ -307,8 +378,8 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
     taken.add(`${city}/${slug}`);
     stmts.push({
       sql: `INSERT OR IGNORE INTO gym_places (id, city_slug, slug, name, kind, address, city, region, country, lat, lon, hours, website, phone,
-         source, source_ref, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)`,
+         postcode, email, instagram, facebook, wheelchair, source, source_ref, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)`,
       args: [
         id,
         city,
@@ -324,6 +395,11 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
         d.hours,
         d.website,
         d.phone,
+        d.postcode,
+        d.email,
+        d.instagram,
+        d.facebook,
+        d.wheelchair,
         d.ref,
         now,
         now,
@@ -470,7 +546,7 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 // --- The finder ---
 
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
-  p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
+  p.postcode, p.email, p.instagram, p.facebook, p.wheelchair, p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
   (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
   (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind = 'logo' LIMIT 1) AS logo`;
@@ -490,6 +566,11 @@ const toPlace = (r: Row, km: number): Place => ({
   hours: s(r.hours),
   website: s(r.website),
   phone: s(r.phone),
+  postcode: s(r.postcode),
+  email: s(r.email),
+  instagram: s(r.instagram),
+  facebook: s(r.facebook),
+  wheelchair: wheelchairOf(s(r.wheelchair)),
   country: s(r.country),
   updatedAt: n(r.updated_at),
   official: !!s(r.claimed_by),

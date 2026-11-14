@@ -37,6 +37,12 @@ export interface Place {
   hours: string;
   website: string;
   phone?: string;
+  /** Postal code, email, social pages and wheelchair access (2026-11-14); missing from servers older than that. */
+  postcode?: string;
+  email?: string;
+  instagram?: string;
+  facebook?: string;
+  wheelchair?: "yes" | "limited" | "no" | "";
   updatedAt?: number;
   official: boolean;
   lifters: number;

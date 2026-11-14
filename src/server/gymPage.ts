@@ -153,10 +153,12 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
       ...(p.address ? { streetAddress: p.address } : {}),
       addressLocality: p.city,
       ...(p.region ? { addressRegion: p.region } : {}),
+      ...(p.postcode ? { postalCode: p.postcode } : {}),
       ...(p.country ? { addressCountry: p.country } : {}),
     },
-    ...(p.website ? { sameAs: [p.website] } : {}),
+    ...(p.website || p.instagram || p.facebook ? { sameAs: [p.website, p.instagram, p.facebook].filter(Boolean) } : {}),
     ...(p.phone ? { telephone: p.phone } : {}),
+    ...(p.email ? { email: p.email } : {}),
     ...(p.amenities.length
       ? {
           amenityFeature: p.amenities.map((a) => ({
@@ -181,7 +183,15 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
   const contact = [
     p.website ? `<li>${icon("link", 18)}<a href="${esc(p.website)}" rel="nofollow noopener">${esc(say(lang, "gp.website"))}</a></li>` : "",
     p.phone ? `<li>${icon("phone", 18)}<a href="tel:${esc(p.phone.replace(/[^\d+]/g, ""))}">${esc(p.phone)}</a></li>` : "",
+    p.email ? `<li>${icon("chat", 18)}<a href="mailto:${esc(p.email)}">${esc(p.email)}</a></li>` : "",
+    p.instagram
+      ? `<li>${icon("camera", 18)}<a href="${esc(p.instagram)}" rel="nofollow noopener">${esc(say(lang, "gp.instagram"))}</a></li>`
+      : "",
+    p.facebook
+      ? `<li>${icon("link", 18)}<a href="${esc(p.facebook)}" rel="nofollow noopener">${esc(say(lang, "gp.facebook"))}</a></li>`
+      : "",
   ].join("");
+  const access = p.wheelchair ? `<p class="muted small">${esc(say(lang, `gp.wheelchair.${p.wheelchair}`))}</p>` : "";
   const hero = `<section class="card hero" aria-labelledby="gym-h">
 ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="${esc(say(lang, "gp.logoAlt", { name: p.name }))}" width="64" height="64">` : ""}<p class="kicker">${esc(say(lang, "gp.kicker"))}</p>
 <h1 id="gym-h"><span>${esc(p.name)}</span>${p.official ? officialMark(lang) : ""}</h1>
@@ -191,7 +201,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
 <a class="btn btn-primary wide" href="${esc(appGymPath(p.id))}">${icon("plus", 18)}${esc(say(lang, "gp.add"))}</a>
 <p class="muted small add-note">${esc(say(lang, p.code ? "gp.addKit" : "gp.addNoKit"))}</p></section>`;
   const place = `<section class="card" aria-labelledby="addr-h"><h2 id="addr-h">${icon("pin", 16)}${esc(say(lang, "gp.address"))}</h2>
-<p>${esc([p.address, city].filter(Boolean).join(", "))}</p>${
+<p>${esc([p.address, city, p.postcode].filter(Boolean).join(", "))}</p>${access}${
     p.map
       ? `<figure class="map"><img src="${esc(p.map)}" alt="${esc(say(lang, "gp.mapAlt", { name: p.name }))}" width="640" height="320" loading="lazy"><figcaption>${esc(say(lang, "gp.mapCredit"))}</figcaption></figure>`
       : ""

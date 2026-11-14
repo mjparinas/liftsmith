@@ -1137,6 +1137,14 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "prices", "TEXT NOT NULL DEFAULT ''"],
   // The gym's starter program for new members (2026-11-13): a routine share code (routineShare.ts), '' for none.
   ["gym_places", "starter", "TEXT NOT NULL DEFAULT ''"],
+  // More of what the map and the gym's own website say (2026-11-14, gymImport.ts and gymEnrich.ts): postcode, email,
+  // Instagram and Facebook pages, wheelchair access (yes, limited, no or ''), and when the website was last read.
+  ["gym_places", "postcode", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "email", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "instagram", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "facebook", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "wheelchair", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "enriched_at", "INTEGER NOT NULL DEFAULT 0"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],
