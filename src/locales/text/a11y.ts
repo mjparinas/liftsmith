@@ -9,6 +9,9 @@ export const en = {
   "a11y.hand.left": "Left hand",
   "a11y.hand.note":
     "During a workout, the weight and rep buttons move down next to Log set, with Log set under the thumb of the hand holding the phone. Hold a + or − button to keep changing.",
+  "a11y.big": "Big numbers",
+  "a11y.big.note":
+    "During a set, the weight and reps get much bigger and Log set gets taller. Music, what's next and Same as last time wait until you rest.",
   "a11y.text": "Text size",
   "a11y.text.system": "Match my phone",
   "a11y.text.100": "Default",
@@ -35,6 +38,9 @@ export const es: Partial<Record<Key, Message>> = {
   "a11y.hand.left": "Mano izquierda",
   "a11y.hand.note":
     "Durante el entrenamiento, los botones de peso y repeticiones bajan junto a Registrar serie, con Registrar serie bajo el pulgar de la mano que sujeta el teléfono. Mantén pulsado + o − para seguir cambiando.",
+  "a11y.big": "Números grandes",
+  "a11y.big.note":
+    "Durante una serie, el peso y las repeticiones se ven mucho más grandes y Registrar serie es más alto. La música, lo siguiente y Igual que la última vez esperan al descanso.",
   "a11y.text": "Tamaño del texto",
   "a11y.text.system": "Igual que el teléfono",
   "a11y.text.100": "Normal",
@@ -60,6 +66,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "a11y.hand.left": "Main gauche",
   "a11y.hand.note":
     "Pendant la séance, les boutons de charge et de répétitions descendent à côté de Enregistrer la série, sous le pouce de la main qui tient le téléphone. Maintenez + ou − pour continuer à changer.",
+  "a11y.big": "Grands chiffres",
+  "a11y.big.note":
+    "Pendant une série, le poids et les répétitions sont bien plus grands et Valider la série est plus haut. La musique, la suite et Comme la dernière fois attendent le repos.",
   "a11y.text": "Taille du texte",
   "a11y.text.system": "Comme mon téléphone",
   "a11y.text.100": "Par défaut",
@@ -85,6 +94,9 @@ export const de: Partial<Record<Key, Message>> = {
   "a11y.hand.left": "Linke Hand",
   "a11y.hand.note":
     "Während des Trainings wandern die Gewichts- und Wiederholungstasten neben Satz eintragen, mit Satz eintragen unter dem Daumen der Hand, die das Telefon hält. Halte eine +- oder −-Taste gedrückt, um weiter zu ändern.",
+  "a11y.big": "Große Zahlen",
+  "a11y.big.note":
+    "Während eines Satzes werden Gewicht und Wiederholungen viel größer und Satz eintragen höher. Musik, was als Nächstes kommt und Wie beim letzten Mal warten bis zur Pause.",
   "a11y.text": "Textgröße",
   "a11y.text.system": "Wie mein Telefon",
   "a11y.text.100": "Standard",
@@ -110,6 +122,9 @@ export const it: Partial<Record<Key, Message>> = {
   "a11y.hand.left": "Mano sinistra",
   "a11y.hand.note":
     "Durante l’allenamento, i pulsanti di peso e ripetizioni scendono accanto a Registra serie, con Registra serie sotto il pollice della mano che tiene il telefono. Tieni premuto + o − per continuare a cambiare.",
+  "a11y.big": "Numeri grandi",
+  "a11y.big.note":
+    "Durante una serie, peso e ripetizioni diventano molto più grandi e Registra serie più alto. Musica, il prossimo esercizio e Come l’ultima volta aspettano il recupero.",
   "a11y.text": "Dimensione del testo",
   "a11y.text.system": "Come il mio telefono",
   "a11y.text.100": "Predefinita",
@@ -135,6 +150,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "a11y.hand.left": "左手",
   "a11y.hand.note":
     "ワークアウト中、重量と回数のボタンが「セットを記録」の横に移動し、「セットを記録」がスマホを持つ手の親指の下に来ます。＋や−を長押しすると連続で変わります。",
+  "a11y.big": "大きな数字",
+  "a11y.big.note":
+    "セット中は重量と回数が大きく表示され、「セットを記録」ボタンも高くなります。音楽、次の種目、「前回と同じ」は休憩まで表示されません。",
   "a11y.text": "文字サイズ",
   "a11y.text.system": "端末に合わせる",
   "a11y.text.100": "標準",

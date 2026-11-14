@@ -40,6 +40,7 @@ export function SetCard({
   doneSets,
   warming,
   docked,
+  big,
   weightStep,
   repStep,
   rightStep,
@@ -59,6 +60,8 @@ export function SetCard({
   warming: boolean;
   /** One-handed controls are on: the steppers show the numbers only. */
   docked: boolean;
+  /** Big numbers (Settings › Workout): bigger weight and reps, and Same as last time steps back. */
+  big?: boolean;
   weightStep: Step | null;
   repStep: Step | null;
   rightStep: Step | null;
@@ -90,7 +93,7 @@ export function SetCard({
         </Button>
       ) : null}
       <div className="flex flex-col items-center gap-5">
-        {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
+        {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} big={big} {...weightStep} />}
         {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
           // This gym's plates are in the other unit: show the weight in the lifter's unit too.
           <p className="num -mt-3 text-sm text-muted">
@@ -100,8 +103,8 @@ export function SetCard({
             )}
           </p>
         )}
-        {repStep && <Stepper display={docked} {...repStep} />}
-        {rightStep && <Stepper display={docked} {...rightStep} />}
+        {repStep && <Stepper display={docked} big={big} {...repStep} />}
+        {rightStep && <Stepper display={docked} big={big} {...rightStep} />}
         {!warming && perSide(ex.id) && !TIMED.has(ex.id) && (
           <button
             type="button"
@@ -175,15 +178,17 @@ export function SetCard({
           </button>
         </p>
       )}
-      <SameAsLastChip
-        ghost={ghost}
-        setIndex={doneSets}
-        ex={ex}
-        unit={profile.unit}
-        weight={active.weight}
-        reps={active.reps}
-        onUse={(w, r) => s.adjust(w, r)}
-      />
+      {!big && (
+        <SameAsLastChip
+          ghost={ghost}
+          setIndex={doneSets}
+          ex={ex}
+          unit={profile.unit}
+          weight={active.weight}
+          reps={active.reps}
+          onUse={(w, r) => s.adjust(w, r)}
+        />
+      )}
       {loading && bar && (
         <div className="mt-4 border-t border-line pt-4">
           <PlateBar loading={loading} bar={bar.weight} unit={unit} finish={finish} />

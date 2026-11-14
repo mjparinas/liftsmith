@@ -454,6 +454,10 @@ export const fr: FeaturesText = {
       name: "Commandes à une main",
       body: "Placez les boutons de charge et de répétitions à côté de Valider la série, sous votre pouce gauche ou droit.",
     },
+    "big-numbers": {
+      name: "Grands chiffres",
+      body: "Pendant une série, le poids et les répétitions sont bien plus grands et Valider la série est plus haut, et la musique et la suite attendent le repos. Lisible à bout de bras, en pleine série.",
+    },
     lean: {
       name: "Mode sobre, sons et vibrations",
       body: "Coupez les animations et les confettis, les sons ou les vibrations, chacun avec un interrupteur.",

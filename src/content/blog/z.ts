@@ -8,7 +8,7 @@ export const BLOG_Z: Article[] = [
     kind: "blog",
     title: "Small touches that keep you in the workout",
     description:
-      "A gentle buzz 10 seconds before rest ends, a gold flash when you beat your best, and a yearly look at day one against today.",
+      "A gentle buzz 10 seconds before rest ends, a gold flash when you beat your best, a yearly look at day one against today, and big numbers for logging mid-set.",
     date: "2026-11-14",
     tag: "Training",
     cta: "plan",
@@ -40,6 +40,10 @@ export const BLOG_Z: Article[] = [
       { h2: "Your lifting anniversary, day one against today" },
       {
         p: "A year after your first workout, Today shows a card that puts that first day beside today: how many workouts and sets you've done, how much you've lifted in total, and the lift from that first workout that has grown the most. Tap Share it for a card with the lot. It stays on Today for a week, so you won't miss it if you skip the gym that day, and it comes back every year.",
+      },
+      { h2: "Big numbers for logging mid-set" },
+      {
+        p: "Turn on Big numbers in Settings › Workout and the set screen keeps only what you need while you lift: the weight and reps in very large type, and a taller Log set. The music controls, what's coming up and Same as last time wait until you're resting. It pairs well with one-handed controls, which move the + and − buttons beside Log set under your thumb.",
       },
       {
         tip: "Rest a little longer on your heaviest sets. The heads-up makes it easy to take the full rest without staring at the clock.",
