@@ -2,12 +2,13 @@
 
 // The admin Gyms tab (docs/decisions/gyms.md): seed a city's gyms from OpenStreetMap, then tidy the list (a studio
 // marked as a gym, a closed gym to hide). Support staff can read; only admins import or change a gym.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces";
 
 import { Card } from "./charts";
 import { GymClaims } from "./GymClaims";
+import { GymImport } from "./GymImport";
 import { GymPosters } from "./GymPosters";
 import { Loading, TableBones } from "./Skeletons";
 
@@ -15,8 +16,6 @@ export function GymPlaces({ admin }: { admin: boolean }) {
   const [data, setData] = useState<(AdminPlaceList & { pending: AdminPlace[] }) | null>(null);
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
-  const [where, setWhere] = useState("");
-  const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   const [ordering, setOrdering] = useState<string | null>(null);
@@ -45,39 +44,6 @@ export function GymPlaces({ admin }: { admin: boolean }) {
     const j = (await r.json().catch(() => ({}))) as { error?: string; area?: string; found?: number; added?: number; updated?: number };
     setVersion((v) => v + 1);
     return r.ok ? j : { error: j.error ?? "That didn't work." };
-  };
-  const importArea = async () => {
-    if (!where.trim()) return;
-    setBusy(true);
-    setNote("Asking OpenStreetMap…");
-    const j = await post({ action: "import", where });
-    setBusy(false);
-    setNote(j.error ?? `${j.area}: found ${j.found} named gyms and studios, ${j.added} new, ${j.updated} refreshed.`);
-  };
-  // Major cities in one go (majorCities.ts): one import after another, two seconds apart, so OpenStreetMap's free
-  // servers aren't hit all at once. Stop leaves what's done; running it again refreshes.
-  const [run, setRun] = useState<{ country: string; done: number; of: number; log: string[] } | null>(null);
-  const stop = useRef(false);
-  const importAll = async (country: "CA" | "US") => {
-    const r = await fetch(`/api/admin/gym-places/?cities=${country}`);
-    const { cities } = (await r.json().catch(() => ({ cities: [] }))) as { cities: string[] };
-    stop.current = false;
-    const log: string[] = [];
-    let found = 0;
-    let added = 0;
-    for (let i = 0; i < cities.length && !stop.current; i++) {
-      setRun({ country, done: i, of: cities.length, log: [...log] });
-      const j = await post({ action: "import", where: cities[i] });
-      if (j.error) log.unshift(`${cities[i]}: ${j.error}`);
-      else {
-        found += j.found ?? 0;
-        added += j.added ?? 0;
-        log.unshift(`${j.area}: ${j.found} found, ${j.added} new`);
-      }
-      await new Promise((ok) => setTimeout(ok, 2000));
-    }
-    setRun(null);
-    setNote(`${stop.current ? "Stopped. " : ""}${country === "CA" ? "Canada" : "US"}: ${found} gyms and studios found, ${added} new.`);
   };
   const act = (p: AdminPlace, action: PlaceAction) => void post({ id: p.id, action }).then((j) => j.error && setNote(j.error));
   return (
@@ -121,86 +87,12 @@ export function GymPlaces({ admin }: { admin: boolean }) {
           </ul>
         </Card>
       )}
-      <Card title="Add a city's gyms">
-        <p className="text-sm text-muted">
-          Pulls every named fitness centre in an area from OpenStreetMap. They show in Find gyms near you as unofficial gyms until an owner
-          claims one. Running it again refreshes unclaimed gyms and never touches a claimed one. Yoga, pilates, martial arts and similar
-          places are marked as studios, which the finder leaves out. Rec and community centres with a gym come in too.
+      <GymImport admin={admin} changed={() => setVersion((v) => v + 1)} />
+      {note && (
+        <p className="text-sm text-muted" role="status">
+          {note}
         </p>
-        {admin && (
-          <form
-            className="mt-3 flex flex-wrap gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void importArea();
-            }}
-          >
-            <label className="sr-only" htmlFor="gym-area">
-              City
-            </label>
-            <input
-              id="gym-area"
-              value={where}
-              onChange={(e) => setWhere(e.target.value)}
-              placeholder="Langley, BC"
-              className="min-w-0 flex-1 rounded-lg border border-line bg-raised px-3 py-2"
-            />
-            <button type="submit" disabled={busy || !!run} className="press btn-primary rounded-lg px-4 py-2 font-semibold">
-              {busy ? "Importing…" : "Import"}
-            </button>
-          </form>
-        )}
-        {admin && (
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-            {run ? (
-              <>
-                <span className="text-muted" role="status">
-                  Importing {run.country === "CA" ? "Canada" : "the US"}: {run.done} of {run.of} cities
-                </span>
-                <button
-                  type="button"
-                  onClick={() => (stop.current = true)}
-                  className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-                >
-                  Stop
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void importAll("CA")}
-                  className="press rounded-lg border border-line px-3 py-1.5"
-                >
-                  Import Canada&apos;s major cities
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void importAll("US")}
-                  className="press rounded-lg border border-line px-3 py-1.5"
-                >
-                  Import the US&apos;s major cities
-                </button>
-              </>
-            )}
-          </div>
-        )}
-        {run && run.log.length > 0 && (
-          <ul className="mt-2 max-h-40 overflow-y-auto text-xs text-faint">
-            {run.log.map((l) => (
-              <li key={l}>{l}</li>
-            ))}
-          </ul>
-        )}
-        {note && (
-          <p className="mt-2 text-sm text-muted" role="status">
-            {note}
-          </p>
-        )}
-        <p className="mt-2 text-xs text-faint">Gym data © OpenStreetMap contributors, under the Open Database Licence.</p>
-      </Card>
+      )}
 
       <Card
         title="Gyms"

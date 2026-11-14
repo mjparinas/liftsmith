@@ -1,10 +1,12 @@
 // GET /api/admin/gym-places/?q=&page=: real gyms for the admin Gyms tab, 50 a page, and the gyms lifters added that
-// wait for a check (staff). ?cities=CA|US: the major cities to import in one go (majorCities.ts). POST (admins, audited):
-// {action: "import", where: "Langley, BC"} seeds an area from OpenStreetMap; {id, action: hide | show | gym | studio |
-// delete | approve | reject} changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
+// wait for a check (staff). ?cities=CA|US: the major cities to import in one go (majorCities.ts) and when each last
+// imported cleanly. ?imports=1: the latest imports with their debug logs (gymImport.ts). POST (admins, audited):
+// {action: "import", where: "Langley, BC", server?: n, fresh?: true} seeds an area from OpenStreetMap; {id, action:
+// hide | show | gym | studio | delete | approve | reject} changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
-import { actOnPlace, adminPlaces, importArea, pendingPlaces } from "@/server/gymPlaces";
+import { importArea, lastImported, recentImports } from "@/server/gymImport";
+import { actOnPlace, adminPlaces, pendingPlaces } from "@/server/gymPlaces";
 import { isImportCountry, MAJOR_CITIES } from "@/server/majorCities";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +18,12 @@ export async function GET(req: Request) {
   if ("response" in gate) return gate.response;
   const u = new URL(req.url).searchParams;
   const country = u.get("cities");
-  if (country !== null) return isImportCountry(country) ? json(200, { cities: MAJOR_CITIES[country] }) : json(400, { error: "CA or US." });
+  if (country !== null) {
+    if (!isImportCountry(country)) return json(400, { error: "CA or US." });
+    const cities = MAJOR_CITIES[country];
+    return json(200, { cities, last: await lastImported(cities) });
+  }
+  if (u.get("imports") !== null) return json(200, { imports: await recentImports() });
   const [list, pending] = await Promise.all([adminPlaces(u.get("q"), u.get("page")), pendingPlaces()]);
   return json(200, { ...list, pending });
 }
@@ -27,15 +34,19 @@ export async function POST(req: Request) {
   const body = await readBody(req);
   if (!body) return json(400, { error: "Bad request." });
   if (body.action === "import") {
-    const r = await importArea(String(body.where ?? ""));
+    const r = await importArea(String(body.where ?? ""), fetch, Date.now(), {
+      server: typeof body.server === "number" ? body.server : 0,
+      fresh: body.fresh === true,
+    });
     if (!r.ok)
       return json(r.error === "where" ? 400 : 502, {
+        ...r,
         error:
           r.error === "where"
             ? "That place wasn't found. Try a city and province, like Langley, BC."
-            : "The map server didn't answer. Try again in a minute.",
+            : "No map server answered in time. Try again in a minute.",
       });
-    await audit(gate.staff.email, "gyms.import", `${r.area}: ${r.added} added, ${r.updated} updated`);
+    await audit(gate.staff.email, "gyms.import", `${r.area}: ${r.added} added, ${r.updated} updated, ${r.unchanged} unchanged`);
     return json(200, r);
   }
   if (!(await actOnPlace(body.id, body.action))) return json(400, { error: "Which gym, and what to do?" });

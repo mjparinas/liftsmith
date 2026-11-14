@@ -467,6 +467,28 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_places_at ON gym_places (lat, lon)`,
   `CREATE UNIQUE INDEX IF NOT EXISTS gym_places_ref ON gym_places (source_ref) WHERE source_ref <> ''`,
+  // One row per city import from OpenStreetMap (gymImport.ts, 2026-11-14): what happened, how long each step took and
+  // which map server answered, for Admin › Gyms' recent imports and its debug log. `scope` keeps the area Nominatim
+  // found, so a re-import skips that lookup. Staff work on public map data, nothing about a lifter; kept 90 days.
+  `CREATE TABLE IF NOT EXISTS gym_imports (
+    id TEXT PRIMARY KEY,
+    query TEXT NOT NULL,
+    area TEXT NOT NULL DEFAULT '',
+    scope TEXT NOT NULL DEFAULT '',
+    ok INTEGER NOT NULL,
+    error TEXT NOT NULL DEFAULT '',
+    found INTEGER NOT NULL DEFAULT 0,
+    added INTEGER NOT NULL DEFAULT 0,
+    updated INTEGER NOT NULL DEFAULT 0,
+    unchanged INTEGER NOT NULL DEFAULT 0,
+    kept INTEGER NOT NULL DEFAULT 0,
+    server TEXT NOT NULL DEFAULT '',
+    ms INTEGER NOT NULL DEFAULT 0,
+    log TEXT NOT NULL DEFAULT '',
+    at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_imports_query ON gym_imports (query, at)`,
+  `CREATE INDEX IF NOT EXISTS gym_imports_at ON gym_imports (at)`,
   // Owners claiming a gym (gymClaims.ts): an emailed code, the poster's code, or staff review. Deleted with the account.
   `CREATE TABLE IF NOT EXISTS gym_claims (
     id TEXT PRIMARY KEY,
