@@ -26,7 +26,7 @@ vi.mock("@/lib/shareImage", async (real) => ({
 vi.mock("@/lib/social", async (real) => ({
   ...(await real<typeof import("@/lib/social")>()),
   social: (op: string) =>
-    op === "invite" ? Promise.resolve({ code: "ABCDEFGH", expiresAt: Date.now() + 20 * 86_400_000 }) : Promise.reject(new Error(op)),
+    op === "invite" ? Promise.resolve({ code: "ABCDEFGH", expiresAt: Date.now() + 20 * 86_400_000 }) : Promise.resolve({ ok: true }),
 }));
 
 const status = (over: Partial<InviteStatus> = {}): InviteStatus => ({
@@ -111,5 +111,14 @@ describe("the share sheet carries the invite link", () => {
     useApp.setState({ profile: { ...useApp.getState().profile, birthYear: new Date().getFullYear() - 15 } });
     render(<ShareSheet open onClose={() => {}} items={[item]} />);
     expect(screen.queryByRole("switch", { name: t("card.invite") })).toBeNull();
+  });
+});
+
+describe("an older server", () => {
+  it("shows no Your invites card when it doesn't know the request", async () => {
+    const { loadInvites } = await import("@/lib/referral");
+    const shown: unknown[] = [];
+    await loadInvites((s) => shown.push(s)).catch(() => undefined);
+    expect(shown).toEqual([]);
   });
 });

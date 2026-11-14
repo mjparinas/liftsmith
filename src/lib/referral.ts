@@ -87,10 +87,23 @@ export const rewardOn = (status?: Pick<InviteStatus, "reward"> | null) => flag("
 
 /** "Your invites", the kept copy at once and then the server's. */
 export function loadInvites(show: (s: InviteStatus) => void): Promise<void> {
-  return liveRead(STATUS, () => social<InviteStatus>("invites"), show);
+  // A server without "invites" (an older deployment) answers something else: show nothing rather than break People.
+  return liveRead(
+    STATUS,
+    () => social<InviteStatus>("invites"),
+    (s) => {
+      if (isStatus(s)) show(s);
+    },
+  );
 }
 
-export const keptInvites = () => readKept<InviteStatus>(STATUS) ?? null;
+const isStatus = (s: unknown): s is InviteStatus =>
+  !!s && typeof s === "object" && Array.isArray((s as InviteStatus).friends) && typeof (s as InviteStatus).needed === "number";
+
+export const keptInvites = (): InviteStatus | null => {
+  const k = readKept<unknown>(STATUS);
+  return isStatus(k) ? k : null;
+};
 
 /** Where an invite was shared from, for analytics (`social_invite` with a detail). */
 export type InviteFrom = "people" | "done" | "card";
