@@ -34,6 +34,7 @@ export const PLACE_LIMITS = {
 };
 
 export type PlaceKind = "gym" | "studio";
+export type Wheelchair = "yes" | "limited" | "no" | "";
 
 /** A real gym as the finder shows it. */
 export interface Place {
@@ -52,6 +53,13 @@ export interface Place {
   hours: string;
   website: string;
   phone: string;
+  /** Postal code, email, Instagram and Facebook pages, from the map or the gym's own website ('' when unknown). */
+  postcode: string;
+  email: string;
+  instagram: string;
+  facebook: string;
+  /** Wheelchair access as the map says it: yes, limited, no, or '' when nobody said. */
+  wheelchair: Wheelchair;
   country: string;
   updatedAt: number;
   /** Claimed by its owner. */
@@ -107,7 +115,7 @@ const STUDIO =
 // Rec and community centres: OpenStreetMap tags them sports_centre or community_centre, not fitness_centre, so the
 // import asks for those too, and keeps one only when its name or sport says there's a gym inside (an arena or a pool
 // alone isn't one).
-const REC_NAME = "recreation|rec cent|leisure|fitness|ymca|ywca|wellness|athletic|gym";
+export const REC_NAME = "recreation|rec cent|leisure|fitness|ymca|ywca|wellness|athletic|gym";
 const REC = new RegExp(REC_NAME, "i");
 const REC_SPORT = /fitness|weightlifting|crossfit|bodybuilding|powerlifting/;
 
@@ -140,9 +148,50 @@ export interface PlaceDraft {
   hours: string;
   website: string;
   phone: string;
+  postcode: string;
+  email: string;
+  instagram: string;
+  facebook: string;
+  wheelchair: Wheelchair;
+  /** True when the map gave no city and the import's own area filled it in. A gym near a border falls inside two
+   * cities' areas, so a refresh keeps the city it already has instead of flipping it with each import. */
+  guessed?: boolean;
 }
 
-const clean = (x: string | undefined, max: number) =>
+/** A plain email address, or ''. */
+export const cleanEmail = (x: string | undefined) => {
+  const v = clean(x, 120).replace(/^mailto:/i, "");
+  return /^[^\s@<>"']+@[^\s@<>"']+\.[a-z]{2,}$/i.test(v) ? v.toLowerCase() : "";
+};
+
+/** A social page as a full https link: "liftsmithgym", "@liftsmithgym" or a link on that site. '' for anything else. */
+export function socialUrl(x: string | undefined, site: "instagram" | "facebook"): string {
+  const v = clean(x, 200);
+  if (!v) return "";
+  const host = site === "instagram" ? "instagram.com" : "facebook.com";
+  const link = /^https?:\/\/(?:www\.|m\.|web\.)?(instagram\.com|facebook\.com|fb\.com)\/([^?#\s]+)/i.exec(v);
+  if (link) {
+    const sameSite = (link[1]!.toLowerCase() === "fb.com" ? "facebook.com" : link[1]!.toLowerCase()) === host;
+    const path = link[2]!.replace(/\/+$/, "");
+    if (!sameSite || !path || /^(sharer|share|plugins|dialog|tr|p|reel|explore)(\/|$)/i.test(path)) return "";
+    return `https://www.${host}/${path}`;
+  }
+  const handle = v.replace(/^@/, "");
+  return /^[A-Za-z0-9._-]{2,60}$/.test(handle) ? `https://www.${host}/${handle}` : "";
+}
+
+const wheelchairOf = (x: string | undefined): Wheelchair =>
+  x === "yes" || x === "limited" || x === "no" ? x : x === "designated" ? "yes" : "";
+
+/** What an import left out, and why: for the admin's debug log. */
+export interface OsmSkips {
+  unnamed: number;
+  private: number;
+  notGym: number;
+  duplicate: number;
+}
+
+export const clean = (x: string | undefined, max: number) =>
   (x ?? "")
     .replace(/[\u0000-\u001f]/g, " ")
     .trim()
@@ -153,76 +202,172 @@ const httpUrl = (x: string | undefined) => {
 };
 
 /** OpenStreetMap fitness centres as places. Unnamed and private ones are left out. */
-export function placesFromOsm(elements: OsmElement[], area: Area): PlaceDraft[] {
+export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSkips): PlaceDraft[] {
   const out: PlaceDraft[] = [];
   const seen = new Set<string>();
+  const skip = (why: keyof OsmSkips) => {
+    if (skips) skips[why]++;
+  };
   for (const e of elements) {
     const t = e.tags ?? {};
     const lat = e.lat ?? e.center?.lat;
     const lon = e.lon ?? e.center?.lon;
     const name = clean(t.name, 80);
-    if (!name || !validLat(lat) || !validLon(lon)) continue;
-    if (t.access === "private" || t.access === "no" || t.access === "members_only_staff") continue;
+    if (!name || !validLat(lat) || !validLon(lon)) {
+      skip("unnamed");
+      continue;
+    }
+    if (t.access === "private" || t.access === "no" || t.access === "members_only_staff") {
+      skip("private");
+      continue;
+    }
     const ref = `osm:${e.type}/${e.id}`;
-    if (seen.has(ref)) continue;
+    if (seen.has(ref)) {
+      skip("duplicate");
+      continue;
+    }
     seen.add(ref);
     const fitness = t.leisure === "fitness_centre";
-    if (!fitness && !REC.test(name) && !REC_SPORT.test(t.sport ?? "")) continue;
+    if (!fitness && !REC.test(name) && !REC_SPORT.test(t.sport ?? "")) {
+      skip("notGym");
+      continue;
+    }
     const about = `${t.sport ?? ""} ${name}`.toLowerCase();
+    const mapCity = clean(t["addr:city"], 60);
     out.push({
       ref,
       name,
       // A rec centre's sport tag lists everything it hosts (swimming, hockey), so only its name can make it a studio.
       kind: STUDIO.test(fitness ? about : name.toLowerCase()) ? "studio" : "gym",
-      address: clean([t["addr:housenumber"], t["addr:street"]].filter(Boolean).join(" "), 120),
-      city: clean(t["addr:city"], 60) || area.city,
+      address: clean(
+        [[t["addr:unit"] ? `${t["addr:unit"]}-` : "", t["addr:housenumber"]].join(""), t["addr:street"]].filter(Boolean).join(" "),
+        120,
+      ),
+      city: mapCity || area.city,
       region: clean(t["addr:province"] ?? t["addr:state"], 60) || area.region,
       country: clean(t["addr:country"], 2).toUpperCase() || area.country,
       lat: Math.round(lat * 1e5) / 1e5,
       lon: Math.round(lon * 1e5) / 1e5,
       hours: clean(t.opening_hours, 200),
       website: httpUrl(t.website ?? t["contact:website"]),
-      phone: clean(t.phone ?? t["contact:phone"], 40),
+      phone: clean(t.phone ?? t["contact:phone"] ?? t["contact:mobile"], 40),
+      postcode: clean(t["addr:postcode"], 20),
+      email: cleanEmail(t.email ?? t["contact:email"]),
+      instagram: socialUrl(t["contact:instagram"] ?? t.instagram, "instagram"),
+      facebook: socialUrl(t["contact:facebook"] ?? t.facebook, "facebook"),
+      wheelchair: wheelchairOf(t.wheelchair),
+      guessed: !mapCity,
     });
   }
   return out;
 }
 
-/** Writes imported places: new ones are added, unclaimed ones refreshed, claimed ones left as their owner set them. */
-export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promise<{ added: number; updated: number }> {
+export interface SaveResult {
+  added: number;
+  updated: number;
+  /** Already there and nothing changed on the map, so nothing was written. */
+  unchanged: number;
+  /** Claimed gyms the import left exactly as their owner set them. */
+  kept: number;
+  /** Database time, in ms: reading what's there, then writing. */
+  readMs: number;
+  writeMs: number;
+  statements: number;
+}
+
+const SAME_FIELDS = [
+  "name",
+  "address",
+  "city",
+  "region",
+  "country",
+  "lat",
+  "lon",
+  "hours",
+  "website",
+  "phone",
+  "postcode",
+  "email",
+  "instagram",
+  "facebook",
+  "wheelchair",
+] as const;
+/** Details the gym's own website may have filled in (gymEnrich.ts): the map never blanks one, only replaces it. */
+const KEEP_IF_MAP_EMPTY = ["address", "hours", "website", "phone", "postcode", "email", "instagram", "facebook", "wheelchair"] as const;
+
+/**
+ * Writes imported places, keyed on the map's own id (`source_ref`, unique), so running an import again is safe: new
+ * ones are added, unclaimed ones refreshed only where the map changed, and claimed ones left exactly as their owner
+ * set them (we take the owner's word over the map's).
+ */
+export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promise<SaveResult> {
   // A big city has thousands of gyms, and each statement is a trip to the database, so read what's there in a few
-  // queries and write in batches (one at a time, New York took minutes).
+  // queries (in parallel) and write in batches (one at a time, New York took minutes).
   const list = drafts.slice(0, PLACE_LIMITS.perImport);
+  const t0 = Date.now();
   const had = new Map<string, Row>();
-  for (const part of chunks(
-    list.map((d) => d.ref),
-    400,
-  )) {
-    const rows = await query(
-      `SELECT id, claimed_by, source_ref FROM gym_places WHERE source_ref IN (${part.map(() => "?").join(",")})`,
-      part,
-    );
-    for (const r of rows) had.set(s(r.source_ref), r);
-  }
+  const reads = await Promise.all(
+    chunks(
+      list.map((d) => d.ref),
+      400,
+    ).map((part) =>
+      query(
+        `SELECT id, claimed_by, source_ref, ${SAME_FIELDS.join(", ")} FROM gym_places WHERE source_ref IN (${part.map(() => "?").join(",")})`,
+        part,
+      ),
+    ),
+  );
+  for (const rows of reads) for (const r of rows) had.set(s(r.source_ref), r);
   const fresh = list.filter((d) => !had.has(d.ref));
   const taken = new Set<string>();
-  for (const part of chunks([...new Set(fresh.map((d) => citySlugOf(d.city, d.region)))], 400)) {
-    const rows = await query(`SELECT city_slug, slug FROM gym_places WHERE city_slug IN (${part.map(() => "?").join(",")})`, part);
-    for (const r of rows) taken.add(`${s(r.city_slug)}/${s(r.slug)}`);
-  }
+  const slugReads = await Promise.all(
+    chunks([...new Set(fresh.map((d) => citySlugOf(d.city, d.region)))], 400).map((part) =>
+      query(`SELECT city_slug, slug FROM gym_places WHERE city_slug IN (${part.map(() => "?").join(",")})`, part),
+    ),
+  );
+  for (const rows of slugReads) for (const r of rows) taken.add(`${s(r.city_slug)}/${s(r.slug)}`);
+  const readMs = Date.now() - t0;
   const stmts: { sql: string; args: (string | number)[] }[] = [];
-  let added = 0;
-  let updated = 0;
+  const out = { added: 0, updated: 0, unchanged: 0, kept: 0 };
   for (const d of list) {
     const old = had.get(d.ref);
     if (old) {
-      if (s(old.claimed_by)) continue;
+      if (s(old.claimed_by)) {
+        out.kept++;
+        continue;
+      }
+      // The city came from the import's area, not the map: keep the one the gym already has.
+      const next = d.guessed ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) } : { ...d };
+      for (const f of KEEP_IF_MAP_EMPTY) if (!next[f] && s(old[f])) (next as Record<string, unknown>)[f] = s(old[f]);
+      if (SAME_FIELDS.every((f) => String(next[f]) === String(old[f] ?? ""))) {
+        out.unchanged++;
+        continue;
+      }
       stmts.push({
         sql: `UPDATE gym_places SET name = ?, address = ?, city = ?, region = ?, country = ?, lat = ?, lon = ?, hours = ?,
-           website = ?, phone = ?, updated_at = ? WHERE id = ?`,
-        args: [d.name, d.address, d.city, d.region, d.country, d.lat, d.lon, d.hours, d.website, d.phone, now, s(old.id)],
+           website = ?, phone = ?, postcode = ?, email = ?, instagram = ?, facebook = ?, wheelchair = ?, updated_at = ?
+           WHERE id = ? AND claimed_by = ''`,
+        args: [
+          next.name,
+          next.address,
+          next.city,
+          next.region,
+          next.country,
+          next.lat,
+          next.lon,
+          next.hours,
+          next.website,
+          next.phone,
+          next.postcode,
+          next.email,
+          next.instagram,
+          next.facebook,
+          next.wheelchair,
+          now,
+          s(old.id),
+        ],
       });
-      updated++;
+      out.updated++;
       continue;
     }
     const id = randomBytes(8).toString("hex");
@@ -233,8 +378,8 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
     taken.add(`${city}/${slug}`);
     stmts.push({
       sql: `INSERT OR IGNORE INTO gym_places (id, city_slug, slug, name, kind, address, city, region, country, lat, lon, hours, website, phone,
-         source, source_ref, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)`,
+         postcode, email, instagram, facebook, wheelchair, source, source_ref, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)`,
       args: [
         id,
         city,
@@ -250,15 +395,21 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
         d.hours,
         d.website,
         d.phone,
+        d.postcode,
+        d.email,
+        d.instagram,
+        d.facebook,
+        d.wheelchair,
         d.ref,
         now,
         now,
       ],
     });
-    added++;
+    out.added++;
   }
-  for (const part of chunks(stmts, 200)) await batch(part);
-  return { added, updated };
+  const t1 = Date.now();
+  for (const part of chunks(stmts, 500)) await batch(part);
+  return { ...out, readMs, writeMs: Date.now() - t1, statements: stmts.length };
 }
 
 function chunks<T>(xs: T[], size: number): T[][] {
@@ -280,74 +431,18 @@ async function freeSlug(name: string, citySlug: string, id: string): Promise<str
   return `${base}-${id}`;
 }
 
-// --- Seeding from OpenStreetMap (staff only) ---
+// --- The map's own services (OpenStreetMap). Imports are in gymImport.ts. ---
 
-const NOMINATIM = "https://nominatim.openstreetmap.org/search";
-const OVERPASS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-  "https://overpass.private.coffee/api/interpreter",
-];
+export const NOMINATIM = "https://nominatim.openstreetmap.org/search";
 // OSM's services ask for an identifying client; this names the app, never a person.
-const UA = "Liftsmith gym finder (https://www.getliftsmith.com)";
+export const UA = "Liftsmith gym finder (https://www.getliftsmith.com)";
 
-interface Found {
+export interface Found {
   osm_type?: string;
   osm_id?: number;
   boundingbox?: string[];
   name?: string;
   address?: Record<string, string>;
-}
-
-export type ImportResult =
-  { ok: true; area: string; found: number; added: number; updated: number } | { ok: false; error: "where" | "map" };
-
-/** Looks up an area by name ("Langley, BC"), then pulls its fitness centres from OpenStreetMap. */
-export async function importArea(where: string, fetcher: typeof fetch = fetch, now = Date.now()): Promise<ImportResult> {
-  const q = clean(where, 120);
-  if (!q) return { ok: false, error: "where" };
-  const geo = await fetcher(`${NOMINATIM}?format=jsonv2&limit=1&addressdetails=1&q=${encodeURIComponent(q)}`, {
-    headers: { "User-Agent": UA, Accept: "application/json" },
-  }).catch(() => null);
-  const hits = geo?.ok ? ((await geo.json().catch(() => [])) as Found[]) : [];
-  const hit = hits[0];
-  if (!hit) return { ok: false, error: "where" };
-  const a = hit.address ?? {};
-  const regionName = a.state ?? a.province ?? "";
-  // "CA-BC": the province or state code, whatever language or spelling the name came back in.
-  const isoRegion = /^(?:CA|US|AU)-([A-Z]{2,3})$/.exec(a["ISO3166-2-lvl4"] ?? "")?.[1];
-  const area: Area = {
-    city: clean(a.city ?? a.town ?? a.village ?? a.municipality ?? hit.name, 60),
-    region: isoRegion ?? SHORT_REGION[regionName] ?? clean(regionName, 60),
-    country: clean(a.country_code, 2).toUpperCase(),
-  };
-  const filters = [
-    `nwr["leisure"="fitness_centre"]`,
-    `nwr["leisure"="sports_centre"]["name"]`,
-    `nwr["amenity"="community_centre"]["name"~"${REC_NAME}",i]`,
-  ];
-  let scope: string;
-  if (hit.osm_type === "relation" && hit.osm_id)
-    scope = `area(${3_600_000_000 + hit.osm_id})->.a;(${filters.map((f) => `${f}(area.a);`).join("")});`;
-  else if (hit.boundingbox?.length === 4) {
-    const [south, north, west, east] = hit.boundingbox.map(Number);
-    scope = `(${filters.map((f) => `${f}(${south},${west},${north},${east});`).join("")});`;
-  } else return { ok: false, error: "where" };
-  const body = `data=${encodeURIComponent(`[out:json][timeout:180];${scope}out center tags;`)}`;
-  for (const url of OVERPASS) {
-    const r = await fetcher(url, {
-      method: "POST",
-      headers: { "User-Agent": UA, "Content-Type": "application/x-www-form-urlencoded" },
-      body,
-    }).catch(() => null);
-    if (!r?.ok) continue;
-    const j = (await r.json().catch(() => null)) as { elements?: OsmElement[] } | null;
-    if (!j?.elements) continue;
-    const drafts = placesFromOsm(j.elements, area);
-    const saved = await savePlaces(drafts, now);
-    return { ok: true, area: [area.city, area.region].filter(Boolean).join(", "), found: drafts.length, ...saved };
-  }
-  return { ok: false, error: "map" };
 }
 
 // --- A gym the map doesn't have: a lifter or owner adds it, staff check it ---
@@ -451,7 +546,7 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 // --- The finder ---
 
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
-  p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
+  p.postcode, p.email, p.instagram, p.facebook, p.wheelchair, p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
   (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
   (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind = 'logo' LIMIT 1) AS logo`;
@@ -471,6 +566,11 @@ const toPlace = (r: Row, km: number): Place => ({
   hours: s(r.hours),
   website: s(r.website),
   phone: s(r.phone),
+  postcode: s(r.postcode),
+  email: s(r.email),
+  instagram: s(r.instagram),
+  facebook: s(r.facebook),
+  wheelchair: wheelchairOf(s(r.wheelchair)),
   country: s(r.country),
   updatedAt: n(r.updated_at),
   official: !!s(r.claimed_by),

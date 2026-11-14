@@ -53,8 +53,6 @@ describe("each exercise's own gear in the demo", () => {
 describe("the gear each exercise needs is drawn", () => {
   // Melvin, 2026-11-14: "Make sure exercises with walls have them, door frame exercises have a door frame,
   // kettle bells, dumbbells, barbells, cables, etc have what they say they do"
-  /** Still drawn without their bench or box until their posture is redone (seated, side-lying, chest-down). */
-  const LATER = new Set(["copenhagen-plank", "short-copenhagen-plank"]);
   function missing(id: string, needs: readonly string[]): string[] {
     const m = motionFor(id);
     const kinds = new Set(props(id).map((p) => p.kind));
@@ -77,15 +75,33 @@ describe("the gear each exercise needs is drawn", () => {
     return out;
   }
   it("draws every weight, cable, band, bar, bench, box, wall and rope the exercise needs, and nothing it doesn't", () => {
-    const wrong = EXERCISES.filter((e) => !LATER.has(e.id))
-      .map((e) => [e.id, missing(e.id, e.needs)] as const)
-      .filter(([, m]) => m.length);
+    const wrong = EXERCISES.map((e) => [e.id, missing(e.id, e.needs)] as const).filter(([, m]) => m.length);
     expect(wrong).toEqual([]);
   });
-  it("keeps the list of moves still waiting for their bench or box short", () => {
-    // remove an id from LATER once it draws its gear
-    const done = [...LATER].filter((id) => !missing(id, EXERCISES.find((e) => e.id === id)!.needs).length);
-    expect(done).toEqual([]);
+  it("puts the top leg of a Copenhagen plank on the bench, the bottom leg under it", () => {
+    for (const [id, contact] of [
+      ["copenhagen-plank", "ankleR"],
+      ["short-copenhagen-plank", "kneeR"],
+    ] as const) {
+      const m = motionFor(id);
+      expect(m.roll?.(0), id).toBe(-90); // on its side, so the pose's z is height
+      const [pad, ...legs] = props(id).filter((p) => p.kind === "box");
+      expect(pad && legs.length, id).toBe(2);
+      const padTop = pad!.kind === "box" ? pad!.at[2] + pad!.size[2] / 2 : 0;
+      const padBottom = padTop - (pad!.kind === "box" ? pad!.size[2] : 0);
+      const lows: number[] = [];
+      for (const d of [0, 0.25, 0.5, 0.75, 1]) {
+        const J = jointsAt(m, B, d) as unknown as Record<string, [number, number, number]>;
+        const c = J[contact]!;
+        // resting on the pad (a joint sits about 5 cm above what it rests on), and staying put over the rep
+        expect(c[2] - padTop, `${id} ${d}`).toBeGreaterThan(0.02);
+        expect(c[2] - padTop, `${id} ${d}`).toBeLessThan(0.09);
+        expect(Math.abs(c[1] - (pad!.kind === "box" ? pad!.at[1] : 0)), `${id} ${d}`).toBeLessThan(0.16);
+        expect(J.ankleL![2], `${id} ${d}`).toBeLessThan(padBottom); // the bottom leg passes under the pad
+        lows.push(J.hipL![2]);
+      }
+      expect(lows[4]! - lows[0]!, id).toBeGreaterThan(0.15); // the hips lift from low into the line
+    }
   });
   it("draws a landmine bar from the floor to the hands, and cables from a pulley", () => {
     for (const id of ["landmine-press", "landmine-row", "landmine-rotation", "landmine-squat"]) {

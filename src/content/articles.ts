@@ -5,6 +5,7 @@
 // names, every link goes to a page that exists, and every exercise id is in the library.
 import { BLOG_A } from "./blog/a";
 import { BLOG_AA } from "./blog/aa";
+import { BLOG_AB } from "./blog/ab";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
 import { BLOG_D } from "./blog/d";
@@ -13,6 +14,7 @@ import { BLOG_F } from "./blog/f";
 import { BLOG_G } from "./blog/g";
 import { BLOG_H } from "./blog/h";
 import { BLOG_I } from "./blog/i";
+import { BLOG_INVITES } from "./blog/invites";
 import { BLOG_J } from "./blog/j";
 import { BLOG_K } from "./blog/k";
 import { BLOG_L } from "./blog/l";
@@ -226,6 +228,8 @@ export const ARTICLES: Article[] = [
   ...BLOG_Y,
   ...BLOG_Z,
   ...BLOG_AA,
+  ...BLOG_AB,
+  ...BLOG_INVITES,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

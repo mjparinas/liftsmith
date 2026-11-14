@@ -7,7 +7,13 @@
 //
 // Coaches: an account with 3 or more clients who each finished a workout in the last 14 days has Pro for as long as
 // that holds (`coachEarnsPro`). Nothing is stored for it; it's worked out on every access check.
+import { FLAGS } from "@/lib/flags";
+import type { InviteFriend, InviteStatus } from "@/lib/referral";
+
 import { query, run } from "./db";
+import { flagStates } from "./flags";
+import { notifyPlain } from "./push";
+import { isMinor } from "./teams";
 
 const DAY = 86_400_000;
 export const EARNED = {
@@ -52,11 +58,29 @@ async function workoutsSince(accountId: string, from: number): Promise<number> {
   return Number(r?.n ?? 0);
 }
 
+/** Whether invites pay out right now (the admin flag `referralReward`; on when the flags can't be read). */
+export async function referralOn(): Promise<boolean> {
+  try {
+    const v = (await flagStates()).get("referralReward")?.value;
+    return typeof v === "boolean" ? v : FLAGS.referralReward.default;
+  } catch {
+    return FLAGS.referralReward.default;
+  }
+}
+
+const nameOf = async (accountId: string) => {
+  const [p] = await query<{ name: string }>("SELECT name FROM social_profiles WHERE account_id = ?", [accountId]);
+  return p?.name ? String(p.name) : "";
+};
+
 /**
  * Gives the friend and their inviter a month each once the friend has finished three workouts since accepting.
- * Called after the friend syncs; does nothing when there's nothing to settle. Returns whether it rewarded.
+ * Called after the friend syncs; does nothing when there's nothing to settle, or while the `referralReward` flag is
+ * off (the invite waits and pays once it's back on). Returns whether it rewarded. Both hear about it by push, except
+ * someone under 18 (no promotional rewards pushed at teens, docs/decisions/school-teams.md).
  */
 export async function settleReferral(friendId: string, now = Date.now()): Promise<boolean> {
+  if (!(await referralOn())) return false;
   const [a] = await query<{ inviter_id: string; at: number }>(
     "SELECT inviter_id, at FROM invite_accepts WHERE friend_id = ? AND rewarded_at IS NULL",
     [friendId],
@@ -80,7 +104,8 @@ export async function settleReferral(friendId: string, now = Date.now()): Promis
     "SELECT COUNT(*) AS n FROM earned_pro WHERE account_id = ? AND friend_id != account_id AND at > ?",
     [inviter, now - 365 * DAY],
   );
-  if (Number(recent?.n ?? 0) < EARNED.perYear) {
+  const inviterEarns = Number(recent?.n ?? 0) < EARNED.perYear;
+  if (inviterEarns) {
     await run("INSERT OR IGNORE INTO earned_pro (account_id, friend_id, at, days) VALUES (?, ?, ?, ?)", [
       inviter,
       friendId,
@@ -88,7 +113,59 @@ export async function settleReferral(friendId: string, now = Date.now()): Promis
       EARNED.days,
     ]);
   }
+  const [friendName, inviterName] = await Promise.all([nameOf(friendId), nameOf(inviter)]);
+  await Promise.all([
+    (async () => {
+      if (!(await isMinor(friendId, now))) await notifyPlain(friendId, "referralFriend", { name: inviterName }, "#/pro");
+    })(),
+    (async () => {
+      if (inviterEarns && !(await isMinor(inviter, now))) await notifyPlain(inviter, "referralInviter", { name: friendName }, "#/friends");
+    })(),
+  ]);
   return true;
+}
+
+/**
+ * The lifter's invites, for "Your invites" on Friends › People: each friend who joined with their link, how many of the
+ * three workouts they've done, whether it paid out, the months earned in the last 365 days and when earned Pro ends.
+ * `joined` is the invite this lifter joined with, if any, so a new lifter sees how close they are to their own month.
+ * `reward` is false while the flag is off and for anyone under 18, and the app then leaves the reward unsaid.
+ */
+export async function inviteStatus(accountId: string, now = Date.now()): Promise<InviteStatus> {
+  const rows = await query<{ friend_id: string; at: number; rewarded_at: number | null; name: string | null; handle: string | null }>(
+    `SELECT ia.friend_id, ia.at, ia.rewarded_at, sp.name, sp.handle FROM invite_accepts ia
+     LEFT JOIN social_profiles sp ON sp.account_id = ia.friend_id AND sp.suspended = 0
+     WHERE ia.inviter_id = ? ORDER BY ia.at DESC LIMIT 50`,
+    [accountId],
+  );
+  const friend = async (r: { friend_id: string; at: number; rewarded_at: number | null; name: string | null; handle: string | null }) => {
+    const rewarded = r.rewarded_at != null;
+    const done = rewarded ? EARNED.workouts : Math.min(EARNED.workouts, await workoutsSince(String(r.friend_id), Number(r.at)));
+    return { name: String(r.name ?? ""), handle: String(r.handle ?? ""), workouts: done, rewarded } satisfies InviteFriend;
+  };
+  const friends = await Promise.all(rows.map(friend));
+  const [mine] = await query<{ inviter_id: string; at: number; rewarded_at: number | null; name: string | null; handle: string | null }>(
+    `SELECT ia.inviter_id, ia.at, ia.rewarded_at, sp.name, sp.handle FROM invite_accepts ia
+     LEFT JOIN social_profiles sp ON sp.account_id = ia.inviter_id AND sp.suspended = 0
+     WHERE ia.friend_id = ?`,
+    [accountId],
+  );
+  const joined = mine ? await friend({ ...mine, friend_id: accountId }) : null;
+  const [recent] = await query<{ n: number }>(
+    "SELECT COUNT(*) AS n FROM earned_pro WHERE account_id = ? AND friend_id != account_id AND at > ?",
+    [accountId, now - 365 * DAY],
+  );
+  const until = await earnedUntil(accountId);
+  const [on, minor] = await Promise.all([referralOn(), isMinor(accountId, now)]);
+  return {
+    friends,
+    joined,
+    months: Number(recent?.n ?? 0),
+    perYear: EARNED.perYear,
+    needed: EARNED.workouts,
+    until: until != null && until > now ? until : null,
+    reward: on && !minor,
+  };
 }
 
 /** When the account's earned Pro ends: months laid end to end from when each was earned. Null with none. */

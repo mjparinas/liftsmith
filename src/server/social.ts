@@ -37,6 +37,7 @@ import {
   type FeedComment,
   type FeedPost,
   type FriendSignals,
+  type HomeGym,
   type Partner,
   type PersonCard,
   type PersonRow,
@@ -55,7 +56,8 @@ import {
 
 import { cleanCode, newCode } from "./coach";
 import { batch, query, rateLimit, run, type Row } from "./db";
-import { recordAccept } from "./earnedPro";
+import { inviteStatus, recordAccept } from "./earnedPro";
+import { isPlaceId } from "./gymPlaces";
 import { MANAGES } from "./gymStaff";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
@@ -83,6 +85,7 @@ export const DAILY = {
   club: 5,
   cheer: 300,
   checkin: 10,
+  handleCheck: 600,
 };
 /** An invite link lasts 30 days and works for this many people. */
 export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
@@ -150,6 +153,8 @@ interface ProfileRow extends Row {
   suggest: number;
   level: number;
   streak: number;
+  tagline: string;
+  home_gym: string;
 }
 
 const AVATAR_SET = new Set<string>(AVATAR_IDS);
@@ -180,9 +185,11 @@ function liftsOf(r: { lifts?: unknown }): ShowcaseLift[] {
   }
 }
 
-const toProfile = (r: ProfileRow): SocialProfile => ({
+const toProfile = (r: ProfileRow, homeGym: HomeGym | null): SocialProfile => ({
   handle: s(r.handle),
   name: s(r.name),
+  tagline: s(r.tagline),
+  homeGym,
   open: !!n(r.open),
   autoPost: !!n(r.auto_post),
   weights: !!n(r.weights),
@@ -233,6 +240,43 @@ export function checkHandle(v: unknown): { ok: true; handle: string } | { ok: fa
   return { ok: true, handle };
 }
 
+/**
+ * Whether a handle is free, asked while the lifter types it (Melvin, 2026-11-14), on the Join screen and in Friends settings.
+ * Reserved and blocked handles read as taken, like on save; the save still checks, and the UNIQUE index settles a race.
+ */
+export async function handleCheck(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const h = checkHandle(b.handle);
+  if (!h.ok) return ok({ handle: cleanHandle(b.handle), status: h.error === "handle" ? "invalid" : "taken" });
+  if (!(await limit(accountId, "handleCheck", now))) return fail(429, "slow");
+  const p = await byHandle(h.handle);
+  return ok({ handle: h.handle, status: !p ? "free" : p.account_id === accountId ? "mine" : "taken" });
+}
+
+/** A tagline: "" clears it; otherwise the same filter as names (no links, no blocked words). */
+export function checkTagline(v: unknown): { ok: true; tagline: string } | { ok: false; error: string } {
+  const raw = tidy(v, SOCIAL_LIMITS.tagline);
+  if (!raw) return { ok: true, tagline: "" };
+  const c = checkText(raw, SOCIAL_LIMITS.tagline);
+  return c.ok ? { ok: true, tagline: c.text } : { ok: false, error: `tagline.${c.error}` };
+}
+
+/** A real gym for a profile, or null when it's unknown or staff hid it. */
+export async function homeGymOf(placeId: unknown): Promise<HomeGym | null> {
+  if (!isPlaceId(placeId)) return null;
+  const [g] = await query("SELECT id, name, city, city_slug, slug FROM gym_places WHERE id = ? AND hidden = 0", [placeId]);
+  return g ? { id: s(g.id), name: s(g.name), city: s(g.city), path: `/gyms/${s(g.city_slug)}/${s(g.slug)}/` } : null;
+}
+
+/**
+ * The home gym others may see on `p`: set, and its lifter isn't under 18 (teen-safe, checked when it's shown as well
+ * as when it's saved, because someone can join a school team after picking one).
+ */
+async function shownGym(p: ProfileRow, now = Date.now()): Promise<HomeGym | null> {
+  if (!s(p.home_gym)) return null;
+  if (await isMinor(s(p.account_id), now)) return null;
+  return homeGymOf(p.home_gym);
+}
+
 function checkName(v: unknown, fallback: string): { ok: true; name: string } | { ok: false; error: string } {
   const raw = tidy(v, SOCIAL_LIMITS.name);
   if (!raw) return { ok: true, name: fallback };
@@ -259,8 +303,10 @@ export async function me(accountId: string, now = Date.now()): Promise<Result> {
   ]);
   if (!row) return ok({ profile: null });
   const p = await liftIfOver(row, now);
+  const [teen, gym] = await Promise.all([isMinor(accountId, now), s(p.home_gym) ? homeGymOf(p.home_gym) : null]);
   return ok({
-    profile: toProfile(p),
+    profile: toProfile(p, teen ? null : gym),
+    teen,
     suspended: barred(p),
     notice: noticeOf(p),
     followers: n(counts?.followers),
@@ -328,18 +374,33 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     if (!c.ok) return fail(400, c.error);
     name = c.name;
   }
+  let tagline = s(p.tagline);
+  if (b.tagline !== undefined) {
+    const c = checkTagline(b.tagline);
+    if (!c.ok) return fail(400, c.error);
+    tagline = c.tagline;
+  }
   const flag = (v: unknown, was: unknown) => (typeof v === "boolean" ? (v ? 1 : 0) : n(was));
   // Public means anyone can follow too, so turning it on opens the profile and closing the profile makes it private.
   // Teen-safe (school teams, docs/decisions/school-teams.md): someone under 18 can't make their profile public.
   const minor = await isMinor(accountId);
   const pub = b.open === false || minor ? 0 : flag(b.public, p.public);
+  // A home gym is one of the finder's real gyms, never typed, and never for someone under 18.
+  let homeGym = minor ? "" : s(p.home_gym);
+  if (b.homeGym !== undefined) {
+    if (b.homeGym === null || b.homeGym === "") homeGym = "";
+    else if (minor) return fail(403, "teen");
+    else if (!(await homeGymOf(b.homeGym))) return fail(400, "gym");
+    else homeGym = s(b.homeGym);
+  }
   const open = pub ? 1 : flag(b.open, p.open);
   try {
     const push = (b.push && typeof b.push === "object" ? b.push : {}) as Record<string, unknown>;
     await run(
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
          push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
-         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?, cheers = ?, push_checkins = ?
+         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?, cheers = ?, push_checkins = ?,
+         tagline = ?, home_gym = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -364,6 +425,8 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         flag(push.posts, p.push_posts ?? 1),
         flag(b.cheers, p.cheers ?? 1),
         flag(push.checkins, p.push_checkins ?? 1),
+        tagline,
+        homeGym,
         accountId,
       ],
     );
@@ -482,6 +545,8 @@ async function card(viewer: string, p: ProfileRow, now = Date.now()): Promise<Pe
   return {
     handle: s(p.handle),
     name: s(p.name),
+    tagline: s(p.tagline),
+    homeGym: canSeePosts ? await shownGym(p, now) : null,
     followers: n(c?.followers),
     following: n(c?.following),
     posts: n(c?.posts),
@@ -2283,6 +2348,7 @@ export const OPS: Record<string, Op> = {
   home,
   join,
   update: (a, b) => update(a, b),
+  handleCheck,
   leave: (a) => leave(a),
   lookup,
   search,
@@ -2324,6 +2390,8 @@ export const OPS: Record<string, Op> = {
   invite,
   inviteInfo,
   acceptInvite,
+  // Your invites (Friends › People): who joined with the lifter's link and how close each is to the month of Pro.
+  invites: async (a, _b, now) => ok(await inviteStatus(a, now)),
   board,
   challengeCreate,
   challenges,
@@ -2394,8 +2462,11 @@ export async function adminReports(): Promise<ReportGroup[]> {
       hidden = !!n(c?.hidden);
       content = c ? s(c.body) : "(deleted)";
     } else authorId = target;
-    const [a] = authorId ? await query("SELECT handle, name, suspended FROM social_profiles WHERE account_id = ?", [authorId]) : [];
-    if (kind === "profile") content = a ? `@${s(a.handle)} · ${s(a.name)}` : "(left Friends)";
+    const [a] = authorId
+      ? await query("SELECT handle, name, tagline, suspended FROM social_profiles WHERE account_id = ?", [authorId])
+      : [];
+    if (kind === "profile")
+      content = a ? [`@${s(a.handle)}`, s(a.name), s(a.tagline) && `“${s(a.tagline)}”`].filter(Boolean).join(" · ") : "(left Friends)";
     const reasons: Record<string, number> = {};
     for (const x of s(r.reasons).split(",").filter(Boolean)) reasons[x] = (reasons[x] ?? 0) + 1;
     out.push({
@@ -2418,7 +2489,7 @@ export type ReportAction = "remove" | "dismiss" | "suspend" | "unsuspend";
 
 /**
  * Staff decide a group of reports: `remove` deletes the post or comment (for a profile, resets its name to its
- * handle), `dismiss` keeps it and shows it again, `suspend` hides everything its author wrote and stops them
+ * handle and clears its tagline), `dismiss` keeps it and shows it again, `suspend` hides everything its author wrote and stops them
  * posting, `unsuspend` undoes that.
  */
 export async function resolveReports(kind: ReportKind, targetId: string, action: ReportAction): Promise<boolean> {
@@ -2440,7 +2511,11 @@ export async function resolveReports(kind: ReportKind, targetId: string, action:
           close("removed"),
         ]);
       else if (kind === "comment") await batch([{ sql: "DELETE FROM post_comments WHERE id = ?", args: [targetId] }, close("removed")]);
-      else await batch([{ sql: "UPDATE social_profiles SET name = handle WHERE account_id = ?", args: [targetId] }, close("removed")]);
+      else
+        await batch([
+          { sql: "UPDATE social_profiles SET name = handle, tagline = '' WHERE account_id = ?", args: [targetId] },
+          close("removed"),
+        ]);
       return true;
     case "dismiss":
       await batch([...(table ? [{ sql: `UPDATE ${table} SET hidden = 0 WHERE id = ?`, args: [targetId] }] : []), close("dismissed")]);

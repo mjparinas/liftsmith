@@ -52,8 +52,8 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
     <Card title="Reports on Friends">
       <p className="text-sm text-muted">
         Posts, comments and profiles lifters reported. Three reports hide a post or comment until it&apos;s decided here. Remove deletes it
-        (for a profile, resets the name to the handle), Dismiss shows it again, Ban author hides everything the author wrote and tells them.
-        For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
+        (for a profile, resets the name to the handle and clears the tagline), Dismiss shows it again, Ban author hides everything the
+        author wrote and tells them. For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (

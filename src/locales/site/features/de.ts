@@ -308,6 +308,11 @@ export const de: FeaturesText = {
       name: "Gerade am Trainieren und Anfeuern",
       body: "Sieh, wer gerade trainiert, und schick einen Anfeuerungsruf, der über den Trainingsbildschirm schwebt.",
     },
+    "invite-friends": {
+      name: "Freunde einladen, Pro verdienen",
+      body: "Teile deinen Einladungslink über Freunde, am Ende eines Trainings oder mit jeder Karte. Ein Freund, der damit beitritt, folgt dir zurück, und sobald er drei Trainings geschafft hat, bekommt ihr beide einen Monat Pro. Deine Einladungen zeigt, wie weit jeder ist.",
+      note: "Bis zu 12 Monate im Jahr. Unter 18-Jährige können Freunde einladen, bekommen die Belohnung aber nicht angeboten.",
+    },
     "check-in": {
       name: "Im Studio einchecken",
       body: "Ein Tipp unter Heute sagt den Freunden, die du auswählst, dass du im Studio bist. Sie bekommen eine Mitteilung und einen Hinweis in der App, bis sie ihn schließen.",
@@ -318,6 +323,11 @@ export const de: FeaturesText = {
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
     },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
+    "tagline-gym": {
+      name: "Motto und Stammstudio",
+      body: "Füge eine kurze Zeile unter deinem Namen hinzu und wähl dein Stammstudio aus der Studiosuche, damit deine Freunde wissen, wo du trainierst. Das sehen alle, die deine Workouts sehen, und es steht auf deiner öffentlichen Seite.",
+      note: "Das Stammstudio gibt es ab 18 Jahren.",
+    },
     safety: {
       name: "Blockieren, stummschalten und melden",
       body: "Blockiere oder schalte jeden stumm und melde einen Post, einen Kommentar oder ein Profil mit einem Tipp auf den Grund. Unser Team prüft jede Meldung und kann verwarnen, vorübergehend sperren oder ausschließen.",

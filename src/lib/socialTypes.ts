@@ -41,9 +41,27 @@ export interface PostBody {
   exercises: PostExercise[];
 }
 
+/**
+ * A real gym on a profile (Melvin, 2026-11-14): one of the finder's gyms (gymPlaces.ts), never a typed place. Its
+ * name and city as the gym list has them, and its web page's path (/gyms/<city>/<slug>/).
+ */
+export interface HomeGym {
+  id: string;
+  name: string;
+  city: string;
+  path: string;
+}
+
 export interface SocialProfile {
   handle: string;
   name: string;
+  /** A short line under the name (up to SOCIAL_LIMITS.tagline characters, through the word filter), or "". */
+  tagline: string;
+  /**
+   * The lifter's home gym, picked from their gyms that are linked to a real gym, or null. Never for someone under
+   * 18 (school teams, docs/decisions/school-teams.md). Shown to the same people who see the posts.
+   */
+  homeGym: HomeGym | null;
   /** Anyone can follow without asking. Off by default: follow requests need approval. */
   open: boolean;
   /** Post every finished workout without asking. Off by default. */
@@ -133,6 +151,10 @@ export type Relation = "self" | "none" | "requested" | "following" | "blocked";
 export interface PersonCard {
   handle: string;
   name: string;
+  /** Their tagline, or "". */
+  tagline: string;
+  /** Their home gym, only to people who can see their posts, and never for someone under 18. */
+  homeGym: HomeGym | null;
   followers: number;
   following: number;
   posts: number;
@@ -253,7 +275,7 @@ export type ReportReason = (typeof REPORT_REASONS)[number];
 
 /**
  * The fixed reasons offered for each kind of report (docs/decisions/moderation.md). A profile has its own list:
- * pretending to be someone, an offensive name or handle, someone under 13 and fake lifts only make sense there
+ * pretending to be someone, an offensive name, handle or tagline, someone under 13 and fake lifts only make sense there
  * (fake lifts on a post too). "Something else" is always last and is the one that asks for a note.
  */
 export const REASONS_FOR: Record<ReportKind, readonly ReportReason[]> = {
@@ -281,6 +303,8 @@ export const SOCIAL_LIMITS = {
   handleMin: 3,
   handleMax: 20,
   name: 40,
+  /** A profile's tagline (Melvin, 2026-11-14: "about 60 characters"). */
+  tagline: 60,
   comment: 280,
   caption: 280,
   lifts: 3,

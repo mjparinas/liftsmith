@@ -78,6 +78,8 @@ describe("joining", () => {
     expect(r.body.profile).toEqual({
       handle: "alex",
       name: "ALEX",
+      tagline: "",
+      homeGym: null,
       open: false,
       autoPost: false,
       weights: true,

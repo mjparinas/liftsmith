@@ -89,6 +89,7 @@ export function PlaceDetails({ place }: { place: Place }) {
         <Icon name="people" size={18} />
         <span>{lifters}</span>
       </p>
+      {place.wheelchair && <p className="mt-1 text-sm text-muted">{t(`gp.wheelchair.${place.wheelchair}`)}</p>}
       {!!place.news?.length && (
         <Section title={t("gp.newsTitle")}>
           <ul className="card divide-y divide-line">
@@ -163,6 +164,10 @@ export function PlaceDetails({ place }: { place: Place }) {
       <div className="mt-3 grid gap-2">
         {link(`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`, "pin", t("gp.directions"))}
         {place.website && link(place.website, "link", t("gp.website"))}
+        {place.phone && link(`tel:${place.phone.replace(/[^\d+]/g, "")}`, "phone", place.phone)}
+        {place.email && link(`mailto:${place.email}`, "chat", place.email)}
+        {place.instagram && link(place.instagram, "camera", t("gp.instagram"))}
+        {place.facebook && link(place.facebook, "link", t("gp.facebook"))}
         {place.citySlug && place.slug && link(`${SITE_URL}/gyms/${place.citySlug}/${place.slug}/`, "gym", t("gym.place.page"))}
       </div>
       {place.club && (

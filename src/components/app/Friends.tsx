@@ -20,7 +20,6 @@ import {
   boardNudge,
   cleanInvite,
   clubUrl,
-  inviteUrl,
   pendingInvite,
   playInviteUrl,
   rankBoard,
@@ -32,6 +31,7 @@ import { useDesktop } from "@/lib/layout";
 import { useNet } from "@/lib/net";
 import { estimate } from "@/lib/onerm";
 import { startPush, stopPush } from "@/lib/push";
+import { rewardOn } from "@/lib/referral";
 import { challengeShare } from "@/lib/shareCards";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
@@ -71,6 +71,7 @@ import {
   type ClubPreview,
   type ClubSummary,
   type FeedPost,
+  type HomeGym,
   type Inviter,
   type ModerationNotice,
   type Partner,
@@ -94,6 +95,7 @@ import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { TrainingNow } from "./FriendsLive";
 import { Icon } from "./icons";
+import { InviteButton } from "./Invites";
 import { MonthFriends } from "./MonthChallenge";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
@@ -102,6 +104,48 @@ import { ShareSheet, useShareContext } from "./ShareSheet";
 import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
 // --- Small pieces ---
+
+type HandleStatus = "free" | "mine" | "taken" | "invalid";
+
+/**
+ * Whether a handle is free, checked while the lifter types (Melvin, 2026-11-14): a moment after the last key, so a
+ * burst of typing asks once. Offline or on any error it says nothing and the save still checks.
+ */
+export function useHandleCheck(handle: string): HandleStatus | null {
+  const [seen, setSeen] = useState<{ handle: string; status: HandleStatus } | null>(null);
+  const valid = HANDLE_RE.test(handle);
+  useEffect(() => {
+    if (!valid) return;
+    let live = true;
+    const timer = setTimeout(() => {
+      social<{ handle: string; status: HandleStatus }>("handleCheck", { handle })
+        .then((r) => live && setSeen({ handle, status: r.status }))
+        .catch(() => undefined);
+    }, 400);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [handle, valid]);
+  if (!valid) return null;
+  return seen?.handle === handle ? seen.status : null;
+}
+
+/** The line under a handle box: the rules, then whether the handle is free once we know. */
+function HandleHint({ id, handle, status }: { id: string; handle: string; status: HandleStatus | null }) {
+  const free = status === "free";
+  const taken = status === "taken" || status === "invalid";
+  return (
+    <p
+      id={id}
+      className={`mt-1 flex items-center gap-1 px-1 text-xs ${free ? "text-good" : taken ? "text-bad" : "text-muted"}`}
+      aria-live="polite"
+    >
+      {free && <Icon name="check" size={14} className="shrink-0" />}
+      {free ? t("friends.handleFree", { handle }) : taken ? t("friends.err.handleTaken") : t("friends.handleHint")}
+    </p>
+  );
+}
 
 function Note({ text }: { text: string | null }) {
   if (!text) return null;
@@ -738,7 +782,8 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const h = cleanHandle(handle);
-  const valid = HANDLE_RE.test(h);
+  const status = useHandleCheck(h);
+  const valid = HANDLE_RE.test(h) && status !== "taken";
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!valid || busy) return;
@@ -779,9 +824,7 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
           aria-describedby="fr-handle-hint"
         />
       </div>
-      <p id="fr-handle-hint" className="mt-1 text-xs text-muted">
-        {t("friends.handleHint")}
-      </p>
+      <HandleHint id="fr-handle-hint" handle={h} status={status} />
       <label htmlFor="fr-name" className="mt-4 block text-sm text-muted">
         {t("friends.name")}
       </label>
@@ -991,6 +1034,83 @@ function AvatarPicker() {
   );
 }
 
+/**
+ * Friends settings › Home gym (Melvin, 2026-11-14): one of the lifter's own gyms that's linked to a real gym (from
+ * Find gyms near you), never a typed place, or none. Not offered to someone under 18 (teen-safe defaults).
+ */
+function HomeGymPicker({
+  current,
+  teen,
+  pub,
+  set,
+  onFind,
+}: {
+  current: HomeGym | null;
+  teen: boolean;
+  pub: boolean;
+  set: (placeId: string) => void;
+  onFind: () => void;
+}) {
+  const { gyms, profile } = useApp();
+  const under18 = teen || isTeen(profile);
+  const real = [...new Map(gyms.filter((g) => g.placeId).map((g) => [g.placeId!, g.name])).entries()];
+  // A home gym picked before its gym left this phone still shows, so it can be seen and cleared.
+  if (current && !real.some(([id]) => id === current.id)) real.unshift([current.id, current.name]);
+  return (
+    <Section title={t("friends.homeGym")}>
+      {under18 ? (
+        <p className="px-1 text-sm text-muted">{t("friends.homeGym.teen")}</p>
+      ) : (
+        <>
+          {real.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              <Chip active={!current} onClick={() => set("")}>
+                {t("friends.homeGym.none")}
+              </Chip>
+              {real.map(([id, name]) => (
+                <Chip key={id} active={current?.id === id} onClick={() => set(id)}>
+                  {name}
+                </Chip>
+              ))}
+            </div>
+          )}
+          <p className="mt-2 px-1 text-xs text-muted">
+            {real.length ? t(pub ? "friends.homeGym.hintPublic" : "friends.homeGym.hint") : t("gym.coach.noReal")}
+          </p>
+          {!real.length && (
+            <Button kind="ghost" icon="gym" className="mt-2 w-full" onClick={onFind}>
+              {t("gym.coach.findGym")}
+            </Button>
+          )}
+        </>
+      )}
+    </Section>
+  );
+}
+
+/** The tagline and home gym under a profile's name, when there are any. */
+function AboutLine({ person }: { person: Pick<PersonCard, "tagline" | "homeGym"> }) {
+  const g = person.homeGym;
+  if (!person.tagline && !g) return null;
+  return (
+    <div className="mt-2 space-y-1 px-1">
+      {person.tagline && <p className="text-sm [overflow-wrap:anywhere]">{person.tagline}</p>}
+      {g && (
+        <button
+          type="button"
+          onClick={() => go("gymplace", g.id)}
+          className="press -mx-1 flex min-h-11 items-center gap-1.5 rounded-xl px-1 text-left text-sm text-muted hover:text-ink"
+        >
+          <Icon name="pin" size={16} className="shrink-0 text-cyan" />
+          <span>
+            {t("friends.homeGym")}: <span className="text-ink">{g.city ? `${g.name}, ${g.city}` : g.name}</span>
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 function SettingsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return open ? <SettingsBody onClose={onClose} /> : null;
 }
@@ -1000,8 +1120,11 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
   const p = me?.profile;
   const [name, setName] = useState(p?.name ?? "");
   const [handle, setHandle] = useState(p?.handle ?? "");
+  const [tagline, setTagline] = useState(p?.tagline ?? "");
   const [note, setNote] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const h = cleanHandle(handle);
+  const checked = useHandleCheck(h === p?.handle ? "" : h);
   if (!p) return null;
   const save = async (change: Record<string, unknown>) => {
     try {
@@ -1029,7 +1152,7 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          void save({ name, handle: cleanHandle(handle) });
+          void save({ name, handle: cleanHandle(handle), tagline });
         }}
       >
         <label htmlFor="fr-set-name" className="block text-sm text-muted">
@@ -1042,6 +1165,21 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
           onChange={(e) => setName(e.target.value)}
           className="card mt-1 w-full px-4 py-3"
         />
+        <label htmlFor="fr-set-tagline" className="mt-3 block text-sm text-muted">
+          {t("friends.tagline")}
+        </label>
+        <input
+          id="fr-set-tagline"
+          value={tagline}
+          maxLength={SOCIAL_LIMITS.tagline}
+          placeholder={t("friends.taglineExample")}
+          aria-describedby="fr-set-tagline-hint"
+          onChange={(e) => setTagline(e.target.value)}
+          className="card mt-1 w-full px-4 py-3"
+        />
+        <p id="fr-set-tagline-hint" className="mt-1 px-1 text-xs text-muted">
+          {t("friends.taglineHint", { count: SOCIAL_LIMITS.tagline - [...tagline].length })}
+        </p>
         <label htmlFor="fr-set-handle" className="mt-3 block text-sm text-muted">
           {t("friends.handle")}
         </label>
@@ -1053,13 +1191,25 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
           autoCorrect="off"
           spellCheck={false}
           className="card mt-1 w-full px-4 py-3"
+          aria-describedby="fr-set-handle-hint"
         />
-        <Button submit kind="ghost" className="mt-3 w-full" disabled={!HANDLE_RE.test(cleanHandle(handle))}>
+        {h !== p.handle && <HandleHint id="fr-set-handle-hint" handle={h} status={checked} />}
+        <Button submit kind="ghost" className="mt-3 w-full" disabled={!HANDLE_RE.test(h) || checked === "taken"}>
           {t("friends.save")}
         </Button>
       </form>
       <Note text={note} />
       <AvatarPicker />
+      <HomeGymPicker
+        current={p.homeGym}
+        teen={!!me?.teen}
+        pub={p.public}
+        set={(homeGym) => void save({ homeGym })}
+        onFind={() => {
+          onClose();
+          go("gym");
+        }}
+      />
       <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} pub={p.public} joined={p} set={(c) => void save(c)} />
       {isNative() && <Notifications prefs={p.push} set={(push) => void save({ push })} />}
       {p.public && (
@@ -1252,34 +1402,6 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
       </ul>
       <Note text={note} />
     </Section>
-  );
-}
-
-/** People › Invite a friend: shares the lifter's invite link. Whoever accepts it and the lifter follow each other. */
-function InviteButton() {
-  const [note, setNote] = useState<string | null>(null);
-  const share = async () => {
-    haptic("tick");
-    try {
-      const r = await social<{ code: string }>("invite");
-      const url = inviteUrl(r.code);
-      track("feature", { name: "social_invite" });
-      if (await shareUrl(url, t("friends.invite.shareTitle"))) return;
-      setNote((await copyText(url)) ? t("link.copied") : url);
-    } catch (e) {
-      oops();
-      setNote(socialError(e));
-    }
-  };
-  return (
-    <>
-      <Button kind="primary" icon="people" className="mt-3 w-full" onClick={() => void share()}>
-        {t("friends.invite")}
-      </Button>
-      <p className="mt-1 px-1 text-xs text-muted">{t("friends.inviteHint")}</p>
-      <p className="mt-1 px-1 text-xs text-muted">{t("friends.invite.reward")}</p>
-      <Note text={note} />
-    </>
   );
 }
 
@@ -2291,6 +2413,7 @@ export function ClubScreen({ code: raw }: { code: string }) {
  */
 export function InviteScreen({ code: raw }: { code: string }) {
   const { account, me } = useSocialLoaded();
+  const { profile } = useApp();
   const code = cleanInvite(raw);
   const [who, setWho] = useState<{ inviter: Inviter; self: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -2369,7 +2492,7 @@ export function InviteScreen({ code: raw }: { code: string }) {
           <p className="min-w-0">
             <span className="block font-semibold">{t("friends.invite.from", { name: inviter.name })}</span>
             <span className="block text-sm text-muted">{t("friends.invite.body")}</span>
-            <span className="mt-1 block text-sm text-muted">{t("friends.invite.rewardFriend")}</span>
+            {rewardOn() && !isTeen(profile) && <span className="mt-1 block text-sm text-muted">{t("friends.invite.rewardFriend")}</span>}
           </p>
         </div>
       ) : (
@@ -2724,6 +2847,7 @@ export function PersonScreen({ handle }: { handle: string }) {
           })}
         </div>
       </div>
+      <AboutLine person={person} />
       <ProfileStats person={person} />
       {person.followsYou && !self && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.followsYou")}</p>}
       {person.muted && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.muted")}</p>}

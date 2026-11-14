@@ -589,10 +589,26 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "tagline-gym",
+        name: "Tagline and home gym",
+        body: "Add a short line under your name and pick your home gym from the gym finder, so friends know where you train. It shows to the people who see your workouts, and on your public page.",
+        tier: "free",
+        note: "Home gym is for lifters 18 and over.",
+        added: "2026-11-14",
+      },
+      {
         id: "safety",
         name: "Block, mute and report",
         body: "Block or mute anyone, and report a post, comment or profile with one tap on a reason. Our team reviews every report and can warn, suspend or ban.",
         tier: "free",
+        added: "2026-11-14",
+      },
+      {
+        id: "invite-friends",
+        name: "Invite friends, earn Pro",
+        body: "Share your invite link from Friends, the end of a workout, or any share card. A friend who joins with it follows you back, and once they finish three workouts you both get a month of Pro. Your invites shows how close each friend is.",
+        tier: "free",
+        note: "Up to 12 months a year. Lifters under 18 can invite friends, but the reward isn't offered to them.",
         added: "2026-11-14",
       },
       {

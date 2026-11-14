@@ -9,6 +9,8 @@ import type { SocialProfile } from "./socialTypes";
 const profile = (over: Partial<SocialProfile> = {}): SocialProfile => ({
   handle: "alex",
   name: "Alex",
+  tagline: "",
+  homeGym: null,
   open: false,
   autoPost: false,
   weights: true,

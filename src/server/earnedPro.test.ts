@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { accessFor } from "./access";
 import { deleteAccount } from "./accounts";
 import { query, resetDb, run } from "./db";
-import { coachEarnsPro, EARNED, earnedUntil, recordAccept, settleReferral } from "./earnedPro";
+import { coachEarnsPro, EARNED, earnedUntil, inviteStatus, recordAccept, settleReferral } from "./earnedPro";
+import { setFlag } from "./flags";
+import { saveToken, setPushSender, type PushMessage } from "./push";
 import { sync } from "./sync";
 
 const NOW = 1_800_000_000_000;
@@ -144,5 +146,95 @@ describe("coaches earn Pro", () => {
     expect(await accessFor("coach", null, NOW)).toMatchObject({ pro: true, via: "coach" });
     // Two weeks later nobody has trained: Pro goes.
     expect(await coachEarnsPro("coach", NOW + 15 * DAY)).toBe(false);
+  });
+});
+
+// The invite loop (docs/decisions/growth.md "The invite loop"): progress on Friends › People, the admin switch, and the
+// push when a month lands.
+describe("the invite loop", () => {
+  const sent: PushMessage[] = [];
+  const lifter = async (id: string, name: string, birthYear?: number, createdAt?: number) => {
+    await account(id, createdAt);
+    await run("INSERT INTO social_profiles (account_id, handle, name, agreed_at, created_at, suspended) VALUES (?, ?, ?, ?, ?, 0)", [
+      id,
+      id,
+      name,
+      NOW,
+      NOW,
+    ]);
+    if (birthYear)
+      await run("INSERT INTO sync_records (account_id, key, body, updated_at) VALUES (?, 'profile', ?, ?)", [
+        id,
+        JSON.stringify({ birthYear }),
+        NOW,
+      ]);
+    await saveToken(id, `token-for-${id}-0123456789`, "android", "en", NOW);
+  };
+  beforeEach(() => {
+    sent.length = 0;
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    return () => setPushSender(null);
+  });
+
+  it("shows each friend's progress, then the month both earned", async () => {
+    await lifter("inviter", "Sam", undefined, NOW - 400 * DAY);
+    await lifter("friend", "Alex");
+    await recordAccept("friend", "inviter", NOW);
+    await workouts("friend", 2);
+    expect(await inviteStatus("inviter", NOW + DAY)).toMatchObject({
+      friends: [{ name: "Alex", handle: "friend", workouts: 2, rewarded: false }],
+      joined: null,
+      months: 0,
+      needed: EARNED.workouts,
+      until: null,
+      reward: true,
+    });
+    // The friend sees their side: whose link and how far they are.
+    expect((await inviteStatus("friend", NOW + DAY)).joined).toMatchObject({ name: "Sam", workouts: 2, rewarded: false });
+
+    await workouts("friend", 1);
+    expect(await settleReferral("friend", NOW + DAY)).toBe(true);
+    const after = await inviteStatus("inviter", NOW + 2 * DAY);
+    expect(after).toMatchObject({ friends: [{ workouts: EARNED.workouts, rewarded: true }], months: 1 });
+    expect(after.until).toBe(NOW + DAY + EARNED.days * DAY);
+  });
+
+  it("tells both by push when the month lands", async () => {
+    await lifter("inviter", "Sam", undefined, NOW - 400 * DAY);
+    await lifter("friend", "Alex");
+    await recordAccept("friend", "inviter", NOW);
+    await workouts("friend", 3);
+    await settleReferral("friend", NOW + DAY);
+    expect(sent.map((m) => [m.token, m.kind, m.body]).sort()).toEqual([
+      ["token-for-friend-0123456789", "referralFriend", "You finished three workouts. You and Sam both have a month of Pro."],
+      ["token-for-inviter-0123456789", "referralInviter", "Alex finished three workouts with your invite. You both have a month of Pro."],
+    ]);
+  });
+
+  it("never pushes the reward at someone under 18, and doesn't mention it to them", async () => {
+    await lifter("inviter", "Sam", undefined, NOW - 400 * DAY);
+    await lifter("teen", "Jo", 2012);
+    await recordAccept("teen", "inviter", NOW);
+    await workouts("teen", 3);
+    expect(await settleReferral("teen", NOW + DAY)).toBe(true);
+    expect(sent.map((m) => m.token)).toEqual(["token-for-inviter-0123456789"]);
+    expect((await inviteStatus("teen", NOW + DAY)).reward).toBe(false);
+    expect((await inviteStatus("inviter", NOW + DAY)).reward).toBe(true);
+  });
+
+  it("pays nothing while the admin switch is off, and pays once it's back on", async () => {
+    await lifter("inviter", "Sam", undefined, NOW - 400 * DAY);
+    await lifter("friend", "Alex");
+    await recordAccept("friend", "inviter", NOW);
+    await workouts("friend", 3);
+    await setFlag("referralReward", false, 100, "test", NOW);
+    expect(await settleReferral("friend", NOW + DAY)).toBe(false);
+    expect((await inviteStatus("inviter", NOW + DAY)).reward).toBe(false);
+    expect(await earnedUntil("friend")).toBeNull();
+    await setFlag("referralReward", true, 100, "test", NOW);
+    expect(await settleReferral("friend", NOW + DAY)).toBe(true);
   });
 });

@@ -52,6 +52,7 @@ describe("flags for an install", () => {
       coachProClients: 3,
       coachClients: 25,
       labSonos: false,
+      referralReward: true,
       social: true,
     });
     await setFlag("repMotion", true, 100, "owner@example.com");
@@ -149,6 +150,7 @@ describe("the flag routes", () => {
         coachProClients: 3,
         coachClients: 25,
         labSonos: false,
+        referralReward: true,
         social: true,
       },
     });

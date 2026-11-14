@@ -302,6 +302,11 @@ export const it: FeaturesText = {
       name: "In allenamento ora e incitamenti",
       body: "Vedi chi si sta allenando adesso e manda un incitamento che sale fluttuando sulla sua schermata di allenamento.",
     },
+    "invite-friends": {
+      name: "Invita amici, guadagna Pro",
+      body: "Condividi il tuo link d’invito da Amici, alla fine di un allenamento o da qualsiasi scheda. Un amico che si iscrive con il link ti segue a sua volta e, quando finisce tre allenamenti, ricevete entrambi un mese di Pro. I tuoi inviti mostra a che punto è ciascuno.",
+      note: "Fino a 12 mesi l’anno. Chi ha meno di 18 anni può invitare amici, ma la ricompensa non gli viene proposta.",
+    },
     "check-in": {
       name: "Check-in in palestra",
       body: "Un tocco su Oggi avvisa gli amici che scegli che sei in palestra. Ricevono una notifica e un avviso nell'app finché non lo chiudono.",
@@ -312,6 +317,11 @@ export const it: FeaturesText = {
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
+    "tagline-gym": {
+      name: "Motto e palestra abituale",
+      body: "Aggiungi una breve frase sotto il tuo nome e scegli la tua palestra abituale dalla ricerca palestre, così gli amici sanno dove ti alleni. La vede chi vede i tuoi allenamenti, e compare sulla tua pagina pubblica.",
+      note: "La palestra abituale è per chi ha almeno 18 anni.",
+    },
     safety: {
       name: "Blocca, silenzia e segnala",
       body: "Blocca o silenzia chiunque e segnala un post, un commento o un profilo con un tocco sul motivo. Il nostro team controlla ogni segnalazione e può avvisare, sospendere o bandire.",

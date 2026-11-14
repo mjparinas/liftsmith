@@ -15,6 +15,7 @@ import { applyAccent, calm, confetti, haptic, juice, sound, type TimerSound } fr
 import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
+import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
 import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -28,6 +29,7 @@ import { clock } from "./format";
 import { PostToFriends } from "./Friends";
 import { Icon } from "./icons";
 import { PainSelect } from "./Injuries";
+import { DoneInvite } from "./Invites";
 import { Mascot } from "./Mascot";
 import { NextUpCard } from "./NextUp";
 import { PrReplayButton } from "./PrReplay";
@@ -161,6 +163,7 @@ export function Done() {
   const vol = useCountUp(s ? Math.round(s.volume) : 0);
   const [sharing, setSharing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const inFriends = useSocial((st) => !!st.me?.profile) && socialOn();
 
   useEffect(() => {
     void confetti(prs.length > 0 || levelUp);
@@ -345,6 +348,7 @@ export function Done() {
           />
           <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
           <ShareWorkout sessionId={s.sessionId} />
+          {inFriends && <DoneInvite />}
         </div>
       )}
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />

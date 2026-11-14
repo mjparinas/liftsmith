@@ -307,6 +307,15 @@ try {
     },
   };
   const friendsApi = {
+    invites: {
+      friends: [{ name: "Blair", handle: "blair", workouts: 1, rewarded: false }],
+      joined: null,
+      months: 0,
+      perYear: 12,
+      needed: 3,
+      until: null,
+      reward: true,
+    },
     me: {
       profile: {
         handle: "alex",

@@ -54,6 +54,10 @@ export function socialError(e: unknown): string {
     "comment.words": "friends.err.words",
     "caption.link": "friends.err.link",
     "caption.words": "friends.err.words",
+    "tagline.link": "friends.err.link",
+    "tagline.words": "friends.err.words",
+    teen: "friends.homeGym.teen",
+    gym: "friends.err.gym",
     noOne: "friends.err.noOne",
     cheersOff: "social.err.cheersOff",
     gone: "friends.err.gone",
@@ -78,6 +82,8 @@ export function socialError(e: unknown): string {
 export interface SocialMe {
   profile: SocialProfile | null;
   suspended?: boolean;
+  /** Under 18 (school teams or the birth year in settings): no home gym on the profile. */
+  teen?: boolean;
   /** A warning, suspension or ban staff want the lifter to know about (docs/decisions/moderation.md). */
   notice?: ModerationNotice | null;
   followers?: number;

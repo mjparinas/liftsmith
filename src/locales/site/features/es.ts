@@ -304,6 +304,11 @@ export const es: FeaturesText = {
       name: "Entrenando ahora y ánimos",
       body: "Mira quién está entrenando ahora mismo y envía un ánimo que sube flotando por su pantalla de entrenamiento.",
     },
+    "invite-friends": {
+      name: "Invita a amigos y gana Pro",
+      body: "Comparte tu enlace de invitación desde Amigos, al terminar un entrenamiento o en cualquier tarjeta. Un amigo que se une con él te sigue también, y cuando completa tres entrenamientos los dos recibís un mes de Pro. Tus invitaciones muestra cuánto le falta a cada uno.",
+      note: "Hasta 12 meses al año. Los menores de 18 años pueden invitar a amigos, pero no se les ofrece la recompensa.",
+    },
     "check-in": {
       name: "Avisa desde el gimnasio",
       body: "Un toque en Hoy avisa a los amigos que elijas de que estás en el gimnasio. Reciben una notificación y un aviso en la app hasta que lo cierren.",
@@ -314,6 +319,11 @@ export const es: FeaturesText = {
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
     },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
+    "tagline-gym": {
+      name: "Lema y gimnasio habitual",
+      body: "Añade una frase corta bajo tu nombre y elige tu gimnasio habitual en el buscador de gimnasios, para que tus amigos sepan dónde entrenas. Lo ve quien ve tus entrenamientos, y sale en tu página pública.",
+      note: "El gimnasio habitual es para mayores de 18 años.",
+    },
     safety: {
       name: "Bloquear, silenciar y denunciar",
       body: "Bloquea o silencia a quien quieras y denuncia una publicación, un comentario o un perfil con un toque en el motivo. Nuestro equipo revisa cada denuncia y puede avisar, suspender o expulsar.",

@@ -309,6 +309,11 @@ export const fr: FeaturesText = {
       name: "En séance maintenant et encouragements",
       body: "Voyez qui s’entraîne en ce moment et envoyez un encouragement qui flotte sur son écran de séance.",
     },
+    "invite-friends": {
+      name: "Invite tes amis, gagne Pro",
+      body: "Partage ton lien d’invitation depuis Amis, à la fin d’une séance ou sur n’importe quelle carte. Un ami qui s’inscrit avec te suit en retour, et dès qu’il a terminé trois séances, vous recevez tous les deux un mois de Pro. Tes invitations montre où en est chaque ami.",
+      note: "Jusqu’à 12 mois par an. Les moins de 18 ans peuvent inviter des amis, mais la récompense ne leur est pas proposée.",
+    },
     "check-in": {
       name: "Check-in à la salle",
       body: "Un geste sur Aujourd'hui prévient les amis que vous choisissez que vous êtes à la salle. Ils reçoivent une notification, et un message dans l'app jusqu'à ce qu'ils le ferment.",
@@ -319,6 +324,11 @@ export const fr: FeaturesText = {
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
     },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
+    "tagline-gym": {
+      name: "Devise et salle habituelle",
+      body: "Ajoutez une courte phrase sous votre nom et choisissez votre salle habituelle dans la recherche de salles, pour que vos amis sachent où vous vous entraînez. Elle s’affiche pour ceux qui voient vos entraînements, et sur votre page publique.",
+      note: "La salle habituelle est réservée aux 18 ans et plus.",
+    },
     safety: {
       name: "Bloquer, masquer et signaler",
       body: "Bloquez ou masquez qui vous voulez, et signalez une publication, un commentaire ou un profil en touchant un motif. Notre équipe vérifie chaque signalement et peut avertir, suspendre ou bannir.",

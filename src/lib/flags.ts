@@ -147,6 +147,17 @@ export const FLAGS = {
     label: "Clients with Coach",
     description: "How many clients the Coach plan allows. Coach Plus has no set limit.",
   },
+  /**
+   * Give a month, get a month (src/server/earnedPro.ts, docs/decisions/growth.md). Off: invites still connect friends,
+   * but no new months are paid out (an invite waiting to pay out pays once it's back on) and the app stops saying so.
+   */
+  referralReward: {
+    default: true,
+    options: [true, false] as const,
+    label: "Invite reward",
+    description:
+      "A friend who joins with a lifter's invite link and finishes three workouts gives both a month of Pro. Off: invites still connect friends, but nothing is paid out and the app stops mentioning it.",
+  },
   /** Labs: Sonos speakers controlled from the workout, and music that follows it (src/lib/sonos.ts, docs/decisions/sonos.md). */
   labSonos: {
     default: false,

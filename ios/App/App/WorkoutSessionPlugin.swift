@@ -23,6 +23,14 @@ class MainViewController: CAPBridgeViewController {
         // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
         // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
         webView?.allowsBackForwardNavigationGestures = true
+        // The app fills the screen and doesn't pinch or double-tap zoom (src/lib/nativeZoom.ts locks the
+        // page's viewport too; Android turns it off in MainActivity). Dynamic Type sets the text size instead.
+        if let scroll = webView?.scrollView {
+            scroll.minimumZoomScale = 1
+            scroll.maximumZoomScale = 1
+            scroll.bouncesZoom = false
+            scroll.pinchGestureRecognizer?.isEnabled = false
+        }
     }
 }
 

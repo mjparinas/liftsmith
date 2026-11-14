@@ -467,6 +467,28 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_places_at ON gym_places (lat, lon)`,
   `CREATE UNIQUE INDEX IF NOT EXISTS gym_places_ref ON gym_places (source_ref) WHERE source_ref <> ''`,
+  // One row per city import from OpenStreetMap (gymImport.ts, 2026-11-14): what happened, how long each step took and
+  // which map server answered, for Admin › Gyms' recent imports and its debug log. `scope` keeps the area Nominatim
+  // found, so a re-import skips that lookup. Staff work on public map data, nothing about a lifter; kept 90 days.
+  `CREATE TABLE IF NOT EXISTS gym_imports (
+    id TEXT PRIMARY KEY,
+    query TEXT NOT NULL,
+    area TEXT NOT NULL DEFAULT '',
+    scope TEXT NOT NULL DEFAULT '',
+    ok INTEGER NOT NULL,
+    error TEXT NOT NULL DEFAULT '',
+    found INTEGER NOT NULL DEFAULT 0,
+    added INTEGER NOT NULL DEFAULT 0,
+    updated INTEGER NOT NULL DEFAULT 0,
+    unchanged INTEGER NOT NULL DEFAULT 0,
+    kept INTEGER NOT NULL DEFAULT 0,
+    server TEXT NOT NULL DEFAULT '',
+    ms INTEGER NOT NULL DEFAULT 0,
+    log TEXT NOT NULL DEFAULT '',
+    at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_imports_query ON gym_imports (query, at)`,
+  `CREATE INDEX IF NOT EXISTS gym_imports_at ON gym_imports (at)`,
   // Owners claiming a gym (gymClaims.ts): an emailed code, the poster's code, or staff review. Deleted with the account.
   `CREATE TABLE IF NOT EXISTS gym_claims (
     id TEXT PRIMARY KEY,
@@ -1094,6 +1116,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
   // The switch for friends' check-ins (Check in on Today, 2026-11-14; on to start).
   ["social_profiles", "push_checkins", "INTEGER NOT NULL DEFAULT 1"],
+  // A tagline and a home gym (a gym_places id) on the profile (Melvin, 2026-11-14).
+  ["social_profiles", "tagline", "TEXT NOT NULL DEFAULT ''"],
+  ["social_profiles", "home_gym", "TEXT NOT NULL DEFAULT ''"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],
@@ -1112,6 +1137,14 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "prices", "TEXT NOT NULL DEFAULT ''"],
   // The gym's starter program for new members (2026-11-13): a routine share code (routineShare.ts), '' for none.
   ["gym_places", "starter", "TEXT NOT NULL DEFAULT ''"],
+  // More of what the map and the gym's own website say (2026-11-14, gymImport.ts and gymEnrich.ts): postcode, email,
+  // Instagram and Facebook pages, wheelchair access (yes, limited, no or ''), and when the website was last read.
+  ["gym_places", "postcode", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "email", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "instagram", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "facebook", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "wheelchair", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "enriched_at", "INTEGER NOT NULL DEFAULT 0"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],

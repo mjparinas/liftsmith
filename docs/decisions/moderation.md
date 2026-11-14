@@ -7,7 +7,7 @@ Melvin, 2026-11-14: "users should be able to report a profile, on the admin i sh
 ## Reporting (Android, iOS and the web app)
 
 - **Fixed reasons per kind** (`REASONS_FOR` in `src/lib/socialTypes.ts`), one chip each, "Something else" always last:
-  - *Profile:* spam or scam, bullying or harassment, hate, pretending to be someone else, offensive name or handle, under 13, fake lifts or cheating, something else.
+  - *Profile:* spam or scam, bullying or harassment, hate, pretending to be someone else, offensive name, handle or tagline (the tagline joined it on 2026-11-14), under 13, fake lifts or cheating, something else.
   - *Post:* spam or scam, bullying or harassment, hate, sexual content, dangerous advice, fake lifts or cheating, something else.
   - *Comment:* the post list without fake lifts.
   The server refuses a reason that isn't on the kind's list. Avatars are preset pictures, not photos, so there's no "inappropriate photo" reason.
@@ -25,7 +25,7 @@ Melvin, 2026-11-14: "users should be able to report a profile, on the admin i sh
 - **Shadow ban:** the lifter carries on as usual and sees their own posts, comments and board line, but nobody else sees anything they do: their profile, posts, comments, likes' and cheers' sources, Activity lines, follow requests and Training now are all hidden by the existing filters, and no push goes out from them (`push.ts` reads the sender only when `suspended = 0`). They're never told; a warning still showing is cleared. For spammers and trolls who'd make a new account if they knew.
 - **Unban** clears a suspension, ban or shadow ban and any notice.
 - **Take off leaderboards** (`boards_off`, for fake lifts): left off other people's friends board, club boards and challenge standings, still on their own (`ON_BOARD` in `social.ts`), so nothing looks different to them. Posts and the feed are unchanged.
-- **Reset name** (to the handle) and **reset handle** (to `lifter_` and six random characters; a name that was just the old handle follows it).
+- **Reset name** (to the handle) and **reset handle** (to `lifter_` and six random characters; a name that was just the old handle follows it). **Clear tagline** (2026-11-14, shown while there is one) empties the tagline ([Friends](friends.md) "Tagline and home gym"); the Reports tab's Remove on a profile resets the name and clears the tagline.
 - **Dismiss reports:** closes every open report on the profile, its posts and its comments, and shows posts and comments hidden by reports again.
 - Warn, suspend and ban take a reason staff pick (the top reason of the waiting reports to start), shown to the lifter in their language. The notice ends "Think we got it wrong? Tell us through Send feedback in Settings", the appeal path.
 - The Reports tab's "Suspend author" is now **Ban author** (and Unban) and goes through the same `moderate()`, so it tells the lifter and adds the email to the ban list.
