@@ -6001,7 +6001,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "reverse-grip-bench-press": () => benchPress({ load: "barbell" }),
   "smith-floor-press": () => benchPress({ load: "barbell" }),
   "band-decline-press": () => fly({ posture: "standing", from: 30, to: 0, load: "none", first: "lift", cable: "high" }),
-  "band-single-arm-press": () => fly({ posture: "standing", from: 0, to: 0, load: "none", first: "lift", cable: "side", oneArm: true }),
+  "band-single-arm-press": () => ({ ...chestPass(), load: "none", hold: undefined }),
   "ring-wide-push-up": () => pushUp({ rings: true, width: 0.32 }),
   "ring-archer-push-up": () => archerPushUp({ rings: true }),
   "pike-shoulder-tap": () => shoulderTaps(pikeBase),
