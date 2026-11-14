@@ -29,11 +29,62 @@ describe("dance easter egg", () => {
     expect(r.taps).toHaveLength(1);
   });
 
-  it("lasts about ten seconds, played once from start to end", () => {
+  it("lasts about sixteen seconds, played once from start to end", () => {
     const m = danceMotion();
     expect(cycleLength(m.phases)).toBe(DANCE_SECONDS);
-    expect(DANCE_SECONDS).toBeGreaterThanOrEqual(8);
-    expect(DANCE_SECONDS).toBeLessThanOrEqual(12);
+    expect(DANCE_SECONDS).toBeGreaterThanOrEqual(14);
+    expect(DANCE_SECONDS).toBeLessThanOrEqual(18);
+  });
+
+  // the signature moves, each checked where it plays (seconds into the routine)
+  const at = (t: number) => jointsAt(danceMotion(), BODIES.male, t / DANCE_SECONDS);
+  const tipZ = (J: ReturnType<typeof at>) => J.headDir[2];
+
+  it("rises from a slump", () => {
+    const B = BODIES.male;
+    expect(at(0.3).shC[1]).toBeLessThan(at(2.0).shC[1] - 0.15);
+    expect(at(0.3).handR[1]).toBeLessThan(at(0.3).hipC[1]); // arms hanging
+    expect(at(2.0).shC[1]).toBeGreaterThan(B.thigh + B.shin); // upright
+  });
+
+  it("walks forward, then comes back to its spot before the end", () => {
+    expect(at(4.5).hipC[0] - at(2.0).hipC[0]).toBeGreaterThan(0.2);
+    expect(Math.abs(at(11).hipC[0] - at(0).hipC[0])).toBeLessThan(0.08);
+  });
+
+  it("snaps the head right and left in the shimmy", () => {
+    const tips = Array.from({ length: 40 }, (_, i) => tipZ(at(5 + (i / 40) * 1.4)));
+    expect(Math.max(...tips)).toBeGreaterThan(0.2);
+    expect(Math.min(...tips)).toBeLessThan(-0.2);
+  });
+
+  it("holds the claws up by one side of the head, steps that way, then the other way", () => {
+    const right = at(8.0);
+    const left = at(9.2);
+    for (const J of [right, left]) {
+      expect(J.handL[1]).toBeGreaterThan(J.shC[1]); // both hands at head height
+      expect(J.handR[1]).toBeGreaterThan(J.shC[1]);
+    }
+    expect(right.handL[2]).toBeGreaterThan(right.shC[2] - 0.05); // the left hand crosses over to the right
+    expect(left.handR[2]).toBeLessThan(left.shC[2] + 0.05);
+    expect(right.hipC[2]).toBeGreaterThan(0.2); // stepped right
+    expect(left.hipC[2]).toBeLessThan(right.hipC[2] - 0.1); // and back left
+  });
+
+  it("swipes the claws from low to high", () => {
+    expect(at(10.35).handR[1] - at(9.9).handR[1]).toBeGreaterThan(0.6);
+  });
+
+  it("thrusts the hips forward on the beat", () => {
+    const xs = Array.from({ length: 40 }, (_, i) => at(11.9 + (i / 40) * 1.4).hipC[0]);
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(0.05);
+  });
+
+  it("ends in the group pose: claws raised overhead, one foot forward", () => {
+    const J = at(14.8);
+    expect(J.handL[1]).toBeGreaterThan(J.head[1]);
+    expect(J.handR[1]).toBeGreaterThan(J.head[1]);
+    expect(J.ankleR[0] - J.ankleL[0]).toBeGreaterThan(0.2);
   });
 
   it("keeps every limb in one piece and the feet on or above the floor, on both bodies", () => {
