@@ -15,6 +15,8 @@ export const en = {
   "account.google": "Continue with Google",
   "account.emailButton": "Continue with email",
   "account.agree": "By signing in, you agree to the terms of use and the privacy policy.",
+  "account.emailNote":
+    "Signing in also turns on a few emails: workout reminders, your weekly recap and tips. Turn any of them off in Settings or from the link in each email.",
   "account.terms": "Terms of use",
   "account.privacy": "Privacy policy",
   "account.email.label": "Your email",
@@ -91,6 +93,8 @@ export const es: Partial<Record<Key, Message>> = {
   "account.google": "Continuar con Google",
   "account.emailButton": "Continuar con correo",
   "account.agree": "Al iniciar sesión, aceptas los términos de uso y la política de privacidad.",
+  "account.emailNote":
+    "Al iniciar sesión también se activan algunos correos: recordatorios de entrenamiento, tu resumen semanal y consejos. Desactiva cualquiera en Ajustes o con el enlace de cada correo.",
   "account.terms": "Términos de uso",
   "account.privacy": "Política de privacidad",
   "account.email.label": "Tu correo",
@@ -167,6 +171,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.google": "Continuer avec Google",
   "account.emailButton": "Continuer avec un e-mail",
   "account.agree": "En vous connectant, vous acceptez les conditions d’utilisation et la politique de confidentialité.",
+  "account.emailNote":
+    "La connexion active aussi quelques e-mails : rappels d'entraînement, votre bilan de la semaine et des conseils. Désactivez-les dans Réglages ou avec le lien de chaque e-mail.",
   "account.terms": "Conditions d’utilisation",
   "account.privacy": "Politique de confidentialité",
   "account.email.label": "Votre e-mail",
@@ -246,6 +252,8 @@ export const de: Partial<Record<Key, Message>> = {
   "account.google": "Weiter mit Google",
   "account.emailButton": "Weiter mit E-Mail",
   "account.agree": "Wenn du dich anmeldest, stimmst du den Nutzungsbedingungen und der Datenschutzerklärung zu.",
+  "account.emailNote":
+    "Mit der Anmeldung werden auch ein paar E-Mails aktiviert: Trainingserinnerungen, dein Wochenrückblick und Tipps. Du kannst jede davon in den Einstellungen oder über den Link in jeder E-Mail abbestellen.",
   "account.terms": "Nutzungsbedingungen",
   "account.privacy": "Datenschutzerklärung",
   "account.email.label": "Deine E-Mail",
@@ -325,6 +333,8 @@ export const it: Partial<Record<Key, Message>> = {
   "account.google": "Continua con Google",
   "account.emailButton": "Continua con l’email",
   "account.agree": "Accedendo, accetti le condizioni d’uso e l’informativa sulla privacy.",
+  "account.emailNote":
+    "Accedendo attivi anche alcune email: promemoria di allenamento, il riepilogo della settimana e consigli. Puoi disattivarle nelle Impostazioni o dal link in ogni email.",
   "account.terms": "Condizioni d’uso",
   "account.privacy": "Informativa sulla privacy",
   "account.email.label": "La tua email",
@@ -401,6 +411,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.google": "Google で続ける",
   "account.emailButton": "メールで続ける",
   "account.agree": "サインインすると、利用規約とプライバシーポリシーに同意したことになります。",
+  "account.emailNote":
+    "サインインすると、ワークアウトのリマインダー、週のまとめ、ヒントのメールも届くようになります。設定または各メールのリンクからいつでも停止できます。",
   "account.terms": "利用規約",
   "account.privacy": "プライバシーポリシー",
   "account.email.label": "メールアドレス",

@@ -27,7 +27,7 @@ import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
 import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
-import { onReminderTap, refreshReminders } from "@/lib/reminders";
+import { onReminderTap, refreshReminders, startDefaultEmail } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
@@ -35,7 +35,7 @@ import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { refreshSocial, socialOn } from "@/lib/social";
 import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
-import { startSync } from "@/lib/sync";
+import { startSync, useSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
 import { forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
@@ -313,6 +313,9 @@ export function App() {
     if (!ready) return;
     const refresh = () => {
       if (document.visibilityState !== "visible") return;
+      // Email is on by default for signed-in adults once this device has synced (reminders.ts autoEmailPrefs).
+      const { profile: now, setProfile } = useApp.getState();
+      if (startDefaultEmail(now, !!useSync.lastSync(), (messages) => setProfile({ messages }))) return; // the change refreshes
       refreshReminders(
         () => useApp.getState(),
         (status, address) => {

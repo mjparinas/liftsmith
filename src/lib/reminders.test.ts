@@ -5,7 +5,7 @@ import { makeProfile, NOW } from "@/test/factories";
 
 import { useAccount } from "./auth";
 import { derive } from "./derive";
-import { refreshReminders, SUB_KEY } from "./reminders";
+import { autoEmailPrefs, refreshReminders, SUB_KEY } from "./reminders";
 
 afterEach(() => {
   useAccount.setState({ account: null });
@@ -55,5 +55,23 @@ describe("email subscriptions from before email followed the account", () => {
     await vi.runAllTimersAsync();
     expect(sent).toEqual([{ auth: undefined, email: "me@example.com" }]);
     expect(onStatus).not.toHaveBeenCalled();
+  });
+});
+
+describe("email on by default", () => {
+  const adult = makeProfile({ onboarded: true, birthYear: 1990 });
+  it("subscribes a signed-in adult's own address once this device has synced", () => {
+    const next = autoEmailPrefs(adult, "me@example.com", true, NOW);
+    expect(next?.email).toEqual({ address: "me@example.com", consentAt: NOW, status: "pending", kinds: {} });
+    expect(next?.startedAt).toBe(NOW);
+  });
+  it("leaves it alone when signed out, before the first sync, already set, turned off, or under 18", () => {
+    expect(autoEmailPrefs(adult, null, true, NOW)).toBeNull();
+    expect(autoEmailPrefs(adult, "me@example.com", false, NOW)).toBeNull();
+    expect(autoEmailPrefs({ ...adult, onboarded: false }, "me@example.com", true, NOW)).toBeNull();
+    expect(autoEmailPrefs({ ...adult, messages: { push: {}, emailOff: true } }, "me@example.com", true, NOW)).toBeNull();
+    expect(autoEmailPrefs(pending("old@example.com"), "me@example.com", true, NOW)).toBeNull();
+    const teen = { ...adult, birthYear: new Date(NOW).getFullYear() - 15 };
+    expect(autoEmailPrefs(teen, "me@example.com", true, NOW)).toBeNull();
   });
 });
