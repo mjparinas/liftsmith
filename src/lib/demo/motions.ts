@@ -2036,6 +2036,235 @@ function plankSaw(): Motion {
   };
 }
 
+// ---------- push-up variations (audit batch 3) ----------
+// Clap, spiderman, archer, one-arm, typewriter, shoulder-tap and hand-release push-ups all played the plain
+// push-up, and ring flys and bodyweight skull crushers played push-ups too (Melvin, 2026-11-14 audit).
+
+/** A pose's hands as left and right. */
+function handsLR(p: Pose): { L: Vec; R: Vec } {
+  const h = p.hand;
+  if (typeof h === "object" && "L" in h) return h;
+  const v = h as Vec;
+  return { L: V(v[0], v[1], -Math.abs(v[2])), R: V(v[0], v[1], Math.abs(v[2])) };
+}
+function anklesLR(p: Pose): { L: Vec; R: Vec } {
+  const a = (p.ankle ?? V(0, ANKLE_H, 0.1)) as Vec | { L: Vec; R: Vec };
+  if ("L" in a) return a;
+  return { L: V(a[0], a[1], -Math.abs(a[2])), R: V(a[0], a[1], Math.abs(a[2])) };
+}
+
+/** Two push-ups, the first doing something on the left and the second on the right: `side` gets the depth, the side's sign and how far into its extra it is. */
+function twoSided(base: Motion, labels: [string, string], side: (B: Body, depth: number, sgn: number, k: number) => Pose): Motion {
+  return {
+    ...base,
+    phases: [
+      [1.0, 0, 0.5, labels[0], 0.6],
+      [0.7, 0.5, 1, labels[1], 1],
+      [1.0, 1, 1.5, labels[0], 0.6],
+      [0.7, 1.5, 2, labels[1], 1],
+    ],
+    pose(B, d) {
+      const u = clamp(d, 0, 2);
+      const first = u <= 1;
+      const r = first ? u : u - 1;
+      const depth = r <= 0.5 ? r * 2 : 2 - r * 2;
+      return side(B, depth, first ? -1 : 1, depth);
+    },
+  };
+}
+
+function clapPushUp(): Motion {
+  const base = pushUp({});
+  return {
+    ...base,
+    phases: [
+      [0.4, 0, 0, "Plank", 0.4],
+      [0.9, 0, 1, "Lower", 0.6],
+      [0.4, 1, -0.3, "Explode", 1],
+      [0.35, -0.3, 0, "Clap and catch", 0.7],
+    ],
+    pose(B, d) {
+      const p = base.pose(B, d);
+      if (d >= 0) return p;
+      // in the air: the hands leave the floor and clap in front of the chest
+      const k = Math.sin((Math.PI / 2) * Math.min(1, -d / 0.3));
+      const { L, R } = handsLR(p);
+      const clap = (sgn: number): Vec => V(p.sh[0] + 0.12, p.sh[1] - 0.22, sgn * 0.04);
+      return { ...p, hand: per(lerpV(L, clap(-1), k), lerpV(R, clap(1), k)), elbowPole: V(-0.4, -0.2, 1) };
+    },
+  };
+}
+
+function spidermanPushUp(): Motion {
+  const base = pushUp({});
+  return twoSided(base, ["Lower, knee to elbow", "Push"], (B, depth, sgn, k) => {
+    const p = base.pose(B, depth);
+    const a = anklesLR(p);
+    const knee = V(p.hip[0] - 0.12, p.hip[1] - 0.12, sgn * 0.42);
+    const moving = lerpV(sgn < 0 ? a.L : a.R, knee, k);
+    return {
+      ...p,
+      ankle: sgn < 0 ? per(moving, a.R) : per(a.L, moving),
+      kneePole: sgn < 0 ? per(V(0.6, 0.2, -1), V(0, -1, 0.1)) : per(V(0, -1, -0.1), V(0.6, 0.2, 1)),
+    };
+  });
+}
+
+function archerPushUp(o: { rings?: boolean }): Motion {
+  const base = pushUp({ width: 0.34, rings: o.rings });
+  return twoSided(base, ["Lower to one side", "Push"], (B, depth, sgn) => {
+    const p = base.pose(B, depth);
+    const s = V(0, 0, sgn * 0.2 * depth);
+    return { ...p, hip: add(p.hip, mul(s, 0.4)), sh: add(p.sh, s), hand: handsLR(p), elbowPole: per(V(-0.3, 0.4, -1), V(-0.3, 0.4, 1)) };
+  });
+}
+
+function typewriterPushUp(): Motion {
+  const base = pushUp({ width: 0.34 });
+  return {
+    ...base,
+    phases: [
+      [1.0, 0, 0.25, "Lower", 0.6],
+      [1.6, 0.25, 0.75, "Slide across", 0.9],
+      [0.8, 0.75, 1, "Push", 1],
+    ],
+    pose(B, d) {
+      const u = clamp(d, 0, 1) * 4;
+      const depth = u < 1 ? u : u > 3 ? 4 - u : 1;
+      const shift = u > 1 && u < 3 ? 0.2 * Math.sin(Math.PI * (u - 1)) : 0;
+      const p = base.pose(B, depth);
+      const s = V(0, 0, shift);
+      return { ...p, hip: add(p.hip, mul(s, 0.4)), sh: add(p.sh, s), hand: handsLR(p), elbowPole: per(V(-0.3, 0.4, -1), V(-0.3, 0.4, 1)) };
+    },
+  };
+}
+
+function oneArmPushUp(): Motion {
+  const base = pushUp({ width: 0.14 });
+  return {
+    ...base,
+    pose(B, d) {
+      const p = base.pose(B, d);
+      const { R } = handsLR(p);
+      // the free hand rests on the lower back, feet wide for balance
+      const back = V(p.hip[0] + 0.12, p.hip[1] + 0.1, -0.08);
+      const a = anklesLR(p);
+      return {
+        ...p,
+        sh: add(p.sh, V(0, 0, 0.06)),
+        hand: per(back, R),
+        ankle: per(
+          within(V(p.hip[0], p.hip[1], -B.hipW), V(a.L[0], a.L[1], -0.4), legMax(B) * 0.99),
+          within(V(p.hip[0], p.hip[1], B.hipW), V(a.R[0], a.R[1], 0.4), legMax(B) * 0.99),
+        ),
+        elbowPole: per(V(-0.4, 1, -0.6), V(-1, 0.3, 0.4)),
+      };
+    },
+  };
+}
+
+function shoulderTapPushUp(): Motion {
+  const base = pushUp({});
+  return {
+    ...base,
+    phases: [
+      [1.0, 0, 1, "Lower", 0.6],
+      [0.7, 1, 0, "Push", 1],
+      [0.6, 0, -1, "Tap", 0.7],
+      [0.6, -1, -2, "Tap", 0.7],
+    ],
+    pose(B, d) {
+      if (d >= 0) return base.pose(B, d);
+      const p = base.pose(B, 0);
+      const left = d > -1;
+      const k = Math.sin(Math.PI * (left ? -d : -d - 1));
+      const { L, R } = handsLR(p);
+      const sgn = left ? -1 : 1;
+      const tap = V(p.sh[0] - 0.04, p.sh[1] - 0.09, -sgn * B.shW * 0.85);
+      const move = (h: Vec) => add(lerpV(h, tap, k), V(0, 0.05 * Math.sin(Math.PI * k)));
+      return { ...p, hand: left ? per(move(L), R) : per(L, move(R)) };
+    },
+  };
+}
+
+function handReleasePushUp(): Motion {
+  const base = pushUp({});
+  return {
+    ...base,
+    phases: [
+      [1.0, 0, 1, "Lower to the floor", 0.6],
+      [0.5, 1, 1.4, "Hands off", 0.5],
+      [0.3, 1.4, 1, "Hands down", 0.5],
+      [0.8, 1, 0, "Push", 1],
+    ],
+    pose(B, d) {
+      if (d <= 1) return base.pose(B, d);
+      const p = base.pose(B, 1);
+      const k = (d - 1) / 0.4;
+      const { L, R } = handsLR(p);
+      const up = (h: Vec, sgn: number) => add(h, V(-0.05 * k, 0.1 * k, sgn * 0.12 * k));
+      return { ...p, sh: add(p.sh, V(0, -0.04 * k)), hand: per(up(L, -1), up(R, 1)), elbowPole: V(-0.2, 1, 0.6) };
+    },
+  };
+}
+
+/** Ring fly: a push-up position on the rings, the arms opening wide as the chest lowers, nearly straight. */
+function ringFly(): Motion {
+  const base = pushUp({ rings: true, width: 0.22 });
+  return {
+    ...base,
+    phases: TEMPO.lowerFirst("Open · 2s", "Squeeze · 1s", "Top", "Stretch"),
+    pose(B, d) {
+      const top = base.pose(B, 0);
+      const p = base.pose(B, d * 0.75);
+      const hz = lerp(0.22, 0.62, d);
+      const hy = handsLR(top).R[1] + 0.06 * d;
+      const hx = handsLR(top).R[0];
+      return { ...p, hand: per(V(hx, hy, -hz), V(hx, hy, hz)), elbowPole: per(V(-0.2, 1, -0.3), V(-0.2, 1, 0.3)) };
+    },
+  };
+}
+
+/**
+ * Bodyweight skull crusher on a bar (or the rings): leaning into the bar with straight arms out in front,
+ * the elbows bend and the head dips under the hands, body straight from the heels.
+ */
+function bodyweightSkullCrusher(o: { rings?: boolean }): Motion {
+  const ankle = V(-0.6, 0.11);
+  /** Where the hands hold the bar: arms straight from the top position, a little above level. */
+  const barAt = (B: Body): Vec => {
+    const Lb = legMax(B) * 0.99 + B.torso;
+    const top = add(ankle, V(Math.cos(rad(35)) * Lb, Math.sin(rad(35)) * Lb));
+    return add(top, V(Math.cos(rad(-10)) * reach(B) * 0.97, Math.sin(rad(-10)) * reach(B) * 0.97));
+  };
+  return {
+    phases: TEMPO.lowerFirst("Bend the elbows · 2s", "Extend · 1s", "Arms long", "Head under"),
+    load: "none",
+    stance: 0.1,
+    grip: 0.12,
+    pose(B, d) {
+      const Lb = legMax(B) * 0.99 + B.torso;
+      const at = (deg: number) => add(ankle, V(Math.cos(rad(deg)) * Lb, Math.sin(rad(deg)) * Lb));
+      const hand = barAt(B);
+      const th = lerp(35, 27, d);
+      const sh = at(th);
+      const dir = norm(sub(sh, ankle));
+      const hip = add(ankle, mul(dir, legMax(B) * 0.99));
+      return {
+        hip,
+        sh,
+        ankle: V(ankle[0], ankle[1], 0.12),
+        foot: 90 - th - 30,
+        kneePole: V(0, -1, 0.1),
+        hand: V(hand[0], hand[1], 0.12),
+        elbowPole: V(1, -0.5, 0.15),
+        headBlend: 0,
+      };
+    },
+    props: o.rings ? undefined : (B) => [rail(add(barAt(B), V(0, 0.02)), 1.2, "z")],
+  };
+}
+
 // ---------- floor positions (audit batch 2) ----------
 
 /** Holds a moving motion still at `at`, breathing (an incline plank is the top of an incline push-up). */
@@ -3808,8 +4037,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-assisted-dip": () => dip({}),
   "band-pull-through": pullThrough,
   "wide-push-up": () => pushUp({ width: 0.34 }),
-  "archer-push-up": () => pushUp({ width: 0.36 }),
-  "clap-push-up": () => pushUp({}),
+  "archer-push-up": () => archerPushUp({}),
+  "clap-push-up": clapPushUp,
   "knee-push-up": () => pushUp({ hands: 0.2 }),
   "hindu-push-up": hinduPushUp,
   "handstand-push-up": handstandPushUp,
@@ -3974,10 +4203,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-fly": () => fly({ posture: "standing", from: 78, to: 8, load: "none", first: "lift", cable: "side" }),
   "banded-push-up": () => pushUp({}),
   "deficit-push-up": () => pushUp({}),
-  "spiderman-push-up": () => pushUp({}),
+  "spiderman-push-up": spidermanPushUp,
   "staggered-push-up": () => pushUp({ width: 0.3 }),
   "push-up-rotation": () => pushUp({}),
-  "ring-fly": () => pushUp({ rings: true, width: 0.32 }),
+  "ring-fly": ringFly,
   "ring-dip": () => dip({}),
   "straight-bar-dip": () => dip({}),
   "db-seated-lateral-raise": () => fly({ posture: "seated", from: 8, to: 84, load: "dumbbell", first: "lift" }),
@@ -4009,7 +4238,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-skull-crusher": () => overheadExtension({ lying: true }),
   "incline-skull-crusher": () => overheadExtension({ lying: true }),
   "band-overhead-extension": () => overheadExtension({}),
-  "bodyweight-skull-crusher": () => pushUp({ hands: 0.45, width: 0.1, close: true }),
+  "bodyweight-skull-crusher": () => bodyweightSkullCrusher({}),
   "seated-dip-machine": machinePress,
   "kb-elbows-out-press": () => overheadExtension({ lying: true }),
   "band-kickback": () => bentRow({ load: "none", lean: 62, oneArm: true }),
@@ -4175,9 +4404,9 @@ const MOTIONS: Record<string, () => Motion> = {
   "landmine-chest-press": machinePress,
   "band-incline-press": machinePress,
   "push-up-bottom-hold": () => pushUp({}),
-  "hand-release-push-up": () => pushUp({}),
-  "one-arm-push-up": () => pushUp({ width: 0.3 }),
-  "typewriter-push-up": () => pushUp({ width: 0.36 }),
+  "hand-release-push-up": handReleasePushUp,
+  "one-arm-push-up": oneArmPushUp,
+  "typewriter-push-up": typewriterPushUp,
   "ring-support-hold": () => dip({}),
   "parallel-bar-support-hold": () => dip({}),
   "feet-up-bench-dip": () => dip({ bench: true }),
@@ -4259,7 +4488,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "smith-jm-press": () => benchPress({ load: "barbell", grip: 0.16, close: true }),
   "close-grip-floor-press": () => benchPress({ load: "barbell", grip: 0.16, close: true }),
   "kb-overhead-extension": () => overheadExtension({}),
-  "ring-triceps-extension": () => pushUp({ rings: true, hands: 0.45, width: 0.1, close: true }),
+  "ring-triceps-extension": () => bodyweightSkullCrusher({ rings: true }),
   "smith-box-squat": () => squat({ hold: "back", smith: true, box: true, depth: 0.9 }),
   "smith-front-squat": () => squat({ hold: "front", smith: true }),
   "half-squat": () => squat({ hold: "back", depth: 0.55 }),
@@ -4430,10 +4659,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-decline-press": () => fly({ posture: "standing", from: 30, to: 0, load: "none", first: "lift", cable: "high" }),
   "band-single-arm-press": () => fly({ posture: "standing", from: 0, to: 0, load: "none", first: "lift", cable: "side", oneArm: true }),
   "ring-wide-push-up": () => pushUp({ rings: true, width: 0.32 }),
-  "ring-archer-push-up": () => pushUp({ rings: true, width: 0.36 }),
+  "ring-archer-push-up": () => archerPushUp({ rings: true }),
   "pike-shoulder-tap": () => shoulderTaps(pikeBase),
   "wall-handstand-shoulder-tap": pikePushUp,
-  "shoulder-tap-push-up": () => pushUp({}),
+  "shoulder-tap-push-up": shoulderTapPushUp,
   "decline-diamond-push-up": () => pushUp({ feet: 0.42, width: 0.06, close: true }),
   "tempo-push-up": () => pushUp({}),
   "paused-push-up": () => pushUp({}),
