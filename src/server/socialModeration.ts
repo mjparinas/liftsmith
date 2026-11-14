@@ -35,6 +35,7 @@ export type ModAction =
   | { action: "boardsOn" }
   | { action: "resetName" }
   | { action: "resetHandle" }
+  | { action: "resetTagline" }
   | { action: "dismiss" };
 
 export const MOD_ACTIONS = [
@@ -47,6 +48,7 @@ export const MOD_ACTIONS = [
   "boardsOn",
   "resetName",
   "resetHandle",
+  "resetTagline",
   "dismiss",
 ] as const satisfies readonly ModAction["action"][];
 
@@ -200,6 +202,9 @@ export async function moderate(accountId: string, a: ModAction, now = Date.now()
     case "resetName":
       await batch([set("name = handle")]);
       return true;
+    case "resetTagline":
+      await batch([set("tagline = ''")]);
+      return true;
     case "resetHandle": {
       const h = await freshHandle();
       // A name that was just the old handle follows it, so the old handle doesn't stay on show.
@@ -251,7 +256,7 @@ export interface ReportLine {
 }
 
 export interface ModerationDetail {
-  profile: { handle: string; name: string; public: boolean; joinedAt: number } | null;
+  profile: { handle: string; name: string; tagline: string; public: boolean; joinedAt: number } | null;
   state: ModState;
   until: number | null;
   boardsOff: boolean;
@@ -329,7 +334,7 @@ export async function moderationFor(accountId: string, now = Date.now()): Promis
   }));
   const state = p ? stateOf(p) : "ok";
   return {
-    profile: p ? { handle: s(p.handle), name: s(p.name), public: !!n(p.public), joinedAt: n(p.created_at) } : null,
+    profile: p ? { handle: s(p.handle), name: s(p.name), tagline: s(p.tagline), public: !!n(p.public), joinedAt: n(p.created_at) } : null,
     state,
     until: state === "suspended" ? n(p?.suspended_until) : null,
     boardsOff: !!n(p?.boards_off),

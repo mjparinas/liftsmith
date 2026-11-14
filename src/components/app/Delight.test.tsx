@@ -86,6 +86,8 @@ function barbellFirst() {
 const MAX: SocialProfile = {
   handle: "max",
   name: "Max",
+  tagline: "",
+  homeGym: null,
   open: false,
   autoPost: false,
   weights: true,

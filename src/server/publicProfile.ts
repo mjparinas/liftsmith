@@ -9,10 +9,11 @@ import { threaded } from "@/lib/commentThread";
 import { isMsgLang, MSG_LANGS, type MsgLang } from "@/lib/messageText";
 import { SHARE_PAGE_CSP } from "@/lib/securityHeaders";
 import { SITE_URL } from "@/lib/site";
-import { AVATAR_IDS, cleanHandle, HANDLE_RE, SOCIAL_LIMITS, type PostBody, type ShowcaseLift } from "@/lib/socialTypes";
+import { AVATAR_IDS, cleanHandle, HANDLE_RE, SOCIAL_LIMITS, type HomeGym, type PostBody, type ShowcaseLift } from "@/lib/socialTypes";
 
 import { query } from "./db";
-import { parseLifts } from "./social";
+import { homeGymOf, parseLifts } from "./social";
+import { isMinor } from "./teams";
 
 const DAY = 86_400_000;
 const AVATAR_SET = new Set<string>(AVATAR_IDS);
@@ -59,6 +60,10 @@ export interface PublicProfile {
   /** The level and training-week streak the app last sent (0 when none yet). */
   level: number;
   streak: number;
+  /** A short line under the name, or "". */
+  tagline: string;
+  /** Their home gym (a real gym, linked to its page), never for someone under 18. */
+  homeGym: HomeGym | null;
   /** The best lifts, only while the lifter shows them and shows weights (the same rule as the app's person page). */
   lifts: ShowcaseLift[];
   /** When each workout posted for everyone in the calendar's weeks started (ms). */
@@ -82,8 +87,10 @@ export async function publicProfile(handle: string, now = Date.now()): Promise<P
     show_lifts: number;
     weights: number;
     lifts: string;
+    tagline: string;
+    home_gym: string;
   }>(
-    `SELECT account_id, handle, name, avatar, level, streak, show_lifts, weights, lifts FROM social_profiles
+    `SELECT account_id, handle, name, avatar, level, streak, show_lifts, weights, lifts, tagline, home_gym FROM social_profiles
      WHERE handle = ? AND public = 1 AND suspended = 0`,
     [h],
   );
@@ -170,9 +177,13 @@ export async function publicProfile(handle: string, now = Date.now()): Promise<P
       // a broken row is left out rather than breaking the page
     }
   }
+  // Teen-safe: a public profile is never a teen's (social.ts refuses it), but the gym is checked again all the same.
+  const homeGym = p.home_gym && !(await isMinor(id, now)) ? await homeGymOf(p.home_gym) : null;
   return {
     handle: String(p.handle),
     name: String(p.name),
+    tagline: String(p.tagline ?? ""),
+    homeGym,
     followers: Number(c?.followers ?? 0),
     following: Number(c?.following ?? 0),
     posts: Number(c?.posts ?? 0),

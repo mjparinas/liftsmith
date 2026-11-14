@@ -308,6 +308,11 @@ export const it: FeaturesText = {
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
+    "tagline-gym": {
+      name: "Motto e palestra abituale",
+      body: "Aggiungi una breve frase sotto il tuo nome e scegli la tua palestra abituale dalla ricerca palestre, così gli amici sanno dove ti alleni. La vede chi vede i tuoi allenamenti, e compare sulla tua pagina pubblica.",
+      note: "La palestra abituale è per chi ha almeno 18 anni.",
+    },
     safety: {
       name: "Blocca, silenzia e segnala",
       body: "Blocca o silenzia chiunque e segnala un post, un commento o un profilo con un tocco sul motivo. Il nostro team controlla ogni segnalazione e può avvisare, sospendere o bandire.",
