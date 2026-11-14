@@ -316,7 +316,7 @@ describe("pages for each side", () => {
     expect(screen.queryByText("New clients start with")).toBeNull();
     expect(screen.queryByRole("button", { name: "Add times" })).toBeNull();
     await u.click(within(nav).getByRole("button", { name: "Messages" }));
-    expect(location.hash).toBe("#/trainer/messages");
+    expect(location.hash).toBe("#/coaching/messages");
   });
 
   it("someone new to coaching picks a side first", async () => {

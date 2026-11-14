@@ -9,6 +9,7 @@ import { can } from "@/lib/entitlements";
 import { weeklySets } from "@/lib/generator";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
+import { isDesktop } from "@/lib/layout";
 import { bandOf, recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type Muscle } from "@/lib/types";
@@ -16,38 +17,41 @@ import { useNow } from "@/lib/useNow";
 
 import { HealthTwin } from "./HealthTwin";
 import { RecoveryMap } from "./RecoveryMap";
-import { go } from "./router";
+import { BODY_VIEWS, go, replaceRoute, setBodyView, type BodyView } from "./router";
 import { Button, EmptyState, ScreenHeader, Section } from "./ui";
 
 const VIEW_KEY = "liftsmith.body.view";
-type BodyView = "muscles" | "health";
+/** The view the Body tab opens: the one looked at last, and Health without Pro. */
 const savedView = (): BodyView => {
+  if (!can("recoveryMap")) return "health";
   try {
     return localStorage.getItem(VIEW_KEY) === "health" ? "health" : "muscles";
   } catch {
     return "muscles";
   }
 };
+setBodyView(savedView);
 
 /**
  * The Body tab (health twin, 2026-11-09): one figure, two views. Muscles is the recovery map (Pro);
- * Health is the health twin (free). Without Pro it opens on Health.
+ * Health is the health twin (free). Without Pro it opens on Health. Each view has its own address,
+ * #/muscles and #/health (Melvin, 2026-11-14); switching swaps the address without adding a step for back.
  */
-export function Recovery() {
-  const [view, setView] = useState<BodyView>(() => (can("recoveryMap") ? savedView() : "health"));
+export function Recovery({ view: named }: { view?: string }) {
+  const view: BodyView = named === "health" || named === "muscles" ? named : savedView();
   const pick = (v: BodyView) => {
     haptic("select");
     sound.tick();
-    setView(v);
     try {
       localStorage.setItem(VIEW_KEY, v);
     } catch {}
+    replaceRoute("recovery", v);
   };
   return (
     <div className="pb-2">
       <ScreenHeader title={t("body.title")} />
       <div className="mt-3 flex rounded-full border border-line bg-surface p-1" role="group" aria-label={t("body.views")}>
-        {(["muscles", "health"] as const).map((v) => (
+        {BODY_VIEWS.map((v) => (
           <button
             key={v}
             type="button"
@@ -110,7 +114,10 @@ function Muscles() {
                   aria-pressed={picked === m}
                   onClick={() => {
                     setPicked(picked === m ? null : m);
-                    window.scrollTo?.({ top: 0, behavior: "smooth" });
+                    // On a phone the map sits above the list, so scroll up to show the muscle's advice. On the
+                    // desktop layout the map is pinned beside the list and already in view, so keep the place
+                    // (Melvin, 2026-11-14).
+                    if (!isDesktop()) window.scrollTo?.({ top: 0, behavior: "smooth" });
                   }}
                   className={`press flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left ${picked === m ? "picked-row" : ""}`}
                 >

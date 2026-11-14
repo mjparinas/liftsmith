@@ -10,13 +10,13 @@ import { APP_PATH } from "@/lib/site";
 export const ME_TO_APP: Record<string, string> = {
   log: "log",
   friends: "friends",
-  trophies: "achievements",
+  trophies: "awards",
 };
 
 /** The app screen for an old dashboard hash ("#/log", "#/history/<id>", ""): Progress unless it has its own. */
 export function appHashFor(hash: string): string {
   const tab = hash.replace(/^#\/?/, "").split("/")[0] ?? "";
-  return `#/${ME_TO_APP[tab] ?? "stats"}`;
+  return `#/${ME_TO_APP[tab] ?? "progress"}`;
 }
 
 export function MeRedirect() {

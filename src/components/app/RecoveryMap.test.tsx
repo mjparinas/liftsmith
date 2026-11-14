@@ -5,6 +5,7 @@ import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DESKTOP_QUERY } from "@/lib/layout";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import type { AppEvent } from "@/lib/types";
@@ -113,5 +114,54 @@ describe("recovery map", () => {
     await user.click(row);
     expect(row).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("muscle-advice")).toHaveTextContent("Rest it.");
+  });
+
+  it("scrolls up to the map from the list on a phone, but keeps the place on the desktop layout", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await act(async () => useApp.getState().importWorkouts(squats(Date.now())));
+    await act(async () => {
+      location.hash = "#/recovery";
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    await screen.findByRole("heading", { name: /^Body$/ });
+    const row = () => screen.getAllByRole("button").find((b) => /Quads/.test(b.textContent ?? "") && b.hasAttribute("aria-pressed"))!;
+    const scroll = vi.fn();
+    window.scrollTo = scroll as unknown as typeof window.scrollTo;
+    await user.click(row());
+    expect(scroll).toHaveBeenCalledTimes(1);
+
+    const phone = window.matchMedia;
+    window.matchMedia = ((q: string) => ({
+      matches: q === DESKTOP_QUERY,
+      media: q,
+      addEventListener() {},
+      removeEventListener() {},
+    })) as unknown as typeof window.matchMedia;
+    try {
+      scroll.mockClear();
+      await user.click(row());
+      await user.click(row());
+      expect(scroll).not.toHaveBeenCalled();
+    } finally {
+      window.matchMedia = phone;
+    }
+  });
+
+  it("gives Muscles and Health their own addresses, and the old #/recovery still opens Body", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await act(async () => {
+      location.hash = "#/recovery";
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    await screen.findByRole("heading", { name: /^Body$/ });
+    expect(location.hash).toBe("#/muscles");
+    await user.click(screen.getByTestId("body-health"));
+    expect(location.hash).toBe("#/health");
+    expect(screen.getByTestId("body-health")).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByTestId("body-muscles"));
+    expect(location.hash).toBe("#/muscles");
+    expect(screen.getByTestId("body-muscles")).toHaveAttribute("aria-pressed", "true");
   });
 });
