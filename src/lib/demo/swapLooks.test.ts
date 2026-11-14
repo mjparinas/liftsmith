@@ -54,25 +54,7 @@ describe("the gear each exercise needs is drawn", () => {
   // Melvin, 2026-11-14: "Make sure exercises with walls have them, door frame exercises have a door frame,
   // kettle bells, dumbbells, barbells, cables, etc have what they say they do"
   /** Still drawn without their bench or box until their posture is redone (seated, side-lying, chest-down). */
-  const LATER = new Set([
-    "copenhagen-plank",
-    "short-copenhagen-plank",
-    "db-kickback",
-    "spider-curl",
-    "db-spider-curl",
-    "seated-good-morning",
-    "feet-up-glute-bridge",
-    "db-seated-calf-raise",
-    "side-lying-lateral-raise",
-    "db-external-rotation",
-    "seated-db-curl",
-    "db-seated-rear-delt-raise",
-    "bench-reverse-hyper",
-    "single-leg-hamstring-bridge",
-    "front-foot-elevated-split-squat",
-    "deficit-reverse-lunge",
-    "barbell-rollout",
-  ]);
+  const LATER = new Set(["copenhagen-plank", "short-copenhagen-plank"]);
   function missing(id: string, needs: readonly string[]): string[] {
     const m = motionFor(id);
     const kinds = new Set(props(id).map((p) => p.kind));
@@ -147,7 +129,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 157;
+  const LOOK_ALIKES = 146;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -693,5 +675,52 @@ describe("single-leg hip thrust", () => {
     const j = jointsAt(motionFor("single-leg-hip-thrust"), B, 0);
     expect(Math.abs(j.handL[2])).toBeGreaterThan(0.5);
     expect(Math.abs(j.handL[1] - j.shC[1])).toBeLessThan(0.08);
+  });
+});
+
+describe("kneeling, seated and chest-down moves, and machines", () => {
+  // Melvin, 2026-11-14: "kneeling cable flys don't have the person kneeling check all kneeling exercises",
+  // "machine shoulder press doesn't look like a machine especially the handles"
+  const at = (id: string, d = 0) => jointsAt(motionFor(id), B, d);
+  it("puts both knees on the floor for tall kneeling and one for half kneeling", () => {
+    for (const id of [
+      "kneeling-cable-fly",
+      "tall-kneeling-pallof",
+      "kneeling-lat-pulldown",
+      "db-tall-kneeling-press",
+      "kneeling-face-pull",
+    ]) {
+      const j = at(id);
+      expect(Math.max(j.kneeL[1], j.kneeR[1]), id).toBeLessThan(0.16);
+    }
+    for (const id of ["half-kneeling-pallof", "db-half-kneeling-press", "half-kneeling-cable-chop"]) {
+      const j = at(id);
+      expect(j.kneeR[1], id).toBeLessThan(0.16);
+      expect(j.kneeL[1], id).toBeGreaterThan(0.3);
+      expect(j.ankleL[0], id).toBeGreaterThan(j.hipC[0] + 0.2);
+    }
+  });
+  it("sits seated moves on a bench and lays spider curls chest-down", () => {
+    for (const id of ["seated-db-curl", "db-seated-calf-raise", "seated-calf-raise", "seated-good-morning", "db-seated-rear-delt-raise"]) {
+      expect(at(id).hipC[1], id).toBeLessThan(0.6);
+      expect(
+        props(id).some((p) => p.kind === "box"),
+        id,
+      ).toBe(true);
+    }
+    const sp = at("spider-curl");
+    expect(sp.shC[0] - sp.hipC[0]).toBeGreaterThan(0.3);
+    expect(at("seated-db-curl", 1).handR[1]).toBeGreaterThan(at("seated-db-curl", 0).handR[1] + 0.2);
+    expect(at("seated-good-morning", 1).shC[0]).toBeGreaterThan(at("seated-good-morning", 0).shC[0] + 0.3);
+    expect(at("feet-up-glute-bridge").ankleL[1]).toBeGreaterThan(0.4);
+    expect(at("bench-reverse-hyper", 1).ankleR[1]).toBeGreaterThan(at("bench-reverse-hyper", 0).ankleR[1] + 0.4);
+  });
+  it("draws a machine's lever arms to each handle, not a bar across the hands", () => {
+    for (const id of ["machine-shoulder-press", "machine-chest-press", "incline-machine-press", "machine-lateral-raise"]) {
+      expect(motionFor(id).load, id).toBe("none");
+      expect(props(id).filter((p) => p.kind === "pole").length, id).toBe(2);
+      expect(props(id).filter((p) => p.kind === "rail").length, id).toBeGreaterThanOrEqual(2);
+    }
+    expect(props("single-arm-shoulder-press-machine").filter((p) => p.kind === "pole")).toHaveLength(1);
   });
 });

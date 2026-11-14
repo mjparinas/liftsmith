@@ -4,14 +4,19 @@
 import { adminEmails, audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { alertSettings, resendMailer, saveAlertSettings, sendAlert } from "@/server/alerts";
-import { sendDigest } from "@/server/digest";
+import { digestRecipients, sendDigest } from "@/server/digest";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   const gate = await requireStaff(req);
   if ("response" in gate) return gate.response;
-  return json(200, { settings: await alertSettings(), recipients: [...adminEmails()], canSend: resendMailer() != null });
+  return json(200, {
+    settings: await alertSettings(),
+    recipients: [...adminEmails()],
+    digestTo: digestRecipients(),
+    canSend: resendMailer() != null,
+  });
 }
 
 export async function PUT(req: Request) {
@@ -34,7 +39,7 @@ export async function POST(req: Request) {
     await audit(gate.staff.email, "alerts.digest", null, { sent: n });
     return n
       ? json(200, { ok: true })
-      : json(409, { error: "Nothing was sent: email isn't set up (RESEND_API_KEY) or ADMIN_EMAILS is empty." });
+      : json(409, { error: "Nothing was sent: email isn't set up (RESEND_API_KEY) or ADMIN_EMAILS and DIGEST_TO are empty." });
   }
   if (body?.action !== "test") return json(400, { error: "Unknown action" });
   const now = Date.now();

@@ -301,8 +301,18 @@ export const digestDue = (now: number, lastSent: string | null) => {
   return c.hour >= DIGEST_HOUR && c.date !== lastSent;
 };
 
+/** Who the digest goes to: every admin, plus `DIGEST_TO` (comma-separated), extra inboxes that get the digest without
+ *  getting into the admin panel (Melvin, 2026-11-14: his own Gmail beside hello@). Lower-cased, each address once. */
+export function digestRecipients(): string[] {
+  const extra = (process.env.DIGEST_TO ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+  return [...new Set([...[...adminEmails()].map((e) => e.toLowerCase()), ...extra])];
+}
+
 /**
- * The morning digest to every admin, unless it's switched off or today's already went out (`force` sends anyway,
+ * The morning digest to every admin and every `DIGEST_TO` address, unless it's switched off or today's already went out (`force` sends anyway,
  * for the Automations tab's test). Returns how many went out.
  */
 export async function sendDigest(opts: { now?: number; mail?: Mailer | null; force?: boolean } = {}): Promise<number> {
@@ -312,7 +322,7 @@ export async function sendDigest(opts: { now?: number; mail?: Mailer | null; for
     if (!digestDue(now, await getSetting(SENT_KEY))) return 0;
   }
   const mail = opts.mail === undefined ? resendMailer() : opts.mail;
-  const to = [...adminEmails()];
+  const to = digestRecipients();
   if (!mail || !to.length) return 0;
   const m = digestMail(digestFrom(await digestData(now)), {
     postalAddress: process.env.MAIL_POSTAL_ADDRESS?.trim() || null,

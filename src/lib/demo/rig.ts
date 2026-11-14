@@ -307,6 +307,8 @@ export interface PoleProp {
   from: Anchor;
   to: Anchor;
   past: number;
+  /** The plate's radius (0.2 when left out; 0 draws none, for a machine's lever arm). */
+  plate?: number;
 }
 
 /** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, and a plate ring by the hands. */
@@ -334,7 +336,12 @@ export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
   }
   // the plates sit on the sleeve just short of the hands
   const plate: Vec = [h[0] - u[0] * 0.14, h[1] - u[1] * 0.14, h[2] - u[2] * 0.14];
-  for (let i = 0; i < 16; i++) out.push([off(plate, 0.2, (i * Math.PI) / 8), off(plate, 0.2, ((i + 1) * Math.PI) / 8)]);
+  const pr = p.plate ?? 0.2;
+  for (let i = 0; i < 16; i++) {
+    // no plate: the unused segments collapse onto the bar's end
+    if (!pr) out.push([b, b]);
+    else out.push([off(plate, pr, (i * Math.PI) / 8), off(plate, pr, ((i + 1) * Math.PI) / 8)]);
+  }
   return out;
 }
 
@@ -391,6 +398,8 @@ export interface Pose {
   /** How much the head stays upright (1) or follows the spine (0). */
   headBlend?: number;
   headBack?: number;
+  /** Tips the head toward the figure's right (+) or left (-): 0.05 is about 14 degrees (the dance's head snaps). */
+  headTilt?: number;
   /** Lifts the shoulder joints (shrugs). */
   shrug?: number;
   /** Barbell centre, when the lift uses one. */
@@ -446,7 +455,7 @@ export interface PoseOpts {
 export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
   const up = norm(sub(pose.sh, pose.hip));
   const blend = pose.headBlend ?? 0.45;
-  const headDir = norm(add(mul(up, 1 - blend * 0.5), mul([0, 1, 0], blend * 0.5)));
+  const headDir = norm(add(add(mul(up, 1 - blend * 0.5), mul([0, 1, 0], blend * 0.5)), V(0, 0, (pose.headTilt ?? 0) / 0.2)));
   const neck = add(pose.sh, mul(up, B.neck));
   const head = add(add(neck, mul(headDir, B.head[1] * 1.05)), V(pose.headBack ?? 0, 0));
   const J = { hipC: pose.hip, shC: pose.sh, neck, head, headDir, bar: pose.bar } as Joints;
