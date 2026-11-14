@@ -163,6 +163,16 @@ function CoachingRow() {
 }
 
 /** Settings' second row: sign in to back up and sync, or who's signed in. */
+/** Where the lifter's data lives: on the device only, or on the device and synced to their account. */
+function StorageNote() {
+  const signedIn = useAccount((s) => !!s.account);
+  return (
+    <p className="mt-8 text-center text-xs text-faint">
+      {t(signedIn ? "settings.footer.synced" : "settings.footer.local", { brand: BRAND.name })}
+    </p>
+  );
+}
+
 function AccountRow() {
   const account = useAccount((s) => s.account);
   return (
@@ -237,7 +247,7 @@ export function Settings() {
       <Section title={t("settings.g.help")}>
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
-      <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+      <StorageNote />
       <p className="mt-1 text-center text-xs">
         <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
           {t("settings.terms")}

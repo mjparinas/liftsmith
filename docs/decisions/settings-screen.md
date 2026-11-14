@@ -23,6 +23,11 @@ Melvin asked on 2026-11-10 whether Settings had too much. The audit found one lo
 - On/off settings that were chip pairs are switches now: Lean mode, usage stats, start the rest timer by itself, keep the screen on.
 - Smart defaults were already right: plate memory, ghost mode, auto-start rest and keeping the screen on default to on; text size, contrast and language default to Match my phone.
 
+## Footer and Labs order (Melvin, 2026-11-14)
+
+- The note at the foot of Settings says where the data lives: signed in, "saved on this device and synced to your account" (`settings.footer.synced`); signed out, "saved on this device only" (`settings.footer.local`). It used to say "everything is stored on this device" for everyone, which was wrong once accounts and sync landed.
+- Sonos is first on Settings › Labs (`LABS` in `src/lib/labs.ts`); the rest keep their order.
+
 ## Tests
 
 `Settings.test.tsx` (order, groups, deep links, training days setting days a week, body weight read-only), the App and Delight tests open the group pages, and `scripts/e2e-a11y.mjs` runs axe on every group page.

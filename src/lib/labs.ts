@@ -52,6 +52,7 @@ export interface Lab {
 
 // One line per lab, so two changes adding one don't touch the same line.
 export const LABS: readonly Lab[] = [
+  { flag: "labSonos", key: "sonos" },
   { flag: "labRepCount", key: "repCount" },
   { flag: "repMotion", key: "repMotion" },
   { flag: "labBarSpeed", key: "barSpeed", needs: "labRepCount" },
@@ -66,7 +67,6 @@ export const LABS: readonly Lab[] = [
   { flag: "labBarPath", key: "barPath", needs: "labRepCount" },
   { flag: "labTempo", key: "tempo" },
   { flag: "labVolumeLog", key: "volumeLog", native: true },
-  { flag: "labSonos", key: "sonos" },
 ];
 
 /** Whether a lab is on for this lifter: Pro, and its flag on (and the lab it needs, if any). */
