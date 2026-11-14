@@ -1,13 +1,14 @@
 // GET /api/admin/gym-places/?q=&page=: real gyms for the admin Gyms tab, 50 a page, and the gyms lifters added that
-// wait for a check (staff). ?cities=CA|US: the major cities to import in one go (majorCities.ts) and when each last
-// imported cleanly. ?imports=1: the latest imports with their debug logs (gymImport.ts). POST (admins, audited):
+// wait for a check (staff). ?countries=1: the countries with major cities to import. ?cities=<code>|ALL: one
+// country's (or every country's) major cities (majorCities.ts, worldCities.ts) and when each last imported cleanly.
+// ?imports=1: the latest imports with their debug logs (gymImport.ts). POST (admins, audited):
 // {action: "import", where: "Langley, BC", server?: n, fresh?: true} seeds an area from OpenStreetMap; {id, action:
 // hide | show | gym | studio | delete | approve | reject} changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { importArea, lastImported, recentImports } from "@/server/gymImport";
 import { actOnPlace, adminPlaces, pendingPlaces } from "@/server/gymPlaces";
-import { isImportCountry, MAJOR_CITIES } from "@/server/majorCities";
+import { importCountryList, isImportCountry, MAJOR_CITIES } from "@/server/majorCities";
 
 export const dynamic = "force-dynamic";
 // An OpenStreetMap import of a big city can take a few minutes on a busy map server.
@@ -19,10 +20,12 @@ export async function GET(req: Request) {
   const u = new URL(req.url).searchParams;
   const country = u.get("cities");
   if (country !== null) {
-    if (!isImportCountry(country)) return json(400, { error: "CA or US." });
-    const cities = MAJOR_CITIES[country];
+    // ALL: every country's cities, biggest countries' lists in the picker's order.
+    const cities = country === "ALL" ? importCountryList().flatMap((c) => MAJOR_CITIES[c.code] ?? []) : MAJOR_CITIES[country];
+    if (!cities || (country !== "ALL" && !isImportCountry(country))) return json(400, { error: "A country code, or ALL." });
     return json(200, { cities, last: await lastImported(cities) });
   }
+  if (u.get("countries") !== null) return json(200, { countries: importCountryList() });
   if (u.get("imports") !== null) return json(200, { imports: await recentImports() });
   const [list, pending] = await Promise.all([adminPlaces(u.get("q"), u.get("page")), pendingPlaces()]);
   return json(200, { ...list, pending });

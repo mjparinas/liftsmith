@@ -1,11 +1,13 @@
 // The major cities staff can import in one go from Admin › Gyms (Melvin, 2026-11-12: "add all gyms from all major
-// cities in Canada", then "the same for the US"). Canada: every city of about 100,000 people or more, plus each
+// cities in Canada", then "the same for the US"; 2026-11-14: every Google Play country, in worldCities.ts). Canada: every city of about 100,000 people or more, plus each
 // province's and territory's capital. US: the hundred-odd biggest cities, about 200,000 people or more, plus a few
 // smaller state capitals and metro hubs. Each is one import (gymPlaces.ts importArea), run one after another from the
 // admin page so OpenStreetMap's free services aren't hit all at once.
 
+import { WORLD_CITIES } from "./worldCities";
+
 // prettier-ignore
-export const MAJOR_CITIES = {
+const NORTH_AMERICA = {
   CA: [
     "Toronto, ON", "Montreal, QC", "Calgary, AB", "Ottawa, ON", "Edmonton, AB", "Winnipeg, MB", "Mississauga, ON",
     "Vancouver, BC", "Brampton, ON", "Hamilton, ON", "Surrey, BC", "Quebec City, QC", "Halifax, NS", "Laval, QC",
@@ -57,5 +59,22 @@ export const MAJOR_CITIES = {
   ],
 } as const;
 
-export type ImportCountry = keyof typeof MAJOR_CITIES;
-export const isImportCountry = (x: unknown): x is ImportCountry => x === "CA" || x === "US";
+/** Every country staff can import in one go, by ISO code: Canada and the US here, the rest in worldCities.ts. */
+export const IMPORT_COUNTRIES: Record<string, { name: string; cities: readonly string[] }> = {
+  CA: { name: "Canada", cities: NORTH_AMERICA.CA },
+  US: { name: "United States", cities: NORTH_AMERICA.US },
+  ...WORLD_CITIES,
+};
+
+/** Cities by country code, as before. */
+export const MAJOR_CITIES: Record<string, readonly string[]> = Object.fromEntries(
+  Object.entries(IMPORT_COUNTRIES).map(([code, c]) => [code, c.cities]),
+);
+
+export const isImportCountry = (x: unknown): x is string => typeof x === "string" && Object.hasOwn(IMPORT_COUNTRIES, x);
+
+/** The country picker: code, name and how many cities, A to Z by name. */
+export const importCountryList = () =>
+  Object.entries(IMPORT_COUNTRIES)
+    .map(([code, c]) => ({ code, name: c.name, cities: c.cities.length }))
+    .sort((a, b) => a.name.localeCompare(b.name));
