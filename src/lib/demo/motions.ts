@@ -19,6 +19,7 @@ import {
   type Body,
   type Hold,
   type Load,
+  type PerSide,
   type PhaseRow,
   type Pose,
   type Prop,
@@ -1736,31 +1737,14 @@ function mountainClimber(): Motion {
 
 /** Bear crawl: on hands and toes with the knees just off the floor, opposite hand and foot stepping together. */
 function bearCrawl(): Motion {
-  return {
-    phases: TEMPO.alternate("Step", "Step"),
-    load: "none",
-    stance: 0.12,
-    pose(B, d) {
-      const hipY = ANKLE_H + B.thigh * 0.92;
-      const hip = V(0, hipY);
-      const shY = 0.03 + reach(B) * 0.93;
-      const lean = (Math.acos(clamp((shY - hipY) / B.torso, -1, 1)) * 180) / Math.PI;
-      const sh = torsoAt(B, hip, lean);
-      const step = 0.09 * (2 * d - 1);
-      const hand = per(V(sh[0] + 0.02 + step, 0.03, -0.17), V(sh[0] + 0.02 - step, 0.03, 0.17));
-      const toe = (dx: number, z: number): Vec => V(-B.shin * 0.75 + dx, 0.1, z);
-      return {
-        hip,
-        sh,
-        hand,
-        ankle: per(toe(-step, -0.12), toe(step, 0.12)),
-        foot: 60,
-        kneePole: V(1, -1, 0.1),
-        elbowPole: V(-1, 0.2, 0.3),
-        headBlend: 0.2,
-      };
-    },
-  };
+  const stride = 0.2;
+  const steps: Step[] = [];
+  const pair = (a: Limb[], dx: number, label: string): Step => ({ limbs: a, by: V(dx, 0), label });
+  for (let k = 0; k < 2; k++)
+    steps.push(pair(["handR", "ankleL"], stride, "Crawl forward"), pair(["handL", "ankleR"], stride, "Crawl forward"));
+  for (let k = 0; k < 2; k++)
+    steps.push(pair(["handR", "ankleL"], -stride, "Crawl back"), pair(["handL", "ankleR"], -stride, "Crawl back"));
+  return stepper(bearBase, steps, { dur: 0.5 });
 }
 
 // ---------- planks and crawls that move ----------
@@ -1953,12 +1937,12 @@ function sidewaysSteps(stride: number, count: number, labels: [string, string]):
 
 /** Sideways plank walk: high plank, a hand and the foot on the same side step out together, the others follow, hips level; then back. */
 function lateralPlankWalk(): Motion {
-  return stepper(highPlankBase, sidewaysSteps(0.18, 2, ["Walk right", "Walk back"]), { handLift: 0.06, footLift: 0.04 });
+  return stepper(highPlankBase, sidewaysSteps(0.2, 3, ["Walk right", "Walk back"]), { handLift: 0.06, footLift: 0.04 });
 }
 
 /** Sideways bear crawl: the bear position travelling to the side and back, knees hovering. */
 function lateralBearCrawl(): Motion {
-  return stepper(bearBase, sidewaysSteps(0.15, 2, ["Crawl right", "Crawl back"]), { dur: 0.5 });
+  return stepper(bearBase, sidewaysSteps(0.2, 3, ["Crawl right", "Crawl back"]), { dur: 0.5 });
 }
 
 /** Backward bear crawl: opposite hand and foot step back together, two strides, then forward to the start. */
@@ -5277,6 +5261,276 @@ function squatToRow(): Motion {
   };
 }
 
+// ---------- moves that travel the way the name says (audit batch 8) ----------
+/**
+ * Moves every point of a pose by `by` (a sideways or forward shift of the whole figure). Mirrored hands
+ * and feet are split into a left and a right first, so a sideways shift moves both the same way.
+ */
+function shiftPose(p: Pose, by: Vec, B: Body, o: { stance?: number; grip?: number } = {}): Pose {
+  const m = (v: Vec) => add(v, by);
+  const two = (t: PerSide<Vec> | undefined, defZ: number, fallback: Vec): PerSide<Vec> => {
+    if (t === undefined) t = fallback;
+    if (!Array.isArray(t)) return { L: m(t.L), R: m(t.R) };
+    const z = t[2] === 0 ? defZ : Math.abs(t[2]);
+    return { L: m(V(t[0], t[1], -z)), R: m(V(t[0], t[1], z)) };
+  };
+  const stance = (o.stance ?? 0.12) * B.s,
+    grip = o.grip ?? 0.25;
+  return {
+    ...p,
+    hip: m(p.hip),
+    sh: m(p.sh),
+    bar: p.bar && m(p.bar),
+    hand: two(p.hand, grip, V(0, 0, grip)),
+    ankle: two(p.ankle, stance, V(0, ANKLE_H, stance)),
+  };
+}
+
+interface LungeLeg {
+  /** The foot that stays down, its x, and its heel angle at the start and end. */
+  plant: "L" | "R";
+  plantX: number;
+  plantFoot: [number, number];
+  /** The other foot's x at the start and end, and its heel angle at the start. */
+  swing: [number, number];
+  swingFoot: number;
+  hip: [number, number];
+  /** Hip height at the start and end (0 standing, 1 at the bottom). */
+  depth: [number, number];
+}
+/**
+ * Walking lunges: step forward and lower, drive through and step the back foot past into the next
+ * lunge, then bring the feet together, turn around and lunge back. Two lunges each way, d 0 to 1 the
+ * whole loop. With `forward` only, one lunge forward and a push back to the start (the forward lunge).
+ */
+function walkingLunge(o: { hands: "dumbbells" | "hips" | "back"; forward?: boolean }): Motion {
+  const S = 0.8;
+  const segs: LungeLeg[] = o.forward
+    ? [{ plant: "L", plantX: -0.4, plantFoot: [0, 55], swing: [-0.4, 0.4], swingFoot: 0, hip: [-0.37, 0], depth: [0, 1] }]
+    : [
+        { plant: "L", plantX: -S, plantFoot: [0, 55], swing: [-S, 0], swingFoot: 0, hip: [-S, -0.4], depth: [0, 1] },
+        { plant: "R", plantX: 0, plantFoot: [0, 55], swing: [-S, S], swingFoot: 55, hip: [-0.4, 0.4], depth: [1, 1] },
+        { plant: "L", plantX: S, plantFoot: [0, 0], swing: [0, S], swingFoot: 55, hip: [0.4, S], depth: [1, 0] },
+      ];
+  const n = segs.length;
+  // forward pass, a turn, the pass back (facing the other way), a turn
+  const PASS = o.forward ? 1 : 0.4;
+  const turnC = S;
+  const rows: PhaseRow[] = o.forward
+    ? [
+        [0.3, 0, 0, "Tall", 0.4],
+        [1.2, 0, 1, "Step forward, lower", 0.8],
+        [1, 1, 0, "Push back to the start", 1],
+      ]
+    : [0, 0.5].flatMap((at): PhaseRow[] => [
+        [1.1, at, at + PASS / 3, "Step and lower", 0.8],
+        [1.5, at + PASS / 3, at + (2 * PASS) / 3, "Drive through, lower", 1],
+        [1, at + (2 * PASS) / 3, at + PASS, "Feet together", 0.6],
+        [0.9, at + PASS, at + 0.5, "Turn around", 0.3],
+      ]);
+  const pass = (B: Body, u: number): Pose => {
+    const k = Math.min(n - 1, Math.floor(clamp(u, 0, n - 1e-9)));
+    const s = segs[k]!;
+    const t = clamp(u - k, 0, 1);
+    const e = ease(t);
+    const top = standY(B, 0.03, 0.99);
+    const bot = 0.07 + B.thigh * 0.96;
+    const depth = (a: number) => lerp(top, bot, a);
+    const y = s.depth[0] === 1 && s.depth[1] === 1 ? lerp(bot, top, Math.sin(Math.PI * t) * 0.85) : depth(lerp(s.depth[0], s.depth[1], e));
+    const hip = V(lerp(s.hip[0], s.hip[1], e), y);
+    const lean = 6;
+    const sh = torsoAt(B, hip, lean);
+    const zOf = (side: "L" | "R") => (side === "L" ? -0.11 : 0.11);
+    const plantFoot = lerp(s.plantFoot[0], s.plantFoot[1], clamp((t - 0.4) / 0.6, 0, 1));
+    const plant = V(s.plantX, ANKLE_H + 0.02 * (plantFoot / 55), zOf(s.plant));
+    const swingFoot = lerp(s.swingFoot, 0, clamp(t / 0.5, 0, 1));
+    const swing = V(
+      lerp(s.swing[0], s.swing[1], e),
+      ANKLE_H + 0.02 * (swingFoot / 55) + 0.1 * Math.sin(Math.PI * t),
+      zOf(s.plant === "L" ? "R" : "L"),
+    );
+    const leg = legMax(B) * 0.99;
+    const ankle = (p: Vec, side: "L" | "R") => within(V(hip[0], hip[1], zOf(side)), p, leg);
+    const L = s.plant === "L" ? ankle(plant, "L") : ankle(swing, "L");
+    const R = s.plant === "R" ? ankle(plant, "R") : ankle(swing, "R");
+    const foot = s.plant === "L" ? { L: plantFoot, R: swingFoot } : { L: swingFoot, R: plantFoot };
+    const base = { hip, sh, ankle: per(L, R), foot, kneePole: per(V(1, -0.2, -0.1), V(1, -0.2, 0.1)), headBlend: 0.8 };
+    if (o.hands === "back") {
+      const bar = V(sh[0] - 0.03, sh[1] - 0.03);
+      return { ...base, bar, hand: bar, elbowPole: V(-1, -0.7, 0) };
+    }
+    if (o.hands === "dumbbells") return { ...base, hand: hangHands(B, sh), elbowPole: V(-1, 0, 0.3) };
+    return { ...base, hand: V(hip[0] + 0.02, hip[1] + 0.06, B.hipW + 0.13), elbowPole: V(-0.4, 0, 1) };
+  };
+  // The turn pivots on the spot where the pass ended: the pose is shifted against the yaw so that spot stays put.
+  const turnShift = (deg: number): Vec => V(turnC * Math.cos(rad(deg)) - turnC, 0, turnC * Math.sin(rad(deg)));
+  const turnOf = (d: number) =>
+    d < PASS ? 0 : d < 0.5 ? (d - PASS) / (0.5 - PASS) : d < 0.5 + PASS ? 1 : 1 + (d - 0.5 - PASS) / (0.5 - PASS);
+  return {
+    phases: rows,
+    load: o.hands === "dumbbells" ? "dumbbell" : o.hands === "back" ? "barbell" : "none",
+    hold: o.hands === "dumbbells" ? "each" : undefined,
+    grip: o.hands === "back" ? 0.34 : undefined,
+    stance: 0.11,
+    pose(B, d) {
+      if (o.forward) return pass(B, d);
+      const half = d >= 0.5 ? 0.5 : 0;
+      const u = (d - half) / PASS;
+      if (u <= 1) return pass(B, u * n);
+      const turned = ease(clamp(turnOf(d) - (half ? 1 : 0), 0, 1)) * 180;
+      return shiftPose(pass(B, n), turnShift(turned), B, { stance: 0.11, grip: o.hands === "back" ? 0.34 : undefined });
+    },
+    yaw: o.forward ? undefined : (d) => ease(clamp(turnOf(d) - (d >= 0.5 ? 1 : 0), 0, 1)) * 180 + (d >= 0.5 ? 180 : 0),
+  };
+}
+
+/**
+ * Carioca: travelling sideways to the right, the left foot crossing in front of the right, the right
+ * stepping out, the left crossing behind, the right stepping out; then the same steps back. The hips
+ * stay facing forward and the arms swing out for balance.
+ */
+function carioca(): Motion {
+  // feet (x, z) before each step, the moving foot lifted between them
+  const L: Vec[] = [V(0, 0, -0.12), V(0.12, 0, 0.22), V(0.12, 0, 0.22), V(-0.12, 0, 0.62), V(-0.12, 0, 0.62)];
+  const R: Vec[] = [V(0, 0, 0.12), V(0, 0, 0.12), V(0, 0, 0.52), V(0, 0, 0.52), V(0, 0, 0.92)];
+  const n = L.length - 1;
+  const mid = 0.4;
+  return {
+    phases: [
+      ...Array.from({ length: n }, (_, i): PhaseRow => [
+        0.32,
+        i / n / 2,
+        (i + 1) / n / 2,
+        i % 2 ? "Step out" : i === 0 ? "Cross in front" : "Cross behind",
+        0.8,
+      ]),
+      ...Array.from({ length: n }, (_, i): PhaseRow => [0.32, 0.5 + i / n / 2, 0.5 + (i + 1) / n / 2, "Back to the left", 0.8]),
+    ],
+    load: "none",
+    stance: 0.12,
+    pose(B, d) {
+      const x = (d < 0.5 ? d * 2 : 2 - d * 2) * n;
+      const i = Math.min(n - 1, Math.floor(x));
+      const t = x - i;
+      const at = (feet: Vec[]) => {
+        const a = feet[i]!,
+          b = feet[i + 1]!;
+        const moving = a[2] !== b[2];
+        return V(lerp(a[0], b[0], ease(t)), ANKLE_H + (moving ? 0.09 * Math.sin(Math.PI * t) : 0), lerp(a[2], b[2], ease(t)) - mid);
+      };
+      const l = at(L),
+        r = at(R);
+      const hip = V(0.03, standY(B, 0.03, 0.95) - 0.02 * Math.sin(Math.PI * t), (l[2] + r[2]) / 2);
+      const sh = add(torsoAt(B, V(hip[0], hip[1]), 4), V(0, 0, hip[2]));
+      const arm = (sgn: number) => V(sh[0] + 0.05, sh[1] - 0.35, hip[2] + sgn * (B.shW + 0.3));
+      return {
+        hip,
+        sh,
+        ankle: per(l, r),
+        foot: 10,
+        kneePole: per(V(1, 0, -0.3), V(1, 0, 0.3)),
+        hand: per(arm(-1), arm(1)),
+        elbowPole: per(V(0, -1, -1), V(0, -1, 1)),
+        headBlend: 0.9,
+      };
+    },
+  };
+}
+
+/** Lateral step-up: the box to the right, the right foot on it, stepping up sideways and lowering back down. */
+function lateralStepUp(o: { load?: Load } = {}): Motion {
+  const top = 0.4;
+  const boxZ = 0.42;
+  return {
+    phases: TEMPO.liftFirst("Step up · 1s", "Lower · 2s", "Foot on the box", "Stand tall"),
+    load: o.load ?? "none",
+    hold: o.load ? "each" : undefined,
+    stance: 0.12,
+    pose(B, d) {
+      const R = V(0.03, top + ANKLE_H, boxZ);
+      const Lfloor = V(0.03, ANKLE_H, -0.12);
+      const Lup = V(0.03, top + ANKLE_H + 0.12, boxZ - 0.24);
+      const Lz = lerpV(Lfloor, Lup, ease(clamp((d - 0.45) / 0.55, 0, 1)));
+      const hipZ = lerp(0.12, boxZ - 0.11, ease(clamp(d / 0.85, 0, 1)));
+      const leg = legMax(B) * 0.99;
+      // as high as the left leg allows while it is on the floor, standing tall over the box at the top
+      const yR = R[1] + Math.sqrt(Math.max(0.01, leg ** 2 - (hipZ + B.hipW - R[2]) ** 2)) * 0.98;
+      const yL = Lz[1] + Math.sqrt(Math.max(0.01, leg ** 2 - (hipZ - B.hipW - Lz[2]) ** 2));
+      const hipY = Math.min(yR, yL, lerp(standY(B, 0.03, 0.9), top + standY(B, 0.03, 0.99), ease(d)));
+      const hip = V(0.03, hipY, hipZ);
+      const sh = add(torsoAt(B, V(hip[0], hip[1]), lerp(12, 4, d)), V(0, 0, hipZ));
+      const hh = hangHands(B, sh);
+      return {
+        hip,
+        sh,
+        ankle: per(Lz, R),
+        foot: { L: d < 0.45 ? lerp(0, 20, d / 0.45) : 10, R: 0 },
+        kneePole: per(V(1, 0, -0.3), V(1, 0, 0.4)),
+        hand: o.load
+          ? per(V(hh[0], hh[1], sh[2] - B.shW - 0.05), V(hh[0], hh[1], sh[2] + B.shW + 0.05))
+          : per(V(hip[0] + 0.02, hip[1] + 0.06, hipZ - B.hipW - 0.13), V(hip[0] + 0.02, hip[1] + 0.06, hipZ + B.hipW + 0.13)),
+        elbowPole: o.load ? V(-1, 0, 0.3) : V(-0.4, 0, 1),
+        headBlend: 0.8,
+      };
+    },
+    props: () => [{ kind: "box", at: V(0.03, top / 2, boxZ + 0.04), size: V(0.5, top, 0.42) }],
+  };
+}
+
+/** Lateral box jump: the box jump turned to the side, jumping up onto a box to the right and stepping back down. */
+function lateralBoxJump(): Motion {
+  const bj = boxJump();
+  return {
+    ...bj,
+    pose(B, d) {
+      const p = bj.pose(B, d);
+      const hip0 = bj.pose(B, 0).hip;
+      // the forward travel becomes sideways travel, the body still facing forward
+      const t = p.hip[0] - hip0[0];
+      return shiftPose(p, V(-t, 0, t), B, { stance: 0.15 });
+    },
+    props: () => [{ kind: "box", at: V(0.05, 0.225, 0.63), size: V(0.5, 0.45, 0.6) }],
+  };
+}
+
+/** Lateral burpee: a burpee, then a jump sideways to the right; the next one jumps back to the left. */
+function lateralBurpee(): Motion {
+  const b = burpee({ top: "none" });
+  return {
+    phases: [0, 1].flatMap((h): PhaseRow[] => {
+      const a = h * 0.5;
+      return [
+        [0.5, a, a + 0.12, "Hands down", 0.6],
+        [0.35, a + 0.12, a + 0.2, "Jump back", 0.9],
+        [0.3, a + 0.2, a + 0.2, "Plank", 0.6],
+        [0.35, a + 0.2, a + 0.28, "Jump in", 0.9],
+        [0.55, a + 0.28, a + 0.36, "Stand up", 1],
+        [0.6, a + 0.36, a + 0.5, h ? "Jump to the left" : "Jump to the right", 1],
+      ];
+    }),
+    load: "none",
+    stance: 0.12,
+    pose(B, d) {
+      const h = d >= 0.5 ? 1 : 0;
+      const u = d - h * 0.5;
+      const side = h ? 0.3 : -0.3;
+      if (u < 0.36) {
+        // burpee d: stand (1) → hands down (0.5) → plank (0) → back up
+        const bd = u < 0.12 ? 1 - u / 0.24 : u < 0.2 ? 0.5 - (u - 0.12) / 0.16 : u < 0.28 ? (u - 0.2) / 0.16 : 0.5 + (u - 0.28) / 0.16;
+        return shiftPose(b.pose(B, bd), V(0, 0, side), B);
+      }
+      // the jump: dip, fly sideways with the arms up, land soft
+      const t = (u - 0.36) / 0.14;
+      const stand = b.pose(B, 1);
+      const air = Math.sin(Math.PI * t);
+      const p = shiftPose(stand, V(0, 0.18 * air, lerp(side, -side, ease(t))), B);
+      const sh = p.sh;
+      const up = V(sh[0] + 0.02, sh[1] + reach(B) * 0.95 * air - 0.45 * (1 - air), sh[2] + B.shW);
+      return { ...p, hand: per(V(up[0], up[1], up[2] - 2 * B.shW), up), elbowPole: V(0, -1, 1), foot: 25 * air };
+    },
+  };
+}
+
 // ---------- Olympic lifts and combos (audit batch 7) ----------
 /**
  * The jerk from the rack: dip, drive, then drop under the bar, either into a split (front foot
@@ -5662,7 +5916,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "bodyweight-squat": () => squat({ hold: "arms" }),
   "bulgarian-split-squat": () => lunge({ rear: "bench", hands: "dumbbells", lean: 12 }),
   "bw-split-squat": () => lunge({ rear: "box", hands: "hips", lean: 8 }),
-  "walking-lunge": () => lunge({ step: "walk", hands: "dumbbells" }),
+  "walking-lunge": () => walkingLunge({ hands: "hips" }),
   "reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
   // Program ladder steps and lifts (programs.ts). Close cousins of existing motions until each gets its own.
   "split-squat": () => lunge({ rear: "floor", hands: "hips" }),
@@ -6011,9 +6265,9 @@ const MOTIONS: Record<string, () => Motion> = {
   "barbell-bulgarian-split-squat": () => lunge({ rear: "bench", hands: "hips", lean: 10 }),
   "bw-bulgarian-split-squat": () => lunge({ rear: "bench", hands: "hips", lean: 10 }),
   "db-reverse-lunge": () => lunge({ step: "back", hands: "dumbbells" }),
-  "forward-lunge": () => lunge({ step: "walk", hands: "hips" }),
+  "forward-lunge": () => walkingLunge({ hands: "hips", forward: true }),
   "deficit-reverse-lunge": () => lunge({ step: "back", hands: "dumbbells" }),
-  "db-lateral-step-up": stepUp,
+  "db-lateral-step-up": () => lateralStepUp({ load: "dumbbell" }),
   "box-step-down": stepUp,
   "band-spanish-squat": () => squat({ hold: "arms", depth: 0.8 }),
   "heels-raised-squat": () => squat({ hold: "arms" }),
@@ -6202,7 +6456,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "paused-front-squat": () => squat({ hold: "front" }),
   "barbell-step-up": stepUp,
   "barbell-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
-  "barbell-walking-lunge": () => lunge({ step: "walk", hands: "hips" }),
+  "barbell-walking-lunge": () => walkingLunge({ hands: "back" }),
   "db-goblet-lateral-lunge": cossack,
   "kb-cossack-squat": cossack,
   "kb-goblet-step-up": stepUp,
@@ -6310,7 +6564,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "burpee-box-jump": boxJump,
   "burpee-pull-up": () => burpee({ top: "pull" }),
   "half-burpee": () => burpee({ top: "none" }),
-  "lateral-burpee": () => burpee(),
+  "lateral-burpee": lateralBurpee,
   "seal-jack": jumpingJack,
   "cross-jack": jumpingJack,
   "squat-jack": () => hop({ dip: 0.55, air: 0.08, arms: "chest", wide: [0.12, 0.34], labels: ["Jump out", "Jump in"] }),
@@ -6319,7 +6573,7 @@ const MOTIONS: Record<string, () => Motion> = {
     hop({ dip: 0.95, air: 0.18, arms: "floor", travel: { x: 0.7 }, walkBack: true, wide: [0.24, 0.24], labels: ["Jump forward", ""] }),
   "in-and-out-jumps": () => hop({ dip: 0.35, air: 0.1, arms: "swing", wide: [0.1, 0.3], labels: ["Jump out", "Jump in"] }),
   "fast-feet": () => run({ lift: 0.25, lean: 5 }),
-  carioca: () => run({ lift: 0.35, lean: 0 }),
+  carioca,
   "skipping-drill": () => run({ lift: 0.8, lean: 0 }),
   "power-skip": () => run({ lift: 0.9, lean: 0 }),
   "shadow-boxing": shadowBoxing,
@@ -6444,7 +6698,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "smith-glute-bridge": () => bridge({}),
   "landmine-rdl": () => rdl({ load: "barbell" }),
   "landmine-single-leg-rdl": () => rdl({ load: "barbell", single: true }),
-  "db-walking-lunge": () => lunge({ step: "walk", hands: "dumbbells" }),
+  "db-walking-lunge": () => walkingLunge({ hands: "dumbbells" }),
   "db-cossack-squat": cossack,
   "db-skater-squat": () => lunge({ hands: "dumbbells", lean: 10 }),
   "db-jump-squat": jumpSquat,
@@ -6452,7 +6706,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-single-leg-hip-thrust": () => bridge({ bench: true, single: true }),
   "db-single-leg-glute-bridge": () => bridge({ single: true }),
   "db-frog-pump": () => bridge({}),
-  "kb-walking-lunge": () => lunge({ step: "walk", hands: "dumbbells" }),
+  "kb-walking-lunge": () => walkingLunge({ hands: "dumbbells" }),
   "kb-lateral-lunge": cossack,
   "kb-curtsy-lunge": () => lunge({ step: "back", hands: "hips", curtsy: true }),
   "kb-glute-bridge": () => bridge({}),
@@ -6473,7 +6727,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "squat-pulse": () => squat({ hold: "arms", depth: 0.4 }),
   "lunge-pulse": () => lunge({ hands: "hips" }),
   "lateral-squat-walk": lateralSquatWalk,
-  "bw-lateral-step-up": stepUp,
+  "bw-lateral-step-up": () => lateralStepUp(),
   "glute-bridge-walkout": () => bridgeWalkout({}),
   "single-leg-hamstring-bridge": () => bridge({ single: true }),
   "tibialis-raise": () => tibialisRaise({}),
@@ -6585,7 +6839,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "single-leg-lateral-hop": () =>
     hop({ dip: 0.2, air: 0.1, arms: "swing", oneLeg: true, travel: { z: 0.3 }, labels: ["Hop right", "Hop left"] }),
   "seated-box-jump": boxJump,
-  "lateral-box-jump": boxJump,
+  "lateral-box-jump": lateralBoxJump,
   "box-step-over": stepUp,
   "line-hops": () => hop({ dip: 0.08, air: 0.07, arms: "swing", travel: { z: 0.22 }, labels: ["Hop over", "Hop back"] }),
   "lateral-plank-walk": lateralPlankWalk,
