@@ -19,6 +19,9 @@ final class WatchModel: NSObject, ObservableObject {
     private var builder: HKLiveWorkoutBuilder?
     private var lastHrSent = Date.distantPast
     private var restTap: Timer?
+    private var warnTap: Timer?
+    /// Seconds before rest ends for the heads-up tap; the same as REST_WARN_S in the phone's src/lib/training.ts.
+    private static let restWarn: TimeInterval = 10
     private var timerTaps: [Timer] = []
     private let motion = MotionStream()
 
@@ -67,6 +70,8 @@ final class WatchModel: NSObject, ObservableObject {
     private func scheduleRestTap() {
         restTap?.invalidate()
         restTap = nil
+        warnTap?.invalidate()
+        warnTap = nil
         timerTaps.forEach { $0.invalidate() }
         // The set timer: a tap on the wrist as each phase ends (go, switch sides, time's up).
         if let s = current, s.vibrate, !s.resting(at: Date()) {
@@ -81,6 +86,13 @@ final class WatchModel: NSObject, ObservableObject {
         guard let s = current, s.vibrate, let end = s.restEnd, end > Date() else { return }
         restTap = Timer.scheduledTimer(withTimeInterval: end.timeIntervalSinceNow, repeats: false) { _ in
             WKInterfaceDevice.current().play(.stop)
+        }
+        // The heads-up before the end: a soft rising tap, so the lifter can get set with the phone in a bag.
+        let soon = end.timeIntervalSinceNow - Self.restWarn
+        if s.warn, soon > 0 {
+            warnTap = Timer.scheduledTimer(withTimeInterval: soon, repeats: false) { _ in
+                WKInterfaceDevice.current().play(.directionUp)
+            }
         }
     }
 

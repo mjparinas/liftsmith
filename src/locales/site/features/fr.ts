@@ -119,7 +119,7 @@ export const fr: FeaturesText = {
     },
     "rest-timer": {
       name: "Minuteur de repos sur l’écran verrouillé",
-      body: "Il démarre seul après chaque série et décompte sur l’écran verrouillé avec la série suivante, les disques, le pouls et des boutons Valider la série et +30 s qui marchent appli fermée.",
+      body: "Il démarre seul après chaque série et décompte sur l’écran verrouillé avec la série suivante, les disques, le pouls et des boutons Valider la série et +30 s qui marchent appli fermée. Une vibration douce 10 secondes avant la fin vous laisse le temps de vous mettre en place, sur le téléphone et la montre.",
       note: "Android : une notification permanente, une Live Update sur Android 16 et la Now Bar de Samsung. iPhone : une Activité en direct sur l’écran verrouillé et dans la Dynamic Island. Web : une notification tant que la page est ouverte.",
     },
     plates: {

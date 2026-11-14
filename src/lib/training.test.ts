@@ -15,6 +15,7 @@ import {
   MAX_PRIORITIES,
   minutesForToday,
   restAlertOf,
+  restWarnOn,
   rpeOf,
   toggleFavourite,
   togglePriority,
@@ -152,6 +153,16 @@ describe("rest-over alert", () => {
     expect(restAlertOf({ restSounds: false, haptics: false, training: { restAlert: "both" } })).toEqual({ sound: true, vibrate: true });
     expect(restAlertOf({ restSounds: true, training: { restAlert: "vibrate" } })).toEqual({ sound: false, vibrate: true });
     expect(restAlertOf({ restSounds: true, training: { restAlert: "silent" } })).toEqual({ sound: false, vibrate: false });
+  });
+});
+
+describe("heads-up before rest ends", () => {
+  it("is on by default, has its own switch, and only buzzes when the rest-over alert vibrates", () => {
+    expect(restWarnOn({ restSounds: true, haptics: true })).toBe(true);
+    expect(restWarnOn({ restSounds: true, haptics: true, training: { restWarn: false } })).toBe(false);
+    expect(restWarnOn({ restSounds: true, haptics: false })).toBe(false);
+    expect(restWarnOn({ restSounds: true, haptics: true, training: { restAlert: "silent" } })).toBe(false);
+    expect(restWarnOn({ restSounds: true, haptics: false, training: { restAlert: "vibrate" } })).toBe(true);
   });
 });
 

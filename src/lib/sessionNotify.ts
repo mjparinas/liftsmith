@@ -21,6 +21,8 @@ export interface SessionState {
   /** Whether the native rest-over alert plays a sound and vibrates (Workout preferences › Rest-over alert). */
   sound?: boolean;
   vibrate?: boolean;
+  /** A gentle buzz REST_WARN_S (10) seconds before rest ends, from the Android service and the watches (training.ts restWarnOn). */
+  warn?: boolean;
   /** Voice coach: said by the Android service when rest ends (voice.ts). iOS and the web say it in the page. */
   speak?: string;
   /** The cue's language (the app's, which can differ from the phone's), so the speech engine uses the right voice. */

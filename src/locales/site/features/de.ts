@@ -121,7 +121,7 @@ export const de: FeaturesText = {
     },
     "rest-timer": {
       name: "Pausentimer auf dem Sperrbildschirm",
-      body: "Startet nach jedem Satz von selbst und zählt auf dem Sperrbildschirm herunter, mit dem nächsten Satz, den Scheiben, dem Puls und Tasten für Satz eintragen und +30 s, die auch bei geschlossener App funktionieren.",
+      body: "Startet nach jedem Satz von selbst und zählt auf dem Sperrbildschirm herunter, mit dem nächsten Satz, den Scheiben, dem Puls und Tasten für Satz eintragen und +30 s, die auch bei geschlossener App funktionieren. Eine sanfte Vibration 10 Sekunden vor dem Ende gibt dir Zeit, dich bereit zu machen, auf dem Handy und der Uhr.",
       note: "Android: eine dauerhafte Benachrichtigung, ein Live Update unter Android 16 und Samsungs Now Bar. iPhone: eine Live-Aktivität auf dem Sperrbildschirm und in der Dynamic Island. Web: eine Benachrichtigung, solange die Seite offen ist.",
     },
     plates: {

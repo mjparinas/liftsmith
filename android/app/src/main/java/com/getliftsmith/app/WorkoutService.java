@@ -174,6 +174,7 @@ public class WorkoutService extends Service {
             w.put("next", n.getStringExtra("next"));
             w.put("plates", n.getStringExtra("plates"));
             w.put("vibrate", n.getBooleanExtra("vibrate", true));
+            w.put("warn", n.getBooleanExtra("warn", false));
             w.put("done", n.getIntExtra("done", 0));
             w.put("total", n.getIntExtra("total", 0));
             long restUntil = n.getLongExtra("restUntil", 0L);
@@ -204,6 +205,7 @@ public class WorkoutService extends Service {
 
         if (restOver != null) handler.removeCallbacks(restOver);
         handler.removeCallbacks(countdownTick);
+        handler.removeCallbacks(warnTick);
         if (resting) {
             final boolean sound = intent.getBooleanExtra("sound", true);
             final boolean vibrate = intent.getBooleanExtra("vibrate", true);
@@ -225,6 +227,11 @@ public class WorkoutService extends Service {
             handler.postDelayed(restOver, restUntil - System.currentTimeMillis());
             // Feel the countdown: three light ticks in the last three seconds, so rest ending is felt with the
             // phone in a pocket. Same rule as the rest-over buzz: only when vibration is on for it.
+            // The heads-up 10 seconds before the end (Workout preferences), so the lifter can get set.
+            if (vibrate && intent.getBooleanExtra("warn", false)) {
+                long at = restUntil - REST_WARN_MS - System.currentTimeMillis();
+                if (at > 0) handler.postDelayed(warnTick, at);
+            }
             if (vibrate) {
                 for (int s = 3; s >= 1; s--) {
                     long at = restUntil - s * 1000L - System.currentTimeMillis();
@@ -396,6 +403,18 @@ public class WorkoutService extends Service {
         scheduleTick(restUntil);
     };
 
+    /** Seconds before rest ends for the heads-up buzz; the same as REST_WARN_S in src/lib/training.ts. */
+    static final long REST_WARN_MS = 10_000L;
+
+    /** The heads-up before rest ends: a gentle double tap, softer than the rest-over buzz. */
+    private final Runnable warnTick = () -> {
+        Vibrator v = getSystemService(Vibrator.class);
+        if (v == null) return;
+        long[] timings = { 0, 40, 90, 40 };
+        if (v.hasAmplitudeControl()) v.vibrate(VibrationEffect.createWaveform(timings, new int[] { 0, 110, 0, 110 }, -1));
+        else v.vibrate(VibrationEffect.createWaveform(timings, -1));
+    };
+
     /** One light tick of the rest countdown (posted three times; removeCallbacks cancels all of them). */
     private final Runnable countdownTick = () -> {
         Vibrator v = getSystemService(Vibrator.class);
@@ -446,6 +465,7 @@ public class WorkoutService extends Service {
         if (restOver != null) handler.removeCallbacks(restOver);
         handler.removeCallbacks(restTick);
         handler.removeCallbacks(countdownTick);
+        handler.removeCallbacks(warnTick);
         handler.removeCallbacks(timerTick);
         handler.removeCallbacks(timerStep);
         handler.removeCallbacks(timerOver);

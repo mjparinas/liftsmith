@@ -114,7 +114,7 @@ export const es: FeaturesText = {
     },
     "rest-timer": {
       name: "Temporizador de descanso en la pantalla de bloqueo",
-      body: "Arranca solo tras cada serie y cuenta atrás en la pantalla de bloqueo con la siguiente serie, los discos, el pulso y botones Registrar serie y +30 s que funcionan con la app cerrada.",
+      body: "Arranca solo tras cada serie y cuenta atrás en la pantalla de bloqueo con la siguiente serie, los discos, el pulso y botones Registrar serie y +30 s que funcionan con la app cerrada. Una vibración suave 10 segundos antes del final te da tiempo para prepararte, en el móvil y en el reloj.",
       note: "Android: una notificación fija, una Live Update en Android 16 y la Now Bar de Samsung. iPhone: una Actividad en Vivo en la pantalla de bloqueo y en la Dynamic Island. Web: una notificación mientras la página está abierta.",
     },
     plates: {
