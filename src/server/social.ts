@@ -56,7 +56,7 @@ import {
 
 import { cleanCode, newCode } from "./coach";
 import { batch, query, rateLimit, run, type Row } from "./db";
-import { recordAccept } from "./earnedPro";
+import { inviteStatus, recordAccept } from "./earnedPro";
 import { isPlaceId } from "./gymPlaces";
 import { MANAGES } from "./gymStaff";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
@@ -2390,6 +2390,8 @@ export const OPS: Record<string, Op> = {
   invite,
   inviteInfo,
   acceptInvite,
+  // Your invites (Friends › People): who joined with the lifter's link and how close each is to the month of Pro.
+  invites: async (a, _b, now) => ok(await inviteStatus(a, now)),
   board,
   challengeCreate,
   challenges,

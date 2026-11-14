@@ -304,6 +304,11 @@ export const es: FeaturesText = {
       name: "Entrenando ahora y ánimos",
       body: "Mira quién está entrenando ahora mismo y envía un ánimo que sube flotando por su pantalla de entrenamiento.",
     },
+    "invite-friends": {
+      name: "Invita a amigos y gana Pro",
+      body: "Comparte tu enlace de invitación desde Amigos, al terminar un entrenamiento o en cualquier tarjeta. Un amigo que se une con él te sigue también, y cuando completa tres entrenamientos los dos recibís un mes de Pro. Tus invitaciones muestra cuánto le falta a cada uno.",
+      note: "Hasta 12 meses al año. Los menores de 18 años pueden invitar a amigos, pero no se les ofrece la recompensa.",
+    },
     "check-in": {
       name: "Avisa desde el gimnasio",
       body: "Un toque en Hoy avisa a los amigos que elijas de que estás en el gimnasio. Reciben una notificación y un aviso en la app hasta que lo cierren.",

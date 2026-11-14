@@ -308,6 +308,11 @@ export const de: FeaturesText = {
       name: "Gerade am Trainieren und Anfeuern",
       body: "Sieh, wer gerade trainiert, und schick einen Anfeuerungsruf, der über den Trainingsbildschirm schwebt.",
     },
+    "invite-friends": {
+      name: "Freunde einladen, Pro verdienen",
+      body: "Teile deinen Einladungslink über Freunde, am Ende eines Trainings oder mit jeder Karte. Ein Freund, der damit beitritt, folgt dir zurück, und sobald er drei Trainings geschafft hat, bekommt ihr beide einen Monat Pro. Deine Einladungen zeigt, wie weit jeder ist.",
+      note: "Bis zu 12 Monate im Jahr. Unter 18-Jährige können Freunde einladen, bekommen die Belohnung aber nicht angeboten.",
+    },
     "check-in": {
       name: "Im Studio einchecken",
       body: "Ein Tipp unter Heute sagt den Freunden, die du auswählst, dass du im Studio bist. Sie bekommen eine Mitteilung und einen Hinweis in der App, bis sie ihn schließen.",

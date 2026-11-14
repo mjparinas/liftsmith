@@ -309,6 +309,11 @@ export const fr: FeaturesText = {
       name: "En séance maintenant et encouragements",
       body: "Voyez qui s’entraîne en ce moment et envoyez un encouragement qui flotte sur son écran de séance.",
     },
+    "invite-friends": {
+      name: "Invite tes amis, gagne Pro",
+      body: "Partage ton lien d’invitation depuis Amis, à la fin d’une séance ou sur n’importe quelle carte. Un ami qui s’inscrit avec te suit en retour, et dès qu’il a terminé trois séances, vous recevez tous les deux un mois de Pro. Tes invitations montre où en est chaque ami.",
+      note: "Jusqu’à 12 mois par an. Les moins de 18 ans peuvent inviter des amis, mais la récompense ne leur est pas proposée.",
+    },
     "check-in": {
       name: "Check-in à la salle",
       body: "Un geste sur Aujourd'hui prévient les amis que vous choisissez que vous êtes à la salle. Ils reçoivent une notification, et un message dans l'app jusqu'à ce qu'ils le ferment.",

@@ -604,6 +604,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-14",
       },
       {
+        id: "invite-friends",
+        name: "Invite friends, earn Pro",
+        body: "Share your invite link from Friends, the end of a workout, or any share card. A friend who joins with it follows you back, and once they finish three workouts you both get a month of Pro. Your invites shows how close each friend is.",
+        tier: "free",
+        note: "Up to 12 months a year. Lifters under 18 can invite friends, but the reward isn't offered to them.",
+        added: "2026-11-14",
+      },
+      {
         id: "share",
         name: "Share cards and links",
         body: "Share a workout, a new best or a milestone as an image, or as a public link with a preview. A new best flashes gold and can be shared from the rest screen right away.",

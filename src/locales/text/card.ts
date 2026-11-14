@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // (ShareSheet.tsx). English is the source: add a key here first, then the other languages.
 
 export const en = {
+  "card.invite": "Add my invite link",
+  "card.inviteNote": "Friends who open it can join you on Liftsmith, and you follow each other.",
   "card.minutes": { one: "{n} min", other: "{n} min" },
   "card.prLine": "{name} · {weight} × {reps}",
   "card.prLineNoWeight": "{name} · new best",
@@ -59,6 +61,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "card.invite": "Añadir mi enlace de invitación",
+  "card.inviteNote": "Los amigos que lo abran pueden unirse a ti en Liftsmith y os seguiréis mutuamente.",
   "card.minutes": { one: "{n} min", other: "{n} min" },
   "card.prLine": "{name} · {weight} × {reps}",
   "card.prLineNoWeight": "{name} · nuevo récord",
@@ -112,6 +116,8 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "card.invite": "Ajouter mon lien d’invitation",
+  "card.inviteNote": "Les amis qui l’ouvrent peuvent te rejoindre sur Liftsmith, et vous vous suivez mutuellement.",
   "card.minutes": { one: "{n} min", other: "{n} min" },
   "card.prLine": "{name} · {weight} × {reps}",
   "card.prLineNoWeight": "{name} · nouveau record",
@@ -166,6 +172,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "card.invite": "Meinen Einladungslink anhängen",
+  "card.inviteNote": "Freunde, die ihn öffnen, können dir auf Liftsmith folgen, und ihr folgt euch gegenseitig.",
   "card.minutes": { one: "{n} Min.", other: "{n} Min." },
   "card.prLine": "{name} · {weight} × {reps}",
   "card.prLineNoWeight": "{name} · neue Bestleistung",
@@ -219,6 +227,8 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "card.invite": "Aggiungi il mio link d’invito",
+  "card.inviteNote": "Gli amici che lo aprono possono raggiungerti su Liftsmith e vi seguite a vicenda.",
   "card.minutes": { one: "{n} min", other: "{n} min" },
   "card.prLine": "{name} · {weight} × {reps}",
   "card.prLineNoWeight": "{name} · nuovo record",
@@ -272,6 +282,8 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "card.invite": "招待リンクを添える",
+  "card.inviteNote": "開いた友達はLiftsmithであなたとつながり、お互いにフォローします。",
   "card.minutes": { other: "{n}分" },
   "card.prLine": "{name} · {weight} × {reps}",
   "card.prLineNoWeight": "{name} · 自己ベスト更新",

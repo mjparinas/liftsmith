@@ -75,13 +75,16 @@ export type CoachPushKind =
 /** A real gym's pushes (gymExtras.ts): an announcement to the gym's club, and a problem report or trainer to its owner. */
 export type GymPushKind = "gymNews" | "gymIssue" | "gymTrainer";
 
+/** Give a month, get a month (earnedPro.ts): the invited friend's month landed, and the inviter's. */
+export type ReferralPushKind = "referralFriend" | "referralInviter";
+
 export interface PushMessage {
   token: string;
   platform: "android" | "ios";
   body: string;
   /** The app screen a tap opens (#/friends, #/routine/<code> or #/trainer…). */
   route: string;
-  kind: PushKind | CoachPushKind | GymPushKind;
+  kind: PushKind | CoachPushKind | GymPushKind | ReferralPushKind;
 }
 /** Sends one message; "gone" means the token is dead and is deleted. */
 export type PushSender = (m: PushMessage) => Promise<"ok" | "gone" | "error">;
@@ -202,7 +205,12 @@ export async function notifyCoach(to: string, kind: CoachPushKind, vars: { name:
  * A push with no Friends switch behind it (the caller decided it's wanted): coaching, and a gym's own news to its club
  * or a report to its owner. `name` is the sender or the gym. Never throws and gives up after a few seconds.
  */
-export async function notifyPlain(to: string, kind: CoachPushKind | GymPushKind, vars: { name: string; text?: string }, route: string) {
+export async function notifyPlain(
+  to: string,
+  kind: CoachPushKind | GymPushKind | ReferralPushKind,
+  vars: { name: string; text?: string },
+  route: string,
+) {
   const sender = testSender ?? (pushConfigured().fcm || pushConfigured().apns ? networkSender : null);
   if (!sender) return;
   try {

@@ -20,7 +20,6 @@ import {
   boardNudge,
   cleanInvite,
   clubUrl,
-  inviteUrl,
   pendingInvite,
   playInviteUrl,
   rankBoard,
@@ -32,6 +31,7 @@ import { useDesktop } from "@/lib/layout";
 import { useNet } from "@/lib/net";
 import { estimate } from "@/lib/onerm";
 import { startPush, stopPush } from "@/lib/push";
+import { rewardOn } from "@/lib/referral";
 import { challengeShare } from "@/lib/shareCards";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
@@ -95,6 +95,7 @@ import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { TrainingNow } from "./FriendsLive";
 import { Icon } from "./icons";
+import { InviteButton } from "./Invites";
 import { MonthFriends } from "./MonthChallenge";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
@@ -1404,34 +1405,6 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
   );
 }
 
-/** People › Invite a friend: shares the lifter's invite link. Whoever accepts it and the lifter follow each other. */
-function InviteButton() {
-  const [note, setNote] = useState<string | null>(null);
-  const share = async () => {
-    haptic("tick");
-    try {
-      const r = await social<{ code: string }>("invite");
-      const url = inviteUrl(r.code);
-      track("feature", { name: "social_invite" });
-      if (await shareUrl(url, t("friends.invite.shareTitle"))) return;
-      setNote((await copyText(url)) ? t("link.copied") : url);
-    } catch (e) {
-      oops();
-      setNote(socialError(e));
-    }
-  };
-  return (
-    <>
-      <Button kind="primary" icon="people" className="mt-3 w-full" onClick={() => void share()}>
-        {t("friends.invite")}
-      </Button>
-      <p className="mt-1 px-1 text-xs text-muted">{t("friends.inviteHint")}</p>
-      <p className="mt-1 px-1 text-xs text-muted">{t("friends.invite.reward")}</p>
-      <Note text={note} />
-    </>
-  );
-}
-
 function People() {
   const me = useSocial((s) => s.me);
   const [q, setQ] = useState("");
@@ -2440,6 +2413,7 @@ export function ClubScreen({ code: raw }: { code: string }) {
  */
 export function InviteScreen({ code: raw }: { code: string }) {
   const { account, me } = useSocialLoaded();
+  const { profile } = useApp();
   const code = cleanInvite(raw);
   const [who, setWho] = useState<{ inviter: Inviter; self: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -2518,7 +2492,7 @@ export function InviteScreen({ code: raw }: { code: string }) {
           <p className="min-w-0">
             <span className="block font-semibold">{t("friends.invite.from", { name: inviter.name })}</span>
             <span className="block text-sm text-muted">{t("friends.invite.body")}</span>
-            <span className="mt-1 block text-sm text-muted">{t("friends.invite.rewardFriend")}</span>
+            {rewardOn() && !isTeen(profile) && <span className="mt-1 block text-sm text-muted">{t("friends.invite.rewardFriend")}</span>}
           </p>
         </div>
       ) : (

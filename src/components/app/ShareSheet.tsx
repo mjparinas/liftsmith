@@ -14,10 +14,13 @@ import { useProMember } from "@/lib/billing";
 import { COSMETICS } from "@/lib/game";
 import { t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { inviteLink, keptInviteCode, trackInvite, warmInviteCode } from "@/lib/referral";
 import { shareText, type Shareable, type ShareContext, type ShareOptions } from "@/lib/shareCards";
 import { drawCard, shareCanvas, type CardData, type CardSize } from "@/lib/shareImage";
 import { copyText, createLink, deleteLink, linkError, shareUrl, type ShareLink } from "@/lib/shareLinks";
+import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
+import { isTeen } from "@/lib/teen";
 import { toast } from "@/lib/toast";
 
 import { go } from "./router";
@@ -28,8 +31,10 @@ interface Prefs {
   size: CardSize;
   weights: boolean;
   name: boolean;
+  /** Add the lifter's invite link to what's shared (the invite loop, docs/decisions/growth.md). */
+  invite: boolean;
 }
-const DEFAULTS: Prefs = { size: "post", weights: true, name: false };
+const DEFAULTS: Prefs = { size: "post", weights: true, name: false, invite: true };
 
 function loadPrefs(): Prefs {
   try {
@@ -38,6 +43,7 @@ function loadPrefs(): Prefs {
       size: p.size === "story" ? "story" : "post",
       weights: typeof p.weights === "boolean" ? p.weights : DEFAULTS.weights,
       name: p.name === true,
+      invite: typeof p.invite === "boolean" ? p.invite : DEFAULTS.invite,
     };
   } catch {
     return DEFAULTS;
@@ -97,6 +103,13 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
   };
   const opts: ShareOptions = { weights: prefs.weights, name: prefs.name && name ? name : null };
   const body = bodyFor(profile.sex);
+  // The invite link rides along for lifters in Friends, never for someone under 18: a card can be posted anywhere,
+  // and an invite makes whoever opens it a mutual follow (docs/decisions/growth.md "The invite loop").
+  const joined = useSocial((st) => !!st.me?.profile);
+  const canInvite = socialOn() && !isTeen(profile) && (joined || !!keptInviteCode());
+  useEffect(() => {
+    if (canInvite) warmInviteCode();
+  }, [canInvite]);
 
   useEffect(() => {
     if (!item?.figure) return;
@@ -132,8 +145,10 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
     if (!canvas || busy) return;
     setBusy(true);
     haptic("tap");
-    const how = await shareCanvas(canvas, item.file, shareText(card));
+    const url = canInvite && prefs.invite ? ((await inviteLink()) ?? undefined) : undefined;
+    const how = await shareCanvas(canvas, item.file, shareText(card), url);
     setBusy(false);
+    if (url && how !== "cancelled" && how !== "failed") trackInvite("card");
     track("feature", { name: "share_card", detail: `${item.kind}:${prefs.size}:${how}` });
     if (how === "failed") oops();
     else if (how !== "cancelled") sound.done();
@@ -189,6 +204,9 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
         on={prefs.name && !!name}
         onChange={(v) => name && setPrefs({ name: v })}
       />
+      {canInvite && (
+        <SwitchRow label={t("card.invite")} hint={t("card.inviteNote")} on={prefs.invite} onChange={(v) => setPrefs({ invite: v })} />
+      )}
       <p className="mt-3 text-xs text-muted">{t("card.privacy")}</p>
       <Button className="mt-4 w-full py-4" icon="share" disabled={busy || !canvas} onClick={() => void share()}>
         {t("card.share")}
