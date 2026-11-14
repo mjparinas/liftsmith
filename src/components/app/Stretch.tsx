@@ -29,6 +29,7 @@ import {
   routineSeconds,
   searchStretches,
   stretch,
+  STRETCHES,
   stretchSeconds,
   stretchWhy,
   suggest,
@@ -614,6 +615,32 @@ export function CoolDownCard() {
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{t("str.coolCard")}</span>
         <span className="block text-sm text-muted">{names.length ? t("str.coolBody", { muscles: listOf(names) }) : t("str.restAny")}</span>
+      </span>
+      <span className="text-accent" aria-hidden>
+        ›
+      </span>
+    </button>
+  );
+}
+
+/**
+ * The stretch library from Today, any day (Melvin, 2026-11-14: "Can you add it on today"). Before this it was only
+ * under Progress › All tools. It opens the library itself; the rest-day and cool-down cards open their own lists.
+ */
+export function StretchLibraryCard() {
+  return (
+    <button
+      type="button"
+      onClick={() => go("stretch")}
+      className="press card mt-4 flex w-full items-center gap-4 p-4 text-left"
+      data-testid="today-stretch-library"
+    >
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-cyan/15 text-cyan" aria-hidden>
+        <Icon name="stretch" size={22} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">{t("str.hub")}</span>
+        <span className="block text-sm text-muted">{t("str.hubBody", { count: STRETCHES.length })}</span>
       </span>
       <span className="text-accent" aria-hidden>
         ›

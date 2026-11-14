@@ -47,7 +47,7 @@ import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CoolDownCard, SplitBar, TodayParts } from "./Stretch";
+import { CoolDownCard, SplitBar, StretchLibraryCard, TodayParts } from "./Stretch";
 import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
@@ -695,6 +695,7 @@ export function Today() {
           )}
         </div>
         <div className="desk:order-3 desk:col-span-2">
+          {!active && <StretchLibraryCard />}
           {profile.quotes !== false && <DailyQuote now={now} />}
           {!active && <SaveNudge />}
           {!active && <TodayGame />}
