@@ -20,7 +20,7 @@ import { PlateBar, type PlateFinish } from "../Plates";
 import { HUE } from "../theme";
 import { Button, Ring } from "../ui";
 import { GhostLine, PlateChange, RestExtra, useGhost } from "../WorkoutExtras";
-import { AlmostThere } from "../WorkoutJuice";
+import { AlmostThere, RestPrShare } from "../WorkoutJuice";
 import { HrReadyLine, TipCard } from "./Polish";
 
 type Ghost = ReturnType<typeof useGhost>;
@@ -101,6 +101,7 @@ export function RestCard({
           {t("workout.skipRest")}
         </Button>
       </div>
+      {lastSet && <RestPrShare set={lastSet} />}
       <HrReadyLine active={active} setStart={lastSetStart} now={now} />
       <GhostLine
         ghost={ghost}

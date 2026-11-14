@@ -320,7 +320,7 @@ export const de: FeaturesText = {
     },
     share: {
       name: "Teilkarten und Links",
-      body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau.",
+      body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau. Eine neue Bestleistung leuchtet golden auf und lässt sich gleich in der Pause teilen.",
     },
     coaching: {
       name: "Kunden coachen",

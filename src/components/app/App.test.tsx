@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setBillingLive } from "@/lib/billing";
 import { exercise } from "@/lib/exercises";
 import { useApp } from "@/lib/store";
+import { makeSet } from "@/test/factories";
 
 import { App } from "./App";
 
@@ -831,5 +832,25 @@ describe("Labs", () => {
     await waitFor(() => expect(vibrate).toHaveBeenCalledWith([22, 70, 22]), { timeout: 2500 });
     expect(vibrate.mock.calls.filter((c) => JSON.stringify(c) === "[[22,70,22]]")).toHaveLength(1);
     Reflect.deleteProperty(navigator, "vibrate");
+  });
+
+  it("a new personal best flashes gold and offers its share card on the rest screen", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await startSquat(user);
+    const st = useApp.getState();
+    const a = st.active!;
+    const exerciseId = a.plan.items[a.index]!.exerciseId;
+    // A lighter set of the same lift last week, so the set about to be logged is a new best.
+    const before = {
+      ...makeSet({ exerciseId, weight: Math.max(1, a.weight / 2), reps: 5, sessionId: "older" }),
+      at: Date.now() - 7 * 86400_000,
+    };
+    act(() => useApp.setState({ events: [before, ...st.events] }));
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    expect(await screen.findByText("New personal record")).toBeInTheDocument();
+    expect(screen.getByTestId("pr-flash")).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: "Share this PR" }));
+    expect(await screen.findByRole("dialog", { name: "Share" })).toBeInTheDocument();
   });
 });

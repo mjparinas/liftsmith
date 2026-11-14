@@ -321,7 +321,7 @@ export const fr: FeaturesText = {
     },
     share: {
       name: "Cartes et liens de partage",
-      body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu.",
+      body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu. Un nouveau record s’illumine en doré et se partage dès l’écran de repos.",
     },
     coaching: {
       name: "Coacher des clients",
