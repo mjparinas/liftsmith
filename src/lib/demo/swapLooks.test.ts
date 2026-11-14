@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 222;
+  const LOOK_ALIKES = 206;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -468,5 +468,37 @@ describe("combos and Olympic lifts", () => {
   it("goes down, halfway up and back down on the one and a half squat", () => {
     const ds = motionFor("one-and-a-half-squat").phases.map((p) => p[2]);
     expect(ds).toEqual([0, 1, 0.5, 1, 0]);
+  });
+});
+
+describe("moves that travel the way the name says", () => {
+  // Melvin, 2026-11-14: "Sideways bear crawl doesn't move sideways … Everything with sideways should move
+  // that way, same with forwards or backwards"
+  const span = (id: string, axis: 0 | 2) => {
+    const m = motionFor(id);
+    const xs = Array.from({ length: 81 }, (_, i) => jointsAt(m, B, i / 80).hipC[axis]);
+    return Math.max(...xs) - Math.min(...xs);
+  };
+  const ids = EXERCISES.map((e) => e.id);
+  const SIDEWAYS = /^(.+-)?(lateral|sideways)-(.+-)?(walk|crawl|shuffle|bound|hop|jump|burpee|drag)$|^carioca$/;
+  const FORWARD = /^(.+-)?(walking|forward|backward)-(.+-)?(lunge|crawl)$|^bear-crawl$/;
+  it("travels sideways when the name says lateral or sideways", () => {
+    const found = ids.filter((id) => SIDEWAYS.test(id));
+    expect(found.length).toBeGreaterThan(10);
+    for (const id of found) {
+      expect(span(id, 2), id).toBeGreaterThan(0.25);
+      expect(span(id, 2), id).toBeGreaterThan(span(id, 0));
+    }
+    expect(span("bw-lateral-step-up", 2)).toBeGreaterThan(0.15);
+  });
+  it("travels forward or back when the name says walking, forward or backward", () => {
+    const found = ids.filter((id) => FORWARD.test(id));
+    expect(found.length).toBeGreaterThan(5);
+    for (const id of found) expect(span(id, 0), id).toBeGreaterThan(0.3);
+  });
+  it("turns around at the end of the walking lunges and comes back", () => {
+    const m = motionFor("walking-lunge");
+    expect(m.yaw?.(0.45)).toBeCloseTo(90, 0);
+    expect(m.yaw?.(0.7)).toBe(180);
   });
 });
