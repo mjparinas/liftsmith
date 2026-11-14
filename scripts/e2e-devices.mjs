@@ -45,6 +45,16 @@ for (const { name } of pick()) {
     // Desktop browsers get the sidebar; phones and tablets (touch) keep the bottom tab bar.
     const desktop = await page.evaluate(() => document.documentElement.dataset.layout === "desktop");
     check(desktop === name.startsWith("Desktop"), `${name}: ${desktop ? "has" : "lacks"} the desktop layout`, fail);
+    if (desktop) {
+      // Today's right column stacks with no gap: the quote and quests start right under the call, however tall
+      // the plan beside them is (Melvin, 2026-11-14: a big empty gap opened under the call).
+      const gap = await page.evaluate(() => {
+        const call = document.getElementById("call-title")?.closest(".desk\\:order-2");
+        const rest = call?.parentElement?.querySelector(":scope > .desk\\:order-3");
+        return call && rest ? rest.getBoundingClientRect().top - call.getBoundingClientRect().bottom : null;
+      });
+      check(gap === null || Math.abs(gap) <= 24, `${name}: Today's right column has a ${gap} px gap under the call`, fail);
+    }
     await page.screenshot({ path: `${OUT}/${tag}-today.png` });
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
     check(start && start.y + start.height <= opts.viewport.height, `${name}: Start workout is below the fold`, fail);

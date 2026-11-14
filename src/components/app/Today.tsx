@@ -338,8 +338,10 @@ export function Today() {
       {/* Phone order (UX audit, 2026-11-13): the call and any coach's notes, then the plan, then the quote, saving
           and the week's quests, so the workout is near the top instead of below the extras. Desktop layout
           (layout.ts): the plan in the wider left column spanning two rows; the call and notes beside it on top, the
-          quote and quests under them. */}
-      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:items-start desk:gap-x-6">
+          quote and quests under them. The first row is only as tall as the call and notes, and the second row takes
+          the rest of the plan's height, so the quote sits right under the call instead of halfway down the page
+          (Melvin, 2026-11-14). */}
+      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:grid-rows-[auto_1fr] desk:items-start desk:gap-x-6">
         {/* Once the day's workout is done it takes the wide column, where the plan was, so the page isn't empty
             beside the notes (Melvin, 2026-11-13). First in the page, so a phone shows it first as before. */}
         {doneToday && resting && (
