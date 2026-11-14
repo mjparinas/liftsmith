@@ -12,6 +12,7 @@ import {
   mul,
   norm,
   rad,
+  solve,
   sub,
   TEMPO,
   V,
@@ -1741,6 +1742,88 @@ function sidePlank(o: { lift?: boolean }): Motion {
       };
     },
     roll: (d) => -90 + (o.lift ? lerp(6, 16, d) : 14 + 1.5 * d),
+  };
+}
+
+/**
+ * Copenhagen plank: a side plank on the bottom forearm with the top leg on a flat bench, the ankle on
+ * the pad (`knee` puts the knee there instead, the short lever). The hips start low and lift into a
+ * straight line while the bottom leg rises to the underside of the pad. Drawn on its left side like the
+ * side-lying moves (roll -90, so the pose's z is height), with the bench across the body under the top
+ * leg and the bottom leg passing under it. The foot or knee stays put on the pad; the shoulder rides a
+ * little over the elbow as the hips drop.
+ */
+function copenhagen(o: { knee?: boolean } = {}): Motion {
+  const benchH = 0.45,
+    padT = 0.07;
+  const pose = (B: Body, d: number): Pose => {
+    const S = 0; // the shoulder line's height
+    const elbowZ = S - (B.shW + B.upper * 0.97);
+    const floor = elbowZ - 0.05;
+    const top = floor + benchH;
+    const leg = legMax(B);
+    // the contact on the pad (ankle or knee) and how far it is from the hip joint
+    const reachC = o.knee ? B.thigh : leg;
+    const cZ = top + (o.knee ? 0.06 : 0.05);
+    // the straight line at the top: shoulder, hip and contact in one line
+    const uz = (cZ - B.hipW - S) / (B.torso + reachC);
+    const uy = -Math.sqrt(1 - uz * uz);
+    const shY = standY(B, 0) + B.torso;
+    const hipTop = V(0, shY + uy * B.torso, S + uz * B.torso);
+    const c = V(0, hipTop[1] + uy * reachC, cZ);
+    // the hips sag toward the floor at d = 0 and lift into the line at d = 1
+    const hipZ = lerp(floor + 0.14 + B.hipW, hipTop[2], d);
+    const dzc = cZ - (hipZ + B.hipW);
+    const hipY = c[1] + Math.sqrt(Math.max(0.01, reachC * reachC - dzc * dzc));
+    const hip = V(0, hipY, hipZ);
+    const dzs = S - hipZ;
+    const sh = V(0, hipY + Math.sqrt(Math.max(0.01, B.torso * B.torso - dzs * dzs)), S);
+    // the top leg: the ankle on the pad, or the shin lying on past the knee
+    const ankleR = o.knee ? add(c, mul(norm(V(0, -1, 0.05)), B.shin)) : c;
+    // bend the knee toward the pad's contact, so it lands right on it whatever the hips do
+    const hipR = V(0, hipY, hipZ + B.hipW);
+    // the bottom leg: low by the floor, then up under the pad
+    const hipL = V(0, hipY, hipZ - B.hipW);
+    const footZ = lerp(floor + 0.07, top - padT - 0.06, d);
+    const dzl = hipL[2] - footZ;
+    const ankleL = V(0, hipY - Math.sqrt(Math.max(0.01, (leg * 0.99) ** 2 - dzl * dzl)), footZ);
+    return {
+      hip,
+      sh,
+      ankle: per(ankleL, ankleR),
+      kneePole: per(V(1, 0, 0), o.knee ? sub(c, lerpV(hipR, ankleR, 0.5)) : V(1, 0, 0)),
+      foot: 20,
+      // the bottom forearm flat on the floor under the shoulder, the top hand on the hip
+      hand: per(V(B.fore * 0.92, shY + 0.02, elbowZ), V(0.03, hipY + 0.08, hipZ + B.hipW + 0.12)),
+      elbowPole: per(V(0, 0, -1), V(-0.4, 0, 1)),
+      headBlend: 0,
+    };
+  };
+  return {
+    phases: TEMPO.liftFirst("Lift the hips · 1s", "Lower · 2s", "Low", "Hold"),
+    load: "none",
+    stance: 0.05,
+    pose,
+    roll: () => -90,
+    props: (B) => {
+      // where the floor really is: the lowest joint over the rep, as placement() finds it
+      let low = Infinity;
+      for (let i = 0; i <= 8; i++) {
+        const J = solve(pose(B, i / 8), B, { stance: 0.05, grip: 0.25 }) as unknown as Record<string, Vec>;
+        for (const k of Object.keys(J)) if (k !== "headDir" && J[k]) low = Math.min(low, J[k]![2]);
+      }
+      const floor = low - 0.05;
+      const p = pose(B, 1);
+      const top = p.sh[2] - (B.shW + B.upper * 0.97) - 0.05 + benchH;
+      const y = o.knee ? (p.ankle as { R: Vec }).R[1] + B.shin * 0.97 : (p.ankle as { R: Vec }).R[1];
+      const legH = top - padT - floor;
+      // a flat bench across the body: the pad under the top leg, a leg at each end clear of the bottom leg
+      return [
+        { kind: "box", at: V(0, y, top - padT / 2), size: V(1.1, 0.3, padT) },
+        { kind: "box", at: V(-0.48, y, floor + legH / 2), size: V(0.08, 0.26, legH) },
+        { kind: "box", at: V(0.48, y, floor + legH / 2), size: V(0.08, 0.26, legH) },
+      ];
+    },
   };
 }
 
@@ -6631,7 +6714,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "hip-thrust": () => bridge({ bench: true, bar: true }),
   "single-leg-hip-thrust": () => bridge({ bench: true, single: true }),
   "cable-pull-through": pullThrough,
-  "copenhagen-plank": () => ({ ...sidePlank({ lift: true }), props: undefined }),
+  "copenhagen-plank": () => copenhagen(),
   "cossack-squat": cossack,
   "standing-calf-raise": () => calfRaise({ machine: true, step: true, load: "none" }),
   "db-calf-raise": () => calfRaise({ single: true, step: true, load: "dumbbell", hold: "R" }),
@@ -6998,7 +7081,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "side-lying-adduction": () => sideLying("adduct"),
   "cable-hip-adduction": () => cableLeg({ move: "in" }),
   "plie-squat": () => squat({ hold: "arms" }),
-  "short-copenhagen-plank": () => ({ ...sidePlank({ lift: true }), props: undefined }),
+  "short-copenhagen-plank": () => copenhagen({ knee: true }),
   "single-leg-calf-raise": () => calfRaise({ single: true, load: "none" }),
   "db-seated-calf-raise": () => seatedCalfRaise({ load: "dumbbell" }),
   "bent-over-calf-raise": () => calfRaise({ step: true, load: "none" }),
