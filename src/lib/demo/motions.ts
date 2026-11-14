@@ -1670,6 +1670,365 @@ function bearCrawl(): Motion {
   };
 }
 
+// ---------- planks and crawls that move ----------
+// Each of these used to borrow the forearm plank, the mountain climber or the in-place bear crawl, so a
+// sideways plank walk showed a forearm plank holding still (Melvin, 2026-11-13). They share two bases (a high
+// plank on the hands and a bear position with the knees hovering) and a stepper that moves hands and feet in turn.
+
+type Limb = "handL" | "handR" | "ankleL" | "ankleR";
+const LIMBS: Limb[] = ["handL", "handR", "ankleL", "ankleR"];
+
+/** A pose with each hand and foot given per side, so a stepper can move one at a time. */
+interface FourPoint {
+  hip: Vec;
+  sh: Vec;
+  handL: Vec;
+  handR: Vec;
+  ankleL: Vec;
+  ankleR: Vec;
+  foot: number;
+  kneePole: Vec;
+  elbowPole: Vec;
+  headBlend: number;
+}
+
+/** A straight-armed plank on the hands, feet hip-width, body in one line from heels to head. */
+function highPlankBase(B: Body, ankleX?: number): FourPoint {
+  const handY = 0.03;
+  const ankleY = 0.11;
+  const Lb = legMax(B) * 0.99 + B.torso;
+  const shY = handY + reach(B) * 0.95;
+  const th = Math.asin(clamp((shY - ankleY) / Lb, -1, 1));
+  const ax = ankleX ?? 0.45 - Lb * Math.cos(th);
+  const dir = V(Math.cos(th), Math.sin(th));
+  const ankle = V(ax, ankleY);
+  const hip = add(ankle, mul(dir, legMax(B) * 0.99));
+  const sh = add(hip, mul(dir, B.torso));
+  const hx = sh[0] + 0.02;
+  return {
+    hip,
+    sh,
+    handL: V(hx, handY, -0.22),
+    handR: V(hx, handY, 0.22),
+    ankleL: V(ax, ankleY, -0.1),
+    ankleR: V(ax, ankleY, 0.1),
+    foot: 90 - (th * 180) / Math.PI - 35,
+    kneePole: V(0, -1, 0.1),
+    elbowPole: V(-0.7, 0.6, 0.7),
+    headBlend: 0,
+  };
+}
+
+/** The forearm plank (`plank`), as a four-point pose with the feet at `ankleX`. */
+function forearmPlankBase(B: Body, ankleX = -0.95): FourPoint {
+  const p = plank().pose(B, 0);
+  const dx = ankleX + 0.95;
+  const hip = add(p.hip, V(dx, 0));
+  const sh = add(p.sh, V(dx, 0));
+  const a = p.ankle as Vec;
+  const h = p.hand as Vec;
+  return {
+    hip,
+    sh,
+    handL: V(h[0] + dx, h[1], -0.12),
+    handR: V(h[0] + dx, h[1], 0.12),
+    ankleL: V(a[0] + dx, a[1], -0.1),
+    ankleR: V(a[0] + dx, a[1], 0.1),
+    foot: 55,
+    kneePole: V(0, -1, 0.1),
+    elbowPole: V(-0.3, -1, 0.1),
+    headBlend: 0,
+  };
+}
+
+/** On hands and toes with the knees hovering just off the floor, back flat. */
+function bearBase(B: Body): FourPoint {
+  const hipY = ANKLE_H + B.thigh * 0.92;
+  const hip = V(0, hipY);
+  const shY = 0.03 + reach(B) * 0.93;
+  const lean = (Math.acos(clamp((shY - hipY) / B.torso, -1, 1)) * 180) / Math.PI;
+  const sh = torsoAt(B, hip, lean);
+  const toeX = -B.shin * 0.75;
+  return {
+    hip,
+    sh,
+    handL: V(sh[0] + 0.02, 0.03, -0.17),
+    handR: V(sh[0] + 0.02, 0.03, 0.17),
+    ankleL: V(toeX, 0.1, -0.12),
+    ankleR: V(toeX, 0.1, 0.12),
+    foot: 60,
+    kneePole: V(1, -1, 0.1),
+    elbowPole: V(-1, 0.2, 0.3),
+    headBlend: 0.2,
+  };
+}
+
+/** Keeps a hand or foot within reach of its shoulder or hip joint, pulling it in along the line between them. */
+function within(from: Vec, to: Vec, l: number): Vec {
+  const v = sub(to, from);
+  const n = Math.hypot(v[0], v[1], v[2]);
+  return n <= l ? to : add(from, mul(v, l / n));
+}
+
+/** Turns a four-point pose into the rig's pose, keeping every hand and foot within reach. */
+function fourPose(B: Body, p: FourPoint): Pose {
+  const hipJ = (s: number) => V(p.hip[0], p.hip[1], p.hip[2] + s * B.hipW);
+  const shJ = (s: number) => V(p.sh[0], p.sh[1], p.sh[2] + s * B.shW);
+  const leg = legMax(B) * 0.99;
+  const arm = reach(B) * 0.995;
+  return {
+    hip: p.hip,
+    sh: p.sh,
+    hand: per(within(shJ(-1), p.handL, arm), within(shJ(1), p.handR, arm)),
+    ankle: per(within(hipJ(-1), p.ankleL, leg), within(hipJ(1), p.ankleR, leg)),
+    foot: p.foot,
+    kneePole: per(V(p.kneePole[0], p.kneePole[1], -p.kneePole[2]), p.kneePole),
+    elbowPole: per(V(p.elbowPole[0], p.elbowPole[1], -p.elbowPole[2]), p.elbowPole),
+    headBlend: p.headBlend,
+  };
+}
+
+/** One move of a stepper: these limbs travel `by` (the body follows by half for a pair, a quarter for one). */
+interface Step {
+  limbs: Limb[];
+  by: Vec;
+  label: string;
+}
+
+/**
+ * Hands and feet stepping in turn and the body travelling with them. Each step is its own phase (d runs 0 to 1
+ * across all of them), the moving hand or foot lifts in a small arc, and the steps add up to nothing, so the
+ * figure ends where it began. The travel is centred, so the camera frames the whole walk.
+ */
+function stepper(base: (B: Body) => FourPoint, steps: Step[], o: { dur?: number; handLift?: number; footLift?: number } = {}): Motion {
+  const n = steps.length;
+  // where everything is before each step
+  const keys: { body: Vec; off: Record<Limb, Vec> }[] = [];
+  let body = V(0, 0);
+  let off: Record<Limb, Vec> = { handL: V(0, 0), handR: V(0, 0), ankleL: V(0, 0), ankleR: V(0, 0) };
+  for (const s of steps) {
+    keys.push({ body, off });
+    off = { ...off };
+    for (const l of s.limbs) off[l] = add(off[l], s.by);
+    body = add(body, mul(s.by, s.limbs.length / 4));
+  }
+  keys.push({ body, off });
+  const lo = [0, 1, 2].map((a) => Math.min(...keys.map((k) => k.body[a]!)));
+  const hi = [0, 1, 2].map((a) => Math.max(...keys.map((k) => k.body[a]!)));
+  const centre = V((lo[0]! + hi[0]!) / 2, 0, (lo[2]! + hi[2]!) / 2);
+  return {
+    phases: steps.map((s, i): PhaseRow => [o.dur ?? 0.55, i / n, (i + 1) / n, s.label, 0.85]),
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const p = base(B);
+      const x = clamp(d, 0, 1) * n;
+      const i = Math.min(n - 1, Math.floor(x));
+      const t = x - i;
+      const a = keys[i]!;
+      const b = keys[i + 1]!;
+      const arc = Math.sin(Math.PI * t);
+      const moving = new Set(steps[i]!.limbs);
+      const shift = sub(lerpV(a.body, b.body, t), centre);
+      const out: FourPoint = { ...p, hip: add(p.hip, shift), sh: add(p.sh, shift) };
+      for (const l of LIMBS) {
+        const at = add(p[l], lerpV(a.off[l], b.off[l], t));
+        const lift = moving.has(l) ? arc * (l.startsWith("hand") ? (o.handLift ?? 0.07) : (o.footLift ?? 0.05)) : 0;
+        out[l] = add(sub(at, V(centre[0], 0, centre[2])), V(0, lift));
+      }
+      return fourPose(B, out);
+    },
+  };
+}
+
+/** `count` steps of a side-by-side pair (same-side hand and foot lead, the others follow), then back again. */
+function sidewaysSteps(stride: number, count: number, labels: [string, string]): Step[] {
+  const go = (sgn: number, label: string): Step[] => {
+    const lead = sgn > 0 ? "R" : "L";
+    const trail = sgn > 0 ? "L" : "R";
+    const by = V(0, 0, sgn * stride);
+    return [
+      { limbs: [`hand${lead}`, `ankle${lead}`] as Limb[], by, label },
+      { limbs: [`hand${trail}`, `ankle${trail}`] as Limb[], by, label },
+    ];
+  };
+  const steps: Step[] = [];
+  for (let k = 0; k < count; k++) steps.push(...go(1, labels[0]));
+  for (let k = 0; k < count; k++) steps.push(...go(-1, labels[1]));
+  return steps;
+}
+
+/** Sideways plank walk: high plank, a hand and the foot on the same side step out together, the others follow, hips level; then back. */
+function lateralPlankWalk(): Motion {
+  return stepper(highPlankBase, sidewaysSteps(0.18, 2, ["Walk right", "Walk back"]), { handLift: 0.06, footLift: 0.04 });
+}
+
+/** Sideways bear crawl: the bear position travelling to the side and back, knees hovering. */
+function lateralBearCrawl(): Motion {
+  return stepper(bearBase, sidewaysSteps(0.15, 2, ["Crawl right", "Crawl back"]), { dur: 0.5 });
+}
+
+/** Backward bear crawl: opposite hand and foot step back together, two strides, then forward to the start. */
+function backwardBearCrawl(): Motion {
+  const stride = 0.18;
+  const steps: Step[] = [];
+  const pair = (a: Limb[], dx: number, label: string): Step => ({ limbs: a, by: V(dx, 0), label });
+  for (let k = 0; k < 2; k++)
+    steps.push(pair(["handL", "ankleR"], -stride, "Crawl back"), pair(["handR", "ankleL"], -stride, "Crawl back"));
+  for (let k = 0; k < 2; k++) steps.push(pair(["handL", "ankleR"], stride, "Return"), pair(["handR", "ankleL"], stride, "Return"));
+  return stepper(bearBase, steps, { dur: 0.5 });
+}
+
+/** A still hold of a four-point pose, breathing. */
+function fourHold(base: (B: Body) => FourPoint): Motion {
+  return {
+    phases: TEMPO.hold(),
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const p = base(B);
+      return fourPose(B, { ...p, hip: add(p.hip, V(0, 0.01 * d)) });
+    },
+  };
+}
+
+/** Plank jacks: high plank, the feet jump wide and back together, hips staying low. */
+function plankJack(): Motion {
+  return {
+    phases: [
+      [0.45, 0, 1, "Jump out", 1],
+      [0.45, 1, 0, "Jump in", 1],
+    ],
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const p = highPlankBase(B);
+      const hop = Math.sin(Math.PI * d) * 0.04;
+      const z = lerp(0.1, 0.42, d);
+      return fourPose(B, {
+        ...p,
+        hip: add(p.hip, V(0, hop * 0.5)),
+        ankleL: V(p.ankleL[0], p.ankleL[1] + hop, -z),
+        ankleR: V(p.ankleR[0], p.ankleR[1] + hop, z),
+      });
+    },
+  };
+}
+
+/** Shoulder taps: from a high plank or bear position, each hand taps the other shoulder in turn while the hips stay square. */
+function shoulderTaps(base: (B: Body) => FourPoint): Motion {
+  return {
+    phases: [
+      [0.8, 0, 0.5, "Tap", 0.8],
+      [0.8, 0.5, 1, "Tap", 0.8],
+    ],
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const p = base(B);
+      const left = d < 0.5;
+      const k = Math.sin(Math.PI * (left ? d * 2 : d * 2 - 1));
+      const sgn = left ? -1 : 1; // the tapping hand's side
+      const hand: Limb = left ? "handL" : "handR";
+      // the tap lands on the front of the other shoulder; the body leans a little onto the standing hand
+      const tap = V(p.sh[0] - 0.04, p.sh[1] - 0.09, -sgn * B.shW * 0.85);
+      const lean = V(0, 0, -sgn * 0.03 * k);
+      const out: FourPoint = { ...p, hip: add(p.hip, mul(lean, 0.5)), sh: add(p.sh, lean) };
+      out[hand] = add(lerpV(p[hand], add(tap, lean), k), V(0, 0.05 * Math.sin(Math.PI * k)));
+      return fourPose(B, out);
+    },
+  };
+}
+
+/** Plank up-downs: forearms to hands one arm at a time, then back down, feet planted. */
+function plankUpDown(): Motion {
+  const ankleX = -0.95;
+  return {
+    phases: [
+      [0.6, 0, 0.25, "Up", 1],
+      [0.6, 0.25, 0.5, "Up", 1],
+      [0.6, 0.5, 0.75, "Down", 0.7],
+      [0.6, 0.75, 1, "Down", 0.7],
+    ],
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const seg = (a: number) => clamp((d - a) / 0.25, 0, 1);
+      const sL = d < 0.5 ? seg(0) : 1 - seg(0.5);
+      const sR = d < 0.5 ? seg(0.25) : 1 - seg(0.75);
+      const low = forearmPlankBase(B, ankleX);
+      const high = highPlankBase(B, ankleX);
+      const m = (sL + sR) / 2;
+      // the body pivots about the toes from the forearm height to the straight-arm height
+      const shY = lerp(low.sh[1], high.sh[1], m);
+      const Lb = legMax(B) * 0.99 + B.torso;
+      const ankle = V(ankleX, 0.11);
+      const th = Math.asin(clamp((shY - ankle[1]) / Lb, -1, 1));
+      const dir = V(Math.cos(th), Math.sin(th));
+      const hip = add(ankle, mul(dir, legMax(B) * 0.99));
+      const sh = add(hip, mul(dir, B.torso));
+      const handAt = (s: number, z: number): Vec => {
+        const forearm = V(sh[0] + B.fore * 0.92, 0.04, z * 0.12);
+        const straight = V(sh[0] + 0.02, 0.03, z * 0.22);
+        return add(lerpV(forearm, straight, s), V(0, 0.06 * Math.sin(Math.PI * s)));
+      };
+      const pole = (s: number, z: number): Vec => lerpV(V(-0.3, -1, z * 0.1), V(-0.7, 0.6, z * 0.7), s);
+      const pose = fourPose(B, { ...low, hip, sh, handL: handAt(sL, -1), handR: handAt(sR, 1), foot: lerp(low.foot, high.foot, m) });
+      return { ...pose, elbowPole: per(pole(sL, -1), pole(sR, 1)) };
+    },
+  };
+}
+
+/** Plank leg lifts: forearm plank, one straight leg lifts behind and lowers, then the other. */
+function plankLegLift(): Motion {
+  return {
+    phases: [
+      [0.9, 0, 0.5, "Lift", 0.8],
+      [0.9, 0.5, 1, "Lift", 0.8],
+    ],
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const p = forearmPlankBase(B);
+      const left = d < 0.5;
+      const k = Math.sin(Math.PI * (left ? d * 2 : d * 2 - 1));
+      const leg: Limb = left ? "ankleL" : "ankleR";
+      const hipJ = V(p.hip[0], p.hip[1], left ? -B.hipW : B.hipW);
+      const v = sub(p[leg], hipJ);
+      // swing the leg up about the hip, keeping its length
+      const a = rad(22 * k);
+      const up = V(v[0] * Math.cos(a) + v[1] * Math.sin(a), v[1] * Math.cos(a) - v[0] * Math.sin(a), v[2]);
+      const out: FourPoint = { ...p };
+      out[leg] = add(hipJ, up);
+      return fourPose(B, out);
+    },
+  };
+}
+
+/** Plank saw: forearm plank, the whole body rocks back over the elbows on the toes and forward again. */
+function plankSaw(): Motion {
+  return {
+    phases: [
+      [1.2, 0, 1, "Saw back", 0.9],
+      [1.2, 1, 0, "Pull forward", 0.9],
+    ],
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const p = forearmPlankBase(B);
+      const back = V(-0.15 * d, 0);
+      return fourPose(B, {
+        ...p,
+        hip: add(p.hip, back),
+        sh: add(p.sh, back),
+        ankleL: add(p.ankleL, back),
+        ankleR: add(p.ankleR, back),
+        foot: 55 + 18 * d,
+      });
+    },
+  };
+}
+
 /** Battle ropes: a half squat with the hands making fast alternating waves. */
 function battleRopes(): Motion {
   return {
@@ -3119,10 +3478,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-seated-calf-raise": () => calfRaise({ load: "dumbbell", hold: "each" }),
   "bent-over-calf-raise": () => calfRaise({ step: true, load: "none" }),
   "pogo-hops": () => calfRaise({ load: "none" }),
-  "plank-shoulder-tap": plank,
-  "high-plank": plank,
+  "plank-shoulder-tap": () => shoulderTaps(highPlankBase),
+  "high-plank": () => fourHold(highPlankBase),
   "side-plank-reach": () => sidePlank({}),
-  "side-plank-hip-drop": () => sidePlank({}),
+  "side-plank-hip-drop": () => sidePlank({ lift: true }),
   "reverse-crunch": () => floorCore({ kind: "legRaise" }),
   "heel-tap": () => floorCore({ kind: "crunch" }),
   "flutter-kicks": () => floorCore({ kind: "hollow" }),
@@ -3140,7 +3499,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "landmine-rotation": () => woodchop({ load: "handle" }),
   "cable-lift": () => woodchop({ load: "handle", anchor: true }),
   "half-kneeling-pallof": pallof,
-  "bear-plank": bearCrawl,
+  "bear-plank": () => fourHold(bearBase),
   "suitcase-march": () => carry({ hold: "R", load: "kettlebell" }),
   "plank-reach": plank,
   "seated-knee-tuck": () => floorCore({ kind: "vUp" }),
@@ -3159,7 +3518,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "star-jump": jumpingJack,
   "lateral-shuffle": cossack,
   "butt-kicks": () => run({ lift: 0.3, lean: 2 }),
-  "plank-jack": mountainClimber,
+  "plank-jack": plankJack,
   // batch b2 (2026-11-11)
   "smith-close-grip-press": () => benchPress({ load: "barbell", grip: 0.16, close: true }),
   "smith-decline-press": () => benchPress({ load: "barbell" }),
@@ -3305,7 +3664,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "high-handle-trap-bar-deadlift": () => deadlift({ trap: true }),
   "landmine-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
   "cable-rdl": () => rdl({ load: "none" }),
-  "plank-up-down": plank,
+  "plank-up-down": plankUpDown,
   "side-plank-star": () => sidePlank({ lift: true }),
   "long-lever-plank": plank,
   "full-tension-plank": plank,
@@ -3325,7 +3684,7 @@ const MOTIONS: Record<string, () => Motion> = {
   jackknife: () => floorCore({ kind: "vUp" }),
   "single-leg-v-up": () => floorCore({ kind: "vUp" }),
   "hanging-knee-tuck-twist": hangingRaise,
-  "bear-plank-shoulder-tap": bearCrawl,
+  "bear-plank-shoulder-tap": () => shoulderTaps(bearBase),
   "bird-dog-row": () => allFours({ kind: "birdDog" }),
   "plank-pull-through": plank,
   "landmine-anti-rotation": () => woodchop({ load: "handle" }),
@@ -3366,8 +3725,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "sled-drag": () => bentRow({ load: "handle", lean: 40 }),
   "battle-rope-slam": battleRopes,
   "crab-walk": () => bridge({}),
-  "lateral-bear-crawl": bearCrawl,
-  "backward-bear-crawl": bearCrawl,
+  "lateral-bear-crawl": lateralBearCrawl,
+  "backward-bear-crawl": backwardBearCrawl,
   sprawl: burpee,
   "burpee-broad-jump": burpee,
   "burpee-box-jump": boxJump,
@@ -3566,8 +3925,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "plank-hip-twist": plank,
   "side-plank-db-row": () => sidePlank({}),
   "spiderman-plank": mountainClimber,
-  "plank-saw": plank,
-  "plank-leg-lift": plank,
+  "plank-saw": plankSaw,
+  "plank-leg-lift": plankLegLift,
   "bird-dog-crunch": () => allFours({ kind: "birdDog" }),
   "heel-slide": deadBug,
   "single-leg-lower": () => floorCore({ kind: "legRaise" }),
@@ -3649,7 +4008,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "lateral-box-jump": boxJump,
   "box-step-over": stepUp,
   "line-hops": jumpSquat,
-  "lateral-plank-walk": plank,
+  "lateral-plank-walk": lateralPlankWalk,
   "duck-walk": () => squat({ hold: "hips", depth: 0.9 }),
   "jog-in-place": () => run({ lift: 0.4, lean: 2 }),
   "march-in-place": () => run({ lift: 0.6, lean: 0 }),
