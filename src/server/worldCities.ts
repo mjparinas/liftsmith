@@ -1,7 +1,8 @@
 // Major cities in every other country Liftsmith is in on Google Play (Melvin, 2026-11-14: "add every country's major
 // city that the Google Play Store is connected to"). The Play countries are the ones where English, Spanish, French,
 // German, Italian or Japanese is an official or main language (docs/decisions/google-play-review.md, "Production
-// countries"); Canada and the US are in majorCities.ts. Each country lists its biggest cities and its capital: about
+// countries"), plus Cuba (Melvin, 2026-11-14: "I love them"), whose gyms are on the map even though the
+// app can't be offered there; Canada and the US are in majorCities.ts. Each country lists its biggest cities and its capital: about
 // twenty for the biggest countries, a handful for mid-sized ones, the capital alone for the smallest. A city is written
 // "City, Country" so Nominatim finds the right one (there are Londons and Córdobas on several continents).
 
@@ -99,6 +100,7 @@ export const WORLD_CITIES: Record<string, WorldCountry> = {
   GT: c("Guatemala", ["Guatemala City", "Quetzaltenango", "Mixco"]),
   BO: c("Bolivia", ["Santa Cruz de la Sierra", "La Paz", "El Alto", "Cochabamba", "Sucre"]),
   DO: c("Dominican Republic", ["Santo Domingo", "Santiago de los Caballeros", "Punta Cana", "La Romana"]),
+  CU: c("Cuba", ["Havana", "Santiago de Cuba", "Camagüey", "Holguín", "Santa Clara", "Guantánamo", "Bayamo", "Pinar del Río", "Cienfuegos", "Matanzas"]),
   HN: c("Honduras", ["Tegucigalpa", "San Pedro Sula"]),
   PY: c("Paraguay", ["Asunción", "Ciudad del Este", "Encarnación"]),
   SV: c("El Salvador", ["San Salvador", "Santa Ana", "San Miguel"]),

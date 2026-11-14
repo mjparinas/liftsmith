@@ -3,8 +3,8 @@
 // "More details per gym"). OpenStreetMap comes first (gymImport.ts); this reads only the website the map links to, never
 // a directory or map site (their terms forbid it), and only to fill what's still empty.
 //
-// One polite visit per gym: its robots.txt first (a site that disallows our agent or everyone at "/" is skipped), then
-// its home page, with a time limit and a size cap. What we read, in order of trust: the page's structured data
+// One visit per gym: its home page only, with a time limit and a size cap, saying who we are in the user agent.
+// robots.txt isn't read (Melvin, 2026-11-14: "ignore robots.txt in the script"): it's one public home page a month. What we read, in order of trust: the page's structured data
 // (schema.org JSON-LD: a LocalBusiness, ExerciseGym, HealthClub, SportsActivityLocation or Organization with its
 // telephone, email, address and opening hours), then tel:, mailto: and Instagram or Facebook links on the page. An email
 // counts only on the gym's own domain, so a web designer's address in the footer isn't taken for the gym's.
@@ -22,7 +22,7 @@ export const ENRICH_LIMITS = {
   batch: 24,
   /** Sites read at once. */
   parallel: 6,
-  /** Each fetch (robots.txt, the page) gets this long. */
+  /** Each fetch gets this long. */
   fetchMs: 8_000,
   /** Bytes of a page we read; the details are near the top or in the footer of any normal home page. */
   maxBytes: 1_500_000,
@@ -42,44 +42,6 @@ export interface SiteDetails {
 }
 
 const EMPTY: SiteDetails = { phone: "", email: "", hours: "", address: "", postcode: "", instagram: "", facebook: "" };
-
-// --- robots.txt ---
-
-/** Whether robots.txt lets our agent read "/". Only the groups for "*" or our name count; an unreadable file allows. */
-export function robotsAllow(robots: string, agent = "liftsmith"): boolean {
-  const groups: { agents: string[]; rules: { allow: boolean; path: string }[] }[] = [];
-  let current: (typeof groups)[number] | null = null;
-  let lastWasAgent = false;
-  for (const raw of robots.split(/\r?\n/)) {
-    const line = raw.replace(/#.*/, "").trim();
-    const m = /^([A-Za-z-]+)\s*:\s*(.*)$/.exec(line);
-    if (!m) continue;
-    const key = m[1]!.toLowerCase();
-    const value = m[2]!.trim();
-    if (key === "user-agent") {
-      if (!current || !lastWasAgent) {
-        current = { agents: [], rules: [] };
-        groups.push(current);
-      }
-      current.agents.push(value.toLowerCase());
-      lastWasAgent = true;
-      continue;
-    }
-    lastWasAgent = false;
-    if (current && (key === "allow" || key === "disallow")) current.rules.push({ allow: key === "allow", path: value });
-  }
-  const mine = groups.filter((g) => g.agents.some((a) => a !== "*" && agent.includes(a)));
-  const rules = (mine.length ? mine : groups.filter((g) => g.agents.includes("*"))).flatMap((g) => g.rules);
-  // The longest matching rule wins; an empty Disallow allows everything.
-  let best: { allow: boolean; path: string } | null = null;
-  for (const r of rules) {
-    if (!r.path) continue;
-    const prefix = r.path.replace(/\*.*$/, "").replace(/\$$/, "");
-    if (!"/".startsWith(prefix)) continue;
-    if (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.allow)) best = r;
-  }
-  return best ? best.allow : true;
-}
 
 // --- Reading a page ---
 
@@ -316,9 +278,6 @@ export async function enrichPlace(
     return { id: p.id, name: p.name, site: p.website, filled, skipped, ms: Date.now() - started };
   };
   if (!publicHost(p.website)) return done([], "not a public web address");
-  const origin = new URL(p.website).origin;
-  const robots = await fetchText(fetcher, `${origin}/robots.txt`, "text/plain");
-  if (robots && robots.status >= 200 && robots.status < 300 && !robotsAllow(robots.text)) return done([], "robots.txt says no");
   const page = await fetchText(fetcher, p.website, "text/html");
   if (!page) return done([], "no answer");
   if (page.status >= 400) return done([], `HTTP ${page.status}`);
