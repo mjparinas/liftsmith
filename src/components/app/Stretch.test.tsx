@@ -66,7 +66,7 @@ describe("stretch library", () => {
     await user.click(screen.getByRole("button", { name: "Pick Wall calf stretch" }));
     expect(screen.getByRole("button", { name: "Pick Cobra" })).toHaveAttribute("aria-pressed", "true");
     await user.click(screen.getByRole("button", { name: "Start 2 stretches" }));
-    expect(location.hash).toBe("#/stretch/picked");
+    expect(location.hash).toBe("#/stretching/picked");
     unmount();
 
     render(<StretchScreen arg="picked" />);

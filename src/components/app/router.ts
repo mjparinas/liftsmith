@@ -44,11 +44,61 @@ export const ROUTES = [
 ] as const;
 export type Route = (typeof ROUTES)[number];
 
+// The name each screen has in the address bar, when it isn't the route's own (Melvin, 2026-11-14: the web URL says
+// what the screen is called). The old names keep working: a link, bookmark, notification or older app that opens
+// #/stats lands on Progress and the address is rewritten to #/progress. Links other people open (coach invites, shared
+// routines, gyms and clubs) are still made with the old names, so an older app on someone's phone can open them.
+export const URL_NAMES: Partial<Record<Route, string>> = {
+  stats: "progress",
+  achievements: "awards",
+  trainer: "coaching",
+  gym: "gyms",
+  stretch: "stretching",
+  training: "workout-preferences",
+};
+// The Body tab's two views have their own addresses (#/muscles, #/health); the old #/recovery opens the view the
+// tab would open. The route stays "recovery", with the view as its argument.
+export const BODY_VIEWS = ["muscles", "health"] as const;
+export type BodyView = (typeof BODY_VIEWS)[number];
+
+const BY_NAME = new Map<string, Route>([
+  ...ROUTES.map((r) => [r, r] as const),
+  ...Object.entries(URL_NAMES).map(([r, name]) => [name, r as Route] as const),
+]);
+
 export function parse(hash: string): { route: Route; arg?: string } {
-  const [, r, arg] = hash.replace(/^#/, "").split("/");
-  const route = (ROUTES as readonly string[]).includes(r) ? (r as Route) : "today";
+  const [, r = "", arg] = hash.replace(/^#/, "").split("/");
+  if ((BODY_VIEWS as readonly string[]).includes(r)) return { route: "recovery", arg: r };
+  const route = BY_NAME.get(r) ?? "today";
   return { route, arg };
 }
+
+// The Body view to open when none is named (the one the lifter last looked at, Health without Pro). Set by the Body
+// screen, which knows; until then Muscles.
+let bodyView: () => BodyView = () => "muscles";
+export function setBodyView(pick: () => BodyView) {
+  bodyView = pick;
+}
+
+/** The address of a screen: #/progress for Progress, #/muscles or #/health for Body. */
+export function hashOf(route: Route, arg?: string): string {
+  if (route === "recovery") return `#/${(BODY_VIEWS as readonly string[]).includes(arg ?? "") ? arg : bodyView()}`;
+  return `#/${URL_NAMES[route] ?? route}${arg ? `/${arg}` : ""}`;
+}
+
+/** The address a hash should show: an old name swapped for the screen's own, everything after it kept. */
+export function canonical(hash: string): string {
+  const m = /^#\/([^/]*)(.*)$/.exec(hash);
+  if (!m) return hash;
+  const [, name = "", rest = ""] = m;
+  if (name === "recovery") return hashOf("recovery");
+  const route = BY_NAME.get(name);
+  const want = route && URL_NAMES[route];
+  return want && want !== name ? `#/${want}${rest}` : hash;
+}
+
+/** Whether this address is that screen, under its own name or an old one. */
+export const isRoute = (hash: string, route: Route) => /^#\//.test(hash) && parse(hash).route === route;
 
 // The app's own history (AGENTS.md "Back button"). Each history entry the app makes carries how many of
 // the app's screens sit behind it and which screen that is, so back can tell "previous screen" from "left
@@ -116,7 +166,7 @@ function startTracking() {
 
 export function go(route: Route, arg?: string) {
   startTracking();
-  const hash = `#/${route}${arg ? `/${arg}` : ""}`;
+  const hash = hashOf(route, arg);
   if (hash === location.hash) return window.scrollTo(0, 0);
   // Going to the screen we came from is a step back, so the phone's back button doesn't return to the
   // screen just left (Settings › Training › "‹ Settings", then back, would open Training again).
@@ -168,7 +218,7 @@ guardTraversals();
 /** Swaps this history entry's screen for another, without adding a step for back to undo. */
 export function replaceRoute(route: Route, arg?: string) {
   startTracking();
-  const hash = `#/${route}${arg ? `/${arg}` : ""}`;
+  const hash = hashOf(route, arg);
   if (hash === location.hash) return;
   const e = entry();
   stamp(e?.depth ?? 0, e?.prev ?? "", hash);
@@ -187,11 +237,26 @@ export function goBack() {
   }
 }
 
+/** Rewrites an old screen name in the address to the screen's own, in place (no extra step for back). */
+export function tidyAddress() {
+  if (typeof location === "undefined") return;
+  const want = canonical(location.hash);
+  if (want === location.hash) return;
+  const e = entry();
+  rememberNext();
+  history.replaceState({ ...nextState, __ls: { ls: 1, depth: e?.depth ?? 0, prev: e?.prev ?? "", hash: want } satisfies Entry }, "", want);
+  if (tracking) lastHash = want;
+}
+
 export function useRoute() {
   const [h, setH] = useState(() => (typeof location === "undefined" ? "" : location.hash));
   useEffect(() => {
     startTracking();
-    const on = () => setH(location.hash);
+    const on = () => {
+      tidyAddress();
+      setH(location.hash);
+    };
+    on();
     window.addEventListener("hashchange", on);
     return () => window.removeEventListener("hashchange", on);
   }, []);

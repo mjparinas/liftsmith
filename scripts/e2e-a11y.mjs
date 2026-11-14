@@ -877,7 +877,7 @@ try {
     if (f.side && f.name === "Progress") {
       reached = true;
       await dp.keyboard.press("Enter");
-      await dp.waitForURL(/#\/stats/);
+      await dp.waitForURL(/#\/progress/);
     }
   }
   if (!reached) fail.push("desktop keyboard: couldn't reach the sidebar's Progress with Tab");

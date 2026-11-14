@@ -68,7 +68,7 @@ import { ProWelcome } from "./ProWelcome";
 import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
-import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
+import { go, goBack, historyDepth, isRoute, parse, useRoute, type Route } from "./router";
 import { ScreenBoundary } from "./ScreenBoundary";
 import { Settings } from "./Settings";
 import { SharedGym } from "./SharedGym";
@@ -279,7 +279,7 @@ export function App() {
     if (!ready) return;
     const run = (a: ShortcutAction, at?: number) => {
       const to = runShortcut(a, at);
-      if (!location.hash.startsWith(`#/${to}`)) go(to);
+      if (!isRoute(location.hash, to)) go(to);
     };
     const fromLink = linkAction(location.search);
     if (fromLink) {
@@ -376,7 +376,7 @@ export function App() {
     const code = pendingCoach();
     if (code) {
       if (readAccount()) savePendingCoach("");
-      if (!location.hash.startsWith("#/trainer")) go("trainer", code);
+      if (!isRoute(location.hash, "trainer")) go("trainer", code);
     }
     const look = () => {
       if (document.visibilityState === "visible") void refreshCoachNotes();
@@ -420,7 +420,7 @@ export function App() {
   const screens: Record<Route, ReactNode> = {
     today: <Today />,
     workout: <Workout />,
-    recovery: <Recovery />,
+    recovery: <Recovery view={arg} />,
     stats: <Stats />,
     gym: <Gym />,
     settings: <Settings />,
