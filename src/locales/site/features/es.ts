@@ -449,6 +449,10 @@ export const es: FeaturesText = {
       name: "Controles a una mano",
       body: "Mueve los botones de peso y repeticiones junto a Registrar serie, bajo tu pulgar izquierdo o derecho.",
     },
+    "big-numbers": {
+      name: "Números grandes",
+      body: "Durante una serie, el peso y las repeticiones se ven mucho más grandes y Registrar serie es más alto, y la música y lo siguiente esperan al descanso. Fácil de leer con el brazo estirado, en plena serie.",
+    },
     lean: {
       name: "Modo ligero, sonidos y vibración",
       body: "Desactiva animaciones y confeti, sonidos o vibración, cada uno con un interruptor.",

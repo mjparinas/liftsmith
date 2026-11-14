@@ -221,6 +221,24 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().active!.reps).toBe(held); // stops on release
   });
 
+  it("big numbers: bigger weight and reps and a taller Log set during a set, the extras back during rest", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings/workout";
+    await user.click(await screen.findByRole("switch", { name: "Big numbers" }));
+    expect(useApp.getState().profile.a11y?.big).toBe(true);
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    await user.click(await screen.findByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    const logSet = await screen.findByRole("button", { name: /Log set/ });
+    expect(logSet.className).toContain("py-8");
+    expect(document.querySelector("[class*='text-[min(4.75rem']")).not.toBeNull();
+    expect(screen.queryByRole("heading", { name: "Coming up" })).not.toBeInTheDocument();
+    await user.click(logSet);
+    expect(await screen.findByRole("heading", { name: "Coming up" })).toBeInTheDocument();
+  });
+
   it("switches language from Settings, for the app and the page", async () => {
     const user = userEvent.setup();
     await onboard(user);

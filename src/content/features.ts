@@ -872,6 +872,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "big-numbers",
+        name: "Big numbers",
+        body: "During a set, the weight and reps get much bigger and Log set gets taller, and the music and what's next wait until you rest. Easy to read at arm's length, mid-set.",
+        tier: "free",
+        added: "2026-11-14",
+      },
+      {
         id: "lean",
         name: "Lean mode, sounds and vibration",
         body: "Turn off motion and confetti, sounds or vibration, each with one switch.",

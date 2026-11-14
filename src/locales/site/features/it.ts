@@ -447,6 +447,10 @@ export const it: FeaturesText = {
       name: "Comandi a una mano",
       body: "Sposta i pulsanti di peso e ripetizioni accanto a Registra serie, sotto il pollice sinistro o destro.",
     },
+    "big-numbers": {
+      name: "Numeri grandi",
+      body: "Durante una serie, peso e ripetizioni diventano molto più grandi e Registra serie più alto, e la musica e il prossimo esercizio aspettano il recupero. Facile da leggere a un braccio di distanza, a metà serie.",
+    },
     lean: {
       name: "Modalità essenziale, suoni e vibrazione",
       body: "Spegni animazioni e coriandoli, suoni o vibrazione, ognuno con un interruttore.",

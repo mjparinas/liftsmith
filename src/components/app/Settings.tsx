@@ -418,6 +418,7 @@ function WorkoutGroup() {
         />
         <p className="mt-2 px-1 text-xs text-faint">{t("a11y.hand.note")}</p>
       </div>
+      <SwitchRow label={t("a11y.big")} hint={t("a11y.big.note")} on={a.big} onChange={(big) => setProfile({ a11y: { ...a, big } })} />
       <SwitchRow
         label={t("settings.sounds")}
         on={!!profile.restSounds}

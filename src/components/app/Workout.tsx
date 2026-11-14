@@ -461,11 +461,13 @@ export function Workout() {
       ? { weight: (item.setTargets?.[0] ?? item.target).weight, reps: (item.setTargets?.[0] ?? item.target).reps, rir: item.target.rir }
       : null;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
-  const hand = cleanA11y(profile.a11y).hand;
+  const { hand, big } = cleanA11y(profile.a11y);
   // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
   // "Sides differ" adds a stepper for the right side.
   const sidesSplit = !!ex && !!active && perSide(ex.id) && active.repsR !== undefined;
   const docked = hand !== "off";
+  // Big numbers ("quiet mode", Settings › Workout): only while a set is up, so rest keeps its extras.
+  const quiet = big && !resting && !finished;
   const weightStep =
     ex && gym && active
       ? {
@@ -740,7 +742,7 @@ export function Workout() {
               )}
             </div>
           ) : (
-            <div className="relative mt-4 h-52">
+            <div className={`relative mt-4 ${quiet ? "h-32" : "h-52"}`}>
               <LiftDemo
                 exerciseId={ex.id}
                 body={bodyFor(profile.sex)}
@@ -827,6 +829,7 @@ export function Workout() {
               doneSets={doneSets}
               warming={warming}
               docked={docked}
+              big={quiet}
               weightStep={weightStep}
               repStep={repStep}
               rightStep={rightStep}
@@ -842,9 +845,11 @@ export function Workout() {
         </>
       ) : null}
 
-      {!finished && (sonosOn() ? <SonosBar resting={resting} /> : <NowPlayingBar className="mt-3" />)}
-      {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
-      <AddExercise />
+      {!finished && !quiet && (sonosOn() ? <SonosBar resting={resting} /> : <NowPlayingBar className="mt-3" />)}
+      {!finished && !quiet && active.plan.items.length > active.index + 1 && <ComingUp />}
+      {!quiet && <AddExercise />}
+      {/* Big numbers' taller Log set needs a little more room under the set card. */}
+      {quiet && <div aria-hidden className="h-8" />}
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
@@ -921,7 +926,10 @@ export function Workout() {
                     aria-hidden
                   />
                 )}
-                <Button className={`relative w-full text-xl ${docked ? "h-full min-h-28 flex-col" : "py-5"}`} onClick={log}>
+                <Button
+                  className={`relative w-full ${quiet ? "text-2xl" : "text-xl"} ${docked ? `h-full flex-col ${quiet ? "min-h-36" : "min-h-28"}` : quiet ? "py-8" : "py-5"}`}
+                  onClick={log}
+                >
                   {warming ? t("workout.logWarmup") : t("workout.logSet")} <Icon name="check" size={24} strokeWidth={2.8} />
                   {lastOfAll && (
                     <span

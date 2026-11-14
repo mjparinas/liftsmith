@@ -453,6 +453,10 @@ export const de: FeaturesText = {
       name: "Einhändige Bedienung",
       body: "Leg die Tasten für Gewicht und Wiederholungen neben Satz eintragen, unter deinen linken oder rechten Daumen.",
     },
+    "big-numbers": {
+      name: "Große Zahlen",
+      body: "Während eines Satzes werden Gewicht und Wiederholungen viel größer und Satz eintragen höher, und Musik und was als Nächstes kommt warten bis zur Pause. Gut lesbar auf Armlänge, mitten im Satz.",
+    },
     lean: {
       name: "Schlichter Modus, Töne und Vibration",
       body: "Schalte Animationen und Konfetti, Töne oder Vibration ab, jeweils mit einem Schalter.",
