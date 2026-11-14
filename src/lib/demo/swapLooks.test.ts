@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 293;
+  const LOOK_ALIKES = 286;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -84,5 +84,53 @@ describe("swaps look different", () => {
     for (const e of EXERCISES)
       for (const a of alternatives(e.id, null).slice(0, 6)) if (of(e.id) === of(a.id)) same.add([e.id, a.id].sort().join(" "));
     expect(same.size).toBeLessThanOrEqual(LOOK_ALIKES);
+  });
+});
+
+describe("planks and crawls that move", () => {
+  // Melvin, 2026-11-13: the sideways plank walk showed a forearm plank holding still.
+  const at = (id: string, d: number) => jointsAt(motionFor(id), B, d);
+  const ds = (id: string) => {
+    const n = motionFor(id).phases.length;
+    return Array.from({ length: n * 4 + 1 }, (_, i) => i / (n * 4));
+  };
+
+  it("walks the sideways plank on straight arms, hips level, out to one side and back", () => {
+    const zs = ds("lateral-plank-walk").map((d) => at("lateral-plank-walk", d));
+    const hipZ = zs.map((J) => J.hipC[2]);
+    expect(Math.max(...hipZ) - Math.min(...hipZ)).toBeGreaterThan(0.3);
+    expect(hipZ[0]).toBeCloseTo(hipZ[hipZ.length - 1]!, 5);
+    const hipY = zs.map((J) => J.hipC[1]);
+    expect(Math.max(...hipY) - Math.min(...hipY)).toBeLessThan(0.005);
+    // on the hands, not the forearms: the elbows stay well off the floor
+    for (const J of zs) expect(Math.min(J.elbowL[1], J.elbowR[1])).toBeGreaterThan(0.2);
+    // the right hand and right foot step out together
+    const q = at("lateral-plank-walk", 1 / 16);
+    const s = at("lateral-plank-walk", 0);
+    expect(q.handR[1]).toBeGreaterThan(s.handR[1] + 0.03);
+    expect(q.ankleR[1]).toBeGreaterThan(s.ankleR[1] + 0.02);
+    expect(q.handL[1]).toBeCloseTo(s.handL[1], 3);
+  });
+
+  it("moves the sideways bear crawl to the side and the backward one backwards", () => {
+    const side = ds("lateral-bear-crawl").map((d) => at("lateral-bear-crawl", d).hipC[2]);
+    expect(Math.max(...side) - Math.min(...side)).toBeGreaterThan(0.25);
+    const back = ds("backward-bear-crawl").map((d) => at("backward-bear-crawl", d).hipC[0]);
+    expect(back[0]! - Math.min(...back)).toBeGreaterThan(0.3);
+    expect(look("bear-crawl")).not.toBe(look("lateral-bear-crawl"));
+  });
+
+  it("jumps the feet wide on plank jacks, taps shoulders, and goes forearms to hands on up-downs", () => {
+    const j0 = at("plank-jack", 0),
+      j1 = at("plank-jack", 1);
+    expect(j1.ankleR[2] - j1.ankleL[2]).toBeGreaterThan(j0.ankleR[2] - j0.ankleL[2] + 0.5);
+    const tap = at("plank-shoulder-tap", 0.25);
+    expect(tap.handL[2]).toBeGreaterThan(0.05); // across to the right shoulder
+    expect(tap.handL[1]).toBeGreaterThan(0.2);
+    const down = at("plank-up-down", 0),
+      up = at("plank-up-down", 0.5);
+    expect(down.elbowL[1]).toBeLessThan(0.12);
+    expect(up.elbowL[1]).toBeGreaterThan(0.2);
+    expect(at("high-plank", 0).elbowL[1]).toBeGreaterThan(0.2);
   });
 });
