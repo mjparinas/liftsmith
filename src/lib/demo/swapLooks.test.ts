@@ -54,14 +54,7 @@ describe("the gear each exercise needs is drawn", () => {
   // Melvin, 2026-11-14: "Make sure exercises with walls have them, door frame exercises have a door frame,
   // kettle bells, dumbbells, barbells, cables, etc have what they say they do"
   /** Still drawn without their bench or box until their posture is redone (seated, side-lying, chest-down). */
-  const LATER = new Set([
-    "copenhagen-plank",
-    "short-copenhagen-plank",
-    "db-kickback",
-    "side-lying-lateral-raise",
-    "db-external-rotation",
-    "barbell-rollout",
-  ]);
+  const LATER = new Set(["copenhagen-plank", "short-copenhagen-plank"]);
   function missing(id: string, needs: readonly string[]): string[] {
     const m = motionFor(id);
     const kinds = new Set(props(id).map((p) => p.kind));
