@@ -165,7 +165,7 @@ export function HeroLift({ labels, plates: platesByStep, words: w, names, locale
           cam.lookAt(tg[0], tg[1], tg[2]);
           cam.updateMatrixWorld();
           const project = (q: Vec) => {
-            const w = placeVec(q, f.roll, f.place.lift, f.place.shiftZ);
+            const w = placeVec(q, f.roll, f.place.lift, f.place.shiftZ, f.yaw);
             v.set(w[0], w[1], w[2]).project(cam);
             return { x: ((v.x + 1) / 2) * size[0], y: ((1 - v.y) / 2) * size[1] };
           };

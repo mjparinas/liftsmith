@@ -9,8 +9,9 @@ import { useAccount, type Account } from "@/lib/auth";
 import { noteOnline, useNet } from "@/lib/net";
 import { useSocial } from "@/lib/social";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
-import { resetDb } from "@/server/db";
+import { query, resetDb } from "@/server/db";
 import { handle } from "@/server/social";
+import { moderate } from "@/server/socialModeration";
 
 import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
 import { SendToFriend } from "./SendToFriend";
@@ -86,9 +87,35 @@ describe("Friends", () => {
     render(<PersonScreen handle="blair" />);
     await u.click(await screen.findByRole("button", { name: "Block or report Blair" }));
     await u.click(screen.getByRole("button", { name: "Report profile" }));
-    await u.click(screen.getByRole("button", { name: "Spam or scam" }));
+    // A profile's own fixed reasons; "Something else" asks for a note.
+    expect(screen.getByRole("button", { name: "Pretending to be someone else" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Under 13" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Dangerous advice" })).toBeNull();
+    await u.click(screen.getByRole("button", { name: "Something else" }));
+    await u.type(screen.getByLabelText("Tell us more (optional)"), "Copies my photos");
     await u.click(screen.getByRole("button", { name: "Send report" }));
     expect(await screen.findByText("Thanks. We’ll take a look.")).toBeInTheDocument();
+    const [r] = await query("SELECT reason, note FROM reports");
+    expect(r).toMatchObject({ reason: "other", note: "Copies my photos" });
+  });
+
+  it("tells a warned lifter why, until Got it, and says nothing about a shadow ban", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await moderate("acc-a", { action: "warn", reason: "abuse" });
+    signIn("tok-a");
+    render(<Friends />);
+    expect(await screen.findByRole("heading", { name: "A warning from the Liftsmith team" })).toBeInTheDocument();
+    expect(screen.getByText("Reason: Bullying or harassment")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Got it" }));
+    await waitFor(() => expect(screen.queryByRole("heading", { name: "A warning from the Liftsmith team" })).toBeNull());
+    cleanup();
+
+    await moderate("acc-a", { action: "shadow" });
+    useSocial.setState({ me: null, error: null });
+    render(<Friends />);
+    expect(await screen.findByText("No workouts yet")).toBeInTheDocument();
+    expect(screen.queryByText(/suspended|banned/i)).toBeNull();
   });
 
   it("rings the bell for someone the lifter follows, and silences it again", async () => {
@@ -123,7 +150,7 @@ describe("Friends", () => {
           autoPost: false,
           weights: true,
           public: false,
-          push: { follows: true, comments: true, sent: true, likes: false, cheers: true, posts: true },
+          push: { follows: true, comments: true, sent: true, likes: false, cheers: true, posts: true, checkins: true },
           avatar: "",
           audience: "all",
           showLifts: true,

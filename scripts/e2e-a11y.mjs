@@ -580,7 +580,29 @@ try {
     setup: {},
     forms: [],
     checkins: [],
-    slots: [],
+    // The schedule's month calendar (2026-11-14): a booked and an open time two days from now.
+    slots: client
+      ? []
+      : [
+          {
+            id: "s1",
+            coachId: "a",
+            start: Date.now() + 2 * 86_400_000,
+            minutes: 60,
+            place: "Main gym",
+            clientId: "c1",
+            bookedAt: Date.now(),
+          },
+          {
+            id: "s2",
+            coachId: "a",
+            start: Date.now() + 2 * 86_400_000 + 7_200_000,
+            minutes: 45,
+            place: "",
+            clientId: null,
+            bookedAt: null,
+          },
+        ],
     sessions: { booked: [], open: [] },
     pay: null,
     coach: !client,
@@ -596,6 +618,9 @@ try {
   await page.goto(`${server.url}/app/#/trainer/messages`);
   await page.getByRole("button", { name: /Alex/ }).waitFor();
   await scan("coaching messages");
+  await page.goto(`${server.url}/app/#/trainer/schedule`);
+  await page.getByTestId("schedule-calendar").waitFor();
+  await scan("coaching schedule");
   coachClient = true;
   await page.goto(`${server.url}/app/#/trainer`);
   await page.reload();
@@ -877,7 +902,7 @@ try {
     if (f.side && f.name === "Progress") {
       reached = true;
       await dp.keyboard.press("Enter");
-      await dp.waitForURL(/#\/stats/);
+      await dp.waitForURL(/#\/progress/);
     }
   }
   if (!reached) fail.push("desktop keyboard: couldn't reach the sidebar's Progress with Tab");

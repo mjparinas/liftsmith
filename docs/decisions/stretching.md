@@ -24,7 +24,7 @@ Melvin asked on 2026-11-11: "add all kinds of different stretches, this should b
 - **Before a workout:** Today's "Warm up first" chip opens the warm-up for today's plan (`#/stretch/warmup`). Settings › Workout › *Warm up before every workout* (off by default) makes Start open it first. Either way it's a list with a reason under each stretch, a Start button and **Skip and start lifting**; the end screen's button is Start workout. Off by default because Start must stay one tap for everyone else ("Focus on the workout").
 - **After a workout:** Done shows a *Cool down* card for the muscles just trained (`#/stretch/cooldown`). Settings › Workout › *Offer a cool-down* (on by default) hides it.
 - **Rest days:** Today's rest-day card offers *Stretch today* (`#/stretch/rest`): holds for what trained in the last two days, or the whole body.
-- **Any day:** Progress › All tools › *Stretch library* (`#/stretch`). Filter by kind and muscle, tap a stretch for its demo and how-to (and *Do this one*), or tick several and *Start*. Picks stay for the session.
+- **Any day:** a *Stretch library* card on Today (under the plan, every day but during a workout; Melvin, 2026-11-14: "Can you add it on today") and Progress › All tools › *Stretch library* (`#/stretch`). Filter by kind and muscle, tap a stretch for its demo and how-to (and *Do this one*), or tick several and *Start*. Picks stay for the session.
 - Suggestions are about five minutes (eight on a rest day), seeded by day, picked to cover the most of the day's muscles. The lifter can drop any before starting.
 
 ## The player

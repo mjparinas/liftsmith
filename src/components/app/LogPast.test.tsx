@@ -84,9 +84,9 @@ describe("log a past workout", () => {
 describe("the retired /me/ dashboard", () => {
   it("sends old links to the closest app screen", () => {
     expect(appHashFor("#/log")).toBe("#/log");
-    expect(appHashFor("#/trophies")).toBe("#/achievements");
+    expect(appHashFor("#/trophies")).toBe("#/awards");
     expect(appHashFor("#/friends")).toBe("#/friends");
-    expect(appHashFor("#/history/s-1")).toBe("#/stats");
-    expect(appHashFor("")).toBe("#/stats");
+    expect(appHashFor("#/history/s-1")).toBe("#/progress");
+    expect(appHashFor("")).toBe("#/progress");
   });
 });

@@ -1,66 +1,48 @@
 import type { Message } from "@/lib/i18n";
 
-// Text for keys starting "buddy.", in every language. English is the source: add a key here first,
-// then its Spanish and French. A missing translation falls back to English.
+// Text for keys starting "buddy.", in every language: a friend's check-in as the toast shows it (src/lib/buddy.ts).
+// English is the source.
 
 export const en = {
-  "buddy.crew": "crew",
-  "buddy.hi": "Hey {who}! ",
-  "buddy.at": "I'm at the gym. Your turn 💪",
-  "buddy.atGym": "I'm at the gym at {gym}. Your turn 💪",
-  "buddy.atFocus": "I'm at the gym, training {focus} today. Your turn 💪",
-  "buddy.atGymFocus": "I'm at the gym at {gym}, training {focus} today. Your turn 💪",
-  "buddy.shareTitle": "Tell your gym buddies",
+  "buddy.at": "{name} is at the gym. Your turn 💪",
+  "buddy.atGym": "{name} is at {gym}. Your turn 💪",
+  "buddy.atFocus": "{name} is at the gym, training {focus} today. Your turn 💪",
+  "buddy.atGymFocus": "{name} is at {gym}, training {focus} today. Your turn 💪",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
-  "buddy.crew": "equipo",
-  "buddy.hi": "¡Hola, {who}! ",
-  "buddy.at": "Estoy en el gimnasio. Te toca 💪",
-  "buddy.atGym": "Estoy en el gimnasio, en {gym}. Te toca 💪",
-  "buddy.atFocus": "Estoy en el gimnasio, hoy toca {focus}. Te toca 💪",
-  "buddy.atGymFocus": "Estoy en el gimnasio, en {gym}, hoy toca {focus}. Te toca 💪",
-  "buddy.shareTitle": "Avisa a tus compañeros de gimnasio",
+  "buddy.at": "{name} está en el gimnasio. Te toca 💪",
+  "buddy.atGym": "{name} está en {gym}. Te toca 💪",
+  "buddy.atFocus": "{name} está en el gimnasio, hoy toca {focus}. Te toca 💪",
+  "buddy.atGymFocus": "{name} está en {gym}, hoy toca {focus}. Te toca 💪",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
-  "buddy.crew": "l’équipe",
-  "buddy.hi": "Salut {who} ! ",
-  "buddy.at": "Je suis à la salle. À ton tour 💪",
-  "buddy.atGym": "Je suis à la salle, à {gym}. À ton tour 💪",
-  "buddy.atFocus": "Je suis à la salle, au programme aujourd’hui : {focus}. À ton tour 💪",
-  "buddy.atGymFocus": "Je suis à la salle, à {gym}, au programme aujourd’hui : {focus}. À ton tour 💪",
-  "buddy.shareTitle": "Prévenez vos partenaires de salle",
+  "buddy.at": "{name} est à la salle. À toi de jouer 💪",
+  "buddy.atGym": "{name} est à {gym}. À toi de jouer 💪",
+  "buddy.atFocus": "{name} est à la salle, au programme aujourd’hui : {focus}. À toi de jouer 💪",
+  "buddy.atGymFocus": "{name} est à {gym}, au programme aujourd’hui : {focus}. À toi de jouer 💪",
 };
 
 export const de: Partial<Record<Key, Message>> = {
-  "buddy.crew": "Crew",
-  "buddy.hi": "Hey {who}!",
-  "buddy.at": "Ich bin im Studio. Du bist dran 💪",
-  "buddy.atGym": "Ich bin im Studio {gym}. Du bist dran 💪",
-  "buddy.atFocus": "Ich bin im Studio und trainiere heute {focus}. Du bist dran 💪",
-  "buddy.atGymFocus": "Ich bin im Studio {gym} und trainiere heute {focus}. Du bist dran 💪",
-  "buddy.shareTitle": "Sag es deinen Trainingspartnern",
+  "buddy.at": "{name} ist im Studio. Du bist dran 💪",
+  "buddy.atGym": "{name} ist im Studio {gym}. Du bist dran 💪",
+  "buddy.atFocus": "{name} ist im Studio und trainiert heute {focus}. Du bist dran 💪",
+  "buddy.atGymFocus": "{name} ist im Studio {gym} und trainiert heute {focus}. Du bist dran 💪",
 };
 
 export const it: Partial<Record<Key, Message>> = {
-  "buddy.crew": "squadra",
-  "buddy.hi": "Ciao {who}!",
-  "buddy.at": "Sono in palestra. Tocca a te 💪",
-  "buddy.atGym": "Sono in palestra da {gym}. Tocca a te 💪",
-  "buddy.atFocus": "Sono in palestra, oggi alleno {focus}. Tocca a te 💪",
-  "buddy.atGymFocus": "Sono in palestra da {gym}, oggi alleno {focus}. Tocca a te 💪",
-  "buddy.shareTitle": "Dillo ai tuoi compagni di palestra",
+  "buddy.at": "{name} è in palestra. Tocca a te 💪",
+  "buddy.atGym": "{name} è in palestra da {gym}. Tocca a te 💪",
+  "buddy.atFocus": "{name} è in palestra, oggi allena {focus}. Tocca a te 💪",
+  "buddy.atGymFocus": "{name} è in palestra da {gym}, oggi allena {focus}. Tocca a te 💪",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
-  "buddy.crew": "仲間",
-  "buddy.hi": "{who}さん、",
-  "buddy.at": "ジムに来たよ。次はあなたの番 💪",
-  "buddy.atGym": "{gym}に来たよ。次はあなたの番 💪",
-  "buddy.atFocus": "ジムで今日は{focus}をトレーニング中。次はあなたの番 💪",
-  "buddy.atGymFocus": "{gym}で今日は{focus}をトレーニング中。次はあなたの番 💪",
-  "buddy.shareTitle": "ジム仲間に知らせる",
+  "buddy.at": "{name}さんがジムに来ました。次はあなたの番 💪",
+  "buddy.atGym": "{name}さんが{gym}に来ました。次はあなたの番 💪",
+  "buddy.atFocus": "{name}さんが今日はジムで{focus}をトレーニング中。次はあなたの番 💪",
+  "buddy.atGymFocus": "{name}さんが今日は{gym}で{focus}をトレーニング中。次はあなたの番 💪",
 };

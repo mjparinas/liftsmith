@@ -80,6 +80,7 @@ export async function figureStill(o: StillOptions): Promise<HTMLCanvasElement | 
       body,
       place,
       roll: place.roll(d),
+      yaw: place.yaw(d),
       meshes,
       skel: { arr: new Float32Array(SKEL_MAX * 6), count: 0 },
       changed: true,

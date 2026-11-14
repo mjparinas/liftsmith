@@ -10,6 +10,7 @@ import { readAccount, useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
+import { refreshCheckins, useCheckins } from "@/lib/buddy";
 import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInvite";
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
@@ -44,6 +45,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { Account } from "./Account";
 import { Achievements, useGame } from "./Achievements";
+import { CheckinToasts } from "./CheckinToasts";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExerciseLibrary } from "./ExerciseLibrary";
@@ -68,7 +70,7 @@ import { ProWelcome } from "./ProWelcome";
 import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
-import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
+import { go, goBack, historyDepth, isRoute, parse, useRoute, type Route } from "./router";
 import { ScreenBoundary } from "./ScreenBoundary";
 import { Settings } from "./Settings";
 import { SharedGym } from "./SharedGym";
@@ -279,7 +281,7 @@ export function App() {
     if (!ready) return;
     const run = (a: ShortcutAction, at?: number) => {
       const to = runShortcut(a, at);
-      if (!location.hash.startsWith(`#/${to}`)) go(to);
+      if (!isRoute(location.hash, to)) go(to);
     };
     const fromLink = linkAction(location.search);
     if (fromLink) {
@@ -376,17 +378,24 @@ export function App() {
     const code = pendingCoach();
     if (code) {
       if (readAccount()) savePendingCoach("");
-      if (!location.hash.startsWith("#/trainer")) go("trainer", code);
+      if (!isRoute(location.hash, "trainer")) go("trainer", code);
     }
     const look = () => {
-      if (document.visibilityState === "visible") void refreshCoachNotes();
+      if (document.visibilityState === "visible") {
+        void refreshCoachNotes();
+        void refreshCheckins();
+      }
     };
     look();
     document.addEventListener("visibilitychange", look);
     const off = useAccount.subscribe((now, before) => {
-      if (before.account && !now.account) forgetNotes();
+      if (before.account && !now.account) {
+        forgetNotes();
+        useCheckins.setState({ checkins: [] });
+      }
       if (now.account && !before.account) {
         void refreshCoachNotes(Date.now(), true);
+        void refreshCheckins(Date.now(), true);
         // Signed in (or just made an account) with a coach's code waiting: back to Coaching with it filled in.
         const waiting = pendingCoach();
         if (waiting) {
@@ -420,7 +429,7 @@ export function App() {
   const screens: Record<Route, ReactNode> = {
     today: <Today />,
     workout: <Workout />,
-    recovery: <Recovery />,
+    recovery: <Recovery view={arg} />,
     stats: <Stats />,
     gym: <Gym />,
     settings: <Settings />,
@@ -480,6 +489,9 @@ export function App() {
           key={route}
           className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
         >
+          {/* Friends' check-ins stay at the top of every screen but the workout until closed (Check in, 2026-11-14).
+              In the page rather than over it, so they never cover a screen's own header. */}
+          <CheckinToasts hidden={route === "workout"} />
           <ScreenBoundary>{screen}</ScreenBoundary>
         </main>
       </div>

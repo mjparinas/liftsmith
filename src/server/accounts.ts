@@ -303,6 +303,30 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
   ]);
 }
 
+/**
+ * Admin "Reset account" (Melvin, 2026-11-14: "reset an account (clear everything, but keep their login
+ * information)"; docs/decisions/moderation.md). Clears what the lifter made: synced workouts, body data and settings,
+ * shared links, Friends, coaching links and chats, shared gym setups, and connected apps (revoked at each service).
+ * Keeps the account, its sign-in methods, staff notes, and everything that pays or proves Pro: store purchases on its
+ * installs, a web subscription, coach payments, earned Pro, school team membership and gym ownership. Every device
+ * is signed out, which wipes it (the app's signed-out path, signOutDevice.ts), so the old data can't sync back; the
+ * lifter signs in again to an empty account. A suspended or banned Friends profile stays, so a reset can't undo it.
+ */
+export async function resetAccount(accountId: string): Promise<void> {
+  await forgetAll(accountId).catch(() => null);
+  const [p] = await query("SELECT suspended FROM social_profiles WHERE account_id = ?", [accountId]);
+  const keepProfile = Number(p?.suspended ?? 0) !== 0;
+  await batch([
+    { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM account_sessions WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
+    ...socialDeletes(accountId).filter((x) => !(keepProfile && x.sql.startsWith("DELETE FROM social_profiles"))),
+    ...coachCleanup(accountId),
+    ...gymDeletes(accountId),
+  ]);
+}
+
 // --- Sign in with Apple's REST API: the client secret, the code exchange and revoking on delete. ---
 
 /** APPLE_TEAM_ID, APPLE_KEY_ID and APPLE_PRIVATE_KEY (a Sign in with Apple .p8 key). Without them nothing is exchanged or revoked. */

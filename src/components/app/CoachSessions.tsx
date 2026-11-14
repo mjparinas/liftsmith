@@ -5,32 +5,42 @@
 // Your clients (a day chip, the time, a length, once or every week, a place) and either leaves them open for clients to
 // book or books one client straight in, also from that client's report. Clients book an open time under Your coach,
 // add it to their calendar and can cancel; a session in the next day shows on Today. Everything is taps except the
-// time (the phone's own time picker) and an optional place.
-import { useState } from "react";
+// time (the phone's own time picker) and an optional place. The coach's Schedule is a month calendar (2026-11-14; Melvin:
+// "this long list is not intuitive, can you make this a calendar view … switch between months").
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import {
   addSlots,
+  BOOK_AHEAD_DAYS,
   bookSlot,
   byDay,
   cancelSlot,
   clock,
   DAYS_AHEAD,
+  daysFromToday,
+  lastScheduleMonth,
   LENGTHS,
   nextSession,
+  openingDay,
   REPEATS,
   sessionToCalendar,
+  slotsByDayKey,
   startAt,
   when,
   type Sessions,
   type Slot,
 } from "@/lib/booking";
+import { dayKey, monthGrid, weekdayNames } from "@/lib/dashboard";
+import { monthOf, monthsBetween, shiftMonth, type YearMonth } from "@/lib/history";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { trainerError, useCoachNotes, type Person, type Role } from "@/lib/trainer";
+import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
 import { Button, Chip, Section, Sheet } from "./ui";
+import { useMonthSwipe } from "./useMonthSwipe";
 
 const FIELD = "mt-1 w-full rounded-xl border border-line bg-raised px-3 py-2";
 const dayLabel = (ms: number) => date(ms, { weekday: "long", month: "short", day: "numeric" });
@@ -43,7 +53,7 @@ function SlotLine({ s }: { s: Slot }) {
 
 // --- The coach's side ---
 
-/** Under Your clients: the next times, open or booked, and Add times. */
+/** Coaching › Schedule: a month calendar of times, open or booked; tap a day for its times. Add times opens on that day. */
 export function CoachSessions({
   slots,
   clients,
@@ -57,6 +67,13 @@ export function CoachSessions({
 }) {
   const [adding, setAdding] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const now = useNow(60_000);
+  const thisMonth = monthOf(now);
+  const lastMonth = lastScheduleMonth(now, slots);
+  const [ym, setYm] = useState<YearMonth>(thisMonth);
+  const [picked, setPicked] = useState<string | null>(null);
+  const days = useMemo(() => slotsByDayKey(slots), [slots]);
+  const selected = picked ?? openingDay(slots, ym, now);
   const name = (id: string | null) => (id ? clients.find((c) => c.id === id)?.name || t("trn.noName") : null);
   const remove = async (s: Slot) => {
     try {
@@ -70,27 +87,143 @@ export function CoachSessions({
       setNote(trainerError(e));
     }
   };
-  const shown = slots.slice(0, 12);
+
+  const canBack = monthsBetween(thisMonth, ym) > 0;
+  const canNext = monthsBetween(ym, lastMonth) > 0;
+  const shift = (by: number) => {
+    if ((by < 0 && !canBack) || (by > 0 && !canNext)) return;
+    haptic("select");
+    setYm((cur) => shiftMonth(cur, by));
+    setPicked(null);
+  };
+  const swipe = useMonthSwipe(shift);
+  const pick = (key: string) => {
+    haptic("select");
+    setPicked(key);
+  };
+
+  const month = date(new Date(ym.y, ym.m, 1), { month: "long", year: "numeric" });
+  const monthSlots = slots.filter((s) => monthsBetween(monthOf(s.start), ym) === 0);
+  const counts = (list: readonly Slot[]) => {
+    const b = list.filter((s) => s.clientId).length;
+    return [...(b ? [t("bk.bookedN", { count: b })] : []), ...(list.length - b ? [t("bk.openN", { count: list.length - b })] : [])];
+  };
+  const todayKey = dayKey(now);
+  const daySlots = selected ? (days.get(selected) ?? []) : [];
+  const selectedMs = selected ? new Date(`${selected}T12:00:00`).getTime() : null;
+  // Add times opens on the picked day when it's today or later; otherwise on tomorrow, as before.
+  const firstDay = selectedMs === null ? 1 : daysFromToday(now, selectedMs);
+
   return (
     <Section title={t("bk.title")} icon="calendar">
-      <div className="card p-4">
-        <p className="text-sm text-muted">{role === "coach" ? t("bk.hintCoach") : t("bk.hint")}</p>
-        <Button className="mt-3 w-full" icon="plus" onClick={() => setAdding(true)}>
-          {t("bk.add")}
-        </Button>
-        {note && (
-          <p className="mt-2 text-sm text-muted" role="status">
-            {note}
-          </p>
-        )}
-      </div>
-      {shown.length > 0 ? (
-        <div className="mt-2 space-y-2">
-          {byDay(shown).map((d) => (
-            <div key={d.day}>
-              <p className="mb-1 px-1 text-sm font-semibold">{dayLabel(d.day)}</p>
-              <ul className="card divide-y divide-line">
-                {d.slots.map((s) => (
+      {/* Desktop: Add times and the calendar share the left column, and the picked day's times sit on the right, level
+          with the calendar's top. */}
+      <div className="desk:grid desk:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] desk:items-start desk:gap-x-3">
+        <div className="card p-4 desk:col-start-1 desk:row-start-1">
+          <p className="text-sm text-muted">{role === "coach" ? t("bk.hintCoach") : t("bk.hint")}</p>
+          <Button className="mt-3 w-full" icon="plus" onClick={() => setAdding(true)}>
+            {t("bk.add")}
+          </Button>
+          {note && (
+            <p className="mt-2 text-sm text-muted" role="status">
+              {note}
+            </p>
+          )}
+        </div>
+        <section className="card mt-2 p-3 desk:col-start-1 desk:row-start-2" aria-label={month} data-testid="schedule-calendar" {...swipe}>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => shift(-1)}
+              disabled={!canBack}
+              className="press grid h-11 w-11 place-items-center rounded-xl border border-line bg-raised disabled:opacity-40"
+              aria-label={t("dash.prevMonth")}
+            >
+              <Icon name="chevronLeft" size={20} />
+            </button>
+            <h3 className="text-center leading-tight" aria-live="polite">
+              <span className="block font-semibold">{month}</span>{" "}
+              <span className="num block text-sm text-muted">{monthSlots.length ? counts(monthSlots).join(" · ") : t("bk.monthNone")}</span>
+            </h3>
+            <button
+              type="button"
+              onClick={() => shift(1)}
+              disabled={!canNext}
+              className="press grid h-11 w-11 place-items-center rounded-xl border border-line bg-raised disabled:opacity-40"
+              aria-label={t("dash.nextMonth")}
+            >
+              <Icon name="chevronRight" size={20} />
+            </button>
+          </div>
+          <table key={`${ym.y}-${ym.m}`} className="fade w-full table-fixed border-separate border-spacing-0.5">
+            <thead>
+              <tr>
+                {weekdayNames().map((d) => (
+                  <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">
+                    {d}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {monthGrid(ym.y, ym.m).map((row, i) => (
+                <tr key={i}>
+                  {row.map((d, j) => {
+                    if (!d) return <td key={j} />;
+                    const list = days.get(d.key) ?? [];
+                    const b = list.filter((s) => s.clientId).length;
+                    const o = list.length - b;
+                    const on = selected === d.key;
+                    const past = d.key < todayKey;
+                    const label = [date(d.ms, { weekday: "long", month: "long", day: "numeric" }), ...counts(list)].join(", ");
+                    return (
+                      <td key={d.key}>
+                        <button
+                          type="button"
+                          aria-pressed={on}
+                          aria-label={label}
+                          aria-current={d.key === todayKey ? "date" : undefined}
+                          onClick={() => pick(d.key)}
+                          className={`press flex h-11 w-full flex-col items-center justify-center gap-0.5 rounded-xl border ${on ? "border-accent" : "border-transparent"} ${list.length ? "bg-accent/15" : ""} ${d.key === todayKey ? "ring-2 ring-accent ring-inset" : ""}`}
+                        >
+                          <span className={`num text-sm ${list.length ? "font-semibold" : past ? "text-faint" : "text-muted"}`}>
+                            {new Date(d.ms).getDate()}
+                          </span>
+                          <span aria-hidden className="flex h-1.5 gap-0.5">
+                            {b > 0 && <span className="h-1.5 w-1.5 rounded-full bg-accent" />}
+                            {o > 0 && <span className="h-1.5 w-1.5 rounded-full border border-good" />}
+                          </span>
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted" aria-label={t("bk.legend")}>
+            <li className="flex items-center gap-1.5">
+              <span aria-hidden className="h-2 w-2 rounded-full bg-accent" />
+              {t("bk.legendBooked")}
+            </li>
+            <li className="flex items-center gap-1.5">
+              <span aria-hidden className="h-2 w-2 rounded-full border border-good" />
+              {t("bk.open")}
+            </li>
+          </ul>
+        </section>
+        {selectedMs !== null && (
+          <section
+            className="card mt-3 desk:col-start-2 desk:row-start-2 desk:mt-2"
+            aria-labelledby="schedule-day-title"
+            data-testid="schedule-day"
+          >
+            <h3 id="schedule-day-title" className="px-4 pb-1 pt-3 font-semibold">
+              {dayLabel(selectedMs)}
+            </h3>
+            {daySlots.length > 0 ? (
+              <ul key={selected} className="fade divide-y divide-line">
+                {daySlots.map((s) => (
                   <li key={s.id} className="flex items-center gap-2 py-2 pl-4 pr-2">
                     <span className="min-w-0 flex-1 py-1">
                       <span className={`block truncate font-medium ${s.clientId ? "" : "text-good"}`}>
@@ -109,18 +242,18 @@ export function CoachSessions({
                   </li>
                 ))}
               </ul>
-            </div>
-          ))}
-          {slots.length > shown.length && <p className="px-1 text-sm text-muted">{t("bk.more", { count: slots.length - shown.length })}</p>}
-        </div>
-      ) : (
-        <p className="mt-2 px-1 text-sm text-muted">{t("bk.none")}</p>
-      )}
+            ) : (
+              <p className="px-4 pb-3 text-sm text-muted">{slots.length ? t("bk.dayNone") : t("bk.none")}</p>
+            )}
+          </section>
+        )}
+      </div>
       {/* A fresh sheet each time it opens, so "Today" is today. */}
       <AddTimes
         key={String(adding)}
         open={adding}
         clients={clients}
+        firstDay={firstDay >= 0 && firstDay < BOOK_AHEAD_DAYS ? firstDay : 1}
         onClose={() => setAdding(false)}
         onDone={(n) => {
           setAdding(false);
@@ -181,6 +314,7 @@ function AddTimes({
   open,
   clients,
   fixed,
+  firstDay = 1,
   onClose,
   onDone,
 }: {
@@ -188,11 +322,19 @@ function AddTimes({
   clients: Person[];
   /** Booking this client in, from their report. */
   fixed?: string;
+  /** The day chip picked at first, in days from today (the schedule passes the day picked on its calendar). */
+  firstDay?: number;
   onClose: () => void;
   onDone: (note: string) => void;
 }) {
   const [now] = useState(() => Date.now());
-  const [day, setDay] = useState(1);
+  const [day, setDay] = useState(firstDay);
+  // A day past the usual three weeks of chips (picked on the calendar) adds chips up to it, scrolled into view.
+  const chips = Math.max(DAYS_AHEAD, firstDay + 1);
+  const picked = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (open) picked.current?.closest("button")?.scrollIntoView?.({ block: "nearest", inline: "center" });
+  }, [open]);
   const [time, setTime] = useState("18:00");
   const [minutes, setMinutes] = useState(60);
   const [weeks, setWeeks] = useState(1);
@@ -225,9 +367,9 @@ function AddTimes({
         {t("bk.day")}
       </p>
       <div className="no-scrollbar -mx-1 mt-1 flex gap-2 overflow-x-auto px-1 pb-1" role="group" aria-labelledby="bk-day">
-        {Array.from({ length: DAYS_AHEAD }, (_, i) => (
+        {Array.from({ length: chips }, (_, i) => (
           <Chip key={i} active={day === i} onClick={() => setDay(i)}>
-            <span className="whitespace-nowrap">
+            <span ref={i === firstDay ? picked : undefined} className="whitespace-nowrap">
               {i === 0 ? t("bk.today") : i === 1 ? t("bk.tomorrow") : date(startAt(now, i, "12:00"), { weekday: "short", day: "numeric" })}
             </span>
           </Chip>

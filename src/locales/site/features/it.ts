@@ -165,6 +165,10 @@ export const it: FeaturesText = {
       name: "Allenamenti in parti",
       body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie. Le routine possono avere il proprio riscaldamento e defaticamento, anche nei link condivisi e da parte del tuo coach. Le note del coach leggono ogni parte: il dolore dopo la riabilitazione che cala o sale, e un battito che resta alto nel defaticamento. La riabilitazione del tuo fisioterapista può stare accanto ai pesi nello stesso allenamento nei giorni in cui tocca, e il cardio può seguire i pesi, con macchina e minuti scelti con un tocco.",
     },
+    "workout-length": {
+      name: "La durata copre tutte le parti",
+      body: "Il cursore della durata su Oggi imposta l’intero allenamento. Riscaldamento, cardio, riabilitazione o defaticamento prendono i loro minuti dai pesi, e una barra sottile sotto il cursore mostra dove va il tempo. I pesi restano almeno 15 minuti: prima si accorcia il cardio, con una riga che spiega perché. In un giorno di cardio e stretching, disattiva i pesi e il cardio prende il loro tempo.",
+    },
     notes: {
       name: "Note del coach",
       body: "Segnala fatica che si accumula, un esercizio fermo, un muscolo con poche serie, un obiettivo settimanale a rischio o massa grassa in aumento, ognuno con una cosa da fare, spesso con un solo tocco.",
@@ -294,11 +298,20 @@ export const it: FeaturesText = {
       name: "In allenamento ora e incitamenti",
       body: "Vedi chi si sta allenando adesso e manda un incitamento che sale fluttuando sulla sua schermata di allenamento.",
     },
+    "check-in": {
+      name: "Check-in in palestra",
+      body: "Un tocco su Oggi avvisa gli amici che scegli che sei in palestra. Ricevono una notifica e un avviso nell'app finché non lo chiudono.",
+      note: "Dai 18 anni in su. Le notifiche sono su Android e iPhone; l'app web mostra l'avviso quando è aperta.",
+    },
     challenges: {
       name: "Sfide, club e classifiche",
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
+    safety: {
+      name: "Blocca, silenzia e segnala",
+      body: "Blocca o silenzia chiunque e segnala un post, un commento o un profilo con un tocco sul motivo. Il nostro team controlla ogni segnalazione e può avvisare, sospendere o bandire.",
+    },
     share: {
       name: "Card e link da condividere",
       body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima.",
@@ -335,7 +348,7 @@ export const it: FeaturesText = {
     },
     "coach-booking": {
       name: "Prenotazione e calendario delle sessioni",
-      body: "Apri gli orari liberi, una volta o ogni settimana, e i clienti li prenotano nell'app, oppure prenotali tu. Entrambi ricevono una notifica, una sessione del giorno dopo compare in Oggi e finisce nel calendario con un tocco.",
+      body: "Apri gli orari liberi, una volta o ogni settimana, e i clienti li prenotano nell'app, oppure prenotali tu. La tua agenda è un calendario mensile: tocca un giorno per vedere chi ha prenotato e cosa è ancora libero. Entrambi ricevono una notifica, una sessione del giorno dopo compare in Oggi e finisce nel calendario con un tocco.",
     },
     "coach-payments": {
       name: "Pagamenti dei clienti con Stripe",

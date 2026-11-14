@@ -22,6 +22,7 @@ import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
 import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
+import { hasOtherParts } from "@/lib/sessionSplit";
 import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { useCoachNotes } from "@/lib/trainer";
@@ -34,7 +35,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { CoachBadge } from "./CoachHome";
-import { PlanExtras, TodayMoments } from "./Extras";
+import { CheckInChip, PlanExtras, TodayMoments } from "./Extras";
 import { loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
@@ -46,7 +47,7 @@ import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CoolDownCard, TodayParts } from "./Stretch";
+import { CoolDownCard, SplitBar, StretchLibraryCard, TodayParts } from "./Stretch";
 import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
@@ -142,6 +143,7 @@ export function Today() {
     setCall,
     pickedByLocation,
     toggleSuperset,
+    split,
   } = useApp();
   const [lenKey, setLenKey] = useState(0);
   const desktop = useDesktop();
@@ -166,7 +168,10 @@ export function Today() {
   const hurt = useMemo(() => activeInjuries(events), [events]);
   const hello = greeting(new Date(now).getHours(), profile.name);
   const call = preview ? CALL_STYLE[preview.call] : null;
-  const fill = `${((profile.minutes - 15) / 75) * 100}%`;
+  // Where the thumb's centre sits: the browser keeps the 28 px thumb inside the track, so a value's spot is half a
+  // thumb in from each end (Melvin, 2026-11-14: 50 looked like 44 against a "45" placed at the middle).
+  const onTrack = (min: number) => `calc(14px + ${(min - 15) / 75} * (100% - 28px))`;
+  const fill = onTrack(profile.minutes);
   const fixed = !!preview?.program?.fixed;
   const tryAdaptive = useApp((st) => st.tryAdaptive);
   const setTryAdaptive = useApp((st) => st.setTryAdaptive);
@@ -315,6 +320,8 @@ export function Today() {
             <Info term={preview.week.deload ? "deload" : profile.training?.effort === "rpe" ? "rpe" : "rir"} className="-ml-1.5 -mr-3.5" />
           </span>
         )}
+        {/* Check in sits with the gym and the week (Melvin, 2026-11-14): a message to the lifter's coach. */}
+        {!active && !resting && <CheckInChip />}
         {/* "Something hurts?" sits with How do you feel? in the readiness card when that's on screen; an injury
             being trained around stays up here, where it reads as today's status. */}
         {(hurt.length > 0 || !showCall) && (
@@ -338,8 +345,10 @@ export function Today() {
       {/* Phone order (UX audit, 2026-11-13): the call and any coach's notes, then the plan, then the quote, saving
           and the week's quests, so the workout is near the top instead of below the extras. Desktop layout
           (layout.ts): the plan in the wider left column spanning two rows; the call and notes beside it on top, the
-          quote and quests under them. */}
-      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:items-start desk:gap-x-6">
+          quote and quests under them. The first row is only as tall as the call and notes, and the second row takes
+          the rest of the plan's height, so the quote sits right under the call instead of halfway down the page
+          (Melvin, 2026-11-14). */}
+      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:grid-rows-[auto_1fr] desk:items-start desk:gap-x-6">
         {/* Once the day's workout is done it takes the wide column, where the plan was, so the page isn't empty
             beside the notes (Melvin, 2026-11-13). First in the page, so a phone shows it first as before. */}
         {doneToday && resting && (
@@ -483,11 +492,15 @@ export function Today() {
                 className="slider mt-4 w-full"
                 style={{ "--fill": fill } as CSSProperties}
               />
-              <div className="mt-1.5 flex justify-between text-xs text-faint num">
+              <div className="num relative mt-1.5 flex justify-between text-xs text-faint" data-testid="len-ticks">
                 <span>15</span>
-                <span>45</span>
+                <span className="absolute -translate-x-1/2" style={{ left: onTrack(45) }}>
+                  45
+                </span>
                 <span>90</span>
               </div>
+              {/* The slider is the whole workout: with other parts on, where its minutes go (sessionSplit.ts). */}
+              {hasOtherParts(split) && <SplitBar split={split} />}
               <FitAroundCalendar />
             </div>
           )}
@@ -496,168 +509,173 @@ export function Today() {
           {resting ? null : preview && preview.items.length > 0 ? (
             <>
               {!active && <TodayParts />}
-              <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
-                {shared && (
-                  <p className="mb-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="plan-shared-why">
-                    <Icon name="target" size={14} className="mt-[3px] shrink-0 text-accent" />
-                    <span>{shared.charAt(0).toUpperCase() + shared.slice(1)}</span>
-                  </p>
-                )}
-                <ol className="stagger card overflow-hidden" data-testid="plan-list">
-                  {items.map((it, i) => {
-                    const ex = exercise(it.exerciseId);
-                    const hue = muscleHue(it.focus);
-                    const ss = supersetLabel(items, i);
-                    const joinsPrev = i > 0 && linkedToNext(items, i - 1);
-                    const joinsNext = linkedToNext(items, i);
-                    const look = live ? { className: "", css: {} } : reorder.style(i);
-                    const picked = !live && reorder.picked === i;
-                    // Supersets read as one block: a shared tint, one accent bracket down the left that runs
-                    // across the rows, and a dashed join where the link button sits on the line between them.
-                    return (
-                      <li
-                        key={it.exerciseId}
-                        {...(live ? {} : reorder.row(i))}
-                        data-superset={it.group ?? undefined}
-                        className={`animate-rise relative flex select-none items-center gap-3 px-4 py-3.5 transition-shadow ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""} ${look.className}`}
-                        style={{ animationDelay: `${i * 40}ms`, ...look.css }}
-                      >
-                        <span
-                          className={`absolute left-0 ${ss ? "w-1 bg-accent" : "w-[3px] rounded-r-full"} ${joinsPrev ? "top-0" : "top-3"} ${joinsNext ? "bottom-0" : "bottom-3"} ${ss && !joinsPrev ? "rounded-tr-full" : ""} ${ss && !joinsNext ? "rounded-br-full" : ""}`}
-                          style={ss ? undefined : { background: hue }}
-                          aria-hidden
-                        />
-                        {/* The number is the button for moving this exercise without dragging (and by keyboard). */}
-                        {live ? (
-                          <span
-                            className="num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold"
-                            style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
-                          >
-                            {i + 1}
-                          </span>
-                        ) : (
-                          <button
-                            type="button"
-                            data-no-drag
-                            onClick={() => reorder.setPicked(picked ? null : i)}
-                            aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
-                            aria-pressed={picked}
-                            className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
-                            style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
-                          >
-                            {i + 1}
-                          </button>
-                        )}
-                        <div className={`min-w-0 flex-1 ${items.length > 1 && !live ? "max-[389px]:pr-9" : ""}`}>
-                          {ss && (
-                            <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">
-                              <Icon name="link" size={12} />
-                              {ss}
-                            </div>
-                          )}
-                          <div className="truncate font-semibold">{ex.name}</div>
-                          <div className="text-sm text-muted num">
-                            {it.label ? `${it.label} · ` : ""}
-                            {it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} ·{" "}
-                            {(it.setTargets ?? []).some((st) => st.weight > it.target.weight) ? t("td.upTo") : ""}
-                            {loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((st) => st.weight)), profile.unit)}
-                            {" · "}
-                            {it.warmup ? t("td.warmups", { count: it.warmup.length }) : ""}
-                            {t("td.mins", { n: Math.max(1, Math.round(itemSeconds(it) / 60)) })}
-                          </div>
-                          {(() => {
-                            const w = whys?.[i];
-                            const line = w ? (shared ? itemWhyWithoutLoad(w) : w.short) : "";
-                            return line ? (
-                              <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">
-                                {line}
-                              </p>
-                            ) : null;
-                          })()}
-                        </div>
-                        {picked ? (
-                          <MoveButtons
-                            name={ex.name}
-                            canUp={i > 0}
-                            canDown={i < items.length - 1}
-                            onUp={() => reorder.step(i, -1)}
-                            onDown={() => reorder.step(i, 1)}
-                            onDone={() => reorder.setPicked(null)}
-                          />
-                        ) : it.injuryPct ? (
-                          <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">
-                            {t("td.injury", { n: it.injuryPct })}
-                          </span>
-                        ) : (
-                          <span
-                            className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${items.length > 1 && !live ? "hidden min-[390px]:inline" : ""}`}
-                            style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}
-                          >
-                            {MUSCLE_LABEL[it.focus]}
-                          </span>
-                        )}
-                        {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
-                        {i > 0 && !live && (
-                          <LinkToggle
-                            className="absolute -top-[22px] right-3 z-10"
-                            on={joinsPrev}
-                            first={exercise(items[i - 1]!.exerciseId).name}
-                            second={ex.name}
-                            onToggle={() => toggleSuperset(i - 1)}
-                          />
-                        )}
-                      </li>
-                    );
-                  })}
-                </ol>
-                {items.length > 1 &&
-                  (() => {
-                    const grouped = items.some((x) => x.group);
-                    const saved = grouped
-                      ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        Math.round((planSeconds(items.map(({ group: _g, ...x }) => x)) - planSeconds(items)) / 60)
-                      : 0;
-                    return (
-                      <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
-                        <Icon name="link" size={14} className="mt-[3px] shrink-0" />
-                        <span>
-                          {live
-                            ? t("td.ssLive", { section: t("workout.comingUp") })
-                            : grouped
-                              ? saved > 0
-                                ? t("td.ssLinkedSaves", { n: saved })
-                                : t("td.ssLinked")
-                              : t("td.ssHint")}
-                          <Info term="superset" />
-                        </span>
-                      </p>
-                    );
-                  })()}
-              </Section>
-              <Section title={t("td.whyMuscles")} icon="recovery">
-                <div className="card p-4">
-                  <RecoveryMap rec={rec} focus={focus} compact chips={false} />
-                  {preview.program && !preview.routineId ? (
-                    <p className="mt-3 text-sm text-muted">
-                      {t(fixed ? "td.programDay" : "td.programDayAdaptive", {
-                        day: preview.program.dayName ?? "",
-                        program: programName(preview.program.id) ?? "",
-                        sets: preview.week.setsPerMuscle,
-                        note: preview.program.note ?? "",
-                      })}
-                    </p>
-                  ) : (
-                    <p className="mt-3 text-sm text-muted">
-                      {preview.routineId
-                        ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))) })
-                        : t("td.targets", {
-                            muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))),
-                            sets: preview.week.setsPerMuscle,
-                          })}
+              {/* Lifting off for today (cardio and stretches only): the exercise list isn't run, so it isn't shown. */}
+              {!(split?.noLift && !active) && (
+                <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
+                  {shared && (
+                    <p className="mb-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="plan-shared-why">
+                      <Icon name="target" size={14} className="mt-[3px] shrink-0 text-accent" />
+                      <span>{shared.charAt(0).toUpperCase() + shared.slice(1)}</span>
                     </p>
                   )}
-                </div>
-              </Section>
+                  <ol className="stagger card overflow-hidden" data-testid="plan-list">
+                    {items.map((it, i) => {
+                      const ex = exercise(it.exerciseId);
+                      const hue = muscleHue(it.focus);
+                      const ss = supersetLabel(items, i);
+                      const joinsPrev = i > 0 && linkedToNext(items, i - 1);
+                      const joinsNext = linkedToNext(items, i);
+                      const look = live ? { className: "", css: {} } : reorder.style(i);
+                      const picked = !live && reorder.picked === i;
+                      // Supersets read as one block: a shared tint, one accent bracket down the left that runs
+                      // across the rows, and a dashed join where the link button sits on the line between them.
+                      return (
+                        <li
+                          key={it.exerciseId}
+                          {...(live ? {} : reorder.row(i))}
+                          data-superset={it.group ?? undefined}
+                          className={`animate-rise relative flex select-none items-center gap-3 px-4 py-3.5 transition-shadow ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""} ${look.className}`}
+                          style={{ animationDelay: `${i * 40}ms`, ...look.css }}
+                        >
+                          <span
+                            className={`absolute left-0 ${ss ? "w-1 bg-accent" : "w-[3px] rounded-r-full"} ${joinsPrev ? "top-0" : "top-3"} ${joinsNext ? "bottom-0" : "bottom-3"} ${ss && !joinsPrev ? "rounded-tr-full" : ""} ${ss && !joinsNext ? "rounded-br-full" : ""}`}
+                            style={ss ? undefined : { background: hue }}
+                            aria-hidden
+                          />
+                          {/* The number is the button for moving this exercise without dragging (and by keyboard). */}
+                          {live ? (
+                            <span
+                              className="num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold"
+                              style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
+                            >
+                              {i + 1}
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              data-no-drag
+                              onClick={() => reorder.setPicked(picked ? null : i)}
+                              aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
+                              aria-pressed={picked}
+                              className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
+                              style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
+                            >
+                              {i + 1}
+                            </button>
+                          )}
+                          <div className={`min-w-0 flex-1 ${items.length > 1 && !live ? "max-[389px]:pr-9" : ""}`}>
+                            {ss && (
+                              <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+                                <Icon name="link" size={12} />
+                                {ss}
+                              </div>
+                            )}
+                            <div className="truncate font-semibold">{ex.name}</div>
+                            <div className="text-sm text-muted num">
+                              {it.label ? `${it.label} · ` : ""}
+                              {it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} ·{" "}
+                              {(it.setTargets ?? []).some((st) => st.weight > it.target.weight) ? t("td.upTo") : ""}
+                              {loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((st) => st.weight)), profile.unit)}
+                              {" · "}
+                              {it.warmup ? t("td.warmups", { count: it.warmup.length }) : ""}
+                              {t("td.mins", { n: Math.max(1, Math.round(itemSeconds(it) / 60)) })}
+                            </div>
+                            {(() => {
+                              const w = whys?.[i];
+                              const line = w ? (shared ? itemWhyWithoutLoad(w) : w.short) : "";
+                              return line ? (
+                                <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">
+                                  {line}
+                                </p>
+                              ) : null;
+                            })()}
+                          </div>
+                          {picked ? (
+                            <MoveButtons
+                              name={ex.name}
+                              canUp={i > 0}
+                              canDown={i < items.length - 1}
+                              onUp={() => reorder.step(i, -1)}
+                              onDown={() => reorder.step(i, 1)}
+                              onDone={() => reorder.setPicked(null)}
+                            />
+                          ) : it.injuryPct ? (
+                            <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">
+                              {t("td.injury", { n: it.injuryPct })}
+                            </span>
+                          ) : (
+                            <span
+                              className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${items.length > 1 && !live ? "hidden min-[390px]:inline" : ""}`}
+                              style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}
+                            >
+                              {MUSCLE_LABEL[it.focus]}
+                            </span>
+                          )}
+                          {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
+                          {i > 0 && !live && (
+                            <LinkToggle
+                              className="absolute -top-[22px] right-3 z-10"
+                              on={joinsPrev}
+                              first={exercise(items[i - 1]!.exerciseId).name}
+                              second={ex.name}
+                              onToggle={() => toggleSuperset(i - 1)}
+                            />
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {items.length > 1 &&
+                    (() => {
+                      const grouped = items.some((x) => x.group);
+                      const saved = grouped
+                        ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                          Math.round((planSeconds(items.map(({ group: _g, ...x }) => x)) - planSeconds(items)) / 60)
+                        : 0;
+                      return (
+                        <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
+                          <Icon name="link" size={14} className="mt-[3px] shrink-0" />
+                          <span>
+                            {live
+                              ? t("td.ssLive", { section: t("workout.comingUp") })
+                              : grouped
+                                ? saved > 0
+                                  ? t("td.ssLinkedSaves", { n: saved })
+                                  : t("td.ssLinked")
+                                : t("td.ssHint")}
+                            <Info term="superset" />
+                          </span>
+                        </p>
+                      );
+                    })()}
+                </Section>
+              )}
+              {!(split?.noLift && !active) && (
+                <Section title={t("td.whyMuscles")} icon="recovery">
+                  <div className="card p-4">
+                    <RecoveryMap rec={rec} focus={focus} compact chips={false} />
+                    {preview.program && !preview.routineId ? (
+                      <p className="mt-3 text-sm text-muted">
+                        {t(fixed ? "td.programDay" : "td.programDayAdaptive", {
+                          day: preview.program.dayName ?? "",
+                          program: programName(preview.program.id) ?? "",
+                          sets: preview.week.setsPerMuscle,
+                          note: preview.program.note ?? "",
+                        })}
+                      </p>
+                    ) : (
+                      <p className="mt-3 text-sm text-muted">
+                        {preview.routineId
+                          ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))) })
+                          : t("td.targets", {
+                              muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))),
+                              sets: preview.week.setsPerMuscle,
+                            })}
+                      </p>
+                    )}
+                  </div>
+                </Section>
+              )}
             </>
           ) : (
             <div className="card mt-6">
@@ -677,6 +695,7 @@ export function Today() {
           )}
         </div>
         <div className="desk:order-3 desk:col-span-2">
+          {!active && <StretchLibraryCard />}
           {profile.quotes !== false && <DailyQuote now={now} />}
           {!active && <SaveNudge />}
           {!active && <TodayGame />}

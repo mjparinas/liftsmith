@@ -60,7 +60,7 @@ export function createScene2D(canvas: HTMLCanvasElement): Scene {
           H / 2 - ((v[0] * up[0] + v[1] * up[1] + v[2] * up[2]) * focal) / z,
         ];
       };
-      const world = (p: Vec) => placeVec(p, f.roll, f.place.lift, f.place.shiftZ);
+      const world = (p: Vec) => placeVec(p, f.roll, f.place.lift, f.place.shiftZ, f.yaw);
       const line = (a: Vec, b: Vec) => {
         const p = proj(world(a)),
           q = proj(world(b));

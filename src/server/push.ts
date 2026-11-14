@@ -17,9 +17,25 @@ import * as text from "@/locales/text/push";
 import { query, run } from "./db";
 
 export type PushKind =
-  "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply" | "cheer" | "posted" | "best";
+  | "follow"
+  | "request"
+  | "accept"
+  | "like"
+  | "comment"
+  | "sent"
+  | "challenge"
+  | "tag"
+  | "mention"
+  | "reply"
+  | "cheer"
+  | "posted"
+  | "best"
+  | "checkin";
 /** Which Friends settings switch covers each kind (the columns on social_profiles). */
-export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_comments" | "push_sent" | "push_cheers" | "push_posts"> = {
+export const PUSH_PREF: Record<
+  PushKind,
+  "push_follows" | "push_likes" | "push_comments" | "push_sent" | "push_cheers" | "push_posts" | "push_checkins"
+> = {
   follow: "push_follows",
   request: "push_follows",
   accept: "push_follows",
@@ -36,6 +52,8 @@ export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_c
   // A workout from someone the lifter rang the bell for; "best" when it has a new best in it.
   posted: "push_posts",
   best: "push_posts",
+  // A friend at the gym (Check in on Today).
+  checkin: "push_checkins",
 };
 /** Tokens kept per account (phones and tablets); the oldest go first. */
 export const MAX_TOKENS = 10;
@@ -136,7 +154,8 @@ async function send(
   vars: { text?: string; workout?: string; code?: string },
 ) {
   const pref = PUSH_PREF[kind];
-  const [who] = await query<{ name: string }>("SELECT name FROM social_profiles WHERE account_id = ?", [from]);
+  // Nothing goes out from a suspended or shadow-banned lifter (socialModeration.ts): a shadow ban would show otherwise.
+  const [who] = await query<{ name: string }>("SELECT name FROM social_profiles WHERE account_id = ? AND suspended = 0", [from]);
   const [prefs] = await query<Record<string, number>>(`SELECT ${pref} AS on_ FROM social_profiles WHERE account_id = ? AND suspended = 0`, [
     to,
   ]);

@@ -171,6 +171,10 @@ export const de: FeaturesText = {
       name: "Training in Teilen",
       body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie. Routinen können ihr eigenes Aufwärmen und Cool-down enthalten, auch in geteilten Links und von deinem Coach. Die Coach-Hinweise lesen jeden Teil: Schmerzen nach der Reha, die nachlassen oder zunehmen, und ein Puls, der im Cool-down hoch bleibt. Die Reha von deiner Physiotherapie kann an den fälligen Tagen neben dem Krafttraining im selben Training laufen, und Cardio kann danach folgen, Gerät und Minuten mit einem Tippen gewählt.",
     },
+    "workout-length": {
+      name: "Die Trainingsdauer umfasst alle Teile",
+      body: "Der Dauer-Regler auf Heute legt das ganze Training fest. Aufwärmen, Cardio, Reha oder Cool-down nehmen ihre Minuten vom Krafttraining, und ein schmaler Balken unter dem Regler zeigt, wohin die Zeit geht. Krafttraining behält mindestens 15 Minuten: Zuerst wird das Cardio kürzer, mit einer Zeile, die sagt, warum. An einem Tag mit Cardio und Dehnen schaltest du das Krafttraining aus, und Cardio bekommt seine Zeit.",
+    },
     notes: {
       name: "Coach-Notizen",
       body: "Weist auf wachsende Ermüdung, eine stagnierende Übung, einen Muskel mit zu wenigen Sätzen, ein gefährdetes Wochenziel oder steigendes Körperfett hin, jeweils mit einer Sache, die du tun kannst, oft mit einem Tippen.",
@@ -300,11 +304,20 @@ export const de: FeaturesText = {
       name: "Gerade am Trainieren und Anfeuern",
       body: "Sieh, wer gerade trainiert, und schick einen Anfeuerungsruf, der über den Trainingsbildschirm schwebt.",
     },
+    "check-in": {
+      name: "Im Studio einchecken",
+      body: "Ein Tipp unter Heute sagt den Freunden, die du auswählst, dass du im Studio bist. Sie bekommen eine Mitteilung und einen Hinweis in der App, bis sie ihn schließen.",
+      note: "Ab 18 Jahren. Mitteilungen gibt es auf Android und iPhone; die Web-App zeigt den Hinweis, wenn sie offen ist.",
+    },
     challenges: {
       name: "Challenges, Clubs und Bestenlisten",
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
     },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
+    safety: {
+      name: "Blockieren, stummschalten und melden",
+      body: "Blockiere oder schalte jeden stumm und melde einen Post, einen Kommentar oder ein Profil mit einem Tipp auf den Grund. Unser Team prüft jede Meldung und kann verwarnen, vorübergehend sperren oder ausschließen.",
+    },
     share: {
       name: "Teilkarten und Links",
       body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau.",
@@ -341,7 +354,7 @@ export const de: FeaturesText = {
     },
     "coach-booking": {
       name: "Termine buchen und planen",
-      body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
+      body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Dein Plan ist ein Monatskalender: Tipp auf einen Tag und du siehst, wer gebucht hat und was noch frei ist. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
     },
     "coach-payments": {
       name: "Kundenzahlungen über Stripe",

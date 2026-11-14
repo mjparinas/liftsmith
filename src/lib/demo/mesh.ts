@@ -391,6 +391,8 @@ export function skeletonSegments(J: Joints, B: Body, arr: Float32Array): number 
 // ---------- placing the figure ----------
 export interface Placement {
   roll: (d: number) => number;
+  /** Turn about the vertical axis through the feet, in degrees (a jump with a half turn). */
+  yaw: (d: number) => number;
   lift: number;
   shiftZ: number;
 }
@@ -418,8 +420,13 @@ const JOINT_KEYS = [
   "handR",
 ] as const;
 
-/** Rotate about the forward (x) axis by `deg`, then lift and shift. */
-export function placeVec(p: Vec, deg: number, lift: number, shiftZ: number): Vec {
+/** Turn about the vertical (y) axis by `yaw`, rotate about the forward (x) axis by `deg`, then lift and shift. */
+export function placeVec(p: Vec, deg: number, lift: number, shiftZ: number, yaw = 0): Vec {
+  if (yaw) {
+    const c = Math.cos(rad(yaw)),
+      s = Math.sin(rad(yaw));
+    p = [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c];
+  }
   if (!deg) return [p[0], p[1] + lift, p[2] + shiftZ];
   const c = Math.cos(rad(deg)),
     s = Math.sin(rad(deg));
@@ -429,7 +436,8 @@ export function placeVec(p: Vec, deg: number, lift: number, shiftZ: number): Vec
 /** For rolled motions (side planks): how far to lift and shift so the figure rests on the floor, centred. */
 export function placement(m: Motion, B: Body): Placement {
   const roll = m.roll ?? (() => 0);
-  if (!m.roll) return { roll, lift: 0, shiftZ: 0 };
+  const yaw = m.yaw ?? (() => 0);
+  if (!m.roll) return { roll, yaw, lift: 0, shiftZ: 0 };
   let minY = Infinity,
     minZ = Infinity,
     maxZ = -Infinity;
@@ -443,7 +451,7 @@ export function placement(m: Motion, B: Body): Placement {
       maxZ = Math.max(maxZ, p[2]);
     }
   }
-  return { roll, lift: 0.05 - minY, shiftZ: -(minZ + maxZ) / 2 };
+  return { roll, yaw, lift: 0.05 - minY, shiftZ: -(minZ + maxZ) / 2 };
 }
 
 /** Solve the pose for a phase value, in the figure's own frame (the renderer applies the placement). */
@@ -460,7 +468,7 @@ export function bounds(m: Motion, B: Body, pl: Placement) {
     const J = jointsAt(m, B, d) as unknown as Record<string, Vec>;
     for (const k of [...JOINT_KEYS, "bar"]) {
       if (!J[k]) continue;
-      const p = placeVec(J[k], pl.roll(d), pl.lift, pl.shiftZ);
+      const p = placeVec(J[k], pl.roll(d), pl.lift, pl.shiftZ, pl.yaw(d));
       for (let a = 0; a < 3; a++) {
         lo[a] = Math.min(lo[a], p[a]);
         hi[a] = Math.max(hi[a], p[a]);

@@ -172,6 +172,10 @@ export const fr: FeaturesText = {
       name: "Séances en plusieurs parties",
       body: "Une séance peut enchaîner un échauffement, la musculation et un retour au calme, avec Passer entre chaque partie. L’écran verrouillé et votre montre indiquent la partie en cours, l’historique montre chaque partie, et les jours d’étirements de 10 minutes ou plus gardent votre série. Les routines peuvent inclure leur propre échauffement et retour au calme, y compris dans les liens partagés et celles de votre coach. Les notes du coach lisent chaque partie : la douleur après la rééducation qui baisse ou monte, et une fréquence cardiaque qui reste haute pendant le retour au calme. La rééducation de votre kiné peut se faire à côté de la musculation dans la même séance les jours prévus, et le cardio peut suivre la musculation, avec la machine et les minutes choisies d’un toucher.",
     },
+    "workout-length": {
+      name: "La durée couvre toutes les parties",
+      body: "Le curseur de durée sur Aujourd’hui fixe toute la séance. Un échauffement, du cardio, de la rééducation ou un retour au calme prend ses minutes sur la musculation, et une fine barre sous le curseur montre où va le temps. La musculation garde au moins 15 minutes : le cardio raccourcit d’abord, avec une ligne qui dit pourquoi. Un jour de cardio et d’étirements, désactive la musculation et le cardio prend son temps.",
+    },
     notes: {
       name: "Notes du coach",
       body: "Signale une fatigue qui s’accumule, un mouvement qui stagne, un muscle qui manque de séries, un objectif de la semaine menacé ou une masse grasse qui grimpe, chaque fois avec une chose à faire, souvent en une touche.",
@@ -301,11 +305,20 @@ export const fr: FeaturesText = {
       name: "En séance maintenant et encouragements",
       body: "Voyez qui s’entraîne en ce moment et envoyez un encouragement qui flotte sur son écran de séance.",
     },
+    "check-in": {
+      name: "Check-in à la salle",
+      body: "Un geste sur Aujourd'hui prévient les amis que vous choisissez que vous êtes à la salle. Ils reçoivent une notification, et un message dans l'app jusqu'à ce qu'ils le ferment.",
+      note: "Pour les 18 ans et plus. Les notifications sont sur Android et iPhone ; l'app web affiche le message quand elle est ouverte.",
+    },
     challenges: {
       name: "Défis, clubs et classements",
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
     },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
+    safety: {
+      name: "Bloquer, masquer et signaler",
+      body: "Bloquez ou masquez qui vous voulez, et signalez une publication, un commentaire ou un profil en touchant un motif. Notre équipe vérifie chaque signalement et peut avertir, suspendre ou bannir.",
+    },
     share: {
       name: "Cartes et liens de partage",
       body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu.",
@@ -342,7 +355,7 @@ export const fr: FeaturesText = {
     },
     "coach-booking": {
       name: "Réservation et planning des séances",
-      body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
+      body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Votre planning est un calendrier mensuel : touchez un jour pour voir qui a réservé et ce qui reste libre. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
     },
     "coach-payments": {
       name: "Paiements des clients avec Stripe",

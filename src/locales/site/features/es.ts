@@ -164,6 +164,10 @@ export const es: FeaturesText = {
       name: "Entrenamientos por partes",
       body: "Un entrenamiento puede hacer un calentamiento, las pesas y una vuelta a la calma en orden, con Saltar entre ellas. La pantalla de bloqueo y tu reloj muestran en qué parte estás, el historial muestra cada parte y los días de estiramientos de 10 minutos o más mantienen tu racha. Las rutinas pueden llevar su propio calentamiento y vuelta a la calma, también en enlaces compartidos y de tu entrenador. Las notas del coach leen cada parte: el dolor tras la rehabilitación que baja o sube, y un pulso que sigue alto en la vuelta a la calma. La rehabilitación de tu fisioterapeuta puede ir junto a las pesas en el mismo entrenamiento los días que toca, y el cardio puede ir después de las pesas, con la máquina y los minutos elegidos con un toque.",
     },
+    "workout-length": {
+      name: "La duración cubre todas las partes",
+      body: "El control de duración en Hoy fija el entrenamiento entero. Un calentamiento, cardio, rehabilitación o vuelta a la calma toma sus minutos de las pesas, y una barra fina bajo el control muestra adónde va el tiempo. Las pesas mantienen al menos 15 minutos: primero se acorta el cardio, con una línea que dice por qué. En un día de cardio y estiramientos, apaga las pesas y el cardio se queda con su tiempo.",
+    },
     notes: {
       name: "Notas del entrenador",
       body: "Señala fatiga acumulada, un ejercicio estancado, un músculo con pocas series, una meta semanal en riesgo o grasa corporal en aumento, cada una con algo que hacer, a menudo con un solo toque.",
@@ -296,11 +300,20 @@ export const es: FeaturesText = {
       name: "Entrenando ahora y ánimos",
       body: "Mira quién está entrenando ahora mismo y envía un ánimo que sube flotando por su pantalla de entrenamiento.",
     },
+    "check-in": {
+      name: "Avisa desde el gimnasio",
+      body: "Un toque en Hoy avisa a los amigos que elijas de que estás en el gimnasio. Reciben una notificación y un aviso en la app hasta que lo cierren.",
+      note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra el aviso cuando está abierta.",
+    },
     challenges: {
       name: "Retos, clubes y clasificaciones",
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
     },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
+    safety: {
+      name: "Bloquear, silenciar y denunciar",
+      body: "Bloquea o silencia a quien quieras y denuncia una publicación, un comentario o un perfil con un toque en el motivo. Nuestro equipo revisa cada denuncia y puede avisar, suspender o expulsar.",
+    },
     share: {
       name: "Tarjetas y enlaces para compartir",
       body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa.",
@@ -337,7 +350,7 @@ export const es: FeaturesText = {
     },
     "coach-booking": {
       name: "Reserva y agenda de sesiones",
-      body: "Abre las horas que tienes libres, una vez o cada semana, y tus clientes las reservan en la app, o resérvalos tú. Ambos reciben una notificación, una sesión del día siguiente aparece en Hoy y pasa a su calendario con un toque.",
+      body: "Abre las horas que tienes libres, una vez o cada semana, y tus clientes las reservan en la app, o resérvalos tú. Tu agenda es un calendario mensual: toca un día para ver quién ha reservado y qué sigue libre. Ambos reciben una notificación, una sesión del día siguiente aparece en Hoy y pasa a su calendario con un toque.",
     },
     "coach-payments": {
       name: "Cobros a clientes con Stripe",

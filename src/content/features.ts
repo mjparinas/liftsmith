@@ -260,6 +260,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "workout-length",
+        name: "Workout length covers every part",
+        body: "The length slider on Today sets the whole workout. A warm-up, cardio, rehab or cool-down takes its minutes out of the lifting, and a thin bar under the slider shows where the time goes. Lifting keeps at least 15 minutes: the cardio shrinks first, with a line saying why. On a cardio and stretching day, switch lifting off and the cardio takes its time.",
+        tier: "free",
+        added: "2026-11-14",
+      },
+      {
         id: "now-playing",
         name: "Music controls",
         body: "Play, pause and skip your music from Today and during a workout, with the song and the app playing it. You can turn it off in Settings.",
@@ -553,6 +560,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "check-in",
+        name: "Check in at the gym",
+        body: "One tap on Today tells the friends you pick that you're at the gym. They get a notification, and a note in the app until they close it.",
+        tier: "free",
+        note: "For lifters 18 and over. Notifications are on Android and iPhone; the web app shows the note when it's open.",
+        added: "2026-11-14",
+      },
+      {
         id: "challenges",
         name: "Challenges, clubs and leaderboards",
         body: "Challenge a friend, join a club or gym crew with a weekly board, and take on the monthly challenge with everyone.",
@@ -565,6 +580,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "An optional public page with your best lifts and workouts.",
         tier: "free",
         added: "2026-11-11",
+      },
+      {
+        id: "safety",
+        name: "Block, mute and report",
+        body: "Block or mute anyone, and report a post, comment or profile with one tap on a reason. Our team reviews every report and can warn, suspend or ban.",
+        tier: "free",
+        added: "2026-11-14",
       },
       {
         id: "share",
@@ -640,7 +662,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-booking",
         name: "Booking and scheduling sessions",
-        body: "Open the times you're free, once or every week, and clients book them in the app, or book a client in yourself. Both sides get a notification, a session in the next day shows on Today, and it goes into their calendar in one tap.",
+        body: "Open the times you're free, once or every week, and clients book them in the app, or book a client in yourself. Your schedule is a month calendar: tap a day to see who's booked and what's still open. Both sides get a notification, a session in the next day shows on Today, and it goes into their calendar in one tap.",
         tier: "pro",
         pro: "coaching",
         added: "2026-11-13",

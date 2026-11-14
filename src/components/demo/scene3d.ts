@@ -530,7 +530,9 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         pathLine.computeLineDistances();
         floor.position.set(f.cam.target[0], 0, f.cam.target[2]);
       }
+      // yaw first, then roll (three.js's default XYZ order applies Y before X), as placeVec does
       fig.rotation.x = (f.roll * Math.PI) / 180;
+      fig.rotation.y = (f.yaw * Math.PI) / 180;
       fig.position.set(0, f.place.lift, f.place.shiftZ);
       const pulse = s.muscles ? (s.highlight ? 0.85 : 0.45 + 0.55 * f.effort) : 0;
       // painted muscles (the recovery map): parse each muscle's colour once per change

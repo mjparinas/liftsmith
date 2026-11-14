@@ -87,6 +87,6 @@ describe("Settings, grouped (2026-11-10)", () => {
     open("#/settings/body");
     render(<Settings />);
     fireEvent.click(screen.getByRole("button", { name: /Log a weigh-in/ }));
-    expect(location.hash).toBe("#/stats/bodyweight");
+    expect(location.hash).toBe("#/progress/bodyweight");
   });
 });

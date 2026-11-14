@@ -135,7 +135,7 @@ describe("a coach signing up from the coaches page", () => {
     }
     expect(steps.join(" / ")).not.toMatch(/Save your progress/i);
     // On the coach's pages, not the first page that asks which side they're on (coachMode.ts).
-    await waitFor(() => expect(location.hash).toBe("#/trainer/clients"));
+    await waitFor(() => expect(location.hash).toBe("#/coaching/clients"));
   });
 
   it("I'm here to train goes back to the usual welcome and forgets it", async () => {

@@ -15,7 +15,7 @@ const CODE_RE = /^[2-9A-HJ-NP-Z]{8}$/;
 /** A typed code or a pasted invite link, tidied to the code. Empty when it can't be one. */
 export function coachCode(text: string | null | undefined): string {
   if (!text) return "";
-  const m = /#\/trainer\/([\w-]+)/.exec(text);
+  const m = /#\/(?:trainer|coaching)\/([\w-]+)/.exec(text);
   const c = (m ? m[1]! : text).toUpperCase().replace(/[\s-]/g, "");
   return CODE_RE.test(c) ? c : "";
 }
@@ -60,8 +60,8 @@ export function coachFromReferrer(raw: string | null | undefined): string {
 // page carries utm_source=coaches, so it survives an install on Android too.
 const SIGNUP = "liftsmith.coachSignup";
 
-/** Opened as #/trainer (or #/trainer/) with no code: the coaches page's way in. */
-export const isCoachSignupHash = (hash: string) => /^#\/trainer\/?$/.test(hash);
+/** Opened as #/trainer or #/coaching (with or without the slash) with no code: the coaches page's way in. */
+export const isCoachSignupHash = (hash: string) => /^#\/(?:trainer|coaching)\/?$/.test(hash);
 
 /** Whether this device came in through the coaches page and hasn't sent its first invite yet. */
 export function coachSignup(): boolean {

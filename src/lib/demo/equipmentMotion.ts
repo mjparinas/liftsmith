@@ -93,11 +93,16 @@ export function withGear(exerciseId: string, m: Motion): Motion {
     // a band has no bar or handle between the hands
     if (load === "barbell" || load === "dumbbell" || load === "kettlebell" || load === "handle") load = "none";
     const hasCable = (B: Body) => (m.props?.(B) ?? []).some((p) => p.kind === "cable");
-    extra.push((B) => (hasCable(B) ? [] : [cable("ankleL", "handL"), cable("ankleR", "handR")]));
+    // one band per working hand: a one-arm move's resting hand holds none
+    const oneHand = hold === "R";
+    extra.push((B) => (hasCable(B) ? [] : oneHand ? [cable("ankleR", "handR")] : [cable("ankleL", "handL"), cable("ankleR", "handR")]));
   }
   if (has("rings")) {
-    // straps from overhead to each hand, where the hands start
-    extra.push((B) => handsOf(pose(B, 0), grip).map((h, i) => cable([h[0], Math.max(2.4, h[1] + 0.9), h[2]], i ? "handR" : "handL")));
+    // straps from overhead to each hand, where the hands start (unless the motion draws its own straps)
+    const ownStraps = (B: Body) => (m.props?.(B) ?? []).some((p) => p.kind === "cable");
+    extra.push((B) =>
+      ownStraps(B) ? [] : handsOf(pose(B, 0), grip).map((h, i) => cable([h[0], Math.max(2.4, h[1] + 0.9), h[2]], i ? "handR" : "handL")),
+    );
   }
   if (has("smith")) {
     // two upright rails either side of the bar's path

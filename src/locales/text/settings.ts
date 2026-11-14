@@ -50,7 +50,8 @@ export const en = {
   "settings.erase.confirm": "Erase everything",
   "settings.cancel": "Cancel",
   "settings.erase": "Erase this device",
-  "settings.footer": "{brand} · everything is stored on this device",
+  "settings.footer.synced": "{brand} · saved on this device and synced to your account",
+  "settings.footer.local": "{brand} · saved on this device only",
   "settings.language": "Language",
   "settings.language.system": "Match my phone",
   "settings.language.note":
@@ -131,7 +132,8 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.erase.confirm": "Borrarlo todo",
   "settings.cancel": "Cancelar",
   "settings.erase": "Borrar este dispositivo",
-  "settings.footer": "{brand} · todo se guarda en este dispositivo",
+  "settings.footer.synced": "{brand} · guardado en este dispositivo y sincronizado con tu cuenta",
+  "settings.footer.local": "{brand} · guardado solo en este dispositivo",
   "settings.language": "Idioma",
   "settings.language.system": "Igual que el teléfono",
   "settings.language.note":
@@ -214,7 +216,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.erase.confirm": "Tout effacer",
   "settings.cancel": "Annuler",
   "settings.erase": "Effacer cet appareil",
-  "settings.footer": "{brand} · tout est enregistré sur cet appareil",
+  "settings.footer.synced": "{brand} · enregistré sur cet appareil et synchronisé avec votre compte",
+  "settings.footer.local": "{brand} · enregistré uniquement sur cet appareil",
   "settings.language": "Langue",
   "settings.language.system": "Comme le téléphone",
   "settings.language.note":
@@ -298,7 +301,8 @@ export const de: Partial<Record<Key, Message>> = {
   "settings.erase.confirm": "Alles löschen",
   "settings.cancel": "Abbrechen",
   "settings.erase": "Dieses Gerät löschen",
-  "settings.footer": "{brand} · alles ist auf diesem Gerät gespeichert",
+  "settings.footer.synced": "{brand} · auf diesem Gerät gespeichert und mit deinem Konto synchronisiert",
+  "settings.footer.local": "{brand} · nur auf diesem Gerät gespeichert",
   "settings.language": "Sprache",
   "settings.language.system": "Wie mein Telefon",
   "settings.language.note":
@@ -377,7 +381,8 @@ export const it: Partial<Record<Key, Message>> = {
   "settings.erase.confirm": "Cancella tutto",
   "settings.cancel": "Annulla",
   "settings.erase": "Cancella questo dispositivo",
-  "settings.footer": "{brand} · tutto è salvato su questo dispositivo",
+  "settings.footer.synced": "{brand} · salvato su questo dispositivo e sincronizzato con il tuo account",
+  "settings.footer.local": "{brand} · salvato solo su questo dispositivo",
   "settings.language": "Lingua",
   "settings.language.system": "Come il mio telefono",
   "settings.language.note":
@@ -459,7 +464,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "settings.erase.confirm": "すべて消去",
   "settings.cancel": "キャンセル",
   "settings.erase": "この端末のデータを消去",
-  "settings.footer": "{brand} · すべてこの端末に保存されています",
+  "settings.footer.synced": "{brand} · この端末に保存し、アカウントと同期しています",
+  "settings.footer.local": "{brand} · この端末にのみ保存されています",
   "settings.language": "言語",
   "settings.language.system": "端末に合わせる",
   "settings.language.note":
