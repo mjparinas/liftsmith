@@ -2,6 +2,7 @@ package com.getliftsmith.app;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.webkit.WebSettings;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -20,6 +21,12 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StoreReviewPlugin.class);
         registerPlugin(NowPlayingPlugin.class);
         super.onCreate(savedInstanceState);
+        // The app fills the screen and doesn't pinch or double-tap zoom (src/lib/nativeZoom.ts locks the
+        // page's viewport too). Text size follows the phone's own setting through TextZoom instead.
+        WebSettings web = getBridge().getWebView().getSettings();
+        web.setSupportZoom(false);
+        web.setBuiltInZoomControls(false);
+        web.setDisplayZoomControls(false);
     }
 
     @Override
