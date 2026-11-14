@@ -9,7 +9,7 @@ import { publicProfile } from "./publicProfile";
 import { adminReports, checkTagline, handle, resolveReports } from "./social";
 import { moderate } from "./socialModeration";
 
-// A profile's tagline and home gym (Melvin, 2026-11-14; docs/decisions/friends.md "Tagline and home gym").
+// A profile's tagline, home gym and live handle check (Melvin, 2026-11-14; docs/decisions/friends.md "Tagline and home gym").
 const NOW = 1_800_000_000_000;
 const call = (who: string, op: string, b: Record<string, unknown> = {}) => handle(who, { op, ...b }, NOW);
 const join = (who: string, h: string) => call(who, "join", { handle: h, name: h.toUpperCase(), agree: true });
@@ -106,6 +106,19 @@ describe("home gym", () => {
     expect((me.profile as SocialProfile).homeGym).toBeNull();
     await call("acc-a", "update", { name: "Alex" });
     expect((await query("SELECT home_gym FROM social_profiles WHERE account_id = 'acc-a'"))[0]!.home_gym).toBe("");
+  });
+});
+
+describe("handle check while typing", () => {
+  it("says free, mine or taken, and reserved handles read as taken", async () => {
+    const status = async (who: string, h: string) => (await call(who, "handleCheck", { handle: h })).body.status;
+    expect(await status("acc-a", "Alex")).toBe("mine");
+    expect(await status("acc-c", "alex")).toBe("taken");
+    expect(await status("acc-c", "admin")).toBe("taken");
+    expect(await status("acc-c", "alex_lifts")).toBe("free");
+    expect(await status("acc-c", "a")).toBe("invalid");
+    // Someone who hasn't joined yet can ask too (the Join screen).
+    expect(await status("acc-new", "blair")).toBe("taken");
   });
 });
 
