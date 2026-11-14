@@ -280,6 +280,26 @@ describe("scheduling", () => {
     expect(capped({ kind: "missed", at: at(0) }, [{ ...s(0), status: "cancelled" }], TZ)).toBe(false);
   });
 
+  it("adds one getting-started email on a free day, never for under-18s, and only while its switch is on", async () => {
+    // Welcomed on Saturday; Sunday's run finds Sunday free (Monday has the 08:00 note): the tour goes out at 10:00.
+    const sun = addDays(MON, -1, TZ);
+    const { store, mail, sent } = await confirmed(addDays(MON, -2, TZ) + 3600_000);
+    await runDaily(store, mail, env, sun + 3600_000);
+    const tour = sent.filter((m) => m.idempotencyKey.includes("tour:"));
+    expect(tour).toHaveLength(1);
+    expect(tour[0].scheduledAt).toBe(atTime(sun, "10:00", TZ));
+    expect(tour[0].html).toContain("/email/en/01.jpg");
+
+    for (const p of [{ teen: true }, { kinds: { tour: false } }]) {
+      const store = memoryStore();
+      const f = fakeMail();
+      await subscribe(ok(body(p)), store, f.mail, env, addDays(MON, -2, TZ) + 3600_000);
+      await confirm(ID, confirmToken(f.sent[0]), store, f.mail, env, addDays(MON, -2, TZ) + 3600_000);
+      await runDaily(store, f.mail, env, sun + 3600_000);
+      expect(f.sent.some((m) => m.idempotencyKey.includes("tour:"))).toBe(false);
+    }
+  });
+
   it("sends nothing while a subscription is unconfirmed", async () => {
     const store = memoryStore();
     const { mail, sent } = fakeMail();

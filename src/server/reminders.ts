@@ -11,6 +11,7 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypt
 
 import {
   dateKey,
+  DEFAULT_ON,
   EMAIL_KINDS,
   KIND_INFO,
   milestone,
@@ -24,6 +25,7 @@ import {
 import { isMsgLang } from "@/lib/messageText";
 
 import { confirmMail, messageMail, welcomeMail, type Footer, type Mail } from "./reminderEmails";
+import { nextTour, tourMail } from "./tour";
 
 export type Status = "pending" | "confirmed" | "unsubscribed";
 export type PlanFields = Omit<PlanInput, "kinds">;
@@ -185,6 +187,7 @@ export function checkBody(b: unknown): { ok: true; body: SubBody } | { ok: false
         pro,
         // Optional so older apps keep working; anything unknown reads as English.
         lang: isMsgLang(x.lang) ? x.lang : undefined,
+        teen: x.teen === true || undefined,
       },
     },
   };
@@ -346,7 +349,8 @@ export async function runDaily(store: Store, mail: Mailer, env: Env, now: number
 
 /** Whether a message would break a cap, given what was already sent or scheduled. */
 export function capped(m: Pick<Message, "kind" | "at">, sends: readonly Send[], tz: string): boolean {
-  const live = sends.filter((s) => s.status !== "cancelled" && s.kind !== "welcome");
+  // The welcome and the feature tour don't count: the tour makes way for anything else on its day (schedule()).
+  const live = sends.filter((s) => s.status !== "cancelled" && s.kind !== "welcome" && s.kind !== "tour");
   if (live.some((s) => dateKey(s.sendAt, tz) === dateKey(m.at, tz))) return true;
   if (live.filter((s) => s.sendAt > m.at - 7 * DAY && s.sendAt <= m.at).length >= CAPS.perWeek) return true;
   if (m.kind === "pro" && live.some((s) => s.kind === "pro" && Math.abs(m.at - s.sendAt) < CAPS.proEvery)) return true;
@@ -395,17 +399,44 @@ async function cancelScheduled(sub: Sub, store: Store, mail: Mailer, now: number
  */
 export async function schedule(sub: Sub, store: Store, mail: Mailer, env: Env, now: number): Promise<number> {
   if (sub.status !== "confirmed") return 0;
-  const msgs = plan({ ...sub.plan, kinds: sub.kinds }, now, now + WINDOW, "email").filter((m) => KIND_INFO[m.kind].email);
+  const tz = sub.plan.tz;
+  const msgs = plan({ ...sub.plan, kinds: sub.kinds }, now, now + WINDOW, "email").filter(
+    // No promotional email to under-18s (Pro offers; the tour below).
+    (m) => KIND_INFO[m.kind].email && !(sub.plan.teen && m.kind === "pro"),
+  );
   const keys = new Set(msgs.map((m) => m.key));
-  await cancelScheduled(sub, store, mail, now, (s) => !keys.has(s.key));
+  // The tour isn't planned here, so it's never cancelled for being missing from the plan (only to make way, below).
+  await cancelScheduled(sub, store, mail, now, (s) => s.kind !== "tour" && !keys.has(s.key));
   const sends = await store.sends(sub.id, now - 30 * DAY);
   let n = 0;
   for (const m of msgs) {
     if (sends.some((s) => s.key === m.key && s.status !== "cancelled")) continue;
-    if (capped(m, sends, sub.plan.tz)) continue;
+    if (capped(m, sends, tz)) continue;
+    // One email a day: a tour email already scheduled for that day steps aside and goes out on a later day.
+    const day = dateKey(m.at, tz);
+    await cancelScheduled(sub, store, mail, now, (s) => s.kind === "tour" && dateKey(s.sendAt, tz) === day);
+    for (const s of sends) if (s.kind === "tour" && s.status === "scheduled" && dateKey(s.sendAt, tz) === day) s.status = "cancelled";
     if (await deliver(sub, m, store, mail, env, now)) {
       sends.push({ subId: sub.id, key: m.key, kind: m.kind, sendAt: m.at, resendId: null, status: "scheduled" });
       n++;
+    }
+  }
+  // The feature tour: the next email in the series, on a day with nothing else (tour.ts).
+  if ((sub.kinds.tour ?? DEFAULT_ON.tour) && !sub.plan.teen) {
+    const t = nextTour(await store.sends(sub.id, 0), tz, now, now + WINDOW);
+    if (t) {
+      const r = await mail.send({
+        ...tourMail(t, footer(env, sub.id), sub.plan.lang),
+        to: sub.email,
+        // Dated: a tour email that stepped aside is sent again on another day under the same key.
+        idempotencyKey: `${sub.id}-${t.key}-${dateKey(t.at, tz)}`,
+        scheduledAt: t.at - now > 60_000 ? t.at : undefined,
+        headers: listHeaders(env, sub.id),
+      });
+      if (r) {
+        await store.putSend({ subId: sub.id, key: t.key, kind: "tour", sendAt: t.at, resendId: r.id, status: "scheduled" });
+        n++;
+      }
     }
   }
   return n;

@@ -64,6 +64,7 @@ describe("Settings › Reminders on the web", () => {
         "resubscribe",
         "startedAt",
         "streakWeeks",
+        "teen",
         "time",
         "token",
         "tz",

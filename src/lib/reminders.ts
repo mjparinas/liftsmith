@@ -58,6 +58,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
     // goalStreak counts this week once it's met; the planner wants the weeks before it.
     streakWeeks: g.weeks - (g.thisWeek >= Math.max(1, profile.daysPerWeek) ? 1 : 0),
     pro: storePro(now) ?? proState(profile.pro, now),
+    teen: isTeen(profile, now) || undefined,
     kinds: (channel === "push" ? prefs?.push : prefs?.email?.kinds) ?? {},
     lang: currentLang(),
   };
@@ -198,6 +199,7 @@ export function subscriptionBody(profile: Profile, stats: Stats, now: number, su
     weekStart: i.weekStart,
     streakWeeks: i.streakWeeks,
     pro: i.pro,
+    teen: i.teen ?? false,
     lang: i.lang,
   };
 }
