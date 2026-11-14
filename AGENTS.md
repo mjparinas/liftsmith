@@ -44,7 +44,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ## Email (rule, Melvin, 2026-11-14)
 
-- **"Email me" is on by default** for every signed-in adult, existing accounts included, with the account's verified address. Under-18s start with it off. Turning it off syncs (`messages.emailOff`), the sign-in screen says emails come with an account, and every email has one-click unsubscribe and its kind's own switch in Settings › Reminders. Details in [Reminders and lifecycle messages](docs/decisions/reminders-and-lifecycle-messages.md).
+- **"Email me" is on by default** for every signed-in adult, existing accounts included, with the account's verified address. Under-18s start with it off. Turning it off syncs (`messages.emailOff`), the sign-in screen says emails come with an account, and every email has one-click unsubscribe and its kind's own switch in Settings › Reminders. **Getting started tips** (the feature tour) send one branded email a day for the first eight days, each with a real app screen in the reader's language (`src/server/tour.ts`, `public/email/`). No promotional email (the tour, Pro offers) goes to under-18s. Details in [Reminders and lifecycle messages](docs/decisions/reminders-and-lifecycle-messages.md).
 
 ## Product rules (apply to every screen)
 

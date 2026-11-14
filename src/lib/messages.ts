@@ -18,7 +18,7 @@ import { dayName, say, type MsgLang } from "./messageText";
 //  - Pro offers only go to people who don't have Pro, are opt-in on both channels, and are rare.
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
-export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro";
+export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour";
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
@@ -42,6 +42,13 @@ export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push
     push: true,
     email: true,
   },
+  // The feature tour: one email a day about one thing the app does, with a real screenshot (server/tour.ts).
+  tour: {
+    label: "Getting started tips",
+    blurb: "One email a day for your first eight days, each about one thing the app does.",
+    push: false,
+    email: true,
+  },
 };
 
 export const KINDS = Object.keys(KIND_INFO) as MessageKind[];
@@ -49,7 +56,14 @@ export const PUSH_KINDS = KINDS.filter((k) => KIND_INFO[k].push);
 export const EMAIL_KINDS = KINDS.filter((k) => KIND_INFO[k].email);
 
 /** On unless the lifter turned them off. Pro offers are off until they turn them on (store rules and GDPR). */
-export const DEFAULT_ON: Record<MessageKind, boolean> = { reminder: true, missed: true, streak: true, milestone: true, pro: false };
+export const DEFAULT_ON: Record<MessageKind, boolean> = {
+  reminder: true,
+  missed: true,
+  streak: true,
+  milestone: true,
+  pro: false,
+  tour: true,
+};
 
 export type ProState =
   | { state: "pro" }
@@ -76,6 +90,8 @@ export interface PlanInput {
   /** Weeks in a row before this one that met the goal (game.ts goalStreak, less this week). */
   streakWeeks: number;
   pro: ProState;
+  /** Under 18 by the birth year they gave (teen.ts): no promotional email (the feature tour, Pro offers). */
+  teen?: boolean;
   kinds: Partial<Record<MessageKind, boolean>>;
   /** The app's language, for the words of each message. English when missing (older subscriptions). */
   lang?: MsgLang;

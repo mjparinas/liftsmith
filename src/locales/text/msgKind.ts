@@ -14,6 +14,8 @@ export const en = {
   "msgKind.milestone.blurb": "Your first workout, and streaks of 4, 8, 12, 26 and 52 weeks.",
   "msgKind.pro": "Pro trial and offers",
   "msgKind.pro.blurb": "When your trial is about to end, and now and then what Pro adds. Never more than one every two weeks.",
+  "msgKind.tour": "Getting started tips",
+  "msgKind.tour.blurb": "One email a day for your first eight days, each about one thing the app does.",
 } as const;
 
 type Key = keyof typeof en;
@@ -29,6 +31,8 @@ export const es: Partial<Record<Key, Message>> = {
   "msgKind.milestone.blurb": "Tu primer entrenamiento y rachas de 4, 8, 12, 26 y 52 semanas.",
   "msgKind.pro": "Prueba de Pro y ofertas",
   "msgKind.pro.blurb": "Cuando tu prueba está a punto de acabar y, de vez en cuando, lo que añade Pro. Nunca más de uno cada dos semanas.",
+  "msgKind.tour": "Consejos para empezar",
+  "msgKind.tour.blurb": "Un correo al día durante tus primeros ocho días, cada uno sobre algo que hace la app.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -43,6 +47,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "msgKind.pro": "Essai Pro et offres",
   "msgKind.pro.blurb":
     "Quand votre essai se termine bientôt, et de temps en temps ce qu’apporte Pro. Jamais plus d’un toutes les deux semaines.",
+  "msgKind.tour": "Conseils pour bien démarrer",
+  "msgKind.tour.blurb": "Un e-mail par jour pendant vos huit premiers jours, chacun sur une chose que fait l'app.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -56,6 +62,8 @@ export const de: Partial<Record<Key, Message>> = {
   "msgKind.milestone.blurb": "Dein erstes Training und Serien von 4, 8, 12, 26 und 52 Wochen.",
   "msgKind.pro": "Pro-Testphase und Angebote",
   "msgKind.pro.blurb": "Wenn deine Testphase bald endet und ab und zu, was Pro bietet. Nie öfter als einmal in zwei Wochen.",
+  "msgKind.tour": "Tipps für den Einstieg",
+  "msgKind.tour.blurb": "Eine E-Mail pro Tag in deinen ersten acht Tagen, jede über eine Sache, die die App kann.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -70,6 +78,8 @@ export const it: Partial<Record<Key, Message>> = {
   "msgKind.milestone.blurb": "Il tuo primo allenamento e le serie di 4, 8, 12, 26 e 52 settimane.",
   "msgKind.pro": "Prova Pro e offerte",
   "msgKind.pro.blurb": "Quando la prova sta per finire e, ogni tanto, cosa aggiunge Pro. Mai più di una ogni due settimane.",
+  "msgKind.tour": "Consigli per iniziare",
+  "msgKind.tour.blurb": "Un'email al giorno per i primi otto giorni, ognuna su una cosa che fa l'app.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -83,4 +93,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "msgKind.milestone.blurb": "初めてのワークアウトと、4・8・12・26・52週の連続記録。",
   "msgKind.pro": "Pro のお試しとお得な情報",
   "msgKind.pro.blurb": "お試し期間の終了前と、ときどき Pro でできること。2週間に1回まで。",
+  "msgKind.tour": "はじめてのヒント",
+  "msgKind.tour.blurb": "最初の 8 日間、1 日 1 通。アプリでできることを 1 つずつ紹介します。",
 };
