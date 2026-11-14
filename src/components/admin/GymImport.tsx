@@ -10,7 +10,7 @@ import type { ImportResult, ImportRow } from "@/server/gymImport";
 
 import { Card } from "./charts";
 
-type Answer = Extract<ImportResult, { ok: true }> | { ok?: false; error: string; detail?: string; log?: string[] };
+type Answer = Extract<ImportResult, { ok: true }> | { ok?: false; error: string; detail?: string; log?: string[]; retry?: boolean };
 
 interface Done {
   where: string;
@@ -18,8 +18,11 @@ interface Done {
   r: Answer;
 }
 
-/** Two cities at a time: one per Overpass server, which stays within each server's per-client slots. */
+/** Two cities at a time: each on its own map server, which stays within each server's per-client slots. */
 export const IMPORT_WORKERS = 2;
+/** A city whose map servers were all busy goes back in line this many times, after these pauses (the servers are often
+ * busy for a few minutes at a time, so a city that failed at 2:00 usually imports at 2:05). */
+export const RETRY_AFTER_MS = [3 * 60_000, 10 * 60_000];
 /** How recent an import must be for "Skip recent cities" to pass it over. */
 const RECENT_MS = 7 * 86_400_000;
 
@@ -58,11 +61,18 @@ async function postImport(where: string, server: number): Promise<Answer> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "import", where, server }),
   }).catch(() => null);
-  if (!r) return { error: "The admin server didn't answer (network or time limit)." };
+  if (!r) return { error: "The admin server didn't answer (network or time limit).", retry: true };
   const j = (await r.json().catch(() => null)) as (Partial<ImportResult> & { error?: string; detail?: string; log?: string[] }) | null;
-  if (!j) return { error: `The admin server answered ${r.status} with no details (it may have hit its five-minute limit).` };
+  if (!j) return { error: `The admin server answered ${r.status} with no details (it may have hit its five-minute limit).`, retry: true };
   if (r.ok && j.ok) return j as Extract<ImportResult, { ok: true }>;
-  return { ok: false, error: j.error ?? `HTTP ${r.status}`, detail: j.detail, log: j.log };
+  // A place Nominatim doesn't know (400) won't be found by asking again; busy map servers (502) and the rest might.
+  return {
+    ok: false,
+    error: j.error ?? `HTTP ${r.status}`,
+    detail: j.detail,
+    log: j.log,
+    retry: r.status !== 400 && r.status !== 401 && r.status !== 403,
+  };
 }
 
 interface Run {
@@ -71,6 +81,10 @@ interface Run {
   skipped: number;
   startedAt: number;
   active: string[];
+  /** Cities waiting to try again, and when. */
+  waiting: { where: string; tries: number; at: number }[];
+  /** Failed tries that went back in line, kept for the debug log. */
+  retried: Done[];
   done: Done[];
   stopped: boolean;
   finished: boolean;
@@ -143,33 +157,60 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
       skipped,
       startedAt: Date.now(),
       active: [],
+      waiting: [],
+      retried: [],
       done: [],
       stopped: false,
       finished: false,
       endedAt: 0,
     };
-    const show = () => setRun({ ...state, active: [...state.active], done: [...state.done] });
+    const show = () =>
+      setRun({ ...state, active: [...state.active], waiting: [...state.waiting], retried: [...state.retried], done: [...state.done] });
     show();
-    let next = 0;
+    const queue = [...places];
+    const tries = new Map<string, number>();
+    const pause = (ms: number) => new Promise((ok) => setTimeout(ok, ms));
+    // The next city: the queue first, then a failed one whose pause is over. A worker with nothing left but cities
+    // still pausing waits for them (a second at a time, so Stop is quick); it ends when nothing is queued, pausing or
+    // being imported by the other worker (which may still put one back).
+    const take = async (): Promise<string | null> => {
+      for (;;) {
+        if (stop.current) return null;
+        const p = queue.shift();
+        if (p !== undefined) return p;
+        const ready = state.waiting.findIndex((x) => x.at <= Date.now());
+        if (ready >= 0) return state.waiting.splice(ready, 1)[0]!.where;
+        if (!state.waiting.length && !state.active.length) return null;
+        await pause(1000);
+      }
+    };
     const worker = async (w: number) => {
       // The second worker starts a moment later, so Nominatim (one request a second) isn't asked twice at once.
-      if (w) await new Promise((ok) => setTimeout(ok, 1500));
-      while (!stop.current && next < places.length) {
-        const i = next++;
-        const place = places[i]!;
+      if (w) await pause(1500);
+      for (let place = await take(); place !== null; place = await take()) {
+        const tried = tries.get(place) ?? 0;
+        tries.set(place, tried + 1);
         state.active.push(place);
         show();
-        // Each worker starts on its own Overpass server and moves round them, so a busy one doesn't hold both.
-        const r = await postImport(place, w + i);
+        // Each worker starts on its own healthy map server (the server ranks them), so two cities don't queue on one.
+        const r = await postImport(place, w);
         state.active = state.active.filter((p) => p !== place);
-        state.done.push({ where: place, at: Date.now(), r });
+        const again = RETRY_AFTER_MS[tried];
+        if (!r.ok && r.retry && again !== undefined && !stop.current) {
+          state.waiting.push({ where: place, tries: tried + 1, at: Date.now() + again });
+          state.retried.push({ where: place, at: Date.now(), r });
+        } else state.done.push({ where: place, at: Date.now(), r });
         show();
         changed();
-        if (!stop.current) await new Promise((ok) => setTimeout(ok, 1000));
+        if (!stop.current) await pause(1000);
       }
     };
     await Promise.all(Array.from({ length: Math.min(IMPORT_WORKERS, places.length) }, (_, w) => worker(w)));
     state.stopped = stop.current;
+    // Cities still pausing when the run was stopped count as not done (Retry failed picks them up).
+    for (const x of state.waiting)
+      state.done.push({ where: x.where, at: Date.now(), r: { ok: false, error: "Stopped before trying again." } });
+    state.waiting = [];
     state.finished = true;
     state.endedAt = Date.now();
     setStopping(false);
@@ -343,7 +384,10 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
                   </div>
                   <div>
                     <dt className="text-xs text-faint">Errors</dt>
-                    <dd className={failed.length ? "text-bad" : ""}>{failed.length}</dd>
+                    <dd className={failed.length ? "text-bad" : ""}>
+                      {failed.length}
+                      {run.waiting.length ? `, ${run.waiting.length} busy, trying again soon` : ""}
+                    </dd>
                   </div>
                 </dl>
                 {failed.length > 0 && (
@@ -368,7 +412,7 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
                       Retry {failed.length} failed
                     </button>
                   )}
-                  {run.done.length > 0 && (
+                  {run.done.length + run.retried.length > 0 && (
                     <button
                       type="button"
                       onClick={() =>
@@ -378,6 +422,7 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
                           total: run.total,
                           skippedAsRecent: run.skipped,
                           cities: run.done.map((d) => ({ where: d.where, finishedAt: new Date(d.at).toISOString(), ...d.r })),
+                          triedAgain: run.retried.map((d) => ({ where: d.where, failedAt: new Date(d.at).toISOString(), ...d.r })),
                         })
                       }
                       className="press rounded-lg border border-line px-3 py-1.5"

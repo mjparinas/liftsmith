@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
-import { detailsFromHtml, enrichBatch, enrichPlace, hoursFromSpec, publicHost } from "./gymEnrich";
-import { placesFromOsm, savePlaces, socialUrl, type OsmElement } from "./gymPlaces";
+import { detailsFromHtml, enrichBatch, enrichPlace, hoursFromSpec, iconLinks, imageType, publicHost } from "./gymEnrich";
+import { placeById, placesFromOsm, savePlaces, socialUrl, type OsmElement } from "./gymPlaces";
 
 const NOW = 1_800_000_000_000;
 const AREA = { city: "Langley", region: "BC", country: "CA" };
@@ -126,13 +126,14 @@ describe("filling in a gym", () => {
     expect((await query("SELECT email FROM gym_places"))[0]!.email).toBe("");
   });
 
-  it("reads the home page even when robots.txt says no, and nothing else", async () => {
+  it("reads the home page even when robots.txt says no, and robots.txt isn't asked for", async () => {
     await savePlaces(placesFromOsm([GYM], AREA), NOW);
     const [p] = await query("SELECT id FROM gym_places");
     const { fetcher, calls } = site("User-agent: *\nDisallow: /", PAGE);
     const r = await enrichPlace({ id: String(p!.id), name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW);
     expect(r.filled).toContain("hours");
-    expect(calls).toEqual(["https://ironworks.example.com/"]);
+    // The home page, then its icon (this page names none, so /favicon.ico).
+    expect(calls).toEqual(["https://ironworks.example.com/", "https://ironworks.example.com/favicon.ico"]);
   });
 
   it("reads gyms in batches, each at most once a month, and counts what's left", async () => {
@@ -185,5 +186,58 @@ describe("what the map says", () => {
       facebook: "https://www.facebook.com/ironworksgym",
       wheelchair: "limited",
     });
+  });
+});
+
+describe("the gym's own icon", () => {
+  const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, ...Array.from({ length: 200 }, () => 7)]);
+  const HEAD = `<html><head><link rel="icon" href="/favicon-32.png" sizes="32x32"><link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"></head><body>Hi</body></html>`;
+
+  it("picks the touch icon, then the largest icon, then /favicon.ico, and never SVG", () => {
+    expect(iconLinks(HEAD, "https://ironworks.example.com/")).toEqual([
+      "https://ironworks.example.com/apple-touch-icon.png",
+      "https://ironworks.example.com/favicon-32.png",
+      "https://ironworks.example.com/favicon.ico",
+    ]);
+    expect(iconLinks("<p>no head</p>", "https://ironworks.example.com/")).toEqual(["https://ironworks.example.com/favicon.ico"]);
+  });
+
+  it("knows an image from its first bytes and refuses anything else", () => {
+    expect(imageType(PNG)).toBe("image/png");
+    expect(imageType(new Uint8Array([0, 0, 1, 0, 1, 0, 16, 16, 0, 0, 1, 0]))).toBe("image/x-icon");
+    expect(imageType(new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"><script>x()</script></svg>'))).toBe("");
+  });
+
+  it("keeps the site's icon as the logo of an unclaimed gym, once, and never for a claimed one", async () => {
+    await savePlaces(placesFromOsm([GYM], AREA), NOW);
+    const [p] = await query("SELECT id FROM gym_places");
+    const id = String(p!.id);
+    const fetcher = (async (url: string | URL | Request) => {
+      const u = String(url);
+      if (u.endsWith("/apple-touch-icon.png"))
+        return new Response("<html>not found page</html>", { headers: { "content-type": "text/html" } });
+      if (u.endsWith("/favicon-32.png")) return new Response(PNG, { headers: { "content-type": "image/png" } });
+      return new Response(HEAD, { headers: { "content-type": "text/html" } });
+    }) as typeof fetch;
+    const r = await enrichPlace({ id, name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW);
+    expect(r.filled).toContain("icon");
+    const logo = (await placeById(id))!.logo;
+    expect(logo).toMatch(/^[0-9a-f]{16}$/);
+    await enrichPlace({ id, name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW + 1);
+    expect(await query("SELECT COUNT(*) AS n FROM gym_photos")).toEqual([{ n: 1 }]);
+    // An owner's logo wins over the icon.
+    await run("INSERT INTO gym_photos (id, place_id, kind, image, created_at) VALUES ('aaaaaaaaaaaaaaaa', ?, 'logo', ?, ?)", [
+      id,
+      new Uint8Array([0xff, 0xd8, 0xff, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+      NOW + 2,
+    ]);
+    expect((await placeById(id))!.logo).toBe("aaaaaaaaaaaaaaaa");
+    await run("DELETE FROM gym_photos");
+    await run("UPDATE gym_places SET claimed_by = 'acc-owner'");
+    expect(
+      (await enrichPlace({ id, name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW + 3)).filled,
+    ).not.toContain("icon");
+    expect(await query("SELECT COUNT(*) AS n FROM gym_photos")).toEqual([{ n: 0 }]);
   });
 });

@@ -1,7 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
-import { IMPORT_LIMITS, importArea, importKey, lastImported, OVERPASS, overpassQuery, recentImports, serverOrder } from "./gymImport";
+import {
+  IMPORT_LIMITS,
+  importArea,
+  importKey,
+  lastImported,
+  OVERPASS,
+  overpassQuery,
+  planServers,
+  recentImports,
+  serverHealth,
+} from "./gymImport";
 import type { OsmElement } from "./gymPlaces";
 
 const NOW = 1_800_000_000_000;
@@ -36,6 +46,7 @@ function fakeWeb(servers: Record<string, () => Response | Promise<Response>>, hi
 const saved = { ...IMPORT_LIMITS };
 beforeEach(async () => {
   await resetDb();
+  IMPORT_LIMITS.waitMs = 1;
 });
 afterEach(() => {
   Object.assign(IMPORT_LIMITS, saved);
@@ -114,12 +125,68 @@ describe("importing a city", () => {
   });
 
   it("starts parallel imports on different servers", async () => {
-    expect(serverOrder(0)).toEqual(OVERPASS);
-    expect(serverOrder(1)[0]).toBe(OVERPASS[1]);
-    expect(serverOrder(4)[0]).toBe(OVERPASS[1]);
+    expect(planServers().order).toEqual(OVERPASS);
+    expect(planServers({}, 1).order[0]).toBe(OVERPASS[1]);
+    expect(planServers({}, 4).order[0]).toBe(OVERPASS[1]);
     const { fetcher, calls } = fakeWeb({});
     await importArea("Langley, BC", fetcher, NOW, { server: 2 });
     expect(calls.filter((u) => !u.includes("nominatim"))).toEqual([OVERPASS[2]]);
+  });
+
+  it("tries the server that answered most lately first, and one that keeps hanging only after a busy round", () => {
+    const { order, slow } = planServers({
+      "overpass-api.de": { ok: 1, busy: 6, timeout: 0, error: 0 },
+      "maps.mail.ru": { ok: 4, busy: 2, timeout: 0, error: 0 },
+      "overpass.private.coffee": { ok: 1, busy: 0, timeout: 5, error: 0 },
+    });
+    expect(order).toEqual([OVERPASS[1], OVERPASS[0], OVERPASS[2]]);
+    expect([...slow]).toEqual([OVERPASS[2]]);
+    // Parallel imports spread over the healthy two; the slow one stays last.
+    expect(planServers({ "overpass.private.coffee": { ok: 0, busy: 0, timeout: 2, error: 0 } }, 1).order).toEqual([
+      OVERPASS[1],
+      OVERPASS[0],
+      OVERPASS[2],
+    ]);
+  });
+
+  it("waits and asks a busy server again instead of failing, and remembers how each server did", async () => {
+    let tries = 0;
+    const busyThenOk = () => (++tries < 2 ? new Response("at capacity", { status: 502 }) : Response.json({ elements: OSM }));
+    const waits: number[] = [];
+    const { fetcher, calls } = fakeWeb({
+      "overpass-api.de": busyThenOk,
+      "maps.mail.ru": () => new Response("busy", { status: 504 }),
+      "overpass.private.coffee": () => new Promise<Response>(() => undefined),
+    });
+    IMPORT_LIMITS.serverMs = 50;
+    IMPORT_LIMITS.waitMs = 8_000;
+    const first = await importArea("Langley, BC", fetcher, NOW, { sleep: async (ms) => void waits.push(ms) });
+    expect(first).toMatchObject({ ok: true, server: "overpass-api.de" });
+    expect(waits).toEqual([8_000]);
+    // Round one: the two quick servers busy, the hanging one tried once; round two: the first answers.
+    expect(calls.filter((u) => !u.includes("nominatim")).map((u) => new URL(u).host)).toEqual([
+      "overpass-api.de",
+      "maps.mail.ru",
+      "overpass.private.coffee",
+      "overpass-api.de",
+    ]);
+    expect(first.log.join("\n")).toMatch(/every map server busy; asking again in 8\.0s/);
+    expect(await serverHealth(NOW)).toEqual({
+      "overpass-api.de": { ok: 1, busy: 1, timeout: 0, error: 0 },
+      "maps.mail.ru": { ok: 0, busy: 1, timeout: 0, error: 0 },
+      "overpass.private.coffee": { ok: 0, busy: 0, timeout: 1, error: 0 },
+    });
+    expect(await serverHealth(NOW + IMPORT_LIMITS.healthMs + 1)).toEqual({});
+  });
+
+  it("gives up after a few busy rounds, with the last thing each server said", async () => {
+    const busy = () => new Response("busy", { status: 504 });
+    const { fetcher } = fakeWeb({ "overpass-api.de": busy, "maps.mail.ru": busy, "overpass.private.coffee": busy });
+    const waits: number[] = [];
+    const r = await importArea("Langley, BC", fetcher, NOW, { sleep: async (ms) => void waits.push(ms) });
+    expect(r).toMatchObject({ ok: false, error: "map" });
+    expect(waits).toHaveLength(IMPORT_LIMITS.rounds - 1);
+    expect(!r.ok && r.detail.split("; ")).toHaveLength(3);
   });
 
   it("asks Overpass to give up before our own time limit", () => {

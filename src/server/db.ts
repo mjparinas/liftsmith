@@ -1145,6 +1145,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "facebook", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "wheelchair", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "enriched_at", "INTEGER NOT NULL DEFAULT 0"],
+  // Each map server request of an import and how it went, so the next import tries the healthiest server first.
+  ["gym_imports", "attempts", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],
