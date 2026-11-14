@@ -71,7 +71,8 @@ export async function removeMedia(accountId: string, placeId: unknown, id: unkno
   return (await run("DELETE FROM gym_photos WHERE id = ? AND place_id = ?", [id, placeId])) > 0;
 }
 
-/** One picture's bytes, for /api/gyms/photo/?id=. */
+/** One picture's bytes, for /api/gyms/photo/?id= (the route names its type from the bytes: an owner's JPEG, or a
+ * website's PNG, ICO, GIF, JPEG or WebP icon). */
 export async function mediaImage(id: unknown): Promise<Buffer | null> {
   if (!isMediaId(id)) return null;
   const [r] = await query<{ image: ArrayBuffer | Uint8Array }>("SELECT image FROM gym_photos WHERE id = ?", [id]);

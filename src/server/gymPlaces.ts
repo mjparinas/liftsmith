@@ -74,7 +74,8 @@ export interface Place {
   club: string;
   /** Our address for its map picture (gymMedia.ts, Mapbox), '' while Mapbox isn't set up. */
   map: string;
-  /** Its logo's and photos' ids (/api/gyms/photo/?id=), added by the owner. Photos only on one gym's own lookups. */
+  /** Its logo's and photos' ids (/api/gyms/photo/?id=), added by the owner. Without an owner's logo, the icon of the
+   * gym's own website stands in (gymEnrich.ts). Photos only on one gym's own lookups. */
   logo: string;
   photos: string[];
   /** What it has besides equipment, and what a visit costs (the owner's, gymExtras.ts). */
@@ -549,7 +550,7 @@ const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.c
   p.postcode, p.email, p.instagram, p.facebook, p.wheelchair, p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
   (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
-  (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind = 'logo' LIMIT 1) AS logo`;
+  (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind IN ('logo', 'icon') ORDER BY m.kind = 'icon' LIMIT 1) AS logo`;
 
 const toPlace = (r: Row, km: number): Place => ({
   id: s(r.id),
