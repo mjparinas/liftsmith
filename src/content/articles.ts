@@ -4,6 +4,7 @@
 // Rules (checked in seo.test.ts): only features that ship today, no other apps' or trademarked programs'
 // names, every link goes to a page that exists, and every exercise id is in the library.
 import { BLOG_A } from "./blog/a";
+import { BLOG_AA } from "./blog/aa";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
 import { BLOG_D } from "./blog/d";
@@ -224,6 +225,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_X,
   ...BLOG_Y,
   ...BLOG_Z,
+  ...BLOG_AA,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

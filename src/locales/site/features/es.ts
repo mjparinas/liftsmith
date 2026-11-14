@@ -405,6 +405,11 @@ export const es: FeaturesText = {
       name: "Recordatorios",
       body: "Recordatorios suaves los días de entrenamiento, como notificaciones en los teléfonos y por correo.",
     },
+    emails: {
+      name: "Correos que te mantienen en marcha",
+      body: "Ocho consejos para empezar con pantallas reales, un resumen semanal y mensual, tus nuevos récords, qué amigos entrenaron y un empujón para volver tras una pausa. Cada tipo tiene su propio interruptor.",
+      note: "Activados con una cuenta; desactivados para menores de 18 salvo que los activen. Cada correo tiene baja con un clic.",
+    },
     cloud: {
       name: "Conexiones con servicios de fitness",
       body: "Oura envía sueño, VFC, pulso en reposo y pasos, con una cuenta gratuita. Estamos estudiando Strava, WHOOP, Withings, Polar y Concept2.",

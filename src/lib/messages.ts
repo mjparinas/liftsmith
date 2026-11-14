@@ -18,7 +18,7 @@ import { dayName, say, type MsgLang } from "./messageText";
 //  - Pro offers only go to people who don't have Pro, are opt-in on both channels, and are rare.
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
-export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour";
+export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends";
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
@@ -37,11 +37,24 @@ export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push
   streak: { label: "Streak alerts", blurb: "When this week's goal is still reachable but only just.", push: true, email: true },
   milestone: { label: "Milestones", blurb: "Your first workout, and streaks of 4, 8, 12, 26 and 52 weeks.", push: false, email: true },
   pro: {
-    label: "Pro trial and offers",
-    blurb: "When your trial is about to end, and now and then what Pro adds. Never more than one every two weeks.",
+    label: "Pro offers",
+    blurb: "Now and then what Pro adds. Never more than one every two weeks.",
     push: true,
     email: true,
   },
+  // Two days before a free trial ends: what it means for you, on by default because it's about your account.
+  trial: { label: "Trial ending", blurb: "Two days before a Pro trial ends.", push: true, email: true },
+  // Sunday evening's week and the 1st of the month's month, from the numbers the phone sends.
+  recap: {
+    label: "Weekly and monthly recaps",
+    blurb: "Sunday evening, your week; on the 1st, your month, ready to share.",
+    push: false,
+    email: true,
+  },
+  // A new personal best, at most one email a week (the app already celebrates it in the moment).
+  records: { label: "Personal bests", blurb: "A new best on a lift, at most once a week.", push: false, email: true },
+  // Thursday evening: which friends trained this week (Friends, server side).
+  friends: { label: "Friend activity", blurb: "Thursday evening, which friends trained this week.", push: false, email: true },
   // The feature tour: one email a day about one thing the app does, with a real screenshot (server/tour.ts).
   tour: {
     label: "Getting started tips",
@@ -63,7 +76,22 @@ export const DEFAULT_ON: Record<MessageKind, boolean> = {
   milestone: true,
   pro: false,
   tour: true,
+  trial: true,
+  recap: true,
+  records: true,
+  friends: true,
 };
+
+/** A stretch of training, for the recaps: from the phone's own workouts (reminders.ts planInput). */
+export interface Totals {
+  /** Local midnight the stretch starts (a Monday, or the 1st of a month). */
+  start: number;
+  workouts: number;
+  sets: number;
+  volumeKg: number;
+  prs: number;
+  minutes: number;
+}
 
 export type ProState =
   | { state: "pro" }
@@ -95,6 +123,13 @@ export interface PlanInput {
   kinds: Partial<Record<MessageKind, boolean>>;
   /** The app's language, for the words of each message. English when missing (older subscriptions). */
   lang?: MsgLang;
+  /** For the recaps and personal bests: the lifter's unit, this week so far, last calendar month, the newest best. */
+  unit?: "kg" | "lb";
+  week?: Totals;
+  lastMonth?: Totals;
+  best?: { at: number; name: string; weightKg: number; reps: number };
+  /** Before the first workout: today's planned exercises (in the app's language) and minutes, for the welcome. */
+  next?: { names: string[]; minutes: number };
 }
 
 export interface Message {
@@ -111,7 +146,7 @@ export interface Message {
 const DAY = 86_400_000;
 export const QUIET = { from: 21, to: 8 } as const;
 export const REMINDER_HOURS = { min: 6, max: 21 } as const;
-const COMEBACK_DAYS = [7, 14, 30];
+const COMEBACK_DAYS = [7, 14, 21, 30];
 /** Days after the trial ends or is declined that a Pro offer goes out. Four in all, then none. */
 export const PRO_OFFER_DAYS = [3, 17, 31, 59];
 export const MILESTONE_WEEKS = [4, 8, 12, 26, 52];
@@ -237,8 +272,8 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
     const monday = mondayIn(day + 12 * 3600_000, tz);
     const trainedToday = last >= day;
     const candidates: Message[] = [];
-    const add = (kind: MessageKind, at: number, title: string, body: string, route = "today") => {
-      if (at >= from && at < to && on(kind)) candidates.push({ key: `${kind}:${key}`, kind, at, title, body, route });
+    const add = (kind: MessageKind, at: number, title: string, body: string, route = "today", tag = "") => {
+      if (at >= from && at < to && on(kind)) candidates.push({ key: `${kind}:${key}${tag}`, kind, at, title, body, route });
     };
 
     // Streak: this week's goal is reachable only if every day left has a workout.
@@ -299,22 +334,61 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       );
     }
 
-    // Comebacks: 7, 14 and 30 days with no workout (or since setup, if none yet), then nothing.
+    // Comebacks: 7, 14, 21 and 30 days with no workout (or since setup, if none yet), then nothing. From two weeks
+    // it's a win-back: the plan starts lighter, so the first one back isn't a slog.
     const quiet = Math.round((day - dayStart(since, tz)) / DAY);
     if (!trainedToday && since > 0 && COMEBACK_DAYS.includes(quiet)) {
+      const winback = !!input.firstWorkoutAt && quiet >= 14;
+      const firstPlan = !input.firstWorkoutAt && email && input.next?.names.length ? input.next : null;
       add(
         "missed",
         atTime(day, sendHour, tz),
-        input.firstWorkoutAt ? say(lang, "rmd.ready") : say(lang, "rmd.firstWaiting"),
-        input.firstWorkoutAt ? say(lang, "rmd.comeback", { days: quiet }) : say(lang, "rmd.firstWaitingBody"),
+        winback ? say(lang, "rmd.winback") : input.firstWorkoutAt ? say(lang, "rmd.ready") : say(lang, "rmd.firstWaiting"),
+        winback
+          ? say(lang, "rmd.winbackBody", { days: quiet })
+          : input.firstWorkoutAt
+            ? say(lang, "rmd.comeback", { days: quiet })
+            : firstPlan
+              ? say(lang, "rmd.firstWaitingPlan", { list: listOf(lang, firstPlan.names), minutes: firstPlan.minutes })
+              : say(lang, "rmd.firstWaitingBody"),
       );
+    }
+
+    // Recaps (email): Sunday at 19:00, the week so far; on the 1st at 09:00, last month. The key carries the numbers,
+    // so a workout logged after the run replaces the scheduled recap with the new numbers.
+    if (email && wd === 0 && input.week && input.week.start === monday && input.week.workouts > 0) {
+      const w = input.week;
+      add(
+        "recap",
+        atTime(day, "19:00", tz),
+        say(lang, "rmd.recapWeek"),
+        totalsLine(lang, w, input.unit),
+        "stats",
+        `:${w.workouts}-${w.sets}-${w.prs}`,
+      );
+    }
+    const local = parts(day + 12 * 3600_000, tz);
+    if (email && local.d === 1 && input.lastMonth && input.lastMonth.workouts > 0) {
+      const m = input.lastMonth;
+      const prev = parts(m.start + 12 * 3600_000, tz);
+      if ((prev.m % 12) + 1 === local.m && prev.d === 1) {
+        const month = new Intl.DateTimeFormat(lang ?? "en", { month: "long", timeZone: tz }).format(m.start + 12 * 3600_000);
+        add(
+          "recap",
+          atTime(day, "09:00", tz),
+          say(lang, "rmd.recapMonth", { month }),
+          `${totalsLine(lang, m, input.unit)} ${say(lang, "rmd.recapMonthShare")}`,
+          "recap",
+          `:month${m.workouts}-${m.sets}`,
+        );
+      }
     }
 
     // Pro: two days before a trial ends, then four offers spread over two months. proState() reports
     // everyone as Pro while billing is off, so none go out until it's live.
     if (input.pro.state === "trial") {
       if (day === addDays(input.pro.endsAt, -2, tz))
-        add("pro", atTime(day, "12:00", tz), say(lang, "rmd.trialEnds"), say(lang, "rmd.trialEndsBody"), "settings");
+        add("trial", atTime(day, "12:00", tz), say(lang, "rmd.trialEnds"), say(lang, "rmd.trialEndsBody"), "settings");
     }
     if (input.pro.state === "free") {
       const n = PRO_OFFER_DAYS.indexOf(Math.round((day - dayStart(input.pro.since, tz)) / DAY));
@@ -322,12 +396,49 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       if (offer) add("pro", atTime(day, "12:00", tz), say(lang, offer), say(lang, `${offer}.body`), "settings");
     }
 
-    // One a day: the reminder (the lifter asked for it) wins, then streak, missed, Pro.
-    const order: MessageKind[] = ["reminder", "streak", "missed", "pro"];
+    // One a day: the reminder (the lifter asked for it) wins, then the trial ending, recaps, streak, missed, Pro.
+    const order: MessageKind[] = ["reminder", "trial", "recap", "streak", "missed", "pro"];
     const best = candidates.sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind))[0];
     if (best && (best.kind === "reminder" || !inQuiet(best.at, tz))) out.push(best);
   }
   return out.sort((a, b) => a.at - b.at);
+}
+
+/** "A, B and C" in the lifter's language. */
+export function listOf(lang: MsgLang | undefined, items: readonly string[]): string {
+  return new Intl.ListFormat(lang ?? "en", { style: "long", type: "conjunction" }).format(items);
+}
+
+/** A week's or month's numbers in one line: workouts, sets, weight lifted and new bests. */
+export function totalsLine(lang: MsgLang | undefined, t: Totals, unit: "kg" | "lb" = "kg"): string {
+  const n = new Intl.NumberFormat(lang ?? "en", { maximumFractionDigits: 0 });
+  const volume = unit === "lb" ? t.volumeKg * 2.2046226218 : t.volumeKg;
+  const line = say(lang, "rmd.recapLine", {
+    workouts: say(lang, "rmd.workouts", { count: t.workouts }),
+    sets: say(lang, "rmd.sets", { count: t.sets }),
+    volume: `${n.format(volume)} ${unit}`,
+  });
+  return t.prs > 0 ? `${line} ${say(lang, "rmd.recapPrs", { count: t.prs })}` : line;
+}
+
+/**
+ * A personal-best email for a best the phone just reported, or null: a new best since the last report, set in the
+ * last day. At most one a week (the server checks its sends).
+ */
+export function record(
+  prev: Pick<PlanInput, "best"> | null,
+  next: Pick<PlanInput, "best" | "lang" | "unit">,
+  now: number,
+): { key: string; title: string; body: string } | null {
+  const b = next.best;
+  if (!b || b.at <= (prev?.best?.at ?? 0) || now - b.at > DAY) return null;
+  const unit = next.unit ?? "kg";
+  const w = unit === "lb" ? Math.round(b.weightKg * 2.2046226218) : Math.round(b.weightKg * 10) / 10;
+  return {
+    key: `records:${b.at}`,
+    title: say(next.lang, "rmd.record", { name: b.name }),
+    body: say(next.lang, "rmd.recordBody", { name: b.name, weight: `${w} ${unit}`, reps: b.reps }),
+  };
 }
 
 export function inQuiet(at: number, tz: string): boolean {

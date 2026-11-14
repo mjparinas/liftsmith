@@ -403,6 +403,11 @@ export const it: FeaturesText = {
       name: "Promemoria",
       body: "Promemoria gentili nei giorni di allenamento, come notifiche sui telefoni e via email.",
     },
+    emails: {
+      name: "Email che ti tengono in movimento",
+      body: "Otto consigli per iniziare con schermate reali, un riepilogo settimanale e mensile, i nuovi record, quali amici si sono allenati e una spinta per tornare dopo una pausa. Ogni tipo ha il suo interruttore.",
+      note: "Attive con un account, disattivate per i minori di 18 anni a meno che non le attivino. Ogni email ha la disiscrizione con un clic.",
+    },
     cloud: {
       name: "Collegamenti ai servizi fitness",
       body: "Oura invia sonno, HRV, battito a riposo e passi, con un account gratuito. Stiamo valutando Strava, WHOOP, Withings, Polar e Concept2.",

@@ -51,6 +51,7 @@ describe("Settings › Reminders on the web", () => {
     const b = calls[0].body;
     expect(Object.keys(b).sort()).toEqual(
       [
+        "best",
         "consentAt",
         "daysPerWeek",
         "days",
@@ -59,7 +60,9 @@ describe("Settings › Reminders on the web", () => {
         "id",
         "kinds",
         "lang",
+        "lastMonth",
         "lastWorkoutAt",
+        "next",
         "pro",
         "resubscribe",
         "startedAt",
@@ -68,6 +71,8 @@ describe("Settings › Reminders on the web", () => {
         "time",
         "token",
         "tz",
+        "unit",
+        "week",
         "weekDays",
         "weekStart",
       ].sort(),
@@ -78,7 +83,7 @@ describe("Settings › Reminders on the web", () => {
     expect(screen.getByRole("switch", { name: "Email me" })).toHaveAttribute("aria-checked", "true");
 
     // Each kind has its own switch; offers start off.
-    const offers = screen.getByRole("switch", { name: "Pro trial and offers" });
+    const offers = screen.getByRole("switch", { name: "Pro offers" });
     expect(offers).toHaveAttribute("aria-checked", "false");
     expect(screen.getByRole("switch", { name: "Workout reminders" })).toHaveAttribute("aria-checked", "true");
     await user.click(screen.getByRole("switch", { name: "Missed workouts" }));

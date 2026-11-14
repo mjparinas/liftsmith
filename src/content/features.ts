@@ -779,6 +779,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "emails",
+        name: "Emails that keep you going",
+        body: "Eight getting-started tips with real screens, a weekly and monthly recap, new personal bests, which friends trained, and a nudge back after a break. Each kind has its own switch.",
+        tier: "free",
+        note: "On with an account, off for lifters under 18 unless they turn it on. Every email has a one-click unsubscribe.",
+        added: "2026-11-14",
+      },
+      {
         id: "cloud",
         name: "Fitness service connections",
         body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, WHOOP, Withings, Polar and Concept2.",

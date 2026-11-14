@@ -410,6 +410,11 @@ export const fr: FeaturesText = {
       name: "Rappels",
       body: "De petits rappels les jours d’entraînement, en notifications sur les téléphones et par e-mail.",
     },
+    emails: {
+      name: "Des e-mails qui vous font avancer",
+      body: "Huit conseils pour bien démarrer avec de vrais écrans, un bilan de la semaine et du mois, vos nouveaux records, les amis qui se sont entraînés et un coup de pouce pour revenir après une pause. Chaque type a son propre interrupteur.",
+      note: "Activés avec un compte, désactivés pour les moins de 18 ans sauf s'ils les activent. Chaque e-mail a un désabonnement en un clic.",
+    },
     cloud: {
       name: "Connexions aux services de fitness",
       body: "Oura envoie sommeil, VFC, pouls au repos et pas, via un compte gratuit. Nous étudions Strava, WHOOP, Withings, Polar et Concept2.",
