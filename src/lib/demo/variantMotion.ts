@@ -21,6 +21,7 @@ function numOf(v: PerSide<number> | undefined, side: "L" | "R"): number | undefi
   return typeof v === "number" ? v : v[side];
 }
 
+const ONE_ARM = /(^|-)(one|single)-arm(-|$)/;
 const HOLD = /(^|-)hold(-|$)|flexed-arm-hang|^active-hang$/;
 const SUPPORT = /support-hold/;
 
@@ -30,6 +31,7 @@ const holds = (m: Motion) => m.phases.some((p) => /^(hold|plank|hang)\b/i.test(p
 export function withVariant(id: string, m: Motion, pattern?: string): Motion {
   if (HOLD.test(id) && !holds(m)) return hold(m, SUPPORT.test(id) || pattern === "carry" ? 0 : 1);
   if (/negative/.test(id)) return negative(m);
+  if (ONE_ARM.test(id) && m.load !== "barbell") return oneArm(m);
   if (/alternating|see-saw/.test(id) && pattern !== "cardio" && !m.phases.some((p) => /side/i.test(p[3]))) return alternate(m);
   return m;
 }
@@ -106,4 +108,37 @@ function alternate(m: Motion): Motion {
     };
   };
   return { ...m, phases: [...left, ...right], pose, hold: m.hold === "centre" || m.hold === "R" ? "each" : m.hold };
+}
+
+/** The left hand, resting on the left hip (on the bench beside it when lying down). */
+function braceHand(p: Pose): Vec {
+  const ux = p.sh[0] - p.hip[0],
+    uy = p.sh[1] - p.hip[1];
+  const n = Math.hypot(ux, uy) || 1;
+  return [p.hip[0] + (ux / n) * 0.1 + (uy / n) * 0.03, p.hip[1] + (uy / n) * 0.1 - (ux / n) * 0.03, (p.hip[2] ?? 0) - 0.24];
+}
+
+/**
+ * One arm works and the other rests on the body. Without this the one-arm dumbbell bench press,
+ * the single-arm cable row and their cousins pressed or pulled with both hands (Melvin, 2026-11-14).
+ * Moves that already keep the left hand still are left alone.
+ */
+function oneArm(m: Motion): Motion {
+  const pose = (B: Parameters<Motion["pose"]>[0], d: number): Pose => {
+    const p = m.pose(B, d);
+    const R = sideOf(p.hand, "R", m.grip ?? 0.25)!;
+    const L = sideOf(p.hand, "L", m.grip ?? 0.25)!;
+    // already one-armed: the left hand doesn't follow the right
+    if (m.hold === "R" && Math.abs(L[0] - R[0]) + Math.abs(L[1] - R[1]) > 0.05) return p;
+    const elbowR = sideOf(p.elbowPole, "R", 0.4) ?? [-1, -0.7, 0.4];
+    return {
+      ...p,
+      hand: { L: braceHand(p), R },
+      elbowPole: { L: [-0.4, 0, -1], R: elbowR },
+      bar: undefined,
+    };
+  };
+  // a strap or cable to the resting hand goes too
+  const props = m.props && ((B: Parameters<Motion["pose"]>[0]) => m.props!(B).filter((p) => !(p.kind === "cable" && p.to === "handL")));
+  return { ...m, pose, hold: "R", props };
 }

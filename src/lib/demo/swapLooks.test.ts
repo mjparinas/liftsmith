@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 230;
+  const LOOK_ALIKES = 222;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -377,5 +377,26 @@ describe("the rest of the audit", () => {
     expect(at("ring-y-raise", 1).handR[2]).toBeGreaterThan(0.45);
     expect(at("ring-reverse-fly", 1).handR[2]).toBeGreaterThan(0.6);
     expect(at("ring-face-pull", 1).elbowR[2]).toBeGreaterThan(0.3);
+  });
+});
+
+describe("one-arm moves", () => {
+  // Melvin, 2026-11-14: the one-arm dumbbell bench press pressed with both hands.
+  const at = (id: string, d: number) => jointsAt(motionFor(id), B, d);
+  const moved = (id: string, k: "handL" | "handR") => Math.hypot(...at(id, 0)[k].map((x, i) => x - at(id, 1)[k][i]!));
+  it("works the right arm while the left hand rests on the hip", () => {
+    for (const id of [
+      "db-single-arm-bench",
+      "kb-single-arm-bench-press",
+      "db-one-arm-floor-press",
+      "db-single-arm-press",
+      "single-arm-cable-row",
+      "single-arm-machine-press",
+      "one-arm-cable-pulldown",
+    ]) {
+      expect(moved(id, "handR"), id).toBeGreaterThan(0.3);
+      expect(moved(id, "handL"), id).toBeLessThan(0.15);
+      expect(motionFor(id).hold, id).toBe("R");
+    }
   });
 });
