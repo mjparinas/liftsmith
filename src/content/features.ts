@@ -640,7 +640,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-booking",
         name: "Booking and scheduling sessions",
-        body: "Open the times you're free, once or every week, and clients book them in the app, or book a client in yourself. Both sides get a notification, a session in the next day shows on Today, and it goes into their calendar in one tap.",
+        body: "Open the times you're free, once or every week, and clients book them in the app, or book a client in yourself. Your schedule is a month calendar: tap a day to see who's booked and what's still open. Both sides get a notification, a session in the next day shows on Today, and it goes into their calendar in one tap.",
         tier: "pro",
         pro: "coaching",
         added: "2026-11-13",

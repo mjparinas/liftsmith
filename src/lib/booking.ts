@@ -2,6 +2,8 @@
 // and booked times, a client's booked sessions and the open times they can book, and the calls.
 import { api, AuthError, readAccount } from "./auth";
 import { addEvent } from "./calendar";
+import { dayKey } from "./dashboard";
+import { monthOf, monthsBetween, type YearMonth } from "./history";
 import { date, t } from "./i18n";
 
 export interface Slot {
@@ -24,6 +26,8 @@ export const LENGTHS = [30, 45, 60, 90];
 export const REPEATS = [1, 4, 8, 12];
 /** How many days ahead the day chips go. */
 export const DAYS_AHEAD = 21;
+/** How far ahead a time can be opened, in days (the server's `BOOK_LIMITS.aheadMs`); the schedule's calendar ends there. */
+export const BOOK_AHEAD_DAYS = 120;
 
 function token(): string {
   const a = readAccount();
@@ -78,3 +82,40 @@ export const sessionToCalendar = (s: Slot, who: string) =>
     title: t("bk.calTitle", { name: who }),
     notes: t("bk.calNote"),
   });
+
+// --- The coach's month calendar (Coaching › Schedule) ---
+
+/** The last month the schedule's calendar can show: the furthest a time can be opened, or a later time already there. */
+export function lastScheduleMonth(now: number, slots: readonly Slot[]): YearMonth {
+  const ahead = new Date(now);
+  ahead.setDate(ahead.getDate() + BOOK_AHEAD_DAYS);
+  const latest = Math.max(ahead.getTime(), ...slots.map((s) => s.start));
+  return monthOf(latest);
+}
+
+/** Times per day (`dayKey`), each day in order. */
+export function slotsByDayKey(slots: readonly Slot[]): Map<string, Slot[]> {
+  const out = new Map<string, Slot[]>();
+  for (const d of byDay(slots)) out.set(dayKey(d.day), d.slots);
+  return out;
+}
+
+/**
+ * The day a month opens on: in this month, the next day from today with something on it, else today; in another
+ * month, its first day with something on it, else none. So the next session is one glance away.
+ */
+export function openingDay(slots: readonly Slot[], ym: YearMonth, now: number): string | null {
+  const today = dayKey(now);
+  const inMonth = byDay(slots).filter((d) => monthsBetween(monthOf(d.day), ym) === 0);
+  if (monthsBetween(monthOf(now), ym) === 0) return inMonth.map((d) => dayKey(d.day)).find((k) => k >= today) ?? today;
+  return inMonth[0] ? dayKey(inMonth[0].day) : null;
+}
+
+/** Whole days from today to `day` on this phone's calendar (negative for a past day), for the Add times day chips. */
+export function daysFromToday(now: number, day: number): number {
+  const a = new Date(now);
+  a.setHours(12, 0, 0, 0);
+  const b = new Date(day);
+  b.setHours(12, 0, 0, 0);
+  return Math.round((b.getTime() - a.getTime()) / 86_400_000);
+}

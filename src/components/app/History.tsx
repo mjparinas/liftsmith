@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type TouchEvent } from "react";
+import { useMemo, useState } from "react";
 
 import { dayKey, monthGrid, sessionDetail, weekdayNames } from "@/lib/dashboard";
 import type { SessionSummary } from "@/lib/derive";
@@ -27,15 +27,13 @@ import { go } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { FAMILY_HUE, familyOf, type Family } from "./theme";
 import { Button } from "./ui";
+import { useMonthSwipe } from "./useMonthSwipe";
 
 // Progress › History (Melvin, 2026-11-11: "a calendar view of past workouts … where we can review what we
 // did"). A month grid with each workout day marked by the muscle families it trained; swipe or ‹ › to change
 // month; tap a day and its workouts show in full under the grid. Pure web code: Android, iOS and the web app.
 
 const FAMILIES: Family[] = ["push", "pull", "legs", "core"];
-/** A horizontal swipe this long (px) changes month; touches this close to an edge belong to the phone's back gesture. */
-const SWIPE = { distance: 48, edge: 24 };
-
 const exName = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
 
 export function HistoryCalendar() {
@@ -92,20 +90,7 @@ export function HistoryCalendar() {
     setPicked(null);
   };
 
-  const touch = useRef<{ x: number; y: number } | null>(null);
-  const onTouchStart = (e: TouchEvent) => {
-    const p = e.touches[0];
-    touch.current = p && p.clientX > SWIPE.edge && p.clientX < window.innerWidth - SWIPE.edge ? { x: p.clientX, y: p.clientY } : null;
-  };
-  const onTouchEnd = (e: TouchEvent) => {
-    const start = touch.current;
-    const p = e.changedTouches[0];
-    touch.current = null;
-    if (!start || !p) return;
-    const dx = p.clientX - start.x;
-    const dy = p.clientY - start.y;
-    if (Math.abs(dx) >= SWIPE.distance && Math.abs(dx) > Math.abs(dy) * 1.5) shift(dx < 0 ? 1 : -1);
-  };
+  const { onTouchStart, onTouchEnd } = useMonthSwipe(shift);
 
   const month = date(new Date(ym.y, ym.m, 1), { month: "long", year: "numeric" });
   const todayKey = dayKey(now);

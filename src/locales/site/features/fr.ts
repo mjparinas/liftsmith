@@ -342,7 +342,7 @@ export const fr: FeaturesText = {
     },
     "coach-booking": {
       name: "Réservation et planning des séances",
-      body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
+      body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Votre planning est un calendrier mensuel : touchez un jour pour voir qui a réservé et ce qui reste libre. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
     },
     "coach-payments": {
       name: "Paiements des clients avec Stripe",

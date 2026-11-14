@@ -341,7 +341,7 @@ export const de: FeaturesText = {
     },
     "coach-booking": {
       name: "Termine buchen und planen",
-      body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
+      body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Dein Plan ist ein Monatskalender: Tipp auf einen Tag und du siehst, wer gebucht hat und was noch frei ist. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
     },
     "coach-payments": {
       name: "Kundenzahlungen über Stripe",
