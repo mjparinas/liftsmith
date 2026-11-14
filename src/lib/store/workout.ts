@@ -6,7 +6,7 @@ import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanIt
 import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
-import { cardioItem, extraOffer, rehabItems } from "../partExtras";
+import { cardioItem, extraOffer, rehabItems, type ExtraOffer } from "../partExtras";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
@@ -14,7 +14,7 @@ import { partDefaults } from "../routines";
 import { doneParts, enterPart, movePart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
-import type { AppEvent, LoadKind, Muscle, Rating, SetTag } from "../types";
+import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine, SetTag } from "../types";
 import { WARMUP_REST, warmupFor } from "../warmup";
 import { persistActive, setsDone, uid, type Ctx } from "./shared";
 
@@ -278,12 +278,42 @@ export function afterLog(a: Active, events: AppEvent[], autoRest: boolean, now: 
 }
 
 export interface PartPicksToday {
+  /** False: lifting off for today, only the other parts (Melvin, 2026-11-14). */
+  lift?: boolean;
   warm?: boolean;
   cool?: boolean;
   rehab?: boolean;
   cardio?: boolean;
   cardioId?: string;
   cardioMin?: number;
+}
+
+/** Which of Today's parts are on: the picks over their defaults. Shared by Today's split, the picks and Start. */
+export interface PartsOn {
+  warm: boolean;
+  cool: boolean;
+  /** Off only when lifting was switched off and cardio or rehab is on, so there's always something to do. */
+  lift: boolean;
+  rehab: boolean;
+  cardio: boolean;
+  offer: ExtraOffer;
+}
+
+export function partsOn(
+  picks: PartPicksToday,
+  profile: Profile,
+  routine: Routine | undefined,
+  plan: { rehab?: boolean },
+  g: Gym,
+  events: readonly AppEvent[],
+  now: number,
+): PartsOn {
+  const dflt = partDefaults(routine, profile.training?.warmFirst);
+  const offer = extraOffer(profile, routine, plan, g, events, now);
+  const rehab = !!offer.rehab && (picks.rehab ?? offer.rehab.due.due);
+  const cardio = !!offer.cardio && (picks.cardio ?? offer.cardioOn);
+  const lift = plan.rehab || picks.lift !== false || (!rehab && !cardio);
+  return { warm: picks.warm ?? dflt.warm, cool: picks.cool ?? dflt.cool, lift, rehab, cardio, offer };
 }
 
 export interface WorkoutSlice {
@@ -312,7 +342,8 @@ export interface WorkoutSlice {
    * Cleared by Start.
    */
   partPicks: PartPicksToday;
-  pickPart(kind: "warm" | "cool" | "rehab" | "cardio", on: boolean): void;
+  /** Switches a part on Today; lifting can be off only while cardio or rehab is on (one turns on to keep it so). */
+  pickPart(kind: "lift" | "warm" | "cool" | "rehab" | "cardio", on: boolean): void;
   /** Today's cardio part: which exercise and how many minutes. */
   pickCardio(change: { exerciseId?: string; minutes?: number }): void;
   /** Moves on to the next part (skipping the one on now when `skip`). Returns the part now on, or null at the end. */
@@ -371,7 +402,19 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
     partPicks: {},
 
     pickPart(kind, on) {
-      set({ partPicks: { ...get().partPicks, [kind]: on } });
+      let picks: PartPicksToday = { ...get().partPicks, [kind]: on };
+      const g = gym();
+      const { preview, profile, events } = get();
+      if (g && preview) {
+        const routine = profile.routines?.find((x) => x.id === preview.routineId);
+        const was = partsOn(picks, profile, routine, preview, g, events, Date.now());
+        // Lifting off needs cardio or rehab to do: switching it off turns the cardio on, and switching the last of
+        // them off brings the lifting back (Melvin, 2026-11-14: "only do cardio and stretch").
+        if (kind === "lift" && !on && !was.rehab && !was.cardio && was.offer.cardio) picks = { ...picks, cardio: true };
+        if ((kind === "cardio" || kind === "rehab") && !on && picks.lift === false && !was.rehab && !was.cardio)
+          picks = { ...picks, lift: true };
+      }
+      set({ partPicks: picks });
       // A part's minutes come out of the lifting (sessionSplit.ts), so the plan is sized again.
       if (!get().active) get().replan();
     },
@@ -414,7 +457,13 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const parts = enterPart(a.parts, i, now, skip);
       const kind = parts[i]!.kind;
       // The first set's time starts when the lifting does, not when the warm-up did.
-      const next: Active = { ...a, parts, part: i, lastAt: now, ...(kind === "lift" || kind === "rehab" ? { setStart: now } : {}) };
+      const next: Active = {
+        ...a,
+        parts,
+        part: i,
+        lastAt: now,
+        ...(kind === "lift" || kind === "rehab" || kind === "cardio" ? { setStart: now } : {}),
+      };
       set({ active: next });
       persistActive(next);
       return kind;
@@ -531,33 +580,39 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const sessionId = uid();
       const now = Date.now();
       const r = get().readiness;
-      const tp = get().profile.training;
       const picks = get().partPicks;
       const routine = plan.routineId ? get().profile.routines?.find((x) => x.id === plan.routineId) : undefined;
-      const dflt = partDefaults(routine, tp?.warmFirst);
       // Rehab beside the lifting and cardio after it (stage 5): added to the end of the plan, each exercise marked
       // with its part, so the workout runs them like any exercise and the sets say which part they were.
       const { events, profile } = get();
-      const offer = extraOffer(profile, routine, plan, g, events, now);
-      const rehab = offer.rehab && (picks.rehab ?? offer.rehab.due.due) ? rehabItems(offer.rehab.routine, g, events, profile, now) : [];
+      const on = partsOn(picks, profile, routine, plan, g, events, now);
+      const offer = on.offer;
+      const rehab = offer.rehab && on.rehab ? rehabItems(offer.rehab.routine, g, events, profile, now) : [];
       // Today's split may have cut the cardio so lifting keeps its floor (sessionSplit.ts): that's what runs.
       const split = given ? null : get().split;
       const cardioPick = offer.cardio && {
         exerciseId: picks.cardioId ?? offer.cardio.exerciseId,
         minutes: split?.cardio || (picks.cardioMin ?? offer.cardio.minutes),
       };
-      const cardio = cardioPick && (picks.cardio ?? offer.cardioOn) ? cardioItem(cardioPick, g, events, profile, now) : null;
-      if (rehab.length || cardio) plan = { ...plan, items: [...plan.items, ...rehab, ...(cardio ? [cardio] : [])] };
+      const cardio = cardioPick && on.cardio ? cardioItem(cardioPick, g, events, profile, now) : null;
+      // Lifting off: the workout is only the other parts, so the lifting exercises are left out.
+      const lifting = on.lift ? plan.items : [];
+      if (rehab.length || cardio || !on.lift) {
+        const items = [...lifting, ...rehab, ...(cardio ? [cardio] : [])];
+        plan = { ...plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
+      }
+      if (!plan.items.length) return;
       const planned = planParts(
         {
-          warm: picks.warm ?? dflt.warm,
-          cool: picks.cool ?? dflt.cool,
+          lift: on.lift,
+          warm: on.warm,
+          cool: on.cool,
           ...(rehab.length && offer.rehab ? { rehab: offer.rehab.routine.id } : {}),
           ...(cardio ? { cardio: cardio.exerciseId } : {}),
         },
         !!plan.rehab,
       );
-      const parts = planned.length > 1 ? enterPart(planned, 0, now) : undefined;
+      const parts = planned.length > 1 || !on.lift ? enterPart(planned, 0, now) : undefined;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem(
         get().events,

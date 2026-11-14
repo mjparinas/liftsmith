@@ -174,7 +174,7 @@ export const fr: FeaturesText = {
     },
     "workout-length": {
       name: "La durée couvre toutes les parties",
-      body: "Le curseur de durée sur Aujourd’hui fixe toute la séance. Un échauffement, du cardio, de la rééducation ou un retour au calme prend ses minutes sur la musculation, et une fine barre sous le curseur montre où va le temps. La musculation garde au moins 15 minutes : le cardio raccourcit d’abord, avec une ligne qui dit pourquoi.",
+      body: "Le curseur de durée sur Aujourd’hui fixe toute la séance. Un échauffement, du cardio, de la rééducation ou un retour au calme prend ses minutes sur la musculation, et une fine barre sous le curseur montre où va le temps. La musculation garde au moins 15 minutes : le cardio raccourcit d’abord, avec une ligne qui dit pourquoi. Un jour de cardio et d’étirements, désactive la musculation et le cardio prend son temps.",
     },
     notes: {
       name: "Notes du coach",

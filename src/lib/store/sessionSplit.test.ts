@@ -62,4 +62,32 @@ describe("workout length covers every part", () => {
     useApp.getState().pickRoutine("r");
     expect(useApp.getState().split).toBeNull();
   });
+
+  it("runs only the other parts with lifting off, the cardio taking the lifting's time", () => {
+    const s = useApp.getState();
+    s.pickPart("warm", true);
+    s.pickPart("lift", false);
+    // Lifting off needs something to do: the cardio switched itself on.
+    expect(useApp.getState().partPicks).toMatchObject({ lift: false, cardio: true });
+    expect(useApp.getState().split).toMatchObject({ noLift: true, lift: 0, warm: 5, cardio: 40, total: 45 });
+    useApp.getState().start();
+    const a = useApp.getState().active!;
+    expect(a.parts?.map((p) => p.kind)).toEqual(["warm", "cardio"]);
+    expect(a.plan.items).toHaveLength(1);
+    expect(a.plan.items[0]).toMatchObject({ part: "cardio", sets: 1 });
+    expect(a.plan.items[0]!.target.reps).toBe(40 * 60);
+  });
+
+  it("brings the lifting back when the last other part with exercises is switched off", () => {
+    useApp.getState().pickPart("lift", false);
+    useApp.getState().pickPart("cardio", false);
+    expect(useApp.getState().partPicks.lift).toBe(true);
+    expect(useApp.getState().split).toMatchObject({ noLift: false, lift: 45 });
+  });
+
+  it("keeps a single cardio part as a part, so the workout records it", () => {
+    useApp.getState().pickPart("lift", false);
+    useApp.getState().start();
+    expect(useApp.getState().active?.parts?.map((p) => p.kind)).toEqual(["cardio"]);
+  });
 });
