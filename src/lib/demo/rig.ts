@@ -287,8 +287,8 @@ export type PerSide<T> = T | { L: T; R: T };
 export type Load = "barbell" | "trapbar" | "dumbbell" | "kettlebell" | "ball" | "handle" | "wheel" | "none";
 export type Hold = "each" | "centre" | "R";
 
-/** A joint name, the midpoint of the hands ("hands"), or a fixed point. */
-export type Anchor = Vec | "hands" | "ankles" | "handL" | "handR" | "ankleL" | "ankleR" | "kneeL" | "kneeR" | "hipC" | "neck";
+/** A joint name, the midpoint of the hands ("hands"), a point just off the upper back ("upperBack", where a band wraps), or a fixed point. */
+export type Anchor = Vec | "hands" | "ankles" | "handL" | "handR" | "ankleL" | "ankleR" | "kneeL" | "kneeR" | "hipC" | "neck" | "upperBack";
 
 /** Scenery drawn around the figure, in the figure's own frame. */
 export type Prop =
@@ -499,5 +499,13 @@ export function anchorAt(J: Joints, a: Anchor): Vec {
   if (typeof a !== "string") return a;
   if (a === "hands") return lerpV(J.handL, J.handR, 0.5);
   if (a === "ankles") return lerpV(J.ankleL, J.ankleR, 0.5);
+  if (a === "upperBack") {
+    // off the shoulder blades, on the side away from the chest
+    const ux = J.shC[0] - J.hipC[0],
+      uy = J.shC[1] - J.hipC[1];
+    const l = Math.hypot(ux, uy) || 1;
+    const c = lerpV(J.hipC, J.shC, 0.85);
+    return [c[0] - (uy / l) * 0.13, c[1] + (ux / l) * 0.13, c[2]];
+  }
   return (J as unknown as Record<string, Vec>)[a];
 }

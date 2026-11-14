@@ -95,7 +95,10 @@ export function withGear(exerciseId: string, m: Motion): Motion {
     const hasCable = (B: Body) => (m.props?.(B) ?? []).some((p) => p.kind === "cable");
     // one band per working hand: a one-arm move's resting hand holds none
     const oneHand = hold === "R";
-    extra.push((B) => (hasCable(B) ? [] : oneHand ? [cable("ankleR", "handR")] : [cable("ankleL", "handL"), cable("ankleR", "handR")]));
+    // a band for a press wraps around the upper back from hand to hand; other bands run from under the feet
+    const from =
+      e.pattern === "hpush" && !exerciseId.includes("dip") ? (["upperBack", "upperBack"] as const) : (["ankleL", "ankleR"] as const);
+    extra.push((B) => (hasCable(B) ? [] : oneHand ? [cable(from[1], "handR")] : [cable(from[0], "handL"), cable(from[1], "handR")]));
   }
   if (has("rings")) {
     // straps from overhead to each hand, where the hands start (unless the motion draws its own straps)
