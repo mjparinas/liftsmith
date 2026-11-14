@@ -115,7 +115,7 @@ export const it: FeaturesText = {
     },
     "rest-timer": {
       name: "Timer di riposo sulla schermata di blocco",
-      body: "Parte da solo dopo ogni serie e fa il conto alla rovescia sulla schermata di blocco con la serie successiva, i dischi, il battito e i pulsanti Registra serie e +30 s che funzionano ad app chiusa.",
+      body: "Parte da solo dopo ogni serie e fa il conto alla rovescia sulla schermata di blocco con la serie successiva, i dischi, il battito e i pulsanti Registra serie e +30 s che funzionano ad app chiusa. Una vibrazione leggera 10 secondi prima della fine ti dà il tempo di prepararti, sul telefono e sull’orologio.",
       note: "Android: una notifica fissa, un Live Update su Android 16 e la Now Bar di Samsung. iPhone: un’Attività dal vivo sulla schermata di blocco e nella Dynamic Island. Web: una notifica finché la pagina è aperta.",
     },
     plates: {

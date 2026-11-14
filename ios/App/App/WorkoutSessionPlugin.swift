@@ -254,6 +254,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             "next": call.getString("next") ?? "",
             "plates": call.getString("plates") ?? "",
             "vibrate": call.getBool("vibrate") ?? true,
+            "warn": call.getBool("warn") ?? false,
             "sessionId": call.getString("sessionId") ?? "",
         ]
         if let r = call.getDouble("restUntil"), r > 0 { s["restUntil"] = r }

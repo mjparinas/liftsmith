@@ -69,6 +69,14 @@ export function restAlertOf(profile: Pick<Profile, "training" | "restSounds" | "
   return { sound: a === "both" || a === "sound", vibrate: a === "both" || a === "vibrate" };
 }
 
+/** Seconds before the end of rest for the heads-up buzz. Every platform uses the same number. */
+export const REST_WARN_S = 10;
+
+/** Whether the heads-up buzz before rest ends is on: its own switch, and only when the rest-over alert vibrates. */
+export function restWarnOn(profile: Pick<Profile, "training" | "restSounds" | "haptics">): boolean {
+  return profile.training?.restWarn !== false && restAlertOf(profile).vibrate;
+}
+
 /** RPE is 10 minus reps in reserve; RIR 4 or more is RPE 6 or less. */
 export const rpeOf = (rir: number) => Math.max(1, 10 - rir);
 

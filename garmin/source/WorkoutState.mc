@@ -2,7 +2,7 @@ import Toybox.Lang;
 import Toybox.Time;
 
 //! The workout the phone is running, as GarminLink sends it: {"t" title, "s" set label, "n" the set (weight and
-//! reps), "p" plates, "r" seconds of rest left, "h" heart rate the phone has, "v" vibrate when rest ends}, or
+//! reps), "p" plates, "r" seconds of rest left, "h" heart rate the phone has, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends}, or
 //! {"end" => true} when it ended. "k" is the set timer for holds, carries and cardio: its phases as [seconds from now
 //! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
 //! phone's never have to agree.
@@ -17,6 +17,7 @@ class WorkoutState {
     var hr as Number = 0;
     var watchHr as Number = 0;
     var vibrate as Boolean = true;
+    var warn as Boolean = false;
     //! When rest ends on the watch's clock (seconds), or 0 while lifting.
     var restEnds as Number = 0;
     //! When the last update arrived (seconds), or 0 when no workout is running.
@@ -41,6 +42,7 @@ class WorkoutState {
         plates = text(data.get("p"));
         hr = whole(data.get("h"));
         vibrate = data.get("v") != false;
+        warn = data.get("w") == true;
         var rest = whole(data.get("r"));
         restEnds = rest > 0 ? now + rest : 0;
         timer = [];

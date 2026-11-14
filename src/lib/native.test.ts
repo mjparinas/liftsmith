@@ -73,7 +73,7 @@ describe("rest time left on the Android Live Update", () => {
     const live = readFileSync(join(__dirname, "../../ios/App/LiftsmithWidgets/WorkoutLiveActivity.swift"), "utf8");
     expect(live).toContain("state.phase(at: now)");
     const watch = readFileSync(join(__dirname, "../../ios/App/LiftsmithWatch/WatchState.swift"), "utf8");
-    expect(watch).toContain("case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId, motion, timer");
+    expect(watch).toContain("case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, timer");
     const garmin = readFileSync(join(__dirname, "../../garmin/source/WorkoutState.mc"), "utf8");
     expect(garmin).toContain('var k = data.get("k");');
   });

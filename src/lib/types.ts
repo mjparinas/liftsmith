@@ -367,6 +367,8 @@ export interface TrainingPrefs {
   autoRest?: boolean;
   /** Missing means it follows Sounds and Vibration. */
   restAlert?: RestAlert;
+  /** A gentle buzz 10 seconds before rest ends (restWarnOn). Missing means on; it only buzzes when the rest-over alert vibrates. */
+  restWarn?: boolean;
   /** Keep the screen on during a workout. Missing means on. */
   keepAwake?: boolean;
   /** The Now playing control on Today and the workout screen (nowPlaying.ts). Missing means on. */

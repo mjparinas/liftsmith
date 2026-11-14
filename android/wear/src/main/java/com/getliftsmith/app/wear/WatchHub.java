@@ -47,6 +47,13 @@ final class WatchHub {
         Vibrator v = appContext == null ? null : appContext.getSystemService(Vibrator.class);
         if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 200, 120, 200 }, -1));
     };
+    /** Seconds before rest ends for the heads-up tap; the same as REST_WARN_S in the phone's src/lib/training.ts. */
+    private static final long REST_WARN_MS = 10_000L;
+    /** The heads-up before rest ends: a gentle double tap on the wrist, softer than the rest-over buzz. */
+    private static final Runnable warnBuzz = () -> {
+        Vibrator v = appContext == null ? null : appContext.getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 40, 90, 40 }, -1));
+    };
     private static List<String> phones = new ArrayList<>();
 
     private WatchHub() {}
@@ -147,6 +154,7 @@ final class WatchHub {
         if (restBuzz != null) main.removeCallbacks(restBuzz);
         restBuzz = null;
         main.removeCallbacks(timerBuzz);
+        main.removeCallbacks(warnBuzz);
         long now = System.currentTimeMillis();
         // The set timer: a buzz as each phase ends (go, switch sides, time's up), felt with the phone in a bag.
         if (s != null && s.vibrate && !s.resting(now)) {
@@ -158,5 +166,6 @@ final class WatchHub {
             if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 300, 150, 300 }, -1));
         };
         main.postDelayed(restBuzz, s.restUntil - now);
+        if (s.warn && s.restUntil - REST_WARN_MS > now) main.postDelayed(warnBuzz, s.restUntil - REST_WARN_MS - now);
     }
 }

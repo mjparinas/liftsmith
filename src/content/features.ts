@@ -164,7 +164,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "rest-timer",
         name: "Lock-screen rest timer",
-        body: "Starts itself after each set and counts down on the lock screen with the next set, the plates, heart rate, and Log set and +30 s buttons that work with the app closed.",
+        body: "Starts itself after each set and counts down on the lock screen with the next set, the plates, heart rate, and Log set and +30 s buttons that work with the app closed. A gentle buzz 10 seconds before the end gives you time to get set, on the phone and on your watch.",
         tier: "free",
         note: "Android: an ongoing notification, a Live Update on Android 16 and Samsung's Now Bar. iPhone: a Live Activity on the lock screen and in the Dynamic Island. Web: a notification while the page is open.",
         landing: "rest-timer",

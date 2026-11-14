@@ -34,7 +34,7 @@ import { followWorkout, sonosOn } from "@/lib/sonos";
 import { partNow, useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
 import { tempoOf } from "@/lib/tempo";
-import { restAlertOf } from "@/lib/training";
+import { REST_WARN_S, restAlertOf, restWarnOn } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -64,7 +64,7 @@ import { ComingUp } from "./workout/ComingUp";
 import { HandsFree } from "./workout/HandsFree";
 import { KeyboardLog } from "./workout/KeyboardLog";
 import { MachineCard } from "./workout/MachineCard";
-import { countdownTick, UndoChip } from "./workout/Polish";
+import { countdownTick, UndoChip, warnTick } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { aheadSteps, sessionFields } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
@@ -129,9 +129,11 @@ export function Workout() {
   const logRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<number | null>(null);
   const lastBeep = useRef(0);
+  const warned = useRef(0);
 
   const awake = profile.training?.keepAwake !== false;
   const alert = restAlertOf(profile);
+  const warn = restWarnOn(profile);
   const scale = profile.training?.effort;
   useEffect(() => {
     void notifyPermission();
@@ -250,6 +252,11 @@ export function Workout() {
     }
     restRef.current = active.restUntil;
     const secs = Math.ceil(left);
+    // The heads-up: once per rest (and again after +30 s), only when it crosses 10 s left with the app open.
+    if (secs === REST_WARN_S && warned.current !== active.restUntil) {
+      warned.current = active.restUntil;
+      warnTick(warn);
+    }
     if (secs <= 3 && secs > 0 && lastBeep.current !== secs) {
       lastBeep.current = secs;
       sound.countdown(alert.sound);
@@ -343,6 +350,7 @@ export function Workout() {
       hr: bpm ?? undefined,
       sound: alert.sound,
       vibrate: alert.vibrate,
+      warn,
       // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
       speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
       speakLang: currentTag(),
