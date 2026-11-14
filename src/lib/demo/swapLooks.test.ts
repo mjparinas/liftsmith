@@ -222,6 +222,25 @@ describe("push-up variations", () => {
     expect(bottom.head[1]).toBeLessThan(top.head[1] - 0.1);
     expect(top.handR[1]).toBeGreaterThan(0.6);
   });
+  it("kneels, stands at a wall, sinks between blocks, staggers the hands, leans past them and reaches up", () => {
+    // Melvin, 2026-11-14: "different variations of push ups all look the same"
+    const knee = at("knee-push-up", 1);
+    expect(knee.kneeL[1]).toBeLessThan(0.16);
+    expect(knee.ankleL[1]).toBeLessThan(0.2);
+    const wall = at("wall-push-up", 0.5);
+    expect(wall.head[1]).toBeGreaterThan(1.3);
+    expect(props("wall-push-up").length).toBeGreaterThan(0);
+    expect(at("deficit-push-up", 1).shC[1]).toBeLessThan(at("push-up", 1).shC[1] - 0.08);
+    expect(props("deficit-push-up").length).toBe(2);
+    const st = at("staggered-push-up", 0);
+    expect(Math.abs(st.handL[0] - st.handR[0])).toBeGreaterThan(0.2);
+    const pl = at("pseudo-planche-push-up", 0);
+    expect(pl.shC[0]).toBeGreaterThan(pl.handL[0] + 0.1);
+    expect(at("push-up-rotation", -1).handR[1]).toBeGreaterThan(1);
+    const scap = (d: number) => at("scap-push-up", d).shC[1];
+    expect(scap(0) - scap(1)).toBeLessThan(0.08);
+    expect(props("med-ball-push-up").length).toBe(1);
+  });
 });
 
 describe("jumps and hops", () => {

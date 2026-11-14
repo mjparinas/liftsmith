@@ -550,47 +550,131 @@ function fly(o: {
 }
 
 // ---------- push-ups and dips ----------
-function pushUp(o: { hands?: number; feet?: number; width?: number; rings?: boolean; close?: boolean }): Motion {
+interface PushUpOpts {
+  hands?: number;
+  feet?: number;
+  width?: number;
+  rings?: boolean;
+  close?: boolean;
+  /** On the knees, shins on the floor. */
+  knees?: boolean;
+  /** Hands on blocks, the chest sinking below them. */
+  deficit?: boolean;
+  /** One hand further forward than the other. */
+  stagger?: boolean;
+  /** Pseudo planche: hands back by the waist, shoulders leaning past them. */
+  planche?: boolean;
+  /** Scapular push-up: arms stay straight, only the shoulder blades move. */
+  scap?: boolean;
+  /** After each rep, turn and reach the right arm to the ceiling. */
+  rotate?: boolean;
+  /** Hands on a medicine ball. */
+  ball?: boolean;
+}
+function pushUp(o: PushUpOpts): Motion {
+  const lower = TEMPO.lowerFirst(
+    o.scap ? "Shoulder blades together" : "Lower · 2s",
+    o.scap ? "Push apart" : "Push · 1s",
+    "Plank",
+    "Bottom",
+  );
   return {
-    phases: TEMPO.lowerFirst("Lower · 2s", "Push · 1s", "Plank", "Bottom"),
+    phases: o.rotate ? [...lower, [0.8, 0, -1, "Reach to the ceiling", 0.7], [0.8, -1, 0, "Hand back down", 0.5]] : lower,
     load: "none",
     stance: 0.1,
     grip: o.width ?? 0.22,
-    pose(B, d) {
-      const handY = (o.hands ?? 0) + (o.rings ? 0.1 : 0.03);
-      const ankleY = (o.feet ?? 0) + 0.11;
-      const Lb = legMax(B) * 0.99 + B.torso;
+    pose(B, d0) {
+      const d = Math.max(0, d0);
+      const handY = (o.hands ?? 0) + (o.rings ? 0.1 : o.deficit ? 0.13 : 0.03);
+      const back = o.planche ? 0.2 : 0;
+      // the body pivots about the feet, or the knees on a knee push-up
+      const pivotY = o.knees ? 0.08 : (o.feet ?? 0) + 0.11;
+      const legL = o.knees ? B.thigh * 0.99 : legMax(B) * 0.99;
+      const Lb = legL + B.torso;
       const r = reach(B) * 0.97;
-      const shTop = handY + r;
-      const shBot = handY + (o.close ? 0.2 : 0.17);
+      const shTop = handY + Math.sqrt(r * r - back * back);
+      const shBot = o.scap ? shTop - 0.05 : o.deficit ? handY - 0.02 : handY + (o.close ? 0.2 : 0.17);
       const shY = lerp(shTop, shBot, d);
-      const thTop = Math.asin(clamp((shTop - ankleY) / Lb, -1, 1));
+      const thTop = Math.asin(clamp((shTop - pivotY) / Lb, -1, 1));
       const handX = 0.45;
-      const ankleX = handX - Lb * Math.cos(thTop);
-      const th = Math.asin(clamp((shY - ankleY) / Lb, -1, 1));
+      const pivotX = handX + back - Lb * Math.cos(thTop);
+      const th = Math.asin(clamp((shY - pivotY) / Lb, -1, 1));
       const dir = V(Math.cos(th), Math.sin(th));
-      const ankle = V(ankleX, ankleY);
-      const hip = add(ankle, mul(dir, legMax(B) * 0.99));
+      const pivot = V(pivotX, pivotY);
+      const hip = add(pivot, mul(dir, legL));
       const sh = add(hip, mul(dir, B.torso));
       const lean = 90 - (th * 180) / Math.PI;
+      const ankle = o.knees ? V(pivot[0] - B.shin * 0.95, 0.1, 0.1) : V(pivot[0], pivot[1], 0.1);
+      const z = o.width ?? 0.22;
+      const st = o.stagger ? 0.13 : 0;
+      let hand: Pose["hand"] = o.stagger ? per(V(handX + 0.02 + st, handY, -z), V(handX + 0.02 - st, handY, z)) : V(handX + 0.02, handY, z);
+      if (o.rotate && d0 < 0) {
+        const up = add(V(sh[0], sh[1], B.shW), V(0, reach(B) * 0.95, 0.15));
+        hand = per(V(handX + 0.02, handY, -z), lerpV(V(handX + 0.02, handY, z), up, -d0));
+      }
       return {
         hip,
         sh,
-        ankle: V(ankle[0], ankle[1], 0.1),
-        foot: 90 - (th * 180) / Math.PI - 35,
-        kneePole: V(0, -1, 0.1),
-        hand: V(handX + 0.02, handY, o.width ?? 0.22),
-        elbowPole: o.close ? V(-1, 0.3, 0.1) : V(-0.7, 0.6, 0.7),
+        ankle,
+        foot: o.knees ? 150 : 90 - (th * 180) / Math.PI - 35,
+        kneePole: o.knees ? V(0.2, -1, 0.1) : V(0, -1, 0.1),
+        hand,
+        elbowPole: o.close || o.planche ? V(-1, 0.3, 0.1) : V(-0.7, 0.6, 0.7),
         headBlend: lean > 60 ? 0 : 0.2,
       };
     },
     props: () => {
       const p: Prop[] = [];
-      if (o.hands) p.push(boxP(0.47, o.hands, 0.7, 0.35));
+      if (o.ball) p.push(boxP(0.47, o.hands ?? 0.2, 0.22, 0.22));
+      else if (o.hands) p.push(boxP(0.47, o.hands, 0.7, 0.35));
+      if (o.deficit) {
+        const z = o.width ?? 0.22;
+        p.push(
+          { kind: "box", at: V(0.47, 0.05, -z), size: V(0.2, 0.1, 0.12) },
+          { kind: "box", at: V(0.47, 0.05, z), size: V(0.2, 0.1, 0.12) },
+        );
+      }
       if (o.feet) p.push(boxP(-1.05, o.feet, 0.5, 0.4));
       if (o.rings) p.push(cable(V(0.47, 2.2, -0.24), "handL"), cable(V(0.47, 2.2, 0.24), "handR"));
       return p;
     },
+  };
+}
+
+/** Wall push-up: standing, hands on a wall at chest height, the body leaning in and pushing back out. */
+function wallPushUp(): Motion {
+  return {
+    phases: TEMPO.lowerFirst(),
+    load: "none",
+    stance: 0.12,
+    grip: 0.24,
+    pose(B, d) {
+      const hand = V(0.62, 1.25 * B.s);
+      const Lb = legMax(B) * 0.99 + B.torso;
+      const ankle = V(0, 0.1);
+      const target = lerp(reach(B) * 0.95, 0.24, ease(d));
+      // lean in about the ankles until the shoulders are `target` from the wall
+      let th = Math.PI / 2;
+      for (let k = 0; k < 40; k++) {
+        const sh = add(ankle, V(Math.cos(th) * Lb, Math.sin(th) * Lb));
+        if (Math.hypot(hand[0] - sh[0], hand[1] - sh[1]) <= target) break;
+        th -= rad(0.75);
+      }
+      const dir = V(Math.cos(th), Math.sin(th));
+      const hip = add(ankle, mul(dir, legMax(B) * 0.99));
+      const sh = add(hip, mul(dir, B.torso));
+      return {
+        hip,
+        sh,
+        ankle: V(ankle[0], ankle[1], 0.12),
+        foot: 90 - (th * 180) / Math.PI,
+        kneePole: V(1, 0, 0.2),
+        hand: V(hand[0], hand[1], 0.24),
+        elbowPole: V(-0.7, -0.6, 0.7),
+        headBlend: 0.6,
+      };
+    },
+    props: (B) => [{ kind: "box", at: V(0.67, 1.2 * B.s), size: V(0.08, 2.4, 1.4) }],
   };
 }
 
@@ -5304,8 +5388,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "split-squat": () => lunge({ rear: "floor", hands: "hips" }),
   "shrimp-squat": () => skaterSquat({ shrimp: true }),
   "pistol-squat": () => pistol({}),
-  "wall-push-up": () => pushUp({ hands: 0.45 }),
-  "pseudo-planche-push-up": () => pushUp({ width: 0.1, close: true }),
+  "wall-push-up": wallPushUp,
+  "pseudo-planche-push-up": () => pushUp({ width: 0.14, planche: true }),
   "negative-dip": () => dip({}),
   "scapular-pull": () => hanging({ grip: 0.34 }),
   "negative-pull-up": () => hanging({ grip: 0.34 }),
@@ -5382,7 +5466,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "wide-push-up": () => pushUp({ width: 0.34 }),
   "archer-push-up": () => archerPushUp({}),
   "clap-push-up": clapPushUp,
-  "knee-push-up": () => pushUp({ hands: 0.2 }),
+  "knee-push-up": () => pushUp({ knees: true }),
   "hindu-push-up": hinduPushUp,
   "handstand-push-up": handstandPushUp,
   "pike-push-up-elevated": pikePushUp,
@@ -5545,10 +5629,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "standing-cable-press": machinePress,
   "band-fly": () => fly({ posture: "standing", from: 78, to: 8, load: "none", first: "lift", cable: "side" }),
   "banded-push-up": () => pushUp({}),
-  "deficit-push-up": () => pushUp({}),
+  "deficit-push-up": () => pushUp({ deficit: true }),
   "spiderman-push-up": spidermanPushUp,
-  "staggered-push-up": () => pushUp({ width: 0.3 }),
-  "push-up-rotation": () => pushUp({}),
+  "staggered-push-up": () => pushUp({ width: 0.28, stagger: true }),
+  "push-up-rotation": () => pushUp({ rotate: true }),
   "ring-fly": ringFly,
   "ring-dip": () => dip({}),
   "straight-bar-dip": () => dip({}),
@@ -5777,7 +5861,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "single-arm-pec-deck": () => fly({ posture: "seated", from: 82, to: 10, load: "handle", first: "lift" }),
   "single-arm-reverse-pec-deck": () => fly({ posture: "facePad", from: 12, to: 88, load: "handle", first: "lift" }),
   "deficit-pike-push-up": pikePushUp,
-  "med-ball-push-up": () => pushUp({ width: 0.12, close: true }),
+  "med-ball-push-up": () => pushUp({ width: 0.08, close: true, hands: 0.2, ball: true }),
   "med-ball-chest-pass": chestPass,
   "med-ball-overhead-throw": () => pulldown({ straightArm: true }),
   "landmine-squeeze-press": machinePress,
@@ -6179,7 +6263,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "overhead-barbell-carry": () => carry({ hold: "centre", load: "barbell", at: "overhead" }),
   "med-ball-bear-hug-carry": () => carry({ hold: "centre", load: "none", at: "goblet" }),
   "band-y-raise": () => fly({ posture: "standing", from: 12, to: 88, load: "none", first: "lift" }),
-  "scap-push-up": () => pushUp({}),
+  "scap-push-up": () => pushUp({ scap: true }),
   "landmine-thruster": () => thruster({ load: "barbell" }),
   "landmine-split-squat": () => lunge({ hands: "hips" }),
   "cable-squat-to-row": () => squat({ hold: "arms", load: "handle" }),
