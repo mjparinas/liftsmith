@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 272;
+  const LOOK_ALIKES = 252;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -221,5 +221,51 @@ describe("push-up variations", () => {
       bottom = at("bodyweight-skull-crusher", 1);
     expect(bottom.head[1]).toBeLessThan(top.head[1] - 0.1);
     expect(top.handR[1]).toBeGreaterThan(0.6);
+  });
+});
+
+describe("jumps and hops", () => {
+  // Melvin, 2026-11-14 audit: these played the jump squat, a calf raise, a back lunge or a jog.
+  const m = (id: string) => motionFor(id);
+  const at = (id: string, d: number) => jointsAt(m(id), B, d);
+  const air = (id: string, d: number) => Math.min(at(id, d).ankleL[1], at(id, d).ankleR[1]);
+  it("leaves the floor on every jump and hop, rope jumps included", () => {
+    for (const id of ["jump-rope", "double-unders", "pogo-hops", "pogo-jumps", "tuck-jump", "squat-jack", "line-hops"])
+      expect(air(id, 0.25), id).toBeGreaterThan(air(id, 0) + 0.04);
+  });
+  it("travels: forward on broad and frog jumps, sideways on lateral hops and line hops", () => {
+    expect(at("broad-jump", 0.5).hipC[0]).toBeGreaterThan(at("broad-jump", 0).hipC[0] + 0.8);
+    expect(at("frog-jump", 0.5).hipC[0]).toBeGreaterThan(at("frog-jump", 0).hipC[0] + 0.6);
+    expect(at("lateral-hop", 0.5).hipC[2] - at("lateral-hop", 0).hipC[2]).toBeGreaterThan(0.4);
+    expect(at("line-hops", 0.5).hipC[2] - at("line-hops", 0).hipC[2]).toBeGreaterThan(0.2);
+  });
+  it("hops on one leg, tucks the knees, lands wide and turns half way round", () => {
+    const one = at("single-leg-hop", 0);
+    expect(one.ankleL[1]).toBeGreaterThan(one.ankleR[1] + 0.2);
+    const tuck = at("tuck-jump", 0.25);
+    expect(tuck.kneeL[1]).toBeGreaterThan(tuck.hipC[1] - 0.25);
+    const jack = (d: number) => at("squat-jack", d).ankleR[2] - at("squat-jack", d).ankleL[2];
+    expect(jack(0.5)).toBeGreaterThan(jack(0) + 0.3);
+    expect(m("squat-jump-180").yaw?.(0.5)).toBe(180);
+    expect(m("jump-squat").yaw).toBeUndefined();
+  });
+  it("switches legs in the air on jumping lunges and crosses behind on curtsy lunges", () => {
+    expect(at("jumping-lunge", 0).ankleR[0]).toBeGreaterThan(at("jumping-lunge", 0).ankleL[0] + 0.5);
+    expect(at("jumping-lunge", 0.5).ankleL[0]).toBeGreaterThan(at("jumping-lunge", 0.5).ankleR[0] + 0.5);
+    const c = at("curtsy-lunge", 1);
+    expect(c.ankleL[2]).toBeGreaterThan(c.ankleR[2]);
+    expect(c.ankleL[0]).toBeLessThan(c.ankleR[0] - 0.3);
+  });
+  it("kicks the heels up on butt kicks and drops the back knee on skater and shrimp squats", () => {
+    const k = at("butt-kicks", 1);
+    expect(k.ankleL[1]).toBeGreaterThan(k.kneeL[1] + 0.2);
+    expect(k.ankleR[1]).toBeLessThan(0.15);
+    for (const id of ["skater-squat", "shrimp-squat"]) {
+      const bottom = at(id, 1);
+      expect(bottom.kneeL[1], id).toBeLessThan(0.15);
+      expect(bottom.ankleL[1], id).toBeGreaterThan(0.05);
+    }
+    const shrimp = at("shrimp-squat", 1);
+    expect(Math.hypot(shrimp.handL[0] - shrimp.ankleL[0], shrimp.handL[1] - shrimp.ankleL[1])).toBeLessThan(0.2);
   });
 });

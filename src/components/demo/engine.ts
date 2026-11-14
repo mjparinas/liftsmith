@@ -108,6 +108,8 @@ export interface Frame {
   body: Body;
   place: Placement;
   roll: number;
+  /** Turn about the vertical axis, in degrees (a jump with a half turn). */
+  yaw: number;
   meshes: MeshBuf[];
   skel: { arr: Float32Array; count: number };
   /** Set when the exercise, body or highlight changed since the last frame. */
@@ -267,6 +269,7 @@ export function startLoop(
       lastCam = { yaw, pitch, target: frameBox.centre, distance, aspect };
       const roll = place.roll(smp.d) + (s.lean ?? 0);
       lastRoll = roll;
+      lastTurn = place.yaw(smp.d);
       scene.draw({
         J,
         effort: smp.effort,
@@ -276,6 +279,7 @@ export function startLoop(
         body,
         place,
         roll,
+        yaw: lastTurn,
         meshes,
         skel,
         changed,
@@ -288,7 +292,8 @@ export function startLoop(
     if (animating) raf = requestAnimationFrame(frame);
   }
   let lastCam: Camera | null = null,
-    lastRoll = 0;
+    lastRoll = 0,
+    lastTurn = 0;
   /** The painted muscle nearest the camera under a point on the canvas, or null. */
   function pick(x: number, y: number): Muscle | null {
     if (!lastCam || !size[0]) return null;
@@ -299,7 +304,7 @@ export function startLoop(
     for (const m of meshes) {
       if (m.P.kind === "hair" && !body.hair) continue;
       for (let k = 0; k < m.P.NT * m.P.M; k++) {
-        const [sx, sy, z] = pr(placeVec([m.pos[k * 3], m.pos[k * 3 + 1], m.pos[k * 3 + 2]], lastRoll, place.lift, place.shiftZ));
+        const [sx, sy, z] = pr(placeVec([m.pos[k * 3], m.pos[k * 3 + 1], m.pos[k * 3 + 2]], lastRoll, place.lift, place.shiftZ, lastTurn));
         const d = (sx - x) ** 2 + (sy - y) ** 2;
         if (d > R2) continue;
         zMin = Math.min(zMin, z);
