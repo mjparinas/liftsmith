@@ -172,6 +172,10 @@ export const fr: FeaturesText = {
       name: "Séances en plusieurs parties",
       body: "Une séance peut enchaîner un échauffement, la musculation et un retour au calme, avec Passer entre chaque partie. L’écran verrouillé et votre montre indiquent la partie en cours, l’historique montre chaque partie, et les jours d’étirements de 10 minutes ou plus gardent votre série. Les routines peuvent inclure leur propre échauffement et retour au calme, y compris dans les liens partagés et celles de votre coach. Les notes du coach lisent chaque partie : la douleur après la rééducation qui baisse ou monte, et une fréquence cardiaque qui reste haute pendant le retour au calme. La rééducation de votre kiné peut se faire à côté de la musculation dans la même séance les jours prévus, et le cardio peut suivre la musculation, avec la machine et les minutes choisies d’un toucher.",
     },
+    "workout-length": {
+      name: "La durée couvre toutes les parties",
+      body: "Le curseur de durée sur Aujourd’hui fixe toute la séance. Un échauffement, du cardio, de la rééducation ou un retour au calme prend ses minutes sur la musculation, et une fine barre sous le curseur montre où va le temps. La musculation garde au moins 15 minutes : le cardio raccourcit d’abord, avec une ligne qui dit pourquoi.",
+    },
     notes: {
       name: "Notes du coach",
       body: "Signale une fatigue qui s’accumule, un mouvement qui stagne, un muscle qui manque de séries, un objectif de la semaine menacé ou une masse grasse qui grimpe, chaque fois avec une chose à faire, souvent en une touche.",

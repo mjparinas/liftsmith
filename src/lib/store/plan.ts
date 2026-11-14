@@ -4,17 +4,20 @@ import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
 import { can } from "../entitlements";
 import { freeAdaptiveLeft } from "../freeAdaptive";
-import { generate, injuryPass, type Plan } from "../generator";
+import { generate, injuryPass, planSeconds, type Plan } from "../generator";
 import { gymAt, locate, wantsLocation, type Fix } from "../geo";
 import { withoutBroken } from "../gymExtrasApi";
 import type { GymKit } from "../gymShare";
 import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
+import { extraOffer, rehabItems } from "../partExtras";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
 import { freeProgramFor, pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
-import { planFromRoutine } from "../routines";
+import { partDefaults, planFromRoutine } from "../routines";
+import { splitSession, STRETCH_PART_MIN, type SessionSplit } from "../sessionSplit";
+import type { State } from "../store";
 import { healthExternal } from "../twin";
 import type { FeelEvent, Gym, Profile } from "../types";
 import { relink, uid, type Ctx } from "./shared";
@@ -25,6 +28,11 @@ import { relink, uid, type Ctx } from "./shared";
 export interface PlanSlice {
   /** The plan preview on Today, rebuilt when the length or gym changes. */
   preview: Plan | null;
+  /**
+   * How the slider's total splits between the parts that are on (sessionSplit.ts): the adaptive plan is sized to its
+   * lifting minutes. Null when the plan doesn't follow the slider (a routine, a fixed program day, a plan picked).
+   */
+  split: SessionSplit | null;
   /** Today's push / normal / recover call from the lifter's data. */
   readiness: Readiness | null;
   /** The lifter's own call for today, overriding the suggestion. */
@@ -76,8 +84,31 @@ export interface PlanSlice {
 
 export function planSlice(c: Ctx): PlanSlice {
   const { set, get, gym, commit } = c;
+
+  /**
+   * The minutes each part picked on Today takes from the slider's total (sessionSplit.ts): a warm-up and cool-down
+   * 5 each, the physio's rehab what its exercises take, and the cardio its minutes. The same picks Start uses.
+   */
+  const partSplit = (profile: Profile, g: Gym, events: State["events"], now: number): SessionSplit => {
+    const picks = get().partPicks;
+    const dflt = partDefaults(undefined, profile.training?.warmFirst);
+    const offer = extraOffer(profile, undefined, {}, g, events, now);
+    const rehabOn = !!offer.rehab && (picks.rehab ?? offer.rehab.due.due);
+    const rehab =
+      rehabOn && offer.rehab ? Math.max(1, Math.round(planSeconds(rehabItems(offer.rehab.routine, g, events, profile, now)) / 60)) : 0;
+    const cardioOn = !!offer.cardio && (picks.cardio ?? offer.cardioOn);
+    const cardio = cardioOn && offer.cardio ? (picks.cardioMin ?? offer.cardio.minutes) : 0;
+    return splitSession({
+      total: profile.minutes,
+      warm: (picks.warm ?? dflt.warm) ? STRETCH_PART_MIN : 0,
+      cool: (picks.cool ?? dflt.cool) ? STRETCH_PART_MIN : 0,
+      rehab,
+      cardio,
+    });
+  };
   return {
     preview: null,
+    split: null,
     readiness: null,
     callOverride: null,
     tryAdaptive: false,
@@ -166,11 +197,16 @@ export function planSlice(c: Ctx): PlanSlice {
       // This week's free adaptive workout replaces the free program's day (Melvin, 2026-11-12).
       const trying = get().tryAdaptive && !can("adaptive") && freeAdaptiveLeft(events, now);
       const src = trying ? undefined : profile.planSource;
-      const programDay = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
-      const fromProgram = programDay?.program?.fixed ? injuryPass(programDay, events, profile, g, now) : programDay;
-      let plan = fromProgram ?? generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge });
       // A saved routine replaces today's plan (adaptive or program), where this gym can do it.
       const routine = profile.routines?.find((x) => x.id === get().routineId);
+      // The slider is the whole workout (Melvin, 2026-11-14): the parts that are on take their minutes out of the
+      // lifting, so the adaptive plan (and a split program's day) is sized to what's left. A routine runs as written.
+      const split = routine ? null : partSplit(profile, g, events, now);
+      const sized = split ? { ...profile, minutes: split.lift } : profile;
+      const programDay =
+        src?.kind === "program" ? programPlan({ src, gym: g, profile: sized, events, now, call, challenge: r.challenge }) : null;
+      const fromProgram = programDay?.program?.fixed ? injuryPass(programDay, events, profile, g, now) : programDay;
+      let plan = fromProgram ?? generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: r.challenge });
       // It isn't a program day, so the program's next day stays next.
       const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
       // A rehab routine from the lifter's physio stays as written: it's meant for the injured area (trainer-mode.md).
@@ -180,7 +216,11 @@ export function planSlice(c: Ctx): PlanSlice {
           : { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
       // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
       if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
-      set({ readiness: r, preview: relink({ ...plan, items: applyOrder(plan.items, get().order) }, get().links) });
+      set({
+        readiness: r,
+        split: fromRoutine || fromProgram?.program?.fixed ? null : split,
+        preview: relink({ ...plan, items: applyOrder(plan.items, get().order) }, get().links),
+      });
     },
 
     applyAccess() {
@@ -249,7 +289,7 @@ export function planSlice(c: Ctx): PlanSlice {
 
     setPlan(plan) {
       if (get().active) return;
-      if (plan) set({ preview: plan, againAt: Date.now() });
+      if (plan) set({ preview: plan, split: null, againAt: Date.now() });
       else get().replan();
     },
 

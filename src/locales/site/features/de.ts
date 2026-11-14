@@ -171,6 +171,10 @@ export const de: FeaturesText = {
       name: "Training in Teilen",
       body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie. Routinen können ihr eigenes Aufwärmen und Cool-down enthalten, auch in geteilten Links und von deinem Coach. Die Coach-Hinweise lesen jeden Teil: Schmerzen nach der Reha, die nachlassen oder zunehmen, und ein Puls, der im Cool-down hoch bleibt. Die Reha von deiner Physiotherapie kann an den fälligen Tagen neben dem Krafttraining im selben Training laufen, und Cardio kann danach folgen, Gerät und Minuten mit einem Tippen gewählt.",
     },
+    "workout-length": {
+      name: "Die Trainingsdauer umfasst alle Teile",
+      body: "Der Dauer-Regler auf Heute legt das ganze Training fest. Aufwärmen, Cardio, Reha oder Cool-down nehmen ihre Minuten vom Krafttraining, und ein schmaler Balken unter dem Regler zeigt, wohin die Zeit geht. Krafttraining behält mindestens 15 Minuten: Zuerst wird das Cardio kürzer, mit einer Zeile, die sagt, warum.",
+    },
     notes: {
       name: "Coach-Notizen",
       body: "Weist auf wachsende Ermüdung, eine stagnierende Übung, einen Muskel mit zu wenigen Sätzen, ein gefährdetes Wochenziel oder steigendes Körperfett hin, jeweils mit einer Sache, die du tun kannst, oft mit einem Tippen.",

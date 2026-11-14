@@ -162,6 +162,10 @@ export const en = {
   "str.part.cardioWith": "{part} ({name})",
   "str.part.routineCardio": "Cardio after",
   "str.part.cardioPlan": "{name}, {n} min",
+  "str.part.splitSeg": "{part} {n} min",
+  "str.part.splitLabel": "Where the time goes",
+  "str.part.cardioCut": "Cardio cut to {n} min so lifting keeps at least {floor} min.",
+  "str.part.over": "Lifting keeps at least {floor} min, so this workout runs about {total} min.",
 } as const;
 
 type Key = keyof typeof en;
@@ -332,6 +336,10 @@ export const es: Partial<Record<Key, Message>> = {
   "str.part.cardioWith": "{part} ({name})",
   "str.part.routineCardio": "Cardio después",
   "str.part.cardioPlan": "{name}, {n} min",
+  "str.part.splitSeg": "{part} {n} min",
+  "str.part.splitLabel": "En qué se va el tiempo",
+  "str.part.cardioCut": "Cardio recortado a {n} min para dejar al menos {floor} min de pesas.",
+  "str.part.over": "Las pesas mantienen al menos {floor} min, así que este entrenamiento dura unos {total} min.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -503,6 +511,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "str.part.cardioWith": "{part} ({name})",
   "str.part.routineCardio": "Cardio après",
   "str.part.cardioPlan": "{name}, {n} min",
+  "str.part.splitSeg": "{part} {n} min",
+  "str.part.splitLabel": "Répartition du temps",
+  "str.part.cardioCut": "Cardio réduit à {n} min pour garder au moins {floor} min de musculation.",
+  "str.part.over": "La musculation garde au moins {floor} min, donc la séance dure environ {total} min.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -672,6 +684,10 @@ export const de: Partial<Record<Key, Message>> = {
   "str.part.cardioWith": "{part} ({name})",
   "str.part.routineCardio": "Cardio danach",
   "str.part.cardioPlan": "{name}, {n} Min.",
+  "str.part.splitSeg": "{part} {n} Min.",
+  "str.part.splitLabel": "So verteilt sich die Zeit",
+  "str.part.cardioCut": "Cardio auf {n} Min. gekürzt, damit mindestens {floor} Min. Krafttraining bleiben.",
+  "str.part.over": "Krafttraining behält mindestens {floor} Min., daher dauert dieses Training etwa {total} Min.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -839,6 +855,10 @@ export const it: Partial<Record<Key, Message>> = {
   "str.part.cardioWith": "{part} ({name})",
   "str.part.routineCardio": "Cardio dopo",
   "str.part.cardioPlan": "{name}, {n} min",
+  "str.part.splitSeg": "{part} {n} min",
+  "str.part.splitLabel": "Come si divide il tempo",
+  "str.part.cardioCut": "Cardio ridotto a {n} min per lasciare almeno {floor} min di pesi.",
+  "str.part.over": "I pesi restano almeno {floor} min, quindi l’allenamento dura circa {total} min.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -995,4 +1015,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "str.part.cardioWith": "{part}（{name}）",
   "str.part.routineCardio": "あとに有酸素",
   "str.part.cardioPlan": "{name}、{n}分",
+  "str.part.splitSeg": "{part}{n}分",
+  "str.part.splitLabel": "時間の内訳",
+  "str.part.cardioCut": "筋トレを{floor}分以上残すため、有酸素を{n}分に短縮しました。",
+  "str.part.over": "筋トレは最低{floor}分残すため、このワークアウトは約{total}分になります。",
 };

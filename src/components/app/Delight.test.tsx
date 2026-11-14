@@ -122,6 +122,11 @@ describe("Today and Progress extras", () => {
     const picker = within(row).getByTestId("cardio-picker");
     await user.click(within(picker).getByRole("button", { name: "30 min" }));
     expect(row).toHaveTextContent("about 30 min");
+    // The slider is the whole workout: the bar under it shows where the minutes go (Melvin, 2026-11-14).
+    const split = useApp.getState().split!;
+    expect(split.cardio + split.lift).toBe(split.total);
+    expect(screen.getByTestId("split-cardio")).toHaveTextContent(`Cardio ${split.cardio} min`);
+    expect(screen.getByTestId("split-lift")).toHaveTextContent(`Lifting ${split.lift} min`);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
     const a = useApp.getState().active!;
     expect(a.parts?.map((p) => p.kind)).toEqual(["lift", "cardio"]);

@@ -22,6 +22,7 @@ import { CARDIO_MINUTES, cardioChoices, cardioDefault, extraOffer, rehabItems } 
 import { MAX_PART_STRETCHES, partDefaults, routinePart } from "@/lib/routines";
 import { updateSession } from "@/lib/sessionNotify";
 import { hadCoolDown, type LivePart, type LivePartKind } from "@/lib/sessions";
+import { LIFT_FLOOR, splitParts, type SessionSplit, type SplitPart } from "@/lib/sessionSplit";
 import { partNow, useApp } from "@/lib/store";
 import {
   demoId,
@@ -660,8 +661,59 @@ export function PartStep({ parts, index }: { parts: readonly LivePart[]; index: 
  * Today: the parts the next workout will run through, in order. The warm-up and cool-down are switches for this
  * workout only (their defaults are Settings › Workout's), each with how long it takes and why; Start runs them.
  */
+/** One hue per part, the same in the split bar and on each part's row on Today. */
+const PART_HUE: Record<SplitPart, string> = {
+  warm: "var(--color-ember)",
+  lift: "var(--color-accent)",
+  rehab: "var(--color-violet)",
+  cardio: "var(--color-mint)",
+  cool: "var(--color-cyan)",
+};
+
+/**
+ * The thin bar under Today's length slider (Melvin, 2026-11-14): where the workout's minutes go, coloured by part,
+ * with the minutes written under it (colour is never the only cue), and why when the cardio was cut or the workout
+ * runs over so lifting keeps its floor.
+ */
+export function SplitBar({ split }: { split: SessionSplit }) {
+  const parts = splitParts(split);
+  const why =
+    split.over > 0
+      ? t("str.part.over", { floor: LIFT_FLOOR, total: split.total })
+      : split.cardioCut > 0
+        ? t("str.part.cardioCut", { n: split.cardio, floor: LIFT_FLOOR })
+        : "";
+  return (
+    <div className="mt-3" data-testid="split-bar" role="group" aria-label={t("str.part.splitLabel")}>
+      <div className="flex h-1.5 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
+        {parts.map((p) => (
+          <span
+            key={p.kind}
+            className="h-full rounded-full transition-[flex-grow] duration-300"
+            style={{ flexGrow: p.minutes, flexBasis: 0, background: PART_HUE[p.kind] }}
+          />
+        ))}
+      </div>
+      <p className="num mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted">
+        {parts.map((p) => (
+          <span key={p.kind} className="inline-flex items-center gap-1.5" data-testid={`split-${p.kind}`}>
+            <span className="size-1.5 shrink-0 rounded-full" style={{ background: PART_HUE[p.kind] }} aria-hidden="true" />
+            {t("str.part.splitSeg", { n: p.minutes, part: partLabel(p.kind) })}
+          </span>
+        ))}
+      </p>
+      {why && (
+        <p className="mt-1.5 flex items-start gap-1.5 text-xs text-muted" data-testid="split-why">
+          <Icon name="target" size={13} className="mt-[2px] shrink-0 text-accent" />
+          <span>{why}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function TodayParts() {
-  const { profile, gyms, preview, partPicks, pickPart, pickCardio, events } = useApp();
+  const { profile, gyms, preview, partPicks, pickPart, pickCardio, events, split } = useApp();
   const muscles = useStretchMuscles("warmup");
   const now = useNow(60_000);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
@@ -694,6 +746,8 @@ export function TodayParts() {
     minutes: partPicks.cardioMin ?? offer.cardio.minutes,
   };
   const cardioOn = !!cardio && (partPicks.cardio ?? offer?.cardioOn ?? false);
+  // When the plan follows the slider, each row shows what the split gave it (a cut cardio included).
+  const minutesOf = (kind: SplitPart, own: number) => (split && split[kind] > 0 ? split[kind] : own);
   const label = (icon: Parameters<typeof Icon>[0]["name"], hue: string, text: string, minutes: number) => (
     <span className="flex items-center gap-2 font-semibold">
       <Icon name={icon} size={16} className={hue} />
@@ -702,7 +756,12 @@ export function TodayParts() {
   );
   const row = (kind: "warm" | "cool", on: boolean) => (
     <InlineSwitch
-      label={label(kind === "warm" ? "flame" : "leaf", kind === "warm" ? "text-ember" : "text-cyan", partLabel(kind), mins[kind])}
+      label={label(
+        kind === "warm" ? "flame" : "leaf",
+        kind === "warm" ? "text-ember" : "text-cyan",
+        partLabel(kind),
+        on ? minutesOf(kind, mins[kind]) : mins[kind],
+      )}
       hint={t(kind === "warm" ? "str.part.warmWhy" : "str.part.coolWhy", { muscles: names })}
       on={on}
       onChange={(v) => pickPart(kind, v)}
@@ -728,12 +787,12 @@ export function TodayParts() {
       <div className="flex min-h-11 items-center gap-2 px-4 py-3">
         <Icon name="dumbbell" size={16} className="text-accent" />
         <span className="font-semibold">{partLabel(main)}</span>
-        <span className="num text-muted">· {t("str.part.minutes", { n: preview.estMinutes })}</span>
+        <span className="num text-muted">· {t("str.part.minutes", { n: minutesOf("lift", preview.estMinutes) })}</span>
       </div>
       {offer?.rehab && (
         <div data-testid="part-rehab">
           <InlineSwitch
-            label={label("bandage", "text-violet", partLabel("rehab"), rehabMin)}
+            label={label("bandage", "text-violet", partLabel("rehab"), rehabOn ? minutesOf("rehab", rehabMin) : rehabMin)}
             hint={rehabWhy()}
             on={rehabOn}
             onChange={(v) => pickPart("rehab", v)}
@@ -744,7 +803,7 @@ export function TodayParts() {
       {cardio && (
         <div data-testid="part-cardio">
           <InlineSwitch
-            label={label("heart", "text-ember", partLabel("cardio"), cardio.minutes)}
+            label={label("heart", "text-mint", partLabel("cardio"), cardioOn ? minutesOf("cardio", cardio.minutes) : cardio.minutes)}
             hint={cardioWhy()}
             on={cardioOn}
             onChange={(v) => pickPart("cardio", v)}

@@ -244,7 +244,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Workout data and coaching](docs/decisions/workout-data-and-coaching.md) (`src/lib/readiness.ts`, `progression.ts`)
 - [Workout history: editing, notes, doing it again, exercise pages and their stats](docs/decisions/workout-history.md) (`EditWorkout.tsx`, `src/lib/editHistory.ts`, `ExercisePage.tsx`, `src/lib/liftPage.ts`, `src/lib/liftStats.ts`, `LiftStats.tsx`, `ExerciseLibrary.tsx`, `store/history.ts`)
 - [Workout screen](docs/decisions/workout-screen.md) (`sessionNotify.ts`, `TrainingSettings.tsx`, `src/lib/training.ts`, `derive.ts`)
-- [Workouts with parts: lifting, stretches, rehab and cardio in one session](docs/decisions/sessions-with-parts.md) (`sessions.ts`, `partMetrics.ts`, `partExtras.ts`, `derive.ts`, `routineShare.ts`, `coach.ts`)
+- [Workouts with parts: lifting, stretches, rehab and cardio in one session](docs/decisions/sessions-with-parts.md) (`sessions.ts`, `partMetrics.ts`, `partExtras.ts`, `sessionSplit.ts`, `derive.ts`, `routineShare.ts`, `coach.ts`; Today's length slider is the whole workout: parts take their minutes from the lifting, which keeps 15, Melvin 2026-11-14)
 - [Your stats](docs/decisions/your-stats.md) (`BodyStats.tsx`, `src/lib/health.ts`, `tdee.ts`, `HealthWorkoutPlugin.swift`)
 
 <!-- BEGIN:nextjs-agent-rules -->
