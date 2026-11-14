@@ -409,6 +409,11 @@ export const de: FeaturesText = {
       name: "Erinnerungen",
       body: "Sanfte Erinnerungen an Trainingstagen, als Benachrichtigung auf den Handys und per E-Mail.",
     },
+    emails: {
+      name: "E-Mails, die dich dranbleiben lassen",
+      body: "Acht Tipps für den Einstieg mit echten Bildschirmen, ein Wochen- und Monatsrückblick, neue Bestleistungen, welche Freunde trainiert haben und ein Anstoß zurück nach einer Pause. Jede Art hat ihren eigenen Schalter.",
+      note: "Mit einem Konto eingeschaltet, für unter 18-Jährige aus, außer sie schalten sie ein. Jede E-Mail lässt sich mit einem Klick abbestellen.",
+    },
     cloud: {
       name: "Verbindungen zu Fitnessdiensten",
       body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",

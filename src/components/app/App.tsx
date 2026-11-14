@@ -15,6 +15,7 @@ import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInv
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
+import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
@@ -27,7 +28,7 @@ import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
 import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
-import { onReminderTap, refreshReminders, startDefaultEmail } from "@/lib/reminders";
+import { onReminderTap, provideNextPlan, refreshReminders, startDefaultEmail } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
@@ -311,6 +312,11 @@ export function App() {
   // the workouts or the profile change (reminders.ts). A tap on one opens the screen it points to.
   useEffect(() => {
     if (!ready) return;
+    // Today's plan, named in the app's language, for the welcome and first-workout emails (reminders.ts).
+    provideNextPlan(() => {
+      const p = useApp.getState().preview;
+      return p ? { names: p.items.map((i) => EXERCISE_BY_ID.get(i.exerciseId)?.name ?? "").filter(Boolean), minutes: p.estMinutes } : null;
+    });
     const refresh = () => {
       if (document.visibilityState !== "visible") return;
       // Email is on by default for signed-in adults once this device has synced (reminders.ts autoEmailPrefs).

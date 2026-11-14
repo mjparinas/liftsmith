@@ -2,6 +2,7 @@
 // phone), with a simple HTML twin. Every email carries the same footer: why it was sent, where to
 // change it, a one-click unsubscribe link and the sender's postal address (CAN-SPAM and CASL).
 import { BRAND } from "@/lib/brand";
+import { listOf } from "@/lib/messages";
 import { say, type MsgLang } from "@/lib/messageText";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 
@@ -95,11 +96,13 @@ export function confirmMail(confirmUrl: string, lang?: MsgLang): Mail {
   );
 }
 
-export function welcomeMail(footer: Footer, lang?: MsgLang): Mail {
+/** The welcome, with the first workout already planned when the phone sent it (before any workout). */
+export function welcomeMail(footer: Footer, lang?: MsgLang, next?: { names: string[]; minutes: number }): Mail {
+  const plan = next?.names.length ? [say(lang, "rmd.mail.welcomePlan", { list: listOf(lang, next.names), minutes: next.minutes })] : [];
   return wrap(
     lang,
     say(lang, "rmd.mail.welcome", { brand: BRAND.name }),
-    [say(lang, "rmd.mail.welcome1"), say(lang, "rmd.mail.welcome2"), say(lang, "rmd.mail.welcome3")],
+    [say(lang, "rmd.mail.welcome1"), ...plan, say(lang, "rmd.mail.welcome2"), say(lang, "rmd.mail.welcome3")],
     { label: say(lang, "rmd.mail.open"), url: appUrl() },
     footer,
     say(lang, "rmd.mail.whyOn"),
@@ -108,10 +111,15 @@ export function welcomeMail(footer: Footer, lang?: MsgLang): Mail {
 
 /** A planned message (messages.ts) or a milestone, as an email. */
 export function messageMail(m: { title: string; body: string; route?: string; kind: string }, footer: Footer, lang?: MsgLang): Mail {
-  const pro = m.kind === "pro";
+  const pro = m.kind === "pro" || m.kind === "trial";
+  // Recaps, bests and friends point at what they're about, not today's workout.
+  const elsewhere = m.kind === "recap" || m.kind === "records" || m.kind === "friends";
   const cta = pro
     ? { label: say(lang, "rmd.mail.seePro"), url: appUrl("settings") }
-    : { label: say(lang, "rmd.mail.open"), url: appUrl(m.route ?? "today") };
+    : {
+        label: elsewhere ? say(lang, "rmd.mail.openApp", { brand: BRAND.name }) : say(lang, "rmd.mail.open"),
+        url: appUrl(m.route ?? "today"),
+      };
   return wrap(lang, m.title, [m.body], cta, footer, say(lang, pro ? "rmd.mail.whyPro" : "rmd.mail.whyReminder"));
 }
 

@@ -11,6 +11,7 @@ import {
   parts,
   plan,
   proState,
+  record,
   zoned,
   type PlanInput,
 } from "./messages";
@@ -18,6 +19,7 @@ import {
 const TZ = "America/Toronto";
 // Monday 9 November 2026, local midnight in Toronto.
 const MON = zoned(2026, 11, 9, 0, 0, TZ);
+const NOW_ISH = Date.UTC(2026, 10, 10, 18);
 const DAY = 86_400_000;
 const at = (dayOffset: number, h: number, m = 0) => atTime(addDays(MON, dayOffset, TZ), `${h}:${String(m).padStart(2, "0")}`, TZ);
 
@@ -103,11 +105,13 @@ describe("push plan", () => {
     expect(msgs.filter((m) => m.kind === "reminder").map((m) => parts(m.at, TZ).wd)).toEqual([3, 5]);
   });
 
-  it("checks in after 7, 14 and 30 quiet days, then stops", () => {
+  it("checks in after 7, 14, 21 and 30 quiet days, then stops, with a win-back from two weeks", () => {
     const last = at(-40, 18);
     const msgs = plan(input({ lastWorkoutAt: last, days: [] }), last + 60_000, addDays(MON, 0, TZ), "push");
-    expect(msgs.map((m) => Math.round((dayStart(m.at, TZ) - dayStart(last, TZ)) / DAY))).toEqual([7, 14, 30]);
+    expect(msgs.map((m) => Math.round((dayStart(m.at, TZ) - dayStart(last, TZ)) / DAY))).toEqual([7, 14, 21, 30]);
     expect(msgs[0].title).toBe("Ready when you are");
+    expect(msgs[1].title).toBe("Your plan is still here");
+    expect(msgs[2].body).toContain("It's been 21 days.");
   });
 
   it("warns when the week's goal needs every day left, and only with a streak to keep", () => {
@@ -151,11 +155,67 @@ describe("push plan", () => {
   });
 
   it("reminds two days before a trial ends", () => {
-    const trial = input({ pro: { state: "trial", endsAt: at(10, 15) }, days: [], kinds: { pro: true } });
-    const msgs = plan(trial, MON, addDays(MON, 14, TZ), "push").filter((m) => m.kind === "pro");
+    // Its own kind, on by default, so it comes even with Pro offers off.
+    const trial = input({ pro: { state: "trial", endsAt: at(10, 15) }, days: [] });
+    const msgs = plan(trial, MON, addDays(MON, 14, TZ), "push").filter((m) => m.kind === "trial");
     expect(msgs).toHaveLength(1);
     expect(Math.round((dayStart(msgs[0].at, TZ) - MON) / DAY)).toBe(8);
     expect(msgs[0].body).toMatch(/do nothing and stay on the free plan/);
+  });
+});
+
+describe("recaps, bests and the first workout (email)", () => {
+  const sun = addDays(MON, 6, TZ);
+  const week = { start: MON, workouts: 3, sets: 54, volumeKg: 12_300, prs: 2, minutes: 150 };
+
+  it("sends the week on Sunday evening, keyed by its numbers so a later workout replaces it", () => {
+    const msgs = plan(input({ week, weekDays: 3 }), addDays(MON, 5, TZ), addDays(MON, 7, TZ), "email").filter((m) => m.kind === "recap");
+    expect(msgs).toHaveLength(1);
+    expect(msgs[0].at).toBe(atTime(sun, "19:00", TZ));
+    expect(msgs[0].title).toBe("Your week in training");
+    expect(msgs[0].body).toBe("3 workouts, 54 sets and 12,300 kg lifted. Plus 2 new personal bests.");
+    expect(msgs[0].key).toBe("recap:2026-11-15:3-54-2");
+    const lb = plan(input({ week, unit: "lb" }), addDays(MON, 5, TZ), addDays(MON, 7, TZ), "email").find((m) => m.kind === "recap");
+    expect(lb?.body).toContain("27,117 lb");
+    // Nothing for a week with no workouts, or with numbers from another week, and never by push.
+    expect(plan(input({ week: { ...week, workouts: 0 } }), sun, addDays(MON, 7, TZ), "email").some((m) => m.kind === "recap")).toBe(false);
+    expect(
+      plan(input({ week: { ...week, start: addDays(MON, -7, TZ) } }), sun, addDays(MON, 7, TZ), "email").some((m) => m.kind === "recap"),
+    ).toBe(false);
+    expect(plan(input({ week }), sun, addDays(MON, 7, TZ), "push").some((m) => m.kind === "recap")).toBe(false);
+  });
+
+  it("sends last month on the 1st, ready to share", () => {
+    const dec1 = zoned(2026, 12, 1, 0, 0, TZ);
+    const lastMonth = { start: zoned(2026, 11, 1, 0, 0, TZ), workouts: 12, sets: 200, volumeKg: 50_000, prs: 0, minutes: 600 };
+    const m = plan(input({ lastMonth, lastWorkoutAt: dec1 - 3600_000 }), dec1, addDays(dec1, 1, TZ), "email").find(
+      (x) => x.kind === "recap",
+    );
+    expect(m?.title).toBe("Your November recap");
+    expect(m?.route).toBe("recap");
+    expect(m?.body).toBe("12 workouts, 200 sets and 50,000 kg lifted. Your recap card is ready to share in the app.");
+  });
+
+  it("names the first workout in the reminder before there is one", () => {
+    const fresh = input({
+      lastWorkoutAt: undefined,
+      firstWorkoutAt: undefined,
+      startedAt: at(-7, 9),
+      days: [],
+      next: { names: ["Squat", "Row"], minutes: 40 },
+    });
+    const m = plan(fresh, MON, addDays(MON, 1, TZ), "email").find((x) => x.kind === "missed");
+    expect(m?.body).toBe(
+      "Your first workout is planned: Squat and Row, about 40 minutes. Open the app, tap Start, and it walks you through every set.",
+    );
+  });
+
+  it("celebrates a new best once, the day it's set", () => {
+    const best = { at: NOW_ISH, name: "Bench press", weightKg: 100, reps: 5 };
+    expect(record(null, { best }, NOW_ISH + 3600_000)).toMatchObject({ key: `records:${NOW_ISH}`, title: "New best: Bench press" });
+    expect(record(null, { best, unit: "lb" }, NOW_ISH)?.body).toContain("220 lb for 5");
+    expect(record({ best }, { best }, NOW_ISH + 3600_000)).toBeNull();
+    expect(record(null, { best }, NOW_ISH + 2 * DAY)).toBeNull();
   });
 });
 
