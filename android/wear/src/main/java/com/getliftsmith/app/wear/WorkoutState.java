@@ -25,6 +25,8 @@ final class WorkoutState {
     /** Heart rate the phone has (a Bluetooth monitor), or 0. */
     final int hr;
     final boolean vibrate;
+    /** A gentle buzz 10 seconds before rest ends (Workout preferences), only when vibrate is on too. */
+    final boolean warn;
     final int done;
     final int total;
     final long at;
@@ -60,6 +62,7 @@ final class WorkoutState {
         restUntil = o.isNull("restUntil") ? 0L : o.optLong("restUntil", 0L);
         hr = o.optInt("hr", 0);
         vibrate = o.optBoolean("vibrate", true);
+        warn = o.optBoolean("warn", false);
         done = o.optInt("done", 0);
         total = o.optInt("total", 0);
         at = o.optLong("at", 0L);

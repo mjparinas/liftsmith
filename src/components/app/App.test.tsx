@@ -817,4 +817,19 @@ describe("Labs", () => {
     expect(b.restUntil).toBe(restStart + 108_000);
     expect(b.hrCut?.restStart).toBe(restStart);
   });
+
+  it("buzzes gently once, 10 seconds before rest ends", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", { value: vibrate, configurable: true });
+    const user = userEvent.setup();
+    await onboard(user);
+    await startSquat(user);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    vibrate.mockClear();
+    const a = useApp.getState().active!;
+    act(() => useApp.setState({ active: { ...a, restUntil: Date.now() + 10_400 } }));
+    await waitFor(() => expect(vibrate).toHaveBeenCalledWith([22, 70, 22]), { timeout: 2500 });
+    expect(vibrate.mock.calls.filter((c) => JSON.stringify(c) === "[[22,70,22]]")).toHaveLength(1);
+    Reflect.deleteProperty(navigator, "vibrate");
+  });
 });

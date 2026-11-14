@@ -161,6 +161,7 @@ public class WorkoutSessionPlugin extends Plugin {
         i.putExtra("hr", hr == null ? 0 : hr);
         i.putExtra("sound", call.getBoolean("sound", true));
         i.putExtra("vibrate", call.getBoolean("vibrate", true));
+        i.putExtra("warn", call.getBoolean("warn", false));
         i.putExtra("speak", call.getString("speak", ""));
         i.putExtra("speakLang", call.getString("speakLang", ""));
         i.putExtra("chip", call.getString("chip", ""));

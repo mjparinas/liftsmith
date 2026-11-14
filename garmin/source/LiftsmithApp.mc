@@ -16,6 +16,8 @@ class LiftsmithApp extends Application.AppBase {
     var workout as WorkoutState;
     private var _timer as Timer.Timer?;
     private var _wasResting as Boolean = false;
+    //! Seconds of rest left at the last tick, for the heads-up buzz at 10 (REST_WARN_S in the phone's training.ts).
+    private var _lastLeft as Number = 0;
     //! The set timer phase last seen (its label), to buzz when it moves on; null with no timer.
     private var _timerPhase as String? = null;
     private var _hrSentAt as Number = 0;
@@ -78,6 +80,14 @@ class LiftsmithApp extends Application.AppBase {
             buzz(400);
         }
         _wasResting = resting;
+        // The heads-up: a short soft buzz as rest crosses 10 seconds left.
+        var left = workout.restLeft();
+        if (_lastLeft > 10 && left <= 10 && left > 0 && workout.active() && workout.vibrate && workout.warn) {
+            if (Attention has :vibrate) {
+                Attention.vibrate([new Attention.VibeProfile(40, 80), new Attention.VibeProfile(0, 90), new Attention.VibeProfile(40, 80)]);
+            }
+        }
+        _lastLeft = left;
         // The set timer: a buzz as each phase ends (go, switch sides, time's up).
         var phase = workout.phase();
         var label = phase == null ? "" : (phase as Array)[2] as String;
