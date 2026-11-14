@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
-import { detailsFromHtml, enrichBatch, enrichPlace, hoursFromSpec, publicHost, robotsAllow } from "./gymEnrich";
+import { detailsFromHtml, enrichBatch, enrichPlace, hoursFromSpec, publicHost } from "./gymEnrich";
 import { placesFromOsm, savePlaces, socialUrl, type OsmElement } from "./gymPlaces";
 
 const NOW = 1_800_000_000_000;
@@ -80,16 +80,6 @@ describe("reading a gym's website", () => {
     expect(hoursFromSpec(null)).toBe("");
   });
 
-  it("follows robots.txt for everyone or for us, and allows when it says nothing", () => {
-    expect(robotsAllow("User-agent: *\nDisallow: /")).toBe(false);
-    expect(robotsAllow("User-agent: *\nDisallow: /admin\n")).toBe(true);
-    expect(robotsAllow("User-agent: *\nDisallow:")).toBe(true);
-    expect(robotsAllow("User-agent: Liftsmith\nDisallow: /\n\nUser-agent: *\nAllow: /")).toBe(false);
-    expect(robotsAllow("User-agent: Googlebot\nDisallow: /")).toBe(true);
-    expect(robotsAllow("User-agent: *\nDisallow: /\nAllow: /$")).toBe(true);
-    expect(robotsAllow("")).toBe(true);
-  });
-
   it("reads only public web addresses", () => {
     expect(publicHost("https://ironworks.example.com/")).toBe(true);
     for (const bad of [
@@ -136,13 +126,13 @@ describe("filling in a gym", () => {
     expect((await query("SELECT email FROM gym_places"))[0]!.email).toBe("");
   });
 
-  it("skips a site whose robots.txt says no, and says why", async () => {
+  it("reads the home page even when robots.txt says no, and nothing else", async () => {
     await savePlaces(placesFromOsm([GYM], AREA), NOW);
     const [p] = await query("SELECT id FROM gym_places");
     const { fetcher, calls } = site("User-agent: *\nDisallow: /", PAGE);
     const r = await enrichPlace({ id: String(p!.id), name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW);
-    expect(r).toMatchObject({ filled: [], skipped: "robots.txt says no" });
-    expect(calls).toEqual(["https://ironworks.example.com/robots.txt"]);
+    expect(r.filled).toContain("hours");
+    expect(calls).toEqual(["https://ironworks.example.com/"]);
   });
 
   it("reads gyms in batches, each at most once a month, and counts what's left", async () => {
