@@ -358,6 +358,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: LAUNCH,
       },
+      {
+        id: "anniversary",
+        name: "Your lifting anniversary",
+        body: "Each year on the day of your first workout, Today puts day one beside today: workouts, sets, total lifted and the lift that has grown most, with a card to share. It stays for a week.",
+        tier: "free",
+        added: "2026-11-14",
+      },
     ],
   },
   {

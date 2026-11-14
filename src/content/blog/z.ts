@@ -7,7 +7,8 @@ export const BLOG_Z: Article[] = [
     slug: "small-touches-in-the-workout",
     kind: "blog",
     title: "Small touches that keep you in the workout",
-    description: "A gentle buzz 10 seconds before rest ends, and a gold flash with a card to share when you beat your best.",
+    description:
+      "A gentle buzz 10 seconds before rest ends, a gold flash when you beat your best, and a yearly look at day one against today.",
     date: "2026-11-14",
     tag: "Training",
     cta: "plan",
@@ -35,6 +36,10 @@ export const BLOG_Z: Article[] = [
       { h2: "A gold flash for a new personal best" },
       {
         p: "When a set beats your best on a lift, the phone gives a celebratory buzz, a gold banner drops in and the edges of the screen glow gold for a moment. On the rest screen that follows, Share this PR opens a card with the lift, the weight and reps, your estimated max and how much it went up. Post it straight from your rest, or wait for the end of the workout, where the same card waits with the rest.",
+      },
+      { h2: "Your lifting anniversary, day one against today" },
+      {
+        p: "A year after your first workout, Today shows a card that puts that first day beside today: how many workouts and sets you've done, how much you've lifted in total, and the lift from that first workout that has grown the most. Tap Share it for a card with the lot. It stays on Today for a week, so you won't miss it if you skip the gym that day, and it comes back every year.",
       },
       {
         tip: "Rest a little longer on your heaviest sets. The heads-up makes it easy to take the full rest without staring at the clock.",

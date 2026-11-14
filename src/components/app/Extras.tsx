@@ -4,15 +4,18 @@
 // challenges, newly earned themes, "same as last time", the general warm-up, Check in to friends, the
 // the strength score and the recap and photos entry. Kept here so the screens they sit on only
 // gain one line each.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { canCheckIn, checkinText, sendCheckin } from "@/lib/buddy";
+import { exercise } from "@/lib/exercises";
+import { COSMETICS } from "@/lib/game";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
 import { date, t as tr } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
-import { doneMoments, todayMoments, type Moment } from "@/lib/moments";
+import { anniversaryLook, doneMoments, fmtTonnage, todayMoments, type AnniversaryLook, type LiftSet, type Moment } from "@/lib/moments";
 import { suggestedPeriod } from "@/lib/recap";
 import { nextSeasonal, seasonalChallenges } from "@/lib/seasonal";
+import { anniversaryShare } from "@/lib/shareCards";
 import { social, socialError, useSocial } from "@/lib/social";
 import type { PersonRow } from "@/lib/socialTypes";
 import { useApp } from "@/lib/store";
@@ -25,10 +28,13 @@ import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
 import { SECTION_LABEL } from "../titles";
+import { useGame } from "./Achievements";
 import { openStats } from "./BodyStats";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { RoutinesSheet } from "./Routines";
+import { ShareSheet } from "./ShareSheet";
+import { HUE } from "./theme";
 import { Badge, Button, InlineSwitch, Section, Sheet, Skeleton } from "./ui";
 
 /** Lean mode (Settings › Celebrations): no extra pop-ups. */
@@ -62,6 +68,93 @@ function MomentCard({ m, onClose }: { m: Moment; onClose?: () => void }) {
 
 // --- Today ------------------------------------------------------------------------------------
 
+/**
+ * The anniversary of the first workout (Melvin, 2026-11-14: "a yearly recap of your first workout versus today"):
+ * day one against today, the lift from that first workout that has grown most, and one Share button for its card.
+ * Shown on Today for a week from the day, until closed.
+ */
+function AnniversaryCard({ a, onClose }: { a: AnniversaryLook; onClose: () => void }) {
+  const { profile } = useApp();
+  const g = useGame();
+  const [sharing, setSharing] = useState(false);
+  const unit = profile.unit;
+  const set = (s: LiftSet) => `${fmtNum(fromKg(s.weight, unit))} ${unit} × ${s.reps}`;
+  const share = anniversaryShare(a, { unit, game: g, accent: COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value });
+  const rows: [string, string, string][] = [
+    [tr("mom.rowWorkouts"), fmtNum(1), fmtNum(a.today.workouts)],
+    [tr("mom.rowSets"), fmtNum(a.dayOne.sets), fmtNum(a.today.sets)],
+    [tr("mom.rowLifted"), fmtTonnage(a.dayOne.volume, unit), fmtTonnage(a.today.volume, unit)],
+  ];
+  if (a.lift) rows.push([exercise(a.lift.exerciseId).name, set(a.lift.then), set(a.lift.best)]);
+  return (
+    <div className="card-tint animate-rise p-4" style={{ "--tint": HUE.gold } as CSSProperties} data-testid="anniversary">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold/15 text-gold" aria-hidden>
+          <Icon name="trophy" size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">{tr("mom.anniv", { count: a.years })}</p>
+          <p className="mt-0.5 text-sm text-muted">
+            {tr("mom.firstOn", { date: date(a.firstAt, { month: "long", day: "numeric", year: "numeric" }) })}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={tr("x.dismiss")}
+          className="press -mr-1 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-faint"
+        >
+          ✕
+        </button>
+      </div>
+      <table className="mt-3 w-full text-sm">
+        <caption className="sr-only">{tr("mom.compare")}</caption>
+        <thead>
+          <tr className="text-xs text-muted">
+            <th scope="col" className="sr-only">
+              {tr("mom.compare")}
+            </th>
+            <th scope="col" className="pb-1 text-right font-medium">
+              {tr("mom.dayOne")}
+            </th>
+            <th scope="col" className="pb-1 text-right font-medium">
+              {tr("mom.today")}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, then, nowV]) => (
+            <tr key={label} className="border-t border-line/60">
+              <th scope="row" className="py-1.5 pr-2 text-left font-normal text-muted">
+                {label}
+              </th>
+              <td className="num py-1.5 text-right text-muted">{then}</td>
+              <td className="num py-1.5 pl-3 text-right font-semibold">{nowV}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {a.lift && (
+        <p className="mt-2 text-sm text-gold">
+          {tr("mom.liftUp", { name: exercise(a.lift.exerciseId).name, pct: fmtNum(Math.round(a.lift.pct)) })}
+        </p>
+      )}
+      <Button
+        kind="ghost"
+        icon="share"
+        className="mt-3 w-full"
+        onClick={() => {
+          haptic("tick");
+          setSharing(true);
+        }}
+      >
+        {tr("card.shareIt")}
+      </Button>
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={[share]} />
+    </div>
+  );
+}
+
 /** Anniversary, welcome back, new theme and seasonal challenge cards. */
 export function TodayMoments() {
   const { stats, events, profile, setProfile, active } = useApp();
@@ -69,6 +162,9 @@ export function TodayMoments() {
   const seen = profile.delight?.seenMoments ?? [];
   const day = new Date(now).toDateString();
   const moments = todayMoments(stats, now).filter((m) => !seen.includes(`${m.id}:${day}`));
+  const anniv = anniversaryLook(events, stats, now);
+  // Keyed by the anniversary's own day, so a dismissed card stays gone for the whole week it shows.
+  const annivKey = anniv ? `anniversary-${anniv.years}:${new Date(anniv.day).toDateString()}` : "";
   const fresh = newlyUnlocked(profile.delight?.seenThemes ?? [], unlockContext(events, stats, profile, now));
   const seasonal = seasonalChallenges(events, now);
   const teaser = seasonal.length ? null : nextSeasonal(now);
@@ -76,6 +172,12 @@ export function TodayMoments() {
   const dismiss = (id: string) => setProfile({ delight: { ...profile.delight, seenMoments: [...seen.slice(-40), `${id}:${day}`] } });
   return (
     <div className="mt-4 space-y-3 empty:hidden">
+      {anniv && !seen.includes(annivKey) && (
+        <AnniversaryCard
+          a={anniv}
+          onClose={() => setProfile({ delight: { ...profile.delight, seenMoments: [...seen.slice(-40), annivKey] } })}
+        />
+      )}
       {moments.map((m) => (
         <MomentCard key={m.id} m={m} onClose={() => dismiss(m.id)} />
       ))}

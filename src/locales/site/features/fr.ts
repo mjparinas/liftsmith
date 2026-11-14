@@ -214,6 +214,10 @@ export const fr: FeaturesText = {
       body: "Téléphone oublié ? Saisissez la séance après coup : elle compte comme les autres.",
     },
     recap: { name: "Bilan du mois", body: "Un court retour sur votre mois, prêt à partager." },
+    anniversary: {
+      name: "Votre anniversaire d’entraînement",
+      body: "Chaque année, le jour de votre première séance, Aujourd’hui met le jour un à côté d’aujourd’hui : séances, séries, total soulevé et l’exercice qui a le plus progressé, avec une carte à partager. Elle reste une semaine.",
+    },
     body: {
       name: "Pesées, masse grasse et photos",
       body: "Notez votre poids et votre masse grasse, ou laissez-les venir de votre balance via l’appli santé du téléphone, et gardez vos photos de progrès sur votre téléphone.",

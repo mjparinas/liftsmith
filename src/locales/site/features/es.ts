@@ -206,6 +206,10 @@ export const es: FeaturesText = {
       body: "¿Olvidaste el teléfono? Registra el entrenamiento después y cuenta como cualquier otro.",
     },
     recap: { name: "Resumen mensual", body: "Un breve repaso de tu mes, listo para compartir." },
+    anniversary: {
+      name: "Aniversario de entrenamiento",
+      body: "Cada año, el día de tu primer entrenamiento, Hoy pone el día uno junto a hoy: entrenamientos, series, peso total y el ejercicio que más ha crecido, con una tarjeta para compartir. Se queda una semana.",
+    },
     body: {
       name: "Peso, grasa corporal y fotos",
       body: "Registra peso y grasa corporal, o deja que lleguen de tu báscula a través de la app de salud del teléfono, y guarda fotos de progreso en tu teléfono.",
