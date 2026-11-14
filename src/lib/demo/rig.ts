@@ -307,6 +307,8 @@ export interface PoleProp {
   from: Anchor;
   to: Anchor;
   past: number;
+  /** The plate's radius (0.2 when left out; 0 draws none, for a machine's lever arm). */
+  plate?: number;
 }
 
 /** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, and a plate ring by the hands. */
@@ -334,7 +336,12 @@ export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
   }
   // the plates sit on the sleeve just short of the hands
   const plate: Vec = [h[0] - u[0] * 0.14, h[1] - u[1] * 0.14, h[2] - u[2] * 0.14];
-  for (let i = 0; i < 16; i++) out.push([off(plate, 0.2, (i * Math.PI) / 8), off(plate, 0.2, ((i + 1) * Math.PI) / 8)]);
+  const pr = p.plate ?? 0.2;
+  for (let i = 0; i < 16; i++) {
+    // no plate: the unused segments collapse onto the bar's end
+    if (!pr) out.push([b, b]);
+    else out.push([off(plate, pr, (i * Math.PI) / 8), off(plate, pr, ((i + 1) * Math.PI) / 8)]);
+  }
   return out;
 }
 
