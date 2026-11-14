@@ -54,6 +54,16 @@ describe("info pages", () => {
     }
   });
 
+  // The maker isn't named anywhere on the site (2026-11-14): the about page says "an independent developer".
+  it("never names the maker on a page", () => {
+    vi.stubGlobal("fetch", ok({ ok: true }));
+    for (const { path, Page } of PAGES) {
+      render(<Page />);
+      expect(document.body.textContent, path).not.toMatch(/melvin|parinas/i);
+      cleanup();
+    }
+  });
+
   // next/link drops the trailing slash in tests; the build adds it back (trailingSlash).
   it("links every new page from the footer", () => {
     render(<Terms />);
