@@ -295,7 +295,48 @@ export type Prop =
   | { kind: "box"; at: Vec; size: Vec; tilt?: number; follow?: Anchor } // centre (offset from `follow` when set), full size, tilt about z (degrees)
   | { kind: "rail"; at: Vec; length: number; axis?: "x" | "y" | "z" } // pull-up bar, dip bars, smith rails
   | { kind: "cable"; from: Anchor; to: Anchor } // pulley cable or band, follows the joints
+  | PoleProp
   | RopeProp;
+
+/**
+ * A landmine bar: a thick bar from a pivot on the floor to the hands, running on past them by `past`,
+ * with a plate on the sleeve just short of the hands. It follows the hands, so it tilts and swings as they move.
+ */
+export interface PoleProp {
+  kind: "pole";
+  from: Anchor;
+  to: Anchor;
+  past: number;
+}
+
+/** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, and a plate ring by the hands. */
+export const POLE_SEGMENTS = 4 + 16;
+export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
+  const a = anchorAt(J, p.from),
+    h = anchorAt(J, p.to);
+  const d: Vec = [h[0] - a[0], h[1] - a[1], h[2] - a[2]];
+  const l = Math.hypot(d[0], d[1], d[2]) || 1;
+  const u: Vec = [d[0] / l, d[1] / l, d[2] / l];
+  const b: Vec = [h[0] + u[0] * p.past, h[1] + u[1] * p.past, h[2] + u[2] * p.past];
+  // two directions across the bar
+  const side: Vec = Math.abs(u[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const n1 = norm(cross(u, side)),
+    n2 = cross(u, n1);
+  const off = (q: Vec, r: number, t: number): Vec => [
+    q[0] + (n1[0] * Math.cos(t) + n2[0] * Math.sin(t)) * r,
+    q[1] + (n1[1] * Math.cos(t) + n2[1] * Math.sin(t)) * r,
+    q[2] + (n1[2] * Math.cos(t) + n2[2] * Math.sin(t)) * r,
+  ];
+  const out: [Vec, Vec][] = [];
+  for (let i = 0; i < 4; i++) {
+    const t = (i * Math.PI) / 2;
+    out.push([off(a, 0.018, t), off(b, 0.018, t)]);
+  }
+  // the plates sit on the sleeve just short of the hands
+  const plate: Vec = [h[0] - u[0] * 0.14, h[1] - u[1] * 0.14, h[2] - u[2] * 0.14];
+  for (let i = 0; i < 16; i++) out.push([off(plate, 0.2, (i * Math.PI) / 8), off(plate, 0.2, ((i + 1) * Math.PI) / 8)]);
+  return out;
+}
 
 /**
  * A battle rope from a hand to an anchor on the floor ahead, drawn with a travelling sine wave. The

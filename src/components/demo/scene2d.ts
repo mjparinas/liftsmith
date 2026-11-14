@@ -1,5 +1,5 @@
 import { partIndices, placeVec } from "@/lib/demo/mesh";
-import { anchorAt, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
+import { anchorAt, poleSegments, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
 
 import { DEMO_COLOURS } from "./colours";
 import type { Scene } from "./engine";
@@ -242,6 +242,8 @@ function drawProp(p: Prop, J: Joints, line: (a: Vec, b: Vec) => void) {
       p.axis === "x" ? [a[0] - h, a[1], a[2]] : p.axis === "y" ? [a[0], a[1] - h, a[2]] : [a[0], a[1], a[2] - h],
       p.axis === "x" ? [a[0] + h, a[1], a[2]] : p.axis === "y" ? [a[0], a[1] + h, a[2]] : [a[0], a[1], a[2] + h],
     );
+  } else if (p.kind === "pole") {
+    for (const [u, v] of poleSegments(p, J)) line(u, v);
   } else if (p.kind === "rope") {
     const pts = ropePoints(p, J);
     for (let i = 1; i < pts.length; i++) line(pts[i - 1]!, pts[i]!);

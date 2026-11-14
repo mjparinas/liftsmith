@@ -28,7 +28,17 @@ import {
 } from "three";
 
 import { partIndices, REGIONS } from "@/lib/demo/mesh";
-import { anchorAt, ropePoints, type Anchor, type Prop, type RopeProp, type Vec } from "@/lib/demo/rig";
+import {
+  anchorAt,
+  POLE_SEGMENTS,
+  poleSegments,
+  ropePoints,
+  type Anchor,
+  type PoleProp,
+  type Prop,
+  type RopeProp,
+  type Vec,
+} from "@/lib/demo/rig";
 
 import { DEMO_COLOURS } from "./colours";
 import type { Frame, Scene } from "./engine";
@@ -300,6 +310,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   let cables: { line: LineSegments; from: Anchor; to: Anchor }[] = [];
   let followers: { obj: LineSegments; at: Vec; follow: Anchor }[] = [];
   let ropes: { line: LineSegments; p: RopeProp }[] = [];
+  let poles: { line: LineSegments; p: PoleProp }[] = [];
   const ROPE_N = 32;
   const buildProps = (props: Prop[]) => {
     for (const c of [...propGroup.children]) {
@@ -309,6 +320,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     cables = [];
     followers = [];
     ropes = [];
+    poles = [];
     for (const p of props) {
       if (p.kind === "box") {
         const e = new LineSegments(new EdgesGeometry(new BoxGeometry(p.size[0], p.size[1], p.size[2]), 1), propMat);
@@ -331,6 +343,13 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         line.frustumCulled = false;
         propGroup.add(line);
         ropes.push({ line, p });
+      } else if (p.kind === "pole") {
+        const g = new BufferGeometry();
+        g.setAttribute("position", new BufferAttribute(new Float32Array(POLE_SEGMENTS * 6), 3));
+        const line = new LineSegments(g, steelMat);
+        line.frustumCulled = false;
+        propGroup.add(line);
+        poles.push({ line, p });
       } else {
         const g = new BufferGeometry();
         g.setAttribute("position", new BufferAttribute(new Float32Array(6), 3));
@@ -641,6 +660,14 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
           a.set(pts[i + 1]!, i * 6 + 3);
         }
         r.line.geometry.attributes.position.needsUpdate = true;
+      }
+      for (const pl of poles) {
+        const a = pl.line.geometry.attributes.position.array as Float32Array;
+        poleSegments(pl.p, J).forEach(([u, v], i) => {
+          a.set(u, i * 6);
+          a.set(v, i * 6 + 3);
+        });
+        pl.line.geometry.attributes.position.needsUpdate = true;
       }
       for (const fl of followers) {
         const p = anchorAt(J, fl.follow);
