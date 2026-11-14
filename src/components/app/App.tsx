@@ -61,6 +61,7 @@ import { GymStaffJoin } from "./GymStaff";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
+import { LogoEgg } from "./LogoEgg";
 import { LogPast } from "./LogPast";
 import { Onboarding } from "./Onboarding";
 import { Photos } from "./Photos";
@@ -614,9 +615,8 @@ function Sidebar({ route }: { route: Route }) {
       aria-label={t("nav.main")}
     >
       <div className="flex items-center gap-2.5 px-3 text-lg font-extrabold tracking-tight text-ink">
-        {/* The app icon, like the site header's (SiteChrome BrandMark). */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />
+        {/* The app icon, like the site header's (SiteChrome BrandMark); seven quick taps open an easter egg (LogoEgg.tsx). */}
+        <LogoEgg size={32} />
         {BRAND.name}
       </div>
       <ul className="flex flex-col gap-1">
