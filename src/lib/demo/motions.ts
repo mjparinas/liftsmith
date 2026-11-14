@@ -3525,20 +3525,55 @@ function renegadeRow(): Motion {
 }
 
 /** Burpee: squat down, hands to the floor, jump back to a plank, jump in, jump up. */
-function burpee(): Motion {
+interface BurpeeOpts {
+  /** What happens at the top: a jump with the arms up, a tuck jump, a jump to a bar and a pull-up, or just standing. */
+  top?: "jump" | "tuck" | "pull" | "none";
+  /** Sprawl: the hips drop all the way to the floor instead of holding a plank. */
+  sprawl?: boolean;
+  /** Hands on kettlebells, standing up as a deadlift. */
+  bells?: boolean;
+}
+function burpee(o: BurpeeOpts = {}): Motion {
+  const top = o.top ?? "jump";
+  const n = top === "none" ? 3 : top === "pull" ? 5 : 4;
+  const p = (i: number) => i / (n - 1);
+  const ending: PhaseRow[] =
+    top === "none"
+      ? [[0.5, p(2), p(2), o.bells ? "Lockout" : "Stand", 0.4]]
+      : top === "pull"
+        ? [
+            [0.45, p(2), p(3), "Jump to the bar", 1],
+            [0.7, p(3), p(4), "Pull up", 1],
+            [0.6, p(4), p(3), "Lower", 0.5],
+            [0.35, p(3), p(2), "Drop down", 0.5],
+          ]
+        : [
+            [0.55, p(2), p(3), top === "tuck" ? "Tuck jump" : "Jump up", 1],
+            [0.35, p(3), p(2), "Land soft", 0.5],
+          ];
+  const barY = (B: Body) => torsoAt(B, standKey(B, 0.14).hip, 0)[1] + reach(B) * 0.95;
   return {
     phases: [
-      [0.5, 2 / 3, 1 / 3, "Hands down", 0.6],
-      [0.35, 1 / 3, 0, "Jump back", 0.9],
-      [0.3, 0, 0, "Plank", 0.6],
-      [0.35, 0, 1 / 3, "Jump in", 0.9],
-      [0.55, 1 / 3, 1, "Jump up", 1],
-      [0.35, 1, 2 / 3, "Land soft", 0.5],
+      [0.5, p(2), p(1), "Hands down", 0.6],
+      [0.35, p(1), 0, o.sprawl ? "Sprawl, hips down" : "Jump back", 0.9],
+      [0.3, 0, 0, o.sprawl ? "Hips on the floor" : "Plank", 0.6],
+      [0.35, 0, p(1), "Jump in", 0.9],
+      [0.55, p(1), p(2), o.bells ? "Deadlift up" : "Stand up", 1],
+      ...ending,
     ],
-    load: "none",
+    load: o.bells ? "kettlebell" : "none",
+    hold: o.bells ? "each" : undefined,
     stance: 0.12,
     pose(B, d) {
       const plank = keyOf(pushUp({}).pose(B, 0), B, 0.1, 0.22);
+      if (o.sprawl) {
+        // hips sink to the floor, arms straight, chest up
+        const sh = torsoAt(B, plank.hip, plank.lean);
+        const hipLow = V(plank.hip[0] + 0.05, 0.22);
+        plank.lean = leanOf(hipLow, sh);
+        plank.hip = hipLow;
+        plank.kneePole = both(V(1, 0.6, 0.4), V(0, 0, 0));
+      }
       const hip = V(-0.12, ANKLE_H + B.shin * 0.72);
       const down: Key = {
         hip,
@@ -3550,13 +3585,34 @@ function burpee(): Motion {
         elbowPole: both(V(-0.7, 0.6, 0.7), V(0, 0, 0)),
         headBlend: 0.4,
       };
-      const jump = standKey(B, 0.14);
-      const sh = torsoAt(B, jump.hip, 0);
-      const up = V(sh[0] + 0.02, sh[1] + reach(B) * 0.95, B.shW);
-      jump.hand = both(up, up);
-      jump.elbowPole = both(V(0, -1, 1), V(0, 0, 0));
-      return keyframes(B, [plank, down, standKey(B), jump], d);
+      const keys: Key[] = [plank, down, standKey(B)];
+      if (top !== "none") {
+        const jump = standKey(B, top === "tuck" ? 0.3 : 0.14);
+        const sh = torsoAt(B, jump.hip, 0);
+        const up = V(sh[0] + 0.02, sh[1] + reach(B) * 0.95, B.shW);
+        jump.hand = both(up, up);
+        jump.elbowPole = both(V(0, -1, 1), V(0, 0, 0));
+        if (top === "tuck") {
+          // knees up to the chest, shins hanging under them
+          const knee = add(jump.hip, V(B.thigh * 0.95, -0.05, 0));
+          jump.ankle = both(V(knee[0] - 0.12, knee[1] - B.shin * 0.9, 0.12), V(0, 0, 0));
+          jump.kneePole = both(V(1, 1, 0.2), V(0, 0, 0));
+          jump.foot = 40;
+        }
+        keys.push(jump);
+        if (top === "pull") {
+          // the same grip on the bar, the body pulled up until the chin clears it
+          const pull = standKey(B, 0.14 + reach(B) * 0.95 - 0.15);
+          pull.ankle = both(V(pull.hip[0] - 0.05, pull.hip[1] - legMax(B) * 0.9, 0.12), V(0, 0, 0));
+          pull.foot = 35;
+          pull.hand = both(V(up[0], up[1], B.shW + 0.1), V(0, 0, 0));
+          pull.elbowPole = both(V(0.3, -1, 0.6), V(0, 0, 0));
+          keys.push(pull);
+        }
+      }
+      return keyframes(B, keys, d);
     },
+    props: top === "pull" ? (B) => [rail(V(standKey(B).hip[0] + 0.04, barY(B) + 0.03), 1.2)] : undefined,
   };
 }
 
@@ -5196,6 +5252,230 @@ function pallofHold(o: { lunge?: boolean }): Motion {
   };
 }
 
+/** Cable squat to row: squat holding the handle out in front, stand, then row it to the ribs. The cable runs to a low-chest pulley ahead. */
+function squatToRow(): Motion {
+  const sq = squat({ hold: "arms", load: "handle" });
+  return {
+    ...sq,
+    phases: [
+      [0.4, 0, 0, "Arms long", 0.4],
+      [1.3, 0, 1, "Squat · 2s", 0.6],
+      [1, 1, 0, "Stand · 1s", 0.9],
+      [0.8, 0, -1, "Row · 1s", 1],
+      [1, -1, 0, "Arms long · 1s", 0.5],
+    ],
+    pose(B, d) {
+      const p = sq.pose(B, Math.max(0, d));
+      if (d >= 0) return p;
+      const k = ease(-d);
+      const out = p.hand as Vec;
+      const reachOut = V(out[0], out[1], out[2]);
+      const ribs = V(p.sh[0] + 0.12, p.sh[1] - 0.26, B.shW + 0.02);
+      return { ...p, hand: lerpV(reachOut, ribs, k), elbowPole: lerpV(V(0, -1, 0.5), V(-1, -0.3, 0.3), k) };
+    },
+    props: () => [cable(V(1.6, 1.25, 0), "hands")],
+  };
+}
+
+// ---------- Olympic lifts and combos (audit batch 7) ----------
+/**
+ * The jerk from the rack: dip, drive, then drop under the bar, either into a split (front foot
+ * forward, back heel up) or a quarter squat (push jerk), recover with the feet together and lower to
+ * the rack. d 0 and 1 are the rack; below 0 the lifter is still in the clean's catch dip.
+ */
+function jerk(o: { split: boolean }): Motion {
+  return {
+    phases: [
+      [0.5, 0, 0, "Rack", 0.35],
+      [0.35, 0, 0.15, "Dip", 0.6],
+      [0.3, 0.15, 0.3, "Drive", 1],
+      [0.3, 0.3, 0.5, o.split ? "Split under" : "Push under", 0.9],
+      [0.5, 0.5, 0.5, "Catch", 0.7],
+      [0.8, 0.5, 0.7, o.split ? "Front foot back, then back foot in" : "Stand", 0.6],
+      [0.4, 0.7, 0.7, "Lockout", 0.5],
+      [1, 0.7, 1, "Lower to the rack", 0.5],
+    ],
+    load: "barbell",
+    stance: 0.15,
+    grip: 0.24,
+    pose(B, d) {
+      const seg = (a: number, b: number) => clamp((d - a) / (b - a), 0, 1);
+      // how far the bar is from the rack (0) to locked out overhead (1)
+      const s =
+        d < 0.15 ? 0 : d < 0.3 ? 0.55 * seg(0.15, 0.3) : d < 0.5 ? 0.55 + 0.45 * seg(0.3, 0.5) : d < 0.7 ? 1 : 1 - ease(seg(0.7, 1));
+      const catchDrop = o.split ? 0.2 : 0.11;
+      const drop =
+        d < 0
+          ? 0.07 * Math.min(1, -d / 0.1)
+          : d < 0.15
+            ? 0.08 * ease(seg(0, 0.15))
+            : d < 0.3
+              ? lerp(0.08, -0.03, seg(0.15, 0.3))
+              : d < 0.5
+                ? lerp(-0.03, catchDrop, ease(seg(0.3, 0.5)))
+                : d < 0.7
+                  ? catchDrop * (1 - ease(seg(0.5, 0.7)))
+                  : 0;
+      const sp = o.split ? (d < 0.3 ? 0 : d < 0.5 ? ease(seg(0.3, 0.5)) : d < 0.55 ? 1 : 1 - ease(seg(0.55, 0.7))) : 0;
+      const wide = o.split ? 0 : d < 0.3 ? 0 : d < 0.5 ? seg(0.3, 0.5) : 1 - seg(0.5, 0.7);
+      const toes = d > 0.15 && d < 0.3 ? Math.sin(Math.PI * seg(0.15, 0.3)) : 0;
+      const hip = V(0.03 - 0.04 * sp, standY(B) - drop);
+      const sh = torsoAt(B, hip, -3 + 2 * sp);
+      const r = reach(B) * 0.985;
+      const bar = V(sh[0] + 0.035 + 0.12 * (1 - Math.pow(s, 4)), sh[1] - 0.01 + r * s, 0);
+      const ankleL = V(0.03 - 0.45 * sp, ANKLE_H + 0.02 * toes + 0.05 * sp, -0.12 - 0.06 * wide);
+      const ankleR = V(0.03 + 0.36 * sp, ANKLE_H + 0.02 * toes, 0.12 + 0.06 * wide);
+      return {
+        hip,
+        sh,
+        bar,
+        hand: V(bar[0], bar[1], 0.24),
+        ankle: per(
+          within(V(hip[0], hip[1], -B.hipW), ankleL, legMax(B) * 0.99),
+          within(V(hip[0], hip[1], B.hipW), ankleR, legMax(B) * 0.99),
+        ),
+        foot: { L: lerp(30 * toes, 55, sp), R: 30 * toes },
+        kneePole: per(lerpV(V(1, 0, 0.45), V(0.6, -1, 0.1), sp), V(1, 0, 0.45)),
+        elbowPole: V(0.6, -1, 0),
+        headBlend: 1,
+        headBack: -0.045 * Math.sin(Math.PI * clamp(s * 1.3, 0, 1)),
+      };
+    },
+  };
+}
+
+/** Clean and jerk: the power clean from the floor to the rack, stand, then the split jerk, back to the rack and down. */
+function cleanAndJerk(): Motion {
+  const pc = powerClean();
+  const j = jerk({ split: true });
+  return {
+    phases: [
+      [0.6, 3, 3, "Set", 0.35],
+      [0.6, 3, 2, "First pull", 0.9],
+      [0.4, 2, 1.5, "Jump", 1],
+      [0.4, 1.5, 1, "Pull under, rack", 0.9],
+      [0.4, 1, 1, "Catch", 0.6],
+      [0.4, -0.1, 0, "Stand", 0.5],
+      ...j.phases.slice(1),
+      [1, 1, 2, "Down to the hips", 0.5],
+      [1, 2, 3, "Lower to the floor", 0.5],
+    ],
+    load: "barbell",
+    stance: 0.15,
+    grip: 0.23,
+    pose(B, d) {
+      if (d <= 1) return j.pose(B, d);
+      return pc.pose(B, d - 1);
+    },
+  };
+}
+
+/**
+ * The snatch: a wide grip, the bar pulled from the hips (or the floor) straight up past the face and
+ * caught locked out overhead in a quarter squat (power snatch) or the hang snatch's deeper catch.
+ * d 0 is caught overhead standing, 0.5 the catch, 1 the hang, 2 the floor.
+ */
+function snatch(o: { floor: boolean }): Motion {
+  const dl = deadlift();
+  const grip = 0.42;
+  return {
+    phases: [
+      ...((o.floor
+        ? [
+            [0.6, 2, 2, "Set", 0.35],
+            [0.6, 2, 1, "First pull", 0.9],
+          ]
+        : [[0.5, 1, 1, "Hang", 0.4]]) as PhaseRow[]),
+      [0.35, 1, 0.75, "Jump", 1],
+      [0.35, 0.75, 0.5, "Pull under", 0.9],
+      [0.5, 0.5, 0.5, "Catch overhead", 0.7],
+      [0.6, 0.5, 0, "Stand", 0.6],
+      [0.4, 0, 0, "Lockout", 0.5],
+      [1.3, 0, 1, "Lower to the hips", 0.5],
+      ...((o.floor ? [[1.2, 1, 2, "Lower to the floor", 0.5]] : []) as PhaseRow[]),
+    ],
+    load: "barbell",
+    stance: 0.17,
+    grip,
+    pose(B, d) {
+      if (d > 1) {
+        const p = dl.pose(B, d - 1);
+        // the wide grip, kept within reach of the shoulder
+        const hand = within(V(p.sh[0], p.sh[1], B.shW), V(p.bar![0], p.bar![1], grip), reach(B) * 0.98);
+        return { ...p, bar: V(hand[0], hand[1], 0), hand: V(hand[0], hand[1], grip) };
+      }
+      const seg = (a: number, b: number) => clamp((d - a) / (b - a), 0, 1);
+      // the hang (d 1): hinged a little, bar at the hips
+      const h = seg(0.75, 1);
+      const catchDrop = o.floor ? 0.14 : 0.2;
+      const drop = d < 0.5 ? catchDrop * ease(d / 0.5) : d < 0.75 ? lerp(catchDrop, -0.03, seg(0.5, 0.75)) : lerp(-0.03, 0.07, h);
+      const lean = d < 0.75 ? 0 : 28 * h;
+      const shX = 0.04 + 0.05 * h;
+      const hipX = shX - Math.sin(rad(lean)) * B.torso;
+      const hip = V(hipX, standY(B, hipX, 1) - drop);
+      const sh = torsoAt(B, hip, lean);
+      const r = reach(B) * 0.97;
+      const up = Math.sqrt(Math.max(0.01, r * r - (grip - B.shW) ** 2)) * 0.98;
+      const over = V(sh[0] - 0.02, sh[1] + up);
+      const hang = V(sh[0] + 0.03, sh[1] - up);
+      // the bar rises close to the body: hips, chest, past the face, overhead
+      const k = d <= 0.5 ? 0 : 1 - seg(0.5, 1);
+      const bar = d <= 0.5 ? over : add(lerpV(hang, over, ease(k)), V(0.12 * Math.sin(Math.PI * k), 0, 0));
+      return {
+        hip,
+        sh,
+        bar,
+        hand: V(bar[0], bar[1], grip),
+        ankle: V(0.02, ANKLE_H, (0.15 + 0.05 * clamp(1 - d / 0.75, 0, 1)) * B.s),
+        shrug: 0.05 * Math.sin(Math.PI * seg(0.6, 1)),
+        elbowPole: k > 0.5 ? V(-1, -0.3, 0.5) : V(-0.3, 1, 0.8),
+        kneePole: V(1, 0, 0.45),
+        headBlend: 0.8,
+      };
+    },
+  };
+}
+
+/** One-arm clean and press: the swing clean to the rack, a press overhead, back to the rack, then hike back. */
+function cleanAndPress(o: { load?: Load }): Motion {
+  const c = kbFlow({ to: "rack", load: o.load });
+  return {
+    ...c,
+    phases: [
+      [0.8, 1, 0, "Clean to the rack", 1],
+      [0.4, 0, 0, "Rack", 0.5],
+      [0.9, 0, -1, "Press · 1s", 1],
+      [0.4, -1, -1, "Lockout", 0.6],
+      [1.1, -1, 0, "Lower to the rack", 0.5],
+      [0.9, 0, 1, "Hike back", 0.55],
+    ],
+    pose(B, d) {
+      const p = c.pose(B, Math.max(0, d));
+      if (d >= 0) return p;
+      const k = ease(-d);
+      const rack = V(p.sh[0] + 0.1, p.sh[1] - 0.1, 0.08);
+      const mid = V(p.sh[0] + 0.07, p.sh[1] + 0.08, B.shW + 0.06);
+      const over = V(p.sh[0] + 0.03, p.sh[1] + reach(B) * 0.95, B.shW - 0.02);
+      const hand = k < 0.35 ? lerpV(rack, mid, k / 0.35) : lerpV(mid, over, (k - 0.35) / 0.65);
+      return { ...p, hand: per((p.hand as { L: Vec }).L, hand), elbowPole: per(V(-1, 0, 0.3), V(0, -1, 1)) };
+    },
+  };
+}
+
+/** One and a half squat: all the way down, halfway up, back down, then stand. */
+function oneAndAHalf(m: Motion): Motion {
+  return {
+    ...m,
+    phases: [
+      [0.4, 0, 0, "Top", 0.4],
+      [1.4, 0, 1, "Lower · 2s", 0.6],
+      [0.6, 1, 0.5, "Halfway up", 0.8],
+      [0.6, 0.5, 1, "Back down", 0.7],
+      [1.1, 1, 0, "Stand · 1s", 1],
+    ],
+  };
+}
+
 /** Hammer curl to press: curl the dumbbells up, press them overhead, and lower both ways back down. */
 function curlToPress(): Motion {
   const c = curl({ load: "dumbbell", grip: 0.23 });
@@ -5483,7 +5763,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "bicycle-crunch": () => floorCore({ kind: "bicycle" }),
   "lying-leg-raise": () => floorCore({ kind: "legRaise" }),
   "mountain-climber": mountainClimber,
-  burpee,
+  burpee: () => burpee(),
   "jumping-jacks": jumpingJack,
   "high-knees": () => run({ lift: 0.8, lean: 0 }),
   "jump-squat": jumpSquat,
@@ -5812,7 +6092,7 @@ const MOTIONS: Record<string, () => Motion> = {
   sprint: () => run({ lift: 0.7, lean: 12 }),
   "skater-jumps": () => skater({ dist: 0.42, height: 0.12, label: ["Jump right", "Jump left"] }),
   "tuck-jump": () => hop({ dip: 0.4, air: 0.32, arms: "swing", tuck: true, labels: ["Jump, knees up", "Jump, knees up"] }),
-  "squat-thrust": burpee,
+  "squat-thrust": () => burpee({ top: "none" }),
   "star-jump": jumpingJack,
   "lateral-shuffle": lateralShuffle,
   "butt-kicks": buttKicks,
@@ -6025,16 +6305,16 @@ const MOTIONS: Record<string, () => Motion> = {
   "crab-walk": crabWalk,
   "lateral-bear-crawl": lateralBearCrawl,
   "backward-bear-crawl": backwardBearCrawl,
-  sprawl: burpee,
-  "burpee-broad-jump": burpee,
+  sprawl: () => burpee({ top: "none", sprawl: true }),
+  "burpee-broad-jump": () => burpee(),
   "burpee-box-jump": boxJump,
-  "burpee-pull-up": burpee,
-  "half-burpee": burpee,
-  "lateral-burpee": burpee,
+  "burpee-pull-up": () => burpee({ top: "pull" }),
+  "half-burpee": () => burpee({ top: "none" }),
+  "lateral-burpee": () => burpee(),
   "seal-jack": jumpingJack,
   "cross-jack": jumpingJack,
   "squat-jack": () => hop({ dip: 0.55, air: 0.08, arms: "chest", wide: [0.12, 0.34], labels: ["Jump out", "Jump in"] }),
-  "plank-to-squat": burpee,
+  "plank-to-squat": () => burpee({ top: "none" }),
   "frog-jump": () =>
     hop({ dip: 0.95, air: 0.18, arms: "floor", travel: { x: 0.7 }, walkBack: true, wide: [0.24, 0.24], labels: ["Jump forward", ""] }),
   "in-and-out-jumps": () => hop({ dip: 0.35, air: 0.1, arms: "swing", wide: [0.1, 0.3], labels: ["Jump out", "Jump in"] }),
@@ -6053,14 +6333,14 @@ const MOTIONS: Record<string, () => Motion> = {
   "incline-treadmill-run": () => run({ lift: 0.55, lean: 10 }),
   "treadmill-walk": walk,
   "db-hang-clean": () => kbFlow({ to: "rack", load: "dumbbell" }),
-  "db-clean-and-press": () => kbFlow({ to: "overhead", load: "dumbbell" }),
+  "db-clean-and-press": () => cleanAndPress({ load: "dumbbell" }),
   "db-devil-press": devilPress,
-  "power-snatch": hangClean,
-  "hang-snatch": hangClean,
-  "clean-and-jerk": hangClean,
-  "push-jerk": () => overhead({ load: "barbell" }),
-  "split-jerk": () => overhead({ load: "barbell" }),
-  "kb-clean-and-press": () => kbFlow({ to: "overhead" }),
+  "power-snatch": () => snatch({ floor: true }),
+  "hang-snatch": () => snatch({ floor: false }),
+  "clean-and-jerk": cleanAndJerk,
+  "push-jerk": () => jerk({ split: false }),
+  "split-jerk": () => jerk({ split: true }),
+  "kb-clean-and-press": () => cleanAndPress({}),
   "kb-overhead-lunge": () => lunge({ step: "back", hands: "hips" }),
   "db-overhead-lunge": () => lunge({ step: "walk", hands: "hips" }),
   "ring-muscle-up": () => muscleUp({ rings: true }),
@@ -6242,7 +6522,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "slider-mountain-climber": mountainClimber,
   "slider-knee-tuck": () => plankKneeTuck({}),
   "standing-oblique-crunch": () => sideBend({ load: "none", crunch: true }),
-  "standing-knee-to-elbow": () => run({ lift: 0.8, lean: 0 }),
+  "standing-knee-to-elbow": () => sideBend({ load: "none", crunch: true }),
   "plank-to-pike": () => plankToPike({}),
   "band-lift": () => woodchop({ load: "none", anchor: true }),
   "pallof-reverse-lunge": () => pallofHold({ lunge: true }),
@@ -6266,7 +6546,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "scap-push-up": () => pushUp({ scap: true }),
   "landmine-thruster": () => thruster({ load: "barbell" }),
   "landmine-split-squat": () => lunge({ hands: "hips" }),
-  "cable-squat-to-row": () => squat({ hold: "arms", load: "handle" }),
+  "cable-squat-to-row": squatToRow,
   "kb-squat-to-press": () => thruster({ load: "kettlebell" }),
   "db-reverse-lunge-press": () => lunge({ step: "back", hands: "dumbbells" }),
   "band-thruster": () => thruster({ load: "none" }),
@@ -6282,7 +6562,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "barbell-hack-squat": deadlift,
   "db-suitcase-squat": () => squat({ hold: "hips", load: "dumbbell" }),
   "tempo-split-squat": () => lunge({ hands: "hips" }),
-  "one-and-a-half-squat": () => squat({ hold: "back", load: "barbell" }),
+  "one-and-a-half-squat": () => oneAndAHalf(squat({ hold: "back", load: "barbell" })),
   "tempo-rdl": () => rdl({ load: "barbell" }),
   "wall-sit-calf-raise": () => calfRaise({ load: "none" }),
   "single-leg-box-jump": boxJump,
@@ -6317,9 +6597,9 @@ const MOTIONS: Record<string, () => Motion> = {
   "treadmill-intervals": run,
   "stair-climber-side-step": () => run({ lift: 0.45, lean: 5 }),
   "elliptical-backward": () => backwards(elliptical(), "Stride backwards"),
-  "burpee-tuck-jump": burpee,
-  "kb-burpee-deadlift": burpee,
-  "med-ball-burpee": burpee,
+  "burpee-tuck-jump": () => burpee({ top: "tuck" }),
+  "kb-burpee-deadlift": () => burpee({ top: "none", bells: true }),
+  "med-ball-burpee": () => burpee(),
   "med-ball-lunge-twist": () => lunge({ step: "walk", hands: "hips" }),
   "hanging-alternating-knee-raise": hangingRaise,
   "step-up-to-balance": stepUp,
