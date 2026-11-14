@@ -14,13 +14,15 @@ import { isNative } from "./juice";
 //   phone" follows the system's increase-contrast setting (prefers-contrast: more).
 // - One-handed controls move the weight and rep bumps on the workout screen down beside Log set,
 //   with Log set under the thumb of the hand that holds the phone.
+// - Big numbers (Melvin, 2026-11-14, "quiet mode"): during a set the weight and reps are much bigger, Log set
+//   is taller, and the optional extras (music, what's next, Same as last time, the demo's height) step back.
 
 export type TextSize = "system" | "100" | "115" | "130" | "150";
 export type Colours = "standard" | "cvd";
 export type Contrast = "system" | "standard" | "more";
 /** One-handed workout controls: off, or docked at the bottom with Log set under that thumb. */
 export type Hand = "off" | "right" | "left";
-export type A11y = { text?: TextSize; colours?: Colours; contrast?: Contrast; hand?: Hand };
+export type A11y = { text?: TextSize; colours?: Colours; contrast?: Contrast; hand?: Hand; big?: boolean };
 
 export const TEXT_SIZES: [TextSize, string][] = [
   ["system", "Match my phone"],
@@ -41,6 +43,7 @@ export function cleanA11y(a: unknown): Required<A11y> {
     colours: o.colours === "cvd" ? "cvd" : "standard",
     contrast: o.contrast === "more" || o.contrast === "standard" ? o.contrast : "system",
     hand: o.hand === "right" || o.hand === "left" ? o.hand : "off",
+    big: o.big === true,
   };
 }
 

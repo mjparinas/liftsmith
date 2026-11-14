@@ -7,7 +7,7 @@
 //    separate "Reminders" channel on Android so it can be muted on its own.
 //  - Email: an opt-in subscription on the server (/api/reminders/) to the signed-in account's email. The
 //    request carries the account's session, so the server knows the address is verified and starts at once;
-//    an older subscription to another address stays double opt-in. The phone sends only the fields the planner needs (PlanInput), never workouts or health data.
+//    an older subscription to another address stays double opt-in. The phone sends only the fields the planner needs (PlanInput), plus recap totals and the newest best, never set-by-set workouts or health data.
 //    The subscription id and its secret stay in this device's storage.
 //  - Web: browsers can't schedule a notification while the page is closed without a push server, so
 //    the web app offers email reminders only (documented in AGENTS.md).
@@ -17,11 +17,25 @@ import { useAccount } from "./auth";
 import { storePro } from "./billing";
 import { trainingDays } from "./calendar";
 import type { Stats } from "./derive";
+import { exercise } from "./exercises";
 import { goalStreak } from "./game";
 import { currentLang } from "./i18n";
 import { isNative } from "./juice";
-import { dayStart, mondayIn, plan, proState, type Message, type MessageKind, type PlanInput } from "./messages";
+import {
+  addDays,
+  dayStart,
+  mondayIn,
+  parts,
+  plan,
+  proState,
+  zoned,
+  type Message,
+  type MessageKind,
+  type PlanInput,
+  type Totals,
+} from "./messages";
 import { SITE_URL } from "./site";
+import { isTeen } from "./teen";
 import type { Profile } from "./types";
 
 export const HORIZON_DAYS = 14;
@@ -36,6 +50,49 @@ export const deviceTz = () => {
     return "UTC";
   }
 };
+
+/** Today's planned workout, for the welcome and first-workout emails (App.tsx provides it from the store). */
+let nextPlan: () => { names: string[]; minutes: number } | null = () => null;
+export const provideNextPlan = (f: typeof nextPlan) => {
+  nextPlan = f;
+};
+
+/** Workouts, sets, weight lifted (kg), new bests and minutes between two instants, from the derived sessions. */
+export function totalsBetween(stats: Stats, start: number, end: number): Totals {
+  const s = stats.sessions.filter((x) => x.start >= start && x.start < end);
+  return {
+    start,
+    workouts: s.length,
+    sets: s.reduce((a, x) => a + x.sets, 0),
+    volumeKg: Math.round(s.reduce((a, x) => a + x.volume, 0)),
+    prs: s.reduce((a, x) => a + x.prs, 0),
+    minutes: Math.round(s.reduce((a, x) => a + x.seconds, 0) / 60),
+  };
+}
+
+/** What only the emails use: the week so far, last month, the newest best and today's plan before the first workout. */
+export function emailExtras(profile: Profile, stats: Stats, now: number, tz = deviceTz()): Partial<PlanInput> {
+  const monday = mondayIn(now, tz);
+  const p = parts(now, tz);
+  const thisMonth = zoned(p.y, p.m, 1, 0, 0, tz);
+  const lastMonth = dayStart(addDays(thisMonth, -1, tz), tz);
+  const lastMonthStart = zoned(parts(lastMonth, tz).y, parts(lastMonth, tz).m, 1, 0, 0, tz);
+  const newest = stats.prs.reduce<Stats["prs"][number] | null>((a, x) => (!a || x.at > a.at ? x : a), null);
+  let best: PlanInput["best"];
+  try {
+    if (newest) best = { at: newest.at, name: exercise(newest.exerciseId).name, weightKg: newest.weight, reps: newest.reps };
+  } catch {
+    best = undefined; // an exercise that's no longer in the library
+  }
+  const next = stats.sessions.length ? null : nextPlan();
+  return {
+    unit: profile.unit === "lb" ? "lb" : "kg",
+    week: totalsBetween(stats, monday, now + 1),
+    lastMonth: totalsBetween(stats, lastMonthStart, thisMonth),
+    best,
+    next: next?.names.length ? { names: next.names.slice(0, 6), minutes: next.minutes } : undefined,
+  };
+}
 
 /** The planner's input from the lifter's profile and stats: a handful of numbers, nothing more. */
 export function planInput(profile: Profile, stats: Stats, now: number, channel: "push" | "email", tz = deviceTz()): PlanInput {
@@ -57,6 +114,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
     // goalStreak counts this week once it's met; the planner wants the weeks before it.
     streakWeeks: g.weeks - (g.thisWeek >= Math.max(1, profile.daysPerWeek) ? 1 : 0),
     pro: storePro(now) ?? proState(profile.pro, now),
+    teen: isTeen(profile, now) || undefined,
     kinds: (channel === "push" ? prefs?.push : prefs?.email?.kinds) ?? {},
     lang: currentLang(),
   };
@@ -178,7 +236,7 @@ function ensureSub(): MailSub {
 /** The body the server stores. Only these fields, nothing about workouts beyond the planner's numbers. */
 export function subscriptionBody(profile: Profile, stats: Stats, now: number, sub: MailSub, resubscribe = false) {
   const email = profile.messages?.email;
-  const i = planInput(profile, stats, now, "email");
+  const i = { ...planInput(profile, stats, now, "email"), ...emailExtras(profile, stats, now) };
   return {
     id: sub.id,
     token: sub.token,
@@ -197,7 +255,13 @@ export function subscriptionBody(profile: Profile, stats: Stats, now: number, su
     weekStart: i.weekStart,
     streakWeeks: i.streakWeeks,
     pro: i.pro,
+    teen: i.teen ?? false,
     lang: i.lang,
+    unit: i.unit,
+    week: i.week,
+    lastMonth: i.lastMonth,
+    best: i.best ?? null,
+    next: i.next ?? null,
   };
 }
 
@@ -240,6 +304,32 @@ export async function deleteEmail(): Promise<boolean> {
   try {
     localStorage.removeItem(SUB_KEY);
   } catch {}
+  return true;
+}
+
+/**
+ * Email is on by default (Melvin, 2026-11-14: "Email me setting should be on by default for all users"): once a
+ * signed-in adult's device has synced with the account (so a fresh phone doesn't start a second subscription before
+ * the account's settings arrive), the account's verified address is subscribed unless the lifter turned email off.
+ * Under-18s start with it off and can turn it on. Returns the new prefs, or null when nothing should change.
+ */
+export function autoEmailPrefs(
+  profile: Profile,
+  email: string | null,
+  synced: boolean,
+  now = Date.now(),
+): NonNullable<Profile["messages"]> | null {
+  const prefs = profile.messages ?? { push: {} };
+  if (!email || !synced || !profile.onboarded || prefs.email || prefs.emailOff || isTeen(profile, now)) return null;
+  return { ...prefs, startedAt: prefs.startedAt ?? now, email: { address: email, consentAt: now, status: "pending", kinds: {} } };
+}
+
+/** Turns email on by default (autoEmailPrefs) and makes this device the one that keeps the subscription up to date. */
+export function startDefaultEmail(profile: Profile, synced: boolean, save: (m: NonNullable<Profile["messages"]>) => void): boolean {
+  const next = autoEmailPrefs(profile, accountEmail(), synced);
+  if (!next) return false;
+  ensureSub();
+  save(next);
   return true;
 }
 

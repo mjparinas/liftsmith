@@ -259,6 +259,7 @@ export function Stepper({
   suffix,
   compact,
   display,
+  big,
 }: {
   value: string;
   onDown: () => void;
@@ -267,6 +268,8 @@ export function Stepper({
   suffix?: string;
   compact?: boolean;
   display?: boolean;
+  /** Big numbers (Settings › Workout): the number is much bigger, capped by the screen's width so it never scrolls sideways. */
+  big?: boolean;
 }) {
   // The number lifts for a moment when it changes.
   const [key, setKey] = useState(0);
@@ -296,7 +299,10 @@ export function Stepper({
       <div className="flex items-center gap-6">
         {!display && <Bump dir={-1} label={label} size="lg" onStep={step} />}
         <div className="min-w-[3.6ch] text-center">
-          <div key={key} className={`display whitespace-nowrap text-[3.5rem] ${key ? "animate-nudge" : ""}`}>
+          <div
+            key={key}
+            className={`display whitespace-nowrap ${big ? (display ? "text-[min(6rem,22vw)]" : "text-[min(4.75rem,15vw)]") : "text-[3.5rem]"} ${key ? "animate-nudge" : ""}`}
+          >
             {value}
           </div>
         </div>

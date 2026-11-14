@@ -114,7 +114,7 @@ export const es: FeaturesText = {
     },
     "rest-timer": {
       name: "Temporizador de descanso en la pantalla de bloqueo",
-      body: "Arranca solo tras cada serie y cuenta atrás en la pantalla de bloqueo con la siguiente serie, los discos, el pulso y botones Registrar serie y +30 s que funcionan con la app cerrada.",
+      body: "Arranca solo tras cada serie y cuenta atrás en la pantalla de bloqueo con la siguiente serie, los discos, el pulso y botones Registrar serie y +30 s que funcionan con la app cerrada. Una vibración suave 10 segundos antes del final te da tiempo para prepararte, en el móvil y en el reloj.",
       note: "Android: una notificación fija, una Live Update en Android 16 y la Now Bar de Samsung. iPhone: una Actividad en Vivo en la pantalla de bloqueo y en la Dynamic Island. Web: una notificación mientras la página está abierta.",
     },
     plates: {
@@ -206,6 +206,10 @@ export const es: FeaturesText = {
       body: "¿Olvidaste el teléfono? Registra el entrenamiento después y cuenta como cualquier otro.",
     },
     recap: { name: "Resumen mensual", body: "Un breve repaso de tu mes, listo para compartir." },
+    anniversary: {
+      name: "Aniversario de entrenamiento",
+      body: "Cada año, el día de tu primer entrenamiento, Hoy pone el día uno junto a hoy: entrenamientos, series, peso total y el ejercicio que más ha crecido, con una tarjeta para compartir. Se queda una semana.",
+    },
     body: {
       name: "Peso, grasa corporal y fotos",
       body: "Registra peso y grasa corporal, o deja que lleguen de tu báscula a través de la app de salud del teléfono, y guarda fotos de progreso en tu teléfono.",
@@ -316,7 +320,7 @@ export const es: FeaturesText = {
     },
     share: {
       name: "Tarjetas y enlaces para compartir",
-      body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa.",
+      body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa. Un nuevo récord brilla en dorado y se puede compartir desde el descanso al momento.",
     },
     coaching: {
       name: "Entrena a clientes",
@@ -401,6 +405,11 @@ export const es: FeaturesText = {
       name: "Recordatorios",
       body: "Recordatorios suaves los días de entrenamiento, como notificaciones en los teléfonos y por correo.",
     },
+    emails: {
+      name: "Correos que te mantienen en marcha",
+      body: "Ocho consejos para empezar con pantallas reales, un resumen semanal y mensual, tus nuevos récords, qué amigos entrenaron y un empujón para volver tras una pausa. Cada tipo tiene su propio interruptor.",
+      note: "Activados con una cuenta; desactivados para menores de 18 salvo que los activen. Cada correo tiene baja con un clic.",
+    },
     cloud: {
       name: "Conexiones con servicios de fitness",
       body: "Oura envía sueño, VFC, pulso en reposo y pasos, con una cuenta gratuita. Estamos estudiando Strava, WHOOP, Withings, Polar y Concept2.",
@@ -444,6 +453,10 @@ export const es: FeaturesText = {
     "one-hand": {
       name: "Controles a una mano",
       body: "Mueve los botones de peso y repeticiones junto a Registrar serie, bajo tu pulgar izquierdo o derecho.",
+    },
+    "big-numbers": {
+      name: "Números grandes",
+      body: "Durante una serie, el peso y las repeticiones se ven mucho más grandes y Registrar serie es más alto, y la música y lo siguiente esperan al descanso. Fácil de leer con el brazo estirado, en plena serie.",
     },
     lean: {
       name: "Modo ligero, sonidos y vibración",

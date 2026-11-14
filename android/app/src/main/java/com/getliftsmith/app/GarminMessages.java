@@ -12,7 +12,7 @@ import org.json.JSONObject;
  * What goes to and comes from the Garmin watch app (garmin/source). Plain data, so it's tested without a watch.
  * The phone sends short keys because Connect IQ messages are small and slow: "t" title, "s" set label, "n" the set,
  * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree), "h" heart rate from a
- * Bluetooth monitor, "v" vibrate when rest ends, "k" the set timer's phases as [seconds from now to its start, to its
+ * Bluetooth monitor, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its
  * end or -1 for a count-up, label] and "ki" which timer that is. The watch sends {"a": "log" | "add30"} or {"hr": bpm}.
  * iOS counterpart: GarminLink.swift (GarminMessages).
  */
@@ -34,6 +34,7 @@ final class GarminMessages {
         m.put("r", restUntil > now ? (int) ((restUntil - now + 999) / 1000) : 0);
         m.put("h", s.optInt("hr", 0));
         m.put("v", s.optBoolean("vibrate", true));
+        m.put("w", s.optBoolean("warn", false));
         // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
         List<Object> k = new ArrayList<>();
         JSONArray timer = restUntil > now ? null : s.optJSONArray("timer");
@@ -69,7 +70,7 @@ final class GarminMessages {
      */
     static boolean worthSending(Map<String, Object> last, Map<String, Object> next, long sinceLastMs) {
         if (last == null) return true;
-        for (String k : new String[] { "t", "s", "n", "p", "v", "ki" }) {
+        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki" }) {
             Object a = last.get(k);
             if (a == null ? next.get(k) != null : !a.equals(next.get(k))) return true;
         }

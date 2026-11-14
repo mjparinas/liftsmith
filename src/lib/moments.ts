@@ -1,6 +1,7 @@
 import type { Stats } from "./derive";
 import { num, t } from "./i18n";
-import type { Unit } from "./types";
+import { epley, TIMED } from "./progression";
+import type { AppEvent, SetEvent, Unit } from "./types";
 import { fromKg } from "./units";
 
 // Lifetime tonnage, anniversaries, workout-count milestones and comebacks: small moments derived from
@@ -67,12 +68,6 @@ export interface Moment {
   detail: string;
 }
 
-function sameDay(a: number, b: number): boolean {
-  const x = new Date(a);
-  const y = new Date(b);
-  return x.getFullYear() === y.getFullYear() && x.getMonth() === y.getMonth() && x.getDate() === y.getDate();
-}
-
 /** Whole years from `first` to `now` when today is the anniversary of the first workout, else 0. */
 export function anniversaryYears(first: number, now: number): number {
   const f = new Date(first);
@@ -82,6 +77,80 @@ export function anniversaryYears(first: number, now: number): number {
   // A first workout on 29 February is celebrated on 28 February in other years.
   const day = f.getMonth() === 1 && f.getDate() === 29 && new Date(n.getFullYear(), 1, 29).getMonth() !== 1 ? 28 : f.getDate();
   return n.getMonth() === f.getMonth() && n.getDate() === day ? years : 0;
+}
+
+/** Days the anniversary card stays on Today after the day itself, for lifters who don't open the app that day. */
+export const ANNIVERSARY_DAYS = 7;
+
+/**
+ * The anniversary of the first workout showing now: whole years and the day it fell on, from the day itself through
+ * the next ANNIVERSARY_DAYS - 1 days, else null.
+ */
+export function anniversaryNear(first: number, now: number): { years: number; day: number } | null {
+  for (let back = 0; back < ANNIVERSARY_DAYS; back++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - back);
+    const years = anniversaryYears(first, d.getTime());
+    if (years > 0) {
+      d.setHours(0, 0, 0, 0);
+      return { years, day: d.getTime() };
+    }
+  }
+  return null;
+}
+
+/** A best set on one lift: weight in kg and reps. */
+export interface LiftSet {
+  weight: number;
+  reps: number;
+}
+
+/** Day one against today, for the anniversary card and its share card. Weights in kg. */
+export interface AnniversaryLook {
+  years: number;
+  /** The day the anniversary fell on (local midnight), which keys its dismissal. */
+  day: number;
+  firstAt: number;
+  dayOne: { sets: number; volume: number };
+  today: { workouts: number; sets: number; volume: number };
+  /** The lift from the first workout that went up the most, by estimated one-rep max, if any went up. */
+  lift?: { exerciseId: string; then: LiftSet; best: LiftSet; pct: number };
+}
+
+/**
+ * The anniversary of the first workout, compared: what day one was (sets, volume) and what's been done since
+ * (workouts, sets, total lifted), plus the lift from that first workout that has grown most. Null when no
+ * anniversary is showing. Derived from the event log, like every other moment.
+ */
+export function anniversaryLook(events: readonly AppEvent[], stats: Stats, now: number): AnniversaryLook | null {
+  const first = stats.sessions.at(-1);
+  if (!first || stats.sessions.length < 2) return null;
+  const near = anniversaryNear(first.start, now);
+  if (!near) return null;
+  const best = (sets: { weight: number; reps: number }[]) => {
+    let b: LiftSet | null = null;
+    for (const s of sets)
+      if (s.weight > 0 && (!b || epley(s.weight, s.reps) > epley(b.weight, b.reps))) b = { weight: s.weight, reps: s.reps };
+    return b;
+  };
+  let lift: AnniversaryLook["lift"];
+  for (const id of new Set(first.exercises)) {
+    if (TIMED.has(id)) continue;
+    const all = events.filter((e): e is SetEvent => e.type === "set" && e.exerciseId === id);
+    const then = best(all.filter((s) => s.sessionId === first.sessionId));
+    const top = best(all);
+    if (!then || !top) continue;
+    const pct = (epley(top.weight, top.reps) / epley(then.weight, then.reps) - 1) * 100;
+    if (pct >= 1 && (!lift || pct > lift.pct)) lift = { exerciseId: id, then, best: top, pct };
+  }
+  return {
+    years: near.years,
+    day: near.day,
+    firstAt: first.start,
+    dayOne: { sets: first.sets, volume: first.volume },
+    today: { workouts: stats.sessions.length, sets: stats.totalSets, volume: stats.totalVolume },
+    lift,
+  };
 }
 
 /** Days since the last workout. */
@@ -102,19 +171,7 @@ function weeksText(days: number): string {
 /** Moments for the Today screen (before a workout). */
 export function todayMoments(stats: Stats, now: number): Moment[] {
   const out: Moment[] = [];
-  const first = stats.sessions.at(-1);
-  if (first) {
-    const y = anniversaryYears(first.start, now);
-    if (y > 0 && !stats.sessions.some((s) => sameDay(s.start, now) && s !== first)) {
-      out.push({
-        id: `anniversary-${y}`,
-        kind: "anniversary",
-        emoji: "🎂",
-        title: t("mom.anniv", { count: y }),
-        detail: t("mom.annivBody", { workouts: num(stats.sessions.length), sets: num(stats.totalSets) }),
-      });
-    }
-  }
+  // The anniversary has its own card now (anniversaryLook, AnniversaryCard in Extras.tsx).
   const away = daysAway(stats, now);
   if (away !== null && away >= COMEBACK_DAYS) {
     out.push({ id: "comeback", kind: "comeback", emoji: "👋", title: t("mom.back"), detail: t("mom.backBody", { time: weeksText(away) }) });

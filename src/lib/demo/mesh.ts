@@ -451,7 +451,7 @@ export function placement(m: Motion, B: Body): Placement {
       maxZ = Math.max(maxZ, p[2]);
     }
   }
-  return { roll, yaw, lift: 0.05 - minY, shiftZ: -(minZ + maxZ) / 2 };
+  return { roll, yaw, lift: (m.restOn ?? 0) + 0.05 - minY, shiftZ: -(minZ + maxZ) / 2 };
 }
 
 /** Solve the pose for a phase value, in the figure's own frame (the renderer applies the placement). */

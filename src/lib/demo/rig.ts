@@ -287,14 +287,102 @@ export type PerSide<T> = T | { L: T; R: T };
 export type Load = "barbell" | "trapbar" | "dumbbell" | "kettlebell" | "ball" | "handle" | "wheel" | "none";
 export type Hold = "each" | "centre" | "R";
 
-/** A joint name, the midpoint of the hands ("hands"), or a fixed point. */
-export type Anchor = Vec | "hands" | "ankles" | "handL" | "handR" | "ankleL" | "ankleR" | "kneeL" | "kneeR" | "hipC" | "neck";
+/** A joint name, the midpoint of the hands ("hands"), a point just off the upper back ("upperBack", where a band wraps), or a fixed point. */
+export type Anchor = Vec | "hands" | "ankles" | "handL" | "handR" | "ankleL" | "ankleR" | "kneeL" | "kneeR" | "hipC" | "neck" | "upperBack";
 
 /** Scenery drawn around the figure, in the figure's own frame. */
 export type Prop =
   | { kind: "box"; at: Vec; size: Vec; tilt?: number; follow?: Anchor } // centre (offset from `follow` when set), full size, tilt about z (degrees)
   | { kind: "rail"; at: Vec; length: number; axis?: "x" | "y" | "z" } // pull-up bar, dip bars, smith rails
-  | { kind: "cable"; from: Anchor; to: Anchor }; // pulley cable or band, follows the joints
+  | { kind: "cable"; from: Anchor; to: Anchor } // pulley cable or band, follows the joints
+  | PoleProp
+  | RopeProp;
+
+/**
+ * A landmine bar: a thick bar from a pivot on the floor to the hands, running on past them by `past`,
+ * with a plate on the sleeve just short of the hands. It follows the hands, so it tilts and swings as they move.
+ */
+export interface PoleProp {
+  kind: "pole";
+  from: Anchor;
+  to: Anchor;
+  past: number;
+  /** The plate's radius (0.2 when left out; 0 draws none, for a machine's lever arm). */
+  plate?: number;
+}
+
+/** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, and a plate ring by the hands. */
+export const POLE_SEGMENTS = 4 + 16;
+export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
+  const a = anchorAt(J, p.from),
+    h = anchorAt(J, p.to);
+  const d: Vec = [h[0] - a[0], h[1] - a[1], h[2] - a[2]];
+  const l = Math.hypot(d[0], d[1], d[2]) || 1;
+  const u: Vec = [d[0] / l, d[1] / l, d[2] / l];
+  const b: Vec = [h[0] + u[0] * p.past, h[1] + u[1] * p.past, h[2] + u[2] * p.past];
+  // two directions across the bar
+  const side: Vec = Math.abs(u[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
+  const n1 = norm(cross(u, side)),
+    n2 = cross(u, n1);
+  const off = (q: Vec, r: number, t: number): Vec => [
+    q[0] + (n1[0] * Math.cos(t) + n2[0] * Math.sin(t)) * r,
+    q[1] + (n1[1] * Math.cos(t) + n2[1] * Math.sin(t)) * r,
+    q[2] + (n1[2] * Math.cos(t) + n2[2] * Math.sin(t)) * r,
+  ];
+  const out: [Vec, Vec][] = [];
+  for (let i = 0; i < 4; i++) {
+    const t = (i * Math.PI) / 2;
+    out.push([off(a, 0.018, t), off(b, 0.018, t)]);
+  }
+  // the plates sit on the sleeve just short of the hands
+  const plate: Vec = [h[0] - u[0] * 0.14, h[1] - u[1] * 0.14, h[2] - u[2] * 0.14];
+  const pr = p.plate ?? 0.2;
+  for (let i = 0; i < 16; i++) {
+    // no plate: the unused segments collapse onto the bar's end
+    if (!pr) out.push([b, b]);
+    else out.push([off(plate, pr, (i * Math.PI) / 8), off(plate, pr, ((i + 1) * Math.PI) / 8)]);
+  }
+  return out;
+}
+
+/**
+ * A battle rope from a hand to an anchor on the floor ahead, drawn with a travelling sine wave. The
+ * hand circles `centre` (forward and back by 0.4 × `radius`, up and down, or side to side when `axis`
+ * is "z", by `radius`), and where it is on that circle sets the wave's phase, so the wave rolls down
+ * the rope as the hand moves with no clock of its own. The wave swells a little along the rope, the
+ * middle sags to the floor, and the far end stays on the anchor.
+ */
+export interface RopeProp {
+  kind: "rope";
+  from: Anchor;
+  to: Vec;
+  centre: Vec;
+  radius: number;
+  /** How many wavelengths fit along the rope. */
+  waves: number;
+  axis?: "y" | "z";
+}
+
+export function ropePoints(p: RopeProp, J: Joints, n = 32): Vec[] {
+  const h = anchorAt(J, p.from);
+  const ai = p.axis === "z" ? 2 : 1;
+  const r = p.radius || 0.1;
+  const sinP = Math.max(-1, Math.min(1, (h[ai] - p.centre[ai]) / r));
+  const phi = Math.atan2(sinP, (h[0] - p.centre[0]) / (0.4 * r));
+  const out: Vec[] = [];
+  for (let i = 0; i <= n; i++) {
+    const s = i / n;
+    const q = lerpV(h, p.to, s);
+    const env = Math.pow(1 - s, 0.7) * (1 + 1.5 * s);
+    // the hand's own offset fades linearly in the straight line; swap it for the wave
+    const wave = r * env * Math.sin(phi - 2 * Math.PI * p.waves * s) - (1 - s) * r * Math.sin(phi);
+    q[ai] += wave;
+    // the middle of the rope lies on the floor
+    q[1] = Math.max(0.02, q[1] - 0.3 * Math.sin(Math.PI * s));
+    out.push(q);
+  }
+  return out;
+}
 
 export interface Pose {
   /** Pelvis and shoulder centres. The torso runs between them in the x-y plane (shared z). */
@@ -310,6 +398,8 @@ export interface Pose {
   /** How much the head stays upright (1) or follows the spine (0). */
   headBlend?: number;
   headBack?: number;
+  /** Tips the head toward the figure's right (+) or left (-): 0.05 is about 14 degrees (the dance's head snaps). */
+  headTilt?: number;
   /** Lifts the shoulder joints (shrugs). */
   shrug?: number;
   /** Barbell centre, when the lift uses one. */
@@ -365,7 +455,7 @@ export interface PoseOpts {
 export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
   const up = norm(sub(pose.sh, pose.hip));
   const blend = pose.headBlend ?? 0.45;
-  const headDir = norm(add(mul(up, 1 - blend * 0.5), mul([0, 1, 0], blend * 0.5)));
+  const headDir = norm(add(add(mul(up, 1 - blend * 0.5), mul([0, 1, 0], blend * 0.5)), V(0, 0, (pose.headTilt ?? 0) / 0.2)));
   const neck = add(pose.sh, mul(up, B.neck));
   const head = add(add(neck, mul(headDir, B.head[1] * 1.05)), V(pose.headBack ?? 0, 0));
   const J = { hipC: pose.hip, shC: pose.sh, neck, head, headDir, bar: pose.bar } as Joints;
@@ -459,5 +549,13 @@ export function anchorAt(J: Joints, a: Anchor): Vec {
   if (typeof a !== "string") return a;
   if (a === "hands") return lerpV(J.handL, J.handR, 0.5);
   if (a === "ankles") return lerpV(J.ankleL, J.ankleR, 0.5);
+  if (a === "upperBack") {
+    // off the shoulder blades, on the side away from the chest
+    const ux = J.shC[0] - J.hipC[0],
+      uy = J.shC[1] - J.hipC[1];
+    const l = Math.hypot(ux, uy) || 1;
+    const c = lerpV(J.hipC, J.shC, 0.85);
+    return [c[0] - (uy / l) * 0.13, c[1] + (ux / l) * 0.13, c[2]];
+  }
   return (J as unknown as Record<string, Vec>)[a];
 }

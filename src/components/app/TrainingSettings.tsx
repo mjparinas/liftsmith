@@ -88,6 +88,12 @@ export function RestTimerSettings() {
         on={tp.restAlert !== "silent"}
         onChange={(v) => put({ restAlert: v ? undefined : "silent" })}
       />
+      <SwitchRow
+        label={t("train.warn")}
+        hint={t("train.warnHint")}
+        on={tp.restWarn !== false}
+        onChange={(v) => put({ restWarn: v ? undefined : false })}
+      />
     </>
   );
 }

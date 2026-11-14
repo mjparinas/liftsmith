@@ -11,6 +11,8 @@ struct WatchState: Decodable, Equatable {
     /// Heart rate the phone has from a Bluetooth monitor.
     var hr: Int?
     var vibrate = true
+    /// A gentle tap 10 seconds before rest ends (Workout preferences), only when vibrate is on too.
+    var warn = false
     var done: Int?
     var total: Int?
     var at: Double = 0
@@ -48,6 +50,7 @@ struct WatchState: Decodable, Equatable {
         restUntil = try? c.decode(Double.self, forKey: .restUntil)
         hr = try? c.decode(Int.self, forKey: .hr)
         vibrate = (try? c.decode(Bool.self, forKey: .vibrate)) ?? true
+        warn = (try? c.decode(Bool.self, forKey: .warn)) ?? false
         done = try? c.decode(Int.self, forKey: .done)
         total = try? c.decode(Int.self, forKey: .total)
         at = (try? c.decode(Double.self, forKey: .at)) ?? 0
@@ -58,7 +61,7 @@ struct WatchState: Decodable, Equatable {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId, motion, timer
+        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, timer
     }
 
     /// The set timer's phase at `now` (started, not ended); never while resting. Same rule as the phone's.

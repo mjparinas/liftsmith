@@ -15,6 +15,7 @@ export const en = {
   "pr.rep": "Rep {n}",
   "pr.estMax": "Estimated max now {weight}",
   "pr.again": "Play again",
+  "pr.share": "Share this PR",
 } as const;
 
 type Key = keyof typeof en;
@@ -31,6 +32,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pr.rep": "Repetición {n}",
   "pr.estMax": "Máximo estimado ahora {weight}",
   "pr.again": "Ver otra vez",
+  "pr.share": "Compartir este récord",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -45,6 +47,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "pr.rep": "Répétition {n}",
   "pr.estMax": "Max estimé maintenant {weight}",
   "pr.again": "Revoir",
+  "pr.share": "Partager ce record",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -59,6 +62,7 @@ export const de: Partial<Record<Key, Message>> = {
   "pr.rep": "Wdh. {n}",
   "pr.estMax": "Geschätztes Maximum jetzt {weight}",
   "pr.again": "Nochmal abspielen",
+  "pr.share": "Diesen Rekord teilen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -73,6 +77,7 @@ export const it: Partial<Record<Key, Message>> = {
   "pr.rep": "Rip. {n}",
   "pr.estMax": "Massimale stimato ora {weight}",
   "pr.again": "Riproduci di nuovo",
+  "pr.share": "Condividi questo record",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -87,4 +92,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "pr.rep": "{n}回目",
   "pr.estMax": "推定最大重量は{weight}に",
   "pr.again": "もう一度再生",
+  "pr.share": "この自己ベストをシェア",
 };

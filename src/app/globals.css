@@ -147,6 +147,17 @@
   100% { transform: translate(var(--dx, 0px), -55vh) scale(0.9); opacity: 0; }
 }
 .cheer-float { animation: cheer-float 2.6s ease-out forwards; }
+/* A new personal best: a gold glow from the screen's edges that fades in under a second (WorkoutJuice.tsx PrMoment).
+   Never in Lean mode or with reduced motion (the component leaves it out). */
+@keyframes gold-flash {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.gold-flash {
+  background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-gold) 55%, transparent) 100%);
+  animation: gold-flash 900ms ease-out forwards;
+}
 @keyframes beat {
   0%, 100% { transform: scale(1); }
   15% { transform: scale(1.22); }

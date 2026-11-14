@@ -1,0 +1,54 @@
+import type { Article } from "../articles";
+
+// Blog, part twenty-six: small touches in the workout (Melvin, 2026-11-14, docs/decisions/workout-screen.md). Only
+// what ships, and no other app named (seo.test.ts). Later touches add a section here.
+export const BLOG_Z: Article[] = [
+  {
+    slug: "small-touches-in-the-workout",
+    kind: "blog",
+    title: "Small touches that keep you in the workout",
+    description:
+      "A gentle buzz 10 seconds before rest ends, a gold flash when you beat your best, a yearly look at day one against today, and big numbers for logging mid-set.",
+    date: "2026-11-14",
+    tag: "Training",
+    cta: "plan",
+    body: [
+      {
+        p: "Liftsmith tries to stay out of your way between sets. The rest timer starts itself, counts down on the lock screen and tells you when rest is over. Now it also gives you a heads-up before that happens.",
+      },
+      { h2: "A buzz 10 seconds before rest ends" },
+      {
+        p: "Ten seconds before the end of every rest, your phone gives a gentle double buzz. It's softer than the rest-over alert, so you can tell the two apart without looking. Use those seconds to chalk up, set your grip or walk back to the bench.",
+      },
+      {
+        ul: [
+          "On Android it comes from the workout notification, so you feel it with the phone locked or in your pocket.",
+          "On iPhone it buzzes while the app is open. Liftsmith keeps the screen on during a workout, so that's most of the time.",
+          "Your Wear OS watch, Apple Watch or Garmin watch taps your wrist too, phone locked or not.",
+          "After +30 s, the heads-up moves with the new end of rest.",
+        ],
+      },
+      { cta: "plan" },
+      { h2: "Turning it off" },
+      {
+        p: "It's on for everyone whose rest-over alert vibrates. To turn it off, open Settings › Workout and switch off Buzz 10 seconds before rest ends. Turning off vibration or the rest-over alert turns it off as well.",
+      },
+      { h2: "A gold flash for a new personal best" },
+      {
+        p: "When a set beats your best on a lift, the phone gives a celebratory buzz, a gold banner drops in and the edges of the screen glow gold for a moment. On the rest screen that follows, Share this PR opens a card with the lift, the weight and reps, your estimated max and how much it went up. Post it straight from your rest, or wait for the end of the workout, where the same card waits with the rest.",
+      },
+      { h2: "Your lifting anniversary, day one against today" },
+      {
+        p: "A year after your first workout, Today shows a card that puts that first day beside today: how many workouts and sets you've done, how much you've lifted in total, and the lift from that first workout that has grown the most. Tap Share it for a card with the lot. It stays on Today for a week, so you won't miss it if you skip the gym that day, and it comes back every year.",
+      },
+      { h2: "Big numbers for logging mid-set" },
+      {
+        p: "Turn on Big numbers in Settings › Workout and the set screen keeps only what you need while you lift: the weight and reps in very large type, and a taller Log set. The music controls, what's coming up and Same as last time wait until you're resting. It pairs well with one-handed controls, which move the + and − buttons beside Log set under your thumb.",
+      },
+      {
+        tip: "Rest a little longer on your heaviest sets. The heads-up makes it easy to take the full rest without staring at the clock.",
+      },
+    ],
+    faq: [["Does it make a sound?", "No. The heads-up is only a buzz. The sound, if you have it on, is saved for the end of rest."]],
+  },
+];

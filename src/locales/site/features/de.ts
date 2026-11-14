@@ -121,7 +121,7 @@ export const de: FeaturesText = {
     },
     "rest-timer": {
       name: "Pausentimer auf dem Sperrbildschirm",
-      body: "Startet nach jedem Satz von selbst und zählt auf dem Sperrbildschirm herunter, mit dem nächsten Satz, den Scheiben, dem Puls und Tasten für Satz eintragen und +30 s, die auch bei geschlossener App funktionieren.",
+      body: "Startet nach jedem Satz von selbst und zählt auf dem Sperrbildschirm herunter, mit dem nächsten Satz, den Scheiben, dem Puls und Tasten für Satz eintragen und +30 s, die auch bei geschlossener App funktionieren. Eine sanfte Vibration 10 Sekunden vor dem Ende gibt dir Zeit, dich bereit zu machen, auf dem Handy und der Uhr.",
       note: "Android: eine dauerhafte Benachrichtigung, ein Live Update unter Android 16 und Samsungs Now Bar. iPhone: eine Live-Aktivität auf dem Sperrbildschirm und in der Dynamic Island. Web: eine Benachrichtigung, solange die Seite offen ist.",
     },
     plates: {
@@ -213,6 +213,10 @@ export const de: FeaturesText = {
       body: "Handy vergessen? Trag das Training hinterher ein, und es zählt wie jedes andere.",
     },
     recap: { name: "Monatsrückblick", body: "Ein kurzer Blick zurück auf deinen Monat, bereit zum Teilen." },
+    anniversary: {
+      name: "Dein Trainingsjahrestag",
+      body: "Jedes Jahr am Tag deines ersten Trainings stellt Heute Tag eins neben heute: Trainings, Sätze, bewegtes Gewicht und die Übung, die am meisten gewachsen ist, mit einer Karte zum Teilen. Sie bleibt eine Woche.",
+    },
     body: {
       name: "Gewicht, Körperfett und Fotos",
       body: "Trage Gewicht und Körperfett ein oder lass sie über die Gesundheits-App deines Handys von deiner Waage kommen, und behalte Fortschrittsfotos auf deinem Handy.",
@@ -320,7 +324,7 @@ export const de: FeaturesText = {
     },
     share: {
       name: "Teilkarten und Links",
-      body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau.",
+      body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau. Eine neue Bestleistung leuchtet golden auf und lässt sich gleich in der Pause teilen.",
     },
     coaching: {
       name: "Kunden coachen",
@@ -405,6 +409,11 @@ export const de: FeaturesText = {
       name: "Erinnerungen",
       body: "Sanfte Erinnerungen an Trainingstagen, als Benachrichtigung auf den Handys und per E-Mail.",
     },
+    emails: {
+      name: "E-Mails, die dich dranbleiben lassen",
+      body: "Acht Tipps für den Einstieg mit echten Bildschirmen, ein Wochen- und Monatsrückblick, neue Bestleistungen, welche Freunde trainiert haben und ein Anstoß zurück nach einer Pause. Jede Art hat ihren eigenen Schalter.",
+      note: "Mit einem Konto eingeschaltet, für unter 18-Jährige aus, außer sie schalten sie ein. Jede E-Mail lässt sich mit einem Klick abbestellen.",
+    },
     cloud: {
       name: "Verbindungen zu Fitnessdiensten",
       body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
@@ -448,6 +457,10 @@ export const de: FeaturesText = {
     "one-hand": {
       name: "Einhändige Bedienung",
       body: "Leg die Tasten für Gewicht und Wiederholungen neben Satz eintragen, unter deinen linken oder rechten Daumen.",
+    },
+    "big-numbers": {
+      name: "Große Zahlen",
+      body: "Während eines Satzes werden Gewicht und Wiederholungen viel größer und Satz eintragen höher, und Musik und was als Nächstes kommt warten bis zur Pause. Gut lesbar auf Armlänge, mitten im Satz.",
     },
     lean: {
       name: "Schlichter Modus, Töne und Vibration",

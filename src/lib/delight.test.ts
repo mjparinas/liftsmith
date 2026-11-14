@@ -10,7 +10,17 @@ import { derive } from "./derive";
 import { generate } from "./generator";
 import { ghostFor, lastWorkout, paceDelta, paceText, repeatPlan, sameAsLast, workoutOf } from "./ghost";
 import { setLanguage } from "./i18n";
-import { anniversaryYears, crossed, doneMoments, fmtTonnage, todayMoments, tonnage, TONNAGE } from "./moments";
+import {
+  anniversaryLook,
+  anniversaryNear,
+  anniversaryYears,
+  crossed,
+  doneMoments,
+  fmtTonnage,
+  todayMoments,
+  tonnage,
+  TONNAGE,
+} from "./moments";
 import { fitSize, pairFor, type Photo } from "./photos";
 import { changeText, lastLoadedKg, plateChange } from "./plateMemory";
 import { monthOf, recap, suggestedPeriod, yearOf } from "./recap";
@@ -69,9 +79,24 @@ describe("anniversaries and comebacks", () => {
     expect(todayMoments(derive(workout(5), NOW), NOW).map((m) => m.id)).not.toContain("comeback");
     expect(todayMoments(derive([], NOW), NOW)).toEqual([]);
   });
-  it("shows the liftiversary on Today", () => {
-    const ms = todayMoments(derive([...workout(365), ...workout(3)], NOW), NOW);
-    expect(ms.find((m) => m.kind === "anniversary")?.title).toBe("1 year since your first workout");
+  it("shows the anniversary card for a week from the day, comparing day one with today", () => {
+    const evs = [...workout(365, 40), ...workout(30, 50), ...workout(3, 60)];
+    const look = anniversaryLook(evs, derive(evs, NOW), NOW)!;
+    expect(look.years).toBe(1);
+    expect(look.dayOne).toEqual({ sets: 3, volume: 3 * 40 * 8 });
+    expect(look.today).toMatchObject({ workouts: 3, sets: 9, volume: 3 * 8 * (40 + 50 + 60) });
+    expect(look.lift).toMatchObject({ exerciseId: "bench-press", then: { weight: 40, reps: 8 }, best: { weight: 60, reps: 8 } });
+    expect(look.lift!.pct).toBeCloseTo(50);
+    // Still showing six days later, gone on the seventh; never on the first workout's own year.
+    expect(anniversaryNear(NOW - 365 * D, NOW + 6 * D)?.years).toBe(1);
+    expect(anniversaryNear(NOW - 365 * D, NOW + 7 * D)).toBeNull();
+    expect(anniversaryNear(NOW - 200 * D, NOW)).toBeNull();
+    // One workout alone, or a lift that didn't go up: no card, or no lift line.
+    expect(anniversaryLook(workout(365), derive(workout(365), NOW), NOW)).toBeNull();
+    const flat = [...workout(365, 60), ...workout(3, 60)];
+    expect(anniversaryLook(flat, derive(flat, NOW), NOW)?.lift).toBeUndefined();
+    // The plain moments list no longer carries it (the card does).
+    expect(todayMoments(derive(evs, NOW), NOW).some((m) => m.kind === "anniversary")).toBe(false);
   });
   it("celebrates a count milestone, a tonnage milestone and a finished comeback after a workout", () => {
     const evs: AppEvent[] = [];

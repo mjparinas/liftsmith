@@ -592,6 +592,18 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     value: (c) => (c.sessions.some((s) => hourOf(s.at) >= 4 && hourOf(s.at) < 6) ? 1 : 0),
   },
   {
+    // Easter egg (Melvin, 2026-11-14): finish a workout between midnight and 4 am, local time. "Before the sun"
+    // is the other end of the night (a start from 4 to 6 am), so the two never overlap.
+    id: "night-owl",
+    name: "Night owl",
+    detail: "Finish a workout between midnight and 4 am",
+    icon: "🦉",
+    category: "secret",
+    secret: true,
+    tiers: [1],
+    value: (c) => (nightOwl(c) ? 1 : 0),
+  },
+  {
     id: "own-call",
     name: "I know my body",
     detail: "Change the day's call before starting",
@@ -689,6 +701,12 @@ function fullWeek(c: Ctx): boolean {
     if (MAJOR.every((m) => hit.has(m))) return true;
   }
   return false;
+}
+
+/** A workout with sets in it whose end was logged after midnight and before 4 am, local time. */
+export function nightOwl(c: Pick<Ctx, "events" | "sessions">): boolean {
+  const withSets = new Set(c.sessions.map((s) => s.id));
+  return c.events.some((e) => e.type === "sessionEnd" && withSets.has(e.sessionId) && hourOf(e.at) < 4);
 }
 
 function gapReturn(c: Ctx, days: number): boolean {
