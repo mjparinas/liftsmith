@@ -2,12 +2,15 @@
 
 // The admin Users tab (as in Gradelings' Users): search accounts by email or id, open one to see how it signs in,
 // its devices and how much it has synced (counts only, never the lifter's data), keep private staff notes, and,
-// for admins, sign it out everywhere or delete it. Plus the CSV downloads.
+// for admins, sign it out everywhere, reset it or delete it. Its Friends standing and reports, and the moderation
+// actions, are in Moderation.tsx (docs/decisions/moderation.md). Plus the CSV downloads.
 import { useCallback, useEffect, useState } from "react";
 
-import type { AccountDetail, AccountRow, CoachTotals, Role } from "@/server/adminUsers";
+import type { AccountDetail, AccountRow, CoachTotals, Role, UserFilter, UserSort } from "@/server/adminUsers";
+import type { ModerationDetail } from "@/server/socialModeration";
 
 import { Card, fmtInt, Table, Tile } from "./charts";
+import { Badge, Moderation, STATE_NAME, stateTone } from "./Moderation";
 import { SchoolCoaches } from "./SchoolCoaches";
 import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
 import { ago, when } from "./time";
@@ -27,23 +30,44 @@ async function post(body: Record<string, unknown>): Promise<string | null> {
   return r.ok ? null : (j.error ?? "That didn't work.");
 }
 
-function Account({ id, admin, me, close }: { id: string; admin: boolean; me: string; close: () => void }) {
+function Account({
+  id,
+  admin,
+  me,
+  close,
+  openAccount,
+}: {
+  id: string;
+  admin: boolean;
+  me: string;
+  close: () => void;
+  openAccount: (id: string) => void;
+}) {
   const [a, setA] = useState<AccountDetail | null | "missing">(null);
+  const [m, setM] = useState<ModerationDetail | null>(null);
   const [version, setVersion] = useState(0);
   const [note, setNote] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [resetting, setResetting] = useState(false);
+  const [resetName, setResetName] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/users/?id=${encodeURIComponent(id)}`)
-      .then(async (r) => live && setA(r.ok ? ((await r.json()) as { account: AccountDetail }).account : "missing"))
+      .then(async (r) => {
+        if (!live) return;
+        if (!r.ok) return setA("missing");
+        const j = (await r.json()) as { account: AccountDetail; moderation?: ModerationDetail };
+        setA(j.account);
+        setM(j.moderation ?? null);
+      })
       .catch(() => live && setA("missing"));
     return () => {
       live = false;
     };
   }, [id, version]);
   const act = async (body: Record<string, unknown>, done: string) => {
-    const err = await post(body);
+    const err = await post({ id, ...body });
     setMsg(err ?? done);
     if (!err) setVersion((v) => v + 1);
     return !err;
@@ -130,6 +154,8 @@ function Account({ id, admin, me, close }: { id: string; admin: boolean; me: str
         Save note
       </button>
 
+      {m && <Moderation m={m} admin={admin} act={act} openAccount={openAccount} />}
+
       {admin && (
         <div className="mt-5 flex flex-wrap items-end gap-3 border-t border-line pt-4">
           <button
@@ -138,6 +164,13 @@ function Account({ id, admin, me, close }: { id: string; admin: boolean; me: str
             onClick={() => void act({ action: "signout", id: a.id }, "Signed out on every device. Their data stays on the devices.")}
           >
             Sign out everywhere
+          </button>
+          <button
+            type="button"
+            className="press rounded-lg border border-bad/60 px-3 py-1.5 text-sm text-bad"
+            onClick={() => setResetting(true)}
+          >
+            Reset account
           </button>
           <div>
             <label htmlFor="delete-confirm" className="block text-xs text-muted">
@@ -168,12 +201,110 @@ function Account({ id, admin, me, close }: { id: string; admin: boolean; me: str
           </div>
         </div>
       )}
+      {admin && resetting && (
+        <ResetDialog
+          name={a.handle ?? a.email ?? a.id}
+          value={resetName}
+          onChange={setResetName}
+          onCancel={() => {
+            setResetting(false);
+            setResetName("");
+          }}
+          onReset={() =>
+            void act(
+              { action: "reset", confirm: resetName },
+              "Account reset. Everything they made is cleared, their devices are signed out and wiped, and their sign-in and Pro stay.",
+            ).then((ok) => {
+              if (ok) {
+                setResetting(false);
+                setResetName("");
+              }
+            })
+          }
+        />
+      )}
       {msg && (
         <p role="status" className="mt-3 text-sm text-muted">
           {msg}
         </p>
       )}
     </Card>
+  );
+}
+
+/**
+ * "Are you sure?" for Reset account (Melvin, 2026-11-14: "forces you to type their username correctly"): the button
+ * waits until their Friends handle (or their email, without one) is typed exactly. The server checks it too.
+ */
+function ResetDialog({
+  name,
+  value,
+  onChange,
+  onCancel,
+  onReset,
+}: {
+  name: string;
+  value: string;
+  onChange: (v: string) => void;
+  onCancel: () => void;
+  onReset: () => void;
+}) {
+  useEffect(() => {
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && onCancel();
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
+  }, [onCancel]);
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="reset-title"
+        aria-describedby="reset-body"
+        className="card w-full max-w-md bg-bg p-5"
+      >
+        <h2 id="reset-title" className="text-lg font-bold">
+          Reset this account?
+        </h2>
+        <div id="reset-body" className="mt-2 space-y-2 text-sm">
+          <p>
+            This clears everything they made: workouts, body data and settings, shared links, Friends, coaching links and chats, shared gym
+            setups and connected apps. It can&apos;t be undone.
+          </p>
+          <p className="text-muted">
+            Kept: the account and how they sign in, staff notes, and everything that pays for or proves Pro (store purchases, a web
+            subscription, coach payments, earned Pro, school teams, gyms they own). Every device is signed out and wiped, so old data
+            can&apos;t sync back. A Friends ban or suspension stays.
+          </p>
+        </div>
+        <label htmlFor="reset-confirm" className="mt-4 block text-sm">
+          Type <span className="font-mono font-semibold">{name}</span> to confirm
+        </label>
+        <input
+          id="reset-confirm"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="card mt-1 w-full px-2 py-1.5 font-mono text-sm"
+          autoComplete="off"
+          spellCheck={false}
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- the dialog's one field, opened by the admin on purpose
+          autoFocus
+        />
+        <div className="mt-4 flex justify-end gap-2">
+          <button type="button" className="press rounded-lg border border-line px-3 py-1.5 text-sm" onClick={onCancel}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={value !== name}
+            className="press rounded-lg bg-bad px-3 py-1.5 text-sm font-semibold text-bg disabled:opacity-50"
+            onClick={onReset}
+          >
+            Reset account
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -201,19 +332,21 @@ export function Users({
 }) {
   const [q, setQ] = useState(initialQuery);
   const [search, setSearch] = useState(initialQuery);
+  const [filter, setFilter] = useState<UserFilter>("all");
+  const [sort, setSort] = useState<UserSort>("newest");
   const [data, setData] = useState<{
     accounts: AccountRow[];
     totals: { total: number; new30: number; active30: number } & Partial<CoachTotals>;
   } | null>(null);
-  const load = useCallback((term: string) => {
-    fetch(`/api/admin/users/?q=${encodeURIComponent(term)}`)
+  const load = useCallback((term: string, f: UserFilter, so: UserSort) => {
+    fetch(`/api/admin/users/?q=${encodeURIComponent(term)}&filter=${f}&sort=${so}`)
       .then(async (r) => r.ok && setData(await r.json()))
       .catch(() => {});
   }, []);
-  useEffect(() => load(search), [load, search, open]);
+  useEffect(() => load(search, filter, sort), [load, search, filter, sort, open]);
   return (
     <div className="space-y-4">
-      {open && <Account id={open} admin={admin} me={me} close={() => setOpen(null)} />}
+      {open && <Account key={open} id={open} admin={admin} me={me} close={() => setOpen(null)} openAccount={setOpen} />}
       {!open && <SchoolCoaches admin={admin} />}
       {data && (
         <div className="grid grid-cols-3 gap-3">
@@ -242,29 +375,79 @@ export function Users({
           }}
         >
           <label htmlFor="user-search" className="sr-only">
-            Search by email or account id
+            Search by email, Friends handle or account id
           </label>
           <input
             id="user-search"
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Email or account id"
+            placeholder="Email, @handle or account id"
             className="card w-full max-w-md px-3 py-2 text-sm"
           />
           <button type="submit" className="press rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-ink">
             Search
           </button>
         </form>
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div role="group" aria-label="Show" className="flex flex-wrap gap-1">
+            {(
+              [
+                ["all", "Everyone"],
+                ["reported", "Reported"],
+                ["actioned", "Banned, suspended or limited"],
+                ["teens", "Under 18"],
+              ] as const
+            ).map(([f, label]) => (
+              <button
+                key={f}
+                type="button"
+                aria-pressed={filter === f}
+                onClick={() => setFilter(f)}
+                className={`press rounded-full border px-3 py-1 text-sm ${filter === f ? "border-accent bg-accent/15 text-accent" : "border-line text-muted"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <label htmlFor="user-sort" className="ml-auto text-sm text-muted">
+            Sort
+          </label>
+          <select id="user-sort" value={sort} onChange={(e) => setSort(e.target.value as UserSort)} className="card px-2 py-1 text-sm">
+            <option value="newest">Newest</option>
+            <option value="reports">Most reported</option>
+            <option value="seen">Last seen</option>
+          </select>
+        </div>
         {!data ? (
           <Loading label="Loading accounts">
             <TableBones />
           </Loading>
         ) : (
           <Table
-            columns={["Email", "Role", "Signed up", "Last seen", "Sign-in", "Devices", "Synced events", ""]}
+            columns={["Email", "Friends", "Reports", "Role", "Signed up", "Last seen", "Sign-in", "Devices", "Synced events", ""]}
             rows={data.accounts.map((a) => [
               a.email ?? "—",
+              a.handle ? (
+                <span key="f" className="flex flex-wrap items-center gap-1">
+                  @{a.handle}
+                  {a.state !== "ok" && <Badge tone={stateTone(a.state)}>{STATE_NAME[a.state]}</Badge>}
+                  {a.minor && <Badge tone="warn">Under 18</Badge>}
+                </span>
+              ) : a.minor ? (
+                <Badge key="f" tone="warn">
+                  Under 18
+                </Badge>
+              ) : (
+                "—"
+              ),
+              a.reports ? (
+                <span key="r">
+                  {a.openReports ? <Badge tone="bad">{`${fmtInt(a.openReports)} waiting`}</Badge> : null} {fmtInt(a.reports ?? 0)} in all
+                </span>
+              ) : (
+                "—"
+              ),
               ROLE_NAME[a.role],
               when(a.createdAt),
               ago(a.lastSeen),
@@ -275,7 +458,7 @@ export function Users({
                 Open
               </button>,
             ])}
-            empty={search ? "No account matches." : "No accounts yet."}
+            empty={search || filter !== "all" ? "No account matches." : "No accounts yet."}
           />
         )}
       </Card>

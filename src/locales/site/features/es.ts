@@ -305,6 +305,10 @@ export const es: FeaturesText = {
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
     },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
+    safety: {
+      name: "Bloquear, silenciar y denunciar",
+      body: "Bloquea o silencia a quien quieras y denuncia una publicación, un comentario o un perfil con un toque en el motivo. Nuestro equipo revisa cada denuncia y puede avisar, suspender o expulsar.",
+    },
     share: {
       name: "Tarjetas y enlaces para compartir",
       body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa.",

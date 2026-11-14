@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 import type { ReportAction, ReportGroup } from "@/server/social";
 
 import { Card } from "./charts";
+import { REASON_NAME } from "./Moderation";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
 const ACTIONS: { action: ReportAction; label: string; danger?: boolean }[] = [
   { action: "remove", label: "Remove", danger: true },
   { action: "dismiss", label: "Dismiss" },
-  { action: "suspend", label: "Suspend author", danger: true },
+  { action: "suspend", label: "Ban author", danger: true },
 ];
 
 export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: number) => void }) {
@@ -51,7 +52,8 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
     <Card title="Reports on Friends">
       <p className="text-sm text-muted">
         Posts, comments and profiles lifters reported. Three reports hide a post or comment until it&apos;s decided here. Remove deletes it
-        (for a profile, resets the name to the handle), Dismiss shows it again, Suspend hides everything the author wrote.
+        (for a profile, resets the name to the handle), Dismiss shows it again, Ban author hides everything the author wrote and tells them.
+        For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
@@ -70,10 +72,10 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
               <div className="min-w-0 flex-1">
                 <p className="break-words font-semibold">{g.content || "(empty)"}</p>
                 <p className="text-sm text-muted">
-                  {g.author ? `@${g.author.handle} (${g.author.name})${g.author.suspended ? " · suspended" : ""}` : "author gone"} ·{" "}
-                  {g.reports} {g.reports === 1 ? "report" : "reports"} ·{" "}
+                  {g.author ? `@${g.author.handle} (${g.author.name})${g.author.suspended ? " · banned or suspended" : ""}` : "author gone"}{" "}
+                  · {g.reports} {g.reports === 1 ? "report" : "reports"} ·{" "}
                   {Object.entries(g.reasons)
-                    .map(([k, n]) => `${k} ${n}`)
+                    .map(([k, n]) => `${REASON_NAME[k] ?? k} ${n}`)
                     .join(", ")}{" "}
                   · last {ago(g.lastAt)}
                   {g.hidden ? " · hidden" : ""}
@@ -98,7 +100,7 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                       onClick={() => void act(g, "unsuspend")}
                       className="press rounded-lg border border-line px-3 py-1.5 text-muted"
                     >
-                      Unsuspend
+                      Unban
                     </button>
                   )}
                 </div>

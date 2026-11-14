@@ -303,6 +303,10 @@ export const it: FeaturesText = {
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
+    safety: {
+      name: "Blocca, silenzia e segnala",
+      body: "Blocca o silenzia chiunque e segnala un post, un commento o un profilo con un tocco sul motivo. Il nostro team controlla ogni segnalazione e può avvisare, sospendere o bandire.",
+    },
     share: {
       name: "Card e link da condividere",
       body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima.",

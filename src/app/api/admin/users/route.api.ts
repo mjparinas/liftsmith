@@ -4,10 +4,26 @@
 //   {action: "unnote", noteId}     remove a note (support: their own; admins: any)
 //   {action: "signout", id}        end every device's session (admins)
 //   {action: "delete", id, confirm: "DELETE"}  delete the account and everything synced to it (admins)
-import { deleteAccount } from "@/server/accounts";
+//   {action: "reset", id, confirm}  clear everything but the sign-in and Pro; `confirm` is their Friends handle, or
+//                                   their email without one, typed exactly (admins; docs/decisions/moderation.md)
+//   {action: "mod", id, what, reason?, days?}  moderate their Friends profile: warn, suspend, ban, shadow, unban,
+//                                   boardsOff, boardsOn, resetName, resetHandle, dismiss (admins)
+// GET ?q= also takes filter (all, reported, actioned, teens) and sort (newest, reports, seen).
+import { deleteAccount, resetAccount } from "@/server/accounts";
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
-import { accountDetail, accountTotals, addNote, checkNote, removeNote, searchAccounts, signOutEverywhere } from "@/server/adminUsers";
+import {
+  accountDetail,
+  accountTotals,
+  addNote,
+  checkNote,
+  removeNote,
+  searchAccounts,
+  signOutEverywhere,
+  USER_FILTERS,
+  USER_SORTS,
+} from "@/server/adminUsers";
+import { moderate, moderationFor, parseAction } from "@/server/socialModeration";
 
 export const dynamic = "force-dynamic";
 
@@ -23,9 +39,11 @@ export async function GET(req: Request) {
     const detail = await accountDetail(id);
     if (!detail) return json(404, { error: "No account with that id." });
     if (gate.staff.role === "support") await audit(gate.staff.email, "account.view", id);
-    return json(200, { account: detail });
+    return json(200, { account: detail, moderation: await moderationFor(id) });
   }
-  const [accounts, totals] = await Promise.all([searchAccounts(q.get("q") ?? ""), accountTotals()]);
+  const filter = USER_FILTERS.find((f) => f === q.get("filter")) ?? "all";
+  const sort = USER_SORTS.find((x) => x === q.get("sort")) ?? "newest";
+  const [accounts, totals] = await Promise.all([searchAccounts(q.get("q") ?? "", 100, { filter, sort }), accountTotals()]);
   return json(200, { accounts, totals });
 }
 
@@ -69,6 +87,32 @@ export async function POST(req: Request) {
       await deleteAccount(id);
       // The email isn't kept in the log once the account is gone.
       await audit(who, "account.delete", id);
+      return json(200, { ok: true });
+    }
+    case "reset": {
+      if (!admin) return json(403, { error: "Only an admin can do that." });
+      if (!id) return json(400, { error: "Which account?" });
+      const detail = await accountDetail(id);
+      if (!detail) return json(404, { error: "No account with that id." });
+      // Melvin, 2026-11-14: "an are you sure message that forces you to type their username correctly".
+      const name = detail.handle ?? detail.email ?? detail.id;
+      if (body.confirm !== name) return json(400, { error: `Type ${name} exactly to confirm.` });
+      await resetAccount(id);
+      await audit(who, "account.reset", id);
+      return json(200, { ok: true });
+    }
+    case "mod": {
+      if (!admin) return json(403, { error: "Only an admin can do that." });
+      if (!id) return json(400, { error: "Which account?" });
+      const a = parseAction(body);
+      if (!a) return json(400, { error: "What should happen?" });
+      if (!(await moderate(id, a))) return json(404, { error: "They haven't joined Friends, so there's nothing to moderate." });
+      await audit(
+        who,
+        `mod.${a.action}`,
+        id,
+        "reason" in a || "days" in a ? { reason: "reason" in a ? a.reason : undefined, days: "days" in a ? a.days : undefined } : undefined,
+      );
       return json(200, { ok: true });
     }
     default:

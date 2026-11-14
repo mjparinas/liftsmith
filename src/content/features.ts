@@ -574,6 +574,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "safety",
+        name: "Block, mute and report",
+        body: "Block or mute anyone, and report a post, comment or profile with one tap on a reason. Our team reviews every report and can warn, suspend or ban.",
+        tier: "free",
+        added: "2026-11-14",
+      },
+      {
         id: "share",
         name: "Share cards and links",
         body: "Share a workout, a new best or a milestone as an image, or as a public link with a preview.",

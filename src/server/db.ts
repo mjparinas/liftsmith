@@ -653,6 +653,14 @@ const SCHEMA = [
     UNIQUE (reporter_id, kind, target_id)
   )`,
   `CREATE INDEX IF NOT EXISTS reports_status ON reports (status, kind, target_id)`,
+  // Every report on one profile or thing, open or decided, for the admin Users tab (moderation.md).
+  `CREATE INDEX IF NOT EXISTS reports_target ON reports (kind, target_id)`,
+  // A banned account's email, as a hash, so deleting the account and signing up again can't undo a Friends ban
+  // (socialModeration.ts). Kept after the account is deleted; nothing else about the person is.
+  `CREATE TABLE IF NOT EXISTS social_bans (
+    email_hash TEXT PRIMARY KEY,
+    at INTEGER NOT NULL
+  )`,
   // A workout sent to a friend (social.ts `send`): a routine code and its name, shown in their Activity.
   `CREATE TABLE IF NOT EXISTS sent_workouts (
     id TEXT PRIMARY KEY,
@@ -1105,6 +1113,14 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["coach_shares", "notes", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_shares", "health", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_shares", "cycle", "INTEGER NOT NULL DEFAULT 0"],
+  // Moderation (2026-11-14, docs/decisions/moderation.md). `suspended` is 0 (fine), 1 (suspended or banned) or 2
+  // (shadow banned); a suspension ends at `suspended_until` (0 for a ban). `boards_off` keeps the lifter off other
+  // people's leaderboards. `notice` is what the lifter is told ('', 'warn', 'suspend' or 'ban') and why.
+  ["social_profiles", "suspended_until", "INTEGER NOT NULL DEFAULT 0"],
+  ["social_profiles", "boards_off", "INTEGER NOT NULL DEFAULT 0"],
+  ["social_profiles", "notice", "TEXT NOT NULL DEFAULT ''"],
+  ["social_profiles", "notice_reason", "TEXT NOT NULL DEFAULT ''"],
+  ["social_profiles", "notice_at", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 /**

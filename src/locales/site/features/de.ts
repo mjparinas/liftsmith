@@ -309,6 +309,10 @@ export const de: FeaturesText = {
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
     },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
+    safety: {
+      name: "Blockieren, stummschalten und melden",
+      body: "Blockiere oder schalte jeden stumm und melde einen Post, einen Kommentar oder ein Profil mit einem Tipp auf den Grund. Unser Team prüft jede Meldung und kann verwarnen, vorübergehend sperren oder ausschließen.",
+    },
     share: {
       name: "Teilkarten und Links",
       body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau.",
