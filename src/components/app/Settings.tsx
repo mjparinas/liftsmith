@@ -37,6 +37,7 @@ import { DelightSettings } from "./DelightSettings";
 import { HandsFree } from "./HandsFree";
 import { Icon, type IconName } from "./icons";
 import { ImportWorkouts } from "./ImportCsv";
+import { LogoEgg } from "./LogoEgg";
 import { MessageSettings } from "./MessageSettings";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
@@ -167,7 +168,7 @@ function CoachingRow() {
 function StorageNote() {
   const signedIn = useAccount((s) => !!s.account);
   return (
-    <p className="mt-8 text-center text-xs text-faint">
+    <p className="mt-3 text-center text-xs text-faint">
       {t(signedIn ? "settings.footer.synced" : "settings.footer.local", { brand: BRAND.name })}
     </p>
   );
@@ -247,6 +248,10 @@ export function Settings() {
       <Section title={t("settings.g.help")}>
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
+      {/* The app logo; seven quick taps open the lifetime total in elephants (an easter egg, LogoEgg.tsx). */}
+      <div className="mt-8 flex justify-center">
+        <LogoEgg size={36} />
+      </div>
       <StorageNote />
       <p className="mt-1 text-center text-xs">
         <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
