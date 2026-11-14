@@ -119,3 +119,74 @@ public class StoreReviewPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 }
+
+/// "A new version is ready" (src/lib/appUpdate.ts; docs/decisions/app-updates.md), iOS side. Asks the App Store's
+/// public lookup, in the background on start, whether a newer version than this one is out for this phone's
+/// storefront and iOS version, and opens its App Store page when the lifter taps Update. iOS has no in-app
+/// download like Play's, so the App Store does the update. Before the app is in the App Store the lookup finds
+/// nothing and nothing shows. Android counterpart: AppUpdatePlugin.java (Play In-App Updates).
+@objc(AppUpdatePlugin)
+public class AppUpdatePlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "AppUpdatePlugin"
+    public let jsName = "AppUpdate"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "check", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "complete", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "open", returnType: CAPPluginReturnPromise),
+    ]
+
+    private var storeURL: URL?
+
+    @objc func check(_ call: CAPPluginCall) {
+        guard let bundleId = Bundle.main.bundleIdentifier,
+              let current = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            call.resolve(["available": false])
+            return
+        }
+        var parts = URLComponents(string: "https://itunes.apple.com/lookup")!
+        var query = [URLQueryItem(name: "bundleId", value: bundleId)]
+        if let region = (Locale.current as NSLocale).countryCode, region.count == 2 {
+            query.append(URLQueryItem(name: "country", value: region.lowercased()))
+        }
+        parts.queryItems = query
+        var request = URLRequest(url: parts.url!, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
+        request.httpMethod = "GET"
+        URLSession.shared.dataTask(with: request) { [weak self] data, _, _ in
+            guard let data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let first = (json["results"] as? [[String: Any]])?.first,
+                  let version = first["version"] as? String else {
+                call.resolve(["available": false])
+                return
+            }
+            // Only offer a version this phone can install.
+            if let minOS = first["minimumOsVersion"] as? String,
+               UIDevice.current.systemVersion.compare(minOS, options: .numeric) == .orderedAscending {
+                call.resolve(["available": false])
+                return
+            }
+            let newer = version.compare(current, options: .numeric) == .orderedDescending
+            if let link = first["trackViewUrl"] as? String { self?.storeURL = URL(string: link) }
+            call.resolve(["available": newer, "version": version, "downloaded": false])
+        }.resume()
+    }
+
+    /// iOS has no in-app download: Update opens the App Store page.
+    @objc func start(_ call: CAPPluginCall) {
+        call.resolve(["started": false])
+    }
+
+    @objc func complete(_ call: CAPPluginCall) {
+        call.resolve()
+    }
+
+    @objc func open(_ call: CAPPluginCall) {
+        let fallback = URL(string: "https://apps.apple.com/search?term=Liftsmith")!
+        let url = storeURL ?? fallback
+        DispatchQueue.main.async {
+            UIApplication.shared.open(url)
+            call.resolve()
+        }
+    }
+}

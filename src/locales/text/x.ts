@@ -5,6 +5,13 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "x.dismiss": "Dismiss",
+  "x.updateNew": "A new version of Liftsmith is out",
+  "x.updateNewBody": "Update for the latest fixes and features.",
+  "x.updateDownloading": "Downloading in the background. Keep lifting.",
+  "x.updateReady": "Update ready",
+  "x.updateReadyBody": "Restart to finish. Your workout is saved.",
+  "x.update": "Update",
+  "x.updateRestart": "Restart",
   "x.newTheme": "New theme unlocked: {name}",
   "x.tryTheme": "{how}. Tap to try it.",
   "x.done": " · done!",
@@ -53,6 +60,13 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "x.dismiss": "Descartar",
+  "x.updateNew": "Hay una nueva versión de Liftsmith",
+  "x.updateNewBody": "Actualiza para tener las últimas mejoras y funciones.",
+  "x.updateDownloading": "Descargando en segundo plano. Sigue entrenando.",
+  "x.updateReady": "Actualización lista",
+  "x.updateReadyBody": "Reinicia para terminar. Tu entrenamiento está guardado.",
+  "x.update": "Actualizar",
+  "x.updateRestart": "Reiniciar",
   "x.newTheme": "Nuevo tema desbloqueado: {name}",
   "x.tryTheme": "{how}. Toca para probarlo.",
   "x.done": " · ¡hecho!",
@@ -99,6 +113,13 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "x.dismiss": "Fermer",
+  "x.updateNew": "Une nouvelle version de Liftsmith est sortie",
+  "x.updateNewBody": "Mettez à jour pour les derniers correctifs et fonctionnalités.",
+  "x.updateDownloading": "Téléchargement en arrière-plan. Continuez à vous entraîner.",
+  "x.updateReady": "Mise à jour prête",
+  "x.updateReadyBody": "Redémarrez pour terminer. Votre séance est enregistrée.",
+  "x.update": "Mettre à jour",
+  "x.updateRestart": "Redémarrer",
   "x.newTheme": "Nouveau thème débloqué : {name}",
   "x.tryTheme": "{how}. Touchez pour l’essayer.",
   "x.done": " · fait !",
@@ -145,6 +166,13 @@ export const fr: Partial<Record<Key, Message>> = {
 
 export const de: Partial<Record<Key, Message>> = {
   "x.dismiss": "Schließen",
+  "x.updateNew": "Eine neue Version von Liftsmith ist da",
+  "x.updateNewBody": "Aktualisiere für die neuesten Korrekturen und Funktionen.",
+  "x.updateDownloading": "Wird im Hintergrund geladen. Trainier einfach weiter.",
+  "x.updateReady": "Update bereit",
+  "x.updateReadyBody": "Starte neu, um es abzuschließen. Dein Training ist gespeichert.",
+  "x.update": "Aktualisieren",
+  "x.updateRestart": "Neu starten",
   "x.newTheme": "Neues Design freigeschaltet: {name}",
   "x.tryTheme": "{how}. Tippe, um es auszuprobieren.",
   "x.done": " · geschafft!",
@@ -191,6 +219,13 @@ export const de: Partial<Record<Key, Message>> = {
 
 export const it: Partial<Record<Key, Message>> = {
   "x.dismiss": "Ignora",
+  "x.updateNew": "È uscita una nuova versione di Liftsmith",
+  "x.updateNewBody": "Aggiorna per avere le ultime correzioni e funzioni.",
+  "x.updateDownloading": "Download in background. Continua ad allenarti.",
+  "x.updateReady": "Aggiornamento pronto",
+  "x.updateReadyBody": "Riavvia per completare. Il tuo allenamento è salvato.",
+  "x.update": "Aggiorna",
+  "x.updateRestart": "Riavvia",
   "x.newTheme": "Nuovo tema sbloccato: {name}",
   "x.tryTheme": "{how}. Tocca per provarlo.",
   "x.done": " · fatto!",
@@ -237,6 +272,13 @@ export const it: Partial<Record<Key, Message>> = {
 
 export const ja: Partial<Record<Key, Message>> = {
   "x.dismiss": "閉じる",
+  "x.updateNew": "Liftsmith の新しいバージョンがあります",
+  "x.updateNewBody": "アップデートすると最新の修正と機能が使えます。",
+  "x.updateDownloading": "バックグラウンドでダウンロード中です。トレーニングを続けてください。",
+  "x.updateReady": "アップデートの準備ができました",
+  "x.updateReadyBody": "再起動すると完了します。ワークアウトは保存されています。",
+  "x.update": "アップデート",
+  "x.updateRestart": "再起動",
   "x.newTheme": "新しいテーマを獲得：{name}",
   "x.tryTheme": "{how}。タップして試す。",
   "x.done": " · 達成！",
