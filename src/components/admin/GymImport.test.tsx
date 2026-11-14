@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { eta, GymImport } from "./GymImport";
+import { eta, GymImport, RETRY_AFTER_MS } from "./GymImport";
 
 const posts: { where: string; server: number }[] = [];
 beforeEach(() => {
@@ -53,17 +53,27 @@ describe("Admin › Gyms import", () => {
     const changed = vi.fn();
     render(<GymImport admin changed={changed} />);
     await userEvent.click(await screen.findByRole("button", { name: "Import its major cities" }));
+    // Surrey's map servers are busy: it goes back in line twice, after a pause each time, before it counts as failed.
+    const waitOut = async () => {
+      for (const ms of RETRY_AFTER_MS) {
+        await waitFor(() => expect(screen.getByText(/1 busy, trying again soon/)).toBeTruthy(), { timeout: 10_000 });
+        await vi.advanceTimersByTimeAsync(ms + 2_000);
+      }
+    };
+    await waitOut();
     await waitFor(() => expect(screen.getByText(/Done: Canada, 2 of 2 cities/)).toBeTruthy(), { timeout: 10_000 });
+    expect(posts.filter((p) => p.where === "Surrey, BC")).toHaveLength(1 + RETRY_AFTER_MS.length);
     expect(screen.getByText(/1 imported in the last 7 days skipped/)).toBeTruthy();
-    expect(posts.map((p) => p.where).sort()).toEqual(["Langley, BC", "Surrey, BC"]);
-    // The two workers start on different map servers.
-    expect(new Set(posts.map((p) => p.server)).size).toBe(2);
+    expect([...new Set(posts.map((p) => p.where))].sort()).toEqual(["Langley, BC", "Surrey, BC"]);
+    // Each worker asks for its own map server (planServers spreads them).
+    expect(posts.every((p) => p.server === 0 || p.server === 1)).toBe(true);
     expect(screen.getAllByText(/Surrey, BC: No map server answered in time\. \(overpass-api\.de: HTTP 504\)/).length).toBeGreaterThan(0);
     expect(changed).toHaveBeenCalled();
     posts.length = 0;
     await userEvent.click(screen.getByRole("button", { name: "Retry 1 failed" }));
+    await waitOut();
     await waitFor(() => expect(screen.getByText(/Done: 1 failed city, 1 of 1 cities/)).toBeTruthy(), { timeout: 10_000 });
-    expect(posts.map((p) => p.where)).toEqual(["Surrey, BC"]);
+    expect(new Set(posts.map((p) => p.where))).toEqual(new Set(["Surrey, BC"]));
     expect(screen.getByRole("button", { name: "Download debug log" })).toBeTruthy();
     vi.useRealTimers();
   });

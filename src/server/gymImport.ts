@@ -7,6 +7,11 @@
 // answer counts as a failure, the area Nominatim found is remembered so a re-import skips that lookup, and parallel
 // imports start on different servers (`server`) so two cities run at once without queueing on one.
 //
+// Busy servers (the first "every country" run, 2026-11-14: 22 of 65 cities failed, mostly 502s and 504s, and one server
+// hung 39 times at 100 s each): every request's outcome is kept (`attempts`), the next import tries the server that has
+// answered most lately first and a server that mostly hangs only after a busy round, and when every server says it's
+// busy the import waits (8 s, doubling) and asks again instead of failing.
+//
 // Every import leaves a row in gym_imports with a step-by-step log (timings, which server, what it said), shown on
 // Admin › Gyms and downloadable, so a failed city can be understood later.
 import { randomBytes } from "node:crypto";
@@ -40,6 +45,12 @@ export const IMPORT_LIMITS = {
   serverMs: 100_000,
   /** What Overpass is told, in seconds, so a busy server gives up on its own before our limit. */
   overpassTimeout: 90,
+  /** The first pause when every map server is busy; it doubles each round. */
+  waitMs: 8_000,
+  /** Rounds over the map servers at most (8 + 16 + 32 + 64 seconds of waiting between five). */
+  rounds: 5,
+  /** How far back recent imports count when choosing which map server to try first. */
+  healthMs: 30 * 60_000,
   /** Nominatim gets this long. */
   lookupMs: 15_000,
   /** How long import rows (and their logs) are kept. */
@@ -81,8 +92,63 @@ export const importKey = (where: string) =>
 const host = (url: string) => new URL(url).host;
 const secs = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 
-/** Servers in the order to try them, starting from `start` (so parallel imports spread out). */
-export const serverOrder = (start = 0) => OVERPASS.map((_, i) => OVERPASS[(i + Math.abs(Math.trunc(start))) % OVERPASS.length]!);
+/** How one request to a map server went. Busy answers (429, 502, 503, 504) are worth another try a little later. */
+export type Outcome = "ok" | "busy" | "timeout" | "error";
+export interface Attempt {
+  host: string;
+  outcome: Outcome;
+  ms: number;
+}
+export type Health = Record<string, Record<Outcome, number>>;
+
+const zero = (): Record<Outcome, number> => ({ ok: 0, busy: 0, timeout: 0, error: 0 });
+
+/** How each map server did in the imports of the last half hour (their `attempts`). */
+export async function serverHealth(now: number): Promise<Health> {
+  const rows = await query("SELECT attempts FROM gym_imports WHERE at > ? AND attempts != '' ORDER BY at DESC LIMIT 80", [
+    now - IMPORT_LIMITS.healthMs,
+  ]);
+  const health: Health = {};
+  for (const row of rows) {
+    let list: Attempt[] = [];
+    try {
+      list = JSON.parse(String(row.attempts)) as Attempt[];
+    } catch {
+      continue;
+    }
+    for (const a of Array.isArray(list) ? list : []) {
+      if (!a || typeof a.host !== "string" || !(a.outcome in zero())) continue;
+      (health[a.host] ??= zero())[a.outcome]++;
+    }
+  }
+  return health;
+}
+
+/**
+ * The servers in the order to try them. The one that has answered most lately goes first; a server that mostly hangs
+ * lately is "slow" and is only tried once the others have been busy for a round, because each try of it costs the full
+ * time limit (on 2026-11-14 one hung 39 times in an hour). Parallel imports pass a different `start`, which spreads them
+ * over the healthy servers so two cities don't queue on one.
+ */
+export function planServers(health: Health = {}, start = 0): { order: string[]; slow: Set<string> } {
+  const score = (url: string) => {
+    const h = health[host(url)] ?? zero();
+    return h.ok * 2 - h.timeout * 3 - h.busy * 0.5 - h.error;
+  };
+  const ranked = OVERPASS.map((url, i) => ({ url, i, s: score(url) }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map((x) => x.url);
+  const slow = new Set(
+    ranked.filter((url) => {
+      const h = health[host(url)] ?? zero();
+      return h.timeout >= 2 && h.timeout > h.ok;
+    }),
+  );
+  const fast = ranked.filter((url) => !slow.has(url));
+  const n = Math.abs(Math.trunc(start));
+  const spread = fast.length ? fast.map((_, i) => fast[(i + n) % fast.length]!) : [];
+  return { order: [...spread, ...ranked.filter((url) => slow.has(url))], slow };
+}
 
 function scopeFrom(hit: Found): Scope | null {
   const a = hit.address ?? {};
@@ -139,6 +205,8 @@ export interface ImportOptions {
   server?: number;
   /** Look the area up again even when an earlier import found it. */
   fresh?: boolean;
+  /** How to wait between rounds (tests pass a quick one). */
+  sleep?: (ms: number) => Promise<void>;
 }
 
 /** Looks up an area by name ("Langley, BC"), then pulls its fitness centres from OpenStreetMap and saves them. */
@@ -154,8 +222,9 @@ export async function importArea(
   const say = (line: string) => log.push(`+${secs(Date.now() - started)} ${line}`);
   const key = importKey(where);
   let scope: Scope | null = null;
+  const attempts: Attempt[] = [];
   const finish = async (r: ImportResult) => {
-    await record(r, key, scope, now).catch(() => undefined);
+    await record(r, key, scope, now, attempts).catch(() => undefined);
     return r;
   };
   const fail = (error: "where" | "map", detail: string) => finish({ ok: false, id, error, detail, ms: Date.now() - started, log });
@@ -185,80 +254,114 @@ export async function importArea(
   say(`area ${areaName || "?"} (${scope.area.country || "?"})`);
 
   const body = `data=${encodeURIComponent(overpassQuery(scope))}`;
-  const problems: string[] = [];
-  for (const url of serverOrder(opts.server)) {
-    const left = IMPORT_LIMITS.budgetMs - (Date.now() - started);
-    if (left < 10_000) {
-      say("out of time for another map server");
+  // The last thing each server said, for the error line.
+  const problems = new Map<string, string>();
+  const health = await serverHealth(now).catch(() => ({}) as Health);
+  const { order, slow } = planServers(health, opts.server);
+  const lately = Object.entries(health)
+    .map(([h, c]) => `${h} ${c.ok} ok, ${c.busy} busy, ${c.timeout} hung`)
+    .join("; ");
+  say(
+    `map servers in order: ${order.map(host).join(", ")}${slow.size ? ` (${[...slow].map(host).join(", ")} only after a busy round)` : ""}${lately ? `; last 30 min: ${lately}` : ""}`,
+  );
+  const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((ok) => setTimeout(ok, ms)));
+  // Servers that hung or failed outright aren't asked again in this import; busy ones are, after a pause.
+  const dropped = new Set<string>();
+  const fastLeft = () => order.some((u) => !slow.has(u) && !dropped.has(u));
+  let outOfTime = false;
+  for (let round = 0; !outOfTime && round < IMPORT_LIMITS.rounds; round++) {
+    for (const url of order) {
+      if (dropped.has(url) || (round === 0 && slow.has(url) && fastLeft())) continue;
+      const left = IMPORT_LIMITS.budgetMs - (Date.now() - started);
+      if (left < 10_000) {
+        say("out of time for another map server");
+        outOfTime = true;
+        break;
+      }
+      const name = host(url);
+      const t = Date.now();
+      const limit = Math.min(IMPORT_LIMITS.serverMs, left);
+      const note = (outcome: Outcome, why: string, line: string) => {
+        attempts.push({ host: name, outcome, ms: Date.now() - t });
+        if (outcome !== "busy") dropped.add(url);
+        problems.set(name, why);
+        say(line);
+      };
+      let r: Response | null = null;
+      try {
+        r = await fetcher(url, {
+          method: "POST",
+          headers: { "User-Agent": UA, "Content-Type": "application/x-www-form-urlencoded" },
+          body,
+          signal: AbortSignal.timeout(limit),
+        });
+      } catch (e) {
+        const hung = e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError");
+        const why = hung ? `no answer in ${secs(limit)}` : String(e);
+        note(hung ? "timeout" : "error", why, `${name} ${why}`);
+        continue;
+      }
+      if (!r.ok) {
+        const text = (await r.text().catch(() => ""))
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+        const why = `HTTP ${r.status}${r.status === 429 ? " (too many requests)" : r.status >= 502 && r.status <= 504 ? " (server busy)" : ""}`;
+        const busy = r.status === 429 || (r.status >= 502 && r.status <= 504);
+        note(busy ? "busy" : "error", why, `${name} ${why} after ${secs(Date.now() - t)}${text ? `: ${text.slice(0, 200)}` : ""}`);
+        continue;
+      }
+      const j = (await r.json().catch(() => null)) as { elements?: OsmElement[]; remark?: string } | null;
+      const remark = overpassFailure(j?.remark);
+      if (!j?.elements || remark) {
+        const why = remark ? `error: ${remark.slice(0, 200)}` : "answer wasn't map data";
+        // Overpass running out of time or memory on this query is a slow server, not a busy one.
+        note(remark && /timed out|out of memory/i.test(remark) ? "timeout" : "error", why, `${name} ${why} after ${secs(Date.now() - t)}`);
+        continue;
+      }
+      attempts.push({ host: name, outcome: "ok", ms: Date.now() - t });
+      say(`${name} ${secs(Date.now() - t)}: ${j.elements.length} map elements`);
+      const skipped: OsmSkips = { unnamed: 0, private: 0, notGym: 0, duplicate: 0 };
+      const drafts = placesFromOsm(j.elements, scope.area, skipped);
+      say(
+        `kept ${drafts.length}; left out ${skipped.unnamed} unnamed, ${skipped.private} private, ${skipped.notGym} without a gym, ${skipped.duplicate} repeated`,
+      );
+      const saved = await savePlaces(drafts, now);
+      say(
+        `database read ${secs(saved.readMs)}, wrote ${saved.statements} rows in ${secs(saved.writeMs)}: ${saved.added} new, ${saved.updated} changed, ${saved.unchanged} unchanged, ${saved.kept} claimed left alone`,
+      );
+      return finish({
+        ok: true,
+        id,
+        area: areaName,
+        found: drafts.length,
+        added: saved.added,
+        updated: saved.updated,
+        unchanged: saved.unchanged,
+        kept: saved.kept,
+        skipped,
+        server: name,
+        ms: Date.now() - started,
+        log,
+      });
+    }
+    if (outOfTime || order.every((u) => dropped.has(u)) || round + 1 >= IMPORT_LIMITS.rounds) break;
+    // Every server still in the running said it was busy: wait (longer each round) and ask again.
+    const wait = Math.min(IMPORT_LIMITS.waitMs * 2 ** round, IMPORT_LIMITS.budgetMs - (Date.now() - started) - 20_000);
+    if (wait <= 0) {
+      say("out of time to wait for a busy map server");
       break;
     }
-    const name = host(url);
-    const t = Date.now();
-    const limit = Math.min(IMPORT_LIMITS.serverMs, left);
-    let r: Response | null = null;
-    try {
-      r = await fetcher(url, {
-        method: "POST",
-        headers: { "User-Agent": UA, "Content-Type": "application/x-www-form-urlencoded" },
-        body,
-        signal: AbortSignal.timeout(limit),
-      });
-    } catch (e) {
-      const why = e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError") ? `no answer in ${secs(limit)}` : String(e);
-      problems.push(`${name}: ${why}`);
-      say(`${name} ${why}`);
-      continue;
-    }
-    if (!r.ok) {
-      const text = (await r.text().catch(() => ""))
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-      const why = `HTTP ${r.status}${r.status === 429 ? " (too many requests)" : r.status === 504 ? " (server busy)" : ""}`;
-      problems.push(`${name}: ${why}`);
-      say(`${name} ${why} after ${secs(Date.now() - t)}${text ? `: ${text.slice(0, 200)}` : ""}`);
-      continue;
-    }
-    const j = (await r.json().catch(() => null)) as { elements?: OsmElement[]; remark?: string } | null;
-    const remark = overpassFailure(j?.remark);
-    if (!j?.elements || remark) {
-      const why = remark ? `error: ${remark.slice(0, 200)}` : "answer wasn't map data";
-      problems.push(`${name}: ${why}`);
-      say(`${name} ${why} after ${secs(Date.now() - t)}`);
-      continue;
-    }
-    say(`${name} ${secs(Date.now() - t)}: ${j.elements.length} map elements`);
-    const skipped: OsmSkips = { unnamed: 0, private: 0, notGym: 0, duplicate: 0 };
-    const drafts = placesFromOsm(j.elements, scope.area, skipped);
-    say(
-      `kept ${drafts.length}; left out ${skipped.unnamed} unnamed, ${skipped.private} private, ${skipped.notGym} without a gym, ${skipped.duplicate} repeated`,
-    );
-    const saved = await savePlaces(drafts, now);
-    say(
-      `database read ${secs(saved.readMs)}, wrote ${saved.statements} rows in ${secs(saved.writeMs)}: ${saved.added} new, ${saved.updated} changed, ${saved.unchanged} unchanged, ${saved.kept} claimed left alone`,
-    );
-    return finish({
-      ok: true,
-      id,
-      area: areaName,
-      found: drafts.length,
-      added: saved.added,
-      updated: saved.updated,
-      unchanged: saved.unchanged,
-      kept: saved.kept,
-      skipped,
-      server: name,
-      ms: Date.now() - started,
-      log,
-    });
+    say(`every map server busy; asking again in ${secs(wait)}`);
+    await sleep(wait);
   }
-  return fail("map", problems.join("; ") || "No map server answered in time.");
+  return fail("map", [...problems].map(([h, why]) => `${h}: ${why}`).join("; ") || "No map server answered in time.");
 }
 
-async function record(r: ImportResult, key: string, scope: Scope | null, now: number) {
+async function record(r: ImportResult, key: string, scope: Scope | null, now: number, attempts: Attempt[]) {
   await run(
-    `INSERT INTO gym_imports (id, query, area, scope, ok, error, found, added, updated, unchanged, kept, server, ms, log, at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO gym_imports (id, query, area, scope, ok, error, found, added, updated, unchanged, kept, server, ms, log, attempts, at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       r.id,
       key,
@@ -274,6 +377,7 @@ async function record(r: ImportResult, key: string, scope: Scope | null, now: nu
       r.ok ? r.server : "",
       r.ms,
       r.log.join("\n").slice(0, 20_000),
+      attempts.length ? JSON.stringify(attempts) : "",
       now,
     ],
   );
