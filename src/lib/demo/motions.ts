@@ -45,6 +45,8 @@ export interface Motion {
   plates?: number;
   /** Whole-figure roll about the forward axis in degrees (side planks); the figure is then set on the floor. */
   roll?: (d: number) => number;
+  /** For a rolled figure: the height its lowest point rests at (a bench top) instead of the floor. */
+  restOn?: number;
   /** Whole-figure turn about the vertical axis in degrees (a jump with a half turn). */
   yaw?: (d: number) => number;
 }
@@ -1773,11 +1775,13 @@ function cableCrunch(): Motion {
   };
 }
 
-function abWheel(): Motion {
+/** Rolling out from the knees on an ab wheel, or on a loaded barbell (its plates the wheels, so the hands ride higher). */
+function abWheel(o: { bar?: boolean } = {}): Motion {
+  const handY = o.bar ? 0.225 : 0.1;
   return {
     phases: TEMPO.lowerFirst("Roll out · 2s", "Pull back · 1s", "Kneel", "Long"),
-    load: "wheel",
-    grip: 0.08,
+    load: o.bar ? "barbell" : "wheel",
+    grip: o.bar ? 0.24 : 0.08,
     stance: 0.12,
     pose(B, d) {
       const knee = V(0, 0.07);
@@ -1786,8 +1790,8 @@ function abWheel(): Motion {
       const lean = lerp(72, 82, d);
       const sh = torsoAt(B, hip, lean);
       const r = reach(B) * 0.97;
-      const dy = sh[1] - 0.1;
-      const hand = V(sh[0] + Math.sqrt(Math.max(0.0001, r * r - dy * dy)), 0.1, 0.08);
+      const dy = sh[1] - handY;
+      const hand = V(sh[0] + Math.sqrt(Math.max(0.0001, r * r - dy * dy)), handY, o.bar ? 0.24 : 0.08);
       return {
         hip,
         sh,
@@ -1795,6 +1799,7 @@ function abWheel(): Motion {
         foot: 70,
         kneePole: V(0, -1, 0.1),
         hand,
+        bar: o.bar ? V(hand[0], hand[1]) : undefined,
         elbowPole: V(-0.2, 1, 0.3),
         headBlend: 0,
       };
@@ -5166,6 +5171,18 @@ function tricepsKickback(o: { load: Load; cable?: boolean }): Motion {
   };
 }
 
+/** The free left hand braced on a flat bench in front (a dumbbell kickback). */
+function leftHandOnBench(m: Motion): Motion {
+  return {
+    ...m,
+    props: (B) => {
+      const L = sideOf(m.pose(B, 0).hand, "L", V(0, 0, 0));
+      const top = L[1] - 0.03;
+      return [...(m.props?.(B) ?? []), { kind: "box", at: V(L[0], top / 2, L[2]), size: V(0.5, top, 0.32) }];
+    },
+  };
+}
+
 /** Sleds on a strap or rope: dragging it walking backwards, pulling it in hand over hand, or rowing it in. */
 function sledPull(o: { kind: "drag" | "pull" | "row" }): Motion {
   const sledAt = V(1.9, 0.18);
@@ -6455,6 +6472,56 @@ function externalRotation(): Motion {
   };
 }
 
+/**
+ * Lying on the left side along a flat bench, the top (right) arm working: a lateral raise from the hip
+ * to straight up, or an external rotation with the elbow pinned to the side. Drawn upright and rolled
+ * onto its side like the floor side-lying moves, resting on the bench (`restOn`), which runs under the
+ * whole body.
+ */
+function sideLyingArm(kind: "raise" | "rotate"): Motion {
+  const top = 0.45;
+  const pose = (B: Body, d: number): Pose => {
+    const hip = V(0, standY(B, 0));
+    const sh = torsoAt(B, hip, 0);
+    const shR = V(sh[0], sh[1] - B.shDrop, B.shW);
+    let hand: Vec;
+    if (kind === "raise") {
+      const phi = rad(lerp(4, 88, d));
+      hand = add(shR, mul(V(0.06, -Math.cos(phi), Math.sin(phi)), reach(B) * 0.95));
+    } else {
+      // the elbow at the side, the forearm turning from across the belly to the ceiling
+      const elbow = add(shR, V(0.02, -B.upper * 0.97, 0.06));
+      const psi = rad(lerp(-25, 75, d));
+      hand = add(elbow, mul(V(Math.cos(psi), 0, Math.sin(psi)), B.fore * 0.95));
+    }
+    return {
+      hip,
+      sh,
+      ankle: per(V(0, ANKLE_H, -0.06), V(0, ANKLE_H, 0.06)),
+      kneePole: V(1, 0, 0.1),
+      // the bottom arm under the head
+      hand: per(V(0.04, sh[1] + 0.3, -0.24), hand),
+      elbowPole: per(V(0.2, 0.4, -1), kind === "raise" ? V(0, 0.2, 1) : V(-0.2, -1, 0.3)),
+      headBlend: 0,
+    };
+  };
+  return {
+    phases: TEMPO.liftFirst(kind === "raise" ? "Raise · 1s" : "Rotate out · 1s", "Lower · 2s", "Set", "Squeeze"),
+    load: "dumbbell",
+    hold: "R",
+    stance: 0.06,
+    pose,
+    roll: () => -90,
+    restOn: top,
+    props: (B) => {
+      // the rolled frame's "down" is -z: the bench runs from below the body's lowest side to the floor
+      const p = pose(B, 0);
+      const low = Math.min(-0.24 - 0.05, -B.shW - 0.08, -B.hipW - 0.1);
+      return [{ kind: "box", at: V(0, (p.sh[1] + 0.35) / 2, low - top / 2), size: V(0.34, p.sh[1] + 0.35, top - 0.02) }];
+    },
+  };
+}
+
 // ---------- the library ----------
 const MOTIONS: Record<string, () => Motion> = {
   // chest
@@ -6738,7 +6805,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-preacher-curl": () => curl({ load: "dumbbell", posture: "seatedThighs" }),
   "zottman-curl": () => curl({ load: "dumbbell", grip: 0.22 }),
   "db-skull-crusher": () => overheadExtension({ lying: true }),
-  "db-kickback": () => tricepsKickback({ load: "dumbbell" }),
+  "db-kickback": () => leftHandOnBench(tricepsKickback({ load: "dumbbell" })),
   "db-close-press": () => benchPress({ load: "dumbbell" }),
   "db-goblet-squat-heels": () => squat({ hold: "goblet", load: "dumbbell", holdKind: "centre" }),
   "db-front-squat": () => squat({ hold: "goblet", load: "dumbbell", holdKind: "each" }),
@@ -6963,7 +7030,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "seated-knee-tuck": () => floorCore({ kind: "vUp" }),
   "oblique-crunch": () => floorCore({ kind: "bicycle" }),
   "ring-rollout": abWheel,
-  "barbell-rollout": abWheel,
+  "barbell-rollout": () => abWheel({ bar: true }),
   "tuck-l-sit": lSit,
   "kb-dead-bug": deadBug,
   "band-pallof-hold": pallof,
@@ -7013,9 +7080,9 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-halo": halo,
   "barbell-high-pull": () => uprightRow({ load: "barbell" }),
   "incline-front-raise": inclineFrontRaise,
-  "side-lying-lateral-raise": () => fly({ posture: "standing", from: 8, to: 84, load: "dumbbell", first: "lift", oneArm: true }),
+  "side-lying-lateral-raise": () => sideLyingArm("raise"),
   "cable-external-rotation": externalRotation,
-  "db-external-rotation": externalRotation,
+  "db-external-rotation": () => sideLyingArm("rotate"),
   "prone-w-raise": superman,
   "prone-y-raise": superman,
   "incline-t-raise": () => fly({ posture: "facePad", from: 12, to: 88, load: "dumbbell", first: "lift" }),
