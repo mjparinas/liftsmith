@@ -9,7 +9,8 @@ describe("major cities to import", () => {
     expect(list.map((c) => c.code)).toEqual(
       expect.arrayContaining(["CA", "US", "GB", "AU", "MX", "FR", "DE", "IT", "JP", "VA", "LI", "SM"]),
     );
-    expect(list.map((c) => c.code)).not.toContain("CU");
+    expect(list.map((c) => c.code)).toContain("CU");
+    expect(MAJOR_CITIES.CU).toContain("Havana, Cuba");
     for (const c of list) expect(c.cities).toBeGreaterThan(0);
     expect(MAJOR_CITIES.GB).toContain("London, United Kingdom");
     expect(MAJOR_CITIES.CA).toContain("Langley, BC");
@@ -23,7 +24,8 @@ describe("major cities to import", () => {
 
   it("knows its country codes", () => {
     expect(isImportCountry("JP")).toBe(true);
-    expect(isImportCountry("CU")).toBe(false);
+    expect(isImportCountry("CU")).toBe(true);
+    expect(isImportCountry("XX")).toBe(false);
     expect(isImportCountry("toString")).toBe(false);
   });
 });
