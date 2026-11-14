@@ -302,6 +302,13 @@ export const SETTINGS: Setting[] = [
   // Admin panel
   { names: ["ADMIN_EMAILS"], label: "Admin emails", group: "Admin panel", need: "required", what: "Who can open this panel." },
   {
+    names: ["DIGEST_TO"],
+    label: "Digest recipients",
+    group: "Admin panel",
+    need: "optional",
+    what: "Extra inboxes for the morning digest, without admin access.",
+  },
+  {
     names: ["SUPPORT_EMAILS"],
     label: "Support emails",
     group: "Admin panel",
