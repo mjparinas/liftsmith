@@ -207,6 +207,10 @@ export const it: FeaturesText = {
       body: "Hai dimenticato il telefono? Registra l’allenamento dopo e conta come tutti gli altri.",
     },
     recap: { name: "Riepilogo mensile", body: "Un breve sguardo al tuo mese, pronto da condividere." },
+    anniversary: {
+      name: "Il tuo anniversario di allenamento",
+      body: "Ogni anno, nel giorno del tuo primo allenamento, Oggi mette il giorno uno accanto a oggi: allenamenti, serie, peso totale e l’esercizio cresciuto di più, con una card da condividere. Resta per una settimana.",
+    },
     body: {
       name: "Peso, massa grassa e foto",
       body: "Registra peso e massa grassa, o lasciali arrivare dalla bilancia tramite l’app di salute del telefono, e tieni le foto dei progressi sul telefono.",

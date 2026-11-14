@@ -213,6 +213,10 @@ export const de: FeaturesText = {
       body: "Handy vergessen? Trag das Training hinterher ein, und es zählt wie jedes andere.",
     },
     recap: { name: "Monatsrückblick", body: "Ein kurzer Blick zurück auf deinen Monat, bereit zum Teilen." },
+    anniversary: {
+      name: "Dein Trainingsjahrestag",
+      body: "Jedes Jahr am Tag deines ersten Trainings stellt Heute Tag eins neben heute: Trainings, Sätze, bewegtes Gewicht und die Übung, die am meisten gewachsen ist, mit einer Karte zum Teilen. Sie bleibt eine Woche.",
+    },
     body: {
       name: "Gewicht, Körperfett und Fotos",
       body: "Trage Gewicht und Körperfett ein oder lass sie über die Gesundheits-App deines Handys von deiner Waage kommen, und behalte Fortschrittsfotos auf deinem Handy.",

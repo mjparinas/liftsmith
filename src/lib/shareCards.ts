@@ -2,7 +2,8 @@ import { TIER_LABEL, type Achievement, type Tier } from "./achievements";
 import type { Pr, SessionSummary } from "./derive";
 import { exercise, EXERCISE_BY_ID } from "./exercises";
 import type { Game } from "./game";
-import { date, t } from "./i18n";
+import { date, num, t } from "./i18n";
+import { fmtTonnage, type AnniversaryLook } from "./moments";
 import { epley } from "./progression";
 import type { CardData } from "./shareImage";
 import { SITE_URL } from "./site";
@@ -15,7 +16,7 @@ import { fmtNum, fromKg } from "./units";
 // - weights (kg or lb) appear only while the lifter leaves "Show weights" on;
 // - the name appears only when they turn "Show my name" on (off by default).
 
-export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge";
+export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge" | "anniversary";
 
 export interface ShareOptions {
   /** Show weights lifted (kg or lb). On by default. */
@@ -174,6 +175,34 @@ export function levelShare(g: Pick<Game, "level" | "streak" | "xp" | "badges">, 
         [t("card.badges"), fmtNum(g.badges.earned)],
       ],
       lines: [],
+      footer: footer(ctx.game),
+      accent: ctx.accent,
+      name: o.name,
+    }),
+  };
+}
+
+/** The anniversary of the first workout: years, day one against today, and the lift that grew most. */
+export function anniversaryShare(a: AnniversaryLook, ctx: ShareContext): Shareable {
+  const lift = a.lift;
+  const ex = lift ? exercise(lift.exerciseId) : null;
+  const set = (s: { weight: number; reps: number }) => `${w(s.weight, ctx.unit)} × ${s.reps}`;
+  return {
+    id: `anniversary-${a.years}`,
+    kind: "anniversary",
+    label: t("card.pick.anniv"),
+    figure: lift?.exerciseId,
+    file: `liftsmith-anniversary-${a.years}`,
+    card: (o) => ({
+      kicker: date(a.firstAt, { month: "long", day: "numeric", year: "numeric" }),
+      headline: t("mom.years", { count: a.years }),
+      big: lift && ex ? { value: `+${num(Math.round(lift.pct))}%`, label: t("card.annivLabel", { name: ex.name }) } : undefined,
+      tiles: [
+        [t("card.workouts"), fmtNum(a.today.workouts)],
+        [t("mom.rowSets"), fmtNum(a.today.sets)],
+        ...(o.weights ? ([[t("mom.rowLifted"), fmtTonnage(a.today.volume, ctx.unit)]] as [string, string][]) : []),
+      ],
+      lines: o.weights && lift && ex ? [`${ex.name} · ${set(lift.then)} → ${set(lift.best)}`] : [],
       footer: footer(ctx.game),
       accent: ctx.accent,
       name: o.name,
