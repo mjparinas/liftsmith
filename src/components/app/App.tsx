@@ -6,6 +6,7 @@ import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { startAppLinks } from "@/lib/appLinks";
+import { startAppUpdates } from "@/lib/appUpdate";
 import { readAccount, useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
@@ -87,6 +88,7 @@ import { Tools } from "./Tools";
 import { Trainer } from "./Trainer";
 import { TrainingSettings } from "./TrainingSettings";
 import { TodaySkeleton } from "./ui";
+import { UpdateToast } from "./UpdateToast";
 import { Workout } from "./Workout";
 
 const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
@@ -183,6 +185,10 @@ export function App() {
   }, []);
   // Whether the server can be reached, for Friends' offline note (net.ts).
   useEffect(() => watchNet(), []);
+  // A newer version in Play or the App Store, asked in the background shortly after start (appUpdate.ts).
+  useEffect(() => {
+    return ready ? startAppUpdates() : undefined;
+  }, [ready]);
   useEffect(() => {
     applyAppearance(savedAppearance());
     applyA11y(savedA11y());
@@ -505,6 +511,8 @@ export function App() {
           {/* Friends' check-ins stay at the top of every screen but the workout until closed (Check in, 2026-11-14).
               In the page rather than over it, so they never cover a screen's own header. */}
           <CheckinToasts hidden={route === "workout"} />
+          {/* A newer version in the store (appUpdate.ts): same place, never during a workout. */}
+          <UpdateToast hidden={route === "workout"} />
           <ScreenBoundary>{screen}</ScreenBoundary>
         </main>
       </div>

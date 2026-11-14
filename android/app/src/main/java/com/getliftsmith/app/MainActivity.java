@@ -19,6 +19,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(SpeechLogPlugin.class);
         registerPlugin(VolumeKeysPlugin.class);
         registerPlugin(StoreReviewPlugin.class);
+        registerPlugin(AppUpdatePlugin.class);
         registerPlugin(NowPlayingPlugin.class);
         super.onCreate(savedInstanceState);
         // The app fills the screen and doesn't pinch or double-tap zoom (src/lib/nativeZoom.ts locks the

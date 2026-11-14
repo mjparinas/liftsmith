@@ -190,6 +190,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Accounts and sign-in](docs/decisions/accounts-and-sign-in.md) (`Account.tsx`, `src/lib/auth.ts`, `AccountSignInPlugin.java`, `AccountSignInPlugin.swift`)
 - [Analytics and the admin panel](docs/decisions/analytics-and-the-admin-panel.md) (`src/lib/analytics.ts`, `src/components/SiteBeacon.tsx`, `src/server/db.ts`, `src/lib/analyticsSchema.ts`)
 - [App size](docs/decisions/app-size.md) (`scripts/native-web.mjs`, `package.json` `capacitor:copy:after`)
+- [App updates](docs/decisions/app-updates.md) (`src/lib/appUpdate.ts`, `UpdateToast.tsx`, `AppUpdatePlugin.java`, `AppUpdatePlugin` in `DelightPlugins.swift`)
 - [Background sync and the offline cache](docs/decisions/background-sync.md) (`src/lib/net.ts`, `src/lib/liveRead.ts`, `SyncSpinner.tsx`, `Friends.tsx` `OfflineNote`)
 - [Battery: nothing runs in the background](docs/decisions/battery.md) (`src/lib/visibility.ts`, `useNow.ts`, `workoutWatch.ts`)
 - [Borrowed from Gradelings](docs/decisions/borrowed-from-gradelings.md) (`src/lib/flags.ts`, `src/lib/analyticsSchema.ts`, `docs/PLAY_LISTING.md`, `docs/PLAY_CONSOLE_ANSWERS.md`)
