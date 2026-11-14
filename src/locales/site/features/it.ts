@@ -335,7 +335,7 @@ export const it: FeaturesText = {
     },
     "coach-booking": {
       name: "Prenotazione e calendario delle sessioni",
-      body: "Apri gli orari liberi, una volta o ogni settimana, e i clienti li prenotano nell'app, oppure prenotali tu. Entrambi ricevono una notifica, una sessione del giorno dopo compare in Oggi e finisce nel calendario con un tocco.",
+      body: "Apri gli orari liberi, una volta o ogni settimana, e i clienti li prenotano nell'app, oppure prenotali tu. La tua agenda è un calendario mensile: tocca un giorno per vedere chi ha prenotato e cosa è ancora libero. Entrambi ricevono una notifica, una sessione del giorno dopo compare in Oggi e finisce nel calendario con un tocco.",
     },
     "coach-payments": {
       name: "Pagamenti dei clienti con Stripe",

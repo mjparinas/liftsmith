@@ -49,6 +49,8 @@ let answered: unknown[] = [];
 let trainer = false;
 let payOn = false;
 const SLOT = { id: "s1", coachId: "k1", start: NOW + 2 * 86_400_000, minutes: 60, place: "Main gym", clientId: null, bookedAt: null };
+/** An upcoming session for the coach's schedule (its calendar starts at this month). */
+const SOON = Date.now() + 2 * 86_400_000;
 let mySessions: { booked: unknown[]; open: unknown[] } = { booked: [], open: [] };
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
@@ -110,7 +112,7 @@ beforeEach(() => {
         targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
         forms: [FORM],
         checkins: linked ? [CHECKIN] : [],
-        slots: coaching ? [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1" }] : [],
+        slots: coaching ? [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1", start: SOON }] : [],
         sessions: mySessions,
         pay: payOn
           ? {
@@ -591,7 +593,16 @@ describe("booking sessions", () => {
     const u = userEvent.setup();
     render(<Trainer arg="schedule" />);
     expect(await screen.findByText("Sessions")).toBeInTheDocument();
-    expect(screen.getAllByText(/Main gym/).length).toBeGreaterThan(0);
+    // A month calendar: the session's day carries its count, and tapping it shows the time under the grid.
+    const cal = screen.getByTestId("schedule-calendar");
+    const day = new Date(SOON);
+    const label = new RegExp(`${day.toLocaleDateString("en-CA", { month: "long" })} ${day.getDate()}\\b.*1 booked`);
+    // It opens on this month, and nothing before it can hold an upcoming time.
+    expect(within(cal).getByRole("button", { name: "Previous month" })).toBeDisabled();
+    while (!within(cal).queryByRole("button", { name: label })) await u.click(within(cal).getByRole("button", { name: "Next month" }));
+    await u.click(within(cal).getByRole("button", { name: label }));
+    expect(within(screen.getByTestId("schedule-day")).getByText(/Main gym/)).toBeInTheDocument();
+    expect(within(screen.getByTestId("schedule-day")).getByText("Alex")).toBeInTheDocument();
     await u.click(screen.getByRole("button", { name: "Add times" }));
     await u.click(screen.getByRole("button", { name: "Tomorrow" }));
     await u.click(screen.getByRole("button", { name: "45 min" }));
