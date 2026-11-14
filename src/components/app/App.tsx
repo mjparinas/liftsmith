@@ -46,6 +46,7 @@ import { Account } from "./Account";
 import { Achievements, useGame } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
+import { ExerciseLibrary } from "./ExerciseLibrary";
 import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
 import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
@@ -445,6 +446,7 @@ export function App() {
     club: <ClubScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
+    exercises: <ExerciseLibrary />,
     gymlink: <SharedGym key={arg ?? ""} code={arg} />,
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
     gymclaim: <GymClaim key={arg ?? ""} id={arg} />,
@@ -519,7 +521,7 @@ function TabBar({ route }: { route: Route }) {
   return (
     <nav
       ref={ref}
-      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
+      className="tab-bar safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
       aria-label={t("nav.main")}
     >
       <ul className={`mx-auto grid max-w-lg px-1 pt-1.5 ${tabs.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>

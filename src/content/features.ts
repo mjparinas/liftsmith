@@ -330,6 +330,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "exercise-stats",
+        name: "Stats for every exercise",
+        body: "Tap any exercise in the library for your sets, total weight lifted, estimated max and how you compare with trained lifters of your weight, age and sex, from published strength standards.",
+        tier: "both",
+        proPart: "Charts from a week to a year are part of Pro's advanced stats.",
+        added: "2026-11-13",
+      },
+      {
         id: "log-past",
         name: "Log a past workout",
         body: "Forgot your phone? Log the workout afterwards and it counts like any other.",

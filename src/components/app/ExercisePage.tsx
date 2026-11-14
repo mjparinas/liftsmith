@@ -6,6 +6,7 @@ import { can } from "@/lib/entitlements";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { date, list, num, t } from "@/lib/i18n";
 import { liftSessions, liftTrend, repBests, type LiftTrend } from "@/lib/liftPage";
+import { liftComparison, liftKind, liftMax, liftTotals } from "@/lib/liftStats";
 import { target } from "@/lib/progression";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
@@ -13,6 +14,7 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { plateText, setText } from "./format";
+import { LiftChart, LiftCompareCard, LiftTotalsCard } from "./LiftStats";
 import { ProLocked } from "./ProLocked";
 import { goBack } from "./router";
 import { SetHints } from "./SetHints";
@@ -22,7 +24,9 @@ import { EmptyState, ScreenHeader, Section } from "./ui";
 // One page for each exercise (Melvin, 2026-11-11: table stakes). It opens on what to do next time, with
 // its reason, then which way the lift is going and what to do about it, then the best weight for each rep
 // count and every past session (AGENTS.md: "what should I do?" before "what happened?"). Opened from an
-// exercise's name in History and from Progress's records. Pure web code: Android, iOS and the web app.
+// exercise's name in History, from Progress's records and from the exercise library (#/exercises). Then the
+// stats (2026-11-13, LiftStats.tsx): lifetime totals and the estimated max, a chart over time, and how the lift
+// compares with published strength standards. Pure web code: Android, iOS and the web app.
 
 const sameYear = (a: number, b: number) => new Date(a).getFullYear() === new Date(b).getFullYear();
 
@@ -52,6 +56,8 @@ export function ExercisePage({ id }: { id?: string }) {
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const sessions = useMemo(() => (ex ? liftSessions(events, ex.id) : []), [events, ex]);
   const next = useMemo(() => (ex && gym ? target(ex, events, profile, gym, now) : null), [ex, gym, events, profile, now]);
+  const max = useMemo(() => (ex ? liftMax(events, ex, now, profile) : null), [events, ex, now, profile]);
+  const compare = useMemo(() => (ex ? liftComparison(ex, max, events, profile, now) : null), [ex, max, events, profile, now]);
   const [shown, setShown] = useState(PAGE);
   const back = { label: t("lift.back"), onClick: goBack };
   if (!ex) {
@@ -64,6 +70,8 @@ export function ExercisePage({ id }: { id?: string }) {
   }
   const loaded = ex.load !== "bodyweight" && !ex.cardio;
   const trend = loaded ? liftTrend(sessions, now) : null;
+  const kind = liftKind(ex);
+  const totals = liftTotals(sessions, ex);
   const bests = loaded ? repBests(sessions, ex.id) : [];
   const best = sessions.reduce((a, s) => Math.max(a, s.e1rm), 0);
   const mostReps = Math.max(0, ...sessions.flatMap((s) => s.sets.map((x) => x.reps)));
@@ -89,28 +97,36 @@ export function ExercisePage({ id }: { id?: string }) {
         </section>
       )}
 
-      {trend && !can("advancedStats") && (
+      {sessions.length > 0 && !can("advancedStats") && (
         <Section title={t("lift.trendTitle")} icon="progress" info="e1rm">
           <ProLocked from="lift" title={t("pro.ft.advancedStats")} body={t("lift.trend.lock")} />
         </Section>
       )}
-      {trend && can("advancedStats") && (
-        <Section title={t("lift.trendTitle")} icon="progress" info="e1rm">
+      {sessions.length > 0 && can("advancedStats") && (
+        <Section title={t("lift.trendTitle")} icon="progress" info={loaded ? "e1rm" : undefined}>
           <div className="card p-4">
-            {best > 0 && (
-              <p className="num">
-                <span className="display text-2xl">{fmtNum(Math.round(fromKg(best, unit)))}</span>{" "}
-                <span className="text-sm text-muted">
-                  {unit} · {t("lift.e1rm")}
-                </span>
-              </p>
+            {trend && (
+              <>
+                {best > 0 && (
+                  <p className="num">
+                    <span className="display text-2xl">{fmtNum(Math.round(fromKg(best, unit)))}</span>{" "}
+                    <span className="text-sm text-muted">
+                      {unit} · {t("lift.bestE1rm")}
+                    </span>
+                  </p>
+                )}
+                <p className="mt-1 text-sm" data-testid="lift-trend">
+                  {trendLine(trend)}
+                </p>
+              </>
             )}
-            <p className="mt-1 text-sm" data-testid="lift-trend">
-              {trendLine(trend)}
-            </p>
+            <LiftChart ex={ex} sessions={sessions} max={max} unit={unit} now={now} />
           </div>
         </Section>
       )}
+
+      <LiftTotalsCard totals={totals} max={max} unit={unit} kind={kind} />
+      {compare && <LiftCompareCard c={compare} unit={unit} />}
 
       {bests.length > 0 && (
         <Section title={t("lift.bests")} icon="trophy">

@@ -33,6 +33,7 @@ export const ROUTES = [
   "club",
   "trainer",
   "exercise",
+  "exercises",
   "gymlink",
   "gymplace",
   "gymclaim",

@@ -200,6 +200,11 @@ export const fr: FeaturesText = {
       name: "Modifier les séances passées et les refaire",
       body: "Corrigez une série, ajoutez une note, nommez une séance ou refaites-la, et chaque mouvement a sa page avec son historique.",
     },
+    "exercise-stats": {
+      name: "Statistiques de chaque exercice",
+      body: "Touchez n’importe quel exercice de la bibliothèque pour voir vos séries, le poids total soulevé, votre max estimé et votre position face aux personnes entraînées de votre poids, âge et sexe, d’après des normes de force publiées.",
+      proPart: "Les graphiques d’une semaine à un an font partie des statistiques avancées de Pro.",
+    },
     "log-past": {
       name: "Saisir une séance passée",
       body: "Téléphone oublié ? Saisissez la séance après coup : elle compte comme les autres.",
