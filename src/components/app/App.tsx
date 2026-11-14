@@ -26,6 +26,7 @@ import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
+import { lockNativeZoom } from "@/lib/nativeZoom";
 import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, provideNextPlan, refreshReminders, startDefaultEmail } from "@/lib/reminders";
@@ -160,6 +161,8 @@ export function App() {
     document.addEventListener("visibilitychange", reread);
     return () => document.removeEventListener("visibilitychange", reread);
   }, [a11y]);
+  // The Android and iOS apps don't pinch or double-tap zoom; the website keeps zoom (nativeZoom.ts).
+  useEffect(() => void lockNativeZoom(), []);
   useEffect(() => {
     // Android's back button: close a sheet, else the previous screen, and leave the app only from Today (back.ts).
     let stop = () => {};
