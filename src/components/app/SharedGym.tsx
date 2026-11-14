@@ -88,7 +88,9 @@ export function SharedGym({ code }: { code?: string }) {
             </span>
           )}
         </h2>
-        {place && placeLine(place) && <p className="mt-1 text-sm text-muted">{placeLine(place)}</p>}
+        {place && placeLine(place) && (
+          <p className="mt-1 text-sm text-muted">{[placeLine(place), place.postcode].filter(Boolean).join(", ")}</p>
+        )}
         <p className="mt-2 text-sm text-muted">{!place ? t("gym.sharedWhy") : place.code ? t("gym.place.why") : t("gym.place.typical")}</p>
         {place?.official && <p className="mt-2 text-sm text-muted">{t("gym.place.officialNote")}</p>}
       </section>

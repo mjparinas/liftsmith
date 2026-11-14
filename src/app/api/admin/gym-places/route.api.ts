@@ -2,10 +2,12 @@
 // wait for a check (staff). ?countries=1: the countries with major cities to import. ?cities=<code>|ALL: one
 // country's (or every country's) major cities (majorCities.ts, worldCities.ts) and when each last imported cleanly.
 // ?imports=1: the latest imports with their debug logs (gymImport.ts). POST (admins, audited):
-// {action: "import", where: "Langley, BC", server?: n, fresh?: true} seeds an area from OpenStreetMap; {id, action:
+// {action: "import", where: "Langley, BC", server?: n, fresh?: true} seeds an area from OpenStreetMap; {action: "enrich"}
+// reads the next batch of gyms' own websites for missing details (gymEnrich.ts); {id, action:
 // hide | show | gym | studio | delete | approve | reject} changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
+import { enrichBatch } from "@/server/gymEnrich";
 import { importArea, lastImported, recentImports } from "@/server/gymImport";
 import { actOnPlace, adminPlaces, pendingPlaces } from "@/server/gymPlaces";
 import { importCountryList, isImportCountry, MAJOR_CITIES } from "@/server/majorCities";
@@ -50,6 +52,13 @@ export async function POST(req: Request) {
             : "No map server answered in time. Try again in a minute.",
       });
     await audit(gate.staff.email, "gyms.import", `${r.area}: ${r.added} added, ${r.updated} updated, ${r.unchanged} unchanged`);
+    return json(200, r);
+  }
+  if (body.action === "enrich") {
+    // The next batch of gyms whose own website may fill missing details (gymEnrich.ts).
+    const r = await enrichBatch();
+    const filled = r.done.filter((d) => d.filled.length).length;
+    if (r.done.length) await audit(gate.staff.email, "gyms.enrich", `${r.done.length} read, ${filled} filled in, ${r.left} left`);
     return json(200, r);
   }
   if (!(await actOnPlace(body.id, body.action))) return json(400, { error: "Which gym, and what to do?" });
