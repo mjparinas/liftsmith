@@ -157,6 +157,14 @@ describe("Today and Progress extras", () => {
     expect(useApp.getState().active?.parts?.map((p) => p.kind)).toEqual(["warm", "lift"]);
   });
 
+  it("opens the stretch library from Today", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    // Melvin, 2026-11-14: "Can you add it on today". Before, it was only under Progress › All tools.
+    await user.click(screen.getByTestId("today-stretch-library"));
+    expect(await screen.findByRole("heading", { name: "Stretching" })).toBeInTheDocument();
+  });
+
   it("adds cardio after the lifting on Today, with its machine and minutes", async () => {
     const user = userEvent.setup();
     await onboard(user);
