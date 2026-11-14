@@ -211,6 +211,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Injury mode](docs/decisions/injury-mode.md) (`src/components/app/Injuries.tsx`, `src/lib/injury.ts`, `generator.ts`, `injury.ts`)
 - [Integrations roadmap](docs/decisions/integrations-roadmap.md) (`generator.ts`, `block.ts`, `health.ts`)
 - [Marketing and growth](docs/decisions/marketing-and-growth.md) (`src/lib/creatorCode.ts`, `src/app/c/page.tsx`, `CreatorLanding.tsx`, `src/lib/creator.ts`)
+- [Moderation: reporting profiles, the Users tab and resetting an account](docs/decisions/moderation.md) (`src/server/socialModeration.ts`, `src/components/admin/Moderation.tsx`, `Users.tsx`, `resetAccount` in `accounts.ts`)
 - [Money](docs/decisions/money.md) (`src/lib/flags.ts`, `Pro.tsx`, `trial.ts`, `src/lib/billing.ts`, `src/server/stripe.ts`, `src/server/access.ts`)
 - [Now playing](docs/decisions/now-playing.md) (`src/lib/nowPlaying.ts`, `NowPlaying.tsx`, `NowPlayingPlugin.java`, `MediaListener.java`, `NowPlayingPlugin.swift`)
 - [Name](docs/decisions/name.md) (`src/lib/brand.ts`, `src/lib/site.ts`)

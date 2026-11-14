@@ -1,7 +1,7 @@
 // Vercel Cron (vercel.json), each morning: runs the admin panel's System checks and emails the admins about any
 // that went down or came back (src/server/alerts.ts), records the database size for
 // the Capacity card, and pings IndexNow with new and changed public pages (src/server/indexnow.ts), and tells coaches about clients who
-// went quiet (src/server/coach.ts alertQuiet). Vercel sends "Authorization: Bearer $CRON_SECRET". Each run is recorded (src/server/monitor.ts).
+// went quiet (src/server/coach.ts alertQuiet), and lifts Friends suspensions that have run out (socialModeration.ts). Vercel sends "Authorization: Bearer $CRON_SECRET". Each run is recorded (src/server/monitor.ts).
 import { watchSystem } from "@/server/alerts";
 import { sampleDbSize } from "@/server/capacity";
 import { alertQuiet } from "@/server/coach";
@@ -9,6 +9,7 @@ import { sendDueCheckins } from "@/server/coachForms";
 import { pingIndexNow } from "@/server/indexnow";
 import { trackJob } from "@/server/monitor";
 import { authorized } from "@/server/revenuecat";
+import { liftExpired } from "@/server/socialModeration";
 
 export const maxDuration = 120;
 
@@ -23,6 +24,8 @@ export async function GET(req: Request) {
     const quiet = await alertQuiet().catch(() => -1);
     // Weekly check-ins that are due go to their clients (coachForms.ts).
     const checkins = await sendDueCheckins().catch(() => -1);
-    return Response.json({ down: watch.down, alerted: watch.alerted, bytes: size, indexNow, quiet, checkins });
+    // A suspension also lifts when the lifter opens Friends; this brings them back for everyone else too.
+    const lifted = await liftExpired().catch(() => -1);
+    return Response.json({ down: watch.down, alerted: watch.alerted, bytes: size, indexNow, quiet, checkins, lifted });
   });
 }

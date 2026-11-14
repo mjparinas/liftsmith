@@ -5,6 +5,7 @@
 import { hasLifetimePro } from "./creators";
 import { query, run } from "./db";
 import { accountHasPro } from "./review";
+import { stateOf, type ModState } from "./socialModeration";
 
 const n = (v: unknown) => Number(v ?? 0);
 const s = (v: unknown) => (v == null ? null : String(v));
@@ -19,7 +20,22 @@ export interface AccountRow {
   events: number;
   /** Coach (made an invite or has clients), client (linked to a coach), both, or neither: an ordinary lifter. */
   role: Role;
+  /** Their Friends handle, or null when they haven't joined Friends. */
+  handle: string | null;
+  /** Friends standing (socialModeration.ts). */
+  state: ModState;
+  /** Reports about them (profile, posts and comments): waiting for staff, and ever. */
+  openReports: number;
+  reports: number;
+  /** Under 18 by a school team or the birth year in their settings (a year-based check, like isMinor). */
+  minor: boolean;
 }
+
+/** The Users tab's filters (moderation.md): everyone, reported and waiting, acted on, or under 18. */
+export const USER_FILTERS = ["all", "reported", "actioned", "teens"] as const;
+export type UserFilter = (typeof USER_FILTERS)[number];
+export const USER_SORTS = ["newest", "reports", "seen"] as const;
+export type UserSort = (typeof USER_SORTS)[number];
 
 export type Role = "lifter" | "coach" | "client" | "both";
 
@@ -40,13 +56,28 @@ export interface Note {
 
 export const NOTE_MAX = 1000;
 
+// Reports grouped by who they're about (a profile, or the author of a post or comment): one pass over reports.
+const REPORTED = `SELECT who, COUNT(*) AS total, SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) AS open FROM (
+    SELECT r.status, CASE r.kind WHEN 'profile' THEN r.target_id
+      WHEN 'post' THEN (SELECT account_id FROM posts WHERE id = r.target_id)
+      ELSE (SELECT account_id FROM post_comments WHERE id = r.target_id) END AS who
+    FROM reports r) WHERE who IS NOT NULL GROUP BY who`;
+
+// ?1 is the youngest birth year that's 18 or over this year.
 const ROW_SQL = `SELECT a.id, a.email, a.created_at, a.last_seen,
+    sp.handle AS handle, sp.suspended AS suspended, sp.suspended_until AS suspended_until, sp.boards_off AS boards_off,
+    COALESCE(rc.open, 0) AS open_reports, COALESCE(rc.total, 0) AS reports,
+    (EXISTS (SELECT 1 FROM team_members t WHERE t.account_id = a.id AND t.birth_year > ?1)
+      OR EXISTS (SELECT 1 FROM sync_records sr WHERE sr.account_id = a.id AND sr.key = 'profile'
+        AND json_valid(sr.body) AND json_extract(sr.body, '$.birthYear') > ?1)) AS minor,
     (SELECT GROUP_CONCAT(DISTINCT provider) FROM account_identities i WHERE i.account_id = a.id) AS providers,
     (SELECT COUNT(*) FROM account_sessions x WHERE x.account_id = a.id) AS devices,
     (SELECT COUNT(*) FROM sync_events e WHERE e.account_id = a.id AND e.body IS NOT NULL) AS events,
     (EXISTS (SELECT 1 FROM coach_accounts c WHERE c.account_id = a.id) OR EXISTS (SELECT 1 FROM coach_links l WHERE l.coach_id = a.id)) AS coach,
     EXISTS (SELECT 1 FROM coach_links l WHERE l.client_id = a.id) AS client
-  FROM accounts a`;
+  FROM accounts a LEFT JOIN social_profiles sp ON sp.account_id = a.id LEFT JOIN (${REPORTED}) rc ON rc.who = a.id`;
+
+const adultYear = (now: number) => new Date(now).getUTCFullYear() - 18;
 
 const roleOf = (coach: unknown, client: unknown): Role =>
   n(coach) && n(client) ? "both" : n(coach) ? "coach" : n(client) ? "client" : "lifter";
@@ -60,18 +91,46 @@ const toRow = (r: Record<string, unknown>): AccountRow => ({
   devices: n(r.devices),
   events: n(r.events),
   role: roleOf(r.coach, r.client),
+  handle: r.handle == null ? null : String(r.handle),
+  state: stateOf(r),
+  openReports: n(r.open_reports),
+  reports: n(r.reports),
+  minor: !!n(r.minor),
 });
 
-/** Accounts matching an email (part of one) or an account id; the newest first. Empty search: the latest. */
-export async function searchAccounts(q: string, limit = 50): Promise<AccountRow[]> {
+const WHERE: Record<UserFilter, string> = {
+  all: "",
+  reported: "open_reports > 0",
+  actioned: "(suspended != 0 OR boards_off != 0)",
+  teens: "minor = 1",
+};
+const ORDER: Record<UserSort, string> = {
+  newest: "created_at DESC",
+  reports: "open_reports DESC, reports DESC, created_at DESC",
+  seen: "last_seen DESC",
+};
+
+/**
+ * Accounts matching an email (part of one), an account id or a Friends handle, filtered and sorted for the Users tab;
+ * the newest first by default. Empty search: the latest.
+ */
+export async function searchAccounts(
+  q: string,
+  limit = 50,
+  opts: { filter?: UserFilter; sort?: UserSort; now?: number } = {},
+): Promise<AccountRow[]> {
   const term = q.trim().toLowerCase().slice(0, 200);
   const like = `%${term.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
-  const rows = term
-    ? await query(
-        `${ROW_SQL} WHERE a.id = ? OR a.email LIKE ? ESCAPE '\\' OR a.id IN (SELECT account_id FROM account_identities WHERE email LIKE ? ESCAPE '\\') ORDER BY a.created_at DESC LIMIT ?`,
-        [q.trim(), like, like, limit],
-      )
-    : await query(`${ROW_SQL} ORDER BY a.created_at DESC LIMIT ?`, [limit]);
+  const handle = term.replace(/^@/, "");
+  const match = term
+    ? `(x.id = ?2 OR x.email LIKE ?3 ESCAPE '\\' OR x.handle = ?4 OR x.id IN (SELECT account_id FROM account_identities WHERE email LIKE ?3 ESCAPE '\\'))`
+    : "";
+  const where = [match, WHERE[opts.filter ?? "all"]].filter(Boolean).join(" AND ");
+  const rows = await query(
+    `SELECT x.* FROM (${ROW_SQL}) x ${where ? `WHERE ${where}` : ""}
+     ORDER BY ${ORDER[opts.sort ?? "newest"]} LIMIT ${Math.max(1, Math.min(200, Math.round(limit)))}`,
+    term ? [adultYear(opts.now ?? Date.now()), q.trim(), like, handle] : [adultYear(opts.now ?? Date.now())],
+  );
   return rows.map(toRow);
 }
 
@@ -126,8 +185,8 @@ export async function coachTotals(now = Date.now(), since = now - 30 * 86_400_00
   };
 }
 
-export async function accountDetail(id: string): Promise<AccountDetail | null> {
-  const rows = await query(`${ROW_SQL} WHERE a.id = ?`, [id]);
+export async function accountDetail(id: string, now = Date.now()): Promise<AccountDetail | null> {
+  const rows = await query(`${ROW_SQL} WHERE a.id = ?2`, [adultYear(now), id]);
   if (!rows[0]) return null;
   const row = toRow(rows[0]);
   const [identities, sessions, sync, records, notes] = await Promise.all([
