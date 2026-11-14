@@ -22,6 +22,7 @@ import { currentLang } from "./i18n";
 import { isNative } from "./juice";
 import { dayStart, mondayIn, plan, proState, type Message, type MessageKind, type PlanInput } from "./messages";
 import { SITE_URL } from "./site";
+import { isTeen } from "./teen";
 import type { Profile } from "./types";
 
 export const HORIZON_DAYS = 14;
@@ -240,6 +241,32 @@ export async function deleteEmail(): Promise<boolean> {
   try {
     localStorage.removeItem(SUB_KEY);
   } catch {}
+  return true;
+}
+
+/**
+ * Email is on by default (Melvin, 2026-11-14: "Email me setting should be on by default for all users"): once a
+ * signed-in adult's device has synced with the account (so a fresh phone doesn't start a second subscription before
+ * the account's settings arrive), the account's verified address is subscribed unless the lifter turned email off.
+ * Under-18s start with it off and can turn it on. Returns the new prefs, or null when nothing should change.
+ */
+export function autoEmailPrefs(
+  profile: Profile,
+  email: string | null,
+  synced: boolean,
+  now = Date.now(),
+): NonNullable<Profile["messages"]> | null {
+  const prefs = profile.messages ?? { push: {} };
+  if (!email || !synced || !profile.onboarded || prefs.email || prefs.emailOff || isTeen(profile, now)) return null;
+  return { ...prefs, startedAt: prefs.startedAt ?? now, email: { address: email, consentAt: now, status: "pending", kinds: {} } };
+}
+
+/** Turns email on by default (autoEmailPrefs) and makes this device the one that keeps the subscription up to date. */
+export function startDefaultEmail(profile: Profile, synced: boolean, save: (m: NonNullable<Profile["messages"]>) => void): boolean {
+  const next = autoEmailPrefs(profile, accountEmail(), synced);
+  if (!next) return false;
+  ensureSub();
+  save(next);
   return true;
 }
 

@@ -42,6 +42,10 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 - **The website's `/features/` lists every feature, a compatibility table of every connection and the newest features, and stays current** (Melvin, 2026-11-12: "keep it up to date with all new features"). It comes from one file, `src/content/features.ts`, and is in all six site languages (the other languages' words in `src/locales/site/features/<lang>.ts`, same ids). A change that adds, removes or renames a feature a lifter would notice, moves one between Free, Pro and Labs, or adds a connection, device or platform updates that file in the same change (a new feature with today's `added` day, which puts it under Newest, and its words in all six languages). A connection that isn't live yet says Investigating (it depends on another company's approval) or Coming soon (only a store listing left). `features.test.ts` fails when a lab, Pro feature, cloud service, import source or feature page is missing, or a language lacks a line. Details in [Features page](docs/decisions/features-page.md).
 
+## Email (rule, Melvin, 2026-11-14)
+
+- **"Email me" is on by default** for every signed-in adult, existing accounts included, with the account's verified address. Under-18s start with it off. Turning it off syncs (`messages.emailOff`), the sign-in screen says emails come with an account, and every email has one-click unsubscribe and its kind's own switch in Settings › Reminders. Details in [Reminders and lifecycle messages](docs/decisions/reminders-and-lifecycle-messages.md).
+
 ## Product rules (apply to every screen)
 
 ### Action over stats (rule, Melvin, 2026-11-09)

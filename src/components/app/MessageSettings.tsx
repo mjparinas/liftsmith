@@ -101,6 +101,7 @@ export function MessageSettings() {
       ...prefs,
       startedAt: startedAt(prefs),
       email: { address: accountEmail, consentAt: Date.now(), status: "pending", kinds: email?.kinds ?? {} },
+      emailOff: undefined,
     };
     setProfile({ messages: next });
     const s = await syncEmail({ ...profile, messages: next }, stats, { resubscribe });
@@ -135,7 +136,8 @@ export function MessageSettings() {
       oops();
       return setStatus(t("msg.offline"));
     }
-    save({ email: undefined });
+    // Remembered on the profile (it syncs), so email stays off on every device instead of coming back on by default.
+    save({ email: undefined, emailOff: true });
     setStatus(t("msg.stopped"));
   };
 

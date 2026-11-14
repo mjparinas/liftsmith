@@ -300,6 +300,9 @@ export interface Profile {
     };
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
+    /** The lifter turned "Email me" off. Email is on by default for signed-in adults (Melvin, 2026-11-14), so this
+     *  is what keeps it off on every device. */
+    emailOff?: boolean;
   };
   /** One-rep max goals with a date (goals.ts). */
   goals?: import("./goals").LiftGoal[];
