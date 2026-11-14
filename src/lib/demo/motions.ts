@@ -44,6 +44,8 @@ export interface Motion {
   plates?: number;
   /** Whole-figure roll about the forward axis in degrees (side planks); the figure is then set on the floor. */
   roll?: (d: number) => number;
+  /** Whole-figure turn about the vertical axis in degrees (a jump with a half turn). */
+  yaw?: (d: number) => number;
 }
 
 // ---------- shared helpers ----------
@@ -1152,16 +1154,23 @@ function overheadExtension(o: { lying?: boolean }): Motion {
 }
 
 // ---------- legs ----------
-function lunge(o: { rear?: "floor" | "bench" | "box"; step?: "back" | "walk"; hands: "dumbbells" | "hips"; lean?: number }): Motion {
+function lunge(o: {
+  rear?: "floor" | "bench" | "box";
+  step?: "back" | "walk";
+  hands: "dumbbells" | "hips";
+  lean?: number;
+  /** Curtsy: the left foot steps behind and across the right. */
+  curtsy?: boolean;
+}): Motion {
   return {
     phases: TEMPO.lowerFirst("Lower · 2s", "Drive · 1s", "Tall", "Bottom"),
     load: o.hands === "dumbbells" ? "dumbbell" : "none",
     pose(B, d) {
       const rearH = o.rear === "bench" ? 0.45 : o.rear === "box" ? 0.42 : 0;
-      const frontA = V(0.34, ANKLE_H, 0.11);
-      let rearA = V(rearH ? -0.58 : -0.5, rearH + (rearH ? 0.05 : ANKLE_H + 0.02), -0.11);
+      const frontA = o.curtsy ? V(0.12, ANKLE_H, 0.13) : V(0.34, ANKLE_H, 0.11);
+      let rearA = o.curtsy ? V(-0.34, ANKLE_H + 0.02, 0.26) : V(rearH ? -0.58 : -0.5, rearH + (rearH ? 0.05 : ANKLE_H + 0.02), -0.11);
       if (o.step === "back") rearA = lerpV(V(0.02, ANKLE_H, -0.11), rearA, clamp(d * 2.2, 0, 1));
-      const hipX = rearH ? -0.04 : -0.06;
+      const hipX = o.curtsy ? -0.08 : rearH ? -0.04 : -0.06;
       const topY = Math.min(standY(B, frontA[0] - hipX, 0.99), standY(B, rearA[0] - hipX, 0.99) + rearH * 0.5);
       const botY = rearH ? 0.52 : 0.07 + B.thigh * 0.96;
       const hip = V(hipX, lerp(topY, botY, ease(d)));
@@ -1173,7 +1182,7 @@ function lunge(o: { rear?: "floor" | "bench" | "box"; step?: "back" | "walk"; ha
         sh,
         ankle: per(rearA, frontA),
         foot: { L: rearH ? 75 : lerp(0, 55, clamp(d * 2.2, 0, 1)), R: 0 },
-        kneePole: per(V(1, -0.3, -0.1), V(1, 0, 0.2)),
+        kneePole: per(o.curtsy ? V(1, -0.4, 0.3) : V(1, -0.3, -0.1), V(1, 0, 0.2)),
         hand,
         elbowPole: o.hands === "hips" ? V(-0.4, 0, 1) : V(-1, 0, 0.3),
         headBlend: 0.8,
@@ -3501,6 +3510,320 @@ function jumpSquat(): Motion {
   };
 }
 
+// ---------- jumps and hops (audit batch 4) ----------
+/**
+ * Jumps and hops, two to a loop (d 0 → 0.5 and 0.5 → 1). Each half dips, takes off, flies and
+ * lands soft. Options give each its look: how deep the dip and how high the flight, travelling
+ * forward or sideways (the second half jumps back, or walks back after a broad jump), one leg,
+ * landing wide and then narrow, knees tucked at the top, a half turn in the air, or a rope turning.
+ */
+interface HopOpts {
+  /** Squat depth of the dip and the landing, 0 to 1. */
+  dip: number;
+  /** Height of the flight, in metres. */
+  air: number;
+  arms: "swing" | "rope" | "chest" | "floor";
+  /** Each jump moves this far forward (x) or to the right (z). */
+  travel?: { x?: number; z?: number };
+  /** After a forward jump, walk back instead of jumping back. */
+  walkBack?: boolean;
+  /** Hops on the right foot; the left knee is bent with the foot behind. */
+  oneLeg?: boolean;
+  /** Half stance width on each landing (the first half lands on `wide[1]`, the second on `wide[0]`). */
+  wide?: [number, number];
+  /** Knees pulled up to the chest at the top. */
+  tuck?: boolean;
+  /** Degrees turned in the air on each jump. */
+  turn?: number;
+  /** Rope turns per jump (double-unders turn twice). */
+  turns?: number;
+  /** The hands cross in front on the first jump (rope crossovers). */
+  cross?: boolean;
+  /** Boxer skip: the weight shifts, one foot just off the floor on each hop. */
+  skip?: boolean;
+  labels?: [string, string];
+}
+function hop(o: HopOpts): Motion {
+  const [l1, l2] = o.labels ?? ["Jump", "Jump"];
+  const halfRows = (off: number, label: string): PhaseRow[] =>
+    o.walkBack && off
+      ? [[1.3, 0.5, 1, "Walk back", 0.3]]
+      : [
+          [0.3, off, off + 0.15, "Dip", 0.6],
+          [0.32, off + 0.15, off + 0.35, label, 1],
+          [0.3, off + 0.35, off + 0.5, "Land soft", 0.5],
+        ];
+  const quick = o.dip < 0.15 && !o.travel?.x;
+  const rows = [...halfRows(0, l1), ...halfRows(0.5, l2)];
+  const phases: PhaseRow[] = quick ? rows.map(([dur, a, b, label, eff]): PhaseRow => [dur * 0.55, a, b, label, eff]) : rows;
+  const sq = squat({ hold: "arms" });
+  const tx = o.travel?.x ?? 0,
+    tz = o.travel?.z ?? 0;
+  // where each half starts and ends, as (x, z) offsets
+  const ends = (second: boolean): [Vec, Vec] => {
+    const a = V(0, 0, -tz / 2),
+      b = V(tx, 0, tz / 2);
+    return second ? [b, a] : [a, b];
+  };
+  const halfOf = (d: number) => {
+    const second = d >= 0.5;
+    return { second, h: clamp((second ? d - 0.5 : d) * 2, 0, 1) };
+  };
+  const flight = (h: number) => clamp((h - 0.3) / 0.4, 0, 1);
+  return {
+    phases,
+    load: "none",
+    stance: 0.14,
+    yaw: o.turn ? (d) => (halfOf(d).second ? o.turn! : 0) + o.turn! * ease(flight(halfOf(d).h)) : undefined,
+    pose(B, d) {
+      const { second, h } = halfOf(d);
+      const [from, to] = ends(second);
+      const leg = legMax(B) * 0.99;
+      const walking = o.walkBack && second;
+      // how deep, how high and how far along this half is
+      const depth = walking
+        ? 0
+        : o.dip *
+          (h < 0.3
+            ? ease(h / 0.3)
+            : h < 0.4
+              ? 1 - (h - 0.3) / 0.1
+              : h < 0.7
+                ? 0
+                : h < 0.85
+                  ? (0.75 * (h - 0.7)) / 0.15
+                  : 0.75 * (1 - (h - 0.85) / 0.15));
+      const u = walking ? 0 : flight(h);
+      const up = walking ? 0 : Math.sin(Math.PI * u) * o.air;
+      const along = walking ? h : ease(u);
+      const at = lerpV(from, to, along);
+      const p = sq.pose(B, clamp(depth, 0, 1));
+      const stanceZ = o.wide ? lerp(o.wide[second ? 1 : 0], o.wide[second ? 0 : 1], ease(u)) : 0.13 * B.s;
+      const tuck = o.tuck ? Math.sin(Math.PI * u) : 0;
+      let hip = add(p.hip, V(at[0], up, at[2]));
+      const lean = leanOf(p.hip, p.sh) + 25 * tuck;
+      // feet: under the hips, lifted in flight, tucked to the chest at the top of a tuck jump
+      const footY = ANKLE_H + up * 0.9;
+      const foot = (sgn: number): Vec => {
+        let a = V(at[0] + 0.02, footY, at[2] + sgn * stanceZ);
+        if (walking) {
+          // two steps each foot, the left leading
+          const w = (k: number) => clamp(h * 4 - k, 0, 1);
+          const steps = sgn < 0 ? ease(w(0)) + ease(w(2)) : ease(w(1)) + ease(w(3));
+          const lift = sgn < 0 ? Math.sin(Math.PI * w(0)) + Math.sin(Math.PI * w(2)) : Math.sin(Math.PI * w(1)) + Math.sin(Math.PI * w(3));
+          a = V(lerp(from[0], to[0], steps / 2) + 0.02, ANKLE_H + 0.06 * lift, sgn * stanceZ);
+        }
+        if (tuck) a = lerpV(a, V(hip[0] + 0.12, hip[1] - B.thigh * 0.55, at[2] + sgn * 0.12), tuck * 0.85);
+        if (o.skip && sgn === (second ? 1 : -1)) a = add(a, V(0.06, 0.05 * (1 - Math.abs(2 * h - 1)) + 0.03, 0));
+        return a;
+      };
+      let ankleL = foot(-1),
+        ankleR = foot(1);
+      if (o.oneLeg) {
+        ankleR = V(at[0] + 0.02, footY, at[2] + 0.1);
+        hip = add(hip, V(0, 0, 0.04));
+      }
+      if (walking) hip = V(lerp(from[0], to[0], ease(h)) + p.hip[0], standY(B, 0.04, 0.99), 0);
+      // keep both standing legs in reach: a wide landing sits lower
+      for (const a of o.oneLeg ? [ankleR] : [ankleL, ankleR]) {
+        const s = a[2] > hip[2] ? 1 : -1;
+        const dx = a[0] - hip[0],
+          dz = a[2] - (hip[2] + s * B.hipW);
+        hip[1] = Math.min(hip[1], a[1] + Math.sqrt(Math.max(0.01, leg * leg - dx * dx - dz * dz)));
+      }
+      const sh = add(torsoAt(B, V(hip[0], hip[1]), lean), V(0, 0, hip[2]));
+      if (o.oneLeg)
+        ankleL = within(V(hip[0], hip[1], hip[2] - B.hipW), V(hip[0] - B.shin * 0.8, hip[1] - B.thigh * 0.75, hip[2] - 0.1), leg);
+      // arms
+      let hand: Pose["hand"];
+      let elbowPole: Pose["elbowPole"] = V(-0.3, -1, 0.3);
+      if (o.arms === "rope") {
+        const spin = 2 * Math.PI * (o.turns ?? 1) * (walking ? 0 : h);
+        const c = (sgn: number) => {
+          const crossed = o.cross && !second ? Math.sin(Math.PI * u) : 0;
+          return V(
+            hip[0] + 0.16 + 0.04 * Math.cos(spin),
+            hip[1] + 0.02 + 0.04 * Math.sin(spin),
+            hip[2] + sgn * lerp(B.hipW + 0.2, -0.1, crossed),
+          );
+        };
+        hand = per(c(-1), c(1));
+        elbowPole = V(-1, -0.2, 0.6);
+      } else if (o.arms === "chest") {
+        const c = add(sh, V(0.2, -0.18, 0));
+        hand = per(add(c, V(0, 0, -0.07)), add(c, V(0, 0, 0.07)));
+        elbowPole = V(0.2, -1, 1);
+      } else {
+        // swing: back on the dip, up in the air, down on the landing
+        const a = walking
+          ? 0
+          : h < 0.3
+            ? -40 * ease(h / 0.3)
+            : h < 0.7
+              ? lerp(-40, o.tuck ? 60 : 150, ease((h - 0.3) / 0.4))
+              : lerp(o.tuck ? 60 : 150, 0, (h - 0.7) / 0.3);
+        const m = (sgn: number): Vec => {
+          const s = swing(V(sh[0], sh[1], 0), reach(B) * 0.95, a);
+          let v = V(s[0], s[1], sh[2] + sgn * (B.shW + 0.03));
+          if (o.arms === "floor") {
+            // frog jumps touch the floor between the feet at the bottom
+            const reachDown = clamp((depth / o.dip - 0.5) * 2, 0, 1) * (h < 0.4 ? 1 : 0);
+            v = within(side(B, sgn, sh), lerpV(v, V(at[0] + 0.25, 0.05, at[2] + sgn * 0.12), reachDown), reach(B) * 0.98);
+          }
+          return v;
+        };
+        hand = per(m(-1), m(1));
+      }
+      return {
+        hip,
+        sh,
+        hand,
+        ankle: per(ankleL, ankleR),
+        foot: walking ? 0 : (Math.min(up, 0.1) / 0.1) * 35,
+        kneePole: o.tuck ? V(1, 0.6, 0.3) : per(V(1, 0, -0.45), o.oneLeg ? V(1, 0, 0.2) : V(1, 0, 0.45)),
+        elbowPole,
+        headBlend: 0.75,
+      };
+    },
+  };
+}
+
+/** Jumping lunges: down in a lunge, jump and switch the legs in the air, land in a lunge on the other leg. */
+function jumpingLunge(): Motion {
+  return {
+    phases: [
+      [0.45, 0, 0.2, "Lower", 0.7],
+      [0.35, 0.2, 0.5, "Jump and switch", 1],
+      [0.45, 0.5, 0.7, "Lower", 0.7],
+      [0.35, 0.7, 1, "Jump and switch", 1],
+    ],
+    load: "none",
+    stance: 0.11,
+    pose(B, d) {
+      // k runs 0 (right leg in front) to 1 (left in front) and back
+      const second = d >= 0.5;
+      const h = (second ? d - 0.5 : d) * 2;
+      const fly = clamp((h - 0.4) / 0.6, 0, 1);
+      const k = second ? 1 - ease(fly) : ease(fly);
+      const air = Math.sin(Math.PI * fly) * 0.14;
+      const sink = h < 0.4 ? ease(h / 0.4) : 1 - Math.sin(Math.PI * fly * 0.5);
+      const front = V(0.3, ANKLE_H, 0.11),
+        rear = V(-0.46, ANKLE_H + 0.02, 0.11);
+      const pos = (t: number, z: number): Vec => {
+        const v = lerpV(front, rear, t);
+        return V(v[0], v[1] + air * 0.9 + 0.06 * Math.sin(Math.PI * t) * Math.sin(Math.PI * fly), z);
+      };
+      const ankleR = pos(k, 0.11),
+        ankleL = pos(1 - k, -0.11);
+      const topY = standY(B, 0.38, 0.97);
+      const botY = 0.07 + B.thigh * 0.98;
+      const hip = V(-0.06, lerp(topY, botY, clamp(sink, 0, 1) * 0.85 + 0.15) + air);
+      const leg = legMax(B) * 0.99;
+      for (const a of [ankleL, ankleR]) hip[1] = Math.min(hip[1], a[1] + Math.sqrt(Math.max(0.01, leg * leg - (a[0] - hip[0]) ** 2)));
+      const sh = torsoAt(B, hip, 6);
+      // the arms swing opposite the front leg
+      const arm = (sgn: number, fwd: number): Vec => {
+        const s = swing(V(sh[0], sh[1], 0), reach(B) * 0.85, lerp(-30, 40, fwd));
+        return V(s[0], s[1] + 0.06, sgn * (B.shW + 0.06));
+      };
+      return {
+        hip,
+        sh,
+        ankle: per(ankleL, ankleR),
+        foot: { L: lerp(0, 55, k), R: lerp(55, 0, k) },
+        kneePole: per(V(1, -0.3, -0.1), V(1, -0.3, 0.1)),
+        hand: per(arm(-1, 1 - k), arm(1, k)),
+        elbowPole: V(-1, -0.4, 0.2),
+        headBlend: 0.8,
+      };
+    },
+  };
+}
+
+/** Butt kicks: jogging on the spot, each heel kicking up to the glutes. */
+function buttKicks(): Motion {
+  return {
+    phases: [
+      [0.3, 0, 1, "Kick", 0.85],
+      [0.3, 1, 0, "Kick", 0.85],
+    ],
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const hip = V(0.02, standY(B) + 0.02);
+      const sh = torsoAt(B, hip, 4);
+      // the thigh stays down and the shin folds up behind it
+      const kick = (k: number, z: number): Vec => {
+        const knee = V(hip[0] + 0.02, hip[1] - B.thigh * 0.98);
+        const a = rad(lerp(0, 165, ease(k)));
+        return V(knee[0] - Math.sin(a) * B.shin * 0.95, knee[1] - Math.cos(a) * B.shin * 0.95 + 0.01 * (1 - k), z);
+      };
+      // the left heel kicks as d nears 1, the right as it nears 0: one foot is always down
+      const kL = clamp((d - 0.4) / 0.6, 0, 1),
+        kR = clamp((0.6 - d) / 0.6, 0, 1);
+      const ankle = per(kick(Math.sin((Math.PI * kL) / 2), -0.1), kick(Math.sin((Math.PI * kR) / 2), 0.1));
+      const arm = (k: number, sgn: number): Vec => {
+        const p = swing(side(B, sgn, sh), reach(B) * 0.8, lerp(-30, 40, k));
+        return V(p[0], p[1] + 0.1, sgn * (B.shW + 0.06));
+      };
+      return {
+        hip,
+        sh,
+        ankle,
+        foot: { L: 60 * kL, R: 60 * kR },
+        hand: per(arm(1 - d, -1), arm(d, 1)),
+        kneePole: V(0.3, -1, 0),
+        elbowPole: V(-1, -0.4, 0.2),
+        headBlend: 1,
+      };
+    },
+  };
+}
+
+/**
+ * Skater squat and shrimp squat: a one-leg squat on the right, the left knee lowering to the floor
+ * behind. The skater reaches the arms forward; the shrimp holds the back foot in its hand.
+ */
+function skaterSquat(o: { shrimp?: boolean }): Motion {
+  return {
+    phases: TEMPO.lowerFirst("Lower · 2s", "Stand · 1s", "Tall", "Knee down"),
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const e = ease(d);
+      const ankleR = V(0.08, ANKLE_H, 0.1);
+      const hipX = lerp(0.0, -0.14, e);
+      const topY = standY(B, ankleR[0] - hipX, 0.99);
+      const botY = 0.08 + B.thigh * 0.98;
+      const hip = V(hipX, lerp(topY, botY, e), 0.03);
+      const lean = lerp(10, 42, e);
+      const sh = add(torsoAt(B, V(hip[0], hip[1]), lean), V(0, 0, 0.03));
+      const leg = legMax(B) * 0.99;
+      const hipL = V(hip[0], hip[1], hip[2] - B.hipW);
+      // back foot: off the floor behind (shrimp: folded up to the glutes)
+      const ankleL = o.shrimp
+        ? within(hipL, V(hip[0] - B.shin * 0.45, hip[1] - B.thigh * 0.25, -0.12), leg)
+        : within(hipL, V(lerp(hip[0] - 0.3, hip[0] - 0.12 - B.shin * 0.85, e), lerp(hip[1] - B.thigh * 1.25, 0.12, e), -0.1), leg);
+      const fwd = (sgn: number): Vec => {
+        const p = add(sh, V(reach(B) * lerp(0.35, 0.95, e), lerp(-0.45, -0.05, e), 0));
+        return V(p[0], p[1], sgn * (B.shW + 0.02));
+      };
+      const shL = V(sh[0], sh[1], sh[2] - B.shW);
+      const hand = o.shrimp ? per(within(shL, add(ankleL, V(0.02, 0.02, -0.03)), reach(B) * 0.98), fwd(1)) : per(fwd(-1), fwd(1));
+      return {
+        hip,
+        sh,
+        ankle: per(ankleL, ankleR),
+        foot: { L: 60, R: 0 },
+        kneePole: per(o.shrimp ? V(0.2, -1, 0) : V(0.6, -1, 0), V(1, 0, 0.2)),
+        hand,
+        elbowPole: o.shrimp ? per(V(0.2, -1, -0.3), V(-0.2, -1, 0.3)) : V(-0.2, -1, 0.3),
+        headBlend: 0.7,
+      };
+    },
+  };
+}
+
 /** Box jump: dip, jump onto the box and land in a squat, stand tall, then back down. */
 function boxJump(): Motion {
   const box = { x: 0.6, top: 0.45 };
@@ -3959,7 +4282,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
   // Program ladder steps and lifts (programs.ts). Close cousins of existing motions until each gets its own.
   "split-squat": () => lunge({ rear: "floor", hands: "hips" }),
-  "shrimp-squat": () => lunge({ rear: "floor", hands: "hips", lean: 16 }),
+  "shrimp-squat": () => skaterSquat({ shrimp: true }),
   "pistol-squat": () => squat({ hold: "arms", depth: 1.05 }),
   "wall-push-up": () => pushUp({ hands: 0.45 }),
   "pseudo-planche-push-up": () => pushUp({ width: 0.1, close: true }),
@@ -4061,10 +4384,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "high-knees": () => run({ lift: 0.8, lean: 0 }),
   "jump-squat": jumpSquat,
   "box-jump": boxJump,
-  "jumping-lunge": () => lunge({ step: "back", hands: "hips" }),
+  "jumping-lunge": jumpingLunge,
   "wall-sit": () => squat({ hold: "arms", depth: 0.8 }),
   "lateral-lunge": cossack,
-  "curtsy-lunge": () => lunge({ step: "back", hands: "hips" }),
+  "curtsy-lunge": () => lunge({ step: "back", hands: "hips", curtsy: true }),
   "single-leg-glute-bridge": () => bridge({ single: true }),
   "donkey-kick": () => allFours({ kind: "donkey" }),
   "bird-dog": () => allFours({ kind: "birdDog" }),
@@ -4179,8 +4502,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "ski-erg": () => pulldown({ straightArm: true }),
   elliptical,
   "stair-climber": () => run({ lift: 0.45, lean: 10 }),
-  "jump-rope": () => calfRaise({ load: "none" }),
-  "double-unders": () => calfRaise({ load: "none" }),
+  "jump-rope": () => hop({ dip: 0.06, air: 0.07, arms: "rope" }),
+  "double-unders": () => hop({ dip: 0.1, air: 0.16, arms: "rope", turns: 2 }),
   "battle-ropes": battleRopes,
   "sled-push": sledPush,
   "sled-pull": () => bentRow({ load: "handle", lean: 40 }),
@@ -4311,7 +4634,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-spanish-squat": () => squat({ hold: "arms", depth: 0.8 }),
   "heels-raised-squat": () => squat({ hold: "arms" }),
   "prisoner-squat": () => squat({ hold: "arms" }),
-  "skater-squat": () => lunge({ rear: "floor", hands: "hips", lean: 16 }),
+  "skater-squat": () => skaterSquat({}),
   "narrow-leg-press": legPress,
   "wide-leg-press": legPress,
   "single-leg-extension": () => kneeMachine({ extend: true }),
@@ -4340,7 +4663,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-monster-walk": bandMonsterWalk,
   "db-swing": kbSwing,
   "hip-airplane": () => rdl({ load: "none", single: true }),
-  "db-curtsy-lunge": () => lunge({ step: "back", hands: "dumbbells" }),
+  "db-curtsy-lunge": () => lunge({ step: "back", hands: "dumbbells", curtsy: true }),
   "side-lying-adduction": () => sideLying("adduct"),
   "cable-hip-adduction": () => kickback({}),
   "plie-squat": () => squat({ hold: "arms" }),
@@ -4348,7 +4671,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "single-leg-calf-raise": () => calfRaise({ single: true, load: "none" }),
   "db-seated-calf-raise": () => calfRaise({ load: "dumbbell", hold: "each" }),
   "bent-over-calf-raise": () => calfRaise({ step: true, load: "none" }),
-  "pogo-hops": () => calfRaise({ load: "none" }),
+  "pogo-hops": () => hop({ dip: 0.05, air: 0.09, arms: "swing" }),
   "plank-shoulder-tap": () => shoulderTaps(highPlankBase),
   "high-plank": () => fourHold(highPlankBase),
   "side-plank-reach": () => sidePlank({}),
@@ -4381,14 +4704,14 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-dead-bug": deadBug,
   "band-pallof-hold": pallof,
   inchworm: pikePushUp,
-  "broad-jump": jumpSquat,
+  "broad-jump": () => hop({ dip: 0.55, air: 0.22, arms: "swing", travel: { x: 0.95 }, walkBack: true, labels: ["Jump forward", ""] }),
   sprint: () => run({ lift: 0.7, lean: 12 }),
   "skater-jumps": () => skater({ dist: 0.42, height: 0.12, label: ["Jump right", "Jump left"] }),
-  "tuck-jump": jumpSquat,
+  "tuck-jump": () => hop({ dip: 0.4, air: 0.32, arms: "swing", tuck: true, labels: ["Jump, knees up", "Jump, knees up"] }),
   "squat-thrust": burpee,
   "star-jump": jumpingJack,
   "lateral-shuffle": lateralShuffle,
-  "butt-kicks": () => run({ lift: 0.3, lean: 2 }),
+  "butt-kicks": buttKicks,
   "plank-jack": plankJack,
   // batch b2 (2026-11-11)
   "smith-close-grip-press": () => benchPress({ load: "barbell", grip: 0.16, close: true }),
@@ -4527,10 +4850,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "smith-seated-calf-raise": () => calfRaise({ machine: true, load: "none" }),
   "kb-calf-raise": () => calfRaise({ step: true, load: "kettlebell", hold: "each" }),
   "calf-raise-hold": () => calfRaise({ load: "none" }),
-  "pogo-jumps": jumpSquat,
+  "pogo-jumps": () => hop({ dip: 0.06, air: 0.12, arms: "swing" }),
   "lateral-bound": () => skater({ dist: 0.6, height: 0.2, label: ["Bound right", "Bound left"] }),
   "depth-jump": boxJump,
-  "single-leg-hop": jumpSquat,
+  "single-leg-hop": () => hop({ dip: 0.2, air: 0.12, arms: "swing", oneLeg: true, labels: ["Hop", "Hop"] }),
   "trap-bar-jump": jumpSquat,
   "high-handle-trap-bar-deadlift": () => deadlift({ trap: true }),
   "landmine-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
@@ -4606,17 +4929,18 @@ const MOTIONS: Record<string, () => Motion> = {
   "lateral-burpee": burpee,
   "seal-jack": jumpingJack,
   "cross-jack": jumpingJack,
-  "squat-jack": jumpSquat,
+  "squat-jack": () => hop({ dip: 0.55, air: 0.08, arms: "chest", wide: [0.12, 0.34], labels: ["Jump out", "Jump in"] }),
   "plank-to-squat": burpee,
-  "frog-jump": jumpSquat,
-  "in-and-out-jumps": jumpSquat,
+  "frog-jump": () =>
+    hop({ dip: 0.95, air: 0.18, arms: "floor", travel: { x: 0.7 }, walkBack: true, wide: [0.24, 0.24], labels: ["Jump forward", ""] }),
+  "in-and-out-jumps": () => hop({ dip: 0.35, air: 0.1, arms: "swing", wide: [0.1, 0.3], labels: ["Jump out", "Jump in"] }),
   "fast-feet": () => run({ lift: 0.25, lean: 5 }),
   carioca: () => run({ lift: 0.35, lean: 0 }),
   "skipping-drill": () => run({ lift: 0.8, lean: 0 }),
   "power-skip": () => run({ lift: 0.9, lean: 0 }),
   "shadow-boxing": stand,
   "jump-rope-high-knees": () => run({ lift: 0.8, lean: 0 }),
-  "jump-rope-single-leg": jumpSquat,
+  "jump-rope-single-leg": () => hop({ dip: 0.08, air: 0.07, arms: "rope", oneLeg: true, labels: ["Hop", "Hop"] }),
   "recumbent-bike": bike,
   rucking: walk,
   hiking: walk,
@@ -4746,11 +5070,11 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-frog-pump": () => bridge({}),
   "kb-walking-lunge": () => lunge({ step: "walk", hands: "dumbbells" }),
   "kb-lateral-lunge": cossack,
-  "kb-curtsy-lunge": () => lunge({ step: "back", hands: "hips" }),
+  "kb-curtsy-lunge": () => lunge({ step: "back", hands: "hips", curtsy: true }),
   "kb-glute-bridge": () => bridge({}),
   "kb-jump-squat": jumpSquat,
   "barbell-lateral-lunge": cossack,
-  "barbell-curtsy-lunge": () => lunge({ step: "back", hands: "hips" }),
+  "barbell-curtsy-lunge": () => lunge({ step: "back", hands: "hips", curtsy: true }),
   "barbell-jump-squat": jumpSquat,
   "barbell-front-rack-lunge": () => lunge({ hands: "hips" }),
   "box-front-squat": () => squat({ hold: "front", load: "barbell", box: true }),
@@ -4865,20 +5189,21 @@ const MOTIONS: Record<string, () => Motion> = {
   "stair-climber-intervals": () => run({ lift: 0.45, lean: 10 }),
   "backward-treadmill-walk": () => backwards(walk(), "Walk backwards"),
   "sled-sprint": sledPush,
-  "jump-rope-crossover": () => calfRaise({ load: "none" }),
-  "jump-rope-boxer-skip": () => calfRaise({ load: "none" }),
+  "jump-rope-crossover": () => hop({ dip: 0.08, air: 0.1, arms: "rope", cross: true, labels: ["Cross", "Open"] }),
+  "jump-rope-boxer-skip": () => hop({ dip: 0.05, air: 0.04, arms: "rope", skip: true, labels: ["Skip", "Skip"] }),
   "battle-rope-alternating-waves": battleRopes,
   "battle-rope-double-waves": battleRopes,
   "battle-rope-circles": battleRopes,
   "battle-rope-side-slams": battleRopes,
   "battle-rope-jumping-jack": jumpingJack,
-  "squat-jump-180": jumpSquat,
-  "lateral-hop": jumpSquat,
-  "single-leg-lateral-hop": jumpSquat,
+  "squat-jump-180": () => hop({ dip: 0.6, air: 0.2, arms: "chest", turn: 180, labels: ["Jump and turn", "Jump and turn"] }),
+  "lateral-hop": () => hop({ dip: 0.35, air: 0.15, arms: "swing", travel: { z: 0.45 }, labels: ["Hop right", "Hop left"] }),
+  "single-leg-lateral-hop": () =>
+    hop({ dip: 0.2, air: 0.1, arms: "swing", oneLeg: true, travel: { z: 0.3 }, labels: ["Hop right", "Hop left"] }),
   "seated-box-jump": boxJump,
   "lateral-box-jump": boxJump,
   "box-step-over": stepUp,
-  "line-hops": jumpSquat,
+  "line-hops": () => hop({ dip: 0.08, air: 0.07, arms: "swing", travel: { z: 0.22 }, labels: ["Hop over", "Hop back"] }),
   "lateral-plank-walk": lateralPlankWalk,
   "duck-walk": duckWalk,
   "jog-in-place": () => run({ lift: 0.4, lean: 2 }),
