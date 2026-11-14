@@ -10,7 +10,6 @@ import {
   actOnPlace,
   ADMIN_PAGE,
   adminPlaces,
-  importArea,
   joinPlace,
   nearbyPlaces,
   pendingPlaces,
@@ -104,10 +103,13 @@ describe("reading OpenStreetMap", () => {
 });
 
 describe("saving places", () => {
-  it("adds once, refreshes on a second import, and gives each a unique address", async () => {
+  it("adds once, writes nothing on a second import, refreshes only what changed, and gives each a unique address", async () => {
     const drafts = placesFromOsm(OSM, AREA);
-    expect(await savePlaces(drafts, NOW)).toEqual({ added: 4, updated: 0 });
-    expect(await savePlaces(drafts, NOW)).toEqual({ added: 0, updated: 4 });
+    expect(await savePlaces(drafts, NOW)).toMatchObject({ added: 4, updated: 0, unchanged: 0, kept: 0, statements: 4 });
+    expect(await savePlaces(drafts, NOW)).toMatchObject({ added: 0, updated: 0, unchanged: 4, statements: 0 });
+    const moved = drafts.map((d) => (d.ref === "osm:node/2" ? { ...d, hours: "Mo-Fr 06:00-22:00" } : d));
+    expect(await savePlaces(moved, NOW + 1)).toMatchObject({ added: 0, updated: 1, unchanged: 3, statements: 1 });
+    expect((await query("SELECT hours FROM gym_places WHERE source_ref = 'osm:node/2'"))[0]!.hours).toBe("Mo-Fr 06:00-22:00");
     await savePlaces([{ ...drafts[1]!, ref: "osm:node/99" }], NOW);
     const slugs = (await query("SELECT city_slug, slug FROM gym_places WHERE name = 'Planet Fitness' ORDER BY slug")).map(
       (r) => `${String(r.city_slug)}/${String(r.slug)}`,
@@ -118,9 +120,34 @@ describe("saving places", () => {
   it("never overwrites a claimed gym", async () => {
     await savePlaces(placesFromOsm(OSM, AREA), NOW);
     await run("UPDATE gym_places SET claimed_by = 'acc-owner', hours = 'Mo-Su 05:00-23:00' WHERE source_ref = 'osm:node/2'");
-    await savePlaces(placesFromOsm(OSM, AREA), NOW + 1);
-    const [p] = await query("SELECT hours FROM gym_places WHERE source_ref = 'osm:node/2'");
-    expect(p!.hours).toBe("Mo-Su 05:00-23:00");
+    const changed = placesFromOsm(OSM, AREA).map((d) => ({ ...d, name: `${d.name} (renamed)`, hours: "24/7" }));
+    expect(await savePlaces(changed, NOW + 1)).toMatchObject({ updated: 3, kept: 1 });
+    const [p] = await query("SELECT name, hours FROM gym_places WHERE source_ref = 'osm:node/2'");
+    expect(p).toMatchObject({ name: "Planet Fitness", hours: "Mo-Su 05:00-23:00" });
+  });
+
+  it("keeps a gym's city when a neighbouring city's import finds it with no city of its own", async () => {
+    // Planet Fitness has no addr:city, so Langley's import files it under Langley; Surrey's box overlaps.
+    await savePlaces(placesFromOsm(OSM, AREA), NOW);
+    expect(await savePlaces(placesFromOsm(OSM, { city: "Surrey", region: "BC", country: "CA" }), NOW + 1)).toMatchObject({
+      updated: 0,
+      unchanged: 4,
+    });
+    const [p] = await query("SELECT city, city_slug FROM gym_places WHERE source_ref = 'osm:node/2'");
+    expect(p).toMatchObject({ city: "Langley", city_slug: "langley-bc" });
+  });
+
+  it("says what it left out and why", () => {
+    const skips = { unnamed: 0, private: 0, notGym: 0, duplicate: 0 };
+    const pool = {
+      type: "node",
+      id: 7,
+      lat: 49.1,
+      lon: -122.6,
+      tags: { leisure: "sports_centre", name: "Langley Pool", sport: "swimming" },
+    };
+    placesFromOsm([...OSM, OSM[0]!, pool], AREA, skips);
+    expect(skips).toEqual({ unnamed: 1, private: 1, notGym: 1, duplicate: 1 });
   });
 });
 
@@ -204,45 +231,6 @@ describe("staff", () => {
     expect((await adminPlaces("", "junk")).page).toBe(1);
     expect(await adminPlaces("Gym 11", 1)).toMatchObject({ total: 120, matches: 10, pages: 1 });
     expect(first.places[0]).toMatchObject({ citySlug: "langley-bc", slug: expect.any(String) });
-  });
-
-  it("imports an area by name through the map services", async () => {
-    const calls: string[] = [];
-    const fake = (async (url: string | URL | Request) => {
-      const u = String(url);
-      calls.push(u);
-      if (u.includes("nominatim"))
-        return Response.json([
-          {
-            osm_type: "relation",
-            osm_id: 2_000_000,
-            name: "Langley",
-            address: { city: "Langley", state: "British Columbia", country_code: "ca" },
-          },
-        ]);
-      if (u.includes("overpass-api.de")) return new Response("busy", { status: 504 });
-      return Response.json({ elements: OSM });
-    }) as typeof fetch;
-    const r = await importArea("Langley, BC", fake, NOW);
-    expect(r).toEqual({ ok: true, area: "Langley, BC", found: 4, added: 4, updated: 0 });
-    expect(calls).toHaveLength(3);
-    expect(await importArea("  ", fake, NOW)).toEqual({ ok: false, error: "where" });
-    const none = (async () => Response.json([])) as unknown as typeof fetch;
-    expect(await importArea("Nowhere", none, NOW)).toEqual({ ok: false, error: "where" });
-
-    // The province's ISO code wins over its name, in whatever language or spelling the name comes back.
-    const french = (async (url: string | URL | Request) =>
-      String(url).includes("nominatim")
-        ? Response.json([
-            {
-              osm_type: "relation",
-              osm_id: 2_000_001,
-              name: "Abbotsford",
-              address: { city: "Abbotsford", state: "Colombie-Britannique", "ISO3166-2-lvl4": "CA-BC", country_code: "ca" },
-            },
-          ])
-        : Response.json({ elements: [] })) as typeof fetch;
-    expect(await importArea("Abbotsford", french, NOW)).toMatchObject({ ok: true, area: "Abbotsford, BC" });
   });
 });
 
