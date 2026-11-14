@@ -62,28 +62,36 @@ export const en = {
   "rmd.tour.kicker": "Getting started · {n} of {total}",
   "rmd.tour.cta": "Try it in {brand}",
   "rmd.tour.plan.title": "Your workout, already planned",
-  "rmd.tour.plan.body": "Open the app and today's workout is waiting. It's built from the equipment in your gym, how recovered each muscle is and where you are in your training block.",
+  "rmd.tour.plan.body":
+    "Open the app and today's workout is waiting. It's built from the equipment in your gym, how recovered each muscle is and where you are in your training block.",
   "rmd.tour.plan.tip": "Short on time? Drag the length slider on Today and the plan shrinks to fit, keeping the lifts that matter most.",
   "rmd.tour.why.title": "Every exercise says why",
-  "rmd.tour.why.body": "Each exercise on Today has a short line saying why it's there: a muscle that's recovered, sets still to do this week, or how it went last time.",
+  "rmd.tour.why.body":
+    "Each exercise on Today has a short line saying why it's there: a muscle that's recovered, sets still to do this week, or how it went last time.",
   "rmd.tour.why.tip": "Not a fan of one? Tap it to swap it for something that works the same muscles with your equipment.",
   "rmd.tour.log.title": "One tap logs the set",
-  "rmd.tour.log.body": "The weight and reps are already filled in, with the plates to load on each side. Lift, then tap Log set. That's it.",
+  "rmd.tour.log.body":
+    "The weight and reps are already filled in, with the plates to load on each side. Lift, then tap Log set. That's it.",
   "rmd.tour.log.tip": "Did more or fewer reps? Nudge the numbers with − and + before you tap, and the next workout adjusts.",
   "rmd.tour.weight.title": "Why this weight?",
-  "rmd.tour.weight.body": "Every target comes from a rule you can read: you hit every set last time, so one more rep; a deload week, so lighter. Tap Why? under the target to see it.",
+  "rmd.tour.weight.body":
+    "Every target comes from a rule you can read: you hit every set last time, so one more rep; a deload week, so lighter. Tap Why? under the target to see it.",
   "rmd.tour.weight.tip": "The weights are always ones you can actually load with your bar and plates.",
   "rmd.tour.rest.title": "The rest timer runs itself",
-  "rmd.tour.rest.body": "Log a set and the rest timer starts on its own. On Android and iPhone it keeps counting on the lock screen, with the next set and its plates.",
+  "rmd.tour.rest.body":
+    "Log a set and the rest timer starts on its own. On Android and iPhone it keeps counting on the lock screen, with the next set and its plates.",
   "rmd.tour.rest.tip": "Ready early? Tap Skip. Need longer? Tap +30 s, right from the lock screen.",
   "rmd.tour.recovery.title": "See what's recovered",
-  "rmd.tour.recovery.body": "Body shows every muscle coloured by how recovered it is, worked out from your own sets. It's how the plan knows to rest your legs after a big squat day.",
+  "rmd.tour.recovery.body":
+    "Body shows every muscle coloured by how recovered it is, worked out from your own sets. It's how the plan knows to rest your legs after a big squat day.",
   "rmd.tour.recovery.tip": "Feeling sore or tired? Tell the app on Today and it takes it easier.",
   "rmd.tour.notes.title": "Your coach says what to do next",
-  "rmd.tour.notes.body": "Coach's notes on Progress watch for things worth acting on: a lift that's stalled, a muscle short of its weekly sets, fatigue building up. Each one says what we saw and one thing to do.",
+  "rmd.tour.notes.body":
+    "Coach's notes on Progress watch for things worth acting on: a lift that's stalled, a muscle short of its weekly sets, fatigue building up. Each one says what we saw and one thing to do.",
   "rmd.tour.notes.tip": "Most come with a one-tap fix, like a deload week or making a muscle a priority.",
   "rmd.tour.awards.title": "PRs, levels and badges",
-  "rmd.tour.awards.body": "Every workout earns XP, new bests show up as you set them, and there are more than 150 badges to collect. Streaks count weeks, so rest days never break them.",
+  "rmd.tour.awards.body":
+    "Every workout earns XP, new bests show up as you set them, and there are more than 150 badges to collect. Streaks count weeks, so rest days never break them.",
   "rmd.tour.awards.tip": "Open Awards to see this week's quests and what you're closest to unlocking.",
 } as const;
 
@@ -154,28 +162,37 @@ export const es: Partial<Record<Key, Message>> = {
   "rmd.tour.kicker": "Primeros pasos · {n} de {total}",
   "rmd.tour.cta": "Pruébalo en {brand}",
   "rmd.tour.plan.title": "Tu entrenamiento, ya planificado",
-  "rmd.tour.plan.body": "Abre la app y el entrenamiento de hoy te está esperando. Se arma con el equipo de tu gimnasio, lo recuperado que está cada músculo y el punto de tu bloque de entrenamiento.",
+  "rmd.tour.plan.body":
+    "Abre la app y el entrenamiento de hoy te está esperando. Se arma con el equipo de tu gimnasio, lo recuperado que está cada músculo y el punto de tu bloque de entrenamiento.",
   "rmd.tour.plan.tip": "¿Vas con poco tiempo? Desliza la duración en Hoy y el plan se ajusta, manteniendo los ejercicios que más importan.",
   "rmd.tour.why.title": "Cada ejercicio dice por qué",
-  "rmd.tour.why.body": "Cada ejercicio de Hoy lleva una línea corta que dice por qué está ahí: un músculo recuperado, series pendientes esta semana o cómo fue la última vez.",
+  "rmd.tour.why.body":
+    "Cada ejercicio de Hoy lleva una línea corta que dice por qué está ahí: un músculo recuperado, series pendientes esta semana o cómo fue la última vez.",
   "rmd.tour.why.tip": "¿No te convence alguno? Tócalo para cambiarlo por otro que trabaje los mismos músculos con tu equipo.",
   "rmd.tour.log.title": "Un toque registra la serie",
-  "rmd.tour.log.body": "El peso y las repeticiones ya están puestos, con los discos que van en cada lado. Levanta y toca Registrar serie. Nada más.",
-  "rmd.tour.log.tip": "¿Hiciste más o menos repeticiones? Ajusta los números con − y + antes de tocar, y el próximo entrenamiento se adapta.",
+  "rmd.tour.log.body":
+    "El peso y las repeticiones ya están puestos, con los discos que van en cada lado. Levanta y toca Registrar serie. Nada más.",
+  "rmd.tour.log.tip":
+    "¿Hiciste más o menos repeticiones? Ajusta los números con − y + antes de tocar, y el próximo entrenamiento se adapta.",
   "rmd.tour.weight.title": "¿Por qué este peso?",
-  "rmd.tour.weight.body": "Cada objetivo sale de una regla que puedes leer: completaste todas las series la última vez, así que una repetición más; semana de descarga, así que más ligero. Toca ¿Por qué? bajo el objetivo para verla.",
+  "rmd.tour.weight.body":
+    "Cada objetivo sale de una regla que puedes leer: completaste todas las series la última vez, así que una repetición más; semana de descarga, así que más ligero. Toca ¿Por qué? bajo el objetivo para verla.",
   "rmd.tour.weight.tip": "Los pesos siempre son cargables con tu barra y tus discos.",
   "rmd.tour.rest.title": "El descanso se cronometra solo",
-  "rmd.tour.rest.body": "Registra una serie y el temporizador de descanso arranca solo. En Android y iPhone sigue contando en la pantalla de bloqueo, con la siguiente serie y sus discos.",
+  "rmd.tour.rest.body":
+    "Registra una serie y el temporizador de descanso arranca solo. En Android y iPhone sigue contando en la pantalla de bloqueo, con la siguiente serie y sus discos.",
   "rmd.tour.rest.tip": "¿Listo antes? Toca Saltar. ¿Necesitas más? Toca +30 s, desde la pantalla de bloqueo.",
   "rmd.tour.recovery.title": "Mira qué está recuperado",
-  "rmd.tour.recovery.body": "Cuerpo muestra cada músculo con un color según lo recuperado que está, calculado a partir de tus propias series. Así sabe el plan que debe dar descanso a tus piernas tras un gran día de sentadillas.",
+  "rmd.tour.recovery.body":
+    "Cuerpo muestra cada músculo con un color según lo recuperado que está, calculado a partir de tus propias series. Así sabe el plan que debe dar descanso a tus piernas tras un gran día de sentadillas.",
   "rmd.tour.recovery.tip": "¿Con agujetas o cansado? Díselo a la app en Hoy y bajará el ritmo.",
   "rmd.tour.notes.title": "Tu entrenador te dice qué hacer",
-  "rmd.tour.notes.body": "Las notas del entrenador en Progreso vigilan lo que merece atención: un ejercicio estancado, un músculo corto de series semanales, cansancio acumulado. Cada una dice qué vimos y una cosa que hacer.",
+  "rmd.tour.notes.body":
+    "Las notas del entrenador en Progreso vigilan lo que merece atención: un ejercicio estancado, un músculo corto de series semanales, cansancio acumulado. Cada una dice qué vimos y una cosa que hacer.",
   "rmd.tour.notes.tip": "La mayoría trae un arreglo de un toque, como una semana de descarga o dar prioridad a un músculo.",
   "rmd.tour.awards.title": "Récords, niveles e insignias",
-  "rmd.tour.awards.body": "Cada entrenamiento suma XP, los nuevos récords aparecen en cuanto los logras y hay más de 150 insignias que conseguir. Las rachas cuentan semanas, así que los días de descanso nunca las rompen.",
+  "rmd.tour.awards.body":
+    "Cada entrenamiento suma XP, los nuevos récords aparecen en cuanto los logras y hay más de 150 insignias que conseguir. Las rachas cuentan semanas, así que los días de descanso nunca las rompen.",
   "rmd.tour.awards.tip": "Abre Logros para ver las misiones de esta semana y lo que tienes más cerca de desbloquear.",
 };
 
@@ -244,28 +261,38 @@ export const fr: Partial<Record<Key, Message>> = {
   "rmd.tour.kicker": "Bien démarrer · {n} sur {total}",
   "rmd.tour.cta": "Essayez-le dans {brand}",
   "rmd.tour.plan.title": "Votre séance, déjà prête",
-  "rmd.tour.plan.body": "Ouvrez l'app : la séance du jour vous attend. Elle est construite d'après le matériel de votre salle, la récupération de chaque muscle et l'étape de votre bloc d'entraînement.",
-  "rmd.tour.plan.tip": "Peu de temps ? Faites glisser la durée sur Aujourd'hui et la séance se raccourcit en gardant les exercices les plus utiles.",
+  "rmd.tour.plan.body":
+    "Ouvrez l'app : la séance du jour vous attend. Elle est construite d'après le matériel de votre salle, la récupération de chaque muscle et l'étape de votre bloc d'entraînement.",
+  "rmd.tour.plan.tip":
+    "Peu de temps ? Faites glisser la durée sur Aujourd'hui et la séance se raccourcit en gardant les exercices les plus utiles.",
   "rmd.tour.why.title": "Chaque exercice dit pourquoi",
-  "rmd.tour.why.body": "Chaque exercice d'Aujourd'hui a une courte ligne qui dit pourquoi il est là : un muscle récupéré, des séries à faire cette semaine ou le résultat de la dernière fois.",
-  "rmd.tour.why.tip": "Un exercice ne vous plaît pas ? Touchez-le pour le remplacer par un autre qui travaille les mêmes muscles avec votre matériel.",
+  "rmd.tour.why.body":
+    "Chaque exercice d'Aujourd'hui a une courte ligne qui dit pourquoi il est là : un muscle récupéré, des séries à faire cette semaine ou le résultat de la dernière fois.",
+  "rmd.tour.why.tip":
+    "Un exercice ne vous plaît pas ? Touchez-le pour le remplacer par un autre qui travaille les mêmes muscles avec votre matériel.",
   "rmd.tour.log.title": "Un geste enregistre la série",
-  "rmd.tour.log.body": "La charge et les répétitions sont déjà remplies, avec les disques à mettre de chaque côté. Soulevez, puis touchez Enregistrer la série. C'est tout.",
+  "rmd.tour.log.body":
+    "La charge et les répétitions sont déjà remplies, avec les disques à mettre de chaque côté. Soulevez, puis touchez Enregistrer la série. C'est tout.",
   "rmd.tour.log.tip": "Plus ou moins de répétitions ? Ajustez avec − et + avant de toucher, et la prochaine séance s'adapte.",
   "rmd.tour.weight.title": "Pourquoi cette charge ?",
-  "rmd.tour.weight.body": "Chaque objectif vient d'une règle que vous pouvez lire : toutes les séries réussies la dernière fois, donc une répétition de plus ; semaine de décharge, donc plus léger. Touchez Pourquoi ? sous l'objectif pour la voir.",
+  "rmd.tour.weight.body":
+    "Chaque objectif vient d'une règle que vous pouvez lire : toutes les séries réussies la dernière fois, donc une répétition de plus ; semaine de décharge, donc plus léger. Touchez Pourquoi ? sous l'objectif pour la voir.",
   "rmd.tour.weight.tip": "Les charges sont toujours réalisables avec votre barre et vos disques.",
   "rmd.tour.rest.title": "Le repos se chronomètre seul",
-  "rmd.tour.rest.body": "Enregistrez une série et le minuteur de repos démarre seul. Sur Android et iPhone, il continue sur l'écran verrouillé, avec la série suivante et ses disques.",
+  "rmd.tour.rest.body":
+    "Enregistrez une série et le minuteur de repos démarre seul. Sur Android et iPhone, il continue sur l'écran verrouillé, avec la série suivante et ses disques.",
   "rmd.tour.rest.tip": "Prêt plus tôt ? Touchez Passer. Besoin de plus ? Touchez +30 s, depuis l'écran verrouillé.",
   "rmd.tour.recovery.title": "Voyez ce qui a récupéré",
-  "rmd.tour.recovery.body": "Corps montre chaque muscle coloré selon sa récupération, calculée d'après vos propres séries. C'est ainsi que le plan sait laisser vos jambes se reposer après une grosse séance de squats.",
+  "rmd.tour.recovery.body":
+    "Corps montre chaque muscle coloré selon sa récupération, calculée d'après vos propres séries. C'est ainsi que le plan sait laisser vos jambes se reposer après une grosse séance de squats.",
   "rmd.tour.recovery.tip": "Courbatures ou fatigue ? Dites-le à l'app sur Aujourd'hui et elle allège la séance.",
   "rmd.tour.notes.title": "Votre coach dit quoi faire",
-  "rmd.tour.notes.body": "Les notes du coach dans Progrès repèrent ce qui mérite d'agir : un exercice qui stagne, un muscle en retard sur ses séries de la semaine, une fatigue qui s'accumule. Chacune dit ce que nous avons vu et une chose à faire.",
+  "rmd.tour.notes.body":
+    "Les notes du coach dans Progrès repèrent ce qui mérite d'agir : un exercice qui stagne, un muscle en retard sur ses séries de la semaine, une fatigue qui s'accumule. Chacune dit ce que nous avons vu et une chose à faire.",
   "rmd.tour.notes.tip": "La plupart proposent une solution en un geste, comme une semaine de décharge ou un muscle en priorité.",
   "rmd.tour.awards.title": "Records, niveaux et badges",
-  "rmd.tour.awards.body": "Chaque séance rapporte de l'XP, les nouveaux records s'affichent dès que vous les battez, et il y a plus de 150 badges à gagner. Les séries comptent en semaines, donc les jours de repos ne les cassent jamais.",
+  "rmd.tour.awards.body":
+    "Chaque séance rapporte de l'XP, les nouveaux records s'affichent dès que vous les battez, et il y a plus de 150 badges à gagner. Les séries comptent en semaines, donc les jours de repos ne les cassent jamais.",
   "rmd.tour.awards.tip": "Ouvrez Récompenses pour voir les quêtes de la semaine et ce que vous êtes près de débloquer.",
 };
 
@@ -333,28 +360,38 @@ export const de: Partial<Record<Key, Message>> = {
   "rmd.tour.kicker": "Erste Schritte · {n} von {total}",
   "rmd.tour.cta": "In {brand} ausprobieren",
   "rmd.tour.plan.title": "Dein Training, schon geplant",
-  "rmd.tour.plan.body": "Öffne die App, und dein Training für heute wartet schon. Es richtet sich nach den Geräten in deinem Studio, der Erholung jedes Muskels und deiner Stelle im Trainingsblock.",
+  "rmd.tour.plan.body":
+    "Öffne die App, und dein Training für heute wartet schon. Es richtet sich nach den Geräten in deinem Studio, der Erholung jedes Muskels und deiner Stelle im Trainingsblock.",
   "rmd.tour.plan.tip": "Wenig Zeit? Zieh auf Heute den Regler für die Dauer, und der Plan passt sich an, die wichtigsten Übungen bleiben.",
   "rmd.tour.why.title": "Jede Übung sagt, warum",
-  "rmd.tour.why.body": "Jede Übung auf Heute hat eine kurze Zeile, warum sie da ist: ein erholter Muskel, Sätze, die diese Woche noch fehlen, oder wie es beim letzten Mal lief.",
-  "rmd.tour.why.tip": "Eine gefällt dir nicht? Tippe darauf und tausche sie gegen eine, die mit deinen Geräten dieselben Muskeln trainiert.",
+  "rmd.tour.why.body":
+    "Jede Übung auf Heute hat eine kurze Zeile, warum sie da ist: ein erholter Muskel, Sätze, die diese Woche noch fehlen, oder wie es beim letzten Mal lief.",
+  "rmd.tour.why.tip":
+    "Eine gefällt dir nicht? Tippe darauf und tausche sie gegen eine, die mit deinen Geräten dieselben Muskeln trainiert.",
   "rmd.tour.log.title": "Ein Tipp trägt den Satz ein",
-  "rmd.tour.log.body": "Gewicht und Wiederholungen sind schon eingetragen, mit den Scheiben für jede Seite. Heben, dann auf Satz eintragen tippen. Fertig.",
-  "rmd.tour.log.tip": "Mehr oder weniger Wiederholungen geschafft? Ändere die Zahlen mit − und + vor dem Tippen, und das nächste Training passt sich an.",
+  "rmd.tour.log.body":
+    "Gewicht und Wiederholungen sind schon eingetragen, mit den Scheiben für jede Seite. Heben, dann auf Satz eintragen tippen. Fertig.",
+  "rmd.tour.log.tip":
+    "Mehr oder weniger Wiederholungen geschafft? Ändere die Zahlen mit − und + vor dem Tippen, und das nächste Training passt sich an.",
   "rmd.tour.weight.title": "Warum dieses Gewicht?",
-  "rmd.tour.weight.body": "Jedes Ziel folgt einer Regel, die du lesen kannst: Letztes Mal alle Sätze geschafft, also eine Wiederholung mehr; Deload-Woche, also leichter. Tippe unter dem Ziel auf Warum?, um sie zu sehen.",
+  "rmd.tour.weight.body":
+    "Jedes Ziel folgt einer Regel, die du lesen kannst: Letztes Mal alle Sätze geschafft, also eine Wiederholung mehr; Deload-Woche, also leichter. Tippe unter dem Ziel auf Warum?, um sie zu sehen.",
   "rmd.tour.weight.tip": "Die Gewichte lassen sich mit deiner Stange und deinen Scheiben immer wirklich auflegen.",
   "rmd.tour.rest.title": "Die Pause läuft von selbst",
-  "rmd.tour.rest.body": "Trag einen Satz ein, und der Pausentimer startet von selbst. Auf Android und iPhone läuft er auf dem Sperrbildschirm weiter, mit dem nächsten Satz und seinen Scheiben.",
+  "rmd.tour.rest.body":
+    "Trag einen Satz ein, und der Pausentimer startet von selbst. Auf Android und iPhone läuft er auf dem Sperrbildschirm weiter, mit dem nächsten Satz und seinen Scheiben.",
   "rmd.tour.rest.tip": "Früher bereit? Tippe auf Überspringen. Mehr Zeit nötig? Tippe auf +30 s, direkt auf dem Sperrbildschirm.",
   "rmd.tour.recovery.title": "Sieh, was erholt ist",
-  "rmd.tour.recovery.body": "Körper zeigt jeden Muskel farbig nach seiner Erholung, berechnet aus deinen eigenen Sätzen. So weiß der Plan, dass deine Beine nach einem harten Kniebeugen-Tag Pause brauchen.",
+  "rmd.tour.recovery.body":
+    "Körper zeigt jeden Muskel farbig nach seiner Erholung, berechnet aus deinen eigenen Sätzen. So weiß der Plan, dass deine Beine nach einem harten Kniebeugen-Tag Pause brauchen.",
   "rmd.tour.recovery.tip": "Muskelkater oder müde? Sag es der App auf Heute, und sie macht es dir leichter.",
   "rmd.tour.notes.title": "Dein Coach sagt, was als Nächstes kommt",
-  "rmd.tour.notes.body": "Die Coach-Notizen unter Fortschritt achten auf das, was sich lohnt: eine Übung, die stagniert, ein Muskel mit zu wenigen Wochensätzen, Müdigkeit, die sich aufbaut. Jede sagt, was wir gesehen haben, und eine Sache, die du tun kannst.",
+  "rmd.tour.notes.body":
+    "Die Coach-Notizen unter Fortschritt achten auf das, was sich lohnt: eine Übung, die stagniert, ein Muskel mit zu wenigen Wochensätzen, Müdigkeit, die sich aufbaut. Jede sagt, was wir gesehen haben, und eine Sache, die du tun kannst.",
   "rmd.tour.notes.tip": "Die meisten bringen eine Lösung mit einem Tipp, etwa eine Deload-Woche oder einen Muskel als Schwerpunkt.",
   "rmd.tour.awards.title": "Rekorde, Level und Abzeichen",
-  "rmd.tour.awards.body": "Jedes Training bringt XP, neue Bestleistungen erscheinen, sobald du sie schaffst, und es gibt über 150 Abzeichen zu sammeln. Serien zählen Wochen, Ruhetage unterbrechen sie also nie.",
+  "rmd.tour.awards.body":
+    "Jedes Training bringt XP, neue Bestleistungen erscheinen, sobald du sie schaffst, und es gibt über 150 Abzeichen zu sammeln. Serien zählen Wochen, Ruhetage unterbrechen sie also nie.",
   "rmd.tour.awards.tip": "Öffne Erfolge, um die Aufgaben dieser Woche zu sehen und was du als Nächstes freischalten kannst.",
 };
 
@@ -423,28 +460,36 @@ export const it: Partial<Record<Key, Message>> = {
   "rmd.tour.kicker": "Primi passi · {n} di {total}",
   "rmd.tour.cta": "Provalo in {brand}",
   "rmd.tour.plan.title": "Il tuo allenamento, già pronto",
-  "rmd.tour.plan.body": "Apri l'app e l'allenamento di oggi ti aspetta. È costruito sull'attrezzatura della tua palestra, sul recupero di ogni muscolo e sul punto del tuo blocco di allenamento.",
+  "rmd.tour.plan.body":
+    "Apri l'app e l'allenamento di oggi ti aspetta. È costruito sull'attrezzatura della tua palestra, sul recupero di ogni muscolo e sul punto del tuo blocco di allenamento.",
   "rmd.tour.plan.tip": "Poco tempo? Trascina la durata in Oggi e il piano si accorcia, tenendo gli esercizi che contano di più.",
   "rmd.tour.why.title": "Ogni esercizio dice perché",
-  "rmd.tour.why.body": "Ogni esercizio in Oggi ha una riga breve che dice perché è lì: un muscolo recuperato, serie ancora da fare questa settimana o com'è andata l'ultima volta.",
+  "rmd.tour.why.body":
+    "Ogni esercizio in Oggi ha una riga breve che dice perché è lì: un muscolo recuperato, serie ancora da fare questa settimana o com'è andata l'ultima volta.",
   "rmd.tour.why.tip": "Uno non ti convince? Toccalo e cambialo con un altro che allena gli stessi muscoli con la tua attrezzatura.",
   "rmd.tour.log.title": "Un tocco registra la serie",
-  "rmd.tour.log.body": "Carico e ripetizioni sono già inseriti, con i dischi da mettere per lato. Solleva, poi tocca Registra serie. Tutto qui.",
+  "rmd.tour.log.body":
+    "Carico e ripetizioni sono già inseriti, con i dischi da mettere per lato. Solleva, poi tocca Registra serie. Tutto qui.",
   "rmd.tour.log.tip": "Hai fatto più o meno ripetizioni? Sistema i numeri con − e + prima di toccare, e il prossimo allenamento si adatta.",
   "rmd.tour.weight.title": "Perché questo carico?",
-  "rmd.tour.weight.body": "Ogni obiettivo viene da una regola che puoi leggere: l'ultima volta hai completato tutte le serie, quindi una ripetizione in più; settimana di scarico, quindi più leggero. Tocca Perché? sotto l'obiettivo per vederla.",
+  "rmd.tour.weight.body":
+    "Ogni obiettivo viene da una regola che puoi leggere: l'ultima volta hai completato tutte le serie, quindi una ripetizione in più; settimana di scarico, quindi più leggero. Tocca Perché? sotto l'obiettivo per vederla.",
   "rmd.tour.weight.tip": "I carichi sono sempre caricabili con il tuo bilanciere e i tuoi dischi.",
   "rmd.tour.rest.title": "Il riposo si cronometra da solo",
-  "rmd.tour.rest.body": "Registra una serie e il timer del riposo parte da solo. Su Android e iPhone continua sulla schermata di blocco, con la serie successiva e i suoi dischi.",
+  "rmd.tour.rest.body":
+    "Registra una serie e il timer del riposo parte da solo. Su Android e iPhone continua sulla schermata di blocco, con la serie successiva e i suoi dischi.",
   "rmd.tour.rest.tip": "Pronto prima? Tocca Salta. Ti serve più tempo? Tocca +30 s, dalla schermata di blocco.",
   "rmd.tour.recovery.title": "Guarda cosa è recuperato",
-  "rmd.tour.recovery.body": "Corpo mostra ogni muscolo colorato in base al recupero, calcolato dalle tue serie. Così il piano sa di far riposare le gambe dopo una giornata pesante di squat.",
+  "rmd.tour.recovery.body":
+    "Corpo mostra ogni muscolo colorato in base al recupero, calcolato dalle tue serie. Così il piano sa di far riposare le gambe dopo una giornata pesante di squat.",
   "rmd.tour.recovery.tip": "Indolenzito o stanco? Dillo all'app in Oggi e andrà più leggera.",
   "rmd.tour.notes.title": "Il tuo coach ti dice cosa fare",
-  "rmd.tour.notes.body": "Le Note del coach in Progressi cercano ciò che vale la pena sistemare: un esercizio in stallo, un muscolo indietro con le serie settimanali, la fatica che si accumula. Ognuna dice cosa abbiamo visto e una cosa da fare.",
+  "rmd.tour.notes.body":
+    "Le Note del coach in Progressi cercano ciò che vale la pena sistemare: un esercizio in stallo, un muscolo indietro con le serie settimanali, la fatica che si accumula. Ognuna dice cosa abbiamo visto e una cosa da fare.",
   "rmd.tour.notes.tip": "Quasi tutte hanno una soluzione con un tocco, come una settimana di scarico o un muscolo in priorità.",
   "rmd.tour.awards.title": "Record, livelli e badge",
-  "rmd.tour.awards.body": "Ogni allenamento dà XP, i nuovi record compaiono appena li fai e ci sono più di 150 badge da raccogliere. Le serie contano le settimane, quindi i giorni di riposo non le interrompono mai.",
+  "rmd.tour.awards.body":
+    "Ogni allenamento dà XP, i nuovi record compaiono appena li fai e ci sono più di 150 badge da raccogliere. Le serie contano le settimane, quindi i giorni di riposo non le interrompono mai.",
   "rmd.tour.awards.tip": "Apri Premi per vedere le missioni della settimana e cosa sei più vicino a sbloccare.",
 };
 
@@ -505,7 +550,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "rmd.tour.kicker": "はじめてのヒント · {n}/{total}",
   "rmd.tour.cta": "{brand} で試す",
   "rmd.tour.plan.title": "今日のメニューは、もうできています",
-  "rmd.tour.plan.body": "アプリを開けば、今日のワークアウトが用意されています。ジムの器具、筋肉ごとの回復具合、トレーニングブロックの進み具合から組み立てます。",
+  "rmd.tour.plan.body":
+    "アプリを開けば、今日のワークアウトが用意されています。ジムの器具、筋肉ごとの回復具合、トレーニングブロックの進み具合から組み立てます。",
   "rmd.tour.plan.tip": "時間がない日は、今日の画面で長さのスライダーを動かしてください。大事な種目を残したまま短くなります。",
   "rmd.tour.why.title": "どの種目にも理由があります",
   "rmd.tour.why.body": "今日の画面の種目には、それぞれ短い理由が付いています。回復した筋肉、今週まだ残っているセット、前回の結果などです。",
@@ -514,18 +560,23 @@ export const ja: Partial<Record<Key, Message>> = {
   "rmd.tour.log.body": "重量と回数は入力済みで、片側に付けるプレートも表示されます。挙げたら「セットを記録」をタップするだけです。",
   "rmd.tour.log.tip": "回数が多かった・少なかったときは、タップする前に − と + で数字を直してください。次のワークアウトに反映されます。",
   "rmd.tour.weight.title": "なぜこの重量?",
-  "rmd.tour.weight.body": "目標の数字には、読めるルールがあります。前回すべてのセットをこなしたので 1 回増やす、ディロードの週なので軽くする、などです。目標の下の「なぜ?」をタップすると確認できます。",
+  "rmd.tour.weight.body":
+    "目標の数字には、読めるルールがあります。前回すべてのセットをこなしたので 1 回増やす、ディロードの週なので軽くする、などです。目標の下の「なぜ?」をタップすると確認できます。",
   "rmd.tour.weight.tip": "重量はいつも、手持ちのバーとプレートで実際に組める数字です。",
   "rmd.tour.rest.title": "休憩タイマーは自動で動きます",
-  "rmd.tour.rest.body": "セットを記録すると、休憩タイマーが自動で始まります。Android と iPhone ではロック画面でもカウントが続き、次のセットとプレートも表示されます。",
+  "rmd.tour.rest.body":
+    "セットを記録すると、休憩タイマーが自動で始まります。Android と iPhone ではロック画面でもカウントが続き、次のセットとプレートも表示されます。",
   "rmd.tour.rest.tip": "早く準備できたら「スキップ」、もっと休みたいときは「+30 秒」を。ロック画面からでも操作できます。",
   "rmd.tour.recovery.title": "回復した部位がひと目でわかります",
-  "rmd.tour.recovery.body": "「からだ」では、自分のセットから計算した回復具合で筋肉ごとに色分けされます。だからスクワットをたくさんした翌日は、脚を休ませるメニューになります。",
+  "rmd.tour.recovery.body":
+    "「からだ」では、自分のセットから計算した回復具合で筋肉ごとに色分けされます。だからスクワットをたくさんした翌日は、脚を休ませるメニューになります。",
   "rmd.tour.recovery.tip": "筋肉痛や疲れがあるときは、今日の画面でアプリに伝えてください。軽めにしてくれます。",
   "rmd.tour.notes.title": "コーチのメモが次の一手を教えます",
-  "rmd.tour.notes.body": "「進捗」のコーチのメモは、手を打つべきことを見つけます。伸び悩んでいる種目、週のセットが足りない筋肉、たまってきた疲れなど。見えたことと、やることを 1 つ伝えます。",
+  "rmd.tour.notes.body":
+    "「進捗」のコーチのメモは、手を打つべきことを見つけます。伸び悩んでいる種目、週のセットが足りない筋肉、たまってきた疲れなど。見えたことと、やることを 1 つ伝えます。",
   "rmd.tour.notes.tip": "多くはワンタップで対処できます。ディロード週にする、筋肉を優先にする、などです。",
   "rmd.tour.awards.title": "自己ベスト、レベル、バッジ",
-  "rmd.tour.awards.body": "ワークアウトのたびに XP がたまり、自己ベストはその場で表示され、150 以上のバッジを集められます。連続記録は週で数えるので、休みの日で途切れることはありません。",
+  "rmd.tour.awards.body":
+    "ワークアウトのたびに XP がたまり、自己ベストはその場で表示され、150 以上のバッジを集められます。連続記録は週で数えるので、休みの日で途切れることはありません。",
   "rmd.tour.awards.tip": "「アワード」を開くと、今週のクエストと、もうすぐ手に入るものが見られます。",
 };
