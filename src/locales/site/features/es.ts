@@ -300,6 +300,11 @@ export const es: FeaturesText = {
       name: "Entrenando ahora y ánimos",
       body: "Mira quién está entrenando ahora mismo y envía un ánimo que sube flotando por su pantalla de entrenamiento.",
     },
+    "check-in": {
+      name: "Avisa desde el gimnasio",
+      body: "Un toque en Hoy avisa a los amigos que elijas de que estás en el gimnasio. Reciben una notificación y un aviso en la app hasta que lo cierren.",
+      note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra el aviso cuando está abierta.",
+    },
     challenges: {
       name: "Retos, clubes y clasificaciones",
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
@@ -315,7 +320,7 @@ export const es: FeaturesText = {
     },
     "coach-chat": {
       name: "Chat, avisos y datos corporales",
-      body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos. Los clientes mayores de 18 avisan con un toque desde Hoy al llegar al gimnasio.",
+      body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos.",
       note: "Las notificaciones son para Android y iPhone. La app web muestra los mensajes nuevos cuando está abierta.",
     },
     physio: {

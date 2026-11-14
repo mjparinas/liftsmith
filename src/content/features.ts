@@ -560,6 +560,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "check-in",
+        name: "Check in at the gym",
+        body: "One tap on Today tells the friends you pick that you're at the gym. They get a notification, and a note in the app until they close it.",
+        tier: "free",
+        note: "For lifters 18 and over. Notifications are on Android and iPhone; the web app shows the note when it's open.",
+        added: "2026-11-14",
+      },
+      {
         id: "challenges",
         name: "Challenges, clubs and leaderboards",
         body: "Challenge a friend, join a club or gym crew with a weekly board, and take on the monthly challenge with everyone.",
@@ -598,7 +606,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-chat",
         name: "Chat, alerts and body data",
-        body: "Message each client, get a notification when they train or go quiet for a week, and see their weigh-ins, measurements and a 3D figure shaped like them when they choose to share. Clients 18 and over can check in from Today with one tap when they get to the gym.",
+        body: "Message each client, get a notification when they train or go quiet for a week, and see their weigh-ins, measurements and a 3D figure shaped like them when they choose to share.",
         tier: "pro",
         pro: "coaching",
         note: "Notifications are on Android and iPhone. The web app shows new messages when it's open.",

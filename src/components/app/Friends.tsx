@@ -849,6 +849,7 @@ function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<Push
     ["likes", "friends.notify.likes"],
     ["cheers", "social.notify.cheers"],
     ["posts", "social.notify.posts"],
+    ["checkins", "social.notify.checkins"],
   ];
   return (
     <Section title={t("friends.notify")}>

@@ -5,20 +5,35 @@ import { act, cleanup, render, screen, waitFor, within } from "@testing-library/
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useAccount } from "@/lib/auth";
+import { useCheckins } from "@/lib/buddy";
 import { exercise } from "@/lib/exercises";
+import { useSocial } from "@/lib/social";
+import type { SocialProfile } from "@/lib/socialTypes";
 import { useApp } from "@/lib/store";
-import { useCoachNotes } from "@/lib/trainer";
 
 import { App } from "./App";
+import { CheckinToasts } from "./CheckinToasts";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
-/** Check-in messages "sent" to a coach: the chat's send, without a server. */
-const sent: { id: string; text: string }[] = [];
-vi.mock("@/lib/trainer", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/trainer")>()),
-  sendMessage: async (id: string, text: string) => (sent.push({ id, text }), { id: "m1", from: "me", text, at: 1 }),
+/** Friends' requests the check-in makes: who is asked for, and what was sent. */
+const calls: { op: string; body: Record<string, unknown> }[] = [];
+vi.mock("@/lib/social", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/social")>()),
+  social: async (op: string, body: Record<string, unknown> = {}) => {
+    calls.push({ op, body });
+    if (op === "people")
+      return {
+        people: [
+          { handle: "sam", name: "Sam", avatar: "" },
+          { handle: "ria", name: "Ria", avatar: "" },
+        ],
+      };
+    if (op === "checkIn") return { sent: (body.handles as string[]).length };
+    if (op === "checkins")
+      return { checkins: [{ id: "k1", handle: "sam", name: "Sam", avatar: "", gym: "Iron Den", focus: ["chest"], at: Date.now() }] };
+    return {};
+  },
 }));
 
 beforeEach(async () => {
@@ -66,6 +81,26 @@ function barbellFirst() {
   useApp.getState().setPlan({ ...p, items: [bench, ...p.items.slice(1).filter((it) => it.exerciseId !== "bench-press")] });
   return useApp.getState().preview!.items[0];
 }
+
+/** The lifter's own Friends profile, for Check in. */
+const MAX: SocialProfile = {
+  handle: "max",
+  name: "Max",
+  open: false,
+  autoPost: false,
+  weights: true,
+  public: false,
+  push: { follows: true, comments: true, sent: true, likes: false, cheers: true, posts: true, checkins: true },
+  avatar: "",
+  audience: "all",
+  showLifts: false,
+  lifts: [],
+  suggest: true,
+  live: false,
+  cheers: true,
+  level: 1,
+  streak: 0,
+};
 
 describe("workout extras", () => {
   it("shows only the plates to change, ghost mode and same as last time, and a breathing guide on rest", async () => {
@@ -143,34 +178,43 @@ describe("Today and Progress extras", () => {
     expect(a.plan.items.at(-1)!.target.reps).toBe(1800);
   });
 
-  it("checks in with the coach through Liftsmith's messages, and never for under 18s", async () => {
+  it("checks in to friends, and never for under 18s", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    // No coach, no Check in: there's nobody in Liftsmith's messages to send it to.
+    // Not in Friends, no Check in: there's nobody to tell.
     expect(screen.queryByRole("button", { name: "Check in" })).not.toBeInTheDocument();
-
-    sent.length = 0;
+    calls.length = 0;
     try {
-      act(() => {
-        useAccount.setState({ account: { token: "t", id: "me", email: null, providers: [], via: "email" } });
-        useCoachNotes.setState({ who: { coaches: [{ id: "c1", name: "Sam Lee" }], clients: 0 } });
-      });
+      act(() => useSocial.setState({ me: { profile: MAX } }));
       await user.click(await screen.findByRole("button", { name: "Check in" }));
-      const sheet = screen.getByRole("dialog", { name: "Check in with your coach" });
-      expect(sheet).toHaveTextContent(/Hi Sam! I'm at the gym/);
+      const sheet = screen.getByRole("dialog", { name: "Tell friends you’re at the gym" });
+      // Every friend is picked to start; the lifter leaves Ria out.
+      await user.click(await within(sheet).findByRole("button", { name: "Ria", pressed: true }));
+      expect(sheet).toHaveTextContent(/Max is at (the gym|Commercial gym)/);
       await user.click(within(sheet).getByRole("button", { name: "Check in" }));
-      await waitFor(() => expect(sent).toHaveLength(1));
-      expect(sent).toEqual([{ id: "c1", text: expect.stringMatching(/^Hi Sam! I'm at the gym/) as string }]);
-      expect(useApp.getState().events.find((e) => e.type === "checkin")).toMatchObject({ buddies: ["Sam Lee"] });
+      await waitFor(() => expect(calls.find((c) => c.op === "checkIn")?.body).toMatchObject({ handles: ["sam"] }));
+      expect(useApp.getState().events.find((e) => e.type === "checkin")).toMatchObject({ buddies: ["Sam"] });
 
-      // A 16-year-old doesn't get it, coach or not (Melvin, 2026-11-14).
+      // A 16-year-old doesn't get it (Melvin, 2026-11-14).
       await act(async () => useApp.getState().setProfile({ birthYear: new Date().getFullYear() - 16 }));
       expect(screen.queryByRole("button", { name: "Check in" })).not.toBeInTheDocument();
     } finally {
-      vi.unstubAllGlobals();
-      useAccount.setState({ account: null });
-      useCoachNotes.setState({ who: { coaches: [], clients: 0 } });
+      useSocial.setState({ me: null });
     }
+  });
+
+  it("shows a friend's check-in as a toast until it's closed", async () => {
+    render(<CheckinToasts hidden={false} />);
+    act(() =>
+      useCheckins.setState({
+        checkins: [{ id: "k1", handle: "sam", name: "Sam", avatar: "", gym: "Iron Den", focus: ["chest"], at: Date.now() }],
+      }),
+    );
+    expect(screen.getByTestId("checkin-toasts")).toHaveTextContent("Sam is at Iron Den, training chest today. Your turn 💪");
+    calls.length = 0;
+    await userEvent.setup().click(screen.getByRole("button", { name: "Dismiss" }));
+    expect(screen.queryByTestId("checkin-toasts")).not.toBeInTheDocument();
+    expect(calls).toEqual([{ op: "checkinDismiss", body: { id: "k1" } }]);
   });
 
   it("shows the recap, body weight and themes", async () => {

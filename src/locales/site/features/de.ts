@@ -304,6 +304,11 @@ export const de: FeaturesText = {
       name: "Gerade am Trainieren und Anfeuern",
       body: "Sieh, wer gerade trainiert, und schick einen Anfeuerungsruf, der über den Trainingsbildschirm schwebt.",
     },
+    "check-in": {
+      name: "Im Studio einchecken",
+      body: "Ein Tipp unter Heute sagt den Freunden, die du auswählst, dass du im Studio bist. Sie bekommen eine Mitteilung und einen Hinweis in der App, bis sie ihn schließen.",
+      note: "Ab 18 Jahren. Mitteilungen gibt es auf Android und iPhone; die Web-App zeigt den Hinweis, wenn sie offen ist.",
+    },
     challenges: {
       name: "Challenges, Clubs und Bestenlisten",
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
@@ -319,7 +324,7 @@ export const de: FeaturesText = {
     },
     "coach-chat": {
       name: "Chat, Hinweise und Körperdaten",
-      body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt. Kunden ab 18 checken mit einem Tipp unter Heute ein, wenn sie im Studio sind.",
+      body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
       note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
     },
     physio: {

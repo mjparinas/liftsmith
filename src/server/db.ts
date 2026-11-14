@@ -772,6 +772,17 @@ const SCHEMA = [
     created_at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS cheers_to ON cheers (to_id, created_at)`,
+  // Check in (Melvin, 2026-11-14): "I'm at the gym" to mutual friends, a push and a toast until they dismiss it.
+  `CREATE TABLE IF NOT EXISTS friend_checkins (
+    id TEXT PRIMARY KEY,
+    from_id TEXT NOT NULL,
+    to_id TEXT NOT NULL,
+    gym TEXT NOT NULL DEFAULT '',
+    focus TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    dismissed INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS friend_checkins_to ON friend_checkins (to_id, dismissed, created_at)`,
   // Suggestions the lifter dismissed (social.ts `suggest`): that person isn't suggested to them again.
   `CREATE TABLE IF NOT EXISTS suggest_hides (
     account_id TEXT NOT NULL,
@@ -1073,6 +1084,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "cheers", "INTEGER NOT NULL DEFAULT 1"],
   // The switch for workouts from people the lifter rang the bell for (Friends gap list 3).
   ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
+  // The switch for friends' check-ins (Check in on Today, 2026-11-14; on to start).
+  ["social_profiles", "push_checkins", "INTEGER NOT NULL DEFAULT 1"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],
