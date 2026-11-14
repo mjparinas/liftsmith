@@ -76,7 +76,7 @@ describe("swaps look different", () => {
   // for every lift, counted where both draw exactly the same thing. A ratchet: lower it as moves get
   // their own motions, never raise it. What's left is mostly true twins (steady and interval cardio,
   // jump rope and battle rope styles) and close cousins still sharing a pose.
-  const LOOK_ALIKES = 282;
+  const LOOK_ALIKES = 274;
   it(`leaves at most ${LOOK_ALIKES} look-alike swap pairs`, () => {
     const looks = new Map<string, string>();
     const of = (id: string) => looks.get(id) ?? (looks.set(id, look(id)), looks.get(id)!);
@@ -161,5 +161,35 @@ describe("walks that travel", () => {
   it("walks backwards on the backward treadmill walk and elliptical", () => {
     expect(motionFor("backward-treadmill-walk").phases[0]![1]).toBe(1);
     expect(motionFor("elliptical-backward").phases[0]![2]).toBe(0);
+  });
+});
+
+describe("floor positions", () => {
+  // Melvin, 2026-11-14 audit: reverse planks and walkouts played glute bridges, side-lying moves a side plank,
+  // handstands pike push-ups and several planks the forearm plank.
+  const at = (id: string, d = 0) => jointsAt(motionFor(id), B, d);
+  it("faces up on the reverse plank, hands behind on straight arms and heels down", () => {
+    const J = at("reverse-plank");
+    expect(J.handL[0]).toBeLessThan(J.hipC[0] - 0.3);
+    expect(J.elbowL[1]).toBeGreaterThan(0.2);
+    expect(J.hipC[1]).toBeGreaterThan(0.3);
+  });
+  it("walks the heels out on walkouts and slides them on slider leg curls", () => {
+    for (const id of ["hamstring-walkout", "slider-leg-curl"]) expect(at(id, 0.5).ankleL[0], id).toBeGreaterThan(at(id, 0).ankleL[0] + 0.3);
+  });
+  it("lies flat on the side for side-lying moves", () => {
+    for (const id of ["side-lying-leg-raise", "band-clamshell", "side-lying-adduction"]) expect(motionFor(id).roll?.(0), id).toBe(-90);
+  });
+  it("stacks handstands over the hands and walks up the wall", () => {
+    const H = at("freestanding-handstand");
+    expect(H.ankleL[1]).toBeGreaterThan(H.hipC[1] + 0.7);
+    expect(H.hipC[1]).toBeGreaterThan(H.shC[1] + 0.4);
+    expect(at("handstand-push-up", 1).head[1]).toBeLessThan(at("handstand-push-up", 0).head[1] - 0.2);
+    expect(at("wall-walk", 0.5).ankleL[1]).toBeGreaterThan(at("wall-walk", 0).ankleL[1] + 0.8);
+  });
+  it("puts the knee plank on the knees and the high-hand planks on straight arms", () => {
+    expect(at("knee-plank").kneeL[1]).toBeLessThan(0.12);
+    for (const id of ["ring-plank", "planche-lean", "plank-pull-through"]) expect(at(id).elbowL[1], id).toBeGreaterThan(0.2);
+    expect(at("plank-to-pike", 1).hipC[1]).toBeGreaterThan(at("plank-to-pike", 0).hipC[1] + 0.3);
   });
 });
