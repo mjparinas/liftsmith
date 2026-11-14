@@ -9,12 +9,12 @@ import { Screenshot } from "@/components/site/Screenshot";
 import { LangRoot, SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
+import { appJsonLd, appOffers } from "@/lib/appSchema";
 import { BRAND } from "@/lib/brand";
 import { faqJsonLd } from "@/lib/faqs";
 import { pageMeta } from "@/lib/pageMeta";
 import { APP_PATH, CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 import { fill, localPath, usd, type SiteLang } from "@/lib/siteLang";
-import { PRICES } from "@/lib/trial";
 import { siteText } from "@/locales/site";
 import { demoWords, exerciseNames, muscleLabels } from "@/locales/site/fromApp";
 import { filledFaqs, siteVars } from "@/locales/site/vars";
@@ -107,21 +107,7 @@ export function HomeView({ lang }: { lang: SiteLang }) {
   const quotes = visibleQuotes();
   const url = `${SITE_URL}${localPath(lang, "/")}`;
   const jsonLd = [
-    {
-      "@context": "https://schema.org",
-      "@type": "MobileApplication",
-      name,
-      operatingSystem: "Android, iOS, Web",
-      applicationCategory: "HealthApplication",
-      description: fill(h.description, vars),
-      url,
-      inLanguage: lang,
-      offers: [
-        { "@type": "Offer", price: "0", priceCurrency: "USD", name: "Free" },
-        { "@type": "Offer", price: PRICES.monthly.price.replace("$", ""), priceCurrency: "USD", name: "Pro monthly" },
-        { "@type": "Offer", price: PRICES.annual.price.replace("$", ""), priceCurrency: "USD", name: "Pro yearly" },
-      ],
-    },
+    appJsonLd({ url, description: fill(h.description, vars), lang, offers: appOffers(`${SITE_URL}${localPath(lang, "/pricing/")}`) }),
     {
       "@context": "https://schema.org",
       "@type": "Organization",

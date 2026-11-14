@@ -3,20 +3,17 @@ import Link from "next/link";
 
 import { InfoPage, Section } from "@/components/site/InfoPage";
 import { CtaBanner, CtaButton, JsonLd } from "@/components/site/SiteChrome";
-import { BRAND } from "@/lib/brand";
+import { appJsonLd, appOffers } from "@/lib/appSchema";
 import { COACH_PLANS } from "@/lib/coachPlans";
 import { faqJsonLd } from "@/lib/faqs";
 import { pageMeta } from "@/lib/pageMeta";
 import { PLAN_TABLE } from "@/lib/plans";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { fill, localPath, usd, type SiteLang } from "@/lib/siteLang";
-import { PRICES } from "@/lib/trial";
 import { siteText } from "@/locales/site";
 import { filledFaqs, siteVars } from "@/locales/site/vars";
 
 // The pricing page, in every site language (src/lib/siteLang.ts): /pricing/ in English, /es/pricing/ and friends.
-
-const name = BRAND.name;
 
 export function pricingMetadata(lang: SiteLang): Metadata {
   const p = siteText(lang).pricing;
@@ -107,23 +104,11 @@ export function PricingView({ lang }: { lang: SiteLang }) {
     no: p.notIncluded,
     text: (s: string) => (s === "Never" ? plans.never : s === "Annual plan" ? plans.annualPlan : s),
   };
-  const offers = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: `${name} Pro`,
-    url: `${SITE_URL}${localPath(lang, "/pricing/")}`,
-    offers: [
-      { "@type": "Offer", price: PRICES.monthly.price.replace("$", ""), priceCurrency: "USD", name: "Pro monthly" },
-      { "@type": "Offer", price: PRICES.annual.price.replace("$", ""), priceCurrency: "USD", name: "Pro yearly" },
-      { "@type": "Offer", price: String(COACH_PLANS.coach.usd.monthly), priceCurrency: "USD", name: "Coach monthly" },
-      { "@type": "Offer", price: String(COACH_PLANS.coach.usd.annual), priceCurrency: "USD", name: "Coach yearly" },
-      { "@type": "Offer", price: String(COACH_PLANS.coachPlus.usd.monthly), priceCurrency: "USD", name: "Coach Plus monthly" },
-      { "@type": "Offer", price: String(COACH_PLANS.coachPlus.usd.annual), priceCurrency: "USD", name: "Coach Plus yearly" },
-    ],
-  };
+  const pageUrl = `${SITE_URL}${localPath(lang, "/pricing/")}`;
+  const app = appJsonLd({ url: pageUrl, description: fill(p.description, vars), lang, offers: appOffers(pageUrl, true) });
   return (
     <InfoPage kind="pricing" wide title={p.h1} intro={fill(p.intro, vars)} lang={lang} path="/pricing/">
-      <JsonLd data={[offers, faqJsonLd(billing)]} />
+      <JsonLd data={[app, faqJsonLd(billing)]} />
       <div className="grid gap-5 md:grid-cols-2">
         <section aria-labelledby="free-h" className="card flex flex-col p-7">
           <h2 id="free-h" className="text-xl font-semibold">
