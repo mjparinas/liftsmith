@@ -1,11 +1,12 @@
 // GET /gyms/, /gyms/<city>/ and /gyms/<city>/<gym>/ (rewritten here with ?city=&gym=): the website's gym pages, plain
-// HTML with no scripts and their own strict CSP (src/server/gymPage.ts). Anything not found gets a noindex page. A visit
+// HTML with no scripts (except /gyms/'s map, gymsNear.ts) and their own strict CSP (src/server/gymPage.ts). Anything not found gets a noindex page. A visit
 // with ?from=qr came from the gym's poster or stand and is counted (gymPosters.ts). Server build only.
 import { addressKey } from "@/server/gymDirectory";
 import { cityHtml, goneHtml, GYM_GONE_HEADERS, GYM_PAGE_HEADERS, gymHtml, indexHtml, pageLang } from "@/server/gymPage";
 import { cities, cityPlaces, placeBySlug } from "@/server/gymPlaces";
 import { countScan } from "@/server/gymPosters";
 import { publicPosterHtml } from "@/server/gymPrint";
+import { GYMS_INDEX_CSP } from "@/server/gymsNear";
 import { cityTrainers } from "@/server/trainerDirectory";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +36,8 @@ export async function GET(req: Request) {
       const trainers = (await cityTrainers(city).catch(() => ({ people: [] }))).people.length;
       return new Response(cityHtml(city, list, lang, trainers), { headers: GYM_PAGE_HEADERS });
     }
-    return new Response(indexHtml(await cities(), lang), { headers: GYM_PAGE_HEADERS });
+    // /gyms/ runs one script of our own (the map of the closest gyms), so it gets its own policy (gymsNear.ts).
+    return new Response(indexHtml(await cities(), lang), { headers: { ...GYM_PAGE_HEADERS, "Content-Security-Policy": GYMS_INDEX_CSP } });
   } catch {
     return gone();
   }
