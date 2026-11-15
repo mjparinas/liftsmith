@@ -21,7 +21,7 @@ import { AREA_PINS, areaMapPath } from "./gymMedia";
 import type { City, Place } from "./gymPlaces";
 import { esc, framePage, icon } from "./siteFrame";
 
-type GpKey = keyof typeof gp.en;
+export type GpKey = keyof typeof gp.en;
 const GP: Record<MsgLang, Partial<Record<GpKey, unknown>>> = { en: gp.en, es: gp.es, fr: gp.fr, de: gp.de, it: gp.it, ja: gp.ja };
 const EQ: Record<MsgLang, Partial<Record<string, unknown>>> = {
   en: equipment.en,
@@ -289,7 +289,8 @@ function listItem(p: Place, lang: MsgLang, pin?: number): string {
 
 // --- A city ---
 
-export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): string {
+/** `trainers`: people listed at the city's gyms (trainerDirectory.ts); with any, the page links to the directory. */
+export function cityHtml(citySlug: string, places: Place[], lang: MsgLang, trainers = 0): string {
   const first = places[0]!;
   const city = cityName(first);
   const gyms = places.filter((p) => p.kind === "gym");
@@ -319,7 +320,9 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): stri
     [city, null],
   ])}
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.cityTitle", { city }))}</h1><p class="muted">${esc(desc)}</p></header>
-${figure}${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${missing(lang)}${credit}</main>`;
+${figure}${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${
+    trainers ? `<p><a class="quiet" href="/trainers/${esc(citySlug)}/">${esc(say(lang, "gp.dirLink", { city }))} ›</a></p>` : ""
+  }${missing(lang)}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, gyms.length > 0), body, GYM_STYLE, "gym");
 }
 

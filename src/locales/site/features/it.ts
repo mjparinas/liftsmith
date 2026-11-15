@@ -388,6 +388,10 @@ export const it: FeaturesText = {
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",
       proPart: "Essere cliente è gratis; allenare clienti è Pro.",
     },
+    "trainer-directory": {
+      name: "Nella directory dei trainer",
+      body: "Registrati come personal trainer, coach o fisioterapista nella tua palestra e compari nella pagina della palestra e nella directory dei trainer della sua città sul sito, con la tua presentazione e un link perché i nuovi clienti si allenino con te. Compaiono solo adulti.",
+    },
     "coach-plans": {
       name: "Piani da coach che crescono con i tuoi clienti",
       body: "Pro copre fino a 3 clienti. Coach dà spazio a 25 e Coach Plus non ha un limite fisso, con ogni strumento da coach in ogni piano. I tuoi clienti si allenano sempre gratis, e Liftsmith non trattiene nulla di quello che ti pagano.",
@@ -455,6 +459,10 @@ export const it: FeaturesText = {
     importExtras: {
       name: "Routine e misure corporee da un’altra app",
       body: "Un’importazione trasforma in routine gli allenamenti ripetuti con lo stesso nome e porta peso, grasso corporeo e misure da Hevy, FitNotes o un’app della bilancia.",
+    },
+    "strength-standards": {
+      name: "Standard di forza da atleti veri",
+      body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
     },
     languages: {
       name: "Sei lingue",

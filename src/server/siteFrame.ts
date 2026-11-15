@@ -86,12 +86,14 @@ ${col(t.cols.product, [
   [localPath(lang, "/features/"), l.features],
   ["/apps/", l.whoFor],
   ["/gyms/", l.gyms],
+  ["/trainers/", l.trainers],
   [localPath(lang, "/pricing/"), l.pricing],
   ["/whats-new/", l.whatsNew],
 ])}
 ${col(t.cols.learn, [
   ["/exercises/", l.exercises],
-  ["/muscles/", l.muscles],
+  [localPath(lang, "/muscles/"), l.muscles],
+  [localPath(lang, "/programs/"), l.programs],
   ["/equipment/", l.equipment],
   ["/guides/", l.guides],
   ["/blog/", l.blog],

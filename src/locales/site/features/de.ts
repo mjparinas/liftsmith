@@ -394,6 +394,10 @@ export const de: FeaturesText = {
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
     },
+    "trainer-directory": {
+      name: "Im Trainerverzeichnis gelistet",
+      body: "Trag dich in deinem Studio als Personal Trainer, Coach oder Physio ein, dann stehst du auf der Seite des Studios und im Trainerverzeichnis seiner Stadt auf der Website, mit deinem Text und einem Link, über den neue Kunden mit dir trainieren können. Gelistet werden nur Erwachsene.",
+    },
     "coach-plans": {
       name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
       body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und Liftsmith behält nichts von dem ein, was sie dir zahlen.",
@@ -461,6 +465,10 @@ export const de: FeaturesText = {
     importExtras: {
       name: "Routinen und Körperwerte aus einer anderen App",
       body: "Ein Import macht Trainings, die du unter demselben Namen wiederholt hast, zu Routinen und holt Körpergewicht, Körperfett und Maße aus Hevy, FitNotes oder einer Waagen-App.",
+    },
+    "strength-standards": {
+      name: "Kraftwerte von echten Lifterinnen und Liftern",
+      body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
     languages: {
       name: "Sechs Sprachen",

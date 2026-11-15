@@ -734,6 +734,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "trainer-directory",
+        name: "Listed in the trainer directory",
+        body: "List yourself as a trainer, coach or physio at your gym and you show on that gym's page and in the trainer directory for its city on the website, with your bio and a link for new clients to start training with you. Only adults are listed.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-15",
+      },
+      {
         id: "coach-plans",
         name: "Coach plans that grow with your client list",
         body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and Liftsmith takes nothing from what they pay you.",
@@ -876,6 +884,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "An import turns workouts you repeated by name into routines, and brings body weight, body fat and tape measurements from Hevy, FitNotes or a scale app.",
         tier: "free",
         added: "2026-11-13",
+      },
+      {
+        id: "strength-standards",
+        name: "Strength standards from real lifters",
+        body: "The website shows how much lifters really squat, bench, deadlift and press, by sex and body weight, built each day from lifters who count. Only groups of 30 or more are shown, as percentiles, never anyone's own numbers. One switch in Settings › Your data and privacy decides whether you count; under-18s never do.",
+        tier: "free",
+        added: "2026-11-15",
       },
     ],
   },
