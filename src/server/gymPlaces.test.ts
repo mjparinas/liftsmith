@@ -11,6 +11,8 @@ import {
   ADMIN_PAGE,
   adminPlaces,
   joinPlace,
+  movedCity,
+  movedGym,
   nearbyPlaces,
   pendingPlaces,
   placesFromOsm,
@@ -137,6 +139,57 @@ describe("saving places", () => {
     expect(p).toMatchObject({ city: "Langley", city_slug: "langley-bc" });
   });
 
+  it("never files a gym under a postcode or house number in its map address", () => {
+    const [a, b, c] = placesFromOsm(
+      [
+        { type: "node", id: 11, lat: 40.85, lon: 14.25, tags: { leisure: "fitness_centre", name: "Palestra Uno", "addr:city": "80145" } },
+        {
+          type: "node",
+          id: 12,
+          lat: 40.85,
+          lon: 14.25,
+          tags: { leisure: "fitness_centre", name: "Palestra Due", "addr:city": "80145 Napoli" },
+        },
+        {
+          type: "node",
+          id: 13,
+          lat: 40.85,
+          lon: 14.25,
+          tags: {
+            leisure: "fitness_centre",
+            name: "Palestra Tre",
+            "addr:housenumber": "12,",
+            "addr:street": "Via Roma,",
+            "addr:city": "1",
+          },
+        },
+      ],
+      { city: "Napoli", region: "Campania", country: "IT" },
+    );
+    expect(a).toMatchObject({ city: "Napoli", guessed: true });
+    expect(b).toMatchObject({ city: "Napoli", guessed: false });
+    expect(c).toMatchObject({ city: "Napoli", address: "12, Via Roma" });
+  });
+
+  it("moves a gym an older import filed under a postcode, and redirects its old page", async () => {
+    await run(
+      `INSERT INTO gym_places (id, city_slug, slug, name, city, region, country, lat, lon, source, source_ref, created_at, updated_at)
+       VALUES ('aaaaaaaaaaaaaaaa', '80145-campania', 'palestra-uno', 'Palestra Uno', '80145', 'Campania', 'IT', 40.85, 14.25, 'osm', 'osm:node/11', ?, ?)`,
+      [NOW, NOW],
+    );
+    const drafts = placesFromOsm(
+      [{ type: "node", id: 11, lat: 40.85, lon: 14.25, tags: { leisure: "fitness_centre", name: "Palestra Uno", "addr:city": "80145" } }],
+      { city: "Napoli", region: "Campania", country: "IT" },
+    );
+    expect(await savePlaces(drafts, NOW + 1)).toMatchObject({ updated: 1 });
+    const [p] = await query("SELECT city, city_slug, slug FROM gym_places WHERE id = 'aaaaaaaaaaaaaaaa'");
+    expect(p).toMatchObject({ city: "Napoli", city_slug: "napoli-campania", slug: "palestra-uno" });
+    expect(await movedGym("80145-campania", "palestra-uno")).toBe("/gyms/napoli-campania/palestra-uno/");
+    expect(await movedCity("80145-campania")).toBe("/gyms/napoli-campania/");
+    expect(await movedGym("80145-campania", "nope")).toBeNull();
+    expect(await movedCity("../etc")).toBeNull();
+  });
+
   it("says what it left out and why", () => {
     const skips = { unnamed: 0, private: 0, notGym: 0, duplicate: 0 };
     const pool = {
@@ -198,7 +251,7 @@ describe("finding gyms", () => {
 describe("staff", () => {
   it("hides, re-marks and deletes gyms", async () => {
     await savePlaces(placesFromOsm(OSM, AREA), NOW);
-    const { places, total } = await adminPlaces("");
+    const { places, total } = await adminPlaces({ q: "" });
     expect(total).toBe(4);
     const planet = places.find((p) => p.name === "Planet Fitness")!;
     expect(await actOnPlace(planet.id, "hide")).toBe(true);
@@ -207,8 +260,25 @@ describe("staff", () => {
     await actOnPlace(pilates.id, "gym");
     expect((await nearbyPlaces(HERE.lat, HERE.lon))!.map((p) => p.name)).toContain("Club Pilates");
     await actOnPlace(pilates.id, "delete");
-    expect((await adminPlaces("pilates")).places).toEqual([]);
+    expect((await adminPlaces({ q: "pilates" })).places).toEqual([]);
     expect(await actOnPlace(planet.id, "explode")).toBe(false);
+  });
+
+  it("filters the gym list by country, city, status and missing details", async () => {
+    await savePlaces(placesFromOsm(OSM, AREA), NOW);
+    await run("UPDATE gym_places SET country = 'IT', city = '80145' WHERE source_ref = 'osm:node/2'");
+    expect((await adminPlaces({ country: "IT" })).places.map((p) => p.name)).toEqual(["Planet Fitness"]);
+    expect((await adminPlaces({ city: "maple" })).places.map((p) => p.name)).toEqual(["Snap Fitness"]);
+    expect((await adminPlaces({ status: "studio" })).places.map((p) => p.name)).toEqual(["Club Pilates"]);
+    expect((await adminPlaces({ missing: "city" })).places.map((p) => p.name)).toEqual(["Planet Fitness"]);
+    expect((await adminPlaces({ missing: "address" })).matches).toBe(3);
+    expect((await adminPlaces({ q: "willowbrook" })).places.map((p) => p.name)).toEqual(["Steve Nash Fitness World"]);
+    const all = await adminPlaces({});
+    expect(all.badCities).toBe(1);
+    expect(all.countries).toEqual([
+      { code: "CA", n: 3 },
+      { code: "IT", n: 1 },
+    ]);
   });
 
   it("pages the gym list 50 at a time", async () => {
@@ -220,16 +290,16 @@ describe("staff", () => {
       tags: { leisure: "fitness_centre", name: `Gym ${String(i).padStart(3, "0")}` },
     }));
     await savePlaces(placesFromOsm(many, AREA), NOW);
-    const first = await adminPlaces("", 1);
+    const first = await adminPlaces({ q: "", page: 1 });
     expect(first).toMatchObject({ total: 120, matches: 120, page: 1, pages: 3 });
     expect(first.places).toHaveLength(ADMIN_PAGE);
-    const last = await adminPlaces("", 3);
+    const last = await adminPlaces({ q: "", page: 3 });
     expect(last.places).toHaveLength(20);
-    const all = new Set([...first.places, ...(await adminPlaces("", 2)).places, ...last.places].map((p) => p.id));
+    const all = new Set([...first.places, ...(await adminPlaces({ q: "", page: 2 })).places, ...last.places].map((p) => p.id));
     expect(all.size).toBe(120);
-    expect((await adminPlaces("", 99)).page).toBe(3);
-    expect((await adminPlaces("", "junk")).page).toBe(1);
-    expect(await adminPlaces("Gym 11", 1)).toMatchObject({ total: 120, matches: 10, pages: 1 });
+    expect((await adminPlaces({ q: "", page: 99 })).page).toBe(3);
+    expect((await adminPlaces({ q: "", page: "junk" })).page).toBe(1);
+    expect(await adminPlaces({ q: "Gym 11", page: 1 })).toMatchObject({ total: 120, matches: 10, pages: 1 });
     expect(first.places[0]).toMatchObject({ citySlug: "langley-bc", slug: expect.any(String) });
   });
 });
@@ -254,7 +324,7 @@ describe("a gym the map doesn't have", () => {
     const id = r.ok ? r.place : "";
     expect(await nearbyPlaces(49.104, -122.66)).toEqual([]);
     expect((await pendingPlaces()).map((p) => [p.name, p.city, p.region])).toEqual([["Forge Barbell Club", "Langley", "BC"]]);
-    expect((await adminPlaces("")).matches).toBe(0);
+    expect((await adminPlaces({ q: "" })).matches).toBe(0);
     expect(await suggestPlace("acc-2", { ...body, name: "Forge Barbell" }, fetcher, NOW)).toEqual({ ok: false, error: "exists" });
 
     expect(await actOnPlace(id, "approve")).toBe(true);

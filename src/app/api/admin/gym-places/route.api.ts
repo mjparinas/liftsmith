@@ -1,11 +1,13 @@
-// GET /api/admin/gym-places/?q=&page=: real gyms for the admin Gyms tab, 50 a page, and the gyms lifters added that
+// GET /api/admin/gym-places/?q=&page=&country=&city=&status=&missing=: real gyms for the admin Gyms tab, 50 a page, and the gyms lifters added that
 // wait for a check (staff). ?countries=1: the countries with major cities to import. ?cities=<code>|ALL: one
 // country's (or every country's) major cities (majorCities.ts, worldCities.ts) and when each last imported cleanly.
 // ?imports=1: the latest imports with their debug logs (gymImport.ts). ?job=1: the country import running on the server
 // (or the latest one not closed) with its progress; ?job=<id>&log=1 its whole debug log (gymImportJobs.ts). POST
 // (admins, audited): {action: "import", where: "Langley, BC", server?: n, fresh?: true} seeds an area from
 // OpenStreetMap; {action: "importJob", country: "CA" | "ALL", skipRecent?, notify?} starts a country import on the
-// server; {action: "importRetry", job} starts a new one of the cities a job didn't import; {action: "importStop" |
+// server; {action: "importRetry", job} starts a new one of the cities a job didn't import; {action: "importRetryRecent"}
+// one of every city whose latest recent import failed; {action: "repair", after} fixes the next thousand gyms' city
+// names and addresses (gymRepair.ts); {action: "importStop" |
 // "importClose", job} stops or closes one; {action: "enrich"}
 // reads the next batch of gyms' own websites for missing details (gymEnrich.ts); {id, action:
 // hide | show | gym | studio | delete | approve | reject} changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
@@ -14,7 +16,7 @@ import { after } from "next/server";
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { enrichBatch } from "@/server/gymEnrich";
-import { importArea, lastImported, recentImports } from "@/server/gymImport";
+import { failedRecently, importArea, lastImported, recentImports } from "@/server/gymImport";
 import {
   createJob,
   dismissJob,
@@ -27,6 +29,7 @@ import {
   unfinishedPlaces,
 } from "@/server/gymImportJobs";
 import { actOnPlace, adminPlaces, pendingPlaces } from "@/server/gymPlaces";
+import { repairStep } from "@/server/gymRepair";
 import { importCountryList, isImportCountry, MAJOR_CITIES } from "@/server/majorCities";
 
 export const dynamic = "force-dynamic";
@@ -54,7 +57,8 @@ export async function GET(req: Request) {
     }
     return json(200, { job: await jobStatus(job === "1" ? undefined : job) });
   }
-  const [list, pending] = await Promise.all([adminPlaces(u.get("q"), u.get("page")), pendingPlaces()]);
+  const filter = { q: u.get("q"), country: u.get("country"), city: u.get("city"), status: u.get("status"), missing: u.get("missing") };
+  const [list, pending] = await Promise.all([adminPlaces({ ...filter, page: u.get("page") }), pendingPlaces()]);
   return json(200, { ...list, pending });
 }
 
@@ -79,7 +83,7 @@ export async function POST(req: Request) {
     await audit(gate.staff.email, "gyms.import", `${r.area}: ${r.added} added, ${r.updated} updated, ${r.unchanged} unchanged`);
     return json(200, r);
   }
-  if (body.action === "importJob" || body.action === "importRetry") {
+  if (body.action === "importJob" || body.action === "importRetry" || body.action === "importRetryRecent") {
     let label: string;
     let places: string[];
     let skipped = 0;
@@ -93,7 +97,7 @@ export async function POST(req: Request) {
       label = country === "ALL" ? "every country" : (importCountryList().find((c) => c.code === country)?.name ?? country);
       if (!places.length) return json(200, { nothing: true, skipped });
     } else {
-      places = await unfinishedPlaces(String(body.job ?? ""));
+      places = body.action === "importRetry" ? await unfinishedPlaces(String(body.job ?? "")) : await failedRecently();
       label = `${places.length} failed ${places.length === 1 ? "city" : "cities"}`;
     }
     const made = await createJob({ label, places, skipped, startedBy: gate.staff.email, notify: body.notify !== false });
@@ -115,6 +119,13 @@ export async function POST(req: Request) {
     if (!done) return json(400, { error: "That import isn't running." });
     if (body.action === "importStop") await audit(gate.staff.email, "gyms.importStop", id);
     return json(200, { job: body.action === "importStop" ? await jobStatus(id) : null });
+  }
+  if (body.action === "repair") {
+    // One step of fixing city names that are postcodes or house numbers, and untidy addresses (gymRepair.ts).
+    const r = await repairStep(typeof body.after === "string" ? body.after.slice(0, 20) : "");
+    if (r.cities || r.addresses || r.moved)
+      await audit(gate.staff.email, "gyms.repair", `${r.cities} cities fixed, ${r.addresses} addresses tidied, ${r.moved} pages moved`);
+    return json(200, r);
   }
   if (body.action === "enrich") {
     // The next batch of gyms whose own website may fill missing details (gymEnrich.ts).

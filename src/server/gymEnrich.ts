@@ -17,6 +17,7 @@ import { randomBytes } from "node:crypto";
 import { DAYS, formatHours, type Week } from "@/lib/openingHours";
 
 import { query, run } from "./db";
+import { km, postcodeFor, sameCity, tidyAddress } from "./gymAddress";
 import { clean, cleanEmail, socialUrl, UA } from "./gymPlaces";
 
 export const ENRICH_LIMITS = {
@@ -157,10 +158,175 @@ export const safeDecode = (x: string) => {
   }
 };
 
-/** What a gym's home page says about it. `site` is the page's address, for checking an email's domain. */
-export function detailsFromHtml(html: string, site: string): SiteDetails {
+/** Where the gym is, from the map, so an address on its website can be checked against it. */
+export interface Near {
+  city?: string;
+  region?: string;
+  country?: string;
+  lat?: number;
+  lon?: number;
+}
+
+/** An address a page gives, with whatever it says about where that is. */
+interface Found {
+  street: string;
+  postcode: string;
+  locality: string;
+  lat?: number;
+  lon?: number;
+  /** Text found next to the gym's city name (an <address> tag, the footer), not in marked-up data. */
+  loose?: boolean;
+}
+
+const plain = (x: string) =>
+  decode(x)
+    .replace(/<br\s*\/?>|<\/(?:p|div|li|h[1-6]|tr|td|section|address)>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/g, " ")
+    .replace(/&#(\d+);/g, (_, d: string) => String.fromCodePoint(Number(d)))
+    .replace(/[ \t]+/g, " ");
+
+/** A street address worth keeping: a letter and a number, not a phone number, link or email. */
+export function looksLikeStreet(x: string): boolean {
+  const v = x.trim();
+  if (v.length < 5 || v.length > 120) return false;
+  if (/@|https?:|www\.|\.com\b/i.test(v)) return false;
+  if (!/\p{L}/u.test(v) || !/\d/.test(v)) return false;
+  // A phone number with a word or two around it ("Call 604-555-0199").
+  if ((v.match(/\d/g) ?? []).length >= 9 && !/\d+\s+\p{L}{3,}/u.test(v.replace(/[\d\s()+.-]{9,}/g, ""))) return false;
+  return true;
+}
+
+/** PostalAddress objects (or a plain address string) from one JSON-LD item, with its geo when it has one. */
+function ldAddresses(o: Record<string, unknown>): Found[] {
+  const geo = (o.geo && typeof o.geo === "object" ? o.geo : {}) as Record<string, unknown>;
+  const lat = Number(geo.latitude);
+  const lon = Number(geo.longitude);
+  const at = Number.isFinite(lat) && Number.isFinite(lon) && (lat || lon) ? { lat, lon } : {};
+  const out: Found[] = [];
+  const loc = o.location && typeof o.location === "object" ? (o.location as Record<string, unknown>).address : undefined;
+  for (const a of [o.address, loc].flatMap((x) => (Array.isArray(x) ? x : [x]))) {
+    if (typeof a === "string") {
+      const parts = a.split(",").map((p) => p.trim());
+      out.push({ street: parts[0] ?? "", postcode: "", locality: parts[1] ?? "", ...at });
+    } else if (a && typeof a === "object") {
+      const addr = a as Record<string, unknown>;
+      out.push({
+        street: str(addr.streetAddress),
+        postcode: str(addr.postalCode),
+        locality: str(addr.addressLocality),
+        ...at,
+      });
+    }
+  }
+  return out;
+}
+
+/** schema.org microdata (itemprop="streetAddress" and friends), in page order. */
+function microdata(html: string): Found[] {
+  const prop = (name: string) =>
+    [
+      ...html.matchAll(
+        new RegExp(`<([a-z0-9]+)[^>]*itemprop=["']${name}["'][^>]*?(?:content=["']([^"']*)["'][^>]*)?>([\\s\\S]*?)<\\/\\1>`, "gi"),
+      ),
+    ].map((m) =>
+      plain(m[2] || m[3] || "")
+        .replace(/\s+/g, " ")
+        .trim(),
+    );
+  const streets = prop("streetAddress");
+  const codes = prop("postalCode");
+  const towns = prop("addressLocality");
+  return streets.map((street, i) => ({ street, postcode: codes[i] ?? "", locality: towns[i] ?? "" }));
+}
+
+/**
+ * Addresses written out in an <address> tag or the footer, kept only when the gym's own city is named right after
+ * them ("100 Main St, Langley, BC V2Y 1A1"), so another branch or the web designer's address isn't taken.
+ */
+function looseAddresses(html: string, near: Near): Found[] {
+  if (!near.city) return [];
+  const blocks = [
+    ...[...html.matchAll(/<address\b[^>]*>([\s\S]*?)<\/address>/gi)].map((m) => m[1]!),
+    ...[...html.matchAll(/<footer\b[^>]*>([\s\S]*?)<\/footer>/gi)].map((m) => m[1]!),
+  ];
+  const out: Found[] = [];
+  for (const b of blocks) {
+    const lines = plain(b)
+      .split(/\n|\s{2,}|\s[|·•]\s/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    for (let i = 0; i < lines.length; i++) {
+      // The city on the same line after a comma, or on the next line.
+      const line = lines[i]!;
+      const parts = line.split(",").map((p) => p.trim());
+      const at = parts.findIndex((p, j) => j > 0 && startsWithCity(p, near.city!));
+      if (at > 0) {
+        out.push({
+          street: parts.slice(0, at).join(", "),
+          postcode: postcodeIn(parts.slice(at).join(" "), near.country),
+          locality: near.city,
+          loose: true,
+        });
+        continue;
+      }
+      const next = lines[i + 1];
+      if (next && startsWithCity(next, near.city))
+        out.push({ street: line, postcode: postcodeIn(next, near.country), locality: near.city, loose: true });
+    }
+  }
+  return out;
+}
+
+const startsWithCity = (text: string, city: string) => {
+  const head = text.split(/[,\d]/)[0]!.trim();
+  return !!head && sameCity(head, city);
+};
+
+/** The first thing in a bit of text that's a postcode for the country. */
+function postcodeIn(text: string, country = ""): string {
+  for (const m of text.matchAll(/[A-Z]\d[A-Z] ?\d[A-Z]\d|[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|\d{3}-\d{4}|\d{4,6}(?:-\d{4})?/gi)) {
+    const v = postcodeFor(m[0], country);
+    if (v) return v;
+  }
+  return "";
+}
+
+/**
+ * The page's address for this gym: marked-up data first, then text next to its city. One that names another city, or
+ * whose map position is more than 15 km from the gym's, is someone else's (a chain's head office, another branch).
+ * When the page lists several addresses and nothing says which is this gym's, none is taken.
+ */
+export function pickAddress(found: Found[], near: Near): { address: string; postcode: string } {
+  const fits = found
+    .map((f) => ({ ...f, street: tidyAddress(f.street, { city: near.city, region: near.region, postcode: f.postcode }) }))
+    .filter((f) => looksLikeStreet(f.street))
+    .filter((f) => !(near.city && f.locality && !sameCity(f.locality, near.city)))
+    .filter(
+      (f) =>
+        !(
+          near.lat !== undefined &&
+          near.lon !== undefined &&
+          f.lat !== undefined &&
+          f.lon !== undefined &&
+          km(f as { lat: number; lon: number }, near as { lat: number; lon: number }) > 15
+        ),
+    );
+  const marked = fits.filter((f) => !f.loose);
+  const pool = marked.length ? marked : fits;
+  const streets = [...new Set(pool.map((f) => f.street.toLowerCase()))];
+  if (streets.length !== 1) return { address: "", postcode: "" };
+  const best = pool[0]!;
+  const postcode = pool.map((f) => postcodeFor(f.postcode, near.country)).find(Boolean) ?? "";
+  return { address: best.street, postcode };
+}
+
+/** What a gym's home page says about it. `site` is the page's address, for checking an email's domain; `near` is
+ * where the map has the gym, for checking an address. */
+export function detailsFromHtml(html: string, site: string, near: Near = {}): SiteDetails {
   const out = { ...EMPTY };
   const domain = hostOf(site);
+  const addresses: Found[] = [];
   const ownEmail = (e: string) => {
     const v = cleanEmail(decode(e));
     if (!v || !domain) return "";
@@ -172,17 +338,15 @@ export function detailsFromHtml(html: string, site: string): SiteDetails {
     out.phone ||= clean(str(o.telephone), 40);
     out.email ||= ownEmail(str(o.email));
     out.hours ||= hoursFromSpec(o.openingHoursSpecification) || hoursFromText(o.openingHours);
-    const a = o.address;
-    if (a && typeof a === "object" && !Array.isArray(a)) {
-      const addr = a as Record<string, unknown>;
-      out.address ||= clean(str(addr.streetAddress), 120);
-      out.postcode ||= clean(str(addr.postalCode), 20);
-    }
+    addresses.push(...ldAddresses(o));
     for (const same of Array.isArray(o.sameAs) ? o.sameAs : [o.sameAs]) {
       out.instagram ||= /instagram\.com/i.test(str(same)) ? socialUrl(str(same), "instagram") : "";
       out.facebook ||= /facebook\.com|fb\.com/i.test(str(same)) ? socialUrl(str(same), "facebook") : "";
     }
   }
+  const picked = pickAddress([...addresses, ...microdata(html), ...looseAddresses(html, near)], near);
+  out.address = clean(picked.address, 120);
+  out.postcode = clean(picked.postcode, 20);
   // Then the page's own links.
   const tel = /href=["']tel:([^"']+)["']/i.exec(html)?.[1];
   if (!out.phone && tel) out.phone = clean(safeDecode(tel).replace(/[^\d+()\-.\s]/g, ""), 40);
@@ -347,7 +511,7 @@ export interface EnrichOne {
 
 /** Reads one gym's website and fills its empty fields. */
 export async function enrichPlace(
-  p: { id: string; name: string; website: string; hasIcon?: boolean } & Partial<SiteDetails>,
+  p: { id: string; name: string; website: string; hasIcon?: boolean; near?: Near } & Partial<SiteDetails>,
   fetcher: typeof fetch = fetch,
   now = Date.now(),
 ): Promise<EnrichOne> {
@@ -374,7 +538,7 @@ export async function enrichPlace(
 }
 
 async function readSite(
-  p: { id: string; website: string; hasIcon?: boolean } & Partial<SiteDetails>,
+  p: { id: string; website: string; hasIcon?: boolean; near?: Near } & Partial<SiteDetails>,
   fetcher: typeof fetch,
   now: number,
   done: (filled: EnrichOne["filled"], skipped: string, set?: Partial<SiteDetails>) => Promise<EnrichOne>,
@@ -383,7 +547,7 @@ async function readSite(
   if (!page) return done([], "no answer");
   if (page.status >= 400) return done([], `HTTP ${page.status}`);
   if (!/html/i.test(page.type) && !/<html/i.test(page.text.slice(0, 2000))) return done([], "not a web page");
-  const found = detailsFromHtml(page.text, p.website);
+  const found = detailsFromHtml(page.text, p.website, p.near);
   const set: Partial<SiteDetails> = {};
   for (const k of Object.keys(found) as (keyof SiteDetails)[]) if (found[k] && !p[k]) set[k] = found[k];
   const filled: EnrichOne["filled"] = Object.keys(set) as (keyof SiteDetails)[];
@@ -420,7 +584,7 @@ const WAITING = `FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND websit
 export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now()): Promise<EnrichBatch> {
   const since = now - ENRICH_LIMITS.againMs;
   const rows = await query(
-    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, ${NO_ICON} AS no_icon ${WAITING} ORDER BY lifters DESC, enriched_at LIMIT ?`,
+    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, city, region, country, lat, lon, ${NO_ICON} AS no_icon ${WAITING} ORDER BY lifters DESC, enriched_at LIMIT ?`,
     [since, ENRICH_LIMITS.batch],
   );
   const gyms = rows.map((r) => ({
@@ -435,6 +599,13 @@ export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(
     instagram: String(r.instagram),
     facebook: String(r.facebook),
     hasIcon: !Number(r.no_icon),
+    near: {
+      city: String(r.city ?? ""),
+      region: String(r.region ?? ""),
+      country: String(r.country ?? ""),
+      lat: Number(r.lat),
+      lon: Number(r.lon),
+    },
   }));
   const done: EnrichOne[] = [];
   let next = 0;
