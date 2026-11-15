@@ -161,11 +161,21 @@ export function LiftDemoCore({
   onClick,
   dance: danceOn = true,
   onDance,
-}: LiftDemoProps & { labels: Partial<Record<Muscle, string>>; words?: DemoWords }) {
+  phaseText,
+}: LiftDemoProps & {
+  labels: Partial<Record<Muscle, string>>;
+  words?: DemoWords;
+  /** The phase readout in the reader's language (the app passes phaseWord); English as the motions have it otherwise. */
+  phaseText?: (label: string) => string;
+}) {
   const VIEWS = viewsOf(w);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loopRef = useRef<Loop | null>(null);
   const phaseRef = useRef<HTMLSpanElement>(null);
+  const phaseTextRef = useRef(phaseText);
+  useEffect(() => {
+    phaseTextRef.current = phaseText;
+  }, [phaseText]);
   const envMode = useSyncExternalStore(noSubscribe, detectMode, () => null);
   const [fellBack, setFellBack] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -258,7 +268,8 @@ export function LiftDemoCore({
         latest.current,
         (l) => {
           const el = phaseRef.current;
-          if (el && el.textContent !== l.toUpperCase()) el.textContent = l.toUpperCase();
+          const text = (phaseTextRef.current?.(l) ?? l).toLocaleUpperCase();
+          if (el && el.textContent !== text) el.textContent = text;
         },
         () => onDoneRef.current?.(),
       );

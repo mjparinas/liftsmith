@@ -15,6 +15,7 @@ import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { estimate } from "@/lib/e1rm";
 import { flag } from "@/lib/flags";
 import { markAdded, placeKit } from "@/lib/gymDirectory";
+import { gymName } from "@/lib/gymNames";
 import { decodeGym, type GymKit } from "@/lib/gymShare";
 import { connectHealth, healthAvailable, readBodyStats, readHints } from "@/lib/health";
 import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
@@ -431,7 +432,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               {rerun && gyms.length > 0 && (
                 <Tile
                   title={t("setup.gym.keep")}
-                  blurb={gyms.map((g) => g.name).join(", ")}
+                  blurb={gyms.map((g) => gymName(g.name)).join(", ")}
                   active={keepGyms}
                   onClick={() => {
                     setKeepGyms(true);
@@ -442,8 +443,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               {PRESETS.map((p) => (
                 <Tile
                   key={p.id}
-                  title={rerun ? t("setup.gym.add", { name: p.name }) : p.name}
-                  blurb={p.blurb}
+                  title={rerun ? t("setup.gym.add", { name: t(`gym.kind.${p.id}`) }) : t(`gym.kind.${p.id}`)}
+                  blurb={t(`gym.kind.${p.id}.blurb`)}
                   active={!keepGyms && !found && preset === p.id}
                   onClick={() => {
                     setKeepGyms(false);
