@@ -490,6 +490,7 @@ export const emails: Record<string, Words> = {
       "Precios del pase de día, el pase semanal y la cuota.",
       "Avisos del gimnasio: horarios festivos, equipamiento nuevo.",
       "Avisa de un equipo averiado y el plan de todos lo evita hasta que se arregle.",
+      "¿Algo mal en la página de un gimnasio, ha cerrado o aparece dos veces? Informa desde la página y nuestro equipo lo corrige.",
     ],
     dyk: "Los miembros del club de un gimnasio oficial reciben un aviso cuando el gimnasio publica novedades.",
   },

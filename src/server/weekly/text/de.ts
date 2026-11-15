@@ -491,6 +491,7 @@ export const emails: Record<string, Words> = {
       "Preise für Tageskarte, Wochenkarte und Mitgliedschaft.",
       "Neuigkeiten vom Studio: Feiertagszeiten, neue Geräte.",
       "Melde defekte Geräte, und alle Pläne umgehen sie, bis sie repariert sind.",
+      "Stimmt etwas auf der Seite eines Studios nicht, hat es geschlossen oder steht es doppelt drin? Melde es auf der Seite, und unser Team korrigiert es.",
     ],
     dyk: "Mitglieder im Club eines offiziellen Studios werden benachrichtigt, wenn das Studio Neuigkeiten postet.",
   },

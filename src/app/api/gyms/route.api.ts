@@ -3,7 +3,7 @@
 // app already rounded to about 1 km. Anyone, rate-limited. `gyms` stays as it was for older apps; `places` is new.
 // POST {op}: publish, unpublish, mine, suggest (add a gym the map doesn't have), the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release), gymClub and
 // the poster ops (posters, posterStatus)
-// need a signed-in account; added and report work signed out too. Round 3 (gymExtras.ts): issue, issueFixed and
+// need a signed-in account; added, report and placeReport (a problem with a real gym's page) work signed out too. Round 3 (gymExtras.ts): issue, issueFixed and
 // issues (equipment problems) work signed out; news, newsDelete, extras (the owner's view), trainer, trainerLeave,
 // trainerGyms and trainerDecide need an account. Staff (gymStaff.ts): staff, staffInvite, staffCancel, staffPreview,
 // staffJoin, staffRemove and staffLeave need an account.
@@ -25,6 +25,7 @@ import {
   reportIssue,
 } from "@/server/gymExtras";
 import { areaMapPath } from "@/server/gymMedia";
+import { mergedTarget, reportPlace } from "@/server/gymPlaceReports";
 import { closestPlaces, isPlaceId, joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
 import { latestOrder, requestPosters } from "@/server/gymPosters";
 import { closestReply, ipSpot } from "@/server/gymsNear";
@@ -41,8 +42,11 @@ export async function GET(req: Request) {
   const allowed = rateLimit(`gyms:search:${ipOf(req)}`, LIMITS.searchesPerHour, 3_600_000);
   // ?place=<id>: one real gym, for its page in the app (GymPlace.tsx, the QR code's target).
   if (u.has("place")) {
-    const [ok, place] = await Promise.all([allowed, placeById(u.get("place"))]);
+    const [ok, found] = await Promise.all([allowed, placeById(u.get("place"))]);
     if (!ok) return reply(req, 429, { error: "slow" });
+    // A gym staff merged into another (gymPlaceReports.ts) opens the gym it was merged into.
+    const merged = found || !isPlaceId(u.get("place")) ? null : await mergedTarget(u.get("place")!);
+    const place = found ?? (merged ? await placeById(merged) : null);
     return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
   }
   // ?closest=1[&lat=&lon=]: the ten gyms closest to the visitor for the website's /gyms/ map (gymsNear.ts). Without a
@@ -97,6 +101,13 @@ export async function POST(req: Request) {
     }
     const r = await reportIssue(who, b);
     if (r.ok) return reply(req, 200, r);
+    return reply(req, r.error === "slow" ? 429 : r.error === "gone" ? 404 : 400, { error: r.error });
+  }
+  // A problem with a real gym's page (wrong details, closed, listed twice, not a gym), for staff (gymPlaceReports.ts).
+  if (b.op === "placeReport") {
+    const s = await sessionOf(req).catch(() => null);
+    const r = await reportPlace(s ? `acc:${s.accountId}` : addressKey(ipOf(req)), b.place, b.reason, b.note);
+    if (r.ok) return reply(req, 200, { ok: true });
     return reply(req, r.error === "slow" ? 429 : r.error === "gone" ? 404 : 400, { error: r.error });
   }
   if (b.op === "added" || b.op === "report") {

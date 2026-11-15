@@ -511,6 +511,7 @@ export const emails: Record<string, Words> = {
       "Day pass, week pass and membership prices.",
       "Announcements from the gym: holiday hours, new equipment.",
       "Report broken equipment, and everyone's plan works around it until it's fixed.",
+      "Something wrong on a gym's page, or is it closed or listed twice? Report a problem from the page, and our team fixes it.",
     ],
     dyk: "Members of an official gym's club get a notification when the gym posts news.",
   },

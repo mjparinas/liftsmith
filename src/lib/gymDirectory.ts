@@ -7,6 +7,7 @@ import { api, AuthError, readAccount } from "./auth";
 import { makeGym } from "./defaults";
 import { locate } from "./geo";
 import type { Amenity, GymIssue, GymNews, GymTrainer, Prices } from "./gymExtras";
+import type { PlaceReportReason } from "./gymPlaceReport";
 import { decodeGym, encodeGym, kitOf, type GymKit } from "./gymShare";
 import { keepRead, readKept } from "./liveRead";
 import { track } from "./net";
@@ -224,6 +225,16 @@ export async function reportGym(id: string, reason: ReportReason): Promise<boole
     return true;
   } catch {
     return false;
+  }
+}
+
+/** A problem with a real gym's page, for staff (gymPlaceReports.ts): signed in or not. */
+export async function reportPlace(placeId: string, reason: PlaceReportReason, note: string): Promise<"ok" | "offline" | "slow" | "failed"> {
+  try {
+    await api("/api/gyms/", { token: token(), body: { op: "placeReport", place: placeId, reason, note } });
+    return "ok";
+  } catch (e) {
+    return problem(e);
   }
 }
 

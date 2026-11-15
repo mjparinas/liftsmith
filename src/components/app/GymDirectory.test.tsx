@@ -146,6 +146,16 @@ describe("gyms near you", () => {
     await user.click(screen.getByRole("button", { name: "Add this gym" }));
     expect(useApp.getState().gyms.at(-1)).toMatchObject({ name: "Steve Nash Fitness World", placeId: PLACE.id });
     expect(calls.at(-1)!.body).toEqual({ op: "added", place: PLACE.id });
+
+    // Anyone can report a problem with a real gym's page (gymPlaceReports.ts).
+    await user.click(screen.getByRole("button", { name: "Report a problem with this page" }));
+    const report = within(screen.getByRole("dialog"));
+    expect(report.getByRole("button", { name: "Send report" })).toBeDisabled();
+    await user.click(report.getByRole("button", { name: "It’s listed twice" }));
+    await user.type(report.getByLabelText("Anything that would help us fix it (optional)"), "Same as the one on 200 St");
+    await user.click(report.getByRole("button", { name: "Send report" }));
+    expect(calls.at(-1)!.body).toEqual({ op: "placeReport", place: PLACE.id, reason: "duplicate", note: "Same as the one on 200 St" });
+    expect(await screen.findByText("Thanks. Our team will look at it.")).toBeInTheDocument();
   });
 
   it("opens a gym's page from its link, with its hours, and adds it with its equipment", async () => {

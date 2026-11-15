@@ -491,6 +491,7 @@ export const emails: Record<string, Words> = {
       "Prezzi di ingresso giornaliero, settimanale e abbonamento.",
       "Annunci della palestra: orari festivi, nuova attrezzatura.",
       "Segnala l'attrezzatura rotta, e il piano di tutti la evita finché non è riparata.",
+      "Qualcosa non va nella pagina di una palestra, ha chiuso o compare due volte? Segnalalo dalla pagina e il nostro team lo corregge.",
     ],
     dyk: "I membri del club di una palestra ufficiale ricevono una notifica quando la palestra pubblica novità.",
   },

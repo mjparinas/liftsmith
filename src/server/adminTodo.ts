@@ -9,6 +9,7 @@ import { jobState } from "@/lib/systemHealth";
 import { loadCreators } from "./creators";
 import { batch, query, run } from "./db";
 import { pendingClaimCount } from "./gymClaims";
+import { placeReportCount } from "./gymPlaceReports";
 import { pendingPlaceCount } from "./gymPlaces";
 import { posterCounts } from "./gymPosters";
 import { inboxConfigured, waitingMail } from "./inbox";
@@ -96,26 +97,27 @@ async function inboxItems(now: number): Promise<TodoItem[]> {
   }));
 }
 
-/** Reports on Friends and on listed gyms that wait for a decision on the Reports tab. */
+/** Reports on Friends, on listed gyms and on real gyms' pages that wait for a decision on the Reports tab. */
 async function reportItems(): Promise<TodoItem[]> {
-  const [friends, gyms] = await Promise.all([
+  const [friends, gyms, places] = await Promise.all([
     query<{ n: number; last: number | null }>(
       "SELECT COUNT(DISTINCT kind || ':' || target_id) AS n, MAX(created_at) AS last FROM reports WHERE status = 'open'",
     ),
     query<{ n: number; last: number | null }>(
       "SELECT COUNT(DISTINCT gym_id) AS n, MAX(created_at) AS last FROM gym_reports WHERE status = 'open'",
     ),
+    placeReportCount(),
   ]);
-  const n = Number(friends[0]?.n ?? 0) + Number(gyms[0]?.n ?? 0);
+  const n = Number(friends[0]?.n ?? 0) + Number(gyms[0]?.n ?? 0) + places.count;
   if (!n) return [];
-  const last = Math.max(Number(friends[0]?.last ?? 0), Number(gyms[0]?.last ?? 0));
+  const last = Math.max(Number(friends[0]?.last ?? 0), Number(gyms[0]?.last ?? 0), places.last);
   return [
     {
       // The newest report is in the key, so a new one brings a dismissed item back.
       key: `reports:${last}`,
       kind: "reports",
       title: n === 1 ? "1 report waiting for a decision" : `${n} reports waiting for a decision`,
-      detail: "Posts, comments, profiles or gym listings lifters reported. Three reports hide a post until it's decided.",
+      detail: "Posts, comments, profiles, gym listings or gym pages people reported. Three reports hide a post until it's decided.",
       at: last || null,
       action: { label: "Open Reports", tab: "Reports" },
     },

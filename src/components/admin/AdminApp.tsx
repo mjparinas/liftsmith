@@ -14,6 +14,7 @@ import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
+import { GymPlaceReports } from "./GymPlaceReports";
 import { GymPlaces } from "./GymPlaces";
 import { GymReports } from "./GymReports";
 import { Inbox } from "./Inbox";
@@ -1084,6 +1085,7 @@ export function AdminApp() {
           <>
             <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />
             <GymReports admin={data.staff.role === "admin"} />
+            <GymPlaceReports admin={data.staff.role === "admin"} />
           </>
         )}
         {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
