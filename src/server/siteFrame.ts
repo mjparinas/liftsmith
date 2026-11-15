@@ -174,6 +174,8 @@ h1,h2,p{margin:0}
 .btn-ghost{border:1px solid var(--line);background:var(--raised);color:var(--ink);width:100%;margin-top:18px}.btn-ghost:hover{border-color:var(--accent)}
 .quiet{display:inline-flex;min-height:44px;align-items:center;color:var(--muted);font-weight:600;text-decoration:none;font-size:.9375rem}.quiet:hover{color:var(--ink)}
 .card{background:linear-gradient(180deg,rgb(255 255 255/.035),transparent 40%),var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px}
+/* No two cards touch (Melvin, 2026-11-15): stacked cards in a page's flow get a gap; grid and flex lists use gap. */
+.page>.card+.card{margin-top:16px}
 .kicker{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--violet)}
 /* Header */
 .site-h{position:sticky;top:0;z-index:30;border-bottom:1px solid rgb(35 45 58/.6);background:rgb(8 11 16/.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
