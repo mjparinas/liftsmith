@@ -3,7 +3,7 @@ import "fake-indexeddb/auto";
 
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 import { forgetAccount, useAccount } from "@/lib/auth";
 import { setBillingLive } from "@/lib/billing";
@@ -505,6 +505,11 @@ describe("check-ins", () => {
   });
 
   it("a coach reads a client's answers, and a low score goes first", async () => {
+    // Low scores count for 14 days, so pin the clock to NOW (only Date, so userEvent's timers still run); with the real
+    // clock this test began failing on 2026-11-15, two weeks after its answer.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NOW);
+    onTestFinished(() => void vi.useRealTimers());
     answered = [
       {
         ...CHECKIN,

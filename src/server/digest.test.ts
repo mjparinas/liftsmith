@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { saveAlertSettings } from "./alerts";
+import { saveAlertSettings, type Mailer } from "./alerts";
 import { resetDb, run } from "./db";
 import { digestData, digestDue, digestFrom, digestMail, digestRecipients, localClock, sendDigest } from "./digest";
 import { clearSystemCache } from "./systemHealth";
@@ -118,6 +118,18 @@ describe("the morning digest", () => {
     expect(await sendDigest({ now: NOW + HOUR, mail: m.mail, force: true })).toBe(1);
     await saveAlertSettings({ instant: true, digest: false });
     expect(await sendDigest({ now: NOW + 24 * HOUR, mail: m.mail })).toBe(0);
+  });
+
+  it("sends one digest when the same run is delivered twice at once, and tries again later if nothing went out", async () => {
+    const m = mailer();
+    const both = await Promise.all([sendDigest({ now: NOW, mail: m.mail }), sendDigest({ now: NOW, mail: m.mail })]);
+    expect(both.sort()).toEqual([0, 1]);
+    expect(m.sent).toHaveLength(1);
+    // A failed send hands the claim back, so the next run (16:00 UTC) still sends.
+    const failing: Mailer = async () => false;
+    const tomorrow = NOW + 24 * HOUR;
+    expect(await sendDigest({ now: tomorrow, mail: failing })).toBe(0);
+    expect(await sendDigest({ now: tomorrow + HOUR, mail: m.mail })).toBe(1);
   });
 
   it("also goes to DIGEST_TO, each address once, without making them admins", async () => {

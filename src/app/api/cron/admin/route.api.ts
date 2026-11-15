@@ -1,4 +1,4 @@
-// Vercel Cron (vercel.json), each morning: runs the admin panel's System checks and emails the admins about any
+// Vercel Schedules (vercel.json, "admin"), each morning: runs the admin panel's System checks and emails the admins about any
 // that went down or came back (src/server/alerts.ts), records the database size for
 // the Capacity card, and pings IndexNow with new and changed public pages (src/server/indexnow.ts), and tells coaches about clients who
 // went quiet (src/server/coach.ts alertQuiet), and lifts Friends suspensions that have run out (socialModeration.ts). Vercel sends "Authorization: Bearer $CRON_SECRET". Each run is recorded (src/server/monitor.ts).
