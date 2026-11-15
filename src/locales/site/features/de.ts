@@ -245,7 +245,12 @@ export const de: FeaturesText = {
     },
     food: {
       name: "Coach-Notizen aus deiner Ernährungs-App",
-      body: "Kalorien und Eiweiß aus einer Ernährungs-App kommen über die Gesundheits-App deines Handys zu Liftsmith und werden zu Notizen wie „drei Tage in Folge zu wenig Eiweiß“. Die App selbst erfasst keine Ernährung.",
+      body: "Kalorien, Eiweiß, Kohlenhydrate und Fett aus einer Ernährungs-App kommen über die Gesundheits-App deines Handys zu Liftsmith und werden zu Notizen wie „drei Tage in Folge zu wenig Eiweiß“, gemessen an einem einzigen Satz Ziele für dein Ziel. Auch nur Eiweiß zu erfassen zählt. Die App selbst erfasst keine Ernährung.",
+    },
+    "measured-maintenance": {
+      name: "Erhaltungsbedarf, gemessen an dem, was du isst",
+      body: "Zwei Wochen Ernährung und Wiegungen messen deinen echten täglichen Kalorienbedarf, mit dem dann Makros, TDEE und deine Ernährungsnotizen rechnen. Eine Karte „Ernährung“ unter Körper zeigt deine Woche im Vergleich zu deinen Zielen.",
+      note: "Unter 18 gibt es nur Tipps zum Eiweiß: kein Ziel zum Fettverlust und keine Kalorien-Notizen.",
     },
     "your-stats": {
       name: "Deine Angaben",
@@ -357,7 +362,7 @@ export const de: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Ernährungsziele für Kunden",
-      body: "Lege für jeden Kunden Kalorien und Protein pro Tag fest. Die Coach-Hinweise prüfen die Ernährungswoche daran, und du siehst, wie er isst, wenn er es teilt.",
+      body: "Lege für jede Person Kalorien, Protein, Kohlenhydrate und Fett pro Tag fest, auf Wunsch mit anderen Kalorien an Ruhetagen, mit einem Tipp aus den eigenen Werten ausgefüllt. Die Hinweise des Coaches prüfen die Ernährungswoche daran, und du siehst, wie gegessen wird, wenn es geteilt wird.",
     },
     "school-teams": {
       name: "Kostenlos für Schulteams",

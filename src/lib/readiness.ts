@@ -39,6 +39,8 @@ export interface ExternalSignals {
   restingHrDelta?: number;
   /** Overnight breathing rate against its 30-day baseline, in breaths a minute. */
   breathingDelta?: number;
+  /** The two newest days a food app logged were both well under maintenance (nutrition.ts underFuelled). */
+  underFuelled?: boolean;
   /** Pre-workout check-in, −1 (low) to 1 (great). Defaults to today's check-in on Today (`todayFeel`). */
   checkIn?: -1 | 0 | 1;
   /** Use logged periods (only when the lifter opted in to cycle-aware readiness). */
@@ -207,6 +209,7 @@ export function healthSignals(external: ExternalSignals): Signal[] {
   }
   if (external.restingHrDelta !== undefined && external.restingHrDelta > 5) add(-8, t("sig.restingUp"));
   if (external.breathingDelta !== undefined && external.breathingDelta >= 2) add(-8, t("sig.breathingUp"));
+  if (external.underFuelled) add(-8, t("sig.underFuelled"));
   return out;
 }
 

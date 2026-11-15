@@ -87,7 +87,8 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    /// Calories and protein eaten per day, for the food coach's notes (src/lib/health.ts readNutrition, insights.ts).
+    /// Calories, protein, carbs and fat eaten per day, for the food coach's notes (src/lib/health.ts readNutrition,
+    /// insights.ts; carbs and fat since 2026-11-15).
     /// Food apps such as MyFitnessPal or Cronometer write dietary energy and protein to Apple Health; this adds them up
     /// per local day (a statistics query, which Apple Health dedupes across sources) for the `days` finished days
     /// before today. Today is left out because it's still being logged. The health plugin can't read protein, so this
@@ -96,7 +97,9 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func nutrition(_ call: CAPPluginCall) {
         guard HKHealthStore.isHealthDataAvailable(),
               let kcalType = HKQuantityType.quantityType(forIdentifier: .dietaryEnergyConsumed),
-              let proteinType = HKQuantityType.quantityType(forIdentifier: .dietaryProtein)
+              let proteinType = HKQuantityType.quantityType(forIdentifier: .dietaryProtein),
+              let carbsType = HKQuantityType.quantityType(forIdentifier: .dietaryCarbohydrates),
+              let fatType = HKQuantityType.quantityType(forIdentifier: .dietaryFatTotal)
         else { return call.resolve(["days": []]) }
         let days = min(60, max(1, call.getInt("days") ?? 14))
         let cal = Calendar.current
@@ -105,14 +108,17 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         let read = { [weak self] in
             guard let self else { return call.resolve(["days": []]) }
             let group = DispatchGroup()
-            var kcal: [String: Double] = [:]
-            var protein: [String: Double] = [:]
+            // Each type's totals per local day, under "kcal", "protein", "carbs" and "fat".
+            var totals: [String: [String: Double]] = [:]
             let lock = NSLock()
             let key: (Date) -> String = { d in
                 let c = cal.dateComponents([.year, .month, .day], from: d)
                 return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
             }
-            for (type, unit, isKcal) in [(kcalType, HKUnit.kilocalorie(), true), (proteinType, HKUnit.gram(), false)] {
+            let reads: [(HKQuantityType, HKUnit, String)] = [
+                (kcalType, .kilocalorie(), "kcal"), (proteinType, .gram(), "protein"), (carbsType, .gram(), "carbs"), (fatType, .gram(), "fat"),
+            ]
+            for (type, unit, name) in reads {
                 group.enter()
                 let q = HKStatisticsCollectionQuery(
                     quantityType: type,
@@ -125,7 +131,7 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
                     results?.enumerateStatistics(from: start, to: end) { stat, _ in
                         guard let sum = stat.sumQuantity() else { return }
                         lock.lock()
-                        if isKcal { kcal[key(stat.startDate)] = sum.doubleValue(for: unit) } else { protein[key(stat.startDate)] = sum.doubleValue(for: unit) }
+                        totals[key(stat.startDate), default: [:]][name] = sum.doubleValue(for: unit)
                         lock.unlock()
                     }
                     group.leave()
@@ -133,17 +139,16 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
                 self.store.execute(q)
             }
             group.notify(queue: .main) {
-                let out: [[String: Any]] = Set(kcal.keys).union(protein.keys).sorted().map { day in
+                let out: [[String: Any]] = totals.keys.sorted().map { day in
                     var d: [String: Any] = ["day": day]
-                    if let k = kcal[day] { d["kcal"] = k }
-                    if let p = protein[day] { d["protein"] = p }
+                    for (name, value) in totals[day] ?? [:] { d[name] = value }
                     return d
                 }
                 call.resolve(["days": out])
             }
         }
         if call.getBool("ask") ?? false {
-            store.requestAuthorization(toShare: nil, read: [kcalType, proteinType]) { _, _ in read() }
+            store.requestAuthorization(toShare: nil, read: [kcalType, proteinType, carbsType, fatType]) { _, _ in read() }
         } else {
             read()
         }

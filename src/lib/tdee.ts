@@ -10,6 +10,7 @@
 // the profile. The current value is always computed fresh; events are the record of the past.
 import type { SessionSummary } from "./derive";
 import { t } from "./i18n";
+import { measuredTdee, type Measured } from "./nutrition";
 import type { AppEvent, Profile, TdeeEvent } from "./types";
 
 export type Activity = "sedentary" | "light" | "moderate" | "heavy" | "athlete";
@@ -229,7 +230,17 @@ export interface CurrentTdee {
   activity: ActivityRead | { activity: Activity; source: "manual"; perWeek?: undefined; steps?: undefined };
   /** Which inputs are still missing, in the order the screen asks for them. */
   missing: ("sex" | "age" | "height")[];
+  /** Maintenance and its cut and lean-gain numbers: measured from food and weigh-ins when there's enough, else the formula's. */
   result?: TdeeResult;
+  /** The formula's own result, for the history of snapshots (they record the formula, not the measurement). */
+  formulaResult?: TdeeResult;
+  /** Maintenance measured from what the lifter ate and how their weight moved (nutrition.ts, 2026-11-15). */
+  measured?: Measured;
+}
+
+/** A formula result with its maintenance swapped for the measured one; cut and lean gain follow it. */
+export function withMeasured(r: TdeeResult, m: Measured): TdeeResult {
+  return { ...r, tdee: m.kcal, cut: Math.max(r.bmr, m.kcal - 500), bulk: m.kcal + 250 };
 }
 
 export function currentTdee(events: AppEvent[], sessions: Pick<SessionSummary, "start">[], profile: Profile, now: number): CurrentTdee {
@@ -254,7 +265,16 @@ export function currentTdee(events: AppEvent[], sessions: Pick<SessionSummary, "
   )
     .filter(([, v]) => v === undefined)
     .map(([k]) => k);
-  return { inputs, activity, missing, result: validInputs(inputs) ? calcTdee(inputs) : undefined };
+  const formula = validInputs(inputs) ? calcTdee(inputs) : undefined;
+  const measured = formula ? (measuredTdee(events, now) ?? undefined) : undefined;
+  return {
+    inputs,
+    activity,
+    missing,
+    result: formula && measured ? withMeasured(formula, measured) : formula,
+    formulaResult: formula,
+    ...(measured ? { measured } : {}),
+  };
 }
 
 // --- Snapshots ---
@@ -289,7 +309,8 @@ export function snapshotDue(
   id: string,
   trigger: TdeeEvent["trigger"] = "auto",
 ): TdeeEvent | null {
-  if (!cur.result || !validInputs(cur.inputs)) return null;
+  const r = cur.formulaResult ?? cur.result;
+  if (!r || !validInputs(cur.inputs)) return null;
   const changes = changesSince(lastSnapshot(events), cur.inputs);
   if (!changes.length && trigger === "auto") return null;
   const i = cur.inputs;
@@ -297,8 +318,8 @@ export function snapshotDue(
     type: "tdee",
     id,
     at: now,
-    kcal: cur.result.tdee,
-    bmr: cur.result.bmr,
+    kcal: r.tdee,
+    bmr: r.bmr,
     kg: i.kg,
     cm: i.cm,
     age: i.age,
@@ -308,7 +329,7 @@ export function snapshotDue(
     ...(cur.activity.perWeek !== undefined ? { perWeek: cur.activity.perWeek } : {}),
     ...(cur.activity.steps !== undefined ? { steps: cur.activity.steps } : {}),
     ...(i.bodyFat !== undefined ? { bodyFat: i.bodyFat } : {}),
-    formula: cur.result.formula,
+    formula: r.formula,
     trigger,
     changes: changes.length ? changes : ["recheck"],
   };

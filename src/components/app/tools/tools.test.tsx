@@ -77,7 +77,11 @@ describe("Tools › Macros", () => {
   it("works out the day from TDEE and the goal, with a reason for each number", async () => {
     const user = userEvent.setup();
     render(<Tools arg="macros" />);
-    // BMR 1780 × 1.55 = 2759 (Mifflin, 80 kg, 180 cm, 30, 3 days a week).
+    // Until a goal is picked it follows the training goal: build muscle eats a lean gain over TDEE.
+    // BMR 1780 × 1.55 = 2759 (Mifflin, 80 kg, 180 cm, 30, 3 days a week), + 250.
+    const muscle = useApp.getState().profile.goal === "muscle";
+    expect(screen.getByTestId("macros-kcal")).toHaveTextContent(muscle ? "3,009" : "2,759");
+    await user.click(screen.getByRole("button", { name: "Maintain" }));
     expect(screen.getByTestId("macros-kcal")).toHaveTextContent("2,759");
     expect(screen.getByText("Your TDEE: what you burn on an average day.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Lose fat" }));

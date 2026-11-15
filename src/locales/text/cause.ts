@@ -15,6 +15,8 @@ export const en = {
     "Your readiness has averaged {avg}, below the 50 baseline. Recovery may be the limit: sleep, food and stress count too.",
   "cause.sameReps": "Every session since your best has been in the same {lo}–{hi} rep range.",
   "cause.none": "Nothing in your data stands out. Effort, sets and rest all look fine, so a change of exercise is the best next step.",
+  "cause.food":
+    "You've eaten about {gap} a day under maintenance this past week. Strength rarely climbs in a deficit, so holding it is a win, and a small step back that rebuilds with the reps is the fair fix.",
 } as const;
 
 type Key = keyof typeof en;
@@ -32,6 +34,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cause.sameReps": "Todas las sesiones desde tu mejor marca han sido en el mismo rango de {lo}–{hi} repeticiones.",
   "cause.none":
     "Nada destaca en tus datos. Esfuerzo, series y descanso parecen correctos, así que cambiar de ejercicio es el mejor siguiente paso.",
+  "cause.food":
+    "Esta semana has comido unas {gap} al día por debajo del mantenimiento. La fuerza rara vez sube en déficit, así que mantenerla ya es un logro, y un pequeño paso atrás que se recupera con las repeticiones es lo justo.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -47,6 +51,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cause.sameReps": "Chaque séance depuis votre record s’est faite dans la même fourchette de {lo} à {hi} répétitions.",
   "cause.none":
     "Rien ne ressort de vos données. Effort, séries et repos semblent corrects, donc changer d’exercice est la meilleure prochaine étape.",
+  "cause.food":
+    "Cette semaine, vous avez mangé environ {gap} par jour sous votre maintien. La force monte rarement en déficit : la garder est déjà une réussite, et un petit pas en arrière qui se reconstruit avec les répétitions est la bonne solution.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -62,6 +68,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cause.sameReps": "Jede Einheit seit deiner Bestleistung lag im selben Bereich von {lo}–{hi} Wiederholungen.",
   "cause.none":
     "In deinen Daten fällt nichts auf. Einsatz, Sätze und Pausen sehen gut aus, also ist ein Übungswechsel der beste nächste Schritt.",
+  "cause.food":
+    "Du hast diese Woche etwa {gap} am Tag unter deinem Erhaltungsbedarf gegessen. Im Defizit steigt die Kraft selten, sie zu halten ist schon ein Erfolg, und ein kleiner Schritt zurück, der sich über die Wiederholungen wieder aufbaut, ist die faire Lösung.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -76,6 +84,8 @@ export const it: Partial<Record<Key, Message>> = {
     "La tua prontezza è stata in media {avg}, sotto la base di 50. Il limite potrebbe essere il recupero: contano anche sonno, alimentazione e stress.",
   "cause.sameReps": "Ogni seduta dal tuo record è stata nello stesso intervallo di {lo}–{hi} ripetizioni.",
   "cause.none": "Nei tuoi dati non spicca nulla. Impegno, serie e riposo sembrano a posto, quindi cambiare esercizio è il passo migliore.",
+  "cause.food":
+    "Questa settimana hai mangiato circa {gap} al giorno sotto il mantenimento. In deficit la forza sale di rado, quindi mantenerla è già un successo, e un piccolo passo indietro che si ricostruisce con le ripetizioni è la soluzione giusta.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -87,4 +97,6 @@ export const ja: Partial<Record<Key, Message>> = {
     "コンディションの平均は{avg}で、基準の50を下回っています。回復が限界かもしれません。睡眠、食事、ストレスも影響します。",
   "cause.sameReps": "ベスト以降のセッションはすべて同じ{lo}〜{hi}レップの範囲でした。",
   "cause.none": "データに目立った問題はありません。強度、セット数、休憩はどれも問題ないので、種目を変えるのが次の一手です。",
+  "cause.food":
+    "この1週間、維持カロリーより1日約{gap}少なく食べています。カロリー不足の間は筋力はなかなか伸びないので、維持できれば十分です。少し重量を下げて回数で戻していくのが妥当な対策です。",
 };

@@ -246,7 +246,12 @@ export const fr: FeaturesText = {
     },
     food: {
       name: "Notes du coach d’après votre appli de nutrition",
-      body: "Les calories et protéines notées dans une appli de nutrition arrivent dans Liftsmith via l’appli santé du téléphone et deviennent des notes comme « protéines insuffisantes trois jours de suite ». L’appli ne fait pas de suivi alimentaire.",
+      body: "Les calories, protéines, glucides et lipides notés dans une appli de nutrition arrivent dans Liftsmith via l’appli santé du téléphone et deviennent des notes comme « protéines insuffisantes trois jours de suite », jugées selon un seul ensemble d’objectifs pour votre but. Noter seulement ses protéines compte aussi. L’appli ne fait pas de suivi alimentaire.",
+    },
+    "measured-maintenance": {
+      name: "Un maintien mesuré sur ce que vous mangez",
+      body: "Deux semaines de repas et de pesées mesurent vos vraies calories quotidiennes, qui servent ensuite à Macros, à la DEJ et à vos notes sur l’alimentation. Une carte Alimentation dans Corps montre votre semaine face à vos objectifs.",
+      note: "Les moins de 18 ans ne reçoivent que des conseils sur les protéines : pas d’objectif de perte de gras ni de notes sur les calories.",
     },
     "your-stats": {
       name: "Vos données",
@@ -358,7 +363,7 @@ export const fr: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Objectifs nutritionnels pour les clients",
-      body: "Fixez les calories et protéines quotidiennes de chaque client. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange s'il le partage.",
+      body: "Fixez les calories, protéines, glucides et lipides quotidiens de chaque client, avec d’autres calories les jours de repos si vous voulez, remplis avec ses propres données en un geste. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange quand il le partage.",
     },
     "school-teams": {
       name: "Gratuit pour les équipes d’école secondaire",

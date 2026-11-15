@@ -126,7 +126,8 @@ class HealthWorkoutPlugin : Plugin() {
     }
 
     /**
-     * Calories and protein eaten per day, for the food coach's notes (src/lib/health.ts readNutrition, insights.ts).
+     * Calories, protein, carbs and fat eaten per day, for the food coach's notes (src/lib/health.ts readNutrition,
+     * insights.ts; carbs and fat since 2026-11-15, under the same READ_NUTRITION permission).
      * Food apps such as MyFitnessPal or Cronometer write nutrition records to Health Connect; this adds them up per
      * local day (Health Connect's aggregate, so two apps logging the same meal are counted once by its source
      * priority) for the `days` finished days before today. Today is left out because it's still being logged. The
@@ -145,7 +146,12 @@ class HealthWorkoutPlugin : Plugin() {
                     val today = LocalDate.now()
                     val groups = c.aggregateGroupByPeriod(
                         AggregateGroupByPeriodRequest(
-                            metrics = setOf(NutritionRecord.ENERGY_TOTAL, NutritionRecord.PROTEIN_TOTAL),
+                            metrics = setOf(
+                                NutritionRecord.ENERGY_TOTAL,
+                                NutritionRecord.PROTEIN_TOTAL,
+                                NutritionRecord.TOTAL_CARBOHYDRATE_TOTAL,
+                                NutritionRecord.TOTAL_FAT_TOTAL,
+                            ),
                             timeRangeFilter = TimeRangeFilter.between(today.minusDays(days.toLong()).atStartOfDay(), today.atStartOfDay()),
                             timeRangeSlicer = Period.ofDays(1),
                         ),
@@ -153,11 +159,15 @@ class HealthWorkoutPlugin : Plugin() {
                     for (g in groups) {
                         val kcal = g.result[NutritionRecord.ENERGY_TOTAL]?.inKilocalories
                         val protein = g.result[NutritionRecord.PROTEIN_TOTAL]?.inGrams
-                        if (kcal == null && protein == null) continue
+                        val carbs = g.result[NutritionRecord.TOTAL_CARBOHYDRATE_TOTAL]?.inGrams
+                        val fat = g.result[NutritionRecord.TOTAL_FAT_TOTAL]?.inGrams
+                        if (kcal == null && protein == null && carbs == null && fat == null) continue
                         val day = JSObject()
                         day.put("day", g.startTime.toLocalDate().toString())
                         if (kcal != null) day.put("kcal", kcal)
                         if (protein != null) day.put("protein", protein)
+                        if (carbs != null) day.put("carbs", carbs)
+                        if (fat != null) day.put("fat", fat)
                         out.put(day)
                     }
                 }

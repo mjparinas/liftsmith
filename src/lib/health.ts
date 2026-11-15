@@ -256,7 +256,7 @@ interface WorkoutPlugin {
   characteristics?(o: { ask: boolean }): Promise<{ sex?: string; birthYear?: number }>;
   /** Opens where Health permissions are changed (or Google Play for Health Connect). Missing on older app builds. */
   openPermissions?(): Promise<{ opened: boolean }>;
-  /** Calories and protein eaten per finished day (food apps write them). Missing on older app builds. */
+  /** Calories, protein, carbs and fat eaten per finished day (food apps write them). Missing on older app builds. */
   nutrition?(o: { days: number; ask?: boolean }): Promise<{ days: NutritionDay[] }>;
 }
 
@@ -265,6 +265,9 @@ export interface NutritionDay {
   day: string;
   kcal?: number;
   protein?: number;
+  /** Grams of carbohydrate and fat (2026-11-15; older app builds send neither). */
+  carbs?: number;
+  fat?: number;
 }
 const workoutPlugin = (): WorkoutPlugin | undefined =>
   isNative()
@@ -443,6 +446,9 @@ export function nutritionReadings(days: readonly NutritionDay[]): DailyReading[]
       out.push({ metric: "kcalIn", day: d.day, value: Math.round(d.kcal), at });
     if (typeof d.protein === "number" && d.protein > 0 && d.protein < 600)
       out.push({ metric: "protein", day: d.day, value: Math.round(d.protein), at });
+    if (typeof d.carbs === "number" && d.carbs > 0 && d.carbs < 1500)
+      out.push({ metric: "carbs", day: d.day, value: Math.round(d.carbs), at });
+    if (typeof d.fat === "number" && d.fat > 0 && d.fat < 600) out.push({ metric: "fat", day: d.day, value: Math.round(d.fat), at });
   }
   return out;
 }

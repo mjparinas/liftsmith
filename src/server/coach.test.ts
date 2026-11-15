@@ -676,22 +676,50 @@ describe("nutrition targets from the coach", () => {
     await joinCoach("client", "CCCCDDDD", NOW);
   });
 
-  it("only go to the coach's own clients, keep numbers in range, and both empty clears them", async () => {
-    expect(await setTargets("stranger", "client", 2400, 160, NOW)).toEqual({ error: "notClient" });
-    expect(await setTargets("coach", "client", 2400.4, 9999, NOW)).toEqual({
+  it("only go to the coach's own clients, keep numbers in range, and all empty clears them", async () => {
+    expect(await setTargets("stranger", "client", { kcal: 2400, protein: 160 }, NOW)).toEqual({ error: "notClient" });
+    expect(await setTargets("coach", "client", { kcal: 2400.4, protein: 9999 }, NOW)).toEqual({
       coachId: "coach",
       clientId: "client",
       kcal: 2400,
       protein: null,
+      carbs: null,
+      fat: null,
+      kcalRest: null,
       at: NOW,
     });
-    expect(await setTargets("coach", "client", 2500, 150, NOW + 1)).toMatchObject({ kcal: 2500, protein: 150 });
+    expect(await setTargets("coach", "client", { kcal: 2500, protein: 150 }, NOW + 1)).toMatchObject({ kcal: 2500, protein: 150 });
     expect((await overview("client", NOW)).targets).toEqual([
-      { coachId: "coach", clientId: "client", kcal: 2500, protein: 150, at: NOW + 1 },
+      { coachId: "coach", clientId: "client", kcal: 2500, protein: 150, carbs: null, fat: null, kcalRest: null, at: NOW + 1 },
     ]);
     expect((await clientView("coach", "client", NOW))?.targets).toMatchObject({ kcal: 2500, protein: 150 });
-    expect(await setTargets("coach", "client", null, "x", NOW)).toBeNull();
+    expect(await setTargets("coach", "client", { kcal: null, protein: "x" }, NOW)).toBeNull();
     expect((await overview("client", NOW)).targets).toEqual([]);
+  });
+
+  it("keep carbs, fat and a rest-day number, which needs a training-day one", async () => {
+    expect(await setTargets("coach", "client", { kcal: 2600, kcalRest: 2200, protein: 160, carbs: 300, fat: 80 }, NOW)).toMatchObject({
+      kcal: 2600,
+      kcalRest: 2200,
+      carbs: 300,
+      fat: 80,
+    });
+    expect(await setTargets("coach", "client", { kcalRest: 2200, protein: 160 }, NOW)).toMatchObject({ kcal: null, kcalRest: null });
+    expect(await setTargets("coach", "client", { carbs: 5000, fat: 2 }, NOW)).toBeNull();
+  });
+
+  it("are protein only for a client under 18, and the coach is told", async () => {
+    await push("teen", [], { name: "Sam", birthYear: 2012 });
+    await makeInvite("coach", NOW, "GGGGHHHH");
+    await joinCoach("teen", "GGGGHHHH", NOW);
+    expect(await setTargets("coach", "teen", { kcal: 1800, protein: 110, carbs: 200, fat: 50 }, NOW)).toMatchObject({
+      kcal: null,
+      protein: 110,
+      carbs: null,
+      fat: null,
+    });
+    expect((await clientView("coach", "teen", NOW))?.teen).toBe(true);
+    expect((await clientView("coach", "client", NOW))?.teen).toBe(false);
   });
 
   it("the client's food days reach the coach only with body sharing on, newest number per day, last 30 days", async () => {
@@ -701,7 +729,7 @@ describe("nutrition targets from the coach", () => {
   });
 
   it("go when the pair unlinks or an account is deleted", async () => {
-    await setTargets("coach", "client", 2400, 160, NOW);
+    await setTargets("coach", "client", { kcal: 2400, protein: 160 }, NOW);
     await unlink("client", "coach");
     expect(await query("SELECT * FROM coach_targets")).toEqual([]);
     expect(coachCleanup("x").some((q) => q.sql.includes("coach_targets"))).toBe(true);

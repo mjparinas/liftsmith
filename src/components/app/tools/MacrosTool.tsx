@@ -5,10 +5,12 @@
 import { useEffect, useMemo } from "react";
 
 import { track } from "@/lib/analytics";
-import { goalCalories, MACRO_GOALS, macros, PROTEIN_PER_KG, type MacroGoal } from "@/lib/calculators";
+import { goalCalories, MACRO_GOALS, macros, PROTEIN_PER_KG } from "@/lib/calculators";
+import { foodTargets } from "@/lib/foodTargets";
 import { list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
-import { currentKg, currentTdee } from "@/lib/tdee";
+import { currentKg } from "@/lib/tdee";
+import { useCoachNotes } from "@/lib/trainer";
 import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
@@ -22,42 +24,58 @@ const COLOUR = { protein: "var(--color-accent)", fat: "var(--color-ember)", carb
 export function MacrosTool() {
   const { events, stats, profile, setProfile } = useApp();
   const now = useNow(60_000);
-  const cur = useMemo(() => currentTdee(events, stats.sessions, profile, now), [events, stats.sessions, profile, now]);
-  const goal: MacroGoal = profile.tdee?.goal ?? "maintain";
+  const coach = useCoachNotes((x) => x.targets);
+  // The one set of food targets (foodTargets.ts): the goal, measured maintenance and a coach's numbers, the same
+  // ones the coach's notes judge the week against. Under-18s don't get Lose fat.
+  const ft = useMemo(() => foodTargets(events, stats.sessions, profile, now, coach), [events, stats.sessions, profile, now, coach]);
+  const cur = ft.tdee;
+  const goal = ft.goal;
   const kg = currentKg(events, profile);
   useEffect(() => track("feature", { name: "tool_macros" }), []);
   const r = cur.result;
-  const kcal = r ? goalCalories(r.tdee, r.bmr, goal) : 0;
-  const m = macros(kcal, kg, goal);
+  const own = macros(r ? goalCalories(r.tdee, r.bmr, goal) : 0, kg, goal);
+  const by = ft.coach;
+  const m = by ? macros(ft.kcal ?? own.kcal, kg, goal) : own;
+  if (by?.protein) m.protein = ft.protein;
+  if (by?.carbs && ft.carbs) m.carbs = ft.carbs;
+  if (by?.fat && ft.fat) m.fat = ft.fat;
+  if (by) {
+    const total = m.protein * 4 + m.fat * 9 + m.carbs * 4 || 1;
+    m.split = { protein: (m.protein * 4) / total, fat: (m.fat * 9) / total, carbs: (m.carbs * 4) / total };
+  }
+  const coachWhy = by ? t("calc.mac.why.coach", { name: by.name || t("ins.yourCoach") }) : "";
   const lb = profile.unit === "lb";
   const pace = (kgPerWeek: number) => (lb ? `${fmtNum(kgPerWeek * 2)} lb` : `${fmtNum(kgPerWeek)} kg`);
 
-  const kcalWhy = !r
-    ? ""
-    : goal === "cut"
-      ? kcal === r.bmr && r.tdee - 500 < r.bmr
-        ? t("calc.mac.why.cutFloor", { bmr: num(r.bmr) })
-        : t("calc.mac.why.cut", { tdee: num(r.tdee), pace: pace(0.5) })
-      : goal === "bulk"
-        ? t("calc.mac.why.bulk", { tdee: num(r.tdee), pace: pace(0.25) })
-        : t("calc.mac.why.maintain", { tdee: num(r.tdee) });
+  const kcalWhy = by?.kcal
+    ? coachWhy
+    : !r
+      ? ""
+      : goal === "cut"
+        ? own.kcal === r.bmr && r.tdee - 500 < r.bmr
+          ? t("calc.mac.why.cutFloor", { bmr: num(r.bmr) })
+          : t("calc.mac.why.cut", { tdee: num(r.tdee), pace: pace(0.5) })
+        : goal === "bulk"
+          ? t("calc.mac.why.bulk", { tdee: num(r.tdee), pace: pace(0.25) })
+          : t("calc.mac.why.maintain", { tdee: num(r.tdee) });
+  const measuredWhy = r && cur.measured && !by?.kcal ? ` ${t("calc.mac.why.measured", { days: cur.measured.days })}` : "";
 
   const rows = [
     {
       key: "protein",
       g: m.protein,
       share: m.split.protein,
-      why: t(`calc.mac.why.protein.${goal}`, { perKg: fmtNum(PROTEIN_PER_KG[goal]) }),
+      why: by?.protein ? coachWhy : t(`calc.mac.why.protein.${goal}`, { perKg: fmtNum(PROTEIN_PER_KG[goal]) }),
     },
-    { key: "fat", g: m.fat, share: m.split.fat, why: t("calc.mac.why.fat") },
-    { key: "carbs", g: m.carbs, share: m.split.carbs, why: t("calc.mac.why.carbs") },
+    { key: "fat", g: m.fat, share: m.split.fat, why: by?.fat ? coachWhy : t("calc.mac.why.fat") },
+    { key: "carbs", g: m.carbs, share: m.split.carbs, why: by?.carbs ? coachWhy : t("calc.mac.why.carbs") },
   ] as const;
 
   return (
     <ToolScreen title={t("calc.mac.title")} blurb={t("calc.mac.blurb")}>
       <Section title={t("calc.mac.goal")}>
         <div className="flex flex-wrap gap-2" role="group" aria-label={t("calc.mac.goal")}>
-          {MACRO_GOALS.map((g) => (
+          {MACRO_GOALS.filter((g) => !(ft.teen && g === "cut")).map((g) => (
             <Chip key={g} active={goal === g} onClick={() => setProfile({ tdee: { ...profile.tdee, goal: g } })}>
               {t(`calc.mac.goal.${g}`)}
             </Chip>
@@ -72,7 +90,10 @@ export function MacrosTool() {
             <div className="num text-4xl font-extrabold" data-testid="macros-kcal">
               {num(m.kcal)} <span className="text-lg font-semibold text-muted">{t("calc.mac.kcal")}</span>
             </div>
-            <p className="mt-1 text-sm text-muted">{kcalWhy}</p>
+            <p className="mt-1 text-sm text-muted">
+              {kcalWhy}
+              {measuredWhy}
+            </p>
             <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-raised" aria-hidden>
               {rows.map((x) => (
                 <span key={x.key} style={{ width: `${x.share * 100}%`, background: COLOUR[x.key] }} />

@@ -109,6 +109,9 @@ export const en = {
   "ins.coolHr.title": "Your heart rate stays up after the cool-down",
   "ins.coolHr.why": "It ended at {bpm} bpm in {count} of your last {total} cool-downs, no lower than while you lifted.",
   "ins.coolHr.advice": "Take the cool-down a few minutes longer and breathe slowly until it settles under 100.",
+  "ins.food.measuredToo": "Maintenance here is measured from {days} days of your own food and weigh-ins.",
+  "ins.stall.cutToo":
+    "You've also eaten about {gap} a day under maintenance this past week, and strength rarely climbs in a deficit, so holding it is a fair result.",
 } as const;
 
 type Key = keyof typeof en;
@@ -225,6 +228,9 @@ export const es: Partial<Record<Key, Message>> = {
   "ins.coolHr.title": "Tu pulso sigue alto tras la vuelta a la calma",
   "ins.coolHr.why": "Terminó en {bpm} ppm en {count} de tus últimas {total} vueltas a la calma, no más bajo que al levantar.",
   "ins.coolHr.advice": "Alarga la vuelta a la calma unos minutos y respira despacio hasta que baje de 100.",
+  "ins.food.measuredToo": "Aquí el mantenimiento se mide con {days} días de tu propia comida y tus pesajes.",
+  "ins.stall.cutToo":
+    "Además, esta semana has comido unas {gap} al día por debajo del mantenimiento, y la fuerza rara vez sube en déficit, así que mantenerla es un buen resultado.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -342,6 +348,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "ins.coolHr.why":
     "Elle finissait à {bpm} bpm dans {count} de vos {total} derniers retours au calme, pas plus bas que pendant les séries.",
   "ins.coolHr.advice": "Prolongez le retour au calme de quelques minutes et respirez lentement jusqu'à passer sous 100.",
+  "ins.food.measuredToo": "Ici, le maintien est mesuré sur {days} jours de vos propres repas et pesées.",
+  "ins.stall.cutToo":
+    "Vous avez aussi mangé environ {gap} par jour sous votre maintien cette semaine, et la force monte rarement en déficit : la garder est un bon résultat.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -457,6 +466,9 @@ export const de: Partial<Record<Key, Message>> = {
   "ins.coolHr.title": "Dein Puls bleibt nach dem Cool-down hoch",
   "ins.coolHr.why": "Er lag am Ende bei {bpm} bpm, in {count} deiner letzten {total} Cool-downs, nicht niedriger als beim Heben.",
   "ins.coolHr.advice": "Mach das Cool-down ein paar Minuten länger und atme langsam, bis er unter 100 fällt.",
+  "ins.food.measuredToo": "Der Erhaltungsbedarf ist hier aus {days} Tagen deiner eigenen Ernährung und Wiegungen gemessen.",
+  "ins.stall.cutToo":
+    "Du hast diese Woche außerdem etwa {gap} am Tag unter deinem Erhaltungsbedarf gegessen, und im Defizit steigt die Kraft selten, sie zu halten ist also ein gutes Ergebnis.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -573,6 +585,9 @@ export const it: Partial<Record<Key, Message>> = {
   "ins.coolHr.title": "Il battito resta alto dopo il defaticamento",
   "ins.coolHr.why": "Finiva a {bpm} bpm in {count} dei tuoi ultimi {total} defaticamenti, non più basso che durante i sollevamenti.",
   "ins.coolHr.advice": "Allunga il defaticamento di qualche minuto e respira piano finché non scende sotto 100.",
+  "ins.food.measuredToo": "Qui il mantenimento è misurato su {days} giorni dei tuoi pasti e delle tue pesate.",
+  "ins.stall.cutToo":
+    "Questa settimana hai anche mangiato circa {gap} al giorno sotto il mantenimento, e in deficit la forza sale di rado, quindi mantenerla è un buon risultato.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -671,4 +686,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "ins.coolHr.title": "クールダウン後も心拍数が高いままです",
   "ins.coolHr.why": "直近{total}回のクールダウンのうち{count}回で、終わりの心拍数が{bpm} bpmと、リフティング中より下がっていませんでした。",
   "ins.coolHr.advice": "クールダウンを数分長くし、100を下回るまでゆっくり呼吸しましょう。",
+  "ins.food.measuredToo": "ここでの維持カロリーは、あなた自身の{days}日分の食事と体重記録から測っています。",
+  "ins.stall.cutToo":
+    "この1週間は維持カロリーより1日約{gap}少なく食べています。カロリー不足の間は筋力が伸びにくいので、維持できていれば十分な結果です。",
 };

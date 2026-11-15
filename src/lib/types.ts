@@ -699,7 +699,7 @@ export interface FitTestEvent extends EventBase {
 }
 
 /** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
-export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing" | "kcalIn" | "protein";
+export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing" | "kcalIn" | "protein" | "carbs" | "fat";
 
 /**
  * One day's reading of a health measure from Health Connect or Apple Health (the health twin, twin.ts):

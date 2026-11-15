@@ -195,7 +195,11 @@ describe("food against a coach's targets", () => {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   };
   const food = (kcal: number, protein?: number) => [1, 2, 3, 4].map((ago) => ({ day: day(ago), kcal, protein }));
-  const view = (kcal: number, protein: number | undefined, targets: { kcal: number | null; protein: number | null } | null) => ({
+  const view = (
+    kcal: number,
+    protein: number | undefined,
+    targets: { kcal: number | null; protein: number | null; kcalRest?: number | null } | null,
+  ) => ({
     name: "Alex",
     daysPerWeek: null,
     events: makeWorkout("w1", NOW - DAY, [{}]),
@@ -213,5 +217,41 @@ describe("food against a coach's targets", () => {
     expect(kinds(view(1200, 50, null))).not.toContain("kcalOff");
     const off = clientReport(view(1800, 100, { kcal: 2400, protein: null }), NOW).flags.find((f) => f.kind === "kcalOff")!;
     expect(flagText(off, new Map()).title).toContain("1800");
+  });
+
+  it("judges each logged day by its own target with a rest-day number (2026-11-15)", () => {
+    const kinds = (v: ReturnType<typeof view>) => clientReport(v, NOW).flags.map((f) => f.kind);
+    // One workout in four logged days: 2,800 on that day and 2,000 on the rest averages 2,200.
+    const v = view(2200, undefined, { kcal: 2800, protein: null });
+    expect(kinds(v)).toContain("kcalOff");
+    expect(kinds({ ...v, targets: { ...v.targets!, kcalRest: 2000 } })).not.toContain("kcalOff");
+  });
+
+  it("says when a sharing client's food app has gone quiet", () => {
+    const v = {
+      ...view(2200, 150, { kcal: 2400, protein: 150 }),
+      body: { sex: null, heightCm: null, weights: [], measures: [], food: [] },
+    };
+    expect(clientReport(v, NOW).flags.map((f) => f.kind)).toContain("noFood");
+    expect(clientReport({ ...v, targets: null }, NOW).flags.map((f) => f.kind)).not.toContain("noFood");
+  });
+});
+
+describe("filling in a client's targets from their numbers", () => {
+  it("uses their weight for protein, and last week's food for calories", async () => {
+    const { suggestTargets } = await import("@/components/app/CoachTargets");
+    const weights = [{ at: NOW - DAY, kg: 80 }];
+    expect(suggestTargets(null, NOW)).toBeNull();
+    expect(suggestTargets({ sex: null, heightCm: null, weights, measures: [] }, NOW)).toMatchObject({
+      protein: 145,
+      kcal: null,
+      from: "weight",
+    });
+    const day = (ago: number) => {
+      const d = new Date(NOW - ago * DAY);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+    const food = [1, 2, 3, 4].map((ago) => ({ day: day(ago), kcal: 2420, protein: 150 }));
+    expect(suggestTargets({ sex: null, heightCm: null, weights, measures: [], food }, NOW)).toMatchObject({ kcal: 2400, from: "week" });
   });
 });

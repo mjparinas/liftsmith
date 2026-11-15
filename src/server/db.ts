@@ -1114,6 +1114,10 @@ const SCHEMA = [
 const COLUMNS: [table: string, column: string, def: string][] = [
   // Codes of our own, not only creators' (Melvin, 2026-11-10): see src/server/creators.ts.
   ["creators", "kind", "TEXT NOT NULL DEFAULT 'creator'"],
+  // A coach's carbs, fat and rest-day calories for a client (2026-11-15, docs/decisions/trainer-mode.md).
+  ["coach_targets", "carbs", "INTEGER"],
+  ["coach_targets", "fat", "INTEGER"],
+  ["coach_targets", "kcal_rest", "INTEGER"],
   ["creators", "trial_days", "INTEGER"],
   ["creators", "offering", "TEXT"],
   ["creators", "ends_at", "INTEGER"],

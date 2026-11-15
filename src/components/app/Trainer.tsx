@@ -415,6 +415,7 @@ function ClientScreen({ id }: { id: string }) {
   const [body, setBody] = useState<BodyShare | null>(null);
   const [physio, setPhysio] = useState(false);
   const [targets, setTargets] = useState<Targets | null>(null);
+  const [teen, setTeen] = useState(false);
   const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots" | "pay" | "role">>({});
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
@@ -433,6 +434,7 @@ function ClientScreen({ id }: { id: string }) {
         // A coach who works as a physio sees pain first, and rehab programs lead the assign sheet.
         setPhysio(v.role === "physio");
         setTargets(v.targets ?? null);
+        setTeen(v.teen === true);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
       },
     ).catch((e: unknown) => live && setError(trainerError(e)));
@@ -572,6 +574,8 @@ function ClientScreen({ id }: { id: string }) {
         clientId={id}
         saved={targets}
         body={body}
+        teen={teen}
+        name={report.name}
         now={report.now}
         onChange={() => setVersion((n) => n + 1)}
       />

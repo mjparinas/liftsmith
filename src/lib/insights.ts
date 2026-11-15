@@ -1,16 +1,16 @@
 import { blockWeek, weekStart } from "./block";
 import { can } from "./entitlements";
 import { EXERCISE_BY_ID } from "./exercises";
+import { foodTargets, targetFor, trainedDays, type CoachFood } from "./foodTargets";
 import type { Streak } from "./game";
 import { weeklySets } from "./generator";
 import { date, inSentence, list, t } from "./i18n";
 import { injuries, PART_LABEL } from "./injury";
 import { fromCm, lengthUnit, measuresOf } from "./measure";
-import { foodDays, proteinShort, weekIntake } from "./nutrition";
+import { foodDays, loggedWeek, proteinShort, weekIntake } from "./nutrition";
 import { coolHrHigh, rehabPainTrends } from "./partMetrics";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
 import { epley, gradedSet, sessionsOf, TIMED } from "./progression";
-import { currentKg, currentTdee } from "./tdee";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -70,7 +70,7 @@ export interface InsightInput {
   /** The days-per-week streak (game.ts goalStreak), for the "streak at risk" note. */
   streak?: Pick<Streak, "needed" | "atRisk" | "weeks">;
   /** Daily nutrition targets from the lifter's coach (trainer mode), which the food notes go by when set. */
-  coachTargets?: { kcal: number | null; protein: number | null; coach: string } | null;
+  coachTargets?: CoachFood | null;
 }
 
 const name = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
@@ -164,6 +164,15 @@ export function insights({ events, profile, now, streak, coachTargets }: Insight
   for (const e of events) if (e.type === "set") sessions.set(e.sessionId, [...(sessions.get(e.sessionId) ?? []), e]);
   const recent = [...sessions.values()].map((sets) => ({ at: sets.at(-1)!.at, sets })).sort((a, b) => b.at - a.at);
   const canDeload = !week.deload && week.week >= 1;
+  // Food (nutrition.ts, foodTargets.ts): one set of targets for every food note, and how far under maintenance the
+  // last week was, which also explains a stall (strength rarely climbs in a deficit).
+  const food = foodDays(events, now);
+  const workouts = events.flatMap((e) => (e.type === "sessionStart" ? [{ start: e.at }] : []));
+  const ft = food.length ? foodTargets(events, workouts, profile, now, coachTargets) : null;
+  const intake = ft && !ft.teen ? weekIntake(food, now) : null;
+  const deficit = intake && ft?.maintenance && intake.avg - ft.maintenance <= -300 ? ft.maintenance - intake.avg : 0;
+  const kcalText = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
+  const cutToo = deficit ? ` ${t("ins.stall.cutToo", { gap: kcalText(deficit) })}` : "";
 
   // 1. Missed reps three workouts running: fatigue is piling up.
   const lastThree = recent.slice(0, 3);
@@ -201,12 +210,13 @@ export function insights({ events, profile, now, streak, coachTargets }: Insight
       id: `stall-many-${stalled.map((s) => s.exerciseId).join(",")}`,
       tone: "warn",
       title: t("ins.stallMany.title", { count: stalled.length }),
-      why: t("ins.stallMany.why", { names: list(names), weeks: weeksText(stalled[0].weeks) }),
+      why: t("ins.stallMany.why", { names: list(names), weeks: weeksText(stalled[0].weeks) }) + cutToo,
       advice: canDeload ? t("ins.stallMany.advice") : t("ins.stallMany.adviceDeload"),
       action: canDeload ? { kind: "deload", label: t("ins.deload") } : undefined,
     });
   } else if (can("plateauDetective")) {
-    for (const p of findPlateaus(events, profile, now, fixes).slice(0, 2)) {
+    const eating = deficit && intake ? { gap: Math.round(deficit / 10) * 10, days: intake.days } : null;
+    for (const p of findPlateaus(events, profile, now, fixes, eating).slice(0, 2)) {
       const fix = FIX_TEXT[p.fix];
       out.push({
         id: `plateau-${p.exerciseId}-${p.weeks}-${p.fix}`,
@@ -228,7 +238,7 @@ export function insights({ events, profile, now, streak, coachTargets }: Insight
       id: `stall-${s.exerciseId}-${s.sessions}`,
       tone: "warn",
       title: t("ins.stalled.title", { name: name(s.exerciseId) }),
-      why: t("ins.stall.why", { weeks: weeksText(s.weeks), sessions: s.sessions, best: w(s.best) }),
+      why: t("ins.stall.why", { weeks: weeksText(s.weeks), sessions: s.sessions, best: w(s.best) }) + cutToo,
       advice: t("ins.stall.advice"),
       // Without Pro: the plateau detective would find the cause; its button opens the paywall there.
       action: { kind: "go", route: "pro/plateau", label: t("ins.stall.action"), pro: true },
@@ -374,78 +384,74 @@ export function insights({ events, profile, now, streak, coachTargets }: Insight
     }
   }
 
-  // 4b. Food, from a food app through Health Connect or Apple Health (nutrition.ts). Protein short several logged
-  // days running gets its own note; calories are judged against TDEE and the goal, and when a body note already
-  // tells the story (weight dropping fast, body fat or waist rising) the food numbers join it instead of a second note.
-  const food = foodDays(events, now);
-  if (food.length) {
-    const coach = coachTargets ?? null;
-    const short = proteinShort(food, currentKg(events as AppEvent[], profile), now, coach?.protein);
+  // 4b. Food, from a food app through Health Connect or Apple Health (nutrition.ts), judged against one set of targets
+  // (foodTargets.ts: the Macros goal, measured maintenance, a coach's numbers). Protein short several logged days
+  // running gets its own note; calories are judged against maintenance and the goal, and when a body note already
+  // tells the story (weight dropping fast, body fat or waist rising) the food numbers join it instead of a second
+  // note. Under-18s get the protein note only: no calorie or deficit advice (2026-11-15).
+  if (ft) {
+    const coach = ft.coach;
+    const short = proteinShort(food, ft.protein, now);
     if (short) {
       out.push({
         id: `protein-short-${short.last}-${short.days}`,
         tone: "warn",
         title: t("ins.proteinShort.title", { count: short.days }),
         why: coach?.protein
-          ? t("ins.proteinShort.whyCoach", { avg: short.avg, target: short.target, name: coach.coach || t("ins.yourCoach") })
+          ? t("ins.proteinShort.whyCoach", { avg: short.avg, target: short.target, name: coach.name || t("ins.yourCoach") })
           : t("ins.proteinShort.why", { avg: short.avg, target: short.target }),
         advice: t("ins.proteinShort.advice", { gap: Math.max(10, Math.round((short.target - short.avg) / 5) * 5) }),
-        action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
+        action: { kind: "go", route: "tools/macros", label: t("ins.food.action") },
       });
     }
-    const intake = weekIntake(food, now);
     // With a calorie target from their coach, the lifter's week is judged against it alone: the coach set it on purpose.
-    if (intake && coach?.kcal && Math.abs(intake.avg - coach.kcal) >= coach.kcal * 0.1) {
-      const kcal = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
-      const under = intake.avg < coach.kcal;
-      out.push({
-        id: `coach-kcal-${intake.last}-${under ? "under" : "over"}`,
-        tone: "warn",
-        title: t(under ? "ins.coachKcalUnder.title" : "ins.coachKcalOver.title"),
-        why: t("ins.coachKcal.why", {
-          days: intake.days,
-          avg: kcal(intake.avg),
-          target: kcal(coach.kcal),
-          name: coach.coach || t("ins.yourCoach"),
-        }),
-        advice: t(under ? "ins.coachKcalUnder.advice" : "ins.coachKcalOver.advice", { gap: kcal(Math.abs(intake.avg - coach.kcal)) }),
-        action: { kind: "go", route: "trainer", label: t("ins.coachKcal.action") },
-      });
+    // A rest-day number makes the target each logged day's own (training or rest).
+    if (intake && coach?.kcal && ft.kcal) {
+      const target = targetFor(loggedWeek(food, now), trainedDays(workouts), ft.kcal, ft.kcalRest);
+      if (Math.abs(intake.avg - target) >= target * 0.1) {
+        const under = intake.avg < target;
+        out.push({
+          id: `coach-kcal-${intake.last}-${under ? "under" : "over"}`,
+          tone: "warn",
+          title: t(under ? "ins.coachKcalUnder.title" : "ins.coachKcalOver.title"),
+          why: t("ins.coachKcal.why", {
+            days: intake.days,
+            avg: kcalText(intake.avg),
+            target: kcalText(target),
+            name: coach.name || t("ins.yourCoach"),
+          }),
+          advice: t(under ? "ins.coachKcalUnder.advice" : "ins.coachKcalOver.advice", { gap: kcalText(Math.abs(intake.avg - target)) }),
+          action: { kind: "go", route: "trainer", label: t("ins.coachKcal.action") },
+        });
+      }
     }
-    const tdee =
-      intake &&
-      currentTdee(
-        events as AppEvent[],
-        [...sessions.values()].map((x) => ({ start: x[0]!.at })),
-        profile,
-        now,
-      ).result;
-    if (intake && tdee && !coach?.kcal) {
-      const kcal = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
-      const gap = intake.avg - tdee.tdee;
-      const nums = { days: intake.days, avg: kcal(intake.avg), gap: kcal(Math.abs(gap)), tdee: kcal(tdee.tdee) };
+    const r = ft.tdee.result;
+    if (intake && r && !coach?.kcal) {
+      const gap = intake.avg - r.tdee;
+      const nums = { days: intake.days, avg: kcalText(intake.avg), gap: kcalText(Math.abs(gap)), tdee: kcalText(r.tdee) };
+      const measured = ft.measured ? ` ${t("ins.food.measuredToo", { days: ft.measured.days })}` : "";
       const body = out.find((x) => /^(weight-down|fat-up|waist-up)-/.test(x.id));
       if (body?.id.startsWith("weight-down-") && gap <= -300) {
         body.why += ` ${t("ins.food.why", nums)}`;
       } else if (body && !body.id.startsWith("weight-down-") && gap >= 150) {
         body.why += ` ${t("ins.food.overToo", nums)}`;
-      } else if (profile.goal === "muscle" && gap <= -300 && !(weightPct !== undefined && weightPct >= 0.25)) {
+      } else if (ft.goal === "bulk" && gap <= -300 && !(weightPct !== undefined && weightPct >= 0.25)) {
         out.push({
           id: `eat-low-muscle-${intake.last}`,
           tone: "warn",
           title: t("ins.eatLowMuscle.title"),
-          why: t("ins.food.why", nums),
-          advice: t("ins.eatLowMuscle.advice", { bulk: kcal(tdee.bulk) }),
-          action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
+          why: t("ins.food.why", nums) + measured,
+          advice: t("ins.eatLowMuscle.advice", { bulk: kcalText(r.bulk) }),
+          action: { kind: "go", route: "tools/macros", label: t("ins.food.action") },
         });
-      } else if (profile.goal !== "muscle" && intake.avg < tdee.cut - 250 && !body) {
+      } else if (ft.goal !== "bulk" && intake.avg < r.cut - 250 && !body) {
         out.push({
           id: `eat-low-${intake.last}`,
           tone: "warn",
           title: t("ins.eatLow.title"),
-          why: t("ins.food.why", nums),
-          advice: t("ins.eatLow.advice", { cut: kcal(tdee.cut), tdee: kcal(tdee.tdee) }),
-          action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
+          why: t("ins.food.why", nums) + measured,
+          advice: t("ins.eatLow.advice", { cut: kcalText(r.cut), tdee: kcalText(r.tdee) }),
+          action: { kind: "go", route: "tools/macros", label: t("ins.food.action") },
         });
       }
     }

@@ -191,7 +191,7 @@ export function planSlice(c: Ctx): PlanSlice {
       // Health signals (sleep, HRV, resting HR, breathing rate) move the call for Pro only (AGENTS.md "Health twin").
       const r = readiness(events, profile, now, {
         cycle: !!profile.cycle?.enabled,
-        ...(can("healthReadiness") ? healthExternal(events, now) : {}),
+        ...(can("healthReadiness") ? healthExternal(events, now, profile) : {}),
       });
       const call = callOverride ?? r.call;
       // This week's free adaptive workout replaces the free program's day (Melvin, 2026-11-12).

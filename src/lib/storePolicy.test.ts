@@ -71,7 +71,7 @@ describe("Play store policy config", () => {
       "steps",
       "VO2 max",
       "respiratory rate",
-      "calories and protein",
+      "calories, protein, carbs and fat",
     ])
       expect(page).toContain(t);
     expect(page).not.toMatch(/blood|oxygen saturation/i);
