@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { defaultProfile } from "./defaults";
+import { foodTargets } from "./foodTargets";
 import { perDay, sleepNights } from "./health";
 import { healthSignals } from "./readiness";
 import { activityForSteps, currentTdee, recentSteps, withSteps } from "./tdee";
@@ -189,5 +190,19 @@ describe("steps set the TDEE activity level", () => {
     const cur = currentTdee(evs, [], profile, NOW);
     expect(cur.activity.source).toBe("steps");
     expect(cur.activity.steps).toBe(9000);
+  });
+});
+
+describe("protein on the energy card", () => {
+  const twinWith = (coachTargets?: Parameters<typeof twin>[0]["coachTargets"]) =>
+    twin({ events: [], profile, sessions: [], now: NOW, pro: true, native: true, coachTargets }).find((m) => m.id === "tdee")!;
+  it("is the same daily protein as the Food card and Macros (foodTargets)", () => {
+    const own = foodTargets([], [], profile, NOW).protein;
+    expect(twinWith().why).toContain(`${own} g`);
+  });
+  it("is the coach's number when a coach set one", () => {
+    const coach = { kcal: null, protein: 205, coach: "Sam" };
+    expect(foodTargets([], [], profile, NOW, coach).protein).toBe(205);
+    expect(twinWith(coach).why).toContain("205 g");
   });
 });

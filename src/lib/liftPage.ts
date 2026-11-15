@@ -1,5 +1,6 @@
 import { dedupe } from "./derive";
-import { epley, TIMED } from "./progression";
+import { sessionBests, setEstimates } from "./onerm";
+import { TIMED } from "./progression";
 import type { AppEvent, SetEvent } from "./types";
 
 // One page per exercise (Melvin, 2026-11-11: table stakes). Every past session of the lift, the best
@@ -20,7 +21,11 @@ export interface LiftSession {
   at: number;
   /** Every set, bonus sets included, in the order done. */
   sets: SetEvent[];
-  /** Best estimated one-rep max of the session (kg), 0 for bodyweight and timed work. */
+  /**
+   * The session's estimated one-rep max (kg), 0 for bodyweight and timed work: the 1RM estimator's own point for the
+   * session (onerm.ts sessionBests), so the page's best, its trend line, its chart and the Estimated max tile all
+   * come from one estimator and can't disagree.
+   */
   e1rm: number;
 }
 
@@ -34,11 +39,12 @@ export function liftSessions(events: readonly AppEvent[], exerciseId: string): L
     by.set(e.sessionId, list);
   }
   const timed = TIMED.has(exerciseId);
+  const est = new Map(timed ? [] : sessionBests(setEstimates(events, exerciseId)).map((b) => [b.sessionId, b.e1rm]));
   const out: LiftSession[] = [];
   for (const [sessionId, sets] of by) {
     const first = sets[0];
     if (!first) continue;
-    const e1rm = timed ? 0 : Math.max(0, ...sets.filter((s) => s.weight > 0).map((s) => epley(s.weight, s.reps)));
+    const e1rm = est.get(sessionId) ?? 0;
     out.push({ sessionId, at: first.at, sets, e1rm: Math.round(e1rm * 10) / 10 });
   }
   return out.sort((a, b) => b.at - a.at);
