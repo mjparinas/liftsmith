@@ -105,10 +105,10 @@ describe("a chat thread", () => {
     const u = userEvent.setup();
     render(<ChatThread id="k1" />);
     await screen.findByText("Heavy but good");
-    await u.click(screen.getByRole("button", { name: "Emoji" }));
+    await u.click(screen.getByRole("button", { name: "Emoji and stickers" }));
     await u.click(screen.getByRole("button", { name: "💪" }));
     expect(screen.getByLabelText("Write a message")).toHaveValue("💪");
-    await u.click(screen.getByRole("button", { name: "Stickers" }));
+    await u.click(screen.getByRole("button", { name: "Stickers", pressed: false }));
     await u.click(screen.getByRole("button", { name: "Send sticker: New PR!" }));
     expect(calls.find((c) => c.body?.action === "send")?.body).toMatchObject({ id: "k1", sticker: "pr" });
     expect(await screen.findByRole("img", { name: "New PR!" })).toBeInTheDocument();

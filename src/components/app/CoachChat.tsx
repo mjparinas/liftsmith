@@ -90,6 +90,13 @@ export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMod
   const end = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
+  // The box grows with what's typed, up to its max height, then scrolls.
+  useEffect(() => {
+    const el = input.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [text]);
   const listRef = useRef<Message[] | null>(null);
   useEffect(() => {
     listRef.current = list;
@@ -422,46 +429,42 @@ export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMod
             : mode === "dock"
               ? "mt-2 shrink-0 border-t border-line pt-2"
               : pane
-                ? "card mt-3 shrink-0 p-3"
-                : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-3"
+                ? "card mt-3 shrink-0 p-2"
+                : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-2"
         }
       >
-        {tray && <ChatTray kind={tray} compact={mode === "dock"} onEmoji={addEmoji} onSticker={(s) => void deliver("", s)} busy={busy} />}
+        {tray && (
+          <ChatTray
+            kind={tray}
+            onKind={setTray}
+            compact={mode === "dock"}
+            onEmoji={addEmoji}
+            onSticker={(s) => void deliver("", s)}
+            busy={busy}
+          />
+        )}
         <label htmlFor={`trn-chat-${mode}-${id}`} className="sr-only">
           {t("trn.chatLabel")}
         </label>
-        <div className="flex items-end gap-1.5">
-          <TrayButton
-            icon="smile"
-            label={t("trn.emoji")}
-            on={tray === "emoji"}
-            onClick={() => setTray(tray === "emoji" ? null : "emoji")}
-          />
-          <TrayButton
-            icon="sticker"
-            label={t("trn.stickers")}
-            on={tray === "stickers"}
-            onClick={() => setTray(tray === "stickers" ? null : "stickers")}
-          />
-          <textarea
-            ref={input}
-            id={`trn-chat-${mode}-${id}`}
-            value={text}
-            onChange={(e) => type(e.target.value)}
-            onKeyDown={onKey}
-            maxLength={MESSAGE_MAX}
-            rows={mode === "dock" ? 1 : 2}
-            placeholder={them === "coach" ? t("trn.messageNamed", { name: who }) : t("trn.chatLabel")}
-            className="min-h-11 min-w-0 flex-1 resize-none rounded-xl border border-line bg-raised px-3 py-2"
-          />
-          <Button
-            submit
-            disabled={busy || !text.trim()}
-            label={mode === "dock" ? t("trn.send") : undefined}
-            icon={mode === "dock" ? "send" : undefined}
-            className={mode === "dock" ? "size-11 !px-0" : ""}
-          >
-            {mode === "dock" ? null : t("trn.send")}
+        {/* One rounded field holds the words and, at its end, the emoji and sticker buttons, so the box gets the whole row
+            and grows with what's typed (up to about six lines); a round send button sits beside it. */}
+        <div className="flex items-end gap-2">
+          <div className="flex min-w-0 flex-1 items-end rounded-3xl border border-line bg-raised pl-4 pr-1 focus-within:border-accent focus-within:outline focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-accent/40">
+            <textarea
+              ref={input}
+              id={`trn-chat-${mode}-${id}`}
+              value={text}
+              onChange={(e) => type(e.target.value)}
+              onKeyDown={onKey}
+              maxLength={MESSAGE_MAX}
+              rows={1}
+              placeholder={them === "coach" ? t("trn.messageNamed", { name: who }) : t("trn.chatLabel")}
+              className="max-h-40 min-h-11 min-w-0 flex-1 resize-none bg-transparent py-2.5 leading-6 focus-visible:shadow-none! focus-visible:outline-none!"
+            />
+            <TrayButton icon="smile" label={t("trn.emojiStickers")} on={!!tray} onClick={() => setTray(tray ? null : "emoji")} />
+          </div>
+          <Button submit disabled={busy || !text.trim()} label={t("trn.send")} icon="send" className="size-11 shrink-0 !rounded-full !px-0">
+            {null}
           </Button>
         </div>
       </form>
@@ -469,7 +472,7 @@ export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMod
   );
 }
 
-function TrayButton({ icon, label, on, onClick }: { icon: "smile" | "sticker"; label: string; on: boolean; onClick: () => void }) {
+function TrayButton({ icon, label, on, onClick }: { icon: "smile"; label: string; on: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -479,7 +482,7 @@ function TrayButton({ icon, label, on, onClick }: { icon: "smile" | "sticker"; l
       }}
       aria-label={label}
       aria-expanded={on}
-      className={`press flex size-11 shrink-0 items-center justify-center rounded-xl ${on ? "bg-accent/15 text-accent" : "text-muted hover:text-ink"}`}
+      className={`press flex size-11 shrink-0 items-center justify-center rounded-full ${on ? "bg-accent/15 text-accent" : "text-muted hover:text-ink"}`}
     >
       <Icon name={icon} size={22} />
     </button>
@@ -489,12 +492,14 @@ function TrayButton({ icon, label, on, onClick }: { icon: "smile" | "sticker"; l
 /** The emoji grid or the sticker grid, above the send box. A sticker sends at once; an emoji goes into the box. */
 function ChatTray({
   kind,
+  onKind,
   compact,
   onEmoji,
   onSticker,
   busy,
 }: {
   kind: "emoji" | "stickers";
+  onKind: (k: "emoji" | "stickers") => void;
   compact: boolean;
   onEmoji: (e: string) => void;
   onSticker: (s: StickerId) => void;
@@ -502,46 +507,64 @@ function ChatTray({
 }) {
   return (
     <div
-      className={`animate-rise mb-2 overflow-y-auto overscroll-contain rounded-2xl border border-line bg-surface p-2 ${compact ? "max-h-44" : "max-h-60"}`}
+      className="animate-rise mb-2 overflow-hidden rounded-2xl border border-line bg-surface"
       role="group"
-      aria-label={kind === "emoji" ? t("trn.emoji") : t("trn.stickers")}
-      data-no-swipe
+      aria-label={t("trn.emojiStickers")}
     >
-      {kind === "emoji" ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))]">
-          {EMOJI.map((e) => (
-            <button
-              key={e}
-              type="button"
-              onClick={() => onEmoji(e)}
-              className="press flex size-11 items-center justify-center rounded-xl text-2xl hover:bg-raised"
-            >
-              {e}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-2">
-          {STICKERS.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              disabled={busy}
-              onClick={() => {
-                sound.pop();
-                onSticker(s.id);
-              }}
-              className="press flex flex-col items-center gap-1 rounded-2xl p-1 hover:bg-raised disabled:opacity-60"
-              aria-label={t("trn.sendSticker", { sticker: t(`trn.stk.${s.id}`) })}
-            >
-              <StickerArt id={s.id} size={compact ? 60 : 72} bare />
-              <span aria-hidden className="line-clamp-2 text-center text-xs font-semibold leading-tight text-muted">
-                {t(`trn.stk.${s.id}`)}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-1 border-b border-line/70 p-1">
+        {(["emoji", "stickers"] as const).map((k) => (
+          <button
+            key={k}
+            type="button"
+            aria-pressed={kind === k}
+            onClick={() => {
+              haptic("select");
+              onKind(k);
+            }}
+            className={`press flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-semibold ${kind === k ? "bg-accent/15 text-accent" : "text-muted hover:text-ink"}`}
+          >
+            <Icon name={k === "emoji" ? "smile" : "sticker"} size={18} />
+            {k === "emoji" ? t("trn.emoji") : t("trn.stickers")}
+          </button>
+        ))}
+      </div>
+      <div className={`overflow-y-auto overscroll-contain p-2 ${compact ? "max-h-40" : "max-h-56"}`} data-no-swipe>
+        {kind === "emoji" ? (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))]">
+            {EMOJI.map((e) => (
+              <button
+                key={e}
+                type="button"
+                onClick={() => onEmoji(e)}
+                className="press flex size-11 items-center justify-center rounded-xl text-2xl hover:bg-raised"
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-2">
+            {STICKERS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  sound.pop();
+                  onSticker(s.id);
+                }}
+                className="press flex flex-col items-center gap-1 rounded-2xl p-1 hover:bg-raised disabled:opacity-60"
+                aria-label={t("trn.sendSticker", { sticker: t(`trn.stk.${s.id}`) })}
+              >
+                <StickerArt id={s.id} size={compact ? 60 : 72} bare />
+                <span aria-hidden className="line-clamp-2 text-center text-xs font-semibold leading-tight text-muted">
+                  {t(`trn.stk.${s.id}`)}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
