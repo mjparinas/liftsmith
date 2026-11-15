@@ -88,6 +88,21 @@ describe("routine links with parts (workouts with parts, stage 3)", () => {
     expect(decodeRoutine(code)).toMatchObject({ rehab: true, parts });
   });
 
+  it("carries a rehab program's area and times a week before the mark (2026-11-15)", () => {
+    const items = [{ exerciseId: "wall-sit", sets: 3 }];
+    const code = encodeRoutine({ name: "A", items, parts, rehab: true, rehabPart: "knee", perWeek: 3 });
+    expect(code).toBe("r1~QQ~wall-sit.3~w:march,jacks~d~h:knee:3~rehab");
+    expect(decodeRoutine(code)).toEqual({ name: "A", items, parts, rehab: true, rehabPart: "knee", perWeek: 3 });
+    // Either may be missing; nothing is written for a program without them, or for a routine that isn't rehab.
+    expect(encodeRoutine({ name: "A", items, rehab: true, perWeek: 5 })).toBe("r1~QQ~wall-sit.3~h::5~rehab");
+    expect(decodeRoutine("r1~QQ~wall-sit.3~h::5~rehab")).toEqual({ name: "A", items, rehab: true, perWeek: 5 });
+    expect(encodeRoutine({ name: "A", items, rehab: true })).toBe("r1~QQ~wall-sit.3~rehab");
+    expect(encodeRoutine({ name: "A", items, rehabPart: "knee", perWeek: 3 })).toBe("r1~QQ~wall-sit.3");
+    // Junk is left out, and the area means nothing without the rehab mark.
+    expect(decodeRoutine("r1~QQ~wall-sit.3~h:elbows:9~rehab")).toEqual({ name: "A", items, rehab: true });
+    expect(decodeRoutine("r1~QQ~wall-sit.3~h:knee:3")).toEqual({ name: "A", items });
+  });
+
   it("drops stretches it doesn't know or of the wrong kind, and a second warm-up", () => {
     expect(decodeRoutine("r1~QQ~bench-press.3~w:march,not-a-stretch,doorway-chest~w:jacks")!.parts).toEqual([
       { kind: "warm", stretches: ["march"] },

@@ -113,6 +113,9 @@ export const en = {
   "rmd.tour.awards.body":
     "Every workout earns XP, new bests show up as you set them, and there are more than 150 badges to collect. Streaks count weeks, so rest days never break them.",
   "rmd.tour.awards.tip": "Open Awards to see this week's quests and what you're closest to unlocking.",
+  "rmd.rehab": "Time for {name}",
+  "rmd.rehabWeek": "{done} of {want} in the last 7 days, as your physio asked.",
+  "rmd.rehabBody": "Your physio's exercises are due today.",
 } as const;
 
 type Key = keyof typeof en;
@@ -234,6 +237,9 @@ export const es: Partial<Record<Key, Message>> = {
   "rmd.tour.awards.body":
     "Cada entrenamiento suma XP, los nuevos récords aparecen en cuanto los logras y hay más de 150 insignias que conseguir. Las rachas cuentan semanas, así que los días de descanso nunca las rompen.",
   "rmd.tour.awards.tip": "Abre Logros para ver las misiones de esta semana y lo que tienes más cerca de desbloquear.",
+  "rmd.rehab": "Hora de {name}",
+  "rmd.rehabWeek": "{done} de {want} en los últimos 7 días, como pidió tu fisioterapeuta.",
+  "rmd.rehabBody": "Hoy tocan los ejercicios de tu fisioterapeuta.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -355,6 +361,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "rmd.tour.awards.body":
     "Chaque séance rapporte de l'XP, les nouveaux records s'affichent dès que vous les battez, et il y a plus de 150 badges à gagner. Les séries comptent en semaines, donc les jours de repos ne les cassent jamais.",
   "rmd.tour.awards.tip": "Ouvrez Récompenses pour voir les quêtes de la semaine et ce que vous êtes près de débloquer.",
+  "rmd.rehab": "C’est l’heure de {name}",
+  "rmd.rehabWeek": "{done} sur {want} ces 7 derniers jours, comme votre kiné l’a demandé.",
+  "rmd.rehabBody": "Les exercices de votre kiné sont prévus aujourd’hui.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -475,6 +484,9 @@ export const de: Partial<Record<Key, Message>> = {
   "rmd.tour.awards.body":
     "Jedes Training bringt XP, neue Bestleistungen erscheinen, sobald du sie schaffst, und es gibt über 150 Abzeichen zu sammeln. Serien zählen Wochen, Ruhetage unterbrechen sie also nie.",
   "rmd.tour.awards.tip": "Öffne Erfolge, um die Aufgaben dieser Woche zu sehen und was du als Nächstes freischalten kannst.",
+  "rmd.rehab": "Zeit für {name}",
+  "rmd.rehabWeek": "{done} von {want} in den letzten 7 Tagen, wie deine Physiotherapie es wünscht.",
+  "rmd.rehabBody": "Heute stehen die Übungen deiner Physiotherapie an.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -593,6 +605,9 @@ export const it: Partial<Record<Key, Message>> = {
   "rmd.tour.awards.body":
     "Ogni allenamento dà XP, i nuovi record compaiono appena li fai e ci sono più di 150 badge da raccogliere. Le serie contano le settimane, quindi i giorni di riposo non le interrompono mai.",
   "rmd.tour.awards.tip": "Apri Premi per vedere le missioni della settimana e cosa sei più vicino a sbloccare.",
+  "rmd.rehab": "È ora di {name}",
+  "rmd.rehabWeek": "{done} su {want} negli ultimi 7 giorni, come ha chiesto il tuo fisioterapista.",
+  "rmd.rehabBody": "Oggi tocca agli esercizi del tuo fisioterapista.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -701,4 +716,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "rmd.tour.awards.body":
     "ワークアウトのたびに XP がたまり、自己ベストはその場で表示され、150 以上のバッジを集められます。連続記録は週で数えるので、休みの日で途切れることはありません。",
   "rmd.tour.awards.tip": "「アワード」を開くと、今週のクエストと、もうすぐ手に入るものが見られます。",
+  "rmd.rehab": "「{name}」の時間です",
+  "rmd.rehabWeek": "直近7日間で{want}回中{done}回（理学療法士の指定）。",
+  "rmd.rehabBody": "今日は理学療法士のエクササイズの日です。",
 };

@@ -107,6 +107,11 @@ export const de: FeaturesText = {
       name: "Verletzungsmodus",
       body: "Sag, was wehtut, und es lässt weg, was es verschlimmern würde, warnt dich vor riskanten Übungen und verfolgt einen Schmerzwert von 0 bis 10 über die Zeit.",
     },
+    "rehab-done": {
+      name: "Reha von deiner Physiotherapie, erledigt",
+      body: "Ein Programm deiner Physiotherapie wartet auf Heute und ist mit einem Tipp gespeichert, samt der Verletzung, für die es gedacht ist. Es folgt den gewünschten Malen pro Woche, erscheint an Ruhetagen und fragt nur für diese Verletzung nach Schmerzen.",
+      note: "Reha-Erinnerungen und die Mitteilung zu einem neuen Programm gibt es auf Android und iPhone.",
+    },
     cycle: {
       name: "Bereitschaft nach Zyklus",
       body: "Wenn du möchtest, trägst du deinen Zyklus ein, und die heutige Ansage berücksichtigt ihn.",

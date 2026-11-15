@@ -778,6 +778,8 @@ const SEEN = "liftsmith.coachNotes.seen";
 const TARGETS = "liftsmith.coachTargets";
 const COACHING = "liftsmith.coaching";
 const WHO = "liftsmith.coachWho";
+const PLANS = "liftsmith.coachPlans";
+const PLANS_SEEN = "liftsmith.coachPlans.seen";
 const NOBODY: Who = { coaches: [], clients: 0 };
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
@@ -812,6 +814,15 @@ interface NotesState {
   coaching: boolean;
   /** Who this lifter trains with and how many clients they coach, for the badge by their name (coachBadge). */
   who: Who;
+  /** Programs this lifter's coaches sent, with the coach's name and role, for Today's "save it" card (2026-11-15). */
+  plans: ShownPlan[];
+  /** Plans "Not now" hid on Today, by id. */
+  plansSeen: string[];
+}
+/** A program from a coach, with who sent it. */
+export interface ShownPlan extends Plan {
+  coach: string;
+  role?: Role;
 }
 /** The lifter's coaches (name and role) and how many clients they coach, kept on the device for the badge. */
 export interface Who {
@@ -844,6 +855,8 @@ export const useCoachNotes = create<NotesState>(() => ({
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
   coaching: typeof window === "undefined" ? false : readJson<boolean>(COACHING, false),
   who: typeof window === "undefined" ? NOBODY : readJson<Who>(WHO, NOBODY),
+  plans: typeof window === "undefined" ? [] : readJson<ShownPlan[]>(PLANS, []),
+  plansSeen: typeof window === "undefined" ? [] : readJson<string[]>(PLANS_SEEN, []),
 }));
 
 /** Whether an account takes part in coaching, as a coach or a client. */
@@ -864,7 +877,7 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
   o: Pick<Overview, "notes" | "coaches"> &
-    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach">>,
+    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans">>,
 ): void {
   const notes = shownNotes(o);
   const coaching = usesCoaching(o);
@@ -884,7 +897,19 @@ export function keepNotes(
     clients: o.clients?.length ?? 0,
   };
   writeJson(WHO, who);
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who });
+  const plans: ShownPlan[] = (o.plans ?? []).map((p) => {
+    const c = o.coaches.find((x) => x.id === p.coachId);
+    return { ...p, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
+  });
+  writeJson(PLANS, plans);
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans });
+}
+
+/** "Not now" on Today's card for a program from a coach: it stays in Coaching, and Today stops asking. */
+export function dismissPlan(id: string): void {
+  const plansSeen = [...useCoachNotes.getState().plansSeen.filter((x) => x !== id), id].slice(-50);
+  writeJson(PLANS_SEEN, plansSeen);
+  useCoachNotes.setState({ plansSeen });
 }
 
 /** A check-in was answered: it no longer waits on Today. */
@@ -941,5 +966,17 @@ export function forgetNotes(): void {
   writeJson(TARGETS, null);
   writeJson(COACHING, false);
   writeJson(WHO, NOBODY);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [], coaching: false, who: NOBODY });
+  writeJson(PLANS, []);
+  writeJson(PLANS_SEEN, []);
+  useCoachNotes.setState({
+    notes: [],
+    unread: [],
+    targets: null,
+    checkins: [],
+    sessions: [],
+    coaching: false,
+    who: NOBODY,
+    plans: [],
+    plansSeen: [],
+  });
 }

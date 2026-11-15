@@ -108,6 +108,11 @@ export const fr: FeaturesText = {
       name: "Mode blessure",
       body: "Indiquez ce qui fait mal : l’appli écarte ce qui l’aggraverait, vous avertit des mouvements à risque et suit une douleur de 0 à 10 dans le temps.",
     },
+    "rehab-done": {
+      name: "La rééducation de votre kiné, faite",
+      body: "Un programme de votre kiné attend sur Aujourd’hui pour être enregistré d’un geste et note la blessure qu’il concerne. Il suit le nombre de fois par semaine demandé, s’affiche les jours de repos et ne demande la douleur que pour cette blessure.",
+      note: "Les rappels de rééducation et la notification de nouveau programme sont sur Android et iPhone.",
+    },
     cycle: { name: "Forme selon le cycle", body: "Si vous le souhaitez, notez votre cycle et la décision du jour en tient compte." },
     "goal-planner": {
       name: "Planificateur d’objectifs",
