@@ -310,7 +310,7 @@ creatorHooks.onChecked = (code) => {
 
 /**
  * Which offering to sell from: the active code's own offering first ("creator30" unless the code names another, for
- * a longer trial or a discount), then the trialDays A/B ("trial7"), then the default.
+ * a longer trial or a discount), then the trialDays flag ("trial7"), then the default.
  */
 export function pickOffering<O>(all: Record<string, O>, current: O | null, codeOffering: string | null, trialDays: number): O | null {
   return (codeOffering ? all[codeOffering] : undefined) ?? (trialDays === 7 ? all["trial7"] : undefined) ?? current;

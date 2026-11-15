@@ -148,6 +148,14 @@ const decode = (x: string) =>
     .replace(/&amp;/g, "&")
     .replace(/&#64;|&commat;/g, "@")
     .replace(/%20/g, " ");
+/** decodeURIComponent that keeps the text as it is when a site's link has a stray "%" (it throws otherwise). */
+export const safeDecode = (x: string) => {
+  try {
+    return decodeURIComponent(x);
+  } catch {
+    return x;
+  }
+};
 
 /** What a gym's home page says about it. `site` is the page's address, for checking an email's domain. */
 export function detailsFromHtml(html: string, site: string): SiteDetails {
@@ -177,7 +185,7 @@ export function detailsFromHtml(html: string, site: string): SiteDetails {
   }
   // Then the page's own links.
   const tel = /href=["']tel:([^"']+)["']/i.exec(html)?.[1];
-  if (!out.phone && tel) out.phone = clean(decodeURIComponent(tel).replace(/[^\d+()\-.\s]/g, ""), 40);
+  if (!out.phone && tel) out.phone = clean(safeDecode(tel).replace(/[^\d+()\-.\s]/g, ""), 40);
   if (!out.email)
     for (const m of html.matchAll(/href=["']mailto:([^"'?]+)/gi)) {
       out.email = ownEmail(m[1]!);
@@ -356,6 +364,21 @@ export async function enrichPlace(
     return { id: p.id, name: p.name, site: p.website, filled, skipped, ms: Date.now() - started };
   };
   if (!publicHost(p.website)) return done([], "not a public web address");
+  try {
+    return await readSite(p, fetcher, now, done);
+  } catch (e) {
+    // One odd page must never stop the batch, or the same gym would come first and fail every time.
+    console.error("gym enrich", p.id, e);
+    return done([], "couldn't read the page");
+  }
+}
+
+async function readSite(
+  p: { id: string; website: string; hasIcon?: boolean } & Partial<SiteDetails>,
+  fetcher: typeof fetch,
+  now: number,
+  done: (filled: EnrichOne["filled"], skipped: string, set?: Partial<SiteDetails>) => Promise<EnrichOne>,
+): Promise<EnrichOne> {
   const page = await fetchText(fetcher, p.website, "text/html");
   if (!page) return done([], "no answer");
   if (page.status >= 400) return done([], `HTTP ${page.status}`);
