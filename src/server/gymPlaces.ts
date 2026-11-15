@@ -203,6 +203,19 @@ const httpUrl = (x: string | undefined) => {
 };
 
 /** OpenStreetMap fitness centres as places. Unnamed and private ones are left out. */
+/**
+ * "109-20202 66 Avenue" from the map's address tags. A unit goes in front of a house number only: on its own it made
+ * addresses like "109-" (Melvin, 2026-11-15), so a unit with no number, or tags with no number and no street, give ''.
+ */
+export function streetAddress(t: Record<string, string | undefined>): string {
+  const number = (t["addr:housenumber"] ?? "").trim();
+  const unit = (t["addr:unit"] ?? "").trim();
+  return clean([number ? (unit ? `${unit}-${number}` : number) : "", t["addr:street"]].filter(Boolean).join(" "), 120);
+}
+
+/** An address saved before streetAddress, with only a unit ("109-"), shows as no address until the next import. */
+const shownAddress = (a: string) => (/^[^\s]{1,12}-$/.test(a.trim()) ? "" : a);
+
 export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSkips): PlaceDraft[] {
   const out: PlaceDraft[] = [];
   const seen = new Set<string>();
@@ -240,10 +253,7 @@ export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSki
       name,
       // A rec centre's sport tag lists everything it hosts (swimming, hockey), so only its name can make it a studio.
       kind: STUDIO.test(fitness ? about : name.toLowerCase()) ? "studio" : "gym",
-      address: clean(
-        [[t["addr:unit"] ? `${t["addr:unit"]}-` : "", t["addr:housenumber"]].join(""), t["addr:street"]].filter(Boolean).join(" "),
-        120,
-      ),
+      address: streetAddress(t),
       city: mapCity || area.city,
       region: clean(t["addr:province"] ?? t["addr:state"], 60) || area.region,
       country: clean(t["addr:country"], 2).toUpperCase() || area.country,
@@ -558,7 +568,7 @@ const toPlace = (r: Row, km: number): Place => ({
   slug: s(r.slug),
   name: s(r.name),
   kind: s(r.kind) === "studio" ? "studio" : "gym",
-  address: s(r.address),
+  address: shownAddress(s(r.address)),
   city: s(r.city),
   region: s(r.region),
   lat: n(r.lat),
@@ -618,6 +628,40 @@ export async function nearbyPlaces(lat: unknown, lon: unknown, opts: { studios?:
     .map(({ r, km }) => toPlace(r, km))
     .sort((a, b) => Number(b.official) - Number(a.official) || a.km - b.km || b.lifters - a.lifters)
     .slice(0, PLACE_LIMITS.results);
+}
+
+/** How far "the gyms closest to you" looks, ring by ring (km), until it has enough. */
+export const CLOSEST_RINGS = [15, 60, 250, 1_000];
+
+/**
+ * The `count` gyms closest to a spot, nearest first (the website's /gyms/ map, docs/decisions/gyms.md "The gyms page
+ * leads with a map"). Unlike `nearbyPlaces`, official gyms don't jump the queue and the search widens ring by ring, so a
+ * visitor far from any imported city still sees the nearest ones. Gyms only, no studios.
+ */
+export async function closestPlaces(lat: unknown, lon: unknown, count = 10): Promise<Place[] | null> {
+  if (!validLat(lat) || !validLon(lon)) return null;
+  const here = { lat, lon };
+  // Nearest first in SQL too (a flat-earth guess, good enough to pick the candidates), so a crowded ring can't push
+  // the closest gyms past the limit.
+  const squash = Math.max(0.05, Math.cos((lat * Math.PI) / 180)) ** 2;
+  let found: Place[] = [];
+  for (const km of CLOSEST_RINGS) {
+    const dLat = km / 111;
+    const dLon = km / (111 * Math.max(0.05, Math.cos((lat * Math.PI) / 180)));
+    const rows = await query(
+      `SELECT ${PLACE_COLUMNS} FROM gym_places p
+       WHERE p.hidden = 0 AND p.kind = 'gym' AND p.lat BETWEEN ? AND ? AND p.lon BETWEEN ? AND ?
+       ORDER BY (p.lat - ?) * (p.lat - ?) + (p.lon - ?) * (p.lon - ?) * ? LIMIT ?`,
+      [lat - dLat, lat + dLat, lon - dLon, lon + dLon, lat, lat, lon, lon, squash, count * 4],
+    );
+    found = rows
+      .map((r) => toPlace(r, distanceKm(here, { lat: n(r.lat), lon: n(r.lon) })))
+      .filter((p) => p.km <= km)
+      .sort((a, b) => a.km - b.km || Number(b.official) - Number(a.official) || a.name.localeCompare(b.name))
+      .slice(0, count);
+    if (found.length >= count) break;
+  }
+  return found;
 }
 
 export async function placeById(id: unknown): Promise<Place | null> {

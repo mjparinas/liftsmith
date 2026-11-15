@@ -1,9 +1,9 @@
 import { shareIds, shareName } from "./achievements";
 import { dedupe, weekOf, weekStartDay, type Stats } from "./derive";
+import { estimate } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
 import { game, levelOf } from "./game";
 import { t, weekday } from "./i18n";
-import { epley } from "./progression";
 import type { AppEvent, Profile, SessionEndEvent, SessionStartEvent, SetEvent, Unit } from "./types";
 
 // The web dashboard (/me/): pure views over the event log, plus the two things it writes: a past
@@ -117,12 +117,12 @@ export function liftBests(events: readonly AppEvent[]): LiftBest[] {
   const out: LiftBest[] = [];
   for (const [exerciseId, sets] of by) {
     let best = sets[0];
-    for (const s of sets) if (epley(s.weight, s.reps) > epley(best.weight, best.reps)) best = s;
+    for (const s of sets) if (estimate(s.weight, s.reps) > estimate(best.weight, best.reps)) best = s;
     out.push({
       exerciseId,
       sessions: new Set(sets.map((s) => s.sessionId)).size,
       sets: sets.length,
-      e1rm: Math.round(epley(best.weight, best.reps) * 10) / 10,
+      e1rm: Math.round(estimate(best.weight, best.reps) * 10) / 10,
       e1rmSet: { weight: best.weight, reps: best.reps, at: best.at },
       heaviest: Math.max(...sets.map((s) => s.weight)),
       mostReps: Math.max(...sets.map((s) => s.reps)),

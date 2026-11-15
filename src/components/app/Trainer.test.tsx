@@ -505,7 +505,8 @@ describe("check-ins", () => {
   });
 
   it("a coach reads a client's answers, and a low score goes first", async () => {
-    // Recent answers are the last 14 days of the real clock, so pin it to the fixtures' day.
+    // Low scores count for 14 days, so pin the clock to NOW (only Date, so userEvent's timers still run); with the real
+    // clock this test began failing on 2026-11-15, two weeks after its answer.
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(NOW);
     onTestFinished(() => void vi.useRealTimers());
@@ -515,7 +516,8 @@ describe("check-ins", () => {
         coachId: "me",
         clientId: "c1",
         answers: { sleep: 2, gym: true, weight: 81.5, wins: "Hit a squat best" },
-        answeredAt: NOW - 86_400_000,
+        // The screen judges "recent" against the real clock (two weeks), so a fixed date here expired on 2026-11-15.
+        answeredAt: Date.now() - 86_400_000,
       },
     ];
     const u = userEvent.setup();

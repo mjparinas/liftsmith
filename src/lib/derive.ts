@@ -1,5 +1,6 @@
+import { estimate } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
-import { epley, TIMED } from "./progression";
+import { TIMED } from "./progression";
 import { joinStretches } from "./sessions";
 import { setVolume } from "./sides";
 import { MUSCLES, type AppEvent, type Muscle, type SessionPart, type SetEvent, type StretchEvent } from "./types";
@@ -101,11 +102,11 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
       // Holds, carries and cardio count seconds, not reps: a longer weighted carry or sled push isn't a stronger lift.
       if (s.weight <= 0 || TIMED.has(s.exerciseId)) continue;
       const cur = perEx.get(s.exerciseId);
-      if (!cur || epley(s.weight, s.reps) > epley(cur.weight, cur.reps)) perEx.set(s.exerciseId, s);
+      if (!cur || estimate(s.weight, s.reps) > estimate(cur.weight, cur.reps)) perEx.set(s.exerciseId, s);
     }
     let prCount = 0;
     for (const [exId, s] of perEx) {
-      const e1 = epley(s.weight, s.reps);
+      const e1 = estimate(s.weight, s.reps);
       e1rmSeries.set(exId, [...(e1rmSeries.get(exId) ?? []), { at: s.at, e1rm: Math.round(e1 * 10) / 10 }]);
       const prev = best.get(exId);
       if (prev !== undefined && e1 > prev + 0.01) {

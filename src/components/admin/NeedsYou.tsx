@@ -12,7 +12,8 @@ import { CardBones, Loading } from "./Skeletons";
 
 const SHOWN = 5;
 
-export function NeedsYou({ go }: { go: (tab: string) => void }) {
+/** `onList` hears the list it read, so the To Do count beside the tab's name stays in step with it. */
+export function NeedsYou({ go, onList }: { go: (tab: string) => void; onList?: (list: TodoList) => void }) {
   const [list, setList] = useState<TodoList | null>(null);
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -21,13 +22,15 @@ export function NeedsYou({ go }: { go: (tab: string) => void }) {
       .then(async (r) => {
         if (!r.ok) throw new Error();
         const j = (await r.json()) as TodoList;
-        if (live) setList(j);
+        if (!live) return;
+        setList(j);
+        onList?.(j);
       })
       .catch(() => live && setError(true));
     return () => {
       live = false;
     };
-  }, []);
+  }, [onList]);
   if (error) return null;
   if (!list)
     return (

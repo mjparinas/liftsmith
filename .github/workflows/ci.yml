@@ -195,7 +195,7 @@ jobs:
           # side by side.
           - { name: "devices · iOS", run: "DEVICES=ios node scripts/e2e-devices.mjs '' e2e-shots/devices" }
           - { name: "devices · Android", run: "DEVICES=android node scripts/e2e-devices.mjs '' e2e-shots/devices" }
-          - { name: "accessibility", run: "node scripts/e2e-a11y.mjs" }
+          - { name: "accessibility", run: "node scripts/e2e-a11y.mjs && node scripts/e2e-gaps.mjs" }
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup

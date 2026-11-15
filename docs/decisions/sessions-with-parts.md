@@ -222,3 +222,5 @@ Each stage updates the features page, gets a blog post, and adds its text in all
 2. **Stretch-only and rehab-only days:** any workout of 10 minutes or more keeps the streak alive and earns XP; the weekly workout goal counts workouts with a lifting or cardio part, except for a lifter whose only plan is rehab, where rehab workouts count.
 3. **Rehab and progression:** rehab sets never move progression, recovery or plateaus for the main lifts.
 4. **Start order:** Start runs the parts in order, with a Skip on each between-parts card.
+
+**Stretch days and the streak** (Melvin, 2026-11-15, number audit): a stand-alone stretch of 10 minutes or more keeps the weekly streak (`goalStreak` in `game.ts`): a past week short of the goal with one isn't a break (no freeze spent, nothing added), and this week isn't "at risk" once one is done. It still doesn't count toward the weekly goal's days.

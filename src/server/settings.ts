@@ -14,6 +14,18 @@ export async function setSetting(key: string, value: string, now = Date.now()): 
   );
 }
 
+/**
+ * Sets `key` to `value` only if it doesn't already hold it, in one statement, and says whether this call changed it.
+ * Two runs racing for the same claim (a schedule delivered twice) can't both win.
+ */
+export async function claimSetting(key: string, value: string, now = Date.now()): Promise<boolean> {
+  const rows = await query(
+    "INSERT INTO admin_settings (key, value, updated_at) VALUES (?, ?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at WHERE admin_settings.value <> excluded.value RETURNING key",
+    [key, value, now],
+  );
+  return rows.length > 0;
+}
+
 /** A JSON setting, or `fallback` when it's missing or unreadable. */
 export async function getJson<T>(key: string, fallback: T): Promise<T> {
   try {

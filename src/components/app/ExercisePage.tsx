@@ -120,7 +120,7 @@ export function ExercisePage({ id }: { id?: string }) {
                 </p>
               </>
             )}
-            <LiftChart ex={ex} sessions={sessions} max={max} unit={unit} now={now} />
+            <LiftChart ex={ex} sessions={sessions} unit={unit} now={now} />
           </div>
         </Section>
       )}

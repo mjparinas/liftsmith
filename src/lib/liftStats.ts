@@ -1,8 +1,9 @@
 import type { LiftSession } from "./liftPage";
-import { latestBodyweight, oneRm, type OneRm } from "./onerm";
+import { oneRm, type OneRm } from "./onerm";
 import { TIMED } from "./progression";
 import { setVolume, totalReps } from "./sides";
 import { ageOf, liftStanding, type AgeSex } from "./strength";
+import { currentKg } from "./tdee";
 import type { AppEvent, Exercise, Profile } from "./types";
 
 // Rich stats on every exercise page (Melvin, 2026-11-13: "if you click on an exercise ... how many sets you've
@@ -80,22 +81,20 @@ export interface StatPoint {
   value: number;
 }
 
-/** One point per session inside the range, oldest first. The estimated max uses the 1RM estimator's own session points. */
-export function liftSeries(
-  sessions: readonly LiftSession[],
-  metric: StatMetric,
-  range: StatRange,
-  now: number,
-  max?: Pick<OneRm, "trend"> | null,
-): StatPoint[] {
+/**
+ * One point per session inside the range, oldest first. The estimated max is each session's 1RM estimator point
+ * (liftPage.ts liftSessions), the same number as the page's best and trend line, and it covers the whole range, not
+ * only the estimator's last 180 days.
+ */
+export function liftSeries(sessions: readonly LiftSession[], metric: StatMetric, range: StatRange, now: number): StatPoint[] {
   const from = now - RANGE_DAYS[range] * DAY;
   const out: StatPoint[] = [];
-  if (metric === "e1rm") {
-    for (const p of max?.trend ?? []) if (p.at >= from && p.at <= now && p.e1rm > 0) out.push({ at: p.at, value: p.e1rm });
-    return out.sort((a, b) => a.at - b.at);
-  }
   for (const s of sessions) {
     if (s.at < from || s.at > now) continue;
+    if (metric === "e1rm") {
+      if (s.e1rm > 0) out.push({ at: s.at, value: s.e1rm });
+      continue;
+    }
     let value = 0;
     for (const x of s.sets) {
       if (metric === "volume") value += x.weight > 0 ? setVolume(x) : 0;
@@ -153,7 +152,7 @@ export function liftComparison(
   now: number,
 ): LiftComparison | null {
   if (!max || max.source !== "logged" || liftKind(ex) !== "loaded" || !(ex.start > 0)) return null;
-  const bw = latestBodyweight(events, profile);
+  const bw = currentKg(events, profile);
   if (!(bw > 0)) return null;
   const age = ageOf(profile, now);
   const s = liftStanding(ex, max.e1rm, bw, age, profile.sex);

@@ -101,8 +101,8 @@ describe("lift bests and session detail", () => {
     ];
     const [squat, pull] = liftBests(ev);
     expect(squat).toMatchObject({ exerciseId: "back-squat", sessions: 2, sets: 6, heaviest: 110, mostReps: 5 });
-    expect(squat.e1rmSet).toMatchObject({ weight: 110, reps: 3 }); // 121 beats 116.7
-    expect(squat.e1rm).toBe(121);
+    expect(squat.e1rmSet).toMatchObject({ weight: 110, reps: 3 }); // 119.3 beats 115.6 (the 1RM calculator's estimate)
+    expect(squat.e1rm).toBe(119.3);
     expect(pull).toMatchObject({ exerciseId: "pull-up", heaviest: 0, mostReps: 12, e1rm: 0 });
   });
 

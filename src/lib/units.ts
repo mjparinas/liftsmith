@@ -1,7 +1,8 @@
 import { num, t } from "./i18n";
 import type { Unit } from "./types";
+import { LB, weightIn } from "./unitMath";
 
-export const LB = 0.45359237;
+export { LB } from "./unitMath";
 
 export function toKg(value: number, unit: Unit): number {
   return unit === "kg" ? value : value * LB;
@@ -41,7 +42,7 @@ export function fmtBodyweight(kg: number, unit: Unit): string {
 }
 
 export function fmtWeight(kg: number, unit: Unit): string {
-  return `${fmtNum(fromKg(kg, unit))} ${unit}`;
+  return `${fmtNum(weightIn(kg, unit))} ${unit}`;
 }
 
 export const CM_PER_IN = 2.54;

@@ -52,5 +52,8 @@ export default defineConfig([
     "reports/**",
     ".stryker-tmp/**",
     "scripts/stryker-vitest5.mjs",
+    // Copied from node_modules before builds (scripts/mediapipe.mjs, scripts/leaflet.mjs), not our code.
+    "public/mediapipe/**",
+    "public/vendor/**",
   ]),
 ]);

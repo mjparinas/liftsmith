@@ -211,7 +211,13 @@ export const SETTINGS: Setting[] = [
     need: "recommended",
     what: "Set it to https://www.getliftsmith.com.",
   },
-  { names: ["CRON_SECRET"], label: "Cron secret", group: "Core", need: "required", what: "Vercel Cron sends it to the daily jobs." },
+  {
+    names: ["CRON_SECRET"],
+    label: "Cron secret",
+    group: "Core",
+    need: "required",
+    what: "Vercel Schedules send it to the scheduled jobs.",
+  },
   {
     names: ["ANALYTICS_SECRET", "ADMIN_SECRET"],
     label: "Visitor hash salt",

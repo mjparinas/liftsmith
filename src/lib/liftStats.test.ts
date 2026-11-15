@@ -84,9 +84,19 @@ describe("liftSeries", () => {
   });
   it("takes the estimated max from the 1RM estimator's own points", () => {
     const max = liftMax(events, squat, NOW + DAY);
-    const pts = liftSeries(sessions, "e1rm", "3m", NOW + DAY, max);
+    const pts = liftSeries(sessions, "e1rm", "3m", NOW + DAY);
     expect(pts.length).toBeGreaterThan(5);
     expect(pts.at(-1)!.value).toBeGreaterThan(pts[0]!.value);
+    // The same points as the estimator's trend: the page's best, its line and its chart can't disagree.
+    const trend = new Map(max!.trend.map((p) => [p.at, p.e1rm]));
+    for (const p of pts) expect(trend.get(p.at)).toBe(p.value);
+    expect(Math.max(...sessions.map((s) => s.e1rm))).toBe(Math.max(...max!.trend.map((p) => p.e1rm)));
+  });
+  it("keeps the estimated max for sessions older than the estimator's window", () => {
+    // A lift last trained 200 days ago still charts over a year (the estimator's own window is 180 days).
+    const later = NOW + 200 * DAY;
+    expect(liftMax(events, squat, later)).toBeNull();
+    expect(liftSeries(sessions, "e1rm", "1y", later)).toHaveLength(20);
   });
 });
 

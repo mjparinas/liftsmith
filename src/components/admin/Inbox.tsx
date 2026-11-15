@@ -4,7 +4,7 @@
 // opens in a sandboxed frame with remote images blocked until asked for, or as plain text; it can be answered as a
 // plain-text reply (from a saved reply, or a first draft by Claude that only fills the box), marked done or
 // archived. Support staff can read; only admins change anything.
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { fillReply, type SavedReply } from "@/lib/savedReplies";
 import type { InboxItem, InboxMessage } from "@/server/inbox";
@@ -13,6 +13,7 @@ import { Card } from "./charts";
 import { SavedReplies } from "./SavedReplies";
 import { InboxBones, LineBones, Loading } from "./Skeletons";
 import { ago, when } from "./time";
+import { afterAction } from "./todoCount";
 
 type List = { configured: boolean; items: InboxItem[]; next: string | null; error?: string };
 const post = async (body: Record<string, unknown>) => {
@@ -49,7 +50,8 @@ function Message({
 }: {
   id: string;
   admin: boolean;
-  onChange: () => void;
+  /** An action went through: the list shows its result at once (`body` is what was sent), then reads mail again. */
+  onChange: (body: Record<string, unknown>) => void;
   onClose: () => void;
   /** Opens the next message in the list, after "Archive and next" or "Done and next". */
   onNext?: () => void;
@@ -96,7 +98,7 @@ function Message({
     setMsg(err ?? done);
     if (!err) {
       setVersion((v) => v + 1);
-      onChange();
+      onChange(body);
     }
     return !err;
   };
@@ -309,11 +311,14 @@ function Message({
 export function Inbox({
   admin,
   onCount,
+  onMail,
   open = null,
   setOpen = () => {},
 }: {
   admin: boolean;
   onCount?: (n: number) => void;
+  /** The mail as the Inbox shows it now, so the To Do count can drop what was archived, done or answered here. */
+  onMail?: (mail: InboxItem[]) => void;
   /** The open message, kept in the address (?tab=Inbox&open=<id>) so a link or a reload lands on it. */
   open?: string | null;
   setOpen?: (id: string | null) => void;
@@ -324,6 +329,8 @@ export function Inbox({
   const [more, setMore] = useState<InboxItem[]>([]);
   const [next, setNext] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  // Messages changed here since the list was last read, shown as changed until the next read brings them.
+  const [changed, setChanged] = useState<Record<string, InboxItem>>({});
   useEffect(() => {
     let live = true;
     fetch("/api/admin/inbox/")
@@ -332,6 +339,7 @@ export function Inbox({
         if (!live) return;
         if (!r.ok) return setList({ configured: true, items: [], next: null, error: j.error ?? "The inbox didn't load." });
         setList(j);
+        setChanged({});
         setMore([]);
         setNext(j.next);
       })
@@ -340,12 +348,15 @@ export function Inbox({
       live = false;
     };
   }, [version]);
-  const all = [...(list?.items ?? []), ...more];
+  const all = useMemo(() => [...(list?.items ?? []), ...more].map((m) => changed[m.id] ?? m), [list, more, changed]);
   const waitingCount = all.filter(waiting).length;
   const configured = list?.configured;
   useEffect(() => {
     if (configured) onCount?.(waitingCount);
   }, [configured, waitingCount, onCount]);
+  useEffect(() => {
+    if (configured) onMail?.(all);
+  }, [configured, all, onMail]);
   const loadMore = async () => {
     if (!next) return;
     const r = await fetch(`/api/admin/inbox/?after=${encodeURIComponent(next)}`);
@@ -481,7 +492,11 @@ export function Inbox({
             key={open}
             id={open}
             admin={admin}
-            onChange={() => setVersion((v) => v + 1)}
+            onChange={(body) => {
+              const m = all.find((x) => x.id === open);
+              if (m) setChanged((c) => ({ ...c, [m.id]: afterAction(m, body, Date.now()) }));
+              setVersion((v) => v + 1);
+            }}
             onClose={() => setOpen(null)}
             onNext={() => after(open)}
           />

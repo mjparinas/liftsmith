@@ -123,7 +123,8 @@ function Task({ task, admin, now, changed }: { task: AdminTask; admin: boolean; 
   );
 }
 
-export function Todo({ admin, go, onCount }: { admin: boolean; go: (tab: string) => void; onCount?: (n: number) => void }) {
+/** `onList` hears every read of the list, for the count beside the tab's name (`todoCount.ts`). */
+export function Todo({ admin, go, onList }: { admin: boolean; go: (tab: string) => void; onList?: (list: TodoList) => void }) {
   const [data, setData] = useState<TodoList | null>(null);
   const [now, setNow] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -147,10 +148,9 @@ export function Todo({ admin, go, onCount }: { admin: boolean; go: (tab: string)
       live = false;
     };
   }, [version]);
-  const count = data ? data.items.length + data.tasks.filter((t) => !t.doneAt).length : null;
   useEffect(() => {
-    if (count != null) onCount?.(count);
-  }, [count, onCount]);
+    if (data) onList?.(data);
+  }, [data, onList]);
 
   const add = async () => {
     const err = await post({ action: "add", title: form.title, note: form.note, due: form.due ? `${form.due}T00:00:00Z` : null });

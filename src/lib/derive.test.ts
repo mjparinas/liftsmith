@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { DAY, makeSessionEnd, makeSet, NOW } from "@/test/factories";
 
 import { dedupe, derive, setWeekStart, weekOf } from "./derive";
+import { estimate } from "./e1rm";
 import type { AppEvent, StretchEvent } from "./types";
 
 // Stats worked out from the event log: workouts, personal bests, the week streak and sets per muscle
@@ -58,7 +59,7 @@ describe("derive: personal bests", () => {
     expect(s.sessions.find((x) => x.sessionId === "b")!.prs).toBe(1);
     expect(s.sessions.find((x) => x.sessionId === "d")!.prs).toBe(0);
     expect(s.prs[0]).toMatchObject({ exerciseId: "bench-press", reps: 5 });
-    expect(s.prs[0]!.e1rm).toBeCloseTo(70 * (1 + 5 / 30), 6);
+    expect(s.prs[0]!.e1rm).toBeCloseTo(estimate(70, 5), 6);
   });
 
   it("lists bests newest first and doesn't count a tie", () => {
@@ -69,8 +70,8 @@ describe("derive: personal bests", () => {
   it("keeps one point a session per lift, from its best set, rounded to 0.1", () => {
     const ev = [bench("a", NOW - 2 * DAY, 61, 5), bench("a", NOW - 2 * DAY + 60_000, 61, 7), bench("b", NOW - DAY, 50, 1)];
     expect(derive(ev, NOW).e1rmSeries.get("bench-press")).toEqual([
-      { at: NOW - 2 * DAY + 60_000, e1rm: 75.2 }, // 61 × (1 + 7/30) = 75.23
-      { at: NOW - DAY, e1rm: 51.7 },
+      { at: NOW - 2 * DAY + 60_000, e1rm: 75.5 }, // 61 kg × 7, the 1RM calculator's estimate (75.54)
+      { at: NOW - DAY, e1rm: 50 }, // a single is its own max
     ]);
   });
 

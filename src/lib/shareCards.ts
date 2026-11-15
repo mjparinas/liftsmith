@@ -1,10 +1,10 @@
 import { TIER_LABEL, type Achievement, type Tier } from "./achievements";
 import type { Pr, SessionSummary } from "./derive";
+import { estimate } from "./e1rm";
 import { exercise, EXERCISE_BY_ID } from "./exercises";
 import type { Game } from "./game";
 import { date, num, t } from "./i18n";
 import { fmtTonnage, type AnniversaryLook } from "./moments";
-import { epley } from "./progression";
 import type { CardData } from "./shareImage";
 import { SITE_URL } from "./site";
 import { MUSCLE_LABEL, type AppEvent, type Muscle, type SetEvent, type Unit } from "./types";
@@ -276,11 +276,11 @@ export function challengeShare(
 
 /** A set as a personal best, and the best before it on the same lift from the event log (for the rest screen's Share). */
 export function prOfSet(events: readonly AppEvent[], set: SetEvent): { pr: Pr; previous: Pr | null } {
-  const pr: Pr = { exerciseId: set.exerciseId, at: set.at, e1rm: epley(set.weight, set.reps), weight: set.weight, reps: set.reps };
+  const pr: Pr = { exerciseId: set.exerciseId, at: set.at, e1rm: estimate(set.weight, set.reps), weight: set.weight, reps: set.reps };
   let previous: Pr | null = null;
   for (const e of events) {
     if (e.type !== "set" || e.exerciseId !== set.exerciseId || e.id === set.id || e.at >= set.at || e.weight <= 0) continue;
-    const e1rm = epley(e.weight, e.reps);
+    const e1rm = estimate(e.weight, e.reps);
     if (!previous || e1rm > previous.e1rm) previous = { exerciseId: e.exerciseId, at: e.at, e1rm, weight: e.weight, reps: e.reps };
   }
   return { pr, previous };
