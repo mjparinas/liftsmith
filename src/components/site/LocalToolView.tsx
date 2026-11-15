@@ -4,15 +4,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { DotsCalculator } from "@/components/site/DotsCalculator";
+import { MacroCalculator } from "@/components/site/MacroCalculator";
 import { OneRmCalculator } from "@/components/site/OneRmCalculator";
 import { PlateCalculator } from "@/components/site/PlateCalculator";
+import { TdeeCalculator } from "@/components/site/TdeeCalculator";
 import { ToolPage } from "@/components/site/ToolPage";
 import { WarmupCalculator } from "@/components/site/WarmupCalculator";
+import { WilksCalculator } from "@/components/site/WilksCalculator";
 import { BRAND } from "@/lib/brand";
 import { pageMeta } from "@/lib/pageMeta";
 import { fill } from "@/lib/siteLang";
 import { WARMUP_REST } from "@/lib/warmup";
 import type { GuideLang } from "@/locales/site/exercise";
+import { activityWords, tdeeWords } from "@/locales/site/fromApp";
 import { isLocalTool, LOCAL_TOOLS } from "@/locales/site/tools";
 import { LOCAL_TOOL_SLUGS, type LocalToolSlug } from "@/locales/site/tools/types";
 
@@ -36,6 +41,14 @@ function calculator(lang: GuideLang, slug: LocalToolSlug) {
       return <OneRmCalculator t={tools[slug].ui} />;
     case "warm-up-calculator":
       return <WarmupCalculator t={tools[slug].ui} />;
+    case "tdee-calculator":
+      return <TdeeCalculator t={tools[slug].ui} words={tdeeWords(lang)} levels={activityWords(lang)} lang={lang} />;
+    case "macro-calculator":
+      return <MacroCalculator t={tools[slug].ui} levels={activityWords(lang)} />;
+    case "wilks-calculator":
+      return <WilksCalculator t={tools[slug].ui} />;
+    case "dots-calculator":
+      return <DotsCalculator t={tools[slug].ui} />;
   }
 }
 

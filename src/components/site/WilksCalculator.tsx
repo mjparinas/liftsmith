@@ -6,16 +6,40 @@ import { useState } from "react";
 
 import { ipfGl, nextDotsLevel, totalFor, wilks, type GlEvent, type Sex } from "@/lib/calculators";
 import { dots } from "@/lib/onerm";
+import { fill } from "@/lib/siteLang";
 import type { Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
+import type { WilksUi } from "@/locales/site/tools/types";
 
-import { dotsLevel } from "./DotsCalculator";
+import { DOTS_LEVELS_EN, dotsBand } from "./DotsCalculator";
 import { Choice, NumBox } from "./NumBox";
+
+/** The calculator's words in English; translated pages pass their own (src/locales/site/tools/). */
+export const WILKS_EN: WilksUi = {
+  units: "Units",
+  formula: "Formula",
+  men: "Men's formula",
+  women: "Women's formula",
+  gear: "Gear",
+  classic: "Classic (raw)",
+  equipped: "Equipped",
+  bw: "Body weight ({unit})",
+  squat: "Squat",
+  bench: "Bench press",
+  deadlift: "Deadlift",
+  liftLabel: "{lift} ({unit})",
+  total: "Total {total} {unit}",
+  level: "DOTS level: {level}.",
+  next: "Add about {weight} {unit} to your total to reach {level} (DOTS {score}).",
+  elite: "That's an elite total.",
+  note: "Wilks and DOTS don't change with gear. IPF GL has separate formulas for classic and equipped lifting, so pick the one you lift in.",
+  levels: DOTS_LEVELS_EN,
+};
 
 const KG = { bw: 80, lifts: [140, 100, 180] };
 const LB = { bw: 175, lifts: [315, 225, 405] };
 
-export function WilksCalculator() {
+export function WilksCalculator({ t = WILKS_EN }: { t?: WilksUi }) {
   const [unit, setUnit] = useState<Unit>("kg");
   const [sex, setSex] = useState<Sex>("male");
   const [gear, setGear] = useState<"classic" | "equipped">("classic");
@@ -38,12 +62,13 @@ export function WilksCalculator() {
   const next = nextDotsLevel(d);
   const gap = next !== null ? totalFor(next, bwKg, (t, b) => dots(t, b, sex)) - totalKg : 0;
   const step = unit === "kg" ? 2.5 : 5;
+  const aria = (label: string) => (t === WILKS_EN ? undefined : label);
   const round = (kg: number) => Math.max(step, Math.ceil(fromKg(kg, unit) / step) * step);
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 [&>*]:min-w-0">
       <div className="card space-y-5 p-5">
         <Choice
-          label="Units"
+          label={t.units}
           value={unit}
           options={[
             ["kg", "kg"],
@@ -52,38 +77,40 @@ export function WilksCalculator() {
           onChange={switchUnit}
         />
         <Choice
-          label="Formula"
+          label={t.formula}
           value={sex}
           options={[
-            ["male", "Men's formula"],
-            ["female", "Women's formula"],
+            ["male", t.men],
+            ["female", t.women],
           ]}
           onChange={setSex}
         />
         <Choice
-          label="Gear"
+          label={t.gear}
           value={gear}
           options={[
-            ["classic", "Classic (raw)"],
-            ["equipped", "Equipped"],
+            ["classic", t.classic],
+            ["equipped", t.equipped],
           ]}
           onChange={setGear}
         />
         <NumBox
           key={`bw-${unit}`}
           id="bw"
-          label={`Body weight (${unit})`}
+          label={fill(t.bw, { unit })}
+          aria={aria(fill(t.bw, { unit }))}
           value={bw}
           onChange={setBw}
           step={unit === "kg" ? 0.5 : 1}
           min={30}
           max={unit === "kg" ? 250 : 550}
         />
-        {(["Squat", "Bench press", "Deadlift"] as const).map((name, i) => (
+        {[t.squat, t.bench, t.deadlift].map((name, i) => (
           <NumBox
-            key={`${name}-${unit}`}
+            key={`${i}-${unit}`}
             id={`lift-${i}`}
-            label={`${name} (${unit})`}
+            label={fill(t.liftLabel, { lift: name, unit })}
+            aria={aria(name)}
             value={lifts[i] ?? 0}
             onChange={(v) => setLifts((l) => l.map((x, j) => (j === i ? v : x)))}
             step={step}
@@ -93,9 +120,7 @@ export function WilksCalculator() {
         ))}
       </div>
       <div className="card p-5" aria-live="polite">
-        <p className="text-sm text-muted">
-          Total {fmtNum(lifts.reduce((s, x) => s + x, 0))} {unit}
-        </p>
+        <p className="text-sm text-muted">{fill(t.total, { total: fmtNum(lifts.reduce((s, x) => s + x, 0)), unit })}</p>
         <div className="mt-2 grid grid-cols-3 gap-3">
           {[
             ["Wilks", w],
@@ -110,16 +135,11 @@ export function WilksCalculator() {
         </div>
         {d > 0 && (
           <p className="mt-4 text-sm">
-            DOTS level: <span className="font-semibold">{dotsLevel(d)}</span>.{" "}
-            {next !== null
-              ? `Add about ${fmtNum(round(gap))} ${unit} to your total to reach ${dotsLevel(next)} (DOTS ${next}).`
-              : "That's an elite total."}
+            {fill(t.level, { level: t.levels[dotsBand(d)] })}{" "}
+            {next !== null ? fill(t.next, { weight: fmtNum(round(gap)), unit, level: t.levels[dotsBand(next)], score: next }) : t.elite}
           </p>
         )}
-        <p className="mt-4 text-sm text-muted">
-          Wilks and DOTS don&apos;t change with gear. IPF GL has separate formulas for classic and equipped lifting, so pick the one you
-          lift in.
-        </p>
+        <p className="mt-4 text-sm text-muted">{t.note}</p>
       </div>
     </div>
   );

@@ -1,22 +1,60 @@
 "use client";
 
-// The public macro calculator (/tools/macro-calculator/): TDEE from the app's engine (tdee.ts), then calories
-// for the goal and protein, fat and carbs (calculators.ts), each with its reason. Nothing is stored or sent.
+// The public macro calculator (/tools/macro-calculator/ and /<lang>/tools/macro-calculator/): TDEE from the app's
+// engine (tdee.ts), then calories for the goal and protein, fat and carbs (calculators.ts), each with its reason.
+// Nothing is stored or sent.
 import { useState } from "react";
 
 import { goalCalories, macros, PROTEIN_PER_KG, type MacroGoal } from "@/lib/calculators";
+import { fill } from "@/lib/siteLang";
 import { ACTIVITIES, ACTIVITY, calcTdee, type Activity, type Sex } from "@/lib/tdee";
 import { fmtNum, LB } from "@/lib/units";
+import type { MacroUi } from "@/locales/site/tools/types";
 
 import { Choice, NumBox } from "./NumBox";
 
-const WHY: Record<MacroGoal, string> = {
-  cut: "the top of the range, to keep muscle while you lose fat",
-  maintain: "the middle of the range lifters need",
-  bulk: "enough to build muscle, with the extra calories going to carbs",
+/** The calculator's words in English; translated pages pass their own (src/locales/site/tools/). */
+export const MACRO_EN: MacroUi = {
+  units: "Units",
+  metric: "Metric",
+  imperial: "Imperial",
+  goal: "Goal",
+  cut: "Lose fat",
+  maintain: "Maintain",
+  bulk: "Build muscle",
+  sex: "Sex",
+  female: "Female",
+  male: "Male",
+  age: "Age",
+  weightKg: "Weight (kg)",
+  weightLb: "Weight (lb)",
+  heightCm: "Height (cm)",
+  heightIn: "Height (inches)",
+  activity: "Activity",
+  kcalDay: "calories a day",
+  protein: "Protein",
+  fat: "Fat",
+  carbs: "Carbs",
+  proteinCut: "{perKg} g per kg of body weight: the top of the range, to keep muscle while you lose fat.",
+  proteinMaintain: "{perKg} g per kg of body weight: the middle of the range lifters need.",
+  proteinBulk: "{perKg} g per kg of body weight: enough to build muscle, with the extra calories going to carbs.",
+  fatWhy: "A quarter of your calories, and never under 0.6 g per kg, for hormones.",
+  carbsWhy: "The rest of your calories, to fuel hard sets.",
+  kcalFloor: "Your BMR of {bmr}: a bigger cut would go under it, which costs muscle.",
+  kcalCut: "500 under your TDEE of {tdee}: about {pace} a week down.",
+  kcalMaintain: "Your TDEE: what you burn on an average day.",
+  kcalBulk: "250 over your TDEE of {tdee}: about {pace} a week up, mostly muscle.",
+  meals: "Spread the protein over {meals} meals; it's used best in portions of 30 to 40 g.",
 };
 
-export function MacroCalculator() {
+export function MacroCalculator({
+  t = MACRO_EN,
+  levels = ACTIVITY,
+}: {
+  t?: MacroUi;
+  /** The activity levels in the page's language (activityWords in fromApp.ts). */
+  levels?: Record<Activity, { label: string; detail: string }>;
+}) {
   const [metric, setMetric] = useState(true);
   const [sex, setSex] = useState<Sex>("male");
   const [age, setAge] = useState(30);
@@ -24,65 +62,88 @@ export function MacroCalculator() {
   const [cm, setCm] = useState(178);
   const [activity, setActivity] = useState<Activity>("moderate");
   const [goal, setGoal] = useState<MacroGoal>("maintain");
+  const aria = (label: string) => (t === MACRO_EN ? undefined : label);
   const r = calcTdee({ sex, age, kg, cm, activity });
   const kcal = goalCalories(r.tdee, r.bmr, goal);
   const m = macros(kcal, kg, goal);
+  const proteinWhy = { cut: t.proteinCut, maintain: t.proteinMaintain, bulk: t.proteinBulk }[goal];
   const rows = [
-    ["Protein", m.protein, m.split.protein, `${fmtNum(PROTEIN_PER_KG[goal])} g per kg of body weight: ${WHY[goal]}.`],
-    ["Fat", m.fat, m.split.fat, "A quarter of your calories, and never under 0.6 g per kg, for hormones."],
-    ["Carbs", m.carbs, m.split.carbs, "The rest of your calories, to fuel hard sets."],
+    [t.protein, m.protein, m.split.protein, fill(proteinWhy, { perKg: fmtNum(PROTEIN_PER_KG[goal]) })],
+    [t.fat, m.fat, m.split.fat, t.fatWhy],
+    [t.carbs, m.carbs, m.split.carbs, t.carbsWhy],
   ] as const;
   const kcalWhy =
     goal === "cut"
       ? kcal === r.bmr
-        ? `Your BMR of ${fmtNum(r.bmr)}: a bigger cut would go under it, which costs muscle.`
-        : `500 under your TDEE of ${fmtNum(r.tdee)}: about ${metric ? "0.5 kg" : "1 lb"} a week down.`
+        ? fill(t.kcalFloor, { bmr: fmtNum(r.bmr) })
+        : fill(t.kcalCut, { tdee: fmtNum(r.tdee), pace: metric ? `${fmtNum(0.5)} kg` : "1 lb" })
       : goal === "bulk"
-        ? `250 over your TDEE of ${fmtNum(r.tdee)}: about ${metric ? "0.25 kg" : "0.5 lb"} a week up, mostly muscle.`
-        : `Your TDEE: what you burn on an average day.`;
+        ? fill(t.kcalBulk, { tdee: fmtNum(r.tdee), pace: metric ? `${fmtNum(0.25)} kg` : `${fmtNum(0.5)} lb` })
+        : t.kcalMaintain;
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 [&>*]:min-w-0">
       <div className="card space-y-5 p-5">
         <Choice
-          label="Units"
+          label={t.units}
           value={metric ? "m" : "i"}
           options={[
-            ["m", "Metric"],
-            ["i", "Imperial"],
+            ["m", t.metric],
+            ["i", t.imperial],
           ]}
           onChange={(v) => setMetric(v === "m")}
         />
         <Choice
-          label="Goal"
+          label={t.goal}
           value={goal}
           options={[
-            ["cut", "Lose fat"],
-            ["maintain", "Maintain"],
-            ["bulk", "Build muscle"],
+            ["cut", t.cut],
+            ["maintain", t.maintain],
+            ["bulk", t.bulk],
           ]}
           onChange={setGoal}
         />
         <Choice
-          label="Sex"
+          label={t.sex}
           value={sex}
           options={[
-            ["female", "Female"],
-            ["male", "Male"],
+            ["female", t.female],
+            ["male", t.male],
           ]}
           onChange={setSex}
         />
-        <NumBox id="age" label="Age" value={age} onChange={setAge} step={1} min={13} max={100} />
+        <NumBox id="age" label={t.age} aria={aria(t.age)} value={age} onChange={setAge} step={1} min={13} max={100} />
         {metric ? (
           <>
-            <NumBox key="kg" id="weight" label="Weight (kg)" value={kg} onChange={setKg} step={0.5} min={25} max={350} />
-            <NumBox key="cm" id="height" label="Height (cm)" value={cm} onChange={setCm} step={1} min={100} max={250} />
+            <NumBox
+              key="kg"
+              id="weight"
+              label={t.weightKg}
+              aria={aria(t.weightKg)}
+              value={kg}
+              onChange={setKg}
+              step={0.5}
+              min={25}
+              max={350}
+            />
+            <NumBox
+              key="cm"
+              id="height"
+              label={t.heightCm}
+              aria={aria(t.heightCm)}
+              value={cm}
+              onChange={setCm}
+              step={1}
+              min={100}
+              max={250}
+            />
           </>
         ) : (
           <>
             <NumBox
               key="lb"
               id="weight"
-              label="Weight (lb)"
+              label={t.weightLb}
+              aria={aria(t.weightLb)}
               value={Math.round(kg / LB)}
               onChange={(v) => setKg(v * LB)}
               step={1}
@@ -92,7 +153,8 @@ export function MacroCalculator() {
             <NumBox
               key="in"
               id="height"
-              label="Height (inches)"
+              label={t.heightIn}
+              aria={aria(t.heightIn)}
               value={Math.round(cm / 2.54)}
               onChange={(v) => setCm(v * 2.54)}
               step={1}
@@ -102,21 +164,21 @@ export function MacroCalculator() {
           </>
         )}
         <div>
-          <p className="font-semibold">Activity</p>
+          <p className="font-semibold">{t.activity}</p>
           <div className="mt-2">
             <Choice
-              label="Activity"
+              label={t.activity}
               value={activity}
-              options={ACTIVITIES.map((a) => [a, ACTIVITY[a].label] as const)}
+              options={ACTIVITIES.map((a) => [a, levels[a].label] as const)}
               onChange={setActivity}
             />
           </div>
-          <p className="mt-1 text-sm text-muted">{ACTIVITY[activity].detail}</p>
+          <p className="mt-1 text-sm text-muted">{levels[activity].detail}</p>
         </div>
       </div>
       <div className="card p-5" aria-live="polite">
         <p className="display text-5xl font-extrabold">{fmtNum(m.kcal)}</p>
-        <p className="font-semibold">calories a day</p>
+        <p className="font-semibold">{t.kcalDay}</p>
         <p className="mt-1 text-sm text-muted">{kcalWhy}</p>
         <ul className="mt-4 divide-y divide-line">
           {rows.map(([name, g, share, why]) => (
@@ -132,9 +194,7 @@ export function MacroCalculator() {
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-sm text-muted">
-          Spread the protein over {fmtNum(Math.max(3, Math.round(m.protein / 40)))} meals; it&apos;s used best in portions of 30 to 40 g.
-        </p>
+        <p className="mt-2 text-sm text-muted">{fill(t.meals, { meals: fmtNum(Math.max(3, Math.round(m.protein / 40))) })}</p>
       </div>
     </div>
   );

@@ -2,16 +2,28 @@
 // the same placeholders as the English calculators, links that exist, and pages in the sitemap with hreflang.
 import { describe, expect, it } from "vitest";
 
+import { DOTS_EN } from "@/components/site/DotsCalculator";
+import { MACRO_EN } from "@/components/site/MacroCalculator";
 import { ONERM_EN } from "@/components/site/OneRmCalculator";
 import { PLATE_EN } from "@/components/site/PlateCalculator";
+import { TDEE_EN } from "@/components/site/TdeeCalculator";
 import { WARMUP_EN } from "@/components/site/WarmupCalculator";
+import { WILKS_EN } from "@/components/site/WilksCalculator";
 import { siteRoutes } from "@/lib/seo";
 import { localPath } from "@/lib/siteLang";
 
 import { LOCAL_TOOLS } from ".";
 import { LOCAL_TOOL_PATHS, LOCAL_TOOL_SLUGS, type ToolUi } from "./types";
 
-const EN: ToolUi = { "plate-calculator": PLATE_EN, "one-rep-max-calculator": ONERM_EN, "warm-up-calculator": WARMUP_EN };
+const EN: ToolUi = {
+  "plate-calculator": PLATE_EN,
+  "one-rep-max-calculator": ONERM_EN,
+  "warm-up-calculator": WARMUP_EN,
+  "tdee-calculator": TDEE_EN,
+  "macro-calculator": MACRO_EN,
+  "wilks-calculator": WILKS_EN,
+  "dots-calculator": DOTS_EN,
+};
 const LANGS = Object.keys(LOCAL_TOOLS) as (keyof typeof LOCAL_TOOLS)[];
 const holes = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 const strings = (o: unknown): string[] =>
