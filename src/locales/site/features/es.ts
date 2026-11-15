@@ -396,7 +396,7 @@ export const es: FeaturesText = {
     },
     "coach-plans": {
       name: "Planes de entrenador que crecen con tu lista de clientes",
-      body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y Liftsmith no se queda nada de lo que te pagan.",
+      body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y con Coach y Coach Plus Liftsmith no se queda nada de lo que te pagan. Con Pro se queda un 2 %.",
     },
     awards: {
       name: "Logros, niveles y rachas",

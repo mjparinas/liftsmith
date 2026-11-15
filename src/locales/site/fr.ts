@@ -319,7 +319,7 @@ export const fr: SiteText = {
       noLimit: "Sans limite fixe de clients",
       inPro: "Inclus dans Pro",
       orMonthly: "ou {monthly} par mois",
-      free: "Vos clients s'entraînent toujours gratuitement, les entraîneurs de lycée qui confirment une adresse scolaire ont Pro gratuitement, et {name} ne prend rien sur ce que vos clients vous paient.",
+      free: "Vos clients s'entraînent toujours gratuitement, les entraîneurs de lycée qui confirment une adresse scolaire ont Pro gratuitement, et avec Coach et Coach Plus, {name} ne prend rien sur ce que vos clients vous paient (2 % avec Pro).",
       cta: "Liftsmith pour les coachs",
     },
   },

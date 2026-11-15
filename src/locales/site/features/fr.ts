@@ -401,7 +401,7 @@ export const fr: FeaturesText = {
     },
     "coach-plans": {
       name: "Des forfaits coach qui grandissent avec votre clientèle",
-      body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et Liftsmith ne prend rien sur ce qu'ils vous paient.",
+      body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et avec Coach et Coach Plus, Liftsmith ne prend rien sur ce qu'ils vous paient. Avec Pro, il garde 2 %.",
     },
     awards: {
       name: "Succès, niveaux et séries de jours",

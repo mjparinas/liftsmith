@@ -6,6 +6,7 @@ import {
   checkoutFor,
   clientPrices,
   endPair,
+  feeFor,
   forgetCoachPay,
   onboardUrl,
   payConfig,
@@ -19,10 +20,12 @@ import {
   type PayConfig,
 } from "./coachPay";
 import { query, resetDb } from "./db";
+import { setFlag } from "./flags";
 import { saveToken, setPushSender, type PushMessage } from "./push";
+import { storeStripeEvent, type StripeEvent } from "./stripe";
 
 const NOW = 1_800_000_000_000;
-const CFG: PayConfig = { secret: "sk_test_x", webhook: "whsec_test", feePercent: 0 };
+const CFG: PayConfig = { secret: "sk_test_x", webhook: "whsec_test" };
 
 const calls: { url: string; body: string; account?: string; method: string }[] = [];
 let charges = true;
@@ -61,12 +64,10 @@ describe("setting up", () => {
   it("needs the Connect webhook secret as well as the key", () => {
     expect(payConfig({ STRIPE_SECRET_KEY: "sk_test_1" })).toBeNull();
     expect(payConfig({ STRIPE_SECRET_KEY: "pk_test_1", STRIPE_CONNECT_WEBHOOK_SECRET: "whsec" })).toBeNull();
-    expect(
-      payConfig({ STRIPE_SECRET_KEY: "sk_test_1", STRIPE_CONNECT_WEBHOOK_SECRET: "whsec", STRIPE_CONNECT_FEE_PERCENT: "5" }),
-    ).toMatchObject({ feePercent: 5 });
-    expect(
-      payConfig({ STRIPE_SECRET_KEY: "sk_test_1", STRIPE_CONNECT_WEBHOOK_SECRET: "whsec", STRIPE_CONNECT_FEE_PERCENT: "90" })?.feePercent,
-    ).toBe(0);
+    expect(payConfig({ STRIPE_SECRET_KEY: "sk_test_1", STRIPE_CONNECT_WEBHOOK_SECRET: "whsec" })).toEqual({
+      secret: "sk_test_1",
+      webhook: "whsec",
+    });
   });
 
   it("makes one Express account and links to Stripe's setup pages", async () => {
@@ -113,11 +114,53 @@ describe("prices and paying", () => {
   it("a monthly plan is a subscription, and Liftsmith's share only applies when set", async () => {
     await ready();
     await setPrice("coach", "client", 200, "month", NOW);
-    await checkoutFor({ ...CFG, feePercent: 5 }, "client", "coach", fake);
+    await checkoutFor(CFG, "client", "coach", fake, 5);
     const q = new URLSearchParams(calls.find((x) => x.url.endsWith("/checkout/sessions"))!.body);
     expect(q.get("mode")).toBe("subscription");
     expect(q.get("line_items[0][price_data][recurring][interval]")).toBe("month");
     expect(q.get("subscription_data[application_fee_percent]")).toBe("5");
+  });
+
+  it("keeps 2% only from a coach on plain Pro once coach plans are on", async () => {
+    expect(await feeFor("coach", NOW)).toBe(0);
+    await setFlag("coachPlans", true, 100, "test", NOW);
+    expect(await feeFor("coach", NOW)).toBe(2);
+    await setFlag("coachPayFee", 1, 100, "test", NOW);
+    expect(await feeFor("coach", NOW)).toBe(1);
+    await ready();
+    await setPrice("coach", "client", 60, "session", NOW);
+    await checkoutFor(CFG, "client", "coach", fake);
+    const q = new URLSearchParams(calls.find((x) => x.url.endsWith("/checkout/sessions"))!.body);
+    expect(q.get("payment_intent_data[application_fee_amount]")).toBe("60");
+  });
+
+  it("takes nothing from a coach on the Coach plan", async () => {
+    await setFlag("coachPlans", true, 100, "test", NOW);
+    const ev: StripeEvent = {
+      id: "evt_plan",
+      type: "customer.subscription.created",
+      created: Math.floor(NOW / 1000),
+      livemode: true,
+      data: {
+        object: {
+          id: "sub_1",
+          customer: "cus_1",
+          status: "active",
+          metadata: { account_id: "coach" },
+          items: { data: [{ current_period_end: Math.floor((NOW + 30 * 86_400_000) / 1000), price: { id: "price_ca" } }] },
+        },
+      },
+    };
+    await storeStripeEvent(
+      ev,
+      {
+        prices: { monthly: "price_m", annual: "price_a" },
+        coachPrices: { coach: { monthly: "price_cm", annual: "price_ca" } },
+        live: true,
+      },
+      NOW,
+    );
+    expect(await feeFor("coach", NOW)).toBe(0);
   });
 });
 

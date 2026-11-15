@@ -56,6 +56,7 @@ import {
   clientPrices,
   dashboardUrl,
   endPair,
+  feeFor,
   onboardUrl,
   payAccount,
   payConfig,
@@ -95,7 +96,9 @@ export async function GET(req: Request) {
       coachPlanOf(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
-    const pay = payConfig() ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId) } : null;
+    const pay = payConfig()
+      ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId), fee: await feeFor(s.accountId) }
+      : null;
     return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });

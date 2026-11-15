@@ -133,6 +133,18 @@ export const FLAGS = {
     description:
       "Pro covers a few clients and Coach and Coach Plus cover more. Turn on once the store products and Stripe prices exist. Coaches over the limit keep 30 for 90 days.",
   },
+  /**
+   * Liftsmith's share of what clients pay a coach on plain Pro (Pro's free clients), once coach plans are on (Melvin,
+   * 2026-11-15: "a nominal platform fee for the 3 free clients, 2%"). Coach and Coach Plus pay none, nor do high school
+   * coaches. src/server/coachPay.ts feeFor.
+   */
+  coachPayFee: {
+    default: 2,
+    options: [0, 1, 2, 3, 5] as const,
+    label: "Fee on client payments (Pro coaches)",
+    description:
+      "Percent Liftsmith keeps from what clients pay a coach on plain Pro, once coach plans are on. Coach and Coach Plus pay nothing.",
+  },
   /** Clients a coach can have with Pro, once coach plans are on. */
   coachProClients: {
     default: 3,
