@@ -28,6 +28,7 @@ export const ja: SiteText = {
       features: "機能",
       whoFor: "こんな人に",
       gyms: "ジムを探す",
+      trainers: "トレーナーを探す",
       coaches: "コーチの方へ",
       pricing: "料金",
       whatsNew: "最新情報",

@@ -6,6 +6,7 @@ import { cityHtml, goneHtml, GYM_GONE_HEADERS, GYM_PAGE_HEADERS, gymHtml, indexH
 import { cities, cityPlaces, placeBySlug } from "@/server/gymPlaces";
 import { countScan } from "@/server/gymPosters";
 import { publicPosterHtml } from "@/server/gymPrint";
+import { cityTrainers } from "@/server/trainerDirectory";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,8 @@ export async function GET(req: Request) {
     if (city) {
       const list = await cityPlaces(city);
       if (!list.length) return gone();
-      return new Response(cityHtml(city, list, lang), { headers: GYM_PAGE_HEADERS });
+      const trainers = (await cityTrainers(city).catch(() => ({ people: [] }))).people.length;
+      return new Response(cityHtml(city, list, lang, trainers), { headers: GYM_PAGE_HEADERS });
     }
     return new Response(indexHtml(await cities(), lang), { headers: GYM_PAGE_HEADERS });
   } catch {

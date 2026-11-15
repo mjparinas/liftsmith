@@ -27,6 +27,7 @@ export const de: SiteText = {
       features: "Funktionen",
       whoFor: "Für wen",
       gyms: "Studio finden",
+      trainers: "Trainer finden",
       coaches: "Für Coaches",
       pricing: "Preise",
       whatsNew: "Neuigkeiten",
