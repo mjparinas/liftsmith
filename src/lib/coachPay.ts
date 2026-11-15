@@ -35,6 +35,8 @@ export interface Payment {
 export interface OverviewPay {
   account: PayAccount | null;
   prices: (Price & { sub: Subscription | null })[];
+  /** The percent Liftsmith keeps from this coach's client payments: 2 on plain Pro once coach plans are on, else 0. */
+  fee?: number;
 }
 /** On a client's report. */
 export interface ClientPay {

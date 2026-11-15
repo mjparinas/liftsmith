@@ -31,7 +31,8 @@ export const en = {
   "cpl.monthly": "{tier}, monthly",
   "cpl.yearPrice": "{price} a year, about {perMonth} a month. Renews each year until you cancel.",
   "cpl.monthPrice": "{price} a month. Renews each month until you cancel.",
-  "cpl.free": "Your clients always train free, and Liftsmith takes nothing from what they pay you.",
+  "cpl.free":
+    "Your clients always train free, and on Coach and Coach Plus Liftsmith takes nothing from what they pay you. On Pro it keeps 2%.",
   "cpl.replace": "Moving up replaces your Pro subscription, so you pay for one plan, and what's left of Pro is credited.",
   "cpl.otherBill.web":
     "Your Pro is billed on the Liftsmith website. Once your coach plan starts, cancel Pro there, because coach plans include Pro.",
@@ -76,7 +77,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, mensual",
   "cpl.yearPrice": "{price} al año, unos {perMonth} al mes. Se renueva cada año hasta que lo canceles.",
   "cpl.monthPrice": "{price} al mes. Se renueva cada mes hasta que lo canceles.",
-  "cpl.free": "Tus clientes siempre entrenan gratis, y Liftsmith no se queda nada de lo que te pagan.",
+  "cpl.free":
+    "Tus clientes siempre entrenan gratis, y con Coach y Coach Plus Liftsmith no se queda nada de lo que te pagan. Con Pro se queda un 2 %.",
   "cpl.replace": "Al subir de plan se sustituye tu suscripción Pro, así que pagas un solo plan, y lo que queda de Pro se descuenta.",
   "cpl.otherBill.web":
     "Tu Pro se cobra en la web de Liftsmith. Cuando empiece tu plan de entrenador, cancela Pro allí, porque los planes de entrenador incluyen Pro.",
@@ -120,7 +122,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, mensuel",
   "cpl.yearPrice": "{price} par an, environ {perMonth} par mois. Renouvelé chaque année jusqu'à résiliation.",
   "cpl.monthPrice": "{price} par mois. Renouvelé chaque mois jusqu'à résiliation.",
-  "cpl.free": "Vos clients s'entraînent toujours gratuitement, et Liftsmith ne prend rien sur ce qu'ils vous paient.",
+  "cpl.free":
+    "Vos clients s'entraînent toujours gratuitement, et avec Coach et Coach Plus, Liftsmith ne prend rien sur ce qu'ils vous paient. Avec Pro, il garde 2 %.",
   "cpl.replace":
     "Passer à un forfait supérieur remplace votre abonnement Pro : vous ne payez qu'un forfait, et le reste de Pro est crédité.",
   "cpl.otherBill.web":
@@ -164,7 +167,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, monatlich",
   "cpl.yearPrice": "{price} pro Jahr, etwa {perMonth} pro Monat. Verlängert sich jährlich, bis du kündigst.",
   "cpl.monthPrice": "{price} pro Monat. Verlängert sich monatlich, bis du kündigst.",
-  "cpl.free": "Deine Kunden trainieren immer kostenlos, und Liftsmith behält nichts von dem ein, was sie dir zahlen.",
+  "cpl.free":
+    "Deine Kunden trainieren immer kostenlos, und mit Coach und Coach Plus behält Liftsmith nichts von dem ein, was sie dir zahlen. Mit Pro behält es 2 %.",
   "cpl.replace": "Ein Upgrade ersetzt dein Pro-Abo, du zahlst also nur einen Plan, und der Rest von Pro wird gutgeschrieben.",
   "cpl.otherBill.web":
     "Dein Pro wird über die Liftsmith-Website abgerechnet. Kündige Pro dort, sobald dein Coach-Plan läuft, denn Coach-Pläne enthalten Pro.",
@@ -207,7 +211,8 @@ export const it: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, mensile",
   "cpl.yearPrice": "{price} all'anno, circa {perMonth} al mese. Si rinnova ogni anno finché non lo annulli.",
   "cpl.monthPrice": "{price} al mese. Si rinnova ogni mese finché non lo annulli.",
-  "cpl.free": "I tuoi clienti si allenano sempre gratis, e Liftsmith non trattiene nulla di quello che ti pagano.",
+  "cpl.free":
+    "I tuoi clienti si allenano sempre gratis, e con Coach e Coach Plus Liftsmith non trattiene nulla di quello che ti pagano. Con Pro trattiene il 2%.",
   "cpl.replace":
     "Passare a un piano superiore sostituisce il tuo abbonamento Pro, così paghi un solo piano, e ciò che resta di Pro viene accreditato.",
   "cpl.otherBill.web":
@@ -252,7 +257,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier} 月額",
   "cpl.yearPrice": "年{price}、月あたり約{perMonth}。解約するまで毎年更新されます。",
   "cpl.monthPrice": "月{price}。解約するまで毎月更新されます。",
-  "cpl.free": "クライアントはいつでも無料でトレーニングでき、クライアントからの支払いから Liftsmith が受け取る分はありません。",
+  "cpl.free":
+    "クライアントはいつでも無料でトレーニングでき、Coach と Coach Plus では、クライアントからの支払いから Liftsmith が受け取る分はありません。Pro では 2% を受け取ります。",
   "cpl.replace": "アップグレードすると Pro の定期購入が置き換わるため、支払いは1つのプランだけで、Pro の残り期間分はクレジットされます。",
   "cpl.otherBill.web":
     "Pro は Liftsmith のウェブサイトで請求されています。コーチプランが始まったら、そちらで Pro を解約してください。コーチプランには Pro が含まれます。",

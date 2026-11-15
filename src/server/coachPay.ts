@@ -1,17 +1,21 @@
 // Client payments through Stripe Connect (Melvin, 2026-11-13: "taking client payments, through Stripe Connect"). A coach
-// or personal trainer connects their own Stripe account (an Express account, set up on Stripe's pages), sets each
+// or personal trainer connects their own Stripe account (with the Express dashboard, set up on Stripe's pages), sets each
 // client's price (per session or monthly), and the client pays on a Stripe Checkout page in the browser. The coach's
-// account is the merchant: the money, the receipts, refunds and disputes are theirs, and Liftsmith takes no cut unless
-// STRIPE_CONNECT_FEE_PERCENT says so. Card details never touch Liftsmith or the app. Decision record:
+// account is the merchant: the money, the receipts, refunds and disputes are theirs. Liftsmith keeps a small share
+// (`feeFor`, 2%) only from coaches on plain Pro once coach plans are on; Coach and Coach Plus pay nothing. Card details
+// never touch Liftsmith or the app. Decision record:
 // docs/decisions/trainer-mode.md "Payments".
 //
 // Configured in Vercel: STRIPE_SECRET_KEY (the platform's key, shared with Pro on the web) and
 // STRIPE_CONNECT_WEBHOOK_SECRET (the signing secret of the Connect webhook endpoint, /api/coach/stripe/). Until both
 // are set, payments don't show anywhere.
+import { allowed, FLAGS } from "@/lib/flags";
 import { SITE_URL } from "@/lib/site";
 
 import { isAccountId, isClient, nameOf } from "./coach";
+import { coachPlanOf } from "./coachPlan";
 import { batch, query, run } from "./db";
+import { flagStates } from "./flags";
 import { notifyCoach } from "./push";
 import { formBody, StripeError, verifySignature, type Fetch } from "./stripe";
 
@@ -21,16 +25,25 @@ const API = "https://api.stripe.com/v1";
 export interface PayConfig {
   secret: string;
   webhook: string;
-  /** Liftsmith's share of each payment, in percent (0 by default). */
-  feePercent: number;
 }
 
 export function payConfig(env: Env = process.env): PayConfig | null {
   const secret = env.STRIPE_SECRET_KEY?.trim();
   const webhook = env.STRIPE_CONNECT_WEBHOOK_SECRET?.trim();
   if (!secret || !webhook || !/^(sk|rk)_(live|test)_/.test(secret)) return null;
-  const fee = Number(env.STRIPE_CONNECT_FEE_PERCENT ?? 0);
-  return { secret, webhook, feePercent: Number.isFinite(fee) && fee > 0 && fee <= 20 ? fee : 0 };
+  return { secret, webhook };
+}
+
+/**
+ * Liftsmith's share of a coach's client payments, in percent: the coachPayFee flag (2% by default) for a coach on plain
+ * Pro, Pro's few free clients, once coach plans are on. Coach and Coach Plus pay nothing, nor do high school coaches,
+ * and nobody pays while coach plans are off (there's no plan to move up to yet).
+ */
+export async function feeFor(coachId: string, now = Date.now()): Promise<number> {
+  const plan = await coachPlanOf(coachId, now);
+  if (!plan.live || plan.tier !== "pro" || plan.via === "school") return 0;
+  const v = (await flagStates().catch(() => new Map())).get("coachPayFee")?.value;
+  return allowed("coachPayFee", v) && typeof v === "number" ? v : FLAGS.coachPayFee.default;
 }
 
 export type PriceKind = "session" | "month";
@@ -149,7 +162,13 @@ export async function onboardUrl(
       "POST",
       "/accounts",
       {
-        type: "express",
+        // Controller properties, not the legacy `type: "express"`, which Stripe now refuses for new platforms because it
+        // makes Liftsmith liable for a coach's negative balance. Here Stripe covers losses, the coach pays Stripe's own
+        // fees (they're the merchant), and the coach gets the Express dashboard.
+        "controller[stripe_dashboard][type]": "express",
+        "controller[fees][payer]": "account",
+        "controller[losses][payments]": "stripe",
+        "controller[requirement_collection]": "stripe",
         email: email ?? undefined,
         "capabilities[card_payments][requested]": true,
         "capabilities[transfers][requested]": true,
@@ -338,6 +357,8 @@ export async function checkoutFor(
   clientId: string,
   coachId: unknown,
   f: Fetch = fetch,
+  /** Liftsmith's share in percent; by default the coach's own (`feeFor`). */
+  feePercent?: number,
 ): Promise<string | { error: PayError }> {
   if (!isAccountId(coachId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
   const p = await priceFor(coachId, clientId);
@@ -348,7 +369,7 @@ export async function checkoutFor(
   if (p.kind === "month" && sub && ["active", "trialing", "past_due"].includes(sub.status) && !sub.ending) return { error: "subscribed" };
   const unit = Math.round(p.amount * minorUnits(p.currency));
   const name = `${p.kind === "month" ? "Coaching" : "Training session"} with ${await nameOf(coachId)}`.slice(0, 120);
-  const fee = cfg.feePercent;
+  const fee = feePercent ?? (await feeFor(coachId));
   const s = await call<{ url: string }>(
     cfg,
     "POST",

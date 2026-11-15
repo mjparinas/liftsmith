@@ -283,7 +283,7 @@ export const en: SiteText = {
       noLimit: "No set limit on clients",
       inPro: "Included in Pro",
       orMonthly: "or {monthly} a month",
-      free: "Your clients always train free, high school coaches who confirm a school email get Pro free, and {name} takes nothing from what clients pay you.",
+      free: "Your clients always train free, high school coaches who confirm a school email get Pro free, and on Coach and Coach Plus {name} takes nothing from what clients pay you (2% on Pro).",
       cta: "Liftsmith for coaches",
     },
   },

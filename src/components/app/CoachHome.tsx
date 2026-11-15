@@ -208,7 +208,7 @@ export function CoachHome({
           <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={reload} />
         )}
         {view.tab === "checkins" && <FormsScreen embedded />}
-        {view.tab === "pay" && data.pay && <PaySetup account={data.pay.account} onChange={reload} />}
+        {view.tab === "pay" && data.pay && <PaySetup account={data.pay.account} fee={data.pay.fee ?? 0} onChange={reload} />}
         {view.tab === "teams" && (
           <Section title={t("team.title")} icon="trophy" info="schoolTeams">
             <CoachTeams data={teams.data} onChange={teams.reload} />

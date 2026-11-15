@@ -61,6 +61,7 @@ import {
   clientPrices,
   dashboardUrl,
   endPair,
+  feeFor,
   onboardUrl,
   payAccount,
   payConfig,
@@ -104,7 +105,9 @@ export async function GET(req: Request) {
       coachPlanOf(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
-    const pay = payConfig() ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId) } : null;
+    const pay = payConfig()
+      ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId), fee: await feeFor(s.accountId) }
+      : null;
     return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
@@ -268,7 +271,9 @@ export async function POST(req: Request) {
         if (body.action === "payStop") return reply(req, 200, { ok: await stopMonthly(cfg, s.accountId, body.id) });
         const r = await checkoutFor(cfg, s.accountId, body.id);
         return typeof r === "string" ? reply(req, 200, { url: r }) : reply(req, 409, r);
-      } catch {
+      } catch (e) {
+        // Stripe's own message (never card or bank details) goes to the function log, so a setup problem can be read there.
+        console.error(`coach ${body.action}: ${e instanceof Error ? e.message : String(e)}`);
         return reply(req, 502, { error: "stripe" });
       }
     }
