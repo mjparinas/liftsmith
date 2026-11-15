@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { cacheFlags, flag, FLAG_CACHE_KEY, variant } from "./flags";
+import { cacheFlags, flag, FLAG_CACHE_KEY } from "./flags";
 import { declineTrial, startTrial, trialDaysLeft } from "./trial";
 
 // Pro trial offer at the end of setup (Melvin, 2026-11-09): 14 days, behind the trialDays flag.
@@ -22,12 +22,6 @@ describe("trialDays flag", () => {
     expect(flag("trialDays")).toBe(7);
     localStorage.setItem(FLAG_CACHE_KEY, "not json");
     expect(flag("trialDays")).toBe(14);
-  });
-
-  it("gives a device a stable A/B variant", () => {
-    expect(variant("trialDays", "device-a")).toBe(variant("trialDays", "device-a"));
-    const seen = new Set(Array.from({ length: 40 }, (_, i) => variant("trialDays", `d${i}`)));
-    expect([...seen].sort((a, b) => a - b)).toEqual([7, 14]);
   });
 });
 

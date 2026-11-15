@@ -194,7 +194,6 @@ const ADMIN_TABS = [
   "Users",
   "Installs",
   "Flags",
-  "A/B Tests",
   "Automations",
   "System",
   "Log",

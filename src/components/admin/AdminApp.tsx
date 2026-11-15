@@ -13,7 +13,7 @@ import type { InboxItem } from "@/server/inbox";
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
-import { Experiments, Flags } from "./Flags";
+import { Flags } from "./Flags";
 import { GymPlaces } from "./GymPlaces";
 import { GymReports } from "./GymReports";
 import { Inbox } from "./Inbox";
@@ -52,7 +52,6 @@ const TABS = [
   "Users",
   "Installs",
   "Flags",
-  "A/B Tests",
   "Automations",
   "System",
   "Log",
@@ -1088,7 +1087,6 @@ export function AdminApp() {
         )}
         {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
-        {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
         {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
         {tab === "Log" && <Log />}

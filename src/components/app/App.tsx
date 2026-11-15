@@ -194,7 +194,7 @@ export function App() {
     applyA11y(savedA11y());
     installDiag();
     startAnalytics();
-    // Feature flags and A/B tests from the server (remoteFlags.ts); the last answer stays for offline use.
+    // Feature flags from the server (remoteFlags.ts); the last answer stays for offline use.
     startFlags();
     // Feedback written offline goes out as soon as there's a connection.
     void flushFeedback();

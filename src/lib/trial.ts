@@ -2,7 +2,7 @@ import type { Profile } from "./types";
 
 // The Pro trial offer (Melvin, 2026-11-09, revenue forecast): every new user sees a Pro trial offer at
 // the end of setup, annual plan first; anyone who declines keeps the free logger and 5x5. The length
-// comes from the trialDays flag (14 now, A/B 7 vs 14 later). Until native billing lands, starting a
+// comes from the trialDays flag (14 now; 7 can be rolled out from the admin Flags tab). Until native billing lands, starting a
 // trial only records the choice, and Pro stays on for everyone.
 
 export type Plan = "annual" | "monthly";
