@@ -390,6 +390,11 @@ export const fr: FeaturesText = {
       body: "L'entraînement est toujours partagé. Fréquence cardiaque, notes de séance, forme et récupération, données corporelles, douleurs et blessures, et cycle sont chacun un interrupteur que le client active pour chaque coach, à l'acceptation ou plus tard. Les photos et les salles ne sortent jamais.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
     },
+    "coach-chat-dock": {
+      name: "Dock de chat, statuts et autocollants",
+      body: "Sur ordinateur, le chat avec le coach se range dans un dock en bas à droite, comme une messagerie : toutes les personnes à qui écrire, jusqu'à deux fenêtres qui se replient, un son et un compteur dans l'onglet quand un message arrive. Chaque côté choisit un statut (en ligne, avec un client, à l'entraînement, absent, ne pas déranger, en vacances ou apparaître hors ligne), voit quand l'autre écrit et quand il a vu votre message, et envoie emojis et autocollants de salle, sur le téléphone aussi.",
+      proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",

@@ -212,6 +212,14 @@ export const sound = {
   pop() {
     if (feel.sound) mallet(NOTE.A5, 0, 0.07, 0.3);
   },
+  /** A chat message came in (coach chat): a soft rising pair, a fourth apart, quieter than Log set. */
+  message() {
+    if (feel.sound)
+      phrase([
+        [NOTE.E5, 0, 0.1, 0.32],
+        [NOTE.A5, 0.07, 0.18, 0.32],
+      ]);
+  },
   /** Something didn't work (a failed send, a value out of range): low and soft, never harsh. */
   error() {
     if (feel.sound)

@@ -659,3 +659,12 @@ Share the work and give new members a head start.
 - Run a club with a weekly leaderboard.
 - Approve trainers who list themselves at your gym.
 Did you know? Your gym's page is on the website too, so people searching for gyms nearby can find it.
+
+### C7 · Your client chat, now a messenger (**New**, 2026-11-15)
+Pro · Coaches and trainers · No screenshot (coaching needs an account)
+On a computer, every chat now lives in a dock at the bottom right, so clients are one click away on any page.
+- Up to two chat windows beside the list, each folding down to its name.
+- A sound and a count in the browser tab when a client writes.
+- Set a status: with a client, training, away, do not disturb, on vacation or appear offline; online shows by itself.
+- See when a client is typing and when they've seen your message, and send emoji and gym stickers.
+Did you know? On Do not disturb or on vacation, chat notifications to you wait until you're back.

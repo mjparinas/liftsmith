@@ -389,6 +389,11 @@ export const de: FeaturesText = {
       body: "Das Training wird immer geteilt. Herzfrequenz, Workout-Notizen, Form und Erholung, Körperdaten, Schmerzen und Verletzungen sowie der Zyklus sind je ein Schalter, den Kunden für jeden Coach umlegen, bei der Zustimmung oder jederzeit danach. Fotos und Studios bleiben immer privat.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
     },
+    "coach-chat-dock": {
+      name: "Chat-Dock, Status und Sticker",
+      body: "Am Computer sitzt der Coach-Chat unten rechts in einem Dock, wie ein Messenger: alle, denen du schreiben kannst, bis zu zwei Chatfenster, die sich einklappen, und ein Ton und eine Zahl im Tab, wenn eine Nachricht kommt. Beide Seiten setzen einen Status (online, bei einem Kunden, beim Training, abwesend, nicht stören, im Urlaub oder offline erscheinen), sehen, wann die andere Seite schreibt und deine Nachricht gesehen hat, und schicken Emojis und Gym-Sticker, auch am Handy.",
+      proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
+    },
     "coach-pages": {
       name: "Eine Seite für jede Seite",
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",

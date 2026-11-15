@@ -802,4 +802,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Updates arrive by themselves; the app tells you when one is ready.",
   },
+  "coach-dock": {
+    title: "Your client chat, now a messenger",
+    intro: "On a computer, every chat now lives in a dock at the bottom right, so clients are one click away on any page.",
+    points: [
+      "Up to two chat windows beside the list, each folding down to its name.",
+      "A sound and a count in the browser tab when a client writes.",
+      "Set a status: with a client, training, away, do not disturb, on vacation or appear offline; online shows by itself.",
+      "See when a client is typing and when they've seen your message, and send emoji and gym stickers.",
+    ],
+    dyk: "On Do not disturb or on vacation, chat notifications to you wait until you're back.",
+  },
 };
