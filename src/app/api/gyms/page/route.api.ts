@@ -5,7 +5,7 @@
 import { addressKey } from "@/server/gymDirectory";
 import { cityHtml, goneHtml, GYM_GONE_HEADERS, GYM_PAGE_HEADERS, gymHtml, indexHtml, pageLang } from "@/server/gymPage";
 import { mergedPath, reportPlace } from "@/server/gymPlaceReports";
-import { cities, cityPlaces, placeBySlug } from "@/server/gymPlaces";
+import { cities, cityPlaces, movedCity, movedGym, placeBySlug } from "@/server/gymPlaces";
 import { countScan } from "@/server/gymPosters";
 import { publicPosterHtml } from "@/server/gymPrint";
 import { GYM_REPORT_HEADERS, reportPageHtml, type ReportPageState } from "@/server/gymReportPage";
@@ -20,13 +20,21 @@ export async function GET(req: Request) {
   const city = u.get("city");
   const gym = u.get("gym");
   const gone = () => new Response(goneHtml(lang), { status: 404, headers: GYM_GONE_HEADERS });
+  // A page that moved when its city was fixed (gymPlaces.ts moveToCity): a permanent redirect, keeping ?from=qr.
+  const moved = (to: string, poster = false) => {
+    const qr = u.get("from") === "qr" ? "?from=qr" : "";
+    return new Response(null, {
+      status: 301,
+      headers: { Location: `${to}${poster ? "poster/" : ""}${qr}`, "Cache-Control": "public, max-age=3600" },
+    });
+  };
   try {
     if (city && gym) {
       const p = await placeBySlug(city, gym);
       if (!p) {
-        // A duplicate staff merged into another gym: its page goes to that gym's (gymPlaceReports.ts).
-        const to = await mergedPath(city, gym);
-        return to ? new Response(null, { status: 301, headers: { Location: to } }) : gone();
+        // A page that moved city (gym_moves), or a duplicate staff merged into another gym (gymPlaceReports.ts).
+        const to = (await movedGym(city, gym)) ?? (await mergedPath(city, gym));
+        return to ? moved(to, u.get("poster") === "1") : gone();
       }
       // /gyms/<city>/<gym>/report/: Report a problem with this page (gymReportPage.ts).
       if (u.get("report") === "1") return new Response(reportPageHtml(p, lang), { headers: GYM_REPORT_HEADERS });
@@ -41,7 +49,10 @@ export async function GET(req: Request) {
     }
     if (city) {
       const list = await cityPlaces(city);
-      if (!list.length) return gone();
+      if (!list.length) {
+        const to = await movedCity(city);
+        return to ? moved(to) : gone();
+      }
       const trainers = (await cityTrainers(city).catch(() => ({ people: [] }))).people.length;
       return new Response(cityHtml(city, list, lang, trainers), { headers: GYM_PAGE_HEADERS });
     }

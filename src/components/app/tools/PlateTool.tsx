@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { barName } from "@/lib/gymNames";
 import { t } from "@/lib/i18n";
 import { loadBar, nearestLoads } from "@/lib/plates";
 import { useApp } from "@/lib/store";
@@ -77,7 +78,7 @@ export function PlateTool() {
             <div className="mt-1 flex flex-wrap gap-2">
               {bars.map((b) => (
                 <Chip key={b.id} active={b.id === bar.id} onClick={() => setBarId(b.id)}>
-                  {b.name} · {fmtNum(b.weight)} {unit}
+                  {barName(b)} · {fmtNum(b.weight)} {unit}
                 </Chip>
               ))}
             </div>

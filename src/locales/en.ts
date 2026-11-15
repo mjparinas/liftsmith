@@ -85,6 +85,7 @@ import * as part from "./text/part";
 import * as past from "./text/past";
 import * as pay from "./text/pay";
 import * as pgm from "./text/pgm";
+import * as phase from "./text/phase";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
 import * as pm from "./text/pm";
@@ -247,6 +248,7 @@ export const en = {
   ...stats.en,
   ...tab.en,
   ...td.en,
+  ...phase.en,
   ...tempo.en,
   ...timer.en,
   ...tdee.en,

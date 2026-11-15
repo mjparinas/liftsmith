@@ -8,6 +8,7 @@ import { generate, injuryPass, planSeconds, type Plan } from "../generator";
 import { gymAt, locate, wantsLocation, type Fix } from "../geo";
 import { withoutBroken } from "../gymExtrasApi";
 import type { GymKit } from "../gymShare";
+import { t } from "../i18n";
 import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
 import { rehabItems } from "../partExtras";
@@ -159,7 +160,8 @@ export function planSlice(c: Ctx): PlanSlice {
     },
 
     addGym(preset) {
-      const g = makeGym(preset, get().profile.unit);
+      // Named in the lifter's language; they can rename it on Gyms.
+      const g = { ...makeGym(preset, get().profile.unit), name: t(`gym.kind.${preset}`) };
       const gyms = [...get().gyms, g];
       set({ gyms });
       void saveRecord("gyms", gyms);

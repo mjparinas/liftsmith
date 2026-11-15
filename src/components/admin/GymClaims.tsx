@@ -8,10 +8,11 @@ import { useEffect, useState } from "react";
 import type { ClaimRow } from "@/server/gymClaims";
 
 import { Card } from "./charts";
+import { HowItWorks } from "./HowItWorks";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
-export function GymClaims({ admin }: { admin: boolean }) {
+export function GymClaims({ admin, onCount }: { admin: boolean; onCount?: (waiting: number) => void }) {
   const [rows, setRows] = useState<ClaimRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
@@ -38,13 +39,19 @@ export function GymClaims({ admin }: { admin: boolean }) {
     setVersion((v) => v + 1);
   };
   const waiting = rows?.filter((c) => c.status === "pending") ?? [];
+  const count = rows ? waiting.length : null;
+  useEffect(() => {
+    if (count !== null) onCount?.(count);
+  }, [count, onCount]);
   const recent = rows?.filter((c) => c.status !== "pending") ?? [];
   return (
     <Card title="Gym claims" subtitle={rows ? `${waiting.length} waiting` : undefined}>
-      <p className="text-sm text-muted">
-        Owners whose email isn&apos;t at the gym&apos;s own website. Check before approving: call the gym&apos;s listed phone and ask for
-        them by name, or look for them on the gym&apos;s website. Approving makes the gym official and theirs to edit.
-      </p>
+      <HowItWorks>
+        <p>
+          Owners whose email isn&apos;t at the gym&apos;s own website. Check before approving: call the gym&apos;s listed phone and ask for
+          them by name, or look for them on the gym&apos;s website. Approving makes the gym official and theirs to edit.
+        </p>
+      </HowItWorks>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
         <Loading label="Loading claims" className="mt-3">

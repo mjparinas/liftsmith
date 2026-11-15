@@ -7,6 +7,7 @@ import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { explain } from "@/lib/explain";
 import { alternatives, type PlanItem } from "@/lib/generator";
+import { gymName } from "@/lib/gymNames";
 import { list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { presetLabels, settingsFor, settingsLine, type Setting } from "@/lib/machineSettings";
@@ -225,7 +226,11 @@ export function MachineSettings({ exerciseId, gym }: { exerciseId: string; gym: 
         <span aria-hidden>⚙</span>
         {line ? <span className="text-ink">{line}</span> : t("coach.saveSetup")}
       </button>
-      <Sheet open={open} onClose={() => setOpen(false)} title={t("coach.setupTitle", { name: exercise(exerciseId).name, gym: gym.name })}>
+      <Sheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t("coach.setupTitle", { name: exercise(exerciseId).name, gym: gymName(gym.name) })}
+      >
         <p className="mb-3 text-sm text-muted">{t("coach.setupHint")}</p>
         <div className="space-y-3">
           {draft.map((d, i) => (

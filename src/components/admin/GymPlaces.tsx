@@ -1,138 +1,324 @@
 "use client";
 
-// The admin Gyms tab (docs/decisions/gyms.md): seed a city's gyms from OpenStreetMap, then tidy the list (a studio
-// marked as a gym, a closed gym to hide). Support staff can read; only admins import or change a gym.
-import { useEffect, useState } from "react";
+// The admin Gyms tab (docs/decisions/gyms.md "The admin Gyms tab"). Four parts, one at a time, so the page isn't one
+// long manual (Melvin, 2026-11-15): To do (claims, posters and gyms lifters added, with counts on the tab), Import
+// (OpenStreetMap, with Recent imports), Website fill-in, and the Gym list with search, filters and Fix city names.
+// Long explanations sit behind "How this works". Support staff can read; only admins import or change a gym.
+import { useCallback, useEffect, useState } from "react";
 
 import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces";
+import type { RepairChange, RepairStep } from "@/server/gymRepair";
 
 import { Card } from "./charts";
 import { GymClaims } from "./GymClaims";
 import { GymEnrich } from "./GymEnrich";
 import { GymImport } from "./GymImport";
 import { GymPosters } from "./GymPosters";
+import { HowItWorks } from "./HowItWorks";
 import { Loading, TableBones } from "./Skeletons";
 
+export const GYM_PARTS = ["To do", "Import", "Website fill-in", "Gym list"] as const;
+export type GymPart = (typeof GYM_PARTS)[number];
+
+type List = AdminPlaceList & { pending: AdminPlace[] };
+
+async function post(body: Record<string, unknown>, url = "/api/admin/gym-places/") {
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  }).catch(() => null);
+  if (!r) return { error: "The admin server didn't answer." };
+  const j = (await r.json().catch(() => ({}))) as { error?: string };
+  return r.ok ? j : { error: j.error ?? "That didn't work." };
+}
+
 export function GymPlaces({ admin }: { admin: boolean }) {
-  const [data, setData] = useState<(AdminPlaceList & { pending: AdminPlace[] }) | null>(null);
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
-  const [note, setNote] = useState<string | null>(null);
+  const [part, setPart] = useState<GymPart>("To do");
   const [version, setVersion] = useState(0);
-  const [ordering, setOrdering] = useState<string | null>(null);
+  const changed = useCallback(() => setVersion((v) => v + 1), []);
+  const [claims, setClaims] = useState(0);
+  const [posters, setPosters] = useState(0);
+  const [pending, setPending] = useState<AdminPlace[]>([]);
+  const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
-    const t = setTimeout(() => {
-      fetch(`/api/admin/gym-places/?q=${encodeURIComponent(q)}&page=${page}`)
-        .then(async (r) => {
-          if (!r.ok) throw new Error();
-          const j = (await r.json()) as AdminPlaceList & { pending: AdminPlace[] };
-          if (live) setData(j);
-        })
-        .catch(() => live && setNote("The gym list didn't load."));
-    }, 250);
+    fetch("/api/admin/gym-places/?page=1&status=official")
+      .then(async (r) => (r.ok ? ((await r.json()) as List) : null))
+      .then((j) => live && j && setPending(j.pending))
+      .catch(() => undefined);
     return () => {
       live = false;
-      clearTimeout(t);
     };
-  }, [q, page, version]);
-  const post = async (body: Record<string, unknown>, url = "/api/admin/gym-places/") => {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+  }, [version]);
+  const todo = claims + posters + pending.length;
+  const badge: Partial<Record<GymPart, number>> = { "To do": todo };
+  const act = (p: AdminPlace, action: PlaceAction) =>
+    void post({ id: p.id, action }).then((j) => {
+      if (j.error) setNote(j.error);
+      changed();
     });
-    const j = (await r.json().catch(() => ({}))) as { error?: string; area?: string; found?: number; added?: number; updated?: number };
-    setVersion((v) => v + 1);
-    return r.ok ? j : { error: j.error ?? "That didn't work." };
-  };
-  const act = (p: AdminPlace, action: PlaceAction) => void post({ id: p.id, action }).then((j) => j.error && setNote(j.error));
   return (
-    <div className="grid gap-4">
-      <GymClaims admin={admin} />
-      <GymPosters admin={admin} version={version} />
-      {data && data.pending.length > 0 && (
-        <Card title="Gyms lifters added" subtitle="Not on the map. Look each one up, then approve it to show it, or reject it.">
-          <ul className="divide-y divide-line">
-            {data.pending.map((p) => (
-              <li key={p.id} className="flex flex-wrap items-start gap-3 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold break-words">{p.name}</p>
-                  <p className="text-sm text-muted">
-                    {[p.address, [p.city, p.region].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
-                  </p>
-                  <p className="text-xs text-faint">
-                    {p.kind} · added {new Date(p.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                {admin && (
-                  <div className="flex flex-wrap gap-2 text-sm">
-                    <button
-                      type="button"
-                      onClick={() => act(p, "approve")}
-                      className="press btn-primary rounded-lg px-3 py-1.5 font-semibold"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => act(p, "reject")}
-                      className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-      <GymImport admin={admin} changed={() => setVersion((v) => v + 1)} />
-      <GymEnrich admin={admin} changed={() => setVersion((v) => v + 1)} />
+    <div className="grid min-w-0 gap-4 [&>*]:min-w-0">
+      <nav className="flex flex-wrap gap-1 border-b border-line pb-2" aria-label="Gyms">
+        {GYM_PARTS.map((t) => (
+          <button
+            key={t}
+            type="button"
+            aria-current={part === t ? "page" : undefined}
+            onClick={() => setPart(t)}
+            className={`press rounded-lg px-3 py-1.5 text-sm ${part === t ? "bg-raised text-ink" : "text-muted"}`}
+          >
+            {t}
+            {badge[t] ? (
+              <span
+                className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-ink"
+                aria-label={`${badge[t]} waiting`}
+              >
+                {badge[t]}
+              </span>
+            ) : null}
+          </button>
+        ))}
+      </nav>
       {note && (
         <p className="text-sm text-muted" role="status">
           {note}
         </p>
       )}
 
-      <Card
-        title="Gyms"
-        subtitle={data ? `${data.total} in all, ${data.official} official` : undefined}
-        right={
+      {/* Every part stays mounted, so the To do counts are right whichever part is open. */}
+      <div hidden={part !== "To do"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
+        {todo === 0 && <p className="text-sm text-muted">Nothing waiting: no claims to check, posters to send or gyms lifters added.</p>}
+        <GymClaims admin={admin} onCount={setClaims} />
+        <GymPosters admin={admin} version={version} onCount={setPosters} />
+        <AddedGyms admin={admin} pending={pending} act={act} />
+      </div>
+      <div hidden={part !== "Import"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
+        <GymImport admin={admin} changed={changed} />
+      </div>
+      <div hidden={part !== "Website fill-in"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
+        <GymEnrich admin={admin} changed={changed} />
+      </div>
+      <div hidden={part !== "Gym list"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
+        <GymList admin={admin} version={version} changed={changed} act={act} setNote={setNote} />
+      </div>
+    </div>
+  );
+}
+
+/** Gyms lifters added that aren't on the map: look each one up, then approve or reject it. */
+function AddedGyms({ admin, pending, act }: { admin: boolean; pending: AdminPlace[]; act: (p: AdminPlace, a: PlaceAction) => void }) {
+  return (
+    <Card title="Gyms lifters added" subtitle={`${pending.length} waiting`}>
+      <HowItWorks>
+        <p>Gyms a lifter or owner added that the map doesn&apos;t have. Look each one up, then approve it to show it, or reject it.</p>
+      </HowItWorks>
+      {pending.length === 0 ? (
+        <p className="mt-3 text-sm text-muted">Nothing waiting.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-line">
+          {pending.map((p) => (
+            <li key={p.id} className="flex flex-wrap items-start gap-3 py-3">
+              <div className="min-w-0 flex-1 basis-64">
+                <p className="font-semibold break-words">{p.name}</p>
+                <p className="text-sm text-muted">{placeLine(p)}</p>
+                <p className="text-xs text-faint">
+                  {p.kind} · added {new Date(p.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              {admin && (
+                <div className="flex flex-wrap gap-2 text-sm">
+                  <button
+                    type="button"
+                    onClick={() => act(p, "approve")}
+                    className="press btn-primary rounded-lg px-3 py-1.5 font-semibold"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => act(p, "reject")}
+                    className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  );
+}
+
+const placeLine = (p: AdminPlace) => [p.address, [p.city, p.region].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+
+const STATUS = [
+  ["", "Any status"],
+  ["official", "Official"],
+  ["unofficial", "Unofficial"],
+  ["studio", "Studios"],
+  ["hidden", "Hidden"],
+] as const;
+const MISSING = [
+  ["", "Any details"],
+  ["city", "City is a postcode or missing"],
+  ["address", "No address"],
+  ["phone", "No phone"],
+  ["hours", "No hours"],
+  ["website", "No website"],
+  ["email", "No email"],
+  ["kit", "No equipment"],
+] as const;
+
+const countryName = (() => {
+  let names: Intl.DisplayNames | null = null;
+  try {
+    names = new Intl.DisplayNames(["en"], { type: "region" });
+  } catch {
+    names = null;
+  }
+  return (code: string) => {
+    try {
+      return names?.of(code) ?? code;
+    } catch {
+      return code;
+    }
+  };
+})();
+
+/** The gym list: search, filters, 50 a page, and Fix city names when some cities are postcodes. */
+function GymList({
+  admin,
+  version,
+  changed,
+  act,
+  setNote,
+}: {
+  admin: boolean;
+  version: number;
+  changed: () => void;
+  act: (p: AdminPlace, a: PlaceAction) => void;
+  setNote: (note: string | null) => void;
+}) {
+  const [data, setData] = useState<List | null>(null);
+  const [q, setQ] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [status, setStatus] = useState("");
+  const [missing, setMissing] = useState("");
+  const [page, setPage] = useState(1);
+  const [ordering, setOrdering] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  // Once shown, Fix city names stays until the page closes, so its result is still there when the count reaches 0.
+  const [fixShown, setFixShown] = useState(false);
+  if (!fixShown && data && data.badCities > 0) setFixShown(true);
+  useEffect(() => {
+    let live = true;
+    const t = setTimeout(() => {
+      const u = new URLSearchParams({ q, country, city, status, missing, page: String(page) });
+      fetch(`/api/admin/gym-places/?${u}`)
+        .then(async (r) => {
+          if (!r.ok) throw new Error();
+          const j = (await r.json()) as List;
+          if (live) {
+            setData(j);
+            setFailed(false);
+          }
+        })
+        .catch(() => live && setFailed(true));
+    }, 250);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [q, country, city, status, missing, page, version]);
+  const set = (f: (v: string) => void) => (v: string) => {
+    f(v);
+    setPage(1);
+  };
+  const filtered = !!(q.trim() || country || city.trim() || status || missing);
+  const field = "rounded-lg border border-line bg-raised px-3 py-1.5 text-sm";
+  return (
+    <>
+      {fixShown && data && <FixCities admin={admin} count={data.badCities} changed={changed} show={() => set(setMissing)("city")} />}
+      <Card title="Gyms" subtitle={data ? `${data.total} in all, ${data.official} official` : undefined}>
+        <div className="mb-3 flex flex-wrap gap-2" role="search" aria-label="Find gyms">
           <input
-            aria-label="Search gyms"
+            aria-label="Search by name, address or city"
             value={q}
-            onChange={(e) => {
-              setQ(e.target.value);
-              setPage(1);
-            }}
-            placeholder="Search"
-            className="w-40 rounded-lg border border-line bg-raised px-3 py-1.5 text-sm"
+            onChange={(e) => set(setQ)(e.target.value)}
+            placeholder="Search name, address or city"
+            className={`${field} min-w-0 flex-1 basis-48`}
           />
-        }
-      >
+          <select aria-label="Country" value={country} onChange={(e) => set(setCountry)(e.target.value)} className={field}>
+            <option value="">All countries</option>
+            {data?.countries.map((c) => (
+              <option key={c.code} value={c.code}>
+                {countryName(c.code)} ({c.n})
+              </option>
+            ))}
+          </select>
+          <input
+            aria-label="City"
+            value={city}
+            onChange={(e) => set(setCity)(e.target.value)}
+            placeholder="City"
+            className={`${field} w-36`}
+          />
+          <select aria-label="Status" value={status} onChange={(e) => set(setStatus)(e.target.value)} className={field}>
+            {STATUS.map(([v, label]) => (
+              <option key={v} value={v}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select aria-label="Missing details" value={missing} onChange={(e) => set(setMissing)(e.target.value)} className={field}>
+            {MISSING.map(([v, label]) => (
+              <option key={v} value={v}>
+                {label}
+              </option>
+            ))}
+          </select>
+          {filtered && (
+            <button
+              type="button"
+              onClick={() => {
+                setQ("");
+                setCountry("");
+                setCity("");
+                setStatus("");
+                setMissing("");
+                setPage(1);
+              }}
+              className="press rounded-lg px-3 py-1.5 text-sm text-muted underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        {failed && <p className="mb-2 text-sm text-bad">The gym list didn&apos;t load.</p>}
         {data === null ? (
           <Loading label="Loading gyms">
             <TableBones />
           </Loading>
         ) : data.places.length === 0 ? (
-          <p className="text-sm text-muted">{q.trim() ? "No gyms match that search." : "No gyms yet. Import a city above."}</p>
+          <p className="text-sm text-muted">{filtered ? "No gyms match." : "No gyms yet. Import a city first."}</p>
         ) : (
           <>
             <ul className="divide-y divide-line">
               {data.places.map((p) => (
                 <li key={p.id} className={`flex flex-wrap items-start gap-3 py-3 ${p.hidden ? "opacity-60" : ""}`}>
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 basis-64">
                     <p className="font-semibold break-words">
                       <a href={`/gyms/${p.citySlug}/${p.slug}/`} target="_blank" rel="noopener" className="hover:underline">
                         {p.name}
                       </a>
                       {p.official ? " ✓" : ""}
                     </p>
-                    <p className="text-sm text-muted">
-                      {[p.address, [p.city, p.region].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
-                    </p>
+                    <p className="text-sm text-muted">{placeLine(p)}</p>
                     <p className="text-xs text-faint">
                       {p.kind} · {p.official ? "official" : "unofficial"} · {p.lifters} {p.lifters === 1 ? "lifter" : "lifters"} ·{" "}
                       {p.setups} {p.setups === 1 ? "setup" : "setups"} listed{p.hasKit ? "" : " · no equipment yet"}
@@ -144,8 +330,11 @@ export function GymPlaces({ admin }: { admin: boolean }) {
                       <PosterForm
                         place={p}
                         done={(error) => {
-                          setNote(error ?? `Posters for ${p.name} are in the queue above.`);
-                          if (!error) setOrdering(null);
+                          setNote(error ?? `Posters for ${p.name} are in the queue (To do).`);
+                          if (!error) {
+                            setOrdering(null);
+                            changed();
+                          }
                         }}
                         post={post}
                       />
@@ -192,7 +381,95 @@ export function GymPlaces({ admin }: { admin: boolean }) {
           </>
         )}
       </Card>
-    </div>
+    </>
+  );
+}
+
+/**
+ * Fix city names (gymRepair.ts): gyms filed under a postcode or house number ("80145, Campania") or no city get the
+ * right one, untidy addresses are cleaned, and moved pages redirect. Runs a thousand gyms a step until the list ends.
+ */
+function FixCities({ admin, count, changed, show }: { admin: boolean; count: number; changed: () => void; show: () => void }) {
+  const [running, setRunning] = useState(false);
+  const [sums, setSums] = useState<Omit<RepairStep, "next" | "changes"> | null>(null);
+  const [changes, setChanges] = useState<RepairChange[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const start = async () => {
+    setRunning(true);
+    setError(null);
+    setChanges([]);
+    const all = { checked: 0, cities: 0, addresses: 0, moved: 0, unsure: 0 };
+    let after = "";
+    for (;;) {
+      const r = await fetch("/api/admin/gym-places/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "repair", after }),
+      }).catch(() => null);
+      const j = r?.ok ? ((await r.json().catch(() => null)) as RepairStep | null) : null;
+      if (!j) {
+        setError(r ? `The admin server answered ${r.status}.` : "The admin server didn't answer.");
+        break;
+      }
+      for (const k of Object.keys(all) as (keyof typeof all)[]) all[k] += j[k];
+      setSums({ ...all });
+      setChanges((c) => [...c, ...j.changes].slice(-200));
+      if (!j.next) break;
+      after = j.next;
+    }
+    setRunning(false);
+    changed();
+  };
+  return (
+    <Card
+      title="Fix city names"
+      subtitle={
+        count
+          ? `${count} ${count === 1 ? "gym's city looks" : "gyms' cities look"} like a postcode or house number, or are missing`
+          : "Every city looks right now."
+      }
+    >
+      <HowItWorks>
+        <p>
+          Some map entries have a postcode or house number where the city goes, so their pages were filed under cities like &ldquo;80145,
+          Campania&rdquo; or &ldquo;1, ON&rdquo;. This gives each one its right city: the name inside the value when there is one
+          (&ldquo;80145 Napoli&rdquo;), else the city most gyms within about 3 km are under, else OpenStreetMap&apos;s answer for the
+          gym&apos;s position (a dozen lookups a step). It also tidies addresses (stray commas, repeated parts) and moves each fixed page to
+          its new address, with a permanent redirect from the old one. Claimed gyms are left as their owner set them.
+        </p>
+      </HowItWorks>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+        {admin && (
+          <button
+            type="button"
+            disabled={running}
+            onClick={() => void start()}
+            className="press btn-primary rounded-lg px-3 py-1.5 font-semibold"
+          >
+            {running ? "Fixing…" : "Fix city names and addresses"}
+          </button>
+        )}
+        <button type="button" onClick={show} className="press rounded-lg border border-line px-3 py-1.5 text-muted">
+          Show them
+        </button>
+        {sums && (
+          <span className="text-muted" role="status">
+            {sums.checked} checked, {sums.cities} cities fixed, {sums.addresses} addresses tidied, {sums.moved} pages moved
+            {sums.unsure ? `, ${sums.unsure} not sure yet (run it again)` : ""}
+          </span>
+        )}
+      </div>
+      {error && <p className="mt-2 text-sm text-bad">{error}</p>}
+      {changes.length > 0 && (
+        <ul className="mt-2 max-h-48 overflow-y-auto text-xs text-faint">
+          {changes.map((c, i) => (
+            <li key={`${c.id}-${i}`}>
+              {c.name}: {c.what}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
   );
 }
 

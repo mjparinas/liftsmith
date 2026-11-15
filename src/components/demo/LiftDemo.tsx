@@ -3,6 +3,7 @@
 // The app's exercise demo: LiftDemoCore with the muscle names and its own words in the lifter's language.
 // The public website uses LiftDemoCore directly with English names from the server, so its pages don't
 // load the catalogues.
+import { phaseWord } from "@/lib/demoPhase";
 import { t } from "@/lib/i18n";
 import { calm, haptic } from "@/lib/juice";
 import { MUSCLE_LABEL } from "@/lib/types";
@@ -27,6 +28,7 @@ export function LiftDemo(props: LiftDemoProps) {
       onDance={props.onDance ?? (() => haptic("celebrate"))}
       labels={MUSCLE_LABEL}
       words={demoWords()}
+      phaseText={phaseWord}
     />
   );
 }

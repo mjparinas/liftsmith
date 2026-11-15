@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
 import {
+  areaCity,
+  failedRecently,
   IMPORT_LIMITS,
   importArea,
   importKey,
@@ -11,6 +13,7 @@ import {
   planServers,
   recentImports,
   serverHealth,
+  typedCity,
 } from "./gymImport";
 import type { OsmElement } from "./gymPlaces";
 
@@ -203,4 +206,24 @@ it("never leaves a claimed gym changed after a re-import", async () => {
   const r = await importArea("Langley, BC", fakeWeb({}).fetcher, NOW + 1);
   expect(r).toMatchObject({ ok: true, kept: 1 });
   expect(await query("SELECT name FROM gym_places WHERE source_ref = 'osm:node/2'")).toEqual([{ name: "Planet Fitness Langley" }]);
+});
+
+describe("an area's city", () => {
+  it("never takes a postcode area or house number for the city, and falls back to what was typed", () => {
+    expect(areaCity({ city: "Napoli" }, "Napoli", "napoli, campania")).toBe("Napoli");
+    expect(areaCity({ postcode: "80145" }, "80145", "napoli, campania")).toBe("Napoli");
+    expect(areaCity({ town: "1" }, "1", "langley, bc")).toBe("Langley");
+    expect(typedCity("new westminster, bc")).toBe("New Westminster");
+  });
+
+  it("lists the places whose latest import failed", async () => {
+    const at = Date.now();
+    for (const [id, q, ok, t] of [
+      ["1", "a, bc", 0, at - 3],
+      ["2", "a, bc", 1, at - 2],
+      ["3", "b, bc", 0, at - 1],
+    ] as const)
+      await run(`INSERT INTO gym_imports (id, query, ok, at) VALUES (?, ?, ?, ?)`, [id, q, ok, t]);
+    expect(await failedRecently()).toEqual(["b, bc"]);
+  });
 });
