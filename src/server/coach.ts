@@ -395,7 +395,8 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
 }
 
 /** A routine share code as the app writes it (r1~name~exercise.sets[.s]~…), checked loosely: the app decodes it. */
-export const isRoutineCode = (x: unknown): x is string => typeof x === "string" && x.length <= 2000 && /^r1~[\w.~-]+$/.test(x);
+/** A routine code (routineShare.ts): parts and the rehab area carry colons and commas (`w:cat-cow,leg-swings`, `h:knee:3`). */
+export const isRoutineCode = (x: unknown): x is string => typeof x === "string" && x.length <= 2000 && /^r1~[\w.~:,-]+$/.test(x);
 
 export type PlanError = "notClient" | "bad" | "full";
 
@@ -430,6 +431,8 @@ export async function assignPlan(
     now,
     w ?? null,
   ]);
+  // The client hears about it (2026-11-15): a tap opens the program's preview, where one tap saves it.
+  await notifyCoach(clientId, "coachPlan", { name: await nameOf(coachId), text: title }, `#/routine/${code}`);
   return w ? { id, coachId, clientId, name: title, code, at: now, perWeek: w } : { id, coachId, clientId, name: title, code, at: now };
 }
 

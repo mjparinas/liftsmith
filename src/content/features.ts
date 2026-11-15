@@ -133,6 +133,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "rehab-done",
+        name: "Rehab from your physio, done",
+        body: "A program from your physio waits on Today to be saved in one tap and logs the injury it's for. It follows the times a week they asked for, shows on rest days and asks about pain for that injury only.",
+        tier: "free",
+        note: "Rehab reminders and the new-program notification are on Android and iPhone.",
+        added: "2026-11-15",
+      },
+      {
         id: "cycle",
         name: "Cycle-aware readiness",
         body: "Optionally log your cycle and today's call takes it into account.",

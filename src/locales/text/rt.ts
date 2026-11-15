@@ -56,6 +56,12 @@ export const en = {
   "rt.sharedHave": "Already in your routines as {name}.",
   "rt.sharedUse": "Use it today",
   "rt.sharedFull": "You have {count} routines, the most there's room for. Delete one in Routines to add this one.",
+  "rt.rehabPart": "For: {part}",
+  "rt.rehabWeek": { one: "Your physio asked for {count} time a week.", other: "Your physio asked for {count} times a week." },
+  "rt.rehabLog": "Add {part} to my injuries",
+  "rt.rehabLogWhy":
+    "Its pain checks, reminders and your physio's report follow that injury. Lifts that load it are skipped until you mark them fine or the injury healed.",
+  "rt.rehabLinked": "Linked to your {part} injury.",
 } as const;
 
 type Key = keyof typeof en;
@@ -115,6 +121,12 @@ export const es: Partial<Record<Key, Message>> = {
   "rt.sharedHave": "Ya está en tus rutinas como {name}.",
   "rt.sharedUse": "Usarla hoy",
   "rt.sharedFull": "Tienes {count} rutinas, el máximo. Borra una en Rutinas para añadir esta.",
+  "rt.rehabPart": "Para: {part}",
+  "rt.rehabWeek": { one: "Tu fisioterapeuta pidió {count} vez por semana.", other: "Tu fisioterapeuta pidió {count} veces por semana." },
+  "rt.rehabLog": "Añadir {part} a mis lesiones",
+  "rt.rehabLogWhy":
+    "Las preguntas de dolor, los recordatorios y el informe de tu fisioterapeuta siguen esa lesión. Los ejercicios que la cargan se saltan hasta que los marques como bien o la lesión como curada.",
+  "rt.rehabLinked": "Vinculado a tu lesión: {part}.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -172,6 +184,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "rt.sharedHave": "Déjà dans tes routines sous le nom {name}.",
   "rt.sharedUse": "L’utiliser aujourd’hui",
   "rt.sharedFull": "Tu as {count} routines, le maximum. Supprimes-en une dans Routines pour ajouter celle-ci.",
+  "rt.rehabPart": "Pour : {part}",
+  "rt.rehabWeek": { one: "Votre kiné a demandé {count} fois par semaine.", other: "Votre kiné a demandé {count} fois par semaine." },
+  "rt.rehabLog": "Ajouter {part} à mes blessures",
+  "rt.rehabLogWhy":
+    "Les questions sur la douleur, les rappels et le rapport de votre kiné suivent cette blessure. Les exercices qui la sollicitent sont sautés jusqu’à ce que vous les marquiez sans douleur ou la blessure guérie.",
+  "rt.rehabLinked": "Lié à votre blessure : {part}.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -229,6 +247,15 @@ export const de: Partial<Record<Key, Message>> = {
   "rt.sharedHave": "Schon in deinen Routinen als {name}.",
   "rt.sharedUse": "Heute verwenden",
   "rt.sharedFull": "Du hast {count} Routinen, mehr passen nicht. Lösche eine unter Routinen, um diese hinzuzufügen.",
+  "rt.rehabPart": "Für: {part}",
+  "rt.rehabWeek": {
+    one: "Deine Physiotherapie wünscht {count}-mal pro Woche.",
+    other: "Deine Physiotherapie wünscht {count}-mal pro Woche.",
+  },
+  "rt.rehabLog": "{part} zu meinen Verletzungen hinzufügen",
+  "rt.rehabLogWhy":
+    "Schmerzabfragen, Erinnerungen und der Bericht deiner Physiotherapie richten sich nach dieser Verletzung. Übungen, die sie belasten, werden ausgelassen, bis du sie als unproblematisch oder die Verletzung als verheilt markierst.",
+  "rt.rehabLinked": "Mit deiner Verletzung verknüpft: {part}.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -286,6 +313,15 @@ export const it: Partial<Record<Key, Message>> = {
   "rt.sharedHave": "È già nelle tue routine come {name}.",
   "rt.sharedUse": "Usala oggi",
   "rt.sharedFull": "Hai {count} routine, il massimo. Eliminane una in Routine per aggiungere questa.",
+  "rt.rehabPart": "Per: {part}",
+  "rt.rehabWeek": {
+    one: "Il tuo fisioterapista ha chiesto {count} volta a settimana.",
+    other: "Il tuo fisioterapista ha chiesto {count} volte a settimana.",
+  },
+  "rt.rehabLog": "Aggiungi {part} ai miei infortuni",
+  "rt.rehabLogWhy":
+    "Le domande sul dolore, i promemoria e il resoconto del fisioterapista seguono quell’infortunio. Gli esercizi che lo caricano vengono saltati finché non li segni come ok o l’infortunio come guarito.",
+  "rt.rehabLinked": "Collegato al tuo infortunio: {part}.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -341,4 +377,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "rt.sharedHave": "「{name}」としてすでに保存されています。",
   "rt.sharedUse": "今日使う",
   "rt.sharedFull": "ルーティンが上限の{count}件あります。追加するには、ルーティンから1件削除してください。",
+  "rt.rehabPart": "対象：{part}",
+  "rt.rehabWeek": { other: "理学療法士の指定は週{count}回です。" },
+  "rt.rehabLog": "{part}をケガに追加",
+  "rt.rehabLogWhy":
+    "痛みの確認、リマインダー、理学療法士への報告はこのケガに合わせて行われます。その部位に負担がかかる種目は、問題なしと記録するか治ったと記録するまで外されます。",
+  "rt.rehabLinked": "{part}のケガと連携しています。",
 };

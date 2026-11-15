@@ -5,6 +5,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { activeInjuries } from "@/lib/injury";
 import { decodeRoutine, encodeRoutine } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
 
@@ -140,5 +141,35 @@ describe("shared routines", () => {
     useApp.getState().saveRoutine({ ...saved, id: "plain", rehab: undefined });
     useApp.getState().pickRoutine("plain");
     expect(useApp.getState().preview!.items.map((i) => i.exerciseId)).not.toEqual(["wall-sit", "split-squat-hold"]);
+  });
+
+  it("links a rehab program to its injury area when it's saved (2026-11-15)", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const items = [{ exerciseId: "wall-sit", sets: 3 }];
+    location.hash = `#/routine/${encodeRoutine({ name: "Knee rehab", items, rehab: true, rehabPart: "knee", perWeek: 4 })}`;
+    expect(await screen.findByTestId("shared-rehab")).toHaveTextContent("For: Knee · Your physio asked for 4 times a week.");
+    const add = screen.getByRole("switch", { name: /Add knee to my injuries/ });
+    expect(add).toHaveAttribute("aria-checked", "true");
+    await user.click(screen.getByRole("button", { name: "Save to my routines" }));
+    expect(useApp.getState().profile.routines![0]).toMatchObject({ rehab: true, rehabPart: "knee", perWeek: 4 });
+    expect(activeInjuries(useApp.getState().events).map((i) => i.part)).toEqual(["knee"]);
+
+    // A second program for the same area links to the injury already there, with no switch.
+    location.hash = `#/routine/${encodeRoutine({ name: "Knee stage 2", items: [{ exerciseId: "glute-bridge", sets: 3 }], rehab: true, rehabPart: "knee" })}`;
+    expect(await screen.findByText("Linked to your knee injury.")).toBeInTheDocument();
+    expect(screen.queryByRole("switch", { name: /to my injuries/ })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Save to my routines" }));
+    expect(activeInjuries(useApp.getState().events)).toHaveLength(1);
+  });
+
+  it("leaves injuries alone when the switch is off", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = `#/routine/${encodeRoutine({ name: "Hip rehab", items: [{ exerciseId: "clamshell", sets: 3 }], rehab: true, rehabPart: "hip" })}`;
+    await user.click(await screen.findByRole("switch", { name: /Add hip to my injuries/ }));
+    await user.click(screen.getByRole("button", { name: "Save to my routines" }));
+    expect(useApp.getState().profile.routines![0]).toMatchObject({ rehabPart: "hip" });
+    expect(activeInjuries(useApp.getState().events)).toEqual([]);
   });
 });

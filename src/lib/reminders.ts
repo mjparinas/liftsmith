@@ -34,9 +34,10 @@ import {
   type PlanInput,
   type Totals,
 } from "./messages";
+import { rehabInjuries, rehabRoutine, rehabTimes } from "./partExtras";
 import { SITE_URL } from "./site";
 import { isTeen } from "./teen";
-import type { Profile } from "./types";
+import type { AppEvent, Profile } from "./types";
 
 export const HORIZON_DAYS = 14;
 const DAY = 86_400_000;
@@ -95,6 +96,17 @@ export function emailExtras(profile: Profile, stats: Stats, now: number, tz = de
 }
 
 /** The planner's input from the lifter's profile and stats: a handful of numbers, nothing more. */
+/** The physio's rehab for the push planner, while an injury it's for is active (it never goes to the server). */
+export function rehabInput(profile: Profile, events: readonly AppEvent[], now: number): PlanInput["rehab"] {
+  const r = rehabRoutine(profile);
+  if (!r || !rehabInjuries(events, r, now).length) return undefined;
+  return {
+    name: r.name,
+    ...(r.perWeek ? { perWeek: r.perWeek } : {}),
+    times: rehabTimes(events, r.id).filter((at) => at > now - 14 * DAY),
+  };
+}
+
 export function planInput(profile: Profile, stats: Stats, now: number, channel: "push" | "email", tz = deviceTz()): PlanInput {
   const starts = stats.sessions.map((s) => s.start);
   const monday = mondayIn(now, tz);
@@ -152,21 +164,23 @@ export async function askPush(): Promise<boolean> {
 let channelMade = false;
 
 /** Replaces every pending reminder with the plan for the next two weeks. Returns what was scheduled. */
-export async function schedulePush(profile: Profile, stats: Stats, now = Date.now()): Promise<Message[]> {
+export async function schedulePush(profile: Profile, stats: Stats, now = Date.now(), events?: readonly AppEvent[]): Promise<Message[]> {
   if (!pushSupported() || !profile.onboarded) return [];
   try {
     const pending = await LocalNotifications.getPending();
     const ours = pending.notifications.filter((n) => (n.extra as { liftsmith?: boolean } | undefined)?.liftsmith);
     if (ours.length) await LocalNotifications.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
     if (!(await pushAllowed())) return [];
-    const msgs = plan(planInput(profile, stats, now, "push"), now + 60_000, now + HORIZON_DAYS * DAY, "push");
+    const rehab = events ? rehabInput(profile, events, now) : undefined;
+    const input = { ...planInput(profile, stats, now, "push"), ...(rehab ? { rehab } : {}) };
+    const msgs = plan(input, now + 60_000, now + HORIZON_DAYS * DAY, "push");
     if (!msgs.length) return [];
     if (!channelMade) {
       // Android only; iOS has no channels and the plugin ignores this there.
       await LocalNotifications.createChannel({
         id: CHANNEL_ID,
         name: "Reminders",
-        description: "Workout reminders, streak alerts and offers you turned on",
+        description: "Workout and rehab reminders, streak alerts and offers you turned on",
         importance: 3,
       }).catch(() => {});
       channelMade = true;
@@ -351,14 +365,14 @@ export const accountEmail = () => useAccount.getState().account?.email?.trim().t
  * waiting for confirmation moves to the signed-in account's address, which the server confirms at once.
  */
 export function refreshReminders(
-  get: () => { profile: Profile; stats: Stats },
+  get: () => { profile: Profile; stats: Stats; events?: readonly AppEvent[] },
   onStatus?: (s: MailStatus, address: string) => void,
   delay = 1500,
 ) {
   clearTimeout(timer);
   const run = async () => {
-    const { profile: p, stats } = get();
-    await schedulePush(p, stats);
+    const { profile: p, stats, events } = get();
+    await schedulePush(p, stats, Date.now(), events);
     const saved = p.messages?.email;
     if (!saved?.address || saved.status === "unsubscribed") return;
     const sub = mailSub();
