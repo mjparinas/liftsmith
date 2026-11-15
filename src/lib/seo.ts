@@ -9,6 +9,7 @@ import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
 import { LOCAL_TOOL_PATHS } from "@/locales/site/tools/types";
 
+import { bestFor } from "./bestFor";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { HELP, helpPath } from "./faqs";
 import { alternatives } from "./generator";
@@ -262,7 +263,6 @@ export function siteRoutes(): Route[] {
   const r: Route[] = [
     { path: "/", priority: 1 },
     { path: "/exercises/", priority: 0.8 },
-    { path: "/muscles/", priority: 0.8 },
     { path: "/equipment/", priority: 0.7 },
     { path: "/guides/", priority: 0.7 },
     { path: "/blog/", priority: 0.8 },
@@ -320,7 +320,13 @@ export function siteRoutes(): Route[] {
     const languages = languageAlternates(path);
     for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/exercises/vs/" ? 0.6 : 0.5, languages });
   }
-  for (const m of MUSCLES) if (exercisesFor(m).length) r.push({ path: `/muscles/${muscleSlug(m)}/`, priority: 0.7 });
+  // Muscle pages ("the best <muscle> exercises", src/lib/bestFor.ts): the index and every muscle a lift works as a main
+  // mover, each in all six languages.
+  for (const path of ["/muscles/", ...MUSCLES.filter((m) => bestFor(m).length).map((m) => `/muscles/${muscleSlug(m)}/`)]) {
+    const languages = languageAlternates(path);
+    for (const lang of SITE_LANGS)
+      r.push({ path: localPath(lang, path), priority: path === "/muscles/" ? 0.8 : lang === "en" ? 0.7 : 0.6, languages });
+  }
   for (const p of pairs()) r.push({ path: `/muscles/${muscleSlug(p.muscle)}/${equipmentSlug(p.equipment)}/`, priority: 0.6 });
   for (const eq of equipmentWithPages()) r.push({ path: `/equipment/${equipmentSlug(eq)}/`, priority: 0.6 });
   for (const a of ARTICLES) r.push({ path: articlePath(a), date: a.updated ?? a.date, priority: a.kind === "guide" ? 0.7 : 0.6 });
