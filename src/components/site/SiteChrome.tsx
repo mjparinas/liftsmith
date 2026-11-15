@@ -139,13 +139,15 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: localPath(lang, "/features/"), label: l.features },
           { href: "/apps/", label: l.whoFor },
           { href: "/gyms/", label: l.gyms },
+          { href: "/trainers/", label: l.trainers },
           { href: localPath(lang, "/coaches/"), label: l.coaches },
           { href: localPath(lang, "/pricing/"), label: l.pricing },
           { href: "/whats-new/", label: l.whatsNew },
         ])}
         {col(t.cols.learn, [
           { href: "/exercises/", label: l.exercises },
-          { href: "/muscles/", label: l.muscles },
+          { href: localPath(lang, "/muscles/"), label: l.muscles },
+          { href: localPath(lang, "/programs/"), label: l.programs },
           { href: "/equipment/", label: l.equipment },
           { href: "/guides/", label: l.guides },
           { href: "/blog/", label: l.blog },

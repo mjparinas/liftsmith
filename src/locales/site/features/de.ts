@@ -107,6 +107,11 @@ export const de: FeaturesText = {
       name: "Verletzungsmodus",
       body: "Sag, was wehtut, und es lässt weg, was es verschlimmern würde, warnt dich vor riskanten Übungen und verfolgt einen Schmerzwert von 0 bis 10 über die Zeit.",
     },
+    "rehab-done": {
+      name: "Reha von deiner Physiotherapie, erledigt",
+      body: "Ein Programm deiner Physiotherapie wartet auf Heute und ist mit einem Tipp gespeichert, samt der Verletzung, für die es gedacht ist. Es folgt den gewünschten Malen pro Woche, erscheint an Ruhetagen und fragt nur für diese Verletzung nach Schmerzen.",
+      note: "Reha-Erinnerungen und die Mitteilung zu einem neuen Programm gibt es auf Android und iPhone.",
+    },
     cycle: {
       name: "Bereitschaft nach Zyklus",
       body: "Wenn du möchtest, trägst du deinen Zyklus ein, und die heutige Ansage berücksichtigt ihn.",
@@ -240,7 +245,12 @@ export const de: FeaturesText = {
     },
     food: {
       name: "Coach-Notizen aus deiner Ernährungs-App",
-      body: "Kalorien und Eiweiß aus einer Ernährungs-App kommen über die Gesundheits-App deines Handys zu Liftsmith und werden zu Notizen wie „drei Tage in Folge zu wenig Eiweiß“. Die App selbst erfasst keine Ernährung.",
+      body: "Kalorien, Eiweiß, Kohlenhydrate und Fett aus einer Ernährungs-App kommen über die Gesundheits-App deines Handys zu Liftsmith und werden zu Notizen wie „drei Tage in Folge zu wenig Eiweiß“, gemessen an einem einzigen Satz Ziele für dein Ziel. Auch nur Eiweiß zu erfassen zählt. Die App selbst erfasst keine Ernährung.",
+    },
+    "measured-maintenance": {
+      name: "Erhaltungsbedarf, gemessen an dem, was du isst",
+      body: "Zwei Wochen Ernährung und Wiegungen messen deinen echten täglichen Kalorienbedarf, mit dem dann Makros, TDEE und deine Ernährungsnotizen rechnen. Eine Karte „Ernährung“ unter Körper zeigt deine Woche im Vergleich zu deinen Zielen.",
+      note: "Unter 18 gibt es nur Tipps zum Eiweiß: kein Ziel zum Fettverlust und keine Kalorien-Notizen.",
     },
     "your-stats": {
       name: "Deine Angaben",
@@ -352,7 +362,7 @@ export const de: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Ernährungsziele für Kunden",
-      body: "Lege für jeden Kunden Kalorien und Protein pro Tag fest. Die Coach-Hinweise prüfen die Ernährungswoche daran, und du siehst, wie er isst, wenn er es teilt.",
+      body: "Lege für jede Person Kalorien, Protein, Kohlenhydrate und Fett pro Tag fest, auf Wunsch mit anderen Kalorien an Ruhetagen, mit einem Tipp aus den eigenen Werten ausgefüllt. Die Hinweise des Coaches prüfen die Ernährungswoche daran, und du siehst, wie gegessen wird, wenn es geteilt wird.",
     },
     "school-teams": {
       name: "Kostenlos für Schulteams",
@@ -383,6 +393,10 @@ export const de: FeaturesText = {
       name: "Eine Seite für jede Seite",
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
+    },
+    "trainer-directory": {
+      name: "Im Trainerverzeichnis gelistet",
+      body: "Trag dich in deinem Studio als Personal Trainer, Coach oder Physio ein, dann stehst du auf der Seite des Studios und im Trainerverzeichnis seiner Stadt auf der Website, mit deinem Text und einem Link, über den neue Kunden mit dir trainieren können. Gelistet werden nur Erwachsene.",
     },
     "coach-plans": {
       name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
@@ -451,6 +465,10 @@ export const de: FeaturesText = {
     importExtras: {
       name: "Routinen und Körperwerte aus einer anderen App",
       body: "Ein Import macht Trainings, die du unter demselben Namen wiederholt hast, zu Routinen und holt Körpergewicht, Körperfett und Maße aus Hevy, FitNotes oder einer Waagen-App.",
+    },
+    "strength-standards": {
+      name: "Kraftwerte von echten Lifterinnen und Liftern",
+      body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
     languages: {
       name: "Sechs Sprachen",

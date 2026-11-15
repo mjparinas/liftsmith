@@ -287,3 +287,40 @@ describe("language", () => {
     expect(milestone(null, { firstWorkoutAt: MON, streakWeeks: 0, lang: "es" }, MON + 1000)!.title).toBe("Tu primer entrenamiento, hecho");
   });
 });
+
+describe("rehab reminders (2026-11-15)", () => {
+  // Training Mon, Wed, Fri; the planner runs from Monday morning. Only the workout reminder and rehab are on.
+  const only = { kinds: { missed: false, streak: false } };
+  const rehabOn = (r: NonNullable<PlanInput["rehab"]>) => plan(input({ ...only, rehab: r }), at(0, 7), addDays(MON, 7, TZ), "push");
+
+  it("goes out on days without a workout reminder, at the workout time, while it's due", () => {
+    const msgs = rehabOn({ name: "Knee rehab", times: [] }).filter((m) => m.kind === "rehab");
+    // Never done: due every non-training day (Tue, Thu, Sat, Sun) the plan can't see done.
+    expect(msgs.map((m) => parts(m.at, TZ).wd)).toEqual([2, 4, 6, 0]);
+    expect(msgs[0]).toMatchObject({ title: "Time for Knee rehab", body: "Your physio's exercises are due today.", route: "today" });
+    expect(parts(msgs[0]!.at, TZ).h).toBe(18);
+  });
+
+  it("follows the times a week and what was done", () => {
+    // Asked for twice a week; done Saturday and Sunday before: the week is full until the first falls out.
+    const msgs = rehabOn({ name: "Knee rehab", perWeek: 2, times: [at(-2, 10), at(-1, 10)] }).filter((m) => m.kind === "rehab");
+    expect(msgs.map((m) => parts(m.at, TZ).wd)).toEqual([6, 0]);
+    expect(msgs[0]!.body).toBe("1 of 2 in the last 7 days, as your physio asked.");
+    // Done today (Tuesday): nothing on Tuesday.
+    const tue = plan(input({ ...only, rehab: { name: "R", times: [at(1, 8)] } }), at(1, 9), addDays(MON, 2, TZ), "push");
+    expect(tue.filter((m) => m.kind === "rehab")).toEqual([]);
+  });
+
+  it("is push only, can be switched off and gives way to the workout reminder", () => {
+    expect(plan(input({ rehab: { name: "R", times: [] } }), at(0, 7), addDays(MON, 7, TZ), "email").some((m) => m.kind === "rehab")).toBe(
+      false,
+    );
+    expect(
+      rehabOn({ name: "R", times: [] })
+        .filter((m) => parts(m.at, TZ).wd === 1)
+        .map((m) => m.kind),
+    ).toEqual(["reminder"]);
+    const off = plan(input({ kinds: { rehab: false }, rehab: { name: "R", times: [] } }), at(0, 7), addDays(MON, 7, TZ), "push");
+    expect(off.some((m) => m.kind === "rehab")).toBe(false);
+  });
+});

@@ -61,6 +61,13 @@ const nextConfig: NextConfig = {
           { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
           { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
           { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
+          // Strength standards from real lifters (src/server/standardsPage.ts, docs/decisions/public-pages-and-seo.md).
+          { source: "/strength-standards/", destination: "/api/standards/page/" },
+          { source: "/strength-standards/:lift/", destination: "/api/standards/page/?lift=:lift" },
+          { source: "/sitemap-strength.xml", destination: "/api/standards/sitemap/" },
+          // Trainers, coaches and physios by city (src/server/trainerPage.ts); in the gym sitemap.
+          { source: "/trainers/", destination: "/api/trainers/page/" },
+          { source: "/trainers/:city/", destination: "/api/trainers/page/?city=:city" },
         ],
       }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
@@ -73,6 +80,8 @@ const nextConfig: NextConfig = {
           { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/u/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/gyms/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),
   env: {

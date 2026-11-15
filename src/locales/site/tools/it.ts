@@ -1,3 +1,4 @@
+import { IT_MORE } from "./more/it";
 import type { LocalTools } from "./types";
 
 // I calcolatori in italiano (tu). Stesse parti delle pagine inglesi (src/app/tools/).
@@ -190,4 +191,5 @@ export const IT_TOOLS: LocalTools = {
       empty: "Bilanciere vuoto",
     },
   },
+  ...IT_MORE,
 };

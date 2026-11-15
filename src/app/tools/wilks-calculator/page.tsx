@@ -10,12 +10,14 @@ export const metadata: Metadata = pageMeta({
   description:
     "Score your squat, bench press and deadlift total for body weight with the Wilks formula, IPF GL points (classic or equipped) and DOTS, in kg or lb.",
   path: "/tools/wilks-calculator/",
+  translated: true,
 });
 
 export default function WilksPage() {
   return (
     <ToolPage
       slug="wilks-calculator"
+      translated
       name="Wilks calculator"
       intro="Your powerlifting total scored for body weight three ways, Wilks, IPF GL and DOTS, so you can compare lifters of any size and see how far the next level is."
       sticky="Your strength score, kept up to date"

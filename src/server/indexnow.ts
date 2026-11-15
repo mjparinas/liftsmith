@@ -6,11 +6,18 @@
 // sent when it turns public and again after each new workout posted for everyone (its date is the last one). A profile
 // that was sent and has since gone private, been suspended or lost its handle is sent once more as gone, so the
 // engines recrawl it, find the noindex "isn't public" page and drop it.
+// The strength standards pages (standards.ts) and the trainer directory's cities (trainerDirectory.ts) go once each when
+// they're first indexable (2026-11-15). Gym pages don't: there are tens of thousands, past what IndexNow takes in a day,
+// so they rely on their sitemap.
 import { INDEXNOW_BATCH, INDEXNOW_ENDPOINT, INDEXNOW_HOST, INDEXNOW_KEY, INDEXNOW_KEY_LOCATION } from "@/lib/indexnow";
 import { absolute, siteRoutes, type Route } from "@/lib/seo";
 
 import { batch, query } from "./db";
 import { sitemapPeople } from "./publicProfile";
+import { publishedLifts } from "./standards";
+import { standardsPath } from "./standardsPage";
+import { trainerCities } from "./trainerDirectory";
+import { directoryEntries } from "./trainerPage";
 
 const TIMEOUT = 15_000;
 
@@ -25,16 +32,26 @@ export async function peopleRoutes(): Promise<Route[]> {
   return people.map((p) => ({ path: `/u/${p.handle}/`, date: new Date(p.lastModified).toISOString().slice(0, 10), priority: 0.4 }));
 }
 
+/** Server-drawn pages worth indexing that aren't in the site's own sitemap: standards and the trainer directory. Undated, so each goes once. */
+export async function serverRoutes(): Promise<Route[]> {
+  const [lifts, cities] = await Promise.all([publishedLifts().catch(() => []), trainerCities().catch(() => [])]);
+  const paths = [
+    ...(lifts.length ? [standardsPath(), ...lifts.map((l) => standardsPath(l.lift))] : []),
+    ...directoryEntries(cities, 0).map((e) => e.path),
+  ];
+  return paths.map((path) => ({ path, priority: 0.5 }));
+}
+
 export type IndexNowResult = { sent: number; skipped?: string } | { sent: 0; error: string };
 
 /** Sends the new and changed pages. `force` sends from any environment (for tests and a manual run). */
 export async function pingIndexNow(
-  opts: { routes?: Route[]; people?: Route[]; now?: number; force?: boolean } = {},
+  opts: { routes?: Route[]; people?: Route[]; pages?: Route[]; now?: number; force?: boolean } = {},
 ): Promise<IndexNowResult> {
   if (!opts.force && process.env.VERCEL_ENV !== "production") return { sent: 0, skipped: "not production" };
   const now = opts.now ?? Date.now();
   const people = opts.people ?? (await peopleRoutes());
-  const routes = [...(opts.routes ?? siteRoutes()), ...people];
+  const routes = [...(opts.routes ?? siteRoutes()), ...people, ...(opts.pages ?? (await serverRoutes()))];
   const sent = new Map((await query<{ url: string; sig: string }>("SELECT url, sig FROM indexnow_sent")).map((r) => [r.url, r.sig]));
   const due = routes.map((r) => ({ url: absolute(r.path), sig: signature(r) })).filter((r) => sent.get(r.url) !== r.sig);
   const live = new Set(people.map((r) => absolute(r.path)));

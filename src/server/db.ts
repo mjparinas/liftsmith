@@ -489,6 +489,43 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_imports_query ON gym_imports (query, at)`,
   `CREATE INDEX IF NOT EXISTS gym_imports_at ON gym_imports (at)`,
+  // Country and every-country imports as a server job (gymImportJobs.ts, 2026-11-15): the job, and one row per city
+  // with its state (pending, running, waiting to retry, ok, failed) and result. One worker holds a job at a time
+  // (`lease_until`). Public map data and timings, plus the staff address that started it; kept 90 days.
+  `CREATE TABLE IF NOT EXISTS gym_import_jobs (
+    id TEXT PRIMARY KEY,
+    label TEXT NOT NULL,
+    state TEXT NOT NULL,
+    total INTEGER NOT NULL DEFAULT 0,
+    skipped INTEGER NOT NULL DEFAULT 0,
+    started_by TEXT NOT NULL DEFAULT '',
+    notify INTEGER NOT NULL DEFAULT 0,
+    emailed INTEGER NOT NULL DEFAULT 0,
+    dismissed INTEGER NOT NULL DEFAULT 0,
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER NOT NULL DEFAULT 0,
+    active_at INTEGER NOT NULL DEFAULT 0,
+    lease_until INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_import_jobs_state ON gym_import_jobs (state, started_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_import_items (
+    job TEXT NOT NULL,
+    idx INTEGER NOT NULL,
+    place TEXT NOT NULL,
+    state TEXT NOT NULL,
+    tries INTEGER NOT NULL DEFAULT 0,
+    not_before INTEGER NOT NULL DEFAULT 0,
+    at INTEGER NOT NULL DEFAULT 0,
+    result TEXT NOT NULL DEFAULT '',
+    retried TEXT NOT NULL DEFAULT '',
+    found INTEGER NOT NULL DEFAULT 0,
+    added INTEGER NOT NULL DEFAULT 0,
+    updated INTEGER NOT NULL DEFAULT 0,
+    unchanged INTEGER NOT NULL DEFAULT 0,
+    kept INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (job, idx)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_import_items_state ON gym_import_items (job, state)`,
   // Owners claiming a gym (gymClaims.ts): an emailed code, the poster's code, or staff review. Deleted with the account.
   `CREATE TABLE IF NOT EXISTS gym_claims (
     id TEXT PRIMARY KEY,
@@ -588,6 +625,20 @@ const SCHEMA = [
     PRIMARY KEY (place_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS gym_trainers_account ON gym_trainers (account_id)`,
+  // Strength standards from lifters who count their lifts (standards.ts, 2026-11-15): one row per lift, sex and body
+  // weight group with at least MIN_CELL lifters, rebuilt each morning. Only percentiles and counts, never an account.
+  `CREATE TABLE IF NOT EXISTS strength_standards (
+    lift TEXT NOT NULL,
+    sex TEXT NOT NULL,
+    band INTEGER NOT NULL,
+    n INTEGER NOT NULL,
+    p25 REAL NOT NULL,
+    p50 REAL NOT NULL,
+    p75 REAL NOT NULL,
+    p90 REAL NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (lift, sex, band)
+  )`,
   // Staff accounts for an official gym (gymStaff.ts, 2026-11-13): who besides the owner manages it, and the one-time
   // invite links the owner made. `name` is what the person typed when joining, shown to the owner.
   `CREATE TABLE IF NOT EXISTS gym_staff (
@@ -1075,8 +1126,15 @@ const SCHEMA = [
  * so each one is added here if it's missing. Only ever append; a column is never renamed or dropped.
  */
 const COLUMNS: [table: string, column: string, def: string][] = [
+  // The country an account last synced from (Vercel's x-vercel-ip-country), for the strength standards' default:
+  // counted unless the lifter says no, except in the EU, EEA, UK and Switzerland, where only a yes counts (standards.ts).
+  ["accounts", "country", "TEXT"],
   // Codes of our own, not only creators' (Melvin, 2026-11-10): see src/server/creators.ts.
   ["creators", "kind", "TEXT NOT NULL DEFAULT 'creator'"],
+  // A coach's carbs, fat and rest-day calories for a client (2026-11-15, docs/decisions/trainer-mode.md).
+  ["coach_targets", "carbs", "INTEGER"],
+  ["coach_targets", "fat", "INTEGER"],
+  ["coach_targets", "kcal_rest", "INTEGER"],
   ["creators", "trial_days", "INTEGER"],
   ["creators", "offering", "TEXT"],
   ["creators", "ends_at", "INTEGER"],

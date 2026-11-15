@@ -70,6 +70,8 @@ export const en = {
     other: "TDEE from {from} on {date} to {to} now, {count} changes",
   },
   "tdee.today": "Today",
+  "tdee.measured": "Measured from {days} days of your food and weigh-ins. The formula alone says {formula}.",
+  "tdee.proteinGoal": "For your goal: {goal}",
 } as const;
 
 type Key = keyof typeof en;
@@ -143,6 +145,8 @@ export const es: Partial<Record<Key, Message>> = {
     other: "GET de {from} el {date} a {to} ahora, {count} cambios",
   },
   "tdee.today": "Hoy",
+  "tdee.measured": "Medido con {days} días de tu comida y tus pesajes. Solo con la fórmula serían {formula}.",
+  "tdee.proteinGoal": "Para tu objetivo: {goal}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -216,6 +220,8 @@ export const fr: Partial<Record<Key, Message>> = {
     other: "DEJ de {from} le {date} à {to} maintenant, {count} changements",
   },
   "tdee.today": "Aujourd’hui",
+  "tdee.measured": "Mesuré sur {days} jours de vos repas et pesées. La formule seule donne {formula}.",
+  "tdee.proteinGoal": "Pour votre objectif : {goal}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -288,6 +294,8 @@ export const de: Partial<Record<Key, Message>> = {
     other: "TDEE von {from} am {date} auf jetzt {to}, {count} Änderungen",
   },
   "tdee.today": "Heute",
+  "tdee.measured": "Aus {days} Tagen deiner Ernährung und Wiegungen gemessen. Die Formel allein ergibt {formula}.",
+  "tdee.proteinGoal": "Für dein Ziel: {goal}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -360,6 +368,8 @@ export const it: Partial<Record<Key, Message>> = {
     other: "TDEE da {from} il {date} a {to} ora, {count} modifiche",
   },
   "tdee.today": "Oggi",
+  "tdee.measured": "Misurato su {days} giorni dei tuoi pasti e delle tue pesate. La sola formula dà {formula}.",
+  "tdee.proteinGoal": "Per il tuo obiettivo: {goal}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -426,4 +436,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "tdee.chartEmpty": "TDEE は体重、年齢、トレーニング日数が変わるたびに記録され、ここにグラフで表示されます。",
   "tdee.chartLabel": { other: "TDEE は{date}の{from}から現在の{to}へ、変更{count}回" },
   "tdee.today": "今日",
+  "tdee.measured": "{days}日分の食事と体重記録から測った値です。計算式だけなら{formula}です。",
+  "tdee.proteinGoal": "目標：{goal}",
 };

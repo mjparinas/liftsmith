@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMeta({
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
-const UPDATED = "10 November 2026";
+const UPDATED = "15 November 2026";
 
 export default function Privacy() {
   return (
@@ -91,12 +91,12 @@ export default function Privacy() {
         </p>
         <p className="mt-2">
           With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max,
-          respiratory rate and the calories and protein a food app logs from Health Connect or Apple Health to fill in setup, bring in
-          weigh-ins and body fat, keep your TDEE (daily calories) current, show the Health view on the Body tab against your own normal,
-          give coach&apos;s notes about what you eat, and (with Pro) adjust how hard today&apos;s workout is, and saves each finished
-          workout back as a strength training workout with its time, title, sets, active calories and average heart rate. These readings
-          stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so your
-          other devices have them, and nowhere else.{" "}
+          respiratory rate and the calories, protein, carbs and fat a food app logs from Health Connect or Apple Health to fill in setup,
+          bring in weigh-ins and body fat, keep your TDEE (daily calories) current, show the Health view on the Body tab against your own
+          normal, give coach&apos;s notes about what you eat, and (with Pro) adjust how hard today&apos;s workout is, and saves each
+          finished workout back as a strength training workout with its time, title, sets, active calories and average heart rate. These
+          readings stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so
+          your other devices have them, and nowhere else.{" "}
           <a className="text-accent underline" href="/privacypolicy.html">
             More about health data
           </a>
@@ -117,11 +117,23 @@ export default function Privacy() {
           An account is optional. If you sign in (with Google, with Apple, or with a code we email you), we keep your email address, which
           sign-in methods you used, and a copy of what you log in the app so it&apos;s backed up and on every device you sign in on: your
           workouts and sets, notes, body weight, gyms, routines and settings, and, if you use them, health readings from Health Connect or
-          Apple Health, injuries and cycle logs. Progress photos are never uploaded. This copy is used only to give it back to you on your
-          devices. It&apos;s never part of usage stats, never used for advertising, never shared, and never read by people unless you ask us
-          for help with it. Sign-in with Google or Apple gives us only your account id there and your email (Apple can give a private relay
-          address instead). You can sign out on any device, which keeps that device&apos;s data, or delete your account in Settings ›
-          Account and sync, which deletes your account and our copy at once.
+          Apple Health, injuries and cycle logs. Progress photos are never uploaded. This copy is used to give it back to you on your
+          devices and, unless you say no, to count your best big lifts in strength standards (below). It&apos;s never part of usage stats,
+          never used for advertising, never shared, and never read by people unless you ask us for help with it. Sign-in with Google or
+          Apple gives us only your account id there and your email (Apple can give a private relay address instead). You can sign out on any
+          device, which keeps that device&apos;s data, or delete your account in Settings › Account and sync, which deletes your account and
+          our copy at once.
+        </p>
+
+        <h2 className="mt-8 text-xl font-semibold">Strength standards</h2>
+        <p className="mt-2">
+          Our strength standards pages show how much lifters squat, bench, deadlift and overhead press, by sex and body weight. They&apos;re
+          made each day from the best of those four lifts each signed-in lifter logged in the past year, with their sex, body weight and
+          birth year from their settings. Only the 25th, 50th, 75th and 90th percentile and the number of lifters in each group are kept,
+          and a group is shown only once it has at least 30 lifters, so no one lifter can be picked out. Your name, email and any single
+          lift are never shown. Under-18s are never counted. In the EU, EEA, UK and Switzerland your lifts count only if you switch it on;
+          everywhere else they count unless you switch it off, in Settings › Your data and privacy › Strength standards. To tell which
+          applies, we keep the country your account last synced from (from your internet address, which itself isn&apos;t kept).
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Friends</h2>

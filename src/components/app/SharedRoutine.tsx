@@ -4,8 +4,10 @@ import { useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { available, exercise } from "@/lib/exercises";
-import { t } from "@/lib/i18n";
+import { inSentence, t } from "@/lib/i18n";
+import { PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
+import { rehabInjuries } from "@/lib/partExtras";
 import { MAX_ROUTINES } from "@/lib/routines";
 import { decodeRoutine, sameItems } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
@@ -13,7 +15,7 @@ import { MUSCLE_LABEL } from "@/lib/types";
 
 import { go } from "./router";
 import { routinePartsLine } from "./Stretch";
-import { Button, EmptyState, ScreenHeader } from "./ui";
+import { Button, EmptyState, InlineSwitch, ScreenHeader } from "./ui";
 
 // A routine someone shared (#/routine/<code>, routines.ts): a preview of its exercises and sets, then
 // one tap saves it to this lifter's own routines. Weights and reps come from their own progression.
@@ -21,9 +23,16 @@ import { Button, EmptyState, ScreenHeader } from "./ui";
 const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
 export function SharedRoutine({ code }: { code?: string }) {
-  const { profile, gyms, active, saveRoutine, pickRoutine } = useApp();
+  // A new link starts fresh (what was saved from the last one doesn't carry over).
+  return <SharedPreview key={code ?? ""} code={code} />;
+}
+
+function SharedPreview({ code }: { code?: string }) {
+  const { profile, gyms, active, events, saveShared, pickRoutine } = useApp();
   const shared = useMemo(() => (code ? decodeRoutine(code) : null), [code]);
   const [savedId, setSavedId] = useState<string | null>(null);
+  // A rehab program for an area with no injury logged there: saving it adds that injury, unless switched off.
+  const [logInjury, setLogInjury] = useState(true);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const can = useMemo(() => new Set(available(gym?.equipment ?? []).map((e) => e.id)), [gym]);
   if (!shared) {
@@ -45,20 +54,27 @@ export function SharedRoutine({ code }: { code?: string }) {
   const letters = new Map<string, string>();
   for (const it of shared.items) if (it.group && !letters.has(it.group)) letters.set(it.group, String.fromCharCode(65 + letters.size));
   const sets = shared.items.reduce((n, i) => n + i.sets, 0);
+  const area = shared.rehab ? shared.rehabPart : undefined;
+  const linked = !!area && rehabInjuries(events, shared).length > 0;
   const save = () => {
     const id = newId();
     const at = Date.now();
     haptic("success");
     sound.tick();
-    saveRoutine({
-      id,
-      name: shared.name,
-      items: shared.items,
-      createdAt: at,
-      updatedAt: at,
-      ...(shared.rehab ? { rehab: true } : {}),
-      ...(shared.parts ? { parts: shared.parts } : {}),
-    });
+    saveShared(
+      {
+        id,
+        name: shared.name,
+        items: shared.items,
+        createdAt: at,
+        updatedAt: at,
+        ...(shared.rehab ? { rehab: true } : {}),
+        ...(area ? { rehabPart: area } : {}),
+        ...(shared.rehab && shared.perWeek ? { perWeek: shared.perWeek } : {}),
+        ...(shared.parts ? { parts: shared.parts } : {}),
+      },
+      logInjury,
+    );
     track("feature", { name: "routine_share", detail: "import" });
     setSavedId(id);
   };
@@ -72,6 +88,16 @@ export function SharedRoutine({ code }: { code?: string }) {
         </p>
         <p className="mt-2 text-sm text-muted">{t("rt.sharedWhy")}</p>
         {shared.rehab && <p className="mt-2 text-sm text-muted">{t("rt.rehabWhy")}</p>}
+        {(area || (shared.rehab && shared.perWeek)) && (
+          <p className="mt-2 text-sm font-medium" data-testid="shared-rehab">
+            {[
+              area ? t("rt.rehabPart", { part: PART_LABEL[area] }) : null,
+              shared.perWeek ? t("rt.rehabWeek", { count: shared.perWeek }) : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        )}
         {shared.parts && (
           <p className="mt-2 text-sm text-muted" data-testid="shared-parts">
             {routinePartsLine(shared)}
@@ -100,6 +126,20 @@ export function SharedRoutine({ code }: { code?: string }) {
         })}
       </ol>
       {missing > 0 && <p className="mt-3 text-sm text-muted">{t("rt.sharedMissing", { gym: gym?.name ?? t("remix.yourGym") })}</p>}
+      {area && !existing && (
+        <div className="card mt-4 p-4">
+          {linked ? (
+            <p className="text-sm text-muted">{t("rt.rehabLinked", { part: inSentence(PART_LABEL[area]) })}</p>
+          ) : (
+            <InlineSwitch
+              label={t("rt.rehabLog", { part: inSentence(PART_LABEL[area]) })}
+              hint={t("rt.rehabLogWhy")}
+              on={logInjury}
+              onChange={setLogInjury}
+            />
+          )}
+        </div>
+      )}
       <div className="mt-6 grid gap-2">
         {existing ? (
           <>

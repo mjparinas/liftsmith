@@ -4,6 +4,7 @@
     { "path": "/api/cron/reminders/", "schedule": "5 0 * * *" },
     { "path": "/api/cron/admin/", "schedule": "0 13 * * *" },
     { "path": "/api/cron/digest/", "schedule": "0 15 * * *" },
-    { "path": "/api/cron/digest/", "schedule": "0 16 * * *" }
+    { "path": "/api/cron/digest/", "schedule": "0 16 * * *" },
+    { "path": "/api/cron/gym-imports/", "schedule": "*/5 * * * *" }
   ]
 }

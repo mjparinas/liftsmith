@@ -122,7 +122,7 @@ export const en = {
   "twin.from.level": "{level} activity",
   "twin.c.aDay": "A day",
   "twin.w.tdee":
-    "About what you burn a day, from {from}. To lose 0.5 kg a week eat about {cut}; for a lean gain about {bulk}. Protein {low}–{high} g.",
+    "About what you burn a day, from {from}. To lose 0.5 kg a week eat about {cut}; for a lean gain about {bulk}. Protein {protein} g.",
   "twin.a.tdee": "Open TDEE",
   "twin.c.needsDetails": "Needs details",
   "twin.w.needsDetails": "Add your {missing} to see what you burn a day.",
@@ -200,6 +200,9 @@ export const en = {
   "twin.shape.measures": "your tape measurements",
   "twin.shape.addHeight": "Add your height",
   "twin.shape.addBody": "Log a weigh-in or measurements",
+  "twin.from.measured": "what you ate and how your weight moved over {days} logged days",
+  "twin.w.tdeeTeen":
+    "About what you burn a day, from {from}. Growing bodies need plenty, so eat at least this, with about {protein} g of protein a day.",
 } as const;
 
 type Key = keyof typeof en;
@@ -326,7 +329,7 @@ export const es: Partial<Record<Key, Message>> = {
   "twin.from.level": "actividad {level}",
   "twin.c.aDay": "Al día",
   "twin.w.tdee":
-    "Más o menos lo que quemas al día, según {from}. Para perder 0,5 kg por semana come unas {cut}; para ganar limpio, unas {bulk}. Proteína: {low}–{high} g.",
+    "Más o menos lo que quemas al día, según {from}. Para perder 0,5 kg por semana come unas {cut}; para ganar limpio, unas {bulk}. Proteína: {protein} g.",
   "twin.a.tdee": "Abrir GET",
   "twin.c.needsDetails": "Faltan datos",
   "twin.w.needsDetails": "Añade tu {missing} para ver lo que quemas al día.",
@@ -408,6 +411,9 @@ export const es: Partial<Record<Key, Message>> = {
   "twin.shape.measures": "tus medidas",
   "twin.shape.addHeight": "Añadir tu estatura",
   "twin.shape.addBody": "Registrar un pesaje o medidas",
+  "twin.from.measured": "lo que comiste y cómo cambió tu peso en {days} días registrados",
+  "twin.w.tdeeTeen":
+    "Más o menos lo que quemas al día, según {from}. Un cuerpo en crecimiento necesita bastante: come al menos esto, con unos {protein} g de proteína al día.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -535,7 +541,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.from.level": "activité {level}",
   "twin.c.aDay": "Par jour",
   "twin.w.tdee":
-    "Environ ce que vous brûlez par jour, d’après {from}. Pour perdre 0,5 kg par semaine, mangez environ {cut} ; pour une prise sèche, environ {bulk}. Protéines : {low}–{high} g.",
+    "Environ ce que vous brûlez par jour, d’après {from}. Pour perdre 0,5 kg par semaine, mangez environ {cut} ; pour une prise sèche, environ {bulk}. Protéines : {protein} g.",
   "twin.a.tdee": "Ouvrir la DEJ",
   "twin.c.needsDetails": "Infos manquantes",
   "twin.w.needsDetails": "Ajoutez votre {missing} pour voir ce que vous brûlez par jour.",
@@ -618,6 +624,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.shape.measures": "vos mensurations",
   "twin.shape.addHeight": "Ajouter votre taille",
   "twin.shape.addBody": "Noter une pesée ou des mensurations",
+  "twin.from.measured": "ce que vous avez mangé et l’évolution de votre poids sur {days} jours notés",
+  "twin.w.tdeeTeen":
+    "Environ ce que vous brûlez par jour, d’après {from}. Un corps qui grandit a besoin de beaucoup : mangez au moins cela, avec environ {protein} g de protéines par jour.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -743,7 +752,7 @@ export const de: Partial<Record<Key, Message>> = {
   "twin.from.level": "deinem Aktivitätsniveau ({level})",
   "twin.c.aDay": "Pro Tag",
   "twin.w.tdee":
-    "Etwa so viel verbrennst du pro Tag, berechnet aus {from}. Um 0,5 kg pro Woche abzunehmen, iss etwa {cut}; für sauberen Aufbau etwa {bulk}. Eiweiß {low}–{high} g.",
+    "Etwa so viel verbrennst du pro Tag, berechnet aus {from}. Um 0,5 kg pro Woche abzunehmen, iss etwa {cut}; für sauberen Aufbau etwa {bulk}. Eiweiß {protein} g.",
   "twin.a.tdee": "TDEE öffnen",
   "twin.c.needsDetails": "Angaben fehlen",
   "twin.w.needsDetails": "Gib {missing} an, um zu sehen, was du pro Tag verbrennst.",
@@ -828,6 +837,9 @@ export const de: Partial<Record<Key, Message>> = {
   "twin.shape.measures": "deinen Umfangsmaßen",
   "twin.shape.addHeight": "Größe eintragen",
   "twin.shape.addBody": "Gewicht oder Maße eintragen",
+  "twin.from.measured": "dem, was du gegessen hast, und wie sich dein Gewicht in {days} erfassten Tagen bewegt hat",
+  "twin.w.tdeeTeen":
+    "Etwa so viel verbrennst du pro Tag, berechnet aus {from}. Ein wachsender Körper braucht viel: Iss mindestens so viel, mit etwa {protein} g Eiweiß am Tag.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -952,7 +964,7 @@ export const it: Partial<Record<Key, Message>> = {
   "twin.from.level": "dal livello di attività ({level})",
   "twin.c.aDay": "Al giorno",
   "twin.w.tdee":
-    "Circa quanto bruci al giorno, calcolato {from}. Per perdere 0,5 kg a settimana mangia circa {cut}; per una massa pulita circa {bulk}. Proteine {low}–{high} g.",
+    "Circa quanto bruci al giorno, calcolato {from}. Per perdere 0,5 kg a settimana mangia circa {cut}; per una massa pulita circa {bulk}. Proteine {protein} g.",
   "twin.a.tdee": "Apri TDEE",
   "twin.c.needsDetails": "Mancano dei dati",
   "twin.w.needsDetails": "Aggiungi {missing} per vedere quanto bruci al giorno.",
@@ -1035,6 +1047,9 @@ export const it: Partial<Record<Key, Message>> = {
   "twin.shape.measures": "le tue misure",
   "twin.shape.addHeight": "Aggiungi la tua altezza",
   "twin.shape.addBody": "Registra una pesata o le misure",
+  "twin.from.measured": "da quello che hai mangiato e da come è cambiato il tuo peso in {days} giorni registrati",
+  "twin.w.tdeeTeen":
+    "Circa quanto bruci al giorno, calcolato {from}. Un corpo in crescita ha bisogno di molto: mangia almeno questo, con circa {protein} g di proteine al giorno.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1156,7 +1171,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "twin.from.level": "活動レベル（{level}）",
   "twin.c.aDay": "1日あたり",
   "twin.w.tdee":
-    "{from}から計算した1日のおおよその消費量です。週0.5 kg減らすなら約{cut}、リーンバルクなら約{bulk}を目安に。タンパク質は{low}〜{high} g。",
+    "{from}から計算した1日のおおよその消費量です。週0.5 kg減らすなら約{cut}、リーンバルクなら約{bulk}を目安に。タンパク質は{protein} g。",
   "twin.a.tdee": "TDEE を開く",
   "twin.c.needsDetails": "情報が必要",
   "twin.w.needsDetails": "{missing}を入力すると、1日の消費量が表示されます。",
@@ -1234,4 +1249,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "twin.shape.measures": "採寸の値",
   "twin.shape.addHeight": "身長を追加",
   "twin.shape.addBody": "体重や採寸を記録",
+  "twin.from.measured": "記録した{days}日分の食事と体重の変化",
+  "twin.w.tdeeTeen":
+    "{from}から計算した1日のおおよその消費量です。成長期の体には十分な栄養が必要なので、少なくともこれだけ食べ、タンパク質は1日約{protein} gを目安にしましょう。",
 };

@@ -3,7 +3,7 @@ import { t } from "./i18n";
 import { clampSets, cleanParts, MAX_ITEMS, NAME_MAX } from "./routines";
 import { APP_PATH, SITE_URL } from "./site";
 import { linksOf, withLinks } from "./superset";
-import type { Routine, RoutineItem, RoutinePart } from "./types";
+import { BODY_PARTS, type BodyPart, type Routine, type RoutineItem, type RoutinePart } from "./types";
 
 // Sharing a routine (Melvin, 2026-11-11: "share routines with other users"). The routine travels in
 // the link itself, like a remix link: its name, the exercises in order, set counts and supersets.
@@ -26,6 +26,33 @@ const REHAB_MARK = "rehab";
  * either may be empty). No dot, so older apps drop it like the other part marks.
  */
 const PART_MARK: Record<RoutinePart["kind"], string> = { warm: "w", cool: "d", cardio: "c" };
+/**
+ * A rehab program's injury area and times a week (2026-11-15) travel as `h:<part>:<times>` just before the rehab mark
+ * (either may be empty). No dot, so older apps drop it like the part marks and still read the rehab mark last.
+ */
+const REHAB_INFO = "h";
+
+function rehabOut(r: Pick<Routine, "rehab" | "rehabPart" | "perWeek">): string[] {
+  if (!r.rehab) return [];
+  const w = cleanTimes(r.perWeek);
+  return [...(r.rehabPart || w ? [`${REHAB_INFO}:${r.rehabPart ?? ""}:${w ?? ""}`] : []), REHAB_MARK];
+}
+
+/** Times a week, 1 to 7, or undefined. */
+export function cleanTimes(n: unknown): number | undefined {
+  return typeof n === "number" && Number.isInteger(n) && n >= 1 && n <= 7 ? n : undefined;
+}
+
+function rehabIn(segments: readonly string[]): { rehabPart?: BodyPart; perWeek?: number } {
+  const seg = segments.find((s) => s.startsWith(`${REHAB_INFO}:`));
+  if (!seg) return {};
+  const [, part = "", times = ""] = seg.split(":");
+  const w = cleanTimes(Number(times));
+  return {
+    ...((BODY_PARTS as readonly string[]).includes(part) ? { rehabPart: part as BodyPart } : {}),
+    ...(times && w ? { perWeek: w } : {}),
+  };
+}
 
 function partsOut(parts: readonly RoutinePart[] | undefined): string[] {
   return (cleanParts(parts) ?? []).map((p) =>
@@ -80,16 +107,16 @@ function nameIn(code: string): string {
 }
 
 /**
- * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~rehab]`,
+ * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~h:part:times][~rehab]`,
  * where `.s`
  * links an exercise to the next.
  */
-export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts">): string {
+export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart" | "perWeek">): string {
   const items = r.items.filter((i) => EXERCISE_BY_ID.has(i.exerciseId)).slice(0, MAX_ITEMS);
   const links = linksOf(items);
   const name = nameOut(r.name.trim().slice(0, NAME_MAX));
   const parts = items.map((i, k) => `${i.exerciseId}.${clampSets(i.sets)}${links[k] ? ".s" : ""}`);
-  return [SHARE_VERSION, name, ...parts, ...partsOut(r.parts), ...(r.rehab ? [REHAB_MARK] : [])].join("~");
+  return [SHARE_VERSION, name, ...parts, ...partsOut(r.parts), ...rehabOut(r)].join("~");
 }
 
 /**
@@ -97,7 +124,9 @@ export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "par
  * between two exercises that both survive and were next to each other), so a link from a newer app
  * still opens. Null when nothing usable is left.
  */
-export function decodeRoutine(code: string): { name: string; items: RoutineItem[]; rehab?: true; parts?: RoutinePart[] } | null {
+export function decodeRoutine(
+  code: string,
+): { name: string; items: RoutineItem[]; rehab?: true; parts?: RoutinePart[]; rehabPart?: BodyPart; perWeek?: number } | null {
   // Some apps encode the fragment again; the separators are plain, so decode once if they're missing.
   const raw = code.includes("~") ? code : safeDecode(code);
   const [v, rawName = "", ...parts] = raw.split("~");
@@ -124,7 +153,7 @@ export function decodeRoutine(code: string): { name: string; items: RoutineItem[
   return {
     name: name || t("rt.defaultName"),
     items,
-    ...(rehab ? { rehab } : {}),
+    ...(rehab ? { rehab, ...rehabIn(parts) } : {}),
     ...(routineParts ? { parts: routineParts } : {}),
   };
 }

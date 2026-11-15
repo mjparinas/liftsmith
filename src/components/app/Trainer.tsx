@@ -247,9 +247,10 @@ function ClientPlans({
   const [picking, setPicking] = useState(false);
   const [perWeek, setPerWeek] = useState<number | undefined>(physio ? 3 : undefined);
   const [note, setNote] = useState<string | null>(null);
-  const give = async (r: Pick<Routine, "name" | "items" | "rehab" | "parts">) => {
+  const give = async (r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart">) => {
     try {
-      await assignPlan(clientId, r.name, encodeRoutine(r), perWeek);
+      // A rehab program carries its area and the times a week, so the client's app can follow them (2026-11-15).
+      await assignPlan(clientId, r.name, encodeRoutine(r.rehab ? { ...r, perWeek } : r), perWeek);
       haptic("success");
       sound.done();
       track("feature", { name: "trainer", detail: r.rehab ? "rehab" : "assign" });
@@ -321,7 +322,7 @@ function ClientPlans({
       <Sheet open={picking} onClose={() => setPicking(false)} title={t("trn.assignTitle")}>
         <PerWeekPicker value={perWeek} onChange={setPerWeek} />
         {/* A physio sees the rehab programs first; a trainer sees their own routines first. */}
-        {physio && <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true })} />}
+        {physio && <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true, rehabPart: p.part })} />}
         {(physio || routines.length > 0) && <p className="mb-2 text-sm font-semibold">{t("trn.assignOwn")}</p>}
         {routines.length ? (
           <ul className="space-y-2">
@@ -353,7 +354,7 @@ function ClientPlans({
         )}
         {!physio && (
           <div className="mt-4">
-            <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true })} />
+            <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true, rehabPart: p.part })} />
           </div>
         )}
       </Sheet>
@@ -414,6 +415,7 @@ function ClientScreen({ id }: { id: string }) {
   const [body, setBody] = useState<BodyShare | null>(null);
   const [physio, setPhysio] = useState(false);
   const [targets, setTargets] = useState<Targets | null>(null);
+  const [teen, setTeen] = useState(false);
   const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots" | "pay" | "role">>({});
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
@@ -432,6 +434,7 @@ function ClientScreen({ id }: { id: string }) {
         // A coach who works as a physio sees pain first, and rehab programs lead the assign sheet.
         setPhysio(v.role === "physio");
         setTargets(v.targets ?? null);
+        setTeen(v.teen === true);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
       },
     ).catch((e: unknown) => live && setError(trainerError(e)));
@@ -571,6 +574,8 @@ function ClientScreen({ id }: { id: string }) {
         clientId={id}
         saved={targets}
         body={body}
+        teen={teen}
+        name={report.name}
         now={report.now}
         onChange={() => setVersion((n) => n + 1)}
       />

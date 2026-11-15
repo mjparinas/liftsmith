@@ -9,7 +9,7 @@
 //   Check-ins, Payments (once the server takes them), Teams (a school coach), Setup, and My coach when they train with
 //   one too. Each tab is its own route (#/trainer/<tab>) that replaces the page rather than adding a step for back.
 // - Someone who is none of these picks first: train with a coach, coach clients, or coach a high school team.
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
 import { savePendingCoach } from "@/lib/coachInvite";
@@ -19,6 +19,7 @@ import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
 import { liveRead } from "@/lib/liveRead";
+import { foodDays, weekIntake, weekProtein } from "@/lib/nutrition";
 import { startPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
@@ -55,6 +56,7 @@ import {
   type Targets,
 } from "@/lib/trainer";
 import type { Experience, Goal } from "@/lib/types";
+import { useNow } from "@/lib/useNow";
 
 import { ChatThread } from "./CoachChat";
 import { FormsScreen, PendingCheckins } from "./CoachCheckins";
@@ -462,6 +464,13 @@ export function NoteCard({ note, coach }: { note: Note; coach: string }) {
 
 /** Notes, targets and routines the lifter's coaches sent them. */
 function FromCoach({ coaches, plans, notes, targets }: { coaches: Person[]; plans: Plan[]; notes: Note[]; targets: Targets[] }) {
+  // How the last week of their food app compares with the targets, from this phone's own readings.
+  const events = useApp((s) => s.events);
+  const now = useNow(60_000);
+  const week = useMemo(() => {
+    const days = foodDays(events, now, 8);
+    return days.length ? { intake: weekIntake(days, now), protein: weekProtein(days, now)?.avg ?? null } : null;
+  }, [events, now]);
   if (!plans.length && !notes.length && !targets.length) return null;
   return (
     <Section title={trainersOnly(coaches) ? t("trn.fromTrainer") : t("trn.fromCoach")} icon="chat">
@@ -471,7 +480,7 @@ function FromCoach({ coaches, plans, notes, targets }: { coaches: Person[]; plan
           <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
         ))}
         {targets.map((x) => (
-          <TargetsCard key={x.coachId} targets={x} coach={coaches.find((c) => c.id === x.coachId)?.name ?? ""} />
+          <TargetsCard key={x.coachId} targets={x} week={week} coach={coaches.find((c) => c.id === x.coachId)?.name ?? ""} />
         ))}
         {plans.length > 0 && (
           <ul className="space-y-2">

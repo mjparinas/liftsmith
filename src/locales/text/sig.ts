@@ -32,6 +32,7 @@ export const en = {
   "sig.cycle.late": "Cycle day {day}: energy can dip before a period",
   "sig.cycle.follicular": "Cycle day {day}: often a good time to push",
   "sig.cycle.day": "Cycle day {day}",
+  "sig.underFuelled": "Ate well under maintenance the last two days",
 } as const;
 
 type Key = keyof typeof en;
@@ -65,6 +66,7 @@ export const es: Partial<Record<Key, Message>> = {
   "sig.cycle.late": "Día {day} del ciclo: la energía puede bajar antes de la regla",
   "sig.cycle.follicular": "Día {day} del ciclo: suele ser buen momento para apretar",
   "sig.cycle.day": "Día {day} del ciclo",
+  "sig.underFuelled": "Comiste muy por debajo del mantenimiento los dos últimos días",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -96,6 +98,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "sig.cycle.late": "Jour {day} du cycle : l’énergie peut baisser avant les règles",
   "sig.cycle.follicular": "Jour {day} du cycle : souvent un bon moment pour pousser",
   "sig.cycle.day": "Jour {day} du cycle",
+  "sig.underFuelled": "Bien moins mangé que votre maintien ces deux derniers jours",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -127,6 +130,7 @@ export const de: Partial<Record<Key, Message>> = {
   "sig.cycle.late": "Zyklustag {day}: Vor der Periode kann die Energie sinken",
   "sig.cycle.follicular": "Zyklustag {day}: oft eine gute Zeit, um Gas zu geben",
   "sig.cycle.day": "Zyklustag {day}",
+  "sig.underFuelled": "Die letzten zwei Tage deutlich unter dem Erhaltungsbedarf gegessen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -158,6 +162,7 @@ export const it: Partial<Record<Key, Message>> = {
   "sig.cycle.late": "Giorno {day} del ciclo: prima delle mestruazioni l’energia può calare",
   "sig.cycle.follicular": "Giorno {day} del ciclo: spesso un buon momento per spingere",
   "sig.cycle.day": "Giorno {day} del ciclo",
+  "sig.underFuelled": "Mangiato molto sotto il mantenimento negli ultimi due giorni",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -189,4 +194,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "sig.cycle.late": "周期{day}日目：生理前はエネルギーが落ちやすい時期",
   "sig.cycle.follicular": "周期{day}日目：攻めやすいことが多い時期",
   "sig.cycle.day": "周期{day}日目",
+  "sig.underFuelled": "この2日間、維持カロリーを大きく下回る食事",
 };

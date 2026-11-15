@@ -8,11 +8,12 @@ import { t } from "@/lib/i18n";
 import { activeInjuries, effectFor, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { barFor } from "@/lib/loads";
+import { rehabInjuries } from "@/lib/partExtras";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { useApp, type Active } from "@/lib/store";
 import { effortChoices } from "@/lib/training";
-import type { EffortScale, Exercise, Gym, SetEvent, SetTag } from "@/lib/types";
+import type { EffortScale, Exercise, Gym, Routine, SetEvent, SetTag } from "@/lib/types";
 
 import { clock, loadText, repsText } from "../format";
 import { PainSelect } from "../Injuries";
@@ -122,7 +123,7 @@ export function RestCard({
       {lastSet && lastOfExercise && !active.tag && !TIMED.has(lastSet.exerciseId) && <ExtraSet lastSet={lastSet} onPick={s.extraSet} />}
       {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
       {lastSet && (
-        <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} rehab={!!active.plan.rehab || lastSet.partId === "rehab"} />
+        <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} rehab={rehabOf(active, lastSet, profile.routines)} />
       )}
       <div className="mt-5 w-full border-t border-line/70 pt-4">
         <p className="text-center text-sm text-muted">
@@ -235,15 +236,27 @@ function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rp
   );
 }
 
+/** A set done in a rehab program: the program, when it's still saved (undefined for one that isn't), or false. */
+type RehabSet = false | { routine: Pick<Routine, "rehabPart"> | undefined };
+
+function rehabOf(active: Active, set: SetEvent, routines: readonly Routine[] | undefined): RehabSet {
+  const find = (id: string | undefined) => (id ? routines?.find((r) => r.id === id) : undefined);
+  if (set.partId === "rehab") return { routine: find(active.parts?.find((p) => p.kind === "rehab")?.ref) };
+  return active.plan.rehab ? { routine: find(active.plan.routineId) } : false;
+}
+
 /**
  * Between sets, one optional pain check for an exercise trained despite an injury (lighter, marked
  * fine, or in a graded return): once per exercise per workout, never during a set. In a rehab routine from
  * the lifter's physio, every exercise asks, for every injury, so the physio sees pain exercise by exercise.
  */
-function PainCheck({ sessionId, exerciseId, rehab }: { sessionId: string; exerciseId: string; rehab: boolean }) {
+function PainCheck({ sessionId, exerciseId, rehab }: { sessionId: string; exerciseId: string; rehab: RehabSet }) {
   const { events, ratePain } = useApp();
   const ex = exercise(exerciseId);
-  const hurt = activeInjuries(events).filter((i) => rehab || (effectFor(ex, [i]) && effectFor(ex, [i])!.action !== "skip"));
+  // A rehab program asks about the injuries it's for: its own area, or every one for an older program (2026-11-15).
+  const hurt = rehab
+    ? rehabInjuries(events, rehab.routine)
+    : activeInjuries(events).filter((i) => effectFor(ex, [i]) && effectFor(ex, [i])!.action !== "skip");
   const asked = (id: string) =>
     events.some((e) => e.type === "pain" && e.injuryId === id && e.sessionId === sessionId && e.exerciseId === exerciseId);
   const todo = hurt.filter((i) => !asked(i.id));

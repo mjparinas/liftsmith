@@ -108,6 +108,11 @@ export const fr: FeaturesText = {
       name: "Mode blessure",
       body: "Indiquez ce qui fait mal : l’appli écarte ce qui l’aggraverait, vous avertit des mouvements à risque et suit une douleur de 0 à 10 dans le temps.",
     },
+    "rehab-done": {
+      name: "La rééducation de votre kiné, faite",
+      body: "Un programme de votre kiné attend sur Aujourd’hui pour être enregistré d’un geste et note la blessure qu’il concerne. Il suit le nombre de fois par semaine demandé, s’affiche les jours de repos et ne demande la douleur que pour cette blessure.",
+      note: "Les rappels de rééducation et la notification de nouveau programme sont sur Android et iPhone.",
+    },
     cycle: { name: "Forme selon le cycle", body: "Si vous le souhaitez, notez votre cycle et la décision du jour en tient compte." },
     "goal-planner": {
       name: "Planificateur d’objectifs",
@@ -241,7 +246,12 @@ export const fr: FeaturesText = {
     },
     food: {
       name: "Notes du coach d’après votre appli de nutrition",
-      body: "Les calories et protéines notées dans une appli de nutrition arrivent dans Liftsmith via l’appli santé du téléphone et deviennent des notes comme « protéines insuffisantes trois jours de suite ». L’appli ne fait pas de suivi alimentaire.",
+      body: "Les calories, protéines, glucides et lipides notés dans une appli de nutrition arrivent dans Liftsmith via l’appli santé du téléphone et deviennent des notes comme « protéines insuffisantes trois jours de suite », jugées selon un seul ensemble d’objectifs pour votre but. Noter seulement ses protéines compte aussi. L’appli ne fait pas de suivi alimentaire.",
+    },
+    "measured-maintenance": {
+      name: "Un maintien mesuré sur ce que vous mangez",
+      body: "Deux semaines de repas et de pesées mesurent vos vraies calories quotidiennes, qui servent ensuite à Macros, à la DEJ et à vos notes sur l’alimentation. Une carte Alimentation dans Corps montre votre semaine face à vos objectifs.",
+      note: "Les moins de 18 ans ne reçoivent que des conseils sur les protéines : pas d’objectif de perte de gras ni de notes sur les calories.",
     },
     "your-stats": {
       name: "Vos données",
@@ -353,7 +363,7 @@ export const fr: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Objectifs nutritionnels pour les clients",
-      body: "Fixez les calories et protéines quotidiennes de chaque client. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange s'il le partage.",
+      body: "Fixez les calories, protéines, glucides et lipides quotidiens de chaque client, avec d’autres calories les jours de repos si vous voulez, remplis avec ses propres données en un geste. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange quand il le partage.",
     },
     "school-teams": {
       name: "Gratuit pour les équipes d’école secondaire",
@@ -384,6 +394,10 @@ export const fr: FeaturesText = {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
+    "trainer-directory": {
+      name: "Dans l'annuaire des coachs",
+      body: "Inscrivez-vous comme coach sportif, coach ou kiné dans votre salle et vous apparaissez sur la page de la salle et dans l'annuaire des coachs de sa ville sur le site, avec votre présentation et un lien pour que de nouveaux clients s'entraînent avec vous. Seuls les adultes y figurent.",
     },
     "coach-plans": {
       name: "Des forfaits coach qui grandissent avec votre clientèle",
@@ -452,6 +466,10 @@ export const fr: FeaturesText = {
     importExtras: {
       name: "Routines et mesures corporelles d’une autre appli",
       body: "Un import transforme en routines les séances répétées sous le même nom, et récupère le poids, la masse grasse et les mensurations de Hevy, FitNotes ou d’une appli de balance.",
+    },
+    "strength-standards": {
+      name: "Niveaux de force de vrais pratiquants",
+      body: "Le site montre ce que les pratiquants soulèvent vraiment au squat, au développé couché, au soulevé de terre et au développé militaire, par sexe et poids de corps, recalculé chaque jour avec ceux qui comptent. Seuls les groupes de 30 personnes ou plus sont affichés, en centiles, jamais les chiffres de quelqu'un. Un interrupteur dans Réglages › Vos données et confidentialité décide si vous comptez ; les moins de 18 ans ne comptent jamais.",
     },
     languages: {
       name: "Six langues",

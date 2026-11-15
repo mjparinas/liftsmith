@@ -17,11 +17,12 @@ import type { ClientLimits, CoachTier } from "./coachPlans";
 import { cycleState } from "./cycle";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
+import { targetFor, trainedDays } from "./foodTargets";
 import { t } from "./i18n";
 import { injuries, PART_LABEL } from "./injury";
 import { stalls, type Stall } from "./insights";
 import { track } from "./net";
-import { KCAL_DAYS, LOGGED_KCAL, PROTEIN_SHORT } from "./nutrition";
+import { KCAL_DAYS, LOGGED_KCAL, loggedWeek, PROTEIN_SHORT, proteinOnly, weekProtein, type FoodDay } from "./nutrition";
 import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
@@ -130,15 +131,20 @@ export interface BodyShare {
   heightCm: number | null;
   weights: { at: number; kg: number; bodyFat?: number }[];
   measures: { at: number; site: string; cm: number }[];
-  /** Calories and protein from their food app for each of the last 30 days, oldest first. */
-  food?: { day: string; kcal?: number; protein?: number }[];
+  /** Calories, protein, carbs and fat from their food app for each of the last 30 days, oldest first. */
+  food?: { day: string; kcal?: number; protein?: number; carbs?: number; fat?: number }[];
 }
 /** A coach's daily nutrition targets for a client. Either number may be empty. */
 export interface Targets {
   coachId: string;
   clientId: string;
+  /** Calories a day (training days when there's a rest-day number). */
   kcal: number | null;
   protein: number | null;
+  /** Grams of carbs and fat, and calories on rest days (2026-11-15; missing from older servers). */
+  carbs?: number | null;
+  fat?: number | null;
+  kcalRest?: number | null;
   at: number;
 }
 export interface ClientView {
@@ -158,6 +164,8 @@ export interface ClientView {
   /** How the coach looking works (their own setting). */
   /** This coach's daily nutrition targets for the client. */
   targets?: Targets | null;
+  /** The client is under 18: protein targets only (food-from-health.md "Teens"). */
+  teen?: boolean;
   /** The latest check-ins this coach sent the client, newest first, and the one that repeats weekly. */
   checkins?: Checkin[];
   repeat?: Repeat | null;
@@ -203,8 +211,16 @@ export const saveSetup = async (setup: Setup) =>
   (await api<{ setup: Setup }>("/api/coach/", { token: token(), body: { action: "setup", setup } })).setup;
 export const saveNote = async (client: string, text: string) =>
   (await api<{ note: Note | null }>("/api/coach/", { token: token(), body: { action: "note", client, text } })).note;
-export const saveTargets = async (client: string, kcal: number | null, protein: number | null) =>
-  (await api<{ targets: Targets | null }>("/api/coach/", { token: token(), body: { action: "targets", client, kcal, protein } })).targets;
+/** What a coach sets for a client; each may be empty. */
+export interface TargetValues {
+  kcal: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
+  kcalRest: number | null;
+}
+export const saveTargets = async (client: string, v: TargetValues) =>
+  (await api<{ targets: Targets | null }>("/api/coach/", { token: token(), body: { action: "targets", client, ...v } })).targets;
 export const assignPlan = async (client: string, name: string, code: string, perWeek?: number) =>
   (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code, perWeek } })).plan;
 export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
@@ -392,6 +408,7 @@ export type Flag =
   | { kind: "lowAdherence"; name: string; done: number; want: number }
   | { kind: "kcalOff"; avg: number; target: number; days: number }
   | { kind: "proteinShort"; avg: number; target: number; days: number }
+  | { kind: "noFood" }
   | CheckinFlag
   | { kind: "payFailed" }
   | { kind: "feelLow"; unwell: boolean }
@@ -679,32 +696,70 @@ export function readinessOf(events: readonly AppEvent[], now: number): Readiness
   };
 }
 
-/** Logged food days (1,000+ kcal, like nutrition.ts) in the last week, once there are 4. */
-export function foodWeek(view: Pick<ClientView, "body">, now: number): { days: number; kcal: number; protein: number | null } | null {
-  const from = new Date(now - WEEK);
-  const key = `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(2, "0")}-${String(from.getDate()).padStart(2, "0")}`;
-  const days = (view.body?.food ?? []).filter((d) => d.day >= key && (d.kcal ?? 0) >= LOGGED_KCAL);
-  if (days.length < KCAL_DAYS) return null;
-  const withProtein = days.filter((d) => d.protein !== undefined);
+/** A shared client's food days, counted the way their own phone counts them (nutrition.ts foodDays). */
+export function sharedDays(food: BodyShare["food"]): FoodDay[] {
+  const out: FoodDay[] = [];
+  for (const d of food ?? []) {
+    if (d.kcal !== undefined && d.kcal >= LOGGED_KCAL) out.push({ ...d });
+    else if (proteinOnly(d.kcal, d.protein)) out.push({ day: d.day, protein: d.protein });
+  }
+  return out;
+}
+
+export interface FoodWeek {
+  /** Days with calories logged in the last week. */
+  days: number;
+  kcal: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
+}
+
+/** The last week of a shared client's food, once 4 days have calories (or protein, for someone logging only that). */
+export function foodWeek(view: Pick<ClientView, "body">, now: number): FoodWeek | null {
+  const all = sharedDays(view.body?.food);
+  const week = loggedWeek(all, now);
+  const protein = weekProtein(all, now);
+  if (week.length < KCAL_DAYS && !protein) return null;
+  const avg = (k: "carbs" | "fat") => {
+    const xs = week.flatMap((d) => (d[k] === undefined ? [] : [d[k]!]));
+    return xs.length ? Math.round(xs.reduce((a, b) => a + b, 0) / xs.length) : null;
+  };
   return {
-    days: days.length,
-    kcal: Math.round(days.reduce((s, d) => s + d.kcal!, 0) / days.length),
-    protein: withProtein.length ? Math.round(withProtein.reduce((s, d) => s + d.protein!, 0) / withProtein.length) : null,
+    days: week.length,
+    kcal: week.length >= KCAL_DAYS ? Math.round(week.reduce((a, d) => a + d.kcal!, 0) / week.length) : null,
+    protein: protein?.avg ?? null,
+    carbs: avg("carbs"),
+    fat: avg("fat"),
   };
 }
 
-/** Calories 10% or more off the coach's target, or protein under 85% of it, over the last week of logged days. */
-function foodFlags(view: Pick<ClientView, "body" | "targets">, now: number): Flag[] {
+/**
+ * Calories 10% or more off the coach's target (each day's own with a rest-day number), or protein under 85% of it,
+ * over the last week of logged days; or nothing from the client's food app all week while they share body data.
+ */
+function foodFlags(view: Pick<ClientView, "body" | "targets" | "events">, now: number): Flag[] {
   const t = view.targets;
-  const week = t && foodWeek(view, now);
-  if (!t || !week) return [];
+  if (!t || !view.body) return [];
+  const week = foodWeek(view, now);
+  if (!week) return sharedDays(view.body.food).some((d) => d.day >= dayAgo(now, 7)) ? [] : [{ kind: "noFood" }];
   const out: Flag[] = [];
-  if (t.kcal && Math.abs(week.kcal - t.kcal) >= t.kcal * 0.1)
-    out.push({ kind: "kcalOff", avg: week.kcal, target: t.kcal, days: week.days });
+  if (t.kcal && week.kcal !== null) {
+    const starts = (view.events as { type?: unknown; at?: unknown }[]).flatMap((e) =>
+      e.type === "sessionStart" && typeof e.at === "number" ? [{ start: e.at }] : [],
+    );
+    const target = targetFor(loggedWeek(sharedDays(view.body.food), now), trainedDays(starts), t.kcal, t.kcalRest ?? undefined);
+    if (Math.abs(week.kcal - target) >= target * 0.1) out.push({ kind: "kcalOff", avg: week.kcal, target, days: week.days });
+  }
   if (t.protein && week.protein !== null && week.protein < t.protein * PROTEIN_SHORT)
     out.push({ kind: "proteinShort", avg: week.protein, target: t.protein, days: week.days });
   return out;
 }
+
+const dayAgo = (now: number, n: number) => {
+  const d = new Date(now - n * 86_400_000);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 /** An exercise's name on the coach's phone: the library's, the client's own, or a plain fallback. */
 export function liftName(id: string, names: ReadonlyMap<string, string>): string {
@@ -750,6 +805,8 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
         advice: t(f.avg < f.target ? "trn.f.kcalUnderDo" : "trn.f.kcalOverDo"),
         tone: "warn",
       };
+    case "noFood":
+      return { title: t("trn.f.noFood"), advice: t("trn.f.noFoodDo"), tone: "info" };
     case "proteinShort":
       return {
         title: t("trn.f.proteinShort", { avg: f.avg, target: f.target, count: f.days }),
@@ -778,6 +835,8 @@ const SEEN = "liftsmith.coachNotes.seen";
 const TARGETS = "liftsmith.coachTargets";
 const COACHING = "liftsmith.coaching";
 const WHO = "liftsmith.coachWho";
+const PLANS = "liftsmith.coachPlans";
+const PLANS_SEEN = "liftsmith.coachPlans.seen";
 const NOBODY: Who = { coaches: [], clients: 0 };
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
@@ -812,6 +871,15 @@ interface NotesState {
   coaching: boolean;
   /** Who this lifter trains with and how many clients they coach, for the badge by their name (coachBadge). */
   who: Who;
+  /** Programs this lifter's coaches sent, with the coach's name and role, for Today's "save it" card (2026-11-15). */
+  plans: ShownPlan[];
+  /** Plans "Not now" hid on Today, by id. */
+  plansSeen: string[];
+}
+/** A program from a coach, with who sent it. */
+export interface ShownPlan extends Plan {
+  coach: string;
+  role?: Role;
 }
 /** The lifter's coaches (name and role) and how many clients they coach, kept on the device for the badge. */
 export interface Who {
@@ -844,6 +912,8 @@ export const useCoachNotes = create<NotesState>(() => ({
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
   coaching: typeof window === "undefined" ? false : readJson<boolean>(COACHING, false),
   who: typeof window === "undefined" ? NOBODY : readJson<Who>(WHO, NOBODY),
+  plans: typeof window === "undefined" ? [] : readJson<ShownPlan[]>(PLANS, []),
+  plansSeen: typeof window === "undefined" ? [] : readJson<string[]>(PLANS_SEEN, []),
 }));
 
 /** Whether an account takes part in coaching, as a coach or a client. */
@@ -864,7 +934,7 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
   o: Pick<Overview, "notes" | "coaches"> &
-    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach">>,
+    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans">>,
 ): void {
   const notes = shownNotes(o);
   const coaching = usesCoaching(o);
@@ -884,7 +954,19 @@ export function keepNotes(
     clients: o.clients?.length ?? 0,
   };
   writeJson(WHO, who);
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who });
+  const plans: ShownPlan[] = (o.plans ?? []).map((p) => {
+    const c = o.coaches.find((x) => x.id === p.coachId);
+    return { ...p, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
+  });
+  writeJson(PLANS, plans);
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans });
+}
+
+/** "Not now" on Today's card for a program from a coach: it stays in Coaching, and Today stops asking. */
+export function dismissPlan(id: string): void {
+  const plansSeen = [...useCoachNotes.getState().plansSeen.filter((x) => x !== id), id].slice(-50);
+  writeJson(PLANS_SEEN, plansSeen);
+  useCoachNotes.setState({ plansSeen });
 }
 
 /** A check-in was answered: it no longer waits on Today. */
@@ -941,5 +1023,17 @@ export function forgetNotes(): void {
   writeJson(TARGETS, null);
   writeJson(COACHING, false);
   writeJson(WHO, NOBODY);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [], coaching: false, who: NOBODY });
+  writeJson(PLANS, []);
+  writeJson(PLANS_SEEN, []);
+  useCoachNotes.setState({
+    notes: [],
+    unread: [],
+    targets: null,
+    checkins: [],
+    sessions: [],
+    coaching: false,
+    who: NOBODY,
+    plans: [],
+    plansSeen: [],
+  });
 }

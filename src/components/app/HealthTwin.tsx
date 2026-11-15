@@ -30,6 +30,7 @@ import { useNow } from "@/lib/useNow";
 
 import { openStats } from "./BodyStats";
 import { FitTestsCard } from "./FitTests";
+import { FoodCard } from "./FoodCard";
 import { useMyShape, useMyStats } from "./myShape";
 import { go } from "./router";
 import { Button, EmptyState, ProTag, Section, Sheet, SwitchRow } from "./ui";
@@ -154,7 +155,7 @@ export function HealthTwin() {
   // Free lifters see what Pro would have called today, from the same signals.
   const proCall = useMemo(() => {
     if (can("healthReadiness", pro) || !r) return null;
-    const withHealth = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled, ...healthExternal(events, now) });
+    const withHealth = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled, ...healthExternal(events, now, profile) });
     return withHealth.call !== r.call ? withHealth.call : null;
   }, [events, profile, now, pro, r]);
 
@@ -242,6 +243,7 @@ export function HealthTwin() {
 
       <FitnessAgeCard native={native} store={store} />
       <FitTestsCard />
+      <FoodCard native={native} store={store} now={now} />
 
       <Section title={t("twin.group.body")} icon="target">
         <Tiles ids={BODY} by={by} onOpen={setOpen} />

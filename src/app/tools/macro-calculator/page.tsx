@@ -10,12 +10,14 @@ export const metadata: Metadata = pageMeta({
   description:
     "Work out calories and macros to lose fat, maintain or build muscle from your age, sex, height, weight and activity, with protein set for lifters.",
   path: "/tools/macro-calculator/",
+  translated: true,
 });
 
 export default function MacroPage() {
   return (
     <ToolPage
       slug="macro-calculator"
+      translated
       name="Macro calculator"
       intro="Calories for your goal from your TDEE, split into protein, fat and carbs for someone who lifts, with the reason behind each number."
       sticky="Macros that follow your weigh-ins"

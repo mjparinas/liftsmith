@@ -1,17 +1,22 @@
 import { describe, expect, it } from "vitest";
 
 import { defaultProfile } from "./defaults";
+import { foodGoal, foodTargets, targetFor } from "./foodTargets";
 import { localDayKey, nutritionReadings } from "./health";
 import { t } from "./i18n";
 import { insights } from "./insights";
-import { foodDays, LOGGED_KCAL, proteinShort, weekIntake } from "./nutrition";
+import { foodDays, LOGGED_KCAL, measuredTdee, proteinOnly, proteinShort, underFuelled, weekIntake } from "./nutrition";
+import { findPlateaus } from "./plateau";
+import { healthSignals } from "./readiness";
+import { currentTdee } from "./tdee";
+import { healthExternal } from "./twin";
 import type { AppEvent, BodyweightEvent, HealthEvent, Profile } from "./types";
 
 // Food from a food app through Health Connect or Apple Health, turned into coach's notes (Melvin, 2026-11-11).
 
 const D = 86_400_000;
 const NOW = new Date("2026-11-11T18:00:00").getTime();
-// 80 kg: the protein target is 128 g, short is under 85% of it (108.8 g).
+// 80 kg on a maintain goal: the protein target is 1.8 g per kg, 144 g; short is under 85% of it (122.4 g).
 const base: Profile = {
   ...defaultProfile(NOW - 60 * D),
   onboarded: true,
@@ -76,9 +81,9 @@ describe("food days", () => {
       ]),
       NOW,
     );
-    expect(proteinShort(short, 80, NOW)).toEqual({ days: 3, avg: 90, target: 128, last: day(1) });
+    expect(proteinShort(short, 128, NOW)).toEqual({ days: 3, avg: 90, target: 128, last: day(1) });
     // Two short days aren't a run yet.
-    expect(proteinShort(short.slice(0, 3), 80, NOW)).toBeNull();
+    expect(proteinShort(short.slice(0, 3), 128, NOW)).toBeNull();
     // A near miss (115 g, over 85% of 128) breaks the run.
     expect(
       proteinShort(
@@ -90,7 +95,7 @@ describe("food days", () => {
           ]),
           NOW,
         ),
-        80,
+        128,
         NOW,
       ),
     ).toBeNull();
@@ -105,7 +110,7 @@ describe("food days", () => {
           ]),
           NOW,
         ),
-        80,
+        128,
         NOW,
       ),
     ).toBeNull();
@@ -151,9 +156,9 @@ describe("food coach's notes", () => {
     ]);
     const note = insights({ events, profile: base, now: NOW }).find((i) => i.id.startsWith("protein-short-"))!;
     expect(note.title).toBe(t("ins.proteinShort.title", { count: 3 }));
-    expect(note.why).toBe(t("ins.proteinShort.why", { avg: 90, target: 128 }));
-    expect(note.advice).toBe(t("ins.proteinShort.advice", { gap: 40 }));
-    expect(note.action).toMatchObject({ kind: "go", route: "tools/tdee" });
+    expect(note.why).toBe(t("ins.proteinShort.why", { avg: 90, target: 144 }));
+    expect(note.advice).toBe(t("ins.proteinShort.advice", { gap: 55 }));
+    expect(note.action).toMatchObject({ kind: "go", route: "tools/macros" });
   });
 
   it("says nothing without food data, or when protein is on target", () => {
@@ -221,18 +226,18 @@ describe("targets from a coach", () => {
   const coach = (kcal: number | null, protein: number | null) => ({ kcal, protein, coach: "Sam" });
 
   it("protein goes by the coach's target instead of the body-weight rule", () => {
-    // 120 g a day is fine for 80 kg (128 g, short under 108.8 g) but short of a coach's 160 g.
+    // 125 g a day is fine for 80 kg (144 g, short under 122.4 g) but short of a coach's 160 g.
     const events = days([
-      [1, 2400, 120],
-      [2, 2400, 120],
-      [3, 2400, 120],
+      [1, 2400, 125],
+      [2, 2400, 125],
+      [3, 2400, 125],
     ]);
     expect(ids(events).some((id) => id.startsWith("protein-short-"))).toBe(false);
     const note = insights({ events, profile: base, now: NOW, coachTargets: coach(null, 160) }).find((i) =>
       i.id.startsWith("protein-short-"),
     )!;
-    expect(note.why).toBe(t("ins.proteinShort.whyCoach", { avg: 120, target: 160, name: "Sam" }));
-    expect(proteinShort([], 0, NOW, 160)).toBeNull();
+    expect(note.why).toBe(t("ins.proteinShort.whyCoach", { avg: 125, target: 160, name: "Sam" }));
+    expect(proteinShort([], 0, NOW)).toBeNull();
   });
 
   it("calories are judged against the coach's target alone, 10% either way", () => {
@@ -250,5 +255,155 @@ describe("targets from a coach", () => {
     expect(notes(2300, 2400).some((id) => id.startsWith("coach-kcal-"))).toBe(false);
     // With a coach's calorie target, the maintenance-based notes stay quiet.
     expect(notes(1200, 1300).some((id) => id.startsWith("eat-low"))).toBe(false);
+  });
+});
+
+describe("one set of food targets (2026-11-15)", () => {
+  const teen: Profile = { ...base, birthYear: new Date(NOW).getFullYear() - 15 };
+
+  it("the goal picked in Macros wins over the training goal", () => {
+    // Build-muscle training while deliberately cutting: no "eating too little to build muscle".
+    const events = days([
+      [4, 2300, 160],
+      [3, 2250, 160],
+      [2, 2350, 160],
+      [1, 2300, 160],
+    ]);
+    const muscle = { ...base, goal: "muscle" as const };
+    expect(foodGoal(muscle)).toBe("bulk");
+    expect(ids(events, muscle).some((id) => id.startsWith("eat-low-muscle-"))).toBe(true);
+    const cutting = { ...muscle, tdee: { goal: "cut" as const } };
+    expect(foodGoal(cutting)).toBe("cut");
+    expect(ids(events, cutting).some((id) => id.startsWith("eat-low"))).toBe(false);
+    // Protein follows the goal: 2.2 g per kg on a cut.
+    expect(foodTargets(events, [], cutting, NOW).protein).toBe(176);
+  });
+
+  it("under-18s never get a fat-loss goal, a calorie target or a calorie note, only protein", () => {
+    expect(foodGoal({ ...teen, tdee: { goal: "cut" } }, NOW)).toBe("maintain");
+    const low = days([
+      [4, 1200, 60],
+      [3, 1300, 60],
+      [2, 1100, 60],
+      [1, 1250, 60],
+    ]);
+    expect(ids(low).some((id) => id.startsWith("eat-low-"))).toBe(true);
+    const notes = ids(low, teen);
+    expect(notes.some((id) => id.startsWith("eat-low") || id.startsWith("coach-kcal"))).toBe(false);
+    expect(notes.some((id) => id.startsWith("protein-short-"))).toBe(true);
+    const ft = foodTargets(low, [], teen, NOW, { kcal: 1500, protein: 120, carbs: 200, fat: 50, coach: "Sam" });
+    expect(ft).toMatchObject({ teen: true, protein: 120 });
+    expect(ft.kcal).toBeUndefined();
+    expect(ft.carbs).toBeUndefined();
+    expect(
+      insights({ events: low, profile: teen, now: NOW, coachTargets: { kcal: 2400, protein: null, coach: "Sam" } }).map((i) => i.id),
+    ).not.toContain(expect.stringMatching(/^coach-kcal-/));
+  });
+
+  it("a rest-day number makes each logged day's own target", () => {
+    const trained = new Set([day(1), day(3)]);
+    const week = [{ day: day(1) }, { day: day(2) }, { day: day(3) }, { day: day(4) }];
+    expect(targetFor(week, trained, 2800, 2200)).toBe(2500);
+    expect(targetFor(week, trained, 2800)).toBe(2800);
+  });
+});
+
+describe("protein-only logging (2026-11-15)", () => {
+  it("counts a low-calorie day for protein when it was mostly protein, never for calories", () => {
+    expect(proteinOnly(400, 80)).toBe(true);
+    expect(proteinOnly(undefined, 60)).toBe(true);
+    expect(proteinOnly(800, 40)).toBe(false); // a half-logged ordinary day
+    expect(proteinOnly(100, 10)).toBe(false);
+    const f = foodDays(
+      days([
+        [3, 450, 90],
+        [2, 500, 95],
+        [1, 400, 85],
+      ]),
+      NOW,
+    );
+    expect(f).toEqual([
+      { day: day(3), protein: 90 },
+      { day: day(2), protein: 95 },
+      { day: day(1), protein: 85 },
+    ]);
+    expect(weekIntake(f, NOW)).toBeNull();
+    expect(proteinShort(f, 144, NOW)).toMatchObject({ days: 3, avg: 90 });
+  });
+});
+
+describe("maintenance measured from food and weigh-ins (2026-11-15)", () => {
+  const weigh = (ago: number, kg: number): BodyweightEvent => ({ type: "bodyweight", id: `w${n++}`, at: NOW - ago * D, kg });
+  const daily = (kcal: number, from = 21) => days(Array.from({ length: from }, (_, i) => [i + 1, kcal] as [number, number]));
+
+  it("is what was eaten plus the weight trend's gap, about 7,700 kcal a kg", () => {
+    // Eating 2,500 a day and losing 0.5 kg a week: maintenance is about 2,500 + 550 = 3,050.
+    const events = [...daily(2500), weigh(21, 81.5), weigh(14, 81), weigh(7, 80.5), weigh(0.5, 80)];
+    const m = measuredTdee(events, NOW)!;
+    expect(m.days).toBe(21);
+    expect(m.kgPerWeek).toBeCloseTo(-0.5, 1);
+    expect(m.kcal).toBeGreaterThan(3000);
+    expect(m.kcal).toBeLessThan(3100);
+    // It replaces the formula's maintenance everywhere, and the snapshots keep the formula's.
+    const cur = currentTdee(events, [], base, NOW);
+    expect(cur.result!.tdee).toBe(m.kcal);
+    expect(cur.formulaResult!.tdee).not.toBe(m.kcal);
+    expect(cur.result!.cut).toBe(m.kcal - 500);
+  });
+
+  it("needs two weeks of logged days and four weigh-ins spread over two weeks", () => {
+    expect(measuredTdee([...daily(2500, 10), weigh(21, 81), weigh(14, 81), weigh(7, 80), weigh(1, 80)], NOW)).toBeNull();
+    expect(measuredTdee([...daily(2500), weigh(3, 81), weigh(2, 81), weigh(1, 80)], NOW)).toBeNull();
+    expect(measuredTdee([...daily(2500), weigh(8, 81), weigh(6, 81), weigh(4, 80), weigh(2, 80)], NOW)).toBeNull();
+    // A wild answer is a logging gap, not a metabolism.
+    expect(measuredTdee([...daily(1100), weigh(21, 80), weigh(14, 82), weigh(7, 84), weigh(1, 86)], NOW)).toBeNull();
+  });
+});
+
+describe("food moves the training (2026-11-15)", () => {
+  it("two very low days in a row read as under-fuelled for readiness", () => {
+    const f = foodDays(
+      days([
+        [3, 2600],
+        [2, 1500],
+        [1, 1600],
+      ]),
+      NOW,
+    );
+    expect(underFuelled(f, 2700, NOW)).toBe(true);
+    expect(underFuelled(f.slice(0, 2), 2700, NOW)).toBe(false);
+    expect(underFuelled(f, 2000, NOW)).toBe(false);
+    expect(underFuelled(f, undefined, NOW)).toBe(false);
+    const ext = healthExternal(
+      days([
+        [2, 1500],
+        [1, 1600],
+      ]),
+      NOW,
+      base,
+    );
+    expect(ext.underFuelled).toBe(true);
+    expect(healthSignals(ext).map((s) => s.text)).toContain(t("sig.underFuelled"));
+  });
+
+  it("eating well under maintenance is a plateau cause", () => {
+    const sets: AppEvent[] = [];
+    // Bench at 100 x 5 for nine weeks: the best was in the first week.
+    for (let w = 9; w >= 0; w--)
+      sets.push({
+        type: "set",
+        id: `s${w}`,
+        at: NOW - w * 7 * D,
+        sessionId: `x${w}`,
+        exerciseId: "bench-press",
+        weight: 100,
+        reps: w === 9 ? 6 : 5,
+        targetReps: 5,
+        rir: 2,
+      } as AppEvent);
+    const ps = findPlateaus(sets, { ...base, blockStart: NOW - 2 * D }, NOW, [], { gap: 600, days: 6 });
+    const p = ps.find((x) => x.exerciseId === "bench-press")!;
+    expect(p.causes.some((c) => c.kind === "food")).toBe(true);
+    expect(findPlateaus(sets, { ...base, blockStart: NOW - 2 * D }, NOW)[0]!.causes.some((c) => c.kind === "food")).toBe(false);
   });
 });

@@ -6,6 +6,7 @@
 import { BLOG_A } from "./blog/a";
 import { BLOG_AA } from "./blog/aa";
 import { BLOG_AB } from "./blog/ab";
+import { BLOG_AC } from "./blog/ac";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
 import { BLOG_D } from "./blog/d";
@@ -24,7 +25,9 @@ import { BLOG_O } from "./blog/o";
 import { BLOG_P } from "./blog/p";
 import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
+import { BLOG_REHAB_DONE } from "./blog/rehabDone";
 import { BLOG_S } from "./blog/s";
+import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
@@ -229,7 +232,10 @@ export const ARTICLES: Article[] = [
   ...BLOG_Z,
   ...BLOG_AA,
   ...BLOG_AB,
+  ...BLOG_AC,
   ...BLOG_INVITES,
+  ...BLOG_REHAB_DONE,
+  ...BLOG_SITE_PAGES,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

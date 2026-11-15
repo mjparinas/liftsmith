@@ -18,7 +18,8 @@ import { dayName, say, type MsgLang } from "./messageText";
 //  - Pro offers only go to people who don't have Pro, are opt-in on both channels, and are rare.
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
-export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends";
+export type MessageKind =
+  "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab";
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
@@ -55,6 +56,8 @@ export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push
   records: { label: "Personal bests", blurb: "A new best on a lift, at most once a week.", push: false, email: true },
   // Thursday evening: which friends trained this week (Friends, server side).
   friends: { label: "Friend activity", blurb: "Thursday evening, which friends trained this week.", push: false, email: true },
+  // The physio's rehab on a day without a workout reminder, when it's due (2026-11-15). Push only: the phone knows.
+  rehab: { label: "Rehab reminders", blurb: "Your physio's exercises on days they're due.", push: true, email: false },
   // The feature tour: one email a day about one thing the app does, with a real screenshot (server/tour.ts).
   tour: {
     label: "Getting started tips",
@@ -80,6 +83,7 @@ export const DEFAULT_ON: Record<MessageKind, boolean> = {
   recap: true,
   records: true,
   friends: true,
+  rehab: true,
 };
 
 /** A stretch of training, for the recaps: from the phone's own workouts (reminders.ts planInput). */
@@ -130,6 +134,22 @@ export interface PlanInput {
   best?: { at: number; name: string; weightKg: number; reps: number };
   /** Before the first workout: today's planned exercises (in the app's language) and minutes, for the welcome. */
   next?: { names: string[]; minutes: number };
+  /**
+   * The physio's rehab program (push only, never sent to the server), while an injury it's for is active: its name,
+   * the times a week asked for and when it was done (start times; the plan assumes it isn't done again after `from`).
+   */
+  rehab?: { name: string; perWeek?: number; times: number[] };
+}
+
+/** Whether the rehab is due on the local day starting at `day`, from what was done before then (partExtras rehabDue). */
+export function rehabDueOn(r: NonNullable<PlanInput["rehab"]>, day: number, tz: string): { due: boolean; done: number } {
+  const before = r.times.filter((at) => at < day);
+  const last = before.length ? Math.max(...before) : undefined;
+  const gap = r.perWeek !== undefined && r.perWeek >= 4 ? 1 : 2;
+  const waited = last === undefined || Math.round((day - dayStart(last, tz)) / DAY) >= gap;
+  const from = addDays(day, -6, tz);
+  const done = new Set(before.filter((at) => at >= from).map((at) => dayStart(at, tz))).size;
+  return { due: waited && (r.perWeek === undefined || done < r.perWeek), done };
 }
 
 export interface Message {
@@ -315,6 +335,21 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
 
     if (streakLine) add("streak", atTime(day, sendHour, tz), say(lang, "rmd.keepStreak"), streakLine);
 
+    // Rehab (push): the physio's exercises at the workout time on a day without a workout reminder (that day's Today
+    // offers the rehab beside the lifting), when they're due. Done today means it isn't.
+    if (!email && input.rehab && !input.days.includes(wd)) {
+      const r = input.rehab;
+      const { due, done } = rehabDueOn(r, day, tz);
+      const doneToday = r.times.some((at) => at >= day && at < addDays(day, 1, tz));
+      if (due && !doneToday)
+        add(
+          "rehab",
+          atTime(day, time, tz),
+          say(lang, "rmd.rehab", { name: r.name }),
+          r.perWeek !== undefined ? say(lang, "rmd.rehabWeek", { done, want: r.perWeek }) : say(lang, "rmd.rehabBody"),
+        );
+    }
+
     // Missed: once per lapse, the day after the first missed training day (by email, the second), and
     // only if today isn't a training day itself (its reminder already says it). Longer lapses get the
     // comebacks below, not a nudge after every missed day.
@@ -396,10 +431,10 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       if (offer) add("pro", atTime(day, "12:00", tz), say(lang, offer), say(lang, `${offer}.body`), "settings");
     }
 
-    // One a day: the reminder (the lifter asked for it) wins, then the trial ending, recaps, streak, missed, Pro.
-    const order: MessageKind[] = ["reminder", "trial", "recap", "streak", "missed", "pro"];
+    // One a day: the reminder (the lifter asked for it) wins, then the physio's rehab, then the trial ending, recaps, streak, missed, Pro.
+    const order: MessageKind[] = ["reminder", "rehab", "trial", "recap", "streak", "missed", "pro"];
     const best = candidates.sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind))[0];
-    if (best && (best.kind === "reminder" || !inQuiet(best.at, tz))) out.push(best);
+    if (best && (best.kind === "reminder" || best.kind === "rehab" || !inQuiet(best.at, tz))) out.push(best);
   }
   return out.sort((a, b) => a.at - b.at);
 }

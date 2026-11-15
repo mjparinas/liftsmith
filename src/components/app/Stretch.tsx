@@ -804,6 +804,7 @@ export function TodayParts() {
   const rehabWhy = () => {
     const r = offer!.rehab!;
     const name = r.routine.name;
+    if (r.due.want !== undefined) return t("str.part.rehabWhyWeek", { name, done: r.due.week, want: r.due.want });
     if (r.due.days === undefined) return t("str.part.rehabWhyNew", { name });
     if (r.due.days === 0) return t("str.part.rehabWhyToday", { name });
     return t("str.part.rehabWhyDays", { name, count: r.due.days });

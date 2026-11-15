@@ -103,6 +103,11 @@ export const es: FeaturesText = {
       name: "Modo lesión",
       body: "Dile qué te duele y deja fuera lo que lo agravaría, te avisa de los ejercicios de riesgo y sigue un nivel de dolor de 0 a 10 a lo largo del tiempo.",
     },
+    "rehab-done": {
+      name: "Rehabilitación de tu fisioterapeuta, hecha",
+      body: "Un programa de tu fisioterapeuta espera en Hoy para guardarlo con un toque y registra la lesión para la que es. Sigue las veces por semana que pidió, aparece en los días de descanso y pregunta por el dolor solo de esa lesión.",
+      note: "Los recordatorios de rehabilitación y el aviso de programa nuevo son para Android y iPhone.",
+    },
     cycle: { name: "Preparación según el ciclo", body: "Si quieres, registra tu ciclo y la decisión de hoy lo tiene en cuenta." },
     "goal-planner": {
       name: "Planificador de metas",
@@ -233,7 +238,12 @@ export const es: FeaturesText = {
     },
     food: {
       name: "Notas del entrenador desde tu app de comida",
-      body: "Las calorías y proteínas que registras en una app de comida llegan a Liftsmith a través de la app de salud del teléfono y se convierten en notas como «te falta proteína tres días seguidos». La app no registra comida.",
+      body: "Las calorías, proteínas, carbohidratos y grasas que registras en una app de comida llegan a Liftsmith a través de la app de salud del teléfono y se convierten en notas como «te falta proteína tres días seguidos», según un único conjunto de objetivos para tu meta. Registrar solo la proteína también cuenta. La app no registra comida.",
+    },
+    "measured-maintenance": {
+      name: "Mantenimiento medido con lo que comes",
+      body: "Dos semanas de comida y pesajes miden tus calorías diarias reales, que luego usan Macros, el GET y tus notas de comida. Una tarjeta de Comida en Cuerpo muestra tu semana frente a tus objetivos.",
+      note: "Los menores de 18 solo reciben consejos de proteína: sin objetivo de perder grasa ni notas de calorías.",
     },
     "your-stats": {
       name: "Tus datos personales",
@@ -348,7 +358,7 @@ export const es: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Objetivos de nutrición para clientes",
-      body: "Fija las calorías y la proteína diarias de cada cliente. Sus notas del entrenador comparan su semana de comida con ellas, y ves cómo come cuando lo comparte.",
+      body: "Fija las calorías, proteína, carbohidratos y grasa diarios de cada cliente, con otras calorías para los días de descanso si quieres, rellenados con sus propios datos en un toque. Sus notas del entrenador comparan su semana de comida con ellos, y ves cómo come cuando lo comparte.",
     },
     "school-teams": {
       name: "Gratis para equipos de secundaria",
@@ -379,6 +389,10 @@ export const es: FeaturesText = {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",
       proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
+    "trainer-directory": {
+      name: "En el directorio de entrenadores",
+      body: "Apúntate como entrenador personal, coach o fisioterapeuta en tu gimnasio y aparecerás en la página del gimnasio y en el directorio de entrenadores de su ciudad en la web, con tu presentación y un enlace para que nuevos clientes entrenen contigo. Solo aparecen adultos.",
     },
     "coach-plans": {
       name: "Planes de entrenador que crecen con tu lista de clientes",
@@ -447,6 +461,10 @@ export const es: FeaturesText = {
     importExtras: {
       name: "Rutinas y datos corporales de otra app",
       body: "Una importación convierte en rutinas los entrenamientos que repetiste con el mismo nombre y trae peso, grasa corporal y medidas desde Hevy, FitNotes o una app de báscula.",
+    },
+    "strength-standards": {
+      name: "Estándares de fuerza de levantadores reales",
+      body: "La web muestra cuánto levantan de verdad en sentadilla, press de banca, peso muerto y press militar, por sexo y peso corporal, calculado cada día con quienes cuentan. Solo se muestran grupos de 30 o más, en percentiles, nunca los números de nadie. Un interruptor en Ajustes › Tus datos y privacidad decide si cuentas; los menores de 18 nunca cuentan.",
     },
     languages: {
       name: "Seis idiomas",

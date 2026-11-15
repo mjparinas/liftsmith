@@ -21,7 +21,7 @@ import { AREA_PINS, areaMapPath } from "./gymMedia";
 import type { City, Place } from "./gymPlaces";
 import { esc, framePage, icon } from "./siteFrame";
 
-type GpKey = keyof typeof gp.en;
+export type GpKey = keyof typeof gp.en;
 const GP: Record<MsgLang, Partial<Record<GpKey, unknown>>> = { en: gp.en, es: gp.es, fr: gp.fr, de: gp.de, it: gp.it, ja: gp.ja };
 const EQ: Record<MsgLang, Partial<Record<string, unknown>>> = {
   en: equipment.en,
@@ -75,7 +75,7 @@ export function pageLang(req: Request): MsgLang {
   return MSG_LANGS[0];
 }
 
-const metaTags = (title: string, desc: string, path: string, ld: unknown, index = true) => {
+export const metaTags = (title: string, desc: string, path: string, ld: unknown, index = true) => {
   const url = `${SITE_URL}${path}`;
   return `<meta name="description" content="${esc(desc)}"><link rel="canonical" href="${esc(url)}">${index ? "" : '<meta name="robots" content="noindex">'}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Liftsmith"><meta property="og:title" content="${esc(title)}">
@@ -85,7 +85,7 @@ const metaTags = (title: string, desc: string, path: string, ld: unknown, index 
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>`;
 };
 
-const crumbs = (lang: MsgLang, items: [string, string | null][]) =>
+export const crumbs = (lang: MsgLang, items: [string, string | null][]) =>
   `<nav class="crumbs" aria-label="Breadcrumb"><ol>${items
     .map(
       ([label, href]) => `<li>${href ? `<a href="${esc(href)}">${esc(label)}</a>` : `<span aria-current="page">${esc(label)}</span>`}</li>`,
@@ -289,7 +289,8 @@ function listItem(p: Place, lang: MsgLang, pin?: number): string {
 
 // --- A city ---
 
-export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): string {
+/** `trainers`: people listed at the city's gyms (trainerDirectory.ts); with any, the page links to the directory. */
+export function cityHtml(citySlug: string, places: Place[], lang: MsgLang, trainers = 0): string {
   const first = places[0]!;
   const city = cityName(first);
   const gyms = places.filter((p) => p.kind === "gym");
@@ -319,7 +320,9 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): stri
     [city, null],
   ])}
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.cityTitle", { city }))}</h1><p class="muted">${esc(desc)}</p></header>
-${figure}${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${missing(lang)}${credit}</main>`;
+${figure}${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${
+    trainers ? `<p><a class="quiet" href="/trainers/${esc(citySlug)}/">${esc(say(lang, "gp.dirLink", { city }))} ›</a></p>` : ""
+  }${missing(lang)}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, gyms.length > 0), body, GYM_STYLE, "gym");
 }
 
@@ -363,7 +366,7 @@ export function gymSitemapXml(entries: { path: string; lastModified: number }[])
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`;
 }
 
-const GYM_STYLE = `
+export const GYM_STYLE = `
 .gym-logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
 .map{margin:12px 0 0}.map.area{margin:0 0 16px}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
 .photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;list-style:none;margin:0;padding:0}.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}

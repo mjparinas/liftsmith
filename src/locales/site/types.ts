@@ -29,11 +29,14 @@ export interface SiteText {
       whoFor: string;
       /** The gym finder's pages (/gyms/). */
       gyms: string;
+      /** The trainer, coach and physio directory (/trainers/). */
+      trainers: string;
       coaches: string;
       pricing: string;
       whatsNew: string;
       exercises: string;
       muscles: string;
+      programs: string;
       equipment: string;
       guides: string;
       blog: string;

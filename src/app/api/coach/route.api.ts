@@ -4,7 +4,7 @@
 // code), "unlink" (either side ends it, with `id`), "assign" (a coach gives a client a routine: `client`, `name`,
 // `code`), "unassign" (with the plan's `id`), "setup" (what the coach's new clients start setup with: `setup`) and
 // "note" (the coach's note to a client: `client`, `text`; empty text clears it), "send" (a chat message to the other
-// side: `id`, `text`), "targets" (a coach's daily calories and protein for a client: `client`, `kcal`, `protein`;
+// side: `id`, `text`), "targets" (a coach's daily calories, protein, carbs and fat for a client: `client`, `kcal`, `protein`, `carbs`, `fat`, `kcalRest`;
 // both empty clears them), "share" (a client shares body data, or with `what` one of SHARE_KINDS (heart rate, notes, readiness, pain, cycle), with a coach or
 // stops: `id`, `on`), "alerts" (a coach's alerts on or off: `on`), "role" (personal trainer, coach or physio: `role`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
 // Booking (coachBooking.ts): "slots" (open times: `slot` with start, minutes, place, weeks and maybe client),
@@ -128,6 +128,9 @@ export async function POST(req: Request) {
         kind?: unknown;
         perWeek?: unknown;
         kcal?: unknown;
+        carbs?: unknown;
+        fat?: unknown;
+        kcalRest?: unknown;
         protein?: unknown;
         form?: unknown;
         answers?: unknown;
@@ -166,7 +169,13 @@ export async function POST(req: Request) {
       return reply(req, 200, { note: r });
     }
     case "targets": {
-      const r = await setTargets(s.accountId, body.client, body.kcal, body.protein);
+      const r = await setTargets(s.accountId, body.client, {
+        kcal: body.kcal,
+        protein: body.protein,
+        carbs: body.carbs,
+        fat: body.fat,
+        kcalRest: body.kcalRest,
+      });
       if (r && "error" in r) return reply(req, 404, r);
       return reply(req, 200, { targets: r });
     }

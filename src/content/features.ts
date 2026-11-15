@@ -133,6 +133,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "rehab-done",
+        name: "Rehab from your physio, done",
+        body: "A program from your physio waits on Today to be saved in one tap and logs the injury it's for. It follows the times a week they asked for, shows on rest days and asks about pain for that injury only.",
+        tier: "free",
+        note: "Rehab reminders and the new-program notification are on Android and iPhone.",
+        added: "2026-11-15",
+      },
+      {
         id: "cycle",
         name: "Cycle-aware readiness",
         body: "Optionally log your cycle and today's call takes it into account.",
@@ -412,10 +420,19 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "food",
         name: "Coach's notes from your food app",
-        body: 'Calories and protein logged in a food app reach Liftsmith through your phone\'s health app and become notes like "protein short three days running". No food logging in the app.',
+        body: 'Calories, protein, carbs and fat logged in a food app reach Liftsmith through your phone\'s health app and become notes like "protein short three days running", judged against one set of targets for your goal. Protein-only logging counts. No food logging in the app.',
         tier: "free",
         where: "phones",
         added: "2026-11-11",
+      },
+      {
+        id: "measured-maintenance",
+        name: "Maintenance measured from what you eat",
+        body: "Two weeks of food and weigh-ins measure your real daily calories, which then drive Macros, TDEE and your food notes. A Food card on Body shows your week against your targets.",
+        tier: "free",
+        where: "phones",
+        note: "Under 18s get protein advice only: no fat-loss goal and no calorie notes.",
+        added: "2026-11-15",
       },
       {
         id: "your-stats",
@@ -654,7 +671,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-nutrition",
         name: "Nutrition targets for clients",
-        body: "Set each client's daily calories and protein. Their coach's notes check their food week against them, and you see how they're eating when they share it.",
+        body: "Set each client's daily calories, protein, carbs and fat, with a rest-day calorie number if you like, filled in from their own numbers in one tap. Their coach's notes check their food week against them, and you see how they're eating when they share it.",
         tier: "pro",
         pro: "coaching",
         added: "2026-11-13",
@@ -715,6 +732,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         proPart: "Being a client is free; coaching clients is Pro.",
         pro: "coaching",
         added: "2026-11-13",
+      },
+      {
+        id: "trainer-directory",
+        name: "Listed in the trainer directory",
+        body: "List yourself as a trainer, coach or physio at your gym and you show on that gym's page and in the trainer directory for its city on the website, with your bio and a link for new clients to start training with you. Only adults are listed.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-15",
       },
       {
         id: "coach-plans",
@@ -859,6 +884,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "An import turns workouts you repeated by name into routines, and brings body weight, body fat and tape measurements from Hevy, FitNotes or a scale app.",
         tier: "free",
         added: "2026-11-13",
+      },
+      {
+        id: "strength-standards",
+        name: "Strength standards from real lifters",
+        body: "The website shows how much lifters really squat, bench, deadlift and press, by sex and body weight, built each day from lifters who count. Only groups of 30 or more are shown, as percentiles, never anyone's own numbers. One switch in Settings › Your data and privacy decides whether you count; under-18s never do.",
+        tier: "free",
+        added: "2026-11-15",
       },
     ],
   },

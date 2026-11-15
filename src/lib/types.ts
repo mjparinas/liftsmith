@@ -265,6 +265,12 @@ export interface Profile {
    */
   birthYear?: number;
   sex?: "male" | "female";
+  /**
+   * Whether this lifter's best big lifts count in the public strength standards (src/server/standards.ts), only inside
+   * groups of 30 or more. Missing: counted outside the EU, EEA, UK and Switzerland (by where the account syncs from),
+   * not inside them. Under-18s never count. Settings › Your data and privacy › Strength standards.
+   */
+  standards?: boolean;
   /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
   /** Under 18 only: body fat and the shaped figure turned on in Body › Health (teen.ts). Off by default. */
@@ -292,14 +298,17 @@ export interface Profile {
    */
   messages?: {
     push: Partial<
-      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab", boolean>
     >;
     email?: {
       address: string;
       consentAt: number;
       status: "pending" | "confirmed" | "unsubscribed";
       kinds: Partial<
-        Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+        Record<
+          "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab",
+          boolean
+        >
       >;
     };
     /** When reminders were first set up: comebacks count from here until there's a workout. */
@@ -419,6 +428,14 @@ export interface Routine {
    * exercise as written instead of skipping or lightening it, and asks about pain between sets.
    */
   rehab?: boolean;
+  /**
+   * Rehab: the injury area the program is for (2026-11-15). Saving it logs that injury when none is active, its pain
+   * check asks about that injury only, and Today offers it while that injury is active. Missing on older programs:
+   * every active injury counts, as before.
+   */
+  rehabPart?: BodyPart;
+  /** Rehab: how many times a week the physio asked for (1 to 7). Missing: about every other day, as before. */
+  perWeek?: number;
   /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.
@@ -688,7 +705,7 @@ export interface FitTestEvent extends EventBase {
 }
 
 /** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
-export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing" | "kcalIn" | "protein";
+export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing" | "kcalIn" | "protein" | "carbs" | "fat";
 
 /**
  * One day's reading of a health measure from Health Connect or Apple Health (the health twin, twin.ts):

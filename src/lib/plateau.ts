@@ -32,7 +32,7 @@ export interface PlateauFix {
 }
 
 export interface Cause {
-  kind: "missed" | "volume" | "rest" | "hard" | "readiness" | "sameReps" | "none";
+  kind: "missed" | "volume" | "rest" | "hard" | "readiness" | "food" | "sameReps" | "none";
   /** What we saw, with the numbers. */
   text: string;
   fix: FixKind;
@@ -75,7 +75,19 @@ function series(events: readonly AppEvent[], exerciseId: string): { at: number; 
     .reverse();
 }
 
-export function findPlateaus(events: readonly AppEvent[], profile: Profile, now: number, fixes: readonly PlateauFix[] = []): Plateau[] {
+/** Eating well under maintenance over the last week (insights.ts, from a food app): calories a day under, and logged days. */
+export interface Eating {
+  gap: number;
+  days: number;
+}
+
+export function findPlateaus(
+  events: readonly AppEvent[],
+  profile: Profile,
+  now: number,
+  fixes: readonly PlateauFix[] = [],
+  eating: Eating | null = null,
+): Plateau[] {
   const out: Plateau[] = [];
   const ids = new Set(events.filter((e): e is SetEvent => e.type === "set").map((e) => e.exerciseId));
   for (const id of ids) {
@@ -96,7 +108,7 @@ export function findPlateaus(events: readonly AppEvent[], profile: Profile, now:
     if (blockWeek(profile, now).deload) continue;
     const since = s.filter((x) => x.at > bestAt);
     if (since.length < 2) continue;
-    const causes = diagnose(events, profile, id, since, bestAt, now);
+    const causes = diagnose(events, profile, id, since, bestAt, now, eating);
     out.push({ exerciseId: id, weeks: Math.floor((now - bestAt) / WEEK), best, bestAt, causes, fix: causes[0]!.fix });
   }
   return out.sort((a, b) => b.weeks - a.weeks);
@@ -109,6 +121,7 @@ function diagnose(
   since: { at: number; sets: SetEvent[] }[],
   from: number,
   now: number,
+  eating: Eating | null = null,
 ): Cause[] {
   const ex = exercise(id);
   const sets = since.flatMap((x) => x.sets);
@@ -157,6 +170,16 @@ function diagnose(
     const avg = reads.reduce((a, b) => a + b, 0) / reads.length;
     if (avg < 42) causes.push({ kind: "readiness", fix: "reset", weight: 1, text: t("cause.readiness", { avg: Math.round(avg) }) });
   }
+
+  // Eating well under maintenance (2026-11-15): strength rarely climbs in a deficit, so a small step back that
+  // rebuilds with the reps is the fair fix, and the note says holding strength on a cut is a win.
+  if (eating && eating.gap >= 300)
+    causes.push({
+      kind: "food",
+      fix: "reset",
+      weight: 1.3 + Math.min(1, eating.gap / 1000),
+      text: t("cause.food", { gap: `${Math.round(eating.gap / 10) * 10} kcal`, count: eating.days }),
+    });
 
   const ranges = new Set(sets.map((s) => s.targetReps));
   const [lo, hi] = repRange(ex, profile.goal);

@@ -104,6 +104,11 @@ export const it: FeaturesText = {
       name: "Modalità infortunio",
       body: "Dille cosa fa male: lascia fuori ciò che lo peggiorerebbe, ti avvisa degli esercizi a rischio e segue un livello di dolore da 0 a 10 nel tempo.",
     },
+    "rehab-done": {
+      name: "La riabilitazione del fisioterapista, fatta",
+      body: "Un programma del tuo fisioterapista ti aspetta in Oggi: lo salvi con un tocco e registra l’infortunio per cui è pensato. Segue le volte a settimana richieste, compare nei giorni di riposo e chiede del dolore solo per quell’infortunio.",
+      note: "I promemoria di riabilitazione e la notifica di un nuovo programma sono su Android e iPhone.",
+    },
     cycle: { name: "Prontezza secondo il ciclo", body: "Se vuoi, registra il tuo ciclo e la scelta di oggi ne tiene conto." },
     "goal-planner": {
       name: "Pianificatore di obiettivi",
@@ -234,7 +239,12 @@ export const it: FeaturesText = {
     },
     food: {
       name: "Note del coach dalla tua app di alimentazione",
-      body: "Calorie e proteine registrate in un’app di alimentazione arrivano a Liftsmith tramite l’app di salute del telefono e diventano note come «poche proteine tre giorni di fila». L’app non registra il cibo.",
+      body: "Calorie, proteine, carboidrati e grassi registrati in un’app di alimentazione arrivano a Liftsmith tramite l’app di salute del telefono e diventano note come «poche proteine tre giorni di fila», giudicate su un unico insieme di obiettivi per il tuo traguardo. Conta anche registrare solo le proteine. L’app non registra il cibo.",
+    },
+    "measured-maintenance": {
+      name: "Mantenimento misurato su quello che mangi",
+      body: "Due settimane di pasti e pesate misurano le tue vere calorie giornaliere, che poi usano Macro, il TDEE e le tue note sull’alimentazione. Una scheda Alimentazione in Corpo mostra la tua settimana rispetto ai tuoi obiettivi.",
+      note: "Sotto i 18 anni solo consigli sulle proteine: nessun obiettivo di perdita di grasso e nessuna nota sulle calorie.",
     },
     "your-stats": {
       name: "I tuoi dati",
@@ -346,7 +356,7 @@ export const it: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Obiettivi nutrizionali per i clienti",
-      body: "Fissa calorie e proteine giornaliere per ogni cliente. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",
+      body: "Fissa calorie, proteine, carboidrati e grassi giornalieri di ogni cliente, con calorie diverse nei giorni di riposo se vuoi, compilati con i suoi dati in un tocco. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",
     },
     "school-teams": {
       name: "Gratis per le squadre delle superiori",
@@ -377,6 +387,10 @@ export const it: FeaturesText = {
       name: "Una pagina per ogni lato",
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",
       proPart: "Essere cliente è gratis; allenare clienti è Pro.",
+    },
+    "trainer-directory": {
+      name: "Nella directory dei trainer",
+      body: "Registrati come personal trainer, coach o fisioterapista nella tua palestra e compari nella pagina della palestra e nella directory dei trainer della sua città sul sito, con la tua presentazione e un link perché i nuovi clienti si allenino con te. Compaiono solo adulti.",
     },
     "coach-plans": {
       name: "Piani da coach che crescono con i tuoi clienti",
@@ -445,6 +459,10 @@ export const it: FeaturesText = {
     importExtras: {
       name: "Routine e misure corporee da un’altra app",
       body: "Un’importazione trasforma in routine gli allenamenti ripetuti con lo stesso nome e porta peso, grasso corporeo e misure da Hevy, FitNotes o un’app della bilancia.",
+    },
+    "strength-standards": {
+      name: "Standard di forza da atleti veri",
+      body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
     },
     languages: {
       name: "Sei lingue",

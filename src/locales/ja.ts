@@ -47,6 +47,7 @@ import * as fb from "./text/fb";
 import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
+import * as food from "./text/food";
 import * as friends from "./text/friends";
 import * as ft from "./text/ft";
 import * as game from "./text/game";
@@ -180,6 +181,7 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...fit.ja,
   ...fix.ja,
   ...fmt.ja,
+  ...food.ja,
   ...ft.ja,
   ...friends.ja,
   ...game.ja,
