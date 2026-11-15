@@ -75,7 +75,7 @@ export function pageLang(req: Request): MsgLang {
   return MSG_LANGS[0];
 }
 
-const metaTags = (title: string, desc: string, path: string, ld: unknown, index = true) => {
+export const metaTags = (title: string, desc: string, path: string, ld: unknown, index = true) => {
   const url = `${SITE_URL}${path}`;
   return `<meta name="description" content="${esc(desc)}"><link rel="canonical" href="${esc(url)}">${index ? "" : '<meta name="robots" content="noindex">'}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Liftsmith"><meta property="og:title" content="${esc(title)}">
@@ -85,7 +85,7 @@ const metaTags = (title: string, desc: string, path: string, ld: unknown, index 
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>`;
 };
 
-const crumbs = (lang: MsgLang, items: [string, string | null][]) =>
+export const crumbs = (lang: MsgLang, items: [string, string | null][]) =>
   `<nav class="crumbs" aria-label="Breadcrumb"><ol>${items
     .map(
       ([label, href]) => `<li>${href ? `<a href="${esc(href)}">${esc(label)}</a>` : `<span aria-current="page">${esc(label)}</span>`}</li>`,
@@ -363,7 +363,7 @@ export function gymSitemapXml(entries: { path: string; lastModified: number }[])
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`;
 }
 
-const GYM_STYLE = `
+export const GYM_STYLE = `
 .gym-logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
 .map{margin:12px 0 0}.map.area{margin:0 0 16px}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
 .photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;list-style:none;margin:0;padding:0}.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}

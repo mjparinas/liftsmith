@@ -8,7 +8,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
-import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
+import { analyticsOn, askFirstHere, installId, setAnalytics } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
@@ -25,6 +25,7 @@ import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
+import { isTeen } from "@/lib/teen";
 import { useCoachNotes } from "@/lib/trainer";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtBodyweight } from "@/lib/units";
@@ -565,7 +566,7 @@ function BodyGroup() {
 
 /** Your data and privacy: saving and backup, the sets CSV, importing, usage stats, and erasing this device. */
 function DataGroup() {
-  const { profile, reset, events } = useApp();
+  const { profile, reset, events, setProfile } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
   return (
@@ -603,6 +604,23 @@ function DataGroup() {
           }
         />
       </Section>
+      {!isTeen(profile) && (
+        <Section title={t("settings.standards")}>
+          <SwitchRow
+            label={t("settings.standards.on")}
+            on={profile.standards ?? !askFirstHere()}
+            onChange={(v) => setProfile({ standards: v })}
+            hint={
+              <>
+                {t("settings.standards.note")}{" "}
+                <a className="underline" href={`${SITE_URL}/strength-standards/`} target="_blank" rel="noreferrer">
+                  {t("settings.standards")}
+                </a>
+              </>
+            }
+          />
+        </Section>
+      )}
       <Section title={t("settings.erase")}>
         {confirm ? (
           <div className="space-y-2">

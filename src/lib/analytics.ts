@@ -71,6 +71,9 @@ const zone = () => {
   }
 };
 
+/** Whether this device is somewhere a data choice needs an explicit yes (usage stats, strength standards). */
+export const askFirstHere = () => needsOptIn(zone());
+
 /** Whether usage stats are on: the lifter's own choice, or the default for where they are. */
 export function analyticsOn(): boolean {
   const v = get(CONSENT_KEY);

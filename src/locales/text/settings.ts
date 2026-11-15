@@ -39,6 +39,10 @@ export const en = {
   "settings.stats.note":
     "Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data.",
   "settings.privacy": "Privacy",
+  "settings.standards": "Strength standards",
+  "settings.standards.on": "Count my lifts",
+  "settings.standards.note":
+    "Your best squat, bench, deadlift and overhead press help make the strength standards on our website, only inside groups of 30 or more lifters of your sex and body weight. Never your name or any one lift.",
   "settings.installId": "Install id {id}",
   "settings.build": "Version {version} · build {commit}",
   "settings.trainingBlock": "Training block",
@@ -120,6 +124,10 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.stats.note":
     "Pantallas y funciones usadas, modelo del dispositivo, versión de la app y cómo nos encontraste, con un identificador de instalación aleatorio. Nunca tus pesos, tus entrenamientos ni tus datos de salud.",
   "settings.privacy": "Privacidad",
+  "settings.standards": "Estándares de fuerza",
+  "settings.standards.on": "Contar mis levantamientos",
+  "settings.standards.note":
+    "Tu mejor sentadilla, press de banca, peso muerto y press militar ayudan a crear los estándares de fuerza de nuestra web, solo dentro de grupos de 30 o más personas de tu sexo y peso. Nunca tu nombre ni un levantamiento suelto.",
   "settings.installId": "Id. de instalación {id}",
   "settings.build": "Versión {version} · compilación {commit}",
   "settings.trainingBlock": "Bloque de entrenamiento",
@@ -204,6 +212,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.stats.note":
     "Écrans et fonctions utilisés, modèle de l’appareil, version de l’app et comment vous nous avez trouvés, sous un identifiant d’installation aléatoire. Jamais vos charges, vos séances ni vos données de santé.",
   "settings.privacy": "Confidentialité",
+  "settings.standards": "Standards de force",
+  "settings.standards.on": "Compter mes levées",
+  "settings.standards.note":
+    "Vos meilleurs squat, développé couché, soulevé de terre et développé militaire aident à établir les standards de force de notre site, seulement dans des groupes de 30 pratiquants ou plus de votre sexe et de votre poids. Jamais votre nom ni une levée seule.",
   "settings.installId": "Id. d’installation {id}",
   "settings.build": "Version {version} · build {commit}",
   "settings.trainingBlock": "Bloc d’entraînement",
@@ -288,6 +300,10 @@ export const de: Partial<Record<Key, Message>> = {
   "settings.stats.note":
     "Genutzte Bildschirme und Funktionen, Gerätemodell, App-Version und wie du uns gefunden hast, unter einer zufälligen Installations-ID. Nie deine Gewichte, Trainingsdetails oder Gesundheitsdaten.",
   "settings.privacy": "Datenschutz",
+  "settings.standards": "Kraftstandards",
+  "settings.standards.on": "Meine Lifts zählen",
+  "settings.standards.note":
+    "Deine beste Kniebeuge, dein bestes Bankdrücken, Kreuzheben und Schulterdrücken fließen in die Kraftstandards auf unserer Website ein, nur in Gruppen von 30 oder mehr Personen deines Geschlechts und Körpergewichts. Nie dein Name oder ein einzelner Lift.",
   "settings.installId": "Installations-ID {id}",
   "settings.build": "Version {version} · Build {commit}",
   "settings.trainingBlock": "Trainingsblock",
@@ -369,6 +385,10 @@ export const it: Partial<Record<Key, Message>> = {
   "settings.stats.note":
     "Schermate e funzioni usate, modello del dispositivo, versione dell’app e come ci hai trovato, con un ID di installazione casuale. Mai i tuoi pesi, i dettagli degli allenamenti o i dati sulla salute.",
   "settings.privacy": "Privacy",
+  "settings.standards": "Standard di forza",
+  "settings.standards.on": "Conta le mie alzate",
+  "settings.standards.note":
+    "Il tuo miglior squat, panca, stacco e lento avanti aiutano a creare gli standard di forza del nostro sito, solo dentro gruppi di 30 o più persone del tuo sesso e peso. Mai il tuo nome né una singola alzata.",
   "settings.installId": "ID di installazione {id}",
   "settings.build": "Versione {version} · build {commit}",
   "settings.trainingBlock": "Blocco di allenamento",
@@ -452,6 +472,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "settings.stats.note":
     "使った画面と機能、端末のモデル、アプリのバージョン、Liftsmith を知ったきっかけを、ランダムなインストール ID で送ります。重量、ワークアウトの詳細、健康データは送りません。",
   "settings.privacy": "プライバシー",
+  "settings.standards": "筋力スタンダード",
+  "settings.standards.on": "自分の記録を含める",
+  "settings.standards.note":
+    "スクワット、ベンチプレス、デッドリフト、オーバーヘッドプレスのベスト記録が、ウェブサイトの筋力スタンダードに使われます。同じ性別と体重の30人以上のグループの中でだけ使い、名前や個々の記録は出しません。",
   "settings.installId": "インストール ID {id}",
   "settings.build": "バージョン {version} · ビルド {commit}",
   "settings.trainingBlock": "トレーニングブロック",
