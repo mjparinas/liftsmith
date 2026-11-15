@@ -15,6 +15,7 @@ import { alternatives } from "./generator";
 import { SITE_URL } from "./site";
 import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
+import { vsPairs, vsPath } from "./versus";
 import { WHATS_NEW } from "./whatsNew";
 
 /** frontDelts → front-delts. */
@@ -313,6 +314,11 @@ export function siteRoutes(): Route[] {
     }
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
     if (indexAlternatives(e.id)) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
+  }
+  // Exercise comparisons (src/lib/versus.ts): the index and every pair, each in all six languages.
+  for (const path of ["/exercises/vs/", ...vsPairs().map(vsPath)]) {
+    const languages = languageAlternates(path);
+    for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/exercises/vs/" ? 0.6 : 0.5, languages });
   }
   for (const m of MUSCLES) if (exercisesFor(m).length) r.push({ path: `/muscles/${muscleSlug(m)}/`, priority: 0.7 });
   for (const p of pairs()) r.push({ path: `/muscles/${muscleSlug(p.muscle)}/${equipmentSlug(p.equipment)}/`, priority: 0.6 });

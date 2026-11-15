@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { rich } from "@/components/site/ArticleView";
 import { ExerciseDemo } from "@/components/site/ExerciseDemo";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { VsLinks } from "@/components/site/VsView";
 import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { BRAND } from "@/lib/brand";
 import { exerciseMeta } from "@/lib/exerciseMeta";
@@ -269,6 +270,7 @@ export default async function ExercisePage({ params }: Props) {
           />
         </section>
       )}
+      <VsLinks lang="en" id={e.id} />
       {alts.length > 0 && (
         <section className="mt-10">
           <h2 className="text-2xl font-bold tracking-tight">Alternatives</h2>
