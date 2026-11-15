@@ -32,6 +32,7 @@ export const it: SiteText = {
       whatsNew: "Novità",
       exercises: "Libreria di esercizi",
       muscles: "Esercizi per muscolo",
+      programs: "Programmi di allenamento",
       equipment: "Esercizi per attrezzatura",
       guides: "Guide all’allenamento",
       blog: "Blog",

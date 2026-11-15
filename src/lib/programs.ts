@@ -1297,6 +1297,21 @@ export function weeklyPreview(id: ProgramId, ctx: Ctx): Record<Muscle, number> {
   return out;
 }
 
+/**
+ * Every workout of a fixed program as a new lifter starts it, in the order they rotate (the public program pages,
+ * docs/decisions/public-pages-and-seo.md "Program pages"). Null for a split, whose days the adaptive engine plans.
+ */
+export function programDays(id: ProgramId, ctx: Ctx): { name: string; items: PlanItem[] }[] | null {
+  const engine = ENGINES[id];
+  if (!engine) return null;
+  const src = pickProgram(id, ctx) as Extract<PlanSource, { kind: "program" }>;
+  const s = programState(src, { ...ctx, events: [] });
+  return Array.from({ length: engine.days }, (_, day) => {
+    const d = engine.build(s, day, (k) => s.lifts[k]!, ctx);
+    return { name: d.name, items: toItems(d, ctx.gym) };
+  });
+}
+
 /** The kit a program's main lifts need that this gym doesn't have. */
 export function missingFor(id: ProgramId, gym: Gym): Equipment[] {
   const info = PROGRAM_BY_ID.get(id);

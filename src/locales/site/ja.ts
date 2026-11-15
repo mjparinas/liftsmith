@@ -33,6 +33,7 @@ export const ja: SiteText = {
       whatsNew: "最新情報",
       exercises: "種目ライブラリ",
       muscles: "部位別の種目",
+      programs: "トレーニングプログラム",
       equipment: "器具別の種目",
       guides: "トレーニングガイド",
       blog: "ブログ",

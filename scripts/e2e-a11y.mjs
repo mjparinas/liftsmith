@@ -218,6 +218,8 @@ try {
     "/ja/exercises/vs/back-squat-vs-front-squat/",
     "/muscles/chest/",
     "/de/muscles/biceps/",
+    "/programs/classic-5x5/",
+    "/it/programs/ppl/",
     "/muscles/chest/dumbbells/",
     "/equipment/barbell/",
     "/guides/reps-in-reserve/",

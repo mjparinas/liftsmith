@@ -31,6 +31,7 @@ export const es: SiteText = {
       whatsNew: "Novedades",
       exercises: "Biblioteca de ejercicios",
       muscles: "Ejercicios por músculo",
+      programs: "Programas de entrenamiento",
       equipment: "Ejercicios por equipo",
       guides: "Guías de entrenamiento",
       blog: "Blog",
