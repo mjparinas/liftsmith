@@ -649,6 +649,21 @@ const SCHEMA = [
     created_at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS gym_staff_invites_place ON gym_staff_invites (place_id)`,
+  // Problems lifters and visitors report with a real gym's page (gymPlaceReports.ts, docs/decisions/gyms.md
+  // "Reporting a gym page"): wrong details, closed, listed twice, not a gym. `who` is the account or a one-way address key.
+  `CREATE TABLE IF NOT EXISTS gym_place_reports (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    who TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    decided_at INTEGER NOT NULL DEFAULT 0,
+    decided_by TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_place_reports_open ON gym_place_reports (status, place_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS gym_place_reports_once ON gym_place_reports (place_id, who) WHERE status = 'open'`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -1194,6 +1209,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "facebook", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "wheelchair", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "enriched_at", "INTEGER NOT NULL DEFAULT 0"],
+  // A duplicate staff merged into another gym: hidden, and its page and app link go to that gym (gymPlaceReports.ts).
+  ["gym_places", "merged_into", "TEXT NOT NULL DEFAULT ''"],
   // Each map server request of an import and how it went, so the next import tries the healthiest server first.
   ["gym_imports", "attempts", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').

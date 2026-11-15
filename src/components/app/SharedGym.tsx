@@ -15,6 +15,7 @@ import { fmtNum } from "@/lib/units";
 
 import { Icon } from "./icons";
 import { PlaceDetails } from "./PlaceDetails";
+import { PlaceReport } from "./PlaceReport";
 import { go } from "./router";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
@@ -172,6 +173,7 @@ export function SharedGym({ code }: { code?: string }) {
               </Button>
             )
           ))}
+        {place && !mine && <PlaceReport placeId={place.id} name={name} />}
         {listing &&
           (reported ? (
             <p className="text-center text-sm text-muted" role="status">

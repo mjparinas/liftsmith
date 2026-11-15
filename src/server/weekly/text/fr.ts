@@ -492,6 +492,7 @@ export const emails: Record<string, Words> = {
       "Tarifs à la journée, à la semaine et abonnement.",
       "Annonces de la salle : horaires des fêtes, nouveau matériel.",
       "Signalez un matériel en panne, et le plan de tout le monde le contourne jusqu'à sa réparation.",
+      "Une erreur sur la page d’une salle, ou elle a fermé ou apparaît deux fois ? Signalez-le depuis la page et notre équipe corrige.",
     ],
     dyk: "Les membres du club d'une salle officielle reçoivent une notification quand la salle publie des nouvelles.",
   },

@@ -261,6 +261,8 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
 <ul class="list">${others.map((x) => listItem(x, lang)).join("")}</ul><a class="quiet" href="${esc(cityPath(p.citySlug))}">${esc(say(lang, "gp.cityTitle", { city }))} ›</a></section>`
     : "";
+  // Anyone can say the page is wrong, closed, listed twice or not a gym (gymReportPage.ts, gymPlaceReports.ts).
+  const reportLink = `<p class="report-link"><a class="quiet" href="${esc(`${gymPath(p)}report/`)}" rel="nofollow">${icon("flag", 16)}${esc(say(lang, "gp.reportLink"))}</a></p>`;
   const credit = p.source === "osm" ? `<p class="credit">${esc(say(lang, "gp.osm"))}</p>` : "";
   const body = `<div class="strip"><div class="wrap row strip-row"><p>${esc(say(lang, "gp.strip"))}</p></div></div>
 <main id="main" class="wrap page">${crumbs(lang, [
@@ -268,7 +270,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${reportLink}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
 
@@ -407,4 +409,5 @@ export const GYM_STYLE = `
 .trainers a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}.prices{gap:4px;margin-bottom:12px;font-weight:600}
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}
 .db{margin-top:12px}.claim{border-style:dashed}
-.credit{margin-top:24px;font-size:.75rem;color:var(--faint)}`;
+.credit{margin-top:24px;font-size:.75rem;color:var(--faint)}
+.report-link{margin-top:16px}.report-link .quiet{gap:6px}`;

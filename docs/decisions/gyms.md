@@ -178,6 +178,16 @@ program"). Pure web code, so Android, iOS and the web app get both together; the
   saved copy is their own routine, so changing the gym's program later doesn't touch it.
 - One program per gym on purpose: the question a new member asks is "what do I do?", and one answer beats a menu.
 
+## Reporting a gym page (2026-11-15)
+
+Melvin, 2026-11-15: "how do i report an unclaimed gym, i don't see it here" (on an imported gym's page). Before this, only lifters' shared setups (Gym sharing), broken equipment (round 3) and Friends posts could be reported; a real gym's page could only be hidden or deleted by staff on Admin › Gyms.
+
+- **Every gym's page has "Report a problem with this page"**: on the website at the foot of the page, which opens `/gyms/<city>/<gym>/report/`, and in the app on the gym's page (`PlaceReport.tsx` in `SharedGym.tsx`, so Android, iOS and the web app get it together), except for the gym's own owner and staff, who edit the page instead. Reasons: the details are wrong, closed for good, listed twice, not a gym, something else (`PLACE_REPORT_REASONS` in `src/lib/gymPlaceReport.ts`), plus an optional note of up to 500 characters. Links are allowed in the note, since only staff read it and a duplicate's address helps. Text in `gp.*`, six languages.
+- **Signed in or not.** A report is kept against the account, or a one-way key of the address (`addressKey`), as other gym reports are. One open report per person per gym (a second replaces the first), at most 10 a day per person (`gym_place_reports`, `src/server/gymPlaceReports.ts`). Deleting an account keeps its reports but drops who sent them.
+- **The website's form has no scripts**, like the gym pages: a plain form that posts back to the same address, with a hidden box that bots fill in (dropped quietly). Its page is never indexed and has its own policy, the gym pages' with `form-action 'self'` (`REPORT_PAGE_CSP`; the other gym pages keep `form-action 'none'`).
+- **Reports never hide a page by themselves**, unlike shared setups (three hide one): a gym's page is a business's listing, and a rival could take it down. Staff decide on **Admin › Reports › Reported gym pages** (`GymPlaceReports.tsx`), and the reports count in To do. Actions: **Edit** (name, address, website, phone, opening hours, gym or studio; the page address stays the same, and the city is fixed on Admin › Gyms, which keeps the old address working), **Merge** (paste the page address of the gym to keep: the duplicate's lifters and shared setups move there, it's hidden with `gym_places.merged_into`, and its page answers 301 to the kept gym's while its app link opens the kept gym; a claimed gym can't be merged away), **Hide** and **Dismiss**. Every action is in the admin log.
+- Not built: telling a claimed gym's owner about reports on their page (staff handle them for now), and hiding after several reports.
+
 ## The admin Gyms tab (2026-11-15)
 
 Melvin, 2026-11-15, after pasting the tab: "yes do it all. and help improve address scraping". The tab had grown into one long page of explanations, a 90-country dropdown and a hundred import lines that each listed every map server's error.
