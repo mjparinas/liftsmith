@@ -14,6 +14,12 @@ const problems = [];
 
 /** Runs in the page: pairs of card-like boxes closer than 4 px, side by side or stacked. */
 function touching() {
+  // A box inside a fixed bar (the workout's Log set bar) floats over the page as it scrolls: how close it
+  // sits to a box on the page depends on the scroll position, not the layout, so only boxes in the same layer count.
+  const fixedLayer = (el) => {
+    for (let p = el.parentElement; p; p = p.parentElement) if (getComputedStyle(p).position === "fixed") return p;
+    return null;
+  };
   const cards = [];
   for (const el of document.querySelectorAll("body *")) {
     const s = getComputedStyle(el);
@@ -23,7 +29,7 @@ function touching() {
     if (parseFloat(s.borderTopLeftRadius) < 10) continue;
     const r = el.getBoundingClientRect();
     if (r.width < 80 || r.height < 36) continue;
-    cards.push({ el, r });
+    cards.push({ el, r, layer: fixedLayer(el) });
   }
   const name = (el) => {
     const t = (el.getAttribute("aria-label") || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 40);
@@ -35,7 +41,7 @@ function touching() {
       if (i === j) continue;
       const a = cards[i];
       const b = cards[j];
-      if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+      if (a.el.contains(b.el) || b.el.contains(a.el) || a.layer !== b.layer) continue;
       const overlapX = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
       const overlapY = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
       const dy = b.r.top - a.r.bottom;
