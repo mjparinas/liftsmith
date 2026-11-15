@@ -13,6 +13,7 @@ import * as demo from "@/locales/text/demo";
 import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
 import * as muscle from "@/locales/text/muscle";
+import * as pgm from "@/locales/text/pgm";
 import * as tdee from "@/locales/text/tdee";
 
 type Catalogue = { en: Record<string, Message> } & Partial<Record<SiteLang, Partial<Record<string, Message>>>>;
@@ -99,3 +100,28 @@ export function tdeeWords(lang: SiteLang): Record<string, string> {
   for (const key of TDEE_RESULT_KEYS) out[key] = line(key.startsWith("bmi.") ? bmi : tdee, lang, key) ?? key;
   return out;
 }
+
+/** A program's name, credit, summary and steps as the app shows them in that language. */
+export function programWords(lang: SiteLang, id: string, steps: number): { name: string; basedOn: string; summary: string; how: string[] } {
+  const get = (k: string) => line(pgm, lang, `pgm.${id}.${k}`) ?? "";
+  return {
+    name: get("name"),
+    basedOn: get("basedOn"),
+    summary: get("summary"),
+    how: Array.from({ length: steps }, (_, i) => get(`how${i + 1}`)),
+  };
+}
+
+const PGM_BY_TEXT = new Map(Object.entries(pgm.en as Record<string, Message>).map(([k, v]) => [typeof v === "string" ? v : v.other, k]));
+
+/**
+ * A line the program engine wrote in English (a day's name, a lift's tier), in another language: found by its English
+ * text in the program catalogue. Null when it isn't a whole catalogue line.
+ */
+export function programLine(lang: SiteLang, english: string): string | null {
+  const key = PGM_BY_TEXT.get(english);
+  return key ? (line(pgm, lang, key) ?? null) : null;
+}
+
+/** "Day {n}" as the app says it. */
+export const programDayN = (lang: SiteLang, n: number) => (line(pgm, lang, "pgm.day") ?? "Day {n}").replace("{n}", String(n));

@@ -13,6 +13,7 @@ import { bestFor } from "./bestFor";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { HELP, helpPath } from "./faqs";
 import { alternatives } from "./generator";
+import { PROGRAMS } from "./programs";
 import { SITE_URL } from "./site";
 import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
@@ -319,6 +320,11 @@ export function siteRoutes(): Route[] {
   for (const path of ["/exercises/vs/", ...vsPairs().map(vsPath)]) {
     const languages = languageAlternates(path);
     for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/exercises/vs/" ? 0.6 : 0.5, languages });
+  }
+  // Program pages (src/lib/programs.ts): the index and every program, each in all six languages.
+  for (const path of ["/programs/", ...PROGRAMS.map((p) => `/programs/${p.id}/`)]) {
+    const languages = languageAlternates(path);
+    for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/programs/" ? 0.8 : 0.7, languages });
   }
   // Muscle pages ("the best <muscle> exercises", src/lib/bestFor.ts): the index and every muscle a lift works as a main
   // mover, each in all six languages.

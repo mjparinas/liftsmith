@@ -145,7 +145,8 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
         ])}
         {col(t.cols.learn, [
           { href: "/exercises/", label: l.exercises },
-          { href: "/muscles/", label: l.muscles },
+          { href: localPath(lang, "/muscles/"), label: l.muscles },
+          { href: localPath(lang, "/programs/"), label: l.programs },
           { href: "/equipment/", label: l.equipment },
           { href: "/guides/", label: l.guides },
           { href: "/blog/", label: l.blog },

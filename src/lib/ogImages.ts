@@ -30,6 +30,18 @@ export interface OgCard {
 }
 
 /** The card file for a public path ("/exercises/back-squat/alternatives/" → "exercises/back-squat.jpg"). */
+/** The lift on each program page's card (/programs/<id>/). */
+export const PROGRAM_FIGURE: Partial<Record<string, string>> = {
+  "classic-5x5": "back-squat",
+  "novice-3x5": "back-squat",
+  "5x5-plus": "back-squat",
+  "ramping-5x5": "back-squat",
+  tiered: "deadlift",
+  waves: "overhead-press",
+  calisthenics: "pull-up",
+  "dumbbell-full-body": "goblet-squat",
+};
+
 export function ogFile(path: string): string {
   const all = path.split("/").filter(Boolean);
   // A page in another language shares its English page's card (/es/exercises/<id>/ → the exercise's card).
@@ -43,6 +55,8 @@ export function ogFile(path: string): string {
     if (pair) return `exercises/${pair.a}.jpg`;
   }
   if (kind === "muscles") return `muscles/${a}.jpg`;
+  // A program shares the card of its first main lift; the splits, which have none, the site's own.
+  if (kind === "programs") return PROGRAM_FIGURE[a] ? `exercises/${PROGRAM_FIGURE[a]}.jpg` : "default.jpg";
   if (kind === "equipment") return `equipment/${a}.jpg`;
   if (kind === "blog" && a === "topic" && seg[2]) return `blog-topics/${seg[2]}.jpg`;
   if (kind === "blog" || kind === "guides") return `articles/${a}.jpg`;
