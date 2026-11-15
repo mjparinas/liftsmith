@@ -42,6 +42,10 @@ export default function ExercisesIndex() {
         <Link href="/equipment/" className="text-accent underline underline-offset-2">
           equipment
         </Link>
+        , or see two similar lifts{" "}
+        <Link href="/exercises/vs/" className="text-accent underline underline-offset-2">
+          compared side by side
+        </Link>
         .
       </p>
       <CtaInline
