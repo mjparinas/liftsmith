@@ -54,7 +54,8 @@ import {
   type TrainingNow,
 } from "@/lib/socialTypes";
 
-import { cleanCode, newCode } from "./coach";
+import { cleanCode, nameOf, newCode } from "./coach";
+import { resolveReview, reviewReport } from "./coachReviews";
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { inviteStatus, recordAccept } from "./earnedPro";
 import { isPlaceId } from "./gymPlaces";
@@ -889,13 +890,15 @@ export async function mute(accountId: string, b: Record<string, unknown>, now = 
   return lookup(accountId, b, now);
 }
 
-const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile"]);
+const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review"]);
+/** Reported through Friends (`report` below); reviews are reported through coachReviews.ts. */
+const FRIENDS_KINDS = new Set<ReportKind>(["post", "comment", "profile"]);
 
 export async function report(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
   const kind = s(b.kind) as ReportKind;
-  if (!REPORT_KINDS.has(kind)) return fail(400, "Bad request.");
+  if (!FRIENDS_KINDS.has(kind)) return fail(400, "Bad request.");
   const reason = REASONS_FOR[kind].find((r) => r === b.reason);
   if (!reason) return fail(400, "Bad request.");
   // Profiles are reported by handle and stored by account, so a new handle doesn't escape the report.
@@ -2461,6 +2464,11 @@ export async function adminReports(): Promise<ReportGroup[]> {
       authorId = s(c?.account_id);
       hidden = !!n(c?.hidden);
       content = c ? s(c.body) : "(deleted)";
+    } else if (kind === "review") {
+      const r = await reviewReport(target);
+      authorId = r?.authorId ?? "";
+      hidden = !!r?.hidden;
+      content = r ? r.content : "(deleted)";
     } else authorId = target;
     const [a] = authorId
       ? await query("SELECT handle, name, tagline, suspended FROM social_profiles WHERE account_id = ?", [authorId])
@@ -2478,7 +2486,11 @@ export async function adminReports(): Promise<ReportGroup[]> {
       firstAt: n(r.first_at),
       lastAt: n(r.last_at),
       content,
-      author: a ? { accountId: authorId, handle: s(a.handle), name: s(a.name), suspended: !!n(a.suspended) } : null,
+      author: a
+        ? { accountId: authorId, handle: s(a.handle), name: s(a.name), suspended: !!n(a.suspended) }
+        : kind === "review" && authorId
+          ? { accountId: authorId, handle: "", name: await nameOf(authorId), suspended: false }
+          : null,
       hidden,
     });
   }
@@ -2494,9 +2506,13 @@ export type ReportAction = "remove" | "dismiss" | "suspend" | "unsuspend";
  */
 export async function resolveReports(kind: ReportKind, targetId: string, action: ReportAction): Promise<boolean> {
   if (!REPORT_KINDS.has(kind) || !targetId) return false;
+  // A coach review or reply: remove deletes it (a reply is cleared), dismiss shows it again. Banning applies to Friends.
+  if (kind === "review" && (action === "remove" || action === "dismiss"))
+    return resolveReview(targetId, action, action === "remove" ? "removed" : "dismissed");
   const table = kind === "post" ? "posts" : kind === "comment" ? "post_comments" : null;
   let author = kind === "profile" ? targetId : "";
   if (table) author = s((await query(`SELECT account_id FROM ${table} WHERE id = ?`, [targetId]))[0]?.account_id);
+  if (kind === "review") author = (await reviewReport(targetId))?.authorId ?? "";
   const close = (status: string) => ({
     sql: "UPDATE reports SET status = ? WHERE kind = ? AND target_id = ? AND status = 'open'",
     args: [status, kind, targetId],

@@ -793,4 +793,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Con No molestar o de vacaciones, las notificaciones del chat esperan hasta que vuelvas.",
   },
+  "coach-reviews": {
+    title: "Reseñas de tus clientes",
+    intro: "Los clientes que han entrenado contigo ya pueden valorarte, y los nuevos clientes lo ven.",
+    points: [
+      "Un cliente puede dejar estrellas y una reseña breve tras cuatro semanas o dos sesiones contigo.",
+      "Tu valoración aparece en tu invitación y en el directorio de entrenadores cuando tienes tres reseñas.",
+      "A su lado: cuántos de tus clientes entrenaron en las últimas dos semanas.",
+      "Responde una vez a cada reseña desde Entrenador › Configuración y denuncia las que incumplan las normas.",
+    ],
+    dyk: "Solo los adultos pueden dejar reseñas, y un cliente descontento no puede hundir a un entrenador nuevo: nada se muestra hasta tener tres reseñas.",
+  },
 };

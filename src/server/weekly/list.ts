@@ -122,6 +122,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("whats-new", "free", "today"),
   // New features, in the order they shipped (sent before the queue above to everyone already in the series).
   R("coach-dock", "coach", "pro", "trainer/messages", { fresh: "2026-11-15", shot: false }),
+  // New, 2026-11-15: ratings and reviews from clients (docs/decisions/coach-reviews.md).
+  R("coach-reviews", "coach", "pro", "trainer/setup", { fresh: "2026-11-15", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */
