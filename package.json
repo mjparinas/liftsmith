@@ -7,7 +7,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/mediapipe.mjs && npm run locales",
     "build": "next build",
-    "postbuild": "node scripts/csp.mjs",
+    "postbuild": "node scripts/csp.mjs && node scripts/bundle-check.mjs .next/server",
     "prebuild:static": "node scripts/mediapipe.mjs && npm run locales",
     "build:static": "STATIC_EXPORT=1 next build",
     "locales": "node --experimental-strip-types --no-warnings scripts/locales.mjs",
