@@ -8,6 +8,7 @@ import { BuildStamp } from "@/components/BuildStamp";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CodeStatus, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
+import type { InboxItem } from "@/server/inbox";
 
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
@@ -27,6 +28,7 @@ import { AdminSkeleton, CardBones, Loading, TabSkeleton, TileBones } from "./Ske
 import { System } from "./System";
 import { countryName } from "./time";
 import { Todo } from "./Todo";
+import { summarizeTodo, todoBadge, type TodoSummary } from "./todoCount";
 import { sessionGate, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
 import { Users } from "./Users";
 
@@ -578,7 +580,14 @@ export function AdminApp() {
   const maintenance = useMaintenance();
   const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
-  const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
+  // The To Do count is the to-do list as last read, less the mail the Inbox has since archived, done or answered.
+  const [todo, setTodo] = useState<TodoSummary | null>(null);
+  const [mail, setMail] = useState<InboxItem[]>([]);
+  const todoList = useCallback((j: unknown) => {
+    const s = summarizeTodo(j);
+    if (s) setTodo(s);
+  }, []);
+  const badges: Partial<Record<Tab, number>> = todo ? { ...counts, "To Do": todoBadge(todo, mail) } : counts;
   const inboxCount = useCallback((n: number) => setCount("Inbox", n), [setCount]);
   const reportsCount = useCallback((n: number) => setCount("Reports", n), [setCount]);
   // Each tab (and an open account or install) has its own address, and every move is in the browser history,
@@ -607,18 +616,17 @@ export function AdminApp() {
     void read("/api/admin/inbox/?count=1", (j) => (typeof j.waiting === "number" ? j.waiting : null)).then(
       (n) => live && n != null && inboxCount(n),
     );
-    void read("/api/admin/todo/", (j) =>
-      Array.isArray(j.items) && Array.isArray(j.tasks)
-        ? j.items.length + (j.tasks as { doneAt: unknown }[]).filter((t) => !t.doneAt).length
-        : null,
-    ).then((n) => live && n != null && todoCount(n));
+    void fetch("/api/admin/todo/")
+      .then(async (r) => (r.ok ? ((await r.json()) as unknown) : null))
+      .catch(() => null)
+      .then((j) => live && j != null && todoList(j));
     void read("/api/admin/reports/", (j) => (Array.isArray(j.reports) ? j.reports.length : null)).then(
       (n) => live && n != null && reportsCount(n),
     );
     return () => {
       live = false;
     };
-  }, [state, inboxCount, todoCount, reportsCount]);
+  }, [state, inboxCount, todoList, reportsCount]);
   useEffect(() => {
     let live = true;
     const stats = () => fetch(`/api/admin/stats/?days=${days}`);
@@ -708,12 +716,12 @@ export function AdminApp() {
               className={`press shrink-0 rounded-lg px-3 py-1.5 text-sm ${tab === t ? "bg-raised text-ink" : "text-muted"}`}
             >
               {t}
-              {counts[t] ? (
+              {badges[t] ? (
                 <span
                   className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-ink"
-                  aria-label={`${counts[t]} waiting`}
+                  aria-label={`${badges[t]} waiting`}
                 >
-                  {counts[t]}
+                  {badges[t]}
                 </span>
               ) : null}
             </button>
@@ -726,7 +734,7 @@ export function AdminApp() {
         {stale && <TabSkeleton tab={tab} />}
         {!stale && tab === "Overview" && (
           <>
-            <NeedsYou go={go} />
+            <NeedsYou go={go} onList={todoList} />
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="New installs" value={fmtInt(o.installs)} delta={delta(o.installs, o.prevInstalls)} sub="vs the period before" />
               <Tile label="Site visitors" value={fmtInt(o.visitors)} delta={delta(o.visitors, o.prevVisitors)} sub="daily unique, summed" />
@@ -1068,8 +1076,10 @@ export function AdminApp() {
           />
         )}
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
-        {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
-        {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} open={view.open} setOpen={openIn("Inbox")} />}
+        {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onList={todoList} />}
+        {tab === "Inbox" && (
+          <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} onMail={setMail} open={view.open} setOpen={openIn("Inbox")} />
+        )}
         {tab === "Reports" && (
           <>
             <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />
