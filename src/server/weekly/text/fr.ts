@@ -782,4 +782,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Les mises à jour arrivent toutes seules ; l'app vous prévient quand l'une est prête.",
   },
+  "coach-dock": {
+    title: "Le chat avec vos clients devient une messagerie",
+    intro:
+      "Sur ordinateur, tous les chats se rangent dans un dock en bas à droite : vos clients sont à un clic, sur n'importe quelle page.",
+    points: [
+      "Jusqu'à deux fenêtres de chat à côté de la liste, chacune se replie sur son nom.",
+      "Un son et un compteur dans l'onglet du navigateur quand un client écrit.",
+      "Choisissez un statut : avec un client, à l'entraînement, absent, ne pas déranger, en vacances ou apparaître hors ligne ; en ligne s'affiche tout seul.",
+      "Voyez quand un client écrit et quand il a vu votre message, et envoyez emojis et autocollants de salle.",
+    ],
+    dyk: "En Ne pas déranger ou en vacances, les notifications du chat attendent votre retour.",
+  },
 };

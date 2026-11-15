@@ -781,4 +781,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Updates kommen von selbst; die App sagt dir, wenn eines bereit ist.",
   },
+  "coach-dock": {
+    title: "Dein Kunden-Chat, jetzt wie ein Messenger",
+    intro: "Am Computer sitzen alle Chats jetzt in einem Dock unten rechts, so sind deine Kunden auf jeder Seite einen Klick entfernt.",
+    points: [
+      "Bis zu zwei Chatfenster neben der Liste, jedes klappt sich auf seinen Namen zusammen.",
+      "Ein Ton und eine Zahl im Browser-Tab, wenn ein Kunde schreibt.",
+      "Setz einen Status: bei einem Kunden, beim Training, abwesend, nicht stören, im Urlaub oder offline erscheinen; online zeigt sich von selbst.",
+      "Sieh, wann ein Kunde schreibt und deine Nachricht gesehen hat, und schick Emojis und Gym-Sticker.",
+    ],
+    dyk: "Bei Nicht stören oder im Urlaub warten Chat-Benachrichtigungen, bis du zurück bist.",
+  },
 };

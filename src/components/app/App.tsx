@@ -48,6 +48,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { Account } from "./Account";
 import { Achievements, useGame } from "./Achievements";
+import { ChatDock } from "./ChatDock";
 import { CheckinToasts } from "./CheckinToasts";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
@@ -518,6 +519,8 @@ export function App() {
       </div>
       <ProWelcome />
       {sidebar ? <Sidebar route={route} /> : showNav && <TabBar route={route} />}
+      {/* Coach chat's dock, bottom right on the desktop layout (ChatDock.tsx); not over a workout or Coaching's own chat. */}
+      {sidebar && <ChatDock hidden={route === "trainer" && (arg === "messages" || !!arg?.startsWith("m."))} />}
       <Toaster />
     </>
   );

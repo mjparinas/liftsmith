@@ -383,6 +383,11 @@ export const it: FeaturesText = {
       body: "L'allenamento è sempre condiviso. Frequenza cardiaca, note di allenamento, forma e recupero, dati corporei, dolore e infortuni, e ciclo sono ciascuno un interruttore che il cliente attiva per ogni coach, al consenso o in qualsiasi momento. Foto e palestre non escono mai.",
       proPart: "Essere cliente è gratis; seguire clienti è Pro.",
     },
+    "coach-chat-dock": {
+      name: "Dock della chat, stati e sticker",
+      body: "Sul computer la chat con il coach sta in un dock in basso a destra, come un messenger: tutte le persone a cui scrivere, fino a due finestre che si chiudono a scomparsa, un suono e un contatore nella scheda quando arriva un messaggio. Entrambi impostano uno stato (online, con un cliente, in allenamento, assente, non disturbare, in vacanza o apparire offline), vedono quando l'altro scrive e quando ha visto il messaggio, e inviano emoji e sticker da palestra, anche sul telefono.",
+      proPart: "Essere cliente è gratis; seguire clienti è Pro.",
+    },
     "coach-pages": {
       name: "Una pagina per ogni lato",
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",

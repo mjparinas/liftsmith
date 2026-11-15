@@ -12,6 +12,7 @@ import {
   coachCleanup,
   forCoach,
   joinCoach,
+  live,
   makeInvite,
   messages,
   newCode,
@@ -29,6 +30,7 @@ import {
   unlink,
   unreadFrom,
 } from "./coach";
+import { setStatus, setTyping, touchSeen, TYPING_MS } from "./coachPresence";
 import { query, resetDb, run } from "./db";
 import { saveToken, setPushSender, type PushMessage } from "./push";
 import { sync } from "./sync";
@@ -388,6 +390,92 @@ describe("chat between a coach and a client", () => {
     expect(sent).toHaveLength(1);
     expect(sent[0]).toMatchObject({ token: "tok-client-0123456789abcdef", kind: "coachMsg", route: "#/trainer/m.coach" });
     expect(sent[0]!.body).toContain("Sam");
+  });
+
+  it("sends a sticker as the whole message, refuses one it doesn't know, and pushes its emoji", async () => {
+    await saveToken("client", "tok-client-0123456789abcdef", "android", "en", NOW);
+    expect(await sendMessage("coach", "client", "", NOW, "m1", "nope")).toEqual({ error: "empty" });
+    expect(await sendMessage("coach", "client", "ignored", NOW, "m1", "pr")).toEqual({
+      id: "m1",
+      from: "coach",
+      text: "",
+      at: NOW,
+      sticker: "pr",
+    });
+    const r = await messages("client", "coach", undefined, NOW + 1);
+    expect("messages" in r && r.messages).toEqual([{ id: "m1", from: "coach", text: "", at: NOW, sticker: "pr" }]);
+    expect(sent[0]!.body).toContain("🏆");
+  });
+
+  it("returns only newer messages after a time, and says when the other side read the thread", async () => {
+    await sendMessage("coach", "client", "One", NOW, "m1");
+    await sendMessage("coach", "client", "Two", NOW + 10, "m2");
+    const r = await messages("coach", "client", undefined, NOW + 20, NOW);
+    expect("messages" in r && r.messages.map((m) => m.id)).toEqual(["m2"]);
+    // The client hasn't opened it yet; once they do, the coach sees when.
+    expect(r).toMatchObject({ seen: 0 });
+    await messages("client", "coach", undefined, NOW + 30);
+    expect(await messages("coach", "client", undefined, NOW + 40)).toMatchObject({ seen: NOW + 30 });
+  });
+
+  it("shows typing for a few seconds, only to the person typed to, and sending ends it", async () => {
+    await setTyping("client", "coach", NOW);
+    expect(await messages("coach", "client", undefined, NOW + 1000)).toMatchObject({ typing: true });
+    expect(await messages("coach", "client", undefined, NOW + TYPING_MS + 1)).toMatchObject({ typing: false });
+    await setTyping("client", "coach", NOW + 10_000);
+    await sendMessage("client", "coach", "Done", NOW + 11_000, "m1");
+    expect(await messages("coach", "client", undefined, NOW + 12_000)).toMatchObject({ typing: false });
+  });
+
+  it("shows online while active, offline with when after that, and never when they appear offline", async () => {
+    await touchSeen("client", NOW);
+    expect(await messages("coach", "client", undefined, NOW + 60_000)).toMatchObject({ presence: { state: "online", until: 0 } });
+    expect(await messages("coach", "client", undefined, NOW + 10 * 60_000)).toMatchObject({
+      presence: { state: "offline", seenAt: NOW },
+    });
+    await setStatus("client", "offline", 0, NOW + 11 * 60_000);
+    const r = await messages("coach", "client", undefined, NOW + 11 * 60_000 + 1);
+    expect("presence" in r && r.presence).toEqual({ state: "offline", until: 0 });
+  });
+
+  it("ends a picked status at its time, and holds pushes on Do not disturb and vacation", async () => {
+    await saveToken("client", "tok-client-0123456789abcdef", "android", "en", NOW);
+    expect(await setStatus("client", "vacation", NOW + 7 * DAY, NOW)).toEqual({ status: "vacation", until: NOW + 7 * DAY });
+    expect(await messages("coach", "client", undefined, NOW + DAY)).toMatchObject({
+      presence: { state: "vacation", until: NOW + 7 * DAY },
+    });
+    await sendMessage("coach", "client", "Enjoy the trip", NOW + DAY, "m1");
+    expect(sent).toHaveLength(0);
+    // After the vacation it's automatic again, and pushes go.
+    await sendMessage("coach", "client", "Welcome back", NOW + 8 * DAY, "m2");
+    expect(sent).toHaveLength(1);
+    expect(await setStatus("client", "dnd", 0, NOW + 8 * DAY)).toEqual({ status: "dnd", until: 0 });
+    await sendMessage("coach", "client", "Quiet", NOW + 8 * DAY + 1, "m3");
+    expect(sent).toHaveLength(1);
+    expect(await setStatus("client", "sleeping", 0, NOW)).toEqual({ error: "bad" });
+  });
+
+  it("lists everyone to message with presence, unread, typing and the newest message", async () => {
+    await setStatus("coach", "busy", NOW + 3_600_000, NOW);
+    await sendMessage("coach", "client", "How was it?", NOW + 1, "m1");
+    await setTyping("coach", "client", NOW + 2);
+    const r = await live("client", NOW + 3);
+    expect(r.me).toEqual({ status: "auto", until: 0 });
+    expect(r.people).toEqual([
+      {
+        id: "coach",
+        name: "Sam",
+        them: "coach",
+        presence: { state: "busy", until: NOW + 3_600_000 },
+        unread: 1,
+        typing: true,
+        seen: NOW + 1,
+        last: { id: "m1", from: "coach", text: "How was it?", at: NOW + 1 },
+      },
+    ]);
+    expect((await live("coach", NOW + 4)).me).toEqual({ status: "busy", until: NOW + 3_600_000 });
+    // Asking marked the client active, so the coach sees them online.
+    expect((await live("coach", NOW + 5)).people[0]).toMatchObject({ id: "client", them: "client", presence: { state: "online" } });
   });
 
   it("goes when the pair unlinks or an account is deleted", async () => {

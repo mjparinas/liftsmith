@@ -12,6 +12,8 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
+import { useAccount } from "@/lib/auth";
+import { useLive, useLivePoll } from "@/lib/chatLive";
 import { savePendingCoach } from "@/lib/coachInvite";
 import { coachingMode, coachingView, readPicked, savePicked, type CoachTab, type Picked } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
@@ -58,6 +60,7 @@ import {
 import type { Experience, Goal } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
+import { MyStatusButton, presenceText, StatusDot } from "./ChatStatus";
 import { ChatThread } from "./CoachChat";
 import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { CoachGyms } from "./CoachGyms";
@@ -819,7 +822,13 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
  */
 function MessagesPage({ data }: { data: Overview }) {
   const desktop = useDesktop();
-  const unread = data.unread ?? {};
+  // Statuses and live unread counts (chatLive.ts), every 20 seconds while this page is open; the overview's until then.
+  const me = useAccount((s) => s.account?.id ?? null);
+  useLivePoll(me);
+  const live = useLive((s) => s.live);
+  const now = useNow(30_000);
+  const liveBy = new Map((live?.people ?? []).map((p) => [p.id, p]));
+  const unread = live ? Object.fromEntries(live.people.map((p) => [p.id, p.unread])) : (data.unread ?? {});
   const people = [
     ...data.clients.map((p) => ({ ...p, side: "client" as const })),
     ...data.coaches.map((p) => ({ ...p, side: "coach" as const })),
@@ -835,37 +844,53 @@ function MessagesPage({ data }: { data: Overview }) {
     );
   return (
     <div className="mt-4 desk:grid desk:grid-cols-[18rem_minmax(0,1fr)] desk:items-start desk:gap-4">
-      <ul className="card divide-y divide-line">
-        {people.map((p) => {
-          const n = unread[p.id] ?? 0;
-          const name = p.name || t("trn.noName");
-          return (
-            <li key={`${p.side}-${p.id}`}>
-              <button
-                type="button"
-                aria-current={desktop && open === p.id ? "true" : undefined}
-                onClick={() => (desktop ? setOpen(p.id) : go("trainer", `${CHAT}${p.id}`))}
-                className={`press flex w-full items-center gap-3 px-4 py-3 text-left ${desktop && open === p.id ? "bg-accent/10" : ""}`}
-              >
-                <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-raised font-bold text-accent">
-                  {name.slice(0, 1).toUpperCase()}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium">{name}</span>
-                  <span className="block text-xs text-muted">{p.side === "coach" ? t("trn.msg.yourCoach") : t("trn.client")}</span>
-                </span>
-                {n > 0 && (
-                  <span className="num rounded-full bg-accent px-2 text-xs font-bold text-accent-ink">
-                    <span aria-hidden>{n}</span>
-                    <span className="sr-only">{t("trn.unread", { count: n })}</span>
+      <div className="space-y-3">
+        {live && (
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-muted">{t("trn.st.yours")}</p>
+            <MyStatusButton status={live.me.status} until={live.me.until} now={now} />
+          </div>
+        )}
+        <ul className="card divide-y divide-line">
+          {people.map((p) => {
+            const n = unread[p.id] ?? 0;
+            const name = p.name || t("trn.noName");
+            const lp = liveBy.get(p.id);
+            return (
+              <li key={`${p.side}-${p.id}`}>
+                <button
+                  type="button"
+                  aria-current={desktop && open === p.id ? "true" : undefined}
+                  onClick={() => (desktop ? setOpen(p.id) : go("trainer", `${CHAT}${p.id}`))}
+                  className={`press flex w-full items-center gap-3 px-4 py-3 text-left ${desktop && open === p.id ? "bg-accent/10" : ""}`}
+                >
+                  <span
+                    aria-hidden
+                    className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full bg-raised font-bold text-accent"
+                  >
+                    {name.slice(0, 1).toUpperCase()}
+                    {lp && <StatusDot state={lp.presence.state} className="absolute -bottom-0.5 -right-0.5" />}
                   </span>
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-      {desktop && open && <ChatThread key={open} id={open} embedded />}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{name}</span>
+                    <span className="block truncate text-xs text-muted">
+                      {p.side === "coach" ? t("trn.msg.yourCoach") : t("trn.client")}
+                      {lp && ` · ${lp.typing ? t("trn.typingShort") : presenceText(lp.presence, now)}`}
+                    </span>
+                  </span>
+                  {n > 0 && (
+                    <span className="num rounded-full bg-accent px-2 text-xs font-bold text-accent-ink">
+                      <span aria-hidden>{n}</span>
+                      <span className="sr-only">{t("trn.unread", { count: n })}</span>
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      {desktop && open && <ChatThread key={open} id={open} mode="embedded" />}
     </div>
   );
 }

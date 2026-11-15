@@ -14,6 +14,7 @@ import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } 
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import type { ClientPay, OverviewPay } from "./coachPay";
 import type { ClientLimits, CoachTier } from "./coachPlans";
+import type { Shown, Status } from "./coachStatus";
 import { cycleState } from "./cycle";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
@@ -27,6 +28,7 @@ import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
+import type { StickerId } from "./stickers";
 import { BODY_PARTS, type AppEvent, type BodyPart, type Experience, type Goal, type RoutinePart, type SetEvent } from "./types";
 import { fmtNum } from "./units";
 
@@ -118,12 +120,47 @@ export interface CoachPlanInfo {
   limits: ClientLimits;
   graceUntil: number | null;
 }
-/** A chat message between a coach and a client. */
+/** A chat message between a coach and a client: words, or one sticker (src/lib/stickers.ts) with empty text. */
 export interface Message {
   id: string;
   from: string;
   text: string;
   at: number;
+  sticker?: StickerId;
+}
+/** How the other side shows in chat (the server's ShownPresence; src/lib/coachStatus.ts). */
+export interface ShownPresence {
+  state: Shown;
+  /** When their picked status ends (0: when they change it). */
+  until: number;
+  /** When they last had coaching open, while they show offline on Automatic. */
+  seenAt?: number;
+}
+/** One chat thread from the server. The page of messages, plus what's live about the other side. */
+export interface Thread {
+  messages: Message[];
+  more: boolean;
+  name?: string;
+  them?: "coach" | "client";
+  /** When they last read this thread. */
+  seen?: number;
+  typing?: boolean;
+  presence?: ShownPresence;
+}
+/** One person in the chat dock (the server's LivePerson). */
+export interface LivePerson {
+  id: string;
+  name: string;
+  them: "coach" | "client";
+  presence: ShownPresence;
+  unread: number;
+  typing: boolean;
+  seen: number;
+  last?: Message;
+}
+export interface Live {
+  me: { status: Status; until: number };
+  people: LivePerson[];
 }
 /** A client's body data, when they share it with this coach (the server's BodyShare). */
 export interface BodyShare {
@@ -226,13 +263,22 @@ export const assignPlan = async (client: string, name: string, code: string, per
 export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
 /** The longest chat message (the server's COACH_LIMITS.message). */
 export const MESSAGE_MAX = 1000;
-export const loadMessages = async (id: string, before?: number) =>
-  api<{ messages: Message[]; more: boolean; name?: string; them?: "coach" | "client" }>(
-    `/api/coach/?chat=${encodeURIComponent(id)}${before ? `&before=${before}` : ""}`,
+/** The latest page of a thread, older messages (`before`), or only the ones after `after` (an open thread checking in). */
+export const loadMessages = async (id: string, at: { before?: number; after?: number } = {}) =>
+  api<Thread>(
+    `/api/coach/?chat=${encodeURIComponent(id)}${at.before ? `&before=${at.before}` : ""}${at.after ? `&after=${at.after}` : ""}`,
     { token: token() },
   );
-export const sendMessage = async (id: string, text: string) =>
-  (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text } })).message;
+/** Sends words, or one sticker. */
+export const sendMessage = async (id: string, text: string, sticker?: StickerId) =>
+  (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text, sticker } })).message;
+/** Everyone this account can message, with their status, and this account's own status (the chat dock). */
+export const loadLive = async () => api<Live>("/api/coach/?live=1", { token: token() });
+/** Picks this account's status; `until` 0 means until it's changed. */
+export const saveStatus = async (status: Status, until = 0) =>
+  api<{ status: Status; until: number }>("/api/coach/", { token: token(), body: { action: "status", status, until } });
+/** Tells the other side this account is typing to them. Fire and forget: a lost one only skips the dots. */
+export const sendTyping = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "typing", id } }));
 export const setBodyShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
 export const setPainShare = async (coach: string, on: boolean) => setShare(coach, "pain", on);

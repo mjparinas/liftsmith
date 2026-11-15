@@ -946,6 +946,16 @@ const SCHEMA = [
     read_at INTEGER NOT NULL,
     PRIMARY KEY (account_id, other_id)
   )`,
+  // Coach chat statuses (2026-11-15, src/lib/coachStatus.ts): what each person picked and until when, when they last
+  // had coaching open (Online), and who they're typing to and when (one row per account, so it never grows).
+  `CREATE TABLE IF NOT EXISTS coach_status (
+    account_id TEXT PRIMARY KEY,
+    status TEXT NOT NULL DEFAULT 'auto',
+    until INTEGER NOT NULL DEFAULT 0,
+    seen_at INTEGER NOT NULL DEFAULT 0,
+    typing_to TEXT,
+    typing_at INTEGER NOT NULL DEFAULT 0
+  )`,
   // What a client shares with one coach beyond training: body (weight, body fat, tape measurements, sex and
   // height, for the shaped 3D figure). Off until the client turns it on.
   `CREATE TABLE IF NOT EXISTS coach_shares (
@@ -1219,6 +1229,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["coach_shares", "notes", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_shares", "health", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_shares", "cycle", "INTEGER NOT NULL DEFAULT 0"],
+  // Coach chat stickers (2026-11-15, src/lib/stickers.ts): a message may be one sticker, by id, with empty text.
+  ["coach_messages", "sticker", "TEXT"],
   // Moderation (2026-11-14, docs/decisions/moderation.md). `suspended` is 0 (fine), 1 (suspended or banned) or 2
   // (shadow banned); a suspension ends at `suspended_until` (0 for a ban). `boards_off` keeps the lifter off other
   // people's leaderboards. `notice` is what the lifter is told ('', 'warn', 'suspend' or 'ban') and why.

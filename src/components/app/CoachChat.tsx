@@ -2,25 +2,48 @@
 
 // Chat between a coach and a client (2026-11-12, after Melvin chose "chat, body data, alerts" from the coaching gap
 // list; docs/decisions/trainer-mode.md). #/trainer/m.<id> is the thread with that person, from either side. Messages
-// are plain text, newest at the bottom. The thread loads when it opens, when the app comes back to the front, and
-// every 20 seconds while it's on screen (nothing runs in the background, battery.md); the other side gets a push on
-// Android and iOS. Sending the first message asks for notification permission, so replies reach this phone too.
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+// are words or one gym sticker, newest at the bottom. The thread loads when it opens, then asks only for newer messages:
+// every 5 seconds while the other side is online or typing, every 20 seconds otherwise, and only while it's on screen
+// (battery.md); the other side gets a push on Android and iOS. Sending the first message asks for notification
+// permission, so replies reach this phone too. Since 2026-11-15 it also shows how the other side is (online, with a
+// client, on vacation and the rest, src/lib/coachStatus.ts), when they've seen your newest message, when they're
+// typing, and an emoji and sticker tray; and on a desktop it opens in the chat dock (ChatDock.tsx).
+import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
+import { chimeFor, clearUnread } from "@/lib/chatLive";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { useKeyboardViewport } from "@/lib/keyboard";
 import { useDesktop } from "@/lib/layout";
 import { liveRead } from "@/lib/liveRead";
 import { startPush } from "@/lib/push";
-import { loadMessages, markRead, MESSAGE_MAX, sendMessage, trainerError, type Message } from "@/lib/trainer";
+import { EMOJI, STICKERS, type StickerId } from "@/lib/stickers";
+import {
+  loadMessages,
+  markRead,
+  MESSAGE_MAX,
+  sendMessage,
+  sendTyping,
+  trainerError,
+  type Message,
+  type ShownPresence,
+  type Thread,
+} from "@/lib/trainer";
+import { isVisible, onVisibility } from "@/lib/visibility";
 
+import { presenceText, StatusDot } from "./ChatStatus";
+import { Icon } from "./icons";
 import { go, goBack, historyDepth } from "./router";
+import { StickerArt } from "./StickerArt";
 import { Button, EmptyState, ScreenHeader } from "./ui";
 
-const POLL_MS = 20_000;
+/** How often an open thread asks for new messages: quickly while the other side is around, slowly otherwise. */
+export const FAST_MS = 5_000;
+export const SLOW_MS = 20_000;
+/** Typing is reported at most this often while the lifter types. */
+const TYPING_EVERY_MS = 3_000;
 
 /** Back to where the lifter came from in Coaching (a page of it), or Coaching itself when nothing is behind (a push). */
 export const backToCoaching = () => (historyDepth() > 0 ? goBack() : go("trainer"));
@@ -30,13 +53,26 @@ export function ChatScreen({ id }: { id: string }) {
   return <ChatThread id={id} />;
 }
 
+/** Where a thread is drawn: its own screen, beside the list on the desktop Messages page, or in a chat dock window. */
+export type ChatMode = "screen" | "embedded" | "dock";
+
+const stamp = (at: number) => date(at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+
+/** Adds messages to a list, oldest first, without doubles (an answer can overlap one just sent). */
+export function mergeMessages(old: readonly Message[], add: readonly Message[]): Message[] {
+  const ids = new Set(old.map((m) => m.id));
+  const fresh = add.filter((m) => !ids.has(m.id));
+  return fresh.length === 0 ? [...old] : [...old, ...fresh].sort((a, b) => a.at - b.at);
+}
+
 /**
  * One chat thread. On its own screen on a phone or tablet it fills the visible screen: the header at the top, the send
  * box fixed at the bottom above the tab bar (or on the keyboard while typing), and only the messages scroll between
  * them (Melvin, 2026-11-13). On a desktop's own screen it's a page with the send box stuck to the bottom; `embedded`
- * (the coach's Messages page on a desktop, beside the list of people) drops the header and scrolls inside its own box.
+ * (the coach's Messages page on a desktop, beside the list of people) drops the header and scrolls inside its own box,
+ * and `dock` fills a chat dock window, whose header the dock draws.
  */
-export function ChatThread({ id, embedded = false }: { id: string; embedded?: boolean }) {
+export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMode }) {
   const me = useAccount((s) => s.account?.id ?? "");
   const [list, setList] = useState<Message[] | null>(null);
   const [name, setName] = useState("");
@@ -46,15 +82,34 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
   const [error, setError] = useState<string | null>(null);
   const [gone, setGone] = useState(false);
   const [them, setThem] = useState<"coach" | "client" | null>(null);
+  const [seen, setSeen] = useState(0);
+  const [typing, setTyping] = useState(false);
+  const [presence, setPresence] = useState<ShownPresence | null>(null);
+  const [tray, setTray] = useState<"emoji" | "stickers" | null>(null);
+  const [now, setNow] = useState(() => Date.now());
   const end = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
+  const input = useRef<HTMLTextAreaElement>(null);
+  const listRef = useRef<Message[] | null>(null);
+  useEffect(() => {
+    listRef.current = list;
+  }, [list]);
+  const typedAt = useRef(0);
   const desktop = useDesktop();
   // Phone and tablet: the thread is a pane the size of the visible screen, and only its list scrolls.
-  const pane = !embedded && !desktop;
-  const inBox = embedded || pane;
+  const pane = mode === "screen" && !desktop;
+  const inBox = mode !== "screen" || pane;
   useKeyboardViewport(pane);
   // Whether the newest message was in view, so a list that shrinks (the keyboard opening) keeps it there.
   const atEnd = useRef(true);
+
+  /** What's live about the other side, from any answer. */
+  const meta = useCallback((r: Thread) => {
+    if (r.seen !== undefined) setSeen(r.seen);
+    if (r.typing !== undefined) setTyping(r.typing);
+    if (r.presence) setPresence(r.presence);
+    setNow(Date.now());
+  }, []);
 
   const load = useCallback(
     () =>
@@ -67,6 +122,7 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
             setName(r.name ?? "");
             setThem(r.them ?? null);
             setMore(r.more);
+            meta(r);
           } else {
             setName((n) => n || (r.name ?? ""));
             setThem((x) => x ?? r.them ?? null);
@@ -79,7 +135,13 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
             return [...older, ...r.messages];
           });
           if (!fresh) return;
+          // Opening a thread doesn't ring for what was already waiting in it.
+          chimeFor(
+            [...r.messages].reverse().find((m) => m.from !== me),
+            true,
+          );
           markRead(id);
+          clearUnread(id);
           setError(null);
         },
       ).then(
@@ -91,21 +153,55 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
           setList((old) => old ?? []);
         },
       ),
-    [id],
+    [id, me, meta],
   );
 
+  /** Asks only for what's new since the newest message shown. */
+  const poll = useCallback(async () => {
+    const shown = listRef.current;
+    const lastAt = shown?.[shown.length - 1]?.at;
+    if (!lastAt) return load();
+    try {
+      const r = await loadMessages(id, { after: lastAt });
+      meta(r);
+      if (r.messages.length > 0) {
+        setList((old) => mergeMessages(old ?? [], r.messages));
+        chimeFor([...r.messages].reverse().find((m) => m.from !== me));
+        markRead(id);
+        clearUnread(id);
+      }
+      setError(null);
+    } catch (e) {
+      const msg = trainerError(e);
+      if (msg === t("trn.err.gone")) setGone(true);
+    }
+  }, [id, load, me, meta]);
+
+  // Quickly while the other side is around (online or typing), slowly otherwise, and never while the app is hidden.
+  const quick = typing || presence?.state === "online";
   useEffect(() => {
     void load();
-    const tick = () => document.visibilityState === "visible" && void load();
-    const timer = setInterval(tick, POLL_MS);
-    document.addEventListener("visibilitychange", tick);
-    return () => {
-      clearInterval(timer);
-      document.removeEventListener("visibilitychange", tick);
-    };
   }, [load]);
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const start = (visible: boolean) => {
+      if (timer) clearInterval(timer);
+      timer = null;
+      if (!visible) return;
+      timer = setInterval(() => void poll(), quick ? FAST_MS : SLOW_MS);
+    };
+    start(isVisible());
+    const off = onVisibility((v) => {
+      if (v) void poll();
+      start(v);
+    });
+    return () => {
+      if (timer) clearInterval(timer);
+      off();
+    };
+  }, [poll, quick]);
 
-  // The newest message in view whenever the list grows at the bottom.
+  // The newest message in view whenever the list grows at the bottom, or the typing dots appear.
   const last = list?.[list.length - 1]?.id;
   useEffect(() => {
     // In a box, only the thread's own list scrolls, so the page stays where it is.
@@ -113,6 +209,9 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
     else end.current?.scrollIntoView?.({ block: "end" });
     atEnd.current = true;
   }, [last, inBox]);
+  useEffect(() => {
+    if (typing && inBox && box.current && atEnd.current) box.current.scrollTop = box.current.scrollHeight;
+  }, [typing, inBox]);
 
   // The keyboard opening or the send box growing shrinks the list: keep the newest message in view if it was.
   useEffect(() => {
@@ -133,7 +232,7 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
     const first = list?.[0];
     if (!first) return;
     try {
-      const r = await loadMessages(id, first.at);
+      const r = await loadMessages(id, { before: first.at });
       // Older messages go above the ones being read, so keep those where they are on screen.
       const el = box.current;
       const below = el ? el.scrollHeight - el.scrollTop : 0;
@@ -146,18 +245,17 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
     }
   };
 
-  const send = async (e: FormEvent) => {
-    e.preventDefault();
-    const body = text.trim();
-    if (!body || busy) return;
+  const deliver = async (body: string, sticker?: StickerId) => {
     setBusy(true);
     try {
-      const m = await sendMessage(id, body);
-      setList((old) => [...(old ?? []), m]);
-      setText("");
+      const m = await sendMessage(id, body, sticker);
+      setList((old) => mergeMessages(old ?? [], [m]));
+      if (!sticker) setText("");
+      setTray(null);
+      typedAt.current = 0;
       haptic("tap");
       sound.log();
-      track("feature", { name: "trainer", detail: "message" });
+      track("feature", { name: "trainer", detail: sticker ? `sticker:${sticker}` : "message" });
       // Ask once, here, so the reply can reach this phone.
       void startPush(true);
     } catch (err) {
@@ -168,24 +266,75 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
     }
   };
 
+  const send = async (e?: FormEvent) => {
+    e?.preventDefault();
+    const body = text.trim();
+    if (!body || busy) return;
+    await deliver(body);
+  };
+
+  const type = (v: string) => {
+    setText(v.slice(0, MESSAGE_MAX));
+    // Tell the other side, at most every 3 seconds; a lost one only skips the dots.
+    const at = Date.now();
+    if (v.trim() && at - typedAt.current > TYPING_EVERY_MS) {
+      typedAt.current = at;
+      void sendTyping(id).catch(() => undefined);
+    }
+  };
+
+  // On a desktop, Enter sends and Shift+Enter starts a new line; on a phone, the keyboard's return is a new line.
+  const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!desktop || e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    void send();
+  };
+
+  /** Puts an emoji where the cursor is. */
+  const addEmoji = (emoji: string) => {
+    const el = input.current;
+    const at = el?.selectionStart ?? text.length;
+    const to = el?.selectionEnd ?? text.length;
+    const next = (text.slice(0, at) + emoji + text.slice(to)).slice(0, MESSAGE_MAX);
+    type(next);
+    sound.tick();
+    requestAnimationFrame(() => {
+      el?.focus();
+      el?.setSelectionRange(at + emoji.length, at + emoji.length);
+    });
+  };
+
   const back = { label: t("trn.back"), onClick: backToCoaching };
   const who = name || t("trn.noName");
   if (gone)
     return (
       <div className="pb-2">
-        {!embedded && <ScreenHeader back={back} title={t("trn.chat")} />}
+        {mode === "screen" && <ScreenHeader back={back} title={t("trn.chat")} />}
         <EmptyState icon="info" title={t("trn.err.gone")} action={<Button onClick={() => go("trainer")}>{t("trn.back")}</Button>} />
       </div>
     );
+  // The newest message this lifter sent, which carries "Seen" or "Sent" under it.
+  const mineLast = [...(list ?? [])].reverse().find((m) => m.from === me);
+  const away = presence && (presence.state === "vacation" || presence.state === "dnd");
+  const frame =
+    mode === "embedded"
+      ? "card flex h-[70dvh] flex-col p-4"
+      : mode === "dock"
+        ? "flex h-full min-h-0 flex-col px-3 pb-3"
+        : pane
+          ? "vv-pane max-w-lg px-5"
+          : "flex min-h-[70dvh] flex-col pb-2";
   return (
-    <div
-      className={embedded ? "card flex h-[70dvh] flex-col p-4" : pane ? "vv-pane max-w-lg px-5" : "flex min-h-[70dvh] flex-col pb-2"}
-      data-testid="chat-thread"
-    >
-      {embedded ? (
-        <p className="font-semibold">{who}</p>
-      ) : (
+    <div className={frame} data-testid="chat-thread">
+      {mode === "embedded" && <p className="shrink-0 font-semibold">{who}</p>}
+      {mode === "screen" && (
         <ScreenHeader className="shrink-0" back={back} kicker={them === "coach" ? t("trn.chatCoach") : t("trn.chat")} title={who} />
+      )}
+      {mode !== "dock" && presence && (
+        <p className="mt-1 flex shrink-0 items-center gap-2 text-sm text-muted">
+          <StatusDot state={presence.state} />
+          {presenceText(presence, now)}
+        </p>
       )}
       {more && (
         <Button kind="quiet" className="mt-2 shrink-0 self-center" onClick={() => void older()}>
@@ -195,11 +344,11 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
       <div
         ref={box}
         onScroll={inBox ? onScroll : undefined}
-        className={`mt-3 flex-1 ${inBox ? "min-h-0 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,transparent,black_1rem)]" : ""}`}
+        className={`${mode === "dock" ? "mt-1" : "mt-3"} flex-1 ${inBox ? "min-h-0 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,transparent,black_1rem)]" : ""}`}
         // A scrolling box must be reachable by keyboard (axe: scrollable-region-focusable).
-        {...(inBox ? { role: "region", tabIndex: 0, "aria-label": t("trn.chat") } : {})}
+        {...(inBox ? { role: "region", tabIndex: 0, "aria-label": t("trn.chatWith", { name: who }) } : {})}
       >
-        <ol className="space-y-2" aria-live="polite" aria-label={inBox ? undefined : t("trn.chat")}>
+        <ol className="space-y-2 pt-3" aria-live="polite" aria-label={inBox ? undefined : t("trn.chat")}>
           {list === null ? (
             <li className="text-sm text-muted">{t("trn.loading")}</li>
           ) : list.length === 0 ? (
@@ -211,60 +360,188 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
           ) : (
             list.map((m) => {
               const mine = m.from === me;
+              const label = t("trn.chatLine", { who: mine ? t("trn.you") : who, date: stamp(m.at) });
               return (
-                <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2 ${mine ? "bg-accent/15 text-ink" : "card"}`}
-                    aria-label={t("trn.chatLine", {
-                      who: mine ? t("trn.you") : who,
-                      date: date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }),
-                    })}
-                  >
-                    <p className="whitespace-pre-line break-words">{m.text}</p>
-                    <p className="mt-1 text-right text-xs text-muted">
-                      {date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                <li key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
+                  {m.sticker ? (
+                    <div className="animate-pop" aria-label={label} role="group">
+                      <StickerArt id={m.sticker} size={mode === "dock" ? 88 : 112} />
+                      <p className="mt-1 text-right text-xs text-muted">{stamp(m.at)}</p>
+                    </div>
+                  ) : (
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-4 py-2 ${mine ? "bg-accent/15 text-ink" : "card"}`}
+                      aria-label={label}
+                      role="group"
+                    >
+                      <p className="whitespace-pre-line break-words">{m.text}</p>
+                      <p className="mt-1 text-right text-xs text-muted">{stamp(m.at)}</p>
+                    </div>
+                  )}
+                  {mineLast?.id === m.id && (
+                    <p className="mt-0.5 px-1 text-xs text-muted" data-testid="chat-receipt">
+                      {seen >= m.at ? t("trn.seen", { time: date(seen, { hour: "numeric", minute: "2-digit" }) }) : t("trn.sent")}
                     </p>
-                  </div>
+                  )}
                 </li>
               );
             })
           )}
+          {typing && (
+            <li className="flex items-center gap-2 px-1 text-sm text-muted" data-testid="chat-typing">
+              <span className="typing-dots" aria-hidden>
+                <span />
+                <span />
+                <span />
+              </span>
+              {t("trn.typing", { name: who })}
+            </li>
+          )}
         </ol>
+        {!inBox && <div ref={end} />}
       </div>
-      {!inBox && <div ref={end} />}
       {error && (
         <p className="mt-2 shrink-0 text-sm text-warn" role="status">
           {error}
         </p>
       )}
+      {away && (
+        // A vacation or Do not disturb says so before you write, and that they'll see it later (no push goes now).
+        <p className="mt-2 flex shrink-0 items-start gap-2 rounded-xl bg-raised px-3 py-2 text-sm text-muted" role="note">
+          <StatusDot state={presence.state} className="mt-1.5" />
+          {presence.state === "vacation"
+            ? t("trn.awayVacation", { name: who, status: presenceText(presence, now) })
+            : t("trn.awayDnd", { name: who })}
+        </p>
+      )}
       <form
         onSubmit={(e) => void send(e)}
         className={
-          embedded
+          mode === "embedded"
             ? "mt-3 shrink-0 border-t border-line pt-3"
-            : pane
-              ? "card mt-3 shrink-0 p-3"
-              : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-3"
+            : mode === "dock"
+              ? "mt-2 shrink-0 border-t border-line pt-2"
+              : pane
+                ? "card mt-3 shrink-0 p-3"
+                : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-3"
         }
       >
-        <label htmlFor={`trn-chat-${id}`} className="sr-only">
+        {tray && <ChatTray kind={tray} compact={mode === "dock"} onEmoji={addEmoji} onSticker={(s) => void deliver("", s)} busy={busy} />}
+        <label htmlFor={`trn-chat-${mode}-${id}`} className="sr-only">
           {t("trn.chatLabel")}
         </label>
-        <div className="flex items-end gap-2">
-          <textarea
-            id={`trn-chat-${id}`}
-            value={text}
-            onChange={(e) => setText(e.target.value.slice(0, MESSAGE_MAX))}
-            maxLength={MESSAGE_MAX}
-            rows={2}
-            placeholder={them === "coach" ? t("trn.messageNamed", { name: who }) : t("trn.chatLabel")}
-            className="min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2"
+        <div className="flex items-end gap-1.5">
+          <TrayButton
+            icon="smile"
+            label={t("trn.emoji")}
+            on={tray === "emoji"}
+            onClick={() => setTray(tray === "emoji" ? null : "emoji")}
           />
-          <Button submit disabled={busy || !text.trim()}>
-            {t("trn.send")}
+          <TrayButton
+            icon="sticker"
+            label={t("trn.stickers")}
+            on={tray === "stickers"}
+            onClick={() => setTray(tray === "stickers" ? null : "stickers")}
+          />
+          <textarea
+            ref={input}
+            id={`trn-chat-${mode}-${id}`}
+            value={text}
+            onChange={(e) => type(e.target.value)}
+            onKeyDown={onKey}
+            maxLength={MESSAGE_MAX}
+            rows={mode === "dock" ? 1 : 2}
+            placeholder={them === "coach" ? t("trn.messageNamed", { name: who }) : t("trn.chatLabel")}
+            className="min-h-11 min-w-0 flex-1 resize-none rounded-xl border border-line bg-raised px-3 py-2"
+          />
+          <Button
+            submit
+            disabled={busy || !text.trim()}
+            label={mode === "dock" ? t("trn.send") : undefined}
+            icon={mode === "dock" ? "send" : undefined}
+            className={mode === "dock" ? "size-11 !px-0" : ""}
+          >
+            {mode === "dock" ? null : t("trn.send")}
           </Button>
         </div>
       </form>
+    </div>
+  );
+}
+
+function TrayButton({ icon, label, on, onClick }: { icon: "smile" | "sticker"; label: string; on: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        haptic("select");
+        onClick();
+      }}
+      aria-label={label}
+      aria-expanded={on}
+      className={`press flex size-11 shrink-0 items-center justify-center rounded-xl ${on ? "bg-accent/15 text-accent" : "text-muted hover:text-ink"}`}
+    >
+      <Icon name={icon} size={22} />
+    </button>
+  );
+}
+
+/** The emoji grid or the sticker grid, above the send box. A sticker sends at once; an emoji goes into the box. */
+function ChatTray({
+  kind,
+  compact,
+  onEmoji,
+  onSticker,
+  busy,
+}: {
+  kind: "emoji" | "stickers";
+  compact: boolean;
+  onEmoji: (e: string) => void;
+  onSticker: (s: StickerId) => void;
+  busy: boolean;
+}) {
+  return (
+    <div
+      className={`animate-rise mb-2 overflow-y-auto overscroll-contain rounded-2xl border border-line bg-surface p-2 ${compact ? "max-h-44" : "max-h-60"}`}
+      role="group"
+      aria-label={kind === "emoji" ? t("trn.emoji") : t("trn.stickers")}
+      data-no-swipe
+    >
+      {kind === "emoji" ? (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))]">
+          {EMOJI.map((e) => (
+            <button
+              key={e}
+              type="button"
+              onClick={() => onEmoji(e)}
+              className="press flex size-11 items-center justify-center rounded-xl text-2xl hover:bg-raised"
+            >
+              {e}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(5rem,1fr))] gap-2">
+          {STICKERS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                sound.pop();
+                onSticker(s.id);
+              }}
+              className="press flex flex-col items-center gap-1 rounded-2xl p-1 hover:bg-raised disabled:opacity-60"
+              aria-label={t("trn.sendSticker", { sticker: t(`trn.stk.${s.id}`) })}
+            >
+              <StickerArt id={s.id} size={compact ? 60 : 72} bare />
+              <span aria-hidden className="line-clamp-2 text-center text-xs font-semibold leading-tight text-muted">
+                {t(`trn.stk.${s.id}`)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

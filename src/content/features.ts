@@ -734,6 +734,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "coach-chat-dock",
+        name: "Chat dock, statuses and stickers",
+        body: "On a computer, coach chat sits in a dock at the bottom right, like a messenger: everyone you can message, up to two chat windows that fold away, a sound and a count in the tab when a message comes in. Both sides set a status (online, with a client, training, away, do not disturb, on vacation or appear offline), see when the other is typing and when they've seen your message, and send emoji and gym stickers, on the phone too.",
+        tier: "both",
+        proPart: "Being a client is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-15",
+      },
+      {
         id: "trainer-directory",
         name: "Listed in the trainer directory",
         body: "List yourself as a trainer, coach or physio at your gym and you show on that gym's page and in the trainer directory for its city on the website, with your bio and a link for new clients to start training with you. Only adults are listed.",
