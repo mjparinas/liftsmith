@@ -20,7 +20,7 @@ import { LB, weightIn } from "./unitMath";
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
 export type MessageKind =
-  "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab";
+  "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab";
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
@@ -66,6 +66,13 @@ export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push
     push: false,
     email: true,
   },
+  // After Getting started: one email a week about one more thing the app does (server/weekly.ts).
+  weekly: {
+    label: "Weekly tips",
+    blurb: "After Getting started, one email a week about something else the app can do.",
+    push: false,
+    email: true,
+  },
 };
 
 export const KINDS = Object.keys(KIND_INFO) as MessageKind[];
@@ -80,6 +87,7 @@ export const DEFAULT_ON: Record<MessageKind, boolean> = {
   milestone: true,
   pro: false,
   tour: true,
+  weekly: true,
   trial: true,
   recap: true,
   records: true,

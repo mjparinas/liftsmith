@@ -435,7 +435,7 @@ export const de: FeaturesText = {
     },
     emails: {
       name: "E-Mails, die dich dranbleiben lassen",
-      body: "Acht Tipps für den Einstieg mit echten Bildschirmen, ein Wochen- und Monatsrückblick, neue Bestleistungen, welche Freunde trainiert haben und ein Anstoß zurück nach einer Pause. Jede Art hat ihren eigenen Schalter.",
+      body: "Acht Tipps für den Einstieg mit echten Bildschirmen, ein Wochen- und Monatsrückblick, neue Bestleistungen, welche Freunde trainiert haben ein Anstoß zurück nach einer Pause und danach jede Woche ein Tipp zu einer Funktion, die du vielleicht noch nicht kennst. Jede Art hat ihren eigenen Schalter.",
       note: "Mit einem Konto eingeschaltet, für unter 18-Jährige aus, außer sie schalten sie ein. Jede E-Mail lässt sich mit einem Klick abbestellen.",
     },
     cloud: {

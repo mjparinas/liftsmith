@@ -1,12 +1,12 @@
-# Weekly tips emails (Melvin, 2026-11-15; planned, not built)
+# Weekly tips emails (Melvin, 2026-11-15; built)
 
 Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that apply to every change and the list of topics. Record decisions about this topic here, in the same change as the code.
 
 Melvin, 2026-11-15: "plan out a series of emails that we can send out on a weekly basis, that doesn't already duplicate the 8 days of getting started emails … should have enough content for 1 year … all emails should be relevant and full of content", then "there should be maybe a series of 'did you know' … features that users may not know about" and "if you find that we have more than enough content, add more to that list of 52".
 
-**Status: content plan waiting for Melvin's approval. Nothing is built yet.** When it's approved, the build follows "How the series works" below and this file becomes its decision record.
+**Status: built** (Melvin approved the content on 2026-11-15: "execute"). The code is `src/server/weekly/`: `list.ts` is the send order and each email's tier, audience and screen; `text/<lang>.ts` holds the words in all six languages under the same ids; `send.ts` picks the next one and writes it; `reminders.ts` `schedule()` sends it from the daily job. The words that go out are the ones in `text/`; the list below is the approved plan they were written from, kept for the reasons behind each email.
 
-**Keep it current** (rule in AGENTS.md, Email): when a brand-new feature a lifter would notice ships, append an email for it to the end of [The list](#the-list) in the same change (next free number, marked **New**), or add it to an existing email when it only extends one. New ones are sent before the rest of the queue (see "New features go first").
+**Keep it current** (rule in AGENTS.md, Email): when a brand-new feature a lifter would notice ships, append an email for it to the end of `WEEKLY` in `list.ts` with `fresh` set to the day it shipped, add its words to every `text/<lang>.ts`, take its screenshot (`ONLY=<id> node scripts/weekly-email-shots.mjs`), and add a short entry at the end of [The list](#the-list) below marked **New**. Or add a point to an existing email when it only extends one. `weekly.test.ts` fails when a language lacks an email, a line or a screenshot. New ones are sent before the rest of the queue (see "New features go first").
 
 ## Is there a year of it?
 
@@ -14,19 +14,20 @@ Yes, with room to spare. Without padding there are **59 emails every adult lifte
 
 Where content was thin it was merged rather than stretched: cycle-aware readiness sits in the readiness email, the smart scale lab in the weigh-ins email, Oura in the sleep and HRV part of readiness, and the 3D figure "shaped like me" with the recovery map and battery saver. Nothing here is a single switch dressed up as an email; single switches go in the "Did you know" round-ups (4 to 6 tips each) and in the "Did you know?" line at the foot of every email.
 
-## How the series works (proposed)
+## How the series works
 
-- **Name and switch:** "Weekly tips", its own kind with its own switch in Settings › Reminders › Email, **on by default** like Getting started tips, and covered by Email me (`messages.emailOff`) and the one-click unsubscribe like every email.
-- **When:** one a week at 10:00 in the lifter's time zone, on **Tuesday** (Monday has the week email, Thursday the friends email, Sunday the recap). The first one goes out on the first Tuesday at least 7 days after the eighth Getting started email, so nobody gets it while the tour is running. Same busy-day rule as the tour: it never lands on a day that already has an email and moves to the next free day that week, and it counts toward the three-a-week cap. Skipped entirely for a week with a trial-ending email.
-- **Never to under-18s,** like the tour and Pro offers: the series is promotional (it sells features and Pro), so `teen` subscriptions get none of it. Teens still get every account and lifecycle email they get today.
-- **Order and progress:** like the tour, each subscription gets the first email in the list it hasn't had. A lifter who joins in March starts at Week 1, not at whatever the calendar says. Emails that don't apply to someone are skipped for them, not left as a gap (see "Who gets what").
-- **New features go first:** an email marked **New** goes to everyone who has finished Getting started, as their next weekly email, then the queue carries on. Someone who joins later gets it in its list position.
-- **Who gets what:** *Lifters* (everyone, the default). *Coaches and trainers*: accounts with coaching on, or a coach role set. *Physios*: accounts with the physio role. *School coaches*: verified school coach accounts. *Gym owners and staff*: owners of a claimed gym and its staff accounts. A role email takes that person's next weekly slot, and their lifter emails move back a week, so nobody gets two in a week. Lifter emails that would only make sense to a role (W38, "Train with a coach") aren't sent to people who already coach.
-- **Pro and free:** each email is tagged Free, Pro, Free + Pro or Labs (Pro). Pro emails have two endings: a free lifter gets "Try it free for 14 days, then $6.99 a month or $39.99 a year. No ads, ever." and a button to the Pro page; a Pro lifter gets "This is part of your Pro" and a button straight to the feature. Until billing is live (`billingLive()`), everyone has Pro, so every email uses the Pro ending and no price is shown. Labs emails also say plainly that Labs are experiments and may change.
-- **Look:** the same branded template as Getting started tips (`brandedMail`), with a kicker ("Weekly tip · 12"), a title, a short opening line, **three or four short points** (the tour has one paragraph and one tip; these carry more), the real screen in the reader's language, a button to that screen, and a **"Did you know?"** line at the foot with one lesser-known setting. Every email in six languages, Canadian English in English.
-- **Screenshots:** each email names the screen to show. They come from the real app, made by a new capture step beside `scripts/email-images.mjs` (demo account with realistic data, dark theme, phone frame, each of the six languages), into `public/email/<lang>/w<NN>.jpg`. Where a screen only exists on the phones (watch, widget, lock screen), the capture uses the existing Play listing shots where one fits, or the Android screen.
-- **Words:** no other app is ever named (the import email says "most lifting apps"), and programs keep our own names (the classic four-week training-max program is "Training max waves", never its trademarked name). No promises the app doesn't keep: connections that aren't live say so.
-- **Data-driven emails:** a few (W51, W52 and the round-ups' "you haven't tried" picks) read numbers the server already keeps for recaps; nothing new is sent to the server for them.
+- **Name and switch:** "Weekly tips" (`weekly` in `messages.ts`), its own switch in Settings › Reminders › Email, **on by default** like Getting started tips, and covered by Email me (`messages.emailOff`) and the one-click unsubscribe like every email. Turning it off (or the account turning out to be under 18) cancels one already scheduled.
+- **When it starts:** a week after the eighth Getting started email. With Getting started switched off, 15 days after the subscription began, as if it had run (`weeklyStart`). Nothing while Getting started is still going.
+- **When each goes out:** 10:00 in the lifter's time zone, on **Tuesday** (Monday has the week email, Thursday the friends email, Sunday the recap). If Tuesday already has an email it moves to the next free weekday, up to Saturday. **One per calendar week** (Monday to Sunday), never on a day that already has an email, never in a week that already had three other emails in the seven days before it, and **none in a week with a trial-ending email**. Like the tour, it steps aside for any email planned later on its day (it's cancelled and goes on another day under the same key) and doesn't count toward the caps itself (`filler` in `reminders.ts`).
+- **Never to under-18s,** like the tour and Pro offers: the series is promotional (it sells features and Pro). Teens still get every account and lifecycle email they get today.
+- **Order and progress:** each subscription gets the first email in `WEEKLY` it hasn't had and that's meant for it. A lifter who joins in March starts at the top, not at whatever the calendar says. The kicker counts that person's own weekly tips ("Weekly tip · 12").
+- **New features go first:** an email with `fresh` set goes before the rest of the queue (oldest first), so everyone already in the series gets it as their next one. Someone who joins later gets it first too, which is fine: it's the newest thing.
+- **Who gets what** (`forAccount`, roles from `weeklyFacts` in `remindersDb.ts`): *Lifters*, everyone. *Coaches and trainers*: a coach account or anyone with a linked client (`coach_accounts`, `coach_links`), physios included. *Physios*: `coach_prefs.kind = 'physio'`. *School coaches*: an approved `school_coaches` row; they get the school email instead of the paid coaching ones. *Gym owners and staff*: an approved gym claim or a `gym_staff` row. Role emails sit in the list where they should land (C1 third, a gym email sixth, and so on), so they take the person's next weekly slot and their lifter emails move back a week. "Train with a coach, free" isn't sent to coaches, physios or school coaches. The coach plans email waits until the `coachPlans` flag is on. Accounts with no data for roles (no account linked) get the lifter emails only.
+- **Pro and free:** each email is Free, Pro, Free + Pro (`both`) or Labs. Pro, Free + Pro and Labs emails end with a line for this reader, from the Pro state the phone already sends: a free lifter gets "This is part of Pro: $6.99 a month or $39.99 a year, with no ads, ever.", a Pro lifter "This is part of your Pro." and someone in a trial "This is part of the Pro trial you're on." Labs emails add that Labs are experiments. The coach plans email has no such line (it has its own prices). Free emails have none. Until billing is live the phones report everyone as Pro, so nobody sees a price. The button always goes to the email's own screen ("See what Pro adds" on the Pro email for anyone without Pro), because Pro features are never hidden and their Pro tag opens the paywall.
+- **Look:** the branded template of Getting started (`brandedMail`), with a kicker, the title, one opening line, **three to five points** as a list, the Pro or Labs line, a **"Did you know?"** line with one lesser-known setting, the button, then the real screen in the reader's language. Six languages, Canadian English.
+- **Screenshots:** `scripts/weekly-email-shots.mjs` trains a demo lifter for two and a half weeks in the static build (like the Play capture), then opens each email's screen in each language and saves `public/email/<lang>/w/<id>.jpg`, 600 px wide. Screens several emails share scroll to the part each one is about (`SCROLL` in the script). The weekly test fails when a picture is missing. Emails about screens that need a signed-in account (coaching, physio, school teams, Friends, invites), the gym owners' emails and the public gym pages email (the website's page, not the app) and the coach plans email go without a picture (`shot: false` in `list.ts`), because the demo lifter has no account and a sign-in screen says nothing about the feature; the desktop email is taken at desktop size, 900 px wide, and the gym finder email taps Add gym first to show its finder (`TAP` in the script).
+- **Words:** no other app is ever named (the import email says "most popular lifting apps"; the test checks every language against the comparison pages' list of names), and programs keep our own names (the four-week training-max program is "Training max waves", never its trademarked name). No promises the app doesn't keep.
+- **Not data-driven:** the server has no yearly totals, so W51 (the anniversary) explains the anniversary card rather than quoting numbers, and W52 is about how to keep up with what's new rather than listing it. Nothing new is sent to the server for this series.
 
 ## The list
 
@@ -482,23 +483,23 @@ Travel, holidays and visiting family don't have to break your streak.
 - Streak freezes cover the week you really can't train.
 Did you know? Short stretch days of 10 minutes or more keep your streak too.
 
-### W51 · A year of lifting, in numbers
-Free · Lifters (data-driven) · Screen: the anniversary card
-What a year of showing up adds up to.
-- Workouts, sets and total lifted this year.
-- The lift that grew most.
-- Your longest streak.
-- One thing to aim for next year.
-Did you know? Seven quick taps on the logo at the foot of Settings shows your lifetime total in other units.
+### W51 · Your lifting anniversary
+Free · Lifters · Screen: Progress
+Every year on the day of your first workout, the app looks back with you.
+- Today puts day one beside today: workouts, sets and total lifted.
+- It names the lift that has grown most.
+- It comes with a card to share.
+- It stays for a week, so you won't miss it.
+Did you know? Seven quick taps on the logo at the foot of Settings shows your lifetime total in elephants.
 
-### W52 · What's new this year
-Free · Lifters (data-driven) · Screen: the features page's Newest section
-Liftsmith kept changing. Here's what arrived since you started.
-- The biggest new features since your first workout.
-- Ones you haven't tried yet.
-- How to switch them on.
-- How to tell us what to build next.
-Did you know? The website's Features page lists every feature and what's newest.
+### W52 · What's new in Liftsmith
+Free · Lifters · Screen: Today
+The app keeps changing. Here's how to keep up, and how to steer it.
+- The Features page on the website lists every feature, with the newest at the top.
+- Each new feature gets its own tip email, so you hear about it once, here.
+- Labs is where new ideas land first.
+- Send feedback from Settings to tell us what to build next.
+Did you know? Updates arrive by themselves; the app tells you when one is ready.
 
 ## Did you know round-ups
 
