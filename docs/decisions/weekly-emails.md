@@ -624,15 +624,6 @@ More clients shouldn't mean fewer tools.
 - Every coaching tool on every plan, clients free, and no cut of client payments.
 Sent only once the `coachPlans` flag is on.
 
-### C7 · Reviews from your clients (**New**, 2026-11-15)
-Pro · Coaches, trainers and physios · No screen (it needs a coach's account) · `fresh`, so it goes next to coaches already in the series
-Clients who've trained with you can now rate you, and new clients can see it.
-- A client can leave stars and a short review after four weeks or two sessions with you.
-- Your rating shows on your invite and in the trainer directory once you have three reviews.
-- Next to it: how many of your clients trained in the last two weeks.
-- Reply once to each review from Coaching › Setup, and report one that breaks the rules.
-Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))
-
 ### P1 · Rehab that actually gets done
 Pro · Physios and rehab clinicians · Screen: assigning a rehab program
 Home exercises work when they're done. Liftsmith puts yours on your client's Today.
@@ -668,3 +659,21 @@ Share the work and give new members a head start.
 - Run a club with a weekly leaderboard.
 - Approve trainers who list themselves at your gym.
 Did you know? Your gym's page is on the website too, so people searching for gyms nearby can find it.
+
+### C7 · Your client chat, now a messenger (**New**, 2026-11-15)
+Pro · Coaches and trainers · No screenshot (coaching needs an account)
+On a computer, every chat now lives in a dock at the bottom right, so clients are one click away on any page.
+- Up to two chat windows beside the list, each folding down to its name.
+- A sound and a count in the browser tab when a client writes.
+- Set a status: with a client, training, away, do not disturb, on vacation or appear offline; online shows by itself.
+- See when a client is typing and when they've seen your message, and send emoji and gym stickers.
+Did you know? On Do not disturb or on vacation, chat notifications to you wait until you're back.
+
+### C8 · Reviews from your clients (**New**, 2026-11-15)
+Pro · Coaches, trainers and physios · No screen (it needs a coach's account) · `fresh`, so it goes next to coaches already in the series
+Clients who've trained with you can now rate you, and new clients can see it.
+- A client can leave stars and a short review after four weeks or two sessions with you.
+- Your rating shows on your invite and in the trainer directory once you have three reviews.
+- Next to it: how many of your clients trained in the last two weeks.
+- Reply once to each review from Coaching › Setup, and report one that breaks the rules.
+Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))

@@ -33,7 +33,7 @@ const per = (kind: PriceKind, amount: string) => (kind === "month" ? t("pay.perM
 // --- The coach's side ---
 
 /** Under Your clients: connect Stripe, finish setting up, or open the Stripe dashboard. */
-export function PaySetup({ account, onChange }: { account: PayAccount | null; onChange: () => void }) {
+export function PaySetup({ account, fee, onChange }: { account: PayAccount | null; fee: number; onChange: () => void }) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acc, setAcc] = useState(account);
@@ -91,6 +91,7 @@ export function PaySetup({ account, onChange }: { account: PayAccount | null; on
           </>
         )}
         <p className="mt-3 text-xs text-muted">{t("pay.fine")}</p>
+        {fee > 0 && <p className="mt-1 text-xs text-muted">{t("pay.fee", { fee })}</p>}
         {note && (
           <p className="mt-2 text-sm text-muted" role="status">
             {note}

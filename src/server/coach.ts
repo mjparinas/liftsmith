@@ -11,7 +11,11 @@
 // Decision record: docs/decisions/trainer-mode.md.
 import { randomBytes } from "node:crypto";
 
+import { liveStatus, muted, shownState, type Presence, type Shown } from "@/lib/coachStatus";
+import { isSticker, stickerEmoji, type StickerId } from "@/lib/stickers";
+
 import { hasRoom } from "./coachPlan";
+import { presenceCleanup, presenceOf, presences, stopTyping, touchSeen, typingTo } from "./coachPresence";
 import { batch, query, rateLimit, run } from "./db";
 import { notifyCoach } from "./push";
 
@@ -849,6 +853,27 @@ export interface Message {
   from: string;
   text: string;
   at: number;
+  /** A sticker instead of words (src/lib/stickers.ts); `text` is then empty. */
+  sticker?: StickerId;
+}
+type MessageRow = { id: string; from_id: string; body: string; at: number; sticker: string | null };
+const messageOf = (r: MessageRow): Message => {
+  const m: Message = { id: String(r.id), from: String(r.from_id), text: String(r.body), at: Number(r.at) };
+  return isSticker(r.sticker) ? { ...m, sticker: r.sticker } : m;
+};
+
+/** What one side sees of the other's presence: the state, when a picked status ends, and when they were last active. */
+export interface ShownPresence {
+  state: Shown;
+  /** When the picked status ends (a vacation's last day), 0 when it doesn't. */
+  until: number;
+  /** When they last had coaching open, only while they show as offline on Automatic (never when they appear offline). */
+  seenAt?: number;
+}
+export function shownPresence(p: Presence, now: number): ShownPresence {
+  const state = shownState(p, now);
+  const out: ShownPresence = { state, until: state === "online" || state === "offline" ? 0 : p.until };
+  return state === "offline" && p.status !== "offline" && p.seenAt > 0 ? { ...out, seenAt: p.seenAt } : out;
 }
 
 /** The pair's coach and client, whichever way round the two are, or null when they aren't linked. */
@@ -867,22 +892,33 @@ export async function sendMessage(
   raw: unknown,
   now = Date.now(),
   id = randomBytes(9).toString("base64url"),
+  rawSticker: unknown = undefined,
 ): Promise<Message | { error: MessageError }> {
   if (!isAccountId(toId)) return { error: "notLinked" };
   const pair = await pairOf(fromId, toId);
   if (!pair) return { error: "notLinked" };
-  const body = typeof raw === "string" ? cleanMessage(raw) : "";
-  if (!body) return { error: "empty" };
+  // A sticker is the whole message; anything typed with it is dropped.
+  const sticker = isSticker(rawSticker) ? rawSticker : null;
+  const body = sticker ? "" : typeof raw === "string" ? cleanMessage(raw) : "";
+  if (!body && !sticker) return { error: "empty" };
   if (!(await rateLimit(`coachmsg:${fromId}`, COACH_LIMITS.messagesPerHour, 3_600_000, now))) return { error: "slow" };
   await batch([
     {
-      sql: "INSERT INTO coach_messages (id, coach_id, client_id, from_id, body, at) VALUES (?, ?, ?, ?, ?, ?)",
-      args: [id, pair.coach, pair.client, fromId, body, now],
+      sql: "INSERT INTO coach_messages (id, coach_id, client_id, from_id, body, at, sticker) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      args: [id, pair.coach, pair.client, fromId, body, now, sticker],
     },
     { sql: READ_SQL, args: [fromId, toId, now] },
   ]);
-  await notifyCoach(toId, "coachMsg", { name: await nameOf(fromId), text: body }, `#/trainer/m.${fromId}`);
-  return { id, from: fromId, text: body, at: now };
+  await stopTyping(fromId);
+  // Do not disturb and On vacation hold the push; the message waits in the chat (src/lib/coachStatus.ts).
+  if (!muted(await presenceOf(toId), now))
+    await notifyCoach(
+      toId,
+      "coachMsg",
+      { name: await nameOf(fromId), text: sticker ? stickerEmoji(sticker) : body },
+      `#/trainer/m.${fromId}`,
+    );
+  return sticker ? { id, from: fromId, text: "", at: now, sticker } : { id, from: fromId, text: body, at: now };
 }
 
 /** A message's text: like a note's, but longer. */
@@ -899,31 +935,126 @@ export function cleanMessage(x: string): string {
 const READ_SQL = `INSERT INTO coach_reads (account_id, other_id, read_at) VALUES (?, ?, ?)
   ON CONFLICT (account_id, other_id) DO UPDATE SET read_at = MAX(coach_reads.read_at, excluded.read_at)`;
 
-/** The latest messages with the other side (oldest first), or older ones before `before`. Reading marks them read. */
+/** When `readerId` last read their thread with `otherId` (0 if never). */
+async function readAt(readerId: string, otherId: string): Promise<number> {
+  const [r] = await query<{ read_at: number }>("SELECT read_at FROM coach_reads WHERE account_id = ? AND other_id = ?", [
+    readerId,
+    otherId,
+  ]);
+  return Number(r?.read_at ?? 0);
+}
+
+export interface Thread {
+  messages: Message[];
+  more: boolean;
+  name: string;
+  them: "coach" | "client";
+  /** When the other side last read this thread, for "Seen" under the newest message they've read. */
+  seen: number;
+  /** Whether the other side is typing to this one right now. */
+  typing: boolean;
+  presence: ShownPresence;
+}
+
+/**
+ * The latest messages with the other side (oldest first), older ones before `before`, or only those after `after` (an
+ * open thread checking for new ones). Reading the latest marks them read, and marks this account active.
+ */
 export async function messages(
   accountId: string,
   otherId: unknown,
   before: unknown,
   now = Date.now(),
-): Promise<{ messages: Message[]; more: boolean; name: string; them: "coach" | "client" } | { error: "notLinked" }> {
+  after: unknown = undefined,
+): Promise<Thread | { error: "notLinked" }> {
   if (!isAccountId(otherId)) return { error: "notLinked" };
   const pair = await pairOf(accountId, otherId);
   if (!pair) return { error: "notLinked" };
-  const until = typeof before === "number" && Number.isFinite(before) ? before : Number.MAX_SAFE_INTEGER;
-  const rows = await query<{ id: string; from_id: string; body: string; at: number }>(
-    "SELECT id, from_id, body, at FROM coach_messages WHERE coach_id = ? AND client_id = ? AND at < ? ORDER BY at DESC LIMIT ?",
-    [pair.coach, pair.client, until, COACH_LIMITS.page + 1],
-  );
+  const older = typeof before === "number" && Number.isFinite(before);
+  const newer = !older && typeof after === "number" && Number.isFinite(after);
+  const rows = newer
+    ? await query<MessageRow>(
+        "SELECT id, from_id, body, at, sticker FROM coach_messages WHERE coach_id = ? AND client_id = ? AND at > ? ORDER BY at DESC LIMIT ?",
+        [pair.coach, pair.client, after, COACH_LIMITS.page + 1],
+      )
+    : await query<MessageRow>(
+        "SELECT id, from_id, body, at, sticker FROM coach_messages WHERE coach_id = ? AND client_id = ? AND at < ? ORDER BY at DESC LIMIT ?",
+        [pair.coach, pair.client, older ? before : Number.MAX_SAFE_INTEGER, COACH_LIMITS.page + 1],
+      );
   const more = rows.length > COACH_LIMITS.page;
   const page = rows.slice(0, COACH_LIMITS.page).reverse();
-  if (!Number.isFinite(before as number)) await run(READ_SQL, [accountId, otherId, now]);
+  if (!older) await batch([{ sql: READ_SQL, args: [accountId, otherId, now] }]);
+  await touchSeen(accountId, now);
+  const them = await presenceOf(otherId);
   return {
-    messages: page.map((r) => ({ id: String(r.id), from: String(r.from_id), text: String(r.body), at: Number(r.at) })),
+    messages: page.map(messageOf),
     more,
     name: await nameOf(otherId),
     // Which side the other person is on, so each side's empty thread says something that fits them.
     them: pair.coach === otherId ? "coach" : "client",
+    seen: await readAt(otherId, accountId),
+    typing: typingTo(them, accountId, now),
+    presence: shownPresence(them, now),
   };
+}
+
+/** One person in the chat dock: who they are, how they show, and the newest message between you. */
+export interface LivePerson {
+  id: string;
+  name: string;
+  them: "coach" | "client";
+  presence: ShownPresence;
+  unread: number;
+  typing: boolean;
+  /** When they last read your messages. */
+  seen: number;
+  last?: Message;
+}
+
+/**
+ * Everyone this account can message, for the chat dock and the Messages page: presence, unread, typing and the newest
+ * message, plus this account's own status. Asking marks this account active (Online on Automatic).
+ */
+export async function live(
+  accountId: string,
+  now = Date.now(),
+): Promise<{ me: { status: Presence["status"]; until: number }; people: LivePerson[] }> {
+  await touchSeen(accountId, now);
+  const links = await query<{ coach_id: string; client_id: string }>(
+    "SELECT coach_id, client_id FROM coach_links WHERE coach_id = ? OR client_id = ? ORDER BY created_at",
+    [accountId, accountId],
+  );
+  const seenIds = new Set<string>();
+  const pairs = links.flatMap((l) => {
+    const coach = String(l.coach_id);
+    const client = String(l.client_id);
+    const other = coach === accountId ? client : coach;
+    if (other === accountId || seenIds.has(other)) return [];
+    seenIds.add(other);
+    return [{ other, coach, client, them: (coach === other ? "coach" : "client") as "coach" | "client" }];
+  });
+  const [mine, others, unread] = await Promise.all([presenceOf(accountId), presences(pairs.map((p) => p.other)), unreadFrom(accountId)]);
+  const people = await Promise.all(
+    pairs.map(async ({ other, coach, client, them }): Promise<LivePerson> => {
+      const p = others.get(other) ?? { status: "auto" as const, until: 0, seenAt: 0, typingTo: null, typingAt: 0 };
+      const [last] = await query<MessageRow>(
+        "SELECT id, from_id, body, at, sticker FROM coach_messages WHERE coach_id = ? AND client_id = ? ORDER BY at DESC LIMIT 1",
+        [coach, client],
+      );
+      const out: LivePerson = {
+        id: other,
+        name: await nameOf(other),
+        them,
+        presence: shownPresence(p, now),
+        unread: unread[other] ?? 0,
+        typing: typingTo(p, accountId, now),
+        seen: await readAt(other, accountId),
+      };
+      return last ? { ...out, last: messageOf(last) } : out;
+    }),
+  );
+  const status = liveStatus(mine, now);
+  return { me: { status, until: status === "auto" ? 0 : mine.until }, people };
 }
 
 /** Unread messages to this account, by who sent them. */
@@ -1099,6 +1230,7 @@ export const coachCleanup = (accountId: string) => [
   { sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE client_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_checkins WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  ...presenceCleanup(accountId),
   // Reviews it wrote and reviews of it (coachReviews.ts).
   { sql: "DELETE FROM coach_reviews WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

@@ -289,7 +289,7 @@ export const emails: Record<string, Words> = {
       "Abre las horas que tienes libres, una vez o cada semana; tus clientes las reservan en la app.",
       "Una sesión en las próximas 24 horas aparece en su Hoy y pasa a su calendario con un toque.",
       "Conecta tu propia cuenta de Stripe y fija un precio por sesión o por mes; el dinero va directo a ti.",
-      "Liftsmith no se queda nada de lo que te pagan, y un pago fallido aparece en su informe.",
+      "Con Coach y Coach Plus, Liftsmith no se queda nada de lo que te pagan (un 2 % con Pro), y un pago fallido aparece en su informe.",
     ],
     dyk: "También puedes reservar tú una sesión a un cliente desde la agenda.",
   },
@@ -501,7 +501,7 @@ export const emails: Record<string, Words> = {
       "Pro incluye hasta 3 clientes.",
       "Coach incluye 25 clientes, por $19.99 al mes o $199.99 al año.",
       "Coach Plus no tiene límite fijo, por $39.99 al mes o $399.99 al año.",
-      "Todas las herramientas de coaching en todos los planes, tus clientes entrenan gratis y Liftsmith no se queda nada de lo que te pagan.",
+      "Todas las herramientas de coaching en todos los planes, tus clientes entrenan gratis y con Coach y Coach Plus Liftsmith no se queda nada de lo que te pagan (un 2 % con Pro).",
     ],
     dyk: "Pasarte del límite nunca desvincula a un cliente.",
   },
@@ -780,6 +780,18 @@ export const emails: Record<string, Words> = {
       "Envía comentarios desde Ajustes para decirnos qué crear después.",
     ],
     dyk: "Las actualizaciones llegan solas; la app te avisa cuando hay una lista.",
+  },
+  "coach-dock": {
+    title: "El chat con tus clientes, ahora como un mensajero",
+    intro:
+      "En el ordenador, todos los chats viven en un panel abajo a la derecha, así tus clientes están a un clic desde cualquier página.",
+    points: [
+      "Hasta dos ventanas de chat junto a la lista, cada una se pliega hasta su nombre.",
+      "Un sonido y un contador en la pestaña del navegador cuando escribe un cliente.",
+      "Pon un estado: con un cliente, entrenando, ausente, no molestar, de vacaciones o aparecer desconectado; en línea se muestra solo.",
+      "Mira cuándo un cliente escribe y cuándo ha visto tu mensaje, y envía emojis y stickers de gimnasio.",
+    ],
+    dyk: "Con No molestar o de vacaciones, las notificaciones del chat esperan hasta que vuelvas.",
   },
   "coach-reviews": {
     title: "Reseñas de tus clientes",

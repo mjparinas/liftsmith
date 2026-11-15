@@ -11,7 +11,11 @@
 // "book" (a client: `id`) and "cancelSlot" (either side: `id`), each with `label`, the time as the phone shows it, for
 // the push. The overview adds the coach's `slots` and the client's `sessions` (booked and open); a client's view adds
 // `slots`.
-// GET ?chat=<id>[&before=<ms>]: the messages with that person, which marks them read.
+// GET ?chat=<id>[&before=<ms>|&after=<ms>]: the messages with that person (older ones, or only newer ones), which marks
+// them read, with when they last read yours, whether they're typing and how they show. GET ?live=1: everyone you can
+// message with their status, unread count, typing and newest message, and your own status (the chat dock). POST
+// "status" (`status`, `until`: src/lib/coachStatus.ts), "typing" (`id`) and "send" with `sticker` (src/lib/stickers.ts).
+// Every GET marks you active (Online on Automatic; coachPresence.ts).
 // Check-ins (coachForms.ts): "form" (save a form: `form`), "deleteForm" (`id`), "sendForm" (`client`, `id`),
 // "repeatForm" (`client`, `id`, or no `id` to stop) and "answer" (the client: `id`, `answers`); GET ?checkin=<id> is
 // one of the client's to fill in. The overview adds the coach's `forms` and the client's waiting `checkins`, and a
@@ -24,6 +28,7 @@ import {
   clientView,
   isAccountId,
   joinCoach,
+  live,
   makeInvite,
   messages,
   overview,
@@ -56,6 +61,7 @@ import {
   clientPrices,
   dashboardUrl,
   endPair,
+  feeFor,
   onboardUrl,
   payAccount,
   payConfig,
@@ -65,6 +71,7 @@ import {
   stopMonthly,
 } from "@/server/coachPay";
 import { coachPlanOf } from "@/server/coachPlan";
+import { setStatus, setTyping, touchSeen } from "@/server/coachPresence";
 import { rateLimit } from "@/server/db";
 import { saveToken } from "@/server/push";
 
@@ -76,9 +83,11 @@ export async function GET(req: Request) {
   const q = new URL(req.url).searchParams;
   const chat = q.get("chat");
   if (chat !== null) {
-    const r = await messages(s.accountId, chat, q.has("before") ? Number(q.get("before")) : undefined);
+    const num = (k: string) => (q.has(k) ? Number(q.get(k)) : undefined);
+    const r = await messages(s.accountId, chat, num("before"), Date.now(), num("after"));
     return "error" in r ? reply(req, 404, r) : reply(req, 200, r);
   }
+  if (q.has("live")) return reply(req, 200, await live(s.accountId));
   const checkin = q.get("checkin");
   if (checkin !== null) {
     const c = await checkinFor(s.accountId, checkin);
@@ -86,6 +95,7 @@ export async function GET(req: Request) {
   }
   const client = q.get("client");
   if (client === null) {
+    await touchSeen(s.accountId);
     const [o, mine, pending, slots, sessions, plan] = await Promise.all([
       overview(s.accountId),
       forms(s.accountId),
@@ -95,7 +105,9 @@ export async function GET(req: Request) {
       coachPlanOf(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
-    const pay = payConfig() ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId) } : null;
+    const pay = payConfig()
+      ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId), fee: await feeFor(s.accountId) }
+      : null;
     return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
@@ -138,6 +150,9 @@ export async function POST(req: Request) {
         slot?: Record<string, unknown>;
         label?: unknown;
         amount?: unknown;
+        status?: unknown;
+        until?: unknown;
+        sticker?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -202,9 +217,20 @@ export async function POST(req: Request) {
       return reply(req, 200, { checkin: r });
     }
     case "send": {
-      const r = await sendMessage(s.accountId, body.id, body.text);
+      const r = await sendMessage(s.accountId, body.id, body.text, Date.now(), undefined, body.sticker);
       if ("error" in r) return reply(req, r.error === "slow" ? 429 : r.error === "empty" ? 400 : 404, r);
       return reply(req, 200, { message: r });
+    }
+    case "status": {
+      const r = await setStatus(s.accountId, body.status, body.until);
+      return "error" in r ? reply(req, 400, r) : reply(req, 200, r);
+    }
+    case "typing": {
+      // Stored whoever it names; the other side only sees it when the two are linked (messages and live check).
+      if (!isAccountId(body.id)) return reply(req, 400, { error: "Bad request." });
+      if (!(await rateLimit(`coachtyping:${s.accountId}`, 60, 60_000))) return reply(req, 429, { error: "slow" });
+      await setTyping(s.accountId, body.id);
+      return reply(req, 200, { ok: true });
     }
     case "share": {
       const r = await setShare(s.accountId, body.id, body.on, Date.now(), body.what);
@@ -245,7 +271,9 @@ export async function POST(req: Request) {
         if (body.action === "payStop") return reply(req, 200, { ok: await stopMonthly(cfg, s.accountId, body.id) });
         const r = await checkoutFor(cfg, s.accountId, body.id);
         return typeof r === "string" ? reply(req, 200, { url: r }) : reply(req, 409, r);
-      } catch {
+      } catch (e) {
+        // Stripe's own message (never card or bank details) goes to the function log, so a setup problem can be read there.
+        console.error(`coach ${body.action}: ${e instanceof Error ? e.message : String(e)}`);
         return reply(req, 502, { error: "stripe" });
       }
     }

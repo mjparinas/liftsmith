@@ -385,6 +385,11 @@ export const es: FeaturesText = {
       body: "El entrenamiento siempre se comparte. Frecuencia cardiaca, notas de entrenamiento, preparación y recuperación, datos corporales, dolor y lesiones, y ciclo son interruptores que el cliente activa para cada entrenador, al aceptar o cuando quiera. Las fotos y los gimnasios nunca salen.",
       proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
     },
+    "coach-chat-dock": {
+      name: "Panel de chat, estados y stickers",
+      body: "En el ordenador, el chat con tu entrenador vive en un panel abajo a la derecha, como un mensajero: todas las personas con las que puedes hablar, hasta dos ventanas que se pliegan, y un sonido y un contador en la pestaña cuando llega un mensaje. Los dos lados ponen un estado (en línea, con un cliente, entrenando, ausente, no molestar, de vacaciones o aparecer desconectado), ven cuándo el otro escribe y cuándo ha visto tu mensaje, y envían emojis y stickers de gimnasio, también en el teléfono.",
+      proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",
@@ -401,7 +406,7 @@ export const es: FeaturesText = {
     },
     "coach-plans": {
       name: "Planes de entrenador que crecen con tu lista de clientes",
-      body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y Liftsmith no se queda nada de lo que te pagan.",
+      body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y con Coach y Coach Plus Liftsmith no se queda nada de lo que te pagan. Con Pro se queda un 2 %.",
     },
     awards: {
       name: "Logros, niveles y rachas",

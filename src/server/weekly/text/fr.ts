@@ -290,7 +290,7 @@ export const emails: Record<string, Words> = {
       "Ouvrez vos créneaux libres, une fois ou chaque semaine ; vos clients les réservent dans l'app.",
       "Une séance dans les 24 heures apparaît sur leur Aujourd'hui et s'ajoute à leur agenda d'un geste.",
       "Connectez votre propre compte Stripe et fixez un prix par séance ou par mois ; l'argent vous arrive directement.",
-      "Liftsmith ne prend rien sur ce que vos clients vous paient, et un paiement échoué s'affiche dans leur rapport.",
+      "Avec Coach et Coach Plus, Liftsmith ne prend rien sur ce que vos clients vous paient (2 % avec Pro), et un paiement échoué s'affiche dans leur rapport.",
     ],
     dyk: "Vous pouvez aussi réserver vous-même une séance pour un client depuis le planning.",
   },
@@ -503,7 +503,7 @@ export const emails: Record<string, Words> = {
       "Pro couvre jusqu'à 3 clients.",
       "Coach couvre 25 clients, pour $19.99 par mois ou $199.99 par an.",
       "Coach Plus n'a pas de limite fixe, pour $39.99 par mois ou $399.99 par an.",
-      "Tous les outils de coaching dans chaque offre, vos clients s'entraînent gratuitement et Liftsmith ne prend rien sur ce qu'ils vous paient.",
+      "Tous les outils de coaching dans chaque offre, vos clients s'entraînent gratuitement et avec Coach et Coach Plus, Liftsmith ne prend rien sur ce qu'ils vous paient (2 % avec Pro).",
     ],
     dyk: "Dépasser votre limite ne délie jamais un client.",
   },
@@ -782,6 +782,18 @@ export const emails: Record<string, Words> = {
       "Envoyez un avis depuis Réglages pour nous dire quoi créer ensuite.",
     ],
     dyk: "Les mises à jour arrivent toutes seules ; l'app vous prévient quand l'une est prête.",
+  },
+  "coach-dock": {
+    title: "Le chat avec vos clients devient une messagerie",
+    intro:
+      "Sur ordinateur, tous les chats se rangent dans un dock en bas à droite : vos clients sont à un clic, sur n'importe quelle page.",
+    points: [
+      "Jusqu'à deux fenêtres de chat à côté de la liste, chacune se replie sur son nom.",
+      "Un son et un compteur dans l'onglet du navigateur quand un client écrit.",
+      "Choisissez un statut : avec un client, à l'entraînement, absent, ne pas déranger, en vacances ou apparaître hors ligne ; en ligne s'affiche tout seul.",
+      "Voyez quand un client écrit et quand il a vu votre message, et envoyez emojis et autocollants de salle.",
+    ],
+    dyk: "En Ne pas déranger ou en vacances, les notifications du chat attendent votre retour.",
   },
   "coach-reviews": {
     title: "Les avis de vos clients",
