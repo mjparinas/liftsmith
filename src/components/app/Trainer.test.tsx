@@ -511,7 +511,8 @@ describe("check-ins", () => {
         coachId: "me",
         clientId: "c1",
         answers: { sleep: 2, gym: true, weight: 81.5, wins: "Hit a squat best" },
-        answeredAt: NOW - 86_400_000,
+        // The screen judges "recent" against the real clock (two weeks), so a fixed date here expired on 2026-11-15.
+        answeredAt: Date.now() - 86_400_000,
       },
     ];
     const u = userEvent.setup();

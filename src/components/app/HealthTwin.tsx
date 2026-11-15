@@ -23,6 +23,7 @@ import { useApp } from "@/lib/store";
 import { scoreBand, strength } from "@/lib/strength";
 import { bmiBand, bmiCategory } from "@/lib/tdee";
 import { bodyCompOn, isTeen } from "@/lib/teen";
+import { useCoachNotes } from "@/lib/trainer";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { MEASURE_SITES, type Unit } from "@/lib/types";
 import { fmtHeight, fmtNum, fmtWeight } from "@/lib/units";
@@ -140,9 +141,10 @@ export function HealthTwin() {
   const native = useSyncExternalStore(noSubscribe, isNative, () => false);
   const pro = isPro();
   const store = storeName();
+  const coachTargets = useCoachNotes((s) => s.targets);
   const metrics = useMemo(
-    () => twin({ events, profile, sessions: stats.sessions, now, pro: can("healthReadiness", pro), native, store }),
-    [events, profile, stats.sessions, now, pro, native, store],
+    () => twin({ events, profile, sessions: stats.sessions, now, pro: can("healthReadiness", pro), native, store, coachTargets }),
+    [events, profile, stats.sessions, now, pro, native, store, coachTargets],
   );
   const by = new Map(metrics.map((m) => [m.id, m]));
   const [open, setOpen] = useState<TwinId | null>(null);

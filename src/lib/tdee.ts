@@ -150,7 +150,7 @@ export function withSteps(training: ActivityRead, steps: number): ActivityRead {
   let i = Math.max(s, t);
   if (steps >= 7500 && training.perWeek >= 3 && i < 3) i += 1;
   if (training.activity === "athlete") i = 4;
-  return { activity: LEVELS[i], source: "steps", perWeek: training.perWeek, steps: Math.round(steps / 100) * 100 };
+  return { activity: LEVELS[i]!, source: "steps", perWeek: training.perWeek, steps: Math.round(steps / 100) * 100 };
 }
 
 /** Average steps a day over the last 7 finished days, when Health gave at least 5 of them. */
