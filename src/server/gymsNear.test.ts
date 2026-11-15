@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { resetDb } from "./db";
-import { indexHtml } from "./gymPage";
-import { cities, closestPlaces, placesFromOsm, savePlaces, type OsmElement } from "./gymPlaces";
+import { resetDb, run } from "./db";
+import { cityHtml, indexHtml } from "./gymPage";
+import { cities, cityPlaces, closestPlaces, placesFromOsm, savePlaces, streetAddress, type OsmElement } from "./gymPlaces";
 import { closestReply, GYMS_INDEX_CSP, ipSpot } from "./gymsNear";
 
 const NOW = 1_800_000_000_000;
@@ -110,5 +110,26 @@ describe("the /gyms/ page", () => {
     expect(html).not.toContain('id="near-map"');
     expect(html).toContain('id="near-list"');
     expect(html).toContain("Studios in deiner Nähe");
+  });
+});
+
+describe("addresses and the city page", () => {
+  it("puts a unit in front of a house number only, never on its own", () => {
+    expect(streetAddress({ "addr:unit": "109", "addr:housenumber": "20202", "addr:street": "66 Avenue" })).toBe("109-20202 66 Avenue");
+    expect(streetAddress({ "addr:unit": "109" })).toBe("");
+    expect(streetAddress({ "addr:unit": "109", "addr:street": "66 Avenue" })).toBe("66 Avenue");
+    expect(streetAddress({ "addr:housenumber": "19925", "addr:street": "Willowbrook Drive" })).toBe("19925 Willowbrook Drive");
+  });
+
+  it("hides an address saved with only a unit, until the next import fixes it", async () => {
+    await run("UPDATE gym_places SET address = '109-' WHERE slug = 'gym-1'");
+    const p = (await cityPlaces("langley-bc")).find((x) => x.slug === "gym-1")!;
+    expect(p.address).toBe("");
+  });
+
+  it("spaces the Gyms and Studios cards apart", async () => {
+    const html = cityHtml("langley-bc", await cityPlaces("langley-bc"), "en");
+    expect(html).toContain('aria-labelledby="studios-h"');
+    expect(html).toContain(".page>section.card+section.card{margin-top:16px}");
   });
 });

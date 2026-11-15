@@ -132,6 +132,10 @@ list. But the main UI should be a mapbox map, that detects your location and sho
   the script, so without scripts there's no dead map. With no `MAPBOX_TOKEN` the list of closest gyms shows without a
   map.
 - Website only (the apps already open the finder with a map from Today's gym chip), so no native code.
+- **Follow-ups the same day** (Melvin): the city page's Gyms and Studios and classes cards had no space between them,
+  so they now sit 16 px apart; and an address that was only a unit ("109-", from a map entry with `addr:unit` but no
+  house number) is now built by `streetAddress`, which puts a unit in front of a house number only. Addresses already
+  saved that way show as none until the city's next import rewrites them.
 
 ## Staff and the starter program (2026-11-13)
 

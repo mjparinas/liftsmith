@@ -203,6 +203,19 @@ const httpUrl = (x: string | undefined) => {
 };
 
 /** OpenStreetMap fitness centres as places. Unnamed and private ones are left out. */
+/**
+ * "109-20202 66 Avenue" from the map's address tags. A unit goes in front of a house number only: on its own it made
+ * addresses like "109-" (Melvin, 2026-11-15), so a unit with no number, or tags with no number and no street, give ''.
+ */
+export function streetAddress(t: Record<string, string | undefined>): string {
+  const number = (t["addr:housenumber"] ?? "").trim();
+  const unit = (t["addr:unit"] ?? "").trim();
+  return clean([number ? (unit ? `${unit}-${number}` : number) : "", t["addr:street"]].filter(Boolean).join(" "), 120);
+}
+
+/** An address saved before streetAddress, with only a unit ("109-"), shows as no address until the next import. */
+const shownAddress = (a: string) => (/^[^\s]{1,12}-$/.test(a.trim()) ? "" : a);
+
 export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSkips): PlaceDraft[] {
   const out: PlaceDraft[] = [];
   const seen = new Set<string>();
@@ -240,10 +253,7 @@ export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSki
       name,
       // A rec centre's sport tag lists everything it hosts (swimming, hockey), so only its name can make it a studio.
       kind: STUDIO.test(fitness ? about : name.toLowerCase()) ? "studio" : "gym",
-      address: clean(
-        [[t["addr:unit"] ? `${t["addr:unit"]}-` : "", t["addr:housenumber"]].join(""), t["addr:street"]].filter(Boolean).join(" "),
-        120,
-      ),
+      address: streetAddress(t),
       city: mapCity || area.city,
       region: clean(t["addr:province"] ?? t["addr:state"], 60) || area.region,
       country: clean(t["addr:country"], 2).toUpperCase() || area.country,
@@ -558,7 +568,7 @@ const toPlace = (r: Row, km: number): Place => ({
   slug: s(r.slug),
   name: s(r.name),
   kind: s(r.kind) === "studio" ? "studio" : "gym",
-  address: s(r.address),
+  address: shownAddress(s(r.address)),
   city: s(r.city),
   region: s(r.region),
   lat: n(r.lat),
