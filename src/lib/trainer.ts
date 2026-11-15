@@ -264,16 +264,28 @@ export const removePlan = async (id: string) => void (await api("/api/coach/", {
 /** The longest chat message (the server's COACH_LIMITS.message). */
 export const MESSAGE_MAX = 1000;
 /** The latest page of a thread, older messages (`before`), or only the ones after `after` (an open thread checking in). */
-export const loadMessages = async (id: string, at: { before?: number; after?: number } = {}) =>
-  api<Thread>(
+export const loadMessages = async (id: string, at: { before?: number; after?: number } = {}): Promise<Thread> => {
+  const r = await api<Partial<Thread>>(
     `/api/coach/?chat=${encodeURIComponent(id)}${at.before ? `&before=${at.before}` : ""}${at.after ? `&after=${at.after}` : ""}`,
     { token: token() },
   );
+  // An answer without a thread in it (an older server, a proxy's page) reads as an empty one rather than breaking the screen.
+  return {
+    ...r,
+    more: r.more === true,
+    messages: Array.isArray(r.messages) ? r.messages : [],
+    presence: r.presence && typeof r.presence.state === "string" ? r.presence : undefined,
+  };
+};
 /** Sends words, or one sticker. */
 export const sendMessage = async (id: string, text: string, sticker?: StickerId) =>
   (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text, sticker } })).message;
 /** Everyone this account can message, with their status, and this account's own status (the chat dock). */
-export const loadLive = async () => api<Live>("/api/coach/?live=1", { token: token() });
+export const loadLive = async (): Promise<Live> => {
+  const r = await api<Partial<Live>>("/api/coach/?live=1", { token: token() });
+  if (!Array.isArray(r.people)) throw new Error("No people in the live list");
+  return { me: r.me ?? { status: "auto", until: 0 }, people: r.people };
+};
 /** Picks this account's status; `until` 0 means until it's changed. */
 export const saveStatus = async (status: Status, until = 0) =>
   api<{ status: Status; until: number }>("/api/coach/", { token: token(), body: { action: "status", status, until } });
