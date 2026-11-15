@@ -1,0 +1,231 @@
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { query, resetDb, run } from "./db";
+import type { ImportResult } from "./gymImport";
+import {
+  createJob,
+  dismissJob,
+  emailDone,
+  JOB_LIMITS,
+  jobLog,
+  jobStatus,
+  kickWorker,
+  placesFor,
+  RETRY_AFTER_MS,
+  runWorker,
+  stopJob,
+  unfinishedPlaces,
+} from "./gymImportJobs";
+
+const ok = (where: string, added = 2): ImportResult => ({
+  ok: true,
+  id: `imp-${where}`,
+  area: where,
+  found: 3,
+  added,
+  updated: 1,
+  unchanged: 0,
+  kept: 0,
+  skipped: { unnamed: 0, private: 0, notGym: 0, duplicate: 0 },
+  server: "overpass-api.de",
+  ms: 1000,
+  log: ["+0.0s import"],
+});
+const busy = (where: string): ImportResult => ({
+  ok: false,
+  id: `busy-${where}`,
+  error: "map",
+  detail: "overpass-api.de: HTTP 504 (server busy)",
+  ms: 1000,
+  log: [],
+});
+const nowhere: ImportResult = { ok: false, id: "x", error: "where", detail: "Nominatim found no place by that name.", ms: 10, log: [] };
+
+const quick = { sleep: async () => undefined, staggerMs: 0, mail: null };
+const later = () => Date.now() + JOB_LIMITS.runMs;
+
+beforeEach(async () => {
+  await resetDb();
+});
+
+describe("gym imports on the server", () => {
+  it("imports every city of a job, two lanes on different map servers, and finishes it", async () => {
+    const made = await createJob({
+      label: "Canada",
+      places: ["Langley, BC", "Surrey, BC", "Delta, BC"],
+      startedBy: "a@x.com",
+      notify: true,
+    });
+    expect("id" in made).toBe(true);
+    const servers: number[] = [];
+    const r = await runWorker({
+      ...quick,
+      importer: async (where, _f, _n, o) => {
+        servers.push(o?.server ?? -1);
+        return ok(where);
+      },
+    });
+    expect(r).toMatchObject({ imported: 3, more: false, finished: true });
+    expect(new Set(servers)).toEqual(new Set([0, 1]));
+    const s = (await jobStatus())!;
+    expect(s).toMatchObject({ state: "done", done: 3, total: 3, failed: [], active: [] });
+    expect(s.sums).toMatchObject({ found: 9, added: 6, updated: 3 });
+    expect(s.recent.map((x) => x.where).sort()).toEqual(["Delta, BC", "Langley, BC", "Surrey, BC"]);
+  });
+
+  it("runs one job at a time and one worker per job", async () => {
+    const first = await createJob({ label: "A", places: ["A, X"], startedBy: "", notify: false });
+    expect(await createJob({ label: "B", places: ["B, X"], startedBy: "", notify: false })).toEqual({
+      error: "running",
+      id: (first as { id: string }).id,
+    });
+    let release!: () => void;
+    const gate = new Promise<void>((ok) => (release = ok));
+    const one = runWorker({ ...quick, importer: async (w) => (await gate, ok(w)) });
+    // Wait until the first worker holds the lease, then a second finds nothing to do.
+    for (let i = 0; i < 50 && !(await jobStatus())?.active.length; i++) await new Promise((ok) => setTimeout(ok, 5));
+    expect(await runWorker({ ...quick, importer: async (w) => ok(w) })).toMatchObject({ job: null, imported: 0 });
+    release();
+    expect(await one).toMatchObject({ imported: 1, finished: true });
+  });
+
+  it("puts a busy city back in line after 3 and then 10 minutes before it counts as failed", async () => {
+    await createJob({ label: "Canada", places: ["Surrey, BC"], startedBy: "", notify: false });
+    const importer = async (w: string) => busy(w);
+    // First try: waiting, and this worker doesn't hang about for three minutes it doesn't have.
+    let r = await runWorker({ ...quick, importer, deadline: Date.now() + JOB_LIMITS.cityMs + 60_000 });
+    expect(r).toMatchObject({ imported: 1, more: false, finished: false });
+    let s = (await jobStatus())!;
+    expect(s).toMatchObject({ state: "running", waiting: 1, done: 0 });
+    const [row] = await query<{ not_before: number }>("SELECT not_before FROM gym_import_items");
+    expect(Number(row!.not_before) - Date.now()).toBeGreaterThan(RETRY_AFTER_MS[0]! - 5_000);
+    // Its pause is over: tried again, then again after 10 minutes, then failed.
+    for (let i = 0; i < RETRY_AFTER_MS.length; i++) {
+      await run("UPDATE gym_import_items SET not_before = 0");
+      r = await runWorker({ ...quick, importer });
+    }
+    expect(r.finished).toBe(true);
+    s = (await jobStatus())!;
+    expect(s.failed).toHaveLength(1);
+    expect(s.failed[0]!.r).toMatchObject({ ok: false, detail: "overpass-api.de: HTTP 504 (server busy)" });
+    const log = (await jobLog(s.id))!;
+    expect(log.cities[0]!.tries).toBe(1 + RETRY_AFTER_MS.length);
+    expect(log.cities[0]!.triedAgain).toHaveLength(RETRY_AFTER_MS.length);
+  });
+
+  it("waits inside the worker for a city whose pause ends in its time", async () => {
+    await createJob({ label: "Canada", places: ["Surrey, BC"], startedBy: "", notify: false });
+    let tries = 0;
+    const slept: number[] = [];
+    const r = await runWorker({
+      mail: null,
+      staggerMs: 0,
+      sleep: async (ms) => {
+        slept.push(ms);
+        await run("UPDATE gym_import_items SET not_before = 0");
+      },
+      importer: async (w) => (++tries === 1 ? busy(w) : ok(w)),
+      deadline: later() + RETRY_AFTER_MS[0]!,
+    });
+    expect(r).toMatchObject({ imported: 2, finished: true });
+    expect(slept.length).toBeGreaterThan(0);
+  });
+
+  it("doesn't retry a place the map doesn't know", async () => {
+    await createJob({ label: "Canada", places: ["Nowhere, ZZ"], startedBy: "", notify: false });
+    const r = await runWorker({ ...quick, importer: async () => nowhere });
+    expect(r.finished).toBe(true);
+    expect((await jobStatus())!.failed[0]!.r).toMatchObject({ ok: false, error: "That place wasn't found." });
+  });
+
+  it("hands over when its time is up, and the next worker carries on", async () => {
+    await createJob({ label: "Canada", places: ["A, X", "B, X", "C, X"], startedBy: "", notify: false });
+    // Time for exactly one city per lane... and a clock that runs out after the first two.
+    let calls = 0;
+    const deadline = Date.now() + JOB_LIMITS.cityMs + 1_000;
+    const first = await runWorker({
+      ...quick,
+      deadline,
+      importer: async (w) => {
+        calls++;
+        // Each city "takes" the time left.
+        await new Promise((ok) => setTimeout(ok, 1_100));
+        return ok(w);
+      },
+    });
+    expect(first).toMatchObject({ imported: 2, more: true, finished: false });
+    expect(calls).toBe(2);
+    const second = await runWorker({ ...quick, importer: async (w) => ok(w) });
+    expect(second).toMatchObject({ imported: 1, finished: true });
+  });
+
+  it("picks up a city a crashed worker left half done", async () => {
+    await createJob({ label: "Canada", places: ["A, X"], startedBy: "", notify: false });
+    // A worker took the city and died: its lease ran out with the city still marked running.
+    await run("UPDATE gym_import_items SET state = 'running', tries = 1");
+    await run("UPDATE gym_import_jobs SET lease_until = ?", [Date.now() - 1]);
+    const r = await runWorker({ ...quick, importer: async (w) => ok(w) });
+    expect(r).toMatchObject({ imported: 1, finished: true });
+    expect((await jobLog((await jobStatus())!.id))!.cities[0]!.tries).toBe(1);
+  });
+
+  it("stops: nothing new starts, and Retry gets the cities it didn't reach", async () => {
+    const made = (await createJob({ label: "Canada", places: ["A, X", "B, X", "C, X"], startedBy: "", notify: false })) as { id: string };
+    let n = 0;
+    await runWorker({
+      ...quick,
+      importer: async (w) => {
+        if (++n === 1) await stopJob(made.id);
+        return w === "B, X" ? nowhere : ok(w);
+      },
+    });
+    const s = (await jobStatus())!;
+    expect(s.state).toBe("stopped");
+    expect(s.done).toBeLessThan(3);
+    const left = await unfinishedPlaces(made.id);
+    expect(left.length).toBe(3 - s.recent.filter((x) => x.r.ok).length);
+    expect(await dismissJob(made.id)).toBe(true);
+    expect(await jobStatus()).toBeNull();
+    // A new job of those cities can start now.
+    expect("id" in (await createJob({ label: "retry", places: left, startedBy: "", notify: false }))).toBe(true);
+  });
+
+  it("emails the admin who started it once, with the failed cities", async () => {
+    await createJob({ label: "Canada", places: ["A, X", "Nowhere, ZZ"], startedBy: "a@x.com", notify: true });
+    const sent: { to: string; subject: string; text: string }[] = [];
+    const mail = async (to: string, subject: string, text: string) => (sent.push({ to, subject, text }), true);
+    await runWorker({ ...quick, mail, importer: async (w) => (w.startsWith("Nowhere") ? nowhere : ok(w)) });
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).toMatchObject({ to: "a@x.com", subject: "Gym import done: Canada, 1 of 2 cities, 1 failed" });
+    expect(sent[0]!.text).toContain("Nowhere, ZZ: That place wasn't found.");
+    expect(sent[0]!.text).toContain("/admin/?tab=Gyms");
+    expect(await emailDone((await jobStatus())!.id, mail)).toBe(false);
+  });
+
+  it("sends no email when the admin turned it off", async () => {
+    await createJob({ label: "Canada", places: ["A, X"], startedBy: "a@x.com", notify: false });
+    const sent: string[] = [];
+    await runWorker({ ...quick, mail: async (to) => (sent.push(to), true), importer: async (w) => ok(w) });
+    expect(sent).toEqual([]);
+  });
+
+  it("skips cities imported cleanly in the last 7 days", async () => {
+    await run(
+      "INSERT INTO gym_imports (id, query, area, scope, ok, error, found, added, updated, unchanged, kept, server, ms, log, attempts, at) VALUES ('i', 'delta, bc', 'Delta, BC', '', 1, '', 0, 0, 0, 0, 0, '', 0, '', '', ?)",
+      [Date.now() - 86_400_000],
+    );
+    expect(await placesFor(["Langley, BC", "Delta, BC"], true)).toEqual({ todo: ["Langley, BC"], skipped: 1 });
+    expect(await placesFor(["Langley, BC", "Delta, BC"], false)).toEqual({ todo: ["Langley, BC", "Delta, BC"], skipped: 0 });
+  });
+
+  it("starts the next worker with the cron secret, on the public site rather than a vercel.app address", async () => {
+    const calls: { url: string; auth: string | null }[] = [];
+    const send = (async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), auth: new Headers(init?.headers).get("authorization") });
+      return Response.json({ started: true });
+    }) as typeof fetch;
+    expect(await kickWorker("https://liftsmith-three.vercel.app", send, { CRON_SECRET: "s" } as unknown as NodeJS.ProcessEnv)).toBe(true);
+    expect(calls[0]).toEqual({ url: "https://www.getliftsmith.com/api/cron/gym-imports/", auth: "Bearer s" });
+    expect(await kickWorker("http://localhost:3000", send, {} as unknown as NodeJS.ProcessEnv)).toBe(false);
+  });
+});

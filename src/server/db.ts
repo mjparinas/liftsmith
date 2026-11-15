@@ -489,6 +489,43 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_imports_query ON gym_imports (query, at)`,
   `CREATE INDEX IF NOT EXISTS gym_imports_at ON gym_imports (at)`,
+  // Country and every-country imports as a server job (gymImportJobs.ts, 2026-11-15): the job, and one row per city
+  // with its state (pending, running, waiting to retry, ok, failed) and result. One worker holds a job at a time
+  // (`lease_until`). Public map data and timings, plus the staff address that started it; kept 90 days.
+  `CREATE TABLE IF NOT EXISTS gym_import_jobs (
+    id TEXT PRIMARY KEY,
+    label TEXT NOT NULL,
+    state TEXT NOT NULL,
+    total INTEGER NOT NULL DEFAULT 0,
+    skipped INTEGER NOT NULL DEFAULT 0,
+    started_by TEXT NOT NULL DEFAULT '',
+    notify INTEGER NOT NULL DEFAULT 0,
+    emailed INTEGER NOT NULL DEFAULT 0,
+    dismissed INTEGER NOT NULL DEFAULT 0,
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER NOT NULL DEFAULT 0,
+    active_at INTEGER NOT NULL DEFAULT 0,
+    lease_until INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_import_jobs_state ON gym_import_jobs (state, started_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_import_items (
+    job TEXT NOT NULL,
+    idx INTEGER NOT NULL,
+    place TEXT NOT NULL,
+    state TEXT NOT NULL,
+    tries INTEGER NOT NULL DEFAULT 0,
+    not_before INTEGER NOT NULL DEFAULT 0,
+    at INTEGER NOT NULL DEFAULT 0,
+    result TEXT NOT NULL DEFAULT '',
+    retried TEXT NOT NULL DEFAULT '',
+    found INTEGER NOT NULL DEFAULT 0,
+    added INTEGER NOT NULL DEFAULT 0,
+    updated INTEGER NOT NULL DEFAULT 0,
+    unchanged INTEGER NOT NULL DEFAULT 0,
+    kept INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (job, idx)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_import_items_state ON gym_import_items (job, state)`,
   // Owners claiming a gym (gymClaims.ts): an emailed code, the poster's code, or staff review. Deleted with the account.
   `CREATE TABLE IF NOT EXISTS gym_claims (
     id TEXT PRIMARY KEY,
