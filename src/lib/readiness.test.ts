@@ -249,7 +249,7 @@ describe("the call", () => {
 
   it("never says push in a deload week, and always says go easy when unwell", () => {
     const build = Math.min(6, Math.max(3, profile.blockWeeks));
-    const deload = { ...profile, blockStart: NOW - build * 7 * DAY - DAY };
+    const deload = { ...profile, blockStart: NOW - build * 7 * DAY };
     expect(blockWeek(deload, NOW).deload).toBe(true);
     expect(readiness(ev, profile, NOW).call).toBe("push");
     expect(readiness(ev, deload, NOW).call).toBe("normal");

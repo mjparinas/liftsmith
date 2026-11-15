@@ -147,7 +147,7 @@ describe("set counts", () => {
     expect(easy.items.every((i) => i.sets <= 3)).toBe(true);
     expect(sum(easy)).toBeLessThan(sum(plain));
     const build = Math.min(6, Math.max(3, profile.blockWeeks));
-    const deload = makeProfile({ blockStart: NOW - build * 7 * DAY - DAY });
+    const deload = makeProfile({ blockStart: NOW - build * 7 * DAY });
     expect(blockWeek(deload, NOW).deload).toBe(true);
     const light = generate({ gym, profile: deload, events: [], minutes: 90, now: NOW });
     expect(light.items.every((i) => i.sets <= 3)).toBe(true);

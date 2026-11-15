@@ -14,6 +14,7 @@ import type { MsgLang } from "@/lib/messageText";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { localPath } from "@/lib/siteLang";
 import { SOCIAL_LIMITS, type AvatarId, type PostBody, type ShowcaseLift } from "@/lib/socialTypes";
+import { LB, weightIn } from "@/lib/unitMath";
 import { siteText } from "@/locales/site";
 
 import type { PublicPost, PublicProfile } from "./publicProfile";
@@ -23,11 +24,13 @@ const DAY = 86_400_000;
 /** Exercises shown per workout before "+N more". */
 const EXERCISES_SHOWN = 8;
 
-const LB = 2.20462;
+/** A set's weight as the app shows it (unitMath.ts weightIn): up to two decimals, the exact pound. */
 function weight(kg: number, unit: "kg" | "lb", lang: MsgLang): string {
-  const v = unit === "lb" ? Math.round(kg * LB) : Math.round(kg * 10) / 10;
-  return `${new Intl.NumberFormat(lang).format(v)} ${unit}`;
+  return `${new Intl.NumberFormat(lang, { maximumFractionDigits: 2, useGrouping: false }).format(weightIn(kg, unit))} ${unit}`;
 }
+/** Total lifted, to the whole kilogram or pound. */
+const volume = (kg: number, unit: "kg" | "lb", lang: MsgLang) =>
+  `${new Intl.NumberFormat(lang).format(Math.round(unit === "lb" ? kg / LB : kg))} ${unit}`;
 const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.round(sec) % 60).padStart(2, "0")}`;
 
 /** One exercise's best set in a line: "100 kg × 5", "× 12" for bodyweight or hidden weights, or time and distance. */
@@ -202,7 +205,7 @@ function postHtml(p: PublicPost, lang: MsgLang, unit: "kg" | "lb", appLink: stri
   const stats: [string, string][] = [
     [say(lang, "pub.time"), `${n.format(Math.max(1, Math.round(b.seconds / 60)))} min`],
     [say(lang, "pub.sets"), n.format(b.sets)],
-    ...(b.volume ? ([[say(lang, "pub.volume"), weight(b.volume, unit, lang)]] as [string, string][]) : []),
+    ...(b.volume ? ([[say(lang, "pub.volume"), volume(b.volume, unit, lang)]] as [string, string][]) : []),
     ...(b.prs ? ([[say(lang, "pub.prs"), n.format(b.prs)]] as [string, string][]) : []),
   ];
   const shown = b.exercises.slice(0, EXERCISES_SHOWN);

@@ -24,10 +24,10 @@ import { isNative } from "./juice";
 import {
   addDays,
   dayStart,
-  mondayIn,
   parts,
   plan,
   proState,
+  weekStartIn,
   zoned,
   type Message,
   type MessageKind,
@@ -58,6 +58,9 @@ export const provideNextPlan = (f: typeof nextPlan) => {
   nextPlan = f;
 };
 
+/** The lifter's first day of the week (Settings › Workout preferences): 0 Sunday, else Monday. */
+const firstDayOf = (profile: Pick<Profile, "training">): 0 | 1 => (profile.training?.weekStart === 0 ? 0 : 1);
+
 /** Workouts, sets, weight lifted (kg), new bests and minutes between two instants, from the derived sessions. */
 export function totalsBetween(stats: Stats, start: number, end: number): Totals {
   const s = stats.sessions.filter((x) => x.start >= start && x.start < end);
@@ -73,7 +76,7 @@ export function totalsBetween(stats: Stats, start: number, end: number): Totals 
 
 /** What only the emails use: the week so far, last month, the newest best and today's plan before the first workout. */
 export function emailExtras(profile: Profile, stats: Stats, now: number, tz = deviceTz()): Partial<PlanInput> {
-  const monday = mondayIn(now, tz);
+  const monday = weekStartIn(now, tz, firstDayOf(profile));
   const p = parts(now, tz);
   const thisMonth = zoned(p.y, p.m, 1, 0, 0, tz);
   const lastMonth = dayStart(addDays(thisMonth, -1, tz), tz);
@@ -109,7 +112,8 @@ export function rehabInput(profile: Profile, events: readonly AppEvent[], now: n
 
 export function planInput(profile: Profile, stats: Stats, now: number, channel: "push" | "email", tz = deviceTz()): PlanInput {
   const starts = stats.sessions.map((s) => s.start);
-  const monday = mondayIn(now, tz);
+  const first = firstDayOf(profile);
+  const monday = weekStartIn(now, tz, first);
   const weekDays = new Set(starts.filter((t) => t >= monday).map((t) => dayStart(t, tz))).size;
   const g = goalStreak(stats, profile, now);
   const prefs = profile.messages;
@@ -123,6 +127,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
     firstWorkoutAt: starts.length ? Math.min(...starts) : undefined,
     weekDays,
     weekStart: monday,
+    firstDay: first,
     // goalStreak counts this week once it's met; the planner wants the weeks before it.
     streakWeeks: g.weeks - (g.thisWeek >= Math.max(1, profile.daysPerWeek) ? 1 : 0),
     pro: storePro(now) ?? proState(profile.pro, now),

@@ -175,7 +175,7 @@ describe("the day's call in the plan", () => {
 
   it("gives a deload week fewer sets", () => {
     const build = Math.min(6, Math.max(3, profile.blockWeeks));
-    const deload = { ...profile, blockStart: NOW - build * 7 * DAY - DAY };
+    const deload = { ...profile, blockStart: NOW - build * 7 * DAY };
     const normal = generate({ gym, profile, events: [], minutes: 60, now: NOW });
     const light = generate({ gym, profile: deload, events: [], minutes: 60, now: NOW });
     const sets = (p: typeof normal) => p.items.reduce((n, i) => n + i.sets, 0) / p.items.length;

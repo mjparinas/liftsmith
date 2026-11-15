@@ -31,6 +31,7 @@
     "src/lib/calculators.ts",
     "src/lib/intervals.ts",
     "src/lib/exerciseSearch.ts",
+    "src/lib/e1rm.ts",
     "src/lib/onerm.ts",
     "src/lib/plateau.ts",
     "src/lib/pickWeights.ts",

@@ -3,9 +3,10 @@ import type { MessageKey } from "@/locales/en";
 
 import { achievements, achievementXp, context, nearest, tierNames, type Achievement, type Tier } from "./achievements";
 import { weekOf, type Stats } from "./derive";
+import { estimate, repsToBeat } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
-import { epley, gradedSet, TIMED } from "./progression";
+import { gradedSet, TIMED } from "./progression";
 import { hash, rng } from "./random";
 import type { AppEvent, Profile, SetEvent } from "./types";
 
@@ -78,7 +79,10 @@ export const FREEZE_EVERY = 4;
 export const MAX_FREEZES = 2;
 
 export interface Streak {
-  /** Weeks in a row meeting the goal (frozen weeks keep it alive but don't add to it). */
+  /**
+   * Weeks in a row meeting the goal. Frozen weeks, and weeks short of the goal with a stretch routine of 10 minutes
+   * or more done on its own (derive.ts stretchDays), keep it alive but don't add to it.
+   */
   weeks: number;
   /** Training days so far this week, and how many more meet the goal. */
   thisWeek: number;
@@ -112,6 +116,9 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
   const goal = Math.max(1, profile.daysPerWeek);
   const thisWeekStart = weekOf(now);
   const met = (w: number) => (days.get(w)?.size ?? 0) >= goal;
+  // A stand-alone stretch of 10+ minutes keeps the streak but doesn't count toward the weekly goal (Melvin,
+  // 2026-11-13 and the number audit, 2026-11-15), so a week short of the goal with one isn't a broken week.
+  const stretched = new Set(stats.stretchDays.map(weekOf));
   const weeks = [...days.keys()].filter((w) => w < thisWeekStart).sort((a, b) => a - b);
   let streak = 0;
   let run = 0;
@@ -125,6 +132,8 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
         streak++;
         run++;
         if (run % FREEZE_EVERY === 0) freezes = Math.min(MAX_FREEZES, freezes + 1);
+      } else if (streak > 0 && stretched.has(w)) {
+        // Kept by a stretch day: no freeze spent, nothing added.
       } else if (streak > 0 && freezes > 0) {
         freezes--;
         frozen.push(w);
@@ -145,7 +154,8 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
   const needed = Math.max(0, goal - thisWeek);
   // Days still free to train: today only counts if not trained yet.
   const free = daysLeft - (trainedToday ? 1 : 0);
-  const atRisk = needed > 0 && streak > 0 && free < needed;
+  const keptByStretch = stretched.has(thisWeekStart);
+  const atRisk = needed > 0 && streak > 0 && free < needed && !keptByStretch;
   return {
     weeks: weeksNow,
     thisWeek,
@@ -155,7 +165,7 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
     best: Math.max(best, weeksNow),
     daysLeft,
     atRisk,
-    freezeReady: needed > 0 && freezes > 0 && streak > 0,
+    freezeReady: needed > 0 && freezes > 0 && streak > 0 && !keptByStretch,
   };
 }
 
@@ -262,11 +272,11 @@ function prsIn(sets: SetEvent[], before: SetEvent[]): number {
   const bestBy = new Map<string, number>();
   for (const s of before)
     if (s.weight > 0 && !TIMED.has(s.exerciseId))
-      bestBy.set(s.exerciseId, Math.max(bestBy.get(s.exerciseId) ?? 0, epley(s.weight, s.reps)));
+      bestBy.set(s.exerciseId, Math.max(bestBy.get(s.exerciseId) ?? 0, estimate(s.weight, s.reps)));
   let n = 0;
   for (const s of [...sets].sort((a, b) => a.at - b.at)) {
     if (s.weight <= 0 || TIMED.has(s.exerciseId)) continue;
-    const e = epley(s.weight, s.reps);
+    const e = estimate(s.weight, s.reps);
     const b = bestBy.get(s.exerciseId);
     if (b !== undefined && e > b + 0.01) n++;
     if (b === undefined || e > b) bestBy.set(s.exerciseId, e);
@@ -589,7 +599,7 @@ export function bestBefore(events: readonly AppEvent[], exerciseId: string, at: 
   let b: number | null = null;
   for (const e of events) {
     if (e.type !== "set" || e.exerciseId !== exerciseId || e.id === excludeId || e.at > at || e.weight <= 0) continue;
-    const v = epley(e.weight, e.reps);
+    const v = estimate(e.weight, e.reps);
     if (b === null || v > b) b = v;
   }
   return b;
@@ -603,7 +613,7 @@ export function isPr(events: readonly AppEvent[], set: SetEvent): boolean {
   );
   if (!prevSessions) return false;
   const b = bestBefore(events, set.exerciseId, set.at, set.id);
-  return b !== null && epley(set.weight, set.reps) > b + 0.01;
+  return b !== null && estimate(set.weight, set.reps) > b + 0.01;
 }
 
 /** Reps at this weight that would beat the best, for an "almost there" hint; null without history. */
@@ -611,9 +621,8 @@ export function repsForPr(events: readonly AppEvent[], exerciseId: string, weigh
   if (weightKg <= 0 || TIMED.has(exerciseId)) return null;
   const b = bestBefore(events, exerciseId, now);
   if (b === null) return null;
-  // The small nudge keeps an exact tie (8 reps when 8 equals the best) from rounding down a rep.
-  const r = Math.floor(30 * (b / weightKg - 1) + 1e-9) + 1;
-  return r >= 1 && r <= 30 ? r : null;
+  // The same rule isPr uses (estimate beats the best by more than 0.01 kg), so the hint and the flash agree.
+  return repsToBeat(b, weightKg);
 }
 
 // ---------- Everything at once

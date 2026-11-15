@@ -1,9 +1,10 @@
 import { blockWeek } from "./block";
+import { estimate, weightForReps } from "./e1rm";
 import { exercise, EXERCISE_BY_ID } from "./exercises";
 import { alternatives, restFor, type Plan } from "./generator";
 import { t } from "./i18n";
 import { roundLoad } from "./loads";
-import { epley, repRange, sessionsOf, target, TIMED, weightFor } from "./progression";
+import { repRange, sessionsOf, target, TIMED } from "./progression";
 import type { AppEvent, Gym, Profile, SetEvent } from "./types";
 
 // Plateau detective (Melvin picked it, 2026-11-09). When a lift's estimated one-rep max hasn't moved
@@ -70,7 +71,7 @@ export const FIX_TEXT: Record<FixKind, { title: string; what: string }> = {
 /** Best estimated one-rep max per session for a lift, oldest first (sets with no load are left out). */
 function series(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number; sets: SetEvent[] }[] {
   return sessionsOf(events, exerciseId)
-    .map((sets) => ({ at: sets[0]!.at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? epley(s.weight, s.reps) : 0))), sets }))
+    .map((sets) => ({ at: sets[0]!.at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? estimate(s.weight, s.reps) : 0))), sets }))
     .filter((s) => s.e1 > 0)
     .reverse();
 }
@@ -239,7 +240,7 @@ export function applyFixes(
         const doneSince = sessionsOf(events, ex.id).some((s) => s[0]!.at >= f.startedAt);
         if (doneSince) return item;
         const kg = roundLoad(
-          f.from > 0 ? weightFor(f.from * 0.9, item.target.reps, item.target.rir) : item.target.weight * 0.9,
+          f.from > 0 ? weightForReps(f.from * 0.9, item.target.reps, item.target.rir) : item.target.weight * 0.9,
           ex,
           gym,
         ).kg;
@@ -252,8 +253,8 @@ export function applyFixes(
         const [lo] = repRange(ex, profile.goal);
         const reps = lo <= 6 ? 10 : 5;
         const recent = sessionsOf(events, ex.id)[0];
-        const e1 = recent ? Math.max(...recent.map((s) => epley(s.weight, s.reps))) : f.from;
-        const kg = roundLoad(weightFor(e1, reps, item.target.rir), ex, gym).kg;
+        const e1 = recent ? Math.max(...recent.map((s) => estimate(s.weight, s.reps))) : f.from;
+        const kg = roundLoad(weightForReps(e1, reps, item.target.rir), ex, gym).kg;
         return { ...item, target: { ...item.target, weight: kg, reps, note: t("note.fixReps", { reps }) } };
       }
       case "variation": {

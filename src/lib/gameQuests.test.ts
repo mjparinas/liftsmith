@@ -5,6 +5,7 @@ import { makeSet } from "@/test/factories";
 import { achievements, achievementXp, context } from "./achievements";
 import { defaultProfile } from "./defaults";
 import { derive, weekOf } from "./derive";
+import { estimate } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
 import {
   bestBefore,
@@ -315,7 +316,7 @@ describe("the totals in game()", () => {
 describe("bests at the edges", () => {
   it("keeps the best, not the last, and leaves out empty bars", () => {
     const evs = [set("bench-press", NOW - 3 * D, 80, 5, "a"), set("bench-press", NOW - 2 * D, 60, 5, "b")];
-    expect(bestBefore(evs, "bench-press", NOW)).toBeCloseTo(80 * (1 + 5 / 30));
+    expect(bestBefore(evs, "bench-press", NOW)).toBeCloseTo(estimate(80, 5));
     expect(bestBefore([set("bench-press", NOW - D, 0, 10, "a")], "bench-press", NOW)).toBeNull();
   });
 
@@ -339,10 +340,11 @@ describe("bests at the edges", () => {
   });
 
   it("asks for up to 30 reps, and no more", () => {
-    // 66 kg × 15 is an estimated 99 kg: at 50 kg that takes 30 reps to beat.
+    // 66 kg × 15 is an estimated 98.8 kg: at 53 kg that takes 30 reps to beat, at 52 kg more than 30.
     const evs = [set("bench-press", NOW - D, 66, 15, "a")];
-    expect(repsForPr(evs, "bench-press", 50, NOW)).toBe(30);
-    expect(repsForPr(evs, "bench-press", 45, NOW)).toBeNull();
+    expect(repsForPr(evs, "bench-press", 53, NOW)).toBe(30);
+    expect(repsForPr(evs, "bench-press", 52, NOW)).toBeNull();
+    expect(repsForPr(evs, "bench-press", 66, NOW)).toBe(16); // 15 only ties it
   });
 });
 
