@@ -822,7 +822,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "emails",
         name: "Emails that keep you going",
-        body: "Eight getting-started tips with real screens, a weekly and monthly recap, new personal bests, which friends trained, and a nudge back after a break. Each kind has its own switch.",
+        body: "Eight getting-started tips with real screens, a weekly and monthly recap, new personal bests, which friends trained, a nudge back after a break, and then a weekly tip on a feature you may not have found yet. Each kind has its own switch.",
         tier: "free",
         note: "On with an account, off for lifters under 18 unless they turn it on. Every email has a one-click unsubscribe.",
         added: "2026-11-14",

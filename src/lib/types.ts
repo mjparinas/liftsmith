@@ -298,7 +298,10 @@ export interface Profile {
    */
   messages?: {
     push: Partial<
-      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab", boolean>
+      Record<
+        "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab",
+        boolean
+      >
     >;
     email?: {
       address: string;
@@ -306,7 +309,7 @@ export interface Profile {
       status: "pending" | "confirmed" | "unsubscribed";
       kinds: Partial<
         Record<
-          "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab",
+          "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab",
           boolean
         >
       >;

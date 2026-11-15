@@ -429,7 +429,7 @@ export const it: FeaturesText = {
     },
     emails: {
       name: "Email che ti tengono in movimento",
-      body: "Otto consigli per iniziare con schermate reali, un riepilogo settimanale e mensile, i nuovi record, quali amici si sono allenati e una spinta per tornare dopo una pausa. Ogni tipo ha il suo interruttore.",
+      body: "Otto consigli per iniziare con schermate reali, un riepilogo settimanale e mensile, i nuovi record, quali amici si sono allenati una spinta per tornare dopo una pausa e poi un consiglio a settimana su una funzione che forse non hai ancora scoperto. Ogni tipo ha il suo interruttore.",
       note: "Attive con un account, disattivate per i minori di 18 anni a meno che non le attivino. Ogni email ha la disiscrizione con un clic.",
     },
     cloud: {

@@ -436,7 +436,7 @@ export const fr: FeaturesText = {
     },
     emails: {
       name: "Des e-mails qui vous font avancer",
-      body: "Huit conseils pour bien démarrer avec de vrais écrans, un bilan de la semaine et du mois, vos nouveaux records, les amis qui se sont entraînés et un coup de pouce pour revenir après une pause. Chaque type a son propre interrupteur.",
+      body: "Huit conseils pour bien démarrer avec de vrais écrans, un bilan de la semaine et du mois, vos nouveaux records, les amis qui se sont entraînés un coup de pouce pour revenir après une pause, puis un conseil par semaine sur une fonction que vous n'avez peut-être pas encore découverte. Chaque type a son propre interrupteur.",
       note: "Activés avec un compte, désactivés pour les moins de 18 ans sauf s'ils les activent. Chaque e-mail a un désabonnement en un clic.",
     },
     cloud: {

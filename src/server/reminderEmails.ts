@@ -30,12 +30,18 @@ export interface Branded {
   image?: { url: string; alt: string };
   /** A small line above the title ("Getting started · 2 of 8"). */
   kicker?: string;
+  /** A short list after the paragraphs (the weekly tips' points). */
+  points?: string[];
+  /** Paragraphs after the list (the weekly tips' Pro or Labs line). */
+  after?: string[];
+  /** A "Did you know?" line, its label in bold, last before the button. */
+  dyk?: { label: string; text: string };
 }
 
 /** Every lifter email: the app icon and name, the title, the words, an optional screen and button, and the footer.
  *  Plain text first (it's what most people read on a phone), with an HTML twin in the app's dark style. */
 export function brandedMail(lang: MsgLang | undefined, m: Branded): Mail {
-  const { title, paras, cta, footer, why, image, kicker } = m;
+  const { title, paras, cta, footer, why, image, kicker, points = [], after = [], dyk } = m;
   const unsubscribe = say(lang, "rmd.mail.unsubscribe", { brand: BRAND.name });
   const foot = footer
     ? [
@@ -50,6 +56,9 @@ export function brandedMail(lang: MsgLang | undefined, m: Branded): Mail {
     title,
     "",
     ...paras.flatMap((p) => [p, ""]),
+    ...(points.length ? [...points.map((p) => `• ${p}`), ""] : []),
+    ...after.flatMap((p) => [p, ""]),
+    ...(dyk ? [`${dyk.label} ${dyk.text}`, ""] : []),
     ...(cta ? [say(lang, "rmd.mail.link", { label: cta.label, url: cta.url }), ""] : []),
     "--",
     ...foot,
@@ -63,6 +72,9 @@ export function brandedMail(lang: MsgLang | undefined, m: Branded): Mail {
 ${kicker ? `<p style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#a78bfa;font-weight:700;margin:0 0 8px">${esc(kicker)}</p>` : ""}
 <h1 style="font-size:22px;margin:0 0 16px">${esc(title)}</h1>
 ${paras.map((p) => `<p style="font-size:16px;line-height:1.5;margin:0 0 14px">${esc(p)}</p>`).join("\n")}
+${points.length ? `<ul style="font-size:16px;line-height:1.5;margin:0 0 14px;padding-left:22px">${points.map((p) => `<li style="margin:0 0 8px">${esc(p)}</li>`).join("")}</ul>` : ""}
+${after.map((p) => `<p style="font-size:15px;line-height:1.5;margin:0 0 14px;color:#c4ccd8">${esc(p)}</p>`).join("\n")}
+${dyk ? `<p style="font-size:15px;line-height:1.5;margin:0 0 14px;padding:12px 14px;border-radius:12px;background:#141a23"><strong style="color:#38d6e8">${esc(dyk.label)}</strong> ${esc(dyk.text)}</p>` : ""}
 ${cta ? `<p style="margin:24px 0"><a href="${esc(cta.url)}" style="display:inline-block;background:#4c8dff;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px">${esc(cta.label)}</a></p>` : ""}
 ${image ? `<p style="margin:8px 0 0;text-align:center"><a href="${esc(cta?.url ?? SITE_URL)}"><img src="${esc(image.url)}" width="300" alt="${esc(image.alt)}" style="display:inline-block;width:300px;max-width:100%;height:auto;border-radius:18px;border:1px solid #222a35"></a></p>` : ""}
 <hr style="border:0;border-top:1px solid #222a35;margin:28px 0 16px">

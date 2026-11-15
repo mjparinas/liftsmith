@@ -431,7 +431,7 @@ export const es: FeaturesText = {
     },
     emails: {
       name: "Correos que te mantienen en marcha",
-      body: "Ocho consejos para empezar con pantallas reales, un resumen semanal y mensual, tus nuevos récords, qué amigos entrenaron y un empujón para volver tras una pausa. Cada tipo tiene su propio interruptor.",
+      body: "Ocho consejos para empezar con pantallas reales, un resumen semanal y mensual, tus nuevos récords, qué amigos entrenaron un empujón para volver tras una pausa y, después, un consejo semanal sobre una función que quizá aún no hayas descubierto. Cada tipo tiene su propio interruptor.",
       note: "Activados con una cuenta; desactivados para menores de 18 salvo que los activen. Cada correo tiene baja con un clic.",
     },
     cloud: {
