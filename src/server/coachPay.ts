@@ -1,5 +1,5 @@
 // Client payments through Stripe Connect (Melvin, 2026-11-13: "taking client payments, through Stripe Connect"). A coach
-// or personal trainer connects their own Stripe account (an Express account, set up on Stripe's pages), sets each
+// or personal trainer connects their own Stripe account (with the Express dashboard, set up on Stripe's pages), sets each
 // client's price (per session or monthly), and the client pays on a Stripe Checkout page in the browser. The coach's
 // account is the merchant: the money, the receipts, refunds and disputes are theirs, and Liftsmith takes no cut unless
 // STRIPE_CONNECT_FEE_PERCENT says so. Card details never touch Liftsmith or the app. Decision record:
@@ -149,7 +149,13 @@ export async function onboardUrl(
       "POST",
       "/accounts",
       {
-        type: "express",
+        // Controller properties, not the legacy `type: "express"`, which Stripe now refuses for new platforms because it
+        // makes Liftsmith liable for a coach's negative balance. Here Stripe covers losses, the coach pays Stripe's own
+        // fees (they're the merchant), and the coach gets the Express dashboard.
+        "controller[stripe_dashboard][type]": "express",
+        "controller[fees][payer]": "account",
+        "controller[losses][payments]": "stripe",
+        "controller[requirement_collection]": "stripe",
         email: email ?? undefined,
         "capabilities[card_payments][requested]": true,
         "capabilities[transfers][requested]": true,

@@ -73,7 +73,10 @@ describe("setting up", () => {
     expect(await onboardUrl(CFG, "coach", "coach@example.com", NOW, fake)).toBe("https://connect.stripe.com/setup/x");
     await onboardUrl(CFG, "coach", "coach@example.com", NOW, fake);
     expect(calls.filter((c) => c.url.endsWith("/accounts"))).toHaveLength(1);
-    expect(calls[0]!.body).toContain("type=express");
+    expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[stripe_dashboard][type]")}=express`);
+    expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[losses][payments]")}=stripe`);
+    expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[fees][payer]")}=account`);
+    expect(calls[0]!.body).not.toContain("type=express");
     charges = false;
     expect(await refreshAccount(CFG, "coach", NOW, fake)).toEqual({ ready: false, currency: "cad" });
   });
