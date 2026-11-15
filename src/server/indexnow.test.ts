@@ -4,9 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { INDEXNOW_ENDPOINT, INDEXNOW_KEY, INDEXNOW_KEY_LOCATION } from "@/lib/indexnow";
 import type { Route } from "@/lib/seo";
 
-import { resetDb } from "./db";
-import { peopleRoutes, pingIndexNow } from "./indexnow";
+import { resetDb, run } from "./db";
+import { peopleRoutes, pingIndexNow, serverRoutes } from "./indexnow";
 import { handle } from "./social";
+import { MIN_LIFT } from "./standards";
 
 // IndexNow pings from the daily admin job: new and changed public pages go once, nothing else, and only from
 // production. The key file must be served from our own host for IndexNow to trust the pings.
@@ -107,5 +108,14 @@ describe("IndexNow", () => {
     expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 1 });
     expect(bodies.at(-1)!.urlList).toEqual(["https://www.getliftsmith.com/u/alex/"]);
     expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 0 });
+  });
+
+  it("sends the strength standards pages once a lift is published, and nothing while none is", async () => {
+    expect(await serverRoutes()).toEqual([]);
+    await run(
+      "INSERT INTO strength_standards (lift, sex, band, n, p25, p50, p75, p90, updated_at) VALUES ('bench-press', 'male', 0, ?, 60, 80, 100, 120, ?)",
+      [MIN_LIFT, NOW],
+    );
+    expect((await serverRoutes()).map((r) => r.path)).toEqual(["/strength-standards/", "/strength-standards/bench-press/"]);
   });
 });
