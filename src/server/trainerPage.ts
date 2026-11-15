@@ -12,9 +12,49 @@ import { DIRECTORY_MIN, type DirectoryCity, type DirectoryPerson } from "./train
 export const trainersPath = (citySlug?: string) => (citySlug ? `/trainers/${citySlug}/` : "/trainers/");
 const place = (c: { city: string; region: string }) => [c.city, c.region].filter(Boolean).join(", ");
 
+const starText = (n: number) => "★".repeat(Math.round(n)) + "☆".repeat(5 - Math.round(n));
+
+/** A coach's rating (once they have enough reviews; coachReviews.ts), how their clients train, and their latest reviews. */
+export function ratingHtml(lang: MsgLang, p: DirectoryPerson): string {
+  const r = p.rating;
+  if (!r) return "";
+  const num = new Intl.NumberFormat(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const stars =
+    r.average !== null
+      ? `<p class="rating"><span class="ember" aria-hidden="true">${starText(r.average)}</span> <span class="sr">${esc(say(lang, "gp.revStars", { rating: num.format(r.average) }))}</span><strong aria-hidden="true">${esc(num.format(r.average))}</strong> <span class="muted small">${esc(say(lang, "gp.revCount", { count: r.count }))}</span></p>`
+      : "";
+  const outcome = r.outcome
+    ? `<p class="muted small">${esc(say(lang, "gp.revOutcome", { active: r.outcome.active, clients: r.outcome.clients }))}</p>`
+    : "";
+  const reviews = (p.reviews ?? [])
+    .slice(0, 2)
+    .map(
+      (v) =>
+        `<blockquote class="review"><p><span class="ember" aria-hidden="true">${starText(v.stars)}</span> <span class="sr">${esc(say(lang, "gp.revStars", { rating: v.stars }))}</span><span class="muted small">${esc(v.name || say(lang, "gp.revAnon"))}</span></p>${v.text ? `<p>${esc(v.text)}</p>` : ""}${v.reply ? `<p class="muted small">${esc(say(lang, "gp.revReply", { name: p.name }))}: ${esc(v.reply)}</p>` : ""}</blockquote>`,
+    )
+    .join("");
+  return stars + outcome + reviews;
+}
+
 function person(lang: MsgLang, p: DirectoryPerson): string {
   const gyms = p.gyms.map((g) => `<a href="${esc(gymPath(g))}">${esc(g.name)}</a>`).join(", ");
-  return `<li><p class="li-name">${esc(p.name)}</p>${p.role ? `<p class="muted small">${esc(say(lang, `gp.role.${p.role}` as GpKey))}</p>` : ""}<p class="muted small">${say(lang, "gp.dirAt", { gyms: "\u0000" }).split("\u0000").map(esc).join(gyms)}</p>${p.bio ? `<p>${esc(p.bio)}</p>` : ""}<p><a href="/app/#/trainer/${esc(p.code)}" rel="nofollow">${esc(say(lang, "gp.trainWith", { name: p.name }))} ›</a></p></li>`;
+  return `<li><p class="li-name">${esc(p.name)}</p>${p.role ? `<p class="muted small">${esc(say(lang, `gp.role.${p.role}` as GpKey))}</p>` : ""}${ratingHtml(lang, p)}<p class="muted small">${say(lang, "gp.dirAt", { gyms: "\u0000" }).split("\u0000").map(esc).join(gyms)}</p>${p.bio ? `<p>${esc(p.bio)}</p>` : ""}<p><a href="/app/#/trainer/${esc(p.code)}" rel="nofollow">${esc(say(lang, "gp.trainWith", { name: p.name }))} ›</a></p></li>`;
+}
+
+/** schema.org rating and reviews for a coach with enough reviews (the same ones the page shows). */
+export function ratingLd(p: DirectoryPerson): Record<string, unknown> {
+  const r = p.rating;
+  if (!r || r.average === null) return {};
+  return {
+    aggregateRating: { "@type": "AggregateRating", ratingValue: r.average, bestRating: 5, worstRating: 1, reviewCount: r.count },
+    review: (p.reviews ?? []).slice(0, 3).map((v) => ({
+      "@type": "Review",
+      reviewRating: { "@type": "Rating", ratingValue: v.stars, bestRating: 5, worstRating: 1 },
+      author: { "@type": "Person", name: v.name || say("en", "gp.revAnon") },
+      datePublished: new Date(v.at).toISOString().slice(0, 10),
+      ...(v.text ? { reviewBody: v.text } : {}),
+    })),
+  };
 }
 
 export function trainerCityHtml(lang: MsgLang, citySlug: string, c: { city: string; region: string; people: DirectoryPerson[] }): string {
@@ -35,6 +75,7 @@ export function trainerCityHtml(lang: MsgLang, citySlug: string, c: { city: stri
         name: p.name,
         ...(p.role ? { jobTitle: say("en", `gp.role.${p.role}` as GpKey) } : {}),
         worksFor: p.gyms.map((g) => ({ "@type": "ExerciseGym", name: g.name, url: `${SITE_URL}${gymPath(g)}` })),
+        ...ratingLd(p),
       },
     })),
   };

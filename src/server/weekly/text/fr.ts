@@ -783,4 +783,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Les mises à jour arrivent toutes seules ; l'app vous prévient quand l'une est prête.",
   },
+  "coach-reviews": {
+    title: "Les avis de vos clients",
+    intro: "Les clients qui se sont entraînés avec vous peuvent maintenant vous noter, et les nouveaux clients le voient.",
+    points: [
+      "Un client peut laisser des étoiles et un court avis après quatre semaines ou deux séances avec vous.",
+      "Votre note s'affiche sur votre invitation et dans l'annuaire des coachs dès trois avis.",
+      "À côté : combien de vos clients se sont entraînés ces deux dernières semaines.",
+      "Répondez une fois à chaque avis depuis Coaching › Réglages, et signalez ceux qui enfreignent les règles.",
+    ],
+    dyk: "Seuls les adultes peuvent laisser un avis, et un client mécontent ne peut pas couler un nouveau coach : rien ne s'affiche avant trois avis.",
+  },
 };

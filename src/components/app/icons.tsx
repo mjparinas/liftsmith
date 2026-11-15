@@ -74,6 +74,8 @@ const PATHS = {
   sides: "M12 3v18M8.5 8 4.5 12l4 4M4.5 12H9M15.5 8l4 4-4 4M19.5 12H15",
   // No connection (Friends' offline note, 2026-11-13): a cloud with a line through it.
   offline: "M7 18h10a4 4 0 0 0 .8-7.9A6 6 0 0 0 7.3 8.6 4.7 4.7 0 0 0 7 18zM3 3l18 18",
+  // A rating star (coach reviews); drawn filled for the stars given.
+  star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
 } as const;
 
 export type IconName = keyof typeof PATHS;

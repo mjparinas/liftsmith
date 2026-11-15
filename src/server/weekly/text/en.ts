@@ -802,4 +802,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Updates arrive by themselves; the app tells you when one is ready.",
   },
+  "coach-reviews": {
+    title: "Reviews from your clients",
+    intro: "Clients who've trained with you can now rate you, and new clients can see it.",
+    points: [
+      "A client can leave stars and a short review after four weeks or two sessions with you.",
+      "Your rating shows on your invite and in the trainer directory once you have three reviews.",
+      "Next to it: how many of your clients trained in the last two weeks.",
+      "Reply once to each review from Coaching › Setup, and report one that breaks the rules.",
+    ],
+    dyk: "Only adults can leave reviews, and one unhappy client can't sink a new coach: nothing shows until three reviews.",
+  },
 };

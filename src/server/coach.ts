@@ -1099,4 +1099,6 @@ export const coachCleanup = (accountId: string) => [
   { sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE client_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_checkins WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  // Reviews it wrote and reviews of it (coachReviews.ts).
+  { sql: "DELETE FROM coach_reviews WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

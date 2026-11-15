@@ -392,6 +392,11 @@ export const it: FeaturesText = {
       name: "Nella directory dei trainer",
       body: "Registrati come personal trainer, coach o fisioterapista nella tua palestra e compari nella pagina della palestra e nella directory dei trainer della sua città sul sito, con la tua presentazione e un link perché i nuovi clienti si allenino con te. Compaiono solo adulti.",
     },
+    "coach-reviews": {
+      name: "Valutazioni e recensioni di clienti veri",
+      body: "I clienti valutano il loro coach, personal trainer o fisioterapista con stelle e una breve recensione dopo quattro settimane o due sessioni insieme. La valutazione compare dopo tre recensioni, accanto a quanti dei suoi clienti si sono allenati nelle ultime due settimane, nell’invito e nell’elenco dei trainer. Il coach risponde una volta a ciascuna e chiunque può segnalare una recensione. Solo gli adulti possono lasciarne una.",
+      proPart: "Lasciare una recensione è gratis; seguire clienti è Pro.",
+    },
     "coach-plans": {
       name: "Piani da coach che crescono con i tuoi clienti",
       body: "Pro copre fino a 3 clienti. Coach dà spazio a 25 e Coach Plus non ha un limite fisso, con ogni strumento da coach in ogni piano. I tuoi clienti si allenano sempre gratis, e Liftsmith non trattiene nulla di quello che ti pagano.",

@@ -782,4 +782,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Updates kommen von selbst; die App sagt dir, wenn eines bereit ist.",
   },
+  "coach-reviews": {
+    title: "Bewertungen deiner Kunden",
+    intro: "Kunden, die mit dir trainiert haben, können dich jetzt bewerten, und neue Kunden sehen es.",
+    points: [
+      "Ein Kunde kann nach vier Wochen oder zwei Einheiten mit dir Sterne und eine kurze Bewertung abgeben.",
+      "Deine Bewertung erscheint ab drei Bewertungen in deiner Einladung und im Trainerverzeichnis.",
+      "Daneben: wie viele deiner Kunden in den letzten zwei Wochen trainiert haben.",
+      "Antworte unter Coaching › Einrichtung einmal auf jede Bewertung und melde, was gegen die Regeln verstößt.",
+    ],
+    dyk: "Nur Erwachsene können bewerten, und ein unzufriedener Kunde kann einen neuen Coach nicht versenken: Vor drei Bewertungen wird nichts angezeigt.",
+  },
 };

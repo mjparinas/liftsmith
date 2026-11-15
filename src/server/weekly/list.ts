@@ -120,6 +120,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("travel", "free", "gym"),
   L("anniversary", "free", "stats"),
   L("whats-new", "free", "today"),
+  // New, 2026-11-15: ratings and reviews from clients (docs/decisions/coach-reviews.md).
+  R("coach-reviews", "coach", "pro", "trainer/setup", { fresh: "2026-11-15", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

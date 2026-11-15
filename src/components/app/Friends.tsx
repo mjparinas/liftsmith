@@ -583,13 +583,16 @@ export function NoticeCard({ notice }: { notice: ModerationNotice }) {
   );
 }
 
+/** What Friends reports; coach reviews are reported from Coaching (CoachReviews.tsx). */
+type FriendsReportKind = Exclude<ReportKind, "review">;
+
 /** Report a post, comment or profile: one tap on a reason, then Send. */
-export function ReportSheet(props: { open: boolean; onClose: () => void; kind: ReportKind; id: string }) {
+export function ReportSheet(props: { open: boolean; onClose: () => void; kind: FriendsReportKind; id: string }) {
   // Mounted only while open, so every report starts fresh.
   return props.open ? <ReportBody {...props} /> : null;
 }
 
-function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () => void; kind: ReportKind; id: string }) {
+function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () => void; kind: FriendsReportKind; id: string }) {
   const [reason, setReason] = useState<ReportReason | null>(null);
   const [note, setNote] = useState("");
   const [done, setDone] = useState<string | null>(null);

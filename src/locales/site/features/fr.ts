@@ -399,6 +399,11 @@ export const fr: FeaturesText = {
       name: "Dans l'annuaire des coachs",
       body: "Inscrivez-vous comme coach sportif, coach ou kiné dans votre salle et vous apparaissez sur la page de la salle et dans l'annuaire des coachs de sa ville sur le site, avec votre présentation et un lien pour que de nouveaux clients s'entraînent avec vous. Seuls les adultes y figurent.",
     },
+    "coach-reviews": {
+      name: "Notes et avis de vrais clients",
+      body: "Les clients notent leur coach, coach personnel ou kiné avec des étoiles et un court avis après quatre semaines ou deux séances ensemble. La note s’affiche dès trois avis, avec le nombre de ses clients qui se sont entraînés ces deux dernières semaines, sur son invitation et dans l’annuaire des coachs. Le coach répond une fois à chaque avis, et tout le monde peut signaler un avis. Seuls les adultes peuvent en laisser un.",
+      proPart: "Laisser un avis est gratuit ; coacher des clients est Pro.",
+    },
     "coach-plans": {
       name: "Des forfaits coach qui grandissent avec votre clientèle",
       body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et Liftsmith ne prend rien sur ce qu'ils vous paient.",

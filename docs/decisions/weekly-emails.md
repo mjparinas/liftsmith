@@ -624,6 +624,15 @@ More clients shouldn't mean fewer tools.
 - Every coaching tool on every plan, clients free, and no cut of client payments.
 Sent only once the `coachPlans` flag is on.
 
+### C7 · Reviews from your clients (**New**, 2026-11-15)
+Pro · Coaches, trainers and physios · No screen (it needs a coach's account) · `fresh`, so it goes next to coaches already in the series
+Clients who've trained with you can now rate you, and new clients can see it.
+- A client can leave stars and a short review after four weeks or two sessions with you.
+- Your rating shows on your invite and in the trainer directory once you have three reviews.
+- Next to it: how many of your clients trained in the last two weeks.
+- Reply once to each review from Coaching › Setup, and report one that breaks the rules.
+Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))
+
 ### P1 · Rehab that actually gets done
 Pro · Physios and rehab clinicians · Screen: assigning a rehab program
 Home exercises work when they're done. Liftsmith puts yours on your client's Today.
