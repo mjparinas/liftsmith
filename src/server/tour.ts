@@ -46,11 +46,14 @@ export function nextTour(sends: readonly Send[], tz: string, from: number, to: n
   const step = TOUR[n]!;
   const busy = new Set(live.map((s) => dateKey(s.sendAt, tz)));
   const lastTour = Math.max(0, ...live.filter((s) => s.kind === "tour").map((s) => s.sendAt));
-  for (let day = dayStart(from, tz); day < to; day = addDays(day, 1, tz)) {
+  // A while loop, not `for (…; …; day = addDays(…))`: the bundler left the imported addDays bare in that
+  // for-loop's update, so the daily job threw "addDays is not defined" in production (scripts/bundle-check.mjs).
+  let day = dayStart(from, tz);
+  while (day < to) {
     const at = atTime(day, TOUR_HOUR, tz);
-    if (at < from || at >= to || at <= lastTour || inQuiet(at, tz)) continue;
-    if (busy.has(dateKey(at, tz))) continue;
-    return { key: `tour:${step.id}`, at, step, n };
+    if (at >= from && at < to && at > lastTour && !inQuiet(at, tz) && !busy.has(dateKey(at, tz)))
+      return { key: `tour:${step.id}`, at, step, n };
+    day = addDays(day, 1, tz);
   }
   return null;
 }
