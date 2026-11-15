@@ -17,6 +17,7 @@ import {
   type OwnedGym,
   type StandOrder,
 } from "@/lib/gymClaims";
+import { gymName } from "@/lib/gymNames";
 import { encodeGym, kitOf } from "@/lib/gymShare";
 import { currentLang, num, t, weekday } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
@@ -150,7 +151,7 @@ export function GymEdit({ id }: { id?: string }) {
   };
   return (
     <div className="pb-2">
-      <ScreenHeader title={t("gym.edit.title")} kicker={gym.name} back={{ label: t("gym.back"), onClick: goBack }} />
+      <ScreenHeader title={t("gym.edit.title")} kicker={gymName(gym.name)} back={{ label: t("gym.back"), onClick: goBack }} />
 
       <Results gym={gym} />
       <ClubSection gym={gym} />
@@ -205,7 +206,7 @@ export function GymEdit({ id }: { id?: string }) {
         <div className="flex flex-wrap gap-2">
           {gyms.map((g) => (
             <Chip key={g.id} active={kitFrom === g.id} onClick={() => setKitFrom(kitFrom === g.id ? null : g.id)}>
-              {g.name}
+              {gymName(g.name)}
             </Chip>
           ))}
         </div>

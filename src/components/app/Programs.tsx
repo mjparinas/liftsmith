@@ -88,7 +88,8 @@ export function Programs() {
                 </span>
               </div>
               <p className="mt-0.5 text-xs text-faint">
-                {level(p.level)} · {t("prog.perWeek", { count: p.daysPerWeek })} · {t("prog.aka", { name: p.aka[0] })}
+                {level(p.level)} · {t("prog.perWeek", { count: p.daysPerWeek })}
+                {akaName(p.aka) ? ` · ${t("prog.aka", { name: akaName(p.aka)! })}` : ""}
               </p>
               <p className="mt-1 text-sm text-muted">{p.summary}</p>
             </button>
@@ -155,3 +156,9 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
 export function programName(id: string | undefined): string | null {
   return id ? (PROGRAM_BY_ID.get(id)?.name ?? null) : null;
 }
+
+/**
+ * The other name a program goes by, when it has one: a proper name ("Starting Strength", "GZCLP"), never a
+ * plain English description ("dumbbell workout"), which would read as untranslated in the other languages.
+ */
+const akaName = (aka: readonly string[]) => aka.find((a) => /^[A-Z0-9]/.test(a));
