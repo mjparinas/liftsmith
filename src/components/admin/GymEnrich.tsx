@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import type { EnrichBatch, EnrichOne } from "@/server/gymEnrich";
 
 import { Card } from "./charts";
+import { HowItWorks } from "./HowItWorks";
 
 const FIELD: Record<string, string> = {
   phone: "phone",
@@ -64,11 +65,18 @@ export function GymEnrich({ admin, changed }: { admin: boolean; changed: () => v
       title="Fill in details from gym websites"
       subtitle="Hours, phone, email, address, postcode, social pages and the site's icon the map doesn't have."
     >
-      <p className="text-sm text-muted">
-        Reads the home page of each unclaimed gym that has a website and is missing something: its structured data first, then its phone,
-        email and social links, and the site&apos;s icon, which shows as the gym&apos;s logo until an owner adds one. Only empty fields are
-        filled, a claimed gym is never touched, and a gym is read at most once a month. Directory and map sites are never read.
-      </p>
+      <HowItWorks>
+        <p>
+          Reads the home page of each unclaimed gym that has a website and is missing something: its structured data first, then its phone,
+          email and social links, and the site&apos;s icon, which shows as the gym&apos;s logo until an owner adds one. Only empty fields
+          are filled, a claimed gym is never touched, and a gym is read at most once a month. Directory and map sites are never read.
+        </p>
+        <p>
+          An address is taken only when it&apos;s this gym&apos;s: from the page&apos;s structured data or microdata, else from an address
+          or footer line followed by the gym&apos;s own city. One that names another city, or whose map position is more than 15 km from the
+          gym, is skipped, and so is a page listing several branches without saying which is which. Postcodes must fit the country.
+        </p>
+      </HowItWorks>
       {admin && (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
           {running ? (

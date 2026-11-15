@@ -1,7 +1,17 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
-import { detailsFromHtml, enrichBatch, enrichPlace, hoursFromSpec, iconLinks, imageType, publicHost } from "./gymEnrich";
+import {
+  detailsFromHtml,
+  enrichBatch,
+  enrichPlace,
+  hoursFromSpec,
+  iconLinks,
+  imageType,
+  looksLikeStreet,
+  pickAddress,
+  publicHost,
+} from "./gymEnrich";
 import { placeById, placesFromOsm, savePlaces, socialUrl, type OsmElement } from "./gymPlaces";
 
 const NOW = 1_800_000_000_000;
@@ -250,5 +260,63 @@ describe("the gym's own icon", () => {
       (await enrichPlace({ id, name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW + 3)).filled,
     ).not.toContain("icon");
     expect(await query("SELECT COUNT(*) AS n FROM gym_photos")).toEqual([{ n: 0 }]);
+  });
+});
+
+describe("addresses from a gym's website", () => {
+  const near = { city: "Langley", region: "BC", country: "CA", lat: 49.1, lon: -122.66 };
+  const ld = (o: unknown) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`;
+
+  it("takes the structured address when it's in the gym's city, tidied, with a postcode that fits the country", () => {
+    const html = ld({
+      "@type": "ExerciseGym",
+      address: { "@type": "PostalAddress", streetAddress: "100 Main St,, Langley,", addressLocality: "Langley", postalCode: "v2y 1a1" },
+    });
+    expect(detailsFromHtml(html, "https://ironworks.example.com/", near)).toMatchObject({ address: "100 Main St", postcode: "V2Y 1A1" });
+  });
+
+  it("skips an address in another city, far from the gym, or one of several branches", () => {
+    const other = ld({ "@type": "HealthClub", address: { streetAddress: "1 Head Office Way", addressLocality: "Toronto" } });
+    expect(detailsFromHtml(other, "https://chain.example.com/", near).address).toBe("");
+    const far = ld({ "@type": "HealthClub", address: { streetAddress: "1 Far Rd" }, geo: { latitude: 49.9, longitude: -123.5 } });
+    expect(detailsFromHtml(far, "https://chain.example.com/", near).address).toBe("");
+    const branches = ld([
+      { "@type": "HealthClub", address: { streetAddress: "1 First Ave" } },
+      { "@type": "HealthClub", address: { streetAddress: "2 Second Ave" } },
+    ]);
+    expect(detailsFromHtml(branches, "https://chain.example.com/", near).address).toBe("");
+    // Of several branches, the one in this gym's city.
+    const mixed = ld([
+      { "@type": "HealthClub", address: { streetAddress: "1 First Ave", addressLocality: "Surrey" } },
+      { "@type": "HealthClub", address: { streetAddress: "2 Second Ave", addressLocality: "Langley" } },
+    ]);
+    expect(detailsFromHtml(mixed, "https://chain.example.com/", near).address).toBe("2 Second Ave");
+  });
+
+  it("reads microdata", () => {
+    const html = `<div itemscope itemtype="https://schema.org/PostalAddress"><span itemprop="streetAddress">20202 66 Ave</span>
+      <span itemprop="addressLocality">Langley</span> <span itemprop="postalCode">V2Y 1P3</span></div>`;
+    expect(detailsFromHtml(html, "https://ironworks.example.com/", near)).toMatchObject({ address: "20202 66 Ave", postcode: "V2Y 1P3" });
+  });
+
+  it("reads an address line in the footer only when the gym's city follows it", () => {
+    const footer = `<footer><p>Iron Works Gym</p><p>20202 66 Ave, Unit 4<br>Langley, BC V2Y 1P3</p><p>Call 604-555-0199</p></footer>`;
+    expect(detailsFromHtml(footer, "https://ironworks.example.com/", near)).toMatchObject({
+      address: "20202 66 Ave, Unit 4",
+      postcode: "V2Y 1P3",
+    });
+    const sameLine = `<address>5 Fraser Hwy, Langley, BC</address>`;
+    expect(detailsFromHtml(sameLine, "https://ironworks.example.com/", near).address).toBe("5 Fraser Hwy");
+    const designer = `<footer>Site by Pixel Co, 9 Granville St, Vancouver, BC</footer>`;
+    expect(detailsFromHtml(designer, "https://ironworks.example.com/", near).address).toBe("");
+    expect(detailsFromHtml(footer, "https://ironworks.example.com/").address).toBe("");
+  });
+
+  it("never takes a phone number, link or email for a street", () => {
+    expect(looksLikeStreet("Call 604-555-0199")).toBe(false);
+    expect(looksLikeStreet("info@ironworks.example.com")).toBe(false);
+    expect(looksLikeStreet("www.ironworks.com")).toBe(false);
+    expect(looksLikeStreet("20202 66 Ave")).toBe(true);
+    expect(pickAddress([{ street: "Main", postcode: "", locality: "" }], near).address).toBe("");
   });
 });

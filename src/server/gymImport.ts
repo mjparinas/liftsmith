@@ -19,6 +19,7 @@ import { randomBytes } from "node:crypto";
 import { SHORT_REGION } from "@/lib/regions";
 
 import { query, run } from "./db";
+import { badCity, cityName } from "./gymAddress";
 import {
   clean,
   NOMINATIM,
@@ -150,13 +151,29 @@ export function planServers(health: Health = {}, start = 0): { order: string[]; 
   return { order: [...spread, ...ranked.filter((url) => slow.has(url))], slow };
 }
 
-function scopeFrom(hit: Found): Scope | null {
+/** The city the person typed: "Langley, BC" → "Langley". Stands in when the map's answer names no real city. */
+export const typedCity = (where: string) =>
+  cityName(
+    clean(where, 120)
+      .split(",")[0]
+      ?.replace(/(^|\s)\p{Ll}/gu, (c) => c.toUpperCase()),
+  );
+
+/**
+ * An area's city: the map's own city, town or village, then the name it found, then the city typed. A postcode area
+ * ("80145") or a house number is never a city (2026-11-15: gyms had been filed under "80145, Campania").
+ */
+export function areaCity(a: Record<string, string>, name: string | undefined, where: string): string {
+  return cityName(a.city ?? a.town ?? a.village ?? a.municipality) || cityName(name) || typedCity(where);
+}
+
+export function scopeFrom(hit: Found, where = ""): Scope | null {
   const a = hit.address ?? {};
   const regionName = a.state ?? a.province ?? "";
   // "CA-BC": the province or state code, whatever language or spelling the name came back in.
   const isoRegion = /^(?:CA|US|AU)-([A-Z]{2,3})$/.exec(a["ISO3166-2-lvl4"] ?? "")?.[1];
   const area: Area = {
-    city: clean(a.city ?? a.town ?? a.village ?? a.municipality ?? hit.name, 60),
+    city: areaCity(a, hit.name, where),
     region: isoRegion ?? SHORT_REGION[regionName] ?? clean(regionName, 60),
     country: clean(a.country_code, 2).toUpperCase(),
   };
@@ -232,6 +249,8 @@ export async function importArea(
   say(`import "${key}"`);
 
   scope = opts.fresh ? null : await cachedScope(key);
+  // An area remembered from before this fix may carry a postcode for its city.
+  if (scope && badCity(scope.area.city)) scope = { ...scope, area: { ...scope.area, city: typedCity(where) } };
   if (scope) say(`area from an earlier import: ${scope.osmType || "box"}${scope.osmId ? `/${scope.osmId}` : ""}, skipped Nominatim`);
   else {
     const t = Date.now();
@@ -246,7 +265,7 @@ export async function importArea(
     const hits = geo?.ok ? ((await geo.json().catch(() => [])) as Found[]) : [];
     const hit = Array.isArray(hits) ? hits[0] : undefined;
     if (!hit) return fail("where", geo?.ok ? "Nominatim found no place by that name." : "Nominatim didn't answer.");
-    scope = scopeFrom(hit);
+    scope = scopeFrom(hit, where);
     if (!scope) return fail("where", `Nominatim found "${hit.name ?? "?"}" but no boundary or box for it.`);
     say(`nominatim ${secs(Date.now() - t)}: ${hit.name ?? "?"} → ${scope.osmType}/${scope.osmId}`);
   }
@@ -438,4 +457,15 @@ export async function lastImported(places: readonly string[]): Promise<Record<st
     for (const r of rows) out[String(r.query)] = Number(r.at);
   }
   return out;
+}
+
+/**
+ * Places whose latest import failed, among the last `limit` imports (a city that failed and then imported cleanly
+ * isn't listed), for Recent imports' Retry failed. They're the import keys, which import the same place again.
+ */
+export async function failedRecently(limit = 100): Promise<string[]> {
+  const rows = await recentImports(limit);
+  const latest = new Map<string, boolean>();
+  for (const r of rows) if (!latest.has(r.query)) latest.set(r.query, r.ok);
+  return [...latest].filter(([, ok]) => !ok).map(([q]) => q);
 }

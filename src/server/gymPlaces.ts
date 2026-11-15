@@ -20,6 +20,7 @@ import {
 import { SHORT_REGION } from "@/lib/regions";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
+import { badCity, cityName, tidyAddress } from "./gymAddress";
 import { distanceKm } from "./gymDirectory";
 import { issuesOf, newsOf, trainersOf } from "./gymExtras";
 import { checkText } from "./moderation";
@@ -247,22 +248,26 @@ export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSki
       continue;
     }
     const about = `${t.sport ?? ""} ${name}`.toLowerCase();
-    const mapCity = clean(t["addr:city"], 60);
+    // A postcode or house number in addr:city ("80145", "1") isn't a city: the import's own area stands in.
+    const mapCity = cityName(t["addr:city"]) || cityName(t["is_in:city"]);
+    const region = clean(t["addr:province"] ?? t["addr:state"], 60) || area.region;
+    const city = mapCity || area.city;
+    const postcode = clean(t["addr:postcode"], 20);
     out.push({
       ref,
       name,
       // A rec centre's sport tag lists everything it hosts (swimming, hockey), so only its name can make it a studio.
       kind: STUDIO.test(fitness ? about : name.toLowerCase()) ? "studio" : "gym",
-      address: streetAddress(t),
-      city: mapCity || area.city,
-      region: clean(t["addr:province"] ?? t["addr:state"], 60) || area.region,
+      address: tidyAddress(streetAddress(t), { city, region, postcode }),
+      city,
+      region,
       country: clean(t["addr:country"], 2).toUpperCase() || area.country,
       lat: Math.round(lat * 1e5) / 1e5,
       lon: Math.round(lon * 1e5) / 1e5,
       hours: clean(t.opening_hours, 200),
       website: httpUrl(t.website ?? t["contact:website"]),
       phone: clean(t.phone ?? t["contact:phone"] ?? t["contact:mobile"], 40),
-      postcode: clean(t["addr:postcode"], 20),
+      postcode,
       email: cleanEmail(t.email ?? t["contact:email"]),
       instagram: socialUrl(t["contact:instagram"] ?? t.instagram, "instagram"),
       facebook: socialUrl(t["contact:facebook"] ?? t.facebook, "facebook"),
@@ -323,7 +328,7 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
       400,
     ).map((part) =>
       query(
-        `SELECT id, claimed_by, source_ref, ${SAME_FIELDS.join(", ")} FROM gym_places WHERE source_ref IN (${part.map(() => "?").join(",")})`,
+        `SELECT id, claimed_by, source_ref, city_slug, ${SAME_FIELDS.join(", ")} FROM gym_places WHERE source_ref IN (${part.map(() => "?").join(",")})`,
         part,
       ),
     ),
@@ -340,6 +345,8 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
   const readMs = Date.now() - t0;
   const stmts: { sql: string; args: (string | number)[] }[] = [];
   const out = { added: 0, updated: 0, unchanged: 0, kept: 0 };
+  // Gyms whose city changed: their pages move, with a redirect from the old address (moveToCity).
+  const moves: string[] = [];
   for (const d of list) {
     const old = had.get(d.ref);
     if (old) {
@@ -347,8 +354,11 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
         out.kept++;
         continue;
       }
-      // The city came from the import's area, not the map: keep the one the gym already has.
-      const next = d.guessed ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) } : { ...d };
+      // The city came from the import's area, not the map: keep the one the gym already has, unless that one was a
+      // postcode or a house number (an older import's mistake).
+      const next =
+        d.guessed && !badCity(s(old.city)) ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) } : { ...d };
+      if (citySlugOf(next.city, next.region) !== s(old.city_slug)) moves.push(s(old.id));
       for (const f of KEEP_IF_MAP_EMPTY) if (!next[f] && s(old[f])) (next as Record<string, unknown>)[f] = s(old[f]);
       if (SAME_FIELDS.every((f) => String(next[f]) === String(old[f] ?? ""))) {
         out.unchanged++;
@@ -420,6 +430,7 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
   }
   const t1 = Date.now();
   for (const part of chunks(stmts, 500)) await batch(part);
+  for (const id of moves) await moveToCity(id, now);
   return { ...out, readMs, writeMs: Date.now() - t1, statements: stmts.length };
 }
 
@@ -440,6 +451,58 @@ async function freeSlug(name: string, citySlug: string, id: string): Promise<str
     if (!taken) return slug;
   }
   return `${base}-${id}`;
+}
+
+// --- Moving a gym to its right city (docs/decisions/gyms.md "Clean city names and addresses") ---
+
+/**
+ * Files a gym under the city its row now says: a new city page folder and a free slug there, with the old address
+ * kept in gym_moves so links and search results to it redirect (gymRedirect). Claimed gyms move too, because their
+ * owner may have fixed the city. Does nothing when the folder is already right.
+ */
+export async function moveToCity(id: string, now = Date.now()): Promise<boolean> {
+  const [r] = await query("SELECT city_slug, slug, name, city, region FROM gym_places WHERE id = ?", [id]);
+  if (!r) return false;
+  const to = citySlugOf(s(r.city), s(r.region));
+  if (to === s(r.city_slug)) return false;
+  const slug = await freeSlug(s(r.name), to, id);
+  const changed = await run("UPDATE OR IGNORE gym_places SET city_slug = ?, slug = ?, updated_at = ? WHERE id = ? AND city_slug = ?", [
+    to,
+    slug,
+    now,
+    id,
+    s(r.city_slug),
+  ]);
+  if (!changed) return false;
+  await run("INSERT OR REPLACE INTO gym_moves (old_city_slug, old_slug, place_id, at) VALUES (?, ?, ?, ?)", [
+    s(r.city_slug),
+    s(r.slug),
+    id,
+    now,
+  ]);
+  return true;
+}
+
+/** Where a gym page that moved lives now: "/gyms/<city>/<gym>/", or null. */
+export async function movedGym(citySlug: unknown, slug: unknown): Promise<string | null> {
+  if (!isSlug(citySlug) || !isSlug(slug)) return null;
+  const [r] = await query(
+    `SELECT p.city_slug, p.slug FROM gym_moves m JOIN gym_places p ON p.id = m.place_id
+     WHERE m.old_city_slug = ? AND m.old_slug = ? AND p.hidden = 0`,
+    [citySlug, slug],
+  );
+  return r ? `/gyms/${s(r.city_slug)}/${s(r.slug)}/` : null;
+}
+
+/** Where a city page whose gyms all moved went: the city most of them are in now, or null. */
+export async function movedCity(citySlug: unknown): Promise<string | null> {
+  if (!isSlug(citySlug)) return null;
+  const [r] = await query(
+    `SELECT p.city_slug, COUNT(*) AS n FROM gym_moves m JOIN gym_places p ON p.id = m.place_id
+     WHERE m.old_city_slug = ? AND p.hidden = 0 GROUP BY p.city_slug ORDER BY n DESC LIMIT 1`,
+    [citySlug],
+  );
+  return r ? `/gyms/${s(r.city_slug)}/` : null;
 }
 
 // --- The map's own services (OpenStreetMap). Imports are in gymImport.ts. ---
@@ -803,34 +866,96 @@ export interface AdminPlaceList {
   /** Every gym, and the official ones, whatever the search. */
   total: number;
   official: number;
-  /** Gyms matching the search, and this page of them (from 1). */
+  /** Gyms matching the search and filters, and this page of them (from 1). */
   matches: number;
   page: number;
   pages: number;
+  /** Countries with gyms, most first, for the country filter. */
+  countries: { code: string; n: number }[];
+  /** Gyms whose city looks like a postcode or a house number, or is missing (Fix city names). */
+  badCities: number;
 }
 
-/** One page of the admin gym list, official first, then most lifters; searchable by name, city or region. */
-export async function adminPlaces(q: unknown, pageAsked: unknown = 1): Promise<AdminPlaceList> {
-  const term = typeof q === "string" ? q.trim().slice(0, 80) : "";
-  const like = `%${term.replace(/[%_]/g, "")}%`;
-  const where = `WHERE p.pending = 0${term ? " AND (p.name LIKE ? OR p.city LIKE ? OR p.region LIKE ?)" : ""}`;
-  const args = term ? [like, like, like] : [];
+/** What the admin gym list can be narrowed to. */
+export interface PlaceFilter {
+  q?: unknown;
+  country?: unknown;
+  city?: unknown;
+  /** official, unofficial, hidden, studio */
+  status?: unknown;
+  /** address, phone, hours, website, email, kit, city (a city that's a postcode or missing) */
+  missing?: unknown;
+  page?: unknown;
+}
+
+/** A city that's empty or has a digit: the SQL side of badCity, close enough to list and count them. */
+export const BAD_CITY_SQL = "(p.city = '' OR p.city GLOB '*[0-9]*')";
+
+const STATUS_SQL: Record<string, string> = {
+  official: "p.claimed_by <> ''",
+  unofficial: "p.claimed_by = ''",
+  hidden: "p.hidden = 1",
+  studio: "p.kind = 'studio'",
+};
+const MISSING_SQL: Record<string, string> = {
+  address: "p.address = ''",
+  phone: "p.phone = ''",
+  hours: "p.hours = ''",
+  website: "p.website = ''",
+  email: "p.email = ''",
+  kit: "p.code = '' AND NOT EXISTS (SELECT 1 FROM public_gyms g WHERE g.place_id = p.id)",
+  city: BAD_CITY_SQL,
+};
+
+/** One page of the admin gym list, official first, then most lifters; searchable by name, address, city or region. */
+export async function adminPlaces(filter: PlaceFilter = {}): Promise<AdminPlaceList> {
+  const text = (x: unknown, max = 80) => (typeof x === "string" ? x.trim().slice(0, max) : "");
+  const term = text(filter.q);
+  const country = text(filter.country, 2).toUpperCase();
+  const city = text(filter.city, 60);
+  const status = STATUS_SQL[text(filter.status, 20)];
+  const missing = MISSING_SQL[text(filter.missing, 20)];
+  const like = (x: string) => `%${x.replace(/[%_]/g, "")}%`;
+  const parts = ["p.pending = 0"];
+  const args: (string | number)[] = [];
+  if (term) {
+    parts.push("(p.name LIKE ? OR p.address LIKE ? OR p.city LIKE ? OR p.region LIKE ?)");
+    args.push(like(term), like(term), like(term), like(term));
+  }
+  if (/^[A-Z]{2}$/.test(country)) {
+    parts.push("p.country = ?");
+    args.push(country);
+  }
+  if (city) {
+    parts.push("(p.city LIKE ? OR p.city_slug = ?)");
+    args.push(like(city), city.toLowerCase());
+  }
+  if (status) parts.push(status);
+  if (missing) parts.push(missing);
+  const where = `WHERE ${parts.join(" AND ")}`;
   const [m] = await query(`SELECT COUNT(*) AS n FROM gym_places p ${where}`, args);
   const matches = n(m?.n);
   const pages = Math.max(1, Math.ceil(matches / ADMIN_PAGE));
-  const page = Math.min(pages, Math.max(1, Math.floor(Number(pageAsked) || 1)));
-  const rows = await query(
-    `${ADMIN_SQL} ${where}
+  const page = Math.min(pages, Math.max(1, Math.floor(Number(filter.page) || 1)));
+  const [rows, [c], countries] = await Promise.all([
+    query(
+      `${ADMIN_SQL} ${where}
      ORDER BY p.claimed_by = '' , p.lifters DESC, p.city, p.name, p.id LIMIT ? OFFSET ?`,
-    [...args, ADMIN_PAGE, (page - 1) * ADMIN_PAGE],
-  );
-  const [c] = await query("SELECT COUNT(*) AS total, SUM(claimed_by <> '') AS official FROM gym_places WHERE pending = 0");
+      [...args, ADMIN_PAGE, (page - 1) * ADMIN_PAGE],
+    ),
+    query(
+      `SELECT COUNT(*) AS total, SUM(claimed_by <> '') AS official, SUM(${BAD_CITY_SQL.replace(/p\./g, "")}) AS bad FROM gym_places WHERE pending = 0`,
+    ),
+    query("SELECT country, COUNT(*) AS n FROM gym_places WHERE pending = 0 AND country <> '' GROUP BY country ORDER BY n DESC"),
+  ]);
   return {
     total: n(c?.total),
     official: n(c?.official),
+    badCities: n(c?.bad),
     matches,
     page,
     pages,
+    countries: countries.map((r) => ({ code: s(r.country), n: n(r.n) })),
     places: rows.map(toAdmin),
   };
 }

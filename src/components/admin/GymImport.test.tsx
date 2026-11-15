@@ -3,9 +3,10 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { ImportRow } from "@/server/gymImport";
 import type { JobStatus } from "@/server/gymImportJobs";
 
-import { eta, GymImport, POLL_MS } from "./GymImport";
+import { eta, failedPlaces, GymImport, pickCountry, POLL_MS, shortError } from "./GymImport";
 
 const T0 = Date.now();
 const job = (over: Partial<JobStatus> = {}): JobStatus => ({
@@ -44,12 +45,14 @@ const finished = job({
 });
 
 let onServer: JobStatus | null = null;
+let imports: ImportRow[] = [];
 const posts: Record<string, unknown>[] = [];
 beforeEach(() => {
   posts.length = 0;
   onServer = null;
+  imports = [];
   vi.stubGlobal("fetch", async (url: string, init?: RequestInit) => {
-    if (url.includes("?imports=1")) return Response.json({ imports: [] });
+    if (url.includes("?imports=1")) return Response.json({ imports });
     if (url.includes("?countries=1"))
       return Response.json({
         countries: [
@@ -62,6 +65,7 @@ beforeEach(() => {
     const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
     posts.push(body);
     if (body.action === "importJob") onServer = job();
+    if (body.action === "importRetryRecent") onServer = job({ id: "job3", label: "1 failed city", total: 1, skipped: 0 });
     if (body.action === "importRetry") onServer = job({ id: "job2", label: "1 failed city", total: 1, skipped: 0, active: ["Surrey, BC"] });
     if (body.action === "importClose") onServer = null;
     return Response.json({ job: onServer });
@@ -78,7 +82,7 @@ describe("Admin › Gyms import", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const changed = vi.fn();
     render(<GymImport admin changed={changed} />);
-    await userEvent.click(await screen.findByRole("button", { name: "Import its major cities" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Import Canada's 3 cities" }));
     expect(posts[0]).toEqual({ action: "importJob", country: "CA", skipRecent: true, notify: true });
     expect(await screen.findByText(/Importing Canada: 0 of 2 cities/)).toBeTruthy();
     expect(screen.getByText(/1 imported in the last 7 days skipped/)).toBeTruthy();
@@ -101,9 +105,54 @@ describe("Admin › Gyms import", () => {
     render(<GymImport admin changed={() => undefined} />);
     expect(await screen.findByText(/Importing Canada: 1 of 2 cities/)).toBeTruthy();
     expect(screen.getByText(/1 busy, trying again soon/)).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Import its major cities" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Import Canada/ })).toBeNull();
     await userEvent.click(screen.getByRole("button", { name: "Stop" }));
     expect(posts.at(-1)).toEqual({ action: "importStop", job: "job1" });
+  });
+
+  it("picks the country from a search box by name or code", async () => {
+    render(<GymImport admin changed={() => undefined} />);
+    const box = await screen.findByRole("combobox", { name: "Country" });
+    await waitFor(() => expect((box as HTMLInputElement).value).toBe("Canada"));
+    await userEvent.clear(box);
+    await userEvent.type(box, "jp");
+    await userEvent.click(screen.getByRole("button", { name: "Import Japan's 1 city" }));
+    expect(posts.at(-1)).toEqual({ action: "importJob", country: "JP", skipRecent: true, notify: true });
+    expect(pickCountry([{ code: "CA", name: "Canada" }], "canada")?.code).toBe("CA");
+    expect(pickCountry([{ code: "CA", name: "Canada" }], "Can")).toBeNull();
+  });
+
+  it("lists recent imports as a table with a short error, a failed-only filter and Retry failed", async () => {
+    imports = [
+      row({
+        id: "a",
+        query: "phoenix, az",
+        area: "Phoenix, AZ",
+        ok: false,
+        error: "map: maps.mail.ru: no answer in 62.8s; overpass-api.de: TypeError: fetch failed",
+      }),
+      row({ id: "b", query: "naperville, il", area: "Naperville, IL", ok: true, found: 32, added: 32 }),
+      row({ id: "c", query: "naperville, il", area: "Naperville, IL", ok: false, error: "map: overpass-api.de: HTTP 502 (server busy)" }),
+    ];
+    render(<GymImport admin changed={() => undefined} />);
+    expect(await screen.findAllByText("Map servers busy")).toHaveLength(2);
+    expect(screen.getByText("The last 3, newest first. 1 still failing.")).toBeTruthy();
+    // The long error is only in the row's details.
+    expect(screen.queryByText(/TypeError: fetch failed/)).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "Failed: Phoenix, AZ" }));
+    expect(screen.getByText(/TypeError: fetch failed/)).toBeTruthy();
+    await userEvent.click(screen.getByRole("button", { name: "Failed only (2)" }));
+    expect(screen.queryByText("32 found, 32 new, 0 changed")).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "Retry 1 failed" }));
+    expect(posts.at(-1)).toEqual({ action: "importRetryRecent", notify: true });
+    expect(await screen.findByText(/Importing 1 failed city/)).toBeTruthy();
+  });
+
+  it("sums up an import error in a few words", () => {
+    expect(shortError("where: Nominatim found no place by that name.")).toBe("Place not found");
+    expect(shortError("map: maps.mail.ru: HTTP 504 (server busy); overpass.private.coffee: no answer in 100.0s")).toBe("Map servers busy");
+    expect(shortError("map: overpass-api.de: error: runtime error: query failed")).toBe("Map error");
+    expect(failedPlaces([row({ query: "a", ok: true }), row({ query: "a", ok: false }), row({ query: "b", ok: false })])).toEqual(["b"]);
   });
 
   it("works out the time left from the cities already done", () => {
@@ -126,3 +175,23 @@ const okLine = {
   server: "maps.mail.ru",
   ms: 12_000,
 };
+
+function row(over: Partial<ImportRow>): ImportRow {
+  return {
+    id: "r",
+    query: "langley, bc",
+    area: "Langley, BC",
+    ok: true,
+    error: "",
+    found: 0,
+    added: 0,
+    updated: 0,
+    unchanged: 0,
+    kept: 0,
+    server: "maps.mail.ru",
+    ms: 30_000,
+    log: "+0.0s import",
+    at: T0,
+    ...over,
+  };
+}

@@ -471,6 +471,15 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_imports_query ON gym_imports (query, at)`,
   `CREATE INDEX IF NOT EXISTS gym_imports_at ON gym_imports (at)`,
+  // A gym page's old address after its city was fixed (gymPlaces.ts moveToCity, 2026-11-15): a postcode or house number
+  // had been taken for the city ("80145, Campania"), so the page moved and the old one redirects. Public pages only.
+  `CREATE TABLE IF NOT EXISTS gym_moves (
+    old_city_slug TEXT NOT NULL,
+    old_slug TEXT NOT NULL,
+    place_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (old_city_slug, old_slug)
+  )`,
   // Country and every-country imports as a server job (gymImportJobs.ts, 2026-11-15): the job, and one row per city
   // with its state (pending, running, waiting to retry, ok, failed) and result. One worker holds a job at a time
   // (`lease_until`). Public map data and timings, plus the staff address that started it; kept 90 days.
