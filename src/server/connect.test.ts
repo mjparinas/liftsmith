@@ -1,13 +1,21 @@
+import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { accountInfo, deleteAccount } from "./accounts";
 import {
   accessToken,
   callback,
+  cardioResults,
   checkWorkout,
   concept2Cardio,
+  dailyReadings,
   dayAt,
   disconnect,
+  forgetAll,
+  garminCallback,
+  garminCardio,
+  garminPing,
+  garminReadings,
   offsetMinutes,
   ouraReadings,
   polarReadings,
@@ -32,6 +40,8 @@ const ENV = {
   WITHINGS_CLIENT_SECRET: "w-secret",
   POLAR_CLIENT_ID: "p-id",
   POLAR_CLIENT_SECRET: "p-secret",
+  GARMIN_CLIENT_ID: "g-id",
+  GARMIN_CLIENT_SECRET: "g-secret",
 } as unknown as NodeJS.ProcessEnv;
 
 type Call = { url: string; init?: RequestInit };
@@ -70,7 +80,16 @@ describe("tokens at rest", () => {
 describe("connecting", () => {
   it("says which services have keys", async () => {
     const s = await status("acc1", ENV);
-    expect(s.ready).toEqual({ strava: true, oura: true, whoop: false, withings: true, polar: true, concept2: false, sonos: false });
+    expect(s.ready).toEqual({
+      strava: true,
+      garmin: true,
+      oura: true,
+      whoop: false,
+      withings: true,
+      polar: true,
+      concept2: false,
+      sonos: false,
+    });
     expect(s.linked).toEqual({});
   });
 
@@ -376,5 +395,211 @@ describe("Withings, Polar and Concept2", () => {
       { id: "1", kind: "rower", start: Date.parse("2026-11-10T12:30:00Z"), seconds: 480, distanceM: 2000 },
       { id: "2", kind: "skierg", start: Date.parse("2026-11-11T18:00:00Z"), seconds: 241, distanceM: 1000 },
     ]);
+  });
+});
+
+describe("Garmin Connect", () => {
+  const G = "https://apis.garmin.com/wellness-api/rest";
+  const DAY_S = Math.floor(NOW / 1000);
+
+  async function connectGarmin(f: typeof fetch, account = "acc1") {
+    const url = (await start(account, "garmin", "android", ENV, NOW))!;
+    return { url, result: await callback("garmin", stateOf(url), "code1", f, ENV, NOW) };
+  }
+
+  it("signs in with PKCE, keeps Garmin's user id, asks for 30 days back, and deregisters on disconnect", async () => {
+    const { f, calls } = fakeFetch({
+      "https://diauth.garmin.com/di-oauth2-service/oauth/token": () => ({
+        body: { access_token: "g-acc", refresh_token: "g-ref", expires_in: 86_400 },
+      }),
+      [`${G}/user/id`]: () => ({ body: { userId: "garmin-user-1" } }),
+      [`${G}/backfill/`]: () => ({ status: 202 }),
+      [`${G}/user/registration`]: () => ({ status: 204 }),
+    });
+    const { url, result } = await connectGarmin(f);
+    const q = new URL(url).searchParams;
+    expect(url.startsWith("https://connect.garmin.com/oauth2Confirm?")).toBe(true);
+    expect(q.get("code_challenge_method")).toBe("S256");
+    expect(q.has("scope")).toBe(false);
+    expect(result).toEqual({ platform: "android" });
+    const verifier = new URLSearchParams(String(calls[0]!.init?.body)).get("code_verifier")!;
+    expect(createHash("sha256").update(verifier).digest("base64url")).toBe(q.get("code_challenge"));
+    expect(calls.filter((c) => c.url.startsWith(`${G}/backfill/`)).map((c) => new URL(c.url).pathname.split("/").pop())).toEqual([
+      "dailies",
+      "sleeps",
+      "hrv",
+      "bodyComps",
+      "activities",
+    ]);
+    expect(await query("SELECT remote_user FROM connections")).toEqual([{ remote_user: "garmin-user-1" }]);
+    await disconnect("acc1", "garmin", f, ENV);
+    expect(calls.some((c) => c.url === `${G}/user/registration` && c.init?.method === "DELETE")).toBe(true);
+    expect(await query("SELECT * FROM connections")).toEqual([]);
+  });
+
+  it("doesn't connect without Garmin's user id", async () => {
+    const { f } = fakeFetch({
+      "https://diauth.garmin.com/di-oauth2-service/oauth/token": () => ({ body: { access_token: "g-acc" } }),
+      [`${G}/user/id`]: () => ({ status: 500 }),
+    });
+    expect((await connectGarmin(f)).result).toBeNull();
+    expect((await status("acc1", ENV)).linked).toEqual({});
+  });
+
+  it("maps dailies, sleeps, HRV and body composition", () => {
+    expect(
+      garminReadings("dailies", [
+        { calendarDate: "2027-01-14", steps: 9012, restingHeartRateInBeatsPerMinute: 52, startTimeInSeconds: 100 },
+      ]),
+    ).toEqual([
+      { metric: "steps", day: "2027-01-14", value: 9012, at: 86_500_000 },
+      { metric: "restingHr", day: "2027-01-14", value: 52, at: 86_500_000 },
+    ]);
+    expect(
+      garminReadings("sleeps", [
+        {
+          calendarDate: "2027-01-15",
+          startTimeInSeconds: 0,
+          durationInSeconds: 28_800,
+          deepSleepDurationInSeconds: 5400,
+          lightSleepDurationInSeconds: 14_400,
+          remSleepInSeconds: 5400,
+        },
+        { calendarDate: "2027-01-16", durationInSeconds: 27_000, awakeDurationInSeconds: 1800 },
+      ]).map((r) => [r.day, r.value]),
+    ).toEqual([
+      ["2027-01-15", 7],
+      ["2027-01-16", 7],
+    ]);
+    expect(
+      garminReadings("hrv", [
+        { calendarDate: "2027-01-15", lastNightAvg: 61 },
+        { calendarDate: "2027-01-16", lastNightAvg: 999 },
+      ]),
+    ).toEqual([{ metric: "hrv", day: "2027-01-15", value: 61, at: Date.parse("2027-01-15T08:00:00Z") }]);
+    // Measured at 23:30 UTC by someone five hours behind: it's still the 15th where they are.
+    const at = Date.parse("2027-01-16T03:30:00Z") / 1000;
+    expect(
+      garminReadings("bodyComps", [
+        { measurementTimeInSeconds: at, measurementTimeOffsetInSeconds: -18_000, weightInGrams: 81_250, bodyFatInPercent: 17.4 },
+      ]),
+    ).toEqual([
+      { metric: "weight", day: "2027-01-15", value: 81.25, at: at * 1000 },
+      { metric: "bodyFat", day: "2027-01-15", value: 17.4, at: at * 1000 },
+    ]);
+    expect(garminReadings("dailies", [null, "junk", { calendarDate: "yesterday", steps: 5 }])).toEqual([]);
+  });
+
+  it("maps runs, rides, rows, elliptical and stairs, and leaves strength sessions out", () => {
+    const base = { startTimeInSeconds: 1000, durationInSeconds: 1800, distanceInMeters: 5000.4 };
+    expect(
+      garminCardio([
+        { ...base, summaryId: "a", activityType: "RUNNING" },
+        { ...base, summaryId: "b", activityType: "treadmill_running" },
+        { ...base, summaryId: "c", activityType: "INDOOR_ROWING" },
+        { ...base, activityId: 9, activityType: "STAIR_CLIMBING", distanceInMeters: undefined },
+        { ...base, summaryId: "e", activityType: "STRENGTH_TRAINING" },
+        { ...base, summaryId: "f", activityType: "RUNNING", durationInSeconds: 20 },
+      ]),
+    ).toEqual([
+      { id: "a", kind: "run", start: 1_000_000, seconds: 1800, distanceM: 5000 },
+      { id: "b", kind: "treadmill", start: 1_000_000, seconds: 1800, distanceM: 5000 },
+      { id: "c", kind: "rower", start: 1_000_000, seconds: 1800, distanceM: 5000 },
+      { id: "9", kind: "stairs", start: 1_000_000, seconds: 1800, distanceM: 0 },
+    ]);
+  });
+
+  it("only follows ping callbacks to Garmin's own API", () => {
+    expect(garminCallback(`${G}/dailies?uploadStartTimeInSeconds=1`)).not.toBeNull();
+    expect(garminCallback("http://apis.garmin.com/wellness-api/rest/dailies")).toBeNull();
+    expect(garminCallback("https://apis.garmin.com.evil.example/wellness-api/rest/dailies")).toBeNull();
+    expect(garminCallback("https://apis.garmin.com/other")).toBeNull();
+    expect(garminCallback(42)).toBeNull();
+  });
+
+  it("a ping fetches the summaries with the lifter's token, keeps them for the app, and ignores inline data", async () => {
+    const { f, calls } = fakeFetch({
+      "https://diauth.garmin.com/di-oauth2-service/oauth/token": () => ({ body: { access_token: "g-acc", expires_in: 86_400 } }),
+      [`${G}/user/id`]: () => ({ body: { userId: "garmin-user-1" } }),
+      [`${G}/backfill/`]: () => ({ status: 202 }),
+      [`${G}/sleeps`]: () => ({ body: [{ calendarDate: dayAt(NOW, 0), durationInSeconds: 28_800 }] }),
+      [`${G}/activities`]: () => ({
+        body: [
+          { summaryId: "run1", activityType: "RUNNING", startTimeInSeconds: DAY_S - 7200, durationInSeconds: 1800, distanceInMeters: 5000 },
+        ],
+      }),
+    });
+    await connectGarmin(f);
+    const kept = await garminPing(
+      {
+        sleeps: [{ userId: "garmin-user-1", callbackURL: `${G}/sleeps?uploadStartTimeInSeconds=1&uploadEndTimeInSeconds=2` }],
+        activities: [{ userId: "garmin-user-1", callbackURL: `${G}/activities?uploadStartTimeInSeconds=1&uploadEndTimeInSeconds=2` }],
+        // Push mode (data in the notification itself) can't be checked, so it's ignored.
+        hrv: [{ userId: "garmin-user-1", calendarDate: dayAt(NOW, 0), lastNightAvg: 70 }],
+        // Somebody else's Garmin id, or a callback to another server: nothing fetched.
+        dailies: [
+          { userId: "stranger", callbackURL: `${G}/dailies?x=1` },
+          { userId: "garmin-user-1", callbackURL: "https://evil.example/wellness-api/rest/dailies" },
+        ],
+      },
+      f,
+      ENV,
+      NOW,
+    );
+    expect(kept).toBe(2);
+    const fetched = calls.filter((c) => c.url.startsWith(`${G}/sleeps`) || c.url.startsWith(`${G}/activities`));
+    expect(fetched.map((c) => (c.init?.headers as Record<string, string>).Authorization)).toEqual(["Bearer g-acc", "Bearer g-acc"]);
+    expect(calls.some((c) => c.url.includes("evil") || c.url.includes("dailies?x=1"))).toBe(false);
+    expect(await dailyReadings("acc1", "garmin", 45, 0, f, ENV, NOW)).toEqual([expect.objectContaining({ metric: "sleep", value: 8 })]);
+    expect(await cardioResults("acc1", "garmin", 30, 0, f, ENV, NOW)).toEqual([
+      { id: "run1", kind: "run", start: (DAY_S - 7200) * 1000, seconds: 1800, distanceM: 5000 },
+    ]);
+    // A ping again for the same night replaces the reading rather than adding one.
+    await garminPing({ sleeps: [{ userId: "garmin-user-1", callbackURL: `${G}/sleeps?again=1` }] }, f, ENV, NOW);
+    expect(await query("SELECT COUNT(*) AS n FROM cloud_readings")).toEqual([{ n: 1 }]);
+  });
+
+  it("leaves today's steps out until the day is over", async () => {
+    const { f } = fakeFetch({
+      "https://diauth.garmin.com/di-oauth2-service/oauth/token": () => ({ body: { access_token: "g-acc", expires_in: 86_400 } }),
+      [`${G}/user/id`]: () => ({ body: { userId: "u" } }),
+      [`${G}/backfill/`]: () => ({ status: 202 }),
+      [`${G}/dailies`]: () => ({
+        body: [
+          { calendarDate: dayAt(NOW, 0), steps: 2000 },
+          { calendarDate: dayAt(NOW - 86_400_000, 0), steps: 11_000 },
+        ],
+      }),
+    });
+    await connectGarmin(f);
+    await garminPing({ dailies: [{ userId: "u", callbackURL: `${G}/dailies?a=1` }] }, f, ENV, NOW);
+    expect((await dailyReadings("acc1", "garmin", 45, 0, f, ENV, NOW)).map((r) => r.value)).toEqual([11_000]);
+  });
+
+  it("a deregistration from Garmin forgets the connection and what was kept", async () => {
+    const { f } = fakeFetch({
+      "https://diauth.garmin.com/di-oauth2-service/oauth/token": () => ({ body: { access_token: "g-acc", expires_in: 86_400 } }),
+      [`${G}/user/id`]: () => ({ body: { userId: "u" } }),
+      [`${G}/backfill/`]: () => ({ status: 202 }),
+      [`${G}/hrv`]: () => ({ body: [{ calendarDate: dayAt(NOW, 0), lastNightAvg: 60 }] }),
+    });
+    await connectGarmin(f);
+    await garminPing({ hrv: [{ userId: "u", callbackURL: `${G}/hrv?a=1` }] }, f, ENV, NOW);
+    await garminPing({ deregistrations: [{ userId: "u" }] }, f, ENV, NOW);
+    expect(await query("SELECT * FROM connections")).toEqual([]);
+    expect(await query("SELECT * FROM cloud_readings")).toEqual([]);
+    await expect(dailyReadings("acc1", "garmin", 45, 0, f, ENV, NOW)).rejects.toThrow();
+  });
+
+  it("deleting the account deletes what Garmin sent", async () => {
+    await run(
+      "INSERT INTO cloud_sessions (account_id, provider, id, kind, start, seconds, distance_m) VALUES ('acc1', 'garmin', 'x', 'run', 1, 60, 0)",
+    );
+    await run(
+      "INSERT INTO cloud_readings (account_id, provider, metric, day, value, at) VALUES ('acc1', 'garmin', 'hrv', '2027-01-01', 50, 1)",
+    );
+    await forgetAll("acc1", fakeFetch({}).f, ENV);
+    expect(await query("SELECT * FROM cloud_sessions")).toEqual([]);
+    expect(await query("SELECT * FROM cloud_readings")).toEqual([]);
   });
 });

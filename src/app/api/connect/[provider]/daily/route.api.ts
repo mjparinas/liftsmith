@@ -1,5 +1,6 @@
-// GET /api/connect/<oura|whoop|withings|polar>/daily/?days=45&tz=-300: the last days of sleep, HRV, resting heart rate,
-// breathing rate, steps and (Withings) weigh-ins, one reading per metric per day. Passed through, never stored. Server build only.
+// GET /api/connect/<garmin|oura|whoop|withings|polar>/daily/?days=45&tz=-300: the last days of sleep, HRV, resting heart
+// rate, breathing rate, steps and (Withings, Garmin) weigh-ins, one reading per metric per day. Passed through, never
+// stored, except Garmin's, which Garmin pushed ahead (connect.ts garminPing). Server build only.
 import { isReadingCloud } from "@/lib/cloud";
 import { preflight, reply, signedIn } from "@/server/accountHttp";
 import { dailyReadings, Unlinked } from "@/server/connect";
