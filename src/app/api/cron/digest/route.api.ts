@@ -1,4 +1,4 @@
-// Vercel Cron (vercel.json) at 15:00 and 16:00 UTC: the admins' morning digest (src/server/digest.ts). Cron runs in
+// Vercel Schedules (vercel.json, "digest-pdt" and "digest-pst") at 15:00 and 16:00 UTC: the admins' morning digest (src/server/digest.ts). Schedules run in
 // UTC, so one of the two runs is 8 AM Pacific whatever the season; the digest goes out once per Pacific day.
 // Vercel sends "Authorization: Bearer $CRON_SECRET". Each run is recorded (src/server/monitor.ts).
 import { sendDigest } from "@/server/digest";

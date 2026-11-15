@@ -1,4 +1,4 @@
-// Vercel Cron (vercel.json), once a day: schedules each confirmed subscriber's emails for the next day
+// Vercel Schedules (vercel.json, "reminders"), once a day: schedules each confirmed subscriber's emails for the next day
 // with Resend (scheduled_at), at local times in their own time zone. Once a day works on every Vercel
 // plan. Vercel sends "Authorization: Bearer $CRON_SECRET".
 import { trackJob } from "@/server/monitor";
