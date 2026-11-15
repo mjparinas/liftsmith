@@ -625,6 +625,20 @@ const SCHEMA = [
     PRIMARY KEY (place_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS gym_trainers_account ON gym_trainers (account_id)`,
+  // Strength standards from lifters who count their lifts (standards.ts, 2026-11-15): one row per lift, sex and body
+  // weight group with at least MIN_CELL lifters, rebuilt each morning. Only percentiles and counts, never an account.
+  `CREATE TABLE IF NOT EXISTS strength_standards (
+    lift TEXT NOT NULL,
+    sex TEXT NOT NULL,
+    band INTEGER NOT NULL,
+    n INTEGER NOT NULL,
+    p25 REAL NOT NULL,
+    p50 REAL NOT NULL,
+    p75 REAL NOT NULL,
+    p90 REAL NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (lift, sex, band)
+  )`,
   // Staff accounts for an official gym (gymStaff.ts, 2026-11-13): who besides the owner manages it, and the one-time
   // invite links the owner made. `name` is what the person typed when joining, shown to the owner.
   `CREATE TABLE IF NOT EXISTS gym_staff (
@@ -1112,6 +1126,9 @@ const SCHEMA = [
  * so each one is added here if it's missing. Only ever append; a column is never renamed or dropped.
  */
 const COLUMNS: [table: string, column: string, def: string][] = [
+  // The country an account last synced from (Vercel's x-vercel-ip-country), for the strength standards' default:
+  // counted unless the lifter says no, except in the EU, EEA, UK and Switzerland, where only a yes counts (standards.ts).
+  ["accounts", "country", "TEXT"],
   // Codes of our own, not only creators' (Melvin, 2026-11-10): see src/server/creators.ts.
   ["creators", "kind", "TEXT NOT NULL DEFAULT 'creator'"],
   ["creators", "trial_days", "INTEGER"],

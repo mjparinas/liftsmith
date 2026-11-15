@@ -265,6 +265,12 @@ export interface Profile {
    */
   birthYear?: number;
   sex?: "male" | "female";
+  /**
+   * Whether this lifter's best big lifts count in the public strength standards (src/server/standards.ts), only inside
+   * groups of 30 or more. Missing: counted outside the EU, EEA, UK and Switzerland (by where the account syncs from),
+   * not inside them. Under-18s never count. Settings › Your data and privacy › Strength standards.
+   */
+  standards?: boolean;
   /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
   /** Under 18 only: body fat and the shaped figure turned on in Body › Health (teen.ts). Off by default. */

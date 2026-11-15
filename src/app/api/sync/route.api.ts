@@ -6,6 +6,7 @@ import { accountAccess } from "@/server/accounts";
 import { alertPain, alertTrained } from "@/server/coach";
 import { rateLimit } from "@/server/db";
 import { settleReferral } from "@/server/earnedPro";
+import { noteCountry } from "@/server/standards";
 import { checkSync, MAX_BODY, sync, SyncFull } from "@/server/sync";
 
 export const OPTIONS = preflight;
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
   try {
     // The install that synced counts its store subscription (if any) for the account (access.ts).
     await linkInstall(s.accountId, (raw as { installId?: unknown }).installId).catch(() => null);
+    // Where the account syncs from sets the strength standards' default (standards.ts).
+    await noteCountry(s.accountId, req.headers.get("x-vercel-ip-country")).catch(() => undefined);
     // `pro`, `proVia` and `sub`: the account's Pro from any source (the review account, a lifetime code, the web or a
     // phone's store), so every device learns it or loses it on sync.
     const out = await sync(s.accountId, s.session, c.body);

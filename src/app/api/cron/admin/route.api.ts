@@ -10,6 +10,7 @@ import { pingIndexNow } from "@/server/indexnow";
 import { trackJob } from "@/server/monitor";
 import { authorized } from "@/server/revenuecat";
 import { liftExpired } from "@/server/socialModeration";
+import { refreshStandards } from "@/server/standards";
 
 export const maxDuration = 120;
 
@@ -26,6 +27,8 @@ export async function GET(req: Request) {
     const checkins = await sendDueCheckins().catch(() => -1);
     // A suspension also lifts when the lifter opens Friends; this brings them back for everyone else too.
     const lifted = await liftExpired().catch(() => -1);
-    return Response.json({ down: watch.down, alerted: watch.alerted, bytes: size, indexNow, quiet, checkins, lifted });
+    // Strength standards from real lifters are rebuilt from the past year's sets (standards.ts).
+    const standards = await refreshStandards().catch(() => -1);
+    return Response.json({ down: watch.down, alerted: watch.alerted, bytes: size, indexNow, quiet, checkins, lifted, standards });
   });
 }
