@@ -11,12 +11,12 @@ import { todoList, type TodoKind, type TodoList } from "./adminTodo";
 import { coachTotals, type CoachTotals } from "./adminUsers";
 import { alertSettings, resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { query } from "./db";
-import { getSetting, setSetting } from "./settings";
+import { claimSetting, getSetting, setSetting } from "./settings";
 import { runCheck } from "./systemHealth";
 
 const DAY = 86_400_000;
 
-/** When it goes out: 8 AM in this zone. Vercel Cron runs in UTC, so the route runs at 15:00 and 16:00 UTC (8 AM PDT and PST). */
+/** When it goes out: 8 AM in this zone. The schedules (vercel.json) run in UTC at 15:00 and 16:00 (8 AM PDT and PST). */
 export const DIGEST_ZONE = "America/Los_Angeles";
 export const DIGEST_HOUR = 8;
 const SENT_KEY = "digest-sent";
@@ -317,19 +317,27 @@ export function digestRecipients(): string[] {
  */
 export async function sendDigest(opts: { now?: number; mail?: Mailer | null; force?: boolean } = {}): Promise<number> {
   const now = opts.now ?? Date.now();
+  let lastSent: string | null = null;
   if (!opts.force) {
     if (!(await alertSettings()).digest) return 0;
-    if (!digestDue(now, await getSetting(SENT_KEY))) return 0;
+    lastSent = await getSetting(SENT_KEY);
+    if (!digestDue(now, lastSent)) return 0;
   }
   const mail = opts.mail === undefined ? resendMailer() : opts.mail;
   const to = digestRecipients();
   if (!mail || !to.length) return 0;
-  const m = digestMail(digestFrom(await digestData(now)), {
-    postalAddress: process.env.MAIL_POSTAL_ADDRESS?.trim() || null,
-    contact: CONTACT_EMAIL,
-  });
+  // Claim today before sending, in one statement, so a run delivered twice (Vercel Schedules can't rule that out)
+  // sends one digest. If nothing goes out, the claim is handed back so the next run tries again.
+  if (!opts.force && !(await claimSetting(SENT_KEY, localClock(now).date, now))) return 0;
   let sent = 0;
-  for (const t of to) if (await mail(t, m.subject, m.text, m.html)) sent++;
-  if (sent && !opts.force) await setSetting(SENT_KEY, localClock(now).date, now);
+  try {
+    const m = digestMail(digestFrom(await digestData(now)), {
+      postalAddress: process.env.MAIL_POSTAL_ADDRESS?.trim() || null,
+      contact: CONTACT_EMAIL,
+    });
+    for (const t of to) if (await mail(t, m.subject, m.text, m.html)) sent++;
+  } finally {
+    if (!sent && !opts.force) await setSetting(SENT_KEY, lastSent ?? "", now);
+  }
   return sent;
 }

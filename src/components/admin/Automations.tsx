@@ -124,8 +124,8 @@ export function Automations({ admin }: { admin: boolean }) {
         )}
       </Card>
       <p className="text-xs text-muted">
-        Site-down alerts come from UptimeRobot watching /api/health/. The daily check runs from Vercel Cron (/api/cron/admin/), which also
-        records the database size for the Capacity card; the digest has its own (/api/cron/digest/).
+        Site-down alerts come from UptimeRobot watching /api/health/. The daily check runs from Vercel Schedules (/api/cron/admin/), which
+        also records the database size for the Capacity card; the digest has its own (/api/cron/digest/).
       </p>
     </div>
   );

@@ -2,6 +2,7 @@ import { dedupe } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { TIMED } from "./progression";
+import { currentKg } from "./tdee";
 import type { AppEvent, EffortEvent, Profile, SetEvent } from "./types";
 
 // One-rep max estimates for the Progress screen's calculator (Melvin, 2026-11-09: "use the latest research
@@ -290,13 +291,6 @@ export function dotsBand(score: number): string {
 export const DOTS_LIFTS = { squat: "back-squat", bench: "bench-press", deadlift: "deadlift" } as const;
 export type DotsLift = keyof typeof DOTS_LIFTS;
 
-/** The lifter's latest body weight: the newest weigh-in, else the profile's. */
-export function latestBodyweight(events: readonly AppEvent[], profile: Pick<Profile, "bodyweight">): number {
-  let best: { at: number; kg: number } | null = null;
-  for (const e of events) if (e.type === "bodyweight" && (!best || e.at > best.at)) best = { at: e.at, kg: e.kg };
-  return best?.kg ?? profile.bodyweight;
-}
-
 export interface DotsReport {
   lifts: Record<DotsLift, OneRm | null>;
   total: number;
@@ -316,7 +310,7 @@ export function dotsFromData(
     (Object.keys(DOTS_LIFTS) as DotsLift[]).map((k) => [k, oneRm(events, DOTS_LIFTS[k], now, profile)]),
   ) as Record<DotsLift, OneRm | null>;
   const total = Object.values(lifts).reduce((s, l) => s + (l?.e1rm ?? 0), 0);
-  const bodyweight = latestBodyweight(events, profile);
+  const bodyweight = currentKg(events, profile);
   const complete = Object.values(lifts).every((l) => !!l);
   return { lifts, total, bodyweight, score: complete ? dots(total, bodyweight, sex) : null, sex };
 }

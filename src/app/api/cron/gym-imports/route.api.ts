@@ -1,5 +1,5 @@
-// The gym import worker (src/server/gymImportJobs.ts, docs/decisions/gyms.md "Imports run on the server"). Vercel Cron
-// calls GET every five minutes (vercel.json) as a safety net; Admin › Gyms and a worker whose time is up call POST to
+// The gym import worker (src/server/gymImportJobs.ts, docs/decisions/gyms.md "Imports run on the server"). Vercel Schedules
+// ("gym-imports" in vercel.json) calls GET every five minutes as a safety net; Admin › Gyms and a worker whose time is up call POST to
 // start the next worker at once. Both answer straight away and import in the background for up to 800 seconds; a
 // worker that finds the job already held, or no job running, does nothing. "Authorization: Bearer $CRON_SECRET".
 import { after } from "next/server";

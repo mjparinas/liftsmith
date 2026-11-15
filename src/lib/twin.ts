@@ -6,7 +6,7 @@
 // (`health`, imported by the store from health.ts readDaily), and the heart rate streams of workouts.
 // Sleep, HRV, resting HR and breathing rate also feed the readiness call, for Pro (healthExternal).
 import type { SessionSummary } from "./derive";
-import { foodGoal, proteinFor } from "./foodTargets";
+import { foodTargets, type CoachFood } from "./foodTargets";
 import { inSentence, list, t } from "./i18n";
 import { foodDays, underFuelled } from "./nutrition";
 import { healthSignals, type ExternalSignals } from "./readiness";
@@ -69,6 +69,8 @@ export interface TwinInput {
   native: boolean;
   /** Which store to name: "Health Connect" or "Apple Health". */
   store?: string;
+  /** A coach's food targets, which win over our own (foodTargets.ts), so the protein here matches the Food card. */
+  coachTargets?: CoachFood | null;
 }
 
 // --- Days and readings ---
@@ -238,6 +240,9 @@ export function twin(input: TwinInput): TwinMetric[] {
 
   const out: TwinMetric[] = [];
   const tdee = currentTdee(events as AppEvent[], input.sessions, profile, now);
+  // The daily protein target from the one set of food targets (Food card, Macros, coach's notes), a coach's included.
+  let proteinMemo: number | undefined;
+  const proteinTarget = () => (proteinMemo ??= foodTargets(events, input.sessions, profile, now, input.coachTargets).protein);
 
   // Weight: the trend over the last four weeks of weigh-ins.
   const weighIns = events.filter((e) => e.type === "bodyweight").sort((a, b) => a.at - b.at);
@@ -382,7 +387,7 @@ export function twin(input: TwinInput): TwinMetric[] {
         lw = t("twin.w.leanDown", {
           delta: dLeanText,
           weeks,
-          protein: `${proteinFor(currentKg(events, profile), foodGoal(profile, now))} g`,
+          protein: `${proteinTarget()} g`,
         });
       }
       out.push({
@@ -461,7 +466,7 @@ export function twin(input: TwinInput): TwinMetric[] {
         : tdee.activity.source === "workouts"
           ? t("twin.from.workouts", { level })
           : t("twin.from.level", { level });
-    const protein = proteinFor(currentKg(events, profile), foodGoal(profile, now));
+    const protein = proteinTarget();
     out.push({
       id: "tdee",
       label: t("twin.l.tdee"),
