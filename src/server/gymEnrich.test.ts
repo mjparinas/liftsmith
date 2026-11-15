@@ -126,6 +126,17 @@ describe("filling in a gym", () => {
     expect((await query("SELECT email FROM gym_places"))[0]!.email).toBe("");
   });
 
+  it("survives a phone link with a stray %, which used to fail the whole batch", async () => {
+    expect(detailsFromHtml(`<a href="tel:604-555-0199%">Call</a>`, "https://ironworks.example.com/").phone).toBe("604-555-0199");
+    expect(detailsFromHtml(`<a href="tel:%2B1%20604">Call</a>`, "https://ironworks.example.com/").phone).toBe("+1 604");
+    await savePlaces(placesFromOsm([GYM], AREA), NOW);
+    const [p] = await query("SELECT id FROM gym_places");
+    const { fetcher } = site(null, `<html><a href="tel:604-555-0199%zz">Call</a></html>`);
+    const r = await enrichPlace({ id: String(p!.id), name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW);
+    expect(r.filled).toContain("phone");
+    expect((await query("SELECT enriched_at FROM gym_places"))[0]!.enriched_at).toBe(NOW);
+  });
+
   it("reads the home page even when robots.txt says no, and robots.txt isn't asked for", async () => {
     await savePlaces(placesFromOsm([GYM], AREA), NOW);
     const [p] = await query("SELECT id FROM gym_places");
