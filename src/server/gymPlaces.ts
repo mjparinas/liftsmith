@@ -620,6 +620,40 @@ export async function nearbyPlaces(lat: unknown, lon: unknown, opts: { studios?:
     .slice(0, PLACE_LIMITS.results);
 }
 
+/** How far "the gyms closest to you" looks, ring by ring (km), until it has enough. */
+export const CLOSEST_RINGS = [15, 60, 250, 1_000];
+
+/**
+ * The `count` gyms closest to a spot, nearest first (the website's /gyms/ map, docs/decisions/gyms.md "The gyms page
+ * leads with a map"). Unlike `nearbyPlaces`, official gyms don't jump the queue and the search widens ring by ring, so a
+ * visitor far from any imported city still sees the nearest ones. Gyms only, no studios.
+ */
+export async function closestPlaces(lat: unknown, lon: unknown, count = 10): Promise<Place[] | null> {
+  if (!validLat(lat) || !validLon(lon)) return null;
+  const here = { lat, lon };
+  // Nearest first in SQL too (a flat-earth guess, good enough to pick the candidates), so a crowded ring can't push
+  // the closest gyms past the limit.
+  const squash = Math.max(0.05, Math.cos((lat * Math.PI) / 180)) ** 2;
+  let found: Place[] = [];
+  for (const km of CLOSEST_RINGS) {
+    const dLat = km / 111;
+    const dLon = km / (111 * Math.max(0.05, Math.cos((lat * Math.PI) / 180)));
+    const rows = await query(
+      `SELECT ${PLACE_COLUMNS} FROM gym_places p
+       WHERE p.hidden = 0 AND p.kind = 'gym' AND p.lat BETWEEN ? AND ? AND p.lon BETWEEN ? AND ?
+       ORDER BY (p.lat - ?) * (p.lat - ?) + (p.lon - ?) * (p.lon - ?) * ? LIMIT ?`,
+      [lat - dLat, lat + dLat, lon - dLon, lon + dLon, lat, lat, lon, lon, squash, count * 4],
+    );
+    found = rows
+      .map((r) => toPlace(r, distanceKm(here, { lat: n(r.lat), lon: n(r.lon) })))
+      .filter((p) => p.km <= km)
+      .sort((a, b) => a.km - b.km || Number(b.official) - Number(a.official) || a.name.localeCompare(b.name))
+      .slice(0, count);
+    if (found.length >= count) break;
+  }
+  return found;
+}
+
 export async function placeById(id: unknown): Promise<Place | null> {
   if (!isPlaceId(id)) return null;
   const [r] = await query(`SELECT ${PLACE_COLUMNS} FROM gym_places p WHERE p.id = ? AND p.hidden = 0`, [id]);

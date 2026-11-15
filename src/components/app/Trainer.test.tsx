@@ -511,7 +511,9 @@ describe("check-ins", () => {
         coachId: "me",
         clientId: "c1",
         answers: { sleep: 2, gym: true, weight: 81.5, wins: "Hit a squat best" },
-        answeredAt: NOW - 86_400_000,
+        // A day before the real clock, which the screen reads: only answers from the last two weeks are flagged, so a
+        // date tied to the fixed NOW stopped being "recent" on 2026-11-15.
+        answeredAt: Date.now() - 86_400_000,
       },
     ];
     const u = userEvent.setup();

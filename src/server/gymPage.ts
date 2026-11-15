@@ -19,6 +19,7 @@ import * as gp from "@/locales/text/gp";
 
 import { AREA_PINS, areaMapPath } from "./gymMedia";
 import type { City, Place } from "./gymPlaces";
+import { NEAR_HEAD, NEAR_STYLE, nearSection } from "./gymsNear";
 import { esc, framePage, icon } from "./siteFrame";
 
 export type GpKey = keyof typeof gp.en;
@@ -344,10 +345,18 @@ export function indexHtml(list: City[], lang: MsgLang): string {
         )}</span></a></li>`,
     )
     .join("");
-  const body = `<main id="main" class="wrap page narrow">
+  // The map of the closest gyms leads (gymsNear.ts); the full directory stays in the page, folded, so search engines
+  // still follow every city link (Melvin, 2026-11-15).
+  const body = `<main id="main" class="wrap page">
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.indexTitle"))}</h1><p class="muted">${esc(say(lang, "gp.indexBody"))}</p></header>
-${list.length ? `<section class="card"><ul class="list">${items}</ul></section>` : ""}${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
-  return framePage(lang, title, metaTags(title, desc, "/gyms/", ld), body, GYM_STYLE, "gym");
+${nearSection(lang)}
+<div class="narrow">${
+    list.length
+      ? `<div class="find" id="find" hidden><label for="city-search">${esc(say(lang, "gp.searchLabel"))}</label><input id="city-search" type="search" autocomplete="off" enterkeyhint="search" placeholder="${esc(say(lang, "gp.searchHint"))}"></div>
+<details class="dir" id="directory"><summary>${esc(say(lang, "gp.directoryShow", { count: n.format(list.length) }))}</summary><section class="card" aria-label="${esc(say(lang, "gp.directoryTitle"))}"><ul class="list" id="city-list">${items}</ul><p class="muted small" id="city-none" hidden>${esc(say(lang, "gp.searchNone"))}</p></section></details>`
+      : ""
+  }${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></div></main>`;
+  return framePage(lang, title, metaTags(title, desc, "/gyms/", ld) + NEAR_HEAD, body, GYM_STYLE + NEAR_STYLE, "gym");
 }
 
 export function goneHtml(lang: MsgLang): string {

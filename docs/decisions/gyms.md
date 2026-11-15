@@ -97,6 +97,42 @@ so scrolling the page past it doesn't. Zoom buttons are 44 px. Drags on it are t
   address, so pin 1 is always the list's first gym.
 - Off with the other maps while `MAPBOX_TOKEN` isn't set. Pure web code, so Android, iOS and the web app get it together.
 
+## The gyms page leads with a map (2026-11-15)
+
+Melvin, 2026-11-15: "The gym page is just a long list of locations, not useful … You can add a show the full directory
+list. But the main UI should be a mapbox map, that detects your location and shows them the closest 10 gyms on the map."
+
+- **`/gyms/` opens on "Gyms near you"** (`src/server/gymsNear.ts`): a Mapbox map with the **10 gyms closest** to the
+  visitor as numbered pins and the same numbers on a list beside it (under it on a phone), each row with its distance
+  (miles for `en-US` browsers, km elsewhere), its address and Official when claimed, linking to the gym's page. Tapping
+  a pin focuses its row. Drawn the same way as the app's finder (Leaflet, tiles through `/api/gyms/tile/`, so the token
+  stays on the server, dark style because the website is dark).
+- **Closest means closest** (`closestPlaces` in `gymPlaces.ts`): nearest first, official gyms don't jump ahead (they
+  only win ties), gyms only (no studios), and the search widens ring by ring (15, 60, 250, 1,000 km) until it has ten,
+  so a visitor far from any imported city still sees the nearest gyms we have. `GET /api/gyms/?closest=1[&lat=&lon=]`,
+  under the finder's search rate limit, never cached.
+- **Where the visitor is, without a prompt first:** the page starts from the rough spot Vercel works out from the
+  visitor's address (`x-vercel-ip-latitude`/`-longitude`/`-city`, read by `ipSpot`; "Around Langley, going by your
+  internet connection"), with a **Use my location** button for the browser's position. If the visitor already allowed
+  location for the site, the page uses it straight away. A permission prompt on page load was left out on purpose:
+  browsers and search tools mark it as bad practice and many people refuse it reflexively, which would leave them with
+  nothing. The browser's position is rounded to about 1 km before it leaves the page, like the app's finder, and the
+  answer rounds it again. The site's Permissions-Policy now allows `geolocation=(self)` (it was `()`, which also
+  blocked Find gyms near you in the web app).
+- **Fallback:** when there's no spot (no IP location, location refused, or the request failed) the page says so and
+  points to **Search for a city**, which filters the directory as you type (accents ignored) and opens it.
+- **The full directory stays in the page, folded** under "Show full directory (N cities)" (`<details>`), so every city
+  link is still in the HTML for search engines and readers without scripts; city and gym pages are unchanged.
+- **Scripts, kept small and on our own origin:** `/gyms/` is still drawn on the server, so it can't use the app's
+  bundle. It loads Leaflet's script and sheet from `public/vendor/leaflet/` (copied from `node_modules` by
+  `scripts/leaflet.mjs` before dev and both builds, like MediaPipe, git-ignored) and one plain script,
+  `public/gyms-near.js`. The words come in the page as a JSON data block in the reader's language (`nearText`, `gp.near*`,
+  six languages). `/gyms/` gets its own policy, `GYMS_INDEX_CSP` (`script-src 'self'`, Leaflet's sheet, the API on our
+  site); every page under `/gyms/` keeps the no-script `SHARE_PAGE_CSP`. The map section is drawn hidden and shown by
+  the script, so without scripts there's no dead map. With no `MAPBOX_TOKEN` the list of closest gyms shows without a
+  map.
+- Website only (the apps already open the finder with a map from Today's gym chip), so no native code.
+
 ## Staff and the starter program (2026-11-13)
 
 Melvin, 2026-11-13, picked the two gym items left from round 3 ("several staff per gym" and "a house starter
