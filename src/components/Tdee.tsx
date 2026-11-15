@@ -5,8 +5,12 @@ import { BmiBar } from "@/components/BmiBar";
 import { date as fmtDate, num, t } from "@/lib/i18n";
 import { ACTIVITIES, ACTIVITY, type Activity, type TdeeResult } from "@/lib/tdee";
 import type { TdeeEvent } from "@/lib/types";
+import type { MessageKey } from "@/locales/en";
 
 const kcal = (n: number) => num(n);
+
+/** A line of text by its catalogue key. The app uses `t`; the public calculator passes the page's own language. */
+export type Say = (key: MessageKey, vars?: Record<string, string | number>) => string;
 
 /**
  * In the app, `protein` is the lifter's one target for their goal (foodTargets.ts) instead of the 1.6 to 2.2 g range,
@@ -15,16 +19,24 @@ const kcal = (n: number) => num(n);
 export function TdeeResults({
   r,
   activity,
+  say = t,
+  fmt = kcal,
+  levels = ACTIVITY,
   protein,
   measured,
   teen,
 }: {
   r: TdeeResult;
   activity: Activity;
+  say?: Say;
+  fmt?: (n: number) => string;
+  levels?: Record<Activity, { label: string; detail: string }>;
   protein?: { g: number; goal: string };
   measured?: { days: number; formula: number };
   teen?: boolean;
 }) {
+  const t = say;
+  const kcal = fmt;
   return (
     <div>
       <div className="card p-5 text-center">
@@ -55,9 +67,9 @@ export function TdeeResults({
           <div className="col-span-2 rounded-xl bg-raised px-3 py-2">
             <div className="flex items-baseline gap-2">
               <span className="text-xs text-muted">{t("tdee.bmi")}</span>
-              <span className="num font-semibold">{num(r.bmi)}</span>
+              <span className="num font-semibold">{fmt(r.bmi)}</span>
             </div>
-            <BmiBar bmi={r.bmi} note />
+            <BmiBar bmi={r.bmi} note say={say} fmt={fmt} />
           </div>
         </div>
       </div>
@@ -67,8 +79,8 @@ export function TdeeResults({
           {ACTIVITIES.map((a) => (
             <tr key={a} className={a === activity ? "bg-accent/12 font-semibold" : ""} aria-current={a === activity ? "true" : undefined}>
               <th scope="row" className="px-4 py-2.5 text-left font-medium">
-                {ACTIVITY[a].label}
-                <div className="text-xs font-normal text-muted">{ACTIVITY[a].detail}</div>
+                {levels[a].label}
+                <div className="text-xs font-normal text-muted">{levels[a].detail}</div>
               </th>
               <td className="num px-4 py-2.5 text-right">{kcal(r.levels[a])}</td>
             </tr>

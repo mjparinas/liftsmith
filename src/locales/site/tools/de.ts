@@ -1,3 +1,4 @@
+import { DE_MORE } from "./more/de";
 import type { LocalTools } from "./types";
 
 // Die Rechner auf Deutsch (du). Gleiche Teile wie die englischen Seiten (src/app/tools/).
@@ -191,4 +192,5 @@ export const DE_TOOLS: LocalTools = {
       empty: "Leere Stange",
     },
   },
+  ...DE_MORE,
 };

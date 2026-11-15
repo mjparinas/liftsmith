@@ -104,6 +104,11 @@ export const it: FeaturesText = {
       name: "Modalità infortunio",
       body: "Dille cosa fa male: lascia fuori ciò che lo peggiorerebbe, ti avvisa degli esercizi a rischio e segue un livello di dolore da 0 a 10 nel tempo.",
     },
+    "rehab-done": {
+      name: "La riabilitazione del fisioterapista, fatta",
+      body: "Un programma del tuo fisioterapista ti aspetta in Oggi: lo salvi con un tocco e registra l’infortunio per cui è pensato. Segue le volte a settimana richieste, compare nei giorni di riposo e chiede del dolore solo per quell’infortunio.",
+      note: "I promemoria di riabilitazione e la notifica di un nuovo programma sono su Android e iPhone.",
+    },
     cycle: { name: "Prontezza secondo il ciclo", body: "Se vuoi, registra il tuo ciclo e la scelta di oggi ne tiene conto." },
     "goal-planner": {
       name: "Pianificatore di obiettivi",

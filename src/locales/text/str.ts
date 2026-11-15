@@ -170,6 +170,13 @@ export const en = {
   "str.part.liftOff": "Off today: just the other parts.",
   "str.part.noLift": "No lifting today, so the cardio gets its time.",
   "str.part.noLiftTotal": "Without lifting, this workout runs about {total} min.",
+  "str.rehabDay.title": "{name} from your physio",
+  "str.rehabDay.week": "{done} of {want} done in the last 7 days, as your physio asked.",
+  "str.rehabDay.new": "Not done yet. It's due while your injury is logged.",
+  "str.rehabDay.days": { one: "Last done yesterday.", other: "Last done {count} days ago." },
+  "str.rehabDay.minutes": { one: "About {count} min", other: "About {count} min" },
+  "str.rehabDay.start": "Do it today",
+  "str.part.rehabWhyWeek": "{name}: {done} of {want} in the last 7 days, as your physio asked.",
 } as const;
 
 type Key = keyof typeof en;
@@ -348,6 +355,13 @@ export const es: Partial<Record<Key, Message>> = {
   "str.part.liftOff": "Hoy no: solo las otras partes.",
   "str.part.noLift": "Hoy sin pesas, así que el cardio se queda con su tiempo.",
   "str.part.noLiftTotal": "Sin pesas, este entrenamiento dura unos {total} min.",
+  "str.rehabDay.title": "{name} de tu fisioterapeuta",
+  "str.rehabDay.week": "{done} de {want} hechas en los últimos 7 días, como pidió tu fisioterapeuta.",
+  "str.rehabDay.new": "Aún no la has hecho. Toca mientras tu lesión siga registrada.",
+  "str.rehabDay.days": { one: "Hecha por última vez ayer.", other: "Hecha por última vez hace {count} días." },
+  "str.rehabDay.minutes": { one: "Unos {count} min", other: "Unos {count} min" },
+  "str.rehabDay.start": "Hacerla hoy",
+  "str.part.rehabWhyWeek": "{name}: {done} de {want} en los últimos 7 días, como pidió tu fisioterapeuta.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -527,6 +541,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "str.part.liftOff": "Pas aujourd’hui : seulement les autres parties.",
   "str.part.noLift": "Pas de musculation aujourd’hui, le cardio prend son temps.",
   "str.part.noLiftTotal": "Sans musculation, la séance dure environ {total} min.",
+  "str.rehabDay.title": "{name} de votre kiné",
+  "str.rehabDay.week": "{done} sur {want} faites ces 7 derniers jours, comme votre kiné l’a demandé.",
+  "str.rehabDay.new": "Pas encore faite. Elle est prévue tant que votre blessure est notée.",
+  "str.rehabDay.days": { one: "Faite pour la dernière fois hier.", other: "Faite pour la dernière fois il y a {count} jours." },
+  "str.rehabDay.minutes": { one: "Environ {count} min", other: "Environ {count} min" },
+  "str.rehabDay.start": "La faire aujourd’hui",
+  "str.part.rehabWhyWeek": "{name} : {done} sur {want} ces 7 derniers jours, comme votre kiné l’a demandé.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -704,6 +725,13 @@ export const de: Partial<Record<Key, Message>> = {
   "str.part.liftOff": "Heute nicht: nur die anderen Teile.",
   "str.part.noLift": "Heute kein Krafttraining, also bekommt Cardio diese Zeit.",
   "str.part.noLiftTotal": "Ohne Krafttraining dauert dieses Training etwa {total} Min.",
+  "str.rehabDay.title": "{name} von deiner Physiotherapie",
+  "str.rehabDay.week": "{done} von {want} in den letzten 7 Tagen gemacht, wie deine Physiotherapie es wünscht.",
+  "str.rehabDay.new": "Noch nicht gemacht. Fällig, solange deine Verletzung eingetragen ist.",
+  "str.rehabDay.days": { one: "Zuletzt gestern gemacht.", other: "Zuletzt vor {count} Tagen gemacht." },
+  "str.rehabDay.minutes": { one: "Etwa {count} Min.", other: "Etwa {count} Min." },
+  "str.rehabDay.start": "Heute machen",
+  "str.part.rehabWhyWeek": "{name}: {done} von {want} in den letzten 7 Tagen, wie deine Physiotherapie es wünscht.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -879,6 +907,13 @@ export const it: Partial<Record<Key, Message>> = {
   "str.part.liftOff": "Oggi no: solo le altre parti.",
   "str.part.noLift": "Oggi niente pesi, quindi il cardio prende il loro tempo.",
   "str.part.noLiftTotal": "Senza pesi, l’allenamento dura circa {total} min.",
+  "str.rehabDay.title": "{name} dal tuo fisioterapista",
+  "str.rehabDay.week": "{done} su {want} fatte negli ultimi 7 giorni, come ha chiesto il tuo fisioterapista.",
+  "str.rehabDay.new": "Non ancora fatta. Va fatta finché l’infortunio è registrato.",
+  "str.rehabDay.days": { one: "Fatta l’ultima volta ieri.", other: "Fatta l’ultima volta {count} giorni fa." },
+  "str.rehabDay.minutes": { one: "Circa {count} min", other: "Circa {count} min" },
+  "str.rehabDay.start": "Falla oggi",
+  "str.part.rehabWhyWeek": "{name}: {done} su {want} negli ultimi 7 giorni, come ha chiesto il tuo fisioterapista.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1043,4 +1078,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "str.part.liftOff": "今日はなし：ほかのパートだけ行います。",
   "str.part.noLift": "今日は筋トレなしなので、その時間を有酸素に回します。",
   "str.part.noLiftTotal": "筋トレなしでは、このワークアウトは約{total}分です。",
+  "str.rehabDay.title": "理学療法士の「{name}」",
+  "str.rehabDay.week": "直近7日間で{want}回中{done}回できています（理学療法士の指定）。",
+  "str.rehabDay.new": "まだ行っていません。ケガが記録されている間は予定に入ります。",
+  "str.rehabDay.days": { other: "前回は{count}日前です。" },
+  "str.rehabDay.minutes": { other: "約{count}分" },
+  "str.rehabDay.start": "今日やる",
+  "str.part.rehabWhyWeek": "「{name}」：直近7日間で{want}回中{done}回（理学療法士の指定）。",
 };

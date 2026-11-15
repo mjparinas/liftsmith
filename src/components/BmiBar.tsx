@@ -7,7 +7,8 @@
 // an alarm. Colour is never the only cue: the band's name is written out, the cut-offs are under the
 // bar, and the whole figure has a text label for screen readers.
 import { num, t } from "@/lib/i18n";
-import { BMI_CUTS, bmiBand, bmiCategory, type BmiCategory } from "@/lib/tdee";
+import { BMI_CUTS, bmiCategory, type BmiCategory } from "@/lib/tdee";
+import type { MessageKey } from "@/locales/en";
 
 /** The bar runs from 15 to 40; values past either end sit at the end. */
 const LO = 15;
@@ -29,9 +30,24 @@ const SEGMENTS: { cat: BmiCategory; from: number; to: number }[] = [
   { cat: "obese", from: BMI_CUTS[2], to: HI },
 ];
 
-export function BmiBar({ bmi, label = true, note = false }: { bmi: number; label?: boolean; note?: boolean }) {
+export function BmiBar({
+  bmi,
+  label = true,
+  note = false,
+  say = t,
+  fmt = num,
+}: {
+  bmi: number;
+  label?: boolean;
+  note?: boolean;
+  /** The public TDEE calculator passes its page's language; the app uses `t`. */
+  say?: (key: MessageKey, vars?: Record<string, string | number>) => string;
+  fmt?: (n: number) => string;
+}) {
+  const t = say;
+  const num = fmt;
   const cat = bmiCategory(bmi);
-  const band = bmiBand(bmi);
+  const band = t(`bmi.${cat}`);
   const at = pct(bmi);
   return (
     <div data-testid="bmi-bar" data-band={cat}>

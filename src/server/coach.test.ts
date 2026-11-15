@@ -620,6 +620,20 @@ describe("physio support", () => {
     expect(plans.find((p) => p.id === "p2")).not.toHaveProperty("perWeek");
   });
 
+  it("takes routine codes with parts and the rehab area, and tells the client (2026-11-15)", async () => {
+    const sent: PushMessage[] = [];
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    await saveToken("client", "tok-client-0123456789abcdef", "android", "en", NOW);
+    const code = "r1~S25lZQ~wall-sit.3~w:cat-cow,leg-swings~c:rowing-machine:15~h:knee:3~rehab";
+    expect(await assignPlan("coach", "client", "Knee", code, NOW, "p1", 3)).toMatchObject({ code });
+    expect(sent.map((m) => [m.kind, m.route])).toEqual([["coachPlan", `#/routine/${code}`]]);
+    expect(sent[0]!.body).toMatch(/sent you a program: Knee\. Tap to save it\.$/);
+    setPushSender(null);
+  });
+
   it("high pain pushes the coach once in a day, only when shared and with alerts on", async () => {
     const sent: PushMessage[] = [];
     setPushSender(async (m) => {

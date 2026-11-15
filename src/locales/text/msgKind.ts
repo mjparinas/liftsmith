@@ -24,6 +24,8 @@ export const en = {
   "msgKind.records.blurb": "A new best on a lift, at most once a week.",
   "msgKind.friends": "Friend activity",
   "msgKind.friends.blurb": "Thursday evening, which friends trained this week.",
+  "msgKind.rehab": "Rehab reminders",
+  "msgKind.rehab.blurb": "Your physio's exercises on the days they're due, at your workout time. Not on days with a workout reminder.",
 } as const;
 
 type Key = keyof typeof en;
@@ -49,6 +51,9 @@ export const es: Partial<Record<Key, Message>> = {
   "msgKind.records.blurb": "Un nuevo récord en un ejercicio, como mucho una vez por semana.",
   "msgKind.friends": "Actividad de amigos",
   "msgKind.friends.blurb": "El jueves por la tarde, qué amigos entrenaron esta semana.",
+  "msgKind.rehab": "Recordatorios de rehabilitación",
+  "msgKind.rehab.blurb":
+    "Los ejercicios de tu fisioterapeuta los días que tocan, a tu hora de entreno. No los días con recordatorio de entrenamiento.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -72,6 +77,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "msgKind.records.blurb": "Un nouveau record sur un exercice, au plus une fois par semaine.",
   "msgKind.friends": "Activité des amis",
   "msgKind.friends.blurb": "Le jeudi soir, les amis qui se sont entraînés cette semaine.",
+  "msgKind.rehab": "Rappels de rééducation",
+  "msgKind.rehab.blurb":
+    "Les exercices de votre kiné les jours prévus, à votre heure d’entraînement. Pas les jours avec un rappel d’entraînement.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -95,6 +103,9 @@ export const de: Partial<Record<Key, Message>> = {
   "msgKind.records.blurb": "Eine neue Bestleistung bei einer Übung, höchstens einmal pro Woche.",
   "msgKind.friends": "Aktivität von Freunden",
   "msgKind.friends.blurb": "Donnerstagabend, welche Freunde diese Woche trainiert haben.",
+  "msgKind.rehab": "Reha-Erinnerungen",
+  "msgKind.rehab.blurb":
+    "Die Übungen deiner Physiotherapie an den fälligen Tagen, zu deiner Trainingszeit. Nicht an Tagen mit Trainingserinnerung.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -119,6 +130,9 @@ export const it: Partial<Record<Key, Message>> = {
   "msgKind.records.blurb": "Un nuovo record in un esercizio, al massimo una volta a settimana.",
   "msgKind.friends": "Attività degli amici",
   "msgKind.friends.blurb": "Il giovedì sera, quali amici si sono allenati questa settimana.",
+  "msgKind.rehab": "Promemoria di riabilitazione",
+  "msgKind.rehab.blurb":
+    "Gli esercizi del fisioterapista nei giorni previsti, all’ora del tuo allenamento. Non nei giorni con un promemoria di allenamento.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -142,4 +156,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "msgKind.records.blurb": "種目の自己ベスト更新を、週に 1 回まで。",
   "msgKind.friends": "友達のアクティビティ",
   "msgKind.friends.blurb": "木曜の夜に、今週トレーニングした友達をお知らせします。",
+  "msgKind.rehab": "リハビリのリマインダー",
+  "msgKind.rehab.blurb":
+    "理学療法士のエクササイズの日に、トレーニングの時刻にお知らせします。トレーニングのリマインダーがある日は送りません。",
 };

@@ -10,12 +10,14 @@ export const metadata: Metadata = pageMeta({
   description:
     "Work out your DOTS score from your squat, bench press and deadlift and your body weight, in kg or lb, to compare lifters of any size.",
   path: "/tools/dots-calculator/",
+  translated: true,
 });
 
 export default function DotsPage() {
   return (
     <ToolPage
       slug="dots-calculator"
+      translated
       name="DOTS calculator"
       intro="Your squat, bench and deadlift total scored for body weight, so a light lifter and a heavy one can see who's stronger for their size."
       sticky="Your DOTS score, kept up to date"

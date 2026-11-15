@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { rich } from "@/components/site/ArticleView";
 import { ExerciseDemo } from "@/components/site/ExerciseDemo";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { VsLinks } from "@/components/site/VsView";
 import { LOCAL_GUIDES, localExercisePath } from "@/content/exerciseGuides/i18n";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
@@ -233,6 +234,7 @@ export function LocalExerciseView({ lang, slug }: { lang: GuideLang; slug: strin
           })}
         />
       </section>
+      <VsLinks lang={lang} id={e.id} />
       {alts.length > 0 && (
         <section className="mt-10">
           <h2 className="text-2xl font-bold tracking-tight">{t.alternatives}</h2>

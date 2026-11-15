@@ -13,8 +13,11 @@ import {
   extraOffer,
   lastRehab,
   rehabDue,
+  rehabGap,
+  rehabInjuries,
   rehabItems,
   rehabRoutine,
+  rehabWeek,
 } from "./partExtras";
 import { sessionsOf } from "./progression";
 import { recovery } from "./recovery";
@@ -59,12 +62,45 @@ describe("rehab beside the lifting", () => {
 
   it("is due with an active injury when not done today or yesterday", () => {
     const doneAgo = (days: number): AppEvent[] => [hurt, makeSessionStart({ at: NOW - days * DAY, routine: "knee" })];
-    expect(rehabDue([hurt], rehab, NOW)).toEqual({ due: true });
-    expect(rehabDue(doneAgo(0), rehab, NOW)).toEqual({ due: false, days: 0 });
-    expect(rehabDue(doneAgo(1), rehab, NOW)).toEqual({ due: false, days: 1 });
-    expect(rehabDue(doneAgo(2), rehab, NOW)).toEqual({ due: true, days: 2 });
+    expect(rehabDue([hurt], rehab, NOW)).toMatchObject({ due: true, week: 0, injured: true });
+    expect(rehabDue([hurt], rehab, NOW).days).toBeUndefined();
+    expect(rehabDue(doneAgo(0), rehab, NOW)).toMatchObject({ due: false, days: 0 });
+    expect(rehabDue(doneAgo(1), rehab, NOW)).toMatchObject({ due: false, days: 1 });
+    expect(rehabDue(doneAgo(2), rehab, NOW)).toMatchObject({ due: true, days: 2 });
     // Healed, or never hurt: offered, but not switched on.
     expect(rehabDue([], rehab, NOW).due).toBe(false);
+  });
+
+  it("follows the physio's times a week over the last seven days", () => {
+    const done = (...daysAgo: number[]): AppEvent[] => [
+      hurt,
+      ...daysAgo.map((d) => makeSessionStart({ at: NOW - d * DAY, routine: "knee" })),
+    ];
+    const thrice = { ...rehab, perWeek: 3 };
+    // Three in the last seven days: done for now, even two days after the last.
+    expect(rehabDue(done(2, 4, 6), thrice, NOW)).toMatchObject({ due: false, week: 3, want: 3 });
+    // The oldest falls out of the week: due again.
+    expect(rehabDue(done(2, 4, 7), thrice, NOW)).toMatchObject({ due: true, week: 2 });
+    // Up to three a week waits a day between; daily from four.
+    expect(rehabDue(done(1), thrice, NOW).due).toBe(false);
+    expect(rehabDue(done(1), { ...rehab, perWeek: 7 }, NOW)).toMatchObject({ due: true, week: 1 });
+    expect(rehabDue(done(0), { ...rehab, perWeek: 7 }, NOW).due).toBe(false);
+    // Twice on one day counts once.
+    expect(rehabWeek([...done(1), makeSessionStart({ at: NOW - DAY + 60_000, routine: "knee" })], "knee", NOW)).toBe(1);
+    expect(rehabGap(undefined)).toBe(2);
+    expect(rehabGap(3)).toBe(2);
+    expect(rehabGap(4)).toBe(1);
+  });
+
+  it("counts only injuries in the program's area", () => {
+    const shoulder: InjuryEvent = { ...hurt, id: "inj2", injuryId: "i2", part: "shoulder" };
+    const knee = { ...rehab, rehabPart: "knee" as const };
+    expect(rehabInjuries([hurt, shoulder], knee, NOW).map((i) => i.part)).toEqual(["knee"]);
+    // An older program without an area: every active injury, as before.
+    expect(rehabInjuries([hurt, shoulder], rehab, NOW)).toHaveLength(2);
+    // Only a shoulder injury: the knee program isn't due.
+    expect(rehabDue([shoulder], knee, NOW)).toMatchObject({ due: false, injured: false });
+    expect(rehabDue([shoulder], rehab, NOW).due).toBe(true);
   });
 
   it("keeps the physio's exercises and sets, and repeats what was done in the last rehab part", () => {

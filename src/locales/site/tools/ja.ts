@@ -1,3 +1,4 @@
+import { JA_MORE } from "./more/ja";
 import type { LocalTools } from "./types";
 
 // 日本語の計算ツール（です・ます）。英語のページ（src/app/tools/）と同じ構成です。
@@ -187,4 +188,5 @@ export const JA_TOOLS: LocalTools = {
       empty: "空のバー",
     },
   },
+  ...JA_MORE,
 };

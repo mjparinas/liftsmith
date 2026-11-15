@@ -1,7 +1,7 @@
 import { available, EXERCISE_BY_ID } from "./exercises";
 import { restFor, type PlanItem } from "./generator";
 import { t as tr } from "./i18n";
-import { activeInjuries } from "./injury";
+import { activeInjuries, type Injury } from "./injury";
 import { target, type Target } from "./progression";
 import type { AppEvent, Gym, Profile, Routine, RoutinePart, SetEvent } from "./types";
 
@@ -45,17 +45,20 @@ export function rehabRoutine(profile: Pick<Profile, "routines">): Routine | unde
   return best;
 }
 
-/** When the rehab routine was last done: as a whole workout, or as a part beside the lifting. */
-export function lastRehab(events: readonly AppEvent[], routineId: string): number | undefined {
-  let last: number | undefined;
-  const later = (at: number) => {
-    if (last === undefined || at > last) last = at;
-  };
+/** When the rehab routine was done: as a whole workout, or as a part beside the lifting (start times, any order). */
+export function rehabTimes(events: readonly AppEvent[], routineId: string): number[] {
+  const out: number[] = [];
   for (const e of events) {
-    if (e.type === "sessionStart" && e.routine === routineId) later(e.at);
-    else if (e.type === "sessionEnd") for (const p of e.parts ?? []) if (p.kind === "rehab" && p.ref === routineId) later(p.start);
+    if (e.type === "sessionStart" && e.routine === routineId) out.push(e.at);
+    else if (e.type === "sessionEnd") for (const p of e.parts ?? []) if (p.kind === "rehab" && p.ref === routineId) out.push(p.start);
   }
-  return last;
+  return out;
+}
+
+/** When the rehab routine was last done, or undefined when never. */
+export function lastRehab(events: readonly AppEvent[], routineId: string): number | undefined {
+  const times = rehabTimes(events, routineId);
+  return times.length ? Math.max(...times) : undefined;
 }
 
 const dayStart = (ms: number) => {
@@ -64,19 +67,53 @@ const dayStart = (ms: number) => {
   return d.getTime();
 };
 
+/**
+ * The injuries a rehab program is for (2026-11-15): the active ones in its area, or every active one for an older
+ * program that doesn't say its area. Its pain check asks about these, and it's offered only while there is one.
+ */
+export function rehabInjuries(events: readonly AppEvent[], routine: Pick<Routine, "rehabPart"> | undefined, now = Date.now()): Injury[] {
+  const hurt = activeInjuries(events, now);
+  return routine?.rehabPart ? hurt.filter((i) => i.part === routine.rehabPart) : hurt;
+}
+
+/** Days with the rehab done in the last seven (today and the six before), so "2 of 3 this week" counts a rolling week. */
+export function rehabWeek(events: readonly AppEvent[], routineId: string, now: number): number {
+  const from = dayStart(now) - 6 * DAY;
+  return new Set(
+    rehabTimes(events, routineId)
+      .filter((at) => at >= from && at <= now + DAY)
+      .map(dayStart),
+  ).size;
+}
+
+/** Days to wait after doing it: every other day for up to 3 times a week, daily from 4 (the physio's times a week). */
+export const rehabGap = (perWeek: number | undefined) => (perWeek !== undefined && perWeek >= 4 ? 1 : REHAB_GAP_DAYS);
+
 export interface RehabDue {
-  /** Whether Today switches it on: an active injury, and not done today or yesterday. */
+  /**
+   * Whether it's due today: an injury it's for is active, it wasn't done too recently (rehabGap), and the physio's
+   * times a week aren't met in the last seven days yet.
+   */
   due: boolean;
   /** Whole days since it was last done (0 today), or undefined when never. */
   days?: number;
+  /** Days done in the last seven. */
+  week: number;
+  /** The physio's times a week, when they set one. */
+  want?: number;
+  /** An injury it's for is active (without one it isn't due, and the pain check has nothing to ask about). */
+  injured: boolean;
 }
 
-/** Whether the physio's rehab is due today, so Today switches it on beside the lifting. */
-export function rehabDue(events: readonly AppEvent[], routine: Pick<Routine, "id">, now: number): RehabDue {
+/** Whether the physio's rehab is due today, so Today switches it on beside the lifting or offers it on its own. */
+export function rehabDue(events: readonly AppEvent[], routine: Pick<Routine, "id" | "rehabPart" | "perWeek">, now: number): RehabDue {
   const last = lastRehab(events, routine.id);
   const days = last === undefined ? undefined : Math.max(0, Math.round((dayStart(now) - dayStart(last)) / DAY));
-  const injured = activeInjuries(events, now).length > 0;
-  return { due: injured && (days === undefined || days >= REHAB_GAP_DAYS), ...(days !== undefined ? { days } : {}) };
+  const injured = rehabInjuries(events, routine, now).length > 0;
+  const want = routine.perWeek;
+  const week = rehabWeek(events, routine.id, now);
+  const due = injured && (days === undefined || days >= rehabGap(want)) && (want === undefined || week < want);
+  return { due, week, injured, ...(days !== undefined ? { days } : {}), ...(want !== undefined ? { want } : {}) };
 }
 
 /** The last set of this exercise done in a part of this kind, or undefined. */

@@ -335,6 +335,16 @@ export const en = {
   "trn.targetsYouWeek": "Your past week, a day: {what}",
   "trn.f.noFood": "Nothing from their food app this past week",
   "trn.f.noFoodDo": "Ask them to keep logging in their food app and to allow food in Body › Health.",
+  "trn.planToday.title": "{name} sent you {plan}",
+  "trn.planToday.rehabLog":
+    "A rehab program. Saving it adds {part} to your injuries, so its pain checks, reminders and your report follow that injury.",
+  "trn.planToday.rehabLinked": "A rehab program for your {part} injury. It keeps every exercise as written.",
+  "trn.planToday.rehab": "A rehab program. It keeps every exercise as written and asks about pain between exercises.",
+  "trn.planToday.plain": "Save it to your routines to use it on any day.",
+  "trn.planToday.week": { one: "{name} asked for {count} time a week.", other: "{name} asked for {count} times a week." },
+  "trn.planToday.save": "Save it",
+  "trn.planToday.see": "See it",
+  "trn.planToday.later": "Not now",
 };
 
 type Key = keyof typeof en;
@@ -675,6 +685,16 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.targetsYouWeek": "Tu última semana, al día: {what}",
   "trn.f.noFood": "Nada de su app de comidas esta semana",
   "trn.f.noFoodDo": "Pídele que siga registrando en su app de comidas y que permita la comida en Cuerpo › Salud.",
+  "trn.planToday.title": "{name} te envió {plan}",
+  "trn.planToday.rehabLog":
+    "Un programa de rehabilitación. Al guardarlo se añade {part} a tus lesiones, así las preguntas de dolor, los recordatorios y tu informe siguen esa lesión.",
+  "trn.planToday.rehabLinked": "Un programa de rehabilitación para tu lesión: {part}. Mantiene cada ejercicio tal como está.",
+  "trn.planToday.rehab": "Un programa de rehabilitación. Mantiene cada ejercicio tal como está y pregunta por el dolor entre ejercicios.",
+  "trn.planToday.plain": "Guárdala en tus rutinas para usarla cualquier día.",
+  "trn.planToday.week": { one: "{name} pidió {count} vez por semana.", other: "{name} pidió {count} veces por semana." },
+  "trn.planToday.save": "Guardar",
+  "trn.planToday.see": "Verla",
+  "trn.planToday.later": "Ahora no",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -1030,6 +1050,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.targetsYouWeek": "Votre dernière semaine, par jour : {what}",
   "trn.f.noFood": "Rien de son appli de nutrition cette semaine",
   "trn.f.noFoodDo": "Demandez-lui de continuer à noter ses repas et d’autoriser l’alimentation dans Corps › Santé.",
+  "trn.planToday.title": "{name} vous a envoyé {plan}",
+  "trn.planToday.rehabLog":
+    "Un programme de rééducation. L’enregistrer ajoute {part} à vos blessures, pour que les questions sur la douleur, les rappels et votre rapport suivent cette blessure.",
+  "trn.planToday.rehabLinked": "Un programme de rééducation pour votre blessure : {part}. Chaque exercice reste tel quel.",
+  "trn.planToday.rehab": "Un programme de rééducation. Chaque exercice reste tel quel, et la douleur est demandée entre les exercices.",
+  "trn.planToday.plain": "Enregistrez-la dans vos routines pour l’utiliser n’importe quel jour.",
+  "trn.planToday.week": { one: "{name} a demandé {count} fois par semaine.", other: "{name} a demandé {count} fois par semaine." },
+  "trn.planToday.save": "Enregistrer",
+  "trn.planToday.see": "Voir",
+  "trn.planToday.later": "Plus tard",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -1380,6 +1410,16 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.targetsYouWeek": "Deine letzte Woche, pro Tag: {what}",
   "trn.f.noFood": "Diese Woche nichts aus der Ernährungs-App",
   "trn.f.noFoodDo": "Bitte darum, weiter in der Ernährungs-App zu erfassen und Ernährung unter Körper › Gesundheit zu erlauben.",
+  "trn.planToday.title": "{name} hat dir {plan} geschickt",
+  "trn.planToday.rehabLog":
+    "Ein Reha-Programm. Beim Speichern kommt {part} zu deinen Verletzungen, damit Schmerzabfragen, Erinnerungen und dein Bericht dieser Verletzung folgen.",
+  "trn.planToday.rehabLinked": "Ein Reha-Programm für deine Verletzung: {part}. Jede Übung bleibt, wie sie ist.",
+  "trn.planToday.rehab": "Ein Reha-Programm. Jede Übung bleibt, wie sie ist, und zwischen den Übungen wird nach Schmerzen gefragt.",
+  "trn.planToday.plain": "Speichere sie in deinen Routinen, um sie an jedem Tag zu nutzen.",
+  "trn.planToday.week": { one: "{name} wünscht {count}-mal pro Woche.", other: "{name} wünscht {count}-mal pro Woche." },
+  "trn.planToday.save": "Speichern",
+  "trn.planToday.see": "Ansehen",
+  "trn.planToday.later": "Nicht jetzt",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1718,6 +1758,16 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.targetsYouWeek": "La tua ultima settimana, al giorno: {what}",
   "trn.f.noFood": "Niente dalla sua app per l'alimentazione questa settimana",
   "trn.f.noFoodDo": "Chiedigli di continuare a registrare nella sua app e di consentire l'alimentazione in Corpo › Salute.",
+  "trn.planToday.title": "{name} ti ha inviato {plan}",
+  "trn.planToday.rehabLog":
+    "Un programma di riabilitazione. Salvandolo aggiungi {part} ai tuoi infortuni, così domande sul dolore, promemoria e resoconto seguono quell’infortunio.",
+  "trn.planToday.rehabLinked": "Un programma di riabilitazione per il tuo infortunio: {part}. Ogni esercizio resta com’è.",
+  "trn.planToday.rehab": "Un programma di riabilitazione. Ogni esercizio resta com’è e tra un esercizio e l’altro ti chiede del dolore.",
+  "trn.planToday.plain": "Salvala nelle tue routine per usarla in qualsiasi giorno.",
+  "trn.planToday.week": { one: "{name} ha chiesto {count} volta a settimana.", other: "{name} ha chiesto {count} volte a settimana." },
+  "trn.planToday.save": "Salva",
+  "trn.planToday.see": "Vedi",
+  "trn.planToday.later": "Non ora",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -2040,4 +2090,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.targetsYouWeek": "この1週間の1日平均：{what}",
   "trn.f.noFood": "この1週間、食事アプリから記録が届いていません",
   "trn.f.noFoodDo": "食事アプリでの記録を続け、「体 › 健康」で食事の読み取りを許可するよう伝えましょう。",
+  "trn.planToday.title": "{name}さんから「{plan}」が届きました",
+  "trn.planToday.rehabLog":
+    "リハビリプログラムです。保存すると{part}がケガに追加され、痛みの確認、リマインダー、報告がこのケガに合わせて行われます。",
+  "trn.planToday.rehabLinked": "{part}のケガのためのリハビリプログラムです。種目はすべてそのまま行います。",
+  "trn.planToday.rehab": "リハビリプログラムです。種目はすべてそのまま行い、種目の間に痛みを確認します。",
+  "trn.planToday.plain": "ルーティンに保存すれば、いつでも使えます。",
+  "trn.planToday.week": { other: "{name}さんの指定は週{count}回です。" },
+  "trn.planToday.save": "保存する",
+  "trn.planToday.see": "見る",
+  "trn.planToday.later": "あとで",
 };

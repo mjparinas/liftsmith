@@ -5,11 +5,15 @@ import type { DemoWords } from "@/components/demo/LiftDemoCore";
 import type { Message } from "@/lib/i18n";
 import { EQUIPMENT_NAME, MUSCLE_NAME } from "@/lib/seo";
 import type { SiteLang } from "@/lib/siteLang";
+import { ACTIVITIES, type Activity } from "@/lib/tdee";
 import type { Equipment, Exercise, Muscle } from "@/lib/types";
+import * as activity from "@/locales/text/activity";
+import * as bmi from "@/locales/text/bmi";
 import * as demo from "@/locales/text/demo";
 import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
 import * as muscle from "@/locales/text/muscle";
+import * as tdee from "@/locales/text/tdee";
 
 type Catalogue = { en: Record<string, Message> } & Partial<Record<SiteLang, Partial<Record<string, Message>>>>;
 
@@ -59,4 +63,39 @@ export function exerciseWords(lang: SiteLang, e: Exercise): { name: string; setu
     setup: line(ex, lang, `ex.${e.id}.setup`) ?? e.setup,
     cues: e.cues.map((c, i) => line(ex, lang, `ex.${e.id}.cue${i + 1}`) ?? c),
   };
+}
+
+/** The activity levels' names and what each means, for the TDEE and macro calculators. */
+export function activityWords(lang: SiteLang): Record<Activity, { label: string; detail: string }> {
+  const out = {} as Record<Activity, { label: string; detail: string }>;
+  for (const a of ACTIVITIES)
+    out[a] = { label: line(activity, lang, `activity.${a}`) ?? a, detail: line(activity, lang, `activity.${a}.detail`) ?? "" };
+  return out;
+}
+
+/** The lines the TDEE results draw (TdeeResults and BmiBar), so the public calculator says them in the page's language. */
+export const TDEE_RESULT_KEYS = [
+  "tdee.maintenance",
+  "tdee.perDay",
+  "tdee.bmr",
+  "tdee.formulaKatch",
+  "tdee.formulaMifflin",
+  "tdee.protein",
+  "tdee.proteinNote",
+  "tdee.cut",
+  "tdee.bulk",
+  "tdee.bmi",
+  "tdee.byActivity",
+  "bmi.under",
+  "bmi.healthy",
+  "bmi.over",
+  "bmi.obese",
+  "bmi.where",
+  "bmi.note",
+] as const;
+
+export function tdeeWords(lang: SiteLang): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of TDEE_RESULT_KEYS) out[key] = line(key.startsWith("bmi.") ? bmi : tdee, lang, key) ?? key;
+  return out;
 }

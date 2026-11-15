@@ -292,14 +292,17 @@ export interface Profile {
    */
   messages?: {
     push: Partial<
-      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+      Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab", boolean>
     >;
     email?: {
       address: string;
       consentAt: number;
       status: "pending" | "confirmed" | "unsubscribed";
       kinds: Partial<
-        Record<"reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends", boolean>
+        Record<
+          "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab",
+          boolean
+        >
       >;
     };
     /** When reminders were first set up: comebacks count from here until there's a workout. */
@@ -419,6 +422,14 @@ export interface Routine {
    * exercise as written instead of skipping or lightening it, and asks about pain between sets.
    */
   rehab?: boolean;
+  /**
+   * Rehab: the injury area the program is for (2026-11-15). Saving it logs that injury when none is active, its pain
+   * check asks about that injury only, and Today offers it while that injury is active. Missing on older programs:
+   * every active injury counts, as before.
+   */
+  rehabPart?: BodyPart;
+  /** Rehab: how many times a week the physio asked for (1 to 7). Missing: about every other day, as before. */
+  perWeek?: number;
   /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.

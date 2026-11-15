@@ -103,6 +103,11 @@ export const es: FeaturesText = {
       name: "Modo lesión",
       body: "Dile qué te duele y deja fuera lo que lo agravaría, te avisa de los ejercicios de riesgo y sigue un nivel de dolor de 0 a 10 a lo largo del tiempo.",
     },
+    "rehab-done": {
+      name: "Rehabilitación de tu fisioterapeuta, hecha",
+      body: "Un programa de tu fisioterapeuta espera en Hoy para guardarlo con un toque y registra la lesión para la que es. Sigue las veces por semana que pidió, aparece en los días de descanso y pregunta por el dolor solo de esa lesión.",
+      note: "Los recordatorios de rehabilitación y el aviso de programa nuevo son para Android y iPhone.",
+    },
     cycle: { name: "Preparación según el ciclo", body: "Si quieres, registra tu ciclo y la decisión de hoy lo tiene en cuenta." },
     "goal-planner": {
       name: "Planificador de metas",

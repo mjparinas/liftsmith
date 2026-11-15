@@ -44,6 +44,7 @@ import { NextUpCard } from "./NextUp";
 import { NowPlayingBar } from "./NowPlaying";
 import { programName } from "./Programs";
 import { RecoveryMap } from "./RecoveryMap";
+import { PlanToday, RehabToday } from "./RehabToday";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
@@ -458,6 +459,9 @@ export function Today() {
             </section>
           )}
 
+          {!active && <PlanToday />}
+          {/* The physio's rehab on a day without lifting; beside the lifting it's the Rehab row in the parts. */}
+          {!active && (resting || !(preview && preview.items.length > 0)) && <RehabToday />}
           {!active && <CoachNoteToday />}
           {!active && <CoachNotes limit={2} />}
         </div>

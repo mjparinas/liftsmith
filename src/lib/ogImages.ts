@@ -13,6 +13,7 @@ import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { equipmentLabel, equipmentSlug, equipmentWithPages, exercisesFor, exercisesWith, MUSCLE_NAME, muscleSlug, TOOL_PAGES } from "./seo";
 import { isSiteLang } from "./siteLang";
 import { MUSCLES } from "./types";
+import { vsBySlug } from "./versus";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 
@@ -36,6 +37,11 @@ export function ogFile(path: string): string {
   const [kind, a] = seg;
   if (!kind || !a) return "default.jpg";
   if (kind === "exercises" && EXERCISE_BY_ID.has(a)) return `exercises/${a}.jpg`;
+  // A comparison shares the card of its first lift (/exercises/vs/back-squat-vs-front-squat/).
+  if (kind === "exercises" && a === "vs" && seg[2]) {
+    const pair = vsBySlug(seg[2]);
+    if (pair) return `exercises/${pair.a}.jpg`;
+  }
   if (kind === "muscles") return `muscles/${a}.jpg`;
   if (kind === "equipment") return `equipment/${a}.jpg`;
   if (kind === "blog" && a === "topic" && seg[2]) return `blog-topics/${seg[2]}.jpg`;
