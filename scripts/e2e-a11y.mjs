@@ -217,6 +217,7 @@ try {
     "/exercises/vs/back-squat-vs-front-squat/",
     "/ja/exercises/vs/back-squat-vs-front-squat/",
     "/muscles/chest/",
+    "/de/muscles/biceps/",
     "/muscles/chest/dumbbells/",
     "/equipment/barbell/",
     "/guides/reps-in-reserve/",
