@@ -1,7 +1,8 @@
+import { estimate } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
 import { date, t } from "./i18n";
 import { roundLoad } from "./loads";
-import { epley, sessionsOf } from "./progression";
+import { sessionsOf } from "./progression";
 import type { AppEvent, Experience, Gym, Profile } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -57,7 +58,7 @@ export interface Forecast {
 /** Best estimated one-rep max per session for a lift, oldest first. */
 export function e1rmHistory(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number }[] {
   return sessionsOf(events, exerciseId)
-    .map((sets) => ({ at: sets[0]!.at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? epley(s.weight, Math.min(s.reps, 12)) : 0))) }))
+    .map((sets) => ({ at: sets[0]!.at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? estimate(s.weight, Math.min(s.reps, 12)) : 0))) }))
     .filter((x) => x.e1 > 0)
     .reverse();
 }

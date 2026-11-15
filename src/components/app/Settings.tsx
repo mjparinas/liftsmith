@@ -13,6 +13,7 @@ import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { COMMIT, versionLabel } from "@/lib/build";
+import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
@@ -388,7 +389,7 @@ function TrainingGroup() {
           options={[3, 4, 5, 6].map((d) => [d, t("settings.weeks", { count: d })])}
         />
         <Section title={t("settings.trainingBlock")} info="blockWeek">
-          <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>
+          <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: weekOf(Date.now()) })}>
             {t("settings.newBlock")}
           </Button>
         </Section>

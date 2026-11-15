@@ -12,6 +12,7 @@ import { BRAND } from "@/lib/brand";
 import { coachSignup, isCoachSignupHash, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
 import { savePicked } from "@/lib/coachMode";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
+import { estimate } from "@/lib/e1rm";
 import { flag } from "@/lib/flags";
 import { markAdded, placeKit } from "@/lib/gymDirectory";
 import { decodeGym, type GymKit } from "@/lib/gymShare";
@@ -19,7 +20,7 @@ import { connectHealth, healthAvailable, readBodyStats, readHints } from "@/lib/
 import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
-import { epley, KNOWN_LIFTS } from "@/lib/progression";
+import { KNOWN_LIFTS } from "@/lib/progression";
 import { keepStorage } from "@/lib/saving";
 import { notifyPermission } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
@@ -185,7 +186,7 @@ export function knownMaxes(
   for (const [id, { w, r }] of Object.entries(entries)) {
     const weight = Number(w);
     const reps = Math.min(15, Math.max(1, Number(r) || 1));
-    if (weight > 0) out[id] = Math.round((reps === 1 ? toKg(weight, unit) : epley(toKg(weight, unit), reps)) * 10) / 10;
+    if (weight > 0) out[id] = Math.round(estimate(toKg(weight, unit), reps) * 10) / 10;
   }
   return Object.keys(out).length ? out : undefined;
 }

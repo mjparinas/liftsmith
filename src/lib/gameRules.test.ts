@@ -4,6 +4,7 @@ import { makeSet } from "@/test/factories";
 
 import { defaultProfile } from "./defaults";
 import { derive, weekOf } from "./derive";
+import { estimate } from "./e1rm";
 import {
   bestBefore,
   demoteBelow,
@@ -157,11 +158,11 @@ describe("bests", () => {
   it("finds the best estimated max before a moment, leaving out the set itself and empty bars", () => {
     const later = bench(NOW - D, "b", 70, 5);
     const ev = [early, later, bench(NOW - 2 * D, "z", 0, 20)];
-    expect(bestBefore(ev, "bench-press", NOW - 2 * D)).toBeCloseTo(60 * (1 + 8 / 30), 6);
-    expect(bestBefore(ev, "bench-press", NOW)).toBeCloseTo(70 * (1 + 5 / 30), 6);
-    expect(bestBefore(ev, "bench-press", NOW, later.id)).toBeCloseTo(60 * (1 + 8 / 30), 6);
+    expect(bestBefore(ev, "bench-press", NOW - 2 * D)).toBeCloseTo(estimate(60, 8), 6);
+    expect(bestBefore(ev, "bench-press", NOW)).toBeCloseTo(estimate(70, 5), 6);
+    expect(bestBefore(ev, "bench-press", NOW, later.id)).toBeCloseTo(estimate(60, 8), 6);
     expect(bestBefore(ev, "back-squat", NOW)).toBeNull();
-    expect(bestBefore(ev, "bench-press", NOW - 3 * D)).toBeCloseTo(76, 6); // a set at that moment counts
+    expect(bestBefore(ev, "bench-press", NOW - 3 * D)).toBeCloseTo(estimate(60, 8), 6); // a set at that moment counts
   });
 
   it("calls a set a best only past the earlier best, with history from another workout", () => {
@@ -174,11 +175,10 @@ describe("bests", () => {
   });
 
   it("says how many reps at a weight would beat the best, within 1 to 30", () => {
-    // Best 76 (60 × 8). At 60 kg, 8 reps only ties it, so 9; at 70 kg, 3 reps (77).
-    // (Floating point made 30 × (76 / 60 − 1) come out just under 8, so this said 8, a tie, before 2026-11-13.)
+    // Best 76.6 (60 × 8, the 1RM calculator's estimate). At 60 kg, 8 reps only ties it, so 9; at 70 kg, 4; at 75, 2.
     expect(repsForPr([early], "bench-press", 60, NOW)).toBe(9);
-    expect(repsForPr([early], "bench-press", 70, NOW)).toBe(3);
-    expect(repsForPr([early], "bench-press", 75, NOW)).toBe(1); // 75 × (1 + 1/30) = 77.5
+    expect(repsForPr([early], "bench-press", 70, NOW)).toBe(4);
+    expect(repsForPr([early], "bench-press", 75, NOW)).toBe(2);
     expect(repsForPr([early], "bench-press", 100, NOW)).toBeNull(); // any set beats it: no hint
     expect(repsForPr([early], "bench-press", 20, NOW)).toBeNull(); // would take more than 30
     expect(repsForPr([early], "bench-press", 0, NOW)).toBeNull();

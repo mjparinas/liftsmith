@@ -203,6 +203,8 @@ export function checkBody(b: unknown): { ok: true; body: SubBody } | { ok: false
         firstWorkoutAt: (x.firstWorkoutAt as number | null) ?? undefined,
         weekDays: x.weekDays as number,
         weekStart: x.weekStart as number,
+        // Optional so older apps keep Monday weeks.
+        ...(x.firstDay === 0 ? { firstDay: 0 as const } : {}),
         streakWeeks: x.streakWeeks as number,
         pro,
         // Optional so older apps keep working; anything unknown reads as English.

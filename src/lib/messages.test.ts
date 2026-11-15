@@ -12,6 +12,7 @@ import {
   plan,
   proState,
   record,
+  weekStartIn,
   zoned,
   type PlanInput,
 } from "./messages";
@@ -185,6 +186,19 @@ describe("recaps, bests and the first workout (email)", () => {
     expect(plan(input({ week }), sun, addDays(MON, 7, TZ), "push").some((m) => m.kind === "recap")).toBe(false);
   });
 
+  it("follows a Sunday first day of the week: the recap goes on Saturday and the weekly email on Sunday", () => {
+    // Number audit (2026-11-15): emails counted Monday weeks while the app counted the lifter's own.
+    const sunStart = addDays(MON, -1, TZ);
+    expect(weekStartIn(addDays(MON, 3, TZ) + 3_600_000, TZ, 0)).toBe(sunStart);
+    const sunWeek = { ...week, start: sunStart };
+    const msgs = plan(input({ week: sunWeek, weekStart: sunStart, firstDay: 0 }), addDays(MON, 3, TZ), addDays(MON, 7, TZ), "email");
+    const recap = msgs.filter((m) => m.kind === "recap");
+    expect(recap).toHaveLength(1);
+    expect(recap[0]!.at).toBe(atTime(addDays(MON, 5, TZ), "19:00", TZ)); // Saturday
+    const weekly = msgs.filter((m) => m.kind === "reminder");
+    expect(weekly.map((m) => m.at)).toEqual([atTime(sun, "08:00", TZ)]); // Sunday morning, the start of the next week
+  });
+
   it("sends last month on the 1st, ready to share", () => {
     const dec1 = zoned(2026, 12, 1, 0, 0, TZ);
     const lastMonth = { start: zoned(2026, 11, 1, 0, 0, TZ), workouts: 12, sets: 200, volumeKg: 50_000, prs: 0, minutes: 600 };
@@ -213,7 +227,7 @@ describe("recaps, bests and the first workout (email)", () => {
   it("celebrates a new best once, the day it's set", () => {
     const best = { at: NOW_ISH, name: "Bench press", weightKg: 100, reps: 5 };
     expect(record(null, { best }, NOW_ISH + 3600_000)).toMatchObject({ key: `records:${NOW_ISH}`, title: "New best: Bench press" });
-    expect(record(null, { best, unit: "lb" }, NOW_ISH)?.body).toContain("220 lb for 5");
+    expect(record(null, { best, unit: "lb" }, NOW_ISH)?.body).toContain("220.46 lb for 5"); // as the app shows it (unitMath.ts)
     expect(record({ best }, { best }, NOW_ISH + 3600_000)).toBeNull();
     expect(record(null, { best }, NOW_ISH + 2 * DAY)).toBeNull();
   });

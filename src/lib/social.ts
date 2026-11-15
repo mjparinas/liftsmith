@@ -9,11 +9,11 @@ import type { MessageKey } from "@/locales/en";
 
 import { api, AuthError, readAccount } from "./auth";
 import type { SessionSummary } from "./derive";
+import { estimate } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
 import { flag } from "./flags";
 import { t } from "./i18n";
-import { estimate } from "./onerm";
-import { epley, TIMED } from "./progression";
+import { TIMED } from "./progression";
 import { encodeRoutine } from "./routineShare";
 import { musclesWorked } from "./shareCards";
 import { SITE_URL } from "./site";
@@ -191,7 +191,7 @@ export function postBodyFor(events: readonly AppEvent[], s: SessionSummary, weig
   for (const e of events) {
     if (e.type !== "set" || e.weight <= 0 || TIMED.has(e.exerciseId)) continue;
     if (e.sessionId === s.sessionId || e.at >= s.start) continue;
-    before.set(e.exerciseId, Math.max(before.get(e.exerciseId) ?? 0, epley(e.weight, e.reps)));
+    before.set(e.exerciseId, Math.max(before.get(e.exerciseId) ?? 0, estimate(e.weight, e.reps)));
   }
   for (const e of events) {
     if (e.type !== "set" || e.sessionId !== s.sessionId) continue;
@@ -201,7 +201,7 @@ export function postBodyFor(events: readonly AppEvent[], s: SessionSummary, weig
       row.sets.push({ w: weights ? e.weight : null, r: e.reps, ...(e.distanceM ? { d: e.distanceM } : {}) });
     const score = e.distanceM ?? (e.weight > 0 ? estimate(e.weight, e.reps) : e.reps);
     if (!row.best || score > row.best.score) row.best = { w: e.weight, r: e.reps, ...(e.distanceM ? { d: e.distanceM } : {}), score };
-    if (e.weight > 0 && !TIMED.has(e.exerciseId)) row.top = Math.max(row.top, epley(e.weight, e.reps));
+    if (e.weight > 0 && !TIMED.has(e.exerciseId)) row.top = Math.max(row.top, estimate(e.weight, e.reps));
     by.set(e.exerciseId, row);
   }
   const exercises: PostExercise[] = [...by.entries()].slice(0, SOCIAL_LIMITS.exercises).map(([id, row]) => {

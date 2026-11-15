@@ -8,6 +8,7 @@ import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
+import { estimate } from "@/lib/e1rm";
 import { endWorkout } from "@/lib/endWorkout";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
@@ -23,7 +24,7 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
 import { meanFullSpeed } from "@/lib/partMetrics";
 import { loadBar } from "@/lib/plates";
-import { epley, TIMED } from "@/lib/progression";
+import { TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
@@ -421,7 +422,7 @@ export function Workout() {
     sound.log();
     if (voiceOn && ex && active.weight > 0) {
       const best = Math.max(0, ...(s.stats.e1rmSeries.get(ex.id) ?? []).map((p) => p.e1rm));
-      if (best > 0 && epley(active.weight, active.reps) > best + 0.01) say(prCue(ex.name));
+      if (best > 0 && estimate(active.weight, active.reps) > best + 0.01) say(prCue(ex.name));
     }
     setPopKey((k) => k + 1);
     // From the top edge of Log set, so the check rises clear of the button's label.

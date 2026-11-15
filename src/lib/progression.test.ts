@@ -20,7 +20,7 @@ const ex = (id: string) => {
 const gym = makeTestGym();
 const profile = makeProfile({ goal: "muscle" }); // compound lifts 6 to 10 reps, bodyweight compounds 6 to 15
 const build = Math.min(6, Math.max(3, profile.blockWeeks));
-const deload = { ...profile, blockStart: NOW - build * 7 * DAY - DAY };
+const deload = { ...profile, blockStart: NOW - build * 7 * DAY };
 
 /** One session of `reps.length` sets of `exerciseId` at `weight`, aiming for `targetReps`, `daysAgo` days ago. */
 function session(id: string, daysAgo: number, exerciseId: string, weight: number, targetReps: number, reps: number[]): SetEvent[] {

@@ -34,7 +34,7 @@ import {
 } from "./game";
 import { setLanguage } from "./i18n";
 import { AVATAR_IDS } from "./socialTypes";
-import type { AppEvent, SetEvent } from "./types";
+import type { AppEvent, SetEvent, StretchEvent } from "./types";
 
 // Wednesday evening.
 const NOW = new Date("2026-11-11T18:00:00").getTime();
@@ -91,6 +91,28 @@ describe("streak with freezes", () => {
     const ev = [5, 4, 2, 1].flatMap(goalWeek);
     expect(goalStreak(derive(ev, NOW), profile(), NOW).weeks).toBe(2);
     expect(goalStreak(derive(ev, NOW), profile(), NOW).best).toBe(2);
+  });
+  it("keeps the streak through a week short of the goal with a stand-alone stretch of 10+ minutes", () => {
+    // Number audit (2026-11-15): derive.ts said stretch days keep the streak; the streak on screen ignored them.
+    const stretch = (back: number, seconds: number): StretchEvent => ({
+      type: "stretch",
+      id: `st${back}-${seconds}`,
+      at: weekOf(NOW) - back * W + 4 * D + 10 * H,
+      moment: "rest",
+      ids: ["childs-pose"],
+      seconds,
+    });
+    const ev = [5, 4, 3, 1].flatMap(goalWeek);
+    expect(goalStreak(derive(ev, NOW), profile(), NOW).weeks).toBe(1);
+    const kept = goalStreak(derive([...ev, stretch(2, 600)], NOW), profile(), NOW);
+    expect(kept.weeks).toBe(4); // kept alive, not added to
+    expect(kept.frozen).toEqual([]);
+    expect(goalStreak(derive([...ev, stretch(2, 300)], NOW), profile(), NOW).weeks).toBe(1); // too short
+    // This week: a stretch day means a short week no longer puts the streak at risk, but it isn't a goal day.
+    const sun = weekOf(NOW) + 6 * D + 18 * H;
+    const three = [3, 2, 1].flatMap(goalWeek);
+    const st = goalStreak(derive([...three, stretch(0, 600)], sun), profile(), sun);
+    expect(st).toMatchObject({ thisWeek: 0, needed: 3, atRisk: false });
   });
   it("holds at most two freezes", () => {
     const ev = Array.from({ length: 16 }, (_, i) => i + 1).flatMap(goalWeek);
