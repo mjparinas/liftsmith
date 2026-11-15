@@ -1,3 +1,4 @@
+import { ES_MORE } from "./more/es";
 import type { LocalTools } from "./types";
 
 // Las calculadoras en español (tú). Mismas partes que las páginas inglesas (src/app/tools/).
@@ -189,4 +190,5 @@ export const ES_TOOLS: LocalTools = {
       empty: "Barra vacía",
     },
   },
+  ...ES_MORE,
 };

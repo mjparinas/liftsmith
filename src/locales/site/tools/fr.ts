@@ -1,3 +1,4 @@
+import { FR_MORE } from "./more/fr";
 import type { LocalTools } from "./types";
 
 // Les calculateurs en français (vous). Mêmes parties que les pages anglaises (src/app/tools/).
@@ -190,4 +191,5 @@ export const FR_TOOLS: LocalTools = {
       empty: "Barre à vide",
     },
   },
+  ...FR_MORE,
 };

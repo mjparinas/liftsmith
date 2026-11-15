@@ -12,6 +12,7 @@ export const metadata: Metadata = pageMeta({
   description:
     "Work out your total daily energy expenditure from age, sex, height, weight and activity, with BMR, BMI, cutting and lean bulk targets and a protein range for lifters.",
   path: "/tools/tdee-calculator/",
+  translated: true,
 });
 
 const FAQ: [string, string][] = [
@@ -56,7 +57,7 @@ const jsonLd = [
 
 export default function TdeePage() {
   return (
-    <SitePage kind="tool" sticky="Calories that follow your weigh-ins">
+    <SitePage kind="tool" sticky="Calories that follow your weigh-ins" path="/tools/tdee-calculator/">
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/tools/", label: "Tools" }, { label: "TDEE calculator" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-4xl">TDEE calculator</h1>

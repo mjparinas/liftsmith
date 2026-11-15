@@ -16,9 +16,12 @@ export function NumBox({
   step,
   min,
   max,
+  aria,
 }: {
   id: string;
   label: string;
+  /** What a screen reader hears for the box; English lowercases its label, other languages pass theirs as is. */
+  aria?: string;
   value: number;
   onChange: (n: number) => void;
   step: number;
@@ -33,7 +36,7 @@ export function NumBox({
       </label>
       <BumpField
         id={id}
-        label={label.toLowerCase()}
+        label={aria ?? label.toLowerCase()}
         className="mt-2"
         value={text}
         onChange={(v) => {
