@@ -30,7 +30,7 @@ const API = "https://api.stripe.com/v1";
 const DAY = 86_400_000;
 /** Stripe's own clock and ours may differ a little; older signatures are refused (Stripe's default). */
 export const SIGNATURE_TOLERANCE_S = 300;
-/** Trial lengths the app may ask for (the trialDays A/B flag). A code's own trial comes from the server. */
+/** Trial lengths the app may ask for (the trialDays flag). A code's own trial comes from the server. */
 const ASKABLE_TRIALS = new Set([7, 14]);
 const DEFAULT_TRIAL = 14;
 /** Statuses that keep Pro on. past_due: Stripe is retrying the card (Smart Retries), like the stores' grace period. */
@@ -177,7 +177,7 @@ export async function trialEligible(accountId: string): Promise<boolean> {
 
 /**
  * The free trial a checkout gives, in days, or null for none: a live code's own trial (a creator's 30 days) first,
- * then the length the app asked for (7 or 14, the trialDays A/B), and nothing for an account that had one already.
+ * then the length the app asked for (7 or 14, the trialDays flag), and nothing for an account that had one already.
  */
 export async function trialFor(
   accountId: string | null,

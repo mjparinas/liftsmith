@@ -1,12 +1,12 @@
 // Feature flags (Gradelings pattern, AGENTS.md "Borrowed from Gradelings"). Every flag is defined here in code
 // with its default and allowed values, so the admin panel can only switch things that exist. Its value for
-// everyone, a rollout to a share of installs, and A/B tests live on the server (src/server/flags.ts); the app
+// everyone and a rollout to a share of installs live on the server (src/server/flags.ts); the app
 // reads them from /api/flags/ (src/lib/remoteFlags.ts) and keeps the last answer on the device, so flags work
 // offline and change without a store release. A value set on this device (a hidden test switch) wins over both.
 import { hash } from "./random";
 
 export const FLAGS = {
-  /** Length of the Pro trial offered at the end of setup (Melvin, 2026-11-09: 14 days; A/B 7 vs 14 later). */
+  /** Length of the Pro trial offered at the end of setup (Melvin, 2026-11-09: 14 days; 7 can be rolled out from the Flags tab). */
   trialDays: {
     default: 14,
     options: [7, 14] as const,
@@ -216,12 +216,6 @@ export function replaceServerFlags(values: Record<string, unknown>) {
 /** This device's own value for a flag (a hidden test switch), which the server never overrides. */
 export function setLocalFlag<K extends FlagName>(name: K, value: FlagValue<K>) {
   write(FLAG_LOCAL_KEY, { ...read(FLAG_LOCAL_KEY), [name]: value });
-}
-
-/** A stable A/B variant for this device, for when the server hasn't assigned one. */
-export function variant<K extends FlagName>(name: K, deviceId: string): FlagValue<K> {
-  const opts = FLAGS[name].options;
-  return opts[hash(`${name}:${deviceId}`) % opts.length] as FlagValue<K>;
 }
 
 /** A stable bucket from 0 to 9,999 for an install, so the same installs keep a partial rollout as it grows. */

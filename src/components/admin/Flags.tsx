@@ -1,16 +1,13 @@
 "use client";
 
-// The admin Flags and A/B Tests tabs (Gradelings' feature flags and experiments, on Liftsmith's value flags in
-// src/lib/flags.ts). Flags: set a value for everyone or a share of installs, or go back to the default. Tests:
-// draft, start, read the results and verdict, stop with a winner, delete. Support staff can look; admins change.
+// The admin Flags tab (Gradelings' feature flags, on Liftsmith's value flags in src/lib/flags.ts): set a value for
+// everyone or a share of installs, or go back to the default. Support staff can look; admins change. The A/B Tests
+// tab was removed on 2026-11-15 (Melvin).
 import { useCallback, useEffect, useState } from "react";
 
-import type { Experiment } from "@/lib/experiments";
-import type { ExperimentResults } from "@/server/flags";
-
-import { Card, fmtInt, fmtPct, Table } from "./charts";
+import { Card } from "./charts";
 import { CardBones, Loading } from "./Skeletons";
-import { ago, when } from "./time";
+import { ago } from "./time";
 
 type Value = string | number | boolean;
 type FlagRow = {
@@ -20,9 +17,7 @@ type FlagRow = {
   default: Value;
   options: Value[];
   state: { value: Value; rollout: number; updatedAt: number; updatedBy: string } | null;
-  experiment: "running" | "stopped" | null;
 };
-type Exp = Experiment & { results: ExperimentResults };
 
 const show = (v: Value) => (typeof v === "boolean" ? (v ? "On" : "Off") : String(v));
 const parse = (s: string, options: Value[]) => options.find((o) => String(o) === s);
@@ -78,9 +73,6 @@ function FlagLine({ f, admin, changed }: { f: FlagRow; admin: boolean; changed: 
           <p className="text-xs text-faint">
             Changed by {f.state.updatedBy} {ago(f.state.updatedAt)}
           </p>
-        )}
-        {f.experiment && (
-          <p className="mt-1 text-sm text-warn">An A/B test on this flag is {f.experiment}, so the test decides what installs get.</p>
         )}
         {msg && (
           <p role="status" className="mt-1 text-sm text-muted">
@@ -170,189 +162,6 @@ export function Flags({ admin }: { admin: boolean }) {
             </ul>
           </Card>
         ))}
-    </div>
-  );
-}
-
-const pText = (p: number | null) => (p == null ? "—" : p < 0.001 ? "<0.001" : p.toFixed(3));
-
-function ExperimentCard({ e, admin, changed }: { e: Exp; admin: boolean; changed: () => void }) {
-  const [msg, setMsg] = useState<string | null>(null);
-  const act = async (body: Record<string, unknown>) => {
-    const err = await post("/api/admin/experiments/", { flag: e.flag, ...body });
-    setMsg(err);
-    if (!err) changed();
-  };
-  const r = e.results;
-  const status =
-    e.status === "draft"
-      ? "Draft: everyone sees the control and nothing is counted."
-      : e.status === "running"
-        ? `Running since ${when(e.startedAt ?? 0)}.`
-        : `Stopped ${when(e.stoppedAt ?? 0)}: everyone gets ${show(e.winner ?? e.variants[0]?.value ?? "")}.`;
-  return (
-    <Card title={`Test: ${e.flag}`} subtitle={e.description || undefined}>
-      <p className="text-sm">{status}</p>
-      <Table
-        columns={["Variant", "Weight", "Installs", "Started a trial", "p", "Paid", "p", "Worked out this week", "p"]}
-        rows={r.rows.map((x, i) => [
-          `${show(x.variant)}${i === 0 ? " (control)" : ""}`,
-          e.variants[i]?.weight ?? "",
-          fmtInt(x.installs),
-          `${fmtInt(x.trials)} (${fmtPct(x.installs ? x.trials / x.installs : null, 0)})`,
-          pText(x.pTrials),
-          `${fmtInt(x.paid)} (${fmtPct(x.installs ? x.paid / x.installs : null, 0)})`,
-          pText(x.pPaid),
-          `${fmtInt(x.active)} (${fmtPct(x.installs ? x.active / x.installs : null, 0)})`,
-          pText(x.pActive),
-        ])}
-      />
-      {e.status !== "draft" && (
-        <div className="mt-3 space-y-1 text-sm">
-          <p>
-            <strong>Paying:</strong> {r.verdict.message}
-          </p>
-          <p>
-            <strong>Trials:</strong> {r.trialVerdict.message}
-          </p>
-          <p className="text-xs text-muted">A p-value under 0.05 is unlikely to be chance. With small groups, wait for more installs.</p>
-        </div>
-      )}
-      {admin && (
-        <div className="mt-3 flex flex-wrap gap-2 text-sm">
-          {e.status === "draft" && (
-            <button
-              type="button"
-              className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-              onClick={() => void act({ action: "start" })}
-            >
-              Start the test
-            </button>
-          )}
-          {e.status === "running" &&
-            e.variants.map((v) => (
-              <button
-                key={String(v.value)}
-                type="button"
-                className={`press rounded-lg px-3 py-1.5 ${r.verdict.ready && r.verdict.leader === v.value ? "bg-accent font-semibold text-accent-ink" : "border border-line"}`}
-                onClick={() => void act({ action: "stop", winner: v.value })}
-              >
-                Use {show(v.value)} for everyone
-              </button>
-            ))}
-          {e.status !== "running" && (
-            <button
-              type="button"
-              className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-              onClick={() => void act({ action: "delete" })}
-            >
-              Delete the test
-            </button>
-          )}
-        </div>
-      )}
-      {msg && (
-        <p role="status" className="mt-2 text-sm text-bad">
-          {msg}
-        </p>
-      )}
-    </Card>
-  );
-}
-
-function NewExperiment({ flags, taken, changed }: { flags: FlagRow[]; taken: Set<string>; changed: () => void }) {
-  const free = flags.filter((f) => !taken.has(f.name));
-  const [name, setName] = useState(free[0]?.name ?? "");
-  const [description, setDescription] = useState("");
-  const [weights, setWeights] = useState<Record<string, string>>({});
-  const [msg, setMsg] = useState<string | null>(null);
-  const f = free.find((x) => x.name === name);
-  if (!f) return null;
-  // The default is the control, so it goes first.
-  const options = [f.default, ...f.options.filter((o) => o !== f.default)];
-  const create = async () => {
-    const variants = options.map((o) => ({ value: o, weight: Number(weights[String(o)] ?? 50) })).filter((v) => v.weight > 0);
-    const err = await post("/api/admin/experiments/", { action: "create", flag: f.name, description, variants });
-    setMsg(err);
-    if (!err) {
-      setDescription("");
-      changed();
-    }
-  };
-  return (
-    <Card title="New test" subtitle="A test splits installs between a flag's values. The default is the control. It starts as a draft.">
-      <div className="flex flex-wrap items-end gap-3 text-sm">
-        <label className="block">
-          <span className="block text-xs text-muted">Flag</span>
-          <select value={name} onChange={(e) => setName(e.target.value)} className="card mt-1 px-2 py-1.5">
-            {free.map((x) => (
-              <option key={x.name} value={x.name}>
-                {x.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        {options.map((o) => (
-          <label key={String(o)} className="block">
-            <span className="block text-xs text-muted">Weight for {show(o)}</span>
-            <input
-              type="number"
-              min={0}
-              max={100}
-              value={weights[String(o)] ?? "50"}
-              onChange={(e) => setWeights((w) => ({ ...w, [String(o)]: e.target.value }))}
-              className="card mt-1 w-20 px-2 py-1.5"
-            />
-          </label>
-        ))}
-        <label className="block min-w-60 flex-1">
-          <span className="block text-xs text-muted">What it tests</span>
-          <input
-            value={description}
-            maxLength={300}
-            onChange={(e) => setDescription(e.target.value)}
-            className="card mt-1 w-full px-2 py-1.5"
-          />
-        </label>
-        <button
-          type="button"
-          className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-          onClick={() => void create()}
-        >
-          Create draft
-        </button>
-      </div>
-      {msg && (
-        <p role="status" className="mt-2 text-sm text-bad">
-          {msg}
-        </p>
-      )}
-    </Card>
-  );
-}
-
-export function Experiments({ admin }: { admin: boolean }) {
-  const [data, reload] = useLoad<{ experiments: Exp[] }>("/api/admin/experiments/");
-  const [flags] = useLoad<{ flags: FlagRow[] }>("/api/admin/flags/");
-  if (!data)
-    return (
-      <Loading label="Loading tests">
-        <CardBones body="rows" />
-      </Loading>
-    );
-  return (
-    <div className="space-y-4">
-      {admin && flags && <NewExperiment flags={flags.flags} taken={new Set(data.experiments.map((e) => e.flag))} changed={reload} />}
-      {data.experiments.length ? (
-        data.experiments.map((e) => <ExperimentCard key={e.flag} e={e} admin={admin} changed={reload} />)
-      ) : (
-        <p className="text-sm text-muted">No tests yet.</p>
-      )}
-      <p className="text-xs text-muted">
-        Installs are counted from the first time they ask for flags during a running test, and only installs that send usage stats. Started
-        a trial and Paid count only after joining the test; Worked out this week counts a finished workout in the last 7 days. The verdict
-        needs 30 installs in each variant.
-      </p>
     </div>
   );
 }
