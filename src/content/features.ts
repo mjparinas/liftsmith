@@ -412,10 +412,19 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "food",
         name: "Coach's notes from your food app",
-        body: 'Calories and protein logged in a food app reach Liftsmith through your phone\'s health app and become notes like "protein short three days running". No food logging in the app.',
+        body: 'Calories, protein, carbs and fat logged in a food app reach Liftsmith through your phone\'s health app and become notes like "protein short three days running", judged against one set of targets for your goal. Protein-only logging counts. No food logging in the app.',
         tier: "free",
         where: "phones",
         added: "2026-11-11",
+      },
+      {
+        id: "measured-maintenance",
+        name: "Maintenance measured from what you eat",
+        body: "Two weeks of food and weigh-ins measure your real daily calories, which then drive Macros, TDEE and your food notes. A Food card on Body shows your week against your targets.",
+        tier: "free",
+        where: "phones",
+        note: "Under 18s get protein advice only: no fat-loss goal and no calorie notes.",
+        added: "2026-11-15",
       },
       {
         id: "your-stats",
@@ -654,7 +663,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-nutrition",
         name: "Nutrition targets for clients",
-        body: "Set each client's daily calories and protein. Their coach's notes check their food week against them, and you see how they're eating when they share it.",
+        body: "Set each client's daily calories, protein, carbs and fat, with a rest-day calorie number if you like, filled in from their own numbers in one tap. Their coach's notes check their food week against them, and you see how they're eating when they share it.",
         tier: "pro",
         pro: "coaching",
         added: "2026-11-13",

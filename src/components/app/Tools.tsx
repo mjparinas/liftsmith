@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { TdeeChart, TdeeResults } from "@/components/Tdee";
 import { track } from "@/lib/analytics";
 import { ffmi, tanakaMax } from "@/lib/calculators";
+import { foodTargets } from "@/lib/foodTargets";
 import { date, inSentence, list, num, t } from "@/lib/i18n";
 import { useDesktop } from "@/lib/layout";
 import { allOneRms, dotsBand, dotsFromData } from "@/lib/onerm";
@@ -24,6 +25,7 @@ import {
   tdeeLog,
   type Activity,
 } from "@/lib/tdee";
+import { useCoachNotes } from "@/lib/trainer";
 import type { TdeeEvent, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -221,6 +223,9 @@ function TdeeScreen() {
   const now = useNow(60_000);
   const unit = profile.unit;
   const cur = useMemo(() => currentTdee(events, stats.sessions, profile, now), [events, stats.sessions, profile, now]);
+  const coach = useCoachNotes((x) => x.targets);
+  // The one set of food targets (foodTargets.ts): the protein shown here is the same number the notes and Macros use.
+  const food = useMemo(() => foodTargets(events, stats.sessions, profile, now, coach), [events, stats.sessions, profile, now, coach]);
   const history = useMemo(() => tdeeHistory(events), [events]);
   const log = useMemo(() => tdeeLog(events), [events]);
   // Sex, age, height and weight live in Your stats (BodyStats.tsx), the one place every tool reads them
@@ -344,7 +349,13 @@ function TdeeScreen() {
 
       <Section title={t("tdee.results")}>
         {cur.result ? (
-          <TdeeResults r={cur.result} activity={a.activity} />
+          <TdeeResults
+            r={cur.result}
+            activity={a.activity}
+            protein={{ g: food.protein, goal: inSentence(t(`calc.mac.goal.${food.goal}`)) }}
+            measured={cur.measured && cur.formulaResult ? { days: cur.measured.days, formula: cur.formulaResult.tdee } : undefined}
+            teen={food.teen}
+          />
         ) : (
           <p className="card p-4 text-muted">{t("tdee.missing", { items: list(cur.missing.map((m) => t(`tdee.missing.${m}`))) })}</p>
         )}

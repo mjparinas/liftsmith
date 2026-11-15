@@ -233,7 +233,12 @@ export const es: FeaturesText = {
     },
     food: {
       name: "Notas del entrenador desde tu app de comida",
-      body: "Las calorías y proteínas que registras en una app de comida llegan a Liftsmith a través de la app de salud del teléfono y se convierten en notas como «te falta proteína tres días seguidos». La app no registra comida.",
+      body: "Las calorías, proteínas, carbohidratos y grasas que registras en una app de comida llegan a Liftsmith a través de la app de salud del teléfono y se convierten en notas como «te falta proteína tres días seguidos», según un único conjunto de objetivos para tu meta. Registrar solo la proteína también cuenta. La app no registra comida.",
+    },
+    "measured-maintenance": {
+      name: "Mantenimiento medido con lo que comes",
+      body: "Dos semanas de comida y pesajes miden tus calorías diarias reales, que luego usan Macros, el GET y tus notas de comida. Una tarjeta de Comida en Cuerpo muestra tu semana frente a tus objetivos.",
+      note: "Los menores de 18 solo reciben consejos de proteína: sin objetivo de perder grasa ni notas de calorías.",
     },
     "your-stats": {
       name: "Tus datos personales",
@@ -348,7 +353,7 @@ export const es: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Objetivos de nutrición para clientes",
-      body: "Fija las calorías y la proteína diarias de cada cliente. Sus notas del entrenador comparan su semana de comida con ellas, y ves cómo come cuando lo comparte.",
+      body: "Fija las calorías, proteína, carbohidratos y grasa diarios de cada cliente, con otras calorías para los días de descanso si quieres, rellenados con sus propios datos en un toque. Sus notas del entrenador comparan su semana de comida con ellos, y ves cómo come cuando lo comparte.",
     },
     "school-teams": {
       name: "Gratis para equipos de secundaria",

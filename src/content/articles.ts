@@ -6,6 +6,7 @@
 import { BLOG_A } from "./blog/a";
 import { BLOG_AA } from "./blog/aa";
 import { BLOG_AB } from "./blog/ab";
+import { BLOG_AC } from "./blog/ac";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
 import { BLOG_D } from "./blog/d";
@@ -229,6 +230,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_Z,
   ...BLOG_AA,
   ...BLOG_AB,
+  ...BLOG_AC,
   ...BLOG_INVITES,
 ];
 

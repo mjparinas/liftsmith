@@ -234,7 +234,12 @@ export const it: FeaturesText = {
     },
     food: {
       name: "Note del coach dalla tua app di alimentazione",
-      body: "Calorie e proteine registrate in un’app di alimentazione arrivano a Liftsmith tramite l’app di salute del telefono e diventano note come «poche proteine tre giorni di fila». L’app non registra il cibo.",
+      body: "Calorie, proteine, carboidrati e grassi registrati in un’app di alimentazione arrivano a Liftsmith tramite l’app di salute del telefono e diventano note come «poche proteine tre giorni di fila», giudicate su un unico insieme di obiettivi per il tuo traguardo. Conta anche registrare solo le proteine. L’app non registra il cibo.",
+    },
+    "measured-maintenance": {
+      name: "Mantenimento misurato su quello che mangi",
+      body: "Due settimane di pasti e pesate misurano le tue vere calorie giornaliere, che poi usano Macro, il TDEE e le tue note sull’alimentazione. Una scheda Alimentazione in Corpo mostra la tua settimana rispetto ai tuoi obiettivi.",
+      note: "Sotto i 18 anni solo consigli sulle proteine: nessun obiettivo di perdita di grasso e nessuna nota sulle calorie.",
     },
     "your-stats": {
       name: "I tuoi dati",
@@ -346,7 +351,7 @@ export const it: FeaturesText = {
     },
     "coach-nutrition": {
       name: "Obiettivi nutrizionali per i clienti",
-      body: "Fissa calorie e proteine giornaliere per ogni cliente. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",
+      body: "Fissa calorie, proteine, carboidrati e grassi giornalieri di ogni cliente, con calorie diverse nei giorni di riposo se vuoi, compilati con i suoi dati in un tocco. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",
     },
     "school-teams": {
       name: "Gratis per le squadre delle superiori",

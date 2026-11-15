@@ -6,9 +6,12 @@
 // (`health`, imported by the store from health.ts readDaily), and the heart rate streams of workouts.
 // Sleep, HRV, resting HR and breathing rate also feed the readiness call, for Pro (healthExternal).
 import type { SessionSummary } from "./derive";
+import { foodGoal, proteinFor } from "./foodTargets";
 import { inSentence, list, t } from "./i18n";
+import { foodDays, underFuelled } from "./nutrition";
 import { healthSignals, type ExternalSignals } from "./readiness";
 import { ACTIVITY, bmiBand, currentKg, currentTdee } from "./tdee";
+import { isTeen } from "./teen";
 import type { AppEvent, HealthMetric, HrSeriesEvent, Profile, SetEvent } from "./types";
 import { fmtBodyweight, fmtNum, fromKg } from "./units";
 
@@ -124,8 +127,11 @@ const window30 = (series: readonly Point[], now: number) => series.filter((p) =>
 
 // --- What readiness counts (Pro) ---
 
-/** Sleep, HRV, resting HR and breathing rate for today's readiness call, from the last two days. */
-export function healthExternal(events: readonly AppEvent[], now: number): ExternalSignals {
+/**
+ * Sleep, HRV, resting HR and breathing rate for today's readiness call, from the last two days, and (with the
+ * profile, for maintenance) whether the last two days a food app logged were well under it.
+ */
+export function healthExternal(events: readonly AppEvent[], now: number, profile?: Profile): ExternalSignals {
   const out: ExternalSignals = {};
   const sleep = recent(readings(events, "sleep"), now, 0);
   if (sleep) out.sleepHours = sleep.value;
@@ -141,6 +147,12 @@ export function healthExternal(events: readonly AppEvent[], now: number): Extern
     brNow = recent(br, now, 1),
     brBase = baseline(br, now, 0);
   if (brNow && brBase) out.breathingDelta = brNow.value - brBase.mean;
+  if (profile) {
+    const days = foodDays(events, now, 7);
+    const sessions = events.flatMap((e) => (e.type === "sessionStart" ? [{ start: e.at }] : []));
+    if (days.length && underFuelled(days, currentTdee(events as AppEvent[], sessions, profile, now).result?.tdee, now))
+      out.underFuelled = true;
+  }
   return out;
 }
 
@@ -370,7 +382,7 @@ export function twin(input: TwinInput): TwinMetric[] {
         lw = t("twin.w.leanDown", {
           delta: dLeanText,
           weeks,
-          protein: tdee.result ? `${tdee.result.protein[0]}–${tdee.result.protein[1]} g` : t("twin.proteinPerKg"),
+          protein: `${proteinFor(currentKg(events, profile), foodGoal(profile, now))} g`,
         });
       }
       out.push({
@@ -442,12 +454,14 @@ export function twin(input: TwinInput): TwinMetric[] {
   if (tdee.result) {
     const r = tdee.result;
     const level = inSentence(ACTIVITY[tdee.activity.activity].label, true);
-    const from =
-      tdee.activity.source === "steps"
+    const from = tdee.measured
+      ? t("twin.from.measured", { days: tdee.measured.days })
+      : tdee.activity.source === "steps"
         ? t("twin.from.steps", { level })
         : tdee.activity.source === "workouts"
           ? t("twin.from.workouts", { level })
           : t("twin.from.level", { level });
+    const protein = proteinFor(currentKg(events, profile), foodGoal(profile, now));
     out.push({
       id: "tdee",
       label: t("twin.l.tdee"),
@@ -455,7 +469,10 @@ export function twin(input: TwinInput): TwinMetric[] {
       value: r.tdee,
       status: "info",
       chip: t("twin.c.aDay"),
-      why: t("twin.w.tdee", { from, cut: kcal(r.cut), bulk: kcal(r.bulk), low: r.protein[0], high: r.protein[1] }),
+      // Under-18s get no fat-loss number (food-from-health.md "Teens").
+      why: isTeen(profile, now)
+        ? t("twin.w.tdeeTeen", { from, protein })
+        : t("twin.w.tdee", { from, cut: kcal(r.cut), bulk: kcal(r.bulk), protein }),
       action: { kind: "route", route: "tools/tdee", label: t("twin.a.tdee") },
       series: [],
       source: "app",

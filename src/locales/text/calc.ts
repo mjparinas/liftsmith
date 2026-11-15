@@ -144,6 +144,8 @@ export const en = {
   "calc.itv.say.work": "Work, round {round} of {rounds}",
   "calc.itv.say.rest": "Rest",
   "calc.itv.say.done": "Done. Nice work.",
+  "calc.mac.why.coach": "Set by {name}, your coach.",
+  "calc.mac.why.measured": "Maintenance is measured from {days} days of your own food and weigh-ins.",
 } as const;
 
 type Key = keyof typeof en;
@@ -296,6 +298,8 @@ export const es: Partial<Record<Key, Message>> = {
   "calc.itv.say.work": "Trabajo, ronda {round} de {rounds}",
   "calc.itv.say.rest": "Descanso",
   "calc.itv.say.done": "Hecho. Buen trabajo.",
+  "calc.mac.why.coach": "Lo fijó {name}, tu entrenador.",
+  "calc.mac.why.measured": "El mantenimiento se mide con {days} días de tu propia comida y tus pesajes.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -446,6 +450,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "calc.itv.say.work": "Effort, tour {round} sur {rounds}",
   "calc.itv.say.rest": "Repos",
   "calc.itv.say.done": "Terminé. Beau travail.",
+  "calc.mac.why.coach": "Fixé par {name}, votre coach.",
+  "calc.mac.why.measured": "Le maintien est mesuré sur {days} jours de vos propres repas et pesées.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -593,6 +599,8 @@ export const de: Partial<Record<Key, Message>> = {
   "calc.itv.say.work": "Belastung, Runde {round} von {rounds}",
   "calc.itv.say.rest": "Pause",
   "calc.itv.say.done": "Fertig. Stark gemacht.",
+  "calc.mac.why.coach": "Von {name} festgelegt, deinem Coach.",
+  "calc.mac.why.measured": "Der Erhaltungsbedarf ist aus {days} Tagen deiner eigenen Ernährung und Wiegungen gemessen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -741,6 +749,8 @@ export const it: Partial<Record<Key, Message>> = {
   "calc.itv.say.work": "Lavoro, round {round} di {rounds}",
   "calc.itv.say.rest": "Recupero",
   "calc.itv.say.done": "Fatto. Ottimo lavoro.",
+  "calc.mac.why.coach": "Fissato da {name}, il tuo coach.",
+  "calc.mac.why.measured": "Il mantenimento è misurato su {days} giorni dei tuoi pasti e delle tue pesate.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -881,4 +891,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "calc.itv.say.work": "運動、ラウンド{round}/{rounds}",
   "calc.itv.say.rest": "休憩",
   "calc.itv.say.done": "終了。お疲れさまでした。",
+  "calc.mac.why.coach": "コーチの{name}が設定しました。",
+  "calc.mac.why.measured": "維持カロリーは、あなた自身の{days}日分の食事と体重記録から測っています。",
 };

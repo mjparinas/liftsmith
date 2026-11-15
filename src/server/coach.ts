@@ -40,9 +40,11 @@ export const COACH_LIMITS = {
   quietMs: 7 * 86_400_000,
   /** How far back a coach sees a sharing client's food days. */
   foodMs: 30 * 86_400_000,
-  /** The range a coach can set for daily calories and grams of protein. */
+  /** The range a coach can set for daily calories and grams of protein, carbs and fat. */
   kcal: [800, 6000] as const,
   protein: [30, 400] as const,
+  carbs: [20, 900] as const,
+  fat: [15, 300] as const,
 };
 
 /** No 0/O or 1/I, so a code read aloud or off a screen is typed right: 32 letters, 8 of them (40 bits). */
@@ -509,7 +511,7 @@ const NOTES_KEEP: Record<string, readonly string[]> = {
 // Readiness and recovery: the check-in on Today, and Health readings (sleep, HRV, resting heart rate, steps, VO2 max,
 // breathing). Calories and protein eaten are food, shared with body data (bodyOf), never here.
 const HEALTH_KEEP: Record<string, readonly string[]> = { feel: ["energy", "sore", "unwell"], health: ["metric", "day", "value"] };
-const FOOD_METRICS = new Set(["kcalIn", "protein"]);
+const FOOD_METRICS = new Set(["kcalIn", "protein", "carbs", "fat"]);
 // Cycle: the days a period started (cycle-aware readiness).
 const CYCLE_KEEP: Record<string, readonly string[]> = { cycle: ["day"] };
 
@@ -549,6 +551,11 @@ export interface ClientView {
   shares: ShareKind[];
   /** This coach's daily nutrition targets for the client, if any. */
   targets: Targets | null;
+  /**
+   * The client is under 18 by their profile: the coach can set protein only, never calories, carbs or fat
+   * (docs/decisions/food-from-health.md "Teens").
+   */
+  teen: boolean;
 }
 
 /** What a client shares when they turn on body data for a coach: enough to shape the 3D figure and see the trend. */
@@ -559,8 +566,8 @@ export interface BodyShare {
   weights: { at: number; kg: number; bodyFat?: number }[];
   /** Tape measurements in the last year, oldest first. */
   measures: { at: number; site: string; cm: number }[];
-  /** Calories and protein from the client's food app (through Health) for each of the last 30 days, oldest first. */
-  food?: { day: string; kcal?: number; protein?: number }[];
+  /** Calories, protein, carbs and fat from the client's food app (through Health) for each of the last 30 days, oldest first. */
+  food?: { day: string; kcal?: number; protein?: number; carbs?: number; fat?: number }[];
 }
 
 /** A client's training for their coach, or null when they aren't this coach's client (any more). */
@@ -592,6 +599,7 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
   } catch {
     /* no profile yet */
   }
+  const teen = teenProfile(p?.body, now);
   const plans = await query<PlanRow>("SELECT * FROM coach_plans WHERE coach_id = ? AND client_id = ? ORDER BY created_at DESC", [
     coachId,
     clientId,
@@ -607,7 +615,18 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     pain,
     shares: SHARE_KINDS.filter((k) => shares[k]),
     targets: (await targetsFor(clientId, coachId))[0] ?? null,
+    teen,
   };
+}
+
+/** Under 18 by a synced profile's birth year (teen.ts isTeen, read on the server). Unknown age counts as an adult. */
+export function teenProfile(body: unknown, now: number): boolean {
+  try {
+    const y = (JSON.parse(String(body ?? "{}")) as { birthYear?: unknown }).birthYear;
+    return typeof y === "number" && y > 1900 && new Date(now).getFullYear() - y < 18;
+  } catch {
+    return false;
+  }
 }
 
 // ---------- Body data, shared by the client's choice (2026-11-12) ----------
@@ -677,12 +696,13 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
   const rows = await query<{ body: string }>(
     `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND at >= ?
        AND (body LIKE '%"type":"bodyweight"%' OR body LIKE '%"type":"measure"%'
-         OR (at >= ? AND (body LIKE '%"metric":"kcalIn"%' OR body LIKE '%"metric":"protein"%'))) ORDER BY at`,
+         OR (at >= ? AND (body LIKE '%"metric":"kcalIn"%' OR body LIKE '%"metric":"protein"%'
+           OR body LIKE '%"metric":"carbs"%' OR body LIKE '%"metric":"fat"%'))) ORDER BY at`,
     [clientId, now - COACH_LIMITS.historyMs, now - COACH_LIMITS.foodMs],
   );
   const weights: BodyShare["weights"] = [];
   const measures: BodyShare["measures"] = [];
-  const food = new Map<string, { day: string; kcal?: number; protein?: number }>();
+  const food = new Map<string, { day: string; kcal?: number; protein?: number; carbs?: number; fat?: number }>();
   for (const r of rows) {
     let e: Record<string, unknown>;
     try {
@@ -708,6 +728,12 @@ async function bodyOf(clientId: string, profileBody: string, now: number): Promi
       } else if (e.metric === "protein") {
         const v = num(e.value, 0, 1_000);
         if (v !== null) d.protein = Math.round(v);
+      } else if (e.metric === "carbs") {
+        const v = num(e.value, 0, 1_500);
+        if (v !== null) d.carbs = Math.round(v);
+      } else if (e.metric === "fat") {
+        const v = num(e.value, 0, 600);
+        if (v !== null) d.fat = Math.round(v);
       }
       food.set(e.day, d);
     }
@@ -730,45 +756,79 @@ export interface Targets {
   kcal: number | null;
   /** Grams of protein a day. */
   protein: number | null;
+  /** Grams of carbs and fat a day (2026-11-15). */
+  carbs: number | null;
+  fat: number | null;
+  /** Calories on days without a workout; empty means the same as `kcal` (2026-11-15). */
+  kcalRest: number | null;
   at: number;
 }
-type TargetRow = { coach_id: string; client_id: string; kcal: number | null; protein: number | null; updated_at: number };
+type TargetRow = {
+  coach_id: string;
+  client_id: string;
+  kcal: number | null;
+  protein: number | null;
+  carbs?: number | null;
+  fat?: number | null;
+  kcal_rest?: number | null;
+  updated_at: number;
+};
+const orNull = (x: unknown) => (x == null ? null : Number(x));
 const targets = (r: TargetRow): Targets => ({
   coachId: String(r.coach_id),
   clientId: String(r.client_id),
-  kcal: r.kcal == null ? null : Number(r.kcal),
-  protein: r.protein == null ? null : Number(r.protein),
+  kcal: orNull(r.kcal),
+  protein: orNull(r.protein),
+  carbs: orNull(r.carbs),
+  fat: orNull(r.fat),
+  kcalRest: orNull(r.kcal_rest),
   at: Number(r.updated_at),
 });
+
+/** What a coach can set: any of these, each optional. */
+export interface TargetInput {
+  kcal?: unknown;
+  protein?: unknown;
+  carbs?: unknown;
+  fat?: unknown;
+  kcalRest?: unknown;
+}
 
 /** A whole number in range, or null for anything else (empty, junk or out of range). */
 const target = (x: unknown, [lo, hi]: readonly [number, number]) =>
   typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi ? Math.round(x) : null;
 
 /**
- * The coach sets (or, with both empty, clears) a client's daily calories and protein. Only for the coach's own
- * clients; a number outside the range is left empty rather than refused.
+ * The coach sets (or, with all empty, clears) a client's daily calories (training days, and optionally rest days),
+ * protein, carbs and fat. Only for the coach's own clients; a number outside the range is left empty rather than
+ * refused. For a client under 18 only protein is kept: no calorie, carb or fat targets for teens (2026-11-15).
  */
 export async function setTargets(
   coachId: string,
   clientId: unknown,
-  kcal: unknown,
-  protein: unknown,
+  input: TargetInput,
   now = Date.now(),
 ): Promise<Targets | null | { error: "notClient" }> {
   if (!isAccountId(clientId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
-  const k = target(kcal, COACH_LIMITS.kcal);
-  const p = target(protein, COACH_LIMITS.protein);
-  if (k === null && p === null) {
+  const [p0] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [clientId]);
+  const teen = teenProfile(p0?.body, now);
+  const k = teen ? null : target(input.kcal, COACH_LIMITS.kcal);
+  const p = target(input.protein, COACH_LIMITS.protein);
+  const c = teen ? null : target(input.carbs, COACH_LIMITS.carbs);
+  const f = teen ? null : target(input.fat, COACH_LIMITS.fat);
+  // A rest-day number only makes sense beside a training-day one.
+  const kr = k === null ? null : target(input.kcalRest, COACH_LIMITS.kcal);
+  if (k === null && p === null && c === null && f === null) {
     await run("DELETE FROM coach_targets WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
     return null;
   }
   await run(
-    `INSERT INTO coach_targets (coach_id, client_id, kcal, protein, updated_at) VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT (coach_id, client_id) DO UPDATE SET kcal = excluded.kcal, protein = excluded.protein, updated_at = excluded.updated_at`,
-    [coachId, clientId, k, p, now],
+    `INSERT INTO coach_targets (coach_id, client_id, kcal, protein, carbs, fat, kcal_rest, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT (coach_id, client_id) DO UPDATE SET kcal = excluded.kcal, protein = excluded.protein, carbs = excluded.carbs,
+       fat = excluded.fat, kcal_rest = excluded.kcal_rest, updated_at = excluded.updated_at`,
+    [coachId, clientId, k, p, c, f, kr, now],
   );
-  return { coachId, clientId, kcal: k, protein: p, at: now };
+  return { coachId, clientId, kcal: k, protein: p, carbs: c, fat: f, kcalRest: kr, at: now };
 }
 
 /** A client's targets from their coaches, newest first (or from one coach). */
