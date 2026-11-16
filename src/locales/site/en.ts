@@ -156,13 +156,13 @@ export const en: SiteText = {
         {
           eyebrow: "Recovery map",
           title: "See which muscles are ready before you train them",
-          body: "Each set adds fatigue to the muscles it works, and it fades over two to three days depending on the muscle. The front and back body map shows every muscle as Fresh, Ready, Recovering or Fatigued, and the plan steers clear of what isn't ready.",
+          body: "Each set adds fatigue to the muscles it works, and it fades over two to three days depending on the muscle. The 3D body map, which you can turn to see front or back, shows every muscle as Fresh, Ready, Recovering or Fatigued, and the plan steers clear of what isn't ready.",
           points: [
             "Colour plus a label and a percentage for every muscle",
             "Weekly sets per muscle against a growth target",
             "No reward, ever, for training a fatigued muscle",
           ],
-          alt: "The recovery map: front and back body views coloured by recovery, with a legend for Fresh, Ready, Recovering and Fatigued",
+          alt: "The recovery map: a 3D body with each muscle glowing in its recovery colour, with a legend for Fresh, Ready, Recovering and Fatigued",
           cta: "Check your recovery",
         },
         {

@@ -161,13 +161,13 @@ export const es: SiteText = {
         {
           eyebrow: "Mapa de recuperación",
           title: "Mira qué músculos están listos antes de entrenarlos",
-          body: "Cada serie suma fatiga a los músculos que trabaja, y se va en dos o tres días según el músculo. El mapa del cuerpo, por delante y por detrás, muestra cada músculo como Fresco, Listo, Recuperándose o Fatigado, y el plan evita lo que aún no está listo.",
+          body: "Cada serie suma fatiga a los músculos que trabaja, y se va en dos o tres días según el músculo. El mapa del cuerpo en 3D, que puedes girar para verlo por delante o por detrás, muestra cada músculo como Fresco, Listo, Recuperándose o Fatigado, y el plan evita lo que aún no está listo.",
           points: [
             "Color más una etiqueta y un porcentaje para cada músculo",
             "Series semanales por músculo frente a un objetivo de crecimiento",
             "Nunca hay premio por entrenar un músculo fatigado",
           ],
-          alt: "El mapa de recuperación: el cuerpo por delante y por detrás coloreado según la recuperación, con una leyenda de Fresco, Listo, Recuperándose y Fatigado",
+          alt: "El mapa de recuperación: un cuerpo en 3D con cada músculo iluminado en el color de su recuperación, con una leyenda de Fresco, Listo, Recuperándose y Fatigado",
           cta: "Ver tu recuperación",
         },
         {
