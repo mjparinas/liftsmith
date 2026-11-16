@@ -186,6 +186,7 @@ Melvin asked for "taking client payments, through Stripe Connect" in the same ro
 - **Ending**: unlinking ends the pair's monthly plan at once and forgets its price and history; deleting an account ends every plan it pays or is paid. Payments already made stay in the coach's Stripe account.
 - **Hidden until set up**: with `STRIPE_SECRET_KEY` and `STRIPE_CONNECT_WEBHOOK_SECRET` both set, payments show; until then nothing about them shows anywhere. Product names on Stripe's page are in English for now ("Training session with Sam").
 - Analytics: `feature` `trainer` with `payOnboard`, `payDashboard`, `price`, `unprice`, `payCheckout` and `payStop`.
+- **Programs** (2026-11-15): coaches also sell programs through the same Stripe account, on the website only. See [Coaches' programs](coach-programs.md).
 
 ## Ratings and reviews (2026-11-15)
 

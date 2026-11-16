@@ -478,6 +478,12 @@ export const tr: FeaturesText = {
       body: "Bilgisayarda koç sohbeti, bir mesajlaşma uygulaması gibi sağ altta bir panelde durur: mesaj atabileceğin herkes, katlanabilen en fazla iki sohbet penceresi, mesaj gelince bir ses ve sekmede bir sayaç. İki taraf da bir durum seçer (çevrimiçi, danışanla, antrenmanda, uzakta, rahatsız etmeyin, tatilde ya da çevrimdışı görün), karşı tarafın ne zaman yazdığını ve mesajını ne zaman gördüğünü görür, emoji ve spor salonu çıkartmaları gönderir; telefonda da.",
       proPart: "Danışan olmak ücretsiz; danışan çalıştırmak Pro.",
     },
+    "coach-programs": {
+      name: "Koç programları",
+      body: "Koçlar ve kişisel antrenörler rutinlerini seviye, hedef ve kaç hafta uygulanacağıyla birlikte ücretsiz ya da ücretli bir programa dönüştürür ve bağlantısını paylaşır. Günlerini tek dokunuşla rutinlerine kaydedersin, ağırlıkları kendi ilerlemen belirler. Ücretli programların ödemesi koçun kendi Stripe hesabına gider.",
+      note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
+      proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
+    },
     "coach-reviews": {
       name: "Gerçek danışanlardan puanlar ve değerlendirmeler",
       body: "Danışanlar, dört hafta ya da birlikte iki seanstan sonra koçlarını, kişisel antrenörlerini ya da fizyoterapistlerini yıldızla ve kısa bir değerlendirmeyle puanlar. Puan, koçun üç değerlendirmesi olunca görünür; yanında son iki haftada danışanlarından kaçının antrenman yaptığı yer alır, davetinde ve antrenör dizininde. Koçlar her birine bir kez yanıt verir ve herkes bir değerlendirmeyi bildirebilir. Yalnızca yetişkinler değerlendirme bırakabilir.",

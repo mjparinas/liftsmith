@@ -81,6 +81,26 @@ describe("a gym's page", () => {
     expect(gymHtml(p, [], "en")).toContain('content="noindex"');
   });
 
+  it("keeps a gym with nothing of its own out of search until it gets a detail, a lifter or an owner", async () => {
+    // A name and an address from the map, nothing else: the pages Search Console left "Crawled - currently not indexed".
+    await savePlaces(
+      placesFromOsm([{ type: "node", id: 9, lat: 49.1, lon: -122.66, tags: { leisure: "fitness_centre", name: "Bare Gym" } }], {
+        city: "Langley",
+        region: "BC",
+        country: "CA",
+      }),
+      NOW,
+    );
+    const bare = async () => gymHtml((await placeBySlug("langley-bc", "bare-gym"))!, [], "en");
+    expect(await bare()).toContain('content="noindex"');
+    expect(gymSitemapXml(await sitemapGyms())).not.toContain("bare-gym");
+    for (const set of ["phone = '+1 604 555 0100'", "lifters = 1", "claimed_by = 'acc-owner'"]) {
+      await run(`UPDATE gym_places SET phone = '', lifters = 0, claimed_by = '', ${set} WHERE slug = 'bare-gym'`);
+      expect(await bare()).not.toContain('content="noindex"');
+      expect(gymSitemapXml(await sitemapGyms())).toContain("/gyms/langley-bc/bare-gym/");
+    }
+  });
+
   it("lays out opening hours by weekday, or as written when it can't read them", () => {
     const html = hoursHtml("Mo-Fr 05:00-23:00; Sa off", "en");
     expect(html).toContain("<dt>Monday</dt><dd>05:00–23:00</dd>");

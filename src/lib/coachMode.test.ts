@@ -19,8 +19,8 @@ describe("which coaching pages a lifter sees", () => {
 
   it("a coach gets a page per job, payments only once the server takes them", () => {
     const mode = coachingMode({ ...NONE, coach: true }, NO_TEAMS);
-    expect(coachTabs(mode, false)).toEqual(["clients", "messages", "schedule", "checkins", "setup"]);
-    expect(coachTabs(mode, true)).toEqual(["clients", "messages", "schedule", "checkins", "pay", "setup"]);
+    expect(coachTabs(mode, false)).toEqual(["clients", "messages", "schedule", "checkins", "programs", "setup"]);
+    expect(coachTabs(mode, true)).toEqual(["clients", "messages", "schedule", "checkins", "programs", "pay", "setup"]);
     expect(coachingView(mode, false, "schedule")).toMatchObject({ kind: "coach", tab: "schedule" });
     // A page that isn't theirs falls back to the first one.
     expect(coachingView(mode, false, "teams")).toMatchObject({ kind: "coach", tab: "clients" });

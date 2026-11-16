@@ -403,6 +403,12 @@ export const es: FeaturesText = {
       body: "En el ordenador, el chat con tu entrenador vive en un panel abajo a la derecha, como un mensajero: todas las personas con las que puedes hablar, hasta dos ventanas que se pliegan, y un sonido y un contador en la pestaña cuando llega un mensaje. Los dos lados ponen un estado (en línea, con un cliente, entrenando, ausente, no molestar, de vacaciones o aparecer desconectado), ven cuándo el otro escribe y cuándo ha visto tu mensaje, y envían emojis y stickers de gimnasio, también en el teléfono.",
       proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
     },
+    "coach-programs": {
+      name: "Programas de entrenadores",
+      body: "Los entrenadores y entrenadores personales convierten sus rutinas en un programa, con nivel, objetivo y cuántas semanas seguirlo, gratis o con precio, y comparten su enlace. Guardas sus días en tus rutinas con un toque y tu propia progresión elige los pesos. Los programas de pago se pagan al entrenador a través de su propia cuenta de Stripe.",
+      note: "Los programas de pago se compran en la web; las apps de Android e iPhone muestran los programas gratis y los que ya tienes.",
+      proPart: "Conseguir programas es gratis; crearlos forma parte del coaching, que es Pro.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",

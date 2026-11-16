@@ -1158,6 +1158,35 @@ const SCHEMA = [
     PRIMARY KEY (coach_id, client_id)
   )`,
   "CREATE INDEX IF NOT EXISTS coach_reviews_client ON coach_reviews (client_id)",
+  // Coaches sell programs (coachPrograms.ts, docs/decisions/coach-programs.md): a coach's program (its days are
+  // routine codes) and who has each one (bought on the web, or got free). A refund removes the owner row.
+  `CREATE TABLE IF NOT EXISTS coach_programs (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    about TEXT NOT NULL,
+    level TEXT NOT NULL,
+    goal TEXT NOT NULL,
+    weeks INTEGER NOT NULL,
+    days TEXT NOT NULL,
+    price REAL NOT NULL,
+    currency TEXT NOT NULL,
+    listed INTEGER NOT NULL DEFAULT 1,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_programs_coach ON coach_programs (coach_id)",
+  "CREATE INDEX IF NOT EXISTS coach_programs_listed ON coach_programs (listed, hidden, updated_at)",
+  `CREATE TABLE IF NOT EXISTS program_owners (
+    program_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    payment_id TEXT,
+    PRIMARY KEY (program_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS program_owners_account ON program_owners (account_id)",
+  "CREATE INDEX IF NOT EXISTS program_owners_payment ON program_owners (payment_id)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (

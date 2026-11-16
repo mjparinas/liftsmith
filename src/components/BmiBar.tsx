@@ -59,7 +59,7 @@ export function BmiBar({
       <div role="img" aria-label={t("bmi.where", { bmi: num(bmi), band })} className="keep-colours relative mt-2 pt-3">
         {/* The marker: a small pointer above the bar and a line through it, in the ink colour. */}
         <span aria-hidden className="absolute top-0 -translate-x-1/2" style={{ left: `${at}%` }}>
-          <svg width="12" height="9" viewBox="0 0 12 9" className="block">
+          <svg width="12" height="9" viewBox="0 0 12 9" className="block" aria-hidden>
             <path d="M0 0h12L6 8z" fill="var(--color-ink)" />
           </svg>
         </span>

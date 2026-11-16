@@ -14,7 +14,7 @@ export function Mascot({ mood = "happy", size = 96, className = "" }: { mood?: M
   const id = useId().replace(/:/g, "");
   return (
     <span className={`inline-block ${className}`} style={{ width: size, height: size }} aria-hidden data-mascot={mood}>
-      <svg width={size} height={size} viewBox="0 0 100 100" className="animate-bob overflow-visible">
+      <svg width={size} height={size} viewBox="0 0 100 100" className="animate-bob overflow-visible" aria-hidden>
         <defs>
           <linearGradient id={`m${id}`} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" style={{ stopColor: "var(--grad-a)" }} />

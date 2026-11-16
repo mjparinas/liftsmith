@@ -7,6 +7,7 @@ import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node
 import { accessFor, type Access } from "./access";
 import { coachCleanup } from "./coach";
 import { forgetCoachPay } from "./coachPay";
+import { programCleanup } from "./coachPrograms";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { earnedDeletes } from "./earnedPro";
@@ -294,6 +295,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
     ...socialDeletes(accountId),
     ...coachCleanup(accountId),
+    ...programCleanup(accountId),
     ...earnedDeletes(accountId),
     ...teamDeletes(accountId),
     ...gymDeletes(accountId),
