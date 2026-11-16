@@ -8,7 +8,6 @@
 // Claimed gyms are left as their owner set them.
 import { query, run } from "./db";
 import { badCity, cityName, tidyAddress } from "./gymAddress";
-import { areaCity } from "./gymImport";
 import { citySlugOf, moveToCity, UA } from "./gymPlaces";
 
 export const REPAIR_LIMITS = {
@@ -79,7 +78,10 @@ export async function reverseCity(lat: number, lon: number, fetcher: typeof fetc
   }).catch(() => null);
   if (!r?.ok) return "";
   const j = (await r.json().catch(() => null)) as { name?: string; address?: Record<string, string> } | null;
-  return j ? areaCity(j.address ?? {}, j.name, "") : "";
+  if (!j) return "";
+  // The map's own city, town or village, else the name it found; a postcode area or house number is never a city.
+  const a = j.address ?? {};
+  return cityName(a.city ?? a.town ?? a.village ?? a.municipality) || cityName(j.name);
 }
 
 /** How many gyms look wrong right now: a city that isn't one, or a page filed under a city it no longer has. */

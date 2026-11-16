@@ -11,7 +11,8 @@
 //
 // A claimed gym is never touched (its owner keeps its details), a field already set is never replaced, and every gym
 // read is stamped (`enriched_at`), so a run picks up where the last one stopped and a site is read again at most once
-// a month.
+// a month. It runs as the import job's second step (gymImportJobs.ts, `enrichBatch`), walking the `gym_places_web`
+// index; what it can't find goes to the AI step (gymAutoFill.ts).
 import { randomBytes } from "node:crypto";
 
 import { DAYS, formatHours, type Week } from "@/lib/openingHours";
@@ -323,16 +324,19 @@ export function pickAddress(found: Found[], near: Near): { address: string; post
 
 /** What a gym's home page says about it. `site` is the page's address, for checking an email's domain; `near` is
  * where the map has the gym, for checking an address. */
+/** An email address only when it's on the gym's own domain (never the web designer's in the footer), else ''. */
+export function siteEmail(e: string, site: string): string {
+  const domain = hostOf(site);
+  const v = cleanEmail(e);
+  if (!v || !domain) return "";
+  const at = v.split("@")[1]!;
+  return at === domain || at.endsWith(`.${domain}`) || domain.endsWith(`.${at}`) ? v : "";
+}
+
 export function detailsFromHtml(html: string, site: string, near: Near = {}): SiteDetails {
   const out = { ...EMPTY };
-  const domain = hostOf(site);
   const addresses: Found[] = [];
-  const ownEmail = (e: string) => {
-    const v = cleanEmail(decode(e));
-    if (!v || !domain) return "";
-    const at = v.split("@")[1]!;
-    return at === domain || at.endsWith(`.${domain}`) || domain.endsWith(`.${at}`) ? v : "";
-  };
+  const ownEmail = (e: string) => siteEmail(decode(e), site);
   for (const o of jsonLd(html)) {
     if (!BUSINESS.test(typeOf(o))) continue;
     out.phone ||= clean(str(o.telephone), 40);
@@ -568,26 +572,33 @@ async function readSite(
   return done(filled, filled.length ? "" : "nothing new on the page", set);
 }
 
-// --- A batch, for Admin › Gyms ---
+// --- A batch, for the import job ---
 
 export interface EnrichBatch {
   done: EnrichOne[];
-  /** Gyms still waiting for a read. */
-  left: number;
+  /** Gyms that had everything already, stamped without reading their site. */
+  complete: number;
+  /** Whether more gyms are due (the batch was full). */
+  more: boolean;
 }
 
 const NO_ICON = `NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = gym_places.id AND m.kind IN ('logo', 'icon'))`;
-const WAITING = `FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at < ?
-  AND (phone = '' OR email = '' OR hours = '' OR postcode = '' OR address = '' OR instagram = '' OR facebook = '' OR ${NO_ICON})`;
+/**
+ * Gyms due a read, oldest read first, through the partial index gym_places_web (its WHERE repeated here, so the query
+ * walks the index instead of the whole table; Turso bills every row read). A gym that has everything is stamped
+ * without a visit, so it isn't read again for a month either.
+ */
+const DUE = `FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at < ?`;
+export const ENRICH_DUE_SQL = `SELECT id ${DUE} ORDER BY enriched_at LIMIT ?`;
 
-/** Reads the next batch of gyms that have a website and miss something, several sites at once. */
-export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now()): Promise<EnrichBatch> {
+/** Reads the next batch of gyms that have a website, several sites at once, and fills what each is missing. */
+export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(), size = ENRICH_LIMITS.batch): Promise<EnrichBatch> {
   const since = now - ENRICH_LIMITS.againMs;
   const rows = await query(
-    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, city, region, country, lat, lon, ${NO_ICON} AS no_icon ${WAITING} ORDER BY lifters DESC, enriched_at LIMIT ?`,
-    [since, ENRICH_LIMITS.batch],
+    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, city, region, country, lat, lon, ${NO_ICON} AS no_icon ${DUE} ORDER BY enriched_at LIMIT ?`,
+    [since, size],
   );
-  const gyms = rows.map((r) => ({
+  const all = rows.map((r) => ({
     id: String(r.id),
     name: String(r.name),
     website: String(r.website),
@@ -607,6 +618,15 @@ export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(
       lon: Number(r.lon),
     },
   }));
+  const missing = (g: (typeof all)[number]) =>
+    !g.hasIcon || (["phone", "email", "hours", "address", "postcode", "instagram", "facebook"] as const).some((k) => !g[k]);
+  const complete = all.filter((g) => !missing(g));
+  if (complete.length)
+    await run(`UPDATE gym_places SET enriched_at = ? WHERE id IN (${complete.map(() => "?").join(",")}) AND claimed_by = ''`, [
+      now,
+      ...complete.map((g) => g.id),
+    ]);
+  const gyms = all.filter(missing);
   const done: EnrichOne[] = [];
   let next = 0;
   await Promise.all(
@@ -617,6 +637,5 @@ export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(
       }
     }),
   );
-  const [left] = await query<{ n: number }>(`SELECT COUNT(*) AS n ${WAITING}`, [since]);
-  return { done, left: Number(left?.n ?? 0) };
+  return { done, complete: complete.length, more: rows.length === size };
 }

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
-import type { ImportResult } from "./gymImport";
+import { SINCE_KEY, type ImportResult } from "./gymImport";
 import {
   createJob,
   dismissJob,
@@ -10,9 +10,10 @@ import {
   jobLog,
   jobStatus,
   kickWorker,
-  placesFor,
   RETRY_AFTER_MS,
   runWorker,
+  startDaily,
+  startWorld,
   stopJob,
   unfinishedPlaces,
 } from "./gymImportJobs";
@@ -42,6 +43,12 @@ const busy = (where: string): ImportResult => ({
 const nowhere: ImportResult = { ok: false, id: "x", error: "where", detail: "Nominatim found no place by that name.", ms: 10, log: [] };
 
 const quick = { sleep: async () => undefined, staggerMs: 0, mail: null };
+/** The steps after the map, doing nothing, for tests about the map step. */
+const noSteps = {
+  enrich: async () => ({ done: [], complete: 0, more: false }),
+  autoFill: async () => ({ done: [], more: false, stopped: "" }),
+  tidy: async () => ({ checked: 0, next: "", cities: 0, addresses: 0, moved: 0, unsure: 0, changes: [] }),
+};
 const later = () => Date.now() + JOB_LIMITS.runMs;
 
 beforeEach(async () => {
@@ -109,8 +116,8 @@ describe("gym imports on the server", () => {
     expect(s.failed).toHaveLength(1);
     expect(s.failed[0]!.r).toMatchObject({ ok: false, detail: "overpass-api.de: HTTP 504 (server busy)" });
     const log = (await jobLog(s.id))!;
-    expect(log.cities[0]!.tries).toBe(1 + RETRY_AFTER_MS.length);
-    expect(log.cities[0]!.triedAgain).toHaveLength(RETRY_AFTER_MS.length);
+    expect(log.items[0]!.tries).toBe(1 + RETRY_AFTER_MS.length);
+    expect(log.items[0]!.triedAgain).toHaveLength(RETRY_AFTER_MS.length);
   });
 
   it("waits inside the worker for a city whose pause ends in its time", async () => {
@@ -135,7 +142,7 @@ describe("gym imports on the server", () => {
     await createJob({ label: "Canada", places: ["Nowhere, ZZ"], startedBy: "", notify: false });
     const r = await runWorker({ ...quick, importer: async () => nowhere });
     expect(r.finished).toBe(true);
-    expect((await jobStatus())!.failed[0]!.r).toMatchObject({ ok: false, error: "That place wasn't found." });
+    expect((await jobStatus())!.failed[0]!.r).toMatchObject({ ok: false, error: "That place wasn't found on the map." });
   });
 
   it("hands over when its time is up, and the next worker carries on", async () => {
@@ -166,7 +173,7 @@ describe("gym imports on the server", () => {
     await run("UPDATE gym_import_jobs SET lease_until = ?", [Date.now() - 1]);
     const r = await runWorker({ ...quick, importer: async (w) => ok(w) });
     expect(r).toMatchObject({ imported: 1, finished: true });
-    expect((await jobLog((await jobStatus())!.id))!.cities[0]!.tries).toBe(1);
+    expect((await jobLog((await jobStatus())!.id))!.items[0]!.tries).toBe(1);
   });
 
   it("stops: nothing new starts, and Retry gets the cities it didn't reach", async () => {
@@ -196,8 +203,9 @@ describe("gym imports on the server", () => {
     const mail = async (to: string, subject: string, text: string) => (sent.push({ to, subject, text }), true);
     await runWorker({ ...quick, mail, importer: async (w) => (w.startsWith("Nowhere") ? nowhere : ok(w)) });
     expect(sent).toHaveLength(1);
-    expect(sent[0]).toMatchObject({ to: "a@x.com", subject: "Gym import done: Canada, 1 of 2 cities, 1 failed" });
-    expect(sent[0]!.text).toContain("Nowhere, ZZ: That place wasn't found.");
+    expect(sent[0]).toMatchObject({ to: "a@x.com", subject: "Gym import done: Canada, 2 new gyms, 1 areas failed" });
+    expect(sent[0]!.text).toContain("Nowhere, ZZ: That place wasn't found on the map.");
+    expect(sent[0]!.text).toContain("Websites: 0 read");
     expect(sent[0]!.text).toContain("/admin/?tab=Gyms");
     expect(await emailDone((await jobStatus())!.id, mail)).toBe(false);
   });
@@ -209,13 +217,85 @@ describe("gym imports on the server", () => {
     expect(sent).toEqual([]);
   });
 
-  it("skips cities imported cleanly in the last 7 days", async () => {
-    await run(
-      "INSERT INTO gym_imports (id, query, area, scope, ok, error, found, added, updated, unchanged, kept, server, ms, log, attempts, at) VALUES ('i', 'delta, bc', 'Delta, BC', '', 1, '', 0, 0, 0, 0, 0, '', 0, '', '', ?)",
-      [Date.now() - 86_400_000],
-    );
-    expect(await placesFor(["Langley, BC", "Delta, BC"], true)).toEqual({ todo: ["Langley, BC"], skipped: 1 });
-    expect(await placesFor(["Langley, BC", "Delta, BC"], false)).toEqual({ todo: ["Langley, BC", "Delta, BC"], skipped: 0 });
+  it("adds a country's regions to the job as it splits", async () => {
+    await startWorld("a@x.com", false);
+    const s0 = (await jobStatus())!;
+    expect(s0).toMatchObject({ kind: "world", phase: "map", label: "every gym in the world" });
+    expect(s0.total).toBeGreaterThan(200);
+    await run("DELETE FROM gym_import_items WHERE place <> 'country:CA'");
+    await run("UPDATE gym_import_jobs SET total = 1");
+    const seen: string[] = [];
+    const r = await runWorker({
+      ...quick,
+      ...noSteps,
+      importer: async (w) => {
+        seen.push(w);
+        return w === "country:CA" ? { ...ok(w, 0), found: 0, updated: 0, split: ["region:CA:1:BC", "region:CA:2:AB"] } : ok(w);
+      },
+    });
+    expect(r.finished).toBe(true);
+    expect(seen.sort()).toEqual(["country:CA", "region:CA:1:BC", "region:CA:2:AB"]);
+    expect((await jobStatus())!).toMatchObject({ total: 3, done: 3, phase: "done", sums: { added: 4 } });
+  });
+
+  it("goes on to the websites, then AI, then tidying, and counts what each did", async () => {
+    await createJob({ label: "Canada", places: ["region:CA:1:BC"], startedBy: "", notify: false });
+    let webCalls = 0;
+    const order: string[] = [];
+    const r = await runWorker({
+      ...quick,
+      importer: async (w) => (order.push("map"), ok(w)),
+      enrich: async () => {
+        order.push("web");
+        webCalls++;
+        return {
+          done: [{ id: "g", name: "G", site: "https://g.example", filled: webCalls === 1 ? ["phone" as const] : [], skipped: "", ms: 1 }],
+          complete: 2,
+          more: webCalls < 2,
+        };
+      },
+      autoFill: async () => (
+        order.push("ai"),
+        { done: [{ id: "g", name: "G", filled: ["hours" as const], skipped: "" }], more: false, stopped: "" }
+      ),
+      tidy: async (after) => (
+        order.push(`tidy:${after}`),
+        { checked: 1000, next: after ? "" : "zz", cities: 2, addresses: 1, moved: 1, unsure: 0, changes: [] }
+      ),
+    });
+    expect(r.finished).toBe(true);
+    expect(order).toEqual(["map", "web", "web", "ai", "tidy:", "tidy:zz"]);
+    expect((await jobStatus())!).toMatchObject({
+      phase: "done",
+      web: { read: 6, filled: 1 },
+      ai: { read: 1, filled: 1 },
+      tidy: { fixed: 6 },
+    });
+  });
+
+  it("stops the AI step at the day's cap, says so, and the daily job skips tidying", async () => {
+    await run("INSERT INTO admin_settings (key, value, updated_at) VALUES (?, ?, 0)", [SINCE_KEY, "12345"]);
+    expect(await startDaily()).toMatchObject({ id: expect.any(String) });
+    expect(await unfinishedPlaces((await jobStatus())!.id)).toEqual(["new:12345"]);
+    let tidied = false;
+    await runWorker({
+      ...quick,
+      importer: async (w) => ok(w),
+      enrich: noSteps.enrich,
+      autoFill: async () => ({ done: [], more: true, stopped: "Today's AI spend reached its $2 cap." }),
+      tidy: async () => ((tidied = true), noSteps.tidy()),
+    });
+    const s = (await jobStatus())!;
+    expect(s).toMatchObject({ kind: "daily", state: "done" });
+    expect(s.note).toMatch(/reached its \$2 cap\. The next daily run carries on/);
+    expect(tidied).toBe(false);
+    // A schedule that arrives twice starts nothing the second time.
+    expect(await startDaily()).toEqual({ skipped: "already ran today" });
+  });
+
+  it("starts no daily job while another import runs", async () => {
+    await createJob({ label: "A", places: ["region:CA:1:BC"], startedBy: "", notify: false });
+    expect(await startDaily()).toEqual({ skipped: "another import is running" });
   });
 
   it("starts the next worker with the cron secret, on the public site rather than a vercel.app address", async () => {

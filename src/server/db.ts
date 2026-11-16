@@ -1315,6 +1315,18 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "merged_into", "TEXT NOT NULL DEFAULT ''"],
   // Each map server request of an import and how it went, so the next import tries the healthiest server first.
   ["gym_imports", "attempts", "TEXT NOT NULL DEFAULT ''"],
+  // The one-button worldwide import (gymImportJobs.ts, 2026-11-16): when Claude last read the gym's site (gymAutoFill.ts),
+  // and the job's kind (world or daily), step (map, web, ai, tidy) and what each step did.
+  ["gym_places", "ai_at", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_import_jobs", "kind", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_import_jobs", "phase", "TEXT NOT NULL DEFAULT 'map'"],
+  ["gym_import_jobs", "web_read", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_import_jobs", "web_filled", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_import_jobs", "ai_read", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_import_jobs", "ai_filled", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_import_jobs", "tidy_after", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_import_jobs", "tidy_fixed", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_import_jobs", "note", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],
@@ -1359,6 +1371,11 @@ const LATE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS live_sessions_updated ON live_sessions (updated_at)`,
   // A gym owner's or staff member's gyms; only claimed gyms are in it, so it stays small.
   `CREATE INDEX IF NOT EXISTS gym_places_claimed ON gym_places (claimed_by) WHERE claimed_by <> ''`,
+  // The import job's website and AI steps walk the gyms due a read through these (gymEnrich.ts, gymAutoFill.ts), and
+  // a new map gym is checked against the claimed and lifter-added ones (savePlaces), never the whole table (2026-11-16).
+  `CREATE INDEX IF NOT EXISTS gym_places_web ON gym_places (enriched_at) WHERE claimed_by = '' AND hidden = 0 AND website <> ''`,
+  `CREATE INDEX IF NOT EXISTS gym_places_ai ON gym_places (ai_at) WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0`,
+  `CREATE INDEX IF NOT EXISTS gym_places_own ON gym_places (source) WHERE source <> 'osm'`,
   // Friends activity (replies to your comments) and erasing an account's comments.
   `CREATE INDEX IF NOT EXISTS post_comments_account ON post_comments (account_id)`,
   `CREATE INDEX IF NOT EXISTS post_comments_reply ON post_comments (reply_to) WHERE reply_to <> ''`,
