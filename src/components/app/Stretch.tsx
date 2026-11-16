@@ -40,6 +40,7 @@ import {
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Routine, type RoutinePart, type StretchEvent } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
+import { FaultList, stretchFaults } from "./FormFaults";
 import { Icon } from "./icons";
 import { useMyShape } from "./myShape";
 import { go, goBack } from "./router";
@@ -219,6 +220,7 @@ function Library() {
             </p>
             <p className="mt-1 text-sm text-muted">{stretchWhy(open, "pick", [])}</p>
             <p className="mt-3">{open.how}</p>
+            <FaultList faults={stretchFaults(open)} title={t("ff.watchFor")} className="mt-4" />
             <Button className="mt-4 w-full" icon="play" onClick={() => run([open.id])}>
               {t("str.doOne")}
             </Button>
@@ -426,6 +428,7 @@ function Routine({ mode }: { mode: Mode }) {
             <StretchDemo s={info} className="h-64" />
             <p className="mt-3 text-sm font-medium num">{dose(info)}</p>
             <p className="mt-3">{info.how}</p>
+            <FaultList faults={stretchFaults(info)} title={t("ff.watchFor")} className="mt-4" />
           </div>
         )}
       </Sheet>
@@ -574,6 +577,7 @@ function Player({
         </Button>
       </div>
       {nextUp && <p className="mt-3 text-center text-sm text-faint">{t("str.nextUp", { name: nextUp.name })}</p>}
+      <FaultList faults={stretchFaults(s)} title={t("ff.watchFor")} className="mt-6" />
       <p className="sr-only" aria-live="polite">
         {say}
       </p>

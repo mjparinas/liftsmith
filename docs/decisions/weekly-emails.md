@@ -677,3 +677,12 @@ Clients who've trained with you can now rate you, and new clients can see it.
 - Next to it: how many of your clients trained in the last two weeks.
 - Reply once to each review from Coaching › Setup, and report one that breaks the rules.
 Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))
+
+### W53 · Common mistakes, and the fix (**New**, 2026-11-16)
+Free · Lifters · Screen: the back squat's exercise page, at How to do it · `fresh`, so it goes next to everyone already in the series
+Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.
+- Each one says what it looks like, what to do instead and why it matters.
+- Find them in How to during a workout, on each exercise's page and on every stretch.
+- Between sets, the rest timer shows one to watch on your next set, a different one each set.
+- They're part of the app, so they work with no signal, in every language.
+Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))

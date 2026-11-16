@@ -124,6 +124,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("coach-dock", "coach", "pro", "trainer/messages", { fresh: "2026-11-15", shot: false }),
   // New, 2026-11-15: ratings and reviews from clients (docs/decisions/coach-reviews.md).
   R("coach-reviews", "coach", "pro", "trainer/setup", { fresh: "2026-11-15", shot: false }),
+  // New, 2026-11-16: common mistakes and their fixes on every exercise (docs/decisions/form-cues.md).
+  L("form-cues", "free", "exercise/back-squat", { fresh: "2026-11-16" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

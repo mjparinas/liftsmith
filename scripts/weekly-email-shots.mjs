@@ -44,6 +44,7 @@ const SCROLL = {
   "labs-coach": ["lab.barSpeed.title"],
   "labs-hands-off": ["lab.voiceLog.title"],
   "labs-gear": ["lab.sonos.title"],
+  "form-cues": ["ff.title"],
 };
 /**
  * What to tap before the picture (a catalogue key): the button that opens a sheet, or a switch that shows more, turned

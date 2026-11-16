@@ -12,6 +12,7 @@ import * as bmi from "@/locales/text/bmi";
 import * as demo from "@/locales/text/demo";
 import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
+import * as ff from "@/locales/text/ff";
 import * as muscle from "@/locales/text/muscle";
 import * as pgm from "@/locales/text/pgm";
 import * as tdee from "@/locales/text/tdee";
@@ -64,6 +65,16 @@ export function exerciseWords(lang: SiteLang, e: Exercise): { name: string; setu
     setup: line(ex, lang, `ex.${e.id}.setup`) ?? e.setup,
     cues: e.cues.map((c, i) => line(ex, lang, `ex.${e.id}.cue${i + 1}`) ?? c),
   };
+}
+
+/** Common form mistakes (src/lib/formFaults.ts) with their fix and why, for an exercise page. */
+export function faultWords(lang: SiteLang, ids: readonly string[]): { id: string; what: string; fix: string; why: string }[] {
+  return ids.map((id) => ({
+    id,
+    what: line(ff, lang, `ff.${id}`) ?? "",
+    fix: line(ff, lang, `ff.${id}.fix`) ?? "",
+    why: line(ff, lang, `ff.${id}.why`) ?? "",
+  }));
 }
 
 /** The activity levels' names and what each means, for the TDEE and macro calculators. */

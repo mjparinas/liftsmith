@@ -88,7 +88,8 @@ describe("why and coach's notes", () => {
     // The last build week of the block gets a note.
     const p = useApp.getState().profile;
     const build = Math.min(6, Math.max(3, p.blockWeeks));
-    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D - D }));
+    // Same weekday, build - 1 weeks back: block weeks are calendar weeks, so a day earlier would be a week earlier on a Monday.
+    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D }));
     await act(async () =>
       useApp.getState().importWorkouts([
         {

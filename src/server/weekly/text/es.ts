@@ -804,4 +804,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Solo los adultos pueden dejar reseñas, y un cliente descontento no puede hundir a un entrenador nuevo: nada se muestra hasta tener tres reseñas.",
   },
+  "form-cues": {
+    title: "Errores comunes y cómo corregirlos",
+    intro: "Cada ejercicio y estiramiento muestra ahora sus dos o tres errores de técnica más comunes, justo al lado de la figura 3D.",
+    points: [
+      "Cada uno dice cómo se ve, qué hacer en su lugar y por qué importa.",
+      "Están en Cómo se hace durante el entrenamiento, en la página de cada ejercicio y en cada estiramiento.",
+      "Entre series, el temporizador de descanso te muestra uno para la próxima serie, distinto cada vez.",
+      "Forman parte de la app, así que funcionan sin cobertura y en todos los idiomas.",
+    ],
+    dyk: "¿Prefieres no verlos en el descanso? Desactiva Revisar la técnica al descansar en Ajustes › Entrenamiento.",
+  },
 };

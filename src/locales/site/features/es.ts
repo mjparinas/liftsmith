@@ -134,6 +134,10 @@ export const es: FeaturesText = {
       name: "Demostraciones de ejercicios en 3D",
       body: "Cada ejercicio tiene una figura 3D que muestra el movimiento con su propio equipo, con pasos de preparación y claves.",
     },
+    "form-mistakes": {
+      name: "Errores comunes y cómo corregirlos",
+      body: "Cada ejercicio y estiramiento muestra sus dos o tres errores de técnica más comunes junto a la figura 3D, cada uno con su corrección y por qué importa, y el temporizador de descanso te enseña uno para la próxima serie. Funciona sin conexión.",
+    },
     "set-types": { name: "Series descendentes y rest-pause", body: "Añade una serie descendente o una rest-pause entre series." },
     "timed-sets": {
       name: "Temporizador para isométricos, cargadas y cardio",

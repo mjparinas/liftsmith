@@ -467,6 +467,8 @@ export interface DelightPrefs {
   ghost?: boolean;
   /** Show only the plates to add or take off between sets. On unless turned off. */
   plateMemory?: boolean;
+  /** One common form mistake for the next set on the rest timer (formFaults.ts). On unless turned off. */
+  formCheck?: boolean;
   /** A breathing guide or a mini-game on the rest timer. Off by default. */
   restExtra?: "breathe" | "game" | "off";
   /** The breathing guide's pattern (`breathing.ts`). Box breathing unless picked. */

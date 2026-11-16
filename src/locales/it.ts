@@ -44,6 +44,7 @@ import * as exp from "./text/exp";
 import * as explain from "./text/explain";
 import * as extra from "./text/extra";
 import * as fb from "./text/fb";
+import * as ff from "./text/ff";
 import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
@@ -180,6 +181,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...explain.it,
   ...extra.it,
   ...fb.it,
+  ...ff.it,
   ...fit.it,
   ...fix.it,
   ...fmt.it,
