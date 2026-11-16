@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { blockWeek } from "@/lib/block";
+import { weekOf } from "@/lib/derive";
 import { useApp } from "@/lib/store";
 import type { AppEvent } from "@/lib/types";
 
@@ -88,7 +89,9 @@ describe("why and coach's notes", () => {
     // The last build week of the block gets a note.
     const p = useApp.getState().profile;
     const build = Math.min(6, Math.max(3, p.blockWeeks));
-    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D - D }));
+    // Block weeks are calendar weeks (block.ts), so start the block a day into the calendar week build - 1 weeks back;
+    // counting days back from now put it a week early on a Monday or Sunday.
+    act(() => useApp.getState().setProfile({ blockStart: weekOf(Date.now()) - (build - 1) * 7 * D + D }));
     await act(async () =>
       useApp.getState().importWorkouts([
         {
