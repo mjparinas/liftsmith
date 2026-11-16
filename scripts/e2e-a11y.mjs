@@ -8,6 +8,10 @@ import { chromium, devices } from "playwright";
 
 import { base, finish, onboard, stubSignIn } from "./helpers.mjs";
 
+// CI runs this in two halves side by side (ci.yml): A11Y_PART=app is every phone app screen in each theme and
+// setting; A11Y_PART=more is the public site, the keyboard run and the desktop layout. Unset runs both.
+const part = process.env.A11Y_PART;
+const runs = (p) => !part || part === p;
 const server = await base();
 const browser = await chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
 const ctx = await browser.newContext({ ...devices["Pixel 7"] });
@@ -38,751 +42,761 @@ const scan = async (where, skip = []) => {
     );
   }
 };
-try {
-  await page.goto(`${server.url}/`);
-  await scan("home");
-  await page.goto(`${server.url}/app/`);
-  await scan("welcome");
-  await page.getByRole("button", { name: "I already have an account" }).click();
-  await page.getByRole("dialog").waitFor();
-  await scan("welcome sign-in");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Get started" }).click();
-  await scan("onboarding");
-  await page.getByRole("button", { name: "Back" }).click();
-  await onboard(page);
-  await scan("today");
-  await page.getByRole("button", { name: "Start workout" }).click();
-  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
-  await scan("workout");
-  // Skip the warm-ups so the saved workout has a working set.
-  const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
-  if (await skipWarm.isVisible()) await skipWarm.click();
-  await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
-  await scan("rest");
-  await page.getByRole("button", { name: "Plate math" }).click();
-  await scan("rest plate math");
-  await page.getByRole("button", { name: "Breathe" }).click();
-  await scan("rest breathing");
-  await page.getByRole("button", { name: "End", exact: true }).click();
-  await page.getByRole("button", { name: "Finish and save" }).click();
-  await page.getByRole("button", { name: /You earned a crate/ }).click();
-  await scan("done");
-  await page.getByRole("button", { name: "Done", exact: true }).click();
-  // Today after the workout says the day's done; Train again brings the plan (and its parts) back.
-  await page.getByTestId("done-today").waitFor();
-  await scan("done for today");
-  await page.getByRole("button", { name: "Train again" }).click();
-  // Workouts with parts: the warm-up switch above the plan, then today's warm-up.
-  await page
-    .getByTestId("today-parts")
-    .getByRole("switch", { name: /Warm-up/ })
-    .click();
-  await scan("today with parts");
-  await page.evaluate(() => (location.hash = "#/stretch/warmup"));
-  await page.getByTestId("stretch-routine").waitFor();
-  await scan("warm-up");
-  for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
-    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
-    await scan(tab);
-    if (tab === "Body") {
-      // The health twin (Body › Health) and one metric's detail sheet.
-      await page.getByTestId("body-health").click();
-      await page.getByTestId("twin-weight").waitFor();
-      await scan("body health");
-      await page.getByTestId("twin-weight").click();
-      await page.getByRole("dialog").waitFor();
-      await scan("body health detail");
-      await page.keyboard.press("Escape");
-      // Fitness age and how it's worked out.
-      await page.getByTestId("fitness-age").getByRole("button", { name: "How is this worked out?" }).click();
-      await page.getByRole("dialog").waitFor();
-      await scan("fitness age how");
-      await page.keyboard.press("Escape");
-      // A fitness test's sheet: steps, timer, result box and reference.
-      await page.getByTestId("ft-hang").click();
-      await page.getByRole("dialog").waitFor();
-      await scan("fitness test");
-      await page.keyboard.press("Escape");
-      await page.getByTestId("body-muscles").click();
+if (runs("app"))
+  try {
+    await page.goto(`${server.url}/app/`);
+    await scan("welcome");
+    await page.getByRole("button", { name: "I already have an account" }).click();
+    await page.getByRole("dialog").waitFor();
+    await scan("welcome sign-in");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Get started" }).click();
+    await scan("onboarding");
+    await page.getByRole("button", { name: "Back" }).click();
+    await onboard(page);
+    await scan("today");
+    await page.getByRole("button", { name: "Start workout" }).click();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+    await scan("workout");
+    // Skip the warm-ups so the saved workout has a working set.
+    const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
+    if (await skipWarm.isVisible()) await skipWarm.click();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
+    await scan("rest");
+    await page.getByRole("button", { name: "Plate math" }).click();
+    await scan("rest plate math");
+    await page.getByRole("button", { name: "Breathe" }).click();
+    await scan("rest breathing");
+    await page.getByRole("button", { name: "End", exact: true }).click();
+    await page.getByRole("button", { name: "Finish and save" }).click();
+    await page.getByRole("button", { name: /You earned a crate/ }).click();
+    await scan("done");
+    await page.getByRole("button", { name: "Done", exact: true }).click();
+    // Today after the workout says the day's done; Train again brings the plan (and its parts) back.
+    await page.getByTestId("done-today").waitFor();
+    await scan("done for today");
+    await page.getByRole("button", { name: "Train again" }).click();
+    // Workouts with parts: the warm-up switch above the plan, then today's warm-up.
+    await page
+      .getByTestId("today-parts")
+      .getByRole("switch", { name: /Warm-up/ })
+      .click();
+    await scan("today with parts");
+    await page.evaluate(() => (location.hash = "#/stretch/warmup"));
+    await page.getByTestId("stretch-routine").waitFor();
+    await scan("warm-up");
+    for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
+      await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
+      await scan(tab);
+      if (tab === "Body") {
+        // The health twin (Body › Health) and one metric's detail sheet.
+        await page.getByTestId("body-health").click();
+        await page.getByTestId("twin-weight").waitFor();
+        await scan("body health");
+        await page.getByTestId("twin-weight").click();
+        await page.getByRole("dialog").waitFor();
+        await scan("body health detail");
+        await page.keyboard.press("Escape");
+        // Fitness age and how it's worked out.
+        await page.getByTestId("fitness-age").getByRole("button", { name: "How is this worked out?" }).click();
+        await page.getByRole("dialog").waitFor();
+        await scan("fitness age how");
+        await page.keyboard.press("Escape");
+        // A fitness test's sheet: steps, timer, result box and reference.
+        await page.getByTestId("ft-hang").click();
+        await page.getByRole("dialog").waitFor();
+        await scan("fitness test");
+        await page.keyboard.press("Escape");
+        await page.getByTestId("body-muscles").click();
+      }
     }
-  }
-  // Gyms (in Settings and behind Today's gym chip since 2026-11-12).
-  await page.goto(`${server.url}/app/#/gym`);
-  await page.getByRole("heading", { name: "Gyms" }).waitFor();
-  await scan("Gyms");
-  // Delightful extras: recap and body/photos.
-  await page.goto(`${server.url}/app/#/recap`);
-  await page.getByRole("heading", { level: 1 }).waitFor();
-  await scan("recap");
-  await page.goto(`${server.url}/app/#/photos`);
-  await page.getByRole("heading", { name: "Body and photos" }).waitFor();
-  await scan("photos");
-  // Log a past workout (moved from the retired /me/ dashboard), with an exercise added from the browser.
-  await page.goto(`${server.url}/me/#/log`);
-  await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
-  await page.getByRole("button", { name: "Add exercise" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Chest", exact: true }).click();
-  await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
-  await scan("log a past workout");
-  await page.goto(`${server.url}/app/#/programs`);
-  await page.getByRole("heading", { name: "Programs", exact: true }).waitFor();
-  await scan("programs");
-  await page.getByRole("button", { name: /Tiered progression/ }).click();
-  await page.getByRole("dialog").waitFor();
-  await scan("program detail");
-  await page.getByRole("button", { name: "Start this program" }).click();
-  await page.getByText(/Tiered progression · Day 1/).waitFor();
-  await scan("today on a program");
-  await page.goto(`${server.url}/app/#/training`);
-  await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
-  await scan("workout preferences");
-  // A finished workout: its edit sheet in History, then an exercise's own page (2026-11-11).
-  await page.goto(`${server.url}/app/#/stats`);
-  await page
-    .getByRole("article")
-    .first()
-    .getByRole("button", { name: /^Edit the workout on/ })
-    .click();
-  await page.getByRole("dialog", { name: "Edit workout" }).waitFor();
-  await scan("edit workout");
-  await page.keyboard.press("Escape");
-  await page.goto(`${server.url}/app/#/exercise/bench-press`);
-  await page.getByRole("heading", { level: 1, name: "Barbell bench press" }).waitFor();
-  await scan("exercise page");
-  // The exercise library (2026-11-13): the lifter's own exercises, then every exercise.
-  await page.goto(`${server.url}/app/#/exercises`);
-  await page.getByRole("heading", { level: 1, name: "Exercises" }).waitFor();
-  await scan("exercise library");
-  // Tools › Plate and warm-up calculators.
-  await page.goto(`${server.url}/app/#/tools/plates`);
-  await page.getByTestId("plate-result").waitFor();
-  await scan("plate calculator");
-  await page.goto(`${server.url}/app/#/tools/warmup`);
-  await page.getByTestId("warmup-result").waitFor();
-  await scan("warm-up calculator");
-  // A shared routine link (routineShare.ts): "Push day", bench press, then a lateral raise and pushdown superset.
-  await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
-  await page.getByRole("heading", { name: "Push day" }).waitFor();
-  await scan("shared routine");
-  // A shared gym link (gymShare.ts): "Iron Works", a barbell, plates, dumbbells and kettlebells.
-  await page.goto(
-    `${server.url}/app/#/gymlink/g1~eyJuIjoiSXJvbiBXb3JrcyIsInUiOiJrZyIsImUiOlsiYmFyYmVsbCIsImR1bWJiZWxscyIsImNhYmxlcyJdLCJiIjpbWyJPbHltcGljIGJhciIsMjBdXSwicCI6W1syMCw0XSxbMTAsNF0sWzUsNF1dLCJkIjpbMiw0LDYsOCwxMF0sImsiOls4LDEyLDE2XSwibSI6NX0`,
-  );
-  await page.getByRole("heading", { name: "Iron Works" }).waitFor();
-  await scan("shared gym");
-  // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
-  await page.goto(`${server.url}/app/#/stretch`);
-  await page.getByTestId("stretch-list").waitFor();
-  await page.getByRole("button", { name: "Pick Pigeon" }).click();
-  await scan("stretch library");
-  await page.getByRole("button", { name: /^Cobra/ }).click();
-  await page.getByRole("dialog").waitFor();
-  await scan("stretch demo");
-  await page.keyboard.press("Escape");
-  await page.goto(`${server.url}/app/#/stretch/rest`);
-  await page.getByTestId("stretch-routine").waitFor();
-  await scan("stretch routine");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
-  await page.getByRole("timer").waitFor();
-  await scan("stretch player");
-  // Tools › TDEE without stats (it links to Your stats), Your stats filled in with bump buttons, then TDEE
-  // reading them, and the public calculator page.
-  await page.goto(`${server.url}/app/#/tools/tdee`);
-  await page.getByRole("heading", { name: "TDEE calculator" }).waitFor();
-  await page.getByRole("button", { name: /Add your stats/ }).waitFor();
-  await scan("tdee, stats missing");
-  await page.getByRole("button", { name: /Add your stats/ }).click();
-  await page.getByRole("button", { name: "Male", exact: true }).click();
-  await page.getByRole("button", { name: "More age" }).click();
-  await page.getByRole("button", { name: "More height" }).click();
-  await scan("your stats");
-  await page.goto(`${server.url}/app/#/tools/tdee`);
-  await page.getByTestId("tdee-value").waitFor();
-  await scan("tdee");
-  await page.goto(`${server.url}/tools/tdee-calculator/`);
-  await page.getByTestId("tdee-value").waitFor();
-  await scan("tdee public page");
-  // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
-  // guide, blog post and index, calculators), then the pricing, help, contact, terms, what's new, status, about and
-  // accessibility pages. The static build has no API, so the status page's health check is answered here.
-  await page.route("**/api/health/", (r) => r.fulfill({ json: { ok: true } }));
-  for (const path of [
-    "/exercises/",
-    "/exercises/bench-press/",
-    "/blog/topic/recovery/",
-    "/exercises/back-squat/",
-    "/exercises/bench-press/alternatives/",
-    "/exercises/vs/",
-    "/exercises/vs/back-squat-vs-front-squat/",
-    "/ja/exercises/vs/back-squat-vs-front-squat/",
-    "/muscles/chest/",
-    "/de/muscles/biceps/",
-    "/programs/classic-5x5/",
-    "/it/programs/ppl/",
-    "/muscles/chest/dumbbells/",
-    "/equipment/barbell/",
-    "/guides/reps-in-reserve/",
-    "/blog/",
-    "/blog/how-long-to-rest-between-sets/",
-    "/tools/plate-calculator/",
-    "/tools/one-rep-max-calculator/",
-    "/tools/warm-up-calculator/",
-    "/tools/rpe-chart/",
-    "/tools/strength-standards/",
-    "/tools/dots-calculator/",
-    "/import/strong/",
-    "/features/",
-    "/features/rest-timer/",
-    "/apps/5x5/",
-    "/compare/",
-    "/compare/fitbod/",
-    "/alternatives/fitbod/",
-    "/compare/best-workout-apps/",
-    "/compare/boostcamp/",
-    "/trust/",
-    "/pricing/",
-    "/help/",
-    "/help/billing/",
-    "/contact/",
-    "/terms/",
-    "/whats-new/",
-    "/status/",
-    "/about/",
-    "/editorial-standards/",
-    "/accessibility/",
-  ]) {
-    await page.goto(`${server.url}${path}`);
+    // Gyms (in Settings and behind Today's gym chip since 2026-11-12).
+    await page.goto(`${server.url}/app/#/gym`);
+    await page.getByRole("heading", { name: "Gyms" }).waitFor();
+    await scan("Gyms");
+    // Delightful extras: recap and body/photos.
+    await page.goto(`${server.url}/app/#/recap`);
     await page.getByRole("heading", { level: 1 }).waitFor();
-    await scan(`site ${path}`);
-  }
-  await page.goto(`${server.url}/app/#/pro`);
-  await page.getByRole("heading", { name: "Liftsmith Pro" }).waitFor();
-  await scan("pro");
-  await page.goto(`${server.url}/app/#/account`);
-  await page.getByRole("heading", { name: "Account and sync" }).waitFor();
-  await page.getByRole("button", { name: "Continue with email" }).click();
-  await scan("account");
-  await page.goto(`${server.url}/app/#/connections`);
-  await page.getByRole("heading", { name: "Connected apps" }).waitFor();
-  await scan("connections");
-  // Add a gym the map doesn't have (docs/decisions/gyms.md): signed out it asks to sign in.
-  await page.goto(`${server.url}/app/#/gymadd`);
-  await page.getByRole("heading", { name: "Add a gym" }).waitFor();
-  await scan("add a gym");
-  // Friends (docs/decisions/friends.md): signed out, then signed in with the API answered here (the static build has
-  // none): the feed with a post, its comments, activity, people, and a person's page.
-  await page.goto(`${server.url}/app/#/friends`);
-  await page.getByText("Train with friends").waitFor();
-  await scan("friends signed out");
-  const friendsPost = {
-    id: "p1",
-    handle: "blair",
-    name: "Blair",
-    at: Date.now() - 3_600_000,
-    likes: 2,
-    liked: false,
-    comments: 1,
-    mine: false,
-    avatar: "av-mascot",
-    caption: "New bench best, felt smooth.",
-    audience: "all",
-    partners: [{ handle: "casey", name: "Casey", avatar: "av-leaf" }],
-    tagged: false,
-    body: {
-      v: 1,
-      seconds: 3100,
-      sets: 14,
-      volume: 5200,
-      prs: 1,
-      muscles: ["chest", "triceps"],
-      exercises: [
-        {
-          id: "bench-press",
-          name: "Bench press",
-          sets: 2,
-          w: 100,
-          r: 5,
-          pr: true,
-          log: [
-            { w: 95, r: 5 },
-            { w: 100, r: 5 },
-          ],
-        },
-      ],
-    },
-  };
-  const friendsApi = {
-    invites: {
-      friends: [{ name: "Blair", handle: "blair", workouts: 1, rewarded: false }],
-      joined: null,
-      months: 0,
-      perYear: 12,
-      needed: 3,
-      until: null,
-      reward: true,
-    },
-    me: {
-      profile: {
-        handle: "alex",
-        name: "Alex",
-        open: false,
-        autoPost: false,
-        weights: true,
-        public: false,
-        push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
-        avatar: "",
-        audience: "all",
-        showLifts: true,
-        lifts: [],
+    await scan("recap");
+    await page.goto(`${server.url}/app/#/photos`);
+    await page.getByRole("heading", { name: "Body and photos" }).waitFor();
+    await scan("photos");
+    // Log a past workout (moved from the retired /me/ dashboard), with an exercise added from the browser.
+    await page.goto(`${server.url}/me/#/log`);
+    await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+    await page.getByRole("button", { name: "Add exercise" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chest", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
+    await scan("log a past workout");
+    await page.goto(`${server.url}/app/#/programs`);
+    await page.getByRole("heading", { name: "Programs", exact: true }).waitFor();
+    await scan("programs");
+    await page.getByRole("button", { name: /Tiered progression/ }).click();
+    await page.getByRole("dialog").waitFor();
+    await scan("program detail");
+    await page.getByRole("button", { name: "Start this program" }).click();
+    await page.getByText(/Tiered progression · Day 1/).waitFor();
+    await scan("today on a program");
+    await page.goto(`${server.url}/app/#/training`);
+    await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
+    await scan("workout preferences");
+    // A finished workout: its edit sheet in History, then an exercise's own page (2026-11-11).
+    await page.goto(`${server.url}/app/#/stats`);
+    await page
+      .getByRole("article")
+      .first()
+      .getByRole("button", { name: /^Edit the workout on/ })
+      .click();
+    await page.getByRole("dialog", { name: "Edit workout" }).waitFor();
+    await scan("edit workout");
+    await page.keyboard.press("Escape");
+    await page.goto(`${server.url}/app/#/exercise/bench-press`);
+    await page.getByRole("heading", { level: 1, name: "Barbell bench press" }).waitFor();
+    await scan("exercise page");
+    // The exercise library (2026-11-13): the lifter's own exercises, then every exercise.
+    await page.goto(`${server.url}/app/#/exercises`);
+    await page.getByRole("heading", { level: 1, name: "Exercises" }).waitFor();
+    await scan("exercise library");
+    // Tools › Plate and warm-up calculators.
+    await page.goto(`${server.url}/app/#/tools/plates`);
+    await page.getByTestId("plate-result").waitFor();
+    await scan("plate calculator");
+    await page.goto(`${server.url}/app/#/tools/warmup`);
+    await page.getByTestId("warmup-result").waitFor();
+    await scan("warm-up calculator");
+    // A shared routine link (routineShare.ts): "Push day", bench press, then a lateral raise and pushdown superset.
+    await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
+    await page.getByRole("heading", { name: "Push day" }).waitFor();
+    await scan("shared routine");
+    // A shared gym link (gymShare.ts): "Iron Works", a barbell, plates, dumbbells and kettlebells.
+    await page.goto(
+      `${server.url}/app/#/gymlink/g1~eyJuIjoiSXJvbiBXb3JrcyIsInUiOiJrZyIsImUiOlsiYmFyYmVsbCIsImR1bWJiZWxscyIsImNhYmxlcyJdLCJiIjpbWyJPbHltcGljIGJhciIsMjBdXSwicCI6W1syMCw0XSxbMTAsNF0sWzUsNF1dLCJkIjpbMiw0LDYsOCwxMF0sImsiOls4LDEyLDE2XSwibSI6NX0`,
+    );
+    await page.getByRole("heading", { name: "Iron Works" }).waitFor();
+    await scan("shared gym");
+    // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
+    await page.goto(`${server.url}/app/#/stretch`);
+    await page.getByTestId("stretch-list").waitFor();
+    await page.getByRole("button", { name: "Pick Pigeon" }).click();
+    await scan("stretch library");
+    await page.getByRole("button", { name: /^Cobra/ }).click();
+    await page.getByRole("dialog").waitFor();
+    await scan("stretch demo");
+    await page.keyboard.press("Escape");
+    await page.goto(`${server.url}/app/#/stretch/rest`);
+    await page.getByTestId("stretch-routine").waitFor();
+    await scan("stretch routine");
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await page.getByRole("timer").waitFor();
+    await scan("stretch player");
+    // Tools › TDEE without stats (it links to Your stats), Your stats filled in with bump buttons, then TDEE
+    // reading them, and the public calculator page.
+    await page.goto(`${server.url}/app/#/tools/tdee`);
+    await page.getByRole("heading", { name: "TDEE calculator" }).waitFor();
+    await page.getByRole("button", { name: /Add your stats/ }).waitFor();
+    await scan("tdee, stats missing");
+    await page.getByRole("button", { name: /Add your stats/ }).click();
+    await page.getByRole("button", { name: "Male", exact: true }).click();
+    await page.getByRole("button", { name: "More age" }).click();
+    await page.getByRole("button", { name: "More height" }).click();
+    await scan("your stats");
+    await page.goto(`${server.url}/app/#/tools/tdee`);
+    await page.getByTestId("tdee-value").waitFor();
+    await scan("tdee");
+    await page.goto(`${server.url}/tools/tdee-calculator/`);
+    await page.getByTestId("tdee-value").waitFor();
+    await scan("tdee public page");
+    // The public pages are scanned in the "more" part, below.
+    await page.route("**/api/health/", (r) => r.fulfill({ json: { ok: true } }));
+    await page.goto(`${server.url}/app/#/pro`);
+    await page.getByRole("heading", { name: "Liftsmith Pro" }).waitFor();
+    await scan("pro");
+    await page.goto(`${server.url}/app/#/account`);
+    await page.getByRole("heading", { name: "Account and sync" }).waitFor();
+    await page.getByRole("button", { name: "Continue with email" }).click();
+    await scan("account");
+    await page.goto(`${server.url}/app/#/connections`);
+    await page.getByRole("heading", { name: "Connected apps" }).waitFor();
+    await scan("connections");
+    // Add a gym the map doesn't have (docs/decisions/gyms.md): signed out it asks to sign in.
+    await page.goto(`${server.url}/app/#/gymadd`);
+    await page.getByRole("heading", { name: "Add a gym" }).waitFor();
+    await scan("add a gym");
+    // Friends (docs/decisions/friends.md): signed out, then signed in with the API answered here (the static build has
+    // none): the feed with a post, its comments, activity, people, and a person's page.
+    await page.goto(`${server.url}/app/#/friends`);
+    await page.getByText("Train with friends").waitFor();
+    await scan("friends signed out");
+    const friendsPost = {
+      id: "p1",
+      handle: "blair",
+      name: "Blair",
+      at: Date.now() - 3_600_000,
+      likes: 2,
+      liked: false,
+      comments: 1,
+      mine: false,
+      avatar: "av-mascot",
+      caption: "New bench best, felt smooth.",
+      audience: "all",
+      partners: [{ handle: "casey", name: "Casey", avatar: "av-leaf" }],
+      tagged: false,
+      body: {
+        v: 1,
+        seconds: 3100,
+        sets: 14,
+        volume: 5200,
+        prs: 1,
+        muscles: ["chest", "triceps"],
+        exercises: [
+          {
+            id: "bench-press",
+            name: "Bench press",
+            sets: 2,
+            w: 100,
+            r: 5,
+            pr: true,
+            log: [
+              { w: 95, r: 5 },
+              { w: 100, r: 5 },
+            ],
+          },
+        ],
       },
-      followers: 1,
-      following: 1,
-      requests: 1,
-      unread: 2,
-    },
-    feed: { posts: [friendsPost], more: false },
-    discover: { posts: [{ ...friendsPost, id: "pd1", handle: "casey", name: "Casey", mine: false }], more: false },
-    clubFeed: { posts: [friendsPost], more: false },
-    person: { posts: [friendsPost], more: false },
-    thread: {
-      post: friendsPost,
-      comments: [
-        { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
-        {
-          id: "c2",
-          handle: "blair",
-          name: "Blair",
-          at: Date.now() - 30_000,
-          body: "Thanks @casey",
-          mine: false,
-          canDelete: false,
-          replyTo: "c1",
+    };
+    const friendsApi = {
+      invites: {
+        friends: [{ name: "Blair", handle: "blair", workouts: 1, rewarded: false }],
+        joined: null,
+        months: 0,
+        perYear: 12,
+        needed: 3,
+        until: null,
+        reward: true,
+      },
+      me: {
+        profile: {
+          handle: "alex",
+          name: "Alex",
+          open: false,
+          autoPost: false,
+          weights: true,
+          public: false,
+          push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
+          avatar: "",
+          audience: "all",
+          showLifts: true,
+          lifts: [],
         },
-      ],
-    },
-    activity: {
-      items: [
-        { kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" },
-        { kind: "sent", handle: "blair", name: "Blair", at: Date.now() - 120_000, text: "Leg day", code: "r1~TGVnIGRheQ~back-squat.4" },
-      ],
-    },
-    people: { people: [{ handle: "blair", name: "Blair", at: Date.now() }] },
-    board: {
-      rows: [
-        { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
-        { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
-      ],
-    },
-    challenges: {
-      challenges: [
-        {
-          id: "ch1",
-          name: "Most sets",
-          metric: "sets",
-          startsAt: Date.now() - 86_400_000,
-          endsAt: Date.now() + 6 * 86_400_000,
-          owner: { handle: "blair", name: "Blair" },
-          mine: false,
-          status: "invited",
-          members: [
-            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 41 },
-            { handle: "alex", name: "Alex", avatar: "", me: true, joined: false, value: 0 },
-          ],
-        },
-        {
-          id: "ch2",
-          name: "Spring minutes",
-          metric: "minutes",
-          startsAt: Date.now() - 3 * 86_400_000,
-          endsAt: Date.now() + 11 * 86_400_000,
-          owner: { handle: "alex", name: "Alex" },
-          mine: true,
-          status: "joined",
-          members: [
-            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 95 },
-            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 140 },
-            { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
-          ],
-        },
-        {
-          id: "ch3",
-          name: "Leg week",
-          metric: "workouts",
-          startsAt: Date.now() - 8 * 86_400_000,
-          endsAt: Date.now() - 86_400_000,
-          owner: { handle: "alex", name: "Alex" },
-          mine: true,
-          status: "joined",
-          members: [
-            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 4 },
-            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 3 },
-          ],
-        },
-      ],
-    },
-    clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
-    club: {
-      club: {
-        id: "cl1",
-        name: "Iron Barn crew",
-        members: 3,
-        mine: true,
-        code: "ABCD2345",
-        owner: { handle: "alex", name: "Alex" },
-        goal: { metric: "workouts", target: 9 },
+        followers: 1,
+        following: 1,
+        requests: 1,
+        unread: 2,
+      },
+      feed: { posts: [friendsPost], more: false },
+      discover: { posts: [{ ...friendsPost, id: "pd1", handle: "casey", name: "Casey", mine: false }], more: false },
+      clubFeed: { posts: [friendsPost], more: false },
+      person: { posts: [friendsPost], more: false },
+      thread: {
+        post: friendsPost,
+        comments: [
+          { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
+          {
+            id: "c2",
+            handle: "blair",
+            name: "Blair",
+            at: Date.now() - 30_000,
+            body: "Thanks @casey",
+            mine: false,
+            canDelete: false,
+            replyTo: "c1",
+          },
+        ],
+      },
+      activity: {
+        items: [
+          { kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" },
+          { kind: "sent", handle: "blair", name: "Blair", at: Date.now() - 120_000, text: "Leg day", code: "r1~TGVnIGRheQ~back-squat.4" },
+        ],
+      },
+      people: { people: [{ handle: "blair", name: "Blair", at: Date.now() }] },
+      board: {
         rows: [
           { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
           { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
-          { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, workouts: 1, sets: 12, minutes: 40, volume: 3000, prs: 0 },
         ],
       },
-    },
-    clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
-    invite: { code: "ABCD2345" },
-    inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
-    lookup: {
-      person: {
-        handle: "blair",
-        name: "Blair",
-        followers: 3,
-        following: 2,
-        posts: 1,
-        relation: "following",
-        followsYou: true,
-        canSee: true,
-        open: false,
-        public: false,
-        avatar: "av-trophy",
-        muted: false,
-        lifts: [
-          { id: "back-squat", w: 140, r: 3, at: Date.now() },
-          { id: "bench-press", w: 100, r: 5, at: Date.now() },
+      challenges: {
+        challenges: [
+          {
+            id: "ch1",
+            name: "Most sets",
+            metric: "sets",
+            startsAt: Date.now() - 86_400_000,
+            endsAt: Date.now() + 6 * 86_400_000,
+            owner: { handle: "blair", name: "Blair" },
+            mine: false,
+            status: "invited",
+            members: [
+              { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 41 },
+              { handle: "alex", name: "Alex", avatar: "", me: true, joined: false, value: 0 },
+            ],
+          },
+          {
+            id: "ch2",
+            name: "Spring minutes",
+            metric: "minutes",
+            startsAt: Date.now() - 3 * 86_400_000,
+            endsAt: Date.now() + 11 * 86_400_000,
+            owner: { handle: "alex", name: "Alex" },
+            mine: true,
+            status: "joined",
+            members: [
+              { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 95 },
+              { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 140 },
+              { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
+            ],
+          },
+          {
+            id: "ch3",
+            name: "Leg week",
+            metric: "workouts",
+            startsAt: Date.now() - 8 * 86_400_000,
+            endsAt: Date.now() - 86_400_000,
+            owner: { handle: "alex", name: "Alex" },
+            mine: true,
+            status: "joined",
+            members: [
+              { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 4 },
+              { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 3 },
+            ],
+          },
         ],
-        level: 12,
-        streak: 4,
-        trained: [1, 3, 8, 10, 15, 17].map((d) => Date.now() - d * 86_400_000),
       },
-    },
-    suggest: {
-      people: [
-        { handle: "drew", name: "Drew", avatar: "av-bolt", reason: "followsYou", open: false },
-        { handle: "emery", name: "Emery", avatar: "", reason: "mutual", count: 2, via: "Blair", open: true },
-      ],
-    },
-    search: { people: [{ handle: "casey", name: "Casey Stone", avatar: "av-leaf" }] },
-    personPeople: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
-    likers: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
-    training: {
-      people: [
-        {
+      clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
+      club: {
+        club: {
+          id: "cl1",
+          name: "Iron Barn crew",
+          members: 3,
+          mine: true,
+          code: "ABCD2345",
+          owner: { handle: "alex", name: "Alex" },
+          goal: { metric: "workouts", target: 9 },
+          rows: [
+            { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
+            { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, workouts: 1, sets: 12, minutes: 40, volume: 3000, prs: 0 },
+          ],
+        },
+      },
+      clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
+      invite: { code: "ABCD2345" },
+      inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
+      lookup: {
+        person: {
           handle: "blair",
           name: "Blair",
+          followers: 3,
+          following: 2,
+          posts: 1,
+          relation: "following",
+          followsYou: true,
+          canSee: true,
+          open: false,
+          public: false,
           avatar: "av-trophy",
-          exercise: "back-squat",
-          done: 4,
-          total: 15,
-          startedAt: Date.now() - 1_800_000,
-          updatedAt: Date.now() - 60_000,
+          muted: false,
+          lifts: [
+            { id: "back-squat", w: 140, r: 3, at: Date.now() },
+            { id: "bench-press", w: 100, r: 5, at: Date.now() },
+          ],
+          level: 12,
+          streak: 4,
+          trained: [1, 3, 8, 10, 15, 17].map((d) => Date.now() - d * 86_400_000),
         },
-      ],
-    },
-  };
-  await page.route("**/api/social/", (r) => r.fulfill({ json: friendsApi[JSON.parse(r.request().postData() ?? "{}").op] ?? { ok: true } }));
-  await page.route("**/api/sync/", (r) => r.fulfill({ json: { cursor: 0, events: [], deleted: [], records: [], more: false } }));
-  await page.evaluate(() =>
-    localStorage.setItem("liftsmith.account", JSON.stringify({ token: "t", id: "a", email: null, providers: ["email"], via: "email" })),
-  );
-  await page.reload();
-  await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
-  await page.getByRole("button", { name: "🔥 Cheer Blair on" }).waitFor();
-  await scan("friends feed");
-  await page.getByRole("button", { name: "Discover" }).click();
-  await page.getByRole("article", { name: "Workout from Casey" }).waitFor();
-  await scan("friends discover");
-  await page.getByRole("button", { name: "Following" }).click();
-  await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
-  await page.getByRole("button", { name: "More options" }).click();
-  await page
-    .getByRole("button", { name: "Edit post" })
-    .or(page.getByRole("button", { name: /^Report/ }))
-    .first()
-    .waitFor();
-  await scan("friends post menu");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: /^See Blair’s whole workout/ }).click();
-  await page.getByRole("button", { name: "Do this workout" }).waitFor();
-  await scan("friends whole workout");
-  await page.keyboard.press("Escape");
-  // Let the closed sheet's history step land first, or it closes the next sheet as it opens.
-  await page.waitForTimeout(1000);
-  await page.getByRole("button", { name: /likes: see who/ }).click();
-  await page.getByRole("dialog", { name: "Liked by" }).waitFor();
-  await scan("friends likers");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Friends settings" }).click();
-  await page.getByRole("group", { name: "Avatar" }).waitFor();
-  await scan("friends settings");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: /^Comments/ }).click();
-  await page.getByText("Strong work!").waitFor();
-  await scan("friends comments");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Board" }).click();
-  // A challenge that just ended opens its results moment once (gap list 3, item 5).
-  await page.getByRole("dialog", { name: "Leg week" }).getByText("You won!").waitFor();
-  await scan("friends challenge result");
-  await page.keyboard.press("Escape");
-  await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
-  await page.getByText("Blair invited you to this challenge.").waitFor();
-  await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();
-  await scan("friends board");
-  await page.getByRole("button", { name: "Start a challenge" }).click();
-  await page.getByRole("group", { name: "Challenge" }).waitFor();
-  await scan("friends start challenge");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Clubs" }).click();
-  await page.getByRole("button", { name: /Iron Barn crew/ }).waitFor();
-  await scan("friends clubs");
-  await page.getByRole("button", { name: /Iron Barn crew/ }).click();
-  await page.getByRole("button", { name: "Invite to the club" }).waitFor();
-  await page.getByText("This week as a crew: 9 workouts").waitFor();
-  await scan("friends club");
-  await page.getByRole("button", { name: "Change goal" }).click();
-  await page.getByRole("button", { name: "Save goal" }).waitFor();
-  await scan("friends club goal");
-  await page.getByRole("button", { name: "Cancel" }).click();
-  await page.getByRole("button", { name: "Posts" }).click();
-  await page.getByRole("article", { name: "Workout from Blair" }).last().waitFor();
-  await scan("friends club posts");
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: /^Activity/ }).click();
-  await page.getByText("Blair liked your workout").waitFor();
-  await scan("friends activity");
-  await page.getByRole("button", { name: /^People/ }).click();
-  await page.getByRole("button", { name: "Accept" }).waitFor();
-  await page.getByText("People you may know").waitFor();
-  await page.getByLabel("Find a friend").fill("stone");
-  await page.getByRole("list", { name: "Search results" }).waitFor();
-  await scan("friends people");
-  await page.getByRole("button", { name: "Scan to follow" }).click();
-  await page.getByRole("img", { name: "Your Liftsmith code" }).waitFor();
-  await scan("friends scan to follow");
-  await page.keyboard.press("Escape");
-  await page.goto(`${server.url}/app/#/person/blair`);
-  await page.getByText("Follows you").waitFor();
-  await page.getByText("Best lifts").waitFor();
-  await page.getByText("Level 12").waitFor();
-  await scan("friends person");
-  await page.getByRole("button", { name: /Followers/ }).click();
-  await page.getByRole("dialog").getByText("Alex", { exact: true }).waitFor();
-  await scan("friends followers");
-  await page.keyboard.press("Escape");
-  await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
-  await page.getByText("Blair invited you").waitFor();
-  await scan("friends invite");
-  await page.goto(`${server.url}/app/#/club/ABCD2345`);
-  await page.getByRole("button", { name: "Join the club" }).waitFor();
-  await scan("friends club link");
-  // Coaching's pages for each side (2026-11-13), signed in against a stand-in API: a coach's tabs, then a client's page.
-  const coachApi = (client) => ({
-    invite: client ? null : { code: "ABCD2345", expiresAt: Date.now() + 7 * 86_400_000 },
-    clients: client ? [] : [{ id: "c1", name: "Alex", since: Date.now() - 30 * 86_400_000 }],
-    coaches: client ? [{ id: "k1", name: "Sam", since: Date.now() - 30 * 86_400_000, role: "coach" }] : [],
-    plans: [],
-    notes: client ? [{ coachId: "k1", clientId: "a", text: "Deload this week.", at: Date.now() }] : [],
-    unread: client ? { k1: 1 } : { c1: 2 },
-    setup: {},
-    forms: [],
-    checkins: [],
-    // The schedule's month calendar (2026-11-14): a booked and an open time two days from now.
-    slots: client
-      ? []
-      : [
+      },
+      suggest: {
+        people: [
+          { handle: "drew", name: "Drew", avatar: "av-bolt", reason: "followsYou", open: false },
+          { handle: "emery", name: "Emery", avatar: "", reason: "mutual", count: 2, via: "Blair", open: true },
+        ],
+      },
+      search: { people: [{ handle: "casey", name: "Casey Stone", avatar: "av-leaf" }] },
+      personPeople: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
+      likers: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
+      training: {
+        people: [
           {
-            id: "s1",
-            coachId: "a",
-            start: Date.now() + 2 * 86_400_000,
-            minutes: 60,
-            place: "Main gym",
-            clientId: "c1",
-            bookedAt: Date.now(),
-          },
-          {
-            id: "s2",
-            coachId: "a",
-            start: Date.now() + 2 * 86_400_000 + 7_200_000,
-            minutes: 45,
-            place: "",
-            clientId: null,
-            bookedAt: null,
+            handle: "blair",
+            name: "Blair",
+            avatar: "av-trophy",
+            exercise: "back-squat",
+            done: 4,
+            total: 15,
+            startedAt: Date.now() - 1_800_000,
+            updatedAt: Date.now() - 60_000,
           },
         ],
-    sessions: { booked: [], open: [] },
-    pay: null,
-    coach: !client,
-  });
-  let coachClient = false;
-  await page.route("**/api/coach/**", (r) =>
-    r.fulfill({ json: r.request().method() === "GET" && !r.request().url().includes("?") ? coachApi(coachClient) : { ok: true } }),
-  );
-  // Ratings and reviews (2026-11-15, coach-reviews.md): the coach's own on Setup, and the client's own review of Sam.
-  const review = (id, stars, name, text, reply = "") => ({
-    id,
-    stars,
-    text,
-    name,
-    at: Date.now() - 86_400_000,
-    reply,
-    replyAt: reply ? Date.now() : 0,
-  });
-  const reviewsApi = (url) => ({
-    rating: { count: 3, average: 4.7, outcome: { clients: 5, active: 4 } },
-    reviews: [
-      review("a1a1a1a1a1a1a1a1a1a1", 5, "Alex P.", "Fixed my squat in a month.", "Thanks Alex!"),
-      review("b2b2b2b2b2b2b2b2b2b2", 5, "Blair", "Clear plans every week."),
-      review("c3c3c3c3c3c3c3c3c3c3", 4, "", ""),
-    ],
-    mine: url.includes("?coach=")
-      ? { review: review("d4d4d4d4d4d4d4d4d4d4", 5, "Jordan P.", "Best coach I've had."), can: { ok: true } }
-      : undefined,
-  });
-  await page.route("**/api/coach/reviews/**", (r) =>
-    r.fulfill({ json: r.request().method() === "GET" ? reviewsApi(r.request().url()) : { ok: true } }),
-  );
-  await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
-  await page.goto(`${server.url}/app/#/trainer/clients`);
-  await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
-  await scan("coaching clients");
-  await page.goto(`${server.url}/app/#/trainer/messages`);
-  await page.getByRole("button", { name: /Alex/ }).waitFor();
-  await scan("coaching messages");
-  await page.goto(`${server.url}/app/#/trainer/schedule`);
-  await page.getByTestId("schedule-calendar").waitFor();
-  await scan("coaching schedule");
-  await page.goto(`${server.url}/app/#/trainer/setup`);
-  await page.getByText("Fixed my squat in a month.").waitFor();
-  await scan("coaching reviews");
-  coachClient = true;
-  await page.goto(`${server.url}/app/#/trainer`);
-  await page.reload();
-  await page.getByRole("button", { name: /Message Sam/ }).waitFor();
-  await page.getByText("Best coach I've had.").waitFor();
-  await scan("coaching client");
-  await page.unroute("**/api/coach/reviews/**");
-  await page.unroute("**/api/coach/**");
-  await page.unroute("**/api/teams/**");
-  await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
-  await page.unroute("**/api/social/");
-  await page.unroute("**/api/sync/");
-  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against. The page was
-  // just on #/trainer signed in, so reload for the signed-out page.
-  await page.goto(`${server.url}/app/#/trainer`);
-  await page.reload();
-  await page.getByRole("heading", { name: "Coaching" }).waitFor();
-  await scan("trainer");
-  await page.goto(`${server.url}/app/#/settings`);
-  await scan("settings");
-  // Every group page of Settings, and Labs (2026-11-10).
-  for (const group of ["training", "workout", "reminders", "look", "body", "data", "labs"]) {
-    await page.goto(`${server.url}/app/#/settings/${group}`);
-    await page.getByRole("heading", { level: 1 }).waitFor();
-    await scan(`settings ${group}`);
-  }
-  await page.goto(`${server.url}/app/#/settings/body`);
-  await page.getByRole("button", { name: "Set up" }).click();
-  await scan("cycle consent");
-  await page.getByRole("button", { name: "I agree, turn it on" }).click();
-  await page.getByRole("button", { name: "Period started today" }).click();
-  await scan("cycle on");
-  await page.goto(`${server.url}/app/#/settings/training`);
-  await page.getByRole("button", { name: "Injuries and sore spots" }).click();
-  await page.getByRole("button", { name: "Log an injury" }).click();
-  await scan("injury picker");
-  await page.getByRole("button", { name: "Knee" }).click();
-  await scan("pain rating");
-  const rate = page.getByRole("dialog", { name: "How bad is it right now?" });
-  await rate.getByRole("slider", { name: "Pain from 0 to 10" }).fill("6");
-  await rate.getByRole("button", { name: "Save rating" }).click();
-  await scan("injuries");
-  await page.getByRole("button", { name: "Lighter" }).first().click();
-  await scan("injury risk warning");
-  await page.getByRole("button", { name: /Keep skipping/ }).click();
-  await page.goto(`${server.url}/app/#/settings`);
-  await page.getByRole("button", { name: "Send feedback or report a bug" }).click();
-  await page.getByRole("button", { name: "See what's included" }).click();
-  await scan("feedback");
-  await page.getByLabel("Message").fill("The rest timer skipped a beat");
-  await page.getByRole("button", { name: "Send", exact: true }).click();
-  await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
-  await scan("feedback sent");
-  // Light mode: every main screen again, so the light tokens pass contrast too.
-  await page.goto(`${server.url}/app/#/settings/look`);
-  await page.getByRole("button", { name: "Light", exact: true }).click();
-  await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
-  await scan("light settings look");
-  await page.goto(`${server.url}/app/#/settings`);
-  await scan("light settings");
-  await page.getByRole("button", { name: "‹ Today" }).click();
-  await scan("light today");
-  for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
-    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
-    await scan(`light ${tab}`);
-  }
-  // Gyms left the tab bar for Settings (and Today's gym chip) on 2026-11-12, so it's opened by its link here.
-  await page.evaluate(() => (location.hash = "#/gym"));
-  await page.getByRole("heading", { name: "Gyms" }).waitFor();
-  await scan("light Gyms");
-  await page.getByRole("button", { name: "‹ Back" }).click();
-  await page.getByRole("button", { name: "Today" }).click();
-  // After a saved workout Today says the day's done; Train again brings the plan (and Start workout) back.
-  const start = page.getByRole("button", { name: "Start workout" });
-  const again = page.getByRole("button", { name: "Train again" });
-  await start.or(again).first().waitFor();
-  if (await again.isVisible()) await again.click();
-  await start.click();
-  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
-  await scan("light workout");
-  await page.goto(`${server.url}/app/#/log`);
-  await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
-  await scan("light log a past workout");
-  // Accessibility settings: colour-blind safe colours and more contrast, in both themes.
-  await page.goto(`${server.url}/app/#/settings/look`);
-  await page.getByRole("group", { name: "Colours" }).getByRole("button", { name: "Colour-blind safe" }).click();
-  await page.getByRole("group", { name: "Contrast" }).getByRole("button", { name: "More" }).click();
-  await page.waitForFunction(() => document.documentElement.dataset.cvd === "on" && document.documentElement.dataset.contrast === "more");
-  await scan("light settings, colour-blind safe, more contrast");
-  for (const tab of ["recovery", "stats"]) {
-    await page.goto(`${server.url}/app/#/${tab}`);
-    await page.getByRole("heading", { level: 1 }).waitFor();
-    await scan(`light ${tab}, colour-blind safe, more contrast`);
-    // The recovery map and its legend mark bands with patterns too, so they don't rely on colour alone.
-    if (tab === "recovery" && !(await page.locator("[data-mark]").count())) fail.push("recovery map: no dot or stripe marks");
-  }
-  await page.goto(`${server.url}/app/#/settings/look`);
-  await page.getByRole("button", { name: "Dark", exact: true }).click();
-  await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
-  for (const tab of ["today", "recovery"]) {
-    await page.goto(`${server.url}/app/#/${tab}`);
+      },
+    };
+    await page.route("**/api/social/", (r) =>
+      r.fulfill({ json: friendsApi[JSON.parse(r.request().postData() ?? "{}").op] ?? { ok: true } }),
+    );
+    await page.route("**/api/sync/", (r) => r.fulfill({ json: { cursor: 0, events: [], deleted: [], records: [], more: false } }));
+    await page.evaluate(() =>
+      localStorage.setItem("liftsmith.account", JSON.stringify({ token: "t", id: "a", email: null, providers: ["email"], via: "email" })),
+    );
+    await page.reload();
+    await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
+    await page.getByRole("button", { name: "🔥 Cheer Blair on" }).waitFor();
+    await scan("friends feed");
+    await page.getByRole("button", { name: "Discover" }).click();
+    await page.getByRole("article", { name: "Workout from Casey" }).waitFor();
+    await scan("friends discover");
+    await page.getByRole("button", { name: "Following" }).click();
+    await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
+    await page.getByRole("button", { name: "More options" }).click();
+    await page
+      .getByRole("button", { name: "Edit post" })
+      .or(page.getByRole("button", { name: /^Report/ }))
+      .first()
+      .waitFor();
+    await scan("friends post menu");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: /^See Blair’s whole workout/ }).click();
+    await page.getByRole("button", { name: "Do this workout" }).waitFor();
+    await scan("friends whole workout");
+    await page.keyboard.press("Escape");
+    // Let the closed sheet's history step land first, or it closes the next sheet as it opens.
+    await page.waitForTimeout(1000);
+    await page.getByRole("button", { name: /likes: see who/ }).click();
+    await page.getByRole("dialog", { name: "Liked by" }).waitFor();
+    await scan("friends likers");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Friends settings" }).click();
+    await page.getByRole("group", { name: "Avatar" }).waitFor();
+    await scan("friends settings");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: /^Comments/ }).click();
+    await page.getByText("Strong work!").waitFor();
+    await scan("friends comments");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Board" }).click();
+    // A challenge that just ended opens its results moment once (gap list 3, item 5).
+    await page.getByRole("dialog", { name: "Leg week" }).getByText("You won!").waitFor();
+    await scan("friends challenge result");
+    await page.keyboard.press("Escape");
+    await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
+    await page.getByText("Blair invited you to this challenge.").waitFor();
+    await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();
+    await scan("friends board");
+    await page.getByRole("button", { name: "Start a challenge" }).click();
+    await page.getByRole("group", { name: "Challenge" }).waitFor();
+    await scan("friends start challenge");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Clubs" }).click();
+    await page.getByRole("button", { name: /Iron Barn crew/ }).waitFor();
+    await scan("friends clubs");
+    await page.getByRole("button", { name: /Iron Barn crew/ }).click();
+    await page.getByRole("button", { name: "Invite to the club" }).waitFor();
+    await page.getByText("This week as a crew: 9 workouts").waitFor();
+    await scan("friends club");
+    await page.getByRole("button", { name: "Change goal" }).click();
+    await page.getByRole("button", { name: "Save goal" }).waitFor();
+    await scan("friends club goal");
+    await page.getByRole("button", { name: "Cancel" }).click();
+    await page.getByRole("button", { name: "Posts" }).click();
+    await page.getByRole("article", { name: "Workout from Blair" }).last().waitFor();
+    await scan("friends club posts");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: /^Activity/ }).click();
+    await page.getByText("Blair liked your workout").waitFor();
+    await scan("friends activity");
+    await page.getByRole("button", { name: /^People/ }).click();
+    await page.getByRole("button", { name: "Accept" }).waitFor();
+    await page.getByText("People you may know").waitFor();
+    await page.getByLabel("Find a friend").fill("stone");
+    await page.getByRole("list", { name: "Search results" }).waitFor();
+    await scan("friends people");
+    await page.getByRole("button", { name: "Scan to follow" }).click();
+    await page.getByRole("img", { name: "Your Liftsmith code" }).waitFor();
+    await scan("friends scan to follow");
+    await page.keyboard.press("Escape");
+    await page.goto(`${server.url}/app/#/person/blair`);
+    await page.getByText("Follows you").waitFor();
+    await page.getByText("Best lifts").waitFor();
+    await page.getByText("Level 12").waitFor();
+    await scan("friends person");
+    await page.getByRole("button", { name: /Followers/ }).click();
+    await page.getByRole("dialog").getByText("Alex", { exact: true }).waitFor();
+    await scan("friends followers");
+    await page.keyboard.press("Escape");
+    await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
+    await page.getByText("Blair invited you").waitFor();
+    await scan("friends invite");
+    await page.goto(`${server.url}/app/#/club/ABCD2345`);
+    await page.getByRole("button", { name: "Join the club" }).waitFor();
+    await scan("friends club link");
+    // Coaching's pages for each side (2026-11-13), signed in against a stand-in API: a coach's tabs, then a client's page.
+    const coachApi = (client) => ({
+      invite: client ? null : { code: "ABCD2345", expiresAt: Date.now() + 7 * 86_400_000 },
+      clients: client ? [] : [{ id: "c1", name: "Alex", since: Date.now() - 30 * 86_400_000 }],
+      coaches: client ? [{ id: "k1", name: "Sam", since: Date.now() - 30 * 86_400_000, role: "coach" }] : [],
+      plans: [],
+      notes: client ? [{ coachId: "k1", clientId: "a", text: "Deload this week.", at: Date.now() }] : [],
+      unread: client ? { k1: 1 } : { c1: 2 },
+      setup: {},
+      forms: [],
+      checkins: [],
+      // The schedule's month calendar (2026-11-14): a booked and an open time two days from now.
+      slots: client
+        ? []
+        : [
+            {
+              id: "s1",
+              coachId: "a",
+              start: Date.now() + 2 * 86_400_000,
+              minutes: 60,
+              place: "Main gym",
+              clientId: "c1",
+              bookedAt: Date.now(),
+            },
+            {
+              id: "s2",
+              coachId: "a",
+              start: Date.now() + 2 * 86_400_000 + 7_200_000,
+              minutes: 45,
+              place: "",
+              clientId: null,
+              bookedAt: null,
+            },
+          ],
+      sessions: { booked: [], open: [] },
+      pay: null,
+      coach: !client,
+    });
+    let coachClient = false;
+    await page.route("**/api/coach/**", (r) =>
+      r.fulfill({ json: r.request().method() === "GET" && !r.request().url().includes("?") ? coachApi(coachClient) : { ok: true } }),
+    );
+    // Ratings and reviews (2026-11-15, coach-reviews.md): the coach's own on Setup, and the client's own review of Sam.
+    const review = (id, stars, name, text, reply = "") => ({
+      id,
+      stars,
+      text,
+      name,
+      at: Date.now() - 86_400_000,
+      reply,
+      replyAt: reply ? Date.now() : 0,
+    });
+    const reviewsApi = (url) => ({
+      rating: { count: 3, average: 4.7, outcome: { clients: 5, active: 4 } },
+      reviews: [
+        review("a1a1a1a1a1a1a1a1a1a1", 5, "Alex P.", "Fixed my squat in a month.", "Thanks Alex!"),
+        review("b2b2b2b2b2b2b2b2b2b2", 5, "Blair", "Clear plans every week."),
+        review("c3c3c3c3c3c3c3c3c3c3", 4, "", ""),
+      ],
+      mine: url.includes("?coach=")
+        ? { review: review("d4d4d4d4d4d4d4d4d4d4", 5, "Jordan P.", "Best coach I've had."), can: { ok: true } }
+        : undefined,
+    });
+    await page.route("**/api/coach/reviews/**", (r) =>
+      r.fulfill({ json: r.request().method() === "GET" ? reviewsApi(r.request().url()) : { ok: true } }),
+    );
+    await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
+    await page.goto(`${server.url}/app/#/trainer/clients`);
+    await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
+    await scan("coaching clients");
+    await page.goto(`${server.url}/app/#/trainer/messages`);
+    await page.getByRole("button", { name: /Alex/ }).waitFor();
+    await scan("coaching messages");
+    await page.goto(`${server.url}/app/#/trainer/schedule`);
+    await page.getByTestId("schedule-calendar").waitFor();
+    await scan("coaching schedule");
+    await page.goto(`${server.url}/app/#/trainer/setup`);
+    await page.getByText("Fixed my squat in a month.").waitFor();
+    await scan("coaching reviews");
+    coachClient = true;
+    await page.goto(`${server.url}/app/#/trainer`);
+    await page.reload();
+    await page.getByRole("button", { name: /Message Sam/ }).waitFor();
+    await page.getByText("Best coach I've had.").waitFor();
+    await scan("coaching client");
+    await page.unroute("**/api/coach/reviews/**");
+    await page.unroute("**/api/coach/**");
+    await page.unroute("**/api/teams/**");
+    await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
+    await page.unroute("**/api/social/");
+    await page.unroute("**/api/sync/");
+    // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against. The page was
+    // just on #/trainer signed in, so reload for the signed-out page.
+    await page.goto(`${server.url}/app/#/trainer`);
+    await page.reload();
+    await page.getByRole("heading", { name: "Coaching" }).waitFor();
+    await scan("trainer");
+    await page.goto(`${server.url}/app/#/settings`);
+    await scan("settings");
+    // Every group page of Settings, and Labs (2026-11-10).
+    for (const group of ["training", "workout", "reminders", "look", "body", "data", "labs"]) {
+      await page.goto(`${server.url}/app/#/settings/${group}`);
+      await page.getByRole("heading", { level: 1 }).waitFor();
+      await scan(`settings ${group}`);
+    }
+    await page.goto(`${server.url}/app/#/settings/body`);
+    await page.getByRole("button", { name: "Set up" }).click();
+    await scan("cycle consent");
+    await page.getByRole("button", { name: "I agree, turn it on" }).click();
+    await page.getByRole("button", { name: "Period started today" }).click();
+    await scan("cycle on");
+    await page.goto(`${server.url}/app/#/settings/training`);
+    await page.getByRole("button", { name: "Injuries and sore spots" }).click();
+    await page.getByRole("button", { name: "Log an injury" }).click();
+    await scan("injury picker");
+    await page.getByRole("button", { name: "Knee" }).click();
+    await scan("pain rating");
+    const rate = page.getByRole("dialog", { name: "How bad is it right now?" });
+    await rate.getByRole("slider", { name: "Pain from 0 to 10" }).fill("6");
+    await rate.getByRole("button", { name: "Save rating" }).click();
+    await scan("injuries");
+    await page.getByRole("button", { name: "Lighter" }).first().click();
+    await scan("injury risk warning");
+    await page.getByRole("button", { name: /Keep skipping/ }).click();
+    await page.goto(`${server.url}/app/#/settings`);
+    await page.getByRole("button", { name: "Send feedback or report a bug" }).click();
+    await page.getByRole("button", { name: "See what's included" }).click();
+    await scan("feedback");
+    await page.getByLabel("Message").fill("The rest timer skipped a beat");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
+    await scan("feedback sent");
+    // Light mode: every main screen again, so the light tokens pass contrast too.
+    await page.goto(`${server.url}/app/#/settings/look`);
+    await page.getByRole("button", { name: "Light", exact: true }).click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
+    await scan("light settings look");
+    await page.goto(`${server.url}/app/#/settings`);
+    await scan("light settings");
+    await page.getByRole("button", { name: "‹ Today" }).click();
+    await scan("light today");
+    for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
+      await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
+      await scan(`light ${tab}`);
+    }
+    // Gyms left the tab bar for Settings (and Today's gym chip) on 2026-11-12, so it's opened by its link here.
+    await page.evaluate(() => (location.hash = "#/gym"));
+    await page.getByRole("heading", { name: "Gyms" }).waitFor();
+    await scan("light Gyms");
+    await page.getByRole("button", { name: "‹ Back" }).click();
+    await page.getByRole("button", { name: "Today" }).click();
+    // After a saved workout Today says the day's done; Train again brings the plan (and Start workout) back.
+    const start = page.getByRole("button", { name: "Start workout" });
+    const again = page.getByRole("button", { name: "Train again" });
+    await start.or(again).first().waitFor();
+    if (await again.isVisible()) await again.click();
+    await start.click();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+    await scan("light workout");
+    await page.goto(`${server.url}/app/#/log`);
+    await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+    await scan("light log a past workout");
+    // Accessibility settings: colour-blind safe colours and more contrast, in both themes.
+    await page.goto(`${server.url}/app/#/settings/look`);
+    await page.getByRole("group", { name: "Colours" }).getByRole("button", { name: "Colour-blind safe" }).click();
+    await page.getByRole("group", { name: "Contrast" }).getByRole("button", { name: "More" }).click();
+    await page.waitForFunction(() => document.documentElement.dataset.cvd === "on" && document.documentElement.dataset.contrast === "more");
+    await scan("light settings, colour-blind safe, more contrast");
+    for (const tab of ["recovery", "stats"]) {
+      await page.goto(`${server.url}/app/#/${tab}`);
+      await page.getByRole("heading", { level: 1 }).waitFor();
+      await scan(`light ${tab}, colour-blind safe, more contrast`);
+      // The recovery map and its legend mark bands with patterns too, so they don't rely on colour alone.
+      if (tab === "recovery" && !(await page.locator("[data-mark]").count())) fail.push("recovery map: no dot or stripe marks");
+    }
+    await page.goto(`${server.url}/app/#/settings/look`);
+    await page.getByRole("button", { name: "Dark", exact: true }).click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
+    for (const tab of ["today", "recovery"]) {
+      await page.goto(`${server.url}/app/#/${tab}`);
+      await page.getByRole("heading", { level: 1 }).first().waitFor();
+      await scan(`dark ${tab}, colour-blind safe, more contrast`);
+    }
+    // One-handed controls: the bump buttons docked beside Log set (a workout is still open from above).
+    await page.goto(`${server.url}/app/#/settings/workout`);
+    await page.getByRole("group", { name: "One-handed controls" }).getByRole("button", { name: "Right hand" }).click();
+    await page.goto(`${server.url}/app/#/workout`);
+    await page.getByRole("group", { name: "Adjust this set" }).waitFor();
+    await scan("one-handed workout");
+    // Forced colours (Windows High Contrast and similar).
+    await page.emulateMedia({ forcedColors: "active" });
+    await page.goto(`${server.url}/app/#/today`);
     await page.getByRole("heading", { level: 1 }).first().waitFor();
-    await scan(`dark ${tab}, colour-blind safe, more contrast`);
+    // axe can't compute contrast under forced colours (the system picks them), so that rule is left out here.
+    await scan("forced colours today", ["color-contrast"]);
+    await page.emulateMedia({ forcedColors: "none" });
+  } catch (e) {
+    fail.push(String(e));
   }
-  // One-handed controls: the bump buttons docked beside Log set (a workout is still open from above).
-  await page.goto(`${server.url}/app/#/settings/workout`);
-  await page.getByRole("group", { name: "One-handed controls" }).getByRole("button", { name: "Right hand" }).click();
-  await page.goto(`${server.url}/app/#/workout`);
-  await page.getByRole("group", { name: "Adjust this set" }).waitFor();
-  await scan("one-handed workout");
-  // Forced colours (Windows High Contrast and similar).
-  await page.emulateMedia({ forcedColors: "active" });
-  await page.goto(`${server.url}/app/#/today`);
-  await page.getByRole("heading", { level: 1 }).first().waitFor();
-  // axe can't compute contrast under forced colours (the system picks them), so that rule is left out here.
-  await scan("forced colours today", ["color-contrast"]);
-  await page.emulateMedia({ forcedColors: "none" });
-} catch (e) {
-  fail.push(String(e));
-}
+if (runs("more"))
+  try {
+    await page.goto(`${server.url}/`);
+    await scan("home");
+    // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
+    // guide, blog post and index, calculators), then the pricing, help, contact, terms, what's new, status, about and
+    // accessibility pages. The static build has no API, so the status page's health check is answered here.
+    await page.route("**/api/health/", (r) => r.fulfill({ json: { ok: true } }));
+    for (const path of [
+      "/exercises/",
+      "/exercises/bench-press/",
+      "/blog/topic/recovery/",
+      "/exercises/back-squat/",
+      "/exercises/bench-press/alternatives/",
+      "/exercises/vs/",
+      "/exercises/vs/back-squat-vs-front-squat/",
+      "/ja/exercises/vs/back-squat-vs-front-squat/",
+      "/muscles/chest/",
+      "/de/muscles/biceps/",
+      "/programs/classic-5x5/",
+      "/it/programs/ppl/",
+      "/muscles/chest/dumbbells/",
+      "/equipment/barbell/",
+      "/guides/reps-in-reserve/",
+      "/blog/",
+      "/blog/how-long-to-rest-between-sets/",
+      "/tools/plate-calculator/",
+      "/tools/one-rep-max-calculator/",
+      "/tools/warm-up-calculator/",
+      "/tools/rpe-chart/",
+      "/tools/strength-standards/",
+      "/tools/dots-calculator/",
+      "/import/strong/",
+      "/features/",
+      "/features/rest-timer/",
+      "/apps/5x5/",
+      "/compare/",
+      "/compare/fitbod/",
+      "/alternatives/fitbod/",
+      "/compare/best-workout-apps/",
+      "/compare/boostcamp/",
+      "/trust/",
+      "/pricing/",
+      "/help/",
+      "/help/billing/",
+      "/contact/",
+      "/terms/",
+      "/whats-new/",
+      "/status/",
+      "/about/",
+      "/editorial-standards/",
+      "/accessibility/",
+    ]) {
+      await page.goto(`${server.url}${path}`);
+      await page.getByRole("heading", { level: 1 }).waitFor();
+      await scan(`site ${path}`);
+    }
+  } catch (e) {
+    fail.push(`site: ${String(e)}`);
+  }
 await ctx.close();
 
 // Keyboard only, with the largest text on a common narrow phone (360 px).
@@ -794,72 +808,73 @@ const kctx = await browser.newContext({
 });
 await stubSignIn(kctx);
 const kp = await kctx.newPage();
-try {
-  await kp.goto(`${server.url}/app/`);
-  await onboard(kp);
-  await kp.goto(`${server.url}/app/#/settings/look`);
-  await kp.getByRole("group", { name: "Text size" }).getByRole("button", { name: "Largest" }).click();
-  await kp.waitForFunction(() => document.documentElement.style.fontSize === "150%");
-  const sideways = async (where) => {
-    const w = await kp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    if (w > 1) fail.push(`largest text: ${where} scrolls sideways by ${w}px`);
-  };
-  await sideways("settings");
-  for (const tab of ["recovery", "stats", "achievements", "gym", "today"]) {
-    await kp.goto(`${server.url}/app/#/${tab}`);
-    await kp.getByRole("heading", { level: 1 }).first().waitFor();
-    await sideways(tab);
-  }
-  // Tab to Start workout. Every stop on the way must show a focus ring.
-  const press = async (key, what, max = 80) => {
-    for (let i = 0; i < max; i++) {
-      await kp.keyboard.press("Tab");
-      const f = await kp.evaluate(() => {
-        const el = document.activeElement;
-        if (!el || el === document.body) return null;
-        const cs = getComputedStyle(el);
-        const ring = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none";
-        const r = el.getBoundingClientRect();
-        return {
-          name: (el.getAttribute("aria-label") || el.textContent || "").trim().slice(0, 40),
-          ring,
-          seen: r.width > 0 && r.height > 0,
-        };
-      });
-      if (f && f.seen && !f.ring) fail.push(`keyboard: no visible focus ring on "${f.name}"`);
-      if (f && what.test(f.name)) {
-        await kp.keyboard.press(key);
-        return true;
+if (runs("more"))
+  try {
+    await kp.goto(`${server.url}/app/`);
+    await onboard(kp);
+    await kp.goto(`${server.url}/app/#/settings/look`);
+    await kp.getByRole("group", { name: "Text size" }).getByRole("button", { name: "Largest" }).click();
+    await kp.waitForFunction(() => document.documentElement.style.fontSize === "150%");
+    const sideways = async (where) => {
+      const w = await kp.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      if (w > 1) fail.push(`largest text: ${where} scrolls sideways by ${w}px`);
+    };
+    await sideways("settings");
+    for (const tab of ["recovery", "stats", "achievements", "gym", "today"]) {
+      await kp.goto(`${server.url}/app/#/${tab}`);
+      await kp.getByRole("heading", { level: 1 }).first().waitFor();
+      await sideways(tab);
+    }
+    // Tab to Start workout. Every stop on the way must show a focus ring.
+    const press = async (key, what, max = 80) => {
+      for (let i = 0; i < max; i++) {
+        await kp.keyboard.press("Tab");
+        const f = await kp.evaluate(() => {
+          const el = document.activeElement;
+          if (!el || el === document.body) return null;
+          const cs = getComputedStyle(el);
+          const ring = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none";
+          const r = el.getBoundingClientRect();
+          return {
+            name: (el.getAttribute("aria-label") || el.textContent || "").trim().slice(0, 40),
+            ring,
+            seen: r.width > 0 && r.height > 0,
+          };
+        });
+        if (f && f.seen && !f.ring) fail.push(`keyboard: no visible focus ring on "${f.name}"`);
+        if (f && what.test(f.name)) {
+          await kp.keyboard.press(key);
+          return true;
+        }
+      }
+      fail.push(`keyboard: couldn't reach ${what} with Tab`);
+      return false;
+    };
+    if (await press("Enter", /^Start workout/)) {
+      await kp.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+      await sideways("workout");
+      if (await press("Enter", /^Log (set|warm-up)/)) {
+        await kp.getByRole("timer").waitFor();
+        await sideways("rest");
       }
     }
-    fail.push(`keyboard: couldn't reach ${what} with Tab`);
-    return false;
-  };
-  if (await press("Enter", /^Start workout/)) {
-    await kp.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
-    await sideways("workout");
-    if (await press("Enter", /^Log (set|warm-up)/)) {
-      await kp.getByRole("timer").waitFor();
-      await sideways("rest");
-    }
+    // A sheet: focus moves in, Tab stays in, Escape closes it and focus comes back.
+    await kp.getByRole("button", { name: "End", exact: true }).focus();
+    await kp.keyboard.press("Enter");
+    const dialog = kp.getByRole("dialog");
+    await dialog.waitFor();
+    const inside = await kp.evaluate(() => !!document.activeElement?.closest("[role=dialog]"));
+    if (!inside) fail.push("keyboard: focus didn't move into the sheet");
+    for (let i = 0; i < 12; i++) await kp.keyboard.press("Tab");
+    const stillInside = await kp.evaluate(() => !!document.activeElement?.closest("[role=dialog]"));
+    if (!stillInside) fail.push("keyboard: Tab left the open sheet");
+    await kp.keyboard.press("Escape");
+    await dialog.waitFor({ state: "detached" });
+    const back = await kp.evaluate(() => document.activeElement?.textContent?.trim());
+    if (back !== "End") fail.push(`keyboard: focus went to "${back}" after closing the sheet, not back to End`);
+  } catch (e) {
+    fail.push(`keyboard and large text: ${String(e)}`);
   }
-  // A sheet: focus moves in, Tab stays in, Escape closes it and focus comes back.
-  await kp.getByRole("button", { name: "End", exact: true }).focus();
-  await kp.keyboard.press("Enter");
-  const dialog = kp.getByRole("dialog");
-  await dialog.waitFor();
-  const inside = await kp.evaluate(() => !!document.activeElement?.closest("[role=dialog]"));
-  if (!inside) fail.push("keyboard: focus didn't move into the sheet");
-  for (let i = 0; i < 12; i++) await kp.keyboard.press("Tab");
-  const stillInside = await kp.evaluate(() => !!document.activeElement?.closest("[role=dialog]"));
-  if (!stillInside) fail.push("keyboard: Tab left the open sheet");
-  await kp.keyboard.press("Escape");
-  await dialog.waitFor({ state: "detached" });
-  const back = await kp.evaluate(() => document.activeElement?.textContent?.trim());
-  if (back !== "End") fail.push(`keyboard: focus went to "${back}" after closing the sheet, not back to End`);
-} catch (e) {
-  fail.push(`keyboard and large text: ${String(e)}`);
-}
 await kctx.close();
 
 // The desktop layout (layout.ts, docs/decisions/desktop-layout.md): the sidebar and the main screens in dark
@@ -886,73 +901,74 @@ const settle = () =>
         .map((a) => a.finished.catch(() => {})),
     ),
   );
-try {
-  await dp.goto(`${server.url}/app/`);
-  await onboard(dp);
-  if ((await dp.evaluate(() => document.documentElement.dataset.layout)) !== "desktop")
-    fail.push("desktop: no desktop layout at 1440 wide");
-  for (const theme of ["Dark", "Light"]) {
-    await dp.goto(`${server.url}/app/#/settings/look`);
-    await dp.getByRole("button", { name: theme, exact: true }).click();
-    for (const tab of ["today", "recovery", "stats", "friends", "achievements", "settings"]) {
-      await dp.goto(`${server.url}/app/#/${tab}`);
-      await dp.getByRole("heading", { level: 1 }).first().waitFor();
-      await dp.waitForTimeout(300);
-      await settle();
-      await dscan(`${theme.toLowerCase()} ${tab}`);
+if (runs("more"))
+  try {
+    await dp.goto(`${server.url}/app/`);
+    await onboard(dp);
+    if ((await dp.evaluate(() => document.documentElement.dataset.layout)) !== "desktop")
+      fail.push("desktop: no desktop layout at 1440 wide");
+    for (const theme of ["Dark", "Light"]) {
+      await dp.goto(`${server.url}/app/#/settings/look`);
+      await dp.getByRole("button", { name: theme, exact: true }).click();
+      for (const tab of ["today", "recovery", "stats", "friends", "achievements", "settings"]) {
+        await dp.goto(`${server.url}/app/#/${tab}`);
+        await dp.getByRole("heading", { level: 1 }).first().waitFor();
+        await dp.waitForTimeout(300);
+        await settle();
+        await dscan(`${theme.toLowerCase()} ${tab}`);
+      }
     }
-  }
-  // The routine builder: a wide dialog with the exercise browser open beside the routine.
-  await dp.goto(`${server.url}/app/#/today`);
-  await dp.getByRole("button", { name: "Routines" }).click();
-  await dp.getByRole("button", { name: "Build a new routine" }).click();
-  await dp.getByRole("searchbox").fill("bench press");
-  await dp
-    .getByRole("dialog")
-    .getByRole("button")
-    .filter({ hasText: /bench press/i })
-    .first()
-    .click();
-  await dp.waitForTimeout(300);
-  await settle();
-  await dscan("routine builder");
-  await dp.keyboard.press("Escape");
-  await dp.goto(`${server.url}/app/#/today`);
-  await dp.getByRole("button", { name: "Start workout" }).click();
-  await dp.getByRole("button", { name: "Swap exercise", exact: true }).click();
-  await dp.getByRole("dialog").waitFor();
-  await dp.waitForTimeout(300);
-  await settle();
-  await dscan("dialog");
-  const box = await dp.getByRole("dialog").boundingBox();
-  if (!box || box.y + box.height >= 899) fail.push("desktop: the sheet didn't open as a centred dialog");
-  await dp.keyboard.press("Escape");
-  // The sidebar from the keyboard: Tab reaches Progress with a focus ring, and Enter opens it.
-  await dp.goto(`${server.url}/app/#/today`);
-  await dp.getByRole("heading", { level: 1 }).first().waitFor();
-  let reached = false;
-  for (let i = 0; i < 12 && !reached; i++) {
-    await dp.keyboard.press("Tab");
-    const f = await dp.evaluate(() => {
-      const el = document.activeElement;
-      const cs = el && getComputedStyle(el);
-      return {
-        side: !!el?.closest("nav"),
-        name: el?.textContent?.trim(),
-        ring: !!cs && ((cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none"),
-      };
-    });
-    if (f.side && !f.ring) fail.push(`desktop keyboard: no focus ring on sidebar "${f.name}"`);
-    if (f.side && f.name === "Progress") {
-      reached = true;
-      await dp.keyboard.press("Enter");
-      await dp.waitForURL(/#\/progress/);
+    // The routine builder: a wide dialog with the exercise browser open beside the routine.
+    await dp.goto(`${server.url}/app/#/today`);
+    await dp.getByRole("button", { name: "Routines" }).click();
+    await dp.getByRole("button", { name: "Build a new routine" }).click();
+    await dp.getByRole("searchbox").fill("bench press");
+    await dp
+      .getByRole("dialog")
+      .getByRole("button")
+      .filter({ hasText: /bench press/i })
+      .first()
+      .click();
+    await dp.waitForTimeout(300);
+    await settle();
+    await dscan("routine builder");
+    await dp.keyboard.press("Escape");
+    await dp.goto(`${server.url}/app/#/today`);
+    await dp.getByRole("button", { name: "Start workout" }).click();
+    await dp.getByRole("button", { name: "Swap exercise", exact: true }).click();
+    await dp.getByRole("dialog").waitFor();
+    await dp.waitForTimeout(300);
+    await settle();
+    await dscan("dialog");
+    const box = await dp.getByRole("dialog").boundingBox();
+    if (!box || box.y + box.height >= 899) fail.push("desktop: the sheet didn't open as a centred dialog");
+    await dp.keyboard.press("Escape");
+    // The sidebar from the keyboard: Tab reaches Progress with a focus ring, and Enter opens it.
+    await dp.goto(`${server.url}/app/#/today`);
+    await dp.getByRole("heading", { level: 1 }).first().waitFor();
+    let reached = false;
+    for (let i = 0; i < 12 && !reached; i++) {
+      await dp.keyboard.press("Tab");
+      const f = await dp.evaluate(() => {
+        const el = document.activeElement;
+        const cs = el && getComputedStyle(el);
+        return {
+          side: !!el?.closest("nav"),
+          name: el?.textContent?.trim(),
+          ring: !!cs && ((cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none"),
+        };
+      });
+      if (f.side && !f.ring) fail.push(`desktop keyboard: no focus ring on sidebar "${f.name}"`);
+      if (f.side && f.name === "Progress") {
+        reached = true;
+        await dp.keyboard.press("Enter");
+        await dp.waitForURL(/#\/progress/);
+      }
     }
+    if (!reached) fail.push("desktop keyboard: couldn't reach the sidebar's Progress with Tab");
+  } catch (e) {
+    fail.push(`desktop: ${String(e)}`);
   }
-  if (!reached) fail.push("desktop keyboard: couldn't reach the sidebar's Progress with Tab");
-} catch (e) {
-  fail.push(`desktop: ${String(e)}`);
-}
 await browser.close();
 server.close();
 finish("accessibility", fail);
