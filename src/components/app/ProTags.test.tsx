@@ -95,6 +95,37 @@ describe("Pro features without Pro", () => {
     expect(within(list).getByText(/Free, always/)).toBeInTheDocument();
   });
 
+  it("turns today into a bonus day of adaptive workouts from the streak flame, once a day (an easter egg)", async () => {
+    const user = userEvent.setup();
+    await onboardFree(user);
+    const s = useApp.getState();
+    const used: AppEvent = {
+      type: "sessionStart",
+      id: "free-1",
+      at: Date.now() - 60_000,
+      sessionId: "free-1",
+      gymId: s.profile.activeGymId!,
+      minutes: 45,
+    };
+    act(() => useApp.setState({ events: [...s.events, used] }));
+    expect(screen.queryByRole("button", { name: /Try adaptive today/ })).toBeNull();
+    let r: ReturnType<typeof s.bonusDay> = null;
+    act(() => {
+      r = useApp.getState().bonusDay();
+    });
+    expect(r).toBe("ok");
+    expect(useApp.getState().events.filter((e) => e.type === "bonusDay")).toHaveLength(1);
+    expect(useApp.getState().preview?.program).toBeUndefined();
+    await user.click(await screen.findByRole("button", { name: "Adaptive today, a bonus day · Back to Classic 5×5" }));
+    expect(useApp.getState().preview?.program?.id).toBe("classic-5x5");
+    expect(screen.getByRole("button", { name: "Bonus day · Try adaptive today" })).toBeInTheDocument();
+    act(() => {
+      r = useApp.getState().bonusDay();
+    });
+    expect(r).toBe("today");
+    expect(useApp.getState().events.filter((e) => e.type === "bonusDay")).toHaveLength(1);
+  });
+
   it("keeps Short on time free during a workout", async () => {
     const user = userEvent.setup();
     await onboardFree(user);
