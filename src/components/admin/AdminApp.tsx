@@ -674,7 +674,7 @@ export function AdminApp() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16">
-      <header className="z-20 -mx-4 md:sticky md:top-0 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
+      <header data-admin-header className="z-20 -mx-4 md:sticky md:top-0 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="mr-auto text-lg font-bold">
             Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
