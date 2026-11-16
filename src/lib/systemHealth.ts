@@ -406,6 +406,7 @@ export const SETTINGS: Setting[] = [
   ...(
     [
       ["STRAVA", "Strava", "Workouts out to Strava."],
+      ["GARMIN", "Garmin Connect", "Sleep, HRV, weigh-ins, runs and rides in from Garmin Connect."],
       ["OURA", "Oura", "Sleep and readiness in from Oura."],
       ["WHOOP", "WHOOP", "Recovery and sleep in from WHOOP."],
       ["WITHINGS", "Withings", "Weigh-ins and body fat in from Withings."],

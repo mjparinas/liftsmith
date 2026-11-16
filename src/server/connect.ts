@@ -2,7 +2,9 @@
 // few API calls each service needs. Strava receives finished workouts; Oura, Whoop, Withings and Polar send
 // sleep, HRV, resting heart rate, breathing rate, steps and (Withings) weigh-ins in, which the app stores like
 // Health Connect's; Concept2 sends rows, ski and bike sessions in as cardio. Readings and sessions pass
-// through and are never stored here. Each service needs its own client id and secret in Vercel
+// through and are never stored here, except Garmin Connect's: Garmin pings us when a lifter's watch syncs and
+// we fetch the new summaries then (sleep, HRV, resting heart rate, steps, weigh-ins, runs, rides and rows), so
+// they wait in cloud_readings and cloud_sessions until the app pulls them. Each service needs its own client id and secret in Vercel
 // (STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET, OURA_…, WHOOP_…, WITHINGS_…, POLAR_…, CONCEPT2_…); without them its
 // row in the app says "Coming soon" and every route for it answers 503. Sonos (SONOS_…) takes play, skip and volume
 // commands from the workout (src/server/sonos.ts).
@@ -10,6 +12,7 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:
 
 import {
   CLOUD,
+  type CardioCloud,
   type Cloud,
   type CloudCardio,
   type CloudReading,
@@ -34,6 +37,8 @@ interface Provider {
   basic?: boolean;
   /** Withings: every token call carries action=requesttoken, and the reply is wrapped in { status, body }. */
   withings?: boolean;
+  /** Garmin: OAuth 2.0 with PKCE (S256); the code verifier is kept with the one-time state. */
+  pkce?: boolean;
 }
 
 export const PROVIDERS: Record<Cloud, Provider> = {
@@ -42,6 +47,14 @@ export const PROVIDERS: Record<Cloud, Provider> = {
     token: "https://www.strava.com/oauth/token",
     scope: "activity:write,read",
     extra: { approval_prompt: "auto" },
+  },
+  // Garmin Connect Developer Program (Health and Activity APIs): OAuth 2.0 with PKCE. What the lifter shares is
+  // picked on Garmin's own consent page, so there's no scope to ask for.
+  garmin: {
+    authorize: "https://connect.garmin.com/oauth2Confirm",
+    token: "https://diauth.garmin.com/di-oauth2-service/oauth/token",
+    scope: "",
+    pkce: true,
   },
   oura: {
     authorize: "https://cloud.ouraring.com/oauth/authorize",
@@ -82,6 +95,7 @@ export const PROVIDERS: Record<Cloud, Provider> = {
 
 const ENV: Record<Cloud, string> = {
   strava: "STRAVA",
+  garmin: "GARMIN",
   oura: "OURA",
   whoop: "WHOOP",
   withings: "WITHINGS",
@@ -150,21 +164,24 @@ export async function start(
   const k = keys(p, env);
   if (!k) return null;
   const state = randomBytes(24).toString("base64url");
+  const cfg = PROVIDERS[p];
+  const verifier = cfg.pkce ? randomBytes(32).toString("base64url") : null;
   await run("DELETE FROM connect_states WHERE expires_at < ?", [now]);
-  await run("INSERT INTO connect_states (state, account_id, provider, platform, expires_at) VALUES (?, ?, ?, ?, ?)", [
+  await run("INSERT INTO connect_states (state, account_id, provider, platform, expires_at, verifier) VALUES (?, ?, ?, ?, ?, ?)", [
     state,
     accountId,
     p,
     platform === "ios" || platform === "android" ? platform : "web",
     now + STATE_MS,
+    verifier,
   ]);
-  const cfg = PROVIDERS[p];
   const q = new URLSearchParams({
     client_id: k.id,
     redirect_uri: redirectUri(p),
     response_type: "code",
-    scope: cfg.scope,
+    ...(cfg.scope ? { scope: cfg.scope } : {}),
     state,
+    ...(verifier ? { code_challenge: createHash("sha256").update(verifier).digest("base64url"), code_challenge_method: "S256" } : {}),
     ...cfg.extra,
   });
   return `${cfg.authorize}?${q}`;
@@ -204,9 +221,17 @@ async function tokenCall(p: Cloud, body: Record<string, string>, f: Fetch, env: 
 const expiry = (j: TokenReply, now: number) =>
   j.expires_at ? j.expires_at * 1000 : now + (j.expires_in && j.expires_in > 0 ? j.expires_in * 1000 : 3_600_000);
 
-async function save(accountId: string, p: Cloud, j: TokenReply, who: string | null, env: NodeJS.ProcessEnv, now: number) {
+async function save(
+  accountId: string,
+  p: Cloud,
+  j: TokenReply,
+  who: string | null,
+  env: NodeJS.ProcessEnv,
+  now: number,
+  remoteUser: string | null = null,
+) {
   const k = keys(p, env)!;
-  const remote = j.x_user_id === undefined ? null : String(j.x_user_id);
+  const remote = remoteUser ?? (j.x_user_id === undefined ? null : String(j.x_user_id));
   await run(
     `INSERT INTO connections (account_id, provider, access_token, refresh_token, expires_at, who, created_at, remote_user)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -255,17 +280,27 @@ export async function callback(
   now = Date.now(),
 ): Promise<{ platform: string } | null> {
   if (!state || !code || state.length > 100 || code.length > 2000) return null;
-  const rows = await query<{ account_id: string; provider: string; platform: string; expires_at: number }>(
-    "DELETE FROM connect_states WHERE state = ? RETURNING account_id, provider, platform, expires_at",
+  const rows = await query<{ account_id: string; provider: string; platform: string; expires_at: number; verifier: string | null }>(
+    "DELETE FROM connect_states WHERE state = ? RETURNING account_id, provider, platform, expires_at, verifier",
     [state],
   );
   const s = rows[0];
   if (!s || s.provider !== p || Number(s.expires_at) < now) return null;
-  const j = await tokenCall(p, { code, grant_type: "authorization_code", redirect_uri: redirectUri(p) }, f, env).catch(() => null);
+  if (PROVIDERS[p].pkce && !s.verifier) return null;
+  const j = await tokenCall(
+    p,
+    { code, grant_type: "authorization_code", redirect_uri: redirectUri(p), ...(s.verifier ? { code_verifier: String(s.verifier) } : {}) },
+    f,
+    env,
+  ).catch(() => null);
   if (!j) return null;
   const who = p === "strava" ? [j.athlete?.firstname, j.athlete?.lastname].filter(Boolean).join(" ") || null : null;
   if (p === "polar" && !(await registerPolar(String(s.account_id), j.access_token!, f))) return null;
-  await save(String(s.account_id), p, j, who, env, now);
+  // Garmin's pings name the lifter by Garmin's user id, so it's needed to know whose data a ping is.
+  const garminUser = p === "garmin" ? await garminUserId(j.access_token!, f) : null;
+  if (p === "garmin" && !garminUser) return null;
+  await save(String(s.account_id), p, j, who, env, now, garminUser);
+  if (p === "garmin") await garminBackfill(j.access_token!, f, now);
   return { platform: String(s.platform) };
 }
 
@@ -299,7 +334,7 @@ export async function accessToken(
 export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, env: NodeJS.ProcessEnv = process.env): Promise<void> {
   const token = await accessToken(accountId, p, f, env).catch(() => null);
   const remote =
-    p === "polar"
+    p === "polar" || p === "garmin"
       ? (
           await query<{ remote_user: string | null }>("SELECT remote_user FROM connections WHERE account_id = ? AND provider = ?", [
             accountId,
@@ -325,6 +360,8 @@ export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, 
         remote
           ? f(`${POLAR}/users/${encodeURIComponent(remote)}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
           : none(),
+      // Deleting the registration ends Liftsmith's access to the lifter's Garmin data.
+      garmin: () => f(`${GARMIN}/user/registration`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }),
       withings: none,
       concept2: none,
       sonos: none,
@@ -333,6 +370,8 @@ export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, 
   }
   await run("DELETE FROM connections WHERE account_id = ? AND provider = ?", [accountId, p]);
   await run("DELETE FROM connect_uploads WHERE account_id = ? AND provider = ?", [accountId, p]);
+  await run("DELETE FROM cloud_readings WHERE account_id = ? AND provider = ?", [accountId, p]);
+  await run("DELETE FROM cloud_sessions WHERE account_id = ? AND provider = ?", [accountId, p]);
 }
 
 /** Every connection of an account, revoked and forgotten (account deletion). */
@@ -341,6 +380,8 @@ export async function forgetAll(accountId: string, f: Fetch = fetch, env: NodeJS
   await run("DELETE FROM connections WHERE account_id = ?", [accountId]);
   await run("DELETE FROM connect_states WHERE account_id = ?", [accountId]);
   await run("DELETE FROM connect_uploads WHERE account_id = ?", [accountId]);
+  await run("DELETE FROM cloud_readings WHERE account_id = ?", [accountId]);
+  await run("DELETE FROM cloud_sessions WHERE account_id = ?", [accountId]);
 }
 
 // --- Strava: post a finished workout ---
@@ -699,6 +740,20 @@ export function concept2Cardio(results: readonly C2Result[], tzMin: number): Clo
   return out.sort((a, b) => a.start - b.start);
 }
 
+/** The last `days` of cardio sessions from Concept2 or Garmin. Throws Unlinked when the service refused the token. */
+export async function cardioResults(
+  accountId: string,
+  p: CardioCloud,
+  days: number,
+  tzMin: number,
+  f: Fetch = fetch,
+  env: NodeJS.ProcessEnv = process.env,
+  now = Date.now(),
+): Promise<CloudCardio[]> {
+  if (p === "garmin") return storedSessions(accountId, days, env, now);
+  return concept2Results(accountId, days, tzMin, f, env, now);
+}
+
 /** The last `days` of Concept2 Logbook sessions. Throws Unlinked when Concept2 refused the token. */
 export async function concept2Results(
   accountId: string,
@@ -739,7 +794,7 @@ async function getJson<T>(url: string, token: string, f: Fetch, accept = "applic
 
 export class Unlinked extends Error {}
 
-/** The last `days` of readings from Oura, Whoop, Withings or Polar. Throws Unlinked when the service refused the token. */
+/** The last `days` of readings from Garmin, Oura, Whoop, Withings or Polar. Throws Unlinked when the service refused the token. */
 export async function dailyReadings(
   accountId: string,
   p: ReadingCloud,
@@ -749,6 +804,8 @@ export async function dailyReadings(
   env: NodeJS.ProcessEnv = process.env,
   now = Date.now(),
 ): Promise<CloudReading[]> {
+  // Garmin sent its readings ahead (garminPing); they're read from here.
+  if (p === "garmin") return storedReadings(accountId, days, tzMin, env, now);
   const token = await accessToken(accountId, p, f, env, now);
   if (!token) throw new Unlinked();
   const from = now - days * 86_400_000;
@@ -818,4 +875,292 @@ export async function dailyReadings(
   };
   const [sleeps, recs] = await Promise.all([all<WhoopSleep>("activity/sleep"), all<WhoopRecovery>("recovery")]);
   return whoopReadings(sleeps, recs, tzMin);
+}
+
+// --- Garmin Connect: pinged when a watch syncs, summaries kept until the app pulls them ---
+
+const GARMIN = "https://apis.garmin.com/wellness-api/rest";
+/** Summary types Liftsmith asks Garmin for, and fetches when pinged. Health API: dailies, sleeps, HRV, body
+ *  composition; Activity API: activities. */
+export const GARMIN_TYPES = ["dailies", "sleeps", "hrv", "bodyComps", "activities"] as const;
+type GarminType = (typeof GARMIN_TYPES)[number];
+const READING_DAYS = 100;
+const SESSION_DAYS = 366;
+
+async function garminUserId(token: string, f: Fetch): Promise<string | null> {
+  const r = await f(`${GARMIN}/user/id`, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }).catch(() => null);
+  if (!r?.ok) return null;
+  const j = (await r.json().catch(() => ({}))) as { userId?: unknown };
+  return typeof j.userId === "string" && j.userId.length > 0 && j.userId.length <= 100 ? j.userId : null;
+}
+
+/**
+ * Asks Garmin to send the last 30 days again (best effort). Garmin answers 202 and pings later, like any sync;
+ * a lifter who didn't allow historical data on Garmin's page gets a 403, and only new days come in.
+ */
+async function garminBackfill(token: string, f: Fetch, now: number): Promise<void> {
+  const q = new URLSearchParams({
+    summaryStartTimeInSeconds: String(Math.floor((now - 30 * 86_400_000) / 1000)),
+    summaryEndTimeInSeconds: String(Math.floor(now / 1000)),
+  });
+  await Promise.all(
+    GARMIN_TYPES.map((t) => f(`${GARMIN}/backfill/${t}?${q}`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => null)),
+  );
+}
+
+interface GarminDaily {
+  calendarDate?: string;
+  steps?: number;
+  restingHeartRateInBeatsPerMinute?: number;
+  startTimeInSeconds?: number;
+  durationInSeconds?: number;
+}
+interface GarminSleep {
+  calendarDate?: string;
+  startTimeInSeconds?: number;
+  durationInSeconds?: number;
+  deepSleepDurationInSeconds?: number;
+  lightSleepDurationInSeconds?: number;
+  remSleepInSeconds?: number;
+  awakeDurationInSeconds?: number;
+}
+interface GarminHrv {
+  calendarDate?: string;
+  lastNightAvg?: number;
+  startTimeInSeconds?: number;
+  durationInSeconds?: number;
+}
+interface GarminBody {
+  measurementTimeInSeconds?: number;
+  measurementTimeOffsetInSeconds?: number;
+  weightInGrams?: number;
+  bodyFatInPercent?: number;
+}
+interface GarminActivity {
+  summaryId?: string | number;
+  activityId?: string | number;
+  activityType?: string;
+  startTimeInSeconds?: number;
+  durationInSeconds?: number;
+  distanceInMeters?: number;
+}
+
+const isDay = (d: unknown): d is string => typeof d === "string" && /^\d{4}-\d\d-\d\d$/.test(d);
+const num = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
+
+/**
+ * Garmin's summaries as one reading per metric per day: dailies (steps, resting heart rate), sleeps (deep +
+ * light + REM, or the whole sleep less time awake), HRV (last night's average) and body composition (weight
+ * and body fat from an Index scale or typed into Garmin Connect, on the day it was measured). Exported for tests.
+ */
+export function garminReadings(type: GarminType, items: readonly unknown[]): CloudReading[] {
+  const out: CloudReading[] = [];
+  const push = (metric: CloudReading["metric"], day: string, value: number, at: number, places = 1) =>
+    out.push({ metric, day, value: round(value, places), at });
+  for (const raw of items) {
+    if (!raw || typeof raw !== "object") continue;
+    if (type === "dailies") {
+      const d = raw as GarminDaily;
+      if (!isDay(d.calendarDate)) continue;
+      const at = num(d.startTimeInSeconds)
+        ? (d.startTimeInSeconds + (d.durationInSeconds ?? 86_400)) * 1000
+        : Date.parse(`${d.calendarDate}T23:59:00Z`);
+      if (num(d.steps) && d.steps > 0 && d.steps < 100_000) push("steps", d.calendarDate, d.steps, at, 0);
+      const rhr = d.restingHeartRateInBeatsPerMinute;
+      if (num(rhr) && rhr > 25 && rhr < 130) push("restingHr", d.calendarDate, rhr, at);
+    } else if (type === "sleeps") {
+      const s = raw as GarminSleep;
+      if (!isDay(s.calendarDate)) continue;
+      const stages = (s.deepSleepDurationInSeconds ?? 0) + (s.lightSleepDurationInSeconds ?? 0) + (s.remSleepInSeconds ?? 0);
+      const secs = stages > 0 ? stages : Math.max(0, (s.durationInSeconds ?? 0) - (s.awakeDurationInSeconds ?? 0));
+      const at = num(s.startTimeInSeconds)
+        ? (s.startTimeInSeconds + (s.durationInSeconds ?? 0)) * 1000
+        : Date.parse(`${s.calendarDate}T08:00:00Z`);
+      const h = secs / 3600;
+      if (h >= 1 && h <= 16) push("sleep", s.calendarDate, h, at, 2);
+    } else if (type === "hrv") {
+      const v = raw as GarminHrv;
+      if (!isDay(v.calendarDate) || !num(v.lastNightAvg) || v.lastNightAvg <= 5 || v.lastNightAvg >= 300) continue;
+      const at = num(v.startTimeInSeconds)
+        ? (v.startTimeInSeconds + (v.durationInSeconds ?? 0)) * 1000
+        : Date.parse(`${v.calendarDate}T08:00:00Z`);
+      push("hrv", v.calendarDate, v.lastNightAvg, at);
+    } else if (type === "bodyComps") {
+      const b = raw as GarminBody;
+      if (!num(b.measurementTimeInSeconds)) continue;
+      const at = b.measurementTimeInSeconds * 1000;
+      const day = dayAt(at, Math.round((b.measurementTimeOffsetInSeconds ?? 0) / 60));
+      const kg = num(b.weightInGrams) ? b.weightInGrams / 1000 : 0;
+      if (kg >= 25 && kg <= 350) push("weight", day, kg, at, 2);
+      if (num(b.bodyFatInPercent) && b.bodyFatInPercent >= 2 && b.bodyFatInPercent <= 70) push("bodyFat", day, b.bodyFatInPercent, at);
+    }
+  }
+  return out;
+}
+
+/** Garmin activity types Liftsmith brings in, by the library exercise they become. Strength sessions are left
+ *  out: those are Liftsmith's own workouts, logged here. */
+const GARMIN_KIND: Record<string, CloudCardio["kind"]> = {
+  RUNNING: "run",
+  TRAIL_RUNNING: "run",
+  STREET_RUNNING: "run",
+  TRACK_RUNNING: "run",
+  ULTRA_RUN: "run",
+  TREADMILL_RUNNING: "treadmill",
+  INDOOR_RUNNING: "treadmill",
+  VIRTUAL_RUN: "treadmill",
+  CYCLING: "ride",
+  ROAD_BIKING: "ride",
+  MOUNTAIN_BIKING: "ride",
+  GRAVEL_CYCLING: "ride",
+  CYCLOCROSS: "ride",
+  INDOOR_CYCLING: "bike",
+  VIRTUAL_RIDE: "bike",
+  INDOOR_ROWING: "rower",
+  ELLIPTICAL: "elliptical",
+  STAIR_CLIMBING: "stairs",
+};
+
+/** Garmin's activities as cardio sessions (runs, rides, indoor rows, elliptical and stairs). Exported for tests. */
+export function garminCardio(items: readonly unknown[]): CloudCardio[] {
+  const out: CloudCardio[] = [];
+  for (const raw of items) {
+    if (!raw || typeof raw !== "object") continue;
+    const a = raw as GarminActivity;
+    const kind = GARMIN_KIND[String(a.activityType ?? "").toUpperCase()];
+    const id = a.summaryId ?? a.activityId;
+    if (!kind || id === undefined || String(id).length > 100 || !num(a.startTimeInSeconds) || !num(a.durationInSeconds)) continue;
+    const seconds = Math.round(a.durationInSeconds);
+    const distanceM = num(a.distanceInMeters) ? Math.round(a.distanceInMeters) : 0;
+    if (seconds < 60 || seconds > 86_400 || distanceM < 0 || distanceM > 1_000_000) continue;
+    out.push({ id: String(id), kind, start: a.startTimeInSeconds * 1000, seconds, distanceM });
+  }
+  return out;
+}
+
+async function keepReadings(accountId: string, readings: readonly CloudReading[]): Promise<void> {
+  for (const r of readings)
+    await run(
+      `INSERT INTO cloud_readings (account_id, provider, metric, day, value, at) VALUES (?, 'garmin', ?, ?, ?, ?)
+       ON CONFLICT(account_id, provider, metric, day) DO UPDATE SET value = excluded.value, at = excluded.at`,
+      [accountId, r.metric, r.day, r.value, r.at],
+    );
+}
+
+async function keepSessions(accountId: string, sessions: readonly CloudCardio[]): Promise<void> {
+  for (const c of sessions)
+    await run(
+      `INSERT INTO cloud_sessions (account_id, provider, id, kind, start, seconds, distance_m) VALUES (?, 'garmin', ?, ?, ?, ?, ?)
+       ON CONFLICT(account_id, provider, id) DO UPDATE SET kind = excluded.kind, start = excluded.start,
+         seconds = excluded.seconds, distance_m = excluded.distance_m`,
+      [accountId, c.id, c.kind, c.start, c.seconds, c.distanceM],
+    );
+}
+
+/** Garmin's own user id to the Liftsmith accounts connected with it (normally one). */
+async function garminAccounts(userId: string): Promise<string[]> {
+  const rows = await query<{ account_id: string }>("SELECT account_id FROM connections WHERE provider = 'garmin' AND remote_user = ?", [
+    userId,
+  ]);
+  return rows.map((r) => String(r.account_id));
+}
+
+/** A ping's callback must go back to Garmin's own API over https, so nobody can point us at another server. */
+export function garminCallback(url: unknown): URL | null {
+  if (typeof url !== "string" || url.length > 2000) return null;
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && u.hostname === "apis.garmin.com" && u.pathname.startsWith("/wellness-api/rest/") ? u : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * POST /api/connect/garmin/push/: Garmin's notification after a lifter's watch synced. Liftsmith uses Garmin's
+ * ping mode: each entry names the user and a callback URL on Garmin's API, which we fetch with that lifter's
+ * own token, so data only ever comes from Garmin itself (a ping can't be signed, so data sent inline in the
+ * notification is ignored). A deregistration (the lifter removed Liftsmith in Garmin Connect) forgets the
+ * connection and everything kept for it. Returns how many summaries were kept.
+ */
+export async function garminPing(body: unknown, f: Fetch = fetch, env: NodeJS.ProcessEnv = process.env, now = Date.now()): Promise<number> {
+  if (!body || typeof body !== "object" || !keys("garmin", env)) return 0;
+  const b = body as Record<string, unknown>;
+  let kept = 0;
+  const list = (k: string) => (Array.isArray(b[k]) ? (b[k] as unknown[]).slice(0, 100) : []);
+  for (const raw of list("deregistrations")) {
+    const userId = (raw as { userId?: unknown } | null)?.userId;
+    if (typeof userId !== "string" || !userId) continue;
+    for (const accountId of await garminAccounts(userId)) {
+      await run("DELETE FROM connections WHERE account_id = ? AND provider = 'garmin'", [accountId]);
+      await run("DELETE FROM cloud_readings WHERE account_id = ? AND provider = 'garmin'", [accountId]);
+      await run("DELETE FROM cloud_sessions WHERE account_id = ? AND provider = 'garmin'", [accountId]);
+    }
+  }
+  for (const type of GARMIN_TYPES) {
+    for (const raw of list(type)) {
+      const entry = raw as { userId?: unknown; callbackURL?: unknown } | null;
+      const url = garminCallback(entry?.callbackURL);
+      if (typeof entry?.userId !== "string" || !url) continue;
+      for (const accountId of await garminAccounts(entry.userId)) {
+        const token = await accessToken(accountId, "garmin", f, env, now).catch(() => null);
+        if (!token) continue;
+        const r = await f(url.toString(), { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }).catch(() => null);
+        if (!r?.ok) continue;
+        const items = (await r.json().catch(() => [])) as unknown;
+        if (!Array.isArray(items)) continue;
+        if (type === "activities") {
+          const sessions = garminCardio(items);
+          await keepSessions(accountId, sessions);
+          kept += sessions.length;
+        } else {
+          const readings = garminReadings(type, items);
+          await keepReadings(accountId, readings);
+          kept += readings.length;
+        }
+      }
+    }
+  }
+  await run("DELETE FROM cloud_readings WHERE provider = 'garmin' AND at < ?", [now - READING_DAYS * 86_400_000]);
+  await run("DELETE FROM cloud_sessions WHERE provider = 'garmin' AND start < ?", [now - SESSION_DAYS * 86_400_000]);
+  return kept;
+}
+
+async function garminLinked(accountId: string, env: NodeJS.ProcessEnv): Promise<boolean> {
+  if (!keys("garmin", env)) return false;
+  return (await query("SELECT 1 FROM connections WHERE account_id = ? AND provider = 'garmin'", [accountId])).length > 0;
+}
+
+/** Garmin readings kept for the account. Today's steps are left out until the day is over, like Oura's. */
+async function storedReadings(
+  accountId: string,
+  days: number,
+  tzMin: number,
+  env: NodeJS.ProcessEnv,
+  now: number,
+): Promise<CloudReading[]> {
+  if (!(await garminLinked(accountId, env))) throw new Unlinked();
+  const today = dayAt(now, tzMin);
+  const rows = await query<{ metric: string; day: string; value: number; at: number }>(
+    "SELECT metric, day, value, at FROM cloud_readings WHERE account_id = ? AND provider = 'garmin' AND day >= ? ORDER BY at",
+    [accountId, dayAt(now - days * 86_400_000, tzMin)],
+  );
+  return rows
+    .map((r) => ({ metric: r.metric as CloudReading["metric"], day: String(r.day), value: Number(r.value), at: Number(r.at) }))
+    .filter((r) => r.metric !== "steps" || r.day < today);
+}
+
+async function storedSessions(accountId: string, days: number, env: NodeJS.ProcessEnv, now: number): Promise<CloudCardio[]> {
+  if (!(await garminLinked(accountId, env))) throw new Unlinked();
+  const rows = await query<{ id: string; kind: string; start: number; seconds: number; distance_m: number }>(
+    "SELECT id, kind, start, seconds, distance_m FROM cloud_sessions WHERE account_id = ? AND provider = 'garmin' AND start >= ? ORDER BY start",
+    [accountId, now - days * 86_400_000],
+  );
+  return rows.map((r) => ({
+    id: String(r.id),
+    kind: r.kind as CloudCardio["kind"],
+    start: Number(r.start),
+    seconds: Number(r.seconds),
+    distanceM: Number(r.distance_m),
+  }));
 }

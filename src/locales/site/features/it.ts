@@ -444,7 +444,7 @@ export const it: FeaturesText = {
     },
     cloud: {
       name: "Collegamenti ai servizi fitness",
-      body: "Oura invia sonno, HRV, battito a riposo e passi, con un account gratuito. Stiamo valutando Strava, WHOOP, Withings, Polar e Concept2.",
+      body: "Oura invia sonno, HRV, battito a riposo e passi, con un account gratuito. Stiamo valutando Strava, Garmin Connect, WHOOP, Withings, Polar e Concept2.",
     },
     "health-save": {
       name: "Allenamenti salvati nella tua app di salute",
@@ -616,6 +616,9 @@ export const it: FeaturesText = {
     },
     oura: { does: "In entrata sonno, HRV, battito a riposo e passi" },
     strava: { does: "Ogni allenamento finito pubblicato su Strava" },
+    "garmin-connect": {
+      does: "Sonno, HRV, battito a riposo, passi e pesate della bilancia Index in entrata, e corse, uscite in bici e sessioni di vogatore come allenamenti cardio",
+    },
     whoop: { does: "In entrata sonno, recupero, HRV e battito a riposo" },
     withings: { does: "In entrata peso, massa grassa, sonno e passi" },
     polar: { does: "In entrata Nightly Recharge, HRV e sonno" },

@@ -450,7 +450,7 @@ export const de: FeaturesText = {
     },
     cloud: {
       name: "Verbindungen zu Fitnessdiensten",
-      body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
+      body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, Garmin Connect, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
     },
     "health-save": {
       name: "Trainings in deiner Gesundheits-App",
@@ -621,6 +621,9 @@ export const de: FeaturesText = {
     },
     oura: { does: "Schlaf, HRV, Ruhepuls und Schritte rein" },
     strava: { does: "Jedes beendete Training wird auf Strava gepostet" },
+    "garmin-connect": {
+      does: "Schlaf, HRV, Ruhepuls, Schritte und Wiegungen der Index-Waage rein, dazu Läufe, Radfahrten und Ruder-Einheiten als Cardio-Trainings",
+    },
     whoop: { does: "Schlaf, Erholung, HRV und Ruhepuls rein" },
     withings: { does: "Gewicht, Körperfett, Schlaf und Schritte rein" },
     polar: { does: "Nightly Recharge, HRV und Schlaf rein" },

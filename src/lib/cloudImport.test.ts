@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { C2_EXERCISE, cloudCardioEvents, cloudReadingEvents } from "./cloudImport";
+import { CARDIO_EXERCISE, cloudCardioEvents, cloudReadingEvents } from "./cloudImport";
 import { EXERCISE_BY_ID } from "./exercises";
 
 const DAY = "2026-11-10";
@@ -31,8 +31,9 @@ describe("cloud readings", () => {
 });
 
 describe("Concept2 sessions", () => {
-  it("map to library cardio exercises logged with distance", () => {
-    for (const id of Object.values(C2_EXERCISE)) expect(EXERCISE_BY_ID.get(id)?.cardio).toBe("distance");
+  it("map to library cardio exercises, logged with distance except the elliptical and stairs", () => {
+    for (const [kind, id] of Object.entries(CARDIO_EXERCISE))
+      expect(EXERCISE_BY_ID.get(id)?.cardio).toBe(kind === "elliptical" || kind === "stairs" ? "time" : "distance");
   });
 
   it("become a finished manual workout with one cardio set, once, and never in the future", () => {
@@ -43,5 +44,26 @@ describe("Concept2 sessions", () => {
     expect(ev[1]).toMatchObject({ exerciseId: "rowing-machine", reps: 480, distanceM: 2000, weight: 0 });
     expect(ev[2]).toMatchObject({ seconds: 480, at: 1_480_000 });
     expect(cloudCardioEvents([s], "gym1", 5_000_000, new Set(ev.map((e) => e.id)))).toEqual([]);
+  });
+});
+
+describe("Garmin sessions", () => {
+  const run = { id: "991", kind: "run" as const, start: 1_000_000, seconds: 1800, distanceM: 5000 };
+
+  it("get their own ids, so a Concept2 id can't collide", () => {
+    const ev = cloudCardioEvents([run], "gym1", 5_000_000, new Set(), "garmin");
+    expect(ev[0]).toMatchObject({ id: "garmin-991-start", sessionId: "garmin-991" });
+    expect(ev[1]).toMatchObject({ exerciseId: "outdoor-run", reps: 1800, distanceM: 5000 });
+  });
+
+  it("leave distance out for a machine that doesn't measure it", () => {
+    const ev = cloudCardioEvents([{ ...run, kind: "stairs", distanceM: 0 }], "gym1", 5_000_000, new Set(), "garmin");
+    expect(ev[1]).toMatchObject({ exerciseId: "stair-climber" });
+    expect(ev[1]).not.toHaveProperty("distanceM");
+  });
+
+  it("skip a session that overlaps a workout already on the device", () => {
+    expect(cloudCardioEvents([run], "gym1", 5_000_000, new Set(), "garmin", [[1_500_000, 4_000_000]])).toEqual([]);
+    expect(cloudCardioEvents([run], "gym1", 5_000_000, new Set(), "garmin", [[2_800_001, 4_000_000]])).toHaveLength(3);
   });
 });

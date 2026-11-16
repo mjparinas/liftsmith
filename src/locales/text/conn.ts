@@ -95,6 +95,8 @@ export const en = {
     "Sends weigh-ins, body fat, sleep, resting heart rate, breathing rate and steps in from your Withings scale and watch.",
   "conn.polar.what": "Sends sleep, overnight heart rate variability, heart rate and breathing rate in for Today's readiness call.",
   "conn.concept2.what": "Rows, ski and bike sessions from your Concept2 Logbook come in as cardio workouts.",
+  "conn.garminConnect.what":
+    "Sends sleep, overnight heart rate variability, resting heart rate, steps and Index scale weigh-ins in for Today's readiness call, and your watch's runs, rides and indoor rows as cardio workouts.",
   "conn.sonos.what":
     "Play, pause, skip and change the volume of your Sonos speakers from the workout, and let the music follow it: louder for sets, quieter for rest.",
   "conn.sonos.speaker": "Speaker",
@@ -224,6 +226,8 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.polar.what":
     "Envía sueño, variabilidad de la frecuencia cardiaca nocturna, frecuencia cardiaca y frecuencia respiratoria para la recomendación de Hoy.",
   "conn.concept2.what": "Las sesiones de remo, esquí y bici de tu Concept2 Logbook llegan como entrenamientos de cardio.",
+  "conn.garminConnect.what":
+    "Envía el sueño, la variabilidad de la frecuencia cardiaca nocturna, la frecuencia cardiaca en reposo, los pasos y los pesajes de la báscula Index para la recomendación de Hoy, y las carreras, salidas en bici y sesiones de remo de tu reloj como entrenamientos de cardio.",
   "conn.sonos.what":
     "Reproduce, pausa, salta canciones y cambia el volumen de tus altavoces Sonos desde el entrenamiento, y deja que la música lo siga: más alta en las series, más baja en el descanso.",
   "conn.sonos.speaker": "Altavoz",
@@ -351,6 +355,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.polar.what":
     "Envoie le sommeil, la variabilité de la fréquence cardiaque nocturne, la fréquence cardiaque et la fréquence respiratoire pour la recommandation du jour.",
   "conn.concept2.what": "Les séances de rameur, de ski et de vélo de votre Concept2 Logbook arrivent comme séances de cardio.",
+  "conn.garminConnect.what":
+    "Envoie le sommeil, la variabilité de la fréquence cardiaque nocturne, la fréquence cardiaque au repos, les pas et les pesées de la balance Index pour la recommandation du jour, et les courses, sorties à vélo et séances de rameur de votre montre comme séances de cardio.",
   "conn.sonos.what":
     "Lancez, mettez en pause, passez un titre et réglez le volume de vos enceintes Sonos depuis la séance, et laissez la musique la suivre : plus fort pendant les séries, plus doux pendant le repos.",
   "conn.sonos.speaker": "Enceinte",
@@ -477,6 +483,8 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.polar.what":
     "Schickt Schlaf, nächtliche Herzfrequenzvariabilität, Herzfrequenz und Atemfrequenz für die heutige Bereitschafts-Entscheidung.",
   "conn.concept2.what": "Ruder-, Ski- und Rad-Einheiten aus deinem Concept2 Logbook kommen als Cardio-Trainings an.",
+  "conn.garminConnect.what":
+    "Schickt Schlaf, nächtliche Herzfrequenzvariabilität, Ruhepuls, Schritte und Wiegungen der Index-Waage für die heutige Bereitschafts-Entscheidung, und die Läufe, Radfahrten und Ruder-Einheiten deiner Uhr als Cardio-Trainings.",
   "conn.sonos.what":
     "Starte, pausiere, überspringe Songs und ändere die Lautstärke deiner Sonos-Lautsprecher aus dem Training heraus, und lass die Musik dem Training folgen: lauter in den Sätzen, leiser in der Pause.",
   "conn.sonos.speaker": "Lautsprecher",
@@ -605,6 +613,8 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.polar.what":
     "Invia sonno, variabilità della frequenza cardiaca notturna, frequenza cardiaca e frequenza respiratoria per la prontezza di oggi.",
   "conn.concept2.what": "Le sessioni di vogatore, sci e bici del tuo Concept2 Logbook arrivano come allenamenti cardio.",
+  "conn.garminConnect.what":
+    "Invia sonno, variabilità della frequenza cardiaca notturna, frequenza cardiaca a riposo, passi e pesate della bilancia Index per la prontezza di oggi, e le corse, le uscite in bici e le sessioni di vogatore del tuo orologio come allenamenti cardio.",
   "conn.sonos.what":
     "Avvia, metti in pausa, salta brani e cambia il volume dei tuoi altoparlanti Sonos dall'allenamento, e lascia che la musica lo segua: più alta nelle serie, più bassa nel recupero.",
   "conn.sonos.speaker": "Altoparlante",
@@ -725,6 +735,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.withings.what": "Withings の体重計や時計から、体重、体脂肪率、睡眠、安静時心拍数、呼吸数、歩数を送ります。",
   "conn.polar.what": "睡眠、夜間の心拍変動、心拍数、呼吸数を送り、今日のコンディション判断に使います。",
   "conn.concept2.what": "Concept2 Logbook のローイング、スキー、バイクのセッションを有酸素運動のワークアウトとして取り込みます。",
+  "conn.garminConnect.what":
+    "睡眠、夜間の心拍変動、安静時心拍数、歩数、Index 体重計の体重を今日のコンディション判断に取り込み、時計で記録したランニング、サイクリング、ローイングを有酸素運動のワークアウトとして取り込みます。",
   "conn.sonos.what":
     "ワークアウト中に Sonos スピーカーの再生、一時停止、スキップ、音量調整ができます。音楽をワークアウトに合わせて、セット中は大きく、休憩中は小さくすることもできます。",
   "conn.sonos.speaker": "スピーカー",
