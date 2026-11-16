@@ -2,14 +2,24 @@
 
 // Connected apps (Settings › Connected apps, Connections.tsx; docs/decisions/connected-apps.md).
 // - Health Connect / Apple Health: health.ts, on the device.
-// - Strava, Oura, Whoop, Withings, Polar and Concept2: through our server (src/server/connect.ts), which keeps
-//   the OAuth tokens, so they need a Liftsmith account. Strava gets each finished workout (an outbox here, so a
-//   workout finished offline goes up later); Oura, Whoop, Withings and Polar readings come in as health events
-//   and weigh-ins, like Health's; Concept2 sessions come in as cardio workouts.
+// - Strava, Garmin Connect, Oura, Whoop, Withings, Polar and Concept2: through our server (src/server/connect.ts),
+//   which keeps the OAuth tokens, so they need a Liftsmith account. Strava gets each finished workout (an outbox
+//   here, so a workout finished offline goes up later); Garmin, Oura, Whoop, Withings and Polar readings come in
+//   as health events and weigh-ins, like Health's; Concept2 and Garmin sessions come in as cardio workouts.
 import { create } from "zustand";
 
 import { api, AuthError, platform, readAccount } from "./auth";
-import { localIso, READS, type Cloud, type CloudCardio, type CloudReading, type CloudStatus, type CloudWorkout } from "./cloud";
+import {
+  CARDIO,
+  localIso,
+  READS,
+  type CardioCloud,
+  type Cloud,
+  type CloudCardio,
+  type CloudReading,
+  type CloudStatus,
+  type CloudWorkout,
+} from "./cloud";
 import { can } from "./entitlements";
 import { exerciseName } from "./game";
 import { t } from "./i18n";
@@ -39,8 +49,8 @@ interface CloudState {
   status: CloudStatus | null;
   busy: Cloud | null;
   error: string | null;
-  /** Last time each service sent readings in, on this device. */
-  pulled: Partial<Record<Cloud, number>>;
+  /** Last time each service sent readings in, on this device; `<service>Cardio` for sessions. */
+  pulled: Partial<Record<Cloud | `${Exclude<CardioCloud, "concept2">}Cardio`, number>>;
 }
 
 const PULLED_KEY = "ls.cloud.pulled";
@@ -121,9 +131,9 @@ export async function disconnectCloud(p: Cloud): Promise<void> {
   }
 }
 
-// --- Oura, Whoop, Withings and Polar: readings in; Concept2: sessions in ---
+// --- Garmin, Oura, Whoop, Withings and Polar: readings in; Concept2 and Garmin: sessions in ---
 
-/** Pulls the last 45 days from each connected service that sends readings, and Concept2 sessions. Returns how many were new. */
+/** Pulls the last 45 days from each connected service that sends readings, and Concept2 and Garmin sessions. Returns how many were new. */
 export async function pullCloud(force = false, now = Date.now()): Promise<number> {
   const account = readAccount();
   // Without Pro a connection stays linked but pauses; it picks up the missed days (45 back) when Pro returns.
@@ -145,16 +155,17 @@ export async function pullCloud(force = false, now = Date.now()): Promise<number
       if (e instanceof AuthError && e.status === 409) await refreshCloud();
     }
   }
-  if (linked("concept2") && (force || now - (useCloud.getState().pulled.concept2 ?? 0) >= 3 * 3_600_000)) {
+  for (const p of CARDIO) {
+    // Concept2 sends only sessions, so its sync time is its own; Garmin's sessions keep a time of their own.
+    const key = p === "concept2" ? p : (`${p}Cardio` as const);
+    if (!linked(p) || (!force && now - (useCloud.getState().pulled[key] ?? 0) < 3 * 3_600_000)) continue;
     try {
       const tz = -new Date(now).getTimezoneOffset();
-      // The first pull brings the last year of sessions; later ones the last 30 days.
-      const days = useCloud.getState().pulled.concept2 ? 30 : 365;
-      const r = await track(
-        api<{ sessions: CloudCardio[] }>(`/api/connect/concept2/results/?days=${days}&tz=${tz}`, { token: account.token }),
-      );
-      added += useApp.getState().importCloudCardio(r.sessions, now);
-      const pulled = { ...useCloud.getState().pulled, concept2: now };
+      // The first pull brings the last year of sessions (Garmin keeps 90 days); later ones the last 30 days.
+      const days = useCloud.getState().pulled[key] ? 30 : 365;
+      const r = await track(api<{ sessions: CloudCardio[] }>(`/api/connect/${p}/results/?days=${days}&tz=${tz}`, { token: account.token }));
+      added += useApp.getState().importCloudCardio(r.sessions, now, p);
+      const pulled = { ...useCloud.getState().pulled, [key]: now };
       useCloud.setState({ pulled });
       writeJson(PULLED_KEY, pulled);
     } catch (e) {

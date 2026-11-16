@@ -389,6 +389,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "photo-compare",
+        name: "Progress photos that line up",
+        body: "The camera shows your last photo as a faint outline to line up with, with a timer to step back. Compare any two dates with a slider or side by side, each with what you weighed that day. Photos stay on your phone; a backup file can carry them to a new one.",
+        tier: "free",
+        added: "2026-11-15",
+      },
+      {
         id: "measurements",
         name: "Tape measurements",
         body: "Nine sites in centimetres or inches. A growing or shrinking waist becomes a coach's note when there's no body fat reading.",
@@ -856,7 +863,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "cloud",
         name: "Fitness service connections",
-        body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, WHOOP, Withings, Polar and Concept2.",
+        body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, Garmin Connect, WHOOP, Withings, Polar and Concept2.",
         tier: "pro",
         pro: "cloudConnections",
         added: "2026-11-10",
@@ -1299,6 +1306,15 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
         id: "strava",
         name: "Strava",
         does: "Each finished workout posted to Strava",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
+        tier: "pro",
+      },
+      {
+        id: "garmin-connect",
+        name: "Garmin Connect",
+        does: "Sleep, HRV, resting heart rate, steps and Index scale weigh-ins in, and runs, rides and indoor rows as cardio workouts",
         android: "investigating",
         ios: "investigating",
         web: "investigating",

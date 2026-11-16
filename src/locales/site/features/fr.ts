@@ -227,6 +227,10 @@ export const fr: FeaturesText = {
       name: "Pesées, masse grasse et photos",
       body: "Notez votre poids et votre masse grasse, ou laissez-les venir de votre balance via l’appli santé du téléphone, et gardez vos photos de progrès sur votre téléphone.",
     },
+    "photo-compare": {
+      name: "Des photos de progrès bien alignées",
+      body: "L’appareil photo affiche votre dernière photo en contour pâle pour vous aligner, avec un retardateur pour reculer. Comparez deux dates au choix au curseur ou côte à côte, chacune avec votre poids ce jour-là. Les photos restent sur votre téléphone ; un fichier de sauvegarde peut les emporter sur un nouveau.",
+    },
     measurements: {
       name: "Mensurations",
       body: "Neuf zones en centimètres ou en pouces. Un tour de taille qui augmente ou diminue devient une note du coach quand il n’y a pas de mesure de masse grasse.",
@@ -456,7 +460,7 @@ export const fr: FeaturesText = {
     },
     cloud: {
       name: "Connexions aux services de fitness",
-      body: "Oura envoie sommeil, VFC, pouls au repos et pas, via un compte gratuit. Nous étudions Strava, WHOOP, Withings, Polar et Concept2.",
+      body: "Oura envoie sommeil, VFC, pouls au repos et pas, via un compte gratuit. Nous étudions Strava, Garmin Connect, WHOOP, Withings, Polar et Concept2.",
     },
     "health-save": {
       name: "Séances enregistrées dans votre appli santé",
@@ -628,6 +632,9 @@ export const fr: FeaturesText = {
     },
     oura: { does: "Sommeil, VFC, pouls au repos et pas en entrée" },
     strava: { does: "Chaque séance terminée publiée sur Strava" },
+    "garmin-connect": {
+      does: "Sommeil, VFC, pouls au repos, pas et pesées de la balance Index importés, et courses, sorties à vélo et séances de rameur comme séances de cardio",
+    },
     whoop: { does: "Sommeil, récupération, VFC et pouls au repos en entrée" },
     withings: { does: "Pesées, masse grasse, sommeil et pas en entrée" },
     polar: { does: "Nightly Recharge, VFC et sommeil en entrée" },

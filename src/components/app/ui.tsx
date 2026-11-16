@@ -59,7 +59,7 @@ export function Button({
         haptic("tick");
         onClick?.();
       }}
-      className={`press inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 disabled:opacity-40 ${styles} ${className}`}
+      className={`btn press inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 disabled:opacity-40 ${styles} ${className}`}
     >
       {icon && <Icon name={icon} size={20} strokeWidth={2.4} />}
       {children}

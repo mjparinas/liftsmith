@@ -58,8 +58,9 @@ export const en = {
   "account.signOut.backup": "Download a backup",
   "account.signOut.anyway": "Sign out anyway",
   "account.signOut.photos": {
-    one: "You have {count} progress photo on this device. Photos never leave it, so signing out deletes it for good.",
-    other: "You have {count} progress photos on this device. Photos never leave it, so signing out deletes them for good.",
+    one: "You have {count} progress photo on this device. Photos never sync, so signing out deletes it unless you save a backup with it first.",
+    other:
+      "You have {count} progress photos on this device. Photos never sync, so signing out deletes them unless you save a backup with them first.",
   },
   "account.signOut.photosConfirm": "Sign out and delete photos",
   "account.delete": "Delete my account",
@@ -77,6 +78,7 @@ export const en = {
   "account.row.out": "Sign in to back up and sync",
   "account.row.in": "Signed in as {email}",
   "account.delete.webSub": "Your Pro subscription from the website ends now too, and won't be charged again.",
+  "account.signOut.backupPhotos": "Save a backup with photos",
 } as const;
 
 type Key = keyof typeof en;
@@ -136,9 +138,9 @@ export const es: Partial<Record<Key, Message>> = {
   "account.signOut.backup": "Descargar una copia",
   "account.signOut.anyway": "Cerrar sesión de todos modos",
   "account.signOut.photos": {
-    one: "Tienes {count} foto de progreso en este dispositivo. Las fotos nunca salen de él, así que cerrar sesión la borra para siempre.",
+    one: "Tienes {count} foto de progreso en este dispositivo. Las fotos nunca se sincronizan, así que cerrar sesión la borra salvo que antes guardes una copia con ella.",
     other:
-      "Tienes {count} fotos de progreso en este dispositivo. Las fotos nunca salen de él, así que cerrar sesión las borra para siempre.",
+      "Tienes {count} fotos de progreso en este dispositivo. Las fotos nunca se sincronizan, así que cerrar sesión las borra salvo que antes guardes una copia con ellas.",
   },
   "account.signOut.photosConfirm": "Cerrar sesión y borrar las fotos",
   "account.delete": "Eliminar mi cuenta",
@@ -157,6 +159,7 @@ export const es: Partial<Record<Key, Message>> = {
   "account.row.out": "Inicia sesión para guardar y sincronizar",
   "account.row.in": "Sesión iniciada como {email}",
   "account.delete.webSub": "Tu suscripción Pro del sitio web también termina ahora y no se volverá a cobrar.",
+  "account.signOut.backupPhotos": "Guardar una copia con fotos",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -217,9 +220,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.signOut.backup": "Télécharger une sauvegarde",
   "account.signOut.anyway": "Se déconnecter quand même",
   "account.signOut.photos": {
-    one: "Vous avez {count} photo de progression sur cet appareil. Les photos ne le quittent jamais : vous déconnecter la supprime définitivement.",
+    one: "Vous avez {count} photo de progrès sur cet appareil. Les photos ne sont jamais synchronisées : la déconnexion la supprime, sauf si vous enregistrez d’abord une sauvegarde qui la contient.",
     other:
-      "Vous avez {count} photos de progression sur cet appareil. Les photos ne le quittent jamais : vous déconnecter les supprime définitivement.",
+      "Vous avez {count} photos de progrès sur cet appareil. Les photos ne sont jamais synchronisées : la déconnexion les supprime, sauf si vous enregistrez d’abord une sauvegarde qui les contient.",
   },
   "account.signOut.photosConfirm": "Se déconnecter et supprimer les photos",
   "account.delete": "Supprimer mon compte",
@@ -238,6 +241,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.row.out": "Connectez-vous pour sauvegarder et synchroniser",
   "account.row.in": "Connecté en tant que {email}",
   "account.delete.webSub": "Votre abonnement Pro pris sur le site prend fin maintenant aussi et ne sera plus facturé.",
+  "account.signOut.backupPhotos": "Enregistrer une sauvegarde avec les photos",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -298,9 +302,9 @@ export const de: Partial<Record<Key, Message>> = {
   "account.signOut.backup": "Sicherung herunterladen",
   "account.signOut.anyway": "Trotzdem abmelden",
   "account.signOut.photos": {
-    one: "Du hast {count} Fortschrittsfoto auf diesem Gerät. Fotos verlassen es nie, deshalb wird es beim Abmelden endgültig gelöscht.",
+    one: "Du hast {count} Fortschrittsfoto auf diesem Gerät. Fotos werden nie synchronisiert, also löscht das Abmelden es, wenn du nicht vorher eine Sicherung mit Foto speicherst.",
     other:
-      "Du hast {count} Fortschrittsfotos auf diesem Gerät. Fotos verlassen es nie, deshalb werden sie beim Abmelden endgültig gelöscht.",
+      "Du hast {count} Fortschrittsfotos auf diesem Gerät. Fotos werden nie synchronisiert, also löscht das Abmelden sie, wenn du nicht vorher eine Sicherung mit Fotos speicherst.",
   },
   "account.signOut.photosConfirm": "Abmelden und Fotos löschen",
   "account.delete": "Mein Konto löschen",
@@ -319,6 +323,7 @@ export const de: Partial<Record<Key, Message>> = {
   "account.row.out": "Anmelden zum Sichern und Synchronisieren",
   "account.row.in": "Angemeldet als {email}",
   "account.delete.webSub": "Dein Pro-Abo von der Website endet damit ebenfalls und wird nicht mehr berechnet.",
+  "account.signOut.backupPhotos": "Sicherung mit Fotos speichern",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -376,9 +381,9 @@ export const it: Partial<Record<Key, Message>> = {
   "account.signOut.backup": "Scarica un backup",
   "account.signOut.anyway": "Esci comunque",
   "account.signOut.photos": {
-    one: "Hai {count} foto dei progressi su questo dispositivo. Le foto non lo lasciano mai, quindi uscendo viene eliminata per sempre.",
+    one: "Hai {count} foto dei progressi su questo dispositivo. Le foto non vengono mai sincronizzate, quindi uscire la elimina, a meno che prima non salvi un backup che la contiene.",
     other:
-      "Hai {count} foto dei progressi su questo dispositivo. Le foto non lo lasciano mai, quindi uscendo vengono eliminate per sempre.",
+      "Hai {count} foto dei progressi su questo dispositivo. Le foto non vengono mai sincronizzate, quindi uscire le elimina, a meno che prima non salvi un backup che le contiene.",
   },
   "account.signOut.photosConfirm": "Esci ed elimina le foto",
   "account.delete": "Elimina il mio account",
@@ -397,6 +402,7 @@ export const it: Partial<Record<Key, Message>> = {
   "account.row.out": "Accedi per backup e sincronizzazione",
   "account.row.in": "Accesso come {email}",
   "account.delete.webSub": "Anche il tuo abbonamento Pro del sito termina ora e non ti verrà più addebitato.",
+  "account.signOut.backupPhotos": "Salva un backup con le foto",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -452,7 +458,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.signOut.backup": "バックアップをダウンロード",
   "account.signOut.anyway": "このままサインアウト",
   "account.signOut.photos": {
-    other: "この端末に進捗写真が{count}枚あります。写真は端末の外に出ないため、サインアウトすると完全に削除されます。",
+    other:
+      "この端末に進捗写真が{count}枚あります。写真は同期されないため、先に写真入りのバックアップを保存しないと、サインアウトで削除されます。",
   },
   "account.signOut.photosConfirm": "サインアウトして写真を削除",
   "account.delete": "アカウントを削除",
@@ -471,4 +478,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.row.out": "サインインしてバックアップと同期",
   "account.row.in": "{email}でサインイン中",
   "account.delete.webSub": "ウェブサイトで登録した Pro のサブスクリプションも今すぐ終了し、今後請求されることはありません。",
+  "account.signOut.backupPhotos": "写真入りのバックアップを保存",
 };

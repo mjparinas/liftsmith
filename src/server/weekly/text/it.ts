@@ -278,7 +278,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Peso e grasso corporeo con − e +, senza scrivere, o direttamente dalla bilancia tramite l'app salute del telefono.",
       "Nove punti di misura con il metro, in centimetri o pollici.",
-      "Le foto dei progressi restano sul telefono e non vengono mai sincronizzate.",
+      "Le foto dei progressi si allineano all'ultima, e due date qualsiasi si confrontano con il cursore o affiancate. Restano sul telefono.",
       "Labs (Pro): una bilancia Bluetooth compila la pesata perché tu la controlli.",
     ],
     dyk: "Un girovita che scende o sale diventa una nota del coach quando non registri il grasso corporeo.",

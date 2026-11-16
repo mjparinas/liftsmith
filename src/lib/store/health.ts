@@ -1,4 +1,4 @@
-import type { CloudCardio, CloudReading } from "../cloud";
+import type { CardioCloud, CloudCardio, CloudReading } from "../cloud";
 import { cloudCardioEvents, cloudReadingEvents } from "../cloudImport";
 import { derive } from "../derive";
 import { cleanResult } from "../fitTests";
@@ -34,7 +34,8 @@ export interface HealthSlice {
    */
   importCloudReadings(source: string, readings: readonly CloudReading[]): number;
   /** Concept2 Logbook sessions as finished cardio workouts under the active gym (cloudImport.ts). */
-  importCloudCardio(sessions: readonly CloudCardio[], now?: number): number;
+  /** Cardio sessions from Concept2 (the default) or Garmin as finished workouts; returns how many were new. */
+  importCloudCardio(sessions: readonly CloudCardio[], now?: number, source?: CardioCloud): number;
   /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
   refreshTdee(trigger?: "auto" | "manual", now?: number): AppEvent | null;
   /** Applies height read from Health Connect or Apple Health, then refreshes TDEE. */
@@ -132,9 +133,15 @@ export function healthSlice(c: Ctx): HealthSlice {
       return fresh.length;
     },
 
-    importCloudCardio(sessions, now = Date.now()) {
-      const have = new Set(get().events.map((e) => e.id));
-      const fresh = cloudCardioEvents(sessions, get().profile.activeGymId, now, have);
+    importCloudCardio(sessions, now = Date.now(), source = "concept2") {
+      const events = get().events;
+      const have = new Set(events.map((e) => e.id));
+      // Workouts already here (a Garmin run inside a Liftsmith workout is the same session, not a new one).
+      const starts = new Map<string, number>();
+      const busy: [number, number][] = [];
+      for (const e of events) if (e.type === "sessionStart") starts.set(e.sessionId, e.at);
+      for (const e of events) if (e.type === "sessionEnd" && starts.has(e.sessionId)) busy.push([starts.get(e.sessionId)!, e.at]);
+      const fresh = cloudCardioEvents(sessions, get().profile.activeGymId, now, have, source, busy);
       if (fresh.length) {
         commit(fresh);
         if (!get().active) get().replan();

@@ -9,13 +9,14 @@ import { parseBackup } from "@/lib/backup";
 import { backupJson, saveFile, stamp } from "@/lib/exportData";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
+import { listPhotos, photosForBackup, restorePhotos } from "@/lib/photos";
 import { canPromptInstall, isIos, onInstallChange, promptInstall, storageKept, where, type Where } from "@/lib/saving";
 import { STORE_LINKS } from "@/lib/site";
 import { useApp } from "@/lib/store";
 
 import { AccountPanel } from "./Account";
 import { go } from "./router";
-import { Button, Section } from "./ui";
+import { Button, InlineSwitch, Section } from "./ui";
 
 // "Save your progress" (Melvin, 2026-11-09: "it's not clear how to save my information or register").
 // These say plainly where the data lives, offer the optional account (backup and sync, Account.tsx), keep
@@ -116,6 +117,31 @@ export function SavingSettings() {
   const account = useAccount((s) => s.account);
   const input = useRef<HTMLInputElement>(null);
   const [note, setNote] = useState<string | null>(null);
+  // Progress photos never sync (photos.ts); the backup file is how they move to a new phone, when the lifter
+  // switches them in. Off by default, because a file with body photos in it shouldn't be made by accident.
+  const [photoCount, setPhotoCount] = useState(0);
+  const [withPhotos, setWithPhotos] = useState(false);
+  const [saving, setSaving] = useState(false);
+  useEffect(
+    () =>
+      void listPhotos().then(
+        (p) => setPhotoCount(p.length),
+        () => setPhotoCount(0),
+      ),
+    [],
+  );
+  const save = async () => {
+    track("feature", { name: "backup", detail: withPhotos ? `${where()}-photos` : where() });
+    setSaving(true);
+    try {
+      const photos = withPhotos && photoCount ? await photosForBackup() : undefined;
+      await saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events, Date.now(), photos));
+    } catch {
+      haptic("error");
+    } finally {
+      setSaving(false);
+    }
+  };
   const pick = async (f: File | undefined) => {
     if (!f) return;
     const b = parseBackup(await f.text());
@@ -124,9 +150,18 @@ export function SavingSettings() {
       return setNote(t("save.bad"));
     }
     const added = restoreBackup(b);
+    const photos = await restorePhotos(b.photos).catch(() => 0);
+    if (photos) setPhotoCount((n) => n + photos);
     haptic("success");
-    track("feature", { name: "restore", detail: added ? "added" : "none" });
-    setNote(added ? t("save.restored") : t("save.restored.none"));
+    track("feature", { name: "restore", detail: added || photos ? "added" : "none" });
+    setNote(
+      [
+        added || !photos ? (added ? t("save.restored") : t("save.restored.none")) : null,
+        photos ? t("save.restored.photos", { count: photos }) : null,
+      ]
+        .filter(Boolean)
+        .join(" "),
+    );
   };
   return (
     <div id="saving">
@@ -134,15 +169,18 @@ export function SavingSettings() {
         <SavedWhere />
         <InstallHelp />
         <p className="mt-3 text-sm text-muted">{t("save.move")}</p>
+        {photoCount > 0 && (
+          <InlineSwitch
+            className="mt-3"
+            label={t("save.photos", { count: photoCount })}
+            hint={t("save.photos.hint")}
+            on={withPhotos}
+            onChange={setWithPhotos}
+          />
+        )}
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <Button
-            kind="ghost"
-            onClick={() => {
-              track("feature", { name: "backup", detail: where() });
-              void saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events));
-            }}
-          >
-            {t("save.backup")}
+          <Button kind="ghost" disabled={saving} onClick={() => void save()}>
+            {saving ? t("save.backup.saving") : t("save.backup")}
           </Button>
           <Button kind="ghost" onClick={() => input.current?.click()}>
             {t("save.restore")}

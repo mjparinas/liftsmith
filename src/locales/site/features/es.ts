@@ -219,6 +219,10 @@ export const es: FeaturesText = {
       name: "Peso, grasa corporal y fotos",
       body: "Registra peso y grasa corporal, o deja que lleguen de tu báscula a través de la app de salud del teléfono, y guarda fotos de progreso en tu teléfono.",
     },
+    "photo-compare": {
+      name: "Fotos de progreso que se alinean",
+      body: "La cámara muestra tu última foto como un contorno tenue para alinearte, con temporizador para alejarte. Compara dos fechas cualquiera con un deslizador o lado a lado, cada una con lo que pesabas ese día. Las fotos se quedan en tu teléfono; una copia de seguridad puede llevarlas a uno nuevo.",
+    },
     measurements: {
       name: "Medidas con cinta",
       body: "Nueve zonas en centímetros o pulgadas. Una cintura que crece o se reduce se convierte en una nota del entrenador cuando no hay datos de grasa corporal.",
@@ -451,7 +455,7 @@ export const es: FeaturesText = {
     },
     cloud: {
       name: "Conexiones con servicios de fitness",
-      body: "Oura envía sueño, VFC, pulso en reposo y pasos, con una cuenta gratuita. Estamos estudiando Strava, WHOOP, Withings, Polar y Concept2.",
+      body: "Oura envía sueño, VFC, pulso en reposo y pasos, con una cuenta gratuita. Estamos estudiando Strava, Garmin Connect, WHOOP, Withings, Polar y Concept2.",
     },
     "health-save": {
       name: "Entrenamientos guardados en tu app de salud",
@@ -623,6 +627,9 @@ export const es: FeaturesText = {
     },
     oura: { does: "Entran sueño, VFC, pulso en reposo y pasos" },
     strava: { does: "Cada entrenamiento terminado se publica en Strava" },
+    "garmin-connect": {
+      does: "Entran el sueño, la VFC, el pulso en reposo, los pasos y los pesajes de la báscula Index, y las carreras, salidas en bici y sesiones de remo como entrenamientos de cardio",
+    },
     whoop: { does: "Entran sueño, recuperación, VFC y pulso en reposo" },
     withings: { does: "Entran peso, grasa corporal, sueño y pasos" },
     polar: { does: "Entran recuperación nocturna, VFC y sueño" },

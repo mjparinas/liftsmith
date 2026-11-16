@@ -285,6 +285,9 @@ function HeartRateCard() {
 
 // --- Strava, Oura, WHOOP, Withings, Polar, Concept2 ---
 
+/** What a service sends or gets. Garmin Connect has its own key: `conn.garmin.*` is the Garmin watch card. */
+const cloudWhat = (p: Cloud): MessageKey => (p === "garmin" ? "conn.garminConnect.what" : (`conn.${p}.what` as MessageKey));
+
 function CloudRow({ p }: { p: Cloud }) {
   const status = useCloud((s) => s.status);
   const busy = useCloud((s) => s.busy);
@@ -319,7 +322,7 @@ function CloudRow({ p }: { p: Cloud }) {
       ) : (
         ready && <Status on={false}>{t("conn.notConnected")}</Status>
       )}
-      <p className="mt-2 text-sm text-muted">{t(`conn.${p}.what` as MessageKey)}</p>
+      <p className="mt-2 text-sm text-muted">{t(cloudWhat(p))}</p>
       {p === "strava" && link && (
         <SwitchRow
           label={t("conn.strava.post")}
@@ -407,7 +410,7 @@ function CloudCards() {
         <ul className="mt-3 space-y-1 px-1 text-sm text-muted">
           {shownClouds(sonosLinked).map((p) => (
             <li key={p}>
-              <span className="font-semibold text-ink">{CLOUD_NAME[p]}</span> · {t(`conn.${p}.what` as MessageKey)}
+              <span className="font-semibold text-ink">{CLOUD_NAME[p]}</span> · {t(cloudWhat(p))}
             </li>
           ))}
         </ul>

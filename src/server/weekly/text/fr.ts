@@ -278,7 +278,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Poids et masse grasse avec − et +, sans saisie, ou directement depuis votre balance via l'app santé du téléphone.",
       "Neuf mensurations au mètre ruban, en centimètres ou en pouces.",
-      "Les photos de progrès restent sur votre téléphone et ne sont jamais synchronisées.",
+      "Les photos de progrès s'alignent sur la précédente, et deux dates au choix se comparent au curseur ou côte à côte. Elles restent sur votre téléphone.",
       "Labs (Pro) : une balance connectée Bluetooth remplit la pesée pour que vous la vérifiiez.",
     ],
     dyk: "Un tour de taille qui baisse ou augmente devient une note du coach quand vous ne suivez pas la masse grasse.",

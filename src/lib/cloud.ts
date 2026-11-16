@@ -1,13 +1,15 @@
 // What the app and the server share about connected cloud services (AGENTS.md "Connected apps",
 // docs/decisions/connected-apps.md): Strava gets finished workouts; Oura, Whoop, Withings and Polar send sleep,
-// HRV, resting heart rate, steps and weigh-ins in; Concept2 sends rows, ski and bike sessions in as cardio; Sonos takes play, skip and volume commands (a lab, docs/decisions/sonos.md). The server holds the OAuth tokens (src/server/connect.ts); the app holds everything else.
+// HRV, resting heart rate, steps and weigh-ins in; Concept2 sends rows, ski and bike sessions in as cardio; Garmin sends
+// sleep, HRV, resting heart rate, steps, weigh-ins and runs, rides and rows in (pushed to us, so the server keeps them for a while); Sonos takes play, skip and volume commands (a lab, docs/decisions/sonos.md). The server holds the OAuth tokens (src/server/connect.ts); the app holds everything else.
 import type { HealthMetric } from "./types";
 
-export const CLOUD = ["strava", "oura", "whoop", "withings", "polar", "concept2", "sonos"] as const;
+export const CLOUD = ["strava", "garmin", "oura", "whoop", "withings", "polar", "concept2", "sonos"] as const;
 export type Cloud = (typeof CLOUD)[number];
 
 export const CLOUD_NAME: Record<Cloud, string> = {
   strava: "Strava",
+  garmin: "Garmin Connect",
   oura: "Oura",
   whoop: "WHOOP",
   withings: "Withings",
@@ -19,7 +21,7 @@ export const CLOUD_NAME: Record<Cloud, string> = {
 export const isCloud = (p: unknown): p is Cloud => typeof p === "string" && (CLOUD as readonly string[]).includes(p);
 
 /** Services that send health readings in (GET /api/connect/<service>/daily/). */
-export const READS = ["oura", "whoop", "withings", "polar"] as const;
+export const READS = ["garmin", "oura", "whoop", "withings", "polar"] as const;
 export type ReadingCloud = (typeof READS)[number];
 export const isReadingCloud = (p: unknown): p is ReadingCloud => typeof p === "string" && (READS as readonly string[]).includes(p);
 
@@ -41,14 +43,23 @@ export interface CloudReading {
   at: number;
 }
 
-/** GET /api/connect/concept2/results/: one Concept2 Logbook session (a row, ski or bike piece). */
+/** Services that send cardio sessions in (GET /api/connect/<service>/results/). */
+export const CARDIO = ["concept2", "garmin"] as const;
+export type CardioCloud = (typeof CARDIO)[number];
+export const isCardioCloud = (p: unknown): p is CardioCloud => typeof p === "string" && (CARDIO as readonly string[]).includes(p);
+
+/**
+ * GET /api/connect/<concept2|garmin>/results/: one cardio session. Concept2 sends rows, ski and bike pieces;
+ * Garmin also sends runs, rides, elliptical and stair sessions recorded on the watch.
+ */
 export interface CloudCardio {
-  /** The Logbook's own id, so an import is never doubled. */
+  /** The service's own id, so an import is never doubled. */
   id: string;
-  kind: "rower" | "skierg" | "bike";
+  kind: "rower" | "skierg" | "bike" | "run" | "treadmill" | "ride" | "elliptical" | "stairs";
   /** Start, ms. */
   start: number;
   seconds: number;
+  /** Metres; 0 when the machine doesn't measure distance (elliptical, stairs). */
   distanceM: number;
 }
 

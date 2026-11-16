@@ -221,6 +221,10 @@ export const ja: FeaturesText = {
       name: "体重、体脂肪、写真",
       body: "体重と体脂肪を記録するか、スマートフォンのヘルスケアアプリ経由で体重計から取り込み、進捗写真はスマートフォンに保存します。",
     },
+    "photo-compare": {
+      name: "位置がそろう進捗写真",
+      body: "カメラに前回の写真がうすい輪郭で表示されるので、位置を合わせて撮れます。離れて撮れるタイマー付き。好きな2つの日付をスライダーか左右に並べて比べられ、それぞれにその日の体重が表示されます。写真はスマホの中だけに保存され、バックアップファイルで新しいスマホに移せます。",
+    },
     measurements: {
       name: "メジャーでの採寸",
       body: "センチかインチで 9 か所。体脂肪のデータがないときは、ウエストの増減がコーチのメモになります。",
@@ -450,7 +454,7 @@ export const ja: FeaturesText = {
     },
     cloud: {
       name: "フィットネスサービスとの連携",
-      body: "無料アカウントで Oura から睡眠、HRV、安静時心拍数、歩数を取り込めます。Strava、WHOOP、Withings、Polar、Concept2 は検討中です。",
+      body: "無料アカウントで Oura から睡眠、HRV、安静時心拍数、歩数を取り込めます。Strava、Garmin Connect、WHOOP、Withings、Polar、Concept2 は検討中です。",
     },
     "health-save": {
       name: "ワークアウトをヘルスケアアプリに保存",
@@ -623,6 +627,9 @@ export const ja: FeaturesText = {
     },
     oura: { does: "睡眠、HRV、安静時心拍数、歩数を取り込み" },
     strava: { does: "終えたワークアウトを Strava に投稿" },
+    "garmin-connect": {
+      does: "睡眠、HRV、安静時心拍数、歩数、Index 体重計の体重を取り込み、ランニング、サイクリング、ローイングを有酸素ワークアウトとして取り込み",
+    },
     whoop: { does: "睡眠、リカバリー、HRV、安静時心拍数を取り込み" },
     withings: { does: "体重、体脂肪、睡眠、歩数を取り込み" },
     polar: { does: "Nightly Recharge、HRV、睡眠を取り込み" },

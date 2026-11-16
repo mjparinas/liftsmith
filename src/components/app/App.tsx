@@ -243,7 +243,7 @@ export function App() {
   useEffect(() => {
     if (ready && signedIn) void redeemSaved();
   }, [ready, signedIn]);
-  // Strava, Oura, WHOOP, Withings, Polar and Concept2 (Connected apps): status, readings in and workouts out, while signed in.
+  // Strava, Garmin Connect, Oura, WHOOP, Withings, Polar and Concept2 (Connected apps): status, readings in and workouts out, while signed in.
   useEffect(() => {
     if (!ready || !signedIn) return;
     return startConnections();
@@ -511,7 +511,7 @@ export function App() {
       <div className={sidebar ? "pl-60" : undefined}>
         <main
           key={route}
-          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
+          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `side-page ${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
         >
           {/* Friends' check-ins stay at the top of every screen but the workout until closed (Check in, 2026-11-14).
               In the page rather than over it, so they never cover a screen's own header. */}
