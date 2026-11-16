@@ -500,7 +500,7 @@ export const it: FeaturesText = {
     },
     languages: {
       name: "Dieci lingue",
-      body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono.",
+      body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono o del browser, oppure quella che scegli nella schermata di benvenuto e nelle impostazioni.",
     },
     appearance: {
       name: "Scuro, chiaro o come il telefono",

@@ -961,7 +961,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "languages",
         name: "Ten languages",
-        body: "English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, following your phone's language.",
+        body: "English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, following your phone's or browser's language, or the one you pick on the welcome screen and in Settings.",
         tier: "free",
         added: "2026-11-15",
       },
