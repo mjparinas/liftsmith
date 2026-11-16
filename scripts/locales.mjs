@@ -22,7 +22,7 @@ registerHooks({
   },
 });
 
-export const LANGS = ["en", "es", "fr", "de", "it", "ja"];
+export const LANGS = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"];
 
 const out = path.join(src, "locales", "gen");
 fs.mkdirSync(out, { recursive: true });

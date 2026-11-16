@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Weight and body fat with − and +, no typing, or straight from your scale through your phone's health app.",
       "Nine tape measurement sites in centimetres or inches.",
-      "Progress photos stay on your phone and never sync.",
+      "Progress photos line up with your last one, and any two dates compare as a slider or side by side. They stay on your phone.",
       "Labs (Pro): a Bluetooth smart scale fills in the weigh-in for you to check.",
     ],
     dyk: "A shrinking or growing waist becomes a coach's note when you don't log body fat.",
@@ -473,7 +473,7 @@ export const emails: Record<string, Words> = {
     title: "Did you know? Make it read your way",
     intro: "Little things that make the app feel like yours.",
     points: [
-      "Pick a language other than your phone's: there are six.",
+      "Pick a language other than your phone's: there are ten.",
       "Kilograms or pounds, and each gym can use its own for its plates.",
       "The daily quote on Today can be switched off.",
       "Run setup again from Settings if your goal, experience or gym has changed.",
@@ -710,7 +710,7 @@ export const emails: Record<string, Words> = {
       "Dark, light or match your phone.",
       "Earn themes and accents from your achievements.",
       "On the phones, an app icon in your theme's colours.",
-      "Six languages, separate from your phone's if you like.",
+      "Ten languages, separate from your phone's if you like.",
     ],
     dyk: "With Appearance on light, a theme changes the accent colour only.",
   },

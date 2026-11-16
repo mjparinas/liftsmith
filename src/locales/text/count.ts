@@ -526,3 +526,376 @@ export const ja: Partial<Record<Key, Message>> = {
   "count.err.model": "レップカウンターを起動できませんでした。初回は通信状態を確認して、もう一度お試しください。",
   "count.err.motion": "モーションへのアクセスが拒否されたため、端末でレップを数えられません。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "count.form.depth": {
+    one: "Sua rep parou acima da paralela. Desça até o quadril ficar na altura dos joelhos e tire peso da barra se precisar.",
+    other:
+      "{hit} de {count} reps pararam acima da paralela. Desça até o quadril ficar na altura dos joelhos e tire peso da barra se precisar.",
+  },
+  "count.form.rom": {
+    one: "Sua rep foi mais curta que a sua melhor. Faça toda rep com a mesma amplitude completa, mesmo que isso signifique menos reps.",
+    other:
+      "{hit} de {count} reps foram mais curtas que a sua melhor. Faça toda rep com a mesma amplitude completa, mesmo que isso signifique menos reps.",
+  },
+  "count.form.leanLeft": {
+    one: "Você inclinou cerca de {deg}° para a esquerda. Mantenha o peso igual nos dois pés e o peito reto.",
+    other: "Você inclinou cerca de {deg}° para a esquerda em {hit} de {count} reps. Mantenha o peso igual nos dois pés e o peito reto.",
+  },
+  "count.form.leanRight": {
+    one: "Você inclinou cerca de {deg}° para a direita. Mantenha o peso igual nos dois pés e o peito reto.",
+    other: "Você inclinou cerca de {deg}° para a direita em {hit} de {count} reps. Mantenha o peso igual nos dois pés e o peito reto.",
+  },
+  "count.path.forwardBottom": {
+    one: "A barra foi cerca de {cm} cm para a frente embaixo. Mantenha-a sobre o meio do pé: contraia o core com força e fique firme embaixo.",
+    other:
+      "A barra foi cerca de {cm} cm para a frente embaixo em {hit} de {count} reps. Mantenha-a sobre o meio do pé: contraia o core com força e fique firme embaixo.",
+  },
+  "count.path.forwardUp": {
+    one: "A barra foi cerca de {cm} cm para a frente na subida. Mantenha-a sobre o meio do pé e empurre reto para cima.",
+    other:
+      "A barra foi cerca de {cm} cm para a frente na subida em {hit} de {count} reps. Mantenha-a sobre o meio do pé e empurre reto para cima.",
+  },
+  "count.path.back": {
+    one: "A barra foi cerca de {cm} cm para trás. Mantenha o peso sobre o meio do pé, não nos calcanhares.",
+    other: "A barra foi cerca de {cm} cm para trás em {hit} de {count} reps. Mantenha o peso sobre o meio do pé, não nos calcanhares.",
+  },
+  "count.path.good": {
+    one: "Trajetória da barra: ficou a até {cm} cm de onde começou nessa rep.",
+    other: "Trajetória da barra: ficou a até {cm} cm de onde começou nessas {count} reps.",
+  },
+  "count.form.good": {
+    one: "Checagem de execução: nada a corrigir nessa rep.",
+    other: "Checagem de execução: nada a corrigir nessas {count} reps.",
+  },
+  "count.max.own": {
+    one: "Medido contra sua própria velocidade de fim de série neste exercício, {speed} m/s, aprendida de {count} série que você levou até a falha.",
+    other:
+      "Medido contra sua própria velocidade de fim de série neste exercício, {speed} m/s, aprendida de {count} séries que você levou até a falha.",
+  },
+  "count.max.book": {
+    one: "Medido contra a velocidade de fim de série típica deste exercício, {speed} m/s. Leve mais {count} série até a falha com a câmera contando e ele aprende a sua.",
+    other:
+      "Medido contra a velocidade de fim de série típica deste exercício, {speed} m/s. Leve mais {count} séries até a falha com a câmera contando e ele aprende a sua.",
+  },
+  "count.max.title": "Velocidade no aquecimento",
+  "count.max.up":
+    "Seus aquecimentos foram rápidos: o máximo de hoje parece ser cerca de {max}, {pct}% acima do que o plano espera. Tente {weight} nas séries de trabalho.",
+  "count.max.down":
+    "Seus aquecimentos foram lentos: o máximo de hoje parece ser cerca de {max}, {pct}% abaixo do que o plano espera. Tente {weight} nas séries de trabalho.",
+  "count.max.hold": "Seus aquecimentos foram como esperado: o máximo de hoje parece ser cerca de {max}. Fique com {weight}.",
+  "count.max.use": "Usar {weight}",
+  "count.max.used": "Peso de trabalho definido em {weight}.",
+  "count.speed.label": "Velocidade da barra",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct}% da melhor",
+  "count.speed.stop": "A velocidade da barra caiu {loss}% em relação à sua rep mais rápida. Um bom momento para encerrar a série.",
+  "count.speed.left": {
+    one: "Cerca de {count} rep no tanque: a velocidade da barra caiu {loss}%.",
+    other: "Cerca de {count} reps no tanque: a velocidade da barra caiu {loss}%.",
+  },
+  "count.toggle": "Contar reps com a câmera",
+  "count.toggleMotion": "Contar reps com o movimento do celular",
+  "count.start": "Contar reps",
+  "count.reps": "reps",
+  "count.stop": "Parar",
+  "count.off": "Parar de contar reps",
+  "count.opening": "Abrindo a câmera…",
+  "count.loading": "Preparando o contador de reps (só da primeira vez)…",
+  "count.position": "Fique de lado com o corpo inteiro na câmera.",
+  "count.watch": {
+    one: "Relógio: {count} rep",
+    other: "Relógio: {count} reps",
+  },
+  "count.counting": "Contando. Suas reps preenchem Registrar série.",
+  "count.resting": "Descansando. A contagem recomeça na próxima série.",
+  "count.flipToBack": "Usar a câmera traseira",
+  "count.flipToFront": "Usar a câmera frontal",
+  "count.useMotion": "Usar o movimento do celular",
+  "count.useCamera": "Usar a câmera",
+  "count.err.denied": "O acesso à câmera está desativado. Permita-o nos ajustes do celular para o Liftsmith contar reps.",
+  "count.err.noCamera": "Nenhuma câmera encontrada para isto.",
+  "count.err.model": "Não foi possível iniciar o contador de reps. Verifique sua conexão na primeira vez e tente de novo.",
+  "count.err.motion": "O acesso ao movimento foi recusado, então não dá para contar reps pelo celular.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "count.form.depth": {
+    other: "{count}회 중 {hit}회가 평행보다 위에서 멈췄어요. 엉덩이가 무릎 높이까지 오도록 앉고, 필요하면 무게를 줄이세요.",
+  },
+  "count.form.rom": {
+    other: "{count}회 중 {hit}회가 최고 기록 때보다 가동 범위가 짧았어요. 횟수가 줄더라도 매 회를 같은 전체 범위로 하세요.",
+  },
+  "count.form.leanLeft": {
+    other: "{count}회 중 {hit}회에서 왼쪽으로 약 {deg}° 기울었어요. 양발에 체중을 고르게 싣고 가슴을 정면으로 유지하세요.",
+  },
+  "count.form.leanRight": {
+    other: "{count}회 중 {hit}회에서 오른쪽으로 약 {deg}° 기울었어요. 양발에 체중을 고르게 싣고 가슴을 정면으로 유지하세요.",
+  },
+  "count.path.forwardBottom": {
+    other:
+      "{count}회 중 {hit}회에서 바가 바닥 지점에서 약 {cm} cm 앞으로 밀렸어요. 바를 발 중앙 위에 두세요. 바닥에서 코어에 힘을 꽉 주고 긴장을 유지하세요.",
+  },
+  "count.path.forwardUp": {
+    other: "{count}회 중 {hit}회에서 바가 올라가면서 약 {cm} cm 앞으로 밀렸어요. 바를 발 중앙 위에 두고 곧장 위로 밀어 올리세요.",
+  },
+  "count.path.back": {
+    other: "{count}회 중 {hit}회에서 바가 약 {cm} cm 뒤로 밀렸어요. 뒤꿈치가 아니라 발 중앙에 체중을 실으세요.",
+  },
+  "count.path.good": {
+    other: "바 경로: {count}회 동안 시작 위치에서 {cm} cm 이내를 유지했어요.",
+  },
+  "count.form.good": {
+    other: "자세 체크: {count}회 모두 고칠 게 없어요.",
+  },
+  "count.max.own": {
+    other: "한계까지 한 {count}세트에서 배운 이 운동의 내 세트 막바지 속도 {speed} m/s를 기준으로 측정했어요.",
+  },
+  "count.max.book": {
+    other:
+      "이 운동의 일반적인 세트 막바지 속도 {speed} m/s를 기준으로 측정했어요. 카메라로 횟수를 세면서 {count}세트를 더 한계까지 하면 내 속도를 배워요.",
+  },
+  "count.max.title": "워밍업 속도",
+  "count.max.up":
+    "워밍업 속도가 빨랐어요. 오늘 최대 중량은 약 {max}로, 계획 예상보다 {pct}% 높아 보여요. 본 세트는 {weight}(으)로 해 보세요.",
+  "count.max.down":
+    "워밍업 속도가 느렸어요. 오늘 최대 중량은 약 {max}로, 계획 예상보다 {pct}% 낮아 보여요. 본 세트는 {weight}(으)로 해 보세요.",
+  "count.max.hold": "워밍업 속도가 예상대로였어요. 오늘 최대 중량은 약 {max}로 보여요. {weight}을(를) 유지하세요.",
+  "count.max.use": "{weight} 사용",
+  "count.max.used": "본 세트 무게를 {weight}(으)로 설정했어요.",
+  "count.speed.label": "바 속도",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "최고의 {pct}%",
+  "count.speed.stop": "바 속도가 가장 빠른 회보다 {loss}% 떨어졌어요. 세트를 끝내기 좋은 지점이에요.",
+  "count.speed.left": {
+    other: "약 {count}회 더 할 힘이 남았어요. 바 속도가 {loss}% 떨어졌어요.",
+  },
+  "count.toggle": "카메라로 횟수 세기",
+  "count.toggleMotion": "휴대폰 움직임으로 횟수 세기",
+  "count.start": "횟수 세기",
+  "count.reps": "회",
+  "count.stop": "중지",
+  "count.off": "횟수 세기 중지",
+  "count.opening": "카메라 여는 중…",
+  "count.loading": "횟수 카운터 준비 중 (처음 한 번만)…",
+  "count.position": "몸 전체가 카메라에 보이도록 옆으로 서세요.",
+  "count.watch": {
+    other: "워치: {count}회",
+  },
+  "count.counting": "세는 중이에요. 횟수가 세트 기록에 채워져요.",
+  "count.resting": "휴식 중이에요. 다음 세트에서 다시 세기 시작해요.",
+  "count.flipToBack": "후면 카메라 사용",
+  "count.flipToFront": "전면 카메라 사용",
+  "count.useMotion": "휴대폰 움직임 사용",
+  "count.useCamera": "카메라 사용",
+  "count.err.denied": "카메라 접근이 꺼져 있어요. Liftsmith가 횟수를 셀 수 있도록 휴대폰 설정에서 허용하세요.",
+  "count.err.noCamera": "사용할 카메라를 찾지 못했어요.",
+  "count.err.model": "횟수 카운터를 시작하지 못했어요. 처음 실행할 때는 인터넷 연결을 확인하고 다시 시도하세요.",
+  "count.err.motion": "동작 접근이 거부되어 휴대폰으로 횟수를 셀 수 없어요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "count.form.depth": {
+    one: "Tekrarın paralelin üstünde kaldı. Kalçan dizlerinle aynı hizaya gelene kadar in; gerekirse barı hafiflet.",
+    other: "{count} tekrarın {hit} tanesi paralelin üstünde kaldı. Kalçan dizlerinle aynı hizaya gelene kadar in; gerekirse barı hafiflet.",
+  },
+  "count.form.rom": {
+    one: "Tekrarın en iyi tekrarından kısaydı. Daha az tekrar anlamına gelse bile her tekrarı aynı tam açıyla yap.",
+    other: "{count} tekrarın {hit} tanesi en iyi tekrarından kısaydı. Daha az tekrar anlamına gelse bile her tekrarı aynı tam açıyla yap.",
+  },
+  "count.form.leanLeft": {
+    one: "Yaklaşık {deg}° soluna eğildin. Ağırlığını iki ayağına eşit ver, göğsünü düz tut.",
+    other: "{count} tekrarın {hit} tanesinde yaklaşık {deg}° soluna eğildin. Ağırlığını iki ayağına eşit ver, göğsünü düz tut.",
+  },
+  "count.form.leanRight": {
+    one: "Yaklaşık {deg}° sağına eğildin. Ağırlığını iki ayağına eşit ver, göğsünü düz tut.",
+    other: "{count} tekrarın {hit} tanesinde yaklaşık {deg}° sağına eğildin. Ağırlığını iki ayağına eşit ver, göğsünü düz tut.",
+  },
+  "count.path.forwardBottom": {
+    one: "Bar en altta yaklaşık {cm} cm öne kaydı. Onu ayağının ortasının üstünde tut: sıkıca karnını kilitle ve altta gergin kal.",
+    other:
+      "{count} tekrarın {hit} tanesinde bar en altta yaklaşık {cm} cm öne kaydı. Onu ayağının ortasının üstünde tut: sıkıca karnını kilitle ve altta gergin kal.",
+  },
+  "count.path.forwardUp": {
+    one: "Bar yukarı çıkarken yaklaşık {cm} cm öne kaydı. Onu ayağının ortasının üstünde tut ve dümdüz yukarı it.",
+    other:
+      "{count} tekrarın {hit} tanesinde bar yukarı çıkarken yaklaşık {cm} cm öne kaydı. Onu ayağının ortasının üstünde tut ve dümdüz yukarı it.",
+  },
+  "count.path.back": {
+    one: "Bar yaklaşık {cm} cm geriye kaydı. Ağırlığını topuklarına değil, ayağının ortasına ver.",
+    other: "{count} tekrarın {hit} tanesinde bar yaklaşık {cm} cm geriye kaydı. Ağırlığını topuklarına değil, ayağının ortasına ver.",
+  },
+  "count.path.good": {
+    one: "Bar yolu: o tekrarda başladığı yerden en fazla {cm} cm uzaklaştı.",
+    other: "Bar yolu: o {count} tekrarda başladığı yerden en fazla {cm} cm uzaklaştı.",
+  },
+  "count.form.good": {
+    one: "Form kontrolü: o tekrarda düzeltilecek bir şey yok.",
+    other: "Form kontrolü: o {count} tekrarda düzeltilecek bir şey yok.",
+  },
+  "count.max.own": {
+    one: "Tükenişe kadar götürdüğün {count} setten öğrenilen, bu hareket için kendi set sonu hızın olan {speed} m/s ile karşılaştırıldı.",
+    other: "Tükenişe kadar götürdüğün {count} setten öğrenilen, bu hareket için kendi set sonu hızın olan {speed} m/s ile karşılaştırıldı.",
+  },
+  "count.max.book": {
+    one: "Bu hareket için olağan set sonu hızı olan {speed} m/s ile karşılaştırıldı. Kamera sayarken {count} set daha tükenişe kadar git, o da senin hızını öğrensin.",
+    other:
+      "Bu hareket için olağan set sonu hızı olan {speed} m/s ile karşılaştırıldı. Kamera sayarken {count} set daha tükenişe kadar git, o da senin hızını öğrensin.",
+  },
+  "count.max.title": "Isınma hızı",
+  "count.max.up":
+    "Isınmaların hızlı geçti: bugünkü maksimumun yaklaşık {max}, planın beklediğinden %{pct} fazla görünüyor. Çalışma setlerin için {weight} dene.",
+  "count.max.down":
+    "Isınmaların yavaş geçti: bugünkü maksimumun yaklaşık {max}, planın beklediğinden %{pct} az görünüyor. Çalışma setlerin için {weight} dene.",
+  "count.max.hold": "Isınmaların beklendiği gibi geçti: bugünkü maksimumun yaklaşık {max} görünüyor. {weight} ile devam et.",
+  "count.max.use": "{weight} kullan",
+  "count.max.used": "Çalışma ağırlığı {weight} olarak ayarlandı.",
+  "count.speed.label": "Bar hızı",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "En iyinin %{pct}'i",
+  "count.speed.stop": "Bar hızı en hızlı tekrarından %{loss} düştü. Seti bitirmek için iyi bir an.",
+  "count.speed.left": {
+    one: "Depoda yaklaşık {count} tekrar kaldı: bar hızı %{loss} düştü.",
+    other: "Depoda yaklaşık {count} tekrar kaldı: bar hızı %{loss} düştü.",
+  },
+  "count.toggle": "Tekrarları kamerayla say",
+  "count.toggleMotion": "Tekrarları telefon hareketiyle say",
+  "count.start": "Tekrarları say",
+  "count.reps": "tekrar",
+  "count.stop": "Durdur",
+  "count.off": "Tekrar saymayı durdur",
+  "count.opening": "Kamera açılıyor…",
+  "count.loading": "Tekrar sayacı hazırlanıyor (yalnızca ilk sefer)…",
+  "count.position": "Yan dur ve tüm vücudun kamera görüntüsünde olsun.",
+  "count.watch": {
+    one: "Saat: {count} tekrar",
+    other: "Saat: {count} tekrar",
+  },
+  "count.counting": "Sayılıyor. Tekrarların Seti kaydet'e işlenir.",
+  "count.resting": "Dinleniyorsun. Sayım sonraki setinle yeniden başlar.",
+  "count.flipToBack": "Arka kamerayı kullan",
+  "count.flipToFront": "Ön kamerayı kullan",
+  "count.useMotion": "Telefon hareketini kullan",
+  "count.useCamera": "Kamerayı kullan",
+  "count.err.denied": "Kamera erişimi kapalı. Liftsmith'in tekrar sayabilmesi için telefonunun ayarlarından izin ver.",
+  "count.err.noCamera": "Bunun için kamera bulunamadı.",
+  "count.err.model": "Tekrar sayacı başlatılamadı. İlk çalıştırma için bağlantını kontrol et ve yeniden dene.",
+  "count.err.motion": "Hareket erişimi reddedildi, bu yüzden tekrarlar telefondan sayılamıyor.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "count.form.depth": {
+    one: "Twoje powtórzenie skończyło się nad równoległą. Schodź, aż biodra będą na wysokości kolan, a w razie potrzeby odciąż sztangę.",
+    few: "W {hit} z {count} powtórzeń zejście skończyło się nad równoległą. Schodź, aż biodra będą na wysokości kolan, a w razie potrzeby odciąż sztangę.",
+    many: "W {hit} z {count} powtórzeń zejście skończyło się nad równoległą. Schodź, aż biodra będą na wysokości kolan, a w razie potrzeby odciąż sztangę.",
+    other:
+      "W {hit} z {count} powtórzeń zejście skończyło się nad równoległą. Schodź, aż biodra będą na wysokości kolan, a w razie potrzeby odciąż sztangę.",
+  },
+  "count.form.rom": {
+    one: "Twoje powtórzenie było krótsze niż Twoje najlepsze. Rób każde powtórzenie w tym samym pełnym zakresie, nawet kosztem liczby powtórzeń.",
+    few: "W {hit} z {count} powtórzeń zakres był krótszy niż Twój najlepszy. Rób każde powtórzenie w tym samym pełnym zakresie, nawet kosztem liczby powtórzeń.",
+    many: "W {hit} z {count} powtórzeń zakres był krótszy niż Twój najlepszy. Rób każde powtórzenie w tym samym pełnym zakresie, nawet kosztem liczby powtórzeń.",
+    other:
+      "W {hit} z {count} powtórzeń zakres był krótszy niż Twój najlepszy. Rób każde powtórzenie w tym samym pełnym zakresie, nawet kosztem liczby powtórzeń.",
+  },
+  "count.form.leanLeft": {
+    one: "Przechył o około {deg}° w lewo. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+    few: "Przechył o około {deg}° w lewo w {hit} z {count} powtórzeń. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+    many: "Przechył o około {deg}° w lewo w {hit} z {count} powtórzeń. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+    other: "Przechył o około {deg}° w lewo w {hit} z {count} powtórzeń. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+  },
+  "count.form.leanRight": {
+    one: "Przechył o około {deg}° w prawo. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+    few: "Przechył o około {deg}° w prawo w {hit} z {count} powtórzeń. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+    many: "Przechył o około {deg}° w prawo w {hit} z {count} powtórzeń. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+    other: "Przechył o około {deg}° w prawo w {hit} z {count} powtórzeń. Rozkładaj ciężar równo na obie stopy i trzymaj klatkę prosto.",
+  },
+  "count.path.forwardBottom": {
+    one: "Sztanga uciekła w dole o około {cm} cm do przodu. Trzymaj ją nad środkiem stopy: mocno się usztywnij i bądź spięty na dole.",
+    few: "Sztanga uciekła w dole o około {cm} cm do przodu w {hit} z {count} powtórzeń. Trzymaj ją nad środkiem stopy: mocno się usztywnij i bądź spięty na dole.",
+    many: "Sztanga uciekła w dole o około {cm} cm do przodu w {hit} z {count} powtórzeń. Trzymaj ją nad środkiem stopy: mocno się usztywnij i bądź spięty na dole.",
+    other:
+      "Sztanga uciekła w dole o około {cm} cm do przodu w {hit} z {count} powtórzeń. Trzymaj ją nad środkiem stopy: mocno się usztywnij i bądź spięty na dole.",
+  },
+  "count.path.forwardUp": {
+    one: "Sztanga uciekła o około {cm} cm do przodu w drodze w górę. Trzymaj ją nad środkiem stopy i pchaj prosto w górę.",
+    few: "Sztanga uciekła o około {cm} cm do przodu w drodze w górę w {hit} z {count} powtórzeń. Trzymaj ją nad środkiem stopy i pchaj prosto w górę.",
+    many: "Sztanga uciekła o około {cm} cm do przodu w drodze w górę w {hit} z {count} powtórzeń. Trzymaj ją nad środkiem stopy i pchaj prosto w górę.",
+    other:
+      "Sztanga uciekła o około {cm} cm do przodu w drodze w górę w {hit} z {count} powtórzeń. Trzymaj ją nad środkiem stopy i pchaj prosto w górę.",
+  },
+  "count.path.back": {
+    one: "Sztanga uciekła o około {cm} cm do tyłu. Trzymaj ciężar nad środkiem stopy, nie na piętach.",
+    few: "Sztanga uciekła o około {cm} cm do tyłu w {hit} z {count} powtórzeń. Trzymaj ciężar nad środkiem stopy, nie na piętach.",
+    many: "Sztanga uciekła o około {cm} cm do tyłu w {hit} z {count} powtórzeń. Trzymaj ciężar nad środkiem stopy, nie na piętach.",
+    other: "Sztanga uciekła o około {cm} cm do tyłu w {hit} z {count} powtórzeń. Trzymaj ciężar nad środkiem stopy, nie na piętach.",
+  },
+  "count.path.good": {
+    one: "Tor sztangi: w tym powtórzeniu nie odszedł dalej niż {cm} cm od punktu startu.",
+    few: "Tor sztangi: w tych {count} powtórzeniach nie odszedł dalej niż {cm} cm od punktu startu.",
+    many: "Tor sztangi: w tych {count} powtórzeniach nie odszedł dalej niż {cm} cm od punktu startu.",
+    other: "Tor sztangi: w tych {count} powtórzeniach nie odszedł dalej niż {cm} cm od punktu startu.",
+  },
+  "count.form.good": {
+    one: "Kontrola techniki: w tym powtórzeniu nie ma nic do poprawy.",
+    few: "Kontrola techniki: w tych {count} powtórzeniach nie ma nic do poprawy.",
+    many: "Kontrola techniki: w tych {count} powtórzeniach nie ma nic do poprawy.",
+    other: "Kontrola techniki: w tych {count} powtórzeniach nie ma nic do poprawy.",
+  },
+  "count.max.own": {
+    one: "W porównaniu z Twoją własną prędkością na końcu serii w tym ćwiczeniu, {speed} m/s, wyuczoną z {count} serii do upadku.",
+    few: "W porównaniu z Twoją własną prędkością na końcu serii w tym ćwiczeniu, {speed} m/s, wyuczoną z {count} serii do upadku.",
+    many: "W porównaniu z Twoją własną prędkością na końcu serii w tym ćwiczeniu, {speed} m/s, wyuczoną z {count} serii do upadku.",
+    other: "W porównaniu z Twoją własną prędkością na końcu serii w tym ćwiczeniu, {speed} m/s, wyuczoną z {count} serii do upadku.",
+  },
+  "count.max.book": {
+    one: "W porównaniu z typową prędkością na końcu serii w tym ćwiczeniu, {speed} m/s. Zrób jeszcze {count} serię do upadku, gdy kamera liczy, a pozna Twoją własną.",
+    few: "W porównaniu z typową prędkością na końcu serii w tym ćwiczeniu, {speed} m/s. Zrób jeszcze {count} serie do upadku, gdy kamera liczy, a pozna Twoją własną.",
+    many: "W porównaniu z typową prędkością na końcu serii w tym ćwiczeniu, {speed} m/s. Zrób jeszcze {count} serii do upadku, gdy kamera liczy, a pozna Twoją własną.",
+    other:
+      "W porównaniu z typową prędkością na końcu serii w tym ćwiczeniu, {speed} m/s. Zrób jeszcze {count} serii do upadku, gdy kamera liczy, a pozna Twoją własną.",
+  },
+  "count.max.title": "Prędkość na rozgrzewce",
+  "count.max.up":
+    "Rozgrzewka szła szybko: dzisiejsze maksimum to około {max}, {pct}% więcej, niż zakłada plan. Spróbuj {weight} w seriach roboczych.",
+  "count.max.down":
+    "Rozgrzewka szła wolno: dzisiejsze maksimum to około {max}, {pct}% mniej, niż zakłada plan. Spróbuj {weight} w seriach roboczych.",
+  "count.max.hold": "Rozgrzewka szła zgodnie z oczekiwaniami: dzisiejsze maksimum to około {max}. Zostań przy {weight}.",
+  "count.max.use": "Użyj {weight}",
+  "count.max.used": "Ciężar roboczy ustawiony na {weight}.",
+  "count.speed.label": "Prędkość sztangi",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct}% najlepszej",
+  "count.speed.stop": "Prędkość sztangi spadła o {loss}% względem najszybszego powtórzenia. Dobry moment, by zakończyć serię.",
+  "count.speed.left": {
+    one: "Zostało około {count} powtórzenie w zapasie: prędkość sztangi spadła o {loss}%.",
+    few: "Zostały około {count} powtórzenia w zapasie: prędkość sztangi spadła o {loss}%.",
+    many: "Zostało około {count} powtórzeń w zapasie: prędkość sztangi spadła o {loss}%.",
+    other: "Zostało około {count} powtórzenia w zapasie: prędkość sztangi spadła o {loss}%.",
+  },
+  "count.toggle": "Licz powtórzenia kamerą",
+  "count.toggleMotion": "Licz powtórzenia ruchem telefonu",
+  "count.start": "Licz powtórzenia",
+  "count.reps": "powt.",
+  "count.stop": "Stop",
+  "count.off": "Przestań liczyć powtórzenia",
+  "count.opening": "Otwieram kamerę…",
+  "count.loading": "Przygotowuję licznik powtórzeń (tylko za pierwszym razem)…",
+  "count.position": "Stań bokiem, tak by cała sylwetka była w kadrze.",
+  "count.watch": {
+    one: "Zegarek: {count} powtórzenie",
+    few: "Zegarek: {count} powtórzenia",
+    many: "Zegarek: {count} powtórzeń",
+    other: "Zegarek: {count} powtórzenia",
+  },
+  "count.counting": "Liczę. Twoje powtórzenia trafią do Zapisz serię.",
+  "count.resting": "Przerwa. Liczenie zacznie się znowu w następnej serii.",
+  "count.flipToBack": "Użyj tylnego aparatu",
+  "count.flipToFront": "Użyj przedniego aparatu",
+  "count.useMotion": "Użyj ruchu telefonu",
+  "count.useCamera": "Użyj kamery",
+  "count.err.denied": "Dostęp do kamery jest wyłączony. Zezwól na niego w ustawieniach telefonu, by Liftsmith mógł liczyć powtórzenia.",
+  "count.err.noCamera": "Nie znaleziono kamery.",
+  "count.err.model": "Nie udało się uruchomić licznika powtórzeń. Przy pierwszym uruchomieniu sprawdź połączenie i spróbuj ponownie.",
+  "count.err.motion": "Odmówiono dostępu do czujników ruchu, więc telefon nie może liczyć powtórzeń.",
+};

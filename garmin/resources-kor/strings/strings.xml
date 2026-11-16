@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">진행 중인 운동 없음</string>
+    <string id="NoneBody">휴대폰에서 운동을 시작하면 여기에 표시돼요.</string>
+    <string id="Rest">휴식</string>
+    <string id="Next">다음: $1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START: 세트 기록</string>
+    <string id="HintAdd">DOWN: +30초</string>
+</strings>

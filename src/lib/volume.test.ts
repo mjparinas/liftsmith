@@ -31,7 +31,7 @@ describe("fmtVolume", () => {
     expect(fmtVolume(-5, "kg")).toBe("0 kg");
   });
 
-  it.each(["es", "fr", "de", "it", "ja"] as const)("reads zero without a thousands suffix in %s", (lang) => {
+  it.each(["es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"] as const)("reads zero without a thousands suffix in %s", (lang) => {
     setLanguage(lang);
     for (const unit of ["kg", "lb"] as const) {
       const text = fmtVolume(0, unit);

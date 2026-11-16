@@ -117,3 +117,78 @@ export const ja: Partial<Record<Key, Message>> = {
   "food.connect.done": "完了しました。{source}で次に1日分をすべて記録すると、ここに表示されます。",
   "food.connect.hide": "今はしない",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "food.title": "Alimentação",
+  "food.kcal": "{avg} de {target} kcal",
+  "food.protein": "{avg} de {target} g de proteína",
+  "food.carbs": "{avg} de {target} g de carboidratos",
+  "food.fat": "{avg} de {target} g de gordura",
+  "food.notEnough": "Mais alguns dias registrados e sua semana aparece aqui.",
+  "food.why.coach": "Médias diárias da última semana, comparadas com as metas que {name} definiu.",
+  "food.why.goal": "Médias diárias da última semana, comparadas com as metas para seu objetivo: {goal}.",
+  "food.why.measured":
+    "Médias diárias da última semana, comparadas com as metas para seu objetivo ({goal}) a partir da sua manutenção, medida em {days} dias.",
+  "food.open": "Abrir Macros",
+  "food.connect": "Permitir alimentação de {source}",
+  "food.connect.body":
+    "Registre refeições em qualquer app de alimentação que grave no {source}, como MyFitnessPal ou Cronometer. As Notas do coach passam a checar sua proteína e calorias, e sua manutenção é medida pelo que você come de verdade.",
+  "food.connect.done": "Pronto. A alimentação aparece aqui depois do seu próximo dia totalmente registrado no {source}.",
+  "food.connect.hide": "Agora não",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "food.title": "식단",
+  "food.kcal": "{avg} / {target} kcal",
+  "food.protein": "단백질 {avg} / {target} g",
+  "food.carbs": "탄수화물 {avg} / {target} g",
+  "food.fat": "지방 {avg} / {target} g",
+  "food.notEnough": "며칠만 더 기록하면 이번 주가 여기 표시돼요.",
+  "food.why.coach": "지난 한 주의 하루 평균이에요. {name} 님이 정한 목표 기준이에요.",
+  "food.why.goal": "지난 한 주의 하루 평균이에요. 목표({goal}) 기준이에요.",
+  "food.why.measured": "지난 한 주의 하루 평균이에요. {days}일 동안 측정한 유지 칼로리를 바탕으로 목표({goal}) 기준이에요.",
+  "food.open": "매크로 열기",
+  "food.connect": "{source}에서 식단 가져오기 허용",
+  "food.connect.body":
+    "MyFitnessPal이나 Cronometer처럼 {source}에 기록하는 식단 앱이면 어디서든 식사를 기록하세요. 그러면 코치 노트가 단백질과 칼로리를 확인하고, 실제로 먹은 양으로 유지 칼로리를 측정해요.",
+  "food.connect.done": "완료했어요. {source}에서 하루를 모두 기록하면 여기에 식단이 표시돼요.",
+  "food.connect.hide": "나중에",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "food.title": "Beslenme",
+  "food.kcal": "{avg} / {target} kcal",
+  "food.protein": "{avg} / {target} g protein",
+  "food.carbs": "{avg} / {target} g karbonhidrat",
+  "food.fat": "{avg} / {target} g yağ",
+  "food.notEnough": "Birkaç gün daha kaydedince haftan burada görünür.",
+  "food.why.coach": "Geçen haftanın günlük ortalamaları, {name} tarafından belirlenen hedeflere göre.",
+  "food.why.goal": "Geçen haftanın günlük ortalamaları, hedefine göre belirlenen değerlerle: {goal}.",
+  "food.why.measured":
+    "Geçen haftanın günlük ortalamaları; hedefin ({goal}) için, {days} gün boyunca ölçülen koruma kalorinden hesaplanan değerlere göre.",
+  "food.open": "Makroları aç",
+  "food.connect": "{source} üzerinden beslenme verilerine izin ver",
+  "food.connect.body":
+    "Öğünlerini {source} uygulamasına yazan herhangi bir beslenme uygulamasında kaydet (MyFitnessPal ya da Cronometer gibi). Koç notları proteinini ve kalorini kontrol eder, koruma kalorin de gerçekte ne yediğinden ölçülür.",
+  "food.connect.done": "Tamam. {source} üzerinde bir sonraki tam kayıtlı gününden sonra beslenme burada görünür.",
+  "food.connect.hide": "Şimdi değil",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "food.title": "Jedzenie",
+  "food.kcal": "{avg} z {target} kcal",
+  "food.protein": "{avg} z {target} g białka",
+  "food.carbs": "{avg} z {target} g węglowodanów",
+  "food.fat": "{avg} z {target} g tłuszczu",
+  "food.notEnough": "Jeszcze kilka zapisanych dni, a pojawi się tu twój tydzień.",
+  "food.why.coach": "Średnie dzienne z ostatniego tygodnia względem celów, które ustawia {name}.",
+  "food.why.goal": "Średnie dzienne z ostatniego tygodnia względem celów dla twojego celu: {goal}.",
+  "food.why.measured":
+    "Średnie dzienne z ostatniego tygodnia względem celów dla twojego celu ({goal}) na podstawie twojego zapotrzebowania, zmierzonego w ciągu {days} dni.",
+  "food.open": "Otwórz Makro",
+  "food.connect": "Pozwól na dane o jedzeniu z {source}",
+  "food.connect.body":
+    "Zapisuj posiłki w dowolnej aplikacji, która zapisuje do {source}, np. MyFitnessPal lub Cronometer. Notatki trenera sprawdzą wtedy twoje białko i kalorie, a zapotrzebowanie zostanie zmierzone z tego, co naprawdę jesz.",
+  "food.connect.done": "Gotowe. Jedzenie pojawi się tu po następnym w pełni zapisanym dniu w {source}.",
+  "food.connect.hide": "Nie teraz",
+};

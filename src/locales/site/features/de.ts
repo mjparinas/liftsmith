@@ -226,6 +226,10 @@ export const de: FeaturesText = {
       name: "Gewicht, Körperfett und Fotos",
       body: "Trage Gewicht und Körperfett ein oder lass sie über die Gesundheits-App deines Handys von deiner Waage kommen, und behalte Fortschrittsfotos auf deinem Handy.",
     },
+    "photo-compare": {
+      name: "Fortschrittsfotos, die zueinander passen",
+      body: "Die Kamera zeigt dein letztes Foto als blassen Umriss zum Ausrichten, mit Selbstauslöser zum Zurücktreten. Vergleiche zwei beliebige Tage per Schieberegler oder nebeneinander, jeweils mit deinem Gewicht an dem Tag. Fotos bleiben auf deinem Handy; eine Sicherungsdatei bringt sie auf ein neues.",
+    },
     measurements: {
       name: "Körpermaße",
       body: "Neun Stellen in Zentimetern oder Zoll. Ein wachsender oder schrumpfender Bauchumfang wird zur Coach-Notiz, wenn es keinen Körperfettwert gibt.",
@@ -456,7 +460,7 @@ export const de: FeaturesText = {
     },
     cloud: {
       name: "Verbindungen zu Fitnessdiensten",
-      body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
+      body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, Garmin Connect, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
     },
     "health-save": {
       name: "Trainings in deiner Gesundheits-App",
@@ -487,8 +491,8 @@ export const de: FeaturesText = {
       body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
     languages: {
-      name: "Sechs Sprachen",
-      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch und Japanisch, passend zur Sprache deines Handys.",
+      name: "Zehn Sprachen",
+      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys.",
     },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",
@@ -627,6 +631,9 @@ export const de: FeaturesText = {
     },
     oura: { does: "Schlaf, HRV, Ruhepuls und Schritte rein" },
     strava: { does: "Jedes beendete Training wird auf Strava gepostet" },
+    "garmin-connect": {
+      does: "Schlaf, HRV, Ruhepuls, Schritte und Wiegungen der Index-Waage rein, dazu Läufe, Radfahrten und Ruder-Einheiten als Cardio-Trainings",
+    },
     whoop: { does: "Schlaf, Erholung, HRV und Ruhepuls rein" },
     withings: { does: "Gewicht, Körperfett, Schlaf und Schritte rein" },
     polar: { does: "Nightly Recharge, HRV und Schlaf rein" },

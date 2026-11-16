@@ -160,3 +160,105 @@ export const ja: Partial<Record<Key, Message>> = {
   "msg.check": "{email}に届いた確認リンクをタップしてください。タップするまで何も送信されません。",
   "msg.stopped": "メールを停止し、アドレスをサーバーから削除しました。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "msg.title": "Lembretes",
+  "msg.intro":
+    "Os lembretes seguem seus dias de treino ({days}) às {time}. Mude em Ajustes › Planejamento. Nada é enviado entre {quietFrom} e {quietTo}, e nunca mais de um por dia.",
+  "msg.noDays": "nenhum escolhido",
+  "msg.push": "Notificações no celular",
+  "msg.pushOff": "As notificações do Liftsmith estão desligadas. Ativar uma pede permissão de novo, ou permita nos ajustes do celular.",
+  "msg.pushDenied": "As notificações do Liftsmith estão desligadas. Você pode permiti-las nos ajustes do celular.",
+  "msg.reminderPush": "Nos seus dias de treino, no seu horário de treino.",
+  "msg.reminderEmail": "Um e-mail na segunda com a sua semana de treino.",
+  "msg.webOnly": "As notificações no celular estão nos apps para Android e iPhone. Na web, use os lembretes por e-mail abaixo.",
+  "msg.email": "E-mail",
+  "msg.emailMe": "Receber por e-mail",
+  "msg.emailTo":
+    "Lembretes de treino e notas de progresso vão para {email}, o endereço com que você entrou. Todo e-mail tem um link para cancelar a inscrição, e as ofertas ficam desligadas a menos que você as ative.",
+  "msg.signInFirst":
+    "Entre para receber lembretes por e-mail. Eles vão para o endereço com que você entra, então não precisa digitar nada.",
+  "msg.pending": "Aguardando você confirmar {email}. Todo e-mail tem um link para cancelar a inscrição.",
+  "msg.sending": "Enviando para {email}. Todo e-mail tem um link para cancelar a inscrição.",
+  "msg.resend": "Reenviar confirmação",
+  "msg.offlineRetry": "Não foi possível falar com o servidor. Vamos tentar de novo quando você estiver online.",
+  "msg.offline": "Não foi possível falar com o servidor. Tente de novo quando estiver online.",
+  "msg.check": "Procure em {email} um link de confirmação. Nada é enviado até você tocar nele.",
+  "msg.stopped": "E-mails parados, e seu endereço foi apagado do nosso servidor.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "msg.title": "알림",
+  "msg.intro":
+    "알림은 운동하는 날({days}) {time}에 보내요. 설정 › 트레이닝에서 바꿀 수 있어요. {quietFrom}부터 {quietTo}까지는 보내지 않고, 하루에 한 번을 넘지 않아요.",
+  "msg.noDays": "선택 안 함",
+  "msg.push": "휴대폰 알림",
+  "msg.pushOff": "Liftsmith 알림이 꺼져 있어요. 하나를 켜면 다시 물어보거나, 휴대폰 설정에서 허용할 수 있어요.",
+  "msg.pushDenied": "Liftsmith 알림이 꺼져 있어요. 휴대폰 설정에서 허용할 수 있어요.",
+  "msg.reminderPush": "운동하는 날, 운동 시간에 보내요.",
+  "msg.reminderEmail": "월요일에 한 주의 운동을 담은 이메일 한 통.",
+  "msg.webOnly": "휴대폰 알림은 Android와 iPhone 앱에서 받을 수 있어요. 웹에서는 아래 이메일 알림을 사용하세요.",
+  "msg.email": "이메일",
+  "msg.emailMe": "이메일 받기",
+  "msg.emailTo":
+    "운동 알림과 진행 상황은 로그인한 주소인 {email}(으)로 보내요. 모든 이메일에는 수신 거부 링크가 있고, 혜택 안내는 직접 켜지 않으면 보내지 않아요.",
+  "msg.signInFirst": "로그인하면 이메일로 알림을 받을 수 있어요. 로그인한 주소로 보내므로 따로 입력할 필요가 없어요.",
+  "msg.pending": "{email} 확인을 기다리고 있어요. 모든 이메일에는 수신 거부 링크가 있어요.",
+  "msg.sending": "{email}(으)로 보내고 있어요. 모든 이메일에는 수신 거부 링크가 있어요.",
+  "msg.resend": "확인 메일 다시 보내기",
+  "msg.offlineRetry": "서버에 연결하지 못했어요. 온라인이 되면 다시 시도할게요.",
+  "msg.offline": "서버에 연결하지 못했어요. 온라인이 되면 다시 시도하세요.",
+  "msg.check": "{email}에서 확인 링크를 확인하세요. 링크를 탭하기 전까지는 아무것도 보내지 않아요.",
+  "msg.stopped": "이메일을 중지했고, 주소는 서버에서 삭제했어요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "msg.title": "Hatırlatıcılar",
+  "msg.intro":
+    "Hatırlatıcılar antrenman günlerini ({days}) saat {time} için izler. Bunları Ayarlar › Program altında değiştir. {quietFrom} ile {quietTo} arasında hiçbir şey gönderilmez ve günde birden fazla asla gönderilmez.",
+  "msg.noDays": "seçilmedi",
+  "msg.push": "Telefon bildirimleri",
+  "msg.pushOff": "Liftsmith için bildirimler kapalı. Birini açmak tekrar sorar ya da telefonunun ayarlarından izin verebilirsin.",
+  "msg.pushDenied": "Liftsmith için bildirimler kapalı. Telefonunun ayarlarından izin verebilirsin.",
+  "msg.reminderPush": "Antrenman günlerinde, antrenman saatinde.",
+  "msg.reminderEmail": "Pazartesi, antrenman haftanla birlikte tek bir e-posta.",
+  "msg.webOnly": "Telefon bildirimleri Android ve iPhone uygulamalarında. Web'de aşağıdaki e-posta hatırlatıcılarını kullan.",
+  "msg.email": "E-posta",
+  "msg.emailMe": "Bana e-posta gönder",
+  "msg.emailTo":
+    "Antrenman hatırlatıcıları ve ilerleme notları giriş yaptığın adres olan {email} adresine gider. Her e-postada abonelikten çıkma bağlantısı vardır ve teklifler sen açmadıkça kapalı kalır.",
+  "msg.signInFirst": "Hatırlatıcıları e-postayla almak için giriş yap. Giriş yaptığın adrese gider, yazacak bir şey yok.",
+  "msg.pending": "{email} adresini onaylaman bekleniyor. Her e-postada abonelikten çıkma bağlantısı vardır.",
+  "msg.sending": "{email} adresine gönderiliyor. Her e-postada abonelikten çıkma bağlantısı vardır.",
+  "msg.resend": "Onayı tekrar gönder",
+  "msg.offlineRetry": "Sunucuya ulaşılamadı. Çevrimiçi olduğunda tekrar deneyeceğiz.",
+  "msg.offline": "Sunucuya ulaşılamadı. Çevrimiçi olduğunda tekrar dene.",
+  "msg.check": "Onay bağlantısı için {email} adresini kontrol et. Ona dokunana kadar hiçbir şey gönderilmez.",
+  "msg.stopped": "E-postalar durduruldu ve adresin sunucumuzdan silindi.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "msg.title": "Przypomnienia",
+  "msg.intro":
+    "Przypomnienia trzymają się twoich dni treningowych ({days}) o {time}. Zmienisz je w Ustawienia › Planowanie. Między {quietFrom} a {quietTo} nic nie wysyłamy i nigdy więcej niż jedno dziennie.",
+  "msg.noDays": "nie wybrano",
+  "msg.push": "Powiadomienia na telefonie",
+  "msg.pushOff": "Powiadomienia dla Liftsmith są wyłączone. Włączenie któregoś zapyta ponownie albo zezwól na nie w ustawieniach telefonu.",
+  "msg.pushDenied": "Powiadomienia dla Liftsmith są wyłączone. Możesz na nie zezwolić w ustawieniach telefonu.",
+  "msg.reminderPush": "W dni treningowe o porze treningu.",
+  "msg.reminderEmail": "Jeden e-mail w poniedziałek z twoim tygodniem treningowym.",
+  "msg.webOnly": "Powiadomienia na telefonie są w aplikacjach na Androida i iPhone'a. W wersji webowej użyj przypomnień e-mail poniżej.",
+  "msg.email": "E-mail",
+  "msg.emailMe": "Wysyłaj mi e-maile",
+  "msg.emailTo":
+    "Przypomnienia o treningach i notatki o postępach trafiają na {email}, adres, którym się logujesz. Każdy e-mail ma link do wypisania się, a oferty pozostają wyłączone, dopóki ich nie włączysz.",
+  "msg.signInFirst":
+    "Zaloguj się, żeby dostawać przypomnienia e-mailem. Trafiają na adres, którym się logujesz, więc nic nie trzeba wpisywać.",
+  "msg.pending": "Czekamy, aż potwierdzisz {email}. Każdy e-mail ma link do wypisania się.",
+  "msg.sending": "Wysyłamy na {email}. Każdy e-mail ma link do wypisania się.",
+  "msg.resend": "Wyślij potwierdzenie ponownie",
+  "msg.offlineRetry": "Brak połączenia z serwerem. Spróbujemy ponownie, gdy będziesz online.",
+  "msg.offline": "Brak połączenia z serwerem. Spróbuj ponownie, gdy będziesz online.",
+  "msg.check": "Sprawdź {email}, tam jest link potwierdzający. Nic nie wyślemy, dopóki go nie stukniesz.",
+  "msg.stopped": "E-maile wyłączone, a twój adres został usunięty z naszego serwera.",
+};

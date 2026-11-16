@@ -18,5 +18,9 @@ for (const [l, c] of Object.entries({
   de: (await import("@/locales/de")).de,
   it: (await import("@/locales/it")).it,
   ja: (await import("@/locales/ja")).ja,
+  pt: (await import("@/locales/pt")).pt,
+  ko: (await import("@/locales/ko")).ko,
+  pl: (await import("@/locales/pl")).pl,
+  tr: (await import("@/locales/tr")).tr,
 }))
   addCatalogue(l as "es", c);

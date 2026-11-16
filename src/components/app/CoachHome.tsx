@@ -210,13 +210,28 @@ export function CoachHome({
         {view.tab === "schedule" && (
           <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={reload} />
         )}
-        {view.tab === "checkins" && <FormsScreen embedded />}
-        {view.tab === "programs" && <CoachPrograms />}
-        {view.tab === "pay" && data.pay && <PaySetup account={data.pay.account} fee={data.pay.fee ?? 0} onChange={reload} />}
+        {/* One card or form on a wide page: one readable column on desktop (.desk-col, globals.css). */}
+        {view.tab === "checkins" && (
+          <div className="desk-col">
+            <FormsScreen embedded />
+          </div>
+        )}
+        {view.tab === "programs" && (
+          <div className="desk-col">
+            <CoachPrograms />
+          </div>
+        )}
+        {view.tab === "pay" && data.pay && (
+          <div className="desk-col">
+            <PaySetup account={data.pay.account} fee={data.pay.fee ?? 0} onChange={reload} />
+          </div>
+        )}
         {view.tab === "teams" && (
-          <Section title={t("team.title")} icon="trophy" info="schoolTeams">
-            <CoachTeams data={teams.data} onChange={teams.reload} />
-          </Section>
+          <div className="desk-col">
+            <Section title={t("team.title")} icon="trophy" info="schoolTeams">
+              <CoachTeams data={teams.data} onChange={teams.reload} />
+            </Section>
+          </div>
         )}
         {view.tab === "setup" && <SetupPage data={data} onChange={reload} />}
         {view.tab === "mine" && (

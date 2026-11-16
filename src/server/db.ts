@@ -371,6 +371,29 @@ const SCHEMA = [
     at INTEGER NOT NULL,
     PRIMARY KEY (account_id, provider, session_id)
   )`,
+  // Garmin Connect pushes data to us instead of answering when asked (src/server/connect.ts, docs/decisions/connected-apps.md),
+  // so its readings and cardio sessions wait here until the lifter's app pulls them: one row per metric and day, and per
+  // session. Readings go after 100 days and sessions after a year; Disconnect, Garmin's deregistration and deleting the
+  // account remove them at once.
+  `CREATE TABLE IF NOT EXISTS cloud_readings (
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    metric TEXT NOT NULL,
+    day TEXT NOT NULL,
+    value REAL NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, provider, metric, day)
+  )`,
+  `CREATE TABLE IF NOT EXISTS cloud_sessions (
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    start INTEGER NOT NULL,
+    seconds INTEGER NOT NULL,
+    distance_m INTEGER NOT NULL,
+    PRIMARY KEY (account_id, provider, id)
+  )`,
   // Public pages already sent to IndexNow, and as what (src/server/indexnow.ts).
   `CREATE TABLE IF NOT EXISTS indexnow_sent (
     url TEXT PRIMARY KEY,
@@ -1213,6 +1236,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "push_sent", "INTEGER NOT NULL DEFAULT 1"],
   // Connected apps: the service's own id for the lifter, where removing access needs it (Polar AccessLink).
   ["connections", "remote_user", "TEXT"],
+  // Connected apps: the PKCE code verifier for services that ask for one (Garmin Connect).
+  ["connect_states", "verifier", "TEXT"],
   ["social_profiles", "push_likes", "INTEGER NOT NULL DEFAULT 0"],
   // Friends stage 3: avatar, who sees new posts, and the best lifts showcase (social.ts).
   ["social_profiles", "avatar", "TEXT NOT NULL DEFAULT ''"],
@@ -1305,6 +1330,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
 const LATE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS public_gyms_for ON public_gyms (place_id)`,
   `CREATE INDEX IF NOT EXISTS clubs_place ON clubs (place_id)`,
+  // Garmin's pings name the lifter by Garmin's own user id (connect.ts garminPing).
+  `CREATE INDEX IF NOT EXISTS connections_remote ON connections (provider, remote_user)`,
 ];
 
 let client: Client | null = null;

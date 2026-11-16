@@ -29,7 +29,7 @@ function commitSha(): string {
 // catalogue modules are swapped for one file per language that scripts/locales.mjs writes before the build. Dev
 // (`next dev`) reads the source, so text edits show at once.
 const building = process.env.NODE_ENV === "production";
-const LANG_FILES = ["en", "es", "fr", "de", "it", "ja"];
+const LANG_FILES = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"];
 
 const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),

@@ -197,7 +197,9 @@ export default function Privacy() {
           yourself off in Coaching, or delete your account, and the listing is deleted.
         </p>
 
-        <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar, Concept2 and Sonos</h2>
+        <h2 className="mt-8 text-xl font-semibold">
+          Connected apps: Strava, Garmin Connect, Oura, WHOOP, Withings, Polar, Concept2 and Sonos
+        </h2>
         <p className="mt-2">
           These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name};
           we keep the access it gives us (encrypted) with your account, plus your name on Strava to show who&apos;s connected. With Strava
@@ -207,14 +209,19 @@ export default function Privacy() {
           your sleep and nightly heart rate, heart rate variability and breathing rate; with Concept2 connected, your Logbook&apos;s rowing,
           ski and bike sessions (when, how long and how far), which are saved as cardio workouts. Our server fetches them from the service
           and passes them straight to your phone without keeping them, and they&apos;re then treated like readings from Health Connect or
-          Apple Health, or like workouts you logged yourself. For Polar we also keep the user number Polar gives us, so we can remove our
-          access when you disconnect. Disconnect in Settings › Connected apps, or delete your account, and we withdraw our access at the
-          service where it lets us (Withings, Concept2 and Sonos have no way for us to do this, so you can also remove {BRAND.name} in your
-          account there) and delete what we kept. With Sonos connected (an experiment in Labs), the app asks our server to list your Sonos
-          speakers and favourites, read what one is playing and its volume, and send play, pause, skip and volume commands to it; nothing
-          from Sonos is kept. The music controls on Today and the workout screen read what your music app is playing (on Android, once you
-          allow notification access; on iPhone, Apple Music once you allow it) only to show it and to play, pause and skip it; this stays on
-          your phone and is never sent to us.
+          Apple Health, or like workouts you logged yourself. Garmin Connect works the other way round: Garmin tells our server when your
+          watch has synced, and our server then fetches your new sleep, overnight heart rate variability, resting heart rate, steps,
+          weigh-ins and body fat, and your runs, rides, indoor rows, elliptical and stair sessions (when, how long and how far), and keeps
+          them with your account until your phone collects them: readings for up to 100 days and sessions for up to a year. For Garmin we
+          also keep the user number Garmin gives us, so we know which syncs are yours. For Polar we also keep the user number Polar gives
+          us, so we can remove our access when you disconnect. You can also remove {BRAND.name} in Garmin Connect, which tells us to delete
+          what we kept. Disconnect in Settings › Connected apps, or delete your account, and we withdraw our access at the service where it
+          lets us (Withings, Concept2 and Sonos have no way for us to do this, so you can also remove {BRAND.name} in your account there)
+          and delete what we kept. With Sonos connected (an experiment in Labs), the app asks our server to list your Sonos speakers and
+          favourites, read what one is playing and its volume, and send play, pause, skip and volume commands to it; nothing from Sonos is
+          kept. The music controls on Today and the workout screen read what your music app is playing (on Android, once you allow
+          notification access; on iPhone, Apple Music once you allow it) only to show it and to play, pause and skip it; this stays on your
+          phone and is never sent to us.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Reminders</h2>

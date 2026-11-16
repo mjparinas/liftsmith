@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">운동 시작</string>
+    <string name="shortcut_start_long">오늘의 운동 시작</string>
+    <string name="shortcut_log_short">세트 기록</string>
+    <string name="shortcut_log_long">현재 세트를 계획대로 기록</string>
+    <string name="shortcut_rest_short">휴식 +30초</string>
+    <string name="shortcut_rest_long">휴식 타이머에 30초 추가</string>
+    <string name="widget_description">오늘의 운동과 그 이유, 주간 목표와 코치 노트, 시작 버튼까지</string>
+    <string name="channel_live">운동 중</string>
+    <string name="channel_live_desc">운동하는 동안 휴식 타이머, 다음 세트, 심박수 표시</string>
+    <string name="rest_over">휴식 끝</string>
+    <string name="next_prefix">다음:</string>
+    <string name="rest_left">휴식 %1$s 남음</string>
+    <string name="rest_left_next">%1$s 남음 · 다음: %2$s</string>
+    <string name="up_next">다음: %1$s</string>
+    <string name="add_30">+30초</string>
+    <string name="widget_title">오늘의 운동</string>
+    <string name="widget_week_title">이번 주</string>
+    <string name="widget_week_description">한눈에 보는 이번 주: 운동한 날, 연속 기록과 이어 가는 방법, 시작 버튼</string>
+    <string name="widget_recovery_title">회복</string>
+    <string name="widget_recovery_description">지금 운동할 수 있는 근육과 나머지가 회복되는 시점, 시작 버튼</string>
+</resources>

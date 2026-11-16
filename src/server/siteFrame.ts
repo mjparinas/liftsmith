@@ -24,6 +24,10 @@ const CATALOG: Record<MsgLang, Partial<Record<PubKey, unknown>>> = {
   de: pub.de,
   it: pub.it,
   ja: pub.ja,
+  pt: pub.pt,
+  ko: pub.ko,
+  pl: pub.pl,
+  tr: pub.tr,
 };
 export const say = (lang: MsgLang, key: PubKey, vars: Record<string, string | number> = {}) =>
   String(CATALOG[lang][key] ?? pub.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => (k in vars ? String(vars[k]) : all));

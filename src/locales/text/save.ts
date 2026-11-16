@@ -35,6 +35,10 @@ export const en = {
   "save.nudge.body": "Sign in to back up your workouts, or add Liftsmith to your home screen, so they can't be cleared.",
   "save.nudge.go": "Keep it safe",
   "save.nudge.dismiss": "Got it",
+  "save.photos": { one: "Include {count} progress photo", other: "Include {count} progress photos" },
+  "save.photos.hint": "Photos never sync, so a backup with them is how they move to a new phone. Keep the file somewhere private.",
+  "save.backup.saving": "Saving…",
+  "save.restored.photos": { one: "{count} progress photo added.", other: "{count} progress photos added." },
 } as const;
 
 type Key = keyof typeof en;
@@ -71,6 +75,11 @@ export const es: Partial<Record<Key, Message>> = {
   "save.nudge.body": "Inicia sesión para guardar tus entrenamientos, o añade Liftsmith a tu pantalla de inicio, para que no se borren.",
   "save.nudge.go": "Protegerlos",
   "save.nudge.dismiss": "Entendido",
+  "save.photos": { one: "Incluir {count} foto de progreso", other: "Incluir {count} fotos de progreso" },
+  "save.photos.hint":
+    "Las fotos nunca se sincronizan, así que una copia con ellas es la forma de llevarlas a un teléfono nuevo. Guarda el archivo en un lugar privado.",
+  "save.backup.saving": "Guardando…",
+  "save.restored.photos": { one: "{count} foto de progreso añadida.", other: "{count} fotos de progreso añadidas." },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -107,6 +116,11 @@ export const fr: Partial<Record<Key, Message>> = {
     "Connectez-vous pour sauvegarder vos séances, ou ajoutez Liftsmith à votre écran d'accueil, pour qu'elles ne puissent pas être effacées.",
   "save.nudge.go": "Les protéger",
   "save.nudge.dismiss": "Compris",
+  "save.photos": { one: "Inclure {count} photo de progrès", other: "Inclure {count} photos de progrès" },
+  "save.photos.hint":
+    "Les photos ne sont jamais synchronisées : une sauvegarde qui les contient est le moyen de les emporter sur un nouveau téléphone. Gardez le fichier dans un endroit privé.",
+  "save.backup.saving": "Enregistrement…",
+  "save.restored.photos": { one: "{count} photo de progrès ajoutée.", other: "{count} photos de progrès ajoutées." },
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -143,6 +157,11 @@ export const de: Partial<Record<Key, Message>> = {
     "Melde dich an, um deine Trainings zu sichern, oder füge Liftsmith deinem Home-Bildschirm hinzu, damit sie nicht gelöscht werden können.",
   "save.nudge.go": "Sicher aufbewahren",
   "save.nudge.dismiss": "Verstanden",
+  "save.photos": { one: "{count} Fortschrittsfoto einschließen", other: "{count} Fortschrittsfotos einschließen" },
+  "save.photos.hint":
+    "Fotos werden nie synchronisiert. Mit einer Sicherung, die sie enthält, kommen sie auf ein neues Handy. Bewahre die Datei privat auf.",
+  "save.backup.saving": "Wird gespeichert…",
+  "save.restored.photos": { one: "{count} Fortschrittsfoto hinzugefügt.", other: "{count} Fortschrittsfotos hinzugefügt." },
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -178,6 +197,11 @@ export const it: Partial<Record<Key, Message>> = {
     "Accedi per fare il backup degli allenamenti, o aggiungi Liftsmith alla schermata Home, così non possono essere cancellati.",
   "save.nudge.go": "Tienili al sicuro",
   "save.nudge.dismiss": "Ho capito",
+  "save.photos": { one: "Includi {count} foto dei progressi", other: "Includi {count} foto dei progressi" },
+  "save.photos.hint":
+    "Le foto non vengono mai sincronizzate, quindi un backup che le contiene è il modo per portarle su un nuovo telefono. Conserva il file in un posto privato.",
+  "save.backup.saving": "Salvataggio…",
+  "save.restored.photos": { one: "{count} foto dei progressi aggiunta.", other: "{count} foto dei progressi aggiunte." },
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -212,4 +236,172 @@ export const ja: Partial<Record<Key, Message>> = {
   "save.nudge.body": "サインインしてワークアウトをバックアップするか、Liftsmith をホーム画面に追加して消えないようにしましょう。",
   "save.nudge.go": "安全に保つ",
   "save.nudge.dismiss": "わかりました",
+  "save.photos": { other: "進捗写真{count}枚を含める" },
+  "save.photos.hint":
+    "写真は同期されないため、新しい端末へ移すには写真入りのバックアップを使います。ファイルは人に見られない場所に保管してください。",
+  "save.backup.saving": "保存中…",
+  "save.restored.photos": { other: "進捗写真を{count}枚追加しました。" },
+};
+
+export const pt: Partial<Record<Key, Message>> = {
+  "save.title": "Salve seu progresso",
+  "save.lead.native": "Tudo o que você registra fica salvo neste celular na hora.",
+  "save.lead.web": "Tudo o que você registra fica salvo neste navegador na hora.",
+  "save.risk.web": "Limpar os dados deste navegador, ou usar uma janela anônima, apaga tudo.",
+  "save.risk.ios": "O Safari também limpa sites que você não abre há 7 dias, a menos que estejam na sua tela inicial.",
+  "save.installed": "O Liftsmith está na sua tela inicial, então seus dados ficam guardados.",
+  "save.kept": "Este navegador concordou em não apagá-los.",
+  "save.install": "Adicionar à tela inicial",
+  "save.install.ios": "Mantenha seguro: no Safari, toque em Compartilhar e depois em Adicionar à Tela de Início.",
+  "save.install.other": "Mantenha seguro: abra o menu do navegador e escolha Instalar app ou Adicionar à tela inicial.",
+  "save.app": "Ou baixe o app:",
+  "save.getAndroid": "Google Play",
+  "save.getIos": "App Store",
+  "save.accounts":
+    "Entre para fazer backup na sua conta e sincronizar com seus outros dispositivos. É opcional: sem conta, tudo fica só neste dispositivo.",
+  "save.synced": "Com backup na sua conta ({email}) e sincronizado com seus dispositivos.",
+  "save.signIn": "Entrar para sincronizar",
+  "save.later": "Você pode entrar, ou salvar um arquivo de backup, quando quiser em Ajustes.",
+  "save.settings": "Salvamento e backup",
+  "save.move":
+    "Mudando para um celular novo, ou do navegador para o app? Entre nos dois e seus treinos vão junto. Ou salve um arquivo de backup aqui e restaure lá.",
+  "save.backup": "Salvar arquivo de backup",
+  "save.restore": "Restaurar um backup",
+  "save.restore.file": "Arquivo de backup para restaurar",
+  "save.restored": "Backup restaurado.",
+  "save.restored.none": "Tudo o que tem nesse backup já está aqui.",
+  "save.bad": "Esse arquivo não é um backup do Liftsmith.",
+  "save.nudge.title": "Salvo só neste navegador",
+  "save.nudge.body": "Entre para fazer backup dos seus treinos, ou adicione o Liftsmith à tela inicial, para que não sejam apagados.",
+  "save.nudge.go": "Manter seguro",
+  "save.nudge.dismiss": "Entendi",
+  "save.photos": { one: "Incluir {count} foto de progresso", other: "Incluir {count} fotos de progresso" },
+  "save.photos.hint":
+    "As fotos nunca sincronizam, então um backup com elas é o jeito de levá-las para um celular novo. Guarde o arquivo em um lugar privado.",
+  "save.backup.saving": "Salvando…",
+  "save.restored.photos": { one: "{count} foto de progresso adicionada.", other: "{count} fotos de progresso adicionadas." },
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "save.title": "진행 상황 저장",
+  "save.lead.native": "기록하는 모든 것은 바로바로 이 휴대폰에 저장돼요.",
+  "save.lead.web": "기록하는 모든 것은 바로바로 이 브라우저에 저장돼요.",
+  "save.risk.web": "브라우저 데이터를 지우거나 비공개 창을 쓰면 지워져요.",
+  "save.risk.ios": "Safari는 홈 화면에 없는 사이트를 7일 동안 열지 않으면 데이터를 지워요.",
+  "save.installed": "Liftsmith가 홈 화면에 있어서 데이터가 그대로 유지돼요.",
+  "save.kept": "이 브라우저는 데이터를 지우지 않기로 했어요.",
+  "save.install": "홈 화면에 추가",
+  "save.install.ios": "안전하게 지키세요: Safari에서 공유를 누른 뒤 홈 화면에 추가를 누르세요.",
+  "save.install.other": "안전하게 지키세요: 브라우저 메뉴를 열고 앱 설치 또는 홈 화면에 추가를 고르세요.",
+  "save.app": "또는 앱 받기:",
+  "save.getAndroid": "Google Play",
+  "save.getIos": "App Store",
+  "save.accounts": "로그인하면 계정에 백업되고 다른 기기와 동기화돼요. 선택 사항이에요: 계정이 없으면 이 기기에만 저장돼요.",
+  "save.synced": "계정({email})에 백업되고 기기와 동기화됐어요.",
+  "save.signIn": "로그인해서 동기화",
+  "save.later": "설정에서 언제든 로그인하거나 백업 파일을 저장할 수 있어요.",
+  "save.settings": "저장 및 백업",
+  "save.move":
+    "새 휴대폰으로 옮기거나 브라우저에서 앱으로 옮기나요? 양쪽에서 로그인하면 운동 기록이 따라와요. 또는 여기서 백업 파일을 저장하고 거기서 복원하세요.",
+  "save.backup": "백업 파일 저장",
+  "save.restore": "백업 복원",
+  "save.restore.file": "복원할 백업 파일",
+  "save.restored": "백업을 복원했어요.",
+  "save.restored.none": "그 백업의 모든 내용이 이미 여기 있어요.",
+  "save.bad": "Liftsmith 백업 파일이 아니에요.",
+  "save.nudge.title": "이 브라우저에만 저장됨",
+  "save.nudge.body": "로그인해서 운동을 백업하거나 Liftsmith를 홈 화면에 추가해서 지워지지 않게 하세요.",
+  "save.nudge.go": "안전하게 지키기",
+  "save.nudge.dismiss": "확인",
+  "save.photos": { other: "변화 사진 {count}장 포함" },
+  "save.photos.hint": "사진은 동기화되지 않아요. 새 휴대폰으로 옮기려면 사진이 포함된 백업을 쓰세요. 파일은 안전한 곳에 보관하세요.",
+  "save.backup.saving": "저장 중…",
+  "save.restored.photos": { other: "변화 사진 {count}장을 추가했어요." },
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "save.title": "İlerlemeni kaydet",
+  "save.lead.native": "Kaydettiğin her şey anında bu telefona kaydedilir.",
+  "save.lead.web": "Kaydettiğin her şey anında bu tarayıcıya kaydedilir.",
+  "save.risk.web": "Bu tarayıcının verilerini temizlemek ya da gizli pencere kullanmak bunları siler.",
+  "save.risk.ios": "Safari, ana ekranında olmadıkça 7 gündür açmadığın siteleri de temizler.",
+  "save.installed": "Liftsmith ana ekranında, yani verilerin yerinde kalır.",
+  "save.kept": "Bu tarayıcı verileri temizlememeyi kabul etti.",
+  "save.install": "Ana ekrana ekle",
+  "save.install.ios": "Güvende tut: Safari'de Paylaş'a, sonra Ana Ekrana Ekle'ye dokun.",
+  "save.install.other": "Güvende tut: tarayıcının menüsünü aç ve Uygulamayı yükle ya da Ana ekrana ekle'yi seç.",
+  "save.app": "Ya da uygulamayı indir:",
+  "save.getAndroid": "Google Play",
+  "save.getIos": "App Store",
+  "save.accounts":
+    "Hesabına yedeklemek ve diğer cihazlarınla eşitlemek için giriş yap. İsteğe bağlı: hesap olmadan veriler yalnızca bu cihazda kalır.",
+  "save.synced": "Hesabına ({email}) yedeklendi ve cihazlarınla eşitlendi.",
+  "save.signIn": "Eşitlemek için giriş yap",
+  "save.later": "İstediğin zaman Ayarlar'dan giriş yapabilir ya da bir yedek dosyası kaydedebilirsin.",
+  "save.settings": "Kaydetme ve yedekleme",
+  "save.move":
+    "Yeni bir telefona mı geçiyorsun, ya da tarayıcıdan uygulamaya mı? İkisinde de giriş yap, antrenmanların seni takip etsin. Ya da burada bir yedek dosyası kaydet ve orada geri yükle.",
+  "save.backup": "Yedek dosyası kaydet",
+  "save.restore": "Yedeği geri yükle",
+  "save.restore.file": "Geri yüklenecek yedek dosyası",
+  "save.restored": "Yedek geri yüklendi.",
+  "save.restored.none": "O yedekteki her şey zaten burada.",
+  "save.bad": "Bu dosya bir Liftsmith yedeği değil.",
+  "save.nudge.title": "Yalnızca bu tarayıcıda kayıtlı",
+  "save.nudge.body": "Antrenmanlarını yedeklemek için giriş yap ya da silinmesinler diye Liftsmith'i ana ekranına ekle.",
+  "save.nudge.go": "Güvende tut",
+  "save.nudge.dismiss": "Anladım",
+  "save.photos": { one: "{count} ilerleme fotoğrafını ekle", other: "{count} ilerleme fotoğrafını ekle" },
+  "save.photos.hint": "Fotoğraflar hiç eşitlenmez; yeni telefona taşımanın yolu fotoğraflı bir yedektir. Dosyayı gizli bir yerde sakla.",
+  "save.backup.saving": "Kaydediliyor…",
+  "save.restored.photos": { one: "{count} ilerleme fotoğrafı eklendi.", other: "{count} ilerleme fotoğrafı eklendi." },
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "save.title": "Zapisz swoje postępy",
+  "save.lead.native": "Wszystko, co zapisujesz, jest na bieżąco zachowywane na tym telefonie.",
+  "save.lead.web": "Wszystko, co zapisujesz, jest na bieżąco zachowywane w tej przeglądarce.",
+  "save.risk.web": "Wyczyszczenie danych tej przeglądarki albo okno prywatne usunie wszystko.",
+  "save.risk.ios": "Safari czyści też strony, których nie otwierałeś przez 7 dni, chyba że są na ekranie głównym.",
+  "save.installed": "Liftsmith jest na ekranie głównym, więc twoje dane zostają na miejscu.",
+  "save.kept": "Ta przeglądarka zgodziła się ich nie czyścić.",
+  "save.install": "Dodaj do ekranu głównego",
+  "save.install.ios": "Zabezpiecz dane: w Safari stuknij Udostępnij, potem Do ekranu początkowego.",
+  "save.install.other": "Zabezpiecz dane: otwórz menu przeglądarki i wybierz Zainstaluj aplikację lub Dodaj do ekranu głównego.",
+  "save.app": "Albo pobierz aplikację:",
+  "save.getAndroid": "Google Play",
+  "save.getIos": "App Store",
+  "save.accounts":
+    "Zaloguj się, żeby zrobić kopię na swoim koncie i synchronizować z innymi urządzeniami. To opcjonalne: bez konta dane zostają tylko na tym urządzeniu.",
+  "save.synced": "Kopia na twoim koncie ({email}) i synchronizacja z twoimi urządzeniami.",
+  "save.signIn": "Zaloguj się, żeby synchronizować",
+  "save.later": "Zalogować się albo zapisać plik kopii zapasowej możesz w każdej chwili w Ustawieniach.",
+  "save.settings": "Zapisywanie i kopia zapasowa",
+  "save.move":
+    "Przenosisz się na nowy telefon albo z przeglądarki do aplikacji? Zaloguj się na obu, a treningi pójdą za tobą. Albo zapisz tu plik kopii zapasowej i przywróć go tam.",
+  "save.backup": "Zapisz plik kopii zapasowej",
+  "save.restore": "Przywróć kopię zapasową",
+  "save.restore.file": "Plik kopii zapasowej do przywrócenia",
+  "save.restored": "Kopia zapasowa przywrócona.",
+  "save.restored.none": "Wszystko z tej kopii już tu jest.",
+  "save.bad": "Ten plik nie jest kopią zapasową Liftsmith.",
+  "save.nudge.title": "Zapisane tylko w tej przeglądarce",
+  "save.nudge.body": "Zaloguj się, żeby zrobić kopię treningów, albo dodaj Liftsmith do ekranu głównego, żeby nie dało się ich wyczyścić.",
+  "save.nudge.go": "Zabezpiecz dane",
+  "save.nudge.dismiss": "Jasne",
+  "save.photos": {
+    one: "Dołącz {count} zdjęcie postępu",
+    few: "Dołącz {count} zdjęcia postępu",
+    many: "Dołącz {count} zdjęć postępu",
+    other: "Dołącz {count} zdjęcia postępu",
+  },
+  "save.photos.hint":
+    "Zdjęcia nigdy się nie synchronizują, więc kopia ze zdjęciami to sposób, by przenieść je na nowy telefon. Trzymaj plik w prywatnym miejscu.",
+  "save.backup.saving": "Zapisywanie…",
+  "save.restored.photos": {
+    one: "Dodano {count} zdjęcie postępu.",
+    few: "Dodano {count} zdjęcia postępu.",
+    many: "Dodano {count} zdjęć postępu.",
+    other: "Dodano {count} zdjęcia postępu.",
+  },
 };

@@ -136,3 +136,86 @@ export const ja: Partial<Record<Key, Message>> = {
   "hr.tip.fitbit":
     "Fitbit では、まず共有をオンにしてください：Google Health アプリ › 接続 › お使いの端末 › 心拍数を共有 › 開始。Pixel Watch ではクイック設定の Connected Fitness を使ってください。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "hr.connect": "Conectar",
+  "hr.connecting": "Conectando…",
+  "hr.reconnecting": "Reconectando…",
+  "hr.dismiss": "Dispensar",
+  "hr.device": "o monitor",
+  "hr.err.bluetoothOff": "O Bluetooth está desligado. Ligue e tente de novo.",
+  "hr.err.blocked": "O Bluetooth não está permitido aqui. Permita nos ajustes do navegador ou do celular e tente de novo.",
+  "hr.err.notFound":
+    "Nenhum monitor cardíaco apareceu. Confira se ele está ligado, compartilhando a frequência cardíaca e perto do celular.",
+  "hr.err.lost": "Conexão com {name} perdida. Toque em Conectar para tentar de novo.",
+  "hr.err.unreachable":
+    "Não foi possível alcançar {name}. Ele pode estar conectado a outro app ou aparelho: desconecte lá, mantenha perto e tente de novo.",
+  "hr.err.noService": "{name} não compartilha a frequência cardíaca do jeito padrão, então não dá para conectar.",
+  "hr.err.pairing": "{name} precisa ser pareado primeiro. Aceite o pedido de pareamento no aparelho ou no celular e tente de novo.",
+  "hr.err.failed": "Não foi possível iniciar a frequência cardíaca de {name}. Tente de novo daqui a pouco.",
+  "hr.tip.reshare":
+    "Se já conectou antes, desligue e ligue o compartilhamento de novo: app Google Health › Conexões › seu aparelho › Compartilhar frequência cardíaca.",
+  "hr.tip.fitbit":
+    "Num Fitbit, ative o compartilhamento primeiro: app Google Health › Conexões › seu aparelho › Compartilhar frequência cardíaca › Começar. Num Pixel Watch, use Connected Fitness nas configurações rápidas.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "hr.connect": "연결",
+  "hr.connecting": "연결하는 중…",
+  "hr.reconnecting": "다시 연결하는 중…",
+  "hr.dismiss": "닫기",
+  "hr.device": "심박 모니터",
+  "hr.err.bluetoothOff": "Bluetooth가 꺼져 있어요. 켜고 다시 시도하세요.",
+  "hr.err.blocked": "여기서는 Bluetooth가 허용되지 않아요. 브라우저나 휴대폰 설정에서 허용한 다음 다시 시도하세요.",
+  "hr.err.notFound": "심박 모니터를 찾지 못했어요. 켜져 있는지, 심박수를 공유하는지, 휴대폰 가까이에 있는지 확인하세요.",
+  "hr.err.lost": "{name} 연결이 끊겼어요. 연결을 탭해서 다시 시도하세요.",
+  "hr.err.unreachable":
+    "{name}에 연결하지 못했어요. 다른 앱이나 기기에 연결돼 있을 수 있어요. 거기서 연결을 끊고 가까이 둔 다음 다시 시도하세요.",
+  "hr.err.noService": "{name}은(는) 표준 방식으로 심박수를 공유하지 않아서 연결할 수 없어요.",
+  "hr.err.pairing": "{name}을(를) 먼저 페어링해야 해요. 기기나 휴대폰에서 페어링 요청을 수락한 다음 다시 시도하세요.",
+  "hr.err.failed": "{name}에서 심박수를 시작하지 못했어요. 잠시 후 다시 시도하세요.",
+  "hr.tip.reshare": "전에 연결된 적이 있다면 공유를 껐다가 다시 켜세요: Google Health 앱 › 연결 › 내 기기 › 심박수 공유.",
+  "hr.tip.fitbit":
+    "Fitbit에서는 먼저 공유를 켜세요: Google Health 앱 › 연결 › 내 기기 › 심박수 공유 › 시작하기. Pixel Watch에서는 빠른 설정의 연결된 피트니스를 사용하세요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "hr.connect": "Bağlan",
+  "hr.connecting": "Bağlanıyor…",
+  "hr.reconnecting": "Yeniden bağlanıyor…",
+  "hr.dismiss": "Kapat",
+  "hr.device": "nabız ölçer",
+  "hr.err.bluetoothOff": "Bluetooth kapalı. Aç ve tekrar dene.",
+  "hr.err.blocked": "Burada Bluetooth'a izin verilmiyor. Tarayıcı ya da telefon ayarlarından izin ver, sonra tekrar dene.",
+  "hr.err.notFound": "Hiç nabız ölçer görünmedi. Açık olduğundan, nabzı paylaştığından ve telefonuna yakın olduğundan emin ol.",
+  "hr.err.lost": "{name} bağlantısı koptu. Tekrar denemek için Bağlan'a dokun.",
+  "hr.err.unreachable":
+    "{name} cihazına ulaşılamadı. Başka bir uygulamaya ya da makineye bağlı olabilir: oradan bağlantısını kes, yakında tut ve tekrar dene.",
+  "hr.err.noService": "{name} nabzı standart yolla paylaşmıyor, bu yüzden bağlanamıyor.",
+  "hr.err.pairing": "{name} önce eşleşmeli. Cihazda ya da telefonunda eşleme isteğini kabul et, sonra tekrar dene.",
+  "hr.err.failed": "{name} cihazından nabız başlatılamadı. Birazdan tekrar dene.",
+  "hr.tip.reshare": "Daha önce bağlandıysa paylaşımı kapatıp tekrar aç: Google Health uygulaması › Bağlantılar › cihazın › Nabzı paylaş.",
+  "hr.tip.fitbit":
+    "Fitbit'te önce paylaşımı aç: Google Health uygulaması › Bağlantılar › cihazın › Nabzı paylaş › Başla. Pixel Watch'ta hızlı ayarlardaki Connected Fitness'ı kullan.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "hr.connect": "Połącz",
+  "hr.connecting": "Łączenie…",
+  "hr.reconnecting": "Ponowne łączenie…",
+  "hr.dismiss": "Zamknij",
+  "hr.device": "pulsometr",
+  "hr.err.bluetoothOff": "Bluetooth jest wyłączony. Włącz go i spróbuj ponownie.",
+  "hr.err.blocked": "Bluetooth nie jest tu dozwolony. Zezwól na niego w ustawieniach przeglądarki lub telefonu i spróbuj ponownie.",
+  "hr.err.notFound": "Nie znaleziono pulsometru. Sprawdź, czy jest włączony, udostępnia tętno i jest blisko telefonu.",
+  "hr.err.lost": "Utracono połączenie: {name}. Stuknij Połącz, żeby spróbować ponownie.",
+  "hr.err.unreachable":
+    "Brak połączenia: {name}. Może być połączony z inną aplikacją lub maszyną: rozłącz go tam, trzymaj blisko i spróbuj ponownie.",
+  "hr.err.noService": "{name}: urządzenie nie udostępnia tętna w standardowy sposób, więc nie można się połączyć.",
+  "hr.err.pairing": "{name}: najpierw trzeba sparować. Zaakceptuj prośbę o parowanie na urządzeniu lub telefonie i spróbuj ponownie.",
+  "hr.err.failed": "Nie udało się uruchomić odczytu tętna: {name}. Spróbuj ponownie za chwilę.",
+  "hr.tip.reshare":
+    "Jeśli wcześniej działało, wyłącz i włącz udostępnianie: aplikacja Google Health › Połączenia › twoje urządzenie › Udostępniaj tętno.",
+  "hr.tip.fitbit":
+    "Na Fitbicie najpierw włącz udostępnianie: aplikacja Google Health › Połączenia › twoje urządzenie › Udostępniaj tętno › Rozpocznij. Na Pixel Watch użyj Connected Fitness w szybkich ustawieniach.",
+};
