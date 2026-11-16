@@ -10,9 +10,11 @@ import { after } from "next/server";
 
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
+import { setFlag } from "@/server/flags";
 import {
   createJob,
   dismissJob,
+  importAiOn,
   jobLog,
   jobStatus,
   kickWorker,
@@ -37,8 +39,8 @@ export async function GET(req: Request) {
       const log = await jobLog(job);
       return log ? json(200, log) : json(404, { error: "No such import." });
     }
-    const [status, daily] = await Promise.all([jobStatus(job === "1" ? undefined : job), lastDaily()]);
-    return json(200, { job: status, daily });
+    const [status, daily, ai] = await Promise.all([jobStatus(job === "1" ? undefined : job), lastDaily(), importAiOn()]);
+    return json(200, { job: status, daily, ai });
   }
   const filter = { q: u.get("q"), country: u.get("country"), city: u.get("city"), status: u.get("status"), missing: u.get("missing") };
   const [list, pending] = await Promise.all([adminPlaces({ ...filter, page: u.get("page") }), pendingPlaces()]);
@@ -73,6 +75,13 @@ export async function POST(req: Request) {
       if (!(await kickWorker(origin))) await runWorker({ deadline: Date.now() + 280_000 }).catch(() => null);
     });
     return json(200, { job: await jobStatus(made.id) });
+  }
+  // The import's AI step on or off (the gymImportAi flag, also on the Flags tab).
+  if (body.action === "importAi") {
+    const on = body.on === true;
+    await setFlag("gymImportAi", on, 100, gate.staff.email);
+    await audit(gate.staff.email, "flag.set", "gymImportAi", { value: on, rollout: 100 });
+    return json(200, { ai: on });
   }
   if (body.action === "importStop" || body.action === "importClose") {
     const id = String(body.job ?? "");

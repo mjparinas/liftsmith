@@ -62,7 +62,7 @@ beforeEach(() => {
   onServer = null;
   daily = null;
   vi.stubGlobal("fetch", async (url: string, init?: RequestInit) => {
-    if (url.includes("?job=1")) return Response.json({ job: onServer, daily });
+    if (url.includes("?job=1")) return Response.json({ job: onServer, daily, ai: true });
     if (url.includes("&log=1")) return Response.json({ run: "every gym in the world", items: [] });
     const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
     posts.push(body);
@@ -138,11 +138,22 @@ describe("Admin › Gyms import", () => {
     expect(posts.at(-1)).toEqual({ action: "importStop", job: "job1" });
   });
 
+  it("switches the AI step off and on", async () => {
+    render(<GymImport admin changed={() => undefined} />);
+    const sw = await screen.findByRole("switch", { name: "AI step" });
+    expect(sw.getAttribute("aria-checked")).toBe("true");
+    await userEvent.click(sw);
+    expect(posts.at(-1)).toEqual({ action: "importAi", on: false });
+    expect(sw.getAttribute("aria-checked")).toBe("false");
+    expect(screen.getByText(/Off: imports and the daily refresh skip AI/)).toBeTruthy();
+  });
+
   it("lets support staff watch but not start or stop", async () => {
     onServer = job();
     render(<GymImport admin={false} changed={() => undefined} />);
     expect(await screen.findByText("Importing every gym in the world")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Stop" })).toBeNull();
+    expect((screen.getByRole("switch", { name: "AI step" }) as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("knows where each step is", () => {

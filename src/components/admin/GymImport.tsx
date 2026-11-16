@@ -87,6 +87,7 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   const [notify, setNotify] = useState(true);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [daily, setDaily] = useState<Daily | null>(null);
+  const [ai, setAi] = useState<boolean | null>(null);
   const [problem, setProblem] = useState("");
   const [starting, setStarting] = useState(false);
   const [now, setNow] = useState(() => Date.now());
@@ -108,11 +109,12 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   const read = useCallback(
     () =>
       fetch("/api/admin/gym-places/?job=1")
-        .then(async (r) => (r.ok ? ((await r.json()) as { job: JobStatus | null; daily?: Daily | null }) : null))
+        .then(async (r) => (r.ok ? ((await r.json()) as { job: JobStatus | null; daily?: Daily | null; ai?: boolean }) : null))
         .then((j) => {
           if (!j) return;
           show(j.job);
           setDaily(j.daily ?? null);
+          if (typeof j.ai === "boolean") setAi(j.ai);
         })
         .catch(() => undefined),
     [show],
@@ -160,8 +162,8 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
           the site&apos;s icon), filling only empty fields. Whatever is still missing, Claude reads from the same page; every answer is
           checked (a street that looks like a street, a postcode that fits the country, hours in the map&apos;s format, an email on the
           gym&apos;s own domain) and written only into empty fields. AI stops at the day&apos;s cap (Flags › AI daily cap) or when it&apos;s
-          switched off, and carries on the next day. Last, city names that are postcodes and untidy addresses are fixed, and moved pages
-          redirect.
+          switched off (the AI step switch below, or Flags › Admin AI helpers), and carries on the next day. Last, city names that are
+          postcodes and untidy addresses are fixed, and moved pages redirect.
         </p>
         <p>
           Every day at 10:00 UTC the daily refresh adds gyms that are new or changed on the map anywhere, and carries on the website and AI
@@ -185,6 +187,39 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
             <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
             Email me when it&apos;s done
           </label>
+        </div>
+      )}
+      {ai !== null && (
+        <div className="mt-3 flex items-center justify-between gap-4 rounded-lg border border-line/60 px-3 py-2">
+          <div>
+            <p className="text-sm font-semibold">AI step</p>
+            <p className="text-xs text-muted">
+              {ai
+                ? "On: after the websites, Claude fills what's still missing (within the day's AI cap)."
+                : "Off: imports and the daily refresh skip AI and go straight on."}
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={ai}
+            aria-label="AI step"
+            disabled={!admin}
+            onClick={() => {
+              const was = ai;
+              setAi(!was);
+              setProblem("");
+              void postJob({ action: "importAi", on: !was }).then((r) => {
+                if (r.error) {
+                  setAi(was);
+                  setProblem(r.error);
+                }
+              });
+            }}
+            className={`press relative h-7 w-12 shrink-0 rounded-full border border-line transition-colors disabled:opacity-50 ${ai ? "bg-accent" : "bg-raised"}`}
+          >
+            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-ink transition-all ${ai ? "left-6" : "left-0.5"}`} />
+          </button>
         </div>
       )}
       <p className="mt-2 text-xs text-faint">
