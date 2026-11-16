@@ -74,6 +74,7 @@ export const en = {
   "gp.print.letterOfficial":
     "{name} is already official, so there’s nothing to claim. Keep your hours and equipment up to date from the app.",
   "gp.print.letterThanks": "Thanks for having us in your gym.",
+  "gp.print.qrAlt": "QR code for {name}'s page on Liftsmith",
   "gp.print.help":
     "Print the poster and table stand inserts on your own printer at 100% scale. Cut the 4 × 6 in inserts along the dashed lines to fit a standard acrylic sign holder.",
   "gp.print.back": "Back to the gym’s page",
@@ -261,6 +262,7 @@ export const es: Partial<Record<Key, Message>> = {
   "gp.print.letterOfficial":
     "{name} ya es oficial, así que no hay nada que reclamar. Mantén al día el horario y el equipamiento desde la app.",
   "gp.print.letterThanks": "Gracias por recibirnos en tu gimnasio.",
+  "gp.print.qrAlt": "Código QR de la página de {name} en Liftsmith",
   "gp.print.help":
     "Imprime el póster y las tarjetas del expositor de mesa en tu impresora al 100 %. Recorta las tarjetas de 10 × 15 cm por las líneas discontinuas para un portacarteles acrílico estándar.",
   "gp.print.back": "Volver a la página del gimnasio",
@@ -452,6 +454,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.print.letterOfficial":
     "{name} est déjà officielle, il n’y a donc rien à réclamer. Gardez vos horaires et votre équipement à jour depuis l’application.",
   "gp.print.letterThanks": "Merci de nous accueillir dans votre salle.",
+  "gp.print.qrAlt": "QR code de la page de {name} sur Liftsmith",
   "gp.print.help":
     "Imprimez l’affiche et les cartes du présentoir de table sur votre imprimante à 100 %. Découpez les cartes de 10 × 15 cm le long des pointillés pour un porte-affiche en acrylique standard.",
   "gp.print.back": "Retour à la page de la salle",
@@ -644,6 +647,7 @@ export const de: Partial<Record<Key, Message>> = {
   "gp.print.letterOfficial":
     "{name} ist bereits offiziell, es gibt also nichts zu beanspruchen. Halte Öffnungszeiten und Ausstattung in der App aktuell.",
   "gp.print.letterThanks": "Danke, dass wir in deinem Studio sein dürfen.",
+  "gp.print.qrAlt": "QR-Code zur Seite von {name} auf Liftsmith",
   "gp.print.help":
     "Drucke das Poster und die Karten für den Tischaufsteller auf deinem eigenen Drucker in 100 % Größe. Schneide die 10 × 15 cm großen Karten entlang der gestrichelten Linien für einen üblichen Acrylaufsteller zu.",
   "gp.print.back": "Zurück zur Seite des Studios",
@@ -834,6 +838,7 @@ export const it: Partial<Record<Key, Message>> = {
   "gp.print.letterOfficial":
     "{name} è già ufficiale, quindi non c’è niente da rivendicare. Tieni aggiornati orari e attrezzatura dall’app.",
   "gp.print.letterThanks": "Grazie per averci nella tua palestra.",
+  "gp.print.qrAlt": "Codice QR della pagina di {name} su Liftsmith",
   "gp.print.help":
     "Stampa il poster e le schede per l’espositore da tavolo con la tua stampante al 100 %. Ritaglia le schede da 10 × 15 cm lungo le linee tratteggiate per un normale portadepliant in acrilico.",
   "gp.print.back": "Torna alla pagina della palestra",
@@ -1022,6 +1027,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "公式ジムにはチェックマークが付き、近くの利用者に最初に表示され、営業時間・連絡先・器具を自分で最新に保てます。無料です。コードは一度しか使えないので、この手紙はポスターとは別に保管してください。",
   "gp.print.letterOfficial": "{name}はすでに公式なので、申請は不要です。営業時間と器具はアプリから最新に保ってください。",
   "gp.print.letterThanks": "ジムに置かせていただき、ありがとうございます。",
+  "gp.print.qrAlt": "Liftsmith の {name} のページを開く QR コード",
   "gp.print.help":
     "ポスターと卓上スタンド用カードをお手元のプリンターで等倍（100%）で印刷してください。10 × 15 cm のカードは点線に沿って切り、一般的なアクリルスタンドに入れてください。",
   "gp.print.back": "ジムのページに戻る",
@@ -1210,6 +1216,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "gp.print.letterOfficial":
     "A {name} já é oficial, então não há nada para reivindicar. Mantenha horários e equipamentos atualizados pelo app.",
   "gp.print.letterThanks": "Obrigado por nos receber na sua academia.",
+  "gp.print.qrAlt": "QR code da página de {name} no Liftsmith",
   "gp.print.help":
     "Imprima o pôster e os cartões do display de mesa na sua própria impressora em escala 100%. Recorte os cartões de 4 × 6 pol. nas linhas tracejadas para caber num porta-placa de acrílico padrão.",
   "gp.print.back": "Voltar à página da academia",
@@ -1395,6 +1402,7 @@ export const ko: Partial<Record<Key, Message>> = {
     "공식 헬스장은 인증 마크를 받고, 근처 사용자에게 먼저 보이며, 운영 시간, 연락처, 장비를 직접 최신으로 관리할 수 있어요. 무료예요. 코드는 한 번만 쓸 수 있으니 이 편지는 포스터와 따로 보관하세요.",
   "gp.print.letterOfficial": "{name}은 이미 공식 헬스장이라 등록할 필요가 없어요. 앱에서 운영 시간과 장비를 최신으로 유지하세요.",
   "gp.print.letterThanks": "헬스장에 함께할 수 있게 해 주셔서 감사해요.",
+  "gp.print.qrAlt": "Liftsmith의 {name} 페이지로 가는 QR 코드",
   "gp.print.help":
     "포스터와 테이블 스탠드 삽지를 직접 프린터로 100% 배율로 인쇄하세요. 4 × 6 in 삽지는 점선을 따라 잘라 일반 아크릴 사인 홀더에 끼우세요.",
   "gp.print.back": "헬스장 페이지로 돌아가기",
@@ -1580,6 +1588,7 @@ export const tr: Partial<Record<Key, Message>> = {
     "Resmi salonlar onay işareti alır, yakındaki sporculara ilk gösterilir ve kendi saatlerini, iletişim bilgilerini ve ekipmanını güncel tutar. Ücretsizdir. Kod bir kez çalışır, bu yüzden bu mektubu posterden uzak tut.",
   "gp.print.letterOfficial": "{name} zaten resmi, sahiplenecek bir şey yok. Saatlerini ve ekipmanını uygulamadan güncel tut.",
   "gp.print.letterThanks": "Bizi salonunda ağırladığın için teşekkürler.",
+  "gp.print.qrAlt": "{name} sayfasına giden Liftsmith QR kodu",
   "gp.print.help":
     "Posteri ve masa standı kartlarını kendi yazıcında %100 ölçekte yazdır. Standart bir akrilik tabelalığa sığması için 4 × 6 inç kartları kesikli çizgilerden kes.",
   "gp.print.back": "Salonun sayfasına dön",
@@ -1766,6 +1775,7 @@ export const pl: Partial<Record<Key, Message>> = {
     "Oficjalne siłownie dostają znaczek, wyświetlają się jako pierwsze osobom w pobliżu i same dbają o aktualność godzin, danych kontaktowych i sprzętu. To nic nie kosztuje. Kod działa raz, więc trzymaj ten list z dala od plakatu.",
   "gp.print.letterOfficial": "{name} jest już oficjalna, więc nie ma czego przejmować. Aktualizuj godziny i sprzęt w aplikacji.",
   "gp.print.letterThanks": "Dziękujemy, że możemy być w twojej siłowni.",
+  "gp.print.qrAlt": "Kod QR do strony {name} w Liftsmith",
   "gp.print.help":
     "Wydrukuj plakat i wkładki do stojaka na własnej drukarce w skali 100%. Wytnij wkładki 4 × 6 cali wzdłuż przerywanych linii, żeby pasowały do standardowego akrylowego stojaka.",
   "gp.print.back": "Wróć do strony siłowni",

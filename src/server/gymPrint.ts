@@ -49,11 +49,11 @@ export const PRINT_HEADERS = {
 const MARK = `<svg class="mark" viewBox="200 190 610 610" aria-hidden="true"><defs><linearGradient id="lg" gradientUnits="userSpaceOnUse" x1="206" y1="196" x2="804" y2="794"><stop offset="0" stop-color="#3b7cf0"/><stop offset=".55" stop-color="#6271ef"/><stop offset="1" stop-color="#7e66e8"/></linearGradient></defs><g fill="url(#lg)"><rect x="226" y="302" width="572" height="36" rx="18"/><rect x="280" y="196" width="68" height="248" rx="20"/><rect x="676" y="196" width="68" height="248" rx="20"/><rect x="358" y="236" width="40" height="168" rx="14"/><rect x="626" y="236" width="40" height="168" rx="14"/><path d="M206 478C206 470 214 466 224 466C300 466 340 458 372 458L788 458Q804 458 804 474L804 534Q804 550 788 550C724 550 676 572 652 612L644 646L712 680Q726 688 726 704L726 778Q726 794 710 794L314 794Q298 794 298 778L298 704Q298 688 312 680L380 646L372 612C356 580 320 560 276 546C232 532 206 506 206 478Z"/></g></svg>`;
 const VERIFIED = `<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2563eb"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-function qrSvg(text: string, cls: string): string {
+function qrSvg(text: string, cls: string, label: string): string {
   const { size, d } = qrPath(text);
   const q = 4;
   const edge = size + q * 2;
-  return `<svg class="${cls}" viewBox="${-q} ${-q} ${edge} ${edge}" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect x="${-q}" y="${-q}" width="${edge}" height="${edge}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+  return `<svg class="${cls}" viewBox="${-q} ${-q} ${edge} ${edge}" shape-rendering="crispEdges" role="img" aria-label="${esc(label)}"><rect x="${-q}" y="${-q}" width="${edge}" height="${edge}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
 }
 
 const brand = `<div class="brand">${MARK}<span>${esc(BRAND.name)}</span></div>`;
@@ -87,7 +87,7 @@ function poster(row: Sheet, lang: MsgLang): string {
 ${brand}
 <h1>${esc(say(lang, "gp.print.headline"))}</h1>
 <p class="gym">${esc(row.placeName)}${row.official ? VERIFIED : ""}</p>
-${qrSvg(qrTarget(row), "qr")}
+${qrSvg(qrTarget(row), "qr", say(lang, "gp.print.qrAlt", { name: row.placeName }))}
 <p class="scan">${esc(say(lang, "gp.print.scan"))}</p>
 <ol class="steps">${steps}</ol>
 <p class="sub">${esc(say(lang, "gp.print.sub", { name: row.placeName }))}</p>
@@ -100,7 +100,7 @@ function insert(row: Sheet, lang: MsgLang): string {
 ${brand}
 <h2>${esc(say(lang, "gp.print.headline"))}</h2>
 <p class="gym">${esc(row.placeName)}${row.official ? VERIFIED : ""}</p>
-${qrSvg(qrTarget(row), "qr")}
+${qrSvg(qrTarget(row), "qr", say(lang, "gp.print.qrAlt", { name: row.placeName }))}
 <p class="scan">${esc(say(lang, "gp.print.scan"))}</p>
 <p class="site">${esc(site)}</p>
 </div>`;
