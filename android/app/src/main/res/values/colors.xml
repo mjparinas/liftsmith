@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app's dark background (color-bg in globals.css), the colour behind the page and the system bars. -->
+    <color name="liftsmith_bg">#0a0d12</color>
+</resources>

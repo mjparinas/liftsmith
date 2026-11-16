@@ -16,4 +16,8 @@
     <string name="up_next">Als Nächstes: %1$s</string>
     <string name="add_30">+30 s</string>
     <string name="widget_title">Heutiges Training</string>
+    <string name="widget_week_title">Diese Woche</string>
+    <string name="widget_week_description">Deine Woche auf einen Blick: trainierte Tage, deine Serie und was sie hält, mit Start</string>
+    <string name="widget_recovery_title">Erholung</string>
+    <string name="widget_recovery_description">Welche Muskeln bereit fürs Training sind und wann der Rest so weit ist, mit Start</string>
 </resources>

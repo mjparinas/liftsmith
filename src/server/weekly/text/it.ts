@@ -804,6 +804,18 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Solo gli adulti possono lasciare recensioni, e un cliente scontento non può affondare un nuovo coach: non si vede nulla prima di tre recensioni.",
   },
+  widgets: {
+    title: "Due nuovi widget per la schermata Home",
+    intro:
+      "Accanto al widget Oggi, altri due rispondono a colpo d'occhio: sono in linea questa settimana, e cosa è pronto per l'allenamento?",
+    points: [
+      "Questa settimana: i giorni di allenamento, quelli in programma, la tua serie e quanti giorni ancora la mantengono.",
+      "Recupero: quali zone del corpo sono pronte per l'allenamento e quando lo saranno le altre.",
+      "Recupero si aggiorna da solo mentre i muscoli recuperano, anche con l'app chiusa, senza consumare batteria.",
+      "Ognuno ha Inizia, così l'allenamento di oggi è a un tocco.",
+    ],
+    dyk: "Tocca il widget Recupero per aprire la mappa del recupero nell'app.",
+  },
   "form-cues": {
     title: "Errori comuni e come correggerli",
     intro: "Ogni esercizio e allungamento ora mostra i suoi due o tre errori tecnici più comuni, proprio accanto alla figura 3D.",

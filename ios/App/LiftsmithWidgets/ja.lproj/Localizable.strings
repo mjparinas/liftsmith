@@ -13,3 +13,7 @@
 "Rest left" = "残りの休憩";
 "Rest over" = "休憩終了";
 "%lld of %lld sets done" = "%2$lld セット中 %1$lld セット完了";
+"This week" = "今週";
+"Your week at a glance: days trained, your streak and what keeps it going, with Start." = "今週のトレーニング日、連続記録、それを続けるためにすること。開始ボタン付き。";
+"Recovery" = "回復";
+"Which muscles are ready to train and when the rest will be, with Start." = "トレーニングできる筋肉と、ほかの筋肉が回復する時刻。開始ボタン付き。";

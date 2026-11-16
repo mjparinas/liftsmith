@@ -426,8 +426,8 @@ export const es: FeaturesText = {
       body: "El entrenamiento en Wear OS y Apple Watch: la serie o la cuenta atrás del descanso, el pulso del reloj, Registrar serie y +30 s, y una vibración al terminar el descanso.",
     },
     widgets: {
-      name: "Widget en la pantalla de inicio",
-      body: "La decisión de hoy, tu meta semanal, una nota del entrenador y Empezar o Registrar serie en la pantalla de inicio.",
+      name: "Widgets en la pantalla de inicio",
+      body: "Tres widgets: Hoy (la decisión del día, tu meta semanal, una nota del entrenador y Empezar o Registrar serie), Esta semana (días entrenados, tu racha y qué la mantiene) y Recuperación (qué músculos están listos para entrenar y cuándo lo estará el resto).",
       note: "La app web tiene accesos directos en su icono de inicio en su lugar.",
     },
     shortcuts: {

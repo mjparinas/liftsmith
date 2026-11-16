@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { makeProfile, makeTestGym, NOW } from "@/test/factories";
+import { DAY, makeProfile, makeSets, makeTestGym, NOW } from "@/test/factories";
 
+import { weekOf } from "./derive";
 import { generate } from "./generator";
 import type { Insight } from "./insights";
+import { READY_AT } from "./nextUp";
 import { readiness } from "./readiness";
+import { recovery } from "./recovery";
+import { MUSCLES } from "./types";
 import { callWhy } from "./why";
-import { widgetSnapshot, type WidgetInput } from "./widget";
+import { AREAS, recoveryPart, weekPart, widgetSnapshot, type WeekInput, type WidgetInput } from "./widget";
 
 // The home-screen widget (Melvin, 2026-11-10): what to do today and why, the weekly goal, and the top coach's note.
 
@@ -74,5 +78,73 @@ describe("widgetSnapshot", () => {
     const b = widgetSnapshot(input({ now: NOW + 86_400_000 }));
     expect(a.day).not.toBe(b.day);
     expect(a.stale).toBe("Open Liftsmith for today's plan.");
+  });
+});
+
+// The This week and Recovery widgets (Melvin chose both, 2026-11-15).
+describe("weekPart", () => {
+  const week = (over: Partial<WeekInput> = {}) =>
+    weekPart({
+      sessions: [],
+      stretchDays: [],
+      profile: { daysPerWeek: 3, calendar: undefined },
+      streak: { thisWeek: 0, needed: 3, weeks: 0 },
+      now: NOW,
+      ...over,
+    });
+
+  it("draws seven days from the first day of the week, with today marked once", () => {
+    const w = week();
+    expect(w.days).toHaveLength(7);
+    expect(w.days.filter((d) => d.today)).toHaveLength(1);
+    expect(new Date(weekOf(NOW) + DAY / 2).getDay()).toBe(1);
+  });
+
+  it("marks trained and stretch days, planned days from today on, and never a missed day in the past", () => {
+    const todayIdx = Math.round((new Date(NOW).setHours(0, 0, 0, 0) - weekOf(NOW)) / DAY);
+    const w = week({
+      sessions: [{ start: NOW }],
+      stretchDays: [NOW + DAY],
+      profile: { daysPerWeek: 7, calendar: undefined },
+    });
+    expect(w.days[todayIdx]!.m).toBe("done");
+    if (todayIdx < 6) expect(w.days[todayIdx + 1]!.m).toBe("stretch");
+    if (todayIdx < 5) expect(w.days[todayIdx + 2]!.m).toBe("plan");
+    for (const d of w.days.slice(0, todayIdx)) expect(d.m).toBe("rest");
+  });
+
+  it("says what keeps the streak going, or that the goal is met", () => {
+    expect(week({ streak: { thisWeek: 1, needed: 2, weeks: 6 } }).why).toBe("2 more days keep your 6-week streak.");
+    expect(week({ streak: { thisWeek: 2, needed: 1, weeks: 0 } }).why).toBe("1 more day hits your goal.");
+    expect(week({ streak: { thisWeek: 3, needed: 0, weeks: 4 } }).why).toBe("Goal met. Anything more is a bonus.");
+    expect(week({ streak: { thisWeek: 2, needed: 1, weeks: 6 } }).title).toBe("2 of 3 this week");
+    expect(week({ streak: { thisWeek: 2, needed: 1, weeks: 6 } }).streak).toBe("6-week streak");
+    expect(week().streak).toBe("");
+  });
+});
+
+describe("recoveryPart", () => {
+  it("says everything is ready with no recent training", () => {
+    const r = recoveryPart([], NOW);
+    expect(r.areas.map((a) => a.n)).toEqual(["Chest", "Shoulders", "Back", "Arms", "Core", "Legs"]);
+    expect(r.areas.every((a) => a.at === 0)).toBe(true);
+    expect(r.all).toMatch(/^Everything has recovered/);
+  });
+
+  it("gives a hard-trained area the hour it's ready again, on the same model as the recovery map", () => {
+    const sets = makeSets(8, { exerciseId: "bench-press", rir: 0, at: NOW - 3600_000 });
+    const r = recoveryPart(sets, NOW);
+    const chest = r.areas.find((a) => a.n === "Chest")!;
+    expect(chest.at).toBeGreaterThan(NOW);
+    expect(chest.at % 3600_000).toBe(0);
+    // Ready by then, not an hour before (rounded up to the hour).
+    expect(recovery(sets, chest.at).chest).toBeGreaterThanOrEqual(READY_AT);
+    expect(chest.line).toMatch(/^Chest · ready /);
+    expect(r.areas.find((a) => a.n === "Legs")!.at).toBe(0);
+  });
+
+  it("covers every muscle in exactly one area", () => {
+    const all = Object.values(AREAS).flat();
+    expect([...all].sort()).toEqual([...MUSCLES].sort());
   });
 });

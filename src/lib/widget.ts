@@ -1,10 +1,15 @@
+import { trainingDays } from "./calendar";
+import { weekOf } from "./derive";
 import type { Streak } from "./game";
 import type { Plan } from "./generator";
-import { t } from "./i18n";
+import { currentLang, date, t } from "./i18n";
 import type { Insight } from "./insights";
 import { isNative } from "./juice";
+import { READY_AT } from "./nextUp";
 import { dayKey } from "./random";
 import { CALL_TEXT, type Readiness } from "./readiness";
+import { recovery } from "./recovery";
+import type { AppEvent, Muscle, Profile } from "./types";
 import { callWhy } from "./why";
 
 // The home-screen widget (Melvin, 2026-11-10). One resizable widget answers "what should I do today?":
@@ -33,6 +38,139 @@ export interface WidgetSnapshot {
   log: string;
   /** Shown instead of the plan once the day has passed, until the app is opened. */
   stale: string;
+  /** The This week widget (2026-11-15). Older apps leave it out, and the widget then shows only Start. */
+  week?: WeekPart;
+  /** The Recovery widget (2026-11-15). */
+  rec?: RecoveryPart;
+}
+
+// ---------- This week and Recovery widgets (Melvin chose both, 2026-11-15)
+// Two more widgets beside Today, each answering its own question with one action (Start): "am I on track this
+// week?" and "what's ready to train?". They read the same snapshot, so the app still sends one thing.
+
+export type DayMark = "done" | "stretch" | "plan" | "rest";
+
+export interface WeekPart {
+  /** "2 of 4 this week". */
+  title: string;
+  /** "6-week streak", or empty with no streak running. */
+  streak: string;
+  /** What to do about it: how many more days keep the streak, or that the goal is met. */
+  why: string;
+  /** Seven days from the lifter's first day of the week: the narrow day name, what happened or is planned, and today. */
+  days: { l: string; m: DayMark; today: boolean }[];
+}
+
+export interface RecoveryPart {
+  /** Headings, in the lifter's language. */
+  ready: string;
+  resting: string;
+  /** Shown when every area is ready. */
+  all: string;
+  /** Joins names on one line (", ", or "、" in Japanese). */
+  sep: string;
+  /** Six body areas: the name, when it's ready (ms, 0 = now), and the line shown while it's still recovering. */
+  areas: { n: string; at: number; line: string }[];
+}
+
+export interface WeekInput {
+  sessions: readonly { start: number }[];
+  stretchDays: readonly number[];
+  profile: Pick<Profile, "calendar" | "daysPerWeek">;
+  streak: Pick<Streak, "thisWeek" | "needed" | "weeks">;
+  now: number;
+}
+
+const DAY = 86_400_000;
+
+/** The week strip and the line under it. Past days without training are rest, never "missed": no guilt on a widget. */
+export function weekPart({ sessions, stretchDays, profile, streak, now }: WeekInput): WeekPart {
+  const start = weekOf(now);
+  const today = new Date(now).toDateString();
+  const trained = new Set(sessions.map((s) => new Date(s.start).toDateString()));
+  const stretched = new Set(stretchDays.map((d) => new Date(d).toDateString()));
+  const planned = new Set(trainingDays(profile));
+  const days: WeekPart["days"] = [];
+  let future = false;
+  for (let i = 0; i < 7; i++) {
+    // Noon steps across daylight saving safely.
+    const d = new Date(start + i * DAY + DAY / 2);
+    const key = d.toDateString();
+    const isToday = key === today;
+    const m: DayMark = trained.has(key)
+      ? "done"
+      : stretched.has(key)
+        ? "stretch"
+        : (future || isToday) && planned.has(d.getDay())
+          ? "plan"
+          : "rest";
+    days.push({ l: date(d, { weekday: "narrow" }), m, today: isToday });
+    if (isToday) future = true;
+  }
+  const goal = Math.max(1, profile.daysPerWeek);
+  const n = { done: streak.thisWeek, goal };
+  const why =
+    streak.needed <= 0
+      ? t("wdg.weekMet")
+      : streak.weeks > 0
+        ? t("wdg.weekKeep", { count: streak.needed, weeks: streak.weeks })
+        : t("wdg.weekMore", { count: streak.needed });
+  return {
+    title: t("wdg.weekTitle", n),
+    streak: streak.weeks > 0 ? t("wdg.streak", { count: streak.weeks }) : "",
+    why,
+    days,
+  };
+}
+
+/** The six areas the Recovery widget names, each made of the app's muscles. */
+export const AREAS: Record<"chest" | "shoulders" | "back" | "arms" | "core" | "legs", readonly Muscle[]> = {
+  chest: ["chest"],
+  shoulders: ["frontDelts", "sideDelts", "rearDelts"],
+  back: ["upperBack", "lats", "lowerBack", "traps"],
+  arms: ["biceps", "triceps", "forearms"],
+  core: ["abs", "obliques"],
+  legs: ["quads", "hamstrings", "glutes", "adductors", "calves"],
+};
+
+const HOUR = 3_600_000;
+
+/**
+ * When each area is ready again (every muscle in it back to READY_AT, the recovery map's "ready" band), from the
+ * same recovery model as Body, run forward an hour at a time. The widget compares these times with the clock as
+ * it draws, so an area moves to "ready" on its own without the app, and without the widget polling.
+ */
+export function recoveryPart(events: readonly AppEvent[], now: number): RecoveryPart {
+  const at = {} as Record<Muscle, number>;
+  const left = new Set(Object.values(AREAS).flat());
+  // Four days is the longest any muscle needs (nextUp.ts hoursUntilReady).
+  for (let h = 0; h <= 96 && left.size; h++) {
+    const time = now + h * HOUR;
+    const r = recovery(events, time);
+    for (const m of [...left]) {
+      if (r[m] >= READY_AT) {
+        at[m] = h === 0 ? 0 : time;
+        left.delete(m);
+      }
+    }
+  }
+  for (const m of left) at[m] = now + 96 * HOUR;
+  const areas = (Object.keys(AREAS) as (keyof typeof AREAS)[]).map((k) => {
+    const when = Math.max(...AREAS[k].map((m) => at[m]));
+    // Rounded up to the hour, so "ready 6 PM" is never a few minutes early.
+    const ready = when === 0 ? 0 : Math.ceil(when / HOUR) * HOUR;
+    const n = t(`wdg.area.${k}`);
+    const sameDay = ready > 0 && new Date(ready).toDateString() === new Date(now).toDateString();
+    const time = ready ? date(ready, sameDay ? { hour: "numeric" } : { weekday: "short", hour: "numeric" }) : "";
+    return { n, at: ready, line: ready ? t("wdg.readyAt", { name: n, time }) : n };
+  });
+  return {
+    ready: t("wdg.ready"),
+    resting: t("wdg.resting"),
+    all: t("wdg.allReady"),
+    sep: currentLang() === "ja" ? "、" : ", ",
+    areas,
+  };
 }
 
 export interface WidgetInput {

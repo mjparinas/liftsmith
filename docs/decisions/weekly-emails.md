@@ -677,9 +677,17 @@ Clients who've trained with you can now rate you, and new clients can see it.
 - Next to it: how many of your clients trained in the last two weeks.
 - Reply once to each review from Coaching › Setup, and report one that breaks the rules.
 Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))
+### W60 · Two new home-screen widgets (**New**, 2026-11-15)
+Free · Lifters · Screen: Body › Muscles, the recovery map the Recovery widget sums up
+Beside the Today widget, two more answer a question at a glance: am I on track this week, and what's ready to train?
+- This week: the days you trained, the ones planned, your streak and how many more days keep it going.
+- Recovery: which body areas are ready to train, and when the rest will be.
+- Recovery updates itself as muscles recover, even with the app closed, without draining the battery.
+- Each has Start, so today's workout is one tap away.
+Did you know? Tap the Recovery widget to open the recovery map in the app.
 
-### W53 · Common mistakes, and the fix (**New**, 2026-11-16)
-Free · Lifters · Screen: the back squat's exercise page, at How to do it · `fresh`, so it goes next to everyone already in the series
+### W61 · Common mistakes, and the fix (**New**, 2026-11-16)
+Free · Lifters · Screen: the back squat's exercise page, at Common mistakes · `fresh`, so it goes next to everyone already in the series
 Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.
 - Each one says what it looks like, what to do instead and why it matters.
 - Find them in How to during a workout, on each exercise's page and on every stretch.

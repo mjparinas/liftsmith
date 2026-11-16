@@ -814,12 +814,12 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       },
       {
         id: "widgets",
-        name: "Home-screen widget",
-        body: "Today's call, your weekly goal, a coach's note and Start or Log set on the home screen.",
+        name: "Home-screen widgets",
+        body: "Three widgets: Today (the day's call, your weekly goal, a coach's note and Start or Log set), This week (days trained, your streak and what keeps it going) and Recovery (which muscles are ready to train and when the rest will be).",
         tier: "free",
         where: "phones",
         note: "The web app has shortcuts on its home-screen icon instead.",
-        added: "2026-11-10",
+        added: "2026-11-15",
       },
       {
         id: "shortcuts",
