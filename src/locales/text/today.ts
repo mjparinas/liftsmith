@@ -126,3 +126,114 @@ export const ja: Partial<Record<Key, Message>> = {
   "today.recovering": "回復中",
   "today.recoveringLine": "光っているのは今日鍛えた筋肉です。回復するまで、次のプランはここを避けて組まれます。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "today.morning": "Bom dia",
+  "today.afternoon": "Boa tarde",
+  "today.evening": "Boa noite",
+  "today.hello": "{greeting}, {name}",
+  "today.start": "Começar treino",
+  "today.trainingAround": "Poupando: {parts}",
+  "today.somethingHurts": "Algo dói?",
+  "today.goalMore": {
+    one: "Mais {count} esta semana para sua meta",
+    other: "Mais {count} esta semana para sua meta",
+  },
+  "today.streakStart": {
+    one: "Mais {count} esta semana para começar uma sequência",
+    other: "Mais {count} esta semana para começar uma sequência",
+  },
+  "today.doneTitle": "Feito por hoje",
+  "today.doneLine": {
+    one: "{count} série em {min} min, {volume} levantados",
+    other: "{count} séries em {min} min, {volume} levantados",
+  },
+  "today.doneRest": "A recuperação começa agora. Coma bem, durma bem, e o próximo plano parte de hoje.",
+  "today.again": "Treinar de novo",
+  "today.recovering": "Recuperando agora",
+  "today.recoveringLine": "Em destaque: os músculos que você treinou hoje. O próximo plano poupa esses músculos até estarem prontos.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "today.morning": "좋은 아침이에요",
+  "today.afternoon": "좋은 오후예요",
+  "today.evening": "좋은 저녁이에요",
+  "today.hello": "{name}님, {greeting}",
+  "today.start": "운동 시작",
+  "today.trainingAround": "피해서 운동: {parts}",
+  "today.somethingHurts": "아픈 곳이 있나요?",
+  "today.goalMore": {
+    other: "목표까지 이번 주 {count}번 더",
+  },
+  "today.streakStart": {
+    other: "이번 주 {count}번 더 하면 연속 기록 시작",
+  },
+  "today.doneTitle": "오늘 운동 끝",
+  "today.doneLine": {
+    other: "{min}분 동안 {count}세트, {volume} 들어 올림",
+  },
+  "today.doneRest": "이제 회복이 시작돼요. 잘 먹고 잘 자면 다음 계획이 오늘을 바탕으로 짜여요.",
+  "today.again": "다시 운동하기",
+  "today.recovering": "회복 중",
+  "today.recoveringLine": "밝게 표시된 곳: 오늘 운동한 근육이에요. 다 회복될 때까지 다음 계획은 이 근육을 피해서 짜요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "today.morning": "Günaydın",
+  "today.afternoon": "Tünaydın",
+  "today.evening": "İyi akşamlar",
+  "today.hello": "{greeting}, {name}",
+  "today.start": "Antrenmana başla",
+  "today.trainingAround": "Şunlara dikkat ederek: {parts}",
+  "today.somethingHurts": "Bir yerin mi ağrıyor?",
+  "today.goalMore": {
+    one: "Hedefin için bu hafta {count} antrenman daha",
+    other: "Hedefin için bu hafta {count} antrenman daha",
+  },
+  "today.streakStart": {
+    one: "Seri başlatmak için bu hafta {count} antrenman daha",
+    other: "Seri başlatmak için bu hafta {count} antrenman daha",
+  },
+  "today.doneTitle": "Bugünlük bu kadar",
+  "today.doneLine": {
+    one: "{min} dk'da {count} set, {volume} kaldırıldı",
+    other: "{min} dk'da {count} set, {volume} kaldırıldı",
+  },
+  "today.doneRest": "Toparlanma şimdi başlıyor. İyi beslen, iyi uyu; sonraki plan bugünün üstüne kurulur.",
+  "today.again": "Yine antrenman yap",
+  "today.recovering": "Şu an toparlanıyor",
+  "today.recoveringLine": "Yanan kaslar: bugün çalıştırdıkların. Sonraki plan, hazır olana kadar onları dikkate alır.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "today.morning": "Dzień dobry",
+  "today.afternoon": "Dzień dobry",
+  "today.evening": "Dobry wieczór",
+  "today.hello": "{greeting}, {name}",
+  "today.start": "Zacznij trening",
+  "today.trainingAround": "Trening z oszczędzaniem: {parts}",
+  "today.somethingHurts": "Coś boli?",
+  "today.goalMore": {
+    one: "Jeszcze {count} w tym tygodniu do celu",
+    few: "Jeszcze {count} w tym tygodniu do celu",
+    many: "Jeszcze {count} w tym tygodniu do celu",
+    other: "Jeszcze {count} w tym tygodniu do celu",
+  },
+  "today.streakStart": {
+    one: "Jeszcze {count} w tym tygodniu, by zacząć passę",
+    few: "Jeszcze {count} w tym tygodniu, by zacząć passę",
+    many: "Jeszcze {count} w tym tygodniu, by zacząć passę",
+    other: "Jeszcze {count} w tym tygodniu, by zacząć passę",
+  },
+  "today.doneTitle": "Na dziś koniec",
+  "today.doneLine": {
+    one: "{count} seria w {min} min, podniesione {volume}",
+    few: "{count} serie w {min} min, podniesione {volume}",
+    many: "{count} serii w {min} min, podniesione {volume}",
+    other: "{count} serii w {min} min, podniesione {volume}",
+  },
+  "today.doneRest": "Teraz zaczyna się regeneracja. Dobrze zjedz, dobrze się wyśpij, a następny plan oprze się na dzisiejszym.",
+  "today.again": "Trenuj ponownie",
+  "today.recovering": "Teraz się regeneruje",
+  "today.recoveringLine": "Podświetlone: mięśnie trenowane dziś. Następny plan je omija, dopóki nie będą gotowe.",
+};

@@ -13,21 +13,21 @@ import { useAccount } from "@/lib/auth";
 import { useProMember } from "@/lib/billing";
 import { COSMETICS } from "@/lib/game";
 import { t } from "@/lib/i18n";
+import { invitePrinted, inviteUrl, withInvite } from "@/lib/inviteLink";
 import { haptic, oops, sound } from "@/lib/juice";
-import { inviteLink, keptInviteCode, trackInvite, warmInviteCode } from "@/lib/referral";
+import { trackInvite } from "@/lib/referral";
 import { shareText, type Shareable, type ShareContext, type ShareOptions } from "@/lib/shareCards";
 import { drawCard, shareCanvas, type CardData, type CardSize } from "@/lib/shareImage";
 import { copyText, createLink, deleteLink, linkError, shareUrl, type ShareLink } from "@/lib/shareLinks";
-import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
-import { isTeen } from "@/lib/teen";
 import { toast } from "@/lib/toast";
 
 import { go } from "./router";
 import { Button, Chip, Sheet, SwitchRow } from "./ui";
+import { useShareInvite } from "./useShareInvite";
 
 const PREFS = "liftsmith.sharePrefs";
-interface Prefs {
+export interface Prefs {
   size: CardSize;
   weights: boolean;
   name: boolean;
@@ -36,7 +36,7 @@ interface Prefs {
 }
 const DEFAULTS: Prefs = { size: "post", weights: true, name: false, invite: true };
 
-function loadPrefs(): Prefs {
+export function loadPrefs(): Prefs {
   try {
     const p = JSON.parse(localStorage.getItem(PREFS) ?? "{}") as Partial<Prefs>;
     return {
@@ -49,7 +49,7 @@ function loadPrefs(): Prefs {
     return DEFAULTS;
   }
 }
-function savePrefs(p: Prefs) {
+export function savePrefs(p: Prefs) {
   try {
     localStorage.setItem(PREFS, JSON.stringify(p));
   } catch {
@@ -59,7 +59,7 @@ function savePrefs(p: Prefs) {
 
 /** Figure stills by exercise and body, drawn once per app run. */
 const stills = new Map<string, Promise<HTMLCanvasElement | null>>();
-function still(exerciseId: string, body: "male" | "female") {
+export function still(exerciseId: string, body: "male" | "female") {
   const k = `${exerciseId}:${body}`;
   let p = stills.get(k);
   if (!p) {
@@ -104,12 +104,11 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
   const opts: ShareOptions = { weights: prefs.weights, name: prefs.name && name ? name : null };
   const body = bodyFor(profile.sex);
   // The invite link rides along for lifters in Friends, never for someone under 18: a card can be posted anywhere,
-  // and an invite makes whoever opens it a mutual follow (docs/decisions/growth.md "The invite loop").
-  const joined = useSocial((st) => !!st.me?.profile);
-  const canInvite = socialOn() && !isTeen(profile) && (joined || !!keptInviteCode());
-  useEffect(() => {
-    if (canInvite) warmInviteCode();
-  }, [canInvite]);
+  // and an invite makes whoever opens it a mutual follow (docs/decisions/growth.md "The invite loop"). It's printed
+  // on the card too, like the site name was (2026-11-15).
+  const invite = useShareInvite();
+  const canInvite = invite.can;
+  const printed = canInvite && prefs.invite && invite.code ? invitePrinted(invite.code) : null;
 
   useEffect(() => {
     if (!item?.figure) return;
@@ -127,10 +126,10 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
   const canvas = useMemo(() => {
     if (!card || typeof document === "undefined") return null;
     const c = document.createElement("canvas");
-    drawCard(c, card, { size: prefs.size, figure: fig, pro: member });
+    drawCard(c, card, { size: prefs.size, figure: fig, pro: member, invite: printed });
     return c;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item?.id, prefs.size, prefs.weights, prefs.name, name, fig, member]);
+  }, [item?.id, prefs.size, prefs.weights, prefs.name, name, fig, member, printed]);
   const src = useMemo(() => {
     try {
       return canvas?.toDataURL("image/png") ?? null;
@@ -145,7 +144,8 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
     if (!canvas || busy) return;
     setBusy(true);
     haptic("tap");
-    const url = canInvite && prefs.invite ? ((await inviteLink()) ?? undefined) : undefined;
+    const code = canInvite && prefs.invite ? await invite.get() : null;
+    const url = code ? inviteUrl(code) : undefined;
     const how = await shareCanvas(canvas, item.file, shareText(card), url);
     setBusy(false);
     if (url && how !== "cancelled" && how !== "failed") trackInvite("card");
@@ -216,13 +216,29 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
           {note}
         </p>
       )}
-      <LinkSection key={`${item.id}:${prefs.weights}:${opts.name ?? ""}`} item={item} card={card} figure={fig} />
+      <LinkSection
+        key={`${item.id}:${prefs.weights}:${opts.name ?? ""}`}
+        item={item}
+        card={card}
+        figure={fig}
+        invite={canInvite && prefs.invite ? invite.code : null}
+      />
     </div>
   );
 }
 
 /** Step 2 of sharing: turn this card into a public link with a preview (signed in only). */
-function LinkSection({ item, card, figure }: { item: Shareable; card: CardData; figure: HTMLCanvasElement | null }) {
+function LinkSection({
+  item,
+  card,
+  figure,
+  invite,
+}: {
+  item: Shareable;
+  card: CardData;
+  figure: HTMLCanvasElement | null;
+  invite: string | null;
+}) {
   const account = useAccount((s) => s.account);
   const [link, setLink] = useState<ShareLink | null>(null);
   const [busy, setBusy] = useState(false);
@@ -243,15 +259,17 @@ function LinkSection({ item, card, figure }: { item: Shareable; card: CardData; 
     }
   };
   // Copied: a toast says so (the sheet's own note sits below the fold). Not copied: show the link to copy by hand.
+  // The link carries the invite on (?invite=), so a friend who joins from its page is credited (growth.md).
+  const url = link ? withInvite(link.url, invite) : "";
   const copy = async () => {
     if (!link) return;
-    if (await copyText(link.url)) {
+    if (await copyText(url)) {
       setNote(null);
       haptic("success");
       toast(t("link.copied"));
     } else {
       oops();
-      setNote(link.url);
+      setNote(url);
     }
   };
   const remove = async () => {
@@ -282,13 +300,13 @@ function LinkSection({ item, card, figure }: { item: Shareable; card: CardData; 
         </>
       ) : link ? (
         <>
-          <p className="card mt-3 select-all break-all px-4 py-3 text-sm">{link.url}</p>
+          <p className="card mt-3 select-all break-all px-4 py-3 text-sm">{url}</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <Button
               kind="ghost"
               icon="link"
               onClick={async () => {
-                if (!(await shareUrl(link.url, card.headline))) await copy();
+                if (!(await shareUrl(url, card.headline))) await copy();
               }}
             >
               {t("link.share")}

@@ -15,9 +15,10 @@ import { isNative } from "./juice";
 // - Text lives in one catalogue per language (src/locales). English is the source; a missing key
 //   falls back to English, and a test checks every catalogue has the same keys and placeholders.
 
-// The G7 countries' languages plus Spanish (Melvin, 2026-11-10). Keep in step with Android's
+// The G7 countries' languages plus Spanish (Melvin, 2026-11-10), then Brazilian Portuguese, Korean, Polish and Turkish
+// (Melvin, 2026-11-15; "pt" is Brazilian Portuguese). Keep in step with Android's
 // locales_config.xml, iOS's CFBundleLocalizations and knownRegions, and MSG_LANGS in messageText.ts.
-export const LANGS = ["en", "es", "fr", "de", "it", "ja"] as const;
+export const LANGS = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"] as const;
 export type Lang = (typeof LANGS)[number];
 export type LangPref = "system" | Lang;
 /** Each language's name in itself, for the picker. */
@@ -28,6 +29,10 @@ export const LANG_NAME: Record<Lang, string> = {
   de: "Deutsch",
   it: "Italiano",
   ja: "日本語",
+  pt: "Português (Brasil)",
+  ko: "한국어",
+  pl: "Polski",
+  tr: "Türkçe",
 };
 
 type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
@@ -42,6 +47,10 @@ const LOADERS: Record<Exclude<Lang, "en">, () => Promise<{ default: Catalogue }>
   de: () => import("@/locales/load/de"),
   it: () => import("@/locales/load/it"),
   ja: () => import("@/locales/load/ja"),
+  pt: () => import("@/locales/load/pt"),
+  ko: () => import("@/locales/load/ko"),
+  pl: () => import("@/locales/load/pl"),
+  tr: () => import("@/locales/load/tr"),
 };
 const loading = new Map<Lang, Promise<void>>();
 

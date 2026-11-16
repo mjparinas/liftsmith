@@ -1,0 +1,281 @@
+import type { Message } from "@/lib/i18n";
+
+import type { MessageKey } from "./en";
+// Polski. Tłumaczenie maszynowe.
+// The text is in src/locales/text/<prefix>.ts, beside the English.
+
+import * as a11y from "./text/a11y";
+import * as account from "./text/account";
+import * as ach from "./text/ach";
+import * as activity from "./text/activity";
+import * as advice from "./text/advice";
+import * as appearance from "./text/appearance";
+import * as awards from "./text/awards";
+import * as band from "./text/band";
+import * as bk from "./text/bk";
+import * as block from "./text/block";
+import * as bmi from "./text/bmi";
+import * as body from "./text/body";
+import * as buddy from "./text/buddy";
+import * as buy from "./text/buy";
+import * as cal from "./text/cal";
+import * as calc from "./text/calc";
+import * as callText from "./text/callText";
+import * as card from "./text/card";
+import * as category from "./text/category";
+import * as cause from "./text/cause";
+import * as chk from "./text/chk";
+import * as coach from "./text/coach";
+import * as conn from "./text/conn";
+import * as cos from "./text/cos";
+import * as count from "./text/count";
+import * as cpl from "./text/cpl";
+import * as creator from "./text/creator";
+import * as cycle from "./text/cycle";
+import * as dash from "./text/dash";
+import * as delight from "./text/delight";
+import * as demo from "./text/demo";
+import * as done from "./text/done";
+import * as dots from "./text/dots";
+import * as egg from "./text/egg";
+import * as equipment from "./text/equipment";
+import * as ex from "./text/ex";
+import * as exp from "./text/exp";
+import * as explain from "./text/explain";
+import * as extra from "./text/extra";
+import * as fb from "./text/fb";
+import * as ff from "./text/ff";
+import * as fit from "./text/fit";
+import * as fix from "./text/fix";
+import * as fmt from "./text/fmt";
+import * as food from "./text/food";
+import * as friends from "./text/friends";
+import * as ft from "./text/ft";
+import * as game from "./text/game";
+import * as ghost from "./text/ghost";
+import * as gl from "./text/gl";
+import * as gloss from "./text/gloss";
+import * as goal from "./text/goal";
+import * as gp from "./text/gp";
+import * as gym from "./text/gym";
+import * as hr from "./text/hr";
+import * as hx from "./text/hx";
+import * as imp from "./text/imp";
+import * as info from "./text/info";
+import * as inj from "./text/inj";
+import * as ins from "./text/ins";
+import * as lab from "./text/lab";
+import * as league from "./text/league";
+import * as lift from "./text/lift";
+import * as link from "./text/link";
+import * as lvl from "./text/lvl";
+import * as map from "./text/map";
+import * as mom from "./text/mom";
+import * as month from "./text/month";
+import * as msg from "./text/msg";
+import * as msgKind from "./text/msgKind";
+import * as muscle from "./text/muscle";
+import * as nav from "./text/nav";
+import * as note from "./text/note";
+import * as notes from "./text/notes";
+import * as now from "./text/now";
+import * as orm from "./text/orm";
+import * as part from "./text/part";
+import * as past from "./text/past";
+import * as pay from "./text/pay";
+import * as pgm from "./text/pgm";
+import * as phase from "./text/phase";
+import * as photos from "./text/photos";
+import * as plate from "./text/plate";
+import * as pm from "./text/pm";
+import * as pol from "./text/pol";
+import * as pr from "./text/pr";
+import * as pro from "./text/pro";
+import * as prog from "./text/prog";
+import * as progress from "./text/progress";
+import * as pub from "./text/pub";
+import * as push from "./text/push";
+import * as quest from "./text/quest";
+import * as quote from "./text/quote";
+import * as rarity from "./text/rarity";
+import * as recap from "./text/recap";
+import * as recovery from "./text/recovery";
+import * as remix from "./text/remix";
+import * as rev from "./text/rev";
+import * as rmd from "./text/rmd";
+import * as rt from "./text/rt";
+import * as save from "./text/save";
+import * as sband from "./text/sband";
+import * as sea from "./text/sea";
+import * as settings from "./text/settings";
+import * as setup from "./text/setup";
+import * as share from "./text/share";
+import * as sig from "./text/sig";
+import * as social from "./text/social";
+import * as stats from "./text/stats";
+import * as str from "./text/str";
+import * as tab from "./text/tab";
+import * as td from "./text/td";
+import * as tdee from "./text/tdee";
+import * as team from "./text/team";
+import * as tempo from "./text/tempo";
+import * as theme from "./text/theme";
+import * as tier from "./text/tier";
+import * as time from "./text/time";
+import * as timer from "./text/timer";
+import * as today from "./text/today";
+import * as ton from "./text/ton";
+import * as tools from "./text/tools";
+import * as train from "./text/train";
+import * as trl from "./text/trl";
+import * as trn from "./text/trn";
+import * as twin from "./text/twin";
+import * as units from "./text/units";
+import * as variety from "./text/variety";
+import * as vc from "./text/vc";
+import * as vl from "./text/vl";
+import * as warm from "./text/warm";
+import * as wdg from "./text/wdg";
+import * as why from "./text/why";
+import * as wk from "./text/wk";
+import * as workout from "./text/workout";
+import * as x from "./text/x";
+
+export const pl: Partial<Record<MessageKey, Message>> = {
+  ...a11y.pl,
+  ...account.pl,
+  ...ach.pl,
+  ...activity.pl,
+  ...advice.pl,
+  ...appearance.pl,
+  ...awards.pl,
+  ...band.pl,
+  ...bk.pl,
+  ...block.pl,
+  ...bmi.pl,
+  ...body.pl,
+  ...buddy.pl,
+  ...buy.pl,
+  ...cal.pl,
+  ...calc.pl,
+  ...card.pl,
+  ...callText.pl,
+  ...category.pl,
+  ...cause.pl,
+  ...chk.pl,
+  ...coach.pl,
+  ...conn.pl,
+  ...cos.pl,
+  ...count.pl,
+  ...cpl.pl,
+  ...creator.pl,
+  ...cycle.pl,
+  ...dash.pl,
+  ...delight.pl,
+  ...demo.pl,
+  ...done.pl,
+  ...dots.pl,
+  ...equipment.pl,
+  ...ex.pl,
+  ...exp.pl,
+  ...explain.pl,
+  ...extra.pl,
+  ...fb.pl,
+  ...ff.pl,
+  ...fit.pl,
+  ...fix.pl,
+  ...fmt.pl,
+  ...food.pl,
+  ...ft.pl,
+  ...friends.pl,
+  ...game.pl,
+  ...ghost.pl,
+  ...gl.pl,
+  ...gloss.pl,
+  ...goal.pl,
+  ...gp.pl,
+  ...gym.pl,
+  ...hr.pl,
+  ...imp.pl,
+  ...info.pl,
+  ...inj.pl,
+  ...ins.pl,
+  ...lab.pl,
+  ...league.pl,
+  ...link.pl,
+  ...lvl.pl,
+  ...map.pl,
+  ...mom.pl,
+  ...month.pl,
+  ...msg.pl,
+  ...msgKind.pl,
+  ...muscle.pl,
+  ...nav.pl,
+  ...note.pl,
+  ...notes.pl,
+  ...now.pl,
+  ...orm.pl,
+  ...part.pl,
+  ...past.pl,
+  ...pay.pl,
+  ...pgm.pl,
+  ...photos.pl,
+  ...plate.pl,
+  ...pm.pl,
+  ...pol.pl,
+  ...pr.pl,
+  ...pro.pl,
+  ...prog.pl,
+  ...progress.pl,
+  ...pub.pl,
+  ...push.pl,
+  ...quest.pl,
+  ...quote.pl,
+  ...rarity.pl,
+  ...recap.pl,
+  ...recovery.pl,
+  ...remix.pl,
+  ...rev.pl,
+  ...rmd.pl,
+  ...rt.pl,
+  ...save.pl,
+  ...sband.pl,
+  ...sea.pl,
+  ...settings.pl,
+  ...setup.pl,
+  ...share.pl,
+  ...sig.pl,
+  ...social.pl,
+  ...str.pl,
+  ...stats.pl,
+  ...tab.pl,
+  ...td.pl,
+  ...phase.pl,
+  ...tempo.pl,
+  ...timer.pl,
+  ...tdee.pl,
+  ...theme.pl,
+  ...team.pl,
+  ...tier.pl,
+  ...time.pl,
+  ...today.pl,
+  ...ton.pl,
+  ...egg.pl,
+  ...hx.pl,
+  ...lift.pl,
+  ...tools.pl,
+  ...train.pl,
+  ...trl.pl,
+  ...trn.pl,
+  ...twin.pl,
+  ...units.pl,
+  ...variety.pl,
+  ...vc.pl,
+  ...vl.pl,
+  ...warm.pl,
+  ...wdg.pl,
+  ...why.pl,
+  ...wk.pl,
+  ...workout.pl,
+  ...x.pl,
+};

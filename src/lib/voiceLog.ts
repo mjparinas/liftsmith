@@ -214,13 +214,133 @@ const WORDS: Record<Lang, Words> = {
     undo: ["取り消し", "元に戻す", "戻して"],
     nums: [],
   },
+  pt: {
+    by: ["por", "x", "vezes", "com"],
+    unit: ["quilogramas", "quilograma", "quilos", "quilo", "kilos", "kilo", "kg", "libras", "libra", "lbs", "lb"],
+    reps: ["repetições", "repeticoes", "repetição", "repeticao", "reps", "rep"],
+    easy: ["fácil demais", "facil demais", "muito fácil", "muito facil", "leve demais", "muito leve", "fácil", "facil", "leve"],
+    right: ["perfeito", "na medida", "certo", "bom"],
+    hard: [
+      "difícil demais",
+      "dificil demais",
+      "muito difícil",
+      "muito dificil",
+      "pesado demais",
+      "muito pesado",
+      "difícil",
+      "dificil",
+      "pesado",
+    ],
+    log: ["registrar", "registra", "feito", "pronto", "próxima", "proxima"],
+    undo: ["desfazer", "desfaz"],
+    nums: [
+      "zero",
+      "um",
+      "dois",
+      "três",
+      "quatro",
+      "cinco",
+      "seis",
+      "sete",
+      "oito",
+      "nove",
+      "dez",
+      "onze",
+      "doze",
+      "treze",
+      "catorze",
+      "quinze",
+      "dezesseis",
+      "dezessete",
+      "dezoito",
+      "dezenove",
+      "vinte",
+    ],
+  },
+  ko: {
+    by: ["킬로에", "킬로로", "kg에", "파운드에", "에", "x", "곱하기"],
+    unit: ["킬로그램", "킬로", "kg", "파운드", "lb"],
+    reps: ["회", "번", "개", "렙", "reps", "rep"],
+    easy: ["너무 쉬워", "너무 가벼워", "쉬워", "가벼워", "쉬움", "가벼움"],
+    right: ["딱 좋아", "적당해", "좋아", "괜찮아"],
+    hard: ["너무 힘들어", "너무 무거워", "힘들어", "무거워", "어려워", "힘듦"],
+    log: ["기록", "완료", "끝", "다음"],
+    undo: ["취소", "되돌리기", "실행 취소"],
+    nums: [],
+  },
+  pl: {
+    by: ["na", "razy", "x", "po", "z"],
+    unit: ["kilogramów", "kilogramow", "kilogramy", "kilogram", "kilo", "kg", "funtów", "funtow", "funty", "lbs", "lb"],
+    reps: ["powtórzeń", "powtorzen", "powtórzenia", "powtorzenia", "powtórzenie", "powtorzenie", "powt", "reps", "rep"],
+    easy: ["za łatwo", "za latwo", "za lekko", "łatwo", "latwo", "lekko"],
+    right: ["w sam raz", "idealnie", "dobrze", "ok"],
+    hard: ["za ciężko", "za ciezko", "za trudno", "ciężko", "ciezko", "trudno"],
+    log: ["zapisz", "gotowe", "zrobione", "dalej"],
+    undo: ["cofnij", "anuluj"],
+    nums: [
+      "zero",
+      "jeden",
+      "dwa",
+      "trzy",
+      "cztery",
+      "pięć",
+      "sześć",
+      "siedem",
+      "osiem",
+      "dziewięć",
+      "dziesięć",
+      "jedenaście",
+      "dwanaście",
+      "trzynaście",
+      "czternaście",
+      "piętnaście",
+      "szesnaście",
+      "siedemnaście",
+      "osiemnaście",
+      "dziewiętnaście",
+      "dwadzieścia",
+    ],
+  },
+  tr: {
+    by: ["kiloyla", "kilo ile", "ile", "x", "çarpı", "carpi", "kere"],
+    unit: ["kilogram", "kilo", "kg", "pound", "lbs", "lb"],
+    reps: ["tekrar", "tekrarlık", "reps", "rep"],
+    easy: ["çok kolay", "cok kolay", "çok hafif", "cok hafif", "kolay", "hafif"],
+    right: ["tam kararında", "tam kararinda", "mükemmel", "mukemmel", "iyi", "tamam"],
+    hard: ["çok zor", "cok zor", "çok ağır", "cok agir", "zor", "ağır", "agir"],
+    log: ["kaydet", "bitti", "tamamlandı", "sonraki"],
+    undo: ["geri al", "iptal"],
+    nums: [
+      "sıfır",
+      "bir",
+      "iki",
+      "üç",
+      "dört",
+      "beş",
+      "altı",
+      "yedi",
+      "sekiz",
+      "dokuz",
+      "on",
+      "on bir",
+      "on iki",
+      "on üç",
+      "on dört",
+      "on beş",
+      "on altı",
+      "on yedi",
+      "on sekiz",
+      "on dokuz",
+      "yirmi",
+    ],
+  },
 };
 
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-/** Matches one phrase as whole words (Japanese has no spaces, so there it's a plain match). */
+/** Matches one phrase as whole words (Japanese has no spaces and Korean joins particles to words, so there it's a plain match). */
 function has(text: string, phrase: string, lang: Lang): boolean {
-  if (lang === "ja") return text.includes(phrase);
+  if (lang === "ja" || lang === "ko") return text.includes(phrase);
   return new RegExp(`(^|[^\\p{L}\\p{N}])${escape(phrase)}(?=$|[^\\p{L}\\p{N}])`, "u").test(text);
 }
 
@@ -259,7 +379,7 @@ const between = (s: string, a: number, b: number) => s.slice(a, b).trim();
 
 /** Whether the text starts with one of the phrases (as a whole word outside Japanese). */
 function startsWith(text: string, phrases: string[], lang: Lang): boolean {
-  return phrases.some((p) => text === p || text.startsWith(lang === "ja" ? p : `${p} `));
+  return phrases.some((p) => text === p || text.startsWith(lang === "ja" || lang === "ko" ? p : `${p} `));
 }
 
 /** The text without one leading phrase from the list. */

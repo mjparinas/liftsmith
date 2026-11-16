@@ -41,8 +41,8 @@ describe("exercise text", () => {
     for (const lang of OTHER_LANGS) {
       setLanguage(lang);
       for (const e of EXERCISES) {
-        // Japanese packs a word into fewer characters (懸垂 is "pull-up").
-        expect(e.name.length, e.id).toBeGreaterThan(lang === "ja" ? 1 : 2);
+        // Japanese and Korean pack a word into fewer characters (懸垂 is "pull-up").
+        expect(e.name.length, e.id).toBeGreaterThan(lang === "ja" || lang === "ko" ? 1 : 2);
         expect(e.cues.length, e.id).toBe(ENGLISH_ROWS.find((r) => r.id === e.id)!.cues.length);
       }
     }

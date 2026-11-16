@@ -134,6 +134,10 @@ export const es: FeaturesText = {
       name: "Demostraciones de ejercicios en 3D",
       body: "Cada ejercicio tiene una figura 3D que muestra el movimiento con su propio equipo, con pasos de preparación y claves.",
     },
+    "form-mistakes": {
+      name: "Errores comunes y cómo corregirlos",
+      body: "Cada ejercicio y estiramiento muestra sus dos o tres errores de técnica más comunes junto a la figura 3D, cada uno con su corrección y por qué importa, y el temporizador de descanso te enseña uno para la próxima serie. Funciona sin conexión.",
+    },
     "set-types": { name: "Series descendentes y rest-pause", body: "Añade una serie descendente o una rest-pause entre series." },
     "timed-sets": {
       name: "Temporizador para isométricos, cargadas y cardio",
@@ -346,6 +350,11 @@ export const es: FeaturesText = {
       name: "Tarjetas y enlaces para compartir",
       body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa. Un nuevo récord brilla en dorado y se puede compartir desde el descanso al momento.",
     },
+    "screenshot-share": {
+      name: "Tarjetas al hacer una captura de pantalla",
+      body: "Haz una captura y aparece una hoja con tarjetas de tu entrenamiento: el último mes, tres meses, seis meses, el año o desde siempre, como totales, en qué se fueron tus series o tus mejores levantamientos. Desliza entre ellas, oculta los pesos con el ojo y compártelas con tu enlace de invitación impreso en la tarjeta. Las mismas tarjetas están en Compartir mi entrenamiento, en Progreso. Cada enlace que compartes lleva ahora tu invitación, en un enlace que lo dice.",
+      note: "Las capturas la abren en Android 14 o posterior y en iPhone, y se puede desactivar. En otros sitios, ábrela desde Progreso. Los menores de 18 años comparten sin enlace de invitación.",
+    },
     coaching: {
       name: "Entrena a clientes",
       body: "Vincula clientes, mira sus resultados y asígnales rutinas, en el teléfono o en una pantalla grande.",
@@ -481,8 +490,8 @@ export const es: FeaturesText = {
       body: "La web muestra cuánto levantan de verdad en sentadilla, press de banca, peso muerto y press militar, por sexo y peso corporal, calculado cada día con quienes cuentan. Solo se muestran grupos de 30 o más, en percentiles, nunca los números de nadie. Un interruptor en Ajustes › Tus datos y privacidad decide si cuentas; los menores de 18 nunca cuentan.",
     },
     languages: {
-      name: "Seis idiomas",
-      body: "Inglés, español, francés, alemán, italiano y japonés, según el idioma de tu teléfono.",
+      name: "Diez idiomas",
+      body: "Inglés, español, francés, alemán, italiano, japonés, portugués de Brasil, coreano, polaco y turco, según el idioma de tu teléfono.",
     },
     appearance: {
       name: "Oscuro, claro o como tu teléfono",

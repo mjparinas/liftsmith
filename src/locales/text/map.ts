@@ -100,3 +100,67 @@ export const ja: Partial<Record<Key, Message>> = {
   "map.close": "閉じる",
   "map.selected": "{muscle}、回復 {pct}%",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "map.front": "Frente",
+  "map.back": "Costas",
+  "map.label": "Músculos: {side}",
+  "map.muscle": "{muscle}: {pct}% recuperado ({band})",
+  "map.legend": "Legenda",
+  "map.figure": "Corpo 3D colorido pela recuperação. {summary}",
+  "map.group": "{band}: {muscles}.",
+  "map.turn": "Arraste para girar. Toque num músculo.",
+  "map.pick": "Toque num músculo no corpo, ou num da lista abaixo, para ver o que fazer com ele.",
+  "map.view": "Vista",
+  "map.byBand": "Músculos por recuperação",
+  "map.close": "Fechar",
+  "map.selected": "{muscle}, {pct}% recuperado",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "map.front": "앞면",
+  "map.back": "뒷면",
+  "map.label": "{side} 근육",
+  "map.muscle": "{muscle}: {pct}% 회복({band})",
+  "map.legend": "범례",
+  "map.figure": "회복 상태로 색칠된 3D 인체. {summary}",
+  "map.group": "{band}: {muscles}.",
+  "map.turn": "드래그해서 돌리고, 근육을 탭하세요.",
+  "map.pick": "몸이나 아래 목록에서 근육을 탭하면 어떻게 하면 좋을지 볼 수 있어요.",
+  "map.view": "보기",
+  "map.byBand": "회복 상태별 근육",
+  "map.close": "닫기",
+  "map.selected": "{muscle}, {pct}% 회복",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "map.front": "Ön",
+  "map.back": "Arka",
+  "map.label": "{side} kaslar",
+  "map.muscle": "{muscle}: %{pct} toparlandı ({band})",
+  "map.legend": "Açıklama",
+  "map.figure": "Toparlanmaya göre renklendirilmiş 3B vücut. {summary}",
+  "map.group": "{band}: {muscles}.",
+  "map.turn": "Döndürmek için sürükle. Bir kasa dokun.",
+  "map.pick": "Ne yapacağını görmek için vücuttaki bir kasa ya da aşağıdakilerden birine dokun.",
+  "map.view": "Görünüm",
+  "map.byBand": "Toparlanmaya göre kaslar",
+  "map.close": "Kapat",
+  "map.selected": "{muscle}, %{pct} toparlandı",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "map.front": "Przód",
+  "map.back": "Tył",
+  "map.label": "Mięśnie: {side}",
+  "map.muscle": "{muscle}: zregenerowane w {pct}% ({band})",
+  "map.legend": "Legenda",
+  "map.figure": "Sylwetka 3D pokolorowana według regeneracji. {summary}",
+  "map.group": "{band}: {muscles}.",
+  "map.turn": "Przeciągnij, żeby obrócić. Stuknij mięsień.",
+  "map.pick": "Stuknij mięsień na sylwetce lub poniżej, żeby zobaczyć, co z nim zrobić.",
+  "map.view": "Widok",
+  "map.byBand": "Mięśnie według regeneracji",
+  "map.close": "Zamknij",
+  "map.selected": "{muscle}, zregenerowane w {pct}%",
+};

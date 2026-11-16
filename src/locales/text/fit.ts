@@ -255,3 +255,175 @@ export const ja: Partial<Record<Key, Message>> = {
   "fit.how.4":
     "心肺機能を反映する数値です。インターバル、坂道ウォーキング、ローイング、ランニングで上がり、筋トレではほとんど変わらないため、筋トレの評価ではありません。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "fit.title": "Idade física",
+  "fit.value": "Cerca de {age}",
+  "fit.floor": "{age} ou menos",
+  "fit.ceiling": "{age} ou mais",
+  "fit.range": "Provavelmente de {low} a {high}; você tem {age}",
+  "fit.chip.younger": "Em melhor forma que o comum para sua idade",
+  "fit.chip.typical": "Mais ou menos o comum para sua idade",
+  "fit.chip.older": "Espaço para evoluir",
+  "fit.from":
+    "Do VO₂ máx. de {vo2} do seu relógio (leitura mais recente: {date}). Uma pessoa saudável típica ({who}) de {age} anos tem cerca de {expected}.",
+  "fit.man": "homem",
+  "fit.woman": "mulher",
+  "fit.todo.younger":
+    "Mantenha assim: duas sessões de cardio intenso por semana, como intervalados, caminhadas em subida ou remo, seguram o VO₂ máx. com o passar dos anos.",
+  "fit.todo.typical":
+    "Duas sessões de cardio intenso de 20 minutos por semana, como intervalados, caminhadas em subida ou remo, costumam aumentar o VO₂ máx. em 6 a 8 semanas, e este número cai junto.",
+  "fit.todo.older":
+    "Este é o número que mais muda com o treino. Duas sessões de cardio intenso de 20 minutos por semana, como intervalados, caminhadas em subida ou remo, costumam aumentar o VO₂ máx. em 6 a 8 semanas. Musculação quase não o altera.",
+  "fit.strength": {
+    one: "Treino de força nos últimos 7 dias: {count} dia, {minutes} min. As diretrizes recomendam fortalecimento muscular em 2 ou mais dias por semana.",
+    other:
+      "Treino de força nos últimos 7 dias: {count} dias, {minutes} min. As diretrizes recomendam fortalecimento muscular em 2 ou mais dias por semana.",
+  },
+  "fit.score": "Pontuação de força: {score} ({band}), em comparação com praticantes típicos do seu peso.",
+  "fit.seeStrength": "Ver pontuação de força",
+  "fit.how": "Como isso é calculado?",
+  "fit.missing.vo2":
+    "Precisa de uma leitura de VO₂ máx. de um relógio (Apple Watch, Fitbit, Pixel Watch ou Garmin) via {source}. Os relógios registram isso depois de caminhadas ou corridas ao ar livre.",
+  "fit.missing.web": "Vem do VO₂ máx. do seu relógio pelo app de saúde do celular. Abra o Liftsmith no celular para ver.",
+  "fit.missing.profile": "Adicione sua idade e sexo para comparar seu VO₂ máx. com pessoas saudáveis como você.",
+  "fit.addProfile": "Adicionar idade e sexo",
+  "fit.disclaimer":
+    "Uma estimativa de condicionamento para bem-estar geral. Não é orientação médica e não diz nada sobre qualquer condição de saúde. Se tiver preocupações com sua saúde, consultar um médico pode ajudar.",
+  "fit.how.1": "Sua idade física é a idade em que uma pessoa saudável típica do seu sexo tem o seu VO₂ máx.",
+  "fit.how.2":
+    "Os valores típicos vêm do HUNT Fitness Study, na Noruega, que mediu o VO₂ máx. em esteira de 3.816 adultos saudáveis (Loe e colegas, 2013). A ideia de idade física vem do mesmo grupo de pesquisa (Nes e colegas, 2014).",
+  "fit.how.3":
+    "Seu VO₂ máx. é a estimativa do seu relógio, o valor do meio das suas últimas leituras. As estimativas de relógio costumam errar de 5 a 15% em relação a um teste de laboratório, então a faixa mostra sua idade física se a leitura fosse 8% mais alta ou mais baixa.",
+  "fit.how.4":
+    "Ela acompanha o condicionamento cardiorrespiratório. Intervalados, caminhadas em subida, remo e corrida a aumentam; musculação quase não a altera, então não é uma nota do seu treino de força.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "fit.title": "체력 나이",
+  "fit.value": "약 {age}세",
+  "fit.floor": "{age}세 이하",
+  "fit.ceiling": "{age}세 이상",
+  "fit.range": "{low}~{high}세로 추정, 실제 나이는 {age}세",
+  "fit.chip.younger": "또래보다 체력이 좋아요",
+  "fit.chip.typical": "또래와 비슷해요",
+  "fit.chip.older": "더 키울 여지가 있어요",
+  "fit.from": "워치의 VO₂ max {vo2}(최근 측정 {date}) 기준이에요. {age}세의 건강한 {who}은 보통 약 {expected}예요.",
+  "fit.man": "남성",
+  "fit.woman": "여성",
+  "fit.todo.younger":
+    "지금처럼 유지하세요: 인터벌, 언덕 걷기, 로잉 같은 고강도 유산소를 일주일에 두 번 하면 나이가 들어도 VO₂ max를 지킬 수 있어요.",
+  "fit.todo.typical":
+    "인터벌, 언덕 걷기, 로잉 같은 20분 고강도 유산소를 일주일에 두 번 하면 보통 6~8주 안에 VO₂ max가 오르고, 이 숫자도 함께 내려가요.",
+  "fit.todo.older":
+    "훈련으로 가장 빨리 바뀌는 숫자예요. 인터벌, 언덕 걷기, 로잉 같은 20분 고강도 유산소를 일주일에 두 번 하면 보통 6~8주 안에 VO₂ max가 올라요. 웨이트로는 거의 바뀌지 않아요.",
+  "fit.strength": {
+    other: "최근 7일 근력 운동: {count}일, {minutes}분. 가이드라인은 일주일에 2일 이상 근력 운동을 권장해요.",
+  },
+  "fit.score": "근력 점수: {score}({band}), 같은 체중의 일반적인 리프터 기준이에요.",
+  "fit.seeStrength": "근력 점수 보기",
+  "fit.how": "어떻게 계산하나요?",
+  "fit.missing.vo2":
+    "{source}에서 받은 워치(Apple Watch, Fitbit, Pixel Watch, Garmin)의 VO₂ max 측정값이 필요해요. 워치는 야외 걷기나 달리기 후에 측정해요.",
+  "fit.missing.web": "휴대폰 건강 앱을 통해 워치의 VO₂ max를 가져와요. 휴대폰에서 Liftsmith를 열어 확인하세요.",
+  "fit.missing.profile": "나이와 성별을 추가하면 나와 비슷한 건강한 사람들과 VO₂ max를 비교할 수 있어요.",
+  "fit.addProfile": "나이와 성별 추가",
+  "fit.disclaimer":
+    "일반적인 건강 관리를 위한 체력 추정치예요. 의학적 조언이 아니며 어떤 건강 상태도 알려 줄 수 없어요. 건강이 걱정된다면 의사와 상담하는 것이 도움이 될 수 있어요.",
+  "fit.how.1": "체력 나이는 같은 성별의 일반적인 건강한 사람이 내 VO₂ max를 갖는 나이예요.",
+  "fit.how.2":
+    "일반적인 수치는 노르웨이의 HUNT 체력 연구에서 나왔어요. 건강한 성인 3,816명의 VO₂ max를 트레드밀에서 측정한 연구예요(Loe 외, 2013). 체력 나이라는 개념도 같은 연구진에게서 나왔어요(Nes 외, 2014).",
+  "fit.how.3":
+    "VO₂ max는 워치의 추정치로, 최근 몇 번 측정값의 중간값이에요. 워치 추정치는 실험실 측정과 5~15% 정도 차이가 나는 경우가 많아서, 측정값이 8% 높거나 낮을 때의 체력 나이를 범위로 보여 줘요.",
+  "fit.how.4":
+    "심폐 체력을 따라가요. 인터벌, 언덕 걷기, 로잉, 달리기로 올라가고 웨이트로는 거의 바뀌지 않아요. 그러니 근력 운동 점수가 아니에요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "fit.title": "Fitness yaşı",
+  "fit.value": "Yaklaşık {age}",
+  "fit.floor": "{age} ya da daha genç",
+  "fit.ceiling": "{age} ya da daha yaşlı",
+  "fit.range": "Muhtemelen {low} ile {high} arası, sen {age} yaşındasın",
+  "fit.chip.younger": "Yaşına göre ortalamadan daha fit",
+  "fit.chip.typical": "Yaşına göre ortalama civarında",
+  "fit.chip.older": "Gelişime açık",
+  "fit.from":
+    "Saatinin VO₂ max değerinden: {vo2} (en yeni ölçüm {date}). {age} yaşındaki sağlıklı bir {who} için tipik değer yaklaşık {expected}.",
+  "fit.man": "erkek",
+  "fit.woman": "kadın",
+  "fit.todo.younger":
+    "Böyle kalsın: haftada iki zorlu kardiyo seansı (interval, yokuş yürüyüşü ya da kürek gibi) yıllar geçse de VO₂ max'ı korur.",
+  "fit.todo.typical":
+    "Haftada iki kez 20 dakikalık zorlu kardiyo (interval, yokuş yürüyüşü ya da kürek gibi) genelde 6 ila 8 haftada VO₂ max'ı artırır ve bu sayı da onunla birlikte düşer.",
+  "fit.todo.older":
+    "Antrenmanla en hızlı değişen sayı bu. Haftada iki kez 20 dakikalık zorlu kardiyo (interval, yokuş yürüyüşü ya da kürek gibi) genelde 6 ila 8 haftada VO₂ max'ı artırır. Ağırlık çalışması onu pek değiştirmez.",
+  "fit.strength": {
+    one: "Son 7 günde kuvvet antrenmanı: {count} gün, {minutes} dk. Öneriler haftada 2 ya da daha fazla gün kas güçlendirici çalışma yapılmasını söyler.",
+    other:
+      "Son 7 günde kuvvet antrenmanı: {count} gün, {minutes} dk. Öneriler haftada 2 ya da daha fazla gün kas güçlendirici çalışma yapılmasını söyler.",
+  },
+  "fit.score": "Kuvvet puanı: {score} ({band}), senin kilondaki tipik sporculara göre.",
+  "fit.seeStrength": "Kuvvet puanını gör",
+  "fit.how": "Bu nasıl hesaplanıyor?",
+  "fit.missing.vo2":
+    "{source} üzerinden bir saatten (Apple Watch, Fitbit, Pixel Watch ya da Garmin) VO₂ max ölçümü gerekiyor. Saatler bunu açık havada yürüyüş ya da koşulardan sonra kaydeder.",
+  "fit.missing.web": "Saatinin VO₂ max değerinden, telefonunun sağlık uygulaması üzerinden gelir. Görmek için Liftsmith'i telefonunda aç.",
+  "fit.missing.profile": "VO₂ max'ını senin gibi sağlıklı insanlarla karşılaştırmak için yaşını ve cinsiyetini ekle.",
+  "fit.addProfile": "Yaş ve cinsiyet ekle",
+  "fit.disclaimer":
+    "Genel sağlıklı yaşam için bir fitness tahmini. Tıbbi tavsiye değildir ve herhangi bir sağlık durumu hakkında bilgi veremez. Sağlığınla ilgili endişelerin varsa bir doktora danışmak faydalı olabilir.",
+  "fit.how.1": "Fitness yaşın, senin cinsiyetindeki tipik sağlıklı bir insanın senin VO₂ max değerine sahip olduğu yaştır.",
+  "fit.how.2":
+    "Tipik değerler, Norveç'teki HUNT Fitness Çalışması'ndan geliyor; bu çalışmada 3.816 sağlıklı yetişkinin VO₂ max değeri koşu bandında ölçüldü (Loe ve diğerleri, 2013). Fitness yaşı fikri de aynı araştırma grubundan çıktı (Nes ve diğerleri, 2014).",
+  "fit.how.3":
+    "VO₂ max değerin saatinin tahmini; son birkaç ölçümünün ortası. Saat tahminleri laboratuvar testinden çoğu zaman %5 ila %15 sapar, bu yüzden aralık, ölçüm %8 daha yüksek ya da düşük olsaydı fitness yaşının ne olacağını gösterir.",
+  "fit.how.4":
+    "Kardiyo kondisyonunu izler. Interval, yokuş yürüyüşü, kürek ve koşu onu yükseltir; ağırlık çalışması pek değiştirmez, yani kuvvet antrenmanının puanı değildir.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "fit.title": "Wiek sprawnościowy",
+  "fit.value": "Ok. {age}",
+  "fit.floor": "{age} lub mniej",
+  "fit.ceiling": "{age} lub więcej",
+  "fit.range": "Prawdopodobnie od {low} do {high}, twój wiek: {age}",
+  "fit.chip.younger": "Sprawniej niż typowo w twoim wieku",
+  "fit.chip.typical": "Mniej więcej typowo dla twojego wieku",
+  "fit.chip.older": "Jest co budować",
+  "fit.from":
+    "Na podstawie VO₂ max z twojego zegarka: {vo2} (najnowszy odczyt {date}). Typowa zdrowa osoba ({who}, {age} lat) ma ok. {expected}.",
+  "fit.man": "mężczyzna",
+  "fit.woman": "kobieta",
+  "fit.todo.younger":
+    "Utrzymaj to: dwa mocne treningi cardio w tygodniu, np. interwały, marsze pod górę albo wiosłowanie, utrzymują VO₂ max mimo upływu lat.",
+  "fit.todo.typical":
+    "Dwa 20-minutowe mocne treningi cardio w tygodniu, np. interwały, marsze pod górę albo wiosłowanie, zwykle podnoszą VO₂ max w ciągu 6–8 tygodni, a ta liczba spada razem z tym.",
+  "fit.todo.older":
+    "Ta liczba najszybciej reaguje na trening. Dwa 20-minutowe mocne treningi cardio w tygodniu, np. interwały, marsze pod górę albo wiosłowanie, zwykle podnoszą VO₂ max w ciągu 6–8 tygodni. Trening siłowy prawie jej nie zmienia.",
+  "fit.strength": {
+    one: "Trening siłowy w ostatnich 7 dniach: {count} dzień, {minutes} min. Zalecenia mówią o ćwiczeniach wzmacniających mięśnie co najmniej 2 dni w tygodniu.",
+    few: "Trening siłowy w ostatnich 7 dniach: {count} dni, {minutes} min. Zalecenia mówią o ćwiczeniach wzmacniających mięśnie co najmniej 2 dni w tygodniu.",
+    many: "Trening siłowy w ostatnich 7 dniach: {count} dni, {minutes} min. Zalecenia mówią o ćwiczeniach wzmacniających mięśnie co najmniej 2 dni w tygodniu.",
+    other:
+      "Trening siłowy w ostatnich 7 dniach: {count} dnia, {minutes} min. Zalecenia mówią o ćwiczeniach wzmacniających mięśnie co najmniej 2 dni w tygodniu.",
+  },
+  "fit.score": "Wynik siłowy: {score} ({band}) w porównaniu z typowymi osobami trenującymi o twojej masie ciała.",
+  "fit.seeStrength": "Zobacz wynik siłowy",
+  "fit.how": "Jak to jest liczone?",
+  "fit.missing.vo2":
+    "Potrzebny jest odczyt VO₂ max z zegarka (Apple Watch, Fitbit, Pixel Watch lub Garmin) przez {source}. Zegarki zapisują go po marszach lub biegach na zewnątrz.",
+  "fit.missing.web":
+    "Pochodzi z VO₂ max z twojego zegarka, przez aplikację zdrowotną w telefonie. Otwórz Liftsmith na telefonie, żeby to zobaczyć.",
+  "fit.missing.profile": "Dodaj wiek i płeć, żeby porównać swoje VO₂ max ze zdrowymi osobami podobnymi do ciebie.",
+  "fit.addProfile": "Dodaj wiek i płeć",
+  "fit.disclaimer":
+    "Szacunek sprawności do celów ogólnego dobrego samopoczucia. To nie porada medyczna i nie mówi nic o żadnym stanie zdrowia. Jeśli martwisz się o swoje zdrowie, warto porozmawiać z lekarzem.",
+  "fit.how.1": "Twój wiek sprawnościowy to wiek, w którym typowa zdrowa osoba twojej płci ma takie VO₂ max jak ty.",
+  "fit.how.2":
+    "Typowe wartości pochodzą z norweskiego badania HUNT Fitness Study, w którym zmierzono VO₂ max na bieżni u 3816 zdrowych dorosłych (Loe i in., 2013). Pomysł wieku sprawnościowego pochodzi od tej samej grupy badawczej (Nes i in., 2014).",
+  "fit.how.3":
+    "Twoje VO₂ max to szacunek zegarka, środek kilku ostatnich odczytów. Szacunki z zegarków często różnią się od testu laboratoryjnego o 5–15%, więc zakres pokazuje twój wiek sprawnościowy, gdyby odczyt był o 8% wyższy lub niższy.",
+  "fit.how.4":
+    "Odzwierciedla wydolność. Interwały, marsze pod górę, wiosłowanie i bieganie ją podnoszą; trening siłowy prawie jej nie zmienia, więc to nie jest ocena twojego treningu siłowego.",
+};

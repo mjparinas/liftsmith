@@ -82,3 +82,55 @@ export const ja: Partial<Record<Key, Message>> = {
   "ghost.last": "前回 {set}",
   "ghost.use": "使う",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "ghost.level": "empatado com seu fantasma",
+  "ghost.ahead": "{time} à frente",
+  "ghost.behind": "{time} atrás",
+  "ghost.lastSet": "Última vez: {weight} {unit} × {reps}",
+  "ghost.lastSetRest": "Última vez: {weight} {unit} × {reps} após {rest} de descanso",
+  "ghost.stopped": "Da última vez você parou aqui",
+  "ghost.bodyweight": "Peso corporal",
+  "ghost.same": "Igual à última vez ({set})",
+  "ghost.last": "Última vez {set}",
+  "ghost.use": "Usar",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "ghost.level": "고스트와 동률",
+  "ghost.ahead": "{time} 앞서요",
+  "ghost.behind": "{time} 뒤져요",
+  "ghost.lastSet": "지난번: {weight} {unit} × {reps}",
+  "ghost.lastSetRest": "지난번: {rest} 휴식 후 {weight} {unit} × {reps}",
+  "ghost.stopped": "지난번엔 여기서 멈췄어요",
+  "ghost.bodyweight": "맨몸",
+  "ghost.same": "지난번과 같게 ({set})",
+  "ghost.last": "지난번 {set}",
+  "ghost.use": "적용",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "ghost.level": "hayaletinle başa baş",
+  "ghost.ahead": "{time} öndesin",
+  "ghost.behind": "{time} gerideysin",
+  "ghost.lastSet": "Geçen sefer: {weight} {unit} × {reps}",
+  "ghost.lastSetRest": "Geçen sefer: {rest} dinlenmeden sonra {weight} {unit} × {reps}",
+  "ghost.stopped": "Geçen sefer burada durmuştun",
+  "ghost.bodyweight": "Vücut ağırlığı",
+  "ghost.same": "Geçen seferki gibi ({set})",
+  "ghost.last": "Geçen sefer {set}",
+  "ghost.use": "Bunu kullan",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "ghost.level": "równo z twoim duchem",
+  "ghost.ahead": "{time} przed duchem",
+  "ghost.behind": "{time} za duchem",
+  "ghost.lastSet": "Ostatnio: {weight} {unit} × {reps}",
+  "ghost.lastSetRest": "Ostatnio: {weight} {unit} × {reps} po {rest} przerwy",
+  "ghost.stopped": "Ostatnio tu był koniec",
+  "ghost.bodyweight": "Masa ciała",
+  "ghost.same": "Jak ostatnio ({set})",
+  "ghost.last": "Ostatnio {set}",
+  "ghost.use": "Użyj",
+};

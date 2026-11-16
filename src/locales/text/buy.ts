@@ -113,3 +113,115 @@ export const ja: Partial<Record<Key, Message>> = {
   "buy.kitMuscles": { other: "{item}：{unlocks}。さらに{count}つの筋肉で初めて負荷をかけたトレーニングができます。" },
   "buy.newEx": { other: "新しい種目{count}つ" },
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "buy.title": "O que comprar em seguida",
+  "buy.got": "Comprei",
+  "buy.have": "Já tenho",
+  "buy.note": "Com base nas suas anilhas, no seu equipamento e nos pesos que você levanta. Sem anúncios nem indicações patrocinadas.",
+  "buy.pair": "Um par de anilhas de {w}: {why}.",
+  "buy.sep": "; ",
+  "buy.jumps": "saltos de {to} em vez de {from}, para que exercícios que evoluem devagar, como o desenvolvimento, continuem progredindo",
+  "buy.more": {
+    one: "mais {count} peso que você pode montar até {hi}",
+    other: "mais {count} pesos que você pode montar até {hi}",
+  },
+  "buy.room": "espaço além do seu limite atual de {max}",
+  "buy.kit": {
+    one: "{item}: {count} exercício novo.",
+    other: "{item}: {count} exercícios novos.",
+  },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks}, e o primeiro trabalho com carga para {count} músculo.",
+    other: "{item}: {unlocks}, e o primeiro trabalho com carga para {count} músculos.",
+  },
+  "buy.newEx": {
+    one: "{count} exercício novo",
+    other: "{count} exercícios novos",
+  },
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "buy.title": "다음에 살 것",
+  "buy.got": "샀어요",
+  "buy.have": "있어요",
+  "buy.note": "가진 원판, 장비, 드는 무게를 바탕으로 했어요. 광고나 협찬 추천은 없어요.",
+  "buy.pair": "{w} 원판 한 쌍: {why}.",
+  "buy.sep": "; ",
+  "buy.jumps": "{from} 대신 {to} 단위로 올릴 수 있어서 프레스처럼 더디게 느는 운동도 계속 발전해요",
+  "buy.more": {
+    other: "{hi}까지 올릴 수 있는 무게가 {count}개 더 생겨요",
+  },
+  "buy.room": "현재 한계 {max} 이상으로 여유",
+  "buy.kit": {
+    other: "{item}: 새 운동 동작 {count}개.",
+  },
+  "buy.kitMuscles": {
+    other: "{item}: {unlocks}, 그리고 근육 {count}곳에 처음으로 중량 운동 가능.",
+  },
+  "buy.newEx": {
+    other: "새 운동 동작 {count}개",
+  },
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "buy.title": "Sırada ne alınır",
+  "buy.got": "Aldım",
+  "buy.have": "Bende var",
+  "buy.note": "Plakalarına, ekipmanına ve kaldırdığın ağırlıklara göre. Reklam ya da sponsorlu öneri yok.",
+  "buy.pair": "Bir çift {w} plaka: {why}.",
+  "buy.sep": "; ",
+  "buy.jumps": "{from} yerine {to} artışlar, böylece press gibi yavaş ilerleyen hareketler ilerlemeye devam eder",
+  "buy.more": {
+    one: "{hi} değerine kadar takabileceğin {count} ağırlık daha",
+    other: "{hi} değerine kadar takabileceğin {count} ağırlık daha",
+  },
+  "buy.room": "şu anki {max} sınırının ötesine geçme imkânı",
+  "buy.kit": {
+    one: "{item}: {count} yeni egzersiz.",
+    other: "{item}: {count} yeni egzersiz.",
+  },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks} ve {count} kas için ilk ağırlıklı çalışma.",
+    other: "{item}: {unlocks} ve {count} kas için ilk ağırlıklı çalışma.",
+  },
+  "buy.newEx": {
+    one: "{count} yeni egzersiz",
+    other: "{count} yeni egzersiz",
+  },
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "buy.title": "Co kupić w następnej kolejności",
+  "buy.got": "Kupione",
+  "buy.have": "Mam to",
+  "buy.note": "Na podstawie Twoich talerzy, sprzętu i ciężarów, które podnosisz. Bez reklam i sponsorowanych propozycji.",
+  "buy.pair": "Para talerzy {w}: {why}.",
+  "buy.sep": "; ",
+  "buy.jumps": "skoki co {to} zamiast {from}, więc wolno rosnące ćwiczenia, jak wyciskanie nad głowę, dalej idą do przodu",
+  "buy.more": {
+    one: "{count} ciężar więcej, który możesz założyć, do {hi}",
+    few: "{count} ciężary więcej, które możesz założyć, do {hi}",
+    many: "{count} ciężarów więcej, które możesz założyć, do {hi}",
+    other: "{count} ciężaru więcej, który możesz założyć, do {hi}",
+  },
+  "buy.room": "zapas ponad Twój obecny limit {max}",
+  "buy.kit": {
+    one: "{item}: {count} nowe ćwiczenie.",
+    few: "{item}: {count} nowe ćwiczenia.",
+    many: "{item}: {count} nowych ćwiczeń.",
+    other: "{item}: {count} nowego ćwiczenia.",
+  },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks} oraz pierwsza praca z obciążeniem dla {count} mięśnia.",
+    few: "{item}: {unlocks} oraz pierwsza praca z obciążeniem dla {count} mięśni.",
+    many: "{item}: {unlocks} oraz pierwsza praca z obciążeniem dla {count} mięśni.",
+    other: "{item}: {unlocks} oraz pierwsza praca z obciążeniem dla {count} mięśnia.",
+  },
+  "buy.newEx": {
+    one: "{count} nowe ćwiczenie",
+    few: "{count} nowe ćwiczenia",
+    many: "{count} nowych ćwiczeń",
+    other: "{count} nowego ćwiczenia",
+  },
+};

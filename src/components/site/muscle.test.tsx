@@ -63,12 +63,12 @@ describe("best exercises for each muscle", () => {
     }
   });
 
-  it("puts every copy in the sitemap with all six languages, and gives each its card", () => {
+  it("puts every copy in the sitemap with all ten languages, and gives each its card", () => {
     const routes = new Map(siteRoutes().map((r) => [r.path, r]));
     for (const path of ["/muscles/", ...pageMuscles().map(musclePath)])
       for (const lang of SITE_LANGS) {
         const r = routes.get(localPath(lang, path));
-        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(7);
+        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(11);
       }
     expect(ogFile("/ja/muscles/chest/")).toBe(ogFile("/muscles/chest/"));
     expect(pageMuscles().length).toBe(MUSCLES.filter((m) => bestFor(m).length).length);
@@ -82,13 +82,16 @@ describe("best exercises for each muscle", () => {
     expect(screen.getAllByText("A staple most gyms can do").length).toBeGreaterThan(0);
   });
 
-  it("draws every muscle in every language without a missing line", () => {
-    for (const lang of SITE_LANGS)
-      for (const m of pageMuscles()) {
-        const { container } = render(<MuscleView lang={lang} slug={musclePath(m).split("/")[2]!} />);
-        expect(container.textContent, `${lang} ${m}`).not.toMatch(/\{\w+\}|undefined/);
-        cleanup();
-      }
+  // One test per language: drawing every muscle in all ten languages at once outgrew the 20 s limit under coverage.
+  it.each(SITE_LANGS)("draws every muscle in %s without a missing line", (lang) => {
+    for (const m of pageMuscles()) {
+      const { container } = render(<MuscleView lang={lang} slug={musclePath(m).split("/")[2]!} />);
+      expect(container.textContent, `${lang} ${m}`).not.toMatch(/\{\w+\}|undefined/);
+      cleanup();
+    }
+  });
+
+  it("draws the muscles index", () => {
     render(<MusclesIndexView lang="it" />);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(MUSCLE_TEXT.it.index.h1);
   });

@@ -452,7 +452,7 @@ export const emails: Record<string, Words> = {
     title: "¿Sabías que…? Que hable a tu manera",
     intro: "Pequeños detalles que hacen que la app se sienta tuya.",
     points: [
-      "Elige un idioma distinto al de tu teléfono: hay seis.",
+      "Elige un idioma distinto al de tu teléfono: hay diez.",
       "Kilos o libras, y cada gimnasio puede usar los suyos para sus discos.",
       "La frase del día en Hoy se puede desactivar.",
       "Vuelve a hacer la configuración desde Ajustes si ha cambiado tu objetivo, tu experiencia o tu gimnasio.",
@@ -689,7 +689,7 @@ export const emails: Record<string, Words> = {
       "Oscuro, claro o igual que el teléfono.",
       "Gana temas y acentos con tus logros.",
       "En los teléfonos, un icono de la app con los colores de tu tema.",
-      "Seis idiomas, distintos al de tu teléfono si quieres.",
+      "Diez idiomas, distintos al de tu teléfono si quieres.",
     ],
     dyk: "Con el aspecto en claro, un tema solo cambia el color de acento.",
   },
@@ -814,5 +814,29 @@ export const emails: Record<string, Words> = {
       "Cada uno tiene Empezar, así el entrenamiento de hoy está a un toque.",
     ],
     dyk: "Toca el widget de Recuperación para abrir el mapa de recuperación en la app.",
+  },
+  "screenshot-share": {
+    title: "Haz una captura y llévate una tarjeta para compartir",
+    intro:
+      "Haz una captura de Liftsmith y aparece una hoja con tarjetas de tu entrenamiento, listas para compartir con tu enlace de invitación.",
+    points: [
+      "Elige el último mes, tres meses, seis meses, el año o desde siempre.",
+      "Desliza entre totales, en qué se fueron tus series y tus mejores levantamientos.",
+      "Toca el ojo para ocultar todos los pesos.",
+      "¿Hoy no? Deslízala hacia abajo o desactívala en Ajustes › Tus datos y privacidad.",
+      "Sin captura: Compartir mi entrenamiento, en Progreso, abre las mismas tarjetas.",
+    ],
+    dyk: "Cada enlace que compartes, de rutinas a gimnasios, lleva ahora tu invitación, en un enlace que dice invite.",
+  },
+  "form-cues": {
+    title: "Errores comunes y cómo corregirlos",
+    intro: "Cada ejercicio y estiramiento muestra ahora sus dos o tres errores de técnica más comunes, justo al lado de la figura 3D.",
+    points: [
+      "Cada uno dice cómo se ve, qué hacer en su lugar y por qué importa.",
+      "Están en Cómo se hace durante el entrenamiento, en la página de cada ejercicio y en cada estiramiento.",
+      "Entre series, el temporizador de descanso te muestra uno para la próxima serie, distinto cada vez.",
+      "Forman parte de la app, así que funcionan sin cobertura y en todos los idiomas.",
+    ],
+    dyk: "¿Prefieres no verlos en el descanso? Desactiva Revisar la técnica al descansar en Ajustes › Entrenamiento.",
   },
 };

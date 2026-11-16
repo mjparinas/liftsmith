@@ -202,6 +202,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "form-mistakes",
+        name: "Common mistakes and their fixes",
+        body: "Every exercise and stretch lists its two or three most common form mistakes beside the 3D figure, each with a fix and why it matters, and the rest timer shows one to watch on your next set. Works offline.",
+        tier: "free",
+        added: "2026-11-16",
+      },
+      {
         id: "set-types",
         name: "Drop sets and rest-pause",
         body: "Add a drop set or a rest-pause set between sets.",
@@ -642,6 +649,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-10",
       },
+      {
+        id: "screenshot-share",
+        name: "Share cards when you take a screenshot",
+        body: "Take a screenshot and a sheet of training cards slides up: your last month, three months, six months, year or all time, as totals, where your sets went or your best lifts. Swipe through, hide the weights with the eye, and share with your invite link printed on the card. The same cards are under Share my training on Progress. Every link you share now carries your invite, in a link that says so.",
+        tier: "free",
+        note: "Screenshots open it on Android 14 and up and on iPhone, and it can be turned off. Elsewhere, open it from Progress. Lifters under 18 share without an invite link.",
+        added: "2026-11-16",
+      },
     ],
   },
   {
@@ -926,10 +941,10 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     features: [
       {
         id: "languages",
-        name: "Six languages",
-        body: "English, Spanish, French, German, Italian and Japanese, following your phone's language.",
+        name: "Ten languages",
+        body: "English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, following your phone's language.",
         tier: "free",
-        added: "2026-11-10",
+        added: "2026-11-15",
       },
       {
         id: "appearance",

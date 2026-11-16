@@ -473,7 +473,7 @@ export const emails: Record<string, Words> = {
     title: "Did you know? Make it read your way",
     intro: "Little things that make the app feel like yours.",
     points: [
-      "Pick a language other than your phone's: there are six.",
+      "Pick a language other than your phone's: there are ten.",
       "Kilograms or pounds, and each gym can use its own for its plates.",
       "The daily quote on Today can be switched off.",
       "Run setup again from Settings if your goal, experience or gym has changed.",
@@ -710,7 +710,7 @@ export const emails: Record<string, Words> = {
       "Dark, light or match your phone.",
       "Earn themes and accents from your achievements.",
       "On the phones, an app icon in your theme's colours.",
-      "Six languages, separate from your phone's if you like.",
+      "Ten languages, separate from your phone's if you like.",
     ],
     dyk: "With Appearance on light, a theme changes the accent colour only.",
   },
@@ -834,5 +834,28 @@ export const emails: Record<string, Words> = {
       "Each has Start, so today's workout is one tap away.",
     ],
     dyk: "Tap the Recovery widget to open the recovery map in the app.",
+  },
+  "screenshot-share": {
+    title: "Take a screenshot, get a card worth sharing",
+    intro: "Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.",
+    points: [
+      "Pick your last month, three months, six months, year or all time.",
+      "Swipe through totals, where your sets went and your best lifts.",
+      "Tap the eye to hide every weight.",
+      "Not today? Swipe it away, or turn it off in Settings › Your data and privacy.",
+      "No screenshot needed: Share my training on Progress opens the same cards.",
+    ],
+    dyk: "Every link you share, from routines to gyms, now carries your invite, in a link that says invite.",
+  },
+  "form-cues": {
+    title: "Common mistakes, and the fix",
+    intro: "Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.",
+    points: [
+      "Each one says what it looks like, what to do instead and why it matters.",
+      "Find them in How to during a workout, on each exercise's page and on every stretch.",
+      "Between sets, the rest timer shows one to watch on your next set, a different one each set.",
+      "They're part of the app, so they work with no signal, in every language.",
+    ],
+    dyk: "Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout.",
   },
 };

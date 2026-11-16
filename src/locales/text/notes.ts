@@ -34,3 +34,23 @@ export const ja: Partial<Record<Key, Message>> = {
   "notes.title": "コーチのメモ",
   "notes.done": "完了。今日のプランを更新しました",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "notes.title": "Notas do coach",
+  "notes.done": "Pronto. O plano de hoje foi atualizado",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "notes.title": "코치 노트",
+  "notes.done": "완료. 오늘 계획을 업데이트했어요",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "notes.title": "Koç notları",
+  "notes.done": "Tamam. Bugünün planı güncellendi",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "notes.title": "Notatki trenera",
+  "notes.done": "Gotowe. Dzisiejszy plan jest zaktualizowany",
+};

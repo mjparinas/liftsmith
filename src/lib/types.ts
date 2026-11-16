@@ -254,6 +254,8 @@ export interface Profile {
   calendar?: CalendarPrefs;
   /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
   lean?: boolean;
+  /** Share cards when a screenshot is taken (StatsShare.tsx); on unless turned off (Settings › Your data and privacy). */
+  shotShare?: boolean;
   /** Battery saver for the 3D figures: lower resolution and frame rate (Settings, src/lib/liteDemos.ts). */
   liteDemos?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
@@ -467,6 +469,8 @@ export interface DelightPrefs {
   ghost?: boolean;
   /** Show only the plates to add or take off between sets. On unless turned off. */
   plateMemory?: boolean;
+  /** One common form mistake for the next set on the rest timer (formFaults.ts). On unless turned off. */
+  formCheck?: boolean;
   /** A breathing guide or a mini-game on the rest timer. Off by default. */
   restExtra?: "breathe" | "game" | "off";
   /** The breathing guide's pattern (`breathing.ts`). Box breathing unless picked. */

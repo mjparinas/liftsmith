@@ -52,3 +52,35 @@ export const ja: Partial<Record<Key, Message>> = {
   "sband.novice": "初級",
   "sband.start": "入門",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "sband.elite": "Elite",
+  "sband.advanced": "Avançado",
+  "sband.intermediate": "Intermediário",
+  "sband.novice": "Novato",
+  "sband.start": "Começando",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "sband.elite": "엘리트",
+  "sband.advanced": "상급",
+  "sband.intermediate": "중급",
+  "sband.novice": "초급",
+  "sband.start": "입문",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "sband.elite": "Elit",
+  "sband.advanced": "İleri",
+  "sband.intermediate": "Orta",
+  "sband.novice": "Acemi",
+  "sband.start": "Yeni başlayan",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "sband.elite": "Elita",
+  "sband.advanced": "Zaawansowany",
+  "sband.intermediate": "Średniozaawansowany",
+  "sband.novice": "Nowicjusz",
+  "sband.start": "Początkujący",
+};

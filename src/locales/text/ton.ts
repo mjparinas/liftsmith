@@ -94,3 +94,63 @@ export const ja: Partial<Record<Key, Message>> = {
   "ton.million": "100万キログラム",
   "ton.eiffel": "エッフェル塔の鉄骨",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "ton.piano": "um piano de cauda",
+  "ton.car": "um carro de família",
+  "ton.elephant": "um elefante africano",
+  "ton.trex": "um T. rex",
+  "ton.bus": "um ônibus de dois andares",
+  "ton.humpback": "uma baleia-jubarte",
+  "ton.tank": "um tanque de guerra",
+  "ton.bluewhale": "uma baleia-azul",
+  "ton.liberty": "a Estátua da Liberdade",
+  "ton.iss": "a Estação Espacial Internacional",
+  "ton.million": "um milhão de quilos",
+  "ton.eiffel": "o ferro da Torre Eiffel",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "ton.piano": "그랜드 피아노",
+  "ton.car": "패밀리카",
+  "ton.elephant": "아프리카코끼리",
+  "ton.trex": "티라노사우루스",
+  "ton.bus": "2층 버스",
+  "ton.humpback": "혹등고래",
+  "ton.tank": "전차",
+  "ton.bluewhale": "흰긴수염고래",
+  "ton.liberty": "자유의 여신상",
+  "ton.iss": "국제우주정거장",
+  "ton.million": "100만 킬로그램",
+  "ton.eiffel": "에펠탑의 철골",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "ton.piano": "bir kuyruklu piyano",
+  "ton.car": "bir aile arabası",
+  "ton.elephant": "bir Afrika fili",
+  "ton.trex": "bir T. rex",
+  "ton.bus": "bir çift katlı otobüs",
+  "ton.humpback": "bir kambur balina",
+  "ton.tank": "bir savaş tankı",
+  "ton.bluewhale": "bir mavi balina",
+  "ton.liberty": "Özgürlük Heykeli",
+  "ton.iss": "Uluslararası Uzay İstasyonu",
+  "ton.million": "bir milyon kilogram",
+  "ton.eiffel": "Eyfel Kulesi'nin demiri",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "ton.piano": "fortepian",
+  "ton.car": "samochód rodzinny",
+  "ton.elephant": "słoń afrykański",
+  "ton.trex": "tyranozaur",
+  "ton.bus": "autobus piętrowy",
+  "ton.humpback": "humbak",
+  "ton.tank": "czołg",
+  "ton.bluewhale": "płetwal błękitny",
+  "ton.liberty": "Statua Wolności",
+  "ton.iss": "Międzynarodowa Stacja Kosmiczna",
+  "ton.million": "milion kilogramów",
+  "ton.eiffel": "żelazo wieży Eiffla",
+};

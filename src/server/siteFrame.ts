@@ -7,6 +7,7 @@
 import { ICON_PATHS, type IconName } from "@/components/app/icons";
 import { navFor } from "@/components/site/nav";
 import { COMMIT } from "@/lib/build";
+import { cleanInvite, INVITE_PARAM } from "@/lib/inviteLink";
 import type { MsgLang } from "@/lib/messageText";
 import { APP_PATH, STORE_LINKS } from "@/lib/site";
 import { fill, localPath } from "@/lib/siteLang";
@@ -24,6 +25,10 @@ const CATALOG: Record<MsgLang, Partial<Record<PubKey, unknown>>> = {
   de: pub.de,
   it: pub.it,
   ja: pub.ja,
+  pt: pub.pt,
+  ko: pub.ko,
+  pl: pub.pl,
+  tr: pub.tr,
 };
 export const say = (lang: MsgLang, key: PubKey, vars: Record<string, string | number> = {}) =>
   String(CATALOG[lang][key] ?? pub.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => (k in vars ? String(vars[k]) : all));
@@ -229,3 +234,18 @@ padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgb(16 21 
 @media (min-width:960px){body{padding-bottom:0}.sticky{display:none}}
 @media (prefers-reduced-motion:no-preference){.btn,.badge{transition:filter .15s,border-color .15s}}
 @media (forced-colors:active){.card,.btn,.badge{border:1px solid CanvasText}}`;
+
+/**
+ * A page opened from a lifter's shared link that carries their invite (`?invite=<code>`, docs/decisions/growth.md "An
+ * invite in every link"): every link into the app on the page carries it on, and the Google Play badge asks Play to
+ * hand it to the app after install (the install referrer, invite.ts `inviteFromReferrer`). The page has no scripts and
+ * the site sets no cookies, so the links themselves carry it. Anything that isn't a code leaves the page as it was.
+ */
+export function withPageInvite(html: string, req: Request): string {
+  const code = cleanInvite(new URL(req.url).searchParams.get(INVITE_PARAM));
+  if (!code) return html;
+  const referrer = encodeURIComponent(`utm_source=invite&utm_campaign=${code}`);
+  return html
+    .replace(/href="\/app\/(#[^"]*)?"/g, (_all, hash: string | undefined) => `href="${APP_PATH}?${INVITE_PARAM}=${code}${hash ?? ""}"`)
+    .replace(/(href="https:\/\/play\.google\.com\/[^"]*?referrer=)[^"&]*/g, `$1${referrer}`);
+}

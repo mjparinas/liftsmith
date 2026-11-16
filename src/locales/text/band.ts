@@ -70,3 +70,47 @@ export const ja: Partial<Record<Key, Message>> = {
   "band.fatigued": "疲労",
   "band.fatigued.hint": "休養が必要",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "band.fresh": "Descansado",
+  "band.fresh.hint": "Totalmente recuperado",
+  "band.ready": "Pronto",
+  "band.ready.hint": "Pronto para treinar",
+  "band.recovering": "Em recuperação",
+  "band.recovering.hint": "Só trabalho leve",
+  "band.fatigued": "Cansado",
+  "band.fatigued.hint": "Precisa descansar",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "band.fresh": "상쾌함",
+  "band.fresh.hint": "완전히 회복됨",
+  "band.ready": "준비됨",
+  "band.ready.hint": "운동해도 좋음",
+  "band.recovering": "회복 중",
+  "band.recovering.hint": "가벼운 운동만",
+  "band.fatigued": "피로함",
+  "band.fatigued.hint": "휴식 필요",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "band.fresh": "Dinç",
+  "band.fresh.hint": "Tamamen toparlandı",
+  "band.ready": "Hazır",
+  "band.ready.hint": "Çalışmaya hazır",
+  "band.recovering": "Toparlanıyor",
+  "band.recovering.hint": "Sadece hafif çalışma",
+  "band.fatigued": "Yorgun",
+  "band.fatigued.hint": "Dinlenmeli",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "band.fresh": "Świeży",
+  "band.fresh.hint": "W pełni zregenerowany",
+  "band.ready": "Gotowy",
+  "band.ready.hint": "Można trenować",
+  "band.recovering": "Regeneruje się",
+  "band.recovering.hint": "Tylko lekka praca",
+  "band.fatigued": "Zmęczony",
+  "band.fatigued.hint": "Potrzebuje odpoczynku",
+};

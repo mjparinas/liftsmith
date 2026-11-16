@@ -58,3 +58,39 @@ export const ja: Partial<Record<Key, Message>> = {
   "callText.recover": "軽めの日",
   "callText.recover.blurb": "セットを1つ減らして少し軽めに。次回に向けて回復しましょう。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "callText.push": "Dia de forçar",
+  "callText.push.blurb": "Você está descansado. Uma rep mais perto da falha no seu primeiro exercício.",
+  "callText.normal": "Treinar como planejado",
+  "callText.normal.blurb": "Progresso constante em relação à última vez.",
+  "callText.recover": "Dia leve",
+  "callText.recover.blurb": "Uma série a menos e um degrau mais leve, para você se recuperar para a próxima.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "callText.push": "강하게 가는 날",
+  "callText.push.blurb": "컨디션이 좋아요. 첫 운동은 한계에 1회 더 가깝게 하세요.",
+  "callText.normal": "계획대로 운동",
+  "callText.normal.blurb": "지난번보다 꾸준히 발전해요.",
+  "callText.recover": "가벼운 날",
+  "callText.recover.blurb": "세트를 하나 줄이고 한 단계 가볍게 해서 다음을 위해 회복해요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "callText.push": "Yüklenme günü",
+  "callText.push.blurb": "Dinçsin. İlk hareketinde tükenişe bir tekrar daha yakın.",
+  "callText.normal": "Plana göre çalış",
+  "callText.normal.blurb": "Geçen seferden istikrarlı ilerleme.",
+  "callText.recover": "Hafif gün",
+  "callText.recover.blurb": "Bir set eksik ve bir kademe hafif; böylece bir sonraki sefere toparlanırsın.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "callText.push": "Dzień Mocniej",
+  "callText.push.blurb": "Pełna świeżość. W pierwszym ćwiczeniu o jedno powtórzenie bliżej upadku.",
+  "callText.normal": "Trenuj zgodnie z planem",
+  "callText.normal.blurb": "Równy postęp od ostatniego razu.",
+  "callText.recover": "Lżejszy dzień",
+  "callText.recover.blurb": "O jedną serię mniej i o stopień lżej, żeby zregenerować się na następny raz.",
+};

@@ -90,3 +90,58 @@ export const ja: Partial<Record<Key, Message>> = {
   "fix.variation": "近いバリエーションに替える",
   "fix.variation.what": "3週間似た種目を行ってから戻します。同じ筋肉を別の方法で鍛えます。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "fix.reset": "Recuar e reconstruir",
+  "fix.reset.what":
+    "Baixe o peso cerca de 10% e volte a subir nas próximas sessões. A maioria passa do recorde antigo em até três semanas.",
+  "fix.reps": "Mudar a faixa de reps",
+  "fix.reps.what": "Três semanas numa faixa de reps diferente. Um estímulo novo, com o peso calculado a partir da sua força atual.",
+  "fix.volume": "Mais séries por semana",
+  "fix.volume.what":
+    "Uma série extra cada vez que você fizer o exercício, por três semanas, para dar ao músculo mais trabalho para se adaptar.",
+  "fix.rest": "Descansar mais",
+  "fix.rest.what": "Um minuto a mais de descanso entre as séries por três semanas, para fazer cada série descansado.",
+  "fix.variation": "Trocar por uma variação próxima",
+  "fix.variation.what": "Três semanas num exercício parecido e depois de volta. Ele trabalha os mesmos músculos de outro jeito.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "fix.reset": "리셋 후 다시 쌓기",
+  "fix.reset.what": "무게를 약 10% 낮추고 다음 운동들에서 다시 올려요. 대부분 3주 안에 이전 최고 기록을 넘어요.",
+  "fix.reps": "반복 범위 바꾸기",
+  "fix.reps.what": "3주 동안 다른 반복 범위로 해요. 새로운 자극이고, 무게는 지금 근력에 맞춰 계산해요.",
+  "fix.volume": "주간 세트 늘리기",
+  "fix.volume.what": "3주 동안 할 때마다 세트를 하나 더 해서 근육이 적응할 일을 늘려요.",
+  "fix.rest": "더 오래 쉬기",
+  "fix.rest.what": "3주 동안 세트 사이에 1분 더 쉬어서 매 세트를 회복된 상태로 해요.",
+  "fix.variation": "비슷한 변형 동작으로 바꾸기",
+  "fix.variation.what": "3주 동안 비슷한 리프트를 한 뒤 다시 돌아와요. 같은 근육을 다른 방식으로 써요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "fix.reset": "Sıfırla ve yeniden kur",
+  "fix.reset.what": "Ağırlığı yaklaşık %10 düşür ve sonraki seanslarda yeniden yüksel. Çoğu sporcu üç hafta içinde eski rekorunu geçer.",
+  "fix.reps": "Tekrar aralığını değiştir",
+  "fix.reps.what": "Üç hafta farklı bir tekrar aralığında. Yeni bir uyaran; ağırlık şu anki kuvvetine göre hesaplanır.",
+  "fix.volume": "Haftada daha fazla set",
+  "fix.volume.what": "Üç hafta boyunca her yaptığında bir set fazla, kasa uyum sağlayacağı daha fazla iş vermek için.",
+  "fix.rest": "Daha uzun dinlen",
+  "fix.rest.what": "Üç hafta boyunca setler arasında bir dakika daha fazla dinlenme, böylece her set dinç yapılır.",
+  "fix.variation": "Yakın bir varyasyona geç",
+  "fix.variation.what": "Üç hafta benzer bir harekette, sonra geri dön. Aynı kasları farklı bir şekilde çalıştırır.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "fix.reset": "Zresetuj i odbuduj",
+  "fix.reset.what":
+    "Zmniejsz ciężar o ok. 10% i odbuduj go w kolejnych treningach. Większość osób przebija swój poprzedni rekord w ciągu trzech tygodni.",
+  "fix.reps": "Zmień zakres powtórzeń",
+  "fix.reps.what": "Trzy tygodnie w innym zakresie powtórzeń. Nowy bodziec, a ciężar wyliczony z twojej obecnej siły.",
+  "fix.volume": "Więcej serii w tygodniu",
+  "fix.volume.what": "Jedna dodatkowa seria za każdym razem przez trzy tygodnie, żeby mięsień miał więcej pracy do adaptacji.",
+  "fix.rest": "Dłuższe przerwy",
+  "fix.rest.what": "Minuta przerwy więcej między seriami przez trzy tygodnie, żeby każda seria była robiona na świeżo.",
+  "fix.variation": "Przejdź na podobny wariant",
+  "fix.variation.what": "Trzy tygodnie na podobnym ćwiczeniu, potem powrót. Pracują te same mięśnie, tylko inaczej.",
+};

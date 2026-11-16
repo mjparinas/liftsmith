@@ -454,7 +454,7 @@ export const emails: Record<string, Words> = {
     title: "Le saviez-vous ? Une app à votre façon",
     intro: "De petites choses qui rendent l'app vraiment vôtre.",
     points: [
-      "Choisissez une autre langue que celle du téléphone : il y en a six.",
+      "Choisissez une autre langue que celle du téléphone : il y en a dix.",
       "Kilos ou livres, et chaque salle peut utiliser les siens pour ses disques.",
       "La citation du jour sur Aujourd'hui peut être désactivée.",
       "Refaites la configuration depuis Réglages si votre objectif, votre niveau ou votre salle a changé.",
@@ -691,7 +691,7 @@ export const emails: Record<string, Words> = {
       "Sombre, clair ou comme le téléphone.",
       "Gagnez des thèmes et des couleurs d'accent grâce à vos succès.",
       "Sur les téléphones, une icône d'app aux couleurs de votre thème.",
-      "Six langues, différentes de celle du téléphone si vous voulez.",
+      "Dix langues, différentes de celle du téléphone si vous voulez.",
     ],
     dyk: "Avec l'apparence claire, un thème ne change que la couleur d'accent.",
   },
@@ -817,5 +817,30 @@ export const emails: Record<string, Words> = {
       "Chacun a Commencer, la séance du jour est donc à un toucher.",
     ],
     dyk: "Touchez le widget Récupération pour ouvrir la carte de récupération dans l’appli.",
+  },
+  "screenshot-share": {
+    title: "Une capture d’écran, une carte à partager",
+    intro:
+      "Faites une capture d’écran de Liftsmith et une feuille de cartes d’entraînement s’ouvre, prête à partager avec votre lien d’invitation.",
+    points: [
+      "Choisissez le dernier mois, trois mois, six mois, l’année ou depuis le début.",
+      "Faites défiler les totaux, la répartition de vos séries et vos meilleures charges.",
+      "Touchez l’œil pour masquer tous les poids.",
+      "Pas aujourd’hui ? Glissez-la vers le bas, ou désactivez-la dans Réglages › Vos données et confidentialité.",
+      "Sans capture : Partager mon entraînement, sur Progrès, ouvre les mêmes cartes.",
+    ],
+    dyk: "Chaque lien que vous partagez, des routines aux salles, porte désormais votre invitation, dans un lien qui dit invite.",
+  },
+  "form-cues": {
+    title: "Erreurs fréquentes et leurs corrections",
+    intro:
+      "Chaque exercice et chaque étirement liste désormais ses deux ou trois erreurs techniques les plus fréquentes, juste à côté de la silhouette 3D.",
+    points: [
+      "Chacune dit à quoi elle ressemble, quoi faire à la place et pourquoi c'est important.",
+      "Vous les trouverez dans Comment le faire pendant la séance, sur la page de chaque exercice et sur chaque étirement.",
+      "Entre les séries, le minuteur de repos en montre une pour la prochaine série, différente à chaque fois.",
+      "Elles font partie de l'app : elles fonctionnent sans réseau, dans toutes les langues.",
+    ],
+    dyk: "Vous préférez ne pas les voir pendant le repos ? Désactivez Points techniques pendant le repos dans Réglages › Séance.",
   },
 };

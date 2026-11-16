@@ -160,3 +160,106 @@ export const ja: Partial<Record<Key, Message>> = {
   "share.brokenBody": "コピーの際に途中で切れた可能性があります。もう一度送ってもらってください。",
   "share.try": "{brand}を試す",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "share.title": "Resumo de treino compartilhado",
+  "share.anon": "Alguém que treina com o {brand}",
+  "share.weekStreak": "Sequência de semanas",
+  "share.badges": "Insígnias",
+  "share.last12": "Últimas 12 semanas",
+  "share.bestLifts": "Melhores marcas (1RM estimado)",
+  "share.made": "Feito em {date}",
+  "share.copied": "Link copiado.",
+  "share.copyFail": "Não foi possível copiar. Selecione o link e copie.",
+  "share.myTraining": "Meus treinos no {brand}",
+  "share.intro":
+    "Envie aos amigos um link para o resumo dos seus treinos: nível, treinos, sequência, insígnias, melhores marcas e os dias em que você treinou nas últimas 12 semanas.",
+  "share.privacy":
+    "Ele nunca inclui frequência cardíaca, peso corporal, dados do ciclo, suas academias ou onde elas ficam. O resumo fica no próprio link, então nada é enviado; qualquer pessoa com o link pode ver.",
+  "share.withName": "Mostrar meu nome ({name})",
+  "share.noName": "Mostrar meu nome (adicione um nos Ajustes do app)",
+  "share.yourLink": "Seu link",
+  "share.copy": "Copiar link",
+  "share.share": "Compartilhar…",
+  "share.friends": "Seguir amigos e um feed compartilhado vêm com as contas.",
+  "share.broken": "Este link não funciona",
+  "share.brokenBody": "Ele pode ter sido cortado ao ser copiado. Peça para seu amigo enviar de novo.",
+  "share.try": "Experimente o {brand}",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "share.title": "공유된 트레이닝 요약",
+  "share.anon": "{brand} 사용자",
+  "share.weekStreak": "주간 연속 기록",
+  "share.badges": "배지",
+  "share.last12": "최근 12주",
+  "share.bestLifts": "최고 기록(추정 1RM)",
+  "share.made": "{date}에 만듦",
+  "share.copied": "링크를 복사했어요.",
+  "share.copyFail": "복사하지 못했어요. 링크를 선택해서 복사하세요.",
+  "share.myTraining": "나의 {brand} 트레이닝",
+  "share.intro": "친구에게 트레이닝 요약 링크를 보내세요: 레벨, 운동, 연속 기록, 배지, 최고 기록, 최근 12주 동안 운동한 날.",
+  "share.privacy":
+    "심박수, 체중, 생리 주기 데이터, 헬스장과 그 위치는 절대 포함되지 않아요. 요약은 링크 자체에 담겨 있어서 아무것도 업로드되지 않고, 링크가 있으면 누구나 볼 수 있어요.",
+  "share.withName": "내 이름 표시({name})",
+  "share.noName": "내 이름 표시(앱 설정에서 추가하세요)",
+  "share.yourLink": "내 링크",
+  "share.copy": "링크 복사",
+  "share.share": "공유…",
+  "share.friends": "친구 팔로우와 공유 피드는 계정이 있으면 쓸 수 있어요.",
+  "share.broken": "이 링크는 작동하지 않아요",
+  "share.brokenBody": "복사할 때 잘렸을 수 있어요. 친구에게 다시 보내 달라고 하세요.",
+  "share.try": "{brand} 써 보기",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "share.title": "Paylaşılan antrenman özeti",
+  "share.anon": "Bir {brand} sporcusu",
+  "share.weekStreak": "Haftalık seri",
+  "share.badges": "Rozetler",
+  "share.last12": "Son 12 hafta",
+  "share.bestLifts": "En iyi kaldırışlar (tahmini 1RM)",
+  "share.made": "Oluşturulma: {date}",
+  "share.copied": "Bağlantı kopyalandı.",
+  "share.copyFail": "Kopyalanamadı. Bağlantıyı seçip kopyala.",
+  "share.myTraining": "{brand} antrenmanım",
+  "share.intro":
+    "Arkadaşlarına antrenman özetinin bağlantısını gönder: seviye, antrenmanlar, seri, rozetler, en iyi kaldırışlar ve son 12 haftada antrenman yaptığın günler.",
+  "share.privacy":
+    "Nabız, vücut ağırlığı, döngü verileri, salonların ya da konumları asla dahil edilmez. Özet bağlantının kendisinde yer alır, yani hiçbir şey yüklenmez; bağlantıya sahip herkes onu görebilir.",
+  "share.withName": "Adımı göster ({name})",
+  "share.noName": "Adımı göster (uygulamanın Ayarlar bölümünden ekle)",
+  "share.yourLink": "Bağlantın",
+  "share.copy": "Bağlantıyı kopyala",
+  "share.share": "Paylaş…",
+  "share.friends": "Arkadaş takibi ve ortak akış hesaplarla gelir.",
+  "share.broken": "Bu bağlantı çalışmıyor",
+  "share.brokenBody": "Kopyalanırken kesilmiş olabilir. Arkadaşından yeniden göndermesini iste.",
+  "share.try": "{brand} uygulamasını dene",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "share.title": "Udostępnione podsumowanie treningów",
+  "share.anon": "Użytkownik {brand}",
+  "share.weekStreak": "Passa tygodni",
+  "share.badges": "Odznaki",
+  "share.last12": "Ostatnie 12 tygodni",
+  "share.bestLifts": "Najlepsze wyniki (szacowany 1RM)",
+  "share.made": "Utworzono {date}",
+  "share.copied": "Link skopiowany.",
+  "share.copyFail": "Nie udało się skopiować. Zaznacz link i skopiuj go.",
+  "share.myTraining": "Mój trening w {brand}",
+  "share.intro":
+    "Wyślij znajomym link do podsumowania treningów: poziom, treningi, passa, odznaki, najlepsze wyniki i dni, w które trenowałeś w ostatnich 12 tygodniach.",
+  "share.privacy":
+    "Nigdy nie zawiera tętna, masy ciała, danych o cyklu, twoich siłowni ani ich położenia. Podsumowanie jest zapisane w samym linku, więc nic nie jest wysyłane; każdy, kto ma link, może je zobaczyć.",
+  "share.withName": "Pokaż moje imię ({name})",
+  "share.noName": "Pokaż moje imię (dodaj je w Ustawieniach aplikacji)",
+  "share.yourLink": "Twój link",
+  "share.copy": "Kopiuj link",
+  "share.share": "Udostępnij…",
+  "share.friends": "Obserwowanie znajomych i wspólny kanał są dostępne z kontem.",
+  "share.broken": "Ten link nie działa",
+  "share.brokenBody": "Mógł zostać ucięty przy kopiowaniu. Poproś znajomego, żeby wysłał go jeszcze raz.",
+  "share.try": "Wypróbuj {brand}",
+};

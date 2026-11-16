@@ -23,7 +23,18 @@ import { NEAR_HEAD, NEAR_STYLE, nearSection } from "./gymsNear";
 import { esc, framePage, icon } from "./siteFrame";
 
 export type GpKey = keyof typeof gp.en;
-const GP: Record<MsgLang, Partial<Record<GpKey, unknown>>> = { en: gp.en, es: gp.es, fr: gp.fr, de: gp.de, it: gp.it, ja: gp.ja };
+const GP: Record<MsgLang, Partial<Record<GpKey, unknown>>> = {
+  en: gp.en,
+  es: gp.es,
+  fr: gp.fr,
+  de: gp.de,
+  it: gp.it,
+  ja: gp.ja,
+  pt: gp.pt,
+  ko: gp.ko,
+  pl: gp.pl,
+  tr: gp.tr,
+};
 const EQ: Record<MsgLang, Partial<Record<string, unknown>>> = {
   en: equipment.en,
   es: equipment.es,
@@ -31,6 +42,10 @@ const EQ: Record<MsgLang, Partial<Record<string, unknown>>> = {
   de: equipment.de,
   it: equipment.it,
   ja: equipment.ja,
+  pt: equipment.pt,
+  ko: equipment.ko,
+  pl: equipment.pl,
+  tr: equipment.tr,
 };
 
 export const say = (lang: MsgLang, key: GpKey, vars: Record<string, string | number> = {}) =>
@@ -38,7 +53,18 @@ export const say = (lang: MsgLang, key: GpKey, vars: Record<string, string | num
 const equipName = (lang: MsgLang, e: Equipment) =>
   String(EQ[lang][`equipment.${e}`] ?? equipment.en[`equipment.${e}` as keyof typeof equipment.en] ?? e);
 
-const EX: Record<MsgLang, Partial<Record<string, unknown>>> = { en: ex.en, es: ex.es, fr: ex.fr, de: ex.de, it: ex.it, ja: ex.ja };
+const EX: Record<MsgLang, Partial<Record<string, unknown>>> = {
+  en: ex.en,
+  es: ex.es,
+  fr: ex.fr,
+  de: ex.de,
+  it: ex.it,
+  ja: ex.ja,
+  pt: ex.pt,
+  ko: ex.ko,
+  pl: ex.pl,
+  tr: ex.tr,
+};
 const exName = (lang: MsgLang, id: string) => {
   const m = EX[lang][`ex.${id}`] ?? (ex.en as Record<string, unknown>)[`ex.${id}`];
   return typeof m === "string" ? m : id;

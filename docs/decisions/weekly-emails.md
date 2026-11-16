@@ -4,7 +4,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 
 Melvin, 2026-11-15: "plan out a series of emails that we can send out on a weekly basis, that doesn't already duplicate the 8 days of getting started emails … should have enough content for 1 year … all emails should be relevant and full of content", then "there should be maybe a series of 'did you know' … features that users may not know about" and "if you find that we have more than enough content, add more to that list of 52".
 
-**Status: built** (Melvin approved the content on 2026-11-15: "execute"). The code is `src/server/weekly/`: `list.ts` is the send order and each email's tier, audience and screen; `text/<lang>.ts` holds the words in all six languages under the same ids; `send.ts` picks the next one and writes it; `reminders.ts` `schedule()` sends it from the daily job. The words that go out are the ones in `text/`; the list below is the approved plan they were written from, kept for the reasons behind each email.
+**Status: built** (Melvin approved the content on 2026-11-15: "execute"). The code is `src/server/weekly/`: `list.ts` is the send order and each email's tier, audience and screen; `text/<lang>.ts` holds the words in all ten languages under the same ids; `send.ts` picks the next one and writes it; `reminders.ts` `schedule()` sends it from the daily job. The words that go out are the ones in `text/`; the list below is the approved plan they were written from, kept for the reasons behind each email.
 
 **Keep it current** (rule in AGENTS.md, Email): when a brand-new feature a lifter would notice ships, append an email for it to the end of `WEEKLY` in `list.ts` with `fresh` set to the day it shipped, add its words to every `text/<lang>.ts`, take its screenshot (`ONLY=<id> node scripts/weekly-email-shots.mjs`), and add a short entry at the end of [The list](#the-list) below marked **New**. Or add a point to an existing email when it only extends one. `weekly.test.ts` fails when a language lacks an email, a line or a screenshot. New ones are sent before the rest of the queue (see "New features go first").
 
@@ -24,7 +24,7 @@ Where content was thin it was merged rather than stretched: cycle-aware readines
 - **New features go first:** an email with `fresh` set goes before the rest of the queue (oldest first), so everyone already in the series gets it as their next one. Someone who joins later gets it first too, which is fine: it's the newest thing.
 - **Who gets what** (`forAccount`, roles from `weeklyFacts` in `remindersDb.ts`): *Lifters*, everyone. *Coaches and trainers*: a coach account or anyone with a linked client (`coach_accounts`, `coach_links`), physios included. *Physios*: `coach_prefs.kind = 'physio'`. *School coaches*: an approved `school_coaches` row; they get the school email instead of the paid coaching ones. *Gym owners and staff*: an approved gym claim or a `gym_staff` row. Role emails sit in the list where they should land (C1 third, a gym email sixth, and so on), so they take the person's next weekly slot and their lifter emails move back a week. "Train with a coach, free" isn't sent to coaches, physios or school coaches. The coach plans email waits until the `coachPlans` flag is on. Accounts with no data for roles (no account linked) get the lifter emails only.
 - **Pro and free:** each email is Free, Pro, Free + Pro (`both`) or Labs. Pro, Free + Pro and Labs emails end with a line for this reader, from the Pro state the phone already sends: a free lifter gets "This is part of Pro: $6.99 a month or $39.99 a year, with no ads, ever.", a Pro lifter "This is part of your Pro." and someone in a trial "This is part of the Pro trial you're on." Labs emails add that Labs are experiments. The coach plans email has no such line (it has its own prices). Free emails have none. Until billing is live the phones report everyone as Pro, so nobody sees a price. The button always goes to the email's own screen ("See what Pro adds" on the Pro email for anyone without Pro), because Pro features are never hidden and their Pro tag opens the paywall.
-- **Look:** the branded template of Getting started (`brandedMail`), with a kicker, the title, one opening line, **three to five points** as a list, the Pro or Labs line, a **"Did you know?"** line with one lesser-known setting, the button, then the real screen in the reader's language. Six languages, Canadian English.
+- **Look:** the branded template of Getting started (`brandedMail`), with a kicker, the title, one opening line, **three to five points** as a list, the Pro or Labs line, a **"Did you know?"** line with one lesser-known setting, the button, then the real screen in the reader's language. Ten languages, Canadian English.
 - **Screenshots:** `scripts/weekly-email-shots.mjs` trains a demo lifter for two and a half weeks in the static build (like the Play capture), then opens each email's screen in each language and saves `public/email/<lang>/w/<id>.jpg`, 600 px wide. Screens several emails share scroll to the part each one is about (`SCROLL` in the script). The weekly test fails when a picture is missing. Emails about screens that need a signed-in account (coaching, physio, school teams, Friends, invites), the gym owners' emails and the public gym pages email (the website's page, not the app) and the coach plans email go without a picture (`shot: false` in `list.ts`), because the demo lifter has no account and a sign-in screen says nothing about the feature; the desktop email is taken at desktop size, 900 px wide, and the gym finder email taps Add gym first to show its finder (`TAP` in the script).
 - **Words:** no other app is ever named (the import email says "most popular lifting apps"; the test checks every language against the comparison pages' list of names), and programs keep our own names (the four-week training-max program is "Training max waves", never its trademarked name). No promises the app doesn't keep.
 - **Not data-driven:** the server has no yearly totals, so W51 (the anniversary) explains the anniversary card rather than quoting numbers, and W52 is about how to keep up with what's new rather than listing it. Nothing new is sent to the server for this series.
@@ -435,7 +435,7 @@ Your app, your look.
 - Dark, light or match your phone.
 - Earned themes and accents from your achievements.
 - On the phones, an app icon in your theme's colours.
-- Six languages, separate from your phone's if you like.
+- Ten languages, separate from your phone's if you like.
 Did you know? The daily quote on Today can be switched off.
 
 ### W46 · Comfortable for everyone
@@ -685,3 +685,22 @@ Beside the Today widget, two more answer a question at a glance: am I on track t
 - Recovery updates itself as muscles recover, even with the app closed, without draining the battery.
 - Each has Start, so today's workout is one tap away.
 Did you know? Tap the Recovery widget to open the recovery map in the app.
+
+### W61 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
+Free · Lifters · Screen: Progress · `fresh`, so it goes next to everyone already in the series
+Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.
+- Pick your last month, three months, six months, year or all time.
+- Swipe through totals, where your sets went and your best lifts.
+- Tap the eye to hide every weight.
+- Not today? Swipe it away, or turn it off in Settings › Your data and privacy.
+- No screenshot needed: Share my training on Progress opens the same cards.
+Did you know? Every link you share, from routines to gyms, now carries your invite, in a link that says invite. ([Sharing](sharing.md))
+
+### W62 · Common mistakes, and the fix (**New**, 2026-11-16)
+Free · Lifters · Screen: the back squat's exercise page, at Common mistakes · `fresh`, so it goes next to everyone already in the series
+Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.
+- Each one says what it looks like, what to do instead and why it matters.
+- Find them in How to during a workout, on each exercise's page and on every stretch.
+- Between sets, the rest timer shows one to watch on your next set, a different one each set.
+- They're part of the app, so they work with no signal, in every language.
+Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))

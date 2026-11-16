@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">Nenhum treino em andamento</string>
+    <string id="NoneBody">Comece um no celular e ele aparece aqui.</string>
+    <string id="Rest">Descanso</string>
+    <string id="Next">Próxima: $1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START: registrar série</string>
+    <string id="HintAdd">DOWN: +30 s</string>
+</strings>

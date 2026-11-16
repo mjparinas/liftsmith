@@ -202,3 +202,201 @@ export const ja: Partial<Record<Key, Message>> = {
   "imp.bodyDone": { other: "体重{count}回とサイズ{measures}件を読み込みました。" },
   "imp.bodyAlready": "これらの記録はすでにあります。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "imp.tooBig": "Esse arquivo é grande demais para importar (mais de 20 MB).",
+  "imp.notExport":
+    "Esse arquivo não parece uma exportação do Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ou Liftsmith, nem um arquivo de peso corporal ou medidas.",
+  "imp.done": {
+    one: "{count} treino importado com {sets} séries.",
+    other: "{count} treinos importados com {sets} séries.",
+  },
+  "imp.already": "Esses treinos já estão aqui.",
+  "imp.fileLabel": "Arquivo CSV para importar",
+  "imp.button": "Importar de outro app (CSV)",
+  "imp.note":
+    "Treinos do Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ou de uma exportação do Liftsmith, ou peso corporal e medidas do Hevy, FitNotes ou de um app de balança. O arquivo é lido neste aparelho e nunca é enviado.",
+  "imp.title": "Importar de {source}",
+  "imp.summary": {
+    one: "{count} treino, {sets} séries",
+    other: "{count} treinos, {sets} séries",
+  },
+  "imp.skipped": {
+    one: "{count} linha deixada de fora (timers de descanso ou séries vazias)",
+    other: "{count} linhas deixadas de fora (timers de descanso ou séries vazias)",
+  },
+  "imp.again": "Treinos que você já importou antes são pulados.",
+  "imp.unit": "Os pesos neste arquivo estão em",
+  "imp.exercises": "Exercícios",
+  "imp.check": "Confira cada um. “Adicionar como meu exercício” cria um exercício personalizado com esse nome.",
+  "imp.custom": "Adicionar como meu exercício",
+  "imp.import": "Importar",
+  "imp.cancel": "Cancelar",
+  "imp.routines": "Salvar suas rotinas também",
+  "imp.routinesHint": "Treinos que você fez com o mesmo nome mais de uma vez viram rotinas: {names}.",
+  "imp.routinesDone": {
+    one: "{count} rotina salva.",
+    other: "{count} rotinas salvas.",
+  },
+  "imp.bodyTitle": "Importar peso corporal e medidas",
+  "imp.bodySummary": {
+    one: "{count} pesagem, {measures} medidas",
+    other: "{count} pesagens, {measures} medidas",
+  },
+  "imp.bodyAgain": "Dias que já têm uma pesagem ou essa medida mantêm a sua.",
+  "imp.bodyDone": {
+    one: "{count} pesagem e {measures} medidas importadas.",
+    other: "{count} pesagens e {measures} medidas importadas.",
+  },
+  "imp.bodyAlready": "Essas leituras já estão aqui.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "imp.tooBig": "파일이 너무 커서 가져올 수 없어요(20MB 초과).",
+  "imp.notExport":
+    "Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes, Liftsmith에서 내보낸 파일이나 체중 또는 신체 치수 파일이 아닌 것 같아요.",
+  "imp.done": {
+    other: "운동 {count}개, {sets}세트를 가져왔어요.",
+  },
+  "imp.already": "이미 있는 운동이에요.",
+  "imp.fileLabel": "가져올 CSV 파일",
+  "imp.button": "다른 앱에서 가져오기(CSV)",
+  "imp.note":
+    "Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes, Liftsmith 내보내기 파일의 운동, 또는 Hevy, FitNotes, 체중계 앱의 체중과 신체 치수를 가져와요. 파일은 이 기기에서 읽고 절대 업로드하지 않아요.",
+  "imp.title": "{source}에서 가져오기",
+  "imp.summary": {
+    other: "운동 {count}개, {sets}세트",
+  },
+  "imp.skipped": {
+    other: "{count}행 제외(휴식 타이머나 빈 세트)",
+  },
+  "imp.again": "전에 가져온 운동은 건너뛰어요.",
+  "imp.unit": "이 파일의 무게 단위",
+  "imp.exercises": "운동 동작",
+  "imp.check": "하나씩 확인하세요. “내 운동 동작으로 추가”를 누르면 그 이름으로 직접 만든 운동 동작이 생겨요.",
+  "imp.custom": "내 운동 동작으로 추가",
+  "imp.import": "가져오기",
+  "imp.cancel": "취소",
+  "imp.routines": "루틴도 저장",
+  "imp.routinesHint": "같은 이름으로 두 번 이상 한 운동은 루틴이 돼요: {names}.",
+  "imp.routinesDone": {
+    other: "루틴 {count}개를 저장했어요.",
+  },
+  "imp.bodyTitle": "체중과 신체 치수 가져오기",
+  "imp.bodySummary": {
+    other: "체중 기록 {count}개, 신체 치수 {measures}개",
+  },
+  "imp.bodyAgain": "이미 체중 기록이나 해당 치수가 있는 날은 기존 값을 유지해요.",
+  "imp.bodyDone": {
+    other: "체중 기록 {count}개와 신체 치수 {measures}개를 가져왔어요.",
+  },
+  "imp.bodyAlready": "이미 있는 기록이에요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "imp.tooBig": "Bu dosya içe aktarmak için çok büyük (20 MB'tan fazla).",
+  "imp.notExport":
+    "Bu dosya Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ya da Liftsmith dışa aktarımı veya bir vücut ağırlığı ya da ölçü dosyası gibi görünmüyor.",
+  "imp.done": {
+    one: "{sets} setle {count} antrenman içe aktarıldı.",
+    other: "{sets} setle {count} antrenman içe aktarıldı.",
+  },
+  "imp.already": "Bu antrenmanlar zaten burada.",
+  "imp.fileLabel": "İçe aktarılacak CSV dosyası",
+  "imp.button": "Başka bir uygulamadan içe aktar (CSV)",
+  "imp.note":
+    "Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ya da bir Liftsmith dışa aktarımından antrenmanlar; veya Hevy, FitNotes ya da bir tartı uygulamasından vücut ağırlığı ve ölçüler. Dosya bu cihazda okunur ve asla yüklenmez.",
+  "imp.title": "{source} kaynağından içe aktar",
+  "imp.summary": {
+    one: "{count} antrenman, {sets} set",
+    other: "{count} antrenman, {sets} set",
+  },
+  "imp.skipped": {
+    one: "{count} satır dışarıda bırakıldı (dinlenme sayaçları ya da boş setler)",
+    other: "{count} satır dışarıda bırakıldı (dinlenme sayaçları ya da boş setler)",
+  },
+  "imp.again": "Daha önce içe aktardığın antrenmanlar atlanır.",
+  "imp.unit": "Bu dosyadaki ağırlıkların birimi",
+  "imp.exercises": "Egzersizler",
+  "imp.check": "Her birini kontrol et. “Kendi egzersizim olarak ekle” o adla özel bir egzersiz oluşturur.",
+  "imp.custom": "Kendi egzersizim olarak ekle",
+  "imp.import": "İçe aktar",
+  "imp.cancel": "İptal",
+  "imp.routines": "Rutinlerini de kaydet",
+  "imp.routinesHint": "Aynı adla birden fazla kez yaptığın antrenmanlar rutin olur: {names}.",
+  "imp.routinesDone": {
+    one: "{count} rutin kaydedildi.",
+    other: "{count} rutin kaydedildi.",
+  },
+  "imp.bodyTitle": "Vücut ağırlığı ve ölçüleri içe aktar",
+  "imp.bodySummary": {
+    one: "{count} tartı, {measures} ölçü",
+    other: "{count} tartı, {measures} ölçü",
+  },
+  "imp.bodyAgain": "Zaten tartısı ya da o ölçüsü olan günlerde seninki kalır.",
+  "imp.bodyDone": {
+    one: "{count} tartı ve {measures} ölçü içe aktarıldı.",
+    other: "{count} tartı ve {measures} ölçü içe aktarıldı.",
+  },
+  "imp.bodyAlready": "Bu ölçümler zaten burada.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "imp.tooBig": "Ten plik jest za duży do importu (ponad 20 MB).",
+  "imp.notExport":
+    "Ten plik nie wygląda na eksport ze Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ani Liftsmith, ani na plik z masą ciała lub pomiarami.",
+  "imp.done": {
+    one: "Zaimportowano {count} trening (serie: {sets}).",
+    few: "Zaimportowano {count} treningi (serie: {sets}).",
+    many: "Zaimportowano {count} treningów (serie: {sets}).",
+    other: "Zaimportowano {count} treningu (serie: {sets}).",
+  },
+  "imp.already": "Te treningi już tu są.",
+  "imp.fileLabel": "Plik CSV do importu",
+  "imp.button": "Importuj z innej aplikacji (CSV)",
+  "imp.note":
+    "Treningi ze Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes lub eksportu Liftsmith albo masa ciała i pomiary z Hevy, FitNotes lub aplikacji wagi. Plik jest odczytywany na tym urządzeniu i nigdy nie jest wysyłany.",
+  "imp.title": "Import z {source}",
+  "imp.summary": {
+    one: "{count} trening, serie: {sets}",
+    few: "{count} treningi, serie: {sets}",
+    many: "{count} treningów, serie: {sets}",
+    other: "{count} treningu, serie: {sets}",
+  },
+  "imp.skipped": {
+    one: "Pominięto {count} wiersz (minutniki przerw lub puste serie)",
+    few: "Pominięto {count} wiersze (minutniki przerw lub puste serie)",
+    many: "Pominięto {count} wierszy (minutniki przerw lub puste serie)",
+    other: "Pominięto {count} wiersza (minutniki przerw lub puste serie)",
+  },
+  "imp.again": "Treningi zaimportowane wcześniej są pomijane.",
+  "imp.unit": "Ciężary w tym pliku są w",
+  "imp.exercises": "Ćwiczenia",
+  "imp.check": "Sprawdź każde. „Dodaj jako własne” tworzy własne ćwiczenie o tej nazwie.",
+  "imp.custom": "Dodaj jako własne ćwiczenie",
+  "imp.import": "Importuj",
+  "imp.cancel": "Anuluj",
+  "imp.routines": "Zapisz też swoje plany",
+  "imp.routinesHint": "Treningi zrobione więcej niż raz pod tą samą nazwą staną się planami: {names}.",
+  "imp.routinesDone": {
+    one: "Zapisano {count} plan.",
+    few: "Zapisano {count} plany.",
+    many: "Zapisano {count} planów.",
+    other: "Zapisano {count} planu.",
+  },
+  "imp.bodyTitle": "Importuj masę ciała i pomiary",
+  "imp.bodySummary": {
+    one: "{count} ważenie, pomiary: {measures}",
+    few: "{count} ważenia, pomiary: {measures}",
+    many: "{count} ważeń, pomiary: {measures}",
+    other: "{count} ważenia, pomiary: {measures}",
+  },
+  "imp.bodyAgain": "Dni, które mają już ważenie lub dany pomiar, zachowują twoje dane.",
+  "imp.bodyDone": {
+    one: "Zaimportowano {count} ważenie (pomiary: {measures}).",
+    few: "Zaimportowano {count} ważenia (pomiary: {measures}).",
+    many: "Zaimportowano {count} ważeń (pomiary: {measures}).",
+    other: "Zaimportowano {count} ważenia (pomiary: {measures}).",
+  },
+  "imp.bodyAlready": "Te odczyty już tu są.",
+};

@@ -135,6 +135,10 @@ export const it: FeaturesText = {
       name: "Dimostrazioni degli esercizi in 3D",
       body: "Ogni esercizio ha una figura 3D che mostra il movimento con la sua attrezzatura, con i passi di preparazione e i consigli.",
     },
+    "form-mistakes": {
+      name: "Errori comuni e come correggerli",
+      body: "Ogni esercizio e allungamento mostra i suoi due o tre errori tecnici più comuni accanto alla figura 3D, ognuno con la correzione e il perché conta, e il timer di recupero te ne mostra uno per la prossima serie. Funziona offline.",
+    },
     "set-types": { name: "Drop set e rest-pause", body: "Aggiungi un drop set o una serie rest-pause tra le serie." },
     "timed-sets": {
       name: "Timer per tenute, trasporti e cardio",
@@ -344,6 +348,11 @@ export const it: FeaturesText = {
       name: "Card e link da condividere",
       body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima. Un nuovo record si illumina d’oro e si condivide subito dal recupero.",
     },
+    "screenshot-share": {
+      name: "Card quando fai uno screenshot",
+      body: "Fai uno screenshot e compare un foglio con le card del tuo allenamento: l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre, come totali, come divisione delle serie o come migliori alzate. Scorrile, nascondi i pesi con l’occhio e condividile con il tuo link d’invito stampato sulla card. Le stesse card sono in Condividi il mio allenamento, in Progressi. Ogni link che condividi ora porta il tuo invito, in un link che lo dice.",
+      note: "Gli screenshot lo aprono su Android 14 e successivi e su iPhone, e si può disattivare. Altrove, aprilo da Progressi. Chi ha meno di 18 anni condivide senza link d’invito.",
+    },
     coaching: {
       name: "Segui i clienti",
       body: "Collega i clienti, vedi i loro risultati e assegna loro routine, sul telefono o su un grande schermo.",
@@ -479,8 +488,8 @@ export const it: FeaturesText = {
       body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
     },
     languages: {
-      name: "Sei lingue",
-      body: "Inglese, spagnolo, francese, tedesco, italiano e giapponese, secondo la lingua del telefono.",
+      name: "Dieci lingue",
+      body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono.",
     },
     appearance: {
       name: "Scuro, chiaro o come il telefono",

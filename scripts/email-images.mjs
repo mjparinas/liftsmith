@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import sharp from "sharp";
 
-const LANGS = ["en", "es", "fr", "de", "it", "ja"];
+const LANGS = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"];
 for (const lang of LANGS) {
   const from = lang === "en" ? "store/play/phone" : `store/play/phone-${lang}`;
   const out = `public/email/${lang}`;

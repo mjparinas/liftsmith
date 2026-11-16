@@ -146,3 +146,97 @@ export const ja: Partial<Record<Key, Message>> = {
   "dots.band.novice": "初級",
   "dots.band.beginner": "入門",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "dots.title": "Pontuação DOTS",
+  "dots.body":
+    "Seu total de agachamento, supino e terra ajustado pelo peso corporal, para comparar pessoas de qualquer tamanho. Calculado a partir dos seus máximos estimados.",
+  "dots.missing": "Precisa de um máximo estimado para {names}. Registre uma série pesada de cada, ou digite-os abaixo.",
+  "dots.total": "Total",
+  "dots.bw": "Peso corporal",
+  "dots.sex": "Fórmula",
+  "dots.male": "Masculina",
+  "dots.female": "Feminina",
+  "dots.calc": "Mudar os números",
+  "dots.reset": "Usar meus dados",
+  "dots.note":
+    "Máximos estimados, não levantamentos de competição. As faixas são uma referência aproximada: abaixo de 200 iniciante, 300 intermediário, 400 avançado, 500 elite.",
+  "dots.lift.squat": "Agachamento",
+  "dots.lift.bench": "Supino",
+  "dots.lift.deadlift": "Levantamento terra",
+  "dots.band.elite": "Elite",
+  "dots.band.advanced": "Avançado",
+  "dots.band.intermediate": "Intermediário",
+  "dots.band.novice": "Novato",
+  "dots.band.beginner": "Iniciante",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "dots.title": "DOTS 점수",
+  "dots.body": "스쿼트, 벤치, 데드리프트 합계를 체중에 맞게 환산해서 체격이 달라도 비교할 수 있어요. 추정 최대 중량으로 계산해요.",
+  "dots.missing": "{names}의 추정 최대 중량이 필요해요. 각각 무거운 세트를 기록하거나 아래에 입력하세요.",
+  "dots.total": "합계",
+  "dots.bw": "체중",
+  "dots.sex": "공식",
+  "dots.male": "남성용",
+  "dots.female": "여성용",
+  "dots.calc": "숫자 바꾸기",
+  "dots.reset": "내 데이터 사용",
+  "dots.note": "대회 기록이 아닌 추정 최대 중량이에요. 구간은 대략적인 기준이에요: 200 미만 입문, 300 중급, 400 상급, 500 엘리트.",
+  "dots.lift.squat": "스쿼트",
+  "dots.lift.bench": "벤치",
+  "dots.lift.deadlift": "데드리프트",
+  "dots.band.elite": "엘리트",
+  "dots.band.advanced": "상급",
+  "dots.band.intermediate": "중급",
+  "dots.band.novice": "초급",
+  "dots.band.beginner": "입문",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "dots.title": "DOTS puanı",
+  "dots.body":
+    "Squat, bench press ve deadlift toplamın vücut ağırlığına göre ölçeklenir; böylece her boydan sporcu karşılaştırılabilir. Tahmini maksimumlarından hesaplanır.",
+  "dots.missing": "{names} için tahmini maksimum gerekli. Her birinden ağır bir set kaydet ya da aşağıya gir.",
+  "dots.total": "Toplam",
+  "dots.bw": "Vücut ağırlığı",
+  "dots.sex": "Formül",
+  "dots.male": "Erkek",
+  "dots.female": "Kadın",
+  "dots.calc": "Sayıları değiştir",
+  "dots.reset": "Verilerimi kullan",
+  "dots.note":
+    "Yarışma kaldırışları değil, tahmini maksimumlar. Aralıklar kaba bir rehber: 200 altı başlangıç, 300 orta, 400 ileri, 500 elit.",
+  "dots.lift.squat": "Squat",
+  "dots.lift.bench": "Bench press",
+  "dots.lift.deadlift": "Deadlift",
+  "dots.band.elite": "Elit",
+  "dots.band.advanced": "İleri",
+  "dots.band.intermediate": "Orta",
+  "dots.band.novice": "Acemi",
+  "dots.band.beginner": "Başlangıç",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "dots.title": "Wynik DOTS",
+  "dots.body":
+    "Suma przysiadu, wyciskania na ławce i martwego ciągu przeliczona względem masy ciała, by można było porównać osoby każdej postury. Liczone z Twoich szacowanych maksów.",
+  "dots.missing": "Potrzebny szacowany 1RM dla: {names}. Zapisz ciężką serię każdego z nich lub wpisz je poniżej.",
+  "dots.total": "Suma",
+  "dots.bw": "Masa ciała",
+  "dots.sex": "Wzór",
+  "dots.male": "Męski",
+  "dots.female": "Żeński",
+  "dots.calc": "Zmień liczby",
+  "dots.reset": "Użyj moich danych",
+  "dots.note":
+    "Szacowane maksy, nie wyniki z zawodów. Przedziały to orientacyjna wskazówka: poniżej 200 początkujący, 300 średniozaawansowany, 400 zaawansowany, 500 elita.",
+  "dots.lift.squat": "Przysiad",
+  "dots.lift.bench": "Wyciskanie na ławce",
+  "dots.lift.deadlift": "Martwy ciąg",
+  "dots.band.elite": "Elita",
+  "dots.band.advanced": "Zaawansowany",
+  "dots.band.intermediate": "Średniozaawansowany",
+  "dots.band.novice": "Nowicjusz",
+  "dots.band.beginner": "Początkujący",
+};

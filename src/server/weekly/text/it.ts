@@ -453,7 +453,7 @@ export const emails: Record<string, Words> = {
     title: "Lo sapevi? Falla parlare a modo tuo",
     intro: "Piccole cose che rendono l'app davvero tua.",
     points: [
-      "Scegli una lingua diversa da quella del telefono: ce ne sono sei.",
+      "Scegli una lingua diversa da quella del telefono: ce ne sono dieci.",
       "Chili o libbre, e ogni palestra può usare la sua unità per i dischi.",
       "La citazione del giorno su Oggi si può disattivare.",
       "Rifai la configurazione da Impostazioni se il tuo obiettivo, la tua esperienza o la tua palestra sono cambiati.",
@@ -690,7 +690,7 @@ export const emails: Record<string, Words> = {
       "Scuro, chiaro o come il telefono.",
       "Guadagna temi e colori d'accento con i tuoi traguardi.",
       "Sui telefoni, un'icona dell'app nei colori del tuo tema.",
-      "Sei lingue, diverse da quella del telefono se vuoi.",
+      "Dieci lingue, diverse da quella del telefono se vuoi.",
     ],
     dyk: "Con l'aspetto chiaro, un tema cambia solo il colore d'accento.",
   },
@@ -815,5 +815,29 @@ export const emails: Record<string, Words> = {
       "Ognuno ha Inizia, così l'allenamento di oggi è a un tocco.",
     ],
     dyk: "Tocca il widget Recupero per aprire la mappa del recupero nell'app.",
+  },
+  "screenshot-share": {
+    title: "Fai uno screenshot, ottieni una card da condividere",
+    intro:
+      "Fai uno screenshot di Liftsmith e compare un foglio con le card del tuo allenamento, pronte da condividere con il tuo link d’invito.",
+    points: [
+      "Scegli l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre.",
+      "Scorri totali, divisione delle serie e migliori alzate.",
+      "Tocca l’occhio per nascondere tutti i pesi.",
+      "Non oggi? Scorrilo via, o disattivalo in Impostazioni › I tuoi dati e la privacy.",
+      "Senza screenshot: Condividi il mio allenamento, in Progressi, apre le stesse card.",
+    ],
+    dyk: "Ogni link che condividi, dalle routine alle palestre, ora porta il tuo invito, in un link che dice invite.",
+  },
+  "form-cues": {
+    title: "Errori comuni e come correggerli",
+    intro: "Ogni esercizio e allungamento ora mostra i suoi due o tre errori tecnici più comuni, proprio accanto alla figura 3D.",
+    points: [
+      "Ognuno dice com'è, cosa fare invece e perché conta.",
+      "Li trovi in Come si fa durante l'allenamento, nella pagina di ogni esercizio e in ogni allungamento.",
+      "Tra una serie e l'altra, il timer di recupero ne mostra uno per la prossima serie, diverso ogni volta.",
+      "Fanno parte dell'app, quindi funzionano senza campo e in ogni lingua.",
+    ],
+    dyk: "Preferisci non vederli durante il recupero? Disattiva Controlli tecnici durante il recupero in Impostazioni › Allenamento.",
   },
 };

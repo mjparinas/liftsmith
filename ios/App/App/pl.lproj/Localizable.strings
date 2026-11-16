@@ -1,0 +1,10 @@
+/* Polish text drawn by the app's own Swift code: Siri and Shortcuts actions, and the rest-over alert. Follows the phone's language. */
+"Start workout" = "Zacznij trening";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Otwiera Liftsmith i zaczyna dzisiejszy trening albo ten, który już trwa.";
+"Log set" = "Zapisz serię";
+"Logs the current set as planned. Does nothing when no workout is running." = "Zapisuje bieżącą serię zgodnie z planem. Nic nie robi, gdy żaden trening nie trwa.";
+"Add 30 seconds of rest" = "Dodaj 30 sekund przerwy";
+"Adds 30 seconds to the rest timer." = "Dodaje 30 sekund do minutnika przerwy.";
+"+30 s rest" = "+30 s przerwy";
+"Rest over" = "Koniec przerwy";
+"Up next: %@" = "Dalej: %@";

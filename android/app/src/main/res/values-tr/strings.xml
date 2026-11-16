@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">Antrenmana başla</string>
+    <string name="shortcut_start_long">Bugünün antrenmanına başla</string>
+    <string name="shortcut_log_short">Seti kaydet</string>
+    <string name="shortcut_log_long">Şu anki seti planlandığı gibi kaydet</string>
+    <string name="shortcut_rest_short">+30 s dinlenme</string>
+    <string name="shortcut_rest_long">Dinlenme sayacına 30 saniye ekle</string>
+    <string name="widget_description">Bugünün antrenmanı ve nedeni, haftalık hedefin ve koç notu, Başla düğmesiyle</string>
+    <string name="channel_live">Antrenman sürüyor</string>
+    <string name="channel_live_desc">Antrenman sırasında dinlenme sayacı, sıradaki set ve nabız</string>
+    <string name="rest_over">Dinlenme bitti</string>
+    <string name="next_prefix">Sıradaki:</string>
+    <string name="rest_left">%1$s dinlenme kaldı</string>
+    <string name="rest_left_next">%1$s kaldı · sıradaki: %2$s</string>
+    <string name="up_next">Sıradaki: %1$s</string>
+    <string name="add_30">+30 s</string>
+    <string name="widget_title">Bugünün antrenmanı</string>
+    <string name="widget_week_title">Bu hafta</string>
+    <string name="widget_week_description">Haftana bir bakışta: antrenman yaptığın günler, serin ve onu neyin sürdürdüğü, Başla ile</string>
+    <string name="widget_recovery_title">Toparlanma</string>
+    <string name="widget_recovery_description">Hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı, Başla ile</string>
+</resources>

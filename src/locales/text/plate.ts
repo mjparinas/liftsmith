@@ -59,3 +59,39 @@ export const ja: Partial<Record<Key, Message>> = {
   "plate.empty": "バーのみ",
   "plate.nearest": "付けられる最も近い重さ",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "plate.label": "Coloque {plates} {unit} de cada lado de uma barra de {bar} {unit}",
+  "plate.noPlates": "sem anilhas",
+  "plate.bar": "Barra de {bar} {unit}",
+  "plate.eachSide": "Cada lado:",
+  "plate.empty": "Barra vazia",
+  "plate.nearest": "o mais próximo que dá para montar",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "plate.label": "{bar} {unit} 바의 양쪽에 각각 {plates} {unit} 끼우기",
+  "plate.noPlates": "원판 없음",
+  "plate.bar": "{bar} {unit} 바",
+  "plate.eachSide": "한쪽당:",
+  "plate.empty": "빈 바",
+  "plate.nearest": "끼울 수 있는 가장 가까운 무게",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "plate.label": "{bar} {unit} barın her iki yanına {plates} {unit} tak",
+  "plate.noPlates": "plaka yok",
+  "plate.bar": "{bar} {unit} bar",
+  "plate.eachSide": "Her yana:",
+  "plate.empty": "Boş bar",
+  "plate.nearest": "takabileceğin en yakın ağırlık",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "plate.label": "Załóż {plates} {unit} z każdej strony sztangi {bar} {unit}",
+  "plate.noPlates": "bez talerzy",
+  "plate.bar": "Sztanga {bar} {unit}",
+  "plate.eachSide": "Z każdej strony:",
+  "plate.empty": "Pusta sztanga",
+  "plate.nearest": "najbliżej, ile się da załadować",
+};

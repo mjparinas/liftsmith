@@ -480,3 +480,328 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.delete.webSub": "ウェブサイトで登録した Pro のサブスクリプションも今すぐ終了し、今後請求されることはありません。",
   "account.signOut.backupPhotos": "写真入りのバックアップを保存",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "account.title": "Conta e sincronização",
+  "account.lead":
+    "Entre para fazer backup dos seus treinos e usá-los em todos os seus dispositivos: celular, tablet e web. É opcional, e tudo continua neste dispositivo também.",
+  "account.leadIn":
+    "Seus treinos, academias e ajustes sincronizam com sua conta sempre que você está online, então ficam seguros e em todo dispositivo em que você entrar.",
+  "account.signIn": "Entrar",
+  "account.yours": "Sua conta",
+  "account.apple": "Continuar com a Apple",
+  "account.google": "Continuar com o Google",
+  "account.emailButton": "Continuar com e-mail",
+  "account.agree": "Ao entrar, você concorda com os termos de uso e a política de privacidade.",
+  "account.emailNote":
+    "Entrar também ativa alguns e-mails: lembretes de treino, seu resumo semanal e dicas. Desative qualquer um deles em Ajustes ou pelo link em cada e-mail.",
+  "account.terms": "Termos de uso",
+  "account.privacy": "Política de privacidade",
+  "account.email.label": "Seu e-mail",
+  "account.email.send": "Me envie um código",
+  "account.email.sent": "Enviamos um código de seis dígitos para {email}. Ele vale por 10 minutos.",
+  "account.email.code": "Código",
+  "account.email.verify": "Entrar",
+  "account.email.again": "Usar outro e-mail",
+  "account.via.google": "Google",
+  "account.via.apple": "Apple",
+  "account.via.email": "e-mail",
+  "account.as": "Conectado como {email} com {via}.",
+  "account.asNoEmail": "Conectado com {via}.",
+  "account.syncing": "Sincronizando…",
+  "account.synced": "Sincronizado {when}.",
+  "account.justNow": "agora mesmo",
+  "account.notSynced": "Ainda não sincronizado. Sincroniza quando você estiver online.",
+  "account.waiting": {
+    one: "{count} alteração esperando para sincronizar.",
+    other: "{count} alterações esperando para sincronizar.",
+  },
+  "account.syncError": "Não foi possível conectar ao servidor. Vamos tentar de novo quando você estiver online.",
+  "account.syncFull":
+    "O armazenamento de sincronização da sua conta está cheio, então as novas alterações ficam neste dispositivo. Tudo aqui está seguro. Avise a gente em Enviar feedback, nos Ajustes.",
+  "account.syncNow": "Sincronizar agora",
+  "account.signOut": "Sair",
+  "account.signOutNote":
+    "Ao sair, suas alterações são salvas na sua conta e depois seus dados são apagados deste dispositivo, para que a próxima pessoa não veja nada. Entre de novo para ter tudo de volta.",
+  "account.signingOut": "Salvando suas alterações…",
+  "account.ended": {
+    one: "Você saiu da conta, e {count} alteração neste dispositivo nunca chegou à sua conta. Entre de novo para salvá-la, baixe um backup ou apague-a deste dispositivo.",
+    other:
+      "Você saiu da conta, e {count} alterações neste dispositivo nunca chegaram à sua conta. Entre de novo para salvá-las, baixe um backup ou apague-as deste dispositivo.",
+  },
+  "account.ended.erase": "Apagar meus dados deste dispositivo",
+  "account.signOut.unsynced": {
+    one: "{count} alteração ainda não chegou à sua conta, então sair agora a apagaria. Tente de novo quando estiver online, baixe um backup antes ou saia mesmo assim.",
+    other:
+      "{count} alterações ainda não chegaram à sua conta, então sair agora as apagaria. Tente de novo quando estiver online, baixe um backup antes ou saia mesmo assim.",
+  },
+  "account.signOut.retry": "Tentar de novo",
+  "account.signOut.backup": "Baixar um backup",
+  "account.signOut.anyway": "Sair mesmo assim",
+  "account.signOut.photos": {
+    one: "Você tem {count} foto de progresso neste dispositivo. As fotos nunca saem dele, então sair a apaga para sempre.",
+    other: "Você tem {count} fotos de progresso neste dispositivo. As fotos nunca saem dele, então sair as apaga para sempre.",
+  },
+  "account.signOut.photosConfirm": "Sair e apagar as fotos",
+  "account.delete": "Excluir minha conta",
+  "account.delete.warn":
+    "Isso exclui sua conta e a cópia dos seus dados no nosso servidor, para sempre. Este dispositivo mantém a própria cópia. Seus outros dispositivos saem da conta e mantêm as deles.",
+  "account.delete.confirm": "Excluir minha conta para sempre",
+  "account.lost":
+    "Você saiu da conta, então este dispositivo parou de sincronizar. Seus dados continuam aqui. Entre de novo para continuar sincronizando.",
+  "account.offline": "Você está offline. Conecte-se e tente de novo.",
+  "account.notReady": "As contas ainda não estão ativadas. Seus dados estão seguros neste dispositivo.",
+  "account.failed": "Não deu certo. Tente de novo.",
+  "account.what": "O que sincroniza",
+  "account.what.body":
+    "Seus treinos, séries, notas, peso corporal, academias, rotinas e ajustes, além de leituras de saúde, lesões e registros do ciclo, se você os usar. Os dados são seus: nunca são usados para anúncios ou análises. As fotos de progresso nunca saem deste dispositivo.",
+  "account.row": "Conta e sincronização",
+  "account.row.out": "Entre para fazer backup e sincronizar",
+  "account.row.in": "Conectado como {email}",
+  "account.delete.webSub": "Sua assinatura Pro do site também termina agora e não será cobrada de novo.",
+  "account.signOut.backupPhotos": "Salvar um backup com as fotos",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "account.title": "계정 및 동기화",
+  "account.lead":
+    "로그인하면 운동 기록을 백업하고 휴대폰, 태블릿, 웹 등 모든 기기에서 쓸 수 있어요. 선택 사항이며, 모든 데이터는 이 기기에도 그대로 남아요.",
+  "account.leadIn": "온라인일 때마다 운동, 헬스장, 설정이 계정에 동기화돼서 안전하게 보관되고 로그인한 모든 기기에서 볼 수 있어요.",
+  "account.signIn": "로그인",
+  "account.yours": "내 계정",
+  "account.apple": "Apple로 계속하기",
+  "account.google": "Google로 계속하기",
+  "account.emailButton": "이메일로 계속하기",
+  "account.agree": "로그인하면 이용약관과 개인정보 처리방침에 동의하게 돼요.",
+  "account.emailNote": "로그인하면 운동 알림, 주간 요약, 팁 등 몇 가지 이메일도 켜져요. 설정이나 각 이메일의 링크에서 언제든 끌 수 있어요.",
+  "account.terms": "이용약관",
+  "account.privacy": "개인정보 처리방침",
+  "account.email.label": "이메일",
+  "account.email.send": "이메일로 코드 받기",
+  "account.email.sent": "{email}(으)로 6자리 코드를 보냈어요. 10분 동안 유효해요.",
+  "account.email.code": "코드",
+  "account.email.verify": "로그인",
+  "account.email.again": "다른 이메일 사용",
+  "account.via.google": "Google",
+  "account.via.apple": "Apple",
+  "account.via.email": "이메일",
+  "account.as": "{via}(으)로 {email} 계정에 로그인했어요.",
+  "account.asNoEmail": "{via}(으)로 로그인했어요.",
+  "account.syncing": "동기화 중…",
+  "account.synced": "{when} 동기화됨.",
+  "account.justNow": "방금",
+  "account.notSynced": "아직 동기화되지 않았어요. 온라인이 되면 동기화돼요.",
+  "account.waiting": {
+    other: "변경 사항 {count}개가 동기화를 기다리고 있어요.",
+  },
+  "account.syncError": "서버에 연결할 수 없어요. 온라인이 되면 다시 시도해요.",
+  "account.syncFull":
+    "계정의 동기화 저장 공간이 가득 차서 새 변경 사항은 이 기기에만 저장돼요. 여기 있는 데이터는 모두 안전해요. 설정의 의견 보내기로 알려 주세요.",
+  "account.syncNow": "지금 동기화",
+  "account.signOut": "로그아웃",
+  "account.signOutNote":
+    "로그아웃하면 변경 사항을 계정에 저장한 뒤 이 기기에서 데이터를 지워서, 다음 사람은 아무것도 볼 수 없어요. 다시 로그인하면 모두 돌아와요.",
+  "account.signingOut": "변경 사항 저장 중…",
+  "account.ended": {
+    other:
+      "로그아웃되었고, 이 기기의 변경 사항 {count}개가 계정에 저장되지 못했어요. 다시 로그인해서 저장하거나, 백업을 다운로드하거나, 이 기기에서 지우세요.",
+  },
+  "account.ended.erase": "이 기기에서 내 데이터 지우기",
+  "account.signOut.unsynced": {
+    other:
+      "변경 사항 {count}개가 아직 계정에 저장되지 않아서 지금 로그아웃하면 지워져요. 온라인이 되면 다시 시도하거나, 먼저 백업을 다운로드하거나, 그래도 로그아웃하세요.",
+  },
+  "account.signOut.retry": "다시 시도",
+  "account.signOut.backup": "백업 다운로드",
+  "account.signOut.anyway": "그래도 로그아웃",
+  "account.signOut.photos": {
+    other: "이 기기에 진행 사진이 {count}장 있어요. 사진은 기기 밖으로 나가지 않아서 로그아웃하면 영구 삭제돼요.",
+  },
+  "account.signOut.photosConfirm": "로그아웃하고 사진 삭제",
+  "account.delete": "계정 삭제",
+  "account.delete.warn":
+    "계정과 서버에 있는 데이터 사본이 영구 삭제돼요. 이 기기는 자체 사본을 유지해요. 다른 기기는 로그아웃되고 각자의 사본을 유지해요.",
+  "account.delete.confirm": "계정 영구 삭제",
+  "account.lost": "로그아웃되어 이 기기의 동기화가 멈췄어요. 데이터는 그대로 있어요. 동기화를 계속하려면 다시 로그인하세요.",
+  "account.offline": "오프라인 상태예요. 연결한 뒤 다시 시도하세요.",
+  "account.notReady": "계정 기능이 아직 켜지지 않았어요. 데이터는 이 기기에 안전하게 있어요.",
+  "account.failed": "잘 안 됐어요. 다시 시도하세요.",
+  "account.what": "동기화되는 항목",
+  "account.what.body":
+    "운동, 세트, 메모, 체중, 헬스장, 루틴, 설정, 그리고 사용한다면 건강 측정값, 부상, 생리 주기 기록까지요. 내 데이터이니 광고나 분석에 절대 쓰이지 않아요. 진행 사진은 이 기기 밖으로 나가지 않아요.",
+  "account.row": "계정 및 동기화",
+  "account.row.out": "로그인해서 백업 및 동기화",
+  "account.row.in": "{email}(으)로 로그인됨",
+  "account.delete.webSub": "웹사이트에서 구독한 Pro도 지금 종료되며 더 이상 결제되지 않아요.",
+  "account.signOut.backupPhotos": "사진 포함 백업 저장",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "account.title": "Hesap ve eşitleme",
+  "account.lead":
+    "Antrenmanlarını yedeklemek ve tüm cihazlarında kullanmak için giriş yap: telefon, tablet ve web. İsteğe bağlı; her şey bu cihazda da kalır.",
+  "account.leadIn":
+    "Antrenmanların, salonların ve ayarların internete bağlı olduğun her an hesabınla eşitlenir; böylece güvende kalır ve giriş yaptığın her cihazda olur.",
+  "account.signIn": "Giriş yap",
+  "account.yours": "Hesabın",
+  "account.apple": "Apple ile devam et",
+  "account.google": "Google ile devam et",
+  "account.emailButton": "E-posta ile devam et",
+  "account.agree": "Giriş yaparak kullanım koşullarını ve gizlilik politikasını kabul etmiş olursun.",
+  "account.emailNote":
+    "Giriş yapınca birkaç e-posta da açılır: antrenman hatırlatıcıları, haftalık özetin ve ipuçları. Hepsini Ayarlar'dan ya da her e-postadaki bağlantıdan kapatabilirsin.",
+  "account.terms": "Kullanım koşulları",
+  "account.privacy": "Gizlilik politikası",
+  "account.email.label": "E-posta adresin",
+  "account.email.send": "Bana kod gönder",
+  "account.email.sent": "{email} adresine altı haneli bir kod gönderdik. 10 dakika geçerli.",
+  "account.email.code": "Kod",
+  "account.email.verify": "Giriş yap",
+  "account.email.again": "Başka bir e-posta kullan",
+  "account.via.google": "Google",
+  "account.via.apple": "Apple",
+  "account.via.email": "e-posta",
+  "account.as": "{email} olarak {via} ile giriş yapıldı.",
+  "account.asNoEmail": "{via} ile giriş yapıldı.",
+  "account.syncing": "Eşitleniyor…",
+  "account.synced": "Eşitlendi: {when}.",
+  "account.justNow": "az önce",
+  "account.notSynced": "Henüz eşitlenmedi. İnternete bağlanınca eşitlenir.",
+  "account.waiting": {
+    one: "{count} değişiklik eşitlenmeyi bekliyor.",
+    other: "{count} değişiklik eşitlenmeyi bekliyor.",
+  },
+  "account.syncError": "Sunucuya ulaşılamadı. İnternete bağlanınca yeniden denenecek.",
+  "account.syncFull":
+    "Hesabının eşitleme alanı dolu, bu yüzden yeni değişiklikler bu cihazda kalıyor. Buradaki her şey güvende. Ayarlar'daki Geri bildirim gönder ile bize haber ver.",
+  "account.syncNow": "Şimdi eşitle",
+  "account.signOut": "Çıkış yap",
+  "account.signOutNote":
+    "Çıkış yapınca değişikliklerin hesabına kaydedilir, ardından verilerin bu cihazdan silinir; böylece sonraki kişi hiçbirini görmez. Hepsini geri almak için yeniden giriş yap.",
+  "account.signingOut": "Değişikliklerin kaydediliyor…",
+  "account.ended": {
+    one: "Oturumun kapatıldı ve bu cihazdaki {count} değişiklik hesabına hiç ulaşmadı. Kaydetmek için yeniden giriş yap, bir yedek indir ya da bu cihazdan sil.",
+    other:
+      "Oturumun kapatıldı ve bu cihazdaki {count} değişiklik hesabına hiç ulaşmadı. Kaydetmek için yeniden giriş yap, bir yedek indir ya da bu cihazdan sil.",
+  },
+  "account.ended.erase": "Verilerimi bu cihazdan sil",
+  "account.signOut.unsynced": {
+    one: "{count} değişiklik henüz hesabına ulaşmadı, şimdi çıkış yaparsan silinir. İnternete bağlanınca yeniden dene, önce bir yedek indir ya da yine de çıkış yap.",
+    other:
+      "{count} değişiklik henüz hesabına ulaşmadı, şimdi çıkış yaparsan silinir. İnternete bağlanınca yeniden dene, önce bir yedek indir ya da yine de çıkış yap.",
+  },
+  "account.signOut.retry": "Yeniden dene",
+  "account.signOut.backup": "Yedek indir",
+  "account.signOut.anyway": "Yine de çıkış yap",
+  "account.signOut.photos": {
+    one: "Bu cihazda {count} gelişim fotoğrafın var. Fotoğraflar cihazdan hiç çıkmaz, bu yüzden çıkış yapmak onu kalıcı olarak siler.",
+    other: "Bu cihazda {count} gelişim fotoğrafın var. Fotoğraflar cihazdan hiç çıkmaz, bu yüzden çıkış yapmak onları kalıcı olarak siler.",
+  },
+  "account.signOut.photosConfirm": "Çıkış yap ve fotoğrafları sil",
+  "account.delete": "Hesabımı sil",
+  "account.delete.warn":
+    "Bu işlem hesabını ve sunucumuzdaki veri kopyanı kalıcı olarak siler. Bu cihaz kendi kopyasını tutar. Diğer cihazlarında oturum kapanır, onlar da kendi kopyalarını tutar.",
+  "account.delete.confirm": "Hesabımı kalıcı olarak sil",
+  "account.lost":
+    "Oturumun kapatıldı, bu yüzden bu cihaz eşitlemeyi durdurdu. Verilerin hâlâ burada. Eşitlemeye devam etmek için yeniden giriş yap.",
+  "account.offline": "Çevrimdışısın. Bağlan ve yeniden dene.",
+  "account.notReady": "Hesaplar henüz açık değil. Verilerin bu cihazda güvende.",
+  "account.failed": "Olmadı. Yeniden dene.",
+  "account.what": "Neler eşitlenir",
+  "account.what.body":
+    "Antrenmanların, setlerin, notların, vücut ağırlığın, salonların, rutinlerin ve ayarların; kullanıyorsan sağlık ölçümleri, sakatlıklar ve döngü kayıtları da. Bunlar senin verilerin: asla reklam ya da analiz için kullanılmaz. Gelişim fotoğrafları bu cihazdan hiç çıkmaz.",
+  "account.row": "Hesap ve eşitleme",
+  "account.row.out": "Yedeklemek ve eşitlemek için giriş yap",
+  "account.row.in": "{email} olarak giriş yapıldı",
+  "account.delete.webSub": "Web sitesinden aldığın Pro aboneliğin de şimdi sona erer ve bir daha ücret alınmaz.",
+  "account.signOut.backupPhotos": "Fotoğraflarla birlikte yedek kaydet",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "account.title": "Konto i synchronizacja",
+  "account.lead":
+    "Zaloguj się, by mieć kopię zapasową treningów i korzystać z nich na wszystkich urządzeniach: telefonie, tablecie i w przeglądarce. To opcjonalne, a wszystko zostaje też na tym urządzeniu.",
+  "account.leadIn":
+    "Twoje treningi, siłownie i ustawienia synchronizują się z kontem, gdy masz internet, więc są bezpieczne i dostępne na każdym urządzeniu, na którym się zalogujesz.",
+  "account.signIn": "Zaloguj się",
+  "account.yours": "Twoje konto",
+  "account.apple": "Kontynuuj z Apple",
+  "account.google": "Kontynuuj z Google",
+  "account.emailButton": "Kontynuuj przez e-mail",
+  "account.agree": "Logując się, akceptujesz warunki korzystania i politykę prywatności.",
+  "account.emailNote":
+    "Logowanie włącza też kilka e-maili: przypomnienia o treningu, cotygodniowe podsumowanie i porady. Każdy z nich wyłączysz w Ustawieniach lub linkiem w e-mailu.",
+  "account.terms": "Warunki korzystania",
+  "account.privacy": "Polityka prywatności",
+  "account.email.label": "Twój e-mail",
+  "account.email.send": "Wyślij mi kod",
+  "account.email.sent": "Wysłaliśmy sześciocyfrowy kod na {email}. Jest ważny 10 minut.",
+  "account.email.code": "Kod",
+  "account.email.verify": "Zaloguj się",
+  "account.email.again": "Użyj innego e-maila",
+  "account.via.google": "Google",
+  "account.via.apple": "Apple",
+  "account.via.email": "e-mail",
+  "account.as": "Zalogowano jako {email} przez {via}.",
+  "account.asNoEmail": "Zalogowano przez {via}.",
+  "account.syncing": "Synchronizacja…",
+  "account.synced": "Zsynchronizowano {when}.",
+  "account.justNow": "przed chwilą",
+  "account.notSynced": "Jeszcze nie zsynchronizowano. Synchronizacja nastąpi, gdy będziesz online.",
+  "account.waiting": {
+    one: "{count} zmiana czeka na synchronizację.",
+    few: "{count} zmiany czekają na synchronizację.",
+    many: "{count} zmian czeka na synchronizację.",
+    other: "{count} zmiany czeka na synchronizację.",
+  },
+  "account.syncError": "Nie udało się połączyć z serwerem. Spróbujemy ponownie, gdy będziesz online.",
+  "account.syncFull":
+    "Miejsce na synchronizację na Twoim koncie jest pełne, więc nowe zmiany zostają na tym urządzeniu. Wszystko tutaj jest bezpieczne. Daj nam znać przez Wyślij opinię w Ustawieniach.",
+  "account.syncNow": "Synchronizuj teraz",
+  "account.signOut": "Wyloguj się",
+  "account.signOutNote":
+    "Wylogowanie zapisuje Twoje zmiany na koncie, a potem usuwa dane z tego urządzenia, więc następna osoba niczego nie zobaczy. Zaloguj się ponownie, by wszystko odzyskać.",
+  "account.signingOut": "Zapisuję Twoje zmiany…",
+  "account.ended": {
+    one: "Wylogowano Cię, a {count} zmiana na tym urządzeniu nie trafiła na Twoje konto. Zaloguj się ponownie, by ją zapisać, pobierz kopię zapasową albo usuń ją z tego urządzenia.",
+    few: "Wylogowano Cię, a {count} zmiany na tym urządzeniu nie trafiły na Twoje konto. Zaloguj się ponownie, by je zapisać, pobierz kopię zapasową albo usuń je z tego urządzenia.",
+    many: "Wylogowano Cię, a {count} zmian na tym urządzeniu nie trafiło na Twoje konto. Zaloguj się ponownie, by je zapisać, pobierz kopię zapasową albo usuń je z tego urządzenia.",
+    other:
+      "Wylogowano Cię, a {count} zmiany na tym urządzeniu nie trafiło na Twoje konto. Zaloguj się ponownie, by je zapisać, pobierz kopię zapasową albo usuń je z tego urządzenia.",
+  },
+  "account.ended.erase": "Usuń moje dane z tego urządzenia",
+  "account.signOut.unsynced": {
+    one: "{count} zmiana nie trafiła jeszcze na Twoje konto, więc wylogowanie teraz by ją usunęło. Spróbuj ponownie, gdy będziesz online, najpierw pobierz kopię zapasową albo i tak się wyloguj.",
+    few: "{count} zmiany nie trafiły jeszcze na Twoje konto, więc wylogowanie teraz by je usunęło. Spróbuj ponownie, gdy będziesz online, najpierw pobierz kopię zapasową albo i tak się wyloguj.",
+    many: "{count} zmian nie trafiło jeszcze na Twoje konto, więc wylogowanie teraz by je usunęło. Spróbuj ponownie, gdy będziesz online, najpierw pobierz kopię zapasową albo i tak się wyloguj.",
+    other:
+      "{count} zmiany nie trafiło jeszcze na Twoje konto, więc wylogowanie teraz by je usunęło. Spróbuj ponownie, gdy będziesz online, najpierw pobierz kopię zapasową albo i tak się wyloguj.",
+  },
+  "account.signOut.retry": "Spróbuj ponownie",
+  "account.signOut.backup": "Pobierz kopię zapasową",
+  "account.signOut.anyway": "Wyloguj mimo to",
+  "account.signOut.photos": {
+    one: "Masz na tym urządzeniu {count} zdjęcie postępów. Zdjęcia nigdy go nie opuszczają, więc wylogowanie usunie je na zawsze.",
+    few: "Masz na tym urządzeniu {count} zdjęcia postępów. Zdjęcia nigdy go nie opuszczają, więc wylogowanie usunie je na zawsze.",
+    many: "Masz na tym urządzeniu {count} zdjęć postępów. Zdjęcia nigdy go nie opuszczają, więc wylogowanie usunie je na zawsze.",
+    other: "Masz na tym urządzeniu {count} zdjęcia postępów. Zdjęcia nigdy go nie opuszczają, więc wylogowanie usunie je na zawsze.",
+  },
+  "account.signOut.photosConfirm": "Wyloguj i usuń zdjęcia",
+  "account.delete": "Usuń moje konto",
+  "account.delete.warn":
+    "To na zawsze usuwa Twoje konto i kopię Twoich danych na naszym serwerze. To urządzenie zachowuje własną kopię. Twoje inne urządzenia zostaną wylogowane i zachowają swoje.",
+  "account.delete.confirm": "Usuń moje konto na zawsze",
+  "account.lost":
+    "Wylogowano Cię, więc to urządzenie przestało się synchronizować. Twoje dane wciąż tu są. Zaloguj się ponownie, by dalej synchronizować.",
+  "account.offline": "Nie masz internetu. Połącz się i spróbuj ponownie.",
+  "account.notReady": "Konta nie są jeszcze włączone. Twoje dane są bezpieczne na tym urządzeniu.",
+  "account.failed": "Nie udało się. Spróbuj ponownie.",
+  "account.what": "Co się synchronizuje",
+  "account.what.body":
+    "Twoje treningi, serie, notatki, masa ciała, siłownie, plany i ustawienia, a także odczyty zdrowotne, kontuzje i zapisy cyklu, jeśli z nich korzystasz. To Twoje dane: nigdy nie służą do reklam ani analityki. Zdjęcia postępów nigdy nie opuszczają tego urządzenia.",
+  "account.row": "Konto i synchronizacja",
+  "account.row.out": "Zaloguj się, by mieć kopię i synchronizację",
+  "account.row.in": "Zalogowano jako {email}",
+  "account.delete.webSub": "Twoja subskrypcja Pro ze strony internetowej też kończy się teraz i nie zostanie ponownie obciążona.",
+  "account.signOut.backupPhotos": "Zapisz kopię zapasową ze zdjęciami",
+};

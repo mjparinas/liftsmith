@@ -720,3 +720,557 @@ export const ja: Partial<Record<Key, Message>> = {
   "rmd.rehabWeek": "直近7日間で{want}回中{done}回（理学療法士の指定）。",
   "rmd.rehabBody": "今日は理学療法士のエクササイズの日です。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "rmd.streakOne": "Um treino hoje mantém sua sequência de {weeks} semanas.",
+  "rmd.streakMany": "Faltam {needed} treinos nesta semana para manter sua sequência de {weeks} semanas.",
+  "rmd.firstReady": "Seu primeiro treino está pronto",
+  "rmd.todayReady": "O treino de hoje está pronto",
+  "rmd.firstReadyBody": "Ele foi planejado para a sua academia e é um toque por série.",
+  "rmd.todayReadyBody": "Planejado a partir da sua recuperação e da última sessão. Toque para começar.",
+  "rmd.week": "Sua semana de treino",
+  "rmd.weekBody": "Esta semana: {days} às {time}. Cada treino é planejado quando você abre o app.",
+  "rmd.weekBodyLast":
+    "Esta semana: {days} às {time}. Na semana passada você treinou {trained} de {goal}. Cada treino é planejado quando você abre o app.",
+  "rmd.days": {
+    one: "{count} dia",
+    other: "{count} dias",
+  },
+  "rmd.keepStreak": "Mantenha sua sequência",
+  "rmd.missedTwo": "Dois dias de treino passaram",
+  "rmd.missedOne": "Perdeu ontem? Hoje também serve",
+  "rmd.missedBody": "Um treino curto hoje usa os músculos mais descansados. Sua sequência conta semanas, então ainda dá tempo.",
+  "rmd.ready": "Pronto quando você estiver",
+  "rmd.firstWaiting": "Seu primeiro treino ainda está esperando",
+  "rmd.comeback": "Já faz {days} dias. Seu próximo treino começa um pouco mais leve para você voltar com calma.",
+  "rmd.firstWaitingBody": "Escolha uma duração, toque em começar e o app faz o planejamento.",
+  "rmd.trialEnds": "Seu teste do Pro termina em 2 dias",
+  "rmd.trialEndsBody":
+    "Fique com os treinos adaptativos, o mapa de recuperação e as estatísticas completas, ou não faça nada e continue no plano grátis.",
+  "rmd.pro1": "Treinos que se adaptam a você",
+  "rmd.pro1.body":
+    "O Pro planeja cada sessão a partir da sua recuperação, da sua academia e de como cada série foi. Teste o Pro grátis e cancele com dois toques.",
+  "rmd.pro2": "Veja o que já se recuperou",
+  "rmd.pro2.body":
+    "O mapa de recuperação mostra quais músculos estão descansados antes de você escolher um treino. Teste o Pro grátis e cancele com dois toques.",
+  "rmd.pro3": "Saiba que você está ficando mais forte",
+  "rmd.pro3.body":
+    "O Pro acompanha seu máximo estimado em cada exercício e suas séries semanais por músculo. Teste o Pro grátis e cancele com dois toques.",
+  "rmd.pro4": "Dias de forçar e dias de pegar leve",
+  "rmd.pro4.body": "O Pro lê sua prontidão e ajusta o treino do dia. Você sempre pode mudar. Teste o Pro grátis e cancele com dois toques.",
+  "rmd.firstDone": "Seu primeiro treino está feito",
+  "rmd.firstDoneBody":
+    "Mandou bem. Seu próximo treino parte dos pesos e reps de hoje, e seu mapa de recuperação agora mostra o que você treinou.",
+  "rmd.streakWeeks": "{weeks} semanas seguidas",
+  "rmd.streakWeeksBody": "Você bateu sua meta de treino {weeks} semanas seguidas. É assim que se constrói força.",
+  "rmd.mail.link": "{label}: {url}",
+  "rmd.mail.choose": "Escolha quais e-mails você recebe no app, em Ajustes, Lembretes.",
+  "rmd.mail.unsubscribe": "Cancelar todos os e-mails do {brand}",
+  "rmd.mail.ignore": "Se não foi você que pediu, ignore e você não terá mais notícias nossas.",
+  "rmd.mail.confirm": "Confirme seus e-mails do {brand}",
+  "rmd.mail.confirmBody": "Toque no botão para começar a receber lembretes de treino por e-mail. Nada é enviado até você confirmar.",
+  "rmd.mail.confirmButton": "Confirmar meu e-mail",
+  "rmd.mail.confirmWhy": "Alguém (esperamos que você) informou este endereço no {brand}.",
+  "rmd.mail.welcome": "Boas-vindas ao {brand}",
+  "rmd.mail.welcome1":
+    "Tudo pronto. Cada treino é planejado quando você abre o app, a partir do equipamento da sua academia, do que já se recuperou e de como foram suas últimas séries.",
+  "rmd.mail.welcome2":
+    "Registre uma série com um toque. A próxima série já vem preenchida e o timer de descanso começa sozinho, então você pode largar o celular e treinar.",
+  "rmd.mail.welcome3":
+    "Vamos mandar um e-mail na segunda-feira com sua semana de treino e, depois disso, só quando ajudar. Você pode desligar qualquer um em Ajustes.",
+  "rmd.mail.open": "Abrir o treino de hoje",
+  "rmd.mail.seePro": "Ver o Pro",
+  "rmd.mail.whyOn": "Você está recebendo isto porque o e-mail está ativado na sua conta.",
+  "rmd.mail.whyReminder": "Você está recebendo isto porque os e-mails de lembrete estão ativados na sua conta.",
+  "rmd.mail.whyPro": "Você está recebendo isto porque ativou os e-mails de teste e ofertas do Pro no app.",
+  "rmd.recapWeek": "Sua semana de treino",
+  "rmd.recapLine": "{workouts}, {sets} e {volume} levantados.",
+  "rmd.workouts": {
+    one: "{count} treino",
+    other: "{count} treinos",
+  },
+  "rmd.sets": {
+    one: "{count} série",
+    other: "{count} séries",
+  },
+  "rmd.recapPrs": {
+    one: "E mais um novo recorde pessoal.",
+    other: "E mais {count} novos recordes pessoais.",
+  },
+  "rmd.recapMonth": "Seu resumo de {month}",
+  "rmd.recapMonthShare": "Seu cartão de resumo está pronto para compartilhar no app.",
+  "rmd.winback": "Seu plano ainda está aqui",
+  "rmd.winbackBody":
+    "Já faz {days} dias. Todo mundo dá uma pausa. Seu próximo treino é mais curto e mais leve, montado a partir do que você fazia antes, para a volta ser boa, não difícil.",
+  "rmd.firstWaitingPlan":
+    "Seu primeiro treino está planejado: {list}, cerca de {minutes} minutos. Abra o app, toque em Começar e ele guia você em cada série.",
+  "rmd.record": "Novo recorde: {name}",
+  "rmd.recordBody": "Você fez {weight} por {reps} no {name}, seu melhor até agora. Suas próximas metas já levam isso em conta.",
+  "rmd.friends": "Seus amigos nesta semana",
+  "rmd.friendsBody": "{list} treinaram nesta semana. Incentive em Amigos ou registre um treino seu.",
+  "rmd.friendLine": {
+    one: "{name} (uma vez)",
+    other: "{name} ({count} vezes)",
+  },
+  "rmd.friendsMore": {
+    one: "mais {count}",
+    other: "mais {count}",
+  },
+  "rmd.mail.openApp": "Abrir o {brand}",
+  "rmd.mail.welcomePlan": "Seu primeiro treino já está planejado: {list}, cerca de {minutes} minutos.",
+  "rmd.mail.whyTour": "Você está recebendo isto porque as dicas para começar estão ativadas na sua conta. Dica {n} de {total}.",
+  "rmd.tour.kicker": "Primeiros passos · {n} de {total}",
+  "rmd.tour.cta": "Experimente no {brand}",
+  "rmd.tour.plan.title": "Seu treino, já planejado",
+  "rmd.tour.plan.body":
+    "Abra o app e o treino de hoje está esperando. Ele é montado a partir do equipamento da sua academia, de quanto cada músculo se recuperou e de onde você está no bloco de treino.",
+  "rmd.tour.plan.tip":
+    "Pouco tempo? Arraste o controle de duração em Hoje e o plano encolhe para caber, mantendo os exercícios que mais importam.",
+  "rmd.tour.why.title": "Cada exercício diz por quê",
+  "rmd.tour.why.body":
+    "Cada exercício em Hoje tem uma linha curta dizendo por que está ali: um músculo recuperado, séries que ainda faltam na semana ou como foi da última vez.",
+  "rmd.tour.why.tip": "Não curtiu algum? Toque nele para trocar por outro que trabalha os mesmos músculos com o seu equipamento.",
+  "rmd.tour.log.title": "Um toque registra a série",
+  "rmd.tour.log.body":
+    "O peso e as reps já vêm preenchidos, com as anilhas para colocar de cada lado. Levante e toque em Registrar série. Só isso.",
+  "rmd.tour.log.tip": "Fez mais ou menos reps? Ajuste os números com − e + antes de tocar, e o próximo treino se adapta.",
+  "rmd.tour.weight.title": "Por que este peso?",
+  "rmd.tour.weight.body":
+    "Cada meta vem de uma regra que você pode ler: você fez todas as séries da última vez, então mais uma rep; semana de deload, então mais leve. Toque em Por quê? embaixo da meta para ver.",
+  "rmd.tour.weight.tip": "Os pesos são sempre os que você consegue montar de verdade com a sua barra e as suas anilhas.",
+  "rmd.tour.rest.title": "O timer de descanso funciona sozinho",
+  "rmd.tour.rest.body":
+    "Registre uma série e o timer de descanso começa sozinho. No Android e no iPhone ele continua contando na tela de bloqueio, com a próxima série e as anilhas dela.",
+  "rmd.tour.rest.tip": "Pronto antes? Toque em Pular. Precisa de mais? Toque em +30 s, direto da tela de bloqueio.",
+  "rmd.tour.recovery.title": "Veja o que já se recuperou",
+  "rmd.tour.recovery.body":
+    "Corpo mostra cada músculo colorido pelo quanto se recuperou, calculado a partir das suas próprias séries. É assim que o plano sabe que deve poupar suas pernas depois de um dia pesado de agachamento.",
+  "rmd.tour.recovery.tip": "Está dolorido ou cansado? Avise o app em Hoje e ele pega mais leve.",
+  "rmd.tour.notes.title": "Seu coach diz o que fazer a seguir",
+  "rmd.tour.notes.body":
+    "As notas do coach em Progresso ficam de olho no que vale a pena resolver: um exercício estagnado, um músculo abaixo das séries semanais, cansaço se acumulando. Cada uma diz o que vimos e uma coisa a fazer.",
+  "rmd.tour.notes.tip": "A maioria vem com uma correção de um toque, como uma semana de deload ou tornar um músculo prioridade.",
+  "rmd.tour.awards.title": "Recordes, níveis e insígnias",
+  "rmd.tour.awards.body":
+    "Todo treino rende XP, os novos recordes aparecem assim que você bate e há mais de 150 insígnias para colecionar. As sequências contam semanas, então dias de descanso nunca as quebram.",
+  "rmd.tour.awards.tip": "Abra Prêmios para ver as missões da semana e o que você está mais perto de desbloquear.",
+  "rmd.rehab": "Hora de {name}",
+  "rmd.rehabWeek": "{done} de {want} nos últimos 7 dias, como seu fisioterapeuta pediu.",
+  "rmd.rehabBody": "Os exercícios do seu fisioterapeuta são para hoje.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "rmd.streakOne": "오늘 한 번만 운동하면 {weeks}주 연속 기록이 이어져요.",
+  "rmd.streakMany": "{weeks}주 연속 기록을 이어 가려면 이번 주에 운동 {needed}번이 남았어요.",
+  "rmd.firstReady": "첫 운동이 준비됐어요",
+  "rmd.todayReady": "오늘의 운동이 준비됐어요",
+  "rmd.firstReadyBody": "내 헬스장에 맞춰 계획했고, 세트마다 한 번만 누르면 돼요.",
+  "rmd.todayReadyBody": "회복 상태와 지난 운동을 바탕으로 계획했어요. 눌러서 시작하세요.",
+  "rmd.week": "이번 주 운동",
+  "rmd.weekBody": "이번 주: {days}, {time}. 각 운동은 앱을 열 때 계획돼요.",
+  "rmd.weekBodyLast": "이번 주: {days}, {time}. 지난주에는 {goal}번 중 {trained}번 운동했어요. 각 운동은 앱을 열 때 계획돼요.",
+  "rmd.days": {
+    other: "{count}일",
+  },
+  "rmd.keepStreak": "연속 기록을 이어 가세요",
+  "rmd.missedTwo": "운동하는 날을 이틀 놓쳤어요",
+  "rmd.missedOne": "어제 놓쳤나요? 오늘도 괜찮아요",
+  "rmd.missedBody": "오늘은 짧은 운동으로 가장 회복된 근육을 골라 줘요. 연속 기록은 주 단위라서 아직 시간이 있어요.",
+  "rmd.ready": "준비되면 언제든지",
+  "rmd.firstWaiting": "첫 운동이 아직 기다리고 있어요",
+  "rmd.comeback": "{days}일이 지났어요. 다음 운동은 조금 가볍게 시작해서 천천히 다시 적응할 수 있어요.",
+  "rmd.firstWaitingBody": "시간을 고르고 시작을 누르면 계획은 앱이 해요.",
+  "rmd.trialEnds": "Pro 체험이 2일 후 끝나요",
+  "rmd.trialEndsBody": "적응형 운동, 회복 맵, 전체 통계를 계속 쓰거나, 아무것도 하지 않으면 무료 요금제로 남아요.",
+  "rmd.pro1": "나에게 맞춰지는 운동",
+  "rmd.pro1.body":
+    "Pro는 회복 상태, 헬스장, 매 세트의 느낌에 맞춰 운동을 계획해요. Pro를 무료로 체험하고, 두 번만 누르면 취소할 수 있어요.",
+  "rmd.pro2": "회복된 근육 확인하기",
+  "rmd.pro2.body":
+    "회복 맵으로 운동을 고르기 전에 어떤 근육이 회복됐는지 볼 수 있어요. Pro를 무료로 체험하고, 두 번만 누르면 취소할 수 있어요.",
+  "rmd.pro3": "강해지고 있다는 걸 확인하세요",
+  "rmd.pro3.body":
+    "Pro는 모든 종목의 추정 최대 무게와 근육별 주간 세트 수를 추적해요. Pro를 무료로 체험하고, 두 번만 누르면 취소할 수 있어요.",
+  "rmd.pro4": "강하게 하는 날과 가볍게 하는 날",
+  "rmd.pro4.body":
+    "Pro는 컨디션을 읽고 그날의 운동을 조정해요. 언제든 직접 바꿀 수 있어요. Pro를 무료로 체험하고, 두 번만 누르면 취소할 수 있어요.",
+  "rmd.firstDone": "첫 운동을 마쳤어요",
+  "rmd.firstDoneBody": "잘했어요. 다음 운동은 오늘의 무게와 반복 수를 바탕으로 하고, 이제 회복 맵에 오늘 훈련한 부위가 보여요.",
+  "rmd.streakWeeks": "{weeks}주 연속",
+  "rmd.streakWeeksBody": "{weeks}주 연속으로 운동 목표를 달성했어요. 근력은 이렇게 쌓여요.",
+  "rmd.mail.link": "{label}: {url}",
+  "rmd.mail.choose": "받을 이메일은 앱의 설정 › 알림에서 고를 수 있어요.",
+  "rmd.mail.unsubscribe": "모든 {brand} 이메일 수신 거부",
+  "rmd.mail.ignore": "요청하지 않았다면 무시하세요. 더 이상 연락드리지 않을게요.",
+  "rmd.mail.confirm": "{brand} 이메일 수신 확인",
+  "rmd.mail.confirmBody": "버튼을 누르면 운동 알림을 이메일로 받기 시작해요. 누르기 전에는 아무것도 보내지 않아요.",
+  "rmd.mail.confirmButton": "이메일 확인",
+  "rmd.mail.confirmWhy": "누군가(아마 당신이) {brand}에 이 주소를 입력했어요.",
+  "rmd.mail.welcome": "{brand}에 오신 걸 환영해요",
+  "rmd.mail.welcome1": "준비가 끝났어요. 각 운동은 앱을 열 때 헬스장의 장비, 회복된 근육, 지난 세트 결과를 바탕으로 계획돼요.",
+  "rmd.mail.welcome2":
+    "한 번만 누르면 세트가 기록돼요. 다음 세트는 미리 채워지고 휴식 타이머도 저절로 시작되니, 휴대폰은 내려놓고 운동에 집중하세요.",
+  "rmd.mail.welcome3": "월요일에 이번 주 운동 계획을 이메일로 보내고, 그 뒤로는 도움이 될 때만 보낼게요. 설정에서 언제든 끌 수 있어요.",
+  "rmd.mail.open": "오늘의 운동 열기",
+  "rmd.mail.seePro": "Pro 보기",
+  "rmd.mail.whyOn": "계정에 이메일 수신이 켜져 있어서 이 메일을 받았어요.",
+  "rmd.mail.whyReminder": "계정에 알림 이메일이 켜져 있어서 이 메일을 받았어요.",
+  "rmd.mail.whyPro": "앱에서 Pro 체험 및 혜택 이메일을 켜서 이 메일을 받았어요.",
+  "rmd.recapWeek": "이번 주 운동 요약",
+  "rmd.recapLine": "{workouts}, {sets}, 총 {volume}을 들어 올렸어요.",
+  "rmd.workouts": {
+    other: "운동 {count}회",
+  },
+  "rmd.sets": {
+    other: "{count}세트",
+  },
+  "rmd.recapPrs": {
+    other: "게다가 새 개인 최고 기록 {count}개.",
+  },
+  "rmd.recapMonth": "{month} 요약",
+  "rmd.recapMonthShare": "앱에서 요약 카드를 공유할 수 있어요.",
+  "rmd.winback": "계획은 그대로 있어요",
+  "rmd.winbackBody":
+    "{days}일이 지났어요. 누구나 쉬어 갈 때가 있어요. 다음 운동은 이전에 했던 운동을 바탕으로 더 짧고 가볍게 짜서, 돌아오는 길이 힘들지 않고 기분 좋을 거예요.",
+  "rmd.firstWaitingPlan": "첫 운동이 계획돼 있어요: {list}, 약 {minutes}분. 앱을 열고 시작을 누르면 모든 세트를 안내해 줘요.",
+  "rmd.record": "새 최고 기록: {name}",
+  "rmd.recordBody": "{name}에서 {weight}로 {reps}회를 해냈어요. 지금까지 최고 기록이에요. 다음 목표에도 벌써 반영됐어요.",
+  "rmd.friends": "이번 주 친구들",
+  "rmd.friendsBody": "{list}이(가) 이번 주에 운동했어요. 친구에서 응원하거나 직접 운동을 기록해 보세요.",
+  "rmd.friendLine": {
+    other: "{name}({count}회)",
+  },
+  "rmd.friendsMore": {
+    other: "외 {count}명",
+  },
+  "rmd.mail.openApp": "{brand} 열기",
+  "rmd.mail.welcomePlan": "첫 운동이 이미 계획돼 있어요: {list}, 약 {minutes}분.",
+  "rmd.mail.whyTour": "계정에 시작 가이드 팁이 켜져 있어서 이 메일을 받았어요. 팁 {total}개 중 {n}번째.",
+  "rmd.tour.kicker": "시작 가이드 · {total}개 중 {n}번째",
+  "rmd.tour.cta": "{brand}에서 해 보기",
+  "rmd.tour.plan.title": "이미 계획된 운동",
+  "rmd.tour.plan.body":
+    "앱을 열면 오늘의 운동이 기다리고 있어요. 헬스장의 장비, 각 근육의 회복 상태, 트레이닝 블록의 진행 상황을 바탕으로 짜여요.",
+  "rmd.tour.plan.tip": "시간이 부족한가요? 오늘 화면의 시간 슬라이더를 끌면 가장 중요한 종목은 남기고 계획이 시간에 맞게 줄어들어요.",
+  "rmd.tour.why.title": "모든 운동 동작에 이유가 있어요",
+  "rmd.tour.why.body":
+    "오늘 화면의 각 운동 동작에는 왜 들어갔는지 짧은 설명이 붙어 있어요: 회복된 근육, 이번 주에 남은 세트, 또는 지난번 결과.",
+  "rmd.tour.why.tip": "마음에 들지 않는 동작이 있나요? 누르면 내 장비로 같은 근육을 쓰는 동작으로 교체할 수 있어요.",
+  "rmd.tour.log.title": "한 번 누르면 세트 기록",
+  "rmd.tour.log.body": "무게와 반복 수가 이미 채워져 있고, 양쪽에 끼울 원판도 나와요. 들어 올리고 세트 기록을 누르면 끝이에요.",
+  "rmd.tour.log.tip": "반복 수가 더 많거나 적었나요? 누르기 전에 −와 +로 숫자를 조정하면 다음 운동이 맞춰져요.",
+  "rmd.tour.weight.title": "왜 이 무게일까요?",
+  "rmd.tour.weight.body":
+    "모든 목표는 읽을 수 있는 규칙에서 나와요: 지난번에 모든 세트를 성공했으니 1회 더, 디로드 주간이니 더 가볍게. 목표 아래의 왜?를 누르면 볼 수 있어요.",
+  "rmd.tour.weight.tip": "무게는 언제나 내 바벨과 원판으로 실제로 맞출 수 있는 무게예요.",
+  "rmd.tour.rest.title": "휴식 타이머는 저절로 돌아가요",
+  "rmd.tour.rest.body":
+    "세트를 기록하면 휴식 타이머가 알아서 시작돼요. Android와 iPhone에서는 잠금 화면에서도 다음 세트와 원판을 보여 주며 계속 카운트해요.",
+  "rmd.tour.rest.tip": "일찍 준비됐나요? 건너뛰기를 누르세요. 더 쉬어야 하나요? 잠금 화면에서 바로 +30초를 누르세요.",
+  "rmd.tour.recovery.title": "회복된 근육 확인하기",
+  "rmd.tour.recovery.body":
+    "몸 화면은 내 세트를 바탕으로 계산한 회복 정도에 따라 모든 근육을 색으로 보여 줘요. 그래서 스쿼트를 많이 한 다음 날에는 계획이 다리를 쉬게 해요.",
+  "rmd.tour.recovery.tip": "근육통이 있거나 피곤한가요? 오늘 화면에서 알려 주면 더 가볍게 해 줘요.",
+  "rmd.tour.notes.title": "코치가 다음에 할 일을 알려 줘요",
+  "rmd.tour.notes.body":
+    "진행 화면의 코치 노트는 행동이 필요한 것을 지켜봐요: 정체된 종목, 주간 세트가 부족한 근육, 쌓이는 피로. 각 노트는 무엇을 봤는지와 할 일 한 가지를 알려 줘요.",
+  "rmd.tour.notes.tip": "대부분은 디로드 주간이나 특정 근육 우선순위 지정처럼 한 번에 적용하는 해결책이 함께 있어요.",
+  "rmd.tour.awards.title": "PR, 레벨, 배지",
+  "rmd.tour.awards.body":
+    "운동할 때마다 XP를 얻고, 새 최고 기록은 세우는 즉시 표시되며, 모을 수 있는 배지가 150개 넘게 있어요. 연속 기록은 주 단위라서 쉬는 날에도 끊기지 않아요.",
+  "rmd.tour.awards.tip": "업적을 열면 이번 주 퀘스트와 곧 열 수 있는 것을 볼 수 있어요.",
+  "rmd.rehab": "{name} 할 시간이에요",
+  "rmd.rehabWeek": "물리치료사가 요청한 대로 최근 7일 동안 {want}번 중 {done}번 했어요.",
+  "rmd.rehabBody": "오늘은 물리치료사가 준 운동을 할 날이에요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "rmd.streakOne": "Bugün bir antrenman {weeks} haftalık serini korur.",
+  "rmd.streakMany": "{weeks} haftalık serini korumak için bu hafta {needed} antrenman kaldı.",
+  "rmd.firstReady": "İlk antrenmanın hazır",
+  "rmd.todayReady": "Bugünün antrenmanı hazır",
+  "rmd.firstReadyBody": "Salonuna göre planlandı ve her set tek dokunuş.",
+  "rmd.todayReadyBody": "Toparlanmana ve son antrenmanına göre planlandı. Başlamak için dokun.",
+  "rmd.week": "Antrenman haftan",
+  "rmd.weekBody": "Bu hafta: {days}, saat {time}. Her antrenman uygulamayı açtığında planlanır.",
+  "rmd.weekBodyLast":
+    "Bu hafta: {days}, saat {time}. Geçen hafta {goal} günün {trained} gününde antrenman yaptın. Her antrenman uygulamayı açtığında planlanır.",
+  "rmd.days": {
+    one: "{count} gün",
+    other: "{count} gün",
+  },
+  "rmd.keepStreak": "Serini koru",
+  "rmd.missedTwo": "İki antrenman günü kaçtı",
+  "rmd.missedOne": "Dün kaçırdın mı? Bugün de olur",
+  "rmd.missedBody": "Bugün kısa bir antrenman en dinç kaslarını seçer. Serin haftaları sayar, yani hâlâ vaktin var.",
+  "rmd.ready": "Sen hazır olduğunda hazır",
+  "rmd.firstWaiting": "İlk antrenmanın hâlâ bekliyor",
+  "rmd.comeback": "{days} gün oldu. Sonraki antrenmanın biraz daha hafif başlıyor, böylece yavaş yavaş geri dönersin.",
+  "rmd.firstWaitingBody": "Bir süre seç, başla'ya dokun, planı uygulama yapsın.",
+  "rmd.trialEnds": "Pro denemen 2 gün içinde bitiyor",
+  "rmd.trialEndsBody":
+    "Uyarlanabilir antrenmanları, toparlanma haritasını ve tüm istatistikleri koru ya da hiçbir şey yapma ve ücretsiz planda kal.",
+  "rmd.pro1": "Sana uyum sağlayan antrenmanlar",
+  "rmd.pro1.body":
+    "Pro her antrenmanı toparlanmana, salonuna ve her setin nasıl hissettirdiğine göre planlar. Pro'yu ücretsiz dene, iki dokunuşla iptal et.",
+  "rmd.pro2": "Neyin toparlandığını gör",
+  "rmd.pro2.body":
+    "Toparlanma haritası, antrenman seçmeden önce hangi kasların dinç olduğunu gösterir. Pro'yu ücretsiz dene, iki dokunuşla iptal et.",
+  "rmd.pro3": "Güçlendiğini bil",
+  "rmd.pro3.body":
+    "Pro her hareketteki tahmini maksimumunu ve kas başına haftalık setlerini takip eder. Pro'yu ücretsiz dene, iki dokunuşla iptal et.",
+  "rmd.pro4": "Yüklenme günleri ve hafif günler",
+  "rmd.pro4.body":
+    "Pro hazırlığını okur ve günün antrenmanını ayarlar. İstediğin zaman değiştirebilirsin. Pro'yu ücretsiz dene, iki dokunuşla iptal et.",
+  "rmd.firstDone": "İlk antrenmanın kayıtlarda",
+  "rmd.firstDoneBody":
+    "Harika iş. Sonraki antrenmanın bugünkü ağırlıklar ve tekrarlar üzerine kurulur; toparlanma haritan da artık neyi çalıştığını gösteriyor.",
+  "rmd.streakWeeks": "Üst üste {weeks} hafta",
+  "rmd.streakWeeksBody": "{weeks} haftadır antrenman hedefini tutturuyorsun. Güç böyle kazanılır.",
+  "rmd.mail.link": "{label}: {url}",
+  "rmd.mail.choose": "Hangi e-postaları alacağını uygulamada Ayarlar, Hatırlatıcılar bölümünden seç.",
+  "rmd.mail.unsubscribe": "Tüm {brand} e-postalarından çık",
+  "rmd.mail.ignore": "Bunu sen istemediysen görmezden gel, bir daha bizden haber almayacaksın.",
+  "rmd.mail.confirm": "{brand} e-postalarını onayla",
+  "rmd.mail.confirmBody":
+    "Antrenman hatırlatıcılarını e-postayla almaya başlamak için düğmeye dokun. Sen onaylayana kadar hiçbir şey gönderilmez.",
+  "rmd.mail.confirmButton": "E-postamı onayla",
+  "rmd.mail.confirmWhy": "Birisi (umarız sensin) bu adresi {brand} uygulamasına girdi.",
+  "rmd.mail.welcome": "{brand} uygulamasına hoş geldin",
+  "rmd.mail.welcome1":
+    "Her şey hazır. Her antrenman, uygulamayı açtığında salonunun ekipmanına, neyin toparlandığına ve son setlerinin nasıl geçtiğine göre planlanır.",
+  "rmd.mail.welcome2":
+    "Bir seti tek dokunuşla kaydet. Sonraki set hazır doldurulur ve dinlenme sayacı kendiliğinden başlar; telefonu bırakıp ağırlığını kaldırabilirsin.",
+  "rmd.mail.welcome3":
+    "Pazartesi sana antrenman haftanla ilgili bir e-posta göndereceğiz, sonrasında yalnızca işe yaradığında. Hepsini Ayarlar'dan kapatabilirsin.",
+  "rmd.mail.open": "Bugünün antrenmanını aç",
+  "rmd.mail.seePro": "Pro'ya bak",
+  "rmd.mail.whyOn": "Bunu, hesabında e-posta açık olduğu için alıyorsun.",
+  "rmd.mail.whyReminder": "Bunu, hesabında hatırlatıcı e-postaları açık olduğu için alıyorsun.",
+  "rmd.mail.whyPro": "Bunu, uygulamada Pro denemesi ve teklif e-postalarını açtığın için alıyorsun.",
+  "rmd.recapWeek": "Antrenman haftan",
+  "rmd.recapLine": "{workouts}, {sets} ve {volume} kaldırıldı.",
+  "rmd.workouts": {
+    one: "{count} antrenman",
+    other: "{count} antrenman",
+  },
+  "rmd.sets": {
+    one: "{count} set",
+    other: "{count} set",
+  },
+  "rmd.recapPrs": {
+    one: "Üstelik yeni bir kişisel rekor.",
+    other: "Üstelik {count} yeni kişisel rekor.",
+  },
+  "rmd.recapMonth": "{month} özetin",
+  "rmd.recapMonthShare": "Özet kartın uygulamada paylaşılmaya hazır.",
+  "rmd.winback": "Planın hâlâ burada",
+  "rmd.winbackBody":
+    "{days} gün oldu. Herkes ara verir. Sonraki antrenmanın daha kısa ve hafif, daha önce yaptıklarına göre kurulu; böylece geri dönmek zor değil, keyifli gelir.",
+  "rmd.firstWaitingPlan":
+    "İlk antrenmanın planlandı: {list}, yaklaşık {minutes} dakika. Uygulamayı aç, Başla'ya dokun; seni her sette yönlendirir.",
+  "rmd.record": "Yeni rekor: {name}",
+  "rmd.recordBody":
+    "{name} hareketinde {weight} ile {reps} tekrar yaptın, şimdiye kadarki en iyin. Sonraki hedeflerin bunu zaten hesaba katıyor.",
+  "rmd.friends": "Bu hafta arkadaşların",
+  "rmd.friendsBody": "{list} bu hafta antrenman yaptı. Arkadaşlar'da onlara tezahürat yap ya da kendi antrenmanını kaydet.",
+  "rmd.friendLine": {
+    one: "{name} (bir kez)",
+    other: "{name} ({count} kez)",
+  },
+  "rmd.friendsMore": {
+    one: "{count} kişi daha",
+    other: "{count} kişi daha",
+  },
+  "rmd.mail.openApp": "{brand} uygulamasını aç",
+  "rmd.mail.welcomePlan": "İlk antrenmanın zaten planlandı: {list}, yaklaşık {minutes} dakika.",
+  "rmd.mail.whyTour": "Bunu, hesabında başlangıç ipuçları açık olduğu için alıyorsun. İpucu {n}/{total}.",
+  "rmd.tour.kicker": "Başlangıç · {n}/{total}",
+  "rmd.tour.cta": "{brand} uygulamasında dene",
+  "rmd.tour.plan.title": "Antrenmanın zaten planlandı",
+  "rmd.tour.plan.body":
+    "Uygulamayı aç, bugünün antrenmanı seni bekliyor. Salonundaki ekipmana, her kasın ne kadar toparlandığına ve antrenman bloğunda nerede olduğuna göre oluşturulur.",
+  "rmd.tour.plan.tip": "Az vaktin mi var? Bugün ekranındaki süre kaydırıcısını sürükle; plan, en önemli hareketleri koruyarak küçülür.",
+  "rmd.tour.why.title": "Her egzersiz nedenini söyler",
+  "rmd.tour.why.body":
+    "Bugün ekranındaki her egzersizin neden orada olduğunu söyleyen kısa bir satırı var: toparlanmış bir kas, bu hafta kalan setler ya da geçen seferin nasıl geçtiği.",
+  "rmd.tour.why.tip": "Birini sevmedin mi? Dokun ve ekipmanınla aynı kasları çalıştıran bir egzersizle değiştir.",
+  "rmd.tour.log.title": "Tek dokunuş seti kaydeder",
+  "rmd.tour.log.body":
+    "Ağırlık ve tekrarlar, her yana takılacak plakalarla birlikte zaten doldurulmuş. Kaldır, sonra Seti kaydet'e dokun. Hepsi bu.",
+  "rmd.tour.log.tip":
+    "Daha çok ya da daha az tekrar mı yaptın? Dokunmadan önce − ve + ile sayıları ayarla; sonraki antrenman buna göre uyum sağlar.",
+  "rmd.tour.weight.title": "Neden bu ağırlık?",
+  "rmd.tour.weight.body":
+    "Her hedef okuyabileceğin bir kuraldan gelir: geçen sefer tüm setleri tamamladın, o yüzden bir tekrar fazla; deload haftası, o yüzden daha hafif. Görmek için hedefin altındaki Neden?'e dokun.",
+  "rmd.tour.weight.tip": "Ağırlıklar her zaman barın ve plakalarınla gerçekten takabileceğin ağırlıklardır.",
+  "rmd.tour.rest.title": "Dinlenme sayacı kendi çalışır",
+  "rmd.tour.rest.body":
+    "Bir set kaydet, dinlenme sayacı kendiliğinden başlar. Android ve iPhone'da sonraki set ve plakalarıyla birlikte kilit ekranında saymaya devam eder.",
+  "rmd.tour.rest.tip": "Erken mi hazırsın? Atla'ya dokun. Daha fazla mı lazım? Doğrudan kilit ekranından +30 sn'ye dokun.",
+  "rmd.tour.recovery.title": "Neyin toparlandığını gör",
+  "rmd.tour.recovery.body":
+    "Vücut ekranı, kendi setlerinden hesaplanan toparlanma durumuna göre her kası renklendirir. Plan, büyük bir squat gününden sonra bacaklarını dinlendirmesi gerektiğini böyle bilir.",
+  "rmd.tour.recovery.tip": "Ağrın mı var ya da yorgun musun? Bugün ekranında uygulamaya söyle, daha hafif tutsun.",
+  "rmd.tour.notes.title": "Koçun sırada ne yapacağını söyler",
+  "rmd.tour.notes.body":
+    "İlerleme ekranındaki Koç notları, üzerine harekete geçmeye değer şeyleri izler: takılmış bir hareket, haftalık setlerinin gerisinde kalan bir kas, biriken yorgunluk. Her biri ne gördüğümüzü ve yapılacak tek bir şeyi söyler.",
+  "rmd.tour.notes.tip": "Çoğu, deload haftası ya da bir kası öncelik yapmak gibi tek dokunuşluk bir çözümle gelir.",
+  "rmd.tour.awards.title": "Rekorlar, seviyeler ve rozetler",
+  "rmd.tour.awards.body":
+    "Her antrenman XP kazandırır, yeni rekorlar kırdıkça görünür ve toplanacak 150'den fazla rozet var. Seriler haftaları sayar, bu yüzden dinlenme günleri onları asla bozmaz.",
+  "rmd.tour.awards.tip": "Bu haftanın görevlerini ve açmaya en yakın olduklarını görmek için Ödüller'i aç.",
+  "rmd.rehab": "{name} zamanı",
+  "rmd.rehabWeek": "Fizyoterapistinin istediği gibi, son 7 günde {want} seansın {done} seansı.",
+  "rmd.rehabBody": "Fizyoterapistinin egzersizlerinin günü bugün.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "rmd.streakOne": "Jeden trening dziś utrzyma twoją passę: {weeks} tyg.",
+  "rmd.streakMany": "Treningi do zrobienia w tym tygodniu: {needed}, żeby utrzymać passę ({weeks} tyg.).",
+  "rmd.firstReady": "Twój pierwszy trening jest gotowy",
+  "rmd.todayReady": "Dzisiejszy trening jest gotowy",
+  "rmd.firstReadyBody": "Jest zaplanowany pod twoją siłownię, a każda seria to jedno stuknięcie.",
+  "rmd.todayReadyBody": "Zaplanowany na podstawie regeneracji i ostatniego treningu. Stuknij, żeby zacząć.",
+  "rmd.week": "Twój tydzień treningowy",
+  "rmd.weekBody": "W tym tygodniu: {days}, o {time}. Każdy trening jest planowany, gdy otwierasz aplikację.",
+  "rmd.weekBodyLast":
+    "W tym tygodniu: {days}, o {time}. W zeszłym tygodniu trenowałeś {trained} z {goal}. Każdy trening jest planowany, gdy otwierasz aplikację.",
+  "rmd.days": {
+    one: "{count} dzień",
+    few: "{count} dni",
+    many: "{count} dni",
+    other: "{count} dnia",
+  },
+  "rmd.keepStreak": "Utrzymaj passę",
+  "rmd.missedTwo": "Umknęły ci dwa dni treningowe",
+  "rmd.missedOne": "Nie udało się wczoraj? Dziś też jest dobrze",
+  "rmd.missedBody": "Krótki trening dziś wybierze najbardziej wypoczęte mięśnie. Passa liczy tygodnie, więc jest jeszcze czas.",
+  "rmd.ready": "Gotowe, kiedy ty będziesz",
+  "rmd.firstWaiting": "Twój pierwszy trening wciąż czeka",
+  "rmd.comeback": "Minęło {days} dni. Następny trening zacznie się trochę lżej, żebyś mógł spokojnie wrócić.",
+  "rmd.firstWaitingBody": "Wybierz długość, stuknij Start, a aplikacja zajmie się planowaniem.",
+  "rmd.trialEnds": "Twój okres próbny Pro kończy się za 2 dni",
+  "rmd.trialEndsBody": "Zachowaj adaptacyjne treningi, mapę regeneracji i pełne statystyki albo nic nie rób i zostań na darmowym planie.",
+  "rmd.pro1": "Treningi, które dopasowują się do ciebie",
+  "rmd.pro1.body":
+    "Pro planuje każdy trening na podstawie regeneracji, siłowni i tego, jak poszła każda seria. Wypróbuj Pro za darmo, anulujesz dwoma stuknięciami.",
+  "rmd.pro2": "Zobacz, co już się zregenerowało",
+  "rmd.pro2.body":
+    "Mapa regeneracji pokazuje, które mięśnie są wypoczęte, zanim wybierzesz trening. Wypróbuj Pro za darmo, anulujesz dwoma stuknięciami.",
+  "rmd.pro3": "Wiedz, że robisz się silniejszy",
+  "rmd.pro3.body":
+    "Pro śledzi szacowany maks w każdym ćwiczeniu i twoje tygodniowe serie na mięsień. Wypróbuj Pro za darmo, anulujesz dwoma stuknięciami.",
+  "rmd.pro4": "Dni mocniejsze i dni lżejsze",
+  "rmd.pro4.body":
+    "Pro odczytuje twoją gotowość i dostosowuje trening na dany dzień. Zawsze możesz to zmienić. Wypróbuj Pro za darmo, anulujesz dwoma stuknięciami.",
+  "rmd.firstDone": "Pierwszy trening zaliczony",
+  "rmd.firstDoneBody":
+    "Dobra robota. Następny trening bazuje na dzisiejszych ciężarach i powtórzeniach, a mapa regeneracji pokazuje już, co trenowałeś.",
+  "rmd.streakWeeks": "{weeks} tyg. z rzędu",
+  "rmd.streakWeeksBody": "Realizujesz swój cel treningowy już {weeks} tyg. z rzędu. Tak buduje się siłę.",
+  "rmd.mail.link": "{label}: {url}",
+  "rmd.mail.choose": "Wybierz, jakie e-maile dostajesz, w aplikacji: Ustawienia, Przypomnienia.",
+  "rmd.mail.unsubscribe": "Wypisz się ze wszystkich e-maili {brand}",
+  "rmd.mail.ignore": "Jeśli o to nie prosiłeś, zignoruj tę wiadomość, a więcej się nie odezwiemy.",
+  "rmd.mail.confirm": "Potwierdź e-maile od {brand}",
+  "rmd.mail.confirmBody": "Stuknij przycisk, żeby zacząć dostawać przypomnienia o treningach e-mailem. Do tego czasu nic nie wyślemy.",
+  "rmd.mail.confirmButton": "Potwierdź mój e-mail",
+  "rmd.mail.confirmWhy": "Ktoś (miejmy nadzieję, że ty) wpisał ten adres w {brand}.",
+  "rmd.mail.welcome": "Witaj w {brand}",
+  "rmd.mail.welcome1":
+    "Wszystko gotowe. Każdy trening jest planowany, gdy otwierasz aplikację, na podstawie sprzętu na twojej siłowni, tego, co się zregenerowało, i tego, jak poszły ostatnie serie.",
+  "rmd.mail.welcome2":
+    "Zapisuj serię jednym stuknięciem. Następna seria jest już wypełniona, a minutnik przerwy włącza się sam, więc możesz odłożyć telefon i ćwiczyć.",
+  "rmd.mail.welcome3":
+    "W poniedziałek wyślemy ci e-mail z twoim tygodniem treningowym, a potem tylko wtedy, gdy to pomoże. Wszystko możesz wyłączyć w Ustawieniach.",
+  "rmd.mail.open": "Otwórz dzisiejszy trening",
+  "rmd.mail.seePro": "Zobacz Pro",
+  "rmd.mail.whyOn": "Dostajesz tę wiadomość, bo e-maile są włączone na twoim koncie.",
+  "rmd.mail.whyReminder": "Dostajesz tę wiadomość, bo przypomnienia e-mailowe są włączone na twoim koncie.",
+  "rmd.mail.whyPro": "Dostajesz tę wiadomość, bo włączyłeś w aplikacji e-maile o okresie próbnym i ofertach Pro.",
+  "rmd.recapWeek": "Twój tydzień treningowy",
+  "rmd.recapLine": "{workouts}, {sets}, łącznie podniesione {volume}.",
+  "rmd.workouts": {
+    one: "{count} trening",
+    few: "{count} treningi",
+    many: "{count} treningów",
+    other: "{count} treningu",
+  },
+  "rmd.sets": {
+    one: "{count} seria",
+    few: "{count} serie",
+    many: "{count} serii",
+    other: "{count} serii",
+  },
+  "rmd.recapPrs": {
+    one: "Do tego nowy rekord życiowy.",
+    few: "Do tego {count} nowe rekordy życiowe.",
+    many: "Do tego {count} nowych rekordów życiowych.",
+    other: "Do tego {count} nowego rekordu życiowego.",
+  },
+  "rmd.recapMonth": "Twoje podsumowanie: {month}",
+  "rmd.recapMonthShare": "Twoja karta podsumowania czeka w aplikacji, gotowa do udostępnienia.",
+  "rmd.winback": "Twój plan wciąż tu jest",
+  "rmd.winbackBody":
+    "Minęło {days} dni. Każdy robi przerwy. Następny trening jest krótszy i lżejszy, zbudowany na tym, co robiłeś wcześniej, żeby powrót był przyjemny, a nie ciężki.",
+  "rmd.firstWaitingPlan":
+    "Twój pierwszy trening jest zaplanowany: {list}, około {minutes} minut. Otwórz aplikację, stuknij Start, a przeprowadzi cię przez każdą serię.",
+  "rmd.record": "Nowy rekord: {name}",
+  "rmd.recordBody": "{name}: {weight} na {reps}, twój najlepszy wynik. Twoje kolejne cele już to uwzględniają.",
+  "rmd.friends": "Twoi znajomi w tym tygodniu",
+  "rmd.friendsBody": "{list} trenowali w tym tygodniu. Dopinguj ich w Znajomych albo zapisz własny trening.",
+  "rmd.friendLine": {
+    one: "{name} (raz)",
+    few: "{name} ({count} razy)",
+    many: "{name} ({count} razy)",
+    other: "{name} ({count} razy)",
+  },
+  "rmd.friendsMore": {
+    one: "jeszcze {count}",
+    few: "jeszcze {count}",
+    many: "jeszcze {count}",
+    other: "jeszcze {count}",
+  },
+  "rmd.mail.openApp": "Otwórz {brand}",
+  "rmd.mail.welcomePlan": "Twój pierwszy trening jest już zaplanowany: {list}, około {minutes} minut.",
+  "rmd.mail.whyTour": "Dostajesz tę wiadomość, bo wskazówki na start są włączone na twoim koncie. Wskazówka {n} z {total}.",
+  "rmd.tour.kicker": "Na start · {n} z {total}",
+  "rmd.tour.cta": "Wypróbuj w {brand}",
+  "rmd.tour.plan.title": "Twój trening, już zaplanowany",
+  "rmd.tour.plan.body":
+    "Otwórz aplikację, a dzisiejszy trening już czeka. Jest zbudowany ze sprzętu na twojej siłowni, regeneracji każdego mięśnia i miejsca, w którym jesteś w bloku treningowym.",
+  "rmd.tour.plan.tip": "Mało czasu? Przesuń suwak długości w Dziś, a plan się skurczy, zachowując najważniejsze ćwiczenia.",
+  "rmd.tour.why.title": "Każde ćwiczenie mówi dlaczego",
+  "rmd.tour.why.body":
+    "Każde ćwiczenie w Dziś ma krótką linijkę wyjaśniającą, czemu tam jest: mięsień się zregenerował, w tym tygodniu zostały jeszcze serie albo tak poszło ostatnio.",
+  "rmd.tour.why.tip": "Nie lubisz któregoś? Stuknij je, żeby zamienić na takie, które pracuje na te same mięśnie z twoim sprzętem.",
+  "rmd.tour.log.title": "Jedno stuknięcie zapisuje serię",
+  "rmd.tour.log.body":
+    "Ciężar i powtórzenia są już wpisane, razem z talerzami do założenia z każdej strony. Zrób serię i stuknij Zapisz serię. To wszystko.",
+  "rmd.tour.log.tip":
+    "Zrobiłeś więcej lub mniej powtórzeń? Popraw liczby przyciskami − i +, zanim stukniesz, a następny trening się dostosuje.",
+  "rmd.tour.weight.title": "Dlaczego taki ciężar?",
+  "rmd.tour.weight.body":
+    "Każdy cel wynika z reguły, którą możesz przeczytać: ostatnio zaliczyłeś wszystkie serie, więc o jedno powtórzenie więcej; tydzień deloadu, więc lżej. Stuknij Dlaczego? pod celem, żeby to zobaczyć.",
+  "rmd.tour.weight.tip": "Ciężary zawsze da się faktycznie załadować twoją sztangą i talerzami.",
+  "rmd.tour.rest.title": "Minutnik przerwy działa sam",
+  "rmd.tour.rest.body":
+    "Zapisz serię, a minutnik przerwy włączy się sam. Na Androidzie i iPhonie odlicza dalej na ekranie blokady, z następną serią i jej talerzami.",
+  "rmd.tour.rest.tip": "Gotowy wcześniej? Stuknij Pomiń. Potrzebujesz więcej? Stuknij +30 s, prosto z ekranu blokady.",
+  "rmd.tour.recovery.title": "Zobacz, co się zregenerowało",
+  "rmd.tour.recovery.body":
+    "Ciało pokazuje każdy mięsień w kolorze zależnym od regeneracji, wyliczonej z twoich własnych serii. Dzięki temu plan wie, że po ciężkim dniu przysiadów nogi mają odpocząć.",
+  "rmd.tour.recovery.tip": "Czujesz zakwasy albo zmęczenie? Powiedz to aplikacji w Dziś, a odpuści.",
+  "rmd.tour.notes.title": "Trener mówi, co robić dalej",
+  "rmd.tour.notes.body":
+    "Notatki trenera w Postępach wyłapują rzeczy, na które warto zareagować: ćwiczenie w zastoju, mięsień z niedoborem tygodniowych serii, narastające zmęczenie. Każda mówi, co zauważyliśmy, i jedną rzecz do zrobienia.",
+  "rmd.tour.notes.tip": "Większość ma poprawkę na jedno stuknięcie, np. tydzień deloadu albo ustawienie mięśnia jako priorytetu.",
+  "rmd.tour.awards.title": "Rekordy, poziomy i odznaki",
+  "rmd.tour.awards.body":
+    "Każdy trening daje XP, nowe rekordy pojawiają się, gdy je ustanawiasz, a do zebrania jest ponad 150 odznak. Passa liczy tygodnie, więc dni odpoczynku nigdy jej nie przerwą.",
+  "rmd.tour.awards.tip": "Otwórz Nagrody, żeby zobaczyć zadania na ten tydzień i to, co jest najbliżej odblokowania.",
+  "rmd.rehab": "Czas na: {name}",
+  "rmd.rehabWeek": "{done} z {want} w ostatnich 7 dniach, tak jak prosił fizjoterapeuta.",
+  "rmd.rehabBody": "Dziś czas na ćwiczenia od fizjoterapeuty.",
+};

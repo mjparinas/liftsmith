@@ -168,5 +168,141 @@
       "自己ベスト、レベル、バッジ",
       "トレーニングのたびに前進"
     ]
+  ],
+  "pt": [
+    [
+      "Seu treino, já planejado",
+      "Feito com sua academia, sua recuperação e seu bloco de treino"
+    ],
+    [
+      "Cada exercício diz o porquê",
+      "Recuperação, séries semanais e a última vez, em palavras simples"
+    ],
+    [
+      "Um toque registra a série",
+      "Peso-alvo, anilhas por lado e uma demo 3D de cada exercício"
+    ],
+    [
+      "Por que este peso?",
+      "Toque para ver a regra por trás de cada número"
+    ],
+    [
+      "O descanso se cronometra sozinho",
+      "Monte as anilhas da próxima série enquanto descansa"
+    ],
+    [
+      "Veja o que está recuperado",
+      "Cada músculo, a partir das suas próprias séries"
+    ],
+    [
+      "Seu coach diz o que fazer",
+      "Encontre estagnações e músculos atrasados cedo e resolva com um toque"
+    ],
+    [
+      "Recordes, níveis e medalhas",
+      "Cada treino faz você avançar"
+    ]
+  ],
+  "ko": [
+    [
+      "내 운동, 이미 준비 완료",
+      "내 헬스장, 회복 상태, 트레이닝 블록에 맞춰 짰어요"
+    ],
+    [
+      "운동마다 이유를 알려 줘요",
+      "회복, 주간 세트, 지난 기록을 쉬운 말로"
+    ],
+    [
+      "탭 한 번으로 세트 기록",
+      "목표 무게, 한쪽 원판, 모든 운동의 3D 시범"
+    ],
+    [
+      "왜 이 무게일까요?",
+      "탭해서 모든 숫자 뒤의 규칙을 확인하세요"
+    ],
+    [
+      "휴식 타이머가 알아서",
+      "쉬는 동안 다음 세트 원판을 끼우세요"
+    ],
+    [
+      "회복된 근육 한눈에",
+      "내 세트로 계산한 모든 근육"
+    ],
+    [
+      "다음 할 일을 코치가 알려 줘요",
+      "정체와 부족한 근육을 일찍 찾아 탭 한 번으로 해결"
+    ],
+    [
+      "개인 최고 기록, 레벨, 배지",
+      "운동할 때마다 한 걸음 앞으로"
+    ]
+  ],
+  "pl": [
+    [
+      "Twój trening, już zaplanowany",
+      "Na podstawie twojej siłowni, regeneracji i bloku treningowego"
+    ],
+    [
+      "Każde ćwiczenie mówi dlaczego",
+      "Regeneracja, serie w tygodniu i ostatni raz, prostymi słowami"
+    ],
+    [
+      "Jedno stuknięcie zapisuje serię",
+      "Docelowy ciężar, talerze na stronę i pokaz 3D każdego ćwiczenia"
+    ],
+    [
+      "Dlaczego ten ciężar?",
+      "Stuknij, żeby zobaczyć regułę za każdą liczbą"
+    ],
+    [
+      "Przerwa odmierza się sama",
+      "Ładuj talerze na następną serię w czasie przerwy"
+    ],
+    [
+      "Zobacz, co się zregenerowało",
+      "Każdy mięsień, na podstawie twoich serii"
+    ],
+    [
+      "Trener mówi, co robić dalej",
+      "Wcześnie wyłapuj zastoje i zaległe mięśnie, napraw jednym stuknięciem"
+    ],
+    [
+      "Rekordy, poziomy i odznaki",
+      "Każdy trening to krok naprzód"
+    ]
+  ],
+  "tr": [
+    [
+      "Antrenmanın zaten hazır",
+      "Salonuna, toparlanmana ve antrenman bloğuna göre"
+    ],
+    [
+      "Her egzersiz nedenini söyler",
+      "Toparlanma, haftalık setler ve geçen sefer, sade sözlerle"
+    ],
+    [
+      "Tek dokunuş seti kaydeder",
+      "Hedef ağırlık, taraf başına plakalar ve her hareketin 3D demosu"
+    ],
+    [
+      "Neden bu ağırlık?",
+      "Her sayının ardındaki kuralı görmek için dokun"
+    ],
+    [
+      "Dinlenme sayacı kendi çalışır",
+      "Dinlenirken sıradaki setin plakalarını tak"
+    ],
+    [
+      "Neyin toparlandığını gör",
+      "Her kas, kendi setlerinden"
+    ],
+    [
+      "Koçun sıradakini söyler",
+      "Durağanlıkları ve geride kalan kasları erken gör, tek dokunuşla düzelt"
+    ],
+    [
+      "Rekorlar, seviyeler ve rozetler",
+      "Her antrenman seni ileri taşır"
+    ]
   ]
 }

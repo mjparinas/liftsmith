@@ -1,0 +1,10 @@
+/* Turkish text drawn by the app's own Swift code: Siri and Shortcuts actions, and the rest-over alert. Follows the phone's language. */
+"Start workout" = "Antrenmana başla";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Liftsmith'i açar ve bugünün antrenmanını ya da zaten süren antrenmanı başlatır.";
+"Log set" = "Seti kaydet";
+"Logs the current set as planned. Does nothing when no workout is running." = "Şu anki seti planlandığı gibi kaydeder. Süren bir antrenman yoksa hiçbir şey yapmaz.";
+"Add 30 seconds of rest" = "30 saniye dinlenme ekle";
+"Adds 30 seconds to the rest timer." = "Dinlenme sayacına 30 saniye ekler.";
+"+30 s rest" = "+30 s dinlenme";
+"Rest over" = "Dinlenme bitti";
+"Up next: %@" = "Sıradaki: %@";

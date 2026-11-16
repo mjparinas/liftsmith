@@ -99,6 +99,10 @@ const CATALOG: Record<MsgLang, Partial<Record<Key, unknown>>> = {
   de: text.de,
   it: text.it,
   ja: text.ja,
+  pt: text.pt,
+  ko: text.ko,
+  pl: text.pl,
+  tr: text.tr,
 };
 export const pushText = (lang: MsgLang, key: Key, vars: Record<string, string>) =>
   String(CATALOG[lang][key] ?? text.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => vars[k] ?? all);

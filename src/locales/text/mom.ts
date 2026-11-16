@@ -170,3 +170,179 @@ export const ja: Partial<Record<Key, Message>> = {
   "mom.liftUp": "{name}は初日から{pct}%アップ。",
   "mom.compare": "初日と今日の比較",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "mom.days": {
+    one: "{count} dia",
+    other: "{count} dias",
+  },
+  "mom.weeks": {
+    one: "{count} semana",
+    other: "{count} semanas",
+  },
+  "mom.months": {
+    one: "{count} mês",
+    other: "{count} meses",
+  },
+  "mom.anniv": {
+    one: "{count} ano desde o seu primeiro treino",
+    other: "{count} anos desde o seu primeiro treino",
+  },
+  "mom.annivBody": "{workouts} treinos e {sets} séries desde então. Feliz aniversário de treino.",
+  "mom.back": "Bem-vindo de volta",
+  "mom.backBody":
+    "Já faz {time}. O plano de hoje te traz de volta com calma, e sua sequência recomeça nesta semana. Não precisa compensar nada.",
+  "mom.count": "Treino número {n}",
+  "mom.count100": "Três dígitos. Isso é um hábito para a vida.",
+  "mom.countBody": "Cada um deles contou.",
+  "mom.ton": "Você já levantou {name}",
+  "mom.tonBody": "Cerca de {kg} no total, uma série de cada vez.",
+  "mom.comeback": "Retorno completo",
+  "mom.comebackBody": "Primeiro treino em {time}. O mais difícil já foi.",
+  "mom.years": {
+    one: "{count} ano de treino",
+    other: "{count} anos de treino",
+  },
+  "mom.yearsBody": "Você treinou no seu aniversário de treino. Nada mais justo.",
+  "mom.dayOne": "Dia um",
+  "mom.today": "Hoje",
+  "mom.firstOn": "Seu primeiro treino foi em {date}.",
+  "mom.rowWorkouts": "Treinos",
+  "mom.rowSets": "Séries",
+  "mom.rowLifted": "Levantado",
+  "mom.liftUp": "{name} subiu {pct}% desde o dia um.",
+  "mom.compare": "Dia um contra hoje",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "mom.days": {
+    other: "{count}일",
+  },
+  "mom.weeks": {
+    other: "{count}주",
+  },
+  "mom.months": {
+    other: "{count}개월",
+  },
+  "mom.anniv": {
+    other: "첫 운동 후 {count}년",
+  },
+  "mom.annivBody": "그동안 운동 {workouts}번, {sets}세트를 했어요. 운동 기념일 축하해요.",
+  "mom.back": "돌아오신 걸 환영해요",
+  "mom.backBody":
+    "{time} 만이에요. 오늘 계획은 천천히 다시 시작하게 짜였고, 연속 기록은 이번 주부터 새로 시작해요. 밀린 걸 따라잡을 필요는 없어요.",
+  "mom.count": "{n}번째 운동",
+  "mom.count100": "세 자릿수 달성. 평생 갈 습관이에요.",
+  "mom.countBody": "하나하나가 다 의미 있었어요.",
+  "mom.ton": "이제 {name}만큼 들어 올렸어요",
+  "mom.tonBody": "한 세트씩, 총 약 {kg}이에요.",
+  "mom.comeback": "복귀 완료",
+  "mom.comebackBody": "{time} 만의 첫 운동이에요. 가장 힘든 한 번을 해냈어요.",
+  "mom.years": {
+    other: "운동 {count}년 차",
+  },
+  "mom.yearsBody": "운동 기념일에 운동했네요. 딱 어울려요.",
+  "mom.dayOne": "첫날",
+  "mom.today": "오늘",
+  "mom.firstOn": "첫 운동은 {date}였어요.",
+  "mom.rowWorkouts": "운동",
+  "mom.rowSets": "세트",
+  "mom.rowLifted": "들어 올린 무게",
+  "mom.liftUp": "{name}이(가) 첫날보다 {pct}% 올랐어요.",
+  "mom.compare": "첫날과 오늘 비교",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "mom.days": {
+    one: "{count} gün",
+    other: "{count} gün",
+  },
+  "mom.weeks": {
+    one: "{count} hafta",
+    other: "{count} hafta",
+  },
+  "mom.months": {
+    one: "{count} ay",
+    other: "{count} ay",
+  },
+  "mom.anniv": {
+    one: "İlk antrenmanından bu yana {count} yıl",
+    other: "İlk antrenmanından bu yana {count} yıl",
+  },
+  "mom.annivBody": "O günden beri {workouts} antrenman ve {sets} set. Ağırlık yıldönümün kutlu olsun.",
+  "mom.back": "Tekrar hoş geldin",
+  "mom.backBody": "{time} oldu. Bugünün planı seni yavaş yavaş geri alıştırır, serin de bu hafta sıfırdan başlar. Telafi etmen gerekmiyor.",
+  "mom.count": "{n}. antrenman",
+  "mom.count100": "Üç haneli. Bu artık ömürlük bir alışkanlık.",
+  "mom.countBody": "Her biri sayıldı.",
+  "mom.ton": "Artık toplamda {name} kaldırdın",
+  "mom.tonBody": "Toplamda yaklaşık {kg}, her seferinde bir set.",
+  "mom.comeback": "Dönüş tamam",
+  "mom.comebackBody": "{time} sonra ilk antrenman. En zoru bitti.",
+  "mom.years": {
+    one: "{count} yıllık ağırlık",
+    other: "{count} yıllık ağırlık",
+  },
+  "mom.yearsBody": "Ağırlık yıldönümünde antrenman yaptın. Tam yakıştı.",
+  "mom.dayOne": "İlk gün",
+  "mom.today": "Bugün",
+  "mom.firstOn": "İlk antrenmanın {date} tarihindeydi.",
+  "mom.rowWorkouts": "Antrenman",
+  "mom.rowSets": "Set",
+  "mom.rowLifted": "Kaldırılan",
+  "mom.liftUp": "{name} ilk günden beri %{pct} arttı.",
+  "mom.compare": "İlk gün ile bugün",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "mom.days": {
+    one: "{count} dzień",
+    few: "{count} dni",
+    many: "{count} dni",
+    other: "{count} dnia",
+  },
+  "mom.weeks": {
+    one: "{count} tydzień",
+    few: "{count} tygodnie",
+    many: "{count} tygodni",
+    other: "{count} tygodnia",
+  },
+  "mom.months": {
+    one: "{count} miesiąc",
+    few: "{count} miesiące",
+    many: "{count} miesięcy",
+    other: "{count} miesiąca",
+  },
+  "mom.anniv": {
+    one: "{count} rok od pierwszego treningu",
+    few: "{count} lata od pierwszego treningu",
+    many: "{count} lat od pierwszego treningu",
+    other: "{count} roku od pierwszego treningu",
+  },
+  "mom.annivBody": "Od tamtej pory treningi: {workouts}, serie: {sets}. Wszystkiego najlepszego w rocznicę treningów.",
+  "mom.back": "Witaj z powrotem",
+  "mom.backBody":
+    "Nie było cię przez {time}. Dzisiejszy plan łagodnie cię wdroży, a passa zaczyna się od nowa w tym tygodniu. Nie trzeba niczego nadrabiać.",
+  "mom.count": "Trening numer {n}",
+  "mom.count100": "Trzy cyfry. To już nawyk na całe życie.",
+  "mom.countBody": "Każdy z nich się liczył.",
+  "mom.ton": "Podniosłeś już tyle, co {name}",
+  "mom.tonBody": "Łącznie około {kg}, seria po serii.",
+  "mom.comeback": "Powrót zaliczony",
+  "mom.comebackBody": "Pierwszy trening po przerwie: {time}. Najtrudniejszy już za tobą.",
+  "mom.years": {
+    one: "{count} rok treningów",
+    few: "{count} lata treningów",
+    many: "{count} lat treningów",
+    other: "{count} roku treningów",
+  },
+  "mom.yearsBody": "Trenowałeś w rocznicę treningów. Pasuje.",
+  "mom.dayOne": "Dzień pierwszy",
+  "mom.today": "Dziś",
+  "mom.firstOn": "Twój pierwszy trening był {date}.",
+  "mom.rowWorkouts": "Treningi",
+  "mom.rowSets": "Serie",
+  "mom.rowLifted": "Podniesione",
+  "mom.liftUp": "{name}: wzrost o {pct}% od dnia pierwszego.",
+  "mom.compare": "Dzień pierwszy kontra dziś",
+};

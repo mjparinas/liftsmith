@@ -139,6 +139,10 @@ export const fr: FeaturesText = {
       name: "Démonstrations d’exercices en 3D",
       body: "Chaque exercice a une silhouette 3D qui montre le mouvement avec son matériel, avec les étapes de mise en place et des consignes.",
     },
+    "form-mistakes": {
+      name: "Erreurs fréquentes et leurs corrections",
+      body: "Chaque exercice et chaque étirement liste ses deux ou trois erreurs techniques les plus fréquentes à côté de la silhouette 3D, chacune avec sa correction et pourquoi elle compte, et le minuteur de repos vous en montre une pour la prochaine série. Fonctionne hors ligne.",
+    },
     "set-types": {
       name: "Séries dégressives et rest-pause",
       body: "Ajoutez une série dégressive ou une série rest-pause entre les séries.",
@@ -351,6 +355,11 @@ export const fr: FeaturesText = {
       name: "Cartes et liens de partage",
       body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu. Un nouveau record s’illumine en doré et se partage dès l’écran de repos.",
     },
+    "screenshot-share": {
+      name: "Des cartes quand vous faites une capture d’écran",
+      body: "Faites une capture d’écran et une feuille de cartes d’entraînement s’ouvre : votre dernier mois, trois mois, six mois, l’année ou depuis le début, en totaux, en répartition de vos séries ou en meilleures charges. Faites-les défiler, masquez les poids avec l’œil et partagez avec votre lien d’invitation imprimé sur la carte. Les mêmes cartes sont dans Partager mon entraînement, sur Progrès. Chaque lien que vous partagez porte désormais votre invitation, dans un lien qui le dit.",
+      note: "Les captures l’ouvrent sur Android 14 et plus et sur iPhone, et on peut la désactiver. Ailleurs, ouvrez-la depuis Progrès. Les moins de 18 ans partagent sans lien d’invitation.",
+    },
     coaching: {
       name: "Coacher des clients",
       body: "Associez des clients, voyez leurs résultats et attribuez-leur des routines, sur le téléphone ou sur grand écran.",
@@ -486,8 +495,8 @@ export const fr: FeaturesText = {
       body: "Le site montre ce que les pratiquants soulèvent vraiment au squat, au développé couché, au soulevé de terre et au développé militaire, par sexe et poids de corps, recalculé chaque jour avec ceux qui comptent. Seuls les groupes de 30 personnes ou plus sont affichés, en centiles, jamais les chiffres de quelqu'un. Un interrupteur dans Réglages › Vos données et confidentialité décide si vous comptez ; les moins de 18 ans ne comptent jamais.",
     },
     languages: {
-      name: "Six langues",
-      body: "Anglais, espagnol, français, allemand, italien et japonais, selon la langue de votre téléphone.",
+      name: "Dix langues",
+      body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone.",
     },
     appearance: {
       name: "Sombre, clair ou comme votre téléphone",

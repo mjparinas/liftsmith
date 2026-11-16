@@ -453,7 +453,7 @@ export const emails: Record<string, Words> = {
     title: "Schon gewusst? So, wie du es lesen willst",
     intro: "Kleinigkeiten, durch die sich die App wie deine anfühlt.",
     points: [
-      "Wähl eine andere Sprache als die deines Handys: Es gibt sechs.",
+      "Wähl eine andere Sprache als die deines Handys: Es gibt zehn.",
       "Kilogramm oder Pfund, und jedes Studio kann seine eigene Einheit für seine Scheiben nutzen.",
       "Das Tageszitat auf Heute lässt sich abschalten.",
       "Starte die Einrichtung über Einstellungen neu, wenn sich dein Ziel, deine Erfahrung oder dein Studio geändert hat.",
@@ -690,7 +690,7 @@ export const emails: Record<string, Words> = {
       "Dunkel, hell oder wie das Handy.",
       "Verdiene Designs und Akzentfarben mit deinen Erfolgen.",
       "Auf den Handys ein App-Symbol in den Farben deines Designs.",
-      "Sechs Sprachen, auf Wunsch anders als die deines Handys.",
+      "Zehn Sprachen, auf Wunsch anders als die deines Handys.",
     ],
     dyk: "Ist das Aussehen auf hell gestellt, ändert ein Design nur die Akzentfarbe.",
   },
@@ -815,5 +815,29 @@ export const emails: Record<string, Words> = {
       "Jedes hat Start, so ist das heutige Training einen Tipp entfernt.",
     ],
     dyk: "Tippe auf das Erholung-Widget, um die Erholungskarte in der App zu öffnen.",
+  },
+  "screenshot-share": {
+    title: "Screenshot machen, Karte zum Teilen bekommen",
+    intro:
+      "Mach einen Screenshot von Liftsmith, und ein Blatt mit Trainingskarten fährt hoch, fertig zum Teilen mit deinem Einladungslink darauf.",
+    points: [
+      "Wähle den letzten Monat, drei Monate, sechs Monate, das Jahr oder alles.",
+      "Wisch durch Summen, die Aufteilung deiner Sätze und deine besten Lifts.",
+      "Tipp aufs Auge, um alle Gewichte auszublenden.",
+      "Heute nicht? Wisch es weg oder schalte es unter Einstellungen › Deine Daten und Datenschutz aus.",
+      "Ohne Screenshot: Mein Training teilen im Fortschritt öffnet dieselben Karten.",
+    ],
+    dyk: "Jeder Link, den du teilst, von Routinen bis zu Studios, trägt jetzt deine Einladung, in einem Link, der invite sagt.",
+  },
+  "form-cues": {
+    title: "Häufige Fehler und wie du sie behebst",
+    intro: "Jede Übung und jede Dehnung zeigt jetzt ihre zwei oder drei häufigsten Technikfehler, direkt neben der 3D-Figur.",
+    points: [
+      "Jeder sagt, wie er aussieht, was du stattdessen tust und warum es wichtig ist.",
+      "Du findest sie in So geht's während des Trainings, auf der Seite jeder Übung und bei jeder Dehnung.",
+      "Zwischen den Sätzen zeigt der Pausentimer einen für den nächsten Satz, jedes Mal einen anderen.",
+      "Sie gehören zur App, funktionieren also ohne Empfang und in jeder Sprache.",
+    ],
+    dyk: "Lieber nicht in der Pause? Schalte Technik-Checks in der Pause unter Einstellungen › Training aus.",
   },
 };

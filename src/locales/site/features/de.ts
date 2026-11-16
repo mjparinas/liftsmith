@@ -141,6 +141,10 @@ export const de: FeaturesText = {
       name: "3D-Übungsdemos",
       body: "Jede Übung hat eine 3D-Figur, die die Bewegung mit dem passenden Gerät zeigt, mit Schritten zum Aufbau und Hinweisen.",
     },
+    "form-mistakes": {
+      name: "Häufige Fehler und wie du sie behebst",
+      body: "Jede Übung und jede Dehnung zeigt neben der 3D-Figur ihre zwei oder drei häufigsten Technikfehler, jeweils mit Lösung und warum es wichtig ist, und der Pausentimer zeigt dir einen für den nächsten Satz. Funktioniert offline.",
+    },
     "set-types": { name: "Dropsätze und Rest-Pause", body: "Füge zwischen den Sätzen einen Dropsatz oder einen Rest-Pause-Satz hinzu." },
     "timed-sets": {
       name: "Satztimer für Halten, Tragen und Cardio",
@@ -350,6 +354,11 @@ export const de: FeaturesText = {
       name: "Teilkarten und Links",
       body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau. Eine neue Bestleistung leuchtet golden auf und lässt sich gleich in der Pause teilen.",
     },
+    "screenshot-share": {
+      name: "Teilkarten beim Screenshot",
+      body: "Mach einen Screenshot, und ein Blatt mit Trainingskarten fährt hoch: dein letzter Monat, drei Monate, sechs Monate, das Jahr oder alles, als Summen, als Aufteilung deiner Sätze oder als deine besten Lifts. Wisch durch, blende die Gewichte mit dem Auge aus und teile sie mit deinem Einladungslink auf der Karte. Dieselben Karten findest du unter Mein Training teilen im Fortschritt. Jeder Link, den du teilst, trägt jetzt deine Einladung, in einem Link, der das auch sagt.",
+      note: "Screenshots öffnen es unter Android 14 und neuer und auf dem iPhone, und es lässt sich ausschalten. Sonst öffnest du es im Fortschritt. Unter 18-Jährige teilen ohne Einladungslink.",
+    },
     coaching: {
       name: "Kunden coachen",
       body: "Verknüpfe Kunden, sieh ihre Ergebnisse und weise ihnen Routinen zu, am Handy oder auf einem großen Bildschirm.",
@@ -485,8 +494,8 @@ export const de: FeaturesText = {
       body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
     languages: {
-      name: "Sechs Sprachen",
-      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch und Japanisch, passend zur Sprache deines Handys.",
+      name: "Zehn Sprachen",
+      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys.",
     },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",

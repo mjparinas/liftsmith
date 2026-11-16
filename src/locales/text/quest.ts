@@ -76,3 +76,64 @@ export const ja: Partial<Record<Key, Message>> = {
   "quest.reps": "{n}回レップする",
   "quest.rest": "{n}セットの前に休憩を最後まで取る",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "quest.days": {
+    one: "Treine {n} dia nesta semana",
+    other: "Treine {n} dias nesta semana",
+  },
+  "quest.pr": "Bata um recorde pessoal",
+  "quest.new-ex": "Experimente um exercício que você nunca fez",
+  "quest.on-target": "Acerte todas as reps-alvo num treino",
+  "quest.sets": "Registre {n} séries",
+  "quest.legs": "Faça um treino com pernas",
+  "quest.muscles": "Treine {n} músculos diferentes",
+  "quest.reps": "Faça {n} reps",
+  "quest.rest": "Faça o descanso completo antes de {n} séries",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "quest.days": {
+    other: "이번 주 {n}일 운동하기",
+  },
+  "quest.pr": "개인 최고 기록 세우기",
+  "quest.new-ex": "한 번도 해 보지 않은 운동 동작 해 보기",
+  "quest.on-target": "한 운동에서 목표 반복 수 모두 달성하기",
+  "quest.sets": "{n}세트 기록하기",
+  "quest.legs": "하체가 들어간 운동 하기",
+  "quest.muscles": "서로 다른 근육 {n}곳 훈련하기",
+  "quest.reps": "{n}회 반복하기",
+  "quest.rest": "{n}세트 전에 휴식 시간 다 채우기",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "quest.days": {
+    one: "Bu hafta {n} gün antrenman yap",
+    other: "Bu hafta {n} gün antrenman yap",
+  },
+  "quest.pr": "Bir kişisel rekor kır",
+  "quest.new-ex": "Hiç yapmadığın bir egzersizi dene",
+  "quest.on-target": "Bir antrenmanda tüm hedef tekrarları tuttur",
+  "quest.sets": "{n} set kaydet",
+  "quest.legs": "İçinde bacak olan bir antrenman yap",
+  "quest.muscles": "{n} farklı kas çalıştır",
+  "quest.reps": "{n} tekrar yap",
+  "quest.rest": "{n} setten önce dinlenmenin tamamını kullan",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "quest.days": {
+    one: "Trenuj {n} dzień w tym tygodniu",
+    few: "Trenuj {n} dni w tym tygodniu",
+    many: "Trenuj {n} dni w tym tygodniu",
+    other: "Trenuj {n} dni w tym tygodniu",
+  },
+  "quest.pr": "Ustanów rekord życiowy",
+  "quest.new-ex": "Spróbuj ćwiczenia, którego nigdy nie robiłeś",
+  "quest.on-target": "Zrób wszystkie docelowe powtórzenia w treningu",
+  "quest.sets": "Zapisz {n} serii",
+  "quest.legs": "Zrób trening z nogami",
+  "quest.muscles": "Wytrenuj {n} różnych mięśni",
+  "quest.reps": "Zrób {n} powtórzeń",
+  "quest.rest": "Odpocznij pełną przerwę przed {n} seriami",
+};
