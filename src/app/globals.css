@@ -590,6 +590,9 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
    control or group the same limit. Phones, the workout panel (no sidebar), dialogs (portalled out of main) and bars pinned
    to the bottom (.after-side) keep the full width. */
 :root[data-layout="desktop"] .side-page :is(.btn.w-full, .desk-fit):not(.after-side *) { max-width: 25rem; }
+/* A screen part that is one card or one form (Coaching's Payments, Check-ins and Teams) keeps one readable column
+   on a wide page, so the card doesn't stretch around a short line and a button (Melvin, 2026-11-16). */
+:root[data-layout="desktop"] .side-page .desk-col { max-width: 42rem; }
 /* A screen whose cards flow into two columns on the desktop layout (stage 3), read down the first column then the
    second, so the phone's order is kept. A card never splits; .desk-span runs across both (the header, say). */
 :root[data-layout="desktop"] .desk-cols { column-count: 2; column-gap: 1.5rem; }

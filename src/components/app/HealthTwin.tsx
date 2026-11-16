@@ -170,90 +170,96 @@ export function HealthTwin() {
   const current = open ? by.get(open) : undefined;
 
   return (
-    <div>
-      <p className="mt-1 text-muted">
-        {t("twin.lead")}
-        <Info term="healthTwin" />
-      </p>
+    // Desktop: the call, the figure and its switch on the left, staying in view, and the numbers on the right, so no card
+    // runs the whole width of the page (desktop-layout.md); phones keep one column in the same order.
+    <div className="desk:grid desk:grid-cols-2 desk:items-start desk:gap-x-6">
+      <div className="desk:sticky desk:top-8">
+        <p className="mt-1 text-muted">
+          {t("twin.lead")}
+          <Info term="healthTwin" />
+        </p>
 
-      {r && (
-        <section
-          className="card card-tint mt-4 p-4"
-          style={
-            {
-              "--tint": r.call === "push" ? "var(--color-ember)" : r.call === "recover" ? "var(--color-cyan)" : "var(--color-accent)",
-            } as React.CSSProperties
-          }
-          aria-label={t("twin.today", { call: CALL_TEXT[r.call].label })}
-          data-testid="twin-verdict"
-        >
-          <h2 className={CARD_TITLE}>{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
-          <p className="mt-1 text-sm text-muted">
-            {(watch.length
-              ? watch.slice(0, 2).map((m) => `${m.label}: ${inSentence(m.chip, true)}`)
-              : r.signals.slice(0, 2).map((s) => s.text)
-            ).join(". ") || CALL_TEXT[r.call].blurb}
-          </p>
-          {proCall && <p className="mt-2 text-sm text-ink">{t("twin.proWould", { call: inSentence(CALL_TEXT[proCall].label, true) })}</p>}
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button onClick={() => go("today")} icon="today">
-              {t("twin.plan")}
-            </Button>
-            {proCall && (
-              <Button kind="ghost" onClick={() => go("pro", "twin")}>
-                {t("twin.seePro")}
+        {r && (
+          <section
+            className="card card-tint mt-4 p-4"
+            style={
+              {
+                "--tint": r.call === "push" ? "var(--color-ember)" : r.call === "recover" ? "var(--color-cyan)" : "var(--color-accent)",
+              } as React.CSSProperties
+            }
+            aria-label={t("twin.today", { call: CALL_TEXT[r.call].label })}
+            data-testid="twin-verdict"
+          >
+            <h2 className={CARD_TITLE}>{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
+            <p className="mt-1 text-sm text-muted">
+              {(watch.length
+                ? watch.slice(0, 2).map((m) => `${m.label}: ${inSentence(m.chip, true)}`)
+                : r.signals.slice(0, 2).map((s) => s.text)
+              ).join(". ") || CALL_TEXT[r.call].blurb}
+            </p>
+            {proCall && <p className="mt-2 text-sm text-ink">{t("twin.proWould", { call: inSentence(CALL_TEXT[proCall].label, true) })}</p>}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button onClick={() => go("today")} icon="today">
+                {t("twin.plan")}
               </Button>
-            )}
-          </div>
-        </section>
-      )}
+              {proCall && (
+                <Button kind="ghost" onClick={() => go("pro", "twin")}>
+                  {t("twin.seePro")}
+                </Button>
+              )}
+            </div>
+          </section>
+        )}
 
-      {canHealth && !hasHealth && (
-        <section className="card mt-3 p-4" data-testid="twin-connect">
-          <p className="text-sm text-muted">{t("twin.connect.body")}</p>
-          <HealthConnect store={store} empty={!hasHealth} />
-        </section>
-      )}
-      {!native && <p className="mt-3 text-sm text-faint">{t("twin.web")}</p>}
+        {canHealth && !hasHealth && (
+          <section className="card mt-3 p-4" data-testid="twin-connect">
+            <p className="text-sm text-muted">{t("twin.connect.body")}</p>
+            <HealthConnect store={store} empty={!hasHealth} />
+          </section>
+        )}
+        {!native && <p className="mt-3 text-sm text-faint">{t("twin.web")}</p>}
 
-      <div className="keep-colours relative mx-auto mt-4 h-[24rem] max-w-[420px]">
-        <LiftDemo
-          className="h-full"
-          body={bodyFor(profile.sex)}
-          shape={shape}
-          view="front"
-          bpm={rhr?.value ? Math.round(rhr.value) : null}
-          label={t("body.health")}
-        />
-        <span className="sr-only">{t("twin.figure", { summary })}</span>
-        <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
-        <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
-        <Pin m={comp && by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
-        <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
-        <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
+        <div className="keep-colours relative mx-auto mt-4 h-[24rem] max-w-[420px]">
+          <LiftDemo
+            className="h-full"
+            body={bodyFor(profile.sex)}
+            shape={shape}
+            view="front"
+            bpm={rhr?.value ? Math.round(rhr.value) : null}
+            label={t("body.health")}
+          />
+          <span className="sr-only">{t("twin.figure", { summary })}</span>
+          <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
+          <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
+          <Pin m={comp && by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
+          <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
+          <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
+        </div>
+
+        {teen && (
+          <SwitchRow
+            label={t("team.bodyComp.label")}
+            hint={t("team.bodyComp.hint")}
+            on={!!profile.bodyComp}
+            onChange={(v) => setProfile({ bodyComp: v })}
+          />
+        )}
+        {comp && <ShapeSwitch />}
       </div>
 
-      {teen && (
-        <SwitchRow
-          label={t("team.bodyComp.label")}
-          hint={t("team.bodyComp.hint")}
-          on={!!profile.bodyComp}
-          onChange={(v) => setProfile({ bodyComp: v })}
-        />
-      )}
-      {comp && <ShapeSwitch />}
+      <div className="desk:[&>section:first-child]:mt-1">
+        <FitnessAgeCard native={native} store={store} />
+        <FitTestsCard />
+        <FoodCard native={native} store={store} now={now} />
 
-      <FitnessAgeCard native={native} store={store} />
-      <FitTestsCard />
-      <FoodCard native={native} store={store} now={now} />
-
-      <Section title={t("twin.group.body")} icon="target">
-        <Tiles ids={BODY} by={by} onOpen={setOpen} />
-      </Section>
-      <Section title={t("twin.group.heart")} icon="heart">
-        <Tiles ids={HEART} by={by} onOpen={setOpen} />
-      </Section>
-      <p className="mt-4 text-xs text-faint">{t("twin.notMedical")}</p>
+        <Section title={t("twin.group.body")} icon="target">
+          <Tiles ids={BODY} by={by} onOpen={setOpen} />
+        </Section>
+        <Section title={t("twin.group.heart")} icon="heart">
+          <Tiles ids={HEART} by={by} onOpen={setOpen} />
+        </Section>
+        <p className="mt-4 text-xs text-faint">{t("twin.notMedical")}</p>
+      </div>
 
       <Sheet open={!!current} onClose={() => setOpen(null)} title={current?.label ?? ""}>
         {current && (
