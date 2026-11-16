@@ -13,7 +13,7 @@ import { Button, Section } from "./ui";
 
 // "Gyms you train at" for a coach (docs/decisions/gyms.md "Round 3"): pick one of your own gyms that is a real gym, add
 // a line about yourself, and the gym's page lists you with "Train with me", which opens the usual "Share my workouts"
-// screen. An official gym's owner approves you first.
+// screen. An official gym's owner approves you first. Tapping a listed gym's name opens its page (#/gymplace/<id>).
 
 const input = "card w-full px-4 py-3";
 
@@ -80,10 +80,19 @@ export function CoachGyms() {
         <ul className="card mt-3 divide-y divide-line">
           {mine.map((x) => (
             <li key={x.place} className="flex flex-wrap items-center gap-3 px-4 py-3">
-              <span className="min-w-0 flex-1">
-                <span className="block font-semibold">{x.name}</span>
-                <span className="block text-sm text-muted">{x.status === "pending" ? t("gym.coach.waiting") : t("gym.coach.shown")}</span>
-              </span>
+              <button
+                type="button"
+                onClick={() => go("gymplace", x.place)}
+                className="press -mx-1 flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-xl px-1 text-left"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold">{x.name}</span>
+                  <span className="block text-sm text-muted">{x.status === "pending" ? t("gym.coach.waiting") : t("gym.coach.shown")}</span>
+                </span>
+                <span aria-hidden className="text-muted">
+                  ›
+                </span>
+              </button>
               <Button kind="ghost" onClick={() => void add(x.place)}>
                 {t("gym.coach.update")}
               </Button>
