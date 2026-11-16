@@ -826,6 +826,7 @@ export const emails: Record<string, Words> = {
       "Laissez le prix vide pour un programme gratuit, ou fixez-en un une fois les paiements Stripe activés.",
       "Les programmes payants s'achètent sur le site, et l'argent va sur votre compte Stripe.",
       "Partagez son lien partout. Ceux qui l'ont le gardent, même après l'avoir retiré de la liste.",
+      "Chaque programme publié a sa propre page sur le site, et les personnes qui l'ont depuis deux semaines peuvent le noter.",
     ],
     dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés.",
   },

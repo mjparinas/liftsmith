@@ -65,7 +65,7 @@ const EX: Record<MsgLang, Partial<Record<string, unknown>>> = {
   pl: ex.pl,
   tr: ex.tr,
 };
-const exName = (lang: MsgLang, id: string) => {
+export const exName = (lang: MsgLang, id: string) => {
   const m = EX[lang][`ex.${id}`] ?? (ex.en as Record<string, unknown>)[`ex.${id}`];
   return typeof m === "string" ? m : id;
 };

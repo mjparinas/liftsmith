@@ -792,6 +792,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "program-pages",
+        name: "Coaches' programs on the website, with ratings",
+        body: "Every listed program from a coach has its own page on the website, with its level, goal, weeks and days, and a free one's exercises, so people can find it in search. Lifters who have had a program for two weeks rate it with stars and a short review; ratings show once a program has three, and its coach replies once to each.",
+        tier: "both",
+        proPart: "Rating a program is free; making one is part of coaching, which is Pro.",
+        pro: "coaching",
+        added: "2026-11-16",
+      },
+      {
         id: "coach-plans",
         name: "Coach plans that grow with your client list",
         body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and on Coach and Coach Plus Liftsmith takes nothing from what they pay you. On Pro it keeps 2%.",

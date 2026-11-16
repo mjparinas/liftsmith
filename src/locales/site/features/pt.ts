@@ -489,6 +489,11 @@ export const pt: FeaturesText = {
       body: "Os alunos dão estrelas e uma avaliação curta ao seu coach, personal trainer ou fisioterapeuta depois de quatro semanas ou duas sessões juntos. A nota aparece quando o coach tem três avaliações, ao lado de quantos alunos dele treinaram nas últimas duas semanas, no convite dele e na lista de personal trainers. Os coaches respondem uma vez a cada uma, e qualquer pessoa pode denunciar uma avaliação. Só adultos podem avaliar.",
       proPart: "Avaliar é grátis; treinar alunos é Pro.",
     },
+    "program-pages": {
+      name: "Programas de treinadores no site, com avaliações",
+      body: "Cada programa publicado por um treinador tem sua própria página no site, com nível, objetivo, semanas e dias, e os exercícios dos gratuitos, para que as pessoas o encontrem nas buscas. Quem tem um programa há duas semanas o avalia com estrelas e uma avaliação curta; as notas aparecem a partir de três, e o treinador responde uma vez a cada uma.",
+      proPart: "Avaliar um programa é grátis; criá-los faz parte do coaching, que é Pro.",
+    },
     "coach-plans": {
       name: "Planos de coach que crescem com sua lista de alunos",
       body: "O Pro cobre até 3 alunos. O Coach abre espaço para 25 e o Coach Plus não tem limite fixo, com todas as ferramentas de coaching em todos os planos. Seus alunos sempre treinam grátis, e no Coach e no Coach Plus o Liftsmith não fica com nada do que eles pagam a você. No Pro, ele fica com 2%.",

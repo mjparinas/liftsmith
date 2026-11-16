@@ -489,6 +489,11 @@ export const pl: FeaturesText = {
       body: "Podopieczni oceniają swojego trenera, trenera personalnego albo fizjoterapeutę gwiazdkami i krótką opinią po czterech tygodniach lub dwóch wspólnych sesjach. Ocena pojawia się, gdy trener ma trzy opinie, obok liczby jego podopiecznych, którzy trenowali w ostatnich dwóch tygodniach, w zaproszeniu i w katalogu trenerów. Trener może raz odpowiedzieć na każdą opinię, a każdy może opinię zgłosić. Opinie mogą wystawiać tylko osoby pełnoletnie.",
       proPart: "Wystawienie opinii jest darmowe; prowadzenie podopiecznych jest w Pro.",
     },
+    "program-pages": {
+      name: "Programy od trenerów na stronie, z ocenami",
+      body: "Każdy opublikowany program trenera ma własną stronę w serwisie, z poziomem, celem, liczbą tygodni i dni oraz ćwiczeniami darmowych programów, więc można go znaleźć w wyszukiwarce. Osoby, które mają program od dwóch tygodni, oceniają go gwiazdkami i krótką opinią; oceny pojawiają się od trzech, a trener odpowiada raz na każdą.",
+      proPart: "Ocenianie programu jest darmowe; tworzenie ich to część trenowania, które jest w Pro.",
+    },
     "coach-plans": {
       name: "Plany dla trenerów, które rosną z listą podopiecznych",
       body: "Pro obejmuje do 3 podopiecznych. Coach mieści 25, a Coach Plus nie ma ustalonego limitu, z każdym narzędziem trenerskim w każdym planie. Twoi podopieczni zawsze trenują za darmo, a w planach Coach i Coach Plus Liftsmith nie bierze nic z tego, co ci płacą. W Pro zatrzymuje 2%.",

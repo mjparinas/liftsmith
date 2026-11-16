@@ -205,6 +205,62 @@ export async function replyToReview(
   return { reply };
 }
 
+/**
+ * Where a review id lives: a review of a coach, or of a program (programReviews.ts, same id shape and the same report
+ * path). With who wrote it, whose reply it carries and the words, for reports.
+ */
+async function locate(id: string): Promise<{
+  table: "coach_reviews" | "program_reviews";
+  author: string;
+  coach: string;
+  stars: number;
+  body: string;
+  reply: string;
+  hidden: boolean;
+  replyHidden: boolean;
+  program: string;
+} | null> {
+  const [c] = await query<ReviewRow & { coach_id: string }>("SELECT * FROM coach_reviews WHERE id = ?", [id]);
+  if (c)
+    return {
+      table: "coach_reviews",
+      author: s(c.client_id),
+      coach: s(c.coach_id),
+      stars: n(c.stars),
+      body: s(c.body),
+      reply: s(c.reply),
+      hidden: !!n(c.hidden),
+      replyHidden: !!n(c.reply_hidden),
+      program: "",
+    };
+  const [p] = await query<{
+    account_id: string;
+    coach_id: string;
+    title: string;
+    stars: number;
+    body: string;
+    reply: string;
+    hidden: number;
+    reply_hidden: number;
+  }>(
+    `SELECT r.account_id, p.coach_id, p.title, r.stars, r.body, r.reply, r.hidden, r.reply_hidden
+       FROM program_reviews r JOIN coach_programs p ON p.id = r.program_id WHERE r.id = ?`,
+    [id],
+  );
+  if (!p) return null;
+  return {
+    table: "program_reviews",
+    author: s(p.account_id),
+    coach: s(p.coach_id),
+    stars: n(p.stars),
+    body: s(p.body),
+    reply: s(p.reply),
+    hidden: !!n(p.hidden),
+    replyHidden: !!n(p.reply_hidden),
+    program: s(p.title),
+  };
+}
+
 /** Anyone signed in reports a review (`part` "review") or the coach's reply to it. Three people hide it until staff decide. */
 export async function reportReview(
   accountId: string,
@@ -218,13 +274,10 @@ export async function reportReview(
   const why = REASONS_FOR.review.find((r) => r === reason);
   if (!why) return { error: "bad" };
   const reply = part === "reply";
-  const [r] = await query<{ coach_id: string; client_id: string; reply: string }>(
-    "SELECT coach_id, client_id, reply FROM coach_reviews WHERE id = ?",
-    [id],
-  );
-  if (!r || (reply && !s(r.reply))) return { error: "gone" };
+  const r = await locate(id);
+  if (!r || (reply && !r.reply)) return { error: "gone" };
   // Nobody reports their own words.
-  if (accountId === s(reply ? r.coach_id : r.client_id)) return { error: "bad" };
+  if (accountId === (reply ? r.coach : r.author)) return { error: "bad" };
   if (!(await rateLimit(`reviewReport:${accountId}`, 30, DAY, now))) return { error: "slow" };
   const target = reply ? `${id}.reply` : id;
   await run(
@@ -235,7 +288,7 @@ export async function reportReview(
     "SELECT COUNT(DISTINCT reporter_id) AS n FROM reports WHERE kind = 'review' AND target_id = ? AND status = 'open'",
     [target],
   );
-  if (n(c?.n) >= REVIEW_LIMITS.hideAfter) await run(`UPDATE coach_reviews SET ${reply ? "reply_hidden" : "hidden"} = 1 WHERE id = ?`, [id]);
+  if (n(c?.n) >= REVIEW_LIMITS.hideAfter) await run(`UPDATE ${r.table} SET ${reply ? "reply_hidden" : "hidden"} = 1 WHERE id = ?`, [id]);
   return { ok: true };
 }
 
@@ -297,19 +350,20 @@ export async function isCoach(accountId: string): Promise<boolean> {
 
 // ---------- Admin: the Reports tab (social.ts) ----------
 
-/** What staff see for a reported review or reply: the words, who wrote them and whether reports hid them. */
+/** What staff see for a reported review or reply (of a coach or a program): the words, who wrote them and whether reports hid them. */
 export async function reviewReport(target: string): Promise<{ content: string; authorId: string; hidden: boolean } | null> {
   const reply = target.endsWith(".reply");
   const id = reply ? target.slice(0, -".reply".length) : target;
-  const [r] = await query<ReviewRow & { coach_id: string }>("SELECT * FROM coach_reviews WHERE id = ?", [id]);
+  const r = await locate(id);
   if (!r) return null;
-  const coach = (await nameOf(s(r.coach_id))) || "a coach";
+  const coach = (await nameOf(r.coach)) || "a coach";
+  const what = r.program ? `the program "${r.program}" by ${coach}` : coach;
   return reply
-    ? { content: `Reply from ${coach}: ${s(r.reply)}`, authorId: s(r.coach_id), hidden: !!n(r.reply_hidden) }
+    ? { content: `Reply from ${coach}${r.program ? ` on "${r.program}"` : ""}: ${r.reply}`, authorId: r.coach, hidden: r.replyHidden }
     : {
-        content: `${"★".repeat(n(r.stars))}${"☆".repeat(5 - n(r.stars))} for ${coach}${s(r.body) ? `: ${s(r.body)}` : ""}`,
-        authorId: s(r.client_id),
-        hidden: !!n(r.hidden),
+        content: `${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)} for ${what}${r.body ? `: ${r.body}` : ""}`,
+        authorId: r.author,
+        hidden: r.hidden,
       };
 }
 
@@ -318,6 +372,7 @@ export async function resolveReview(target: string, action: "remove" | "dismiss"
   const reply = target.endsWith(".reply");
   const id = reply ? target.slice(0, -".reply".length) : target;
   if (!isReviewId(id)) return false;
+  const table = (await locate(id))?.table ?? "coach_reviews";
   const close = {
     sql: "UPDATE reports SET status = ? WHERE kind = 'review' AND target_id = ? AND status = 'open'",
     args: [status, target],
@@ -325,10 +380,10 @@ export async function resolveReview(target: string, action: "remove" | "dismiss"
   if (action === "remove")
     await batch([
       reply
-        ? { sql: "UPDATE coach_reviews SET reply = '', reply_at = 0, reply_hidden = 0 WHERE id = ?", args: [id] }
-        : { sql: "DELETE FROM coach_reviews WHERE id = ?", args: [id] },
+        ? { sql: `UPDATE ${table} SET reply = '', reply_at = 0, reply_hidden = 0 WHERE id = ?`, args: [id] }
+        : { sql: `DELETE FROM ${table} WHERE id = ?`, args: [id] },
       close,
     ]);
-  else await batch([{ sql: `UPDATE coach_reviews SET ${reply ? "reply_hidden" : "hidden"} = 0 WHERE id = ?`, args: [id] }, close]);
+  else await batch([{ sql: `UPDATE ${table} SET ${reply ? "reply_hidden" : "hidden"} = 0 WHERE id = ?`, args: [id] }, close]);
   return true;
 }

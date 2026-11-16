@@ -489,6 +489,11 @@ export const tr: FeaturesText = {
       body: "Danışanlar, dört hafta ya da birlikte iki seanstan sonra koçlarını, kişisel antrenörlerini ya da fizyoterapistlerini yıldızla ve kısa bir değerlendirmeyle puanlar. Puan, koçun üç değerlendirmesi olunca görünür; yanında son iki haftada danışanlarından kaçının antrenman yaptığı yer alır, davetinde ve antrenör dizininde. Koçlar her birine bir kez yanıt verir ve herkes bir değerlendirmeyi bildirebilir. Yalnızca yetişkinler değerlendirme bırakabilir.",
       proPart: "Değerlendirme bırakmak ücretsiz; danışan çalıştırmak Pro.",
     },
+    "program-pages": {
+      name: "Koçların programları web sitesinde, puanlarıyla",
+      body: "Bir koçun yayınladığı her programın web sitesinde kendi sayfası olur; seviyesi, hedefi, hafta ve gün sayısı ve ücretsizse egzersizleri görünür, böylece aramada bulunur. Bir programa iki haftadır sahip olanlar onu yıldız ve kısa bir değerlendirmeyle puanlar; puanlar üç değerlendirmeden sonra görünür ve koç her birine bir kez yanıt verir.",
+      proPart: "Program puanlamak ücretsizdir; program yapmak Pro olan koçluğun parçasıdır.",
+    },
     "coach-plans": {
       name: "Danışan listenle büyüyen koç planları",
       body: "Pro en fazla 3 danışanı kapsar. Coach 25 danışana yer açar, Coach Plus'ın belirli bir sınırı yok; her planda tüm koçluk araçları var. Danışanların her zaman ücretsiz antrenman yapar ve Coach ile Coach Plus'ta Liftsmith sana ödediklerinden hiçbir şey almaz. Pro'da %2 alır.",

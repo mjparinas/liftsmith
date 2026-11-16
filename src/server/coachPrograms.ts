@@ -104,6 +104,20 @@ export function countCode(code: string): { exercises: number; sets: number } {
   return { exercises, sets };
 }
 
+/** A routine code's exercises and set counts in order ("bench-press", 4), for the public page of a free program. */
+export function codeItems(code: string): { id: string; sets: number }[] {
+  return code
+    .split("~")
+    .slice(2)
+    .flatMap((seg) => {
+      const m = /^([\w-]+)\.(\d+)/.exec(seg);
+      return m ? [{ id: m[1]!, sets: Number(m[2]) }] : [];
+    });
+}
+
+/** Whether a coach is under 18 by their profile (their programs then never show to anyone else). */
+export const coachIsTeen = (accountId: string, now = Date.now()) => isTeen(accountId, now);
+
 function readDays(raw: string): { name: string; code: string }[] {
   try {
     const v = JSON.parse(raw) as unknown;
@@ -231,7 +245,10 @@ export async function deleteProgram(coachId: string, id: unknown, now = Date.now
     await run("UPDATE coach_programs SET listed = 0, updated_at = ? WHERE id = ?", [now, id]);
     return "unlisted";
   }
-  await run("DELETE FROM coach_programs WHERE id = ?", [id]);
+  await batch([
+    { sql: "DELETE FROM program_reviews WHERE program_id = ?", args: [id] },
+    { sql: "DELETE FROM coach_programs WHERE id = ?", args: [id] },
+  ]);
   return "deleted";
 }
 
@@ -274,7 +291,7 @@ export async function ownedPrograms(accountId: string): Promise<CoachProgram[]> 
  */
 export async function browsePrograms(
   viewer: string | null,
-  opts: { freeOnly?: boolean; coach?: string } = {},
+  opts: { freeOnly?: boolean; coach?: string; limit?: number } = {},
   now = Date.now(),
 ): Promise<CoachProgram[]> {
   const where = ["listed = 1", "hidden = 0"];
@@ -286,13 +303,13 @@ export async function browsePrograms(
   }
   const rows = await query<Row>(`SELECT * FROM coach_programs WHERE ${where.join(" AND ")} ORDER BY updated_at DESC LIMIT ?`, [
     ...args,
-    PROGRAM_LIMITS.browse * 2,
+    (opts.limit ?? PROGRAM_LIMITS.browse) * 2,
   ]);
   // Only adults' programs are shown (a coach's birthday may pass after they listed one, or the other way round).
   const adults: Row[] = [];
   for (const r of rows) if (!(await isTeen(String(r.coach_id), now))) adults.push(r);
   const owned = await ownedBy(viewer);
-  return Promise.all(adults.slice(0, PROGRAM_LIMITS.browse).map((r) => shape(r, viewer, owned)));
+  return Promise.all(adults.slice(0, opts.limit ?? PROGRAM_LIMITS.browse).map((r) => shape(r, viewer, owned)));
 }
 
 export type GetError = "gone" | "notFree" | "paid";

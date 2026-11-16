@@ -83,6 +83,17 @@ export const en = {
   "cpg.err.words": "Take out links and words that aren't allowed, then save again.",
   "cpg.err.noAccount": "Set up payments with Stripe before setting a price.",
   "cpg.err.teen": "You need to be 18 or over to share programs.",
+  "cpg.rev.title": "Ratings",
+  "cpg.rev.unrated": "Not rated yet. Ratings show once {count} people who have it rate it.",
+  "cpg.rev.ownLead":
+    "Lifters who have had it {days} days can rate it. Others see the rating once there are 3, and you can reply once to each.",
+  "cpg.rev.rateTitle": "Rate this program",
+  "cpg.rev.rateLead": "How did it go? Your first name and last initial show with your review on this program's page.",
+  "cpg.rev.placeholder": "What worked? What changed for you?",
+  "cpg.rev.wait": "You can rate it from {date}, two weeks after you got it.",
+  "cpg.rev.early": "It's a little early to rate this program.",
+  "cpg.rev.notOwner": "Only lifters who have this program can rate it.",
+  "cpg.rev.anon": "A lifter",
 } as const;
 
 type Key = keyof typeof en;
@@ -169,6 +180,17 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Quita los enlaces y las palabras no permitidas y vuelve a guardar.",
   "cpg.err.noAccount": "Configura los pagos con Stripe antes de poner un precio.",
   "cpg.err.teen": "Tienes que tener 18 años o más para compartir programas.",
+  "cpg.rev.title": "Valoraciones",
+  "cpg.rev.unrated": "Aún sin valorar. Las valoraciones se muestran cuando {count} personas que lo tienen lo valoran.",
+  "cpg.rev.ownLead":
+    "Quienes lo tienen desde hace {days} días pueden valorarlo. Los demás ven la valoración cuando haya 3, y puedes responder una vez a cada una.",
+  "cpg.rev.rateTitle": "Valora este programa",
+  "cpg.rev.rateLead": "¿Qué tal te fue? Tu nombre y la inicial de tu apellido se muestran con tu reseña en la página del programa.",
+  "cpg.rev.placeholder": "¿Qué funcionó? ¿Qué cambió para ti?",
+  "cpg.rev.wait": "Podrás valorarlo a partir del {date}, dos semanas después de conseguirlo.",
+  "cpg.rev.early": "Aún es pronto para valorar este programa.",
+  "cpg.rev.notOwner": "Solo quienes tienen este programa pueden valorarlo.",
+  "cpg.rev.anon": "Un usuario",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -258,6 +280,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Retirez les liens et les mots non autorisés, puis enregistrez de nouveau.",
   "cpg.err.noAccount": "Configurez les paiements avec Stripe avant de fixer un prix.",
   "cpg.err.teen": "Vous devez avoir 18 ans ou plus pour partager des programmes.",
+  "cpg.rev.title": "Notes",
+  "cpg.rev.unrated": "Pas encore noté. Les notes s'affichent quand {count} personnes qui l'ont le notent.",
+  "cpg.rev.ownLead":
+    "Les personnes qui l'ont depuis {days} jours peuvent le noter. Les autres voient la note à partir de 3 avis, et vous pouvez répondre une fois à chacun.",
+  "cpg.rev.rateTitle": "Noter ce programme",
+  "cpg.rev.rateLead":
+    "Comment ça s'est passé ? Votre prénom et l'initiale de votre nom s'affichent avec votre avis sur la page du programme.",
+  "cpg.rev.placeholder": "Qu'est-ce qui a marché ? Qu'est-ce qui a changé pour vous ?",
+  "cpg.rev.wait": "Vous pourrez le noter à partir du {date}, deux semaines après l'avoir obtenu.",
+  "cpg.rev.early": "C'est un peu tôt pour noter ce programme.",
+  "cpg.rev.notOwner": "Seules les personnes qui ont ce programme peuvent le noter.",
+  "cpg.rev.anon": "Un utilisateur",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -344,6 +378,18 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Entferne Links und nicht erlaubte Wörter und speichere noch einmal.",
   "cpg.err.noAccount": "Richte Zahlungen mit Stripe ein, bevor du einen Preis festlegst.",
   "cpg.err.teen": "Du musst mindestens 18 sein, um Programme zu teilen.",
+  "cpg.rev.title": "Bewertungen",
+  "cpg.rev.unrated": "Noch nicht bewertet. Bewertungen erscheinen, sobald {count} Personen, die es haben, es bewerten.",
+  "cpg.rev.ownLead":
+    "Wer es seit {days} Tagen hat, kann es bewerten. Andere sehen die Bewertung ab 3 Bewertungen, und du kannst auf jede einmal antworten.",
+  "cpg.rev.rateTitle": "Dieses Programm bewerten",
+  "cpg.rev.rateLead":
+    "Wie lief es? Dein Vorname und der erste Buchstabe deines Nachnamens erscheinen mit deiner Bewertung auf der Seite des Programms.",
+  "cpg.rev.placeholder": "Was hat funktioniert? Was hat sich für dich verändert?",
+  "cpg.rev.wait": "Du kannst es ab dem {date} bewerten, zwei Wochen nachdem du es bekommen hast.",
+  "cpg.rev.early": "Es ist noch etwas früh, dieses Programm zu bewerten.",
+  "cpg.rev.notOwner": "Nur wer dieses Programm hat, kann es bewerten.",
+  "cpg.rev.anon": "Ein Nutzer",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -430,6 +476,17 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Togli i link e le parole non consentite, poi salva di nuovo.",
   "cpg.err.noAccount": "Configura i pagamenti con Stripe prima di fissare un prezzo.",
   "cpg.err.teen": "Devi avere almeno 18 anni per condividere programmi.",
+  "cpg.rev.title": "Valutazioni",
+  "cpg.rev.unrated": "Non ancora valutato. Le valutazioni compaiono quando {count} persone che lo hanno lo valutano.",
+  "cpg.rev.ownLead":
+    "Chi lo ha da {days} giorni può valutarlo. Gli altri vedono la valutazione da 3 recensioni in su, e puoi rispondere una volta a ciascuna.",
+  "cpg.rev.rateTitle": "Valuta questo programma",
+  "cpg.rev.rateLead": "Com'è andata? Il tuo nome e l'iniziale del cognome compaiono con la tua recensione sulla pagina del programma.",
+  "cpg.rev.placeholder": "Cosa ha funzionato? Cosa è cambiato per te?",
+  "cpg.rev.wait": "Potrai valutarlo dal {date}, due settimane dopo averlo ottenuto.",
+  "cpg.rev.early": "È ancora presto per valutare questo programma.",
+  "cpg.rev.notOwner": "Solo chi ha questo programma può valutarlo.",
+  "cpg.rev.anon": "Un utente",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -509,6 +566,16 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.err.words": "リンクや使えない言葉を取り除いて、もう一度保存してください。",
   "cpg.err.noAccount": "価格を設定する前に、Stripeで支払いを設定してください。",
   "cpg.err.teen": "プログラムを共有するには18歳以上である必要があります。",
+  "cpg.rev.title": "評価",
+  "cpg.rev.unrated": "まだ評価はありません。プログラムを持つ{count}人が評価すると表示されます。",
+  "cpg.rev.ownLead": "{days}日間持っている人が評価できます。評価が3件になるとほかの人にも表示され、各レビューに1回返信できます。",
+  "cpg.rev.rateTitle": "このプログラムを評価",
+  "cpg.rev.rateLead": "いかがでしたか？名と姓のイニシャルがレビューと一緒にプログラムのページに表示されます。",
+  "cpg.rev.placeholder": "何がうまくいきましたか？何が変わりましたか？",
+  "cpg.rev.wait": "{date}から評価できます（入手から2週間後）。",
+  "cpg.rev.early": "このプログラムを評価するにはまだ少し早いです。",
+  "cpg.rev.notOwner": "このプログラムを持っている人だけが評価できます。",
+  "cpg.rev.anon": "ユーザー",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -595,6 +662,17 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Tire links e palavras não permitidas e salve de novo.",
   "cpg.err.noAccount": "Configure os pagamentos com a Stripe antes de definir um preço.",
   "cpg.err.teen": "Você precisa ter 18 anos ou mais para compartilhar programas.",
+  "cpg.rev.title": "Avaliações",
+  "cpg.rev.unrated": "Ainda sem avaliações. As avaliações aparecem quando {count} pessoas que têm o programa o avaliam.",
+  "cpg.rev.ownLead":
+    "Quem tem o programa há {days} dias pode avaliá-lo. Os outros veem a nota a partir de 3 avaliações, e você pode responder uma vez a cada uma.",
+  "cpg.rev.rateTitle": "Avalie este programa",
+  "cpg.rev.rateLead": "Como foi? Seu primeiro nome e a inicial do sobrenome aparecem com sua avaliação na página do programa.",
+  "cpg.rev.placeholder": "O que funcionou? O que mudou para você?",
+  "cpg.rev.wait": "Você pode avaliá-lo a partir de {date}, duas semanas depois de recebê-lo.",
+  "cpg.rev.early": "Ainda é um pouco cedo para avaliar este programa.",
+  "cpg.rev.notOwner": "Só quem tem este programa pode avaliá-lo.",
+  "cpg.rev.anon": "Uma pessoa",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -674,6 +752,17 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.err.words": "링크와 허용되지 않는 단어를 빼고 다시 저장하세요.",
   "cpg.err.noAccount": "가격을 정하기 전에 Stripe 결제를 설정하세요.",
   "cpg.err.teen": "프로그램을 공유하려면 만 18세 이상이어야 해요.",
+  "cpg.rev.title": "평점",
+  "cpg.rev.unrated": "아직 평점이 없어요. 프로그램을 가진 {count}명이 평가하면 평점이 보여요.",
+  "cpg.rev.ownLead":
+    "{days}일 동안 가진 사람이 평가할 수 있어요. 평가가 3개가 되면 다른 사람에게도 보이고, 각 리뷰에 한 번씩 답할 수 있어요.",
+  "cpg.rev.rateTitle": "이 프로그램 평가하기",
+  "cpg.rev.rateLead": "어땠나요? 이름과 성의 첫 글자가 리뷰와 함께 프로그램 페이지에 보여요.",
+  "cpg.rev.placeholder": "무엇이 효과가 있었나요? 무엇이 달라졌나요?",
+  "cpg.rev.wait": "{date}부터 평가할 수 있어요. 받은 지 2주 뒤예요.",
+  "cpg.rev.early": "이 프로그램을 평가하기엔 아직 조금 일러요.",
+  "cpg.rev.notOwner": "이 프로그램을 가진 사람만 평가할 수 있어요.",
+  "cpg.rev.anon": "한 사용자",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -756,6 +845,17 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Bağlantıları ve izin verilmeyen kelimeleri çıkarıp tekrar kaydet.",
   "cpg.err.noAccount": "Fiyat koymadan önce Stripe ile ödemeleri kur.",
   "cpg.err.teen": "Program paylaşmak için 18 yaşında ya da daha büyük olmalısın.",
+  "cpg.rev.title": "Puanlar",
+  "cpg.rev.unrated": "Henüz puan yok. Programa sahip {count} kişi puan verdiğinde puanlar görünür.",
+  "cpg.rev.ownLead":
+    "Programa {days} gündür sahip olanlar puan verebilir. Diğerleri puanı 3 değerlendirmeden sonra görür ve her birine bir kez yanıt verebilirsin.",
+  "cpg.rev.rateTitle": "Bu programı puanla",
+  "cpg.rev.rateLead": "Nasıl geçti? Adın ve soyadının baş harfi değerlendirmenle birlikte programın sayfasında görünür.",
+  "cpg.rev.placeholder": "Ne işe yaradı? Senin için ne değişti?",
+  "cpg.rev.wait": "{date} tarihinden itibaren puan verebilirsin, programı aldıktan iki hafta sonra.",
+  "cpg.rev.early": "Bu programı puanlamak için henüz biraz erken.",
+  "cpg.rev.notOwner": "Yalnızca bu programa sahip olanlar puan verebilir.",
+  "cpg.rev.anon": "Bir sporcu",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -866,4 +966,15 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.err.words": "Usuń linki i niedozwolone słowa, a potem zapisz ponownie.",
   "cpg.err.noAccount": "Przed ustaleniem ceny skonfiguruj płatności w Stripe.",
   "cpg.err.teen": "Aby udostępniać programy, musisz mieć co najmniej 18 lat.",
+  "cpg.rev.title": "Oceny",
+  "cpg.rev.unrated": "Jeszcze bez ocen. Oceny pojawią się, gdy oceni go tyle osób, które go mają: {count}.",
+  "cpg.rev.ownLead":
+    "Ocenić mogą osoby, które mają go od tylu dni: {days}. Inni widzą ocenę od 3 opinii, a na każdą możesz odpowiedzieć raz.",
+  "cpg.rev.rateTitle": "Oceń ten program",
+  "cpg.rev.rateLead": "Jak poszło? Twoje imię i pierwsza litera nazwiska pojawią się z opinią na stronie programu.",
+  "cpg.rev.placeholder": "Co zadziałało? Co się dla Ciebie zmieniło?",
+  "cpg.rev.wait": "Możesz go ocenić od {date}, dwa tygodnie po otrzymaniu.",
+  "cpg.rev.early": "Na ocenę tego programu jest jeszcze trochę za wcześnie.",
+  "cpg.rev.notOwner": "Ocenić program mogą tylko osoby, które go mają.",
+  "cpg.rev.anon": "Użytkownik",
 };

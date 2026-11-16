@@ -15,7 +15,7 @@ import { siteText } from "@/locales/site";
 import * as pub from "@/locales/text/pub";
 
 /** Which page the frame is on, for the store links' referrer (the only links that carry a source). */
-export type FrameSource = "profile" | "share" | "gym" | "standards" | "trainers";
+export type FrameSource = "profile" | "share" | "gym" | "standards" | "trainers" | "programs";
 
 type PubKey = keyof typeof pub.en;
 const CATALOG: Record<MsgLang, Partial<Record<PubKey, unknown>>> = {

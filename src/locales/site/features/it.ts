@@ -421,6 +421,11 @@ export const it: FeaturesText = {
       body: "I clienti valutano il loro coach, personal trainer o fisioterapista con stelle e una breve recensione dopo quattro settimane o due sessioni insieme. La valutazione compare dopo tre recensioni, accanto a quanti dei suoi clienti si sono allenati nelle ultime due settimane, nell’invito e nell’elenco dei trainer. Il coach risponde una volta a ciascuna e chiunque può segnalare una recensione. Solo gli adulti possono lasciarne una.",
       proPart: "Lasciare una recensione è gratis; seguire clienti è Pro.",
     },
+    "program-pages": {
+      name: "I programmi dei coach sul sito, con valutazioni",
+      body: "Ogni programma pubblicato da un coach ha una sua pagina sul sito, con livello, obiettivo, settimane e giorni, e gli esercizi di quelli gratuiti, così lo si trova nei motori di ricerca. Chi ha un programma da due settimane lo valuta con stelle e una breve recensione; le valutazioni compaiono da tre in su, e il coach risponde una volta a ciascuna.",
+      proPart: "Valutare un programma è gratis; crearli fa parte del coaching, che è Pro.",
+    },
     "coach-plans": {
       name: "Piani da coach che crescono con i tuoi clienti",
       body: "Pro copre fino a 3 clienti. Coach dà spazio a 25 e Coach Plus non ha un limite fisso, con ogni strumento da coach in ogni piano. I tuoi clienti si allenano sempre gratis, e con Coach e Coach Plus Liftsmith non trattiene nulla di quello che ti pagano. Con Pro trattiene il 2%.",

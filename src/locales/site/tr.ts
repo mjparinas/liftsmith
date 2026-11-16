@@ -39,6 +39,7 @@ export const tr: SiteText = {
       exercises: "Egzersiz kütüphanesi",
       muscles: "Kas gruplarına göre egzersizler",
       programs: "Antrenman programları",
+      coachPrograms: "Koçlardan programlar",
       equipment: "Ekipmana göre egzersizler",
       guides: "Antrenman rehberleri",
       blog: "Blog",

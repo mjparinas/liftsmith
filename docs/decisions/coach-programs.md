@@ -41,7 +41,20 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 
 `src/server/coachPrograms.ts` (tables `coach_programs` and `program_owners`), `/api/programs/` (`src/app/api/programs/route.api.ts`), `src/lib/coachPrograms.ts`, `CoachPrograms.tsx` (coach), `CoachProgram.tsx` (list and page), `Programs.tsx` (From coaches), text in `src/locales/text/cpg.ts` and the glossary term `coachPrograms`. Pure web code plus the server, so Android, iOS and the web app get it together; the only platform difference is where a paid program can be bought ([Platform deltas](platform-deltas.md)).
 
+## Ratings (Melvin, 2026-11-16: "build public seo pages for both")
+
+- **Only someone who has the program rates it**, after two weeks with it (`PROGRAM_REVIEW_LIMITS.days`), so a rating says how it went rather than how it looked. Never its own coach, and only adults. One review per lifter and program, 1 to 5 stars and an optional line of up to 500 characters through the Friends text filter (no links); they can change or delete it, and it stays if they drop the program or it's refunded, because it was still true.
+- **Nobody sees a program's rating or reviews until it has three** (`shown`), except its coach, who sees every review from the first one and replies once to each in public. The coach gets a push the first time a lifter rates one of their programs (`coachProgramReview`).
+- **Reports** use the coach reviews' path: kind `review` in `reports`, three reports hide it, and Admin › Reports handles both kinds unchanged (`locate` in `coachReviews.ts` looks in `coach_reviews`, then `program_reviews`).
+- **In the app** the program's page (`#/program/<id>`) has a Ratings section (`ProgramReviews.tsx`): the stars and count, a form for a lifter who can rate it, their own review with Edit and Delete, a line on when they can, and for its coach every review with a reply box. Reviews show the reviewer's first name and last initial, or "A lifter".
+- Code: `src/server/programReviews.ts` (table `program_reviews`), the `review`, `unreview` and `reply` actions on `/api/programs/`, and `rating`, `reviews` and `mine` on `GET ?id`.
+
+## Public pages (2026-11-16)
+
+- **`/coach-programs/`** lists every listed program of an adult coach, grouped by goal, with its price and rating (most reviewed first, then newest, up to 500), and **`/coach-programs/<slug>-<id>/`** is one program: who made it, level, goal, weeks, days, about, the price, its rating and latest reviews once it has three, and the coach's other programs. A free program lists each day's exercises; a paid one shows only how many exercises and sets each day has, because the exercises are what's being sold. "Get it" opens the program in the web app, where a paid one is bought.
+- Plain HTML with no scripts, in the reader's language, under the share pages' strict CSP, drawn per request like the trainer directory (`src/server/programPage.ts`, `/api/programs/page/`, rewritten in `next.config.ts`). An old slug redirects to the program's own address; an unlisted, removed or under-18 coach's program is a noindex 404 showing the list. Structured data: `ItemList` on the list and a `Course` provided by the coach (`provider`, `offers`, and `aggregateRating` and `review` once it has three) on each program, never a `Product`, which Google reads as a merchant listing (`appSchema.test.ts`).
+- In `/sitemap-gyms.xml` and the daily IndexNow ping (dated by `updatedAt`), and linked from the site footer (Programs from coaches). Web only: these are website pages, so there is nothing for the apps to do.
+
 ## Not built yet
 
-- Public, indexable program pages on the website (`/coach-programs/<id>/`) and listing a coach's programs on the trainer directory. The share link opens the web app for now.
-- Ratings on programs (coach ratings are their own feature), and staff hiding a program from the admin panel (the `hidden` column is there; programs pass the text filter on the way in).
+- Listing a coach's programs on their trainer directory entry, and staff hiding a program from the admin panel (the `hidden` column is there; programs pass the text filter on the way in).

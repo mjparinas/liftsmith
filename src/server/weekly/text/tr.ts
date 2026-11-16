@@ -822,6 +822,7 @@ export const emails: Record<string, Words> = {
       "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle.",
       "Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
       "Bağlantısını her yerde paylaş. Programa sahip olanlar, sen listeden kaldırsan bile onu tutar.",
+      "Yayınlanan her programın web sitesinde kendi sayfası olur ve iki haftadır sahip olanlar onu puanlayabilir.",
     ],
     dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar.",
   },
