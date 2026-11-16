@@ -35,6 +35,10 @@ export const en = {
   "save.nudge.body": "Sign in to back up your workouts, or add Liftsmith to your home screen, so they can't be cleared.",
   "save.nudge.go": "Keep it safe",
   "save.nudge.dismiss": "Got it",
+  "save.photos": { one: "Include {count} progress photo", other: "Include {count} progress photos" },
+  "save.photos.hint": "Photos never sync, so a backup with them is how they move to a new phone. Keep the file somewhere private.",
+  "save.backup.saving": "Saving…",
+  "save.restored.photos": { one: "{count} progress photo added.", other: "{count} progress photos added." },
 } as const;
 
 type Key = keyof typeof en;
@@ -71,6 +75,11 @@ export const es: Partial<Record<Key, Message>> = {
   "save.nudge.body": "Inicia sesión para guardar tus entrenamientos, o añade Liftsmith a tu pantalla de inicio, para que no se borren.",
   "save.nudge.go": "Protegerlos",
   "save.nudge.dismiss": "Entendido",
+  "save.photos": { one: "Incluir {count} foto de progreso", other: "Incluir {count} fotos de progreso" },
+  "save.photos.hint":
+    "Las fotos nunca se sincronizan, así que una copia con ellas es la forma de llevarlas a un teléfono nuevo. Guarda el archivo en un lugar privado.",
+  "save.backup.saving": "Guardando…",
+  "save.restored.photos": { one: "{count} foto de progreso añadida.", other: "{count} fotos de progreso añadidas." },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -107,6 +116,11 @@ export const fr: Partial<Record<Key, Message>> = {
     "Connectez-vous pour sauvegarder vos séances, ou ajoutez Liftsmith à votre écran d'accueil, pour qu'elles ne puissent pas être effacées.",
   "save.nudge.go": "Les protéger",
   "save.nudge.dismiss": "Compris",
+  "save.photos": { one: "Inclure {count} photo de progrès", other: "Inclure {count} photos de progrès" },
+  "save.photos.hint":
+    "Les photos ne sont jamais synchronisées : une sauvegarde qui les contient est le moyen de les emporter sur un nouveau téléphone. Gardez le fichier dans un endroit privé.",
+  "save.backup.saving": "Enregistrement…",
+  "save.restored.photos": { one: "{count} photo de progrès ajoutée.", other: "{count} photos de progrès ajoutées." },
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -143,6 +157,11 @@ export const de: Partial<Record<Key, Message>> = {
     "Melde dich an, um deine Trainings zu sichern, oder füge Liftsmith deinem Home-Bildschirm hinzu, damit sie nicht gelöscht werden können.",
   "save.nudge.go": "Sicher aufbewahren",
   "save.nudge.dismiss": "Verstanden",
+  "save.photos": { one: "{count} Fortschrittsfoto einschließen", other: "{count} Fortschrittsfotos einschließen" },
+  "save.photos.hint":
+    "Fotos werden nie synchronisiert. Mit einer Sicherung, die sie enthält, kommen sie auf ein neues Handy. Bewahre die Datei privat auf.",
+  "save.backup.saving": "Wird gespeichert…",
+  "save.restored.photos": { one: "{count} Fortschrittsfoto hinzugefügt.", other: "{count} Fortschrittsfotos hinzugefügt." },
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -178,6 +197,11 @@ export const it: Partial<Record<Key, Message>> = {
     "Accedi per fare il backup degli allenamenti, o aggiungi Liftsmith alla schermata Home, così non possono essere cancellati.",
   "save.nudge.go": "Tienili al sicuro",
   "save.nudge.dismiss": "Ho capito",
+  "save.photos": { one: "Includi {count} foto dei progressi", other: "Includi {count} foto dei progressi" },
+  "save.photos.hint":
+    "Le foto non vengono mai sincronizzate, quindi un backup che le contiene è il modo per portarle su un nuovo telefono. Conserva il file in un posto privato.",
+  "save.backup.saving": "Salvataggio…",
+  "save.restored.photos": { one: "{count} foto dei progressi aggiunta.", other: "{count} foto dei progressi aggiunte." },
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -212,4 +236,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "save.nudge.body": "サインインしてワークアウトをバックアップするか、Liftsmith をホーム画面に追加して消えないようにしましょう。",
   "save.nudge.go": "安全に保つ",
   "save.nudge.dismiss": "わかりました",
+  "save.photos": { other: "進捗写真{count}枚を含める" },
+  "save.photos.hint":
+    "写真は同期されないため、新しい端末へ移すには写真入りのバックアップを使います。ファイルは人に見られない場所に保管してください。",
+  "save.backup.saving": "保存中…",
+  "save.restored.photos": { other: "進捗写真を{count}枚追加しました。" },
 };

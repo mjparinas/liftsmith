@@ -226,6 +226,10 @@ export const de: FeaturesText = {
       name: "Gewicht, Körperfett und Fotos",
       body: "Trage Gewicht und Körperfett ein oder lass sie über die Gesundheits-App deines Handys von deiner Waage kommen, und behalte Fortschrittsfotos auf deinem Handy.",
     },
+    "photo-compare": {
+      name: "Fortschrittsfotos, die zueinander passen",
+      body: "Die Kamera zeigt dein letztes Foto als blassen Umriss zum Ausrichten, mit Selbstauslöser zum Zurücktreten. Vergleiche zwei beliebige Tage per Schieberegler oder nebeneinander, jeweils mit deinem Gewicht an dem Tag. Fotos bleiben auf deinem Handy; eine Sicherungsdatei bringt sie auf ein neues.",
+    },
     measurements: {
       name: "Körpermaße",
       body: "Neun Stellen in Zentimetern oder Zoll. Ein wachsender oder schrumpfender Bauchumfang wird zur Coach-Notiz, wenn es keinen Körperfettwert gibt.",

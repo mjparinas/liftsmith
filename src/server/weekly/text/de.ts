@@ -278,7 +278,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Gewicht und Körperfett mit − und +, ohne Tippen, oder direkt von deiner Waage über die Gesundheits-App des Handys.",
       "Neun Messstellen fürs Maßband, in Zentimetern oder Zoll.",
-      "Fortschrittsfotos bleiben auf deinem Handy und werden nie synchronisiert.",
+      "Fortschrittsfotos richtest du am letzten aus, und zwei beliebige Tage vergleichst du per Schieberegler oder nebeneinander. Sie bleiben auf deinem Handy.",
       "Labs (Pro): Eine Bluetooth-Waage füllt die Wiegung aus, damit du sie prüfst.",
     ],
     dyk: "Ein schrumpfender oder wachsender Bauchumfang wird zur Coach-Notiz, wenn du kein Körperfett einträgst.",

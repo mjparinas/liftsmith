@@ -389,6 +389,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "photo-compare",
+        name: "Progress photos that line up",
+        body: "The camera shows your last photo as a faint outline to line up with, with a timer to step back. Compare any two dates with a slider or side by side, each with what you weighed that day. Photos stay on your phone; a backup file can carry them to a new one.",
+        tier: "free",
+        added: "2026-11-15",
+      },
+      {
         id: "measurements",
         name: "Tape measurements",
         body: "Nine sites in centimetres or inches. A growing or shrinking waist becomes a coach's note when there's no body fat reading.",

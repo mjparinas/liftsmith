@@ -25,7 +25,7 @@ import {
 import { backupJson, saveFile, stamp } from "@/lib/exportData";
 import { currentLang, currentTag, relative, subscribeLang, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
-import { listPhotos } from "@/lib/photos";
+import { listPhotos, photosForBackup } from "@/lib/photos";
 import { signOutDevice } from "@/lib/signOutDevice";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
@@ -362,9 +362,14 @@ function SignedIn() {
               : t("account.signOut.unsynced", { count: leaving.waiting })}
           </p>
           {leaving.photos ? (
-            <Button kind="danger" className="w-full" onClick={() => void leave(false, true)}>
-              {t("account.signOut.photosConfirm")}
-            </Button>
+            <>
+              <Button kind="ghost" className="w-full" onClick={() => void backup(true)}>
+                {t("account.signOut.backupPhotos")}
+              </Button>
+              <Button kind="danger" className="w-full" onClick={() => void leave(false, true)}>
+                {t("account.signOut.photosConfirm")}
+              </Button>
+            </>
           ) : (
             <>
               <Button kind="ghost" className="w-full" onClick={() => void leave(false, true)}>
@@ -419,11 +424,12 @@ function SignedIn() {
   );
 }
 
-/** Downloads a backup file of everything on this device (the same file as Settings › Saving and backup). */
-function backup() {
+/** Downloads a backup file of everything on this device (the same file as Settings › Saving and backup), photos too when asked. */
+async function backup(withPhotos = false) {
   const { profile, gyms, events } = useApp.getState();
-  track("feature", { name: "backup", detail: "signOut" });
-  return saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events));
+  track("feature", { name: "backup", detail: withPhotos ? "signOut-photos" : "signOut" });
+  const photos = withPhotos ? await photosForBackup().catch(() => undefined) : undefined;
+  return saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events, Date.now(), photos));
 }
 
 /** The server ended the session while changes here hadn't reached the account (sync.ts): sign in again, save, or erase. */

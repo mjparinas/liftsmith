@@ -219,6 +219,10 @@ export const es: FeaturesText = {
       name: "Peso, grasa corporal y fotos",
       body: "Registra peso y grasa corporal, o deja que lleguen de tu báscula a través de la app de salud del teléfono, y guarda fotos de progreso en tu teléfono.",
     },
+    "photo-compare": {
+      name: "Fotos de progreso que se alinean",
+      body: "La cámara muestra tu última foto como un contorno tenue para alinearte, con temporizador para alejarte. Compara dos fechas cualquiera con un deslizador o lado a lado, cada una con lo que pesabas ese día. Las fotos se quedan en tu teléfono; una copia de seguridad puede llevarlas a uno nuevo.",
+    },
     measurements: {
       name: "Medidas con cinta",
       body: "Nueve zonas en centímetros o pulgadas. Una cintura que crece o se reduce se convierte en una nota del entrenador cuando no hay datos de grasa corporal.",
