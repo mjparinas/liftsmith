@@ -251,8 +251,8 @@ describe("through the daily job", () => {
   it("puts a role's email in its turn", async () => {
     const store = memoryStore();
     expect(store.facts.size).toBe(0);
-    // A new feature goes first (coach-dock, 2026-11-15), so it is marked sent here to see the role email in its turn.
-    const sent = new Set(["weekly:gym-setup", "weekly:import", "weekly:coach-dock"]);
+    // New feature emails go first (tested above), so count them as already sent here.
+    const sent = new Set(["weekly:gym-setup", "weekly:import", ...WEEKLY.filter((w) => w.fresh).map((w) => `weekly:${w.id}`)]);
     expect(queue(sent, { roles: ["coach"], flags: { coachPlans: false } })[0]!.id).toBe("coach-clients");
     expect((await run({}, ["gym"]))[0]!.html).toContain("/w/gym-setup.jpg");
   });

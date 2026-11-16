@@ -751,6 +751,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "coach-reviews",
+        name: "Ratings and reviews from real clients",
+        body: "Clients rate their coach, personal trainer or physio with stars and a short review after four weeks or two sessions together. A rating shows once a coach has three reviews, next to how many of their clients trained in the last two weeks, on their invite and in the trainer directory. Coaches reply once to each, and anyone can report a review. Only adults can leave one.",
+        tier: "both",
+        proPart: "Leaving a review is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-15",
+      },
+      {
         id: "coach-plans",
         name: "Coach plans that grow with your client list",
         body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and on Coach and Coach Plus Liftsmith takes nothing from what they pay you. On Pro it keeps 2%.",

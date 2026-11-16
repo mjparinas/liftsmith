@@ -403,6 +403,11 @@ export const de: FeaturesText = {
       name: "Im Trainerverzeichnis gelistet",
       body: "Trag dich in deinem Studio als Personal Trainer, Coach oder Physio ein, dann stehst du auf der Seite des Studios und im Trainerverzeichnis seiner Stadt auf der Website, mit deinem Text und einem Link, über den neue Kunden mit dir trainieren können. Gelistet werden nur Erwachsene.",
     },
+    "coach-reviews": {
+      name: "Bewertungen von echten Kunden",
+      body: "Kunden bewerten ihren Coach, Personal Trainer oder Physio nach vier Wochen oder zwei Einheiten mit Sternen und einer kurzen Bewertung. Die Bewertung erscheint ab drei Bewertungen, neben der Zahl der Kunden, die in den letzten zwei Wochen trainiert haben, in der Einladung und im Trainerverzeichnis. Coaches antworten einmal auf jede, und jeder kann eine Bewertung melden. Nur Erwachsene können bewerten.",
+      proPart: "Bewerten ist kostenlos; Kunden coachen ist Pro.",
+    },
     "coach-plans": {
       name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
       body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und mit Coach und Coach Plus behält Liftsmith nichts von dem ein, was sie dir zahlen. Mit Pro behält es 2 %.",

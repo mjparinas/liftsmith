@@ -66,6 +66,7 @@ import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { CoachGyms } from "./CoachGyms";
 import { PaySetup, YourPayments } from "./CoachPay";
 import { CoachPlanCard } from "./CoachPlan";
+import { CoachRatingPreview, MyReviews, RateCoach } from "./CoachReviews";
 import { CoachSessions, YourSessions } from "./CoachSessions";
 import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
@@ -399,6 +400,9 @@ function ClientPage({
       {coaches.map((c) => (
         <Sharing key={c.id} coach={c} on={sharedWith(data, c.id)} onChange={onChange} />
       ))}
+      {coaches.map((c) => (
+        <RateCoach key={c.id} coach={c} />
+      ))}
       <Section title={coaches.length || teams.joined.length ? t("trn.addAnother") : t("trn.joinTitle")} icon="plus">
         {adding ? (
           <div className="space-y-3">
@@ -619,6 +623,7 @@ function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[
         <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-accent)" }} aria-live="polite">
           {found.role && <p className="text-xs font-semibold tracking-wider text-muted uppercase">{t(`trn.role.${found.role}`)}</p>}
           <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
+          <CoachRatingPreview coach={found} />
           <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
           <ConsentShares name={found.name || t("trn.noName")} picked={picked} onPick={setPicked} />
           <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
@@ -917,6 +922,7 @@ function SetupPage({ data, onChange }: { data: Overview; onChange: () => void })
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
       <CoachGyms />
+      <MyReviews />
       <div className="mt-3">
         <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
       </div>

@@ -258,7 +258,8 @@ export interface ActivityItem {
   code?: string;
 }
 
-export type ReportKind = "post" | "comment" | "profile";
+/** A coach review or a coach's reply to one is "review" (src/server/coachReviews.ts). */
+export type ReportKind = "post" | "comment" | "profile" | "review";
 export const REPORT_REASONS = [
   "spam",
   "abuse",
@@ -282,6 +283,7 @@ export const REASONS_FOR: Record<ReportKind, readonly ReportReason[]> = {
   post: ["spam", "abuse", "hate", "sexual", "danger", "cheating", "other"],
   comment: ["spam", "abuse", "hate", "sexual", "danger", "other"],
   profile: ["spam", "abuse", "hate", "impersonation", "name", "underage", "cheating", "other"],
+  review: ["spam", "abuse", "hate", "sexual", "impersonation", "other"],
 };
 /** A report's optional note (only staff read it). */
 export const REPORT_NOTE_MAX = 280;

@@ -406,6 +406,7 @@ export const GYM_STYLE = `
 .chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
 .news,.trainers,.prices{list-style:none;margin:0;padding:0;display:grid;gap:12px}.starter{margin:8px 0;padding-left:20px}.news p,.trainers p{margin:0}
 .trainers li{border-top:1px solid var(--line);padding-top:12px}.trainers li:first-child{border-top:0;padding-top:0}
+.rating{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}.review{margin:8px 0 0;padding-left:10px;border-left:2px solid var(--line)}.review p{margin:2px 0}
 .trainers a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}.prices{gap:4px;margin-bottom:12px;font-weight:600}
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}
 .db{margin-top:12px}.claim{border-style:dashed}
