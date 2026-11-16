@@ -814,6 +814,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Dotknij widżetu Regeneracja, żeby otworzyć mapę regeneracji w aplikacji.",
   },
+  "coach-programs": {
+    title: "Udostępniaj i sprzedawaj swoje programy",
+    intro: "Zamień programy, które dajesz raz po raz, w coś, co każdy może realizować, za darmo lub za opłatą.",
+    points: [
+      "W Trenowanie › Programy wybierz do siedmiu swoich planów jako dni, potem dodaj nazwę, poziom, cel i liczbę tygodni.",
+      "Zostaw cenę pustą dla darmowego programu albo ustaw ją, gdy płatności przez Stripe są włączone.",
+      "Płatne programy kupuje się na stronie, a pieniądze trafiają na Twoje konto Stripe.",
+      "Udostępnij link gdziekolwiek. Kto ma program, zachowuje go, nawet gdy zdejmiesz go z listy.",
+    ],
+    dyk: "Program nie ma ciężarów: dobiera je progresja każdej osoby, więc jeden program pasuje i początkującym, i weteranom.",
+  },
   "screenshot-share": {
     title: "Zrób zrzut ekranu, dostań kartę wartą udostępnienia",
     intro: "Zrób zrzut ekranu Liftsmith, a wysunie się arkusz kart z twoim treningiem, gotowych do udostępnienia z linkiem z zaproszeniem.",

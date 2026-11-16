@@ -41,6 +41,7 @@ export const ROUTES = [
   "gymstaff",
   "gymadd",
   "log",
+  "program",
 ] as const;
 export type Route = (typeof ROUTES)[number];
 

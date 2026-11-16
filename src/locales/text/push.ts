@@ -35,6 +35,7 @@ export const en = {
   "push.coachBooked": "{name} booked a session: {text}",
   "push.coachCancelled": "{name} cancelled a session: {text}",
   "push.coachPaid": "{name} paid you {text}.",
+  "push.coachProgramSold": "{name} bought your program “{text}”.",
   "push.referralInviter": "{name} finished three workouts with your invite. You both have a month of Pro.",
   "push.referralFriend": "You finished three workouts. You and {name} both have a month of Pro.",
   "push.coachPlan": "{name} sent you a program: {text}. Tap to save it.",
@@ -73,6 +74,7 @@ export const es: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} reservó una sesión: {text}",
   "push.coachCancelled": "{name} canceló una sesión: {text}",
   "push.coachPaid": "{name} te pagó {text}.",
+  "push.coachProgramSold": "{name} compró tu programa «{text}».",
   "push.referralInviter": "{name} terminó tres entrenamientos con tu invitación. Los dos tenéis un mes de Pro.",
   "push.referralFriend": "Terminaste tres entrenamientos. Tú y {name} tenéis un mes de Pro.",
   "push.coachPlan": "{name} te envió un programa: {text}. Toca para guardarlo.",
@@ -110,6 +112,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} a réservé une séance : {text}",
   "push.coachCancelled": "{name} a annulé une séance : {text}",
   "push.coachPaid": "{name} vous a payé {text}.",
+  "push.coachProgramSold": "{name} a acheté votre programme « {text} ».",
   "push.referralInviter": "{name} a terminé trois séances grâce à ton invitation. Vous avez tous les deux un mois de Pro.",
   "push.referralFriend": "Tu as terminé trois séances. Toi et {name} avez tous les deux un mois de Pro.",
   "push.coachPlan": "{name} vous a envoyé un programme : {text}. Touchez pour l’enregistrer.",
@@ -146,6 +149,7 @@ export const de: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} hat einen Termin gebucht: {text}",
   "push.coachCancelled": "{name} hat einen Termin abgesagt: {text}",
   "push.coachPaid": "{name} hat dir {text} bezahlt.",
+  "push.coachProgramSold": "{name} hat dein Programm „{text}“ gekauft.",
   "push.referralInviter": "{name} hat mit deiner Einladung drei Trainings geschafft. Ihr habt beide einen Monat Pro.",
   "push.referralFriend": "Du hast drei Trainings geschafft. Du und {name} habt beide einen Monat Pro.",
   "push.coachPlan": "{name} hat dir ein Programm geschickt: {text}. Tippe, um es zu speichern.",
@@ -183,6 +187,7 @@ export const it: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name} ha prenotato una sessione: {text}",
   "push.coachCancelled": "{name} ha annullato una sessione: {text}",
   "push.coachPaid": "{name} ti ha pagato {text}.",
+  "push.coachProgramSold": "{name} ha acquistato il tuo programma “{text}”.",
   "push.referralInviter": "{name} ha finito tre allenamenti con il tuo invito. Avete entrambi un mese di Pro.",
   "push.referralFriend": "Hai finito tre allenamenti. Tu e {name} avete entrambi un mese di Pro.",
   "push.coachPlan": "{name} ti ha inviato un programma: {text}. Tocca per salvarlo.",
@@ -220,6 +225,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.coachBooked": "{name}さんがセッションを予約しました：{text}",
   "push.coachCancelled": "{name}さんがセッションをキャンセルしました：{text}",
   "push.coachPaid": "{name}さんから{text}の支払いがありました。",
+  "push.coachProgramSold": "{name}さんがあなたのプログラム「{text}」を購入しました。",
   "push.referralInviter": "{name}さんがあなたの招待で3回のワークアウトを終えました。2人ともProが1か月使えます。",
   "push.referralFriend": "3回のワークアウトを終えました。あなたと{name}さんは2人ともProが1か月使えます。",
   "push.coachPlan": "{name}さんからプログラムが届きました：{text}。タップして保存しましょう。",
@@ -259,6 +265,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "push.referralFriend": "Você terminou três treinos. Você e {name} ganharam um mês de Pro.",
   "push.coachPlan": "{name} enviou um programa para você: {text}. Toque para salvar.",
   "push.coachReview": "{name} deixou uma avaliação para você: {text}",
+  "push.coachProgramSold": "{name} comprou o seu programa “{text}”.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -295,6 +302,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "push.referralFriend": "운동 세 번을 마쳤어요. 회원님과 {name}님 모두 Pro 1개월을 받았어요.",
   "push.coachPlan": "{name}님이 프로그램을 보냈어요: {text}. 눌러서 저장하세요.",
   "push.coachReview": "{name}님이 리뷰를 남겼어요: {text}",
+  "push.coachProgramSold": "{name}님이 내 프로그램 “{text}”을(를) 구매했어요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -331,6 +339,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "push.referralFriend": "Üç antrenman bitirdin. Sana ve {name} kullanıcısına bir ay Pro.",
   "push.coachPlan": "{name} sana bir program gönderdi: {text}. Kaydetmek için dokun.",
   "push.coachReview": "{name} sana bir değerlendirme bıraktı: {text}",
+  "push.coachProgramSold": "{name} “{text}” programını satın aldı.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -368,4 +377,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "push.referralFriend": "Masz za sobą trzy treningi. Ty i {name} macie miesiąc Pro.",
   "push.coachPlan": "{name} wysyła ci program: {text}. Stuknij, żeby go zapisać.",
   "push.coachReview": "{name} wystawia ci opinię: {text}",
+  "push.coachProgramSold": "{name} kupuje twój program „{text}”.",
 };

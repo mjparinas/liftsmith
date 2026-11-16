@@ -686,6 +686,15 @@ Beside the Today widget, two more answer a question at a glance: am I on track t
 - Each has Start, so today's workout is one tap away.
 Did you know? Tap the Recovery widget to open the recovery map in the app.
 
+### C9 · Share and sell your programs (**New**, 2026-11-15)
+
+Turn the programs you hand out again and again into something anyone can follow, free or for a price.
+- Under Coaching › Programs, pick up to seven of your routines as its days, then add a name, a level, a goal and how many weeks.
+- Leave the price empty for a free program, or set one once payments with Stripe are on.
+- Paid programs are bought on the website, and the money goes to your Stripe account.
+- Share its link anywhere. People who have it keep it, even after you take it off the list.
+Did you know? There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.
+
 ### W61 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
 Free · Lifters · Screen: Progress · `fresh`, so it goes next to everyone already in the series
 Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.

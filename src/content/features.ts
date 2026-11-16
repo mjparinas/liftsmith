@@ -765,6 +765,16 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "coach-programs",
+        name: "Programs from coaches",
+        body: "Coaches and personal trainers turn their routines into a program, with a level, a goal and how many weeks to run it, free or with a price, and share its link. Lifters save its days to their routines in one tap, and their own progression picks the weights. Paid programs pay the coach through their own Stripe account.",
+        tier: "both",
+        note: "Paid programs are bought on the website; the Android and iPhone apps show free programs and the ones you have.",
+        proPart: "Getting programs is free; making them is part of coaching, which is Pro.",
+        pro: "coaching",
+        added: "2026-11-15",
+      },
+      {
         id: "trainer-directory",
         name: "Listed in the trainer directory",
         body: "List yourself as a trainer, coach or physio at your gym and you show on that gym's page and in the trainer directory for its city on the website, with your bio and a link for new clients to start training with you. Only adults are listed.",

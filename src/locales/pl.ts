@@ -29,6 +29,7 @@ import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
 import * as count from "./text/count";
+import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
 import * as cycle from "./text/cycle";
@@ -235,6 +236,7 @@ export const pl: Partial<Record<MessageKey, Message>> = {
   ...recap.pl,
   ...recovery.pl,
   ...remix.pl,
+  ...cpg.pl,
   ...rev.pl,
   ...rmd.pl,
   ...rt.pl,

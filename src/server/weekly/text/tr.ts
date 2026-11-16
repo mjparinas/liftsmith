@@ -814,6 +814,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Uygulamada toparlanma haritasını açmak için Toparlanma widget'ına dokun.",
   },
+  "coach-programs": {
+    title: "Programlarını paylaş ve sat",
+    intro: "Tekrar tekrar verdiğin programları herkesin izleyebileceği bir şeye dönüştür, ücretsiz ya da ücretli.",
+    points: [
+      "Koçluk › Programlar'da rutinlerinden en fazla yedisini gün olarak seç, sonra bir ad, seviye, hedef ve kaç hafta olduğunu ekle.",
+      "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle.",
+      "Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
+      "Bağlantısını her yerde paylaş. Programa sahip olanlar, sen listeden kaldırsan bile onu tutar.",
+    ],
+    dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar.",
+  },
   "screenshot-share": {
     title: "Ekran görüntüsü al, paylaşmaya değer bir kart al",
     intro: "Liftsmith'in ekran görüntüsünü al, davet bağlantınla paylaşmaya hazır antrenman kartları açılsın.",

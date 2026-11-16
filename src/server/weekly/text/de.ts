@@ -816,6 +816,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Tippe auf das Erholung-Widget, um die Erholungskarte in der App zu öffnen.",
   },
+  "coach-programs": {
+    title: "Teile und verkaufe deine Programme",
+    intro: "Mach aus den Programmen, die du immer wieder ausgibst, etwas, dem jeder folgen kann, kostenlos oder mit Preis.",
+    points: [
+      "Wähle unter Coaching › Programme bis zu sieben deiner Routinen als Tage und gib Name, Level, Ziel und Anzahl Wochen an.",
+      "Lass den Preis leer für ein kostenloses Programm, oder leg einen fest, sobald Zahlungen mit Stripe eingerichtet sind.",
+      "Kostenpflichtige Programme werden auf der Website gekauft, und das Geld geht auf dein Stripe-Konto.",
+      "Teile den Link überall. Wer es hat, behält es, auch wenn du es von der Liste nimmst.",
+    ],
+    dyk: "Ein Programm enthält keine Gewichte: Die eigene Progression jedes Trainierenden wählt sie, also passt ein Programm für Anfänger und Erfahrene.",
+  },
   "screenshot-share": {
     title: "Screenshot machen, Karte zum Teilen bekommen",
     intro:

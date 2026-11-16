@@ -835,6 +835,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Tap the Recovery widget to open the recovery map in the app.",
   },
+  "coach-programs": {
+    title: "Share and sell your programs",
+    intro: "Turn the programs you hand out again and again into something anyone can follow, free or for a price.",
+    points: [
+      "Under Coaching › Programs, pick up to seven of your routines as its days, then add a name, a level, a goal and how many weeks.",
+      "Leave the price empty for a free program, or set one once payments with Stripe are on.",
+      "Paid programs are bought on the website, and the money goes to your Stripe account.",
+      "Share its link anywhere. People who have it keep it, even after you take it off the list.",
+    ],
+    dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.",
+  },
   "screenshot-share": {
     title: "Take a screenshot, get a card worth sharing",
     intro: "Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.",

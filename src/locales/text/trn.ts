@@ -294,6 +294,7 @@ export const en = {
   "trn.tab.messages": "Messages",
   "trn.tab.schedule": "Schedule",
   "trn.tab.checkins": "Check-ins",
+  "trn.tab.programs": "Programs",
   "trn.tab.pay": "Payments",
   "trn.tab.teams": "Teams",
   "trn.tab.setup": "Setup",
@@ -700,6 +701,7 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.tab.messages": "Mensajes",
   "trn.tab.schedule": "Agenda",
   "trn.tab.checkins": "Seguimientos",
+  "trn.tab.programs": "Programas",
   "trn.tab.pay": "Pagos",
   "trn.tab.teams": "Equipos",
   "trn.tab.setup": "Ajustes",
@@ -1120,6 +1122,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.tab.messages": "Messages",
   "trn.tab.schedule": "Agenda",
   "trn.tab.checkins": "Bilans",
+  "trn.tab.programs": "Programmes",
   "trn.tab.pay": "Paiements",
   "trn.tab.teams": "Équipes",
   "trn.tab.setup": "Réglages",
@@ -1534,6 +1537,7 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.tab.messages": "Nachrichten",
   "trn.tab.schedule": "Termine",
   "trn.tab.checkins": "Check-ins",
+  "trn.tab.programs": "Programme",
   "trn.tab.pay": "Zahlungen",
   "trn.tab.teams": "Teams",
   "trn.tab.setup": "Einrichtung",
@@ -1943,6 +1947,7 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.tab.messages": "Messaggi",
   "trn.tab.schedule": "Agenda",
   "trn.tab.checkins": "Check-in",
+  "trn.tab.programs": "Programmi",
   "trn.tab.pay": "Pagamenti",
   "trn.tab.teams": "Squadre",
   "trn.tab.setup": "Impostazioni",
@@ -2335,6 +2340,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.tab.messages": "メッセージ",
   "trn.tab.schedule": "予定",
   "trn.tab.checkins": "チェックイン",
+  "trn.tab.programs": "プログラム",
   "trn.tab.pay": "支払い",
   "trn.tab.teams": "チーム",
   "trn.tab.setup": "設定",
@@ -2893,6 +2899,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "trn.st.backOn": "Volta em",
   "trn.st.backHint": "Nesse dia você volta para Automático. Deixe em branco para mudar você mesmo.",
   "trn.st.save": "Definir status",
+  "trn.tab.programs": "Programas",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -3311,6 +3318,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "trn.st.backOn": "복귀일",
   "trn.st.backHint": "그날 자동으로 돌아가요. 비워 두면 직접 바꿔야 해요.",
   "trn.st.save": "상태 설정",
+  "trn.tab.programs": "프로그램",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -3761,6 +3769,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "trn.st.backOn": "Dönüş günü",
   "trn.st.backHint": "O gün tekrar Otomatik'e geçersin. Kendin değiştirmek için boş bırak.",
   "trn.st.save": "Durumu ayarla",
+  "trn.tab.programs": "Programlar",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -4254,4 +4263,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "trn.st.backOn": "Powrót",
   "trn.st.backHint": "Tego dnia wracasz na Automatycznie. Zostaw puste, żeby zmienić status samodzielnie.",
   "trn.st.save": "Ustaw status",
+  "trn.tab.programs": "Programy",
 };

@@ -816,6 +816,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Tocca il widget Recupero per aprire la mappa del recupero nell'app.",
   },
+  "coach-programs": {
+    title: "Condividi e vendi i tuoi programmi",
+    intro: "Trasforma i programmi che dai sempre ai tuoi clienti in qualcosa che chiunque può seguire, gratis o a pagamento.",
+    points: [
+      "In Coaching › Programmi, scegli fino a sette tue routine come giorni, poi aggiungi nome, livello, obiettivo e numero di settimane.",
+      "Lascia vuoto il prezzo per un programma gratuito, oppure fissane uno quando i pagamenti con Stripe sono attivi.",
+      "I programmi a pagamento si acquistano sul sito e i soldi vanno sul tuo account Stripe.",
+      "Condividi il link ovunque. Chi lo ha lo conserva, anche dopo che lo togli dalla lista.",
+    ],
+    dyk: "Un programma non contiene carichi: li sceglie la progressione di ogni atleta, quindi lo stesso programma va bene per principianti ed esperti.",
+  },
   "screenshot-share": {
     title: "Fai uno screenshot, ottieni una card da condividere",
     intro:

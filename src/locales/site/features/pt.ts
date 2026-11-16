@@ -478,6 +478,12 @@ export const pt: FeaturesText = {
       body: "No computador, o chat com o coach fica fixo no canto inferior direito, como um mensageiro: todo mundo com quem você pode conversar, até duas janelas de chat que se recolhem, um som e um contador na aba quando chega mensagem. Os dois lados definem um status (online, com um aluno, treinando, ausente, não perturbe, de férias ou aparecer offline), veem quando o outro está digitando e quando viu sua mensagem, e mandam emoji e figurinhas de academia, no celular também.",
       proPart: "Ser aluno é grátis; treinar alunos é Pro.",
     },
+    "coach-programs": {
+      name: "Programas de treinadores",
+      body: "Treinadores e personal trainers transformam suas rotinas em um programa, com nível, objetivo e quantas semanas seguir, grátis ou com preço, e compartilham o link. Você salva os dias nas suas rotinas com um toque, e a sua própria progressão escolhe as cargas. Programas pagos são pagos ao treinador pela própria conta Stripe dele.",
+      note: "Programas pagos são comprados no site; os apps de Android e iPhone mostram os programas grátis e os que você já tem.",
+      proPart: "Pegar programas é grátis; criá-los faz parte do coaching, que é Pro.",
+    },
     "coach-reviews": {
       name: "Notas e avaliações de alunos reais",
       body: "Os alunos dão estrelas e uma avaliação curta ao seu coach, personal trainer ou fisioterapeuta depois de quatro semanas ou duas sessões juntos. A nota aparece quando o coach tem três avaliações, ao lado de quantos alunos dele treinaram nas últimas duas semanas, no convite dele e na lista de personal trainers. Os coaches respondem uma vez a cada uma, e qualquer pessoa pode denunciar uma avaliação. Só adultos podem avaliar.",

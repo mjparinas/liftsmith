@@ -126,7 +126,7 @@ try {
   await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
   await scan("log a past workout");
   await page.goto(`${server.url}/app/#/programs`);
-  await page.getByRole("heading", { name: "Programs" }).waitFor();
+  await page.getByRole("heading", { name: "Programs", exact: true }).waitFor();
   await scan("programs");
   await page.getByRole("button", { name: /Tiered progression/ }).click();
   await page.getByRole("dialog").waitFor();

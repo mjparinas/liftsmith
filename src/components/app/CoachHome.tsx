@@ -66,6 +66,7 @@ import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { CoachGyms } from "./CoachGyms";
 import { PaySetup, YourPayments } from "./CoachPay";
 import { CoachPlanCard } from "./CoachPlan";
+import { CoachPrograms } from "./CoachPrograms";
 import { CoachRatingPreview, MyReviews, RateCoach } from "./CoachReviews";
 import { CoachSessions, YourSessions } from "./CoachSessions";
 import { ConsentShares, ShareSwitches } from "./CoachShare";
@@ -83,6 +84,7 @@ const TAB_ICON: Record<CoachTab, IconName> = {
   messages: "chat",
   schedule: "calendar",
   checkins: "edit",
+  programs: "layers",
   pay: "gift",
   teams: "trophy",
   setup: "settings",
@@ -212,6 +214,11 @@ export function CoachHome({
         {view.tab === "checkins" && (
           <div className="desk-col">
             <FormsScreen embedded />
+          </div>
+        )}
+        {view.tab === "programs" && (
+          <div className="desk-col">
+            <CoachPrograms />
           </div>
         )}
         {view.tab === "pay" && data.pay && (

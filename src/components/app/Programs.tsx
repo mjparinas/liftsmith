@@ -1,19 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { useAccount } from "@/lib/auth";
+import { loadMine, shownHere, type CoachProgram } from "@/lib/coachPrograms";
 import { can } from "@/lib/entitlements";
 import { inSentence, list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
+import { liveRead } from "@/lib/liveRead";
 import { missingFor, PICKER_ORDER, pickProgram, PROGRAM_BY_ID, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
+import { ProgramCard } from "./CoachProgram";
 import { go } from "./router";
-import { Button, ProTag, ScreenHeader, Sheet } from "./ui";
+import { Button, ProTag, ScreenHeader, Section, Sheet } from "./ui";
 
 // Pick how Today's workout is planned: the adaptive engine (the default), a classic fixed program,
 // or a split the adaptive engine fills in. Program details (summary, steps, credit) are still English.
@@ -97,6 +101,8 @@ export function Programs() {
         ))}
       </ul>
 
+      <FromCoaches />
+
       <Sheet open={!!open} onClose={() => setOpen(null)} title={open?.name ?? ""}>
         {open && gym && <Detail p={open} current={currentId === open.id} onStart={() => choose(open.id)} />}
       </Sheet>
@@ -162,3 +168,33 @@ export function programName(id: string | undefined): string | null {
  * plain English description ("dumbbell workout"), which would read as untranslated in the other languages.
  */
 const akaName = (aka: readonly string[]) => aka.find((a) => /^[A-Z0-9]/.test(a));
+
+/** Coaches' programs (docs/decisions/coach-programs.md): the ones this lifter has, and the way to the list. */
+function FromCoaches() {
+  const signedIn = !!useAccount((s) => s.account);
+  const [owned, setOwned] = useState<CoachProgram[]>([]);
+  useEffect(() => {
+    if (!signedIn) return;
+    liveRead(
+      "programs.owned",
+      async () => (await loadMine()).owned,
+      (o) => setOwned(o.filter(shownHere)),
+    ).catch(() => undefined);
+  }, [signedIn]);
+  return (
+    <Section title={t("cpg.fromCoaches")} icon="people" info="coachPrograms">
+      {owned.length > 0 && (
+        <ul className="mb-3 space-y-3">
+          {owned.map((p) => (
+            <li key={p.id}>
+              <ProgramCard p={p} onOpen={() => go("program", p.id)} />
+            </li>
+          ))}
+        </ul>
+      )}
+      <Button kind="ghost" icon="layers" className="w-full" onClick={() => go("program")}>
+        {t("cpg.browse")}
+      </Button>
+    </Section>
+  );
+}

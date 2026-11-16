@@ -1,8 +1,10 @@
 // POST /api/coach/stripe/: the Stripe Connect webhook for client payments (src/server/coachPay.ts). Server build only.
 // Set up in Stripe as a Connect endpoint ("Events on connected accounts") with its own signing secret,
 // STRIPE_CONNECT_WEBHOOK_SECRET. Events to send: account.updated, checkout.session.completed, invoice.paid,
-// invoice.payment_failed, customer.subscription.updated and customer.subscription.deleted.
+// invoice.payment_failed, customer.subscription.updated and customer.subscription.deleted, and charge.refunded (a
+// refunded program is taken back; coachPrograms.ts).
 import { payConfig, storeConnectEvent, verifyConnect, type ConnectEvent } from "@/server/coachPay";
+import { storeProgramEvent } from "@/server/coachPrograms";
 
 const MAX = 256_000;
 
@@ -20,7 +22,8 @@ export async function POST(req: Request) {
   }
   if (!e?.data?.object || typeof e.type !== "string") return Response.json({ ok: true });
   try {
-    await storeConnectEvent(e);
+    // A program sale or refund is the program side's; everything else is client payments.
+    if (!(await storeProgramEvent(e))) await storeConnectEvent(e);
     return Response.json({ ok: true });
   } catch {
     // Stripe retries failed deliveries for three days, so a database hiccup isn't lost.

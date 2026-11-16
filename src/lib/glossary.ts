@@ -48,6 +48,7 @@ const TERMS = [
   "badges",
   "monthly",
   "schoolTeams",
+  "coachPrograms",
   "strengthStandards",
 ] as const;
 
