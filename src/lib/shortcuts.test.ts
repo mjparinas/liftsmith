@@ -40,6 +40,11 @@ describe("shortcuts", () => {
     expect(useApp.getState().active!.restUntil).toBe(until + 30_000);
   });
 
+  it("opens Body's muscle view from the Recovery widget without starting anything", () => {
+    expect(runShortcut("muscles")).toBe("recovery");
+    expect(useApp.getState().active).toBeNull();
+  });
+
   it("logs a lock-screen tap made with the app closed at the time it was tapped, not when the app opens", () => {
     runShortcut("start");
     const tapped = Date.now() - 90_000;

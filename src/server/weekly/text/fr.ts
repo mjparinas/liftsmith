@@ -806,4 +806,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Seuls les adultes peuvent laisser un avis, et un client mécontent ne peut pas couler un nouveau coach : rien ne s'affiche avant trois avis.",
   },
+  widgets: {
+    title: "Deux nouveaux widgets d’écran d’accueil",
+    intro:
+      "À côté du widget Aujourd’hui, deux autres répondent d’un coup d’œil : suis-je dans les temps cette semaine, et qu’est-ce qui est prêt à travailler ?",
+    points: [
+      "Cette semaine : les jours entraînés, ceux prévus, votre série et combien de jours encore pour la garder.",
+      "Récupération : les zones du corps prêtes à travailler et quand les autres le seront.",
+      "Récupération se met à jour toute seule pendant que les muscles récupèrent, même appli fermée, sans vider la batterie.",
+      "Chacun a Commencer, la séance du jour est donc à un toucher.",
+    ],
+    dyk: "Touchez le widget Récupération pour ouvrir la carte de récupération dans l’appli.",
+  },
 };
