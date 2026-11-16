@@ -179,13 +179,13 @@ export const pt: SiteText = {
         {
           eyebrow: "Mapa de recuperação",
           title: "Veja quais músculos estão prontos antes de treiná-los",
-          body: "Cada série soma fadiga aos músculos que trabalha, e ela some em dois a três dias, conforme o músculo. O mapa do corpo, de frente e de costas, mostra cada músculo como Descansado, Pronto, Em recuperação ou Cansado, e o plano evita o que ainda não está pronto.",
+          body: "Cada série soma fadiga aos músculos que trabalha, e ela some em dois a três dias, conforme o músculo. O mapa do corpo em 3D, que você pode girar para ver de frente ou de costas, mostra cada músculo como Descansado, Pronto, Em recuperação ou Cansado, e o plano evita o que ainda não está pronto.",
           points: [
             "Cor mais um rótulo e uma porcentagem para cada músculo",
             "Séries semanais por músculo comparadas a uma meta de crescimento",
             "Nenhuma recompensa, nunca, por treinar um músculo cansado",
           ],
-          alt: "O mapa de recuperação: o corpo de frente e de costas colorido pela recuperação, com a legenda Descansado, Pronto, Em recuperação e Cansado",
+          alt: "O mapa de recuperação: um corpo em 3D com cada músculo brilhando na cor da sua recuperação, com a legenda Descansado, Pronto, Em recuperação e Cansado",
           cta: "Confira sua recuperação",
         },
         {

@@ -179,13 +179,13 @@ export const tr: SiteText = {
         {
           eyebrow: "Toparlanma haritası",
           title: "Kaslarını çalıştırmadan önce hangilerinin hazır olduğunu gör",
-          body: "Her set çalıştırdığı kaslara yorgunluk ekler; bu yorgunluk kasa göre iki üç günde geçer. Önden ve arkadan vücut haritası her kası Dinç, Hazır, Toparlanıyor veya Yorgun olarak gösterir ve plan hazır olmayanlardan uzak durur.",
+          body: "Her set çalıştırdığı kaslara yorgunluk ekler; bu yorgunluk kasa göre iki üç günde geçer. Önünü ya da arkasını görmek için çevirebildiğin 3D vücut haritası her kası Dinç, Hazır, Toparlanıyor veya Yorgun olarak gösterir ve plan hazır olmayanlardan uzak durur.",
           points: [
             "Her kas için renk, etiket ve yüzde",
             "Kas başına haftalık setler, gelişim hedefiyle karşılaştırmalı",
             "Yorgun bir kası çalıştırmanın asla ödülü yok",
           ],
-          alt: "Toparlanma haritası: toparlanmaya göre renklendirilmiş önden ve arkadan vücut görünümleri, Dinç, Hazır, Toparlanıyor ve Yorgun açıklamasıyla",
+          alt: "Toparlanma haritası: her kasın toparlanma rengiyle parladığı 3D bir vücut, Dinç, Hazır, Toparlanıyor ve Yorgun açıklamasıyla",
           cta: "Toparlanmanı kontrol et",
         },
         {

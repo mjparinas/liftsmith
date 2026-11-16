@@ -3,8 +3,10 @@
 // program:
 // - Only someone who has the program (bought it, or got it free) can rate it, and only after PROGRAM_REVIEW_LIMITS.days
 //   with it, so a rating says how it went rather than how it looked. Never the coach who made it.
-// - Only adults (teams.ts isMinor). One review per lifter and program, which they can change or delete; it stays if
-//   they drop the program or it's refunded, because it was still true.
+// - Only adults (teams.ts isMinor). One review per lifter and program, which they can change or delete. A review counts
+//   and shows only while its writer still has the program (Melvin, 2026-11-16: "can confirmed purchasers provide
+//   reviews"): a refund or dropping a free program takes it out, and getting the program back brings it back. A review
+//   from someone who paid carries a "Verified purchase" mark (`verified`).
 // - One to five stars and an optional short review through the same filter as Friends.
 // - The coach can post one public reply to each review.
 // - Nobody else sees a program's rating or reviews until it has PROGRAM_REVIEW_LIMITS.shown.
@@ -63,7 +65,11 @@ type Row = {
   reply_at: number;
   hidden: number;
   reply_hidden: number;
+  payment_id?: string | null;
 };
+
+/** Reviews whose writer still has the program, with how they got it (a payment, or free). */
+const OWNED = `program_reviews r JOIN program_owners o ON o.program_id = r.program_id AND o.account_id = r.account_id`;
 
 async function toReview(r: Row, own = false): Promise<Review> {
   return {
@@ -74,6 +80,7 @@ async function toReview(r: Row, own = false): Promise<Review> {
     at: n(r.updated_at),
     reply: n(r.reply_hidden) && !own ? "" : s(r.reply),
     replyAt: n(r.reply_hidden) && !own ? 0 : n(r.reply_at),
+    ...(r.payment_id ? { verified: true } : {}),
     ...(own && (n(r.hidden) || n(r.reply_hidden)) ? { hidden: true } : {}),
   };
 }
@@ -157,7 +164,7 @@ export async function replyToProgramReview(
 /** A program's rating: how many reviews count, and the average once there are enough. No outcome line for programs. */
 export async function programRating(programId: string): Promise<Rating> {
   const [r] = await query<{ c: number; a: number | null }>(
-    "SELECT COUNT(*) AS c, AVG(stars) AS a FROM program_reviews WHERE program_id = ? AND hidden = 0",
+    `SELECT COUNT(*) AS c, AVG(r.stars) AS a FROM ${OWNED} WHERE r.program_id = ? AND r.hidden = 0`,
     [programId],
   );
   const count = n(r?.c);
@@ -167,7 +174,7 @@ export async function programRating(programId: string): Promise<Rating> {
 /** A program's reviews, newest first: none for others until there are enough; its coach sees all, hidden ones marked. */
 export async function programReviewsOf(programId: string, own: boolean, limit = 50): Promise<Review[]> {
   const rows = await query<Row>(
-    `SELECT * FROM program_reviews WHERE program_id = ?${own ? "" : " AND hidden = 0"} ORDER BY updated_at DESC LIMIT ?`,
+    `SELECT r.*, o.payment_id FROM ${OWNED} WHERE r.program_id = ?${own ? "" : " AND r.hidden = 0"} ORDER BY r.updated_at DESC LIMIT ?`,
     [programId, limit],
   );
   if (!own && rows.length < PROGRAM_REVIEW_LIMITS.shown) return [];
@@ -180,7 +187,11 @@ export async function myProgramReview(
   programId: string,
   now = Date.now(),
 ): Promise<{ review: Review | null; can: ProgramEligibility }> {
-  const [row] = await query<Row>("SELECT * FROM program_reviews WHERE program_id = ? AND account_id = ?", [programId, accountId]);
+  const [row] = await query<Row>(
+    `SELECT r.*, o.payment_id FROM program_reviews r LEFT JOIN program_owners o ON o.program_id = r.program_id AND o.account_id = r.account_id
+     WHERE r.program_id = ? AND r.account_id = ?`,
+    [programId, accountId],
+  );
   return { review: row ? await toReview(row) : null, can: await programEligibility(programId, accountId, now) };
 }
 

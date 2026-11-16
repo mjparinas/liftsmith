@@ -4,7 +4,7 @@ Melvin, 2026-11-16: "do them all", approving five AI helpers for the admin panel
 
 ## The rule: Claude suggests, a person acts
 
-Every helper only reads and suggests. Nothing Claude says is applied until a member of staff presses the button that already did that job (Remove, Dismiss, Merge, Save, Send). Report content, gym web pages and emails are things the public wrote, so each prompt wraps them in tags and says they are data, never instructions, and every answer is held to a JSON schema or shown as plain text beside a button.
+Every helper only reads and suggests (one exception since 2026-11-16, the gym import's backfill below). Nothing Claude says is applied until a member of staff presses the button that already did that job (Remove, Dismiss, Merge, Save, Send). Report content, gym web pages and emails are things the public wrote, so each prompt wraps them in tags and says they are data, never instructions, and every answer is held to a JSON schema or shown as plain text beside a button.
 
 ## The five helpers
 
@@ -38,3 +38,14 @@ Every helper only reads and suggests. Nothing Claude says is applied until a mem
 ## Privacy
 
 What's sent: a reported post's exercise names, a comment, a profile's name, handle and tagline, a review or reply, the reporters' reasons and notes; a gym's public web page; an email someone sent us; counts from the Overview and the digest. Nothing about a lifter's training. `/privacy/` and `docs/PRIVACY_LABELS.md` name Anthropic as a service provider for drafts and report suggestions.
+
+## The import's AI backfill (2026-11-16)
+
+Melvin, 2026-11-16: the gym import should "use AI to backfill the rest of the data" when reading a gym's website with plain code fails, as part of one button. This is the one place Claude's answer is written without a person pressing a button, so it is held tighter than the helpers (`src/server/gymAutoFill.ts`, task `gymAuto`):
+
+- **Only unclaimed, visible gyms, only empty fields.** The update keeps any value already there (`CASE WHEN field = '' …`) and requires `claimed_by = ''`; the city is replaced only when the current one is a postcode, a number or missing, and the gym then moves like any city fix.
+- **Every answer is checked in code** (`checkedFill`): an address must look like a street and is tidied; a postcode must fit the country; a phone has 7 to 15 digits; hours must parse and are rewritten in the map's form; an email must be on the gym's own domain; Instagram and Facebook must be real profile links on those sites. Anything else is dropped.
+- **Same door, cap and switch**: through `askClaude` (Haiku, page wrapped as data, answer held to a schema), behind `aiHelpers` and counted against `aiDailyCap`. When either stops it, or the key is missing or refused, the step ends with a note on the job and the next daily run carries on; other errors stamp that gym and move on.
+- **Its own switch**: the AI step switch on Admin › Gyms › Import (flag `gymImportAi`, on by default) turns only this step off; the other helpers keep running.
+- **Asked once per gym per 180 days** (`ai_at`, index `gym_places_ai`), 12 gyms a batch, 4 at a time.
+

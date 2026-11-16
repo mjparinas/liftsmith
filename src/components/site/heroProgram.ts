@@ -80,3 +80,14 @@ export function muscleAnchor(m: Muscle, J: Joints): Vec {
 export const DEMO_LIFTS = ["back-squat", "deadlift", "bench-press", "overhead-press", "pull-up", "romanian-deadlift"].filter((id) =>
   EXERCISE_BY_ID.has(id),
 );
+
+/**
+ * The made-up heart rate for the home page's exercise demo (Melvin, 2026-11-16: "the 3D exercise demos on the home page
+ * should have a heart beating animation"): it climbs through a 40-second set from about 98 to 124 bpm and settles again,
+ * so the heart on the figure's chest speeds up and slows down like a lifter's. Demo data, like the hero's.
+ */
+export const DEMO_HR_PERIOD = 40;
+export function demoHeartRate(seconds: number): number {
+  const p = (((seconds % DEMO_HR_PERIOD) + DEMO_HR_PERIOD) % DEMO_HR_PERIOD) / DEMO_HR_PERIOD;
+  return Math.round(98 + 26 * Math.sin(Math.PI * p) ** 2);
+}

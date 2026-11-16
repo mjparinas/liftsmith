@@ -23,3 +23,4 @@ store/play/raw/
 store/play/promo-video.mp4
 # One file per language for the production builds, written by scripts/locales.mjs before each build
 src/locales/gen/
+.vitest/

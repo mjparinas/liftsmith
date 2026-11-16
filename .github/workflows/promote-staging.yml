@@ -34,7 +34,7 @@ jobs:
   promote:
     name: Merge staging into main
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 35
     steps:
       - uses: actions/github-script@v9
         env:
@@ -49,8 +49,18 @@ jobs:
               core.notice('staging has nothing that main lacks.');
               return;
             }
-            const checks = await github.paginate(github.rest.checks.listForRef, { owner, repo, ref: staging, per_page: 100 });
-            const passed = checks.filter((c) => c.name === 'CI passed').sort((a, b) => b.id - a.id)[0];
+            // Run by hand right after a merge, CI on staging is usually still going: wait for it (up to 25 minutes)
+            // rather than fail and need a second run. A failed or missing check still stops the promotion.
+            const ciPassed = async () => {
+              const checks = await github.paginate(github.rest.checks.listForRef, { owner, repo, ref: staging, per_page: 100 });
+              return checks.filter((c) => c.name === 'CI passed').sort((a, b) => b.id - a.id)[0];
+            };
+            let passed = await ciPassed();
+            for (let waited = 0; waited < 25 * 60 && (!passed || passed.status !== 'completed'); waited += 30) {
+              core.info(`Waiting for CI on staging (${staging.slice(0, 7)}): ${passed ? passed.status : 'not started yet'}.`);
+              await new Promise((r) => setTimeout(r, 30_000));
+              passed = await ciPassed();
+            }
             if (!passed || passed.status !== 'completed' || passed.conclusion !== 'success') {
               core.setFailed(`CI has not passed on staging (${staging.slice(0, 7)}): ${passed ? `${passed.status} / ${passed.conclusion}` : 'no "CI passed" check yet'}. Nothing promoted.`);
               return;

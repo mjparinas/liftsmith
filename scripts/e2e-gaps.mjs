@@ -241,7 +241,8 @@ async function admin(layout) {
   await ctx.close();
 }
 
-for (const layout of ["phone", "desktop"]) {
+// CI checks each layout in its own job side by side (GAPS_LAYOUT=phone or desktop, ci.yml); unset checks both.
+for (const layout of process.env.GAPS_LAYOUT ? [process.env.GAPS_LAYOUT] : ["phone", "desktop"]) {
   await admin(layout);
   if (!process.env.SITE_ONLY) for (const theme of ["dark", "light"]) await app(layout, theme);
   await site(layout);

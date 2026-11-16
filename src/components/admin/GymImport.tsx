@@ -1,25 +1,24 @@
 "use client";
 
-// Admin › Gyms: importing gyms from OpenStreetMap (src/server/gymImport.ts, docs/decisions/gyms.md "Importing gyms").
-// One city by name, right here; a country's major cities (or every country's) as a job on the server
-// (src/server/gymImportJobs.ts), so this page can be closed while it runs. The page only shows the job: the cities
-// being imported, done of total, time left, errors, Stop, Retry failed and the debug log, read every few seconds. Recent
-// imports lists the last hundred city imports with each one's step-by-step log.
+// Admin › Gyms › Import: one button (Melvin, 2026-11-16: "this should really just be one button that we press, rather
+// than on multiple screens that is it today"; docs/decisions/gyms.md "One button: every gym in the world"). It starts
+// the worldwide job on the server (src/server/gymImportJobs.ts): every country's gyms from OpenStreetMap, region by
+// region, then each gym's own website read by plain code, then Claude for what's still missing, then city names and
+// addresses tidied. The page only shows the job, read every few seconds while it runs, so it can be closed. A daily
+// refresh (Vercel Schedules) adds gyms new on the map and carries on the website and AI steps; the line under the
+// button says when it last ran.
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { isVisible, onVisibility } from "@/lib/visibility";
-import type { ImportResult, ImportRow } from "@/server/gymImport";
-import type { CityLine, JobStatus } from "@/server/gymImportJobs";
+import type { CityLine, JobPhase, JobStatus } from "@/server/gymImportJobs";
 
 import { Card } from "./charts";
 import { HowItWorks } from "./HowItWorks";
 
-type Answer = Extract<ImportResult, { ok: true }> | { ok?: false; error: string; detail?: string; log?: string[] };
-
-interface Done {
-  where: string;
+interface Daily {
   at: number;
-  r: Answer;
+  state: string;
+  added: number;
 }
 
 /** How often the page reads a running job. */
@@ -33,10 +32,26 @@ const mins = (ms: number) => {
   return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
 };
 
-/** Time left: what the finished cities took on average, spread over the cities still to go (already in parallel). */
+/** Time left: what the finished areas took on average, spread over the areas still to go (already in parallel). */
 export function eta(startedAt: number, done: number, total: number, now: number): number | null {
   if (done <= 0 || done >= total) return null;
   return ((now - startedAt) / done) * (total - done);
+}
+
+/**
+ * A failed import in a few words, instead of every map server's error on one line: "Not on the map", "Map servers
+ * busy" (every server busy or hung) or "Map error". The full text is in the debug log.
+ */
+export function shortError(error: string): string {
+  if (/^where\b|wasn't found/i.test(error)) return "Not on the map";
+  const detail = error.replace(/^map:\s*/, "");
+  const parts = detail
+    .split(";")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length && parts.every((p) => /busy|no answer|fetch failed|timed out|too many requests|HTTP 5\d\d/i.test(p)))
+    return "Map servers busy";
+  return "Map error";
 }
 
 function download(name: string, data: unknown) {
@@ -50,99 +65,42 @@ function download(name: string, data: unknown) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-const line = (d: Done | CityLine) =>
+const line = (d: CityLine) =>
   d.r.ok
-    ? `${d.r.area}: ${d.r.found} found, ${d.r.added} new, ${d.r.updated} changed, ${d.r.unchanged} unchanged${d.r.kept ? `, ${d.r.kept} claimed left alone` : ""} (${mins(d.r.ms)}, ${d.r.server})`
-    : `${d.where}: ${d.r.error}${d.r.detail ? ` (${d.r.detail})` : ""}`;
-
-async function postImport(where: string): Promise<Answer> {
-  const r = await fetch("/api/admin/gym-places/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "import", where, server: 0 }),
-  }).catch(() => null);
-  if (!r) return { error: "The admin server didn't answer (network or time limit)." };
-  const j = (await r.json().catch(() => null)) as (Partial<ImportResult> & { error?: string; detail?: string; log?: string[] }) | null;
-  if (!j) return { error: `The admin server answered ${r.status} with no details (it may have hit its five-minute limit).` };
-  if (r.ok && j.ok) return j as Extract<ImportResult, { ok: true }>;
-  return { ok: false, error: j.error ?? `HTTP ${r.status}`, detail: j.detail, log: j.log };
-}
+    ? `${d.where}: ${d.r.found} found, ${d.r.added} new, ${d.r.updated} changed${d.r.kept ? `, ${d.r.kept} left alone` : ""} (${mins(d.r.ms)}, ${d.r.server})`
+    : `${d.where}: ${shortError(`${d.r.error} ${d.r.detail ?? ""}`)}${d.r.detail ? ` (${d.r.detail})` : ""}`;
 
 /** POSTs a job action and returns its answer (or an error line). */
-async function postJob(
-  body: Record<string, unknown>,
-): Promise<{ job?: JobStatus | null; nothing?: boolean; skipped?: number; error?: string }> {
+async function postJob(body: Record<string, unknown>): Promise<{ job?: JobStatus | null; error?: string }> {
   const r = await fetch("/api/admin/gym-places/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   }).catch(() => null);
   if (!r) return { error: "The admin server didn't answer." };
-  const j = (await r.json().catch(() => null)) as { job?: JobStatus | null; nothing?: boolean; skipped?: number; error?: string } | null;
+  const j = (await r.json().catch(() => null)) as { job?: JobStatus | null; error?: string } | null;
   if (!j) return { error: `The admin server answered ${r.status}.` };
   return r.ok ? j : { ...j, error: j.error ?? `HTTP ${r.status}` };
 }
 
 export function GymImport({ admin, changed }: { admin: boolean; changed: () => void }) {
-  const [where, setWhere] = useState("");
-  const [single, setSingle] = useState<Done | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [skipRecent, setSkipRecent] = useState(true);
   const [notify, setNotify] = useState(true);
   const [job, setJob] = useState<JobStatus | null>(null);
+  const [daily, setDaily] = useState<Daily | null>(null);
+  const [ai, setAi] = useState<boolean | null>(null);
   const [problem, setProblem] = useState("");
+  const [starting, setStarting] = useState(false);
   const [now, setNow] = useState(() => Date.now());
-  const [recent, setRecent] = useState<ImportRow[] | null>(null);
-  const [recentVersion, setRecentVersion] = useState(0);
-  const [countries, setCountries] = useState<{ code: string; name: string; cities: number }[]>([]);
-  const [countryText, setCountryText] = useState("Canada");
-  const [failedOnly, setFailedOnly] = useState(false);
-  const [open, setOpen] = useState<string | null>(null);
-  const seen = useRef(-1);
-  useEffect(() => {
-    let live = true;
-    fetch("/api/admin/gym-places/?countries=1")
-      .then(async (r) => (r.ok ? ((await r.json()) as { countries: typeof countries }) : { countries: [] }))
-      .then((j) => {
-        if (!live) return;
-        setCountries(j.countries);
-        setCountryText(j.countries.find((c) => c.code === "CA")?.name ?? j.countries[0]?.name ?? "");
-      })
-      .catch(() => undefined);
-    return () => {
-      live = false;
-    };
-  }, []);
-  const allCities = countries.reduce((n, c) => n + c.cities, 0);
-  // The country typed or picked in the search box, by name or code ("canada", "CA").
-  const picked = pickCountry(countries, countryText);
-  const failedRecent = failedPlaces(recent ?? []);
-  const shown = (recent ?? []).filter((r) => !failedOnly || !r.ok);
+  const seen = useRef("");
   const running = job?.state === "running";
-
-  useEffect(() => {
-    let live = true;
-    fetch("/api/admin/gym-places/?imports=1")
-      .then(async (r) => {
-        if (!r.ok) throw new Error();
-        const j = (await r.json()) as { imports: ImportRow[] };
-        if (live) setRecent(j.imports);
-      })
-      .catch(() => live && setRecent([]));
-    return () => {
-      live = false;
-    };
-  }, [recentVersion]);
 
   const show = useCallback(
     (j: JobStatus | null) => {
       setJob(j);
-      // New cities done: the gym list and Recent imports have news.
-      if (j && seen.current >= 0 && j.done !== seen.current) {
-        changed();
-        setRecentVersion((v) => v + 1);
-      }
-      seen.current = j ? j.done : -1;
+      // New areas done or a new step: the gym list has news.
+      const mark = j ? `${j.done}/${j.phase}/${j.web.filled}/${j.ai.filled}` : "";
+      if (seen.current && mark !== seen.current) changed();
+      seen.current = mark;
     },
     [changed],
   );
@@ -151,24 +109,22 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   const read = useCallback(
     () =>
       fetch("/api/admin/gym-places/?job=1")
-        .then(async (r) => (r.ok ? ((await r.json()) as { job: JobStatus | null }) : null))
-        .then((j) => j && show(j.job))
+        .then(async (r) => (r.ok ? ((await r.json()) as { job: JobStatus | null; daily?: Daily | null; ai?: boolean }) : null))
+        .then((j) => {
+          if (!j) return;
+          show(j.job);
+          setDaily(j.daily ?? null);
+          if (typeof j.ai === "boolean") setAi(j.ai);
+        })
         .catch(() => undefined),
     [show],
   );
   useEffect(() => {
-    let live = true;
-    fetch("/api/admin/gym-places/?job=1")
-      .then(async (r) => (r.ok ? ((await r.json()) as { job: JobStatus | null }) : null))
-      .then((j) => live && j && show(j.job))
-      .catch(() => undefined);
-    return () => {
-      live = false;
-    };
-  }, [show]);
+    void read();
+  }, [read]);
   useEffect(() => {
     if (!running) return;
-    // Not while the tab is hidden (each read counts the job's cities, and Turso bills every row read); it reads again
+    // Not while the tab is hidden (each read counts the job's items, and Turso bills every row read); it reads again
     // when the tab comes back.
     const t = setInterval(() => isVisible() && void read(), POLL_MS);
     const c = setInterval(() => setNow(Date.now()), 1000);
@@ -180,333 +136,253 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
     };
   }, [running, read]);
 
-  const importOne = async () => {
-    if (!where.trim()) return;
-    setBusy(true);
-    setSingle(null);
-    const r = await postImport(where);
-    setSingle({ where, at: Date.now(), r });
-    setBusy(false);
-    changed();
-    setRecentVersion((v) => v + 1);
-  };
-
   const act = async (body: Record<string, unknown>) => {
     setProblem("");
     const r = await postJob(body);
     if (r.error) setProblem(r.error);
-    else if (r.nothing)
-      setProblem(`Every city there was imported in the last 7 days (${r.skipped ?? 0} skipped). Untick the box to import them again.`);
     if (r.job !== undefined) show(r.job);
     else if (r.error) await read();
   };
 
   return (
-    <>
-      <Card title="Add a city's gyms">
-        <HowItWorks>
-          <p>
-            Pulls every named fitness centre in an area from OpenStreetMap. They show in Find gyms near you as unofficial gyms until an
-            owner claims one. Running it again is safe: gyms are matched by their map id, only what changed on the map is written, and a
-            claimed gym is never touched. Yoga, pilates, martial arts and similar places are marked as studios, which the finder leaves out.
-            Rec and community centres with a gym come in too.
-          </p>
-          <p>
-            A gym&apos;s city comes from its own map address when that&apos;s a real place name. A postcode or house number there (some map
-            entries have one) is ignored and the city you imported stands in. Addresses are tidied: stray commas, repeated parts and the
-            city or postcode at the end are dropped.
-          </p>
-          <p>Country imports run on the server, two cities at a time, so you can close this page.</p>
-        </HowItWorks>
-        {admin && (
-          <form
-            className="mt-3 flex flex-wrap gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void importOne();
+    <Card title="Gyms from OpenStreetMap">
+      <HowItWorks>
+        <p>
+          One button imports every gym in the world. It runs on the server, so you can close this page. Each country is split into its
+          regions (provinces, states) and every fitness centre, and every rec or community centre with a gym, comes in from OpenStreetMap
+          with everything the map has: address, postcode, phone, email, website, hours, Instagram, Facebook and wheelchair access. A gym
+          without a city on the map gets the nearest city, town or village.
+        </p>
+        <p>
+          Nothing is listed twice: gyms are matched by their map id, and a new map gym next to a claimed gym or one a lifter added with a
+          similar name is that gym. A claimed gym is never changed; its owner&apos;s details win.
+        </p>
+        <p>
+          Then each gym&apos;s own website is read by plain code (structured data, phone and email links, address lines, social pages and
+          the site&apos;s icon), filling only empty fields. Whatever is still missing, Claude reads from the same page; every answer is
+          checked (a street that looks like a street, a postcode that fits the country, hours in the map&apos;s format, an email on the
+          gym&apos;s own domain) and written only into empty fields. AI stops at the day&apos;s cap (Flags › AI daily cap) or when it&apos;s
+          switched off (the AI step switch below, or Flags › Admin AI helpers), and carries on the next day. Last, city names that are
+          postcodes and untidy addresses are fixed, and moved pages redirect.
+        </p>
+        <p>
+          Every day at 10:00 UTC the daily refresh adds gyms that are new or changed on the map anywhere, and carries on the website and AI
+          steps.
+        </p>
+      </HowItWorks>
+      {admin && !running && (
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <button
+            type="button"
+            disabled={starting}
+            onClick={() => {
+              setStarting(true);
+              void act({ action: "importWorld", notify }).finally(() => setStarting(false));
             }}
+            className="press btn-primary rounded-lg px-4 py-2 font-semibold"
           >
-            <label className="sr-only" htmlFor="gym-area">
-              City
-            </label>
-            <input
-              id="gym-area"
-              value={where}
-              onChange={(e) => setWhere(e.target.value)}
-              placeholder="Langley, BC"
-              className="min-w-0 flex-1 rounded-lg border border-line bg-raised px-3 py-2"
-            />
-            <button type="submit" disabled={busy || running} className="press btn-primary rounded-lg px-4 py-2 font-semibold">
-              {busy ? "Importing…" : "Import"}
-            </button>
-          </form>
-        )}
-        {busy && (
-          <p className="mt-2 text-sm text-muted" role="status">
-            Importing {where}… a big city can take a minute or two.
-          </p>
-        )}
-        {single && (
-          <div className="mt-2 text-sm" role="status">
-            <p className={single.r.ok ? "text-muted" : "text-bad"}>{line(single)}</p>
-            {single.r.log && single.r.log.length > 0 && (
-              <details className="mt-1">
-                <summary className="cursor-pointer text-xs text-faint">Debug log</summary>
-                <pre className="mt-1 overflow-x-auto text-xs whitespace-pre-wrap text-faint">{single.r.log.join("\n")}</pre>
-              </details>
-            )}
+            {starting ? "Starting…" : "Import every gym in the world"}
+          </button>
+          <label className="flex items-center gap-2 text-muted">
+            <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+            Email me when it&apos;s done
+          </label>
+        </div>
+      )}
+      {ai !== null && (
+        <div className="mt-3 flex items-center justify-between gap-4 rounded-lg border border-line/60 px-3 py-2">
+          <div>
+            <p className="text-sm font-semibold">AI step</p>
+            <p className="text-xs text-muted">
+              {ai
+                ? "On: after the websites, Claude fills what's still missing (within the day's AI cap)."
+                : "Off: imports and the daily refresh skip AI and go straight on."}
+            </p>
           </div>
-        )}
-
-        {admin && (
-          <div className="mt-4 grid gap-2 text-sm">
-            {!running && (
-              <>
-                <div className="flex flex-wrap items-center gap-2">
-                  <label className="sr-only" htmlFor="gym-country">
-                    Country
-                  </label>
-                  <input
-                    id="gym-country"
-                    list="gym-countries"
-                    value={countryText}
-                    onChange={(e) => {
-                      setCountryText(e.target.value);
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    placeholder="Search countries"
-                    autoComplete="off"
-                    className="w-56 rounded-lg border border-line bg-raised px-3 py-1.5"
-                  />
-                  <datalist id="gym-countries">
-                    {countries.map((c) => (
-                      <option key={c.code} value={c.name}>
-                        {c.cities} {c.cities === 1 ? "city" : "cities"}
-                      </option>
-                    ))}
-                  </datalist>
-                  <button
-                    type="button"
-                    disabled={busy || !picked}
-                    onClick={() => picked && void act({ action: "importJob", country: picked.code, skipRecent, notify })}
-                    className="press rounded-lg border border-line px-3 py-1.5"
-                  >
-                    {picked ? `Import ${picked.name}'s ${picked.cities} ${picked.cities === 1 ? "city" : "cities"}` : "Pick a country"}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy || !countries.length}
-                    onClick={() => void act({ action: "importJob", country: "ALL", skipRecent, notify })}
-                    className="press rounded-lg border border-line px-3 py-1.5"
-                  >
-                    Import every country ({countries.length} countries, {allCities} cities)
-                  </button>
-                </div>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={skipRecent} onChange={(e) => setSkipRecent(e.target.checked)} />
-                    Skip cities imported in the last 7 days
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
-                    Email me when it&apos;s done
-                  </label>
-                </div>
-              </>
-            )}
-            {problem && (
-              <p className="text-bad" role="alert">
-                {problem}
-              </p>
-            )}
-            {job && <JobCard job={job} now={now} act={act} />}
-          </div>
-        )}
-        <p className="mt-2 text-xs text-faint">Gym data © OpenStreetMap contributors, under the Open Database Licence.</p>
-      </Card>
-
-      <Card
-        title="Recent imports"
-        subtitle={
-          recent
-            ? `The last ${recent.length}, newest first. ${failedRecent.length ? `${failedRecent.length} still failing.` : "None failing."}`
-            : undefined
-        }
-        right={
-          recent && recent.length > 0 ? (
-            <button
-              type="button"
-              onClick={() => download("gym-imports.json", recent)}
-              className="press rounded-lg border border-line px-3 py-1.5 text-sm"
-            >
-              Download all
-            </button>
-          ) : undefined
-        }
-      >
-        {recent && recent.length > 0 && (
-          <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
-            <div className="flex gap-1" role="group" aria-label="Show">
-              {[false, true].map((only) => (
-                <button
-                  key={String(only)}
-                  type="button"
-                  aria-pressed={failedOnly === only}
-                  onClick={() => setFailedOnly(only)}
-                  className={`press rounded-full border px-3 py-1 ${failedOnly === only ? "border-accent bg-accent/15" : "border-line text-muted"}`}
-                >
-                  {only ? `Failed only (${recent.filter((r) => !r.ok).length})` : `All (${recent.length})`}
-                </button>
-              ))}
-            </div>
-            {admin && failedRecent.length > 0 && (
-              <button
-                type="button"
-                disabled={running}
-                onClick={() => void act({ action: "importRetryRecent", notify })}
-                className="press btn-primary ml-auto rounded-lg px-3 py-1.5 font-semibold"
-              >
-                Retry {failedRecent.length} failed
-              </button>
-            )}
-          </div>
-        )}
-        {recent === null ? (
-          <p className="text-sm text-muted">Loading…</p>
-        ) : recent.length === 0 ? (
-          <p className="text-sm text-muted">No imports yet.</p>
-        ) : shown.length === 0 ? (
-          <p className="text-sm text-muted">None failed.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="num w-full min-w-[560px] text-sm">
-              <caption className="sr-only">Recent city imports. Open one for its full error and step-by-step log.</caption>
-              <thead>
-                <tr className="border-b border-line text-left text-xs text-muted">
-                  <th className="px-2 py-1.5 font-normal">City</th>
-                  <th className="px-2 py-1.5 font-normal">Result</th>
-                  <th className="px-2 py-1.5 text-right font-normal">Took</th>
-                  <th className="px-2 py-1.5 font-normal">Server</th>
-                  <th className="px-2 py-1.5 font-normal">When</th>
-                </tr>
-              </thead>
-              <tbody>
-                {shown.map((r) => (
-                  <RecentRow key={r.id} r={r} open={open === r.id} toggle={() => setOpen(open === r.id ? null : r.id)} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
-    </>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={ai}
+            aria-label="AI step"
+            disabled={!admin}
+            onClick={() => {
+              const was = ai;
+              setAi(!was);
+              setProblem("");
+              void postJob({ action: "importAi", on: !was }).then((r) => {
+                if (r.error) {
+                  setAi(was);
+                  setProblem(r.error);
+                }
+              });
+            }}
+            className={`press relative h-7 w-12 shrink-0 rounded-full border border-line transition-colors disabled:opacity-50 ${ai ? "bg-accent" : "bg-raised"}`}
+          >
+            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-ink transition-all ${ai ? "left-6" : "left-0.5"}`} />
+          </button>
+        </div>
+      )}
+      <p className="mt-2 text-xs text-faint">
+        {daily
+          ? `Daily refresh: last ran ${new Date(daily.at).toLocaleString()}${daily.state === "running" ? " (running now)" : `, ${daily.added} new ${daily.added === 1 ? "gym" : "gyms"}`}.`
+          : "Daily refresh: runs every day at 10:00 UTC, once the first import is done."}
+      </p>
+      {problem && (
+        <p className="mt-2 text-sm text-bad" role="alert">
+          {problem}
+        </p>
+      )}
+      {job && <JobCard job={job} now={now} admin={admin} act={act} />}
+      <p className="mt-2 text-xs text-faint">Gym data © OpenStreetMap contributors, under the Open Database Licence.</p>
+    </Card>
   );
 }
 
-function JobCard({ job, now, act }: { job: JobStatus; now: number; act: (body: Record<string, unknown>) => Promise<void> }) {
+const STEPS: { phase: JobPhase; label: string }[] = [
+  { phase: "map", label: "Gyms from the map" },
+  { phase: "web", label: "Gym websites" },
+  { phase: "ai", label: "AI for what's missing" },
+  { phase: "tidy", label: "City names and addresses" },
+];
+const ORDER: JobPhase[] = ["map", "web", "ai", "tidy", "done"];
+
+/** Where each step is: done, running now or still to come. */
+export function stepState(job: Pick<JobStatus, "phase" | "state">, step: JobPhase): "done" | "now" | "next" {
+  const at = ORDER.indexOf(job.phase);
+  const i = ORDER.indexOf(step);
+  if (i < at) return "done";
+  if (i === at) return job.state === "running" ? "now" : "next";
+  return "next";
+}
+
+function JobCard({
+  job,
+  now,
+  admin,
+  act,
+}: {
+  job: JobStatus;
+  now: number;
+  admin: boolean;
+  act: (body: Record<string, unknown>) => Promise<void>;
+}) {
   const [stopping, setStopping] = useState(false);
   const running = job.state === "running";
   const failed = job.failed;
-  const left = running ? eta(job.startedAt, job.done, job.total, now) : null;
+  const mapping = running && job.phase === "map";
+  const left = mapping ? eta(job.startedAt, job.done, job.total, now) : null;
   const quiet = running && !job.active.length && now - job.activeAt > QUIET_MS;
-  const title =
-    job.state === "running"
-      ? `Importing ${job.label}: ${job.done} of ${job.total} cities`
-      : `${job.state === "stopped" ? "Stopped" : "Done"}: ${job.label}, ${job.done} of ${job.total} cities in ${mins((job.endedAt || now) - job.startedAt)}`;
+  const title = running
+    ? `Importing ${job.label}`
+    : `${job.state === "stopped" ? "Stopped" : "Done"}: ${job.label} in ${mins((job.endedAt || now) - job.startedAt)}`;
   const saveLog = async () => {
     const r = await fetch(`/api/admin/gym-places/?job=${encodeURIComponent(job.id)}&log=1`).catch(() => null);
     const data: unknown = r?.ok ? await r.json().catch(() => null) : null;
     if (data) download(`gym-import-${new Date(job.startedAt).toISOString().slice(0, 19).replace(/:/g, "")}.json`, data);
   };
-  // Failed cities, plus any a stopped run never reached.
+  // Failed areas, plus any a stopped run never reached.
   const notDone = job.total - (job.done - failed.length);
+  const steps = STEPS.filter((s) => s.phase !== "tidy" || job.kind === "world");
+  const detail: Record<JobPhase, string> = {
+    map: `${job.done} of ${job.total} areas · ${job.sums.found} gyms found, ${job.sums.added} new, ${job.sums.updated} changed${job.sums.kept ? `, ${job.sums.kept} claimed or added by lifters left alone` : ""}`,
+    web: `${job.web.read} read, ${job.web.filled} gyms got details`,
+    ai: `${job.ai.read} read, ${job.ai.filled} gyms got details`,
+    tidy: `${job.tidy.fixed} city names or addresses fixed`,
+    done: "",
+  };
   return (
-    <div className="grid gap-2 rounded-lg border border-line p-3">
+    <div className="mt-3 grid gap-2 rounded-lg border border-line p-3 text-sm">
       <div className="flex flex-wrap items-center gap-2">
         <p className="flex-1 font-semibold" role="status">
           {title}
-          {job.skipped ? ` (${job.skipped} imported in the last 7 days skipped)` : ""}
         </p>
-        {running ? (
-          <button
-            type="button"
-            disabled={stopping}
-            onClick={() => {
-              setStopping(true);
-              void act({ action: "importStop", job: job.id }).finally(() => setStopping(false));
-            }}
-            className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-          >
-            Stop
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => void act({ action: "importClose", job: job.id })}
-            className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-          >
-            Close
-          </button>
-        )}
+        {admin &&
+          (running ? (
+            <button
+              type="button"
+              disabled={stopping}
+              onClick={() => {
+                setStopping(true);
+                void act({ action: "importStop", job: job.id }).finally(() => setStopping(false));
+              }}
+              className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+            >
+              Stop
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void act({ action: "importClose", job: job.id })}
+              className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+            >
+              Close
+            </button>
+          ))}
       </div>
       <p className="text-xs text-faint">
-        Started by {job.startedBy || "staff"} {new Date(job.startedAt).toLocaleString()}
+        Started by {job.startedBy || "the daily refresh"} {new Date(job.startedAt).toLocaleString()}
         {running ? `. Runs on the server, so this page can be closed${job.notify ? "; an email goes out when it's done" : ""}.` : "."}
       </p>
-      <div
-        className="h-2 overflow-hidden rounded-full bg-raised"
-        role="progressbar"
-        aria-label="Cities imported"
-        aria-valuemin={0}
-        aria-valuemax={job.total}
-        aria-valuenow={job.done}
-      >
-        <div className="h-full bg-accent" style={{ width: `${job.total ? (job.done / job.total) * 100 : 100}%` }} />
-      </div>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-muted sm:grid-cols-4">
-        <div>
-          <dt className="text-xs text-faint">Now importing</dt>
-          <dd>
+      <ol className="grid gap-1.5">
+        {steps.map((s, i) => {
+          const st = stepState(job, s.phase);
+          return (
+            <li key={s.phase} className="flex flex-wrap items-baseline gap-x-2">
+              <span
+                aria-hidden
+                className={`inline-block h-2 w-2 shrink-0 rounded-full ${st === "done" ? "bg-good" : st === "now" ? "bg-accent" : "bg-line"}`}
+              />
+              <span className={st === "next" ? "text-faint" : "font-semibold"}>
+                {i + 1}. {s.label}
+                <span className="sr-only">: {st === "done" ? "done" : st === "now" ? "running now" : "to come"}</span>
+              </span>
+              {st !== "next" && <span className="text-muted">{detail[s.phase]}</span>}
+            </li>
+          );
+        })}
+      </ol>
+      {mapping && (
+        <>
+          <div
+            className="h-2 overflow-hidden rounded-full bg-raised"
+            role="progressbar"
+            aria-label="Areas imported"
+            aria-valuemin={0}
+            aria-valuemax={job.total}
+            aria-valuenow={job.done}
+          >
+            <div className="h-full bg-accent" style={{ width: `${job.total ? (job.done / job.total) * 100 : 100}%` }} />
+          </div>
+          <p className="text-muted">
             {job.active.length
-              ? job.active.join(", ")
-              : !running
-                ? "Nothing"
-                : stopping
-                  ? "Stopping…"
-                  : quiet
-                    ? "Waiting for the server to pick it up (within five minutes)"
-                    : job.waiting && !job.pending
-                      ? "Waiting to try busy cities again"
-                      : "Starting…"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-faint">Time left</dt>
-          <dd>{running ? (left === null ? "Working it out…" : `About ${mins(left)}`) : "None"}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-faint">Gyms</dt>
-          <dd>
-            {job.sums.found} found, {job.sums.added} new, {job.sums.updated} changed
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-faint">Errors</dt>
-          <dd className={failed.length ? "text-bad" : ""}>
-            {failed.length}
-            {job.waiting ? `, ${job.waiting} busy, trying again soon` : ""}
-          </dd>
-        </div>
-      </dl>
+              ? `Now: ${job.active.join(", ")}`
+              : stopping
+                ? "Stopping…"
+                : quiet
+                  ? "Waiting for the server to pick it up (within five minutes)"
+                  : job.waiting && !job.pending
+                    ? "Waiting to try busy areas again"
+                    : "Starting…"}
+            {left !== null ? `. About ${mins(left)} left of the map step (countries split into regions as they go).` : ""}
+          </p>
+        </>
+      )}
+      {running && !mapping && quiet && <p className="text-muted">Waiting for the server to pick it up (within five minutes).</p>}
+      {job.note && <p className="text-muted">{job.note}</p>}
+      {(failed.length > 0 || job.waiting > 0) && (
+        <p className={failed.length ? "text-bad" : "text-muted"}>
+          {failed.length} {failed.length === 1 ? "area" : "areas"} failed{job.waiting ? `, ${job.waiting} busy, trying again soon` : ""}
+        </p>
+      )}
       {failed.length > 0 && (
-        <ul className="grid gap-1 text-xs text-bad">
+        <ul className="grid max-h-40 gap-1 overflow-y-auto text-xs text-bad">
           {failed.map((d) => (
             <li key={`${d.where}-${d.at}`}>{line(d)}</li>
           ))}
         </ul>
       )}
       <div className="flex flex-wrap gap-2">
-        {!running && notDone > 0 && (
+        {admin && !running && notDone > 0 && (
           <button
             type="button"
             onClick={() => void act({ action: "importRetry", job: job.id })}
@@ -522,79 +398,17 @@ function JobCard({ job, now, act }: { job: JobStatus; now: number; act: (body: R
         )}
       </div>
       {job.recent.length > 0 && (
-        <ul className="max-h-48 overflow-y-auto text-xs text-faint">
-          {job.recent.map((d) => (
-            <li key={`${d.where}-${d.at}`} className={d.r.ok ? "" : "text-bad"}>
-              {line(d)}
-            </li>
-          ))}
-        </ul>
+        <details>
+          <summary className="cursor-pointer text-xs text-faint">Latest areas</summary>
+          <ul className="mt-1 max-h-48 overflow-y-auto text-xs text-faint">
+            {job.recent.map((d) => (
+              <li key={`${d.where}-${d.at}`} className={d.r.ok ? "" : "text-bad"}>
+                {line(d)}
+              </li>
+            ))}
+          </ul>
+        </details>
       )}
     </div>
-  );
-}
-
-/** A country from the search box, by its name or code ("canada", "CA"), or null. */
-export function pickCountry<T extends { code: string; name: string }>(list: T[], text: string): T | null {
-  const v = text.trim().toLowerCase();
-  if (!v) return null;
-  return list.find((c) => c.name.toLowerCase() === v || c.code.toLowerCase() === v) ?? null;
-}
-
-/** Places whose latest import in the list failed (a later clean import clears an earlier failure). */
-export function failedPlaces(rows: ImportRow[]): string[] {
-  const latest = new Map<string, boolean>();
-  for (const r of rows) if (!latest.has(r.query)) latest.set(r.query, r.ok);
-  return [...latest].filter(([, ok]) => !ok).map(([q]) => q);
-}
-
-/**
- * A failed import in a few words, instead of every map server's error on one line: "Place not found", "Map servers
- * busy" (every server busy or hung) or "Map error". The full text is in the row's details.
- */
-export function shortError(error: string): string {
-  if (/^where\b/.test(error)) return "Place not found";
-  const detail = error.replace(/^map:\s*/, "");
-  const parts = detail
-    .split(";")
-    .map((p) => p.trim())
-    .filter(Boolean);
-  if (parts.length && parts.every((p) => /busy|no answer|fetch failed|timed out|too many requests|HTTP 5\d\d/i.test(p)))
-    return "Map servers busy";
-  return "Map error";
-}
-
-function RecentRow({ r, open, toggle }: { r: ImportRow; open: boolean; toggle: () => void }) {
-  return (
-    <>
-      <tr className="border-b border-line align-top">
-        <td className="px-2 py-1.5">
-          <button
-            type="button"
-            aria-expanded={open}
-            aria-label={`${r.ok ? "Imported" : "Failed"}: ${r.area || r.query}`}
-            onClick={toggle}
-            className="flex items-center gap-2 text-left hover:underline"
-          >
-            <span aria-hidden className={`inline-block h-2 w-2 shrink-0 rounded-full ${r.ok ? "bg-good" : "bg-bad"}`} />
-            <span className="break-words">{r.area || r.query}</span>
-          </button>
-        </td>
-        <td className={`px-2 py-1.5 ${r.ok ? "text-muted" : "text-bad"}`}>
-          {r.ok ? `${r.found} found, ${r.added} new, ${r.updated} changed` : shortError(r.error)}
-        </td>
-        <td className="px-2 py-1.5 text-right whitespace-nowrap text-muted">{mins(r.ms)}</td>
-        <td className="px-2 py-1.5 text-muted">{r.server || "—"}</td>
-        <td className="px-2 py-1.5 whitespace-nowrap text-muted">{new Date(r.at).toLocaleString()}</td>
-      </tr>
-      {open && (
-        <tr className="border-b border-line">
-          <td colSpan={5} className="px-2 pb-2">
-            {!r.ok && <p className="text-xs break-words text-bad">{r.error}</p>}
-            <pre className="mt-1 max-h-72 overflow-auto text-xs whitespace-pre-wrap text-faint">{r.log || "No log."}</pre>
-          </td>
-        </tr>
-      )}
-    </>
   );
 }

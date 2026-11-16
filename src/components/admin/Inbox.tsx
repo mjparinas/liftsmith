@@ -10,6 +10,7 @@ import { fillReply, type SavedReply } from "@/lib/savedReplies";
 import type { InboxItem, InboxMessage } from "@/server/inbox";
 
 import { Card } from "./charts";
+import { Reveal } from "./Reveal";
 import { SavedReplies } from "./SavedReplies";
 import { InboxBones, LineBones, Loading } from "./Skeletons";
 import { ago, when } from "./time";
@@ -488,18 +489,19 @@ export function Inbox({
           )}
         </Card>
         {open ? (
-          <Message
-            key={open}
-            id={open}
-            admin={admin}
-            onChange={(body) => {
-              const m = all.find((x) => x.id === open);
-              if (m) setChanged((c) => ({ ...c, [m.id]: afterAction(m, body, Date.now()) }));
-              setVersion((v) => v + 1);
-            }}
-            onClose={() => setOpen(null)}
-            onNext={() => after(open)}
-          />
+          <Reveal key={open} label="Open message" focus={false}>
+            <Message
+              id={open}
+              admin={admin}
+              onChange={(body) => {
+                const m = all.find((x) => x.id === open);
+                if (m) setChanged((c) => ({ ...c, [m.id]: afterAction(m, body, Date.now()) }));
+                setVersion((v) => v + 1);
+              }}
+              onClose={() => setOpen(null)}
+              onNext={() => after(open)}
+            />
+          </Reveal>
         ) : (
           <p className="hidden text-sm text-muted lg:block">Pick a message to read it.</p>
         )}

@@ -1,25 +1,24 @@
 "use client";
 
-// The admin Gyms tab (docs/decisions/gyms.md "The admin Gyms tab"). Four parts, one at a time, so the page isn't one
-// long manual (Melvin, 2026-11-15): To do (claims, posters and gyms lifters added, with counts on the tab), Import
-// (OpenStreetMap, with Recent imports), Website fill-in, and the Gym list with search, filters and Fix city names.
+// The admin Gyms tab (docs/decisions/gyms.md "The admin Gyms tab"). Three parts, one at a time, so the page isn't one
+// long manual (Melvin, 2026-11-15): To do (claims, posters and gyms lifters added, with counts on the tab), Import (the
+// one button: every gym in the world from OpenStreetMap, their websites, AI for the rest and the daily refresh;
+// 2026-11-16), and the Gym list with search and filters.
 // Long explanations sit behind "How this works". Support staff can read; only admins import or change a gym.
 import { useCallback, useEffect, useState } from "react";
 
 import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces";
-import type { RepairChange, RepairStep } from "@/server/gymRepair";
 
 import { useAiStatus } from "./Ai";
 import { Card } from "./charts";
 import { FindDupes, GymFillPanel } from "./GymAi";
 import { GymClaims } from "./GymClaims";
-import { GymEnrich } from "./GymEnrich";
 import { GymImport } from "./GymImport";
 import { GymPosters } from "./GymPosters";
 import { HowItWorks } from "./HowItWorks";
 import { Loading, TableBones } from "./Skeletons";
 
-export const GYM_PARTS = ["To do", "Import", "Website fill-in", "Gym list"] as const;
+export const GYM_PARTS = ["To do", "Import", "Gym list"] as const;
 export type GymPart = (typeof GYM_PARTS)[number];
 
 type List = AdminPlaceList & { pending: AdminPlace[] };
@@ -98,9 +97,6 @@ export function GymPlaces({ admin }: { admin: boolean }) {
       </div>
       <div hidden={part !== "Import"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
         <GymImport admin={admin} changed={changed} />
-      </div>
-      <div hidden={part !== "Website fill-in"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
-        <GymEnrich admin={admin} changed={changed} />
       </div>
       <div hidden={part !== "Gym list"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
         <GymList admin={admin} version={version} changed={changed} act={act} setNote={setNote} />
@@ -191,7 +187,7 @@ const countryName = (() => {
   };
 })();
 
-/** The gym list: search, filters, 50 a page, and Fix city names when some cities are postcodes. */
+/** The gym list: search, filters and 50 a page. */
 function GymList({
   admin,
   version,
@@ -216,9 +212,6 @@ function GymList({
   const [filling, setFilling] = useState<string | null>(null);
   const ai = useAiStatus();
   const [failed, setFailed] = useState(false);
-  // Once shown, Fix city names stays until the page closes, so its result is still there when the count reaches 0.
-  const [fixShown, setFixShown] = useState(false);
-  if (!fixShown && data && data.badCities > 0) setFixShown(true);
   useEffect(() => {
     let live = true;
     const t = setTimeout(() => {
@@ -247,7 +240,6 @@ function GymList({
   const field = "rounded-lg border border-line bg-raised px-3 py-1.5 text-sm";
   return (
     <>
-      {fixShown && data && <FixCities admin={admin} count={data.badCities} changed={changed} show={() => set(setMissing)("city")} />}
       <Card title="Gyms" subtitle={data ? `${data.total} in all, ${data.official} official` : undefined}>
         <div className="mb-3 flex flex-wrap gap-2" role="search" aria-label="Find gyms">
           <input
@@ -415,94 +407,6 @@ function GymList({
         )}
       </Card>
     </>
-  );
-}
-
-/**
- * Fix city names (gymRepair.ts): gyms filed under a postcode or house number ("80145, Campania") or no city get the
- * right one, untidy addresses are cleaned, and moved pages redirect. Runs a thousand gyms a step until the list ends.
- */
-function FixCities({ admin, count, changed, show }: { admin: boolean; count: number; changed: () => void; show: () => void }) {
-  const [running, setRunning] = useState(false);
-  const [sums, setSums] = useState<Omit<RepairStep, "next" | "changes"> | null>(null);
-  const [changes, setChanges] = useState<RepairChange[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const start = async () => {
-    setRunning(true);
-    setError(null);
-    setChanges([]);
-    const all = { checked: 0, cities: 0, addresses: 0, moved: 0, unsure: 0 };
-    let after = "";
-    for (;;) {
-      const r = await fetch("/api/admin/gym-places/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "repair", after }),
-      }).catch(() => null);
-      const j = r?.ok ? ((await r.json().catch(() => null)) as RepairStep | null) : null;
-      if (!j) {
-        setError(r ? `The admin server answered ${r.status}.` : "The admin server didn't answer.");
-        break;
-      }
-      for (const k of Object.keys(all) as (keyof typeof all)[]) all[k] += j[k];
-      setSums({ ...all });
-      setChanges((c) => [...c, ...j.changes].slice(-200));
-      if (!j.next) break;
-      after = j.next;
-    }
-    setRunning(false);
-    changed();
-  };
-  return (
-    <Card
-      title="Fix city names"
-      subtitle={
-        count
-          ? `${count} ${count === 1 ? "gym's city looks" : "gyms' cities look"} like a postcode or house number, or are missing`
-          : "Every city looks right now."
-      }
-    >
-      <HowItWorks>
-        <p>
-          Some map entries have a postcode or house number where the city goes, so their pages were filed under cities like &ldquo;80145,
-          Campania&rdquo; or &ldquo;1, ON&rdquo;. This gives each one its right city: the name inside the value when there is one
-          (&ldquo;80145 Napoli&rdquo;), else the city most gyms within about 3 km are under, else OpenStreetMap&apos;s answer for the
-          gym&apos;s position (a dozen lookups a step). It also tidies addresses (stray commas, repeated parts) and moves each fixed page to
-          its new address, with a permanent redirect from the old one. Claimed gyms are left as their owner set them.
-        </p>
-      </HowItWorks>
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-        {admin && (
-          <button
-            type="button"
-            disabled={running}
-            onClick={() => void start()}
-            className="press btn-primary rounded-lg px-3 py-1.5 font-semibold"
-          >
-            {running ? "Fixing…" : "Fix city names and addresses"}
-          </button>
-        )}
-        <button type="button" onClick={show} className="press rounded-lg border border-line px-3 py-1.5 text-muted">
-          Show them
-        </button>
-        {sums && (
-          <span className="text-muted" role="status">
-            {sums.checked} checked, {sums.cities} cities fixed, {sums.addresses} addresses tidied, {sums.moved} pages moved
-            {sums.unsure ? `, ${sums.unsure} not sure yet (run it again)` : ""}
-          </span>
-        )}
-      </div>
-      {error && <p className="mt-2 text-sm text-bad">{error}</p>}
-      {changes.length > 0 && (
-        <ul className="mt-2 max-h-48 overflow-y-auto text-xs text-faint">
-          {changes.map((c, i) => (
-            <li key={`${c.id}-${i}`}>
-              {c.name}: {c.what}
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
   );
 }
 

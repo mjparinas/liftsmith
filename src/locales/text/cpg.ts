@@ -94,6 +94,7 @@ export const en = {
   "cpg.rev.early": "It's a little early to rate this program.",
   "cpg.rev.notOwner": "Only lifters who have this program can rate it.",
   "cpg.rev.anon": "A lifter",
+  "cpg.rev.verified": "Verified purchase",
 } as const;
 
 type Key = keyof typeof en;
@@ -191,6 +192,7 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "Aún es pronto para valorar este programa.",
   "cpg.rev.notOwner": "Solo quienes tienen este programa pueden valorarlo.",
   "cpg.rev.anon": "Un usuario",
+  "cpg.rev.verified": "Compra verificada",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -292,6 +294,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "C'est un peu tôt pour noter ce programme.",
   "cpg.rev.notOwner": "Seules les personnes qui ont ce programme peuvent le noter.",
   "cpg.rev.anon": "Un utilisateur",
+  "cpg.rev.verified": "Achat vérifié",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -390,6 +393,7 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "Es ist noch etwas früh, dieses Programm zu bewerten.",
   "cpg.rev.notOwner": "Nur wer dieses Programm hat, kann es bewerten.",
   "cpg.rev.anon": "Ein Nutzer",
+  "cpg.rev.verified": "Verifizierter Kauf",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -487,6 +491,7 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "È ancora presto per valutare questo programma.",
   "cpg.rev.notOwner": "Solo chi ha questo programma può valutarlo.",
   "cpg.rev.anon": "Un utente",
+  "cpg.rev.verified": "Acquisto verificato",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -576,6 +581,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "このプログラムを評価するにはまだ少し早いです。",
   "cpg.rev.notOwner": "このプログラムを持っている人だけが評価できます。",
   "cpg.rev.anon": "ユーザー",
+  "cpg.rev.verified": "購入済み",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -673,6 +679,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "Ainda é um pouco cedo para avaliar este programa.",
   "cpg.rev.notOwner": "Só quem tem este programa pode avaliá-lo.",
   "cpg.rev.anon": "Uma pessoa",
+  "cpg.rev.verified": "Compra verificada",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -763,6 +770,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "이 프로그램을 평가하기엔 아직 조금 일러요.",
   "cpg.rev.notOwner": "이 프로그램을 가진 사람만 평가할 수 있어요.",
   "cpg.rev.anon": "한 사용자",
+  "cpg.rev.verified": "구매 확인됨",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -856,6 +864,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "Bu programı puanlamak için henüz biraz erken.",
   "cpg.rev.notOwner": "Yalnızca bu programa sahip olanlar puan verebilir.",
   "cpg.rev.anon": "Bir sporcu",
+  "cpg.rev.verified": "Doğrulanmış satın alma",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -977,4 +986,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.rev.early": "Na ocenę tego programu jest jeszcze trochę za wcześnie.",
   "cpg.rev.notOwner": "Ocenić program mogą tylko osoby, które go mają.",
   "cpg.rev.anon": "Użytkownik",
+  "cpg.rev.verified": "Zweryfikowany zakup",
 };

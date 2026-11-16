@@ -234,7 +234,8 @@ export function startLoop(
     if (!visible || document.hidden) return;
     const dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
     last = now;
-    if (s.bpm) beat = advanceBeat(beat, dt, s.bpm);
+    // With reduced motion the heart is drawn but doesn't beat, so a heart rate alone never keeps the figure moving.
+    if (s.bpm && !reduced) beat = advanceBeat(beat, dt, s.bpm);
     const cyc = cycleLength(motion.phases);
     if (s.playing && !done) {
       t += dt * s.speed;
@@ -249,7 +250,12 @@ export function startLoop(
     const target = s.follow?.() ?? null;
     if (target !== null) followD += (clamp(target, 0, 1) - followD) * Math.min(1, dt * 14);
     const animating =
-      !!s.follow || (s.playing && !done) || !!s.bpm || !!drag || Math.abs(yawTarget - yaw) > 0.05 || (s.view === "orbit" && s.playing);
+      !!s.follow ||
+      (s.playing && !done) ||
+      (!!s.bpm && !reduced) ||
+      !!drag ||
+      Math.abs(yawTarget - yaw) > 0.05 ||
+      (s.view === "orbit" && s.playing);
     if (changed || now - lastDraw >= 1000 / s.fps - 4) {
       lastDraw = now;
       const r = canvas.getBoundingClientRect();

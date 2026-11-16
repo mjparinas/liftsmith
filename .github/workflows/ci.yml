@@ -6,7 +6,8 @@ name: CI
 # Speed (2026-11-09, 2026-11-10): the "changes" job skips everything for a tree that already passed and for
 # Markdown-only changes, and skips the native builds unless native code, Capacitor or dependencies changed; the device sweep is split by
 # platform; Gradle uses its build cache; the iOS build compiles for one simulator architecture and doesn't wait
-# for the web build.
+# for the web build. 2026-11-16: the unit tests run as two shards with their coverage merged, and the accessibility
+# and card-gap checks as four browser jobs instead of one, which took a run from about 9.5 to about 6 minutes.
 
 on:
   push:
@@ -142,18 +143,44 @@ jobs:
         run: npm audit --audit-level=high
         continue-on-error: true
 
+  # Two shards side by side (vitest --shard), each about half the files; the coverage job merges their blob reports
+  # into the same coverage summary one run used to print. Every test still runs exactly once.
   unit:
-    name: Unit and integration tests
+    name: Unit and integration tests · ${{ matrix.shard }}/2
     needs: changes
     if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: npx vitest run --coverage
+      - run: npx vitest run --coverage --shard=${{ matrix.shard }}/2 --reporter=default --reporter=blob
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vitest-blob-${{ matrix.shard }}
+          path: .vitest/blob
+          include-hidden-files: true
+          retention-days: 1
+
+  coverage:
+    name: Unit test coverage
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: vitest-blob-*
+          path: .vitest/blob
+          merge-multiple: true
+      - run: npx vitest run --merge-reports --coverage
       - name: Coverage summary
-        if: ${{ !cancelled() }}
         run: node -e "const s=require('./coverage/coverage-summary.json').total;const r=['lines','statements','functions','branches'].map(k=>'| '+k+' | '+s[k].pct+'% |').join('\n');require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### Unit test coverage\n\n| | |\n|---|---|\n'+r+'\n')"
 
   build:
@@ -195,7 +222,12 @@ jobs:
           # side by side.
           - { name: "devices · iOS", run: "DEVICES=ios node scripts/e2e-devices.mjs '' e2e-shots/devices" }
           - { name: "devices · Android", run: "DEVICES=android node scripts/e2e-devices.mjs '' e2e-shots/devices" }
-          - { name: "accessibility", run: "node scripts/e2e-a11y.mjs && node scripts/e2e-gaps.mjs" }
+          # Accessibility and card gaps were one job of about 6.5 minutes, the slowest in CI (2026-11-16). Each script now
+          # runs as two halves of about the same length, with the same screens and checks between them.
+          - { name: "accessibility · app", run: "A11Y_PART=app node scripts/e2e-a11y.mjs" }
+          - { name: "accessibility · site, keyboard, desktop", run: "A11Y_PART=more node scripts/e2e-a11y.mjs" }
+          - { name: "card gaps · phone", run: "GAPS_LAYOUT=phone node scripts/e2e-gaps.mjs" }
+          - { name: "card gaps · desktop", run: "GAPS_LAYOUT=desktop node scripts/e2e-gaps.mjs" }
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -300,7 +332,7 @@ jobs:
 
   passed:
     name: CI passed
-    needs: [changes, static, unit, build, browser, android, ios]
+    needs: [changes, static, unit, coverage, build, browser, android, ios]
     if: always()
     runs-on: ubuntu-latest
     permissions:

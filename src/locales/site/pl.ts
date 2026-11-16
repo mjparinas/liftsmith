@@ -179,13 +179,13 @@ export const pl: SiteText = {
         {
           eyebrow: "Mapa regeneracji",
           title: "Zobacz, które mięśnie są gotowe, zanim je potrenujesz",
-          body: "Każda seria dokłada zmęczenia mięśniom, które pracują, a ono znika w ciągu dwóch, trzech dni, zależnie od mięśnia. Mapa ciała z przodu i z tyłu pokazuje każdy mięsień jako Świeży, Gotowy, Regeneruje się lub Zmęczony, a plan omija to, co nie jest gotowe.",
+          body: "Każda seria dokłada zmęczenia mięśniom, które pracują, a ono znika w ciągu dwóch, trzech dni, zależnie od mięśnia. Mapa ciała w 3D, którą możesz obrócić, by zobaczyć przód lub tył, pokazuje każdy mięsień jako Świeży, Gotowy, Regeneruje się lub Zmęczony, a plan omija to, co nie jest gotowe.",
           points: [
             "Kolor plus etykieta i procent dla każdego mięśnia",
             "Serie na mięsień w tygodniu względem celu na wzrost",
             "Nigdy żadnej nagrody za trenowanie zmęczonego mięśnia",
           ],
-          alt: "Mapa regeneracji: widok ciała z przodu i z tyłu pokolorowany według regeneracji, z legendą Świeży, Gotowy, Regeneruje się i Zmęczony",
+          alt: "Mapa regeneracji: ciało w 3D, w którym każdy mięsień świeci kolorem swojej regeneracji, z legendą Świeży, Gotowy, Regeneruje się i Zmęczony",
           cta: "Sprawdź regenerację",
         },
         {

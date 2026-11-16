@@ -568,7 +568,7 @@ export const pt: FeaturesText = {
     },
     languages: {
       name: "Dez idiomas",
-      body: "Inglês, espanhol, francês, alemão, italiano, japonês, português do Brasil, coreano, polonês e turco, seguindo o idioma do seu celular.",
+      body: "Inglês, espanhol, francês, alemão, italiano, japonês, português do Brasil, coreano, polonês e turco, seguindo o idioma do seu celular ou navegador, ou o que você escolher na tela de boas-vindas e nos ajustes.",
     },
     appearance: {
       name: "Escuro, claro ou igual ao celular",

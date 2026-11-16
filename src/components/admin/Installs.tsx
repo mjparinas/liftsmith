@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { Card, Table } from "./charts";
 import { InstallDetail } from "./InstallDetail";
+import { Reveal } from "./Reveal";
 import { Loading, TableBones } from "./Skeletons";
 import { ago, countryName, shortDay, when } from "./time";
 
@@ -96,7 +97,11 @@ export function Installs({ admin, open, setOpen }: { admin: boolean; open: strin
   const field = "card px-3 py-2 text-sm";
   return (
     <div className="space-y-4">
-      {open && <InstallDetail id={open} close={() => setOpen(null)} />}
+      {open && (
+        <Reveal key={open} label="Open install">
+          <InstallDetail id={open} close={() => setOpen(null)} />
+        </Reveal>
+      )}
       <Card
         title="Installs"
         subtitle="Newest first. Device and source only. Mark your own phones and CI devices as test so they're left out of every number. The install id is shown in the app under Settings › Usage stats."

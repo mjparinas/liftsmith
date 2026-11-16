@@ -219,7 +219,8 @@ export function LiftDemoCore({
     playing: playing && !paused && (dancing || !still),
     reps: dancing ? 1 : reps,
     highlight,
-    bpm: bpm ?? null,
+    // Where the 2D figure waits for Play (the public site), its heart waits too, so the main thread stays free.
+    bpm: mode === "2d" && autoPlay2d === false && !playing ? null : (bpm ?? null),
     fps: lite ? Math.min(fps ?? 60, controls ? LITE.controlsFps : LITE.fps) : (fps ?? (controls ? 60 : 30)),
     maxDpr: lite ? Math.min(maxDpr ?? 2, LITE.maxDpr) : maxDpr,
     follow: follow ?? null,
@@ -340,7 +341,7 @@ export function LiftDemoCore({
           <span className="truncate">{label ?? (controls ? VIEWS.find((v) => v[0] === view)?.[1] : "")}</span>
           <span ref={phaseRef} className="shrink-0 text-[#5cc8ff]" aria-hidden />
         </div>
-        {!!bpm && <HeartReadout bpm={bpm} trend={hrTrend} />}
+        {!!settings.bpm && <HeartReadout bpm={settings.bpm} trend={hrTrend} />}
         {controls && (
           <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
             <span>{bpm ? "" : w.drag}</span>

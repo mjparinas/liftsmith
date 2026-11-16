@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { BuildStamp } from "@/components/BuildStamp";
+import { LangLink } from "@/components/site/LangLink";
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { fill, localPath, SITE_LANG_NAME, SITE_LANGS, type SiteLang } from "@/lib/siteLang";
@@ -204,7 +205,8 @@ function LanguageSwitcher({ lang, path, label }: { lang: SiteLang; path: string;
         </li>
         {SITE_LANGS.map((l) => (
           <li key={l}>
-            <Link
+            <LangLink
+              to={l}
               href={localPath(l, path)}
               hrefLang={l}
               lang={l}
@@ -212,7 +214,7 @@ function LanguageSwitcher({ lang, path, label }: { lang: SiteLang; path: string;
               className={`inline-flex min-h-11 items-center rounded-lg px-2.5 hover:bg-surface ${l === lang ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}
             >
               {SITE_LANG_NAME[l]}
-            </Link>
+            </LangLink>
           </li>
         ))}
       </ul>

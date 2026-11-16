@@ -127,7 +127,7 @@ function reviewsHtml(lang: MsgLang, p: CoachProgram, reviews: Review[]): string 
   return reviews
     .map(
       (v) =>
-        `<blockquote class="review"><p><span class="ember" aria-hidden="true">${starText(v.stars)}</span> <span class="sr">${esc(say(lang, "gp.revStars", { rating: v.stars }))}</span><span class="muted small">${esc(v.name || say(lang, "gp.cpgAnon"))}</span></p>${v.text ? `<p>${esc(v.text)}</p>` : ""}${v.reply ? `<p class="muted small">${esc(say(lang, "gp.revReply", { name: p.coachName || sayP(lang, "cpg.aCoach") }))}: ${esc(v.reply)}</p>` : ""}</blockquote>`,
+        `<blockquote class="review"><p><span class="ember" aria-hidden="true">${starText(v.stars)}</span> <span class="sr">${esc(say(lang, "gp.revStars", { rating: v.stars }))}</span><span class="muted small">${esc(v.name || say(lang, "gp.cpgAnon"))}${v.verified ? ` · ${esc(say(lang, "gp.cpgVerified"))}` : ""}</span></p>${v.text ? `<p>${esc(v.text)}</p>` : ""}${v.reply ? `<p class="muted small">${esc(say(lang, "gp.revReply", { name: p.coachName || sayP(lang, "cpg.aCoach") }))}: ${esc(v.reply)}</p>` : ""}</blockquote>`,
     )
     .join("");
 }

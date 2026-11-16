@@ -17,7 +17,7 @@ import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
-import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
@@ -40,6 +40,7 @@ import { DelightSettings } from "./DelightSettings";
 import { HandsFree } from "./HandsFree";
 import { Icon, type IconName } from "./icons";
 import { ImportWorkouts } from "./ImportCsv";
+import { LanguageChoices } from "./LanguagePicker";
 import { LogoEgg } from "./LogoEgg";
 import { MessageSettings } from "./MessageSettings";
 import { programName } from "./Programs";
@@ -470,13 +471,9 @@ function LookGroup() {
       />
       <DelightSettings part="look" />
       <SwitchRow label={t("settings.quote")} on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
-      <Row<LangPref>
-        label={t("settings.language")}
-        value={profile.language ?? "system"}
-        onPick={(language) => setProfile({ language })}
-        options={[["system", t("settings.language.system")], ...LANGS.map((l) => [l, LANG_NAME[l]] as [LangPref, string])]}
-      />
-      <p className="mt-2 px-1 text-xs text-faint">{t("settings.language.note")}</p>
+      <Section title={t("settings.language")}>
+        <LanguageChoices label={t("settings.language")} />
+      </Section>
       <AccessibilitySettings />
     </>
   );

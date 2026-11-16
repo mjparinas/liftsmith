@@ -67,3 +67,25 @@ export const amountOf = (price: string) => Number(price.replace(/[^0-9.]/g, ""))
 export function fill(s: string, vars: Record<string, string | number>): string {
   return s.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 }
+
+// The website remembers the language a visitor picked (the footer's switcher, or reading a page in another language), so
+// the web app's first visit starts in it (`LanguageButton` on the welcome screen; Melvin, 2026-11-16). Not personal data:
+// only a language code, kept in this browser.
+const SITE_LANG_KEY = "liftsmith.siteLang";
+
+/** Remembers the website language this visitor chose. */
+export function rememberSiteLang(lang: SiteLang): void {
+  try {
+    localStorage.setItem(SITE_LANG_KEY, lang);
+  } catch {}
+}
+
+/** The website language this visitor last chose, if any. */
+export function readSiteLang(): SiteLang | undefined {
+  try {
+    const v = localStorage.getItem(SITE_LANG_KEY);
+    return v && isSiteLang(v) ? v : undefined;
+  } catch {
+    return undefined;
+  }
+}

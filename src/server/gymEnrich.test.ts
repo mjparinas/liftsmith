@@ -157,7 +157,7 @@ describe("filling in a gym", () => {
     expect(calls).toEqual(["https://ironworks.example.com/", "https://ironworks.example.com/favicon.ico"]);
   });
 
-  it("reads gyms in batches, each at most once a month, and counts what's left", async () => {
+  it("reads gyms in batches, each at most once a month, and stamps one that has everything without a visit", async () => {
     await savePlaces(
       placesFromOsm(
         [
@@ -172,9 +172,21 @@ describe("filling in a gym", () => {
     const { fetcher } = site(null, "<html><body>Hi</body></html>");
     const first = await enrichBatch(fetcher, NOW);
     expect(first.done.map((d) => d.skipped)).toEqual(["nothing new on the page", "nothing new on the page"]);
-    expect(first.left).toBe(0);
+    expect(first.more).toBe(false);
     expect((await enrichBatch(fetcher, NOW + 1000)).done).toHaveLength(0);
     expect((await enrichBatch(fetcher, NOW + 31 * 86_400_000)).done).toHaveLength(2);
+    // A full batch says there may be more.
+    expect((await enrichBatch(fetcher, NOW + 62 * 86_400_000, 1)).more).toBe(true);
+    // A gym with every detail and an icon isn't visited, only stamped.
+    await run(
+      `UPDATE gym_places SET phone = '1', email = 'a@b.co', hours = '24/7', address = '1 A St', postcode = 'V2Y 1A1',
+         instagram = 'https://www.instagram.com/a', facebook = 'https://www.facebook.com/a', enriched_at = 0`,
+    );
+    await run("INSERT INTO gym_photos (id, place_id, kind, image, created_at) SELECT 'p' || id, id, 'icon', x'00', 0 FROM gym_places");
+    const quiet = site(null, "");
+    const stamped = await enrichBatch(quiet.fetcher, NOW + 63 * 86_400_000);
+    expect(stamped).toMatchObject({ done: [], complete: 2 });
+    expect(quiet.calls).toEqual([]);
   });
 });
 

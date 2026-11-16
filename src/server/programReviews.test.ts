@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { getFree, saveProgram } from "./coachPrograms";
+import { dropProgram, getFree, saveProgram } from "./coachPrograms";
 import { reportReview, resolveReview, reviewReport } from "./coachReviews";
 import { batch, query, resetDb, run } from "./db";
 import {
@@ -124,5 +124,25 @@ describe("reports and deleting", () => {
     await saveProgramReview("a", id, 5, "", LATER);
     await batch(programReviewCleanup("coach"));
     expect(await query("SELECT * FROM program_reviews")).toEqual([]);
+  });
+
+  it("count only while the writer still has it, and paid ones say Verified purchase", async () => {
+    for (const who of ["a", "b", "c"]) await saveProgramReview(who, id, 4, "", LATER);
+    expect((await programRating(id)).count).toBe(3);
+    expect((await programReviewsOf(id, false)).some((r) => r.verified)).toBe(false);
+
+    // A paid copy (as the Stripe webhook records it) marks the review; a refund deletes the copy and the review stops counting.
+    await run("UPDATE program_owners SET payment_id = 'pi_test' WHERE program_id = ? AND account_id = 'a'", [id]);
+    const name = (await myProgramReview("a", id, LATER)).review?.name;
+    expect((await programReviewsOf(id, false)).find((r) => r.name === name)?.verified).toBe(true);
+    await run("DELETE FROM program_owners WHERE payment_id = 'pi_test'");
+    expect(await programRating(id)).toMatchObject({ count: 2, average: null });
+    expect(await programReviewsOf(id, true)).toHaveLength(2);
+
+    // Dropping a free copy does the same; getting it back brings the review back.
+    expect(await dropProgram("b", id)).toBe(true);
+    expect((await programRating(id)).count).toBe(1);
+    await getFree("b", id, LATER);
+    expect((await programRating(id)).count).toBe(2);
   });
 });

@@ -6,6 +6,8 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "td.freeAdaptive.try": "Try adaptive today · 1 free this week",
   "td.freeAdaptive.back": "Adaptive today, free this week · Back to {name}",
+  "td.freeAdaptive.bonusTry": "Bonus day · Try adaptive today",
+  "td.freeAdaptive.bonusBack": "Adaptive today, a bonus day · Back to {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} streak freeze", other: "{count} streak freezes" },
   "td.lvlTitle": "{title}: {into} of {span} XP to {next}",
@@ -62,6 +64,8 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Prueba el adaptativo hoy · 1 gratis esta semana",
   "td.freeAdaptive.back": "Adaptativo hoy, gratis esta semana · Volver a {name}",
+  "td.freeAdaptive.bonusTry": "Día extra · Prueba el adaptativo hoy",
+  "td.freeAdaptive.bonusBack": "Adaptativo hoy, día extra · Volver a {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} protector de racha", other: "{count} protectores de racha" },
   "td.lvlTitle": "{title}: {into} de {span} XP para {next}",
@@ -118,6 +122,8 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Essayer l’adaptatif aujourd’hui · 1 gratuit cette semaine",
   "td.freeAdaptive.back": "Adaptatif aujourd’hui, gratuit cette semaine · Revenir à {name}",
+  "td.freeAdaptive.bonusTry": "Jour bonus · Essayez l’adaptatif aujourd’hui",
+  "td.freeAdaptive.bonusBack": "Adaptatif aujourd’hui, jour bonus · Revenir à {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} gel de série", other: "{count} gels de série" },
   "td.lvlTitle": "{title} : {into} sur {span} XP avant {next}",
@@ -174,6 +180,8 @@ export const fr: Partial<Record<Key, Message>> = {
 export const de: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Heute adaptiv testen · 1 gratis diese Woche",
   "td.freeAdaptive.back": "Heute adaptiv, gratis diese Woche · Zurück zu {name}",
+  "td.freeAdaptive.bonusTry": "Bonustag · Heute adaptiv ausprobieren",
+  "td.freeAdaptive.bonusBack": "Heute adaptiv, ein Bonustag · Zurück zu {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} Serien-Freeze", other: "{count} Serien-Freezes" },
   "td.lvlTitle": "{title}: {into} von {span} XP bis {next}",
@@ -230,6 +238,8 @@ export const de: Partial<Record<Key, Message>> = {
 export const it: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Prova l’adattivo oggi · 1 gratis questa settimana",
   "td.freeAdaptive.back": "Adattivo oggi, gratis questa settimana · Torna a {name}",
+  "td.freeAdaptive.bonusTry": "Giorno bonus · Prova l’adattivo oggi",
+  "td.freeAdaptive.bonusBack": "Adattivo oggi, giorno bonus · Torna a {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} freeze della serie", other: "{count} freeze della serie" },
   "td.lvlTitle": "{title}: {into} di {span} XP per {next}",
@@ -286,6 +296,8 @@ export const it: Partial<Record<Key, Message>> = {
 export const ja: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "今日はアダプティブを試す・今週1回無料",
   "td.freeAdaptive.back": "今日はアダプティブ（今週は無料）・{name} に戻す",
+  "td.freeAdaptive.bonusTry": "ボーナスデー・今日はアダプティブを試す",
+  "td.freeAdaptive.bonusBack": "今日はアダプティブ（ボーナスデー）・{name} に戻す",
   "td.streakTitle": "{streak}、{freezes}",
   "td.freezeLabel": { other: "連続記録フリーズ{count}個" },
   "td.lvlTitle": "{title}：{next}まで{span} XP中{into} XP",
@@ -340,6 +352,8 @@ export const ja: Partial<Record<Key, Message>> = {
 export const pt: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Experimente o adaptativo hoje · 1 grátis esta semana",
   "td.freeAdaptive.back": "Adaptativo hoje, grátis esta semana · Voltar para {name}",
+  "td.freeAdaptive.bonusTry": "Dia bônus · Experimente o adaptativo hoje",
+  "td.freeAdaptive.bonusBack": "Adaptativo hoje, dia bônus · Voltar para {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": {
     one: "{count} congelamento de sequência",
@@ -405,6 +419,8 @@ export const pt: Partial<Record<Key, Message>> = {
 export const ko: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "오늘 적응형 해 보기 · 이번 주 무료 1회",
   "td.freeAdaptive.back": "오늘은 적응형, 이번 주 무료 · {name}(으)로 돌아가기",
+  "td.freeAdaptive.bonusTry": "보너스 데이 · 오늘 적응형 해 보기",
+  "td.freeAdaptive.bonusBack": "오늘은 적응형, 보너스 데이 · {name}(으)로 돌아가기",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": {
     other: "연속 기록 보호권 {count}개",
@@ -465,6 +481,8 @@ export const ko: Partial<Record<Key, Message>> = {
 export const tr: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Bugün uyarlanabilir dene · bu hafta 1 ücretsiz",
   "td.freeAdaptive.back": "Bugün uyarlanabilir, bu hafta ücretsiz · {name} programına dön",
+  "td.freeAdaptive.bonusTry": "Bonus gün · Bugün uyarlanabilir programı dene",
+  "td.freeAdaptive.bonusBack": "Bugün uyarlanabilir, bonus gün · {name} programına dön",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": {
     one: "{count} seri dondurma",
@@ -529,6 +547,8 @@ export const tr: Partial<Record<Key, Message>> = {
 export const pl: Partial<Record<Key, Message>> = {
   "td.freeAdaptive.try": "Wypróbuj adaptacyjny dziś · 1 darmowy w tym tygodniu",
   "td.freeAdaptive.back": "Dziś adaptacyjny, darmowy w tym tygodniu · Wróć do: {name}",
+  "td.freeAdaptive.bonusTry": "Dzień bonusowy · Wypróbuj dziś trening adaptacyjny",
+  "td.freeAdaptive.bonusBack": "Dziś adaptacyjny, dzień bonusowy · Wróć do: {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": {
     one: "{count} zamrożenie passy",

@@ -5,6 +5,9 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "egg.joke.420": "420 on the bar. Nice. Very chill number for a very heavy set.",
   "egg.joke.1337": "1337: elite. Literally. That's hacker speak for very, very good.",
+  "egg.flame.ok": "You found a secret: an extra day of adaptive workouts. Today's plan is adaptive.",
+  "egg.flame.today": "Today's already a bonus day. Come back tomorrow.",
+  "egg.flame.week": "That's three bonus days this week. The flame rests until next week.",
   "egg.title": "Lifetime, in other units",
   "egg.lead": "You've lifted {total} in all. That's about:",
   "egg.empty": "Lift something first, then come back and see what it weighs in elephants.",
@@ -23,6 +26,9 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "egg.joke.420": "420 en la barra. Qué bien. Un número muy tranquilo para una serie muy pesada.",
   "egg.joke.1337": "1337: élite. Literalmente. Así dicen los hackers «muy, muy bueno».",
+  "egg.flame.ok": "Has encontrado un secreto: un día extra de entrenamientos adaptativos. El plan de hoy es adaptativo.",
+  "egg.flame.today": "Hoy ya es un día extra. Vuelve mañana.",
+  "egg.flame.week": "Ya van tres días extra esta semana. La llama descansa hasta la semana que viene.",
   "egg.title": "Tu total, en otras unidades",
   "egg.lead": "Has levantado {total} en total. Eso es más o menos:",
   "egg.empty": "Levanta algo primero y vuelve para ver cuánto pesa en elefantes.",
@@ -39,6 +45,9 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "egg.joke.420": "420 sur la barre. Joli. Un nombre très cool pour une série très lourde.",
   "egg.joke.1337": "1337 : élite. Littéralement. C’est « très, très fort » en langage de hacker.",
+  "egg.flame.ok": "Vous avez trouvé un secret : un jour de plus d’entraînements adaptatifs. Le plan du jour est adaptatif.",
+  "egg.flame.today": "Aujourd’hui est déjà un jour bonus. Revenez demain.",
+  "egg.flame.week": "Trois jours bonus cette semaine. La flamme se repose jusqu’à la semaine prochaine.",
   "egg.title": "Votre total, en d’autres unités",
   "egg.lead": "Vous avez soulevé {total} au total. Soit environ :",
   "egg.empty": "Soulevez quelque chose d’abord, puis revenez voir combien ça pèse en éléphants.",
@@ -55,6 +64,9 @@ export const fr: Partial<Record<Key, Message>> = {
 export const de: Partial<Record<Key, Message>> = {
   "egg.joke.420": "420 auf der Stange. Nice. Eine sehr entspannte Zahl für einen sehr schweren Satz.",
   "egg.joke.1337": "1337: Elite. Wörtlich. Das ist Hackersprache für „sehr, sehr gut“.",
+  "egg.flame.ok": "Du hast ein Geheimnis gefunden: einen zusätzlichen Tag mit adaptiven Workouts. Der heutige Plan ist adaptiv.",
+  "egg.flame.today": "Heute ist schon ein Bonustag. Komm morgen wieder.",
+  "egg.flame.week": "Das sind drei Bonustage diese Woche. Die Flamme ruht bis nächste Woche.",
   "egg.title": "Dein Gesamtgewicht in anderen Einheiten",
   "egg.lead": "Du hast insgesamt {total} gehoben. Das sind ungefähr:",
   "egg.empty": "Heb erst etwas und schau dann, wie viele Elefanten das sind.",
@@ -71,6 +83,9 @@ export const de: Partial<Record<Key, Message>> = {
 export const it: Partial<Record<Key, Message>> = {
   "egg.joke.420": "420 sul bilanciere. Niente male. Un numero molto rilassato per una serie molto pesante.",
   "egg.joke.1337": "1337: élite. Letteralmente. In gergo hacker vuol dire «molto, molto bravo».",
+  "egg.flame.ok": "Hai trovato un segreto: un giorno in più di allenamenti adattivi. Il piano di oggi è adattivo.",
+  "egg.flame.today": "Oggi è già un giorno bonus. Torna domani.",
+  "egg.flame.week": "Sono già tre giorni bonus questa settimana. La fiamma riposa fino alla prossima.",
   "egg.title": "Il tuo totale, in altre unità",
   "egg.lead": "Hai sollevato {total} in tutto. Più o meno:",
   "egg.empty": "Solleva qualcosa prima, poi torna a vedere quanto pesa in elefanti.",
@@ -87,6 +102,9 @@ export const it: Partial<Record<Key, Message>> = {
 export const ja: Partial<Record<Key, Message>> = {
   "egg.joke.420": "バーに420。いいね。とても重いセットに、とてもゆるい数字。",
   "egg.joke.1337": "1337：エリート。文字どおり。ハッカー語で「めちゃくちゃすごい」という意味です。",
+  "egg.flame.ok": "秘密を見つけました：アダプティブワークアウトがもう1日使えます。今日のプランはアダプティブです。",
+  "egg.flame.today": "今日はすでにボーナスデーです。また明日どうぞ。",
+  "egg.flame.week": "今週のボーナスデーは3日に達しました。炎は来週まで休みます。",
   "egg.title": "これまでの合計を別の単位で",
   "egg.lead": "これまでに合計{total}を挙げました。だいたい：",
   "egg.empty": "まず何か挙げてから、ゾウ何頭分か見に来てください。",
@@ -103,6 +121,9 @@ export const ja: Partial<Record<Key, Message>> = {
 export const pt: Partial<Record<Key, Message>> = {
   "egg.joke.420": "420 na barra. Boa. Número bem tranquilo para uma série bem pesada.",
   "egg.joke.1337": "1337: elite. Literalmente. É a gíria hacker para muito, muito bom.",
+  "egg.flame.ok": "Você achou um segredo: um dia extra de treinos adaptativos. O plano de hoje é adaptativo.",
+  "egg.flame.today": "Hoje já é um dia bônus. Volte amanhã.",
+  "egg.flame.week": "Já são três dias bônus esta semana. A chama descansa até a semana que vem.",
   "egg.title": "Sua vida toda, em outras unidades",
   "egg.lead": "Você já levantou {total} no total. Isso é cerca de:",
   "egg.empty": "Levante alguma coisa primeiro, depois volte para ver quanto pesa em elefantes.",
@@ -140,6 +161,9 @@ export const pt: Partial<Record<Key, Message>> = {
 export const ko: Partial<Record<Key, Message>> = {
   "egg.joke.420": "바에 420. 좋네요. 아주 무거운 세트에 아주 여유로운 숫자예요.",
   "egg.joke.1337": "1337: 엘리트. 진짜로요. 해커 말로 엄청, 엄청 잘한다는 뜻이에요.",
+  "egg.flame.ok": "비밀을 찾았어요: 적응형 운동을 하루 더 할 수 있어요. 오늘 계획은 적응형이에요.",
+  "egg.flame.today": "오늘은 이미 보너스 데이예요. 내일 다시 와 주세요.",
+  "egg.flame.week": "이번 주 보너스 데이를 세 번 모두 썼어요. 불꽃은 다음 주까지 쉬어요.",
   "egg.title": "지금까지 든 무게, 다른 단위로",
   "egg.lead": "지금까지 총 {total}을(를) 들었어요. 대략 이 정도예요:",
   "egg.empty": "먼저 뭔가를 들어 보고, 다시 와서 코끼리로 몇 마리인지 확인하세요.",
@@ -170,6 +194,9 @@ export const ko: Partial<Record<Key, Message>> = {
 export const tr: Partial<Record<Key, Message>> = {
   "egg.joke.420": "Barda 420. Güzel. Çok ağır bir set için epey rahat bir sayı.",
   "egg.joke.1337": "1337: elit. Gerçekten. Hacker dilinde çok, çok iyi demek.",
+  "egg.flame.ok": "Bir sır buldun: bir gün daha uyarlanabilir antrenman. Bugünün planı uyarlanabilir.",
+  "egg.flame.today": "Bugün zaten bonus gün. Yarın tekrar gel.",
+  "egg.flame.week": "Bu hafta üç bonus gün oldu. Alev gelecek haftaya kadar dinleniyor.",
   "egg.title": "Tüm zamanlar, başka birimlerle",
   "egg.lead": "Toplamda {total} kaldırdın. Bu yaklaşık:",
   "egg.empty": "Önce bir şey kaldır, sonra gel ve kaç fil ettiğini gör.",
@@ -207,6 +234,9 @@ export const tr: Partial<Record<Key, Message>> = {
 export const pl: Partial<Record<Key, Message>> = {
   "egg.joke.420": "420 na sztandze. Nieźle. Bardzo wyluzowana liczba jak na bardzo ciężką serię.",
   "egg.joke.1337": "1337: elita. Dosłownie. W języku hakerów to znaczy bardzo, bardzo dobrze.",
+  "egg.flame.ok": "Odkryto sekret: dodatkowy dzień treningów adaptacyjnych. Dzisiejszy plan jest adaptacyjny.",
+  "egg.flame.today": "Dziś to już dzień bonusowy. Wróć jutro.",
+  "egg.flame.week": "To już trzy dni bonusowe w tym tygodniu. Płomień odpoczywa do przyszłego tygodnia.",
   "egg.title": "Całe życie, w innych jednostkach",
   "egg.lead": "Łącznie podniesiono {total}. To mniej więcej:",
   "egg.empty": "Najpierw coś podnieś, a potem wróć i sprawdź, ile to waży w słoniach.",
