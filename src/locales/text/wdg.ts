@@ -238,6 +238,30 @@ export const pt: Partial<Record<Key, Message>> = {
     other: "{done} de {goal} esta semana. Mais {count} mantêm sua sequência de {weeks} semanas.",
   },
   "wdg.goalMet": "Meta semanal batida: {done} de {goal}. Descansar também é treinar.",
+  "wdg.weekTitle": "{done} de {goal} nesta semana",
+  "wdg.streak": {
+    one: "Sequência de {count} semana",
+    other: "Sequência de {count} semanas",
+  },
+  "wdg.weekKeep": {
+    one: "Mais {count} dia mantém sua sequência de {weeks} semanas.",
+    other: "Mais {count} dias mantêm sua sequência de {weeks} semanas.",
+  },
+  "wdg.weekMore": {
+    one: "Mais {count} dia e você bate sua meta.",
+    other: "Mais {count} dias e você bate sua meta.",
+  },
+  "wdg.weekMet": "Meta batida. O que vier agora é bônus.",
+  "wdg.ready": "Pronto para treinar",
+  "wdg.resting": "Ainda se recuperando",
+  "wdg.allReady": "Tudo se recuperou. Qualquer treino serve hoje.",
+  "wdg.readyAt": "{name} · pronto {time}",
+  "wdg.area.chest": "Peito",
+  "wdg.area.shoulders": "Ombros",
+  "wdg.area.back": "Costas",
+  "wdg.area.arms": "Braços",
+  "wdg.area.core": "Core",
+  "wdg.area.legs": "Pernas",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -255,6 +279,27 @@ export const ko: Partial<Record<Key, Message>> = {
     other: "이번 주 {goal}회 중 {done}회. {count}회 더 하면 {weeks}주 연속 기록 유지.",
   },
   "wdg.goalMet": "주간 목표 달성: {goal}회 중 {done}회. 휴식도 운동이에요.",
+  "wdg.weekTitle": "이번 주 {goal}일 중 {done}일",
+  "wdg.streak": {
+    other: "{count}주 연속 기록",
+  },
+  "wdg.weekKeep": {
+    other: "{count}일 더 하면 {weeks}주 연속 기록이 이어져요.",
+  },
+  "wdg.weekMore": {
+    other: "{count}일 더 하면 목표 달성이에요.",
+  },
+  "wdg.weekMet": "목표 달성. 더 하는 건 보너스예요.",
+  "wdg.ready": "운동 준비 완료",
+  "wdg.resting": "아직 회복 중",
+  "wdg.allReady": "모두 회복됐어요. 오늘은 어떤 운동이든 좋아요.",
+  "wdg.readyAt": "{name} · {time} 준비",
+  "wdg.area.chest": "가슴",
+  "wdg.area.shoulders": "어깨",
+  "wdg.area.back": "등",
+  "wdg.area.arms": "팔",
+  "wdg.area.core": "코어",
+  "wdg.area.legs": "하체",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -274,6 +319,30 @@ export const tr: Partial<Record<Key, Message>> = {
     other: "Bu hafta {goal} antrenmandan {done}. {count} antrenman daha {weeks} haftalık serini korur.",
   },
   "wdg.goalMet": "Haftalık hedef tamam: {goal} antrenmandan {done}. Dinlenmek de antrenmandır.",
+  "wdg.weekTitle": "Bu hafta {done}/{goal}",
+  "wdg.streak": {
+    one: "{count} haftalık seri",
+    other: "{count} haftalık seri",
+  },
+  "wdg.weekKeep": {
+    one: "{count} gün daha {weeks} haftalık serini korur.",
+    other: "{count} gün daha {weeks} haftalık serini korur.",
+  },
+  "wdg.weekMore": {
+    one: "{count} gün daha ve hedefine ulaşırsın.",
+    other: "{count} gün daha ve hedefine ulaşırsın.",
+  },
+  "wdg.weekMet": "Hedefe ulaşıldı. Fazlası bonus.",
+  "wdg.ready": "Antrenmana hazır",
+  "wdg.resting": "Hâlâ toparlanıyor",
+  "wdg.allReady": "Her şey toparlandı. Bugün her antrenman uyar.",
+  "wdg.readyAt": "{name} · hazır {time}",
+  "wdg.area.chest": "Göğüs",
+  "wdg.area.shoulders": "Omuzlar",
+  "wdg.area.back": "Sırt",
+  "wdg.area.arms": "Kollar",
+  "wdg.area.core": "Karın",
+  "wdg.area.legs": "Bacaklar",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -297,4 +366,34 @@ export const pl: Partial<Record<Key, Message>> = {
     other: "{done} z {goal} w tym tygodniu. Jeszcze {count}, by utrzymać passę ({weeks} tyg.).",
   },
   "wdg.goalMet": "Cel tygodniowy osiągnięty: {done} z {goal}. Odpoczynek to też trening.",
+  "wdg.weekTitle": "{done} z {goal} w tym tygodniu",
+  "wdg.streak": {
+    one: "{count} tydzień passy",
+    few: "{count} tygodnie passy",
+    many: "{count} tygodni passy",
+    other: "{count} tygodnia passy",
+  },
+  "wdg.weekKeep": {
+    one: "Jeszcze {count} dzień i utrzymasz {weeks}-tygodniową passę.",
+    few: "Jeszcze {count} dni i utrzymasz {weeks}-tygodniową passę.",
+    many: "Jeszcze {count} dni i utrzymasz {weeks}-tygodniową passę.",
+    other: "Jeszcze {count} dnia i utrzymasz {weeks}-tygodniową passę.",
+  },
+  "wdg.weekMore": {
+    one: "Jeszcze {count} dzień i osiągniesz cel.",
+    few: "Jeszcze {count} dni i osiągniesz cel.",
+    many: "Jeszcze {count} dni i osiągniesz cel.",
+    other: "Jeszcze {count} dnia i osiągniesz cel.",
+  },
+  "wdg.weekMet": "Cel osiągnięty. Wszystko ponad to jest bonusem.",
+  "wdg.ready": "Gotowe do treningu",
+  "wdg.resting": "Jeszcze w regeneracji",
+  "wdg.allReady": "Wszystko się zregenerowało. Dziś pasuje każdy trening.",
+  "wdg.readyAt": "{name} · gotowe {time}",
+  "wdg.area.chest": "Klatka",
+  "wdg.area.shoulders": "Barki",
+  "wdg.area.back": "Plecy",
+  "wdg.area.arms": "Ramiona",
+  "wdg.area.core": "Core",
+  "wdg.area.legs": "Nogi",
 };

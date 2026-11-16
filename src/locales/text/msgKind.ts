@@ -197,6 +197,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Lembretes de reabilitação",
   "msgKind.rehab.blurb":
     "Os exercícios do seu fisioterapeuta nos dias certos, no seu horário de treino. Não nos dias com lembrete de treino.",
+  "msgKind.weekly": "Dicas semanais",
+  "msgKind.weekly.blurb": "Depois das Dicas para começar, um e-mail por semana sobre outra coisa que o app faz.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -222,6 +224,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "msgKind.friends.blurb": "목요일 저녁, 이번 주에 운동한 친구를 알려 드려요.",
   "msgKind.rehab": "재활 알림",
   "msgKind.rehab.blurb": "물리치료사가 정한 운동을 해야 하는 날, 운동 시간에 알려 드려요. 운동 알림이 있는 날에는 보내지 않아요.",
+  "msgKind.weekly": "주간 팁",
+  "msgKind.weekly.blurb": "시작하기 팁이 끝나면, 앱으로 할 수 있는 다른 기능을 주 1회 이메일로 알려 드려요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -248,6 +252,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Rehabilitasyon hatırlatıcıları",
   "msgKind.rehab.blurb":
     "Fizyoterapistinin egzersizleri, zamanı geldiği günlerde antrenman saatinde. Antrenman hatırlatıcısı olan günlerde değil.",
+  "msgKind.weekly": "Haftalık ipuçları",
+  "msgKind.weekly.blurb": "Başlangıç ipuçlarından sonra haftada bir e-posta, uygulamanın yapabildiği başka bir şey hakkında.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -274,4 +280,6 @@ export const pl: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Przypomnienia o rehabilitacji",
   "msgKind.rehab.blurb":
     "Ćwiczenia od fizjoterapeuty w dni, w które je zaplanował, o porze treningu. Nie w dni z przypomnieniem o treningu.",
+  "msgKind.weekly": "Cotygodniowe porady",
+  "msgKind.weekly.blurb": "Po wskazówkach na start jeden e-mail w tygodniu o czymś innym, co potrafi aplikacja.",
 };

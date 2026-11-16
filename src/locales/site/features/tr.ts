@@ -339,7 +339,7 @@ export const tr: FeaturesText = {
     },
     "gym-finder": {
       name: "Salon bulucu ve salon sayfaları",
-      body: "Yakınındaki salonları haritada ve altındaki listede bul; önce resmi olanlar, her biri kendi sayfasıyla: ekipman, çalışma saatleri, harita ve üyeler. Sahipler salonlarını sahiplenip logo ve fotoğraf ekleyebilir. Bir salon eksik mi? Ekle. Sahipler kaç kişinin salonu eklediğini ve afişi taradığını, sırada ne yapacaklarını görür. Resmi salonlar haftalık sıralamalı bir kulüp yürütebilir.",
+      body: "Yakınındaki salonları haritada ve altındaki listede bul; önce resmi olanlar, her biri kendi sayfasıyla: ekipman, çalışma saatleri, harita ve üyeler. Sahipler salonlarını sahiplenip logo ve fotoğraf ekleyebilir. Bir salon eksik mi? Ekle. Sahipler kaç kişinin salonu eklediğini ve afişi taradığını, sırada ne yapacaklarını görür. Resmi salonlar haftalık sıralamalı bir kulüp yürütebilir. Bir sayfada yanlış bir şey mi var? Bildir, ekibimiz düzeltsin.",
     },
     "gym-amenities": {
       name: "Salon sayfalarında olanaklar ve fiyatlar",
@@ -460,9 +460,19 @@ export const tr: FeaturesText = {
       name: "Antrenör rehberinde yer al",
       body: "Salonunda antrenör, koç ya da fizyoterapist olarak kendini listele; o salonun sayfasında ve web sitesindeki o şehrin antrenör rehberinde, biyografin ve yeni danışanların seninle antrenmana başlaması için bir linkle görün. Yalnızca yetişkinler listelenir.",
     },
+    "coach-chat-dock": {
+      name: "Sohbet paneli, durumlar ve çıkartmalar",
+      body: "Bilgisayarda koç sohbeti, bir mesajlaşma uygulaması gibi sağ altta bir panelde durur: mesaj atabileceğin herkes, katlanabilen en fazla iki sohbet penceresi, mesaj gelince bir ses ve sekmede bir sayaç. İki taraf da bir durum seçer (çevrimiçi, danışanla, antrenmanda, uzakta, rahatsız etmeyin, tatilde ya da çevrimdışı görün), karşı tarafın ne zaman yazdığını ve mesajını ne zaman gördüğünü görür, emoji ve spor salonu çıkartmaları gönderir; telefonda da.",
+      proPart: "Danışan olmak ücretsiz; danışan çalıştırmak Pro.",
+    },
+    "coach-reviews": {
+      name: "Gerçek danışanlardan puanlar ve değerlendirmeler",
+      body: "Danışanlar, dört hafta ya da birlikte iki seanstan sonra koçlarını, kişisel antrenörlerini ya da fizyoterapistlerini yıldızla ve kısa bir değerlendirmeyle puanlar. Puan, koçun üç değerlendirmesi olunca görünür; yanında son iki haftada danışanlarından kaçının antrenman yaptığı yer alır, davetinde ve antrenör dizininde. Koçlar her birine bir kez yanıt verir ve herkes bir değerlendirmeyi bildirebilir. Yalnızca yetişkinler değerlendirme bırakabilir.",
+      proPart: "Değerlendirme bırakmak ücretsiz; danışan çalıştırmak Pro.",
+    },
     "coach-plans": {
       name: "Danışan listenle büyüyen koç planları",
-      body: "Pro en fazla 3 danışanı kapsar. Coach 25 danışana yer açar, Coach Plus'ın belirli bir sınırı yok; her planda tüm koçluk araçları var. Danışanların her zaman ücretsiz antrenman yapar ve Liftsmith sana ödediklerinden hiçbir şey almaz.",
+      body: "Pro en fazla 3 danışanı kapsar. Coach 25 danışana yer açar, Coach Plus'ın belirli bir sınırı yok; her planda tüm koçluk araçları var. Danışanların her zaman ücretsiz antrenman yapar ve Coach ile Coach Plus'ta Liftsmith sana ödediklerinden hiçbir şey almaz. Pro'da %2 alır.",
     },
     awards: {
       name: "Başarımlar, seviyeler ve seriler",
@@ -478,8 +488,8 @@ export const tr: FeaturesText = {
       body: "Wear OS ve Apple Watch'ta antrenman: set ya da dinlenme geri sayımı, saatten nabız, Seti kaydet ve +30 s, dinlenme bitince de bir titreşim.",
     },
     widgets: {
-      name: "Ana ekran widget'ı",
-      body: "Günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet ana ekranında.",
+      name: "Ana ekran widget'ları",
+      body: "Üç widget: Bugün (günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet), Bu hafta (antrenman yaptığın günler, serin ve onu neyin sürdürdüğü) ve Toparlanma (hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı).",
       note: "Web uygulamasında bunun yerine ana ekran simgesinde kısayollar var.",
     },
     shortcuts: {
@@ -497,7 +507,7 @@ export const tr: FeaturesText = {
     },
     emails: {
       name: "Seni motive tutan e-postalar",
-      body: "Gerçek ekranlarla sekiz başlangıç ipucu, haftalık ve aylık özet, yeni kişisel rekorlar, hangi arkadaşların antrenman yaptığı ve bir aradan sonra geri dönmen için küçük bir dürtme. Her türün kendi anahtarı var.",
+      body: "Gerçek ekranlarla sekiz başlangıç ipucu, haftalık ve aylık özet, yeni kişisel rekorlar, hangi arkadaşların antrenman yaptığı, bir aradan sonra geri dönmen için küçük bir dürtme ve ardından henüz keşfetmemiş olabileceğin bir özellik hakkında haftalık bir ipucu. Her türün kendi anahtarı var.",
       note: "Hesapla açık, 18 yaş altı için kendileri açmadıkça kapalı. Her e-postada tek tıkla abonelikten çıkma var.",
     },
     cloud: {

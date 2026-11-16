@@ -301,7 +301,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, mensal",
   "cpl.yearPrice": "{price} por ano, cerca de {perMonth} por mês. Renova todo ano até você cancelar.",
   "cpl.monthPrice": "{price} por mês. Renova todo mês até você cancelar.",
-  "cpl.free": "Seus alunos sempre treinam de graça, e o Liftsmith não fica com nada do que eles te pagam.",
+  "cpl.free":
+    "Seus alunos sempre treinam de graça, e no Coach e no Coach Plus o Liftsmith não fica com nada do que eles te pagam. No Pro, ele fica com 2%.",
   "cpl.replace": "Fazer o upgrade substitui sua assinatura Pro, então você paga um plano só, e o que sobrar do Pro vira crédito.",
   "cpl.otherBill.web":
     "Seu Pro é cobrado no site do Liftsmith. Quando seu plano de coach começar, cancele o Pro lá, porque os planos de coach incluem o Pro.",
@@ -344,7 +345,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, 월간",
   "cpl.yearPrice": "연 {price}, 월 약 {perMonth}. 해지할 때까지 매년 갱신돼요.",
   "cpl.monthPrice": "월 {price}. 해지할 때까지 매월 갱신돼요.",
-  "cpl.free": "회원은 항상 무료로 운동하고, Liftsmith는 회원이 코치에게 내는 금액에서 아무것도 가져가지 않아요.",
+  "cpl.free":
+    "회원은 항상 무료로 운동하고, Coach와 Coach Plus에서는 Liftsmith가 회원이 코치에게 내는 금액에서 아무것도 가져가지 않아요. Pro에서는 2%를 가져가요.",
   "cpl.replace": "업그레이드하면 Pro 구독이 대체되어 요금제 하나만 결제하고, 남은 Pro 기간은 크레딧으로 돌려받아요.",
   "cpl.otherBill.web":
     "Pro는 Liftsmith 웹사이트에서 결제되고 있어요. 코치 요금제에 Pro가 포함되니, 코치 요금제가 시작되면 웹사이트에서 Pro를 해지하세요.",
@@ -388,7 +390,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, aylık",
   "cpl.yearPrice": "Yılda {price}, ayda yaklaşık {perMonth}. İptal edene kadar her yıl yenilenir.",
   "cpl.monthPrice": "Ayda {price}. İptal edene kadar her ay yenilenir.",
-  "cpl.free": "Danışanların her zaman ücretsiz çalışır ve Liftsmith sana ödediklerinden hiçbir pay almaz.",
+  "cpl.free":
+    "Danışanların her zaman ücretsiz antrenman yapar ve Coach ile Coach Plus'ta Liftsmith sana ödediklerinden hiçbir şey almaz. Pro'da %2 alır.",
   "cpl.replace": "Yükseltme Pro aboneliğinin yerini alır, böylece tek bir plan için ödersin; Pro'dan kalan süre de hesabına yansıtılır.",
   "cpl.otherBill.web":
     "Pro'n Liftsmith web sitesi üzerinden faturalanıyor. Koç planın başlayınca Pro'yu orada iptal et, çünkü koç planları Pro'yu içerir.",
@@ -431,7 +434,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpl.monthly": "{tier}, miesięcznie",
   "cpl.yearPrice": "{price} rocznie, około {perMonth} miesięcznie. Odnawia się co roku, dopóki nie anulujesz.",
   "cpl.monthPrice": "{price} miesięcznie. Odnawia się co miesiąc, dopóki nie anulujesz.",
-  "cpl.free": "Twoi podopieczni zawsze trenują za darmo, a Liftsmith nie bierze nic z tego, co Ci płacą.",
+  "cpl.free":
+    "Twoi podopieczni zawsze trenują za darmo, a w planach Coach i Coach Plus Liftsmith nie bierze nic z tego, co ci płacą. W Pro zatrzymuje 2%.",
   "cpl.replace": "Przejście wyżej zastępuje Twoją subskrypcję Pro, więc płacisz za jeden plan, a pozostała część Pro zostaje zaliczona.",
   "cpl.otherBill.web":
     "Twoje Pro jest rozliczane na stronie Liftsmith. Gdy plan trenerski się zacznie, anuluj tam Pro, bo plany trenerskie zawierają Pro.",

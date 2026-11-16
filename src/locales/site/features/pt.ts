@@ -339,7 +339,7 @@ export const pt: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador de academias e páginas de academia",
-      body: "Encontre academias perto de você num mapa com a lista embaixo, as oficiais primeiro, cada uma com sua página: equipamentos, horários, mapa e membros. Donos podem reivindicar a academia e adicionar logo e fotos. Falta uma academia? Adicione. Os donos veem quantas pessoas adicionaram a academia e escanearam o cartaz, e o que fazer em seguida. Academias oficiais podem ter um clube com ranking semanal.",
+      body: "Encontre academias perto de você num mapa com a lista embaixo, as oficiais primeiro, cada uma com sua página: equipamentos, horários, mapa e membros. Donos podem reivindicar a academia e adicionar logo e fotos. Falta uma academia? Adicione. Os donos veem quantas pessoas adicionaram a academia e escanearam o cartaz, e o que fazer em seguida. Academias oficiais podem ter um clube com ranking semanal. Algo errado numa página? Relate, e nossa equipe corrige.",
     },
     "gym-amenities": {
       name: "Comodidades e preços nas páginas de academia",
@@ -460,9 +460,19 @@ export const pt: FeaturesText = {
       name: "No diretório de personal trainers",
       body: "Liste-se como personal trainer, coach ou fisioterapeuta na sua academia e você aparece na página dessa academia e no diretório de personal trainers da cidade dela no site, com sua bio e um link para novos alunos começarem a treinar com você. Só adultos são listados.",
     },
+    "coach-chat-dock": {
+      name: "Chat fixo, status e figurinhas",
+      body: "No computador, o chat com o coach fica fixo no canto inferior direito, como um mensageiro: todo mundo com quem você pode conversar, até duas janelas de chat que se recolhem, um som e um contador na aba quando chega mensagem. Os dois lados definem um status (online, com um aluno, treinando, ausente, não perturbe, de férias ou aparecer offline), veem quando o outro está digitando e quando viu sua mensagem, e mandam emoji e figurinhas de academia, no celular também.",
+      proPart: "Ser aluno é grátis; treinar alunos é Pro.",
+    },
+    "coach-reviews": {
+      name: "Notas e avaliações de alunos reais",
+      body: "Os alunos dão estrelas e uma avaliação curta ao seu coach, personal trainer ou fisioterapeuta depois de quatro semanas ou duas sessões juntos. A nota aparece quando o coach tem três avaliações, ao lado de quantos alunos dele treinaram nas últimas duas semanas, no convite dele e na lista de personal trainers. Os coaches respondem uma vez a cada uma, e qualquer pessoa pode denunciar uma avaliação. Só adultos podem avaliar.",
+      proPart: "Avaliar é grátis; treinar alunos é Pro.",
+    },
     "coach-plans": {
       name: "Planos de coach que crescem com sua lista de alunos",
-      body: "O Pro cobre até 3 alunos. O Coach abre espaço para 25 e o Coach Plus não tem limite fixo, com todas as ferramentas de coaching em todos os planos. Seus alunos sempre treinam grátis, e o Liftsmith não fica com nada do que eles pagam a você.",
+      body: "O Pro cobre até 3 alunos. O Coach abre espaço para 25 e o Coach Plus não tem limite fixo, com todas as ferramentas de coaching em todos os planos. Seus alunos sempre treinam grátis, e no Coach e no Coach Plus o Liftsmith não fica com nada do que eles pagam a você. No Pro, ele fica com 2%.",
     },
     awards: {
       name: "Conquistas, níveis e sequências",
@@ -478,8 +488,8 @@ export const pt: FeaturesText = {
       body: "O treino no Wear OS e no Apple Watch: a série ou a contagem do descanso, a frequência cardíaca do relógio, Registrar série e +30 s, e uma vibração quando o descanso acaba.",
     },
     widgets: {
-      name: "Widget na tela inicial",
-      body: "A decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série na tela inicial.",
+      name: "Widgets na tela inicial",
+      body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",
       note: "No lugar disso, o app web tem atalhos no ícone da tela inicial.",
     },
     shortcuts: {
@@ -497,7 +507,7 @@ export const pt: FeaturesText = {
     },
     emails: {
       name: "E-mails que mantêm você no ritmo",
-      body: "Oito dicas para começar com telas reais, um resumo semanal e um mensal, recordes pessoais novos, quais amigos treinaram e um empurrãozinho para voltar depois de uma pausa. Cada tipo tem sua própria chave.",
+      body: "Oito dicas para começar com telas reais, um resumo semanal e um mensal, recordes pessoais novos, quais amigos treinaram, um empurrãozinho para voltar depois de uma pausa e, depois, uma dica por semana sobre um recurso que você talvez ainda não tenha descoberto. Cada tipo tem sua própria chave.",
       note: "Ativados com uma conta, desligados para menores de 18 a menos que eles liguem. Todo e-mail tem cancelamento com um clique.",
     },
     cloud: {

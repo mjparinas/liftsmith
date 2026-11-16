@@ -16,4 +16,8 @@
     <string name="up_next">Sıradaki: %1$s</string>
     <string name="add_30">+30 s</string>
     <string name="widget_title">Bugünün antrenmanı</string>
+    <string name="widget_week_title">Bu hafta</string>
+    <string name="widget_week_description">Haftana bir bakışta: antrenman yaptığın günler, serin ve onu neyin sürdürdüğü, Başla ile</string>
+    <string name="widget_recovery_title">Toparlanma</string>
+    <string name="widget_recovery_description">Hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı, Başla ile</string>
 </resources>

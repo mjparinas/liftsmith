@@ -258,6 +258,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "push.referralInviter": "{name} terminou três treinos com seu convite. Vocês dois ganharam um mês de Pro.",
   "push.referralFriend": "Você terminou três treinos. Você e {name} ganharam um mês de Pro.",
   "push.coachPlan": "{name} enviou um programa para você: {text}. Toque para salvar.",
+  "push.coachReview": "{name} deixou uma avaliação para você: {text}",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -293,6 +294,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "push.referralInviter": "{name}님이 회원님의 초대로 운동 세 번을 마쳤어요. 두 분 모두 Pro 1개월을 받았어요.",
   "push.referralFriend": "운동 세 번을 마쳤어요. 회원님과 {name}님 모두 Pro 1개월을 받았어요.",
   "push.coachPlan": "{name}님이 프로그램을 보냈어요: {text}. 눌러서 저장하세요.",
+  "push.coachReview": "{name}님이 리뷰를 남겼어요: {text}",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -328,6 +330,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "push.referralInviter": "{name} davetinle üç antrenman bitirdi. İkinize de bir ay Pro.",
   "push.referralFriend": "Üç antrenman bitirdin. Sana ve {name} kullanıcısına bir ay Pro.",
   "push.coachPlan": "{name} sana bir program gönderdi: {text}. Kaydetmek için dokun.",
+  "push.coachReview": "{name} sana bir değerlendirme bıraktı: {text}",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -364,4 +367,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "push.referralInviter": "{name} kończy trzy treningi z twojego zaproszenia. Oboje macie miesiąc Pro.",
   "push.referralFriend": "Masz za sobą trzy treningi. Ty i {name} macie miesiąc Pro.",
   "push.coachPlan": "{name} wysyła ci program: {text}. Stuknij, żeby go zapisać.",
+  "push.coachReview": "{name} wystawia ci opinię: {text}",
 };

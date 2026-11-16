@@ -16,4 +16,8 @@
     <string name="up_next">다음: %1$s</string>
     <string name="add_30">+30초</string>
     <string name="widget_title">오늘의 운동</string>
+    <string name="widget_week_title">이번 주</string>
+    <string name="widget_week_description">한눈에 보는 이번 주: 운동한 날, 연속 기록과 이어 가는 방법, 시작 버튼</string>
+    <string name="widget_recovery_title">회복</string>
+    <string name="widget_recovery_description">지금 운동할 수 있는 근육과 나머지가 회복되는 시점, 시작 버튼</string>
 </resources>

@@ -340,7 +340,7 @@ export const pl: SiteText = {
       noLimit: "Bez ustalonego limitu podopiecznych",
       inPro: "W ramach Pro",
       orMonthly: "lub {monthly} miesięcznie",
-      free: "Twoi podopieczni zawsze trenują za darmo, trenerzy szkolni, którzy potwierdzą szkolny adres e-mail, dostają Pro za darmo, a {name} nie bierze nic z tego, co płacą ci podopieczni.",
+      free: "Twoi podopieczni zawsze trenują za darmo, trenerzy szkół średnich, którzy potwierdzą szkolny adres e-mail, dostają Pro za darmo, a w planach Coach i Coach Plus {name} nie bierze nic z tego, co płacą ci podopieczni (2% w Pro).",
       cta: "Liftsmith dla trenerów",
     },
   },

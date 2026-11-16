@@ -266,6 +266,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "pay.paySession": "Pagar uma sessão · {amount}",
   "pay.onStripe": "Você paga na página segura da Stripe. O Liftsmith nunca vê seu cartão.",
   "pay.thanks": "Pagamento enviado. Obrigado! Seu recibo chega da Stripe por e-mail.",
+  "pay.fee": "No Pro, o Liftsmith fica com {fee}% de cada pagamento de aluno. No Coach e no Coach Plus, não fica com nada.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -302,6 +303,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "pay.paySession": "1회 결제 · {amount}",
   "pay.onStripe": "Stripe의 보안 페이지에서 결제해요. Liftsmith는 카드 정보를 절대 보지 않아요.",
   "pay.thanks": "결제를 보냈어요. 감사해요! 영수증은 Stripe에서 이메일로 보내요.",
+  "pay.fee": "Pro에서는 Liftsmith가 회원 결제마다 {fee}%를 가져가요. Coach와 Coach Plus에서는 아무것도 가져가지 않아요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -338,6 +340,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "pay.paySession": "Bir seans için öde · {amount}",
   "pay.onStripe": "Stripe'ın güvenli sayfasında ödersin. Liftsmith kartını asla görmez.",
   "pay.thanks": "Ödeme gönderildi. Teşekkürler! Makbuzun Stripe'tan e-postayla gelir.",
+  "pay.fee": "Pro'da Liftsmith her danışan ödemesinin %{fee} kadarını alır. Coach ve Coach Plus'ta hiçbir şey almaz.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -375,4 +378,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "pay.paySession": "Zapłać za trening · {amount}",
   "pay.onStripe": "Płacisz na bezpiecznej stronie Stripe. Liftsmith nigdy nie widzi twojej karty.",
   "pay.thanks": "Płatność wysłana. Dzięki! Potwierdzenie przyjdzie e-mailem od Stripe.",
+  "pay.fee": "W Pro Liftsmith zatrzymuje {fee}% każdej płatności od podopiecznego. W planach Coach i Coach Plus nie zatrzymuje nic.",
 };

@@ -452,7 +452,7 @@ export const emails: Record<string, Words> = {
     title: "¿Sabías que…? Que hable a tu manera",
     intro: "Pequeños detalles que hacen que la app se sienta tuya.",
     points: [
-      "Elige un idioma distinto al de tu teléfono: hay seis.",
+      "Elige un idioma distinto al de tu teléfono: hay diez.",
       "Kilos o libras, y cada gimnasio puede usar los suyos para sus discos.",
       "La frase del día en Hoy se puede desactivar.",
       "Vuelve a hacer la configuración desde Ajustes si ha cambiado tu objetivo, tu experiencia o tu gimnasio.",
@@ -689,7 +689,7 @@ export const emails: Record<string, Words> = {
       "Oscuro, claro o igual que el teléfono.",
       "Gana temas y acentos con tus logros.",
       "En los teléfonos, un icono de la app con los colores de tu tema.",
-      "Seis idiomas, distintos al de tu teléfono si quieres.",
+      "Diez idiomas, distintos al de tu teléfono si quieres.",
     ],
     dyk: "Con el aspecto en claro, un tema solo cambia el color de acento.",
   },

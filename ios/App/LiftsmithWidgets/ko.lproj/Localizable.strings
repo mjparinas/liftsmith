@@ -13,3 +13,7 @@
 "Rest left" = "남은 휴식";
 "Rest over" = "휴식 끝";
 "%lld of %lld sets done" = "%2$lld세트 중 %1$lld세트 완료";
+"This week" = "이번 주";
+"Your week at a glance: days trained, your streak and what keeps it going, with Start." = "한눈에 보는 이번 주: 운동한 날, 연속 기록과 이어 가는 방법, 시작 버튼.";
+"Recovery" = "회복";
+"Which muscles are ready to train and when the rest will be, with Start." = "지금 운동할 수 있는 근육과 나머지가 회복되는 시점, 시작 버튼.";

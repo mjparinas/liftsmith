@@ -339,7 +339,7 @@ export const pl: FeaturesText = {
     },
     "gym-finder": {
       name: "Wyszukiwarka siłowni i strony siłowni",
-      body: "Znajdź siłownie w pobliżu na mapie z listą pod nią, oficjalne na początku, każda z własną stroną: sprzęt, godziny otwarcia, mapa i członkowie. Właściciele mogą przejąć swoją siłownię i dodać logo oraz zdjęcia. Brakuje siłowni? Dodaj ją. Właściciele widzą, ile osób ją dodało i zeskanowało plakat, oraz co zrobić dalej. Oficjalne siłownie mogą prowadzić klub z cotygodniowym rankingiem.",
+      body: "Znajdź siłownie w pobliżu na mapie z listą pod nią, oficjalne na początku, każda z własną stroną: sprzęt, godziny otwarcia, mapa i członkowie. Właściciele mogą przejąć swoją siłownię i dodać logo oraz zdjęcia. Brakuje siłowni? Dodaj ją. Właściciele widzą, ile osób ją dodało i zeskanowało plakat, oraz co zrobić dalej. Oficjalne siłownie mogą prowadzić klub z cotygodniowym rankingiem. Coś jest nie tak na stronie? Zgłoś to, a nasz zespół to poprawi.",
     },
     "gym-amenities": {
       name: "Udogodnienia i ceny na stronach siłowni",
@@ -460,9 +460,19 @@ export const pl: FeaturesText = {
       name: "Wpis w katalogu trenerów",
       body: "Dodaj się jako trener personalny, trener albo fizjoterapeuta w swojej siłowni, a pojawisz się na jej stronie i w katalogu trenerów dla jej miasta na stronie internetowej, z opisem i linkiem, przez który nowi podopieczni zaczną z tobą trenować. Wpisywane są tylko osoby pełnoletnie.",
     },
+    "coach-chat-dock": {
+      name: "Panel czatu, statusy i naklejki",
+      body: "Na komputerze czat z trenerem siedzi w panelu w prawym dolnym rogu, jak w komunikatorze: wszyscy, do których możesz pisać, do dwóch okien czatu, które się zwijają, oraz dźwięk i licznik na karcie, gdy przychodzi wiadomość. Obie strony ustawiają status (online, z podopiecznym, na treningu, zaraz wracam, nie przeszkadzać, na urlopie albo pokazuj jako offline), widzą, kiedy druga osoba pisze i kiedy wyświetliła wiadomość, i wysyłają emoji oraz siłowniane naklejki, także na telefonie.",
+      proPart: "Bycie podopiecznym jest darmowe; prowadzenie podopiecznych jest w Pro.",
+    },
+    "coach-reviews": {
+      name: "Oceny i opinie od prawdziwych podopiecznych",
+      body: "Podopieczni oceniają swojego trenera, trenera personalnego albo fizjoterapeutę gwiazdkami i krótką opinią po czterech tygodniach lub dwóch wspólnych sesjach. Ocena pojawia się, gdy trener ma trzy opinie, obok liczby jego podopiecznych, którzy trenowali w ostatnich dwóch tygodniach, w zaproszeniu i w katalogu trenerów. Trener może raz odpowiedzieć na każdą opinię, a każdy może opinię zgłosić. Opinie mogą wystawiać tylko osoby pełnoletnie.",
+      proPart: "Wystawienie opinii jest darmowe; prowadzenie podopiecznych jest w Pro.",
+    },
     "coach-plans": {
       name: "Plany dla trenerów, które rosną z listą podopiecznych",
-      body: "Pro obejmuje do 3 podopiecznych. Coach mieści 25, a Coach Plus nie ma ustalonego limitu, z każdym narzędziem trenerskim w każdym planie. Twoi podopieczni zawsze trenują za darmo, a Liftsmith nie bierze nic z tego, co ci płacą.",
+      body: "Pro obejmuje do 3 podopiecznych. Coach mieści 25, a Coach Plus nie ma ustalonego limitu, z każdym narzędziem trenerskim w każdym planie. Twoi podopieczni zawsze trenują za darmo, a w planach Coach i Coach Plus Liftsmith nie bierze nic z tego, co ci płacą. W Pro zatrzymuje 2%.",
     },
     awards: {
       name: "Osiągnięcia, poziomy i passy",
@@ -478,8 +488,8 @@ export const pl: FeaturesText = {
       body: "Trening na Wear OS i Apple Watch: seria albo odliczanie przerwy, tętno z zegarka, Zapisz serię i +30 s oraz wibracja na koniec przerwy.",
     },
     widgets: {
-      name: "Widżet na ekranie głównym",
-      body: "Decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię na ekranie głównym.",
+      name: "Widżety na ekranie głównym",
+      body: "Trzy widżety: Dziś (decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię), Ten tydzień (dni z treningiem, twoja passa i co ją podtrzyma) oraz Regeneracja (które mięśnie są gotowe do treningu i kiedy będą pozostałe).",
       note: "Aplikacja webowa ma zamiast tego skróty na ikonie ekranu głównego.",
     },
     shortcuts: {
@@ -497,7 +507,7 @@ export const pl: FeaturesText = {
     },
     emails: {
       name: "E-maile, które pomagają nie odpuszczać",
-      body: "Osiem porad na start z prawdziwymi ekranami, podsumowanie tygodnia i miesiąca, nowe rekordy życiowe, którzy znajomi trenowali, i zachęta do powrotu po przerwie. Każdy rodzaj ma własny przełącznik.",
+      body: "Osiem porad na start z prawdziwymi ekranami, podsumowanie tygodnia i miesiąca, nowe rekordy życiowe, którzy znajomi trenowali, zachęta do powrotu po przerwie, a potem cotygodniowa porada o funkcji, której może jeszcze nie znasz. Każdy rodzaj ma własny przełącznik.",
       note: "Włączone przy koncie, wyłączone dla osób poniżej 18 lat, chyba że same je włączą. Każdy e-mail ma wypisanie się jednym kliknięciem.",
     },
     cloud: {

@@ -340,7 +340,7 @@ export const tr: SiteText = {
       noLimit: "Danışan sayısında sabit sınır yok",
       inPro: "Pro'ya dahil",
       orMonthly: "ya da ayda {monthly}",
-      free: "Danışanların her zaman ücretsiz antrenman yapar, okul e-postasını doğrulayan lise koçları Pro'yu ücretsiz alır ve {name}, danışanların sana ödediğinden hiçbir pay almaz.",
+      free: "Danışanların her zaman ücretsiz antrenman yapar, okul e-postasını doğrulayan lise koçları Pro'yu ücretsiz alır ve Coach ile Coach Plus'ta {name} danışanların sana ödediklerinden hiçbir şey almaz (Pro'da %2).",
       cta: "Koçlar için Liftsmith",
     },
   },

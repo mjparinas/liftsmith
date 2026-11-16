@@ -473,7 +473,7 @@ export const emails: Record<string, Words> = {
     title: "Did you know? Make it read your way",
     intro: "Little things that make the app feel like yours.",
     points: [
-      "Pick a language other than your phone's: there are six.",
+      "Pick a language other than your phone's: there are ten.",
       "Kilograms or pounds, and each gym can use its own for its plates.",
       "The daily quote on Today can be switched off.",
       "Run setup again from Settings if your goal, experience or gym has changed.",
@@ -710,7 +710,7 @@ export const emails: Record<string, Words> = {
       "Dark, light or match your phone.",
       "Earn themes and accents from your achievements.",
       "On the phones, an app icon in your theme's colours.",
-      "Six languages, separate from your phone's if you like.",
+      "Ten languages, separate from your phone's if you like.",
     ],
     dyk: "With Appearance on light, a theme changes the accent colour only.",
   },

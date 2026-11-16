@@ -13,3 +13,7 @@
 "Rest left" = "Kalan dinlenme";
 "Rest over" = "Dinlenme bitti";
 "%lld of %lld sets done" = "%2$lld setten %1$lld tanesi bitti";
+"This week" = "Bu hafta";
+"Your week at a glance: days trained, your streak and what keeps it going, with Start." = "Haftana bir bakışta: antrenman yaptığın günler, serin ve onu neyin sürdürdüğü, Başla ile.";
+"Recovery" = "Toparlanma";
+"Which muscles are ready to train and when the rest will be, with Start." = "Hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı, Başla ile.";

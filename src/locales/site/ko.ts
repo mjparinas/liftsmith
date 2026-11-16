@@ -338,7 +338,7 @@ export const ko: SiteText = {
       noLimit: "회원 수 제한 없음",
       inPro: "Pro에 포함",
       orMonthly: "또는 월 {monthly}",
-      free: "회원은 언제나 무료로 운동하고, 학교 이메일을 인증한 고등학교 코치는 Pro를 무료로 쓰며, {name}는 회원이 코치에게 내는 비용에서 아무것도 떼어 가지 않아요.",
+      free: "회원은 항상 무료로 운동하고, 학교 이메일을 인증한 고등학교 코치는 Pro를 무료로 쓰며, Coach와 Coach Plus에서는 {name}가 회원이 코치에게 내는 금액에서 아무것도 가져가지 않아요(Pro에서는 2%).",
       cta: "코치를 위한 Liftsmith",
     },
   },

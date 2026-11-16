@@ -2517,6 +2517,17 @@ export const pt: Partial<Record<Key, Message>> = {
   "gym.coach.err.coach": "Crie um código de convite primeiro, para ficar configurado como coach.",
   "gym.coach.err.name": "Adicione seu nome em Ajustes primeiro, para as pessoas saberem quem você é.",
   "gym.coach.err.full": "Já são cinco academias. Remova uma para adicionar outra.",
+  "gym.kind.commercial": "Academia comercial",
+  "gym.kind.commercial.blurb": "Racks, máquinas e polias",
+  "gym.kind.home": "Academia em casa",
+  "gym.kind.home.blurb": "Rack, barra, banco, halteres",
+  "gym.kind.dumbbells": "Só halteres",
+  "gym.kind.dumbbells.blurb": "Um jogo de halteres e um banco",
+  "gym.kind.bodyweight": "Peso do corpo",
+  "gym.kind.bodyweight.blurb": "Quarto de hotel, parque, viagem",
+  "gym.bar.olympic": "Barra olímpica",
+  "gym.bar.ez": "Barra W",
+  "gym.bar.trap": "Barra hexagonal",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -2861,6 +2872,17 @@ export const ko: Partial<Record<Key, Message>> = {
   "gym.coach.err.coach": "먼저 초대 코드를 만들어 코치로 설정하세요.",
   "gym.coach.err.name": "먼저 설정에서 이름을 추가해서 사람들이 누구인지 알 수 있게 하세요.",
   "gym.coach.err.full": "헬스장이 5곳이에요. 하나를 삭제해야 추가할 수 있어요.",
+  "gym.kind.commercial": "일반 헬스장",
+  "gym.kind.commercial.blurb": "랙, 머신, 케이블",
+  "gym.kind.home": "홈짐",
+  "gym.kind.home.blurb": "랙, 바벨, 벤치, 덤벨",
+  "gym.kind.dumbbells": "덤벨만",
+  "gym.kind.dumbbells.blurb": "덤벨 한 세트와 벤치",
+  "gym.kind.bodyweight": "맨몸",
+  "gym.kind.bodyweight.blurb": "호텔 방, 공원, 여행",
+  "gym.bar.olympic": "올림픽 바",
+  "gym.bar.ez": "EZ 컬 바",
+  "gym.bar.trap": "트랩 바",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -3224,6 +3246,17 @@ export const tr: Partial<Record<Key, Message>> = {
   "gym.coach.err.coach": "Koç olarak ayarlanman için önce bir davet kodu oluştur.",
   "gym.coach.err.name": "İnsanlar kim olduğunu bilsin diye önce Ayarlar'da adını ekle.",
   "gym.coach.err.full": "Beş salon oldu. Başka eklemek için birini kaldır.",
+  "gym.kind.commercial": "Ticari spor salonu",
+  "gym.kind.commercial.blurb": "Rack'ler, makineler ve kablolar",
+  "gym.kind.home": "Ev salonu",
+  "gym.kind.home.blurb": "Rack, barbell, sehpa, dambıllar",
+  "gym.kind.dumbbells": "Sadece dambıl",
+  "gym.kind.dumbbells.blurb": "Bir dambıl seti ve bir sehpa",
+  "gym.kind.bodyweight": "Vücut ağırlığı",
+  "gym.kind.bodyweight.blurb": "Otel odaları, parklar, seyahat",
+  "gym.bar.olympic": "Olimpik bar",
+  "gym.bar.ez": "EZ bar",
+  "gym.bar.trap": "Trap bar",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -3610,4 +3643,15 @@ export const pl: Partial<Record<Key, Message>> = {
   "gym.coach.err.coach": "Najpierw utwórz kod zaproszenia, żeby mieć konto trenera.",
   "gym.coach.err.name": "Najpierw dodaj swoje imię w Ustawieniach, żeby ludzie wiedzieli, kim jesteś.",
   "gym.coach.err.full": "To już pięć siłowni. Usuń jedną, żeby dodać kolejną.",
+  "gym.kind.commercial": "Siłownia komercyjna",
+  "gym.kind.commercial.blurb": "Klatki, maszyny i wyciągi",
+  "gym.kind.home": "Domowa siłownia",
+  "gym.kind.home.blurb": "Stojak, sztanga, ławka, hantle",
+  "gym.kind.dumbbells": "Tylko hantle",
+  "gym.kind.dumbbells.blurb": "Zestaw hantli i ławka",
+  "gym.kind.bodyweight": "Masa ciała",
+  "gym.kind.bodyweight.blurb": "Pokoje hotelowe, parki, podróże",
+  "gym.bar.olympic": "Sztanga olimpijska",
+  "gym.bar.ez": "Sztanga łamana",
+  "gym.bar.trap": "Sztanga trap bar",
 };
