@@ -268,7 +268,9 @@ export default function Privacy() {
           Usage stats, site visits, accounts and synced data are stored in our database (Turso), on servers run by Vercel. Emails go through
           Resend. Subscriptions are checked by RevenueCat, and web payments are taken by Stripe. When you email us, we may ask
           Anthropic&apos;s Claude for a first draft of our answer; your message is sent for that one request, and a person reads and sends
-          every reply. None of them may use the data for their own purposes. We keep usage stats for up to 25 months.
+          every reply. When something is reported on Friends, we may also ask Claude to suggest what to do with it, sending only what was
+          reported and the reports; a person always decides. None of them may use the data for their own purposes. We keep usage stats for
+          up to 25 months.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Your choices</h2>

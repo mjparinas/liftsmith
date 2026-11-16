@@ -7,8 +7,10 @@
 import { useEffect, useState } from "react";
 
 import type { PlaceReportAction, PlaceReportReason } from "@/lib/gymPlaceReport";
+import type { PlaceSuggestion } from "@/server/aiHelpers";
 import type { ReportedPlace } from "@/server/gymPlaceReports";
 
+import { aiBtn, AiNote, aiPost, AiSuggestion, useAiStatus } from "./Ai";
 import { Card } from "./charts";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
@@ -25,16 +27,40 @@ const box = "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm";
 const btn = "press rounded-lg border border-line px-3 py-1.5 text-muted";
 
 type Open = { id: string; mode: "merge" | "edit" } | null;
+type Tip = PlaceSuggestion | "…" | { error: string };
 type Draft = { into: string; name: string; address: string; website: string; phone: string; hours: string; kind: "gym" | "studio" };
+
+const LABEL: Record<PlaceReportAction, string> = { dismiss: "Dismiss", hide: "Hide", merge: "Merge", edit: "Save the fix" };
+
+/** Claude's suggestion for one reported gym: what it would do and why, with the button that does it. */
+function suggestionLabel(t: PlaceSuggestion): { label: string; reason: string } {
+  if (t.action === "merge") return { label: LABEL.merge, reason: `Into ${t.intoName}. ${t.reason}` };
+  if (t.action === "edit")
+    return {
+      label: LABEL.edit,
+      reason: `${Object.entries(t.edits)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("; ")}. ${t.reason}`,
+    };
+  return { label: LABEL[t.action], reason: t.reason };
+}
 
 function Row({
   g,
   admin,
   act,
+  tip,
+  suggest,
+  drop,
+  canSuggest,
 }: {
   g: ReportedPlace;
   admin: boolean;
   act: (g: ReportedPlace, action: PlaceReportAction, extra?: object) => Promise<boolean>;
+  tip: Tip | undefined;
+  suggest: () => void;
+  drop: () => void;
+  canSuggest: boolean;
 }) {
   const [open, setOpen] = useState<Open>(null);
   const [d, setD] = useState<Draft>({
@@ -89,6 +115,11 @@ function Row({
         </div>
         {admin && (
           <div className="flex flex-wrap gap-2 text-sm">
+            {canSuggest && !tip && (
+              <button type="button" onClick={suggest} className={aiBtn}>
+                Suggest
+              </button>
+            )}
             <button type="button" onClick={() => setOpen(open?.mode === "edit" ? null : { id: g.id, mode: "edit" })} className={btn}>
               Edit
             </button>
@@ -112,6 +143,24 @@ function Row({
           </div>
         )}
       </div>
+      {admin && tip === "…" && <p className="mt-2 text-sm text-muted">Claude is reading the reports…</p>}
+      {admin && tip && tip !== "…" && "error" in tip && (
+        <p className="mt-2 text-sm text-bad" role="alert">
+          {tip.error}
+        </p>
+      )}
+      {admin && tip && tip !== "…" && "action" in tip && (
+        <AiSuggestion
+          {...suggestionLabel(tip)}
+          danger={tip.action === "hide"}
+          doIt={() =>
+            act(g, tip.action, tip.action === "merge" ? { into: tip.into } : tip.action === "edit" ? tip.edits : {}).then(
+              (ok) => ok && drop(),
+            )
+          }
+          dismiss={drop}
+        />
+      )}
       {admin && open?.mode === "merge" && (
         <form
           className="mt-3 grid gap-2"
@@ -204,12 +253,32 @@ export function GymPlaceReports({ admin }: { admin: boolean }) {
     setVersion((v) => v + 1);
     return true;
   };
+  const ai = useAiStatus();
+  const [tips, setTips] = useState<Record<string, Tip>>({});
+  const drop = (id: string) => setTips((t) => Object.fromEntries(Object.entries(t).filter(([k]) => k !== id)));
+  // Claude reads one gym's reports (and, for "listed twice", the other gyms in its city) and suggests an action.
+  const suggest = async (g: ReportedPlace) => {
+    setTips((t) => ({ ...t, [g.id]: "…" }));
+    const r = await aiPost<{ suggestion: PlaceSuggestion }>({ task: "triagePlace", place: g });
+    setTips((t) => ({ ...t, [g.id]: r.ok ? r.data.suggestion : { error: r.error } }));
+  };
+  const suggestAll = async () => {
+    for (const g of rows ?? []) if (!tips[g.id]) await suggest(g);
+  };
   return (
     <Card title="Reported gym pages">
       <p className="text-sm text-muted">
         Real gyms whose page someone reported from the website or the app. Reports never hide a page by themselves. Edit fixes the details,
         Merge sends a duplicate to the gym it copies, Hide takes the page down, Dismiss leaves it as it is.
       </p>
+      {admin && ai?.configured && rows && rows.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+          <button type="button" disabled={!ai.ready} onClick={() => void suggestAll()} className={aiBtn}>
+            Suggest for all with AI
+          </button>
+          <AiNote s={ai} />
+        </div>
+      )}
       {error && (
         <p className="mt-2 text-sm text-bad" role="alert">
           {error}
@@ -224,7 +293,16 @@ export function GymPlaceReports({ admin }: { admin: boolean }) {
       ) : (
         <ul className="mt-3 divide-y divide-line">
           {rows.map((g) => (
-            <Row key={g.id} g={g} admin={admin} act={act} />
+            <Row
+              key={g.id}
+              g={g}
+              admin={admin}
+              act={act}
+              tip={tips[g.id]}
+              suggest={() => void suggest(g)}
+              drop={() => drop(g.id)}
+              canSuggest={!!ai?.ready}
+            />
           ))}
         </ul>
       )}
