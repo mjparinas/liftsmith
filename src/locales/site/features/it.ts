@@ -426,7 +426,7 @@ export const it: FeaturesText = {
     },
     widgets: {
       name: "Widget della schermata Home",
-      body: "La scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie nella schermata Home.",
+      body: "Tre widget: Oggi (la scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie), Questa settimana (giorni di allenamento, la tua serie e cosa la mantiene) e Recupero (quali muscoli sono pronti e quando lo saranno gli altri).",
       note: "La web app ha invece scorciatoie sulla sua icona nella schermata Home.",
     },
     shortcuts: {

@@ -804,6 +804,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Solo los adultos pueden dejar reseñas, y un cliente descontento no puede hundir a un entrenador nuevo: nada se muestra hasta tener tres reseñas.",
   },
+  widgets: {
+    title: "Dos widgets nuevos para la pantalla de inicio",
+    intro: "Junto al widget de Hoy, otros dos responden de un vistazo: ¿voy bien esta semana y qué está listo para entrenar?",
+    points: [
+      "Esta semana: los días que entrenaste, los planificados, tu racha y cuántos días más la mantienen.",
+      "Recuperación: qué zonas del cuerpo están listas para entrenar y cuándo lo estará el resto.",
+      "Recuperación se actualiza sola a medida que los músculos se recuperan, incluso con la app cerrada, sin gastar batería.",
+      "Cada uno tiene Empezar, así el entrenamiento de hoy está a un toque.",
+    ],
+    dyk: "Toca el widget de Recuperación para abrir el mapa de recuperación en la app.",
+  },
   "screenshot-share": {
     title: "Haz una captura y llévate una tarjeta para compartir",
     intro:

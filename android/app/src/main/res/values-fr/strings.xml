@@ -16,4 +16,8 @@
     <string name="up_next">Ensuite : %1$s</string>
     <string name="add_30">+30 s</string>
     <string name="widget_title">Séance du jour</string>
+    <string name="widget_week_title">Cette semaine</string>
+    <string name="widget_week_description">Votre semaine en un coup d’œil : jours entraînés, votre série et ce qui la garde, avec Commencer</string>
+    <string name="widget_recovery_title">Récupération</string>
+    <string name="widget_recovery_description">Les muscles prêts à travailler et quand les autres le seront, avec Commencer</string>
 </resources>

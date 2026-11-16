@@ -677,8 +677,16 @@ Clients who've trained with you can now rate you, and new clients can see it.
 - Next to it: how many of your clients trained in the last two weeks.
 - Reply once to each review from Coaching › Setup, and report one that breaks the rules.
 Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))
+### W60 · Two new home-screen widgets (**New**, 2026-11-15)
+Free · Lifters · Screen: Body › Muscles, the recovery map the Recovery widget sums up
+Beside the Today widget, two more answer a question at a glance: am I on track this week, and what's ready to train?
+- This week: the days you trained, the ones planned, your streak and how many more days keep it going.
+- Recovery: which body areas are ready to train, and when the rest will be.
+- Recovery updates itself as muscles recover, even with the app closed, without draining the battery.
+- Each has Start, so today's workout is one tap away.
+Did you know? Tap the Recovery widget to open the recovery map in the app.
 
-### W53 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
+### W61 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
 Free · Lifters · Screen: Progress · `fresh`, so it goes next to everyone already in the series
 Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.
 - Pick your last month, three months, six months, year or all time.

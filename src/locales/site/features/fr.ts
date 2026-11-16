@@ -432,8 +432,8 @@ export const fr: FeaturesText = {
       body: "La séance sur Wear OS et Apple Watch : la série ou le décompte du repos, le pouls de la montre, Valider la série et +30 s, et une vibration à la fin du repos.",
     },
     widgets: {
-      name: "Widget d’écran d’accueil",
-      body: "La décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série sur l’écran d’accueil.",
+      name: "Widgets d’écran d’accueil",
+      body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",
       note: "L’appli Web propose à la place des raccourcis sur son icône d’accueil.",
     },
     shortcuts: {

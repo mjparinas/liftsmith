@@ -252,7 +252,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
     @objc func setWidget(_ call: CAPPluginCall) {
         guard let json = call.getString("json") else { return call.resolve() }
         UserDefaults(suiteName: "group.com.getliftsmith.app")?.set(json, forKey: "widget")
-        WidgetCenter.shared.reloadTimelines(ofKind: "QuickStart")
+        // Today, This week and Recovery all read this one snapshot.
+        WidgetCenter.shared.reloadAllTimelines()
         call.resolve()
     }
 
