@@ -346,6 +346,11 @@ export const de: FeaturesText = {
       name: "Teilkarten und Links",
       body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau. Eine neue Bestleistung leuchtet golden auf und lässt sich gleich in der Pause teilen.",
     },
+    "screenshot-share": {
+      name: "Teilkarten beim Screenshot",
+      body: "Mach einen Screenshot, und ein Blatt mit Trainingskarten fährt hoch: dein letzter Monat, drei Monate, sechs Monate, das Jahr oder alles, als Summen, als Aufteilung deiner Sätze oder als deine besten Lifts. Wisch durch, blende die Gewichte mit dem Auge aus und teile sie mit deinem Einladungslink auf der Karte. Dieselben Karten findest du unter Mein Training teilen im Fortschritt. Jeder Link, den du teilst, trägt jetzt deine Einladung, in einem Link, der das auch sagt.",
+      note: "Screenshots öffnen es unter Android 14 und neuer und auf dem iPhone, und es lässt sich ausschalten. Sonst öffnest du es im Fortschritt. Unter 18-Jährige teilen ohne Einladungslink.",
+    },
     coaching: {
       name: "Kunden coachen",
       body: "Verknüpfe Kunden, sieh ihre Ergebnisse und weise ihnen Routinen zu, am Handy oder auf einem großen Bildschirm.",

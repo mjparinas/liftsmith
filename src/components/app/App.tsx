@@ -23,7 +23,7 @@ import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
 import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
-import { startInvite } from "@/lib/invite";
+import { catchInviteInAddress, startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
@@ -81,6 +81,7 @@ import { Settings } from "./Settings";
 import { SharedGym } from "./SharedGym";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
+import { ScreenshotShare } from "./StatsShare";
 import { StretchScreen } from "./Stretch";
 import { SyncSpinner } from "./SyncSpinner";
 import { Toaster } from "./Toaster";
@@ -201,7 +202,9 @@ export function App() {
     void flushFeedback();
     // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
     void startCreator();
-    // An invite that came through the Play install referrer waits for Friends (invite.ts).
+    // An invite that came through the Play install referrer, or in the address (?invite=, a link a friend shared),
+    // waits for Friends (invite.ts).
+    catchInviteInAddress();
     void startInvite();
     // A coach's invite (#/trainer/<code>, or the Play install referrer) waits for setup's coach path (coachInvite.ts).
     void startCoachInvite();
@@ -518,6 +521,8 @@ export function App() {
         </main>
       </div>
       <ProWelcome />
+      {/* Share cards when the lifter takes a screenshot (phones only; StatsShare.tsx, docs/decisions/sharing.md). */}
+      <ScreenshotShare route={route} />
       {sidebar ? <Sidebar route={route} /> : showNav && <TabBar route={route} />}
       {/* Coach chat's dock, bottom right on the desktop layout (ChatDock.tsx); not over a workout or Coaching's own chat. */}
       {sidebar && <ChatDock hidden={route === "trainer" && (arg === "messages" || !!arg?.startsWith("m."))} />}

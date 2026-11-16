@@ -88,7 +88,9 @@ describe("why and coach's notes", () => {
     // The last build week of the block gets a note.
     const p = useApp.getState().profile;
     const build = Math.min(6, Math.max(3, p.blockWeeks));
-    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D - D }));
+    // The same weekday build - 1 weeks back, so it's that many calendar weeks ago whatever today is (a day earlier
+    // fell into the week before on the first day of the week, and the test failed on Mondays).
+    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D }));
     await act(async () =>
       useApp.getState().importWorkouts([
         {

@@ -37,6 +37,19 @@ const send = (key: string, kind: Send["kind"], at: number, status: Send["status"
   status,
 });
 const byId = (id: string) => WEEKLY.find((e) => e.id === id)!;
+/**
+ * Runs a test of the list's own order with today's brand-new feature emails set aside: those go first to everyone
+ * (tested on their own), and a new one is added with every feature, so the order tests mustn't depend on them.
+ */
+async function withoutFresh<T>(fn: () => T | Promise<T>): Promise<T> {
+  const fresh = WEEKLY.filter((w) => w.fresh).map((w) => [w, w.fresh] as const);
+  for (const [w] of fresh) delete w.fresh;
+  try {
+    return await fn();
+  } finally {
+    for (const [w, f] of fresh) w.fresh = f;
+  }
+}
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
 describe("the weekly tips' words", () => {
@@ -99,7 +112,8 @@ describe("who gets which", () => {
   });
 
   it("goes in list order, skipping what was sent, with brand-new features first", () => {
-    const sent = new Set([weeklyKey(byId("gym-setup"))]);
+    // Today's new-feature emails count as sent, so the list's own order shows.
+    const sent = new Set([weeklyKey(byId("gym-setup")), ...WEEKLY.filter((w) => w.fresh).map(weeklyKey)]);
     expect(queue(sent, NO_FACTS)[0]!.id).toBe("import");
     const original = WEEKLY.length;
     const fresh: WeeklyEmail = { id: "zz-new", audience: "lifter", tier: "free", route: "today", fresh: "2026-12-01" };
@@ -122,24 +136,25 @@ describe("when they go out", () => {
     expect(weeklyStart([], false, MON)).toBe(MON + WITHOUT_TOUR);
   });
 
-  it("goes on Tuesday at 10:00, or the next free weekday, and once a calendar week", () => {
-    const start = 0;
-    const t = nextWeekly(tourDone, TZ, MON + 12 * 3600_000, TUE + DAY, start, NO_FACTS);
-    expect(t).toMatchObject({ key: "weekly:gym-setup", at: atTime(TUE, "10:00", TZ), n: 0 });
-    // Tuesday already has an email: Wednesday instead.
-    const busy = [...tourDone, send("recap:x", "recap", atTime(TUE, "18:00", TZ))];
-    expect(nextWeekly(busy, TZ, TUE, TUE + DAY, start, NO_FACTS)).toBeNull();
-    const wed = addDays(MON, 2, TZ);
-    expect(nextWeekly(busy, TZ, wed, wed + DAY, start, NO_FACTS)?.at).toBe(atTime(wed, "10:00", TZ));
-    // One went out this week: nothing more until next week, and the next one is the next on the list.
-    const done = [...tourDone, send("weekly:gym-setup", "weekly", atTime(TUE, "10:00", TZ))];
-    expect(nextWeekly(done, TZ, wed, addDays(MON, 7, TZ), start, NO_FACTS)).toBeNull();
-    const nextTue = addDays(MON, 8, TZ);
-    expect(nextWeekly(done, TZ, nextTue, nextTue + DAY, start, NO_FACTS)).toMatchObject({ key: "weekly:import", n: 1 });
-    // A weekly tip that stepped aside goes again.
-    const stepped = [...tourDone, send("weekly:gym-setup", "weekly", atTime(TUE, "10:00", TZ), "cancelled")];
-    expect(nextWeekly(stepped, TZ, wed, wed + DAY, start, NO_FACTS)?.key).toBe("weekly:gym-setup");
-  });
+  it("goes on Tuesday at 10:00, or the next free weekday, and once a calendar week", () =>
+    withoutFresh(() => {
+      const start = 0;
+      const t = nextWeekly(tourDone, TZ, MON + 12 * 3600_000, TUE + DAY, start, NO_FACTS);
+      expect(t).toMatchObject({ key: "weekly:gym-setup", at: atTime(TUE, "10:00", TZ), n: 0 });
+      // Tuesday already has an email: Wednesday instead.
+      const busy = [...tourDone, send("recap:x", "recap", atTime(TUE, "18:00", TZ))];
+      expect(nextWeekly(busy, TZ, TUE, TUE + DAY, start, NO_FACTS)).toBeNull();
+      const wed = addDays(MON, 2, TZ);
+      expect(nextWeekly(busy, TZ, wed, wed + DAY, start, NO_FACTS)?.at).toBe(atTime(wed, "10:00", TZ));
+      // One went out this week: nothing more until next week, and the next one is the next on the list.
+      const done = [...tourDone, send("weekly:gym-setup", "weekly", atTime(TUE, "10:00", TZ))];
+      expect(nextWeekly(done, TZ, wed, addDays(MON, 7, TZ), start, NO_FACTS)).toBeNull();
+      const nextTue = addDays(MON, 8, TZ);
+      expect(nextWeekly(done, TZ, nextTue, nextTue + DAY, start, NO_FACTS)).toMatchObject({ key: "weekly:import", n: 1 });
+      // A weekly tip that stepped aside goes again.
+      const stepped = [...tourDone, send("weekly:gym-setup", "weekly", atTime(TUE, "10:00", TZ), "cancelled")];
+      expect(nextWeekly(stepped, TZ, wed, wed + DAY, start, NO_FACTS)?.key).toBe("weekly:gym-setup");
+    }));
 
   it("never on Sunday or Monday, before it may start, in a week that already has three emails or a trial ending", () => {
     expect(nextWeekly(tourDone, TZ, MON, MON + DAY, 0, NO_FACTS)).toBeNull();
@@ -237,7 +252,7 @@ describe("through the daily job", () => {
   }
 
   it("sends the first weekly tip on Tuesday once Getting started is behind them", async () => {
-    const w = await run();
+    const w = await withoutFresh(() => run());
     expect(w).toHaveLength(1);
     expect(w[0]!.scheduledAt).toBe(atTime(TUE, "10:00", TZ));
     expect(w[0]!.html).toContain("/email/en/w/gym-setup.jpg");
@@ -254,6 +269,6 @@ describe("through the daily job", () => {
     // New feature emails go first (tested above), so count them as already sent here.
     const sent = new Set(["weekly:gym-setup", "weekly:import", ...WEEKLY.filter((w) => w.fresh).map((w) => `weekly:${w.id}`)]);
     expect(queue(sent, { roles: ["coach"], flags: { coachPlans: false } })[0]!.id).toBe("coach-clients");
-    expect((await run({}, ["gym"]))[0]!.html).toContain("/w/gym-setup.jpg");
+    expect((await withoutFresh(() => run({}, ["gym"])))[0]!.html).toContain("/w/gym-setup.jpg");
   });
 });

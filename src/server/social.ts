@@ -88,8 +88,13 @@ export const DAILY = {
   checkin: 10,
   handleCheck: 600,
 };
-/** An invite link lasts 30 days and works for this many people. */
-export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
+/**
+ * An invite link works for a year from the last time the lifter shared it, for this many people. It used to last 30
+ * days for 50 people; since 2026-11-15 the same link goes on every share card and shared link, which can be found long
+ * after they're posted, so a live code is renewed each time it's asked for (docs/decisions/growth.md "An invite in
+ * every link"). The month of Pro still stops at 12 a year (earnedPro.ts).
+ */
+export const INVITE = { ttl: 365 * 86_400_000, uses: 1000, renewAfter: 30 * 86_400_000 };
 /** Handles nobody can take: they'd look official. */
 const RESERVED = new Set([
   "admin",
@@ -1807,7 +1812,14 @@ export async function invite(accountId: string, _b: Record<string, unknown>, now
     now,
     INVITE.uses,
   ]);
-  if (live) return ok({ code: s(live.code), expiresAt: n(live.expires_at) });
+  if (live) {
+    // Renewed at most once a month, so asking for it again doesn't write every time.
+    if (n(live.expires_at) < now + INVITE.ttl - INVITE.renewAfter) {
+      await query("UPDATE social_invites SET expires_at = ? WHERE code = ?", [now + INVITE.ttl, s(live.code)]);
+      return ok({ code: s(live.code), expiresAt: now + INVITE.ttl });
+    }
+    return ok({ code: s(live.code), expiresAt: n(live.expires_at) });
+  }
   if (!(await limit(accountId, "invite", now))) return fail(429, "slow");
   const code = newCode();
   await batch([

@@ -49,7 +49,11 @@ const SCROLL = {
  * What to tap before the picture (a catalogue key): the button that opens a sheet, or a switch that shows more, turned
  * back off afterwards so the next emails see the app as it was.
  */
-const TAP = { "gym-finder": { role: "button", key: "gym.add" }, "labs-coach": { role: "switch", key: "lab.repCount.title", undo: true } };
+const TAP = {
+  "gym-finder": { role: "button", key: "gym.add" },
+  "screenshot-share": { role: "button", key: "card.shot.open" },
+  "labs-coach": { role: "switch", key: "lab.repCount.title", undo: true },
+};
 const tap = (T, e) => page.getByRole(TAP[e.id].role, { name: T[TAP[e.id].key] }).first().click();
 /** Emails shown at desktop size, because they're about the computer. */
 const WIDE = new Set(["desktop"]);

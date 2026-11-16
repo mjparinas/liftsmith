@@ -804,4 +804,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Solo gli adulti possono lasciare recensioni, e un cliente scontento non può affondare un nuovo coach: non si vede nulla prima di tre recensioni.",
   },
+  "screenshot-share": {
+    title: "Fai uno screenshot, ottieni una card da condividere",
+    intro:
+      "Fai uno screenshot di Liftsmith e compare un foglio con le card del tuo allenamento, pronte da condividere con il tuo link d’invito.",
+    points: [
+      "Scegli l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre.",
+      "Scorri totali, divisione delle serie e migliori alzate.",
+      "Tocca l’occhio per nascondere tutti i pesi.",
+      "Non oggi? Scorrilo via, o disattivalo in Impostazioni › I tuoi dati e la privacy.",
+      "Senza screenshot: Condividi il mio allenamento, in Progressi, apre le stesse card.",
+    ],
+    dyk: "Ogni link che condividi, dalle routine alle palestre, ora porta il tuo invito, in un link che dice invite.",
+  },
 };

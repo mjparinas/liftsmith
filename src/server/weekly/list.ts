@@ -124,6 +124,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("coach-dock", "coach", "pro", "trainer/messages", { fresh: "2026-11-15", shot: false }),
   // New, 2026-11-15: ratings and reviews from clients (docs/decisions/coach-reviews.md).
   R("coach-reviews", "coach", "pro", "trainer/setup", { fresh: "2026-11-15", shot: false }),
+  // New, 2026-11-16: share cards when you take a screenshot, and an invite in every link (docs/decisions/sharing.md).
+  L("screenshot-share", "free", "stats", { fresh: "2026-11-16" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

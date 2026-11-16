@@ -21,6 +21,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StoreReviewPlugin.class);
         registerPlugin(AppUpdatePlugin.class);
         registerPlugin(NowPlayingPlugin.class);
+        registerPlugin(ScreenshotsPlugin.class);
         super.onCreate(savedInstanceState);
         // The app fills the screen and doesn't pinch or double-tap zoom (src/lib/nativeZoom.ts locks the
         // page's viewport too). Text size follows the phone's own setting through TextZoom instead.

@@ -677,3 +677,13 @@ Clients who've trained with you can now rate you, and new clients can see it.
 - Next to it: how many of your clients trained in the last two weeks.
 - Reply once to each review from Coaching › Setup, and report one that breaks the rules.
 Did you know? Only adults can leave reviews, and nothing shows until three reviews. ([Coach reviews](coach-reviews.md))
+
+### W53 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
+Free · Lifters · Screen: Progress · `fresh`, so it goes next to everyone already in the series
+Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.
+- Pick your last month, three months, six months, year or all time.
+- Swipe through totals, where your sets went and your best lifts.
+- Tap the eye to hide every weight.
+- Not today? Swipe it away, or turn it off in Settings › Your data and privacy.
+- No screenshot needed: Share my training on Progress opens the same cards.
+Did you know? Every link you share, from routines to gyms, now carries your invite, in a link that says invite. ([Sharing](sharing.md))

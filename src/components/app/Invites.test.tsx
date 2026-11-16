@@ -99,7 +99,7 @@ describe("the share sheet carries the invite link", () => {
     joinFriends();
     render(<ShareSheet open onClose={() => {}} items={[item]} />);
     fireEvent.click(screen.getByRole("button", { name: t("card.share") }));
-    await waitFor(() => expect(shared.url).toBe("https://www.getliftsmith.com/app/#/invite/ABCDEFGH"));
+    await waitFor(() => expect(shared.url).toBe("https://www.getliftsmith.com/invite/ABCDEFGH"));
     fireEvent.click(screen.getByRole("switch", { name: t("card.invite") }));
     shared.url = "unset";
     fireEvent.click(screen.getByRole("button", { name: t("card.share") }));

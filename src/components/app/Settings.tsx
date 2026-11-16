@@ -23,6 +23,7 @@ import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { useDesktop } from "@/lib/layout";
 import { deleteEmail } from "@/lib/reminders";
+import { screenshotsSupported } from "@/lib/screenshots";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
@@ -586,6 +587,7 @@ function DataGroup() {
         <p className="mb-3 text-xs text-faint">{t("settings.data.note")}</p>
         <ImportWorkouts />
       </Section>
+      <ScreenshotSetting />
       <Section title={t("settings.stats")}>
         <SwitchRow
           label={t("settings.stats.on")}
@@ -661,5 +663,29 @@ function BuildLine() {
     <p className="mt-1 text-center text-xs text-faint tabular-nums">
       {t("settings.build", { version: versionLabel(native), commit: COMMIT })}
     </p>
+  );
+}
+
+/** Share cards on screenshots (StatsShare.tsx): only where the phone tells the app about screenshots. */
+function ScreenshotSetting() {
+  const { profile, setProfile } = useApp();
+  const [supported, setSupported] = useState(false);
+  useEffect(() => {
+    let live = true;
+    void screenshotsSupported().then((s) => live && setSupported(s));
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (!supported) return null;
+  return (
+    <Section title={t("card.shot.settingTitle")}>
+      <SwitchRow
+        label={t("card.shot.setting")}
+        hint={t("card.shot.settingNote")}
+        on={profile.shotShare !== false}
+        onChange={(v) => setProfile({ shotShare: v })}
+      />
+    </Section>
   );
 }
