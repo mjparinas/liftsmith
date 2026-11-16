@@ -134,6 +134,10 @@ export const es: FeaturesText = {
       name: "Demostraciones de ejercicios en 3D",
       body: "Cada ejercicio tiene una figura 3D que muestra el movimiento con su propio equipo, con pasos de preparación y claves.",
     },
+    "form-mistakes": {
+      name: "Errores comunes y cómo corregirlos",
+      body: "Cada ejercicio y estiramiento muestra sus dos o tres errores de técnica más comunes junto a la figura 3D, cada uno con su corrección y por qué importa, y el temporizador de descanso te enseña uno para la próxima serie. Funciona sin conexión.",
+    },
     "set-types": { name: "Series descendentes y rest-pause", body: "Añade una serie descendente o una rest-pause entre series." },
     "timed-sets": {
       name: "Temporizador para isométricos, cargadas y cardio",
@@ -218,6 +222,10 @@ export const es: FeaturesText = {
     body: {
       name: "Peso, grasa corporal y fotos",
       body: "Registra peso y grasa corporal, o deja que lleguen de tu báscula a través de la app de salud del teléfono, y guarda fotos de progreso en tu teléfono.",
+    },
+    "photo-compare": {
+      name: "Fotos de progreso que se alinean",
+      body: "La cámara muestra tu última foto como un contorno tenue para alinearte, con temporizador para alejarte. Compara dos fechas cualquiera con un deslizador o lado a lado, cada una con lo que pesabas ese día. Las fotos se quedan en tu teléfono; una copia de seguridad puede llevarlas a uno nuevo.",
     },
     measurements: {
       name: "Medidas con cinta",
@@ -342,6 +350,11 @@ export const es: FeaturesText = {
       name: "Tarjetas y enlaces para compartir",
       body: "Comparte un entrenamiento, un nuevo récord o un hito como imagen, o como un enlace público con vista previa. Un nuevo récord brilla en dorado y se puede compartir desde el descanso al momento.",
     },
+    "screenshot-share": {
+      name: "Tarjetas al hacer una captura de pantalla",
+      body: "Haz una captura y aparece una hoja con tarjetas de tu entrenamiento: el último mes, tres meses, seis meses, el año o desde siempre, como totales, en qué se fueron tus series o tus mejores levantamientos. Desliza entre ellas, oculta los pesos con el ojo y compártelas con tu enlace de invitación impreso en la tarjeta. Las mismas tarjetas están en Compartir mi entrenamiento, en Progreso. Cada enlace que compartes lleva ahora tu invitación, en un enlace que lo dice.",
+      note: "Las capturas la abren en Android 14 o posterior y en iPhone, y se puede desactivar. En otros sitios, ábrela desde Progreso. Los menores de 18 años comparten sin enlace de invitación.",
+    },
     coaching: {
       name: "Entrena a clientes",
       body: "Vincula clientes, mira sus resultados y asígnales rutinas, en el teléfono o en una pantalla grande.",
@@ -422,8 +435,8 @@ export const es: FeaturesText = {
       body: "El entrenamiento en Wear OS y Apple Watch: la serie o la cuenta atrás del descanso, el pulso del reloj, Registrar serie y +30 s, y una vibración al terminar el descanso.",
     },
     widgets: {
-      name: "Widget en la pantalla de inicio",
-      body: "La decisión de hoy, tu meta semanal, una nota del entrenador y Empezar o Registrar serie en la pantalla de inicio.",
+      name: "Widgets en la pantalla de inicio",
+      body: "Tres widgets: Hoy (la decisión del día, tu meta semanal, una nota del entrenador y Empezar o Registrar serie), Esta semana (días entrenados, tu racha y qué la mantiene) y Recuperación (qué músculos están listos para entrenar y cuándo lo estará el resto).",
       note: "La app web tiene accesos directos en su icono de inicio en su lugar.",
     },
     shortcuts: {
@@ -446,7 +459,7 @@ export const es: FeaturesText = {
     },
     cloud: {
       name: "Conexiones con servicios de fitness",
-      body: "Oura envía sueño, VFC, pulso en reposo y pasos, con una cuenta gratuita. Estamos estudiando Strava, WHOOP, Withings, Polar y Concept2.",
+      body: "Oura envía sueño, VFC, pulso en reposo y pasos, con una cuenta gratuita. Estamos estudiando Strava, Garmin Connect, WHOOP, Withings, Polar y Concept2.",
     },
     "health-save": {
       name: "Entrenamientos guardados en tu app de salud",
@@ -477,8 +490,8 @@ export const es: FeaturesText = {
       body: "La web muestra cuánto levantan de verdad en sentadilla, press de banca, peso muerto y press militar, por sexo y peso corporal, calculado cada día con quienes cuentan. Solo se muestran grupos de 30 o más, en percentiles, nunca los números de nadie. Un interruptor en Ajustes › Tus datos y privacidad decide si cuentas; los menores de 18 nunca cuentan.",
     },
     languages: {
-      name: "Seis idiomas",
-      body: "Inglés, español, francés, alemán, italiano y japonés, según el idioma de tu teléfono.",
+      name: "Diez idiomas",
+      body: "Inglés, español, francés, alemán, italiano, japonés, portugués de Brasil, coreano, polaco y turco, según el idioma de tu teléfono.",
     },
     appearance: {
       name: "Oscuro, claro o como tu teléfono",
@@ -618,6 +631,9 @@ export const es: FeaturesText = {
     },
     oura: { does: "Entran sueño, VFC, pulso en reposo y pasos" },
     strava: { does: "Cada entrenamiento terminado se publica en Strava" },
+    "garmin-connect": {
+      does: "Entran el sueño, la VFC, el pulso en reposo, los pasos y los pesajes de la báscula Index, y las carreras, salidas en bici y sesiones de remo como entrenamientos de cardio",
+    },
     whoop: { does: "Entran sueño, recuperación, VFC y pulso en reposo" },
     withings: { does: "Entran peso, grasa corporal, sueño y pasos" },
     polar: { does: "Entran recuperación nocturna, VFC y sueño" },

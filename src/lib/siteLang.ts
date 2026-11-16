@@ -5,7 +5,7 @@
 // Every translated page lists all its languages in hreflang tags (`languageAlternates`), and the sitemap does too.
 // Kept apart from src/lib/i18n.ts so site pages never load the app's catalogues.
 
-export const SITE_LANGS = ["en", "es", "fr", "de", "it", "ja"] as const;
+export const SITE_LANGS = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"] as const;
 export type SiteLang = (typeof SITE_LANGS)[number];
 
 /** The translated paths, English form (with the trailing slash). */
@@ -19,6 +19,10 @@ export const SITE_LANG_NAME: Record<SiteLang, string> = {
   de: "Deutsch",
   it: "Italiano",
   ja: "日本語",
+  pt: "Português",
+  ko: "한국어",
+  pl: "Polski",
+  tr: "Türkçe",
 };
 
 /** Open Graph locale for each language. */
@@ -29,6 +33,10 @@ export const OG_LOCALE: Record<SiteLang, string> = {
   de: "de_DE",
   it: "it_IT",
   ja: "ja_JP",
+  pt: "pt_BR",
+  ko: "ko_KR",
+  pl: "pl_PL",
+  tr: "tr_TR",
 };
 
 export const isSiteLang = (s: string): s is SiteLang => (SITE_LANGS as readonly string[]).includes(s);

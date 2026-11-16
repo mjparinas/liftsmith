@@ -18,8 +18,12 @@ import * as es from "./text/es";
 import * as fr from "./text/fr";
 import * as it from "./text/it";
 import * as ja from "./text/ja";
+import * as ko from "./text/ko";
+import * as pl from "./text/pl";
+import * as pt from "./text/pt";
+import * as tr from "./text/tr";
 
-export const TEXT: Record<MsgLang, { common: en.Common; emails: Record<string, en.Words> }> = { en, es, fr, de, it, ja };
+export const TEXT: Record<MsgLang, { common: en.Common; emails: Record<string, en.Words> }> = { en, es, fr, de, it, ja, pt, ko, pl, tr };
 
 export const WEEKLY_HOUR = "10:00";
 const DAY = 86_400_000;

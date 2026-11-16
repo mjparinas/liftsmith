@@ -545,6 +545,10 @@ function PosterForm({
           <option value="de">German</option>
           <option value="it">Italian</option>
           <option value="ja">Japanese</option>
+          <option value="pt">Portuguese</option>
+          <option value="ko">Korean</option>
+          <option value="pl">Polish</option>
+          <option value="tr">Turkish</option>
         </select>
       </label>
       <button type="submit" className="press btn-primary rounded-lg px-4 py-2 text-sm font-semibold">

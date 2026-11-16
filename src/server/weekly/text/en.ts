@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Weight and body fat with − and +, no typing, or straight from your scale through your phone's health app.",
       "Nine tape measurement sites in centimetres or inches.",
-      "Progress photos stay on your phone and never sync.",
+      "Progress photos line up with your last one, and any two dates compare as a slider or side by side. They stay on your phone.",
       "Labs (Pro): a Bluetooth smart scale fills in the weigh-in for you to check.",
     ],
     dyk: "A shrinking or growing waist becomes a coach's note when you don't log body fat.",
@@ -473,7 +473,7 @@ export const emails: Record<string, Words> = {
     title: "Did you know? Make it read your way",
     intro: "Little things that make the app feel like yours.",
     points: [
-      "Pick a language other than your phone's: there are six.",
+      "Pick a language other than your phone's: there are ten.",
       "Kilograms or pounds, and each gym can use its own for its plates.",
       "The daily quote on Today can be switched off.",
       "Run setup again from Settings if your goal, experience or gym has changed.",
@@ -710,7 +710,7 @@ export const emails: Record<string, Words> = {
       "Dark, light or match your phone.",
       "Earn themes and accents from your achievements.",
       "On the phones, an app icon in your theme's colours.",
-      "Six languages, separate from your phone's if you like.",
+      "Ten languages, separate from your phone's if you like.",
     ],
     dyk: "With Appearance on light, a theme changes the accent colour only.",
   },
@@ -823,5 +823,39 @@ export const emails: Record<string, Words> = {
       "Reply once to each review from Coaching › Setup, and report one that breaks the rules.",
     ],
     dyk: "Only adults can leave reviews, and one unhappy client can't sink a new coach: nothing shows until three reviews.",
+  },
+  widgets: {
+    title: "Two new home-screen widgets",
+    intro: "Beside the Today widget, two more answer a question at a glance: am I on track this week, and what's ready to train?",
+    points: [
+      "This week: the days you trained, the ones planned, your streak and how many more days keep it going.",
+      "Recovery: which body areas are ready to train, and when the rest will be.",
+      "Recovery updates itself as muscles recover, even with the app closed, without draining the battery.",
+      "Each has Start, so today's workout is one tap away.",
+    ],
+    dyk: "Tap the Recovery widget to open the recovery map in the app.",
+  },
+  "screenshot-share": {
+    title: "Take a screenshot, get a card worth sharing",
+    intro: "Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.",
+    points: [
+      "Pick your last month, three months, six months, year or all time.",
+      "Swipe through totals, where your sets went and your best lifts.",
+      "Tap the eye to hide every weight.",
+      "Not today? Swipe it away, or turn it off in Settings › Your data and privacy.",
+      "No screenshot needed: Share my training on Progress opens the same cards.",
+    ],
+    dyk: "Every link you share, from routines to gyms, now carries your invite, in a link that says invite.",
+  },
+  "form-cues": {
+    title: "Common mistakes, and the fix",
+    intro: "Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.",
+    points: [
+      "Each one says what it looks like, what to do instead and why it matters.",
+      "Find them in How to during a workout, on each exercise's page and on every stretch.",
+      "Between sets, the rest timer shows one to watch on your next set, a different one each set.",
+      "They're part of the app, so they work with no signal, in every language.",
+    ],
+    dyk: "Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout.",
   },
 };

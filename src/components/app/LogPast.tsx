@@ -128,7 +128,8 @@ export function LogPast() {
           save();
         }}
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Day, length and start time in one column (Melvin, 2026-11-16); on desktop it keeps the buttons' width (.desk-fit). */}
+        <div className="desk-fit space-y-4">
           <div>
             <span className="text-sm text-muted" id="past-day">
               {t("past.day")}
@@ -163,32 +164,6 @@ export function LogPast() {
                 className="card num mt-2 w-full px-3 py-3"
               />
             )}
-            <span className="mt-4 block text-sm text-muted">{t("past.at")}</span>
-            <div className="mt-1 flex items-center gap-3">
-              <Bump
-                dir={-1}
-                size="sm"
-                aria={t("past.earlierTime")}
-                onStep={() => {
-                  if (time < TIME_STEP) return false;
-                  setTime((v) => Math.max(0, v - TIME_STEP));
-                  return true;
-                }}
-              />
-              <output className="num card flex-1 px-3 py-2.5 text-center font-semibold" aria-live="polite">
-                {clockTime(Math.floor(time / 60), time % 60)}
-              </output>
-              <Bump
-                dir={1}
-                size="sm"
-                aria={t("past.laterTime")}
-                onStep={() => {
-                  if (time + TIME_STEP >= 24 * 60) return false;
-                  setTime((v) => Math.min(24 * 60 - TIME_STEP, v + TIME_STEP));
-                  return true;
-                }}
-              />
-            </div>
           </div>
           <div>
             <span className="text-sm text-muted">{t("past.length")}</span>
@@ -202,6 +177,34 @@ export function LogPast() {
               max={600}
               label={t("past.length")}
             />
+          </div>
+          <div>
+            <span className="block text-sm text-muted">{t("past.at")}</span>
+            <div className="mt-1 flex items-center gap-2">
+              <Bump
+                dir={-1}
+                size="md"
+                aria={t("past.earlierTime")}
+                onStep={() => {
+                  if (time < TIME_STEP) return false;
+                  setTime((v) => Math.max(0, v - TIME_STEP));
+                  return true;
+                }}
+              />
+              <output className="num card flex min-h-12 flex-1 items-center justify-center px-3 text-lg font-semibold" aria-live="polite">
+                {clockTime(Math.floor(time / 60), time % 60)}
+              </output>
+              <Bump
+                dir={1}
+                size="md"
+                aria={t("past.laterTime")}
+                onStep={() => {
+                  if (time + TIME_STEP >= 24 * 60) return false;
+                  setTime((v) => Math.min(24 * 60 - TIME_STEP, v + TIME_STEP));
+                  return true;
+                }}
+              />
+            </div>
           </div>
         </div>
 

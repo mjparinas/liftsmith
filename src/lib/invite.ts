@@ -1,27 +1,48 @@
 "use client";
 
 // Invite links and the friends leaderboard, the app side (Melvin, 2026-11-11, from the social gaps list; decision
-// record docs/decisions/friends.md "Invites and the leaderboard"). An invite link is
-// www.getliftsmith.com/app/#/invite/<code>: the app opens it through App Links on Android, and anywhere else it opens
-// the web app. On Android a lifter without the app can install it from the invite screen with the code as the
+// record docs/decisions/friends.md "Invites and the leaderboard"). An invite link is www.getliftsmith.com/invite/<code>
+// (Melvin, 2026-11-15: "it should have invite in the URL so people can see what it does"; the server sends it on to
+// the app's invite screen, /app/#/invite/<code>, which still works for links shared before). The app opens it through
+// App Links on Android, and anywhere else it opens the web app. Every other link the lifter shares (a routine, a gym,
+// a share card's page) carries their code as `?invite=<code>` (withInvite), so a friend who joins from it is credited.
+// On Android a lifter without the app can install it from the invite screen with the code as the
 // Play install referrer, so the invite still arrives after install. The code waits on the device until the lifter
 // has signed in and joined Friends, then the two follow each other.
 import { readAccount } from "./auth";
 import { installInfo } from "./installInfo";
+import { cleanInvite, INVITE_PARAM, inviteOfUrl } from "./inviteLink";
 import { isNative } from "./juice";
 import { APP_PATH, SITE_URL } from "./site";
 import { social } from "./social";
 import type { BoardMetric, BoardRow } from "./socialTypes";
 
+export { cleanInvite, INVITE_PARAM, inviteAppPath, inviteOfUrl, invitePrinted, inviteUrl, withInvite } from "./inviteLink";
+
 const PENDING = "liftsmith.invite";
-const CODE_RE = /^[2-9A-HJ-NP-Z]{8}$/;
+/**
+ * Keeps the invite a link carried, unless one is already waiting (the first friend who brought the lifter here gets
+ * the credit). Returns whether it was kept.
+ */
+export function keepInviteFrom(url: string): boolean {
+  const code = inviteOfUrl(url);
+  if (!code || pendingInvite()) return false;
+  savePendingInvite(code);
+  return true;
+}
 
-export const cleanInvite = (x: unknown) => {
-  const c = typeof x === "string" ? x.toUpperCase().replace(/[\s-]/g, "") : "";
-  return CODE_RE.test(c) ? c : "";
-};
-
-export const inviteUrl = (code: string) => `${SITE_URL}${APP_PATH}#/invite/${code}`;
+/** On the web app's first load: an ?invite= in the address is kept, then taken out so it isn't shared on again. */
+export function catchInviteInAddress(): void {
+  if (typeof location === "undefined" || !location.search.includes(INVITE_PARAM)) return;
+  keepInviteFrom(location.href);
+  try {
+    const u = new URL(location.href);
+    u.searchParams.delete(INVITE_PARAM);
+    history.replaceState(history.state, "", u.pathname + u.search + u.hash);
+  } catch {
+    // the address keeps it; harmless
+  }
+}
 /** A club's join link (clubs use the same code alphabet as invites). */
 export const clubUrl = (code: string) => `${SITE_URL}${APP_PATH}#/club/${code}`;
 

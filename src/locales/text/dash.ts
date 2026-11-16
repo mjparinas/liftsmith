@@ -82,3 +82,68 @@ export const ja: Partial<Record<Key, Message>> = {
   "dash.byHand": " · 手動で記録",
   "dash.trainedOf": "直近{total}日のうち{n}日トレーニング",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "dash.loading": "Carregando…",
+  "dash.workouts": "Treinos",
+  "dash.level": "Nível",
+  "dash.levelTitle": "Nível {level} · {title}",
+  "dash.workoutsN": {
+    one: "{count} treino",
+    other: "{count} treinos",
+  },
+  "dash.prevMonth": "Mês anterior",
+  "dash.nextMonth": "Próximo mês",
+  "dash.min": "{n} min",
+  "dash.byHand": " · registrado à mão",
+  "dash.trainedOf": "Treinou em {n} dos últimos {total} dias",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "dash.loading": "불러오는 중…",
+  "dash.workouts": "운동",
+  "dash.level": "레벨",
+  "dash.levelTitle": "레벨 {level} · {title}",
+  "dash.workoutsN": {
+    other: "운동 {count}회",
+  },
+  "dash.prevMonth": "이전 달",
+  "dash.nextMonth": "다음 달",
+  "dash.min": "{n}분",
+  "dash.byHand": " · 직접 기록",
+  "dash.trainedOf": "최근 {total}일 중 {n}일 운동",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "dash.loading": "Yükleniyor…",
+  "dash.workouts": "Antrenmanlar",
+  "dash.level": "Seviye",
+  "dash.levelTitle": "Seviye {level} · {title}",
+  "dash.workoutsN": {
+    one: "{count} antrenman",
+    other: "{count} antrenman",
+  },
+  "dash.prevMonth": "Önceki ay",
+  "dash.nextMonth": "Sonraki ay",
+  "dash.min": "{n} dk",
+  "dash.byHand": " · elle kaydedildi",
+  "dash.trainedOf": "Son {total} günün {n} gününde antrenman yapıldı",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "dash.loading": "Ładowanie…",
+  "dash.workouts": "Treningi",
+  "dash.level": "Poziom",
+  "dash.levelTitle": "Poziom {level} · {title}",
+  "dash.workoutsN": {
+    one: "{count} trening",
+    few: "{count} treningi",
+    many: "{count} treningów",
+    other: "{count} treningu",
+  },
+  "dash.prevMonth": "Poprzedni miesiąc",
+  "dash.nextMonth": "Następny miesiąc",
+  "dash.min": "{n} min",
+  "dash.byHand": " · zapisany ręcznie",
+  "dash.trainedOf": "Treningi w {n} z ostatnich {total} dni",
+};

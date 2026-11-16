@@ -28,3 +28,19 @@ export const it: Partial<Record<Key, Message>> = {
 export const ja: Partial<Record<Key, Message>> = {
   "info.whatIs": "{term}とは？",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "info.whatIs": "O que é {term}?",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "info.whatIs": "{term}이란?",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "info.whatIs": "{term} nedir?",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "info.whatIs": "Co to jest {term}?",
+};

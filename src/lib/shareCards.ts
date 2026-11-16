@@ -16,7 +16,7 @@ import { fmtNum, fromKg } from "./units";
 // - weights (kg or lb) appear only while the lifter leaves "Show weights" on;
 // - the name appears only when they turn "Show my name" on (off by default).
 
-export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge" | "anniversary";
+export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge" | "anniversary" | "stats";
 
 export interface ShareOptions {
   /** Show weights lifted (kg or lb). On by default. */
@@ -74,7 +74,7 @@ export function figureFor(exerciseIds: readonly string[]): string | undefined {
   return exerciseIds.find((id) => EXERCISE_BY_ID.get(id)?.compound) ?? exerciseIds.find((id) => EXERCISE_BY_ID.has(id));
 }
 
-const prLine = (p: Pr, o: ShareOptions, unit: Unit) =>
+export const prLine = (p: Pick<Pr, "exerciseId" | "weight" | "reps">, o: ShareOptions, unit: Unit) =>
   o.weights
     ? t("card.prLine", { name: exercise(p.exerciseId).name, weight: w(p.weight, unit), reps: p.reps })
     : t("card.prLineNoWeight", { name: exercise(p.exerciseId).name });

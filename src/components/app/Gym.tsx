@@ -11,6 +11,7 @@ import { listGym, myListings, pickListing, pickPlace, placeKit, unlistGym, type 
 import { barName, gymName } from "@/lib/gymNames";
 import { encodeGym, gymCodeFromLink, gymUrl, kitOf } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
+import { withInvite } from "@/lib/inviteLink";
 import { haptic } from "@/lib/juice";
 import { loadBar, plateStyle } from "@/lib/plates";
 import { copyText, shareUrl } from "@/lib/shareLinks";
@@ -25,6 +26,7 @@ import { NearbyGyms } from "./NearbyGyms";
 import { PlateBar } from "./Plates";
 import { go, goBack } from "./router";
 import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
+import { useShareInvite } from "./useShareInvite";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -272,9 +274,10 @@ export function Gym() {
 /** "Share this gym": a link to the gym's equipment and weights, never where it is or machine settings. */
 function ShareGym({ gym }: { gym: GymT }) {
   const [note, setNote] = useState<string | null>(null);
+  const invite = useShareInvite();
   const share = async () => {
     haptic("tap");
-    const url = gymUrl(encodeGym(kitOf(gym)));
+    const url = withInvite(gymUrl(encodeGym(kitOf(gym))), await invite.get());
     track("feature", { name: "gym_share", detail: "share" });
     if (await shareUrl(url, t("gym.shareTitle", { name: gym.name }))) return;
     setNote((await copyText(url)) ? t("gym.copied") : null);

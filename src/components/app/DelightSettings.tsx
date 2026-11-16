@@ -60,6 +60,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
           set={(plateMemory) => put({ plateMemory })}
           hint={t("delight.platesHint")}
         />
+        <Toggle label={t("ff.setting")} on={d.formCheck !== false} set={(formCheck) => put({ formCheck })} hint={t("ff.settingHint")} />
         <Section title={t("delight.rest")}>
           <div className="flex flex-wrap gap-2">
             {(

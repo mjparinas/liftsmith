@@ -60,3 +60,39 @@ export const ja: Partial<Record<Key, Message>> = {
   "bmi.where": "BMI {bmi}：{band}。区分は18.5未満、18.5〜25、25〜30、30以上です。",
   "bmi.note": "BMIは筋肉と脂肪を区別できないため、筋トレをする人は高めに出がちです。体脂肪率のほうが参考になります。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "bmi.under": "Abaixo do peso",
+  "bmi.healthy": "Faixa saudável",
+  "bmi.over": "Sobrepeso",
+  "bmi.obese": "Obesidade",
+  "bmi.where": "IMC {bmi}: {band}. As faixas são abaixo de 18,5, de 18,5 a 25, de 25 a 30, e 30 ou mais.",
+  "bmi.note": "O IMC não diferencia músculo de gordura, então quem treina costuma dar alto. A gordura corporal diz mais.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "bmi.under": "저체중",
+  "bmi.healthy": "정상 범위",
+  "bmi.over": "과체중",
+  "bmi.obese": "비만",
+  "bmi.where": "BMI {bmi}: {band}. 구간은 18.5 미만, 18.5~25, 25~30, 30 이상이에요.",
+  "bmi.note": "BMI는 근육과 지방을 구분하지 못해서 웨이트 하는 사람은 높게 나오기 쉬워요. 체지방이 더 많은 걸 알려 줘요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "bmi.under": "Zayıf",
+  "bmi.healthy": "Sağlıklı aralık",
+  "bmi.over": "Fazla kilolu",
+  "bmi.obese": "Obez",
+  "bmi.where": "BMI {bmi}: {band}. Aralıklar: 18,5'in altı, 18,5-25, 25-30 ve 30 ve üzeri.",
+  "bmi.note": "BMI kası yağdan ayıramaz, bu yüzden ağırlık çalışanlarda genelde yüksek çıkar. Vücut yağı daha çok şey söyler.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "bmi.under": "Niedowaga",
+  "bmi.healthy": "Prawidłowa waga",
+  "bmi.over": "Nadwaga",
+  "bmi.obese": "Otyłość",
+  "bmi.where": "BMI {bmi}: {band}. Przedziały to poniżej 18,5, od 18,5 do 25, od 25 do 30 oraz 30 i więcej.",
+  "bmi.note": "BMI nie odróżnia mięśni od tłuszczu, więc u osób trenujących siłowo często wychodzi wysokie. Tkanka tłuszczowa mówi więcej.",
+};

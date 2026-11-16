@@ -46,3 +46,31 @@ export const ja: Partial<Record<Key, Message>> = {
   "buddy.atFocus": "{name}さんが今日はジムで{focus}をトレーニング中。次はあなたの番 💪",
   "buddy.atGymFocus": "{name}さんが今日は{gym}で{focus}をトレーニング中。次はあなたの番 💪",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "buddy.at": "{name} está na academia. Sua vez 💪",
+  "buddy.atGym": "{name} está na {gym}. Sua vez 💪",
+  "buddy.atFocus": "{name} está na academia, treinando {focus} hoje. Sua vez 💪",
+  "buddy.atGymFocus": "{name} está na {gym}, treinando {focus} hoje. Sua vez 💪",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "buddy.at": "{name}님이 헬스장에 있어요. 이제 당신 차례예요 💪",
+  "buddy.atGym": "{name}님이 {gym}에 있어요. 이제 당신 차례예요 💪",
+  "buddy.atFocus": "{name}님이 헬스장에서 오늘 {focus} 운동 중이에요. 이제 당신 차례예요 💪",
+  "buddy.atGymFocus": "{name}님이 {gym}에서 오늘 {focus} 운동 중이에요. 이제 당신 차례예요 💪",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "buddy.at": "{name} salonda. Sıra sende 💪",
+  "buddy.atGym": "{name} şu an {gym} salonunda. Sıra sende 💪",
+  "buddy.atFocus": "{name} salonda, bugün {focus} çalışıyor. Sıra sende 💪",
+  "buddy.atGymFocus": "{name} şu an {gym} salonunda, bugün {focus} çalışıyor. Sıra sende 💪",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "buddy.at": "{name} jest na siłowni. Twoja kolej 💪",
+  "buddy.atGym": "{name} jest w {gym}. Twoja kolej 💪",
+  "buddy.atFocus": "{name} jest na siłowni i trenuje dziś {focus}. Twoja kolej 💪",
+  "buddy.atGymFocus": "{name} jest w {gym} i trenuje dziś {focus}. Twoja kolej 💪",
+};

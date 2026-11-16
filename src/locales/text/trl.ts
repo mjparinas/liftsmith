@@ -213,3 +213,207 @@ export const ja: Partial<Record<Key, Message>> = {
   "trl.done.pushed": "よく回復していたので、今日は強めにしました。",
   "trl.done.left": { other: "トライアルは残り{count}日です。" },
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "trl.workouts": {
+    one: "{count} treino adaptativo",
+    other: "{count} treinos adaptativos",
+  },
+  "trl.weights": {
+    one: "{count} peso",
+    other: "{count} pesos",
+  },
+  "trl.days": {
+    one: "{count} dia",
+    other: "{count} dias",
+  },
+  "trl.soFar": "Até agora o Pro planejou {workouts} para você e aumentou {weights}.",
+  "trl.soFarDays": "Até agora o Pro planejou {workouts} para você, aumentou {weights} e ajustou {days} ao quanto você estava recuperado.",
+  "trl.did": "No seu teste, o Pro planejou {workouts} para você e aumentou {weights}.",
+  "trl.didDays": "No seu teste, o Pro planejou {workouts} para você, aumentou {weights} e ajustou {days} ao quanto você estava recuperado.",
+  "trl.top": "Maior salto: {name}, de {from} para {to}.",
+  "trl.none":
+    "Você ainda não fez um treino adaptativo. O Pro planeja cada um de acordo com sua academia, sua recuperação e como foram suas últimas séries.",
+  "trl.none.advice": "Comece o treino de hoje para ver como funciona.",
+  "trl.halfway.title": "Metade do seu teste do Pro",
+  "trl.halfway.advice": "Avalie como cada exercício pareceu entre as séries: o Pro usa isso para definir seu próximo peso.",
+  "trl.seeAll": "Ver tudo no Pro",
+  "trl.ending.title": {
+    one: "Seu teste do Pro termina amanhã",
+    other: "Seu teste do Pro termina em {count} dias",
+  },
+  "trl.ending.renews":
+    "Em {date} ele vira sua assinatura Pro e o plano continua se adaptando, sem você precisar fazer nada. Você pode cancelar na loja antes disso.",
+  "trl.ending.stops": "O Pro para em {date} e Hoje volta ao plano grátis, com um treino adaptativo por semana.",
+  "trl.keep": "Manter o Pro",
+  "trl.ended.title": "Seu teste do Pro terminou",
+  "trl.ended.advice": "Hoje está no plano grátis agora. O Pro retoma dos seus números mais recentes sempre que você voltar.",
+  "trl.back": "Voltar ao Pro",
+  "trl.recap.soFar": "O que o Pro fez até agora",
+  "trl.recap.did": "O que o Pro fez no seu teste",
+  "trl.tile.workouts": "Treinos adaptativos",
+  "trl.tile.raised": "Pesos aumentados",
+  "trl.tile.adjusted": "Dias ajustados",
+  "trl.done.title": "O Pro neste treino",
+  "trl.done.raised": "O Pro aumentou {lifts} hoje.",
+  "trl.done.eased": "Ele deixou hoje mais leve porque sua recuperação estava baixa.",
+  "trl.done.pushed": "Ele puxou mais hoje porque você estava bem recuperado.",
+  "trl.done.left": {
+    one: "Falta {count} dia no seu teste.",
+    other: "Faltam {count} dias no seu teste.",
+  },
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "trl.workouts": {
+    other: "적응형 운동 {count}개",
+  },
+  "trl.weights": {
+    other: "무게 {count}개",
+  },
+  "trl.days": {
+    other: "{count}일",
+  },
+  "trl.soFar": "지금까지 Pro가 {workouts}를 계획하고 {weights}를 올렸어요.",
+  "trl.soFarDays": "지금까지 Pro가 {workouts}를 계획하고, {weights}를 올리고, 회복 상태에 맞춰 {days}을 조정했어요.",
+  "trl.did": "체험 기간 동안 Pro가 {workouts}를 계획하고 {weights}를 올렸어요.",
+  "trl.didDays": "체험 기간 동안 Pro가 {workouts}를 계획하고, {weights}를 올리고, 회복 상태에 맞춰 {days}을 조정했어요.",
+  "trl.top": "가장 크게 오른 운동: {name}, {from}에서 {to}로.",
+  "trl.none": "아직 적응형 운동을 하지 않았어요. Pro는 헬스장, 회복 상태, 지난 세트 결과에 맞춰 매번 운동을 계획해요.",
+  "trl.none.advice": "오늘의 운동을 시작해서 직접 확인해 보세요.",
+  "trl.halfway.title": "Pro 체험이 절반 지났어요",
+  "trl.halfway.advice": "세트 사이에 각 운동의 느낌을 평가하세요. Pro가 다음 무게를 정할 때 써요.",
+  "trl.seeAll": "Pro의 모든 기능 보기",
+  "trl.ending.title": {
+    other: "Pro 체험이 {count}일 뒤에 끝나요",
+  },
+  "trl.ending.renews": "{date}에 Pro 구독으로 바뀌고, 따로 할 일 없이 계획이 계속 맞춰져요. 그 전에 스토어에서 취소할 수 있어요.",
+  "trl.ending.stops": "{date}에 Pro가 끝나고 오늘 화면은 주 1회 적응형 운동이 있는 무료 플랜으로 돌아가요.",
+  "trl.keep": "Pro 유지",
+  "trl.ended.title": "Pro 체험이 끝났어요",
+  "trl.ended.advice": "이제 오늘 화면은 무료 플랜이에요. 언제 돌아오든 Pro가 최신 기록부터 이어서 계획해요.",
+  "trl.back": "Pro 다시 받기",
+  "trl.recap.soFar": "지금까지 Pro가 한 일",
+  "trl.recap.did": "체험 기간에 Pro가 한 일",
+  "trl.tile.workouts": "적응형 운동",
+  "trl.tile.raised": "올린 무게",
+  "trl.tile.adjusted": "조정한 날",
+  "trl.done.title": "이번 운동의 Pro",
+  "trl.done.raised": "오늘 Pro가 {lifts}의 무게를 올렸어요.",
+  "trl.done.eased": "회복이 부족해서 오늘을 가볍게 했어요.",
+  "trl.done.pushed": "회복이 잘 돼서 오늘을 강하게 했어요.",
+  "trl.done.left": {
+    other: "체험 기간이 {count}일 남았어요.",
+  },
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "trl.workouts": {
+    one: "{count} uyarlanabilir antrenman",
+    other: "{count} uyarlanabilir antrenman",
+  },
+  "trl.weights": {
+    one: "{count} ağırlık",
+    other: "{count} ağırlık",
+  },
+  "trl.days": {
+    one: "{count} gün",
+    other: "{count} gün",
+  },
+  "trl.soFar": "Pro şimdiye kadar senin için {workouts} planladı ve {weights} artırdı.",
+  "trl.soFarDays": "Pro şimdiye kadar senin için {workouts} planladı, {weights} artırdı ve {days} toparlanma durumuna göre ayarladı.",
+  "trl.did": "Deneme sürende Pro senin için {workouts} planladı ve {weights} artırdı.",
+  "trl.didDays": "Deneme sürende Pro senin için {workouts} planladı, {weights} artırdı ve {days} toparlanma durumuna göre ayarladı.",
+  "trl.top": "En büyük artış: {name}, {from} → {to}.",
+  "trl.none":
+    "Henüz uyarlanabilir bir antrenman yapmadın. Pro her birini salonuna, toparlanmana ve son setlerinin nasıl geçtiğine göre planlar.",
+  "trl.none.advice": "Nasıl çalıştığını görmek için bugünün antrenmanına başla.",
+  "trl.halfway.title": "Pro denemenin yarısındasın",
+  "trl.halfway.advice":
+    "Setler arasında her hareketin nasıl hissettirdiğini puanla: Pro bunu bir sonraki ağırlığını belirlemek için kullanır.",
+  "trl.seeAll": "Pro'daki her şeyi gör",
+  "trl.ending.title": {
+    one: "Pro denemen yarın bitiyor",
+    other: "Pro denemen {count} gün sonra bitiyor",
+  },
+  "trl.ending.renews":
+    "{date} tarihinde Pro aboneliğine dönüşür ve plan uyum sağlamaya devam eder; senin bir şey yapmana gerek yok. O tarihten önce mağazadan iptal edebilirsin.",
+  "trl.ending.stops": "Pro {date} tarihinde durur ve Bugün, haftada bir uyarlanabilir antrenmanla ücretsiz plana döner.",
+  "trl.keep": "Pro'yu tut",
+  "trl.ended.title": "Pro denemen bitti",
+  "trl.ended.advice": "Bugün artık ücretsiz planda. Ne zaman dönersen Pro en son sayılarından devam eder.",
+  "trl.back": "Pro'yu geri al",
+  "trl.recap.soFar": "Pro şimdiye kadar neler yaptı",
+  "trl.recap.did": "Pro deneme sürende neler yaptı",
+  "trl.tile.workouts": "Uyarlanabilir antrenman",
+  "trl.tile.raised": "Artan ağırlık",
+  "trl.tile.adjusted": "Ayarlanan gün",
+  "trl.done.title": "Bu antrenmanda Pro",
+  "trl.done.raised": "Pro bugün şunları artırdı: {lifts}.",
+  "trl.done.eased": "Toparlanman düşük olduğu için bugünü hafifletti.",
+  "trl.done.pushed": "İyi toparlandığın için bugün yüklendi.",
+  "trl.done.left": {
+    one: "Deneme sürende {count} gün kaldı.",
+    other: "Deneme sürende {count} gün kaldı.",
+  },
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "trl.workouts": {
+    one: "{count} adaptacyjny trening",
+    few: "{count} adaptacyjne treningi",
+    many: "{count} adaptacyjnych treningów",
+    other: "{count} adaptacyjnego treningu",
+  },
+  "trl.weights": {
+    one: "{count} ciężar",
+    few: "{count} ciężary",
+    many: "{count} ciężarów",
+    other: "{count} ciężaru",
+  },
+  "trl.days": {
+    one: "{count} dzień",
+    few: "{count} dni",
+    many: "{count} dni",
+    other: "{count} dnia",
+  },
+  "trl.soFar": "Jak dotąd Pro zaplanował ci {workouts} i zwiększył {weights}.",
+  "trl.soFarDays": "Jak dotąd Pro zaplanował ci {workouts}, zwiększył {weights} i dopasował {days} do twojej regeneracji.",
+  "trl.did": "W okresie próbnym Pro zaplanował ci {workouts} i zwiększył {weights}.",
+  "trl.didDays": "W okresie próbnym Pro zaplanował ci {workouts}, zwiększył {weights} i dopasował {days} do twojej regeneracji.",
+  "trl.top": "Największy skok: {name}, z {from} do {to}.",
+  "trl.none":
+    "Nie masz jeszcze za sobą adaptacyjnego treningu. Pro planuje każdy z myślą o twojej siłowni, regeneracji i tym, jak poszły ostatnie serie.",
+  "trl.none.advice": "Zacznij dzisiejszy trening, żeby zobaczyć, jak to działa.",
+  "trl.halfway.title": "Połowa okresu próbnego Pro za tobą",
+  "trl.halfway.advice": "Oceniaj między seriami, jak szło każde ćwiczenie: Pro używa tego do ustalenia następnego ciężaru.",
+  "trl.seeAll": "Zobacz wszystko w Pro",
+  "trl.ending.title": {
+    one: "Twój okres próbny Pro kończy się jutro",
+    few: "Twój okres próbny Pro kończy się za {count} dni",
+    many: "Twój okres próbny Pro kończy się za {count} dni",
+    other: "Twój okres próbny Pro kończy się za {count} dnia",
+  },
+  "trl.ending.renews":
+    "{date} zmieni się w subskrypcję Pro, a plan dalej będzie się dopasowywać, bez żadnych działań z twojej strony. Do tego czasu możesz anulować w sklepie.",
+  "trl.ending.stops": "Pro kończy się {date}, a ekran Dziś wraca do darmowego planu z jednym adaptacyjnym treningiem w tygodniu.",
+  "trl.keep": "Zachowaj Pro",
+  "trl.ended.title": "Twój okres próbny Pro się zakończył",
+  "trl.ended.advice": "Ekran Dziś działa teraz na darmowym planie. Pro podejmie pracę od twoich najnowszych wyników, kiedy tylko wrócisz.",
+  "trl.back": "Wróć do Pro",
+  "trl.recap.soFar": "Co Pro zrobił do tej pory",
+  "trl.recap.did": "Co Pro zrobił w okresie próbnym",
+  "trl.tile.workouts": "Adaptacyjne treningi",
+  "trl.tile.raised": "Zwiększone ciężary",
+  "trl.tile.adjusted": "Dopasowane dni",
+  "trl.done.title": "Pro w tym treningu",
+  "trl.done.raised": "Pro zwiększył dziś: {lifts}.",
+  "trl.done.eased": "Dzisiejszy trening był lżejszy, bo regeneracja była słaba.",
+  "trl.done.pushed": "Dzisiejszy trening był mocniejszy, bo regeneracja była dobra.",
+  "trl.done.left": {
+    one: "Do końca okresu próbnego został {count} dzień.",
+    few: "Do końca okresu próbnego zostały {count} dni.",
+    many: "Do końca okresu próbnego zostało {count} dni.",
+    other: "Do końca okresu próbnego zostało {count} dnia.",
+  },
+};

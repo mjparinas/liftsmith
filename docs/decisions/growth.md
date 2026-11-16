@@ -92,6 +92,17 @@ Melvin picked "set up a referral or share loop so friends invite friends" (2026-
 - **Measured** as `social_invite` with a detail of where it was shared from (`people`, `done`, `card`), next to the existing invite installs.
 - Pure web code plus server pushes that already go to both phones, so Android, iOS and the web app get it together.
 
+### An invite in every link (2026-11-16)
+
+Melvin, 2026-11-15: "all share functionality should include the users share link for tracking and benefit purposes. Do share links have invite in the URL? It should so people can easily see what it does."
+
+- **The invite link says invite:** `www.getliftsmith.com/invite/<code>` (`inviteUrl` in `src/lib/inviteLink.ts`). On the website it's a server redirect to `/app/#/invite/<code>` (`src/app/api/invite/`, a rewrite in `next.config.ts`, `noindex`); on Android it's in the verified App Links filter (`pathPrefix="/invite"`), so the app opens straight onto the invite; Google Play still carries the code as the install referrer. The old `/app/#/invite/<code>` links keep working.
+- **Every share carries it, for lifters in Friends:** share cards (printed on the card as `getliftsmith.com/invite/<code>` and sent with it, behind the Add my invite link switch), the screenshot sheet, shared routines and gyms, a workout remix link, a profile link and a public card link (`/w/<id>/`) all get `?invite=<code>` added (`withInvite`). Whoever opens one is offered the follow as with any invite; the app keeps the code from its own address (`catchInviteInAddress`) or an App Link (`keepInviteFrom`) unless an invite is already waiting, and takes it out of the address. One hook decides for every screen (`useShareInvite`): Friends on, the lifter in Friends (or a code kept), and not under 18.
+- **Server pages pass it on:** a `/w/<id>/` or `/u/<handle>/` page opened with `?invite=` adds it to its links into the web app and swaps its Google Play badge's referrer for the invite one (`withPageInvite` in `siteFrame.ts`). The site sets no cookies, so the links carry it.
+- **Codes last a year now:** a code printed on a card has to keep working, so a live code lasts 365 days and up to 1,000 people (was 30 days and 50), and is renewed for another year once it has less than 11 months left (`INVITE` in `src/server/social.ts`). A code is still only an offer to follow each other, and the reward stays capped at 12 a year.
+- **Under 18:** no invite link on anything they share, as before.
+- Measured as before (`social_invite`, now also from `link` and `screenshot`).
+
 ### Coaches with 3+ active clients get Pro free (item 3, 2026-11-12)
 
 - A coach (`coach_links`) with 3 or more clients who each finished a workout in the last 14 days has Pro for as long as that holds (`coachEarnsPro`, worked out on every access check, nothing stored). `via: "coach"`; the Pro screen says "Pro comes with your account while 3 or more of your clients are training." Coaching (Settings › Coaching) says so under the invite code: "Pro is free for you while 3 or more of your clients are training (each with a workout in the last 14 days)."

@@ -46,3 +46,31 @@ export const ja: Partial<Record<Key, Message>> = {
   "pm.off": "片側から{off} {unit}を外す",
   "pm.add": "片側に{add} {unit}を追加",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "pm.same": "Mesmas anilhas: nada muda",
+  "pm.offAdd": "Tire {off}, depois coloque {add} {unit} de cada lado",
+  "pm.off": "Tire {off} {unit} de cada lado",
+  "pm.add": "Coloque {add} {unit} de cada lado",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "pm.same": "원판 그대로: 변경 없음",
+  "pm.offAdd": "한쪽당 {off} 빼고 {add} {unit} 추가",
+  "pm.off": "한쪽당 {off} {unit} 빼기",
+  "pm.add": "한쪽당 {add} {unit} 추가",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "pm.same": "Aynı plakalar: değişiklik yok",
+  "pm.offAdd": "Her yandan {off} çıkar, sonra {add} {unit} ekle",
+  "pm.off": "Her yandan {off} {unit} çıkar",
+  "pm.add": "Her yana {add} {unit} ekle",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "pm.same": "Te same talerze: bez zmian",
+  "pm.offAdd": "Zdejmij {off}, potem dodaj {add} {unit} z każdej strony",
+  "pm.off": "Zdejmij {off} {unit} z każdej strony",
+  "pm.add": "Dodaj {add} {unit} z każdej strony",
+};

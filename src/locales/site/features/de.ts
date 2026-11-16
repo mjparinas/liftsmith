@@ -141,6 +141,10 @@ export const de: FeaturesText = {
       name: "3D-Übungsdemos",
       body: "Jede Übung hat eine 3D-Figur, die die Bewegung mit dem passenden Gerät zeigt, mit Schritten zum Aufbau und Hinweisen.",
     },
+    "form-mistakes": {
+      name: "Häufige Fehler und wie du sie behebst",
+      body: "Jede Übung und jede Dehnung zeigt neben der 3D-Figur ihre zwei oder drei häufigsten Technikfehler, jeweils mit Lösung und warum es wichtig ist, und der Pausentimer zeigt dir einen für den nächsten Satz. Funktioniert offline.",
+    },
     "set-types": { name: "Dropsätze und Rest-Pause", body: "Füge zwischen den Sätzen einen Dropsatz oder einen Rest-Pause-Satz hinzu." },
     "timed-sets": {
       name: "Satztimer für Halten, Tragen und Cardio",
@@ -225,6 +229,10 @@ export const de: FeaturesText = {
     body: {
       name: "Gewicht, Körperfett und Fotos",
       body: "Trage Gewicht und Körperfett ein oder lass sie über die Gesundheits-App deines Handys von deiner Waage kommen, und behalte Fortschrittsfotos auf deinem Handy.",
+    },
+    "photo-compare": {
+      name: "Fortschrittsfotos, die zueinander passen",
+      body: "Die Kamera zeigt dein letztes Foto als blassen Umriss zum Ausrichten, mit Selbstauslöser zum Zurücktreten. Vergleiche zwei beliebige Tage per Schieberegler oder nebeneinander, jeweils mit deinem Gewicht an dem Tag. Fotos bleiben auf deinem Handy; eine Sicherungsdatei bringt sie auf ein neues.",
     },
     measurements: {
       name: "Körpermaße",
@@ -346,6 +354,11 @@ export const de: FeaturesText = {
       name: "Teilkarten und Links",
       body: "Teile ein Training, eine neue Bestleistung oder einen Meilenstein als Bild oder als öffentlichen Link mit Vorschau. Eine neue Bestleistung leuchtet golden auf und lässt sich gleich in der Pause teilen.",
     },
+    "screenshot-share": {
+      name: "Teilkarten beim Screenshot",
+      body: "Mach einen Screenshot, und ein Blatt mit Trainingskarten fährt hoch: dein letzter Monat, drei Monate, sechs Monate, das Jahr oder alles, als Summen, als Aufteilung deiner Sätze oder als deine besten Lifts. Wisch durch, blende die Gewichte mit dem Auge aus und teile sie mit deinem Einladungslink auf der Karte. Dieselben Karten findest du unter Mein Training teilen im Fortschritt. Jeder Link, den du teilst, trägt jetzt deine Einladung, in einem Link, der das auch sagt.",
+      note: "Screenshots öffnen es unter Android 14 und neuer und auf dem iPhone, und es lässt sich ausschalten. Sonst öffnest du es im Fortschritt. Unter 18-Jährige teilen ohne Einladungslink.",
+    },
     coaching: {
       name: "Kunden coachen",
       body: "Verknüpfe Kunden, sieh ihre Ergebnisse und weise ihnen Routinen zu, am Handy oder auf einem großen Bildschirm.",
@@ -426,8 +439,8 @@ export const de: FeaturesText = {
       body: "Das Training auf Wear OS und der Apple Watch: der Satz oder der Pausen-Countdown, der Puls der Uhr, Satz eintragen und +30 s, und ein Vibrieren, wenn die Pause endet.",
     },
     widgets: {
-      name: "Widget für den Startbildschirm",
-      body: "Die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen auf dem Startbildschirm.",
+      name: "Widgets für den Startbildschirm",
+      body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",
       note: "Die Web-App hat stattdessen Kurzbefehle auf ihrem Startbildschirm-Symbol.",
     },
     shortcuts: {
@@ -450,7 +463,7 @@ export const de: FeaturesText = {
     },
     cloud: {
       name: "Verbindungen zu Fitnessdiensten",
-      body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
+      body: "Oura liefert Schlaf, HRV, Ruhepuls und Schritte, über ein kostenloses Konto. Strava, Garmin Connect, WHOOP, Withings, Polar und Concept2 prüfen wir gerade.",
     },
     "health-save": {
       name: "Trainings in deiner Gesundheits-App",
@@ -481,8 +494,8 @@ export const de: FeaturesText = {
       body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
     languages: {
-      name: "Sechs Sprachen",
-      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch und Japanisch, passend zur Sprache deines Handys.",
+      name: "Zehn Sprachen",
+      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys.",
     },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",
@@ -621,6 +634,9 @@ export const de: FeaturesText = {
     },
     oura: { does: "Schlaf, HRV, Ruhepuls und Schritte rein" },
     strava: { does: "Jedes beendete Training wird auf Strava gepostet" },
+    "garmin-connect": {
+      does: "Schlaf, HRV, Ruhepuls, Schritte und Wiegungen der Index-Waage rein, dazu Läufe, Radfahrten und Ruder-Einheiten als Cardio-Trainings",
+    },
     whoop: { does: "Schlaf, Erholung, HRV und Ruhepuls rein" },
     withings: { does: "Gewicht, Körperfett, Schlaf und Schritte rein" },
     polar: { does: "Nightly Recharge, HRV und Schlaf rein" },

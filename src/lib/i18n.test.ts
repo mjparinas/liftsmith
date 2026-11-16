@@ -7,6 +7,10 @@ import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
 import { it as itCatalogue } from "@/locales/it";
 import { ja } from "@/locales/ja";
+import { ko } from "@/locales/ko";
+import { pl } from "@/locales/pl";
+import { pt } from "@/locales/pt";
+import { tr } from "@/locales/tr";
 
 import { CATEGORY_LABEL, TIER_LABEL } from "./achievements";
 import { RARITY_LABEL } from "./game";
@@ -39,7 +43,7 @@ const holes = (m: Message) =>
 afterEach(() => setLanguage("system"));
 
 describe("catalogues", () => {
-  for (const [name, cat] of Object.entries({ es, fr, de, it: itCatalogue, ja })) {
+  for (const [name, cat] of Object.entries({ es, fr, de, it: itCatalogue, ja, pt, ko, pl, tr })) {
     it(`${name} has every English key, and no others`, () => {
       expect(Object.keys(cat).sort()).toEqual(Object.keys(en).sort());
     });
@@ -70,12 +74,16 @@ describe("catalogue files", () => {
 
 describe("language", () => {
   it("follows the phone's first supported language, keeping its region for formats", () => {
-    expect(resolve(["pt-BR", "es-MX", "en-US"])).toEqual({ lang: "es", tag: "es-MX" });
+    expect(resolve(["zh-TW", "es-MX", "en-US"])).toEqual({ lang: "es", tag: "es-MX" });
     expect(resolve(["de-AT", "en-US"])).toEqual({ lang: "de", tag: "de-AT" });
     expect(resolve(["it-CH"])).toEqual({ lang: "it", tag: "it-CH" });
     expect(resolve(["ja-JP"])).toEqual({ lang: "ja", tag: "ja-JP" });
     expect(resolve(["fr-CA"])).toEqual({ lang: "fr", tag: "fr-CA" });
-    expect(resolve(["ko-KR"])).toEqual({ lang: "en", tag: "en" });
+    expect(resolve(["ko-KR"])).toEqual({ lang: "ko", tag: "ko-KR" });
+    expect(resolve(["pt-BR"])).toEqual({ lang: "pt", tag: "pt-BR" });
+    expect(resolve(["pl-PL", "en-US"])).toEqual({ lang: "pl", tag: "pl-PL" });
+    expect(resolve(["tr-TR"])).toEqual({ lang: "tr", tag: "tr-TR" });
+    expect(resolve(["zh-CN"])).toEqual({ lang: "en", tag: "en" });
     expect(resolve(["en-GB", "fr-FR"])).toEqual({ lang: "en", tag: "en-GB" });
   });
 

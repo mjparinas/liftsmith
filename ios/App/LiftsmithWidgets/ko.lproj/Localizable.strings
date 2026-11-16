@@ -1,0 +1,19 @@
+/* Korean text for the widget, the Control Center button and the Live Activity. Follows the phone's language. */
+"Start workout" = "운동 시작";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Liftsmith를 열고 오늘의 운동이나 이미 진행 중인 운동을 시작해요.";
+"Log set" = "세트 기록";
+"Logs the current set as planned. Does nothing when no workout is running." = "현재 세트를 계획대로 기록해요. 진행 중인 운동이 없으면 아무것도 하지 않아요.";
+"Add 30 seconds of rest" = "휴식 30초 추가";
+"Adds 30 seconds to the rest timer." = "휴식 타이머에 30초를 추가해요.";
+"Start today's workout in Liftsmith." = "Liftsmith에서 오늘의 운동을 시작하세요.";
+"Today's workout" = "오늘의 운동";
+"Today's workout and why, your weekly goal and coach's note, with Start." = "오늘의 운동과 그 이유, 주간 목표와 코치 노트, 시작 버튼까지.";
+"Lift" = "세트";
+"Next: %@" = "다음: %@";
+"Rest left" = "남은 휴식";
+"Rest over" = "휴식 끝";
+"%lld of %lld sets done" = "%2$lld세트 중 %1$lld세트 완료";
+"This week" = "이번 주";
+"Your week at a glance: days trained, your streak and what keeps it going, with Start." = "한눈에 보는 이번 주: 운동한 날, 연속 기록과 이어 가는 방법, 시작 버튼.";
+"Recovery" = "회복";
+"Which muscles are ready to train and when the rest will be, with Start." = "지금 운동할 수 있는 근육과 나머지가 회복되는 시점, 시작 버튼.";

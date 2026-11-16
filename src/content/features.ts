@@ -202,6 +202,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "form-mistakes",
+        name: "Common mistakes and their fixes",
+        body: "Every exercise and stretch lists its two or three most common form mistakes beside the 3D figure, each with a fix and why it matters, and the rest timer shows one to watch on your next set. Works offline.",
+        tier: "free",
+        added: "2026-11-16",
+      },
+      {
         id: "set-types",
         name: "Drop sets and rest-pause",
         body: "Add a drop set or a rest-pause set between sets.",
@@ -387,6 +394,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         landing: "body-tracking",
         added: LAUNCH,
+      },
+      {
+        id: "photo-compare",
+        name: "Progress photos that line up",
+        body: "The camera shows your last photo as a faint outline to line up with, with a timer to step back. Compare any two dates with a slider or side by side, each with what you weighed that day. Photos stay on your phone; a backup file can carry them to a new one.",
+        tier: "free",
+        added: "2026-11-15",
       },
       {
         id: "measurements",
@@ -635,6 +649,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-10",
       },
+      {
+        id: "screenshot-share",
+        name: "Share cards when you take a screenshot",
+        body: "Take a screenshot and a sheet of training cards slides up: your last month, three months, six months, year or all time, as totals, where your sets went or your best lifts. Swipe through, hide the weights with the eye, and share with your invite link printed on the card. The same cards are under Share my training on Progress. Every link you share now carries your invite, in a link that says so.",
+        tier: "free",
+        note: "Screenshots open it on Android 14 and up and on iPhone, and it can be turned off. Elsewhere, open it from Progress. Lifters under 18 share without an invite link.",
+        added: "2026-11-16",
+      },
     ],
   },
   {
@@ -807,12 +829,12 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       },
       {
         id: "widgets",
-        name: "Home-screen widget",
-        body: "Today's call, your weekly goal, a coach's note and Start or Log set on the home screen.",
+        name: "Home-screen widgets",
+        body: "Three widgets: Today (the day's call, your weekly goal, a coach's note and Start or Log set), This week (days trained, your streak and what keeps it going) and Recovery (which muscles are ready to train and when the rest will be).",
         tier: "free",
         where: "phones",
         note: "The web app has shortcuts on its home-screen icon instead.",
-        added: "2026-11-10",
+        added: "2026-11-15",
       },
       {
         id: "shortcuts",
@@ -848,7 +870,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "cloud",
         name: "Fitness service connections",
-        body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, WHOOP, Withings, Polar and Concept2.",
+        body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, Garmin Connect, WHOOP, Withings, Polar and Concept2.",
         tier: "pro",
         pro: "cloudConnections",
         added: "2026-11-10",
@@ -919,10 +941,10 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     features: [
       {
         id: "languages",
-        name: "Six languages",
-        body: "English, Spanish, French, German, Italian and Japanese, following your phone's language.",
+        name: "Ten languages",
+        body: "English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, following your phone's language.",
         tier: "free",
-        added: "2026-11-10",
+        added: "2026-11-15",
       },
       {
         id: "appearance",
@@ -1291,6 +1313,15 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
         id: "strava",
         name: "Strava",
         does: "Each finished workout posted to Strava",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
+        tier: "pro",
+      },
+      {
+        id: "garmin-connect",
+        name: "Garmin Connect",
+        does: "Sleep, HRV, resting heart rate, steps and Index scale weigh-ins in, and runs, rides and indoor rows as cardio workouts",
         android: "investigating",
         ios: "investigating",
         web: "investigating",

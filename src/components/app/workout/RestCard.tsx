@@ -16,6 +16,7 @@ import { effortChoices } from "@/lib/training";
 import type { EffortScale, Exercise, Gym, Routine, SetEvent, SetTag } from "@/lib/types";
 
 import { clock, loadText, repsText } from "../format";
+import { FormCheckLine } from "../FormFaults";
 import { PainSelect } from "../Injuries";
 import { PlateBar, type PlateFinish } from "../Plates";
 import { HUE } from "../theme";
@@ -139,6 +140,7 @@ export function RestCard({
         )}
         <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} since={active.startedAt - 1} />
         <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
+        {profile.delight?.formCheck !== false && !ex.custom && <FormCheckLine ex={ex} setsDone={doneSets} />}
       </div>
       <RestExtra left={left} gym={gym} />
       <TipCard active={active} setsLogged={setsLogged} />

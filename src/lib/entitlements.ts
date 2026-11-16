@@ -21,7 +21,7 @@ import { hasPro } from "./billing";
 // Labs, the experimental features (camera rep counting among them; "labs", 2026-11-10), is Pro.
 // Free vs Pro rebalance (Melvin picked it, 2026-11-12; docs/decisions/money.md): advanced stats are Pro in the
 // app too (weekly sets per muscle, one-rep max trend lines, an exercise's trend); the cloud connections (Strava,
-// Oura, Whoop, Withings, Polar, Concept2) are Pro, while Health Connect and Apple Health stay free; "Short on
+// Garmin Connect, Oura, Whoop, Withings, Polar, Concept2) are Pro, while Health Connect and Apple Health stay free; "Short on
 // time" is free, the rest of changing the plan mid-workout stays Pro; free lifters get one adaptive workout a
 // week (freeAdaptive.ts) and a free program that fits their gym (freeProgramFor in programs.ts).
 // Trainer mode out of Labs (Melvin picked it, 2026-11-12; docs/decisions/trainer-mode.md): coaching clients is its own

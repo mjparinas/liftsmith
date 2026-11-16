@@ -82,3 +82,55 @@ export const ja: Partial<Record<Key, Message>> = {
   "activity.heavy.detail": "週6〜7日",
   "activity.athlete.detail": "1日2回、または肉体労働とトレーニング",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "Sedentário",
+  "activity.light": "Exercício leve",
+  "activity.moderate": "Exercício moderado",
+  "activity.heavy": "Exercício intenso",
+  "activity.athlete": "Atleta",
+  "activity.sedentary.detail": "Trabalho sentado, pouco ou nenhum exercício",
+  "activity.light.detail": "1 a 2 dias por semana",
+  "activity.moderate.detail": "3 a 5 dias por semana",
+  "activity.heavy.detail": "6 a 7 dias por semana",
+  "activity.athlete.detail": "Duas vezes por dia, ou trabalho físico mais treino",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "좌식 생활",
+  "activity.light": "가벼운 운동",
+  "activity.moderate": "보통 운동",
+  "activity.heavy": "강도 높은 운동",
+  "activity.athlete": "운동선수",
+  "activity.sedentary.detail": "사무직, 운동을 거의 또는 전혀 안 함",
+  "activity.light.detail": "주 1~2일",
+  "activity.moderate.detail": "주 3~5일",
+  "activity.heavy.detail": "주 6~7일",
+  "activity.athlete.detail": "하루 두 번, 또는 육체노동과 운동 병행",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "Hareketsiz",
+  "activity.light": "Hafif egzersiz",
+  "activity.moderate": "Orta düzey egzersiz",
+  "activity.heavy": "Yoğun egzersiz",
+  "activity.athlete": "Sporcu",
+  "activity.sedentary.detail": "Masa başı iş, az ya da hiç egzersiz",
+  "activity.light.detail": "Haftada 1-2 gün",
+  "activity.moderate.detail": "Haftada 3-5 gün",
+  "activity.heavy.detail": "Haftada 6-7 gün",
+  "activity.athlete.detail": "Günde iki kez ya da fiziksel bir iş artı antrenman",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "Siedzący tryb życia",
+  "activity.light": "Lekka aktywność",
+  "activity.moderate": "Umiarkowana aktywność",
+  "activity.heavy": "Duża aktywność",
+  "activity.athlete": "Sportowiec",
+  "activity.sedentary.detail": "Praca przy biurku, mało lub brak ruchu",
+  "activity.light.detail": "1–2 dni w tygodniu",
+  "activity.moderate.detail": "3–5 dni w tygodniu",
+  "activity.heavy.detail": "6–7 dni w tygodniu",
+  "activity.athlete.detail": "Dwa razy dziennie lub praca fizyczna plus trening",
+};

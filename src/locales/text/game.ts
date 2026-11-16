@@ -83,3 +83,61 @@ export const ja: Partial<Record<Key, Message>> = {
   "game.thisWeek": "今週",
   "game.almost": "あと少し：",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "game.freezeSaves": {
+    one: "A meta desta semana não dá mais para alcançar. Um congelamento vai salvar sua sequência de {count} semana.",
+    other: "A meta desta semana não dá mais para alcançar. Um congelamento vai salvar sua sequência de {count} semanas.",
+  },
+  "game.streakResets": {
+    one: "A meta desta semana não dá mais para alcançar, então sua sequência de {count} semana recomeça na segunda. A cada 4 semanas com meta cumprida você ganha um congelamento.",
+    other:
+      "A meta desta semana não dá mais para alcançar, então sua sequência de {count} semanas recomeça na segunda. A cada 4 semanas com meta cumprida você ganha um congelamento.",
+  },
+  "game.thisWeek": "Esta semana",
+  "game.almost": "Quase lá:",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "game.freezeSaves": {
+    other: "이번 주 목표는 달성할 수 없어요. 프리즈가 {count}주 연속 기록을 지켜 줄 거예요.",
+  },
+  "game.streakResets": {
+    other:
+      "이번 주 목표는 달성할 수 없어서 {count}주 연속 기록이 월요일에 다시 시작돼요. 목표를 달성한 주가 4번 쌓일 때마다 프리즈를 받아요.",
+  },
+  "game.thisWeek": "이번 주",
+  "game.almost": "거의 다 왔어요:",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "game.freezeSaves": {
+    one: "Bu haftanın hedefine artık ulaşılamaz. Bir dondurma {count} haftalık serini kurtaracak.",
+    other: "Bu haftanın hedefine artık ulaşılamaz. Bir dondurma {count} haftalık serini kurtaracak.",
+  },
+  "game.streakResets": {
+    one: "Bu haftanın hedefine artık ulaşılamaz, bu yüzden {count} haftalık serin pazartesi yeniden başlar. Hedefe ulaşılan her 4 hafta bir dondurma kazandırır.",
+    other:
+      "Bu haftanın hedefine artık ulaşılamaz, bu yüzden {count} haftalık serin pazartesi yeniden başlar. Hedefe ulaşılan her 4 hafta bir dondurma kazandırır.",
+  },
+  "game.thisWeek": "Bu hafta",
+  "game.almost": "Az kaldı:",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "game.freezeSaves": {
+    one: "Cel na ten tydzień jest już poza zasięgiem. Zamrożenie uratuje twoją passę ({count} tydz.).",
+    few: "Cel na ten tydzień jest już poza zasięgiem. Zamrożenie uratuje twoją passę ({count} tyg.).",
+    many: "Cel na ten tydzień jest już poza zasięgiem. Zamrożenie uratuje twoją passę ({count} tyg.).",
+    other: "Cel na ten tydzień jest już poza zasięgiem. Zamrożenie uratuje twoją passę ({count} tyg.).",
+  },
+  "game.streakResets": {
+    one: "Cel na ten tydzień jest już poza zasięgiem, więc twoja passa ({count} tydz.) zacznie się od nowa w poniedziałek. Co 4 tygodnie z osiągniętym celem dają zamrożenie.",
+    few: "Cel na ten tydzień jest już poza zasięgiem, więc twoja passa ({count} tyg.) zacznie się od nowa w poniedziałek. Co 4 tygodnie z osiągniętym celem dają zamrożenie.",
+    many: "Cel na ten tydzień jest już poza zasięgiem, więc twoja passa ({count} tyg.) zacznie się od nowa w poniedziałek. Co 4 tygodnie z osiągniętym celem dają zamrożenie.",
+    other:
+      "Cel na ten tydzień jest już poza zasięgiem, więc twoja passa ({count} tyg.) zacznie się od nowa w poniedziałek. Co 4 tygodnie z osiągniętym celem dają zamrożenie.",
+  },
+  "game.thisWeek": "Ten tydzień",
+  "game.almost": "Już prawie:",
+};

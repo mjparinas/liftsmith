@@ -1,4 +1,5 @@
 import { defaultProfile } from "./defaults";
+import { parseSavedPhotos, type SavedPhoto } from "./photos";
 import type { AppEvent, Gym, Profile } from "./types";
 
 // Restore a full backup (Settings › Saving and backup; Melvin, 2026-11-09: "it's not clear how to save
@@ -13,9 +14,12 @@ export interface Backup {
   gyms: Gym[];
   events: AppEvent[];
   exportedAt?: string;
+  /** Progress photos, when the lifter chose to include them (they never sync; the file is how they move). */
+  photos: SavedPhoto[];
 }
 
-const MAX_BYTES = 50_000_000;
+/** Big enough for a few hundred progress photos (about 400 KB each as base64). */
+const MAX_BYTES = 300_000_000;
 const obj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
 
 /** Reads a Liftsmith backup file, or null when it isn't one. Bad events and gyms are dropped, not trusted. */
@@ -38,7 +42,13 @@ export function parseBackup(text: string): Backup | null {
   );
   const profile = { ...defaultProfile(), ...(raw.profile as Partial<Profile>) } as Profile;
   if (!gyms.some((g) => g.id === profile.activeGymId)) profile.activeGymId = gyms[0]?.id ?? profile.activeGymId;
-  return { profile, gyms, events, exportedAt: typeof raw.exportedAt === "string" ? raw.exportedAt : undefined };
+  return {
+    profile,
+    gyms,
+    events,
+    exportedAt: typeof raw.exportedAt === "string" ? raw.exportedAt : undefined,
+    photos: parseSavedPhotos(raw.photos),
+  };
 }
 
 /** What this device holds after restoring `b`: nothing on the device is removed. */

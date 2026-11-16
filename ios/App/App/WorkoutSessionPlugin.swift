@@ -21,6 +21,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(StoreReviewPlugin())
         bridge?.registerPluginInstance(AppUpdatePlugin())
         bridge?.registerPluginInstance(NowPlayingPlugin())
+        bridge?.registerPluginInstance(ScreenshotsPlugin())
         // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
         // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
         webView?.allowsBackForwardNavigationGestures = true
@@ -251,7 +252,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
     @objc func setWidget(_ call: CAPPluginCall) {
         guard let json = call.getString("json") else { return call.resolve() }
         UserDefaults(suiteName: "group.com.getliftsmith.app")?.set(json, forKey: "widget")
-        WidgetCenter.shared.reloadTimelines(ofKind: "QuickStart")
+        // Today, This week and Recovery all read this one snapshot.
+        WidgetCenter.shared.reloadAllTimelines()
         call.resolve()
     }
 

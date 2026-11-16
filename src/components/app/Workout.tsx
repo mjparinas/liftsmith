@@ -48,6 +48,7 @@ import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { clock, loadText, repsText, setText } from "./format";
+import { FaultList, faultsFor } from "./FormFaults";
 import { Icon } from "./icons";
 import { useMyShape } from "./myShape";
 import { NowPlayingBar } from "./NowPlaying";
@@ -1000,6 +1001,7 @@ export function Workout() {
                 </li>
               ))}
             </ol>
+            <FaultList faults={faultsFor(ex)} />
             <NoteEditor
               key={ex.id + note}
               initial={note}

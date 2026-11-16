@@ -40,3 +40,27 @@ export const ja: Partial<Record<Key, Message>> = {
   "exp.intermediate": "少し経験あり",
   "exp.advanced": "経験者",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "exp.new": "Iniciante",
+  "exp.intermediate": "Intermediário",
+  "exp.advanced": "Experiente",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "exp.new": "처음",
+  "exp.intermediate": "조금 해봤어요",
+  "exp.advanced": "숙련",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "exp.new": "Yeni",
+  "exp.intermediate": "Biraz",
+  "exp.advanced": "Deneyimli",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "exp.new": "Początkujący",
+  "exp.intermediate": "Trochę",
+  "exp.advanced": "Doświadczony",
+};

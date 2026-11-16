@@ -5,6 +5,7 @@ import { joinCoach, makeInvite } from "./coach";
 import {
   checkoutFor,
   clientPrices,
+  dashboardUrl,
   endPair,
   feeFor,
   forgetCoachPay,
@@ -70,16 +71,19 @@ describe("setting up", () => {
     });
   });
 
-  it("makes one Express account and links to Stripe's setup pages", async () => {
+  it("makes one account with the full Stripe dashboard and links to Stripe's setup pages", async () => {
     expect(await onboardUrl(CFG, "coach", "coach@example.com", NOW, fake)).toBe("https://connect.stripe.com/setup/x");
     await onboardUrl(CFG, "coach", "coach@example.com", NOW, fake);
     expect(calls.filter((c) => c.url.endsWith("/accounts"))).toHaveLength(1);
-    expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[stripe_dashboard][type]")}=express`);
+    expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[stripe_dashboard][type]")}=full`);
     expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[losses][payments]")}=stripe`);
     expect(calls[0]!.body).toContain(`${encodeURIComponent("controller[fees][payer]")}=account`);
     expect(calls[0]!.body).not.toContain("type=express");
     charges = false;
     expect(await refreshAccount(CFG, "coach", NOW, fake)).toEqual({ ready: false, currency: "cad" });
+    // Open Stripe goes to Stripe's own dashboard; there are no login links for a full-dashboard account.
+    expect(await dashboardUrl("coach")).toBe("https://dashboard.stripe.com/");
+    expect(await dashboardUrl("nobody")).toBeNull();
   });
 });
 

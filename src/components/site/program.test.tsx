@@ -78,12 +78,12 @@ describe("program pages", () => {
     }
   });
 
-  it("puts every copy in the sitemap with all six languages, with a lift's card", () => {
+  it("puts every copy in the sitemap with all ten languages, with a lift's card", () => {
     const routes = new Map(siteRoutes().map((r) => [r.path, r]));
     for (const path of ["/programs/", ...PROGRAMS.map((p) => programPath(p.id))])
       for (const lang of SITE_LANGS) {
         const r = routes.get(localPath(lang, path));
-        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(7);
+        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(11);
       }
     for (const id of Object.values(PROGRAM_FIGURE)) expect(EXERCISE_BY_ID.has(id!), id).toBe(true);
     expect(ogFile("/fr/programs/classic-5x5/")).toBe("exercises/back-squat.jpg");
@@ -97,13 +97,16 @@ describe("program pages", () => {
     expect(screen.getByRole("heading", { name: "What it trains most" })).toBeTruthy();
   });
 
-  it("draws every program in every language without a missing line", () => {
-    for (const lang of SITE_LANGS)
-      for (const p of PROGRAMS) {
-        const { container } = render(<ProgramView lang={lang} id={p.id} />);
-        expect(container.textContent, `${lang} ${p.id}`).not.toMatch(/\{\w+\}|undefined|NaN/);
-        cleanup();
-      }
+  // One test per language, so ten languages stay well inside the 20 s limit under coverage.
+  it.each(SITE_LANGS)("draws every program in %s without a missing line", (lang) => {
+    for (const p of PROGRAMS) {
+      const { container } = render(<ProgramView lang={lang} id={p.id} />);
+      expect(container.textContent, `${lang} ${p.id}`).not.toMatch(/\{\w+\}|undefined|NaN/);
+      cleanup();
+    }
+  });
+
+  it("draws the programs index", () => {
     render(<ProgramsIndexView lang="ja" />);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(PROGRAM_TEXT.ja.index.h1);
   });

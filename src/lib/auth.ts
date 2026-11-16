@@ -249,7 +249,18 @@ export function loadScript(src: string): Promise<void> {
 }
 
 /** Apple's sign-in script per app language (one script per locale in its path). */
-const APPLE_LOCALE: Record<Lang, string> = { en: "en_US", es: "es_ES", fr: "fr_FR", de: "de_DE", it: "it_IT", ja: "ja_JP" };
+const APPLE_LOCALE: Record<Lang, string> = {
+  en: "en_US",
+  es: "es_ES",
+  fr: "fr_FR",
+  de: "de_DE",
+  it: "it_IT",
+  ja: "ja_JP",
+  pt: "pt_BR",
+  ko: "ko_KR",
+  pl: "pl_PL",
+  tr: "tr_TR",
+};
 
 export function signInApple(): Promise<Account> {
   return withBusy(async () => {

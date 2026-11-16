@@ -40,3 +40,27 @@ export const ja: Partial<Record<Key, Message>> = {
   "appearance.light": "ライト",
   "appearance.system": "システムに合わせる",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "appearance.dark": "Escuro",
+  "appearance.light": "Claro",
+  "appearance.system": "Igual ao sistema",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "appearance.dark": "다크",
+  "appearance.light": "라이트",
+  "appearance.system": "시스템 설정 따르기",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "appearance.dark": "Koyu",
+  "appearance.light": "Açık",
+  "appearance.system": "Sisteme uy",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "appearance.dark": "Ciemny",
+  "appearance.light": "Jasny",
+  "appearance.system": "Jak w systemie",
+};

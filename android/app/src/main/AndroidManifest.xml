@@ -39,6 +39,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/app" />
+                <!-- Invite links, www.getliftsmith.com/invite/<code> (src/lib/appLinks.ts, 2026-11-15). -->
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/invite" />
             </intent-filter>
 
         </activity>
@@ -178,6 +180,28 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_workout_info" />
         </receiver>
 
+        <!-- This week widget: the week strip, streak and what keeps it going, with Start (WeekWidget.java). -->
+        <receiver
+            android:name=".WeekWidget"
+            android:exported="false"
+            android:label="@string/widget_week_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_week_info" />
+        </receiver>
+
+        <!-- Recovery widget: body areas ready to train and the ones still recovering, with Start (RecoveryWidget.java). -->
+        <receiver
+            android:name=".RecoveryWidget"
+            android:exported="false"
+            android:label="@string/widget_recovery_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_recovery_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -198,6 +222,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Android 14+: hear that the lifter took a screenshot of Liftsmith, to offer share cards (ScreenshotsPlugin). Install-time, no prompt. -->
+    <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE" />
     <!-- Rep counter lab: camera frames are analysed on the device and never stored or sent. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />

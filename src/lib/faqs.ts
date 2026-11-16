@@ -117,7 +117,7 @@ export const HELP: HelpTopic[] = [
       },
       {
         q: "Which languages does it speak?",
-        a: "The app is in English, Spanish, French, German, Italian and Japanese, and follows your phone's language unless you pick one in Settings. This site's home and pricing pages are in all six too.",
+        a: "The app is in English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, and follows your phone's language unless you pick one in Settings. This site's home and pricing pages are in all ten too.",
       },
     ],
   },
