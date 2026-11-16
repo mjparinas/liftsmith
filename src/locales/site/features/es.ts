@@ -403,6 +403,11 @@ export const es: FeaturesText = {
       name: "En el directorio de entrenadores",
       body: "Apúntate como entrenador personal, coach o fisioterapeuta en tu gimnasio y aparecerás en la página del gimnasio y en el directorio de entrenadores de su ciudad en la web, con tu presentación y un enlace para que nuevos clientes entrenen contigo. Solo aparecen adultos.",
     },
+    "coach-reviews": {
+      name: "Valoraciones y reseñas de clientes reales",
+      body: "Los clientes valoran a su entrenador, entrenador personal o fisioterapeuta con estrellas y una reseña breve tras cuatro semanas o dos sesiones juntos. La valoración aparece cuando tiene tres reseñas, junto a cuántos de sus clientes entrenaron en las últimas dos semanas, en su invitación y en el directorio de entrenadores. El entrenador responde una vez a cada una y cualquiera puede denunciar una reseña. Solo los adultos pueden dejar una.",
+      proPart: "Dejar una reseña es gratis; entrenar a clientes es Pro.",
+    },
     "coach-plans": {
       name: "Planes de entrenador que crecen con tu lista de clientes",
       body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y con Coach y Coach Plus Liftsmith no se queda nada de lo que te pagan. Con Pro se queda un 2 %.",
@@ -421,8 +426,8 @@ export const es: FeaturesText = {
       body: "El entrenamiento en Wear OS y Apple Watch: la serie o la cuenta atrás del descanso, el pulso del reloj, Registrar serie y +30 s, y una vibración al terminar el descanso.",
     },
     widgets: {
-      name: "Widget en la pantalla de inicio",
-      body: "La decisión de hoy, tu meta semanal, una nota del entrenador y Empezar o Registrar serie en la pantalla de inicio.",
+      name: "Widgets en la pantalla de inicio",
+      body: "Tres widgets: Hoy (la decisión del día, tu meta semanal, una nota del entrenador y Empezar o Registrar serie), Esta semana (días entrenados, tu racha y qué la mantiene) y Recuperación (qué músculos están listos para entrenar y cuándo lo estará el resto).",
       note: "La app web tiene accesos directos en su icono de inicio en su lugar.",
     },
     shortcuts: {

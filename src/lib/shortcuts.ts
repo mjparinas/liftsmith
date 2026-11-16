@@ -12,8 +12,9 @@ import { useApp } from "./store";
 // The native side hands the action to the WorkoutSession plugin's "action" event, the same event the
 // lock-screen notification buttons use.
 
-export type ShortcutAction = "start" | "log" | "add30";
-export const SHORTCUT_ACTIONS: readonly ShortcutAction[] = ["start", "log", "add30"];
+export type ShortcutAction = "start" | "log" | "add30" | "muscles";
+/** "muscles" opens Body's muscle view: the Recovery widget's tap (2026-11-15). */
+export const SHORTCUT_ACTIONS: readonly ShortcutAction[] = ["start", "log", "add30", "muscles"];
 
 export const isShortcut = (a: unknown): a is ShortcutAction => typeof a === "string" && (SHORTCUT_ACTIONS as readonly string[]).includes(a);
 
@@ -23,9 +24,10 @@ export const isShortcut = (a: unknown): a is ShortcutAction => typeof a === "str
  * nothing without one, so a stray tap can never log a set nobody did. `at` is when a notification button was
  * tapped (sessionNotify.ts `onSessionAction`), so a tap made with the app closed is logged at its own time.
  */
-export function runShortcut(action: ShortcutAction, at?: number): "workout" | "today" {
+export function runShortcut(action: ShortcutAction, at?: number): "workout" | "today" | "recovery" {
   const s = useApp.getState();
   if (!s.ready || !s.profile.onboarded) return "today";
+  if (action === "muscles") return "recovery";
   if (action === "start") {
     if (!s.active) s.start();
     return useApp.getState().active ? "workout" : "today";

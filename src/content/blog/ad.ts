@@ -1,65 +1,64 @@
 import type { Article } from "../articles";
 
-// Blog, part thirty: progress photos that line up (Melvin, 2026-11-15, docs/decisions/progress-photos.md). Only what
-// ships, and no other app named (seo.test.ts).
+// Blog, part thirty: ratings and reviews for coaches, personal trainers and physios (Melvin, 2026-11-15,
+// docs/decisions/coach-reviews.md). Only what ships, and no other app named (seo.test.ts).
 export const BLOG_AD: Article[] = [
   {
-    slug: "progress-photos-that-line-up",
+    slug: "coach-ratings-and-reviews",
     kind: "blog",
-    title: "Progress photos that line up, and compare any two dates",
+    title: "Coach ratings and reviews from clients who trained with them",
     description:
-      "Take progress photos with your last one as an outline to line up with, then compare any two dates with a slider or side by side. They stay on your phone.",
+      "Clients can now rate their coach after four weeks or two sessions. Ratings show after three reviews, next to how their clients are training.",
     date: "2026-11-15",
-    tag: "Tracking",
-    cta: "plan",
+    tag: "Coaching",
+    cta: "coach",
     body: [
       {
-        p: "The mirror lies by being there every day. Change in your body is slow, so you only see it when you put two photos weeks apart next to each other. That only works if the two photos are taken the same way: same spot, same distance, same light. Liftsmith's progress photos now help with exactly that.",
+        p: "Picking a coach is a leap of faith. Star ratings help, but most review sites can't tell whether the person writing ever trained with the coach. In Liftsmith, only a coach's own clients can rate them, and only after they've worked together long enough to know.",
       },
-      { h2: "Line it up with last time" },
-      {
-        p: "Open Progress › Body and photos, pick front, side or back, and tap Add a photo. The camera opens with your last photo of that pose as a faint outline over the live picture. Step until your outline matches, and the new photo is framed like the old one. A 3 or 10 second timer gives you time to put the phone down and step back.",
-      },
-      {
-        p: "You check the photo before it's kept, and you can still choose one that's already on your phone instead.",
-      },
-      { h2: "Compare any two dates" },
+      { h2: "Who can leave a review" },
       {
         ul: [
-          "Start with your first and latest photo, then move either side to an older or newer one with the arrows.",
-          "Wipe between them with a slider, or put them side by side.",
-          "Each photo shows what you weighed that week, and the line under them says how far apart they are and how much your weight changed.",
+          "A client of that coach, personal trainer or physio in the app.",
+          "After four weeks together, or sooner once they've had two paid or booked sessions.",
+          "Adults only: clients under 18 can't leave public reviews.",
+          "One review per coach, which the client can change or delete at any time.",
         ],
       },
-      { cta: "plan" },
-      { h2: "Every four weeks is enough" },
       {
-        p: "Under the photos, Liftsmith says when your next one is due: four weeks after the last. Weekly photos mostly show water and lighting. Monthly ones show training. Weigh in the same morning and both stories line up.",
+        p: "Rating takes one tap on a star under your coach on Coaching, plus an optional line about what it was like. Your first name and last initial show with it.",
       },
-      { h2: "Private by default" },
+      { cta: "coach" },
+      { h2: "Fair to new coaches" },
       {
-        p: "Progress photos stay on your phone. They're never uploaded, never synced to your account and never seen by a coach. If you want them on a new phone, switch on Include progress photos in Settings › Saving and backup and keep the backup file somewhere private. Signing out offers the same backup before your photos are removed.",
+        p: "A coach's rating stays hidden until they have three reviews, so one unhappy client can't sink someone who's just starting out. The coach sees every review from the first one, so they can thank a client or answer a concern, with one public reply to each.",
+      },
+      { h2: "Results, not just stars" },
+      {
+        p: "Next to the stars, once a coach has three or more clients, Liftsmith shows how many of them trained in the last two weeks, counted from their logged workouts. It's a plain measure of whether a coach keeps people training, and it can't be written by a friend.",
+      },
+      { h2: "Where reviews show" },
+      {
+        p: "Ratings and the latest reviews show on a coach's invite, before you agree to train with them, and on the trainer directory for their city on the website, with the stars search engines read.",
+      },
+      { h2: "Keeping it honest" },
+      {
+        p: "Reviews and replies go through the same word and link filter as Friends. Anyone can report a review or a reply, and one that three people report is hidden until we look at it.",
       },
       {
-        p: "Adults can share a pair as one side by side image through the phone's share sheet, with the dates and weights under it. Nothing is shared unless you tap it, and lifters under 18 don't get the option at all.",
-      },
-      {
-        tip: "Same time of day, same clothes, relaxed and then flexed. Morning, before food, is the most repeatable.",
+        tip: "Coaches: once a client has trained with you for a month, ask them for a review. Three honest reviews are what turns your rating on.",
       },
     ],
     faq: [
       [
-        "Are my progress photos uploaded anywhere?",
-        "No. They stay in the app's storage on your phone. They only leave it in a backup file you make yourself, or an image you choose to share.",
+        "Can a coach delete a bad review?",
+        "No. A coach can reply once, publicly, and report a review that breaks the rules. Only the client who wrote it, or our moderators, can take it down.",
       ],
       [
-        "Does this work in the web app?",
-        "Yes. The web app uses your computer's or phone's camera the same way, and the photos stay in that browser.",
+        "What happens to my review if I stop training with my coach?",
+        "It stays up, and you can still delete it. You can't change it once you're no longer their client.",
       ],
-      [
-        "Why does the front camera look mirrored?",
-        "The live picture is mirrored like a mirror, so moving left moves left. The saved photo isn't mirrored, the same as your phone's own camera, and the outline is drawn to match.",
-      ],
+      ["Does it cost anything?", "No. Being a client is free, and so is leaving a review. Coaches see their reviews on any plan."],
     ],
   },
 ];

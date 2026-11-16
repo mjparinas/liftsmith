@@ -793,4 +793,27 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Bei Nicht stören oder im Urlaub warten Chat-Benachrichtigungen, bis du zurück bist.",
   },
+  "coach-reviews": {
+    title: "Bewertungen deiner Kunden",
+    intro: "Kunden, die mit dir trainiert haben, können dich jetzt bewerten, und neue Kunden sehen es.",
+    points: [
+      "Ein Kunde kann nach vier Wochen oder zwei Einheiten mit dir Sterne und eine kurze Bewertung abgeben.",
+      "Deine Bewertung erscheint ab drei Bewertungen in deiner Einladung und im Trainerverzeichnis.",
+      "Daneben: wie viele deiner Kunden in den letzten zwei Wochen trainiert haben.",
+      "Antworte unter Coaching › Einrichtung einmal auf jede Bewertung und melde, was gegen die Regeln verstößt.",
+    ],
+    dyk: "Nur Erwachsene können bewerten, und ein unzufriedener Kunde kann einen neuen Coach nicht versenken: Vor drei Bewertungen wird nichts angezeigt.",
+  },
+  widgets: {
+    title: "Zwei neue Widgets für den Startbildschirm",
+    intro:
+      "Neben dem Heute-Widget beantworten zwei weitere eine Frage auf einen Blick: Liege ich diese Woche im Plan, und was ist bereit fürs Training?",
+    points: [
+      "Diese Woche: die Tage, an denen du trainiert hast, die geplanten, deine Serie und wie viele Tage sie noch halten.",
+      "Erholung: welche Körperbereiche bereit fürs Training sind und wann der Rest so weit ist.",
+      "Erholung aktualisiert sich selbst, während die Muskeln sich erholen, auch bei geschlossener App und ohne den Akku zu belasten.",
+      "Jedes hat Start, so ist das heutige Training einen Tipp entfernt.",
+    ],
+    dyk: "Tippe auf das Erholung-Widget, um die Erholungskarte in der App zu öffnen.",
+  },
 };

@@ -103,11 +103,11 @@ public class WorkoutSessionPlugin extends Plugin {
         deliver(intent);
     }
 
-    /** Shortcut links: liftsmith://start, liftsmith://log, liftsmith://add30. Anything else is ignored. */
+    /** Shortcut links: liftsmith://start, log, add30 and muscles (the Recovery widget). Anything else is ignored. */
     static String shortcutAction(Uri uri) {
         if (uri == null || !"liftsmith".equals(uri.getScheme())) return null;
         String a = uri.getHost();
-        return "start".equals(a) || "log".equals(a) || "add30".equals(a) ? a : null;
+        return "start".equals(a) || "log".equals(a) || "add30".equals(a) || "muscles".equals(a) ? a : null;
     }
 
     private boolean deliver(Intent intent) {

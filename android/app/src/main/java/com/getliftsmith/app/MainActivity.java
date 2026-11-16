@@ -1,8 +1,11 @@
 package com.getliftsmith.app;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.webkit.WebSettings;
+import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -21,6 +24,12 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StoreReviewPlugin.class);
         registerPlugin(AppUpdatePlugin.class);
         registerPlugin(NowPlayingPlugin.class);
+        // Edge to edge on every Android version, not only 15+ where it's enforced: the page draws under the
+        // status and navigation bars and keeps clear of them with env(safe-area-inset-*) (Capacitor's SystemBars
+        // passes the insets through). Transparent bars with light icons to start, as the app opens dark; the
+        // page switches the icons with the theme (src/lib/appearance.ts). Replaces @capacitor/status-bar, whose
+        // colour calls Play flags as deprecated edge-to-edge APIs (docs/decisions/platform-deltas.md).
+        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
         super.onCreate(savedInstanceState);
         // The app fills the screen and doesn't pinch or double-tap zoom (src/lib/nativeZoom.ts locks the
         // page's viewport too). Text size follows the phone's own setting through TextZoom instead.

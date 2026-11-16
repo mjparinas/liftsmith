@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { COMPETITORS } from "@/content/compare";
 import { addDays, atTime, parts, zoned } from "@/lib/messages";
@@ -38,6 +38,21 @@ const send = (key: string, kind: Send["kind"], at: number, status: Send["status"
 });
 const byId = (id: string) => WEEKLY.find((e) => e.id === id)!;
 const placeholders = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+
+/**
+ * Brand-new feature emails (`fresh`) go out first to everyone, so while one is on the list it leads every queue.
+ * The order tests are about the list underneath, so they set the real fresh emails aside (and add their own).
+ */
+function setFreshAside() {
+  let aside: WeeklyEmail[] = [];
+  beforeAll(() => {
+    aside = WEEKLY.filter((e) => e.fresh);
+    for (const e of aside) WEEKLY.splice(WEEKLY.indexOf(e), 1);
+  });
+  afterAll(() => {
+    WEEKLY.push(...aside);
+  });
+}
 
 describe("the weekly tips' words", () => {
   it("has every email in every language, with the same number of points", () => {
@@ -87,6 +102,7 @@ describe("the weekly tips' words", () => {
 });
 
 describe("who gets which", () => {
+  setFreshAside();
   const coach = { roles: ["coach" as const], flags: { coachPlans: false } };
   it("sends role emails only to that role, keeps lifter emails from roles they'd repeat, and waits for flags", () => {
     expect(forAccount(byId("coach-clients"), NO_FACTS)).toBe(false);
@@ -113,6 +129,7 @@ describe("who gets which", () => {
 });
 
 describe("when they go out", () => {
+  setFreshAside();
   const tourDone = TOUR.map((t, i) => send(`tour:${t.id}`, "tour", atTime(addDays(MON, i - 14, TZ), "10:00", TZ)));
   const lastTour = tourDone.at(-1)!.sendAt;
 
@@ -182,6 +199,7 @@ describe("the email", () => {
 });
 
 describe("through the daily job", () => {
+  setFreshAside();
   const env: Env = { siteUrl: "https://www.getliftsmith.com", secret: "s3cret", postalAddress: "1 Main St" };
   const ID = "a".repeat(32);
   const TOKEN = "b".repeat(64);
@@ -251,8 +269,8 @@ describe("through the daily job", () => {
   it("puts a role's email in its turn", async () => {
     const store = memoryStore();
     expect(store.facts.size).toBe(0);
-    // A new feature goes first (coach-dock, 2026-11-15), so it is marked sent here to see the role email in its turn.
-    const sent = new Set(["weekly:gym-setup", "weekly:import", "weekly:coach-dock"]);
+    // New feature emails go first (tested above), so count them as already sent here.
+    const sent = new Set(["weekly:gym-setup", "weekly:import", ...WEEKLY.filter((w) => w.fresh).map((w) => `weekly:${w.id}`)]);
     expect(queue(sent, { roles: ["coach"], flags: { coachPlans: false } })[0]!.id).toBe("coach-clients");
     expect((await run({}, ["gym"]))[0]!.html).toContain("/w/gym-setup.jpg");
   });

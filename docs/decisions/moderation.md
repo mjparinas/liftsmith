@@ -43,3 +43,7 @@ Melvin, 2026-11-14: "users should be able to report a profile, on the admin i sh
 - **What's kept:** the account and its sign-in methods, staff notes, and everything that pays for or proves Pro: store purchases on its installs, a web subscription, coach payments, earned Pro, school team membership and official gyms they own or work at. A suspended, banned or shadow-banned Friends profile stays (an empty profile with its standing), so a reset can't undo moderation; a ban's email hash stays too.
 - **Devices:** every session is ended, so each device gets the signed-out answer on its next request and wipes itself through the app's own sign-out path ([Accounts and sign-in](accounts-and-sign-in.md)); the old data can't sync back. The lifter signs in again to an empty account. One edge: changes made on a device that never reached the server (offline) are kept there by that path and offered back, as for any sign-out.
 - **"Are you sure?"** A dialog lists what goes and what stays, and the Reset button waits until their Friends handle (their email without one, their id without either) is typed exactly; the server checks the same text.
+
+## Coach reviews (2026-11-15)
+
+Reviews of coaches and coaches' replies are reported into the same `reports` table as kind `review` and show on the Reports tab. Three people reporting hides one; Remove deletes the review (or clears just the reply), Dismiss shows it again. See [Coach ratings and reviews](coach-reviews.md).

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Recovery widget (RecoveryWidget.java): grows to show every recovering area; Start shows once it is tall enough. No periodic updates: the app pushes changes, plus non-waking redraws (WorkoutWidget.java explains). -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_recovery_description"
+    android:initialLayout="@layout/widget_recovery"
+    android:minWidth="180dp"
+    android:minHeight="50dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="40dp"
+    android:previewLayout="@layout/widget_recovery"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

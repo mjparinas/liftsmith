@@ -186,3 +186,7 @@ Melvin asked for "taking client payments, through Stripe Connect" in the same ro
 - **Ending**: unlinking ends the pair's monthly plan at once and forgets its price and history; deleting an account ends every plan it pays or is paid. Payments already made stay in the coach's Stripe account.
 - **Hidden until set up**: with `STRIPE_SECRET_KEY` and `STRIPE_CONNECT_WEBHOOK_SECRET` both set, payments show; until then nothing about them shows anywhere. Product names on Stripe's page are in English for now ("Training session with Sam").
 - Analytics: `feature` `trainer` with `payOnboard`, `payDashboard`, `price`, `unprice`, `payCheckout` and `payStop`.
+
+## Ratings and reviews (2026-11-15)
+
+Clients rate their coach, personal trainer or physio after four weeks or two sessions together; the rating shows on the invite and the trainer directory once there are three reviews, with how many clients trained in the last two weeks. Coaches reply on Coaching › Setup. See [Coach ratings and reviews](coach-reviews.md).

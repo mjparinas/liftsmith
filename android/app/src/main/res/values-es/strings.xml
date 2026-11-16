@@ -16,4 +16,8 @@
     <string name="up_next">Siguiente: %1$s</string>
     <string name="add_30">+30 s</string>
     <string name="widget_title">Entrenamiento de hoy</string>
+    <string name="widget_week_title">Esta semana</string>
+    <string name="widget_week_description">Tu semana de un vistazo: días entrenados, tu racha y qué la mantiene, con Empezar</string>
+    <string name="widget_recovery_title">Recuperación</string>
+    <string name="widget_recovery_description">Qué músculos están listos para entrenar y cuándo lo estará el resto, con Empezar</string>
 </resources>

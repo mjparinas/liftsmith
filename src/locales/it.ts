@@ -100,6 +100,7 @@ import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rev from "./text/rev";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -232,6 +233,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...recap.it,
   ...recovery.it,
   ...remix.it,
+  ...rev.it,
   ...rmd.it,
   ...rt.it,
   ...save.it,

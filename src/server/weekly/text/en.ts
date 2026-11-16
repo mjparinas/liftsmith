@@ -813,4 +813,26 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "On Do not disturb or on vacation, chat notifications to you wait until you're back.",
   },
+  "coach-reviews": {
+    title: "Reviews from your clients",
+    intro: "Clients who've trained with you can now rate you, and new clients can see it.",
+    points: [
+      "A client can leave stars and a short review after four weeks or two sessions with you.",
+      "Your rating shows on your invite and in the trainer directory once you have three reviews.",
+      "Next to it: how many of your clients trained in the last two weeks.",
+      "Reply once to each review from Coaching › Setup, and report one that breaks the rules.",
+    ],
+    dyk: "Only adults can leave reviews, and one unhappy client can't sink a new coach: nothing shows until three reviews.",
+  },
+  widgets: {
+    title: "Two new home-screen widgets",
+    intro: "Beside the Today widget, two more answer a question at a glance: am I on track this week, and what's ready to train?",
+    points: [
+      "This week: the days you trained, the ones planned, your streak and how many more days keep it going.",
+      "Recovery: which body areas are ready to train, and when the rest will be.",
+      "Recovery updates itself as muscles recover, even with the app closed, without draining the battery.",
+      "Each has Start, so today's workout is one tap away.",
+    ],
+    dyk: "Tap the Recovery widget to open the recovery map in the app.",
+  },
 };
