@@ -37,7 +37,17 @@ describe("edge to edge on Android", () => {
 
   it("goes edge to edge in MainActivity", () => {
     const main = readFileSync(join(root, "android/app/src/main/java/com/getliftsmith/app/MainActivity.java"), "utf8");
-    expect(main).toMatch(/EdgeToEdge\.enable\(this[^)]*\)[\s\S]*super\.onCreate/);
+    // After super.onCreate, where BridgeActivity applies AppTheme.NoActionBar: before it, the window was built under
+    // the splash theme and every screen showed a "Liftsmith" title bar.
+    expect(main).toMatch(/super\.onCreate\([^)]*\);[\s\S]*EdgeToEdge\.enable\(this/);
+    expect(main).not.toMatch(/EdgeToEdge\.enable\(this[^)]*\)[\s\S]*super\.onCreate/);
+  });
+
+  it("keeps the title bar off in the launch theme", () => {
+    const styles = readFileSync(join(root, "android/app/src/main/res/values/styles.xml"), "utf8");
+    const launch = styles.match(/<style name="AppTheme\.NoActionBarLaunch"[\s\S]*?<\/style>/)?.[0] ?? "";
+    expect(launch).toContain('<item name="android:windowActionBar">false</item>');
+    expect(launch).toContain('<item name="android:windowNoTitle">true</item>');
   });
 
   it("never calls the deprecated bar colour APIs in our own Android code", () => {
