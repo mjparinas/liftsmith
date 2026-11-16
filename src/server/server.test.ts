@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { checkBatch } from "@/lib/analyticsSchema";
 
 import { finishSignIn, getStaff, requireStaff, startSignIn } from "./adminAuth";
-import { adminMetrics, recentInstalls } from "./adminData";
+import { adminMetrics, forgetAdminMetrics, METRICS_KEEP_MS, recentInstalls } from "./adminData";
 import { parseUa, storeBatch, storePageView, visitorHash, whereFrom } from "./collect";
 import { query, rateLimit, resetDb, run } from "./db";
 
@@ -27,6 +27,7 @@ const batch = (events: unknown[], c = ctx()) => {
 
 beforeEach(async () => {
   await resetDb();
+  forgetAdminMetrics();
   vi.unstubAllEnvs();
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -241,6 +242,10 @@ describe("the admin numbers end to end", () => {
     expect(m.site.visitors).toBe(1);
     expect(m.acquisition.sources[0].key).toBe("reddit / social");
     expect(m.engagement.avgMinutes).toBe(40);
+    // The numbers are kept for a couple of minutes (they read whole tables), then read again.
+    await storePageView({ path: "/" }, { ip: "8.8.8.8", ua: "Mozilla/5.0 (X11; Linux x86_64) Firefox/130" }, NOW);
+    expect((await adminMetrics(28, NOW + 1000)).site.visitors).toBe(1);
+    expect((await adminMetrics(28, NOW + METRICS_KEEP_MS)).site.visitors).toBe(2);
     const { installs: list } = await recentInstalls();
     expect(list.find((i) => i.id === "install-owner-1")?.test).toBe(true);
     // The Installs tab's filters: test devices only, and a search on part of the id.

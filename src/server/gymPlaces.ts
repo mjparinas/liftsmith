@@ -780,6 +780,37 @@ export async function cities(): Promise<City[]> {
   }));
 }
 
+/**
+ * How long a server keeps the city list and the sitemap's gym list (both read every gym row). Turso bills each row a
+ * query reads, and /gyms/ plus the sitemap ran these on every edge cache miss (2026-11-16), so the pages that show them
+ * use the kept copy: a new import shows up within this time. Admin and tests call `cities()` and `sitemapGyms()` fresh.
+ */
+export const LIST_KEEP_MS = 15 * 60_000;
+
+const kept = globalThis as unknown as { __gymLists?: Map<string, { at: number; value: Promise<unknown> }> };
+
+/** `load()`'s answer, kept on this server for `LIST_KEEP_MS`; a failed load isn't kept. */
+export function keptList<T>(key: string, load: () => Promise<T>, now = Date.now()): Promise<T> {
+  const map = (kept.__gymLists ??= new Map());
+  const hit = map.get(key);
+  if (hit && now - hit.at < LIST_KEEP_MS) return hit.value as Promise<T>;
+  const value = load();
+  map.set(key, { at: now, value });
+  value.catch(() => map.delete(key));
+  return value;
+}
+
+/** Forgets the kept lists (tests, and after an import so the admin sees it at once on this server). */
+export function forgetKeptLists() {
+  kept.__gymLists?.clear();
+}
+
+/** `cities()` as the public pages show it: kept for `LIST_KEEP_MS`. */
+export const keptCities = () => keptList("cities", cities);
+
+/** `sitemapGyms()` as the sitemap shows it: kept for `LIST_KEEP_MS`. */
+export const keptSitemapGyms = () => keptList("sitemap", sitemapGyms);
+
 /** Every gym page worth indexing: gyms (not studios) that aren't hidden. */
 export async function sitemapGyms(): Promise<{ path: string; lastModified: number }[]> {
   const rows = await query(

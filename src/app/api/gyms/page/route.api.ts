@@ -5,12 +5,15 @@
 import { addressKey } from "@/server/gymDirectory";
 import { cityHtml, goneHtml, GYM_GONE_HEADERS, GYM_PAGE_HEADERS, gymHtml, indexHtml, pageLang } from "@/server/gymPage";
 import { mergedPath, reportPlace } from "@/server/gymPlaceReports";
-import { cities, cityPlaces, movedCity, movedGym, placeBySlug } from "@/server/gymPlaces";
+import { cityPlaces, keptCities, movedCity, movedGym, placeBySlug } from "@/server/gymPlaces";
 import { countScan } from "@/server/gymPosters";
 import { publicPosterHtml } from "@/server/gymPrint";
 import { GYM_REPORT_HEADERS, reportPageHtml, type ReportPageState } from "@/server/gymReportPage";
 import { GYMS_INDEX_CSP } from "@/server/gymsNear";
 import { cityTrainers } from "@/server/trainerDirectory";
+
+/** /gyms/: an hour at the edge, then the old copy while a fresh one is drawn. */
+const GYMS_INDEX_CACHE = "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
 
 export const dynamic = "force-dynamic";
 
@@ -56,8 +59,11 @@ export async function GET(req: Request) {
       const trainers = (await cityTrainers(city).catch(() => ({ people: [] }))).people.length;
       return new Response(cityHtml(city, list, lang, trainers), { headers: GYM_PAGE_HEADERS });
     }
-    // /gyms/ runs one script of our own (the map of the closest gyms), so it gets its own policy (gymsNear.ts).
-    return new Response(indexHtml(await cities(), lang), { headers: { ...GYM_PAGE_HEADERS, "Content-Security-Policy": GYMS_INDEX_CSP } });
+    // /gyms/ runs one script of our own (the map of the closest gyms), so it gets its own policy (gymsNear.ts). The city
+    // list reads every gym row, so the server keeps it (keptCities) and the edge keeps the page an hour.
+    return new Response(indexHtml(await keptCities(), lang), {
+      headers: { ...GYM_PAGE_HEADERS, "Cache-Control": GYMS_INDEX_CACHE, "Content-Security-Policy": GYMS_INDEX_CSP },
+    });
   } catch {
     return gone();
   }

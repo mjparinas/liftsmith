@@ -2,7 +2,7 @@
 // the site's own sitemap: /gyms/, every city with gyms, every gym that isn't hidden or a studio, and the trainer
 // directory's cities with enough people listed (trainerPage.ts). Server build only.
 import { gymSitemapXml } from "@/server/gymPage";
-import { cities, sitemapGyms } from "@/server/gymPlaces";
+import { keptCities, keptSitemapGyms } from "@/server/gymPlaces";
 import { trainerCities } from "@/server/trainerDirectory";
 import { directoryEntries } from "@/server/trainerPage";
 
@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const [list, gyms, trainers] = await Promise.all([
-    cities().catch(() => []),
-    sitemapGyms().catch(() => []),
+    keptCities().catch(() => []),
+    keptSitemapGyms().catch(() => []),
     trainerCities().catch(() => []),
   ]);
   const newest = Math.max(0, ...list.map((c) => c.updatedAt));

@@ -211,8 +211,23 @@ async function loadSite(days: number, now: number): Promise<MetricsInput["site"]
   };
 }
 
+/** How long a server keeps the admin numbers for each period: they read whole analytics tables, and Turso bills every row
+ *  read (2026-11-16), so opening the panel again or switching tabs and back reuses them. */
+export const METRICS_KEEP_MS = 2 * 60_000;
+const keptMetrics = new Map<number, { at: number; value: Promise<ReturnType<typeof computeMetrics>> }>();
+
 export async function adminMetrics(days: number, now = Date.now()) {
-  return computeMetrics(await loadMetricsInput(days, now));
+  const hit = keptMetrics.get(days);
+  if (hit && now - hit.at < METRICS_KEEP_MS && now >= hit.at) return hit.value;
+  const value = loadMetricsInput(days, now).then(computeMetrics);
+  keptMetrics.set(days, { at: now, value });
+  value.catch(() => keptMetrics.delete(days));
+  return value;
+}
+
+/** For tests. */
+export function forgetAdminMetrics() {
+  keptMetrics.clear();
 }
 
 /** The latest installs, for the Installs tab (device and source, never anything the lifter typed). */
