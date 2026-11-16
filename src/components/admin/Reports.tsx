@@ -8,10 +8,14 @@ import { useEffect, useState } from "react";
 
 import type { ReportAction, ReportGroup } from "@/server/social";
 
+import { aiBtn, AiNote, aiPost, AiSuggestion, useAiStatus } from "./Ai";
 import { Card } from "./charts";
 import { REASON_NAME } from "./Moderation";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
+
+type Suggestion = { action: Exclude<ReportAction, "unsuspend">; reason: string };
+const key = (g: ReportGroup) => `${g.kind}:${g.targetId}`;
 
 const ACTIONS: { action: ReportAction; label: string; danger?: boolean }[] = [
   { action: "remove", label: "Remove", danger: true },
@@ -39,6 +43,28 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
     };
   }, [version, onCount]);
   const load = () => setVersion((v) => v + 1);
+  const ai = useAiStatus();
+  const [tips, setTips] = useState<Record<string, Suggestion | "…" | { error: string }>>({});
+  // Claude reads one report and suggests remove, dismiss or ban, with a reason; staff press the button (or ignore it).
+  const suggest = async (g: ReportGroup) => {
+    setTips((t) => ({ ...t, [key(g)]: "…" }));
+    const r = await aiPost<{ suggestion: Suggestion }>({
+      task: "triage",
+      report: {
+        kind: g.kind,
+        content: g.content,
+        reports: g.reports,
+        reasons: g.reasons,
+        notes: g.notes,
+        author: g.author,
+        hidden: g.hidden,
+      },
+    });
+    setTips((t) => ({ ...t, [key(g)]: r.ok ? r.data.suggestion : { error: r.error } }));
+  };
+  const suggestAll = async () => {
+    for (const g of rows ?? []) if (!tips[key(g)]) await suggest(g);
+  };
   const act = async (g: ReportGroup, action: ReportAction) => {
     const r = await fetch("/api/admin/reports/", {
       method: "POST",
@@ -56,6 +82,14 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
         reply, clears the reply and keeps the review), Dismiss shows it again, Ban author hides everything the author wrote on Friends and
         tells them. For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
       </p>
+      {admin && ai?.configured && rows && rows.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+          <button type="button" disabled={!ai.ready} onClick={() => void suggestAll()} className={aiBtn}>
+            Suggest for all with AI
+          </button>
+          <AiNote s={ai} />
+        </div>
+      )}
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
         !error && (
@@ -84,6 +118,13 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                   {g.hidden ? " · hidden" : ""}
                 </p>
                 {g.notes.length > 0 && <p className="mt-1 text-sm text-muted">Notes: {g.notes.join(" | ")}</p>}
+                {admin && (
+                  <Tip
+                    tip={tips[key(g)]}
+                    act={(a) => act(g, a)}
+                    drop={() => setTips((t) => Object.fromEntries(Object.entries(t).filter(([k]) => k !== key(g))))}
+                  />
+                )}
               </div>
               {admin && (
                 <div className="flex flex-wrap gap-2 text-sm">
@@ -99,6 +140,11 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                       {a.label}
                     </button>
                   ))}
+                  {ai?.ready && !tips[key(g)] && (
+                    <button type="button" onClick={() => void suggest(g)} className={aiBtn}>
+                      Suggest
+                    </button>
+                  )}
                   {g.author?.suspended && (
                     <button
                       type="button"
@@ -115,5 +161,35 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
         </ul>
       )}
     </Card>
+  );
+}
+
+const LABEL: Record<Suggestion["action"], string> = { remove: "Remove", dismiss: "Dismiss", suspend: "Ban author" };
+
+function Tip({
+  tip,
+  act,
+  drop,
+}: {
+  tip: Suggestion | "…" | { error: string } | undefined;
+  act: (a: ReportAction) => Promise<void>;
+  drop: () => void;
+}) {
+  if (!tip) return null;
+  if (tip === "…") return <p className="mt-2 text-sm text-muted">Claude is reading it…</p>;
+  if ("error" in tip)
+    return (
+      <p className="mt-2 text-sm text-bad" role="alert">
+        {tip.error}
+      </p>
+    );
+  return (
+    <AiSuggestion
+      label={LABEL[tip.action]}
+      reason={tip.reason}
+      danger={tip.action !== "dismiss"}
+      doIt={() => act(tip.action).then(drop)}
+      dismiss={drop}
+    />
   );
 }

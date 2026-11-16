@@ -432,7 +432,7 @@ async function fetchBytes(
   }
 }
 
-async function fetchText(
+export async function fetchText(
   fetcher: typeof fetch,
   url: string,
   accept: string,

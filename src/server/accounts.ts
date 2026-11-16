@@ -288,6 +288,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
   await batch([
     { sql: "DELETE FROM account_installs WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM sync_usage WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_sessions WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_identities WHERE account_id = ?", args: [accountId] },
@@ -324,6 +325,7 @@ export async function resetAccount(accountId: string): Promise<void> {
   const keepProfile = Number(p?.suspended ?? 0) !== 0;
   await batch([
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM sync_usage WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_sessions WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },

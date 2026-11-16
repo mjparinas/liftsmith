@@ -41,10 +41,14 @@ export async function resetFlag(name: FlagName) {
   await run("DELETE FROM feature_flags WHERE name = ?", [name]);
 }
 
-/** Every flag's value for one install (GET /api/flags/): what the Flags tab set, rolled out by install id. */
+/** Every flag's value for one install (GET /api/flags/): what the Flags tab set, rolled out by install id. Admin-only flags are left out. */
 export async function flagsFor(id: string | null): Promise<Record<FlagName, AnyFlagValue>> {
   const states = await flagStates();
   const out = {} as Record<FlagName, AnyFlagValue>;
-  for (const name of Object.keys(FLAGS) as FlagName[]) out[name] = rolledOut(name, states.get(name), id);
+  for (const name of Object.keys(FLAGS) as FlagName[]) {
+    // Flags for the admin panel only (the AI helpers' switch and cap) aren't the app's business.
+    if ("adminOnly" in FLAGS[name]) continue;
+    out[name] = rolledOut(name, states.get(name), id);
+  }
   return out;
 }

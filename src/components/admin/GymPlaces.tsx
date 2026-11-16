@@ -9,7 +9,9 @@ import { useCallback, useEffect, useState } from "react";
 import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces";
 import type { RepairChange, RepairStep } from "@/server/gymRepair";
 
+import { useAiStatus } from "./Ai";
 import { Card } from "./charts";
+import { FindDupes, GymFillPanel } from "./GymAi";
 import { GymClaims } from "./GymClaims";
 import { GymEnrich } from "./GymEnrich";
 import { GymImport } from "./GymImport";
@@ -211,6 +213,8 @@ function GymList({
   const [missing, setMissing] = useState("");
   const [page, setPage] = useState(1);
   const [ordering, setOrdering] = useState<string | null>(null);
+  const [filling, setFilling] = useState<string | null>(null);
+  const ai = useAiStatus();
   const [failed, setFailed] = useState(false);
   // Once shown, Fix city names stays until the page closes, so its result is still there when the count reaches 0.
   const [fixShown, setFixShown] = useState(false);
@@ -300,6 +304,14 @@ function GymList({
           )}
         </div>
         {failed && <p className="mb-2 text-sm text-bad">The gym list didn&apos;t load.</p>}
+        {admin && city.trim() && data && data.places.length > 1 && data.places.every((p) => p.citySlug === data.places[0]!.citySlug) && (
+          <FindDupes
+            key={data.places[0]!.citySlug}
+            citySlug={data.places[0]!.citySlug}
+            cityLabel={[data.places[0]!.city, data.places[0]!.region].filter(Boolean).join(", ") || city.trim()}
+            changed={changed}
+          />
+        )}
         {data === null ? (
           <Loading label="Loading gyms">
             <TableBones />
@@ -326,6 +338,18 @@ function GymList({
                       {p.qrScans ? ` · ${p.qrScans} QR ${p.qrScans === 1 ? "scan" : "scans"}` : ""}
                       {p.pictures ? ` · ${p.pictures} ${p.pictures === 1 ? "picture" : "pictures"}` : ""}
                     </p>
+                    {filling === p.id && (
+                      <GymFillPanel
+                        id={p.id}
+                        done={(note) => {
+                          setFilling(null);
+                          if (note) {
+                            setNote(note);
+                            changed();
+                          }
+                        }}
+                      />
+                    )}
                     {ordering === p.id && (
                       <PosterForm
                         place={p}
@@ -349,6 +373,15 @@ function GymList({
                       >
                         {p.kind === "gym" ? "Mark studio" : "Mark gym"}
                       </button>
+                      {ai?.ready && !p.official && (
+                        <button
+                          type="button"
+                          onClick={() => setFilling(filling === p.id ? null : p.id)}
+                          className="press rounded-lg border border-accent/40 px-3 py-1.5 text-accent"
+                        >
+                          Fill with AI
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => setOrdering(ordering === p.id ? null : p.id)}

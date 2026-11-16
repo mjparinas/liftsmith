@@ -2,7 +2,7 @@
 // the site's own sitemap: /gyms/, every city with gyms, every gym that isn't hidden or a studio, and the trainer
 // directory's cities with enough people listed (trainerPage.ts), and coaches' listed programs (programPage.ts). Server build only.
 import { gymSitemapXml } from "@/server/gymPage";
-import { cities, sitemapGyms } from "@/server/gymPlaces";
+import { keptCities, keptSitemapGyms } from "@/server/gymPlaces";
 import { programEntries, publicPrograms } from "@/server/programPage";
 import { trainerCities } from "@/server/trainerDirectory";
 import { directoryEntries } from "@/server/trainerPage";
@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const [list, gyms, trainers, programs] = await Promise.all([
-    cities().catch(() => []),
-    sitemapGyms().catch(() => []),
+    keptCities().catch(() => []),
+    keptSitemapGyms().catch(() => []),
     trainerCities().catch(() => []),
     publicPrograms().catch(() => []),
   ]);

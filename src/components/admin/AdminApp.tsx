@@ -10,6 +10,7 @@ import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CodeStatus, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 import type { InboxItem } from "@/server/inbox";
 
+import { AskData } from "./Ai";
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
@@ -759,6 +760,7 @@ export function AdminApp() {
               <Tile label="Trial starts" value={fmtInt(o.trialStarts)} delta={delta(o.trialStarts, o.prevTrialStarts)} />
               <Tile label="MRR gross / net" value={`${fmtUsd(o.grossMrr)} / ${fmtUsd(o.netMrr)}`} sub={`${fmtInt(o.paying)} paying`} />
             </div>
+            {data.staff.role === "admin" && <AskData data={data} days={days} />}
             <Card title="New installs a day" subtitle="By store.">
               <StackedBars
                 rows={data.installsDaily}

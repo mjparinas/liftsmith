@@ -100,6 +100,27 @@ describe("Admin › Gyms import", () => {
     expect(await screen.findByText(/Importing 1 failed city: 0 of 1 cities/)).toBeTruthy();
   });
 
+  it("doesn't poll while the tab is hidden, and reads again when it comes back", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    onServer = job();
+    let reads = 0;
+    const real = globalThis.fetch;
+    vi.stubGlobal("fetch", (url: string, init?: RequestInit) => {
+      if (url.includes("?job=1")) reads++;
+      return real(url, init);
+    });
+    render(<GymImport admin changed={() => undefined} />);
+    expect(await screen.findByText(/Importing Canada: 0 of 2 cities/)).toBeTruthy();
+    const hidden = vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+    const before = reads;
+    await vi.advanceTimersByTimeAsync(POLL_MS * 3 + 100);
+    expect(reads).toBe(before);
+    hidden.mockReturnValue("visible");
+    document.dispatchEvent(new Event("visibilitychange"));
+    await waitFor(() => expect(reads).toBe(before + 1));
+    hidden.mockRestore();
+  });
+
   it("shows the import still running on the server when the page opens again", async () => {
     onServer = job({ done: 1, active: ["Surrey, BC"], waiting: 1, recent: [{ where: "Langley, BC", at: T0, r: { ...okLine } }] });
     render(<GymImport admin changed={() => undefined} />);
