@@ -241,8 +241,9 @@ jobs:
           restore-keys: |
             gradle-build-${{ runner.os }}-${{ hashFiles('package-lock.json', 'android/**/*.gradle') }}-
             gradle-build-${{ runner.os }}-
-      # The phone app and the Wear OS app (android/wear), plus both apps' native unit tests.
-      - run: ./gradlew assembleDebug :app:testDebugUnitTest :wear:testDebugUnitTest --no-daemon --build-cache --parallel
+      # The phone app and the Wear OS app (android/wear), plus both apps' native unit tests, plus unsigned release
+      # builds so R8 (code shrinking, docs/decisions/app-size.md) fails here on a missing keep rule, not in Release.
+      - run: ./gradlew assembleDebug assembleRelease :app:testDebugUnitTest :wear:testDebugUnitTest --no-daemon --build-cache --parallel
         working-directory: android
       - uses: actions/upload-artifact@v7
         with:

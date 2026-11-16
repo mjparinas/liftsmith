@@ -13,6 +13,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- The app's navy, so nothing white flashes behind the transparent system bars (MainActivity edge to edge). -->
+        <item name="android:windowBackground">@color/liftsmith_bg</item>
     </style>
 
 
