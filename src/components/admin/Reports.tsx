@@ -49,11 +49,12 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
     load();
   };
   return (
-    <Card title="Reports on Friends">
+    <Card title="Reports on Friends and coach reviews">
       <p className="text-sm text-muted">
-        Posts, comments and profiles lifters reported. Three reports hide a post or comment until it&apos;s decided here. Remove deletes it
-        (for a profile, resets the name to the handle and clears the tagline), Dismiss shows it again, Ban author hides everything the
-        author wrote and tells them. For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
+        Posts, comments, profiles, coach reviews and coaches&apos; replies that people reported. Three reports hide a post, comment, review
+        or reply until it&apos;s decided here. Remove deletes it (for a profile, resets the name to the handle and clears the tagline; for a
+        reply, clears the reply and keeps the review), Dismiss shows it again, Ban author hides everything the author wrote on Friends and
+        tells them. For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
@@ -72,7 +73,9 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
               <div className="min-w-0 flex-1">
                 <p className="break-words font-semibold">{g.content || "(empty)"}</p>
                 <p className="text-sm text-muted">
-                  {g.author ? `@${g.author.handle} (${g.author.name})${g.author.suspended ? " · banned or suspended" : ""}` : "author gone"}{" "}
+                  {g.author
+                    ? `${g.author.handle ? `@${g.author.handle} (${g.author.name})` : g.author.name || "No name"}${g.author.suspended ? " · banned or suspended" : ""}`
+                    : "author gone"}{" "}
                   · {g.reports} {g.reports === 1 ? "report" : "reports"} ·{" "}
                   {Object.entries(g.reasons)
                     .map(([k, n]) => `${REASON_NAME[k] ?? k} ${n}`)
@@ -84,7 +87,9 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
               </div>
               {admin && (
                 <div className="flex flex-wrap gap-2 text-sm">
-                  {ACTIONS.filter((a) => !(a.action === "remove" && !g.content)).map((a) => (
+                  {ACTIONS.filter(
+                    (a) => !(a.action === "remove" && !g.content) && !(a.action === "suspend" && g.kind === "review" && !g.author?.handle),
+                  ).map((a) => (
                     <button
                       key={a.action}
                       type="button"

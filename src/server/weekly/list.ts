@@ -122,6 +122,11 @@ export const WEEKLY: WeeklyEmail[] = [
   L("whats-new", "free", "today"),
   // New features, in the order they shipped (sent before the queue above to everyone already in the series).
   R("coach-dock", "coach", "pro", "trainer/messages", { fresh: "2026-11-15", shot: false }),
+  // New, 2026-11-15: ratings and reviews from clients (docs/decisions/coach-reviews.md).
+  R("coach-reviews", "coach", "pro", "trainer/setup", { fresh: "2026-11-15", shot: false }),
+  // New, 2026-11-15: the This week and Recovery home-screen widgets (docs/decisions/voice-and-system-shortcuts.md).
+  L("widgets", "free", "muscles", { fresh: "2026-11-15" }),
+  // New, 2026-11-15: coaches share and sell programs (docs/decisions/coach-programs.md).
   R("coach-programs", "coach", "pro", "trainer/programs", { fresh: "2026-11-15", shot: false }),
 ];
 

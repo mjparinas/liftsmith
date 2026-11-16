@@ -795,6 +795,29 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "En Ne pas déranger ou en vacances, les notifications du chat attendent votre retour.",
   },
+  "coach-reviews": {
+    title: "Les avis de vos clients",
+    intro: "Les clients qui se sont entraînés avec vous peuvent maintenant vous noter, et les nouveaux clients le voient.",
+    points: [
+      "Un client peut laisser des étoiles et un court avis après quatre semaines ou deux séances avec vous.",
+      "Votre note s'affiche sur votre invitation et dans l'annuaire des coachs dès trois avis.",
+      "À côté : combien de vos clients se sont entraînés ces deux dernières semaines.",
+      "Répondez une fois à chaque avis depuis Coaching › Réglages, et signalez ceux qui enfreignent les règles.",
+    ],
+    dyk: "Seuls les adultes peuvent laisser un avis, et un client mécontent ne peut pas couler un nouveau coach : rien ne s'affiche avant trois avis.",
+  },
+  widgets: {
+    title: "Deux nouveaux widgets d’écran d’accueil",
+    intro:
+      "À côté du widget Aujourd’hui, deux autres répondent d’un coup d’œil : suis-je dans les temps cette semaine, et qu’est-ce qui est prêt à travailler ?",
+    points: [
+      "Cette semaine : les jours entraînés, ceux prévus, votre série et combien de jours encore pour la garder.",
+      "Récupération : les zones du corps prêtes à travailler et quand les autres le seront.",
+      "Récupération se met à jour toute seule pendant que les muscles récupèrent, même appli fermée, sans vider la batterie.",
+      "Chacun a Commencer, la séance du jour est donc à un toucher.",
+    ],
+    dyk: "Touchez le widget Récupération pour ouvrir la carte de récupération dans l’appli.",
+  },
   "coach-programs": {
     title: "Partagez et vendez vos programmes",
     intro: "Faites des programmes que vous donnez encore et encore quelque chose que tout le monde peut suivre, gratuit ou payant.",

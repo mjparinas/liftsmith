@@ -33,11 +33,21 @@ export function applyAppearance(theme: Appearance = "dark"): void {
   } catch {}
   const light = isLight(theme);
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", light ? "#f4f6f9" : "#0a0d12");
-  if (isNative()) {
-    void import("@capacitor/status-bar")
-      .then(({ StatusBar, Style }) => StatusBar.setStyle({ style: light ? Style.Light : Style.Dark }))
-      .catch(() => {});
-  }
+  if (isNative()) void setBarIcons(light);
+}
+
+/** Dark icons on a light screen and light ones on a dark screen. Android uses Capacitor's own SystemBars (edge to
+ *  edge, no deprecated colour calls; the status bar plugin isn't in the Android app), iOS the status bar plugin. */
+async function setBarIcons(light: boolean): Promise<void> {
+  try {
+    const { Capacitor, SystemBars, SystemBarsStyle } = await import("@capacitor/core");
+    if (Capacitor.getPlatform() === "android") {
+      await SystemBars.setStyle({ style: light ? SystemBarsStyle.Light : SystemBarsStyle.Dark });
+      return;
+    }
+    const { StatusBar, Style } = await import("@capacitor/status-bar");
+    await StatusBar.setStyle({ style: light ? Style.Light : Style.Dark });
+  } catch {}
 }
 
 const QUERY = "(prefers-color-scheme: light)";

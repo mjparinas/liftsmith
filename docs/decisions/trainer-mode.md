@@ -187,3 +187,7 @@ Melvin asked for "taking client payments, through Stripe Connect" in the same ro
 - **Hidden until set up**: with `STRIPE_SECRET_KEY` and `STRIPE_CONNECT_WEBHOOK_SECRET` both set, payments show; until then nothing about them shows anywhere. Product names on Stripe's page are in English for now ("Training session with Sam").
 - Analytics: `feature` `trainer` with `payOnboard`, `payDashboard`, `price`, `unprice`, `payCheckout` and `payStop`.
 - **Programs** (2026-11-15): coaches also sell programs through the same Stripe account, on the website only. See [Coaches' programs](coach-programs.md).
+
+## Ratings and reviews (2026-11-15)
+
+Clients rate their coach, personal trainer or physio after four weeks or two sessions together; the rating shows on the invite and the trainer directory once there are three reviews, with how many clients trained in the last two weeks. Coaches reply on Coaching › Setup. See [Coach ratings and reviews](coach-reviews.md).

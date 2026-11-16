@@ -1,12 +1,14 @@
 import SwiftUI
 import WidgetKit
 
-/// Liftsmith's widget extension: the home-screen and lock-screen widget, the workout Live Activity, and (iOS 18)
+/// Liftsmith's widget extension: the Today, This week and Recovery widgets (home screen and lock screen), the workout Live Activity, and (iOS 18)
 /// a Control Center control. Android counterparts: WorkoutWidget.java, WorkoutService.java, WorkoutTileService.java.
 @main
 struct LiftsmithWidgets: WidgetBundle {
     var body: some Widget {
         QuickStartWidget()
+        WeekWidget()
+        RecoveryWidget()
         WorkoutLiveActivity()
         if #available(iOS 18.0, *) {
             StartWorkoutControl()

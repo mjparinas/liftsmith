@@ -32,8 +32,11 @@ android {
     buildTypes {
         release {
             if (System.getenv("ANDROID_KEYSTORE_PATH")) signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // R8 shrinks, optimizes and renames the code (Play's code optimization check, docs/decisions/app-size.md).
+            // The mapping file rides inside the app bundle, so Play Console shows crash traces with real names.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -47,6 +50,8 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    // EdgeToEdge.enable in MainActivity: the same edge-to-edge layout on Android 8 to 14 as Android 15+ enforces.
+    implementation "androidx.activity:activity:$androidxActivityVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     // NotificationCompat with Android 16 Live Updates (setRequestPromotedOngoing, setShortCriticalText) for WorkoutService.

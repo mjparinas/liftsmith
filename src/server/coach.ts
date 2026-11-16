@@ -1231,4 +1231,6 @@ export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_checkins WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   ...presenceCleanup(accountId),
+  // Reviews it wrote and reviews of it (coachReviews.ts).
+  { sql: "DELETE FROM coach_reviews WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

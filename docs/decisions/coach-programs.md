@@ -34,7 +34,7 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 ## Money
 
 - **The coach is the merchant**, as with client payments: the Checkout session runs on the coach's connected account (direct charge), so receipts, refunds and disputes are theirs. Liftsmith's share is `feeFor` (the `coachPayFee` flag, 2% by default, only from a coach on plain Pro once coach plans are on; Coach, Coach Plus and high school coaches pay nothing), as `application_fee_amount`.
-- **The Connect webhook** (`/api/coach/stripe/`) passes each event to `storeProgramEvent` first: `checkout.session.completed` with `metadata[kind] = program` gives the buyer the program, only when the event's account is the program's coach's; `charge.refunded` (fully refunded) takes it back, matched by payment on that coach's account. Everything else goes on to client payments as before. Stripe resends events, so each sale is recorded and announced once.
+- **The Connect webhook** (`/api/coach/stripe/`) passes each event to `storeProgramEvent` first: `checkout.session.completed` with `metadata[kind] = program` gives the buyer the program, only when the event's account is the program's coach's; `charge.refunded` (fully refunded) takes it back, matched by payment on that coach's account. Everything else goes on to client payments as before. Stripe resends events, so each sale is recorded and announced once. The live Connect endpoint listens for `charge.refunded` (added 2026-11-16).
 - **Deleting an account** removes the programs it has and the programs it made (with who had them); lifters keep any days they already saved to their routines, since those live on their own devices.
 
 ## Code

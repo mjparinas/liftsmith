@@ -294,7 +294,8 @@ export function App() {
     if (!ready) return;
     const run = (a: ShortcutAction, at?: number) => {
       const to = runShortcut(a, at);
-      if (!isRoute(location.hash, to)) go(to);
+      if (to === "recovery") go("recovery", "muscles");
+      else if (!isRoute(location.hash, to)) go(to);
     };
     const fromLink = linkAction(location.search);
     if (fromLink) {
