@@ -215,6 +215,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Fitness age](docs/decisions/fitness-age.md) (`docs/FITNESS_AGE.md`, `src/lib/fitnessAge.ts`, `HealthTwin.tsx`, `health.ts`)
 - [Fitness tests](docs/decisions/fitness-tests.md) (`src/lib/fitTests.ts`, `FitTests.tsx`, `HealthTwin.tsx`)
 - [Food from Health](docs/decisions/food-from-health.md) (`src/lib/nutrition.ts`, `insights.ts`, `health.ts`, `HealthWorkoutPlugin.kt`, `HealthWorkoutPlugin.swift`)
+- [Form cues: common mistakes and their fixes](docs/decisions/form-cues.md) (`src/lib/formFaults.ts`, `FormFaults.tsx`, `src/locales/text/ff.ts`)
 - [Friends and the workout feed](docs/decisions/friends.md) (`src/server/social.ts`, `src/lib/social.ts`, `Friends.tsx`, `src/server/moderation.ts`; tagline and home gym in `socialAbout.test.ts`)
 - [Google Play review](docs/decisions/google-play-review.md) (`health.ts`, `docs/PRIVACY_LABELS.md`, `site.ts`)
 - [Growth: organic, the Hevy way](docs/decisions/growth.md) (strategy, segments and the ranked list of growth work; channels in Marketing and growth)

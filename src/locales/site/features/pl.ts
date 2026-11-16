@@ -183,6 +183,10 @@ export const pl: FeaturesText = {
       name: "Demonstracje ćwiczeń w 3D",
       body: "Każde ćwiczenie ma postać 3D, która pokazuje ruch z odpowiednim sprzętem, wraz z krokami ustawienia i wskazówkami.",
     },
+    "form-mistakes": {
+      name: "Częste błędy i ich poprawki",
+      body: "Każde ćwiczenie i rozciąganie pokazuje obok postaci 3D dwa lub trzy najczęstsze błędy techniki, każdy z poprawką i wyjaśnieniem, dlaczego to ważne, a licznik przerwy pokazuje jeden na następną serię. Działa offline.",
+    },
     "set-types": {
       name: "Drop sety i rest-pause",
       body: "Dodaj drop set albo serię rest-pause między seriami.",
@@ -278,6 +282,10 @@ export const pl: FeaturesText = {
     body: {
       name: "Ważenia, tkanka tłuszczowa i zdjęcia",
       body: "Zapisuj wagę i tkankę tłuszczową albo pozwól, by przychodziły z wagi przez aplikację zdrowotną w telefonie, i trzymaj zdjęcia postępów na telefonie.",
+    },
+    "photo-compare": {
+      name: "Zdjęcia postępów, które się pokrywają",
+      body: "Aparat pokazuje ostatnie zdjęcie jako blady kontur do dopasowania, z samowyzwalaczem, żebyś mógł się odsunąć. Porównaj dowolne dwie daty suwakiem albo obok siebie, każdą z wagą z tego dnia. Zdjęcia zostają w telefonie; plik kopii zapasowej przeniesie je na nowy.",
     },
     measurements: {
       name: "Pomiary taśmą",
@@ -407,6 +415,11 @@ export const pl: FeaturesText = {
     share: {
       name: "Karty i linki do udostępniania",
       body: "Udostępnij trening, nowy rekord albo kamień milowy jako obrazek lub publiczny link z podglądem. Nowy rekord błyska na złoto i możesz go od razu udostępnić z ekranu przerwy.",
+    },
+    "screenshot-share": {
+      name: "Karty po zrobieniu zrzutu ekranu",
+      body: "Zrób zrzut ekranu, a wysunie się arkusz kart z twoim treningiem: ostatni miesiąc, trzy miesiące, sześć miesięcy, rok albo od początku, jako podsumowanie, podział serii albo najlepsze boje. Przesuwaj je, ukryj ciężary ikoną oka i udostępnij z linkiem z zaproszeniem na karcie. Te same karty są pod Udostępnij mój trening w Postępach. Każdy link, który udostępniasz, niesie teraz twoje zaproszenie, w linku, który o tym mówi.",
+      note: "Zrzuty ekranu otwierają to na Androidzie 14 i nowszym oraz na iPhonie, i można to wyłączyć. Gdzie indziej otwórz to z Postępów. Osoby poniżej 18 lat udostępniają bez linku z zaproszeniem.",
     },
     coaching: {
       name: "Prowadź podopiecznych",
@@ -697,6 +710,9 @@ export const pl: FeaturesText = {
     strava: {
       name: "Strava",
       does: "Każdy ukończony trening publikowany na Stravie",
+    },
+    "garmin-connect": {
+      does: "Sen, HRV, tętno spoczynkowe, kroki i pomiary z wagi Index trafiają do aplikacji, a biegi, jazdy rowerem i wiosłowanie w pomieszczeniu jako treningi cardio",
     },
     whoop: {
       name: "WHOOP",

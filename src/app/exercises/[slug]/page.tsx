@@ -10,12 +10,14 @@ import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { BRAND } from "@/lib/brand";
 import { exerciseMeta } from "@/lib/exerciseMeta";
 import { EXERCISES } from "@/lib/exercises";
+import { faultIdsFor } from "@/lib/formFaults";
 import { ogImage } from "@/lib/ogImages";
 import { pageMeta } from "@/lib/pageMeta";
 import { alternativesTo, EQUIPMENT_NAME, equipmentSlug, exerciseBySlug, exercisesFor, MUSCLE_NAME, muscleSlug, needsText } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { EXAMPLE, hasStartTable, startTable, type StartCell } from "@/lib/startTable";
 import type { Exercise } from "@/lib/types";
+import { faultWords } from "@/locales/site/fromApp";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => EXERCISES.map((e) => ({ slug: e.id }));
@@ -176,6 +178,21 @@ export default async function ExercisePage({ params }: Props) {
           )}
         </div>
       </div>
+      {!guide && (
+        <section className="mt-10 max-w-2xl">
+          <h2 className="text-2xl font-bold tracking-tight">Common mistakes</h2>
+          <dl className="mt-4 space-y-4">
+            {faultWords("en", faultIdsFor(e)).map((f) => (
+              <div key={f.id}>
+                <dt className="font-semibold">{f.what}</dt>
+                <dd className="mt-1 leading-relaxed text-muted">
+                  {f.fix} {f.why}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
       {guide && (
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
           <section>

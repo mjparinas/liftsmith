@@ -831,4 +831,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Chaque lien que vous partagez, des routines aux salles, porte désormais votre invitation, dans un lien qui dit invite.",
   },
+  "form-cues": {
+    title: "Erreurs fréquentes et leurs corrections",
+    intro:
+      "Chaque exercice et chaque étirement liste désormais ses deux ou trois erreurs techniques les plus fréquentes, juste à côté de la silhouette 3D.",
+    points: [
+      "Chacune dit à quoi elle ressemble, quoi faire à la place et pourquoi c'est important.",
+      "Vous les trouverez dans Comment le faire pendant la séance, sur la page de chaque exercice et sur chaque étirement.",
+      "Entre les séries, le minuteur de repos en montre une pour la prochaine série, différente à chaque fois.",
+      "Elles font partie de l'app : elles fonctionnent sans réseau, dans toutes les langues.",
+    ],
+    dyk: "Vous préférez ne pas les voir pendant le repos ? Désactivez Points techniques pendant le repos dans Réglages › Séance.",
+  },
 };

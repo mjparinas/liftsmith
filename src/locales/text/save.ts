@@ -275,6 +275,11 @@ export const pt: Partial<Record<Key, Message>> = {
   "save.nudge.body": "Entre para fazer backup dos seus treinos, ou adicione o Liftsmith à tela inicial, para que não sejam apagados.",
   "save.nudge.go": "Manter seguro",
   "save.nudge.dismiss": "Entendi",
+  "save.photos": { one: "Incluir {count} foto de progresso", other: "Incluir {count} fotos de progresso" },
+  "save.photos.hint":
+    "As fotos nunca sincronizam, então um backup com elas é como elas vão para um celular novo. Guarde o arquivo num lugar privado.",
+  "save.backup.saving": "Salvando…",
+  "save.restored.photos": { one: "{count} foto de progresso adicionada.", other: "{count} fotos de progresso adicionadas." },
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -308,6 +313,10 @@ export const ko: Partial<Record<Key, Message>> = {
   "save.nudge.body": "로그인해서 운동을 백업하거나 Liftsmith를 홈 화면에 추가해서 지워지지 않게 하세요.",
   "save.nudge.go": "안전하게 지키기",
   "save.nudge.dismiss": "확인",
+  "save.photos": { other: "변화 사진 {count}장 포함" },
+  "save.photos.hint": "사진은 동기화되지 않으니, 사진을 포함한 백업으로 새 휴대폰에 옮겨야 해요. 파일은 안전한 곳에 보관하세요.",
+  "save.backup.saving": "저장 중…",
+  "save.restored.photos": { other: "변화 사진 {count}장을 추가했어요." },
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -342,6 +351,11 @@ export const tr: Partial<Record<Key, Message>> = {
   "save.nudge.body": "Antrenmanlarını yedeklemek için giriş yap ya da silinmesinler diye Liftsmith'i ana ekranına ekle.",
   "save.nudge.go": "Güvende tut",
   "save.nudge.dismiss": "Anladım",
+  "save.photos": { one: "{count} ilerleme fotoğrafını ekle", other: "{count} ilerleme fotoğrafını ekle" },
+  "save.photos.hint":
+    "Fotoğraflar asla eşitlenmez, bu yüzden yeni telefona onlarla birlikte bir yedekle taşınır. Dosyayı gizli bir yerde sakla.",
+  "save.backup.saving": "Kaydediliyor…",
+  "save.restored.photos": { one: "{count} ilerleme fotoğrafı eklendi.", other: "{count} ilerleme fotoğrafı eklendi." },
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -376,4 +390,19 @@ export const pl: Partial<Record<Key, Message>> = {
   "save.nudge.body": "Zaloguj się, żeby zrobić kopię treningów, albo dodaj Liftsmith do ekranu głównego, żeby nie dało się ich wyczyścić.",
   "save.nudge.go": "Zabezpiecz dane",
   "save.nudge.dismiss": "Jasne",
+  "save.photos": {
+    one: "Dołącz {count} zdjęcie postępów",
+    few: "Dołącz {count} zdjęcia postępów",
+    many: "Dołącz {count} zdjęć postępów",
+    other: "Dołącz {count} zdjęcia postępów",
+  },
+  "save.photos.hint":
+    "Zdjęcia nigdy się nie synchronizują, więc kopia zapasowa z nimi to sposób, by przenieść je na nowy telefon. Trzymaj plik w prywatnym miejscu.",
+  "save.backup.saving": "Zapisywanie…",
+  "save.restored.photos": {
+    one: "Dodano {count} zdjęcie postępów.",
+    few: "Dodano {count} zdjęcia postępów.",
+    many: "Dodano {count} zdjęć postępów.",
+    other: "Dodano {count} zdjęcia postępów.",
+  },
 };
