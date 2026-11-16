@@ -36,6 +36,9 @@ public class WorkoutWidget extends AppWidgetProvider {
     static void save(Context context, String json) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY, json).apply();
         refresh(context);
+        // The This week and Recovery widgets read the same snapshot.
+        WeekWidget.refresh(context);
+        RecoveryWidget.refresh(context);
     }
 
     static void refresh(Context context) {
@@ -116,7 +119,7 @@ public class WorkoutWidget extends AppWidgetProvider {
         }
     }
 
-    private static JSONObject snapshot(Context context) {
+    static JSONObject snapshot(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         String json = prefs.getString(KEY, null);
         if (json == null) return null;
@@ -153,14 +156,14 @@ public class WorkoutWidget extends AppWidgetProvider {
         return PendingIntent.getBroadcast(context, 3, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private static PendingIntent link(Context context, String action, int code) {
+    static PendingIntent link(Context context, String action, int code) {
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("liftsmith://" + action))
             .setClass(context, MainActivity.class)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, code, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private static PendingIntent open(Context context) {
+    static PendingIntent open(Context context) {
         Intent i = new Intent(context, MainActivity.class).setAction(Intent.ACTION_MAIN).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(context, 4, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }

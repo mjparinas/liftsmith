@@ -85,11 +85,11 @@ describe("why and coach's notes", () => {
   it("hides a note after Got it", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    // The last build week of the block gets a note. Block weeks are calendar weeks, so start the block on today's
-    // weekday (build - 1) weeks back: "a day earlier" fell into the week before on Mondays and made this the deload.
+    // The last build week of the block gets a note. Block weeks are calendar weeks, so the block starts the same
+    // weekday `build - 1` weeks ago (a day earlier crossed into another calendar week on Mondays and failed).
     const p = useApp.getState().profile;
     const build = Math.min(6, Math.max(3, p.blockWeeks));
-    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D }));
+    act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D - 60_000 }));
     await act(async () =>
       useApp.getState().importWorkouts([
         {

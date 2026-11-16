@@ -16,4 +16,8 @@
     <string name="up_next">次：%1$s</string>
     <string name="add_30">+30 秒</string>
     <string name="widget_title">今日のワークアウト</string>
+    <string name="widget_week_title">今週</string>
+    <string name="widget_week_description">今週のトレーニング日、連続記録、それを続けるためにすること。開始ボタン付き</string>
+    <string name="widget_recovery_title">回復</string>
+    <string name="widget_recovery_description">トレーニングできる筋肉と、ほかの筋肉が回復する時刻。開始ボタン付き</string>
 </resources>

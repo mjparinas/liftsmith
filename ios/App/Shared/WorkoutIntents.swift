@@ -16,10 +16,10 @@ enum ShortcutInbox {
         NotificationCenter.default.post(name: notification, object: nil, userInfo: ["action": action])
     }
 
-    /// Widget and Live Activity links: liftsmith://start, liftsmith://log, liftsmith://add30. Returns whether the URL was ours.
+    /// Widget and Live Activity links: liftsmith://start, log, add30 and muscles (the Recovery widget). Returns whether the URL was ours.
     @discardableResult
     static func open(_ url: URL) -> Bool {
-        guard url.scheme == "liftsmith", let a = url.host, ["start", "log", "add30"].contains(a) else { return false }
+        guard url.scheme == "liftsmith", let a = url.host, ["start", "log", "add30", "muscles"].contains(a) else { return false }
         send(a)
         return true
     }
