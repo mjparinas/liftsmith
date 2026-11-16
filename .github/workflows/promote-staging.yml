@@ -45,21 +45,51 @@ jobs:
             const { owner, repo } = context.repo;
             const staging = (await github.rest.repos.getBranch({ owner, repo, branch: 'staging' })).data.commit.sha;
             const cmp = await github.rest.repos.compareCommitsWithBasehead({ owner, repo, basehead: `main...${staging}` });
-            if (cmp.data.ahead_by === 0) {
+            const treeOf = async (ref) => (await github.rest.git.getCommit({ owner, repo, commit_sha: ref })).data.tree.sha;
+            const head = (await github.rest.git.getCommit({ owner, repo, commit_sha: staging })).data;
+            const mainSha = (await github.rest.repos.getBranch({ owner, repo, branch: 'main' })).data.commit.sha;
+            // After a promotion, staging's head is the "Bring main back into staging" merge: one commit main lacks, but
+            // the same files. Nothing to ship then (and that merge, pushed with GITHUB_TOKEN, never starts CI).
+            if (cmp.data.ahead_by === 0 || head.tree.sha === (await treeOf(mainSha))) {
               core.notice('staging has nothing that main lacks.');
               return;
             }
-            // Run by hand right after a merge, CI on staging is usually still going: wait for it (up to 25 minutes)
-            // rather than fail and need a second run. A failed or missing check still stops the promotion.
-            const ciPassed = async () => {
-              const checks = await github.paginate(github.rest.checks.listForRef, { owner, repo, ref: staging, per_page: 100 });
+            const ciPassed = async (sha) => {
+              const checks = await github.paginate(github.rest.checks.listForRef, { owner, repo, ref: sha, per_page: 100 });
               return checks.filter((c) => c.name === 'CI passed').sort((a, b) => b.id - a.id)[0];
             };
-            let passed = await ciPassed();
+            const ciRuns = async (sha) =>
+              (await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: 'ci.yml', head_sha: sha, per_page: 1 })).data.total_count;
+            // The CI that vouches for staging's head: its own, or, when the head is a merge pushed with GITHUB_TOKEN (which
+            // never starts CI) that changed no files, the "CI passed" of the parent with the same tree.
+            let ref = staging;
+            if ((await ciRuns(staging)) === 0) {
+              for (const p of head.parents) {
+                if ((await treeOf(p.sha)) === head.tree.sha) {
+                  const c = await ciPassed(p.sha);
+                  if (c && c.status === 'completed' && c.conclusion === 'success') {
+                    core.info(`staging's head ${staging.slice(0, 7)} has the same files as ${p.sha.slice(0, 7)}, where CI passed.`);
+                    ref = p.sha;
+                    break;
+                  }
+                }
+              }
+            }
+            // Run by hand right after a merge, CI on staging is usually still going: wait for it (up to 25 minutes)
+            // rather than fail and need a second run. A failed or missing check still stops the promotion, and when no
+            // CI run exists for the commit after two minutes, none is coming, so stop then with a clear message.
+            let passed = await ciPassed(ref);
             for (let waited = 0; waited < 25 * 60 && (!passed || passed.status !== 'completed'); waited += 30) {
-              core.info(`Waiting for CI on staging (${staging.slice(0, 7)}): ${passed ? passed.status : 'not started yet'}.`);
+              if (!passed && waited >= 120 && (await ciRuns(ref)) === 0) {
+                core.setFailed(
+                  `No CI run exists for staging's head (${staging.slice(0, 7)}, "${head.message.split('\n')[0]}"), so it can't be checked. ` +
+                    'Commits pushed with GITHUB_TOKEN start no workflows: merge a pull request into staging (or push to it) to run CI, then promote again. Nothing promoted.',
+                );
+                return;
+              }
+              core.info(`Waiting for CI on staging (${ref.slice(0, 7)}): ${passed ? passed.status : 'not started yet'}.`);
               await new Promise((r) => setTimeout(r, 30_000));
-              passed = await ciPassed();
+              passed = await ciPassed(ref);
             }
             if (!passed || passed.status !== 'completed' || passed.conclusion !== 'success') {
               core.setFailed(`CI has not passed on staging (${staging.slice(0, 7)}): ${passed ? `${passed.status} / ${passed.conclusion}` : 'no "CI passed" check yet'}. Nothing promoted.`);
