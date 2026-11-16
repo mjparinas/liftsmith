@@ -1,0 +1,8 @@
+/* Turkish Siri phrases for ShortcutIntents.swift. Every phrase keeps ${applicationName}. */
+"Start a workout in ${applicationName}" = "${applicationName} ile antrenmana başla";
+"Start ${applicationName}" = "${applicationName} uygulamasını başlat";
+"Start my ${applicationName} workout" = "${applicationName} antrenmanımı başlat";
+"Log set in ${applicationName}" = "${applicationName} ile seti kaydet";
+"Log a set in ${applicationName}" = "${applicationName} ile bir set kaydet";
+"Add rest in ${applicationName}" = "${applicationName} ile dinlenme ekle";
+"More rest in ${applicationName}" = "${applicationName} ile dinlenmeyi uzat";

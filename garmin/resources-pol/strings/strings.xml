@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">Brak trwającego treningu</string>
+    <string id="NoneBody">Zacznij trening na telefonie, a pojawi się tutaj.</string>
+    <string id="Rest">Przerwa</string>
+    <string id="Next">Dalej: $1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START: zapisz serię</string>
+    <string id="HintAdd">DOWN: +30 s</string>
+</strings>

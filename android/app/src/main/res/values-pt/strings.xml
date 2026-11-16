@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">Iniciar treino</string>
+    <string name="shortcut_start_long">Iniciar o treino de hoje</string>
+    <string name="shortcut_log_short">Registrar série</string>
+    <string name="shortcut_log_long">Registrar a série atual como planejado</string>
+    <string name="shortcut_rest_short">+30 s de descanso</string>
+    <string name="shortcut_rest_long">Adicionar 30 segundos ao descanso</string>
+    <string name="widget_description">O treino de hoje e o porquê, sua meta semanal e a nota do coach, com Iniciar</string>
+    <string name="channel_live">Treino em andamento</string>
+    <string name="channel_live_desc">Timer de descanso, próxima série e frequência cardíaca enquanto você treina</string>
+    <string name="rest_over">Fim do descanso</string>
+    <string name="next_prefix">Próxima:</string>
+    <string name="rest_left">Faltam %1$s de descanso</string>
+    <string name="rest_left_next">Faltam %1$s · próxima: %2$s</string>
+    <string name="up_next">A seguir: %1$s</string>
+    <string name="add_30">+30 s</string>
+    <string name="widget_title">Treino de hoje</string>
+</resources>

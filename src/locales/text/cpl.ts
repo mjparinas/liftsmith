@@ -272,3 +272,176 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpl.already": "このアカウントには、すでにこのプランかそれ以上のプランがあります。",
   "cpl.error": "うまくいきませんでした。少ししてからもう一度お試しください。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "cpl.title": "Seu plano de coaching",
+  "cpl.tier.pro": "Pro",
+  "cpl.tier.coach": "Coach",
+  "cpl.tier.coachPlus": "Coach Plus",
+  "cpl.tier.school": "Equipe escolar",
+  "cpl.count": "Alunos: {count} de {limit}",
+  "cpl.countNoLimit": "Alunos: {count}, sem limite definido",
+  "cpl.full":
+    "Você chegou ao limite do seu plano, então novos alunos ainda não podem entrar. Remova um aluno que você não treina mais, ou mude para um plano com mais espaço.",
+  "cpl.left": "Espaço restante: {left}",
+  "cpl.grace":
+    "Você tinha mais alunos do que o Pro cobre quando os planos de coach começaram, então seu limite fica em {limit} até {date}. Todos que você treina agora continuam vinculados.",
+  "cpl.over": "Todos que você treina continuam vinculados. Para adicionar novos alunos, mude para um plano com mais espaço.",
+  "cpl.school": "Grátis para coaches de ensino médio verificados, até {limit} alunos.",
+  "cpl.see": "Ver planos de coach",
+  "cpl.sheetTitle": "Planos de coach",
+  "cpl.sheetLead":
+    "O Pro cobre até {pro} alunos. Os planos de coach dão mais espaço conforme sua lista de alunos cresce, e incluem tudo do Pro. Todas as ferramentas de coaching funcionam em todos os planos.",
+  "cpl.clients.coach": "Até {limit} alunos",
+  "cpl.clients.coachPlus": "Sem limite definido de alunos",
+  "cpl.what.coach": "Relatórios, rotinas, chat, check-ins, agendamento, pagamentos e metas de nutrição para uma lista completa de alunos.",
+  "cpl.what.coachPlus": "As mesmas ferramentas sem limite definido, para uma grande lista de alunos.",
+  "cpl.current": "Seu plano",
+  "cpl.yearly": "{tier}, anual",
+  "cpl.monthly": "{tier}, mensal",
+  "cpl.yearPrice": "{price} por ano, cerca de {perMonth} por mês. Renova todo ano até você cancelar.",
+  "cpl.monthPrice": "{price} por mês. Renova todo mês até você cancelar.",
+  "cpl.free": "Seus alunos sempre treinam de graça, e o Liftsmith não fica com nada do que eles te pagam.",
+  "cpl.replace": "Fazer o upgrade substitui sua assinatura Pro, então você paga um plano só, e o que sobrar do Pro vira crédito.",
+  "cpl.otherBill.web":
+    "Seu Pro é cobrado no site do Liftsmith. Quando seu plano de coach começar, cancele o Pro lá, porque os planos de coach incluem o Pro.",
+  "cpl.otherBill.store":
+    "Seu Pro é cobrado pela loja de apps do seu celular. Quando seu plano de coach começar, cancele o Pro lá, porque os planos de coach incluem o Pro.",
+  "cpl.unavailable": "Os planos de coach não podem ser mostrados agora. Verifique sua conexão e tente de novo.",
+  "cpl.retry": "Tentar de novo",
+  "cpl.manage": "Gerenciar plano",
+  "cpl.done": "{tier} está ativo. Pode levar um minuto para chegar à sua conta.",
+  "cpl.paid": "Obrigado! Seu plano de coach está ativo. Pode levar um minuto para aparecer aqui.",
+  "cpl.already": "Sua conta já tem este plano ou um maior.",
+  "cpl.error": "Não deu certo. Tente de novo daqui a pouco.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "cpl.title": "내 코칭 요금제",
+  "cpl.tier.pro": "Pro",
+  "cpl.tier.coach": "Coach",
+  "cpl.tier.coachPlus": "Coach Plus",
+  "cpl.tier.school": "학교 팀",
+  "cpl.count": "회원: {limit}명 중 {count}명",
+  "cpl.countNoLimit": "회원: {count}명, 인원 제한 없음",
+  "cpl.full":
+    "요금제 한도에 도달해서 새 회원이 아직 가입할 수 없어요. 더 이상 코칭하지 않는 회원을 삭제하거나, 여유가 더 있는 요금제로 바꾸세요.",
+  "cpl.left": "남은 자리: {left}",
+  "cpl.grace":
+    "코치 요금제가 시작될 때 Pro 한도보다 회원이 많았기 때문에, {date}까지 한도가 {limit}명으로 유지돼요. 지금 코칭하는 모든 회원은 연결된 채로 남아요.",
+  "cpl.over": "지금 코칭하는 모든 회원은 연결된 채로 남아요. 새 회원을 추가하려면 여유가 더 있는 요금제로 바꾸세요.",
+  "cpl.school": "인증된 고등학교 코치는 회원 {limit}명까지 무료예요.",
+  "cpl.see": "코치 요금제 보기",
+  "cpl.sheetTitle": "코치 요금제",
+  "cpl.sheetLead":
+    "Pro는 회원 {pro}명까지 지원해요. 코치 요금제는 회원이 늘어날수록 자리를 더해 주고, Pro의 모든 기능을 포함해요. 모든 코칭 도구는 모든 요금제에서 쓸 수 있어요.",
+  "cpl.clients.coach": "회원 최대 {limit}명",
+  "cpl.clients.coachPlus": "회원 인원 제한 없음",
+  "cpl.what.coach": "회원 전체를 위한 리포트, 루틴, 채팅, 체크인, 예약, 결제, 영양 목표.",
+  "cpl.what.coachPlus": "같은 도구를 인원 제한 없이, 많은 회원을 위해.",
+  "cpl.current": "내 요금제",
+  "cpl.yearly": "{tier}, 연간",
+  "cpl.monthly": "{tier}, 월간",
+  "cpl.yearPrice": "연 {price}, 월 약 {perMonth}. 해지할 때까지 매년 갱신돼요.",
+  "cpl.monthPrice": "월 {price}. 해지할 때까지 매월 갱신돼요.",
+  "cpl.free": "회원은 항상 무료로 운동하고, Liftsmith는 회원이 코치에게 내는 금액에서 아무것도 가져가지 않아요.",
+  "cpl.replace": "업그레이드하면 Pro 구독이 대체되어 요금제 하나만 결제하고, 남은 Pro 기간은 크레딧으로 돌려받아요.",
+  "cpl.otherBill.web":
+    "Pro는 Liftsmith 웹사이트에서 결제되고 있어요. 코치 요금제에 Pro가 포함되니, 코치 요금제가 시작되면 웹사이트에서 Pro를 해지하세요.",
+  "cpl.otherBill.store":
+    "Pro는 휴대폰의 앱 스토어에서 결제되고 있어요. 코치 요금제에 Pro가 포함되니, 코치 요금제가 시작되면 앱 스토어에서 Pro를 해지하세요.",
+  "cpl.unavailable": "지금은 코치 요금제를 표시할 수 없어요. 연결을 확인하고 다시 시도하세요.",
+  "cpl.retry": "다시 시도",
+  "cpl.manage": "요금제 관리",
+  "cpl.done": "{tier}이(가) 켜졌어요. 계정에 반영되는 데 1분 정도 걸릴 수 있어요.",
+  "cpl.paid": "고마워요! 코치 요금제가 켜졌어요. 여기에 표시되는 데 1분 정도 걸릴 수 있어요.",
+  "cpl.already": "계정에 이미 이 요금제나 더 큰 요금제가 있어요.",
+  "cpl.error": "처리되지 않았어요. 잠시 후 다시 시도하세요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "cpl.title": "Koçluk planın",
+  "cpl.tier.pro": "Pro",
+  "cpl.tier.coach": "Coach",
+  "cpl.tier.coachPlus": "Coach Plus",
+  "cpl.tier.school": "Okul takımı",
+  "cpl.count": "Danışanlar: {count} / {limit}",
+  "cpl.countNoLimit": "Danışanlar: {count}, sınır yok",
+  "cpl.full":
+    "Planının sınırındasın, bu yüzden yeni danışanlar henüz katılamaz. Artık çalıştırmadığın bir danışanı kaldır ya da daha geniş bir plana geç.",
+  "cpl.left": "Kalan yer: {left}",
+  "cpl.grace":
+    "Koç planları başladığında Pro'nun kapsadığından fazla danışanın vardı, bu yüzden sınırın {date} tarihine kadar {limit} olarak kalır. Şu an çalıştırdığın herkes bağlı kalır.",
+  "cpl.over": "Çalıştırdığın herkes bağlı kalır. Yeni danışan eklemek için daha geniş bir plana geç.",
+  "cpl.school": "Doğrulanmış lise koçları için ücretsiz, en fazla {limit} danışan.",
+  "cpl.see": "Koç planlarını gör",
+  "cpl.sheetTitle": "Koç planları",
+  "cpl.sheetLead":
+    "Pro en fazla {pro} danışanı kapsar. Koç planları, danışan listen büyüdükçe yer açar ve Pro'daki her şeyi içerir. Her koçluk aracı her planda çalışır.",
+  "cpl.clients.coach": "En fazla {limit} danışan",
+  "cpl.clients.coachPlus": "Danışan sınırı yok",
+  "cpl.what.coach":
+    "Dolu bir danışan listesi için raporlar, rutinler, sohbet, durum bildirimleri, rezervasyon, ödemeler ve beslenme hedefleri.",
+  "cpl.what.coachPlus": "Aynı araçlar sınırsız, büyük bir danışan kadrosu için.",
+  "cpl.current": "Planın",
+  "cpl.yearly": "{tier}, yıllık",
+  "cpl.monthly": "{tier}, aylık",
+  "cpl.yearPrice": "Yılda {price}, ayda yaklaşık {perMonth}. İptal edene kadar her yıl yenilenir.",
+  "cpl.monthPrice": "Ayda {price}. İptal edene kadar her ay yenilenir.",
+  "cpl.free": "Danışanların her zaman ücretsiz çalışır ve Liftsmith sana ödediklerinden hiçbir pay almaz.",
+  "cpl.replace": "Yükseltme Pro aboneliğinin yerini alır, böylece tek bir plan için ödersin; Pro'dan kalan süre de hesabına yansıtılır.",
+  "cpl.otherBill.web":
+    "Pro'n Liftsmith web sitesi üzerinden faturalanıyor. Koç planın başlayınca Pro'yu orada iptal et, çünkü koç planları Pro'yu içerir.",
+  "cpl.otherBill.store":
+    "Pro'n telefonunun uygulama mağazası üzerinden faturalanıyor. Koç planın başlayınca Pro'yu orada iptal et, çünkü koç planları Pro'yu içerir.",
+  "cpl.unavailable": "Koç planları şu an gösterilemiyor. Bağlantını kontrol et ve yeniden dene.",
+  "cpl.retry": "Yeniden dene",
+  "cpl.manage": "Planı yönet",
+  "cpl.done": "{tier} açık. Hesabına ulaşması bir dakika sürebilir.",
+  "cpl.paid": "Teşekkürler! Koç planın açık. Burada görünmesi bir dakika sürebilir.",
+  "cpl.already": "Hesabında zaten bu plan ya da daha büyüğü var.",
+  "cpl.error": "İşlem gerçekleşmedi. Biraz sonra yeniden dene.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "cpl.title": "Twój plan trenerski",
+  "cpl.tier.pro": "Pro",
+  "cpl.tier.coach": "Coach",
+  "cpl.tier.coachPlus": "Coach Plus",
+  "cpl.tier.school": "Drużyna szkolna",
+  "cpl.count": "Podopieczni: {count} z {limit}",
+  "cpl.countNoLimit": "Podopieczni: {count}, bez limitu",
+  "cpl.full":
+    "Twój plan osiągnął limit, więc nowi podopieczni nie mogą jeszcze dołączyć. Usuń podopiecznego, którego już nie trenujesz, albo przejdź na plan z większym limitem.",
+  "cpl.left": "Wolne miejsca: {left}",
+  "cpl.grace":
+    "Gdy wystartowały plany trenerskie, Twoich podopiecznych było więcej, niż obejmuje Pro, więc Twój limit zostaje na poziomie {limit} do {date}. Wszyscy, których teraz trenujesz, pozostają połączeni.",
+  "cpl.over": "Wszyscy, których trenujesz, pozostają połączeni. Aby dodać nowych podopiecznych, przejdź na plan z większym limitem.",
+  "cpl.school": "Za darmo dla zweryfikowanych trenerów szkół średnich, do {limit} podopiecznych.",
+  "cpl.see": "Zobacz plany trenerskie",
+  "cpl.sheetTitle": "Plany trenerskie",
+  "cpl.sheetLead":
+    "Pro obejmuje do {pro} podopiecznych. Plany trenerskie dają więcej miejsca, gdy lista podopiecznych rośnie, i zawierają wszystko z Pro. Każde narzędzie trenerskie działa w każdym planie.",
+  "cpl.clients.coach": "Do {limit} podopiecznych",
+  "cpl.clients.coachPlus": "Bez limitu podopiecznych",
+  "cpl.what.coach": "Raporty, plany treningowe, czat, ankiety, rezerwacje, płatności i cele żywieniowe dla pełnej listy podopiecznych.",
+  "cpl.what.coachPlus": "Te same narzędzia bez limitu, dla dużej grupy podopiecznych.",
+  "cpl.current": "Twój plan",
+  "cpl.yearly": "{tier}, rocznie",
+  "cpl.monthly": "{tier}, miesięcznie",
+  "cpl.yearPrice": "{price} rocznie, około {perMonth} miesięcznie. Odnawia się co roku, dopóki nie anulujesz.",
+  "cpl.monthPrice": "{price} miesięcznie. Odnawia się co miesiąc, dopóki nie anulujesz.",
+  "cpl.free": "Twoi podopieczni zawsze trenują za darmo, a Liftsmith nie bierze nic z tego, co Ci płacą.",
+  "cpl.replace": "Przejście wyżej zastępuje Twoją subskrypcję Pro, więc płacisz za jeden plan, a pozostała część Pro zostaje zaliczona.",
+  "cpl.otherBill.web":
+    "Twoje Pro jest rozliczane na stronie Liftsmith. Gdy plan trenerski się zacznie, anuluj tam Pro, bo plany trenerskie zawierają Pro.",
+  "cpl.otherBill.store":
+    "Twoje Pro jest rozliczane przez sklep z aplikacjami w telefonie. Gdy plan trenerski się zacznie, anuluj tam Pro, bo plany trenerskie zawierają Pro.",
+  "cpl.unavailable": "Nie można teraz pokazać planów trenerskich. Sprawdź połączenie i spróbuj ponownie.",
+  "cpl.retry": "Spróbuj ponownie",
+  "cpl.manage": "Zarządzaj planem",
+  "cpl.done": "{tier} jest aktywny. Może minąć chwila, zanim pojawi się na Twoim koncie.",
+  "cpl.paid": "Dzięki! Twój plan trenerski jest aktywny. Może minąć chwila, zanim się tu pojawi.",
+  "cpl.already": "Twoje konto ma już ten plan lub większy.",
+  "cpl.error": "Nie udało się. Spróbuj ponownie za chwilę.",
+};

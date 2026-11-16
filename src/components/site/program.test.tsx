@@ -78,12 +78,12 @@ describe("program pages", () => {
     }
   });
 
-  it("puts every copy in the sitemap with all six languages, with a lift's card", () => {
+  it("puts every copy in the sitemap with all ten languages, with a lift's card", () => {
     const routes = new Map(siteRoutes().map((r) => [r.path, r]));
     for (const path of ["/programs/", ...PROGRAMS.map((p) => programPath(p.id))])
       for (const lang of SITE_LANGS) {
         const r = routes.get(localPath(lang, path));
-        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(7);
+        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(11);
       }
     for (const id of Object.values(PROGRAM_FIGURE)) expect(EXERCISE_BY_ID.has(id!), id).toBe(true);
     expect(ogFile("/fr/programs/classic-5x5/")).toBe("exercises/back-squat.jpg");

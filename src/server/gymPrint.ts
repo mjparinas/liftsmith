@@ -17,7 +17,18 @@ import type { PosterRow } from "./gymPosters";
 import { esc } from "./siteFrame";
 
 type GymKey = keyof typeof gym.en;
-const GYM: Record<MsgLang, Partial<Record<GymKey, unknown>>> = { en: gym.en, es: gym.es, fr: gym.fr, de: gym.de, it: gym.it, ja: gym.ja };
+const GYM: Record<MsgLang, Partial<Record<GymKey, unknown>>> = {
+  en: gym.en,
+  es: gym.es,
+  fr: gym.fr,
+  de: gym.de,
+  it: gym.it,
+  ja: gym.ja,
+  pt: gym.pt,
+  ko: gym.ko,
+  pl: gym.pl,
+  tr: gym.tr,
+};
 const appLabel = (lang: MsgLang, key: GymKey) => String(GYM[lang][key] ?? gym.en[key]);
 
 /** Where the gym's QR code goes. */

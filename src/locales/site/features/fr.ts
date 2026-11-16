@@ -482,8 +482,8 @@ export const fr: FeaturesText = {
       body: "Le site montre ce que les pratiquants soulèvent vraiment au squat, au développé couché, au soulevé de terre et au développé militaire, par sexe et poids de corps, recalculé chaque jour avec ceux qui comptent. Seuls les groupes de 30 personnes ou plus sont affichés, en centiles, jamais les chiffres de quelqu'un. Un interrupteur dans Réglages › Vos données et confidentialité décide si vous comptez ; les moins de 18 ans ne comptent jamais.",
     },
     languages: {
-      name: "Six langues",
-      body: "Anglais, espagnol, français, allemand, italien et japonais, selon la langue de votre téléphone.",
+      name: "Dix langues",
+      body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone.",
     },
     appearance: {
       name: "Sombre, clair ou comme votre téléphone",

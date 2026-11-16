@@ -1,0 +1,15 @@
+/* Polish text for the widget, the Control Center button and the Live Activity. Follows the phone's language. */
+"Start workout" = "Zacznij trening";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Otwiera Liftsmith i zaczyna dzisiejszy trening albo ten, który już trwa.";
+"Log set" = "Zapisz serię";
+"Logs the current set as planned. Does nothing when no workout is running." = "Zapisuje bieżącą serię zgodnie z planem. Nic nie robi, gdy żaden trening nie trwa.";
+"Add 30 seconds of rest" = "Dodaj 30 sekund przerwy";
+"Adds 30 seconds to the rest timer." = "Dodaje 30 sekund do minutnika przerwy.";
+"Start today's workout in Liftsmith." = "Zacznij dzisiejszy trening w Liftsmith.";
+"Today's workout" = "Dzisiejszy trening";
+"Today's workout and why, your weekly goal and coach's note, with Start." = "Dzisiejszy trening i dlaczego taki, twój cel tygodniowy i notatka trenera, z przyciskiem Start.";
+"Lift" = "Seria";
+"Next: %@" = "Dalej: %@";
+"Rest left" = "Pozostała przerwa";
+"Rest over" = "Koniec przerwy";
+"%lld of %lld sets done" = "Ukończono %1$lld z %2$lld serii";

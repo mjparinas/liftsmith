@@ -481,8 +481,8 @@ export const de: FeaturesText = {
       body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
     languages: {
-      name: "Sechs Sprachen",
-      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch und Japanisch, passend zur Sprache deines Handys.",
+      name: "Zehn Sprachen",
+      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys.",
     },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",

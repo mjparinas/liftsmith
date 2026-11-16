@@ -152,3 +152,102 @@ export const ja: Partial<Record<Key, Message>> = {
   "cycle.agree": "同意してオンにする",
   "cycle.notNow": "今はしない",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "cycle.title": "Prontidão de acordo com o ciclo",
+  "cycle.intro":
+    "Opcional. Registre o dia em que sua menstruação começa, e o Liftsmith ajusta um pouco a decisão de forçar ou pegar leve ao longo do seu ciclo.",
+  "cycle.setUp": "Configurar",
+  "cycle.day": "Dia {day} de um ciclo de cerca de {length}.",
+  "cycle.logFirst": "Registre o primeiro dia da sua próxima menstruação para começar.",
+  "cycle.today": "Menstruação começou hoje",
+  "cycle.yesterday": "Começou ontem",
+  "cycle.offNote": "Isso desativa o recurso e apaga todas as menstruações que você registrou neste dispositivo.",
+  "cycle.offConfirm": "Desativar e apagar",
+  "cycle.cancel": "Cancelar",
+  "cycle.off": "Desativar e apagar dados do ciclo",
+  "cycle.consent1":
+    "Você registra o primeiro dia de cada menstruação. O Liftsmith estima em que ponto do ciclo você está a partir da sua duração típica e ajusta um pouco a prontidão do dia. Por exemplo, pode sugerir treinar conforme a sensação durante a menstruação. Você sempre pode mudar a decisão.",
+  "cycle.consent2a": "Os dados do seu ciclo ficam neste celular.",
+  "cycle.consent2b":
+    "Eles só saem daqui pelo seu próprio backup e sincronização, se você ativá-los. Nunca são usados para análises ou anúncios, nunca entram em relatórios de feedback e nunca são compartilhados ou vendidos.",
+  "cycle.consent3":
+    "As pesquisas sobre fase do ciclo e força são divergentes e variam entre pessoas, então o efeito é pequeno. Isto não é orientação médica, método contraceptivo nem ferramenta de fertilidade.",
+  "cycle.consent4": "Você pode desativar a qualquer momento, o que apaga tudo o que registrou.",
+  "cycle.agree": "Concordo, ativar",
+  "cycle.notNow": "Agora não",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "cycle.title": "생리 주기 반영 컨디션",
+  "cycle.intro": "선택 사항이에요. 생리 시작일을 기록하면 Liftsmith가 주기에 맞춰 그날의 강하게 또는 가볍게 판단을 조금 조정해요.",
+  "cycle.setUp": "설정",
+  "cycle.day": "약 {length}일 주기 중 {day}일째.",
+  "cycle.logFirst": "시작하려면 다음 생리 첫날을 기록하세요.",
+  "cycle.today": "오늘 생리 시작",
+  "cycle.yesterday": "어제 시작",
+  "cycle.offNote": "이 기능을 끄고 이 기기에 기록한 모든 생리 기록을 삭제해요.",
+  "cycle.offConfirm": "끄고 삭제",
+  "cycle.cancel": "취소",
+  "cycle.off": "끄고 주기 데이터 삭제",
+  "cycle.consent1":
+    "각 생리의 첫날을 기록하세요. Liftsmith는 내 평소 주기 길이로 현재 주기 위치를 추정하고 그날의 컨디션을 조금 조정해요. 예를 들어 생리 중에는 느낌대로 하라고 제안할 수 있어요. 판단은 언제든 직접 바꿀 수 있어요.",
+  "cycle.consent2a": "주기 데이터는 이 휴대폰에 남아요.",
+  "cycle.consent2b":
+    "백업과 동기화를 직접 켠 경우에만 그 경로로 휴대폰 밖으로 나가요. 분석이나 광고에 절대 쓰이지 않고, 의견 보고서에 포함되지 않으며, 공유되거나 판매되지 않아요.",
+  "cycle.consent3":
+    "생리 주기와 근력에 관한 연구는 결과가 엇갈리고 사람마다 달라서 효과는 작아요. 의학적 조언, 피임 또는 임신 관련 도구가 아니에요.",
+  "cycle.consent4": "언제든 끌 수 있고, 끄면 기록한 모든 내용이 삭제돼요.",
+  "cycle.agree": "동의하고 켜기",
+  "cycle.notNow": "나중에",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "cycle.title": "Döngüye duyarlı hazırlık",
+  "cycle.intro":
+    "İsteğe bağlı. Regl döneminin başladığı günü kaydet, Liftsmith da günün yüklenme ya da hafif tutma kararını döngüne göre biraz ayarlasın.",
+  "cycle.setUp": "Kur",
+  "cycle.day": "Yaklaşık {length} günlük döngünün {day}. günü.",
+  "cycle.logFirst": "Başlamak için bir sonraki regl döneminin ilk gününü kaydet.",
+  "cycle.today": "Regl bugün başladı",
+  "cycle.yesterday": "Dün başladı",
+  "cycle.offNote": "Bu, özelliği kapatır ve bu cihazda kaydettiğin tüm regl dönemlerini siler.",
+  "cycle.offConfirm": "Kapat ve sil",
+  "cycle.cancel": "Vazgeç",
+  "cycle.off": "Kapat ve döngü verilerini sil",
+  "cycle.consent1":
+    "Her regl döneminin ilk gününü kaydedersin. Liftsmith kendi ortalama döngü uzunluğundan döngünün neresinde olduğunu tahmin eder ve günün hazırlığını biraz ayarlar. Örneğin regl sırasında hissine göre gitmeyi önerebilir. Kararı her zaman değiştirebilirsin.",
+  "cycle.consent2a": "Döngü verilerin bu telefonda kalır.",
+  "cycle.consent2b":
+    "Yalnızca açarsan kendi yedeğin ve eşitlemen yoluyla telefondan çıkar. Asla analiz ya da reklam için kullanılmaz, geri bildirim raporlarına eklenmez, paylaşılmaz ya da satılmaz.",
+  "cycle.consent3":
+    "Döngü evresi ve güç üzerine araştırmalar karışık ve kişiden kişiye değişiyor, bu yüzden etkisi küçük. Bu tıbbi tavsiye, doğum kontrolü ya da doğurganlık aracı değildir.",
+  "cycle.consent4": "İstediğin zaman kapatabilirsin; bu, kaydettiğin her şeyi siler.",
+  "cycle.agree": "Kabul ediyorum, aç",
+  "cycle.notNow": "Şimdi değil",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "cycle.title": "Gotowość z uwzględnieniem cyklu",
+  "cycle.intro":
+    "Opcjonalne. Zapisz dzień, w którym zaczyna się okres, a Liftsmith lekko dostosuje decyzję na dziś (Mocniej lub Lżej) do Twojego cyklu.",
+  "cycle.setUp": "Skonfiguruj",
+  "cycle.day": "Dzień cyklu {day} z około {length}.",
+  "cycle.logFirst": "Zapisz pierwszy dzień następnego okresu, by zacząć.",
+  "cycle.today": "Okres zaczął się dziś",
+  "cycle.yesterday": "Zaczął się wczoraj",
+  "cycle.offNote": "To wyłącza funkcję i usuwa wszystkie zapisane na tym urządzeniu okresy.",
+  "cycle.offConfirm": "Wyłącz i usuń",
+  "cycle.cancel": "Anuluj",
+  "cycle.off": "Wyłącz i usuń dane o cyklu",
+  "cycle.consent1":
+    "Zapisujesz pierwszy dzień każdego okresu. Liftsmith szacuje, w którym miejscu cyklu jesteś, na podstawie Twojej typowej długości cyklu i lekko dostosowuje gotowość na dany dzień. Może np. zasugerować trening według samopoczucia w czasie okresu. Zawsze możesz zmienić decyzję.",
+  "cycle.consent2a": "Twoje dane o cyklu zostają na tym telefonie.",
+  "cycle.consent2b":
+    "Opuszczają go tylko przez Twoją kopię zapasową i synchronizację, jeśli je włączysz. Nigdy nie służą do analityki ani reklam, nigdy nie trafiają do zgłoszeń z opiniami i nigdy nie są udostępniane ani sprzedawane.",
+  "cycle.consent3":
+    "Badania nad fazą cyklu a siłą są niejednoznaczne i różnią się między osobami, więc efekt jest niewielki. To nie jest porada medyczna, antykoncepcja ani narzędzie do płodności.",
+  "cycle.consent4": "Możesz to wyłączyć w każdej chwili, co usuwa wszystkie Twoje zapisy.",
+  "cycle.agree": "Zgadzam się, włącz",
+  "cycle.notNow": "Nie teraz",
+};

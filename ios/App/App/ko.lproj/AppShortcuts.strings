@@ -1,0 +1,8 @@
+/* Korean Siri phrases for ShortcutIntents.swift. Every phrase keeps ${applicationName}. */
+"Start a workout in ${applicationName}" = "${applicationName}에서 운동 시작해 줘";
+"Start ${applicationName}" = "${applicationName} 시작해 줘";
+"Start my ${applicationName} workout" = "내 ${applicationName} 운동 시작해 줘";
+"Log set in ${applicationName}" = "${applicationName}에서 세트 기록해 줘";
+"Log a set in ${applicationName}" = "${applicationName}에 세트 하나 기록해 줘";
+"Add rest in ${applicationName}" = "${applicationName}에서 휴식 추가해 줘";
+"More rest in ${applicationName}" = "${applicationName}에서 휴식 더 줘";

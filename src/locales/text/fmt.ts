@@ -119,3 +119,105 @@ export const ja: Partial<Record<Key, Message>> = {
   "fmt.link": "{second}を{first}とスーパーセットにする",
   "fmt.unlink": "{second}を{first}から分ける",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "Peso corporal",
+  "fmt.each": "{weight} por mão",
+  "fmt.reps": {
+    one: "{n} rep",
+    other: "{n} reps",
+  },
+  "fmt.seconds": "{n} s",
+  "fmt.repsSide": {
+    one: "{n} rep de cada lado",
+    other: "{n} reps de cada lado",
+  },
+  "fmt.secondsSide": "{n} s de cada lado",
+  "fmt.repsLR": "{left} esquerda · {right} direita",
+  "fmt.perSide": "Cada lado",
+  "fmt.sideReps": "As reps são por lado. Faça dos dois lados.",
+  "fmt.sideHold": "O tempo é por lado. Segure dos dois lados.",
+  "fmt.perHand": "O peso é por halter, um em cada mão.",
+  "fmt.eachSide": "Cada lado: {plates} {unit}",
+  "fmt.emptyBar": "Barra vazia",
+  "fmt.superset": "Bi-set {letter} · {n} de {total}",
+  "fmt.link": "Fazer {second} em bi-set com {first}",
+  "fmt.unlink": "Separar {second} de {first}",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "맨몸",
+  "fmt.each": "한 손에 {weight}",
+  "fmt.reps": {
+    other: "{n}회",
+  },
+  "fmt.seconds": "{n} s",
+  "fmt.repsSide": {
+    other: "양쪽 각 {n}회",
+  },
+  "fmt.secondsSide": "양쪽 각 {n} s",
+  "fmt.repsLR": "왼쪽 {left} · 오른쪽 {right}",
+  "fmt.perSide": "양쪽 각각",
+  "fmt.sideReps": "횟수는 한쪽 기준이에요. 양쪽 모두 하세요.",
+  "fmt.sideHold": "시간은 한쪽 기준이에요. 양쪽 모두 버티세요.",
+  "fmt.perHand": "무게는 덤벨 하나 기준이고, 양손에 하나씩 들어요.",
+  "fmt.eachSide": "한쪽에: {plates} {unit}",
+  "fmt.emptyBar": "빈 바",
+  "fmt.superset": "슈퍼세트 {letter} · {total}개 중 {n}번째",
+  "fmt.link": "{second}을(를) {first}와(과) 슈퍼세트로",
+  "fmt.unlink": "{second}을(를) {first}에서 분리",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "Vücut ağırlığı",
+  "fmt.each": "El başına {weight}",
+  "fmt.reps": {
+    one: "{n} tekrar",
+    other: "{n} tekrar",
+  },
+  "fmt.seconds": "{n} s",
+  "fmt.repsSide": {
+    one: "Her taraf {n} tekrar",
+    other: "Her taraf {n} tekrar",
+  },
+  "fmt.secondsSide": "Her taraf {n} s",
+  "fmt.repsLR": "Sol {left} · sağ {right}",
+  "fmt.perSide": "Her taraf",
+  "fmt.sideReps": "Tekrarlar taraf başına. İki tarafta da yap.",
+  "fmt.sideHold": "Süre taraf başına. İki tarafta da tut.",
+  "fmt.perHand": "Ağırlık dambıl başına, her elde bir tane.",
+  "fmt.eachSide": "Her taraf: {plates} {unit}",
+  "fmt.emptyBar": "Boş bar",
+  "fmt.superset": "Süperset {letter} · {n}/{total}",
+  "fmt.link": "{second} hareketini {first} ile süperset yap",
+  "fmt.unlink": "{second} hareketini {first} hareketinden ayır",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "Masa ciała",
+  "fmt.each": "{weight} na rękę",
+  "fmt.reps": {
+    one: "{n} powtórzenie",
+    few: "{n} powtórzenia",
+    many: "{n} powtórzeń",
+    other: "{n} powtórzenia",
+  },
+  "fmt.seconds": "{n} s",
+  "fmt.repsSide": {
+    one: "{n} powtórzenie na stronę",
+    few: "{n} powtórzenia na stronę",
+    many: "{n} powtórzeń na stronę",
+    other: "{n} powtórzenia na stronę",
+  },
+  "fmt.secondsSide": "{n} s na stronę",
+  "fmt.repsLR": "{left} lewa · {right} prawa",
+  "fmt.perSide": "Na stronę",
+  "fmt.sideReps": "Powtórzenia są na stronę. Zrób je po obu stronach.",
+  "fmt.sideHold": "Czas jest na stronę. Wytrzymaj po obu stronach.",
+  "fmt.perHand": "Ciężar to jeden hantel, po jednym w każdej ręce.",
+  "fmt.eachSide": "Na stronę: {plates} {unit}",
+  "fmt.emptyBar": "Pusta sztanga",
+  "fmt.superset": "Superseria {letter} · {n} z {total}",
+  "fmt.link": "Superseria: {second} z {first}",
+  "fmt.unlink": "Rozdziel: {second} i {first}",
+};

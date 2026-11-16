@@ -40,3 +40,27 @@ export const ja: Partial<Record<Key, Message>> = {
   "variety.balanced": "バランス",
   "variety.variable": "変化を重視",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "variety.consistent": "Mais constante",
+  "variety.balanced": "Equilibrado",
+  "variety.variable": "Mais variedade",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "variety.consistent": "더 일관되게",
+  "variety.balanced": "균형",
+  "variety.variable": "더 다양하게",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "variety.consistent": "Daha tutarlı",
+  "variety.balanced": "Dengeli",
+  "variety.variable": "Daha çeşitli",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "variety.consistent": "Bardziej stałe",
+  "variety.balanced": "Zrównoważone",
+  "variety.variable": "Więcej różnorodności",
+};

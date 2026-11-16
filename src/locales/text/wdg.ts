@@ -220,3 +220,81 @@ export const ja: Partial<Record<Key, Message>> = {
   "wdg.area.core": "体幹",
   "wdg.area.legs": "脚",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes} min",
+  "wdg.start": "Começar",
+  "wdg.resume": "Retomar",
+  "wdg.log": "Registrar série",
+  "wdg.activeWhy": "Sua próxima série está pronta. Registre aqui ou abra o treino.",
+  "wdg.stale": "Abra o Liftsmith para ver o plano de hoje.",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": {
+    one: "{done} de {goal} esta semana. Mais {count} para bater sua meta.",
+    other: "{done} de {goal} esta semana. Mais {count} para bater sua meta.",
+  },
+  "wdg.goalStreak": {
+    one: "{done} de {goal} esta semana. Mais {count} mantém sua sequência de {weeks} semanas.",
+    other: "{done} de {goal} esta semana. Mais {count} mantêm sua sequência de {weeks} semanas.",
+  },
+  "wdg.goalMet": "Meta semanal batida: {done} de {goal}. Descansar também é treinar.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes}분",
+  "wdg.start": "시작",
+  "wdg.resume": "계속",
+  "wdg.log": "세트 기록",
+  "wdg.activeWhy": "다음 세트가 준비됐어요. 여기서 기록하거나 운동을 여세요.",
+  "wdg.stale": "오늘의 계획을 보려면 Liftsmith를 여세요.",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": {
+    other: "이번 주 {goal}회 중 {done}회. 목표까지 {count}회 더.",
+  },
+  "wdg.goalStreak": {
+    other: "이번 주 {goal}회 중 {done}회. {count}회 더 하면 {weeks}주 연속 기록 유지.",
+  },
+  "wdg.goalMet": "주간 목표 달성: {goal}회 중 {done}회. 휴식도 운동이에요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes} dk",
+  "wdg.start": "Başla",
+  "wdg.resume": "Devam et",
+  "wdg.log": "Seti kaydet",
+  "wdg.activeWhy": "Sonraki setin hazır. Buradan kaydet ya da antrenmanı aç.",
+  "wdg.stale": "Bugünün planı için Liftsmith'i aç.",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": {
+    one: "Bu hafta {goal} antrenmandan {done}. Hedefine {count} kaldı.",
+    other: "Bu hafta {goal} antrenmandan {done}. Hedefine {count} kaldı.",
+  },
+  "wdg.goalStreak": {
+    one: "Bu hafta {goal} antrenmandan {done}. {count} antrenman daha {weeks} haftalık serini korur.",
+    other: "Bu hafta {goal} antrenmandan {done}. {count} antrenman daha {weeks} haftalık serini korur.",
+  },
+  "wdg.goalMet": "Haftalık hedef tamam: {goal} antrenmandan {done}. Dinlenmek de antrenmandır.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes} min",
+  "wdg.start": "Start",
+  "wdg.resume": "Wznów",
+  "wdg.log": "Zapisz serię",
+  "wdg.activeWhy": "Następna seria jest gotowa. Zapisz ją tutaj albo otwórz trening.",
+  "wdg.stale": "Otwórz Liftsmith, żeby zobaczyć plan na dziś.",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": {
+    one: "{done} z {goal} w tym tygodniu. Jeszcze {count} do celu.",
+    few: "{done} z {goal} w tym tygodniu. Jeszcze {count} do celu.",
+    many: "{done} z {goal} w tym tygodniu. Jeszcze {count} do celu.",
+    other: "{done} z {goal} w tym tygodniu. Jeszcze {count} do celu.",
+  },
+  "wdg.goalStreak": {
+    one: "{done} z {goal} w tym tygodniu. Jeszcze {count}, by utrzymać passę ({weeks} tyg.).",
+    few: "{done} z {goal} w tym tygodniu. Jeszcze {count}, by utrzymać passę ({weeks} tyg.).",
+    many: "{done} z {goal} w tym tygodniu. Jeszcze {count}, by utrzymać passę ({weeks} tyg.).",
+    other: "{done} z {goal} w tym tygodniu. Jeszcze {count}, by utrzymać passę ({weeks} tyg.).",
+  },
+  "wdg.goalMet": "Cel tygodniowy osiągnięty: {done} z {goal}. Odpoczynek to też trening.",
+};

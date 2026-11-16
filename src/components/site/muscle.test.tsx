@@ -63,12 +63,12 @@ describe("best exercises for each muscle", () => {
     }
   });
 
-  it("puts every copy in the sitemap with all six languages, and gives each its card", () => {
+  it("puts every copy in the sitemap with all ten languages, and gives each its card", () => {
     const routes = new Map(siteRoutes().map((r) => [r.path, r]));
     for (const path of ["/muscles/", ...pageMuscles().map(musclePath)])
       for (const lang of SITE_LANGS) {
         const r = routes.get(localPath(lang, path));
-        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(7);
+        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${path}`).toBe(11);
       }
     expect(ogFile("/ja/muscles/chest/")).toBe(ogFile("/muscles/chest/"));
     expect(pageMuscles().length).toBe(MUSCLES.filter((m) => bestFor(m).length).length);

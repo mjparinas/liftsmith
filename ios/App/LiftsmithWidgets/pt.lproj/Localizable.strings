@@ -1,0 +1,15 @@
+/* Brazilian Portuguese text for the widget, the Control Center button and the Live Activity. Follows the phone's language. */
+"Start workout" = "Iniciar treino";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Abre o Liftsmith e inicia o treino de hoje, ou o que já está em andamento.";
+"Log set" = "Registrar série";
+"Logs the current set as planned. Does nothing when no workout is running." = "Registra a série atual como planejado. Não faz nada se não houver treino em andamento.";
+"Add 30 seconds of rest" = "Adicionar 30 segundos de descanso";
+"Adds 30 seconds to the rest timer." = "Adiciona 30 segundos ao timer de descanso.";
+"Start today's workout in Liftsmith." = "Inicie o treino de hoje no Liftsmith.";
+"Today's workout" = "Treino de hoje";
+"Today's workout and why, your weekly goal and coach's note, with Start." = "O treino de hoje e o porquê, sua meta semanal e a nota do coach, com Iniciar.";
+"Lift" = "Série";
+"Next: %@" = "Próxima: %@";
+"Rest left" = "Descanso restante";
+"Rest over" = "Fim do descanso";
+"%lld of %lld sets done" = "%1$lld de %2$lld séries feitas";

@@ -14,7 +14,18 @@ import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
 const ITEMS: Record<PosterRow["items"], string> = { both: "Poster and stand", poster: "Poster", stand: "Stand" };
-const LANG: Record<string, string> = { en: "English", es: "Spanish", fr: "French", de: "German", it: "Italian", ja: "Japanese" };
+const LANG: Record<string, string> = {
+  en: "English",
+  es: "Spanish",
+  fr: "French",
+  de: "German",
+  it: "Italian",
+  ja: "Japanese",
+  pt: "Portuguese",
+  ko: "Korean",
+  pl: "Polish",
+  tr: "Turkish",
+};
 
 export function GymPosters({ admin, version, onCount }: { admin: boolean; version: number; onCount?: (open: number) => void }) {
   const [rows, setRows] = useState<PosterRow[] | null>(null);

@@ -52,3 +52,35 @@ export const ja: Partial<Record<Key, Message>> = {
   "tab.awards": "実績",
   "tab.friends": "フレンド",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "tab.today": "Hoje",
+  "tab.recovery": "Corpo",
+  "tab.progress": "Progresso",
+  "tab.awards": "Prêmios",
+  "tab.friends": "Amigos",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "tab.today": "오늘",
+  "tab.recovery": "몸",
+  "tab.progress": "진행",
+  "tab.awards": "업적",
+  "tab.friends": "친구",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "tab.today": "Bugün",
+  "tab.recovery": "Vücut",
+  "tab.progress": "İlerleme",
+  "tab.awards": "Ödüller",
+  "tab.friends": "Arkadaşlar",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "tab.today": "Dziś",
+  "tab.recovery": "Ciało",
+  "tab.progress": "Postępy",
+  "tab.awards": "Nagrody",
+  "tab.friends": "Znajomi",
+};

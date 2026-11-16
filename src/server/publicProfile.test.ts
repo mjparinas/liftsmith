@@ -65,7 +65,8 @@ describe("public profiles on the web", () => {
 
   it("follows the reader's language and units", () => {
     expect(langFrom(req("de-DE,de;q=0.9,en;q=0.8"))).toBe("de");
-    expect(langFrom(req("pt-BR"))).toBe("en");
+    expect(langFrom(req("pt-BR"))).toBe("pt");
+    expect(langFrom(req("zh-CN"))).toBe("en");
     expect(unitFrom(req("en-US,en;q=0.9"))).toBe("lb");
     expect(unitFrom(req("en-CA"))).toBe("kg");
     expect(bestSetText({ id: "bench-press", name: "", sets: 3, w: 100, r: 5 }, "lb", "en")).toBe("220.46 lb × 5"); // the app's rounding (unitMath.ts), not a whole pound

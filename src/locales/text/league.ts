@@ -64,3 +64,43 @@ export const ja: Partial<Record<Key, Message>> = {
   "league.emerald": "エメラルド",
   "league.diamond": "ダイヤモンド",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "league.bronze": "Bronze",
+  "league.silver": "Prata",
+  "league.gold": "Ouro",
+  "league.sapphire": "Safira",
+  "league.ruby": "Rubi",
+  "league.emerald": "Esmeralda",
+  "league.diamond": "Diamante",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "league.bronze": "브론즈",
+  "league.silver": "실버",
+  "league.gold": "골드",
+  "league.sapphire": "사파이어",
+  "league.ruby": "루비",
+  "league.emerald": "에메랄드",
+  "league.diamond": "다이아몬드",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "league.bronze": "Bronz",
+  "league.silver": "Gümüş",
+  "league.gold": "Altın",
+  "league.sapphire": "Safir",
+  "league.ruby": "Yakut",
+  "league.emerald": "Zümrüt",
+  "league.diamond": "Elmas",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "league.bronze": "Brąz",
+  "league.silver": "Srebro",
+  "league.gold": "Złoto",
+  "league.sapphire": "Szafir",
+  "league.ruby": "Rubin",
+  "league.emerald": "Szmaragd",
+  "league.diamond": "Diament",
+};

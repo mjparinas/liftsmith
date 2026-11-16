@@ -1,0 +1,275 @@
+import type { Message } from "@/lib/i18n";
+
+import type { MessageKey } from "./en";
+// 한국어. 기계 번역.
+// The text is in src/locales/text/<prefix>.ts, beside the English.
+
+import * as a11y from "./text/a11y";
+import * as account from "./text/account";
+import * as ach from "./text/ach";
+import * as activity from "./text/activity";
+import * as advice from "./text/advice";
+import * as appearance from "./text/appearance";
+import * as awards from "./text/awards";
+import * as band from "./text/band";
+import * as bk from "./text/bk";
+import * as block from "./text/block";
+import * as bmi from "./text/bmi";
+import * as body from "./text/body";
+import * as buddy from "./text/buddy";
+import * as buy from "./text/buy";
+import * as cal from "./text/cal";
+import * as calc from "./text/calc";
+import * as callText from "./text/callText";
+import * as card from "./text/card";
+import * as category from "./text/category";
+import * as cause from "./text/cause";
+import * as chk from "./text/chk";
+import * as coach from "./text/coach";
+import * as conn from "./text/conn";
+import * as cos from "./text/cos";
+import * as count from "./text/count";
+import * as cpl from "./text/cpl";
+import * as creator from "./text/creator";
+import * as cycle from "./text/cycle";
+import * as dash from "./text/dash";
+import * as delight from "./text/delight";
+import * as demo from "./text/demo";
+import * as done from "./text/done";
+import * as dots from "./text/dots";
+import * as egg from "./text/egg";
+import * as equipment from "./text/equipment";
+import * as ex from "./text/ex";
+import * as exp from "./text/exp";
+import * as explain from "./text/explain";
+import * as extra from "./text/extra";
+import * as fb from "./text/fb";
+import * as fit from "./text/fit";
+import * as fix from "./text/fix";
+import * as fmt from "./text/fmt";
+import * as food from "./text/food";
+import * as friends from "./text/friends";
+import * as ft from "./text/ft";
+import * as game from "./text/game";
+import * as ghost from "./text/ghost";
+import * as gl from "./text/gl";
+import * as gloss from "./text/gloss";
+import * as goal from "./text/goal";
+import * as gp from "./text/gp";
+import * as gym from "./text/gym";
+import * as hr from "./text/hr";
+import * as hx from "./text/hx";
+import * as imp from "./text/imp";
+import * as info from "./text/info";
+import * as inj from "./text/inj";
+import * as ins from "./text/ins";
+import * as lab from "./text/lab";
+import * as league from "./text/league";
+import * as lift from "./text/lift";
+import * as link from "./text/link";
+import * as lvl from "./text/lvl";
+import * as map from "./text/map";
+import * as mom from "./text/mom";
+import * as month from "./text/month";
+import * as msg from "./text/msg";
+import * as msgKind from "./text/msgKind";
+import * as muscle from "./text/muscle";
+import * as nav from "./text/nav";
+import * as note from "./text/note";
+import * as notes from "./text/notes";
+import * as now from "./text/now";
+import * as orm from "./text/orm";
+import * as part from "./text/part";
+import * as past from "./text/past";
+import * as pay from "./text/pay";
+import * as pgm from "./text/pgm";
+import * as photos from "./text/photos";
+import * as plate from "./text/plate";
+import * as pm from "./text/pm";
+import * as pol from "./text/pol";
+import * as pr from "./text/pr";
+import * as pro from "./text/pro";
+import * as prog from "./text/prog";
+import * as progress from "./text/progress";
+import * as pub from "./text/pub";
+import * as push from "./text/push";
+import * as quest from "./text/quest";
+import * as quote from "./text/quote";
+import * as rarity from "./text/rarity";
+import * as recap from "./text/recap";
+import * as recovery from "./text/recovery";
+import * as remix from "./text/remix";
+import * as rmd from "./text/rmd";
+import * as rt from "./text/rt";
+import * as save from "./text/save";
+import * as sband from "./text/sband";
+import * as sea from "./text/sea";
+import * as settings from "./text/settings";
+import * as setup from "./text/setup";
+import * as share from "./text/share";
+import * as sig from "./text/sig";
+import * as social from "./text/social";
+import * as stats from "./text/stats";
+import * as str from "./text/str";
+import * as tab from "./text/tab";
+import * as td from "./text/td";
+import * as tdee from "./text/tdee";
+import * as team from "./text/team";
+import * as tempo from "./text/tempo";
+import * as theme from "./text/theme";
+import * as tier from "./text/tier";
+import * as time from "./text/time";
+import * as timer from "./text/timer";
+import * as today from "./text/today";
+import * as ton from "./text/ton";
+import * as tools from "./text/tools";
+import * as train from "./text/train";
+import * as trl from "./text/trl";
+import * as trn from "./text/trn";
+import * as twin from "./text/twin";
+import * as units from "./text/units";
+import * as variety from "./text/variety";
+import * as vc from "./text/vc";
+import * as vl from "./text/vl";
+import * as warm from "./text/warm";
+import * as wdg from "./text/wdg";
+import * as why from "./text/why";
+import * as wk from "./text/wk";
+import * as workout from "./text/workout";
+import * as x from "./text/x";
+
+export const ko: Partial<Record<MessageKey, Message>> = {
+  ...a11y.ko,
+  ...account.ko,
+  ...ach.ko,
+  ...activity.ko,
+  ...advice.ko,
+  ...appearance.ko,
+  ...awards.ko,
+  ...band.ko,
+  ...bk.ko,
+  ...block.ko,
+  ...bmi.ko,
+  ...body.ko,
+  ...buddy.ko,
+  ...buy.ko,
+  ...cal.ko,
+  ...calc.ko,
+  ...card.ko,
+  ...callText.ko,
+  ...category.ko,
+  ...cause.ko,
+  ...chk.ko,
+  ...coach.ko,
+  ...conn.ko,
+  ...cos.ko,
+  ...count.ko,
+  ...cpl.ko,
+  ...creator.ko,
+  ...cycle.ko,
+  ...dash.ko,
+  ...delight.ko,
+  ...demo.ko,
+  ...done.ko,
+  ...dots.ko,
+  ...equipment.ko,
+  ...ex.ko,
+  ...exp.ko,
+  ...explain.ko,
+  ...extra.ko,
+  ...fb.ko,
+  ...fit.ko,
+  ...fix.ko,
+  ...fmt.ko,
+  ...food.ko,
+  ...ft.ko,
+  ...friends.ko,
+  ...game.ko,
+  ...ghost.ko,
+  ...gl.ko,
+  ...gloss.ko,
+  ...goal.ko,
+  ...gp.ko,
+  ...gym.ko,
+  ...hr.ko,
+  ...imp.ko,
+  ...info.ko,
+  ...inj.ko,
+  ...ins.ko,
+  ...lab.ko,
+  ...league.ko,
+  ...link.ko,
+  ...lvl.ko,
+  ...map.ko,
+  ...mom.ko,
+  ...month.ko,
+  ...msg.ko,
+  ...msgKind.ko,
+  ...muscle.ko,
+  ...nav.ko,
+  ...note.ko,
+  ...notes.ko,
+  ...now.ko,
+  ...orm.ko,
+  ...part.ko,
+  ...past.ko,
+  ...pay.ko,
+  ...pgm.ko,
+  ...photos.ko,
+  ...plate.ko,
+  ...pm.ko,
+  ...pol.ko,
+  ...pr.ko,
+  ...pro.ko,
+  ...prog.ko,
+  ...progress.ko,
+  ...pub.ko,
+  ...push.ko,
+  ...quest.ko,
+  ...quote.ko,
+  ...rarity.ko,
+  ...recap.ko,
+  ...recovery.ko,
+  ...remix.ko,
+  ...rmd.ko,
+  ...rt.ko,
+  ...save.ko,
+  ...sband.ko,
+  ...sea.ko,
+  ...settings.ko,
+  ...setup.ko,
+  ...share.ko,
+  ...sig.ko,
+  ...social.ko,
+  ...str.ko,
+  ...stats.ko,
+  ...tab.ko,
+  ...td.ko,
+  ...tempo.ko,
+  ...timer.ko,
+  ...tdee.ko,
+  ...theme.ko,
+  ...team.ko,
+  ...tier.ko,
+  ...time.ko,
+  ...today.ko,
+  ...ton.ko,
+  ...egg.ko,
+  ...hx.ko,
+  ...lift.ko,
+  ...tools.ko,
+  ...train.ko,
+  ...trl.ko,
+  ...trn.ko,
+  ...twin.ko,
+  ...units.ko,
+  ...variety.ko,
+  ...vc.ko,
+  ...vl.ko,
+  ...warm.ko,
+  ...wdg.ko,
+  ...why.ko,
+  ...wk.ko,
+  ...workout.ko,
+  ...x.ko,
+};

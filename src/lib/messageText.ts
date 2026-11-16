@@ -4,7 +4,7 @@
 // the same way t() does: {placeholders}, and {one, other} plurals picked by `count`.
 import * as rmd from "@/locales/text/rmd";
 
-export const MSG_LANGS = ["en", "es", "fr", "de", "it", "ja"] as const;
+export const MSG_LANGS = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"] as const;
 export type MsgLang = (typeof MSG_LANGS)[number];
 export type MsgKey = keyof typeof rmd.en;
 
@@ -15,6 +15,10 @@ const CATALOG: Record<MsgLang, Partial<Record<MsgKey, unknown>>> = {
   de: rmd.de,
   it: rmd.it,
   ja: rmd.ja,
+  pt: rmd.pt,
+  ko: rmd.ko,
+  pl: rmd.pl,
+  tr: rmd.tr,
 };
 
 export const isMsgLang = (x: unknown): x is MsgLang => typeof x === "string" && (MSG_LANGS as readonly string[]).includes(x);

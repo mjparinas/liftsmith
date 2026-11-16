@@ -70,3 +70,47 @@ export const ja: Partial<Record<Key, Message>> = {
   "recovery.locked.title": "回復マップは Pro の機能です",
   "recovery.locked.body": "各筋肉の回復度と、今日トレーニングできる筋肉がわかります。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "recovery.title": "Recuperação",
+  "recovery.lead": "Cores e marcas mostram o quanto cada músculo já se recuperou das suas séries recentes.",
+  "recovery.muscles": "Músculos · esta semana vs meta de {goal} séries",
+  "recovery.setsOf": "{done} de {goal} séries nesta semana",
+  "recovery.pct": "{pct}% recuperado",
+  "recovery.setsShort": "{done}/{goal} séries",
+  "recovery.locked.title": "O mapa de recuperação faz parte do Pro",
+  "recovery.locked.body": "Veja o quanto cada músculo se recuperou e quais estão prontos para treinar hoje.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "recovery.title": "회복",
+  "recovery.lead": "색과 표시로 최근 세트 이후 각 근육이 얼마나 회복됐는지 보여 줘요.",
+  "recovery.muscles": "근육 · 이번 주 vs {goal}세트 목표",
+  "recovery.setsOf": "이번 주 {goal}세트 중 {done}세트",
+  "recovery.pct": "{pct}% 회복",
+  "recovery.setsShort": "{done}/{goal}세트",
+  "recovery.locked.title": "회복 맵은 Pro 기능이에요",
+  "recovery.locked.body": "각 근육이 얼마나 회복됐는지, 오늘 어떤 근육을 훈련할 수 있는지 확인하세요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "recovery.title": "Toparlanma",
+  "recovery.lead": "Renkler ve işaretler, son setlerinden sonra her kasın ne kadar toparlandığını gösterir.",
+  "recovery.muscles": "Kaslar · bu hafta, {goal} setlik hedefe göre",
+  "recovery.setsOf": "Bu hafta {goal} setten {done}",
+  "recovery.pct": "%{pct} toparlandı",
+  "recovery.setsShort": "{done}/{goal} set",
+  "recovery.locked.title": "Toparlanma haritası Pro'nun parçası",
+  "recovery.locked.body": "Her kasın ne kadar toparlandığını ve hangilerinin bugün çalışmaya hazır olduğunu gör.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "recovery.title": "Regeneracja",
+  "recovery.lead": "Kolory i oznaczenia pokazują, jak bardzo każdy mięsień zregenerował się po ostatnich seriach.",
+  "recovery.muscles": "Mięśnie · ten tydzień vs cel {goal} serii",
+  "recovery.setsOf": "{done} z {goal} serii w tym tygodniu",
+  "recovery.pct": "Regeneracja {pct}%",
+  "recovery.setsShort": "{done}/{goal} serii",
+  "recovery.locked.title": "Mapa regeneracji jest częścią Pro",
+  "recovery.locked.body": "Zobacz, jak zregenerowany jest każdy mięsień i które są dziś gotowe do treningu.",
+};
