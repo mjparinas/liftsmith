@@ -70,6 +70,8 @@ export interface Review {
   replyAt: number;
   /** Only for the coach looking at their own: hidden by reports until staff decide. */
   hidden?: boolean;
+  /** Program reviews only: the writer paid for the program (programReviews.ts). */
+  verified?: boolean;
 }
 
 export interface Rating {

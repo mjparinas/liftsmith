@@ -86,6 +86,7 @@ export function ReviewItem({ review, coach, anon, children }: { review: Review; 
         <Stars value={review.stars} size={14} />
         <span className="text-sm text-muted">
           {review.name || anon || t("rev.anon")} · {short(review.at)}
+          {review.verified && <> · {t("cpg.rev.verified")}</>}
         </span>
       </div>
       {review.text && <p className="mt-2 whitespace-pre-line break-words">{review.text}</p>}
