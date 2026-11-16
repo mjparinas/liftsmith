@@ -277,7 +277,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Peso y grasa corporal con − y +, sin escribir, o directos de tu báscula a través de la app de salud del teléfono.",
       "Nueve puntos de medida con cinta, en centímetros o pulgadas.",
-      "Las fotos de progreso se quedan en tu teléfono y nunca se sincronizan.",
+      "Las fotos de progreso se alinean con la anterior y puedes comparar dos fechas cualquiera con un deslizador o lado a lado. Se quedan en tu teléfono.",
       "Labs (Pro): una báscula Bluetooth rellena el pesaje para que lo revises.",
     ],
     dyk: "Una cintura que baja o sube se convierte en nota del coach cuando no registras la grasa corporal.",

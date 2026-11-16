@@ -1,5 +1,6 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { isNative } from "./juice";
+import type { SavedPhoto } from "./photos";
 import type { AppEvent, Gym, Profile, Unit } from "./types";
 import { fromKg } from "./units";
 
@@ -11,9 +12,24 @@ import { fromKg } from "./units";
 
 export const EXPORT_VERSION = 1;
 
-export function backupJson(profile: Profile, gyms: Gym[], events: readonly AppEvent[], now = Date.now()): string {
+export function backupJson(
+  profile: Profile,
+  gyms: Gym[],
+  events: readonly AppEvent[],
+  now = Date.now(),
+  photos?: readonly SavedPhoto[],
+): string {
+  // Progress photos go in only when the lifter switched them on (Settings › Saving and backup); they never sync.
   return JSON.stringify(
-    { app: "liftsmith", version: EXPORT_VERSION, exportedAt: new Date(now).toISOString(), profile, gyms, events },
+    {
+      app: "liftsmith",
+      version: EXPORT_VERSION,
+      exportedAt: new Date(now).toISOString(),
+      profile,
+      gyms,
+      events,
+      ...(photos?.length ? { photos } : {}),
+    },
     null,
     1,
   );

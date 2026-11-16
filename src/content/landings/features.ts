@@ -322,7 +322,10 @@ export const LANDINGS_FEATURES: Landing[] = [
       },
       {
         h2: "Photos that stay yours",
-        p: ["Progress photos are kept only on your phone. They never sync and never leave it. Compare your first and latest side by side."],
+        p: [
+          "Progress photos are kept only on your phone. They never sync, and go into a backup file only if you switch them in, so a new phone can have them.",
+          "The camera shows your last photo as a faint outline to line up with, with a 3 or 10 second timer to step back. Then compare any two dates with a slider or side by side, each with what you weighed that day.",
+        ],
       },
       {
         h2: "Notes, not just numbers",

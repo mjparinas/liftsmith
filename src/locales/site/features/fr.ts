@@ -227,6 +227,10 @@ export const fr: FeaturesText = {
       name: "Pesées, masse grasse et photos",
       body: "Notez votre poids et votre masse grasse, ou laissez-les venir de votre balance via l’appli santé du téléphone, et gardez vos photos de progrès sur votre téléphone.",
     },
+    "photo-compare": {
+      name: "Des photos de progrès bien alignées",
+      body: "L’appareil photo affiche votre dernière photo en contour pâle pour vous aligner, avec un retardateur pour reculer. Comparez deux dates au choix au curseur ou côte à côte, chacune avec votre poids ce jour-là. Les photos restent sur votre téléphone ; un fichier de sauvegarde peut les emporter sur un nouveau.",
+    },
     measurements: {
       name: "Mensurations",
       body: "Neuf zones en centimètres ou en pouces. Un tour de taille qui augmente ou diminue devient une note du coach quand il n’y a pas de mesure de masse grasse.",

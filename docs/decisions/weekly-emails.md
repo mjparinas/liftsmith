@@ -173,7 +173,7 @@ Free + Labs · Lifters · Screen: Body and photos with the weigh-in and body fat
 Your body changes, not just your lifts. Track it with a few taps.
 - Weight and body fat with − and + (no typing), or straight from your scale through your phone's health app.
 - Nine tape measurement sites in centimetres or inches.
-- Progress photos stay on your phone and never sync.
+- Progress photos line up with your last one, and any two dates compare as a slider or side by side. They stay on your phone. (Point updated 2026-11-15 with the compare upgrade, [Progress photos](progress-photos.md).)
 - Labs (Pro): a Bluetooth smart scale fills in the weigh-in for you to check.
 Did you know? A shrinking or growing waist becomes a coach's note when you don't log body fat.
 

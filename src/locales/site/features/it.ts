@@ -220,6 +220,10 @@ export const it: FeaturesText = {
       name: "Peso, massa grassa e foto",
       body: "Registra peso e massa grassa, o lasciali arrivare dalla bilancia tramite l’app di salute del telefono, e tieni le foto dei progressi sul telefono.",
     },
+    "photo-compare": {
+      name: "Foto dei progressi che si allineano",
+      body: "La fotocamera mostra l’ultima foto come un contorno tenue a cui allinearti, con l’autoscatto per allontanarti. Confronta due date qualsiasi con il cursore o affiancate, ognuna con il tuo peso di quel giorno. Le foto restano sul telefono; un file di backup può portarle su uno nuovo.",
+    },
     measurements: {
       name: "Misure con il metro",
       body: "Nove punti in centimetri o pollici. Un girovita che cresce o cala diventa una nota del coach quando manca la massa grassa.",
