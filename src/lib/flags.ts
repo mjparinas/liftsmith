@@ -183,6 +183,18 @@ export const FLAGS = {
     description:
       "Claude suggests what to do with reports, fills in gym details, answers questions about the numbers, drafts Inbox replies and sums up the digest. Off stops every AI request at once.",
   },
+  /**
+   * The gym import's AI step (src/server/gymAutoFill.ts, docs/decisions/gyms.md "One button"): off, the import and the
+   * daily refresh skip it and go straight on. Switched from Admin › Gyms › Import (Melvin, 2026-11-16). Admin only.
+   */
+  gymImportAi: {
+    adminOnly: true,
+    default: true,
+    options: [true, false] as const,
+    label: "Gym import: AI step",
+    description:
+      "After reading gym websites, Claude fills what's still missing (checked answers, empty fields of unclaimed gyms only). Off: imports and the daily refresh skip the AI step.",
+  },
   /** The most the admin AI helpers may spend in a Pacific day, in US dollars (Melvin has $100 of credit until 2026-12-11). */
   aiDailyCap: {
     adminOnly: true,

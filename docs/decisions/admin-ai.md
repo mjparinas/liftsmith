@@ -46,5 +46,6 @@ Melvin, 2026-11-16: the gym import should "use AI to backfill the rest of the da
 - **Only unclaimed, visible gyms, only empty fields.** The update keeps any value already there (`CASE WHEN field = '' …`) and requires `claimed_by = ''`; the city is replaced only when the current one is a postcode, a number or missing, and the gym then moves like any city fix.
 - **Every answer is checked in code** (`checkedFill`): an address must look like a street and is tidied; a postcode must fit the country; a phone has 7 to 15 digits; hours must parse and are rewritten in the map's form; an email must be on the gym's own domain; Instagram and Facebook must be real profile links on those sites. Anything else is dropped.
 - **Same door, cap and switch**: through `askClaude` (Haiku, page wrapped as data, answer held to a schema), behind `aiHelpers` and counted against `aiDailyCap`. When either stops it, or the key is missing or refused, the step ends with a note on the job and the next daily run carries on; other errors stamp that gym and move on.
+- **Its own switch**: the AI step switch on Admin › Gyms › Import (flag `gymImportAi`, on by default) turns only this step off; the other helpers keep running.
 - **Asked once per gym per 180 days** (`ai_at`, index `gym_places_ai`), 12 gyms a batch, 4 at a time.
 

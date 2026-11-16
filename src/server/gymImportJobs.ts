@@ -19,6 +19,8 @@
 // admin finishes, they get an email (if they left "Email me when it's done" on).
 import { randomBytes } from "node:crypto";
 
+import { FLAGS } from "@/lib/flags";
+
 import { resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { COUNTRIES } from "./countries";
 import { batch, query, run } from "./db";
@@ -150,6 +152,16 @@ async function addItems(job: string, places: readonly string[], from: number) {
         args: [job, from + i + k, place.slice(0, 200)],
       })),
     );
+}
+
+/** Whether the import's AI step is on: the gymImportAi flag (Admin › Gyms › Import), one row read by its key. */
+export async function importAiOn(): Promise<boolean> {
+  const [row] = await query<{ value: string }>("SELECT value FROM feature_flags WHERE name = 'gymImportAi'");
+  try {
+    return row ? JSON.parse(String(row.value)) !== false : FLAGS.gymImportAi.default;
+  } catch {
+    return FLAGS.gymImportAi.default;
+  }
 }
 
 /** The one button: every gym in the world, then their websites, then AI for what's still missing, then tidy-up. */
@@ -313,6 +325,8 @@ export interface WorkerOptions {
   importer?: typeof importItem;
   enrich?: () => ReturnType<typeof enrichBatch>;
   autoFill?: () => ReturnType<typeof autoFillBatch>;
+  /** Whether the AI step is switched on (tests). */
+  aiOn?: () => Promise<boolean>;
   tidy?: (after: string) => ReturnType<typeof repairStep>;
   sleep?: (ms: number) => Promise<void>;
   mail?: Mailer | null;
@@ -461,7 +475,10 @@ export async function runWorker(opts: WorkerOptions = {}): Promise<WorkerResult>
       await touch();
       if (!b.more) await setPhase("ai");
     }
-    // The AI step: what the site's code didn't give, Claude reads from the page; it stops at the day's cap.
+    // The AI step: what the site's code didn't give, Claude reads from the page; it stops at the day's cap. Switched off
+    // in Admin › Gyms (the gymImportAi flag), the job goes straight on.
+    if (phase === "ai" && !(await (opts.aiOn ?? importAiOn)()))
+      await setPhase(kind === "world" ? "tidy" : "done", "AI step skipped: it's switched off in Admin › Gyms › Import.");
     while (phase === "ai" && timeFor(JOB_LIMITS.stepMs) && (await stillRunning())) {
       const b = await (opts.autoFill ?? (() => autoFillBatch()))();
       await run("UPDATE gym_import_jobs SET ai_read = ai_read + ?, ai_filled = ai_filled + ? WHERE id = ?", [

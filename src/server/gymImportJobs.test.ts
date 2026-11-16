@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
+import { setFlag } from "./flags";
 import { SINCE_KEY, type ImportResult } from "./gymImport";
 import {
   createJob,
   dismissJob,
   emailDone,
+  importAiOn,
   JOB_LIMITS,
   jobLog,
   jobStatus,
@@ -291,6 +293,34 @@ describe("gym imports on the server", () => {
     expect(tidied).toBe(false);
     // A schedule that arrives twice starts nothing the second time.
     expect(await startDaily()).toEqual({ skipped: "already ran today" });
+  });
+
+  it("skips the AI step when it's switched off, and says so", async () => {
+    await createJob({ label: "A", places: ["region:CA:1:BC"], startedBy: "", notify: false });
+    let asked = false;
+    await runWorker({
+      ...quick,
+      importer: async (w) => ok(w),
+      ...noSteps,
+      autoFill: async () => ((asked = true), noSteps.autoFill()),
+    });
+    // The flag is read from the database: off in Admin › Gyms.
+    expect(asked).toBe(true);
+    expect(await importAiOn()).toBe(true);
+    await setFlag("gymImportAi", false, 100, "a@x.com");
+    expect(await importAiOn()).toBe(false);
+    await run("DELETE FROM gym_import_jobs");
+    await run("DELETE FROM gym_import_items");
+    asked = false;
+    await createJob({ label: "B", places: ["region:CA:1:BC"], startedBy: "", notify: false });
+    await runWorker({
+      ...quick,
+      importer: async (w) => ok(w),
+      ...noSteps,
+      autoFill: async () => ((asked = true), noSteps.autoFill()),
+    });
+    expect(asked).toBe(false);
+    expect((await jobStatus())!).toMatchObject({ state: "done", note: expect.stringMatching(/AI step skipped: it's switched off/) });
   });
 
   it("starts no daily job while another import runs", async () => {
