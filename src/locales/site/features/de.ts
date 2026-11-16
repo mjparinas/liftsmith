@@ -426,8 +426,8 @@ export const de: FeaturesText = {
       body: "Das Training auf Wear OS und der Apple Watch: der Satz oder der Pausen-Countdown, der Puls der Uhr, Satz eintragen und +30 s, und ein Vibrieren, wenn die Pause endet.",
     },
     widgets: {
-      name: "Widget für den Startbildschirm",
-      body: "Die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen auf dem Startbildschirm.",
+      name: "Widgets für den Startbildschirm",
+      body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",
       note: "Die Web-App hat stattdessen Kurzbefehle auf ihrem Startbildschirm-Symbol.",
     },
     shortcuts: {

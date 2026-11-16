@@ -12,6 +12,7 @@
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		39E8E5E8FBE92B529AF54203 /* WorkoutActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */; };
 		47972A53B79335DC8081E419 /* QuickStartWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB70B2D7282FE8799D61E99 /* QuickStartWidget.swift */; };
+		5A1E0C3F9B7D4E21A6C80F11 /* RecoveryWeekWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1E0C3F9B7D4E21A6C80F12 /* RecoveryWeekWidgets.swift */; };
 		48DDA7D2D0A965653FC060C3 /* LiftsmithWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
@@ -99,6 +100,7 @@
 /* Begin PBXFileReference section */
 		10E55AD838EAA29A42924E6E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		5A1E0C3F9B7D4E21A6C80F12 /* RecoveryWeekWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RecoveryWeekWidgets.swift; sourceTree = "<group>"; };
 		4DB70B2D7282FE8799D61E99 /* QuickStartWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickStartWidget.swift; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -259,6 +261,7 @@
 			children = (
 				70B206EE2EB828FFEC7CB570 /* LiftsmithWidgets.swift */,
 				4DB70B2D7282FE8799D61E99 /* QuickStartWidget.swift */,
+				5A1E0C3F9B7D4E21A6C80F12 /* RecoveryWeekWidgets.swift */,
 				6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */,
 				EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */,
 				BB05485F3EDA6B8DD896565A /* Info.plist */,
@@ -461,6 +464,7 @@
 			files = (
 				CCAC65A6C31069F3AFFA6ACC /* LiftsmithWidgets.swift in Sources */,
 				47972A53B79335DC8081E419 /* QuickStartWidget.swift in Sources */,
+				5A1E0C3F9B7D4E21A6C80F11 /* RecoveryWeekWidgets.swift in Sources */,
 				AF6645131DB97D20C8BEEA68 /* WorkoutLiveActivity.swift in Sources */,
 				75CB0BBFB6B818C08383E48F /* StartWorkoutControl.swift in Sources */,
 				D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */,

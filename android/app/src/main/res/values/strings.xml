@@ -20,4 +20,8 @@
     <string name="up_next">Up next: %1$s</string>
     <string name="add_30">+30 s</string>
     <string name="widget_title">Today\'s workout</string>
+    <string name="widget_week_title">This week</string>
+    <string name="widget_week_description">Your week at a glance: days trained, your streak and what keeps it going, with Start</string>
+    <string name="widget_recovery_title">Recovery</string>
+    <string name="widget_recovery_description">Which muscles are ready to train and when the rest will be, with Start</string>
 </resources>
