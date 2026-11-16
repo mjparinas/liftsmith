@@ -50,7 +50,7 @@ export function Recovery({ view: named }: { view?: string }) {
   return (
     <div className="pb-2">
       <ScreenHeader title={t("body.title")} />
-      <div className="mt-3 flex rounded-full border border-line bg-surface p-1" role="group" aria-label={t("body.views")}>
+      <div className="desk-fit mt-3 flex rounded-full border border-line bg-surface p-1" role="group" aria-label={t("body.views")}>
         {BODY_VIEWS.map((v) => (
           <button
             key={v}

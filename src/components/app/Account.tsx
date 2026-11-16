@@ -250,7 +250,7 @@ function SignedOut() {
   const onGoogleWeb = done("google");
   const onGoogleErr = (m: string) => setError(m);
   return (
-    <div className="space-y-2">
+    <div className="desk-fit space-y-2">
       {list.includes("apple") && (
         <button
           type="button"
