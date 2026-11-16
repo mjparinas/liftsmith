@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
-import { TRADEMARKS } from "@/content/compare";
+import { COMPETITOR_BY_SLUG, TRADEMARKS } from "@/content/compare";
 import { IMPORT_BY_SLUG, IMPORT_SOURCES } from "@/content/imports";
 import { BRAND } from "@/lib/brand";
 import { pageMeta } from "@/lib/pageMeta";
@@ -96,11 +96,18 @@ export default async function ImportPage({ params }: Props) {
           picking what to do each day, you open the app and the workout is already planned around your equipment, recovery and time.
         </p>
         <p className="text-muted">
-          See how the two apps compare in{" "}
-          <Link href={`/compare/${s.slug}/`} className="text-accent underline underline-offset-2">
-            {BRAND.name} vs {s.name}
-          </Link>
-          , or read{" "}
+          {/* Only apps with a comparison page get the link: FitNotes has an import page but no /compare/ page, and the link was a 404. */}
+          {COMPETITOR_BY_SLUG.has(s.slug) ? (
+            <>
+              See how the two apps compare in{" "}
+              <Link href={`/compare/${s.slug}/`} className="text-accent underline underline-offset-2">
+                {BRAND.name} vs {s.name}
+              </Link>
+              , or read{" "}
+            </>
+          ) : (
+            <>Read </>
+          )}
           <Link href="/blog/how-to-track-your-workouts/" className="text-accent underline underline-offset-2">
             how to track your workouts so they actually improve
           </Link>

@@ -116,6 +116,18 @@ describe("SEO pages", () => {
     }
   });
 
+  it("links a switch-from page to a comparison only when that comparison page exists", async () => {
+    // FitNotes has an import page but no /compare/ page; the link was a 404 that Search Console crawled.
+    const { siteRoutes } = await import("@/lib/seo");
+    const paths = new Set(siteRoutes().map((r) => r.path));
+    for (const slug of ["fitnotes", "strong"]) {
+      render(await ImportPage({ params: Promise.resolve({ slug }) }));
+      for (const a of document.querySelectorAll('a[href^="/compare/"]'))
+        expect(a.getAttribute("href")!).toSatisfy((h: string) => paths.has(h.replace(/\/?$/, "/")));
+      cleanup();
+    }
+  });
+
   it("renders every app and feature page with its calls to action and questions", async () => {
     for (const l of LANDINGS) {
       const Page = l.group === "apps" ? AppLandingPage : FeaturePage;
