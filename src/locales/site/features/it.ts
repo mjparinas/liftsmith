@@ -135,6 +135,10 @@ export const it: FeaturesText = {
       name: "Dimostrazioni degli esercizi in 3D",
       body: "Ogni esercizio ha una figura 3D che mostra il movimento con la sua attrezzatura, con i passi di preparazione e i consigli.",
     },
+    "form-mistakes": {
+      name: "Errori comuni e come correggerli",
+      body: "Ogni esercizio e allungamento mostra i suoi due o tre errori tecnici più comuni accanto alla figura 3D, ognuno con la correzione e il perché conta, e il timer di recupero te ne mostra uno per la prossima serie. Funziona offline.",
+    },
     "set-types": { name: "Drop set e rest-pause", body: "Aggiungi un drop set o una serie rest-pause tra le serie." },
     "timed-sets": {
       name: "Timer per tenute, trasporti e cardio",
