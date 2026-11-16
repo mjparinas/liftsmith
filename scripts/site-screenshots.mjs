@@ -15,7 +15,11 @@ fs.mkdirSync(TMP, { recursive: true });
 
 const server = await base();
 // SwiftShader gives headless Chromium WebGL, so the 3D demo on the workout screen renders.
-const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
+const browser = await chromium.launch({
+  args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+  // PW_CHROMIUM: another Chromium when the installed Playwright has no browser of its own (cloud sessions).
+  ...(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {}),
+});
 const ctx = await browser.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,

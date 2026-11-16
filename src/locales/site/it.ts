@@ -162,13 +162,13 @@ export const it: SiteText = {
         {
           eyebrow: "Mappa del recupero",
           title: "Scopri quali muscoli sono pronti prima di allenarli",
-          body: "Ogni serie aggiunge fatica ai muscoli che lavora, e si smaltisce in due o tre giorni a seconda del muscolo. La mappa del corpo, davanti e dietro, mostra ogni muscolo come Fresco, Pronto, In recupero o Affaticato, e il piano evita ciò che non è pronto.",
+          body: "Ogni serie aggiunge fatica ai muscoli che lavora, e si smaltisce in due o tre giorni a seconda del muscolo. La mappa del corpo in 3D, che puoi ruotare per vederla davanti o dietro, mostra ogni muscolo come Fresco, Pronto, In recupero o Affaticato, e il piano evita ciò che non è pronto.",
           points: [
             "Colore più un’etichetta e una percentuale per ogni muscolo",
             "Serie settimanali per muscolo rispetto a un obiettivo di crescita",
             "Nessun premio, mai, per allenare un muscolo affaticato",
           ],
-          alt: "La mappa del recupero: il corpo davanti e dietro colorato in base al recupero, con una legenda di Fresco, Pronto, In recupero e Affaticato",
+          alt: "La mappa del recupero: un corpo in 3D con ogni muscolo illuminato nel colore del suo recupero, con una legenda di Fresco, Pronto, In recupero e Affaticato",
           cta: "Controlla il tuo recupero",
         },
         {

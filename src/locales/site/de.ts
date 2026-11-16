@@ -162,13 +162,13 @@ export const de: SiteText = {
         {
           eyebrow: "Erholungskarte",
           title: "Sieh, welche Muskeln bereit sind, bevor du sie trainierst",
-          body: "Jeder Satz belastet die Muskeln, die er trainiert, und die Ermüdung klingt je nach Muskel in zwei bis drei Tagen ab. Die Körperkarte von vorn und hinten zeigt jeden Muskel als Frisch, Bereit, In Erholung oder Ermüdet, und der Plan meidet, was noch nicht bereit ist.",
+          body: "Jeder Satz belastet die Muskeln, die er trainiert, und die Ermüdung klingt je nach Muskel in zwei bis drei Tagen ab. Die 3D-Körperkarte, die du drehen kannst, um sie von vorn oder hinten zu sehen, zeigt jeden Muskel als Frisch, Bereit, In Erholung oder Ermüdet, und der Plan meidet, was noch nicht bereit ist.",
           points: [
             "Farbe plus Beschriftung und Prozentwert für jeden Muskel",
             "Wöchentliche Sätze pro Muskel im Vergleich zum Wachstumsziel",
             "Nie eine Belohnung für das Training eines ermüdeten Muskels",
           ],
-          alt: "Die Erholungskarte: der Körper von vorn und hinten nach Erholung eingefärbt, mit einer Legende für Frisch, Bereit, In Erholung und Ermüdet",
+          alt: "Die Erholungskarte: ein 3D-Körper, in dem jeder Muskel in seiner Erholungsfarbe leuchtet, mit einer Legende für Frisch, Bereit, In Erholung und Ermüdet",
           cta: "Deine Erholung prüfen",
         },
         {

@@ -162,13 +162,13 @@ export const fr: SiteText = {
         {
           eyebrow: "Carte de récupération",
           title: "Voyez quels muscles sont prêts avant de les entraîner",
-          body: "Chaque série ajoute de la fatigue aux muscles qu’elle sollicite, et elle s’estompe en deux ou trois jours selon le muscle. La carte du corps, de face et de dos, montre chaque muscle comme Frais, Prêt, En récupération ou Fatigué, et le plan évite ce qui n’est pas prêt.",
+          body: "Chaque série ajoute de la fatigue aux muscles qu’elle sollicite, et elle s’estompe en deux ou trois jours selon le muscle. La carte du corps en 3D, que vous pouvez tourner pour la voir de face ou de dos, montre chaque muscle comme Frais, Prêt, En récupération ou Fatigué, et le plan évite ce qui n’est pas prêt.",
           points: [
             "Une couleur, plus une étiquette et un pourcentage pour chaque muscle",
             "Séries hebdomadaires par muscle face à un objectif de croissance",
             "Jamais de récompense pour avoir entraîné un muscle fatigué",
           ],
-          alt: "La carte de récupération : le corps de face et de dos coloré selon la récupération, avec une légende Frais, Prêt, En récupération et Fatigué",
+          alt: "La carte de récupération : un corps en 3D où chaque muscle brille de la couleur de sa récupération, avec une légende Frais, Prêt, En récupération et Fatigué",
           cta: "Voir votre récupération",
         },
         {
