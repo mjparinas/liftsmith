@@ -427,6 +427,11 @@ export const de: FeaturesText = {
       body: "Kunden bewerten ihren Coach, Personal Trainer oder Physio nach vier Wochen oder zwei Einheiten mit Sternen und einer kurzen Bewertung. Die Bewertung erscheint ab drei Bewertungen, neben der Zahl der Kunden, die in den letzten zwei Wochen trainiert haben, in der Einladung und im Trainerverzeichnis. Coaches antworten einmal auf jede, und jeder kann eine Bewertung melden. Nur Erwachsene können bewerten.",
       proPart: "Bewerten ist kostenlos; Kunden coachen ist Pro.",
     },
+    "program-pages": {
+      name: "Programme von Coaches auf der Website, mit Bewertungen",
+      body: "Jedes veröffentlichte Programm eines Coaches hat eine eigene Seite auf der Website, mit Niveau, Ziel, Wochen und Tagen und bei kostenlosen Programmen den Übungen, damit man es in Suchmaschinen findet. Wer ein Programm seit zwei Wochen hat, bewertet es mit Sternen und einer kurzen Bewertung; Bewertungen erscheinen ab drei, und der Coach antwortet einmal auf jede.",
+      proPart: "Ein Programm bewerten ist kostenlos; Programme erstellen gehört zum Coaching, das Pro ist.",
+    },
     "coach-plans": {
       name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
       body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und mit Coach und Coach Plus behält Liftsmith nichts von dem ein, was sie dir zahlen. Mit Pro behält es 2 %.",

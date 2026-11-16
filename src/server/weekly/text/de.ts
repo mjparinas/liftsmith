@@ -824,6 +824,7 @@ export const emails: Record<string, Words> = {
       "Lass den Preis leer für ein kostenloses Programm, oder leg einen fest, sobald Zahlungen mit Stripe eingerichtet sind.",
       "Kostenpflichtige Programme werden auf der Website gekauft, und das Geld geht auf dein Stripe-Konto.",
       "Teile den Link überall. Wer es hat, behält es, auch wenn du es von der Liste nimmst.",
+      "Jedes veröffentlichte Programm bekommt eine eigene Seite auf der Website, und wer es seit zwei Wochen hat, kann es bewerten.",
     ],
     dyk: "Ein Programm enthält keine Gewichte: Die eigene Progression jedes Trainierenden wählt sie, also passt ein Programm für Anfänger und Erfahrene.",
   },

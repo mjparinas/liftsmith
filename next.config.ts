@@ -71,6 +71,9 @@ const nextConfig: NextConfig = {
           // Trainers, coaches and physios by city (src/server/trainerPage.ts); in the gym sitemap.
           { source: "/trainers/", destination: "/api/trainers/page/" },
           { source: "/trainers/:city/", destination: "/api/trainers/page/?city=:city" },
+          // Coaches' programs and their ratings (src/server/programPage.ts); in the gym sitemap.
+          { source: "/coach-programs/", destination: "/api/programs/page/" },
+          { source: "/coach-programs/:p/", destination: "/api/programs/page/?p=:p" },
         ],
       }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
@@ -89,6 +92,7 @@ const nextConfig: NextConfig = {
           { source: "/gyms/:city/:gym/report/", headers: [{ key: "Content-Security-Policy", value: REPORT_PAGE_CSP }] },
           { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),
   env: {

@@ -5,7 +5,17 @@ import { useEffect, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 import { AuthError, useAccount } from "@/lib/auth";
 import { money } from "@/lib/coachPay";
-import { browse, buy, canBuyHere, getFree, loadProgram, programRoutines, shownHere, type CoachProgram } from "@/lib/coachPrograms";
+import {
+  browse,
+  buy,
+  canBuyHere,
+  getFree,
+  loadProgramPage,
+  programRoutines,
+  shownHere,
+  type CoachProgram,
+  type ProgramPage,
+} from "@/lib/coachPrograms";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
@@ -13,6 +23,7 @@ import { MAX_ROUTINES } from "@/lib/routines";
 import { sameItems } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
 
+import { ProgramReviews } from "./ProgramReviews";
 import { go } from "./router";
 import { Button, EmptyState, ScreenHeader, Skeleton } from "./ui";
 
@@ -89,8 +100,11 @@ function Browse() {
 
 function ProgramDetail({ id, paid }: { id: string; paid: boolean }) {
   const { profile, active, saveShared } = useApp();
-  const signedIn = !!useAccount((s) => s.account);
+  const me = useAccount((s) => s.account?.id ?? null);
+  const signedIn = !!me;
   const [p, setP] = useState<CoachProgram | null>(null);
+  const [page, setPage] = useState<Omit<ProgramPage, "program">>({});
+  const [reload, setReload] = useState(0);
   const [state, setState] = useState<"loading" | "gone" | "ok">("loading");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(paid ? t("cpg.thanks") : null);
@@ -99,10 +113,11 @@ function ProgramDetail({ id, paid }: { id: string; paid: boolean }) {
   useEffect(() => {
     let stop = false;
     const load = () =>
-      loadProgram(id)
-        .then((x) => {
+      loadProgramPage(id)
+        .then(({ program, ...rest }) => {
           if (stop) return;
-          setP(x);
+          setP(program);
+          setPage(rest);
           setState("ok");
         })
         // Gone, unlisted, or no connection the first time: a reload that worked before keeps what it showed.
@@ -114,7 +129,7 @@ function ProgramDetail({ id, paid }: { id: string; paid: boolean }) {
       stop = true;
       timers.forEach(clearTimeout);
     };
-  }, [id, paid]);
+  }, [id, paid, reload]);
 
   const routines = useMemo(() => profile.routines ?? [], [profile.routines]);
   const days = useMemo(() => (p ? programRoutines(p, 0, () => "") : []), [p]);
@@ -242,6 +257,16 @@ function ProgramDetail({ id, paid }: { id: string; paid: boolean }) {
         ) : null}
         {canSave && <p className="text-center text-xs text-faint">{t("cpg.saveWhy")}</p>}
         {!canSave && canBuyHere() && p.price > 0 && <p className="text-center text-xs text-faint">{t("cpg.buyWhy")}</p>}
+      </div>
+
+      <div className="mt-6">
+        <ProgramReviews
+          id={p.id}
+          page={page}
+          coach={p.coachName}
+          own={!!me && me === p.coachId}
+          onChanged={() => setReload((n) => n + 1)}
+        />
       </div>
     </div>
   );

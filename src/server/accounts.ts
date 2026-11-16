@@ -18,6 +18,7 @@ import { placeReportDeletes } from "./gymPlaceReports";
 import { placeDeletes } from "./gymPlaces";
 import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
+import { programReviewCleanup } from "./programReviews";
 import { isReviewEmail, reviewCodeMatches } from "./review";
 import { socialDeletes } from "./social";
 import { forgetStripe } from "./stripe";
@@ -295,6 +296,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
     ...socialDeletes(accountId),
     ...coachCleanup(accountId),
+    ...programReviewCleanup(accountId),
     ...programCleanup(accountId),
     ...earnedDeletes(accountId),
     ...teamDeletes(accountId),

@@ -428,6 +428,11 @@ export const fr: FeaturesText = {
       body: "Les clients notent leur coach, coach personnel ou kiné avec des étoiles et un court avis après quatre semaines ou deux séances ensemble. La note s’affiche dès trois avis, avec le nombre de ses clients qui se sont entraînés ces deux dernières semaines, sur son invitation et dans l’annuaire des coachs. Le coach répond une fois à chaque avis, et tout le monde peut signaler un avis. Seuls les adultes peuvent en laisser un.",
       proPart: "Laisser un avis est gratuit ; coacher des clients est Pro.",
     },
+    "program-pages": {
+      name: "Les programmes des coachs sur le site, avec des notes",
+      body: "Chaque programme publié par un coach a sa propre page sur le site, avec son niveau, son objectif, ses semaines et ses jours, et les exercices des programmes gratuits, pour qu'on le trouve dans les moteurs de recherche. Les personnes qui ont un programme depuis deux semaines le notent avec des étoiles et un court avis ; les notes s'affichent dès trois avis, et le coach répond une fois à chacun.",
+      proPart: "Noter un programme est gratuit ; en créer fait partie du coaching, qui est Pro.",
+    },
     "coach-plans": {
       name: "Des forfaits coach qui grandissent avec votre clientèle",
       body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et avec Coach et Coach Plus, Liftsmith ne prend rien sur ce qu'ils vous paient. Avec Pro, il garde 2 %.",

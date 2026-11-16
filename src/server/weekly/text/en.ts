@@ -843,6 +843,7 @@ export const emails: Record<string, Words> = {
       "Leave the price empty for a free program, or set one once payments with Stripe are on.",
       "Paid programs are bought on the website, and the money goes to your Stripe account.",
       "Share its link anywhere. People who have it keep it, even after you take it off the list.",
+      "Each listed program gets its own page on the website, and lifters who've had it two weeks can rate it.",
     ],
     dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.",
   },

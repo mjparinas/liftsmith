@@ -39,6 +39,7 @@ export const pt: SiteText = {
       exercises: "Biblioteca de exercícios",
       muscles: "Exercícios por músculo",
       programs: "Programas de treino",
+      coachPrograms: "Programas de coaches",
       equipment: "Exercícios por equipamento",
       guides: "Guias de treino",
       blog: "Blog",

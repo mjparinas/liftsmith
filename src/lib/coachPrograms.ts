@@ -1,6 +1,7 @@
 // Coaches sell programs, on the phone and the web app (server: src/server/coachPrograms.ts; decision record:
 // docs/decisions/coach-programs.md). Types, calls, and the one rule about where a paid program can be bought.
 import { api, AuthError, readAccount } from "./auth";
+import type { Rating, Review } from "./coachReviews";
 import { openOutside } from "./connections";
 import { isNative } from "./juice";
 import { decodeRoutine, encodeRoutine } from "./routineShare";
@@ -85,8 +86,29 @@ const mustToken = () => {
 };
 const post = <T>(body: Record<string, unknown>) => api<T>("/api/programs/", { token: mustToken(), body });
 
-export const loadProgram = async (id: string) =>
-  (await api<{ program: CoachProgram }>(`/api/programs/?id=${encodeURIComponent(id)}`, { token: token() })).program;
+/** The server's PROGRAM_REVIEW_LIMITS (programReviews.ts), for the words around the form. */
+export const PROGRAM_REVIEW_RULES = { days: 14, shown: 3, text: 500 } as const;
+
+export type ProgramReviewBlock = "notOwner" | "yours" | "teen" | "wait";
+
+/** One program with its ratings: none shown until it has PROGRAM_REVIEW_RULES.shown, except to its coach. */
+export interface ProgramPage {
+  program: CoachProgram;
+  rating?: Rating;
+  reviews?: Review[];
+  /** For a lifter who has it: their own review and whether they can write one now. */
+  mine?: { review: Review | null; can: { ok: true } | { ok: false; why: ProgramReviewBlock; readyAt?: number } } | null;
+}
+
+export const loadProgramPage = (id: string) => api<ProgramPage>(`/api/programs/?id=${encodeURIComponent(id)}`, { token: token() });
+export const loadProgram = async (id: string) => (await loadProgramPage(id)).program;
+
+export const rateProgram = async (id: string, stars: number, text: string) =>
+  (await post<{ review: Review }>({ action: "review", id, stars, text })).review;
+export const unrateProgram = async (id: string) => void (await post({ action: "unreview", id }));
+/** The program's coach answers a review of it, once ("" removes the reply). */
+export const replyToProgramReview = async (review: string, text: string) =>
+  (await post<{ reply: string }>({ action: "reply", review, text })).reply;
 
 /** Listed programs; the apps ask for free ones only. */
 export async function browse(coach?: string): Promise<CoachProgram[]> {

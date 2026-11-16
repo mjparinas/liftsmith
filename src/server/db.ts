@@ -1187,6 +1187,23 @@ const SCHEMA = [
   )`,
   "CREATE INDEX IF NOT EXISTS program_owners_account ON program_owners (account_id)",
   "CREATE INDEX IF NOT EXISTS program_owners_payment ON program_owners (payment_id)",
+  // Ratings and reviews of programs (programReviews.ts, 2026-11-16): one per lifter and program, from adults who've had
+  // it two weeks, with one public reply from its coach. Hidden and reply_hidden work as in coach_reviews.
+  `CREATE TABLE IF NOT EXISTS program_reviews (
+    program_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    id TEXT NOT NULL UNIQUE,
+    stars INTEGER NOT NULL,
+    body TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    reply TEXT NOT NULL DEFAULT '',
+    reply_at INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    reply_hidden INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (program_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS program_reviews_account ON program_reviews (account_id)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (

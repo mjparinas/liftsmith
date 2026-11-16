@@ -53,7 +53,7 @@ export function Stars({ value, size = 16 }: { value: number; size?: number }) {
 }
 
 /** The rating line: stars, average and count once there are enough reviews, and how the coach's clients are training. */
-export function RatingSummary({ rating, own = false }: { rating: Rating; own?: boolean }) {
+export function RatingSummary({ rating, own = false, unrated }: { rating: Rating; own?: boolean; unrated?: string }) {
   return (
     <div className="space-y-1">
       {rating.average !== null ? (
@@ -63,7 +63,7 @@ export function RatingSummary({ rating, own = false }: { rating: Rating; own?: b
           <span className="text-sm text-muted">{t("rev.count", { count: rating.count })}</span>
         </p>
       ) : (
-        <p className="text-sm text-muted">{own ? t("rev.mineHidden", { count: rating.count }) : t("rev.newCoach")}</p>
+        <p className="text-sm text-muted">{own ? t("rev.mineHidden", { count: rating.count }) : (unrated ?? t("rev.newCoach"))}</p>
       )}
       {rating.outcome && (
         <p className="flex items-center gap-1.5 text-sm text-muted">
@@ -79,13 +79,13 @@ export function RatingSummary({ rating, own = false }: { rating: Rating; own?: b
 }
 
 /** One review: stars, the words, who and when, and the coach's reply under it. */
-function ReviewItem({ review, coach, children }: { review: Review; coach: string; children?: ReactNode }) {
+export function ReviewItem({ review, coach, anon, children }: { review: Review; coach: string; anon?: string; children?: ReactNode }) {
   return (
     <li className="card p-4">
       <div className="flex flex-wrap items-center gap-2">
         <Stars value={review.stars} size={14} />
         <span className="text-sm text-muted">
-          {review.name || t("rev.anon")} · {short(review.at)}
+          {review.name || anon || t("rev.anon")} · {short(review.at)}
         </span>
       </div>
       {review.text && <p className="mt-2 whitespace-pre-line break-words">{review.text}</p>}
@@ -163,7 +163,7 @@ function ReportReview({ id, part, onClose }: { id: string; part: "review" | "rep
 }
 
 /** A quiet Report link under a review or reply. */
-function ReportLink({ id, part }: { id: string; part: "review" | "reply" }) {
+export function ReportLink({ id, part }: { id: string; part: "review" | "reply" }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -205,7 +205,7 @@ export function CoachRatingPreview({ coach }: { coach: Pick<Person, "id" | "name
 }
 
 /** One tap per star: a row of five 44 px buttons, as a radio group. */
-function StarPicker({ value, onPick }: { value: number; onPick: (n: number) => void }) {
+export function StarPicker({ value, onPick }: { value: number; onPick: (n: number) => void }) {
   return (
     <div role="radiogroup" aria-label={t("rev.starsGroup")} className="flex gap-1">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -371,7 +371,16 @@ export function RateCoach({ coach }: { coach: Person }) {
 }
 
 /** The coach's reply to one review: Reply opens a box; a reply already posted can be changed or removed. */
-function ReplyBox({ review, onSaved }: { review: Review; onSaved: () => void }) {
+export function ReplyBox({
+  review,
+  onSaved,
+  save: send = replyToReview,
+}: {
+  review: Review;
+  onSaved: () => void;
+  /** Where the reply goes: a review of the coach (the default) or of one of their programs. */
+  save?: (id: string, text: string) => Promise<unknown>;
+}) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState(review.reply);
   const [busy, setBusy] = useState(false);
@@ -379,7 +388,7 @@ function ReplyBox({ review, onSaved }: { review: Review; onSaved: () => void }) 
   const save = async (value: string) => {
     setBusy(true);
     try {
-      await replyToReview(review.id, value);
+      await send(review.id, value);
       haptic("success");
       track("feature", { name: "review_reply", detail: value ? "post" : "clear" });
       setOpen(false);
