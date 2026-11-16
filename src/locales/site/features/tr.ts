@@ -568,7 +568,7 @@ export const tr: FeaturesText = {
     },
     languages: {
       name: "On dil",
-      body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun dilini takip eder.",
+      body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun ya da tarayıcının dilini takip eder veya karşılama ekranında ve ayarlarda istediğini seçersin.",
     },
     appearance: {
       name: "Koyu, açık ya da telefonuna uygun",

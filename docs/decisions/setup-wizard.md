@@ -8,3 +8,12 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - One question per screen, big tiles, every step optional except the first three, under a minute in total.
 - **The last step before the Pro offer is "Save your progress"** (Melvin, 2026-11-09, after setting up in a phone browser: "it's not clear how to save my information or register"). See "Saving and backup".
 - **Experience starts on New to lifting** (UX audit, Melvin 2026-11-13). A first run preselects New to lifting, the safe guess (lighter starting weights, familiar lifts; anyone else changes it in one tap); a rerun from Settings keeps the saved answer.
+
+## Choosing the language before setup (Melvin, 2026-11-16)
+
+Melvin asked to "allow users on the web to change their language". Settings › Look and feel › Language already offered the ten languages, but only after setup, and on the web it was labelled "Match my phone". Now:
+
+- **A language button on the welcome screen** (top right: a globe and the language showing now, named in itself) opens the same choices as Settings, so nobody answers setup in a language they can't read. On every platform, because a phone can be set to a language the lifter doesn't want for the app too. One list for both places: `LanguagePicker.tsx` (`LanguageChoices`, `LanguageButton`).
+- **"Match my browser" on the web** (`settings.language.browser`, with its own note), "Match my phone" in the apps.
+- **The website's language carries over** on the web: reading a page in another language (`DocLang`) or picking one in the footer's switcher (`LangLink`) remembers it in this browser (`liftsmith.siteLang`, `rememberSiteLang`), and the web app's first visit starts in it unless a language was already chosen. Only a language code, not personal data, so it isn't on `wipe.ts`.
+- The choice is `profile.language`, so it syncs to the lifter's other devices.

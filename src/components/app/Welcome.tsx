@@ -15,6 +15,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { AccountPanel } from "./Account";
 import { Icon, type IconName } from "./icons";
+import { LanguageButton } from "./LanguagePicker";
 import { go, replaceRoute } from "./router";
 import { Button, Sheet } from "./ui";
 
@@ -60,6 +61,12 @@ export function Welcome({
   const signedIn = useAccount((s) => !!s.account);
   return (
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
+      {/* The language, before the first question (Melvin, 2026-11-16): the web follows the browser, which may not be the
+          language the lifter reads best, and the apps follow the phone. Settings › Look and feel has the same choice later. */}
+      {/* No height of its own: it sits over the lifter's corner, so the welcome screen still fits a small phone. */}
+      <div className="relative z-10 flex h-0 justify-end">
+        <LanguageButton className="mt-3" />
+      </div>
       <div className="animate-rise flex flex-1 flex-col justify-center py-3">
         {/* The 3D lifter squatting (the exercise demo engine, bare: no frame or readout). Reduced motion holds a still pose;
             phones without GPU WebGL get the 2D figure, as everywhere else. Decoration only, so hidden from screen readers;

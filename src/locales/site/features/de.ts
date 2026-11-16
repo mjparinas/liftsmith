@@ -506,7 +506,7 @@ export const de: FeaturesText = {
     },
     languages: {
       name: "Zehn Sprachen",
-      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys.",
+      body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys oder Browsers, oder frei wählbar auf dem Startbildschirm und in den Einstellungen.",
     },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",

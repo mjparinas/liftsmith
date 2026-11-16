@@ -60,6 +60,9 @@ export const en = {
   "settings.language.system": "Match my phone",
   "settings.language.note":
     "Match my phone follows the language set for Liftsmith in your phone's settings. Numbers, dates and units follow your region. Some screens are still in English while translation is under way.",
+  "settings.language.browser": "Match my browser",
+  "settings.language.noteWeb":
+    "Match my browser follows the languages set in your browser. Numbers, dates and units follow your region. Some screens are still in English while translation is under way.",
   "settings.pro.lead": "Plans that adapt to your recovery every day, the recovery map, readiness and plateau fixes.",
   "settings.pro.manage": "Manage your plan",
   "settings.g.training": "Training",
@@ -146,6 +149,9 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.language.system": "Igual que el teléfono",
   "settings.language.note":
     "«Igual que el teléfono» usa el idioma elegido para Liftsmith en los ajustes del teléfono. Los números, las fechas y las unidades siguen tu región. Algunas pantallas siguen en inglés mientras avanza la traducción.",
+  "settings.language.browser": "Igual que el navegador",
+  "settings.language.noteWeb":
+    "«Igual que el navegador» usa los idiomas configurados en tu navegador. Los números, las fechas y las unidades siguen tu región. Algunas pantallas siguen en inglés mientras avanza la traducción.",
   "settings.pro.lead":
     "Planes que se adaptan a tu recuperación cada día, el mapa de recuperación, la preparación y soluciones para estancamientos.",
   "settings.pro.manage": "Gestionar tu plan",
@@ -234,6 +240,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.language.system": "Comme le téléphone",
   "settings.language.note":
     "« Comme le téléphone » suit la langue choisie pour Liftsmith dans les réglages du téléphone. Les nombres, les dates et les unités suivent votre région. Certains écrans sont encore en anglais pendant la traduction.",
+  "settings.language.browser": "Comme le navigateur",
+  "settings.language.noteWeb":
+    "« Comme le navigateur » suit les langues choisies dans votre navigateur. Les nombres, les dates et les unités suivent votre région. Certains écrans sont encore en anglais pendant la traduction.",
   "settings.pro.lead":
     "Des plans qui s'adaptent à votre récupération chaque jour, la carte de récupération, la forme du jour et des solutions aux plateaux.",
   "settings.pro.manage": "Gérer votre abonnement",
@@ -323,6 +332,9 @@ export const de: Partial<Record<Key, Message>> = {
   "settings.language.system": "Wie mein Telefon",
   "settings.language.note":
     "„Wie mein Telefon“ folgt der Sprache, die in den Einstellungen deines Telefons für Liftsmith festgelegt ist. Zahlen, Daten und Einheiten folgen deiner Region. Einige Bildschirme sind noch auf Englisch, während die Übersetzung läuft.",
+  "settings.language.browser": "Wie mein Browser",
+  "settings.language.noteWeb":
+    "„Wie mein Browser“ folgt den Sprachen, die in deinem Browser eingestellt sind. Zahlen, Daten und Einheiten folgen deiner Region. Einige Bildschirme sind noch auf Englisch, während die Übersetzung läuft.",
   "settings.pro.lead": "Pläne, die sich jeden Tag an deine Erholung anpassen, die Erholungskarte, Bereitschaft und Plateau-Lösungen.",
   "settings.pro.manage": "Abo verwalten",
   "settings.g.training": "Trainingsplanung",
@@ -407,6 +419,9 @@ export const it: Partial<Record<Key, Message>> = {
   "settings.language.system": "Come il mio telefono",
   "settings.language.note":
     "«Come il mio telefono» segue la lingua impostata per Liftsmith nelle impostazioni del telefono. Numeri, date e unità seguono la tua regione. Alcune schermate sono ancora in inglese mentre la traduzione è in corso.",
+  "settings.language.browser": "Come il mio browser",
+  "settings.language.noteWeb":
+    "«Come il mio browser» segue le lingue impostate nel browser. Numeri, date e unità seguono la tua regione. Alcune schermate sono ancora in inglese mentre la traduzione è in corso.",
   "settings.pro.lead": "Piani che si adattano ogni giorno al tuo recupero, la mappa del recupero, la prontezza e le soluzioni agli stalli.",
   "settings.pro.manage": "Gestisci il tuo piano",
   "settings.g.training": "Programmazione",
@@ -494,6 +509,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "settings.language.system": "端末に合わせる",
   "settings.language.note":
     "「端末に合わせる」は端末の設定で Liftsmith に指定した言語に従います。数値、日付、単位は地域の形式に従います。翻訳中のため、一部の画面はまだ英語です。",
+  "settings.language.browser": "ブラウザに合わせる",
+  "settings.language.noteWeb":
+    "「ブラウザに合わせる」はブラウザで設定した言語に従います。数値、日付、単位は地域の形式に従います。翻訳中のため、一部の画面はまだ英語です。",
   "settings.pro.lead": "毎日の回復に合わせて変わるプラン、回復マップ、コンディション、停滞の対策。",
   "settings.pro.manage": "プランを管理",
   "settings.g.training": "トレーニング",
@@ -580,6 +598,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "settings.language.system": "Igual ao celular",
   "settings.language.note":
     "Igual ao celular segue o idioma definido para o Liftsmith nos ajustes do seu celular. Números, datas e unidades seguem sua região. Algumas telas ainda estão em inglês enquanto a tradução não termina.",
+  "settings.language.browser": "Igual ao navegador",
+  "settings.language.noteWeb":
+    "Igual ao navegador segue os idiomas definidos no seu navegador. Números, datas e unidades seguem sua região. Algumas telas ainda estão em inglês enquanto a tradução não termina.",
   "settings.pro.lead": "Planos que se adaptam à sua recuperação todo dia, o mapa de recuperação, a prontidão e correções de platô.",
   "settings.pro.manage": "Gerenciar seu plano",
   "settings.g.training": "Planejamento",
@@ -668,6 +689,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "settings.language.system": "휴대폰 설정 따르기",
   "settings.language.note":
     "휴대폰 설정 따르기를 선택하면 휴대폰 설정에서 Liftsmith에 지정한 언어를 따라요. 숫자, 날짜, 단위는 지역 설정을 따라요. 번역이 진행 중이라 일부 화면은 아직 영어로 나와요.",
+  "settings.language.browser": "브라우저 설정 따르기",
+  "settings.language.noteWeb":
+    "브라우저 설정 따르기를 선택하면 브라우저에 설정한 언어를 따라요. 숫자, 날짜, 단위는 지역 설정을 따라요. 번역이 진행 중이라 일부 화면은 아직 영어로 나와요.",
   "settings.pro.lead": "매일 회복 상태에 맞춰 바뀌는 계획, 회복 맵, 컨디션, 정체기 해결책.",
   "settings.pro.manage": "요금제 관리",
   "settings.g.training": "트레이닝",
@@ -756,6 +780,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "settings.language.system": "Telefonuma uy",
   "settings.language.note":
     "Telefonuma uy, telefonunun ayarlarında Liftsmith için seçilen dili izler. Sayılar, tarihler ve birimler bölgeni izler. Çeviri sürerken bazı ekranlar hâlâ İngilizce.",
+  "settings.language.browser": "Tarayıcıma uy",
+  "settings.language.noteWeb":
+    "Tarayıcıma uy, tarayıcında ayarlı dilleri izler. Sayılar, tarihler ve birimler bölgeni izler. Çeviri sürerken bazı ekranlar hâlâ İngilizce.",
   "settings.pro.lead": "Her gün toparlanmana uyum sağlayan planlar, toparlanma haritası, hazırlık ve durgunluk çözümleri.",
   "settings.pro.manage": "Planını yönet",
   "settings.g.training": "Program",
@@ -849,6 +876,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "settings.language.system": "Jak w telefonie",
   "settings.language.note":
     "Jak w telefonie oznacza język ustawiony dla Liftsmith w ustawieniach telefonu. Liczby, daty i jednostki zależą od regionu. Niektóre ekrany są jeszcze po angielsku, dopóki trwa tłumaczenie.",
+  "settings.language.browser": "Jak w przeglądarce",
+  "settings.language.noteWeb":
+    "Jak w przeglądarce oznacza języki ustawione w przeglądarce. Liczby, daty i jednostki zależą od regionu. Niektóre ekrany są jeszcze po angielsku, dopóki trwa tłumaczenie.",
   "settings.pro.lead": "Plany, które codziennie dopasowują się do regeneracji, mapa regeneracji, gotowość i poprawki na zastoje.",
   "settings.pro.manage": "Zarządzaj planem",
   "settings.g.training": "Planowanie",

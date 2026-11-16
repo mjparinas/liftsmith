@@ -507,7 +507,7 @@ export const fr: FeaturesText = {
     },
     languages: {
       name: "Dix langues",
-      body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone.",
+      body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone ou de votre navigateur, ou celle que vous choisissez sur l’écran d’accueil et dans les réglages.",
     },
     appearance: {
       name: "Sombre, clair ou comme votre téléphone",
