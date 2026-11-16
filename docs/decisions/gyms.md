@@ -226,3 +226,10 @@ Melvin, 2026-11-16: "completely change how gym imports work": only OpenStreetMap
 - **The AI step has its own switch** (Melvin, 2026-11-16: "a toggle in the admin that enables or disables that AI step"): **AI step** on the Import card (admins switch it, support staff see it), the admin-only flag `gymImportAi` (on by default, also on the Flags tab as "Gym import: AI step"; POST `{action: "importAi", on}`, audited as `flag.set`). Off, a job reaching the AI step skips it with the note "AI step skipped: it's switched off in Admin › Gyms › Import." and goes on to tidy-up or done; the daily refresh does the same. The `aiHelpers` kill switch and the day's cap still stop it too.
 - **Daily refresh** (`/api/cron/gym-refresh/`, the `gym-refresh` Vercel Schedule, 10:00 UTC; `startDaily`): one `new:<since>` item asks Overpass for gyms added or changed anywhere since the last run (`newer:`, an hour of overlap, kept in `admin_settings.gym_refresh_since`), skips the ones already known by `source_ref`, finds each new gym's country, region and town in batches of 60 (`is_in`), saves them, then runs the website and AI steps (no tidy). It does nothing when a job is running or a daily job ran in the last 20 hours, so a repeated call is safe.
 - **Reads stay small**: each step walks a partial index with `LIMIT`, never a scan (`dbIndexes.test.ts` has the three queries).
+
+## Gyms you train at open their page (2026-11-16)
+
+Melvin, 2026-11-16: "i should be able to click on the gym name and it should open" (Coaching › Setup › Gyms you train
+at). Each listed gym's name and status line is one button that opens the gym's page in the app (`#/gymplace/<id>`,
+`CoachGyms.tsx`), with a › to show it goes somewhere; Save and Remove stay beside it. Pure web code, so Android, iOS and
+the web app get it together.
