@@ -829,4 +829,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés.",
   },
+  "screenshot-share": {
+    title: "Une capture d’écran, une carte à partager",
+    intro:
+      "Faites une capture d’écran de Liftsmith et une feuille de cartes d’entraînement s’ouvre, prête à partager avec votre lien d’invitation.",
+    points: [
+      "Choisissez le dernier mois, trois mois, six mois, l’année ou depuis le début.",
+      "Faites défiler les totaux, la répartition de vos séries et vos meilleures charges.",
+      "Touchez l’œil pour masquer tous les poids.",
+      "Pas aujourd’hui ? Glissez-la vers le bas, ou désactivez-la dans Réglages › Vos données et confidentialité.",
+      "Sans capture : Partager mon entraînement, sur Progrès, ouvre les mêmes cartes.",
+    ],
+    dyk: "Chaque lien que vous partagez, des routines aux salles, porte désormais votre invitation, dans un lien qui dit invite.",
+  },
 };

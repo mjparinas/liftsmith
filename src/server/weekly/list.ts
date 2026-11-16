@@ -128,6 +128,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("widgets", "free", "muscles", { fresh: "2026-11-15" }),
   // New, 2026-11-15: coaches share and sell programs (docs/decisions/coach-programs.md).
   R("coach-programs", "coach", "pro", "trainer/programs", { fresh: "2026-11-15", shot: false }),
+  // New, 2026-11-16: share cards when you take a screenshot, and an invite in every link (docs/decisions/sharing.md).
+  L("screenshot-share", "free", "stats", { fresh: "2026-11-16" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

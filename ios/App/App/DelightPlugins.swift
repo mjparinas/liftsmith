@@ -190,3 +190,29 @@ public class AppUpdatePlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 }
+
+/// Tells the web app when the lifter takes a screenshot of Liftsmith, so it can offer branded share cards with their
+/// invite link (src/lib/screenshots.ts; docs/decisions/sharing.md "Share cards when you take a screenshot"). iOS posts
+/// userDidTakeScreenshotNotification after the screenshot is saved, so it's never blocked or changed; this only passes
+/// the news on. Android counterpart: ScreenshotsPlugin.java (Activity.ScreenCaptureCallback, Android 14+).
+@objc(ScreenshotsPlugin)
+public class ScreenshotsPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "ScreenshotsPlugin"
+    public let jsName = "Screenshots"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "isSupported", returnType: CAPPluginReturnPromise),
+    ]
+
+    override public func load() {
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(tookScreenshot), name: UIApplication.userDidTakeScreenshotNotification, object: nil)
+    }
+
+    @objc func tookScreenshot() {
+        notifyListeners("screenshot", data: [:])
+    }
+
+    @objc func isSupported(_ call: CAPPluginCall) {
+        call.resolve(["supported": true])
+    }
+}

@@ -21,6 +21,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(StoreReviewPlugin())
         bridge?.registerPluginInstance(AppUpdatePlugin())
         bridge?.registerPluginInstance(NowPlayingPlugin())
+        bridge?.registerPluginInstance(ScreenshotsPlugin())
         // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
         // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
         webView?.allowsBackForwardNavigationGestures = true

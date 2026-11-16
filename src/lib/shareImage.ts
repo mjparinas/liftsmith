@@ -32,6 +32,8 @@ export interface CardData {
   medal?: { icon: string; colour: string };
   /** The lifter's name, only when they chose to show it. */
   name?: string | null;
+  /** A half ring of shares with a legend (where the sets went, statsCards.ts); percentages add up to 100. */
+  split?: { label: string; percent: number; colour: string }[];
 }
 
 export interface DrawOptions {
@@ -40,6 +42,11 @@ export interface DrawOptions {
   figure?: HTMLCanvasElement | null;
   /** A Pro member's card carries a small Pro pill beside the brand (billing.ts proMember). */
   pro?: boolean;
+  /**
+   * The lifter's invite link as printed ("getliftsmith.com/invite/ABCD2345", invitePrinted), in place of the plain
+   * site name (2026-11-15: every share carries the invite, docs/decisions/growth.md "An invite in every link").
+   */
+  invite?: string | null;
 }
 
 const INK = "#e8edf3";
@@ -151,6 +158,8 @@ export function drawCard(canvas: HTMLCanvasElement, d: CardData, o: DrawOptions 
     c.globalAlpha = inline ? 1 : 0.75;
     c.drawImage(f, box.x + (box.w - fw) / 2, box.y + (box.h - fh) / 2, fw, fh);
     c.restore();
+  } else if (d.split?.length && artH >= 200) {
+    drawSplit(c, d.split, { x: PAD, y: artTop, w: W - PAD * 2, h: artH }, font);
   } else if (d.medal && artH >= 160) {
     const r = Math.min(story ? 220 : 150, artH / 2 - 10);
     const cx = W / 2,
@@ -274,11 +283,68 @@ export function drawCard(canvas: HTMLCanvasElement, d: CardData, o: DrawOptions 
     c.fillText(l, PAD + 36, ly + 66, W - PAD * 2 - 72);
   });
 
+  drawFooter(c, d.footer, accent, W, H, o.invite);
+}
+
+/** A half ring, each share its own arc in its colour, with a two-column legend under it. */
+function drawSplit(
+  c: CanvasRenderingContext2D,
+  split: NonNullable<CardData["split"]>,
+  box: { x: number; y: number; w: number; h: number },
+  font: (px: number, weight?: number) => string,
+) {
+  const rows = Math.ceil(split.length / 2);
+  const legendH = rows * 64;
+  const r = Math.max(60, Math.min(box.w / 2 - 20, box.h - legendH - 40));
+  const thick = r * 0.36;
+  const cx = box.x + box.w / 2;
+  const cy = box.y + 10 + r;
+  const gap = split.length > 1 ? 0.025 : 0;
+  let a = Math.PI;
+  for (const s of split) {
+    const sweep = (Math.PI * s.percent) / 100;
+    if (sweep <= 0) continue;
+    c.beginPath();
+    c.arc(cx, cy, r - thick / 2, a + gap / 2, a + Math.max(sweep - gap / 2, gap / 2));
+    c.lineWidth = thick;
+    c.lineCap = "butt";
+    c.strokeStyle = s.colour;
+    c.stroke();
+    a += sweep;
+  }
+  const colW = box.w / 2;
+  split.forEach((s, i) => {
+    const x = box.x + (i % 2) * colW + 10;
+    const y = cy + 70 + Math.floor(i / 2) * 64;
+    c.beginPath();
+    c.arc(x + 14, y - 12, 14, 0, Math.PI * 2);
+    c.fillStyle = s.colour;
+    c.fill();
+    c.fillStyle = INK;
+    c.font = font(40, 700);
+    c.fillText(s.label, x + 44, y, colW - 200);
+    const lw = c.measureText(s.label).width;
+    c.fillStyle = MUTED;
+    c.font = font(40, 600);
+    c.fillText(`${s.percent}%`, x + 44 + Math.min(lw, colW - 200) + 18, y);
+  });
+}
+
+/** The footer every card shares: the level and streak line, then the site, or the lifter's invite link on its own line. */
+function drawFooter(c: CanvasRenderingContext2D, footer: string, accent: string, W: number, H: number, invite?: string | null) {
+  const font = (px: number, weight = 600) => `${weight} ${px}px system-ui, -apple-system, Roboto, "Noto Sans JP", sans-serif`;
   c.fillStyle = accent;
   c.fillRect(PAD, H - 170, 120, 8);
   c.fillStyle = INK;
   c.font = font(40, 700);
-  c.fillText(d.footer, PAD, H - 100, W - PAD * 2 - 360);
+  if (invite) {
+    c.fillText(footer, PAD, H - 108, W - PAD * 2);
+    c.fillStyle = MUTED;
+    c.font = font(34, 600);
+    c.fillText(invite, PAD, H - 56, W - PAD * 2);
+    return;
+  }
+  c.fillText(footer, PAD, H - 100, W - PAD * 2 - 360);
   c.fillStyle = MUTED;
   c.font = font(32, 600);
   c.textAlign = "right";

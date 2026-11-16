@@ -694,3 +694,13 @@ Turn the programs you hand out again and again into something anyone can follow,
 - Paid programs are bought on the website, and the money goes to your Stripe account.
 - Share its link anywhere. People who have it keep it, even after you take it off the list.
 Did you know? There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.
+
+### W61 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
+Free · Lifters · Screen: Progress · `fresh`, so it goes next to everyone already in the series
+Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.
+- Pick your last month, three months, six months, year or all time.
+- Swipe through totals, where your sets went and your best lifts.
+- Tap the eye to hide every weight.
+- Not today? Swipe it away, or turn it off in Settings › Your data and privacy.
+- No screenshot needed: Share my training on Progress opens the same cards.
+Did you know? Every link you share, from routines to gyms, now carries your invite, in a link that says invite. ([Sharing](sharing.md))

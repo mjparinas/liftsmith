@@ -254,6 +254,8 @@ export interface Profile {
   calendar?: CalendarPrefs;
   /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
   lean?: boolean;
+  /** Share cards when a screenshot is taken (StatsShare.tsx); on unless turned off (Settings › Your data and privacy). */
+  shotShare?: boolean;
   /** Battery saver for the 3D figures: lower resolution and frame rate (Settings, src/lib/liteDemos.ts). */
   liteDemos?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
