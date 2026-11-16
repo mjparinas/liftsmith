@@ -11,6 +11,7 @@ import type { ModerationDetail } from "@/server/socialModeration";
 
 import { Card, fmtInt, Table, Tile } from "./charts";
 import { Badge, Moderation, STATE_NAME, stateTone } from "./Moderation";
+import { Reveal } from "./Reveal";
 import { SchoolCoaches } from "./SchoolCoaches";
 import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
 import { ago, when } from "./time";
@@ -346,7 +347,11 @@ export function Users({
   useEffect(() => load(search, filter, sort), [load, search, filter, sort, open]);
   return (
     <div className="space-y-4">
-      {open && <Account key={open} id={open} admin={admin} me={me} close={() => setOpen(null)} openAccount={setOpen} />}
+      {open && (
+        <Reveal key={open} label="Open account">
+          <Account id={open} admin={admin} me={me} close={() => setOpen(null)} openAccount={setOpen} />
+        </Reveal>
+      )}
       {!open && <SchoolCoaches admin={admin} />}
       {data && (
         <div className="grid grid-cols-3 gap-3">
