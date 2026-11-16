@@ -183,6 +183,10 @@ export const pt: FeaturesText = {
       name: "Demonstrações de exercícios em 3D",
       body: "Todo exercício tem uma figura 3D mostrando o movimento com o equipamento certo, com passos de preparação e dicas.",
     },
+    "form-mistakes": {
+      name: "Erros comuns e como corrigir",
+      body: "Todo exercício e alongamento mostra seus dois ou três erros de técnica mais comuns ao lado da figura 3D, cada um com a correção e por que importa, e o cronômetro de descanso mostra um para a próxima série. Funciona offline.",
+    },
     "set-types": {
       name: "Drop sets e rest-pause",
       body: "Adicione um drop set ou uma série rest-pause entre as séries.",
@@ -278,6 +282,10 @@ export const pt: FeaturesText = {
     body: {
       name: "Pesagens, gordura corporal e fotos",
       body: "Registre peso e gordura corporal, ou deixe que cheguem da sua balança pelo app de saúde do celular, e guarde fotos de progresso no celular.",
+    },
+    "photo-compare": {
+      name: "Fotos de progresso que se alinham",
+      body: "A câmera mostra sua última foto como um contorno suave para você se alinhar, com temporizador para dar um passo atrás. Compare duas datas quaisquer com um controle deslizante ou lado a lado, cada uma com o que você pesava naquele dia. As fotos ficam no seu celular; um arquivo de backup pode levá-las para um novo.",
     },
     measurements: {
       name: "Medidas com fita",
@@ -408,6 +416,11 @@ export const pt: FeaturesText = {
       name: "Cards e links para compartilhar",
       body: "Compartilhe um treino, um recorde novo ou um marco como imagem, ou como link público com prévia. Um recorde novo brilha em dourado e pode ser compartilhado na hora, na tela de descanso.",
     },
+    "screenshot-share": {
+      name: "Cards ao fazer uma captura de tela",
+      body: "Faça uma captura de tela e uma folha de cards do seu treino aparece: último mês, três meses, seis meses, ano ou desde o início, como totais, para onde foram suas séries ou seus melhores levantamentos. Deslize entre eles, oculte os pesos com o olho e compartilhe com seu link de convite impresso no card. Os mesmos cards estão em Compartilhar meu treino, no Progresso. Todo link que você compartilha agora leva seu convite, num link que diz isso.",
+      note: "As capturas abrem isso no Android 14 ou mais recente e no iPhone, e dá para desativar. Em outros lugares, abra pelo Progresso. Quem tem menos de 18 anos compartilha sem link de convite.",
+    },
     coaching: {
       name: "Treine alunos",
       body: "Vincule alunos, veja os resultados deles e passe rotinas, no celular ou numa tela grande.",
@@ -464,10 +477,6 @@ export const pt: FeaturesText = {
       name: "Chat fixo, status e figurinhas",
       body: "No computador, o chat com o coach fica fixo no canto inferior direito, como um mensageiro: todo mundo com quem você pode conversar, até duas janelas de chat que se recolhem, um som e um contador na aba quando chega mensagem. Os dois lados definem um status (online, com um aluno, treinando, ausente, não perturbe, de férias ou aparecer offline), veem quando o outro está digitando e quando viu sua mensagem, e mandam emoji e figurinhas de academia, no celular também.",
       proPart: "Ser aluno é grátis; treinar alunos é Pro.",
-    },
-    "photo-compare": {
-      name: "Fotos de progresso que se alinham",
-      body: "A câmera mostra sua última foto como um contorno suave para você se alinhar, com temporizador para dar um passo atrás. Compare duas datas quaisquer com um controle deslizante ou lado a lado, cada uma com o seu peso naquele dia. As fotos ficam no seu celular; um arquivo de backup pode levá-las para um novo.",
     },
     "coach-programs": {
       name: "Programas de treinadores",

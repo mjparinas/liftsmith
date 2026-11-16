@@ -1022,7 +1022,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Liftsmith로 기록함",
   "conn.garminConnect.what":
-    "수면, 야간 심박 변이도, 안정 시 심박수, 걸음 수, Index 체중계 측정값을 오늘의 컨디션 판단에 보내고, 시계의 달리기, 자전거, 실내 로잉을 유산소 운동으로 가져와요.",
+    "수면, 밤사이 심박 변이도, 안정 시 심박수, 걸음 수와 Index 체중계 측정값을 오늘의 컨디션 판단에 보내고, 워치의 달리기, 라이딩, 실내 로잉을 유산소 운동으로 가져와요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1153,7 +1153,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Liftsmith ile kaydedildi",
   "conn.garminConnect.what":
-    "Uykuyu, gece kalp atış hızı değişkenliğini, dinlenik nabzı, adımları ve Index tartı ölçümlerini Bugün'ün hazır olma kararına gönderir; saatindeki koşu, bisiklet ve kapalı alan kürek antrenmanlarını kardiyo antrenmanı olarak getirir.",
+    "Uykuyu, gece kalp atış hızı değişkenliğini, dinlenik nabzı, adımları ve Index tartı ölçümlerini Bugün'ün hazırlık kararına gönderir; saatindeki koşu, bisiklet ve kapalı alan kürek seanslarını kardiyo antrenmanı olarak getirir.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1288,5 +1288,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Zapisano w Liftsmith",
   "conn.garminConnect.what":
-    "Przesyła sen, nocną zmienność rytmu serca, tętno spoczynkowe, kroki i pomiary z wagi Index do oceny gotowości na Dziś, a biegi, jazdy na rowerze i wiosłowanie w pomieszczeniu z zegarka jako treningi cardio.",
+    "Przesyła sen, nocną zmienność rytmu serca, tętno spoczynkowe, kroki i pomiary z wagi Index do dzisiejszej oceny gotowości, a biegi, jazdy na rowerze i wiosłowanie w pomieszczeniu z zegarka jako treningi cardio.",
 };

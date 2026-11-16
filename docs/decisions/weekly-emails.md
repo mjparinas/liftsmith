@@ -704,3 +704,12 @@ Screenshot Liftsmith and a sheet of training cards slides up, ready to share wit
 - Not today? Swipe it away, or turn it off in Settings › Your data and privacy.
 - No screenshot needed: Share my training on Progress opens the same cards.
 Did you know? Every link you share, from routines to gyms, now carries your invite, in a link that says invite. ([Sharing](sharing.md))
+
+### W62 · Common mistakes, and the fix (**New**, 2026-11-16)
+Free · Lifters · Screen: the back squat's exercise page, at Common mistakes · `fresh`, so it goes next to everyone already in the series
+Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.
+- Each one says what it looks like, what to do instead and why it matters.
+- Find them in How to during a workout, on each exercise's page and on every stretch.
+- Between sets, the rest timer shows one to watch on your next set, a different one each set.
+- They're part of the app, so they work with no signal, in every language.
+Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))

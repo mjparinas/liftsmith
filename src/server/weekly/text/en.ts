@@ -858,4 +858,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Every link you share, from routines to gyms, now carries your invite, in a link that says invite.",
   },
+  "form-cues": {
+    title: "Common mistakes, and the fix",
+    intro: "Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.",
+    points: [
+      "Each one says what it looks like, what to do instead and why it matters.",
+      "Find them in How to during a workout, on each exercise's page and on every stretch.",
+      "Between sets, the rest timer shows one to watch on your next set, a different one each set.",
+      "They're part of the app, so they work with no signal, in every language.",
+    ],
+    dyk: "Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout.",
+  },
 };

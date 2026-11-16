@@ -828,4 +828,28 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Um programa não tem pesos: a progressão de cada pessoa escolhe os pesos, então o mesmo programa serve para iniciantes e veteranos.",
   },
+  "screenshot-share": {
+    title: "Tire uma captura de tela e ganhe um card que vale compartilhar",
+    intro:
+      "Faça uma captura de tela do Liftsmith e uma folha de cards do seu treino aparece, pronta para compartilhar com seu link de convite.",
+    points: [
+      "Escolha o último mês, três meses, seis meses, o ano ou desde o início.",
+      "Deslize entre totais, para onde foram suas séries e seus melhores levantamentos.",
+      "Toque no olho para ocultar todos os pesos.",
+      "Hoje não? Deslize para fechar, ou desative em Ajustes › Seus dados e privacidade.",
+      "Sem captura de tela: Compartilhar meu treino no Progresso abre os mesmos cards.",
+    ],
+    dyk: "Todo link que você compartilha, de rotinas a academias, agora leva seu convite, num link que diz convite.",
+  },
+  "form-cues": {
+    title: "Erros comuns, e como corrigir",
+    intro: "Todo exercício e alongamento agora mostra seus dois ou três erros de técnica mais comuns, bem ao lado da figura 3D.",
+    points: [
+      "Cada um diz como ele aparece, o que fazer no lugar e por que isso importa.",
+      "Veja em Como fazer durante o treino, na página de cada exercício e em todo alongamento.",
+      "Entre as séries, o cronômetro de descanso mostra um para observar na próxima série, um diferente a cada série.",
+      "Eles fazem parte do app, então funcionam sem sinal, em todos os idiomas.",
+    ],
+    dyk: "Prefere não ver no cronômetro de descanso? Desligue Checagem de técnica no descanso em Ajustes › Treino.",
+  },
 };

@@ -139,6 +139,10 @@ export const fr: FeaturesText = {
       name: "Démonstrations d’exercices en 3D",
       body: "Chaque exercice a une silhouette 3D qui montre le mouvement avec son matériel, avec les étapes de mise en place et des consignes.",
     },
+    "form-mistakes": {
+      name: "Erreurs fréquentes et leurs corrections",
+      body: "Chaque exercice et chaque étirement liste ses deux ou trois erreurs techniques les plus fréquentes à côté de la silhouette 3D, chacune avec sa correction et pourquoi elle compte, et le minuteur de repos vous en montre une pour la prochaine série. Fonctionne hors ligne.",
+    },
     "set-types": {
       name: "Séries dégressives et rest-pause",
       body: "Ajoutez une série dégressive ou une série rest-pause entre les séries.",

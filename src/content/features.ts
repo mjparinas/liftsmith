@@ -202,6 +202,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "form-mistakes",
+        name: "Common mistakes and their fixes",
+        body: "Every exercise and stretch lists its two or three most common form mistakes beside the 3D figure, each with a fix and why it matters, and the rest timer shows one to watch on your next set. Works offline.",
+        tier: "free",
+        added: "2026-11-16",
+      },
+      {
         id: "set-types",
         name: "Drop sets and rest-pause",
         body: "Add a drop set or a rest-pause set between sets.",

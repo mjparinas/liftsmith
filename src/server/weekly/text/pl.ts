@@ -825,4 +825,27 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Program nie ma ciężarów: dobiera je progresja każdej osoby, więc jeden program pasuje i początkującym, i weteranom.",
   },
+  "screenshot-share": {
+    title: "Zrób zrzut ekranu, dostań kartę wartą udostępnienia",
+    intro: "Zrób zrzut ekranu Liftsmith, a wysunie się arkusz kart z twoim treningiem, gotowych do udostępnienia z linkiem z zaproszeniem.",
+    points: [
+      "Wybierz ostatni miesiąc, trzy miesiące, sześć miesięcy, rok albo od początku.",
+      "Przesuwaj podsumowanie, podział serii i najlepsze boje.",
+      "Stuknij oko, by ukryć wszystkie ciężary.",
+      "Nie dziś? Przesuń, by zamknąć, albo wyłącz to w Ustawienia › Twoje dane i prywatność.",
+      "Bez zrzutu ekranu: Udostępnij mój trening w Postępach otwiera te same karty.",
+    ],
+    dyk: "Każdy link, który udostępniasz, od planów po siłownie, niesie teraz twoje zaproszenie, w linku ze słowem zaproszenie.",
+  },
+  "form-cues": {
+    title: "Częste błędy i jak je poprawić",
+    intro: "Każde ćwiczenie i rozciąganie pokazuje teraz dwa lub trzy najczęstsze błędy techniki, tuż obok postaci 3D.",
+    points: [
+      "Każdy mówi, jak wygląda, co robić zamiast tego i dlaczego to ważne.",
+      "Znajdziesz je w Jak to zrobić podczas treningu, na stronie każdego ćwiczenia i przy każdym rozciąganiu.",
+      "Między seriami licznik przerwy pokazuje jeden, na który uważać w następnej serii, w każdej serii inny.",
+      "Są częścią aplikacji, więc działają bez zasięgu, w każdym języku.",
+    ],
+    dyk: "Wolisz ich nie widzieć na liczniku przerwy? Wyłącz Kontrola techniki w przerwie w Ustawienia › Trening.",
+  },
 };

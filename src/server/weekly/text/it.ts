@@ -840,4 +840,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ogni link che condividi, dalle routine alle palestre, ora porta il tuo invito, in un link che dice invite.",
   },
+  "form-cues": {
+    title: "Errori comuni e come correggerli",
+    intro: "Ogni esercizio e allungamento ora mostra i suoi due o tre errori tecnici più comuni, proprio accanto alla figura 3D.",
+    points: [
+      "Ognuno dice com'è, cosa fare invece e perché conta.",
+      "Li trovi in Come si fa durante l'allenamento, nella pagina di ogni esercizio e in ogni allungamento.",
+      "Tra una serie e l'altra, il timer di recupero ne mostra uno per la prossima serie, diverso ogni volta.",
+      "Fanno parte dell'app, quindi funzionano senza campo e in ogni lingua.",
+    ],
+    dyk: "Preferisci non vederli durante il recupero? Disattiva Controlli tecnici durante il recupero in Impostazioni › Allenamento.",
+  },
 };

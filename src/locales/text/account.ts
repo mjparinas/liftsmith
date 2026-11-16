@@ -559,7 +559,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "account.row.out": "Entre para fazer backup e sincronizar",
   "account.row.in": "Conectado como {email}",
   "account.delete.webSub": "Sua assinatura Pro do site também termina agora e não será cobrada de novo.",
-  "account.signOut.backupPhotos": "Salvar um backup com fotos",
+  "account.signOut.backupPhotos": "Salvar um backup com as fotos",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -803,5 +803,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "account.row.out": "Zaloguj się, by mieć kopię i synchronizację",
   "account.row.in": "Zalogowano jako {email}",
   "account.delete.webSub": "Twoja subskrypcja Pro ze strony internetowej też kończy się teraz i nie zostanie ponownie obciążona.",
-  "account.signOut.backupPhotos": "Zapisz kopię ze zdjęciami",
+  "account.signOut.backupPhotos": "Zapisz kopię zapasową ze zdjęciami",
 };

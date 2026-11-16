@@ -840,4 +840,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Jeder Link, den du teilst, von Routinen bis zu Studios, trägt jetzt deine Einladung, in einem Link, der invite sagt.",
   },
+  "form-cues": {
+    title: "Häufige Fehler und wie du sie behebst",
+    intro: "Jede Übung und jede Dehnung zeigt jetzt ihre zwei oder drei häufigsten Technikfehler, direkt neben der 3D-Figur.",
+    points: [
+      "Jeder sagt, wie er aussieht, was du stattdessen tust und warum es wichtig ist.",
+      "Du findest sie in So geht's während des Trainings, auf der Seite jeder Übung und bei jeder Dehnung.",
+      "Zwischen den Sätzen zeigt der Pausentimer einen für den nächsten Satz, jedes Mal einen anderen.",
+      "Sie gehören zur App, funktionieren also ohne Empfang und in jeder Sprache.",
+    ],
+    dyk: "Lieber nicht in der Pause? Schalte Technik-Checks in der Pause unter Einstellungen › Training aus.",
+  },
 };

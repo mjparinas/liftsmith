@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { can } from "@/lib/entitlements";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { date, list, num, t } from "@/lib/i18n";
@@ -14,7 +15,9 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { plateText, setText } from "./format";
+import { FaultList, faultsFor } from "./FormFaults";
 import { LiftChart, LiftCompareCard, LiftTotalsCard } from "./LiftStats";
+import { useMyShape } from "./myShape";
 import { ProLocked } from "./ProLocked";
 import { goBack } from "./router";
 import { SetHints } from "./SetHints";
@@ -59,6 +62,7 @@ export function ExercisePage({ id }: { id?: string }) {
   const max = useMemo(() => (ex ? liftMax(events, ex, now, profile) : null), [events, ex, now, profile]);
   const compare = useMemo(() => (ex ? liftComparison(ex, max, events, profile, now) : null), [ex, max, events, profile, now]);
   const [shown, setShown] = useState(PAGE);
+  const shape = useMyShape();
   const back = { label: t("lift.back"), onClick: goBack };
   if (!ex) {
     return (
@@ -95,6 +99,26 @@ export function ExercisePage({ id }: { id?: string }) {
           {plates && <p className="num mt-1 text-sm text-muted">{plates}</p>}
           {next.note && <p className="mt-2 text-sm text-muted">{next.note}</p>}
         </section>
+      )}
+
+      {!ex.custom && (
+        <Section title={t("ff.howTo")} icon="dumbbell">
+          <div className="card p-4">
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} shape={shape} controls />
+            <p className="mt-3 text-muted">{ex.setup}</p>
+            <ol className="mt-3 space-y-2">
+              {ex.cues.map((c, i) => (
+                <li key={c} className="flex gap-3">
+                  <span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 text-sm font-bold text-accent">
+                    {i + 1}
+                  </span>
+                  {c}
+                </li>
+              ))}
+            </ol>
+            <FaultList faults={faultsFor(ex)} className="mt-5" />
+          </div>
+        </Section>
       )}
 
       {sessions.length > 0 && !can("advancedStats") && (
