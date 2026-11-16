@@ -50,6 +50,7 @@ import { Account } from "./Account";
 import { Achievements, useGame } from "./Achievements";
 import { ChatDock } from "./ChatDock";
 import { CheckinToasts } from "./CheckinToasts";
+import { CoachProgramScreen } from "./CoachProgram";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExerciseLibrary } from "./ExerciseLibrary";
@@ -483,6 +484,7 @@ export function App() {
     gymstaff: <GymStaffJoin key={arg ?? ""} code={arg} />,
     gymadd: <GymAdd />,
     log: <LogPast />,
+    program: <CoachProgramScreen key={arg ?? ""} arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

@@ -668,3 +668,12 @@ On a computer, every chat now lives in a dock at the bottom right, so clients ar
 - Set a status: with a client, training, away, do not disturb, on vacation or appear offline; online shows by itself.
 - See when a client is typing and when they've seen your message, and send emoji and gym stickers.
 Did you know? On Do not disturb or on vacation, chat notifications to you wait until you're back.
+
+### C8 · Share and sell your programs (**New**, 2026-11-15)
+
+Turn the programs you hand out again and again into something anyone can follow, free or for a price.
+- Under Coaching › Programs, pick up to seven of your routines as its days, then add a name, a level, a goal and how many weeks.
+- Leave the price empty for a free program, or set one once payments with Stripe are on.
+- Paid programs are bought on the website, and the money goes to your Stripe account.
+- Share its link anywhere. People who have it keep it, even after you take it off the list.
+Did you know? There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.

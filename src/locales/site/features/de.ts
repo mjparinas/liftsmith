@@ -394,6 +394,12 @@ export const de: FeaturesText = {
       body: "Am Computer sitzt der Coach-Chat unten rechts in einem Dock, wie ein Messenger: alle, denen du schreiben kannst, bis zu zwei Chatfenster, die sich einklappen, und ein Ton und eine Zahl im Tab, wenn eine Nachricht kommt. Beide Seiten setzen einen Status (online, bei einem Kunden, beim Training, abwesend, nicht stören, im Urlaub oder offline erscheinen), sehen, wann die andere Seite schreibt und deine Nachricht gesehen hat, und schicken Emojis und Gym-Sticker, auch am Handy.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
     },
+    "coach-programs": {
+      name: "Programme von Coaches",
+      body: "Coaches und Personal Trainer machen aus ihren Routinen ein Programm, mit Level, Ziel und Anzahl Wochen, kostenlos oder mit Preis, und teilen den Link. Du speicherst seine Tage mit einem Tippen in deinen Routinen, und deine eigene Progression wählt die Gewichte. Kostenpflichtige Programme bezahlst du dem Coach über sein eigenes Stripe-Konto.",
+      note: "Kostenpflichtige Programme werden auf der Website gekauft; die Android- und iPhone-Apps zeigen kostenlose Programme und die, die du hast.",
+      proPart: "Programme zu bekommen ist kostenlos; sie zu erstellen gehört zum Coaching, das Pro ist.",
+    },
     "coach-pages": {
       name: "Eine Seite für jede Seite",
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",

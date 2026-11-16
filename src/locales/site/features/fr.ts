@@ -395,6 +395,12 @@ export const fr: FeaturesText = {
       body: "Sur ordinateur, le chat avec le coach se range dans un dock en bas à droite, comme une messagerie : toutes les personnes à qui écrire, jusqu'à deux fenêtres qui se replient, un son et un compteur dans l'onglet quand un message arrive. Chaque côté choisit un statut (en ligne, avec un client, à l'entraînement, absent, ne pas déranger, en vacances ou apparaître hors ligne), voit quand l'autre écrit et quand il a vu votre message, et envoie emojis et autocollants de salle, sur le téléphone aussi.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
     },
+    "coach-programs": {
+      name: "Programmes de coachs",
+      body: "Les coachs et entraîneurs personnels font de leurs routines un programme, avec un niveau, un objectif et un nombre de semaines, gratuit ou payant, et partagent son lien. Vous enregistrez ses jours dans vos routines d'un toucher, et votre propre progression choisit les charges. Les programmes payants paient le coach par son propre compte Stripe.",
+      note: "Les programmes payants s'achètent sur le site ; les apps Android et iPhone montrent les programmes gratuits et ceux que vous avez.",
+      proPart: "Obtenir des programmes est gratuit ; en créer fait partie du coaching, qui est Pro.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",

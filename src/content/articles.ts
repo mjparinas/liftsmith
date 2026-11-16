@@ -9,6 +9,7 @@ import { BLOG_AB } from "./blog/ab";
 import { BLOG_AC } from "./blog/ac";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
+import { BLOG_COACH_PROGRAMS } from "./blog/coachPrograms";
 import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
@@ -235,6 +236,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_AC,
   ...BLOG_INVITES,
   ...BLOG_REHAB_DONE,
+  ...BLOG_COACH_PROGRAMS,
   ...BLOG_SITE_PAGES,
 ];
 

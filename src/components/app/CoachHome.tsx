@@ -66,6 +66,7 @@ import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { CoachGyms } from "./CoachGyms";
 import { PaySetup, YourPayments } from "./CoachPay";
 import { CoachPlanCard } from "./CoachPlan";
+import { CoachPrograms } from "./CoachPrograms";
 import { CoachSessions, YourSessions } from "./CoachSessions";
 import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
@@ -82,6 +83,7 @@ const TAB_ICON: Record<CoachTab, IconName> = {
   messages: "chat",
   schedule: "calendar",
   checkins: "edit",
+  programs: "layers",
   pay: "gift",
   teams: "trophy",
   setup: "settings",
@@ -208,6 +210,7 @@ export function CoachHome({
           <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={reload} />
         )}
         {view.tab === "checkins" && <FormsScreen embedded />}
+        {view.tab === "programs" && <CoachPrograms />}
         {view.tab === "pay" && data.pay && <PaySetup account={data.pay.account} fee={data.pay.fee ?? 0} onChange={reload} />}
         {view.tab === "teams" && (
           <Section title={t("team.title")} icon="trophy" info="schoolTeams">

@@ -793,4 +793,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Con No molestar o de vacaciones, las notificaciones del chat esperan hasta que vuelvas.",
   },
+  "coach-programs": {
+    title: "Comparte y vende tus programas",
+    intro: "Convierte los programas que repites una y otra vez en algo que cualquiera pueda seguir, gratis o con precio.",
+    points: [
+      "En Coaching › Programas, elige hasta siete de tus rutinas como sus días y añade un nombre, un nivel, un objetivo y cuántas semanas.",
+      "Deja el precio vacío para un programa gratis, o pon uno cuando tengas los pagos con Stripe activados.",
+      "Los programas de pago se compran en la web y el dinero va a tu cuenta de Stripe.",
+      "Comparte su enlace donde quieras. Quien ya lo tiene lo conserva, aunque lo quites de la lista.",
+    ],
+    dyk: "Un programa no lleva pesos: la progresión de cada deportista los elige, así que un mismo programa sirve a principiantes y veteranos.",
+  },
 };

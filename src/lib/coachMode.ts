@@ -10,8 +10,8 @@
 import type { TeamsOverview } from "./teams";
 import type { Overview } from "./trainer";
 
-export type CoachTab = "clients" | "messages" | "schedule" | "checkins" | "pay" | "teams" | "setup" | "mine";
-export const COACH_TABS: readonly CoachTab[] = ["clients", "messages", "schedule", "checkins", "pay", "teams", "setup", "mine"];
+export type CoachTab = "clients" | "messages" | "schedule" | "checkins" | "programs" | "pay" | "teams" | "setup" | "mine";
+export const COACH_TABS: readonly CoachTab[] = ["clients", "messages", "schedule", "checkins", "programs", "pay", "teams", "setup", "mine"];
 
 export interface Mode {
   /** Coaches clients (or said they will). */
@@ -57,10 +57,10 @@ export function coachingMode(o: O | null, teams: T | null, picked: Picked = null
   };
 }
 
-/** The coach's pages, in order. Payments only once the server takes them; My coach when they train with one too. */
+/** The coach's pages, in order. Programs (coachPrograms.ts) for every coach: free ones need no payments. Payments only once the server takes them; My coach when they train with one too. */
 export function coachTabs(mode: Mode, payments: boolean): CoachTab[] {
   const tabs: CoachTab[] = [];
-  if (mode.coach) tabs.push("clients", "messages", "schedule", "checkins");
+  if (mode.coach) tabs.push("clients", "messages", "schedule", "checkins", "programs");
   if (mode.coach && payments) tabs.push("pay");
   if (mode.school) tabs.push("teams");
   if (mode.coach) tabs.push("setup");

@@ -69,6 +69,7 @@ export type CoachPushKind =
   | "coachBooked"
   | "coachCancelled"
   | "coachPaid"
+  | "coachProgramSold"
   | "coachFull"
   | "coachPain"
   | "coachPlan";
