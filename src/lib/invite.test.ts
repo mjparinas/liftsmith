@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { boardNudge, cleanInvite, inviteFromReferrer, inviteUrl, playInviteUrl, rankBoard, weekStart } from "./invite";
+import {
+  boardNudge,
+  cleanInvite,
+  inviteFromReferrer,
+  inviteOfUrl,
+  invitePrinted,
+  inviteUrl,
+  playInviteUrl,
+  rankBoard,
+  weekStart,
+  withInvite,
+} from "./invite";
 import type { BoardRow } from "./socialTypes";
 
 const row = (name: string, workouts: number, me = false): BoardRow => ({
@@ -19,10 +30,31 @@ describe("invite links", () => {
   it("reads codes from links, typing and the Play install referrer", () => {
     expect(cleanInvite("abcd-efgh")).toBe("ABCDEFGH");
     expect(cleanInvite("ABCD0FGH")).toBe(""); // no 0, O, 1 or I
-    expect(inviteUrl("ABCDEFGH")).toMatch(/\/app\/#\/invite\/ABCDEFGH$/);
+    // "Invite" is in the address, so people can see what the link does (Melvin, 2026-11-15).
+    expect(inviteUrl("ABCDEFGH")).toBe("https://www.getliftsmith.com/invite/ABCDEFGH");
+    expect(invitePrinted("ABCDEFGH")).toBe("getliftsmith.com/invite/ABCDEFGH");
     expect(inviteFromReferrer("utm_source=invite&utm_campaign=ABCDEFGH")).toBe("ABCDEFGH");
     expect(inviteFromReferrer("utm_source=creator&utm_campaign=ABCDEFGH")).toBe("");
     expect(inviteFromReferrer(decodeURIComponent(new URL(playInviteUrl("ABCDEFGH")).searchParams.get("referrer")!))).toBe("ABCDEFGH");
+  });
+});
+
+describe("an invite on every shared link", () => {
+  it("adds the code before the app's screen, and leaves a link alone without one", () => {
+    expect(withInvite("https://www.getliftsmith.com/app/#/routine/r1~QQ", "abcdefgh")).toBe(
+      "https://www.getliftsmith.com/app/?invite=ABCDEFGH#/routine/r1~QQ",
+    );
+    expect(withInvite("https://www.getliftsmith.com/w/abc/", "ABCDEFGH")).toBe("https://www.getliftsmith.com/w/abc/?invite=ABCDEFGH");
+    expect(withInvite("https://www.getliftsmith.com/w/abc/", null)).toBe("https://www.getliftsmith.com/w/abc/");
+    expect(withInvite("https://www.getliftsmith.com/w/abc/", "bad")).toBe("https://www.getliftsmith.com/w/abc/");
+  });
+
+  it("reads the invite from the new links, the old ones and any link that carries it", () => {
+    expect(inviteOfUrl("https://www.getliftsmith.com/invite/ABCDEFGH/")).toBe("ABCDEFGH");
+    expect(inviteOfUrl("https://www.getliftsmith.com/app/#/invite/ABCDEFGH")).toBe("ABCDEFGH");
+    expect(inviteOfUrl("https://www.getliftsmith.com/app/?invite=abcdefgh#/gym/x")).toBe("ABCDEFGH");
+    expect(inviteOfUrl("https://www.getliftsmith.com/app/#/routine/x")).toBe("");
+    expect(inviteOfUrl("https://www.getliftsmith.com/invite/0000/")).toBe("");
   });
 });
 

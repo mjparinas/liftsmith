@@ -816,4 +816,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Tippe auf das Erholung-Widget, um die Erholungskarte in der App zu öffnen.",
   },
+  "screenshot-share": {
+    title: "Screenshot machen, Karte zum Teilen bekommen",
+    intro:
+      "Mach einen Screenshot von Liftsmith, und ein Blatt mit Trainingskarten fährt hoch, fertig zum Teilen mit deinem Einladungslink darauf.",
+    points: [
+      "Wähle den letzten Monat, drei Monate, sechs Monate, das Jahr oder alles.",
+      "Wisch durch Summen, die Aufteilung deiner Sätze und deine besten Lifts.",
+      "Tipp aufs Auge, um alle Gewichte auszublenden.",
+      "Heute nicht? Wisch es weg oder schalte es unter Einstellungen › Deine Daten und Datenschutz aus.",
+      "Ohne Screenshot: Mein Training teilen im Fortschritt öffnet dieselben Karten.",
+    ],
+    dyk: "Jeder Link, den du teilst, von Routinen bis zu Studios, trägt jetzt deine Einladung, in einem Link, der invite sagt.",
+  },
 };

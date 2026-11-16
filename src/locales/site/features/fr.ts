@@ -351,6 +351,11 @@ export const fr: FeaturesText = {
       name: "Cartes et liens de partage",
       body: "Partagez une séance, un nouveau record ou une étape en image, ou en lien public avec aperçu. Un nouveau record s’illumine en doré et se partage dès l’écran de repos.",
     },
+    "screenshot-share": {
+      name: "Des cartes quand vous faites une capture d’écran",
+      body: "Faites une capture d’écran et une feuille de cartes d’entraînement s’ouvre : votre dernier mois, trois mois, six mois, l’année ou depuis le début, en totaux, en répartition de vos séries ou en meilleures charges. Faites-les défiler, masquez les poids avec l’œil et partagez avec votre lien d’invitation imprimé sur la carte. Les mêmes cartes sont dans Partager mon entraînement, sur Progrès. Chaque lien que vous partagez porte désormais votre invitation, dans un lien qui le dit.",
+      note: "Les captures l’ouvrent sur Android 14 et plus et sur iPhone, et on peut la désactiver. Ailleurs, ouvrez-la depuis Progrès. Les moins de 18 ans partagent sans lien d’invitation.",
+    },
     coaching: {
       name: "Coacher des clients",
       body: "Associez des clients, voyez leurs résultats et attribuez-leur des routines, sur le téléphone ou sur grand écran.",

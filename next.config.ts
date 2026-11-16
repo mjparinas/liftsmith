@@ -50,6 +50,8 @@ const nextConfig: NextConfig = {
     : {
         rewrites: async () => [
           { source: "/c/:code/", destination: "/c/" },
+          // Invite links (www.getliftsmith.com/invite/<code>/) go on to the app's invite screen (src/app/api/invite/).
+          { source: "/invite/:code/", destination: "/api/invite/?code=:code" },
           { source: "/w/:id/card.jpg", destination: "/api/share/image/?id=:id" },
           { source: "/w/:id/", destination: "/api/share/page/?id=:id" },
           // Public profiles (www.getliftsmith.com/u/<handle>/) and the sitemap of them (src/server/publicProfile.ts).

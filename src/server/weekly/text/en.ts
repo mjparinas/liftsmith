@@ -835,4 +835,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Tap the Recovery widget to open the recovery map in the app.",
   },
+  "screenshot-share": {
+    title: "Take a screenshot, get a card worth sharing",
+    intro: "Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.",
+    points: [
+      "Pick your last month, three months, six months, year or all time.",
+      "Swipe through totals, where your sets went and your best lifts.",
+      "Tap the eye to hide every weight.",
+      "Not today? Swipe it away, or turn it off in Settings › Your data and privacy.",
+      "No screenshot needed: Share my training on Progress opens the same cards.",
+    ],
+    dyk: "Every link you share, from routines to gyms, now carries your invite, in a link that says invite.",
+  },
 };

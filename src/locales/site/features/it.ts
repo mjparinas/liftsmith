@@ -344,6 +344,11 @@ export const it: FeaturesText = {
       name: "Card e link da condividere",
       body: "Condividi un allenamento, un nuovo record o un traguardo come immagine, o come link pubblico con anteprima. Un nuovo record si illumina d’oro e si condivide subito dal recupero.",
     },
+    "screenshot-share": {
+      name: "Card quando fai uno screenshot",
+      body: "Fai uno screenshot e compare un foglio con le card del tuo allenamento: l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre, come totali, come divisione delle serie o come migliori alzate. Scorrile, nascondi i pesi con l’occhio e condividile con il tuo link d’invito stampato sulla card. Le stesse card sono in Condividi il mio allenamento, in Progressi. Ogni link che condividi ora porta il tuo invito, in un link che lo dice.",
+      note: "Gli screenshot lo aprono su Android 14 e successivi e su iPhone, e si può disattivare. Altrove, aprilo da Progressi. Chi ha meno di 18 anni condivide senza link d’invito.",
+    },
     coaching: {
       name: "Segui i clienti",
       body: "Collega i clienti, vedi i loro risultati e assegna loro routine, sul telefono o su un grande schermo.",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
@@ -21,6 +21,7 @@ import { CoachNotes } from "./Insights";
 import { OneRmSection } from "./OneRepMax";
 import { ProLocked } from "./ProLocked";
 import { go, useRoute } from "./router";
+import { StatsShareSheet } from "./StatsShare";
 import { HUE } from "./theme";
 import { Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
 import { WeighInForm } from "./WeighIn";
@@ -90,6 +91,7 @@ export function Stats() {
           <StatTile key={k} label={label} value={v} icon={icon} tint={hue} />
         ))}
       </div>
+      {stats.sessions.length > 0 && <ShareTraining />}
       <RecapAndPhotos />
       <div id="strength-score" className="scroll-mt-14">
         <StrengthCard />
@@ -245,5 +247,18 @@ function BodyweightCard() {
         <WeighInForm id="progress" className="mt-3" />
       </div>
     </Section>
+  );
+}
+
+/** "Share my training": the screenshot share sheet's cards, one tap away on every platform (StatsShare.tsx). */
+function ShareTraining() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="desk-span mt-3">
+      <Button kind="ghost" icon="share" className="w-full" onClick={() => setOpen(true)}>
+        {t("card.shot.open")}
+      </Button>
+      <StatsShareSheet open={open} onClose={() => setOpen(false)} from="progress" />
+    </div>
   );
 }

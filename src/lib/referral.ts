@@ -106,5 +106,5 @@ export const keptInvites = (): InviteStatus | null => {
 };
 
 /** Where an invite was shared from, for analytics (`social_invite` with a detail). */
-export type InviteFrom = "people" | "done" | "card";
+export type InviteFrom = "people" | "done" | "card" | "link" | "screenshot";
 export const trackInvite = (from: InviteFrom) => track("feature", { name: "social_invite", detail: from });
