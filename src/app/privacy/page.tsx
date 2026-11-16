@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMeta({
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
-const UPDATED = "15 November 2026";
+const UPDATED = "16 November 2026";
 
 export default function Privacy() {
   return (
@@ -117,12 +117,13 @@ export default function Privacy() {
           An account is optional. If you sign in (with Google, with Apple, or with a code we email you), we keep your email address, which
           sign-in methods you used, and a copy of what you log in the app so it&apos;s backed up and on every device you sign in on: your
           workouts and sets, notes, body weight, gyms, routines and settings, and, if you use them, health readings from Health Connect or
-          Apple Health, injuries and cycle logs. Progress photos are never uploaded. This copy is used to give it back to you on your
-          devices and, unless you say no, to count your best big lifts in strength standards (below). It&apos;s never part of usage stats,
-          never used for advertising, never shared, and never read by people unless you ask us for help with it. Sign-in with Google or
-          Apple gives us only your account id there and your email (Apple can give a private relay address instead). You can sign out on any
-          device, which keeps that device&apos;s data, or delete your account in Settings › Account and sync, which deletes your account and
-          our copy at once.
+          Apple Health, injuries and cycle logs. Progress photos are never uploaded; they go into a backup file only if you switch that on.
+          This copy is used to give it back to you on your devices and, unless you say no, to count your best big lifts in strength
+          standards (below). It&apos;s never part of usage stats, never used for advertising, never shared, and never read by people unless
+          you ask us for help with it. Sign-in with Google or Apple gives us only your account id there and your email (Apple can give a
+          private relay address instead). Signing out of a device first saves anything not yet synced to your account, then erases that
+          device&apos;s copy, photos included (it offers a backup file first). Delete your account in Settings › Account and sync, which
+          deletes your account and our copy at once.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Strength standards</h2>
@@ -151,6 +152,24 @@ export default function Privacy() {
           rate, body weight or fat, measurements, cycle data, injuries, gyms or places. If you report something, we keep the report and who
           made it so we can review it, and the person you reported isn&apos;t told who reported them. Leave Friends in its settings, or
           delete your account, and all of this is deleted.
+        </p>
+        <p className="mt-2">
+          Your invite link carries a code tied to your account. If someone joins with it, we keep whose link it was, so you follow each
+          other and, once they&apos;ve finished three workouts, you both get a month of Pro; you each see how many of those workouts are
+          done, never what they were. Anyone under 18 can invite friends, but their share pictures never carry the link.
+        </p>
+
+        <h2 className="mt-8 text-xl font-semibold">Coaching</h2>
+        <p className="mt-2">
+          Coaching is optional and needs an account. When you join a coach with their code, we keep the link between your accounts, the name
+          you give, and what you chose to share. Your coach sees your workouts from the last year (exercises, sets, weights, reps, effort
+          and feedback), and, only if you switch each one on for that coach, heart rate, your workout notes, readiness and recovery, body
+          data, pain and injuries, and cycle. Never your gyms, places or progress photos. We also keep what you and your coach send each
+          other: messages, notes, routines, check-in answers and booked sessions. Staff don&apos;t read your messages. Stop sharing in
+          Coaching cuts the coach&apos;s access at once, and unlinking either way, or deleting your account, deletes your messages and what
+          was shared. If you coach, your name and role are shown to the clients who use your code, and, once you have three ratings, your
+          clients&apos; star ratings and reviews are shown with your invite and in the trainer directory. A review shows its writer as a
+          first name and last initial, or as &ldquo;A client&rdquo;.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Gyms you share or list</h2>
@@ -226,12 +245,16 @@ export default function Privacy() {
 
         <h2 className="mt-8 text-xl font-semibold">Reminders</h2>
         <p className="mt-2">
-          Phone reminders are scheduled on your phone from your own data and send nothing to us. If you turn on email reminders, we keep
-          your email address, which kinds of email you chose, when you agreed, and only what&apos;s needed to time them: your training days
-          and time, time zone, days-a-week goal, when you finished setup, when your first and latest workouts were, how many days you
-          trained this week, your streak and whether you have Pro. Never your weights, reps, heart rate or health data. Nothing is sent
-          until you confirm the address, offers stay off unless you turn them on, and every email has a one-click unsubscribe link. Stop all
-          email in Settings › Reminders, or erase this device, and we delete your address and its history.
+          Phone reminders are scheduled on your phone from your own data and send nothing to us. Email is on once you sign in (off for
+          anyone under 18 until they turn it on), and goes only to the address you signed in with, which sign-in has already checked; an
+          address you typed in an older version gets an email to confirm it first. We keep your email address, which kinds of email are on,
+          when you agreed, and only what&apos;s needed to time and fill them: your training days and time, time zone, units, days-a-week
+          goal, when you finished setup, when your first and latest workouts were, how many days you trained this week, your streak, whether
+          you have Pro, this week&apos;s and last month&apos;s totals (workouts, sets and new bests), your newest best (the exercise, weight
+          and reps) and, before your first workout, the name and length of the workout waiting for you. Never your other sets, body weight,
+          heart rate or health data. Each kind of email has its own switch, offers stay off unless you turn them on (and never go to anyone
+          under 18), and every email has a one-click unsubscribe link. Stop all email in Settings › Reminders, or erase this device, and we
+          delete your address and its history.
         </p>
         <h2 className="mt-8 text-xl font-semibold">Subscriptions</h2>
         <p className="mt-2">
@@ -247,6 +270,13 @@ export default function Privacy() {
           and tells us when the subscription starts, renews, is cancelled or refunded. If a phone signed in to your account has a store
           subscription, we link that phone&apos;s install id to your account so Pro works on the web too. Deleting your account cancels a
           web subscription and removes the link; Stripe keeps its own payment records, as the law requires.
+        </p>
+        <p className="mt-2">
+          Coaches who take payments have their own Stripe account: Stripe&apos;s own pages ask for their details and bank account, which we
+          never see, and we keep only the account&apos;s id and whether it can take payments. When you pay a coach, or buy a coach&apos;s
+          program on the website, you pay on Stripe&apos;s checkout page for the coach&apos;s account, so the coach is the seller and
+          receipts and refunds are theirs. Stripe receives a random id for you and the coach (and the program); we keep what was paid, when,
+          and whether it was refunded, so the coach&apos;s Payments and your purchases are right. A payment to a coach never unlocks Pro.
         </p>
         <h2 className="mt-8 text-xl font-semibold">Codes</h2>
         <p className="mt-2">
@@ -269,8 +299,10 @@ export default function Privacy() {
           Resend. Subscriptions are checked by RevenueCat, and web payments are taken by Stripe. When you email us, we may ask
           Anthropic&apos;s Claude for a first draft of our answer; your message is sent for that one request, and a person reads and sends
           every reply. When something is reported on Friends, we may also ask Claude to suggest what to do with it, sending only what was
-          reported and the reports; a person always decides. None of them may use the data for their own purposes. We keep usage stats for
-          up to 25 months.
+          reported and the reports; a person always decides. Our staff also use Claude to suggest a gym&apos;s missing details from its own
+          website, spot gyms listed twice, and summarize our own totals; it&apos;s never sent your workouts, health readings or messages.
+          Map pictures and the gym map come from Mapbox through our own server, so Mapbox never receives anything about you. None of them
+          may use the data for their own purposes. We keep usage stats for up to 25 months.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Your choices</h2>

@@ -9,7 +9,7 @@ import { BRAND } from "@/lib/brand";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 /** The day this page's claims were last checked against the code. */
-export const TRUST_UPDATED = "10 November 2026";
+export const TRUST_UPDATED = "16 November 2026";
 
 export interface Control {
   title: string;
@@ -23,11 +23,12 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
     controls: [
       { title: "No ads, ever", note: "We never sell or share your data with advertisers or data brokers." },
       { title: "Your training stays on your phone", note: "The app works offline. Nothing leaves it unless you sign in to sync." },
-      { title: "Accounts are optional", note: "Sign in only if you want a backup and your other devices." },
+      { title: "Accounts are optional", note: "Sign in only if you want a backup, your other devices, Friends or a coach." },
       { title: "Usage stats you control", note: "No advertising id. Off by default in the EU and UK, off anytime in Settings." },
       { title: "No cookies on this website", note: "Visits are counted without cookies, and Global Privacy Control turns it off." },
+      { title: "Progress photos never upload", note: "They stay on your phone, and go in a backup file only if you switch it on." },
       { title: "Delete anytime", note: "Your account and everything synced to it, in a few taps." },
-      { title: "Where synced data lives", note: "In our own Turso database. Never with ad networks or data brokers." },
+      { title: "Where synced data lives", note: "In our own Turso database, used by our servers on Vercel. Never sold or shared." },
     ],
   },
   {
@@ -38,6 +39,7 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
       { title: "Limited Use", note: "Follows Health Connect's Limited Use rules. Never read by people." },
       { title: "The camera stays on your phone", note: "Rep counting is worked out on the device. Nothing is recorded." },
       { title: "Kept out of phone backups", note: "App data skips cloud and computer backups. Sign-in or a backup file moves it." },
+      { title: "Connected apps on your terms", note: "Strava, Garmin, Oura and the rest: access kept encrypted, removed on disconnect." },
     ],
   },
   {
@@ -46,34 +48,50 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
       { title: "No passwords to leak", note: "Sign in with Google, Apple, or a code we email you." },
       { title: "Secure sessions", note: "Random tokens. The server keeps only a hash of each one." },
       { title: "Sign-in limits", note: "Five tries per email code, and repeated sign-ins are slowed down." },
-      { title: "Yours alone", note: "Synced data only comes back to your devices. Progress photos never upload." },
+      { title: "Yours alone", note: "Synced data comes back only to your devices, and to a coach only if you share." },
+      { title: "Signing out clears the phone", note: "What's waiting is saved to your account first, then the device is wiped." },
+      { title: "Extra care for under-18s", note: "No public profile, body composition or promotional email before 18." },
+    ],
+  },
+  {
+    title: "Coaching",
+    controls: [
+      { title: "You choose what a coach sees", note: "Workouts always. Heart rate, notes, readiness, body, pain and cycle by switch." },
+      { title: "Stop sharing anytime", note: "One tap cuts a coach's access at once. Unlinking deletes your chat." },
+      { title: "Private chats", note: "Messages between you and your coach never show in the admin panel." },
     ],
   },
   {
     title: "Payments",
     controls: [
-      { title: "Store checkout", note: "Google Play or the App Store take payment. We never see your card." },
+      { title: "Store checkout in the apps", note: "Google Play or the App Store take payment. We never see your card." },
+      { title: "Stripe on the web", note: "Pro on the web is paid on Stripe's own checkout page. No card reaches us." },
+      { title: "Coaches are paid directly", note: "Clients and programs are paid to the coach's own Stripe account." },
       { title: "Receipts checked for us", note: "RevenueCat verifies them and never gets your name, email or workouts." },
-      { title: "Verified subscription events", note: "Store events are checked with a shared secret before we act." },
+      { title: "Verified payment events", note: "Store and Stripe events are checked with a secret or signature first." },
+      { title: "Coach payments kept apart", note: "Paying a coach can never unlock Pro or count as our revenue." },
     ],
   },
   {
     title: "Infrastructure",
     controls: [
       { title: "HTTPS everywhere", note: "With HSTS, so connections are always encrypted." },
-      { title: "Security headers", note: "No framing, no sniffing. Only the camera and Bluetooth are allowed." },
+      { title: "Security headers", note: "No framing, no sniffing. Only the camera, Bluetooth and location are allowed." },
       { title: "Strict script policy", note: "Each website page runs only the scripts it lists." },
-      { title: "Our own code, not a CDN", note: "Libraries and models are served by us. No trackers or ad scripts." },
+      { title: "Our own code, not a CDN", note: "Served by us, except Google and Apple sign-in. No trackers or ad scripts." },
+      { title: "Maps without tracking", note: "Gym maps come through our server, so Mapbox never sees you." },
       { title: "Rate limits on every public route", note: "Kept in the database, so bursts can't get around them." },
       { title: "Uptime monitoring", note: "The site and its database are checked from outside, around the clock." },
+      { title: "Public status page", note: "A live check of the website, sign-in and syncing, at /status/." },
     ],
   },
   {
     title: "Email and AI",
     controls: [
       { title: "SPF, DKIM and DMARC", note: "Mail from getliftsmith.com is signed, and fakes are sent to spam." },
-      { title: "Nothing until you confirm", note: "Reminder emails need a confirmed address, with one-click unsubscribe." },
+      { title: "Email you control", note: "Only to your verified address, a switch per kind, one-click unsubscribe." },
       { title: "AI drafts, human replies", note: "A person reads and sends every reply to your email." },
+      { title: "AI suggests, staff decide", note: "Claude helps staff sort reports and gym pages. It never sees your training." },
     ],
   },
   {
@@ -82,7 +100,7 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
       { title: "Locked-down admin access", note: "Named staff accounts, two-step sign-in, every change logged." },
       { title: "No workouts for staff", note: "The admin panel shows counts, never your workouts or health readings." },
       { title: "Tested on every change", note: "Automated tests, accessibility checks and a dependency audit." },
-      { title: "Security review", note: "November 2026, with fixes for what it found." },
+      { title: "Security reviews", note: "November 2026, three rounds, with fixes for what each one found." },
     ],
   },
 ];
