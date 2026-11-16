@@ -30,8 +30,11 @@ public class MainActivity extends BridgeActivity {
         // passes the insets through). Transparent bars with light icons to start, as the app opens dark; the
         // page switches the icons with the theme (src/lib/appearance.ts). Replaces @capacitor/status-bar, whose
         // colour calls Play flags as deprecated edge-to-edge APIs (docs/decisions/platform-deltas.md).
-        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
+        // It must run after super.onCreate: BridgeActivity switches from the splash theme to AppTheme.NoActionBar
+        // there, and enable() builds the window's decor. Built under the splash theme (on Android 12+ a platform
+        // theme with an action bar), every screen got a "Liftsmith" title bar with a stretched icon.
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
         // The app fills the screen and doesn't pinch or double-tap zoom (src/lib/nativeZoom.ts locks the
         // page's viewport too). Text size follows the phone's own setting through TextZoom instead.
         WebSettings web = getBridge().getWebView().getSettings();
