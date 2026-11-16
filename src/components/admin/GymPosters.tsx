@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 import type { PosterAction, PosterRow } from "@/server/gymPosters";
 
 import { Card } from "./charts";
+import { HowItWorks } from "./HowItWorks";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
 const ITEMS: Record<PosterRow["items"], string> = { both: "Poster and stand", poster: "Poster", stand: "Stand" };
 const LANG: Record<string, string> = { en: "English", es: "Spanish", fr: "French", de: "German", it: "Italian", ja: "Japanese" };
 
-export function GymPosters({ admin, version }: { admin: boolean; version: number }) {
+export function GymPosters({ admin, version, onCount }: { admin: boolean; version: number; onCount?: (open: number) => void }) {
   const [rows, setRows] = useState<PosterRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mine, setMine] = useState(0);
@@ -44,14 +45,20 @@ export function GymPosters({ admin, version }: { admin: boolean; version: number
   const open = rows?.filter((o) => o.status === "requested" || o.status === "printed") ?? [];
   const done = rows?.filter((o) => o.status === "shipped" || o.status === "cancelled") ?? [];
   const toPrint = open.filter((o) => o.status === "requested").length;
+  const openCount = rows ? open.length : null;
+  useEffect(() => {
+    if (openCount !== null) onCount?.(openCount);
+  }, [openCount, onCount]);
   const button = "press rounded-lg border border-line px-3 py-1.5 text-muted";
   return (
     <Card title="Posters and stands" subtitle={rows ? `${toPrint} to print, ${open.length - toPrint} to mail` : undefined}>
-      <p className="text-sm text-muted">
-        Print opens the sheet for the order: a letter for the envelope (with the gym&apos;s one-time claim code when nobody has claimed it),
-        the poster, and two 4 × 6 in inserts for a table stand. The QR code opens the gym&apos;s page and counts the scan. Mark it printed,
-        then shipped once it&apos;s in the mail; shipping forgets the code here, and the gym keeps only a hash of it.
-      </p>
+      <HowItWorks>
+        <p>
+          Print opens the sheet for the order: a letter for the envelope (with the gym&apos;s one-time claim code when nobody has claimed
+          it), the poster, and two 4 × 6 in inserts for a table stand. The QR code opens the gym&apos;s page and counts the scan. Mark it
+          printed, then shipped once it&apos;s in the mail; shipping forgets the code here, and the gym keeps only a hash of it.
+        </p>
+      </HowItWorks>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
         <Loading label="Loading posters" className="mt-3">

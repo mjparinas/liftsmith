@@ -123,7 +123,7 @@ const DATA: (Omit<ProgramInfo, "name" | "basedOn" | "summary" | "how"> & { steps
   },
   {
     id: "calisthenics",
-    aka: ["Calisthenics", "Recommended Routine", "BWF RR", "bodyweight fitness"],
+    aka: ["Recommended Routine", "BWF RR", "calisthenics", "bodyweight fitness"],
     steps: 4,
     daysPerWeek: 3,
     level: "Any level",

@@ -312,7 +312,7 @@ const SCHEMA = [
     text TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS account_notes_account ON account_notes (account_id)`,
-  // Feature flags and A/B tests (src/server/flags.ts). A flag's row appears once an admin changes it; until then
+  // Feature flags (src/server/flags.ts; A/B tests and their tables were removed on 2026-11-15). A flag's row appears once an admin changes it; until then
   // its default in src/lib/flags.ts applies. Values are stored as JSON (14, true).
   `CREATE TABLE IF NOT EXISTS feature_flags (
     name TEXT PRIMARY KEY,
@@ -320,24 +320,6 @@ const SCHEMA = [
     rollout INTEGER NOT NULL DEFAULT 100,
     updated_at INTEGER NOT NULL,
     updated_by TEXT NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS experiments (
-    flag TEXT PRIMARY KEY,
-    description TEXT NOT NULL,
-    status TEXT NOT NULL,
-    variants TEXT NOT NULL,
-    winner TEXT,
-    created_at INTEGER NOT NULL,
-    started_at INTEGER,
-    stopped_at INTEGER
-  )`,
-  // Which variant each install was shown, recorded the first time it asks during a running test.
-  `CREATE TABLE IF NOT EXISTS experiment_assignments (
-    flag TEXT NOT NULL,
-    install_id TEXT NOT NULL,
-    variant TEXT NOT NULL,
-    at INTEGER NOT NULL,
-    PRIMARY KEY (flag, install_id)
   )`,
   // Small admin settings (src/server/settings.ts): maintenance mode, alert switches, running costs, saved replies,
   // the last restore practice, and when each alert last went out.
@@ -489,6 +471,15 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_imports_query ON gym_imports (query, at)`,
   `CREATE INDEX IF NOT EXISTS gym_imports_at ON gym_imports (at)`,
+  // A gym page's old address after its city was fixed (gymPlaces.ts moveToCity, 2026-11-15): a postcode or house number
+  // had been taken for the city ("80145, Campania"), so the page moved and the old one redirects. Public pages only.
+  `CREATE TABLE IF NOT EXISTS gym_moves (
+    old_city_slug TEXT NOT NULL,
+    old_slug TEXT NOT NULL,
+    place_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (old_city_slug, old_slug)
+  )`,
   // Country and every-country imports as a server job (gymImportJobs.ts, 2026-11-15): the job, and one row per city
   // with its state (pending, running, waiting to retry, ok, failed) and result. One worker holds a job at a time
   // (`lease_until`). Public map data and timings, plus the staff address that started it; kept 90 days.
@@ -658,6 +649,21 @@ const SCHEMA = [
     created_at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS gym_staff_invites_place ON gym_staff_invites (place_id)`,
+  // Problems lifters and visitors report with a real gym's page (gymPlaceReports.ts, docs/decisions/gyms.md
+  // "Reporting a gym page"): wrong details, closed, listed twice, not a gym. `who` is the account or a one-way address key.
+  `CREATE TABLE IF NOT EXISTS gym_place_reports (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    who TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    decided_at INTEGER NOT NULL DEFAULT 0,
+    decided_by TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_place_reports_open ON gym_place_reports (status, place_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS gym_place_reports_once ON gym_place_reports (place_id, who) WHERE status = 'open'`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -946,6 +952,16 @@ const SCHEMA = [
     read_at INTEGER NOT NULL,
     PRIMARY KEY (account_id, other_id)
   )`,
+  // Coach chat statuses (2026-11-15, src/lib/coachStatus.ts): what each person picked and until when, when they last
+  // had coaching open (Online), and who they're typing to and when (one row per account, so it never grows).
+  `CREATE TABLE IF NOT EXISTS coach_status (
+    account_id TEXT PRIMARY KEY,
+    status TEXT NOT NULL DEFAULT 'auto',
+    until INTEGER NOT NULL DEFAULT 0,
+    seen_at INTEGER NOT NULL DEFAULT 0,
+    typing_to TEXT,
+    typing_at INTEGER NOT NULL DEFAULT 0
+  )`,
   // What a client shares with one coach beyond training: body (weight, body fat, tape measurements, sex and
   // height, for the shaped 3D figure). Off until the client turns it on.
   `CREATE TABLE IF NOT EXISTS coach_shares (
@@ -1098,6 +1114,25 @@ const SCHEMA = [
     at INTEGER NOT NULL
   )`,
   "CREATE INDEX IF NOT EXISTS coach_payments_pair ON coach_payments (coach_id, client_id, at)",
+  // Ratings and reviews of coaches (coachReviews.ts, docs/decisions/coach-reviews.md, 2026-11-15): one per client and
+  // coach, from adult clients after four weeks together or two paid or booked sessions, with one public reply from the
+  // coach. `id` is a public handle that doesn't give away either account; `hidden` and `reply_hidden` are set by three
+  // reports until staff decide.
+  `CREATE TABLE IF NOT EXISTS coach_reviews (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    id TEXT NOT NULL UNIQUE,
+    stars INTEGER NOT NULL,
+    body TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    reply TEXT NOT NULL DEFAULT '',
+    reply_at INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    reply_hidden INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_reviews_client ON coach_reviews (client_id)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (
@@ -1203,6 +1238,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "facebook", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "wheelchair", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "enriched_at", "INTEGER NOT NULL DEFAULT 0"],
+  // A duplicate staff merged into another gym: hidden, and its page and app link go to that gym (gymPlaceReports.ts).
+  ["gym_places", "merged_into", "TEXT NOT NULL DEFAULT ''"],
   // Each map server request of an import and how it went, so the next import tries the healthiest server first.
   ["gym_imports", "attempts", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
@@ -1219,6 +1256,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["coach_shares", "notes", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_shares", "health", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_shares", "cycle", "INTEGER NOT NULL DEFAULT 0"],
+  // Coach chat stickers (2026-11-15, src/lib/stickers.ts): a message may be one sticker, by id, with empty text.
+  ["coach_messages", "sticker", "TEXT"],
   // Moderation (2026-11-14, docs/decisions/moderation.md). `suspended` is 0 (fine), 1 (suspended or banned) or 2
   // (shadow banned); a suspension ends at `suspended_until` (0 for a ban). `boards_off` keeps the lifter off other
   // people's leaderboards. `notice` is what the lifter is told ('', 'warn', 'suspend' or 'ban') and why.

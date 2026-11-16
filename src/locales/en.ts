@@ -85,6 +85,7 @@ import * as part from "./text/part";
 import * as past from "./text/past";
 import * as pay from "./text/pay";
 import * as pgm from "./text/pgm";
+import * as phase from "./text/phase";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
 import * as pm from "./text/pm";
@@ -101,6 +102,7 @@ import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rev from "./text/rev";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -233,6 +235,7 @@ export const en = {
   ...recap.en,
   ...recovery.en,
   ...remix.en,
+  ...rev.en,
   ...rmd.en,
   ...rt.en,
   ...save.en,
@@ -247,6 +250,7 @@ export const en = {
   ...stats.en,
   ...tab.en,
   ...td.en,
+  ...phase.en,
   ...tempo.en,
   ...timer.en,
   ...tdee.en,

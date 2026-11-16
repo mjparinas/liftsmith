@@ -13,6 +13,7 @@ import { earnedDeletes } from "./earnedPro";
 import { claimDeletes } from "./gymClaims";
 import { gymDeletes } from "./gymDirectory";
 import { extrasDeletes } from "./gymExtras";
+import { placeReportDeletes } from "./gymPlaceReports";
 import { placeDeletes } from "./gymPlaces";
 import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
@@ -296,6 +297,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...teamDeletes(accountId),
     ...gymDeletes(accountId),
     ...placeDeletes(accountId),
+    ...placeReportDeletes(accountId),
     ...claimDeletes(accountId),
     ...extrasDeletes(accountId),
     ...posterDeletes(accountId),

@@ -2,7 +2,7 @@
 // plans"). Pro keeps its price and includes coaching up to 3 clients, so any trainer can try it with no risk. Coaches
 // who need more pick a plan that grows with their client list: Coach (up to 25 clients) or Coach Plus (no set limit).
 // Both include everything in Pro. Clients always train free, high school coaches stay free (school teams), and
-// Liftsmith takes nothing from what clients pay their coach (coachPay.ts).
+// Liftsmith takes nothing from what clients pay a coach on Coach or Coach Plus, and 2% on plain Pro (`feeFor` in coachPay.ts).
 //
 // One place for the numbers, read by the server (the client limit on joining), the app (the plan card and its
 // sheet) and the website (pricing and coaches pages). The prices people pay are the stores' and Stripe's own; the

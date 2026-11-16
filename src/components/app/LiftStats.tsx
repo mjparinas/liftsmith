@@ -102,23 +102,11 @@ const METRIC_LABEL: Record<StatMetric, () => string> = {
 };
 
 /** The chart with its range and metric chips. Advanced stats (Pro), so ExercisePage shows it inside the trend card. */
-export function LiftChart({
-  ex,
-  sessions,
-  max,
-  unit,
-  now,
-}: {
-  ex: Exercise;
-  sessions: readonly LiftSession[];
-  max: OneRm | null;
-  unit: Unit;
-  now: number;
-}) {
+export function LiftChart({ ex, sessions, unit, now }: { ex: Exercise; sessions: readonly LiftSession[]; unit: Unit; now: number }) {
   const metrics = metricsFor(ex);
   const [metric, setMetric] = useState<StatMetric>(metrics[0]!);
   const [range, setRange] = useState<StatRange>(DEFAULT_RANGE);
-  const points = useMemo(() => liftSeries(sessions, metric, range, now, max), [sessions, metric, range, now, max]);
+  const points = useMemo(() => liftSeries(sessions, metric, range, now), [sessions, metric, range, now]);
   const change = seriesChange(points);
   return (
     <div className="mt-4" data-testid="lift-chart">

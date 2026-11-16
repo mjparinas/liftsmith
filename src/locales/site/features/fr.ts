@@ -281,7 +281,7 @@ export const fr: FeaturesText = {
     },
     "gym-finder": {
       name: "Recherche de salles et pages de salle",
-      body: "Trouvez des salles près de chez vous sur une carte avec la liste en dessous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire.",
+      body: "Trouvez des salles près de chez vous sur une carte avec la liste en dessous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire. Une erreur sur une page ? Signalez-la et notre équipe la corrige.",
     },
     "gym-amenities": {
       name: "Services et tarifs sur les pages des salles",
@@ -390,6 +390,11 @@ export const fr: FeaturesText = {
       body: "L'entraînement est toujours partagé. Fréquence cardiaque, notes de séance, forme et récupération, données corporelles, douleurs et blessures, et cycle sont chacun un interrupteur que le client active pour chaque coach, à l'acceptation ou plus tard. Les photos et les salles ne sortent jamais.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
     },
+    "coach-chat-dock": {
+      name: "Dock de chat, statuts et autocollants",
+      body: "Sur ordinateur, le chat avec le coach se range dans un dock en bas à droite, comme une messagerie : toutes les personnes à qui écrire, jusqu'à deux fenêtres qui se replient, un son et un compteur dans l'onglet quand un message arrive. Chaque côté choisit un statut (en ligne, avec un client, à l'entraînement, absent, ne pas déranger, en vacances ou apparaître hors ligne), voit quand l'autre écrit et quand il a vu votre message, et envoie emojis et autocollants de salle, sur le téléphone aussi.",
+      proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",
@@ -399,9 +404,14 @@ export const fr: FeaturesText = {
       name: "Dans l'annuaire des coachs",
       body: "Inscrivez-vous comme coach sportif, coach ou kiné dans votre salle et vous apparaissez sur la page de la salle et dans l'annuaire des coachs de sa ville sur le site, avec votre présentation et un lien pour que de nouveaux clients s'entraînent avec vous. Seuls les adultes y figurent.",
     },
+    "coach-reviews": {
+      name: "Notes et avis de vrais clients",
+      body: "Les clients notent leur coach, coach personnel ou kiné avec des étoiles et un court avis après quatre semaines ou deux séances ensemble. La note s’affiche dès trois avis, avec le nombre de ses clients qui se sont entraînés ces deux dernières semaines, sur son invitation et dans l’annuaire des coachs. Le coach répond une fois à chaque avis, et tout le monde peut signaler un avis. Seuls les adultes peuvent en laisser un.",
+      proPart: "Laisser un avis est gratuit ; coacher des clients est Pro.",
+    },
     "coach-plans": {
       name: "Des forfaits coach qui grandissent avec votre clientèle",
-      body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et Liftsmith ne prend rien sur ce qu'ils vous paient.",
+      body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et avec Coach et Coach Plus, Liftsmith ne prend rien sur ce qu'ils vous paient. Avec Pro, il garde 2 %.",
     },
     awards: {
       name: "Succès, niveaux et séries de jours",
@@ -436,7 +446,7 @@ export const fr: FeaturesText = {
     },
     emails: {
       name: "Des e-mails qui vous font avancer",
-      body: "Huit conseils pour bien démarrer avec de vrais écrans, un bilan de la semaine et du mois, vos nouveaux records, les amis qui se sont entraînés et un coup de pouce pour revenir après une pause. Chaque type a son propre interrupteur.",
+      body: "Huit conseils pour bien démarrer avec de vrais écrans, un bilan de la semaine et du mois, vos nouveaux records, les amis qui se sont entraînés un coup de pouce pour revenir après une pause, puis un conseil par semaine sur une fonction que vous n'avez peut-être pas encore découverte. Chaque type a son propre interrupteur.",
       note: "Activés avec un compte, désactivés pour les moins de 18 ans sauf s'ils les activent. Chaque e-mail a un désabonnement en un clic.",
     },
     cloud: {

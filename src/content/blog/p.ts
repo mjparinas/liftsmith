@@ -49,7 +49,7 @@ export const BLOG_P: Article[] = [
     faq: [
       [
         "Does Liftsmith take a cut of my payments?",
-        "No. Payments go to your own Stripe account. Stripe charges its usual card fees, and Liftsmith takes nothing on top.",
+        "Not on the Coach or Coach Plus plans. Payments go to your own Stripe account, Stripe charges its usual card fees, and Liftsmith takes nothing on top. On Pro, which covers up to 3 clients, Liftsmith keeps 2% of each payment.",
       ],
       [
         "Do my clients need Pro?",

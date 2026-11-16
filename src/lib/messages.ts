@@ -1,6 +1,7 @@
 // While billing isn't live everyone has Pro, so the planner sends no Pro offers (billing.ts).
 import { billingLive as billingIsLive } from "./billing";
 import { dayName, say, type MsgLang } from "./messageText";
+import { LB, weightIn } from "./unitMath";
 
 // Reminders and lifecycle messages (Melvin, 2026-11-09): workout reminders on training days, a nudge
 // after a missed training day, streak alerts, comebacks, milestones and Pro offers, by push
@@ -19,7 +20,7 @@ import { dayName, say, type MsgLang } from "./messageText";
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
 export type MessageKind =
-  "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "trial" | "recap" | "records" | "friends" | "rehab";
+  "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab";
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
@@ -65,6 +66,13 @@ export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push
     push: false,
     email: true,
   },
+  // After Getting started: one email a week about one more thing the app does (server/weekly.ts).
+  weekly: {
+    label: "Weekly tips",
+    blurb: "After Getting started, one email a week about something else the app can do.",
+    push: false,
+    email: true,
+  },
 };
 
 export const KINDS = Object.keys(KIND_INFO) as MessageKind[];
@@ -79,6 +87,7 @@ export const DEFAULT_ON: Record<MessageKind, boolean> = {
   milestone: true,
   pro: false,
   tour: true,
+  weekly: true,
   trial: true,
   recap: true,
   records: true,
@@ -115,10 +124,15 @@ export interface PlanInput {
   startedAt: number;
   lastWorkoutAt?: number;
   firstWorkoutAt?: number;
-  /** Distinct days with a workout in the week (Monday to Sunday) that starts at weekStart. */
+  /** Distinct days with a workout in the week that starts at weekStart. */
   weekDays: number;
-  /** Local midnight of that Monday (ms). */
+  /** Local midnight of the first day of that week (ms): Monday, or Sunday when `firstDay` is 0. */
   weekStart: number;
+  /**
+   * The lifter's first day of the week (Settings › Workout preferences): 1 Monday (default, and older apps), 0
+   * Sunday. Weeks here follow it, so a streak warning or recap counts the same week as the app (number audit, 2026-11-15).
+   */
+  firstDay?: 0 | 1;
   /** Weeks in a row before this one that met the goal (game.ts goalStreak, less this week). */
   streakWeeks: number;
   pro: ProState;
@@ -251,8 +265,13 @@ export function atTime(day: number, hhmm: string, tz: string): number {
 
 /** Local Monday midnight of the week containing `ms`. */
 export function mondayIn(ms: number, tz: string): number {
+  return weekStartIn(ms, tz, 1);
+}
+
+/** Local midnight-ish start of the week holding `ms` in `tz`: Monday (1) or Sunday (0). */
+export function weekStartIn(ms: number, tz: string, firstDay: 0 | 1 = 1): number {
   const p = parts(ms, tz);
-  return addDays(ms, -((p.wd + 6) % 7), tz);
+  return addDays(ms, -((p.wd + 7 - firstDay) % 7), tz);
 }
 
 export const dateKey = (ms: number, tz: string) => {
@@ -285,11 +304,14 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
   const goal = Math.max(1, Math.min(7, input.daysPerWeek));
   const last = input.lastWorkoutAt ?? 0;
   const out: Message[] = [];
+  const first = input.firstDay === 0 ? 0 : 1;
+  /** The last day of the lifter's week: Sunday, or Saturday when weeks start on Sunday. */
+  const lastDay = (first + 6) % 7;
 
   for (let day = dayStart(from, tz); day < to; day = addDays(day, 1, tz)) {
     const wd = parts(day + 12 * 3600_000, tz).wd;
     const key = dateKey(day + 12 * 3600_000, tz);
-    const monday = mondayIn(day + 12 * 3600_000, tz);
+    const monday = weekStartIn(day + 12 * 3600_000, tz, first);
     const trainedToday = last >= day;
     const candidates: Message[] = [];
     const add = (kind: MessageKind, at: number, title: string, body: string, route = "today", tag = "") => {
@@ -298,10 +320,10 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
 
     // Streak: this week's goal is reachable only if every day left has a workout.
     let streakLine: string | null = null;
-    if (monday === mondayIn(from, tz) && input.streakWeeks >= 1) {
+    if (monday === weekStartIn(from, tz, first) && input.streakWeeks >= 1) {
       const done = input.weekStart === monday ? input.weekDays : 0;
       const needed = goal - done;
-      const daysLeft = 7 - ((wd + 6) % 7); // today included
+      const daysLeft = 7 - ((wd + 7 - first) % 7); // today included
       if (needed > 0 && needed === daysLeft && !trainedToday) {
         streakLine =
           needed === 1
@@ -310,7 +332,7 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       }
     }
 
-    // Reminder: push on each training day at the lifter's time; email once a week, Monday morning.
+    // Reminder: push on each training day at the lifter's time; email once a week, on the first morning of their week.
     if (!email && input.days.includes(wd) && !trainedToday) {
       const first = !input.firstWorkoutAt;
       add(
@@ -320,9 +342,9 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
         streakLine ?? (first ? say(lang, "rmd.firstReadyBody") : say(lang, "rmd.todayReadyBody")),
       );
     }
-    if (email && wd === 1 && input.days.length) {
+    if (email && wd === first && input.days.length) {
       const lastWeek = input.weekStart === addDays(monday, -7, tz) ? input.weekDays : null;
-      const names = [...input.days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((d) => dayName(lang, d));
+      const names = [...input.days].sort((a, b) => ((a + 7 - first) % 7) - ((b + 7 - first) % 7)).map((d) => dayName(lang, d));
       add(
         "reminder",
         atTime(day, sendHour, tz),
@@ -389,9 +411,9 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       );
     }
 
-    // Recaps (email): Sunday at 19:00, the week so far; on the 1st at 09:00, last month. The key carries the numbers,
+    // Recaps (email): the last day of the lifter's week (Sunday, or Saturday for Sunday weeks) at 19:00, the week so far; on the 1st at 09:00, last month. The key carries the numbers,
     // so a workout logged after the run replaces the scheduled recap with the new numbers.
-    if (email && wd === 0 && input.week && input.week.start === monday && input.week.workouts > 0) {
+    if (email && wd === lastDay && input.week && input.week.start === monday && input.week.workouts > 0) {
       const w = input.week;
       add(
         "recap",
@@ -447,7 +469,7 @@ export function listOf(lang: MsgLang | undefined, items: readonly string[]): str
 /** A week's or month's numbers in one line: workouts, sets, weight lifted and new bests. */
 export function totalsLine(lang: MsgLang | undefined, t: Totals, unit: "kg" | "lb" = "kg"): string {
   const n = new Intl.NumberFormat(lang ?? "en", { maximumFractionDigits: 0 });
-  const volume = unit === "lb" ? t.volumeKg * 2.2046226218 : t.volumeKg;
+  const volume = unit === "lb" ? t.volumeKg / LB : t.volumeKg;
   const line = say(lang, "rmd.recapLine", {
     workouts: say(lang, "rmd.workouts", { count: t.workouts }),
     sets: say(lang, "rmd.sets", { count: t.sets }),
@@ -468,7 +490,8 @@ export function record(
   const b = next.best;
   if (!b || b.at <= (prev?.best?.at ?? 0) || now - b.at > DAY) return null;
   const unit = next.unit ?? "kg";
-  const w = unit === "lb" ? Math.round(b.weightKg * 2.2046226218) : Math.round(b.weightKg * 10) / 10;
+  // The weight as the app shows it (unitMath.ts weightIn), in the email's language.
+  const w = new Intl.NumberFormat(next.lang ?? "en", { maximumFractionDigits: 2, useGrouping: false }).format(weightIn(b.weightKg, unit));
   return {
     key: `records:${b.at}`,
     title: say(next.lang, "rmd.record", { name: b.name }),

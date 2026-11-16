@@ -4,7 +4,7 @@
 import { allowed, FLAGS, isFlagName } from "@/lib/flags";
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
-import { flagStates, getExperiment, resetFlag, setFlag } from "@/server/flags";
+import { flagStates, resetFlag, setFlag } from "@/server/flags";
 
 export const dynamic = "force-dynamic";
 
@@ -12,21 +12,17 @@ export async function GET(req: Request) {
   const gate = await requireStaff(req);
   if ("response" in gate) return gate.response;
   const states = await flagStates();
-  const flags = await Promise.all(
-    (Object.keys(FLAGS) as (keyof typeof FLAGS)[]).map(async (name) => {
-      const d = FLAGS[name];
-      const e = await getExperiment(name);
-      return {
-        name,
-        label: d.label,
-        description: d.description,
-        default: d.default,
-        options: [...d.options],
-        state: states.get(name) ?? null,
-        experiment: e && e.status !== "draft" ? e.status : null,
-      };
-    }),
-  );
+  const flags = (Object.keys(FLAGS) as (keyof typeof FLAGS)[]).map((name) => {
+    const d = FLAGS[name];
+    return {
+      name,
+      label: d.label,
+      description: d.description,
+      default: d.default,
+      options: [...d.options],
+      state: states.get(name) ?? null,
+    };
+  });
   return json(200, { flags });
 }
 

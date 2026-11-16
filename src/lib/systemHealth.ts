@@ -211,7 +211,13 @@ export const SETTINGS: Setting[] = [
     need: "recommended",
     what: "Set it to https://www.getliftsmith.com.",
   },
-  { names: ["CRON_SECRET"], label: "Cron secret", group: "Core", need: "required", what: "Vercel Cron sends it to the daily jobs." },
+  {
+    names: ["CRON_SECRET"],
+    label: "Cron secret",
+    group: "Core",
+    need: "required",
+    what: "Vercel Schedules send it to the scheduled jobs.",
+  },
   {
     names: ["ANALYTICS_SECRET", "ADMIN_SECRET"],
     label: "Visitor hash salt",
@@ -388,13 +394,6 @@ export const SETTINGS: Setting[] = [
     group: "Payments",
     need: "optional",
     what: "The signing secret of the Connect webhook (/api/coach/stripe/). With it and STRIPE_SECRET_KEY set, coaches can take client payments; without it payments don't show.",
-  },
-  {
-    names: ["STRIPE_CONNECT_FEE_PERCENT"],
-    label: "Liftsmith's share of client payments",
-    group: "Payments",
-    need: "optional",
-    what: "A percentage (up to 20) taken from each client payment. Unset or 0: coaches keep everything but Stripe's own fees.",
   },
   {
     names: ["REVENUECAT_WEBHOOK_SECRET"],

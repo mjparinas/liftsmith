@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { pickVariant, pValue, rolledOut, validateExperiment, verdict } from "./experiments";
+import { rolledOut } from "./experiments";
 import { flag, FLAG_CACHE_KEY, FLAG_LOCAL_KEY, replaceServerFlags, setLocalFlag } from "./flags";
 import { flagsUrl, refreshFlags } from "./remoteFlags";
 
@@ -24,76 +24,6 @@ describe("flag rollouts", () => {
     expect(rolledOut("trialDays", { value: 7, rollout: 50 }, null)).toBe(14);
     expect(rolledOut("trialDays", { value: 7, rollout: 100 }, null)).toBe(7);
     expect(ids.some((id) => rolledOut("repMotion", { value: true, rollout: 0 }, id))).toBe(false);
-  });
-});
-
-describe("A/B tests", () => {
-  const exp = {
-    flag: "trialDays" as const,
-    status: "running" as const,
-    variants: [
-      { value: 14, weight: 50 },
-      { value: 7, weight: 50 },
-    ],
-    winner: null,
-  };
-
-  it("splits installs by weight, stably; drafts and no id see the control; stopped tests their winner", () => {
-    const seven = ids.filter((id) => pickVariant(exp, id) === 7).length / ids.length;
-    expect(seven).toBeGreaterThan(0.45);
-    expect(seven).toBeLessThan(0.55);
-    expect(pickVariant(exp, "install-0042")).toBe(pickVariant(exp, "install-0042"));
-    expect(pickVariant({ ...exp, status: "draft" }, "install-0042")).toBe(14);
-    expect(pickVariant(exp, null)).toBe(14);
-    expect(pickVariant({ ...exp, status: "stopped", winner: 7 }, "install-0042")).toBe(7);
-    expect(pickVariant({ ...exp, status: "stopped", winner: 30 }, "install-0042")).toBe(14);
-  });
-
-  it("checks variants against the flag's options", () => {
-    expect(validateExperiment("trialDays", exp.variants, "7 vs 14")).toBeNull();
-    expect(validateExperiment("trialDays", [{ value: 14, weight: 50 }], "")).toMatch(/2 to 5/);
-    expect(
-      validateExperiment(
-        "trialDays",
-        [
-          { value: 14, weight: 50 },
-          { value: 30, weight: 50 },
-        ],
-        "",
-      ),
-    ).toMatch(/one of 7, 14/);
-    expect(
-      validateExperiment(
-        "trialDays",
-        [
-          { value: 14, weight: 50 },
-          { value: 14, weight: 50 },
-        ],
-        "",
-      ),
-    ).toMatch(/different/);
-    expect(
-      validateExperiment(
-        "trialDays",
-        [
-          { value: 14, weight: 0 },
-          { value: 7, weight: 50 },
-        ],
-        "",
-      ),
-    ).toMatch(/Weights/);
-  });
-
-  it("works out a two-sided p-value and a plain verdict", () => {
-    expect(pValue(100, 10, 100, 10)).toBeCloseTo(1, 5);
-    expect(pValue(1000, 100, 1000, 150)!).toBeLessThan(0.01);
-    expect(pValue(0, 0, 10, 1)).toBeNull();
-    const row = (variant: number, installs: number, paid: number) => ({ variant, installs, trials: paid, paid, active: 0 });
-    expect(verdict([row(14, 10, 1), row(7, 10, 2)]).message).toMatch(/Too early/);
-    const v = verdict([row(14, 1000, 50), row(7, 1000, 90)]);
-    expect(v).toMatchObject({ leader: 7, ready: true });
-    expect(verdict([row(14, 100, 10), row(7, 100, 11)]).ready).toBe(false);
-    expect(verdict([row(14, 1000, 90), row(7, 1000, 50)]).leader).toBe(14);
   });
 });
 

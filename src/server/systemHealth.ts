@@ -590,7 +590,7 @@ export async function jobCheck(now = Date.now()): Promise<HealthCheck> {
       id: "job",
       title,
       state: "off",
-      summary: "CRON_SECRET isn't set, so Vercel Cron can't run the job.",
+      summary: "CRON_SECRET isn't set, so Vercel Schedules can't run the job.",
       rows: [],
       setup: "Set CRON_SECRET (any long random string).",
     };

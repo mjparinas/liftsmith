@@ -10,10 +10,11 @@ export const SECURITY_HEADERS: { key: string; value: string }[] = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // The web app uses the camera (rep counting), Web Bluetooth (heart rate) and nothing else from this list.
+  // The web app uses the camera (rep counting), Web Bluetooth (heart rate) and the position (Find gyms near you, and
+  // the /gyms/ map of the closest gyms), and nothing else from this list.
   {
     key: "Permissions-Policy",
-    value: "camera=(self), bluetooth=(self), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
+    value: "camera=(self), bluetooth=(self), microphone=(), geolocation=(self), payment=(), usb=(), browsing-topics=()",
   },
   { key: "Content-Security-Policy", value: CSP },
 ];
@@ -25,6 +26,19 @@ export const SECURITY_HEADERS: { key: string; value: string }[] = [
  */
 export const SHARE_PAGE_CSP =
   "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
+/**
+ * A gym's "Report a problem" page (/gyms/<city>/<gym>/report/, src/server/gymReportPage.ts): the gym pages' policy,
+ * except that its one form may post back to this site.
+ */
+export const REPORT_PAGE_CSP = SHARE_PAGE_CSP.replace("form-action 'none'", "form-action 'self'");
+
+/**
+ * The website's /gyms/ page (src/server/gymsNear.ts): the gym pages' policy plus our own scripts (the map of the
+ * closest gyms and Leaflet, both served from this site), Leaflet's sheet, and the gym API on this site.
+ */
+export const GYMS_INDEX_CSP =
+  "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 
 /**
  * The free calculators other sites embed (/embed/<slug>/, src/lib/embeds.ts): the same policy, except that any site

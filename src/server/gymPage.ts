@@ -19,6 +19,7 @@ import * as gp from "@/locales/text/gp";
 
 import { AREA_PINS, areaMapPath } from "./gymMedia";
 import type { City, Place } from "./gymPlaces";
+import { NEAR_HEAD, NEAR_STYLE, nearSection } from "./gymsNear";
 import { esc, framePage, icon } from "./siteFrame";
 
 export type GpKey = keyof typeof gp.en;
@@ -260,6 +261,8 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
 <ul class="list">${others.map((x) => listItem(x, lang)).join("")}</ul><a class="quiet" href="${esc(cityPath(p.citySlug))}">${esc(say(lang, "gp.cityTitle", { city }))} ›</a></section>`
     : "";
+  // Anyone can say the page is wrong, closed, listed twice or not a gym (gymReportPage.ts, gymPlaceReports.ts).
+  const reportLink = `<p class="report-link"><a class="quiet" href="${esc(`${gymPath(p)}report/`)}" rel="nofollow">${icon("flag", 16)}${esc(say(lang, "gp.reportLink"))}</a></p>`;
   const credit = p.source === "osm" ? `<p class="credit">${esc(say(lang, "gp.osm"))}</p>` : "";
   const body = `<div class="strip"><div class="wrap row strip-row"><p>${esc(say(lang, "gp.strip"))}</p></div></div>
 <main id="main" class="wrap page">${crumbs(lang, [
@@ -267,7 +270,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${reportLink}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
 
@@ -344,10 +347,18 @@ export function indexHtml(list: City[], lang: MsgLang): string {
         )}</span></a></li>`,
     )
     .join("");
-  const body = `<main id="main" class="wrap page narrow">
+  // The map of the closest gyms leads (gymsNear.ts); the full directory stays in the page, folded, so search engines
+  // still follow every city link (Melvin, 2026-11-15).
+  const body = `<main id="main" class="wrap page">
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.indexTitle"))}</h1><p class="muted">${esc(say(lang, "gp.indexBody"))}</p></header>
-${list.length ? `<section class="card"><ul class="list">${items}</ul></section>` : ""}${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
-  return framePage(lang, title, metaTags(title, desc, "/gyms/", ld), body, GYM_STYLE, "gym");
+${nearSection(lang)}
+<div class="narrow">${
+    list.length
+      ? `<div class="find" id="find" hidden><label for="city-search">${esc(say(lang, "gp.searchLabel"))}</label><input id="city-search" type="search" autocomplete="off" enterkeyhint="search" placeholder="${esc(say(lang, "gp.searchHint"))}"></div>
+<details class="dir" id="directory"><summary>${esc(say(lang, "gp.directoryShow", { count: n.format(list.length) }))}</summary><section class="card" aria-label="${esc(say(lang, "gp.directoryTitle"))}"><ul class="list" id="city-list">${items}</ul><p class="muted small" id="city-none" hidden>${esc(say(lang, "gp.searchNone"))}</p></section></details>`
+      : ""
+  }${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></div></main>`;
+  return framePage(lang, title, metaTags(title, desc, "/gyms/", ld) + NEAR_HEAD, body, GYM_STYLE + NEAR_STYLE, "gym");
 }
 
 export function goneHtml(lang: MsgLang): string {
@@ -368,6 +379,7 @@ export function gymSitemapXml(entries: { path: string; lastModified: number }[])
 
 export const GYM_STYLE = `
 .gym-logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
+.page>section.card+section.card{margin-top:16px}
 .map{margin:12px 0 0}.map.area{margin:0 0 16px}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
 .photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;list-style:none;margin:0;padding:0}.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -394,7 +406,9 @@ export const GYM_STYLE = `
 .chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
 .news,.trainers,.prices{list-style:none;margin:0;padding:0;display:grid;gap:12px}.starter{margin:8px 0;padding-left:20px}.news p,.trainers p{margin:0}
 .trainers li{border-top:1px solid var(--line);padding-top:12px}.trainers li:first-child{border-top:0;padding-top:0}
+.rating{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}.review{margin:8px 0 0;padding-left:10px;border-left:2px solid var(--line)}.review p{margin:2px 0}
 .trainers a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}.prices{gap:4px;margin-bottom:12px;font-weight:600}
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}
 .db{margin-top:12px}.claim{border-style:dashed}
-.credit{margin-top:24px;font-size:.75rem;color:var(--faint)}`;
+.credit{margin-top:24px;font-size:.75rem;color:var(--faint)}
+.report-link{margin-top:16px}.report-link .quiet{gap:6px}`;

@@ -83,6 +83,7 @@ import * as part from "./text/part";
 import * as past from "./text/past";
 import * as pay from "./text/pay";
 import * as pgm from "./text/pgm";
+import * as phase from "./text/phase";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
 import * as pm from "./text/pm";
@@ -99,6 +100,7 @@ import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rev from "./text/rev";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -231,6 +233,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...recap.fr,
   ...recovery.fr,
   ...remix.fr,
+  ...rev.fr,
   ...rmd.fr,
   ...rt.fr,
   ...save.fr,
@@ -245,6 +248,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...stats.fr,
   ...tab.fr,
   ...td.fr,
+  ...phase.fr,
   ...tempo.fr,
   ...timer.fr,
   ...tdee.fr,

@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
 
-import { EMBED_HEADERS, NOT_EMBED, SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
+import { EMBED_HEADERS, GYMS_INDEX_CSP, NOT_EMBED, REPORT_PAGE_CSP, SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
 
 // Two builds from one codebase:
 // - STATIC_EXPORT=1 (npm run build:static): a static export to out/ for the Capacitor shells and the
@@ -60,6 +60,7 @@ const nextConfig: NextConfig = {
           { source: "/gyms/:city/", destination: "/api/gyms/page/?city=:city" },
           { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
           { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
+          { source: "/gyms/:city/:gym/report/", destination: "/api/gyms/page/?city=:city&gym=:gym&report=1" },
           { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
           // Strength standards from real lifters (src/server/standardsPage.ts, docs/decisions/public-pages-and-seo.md).
           { source: "/strength-standards/", destination: "/api/standards/page/" },
@@ -79,7 +80,11 @@ const nextConfig: NextConfig = {
           { source: "/embed/:path*", headers: EMBED_HEADERS },
           { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/u/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
-          { source: "/gyms/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          // /gyms/ itself runs its map script (src/server/gymsNear.ts); the pages under it run none.
+          { source: "/gyms/", headers: [{ key: "Content-Security-Policy", value: GYMS_INDEX_CSP }] },
+          { source: "/gyms/:path+", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          // A gym's Report a problem page posts its one form back to this site (src/server/gymReportPage.ts).
+          { source: "/gyms/:city/:gym/report/", headers: [{ key: "Content-Security-Policy", value: REPORT_PAGE_CSP }] },
           { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],

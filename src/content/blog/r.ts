@@ -9,7 +9,7 @@ export const BLOG_R: Article[] = [
     kind: "blog",
     title: "Coach plans: priced by your client list, never by a cut of your pay",
     description:
-      "Pro now covers 3 clients, Coach 25 and Coach Plus has no set limit. Clients train free, and Liftsmith takes nothing from what they pay you.",
+      "Pro covers 3 clients, Coach 25 and Coach Plus has no set limit. Clients train free, and on Coach and Coach Plus Liftsmith takes nothing from what they pay you.",
     date: "2026-11-13",
     tag: "Coaching",
     cta: "coach",
@@ -26,7 +26,7 @@ export const BLOG_R: Article[] = [
       },
       { h2: "What stays free" },
       {
-        p: "Your clients always train free, on Android, iPhone and the web. They never need Pro to follow your routines, answer a check-in, book a session or pay you. High school coaches who confirm a school email address still get Pro free, and so do their athletes aged 13 to 18, with room for whole teams. And Liftsmith takes nothing from what your clients pay you: payments go straight to your own Stripe account, less Stripe's usual card fees.",
+        p: "Your clients always train free, on Android, iPhone and the web. They never need Pro to follow your routines, answer a check-in, book a session or pay you. High school coaches who confirm a school email address still get Pro free, and so do their athletes aged 13 to 18, with room for whole teams. On Coach and Coach Plus, Liftsmith takes nothing from what your clients pay you: payments go straight to your own Stripe account, less Stripe's usual card fees. On Pro, Liftsmith keeps 2% of each client payment.",
       },
       { cta: "coach" },
       { h2: "When you reach your limit" },
@@ -48,7 +48,7 @@ export const BLOG_R: Article[] = [
       ],
       [
         "Does Liftsmith take a percentage of my client payments?",
-        "No. Client payments go to your own Stripe account. Stripe charges its usual card fees, and Liftsmith takes nothing on top.",
+        "Not on Coach or Coach Plus. Client payments go to your own Stripe account, Stripe charges its usual card fees, and Liftsmith takes nothing on top. On Pro, which covers up to 3 clients, Liftsmith keeps 2% of each payment.",
       ],
       [
         "What happens to my clients if I go back to Pro?",

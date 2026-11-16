@@ -626,6 +626,30 @@ try {
   await page.route("**/api/coach/**", (r) =>
     r.fulfill({ json: r.request().method() === "GET" && !r.request().url().includes("?") ? coachApi(coachClient) : { ok: true } }),
   );
+  // Ratings and reviews (2026-11-15, coach-reviews.md): the coach's own on Setup, and the client's own review of Sam.
+  const review = (id, stars, name, text, reply = "") => ({
+    id,
+    stars,
+    text,
+    name,
+    at: Date.now() - 86_400_000,
+    reply,
+    replyAt: reply ? Date.now() : 0,
+  });
+  const reviewsApi = (url) => ({
+    rating: { count: 3, average: 4.7, outcome: { clients: 5, active: 4 } },
+    reviews: [
+      review("a1a1a1a1a1a1a1a1a1a1", 5, "Alex P.", "Fixed my squat in a month.", "Thanks Alex!"),
+      review("b2b2b2b2b2b2b2b2b2b2", 5, "Blair", "Clear plans every week."),
+      review("c3c3c3c3c3c3c3c3c3c3", 4, "", ""),
+    ],
+    mine: url.includes("?coach=")
+      ? { review: review("d4d4d4d4d4d4d4d4d4d4", 5, "Jordan P.", "Best coach I've had."), can: { ok: true } }
+      : undefined,
+  });
+  await page.route("**/api/coach/reviews/**", (r) =>
+    r.fulfill({ json: r.request().method() === "GET" ? reviewsApi(r.request().url()) : { ok: true } }),
+  );
   await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
   await page.goto(`${server.url}/app/#/trainer/clients`);
   await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
@@ -636,11 +660,16 @@ try {
   await page.goto(`${server.url}/app/#/trainer/schedule`);
   await page.getByTestId("schedule-calendar").waitFor();
   await scan("coaching schedule");
+  await page.goto(`${server.url}/app/#/trainer/setup`);
+  await page.getByText("Fixed my squat in a month.").waitFor();
+  await scan("coaching reviews");
   coachClient = true;
   await page.goto(`${server.url}/app/#/trainer`);
   await page.reload();
   await page.getByRole("button", { name: /Message Sam/ }).waitFor();
+  await page.getByText("Best coach I've had.").waitFor();
   await scan("coaching client");
+  await page.unroute("**/api/coach/reviews/**");
   await page.unroute("**/api/coach/**");
   await page.unroute("**/api/teams/**");
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));

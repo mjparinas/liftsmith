@@ -11,6 +11,7 @@ import type { ImportResult, ImportRow } from "@/server/gymImport";
 import type { CityLine, JobStatus } from "@/server/gymImportJobs";
 
 import { Card } from "./charts";
+import { HowItWorks } from "./HowItWorks";
 
 type Answer = Extract<ImportResult, { ok: true }> | { ok?: false; error: string; detail?: string; log?: string[] };
 
@@ -93,19 +94,29 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   const [recent, setRecent] = useState<ImportRow[] | null>(null);
   const [recentVersion, setRecentVersion] = useState(0);
   const [countries, setCountries] = useState<{ code: string; name: string; cities: number }[]>([]);
-  const [country, setCountry] = useState("CA");
+  const [countryText, setCountryText] = useState("Canada");
+  const [failedOnly, setFailedOnly] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
   const seen = useRef(-1);
   useEffect(() => {
     let live = true;
     fetch("/api/admin/gym-places/?countries=1")
       .then(async (r) => (r.ok ? ((await r.json()) as { countries: typeof countries }) : { countries: [] }))
-      .then((j) => live && setCountries(j.countries))
+      .then((j) => {
+        if (!live) return;
+        setCountries(j.countries);
+        setCountryText(j.countries.find((c) => c.code === "CA")?.name ?? j.countries[0]?.name ?? "");
+      })
       .catch(() => undefined);
     return () => {
       live = false;
     };
   }, []);
   const allCities = countries.reduce((n, c) => n + c.cities, 0);
+  // The country typed or picked in the search box, by name or code ("canada", "CA").
+  const picked = pickCountry(countries, countryText);
+  const failedRecent = failedPlaces(recent ?? []);
+  const shown = (recent ?? []).filter((r) => !failedOnly || !r.ok);
   const running = job?.state === "running";
 
   useEffect(() => {
@@ -188,12 +199,20 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   return (
     <>
       <Card title="Add a city's gyms">
-        <p className="text-sm text-muted">
-          Pulls every named fitness centre in an area from OpenStreetMap. They show in Find gyms near you as unofficial gyms until an owner
-          claims one. Running it again is safe: gyms are matched by their map id, only what changed on the map is written, and a claimed gym
-          is never touched. Yoga, pilates, martial arts and similar places are marked as studios, which the finder leaves out. Rec and
-          community centres with a gym come in too.
-        </p>
+        <HowItWorks>
+          <p>
+            Pulls every named fitness centre in an area from OpenStreetMap. They show in Find gyms near you as unofficial gyms until an
+            owner claims one. Running it again is safe: gyms are matched by their map id, only what changed on the map is written, and a
+            claimed gym is never touched. Yoga, pilates, martial arts and similar places are marked as studios, which the finder leaves out.
+            Rec and community centres with a gym come in too.
+          </p>
+          <p>
+            A gym&apos;s city comes from its own map address when that&apos;s a real place name. A postcode or house number there (some map
+            entries have one) is ignored and the city you imported stands in. Addresses are tidied: stray commas, repeated parts and the
+            city or postcode at the end are dropped.
+          </p>
+          <p>Country imports run on the server, two cities at a time, so you can close this page.</p>
+        </HowItWorks>
         {admin && (
           <form
             className="mt-3 flex flex-wrap gap-2"
@@ -242,25 +261,32 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
                   <label className="sr-only" htmlFor="gym-country">
                     Country
                   </label>
-                  <select
+                  <input
                     id="gym-country"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="rounded-lg border border-line bg-raised px-3 py-1.5"
-                  >
+                    list="gym-countries"
+                    value={countryText}
+                    onChange={(e) => {
+                      setCountryText(e.target.value);
+                    }}
+                    onFocus={(e) => e.target.select()}
+                    placeholder="Search countries"
+                    autoComplete="off"
+                    className="w-56 rounded-lg border border-line bg-raised px-3 py-1.5"
+                  />
+                  <datalist id="gym-countries">
                     {countries.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.name} ({c.cities} {c.cities === 1 ? "city" : "cities"})
+                      <option key={c.code} value={c.name}>
+                        {c.cities} {c.cities === 1 ? "city" : "cities"}
                       </option>
                     ))}
-                  </select>
+                  </datalist>
                   <button
                     type="button"
-                    disabled={busy || !countries.length}
-                    onClick={() => void act({ action: "importJob", country, skipRecent, notify })}
+                    disabled={busy || !picked}
+                    onClick={() => picked && void act({ action: "importJob", country: picked.code, skipRecent, notify })}
                     className="press rounded-lg border border-line px-3 py-1.5"
                   >
-                    Import its major cities
+                    {picked ? `Import ${picked.name}'s ${picked.cities} ${picked.cities === 1 ? "city" : "cities"}` : "Pick a country"}
                   </button>
                   <button
                     type="button"
@@ -281,7 +307,6 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
                     Email me when it&apos;s done
                   </label>
                 </div>
-                <p className="text-xs text-faint">Country imports run on the server, two cities at a time. You can close this page.</p>
               </>
             )}
             {problem && (
@@ -297,7 +322,11 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
 
       <Card
         title="Recent imports"
-        subtitle="The last hundred, newest first. Open one for its step-by-step log."
+        subtitle={
+          recent
+            ? `The last ${recent.length}, newest first. ${failedRecent.length ? `${failedRecent.length} still failing.` : "None failing."}`
+            : undefined
+        }
         right={
           recent && recent.length > 0 ? (
             <button
@@ -310,28 +339,59 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
           ) : undefined
         }
       >
+        {recent && recent.length > 0 && (
+          <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
+            <div className="flex gap-1" role="group" aria-label="Show">
+              {[false, true].map((only) => (
+                <button
+                  key={String(only)}
+                  type="button"
+                  aria-pressed={failedOnly === only}
+                  onClick={() => setFailedOnly(only)}
+                  className={`press rounded-full border px-3 py-1 ${failedOnly === only ? "border-accent bg-accent/15" : "border-line text-muted"}`}
+                >
+                  {only ? `Failed only (${recent.filter((r) => !r.ok).length})` : `All (${recent.length})`}
+                </button>
+              ))}
+            </div>
+            {admin && failedRecent.length > 0 && (
+              <button
+                type="button"
+                disabled={running}
+                onClick={() => void act({ action: "importRetryRecent", notify })}
+                className="press btn-primary ml-auto rounded-lg px-3 py-1.5 font-semibold"
+              >
+                Retry {failedRecent.length} failed
+              </button>
+            )}
+          </div>
+        )}
         {recent === null ? (
           <p className="text-sm text-muted">Loading…</p>
         ) : recent.length === 0 ? (
           <p className="text-sm text-muted">No imports yet.</p>
+        ) : shown.length === 0 ? (
+          <p className="text-sm text-muted">None failed.</p>
         ) : (
-          <ul className="divide-y divide-line text-sm">
-            {recent.map((r) => (
-              <li key={r.id} className="py-2">
-                <details>
-                  <summary className="cursor-pointer">
-                    <span className={r.ok ? "" : "text-bad"}>{r.area || r.query}</span>
-                    <span className="text-muted">
-                      {" "}
-                      · {r.ok ? `${r.found} found, ${r.added} new, ${r.updated} changed` : r.error} · {mins(r.ms)}
-                      {r.server ? ` · ${r.server}` : ""} · {new Date(r.at).toLocaleString()}
-                    </span>
-                  </summary>
-                  <pre className="mt-1 overflow-x-auto text-xs whitespace-pre-wrap text-faint">{r.log || "No log."}</pre>
-                </details>
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="num w-full min-w-[560px] text-sm">
+              <caption className="sr-only">Recent city imports. Open one for its full error and step-by-step log.</caption>
+              <thead>
+                <tr className="border-b border-line text-left text-xs text-muted">
+                  <th className="px-2 py-1.5 font-normal">City</th>
+                  <th className="px-2 py-1.5 font-normal">Result</th>
+                  <th className="px-2 py-1.5 text-right font-normal">Took</th>
+                  <th className="px-2 py-1.5 font-normal">Server</th>
+                  <th className="px-2 py-1.5 font-normal">When</th>
+                </tr>
+              </thead>
+              <tbody>
+                {shown.map((r) => (
+                  <RecentRow key={r.id} r={r} open={open === r.id} toggle={() => setOpen(open === r.id ? null : r.id)} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Card>
     </>
@@ -466,5 +526,70 @@ function JobCard({ job, now, act }: { job: JobStatus; now: number; act: (body: R
         </ul>
       )}
     </div>
+  );
+}
+
+/** A country from the search box, by its name or code ("canada", "CA"), or null. */
+export function pickCountry<T extends { code: string; name: string }>(list: T[], text: string): T | null {
+  const v = text.trim().toLowerCase();
+  if (!v) return null;
+  return list.find((c) => c.name.toLowerCase() === v || c.code.toLowerCase() === v) ?? null;
+}
+
+/** Places whose latest import in the list failed (a later clean import clears an earlier failure). */
+export function failedPlaces(rows: ImportRow[]): string[] {
+  const latest = new Map<string, boolean>();
+  for (const r of rows) if (!latest.has(r.query)) latest.set(r.query, r.ok);
+  return [...latest].filter(([, ok]) => !ok).map(([q]) => q);
+}
+
+/**
+ * A failed import in a few words, instead of every map server's error on one line: "Place not found", "Map servers
+ * busy" (every server busy or hung) or "Map error". The full text is in the row's details.
+ */
+export function shortError(error: string): string {
+  if (/^where\b/.test(error)) return "Place not found";
+  const detail = error.replace(/^map:\s*/, "");
+  const parts = detail
+    .split(";")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length && parts.every((p) => /busy|no answer|fetch failed|timed out|too many requests|HTTP 5\d\d/i.test(p)))
+    return "Map servers busy";
+  return "Map error";
+}
+
+function RecentRow({ r, open, toggle }: { r: ImportRow; open: boolean; toggle: () => void }) {
+  return (
+    <>
+      <tr className="border-b border-line align-top">
+        <td className="px-2 py-1.5">
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-label={`${r.ok ? "Imported" : "Failed"}: ${r.area || r.query}`}
+            onClick={toggle}
+            className="flex items-center gap-2 text-left hover:underline"
+          >
+            <span aria-hidden className={`inline-block h-2 w-2 shrink-0 rounded-full ${r.ok ? "bg-good" : "bg-bad"}`} />
+            <span className="break-words">{r.area || r.query}</span>
+          </button>
+        </td>
+        <td className={`px-2 py-1.5 ${r.ok ? "text-muted" : "text-bad"}`}>
+          {r.ok ? `${r.found} found, ${r.added} new, ${r.updated} changed` : shortError(r.error)}
+        </td>
+        <td className="px-2 py-1.5 text-right whitespace-nowrap text-muted">{mins(r.ms)}</td>
+        <td className="px-2 py-1.5 text-muted">{r.server || "—"}</td>
+        <td className="px-2 py-1.5 whitespace-nowrap text-muted">{new Date(r.at).toLocaleString()}</td>
+      </tr>
+      {open && (
+        <tr className="border-b border-line">
+          <td colSpan={5} className="px-2 pb-2">
+            {!r.ok && <p className="text-xs break-words text-bad">{r.error}</p>}
+            <pre className="mt-1 max-h-72 overflow-auto text-xs whitespace-pre-wrap text-faint">{r.log || "No log."}</pre>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }

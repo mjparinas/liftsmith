@@ -1,4 +1,5 @@
 import { blockWeek, weekStart } from "./block";
+import { estimate } from "./e1rm";
 import { can } from "./entitlements";
 import { EXERCISE_BY_ID } from "./exercises";
 import { foodTargets, targetFor, trainedDays, type CoachFood } from "./foodTargets";
@@ -10,7 +11,7 @@ import { fromCm, lengthUnit, measuresOf } from "./measure";
 import { foodDays, loggedWeek, proteinShort, weekIntake } from "./nutrition";
 import { coolHrHigh, rehabPainTrends } from "./partMetrics";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
-import { epley, gradedSet, sessionsOf, TIMED } from "./progression";
+import { gradedSet, sessionsOf, TIMED } from "./progression";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -83,7 +84,7 @@ function e1Series(events: readonly AppEvent[], exerciseId: string): { at: number
   return sessionsOf(events, exerciseId)
     .map((sets) => ({
       at: sets[0].at,
-      e1: Math.max(0, ...sets.filter((s) => !s.challenge && s.weight > 0).map((s) => epley(s.weight, s.reps))),
+      e1: Math.max(0, ...sets.filter((s) => !s.challenge && s.weight > 0).map((s) => estimate(s.weight, s.reps))),
     }))
     .filter((s) => s.e1 > 0)
     .reverse();

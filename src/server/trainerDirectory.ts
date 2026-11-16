@@ -4,6 +4,7 @@
 // directory always agree. Only adults: a profile without a birth year saying 18 or over is left out, whatever else it
 // says, and so is a profile without a name. Grouped by person, with every gym in the city they train at.
 import { roleOf, type Role } from "./coach";
+import { ratingOf, reviewsOf, type Rating, type Review } from "./coachReviews";
 import { query } from "./db";
 
 /** People a city needs before its directory page is indexed and in the sitemap. */
@@ -21,6 +22,9 @@ export interface DirectoryPerson {
   role: Role | "";
   bio: string;
   gyms: DirectoryGym[];
+  /** Their rating, how their clients are training, and their latest reviews (none until they have enough; coachReviews.ts). */
+  rating?: Rating;
+  reviews?: Review[];
 }
 
 export interface DirectoryCity {
@@ -103,6 +107,12 @@ export async function cityTrainers(
       if (!p.bio) p.bio = l.bio;
     } else people.set(l.account, { code: l.code, name: l.name, role: "", bio: l.bio, gyms: [l.gym] });
   }
-  await Promise.all([...people].map(async ([account, p]) => (p.role = (await roleOf(account)) ?? "")));
+  await Promise.all(
+    [...people].map(async ([account, p]) => {
+      p.role = (await roleOf(account)) ?? "";
+      p.rating = await ratingOf(account, now);
+      p.reviews = await reviewsOf(account, null, 3);
+    }),
+  );
   return { city: list[0]?.city ?? "", region: list[0]?.region ?? "", people: [...people.values()] };
 }

@@ -509,7 +509,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "gym-finder",
         name: "Gym finder and gym pages",
-        body: "Find gyms near you on a map with the list beneath it, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard.",
+        body: "Find gyms near you on a map with the list beneath it, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard. Something wrong on a page? Report it, and our team fixes it.",
         tier: "free",
         added: "2026-11-12",
       },
@@ -734,6 +734,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "coach-chat-dock",
+        name: "Chat dock, statuses and stickers",
+        body: "On a computer, coach chat sits in a dock at the bottom right, like a messenger: everyone you can message, up to two chat windows that fold away, a sound and a count in the tab when a message comes in. Both sides set a status (online, with a client, training, away, do not disturb, on vacation or appear offline), see when the other is typing and when they've seen your message, and send emoji and gym stickers, on the phone too.",
+        tier: "both",
+        proPart: "Being a client is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-15",
+      },
+      {
         id: "trainer-directory",
         name: "Listed in the trainer directory",
         body: "List yourself as a trainer, coach or physio at your gym and you show on that gym's page and in the trainer directory for its city on the website, with your bio and a link for new clients to start training with you. Only adults are listed.",
@@ -742,9 +751,18 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "coach-reviews",
+        name: "Ratings and reviews from real clients",
+        body: "Clients rate their coach, personal trainer or physio with stars and a short review after four weeks or two sessions together. A rating shows once a coach has three reviews, next to how many of their clients trained in the last two weeks, on their invite and in the trainer directory. Coaches reply once to each, and anyone can report a review. Only adults can leave one.",
+        tier: "both",
+        proPart: "Leaving a review is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-15",
+      },
+      {
         id: "coach-plans",
         name: "Coach plans that grow with your client list",
-        body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and Liftsmith takes nothing from what they pay you.",
+        body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and on Coach and Coach Plus Liftsmith takes nothing from what they pay you. On Pro it keeps 2%.",
         tier: "pro",
         pro: "coaching",
         added: "2026-11-13",
@@ -822,7 +840,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "emails",
         name: "Emails that keep you going",
-        body: "Eight getting-started tips with real screens, a weekly and monthly recap, new personal bests, which friends trained, and a nudge back after a break. Each kind has its own switch.",
+        body: "Eight getting-started tips with real screens, a weekly and monthly recap, new personal bests, which friends trained, a nudge back after a break, and then a weekly tip on a feature you may not have found yet. Each kind has its own switch.",
         tier: "free",
         note: "On with an account, off for lifters under 18 unless they turn it on. Every email has a one-click unsubscribe.",
         added: "2026-11-14",

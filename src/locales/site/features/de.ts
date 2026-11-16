@@ -280,7 +280,7 @@ export const de: FeaturesText = {
     },
     "gym-finder": {
       name: "Studiosuche und Studioseiten",
-      body: "Finde Studios in deiner Nähe auf einer Karte mit der Liste darunter, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen.",
+      body: "Finde Studios in deiner Nähe auf einer Karte mit der Liste darunter, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen. Stimmt etwas auf einer Seite nicht? Melde es, und unser Team korrigiert es.",
     },
     "gym-amenities": {
       name: "Ausstattung und Preise auf Studioseiten",
@@ -389,6 +389,11 @@ export const de: FeaturesText = {
       body: "Das Training wird immer geteilt. Herzfrequenz, Workout-Notizen, Form und Erholung, Körperdaten, Schmerzen und Verletzungen sowie der Zyklus sind je ein Schalter, den Kunden für jeden Coach umlegen, bei der Zustimmung oder jederzeit danach. Fotos und Studios bleiben immer privat.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
     },
+    "coach-chat-dock": {
+      name: "Chat-Dock, Status und Sticker",
+      body: "Am Computer sitzt der Coach-Chat unten rechts in einem Dock, wie ein Messenger: alle, denen du schreiben kannst, bis zu zwei Chatfenster, die sich einklappen, und ein Ton und eine Zahl im Tab, wenn eine Nachricht kommt. Beide Seiten setzen einen Status (online, bei einem Kunden, beim Training, abwesend, nicht stören, im Urlaub oder offline erscheinen), sehen, wann die andere Seite schreibt und deine Nachricht gesehen hat, und schicken Emojis und Gym-Sticker, auch am Handy.",
+      proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
+    },
     "coach-pages": {
       name: "Eine Seite für jede Seite",
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",
@@ -398,9 +403,14 @@ export const de: FeaturesText = {
       name: "Im Trainerverzeichnis gelistet",
       body: "Trag dich in deinem Studio als Personal Trainer, Coach oder Physio ein, dann stehst du auf der Seite des Studios und im Trainerverzeichnis seiner Stadt auf der Website, mit deinem Text und einem Link, über den neue Kunden mit dir trainieren können. Gelistet werden nur Erwachsene.",
     },
+    "coach-reviews": {
+      name: "Bewertungen von echten Kunden",
+      body: "Kunden bewerten ihren Coach, Personal Trainer oder Physio nach vier Wochen oder zwei Einheiten mit Sternen und einer kurzen Bewertung. Die Bewertung erscheint ab drei Bewertungen, neben der Zahl der Kunden, die in den letzten zwei Wochen trainiert haben, in der Einladung und im Trainerverzeichnis. Coaches antworten einmal auf jede, und jeder kann eine Bewertung melden. Nur Erwachsene können bewerten.",
+      proPart: "Bewerten ist kostenlos; Kunden coachen ist Pro.",
+    },
     "coach-plans": {
       name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
-      body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und Liftsmith behält nichts von dem ein, was sie dir zahlen.",
+      body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und mit Coach und Coach Plus behält Liftsmith nichts von dem ein, was sie dir zahlen. Mit Pro behält es 2 %.",
     },
     awards: {
       name: "Erfolge, Level und Serien",
@@ -435,7 +445,7 @@ export const de: FeaturesText = {
     },
     emails: {
       name: "E-Mails, die dich dranbleiben lassen",
-      body: "Acht Tipps für den Einstieg mit echten Bildschirmen, ein Wochen- und Monatsrückblick, neue Bestleistungen, welche Freunde trainiert haben und ein Anstoß zurück nach einer Pause. Jede Art hat ihren eigenen Schalter.",
+      body: "Acht Tipps für den Einstieg mit echten Bildschirmen, ein Wochen- und Monatsrückblick, neue Bestleistungen, welche Freunde trainiert haben ein Anstoß zurück nach einer Pause und danach jede Woche ein Tipp zu einer Funktion, die du vielleicht noch nicht kennst. Jede Art hat ihren eigenen Schalter.",
       note: "Mit einem Konto eingeschaltet, für unter 18-Jährige aus, außer sie schalten sie ein. Jede E-Mail lässt sich mit einem Klick abbestellen.",
     },
     cloud: {

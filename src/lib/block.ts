@@ -1,3 +1,4 @@
+import { weekOf } from "./derive";
 import { t } from "./i18n";
 import type { Experience, Profile } from "./types";
 
@@ -26,7 +27,7 @@ const BASE_SETS: Record<Experience, [number, number]> = { new: [8, 12], intermed
 export function blockWeek(profile: Pick<Profile, "blockStart" | "blockWeeks" | "experience">, now: number): BlockWeek {
   const build = Math.min(6, Math.max(3, profile.blockWeeks));
   const length = build + 1;
-  const week = Math.max(0, Math.floor((now - profile.blockStart) / WEEK)) % length;
+  const week = weeksIn(profile, now) % length;
   const [lo, hi] = BASE_SETS[profile.experience];
   if (week === build) {
     return { week, length, deload: true, rir: 4, setsPerMuscle: Math.round(lo / 2), volume: 0.5, label: t("block.deload") };
@@ -45,8 +46,16 @@ export function blockWeek(profile: Pick<Profile, "blockStart" | "blockWeeks" | "
   };
 }
 
-/** Start of the current block week (for counting this week's sets). */
+/**
+ * Whole weeks since the block started. Block weeks are the lifter's calendar weeks (derive.ts weekOf, Monday or
+ * Sunday as set), so "this week" means the same on Body, Progress, the streak and the plan (number audit, Melvin
+ * 2026-11-15). A block started midweek counts that week as its first. Rounded, so a clock change can't skip a week.
+ */
+function weeksIn(profile: Pick<Profile, "blockStart">, now: number): number {
+  return Math.max(0, Math.round((weekOf(now) - weekOf(profile.blockStart)) / WEEK));
+}
+
+/** Start of the current block week (for counting this week's sets): the start of this calendar week. */
 export function weekStart(profile: Pick<Profile, "blockStart">, now: number): number {
-  const n = Math.max(0, Math.floor((now - profile.blockStart) / WEEK));
-  return profile.blockStart + n * WEEK;
+  return now < profile.blockStart ? weekOf(profile.blockStart) : weekOf(now);
 }

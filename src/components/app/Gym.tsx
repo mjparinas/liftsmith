@@ -8,6 +8,7 @@ import { useAccount } from "@/lib/auth";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { listGym, myListings, pickListing, pickPlace, placeKit, unlistGym, type ListError } from "@/lib/gymDirectory";
+import { barName, gymName } from "@/lib/gymNames";
 import { encodeGym, gymCodeFromLink, gymUrl, kitOf } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -40,7 +41,7 @@ export function Gym() {
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>
-            {g.name}
+            {gymName(g.name)}
           </Chip>
         ))}
         <Chip onClick={() => setAdding(true)}>{t("gym.add")}</Chip>
@@ -69,7 +70,7 @@ export function Gym() {
       <Section title={t("gym.place")}>
         {gym.place ? (
           <div className="card flex items-center justify-between gap-3 p-4">
-            <p className="text-sm text-muted">{t("gym.place.on", { name: gym.name })}</p>
+            <p className="text-sm text-muted">{t("gym.place.on", { name: gymName(gym.name) })}</p>
             <Button kind="quiet" onClick={() => update({ place: undefined })}>
               {t("gym.place.off")}
             </Button>
@@ -181,9 +182,9 @@ export function Gym() {
         <ul className="card divide-y divide-line">
           {gym.bars.map((b, i) => (
             <li key={b.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
-              <span>{b.name}</span>
+              <span>{barName(b)}</span>
               <BumpField
-                label={t("gym.barWeight", { name: b.name })}
+                label={t("gym.barWeight", { name: barName(b) })}
                 value={String(b.weight)}
                 onChange={(v) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(v) || 0 } : x)) })}
                 step={gym.unit === "lb" ? 1 : 0.5}
@@ -237,8 +238,8 @@ export function Gym() {
                 setAdding(false);
               }}
             >
-              <div className="font-semibold">{p.name}</div>
-              <div className="text-sm text-muted">{p.blurb}</div>
+              <div className="font-semibold">{t(`gym.kind.${p.id}`)}</div>
+              <div className="text-sm text-muted">{t(`gym.kind.${p.id}.blurb`)}</div>
             </button>
           ))}
         </div>

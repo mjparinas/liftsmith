@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { exercise } from "@/lib/exercises";
+import { gymName } from "@/lib/gymNames";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { adaptRemix, decodeRemix, encodeShared, remixUrl, sharedFromSession } from "@/lib/remix";
@@ -39,7 +40,7 @@ export function Remix({ code }: { code?: string }) {
   return (
     <div className="pb-2">
       <ScreenHeader title={t("remix.title")} />
-      <p className="mt-1 text-muted">{t("remix.rebuilt", { gym: gym?.name ?? t("remix.yourGym"), min: plan.estMinutes })}</p>
+      <p className="mt-1 text-muted">{t("remix.rebuilt", { gym: gym ? gymName(gym.name) : t("remix.yourGym"), min: plan.estMinutes })}</p>
       {(swapped.length > 0 || missing.length > 0) && (
         <div className="card mt-4 p-4 text-sm">
           {swapped.map((x) => (

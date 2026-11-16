@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 import { ownedGyms } from "@/lib/gymClaims";
 import { listingFor, markAdded, placeFor, placeLine, REPORT_REASONS, reportGym } from "@/lib/gymDirectory";
+import { barName } from "@/lib/gymNames";
 import { decodeGym, sameKit } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
@@ -14,6 +15,7 @@ import { fmtNum } from "@/lib/units";
 
 import { Icon } from "./icons";
 import { PlaceDetails } from "./PlaceDetails";
+import { PlaceReport } from "./PlaceReport";
 import { go } from "./router";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
@@ -117,7 +119,7 @@ export function SharedGym({ code }: { code?: string }) {
           <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 px-4 py-3">
             <dt className="text-muted">{t("gym.bars")}</dt>
             <dd className="num text-right">
-              {kit.bars.length ? kit.bars.map((b) => `${b.name} ${fmtNum(b.weight)} ${kit.unit}`).join(", ") : t("gym.dumbbells.none")}
+              {kit.bars.length ? kit.bars.map((b) => `${barName(b)} ${fmtNum(b.weight)} ${kit.unit}`).join(", ") : t("gym.dumbbells.none")}
             </dd>
           </div>
           <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 px-4 py-3">
@@ -171,6 +173,7 @@ export function SharedGym({ code }: { code?: string }) {
               </Button>
             )
           ))}
+        {place && !mine && <PlaceReport placeId={place.id} name={name} />}
         {listing &&
           (reported ? (
             <p className="text-center text-sm text-muted" role="status">

@@ -311,7 +311,7 @@ export const de: SiteText = {
       noLimit: "Keine feste Grenze für Kunden",
       inPro: "In Pro enthalten",
       orMonthly: "oder {monthly} im Monat",
-      free: "Deine Kunden trainieren immer kostenlos, Schulsport-Coaches mit bestätigter Schuladresse bekommen Pro kostenlos, und {name} behält nichts von dem ein, was Kunden dir zahlen.",
+      free: "Deine Kunden trainieren immer kostenlos, Schulsport-Coaches mit bestätigter Schuladresse bekommen Pro kostenlos, und mit Coach und Coach Plus behält {name} nichts von dem ein, was Kunden dir zahlen (2 % mit Pro).",
       cta: "Liftsmith für Coaches",
     },
   },

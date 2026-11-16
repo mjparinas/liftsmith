@@ -34,6 +34,10 @@ const PATHS = {
   plus: "M12 5v14M5 12h14",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2",
   bolt: "M13 2 4 14h7l-1 8 9-12h-7z",
+  smile: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8.5 14.5a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01",
+  sticker: "M15.5 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h7.5L21 13.5V8.5A5.5 5.5 0 0 0 15.5 3zM13.5 21v-4.5a3 3 0 0 1 3-3H21",
+  minus: "M5 12h14",
+  close: "M6 6l12 12M18 6 6 18",
   leaf: "M5 19c0-8 5-14 15-14 0 10-6 15-14 15M5 19c3-4 6-6 10-8",
   target: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z",
   trophy: "M8 4h8v5a4 4 0 0 1-8 0zM8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 13v4M8 21h8M9 17h6v4H9z",
@@ -74,6 +78,8 @@ const PATHS = {
   sides: "M12 3v18M8.5 8 4.5 12l4 4M4.5 12H9M15.5 8l4 4-4 4M19.5 12H15",
   // No connection (Friends' offline note, 2026-11-13): a cloud with a line through it.
   offline: "M7 18h10a4 4 0 0 0 .8-7.9A6 6 0 0 0 7.3 8.6 4.7 4.7 0 0 0 7 18zM3 3l18 18",
+  // A rating star (coach reviews); drawn filled for the stars given.
+  star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
 } as const;
 
 export type IconName = keyof typeof PATHS;
