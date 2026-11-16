@@ -26,6 +26,7 @@ import {
   savePendingInvite,
   weekStart,
 } from "@/lib/invite";
+import { withInvite } from "@/lib/inviteLink";
 import { confetti, haptic, isNative, oops, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
 import { useNet } from "@/lib/net";
@@ -102,6 +103,7 @@ import { go, goBack } from "./router";
 import { ScanToFollow } from "./ScanToFollow";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
+import { useShareInvite } from "./useShareInvite";
 
 // --- Small pieces ---
 
@@ -1410,6 +1412,7 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
 
 function People() {
   const me = useSocial((s) => s.me);
+  const invite = useShareInvite();
   const [q, setQ] = useState("");
   // Accepting a request adds a follower, so every list reloads after a change.
   const [version, setVersion] = useState(0);
@@ -1424,7 +1427,7 @@ function People() {
     go("person", h);
   };
   const share = async () => {
-    const url = profileUrl(handle, !!me?.profile?.public);
+    const url = withInvite(profileUrl(handle, !!me?.profile?.public), await invite.get());
     if (await shareUrl(url, t("friends.shareTitle"))) return;
     setNote((await copyText(url)) ? t("link.copied") : url);
   };

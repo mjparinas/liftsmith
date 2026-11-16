@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 import { available, exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
+import { withInvite } from "@/lib/inviteLink";
 import { haptic, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
 import { moveItem as moveTo } from "@/lib/reorder";
@@ -21,6 +22,7 @@ import { go } from "./router";
 import { SendToFriend } from "./SendToFriend";
 import { RoutinePartsEditor, routinePartsLine } from "./Stretch";
 import { Bump, Button, EmptyState, LinkToggle, Sheet } from "./ui";
+import { useShareInvite } from "./useShareInvite";
 
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
 // one from the exercise library. All of it is optional and happens before or after a workout.
@@ -233,9 +235,10 @@ function AddFromLink({ onOpen }: { onOpen: () => void }) {
 /** "Share routine": a link to the routine's exercises and sets, nothing personal. */
 function ShareRoutine({ routine }: { routine: Routine }) {
   const [note, setNote] = useState<string | null>(null);
+  const invite = useShareInvite();
   const share = async () => {
     haptic("tap");
-    const url = routineUrl(encodeRoutine(routine));
+    const url = withInvite(routineUrl(encodeRoutine(routine)), await invite.get());
     track("feature", { name: "routine_share", detail: "share" });
     if (await shareUrl(url, t("rt.shareTitle", { name: routine.name }))) return;
     setNote((await copyText(url)) ? t("rt.copied") : null);

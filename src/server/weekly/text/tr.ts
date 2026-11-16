@@ -814,6 +814,18 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Uygulamada toparlanma haritasını açmak için Toparlanma widget'ına dokun.",
   },
+  "screenshot-share": {
+    title: "Ekran görüntüsü al, paylaşmaya değer bir kart al",
+    intro: "Liftsmith'in ekran görüntüsünü al, davet bağlantınla paylaşmaya hazır antrenman kartları açılsın.",
+    points: [
+      "Son ay, üç ay, altı ay, yıl ya da tüm zamanlar arasından seç.",
+      "Toplamlar, setlerin nereye gittiği ve en iyi kaldırışların arasında kaydır.",
+      "Tüm ağırlıkları gizlemek için göze dokun.",
+      "Bugün değil mi? Kaydırıp kapat ya da Ayarlar › Verilerin ve gizlilik bölümünden kapat.",
+      "Ekran görüntüsü gerekmez: İlerleme'deki Antrenmanımı paylaş aynı kartları açar.",
+    ],
+    dyk: "Rutinlerden spor salonlarına kadar paylaştığın her bağlantı artık davetini taşıyor, davet yazan bir bağlantıyla.",
+  },
   "form-cues": {
     title: "Sık yapılan hatalar ve düzeltmeleri",
     intro: "Artık her egzersiz ve esneme, en sık yapılan iki üç form hatasını 3D figürün hemen yanında gösteriyor.",

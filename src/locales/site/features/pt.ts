@@ -283,6 +283,10 @@ export const pt: FeaturesText = {
       name: "Pesagens, gordura corporal e fotos",
       body: "Registre peso e gordura corporal, ou deixe que cheguem da sua balança pelo app de saúde do celular, e guarde fotos de progresso no celular.",
     },
+    "photo-compare": {
+      name: "Fotos de progresso que se alinham",
+      body: "A câmera mostra sua última foto como um contorno suave para você se alinhar, com temporizador para dar um passo atrás. Compare duas datas quaisquer com um controle deslizante ou lado a lado, cada uma com o que você pesava naquele dia. As fotos ficam no seu celular; um arquivo de backup pode levá-las para um novo.",
+    },
     measurements: {
       name: "Medidas com fita",
       body: "Nove pontos em centímetros ou polegadas. Uma cintura que aumenta ou diminui vira uma nota do coach quando não há medição de gordura corporal.",
@@ -411,6 +415,11 @@ export const pt: FeaturesText = {
     share: {
       name: "Cards e links para compartilhar",
       body: "Compartilhe um treino, um recorde novo ou um marco como imagem, ou como link público com prévia. Um recorde novo brilha em dourado e pode ser compartilhado na hora, na tela de descanso.",
+    },
+    "screenshot-share": {
+      name: "Cards ao fazer uma captura de tela",
+      body: "Faça uma captura de tela e uma folha de cards do seu treino aparece: último mês, três meses, seis meses, ano ou desde o início, como totais, para onde foram suas séries ou seus melhores levantamentos. Deslize entre eles, oculte os pesos com o olho e compartilhe com seu link de convite impresso no card. Os mesmos cards estão em Compartilhar meu treino, no Progresso. Todo link que você compartilha agora leva seu convite, num link que diz isso.",
+      note: "As capturas abrem isso no Android 14 ou mais recente e no iPhone, e dá para desativar. Em outros lugares, abra pelo Progresso. Quem tem menos de 18 anos compartilha sem link de convite.",
     },
     coaching: {
       name: "Treine alunos",
@@ -701,6 +710,9 @@ export const pt: FeaturesText = {
     strava: {
       name: "Strava",
       does: "Cada treino concluído publicado no Strava",
+    },
+    "garmin-connect": {
+      does: "Entram sono, VFC, frequência cardíaca em repouso, passos e pesagens da balança Index, e corridas, pedaladas e remadas indoor como treinos de cardio",
     },
     whoop: {
       name: "WHOOP",

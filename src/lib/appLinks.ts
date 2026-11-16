@@ -1,5 +1,6 @@
 "use client";
 
+import { inviteAppPath, inviteOfUrl, keepInviteFrom } from "./invite";
 import { APP_PATH } from "./site";
 
 // Android App Links (Melvin, 2026-11-11). Links to the web app on our own domain
@@ -8,7 +9,8 @@ import { APP_PATH } from "./site";
 // public/.well-known/assetlinks.json names the app's signing certificates. The app then gets the link
 // through @capacitor/app (`getLaunchUrl` on a cold start, `appUrlOpen` while running) and shows the
 // screen in its fragment. iOS Universal Links are deferred (open-items.md); the paste box in Routines
-// covers the iPhone meanwhile.
+// covers the iPhone meanwhile. Invite links (www.getliftsmith.com/invite/<code>, 2026-11-15) are claimed too and open
+// the invite screen; any other link that carries ?invite=<code> keeps that invite for when the lifter joins Friends.
 
 /** The hosts whose links open the app. The bare domain redirects to www, and verification doesn't follow redirects. */
 export const LINK_HOSTS = ["www.getliftsmith.com"] as const;
@@ -23,6 +25,10 @@ export function hashFromLink(url: string): string | null {
   }
   if (u.protocol !== "https:" || !(LINK_HOSTS as readonly string[]).includes(u.hostname)) return null;
   const path = u.pathname.endsWith("/") ? u.pathname : `${u.pathname}/`;
+  if (path.startsWith("/invite/")) {
+    const code = inviteOfUrl(u.toString());
+    return code ? inviteAppPath(code).slice(APP_PATH.length) : "#/today";
+  }
   if (path !== APP_PATH && path !== `${APP_PATH}index.html/`) return null;
   return u.hash.startsWith("#/") ? u.hash : "#/today";
 }
@@ -34,7 +40,9 @@ export async function startAppLinks(open: (hash: string) => void): Promise<() =>
   const { App } = await import("@capacitor/app");
   const go = (url: string | undefined) => {
     const hash = url ? hashFromLink(url) : null;
-    if (hash) open(hash);
+    if (!hash || !url) return;
+    keepInviteFrom(url);
+    open(hash);
   };
   const handle = await App.addListener("appUrlOpen", (e) => go(e.url));
   try {

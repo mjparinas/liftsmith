@@ -6,6 +6,7 @@ import { track } from "@/lib/analytics";
 import { exercise } from "@/lib/exercises";
 import { gymName } from "@/lib/gymNames";
 import { t } from "@/lib/i18n";
+import { withInvite } from "@/lib/inviteLink";
 import { haptic } from "@/lib/juice";
 import { adaptRemix, decodeRemix, encodeShared, remixUrl, sharedFromSession } from "@/lib/remix";
 import { useApp } from "@/lib/store";
@@ -14,6 +15,7 @@ import { useNow } from "@/lib/useNow";
 import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Button, ScreenHeader } from "./ui";
+import { useShareInvite } from "./useShareInvite";
 
 // A shared workout opened from a link (#/remix/<code>), rebuilt for this lifter's gym and strength.
 
@@ -94,11 +96,12 @@ export function Remix({ code }: { code?: string }) {
 export function ShareWorkout({ sessionId }: { sessionId: string }) {
   const { events, profile } = useApp();
   const [note, setNote] = useState<string | null>(null);
+  const invite = useShareInvite();
   const items = sharedFromSession(events, sessionId, profile.goal);
   if (!items.length) return null;
-  const url = remixUrl(encodeShared(items));
   const share = async () => {
     haptic("tap");
+    const url = withInvite(remixUrl(encodeShared(items)), await invite.get());
     const text = t("done.remixText");
     try {
       if (navigator.share) {

@@ -14,6 +14,13 @@ describe("app links", () => {
     expect(hashFromLink("https://www.getliftsmith.com/app")).toBe("#/today");
   });
 
+  it("opens invite links on the invite screen, and keeps an invite a shared link carries", () => {
+    expect(hashFromLink("https://www.getliftsmith.com/invite/ABCDEFGH")).toBe("#/invite/ABCDEFGH");
+    expect(hashFromLink("https://www.getliftsmith.com/invite/abcd-efgh/")).toBe("#/invite/ABCDEFGH");
+    expect(hashFromLink("https://www.getliftsmith.com/invite/nope/")).toBe("#/today");
+    expect(hashFromLink("https://www.getliftsmith.com/app/?invite=ABCDEFGH#/routine/r1~QQ")).toBe("#/routine/r1~QQ");
+  });
+
   it("ignores links that aren't into the app", () => {
     expect(hashFromLink("https://www.getliftsmith.com/blog/#/x")).toBeNull();
     expect(hashFromLink("https://evil.example/app/#/routine/x")).toBeNull();
@@ -22,13 +29,14 @@ describe("app links", () => {
     expect(hashFromLink("not a url")).toBeNull();
   });
 
-  it("claims /app on www in the manifest, verified, and nowhere else", () => {
+  it("claims /app and /invite on www in the manifest, verified, and nowhere else", () => {
     const manifest = readFileSync("android/app/src/main/AndroidManifest.xml", "utf8");
     const filter = /<intent-filter android:autoVerify="true">([\s\S]*?)<\/intent-filter>/.exec(manifest)?.[1] ?? "";
     expect(filter).toContain('android:scheme="https"');
     expect(filter).toContain('android:host="www.getliftsmith.com"');
     expect(filter).toContain('android:pathPrefix="/app"');
-    expect([...filter.matchAll(/android:host="([^"]+)"/g)].map((m) => m[1])).toEqual(["www.getliftsmith.com"]);
+    expect([...filter.matchAll(/android:pathPrefix="([^"]+)"/g)].map((m) => m[1])).toEqual(["/app", "/invite"]);
+    expect(new Set([...filter.matchAll(/android:host="([^"]+)"/g)].map((m) => m[1]))).toEqual(new Set(["www.getliftsmith.com"]));
   });
 
   it("publishes assetlinks.json for the app's package with SHA-256 fingerprints", () => {

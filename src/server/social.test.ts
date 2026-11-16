@@ -406,7 +406,10 @@ describe("invite links and the leaderboard (stage 4)", () => {
     await join("acc-c", "casey");
     const code = (await call("acc-a", "invite", {}, NOW)).body.code as string;
     expect((await call("acc-b", "acceptInvite", { code: "ZZZZZZZZ" })).body.error).toBe("invite");
-    expect((await call("acc-b", "acceptInvite", { code }, NOW + 31 * DAY)).body.error).toBe("invite");
+    // A year from the last time it was asked for (2026-11-15: the same link goes on every share card).
+    expect((await call("acc-b", "acceptInvite", { code }, NOW + 366 * DAY)).body.error).toBe("invite");
+    expect((await call("acc-a", "invite", {}, NOW + 200 * DAY)).body.code).toBe(code); // renewed, same code
+    expect((await call("acc-c", "inviteInfo", { code }, NOW + 366 * DAY)).code).toBe(200);
     await call("acc-a", "block", { handle: "casey" });
     expect((await call("acc-c", "inviteInfo", { code })).code).toBe(404);
     await resolveReports("profile", "acc-a", "suspend");

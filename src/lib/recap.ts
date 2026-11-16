@@ -8,7 +8,8 @@ import { type AppEvent, type Muscle, type SetEvent } from "./types";
 // The monthly and yearly recap ("your year in lifting"). Derived from events for a period, never
 // stored, so every device shows the same recap. Shown on Progress and shareable as an image.
 
-export type Period = { kind: "month" | "year"; start: number; end: number };
+/** A calendar month or year, or a span of days ending now (the screenshot share sheet's 1M to All, statsCards.ts). */
+export type Period = { kind: "month" | "year" | "span"; start: number; end: number };
 
 export function monthOf(ms: number): Period {
   const d = new Date(ms);
@@ -26,6 +27,8 @@ export function yearOf(ms: number): Period {
 
 export function periodLabel(p: Period): string {
   const d = new Date(p.start);
+  if (p.kind === "span")
+    return `${date(d, { month: "short", day: "numeric", year: "numeric" })} – ${date(p.end - 1, { month: "short", day: "numeric", year: "numeric" })}`;
   return p.kind === "year" ? String(d.getFullYear()) : date(d, { month: "long", year: "numeric" });
 }
 
@@ -67,6 +70,10 @@ export interface Recap {
 }
 
 function shift(p: Period, by: number): Period {
+  if (p.kind === "span") {
+    const len = p.end - p.start;
+    return { kind: "span", start: p.start + by * len, end: p.end + by * len };
+  }
   const d = new Date(p.start);
   const s = p.kind === "year" ? new Date(d.getFullYear() + by, 0, 1) : new Date(d.getFullYear(), d.getMonth() + by, 1);
   const e = p.kind === "year" ? new Date(d.getFullYear() + by + 1, 0, 1) : new Date(d.getFullYear(), d.getMonth() + by + 1, 1);
@@ -153,7 +160,7 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
     timeOfDay: tod && tod[1] > 0 && sessions.length >= 2 ? (tod[0] as NonNullable<Recap["timeOfDay"]>) : null,
     heaviest,
     activeWeeks,
-    weeks: Math.min(weeks, period.kind === "year" ? 53 : 6),
+    weeks: period.kind === "span" ? weeks : Math.min(weeks, period.kind === "year" ? 53 : 6),
     volumeChange: prevVol > 0 ? volumeKg / prevVol - 1 : null,
     likeA: tonnage(volumeKg).last?.name ?? null,
     avgHr: hrs.length ? Math.round(hrs.reduce((a, b) => a + b, 0) / hrs.length) : null,

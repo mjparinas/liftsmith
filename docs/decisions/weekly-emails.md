@@ -686,7 +686,17 @@ Beside the Today widget, two more answer a question at a glance: am I on track t
 - Each has Start, so today's workout is one tap away.
 Did you know? Tap the Recovery widget to open the recovery map in the app.
 
-### W61 · Common mistakes, and the fix (**New**, 2026-11-16)
+### W61 · Take a screenshot, get a card worth sharing (**New**, 2026-11-16)
+Free · Lifters · Screen: Progress · `fresh`, so it goes next to everyone already in the series
+Screenshot Liftsmith and a sheet of training cards slides up, ready to share with your invite link on them.
+- Pick your last month, three months, six months, year or all time.
+- Swipe through totals, where your sets went and your best lifts.
+- Tap the eye to hide every weight.
+- Not today? Swipe it away, or turn it off in Settings › Your data and privacy.
+- No screenshot needed: Share my training on Progress opens the same cards.
+Did you know? Every link you share, from routines to gyms, now carries your invite, in a link that says invite. ([Sharing](sharing.md))
+
+### W62 · Common mistakes, and the fix (**New**, 2026-11-16)
 Free · Lifters · Screen: the back squat's exercise page, at Common mistakes · `fresh`, so it goes next to everyone already in the series
 Every exercise and stretch now lists its two or three most common form mistakes, right beside the 3D figure.
 - Each one says what it looks like, what to do instead and why it matters.

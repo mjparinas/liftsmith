@@ -816,6 +816,19 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Tocca il widget Recupero per aprire la mappa del recupero nell'app.",
   },
+  "screenshot-share": {
+    title: "Fai uno screenshot, ottieni una card da condividere",
+    intro:
+      "Fai uno screenshot di Liftsmith e compare un foglio con le card del tuo allenamento, pronte da condividere con il tuo link d’invito.",
+    points: [
+      "Scegli l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre.",
+      "Scorri totali, divisione delle serie e migliori alzate.",
+      "Tocca l’occhio per nascondere tutti i pesi.",
+      "Non oggi? Scorrilo via, o disattivalo in Impostazioni › I tuoi dati e la privacy.",
+      "Senza screenshot: Condividi il mio allenamento, in Progressi, apre le stesse card.",
+    ],
+    dyk: "Ogni link che condividi, dalle routine alle palestre, ora porta il tuo invito, in un link che dice invite.",
+  },
   "form-cues": {
     title: "Errori comuni e come correggerli",
     intro: "Ogni esercizio e allungamento ora mostra i suoi due o tre errori tecnici più comuni, proprio accanto alla figura 3D.",

@@ -817,6 +817,19 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Toque no widget Recuperação para abrir o mapa de recuperação no app.",
   },
+  "screenshot-share": {
+    title: "Tire uma captura de tela e ganhe um card que vale compartilhar",
+    intro:
+      "Faça uma captura de tela do Liftsmith e uma folha de cards do seu treino aparece, pronta para compartilhar com seu link de convite.",
+    points: [
+      "Escolha o último mês, três meses, seis meses, o ano ou desde o início.",
+      "Deslize entre totais, para onde foram suas séries e seus melhores levantamentos.",
+      "Toque no olho para ocultar todos os pesos.",
+      "Hoje não? Deslize para fechar, ou desative em Ajustes › Seus dados e privacidade.",
+      "Sem captura de tela: Compartilhar meu treino no Progresso abre os mesmos cards.",
+    ],
+    dyk: "Todo link que você compartilha, de rotinas a academias, agora leva seu convite, num link que diz convite.",
+  },
   "form-cues": {
     title: "Erros comuns, e como corrigir",
     intro: "Todo exercício e alongamento agora mostra seus dois ou três erros de técnica mais comuns, bem ao lado da figura 3D.",
