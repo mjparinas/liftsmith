@@ -39,7 +39,7 @@ describe("Connected apps on the web", () => {
       "fetch",
       vi.fn(async () =>
         Response.json({
-          ready: { strava: true, oura: true, whoop: false, withings: false, polar: false, concept2: false },
+          ready: { strava: true, garmin: false, oura: true, whoop: false, withings: false, polar: false, concept2: false },
           linked: { strava: { since: Date.now(), who: "Sam Lee" } },
         }),
       ),
@@ -47,7 +47,7 @@ describe("Connected apps on the web", () => {
     render(<Connections />);
     expect(await screen.findByText("Connected as Sam Lee")).toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Post my workouts to Strava" })).toBeChecked();
-    expect(screen.getAllByText("Coming soon")).toHaveLength(4);
+    expect(screen.getAllByText("Coming soon")).toHaveLength(5);
     expect(screen.getByRole("button", { name: "Disconnect" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Connect" })).toBeInTheDocument();
   });

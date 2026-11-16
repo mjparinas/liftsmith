@@ -34,3 +34,23 @@ export const ja: Partial<Record<Key, Message>> = {
   "time.today": "今日",
   "time.yesterday": "昨日",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "time.today": "Hoje",
+  "time.yesterday": "Ontem",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "time.today": "오늘",
+  "time.yesterday": "어제",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "time.today": "Bugün",
+  "time.yesterday": "Dün",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "time.today": "Dziś",
+  "time.yesterday": "Wczoraj",
+};

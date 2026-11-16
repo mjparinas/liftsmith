@@ -30,8 +30,8 @@ const strings = (o: unknown): string[] =>
   typeof o === "string" ? [o] : Array.isArray(o) ? o.flatMap(strings) : o && typeof o === "object" ? Object.values(o).flatMap(strings) : [];
 
 describe("translated tools", () => {
-  it("covers the five other site languages", () => {
-    expect(LANGS.sort()).toEqual(["de", "es", "fr", "it", "ja"]);
+  it("covers the nine other site languages", () => {
+    expect(LANGS.sort()).toEqual(["de", "es", "fr", "it", "ja", "ko", "pl", "pt", "tr"]);
   });
 
   for (const slug of LOCAL_TOOL_SLUGS) {
@@ -52,8 +52,8 @@ describe("translated tools", () => {
       const [first, ...rest] = LANGS.map((l) => LOCAL_TOOLS[l][slug].page);
       for (const p of rest) {
         expect(p.faq.length).toBe(first!.faq.length);
-        expect(p.reading.map((r) => r.href.replace(/^\/(es|fr|de|it|ja)\//, "/"))).toEqual(
-          first!.reading.map((r) => r.href.replace(/^\/(es|fr|de|it|ja)\//, "/")),
+        expect(p.reading.map((r) => r.href.replace(/^\/(es|fr|de|it|ja|pt|ko|pl|tr)\//, "/"))).toEqual(
+          first!.reading.map((r) => r.href.replace(/^\/(es|fr|de|it|ja|pt|ko|pl|tr)\//, "/")),
         );
         expect(p.more?.paragraphs.length).toBe(first!.more?.paragraphs.length);
       }
@@ -72,17 +72,17 @@ describe("translated tools", () => {
         for (const r of LOCAL_TOOLS[lang][slug].page.reading) {
           expect(paths.has(r.href), `${lang} ${r.href}`).toBe(true);
           if (r.href.startsWith("/tools/")) throw new Error(`${lang} links to the English ${r.href}`);
-          if (/^\/(es|fr|de|it|ja)\//.test(r.href)) expect(r.href.startsWith(`/${lang}/`), `${lang} ${r.href}`).toBe(true);
+          if (/^\/(es|fr|de|it|ja|pt|ko|pl|tr)\//.test(r.href)) expect(r.href.startsWith(`/${lang}/`), `${lang} ${r.href}`).toBe(true);
         }
   });
 
-  it("puts every copy in the sitemap, each listing all six languages", () => {
+  it("puts every copy in the sitemap, each listing all ten languages", () => {
     const routes = siteRoutes();
     for (const path of LOCAL_TOOL_PATHS)
       for (const lang of ["en", ...LANGS] as const) {
         const route = routes.find((r) => r.path === localPath(lang, path));
         expect(route?.languages && Object.keys(route.languages).sort(), `${lang} ${path}`).toEqual(
-          ["de", "en", "es", "fr", "it", "ja", "x-default"].sort(),
+          ["de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt", "tr", "x-default"].sort(),
         );
       }
   });

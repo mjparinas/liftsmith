@@ -1,5 +1,5 @@
 // Client payments through Stripe Connect (Melvin, 2026-11-13: "taking client payments, through Stripe Connect"). A coach
-// or personal trainer connects their own Stripe account (with the Express dashboard, set up on Stripe's pages), sets each
+// or personal trainer connects their own Stripe account (with the full Stripe dashboard, set up on Stripe's pages), sets each
 // client's price (per session or monthly), and the client pays on a Stripe Checkout page in the browser. The coach's
 // account is the merchant: the money, the receipts, refunds and disputes are theirs. Liftsmith keeps a small share
 // (`feeFor`, 2%) only from coaches on plain Pro once coach plans are on; Coach and Coach Plus pay nothing. Card details
@@ -145,7 +145,7 @@ async function saveAccount(coachId: string, a: StripeAccount, now: number) {
 export const PAY_RETURN = `${SITE_URL}/app/#/trainer`;
 
 /**
- * The link to Stripe's setup pages for this coach, making their Express account the first time. Stripe asks for their
+ * The link to Stripe's setup pages for this coach, making their Stripe account the first time. Stripe asks for their
  * country, business details and bank account; Liftsmith never sees them.
  */
 export async function onboardUrl(
@@ -162,10 +162,12 @@ export async function onboardUrl(
       "POST",
       "/accounts",
       {
-        // Controller properties, not the legacy `type: "express"`, which Stripe now refuses for new platforms because it
-        // makes Liftsmith liable for a coach's negative balance. Here Stripe covers losses, the coach pays Stripe's own
-        // fees (they're the merchant), and the coach gets the Express dashboard.
-        "controller[stripe_dashboard][type]": "express",
+        // Controller properties, not the legacy `type: "express"`, which Stripe refuses for this platform because it
+        // makes Liftsmith liable for a coach's negative balance. Here Stripe covers losses and the coach pays Stripe's own
+        // fees (they're the merchant). That rules out the Express dashboard too: Stripe allows it only when the platform
+        // collects fees and covers losses (production refused it, 2026-11-16), so the coach gets the full Stripe
+        // dashboard, like a Standard account.
+        "controller[stripe_dashboard][type]": "full",
         "controller[fees][payer]": "account",
         "controller[losses][payments]": "stripe",
         "controller[requirement_collection]": "stripe",
@@ -201,11 +203,15 @@ export async function refreshAccount(cfg: PayConfig, coachId: string, now = Date
   return { ready: !!a.charges_enabled, currency: (a.default_currency ?? "cad").toLowerCase() };
 }
 
-/** A one-time link into the coach's own Stripe dashboard (payouts, refunds, receipts). */
-export async function dashboardUrl(cfg: PayConfig, coachId: string, f: Fetch = fetch): Promise<string | null> {
-  const row = await accountRow(coachId);
-  if (!row) return null;
-  return (await call<{ url: string }>(cfg, "POST", `/accounts/${encodeURIComponent(row.stripe_id)}/login_links`, {}, undefined, f)).url;
+/** Stripe's own dashboard, where the coach signs in to see payouts, refunds and receipts. */
+export const STRIPE_DASHBOARD = "https://dashboard.stripe.com/";
+
+/**
+ * Where Open Stripe goes. A coach's account has the full Stripe dashboard, which they sign in to themselves (one-time
+ * login links exist only for Express dashboards).
+ */
+export async function dashboardUrl(coachId: string): Promise<string | null> {
+  return (await accountRow(coachId)) ? STRIPE_DASHBOARD : null;
 }
 
 // ---------- Prices ----------

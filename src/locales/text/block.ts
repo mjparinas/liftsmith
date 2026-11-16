@@ -34,3 +34,23 @@ export const ja: Partial<Record<Key, Message>> = {
   "block.deload": "ディロード週",
   "block.week": "第{week}週（全{count}週）",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "block.deload": "Semana de deload",
+  "block.week": "Semana {week} de {count}",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "block.deload": "디로드 주간",
+  "block.week": "{count}주 중 {week}주차",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "block.deload": "Deload haftası",
+  "block.week": "Hafta {week} / {count}",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "block.deload": "Tydzień deloadu",
+  "block.week": "Tydzień {week} z {count}",
+};

@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">Süren antrenman yok</string>
+    <string id="NoneBody">Telefonunda bir antrenman başlat, burada görünsün.</string>
+    <string id="Rest">Dinlenme</string>
+    <string id="Next">Sıradaki: $1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START: Seti kaydet</string>
+    <string id="HintAdd">DOWN: +30 s</string>
+</strings>

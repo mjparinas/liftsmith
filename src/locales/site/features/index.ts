@@ -7,11 +7,15 @@ import { es } from "./es";
 import { fr } from "./fr";
 import { it } from "./it";
 import { ja } from "./ja";
+import { ko } from "./ko";
+import { pl } from "./pl";
+import { pt } from "./pt";
+import { tr } from "./tr";
 import type { FeaturesText } from "./types";
 
 export type { FeaturesText } from "./types";
 
-export const FEATURES_TEXT: Record<SiteLang, FeaturesText> = { en, es, fr, de, it, ja };
+export const FEATURES_TEXT: Record<SiteLang, FeaturesText> = { en, es, fr, de, it, ja, pt, ko, pl, tr };
 
 export const featuresText = (lang: SiteLang = "en"): FeaturesText => FEATURES_TEXT[lang];
 

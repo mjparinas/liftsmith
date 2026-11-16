@@ -8,9 +8,23 @@ import { ES_TOOLS } from "./es";
 import { FR_TOOLS } from "./fr";
 import { IT_TOOLS } from "./it";
 import { JA_TOOLS } from "./ja";
+import { KO_TOOLS } from "./ko";
+import { PL_TOOLS } from "./pl";
+import { PT_TOOLS } from "./pt";
+import { TR_TOOLS } from "./tr";
 import { LOCAL_TOOL_SLUGS, type LocalTools, type LocalToolSlug } from "./types";
 
-export const LOCAL_TOOLS: Record<GuideLang, LocalTools> = { es: ES_TOOLS, fr: FR_TOOLS, de: DE_TOOLS, it: IT_TOOLS, ja: JA_TOOLS };
+export const LOCAL_TOOLS: Record<GuideLang, LocalTools> = {
+  es: ES_TOOLS,
+  fr: FR_TOOLS,
+  de: DE_TOOLS,
+  it: IT_TOOLS,
+  ja: JA_TOOLS,
+  pt: PT_TOOLS,
+  ko: KO_TOOLS,
+  pl: PL_TOOLS,
+  tr: TR_TOOLS,
+};
 
 export const isLocalTool = (slug: string): slug is LocalToolSlug => (LOCAL_TOOL_SLUGS as readonly string[]).includes(slug);
 

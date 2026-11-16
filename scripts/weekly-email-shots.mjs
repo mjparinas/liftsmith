@@ -1,5 +1,5 @@
-// The pictures in the weekly tips emails (src/server/weekly/): the real screen each email's button opens, in each of
-// the six languages. It drives the static build through two and a half weeks of four-day training on a fake clock
+// The pictures in the weekly tips emails (src/server/weekly/): the real screen each email's button opens, in
+// every app language. It drives the static build through two and a half weeks of four-day training on a fake clock
 // (like play-capture.mjs), then opens every email's screen in each language and saves it small enough for email:
 //   npm run build:static && node scripts/weekly-email-shots.mjs [base-url]
 // Writes public/email/<lang>/w/<id>.jpg, 600 px wide (shown at 300 px, so sharp on high-density screens).
@@ -13,7 +13,7 @@ import { base } from "./helpers.mjs";
 
 const jiti = createJiti(import.meta.url, { alias: { "@": `${process.cwd()}/src` } });
 const { WEEKLY } = await jiti.import(`${process.cwd()}/src/server/weekly/list.ts`);
-const LANGS = (process.env.LANGS || "en,es,fr,de,it,ja").split(",");
+const LANGS = (process.env.LANGS || "en,es,fr,de,it,ja,pt,ko,pl,tr").split(",");
 const ONLY = process.env.ONLY ? new Set(process.env.ONLY.split(",")) : null;
 const catalogue = async (lang) => (await jiti.import(`${process.cwd()}/src/locales/${lang}.ts`))[lang];
 

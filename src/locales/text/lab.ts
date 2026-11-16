@@ -482,3 +482,318 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.sonos.body":
     "ワークアウト中に Sonos スピーカーを操作します。再生中の曲、スキップ、一時停止、音量。ワークアウトに合わせて、セット中は音楽を大きく、休憩中は小さくし、Sonos のお気に入りで始めて、終了時に一時停止することもできます。連携アプリで Sonos を接続してください。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Replay do trajeto da barra",
+  "lab.barPath.body":
+    "Depois de um agachamento, levantamento terra ou desenvolvimento contado pela câmera, mostra de novo uma rep com o trajeto da barra desenhado sobre um boneco de palitos e dá uma dica se a barra saiu da linha. De lado funciona melhor. Só os pontos que a câmera leu ficam guardados, até a sua próxima série; nenhum vídeo é gravado.",
+  "lab.formCheck.title": "Checagem de técnica pela câmera",
+  "lab.formCheck.body":
+    "Enquanto a câmera conta as reps, ela também observa como elas se movem: agachamentos que param acima da paralela, reps curtas e inclinação para um lado. Entre as séries, dá uma dica e mostra na figura. De lado é melhor para a profundidade; de frente para a câmera, para ver a inclinação.",
+  "lab.speedMax.title": "Máximo do dia pelo aquecimento",
+  "lab.speedMax.body":
+    "Usa a velocidade da barra no aquecimento para estimar o máximo de hoje e sugere um peso de trabalho um pouco mais pesado ou mais leve antes da primeira série pesada. Funciona em agachamentos, levantamentos de quadril, empurradas, remadas e barras fixas, e precisa da sua altura em Seus dados. Séries levadas até a falha com a câmera contando ensinam a ela a sua própria velocidade de fim de série.",
+  "lab.barSpeed.title": "Velocidade da barra pela câmera",
+  "lab.barSpeed.body":
+    "Enquanto a câmera conta as reps, ela também mostra a velocidade da barra, quanto ela desacelerou desde a sua rep mais rápida e a hora de terminar a série. Adicione sua altura em Seus dados para ver velocidades em m/s.",
+  "lab.hrRest.title": "Timer de descanso pela frequência cardíaca",
+  "lab.hrRest.body":
+    "Com um monitor cardíaco ou relógio conectado, o descanso termina mais cedo quando sua frequência cardíaca volta perto de onde estava no início da série. Ele nunca corta mais de 40% do descanso planejado, e +30 s ainda adiciona tempo.",
+  "lab.hrRest.cut":
+    "A frequência voltou a {bpm}, perto dos {start} com que você começou a série, então o descanso ficou {saved} s mais curto. Prepare-se.",
+  "lab.row": "Labs",
+  "lab.rowNote": "Teste recursos experimentais antes",
+  "lab.title": "Labs",
+  "lab.intro":
+    "Experimentos que ainda não estão prontos para todo mundo. Eles podem mudar, falhar ou sumir. Ative o que você quiser testar.",
+  "lab.pro": "Labs faz parte do Pro.",
+  "lab.needs": "Precisa de {lab} ativado.",
+  "lab.repCount.title": "Contagem de reps pela câmera",
+  "lab.repCount.body":
+    "Adiciona Contar reps ao exercício na tela de treino. A câmera acompanha sua série, desenha sobre você o esqueleto que enxerga e preenche suas reps. O vídeo fica no seu celular.",
+  "lab.repMotion.title": "Contagem de reps pelo movimento do celular",
+  "lab.repMotion.body": "Conta as reps pelos sensores de movimento do celular em vez da câmera. Menos confiável.",
+  "lab.watchReps.title": "Contagem de reps pelo relógio",
+  "lab.watchReps.body":
+    "Seu relógio Wear OS ou Apple Watch conta as reps pelo pulso em cada série e preenche para Registrar série no celular. Precisa do app Liftsmith aberto no relógio. Não serve para exercícios em que as mãos ficam paradas, como a barra fixa.",
+  "lab.voiceLog.title": "Registro de séries por voz",
+  "lab.voiceLog.body":
+    "Adiciona um microfone acima de Registrar série na tela de treino. Toque nele e diga “100 por 8”, “8 reps”, “fácil demais” ou “desfazer”. A fala é reconhecida no seu celular e nunca é gravada nem enviada, então precisa de um celular que faça isso no seu idioma.",
+  "lab.machines.title": "Aparelhos de academia Bluetooth",
+  "lab.machines.body":
+    "No cardio, conecte uma bike, remo, esteira ou elíptico que compartilhe os dados por Bluetooth (o padrão de aparelhos fitness que a maioria dos modelos novos usa). Tempo, distância e potência se preenchem sozinhos, prontos para Registrar série, e os ajustes manuais continuam funcionando se algo estiver errado. No app web, precisa do Chrome.",
+  "lab.machines.connect": "Conectar aparelho",
+  "lab.machines.device": "o aparelho",
+  "lab.machines.live": "{name} está preenchendo esta série.",
+  "lab.machines.reconnecting": "Reconectando a {name}… O que ele já enviou fica guardado.",
+  "lab.machines.power": "{watts} W de média",
+  "lab.machines.disconnect": "Desconectar",
+  "lab.machines.err.notFound":
+    "Nenhum aparelho apareceu. Comece a pedalar ou remar para ativá-lo, mantenha o celular perto e confira se ele não está conectado a outro app.",
+  "lab.machines.err.noService": "{name} não compartilha os dados do jeito padrão, então não dá para conectar.",
+  "lab.machines.err.lost": "Conexão com {name} perdida. O que ele já enviou fica guardado. Toque em Conectar aparelho para continuar.",
+  "lab.machines.err.failed":
+    "Não foi possível conectar a {name}. Ele pode estar conectado a outro app ou relógio: desconecte lá, mantenha perto e tente de novo.",
+  "lab.scale.title": "Balança inteligente Bluetooth",
+  "lab.scale.body":
+    "Abaixo da pesagem em Progresso e Corpo, um botão conecta uma balança que compartilha a leitura por Bluetooth do jeito padrão (os padrões de balança e composição corporal). Suba nela, e seu peso e gordura corporal se preenchem, prontos para registrar. Muitas balanças baratas usam o protocolo do próprio app e não vão aparecer. No app web, precisa do Chrome.",
+  "lab.scale.button": "Pesar na minha balança",
+  "lab.scale.which": "Quais balanças funcionam?",
+  "lab.scale.device": "a balança",
+  "lab.scale.connecting": "Procurando sua balança…",
+  "lab.scale.waiting": "Suba na {name} agora.",
+  "lab.scale.got": "{name} fez a leitura. Confira e toque em {log}.",
+  "lab.scale.err.notFound":
+    "Nenhuma balança apareceu. Suba nela para ativá-la, mantenha o celular perto e confira se ela não está conectada ao próprio app agora.",
+  "lab.scale.err.noService": "{name} não compartilha a leitura do jeito padrão, então não dá para conectar.",
+  "lab.scale.err.timeout": "{name} não enviou um peso. Suba de novo e fique parado até estabilizar.",
+  "lab.scale.err.failed": "Não foi possível conectar a {name}. Feche o app dela, mantenha o celular perto e tente de novo.",
+  "lab.handsFree.title": "Séries sem as mãos",
+  "lab.handsFree.body":
+    "Enquanto a contagem de reps pela câmera, pelo movimento do celular ou pelo relógio estiver contando, a série se registra sozinha alguns segundos depois da sua última rep e o descanso começa: 4 segundos quando as reps planejadas estiverem feitas, 8 enquanto faltarem. Desfazer coloca de volta. Precisa de um desses labs de contagem de reps ativado.",
+  "lab.handsFree.soon": "Registrando esta série em {s} s. Faça mais uma rep para continuar.",
+  "lab.tempo.title": "Coach de cadência",
+  "lab.tempo.body":
+    "Em exercícios com cadência ou pausa, como um agachamento com cadência ou um supino com pausa, adiciona Contar cadência acima de Registrar série. Toque quando pegar o peso: depois de 3, 2, 1, ele conta cada segundo de cada rep com sons e vibrações, uma nota descendo para baixar, uma constante para segurar e uma subindo para subir, e para depois das suas reps. Registrar série continua sendo um toque.",
+  "lab.volumeLog.title": "Botão de volume registra a série",
+  "lab.volumeLog.body":
+    "Durante o treino, aperte o volume para cima no celular ou nos fones Bluetooth para registrar a série como planejado, igual a tocar em Registrar série. Apertado durante o descanso, registra a próxima série. O volume volta na hora e sua música continua tocando; o volume para baixo continua abaixando. Funciona com o Liftsmith na tela.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Controle uma caixa Sonos pelo treino: o que está tocando, pular, pausar e volume. Ela também pode acompanhar o treino, aumentando a música nas séries e abaixando no descanso, tocando um favorito do Sonos no início e pausando no fim. Conecte o Sonos em Apps conectados.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "바 궤적 다시 보기",
+  "lab.barPath.body":
+    "카메라로 센 스쿼트, 데드리프트, 오버헤드 프레스 후에 반복 하나를 다시 재생하며 막대 인형 위에 바의 궤적을 그리고, 바가 흐르면 팁을 하나 알려 줘요. 옆에서 찍는 게 가장 좋아요. 카메라가 읽은 점만 다음 세트까지 보관하고, 영상은 녹화하지 않아요.",
+  "lab.formCheck.title": "카메라 자세 체크",
+  "lab.formCheck.body":
+    "카메라가 반복을 세면서 움직임도 살펴봐요. 평행보다 위에서 멈추는 스쿼트, 짧게 끝난 반복, 한쪽으로 기우는 자세예요. 세트 사이에 팁을 하나 주고 인체 모형으로 보여 줘요. 깊이는 옆에서, 기울기는 카메라를 정면으로 보고 확인하는 게 가장 좋아요.",
+  "lab.speedMax.title": "워밍업으로 보는 오늘의 최대 중량",
+  "lab.speedMax.body":
+    "워밍업의 바 속도로 오늘의 최대 중량을 추정하고, 첫 고강도 세트 전에 본 세트 무게를 조금 무겁게 또는 가볍게 제안해요. 스쿼트, 힌지, 프레스, 로우, 풀업에서 작동하며, 내 신체 정보에 키가 필요해요. 카메라가 세는 동안 한계까지 한 세트로 내 세트 마지막 속도를 학습해요.",
+  "lab.barSpeed.title": "카메라 바 속도",
+  "lab.barSpeed.body":
+    "카메라가 반복을 세면서 바가 얼마나 빨리 움직이는지, 가장 빠른 반복보다 얼마나 느려졌는지, 언제 세트를 끝내면 좋을지도 보여 줘요. 내 신체 정보에 키를 추가하면 속도를 m/s로 볼 수 있어요.",
+  "lab.hrRest.title": "심박수 휴식 타이머",
+  "lab.hrRest.body":
+    "심박 모니터나 워치를 연결하면, 심박수가 세트를 시작할 때 수준 가까이 돌아왔을 때 휴식이 일찍 끝나요. 계획된 휴식의 40% 넘게 줄이지는 않으며, +30초로 시간을 늘릴 수도 있어요.",
+  "lab.hrRest.cut": "심박수가 {bpm}(으)로 돌아와 세트 시작 때의 {start}에 가까워져서 휴식을 {saved}초 줄였어요. 준비하세요.",
+  "lab.row": "실험실",
+  "lab.rowNote": "실험 기능을 먼저 써 보세요",
+  "lab.title": "실험실",
+  "lab.intro": "아직 모두에게 내놓기엔 이른 실험 기능이에요. 바뀌거나, 오작동하거나, 사라질 수 있어요. 써 보고 싶은 기능을 켜세요.",
+  "lab.pro": "실험실은 Pro 기능이에요.",
+  "lab.needs": "{lab}을(를) 켜야 해요.",
+  "lab.repCount.title": "카메라 반복 세기",
+  "lab.repCount.body":
+    "운동 화면의 운동 동작에 반복 세기를 추가해요. 카메라가 세트를 보면서 인식한 뼈대를 몸 위에 그리고 반복 수를 채워 줘요. 영상은 휴대폰에만 남아요.",
+  "lab.repMotion.title": "휴대폰 동작 감지 반복 세기",
+  "lab.repMotion.body": "카메라 대신 휴대폰의 동작 센서로 반복을 세요. 정확도는 떨어져요.",
+  "lab.watchReps.title": "워치 반복 세기",
+  "lab.watchReps.body":
+    "Wear OS 워치나 Apple Watch가 세트마다 손목 움직임으로 반복을 세서 휴대폰의 세트 기록에 채워 줘요. 손목에서 Liftsmith 워치 앱이 열려 있어야 해요. 풀업처럼 손이 움직이지 않는 리프트에는 맞지 않아요.",
+  "lab.voiceLog.title": "음성 세트 기록",
+  "lab.voiceLog.body":
+    "운동 화면의 세트 기록 위에 마이크를 추가해요. 탭하고 “100에 8회”, “8회”, “너무 쉬워”, “취소”라고 말하세요. 음성은 휴대폰에서 인식하고 절대 녹음하거나 전송하지 않으므로, 내 언어로 음성 인식을 할 수 있는 휴대폰이 필요해요.",
+  "lab.machines.title": "Bluetooth 운동 기구",
+  "lab.machines.body":
+    "유산소 운동에서 Bluetooth로 수치를 공유하는 실내 자전거, 로잉 머신, 러닝머신, 크로스 트레이너를 연결하세요(최신 기구 대부분이 쓰는 피트니스 기구 표준). 시간, 거리, 파워가 자동으로 채워져 바로 세트 기록을 할 수 있고, 무언가 맞지 않으면 직접 조절할 수도 있어요. 웹 앱에서는 Chrome이 필요해요.",
+  "lab.machines.connect": "기구 연결",
+  "lab.machines.device": "운동 기구",
+  "lab.machines.live": "{name}이(가) 이 세트를 채우고 있어요.",
+  "lab.machines.reconnecting": "{name}에 다시 연결하는 중… 지금까지 받은 값은 유지돼요.",
+  "lab.machines.power": "평균 {watts}W",
+  "lab.machines.disconnect": "연결 끊기",
+  "lab.machines.err.notFound":
+    "운동 기구를 찾지 못했어요. 페달을 밟거나 노를 저어 기구를 깨우고, 휴대폰을 가까이 두고, 다른 앱에 연결돼 있지 않은지 확인하세요.",
+  "lab.machines.err.noService": "{name}은(는) 표준 방식으로 수치를 공유하지 않아서 연결할 수 없어요.",
+  "lab.machines.err.lost": "{name} 연결이 끊겼어요. 지금까지 받은 값은 유지돼요. 기구 연결을 탭해서 계속하세요.",
+  "lab.machines.err.failed":
+    "{name}에 연결하지 못했어요. 다른 앱이나 워치에 연결돼 있을 수 있어요. 거기서 연결을 끊고 가까이 둔 다음 다시 시도하세요.",
+  "lab.scale.title": "Bluetooth 스마트 체중계",
+  "lab.scale.body":
+    "진행과 몸 화면의 체중 기록 아래에 있는 버튼으로, Bluetooth 표준 방식(체중계 및 체성분 표준)으로 측정값을 공유하는 체중계를 연결해요. 올라서면 체중과 체지방이 채워져 바로 기록할 수 있어요. 저렴한 체중계 중에는 자체 앱 프로토콜을 써서 나타나지 않는 것이 많아요. 웹 앱에서는 Chrome이 필요해요.",
+  "lab.scale.button": "체중계로 재기",
+  "lab.scale.which": "어떤 체중계가 되나요?",
+  "lab.scale.device": "체중계",
+  "lab.scale.connecting": "체중계를 찾는 중…",
+  "lab.scale.waiting": "지금 {name}에 올라서세요.",
+  "lab.scale.got": "{name}이(가) 측정했어요. 확인하고 {log}을(를) 탭하세요.",
+  "lab.scale.err.notFound":
+    "체중계를 찾지 못했어요. 올라서서 체중계를 깨우고, 휴대폰을 가까이 두고, 지금 체중계 전용 앱에 연결돼 있지 않은지 확인하세요.",
+  "lab.scale.err.noService": "{name}은(는) 표준 방식으로 측정값을 공유하지 않아서 연결할 수 없어요.",
+  "lab.scale.err.timeout": "{name}이(가) 체중을 보내지 않았어요. 다시 올라서서 숫자가 멈출 때까지 가만히 서 계세요.",
+  "lab.scale.err.failed": "{name}에 연결하지 못했어요. 체중계 전용 앱을 닫고, 휴대폰을 가까이 둔 다음 다시 시도하세요.",
+  "lab.handsFree.title": "핸즈프리 세트",
+  "lab.handsFree.body":
+    "카메라, 휴대폰 동작 감지, 워치 반복 세기가 작동하는 동안 마지막 반복 몇 초 뒤에 세트가 자동으로 기록되고 휴식이 시작돼요. 계획한 반복을 채우면 4초, 모자라면 8초 뒤예요. 실행 취소로 되돌릴 수 있어요. 반복 세기 실험 기능 중 하나를 켜야 해요.",
+  "lab.handsFree.soon": "{s}초 후 이 세트를 기록해요. 계속하려면 한 번 더 반복하세요.",
+  "lab.tempo.title": "템포 코치",
+  "lab.tempo.body":
+    "템포 스쿼트나 포즈 벤치 프레스 같은 템포 및 정지 리프트에서 세트 기록 위에 템포 세기를 추가해요. 무게를 들 때 탭하세요. 3, 2, 1 뒤에 반복마다 매초를 소리와 진동으로 세어 줘요. 내릴 때는 내려가는 음, 버틸 때는 일정한 음, 올릴 때는 올라가는 음이고, 반복을 마치면 멈춰요. 세트 기록은 여전히 한 번 탭이에요.",
+  "lab.volumeLog.title": "볼륨 버튼으로 세트 기록",
+  "lab.volumeLog.body":
+    "운동 중에 휴대폰이나 Bluetooth 이어폰의 볼륨 업 버튼을 누르면 세트 기록을 탭한 것처럼 계획대로 세트를 기록해요. 휴식 중에 누르면 다음 세트를 기록해요. 볼륨은 바로 원래대로 돌아가고 음악도 계속 재생돼요. 볼륨 다운은 그대로 볼륨을 줄여요. Liftsmith가 화면에 떠 있을 때 작동해요.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "운동 중에 Sonos 스피커를 조작하세요. 재생 중인 곡, 건너뛰기, 일시 정지, 볼륨이에요. 운동에 맞춰 세트 때는 음악을 키우고 휴식 때는 줄이며, 시작할 때 Sonos 즐겨찾기를 틀고 끝날 때 일시 정지할 수도 있어요. 연결된 앱에서 Sonos를 연결하세요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Bar yolu tekrarı",
+  "lab.barPath.body":
+    "Kamerayla sayılan bir squat, deadlift ya da overhead press'ten sonra bir tekrarı, barın yolu bir çöp adam üzerine çizilmiş olarak tekrar oynatır ve bar kaydıysa bir ipucu verir. En iyisi yandan. Sadece kameranın okuduğu noktalar bir sonraki setine kadar saklanır; video kaydedilmez.",
+  "lab.formCheck.title": "Kamerayla form kontrolü",
+  "lab.formCheck.body":
+    "Kamera tekrarları sayarken nasıl hareket ettiklerini de izler: paralelin üstünde kalan squatlar, kısa kesilen tekrarlar ve bir yana yatma. Setler arasında bir ipucu verir ve figürde gösterir. Derinlik için en iyisi yandan; yana yatmayı kontrol etmek için kameraya dön.",
+  "lab.speedMax.title": "Isınmalardan bugünkü maksimum",
+  "lab.speedMax.body":
+    "Bugünkü maksimumunu tahmin etmek için ısınmalarındaki bar hızını kullanır, sonra ilk zor setinden önce biraz daha ağır ya da hafif bir çalışma ağırlığı önerir. Squat, hinge, press, row ve barfikslerde çalışır ve Bilgilerin'de boyunun girilmiş olmasını ister. Kamera sayarken tükenişe kadar götürdüğün setler ona kendi set sonu hızını öğretir.",
+  "lab.barSpeed.title": "Kamerayla bar hızı",
+  "lab.barSpeed.body":
+    "Kamera tekrarları sayarken barın ne kadar hızlı gittiğini, en hızlı tekrarından bu yana ne kadar yavaşladığını ve seti bitirme zamanının geldiğini de gösterir. Hızları m/s olarak görmek için Bilgilerin'e boyunu ekle.",
+  "lab.hrRest.title": "Nabza göre dinlenme sayacı",
+  "lab.hrRest.body":
+    "Bir nabız ölçer ya da saat bağlıyken, nabzın set başladığındaki seviyeye yakın dönünce dinlenme erken biter. Planlanan dinlenmenin %40'ından fazlasını asla kesmez ve +30 s yine süre ekler.",
+  "lab.hrRest.cut": "Nabzın {bpm} seviyesine döndü, o sete başladığın {start} değerine yakın; bu yüzden dinlenme {saved} s kısa. Hazırlan.",
+  "lab.row": "Laboratuvar",
+  "lab.rowNote": "Deneysel özellikleri erkenden dene",
+  "lab.title": "Laboratuvar",
+  "lab.intro": "Henüz herkese hazır olmayan deneyler. Değişebilir, tuhaf davranabilir ya da kaldırılabilirler. Denemek istediklerini aç.",
+  "lab.pro": "Laboratuvar, Pro'nun bir parçası.",
+  "lab.needs": "{lab} açık olmalı.",
+  "lab.repCount.title": "Kamerayla tekrar sayma",
+  "lab.repCount.body":
+    "Antrenman ekranındaki egzersize Tekrarları say ekler. Kamera setini izler, gördüğü iskeleti üzerine çizer ve tekrarlarını doldurur. Video telefonunda kalır.",
+  "lab.repMotion.title": "Telefon hareketiyle tekrar sayma",
+  "lab.repMotion.body": "Tekrarları kamera yerine telefonun hareket sensörleriyle say. Daha az güvenilir.",
+  "lab.watchReps.title": "Saatle tekrar sayma",
+  "lab.watchReps.body":
+    "Wear OS saatin ya da Apple Watch'ın her set boyunca bileğinden tekrarları sayar ve telefonundaki Seti kaydet için doldurur. Bileğinde Liftsmith saat uygulamasının açık olması gerekir. Barfiks gibi ellerin sabit kaldığı hareketler için değil.",
+  "lab.voiceLog.title": "Sesle set kaydı",
+  "lab.voiceLog.body":
+    "Antrenman ekranında Seti kaydet'in üstüne bir mikrofon ekler. Dokun ve “100'e 8”, “8 tekrar”, “çok kolay” ya da “geri al” de. Konuşma telefonunda tanınır, asla kaydedilmez ya da gönderilmez; bu yüzden bunu senin dilinde yapabilen bir telefon gerekir.",
+  "lab.machines.title": "Bluetooth spor aletleri",
+  "lab.machines.body":
+    "Kardiyoda, sayılarını Bluetooth üzerinden paylaşan bir bisiklet, kürek, koşu bandı ya da eliptik bağla (yeni aletlerin çoğunun kullandığı fitness aleti standardı). Süre, mesafe ve güç kendiliğinden dolar, Seti kaydet için hazır olur; bir şey yanlışsa ayarlayıcılar yine çalışır. Web uygulamasında Chrome gerekir.",
+  "lab.machines.connect": "Alet bağla",
+  "lab.machines.device": "alet",
+  "lab.machines.live": "{name} bu seti dolduruyor.",
+  "lab.machines.reconnecting": "{name} cihazına yeniden bağlanılıyor… Şimdiye kadar gönderdikleri saklanıyor.",
+  "lab.machines.power": "Ortalama {watts} W",
+  "lab.machines.disconnect": "Bağlantıyı kes",
+  "lab.machines.err.notFound":
+    "Hiç spor aleti görünmedi. Uyandırmak için pedal çevirmeye ya da kürek çekmeye başla, telefonunu yakın tut ve başka bir uygulamaya bağlı olmadığından emin ol.",
+  "lab.machines.err.noService": "{name} sayılarını standart yolla paylaşmıyor, bu yüzden bağlanamıyor.",
+  "lab.machines.err.lost": "{name} bağlantısı koptu. Şimdiye kadar gönderdikleri saklandı. Devam etmek için Alet bağla'ya dokun.",
+  "lab.machines.err.failed":
+    "{name} cihazına bağlanılamadı. Başka bir uygulamaya ya da saate bağlı olabilir: oradan bağlantısını kes, yakında tut ve tekrar dene.",
+  "lab.scale.title": "Bluetooth akıllı tartı",
+  "lab.scale.body":
+    "İlerleme ve Vücut'taki tartı kaydının altında bir düğme, ölçümünü Bluetooth üzerinden standart yolla (tartı ve vücut kompozisyonu standartları) paylaşan bir tartıyı bağlar. Üstüne çık, kilon ve vücut yağın kaydetmeye hazır şekilde dolsun. Pek çok ucuz tartı bunun yerine kendi uygulamasının protokolünü kullanır ve görünmez. Web uygulamasında Chrome gerekir.",
+  "lab.scale.button": "Tartımda tartıl",
+  "lab.scale.which": "Hangi tartılar çalışır?",
+  "lab.scale.device": "tartı",
+  "lab.scale.connecting": "Tartın aranıyor…",
+  "lab.scale.waiting": "Şimdi {name} üstüne çık.",
+  "lab.scale.got": "{name} ölçtü. Kontrol et ve {log} seçeneğine dokun.",
+  "lab.scale.err.notFound":
+    "Hiç tartı görünmedi. Uyandırmak için üstüne çık, telefonunu yakın tut ve şu an kendi uygulamasına bağlı olmadığından emin ol.",
+  "lab.scale.err.noService": "{name} ölçümünü standart yolla paylaşmıyor, bu yüzden bağlanamıyor.",
+  "lab.scale.err.timeout": "{name} bir ağırlık göndermedi. Tekrar üstüne çık ve sabitlenene kadar kıpırdama.",
+  "lab.scale.err.failed": "{name} cihazına bağlanılamadı. Kendi uygulamasını kapat, telefonunu yakın tut ve tekrar dene.",
+  "lab.handsFree.title": "Eller serbest setler",
+  "lab.handsFree.body":
+    "Kamera, telefon hareketi ya da saatle tekrar sayma çalışırken set, son tekrarından birkaç saniye sonra kendini kaydeder ve dinlenme başlar: planlanan tekrarların tamamsa 4 saniye, eksikse 8 saniye. Geri al onu geri koyar. Bu tekrar sayma laboratuvarlarından birinin açık olması gerekir.",
+  "lab.handsFree.soon": "Bu set {s} s içinde kaydediliyor. Devam etmek için bir tekrar daha yap.",
+  "lab.tempo.title": "Tempo koçu",
+  "lab.tempo.body":
+    "Tempo squat ya da duraklamalı bench press gibi tempolu ve duraklamalı hareketlerde Seti kaydet'in üstüne Tempoyu say ekler. Ağırlığı alırken dokun: 3, 2, 1'den sonra her tekrarın her saniyesini ses ve titreşimle sayar; indirmek için düşen bir nota, tutmak için sabit bir nota, kaldırmak için yükselen bir nota, tekrarların bitince de durur. Seti kaydet hâlâ tek dokunuş.",
+  "lab.volumeLog.title": "Ses tuşu seti kaydeder",
+  "lab.volumeLog.body":
+    "Antrenman sırasında, seti plana göre kaydetmek için telefonunda ya da Bluetooth kulaklığında sesi açma tuşuna bas; Seti kaydet'e dokunmakla aynı. Dinlenmede basarsan sonraki seti kaydeder. Ses hemen eski haline döner ve müziğin çalmaya devam eder; ses kısma tuşu yine sesi kısar. Liftsmith ekrandayken çalışır.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Antrenmandan bir Sonos hoparlörünü kontrol et: çalan şarkı, geçme, duraklatma ve ses. Antrenmanı da takip edebilir: setlerde müziği açar, dinlenmede kısar, bir Sonos favorisini başlatır ve sonunda duraklatır. Sonos'u Bağlı uygulamalar'dan bağla.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Powtórka toru sztangi",
+  "lab.barPath.body":
+    "Po przysiadzie, martwym ciągu lub wyciskaniu nad głowę liczonym kamerą odtwarza jedno powtórzenie z torem sztangi narysowanym na patyczkowej sylwetce i daje jedną wskazówkę, jeśli sztanga uciekła. Najlepiej z boku. Zachowywane są tylko punkty odczytane przez kamerę, do następnej serii; wideo nie jest nagrywane.",
+  "lab.formCheck.title": "Kontrola techniki kamerą",
+  "lab.formCheck.body":
+    "Gdy kamera liczy powtórzenia, sprawdza też, jak przebiegają: przysiady kończone nad równoległą, skrócone powtórzenia i przechylanie się na bok. Między seriami daje jedną wskazówkę i pokazuje ją na sylwetce. Z boku najlepiej widać głębokość; stań przodem do kamery, żeby sprawdzić przechył.",
+  "lab.speedMax.title": "Dzisiejsze maksimum z rozgrzewki",
+  "lab.speedMax.body":
+    "Na podstawie prędkości sztangi w rozgrzewce szacuje dzisiejsze maksimum, a potem proponuje trochę cięższy lub lżejszy ciężar roboczy przed pierwszą ciężką serią. Działa w przysiadach, ćwiczeniach z zawiasem biodrowym, wyciskaniach, wiosłowaniach i podciąganiach i wymaga podania wzrostu w Twoich danych. Serie do upadku liczone kamerą uczą go twojej prędkości z końca serii.",
+  "lab.barSpeed.title": "Prędkość sztangi z kamery",
+  "lab.barSpeed.body":
+    "Gdy kamera liczy powtórzenia, pokazuje też, jak szybko porusza się sztanga, o ile zwolniła od najszybszego powtórzenia i kiedy czas zakończyć serię. Dodaj wzrost w Twoich danych, żeby widzieć prędkość w m/s.",
+  "lab.hrRest.title": "Minutnik przerwy według tętna",
+  "lab.hrRest.body":
+    "Z podłączonym pulsometrem lub zegarkiem przerwa kończy się wcześniej, gdy tętno wróci blisko poziomu z początku serii. Nigdy nie skraca jej o więcej niż 40% planu, a +30 s nadal dodaje czas.",
+  "lab.hrRest.cut": "Tętno wróciło do {bpm}, blisko {start} z początku serii, więc przerwa jest krótsza o {saved} s. Przygotuj się.",
+  "lab.row": "Laboratorium",
+  "lab.rowNote": "Wypróbuj eksperymentalne funkcje wcześniej",
+  "lab.title": "Laboratorium",
+  "lab.intro":
+    "Eksperymenty, które nie są jeszcze gotowe dla wszystkich. Mogą się zmienić, działać dziwnie albo zniknąć. Włącz to, co chcesz wypróbować.",
+  "lab.pro": "Laboratorium jest częścią Pro.",
+  "lab.needs": "Wymaga włączenia: {lab}.",
+  "lab.repCount.title": "Liczenie powtórzeń kamerą",
+  "lab.repCount.body":
+    "Dodaje Licz powtórzenia do ćwiczenia na ekranie treningu. Kamera obserwuje serię, rysuje na tobie wykryte kości i wpisuje powtórzenia. Wideo zostaje na telefonie.",
+  "lab.repMotion.title": "Liczenie powtórzeń ruchem telefonu",
+  "lab.repMotion.body": "Liczy powtórzenia z czujników ruchu telefonu zamiast kamery. Mniej niezawodne.",
+  "lab.watchReps.title": "Liczenie powtórzeń zegarkiem",
+  "lab.watchReps.body":
+    "Zegarek z Wear OS lub Apple Watch liczy powtórzenia z nadgarstka w każdej serii i wpisuje je do Zapisz serię na telefonie. Wymaga otwartej aplikacji Liftsmith na zegarku. Nie dla ćwiczeń, w których dłonie się nie ruszają, jak podciąganie.",
+  "lab.voiceLog.title": "Zapisywanie serii głosem",
+  "lab.voiceLog.body":
+    "Dodaje mikrofon nad Zapisz serię na ekranie treningu. Stuknij go i powiedz „100 na 8”, „8 powtórzeń”, „za łatwo” albo „cofnij”. Mowa jest rozpoznawana na telefonie i nigdy nie jest nagrywana ani wysyłana, więc telefon musi to umieć w twoim języku.",
+  "lab.machines.title": "Maszyny na siłowni przez Bluetooth",
+  "lab.machines.body":
+    "W cardio połącz rower, wioślarz, bieżnię lub orbitrek, który udostępnia dane przez Bluetooth (standard maszyn fitness, którego używa większość nowszych maszyn). Czas, dystans i moc wpisują się same, gotowe do Zapisz serię, a przyciski +/− nadal działają, jeśli coś się nie zgadza. W aplikacji webowej wymaga Chrome.",
+  "lab.machines.connect": "Połącz maszynę",
+  "lab.machines.device": "maszyna",
+  "lab.machines.live": "{name} wypełnia tę serię.",
+  "lab.machines.reconnecting": "Ponowne łączenie: {name}… Dotychczas wysłane dane zostają.",
+  "lab.machines.power": "Średnio {watts} W",
+  "lab.machines.disconnect": "Rozłącz",
+  "lab.machines.err.notFound":
+    "Nie znaleziono maszyny. Zacznij pedałować lub wiosłować, żeby ją wybudzić, trzymaj telefon blisko i sprawdź, czy nie jest połączona z inną aplikacją.",
+  "lab.machines.err.noService": "{name}: urządzenie nie udostępnia danych w standardowy sposób, więc nie można się połączyć.",
+  "lab.machines.err.lost": "Utracono połączenie: {name}. Dotychczas wysłane dane zostają. Stuknij Połącz maszynę, żeby kontynuować.",
+  "lab.machines.err.failed":
+    "Nie udało się połączyć: {name}. Może być połączona z inną aplikacją lub zegarkiem: rozłącz ją tam, trzymaj blisko i spróbuj ponownie.",
+  "lab.scale.title": "Inteligentna waga Bluetooth",
+  "lab.scale.body":
+    "Pod ważeniem w Postępach i Ciele przycisk łączy wagę, która udostępnia odczyt przez Bluetooth w standardowy sposób (standardy wagi i składu ciała). Stań na niej, a waga i tkanka tłuszczowa wpiszą się same, gotowe do zapisania. Wiele tanich wag używa zamiast tego protokołu własnej aplikacji i się nie pojawi. W aplikacji webowej wymaga Chrome.",
+  "lab.scale.button": "Zważ się na mojej wadze",
+  "lab.scale.which": "Które wagi działają?",
+  "lab.scale.device": "waga",
+  "lab.scale.connecting": "Szukam twojej wagi…",
+  "lab.scale.waiting": "Stań teraz na wadze ({name}).",
+  "lab.scale.got": "{name}: odczyt gotowy. Sprawdź go i stuknij {log}.",
+  "lab.scale.err.notFound":
+    "Nie znaleziono wagi. Stań na niej, żeby ją wybudzić, trzymaj telefon blisko i sprawdź, czy nie jest teraz połączona z własną aplikacją.",
+  "lab.scale.err.noService": "{name}: urządzenie nie udostępnia odczytu w standardowy sposób, więc nie można się połączyć.",
+  "lab.scale.err.timeout": "{name}: nie przesłano wagi. Stań na niej ponownie i stój nieruchomo, aż odczyt się ustabilizuje.",
+  "lab.scale.err.failed": "Nie udało się połączyć: {name}. Zamknij jej własną aplikację, trzymaj telefon blisko i spróbuj ponownie.",
+  "lab.handsFree.title": "Serie bez rąk",
+  "lab.handsFree.body":
+    "Gdy liczenie powtórzeń kamerą, ruchem telefonu lub zegarkiem działa, seria zapisuje się sama kilka sekund po ostatnim powtórzeniu i zaczyna się przerwa: 4 sekundy, gdy masz już zaplanowane powtórzenia, 8, gdy jeszcze ich brakuje. Cofnij przywraca serię. Wymaga włączenia jednego z tych eksperymentów z liczeniem powtórzeń.",
+  "lab.handsFree.soon": "Zapisuję serię za {s} s. Zrób kolejne powtórzenie, żeby kontynuować.",
+  "lab.tempo.title": "Trener tempa",
+  "lab.tempo.body":
+    "W ćwiczeniach z tempem i pauzą, jak przysiad z tempem czy wyciskanie z pauzą, dodaje Licz tempo nad Zapisz serię. Stuknij, gdy bierzesz ciężar: po 3, 2, 1 odlicza każdą sekundę każdego powtórzenia dźwiękiem i wibracją, opadający ton przy opuszczaniu, równy przy zatrzymaniu i rosnący przy podnoszeniu, a po twoich powtórzeniach milknie. Zapisz serię to nadal jedno stuknięcie.",
+  "lab.volumeLog.title": "Przycisk głośności zapisuje serię",
+  "lab.volumeLog.body":
+    "Podczas treningu naciśnij głośniej na telefonie lub słuchawkach Bluetooth, żeby zapisać serię zgodnie z planem, tak jak stuknięcie Zapisz serię. Naciśnięty w przerwie zapisuje następną serię. Głośność od razu wraca, a muzyka gra dalej; ciszej nadal ścisza. Działa, gdy Liftsmith jest na ekranie.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Steruj głośnikiem Sonos z treningu: co gra, następny utwór, pauza i głośność. Może też podążać za treningiem: podgłaśniać muzykę w seriach i ściszać w przerwach, włączać ulubione z Sonos na start i pauzować na koniec. Połącz Sonos w Połączonych aplikacjach.",
+};

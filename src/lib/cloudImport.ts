@@ -4,12 +4,23 @@ import type { CloudCardio, CloudReading } from "./cloud";
 import { MANUAL_RIR } from "./dashboard";
 import type { AppEvent, BodyweightEvent, HealthEvent, HealthMetric, SessionEndEvent, SessionStartEvent, SetEvent } from "./types";
 
-/** Concept2 machines to the library's cardio exercises (all logged with distance). */
-export const C2_EXERCISE: Record<CloudCardio["kind"], string> = {
+/**
+ * Cloud cardio kinds to the library's cardio exercises. Concept2's machines (rower, SkiErg, BikeErg) are all
+ * logged with distance; Garmin adds runs and rides (distance) and elliptical and stair sessions (time only).
+ */
+export const CARDIO_EXERCISE: Record<CloudCardio["kind"], string> = {
   rower: "rowing-machine",
   skierg: "ski-erg",
   bike: "stationary-bike",
+  run: "outdoor-run",
+  treadmill: "treadmill-run",
+  ride: "outdoor-cycling",
+  elliptical: "elliptical",
+  stairs: "stair-climber",
 };
+
+/** Event id prefix per service, so the same session is never imported twice ("c2-…" since Concept2 shipped). */
+export const CARDIO_PREFIX = { concept2: "c2", garmin: "garmin" } as const;
 
 /**
  * Health readings become `health` events (`<source>-<metric>-<day>-<value>`, as before). A scale's weight and
@@ -54,15 +65,27 @@ export function cloudReadingEvents(source: string, readings: readonly CloudReadi
 }
 
 /**
- * Each Concept2 session as a finished cardio workout, written like a hand-logged past workout (dashboard.ts):
- * a manual session start, one set (reps are the seconds, with the distance) and an end. Ids `c2-<id>`.
+ * Each cloud cardio session as a finished cardio workout, written like a hand-logged past workout (dashboard.ts):
+ * a manual session start, one set (reps are the seconds, with the distance when there is one) and an end. Ids
+ * `c2-<id>` (Concept2) or `garmin-<id>`. `busy` holds the start and end of workouts already on the device: a
+ * Garmin session that overlaps one is left out, because the watch also records cardio done inside a Liftsmith
+ * workout (or a row the Concept2 Logbook already sent).
  */
-export function cloudCardioEvents(sessions: readonly CloudCardio[], gymId: string, now: number, have: ReadonlySet<string>): AppEvent[] {
+export function cloudCardioEvents(
+  sessions: readonly CloudCardio[],
+  gymId: string,
+  now: number,
+  have: ReadonlySet<string>,
+  source: keyof typeof CARDIO_PREFIX = "concept2",
+  busy: readonly (readonly [number, number])[] = [],
+): AppEvent[] {
   const out: AppEvent[] = [];
   for (const c of sessions) {
-    const sessionId = `c2-${c.id}`;
+    const sessionId = `${CARDIO_PREFIX[source]}-${c.id}`;
     if (have.has(`${sessionId}-start`) || c.start > now) continue;
-    const exerciseId = C2_EXERCISE[c.kind];
+    const finish = c.start + c.seconds * 1000;
+    if (source !== "concept2" && busy.some(([a, b]) => c.start < b && finish > a)) continue;
+    const exerciseId = CARDIO_EXERCISE[c.kind];
     const start: SessionStartEvent = {
       type: "sessionStart",
       id: `${sessionId}-start`,
@@ -81,7 +104,7 @@ export function cloudCardioEvents(sessions: readonly CloudCardio[], gymId: strin
       weight: 0,
       reps: c.seconds,
       targetReps: c.seconds,
-      distanceM: c.distanceM,
+      ...(c.distanceM > 0 ? { distanceM: c.distanceM } : {}),
       rir: MANUAL_RIR,
     };
     const end: SessionEndEvent = {

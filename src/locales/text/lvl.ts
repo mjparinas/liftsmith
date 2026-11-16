@@ -70,3 +70,47 @@ export const ja: Partial<Record<Key, Message>> = {
   "lvl.legend": "レジェンド",
   "lvl.mythic": "ミシック",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "Novato",
+  "lvl.regular": "Frequente",
+  "lvl.grinder": "Ralador",
+  "lvl.iron": "Ferro",
+  "lvl.steel": "Aço",
+  "lvl.titan": "Titã",
+  "lvl.legend": "Lenda",
+  "lvl.mythic": "Mítico",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "루키",
+  "lvl.regular": "레귤러",
+  "lvl.grinder": "그라인더",
+  "lvl.iron": "아이언",
+  "lvl.steel": "스틸",
+  "lvl.titan": "타이탄",
+  "lvl.legend": "레전드",
+  "lvl.mythic": "미시컬",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "Çaylak",
+  "lvl.regular": "Müdavim",
+  "lvl.grinder": "Azimli",
+  "lvl.iron": "Demir",
+  "lvl.steel": "Çelik",
+  "lvl.titan": "Titan",
+  "lvl.legend": "Efsane",
+  "lvl.mythic": "Mitik",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "Nowicjusz",
+  "lvl.regular": "Bywalec",
+  "lvl.grinder": "Harownik",
+  "lvl.iron": "Żelazo",
+  "lvl.steel": "Stal",
+  "lvl.titan": "Tytan",
+  "lvl.legend": "Legenda",
+  "lvl.mythic": "Mityczny",
+};

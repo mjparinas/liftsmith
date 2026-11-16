@@ -224,6 +224,10 @@ export const it: FeaturesText = {
       name: "Peso, massa grassa e foto",
       body: "Registra peso e massa grassa, o lasciali arrivare dalla bilancia tramite l’app di salute del telefono, e tieni le foto dei progressi sul telefono.",
     },
+    "photo-compare": {
+      name: "Foto dei progressi che si allineano",
+      body: "La fotocamera mostra l’ultima foto come un contorno tenue a cui allinearti, con l’autoscatto per allontanarti. Confronta due date qualsiasi con il cursore o affiancate, ognuna con il tuo peso di quel giorno. Le foto restano sul telefono; un file di backup può portarle su uno nuovo.",
+    },
     measurements: {
       name: "Misure con il metro",
       body: "Nove punti in centimetri o pollici. Un girovita che cresce o cala diventa una nota del coach quando manca la massa grassa.",
@@ -448,7 +452,7 @@ export const it: FeaturesText = {
     },
     cloud: {
       name: "Collegamenti ai servizi fitness",
-      body: "Oura invia sonno, HRV, battito a riposo e passi, con un account gratuito. Stiamo valutando Strava, WHOOP, Withings, Polar e Concept2.",
+      body: "Oura invia sonno, HRV, battito a riposo e passi, con un account gratuito. Stiamo valutando Strava, Garmin Connect, WHOOP, Withings, Polar e Concept2.",
     },
     "health-save": {
       name: "Allenamenti salvati nella tua app di salute",
@@ -479,8 +483,8 @@ export const it: FeaturesText = {
       body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
     },
     languages: {
-      name: "Sei lingue",
-      body: "Inglese, spagnolo, francese, tedesco, italiano e giapponese, secondo la lingua del telefono.",
+      name: "Dieci lingue",
+      body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono.",
     },
     appearance: {
       name: "Scuro, chiaro o come il telefono",
@@ -620,6 +624,9 @@ export const it: FeaturesText = {
     },
     oura: { does: "In entrata sonno, HRV, battito a riposo e passi" },
     strava: { does: "Ogni allenamento finito pubblicato su Strava" },
+    "garmin-connect": {
+      does: "Sonno, HRV, battito a riposo, passi e pesate della bilancia Index in entrata, e corse, uscite in bici e sessioni di vogatore come allenamenti cardio",
+    },
     whoop: { does: "In entrata sonno, recupero, HRV e battito a riposo" },
     withings: { does: "In entrata peso, massa grassa, sonno e passi" },
     polar: { does: "In entrata Nightly Recharge, HRV e sonno" },

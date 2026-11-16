@@ -99,3 +99,158 @@ export const ja: Partial<Record<Key, Message>> = {
   "egg.unit.retriever": { other: "ゴールデンレトリバー{n}匹" },
   "egg.unit.bluewhale": { other: "シロナガスクジラ{n}頭" },
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "egg.joke.420": "420 na barra. Boa. Número bem tranquilo para uma série bem pesada.",
+  "egg.joke.1337": "1337: elite. Literalmente. É a gíria hacker para muito, muito bom.",
+  "egg.title": "Sua vida toda, em outras unidades",
+  "egg.lead": "Você já levantou {total} no total. Isso é cerca de:",
+  "egg.empty": "Levante alguma coisa primeiro, depois volte para ver quanto pesa em elefantes.",
+  "egg.note": "Massas aproximadas, só por diversão. Você achou um segredo.",
+  "egg.unit.elephant": {
+    one: "{n} elefante-africano",
+    other: "{n} elefantes-africanos",
+  },
+  "egg.unit.trex": {
+    one: "{n} T. rex",
+    other: "{n} T. rex",
+  },
+  "egg.unit.bus": {
+    one: "{n} ônibus de dois andares",
+    other: "{n} ônibus de dois andares",
+  },
+  "egg.unit.car": {
+    one: "{n} carro de passeio",
+    other: "{n} carros de passeio",
+  },
+  "egg.unit.piano": {
+    one: "{n} piano de cauda",
+    other: "{n} pianos de cauda",
+  },
+  "egg.unit.retriever": {
+    one: "{n} golden retriever",
+    other: "{n} golden retrievers",
+  },
+  "egg.unit.bluewhale": {
+    one: "{n} baleia-azul",
+    other: "{n} baleias-azuis",
+  },
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "egg.joke.420": "바에 420. 좋네요. 아주 무거운 세트에 아주 여유로운 숫자예요.",
+  "egg.joke.1337": "1337: 엘리트. 진짜로요. 해커 말로 엄청, 엄청 잘한다는 뜻이에요.",
+  "egg.title": "지금까지 든 무게, 다른 단위로",
+  "egg.lead": "지금까지 총 {total}을(를) 들었어요. 대략 이 정도예요:",
+  "egg.empty": "먼저 뭔가를 들어 보고, 다시 와서 코끼리로 몇 마리인지 확인하세요.",
+  "egg.note": "재미로 보는 대략적인 무게예요. 비밀을 찾았네요.",
+  "egg.unit.elephant": {
+    other: "아프리카코끼리 {n}마리",
+  },
+  "egg.unit.trex": {
+    other: "티라노사우루스 {n}마리",
+  },
+  "egg.unit.bus": {
+    other: "2층 버스 {n}대",
+  },
+  "egg.unit.car": {
+    other: "승용차 {n}대",
+  },
+  "egg.unit.piano": {
+    other: "그랜드 피아노 {n}대",
+  },
+  "egg.unit.retriever": {
+    other: "골든 리트리버 {n}마리",
+  },
+  "egg.unit.bluewhale": {
+    other: "대왕고래 {n}마리",
+  },
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "egg.joke.420": "Barda 420. Güzel. Çok ağır bir set için epey rahat bir sayı.",
+  "egg.joke.1337": "1337: elit. Gerçekten. Hacker dilinde çok, çok iyi demek.",
+  "egg.title": "Tüm zamanlar, başka birimlerle",
+  "egg.lead": "Toplamda {total} kaldırdın. Bu yaklaşık:",
+  "egg.empty": "Önce bir şey kaldır, sonra gel ve kaç fil ettiğini gör.",
+  "egg.note": "Kaba ağırlıklar, eğlence için. Bir sır buldun.",
+  "egg.unit.elephant": {
+    one: "{n} Afrika fili",
+    other: "{n} Afrika fili",
+  },
+  "egg.unit.trex": {
+    one: "{n} T. rex",
+    other: "{n} T. rex",
+  },
+  "egg.unit.bus": {
+    one: "{n} iki katlı otobüs",
+    other: "{n} iki katlı otobüs",
+  },
+  "egg.unit.car": {
+    one: "{n} aile arabası",
+    other: "{n} aile arabası",
+  },
+  "egg.unit.piano": {
+    one: "{n} kuyruklu piyano",
+    other: "{n} kuyruklu piyano",
+  },
+  "egg.unit.retriever": {
+    one: "{n} golden retriever",
+    other: "{n} golden retriever",
+  },
+  "egg.unit.bluewhale": {
+    one: "{n} mavi balina",
+    other: "{n} mavi balina",
+  },
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "egg.joke.420": "420 na sztandze. Nieźle. Bardzo wyluzowana liczba jak na bardzo ciężką serię.",
+  "egg.joke.1337": "1337: elita. Dosłownie. W języku hakerów to znaczy bardzo, bardzo dobrze.",
+  "egg.title": "Całe życie, w innych jednostkach",
+  "egg.lead": "Łącznie podniesiono {total}. To mniej więcej:",
+  "egg.empty": "Najpierw coś podnieś, a potem wróć i sprawdź, ile to waży w słoniach.",
+  "egg.note": "Przybliżone masy, dla zabawy. Udało Ci się znaleźć sekret.",
+  "egg.unit.elephant": {
+    one: "{n} słoń afrykański",
+    few: "{n} słonie afrykańskie",
+    many: "{n} słoni afrykańskich",
+    other: "{n} słonia afrykańskiego",
+  },
+  "egg.unit.trex": {
+    one: "{n} T. rex",
+    few: "{n} T. reksy",
+    many: "{n} T. reksów",
+    other: "{n} T. reksa",
+  },
+  "egg.unit.bus": {
+    one: "{n} autobus piętrowy",
+    few: "{n} autobusy piętrowe",
+    many: "{n} autobusów piętrowych",
+    other: "{n} autobusu piętrowego",
+  },
+  "egg.unit.car": {
+    one: "{n} samochód rodzinny",
+    few: "{n} samochody rodzinne",
+    many: "{n} samochodów rodzinnych",
+    other: "{n} samochodu rodzinnego",
+  },
+  "egg.unit.piano": {
+    one: "{n} fortepian",
+    few: "{n} fortepiany",
+    many: "{n} fortepianów",
+    other: "{n} fortepianu",
+  },
+  "egg.unit.retriever": {
+    one: "{n} golden retriever",
+    few: "{n} golden retrievery",
+    many: "{n} golden retrieverów",
+    other: "{n} golden retrievera",
+  },
+  "egg.unit.bluewhale": {
+    one: "{n} płetwal błękitny",
+    few: "{n} płetwale błękitne",
+    many: "{n} płetwali błękitnych",
+    other: "{n} płetwala błękitnego",
+  },
+};

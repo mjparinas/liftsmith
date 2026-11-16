@@ -3,7 +3,7 @@
 // screen raw, at phone size and at tablet size, into store/play/raw/. Step 2 (play-compose.mjs) frames them
 // with captions. Run after a visible change to the screens the listing shows:
 //   npm run build:static && node scripts/play-capture.mjs [base-url] && node scripts/play-compose.mjs
-// PLAY_LANG=es (fr, de, it, ja) captures the eight phone shots with the app in that language, into
+// PLAY_LANG=es (fr, de, it, ja, pt, ko, pl, tr) captures the eight phone shots with the app in that language, into
 // store/play/raw/<lang>/, for the translated listings (docs/PLAY_LISTING_TRANSLATIONS.md). The training still
 // runs in English, so the selectors below stay readable; the app switches language only for the shots.
 import fs from "node:fs";

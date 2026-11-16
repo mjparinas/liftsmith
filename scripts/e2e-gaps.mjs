@@ -1,7 +1,9 @@
 // No two cards touch (Melvin, 2026-11-15: "ensure that there are no cards touching, there should be a gap").
 // Visits every app screen on a phone and a desktop window, in dark and light, and a sample of each kind of
 // website page, and fails when two card-like boxes (a border, rounded corners) sit edge to edge with less than
-// 4 px between them. Usage: node scripts/e2e-gaps.mjs [base-url]  (after npm run build:static)
+// 4 px between them. On the desktop layout it also fails when a button (`Button`, .btn) or a .desk-fit control on a page
+// stretches past 25rem (Melvin, 2026-11-16: buttons "very long … in many places across the app on the web view";
+// docs/decisions/desktop-layout.md). Usage: node scripts/e2e-gaps.mjs [base-url]  (after npm run build:static)
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright";
@@ -55,9 +57,25 @@ function touching() {
   return out;
 }
 
+/** Runs in the page: buttons and .desk-fit controls on a desktop page wider than 25rem (globals.css, .side-page). */
+function stretched() {
+  if (document.documentElement.dataset.layout !== "desktop") return [];
+  const max = 25 * parseFloat(getComputedStyle(document.documentElement).fontSize) + 1;
+  const out = [];
+  for (const el of document.querySelectorAll(".side-page :is(.btn, .desk-fit)")) {
+    if (el.closest(".after-side")) continue;
+    const w = el.getBoundingClientRect().width;
+    if (w > max)
+      out.push(
+        `stretched ${Math.round(w)}px: ${(el.getAttribute("aria-label") || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 40)}`,
+      );
+  }
+  return out;
+}
+
 async function check(page, label) {
   await page.waitForTimeout(500);
-  const found = await page.evaluate(touching);
+  const found = [...(await page.evaluate(touching)), ...(await page.evaluate(stretched))];
   for (const f of found) problems.push(`${label}: ${f}`);
 }
 
@@ -236,4 +254,4 @@ if (unique.length) {
   console.log(`\n${unique.length} touching pairs`);
   process.exit(1);
 }
-console.log("No touching cards");
+console.log("No touching cards and no stretched buttons");

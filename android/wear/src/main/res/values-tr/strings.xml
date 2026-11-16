@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel">Antrenman sürüyor</string>
+    <string name="in_progress">Antrenman sürüyor</string>
+    <string name="none_title">Süren antrenman yok</string>
+    <string name="none_body">Telefonunda bir antrenman başlat, burada görünsün.</string>
+    <string name="log_set">Seti kaydet</string>
+    <string name="add_30">+30 s</string>
+    <string name="up_next">Sıradaki: %1$s</string>
+    <string name="rest_left">Dinlenme, %1$s kaldı</string>
+    <string name="bpm">♥ %1$d bpm</string>
+</resources>

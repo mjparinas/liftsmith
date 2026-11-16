@@ -468,6 +468,13 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 }
 :lang(ja) body { line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere; }
 :lang(de) body { hyphens: auto; overflow-wrap: anywhere; }
+/* Korean (2026-11-15): the phone's Korean fonts first (so Hangul never falls back to Japanese or Chinese shapes), and
+   lines break between words (keep-all), as Korean is written with spaces. Polish and Turkish words run long like German. */
+:root:lang(ko) {
+  --font-sans: "Inter", "Roboto", "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", "Malgun Gothic", system-ui, sans-serif;
+}
+:lang(ko) body { word-break: keep-all; overflow-wrap: anywhere; }
+:lang(pl) body, :lang(tr) body { hyphens: auto; overflow-wrap: anywhere; }
 /* The website's translated pages (src/lib/siteLang.ts) carry their language on a wrapper (LangRoot), because the static
    HTML's <html lang> is English until the page runs, so the same rules apply there too. */
 div[lang="ja"] {
@@ -475,6 +482,11 @@ div[lang="ja"] {
   font-family: var(--font-sans); line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere;
 }
 div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
+div[lang="ko"] {
+  --font-sans: "Inter", "Roboto", "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", "Malgun Gothic", system-ui, sans-serif;
+  font-family: var(--font-sans); word-break: keep-all; overflow-wrap: anywhere;
+}
+div[lang="pl"], div[lang="tr"] { hyphens: auto; overflow-wrap: anywhere; }
 
 /* A soft light at the top of every app screen, so the dark base has depth without noise. */
 .aurora { position: relative; isolation: isolate; }
@@ -584,6 +596,15 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
    to the bottom of a screen and toasts start after it, so they centre on the page rather than the window. */
 .toast-wrap { left: var(--side-w, 0px); }
 .after-side { left: var(--side-w, 0px); }
+/* Buttons don't stretch across a desktop page (Melvin, 2026-11-16: "this button is very long … in many places across the app
+   on the web view"; docs/decisions/desktop-layout.md). A full-width `Button` (.btn, ui.tsx) on a page beside the sidebar stops
+   at 25rem, the width Google's sign-in button tops out at, so stacked buttons still line up; .desk-fit gives any other
+   control or group the same limit. Phones, the workout panel (no sidebar), dialogs (portalled out of main) and bars pinned
+   to the bottom (.after-side) keep the full width. */
+:root[data-layout="desktop"] .side-page :is(.btn.w-full, .desk-fit):not(.after-side *) { max-width: 25rem; }
+/* A screen part that is one card or one form (Coaching's Payments, Check-ins and Teams) keeps one readable column
+   on a wide page, so the card doesn't stretch around a short line and a button (Melvin, 2026-11-16). */
+:root[data-layout="desktop"] .side-page .desk-col { max-width: 42rem; }
 /* A screen whose cards flow into two columns on the desktop layout (stage 3), read down the first column then the
    second, so the phone's order is kept. A card never splits; .desk-span runs across both (the header, say). */
 :root[data-layout="desktop"] .desk-cols { column-count: 2; column-gap: 1.5rem; }

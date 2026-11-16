@@ -43,7 +43,17 @@ const captions = JSON.parse(readFileSync(join(process.cwd(), "scripts/play-capti
 
 describe("Play listing translations", () => {
   it("has every language the app speaks but English", () => {
-    expect(languages.map((l) => l.split("\n")[0]!.trim())).toEqual(["Español", "Français", "Deutsch", "Italiano", "日本語"]);
+    expect(languages.map((l) => l.split("\n")[0]!.trim())).toEqual([
+      "Español",
+      "Français",
+      "Deutsch",
+      "Italiano",
+      "日本語",
+      "Português (Brasil)",
+      "한국어",
+      "Polski",
+      "Türkçe",
+    ]);
   });
 
   for (const section of languages) {

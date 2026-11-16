@@ -14,6 +14,10 @@
 		<string>de</string>
 		<string>it</string>
 		<string>ja</string>
+		<string>pt</string>
+		<string>ko</string>
+		<string>pl</string>
+		<string>tr</string>
 	</array>
 	<key>CFBundleDisplayName</key>
         <string>Liftsmith</string>
