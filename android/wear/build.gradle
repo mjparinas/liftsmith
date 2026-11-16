@@ -28,7 +28,10 @@ android {
     buildTypes {
         release {
             if (System.getenv("ANDROID_KEYSTORE_PATH")) signingConfig signingConfigs.release
-            minifyEnabled false
+            // R8, like the phone app (docs/decisions/app-size.md); the mapping file rides inside the bundle.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
