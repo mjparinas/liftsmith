@@ -9,6 +9,7 @@ import { CHECKS, type CheckState, type HealthCheck } from "@/lib/systemHealth";
 import { adminEmails } from "./adminAuth";
 import { todoList, type TodoKind, type TodoList } from "./adminTodo";
 import { coachTotals, type CoachTotals } from "./adminUsers";
+import { digestSummary } from "./aiHelpers";
 import { alertSettings, resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { query } from "./db";
 import { claimSetting, getSetting, setSetting } from "./settings";
@@ -139,6 +140,8 @@ export interface Digest {
   sections: { title: string; lines: string[]; bullets?: string[] }[];
   todoCount: number;
   problems: number;
+  /** A two- or three-sentence summary by Claude (src/server/aiHelpers.ts digestSummary), when the AI helpers are on. */
+  summary?: string | null;
 }
 
 export function digestFrom(d: DigestData): Digest {
@@ -238,6 +241,7 @@ export function digestMail(g: Digest, footer: DigestFooter, origin = siteOrigin(
   const privacy = `${origin}/privacy/`;
   const text = [
     "Your morning digest",
+    ...(g.summary ? [g.summary, ""] : []),
     g.headline,
     ...g.sections.flatMap((s) => ["", `${s.title}`, ...s.lines, ...(s.bullets ?? []).map((b) => `• ${b}`)]),
     "",
@@ -258,6 +262,7 @@ export function digestMail(g: Digest, footer: DigestFooter, origin = siteOrigin(
 <td style="padding-right:10px"><img src="${esc(origin)}/icon-192.png" width="40" height="40" alt="Liftsmith anvil and barbell" style="display:block;border-radius:10px"></td>
 <td style="color:#4c8dff;font-weight:700;font-size:17px">Liftsmith</td></tr></table>
 <h1 style="font-size:22px;margin:0 0 8px">Your morning digest</h1>
+${g.summary ? `<p style="font-size:15px;line-height:1.5;margin:0 0 14px;padding:12px 14px;border-left:3px solid #4c8dff;background:#121821;border-radius:8px">${esc(g.summary)}</p>` : ""}
 <p style="font-size:16px;line-height:1.5;margin:0 0 20px">${esc(g.headline)}</p>
 ${g.sections
   .map(
@@ -331,7 +336,10 @@ export async function sendDigest(opts: { now?: number; mail?: Mailer | null; for
   if (!opts.force && !(await claimSetting(SENT_KEY, localClock(now).date, now))) return 0;
   let sent = 0;
   try {
-    const m = digestMail(digestFrom(await digestData(now)), {
+    const g = digestFrom(await digestData(now));
+    // A short summary on top, written from the digest's own lines; left out when the AI helpers are off or fail.
+    g.summary = await digestSummary(g);
+    const m = digestMail(g, {
       postalAddress: process.env.MAIL_POSTAL_ADDRESS?.trim() || null,
       contact: CONTACT_EMAIL,
     });
