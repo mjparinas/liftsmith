@@ -1334,6 +1334,19 @@ const LATE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS clubs_place ON clubs (place_id)`,
   // Garmin's pings name the lifter by Garmin's own user id (connect.ts garminPing).
   `CREATE INDEX IF NOT EXISTS connections_remote ON connections (provider, remote_user)`,
+  // Found by EXPLAIN QUERY PLAN over every query (2026-11-16, docs/decisions/database-reads.md); each was a full scan.
+  // Admin Stats: five per-install lookups by event name, and each install's trial start.
+  `CREATE INDEX IF NOT EXISTS events_install_name ON events (install_id, name, at)`,
+  `CREATE INDEX IF NOT EXISTS subscription_events_install ON subscription_events (install_id)`,
+  // Friends' "training now" starts from the sessions updated in the last few minutes, not every profile.
+  `CREATE INDEX IF NOT EXISTS live_sessions_updated ON live_sessions (updated_at)`,
+  // A gym owner's or staff member's gyms; only claimed gyms are in it, so it stays small.
+  `CREATE INDEX IF NOT EXISTS gym_places_claimed ON gym_places (claimed_by) WHERE claimed_by <> ''`,
+  // Friends activity (replies to your comments) and erasing an account's comments.
+  `CREATE INDEX IF NOT EXISTS post_comments_account ON post_comments (account_id)`,
+  `CREATE INDEX IF NOT EXISTS post_comments_reply ON post_comments (reply_to) WHERE reply_to <> ''`,
+  // A client's coaches who see their body data or pain ratings (coach overview, sync's pain alerts).
+  `CREATE INDEX IF NOT EXISTS coach_shares_client ON coach_shares (client_id)`,
 ];
 
 let client: Client | null = null;
