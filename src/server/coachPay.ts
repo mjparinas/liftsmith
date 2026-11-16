@@ -80,7 +80,7 @@ export const PAY_LIMITS = {
   history: 10,
 };
 
-async function call<T>(
+export async function call<T>(
   cfg: PayConfig,
   method: "GET" | "POST" | "DELETE",
   path: string,
@@ -120,7 +120,7 @@ interface StripeAccount {
   metadata?: Record<string, string>;
 }
 
-async function accountRow(coachId: string): Promise<{ stripe_id: string; ready: number; currency: string } | null> {
+export async function accountRow(coachId: string): Promise<{ stripe_id: string; ready: number; currency: string } | null> {
   const [r] = await query<{ stripe_id: string; ready: number; currency: string }>(
     "SELECT stripe_id, ready, currency FROM coach_stripe WHERE coach_id = ?",
     [coachId],
@@ -437,7 +437,7 @@ const str = (x: unknown) => (typeof x === "string" ? x : "");
 const meta = (o: Obj): Record<string, string> =>
   o.metadata && typeof o.metadata === "object" ? (o.metadata as Record<string, string>) : {};
 
-async function coachOfStripe(stripeId: string): Promise<string | null> {
+export async function coachOfStripe(stripeId: string): Promise<string | null> {
   const [r] = await query<{ coach_id: string }>("SELECT coach_id FROM coach_stripe WHERE stripe_id = ?", [stripeId]);
   return r ? String(r.coach_id) : null;
 }

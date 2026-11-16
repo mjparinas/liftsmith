@@ -7,6 +7,7 @@
 // imports lists the last hundred city imports with each one's step-by-step log.
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { isVisible, onVisibility } from "@/lib/visibility";
 import type { ImportResult, ImportRow } from "@/server/gymImport";
 import type { CityLine, JobStatus } from "@/server/gymImportJobs";
 
@@ -167,11 +168,15 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
   }, [show]);
   useEffect(() => {
     if (!running) return;
-    const t = setInterval(() => void read(), POLL_MS);
+    // Not while the tab is hidden (each read counts the job's cities, and Turso bills every row read); it reads again
+    // when the tab comes back.
+    const t = setInterval(() => isVisible() && void read(), POLL_MS);
     const c = setInterval(() => setNow(Date.now()), 1000);
+    const off = onVisibility((v) => v && void read());
     return () => {
       clearInterval(t);
       clearInterval(c);
+      off();
     };
   }, [running, read]);
 

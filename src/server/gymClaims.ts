@@ -108,7 +108,7 @@ export async function startClaim(
     .slice(0, 30);
   const note = typeof body.note === "string" && body.note.trim() ? checkText(body.note, 500) : null;
   if (note && !note.ok) return { ok: false, error: note.error };
-  const [owned] = await query("SELECT COUNT(*) AS n FROM gym_places WHERE claimed_by = ?", [accountId]);
+  const [owned] = await query("SELECT COUNT(*) AS n FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?", [accountId]);
   if (n(owned?.n) >= CLAIM_LIMITS.perAccount) return { ok: false, error: "full" };
   if (!(await rateLimit(`gyms:claim:${accountId}`, CLAIM_LIMITS.perDay, 86_400_000, now))) return { ok: false, error: "slow" };
   const byEmail = emailMatchesSite(email, s(p.website));
@@ -428,5 +428,5 @@ export async function decideClaim(id: unknown, action: unknown, now = Date.now()
 export const claimDeletes = (accountId: string) => [
   ...staffDeletes(accountId),
   { sql: "DELETE FROM gym_claims WHERE account_id = ?", args: [accountId] },
-  { sql: "UPDATE gym_places SET claimed_by = '', claimed_at = 0 WHERE claimed_by = ?", args: [accountId] },
+  { sql: "UPDATE gym_places SET claimed_by = '', claimed_at = 0 WHERE claimed_by <> '' AND claimed_by = ?", args: [accountId] },
 ];

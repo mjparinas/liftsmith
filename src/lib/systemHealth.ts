@@ -337,10 +337,10 @@ export const SETTINGS: Setting[] = [
   },
   {
     names: ["ANTHROPIC_API_KEY"],
-    label: "Draft with AI",
+    label: "Admin AI helpers",
     group: "Admin panel",
     need: "optional",
-    what: "The Inbox's Draft with AI button.",
+    what: "Claude in the admin panel: report suggestions, gym details and duplicates, Ask your data, Inbox drafts and the digest's summary (Flags › Admin AI helpers and AI daily cap).",
   },
   // Sign-in
   {

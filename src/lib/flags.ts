@@ -170,6 +170,27 @@ export const FLAGS = {
     description:
       "A friend who joins with a lifter's invite link and finishes three workouts gives both a month of Pro. Off: invites still connect friends, but nothing is paid out and the app stops mentioning it.",
   },
+  /**
+   * The admin panel's AI helpers (src/server/ai.ts, docs/decisions/admin-ai.md): report suggestions, gym details and
+   * duplicates, Ask your data, Inbox drafts and the digest's summary. The kill switch: off stops every request at once.
+   * Admin only; the app never reads it.
+   */
+  aiHelpers: {
+    adminOnly: true,
+    default: true,
+    options: [true, false] as const,
+    label: "Admin AI helpers",
+    description:
+      "Claude suggests what to do with reports, fills in gym details, answers questions about the numbers, drafts Inbox replies and sums up the digest. Off stops every AI request at once.",
+  },
+  /** The most the admin AI helpers may spend in a Pacific day, in US dollars (Melvin has $100 of credit until 2026-12-11). */
+  aiDailyCap: {
+    adminOnly: true,
+    default: 2,
+    options: [0.5, 1, 2, 4] as const,
+    label: "AI daily cap (US$)",
+    description: "The most the admin AI helpers may spend in a day (midnight to midnight Pacific). Once reached, they stop until tomorrow.",
+  },
   /** Labs: Sonos speakers controlled from the workout, and music that follows it (src/lib/sonos.ts, docs/decisions/sonos.md). */
   labSonos: {
     default: false,

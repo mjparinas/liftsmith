@@ -13,10 +13,10 @@ import {
   startEmail,
   verifyEmail,
 } from "./accounts";
-import { query, resetDb } from "./db";
+import { query, resetDb, run } from "./db";
 import { clearKeys, sha256hex, verifiedEmail, verifyIdToken, type Claims } from "./idToken";
 import { REVIEW_EMAIL, reviewCode, reviewCodeMatches } from "./review";
-import { checkSync, sync, SyncFull } from "./sync";
+import { checkSync, sync, SyncFull, USAGE_RECOUNT_MS } from "./sync";
 
 const NOW = 1_800_000_000_000;
 const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
@@ -387,5 +387,23 @@ describe("sync", () => {
     await sync("acc", "phone", req({ records: [gym("a"), gym("b")] }), quota);
     await sync("acc", "phone", req({ records: [gym("a"), gym("b")] }), quota); // updates are fine
     await expect(sync("acc", "phone", req({ records: [gym("c")] }), quota)).rejects.toBeInstanceOf(SyncFull);
+  });
+
+  it("keeps a count of the account's events instead of counting them all on every push", async () => {
+    const quota = { events: 1_000, bytes: 1_000_000, records: 2 };
+    const usage = async () => (await query("SELECT events, at FROM sync_usage WHERE account_id = 'acc'"))[0];
+    await sync("acc", "phone", req({ events: [ev("e1"), ev("e2")] as never }), quota, NOW);
+    expect(await usage()).toEqual({ events: 2, at: NOW });
+    // Rows the kept count doesn't know about stay unread until it's a day old.
+    await run(
+      "INSERT INTO sync_events (account_id, id, at, body, session) VALUES ('acc', 'x1', 1, '{}', 'w'), ('acc', 'x2', 1, '{}', 'w')",
+    );
+    await sync("acc", "phone", req({ events: [ev("e3")] as never }), quota, NOW + 1000);
+    expect(await usage()).toEqual({ events: 3, at: NOW });
+    await sync("acc", "phone", req({ events: [ev("e4")] as never }), quota, NOW + USAGE_RECOUNT_MS);
+    expect(await usage()).toEqual({ events: 6, at: NOW + USAGE_RECOUNT_MS });
+    // A pull alone writes nothing.
+    await sync("acc", "web", req(), quota, NOW + USAGE_RECOUNT_MS + 1);
+    expect((await usage())?.events).toBe(6);
   });
 });

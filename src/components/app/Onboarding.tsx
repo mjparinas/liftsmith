@@ -61,6 +61,7 @@ function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string
             strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            aria-hidden
           >
             <path d="M5 12.5l4.5 4.5L19 7.5" />
           </svg>

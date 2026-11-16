@@ -39,6 +39,7 @@ export const ko: SiteText = {
       exercises: "운동 라이브러리",
       muscles: "근육별 운동",
       programs: "운동 프로그램",
+      coachPrograms: "코치의 프로그램",
       equipment: "장비별 운동",
       guides: "트레이닝 가이드",
       blog: "블로그",

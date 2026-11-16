@@ -18,7 +18,7 @@ import * as ex from "@/locales/text/ex";
 import * as gp from "@/locales/text/gp";
 
 import { AREA_PINS, areaMapPath } from "./gymMedia";
-import type { City, Place } from "./gymPlaces";
+import { gymIndexable, type City, type Place } from "./gymPlaces";
 import { NEAR_HEAD, NEAR_STYLE, nearSection } from "./gymsNear";
 import { esc, framePage, icon } from "./siteFrame";
 
@@ -65,7 +65,7 @@ const EX: Record<MsgLang, Partial<Record<string, unknown>>> = {
   pl: ex.pl,
   tr: ex.tr,
 };
-const exName = (lang: MsgLang, id: string) => {
+export const exName = (lang: MsgLang, id: string) => {
   const m = EX[lang][`ex.${id}`] ?? (ex.en as Record<string, unknown>)[`ex.${id}`];
   return typeof m === "string" ? m : id;
 };
@@ -297,7 +297,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [p.name, null],
   ])}
 <div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${reportLink}${credit}</main>`;
-  return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
+  return framePage(lang, title, metaTags(title, desc, path, ld, gymIndexable(p)), body, GYM_STYLE, "gym");
 }
 
 /** "Day pass $15", "Membership from $49 a month": the prices the owner set, in the reader's language. */

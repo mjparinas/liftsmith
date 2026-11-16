@@ -7,12 +7,13 @@
 // that was sent and has since gone private, been suspended or lost its handle is sent once more as gone, so the
 // engines recrawl it, find the noindex "isn't public" page and drop it.
 // The strength standards pages (standards.ts) and the trainer directory's cities (trainerDirectory.ts) go once each when
-// they're first indexable (2026-11-15). Gym pages don't: there are tens of thousands, past what IndexNow takes in a day,
+// they're first indexable (2026-11-15). Coaches' programs (programPage.ts) go when listed and again after each edit. Gym pages don't: there are tens of thousands, past what IndexNow takes in a day,
 // so they rely on their sitemap.
 import { INDEXNOW_BATCH, INDEXNOW_ENDPOINT, INDEXNOW_HOST, INDEXNOW_KEY, INDEXNOW_KEY_LOCATION } from "@/lib/indexnow";
 import { absolute, siteRoutes, type Route } from "@/lib/seo";
 
 import { batch, query } from "./db";
+import { programEntries, publicPrograms } from "./programPage";
 import { sitemapPeople } from "./publicProfile";
 import { publishedLifts } from "./standards";
 import { standardsPath } from "./standardsPage";
@@ -34,12 +35,22 @@ export async function peopleRoutes(): Promise<Route[]> {
 
 /** Server-drawn pages worth indexing that aren't in the site's own sitemap: standards and the trainer directory. Undated, so each goes once. */
 export async function serverRoutes(): Promise<Route[]> {
-  const [lifts, cities] = await Promise.all([publishedLifts().catch(() => []), trainerCities().catch(() => [])]);
+  const [lifts, cities, programs] = await Promise.all([
+    publishedLifts().catch(() => []),
+    trainerCities().catch(() => []),
+    publicPrograms().catch(() => []),
+  ]);
   const paths = [
     ...(lifts.length ? [standardsPath(), ...lifts.map((l) => standardsPath(l.lift))] : []),
     ...directoryEntries(cities, 0).map((e) => e.path),
   ];
-  return paths.map((path) => ({ path, priority: 0.5 }));
+  // Coaches' programs are dated by their last change, so an edited program goes again (programPage.ts).
+  const dated = programEntries(programs).map((e) => ({
+    path: e.path,
+    date: new Date(e.lastModified).toISOString().slice(0, 10),
+    priority: 0.5,
+  }));
+  return [...paths.map((path) => ({ path, priority: 0.5 })), ...dated];
 }
 
 export type IndexNowResult = { sent: number; skipped?: string } | { sent: 0; error: string };

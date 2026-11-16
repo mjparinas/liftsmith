@@ -403,6 +403,12 @@ export const es: FeaturesText = {
       body: "En el ordenador, el chat con tu entrenador vive en un panel abajo a la derecha, como un mensajero: todas las personas con las que puedes hablar, hasta dos ventanas que se pliegan, y un sonido y un contador en la pestaña cuando llega un mensaje. Los dos lados ponen un estado (en línea, con un cliente, entrenando, ausente, no molestar, de vacaciones o aparecer desconectado), ven cuándo el otro escribe y cuándo ha visto tu mensaje, y envían emojis y stickers de gimnasio, también en el teléfono.",
       proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
     },
+    "coach-programs": {
+      name: "Programas de entrenadores",
+      body: "Los entrenadores y entrenadores personales convierten sus rutinas en un programa, con nivel, objetivo y cuántas semanas seguirlo, gratis o con precio, y comparten su enlace. Guardas sus días en tus rutinas con un toque y tu propia progresión elige los pesos. Los programas de pago se pagan al entrenador a través de su propia cuenta de Stripe.",
+      note: "Los programas de pago se compran en la web; las apps de Android e iPhone muestran los programas gratis y los que ya tienes.",
+      proPart: "Conseguir programas es gratis; crearlos forma parte del coaching, que es Pro.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",
@@ -416,6 +422,11 @@ export const es: FeaturesText = {
       name: "Valoraciones y reseñas de clientes reales",
       body: "Los clientes valoran a su entrenador, entrenador personal o fisioterapeuta con estrellas y una reseña breve tras cuatro semanas o dos sesiones juntos. La valoración aparece cuando tiene tres reseñas, junto a cuántos de sus clientes entrenaron en las últimas dos semanas, en su invitación y en el directorio de entrenadores. El entrenador responde una vez a cada una y cualquiera puede denunciar una reseña. Solo los adultos pueden dejar una.",
       proPart: "Dejar una reseña es gratis; entrenar a clientes es Pro.",
+    },
+    "program-pages": {
+      name: "Programas de entrenadores en la web, con valoraciones",
+      body: "Cada programa publicado por un entrenador tiene su propia página en la web, con su nivel, objetivo, semanas y días, y los ejercicios de los gratuitos, para que la gente lo encuentre en buscadores. Quien tiene un programa desde hace dos semanas lo valora con estrellas y una reseña corta; las valoraciones se muestran cuando un programa tiene tres, y su entrenador responde una vez a cada una.",
+      proPart: "Valorar un programa es gratis; crearlos es parte del coaching, que es Pro.",
     },
     "coach-plans": {
       name: "Planes de entrenador que crecen con tu lista de clientes",

@@ -478,10 +478,21 @@ export const pl: FeaturesText = {
       body: "Na komputerze czat z trenerem siedzi w panelu w prawym dolnym rogu, jak w komunikatorze: wszyscy, do których możesz pisać, do dwóch okien czatu, które się zwijają, oraz dźwięk i licznik na karcie, gdy przychodzi wiadomość. Obie strony ustawiają status (online, z podopiecznym, na treningu, zaraz wracam, nie przeszkadzać, na urlopie albo pokazuj jako offline), widzą, kiedy druga osoba pisze i kiedy wyświetliła wiadomość, i wysyłają emoji oraz siłowniane naklejki, także na telefonie.",
       proPart: "Bycie podopiecznym jest darmowe; prowadzenie podopiecznych jest w Pro.",
     },
+    "coach-programs": {
+      name: "Programy trenerów",
+      body: "Trenerzy i trenerzy personalni zamieniają swoje rutyny w program z poziomem, celem i liczbą tygodni, darmowy lub płatny, i udostępniają link. Jednym dotknięciem zapisujesz jego dni w swoich rutynach, a ciężary dobiera twój własny postęp. Za płatne programy płacisz trenerowi przez jego własne konto Stripe.",
+      note: "Płatne programy kupuje się na stronie; aplikacje na Androida i iPhone'a pokazują programy darmowe i te, które już masz.",
+      proPart: "Pobieranie programów jest darmowe; tworzenie ich to część coachingu, który jest w Pro.",
+    },
     "coach-reviews": {
       name: "Oceny i opinie od prawdziwych podopiecznych",
       body: "Podopieczni oceniają swojego trenera, trenera personalnego albo fizjoterapeutę gwiazdkami i krótką opinią po czterech tygodniach lub dwóch wspólnych sesjach. Ocena pojawia się, gdy trener ma trzy opinie, obok liczby jego podopiecznych, którzy trenowali w ostatnich dwóch tygodniach, w zaproszeniu i w katalogu trenerów. Trener może raz odpowiedzieć na każdą opinię, a każdy może opinię zgłosić. Opinie mogą wystawiać tylko osoby pełnoletnie.",
       proPart: "Wystawienie opinii jest darmowe; prowadzenie podopiecznych jest w Pro.",
+    },
+    "program-pages": {
+      name: "Programy od trenerów na stronie, z ocenami",
+      body: "Każdy opublikowany program trenera ma własną stronę w serwisie, z poziomem, celem, liczbą tygodni i dni oraz ćwiczeniami darmowych programów, więc można go znaleźć w wyszukiwarce. Osoby, które mają program od dwóch tygodni, oceniają go gwiazdkami i krótką opinią; oceny pojawiają się od trzech, a trener odpowiada raz na każdą.",
+      proPart: "Ocenianie programu jest darmowe; tworzenie ich to część trenowania, które jest w Pro.",
     },
     "coach-plans": {
       name: "Plany dla trenerów, które rosną z listą podopiecznych",

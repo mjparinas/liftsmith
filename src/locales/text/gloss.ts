@@ -121,6 +121,9 @@ export const en = {
   "gloss.monthly.title": "The monthly challenge",
   "gloss.monthly.body":
     "Every lifter gets the same challenge each month: a number of workouts, sets or minutes, rotating month to month. Your own finished workouts count, so it works offline.\nFinish it before the month ends to earn that month's medal. Each finished month counts toward the Monthly challenger badge. Friends › Board shows how the people you follow are doing.",
+  "gloss.coachPrograms.title": "Coaches' programs",
+  "gloss.coachPrograms.body":
+    "A program is a few routines a coach or personal trainer put together, with how many weeks to run it. Its days save to your routines, and your own progression picks the weights and reps.\nFree programs work in every app. Paid ones are bought on the Liftsmith website, and the money goes to the coach, who handles receipts and refunds through Stripe. Once you have one, it's yours on every device you sign in on.",
   "gloss.schoolTeams.title": "School teams",
   "gloss.schoolTeams.body":
     "High school coaches get Pro free once they confirm an email address from their school or district. Their athletes aged 13 to 18 get Pro free too, for as long as they're on the team.\nThe coach sees your workouts, not your body data. Teammates see only your first name and how many workouts and sets you did this week.",
@@ -249,6 +252,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "El reto del mes",
   "gloss.monthly.body":
     "Todos reciben el mismo reto cada mes: un número de entrenamientos, series o minutos, que va cambiando de mes en mes. Cuentan tus entrenamientos terminados, así que funciona sin conexión.\nTermínalo antes de que acabe el mes para ganar la medalla de ese mes. Cada mes terminado cuenta para la insignia Reto del mes. Amigos › Clasificación muestra cómo van las personas que sigues.",
+  "gloss.coachPrograms.title": "Programas de entrenadores",
+  "gloss.coachPrograms.body":
+    "Un programa son unas cuantas rutinas que un entrenador o entrenador personal ha reunido, con cuántas semanas seguirlo. Sus días se guardan en tus rutinas y tu propia progresión elige los pesos y las repeticiones.\nLos programas gratis funcionan en todas las apps. Los de pago se compran en la web de Liftsmith y el dinero va al entrenador, que gestiona recibos y reembolsos con Stripe. Cuando tienes uno, es tuyo en todos los dispositivos donde inicies sesión.",
   "gloss.schoolTeams.title": "Equipos escolares",
   "gloss.schoolTeams.body":
     "Los entrenadores de secundaria tienen Pro gratis al confirmar una dirección de correo de su escuela o distrito. Sus atletas de 13 a 18 años también tienen Pro gratis mientras estén en el equipo.\nEl entrenador ve tus entrenamientos, no tus datos corporales. Tus compañeros solo ven tu nombre de pila y cuántos entrenamientos y series hiciste esta semana.",
@@ -375,6 +381,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "Le défi du mois",
   "gloss.monthly.body":
     "Chaque mois, tout le monde a le même défi : un nombre de séances, de séries ou de minutes, qui change d’un mois à l’autre. Vos séances terminées comptent, donc ça marche hors ligne.\nRéussissez-le avant la fin du mois pour gagner la médaille du mois. Chaque mois réussi compte pour le badge Défi du mois. Amis › Classement montre où en sont les personnes que vous suivez.",
+  "gloss.coachPrograms.title": "Programmes de coachs",
+  "gloss.coachPrograms.body":
+    "Un programme, c'est quelques routines qu'un coach ou un entraîneur personnel a réunies, avec le nombre de semaines à le suivre. Ses jours s'enregistrent dans vos routines, et votre propre progression choisit les charges et les répétitions.\nLes programmes gratuits fonctionnent dans toutes les apps. Les payants s'achètent sur le site Liftsmith, et l'argent va au coach, qui gère reçus et remboursements avec Stripe. Une fois à vous, il l'est sur tous les appareils où vous vous connectez.",
   "gloss.schoolTeams.title": "Équipes scolaires",
   "gloss.schoolTeams.body":
     "Les entraîneurs d’école secondaire ont Pro gratuitement après avoir confirmé une adresse courriel de leur école ou de leur district. Leurs athlètes de 13 à 18 ans ont aussi Pro gratuitement tant qu’ils font partie de l’équipe.\nL’entraîneur voit vos séances, pas vos données corporelles. Vos coéquipiers ne voient que votre prénom et le nombre de séances et de séries de la semaine.",
@@ -501,6 +510,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "Die Challenge des Monats",
   "gloss.monthly.body":
     "Jeden Monat haben alle dieselbe Challenge: eine Zahl an Trainings, Sätzen oder Minuten, die von Monat zu Monat wechselt. Deine abgeschlossenen Trainings zählen, also klappt es auch offline.\nSchaffe sie vor Monatsende, um die Medaille des Monats zu bekommen. Jeder geschaffte Monat zählt für das Abzeichen Monatschallenge. Unter Freunde › Rangliste siehst du, wie es bei den Leuten läuft, denen du folgst.",
+  "gloss.coachPrograms.title": "Programme von Coaches",
+  "gloss.coachPrograms.body":
+    "Ein Programm sind ein paar Routinen, die ein Coach oder Personal Trainer zusammengestellt hat, mit der Anzahl Wochen, die man es macht. Seine Tage landen in deinen Routinen, und deine eigene Progression wählt Gewichte und Wiederholungen.\nKostenlose Programme funktionieren in jeder App. Kostenpflichtige werden auf der Liftsmith-Website gekauft, und das Geld geht an den Coach, der Quittungen und Erstattungen über Stripe abwickelt. Hast du eins, gehört es dir auf jedem Gerät, auf dem du angemeldet bist.",
   "gloss.schoolTeams.title": "Schulteams",
   "gloss.schoolTeams.body":
     "Trainer an weiterführenden Schulen bekommen Pro kostenlos, sobald sie eine E-Mail-Adresse ihrer Schule oder ihres Schulträgers bestätigen. Ihre Sportler von 13 bis 18 Jahren bekommen Pro ebenfalls kostenlos, solange sie im Team sind.\nDer Trainer sieht deine Trainings, nicht deine Körperdaten. Teamkollegen sehen nur deinen Vornamen und wie viele Trainings und Sätze du diese Woche gemacht hast.",
@@ -627,6 +639,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "La sfida del mese",
   "gloss.monthly.body":
     "Ogni mese tutti hanno la stessa sfida: un numero di allenamenti, serie o minuti, che cambia di mese in mese. Contano i tuoi allenamenti completati, quindi funziona anche offline.\nCompletala prima della fine del mese per vincere la medaglia del mese. Ogni mese completato conta per il badge Sfida del mese. Amici › Classifica mostra come vanno le persone che segui.",
+  "gloss.coachPrograms.title": "Programmi dei coach",
+  "gloss.coachPrograms.body":
+    "Un programma è un insieme di routine messe insieme da un coach o personal trainer, con quante settimane seguirlo. I suoi giorni si salvano nelle tue routine e la tua progressione sceglie carichi e ripetizioni.\nI programmi gratuiti funzionano in ogni app. Quelli a pagamento si acquistano sul sito di Liftsmith e i soldi vanno al coach, che gestisce ricevute e rimborsi con Stripe. Una volta tuo, lo è su ogni dispositivo in cui accedi.",
   "gloss.schoolTeams.title": "Squadre scolastiche",
   "gloss.schoolTeams.body":
     "Gli allenatori delle superiori hanno Pro gratis dopo aver confermato un indirizzo email della loro scuola o del distretto. Anche i loro atleti dai 13 ai 18 anni hanno Pro gratis finché sono nella squadra.\nL’allenatore vede i tuoi allenamenti, non i tuoi dati corporei. I compagni vedono solo il tuo nome e quanti allenamenti e serie hai fatto questa settimana.",
@@ -753,6 +768,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "今月のチャレンジ",
   "gloss.monthly.body":
     "毎月、全員に同じチャレンジが用意されます。ワークアウト回数、セット数、トレーニング時間のいずれかで、月ごとに入れ替わります。完了したワークアウトが加算されるので、オフラインでも使えます。\n月末までに達成するとその月のメダルがもらえます。達成した月はマンスリーチャレンジャーのバッジに加算されます。フレンド › ランキングで、フォローしている人の進み具合が見られます。",
+  "gloss.coachPrograms.title": "コーチのプログラム",
+  "gloss.coachPrograms.body":
+    "プログラムは、コーチやパーソナルトレーナーがまとめたいくつかのルーティンと、続ける週数です。各日はあなたのルーティンに保存され、重量と回数はあなた自身の進み具合で決まります。\n無料プログラムはどのアプリでも使えます。有料プログラムはLiftsmithのウェブサイトで購入し、代金はコーチに支払われます。領収書と返金はコーチがStripeで扱います。一度手に入れると、サインインしたすべての端末で使えます。",
   "gloss.schoolTeams.title": "学校のチーム",
   "gloss.schoolTeams.body":
     "高校のコーチは、学校や教育委員会のメールアドレスを確認すると Pro が無料になります。チームにいる13〜18歳の選手も、チームにいる間は Pro が無料です。\nコーチに見えるのはワークアウトだけで、体のデータは見えません。チームメイトに見えるのは下の名前と今週のワークアウト数・セット数だけです。",
@@ -885,6 +903,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Padrões de força",
   "gloss.strengthStandards.body":
     "1RMs estimados típicos de quem treina, ajustados ao peso corporal e, se você informou, à idade e ao sexo, com base no formato de padrões de força publicados e de coeficientes master.\nA porcentagem é uma parte aproximada dos praticantes treinados que sua estimativa supera, não um ranking de usuários reais do Liftsmith. Altura e IMC não são usados.",
+  "gloss.coachPrograms.title": "Programas de treinadores",
+  "gloss.coachPrograms.body":
+    "Um programa é um conjunto de rotinas que um treinador ou personal trainer montou, com quantas semanas seguir. Os dias dele vão para as suas rotinas, e a sua própria progressão escolhe cargas e repetições.\nProgramas grátis funcionam em todos os apps. Os pagos são comprados no site do Liftsmith, e o dinheiro vai para o treinador, que cuida de recibos e reembolsos pela Stripe. Depois que você tem um, ele é seu em todo aparelho em que você entrar.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1010,6 +1031,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "근력 기준",
   "gloss.strengthStandards.body":
     "훈련된 사람들의 일반적인 추정 1RM으로, 체중에 맞추고 입력한 경우 나이와 성별도 반영해요. 공개된 근력 기준과 마스터즈 계수의 형태를 바탕으로 해요.\n백분율은 내 추정치가 훈련된 사람 중 대략 몇 %보다 높은지를 나타내며, 실제 Liftsmith 사용자 순위가 아니에요. 키와 BMI는 쓰지 않아요.",
+  "gloss.coachPrograms.title": "코치 프로그램",
+  "gloss.coachPrograms.body":
+    "프로그램은 코치나 퍼스널 트레이너가 엮은 루틴 몇 개와 진행할 주 수예요. 운동일은 내 루틴에 저장되고, 무게와 횟수는 내 진행 상황에 맞춰 정해져요.\n무료 프로그램은 모든 앱에서 쓸 수 있어요. 유료 프로그램은 Liftsmith 웹사이트에서 구매하고, 돈은 코치에게 가며 영수증과 환불은 코치가 Stripe로 처리해요. 한 번 가지면 로그인한 모든 기기에서 내 것이에요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1135,6 +1159,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Güç standartları",
   "gloss.strengthStandards.body":
     "Antrenmanlı sporcular için tipik tahmini 1RM değerleri; vücut ağırlığına göre ölçeklenir ve eklediysen yaş ile cinsiyete göre ayarlanır. Yayınlanmış güç standartlarının ve master katsayılarının şeklinden gelir.\nYüzde, tahmininin geçtiği antrenmanlı sporcuların kaba bir payıdır; gerçek Liftsmith kullanıcılarının sıralaması değildir. Boy ve BMI kullanılmaz.",
+  "gloss.coachPrograms.title": "Koç programları",
+  "gloss.coachPrograms.body":
+    "Program, bir koçun ya da kişisel antrenörün bir araya getirdiği birkaç rutin ve kaç hafta uygulanacağıdır. Günleri rutinlerine kaydedilir, ağırlık ve tekrarları kendi ilerlemen belirler.\nÜcretsiz programlar her uygulamada çalışır. Ücretli olanlar Liftsmith web sitesinden satın alınır; para koça gider, makbuz ve iadeleri koç Stripe üzerinden yönetir. Bir kez sahip olunca, giriş yaptığın her cihazda senindir.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1261,4 +1288,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Normy siłowe",
   "gloss.strengthStandards.body":
     "Typowe szacowane 1RM trenujących osób, przeliczone na masę ciała i skorygowane o wiek i płeć, jeśli je podałeś, na podstawie opublikowanych norm siłowych i współczynników masters.\nProcent to przybliżony odsetek trenujących, których twój szacunek przewyższa, a nie ranking prawdziwych użytkowników Liftsmith. Wzrost i BMI nie są brane pod uwagę.",
+  "gloss.coachPrograms.title": "Programy trenerów",
+  "gloss.coachPrograms.body":
+    "Program to kilka rutyn ułożonych przez trenera lub trenera personalnego, z liczbą tygodni na jego wykonanie. Jego dni trafiają do twoich rutyn, a ciężary i powtórzenia dobiera twój własny postęp.\nDarmowe programy działają w każdej aplikacji. Płatne kupuje się na stronie Liftsmith, a pieniądze trafiają do trenera, który obsługuje potwierdzenia i zwroty przez Stripe. Gdy już go masz, jest twój na każdym urządzeniu, na którym się zalogujesz.",
 };

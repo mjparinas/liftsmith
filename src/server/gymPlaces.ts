@@ -780,10 +780,68 @@ export async function cities(): Promise<City[]> {
   }));
 }
 
-/** Every gym page worth indexing: gyms (not studios) that aren't hidden. */
+/**
+ * How long a server keeps the city list and the sitemap's gym list (both read every gym row). Turso bills each row a
+ * query reads, and /gyms/ plus the sitemap ran these on every edge cache miss (2026-11-16), so the pages that show them
+ * use the kept copy: a new import shows up within this time. Admin and tests call `cities()` and `sitemapGyms()` fresh.
+ */
+export const LIST_KEEP_MS = 15 * 60_000;
+
+const kept = globalThis as unknown as { __gymLists?: Map<string, { at: number; value: Promise<unknown> }> };
+
+/** `load()`'s answer, kept on this server for `LIST_KEEP_MS`; a failed load isn't kept. */
+export function keptList<T>(key: string, load: () => Promise<T>, now = Date.now()): Promise<T> {
+  const map = (kept.__gymLists ??= new Map());
+  const hit = map.get(key);
+  if (hit && now - hit.at < LIST_KEEP_MS) return hit.value as Promise<T>;
+  const value = load();
+  map.set(key, { at: now, value });
+  value.catch(() => map.delete(key));
+  return value;
+}
+
+/** Forgets the kept lists (tests, and after an import so the admin sees it at once on this server). */
+export function forgetKeptLists() {
+  kept.__gymLists?.clear();
+}
+
+/** `cities()` as the public pages show it: kept for `LIST_KEEP_MS`. */
+export const keptCities = () => keptList("cities", cities);
+
+/** `sitemapGyms()` as the sitemap shows it: kept for `LIST_KEEP_MS`. */
+export const keptSitemapGyms = () => keptList("sitemap", sitemapGyms);
+
+/**
+ * Whether a gym's page is offered to search engines (Search Console, 2026-11-16). About half the imported gyms have
+ * only a name and an address from the map: no website, phone or hours, nobody using it, no owner. Those pages read as
+ * near-copies of each other and of the city page, and on a new domain thousands of them sat in "Crawled - currently not
+ * indexed" and "Discovered - currently not indexed", slowing how fast the rest of the site gets crawled. They stay up
+ * for visitors, `noindex`, out of the sitemap, and come back on their own once the gym gets a detail, an owner or a
+ * lifter. Studios are never indexed. `INDEXABLE_SQL` is the same rule for the sitemap; this one may be broader
+ * (photos, trainers, news), never narrower, so nothing in the sitemap is noindex.
+ */
+export const gymIndexable = (p: Place): boolean =>
+  p.kind === "gym" &&
+  !!(
+    p.official ||
+    p.website ||
+    p.phone ||
+    p.hours ||
+    p.lifters > 0 ||
+    p.code ||
+    p.amenities.length ||
+    p.prices ||
+    p.photos.length ||
+    p.trainers.length ||
+    p.news.length
+  );
+export const INDEXABLE_SQL =
+  "kind = 'gym' AND (claimed_by <> '' OR website <> '' OR phone <> '' OR hours <> '' OR lifters > 0 OR code <> '')";
+
+/** Every gym page worth indexing (gymIndexable): gyms that aren't hidden and have something of their own. */
 export async function sitemapGyms(): Promise<{ path: string; lastModified: number }[]> {
   const rows = await query(
-    "SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND kind = 'gym' ORDER BY updated_at DESC LIMIT 45000",
+    `SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND ${INDEXABLE_SQL} ORDER BY updated_at DESC LIMIT 45000`,
   );
   return rows.map((r) => ({ path: `/gyms/${s(r.city_slug)}/${s(r.slug)}/`, lastModified: n(r.updated_at) }));
 }

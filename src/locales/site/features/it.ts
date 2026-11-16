@@ -401,6 +401,12 @@ export const it: FeaturesText = {
       body: "Sul computer la chat con il coach sta in un dock in basso a destra, come un messenger: tutte le persone a cui scrivere, fino a due finestre che si chiudono a scomparsa, un suono e un contatore nella scheda quando arriva un messaggio. Entrambi impostano uno stato (online, con un cliente, in allenamento, assente, non disturbare, in vacanza o apparire offline), vedono quando l'altro scrive e quando ha visto il messaggio, e inviano emoji e sticker da palestra, anche sul telefono.",
       proPart: "Essere cliente è gratis; seguire clienti è Pro.",
     },
+    "coach-programs": {
+      name: "Programmi dei coach",
+      body: "Coach e personal trainer trasformano le loro routine in un programma, con livello, obiettivo e numero di settimane, gratuito o a pagamento, e ne condividono il link. Salvi i suoi giorni nelle tue routine con un tocco e la tua progressione sceglie i carichi. I programmi a pagamento pagano il coach tramite il suo account Stripe.",
+      note: "I programmi a pagamento si acquistano sul sito; le app per Android e iPhone mostrano quelli gratuiti e quelli che hai.",
+      proPart: "Ottenere programmi è gratis; crearli fa parte del coaching, che è Pro.",
+    },
     "coach-pages": {
       name: "Una pagina per ogni lato",
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",
@@ -414,6 +420,11 @@ export const it: FeaturesText = {
       name: "Valutazioni e recensioni di clienti veri",
       body: "I clienti valutano il loro coach, personal trainer o fisioterapista con stelle e una breve recensione dopo quattro settimane o due sessioni insieme. La valutazione compare dopo tre recensioni, accanto a quanti dei suoi clienti si sono allenati nelle ultime due settimane, nell’invito e nell’elenco dei trainer. Il coach risponde una volta a ciascuna e chiunque può segnalare una recensione. Solo gli adulti possono lasciarne una.",
       proPart: "Lasciare una recensione è gratis; seguire clienti è Pro.",
+    },
+    "program-pages": {
+      name: "I programmi dei coach sul sito, con valutazioni",
+      body: "Ogni programma pubblicato da un coach ha una sua pagina sul sito, con livello, obiettivo, settimane e giorni, e gli esercizi di quelli gratuiti, così lo si trova nei motori di ricerca. Chi ha un programma da due settimane lo valuta con stelle e una breve recensione; le valutazioni compaiono da tre in su, e il coach risponde una volta a ciascuna.",
+      proPart: "Valutare un programma è gratis; crearli fa parte del coaching, che è Pro.",
     },
     "coach-plans": {
       name: "Piani da coach che crescono con i tuoi clienti",

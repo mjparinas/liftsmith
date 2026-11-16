@@ -127,7 +127,7 @@ export async function cancelInvite(accountId: string, placeId: unknown, code: un
   if (!isPlaceId(placeId) || !isInvite(code)) return false;
   return (
     (await run(
-      "DELETE FROM gym_staff_invites WHERE code = ? AND place_id = ? AND place_id IN (SELECT id FROM gym_places WHERE claimed_by = ?)",
+      "DELETE FROM gym_staff_invites WHERE code = ? AND place_id = ? AND place_id IN (SELECT id FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?)",
       [code, placeId, accountId],
     )) > 0
   );
@@ -202,6 +202,12 @@ export const staffEnds = (placeId: string) => [
 /** Account deletion: their staff places, and the staff and invites of gyms they own (which go back to unofficial). */
 export const staffDeletes = (accountId: string) => [
   { sql: "DELETE FROM gym_staff WHERE account_id = ?", args: [accountId] },
-  { sql: "DELETE FROM gym_staff WHERE place_id IN (SELECT id FROM gym_places WHERE claimed_by = ?)", args: [accountId] },
-  { sql: "DELETE FROM gym_staff_invites WHERE place_id IN (SELECT id FROM gym_places WHERE claimed_by = ?)", args: [accountId] },
+  {
+    sql: "DELETE FROM gym_staff WHERE place_id IN (SELECT id FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?)",
+    args: [accountId],
+  },
+  {
+    sql: "DELETE FROM gym_staff_invites WHERE place_id IN (SELECT id FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?)",
+    args: [accountId],
+  },
 ];

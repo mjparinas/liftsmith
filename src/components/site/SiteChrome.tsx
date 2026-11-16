@@ -148,6 +148,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: "/exercises/", label: l.exercises },
           { href: localPath(lang, "/muscles/"), label: l.muscles },
           { href: localPath(lang, "/programs/"), label: l.programs },
+          { href: "/coach-programs/", label: l.coachPrograms },
           { href: "/equipment/", label: l.equipment },
           { href: "/guides/", label: l.guides },
           { href: "/blog/", label: l.blog },
@@ -196,7 +197,7 @@ function LanguageSwitcher({ lang, path, label }: { lang: SiteLang; path: string;
     <nav aria-label={label} className="mx-auto max-w-6xl px-4 pb-6">
       <ul className="flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
         <li aria-hidden className="mr-1 text-muted">
-          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
             <circle cx="12" cy="12" r="9" />
             <path d="M3 12h18M12 3c2.5 2.7 3.6 5.7 3.6 9s-1.1 6.3-3.6 9c-2.5-2.7-3.6-5.7-3.6-9S9.5 5.7 12 3z" />
           </svg>
