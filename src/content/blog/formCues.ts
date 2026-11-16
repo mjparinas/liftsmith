@@ -8,7 +8,7 @@ export const BLOG_FORM_CUES: Article[] = [
     kind: "blog",
     title: "Common form mistakes, and the fix, on every exercise",
     description:
-      "Every exercise and stretch in Liftsmith now lists its two or three most common mistakes, each with a fix and a short reason, and the rest timer shows one before your next set.",
+      "Every exercise and stretch now lists its most common form mistakes, each with a fix and why it matters, and the rest timer shows one before your next set.",
     date: "2026-11-16",
     tag: "Exercises",
     cta: "plan",
