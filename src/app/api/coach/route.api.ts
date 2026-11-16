@@ -267,7 +267,7 @@ export async function POST(req: Request) {
           return reply(req, 200, { url: await onboardUrl(cfg, s.accountId, a?.email ?? null) });
         }
         if (body.action === "payRefresh") return reply(req, 200, { account: await refreshAccount(cfg, s.accountId) });
-        if (body.action === "payDashboard") return reply(req, 200, { url: await dashboardUrl(cfg, s.accountId) });
+        if (body.action === "payDashboard") return reply(req, 200, { url: await dashboardUrl(s.accountId) });
         if (body.action === "payStop") return reply(req, 200, { ok: await stopMonthly(cfg, s.accountId, body.id) });
         const r = await checkoutFor(cfg, s.accountId, body.id);
         return typeof r === "string" ? reply(req, 200, { url: r }) : reply(req, 409, r);
