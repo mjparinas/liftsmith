@@ -141,6 +141,10 @@ export const de: FeaturesText = {
       name: "3D-Übungsdemos",
       body: "Jede Übung hat eine 3D-Figur, die die Bewegung mit dem passenden Gerät zeigt, mit Schritten zum Aufbau und Hinweisen.",
     },
+    "form-mistakes": {
+      name: "Häufige Fehler und wie du sie behebst",
+      body: "Jede Übung und jede Dehnung zeigt neben der 3D-Figur ihre zwei oder drei häufigsten Technikfehler, jeweils mit Lösung und warum es wichtig ist, und der Pausentimer zeigt dir einen für den nächsten Satz. Funktioniert offline.",
+    },
     "set-types": { name: "Dropsätze und Rest-Pause", body: "Füge zwischen den Sätzen einen Dropsatz oder einen Rest-Pause-Satz hinzu." },
     "timed-sets": {
       name: "Satztimer für Halten, Tragen und Cardio",

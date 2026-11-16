@@ -559,6 +559,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "account.row.out": "Entre para fazer backup e sincronizar",
   "account.row.in": "Conectado como {email}",
   "account.delete.webSub": "Sua assinatura Pro do site também termina agora e não será cobrada de novo.",
+  "account.signOut.backupPhotos": "Salvar um backup com as fotos",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -632,6 +633,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "account.row.out": "로그인해서 백업 및 동기화",
   "account.row.in": "{email}(으)로 로그인됨",
   "account.delete.webSub": "웹사이트에서 구독한 Pro도 지금 종료되며 더 이상 결제되지 않아요.",
+  "account.signOut.backupPhotos": "사진 포함 백업 저장",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -712,6 +714,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "account.row.out": "Yedeklemek ve eşitlemek için giriş yap",
   "account.row.in": "{email} olarak giriş yapıldı",
   "account.delete.webSub": "Web sitesinden aldığın Pro aboneliğin de şimdi sona erer ve bir daha ücret alınmaz.",
+  "account.signOut.backupPhotos": "Fotoğraflarla birlikte yedek kaydet",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -800,4 +803,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "account.row.out": "Zaloguj się, by mieć kopię i synchronizację",
   "account.row.in": "Zalogowano jako {email}",
   "account.delete.webSub": "Twoja subskrypcja Pro ze strony internetowej też kończy się teraz i nie zostanie ponownie obciążona.",
+  "account.signOut.backupPhotos": "Zapisz kopię zapasową ze zdjęciami",
 };

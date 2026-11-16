@@ -14,6 +14,7 @@ import { BLOG_C } from "./blog/c";
 import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
+import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_G } from "./blog/g";
 import { BLOG_H } from "./blog/h";
 import { BLOG_I } from "./blog/i";
@@ -242,6 +243,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_INVITES,
   ...BLOG_REHAB_DONE,
   ...BLOG_SCREENSHOT_SHARE,
+  ...BLOG_FORM_CUES,
   ...BLOG_SITE_PAGES,
   ...BLOG_WIDGETS,
 ];

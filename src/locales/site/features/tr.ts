@@ -183,6 +183,10 @@ export const tr: FeaturesText = {
       name: "3D egzersiz gösterimleri",
       body: "Her egzersizde, hareketi kendi ekipmanıyla gösteren 3D bir figür, kurulum adımları ve ipuçları var.",
     },
+    "form-mistakes": {
+      name: "Sık yapılan hatalar ve düzeltmeleri",
+      body: "Her egzersiz ve esneme, en sık yapılan iki üç form hatasını 3D figürün yanında, düzeltmesi ve neden önemli olduğuyla gösterir; dinlenme sayacı da bir sonraki set için birini gösterir. Çevrimdışı çalışır.",
+    },
     "set-types": {
       name: "Drop set ve rest-pause",
       body: "Setlerin arasına bir drop set ya da rest-pause seti ekle.",
@@ -278,6 +282,10 @@ export const tr: FeaturesText = {
     body: {
       name: "Tartı, vücut yağı ve fotoğraflar",
       body: "Kilonu ve vücut yağını kaydet ya da tartından telefonunun sağlık uygulaması üzerinden gelsin; ilerleme fotoğraflarını telefonunda sakla.",
+    },
+    "photo-compare": {
+      name: "Hizalanan ilerleme fotoğrafları",
+      body: "Kamera, hizalanman için son fotoğrafını soluk bir çizgi olarak gösterir; geri çekilmen için zamanlayıcı da var. İstediğin iki tarihi kaydırıcıyla ya da yan yana, o gün kaç kilo olduğunla birlikte karşılaştır. Fotoğraflar telefonunda kalır; bir yedek dosyası onları yenisine taşıyabilir.",
     },
     measurements: {
       name: "Mezura ölçüleri",
@@ -407,6 +415,11 @@ export const tr: FeaturesText = {
     share: {
       name: "Paylaşım kartları ve linkleri",
       body: "Bir antrenmanı, yeni bir rekoru ya da bir dönüm noktasını görsel olarak ya da önizlemeli herkese açık bir linkle paylaş. Yeni rekor altın renginde parlar ve hemen dinlenme ekranından paylaşılabilir.",
+    },
+    "screenshot-share": {
+      name: "Ekran görüntüsü alınca paylaşım kartları",
+      body: "Ekran görüntüsü al, antrenman kartlarından oluşan bir sayfa açılsın: son ay, üç ay, altı ay, yıl ya da tüm zamanlar; toplamlar, setlerin nereye gittiği veya en iyi kaldırışların olarak. Aralarında kaydır, gözle ağırlıkları gizle ve davet bağlantın kartın üstünde basılı olarak paylaş. Aynı kartlar İlerleme'deki Antrenmanımı paylaş altında. Paylaştığın her bağlantı artık davetini taşıyor, bunu söyleyen bir bağlantıyla.",
+      note: "Ekran görüntüleri bunu Android 14 ve sonrasında ve iPhone'da açar, kapatılabilir. Başka yerlerde İlerleme'den aç. 18 yaş altı, davet bağlantısı olmadan paylaşır.",
     },
     coaching: {
       name: "Danışan çalıştır",
@@ -697,6 +710,9 @@ export const tr: FeaturesText = {
     strava: {
       name: "Strava",
       does: "Biten her antrenman Strava'da paylaşılır",
+    },
+    "garmin-connect": {
+      does: "Uyku, HRV, dinlenik nabız, adımlar ve Index tartı ölçümleri gelir; koşu, bisiklet ve kapalı alan kürek seansları kardiyo antrenmanı olarak gelir",
     },
     whoop: {
       name: "WHOOP",
