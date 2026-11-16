@@ -65,6 +65,8 @@ function frameHtml(img, title, sub, { tablet = false, pos = "top", lang = "en" }
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><style>${TOKENS}
     :lang(ja) body { font-family:"Inter","Roboto","Hiragino Sans","Noto Sans CJK JP","Noto Sans JP","Yu Gothic",system-ui,sans-serif; }
     :lang(ja) h1, :lang(ja) p { line-break:strict; word-break:auto-phrase; }
+    :lang(ko) body { font-family:"Inter","Roboto","Apple SD Gothic Neo","Noto Sans CJK KR","Noto Sans KR",system-ui,sans-serif; }
+    :lang(ko) h1, :lang(ko) p { word-break:keep-all; }
     .cap { position:absolute; left:72px; right:72px; top:110px; text-align:center; }
     h1 { font-size:68px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; }
     p { margin-top:26px; font-size:36px; line-height:1.3; color:var(--muted); }

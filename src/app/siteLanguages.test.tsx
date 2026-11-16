@@ -164,6 +164,10 @@ describe("hreflang and the sitemap", () => {
       de: "/de/pricing/",
       it: "/it/pricing/",
       ja: "/ja/pricing/",
+      pt: "/pt/pricing/",
+      ko: "/ko/pricing/",
+      pl: "/pl/pricing/",
+      tr: "/tr/pricing/",
       "x-default": "/pricing/",
     });
     for (const lang of SITE_LANGS) {

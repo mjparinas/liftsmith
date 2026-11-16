@@ -40,3 +40,27 @@ export const ja: Partial<Record<Key, Message>> = {
   "goal.strength": "強くなる",
   "goal.general": "健康を保つ",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "goal.muscle": "Ganhar músculo",
+  "goal.strength": "Ficar mais forte",
+  "goal.general": "Manter a forma",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "goal.muscle": "근육 키우기",
+  "goal.strength": "더 강해지기",
+  "goal.general": "건강 유지",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "goal.muscle": "Kas yap",
+  "goal.strength": "Güçlen",
+  "goal.general": "Formda kal",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "goal.muscle": "Budowa mięśni",
+  "goal.strength": "Więcej siły",
+  "goal.general": "Utrzymanie formy",
+};

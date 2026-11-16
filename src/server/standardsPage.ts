@@ -16,7 +16,18 @@ export const standardsPath = (lift?: StandardLift) => (lift ? `/strength-standar
 const fill = (s: string, vars: Record<string, string | number>) =>
   s.replace(/\{(\w+)\}/g, (all, k: string) => (k in vars ? String(vars[k]) : all));
 
-const EX: Record<MsgLang, Partial<Record<string, unknown>>> = { en: ex.en, es: ex.es, fr: ex.fr, de: ex.de, it: ex.it, ja: ex.ja };
+const EX: Record<MsgLang, Partial<Record<string, unknown>>> = {
+  en: ex.en,
+  es: ex.es,
+  fr: ex.fr,
+  de: ex.de,
+  it: ex.it,
+  ja: ex.ja,
+  pt: ex.pt,
+  ko: ex.ko,
+  pl: ex.pl,
+  tr: ex.tr,
+};
 export const liftName = (lang: MsgLang, id: string) => {
   const m = EX[lang][`ex.${id}`] ?? (ex.en as Record<string, unknown>)[`ex.${id}`];
   return typeof m === "string" ? m : id;

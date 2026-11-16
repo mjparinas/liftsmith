@@ -65,7 +65,17 @@ describe("Garmin watch app", () => {
   // garmin/ (Connect IQ): English in resources/, every other app language in resources-<Garmin code>/, all
   // listed in the manifest, each with the same strings as English (the app name stays English).
   const GARMIN = join(__dirname, "../../garmin");
-  const CODES: Record<string, string> = { es: "spa", fr: "fre", de: "deu", it: "ita", ja: "jpn" };
+  const CODES: Record<string, string> = {
+    es: "spa",
+    fr: "fre",
+    de: "deu",
+    it: "ita",
+    ja: "jpn",
+    pt: "por",
+    ko: "kor",
+    pl: "pol",
+    tr: "tur",
+  };
   const ids = (path: string) => [...readFileSync(join(GARMIN, path), "utf8").matchAll(/<string id="(\w+)">/g)].map((m) => m[1]!);
 
   it("has every app language, with every string", () => {

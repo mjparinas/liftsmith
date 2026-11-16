@@ -10,8 +10,12 @@ import { ES_GUIDES } from "./es";
 import { FR_GUIDES } from "./fr";
 import { IT_GUIDES } from "./it";
 import { JA_GUIDES } from "./ja";
+import { KO_GUIDES } from "./ko";
+import { PL_GUIDES } from "./pl";
+import { PT_GUIDES } from "./pt";
+import { TR_GUIDES } from "./tr";
 
-export const GUIDE_LANGS: readonly GuideLang[] = ["es", "fr", "de", "it", "ja"];
+export const GUIDE_LANGS: readonly GuideLang[] = ["es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"];
 
 export const LOCAL_GUIDES: Record<GuideLang, Record<string, ExerciseGuide>> = {
   es: ES_GUIDES,
@@ -19,6 +23,10 @@ export const LOCAL_GUIDES: Record<GuideLang, Record<string, ExerciseGuide>> = {
   de: DE_GUIDES,
   it: IT_GUIDES,
   ja: JA_GUIDES,
+  pt: PT_GUIDES,
+  ko: KO_GUIDES,
+  pl: PL_GUIDES,
+  tr: TR_GUIDES,
 };
 
 export const localExercisePath = (lang: GuideLang, id: string) => localPath(lang, `/exercises/${id}/`);

@@ -100,3 +100,70 @@ export const ja: Partial<Record<Key, Message>> = {
   "cause.food":
     "この1週間、維持カロリーより1日約{gap}少なく食べています。カロリー不足の間は筋力はなかなか伸びないので、維持できれば十分です。少し重量を下げて回数で戻していくのが妥当な対策です。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "cause.missed": "{missed} das suas últimas {count} séries ficaram abaixo das reps-alvo. O peso passou à sua frente.",
+  "cause.hard": {
+    one: "Você avaliou como difícil demais {count} vez desde seu último recorde.",
+    other: "Você avaliou como difícil demais {count} vezes desde seu último recorde.",
+  },
+  "cause.volume": "Ele teve cerca de {sets} séries pesadas por semana, contra {want} para este bloco.",
+  "cause.rest": "Você descansou cerca de {sec} segundos entre as séries, contra {planned} planejados.",
+  "cause.readiness":
+    "Sua prontidão ficou em média em {avg}, abaixo da base de 50. A recuperação pode ser o limite: sono, alimentação e estresse também contam.",
+  "cause.sameReps": "Todas as sessões desde seu recorde ficaram na mesma faixa de {lo}–{hi} reps.",
+  "cause.none":
+    "Nada nos seus dados chama atenção. Esforço, séries e descanso parecem bons, então trocar de exercício é o melhor próximo passo.",
+  "cause.food":
+    "Você comeu cerca de {gap} por dia abaixo da manutenção na última semana. A força raramente sobe em déficit, então mantê-la já é uma vitória, e um pequeno passo atrás que se reconstrói com as reps é o ajuste justo.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "cause.missed": "최근 {count}세트 중 {missed}세트가 목표 횟수에 못 미쳤어요. 무게가 실력을 앞서가고 있어요.",
+  "cause.hard": {
+    other: "마지막 최고 기록 이후 {count}번 너무 힘들다고 평가했어요.",
+  },
+  "cause.volume": "이번 블록 목표는 주 {want}세트인데, 고강도 세트를 주 약 {sets}세트 했어요.",
+  "cause.rest": "계획은 {planned}초인데, 세트 사이에 약 {sec}초 쉬었어요.",
+  "cause.readiness": "컨디션 평균이 {avg}로, 기준선 50보다 낮아요. 회복이 한계일 수 있어요. 수면, 식사, 스트레스도 중요해요.",
+  "cause.sameReps": "최고 기록 이후 모든 운동이 같은 {lo}–{hi}회 범위였어요.",
+  "cause.none": "데이터에서 눈에 띄는 건 없어요. 강도, 세트, 휴식 모두 괜찮아 보이니 운동 동작을 바꾸는 게 가장 좋은 다음 단계예요.",
+  "cause.food":
+    "지난주에 유지 칼로리보다 하루 약 {gap} 적게 먹었어요. 칼로리 적자에서는 근력이 잘 오르지 않으니 유지만 해도 성공이에요. 무게를 조금 낮췄다가 횟수로 다시 올리는 게 적절한 해결책이에요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "cause.missed": "Son {count} setinin {missed} tanesi hedef tekrarın altında kaldı. Ağırlık senden önde gitmiş.",
+  "cause.hard": {
+    one: "Son rekorundan bu yana {count} kez çok zor olarak puanladın.",
+    other: "Son rekorundan bu yana {count} kez çok zor olarak puanladın.",
+  },
+  "cause.volume": "Bu blok için hedef {want} iken haftada yaklaşık {sets} zor set yapıldı.",
+  "cause.rest": "Setler arasında planlanan {planned} saniye yerine yaklaşık {sec} saniye dinlendin.",
+  "cause.readiness":
+    "Hazırlık ortalaman {avg}, 50'lik temel değerin altında. Sınır toparlanma olabilir: uyku, beslenme ve stres de önemli.",
+  "cause.sameReps": "Rekorundan bu yana her antrenman aynı {lo}–{hi} tekrar aralığındaydı.",
+  "cause.none":
+    "Verilerinde göze çarpan bir şey yok. Efor, set sayısı ve dinlenme iyi görünüyor; bu yüzden en iyi sonraki adım egzersizi değiştirmek.",
+  "cause.food":
+    "Geçen hafta koruma kalorinin günde yaklaşık {gap} altında yedin. Kalori açığında güç nadiren artar; onu korumak bile kazanç, tekrarlarla yeniden yükselen küçük bir geri adım da adil bir çözüm.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "cause.missed": "{missed} z Twoich ostatnich {count} serii nie osiągnęło docelowych powtórzeń. Ciężar Cię wyprzedził.",
+  "cause.hard": {
+    one: "Od ostatniego rekordu {count} raz oceniono je jako za ciężkie.",
+    few: "Od ostatniego rekordu {count} razy oceniono je jako za ciężkie.",
+    many: "Od ostatniego rekordu {count} razy oceniono je jako za ciężkie.",
+    other: "Od ostatniego rekordu {count} raza oceniono je jako za ciężkie.",
+  },
+  "cause.volume": "Dostawało około {sets} ciężkich serii tygodniowo, przy {want} zaplanowanych na ten blok.",
+  "cause.rest": "Odpoczywasz około {sec} sekund między seriami, przy zaplanowanych {planned}.",
+  "cause.readiness":
+    "Twoja średnia gotowość to {avg}, poniżej bazowego 50. Ograniczeniem może być regeneracja: sen, jedzenie i stres też się liczą.",
+  "cause.sameReps": "Każdy trening od Twojego rekordu był w tym samym zakresie {lo}–{hi} powtórzeń.",
+  "cause.none":
+    "Nic w Twoich danych się nie wyróżnia. Wysiłek, serie i przerwy wyglądają dobrze, więc najlepszym krokiem jest zmiana ćwiczenia.",
+  "cause.food":
+    "W ostatnim tygodniu Twoje jedzenie było o około {gap} dziennie poniżej zapotrzebowania. Na deficycie siła rzadko rośnie, więc jej utrzymanie to sukces, a uczciwym rozwiązaniem jest mały krok w tył, który odbudujesz powtórzeniami.",
+};

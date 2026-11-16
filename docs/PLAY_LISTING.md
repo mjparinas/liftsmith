@@ -9,7 +9,7 @@ node scripts/play-compose.mjs   # store/play/phone, tablet-7, tablet-10, chromeb
 node scripts/play-video.mjs     # store/play/promo-video.mp4 (not committed; upload to YouTube)
 ```
 
-The same listing in Spanish, French, German, Italian and Japanese, with its own phone screenshots, is in [PLAY_LISTING_TRANSLATIONS.md](PLAY_LISTING_TRANSLATIONS.md).
+The same listing in Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, with its own phone screenshots, is in [PLAY_LISTING_TRANSLATIONS.md](PLAY_LISTING_TRANSLATIONS.md).
 
 Rules for this text (Play's metadata policy plus our own):
 - Only features that ship on Android today. Wear OS, optional accounts with sync, Friends and Pro are in (2026-11-11, for the public launch); Strava, Garmin Connect, Oura, Whoop, Withings, Polar and Concept2 stay out until they leave "Coming soon", and anything iPhone-only (Apple Watch) stays out of the Play listing. No prices: Play shows them on the listing itself.
@@ -103,7 +103,7 @@ MADE FOR EVERY LIFTER
 • One-handed controls for left or right hand, with hold-to-repeat buttons instead of typing.
 • Text size that follows your phone, colour-blind safe colours, a high-contrast option, and screen reader support.
 • Light and dark themes, and a Lean mode with less motion.
-• In English, Spanish, French, German, Italian and Japanese.
+• In ten languages, from English and Spanish to Japanese and Korean.
 
 LIFTSMITH PRO
 The logger, plate math, rest timer, lock-screen controls, fixed programs, one adaptive workout a week and coaching reasons are free. Pro adds daily adaptive programming, splits, the recovery map, advanced stats, cloud connections, the plateau detective and the goal planner. Try it free for 14 days.

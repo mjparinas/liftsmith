@@ -1,0 +1,10 @@
+/* Korean text drawn by the app's own Swift code: Siri and Shortcuts actions, and the rest-over alert. Follows the phone's language. */
+"Start workout" = "운동 시작";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Liftsmith를 열고 오늘의 운동이나 이미 진행 중인 운동을 시작해요.";
+"Log set" = "세트 기록";
+"Logs the current set as planned. Does nothing when no workout is running." = "현재 세트를 계획대로 기록해요. 진행 중인 운동이 없으면 아무것도 하지 않아요.";
+"Add 30 seconds of rest" = "휴식 30초 추가";
+"Adds 30 seconds to the rest timer." = "휴식 타이머에 30초를 추가해요.";
+"+30 s rest" = "휴식 +30초";
+"Rest over" = "휴식 끝";
+"Up next: %@" = "다음: %@";

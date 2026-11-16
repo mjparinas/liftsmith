@@ -123,3 +123,83 @@ export const ja: Partial<Record<Key, Message>> = {
   "now.allowIos": "Apple Musicを許可",
   "now.settingsIos": "設定を開く",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "now.title": "Tocando agora",
+  "now.playing": "Música tocando",
+  "now.paused": "Música pausada",
+  "now.play": "Tocar",
+  "now.pause": "Pausar",
+  "now.next": "Próxima música",
+  "now.previous": "Música anterior",
+  "now.setting": "Controles de música",
+  "now.hint": "Toque, pause e pule as músicas do seu app de música em Hoje e durante o treino.",
+  "now.hintIos":
+    "Toque, pause e pule músicas do Apple Music em Hoje e durante o treino. A Apple não deixa apps controlarem outros apps de música.",
+  "now.names":
+    "Para mostrar a música e o app que está tocando, o Android pede que você permita o acesso às notificações para o Liftsmith. Ele só é usado para ler o que está tocando, neste celular.",
+  "now.allow": "Mostrar nomes das músicas",
+  "now.namesIos": "Permita o Apple Music para o Liftsmith mostrar a música e controlá-la.",
+  "now.allowIos": "Permitir Apple Music",
+  "now.settingsIos": "Abrir Ajustes",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "now.title": "재생 중",
+  "now.playing": "음악 재생 중",
+  "now.paused": "음악 일시 정지됨",
+  "now.play": "재생",
+  "now.pause": "일시 정지",
+  "now.next": "다음 곡",
+  "now.previous": "이전 곡",
+  "now.setting": "음악 컨트롤",
+  "now.hint": "오늘 화면과 운동 중에 음악 앱의 곡을 재생, 일시 정지, 건너뛸 수 있어요.",
+  "now.hintIos":
+    "오늘 화면과 운동 중에 Apple Music을 재생, 일시 정지, 건너뛸 수 있어요. Apple은 앱이 다른 음악 앱을 제어하는 것을 허용하지 않아요.",
+  "now.names":
+    "곡과 재생 중인 앱을 표시하려면 Android에서 Liftsmith의 알림 접근을 허용해야 해요. 이 휴대폰에서 재생 중인 곡을 읽는 데만 써요.",
+  "now.allow": "곡 이름 표시",
+  "now.namesIos": "Apple Music을 허용하면 Liftsmith가 곡을 표시하고 제어할 수 있어요.",
+  "now.allowIos": "Apple Music 허용",
+  "now.settingsIos": "설정 열기",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "now.title": "Şimdi çalıyor",
+  "now.playing": "Müzik çalıyor",
+  "now.paused": "Müzik duraklatıldı",
+  "now.play": "Oynat",
+  "now.pause": "Duraklat",
+  "now.next": "Sonraki şarkı",
+  "now.previous": "Önceki şarkı",
+  "now.setting": "Müzik kontrolleri",
+  "now.hint": "Müzik uygulamandaki şarkıları Bugün'den ve antrenman sırasında oynat, duraklat ve geç.",
+  "now.hintIos":
+    "Apple Music'i Bugün'den ve antrenman sırasında oynat, duraklat ve geç. Apple, uygulamaların başka müzik uygulamalarını kontrol etmesine izin vermiyor.",
+  "now.names":
+    "Şarkıyı ve onu çalan uygulamayı göstermek için Android, Liftsmith'e bildirim erişimi vermeni ister. Sadece bu telefonda neyin çaldığını okumak için kullanılır.",
+  "now.allow": "Şarkı adlarını göster",
+  "now.namesIos": "Liftsmith'in şarkıyı gösterip kontrol edebilmesi için Apple Music'e izin ver.",
+  "now.allowIos": "Apple Music'e izin ver",
+  "now.settingsIos": "Ayarlar'ı aç",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "now.title": "Teraz gra",
+  "now.playing": "Muzyka gra",
+  "now.paused": "Muzyka wstrzymana",
+  "now.play": "Odtwórz",
+  "now.pause": "Pauza",
+  "now.next": "Następny utwór",
+  "now.previous": "Poprzedni utwór",
+  "now.setting": "Sterowanie muzyką",
+  "now.hint": "Odtwarzaj, pauzuj i przewijaj utwory z aplikacji muzycznej z ekranu Dziś i podczas treningu.",
+  "now.hintIos":
+    "Odtwarzaj, pauzuj i przewijaj Apple Music z ekranu Dziś i podczas treningu. Apple nie pozwala aplikacjom sterować innymi aplikacjami muzycznymi.",
+  "now.names":
+    "Żeby pokazać utwór i aplikację, która go odtwarza, Android prosi o dostęp do powiadomień dla Liftsmith. Służy tylko do odczytu tego, co gra, na tym telefonie.",
+  "now.allow": "Pokazuj nazwy utworów",
+  "now.namesIos": "Zezwól na Apple Music, żeby Liftsmith mógł pokazać utwór i nim sterować.",
+  "now.allowIos": "Zezwól na Apple Music",
+  "now.settingsIos": "Otwórz Ustawienia",
+};

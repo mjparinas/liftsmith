@@ -54,12 +54,12 @@ describe("exercise comparisons", () => {
     }
   });
 
-  it("puts every copy in the sitemap with all six languages, and gives each its lift's card", () => {
+  it("puts every copy in the sitemap with all ten languages, and gives each its lift's card", () => {
     const routes = new Map(siteRoutes().map((r) => [r.path, r]));
     for (const p of vsPairs())
       for (const lang of SITE_LANGS) {
         const r = routes.get(localPath(lang, vsPath(p)));
-        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${p.slug}`).toBe(7);
+        expect(r && Object.keys(r.languages ?? {}).length, `${lang} ${p.slug}`).toBe(11);
       }
     expect(ogFile("/de/exercises/vs/back-squat-vs-front-squat/")).toBe("exercises/back-squat.jpg");
   });

@@ -1,0 +1,8 @@
+/* Brazilian Portuguese Siri phrases for ShortcutIntents.swift. Every phrase keeps ${applicationName}. */
+"Start a workout in ${applicationName}" = "Comece um treino no ${applicationName}";
+"Start ${applicationName}" = "Inicie o ${applicationName}";
+"Start my ${applicationName} workout" = "Comece meu treino do ${applicationName}";
+"Log set in ${applicationName}" = "Registre a série no ${applicationName}";
+"Log a set in ${applicationName}" = "Registre uma série no ${applicationName}";
+"Add rest in ${applicationName}" = "Adicione descanso no ${applicationName}";
+"More rest in ${applicationName}" = "Mais descanso no ${applicationName}";

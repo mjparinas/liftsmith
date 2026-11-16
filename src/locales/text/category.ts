@@ -64,3 +64,43 @@ export const ja: Partial<Record<Key, Message>> = {
   "category.smart": "賢いトレーニング",
   "category.secret": "シークレット",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "category.consistency": "Constância",
+  "category.strength": "Força",
+  "category.volume": "Volume",
+  "category.records": "Recordes",
+  "category.explore": "Exploração",
+  "category.smart": "Treino inteligente",
+  "category.secret": "Secretas",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "category.consistency": "꾸준함",
+  "category.strength": "근력",
+  "category.volume": "볼륨",
+  "category.records": "기록",
+  "category.explore": "탐험",
+  "category.smart": "똑똑한 운동",
+  "category.secret": "비밀",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "category.consistency": "İstikrar",
+  "category.strength": "Güç",
+  "category.volume": "Hacim",
+  "category.records": "Rekorlar",
+  "category.explore": "Keşif",
+  "category.smart": "Akıllı antrenman",
+  "category.secret": "Gizli",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "category.consistency": "Regularność",
+  "category.strength": "Siła",
+  "category.volume": "Objętość",
+  "category.records": "Rekordy",
+  "category.explore": "Odkrywanie",
+  "category.smart": "Mądry trening",
+  "category.secret": "Tajne",
+};

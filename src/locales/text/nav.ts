@@ -64,3 +64,43 @@ export const ja: Partial<Record<Key, Message>> = {
   "nav.crash.reload": "再読み込み",
   "nav.crash.details": "エラーの詳細",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "nav.main": "Principal",
+  "nav.back.today": "Hoje",
+  "nav.loading": "Carregando",
+  "nav.crash.title": "Algo deu errado nesta tela",
+  "nav.crash.body": "Seu treino e seus dados estão seguros. Recarregue para continuar.",
+  "nav.crash.reload": "Recarregar",
+  "nav.crash.details": "Detalhes do erro",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "nav.main": "메인",
+  "nav.back.today": "오늘",
+  "nav.loading": "불러오는 중",
+  "nav.crash.title": "이 화면에서 문제가 생겼어요",
+  "nav.crash.body": "운동과 데이터는 안전해요. 새로고침해서 계속하세요.",
+  "nav.crash.reload": "새로고침",
+  "nav.crash.details": "오류 정보",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "nav.main": "Ana",
+  "nav.back.today": "Bugün",
+  "nav.loading": "Yükleniyor",
+  "nav.crash.title": "Bu ekranda bir şeyler ters gitti",
+  "nav.crash.body": "Antrenmanın ve verilerin güvende. Devam etmek için yeniden yükle.",
+  "nav.crash.reload": "Yeniden yükle",
+  "nav.crash.details": "Hata ayrıntıları",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "nav.main": "Główna",
+  "nav.back.today": "Dziś",
+  "nav.loading": "Ładowanie",
+  "nav.crash.title": "Coś poszło nie tak na tym ekranie",
+  "nav.crash.body": "Twój trening i dane są bezpieczne. Odśwież, żeby kontynuować.",
+  "nav.crash.reload": "Odśwież",
+  "nav.crash.details": "Szczegóły błędu",
+};

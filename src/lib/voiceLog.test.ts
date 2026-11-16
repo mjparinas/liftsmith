@@ -88,6 +88,31 @@ describe("parseVoice", () => {
     expect(parseVoice("簡単すぎ", "ja")).toEqual({ rating: 1 });
     expect(parseVoice("きつい", "ja")).toEqual({ rating: -1 });
     expect(parseVoice("取り消し", "ja")).toEqual({ undo: true });
+
+    expect(parseVoice("100 por 8", "pt")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("100 quilos com oito repetições", "pt")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("fácil demais", "pt")).toEqual({ rating: 1 });
+    expect(parseVoice("muito pesado", "pt")).toEqual({ rating: -1 });
+    expect(parseVoice("desfazer", "pt")).toEqual({ undo: true });
+
+    expect(parseVoice("100킬로 8회", "ko")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("100킬로에 8번", "ko")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("8회", "ko")).toEqual({ reps: 8 });
+    expect(parseVoice("너무 쉬워", "ko")).toEqual({ rating: 1 });
+    expect(parseVoice("너무 무거워요", "ko")).toEqual({ rating: -1 });
+    expect(parseVoice("취소", "ko")).toEqual({ undo: true });
+
+    expect(parseVoice("100 na 8", "pl")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("100 kilogramów osiem powtórzeń", "pl")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("za łatwo", "pl")).toEqual({ rating: 1 });
+    expect(parseVoice("za ciężko", "pl")).toEqual({ rating: -1 });
+    expect(parseVoice("cofnij", "pl")).toEqual({ undo: true });
+
+    expect(parseVoice("100 kilo ile 8 tekrar", "tr")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("100 çarpı sekiz", "tr")).toEqual({ weight: 100, reps: 8 });
+    expect(parseVoice("çok kolay", "tr")).toEqual({ rating: 1 });
+    expect(parseVoice("çok ağır", "tr")).toEqual({ rating: -1 });
+    expect(parseVoice("geri al", "tr")).toEqual({ undo: true });
   });
 
   it("doesn't match a phrase inside another word", () => {

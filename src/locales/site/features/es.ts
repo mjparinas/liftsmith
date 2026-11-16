@@ -481,8 +481,8 @@ export const es: FeaturesText = {
       body: "La web muestra cuánto levantan de verdad en sentadilla, press de banca, peso muerto y press militar, por sexo y peso corporal, calculado cada día con quienes cuentan. Solo se muestran grupos de 30 o más, en percentiles, nunca los números de nadie. Un interruptor en Ajustes › Tus datos y privacidad decide si cuentas; los menores de 18 nunca cuentan.",
     },
     languages: {
-      name: "Seis idiomas",
-      body: "Inglés, español, francés, alemán, italiano y japonés, según el idioma de tu teléfono.",
+      name: "Diez idiomas",
+      body: "Inglés, español, francés, alemán, italiano, japonés, portugués de Brasil, coreano, polaco y turco, según el idioma de tu teléfono.",
     },
     appearance: {
       name: "Oscuro, claro o como tu teléfono",

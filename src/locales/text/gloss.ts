@@ -760,3 +760,505 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.body":
     "トレーニング経験者の典型的な推定最大重量を体重に合わせ、年齢と性別を入力していればそれも補正したもので、公表された筋力基準とマスターズ係数に基づきます。\nパーセンテージは、あなたの推定値が上回るトレーニング経験者のおおよその割合で、実際のLiftsmithユーザーの順位ではありません。身長とBMIは使いません。",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Trajetória da barra",
+  "gloss.barPath.body":
+    "A linha que a barra faz em cada rep, vista de lado. No agachamento, no levantamento terra e no desenvolvimento, o ideal é ela subir e descer quase reta sobre o meio do pé.\nDepois da série, o replay mostra a rep que vale a pena ver: a linha azul é a barra, e a tracejada sobe reta de onde ela começou. Se a barra foi para a frente ou para trás em um quarto das suas reps ou mais, você recebe uma dica. É uma leitura aproximada de uma câmera só (seus ombros fazem o papel da barra no agachamento, e suas mãos nos outros exercícios), então ela só fala quando está claro.",
+  "gloss.formCheck.title": "Checagem de técnica",
+  "gloss.formCheck.body":
+    "Enquanto conta as reps, a câmera também observa como cada rep se moveu: no agachamento, se o quadril desceu até a altura dos joelhos; em todo exercício, se algumas reps ficaram mais curtas que a sua melhor; e no agachamento, no levantamento terra e no desenvolvimento, se você pendeu para um lado.\nEntre as séries, ela aponta a coisa que mais vale corrigir, em quantas reps viu isso, e a figura mostra: onde suas reps curtas pararam ou para que lado você pendeu. É uma checagem aproximada de uma câmera só, então ela só fala quando está claro. De lado mostra melhor a profundidade; de frente para a câmera mostra a inclinação.",
+  "gloss.speedMax.title": "Máximo do dia pela velocidade da barra",
+  "gloss.speedMax.body":
+    "Quanto mais pesado, mais devagar a barra se move, e todo exercício tem uma velocidade em que a rep é quase o máximo que você aguenta. Seu aquecimento dá alguns pesos e suas velocidades, e a linha entre eles aponta o peso que você moveria nessa velocidade: o máximo estimado de hoje.\nQuando ele fica bem acima ou abaixo do que o plano de hoje espera, sugerimos uma pequena mudança, no máximo 5% mais pesado ou 10% mais leve. É uma estimativa da câmera, então deixe sua primeira série dar a palavra final.\nEssa velocidade muda um pouco de pessoa para pessoa, e a câmera mede seu corpo, não a barra. Por isso, quando você leva uma série de trabalho até a falha com a câmera contando (uma rep que não sobe, nenhuma rep sobrando ou menos reps que o planejado), a velocidade da última rep boa fica guardada, e depois de três séries assim a estimativa usa a sua própria velocidade em vez da padrão.",
+  "gloss.barSpeed.title": "Velocidade da barra",
+  "gloss.barSpeed.body":
+    "A rapidez com que a barra sobe em cada rep, medida pela câmera. Quando a série fica difícil, a barra desacelera, mesmo que as reps ainda pareçam tranquilas.\nQuando ela está cerca de um terço mais lenta que a sua rep mais rápida, sobra mais ou menos uma rep boa, então parar a série ali mantém o trabalho pesado sem se arrastar. É uma estimativa: uma vista de lado e boa luz ajudam.",
+  "gloss.fitnessAge.title": "Idade fitness",
+  "gloss.fitnessAge.body":
+    "A idade em que uma pessoa saudável típica do seu sexo tem o seu VO₂ máx., segundo um grande estudo norueguês com adultos saudáveis.\nÉ uma estimativa de condicionamento, não um exame de saúde. Cardio intenso a reduz em poucas semanas.",
+  "gloss.deloadWeeks.title": "Semanas de construção antes do deload",
+  "gloss.deloadWeeks.body":
+    "Seu treino é dividido em blocos. Nas semanas de construção, o plano fica um pouco mais difícil a cada semana: mais séries e menos reps sobrando no tanque.\nDepois vem uma semana de deload: mais leve, com cerca de metade das séries. Ela deixa articulações e sistema nervoso se recuperarem, para você voltar mais forte. Escolha menos semanas de construção se você é iniciante ou está sem tempo, e mais se você se recupera bem.",
+  "gloss.deload.title": "Semana de deload",
+  "gloss.deload.body":
+    "Uma semana mais leve depois de um bloco de treino pesado: pesos menores e cerca de metade das séries. Não é progresso perdido. É quando o corpo absorve o trabalho, e o próximo bloco começa mais forte.",
+  "gloss.rir.title": "RIR: reps em reserva",
+  "gloss.rir.body":
+    "Quantas reps a mais você conseguiria fazer quando para a série. RIR 2 significa terminar a série sentindo que ainda tinha umas duas reps boas.\nO plano começa com mais sobrando no tanque e chega mais perto da falha ao longo do bloco.",
+  "gloss.rpe.title": "RPE: percepção de esforço",
+  "gloss.rpe.body":
+    "O quanto uma série foi pesada numa escala de 1 a 10, em que 10 é tudo o que você tinha. Um 8 significa que ainda tinha umas duas reps boas, o mesmo que 2 reps em reserva.",
+  "gloss.blockWeek.title": "Bloco de treino",
+  "gloss.blockWeek.body":
+    "Onde você está no seu bloco: qual semana de construção (ou o deload) e quantas reps deixar no tanque nesta semana. Você pode mudar a duração do bloco em Ajustes.",
+  "gloss.readiness.title": "Prontidão",
+  "gloss.readiness.body":
+    "Uma nota de 0 a 100, em que 50 é um dia normal. Ela vem de quão recuperados estão seus músculos grandes, de como foram os treinos recentes (reps feitas, como as séries pareceram, velocidade das reps e frequência cardíaca) e dos dias de descanso.\n65 ou mais é dia de forçar, 35 ou menos é dia leve. Você sempre pode mudar.",
+  "gloss.call.title": "Decisão do dia",
+  "gloss.call.body":
+    "Forçar: seu primeiro exercício grande vai uma rep mais perto da falha. Como planejado: o plano normal. Pegar leve: uma série a menos, um passo mais leve e uma rep a mais em reserva. Sua escolha fica salva.",
+  "gloss.volume.title": "Volume",
+  "gloss.volume.body":
+    "Peso × reps, somado em todas as séries de trabalho. É uma medida aproximada de quanto trabalho total você fez. O aquecimento não conta.",
+  "gloss.e1rm.title": "1RM estimado",
+  "gloss.e1rm.body":
+    "O máximo que você provavelmente levantaria uma vez, calculado a partir das suas séries somando as reps que sobraram. Usa as fórmulas que as pesquisas acharam mais precisas para cada faixa de reps (Brzycki e Epley até 10 reps até a falha, Mayhew e Wathan acima disso), cada uma com média junto a uma equação de 2026 baseada no peso, ajustada em mais de 300.000 séries. Séries recentes, pesadas e perto da falha contam mais, e séries acima de 20 reps são ignoradas. Assim dá para comparar uma série de 5 com uma de 8 e ver a evolução real da força sem testar um máximo de verdade.",
+  "gloss.weeklySets.title": "Séries por músculo nesta semana",
+  "gloss.weeklySets.body":
+    "Séries pesadas que trabalharam cada músculo nesta semana. Músculos secundários contam meia série. A faixa verde, de 10 a 20, é o intervalo que a maioria das pesquisas indica para hipertrofia. O plano mira nos músculos mais abaixo dela.",
+  "gloss.experience.title": "Experiência",
+  "gloss.experience.body":
+    "Há quanto tempo você treina com regularidade. Iniciante é menos de um ano, Intermediário é de 1 a 3 anos e Experiente é 3 anos ou mais.\nIsso define quantas séries pesadas cada músculo recebe por semana (8 a 12 para Iniciante, 10 a 16 para Intermediário, 12 a 20 para Experiente) e o peso inicial nos exercícios que você ainda não registrou. Depois que você registra um exercício, suas próprias séries definem os pesos.\nTambém escolhe o nível inicial nos programas com peso corporal e a velocidade prevista para suas metas de carga. Na dúvida? Escolha o menor; o plano se ajusta rápido.",
+  "gloss.variety.title": "Variedade de exercícios",
+  "gloss.variety.body":
+    "Com que frequência o plano mantém o mesmo exercício para um músculo. Mais constante é melhor para acompanhar o progresso num exercício. Mais variedade deixa o treino mais fresco e distribui o estresse.",
+  "gloss.recovery.title": "Recuperação",
+  "gloss.recovery.body":
+    "Cada série cansa os músculos que trabalha. Essa fadiga passa em 2 a 3 dias. Descansado é 90% ou mais, Pronto 70%, Recuperando 40%, e Cansado é abaixo de 40%. O plano evita músculos que ainda estão cansados.",
+  "gloss.superset.title": "Bi-set",
+  "gloss.superset.body":
+    "Dois ou mais exercícios feitos em sequência: uma série do primeiro, direto para uma série do seguinte, e só então o descanso. Economiza tempo e funciona melhor com exercícios que não cansam os mesmos músculos, como uma remada com um supino.\nToque no elo entre dois exercícios para juntá-los, e de novo para separá-los.",
+  "gloss.warmup.title": "Séries de aquecimento",
+  "gloss.warmup.body":
+    "Séries mais leves que vão subindo até o seu peso de trabalho. Elas não contam nas suas estatísticas nem no progresso. Pule se você já estiver aquecido.",
+  "gloss.firstWeights.title": "Por que perguntamos",
+  "gloss.firstWeights.body":
+    "Só para sugerir um primeiro peso seguro para cada exercício. Começamos pelo lado leve e ajustamos depois do seu primeiro treino. Isso fica no seu celular.",
+  "gloss.healthTwin.title": "Saúde",
+  "gloss.healthTwin.body":
+    "Os números do seu corpo num só lugar: peso, gordura corporal, energia, sono, coração e passos, do Liftsmith e do app de saúde do celular.\nCada um é comparado com o seu próprio normal dos últimos 30 dias, nunca com outras pessoas, e diz o que fazer. Não é orientação médica.",
+  "gloss.hrv.title": "VFC: variabilidade da frequência cardíaca",
+  "gloss.hrv.body":
+    "As pequenas variações no tempo entre os batimentos, medidas por um relógio ou anel, quase sempre durante a noite. Acima do seu normal costuma indicar que você se recuperou; abaixo indica estresse do treino, sono ruim ou doença.\nSó a sua própria tendência importa: celulares e relógios medem de jeitos diferentes, então não compare seu número com o de ninguém.",
+  "gloss.restingHr.title": "Frequência cardíaca de repouso",
+  "gloss.restingHr.body":
+    "Sua frequência cardíaca em repouso total, geralmente medida enquanto você dorme. Alguns batimentos acima do seu normal por um ou dois dias é um sinal precoce para ir mais devagar.",
+  "gloss.breathingRate.title": "Frequência respiratória",
+  "gloss.breathingRate.body":
+    "Respirações por minuto enquanto você dorme, de um relógio ou anel. Ela é bem estável, então um salto de duas ou mais acima do seu normal costuma ser um dos primeiros sinais de que você está ficando doente.",
+  "gloss.breathPattern.title": "Padrões de respiração",
+  "gloss.breathPattern.body":
+    "Um guia para o descanso entre séries: siga o ponto ao redor do quadrado e o quadrado enquanto ele cresce e diminui. Cada mudança de etapa faz um som suave e uma vibração leve, para você acompanhar de olhos fechados.\nRespiração quadrada: inspire, segure, expire e segure, 4 segundos cada. Estável e calmante.\n4-7-8: inspire por 4, segure por 7, expire por 8. A expiração longa é a que mais desacelera o coração.\nSuspiro duplo: uma inspiração, um segundo gole curto por cima, depois uma expiração longa. O jeito mais rápido de se acalmar.\nRespiração lenta: inspire por 4, expire por 6.\nPersonalizado: defina você mesmo cada lado do quadrado. Uma pausa de 0 a deixa de fora.",
+  "gloss.vo2max.title": "VO₂ máx.",
+  "gloss.vo2max.body":
+    "Quanto oxigênio seu corpo consegue usar no esforço máximo, em mililitros por quilo por minuto. Relógios estimam a partir de caminhadas e corridas. É a melhor medida isolada de condicionamento cardiovascular.\nMusculação quase não mexe nele. Duas sessões de cardio intenso de 20 minutos por semana mexem.",
+  "gloss.bodyFat.title": "Gordura corporal",
+  "gloss.bodyFat.body":
+    "A parte do seu peso que é gordura, de uma balança inteligente, um scanner corporal ou adipômetro. Cada método mede diferente, então fique com um só e meça no mesmo horário, de preferência de manhã, antes de comer.\nUma leitura sozinha diz pouco. Três ou mais ao longo de algumas semanas mostram a tendência, e as Notas do coach avisam quando ela vai no sentido errado para o seu objetivo.",
+  "gloss.leanMass.title": "Massa magra",
+  "gloss.leanMass.body":
+    "Tudo no seu corpo que não é gordura: músculo, osso, órgãos e água. Seu peso vezes a parte que não é gordura. Massa magra subindo enquanto a gordura corporal se mantém ou cai significa que o treino está construindo músculo.",
+  "gloss.bmi.title": "IMC: índice de massa corporal",
+  "gloss.bmi.body":
+    "Peso dividido pela altura ao quadrado. É uma referência aproximada para quem não treina: não diferencia músculo de gordura, então quem tem muito músculo costuma aparecer com sobrepeso. Quando você tiver uma leitura de gordura corporal, confie nela.",
+  "gloss.liftScores.title": "DOTS, Wilks e IPF GL",
+  "gloss.liftScores.body":
+    "Três formas de pontuar o total de agachamento, supino e levantamento terra pelo peso corporal, para comparar um atleta leve com um pesado.\nDOTS (2019) e IPF GL (2020) são as fórmulas mais novas e justas; Wilks é a mais antiga, que muita gente ainda conhece. Compare uma pontuação só com a mesma fórmula.",
+  "gloss.ffmi.title": "FFMI: índice de massa livre de gordura",
+  "gloss.ffmi.body":
+    "Sua massa magra (tudo menos gordura) dividida pela altura ao quadrado, ajustada para uma altura padrão de 1,8 m. Mostra quanto músculo você tem, o que o IMC não mostra.\nA maioria dos homens que treinam fica entre 19 e 23, e as mulheres cerca de 4 abaixo. Um estudo com atletas sem uso de drogas encontrou poucos acima de 25.",
+  "gloss.hrZones.title": "Zonas de frequência cardíaca",
+  "gloss.hrZones.body":
+    "Cinco faixas de esforço definidas pela sua frequência cardíaca máxima, do leve (zona 1) ao máximo (zona 5).\nCom a frequência de repouso, elas usam sua reserva de frequência cardíaca (a diferença entre repouso e máxima), que acompanha melhor seu condicionamento.",
+  "gloss.restDrop.title": "Queda da frequência no descanso",
+  "gloss.restDrop.body":
+    "Quantos batimentos por minuto sua frequência cardíaca cai no primeiro minuto depois de uma série, pelo seu monitor cardíaco. Uma queda maior ao longo dos meses indica um coração mais condicionado; uma menor que o normal pode indicar cansaço.",
+  "gloss.setTypes.title": "Drop sets e rest-pause",
+  "gloss.setTypes.body":
+    "Séries extras que você pode adicionar entre as séries, depois de registrar a série planejada.\nUm drop set baixa o peso em cerca de um quarto e continua na hora. Um rest-pause mantém o mesmo peso, pausa por 15 segundos e espreme mais algumas reps.\nOs dois dão mais trabalho ao músculo sem uma série extra completa. Eles contam no seu volume, mas os próximos pesos do plano só leem suas séries planejadas.",
+  "gloss.stretching.title": "Mobilidade de aquecimento e alongamentos finais",
+  "gloss.stretching.body":
+    "Os movimentos de aquecimento são alongamentos dinâmicos e exercícios de mobilidade. Eles aumentam a frequência cardíaca e levam as articulações pela amplitude, para as primeiras séries renderem melhor.\nOs alongamentos finais são estáticos, mantidos por 30 segundos ou mais com respiração lenta. Combinam com o fim do treino ou um dia de descanso, quando os músculos estão aquecidos. Alongue até uma tensão leve, nunca até a dor.",
+  "gloss.crate.title": "Caixas e o Armário",
+  "gloss.crate.body":
+    "Cada treino concluído dá uma caixa na tela de Concluído. Ela traz uma cor de destaque, um som do timer de descanso ou um acabamento de anilha, sorteado: os comuns aparecem mais e os lendários, menos.\nAlguns níveis dão um item fixo, e cada novo título dá uma caixa bônus, então até os itens mais raros têm um caminho garantido. Toque num item bloqueado para ver como consegui-lo.\nSe vier algo que você já tem, vira 25 XP de bônus. Escolha o que usar aqui no Armário.",
+  "gloss.badges.title": "Conquistas e medalhas",
+  "gloss.badges.body":
+    "Uma conquista é uma meta, como concluir treinos ou bater recordes pessoais. Cada uma tem até quatro medalhas, bronze, prata, ouro e platina, ganhas em números cada vez maiores.\nAlgumas medalhas também desbloqueiam um tema de cores para o app; a medalha diz qual. Toda medalha dá XP, que sobe seu nível.",
+  "gloss.monthly.title": "O desafio do mês",
+  "gloss.monthly.body":
+    "Todo mundo recebe o mesmo desafio a cada mês: um número de treinos, séries ou minutos, que muda de mês para mês. Seus próprios treinos concluídos contam, então funciona offline.\nComplete antes do fim do mês para ganhar a medalha daquele mês. Cada mês completo conta para a medalha Desafiante mensal. Amigos › Placar mostra como estão as pessoas que você segue.",
+  "gloss.schoolTeams.title": "Equipes escolares",
+  "gloss.schoolTeams.body":
+    "Treinadores de ensino médio ganham o Pro grátis depois de confirmar um e-mail da escola ou da secretaria de ensino. Os atletas deles de 13 a 18 anos também ganham o Pro grátis, enquanto estiverem na equipe.\nO treinador vê seus treinos, não seus dados corporais. Os colegas de equipe veem só seu primeiro nome e quantos treinos e séries você fez nesta semana.",
+  "gloss.strengthStandards.title": "Padrões de força",
+  "gloss.strengthStandards.body":
+    "1RMs estimados típicos de quem treina, ajustados ao peso corporal e, se você informou, à idade e ao sexo, com base no formato de padrões de força publicados e de coeficientes master.\nA porcentagem é uma parte aproximada dos praticantes treinados que sua estimativa supera, não um ranking de usuários reais do Liftsmith. Altura e IMC não são usados.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "바 경로",
+  "gloss.barPath.body":
+    "옆에서 본, 반복마다 바가 움직이는 선이에요. 스쿼트, 데드리프트, 오버헤드 프레스에서는 발 중앙 위로 거의 수직으로 오르내릴 때 가장 좋아요.\n세트가 끝나면 다시 볼 만한 반복을 재생해요. 파란 선이 바이고, 점선은 시작 지점에서 수직으로 올린 선이에요. 반복의 4분의 1 이상에서 바가 앞이나 뒤로 흐르면 팁을 하나 알려 드려요. 카메라 한 대로 대략 읽는 것이라(스쿼트에서는 어깨, 다른 리프트에서는 손을 바 대신 봐요) 확실할 때만 알려 드려요.",
+  "gloss.formCheck.title": "자세 체크",
+  "gloss.formCheck.body":
+    "카메라가 반복을 세면서 각 반복의 움직임도 살펴봐요. 스쿼트에서는 엉덩이가 무릎 높이까지 내려갔는지, 모든 리프트에서는 가장 잘된 반복보다 짧게 끝난 반복이 있는지, 스쿼트, 데드리프트, 오버헤드 프레스에서는 한쪽으로 기울었는지를 봐요.\n세트 사이에 가장 고칠 만한 점 하나를 몇 번의 반복에서 보였는지와 함께 알려 드리고, 인체 모형으로도 보여 드려요. 짧은 반복이 멈춘 지점이나 기운 방향이에요. 카메라 한 대로 대략 확인하는 것이라 확실할 때만 알려 드려요. 옆에서 찍으면 깊이가, 정면에서 찍으면 기울기가 가장 잘 보여요.",
+  "gloss.speedMax.title": "바 속도로 보는 오늘의 최대 중량",
+  "gloss.speedMax.body":
+    "무게가 무거울수록 천천히 움직이고, 리프트마다 그 속도면 거의 한계 무게가 되는 속도가 있어요. 워밍업으로 몇 가지 무게와 속도를 얻으면, 그 점들을 잇는 선이 그 속도로 들 수 있는 무게, 즉 오늘의 추정 최대 중량을 가리켜요.\n오늘 계획보다 많이 높거나 낮으면 작은 조정을 제안해요. 최대 5% 더 무겁게, 또는 10% 더 가볍게예요. 카메라 추정치라서 마지막 판단은 첫 세트에 맡기세요.\n그 속도는 사람마다 조금씩 다르고, 카메라는 바가 아닌 몸을 측정해요. 그래서 카메라가 세는 동안 본 세트를 한계까지 하면(실패한 반복, 남은 반복 없음, 계획보다 적은 반복) 마지막 성공 반복의 속도를 저장하고, 그런 세트가 세 번 쌓이면 일반적인 속도 대신 내 속도로 추정해요.",
+  "gloss.barSpeed.title": "바 속도",
+  "gloss.barSpeed.body":
+    "반복마다 바가 올라가는 속도를 카메라로 측정해요. 세트가 힘들어지면 반복이 아직 괜찮게 느껴져도 바는 느려져요.\n가장 빠른 반복보다 약 3분의 1 느려지면 제대로 된 반복이 대략 한 번 남은 거예요. 거기서 세트를 끝내면 무리하지 않고도 충분히 힘들게 운동할 수 있어요. 추정치이니 옆에서 찍고 밝은 곳에서 하면 도움이 돼요.",
+  "gloss.fitnessAge.title": "체력 나이",
+  "gloss.fitnessAge.body":
+    "나와 같은 성별의 평범한 건강한 사람이 내 VO₂ max를 갖는 나이로, 건강한 성인을 대상으로 한 대규모 노르웨이 연구를 바탕으로 해요.\n체력 추정치이지 건강 검진이 아니에요. 고강도 유산소 운동을 하면 몇 주 안에 낮아져요.",
+  "gloss.deloadWeeks.title": "디로드 전 빌드 주간",
+  "gloss.deloadWeeks.body":
+    "운동은 블록 단위로 진행돼요. 빌드 주간에는 계획이 매주 조금씩 어려워져요. 세트는 늘고 남겨 두는 반복은 줄어요.\n그다음 디로드 주가 한 번 와요. 더 가볍게, 세트는 절반 정도예요. 관절과 신경이 회복할 시간을 줘서 더 강해져서 돌아오게 해요. 처음이거나 바쁘면 빌드 주간을 짧게, 회복이 잘되면 길게 고르세요.",
+  "gloss.deload.title": "디로드 주",
+  "gloss.deload.body":
+    "힘든 운동 블록 뒤에 오는 쉬운 주예요. 무게는 가볍게, 세트는 절반 정도예요. 진행이 멈추는 게 아니에요. 몸이 그동안의 운동을 흡수하는 시기라서 다음 블록을 더 강하게 시작할 수 있어요.",
+  "gloss.rir.title": "RIR: 남은 반복 수",
+  "gloss.rir.body":
+    "세트를 멈췄을 때 더 할 수 있었던 반복 수예요. RIR 2는 제대로 된 반복을 두 번 정도 더 할 수 있다고 느끼며 세트를 끝낸다는 뜻이에요.\n계획은 여유 있게 시작해서 블록이 진행될수록 한계에 가까워져요.",
+  "gloss.rpe.title": "RPE: 운동 자각도",
+  "gloss.rpe.body":
+    "세트가 얼마나 힘들게 느껴졌는지를 1에서 10으로 나타낸 거예요. 10은 전력을 다한 거예요. 8은 제대로 된 반복을 두 번 정도 더 할 수 있었다는 뜻으로, RIR 2와 같아요.",
+  "gloss.blockWeek.title": "트레이닝 블록",
+  "gloss.blockWeek.body":
+    "블록에서 지금 어디쯤인지 보여 줘요. 몇 번째 빌드 주간(또는 디로드)인지, 이번 주에 몇 회를 남겨 둘지예요. 블록 길이는 설정에서 바꿀 수 있어요.",
+  "gloss.readiness.title": "컨디션",
+  "gloss.readiness.body":
+    "0에서 100까지의 점수로, 50이 평소 수준이에요. 큰 근육이 얼마나 회복됐는지, 최근 운동이 어땠는지(목표 반복 달성, 세트 체감, 반복 속도, 심박수), 휴식일을 바탕으로 해요.\n65 이상이면 강하게 하는 날, 35 이하면 가볍게 하는 날이에요. 언제든 직접 바꿀 수 있어요.",
+  "gloss.call.title": "오늘의 판단",
+  "gloss.call.body":
+    "강하게: 첫 번째 큰 리프트를 한계에 1회 더 가깝게 해요. 계획대로: 평소 계획이에요. 가볍게: 세트 하나 적게, 한 단계 가볍게, 남은 반복은 1회 더 많게 해요. 선택은 저장돼요.",
+  "gloss.volume.title": "볼륨",
+  "gloss.volume.body": "본 세트마다 무게 × 반복을 모두 더한 값이에요. 총 운동량을 대략 보여 줘요. 워밍업은 포함하지 않아요.",
+  "gloss.e1rm.title": "추정 1RM",
+  "gloss.e1rm.body":
+    "한 번에 들 수 있을 것으로 보이는 최대 무게로, 세트 기록에 남은 반복 수를 더해 계산해요. 연구에서 반복 범위별로 가장 정확하다고 나온 공식을 써요(한계까지 10회 이하는 Brzycki와 Epley, 그 이상은 Mayhew와 Wathan). 각 공식은 30만 개 이상의 세트로 맞춘 2026년 무게 기반 공식과 평균을 내요. 최근 세트, 무거운 세트, 한계에 가까운 세트일수록 비중이 크고, 20회를 넘는 세트는 제외해요. 5회 세트와 8회 세트를 비교할 수 있어서 실제 최대 중량을 테스트하지 않아도 근력 추세를 볼 수 있어요.",
+  "gloss.weeklySets.title": "이번 주 근육별 세트",
+  "gloss.weeklySets.body":
+    "이번 주 각 근육을 자극한 고강도 세트 수예요. 보조 근육은 0.5세트로 세요. 초록색 구간인 10~20세트가 근성장에 대해 가장 많은 연구가 뒷받침하는 범위예요. 계획은 이 구간에서 가장 많이 모자란 근육을 우선해요.",
+  "gloss.experience.title": "운동 경력",
+  "gloss.experience.body":
+    "규칙적으로 웨이트를 한 기간이에요. 입문은 1년 미만, 중급은 1~3년, 숙련은 3년 이상이에요.\n각 근육이 주당 받는 고강도 세트 수(입문 8~12, 중급 10~16, 숙련 12~20)와 아직 기록하지 않은 리프트의 첫 무게를 정해요. 리프트를 기록하고 나면 내 세트 기록으로 무게를 정해요.\n맨몸 운동 프로그램의 시작 단계와 리프트 목표가 얼마나 빨리 오를지 예측하는 데도 쓰여요. 잘 모르겠다면 낮은 쪽을 고르세요. 계획이 금방 따라잡아요.",
+  "gloss.variety.title": "운동 동작 다양성",
+  "gloss.variety.body":
+    "계획이 한 근육에 같은 운동 동작을 얼마나 자주 유지할지예요. 일관될수록 리프트의 진행을 추적하기 좋아요. 다양할수록 새롭고 부담이 분산돼요.",
+  "gloss.recovery.title": "회복",
+  "gloss.recovery.body":
+    "세트마다 자극한 근육이 피로해져요. 그 피로는 2~3일에 걸쳐 풀려요. 90% 이상은 충분히 회복, 70%는 준비됨, 40%는 회복 중, 40% 미만은 피로예요. 계획은 아직 피로한 근육을 피해요.",
+  "gloss.superset.title": "슈퍼세트",
+  "gloss.superset.body":
+    "둘 이상의 운동 동작을 연달아 하는 거예요. 첫 번째 동작 한 세트, 바로 다음 동작 한 세트, 그다음 휴식이에요. 시간을 아낄 수 있고, 로우와 프레스처럼 같은 근육을 지치게 하지 않는 동작끼리 할 때 가장 좋아요.\n두 운동 동작 사이의 연결 버튼을 탭하면 묶이고, 다시 탭하면 풀려요.",
+  "gloss.warmup.title": "워밍업 세트",
+  "gloss.warmup.body":
+    "본 세트 무게까지 점점 올려 가는 가벼운 세트예요. 통계나 진행에는 포함되지 않아요. 이미 몸이 풀렸다면 건너뛰어도 돼요.",
+  "gloss.firstWeights.title": "묻는 이유",
+  "gloss.firstWeights.body":
+    "리프트마다 안전한 첫 무게를 제안하기 위해서예요. 가벼운 쪽에서 시작해 첫 운동 후에 조정해요. 정보는 휴대폰에만 저장돼요.",
+  "gloss.healthTwin.title": "건강",
+  "gloss.healthTwin.body":
+    "몸의 수치를 한곳에 모았어요. 체중, 체지방, 에너지, 수면, 심장, 걸음 수를 Liftsmith와 휴대폰의 건강 앱에서 가져와요.\n각 수치는 다른 사람이 아니라 지난 30일간의 내 평소 수치와 비교하고, 어떻게 하면 좋을지 알려 줘요. 의학적 조언은 아니에요.",
+  "gloss.hrv.title": "HRV: 심박 변이도",
+  "gloss.hrv.body":
+    "심장 박동 사이 간격의 미세한 변화로, 워치나 링이 주로 밤사이에 측정해요. 평소보다 높으면 대개 회복이 됐다는 뜻이고, 낮으면 운동, 수면 부족, 질병으로 인한 스트레스를 뜻해요.\n중요한 건 내 추세뿐이에요. 휴대폰과 워치마다 측정 방식이 달라서 다른 사람의 수치와 비교하지 마세요.",
+  "gloss.restingHr.title": "안정 시 심박수",
+  "gloss.restingHr.body":
+    "완전히 쉬고 있을 때의 심박수로, 보통 자는 동안 측정해요. 하루 이틀 평소보다 몇 회 높다면 조금 쉬엄쉬엄하라는 초기 신호예요.",
+  "gloss.breathingRate.title": "호흡수",
+  "gloss.breathingRate.body":
+    "자는 동안 1분에 쉬는 숨의 횟수로, 워치나 링이 측정해요. 매우 일정하게 유지되므로 평소보다 2회 이상 늘면 몸이 아프기 시작한다는 첫 신호인 경우가 많아요.",
+  "gloss.breathPattern.title": "호흡 패턴",
+  "gloss.breathPattern.body":
+    "세트 사이 휴식을 위한 가이드예요. 상자 둘레를 도는 점과 커졌다 작아지는 사각형을 따라가세요. 단계가 바뀔 때마다 부드러운 소리와 가벼운 진동이 나서 눈을 감고도 따라 할 수 있어요.\n박스 호흡: 들이쉬고, 참고, 내쉬고, 참기를 각 4초씩. 안정되고 차분해져요.\n4-7-8: 4초 들이쉬고, 7초 참고, 8초 내쉬어요. 긴 날숨이 심박을 가장 많이 늦춰요.\n이중 한숨: 숨을 들이쉬고 짧게 한 번 더 들이쉰 다음 길게 내쉬어요. 가장 빨리 진정되는 방법이에요.\n느린 호흡: 4초 들이쉬고 6초 내쉬어요.\n내 패턴: 상자의 각 변을 직접 정해요. 참기를 0으로 하면 빠져요.",
+  "gloss.vo2max.title": "VO₂ max",
+  "gloss.vo2max.body":
+    "최대 노력에서 몸이 쓸 수 있는 산소량으로, 1분에 체중 1킬로그램당 밀리리터로 나타내요. 워치가 걷기와 달리기로 추정해요. 심폐 체력을 보여 주는 가장 좋은 단일 지표예요.\n웨이트로는 거의 변하지 않아요. 주 2회 20분 고강도 유산소 운동이면 올라가요.",
+  "gloss.bodyFat.title": "체지방",
+  "gloss.bodyFat.body":
+    "체중에서 지방이 차지하는 비율로, 스마트 체중계, 체성분 측정기, 캘리퍼 측정으로 알 수 있어요. 방법마다 수치가 다르게 나오니 한 가지만 쓰고, 같은 시간대에, 되도록 아침 식사 전에 재세요.\n한 번의 측정은 큰 의미가 없어요. 몇 주에 걸쳐 세 번 이상 재면 추세가 보이고, 목표와 반대로 움직이면 코치 노트가 알려 줘요.",
+  "gloss.leanMass.title": "제지방량",
+  "gloss.leanMass.body":
+    "몸에서 지방을 뺀 전부예요. 근육, 뼈, 장기, 수분이에요. 체중에 지방이 아닌 비율을 곱한 값이에요. 체지방이 유지되거나 줄면서 제지방량이 늘면 운동으로 근육이 붙고 있다는 뜻이에요.",
+  "gloss.bmi.title": "BMI: 체질량 지수",
+  "gloss.bmi.body":
+    "체중을 키의 제곱으로 나눈 값이에요. 웨이트를 하지 않는 사람을 위한 대략적인 기준이에요. 근육과 지방을 구분하지 못해서 근육이 많은 사람은 과체중으로 나오기도 해요. 체지방 측정값이 있다면 그쪽을 믿으세요.",
+  "gloss.liftScores.title": "DOTS, Wilks, IPF GL",
+  "gloss.liftScores.body":
+    "스쿼트, 벤치 프레스, 데드리프트 합계를 체중에 맞춰 점수로 매기는 세 가지 방법이에요. 가벼운 사람과 무거운 사람을 비교할 수 있어요.\nDOTS(2019)와 IPF GL(2020)이 더 새롭고 공정한 공식이고, Wilks는 많은 사람이 아직 알고 있는 예전 공식이에요. 점수는 같은 공식끼리만 비교하세요.",
+  "gloss.ffmi.title": "FFMI: 제지방 지수",
+  "gloss.ffmi.body":
+    "제지방량(지방을 뺀 전부)을 키의 제곱으로 나누고 표준 키 1.8m에 맞춰 보정한 값이에요. BMI로는 알 수 없는 근육량을 보여 줘요.\n웨이트를 하는 남성은 대부분 19~23, 여성은 그보다 4 정도 낮아요. 약물을 쓰지 않는 사람을 조사한 연구에서는 25를 넘는 경우가 드물었어요.",
+  "gloss.hrZones.title": "심박수 구간",
+  "gloss.hrZones.body":
+    "최대 심박수를 기준으로 나눈 다섯 단계의 운동 강도로, 쉬운 강도(1구간)부터 전력(5구간)까지예요.\n안정 시 심박수가 있으면 여유 심박수(안정 시와 최대 사이의 차이)를 사용해서 체력 변화를 더 잘 반영해요.",
+  "gloss.restDrop.title": "휴식 중 심박수 감소",
+  "gloss.restDrop.body":
+    "세트 후 첫 1분 동안 심박수가 분당 몇 회 떨어지는지로, 심박 모니터로 측정해요. 몇 달에 걸쳐 감소 폭이 커지면 심장이 튼튼해졌다는 뜻이고, 평소보다 작으면 피곤하다는 뜻일 수 있어요.",
+  "gloss.setTypes.title": "드롭 세트와 레스트 포즈",
+  "gloss.setTypes.body":
+    "계획된 세트를 기록한 뒤 세트 사이에 추가할 수 있는 보너스 세트예요.\n드롭 세트는 무게를 4분의 1 정도 줄여 바로 다시 해요. 레스트 포즈 세트는 같은 무게로 15초 쉬고 몇 회를 더 짜내요.\n둘 다 세트를 하나 통째로 더하지 않고도 근육에 자극을 더해요. 볼륨에는 포함되지만, 다음 무게는 계획된 세트만 보고 정해요.",
+  "gloss.stretching.title": "워밍업 동작과 쿨다운 스트레칭",
+  "gloss.stretching.body":
+    "워밍업 동작은 움직이면서 하는 스트레칭과 드릴이에요. 심박수를 올리고 관절을 가동 범위 전체로 움직여서 첫 세트가 더 편해져요.\n쿨다운 스트레칭은 천천히 숨 쉬면서 30초 이상 유지하는 정적 스트레칭이에요. 근육이 따뜻한 운동 마지막이나 휴식일에 잘 맞아요. 살짝 당기는 정도까지만, 절대 아플 때까지 하지 마세요.",
+  "gloss.crate.title": "상자와 보관함",
+  "gloss.crate.body":
+    "운동을 마칠 때마다 완료 화면에서 상자를 하나 받아요. 상자에는 강조 색상, 휴식 타이머 소리, 원판 마감 중 하나가 무작위로 들어 있어요. 일반 아이템이 가장 자주, 전설 아이템이 가장 드물게 나와요.\n어떤 레벨에서는 정해진 아이템을 주고, 새 칭호마다 보너스 상자를 줘서 가장 희귀한 아이템도 확실히 얻을 방법이 있어요. 잠긴 아이템을 탭하면 얻는 방법을 볼 수 있어요.\n이미 가진 아이템이 나오면 보너스 25 XP로 바뀌어요. 쓸 아이템은 여기 보관함에서 고르세요.",
+  "gloss.badges.title": "업적과 배지",
+  "gloss.badges.body":
+    "업적은 운동 완료나 개인 최고 기록 경신 같은 목표예요. 업적마다 브론즈, 실버, 골드, 플래티넘의 최대 네 개 배지가 있고, 숫자가 커질수록 다음 배지를 받아요.\n어떤 배지는 앱의 색상 테마도 열어 줘요. 배지에 표시돼 있어요. 모든 배지는 XP를 주고, XP가 쌓이면 레벨이 올라요.",
+  "gloss.monthly.title": "월간 챌린지",
+  "gloss.monthly.body":
+    "매달 모든 사용자가 같은 챌린지를 받아요. 운동 횟수, 세트 수, 운동 시간 중 하나가 달마다 바뀌어요. 내가 마친 운동으로 세기 때문에 오프라인에서도 돼요.\n달이 끝나기 전에 완료하면 그달의 메달을 받아요. 완료한 달은 월간 챌린저 배지에 반영돼요. 친구 › 보드에서 팔로우하는 사람들의 현황을 볼 수 있어요.",
+  "gloss.schoolTeams.title": "학교 팀",
+  "gloss.schoolTeams.body":
+    "고등학교 코치는 학교나 교육청 이메일 주소를 인증하면 Pro를 무료로 받아요. 13~18세 선수도 팀에 있는 동안 Pro를 무료로 받아요.\n코치는 내 운동은 보지만 신체 정보는 보지 못해요. 팀원은 내 이름과 이번 주 운동 및 세트 수만 볼 수 있어요.",
+  "gloss.strengthStandards.title": "근력 기준",
+  "gloss.strengthStandards.body":
+    "훈련된 사람들의 일반적인 추정 1RM으로, 체중에 맞추고 입력한 경우 나이와 성별도 반영해요. 공개된 근력 기준과 마스터즈 계수의 형태를 바탕으로 해요.\n백분율은 내 추정치가 훈련된 사람 중 대략 몇 %보다 높은지를 나타내며, 실제 Liftsmith 사용자 순위가 아니에요. 키와 BMI는 쓰지 않아요.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Bar yolu",
+  "gloss.barPath.body":
+    "Barın her tekrarda izlediği çizgi, yandan bakınca. Squat, deadlift ve overhead press'te en iyisi, ayağının ortası üzerinde aşağı yukarı dümdüz inip çıkmasıdır.\nSetten sonra tekrar oynatma, görülmeye değer tekrarı gösterir: mavi çizgi bar, kesikli çizgi ise başladığı yerden dümdüz yukarısıdır. Bar tekrarlarının dörtte birinde ya da daha fazlasında öne veya arkaya kaydıysa bir ipucu alırsın. Tek kameradan kaba bir okuma (squat'ta omuzların, diğer hareketlerde ellerin barın yerine geçer), bu yüzden net olmadıkça sessiz kalır.",
+  "gloss.formCheck.title": "Form kontrolü",
+  "gloss.formCheck.body":
+    "Kamera tekrarları sayarken her tekrarın nasıl gittiğine de bakar: squat'ta kalçanın diz hizasına inip inmediğine; her harekette bazı tekrarların en iyinden kısa kesilip kesilmediğine; squat, deadlift ve overhead press'te de bir yana yatıp yatmadığına.\nSetler arasında düzeltmeye en çok değer tek şeyi, kaç tekrarda gördüğüyle birlikte söyler, figür de gösterir: kısa tekrarlarının nerede durduğunu ya da nasıl yattığını. Tek kameradan kaba bir kontrol, bu yüzden net olmadıkça sessiz kalır. Derinliği en iyi yandan, yana yatmayı ise kameraya dönük durunca görür.",
+  "gloss.speedMax.title": "Bar hızından bugünkü maksimum",
+  "gloss.speedMax.body":
+    "Ağırlık arttıkça daha yavaş kalkar ve her hareketin, bir tekrarın neredeyse kaldırabileceğin en ağır olduğu bir hızı vardır. Isınmaların birkaç ağırlık ve hızlarını verir; bunlardan geçen çizgi o hızda kaldıracağın ağırlığı gösterir: bugünkü tahmini maksimum.\nBugünkü planın beklediğinden epey yukarı ya da aşağıdaysa küçük bir değişiklik öneririz: en fazla %5 ağır ya da %10 hafif. Bu bir kamera tahmini, son sözü ilk setin söylesin.\nO hız kişiden kişiye biraz değişir ve kamera barı değil vücudunu ölçer. Bu yüzden kamera sayarken bir çalışma setini tükenişe kadar götürdüğünde (çıkmayan bir tekrar, kalmayan tekrar ya da plandan az tekrar), son iyi tekrarının hızı saklanır ve bu tür üç setten sonra tahmin olağan hız yerine senin hızını kullanır.",
+  "gloss.barSpeed.title": "Bar hızı",
+  "gloss.barSpeed.body":
+    "Barın her tekrarda ne kadar hızlı kalktığı, kamerayla ölçülür. Set zorlaştıkça tekrarlar iyi hissettirse bile bar yavaşlar.\nEn hızlı tekrarından yaklaşık üçte bir yavaşsa aşağı yukarı bir iyi tekrarın kalmıştır; seti orada bitirmek işi zor tutar ama zorlanmadan. Bu bir tahmin: yandan bakış ve iyi ışık yardımcı olur.",
+  "gloss.fitnessAge.title": "Fitness yaşı",
+  "gloss.fitnessAge.body":
+    "Senin cinsiyetinden tipik sağlıklı birinin senin VO₂ max değerine sahip olduğu yaş; sağlıklı yetişkinlerle yapılmış büyük bir Norveç çalışmasına dayanır.\nBu bir kondisyon tahmini, sağlık kontrolü değil. Zorlu kardiyo onu birkaç hafta içinde düşürür.",
+  "gloss.deloadWeeks.title": "Deload öncesi yükleme haftaları",
+  "gloss.deloadWeeks.body":
+    "Antrenmanın bloklar halinde ilerler. Yükleme haftalarında plan her hafta biraz zorlaşır: daha çok set ve yedekte daha az tekrar.\nSonra bir deload haftası gelir: daha hafif, setlerin yaklaşık yarısı. Eklemlerin ve sinirlerin toparlanır, daha güçlü dönersin. Yeniysen ya da yoğunsan daha az yükleme haftası, iyi toparlanıyorsan daha fazla seç.",
+  "gloss.deload.title": "Deload haftası",
+  "gloss.deload.body":
+    "Zorlu bir antrenman bloğundan sonra daha kolay bir hafta: daha hafif ağırlıklar ve setlerin yaklaşık yarısı. Kaybedilmiş ilerleme değil. Vücudun yapılan işi o zaman sindirir, böylece sonraki blok daha güçlü başlar.",
+  "gloss.rir.title": "RIR: yedekteki tekrar",
+  "gloss.rir.body":
+    "Seti bitirdiğinde kaç tekrar daha yapabilecek olduğun. RIR 2, seti yaklaşık iki iyi tekrarın daha kaldığını hissederek bitirmek demek.\nPlan yedekte daha çok tekrarla başlar ve blok boyunca tükenişe yaklaşır.",
+  "gloss.rpe.title": "RPE: algılanan zorluk derecesi",
+  "gloss.rpe.body":
+    "Bir setin 1'den 10'a kadar bir ölçekte ne kadar zor hissettirdiği; 10, elindeki her şey demek. 8, yaklaşık iki iyi tekrarın daha kaldığı anlamına gelir, yani yedekte 2 tekrarla aynı.",
+  "gloss.blockWeek.title": "Antrenman bloğu",
+  "gloss.blockWeek.body":
+    "Bloğunda nerede olduğun: hangi yükleme haftası (ya da deload) ve bu hafta yedekte kaç tekrar bırakacağın. Blok uzunluğunu Ayarlar'dan değiştirebilirsin.",
+  "gloss.readiness.title": "Hazırlık",
+  "gloss.readiness.body":
+    "0 ile 100 arası bir puan; 50 normal bir gün. Büyük kaslarının ne kadar toparlandığından, son antrenmanların nasıl geçtiğinden (tutturulan tekrarlar, setlerin nasıl hissettirdiği, tekrar hızı ve nabız) ve dinlenme günlerinden gelir.\n65 ve üstü yüklenme günü, 35 ve altı hafif gün. İstediğin zaman geçersiz kılabilirsin.",
+  "gloss.call.title": "Günün kararı",
+  "gloss.call.body":
+    "Yüklen: ilk büyük hareketin tükenişe bir tekrar daha yaklaşır. Plana göre: normal plan. Hafif tut: bir set eksik, bir kademe hafif ve yedekte bir tekrar fazla. Seçimin kaydedilir.",
+  "gloss.volume.title": "Hacim",
+  "gloss.volume.body": "Ağırlık × tekrar, tüm çalışma setlerinde toplanır. Yaptığın toplam işin kaba bir ölçüsü. Isınmalar sayılmaz.",
+  "gloss.e1rm.title": "Tahmini 1RM",
+  "gloss.e1rm.body":
+    "Muhtemelen bir kez kaldırabileceğin en fazla ağırlık; setlerinden, kalan tekrarlar eklenerek hesaplanır. Araştırmaların her tekrar aralığı için en doğru bulduğu formülleri kullanır (tükenişe 10 tekrara kadar Brzycki ve Epley, üstünde Mayhew ve Wathan), her biri 300.000'den fazla sete uydurulmuş, ağırlığa dayalı 2026 tarihli bir denklemle ortalanır. Yakın tarihli, ağır, tükenişe yakın setler en çok sayılır, 20 tekrarı geçen setler yok sayılır. 5'lik bir seti 8'lik bir setle karşılaştırmanı sağlar; böylece gerçek maksimumunu test etmeden gerçek güç eğilimlerini görürsün.",
+  "gloss.weeklySets.title": "Bu hafta kas başına set",
+  "gloss.weeklySets.body":
+    "Bu hafta her kası çalıştıran zor setler. Yardımcı kaslar yarım set sayılır. 10 ile 20 arasındaki yeşil bant, araştırmaların büyüme için en çok desteklediği aralık. Plan bunun en çok altında kalan kaslara yönelir.",
+  "gloss.experience.title": "Deneyim",
+  "gloss.experience.body":
+    "Ne kadar süredir düzenli ağırlık çalıştığın. Yeni bir yıldan az, Biraz 1 ila 3 yıl, Deneyimli ise 3 yıl ya da daha fazla.\nHer kasın haftada kaç zor set alacağını (Yeni için 8–12, Biraz için 10–16, Deneyimli için 12–20) ve henüz kaydetmediğin hareketlerde ilk ağırlıkların ne kadar olacağını belirler. Bir hareketi kaydettikten sonra ağırlıklarını kendi setlerin belirler.\nAyrıca vücut ağırlığı programlarında başlangıç kademesini ve hareket hedeflerinin ne kadar hızlı ilerleyeceğinin tahminini seçer. Emin değil misin? Düşük olanı seç; plan çabucak yetişir.",
+  "gloss.variety.title": "Egzersiz çeşitliliği",
+  "gloss.variety.body":
+    "Planın bir kas için aynı egzersizi ne sıklıkla koruduğu. Daha tutarlı, bir harekette ilerlemeyi takip etmek için daha iyi. Daha çok çeşitlilik işleri taze tutar ve yükü dağıtır.",
+  "gloss.recovery.title": "Toparlanma",
+  "gloss.recovery.body":
+    "Her set çalıştırdığı kasları yorar. Bu yorgunluk 2–3 günde geçer. Dinç %90 ve üstü, Hazır %70, Toparlanıyor %40, Yorgun ise %40'ın altı. Plan hâlâ yorgun olan kaslardan kaçınır.",
+  "gloss.superset.title": "Süperset",
+  "gloss.superset.body":
+    "Arka arkaya yapılan iki ya da daha fazla egzersiz: ilkinden bir set, ardından hemen sonrakinden bir set, sonra dinlenme. Zaman kazandırır ve aynı kasları yormayan egzersizlerde, örneğin bir row ile bir press'te, en iyi işler.\nEşleştirmek için iki egzersiz arasındaki bağlantıya dokun, ayırmak için yine dokun.",
+  "gloss.warmup.title": "Isınma setleri",
+  "gloss.warmup.body":
+    "Çalışma ağırlığına doğru çıkan daha hafif setler. İstatistiklerine ya da ilerlemene sayılmazlar. Zaten ısındıysan atla.",
+  "gloss.firstWeights.title": "Neden soruyoruz",
+  "gloss.firstWeights.body":
+    "Sadece her hareket için güvenli bir ilk ağırlık önermek için. Hafif taraftan başlar, ilk antrenmanından sonra ayarlarız. Telefonunda kalır.",
+  "gloss.healthTwin.title": "Sağlık",
+  "gloss.healthTwin.body":
+    "Vücudunun sayıları tek yerde: kilo, vücut yağı, enerji, uyku, kalp ve adımlar; Liftsmith'ten ve telefonunun sağlık uygulamasından.\nHer biri başkalarıyla değil, son 30 gündeki kendi normalinle karşılaştırılır ve ne yapman gerektiğini söyler. Tıbbi tavsiye değildir.",
+  "gloss.hrv.title": "HRV: kalp atış hızı değişkenliği",
+  "gloss.hrv.body":
+    "Kalp atışları arasındaki sürede olan minik değişimler; saat ya da yüzükle, çoğunlukla gece ölçülür. Kendi normalinden yüksek olması genelde toparlandığın, düşük olması ise antrenman, kötü uyku ya da hastalıktan gelen stres anlamına gelir.\nSadece kendi eğilimin önemli: telefonlar ve saatler bunu farklı ölçer, o yüzden sayını başkasınınkiyle karşılaştırma.",
+  "gloss.restingHr.title": "Dinlenme nabzı",
+  "gloss.restingHr.body":
+    "Tamamen dinlenirkenki nabzın, genelde uyurken ölçülür. Bir iki gün kendi normalinin birkaç atım üstünde olması, biraz yavaşlaman için erken bir işaret.",
+  "gloss.breathingRate.title": "Solunum hızı",
+  "gloss.breathingRate.body":
+    "Uyurken dakikadaki nefes sayısı, saat ya da yüzükten. Çok sabit kalır; bu yüzden normalinin iki ya da daha fazla üstüne sıçraması çoğu zaman hastalanmanın ilk işaretlerinden biridir.",
+  "gloss.breathPattern.title": "Nefes kalıpları",
+  "gloss.breathPattern.body":
+    "Setler arası dinlenme için bir rehber: noktayı kutunun etrafında, kareyi de büyüyüp küçülürken takip et. Her adım değişiminde yumuşak bir ses ve hafif bir titreşim gelir, böylece gözlerin kapalı da takip edebilirsin.\nKutu nefesi: al, tut, ver ve tut, her biri 4 saniye. Dengeli ve sakinleştirici.\n4-7-8: 4'te al, 7 tut, 8'de ver. Uzun nefes verme kalbi en çok yavaşlatır.\nÇift iç çekiş: bir nefes al, üstüne kısa ikinci bir yudum, sonra uzun bir nefes ver. Sakinleşmenin en hızlı yolu.\nYavaş nefesler: 4'te al, 6'da ver.\nSenin kalıbın: kutunun her kenarını kendin ayarla. 0 tutma onu çıkarır.",
+  "gloss.vo2max.title": "VO₂ max",
+  "gloss.vo2max.body":
+    "Vücudunun tam eforda kullanabildiği oksijen miktarı, kilogram başına dakikada mililitre olarak. Saatler bunu yürüyüş ve koşulardan tahmin eder. Kalp kondisyonunun en iyi tek ölçüsü.\nAğırlık çalışmak onu pek değiştirmez. Haftada iki kez 20 dakikalık zorlu kardiyo değiştirir.",
+  "gloss.bodyFat.title": "Vücut yağı",
+  "gloss.bodyFat.body":
+    "Kilonun yağdan oluşan payı; akıllı tartı, vücut tarayıcı ya da kaliper ölçümünden. Her yöntem farklı okur, bu yüzden birine bağlı kal ve günün aynı saatinde, tercihen sabah yemekten önce ölç.\nTek bir ölçüm pek bir şey ifade etmez. Birkaç hafta içinde üç ya da daha fazlası eğilimi gösterir; hedefin için yanlış yöne gidiyorsa Koç notları sana söyler.",
+  "gloss.leanMass.title": "Yağsız kütle",
+  "gloss.leanMass.body":
+    "Vücudunda yağ olmayan her şey: kas, kemik, organlar ve su. Kilonun, yağ olmayan payla çarpımı. Vücut yağı sabit kalırken ya da düşerken yağsız kütlenin artması, antrenmanın kas yaptığı anlamına gelir.",
+  "gloss.bmi.title": "BMI: vücut kitle indeksi",
+  "gloss.bmi.body":
+    "Kilonun boyun karesine bölümü. Ağırlık çalışmayanlar için kaba bir rehber: kası yağdan ayıramaz, bu yüzden kaslı sporcular sık sık fazla kilolu görünür. Bir vücut yağı ölçümün varsa ona güven.",
+  "gloss.liftScores.title": "DOTS, Wilks ve IPF GL",
+  "gloss.liftScores.body":
+    "Squat, bench press ve deadlift toplamını vücut ağırlığına göre puanlamanın üç yolu; böylece hafif ve ağır bir sporcu karşılaştırılabilir.\nDOTS (2019) ve IPF GL (2020) daha yeni ve daha adil formüller; Wilks ise pek çok sporcunun hâlâ bildiği eski formül. Bir puanı sadece aynı formülle karşılaştır.",
+  "gloss.ffmi.title": "FFMI: yağsız kütle indeksi",
+  "gloss.ffmi.body":
+    "Yağsız kütlenin (yağ dışındaki her şey) boyunun karesine bölümü, 1,8 m standart boya göre ayarlanır. BMI'nin gösteremediği, ne kadar kas taşıdığını gösterir.\nAğırlık çalışan erkeklerin çoğu 19 ile 23 arasında, kadınlar yaklaşık 4 aşağıda. Doping kullanmayan sporcularla yapılan bir çalışma 25'in üstünde çok az kişi buldu.",
+  "gloss.hrZones.title": "Nabız bölgeleri",
+  "gloss.hrZones.body":
+    "Maksimum nabzından belirlenen beş efor bandı; kolaydan (bölge 1) tam güce (bölge 5) kadar.\nDinlenme nabzın varsa, kondisyonunu daha iyi takip eden nabız rezervini (dinlenme ile maksimum arasındaki fark) kullanırlar.",
+  "gloss.restDrop.title": "Dinlenmede nabız düşüşü",
+  "gloss.restDrop.body":
+    "Bir setten sonraki ilk dakikada nabzının dakikada kaç atım düştüğü, nabız ölçerinden. Aylar içinde daha büyük bir düşüş daha fit bir kalp demek; olağandan küçük bir düşüş yorgun olduğun anlamına gelebilir.",
+  "gloss.setTypes.title": "Drop set ve rest-pause",
+  "gloss.setTypes.body":
+    "Planlanan set kaydedildikten sonra setler arasında ekleyebileceğin bonus setler.\nDrop set ağırlığı yaklaşık dörtte bir düşürür ve hemen tekrar yapar. Rest-pause seti aynı ağırlıkta kalır, 15 saniye durur, sonra birkaç tekrar daha sıkar.\nİkisi de tam bir ekstra set olmadan kasa iş ekler. Hacmine sayılırlar ama planın sonraki ağırlıkları sadece planlanan setlerine bakar.",
+  "gloss.stretching.title": "Isınma hareketleri ve soğuma esneme",
+  "gloss.stretching.body":
+    "Isınma hareketleri, hareketli esnemeler ve drillerdir. Nabzını yükseltir ve eklemlerini hareket açıklıklarında gezdirir, böylece ilk setler daha iyi hissettirir.\nSoğuma esnemeleri, yavaş nefes alırken 30 saniye ya da daha uzun tuttuğun sabit esnemelerdir. Kaslar ısınmışken, antrenman sonuna ya da dinlenme gününe uyar. Hafif gerginliğe kadar esne, asla acıya kadar değil.",
+  "gloss.crate.title": "Sandıklar ve Dolap",
+  "gloss.crate.body":
+    "Biten her antrenman Bitti ekranında sana bir sandık verir. İçinde rastgele seçilmiş bir vurgu rengi, dinlenme sayacı sesi ya da plaka kaplaması vardır: yaygınlar en sık, efsaneviler en seyrek çıkar.\nBazı seviyeler belirli bir eşya verir ve her yeni unvan bonus bir sandık verir; böylece en nadir eşyaların bile kesin bir yolu vardır. Nasıl alınacağını görmek için kilitli bir eşyaya dokun.\nZaten sahip olduğun bir şey çıkarsa 25 bonus XP'ye dönüşür. Kullandıklarını burada, Dolap'ta seç.",
+  "gloss.badges.title": "Başarımlar ve rozetler",
+  "gloss.badges.body":
+    "Başarım bir hedeftir, antrenman bitirmek ya da kişisel rekor kırmak gibi. Her birinin en fazla dört rozeti vardır: bronz, gümüş, altın ve platin; giderek büyüyen sayılarda kazanılır.\nBazı rozetler uygulama için bir renk teması da açar; rozet hangisi olduğunu söyler. Her rozet XP verir, bu da seviyeni yükseltir.",
+  "gloss.monthly.title": "Aylık meydan okuma",
+  "gloss.monthly.body":
+    "Her ay her sporcu aynı meydan okumayı alır: belli sayıda antrenman, set ya da dakika, aydan aya değişir. Kendi bitirdiğin antrenmanlar sayılır, bu yüzden çevrimdışı da çalışır.\nO ayın madalyasını kazanmak için ay bitmeden tamamla. Tamamlanan her ay Aylık meydan okuyucu rozetine sayılır. Arkadaşlar › Tablo, takip ettiklerinin nasıl gittiğini gösterir.",
+  "gloss.schoolTeams.title": "Okul takımları",
+  "gloss.schoolTeams.body":
+    "Lise koçları, okullarından ya da eğitim bölgelerinden bir e-posta adresini doğruladıklarında Pro'yu ücretsiz alır. 13–18 yaş arası sporcuları da takımda oldukları sürece Pro'yu ücretsiz alır.\nKoç antrenmanlarını görür, vücut verilerini görmez. Takım arkadaşların sadece adını ve bu hafta kaç antrenman ve set yaptığını görür.",
+  "gloss.strengthStandards.title": "Güç standartları",
+  "gloss.strengthStandards.body":
+    "Antrenmanlı sporcular için tipik tahmini 1RM değerleri; vücut ağırlığına göre ölçeklenir ve eklediysen yaş ile cinsiyete göre ayarlanır. Yayınlanmış güç standartlarının ve master katsayılarının şeklinden gelir.\nYüzde, tahmininin geçtiği antrenmanlı sporcuların kaba bir payıdır; gerçek Liftsmith kullanıcılarının sıralaması değildir. Boy ve BMI kullanılmaz.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Tor sztangi",
+  "gloss.barPath.body":
+    "Linia, którą sztanga pokonuje w każdym powtórzeniu, widziana z boku. W przysiadach, martwym ciągu i wyciskaniu nad głowę najlepiej, gdy idzie mniej więcej pionowo w górę i w dół nad środkiem stopy.\nPo serii powtórka pokazuje powtórzenie, które warto zobaczyć: niebieska linia to sztanga, a przerywana to pion od miejsca startu. Jeśli sztanga uciekła do przodu lub do tyłu w co najmniej jednej czwartej powtórzeń, dostaniesz jedną wskazówkę. To przybliżony odczyt z jednej kamery (w przysiadzie sztangę zastępują barki, w innych ćwiczeniach dłonie), więc odzywa się tylko, gdy wszystko jest jasne.",
+  "gloss.formCheck.title": "Kontrola techniki",
+  "gloss.formCheck.body":
+    "Licząc powtórzenia, kamera sprawdza też, jak przebiegło każde z nich: w przysiadach, czy biodra zeszły do poziomu kolan; w każdym ćwiczeniu, czy niektóre powtórzenia były krótsze niż twoje najlepsze; a w przysiadach, martwym ciągu i wyciskaniu nad głowę, czy przechylałeś się na bok.\nMiędzy seriami podaje jedną rzecz, którą najbardziej warto poprawić, z liczbą powtórzeń, w których ją zauważyła, a sylwetka to pokazuje: gdzie zatrzymały się krótkie powtórzenia albo w którą stronę się przechylałeś. To przybliżona kontrola z jednej kamery, więc odzywa się tylko, gdy wszystko jest jasne. Z boku najlepiej widać głębokość; przodem do kamery widać przechył.",
+  "gloss.speedMax.title": "Dzisiejsze maksimum z prędkości sztangi",
+  "gloss.speedMax.body":
+    "Im większy ciężar, tym wolniej się porusza, a każde ćwiczenie ma prędkość, przy której powtórzenie jest mniej więcej tak ciężkie, jak dasz radę. Rozgrzewka daje kilka ciężarów i ich prędkości, a linia przez nie wskazuje ciężar, który przesunąłbyś z tą prędkością: dzisiejsze szacowane maksimum.\nGdy wyraźnie odbiega od tego, czego oczekuje dzisiejszy plan, proponujemy małą zmianę: najwyżej 5% więcej lub 10% mniej. To szacunek z kamery, więc ostatnie słowo należy do pierwszej serii.\nTa prędkość różni się trochę między ludźmi, a kamera mierzy twoje ciało, a nie sztangę. Dlatego gdy zrobisz serię roboczą do upadku, kiedy kamera liczy (nieudane powtórzenie, brak zapasu albo mniej powtórzeń niż w planie), zapisujemy prędkość ostatniego dobrego powtórzenia, a po trzech takich seriach szacunek opiera się na twojej prędkości zamiast typowej.",
+  "gloss.barSpeed.title": "Prędkość sztangi",
+  "gloss.barSpeed.body":
+    "Jak szybko sztanga idzie w górę w każdym powtórzeniu, mierzone kamerą. Gdy seria robi się ciężka, sztanga zwalnia, nawet jeśli powtórzenia wciąż wydają się w porządku.\nGdy jest mniej więcej o jedną trzecią wolniejsza niż twoje najszybsze powtórzenie, zostało ci około jednego dobrego powtórzenia, więc zakończenie serii w tym miejscu utrzymuje ciężką pracę bez mielenia. To szacunek: widok z boku i dobre światło pomagają.",
+  "gloss.fitnessAge.title": "Wiek sprawnościowy",
+  "gloss.fitnessAge.body":
+    "Wiek, w którym typowa zdrowa osoba twojej płci ma twoje VO₂ max, według dużego norweskiego badania zdrowych dorosłych.\nTo szacunek sprawności, nie badanie zdrowia. Intensywne cardio obniża go w ciągu kilku tygodni.",
+  "gloss.deloadWeeks.title": "Tygodnie budowania przed deloadem",
+  "gloss.deloadWeeks.body":
+    "Twój trening jest podzielony na bloki. W tygodniach budowania plan co tydzień robi się trochę trudniejszy: więcej serii i mniejszy zapas powtórzeń.\nPotem przychodzi jeden tydzień deloadu: lżej, około połowy serii. Pozwala stawom i układowi nerwowemu nadrobić zaległości, więc wracasz silniejszy. Wybierz mniej tygodni budowania, jeśli zaczynasz lub masz mało czasu, więcej, jeśli dobrze się regenerujesz.",
+  "gloss.deload.title": "Tydzień deloadu",
+  "gloss.deload.body":
+    "Lżejszy tydzień po bloku ciężkiego treningu: mniejsze ciężary i około połowy serii. To nie strata postępów. To wtedy ciało przyswaja pracę, więc kolejny blok zaczynasz silniejszy.",
+  "gloss.rir.title": "RIR: powtórzenia w zapasie",
+  "gloss.rir.body":
+    "Ile jeszcze powtórzeń dałbyś radę zrobić, kończąc serię. RIR 2 oznacza, że kończysz serię z poczuciem, że masz w sobie jeszcze około dwóch dobrych powtórzeń.\nPlan zaczyna z większym zapasem i w trakcie bloku zbliża się do upadku.",
+  "gloss.rpe.title": "RPE: odczuwany wysiłek",
+  "gloss.rpe.body":
+    "Jak ciężka była seria w skali od 1 do 10, gdzie 10 to wszystko, co miałeś. 8 oznacza, że miałeś w sobie jeszcze około dwóch dobrych powtórzeń, czyli tyle samo co 2 powtórzenia w zapasie.",
+  "gloss.blockWeek.title": "Blok treningowy",
+  "gloss.blockWeek.body":
+    "Gdzie jesteś w bloku: który tydzień budowania (albo deload) i ile powtórzeń zostawić w zapasie w tym tygodniu. Długość bloku zmienisz w Ustawieniach.",
+  "gloss.readiness.title": "Gotowość",
+  "gloss.readiness.body":
+    "Wynik od 0 do 100, gdzie 50 to zwykły dzień. Bierze się z tego, jak zregenerowane są twoje duże mięśnie, jak poszły ostatnie treningi (zrobione powtórzenia, odczucia z serii, prędkość powtórzeń i tętno) oraz z dni odpoczynku.\n65 lub więcej to dzień na mocniej, 35 lub mniej to dzień na lżej. Zawsze możesz to zmienić.",
+  "gloss.call.title": "Decyzja na dziś",
+  "gloss.call.body":
+    "Mocniej: pierwsze duże ćwiczenie idzie o jedno powtórzenie bliżej upadku. Zgodnie z planem: zwykły plan. Lżej: o jedną serię mniej, o stopień lżej i jedno powtórzenie więcej w zapasie. Twój wybór zostaje zapisany.",
+  "gloss.volume.title": "Objętość",
+  "gloss.volume.body":
+    "Ciężar × powtórzenia, zsumowane ze wszystkich serii roboczych. To przybliżona miara całej wykonanej pracy. Rozgrzewka się nie liczy.",
+  "gloss.e1rm.title": "Szacowany 1RM",
+  "gloss.e1rm.body":
+    "Najwięcej, ile prawdopodobnie podniósłbyś raz, wyliczone z twoich serii z doliczonym zapasem powtórzeń. Używa wzorów, które badania uznały za najdokładniejsze dla danego zakresu powtórzeń (Brzycki i Epley do 10 powtórzeń do upadku, Mayhew i Wathan powyżej), każdy uśredniony z równaniem z 2026 roku opartym na ciężarze, dopasowanym na ponad 300 000 serii. Najbardziej liczą się świeże, ciężkie serie blisko upadku, a serie powyżej 20 powtórzeń są pomijane. Pozwala porównać serię na 5 z serią na 8, więc widzisz prawdziwe trendy siły bez testowania prawdziwego maksimum.",
+  "gloss.weeklySets.title": "Serie na mięsień w tym tygodniu",
+  "gloss.weeklySets.body":
+    "Ciężkie serie, które w tym tygodniu pracowały na dany mięsień. Mięśnie pomocnicze liczą się jako pół serii. Zielony pas, od 10 do 20, to zakres, który większość badań wspiera dla wzrostu mięśni. Plan celuje w mięśnie najbardziej poniżej niego.",
+  "gloss.experience.title": "Doświadczenie",
+  "gloss.experience.body":
+    "Jak długo regularnie trenujesz z ciężarami. Początkujący to mniej niż rok, Średnio zaawansowany to 1 do 3 lat, a Doświadczony to 3 lata lub więcej.\nUstala, ile ciężkich serii tygodniowo dostaje każdy mięsień (8 do 12 dla Początkującego, 10 do 16 dla Średnio zaawansowanego, 12 do 20 dla Doświadczonego) i jak ciężkie są pierwsze ciężary w ćwiczeniach, których jeszcze nie zapisałeś. Po zapisaniu ćwiczenia ciężary ustalają twoje własne serie.\nWybiera też poziom startowy w programach z masą ciała i to, jak szybko według prognozy będą rosły twoje cele siłowe. Nie wiesz? Wybierz niższy; plan szybko nadrobi.",
+  "gloss.variety.title": "Różnorodność ćwiczeń",
+  "gloss.variety.body":
+    "Jak często plan zostawia to samo ćwiczenie na dany mięsień. Większa stałość lepiej sprawdza się przy śledzeniu postępów w ćwiczeniu. Większa różnorodność daje świeżość i rozkłada obciążenie.",
+  "gloss.recovery.title": "Regeneracja",
+  "gloss.recovery.body":
+    "Każda seria męczy mięśnie, które pracują. To zmęczenie mija w ciągu 2–3 dni. Świeży to 90% lub więcej, Gotowy 70%, W regeneracji 40%, a Zmęczony to poniżej 40%. Plan omija mięśnie, które są jeszcze zmęczone.",
+  "gloss.superset.title": "Superseria",
+  "gloss.superset.body":
+    "Dwa lub więcej ćwiczeń jedno po drugim: jedna seria pierwszego, od razu jedna seria następnego, a potem przerwa. Oszczędza czas i najlepiej działa dla ćwiczeń, które nie męczą tych samych mięśni, na przykład wiosłowania z wyciskaniem.\nStuknij łącznik między dwoma ćwiczeniami, żeby je połączyć, i jeszcze raz, żeby je rozdzielić.",
+  "gloss.warmup.title": "Serie rozgrzewkowe",
+  "gloss.warmup.body":
+    "Lżejsze serie, które prowadzą do ciężaru roboczego. Nie liczą się do statystyk ani postępów. Pomiń je, jeśli już jesteś rozgrzany.",
+  "gloss.firstWeights.title": "Dlaczego pytamy",
+  "gloss.firstWeights.body":
+    "Tylko po to, żeby zaproponować bezpieczny pierwszy ciężar w każdym ćwiczeniu. Zaczynamy lżej i dostosowujemy po pierwszym treningu. Dane zostają na twoim telefonie.",
+  "gloss.healthTwin.title": "Zdrowie",
+  "gloss.healthTwin.body":
+    "Liczby twojego ciała w jednym miejscu: waga, tkanka tłuszczowa, energia, sen, serce i kroki, z Liftsmith i aplikacji zdrowia w telefonie.\nKażda jest porównywana z twoją własną normą z ostatnich 30 dni, nigdy z innymi ludźmi, i mówi, co z tym zrobić. To nie jest porada medyczna.",
+  "gloss.hrv.title": "HRV: zmienność rytmu serca",
+  "gloss.hrv.body":
+    "Drobne zmiany odstępów między uderzeniami serca, mierzone zegarkiem lub pierścieniem, głównie w nocy. Wyższa niż twoja norma zwykle oznacza, że się zregenerowałeś; niższa oznacza stres od treningu, słaby sen lub chorobę.\nLiczy się tylko twój własny trend: telefony i zegarki mierzą ją inaczej, więc nie porównuj swojej liczby z cudzą.",
+  "gloss.restingHr.title": "Tętno spoczynkowe",
+  "gloss.restingHr.body":
+    "Twoje tętno w pełnym spoczynku, zwykle mierzone podczas snu. Kilka uderzeń powyżej twojej normy przez dzień lub dwa to wczesny sygnał, żeby trochę odpuścić.",
+  "gloss.breathingRate.title": "Częstość oddechów",
+  "gloss.breathingRate.body":
+    "Oddechy na minutę podczas snu, z zegarka lub pierścienia. Jest bardzo stabilna, więc skok o dwa lub więcej ponad twoją normę jest często jednym z pierwszych objawów choroby.",
+  "gloss.breathPattern.title": "Wzorce oddechu",
+  "gloss.breathPattern.body":
+    "Przewodnik na przerwę między seriami: śledź kropkę wokół kwadratu i kwadrat, gdy rośnie i maleje. Każda zmiana fazy daje cichy dźwięk i lekką wibrację, więc możesz oddychać z zamkniętymi oczami.\nOddech pudełkowy: wdech, wstrzymanie, wydech i wstrzymanie, po 4 sekundy. Równy i uspokajający.\n4-7-8: wdech na 4, wstrzymanie na 7, wydech na 8. Długi wydech najbardziej zwalnia serce.\nPodwójne westchnienie: wdech, krótki drugi wdech na wierzchu, potem długi wydech. Najszybszy sposób, żeby się uspokoić.\nSpokojne oddechy: wdech na 4, wydech na 6.\nWłasny: ustaw każdy bok kwadratu sam. Wstrzymanie 0 je pomija.",
+  "gloss.vo2max.title": "VO₂ max",
+  "gloss.vo2max.body":
+    "Ile tlenu twoje ciało może wykorzystać przy pełnym wysiłku, w mililitrach na kilogram na minutę. Zegarki szacują je ze spacerów i biegów. To najlepsza pojedyncza miara wydolności serca.\nTrening siłowy prawie go nie zmienia. Dwie 20-minutowe intensywne sesje cardio w tygodniu już tak.",
+  "gloss.bodyFat.title": "Tkanka tłuszczowa",
+  "gloss.bodyFat.body":
+    "Udział tłuszczu w twojej wadze, z inteligentnej wagi, skanera ciała lub pomiaru fałdomierzem. Każda metoda mierzy inaczej, więc trzymaj się jednej i mierz o tej samej porze dnia, najlepiej rano przed jedzeniem.\nJeden pomiar niewiele mówi. Trzy lub więcej w ciągu kilku tygodni pokazują trend, a notatki trenera powiedzą ci, gdy zmienia się w złą stronę dla twojego celu.",
+  "gloss.leanMass.title": "Beztłuszczowa masa ciała",
+  "gloss.leanMass.body":
+    "Wszystko w twoim ciele, co nie jest tłuszczem: mięśnie, kości, narządy i woda. Twoja waga razy udział, który nie jest tłuszczem. Rosnąca masa beztłuszczowa przy stałej lub spadającej tkance tłuszczowej oznacza, że trening buduje mięśnie.",
+  "gloss.bmi.title": "BMI: wskaźnik masy ciała",
+  "gloss.bmi.body":
+    "Waga podzielona przez wzrost do kwadratu. To przybliżona wskazówka dla osób, które nie trenują siłowo: nie odróżnia mięśni od tłuszczu, więc umięśnieni często wychodzą na osoby z nadwagą. Gdy masz pomiar tkanki tłuszczowej, ufaj jemu.",
+  "gloss.liftScores.title": "DOTS, Wilks i IPF GL",
+  "gloss.liftScores.body":
+    "Trzy sposoby oceny sumy przysiadu, wyciskania i martwego ciągu względem masy ciała, żeby porównać lekkiego zawodnika z ciężkim.\nDOTS (2019) i IPF GL (2020) to nowsze, sprawiedliwsze wzory; Wilks to starszy, który wielu wciąż zna. Porównuj wynik tylko w obrębie tego samego wzoru.",
+  "gloss.ffmi.title": "FFMI: wskaźnik beztłuszczowej masy ciała",
+  "gloss.ffmi.body":
+    "Twoja beztłuszczowa masa ciała (wszystko poza tłuszczem) podzielona przez wzrost do kwadratu, przeliczona na standardowy wzrost 1,8 m. Pokazuje, ile masz mięśni, czego BMI nie potrafi.\nWiększość trenujących mężczyzn mieści się między 19 a 23, a kobiety około 4 niżej. Badanie trenujących bez dopingu wykazało niewielu powyżej 25.",
+  "gloss.hrZones.title": "Strefy tętna",
+  "gloss.hrZones.body":
+    "Pięć przedziałów wysiłku ustalonych z twojego tętna maksymalnego, od lekkiego (strefa 1) do maksymalnego (strefa 5).\nGdy znane jest tętno spoczynkowe, strefy używają rezerwy tętna (różnicy między spoczynkowym a maksymalnym), która lepiej odzwierciedla twoją formę.",
+  "gloss.restDrop.title": "Spadek tętna w przerwie",
+  "gloss.restDrop.body":
+    "O ile uderzeń na minutę spada twoje tętno w pierwszej minucie po serii, według pulsometru. Większy spadek z miesiącami oznacza sprawniejsze serce; mniejszy niż zwykle może oznaczać zmęczenie.",
+  "gloss.setTypes.title": "Drop sety i rest-pause",
+  "gloss.setTypes.body":
+    "Dodatkowe serie, które możesz dorzucić między seriami, gdy zaplanowana seria jest już zapisana.\nDrop set zmniejsza ciężar o mniej więcej jedną czwartą i od razu idzie dalej. Seria rest-pause zostaje przy tym samym ciężarze, robi 15 sekund pauzy, a potem wyciska jeszcze kilka powtórzeń.\nObie dokładają pracy mięśniowi bez pełnej dodatkowej serii. Liczą się do objętości, ale kolejne ciężary w planie biorą pod uwagę tylko zaplanowane serie.",
+  "gloss.stretching.title": "Ruchy rozgrzewkowe i rozciąganie na koniec",
+  "gloss.stretching.body":
+    "Ruchy rozgrzewkowe to dynamiczne rozciąganie i ćwiczenia. Podnoszą tętno i przeprowadzają stawy przez pełny zakres, więc pierwsze serie idą lepiej.\nRozciąganie na koniec to statyczne pozycje trzymane 30 sekund lub dłużej przy spokojnym oddechu. Pasują na koniec treningu albo w dzień odpoczynku, gdy mięśnie są rozgrzane. Rozciągaj do lekkiego napięcia, nigdy do bólu.",
+  "gloss.crate.title": "Skrzynki i Szafka",
+  "gloss.crate.body":
+    "Każdy ukończony trening daje skrzynkę na ekranie Gotowe. Zawiera jeden kolor akcentu, dźwięk minutnika przerwy albo wykończenie talerzy, wylosowane: zwykłe trafiają się najczęściej, a legendarne najrzadziej.\nNiektóre poziomy dają konkretny przedmiot, a każdy nowy tytuł daje dodatkową skrzynkę, więc nawet najrzadsze przedmioty mają pewną drogę. Stuknij zablokowany przedmiot, żeby zobaczyć, jak go zdobyć.\nJeśli dostaniesz coś, co już masz, zamienia się w 25 dodatkowych XP. Tutaj w Szafce wybierasz, czego używasz.",
+  "gloss.badges.title": "Osiągnięcia i odznaki",
+  "gloss.badges.body":
+    "Osiągnięcie to cel, na przykład ukończone treningi albo rekordy życiowe. Każde ma do czterech odznak: brązową, srebrną, złotą i platynową, zdobywane przy coraz większych liczbach.\nNiektóre odznaki odblokowują też motyw kolorystyczny aplikacji; odznaka mówi który. Każda odznaka daje XP, które podnosi twój poziom.",
+  "gloss.monthly.title": "Wyzwanie miesiąca",
+  "gloss.monthly.body":
+    "Każdy co miesiąc dostaje to samo wyzwanie: liczbę treningów, serii lub minut, zmieniane z miesiąca na miesiąc. Liczą się twoje ukończone treningi, więc działa offline.\nUkończ je przed końcem miesiąca, żeby zdobyć medal tego miesiąca. Każdy ukończony miesiąc liczy się do odznaki Miesięczny pretendent. Znajomi › Tablica pokazuje, jak radzą sobie osoby, które obserwujesz.",
+  "gloss.schoolTeams.title": "Drużyny szkolne",
+  "gloss.schoolTeams.body":
+    "Trenerzy szkół średnich dostają Pro za darmo, gdy potwierdzą adres e-mail swojej szkoły lub okręgu. Ich zawodnicy w wieku od 13 do 18 lat też dostają Pro za darmo, dopóki są w drużynie.\nTrener widzi twoje treningi, ale nie dane o ciele. Koledzy z drużyny widzą tylko twoje imię i ile treningów i serii zrobiłeś w tym tygodniu.",
+  "gloss.strengthStandards.title": "Normy siłowe",
+  "gloss.strengthStandards.body":
+    "Typowe szacowane 1RM trenujących osób, przeliczone na masę ciała i skorygowane o wiek i płeć, jeśli je podałeś, na podstawie opublikowanych norm siłowych i współczynników masters.\nProcent to przybliżony odsetek trenujących, których twój szacunek przewyższa, a nie ranking prawdziwych użytkowników Liftsmith. Wzrost i BMI nie są brane pod uwagę.",
+};

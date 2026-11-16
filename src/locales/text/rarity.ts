@@ -46,3 +46,31 @@ export const ja: Partial<Record<Key, Message>> = {
   "rarity.epic": "エピック",
   "rarity.legendary": "レジェンダリー",
 };
+
+export const pt: Partial<Record<Key, Message>> = {
+  "rarity.common": "Comum",
+  "rarity.rare": "Raro",
+  "rarity.epic": "Épico",
+  "rarity.legendary": "Lendário",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "rarity.common": "일반",
+  "rarity.rare": "희귀",
+  "rarity.epic": "에픽",
+  "rarity.legendary": "전설",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "rarity.common": "Sıradan",
+  "rarity.rare": "Nadir",
+  "rarity.epic": "Destansı",
+  "rarity.legendary": "Efsanevi",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "rarity.common": "Zwykły",
+  "rarity.rare": "Rzadki",
+  "rarity.epic": "Epicki",
+  "rarity.legendary": "Legendarny",
+};

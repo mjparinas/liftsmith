@@ -926,10 +926,10 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
     features: [
       {
         id: "languages",
-        name: "Six languages",
-        body: "English, Spanish, French, German, Italian and Japanese, following your phone's language.",
+        name: "Ten languages",
+        body: "English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, following your phone's language.",
         tier: "free",
-        added: "2026-11-10",
+        added: "2026-11-15",
       },
       {
         id: "appearance",

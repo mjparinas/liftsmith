@@ -453,7 +453,7 @@ export const emails: Record<string, Words> = {
     title: "Schon gewusst? So, wie du es lesen willst",
     intro: "Kleinigkeiten, durch die sich die App wie deine anfühlt.",
     points: [
-      "Wähl eine andere Sprache als die deines Handys: Es gibt sechs.",
+      "Wähl eine andere Sprache als die deines Handys: Es gibt zehn.",
       "Kilogramm oder Pfund, und jedes Studio kann seine eigene Einheit für seine Scheiben nutzen.",
       "Das Tageszitat auf Heute lässt sich abschalten.",
       "Starte die Einrichtung über Einstellungen neu, wenn sich dein Ziel, deine Erfahrung oder dein Studio geändert hat.",
@@ -690,7 +690,7 @@ export const emails: Record<string, Words> = {
       "Dunkel, hell oder wie das Handy.",
       "Verdiene Designs und Akzentfarben mit deinen Erfolgen.",
       "Auf den Handys ein App-Symbol in den Farben deines Designs.",
-      "Sechs Sprachen, auf Wunsch anders als die deines Handys.",
+      "Zehn Sprachen, auf Wunsch anders als die deines Handys.",
     ],
     dyk: "Ist das Aussehen auf hell gestellt, ändert ein Design nur die Akzentfarbe.",
   },

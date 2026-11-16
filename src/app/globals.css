@@ -468,6 +468,13 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 }
 :lang(ja) body { line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere; }
 :lang(de) body { hyphens: auto; overflow-wrap: anywhere; }
+/* Korean (2026-11-15): the phone's Korean fonts first (so Hangul never falls back to Japanese or Chinese shapes), and
+   lines break between words (keep-all), as Korean is written with spaces. Polish and Turkish words run long like German. */
+:root:lang(ko) {
+  --font-sans: "Inter", "Roboto", "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", "Malgun Gothic", system-ui, sans-serif;
+}
+:lang(ko) body { word-break: keep-all; overflow-wrap: anywhere; }
+:lang(pl) body, :lang(tr) body { hyphens: auto; overflow-wrap: anywhere; }
 /* The website's translated pages (src/lib/siteLang.ts) carry their language on a wrapper (LangRoot), because the static
    HTML's <html lang> is English until the page runs, so the same rules apply there too. */
 div[lang="ja"] {
@@ -475,6 +482,11 @@ div[lang="ja"] {
   font-family: var(--font-sans); line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere;
 }
 div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
+div[lang="ko"] {
+  --font-sans: "Inter", "Roboto", "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", "Malgun Gothic", system-ui, sans-serif;
+  font-family: var(--font-sans); word-break: keep-all; overflow-wrap: anywhere;
+}
+div[lang="pl"], div[lang="tr"] { hyphens: auto; overflow-wrap: anywhere; }
 
 /* A soft light at the top of every app screen, so the dark base has depth without noise. */
 .aurora { position: relative; isolation: isolate; }

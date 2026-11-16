@@ -174,6 +174,10 @@ const CATALOG: Record<MsgLang, Partial<Record<LinkKey, unknown>>> = {
   de: link.de,
   it: link.it,
   ja: link.ja,
+  pt: link.pt,
+  ko: link.ko,
+  pl: link.pl,
+  tr: link.tr,
 };
 const say = (lang: MsgLang, key: LinkKey, vars: Record<string, string> = {}) =>
   String(CATALOG[lang][key] ?? link.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => vars[k] ?? all);
