@@ -9,7 +9,10 @@ import { fromKg } from "./units";
 //   elephants and friends. Seven, on the logo, so it never clashes with the figure's five.
 // - Plate math: logging exactly 420 or 1,337 (kg or lb) shows a joke toast once on the device. Never the 420
 //   one to anyone under 18, or to anyone whose age the app doesn't know.
-// Pure functions here; LogoEgg.tsx and the workout slice call them.
+// - Seven quick taps on the streak flame on Today (2026-11-16) give a free lifter an extra day of adaptive
+//   workouts, one a day and three a week (freeAdaptive.ts `bonusDayCheck`). Same count as the logo, on another
+//   control, so the two never meet; nothing happens for Pro.
+// Pure functions here; LogoEgg.tsx, Today's Flame and the workout slice call them.
 
 // ---------- Logo taps ----------
 
@@ -24,6 +27,9 @@ export function logoTaps(taps: readonly number[], now: number): { taps: number[]
   if (next.length >= LOGO_TAPS) return { taps: [], open: true };
   return { taps: next, open: false };
 }
+
+/** The streak flame counts its taps the same way as the logo (seven quick ones). */
+export const flameTaps = logoTaps;
 
 /** Rough masses in kilograms, for fun ("about" in the app). Text is `egg.unit.<id>`, a plural with {n}. */
 export const UNITS = [

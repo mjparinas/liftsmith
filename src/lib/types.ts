@@ -677,6 +677,17 @@ export interface ProEvent extends EventBase {
   month: string;
 }
 
+/**
+ * An extra day of adaptive workouts for a free lifter, from the streak flame easter egg (seven quick taps on the
+ * flame on Today; freeAdaptive.ts). One a day (the id is `bonus-day-<day>`, so two devices can't make two), three
+ * a week. An event like any other, so it syncs to the account and a reinstall doesn't reset the count.
+ */
+export interface BonusDayEvent extends EventBase {
+  type: "bonusDay";
+  /** The lifter's local day it was unlocked for (random.ts `dayKey`). */
+  day: string;
+}
+
 /** A body weight weigh-in (progress photos screen). Kilograms. */
 export interface BodyweightEvent extends EventBase {
   type: "bodyweight";
@@ -904,6 +915,7 @@ export interface InjuryReturnEvent extends EventBase {
 // Every event kind, one per line so two changes adding an event don't touch the same line.
 export type AppEvent =
   | ProEvent
+  | BonusDayEvent
   | BodyweightEvent
   | MeasureEvent
   | FitTestEvent

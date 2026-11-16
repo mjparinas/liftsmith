@@ -3,7 +3,7 @@ import { weekStart } from "../block";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
 import { can } from "../entitlements";
-import { freeAdaptiveLeft } from "../freeAdaptive";
+import { bonusDayCheck, bonusDayEvent, freeAdaptiveLeft } from "../freeAdaptive";
 import { generate, injuryPass, planSeconds, type Plan } from "../generator";
 import { gymAt, locate, wantsLocation, type Fix } from "../geo";
 import { withoutBroken } from "../gymExtrasApi";
@@ -43,6 +43,11 @@ export interface PlanSlice {
   /** Without Pro: today's plan is this week's one free adaptive workout instead of the free program (freeAdaptive.ts). */
   tryAdaptive: boolean;
   setTryAdaptive(on: boolean): void;
+  /**
+   * The streak flame easter egg (seven taps, freeAdaptive.ts): without Pro, makes today a bonus day of adaptive
+   * workouts and switches today's plan to it. Says what happened: "ok", or why not ("today", "week"); null with Pro.
+   */
+  bonusDay(now?: number): "ok" | "today" | "week" | null;
   /**
    * The pre-workout check-in on Today: merges the change into today's answer, saves it as a new "feel"
    * event (the newest one today counts) and rebuilds the plan, so the call follows.
@@ -253,6 +258,19 @@ export function planSlice(c: Ctx): PlanSlice {
       set({ tryAdaptive: on });
       track("feature", { name: "free_adaptive", detail: on ? "on" : "off" });
       get().replan();
+    },
+
+    bonusDay(now = Date.now()) {
+      if (can("adaptive")) return null;
+      const r = bonusDayCheck(get().events, now);
+      track("feature", { name: "bonus_day", detail: r });
+      if (r !== "ok") return r;
+      commit([bonusDayEvent(now)]);
+      if (!get().active && get().profile.planSource?.kind === "program") {
+        set({ tryAdaptive: true });
+        get().replan();
+      }
+      return r;
     },
 
     feel(change) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
@@ -8,9 +8,10 @@ import { useProMember } from "@/lib/billing";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { sessionDetail } from "@/lib/dashboard";
 import type { SessionSummary } from "@/lib/derive";
+import { flameTaps } from "@/lib/eggs";
 import { can } from "@/lib/entitlements";
 import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
-import { freeAdaptiveLeft } from "@/lib/freeAdaptive";
+import { bonusToday, freeAdaptiveLeft } from "@/lib/freeAdaptive";
 import { itemSeconds, planSeconds } from "@/lib/generator";
 import { useOutOfOrder } from "@/lib/gymExtrasApi";
 import { prSetIds } from "@/lib/history";
@@ -25,6 +26,7 @@ import { recovery } from "@/lib/recovery";
 import { hasOtherParts } from "@/lib/sessionSplit";
 import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
+import { toast } from "@/lib/toast";
 import { useCoachNotes } from "@/lib/trainer";
 import { effortLabel } from "@/lib/training";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Muscle } from "@/lib/types";
@@ -56,14 +58,50 @@ import { Button, Chip, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section }
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
+  // The streak flame easter egg (eggs.ts, freeAdaptive.ts): seven quick taps give a free lifter an extra day of
+  // adaptive workouts. Hidden on purpose, like the logo's: the tap target is out of the Tab order and away from
+  // screen readers, which still read the streak from the pill underneath.
+  const taps = useRef<number[]>([]);
+  const bonusDay = useApp((s) => s.bonusDay);
+  const tap = () => {
+    const now = Date.now();
+    const r = flameTaps(taps.current, now);
+    taps.current = r.taps;
+    if (!r.open) return;
+    const got = bonusDay(now);
+    if (!got) return;
+    if (got === "ok") {
+      haptic("celebrate");
+      sound.badge();
+    } else haptic("tick");
+    toast(t(`egg.flame.${got}`));
+  };
+  return (
+    <span className="relative inline-flex">
+      <FlamePill weeks={weeks} freezes={freezes} lit={lit} />
+      {/* It covers the pill, so it carries the pill's hover title too. */}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-hidden
+        onClick={tap}
+        title={streakTitle(weeks, freezes)}
+        className="absolute inset-0 rounded-full"
+      />
+    </span>
+  );
+}
+
+const streakTitle = (weeks: number, freezes: number) =>
+  freezes
+    ? t("td.streakTitle", { streak: t("awards.streak", { count: weeks }), freezes: t("awards.freezes", { count: freezes }) })
+    : t("awards.streak", { count: weeks });
+
+function FlamePill({ weeks, freezes, lit }: { weeks: number; freezes: number; lit: boolean }) {
   return (
     <span
       className={`num inline-flex h-9 items-center gap-1 rounded-full border px-2.5 text-sm font-bold ${lit ? "border-ember/40 bg-ember/12 text-ember" : "border-line bg-surface text-faint"}`}
-      title={
-        freezes
-          ? t("td.streakTitle", { streak: t("awards.streak", { count: weeks }), freezes: t("awards.freezes", { count: freezes }) })
-          : t("awards.streak", { count: weeks })
-      }
+      title={streakTitle(weeks, freezes)}
     >
       <Icon name="flame" size={16} filled={lit} strokeWidth={1.6} className={lit ? "drop-shadow-[0_0_6px_rgb(255_138_61/0.7)]" : ""} />
       {weeks}
@@ -177,6 +215,7 @@ export function Today() {
   const tryAdaptive = useApp((st) => st.tryAdaptive);
   const setTryAdaptive = useApp((st) => st.setTryAdaptive);
   const freeLeft = useMemo(() => freeAdaptiveLeft(events, now), [events, now]);
+  const bonus = useMemo(() => bonusToday(events, now), [events, now]);
   // Every recommendation says why (why.ts): one line per exercise, one sentence for the day's call.
   const why = useMemo(() => (preview ? whyContext(preview, events, profile, now) : null), [preview, events, profile, now]);
   // While a workout runs, the list shows the live workout and can't be changed here: linking and
@@ -285,7 +324,7 @@ export function Today() {
             className="press inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-3 py-1.5"
           >
             <Icon name="sparkle" size={15} className="text-violet" />
-            {t("td.freeAdaptive.back", { name: programName(profile.planSource.id) ?? "" })}
+            {t(bonus ? "td.freeAdaptive.bonusBack" : "td.freeAdaptive.back", { name: programName(profile.planSource.id) ?? "" })}
           </button>
         )}
         {preview?.program && !can("adaptive") && freeLeft && (
@@ -296,7 +335,7 @@ export function Today() {
             className="press inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-3 py-1.5"
           >
             <Icon name="sparkle" size={15} className="text-violet" />
-            {t("td.freeAdaptive.try")}
+            {t(bonus ? "td.freeAdaptive.bonusTry" : "td.freeAdaptive.try")}
           </button>
         )}
         {preview?.program && !can("adaptive") && !freeLeft && (
