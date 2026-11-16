@@ -780,10 +780,37 @@ export async function cities(): Promise<City[]> {
   }));
 }
 
-/** Every gym page worth indexing: gyms (not studios) that aren't hidden. */
+/**
+ * Whether a gym's page is offered to search engines (Search Console, 2026-11-16). About half the imported gyms have
+ * only a name and an address from the map: no website, phone or hours, nobody using it, no owner. Those pages read as
+ * near-copies of each other and of the city page, and on a new domain thousands of them sat in "Crawled - currently not
+ * indexed" and "Discovered - currently not indexed", slowing how fast the rest of the site gets crawled. They stay up
+ * for visitors, `noindex`, out of the sitemap, and come back on their own once the gym gets a detail, an owner or a
+ * lifter. Studios are never indexed. `INDEXABLE_SQL` is the same rule for the sitemap; this one may be broader
+ * (photos, trainers, news), never narrower, so nothing in the sitemap is noindex.
+ */
+export const gymIndexable = (p: Place): boolean =>
+  p.kind === "gym" &&
+  !!(
+    p.official ||
+    p.website ||
+    p.phone ||
+    p.hours ||
+    p.lifters > 0 ||
+    p.code ||
+    p.amenities.length ||
+    p.prices ||
+    p.photos.length ||
+    p.trainers.length ||
+    p.news.length
+  );
+export const INDEXABLE_SQL =
+  "kind = 'gym' AND (claimed_by <> '' OR website <> '' OR phone <> '' OR hours <> '' OR lifters > 0 OR code <> '')";
+
+/** Every gym page worth indexing (gymIndexable): gyms that aren't hidden and have something of their own. */
 export async function sitemapGyms(): Promise<{ path: string; lastModified: number }[]> {
   const rows = await query(
-    "SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND kind = 'gym' ORDER BY updated_at DESC LIMIT 45000",
+    `SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND ${INDEXABLE_SQL} ORDER BY updated_at DESC LIMIT 45000`,
   );
   return rows.map((r) => ({ path: `/gyms/${s(r.city_slug)}/${s(r.slug)}/`, lastModified: n(r.updated_at) }));
 }

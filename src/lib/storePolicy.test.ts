@@ -61,6 +61,8 @@ describe("Play store policy config", () => {
     const page = readFileSync(join(root, "public/privacypolicy.html"), "utf8");
     expect(page).toContain("Limited Use");
     expect(page).toContain(CONTACT_EMAIL);
+    // A short copy of /privacy/, so search engines are pointed at the full page (Search Console, 2026-11-16).
+    expect(page).toContain('<link rel="canonical" href="https://www.getliftsmith.com/privacy/">');
     for (const t of [
       "weight",
       "height",
