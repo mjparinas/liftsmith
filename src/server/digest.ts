@@ -255,7 +255,7 @@ export function digestMail(g: Digest, footer: DigestFooter, origin = siteOrigin(
 <body style="margin:0;background:#0a0d12;color:#e8edf4;font-family:Roboto,-apple-system,Segoe UI,Arial,sans-serif">
 <div style="max-width:560px;margin:0 auto;padding:28px 20px">
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr>
-<td style="padding-right:10px"><img src="${esc(origin)}/icon-192.png" width="40" height="40" alt="Liftsmith anvil and barbell" style="display:block;border-radius:10px"></td>
+<td style="padding-right:10px"><img src="${esc(origin)}/icon-192.png" width="40" height="40" alt="" style="display:block;border-radius:10px"></td>
 <td style="color:#4c8dff;font-weight:700;font-size:17px">Liftsmith</td></tr></table>
 <h1 style="font-size:22px;margin:0 0 8px">Your morning digest</h1>
 <p style="font-size:16px;line-height:1.5;margin:0 0 20px">${esc(g.headline)}</p>
