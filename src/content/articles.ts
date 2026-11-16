@@ -33,6 +33,7 @@ import { BLOG_T } from "./blog/t";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
+import { BLOG_WIDGETS } from "./blog/widgets";
 import { BLOG_X } from "./blog/x";
 import { BLOG_Y } from "./blog/y";
 import { BLOG_Z } from "./blog/z";
@@ -238,6 +239,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_INVITES,
   ...BLOG_REHAB_DONE,
   ...BLOG_SITE_PAGES,
+  ...BLOG_WIDGETS,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));
