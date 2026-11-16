@@ -8,7 +8,7 @@ import type { Keypoint } from "./pose";
 
 /** Copied from node_modules by scripts/mediapipe.mjs; the version is in the path so caches can keep it forever.
  *  mediapipe.test.ts checks it matches the installed package. */
-export const WASM = "/mediapipe/tasks-vision-1.2.2";
+export const WASM = "/mediapipe/tasks-vision-1.2.3";
 /** Committed; mediapipe.test.ts checks its SHA-256. */
 export const MODEL = { lite: "/mediapipe/pose_landmarker_lite-f16-v1.task" };
 
