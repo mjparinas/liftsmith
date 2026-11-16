@@ -1496,7 +1496,7 @@ const ACTIVITY = `
   UNION ALL
   SELECT 'reply', c.account_id, c.created_at, c.post_id, c.body
     FROM post_comments c JOIN post_comments pc ON pc.id = c.reply_to JOIN posts p ON p.id = c.post_id
-    WHERE pc.account_id = ?1 AND c.account_id != ?1 AND p.account_id != ?1 AND c.hidden = 0
+    WHERE pc.account_id = ?1 AND c.reply_to <> '' AND c.account_id != ?1 AND p.account_id != ?1 AND c.hidden = 0
       AND NOT EXISTS (SELECT 1 FROM comment_mentions m WHERE m.comment_id = c.id AND m.account_id = ?1)
   UNION ALL
   SELECT 'cheer', ch.from_id, ch.created_at, NULL, ch.emoji FROM cheers ch WHERE ch.to_id = ?1
@@ -1912,10 +1912,10 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
        COALESCE(SUM(json_extract(p.body, '$.seconds')), 0) AS seconds,
        COALESCE(SUM(json_extract(p.body, '$.volume')), 0) AS volume,
        COALESCE(SUM(json_extract(p.body, '$.prs')), 0) AS prs
-     FROM social_profiles sp
+     FROM (SELECT ?1 AS id UNION SELECT followee_id FROM follows WHERE follower_id = ?1 AND accepted = 1) ids
+     JOIN social_profiles sp ON sp.account_id = ids.id
      LEFT JOIN posts p ON p.account_id = sp.account_id AND p.hidden = 0 AND p.at >= ?2 AND p.at < ?3 AND ${seesPost("?1")}
      WHERE ${ON_BOARD("?1")}
-       AND (sp.account_id = ?1 OR sp.account_id IN (SELECT followee_id FROM follows WHERE follower_id = ?1 AND accepted = 1))
        AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)
        AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?1)
      GROUP BY sp.account_id LIMIT 201`,

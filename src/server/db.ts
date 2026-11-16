@@ -3,8 +3,6 @@
 // TURSO_AUTH_TOKEN pair the Vercel Marketplace integration creates), and memory in tests.
 import { createClient, type Client, type InValue } from "@libsql/client";
 
-import { regionSlug, SHORT_REGION } from "@/lib/regions";
-
 const SCHEMA = [
   // One row per install (a random id made on first open; not an advertising id). Latest device details win.
   `CREATE TABLE IF NOT EXISTS installs (
@@ -50,6 +48,8 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS events_name_at ON events (name, at)`,
   `CREATE INDEX IF NOT EXISTS events_install_at ON events (install_id, at)`,
+  // The admin panel's date-range counts ("events WHERE at > ?") read only the days asked for, not the whole table.
+  `CREATE INDEX IF NOT EXISTS events_at ON events (at)`,
   // Website page views and call-to-action clicks: cookieless. `visitor` is a hash of a daily salt, the
   // address and the browser, so a visitor counts once a day and can't be followed from one day to the next.
   `CREATE TABLE IF NOT EXISTS page_views (
@@ -218,6 +218,14 @@ const SCHEMA = [
     UNIQUE (account_id, id)
   )`,
   `CREATE INDEX IF NOT EXISTS sync_events_account_seq ON sync_events (account_id, seq)`,
+  // How many events (tombstones included) and bytes of bodies an account has synced, kept so a push needn't count them
+  // all (sync.ts checkQuota). Runs high, never low, and is counted afresh daily and near the quota.
+  `CREATE TABLE IF NOT EXISTS sync_usage (
+    account_id TEXT PRIMARY KEY,
+    events INTEGER NOT NULL,
+    bytes INTEGER NOT NULL,
+    at INTEGER NOT NULL
+  )`,
   // The profile and each gym, last write wins on updated_at. A removed gym keeps a row with body NULL.
   `CREATE TABLE IF NOT EXISTS sync_records (
     account_id TEXT NOT NULL,
@@ -576,12 +584,6 @@ const SCHEMA = [
     shipped_at INTEGER NOT NULL DEFAULT 0
   )`,
   `CREATE INDEX IF NOT EXISTS gym_posters_status ON gym_posters (status, created_at)`,
-  // Gyms imported with the province's full name ("Langley, British Columbia", 2026-11-12) get its code and the shorter
-  // web address ("langley-bc"). OR IGNORE leaves a gym whose new address is taken where it is.
-  ...Object.entries(SHORT_REGION).map(
-    ([name, code]) =>
-      `UPDATE OR IGNORE gym_places SET region = '${code}', city_slug = substr(city_slug, 1, length(city_slug) - ${regionSlug(name).length}) || '${code.toLowerCase()}' WHERE region = '${name}' AND city_slug LIKE '%-${regionSlug(name)}'`,
-  ),
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
   // Poster and stand QR visits per gym and day (gymPosters.ts countScan), for the owner's last 30 days.
   `CREATE TABLE IF NOT EXISTS gym_scan_days (
@@ -1332,6 +1334,19 @@ const LATE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS clubs_place ON clubs (place_id)`,
   // Garmin's pings name the lifter by Garmin's own user id (connect.ts garminPing).
   `CREATE INDEX IF NOT EXISTS connections_remote ON connections (provider, remote_user)`,
+  // Found by EXPLAIN QUERY PLAN over every query (2026-11-16, docs/decisions/database-reads.md); each was a full scan.
+  // Admin Stats: five per-install lookups by event name, and each install's trial start.
+  `CREATE INDEX IF NOT EXISTS events_install_name ON events (install_id, name, at)`,
+  `CREATE INDEX IF NOT EXISTS subscription_events_install ON subscription_events (install_id)`,
+  // Friends' "training now" starts from the sessions updated in the last few minutes, not every profile.
+  `CREATE INDEX IF NOT EXISTS live_sessions_updated ON live_sessions (updated_at)`,
+  // A gym owner's or staff member's gyms; only claimed gyms are in it, so it stays small.
+  `CREATE INDEX IF NOT EXISTS gym_places_claimed ON gym_places (claimed_by) WHERE claimed_by <> ''`,
+  // Friends activity (replies to your comments) and erasing an account's comments.
+  `CREATE INDEX IF NOT EXISTS post_comments_account ON post_comments (account_id)`,
+  `CREATE INDEX IF NOT EXISTS post_comments_reply ON post_comments (reply_to) WHERE reply_to <> ''`,
+  // A client's coaches who see their body data or pain ratings (coach overview, sync's pain alerts).
+  `CREATE INDEX IF NOT EXISTS coach_shares_client ON coach_shares (client_id)`,
 ];
 
 let client: Client | null = null;
@@ -1387,9 +1402,10 @@ async function migrate(c: Client): Promise<void> {
     for (const s of LATE_SCHEMA) await c.execute(s);
     return;
   }
-  // Tables and indexes that aren't there yet, plus the one-off data fixes (UPDATE … statements, which make nothing
-  // and run on every start because they change nothing once done), in their order in SCHEMA.
-  const todo = SCHEMA.filter((sql) => !schemaName(sql) || !have.names.has(schemaName(sql)));
+  // Tables and indexes that aren't there yet, in their order in SCHEMA. SCHEMA holds only CREATE statements: a data fix
+  // there would run on every cold start, and Turso bills every row it reads (a province fix-up that scanned the whole
+  // gym table 13 times per start used most of the month's reads, 2026-11-16). Run a data fix once by hand instead.
+  const todo = SCHEMA.filter((sql) => !have.names.has(schemaName(sql)));
   if (todo.length) await c.batch(todo, "write");
   // A table made just now may still lack columns added to COLUMNS since it was first written.
   if (todo.some((sql) => schemaName(sql))) have = await present(c);

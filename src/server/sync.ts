@@ -86,18 +86,39 @@ export function checkSync(raw: unknown): { ok: true; body: SyncRequest } | { ok:
   };
 }
 
-/** Throws SyncFull when storing this push would take the account past its quota. Parallel pushes can each
- *  pass the check, so the account can end up over by at most a few pushes (1,000 events each); fine for a
- *  limit that's about abuse, not billing. */
-async function checkQuota(accountId: string, req: SyncRequest, quota: Quota): Promise<void> {
+/** How long a kept count of an account's events (sync_usage) stands before it's counted again. */
+export const USAGE_RECOUNT_MS = 24 * 60 * 60_000;
+/** Within this share of the quota the events are counted afresh, so the limit itself is exact. */
+const USAGE_NEAR = 0.9;
+
+type Usage = { events: number; bytes: number; at: number };
+
+/**
+ * Throws SyncFull when storing this push would take the account past its quota, and returns the account's usage after
+ * it (to keep in sync_usage) when the push adds events. Counting every event the account has on each push read its
+ * whole history every time a set was logged, and Turso bills each row read (2026-11-16), so the count is kept in
+ * sync_usage, raised by each push, and counted afresh once a day or when the account nears the limit. The kept count
+ * only ever runs high (an event the account already had still adds), so it never lets a push past the quota.
+ * Parallel pushes can each pass the check, so the account can end up over by at most a few pushes (1,000 events
+ * each); fine for a limit that's about abuse, not billing.
+ */
+async function checkQuota(accountId: string, req: SyncRequest, quota: Quota, now: number): Promise<Usage | null> {
   const adds = req.events.length + req.deleted.length;
+  let after: Usage | null = null;
   if (adds) {
     const incoming = req.events.reduce((n, e) => n + JSON.stringify(e).length, 0);
-    const [use] = await query<{ n: number; bytes: number }>(
-      "SELECT COUNT(*) AS n, COALESCE(SUM(LENGTH(body)), 0) AS bytes FROM sync_events WHERE account_id = ?",
-      [accountId],
-    );
-    if (Number(use?.n ?? 0) + adds > quota.events || Number(use?.bytes ?? 0) + incoming > quota.bytes) throw new SyncFull();
+    const [kept] = await query<Usage>("SELECT events, bytes, at FROM sync_usage WHERE account_id = ?", [accountId]);
+    let use: Usage | undefined = kept && { events: Number(kept.events), bytes: Number(kept.bytes), at: Number(kept.at) };
+    const near = (u: Usage) => u.events + adds > quota.events * USAGE_NEAR || u.bytes + incoming > quota.bytes * USAGE_NEAR;
+    if (!use || now - use.at >= USAGE_RECOUNT_MS || near(use)) {
+      const [c] = await query<{ n: number; bytes: number }>(
+        "SELECT COUNT(*) AS n, COALESCE(SUM(LENGTH(body)), 0) AS bytes FROM sync_events WHERE account_id = ?",
+        [accountId],
+      );
+      use = { events: Number(c?.n ?? 0), bytes: Number(c?.bytes ?? 0), at: now };
+    }
+    if (use.events + adds > quota.events || use.bytes + incoming > quota.bytes) throw new SyncFull();
+    after = { events: use.events + adds, bytes: use.bytes + incoming, at: use.at };
   }
   if (req.records.length) {
     const keys = new Set(
@@ -106,10 +127,17 @@ async function checkQuota(accountId: string, req: SyncRequest, quota: Quota): Pr
     const fresh = new Set(req.records.map((r) => r.key).filter((k) => !keys.has(k)));
     if (keys.size + fresh.size > quota.records) throw new SyncFull();
   }
+  return after;
 }
 
-export async function sync(accountId: string, session: string, req: SyncRequest, quota: Quota = QUOTA): Promise<SyncResponse> {
-  await checkQuota(accountId, req, quota);
+export async function sync(
+  accountId: string,
+  session: string,
+  req: SyncRequest,
+  quota: Quota = QUOTA,
+  now = Date.now(),
+): Promise<SyncResponse> {
+  const usage = await checkQuota(accountId, req, quota, now);
   const stmts: { sql: string; args: (string | number | null)[] }[] = [];
   // New events. An id the account already has (or deleted) is left alone, so a tombstone is never undone.
   for (const e of req.events) {
@@ -126,6 +154,12 @@ export async function sync(accountId: string, session: string, req: SyncRequest,
       args: [accountId, id, session],
     });
   }
+  if (usage)
+    stmts.push({
+      sql: `INSERT INTO sync_usage (account_id, events, bytes, at) VALUES (?, ?, ?, ?)
+            ON CONFLICT(account_id) DO UPDATE SET events = excluded.events, bytes = excluded.bytes, at = excluded.at`,
+      args: [accountId, usage.events, usage.bytes, usage.at],
+    });
   if (stmts.length) await batch(stmts);
 
   // Records: keep whichever is newer. On a device's first sync the account's profile wins.
