@@ -183,6 +183,10 @@ export const tr: FeaturesText = {
       name: "3D egzersiz gösterimleri",
       body: "Her egzersizde, hareketi kendi ekipmanıyla gösteren 3D bir figür, kurulum adımları ve ipuçları var.",
     },
+    "form-mistakes": {
+      name: "Sık yapılan hatalar ve düzeltmeleri",
+      body: "Her egzersiz ve esneme, en sık yapılan iki üç form hatasını 3D figürün yanında, düzeltmesi ve neden önemli olduğuyla gösterir; dinlenme sayacı da bir sonraki set için birini gösterir. Çevrimdışı çalışır.",
+    },
     "set-types": {
       name: "Drop set ve rest-pause",
       body: "Setlerin arasına bir drop set ya da rest-pause seti ekle.",

@@ -814,4 +814,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Dotknij widżetu Regeneracja, żeby otworzyć mapę regeneracji w aplikacji.",
   },
+  "form-cues": {
+    title: "Częste błędy i jak je poprawić",
+    intro: "Każde ćwiczenie i rozciąganie pokazuje teraz dwa lub trzy najczęstsze błędy techniki, tuż obok postaci 3D.",
+    points: [
+      "Każdy mówi, jak wygląda, co robić zamiast tego i dlaczego to ważne.",
+      "Znajdziesz je w Jak to zrobić podczas treningu, na stronie każdego ćwiczenia i przy każdym rozciąganiu.",
+      "Między seriami licznik przerwy pokazuje jeden, na który uważać w następnej serii, w każdej serii inny.",
+      "Są częścią aplikacji, więc działają bez zasięgu, w każdym języku.",
+    ],
+    dyk: "Wolisz ich nie widzieć na liczniku przerwy? Wyłącz Kontrola techniki w przerwie w Ustawienia › Trening.",
+  },
 };

@@ -814,4 +814,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Uygulamada toparlanma haritasını açmak için Toparlanma widget'ına dokun.",
   },
+  "form-cues": {
+    title: "Sık yapılan hatalar ve düzeltmeleri",
+    intro: "Artık her egzersiz ve esneme, en sık yapılan iki üç form hatasını 3D figürün hemen yanında gösteriyor.",
+    points: [
+      "Her biri nasıl göründüğünü, yerine ne yapacağını ve neden önemli olduğunu söylüyor.",
+      "Antrenman sırasında Nasıl yapılır'da, her egzersizin sayfasında ve her esnemede bulabilirsin.",
+      "Setler arasında dinlenme sayacı, bir sonraki sette dikkat edeceğin bir hatayı gösterir, her sette farklı birini.",
+      "Uygulamanın parçası oldukları için sinyal olmadan da, her dilde çalışırlar.",
+    ],
+    dyk: "Dinlenme sayacında görmek istemiyor musun? Ayarlar › Antrenman'da Dinlenirken form kontrolü'nü kapat.",
+  },
 };

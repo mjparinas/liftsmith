@@ -183,6 +183,10 @@ export const pt: FeaturesText = {
       name: "Demonstrações de exercícios em 3D",
       body: "Todo exercício tem uma figura 3D mostrando o movimento com o equipamento certo, com passos de preparação e dicas.",
     },
+    "form-mistakes": {
+      name: "Erros comuns e como corrigir",
+      body: "Todo exercício e alongamento mostra seus dois ou três erros de técnica mais comuns ao lado da figura 3D, cada um com a correção e por que importa, e o cronômetro de descanso mostra um para a próxima série. Funciona offline.",
+    },
     "set-types": {
       name: "Drop sets e rest-pause",
       body: "Adicione um drop set ou uma série rest-pause entre as séries.",

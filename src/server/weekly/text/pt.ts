@@ -817,4 +817,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Toque no widget Recuperação para abrir o mapa de recuperação no app.",
   },
+  "form-cues": {
+    title: "Erros comuns, e como corrigir",
+    intro: "Todo exercício e alongamento agora mostra seus dois ou três erros de técnica mais comuns, bem ao lado da figura 3D.",
+    points: [
+      "Cada um diz como ele aparece, o que fazer no lugar e por que isso importa.",
+      "Veja em Como fazer durante o treino, na página de cada exercício e em todo alongamento.",
+      "Entre as séries, o cronômetro de descanso mostra um para observar na próxima série, um diferente a cada série.",
+      "Eles fazem parte do app, então funcionam sem sinal, em todos os idiomas.",
+    ],
+    dyk: "Prefere não ver no cronômetro de descanso? Desligue Checagem de técnica no descanso em Ajustes › Treino.",
+  },
 };

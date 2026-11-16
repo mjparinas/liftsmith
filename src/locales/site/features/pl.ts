@@ -183,6 +183,10 @@ export const pl: FeaturesText = {
       name: "Demonstracje ćwiczeń w 3D",
       body: "Każde ćwiczenie ma postać 3D, która pokazuje ruch z odpowiednim sprzętem, wraz z krokami ustawienia i wskazówkami.",
     },
+    "form-mistakes": {
+      name: "Częste błędy i ich poprawki",
+      body: "Każde ćwiczenie i rozciąganie pokazuje obok postaci 3D dwa lub trzy najczęstsze błędy techniki, każdy z poprawką i wyjaśnieniem, dlaczego to ważne, a licznik przerwy pokazuje jeden na następną serię. Działa offline.",
+    },
     "set-types": {
       name: "Drop sety i rest-pause",
       body: "Dodaj drop set albo serię rest-pause między seriami.",
