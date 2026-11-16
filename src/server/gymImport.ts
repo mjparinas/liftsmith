@@ -1,37 +1,30 @@
-// Importing a city's gyms from OpenStreetMap (staff only; docs/decisions/gyms.md "Importing gyms"). Nominatim finds
-// the area, Overpass lists its fitness centres, savePlaces (gymPlaces.ts) writes them keyed on the map's own id.
+// Importing the world's gyms from OpenStreetMap (staff only; docs/decisions/gyms.md "One button: every gym in the
+// world"). Melvin, 2026-11-16: "only import gyms from around the world using openstreetmap … should not overwrite or
+// duplicate existing claimed gyms … get as much data from openstreetmap … one button … refreshed for new gyms found
+// once a day". The job (gymImportJobs.ts) runs one item at a time per lane, and an item is one of:
 //
-// Speed (Melvin, 2026-11-14: "importing gyms take a long time"): almost all of an import is waiting on Overpass, and a
-// busy Overpass server would hold a request for minutes and then fail, before the next server was even tried. So each
-// server gets a time limit (and Overpass is told to give up sooner itself), an error Overpass hides inside a 200
-// answer counts as a failure, the area Nominatim found is remembered so a re-import skips that lookup, and parallel
-// imports start on different servers (`server`) so two cities run at once without queueing on one.
+// - `country:CA` asks OpenStreetMap for the country's regions (provinces, states, Länder: admin level 4 with an
+//   ISO 3166-2 code) and splits into one item per region; a country without regions is imported whole.
+// - `region:CA:<relation id>:BC` pulls every fitness centre (and rec centre with a gym) inside the region's boundary,
+//   with the region's cities, towns and villages, so a gym whose map address has no city gets the nearest one.
+// - `new:<ms>` (the daily refresh) asks for every gym added or edited on the map since then, anywhere, and finds the
+//   country, region and town of each new one from the map's boundaries around it.
 //
-// Busy servers (the first "every country" run, 2026-11-14: 22 of 65 cities failed, mostly 502s and 504s, and one server
-// hung 39 times at 100 s each): every request's outcome is kept (`attempts`), the next import tries the server that has
+// Saving is savePlaces (gymPlaces.ts): keyed on the map's own id, so nothing is listed twice; only what changed is
+// written; a claimed gym is never changed; and a new map gym next to a claimed or lifter-added gym of the same name is
+// linked to that gym instead of listed again.
+//
+// Map servers (2026-11-14): every request's outcome is kept (`attempts`), the next import tries the server that has
 // answered most lately first and a server that mostly hangs only after a busy round, and when every server says it's
-// busy the import waits (8 s, doubling) and asks again instead of failing.
-//
-// Every import leaves a row in gym_imports with a step-by-step log (timings, which server, what it said), shown on
-// Admin › Gyms and downloadable, so a failed city can be understood later.
+// busy the import waits (8 s, doubling) and asks again instead of failing. Every item leaves a row in gym_imports with a
+// step-by-step log (timings, which server, what it said), in the job's debug log.
 import { randomBytes } from "node:crypto";
 
 import { SHORT_REGION } from "@/lib/regions";
 
 import { query, run } from "./db";
-import { badCity, cityName } from "./gymAddress";
-import {
-  clean,
-  NOMINATIM,
-  placesFromOsm,
-  REC_NAME,
-  savePlaces,
-  UA,
-  type Area,
-  type Found,
-  type OsmElement,
-  type OsmSkips,
-} from "./gymPlaces";
+import { cityName, km } from "./gymAddress";
+import { clean, placesFromOsm, REC_NAME, savePlaces, UA, type Area, type OsmElement, type OsmSkips } from "./gymPlaces";
 
 export const OVERPASS = [
   "https://overpass-api.de/api/interpreter",
@@ -40,31 +33,23 @@ export const OVERPASS = [
 ];
 
 export const IMPORT_LIMITS = {
-  /** The whole import must finish inside the route's five minutes, with room to save. */
-  budgetMs: 250_000,
+  /** One item must finish inside this, with room to save. */
+  budgetMs: 300_000,
   /** One Overpass server gets at most this long before the next is tried. */
-  serverMs: 100_000,
+  serverMs: 150_000,
   /** What Overpass is told, in seconds, so a busy server gives up on its own before our limit. */
-  overpassTimeout: 90,
+  overpassTimeout: 140,
   /** The first pause when every map server is busy; it doubles each round. */
   waitMs: 8_000,
   /** Rounds over the map servers at most (8 + 16 + 32 + 64 seconds of waiting between five). */
   rounds: 5,
   /** How far back recent imports count when choosing which map server to try first. */
   healthMs: 30 * 60_000,
-  /** Nominatim gets this long. */
-  lookupMs: 15_000,
   /** How long import rows (and their logs) are kept. */
   keepMs: 90 * 86_400_000,
+  /** New gyms located in one Overpass request (the daily refresh). */
+  locateBatch: 60,
 };
-
-/** Where an area is on the map, as Nominatim found it. Kept on each import row so a re-import skips the lookup. */
-export interface Scope {
-  osmType: string;
-  osmId: number;
-  bbox: number[];
-  area: Area;
-}
 
 export type ImportResult =
   | {
@@ -80,10 +65,12 @@ export type ImportResult =
       server: string;
       ms: number;
       log: string[];
+      /** A country with regions: the items to import instead (the job adds them). */
+      split?: string[];
     }
   | { ok: false; id: string; error: "where" | "map"; detail: string; ms: number; log: string[] };
 
-/** "  Langley,  BC " → "langley, bc": one key per place, whatever the spacing or case. */
+/** "  Langley,  BC " → "langley, bc": one key per item, whatever the spacing or case. */
 export const importKey = (where: string) =>
   clean(where, 120)
     .toLowerCase()
@@ -151,68 +138,6 @@ export function planServers(health: Health = {}, start = 0): { order: string[]; 
   return { order: [...spread, ...ranked.filter((url) => slow.has(url))], slow };
 }
 
-/** The city the person typed: "Langley, BC" → "Langley". Stands in when the map's answer names no real city. */
-export const typedCity = (where: string) =>
-  cityName(
-    clean(where, 120)
-      .split(",")[0]
-      ?.replace(/(^|\s)\p{Ll}/gu, (c) => c.toUpperCase()),
-  );
-
-/**
- * An area's city: the map's own city, town or village, then the name it found, then the city typed. A postcode area
- * ("80145") or a house number is never a city (2026-11-15: gyms had been filed under "80145, Campania").
- */
-export function areaCity(a: Record<string, string>, name: string | undefined, where: string): string {
-  return cityName(a.city ?? a.town ?? a.village ?? a.municipality) || cityName(name) || typedCity(where);
-}
-
-export function scopeFrom(hit: Found, where = ""): Scope | null {
-  const a = hit.address ?? {};
-  const regionName = a.state ?? a.province ?? "";
-  // "CA-BC": the province or state code, whatever language or spelling the name came back in.
-  const isoRegion = /^(?:CA|US|AU)-([A-Z]{2,3})$/.exec(a["ISO3166-2-lvl4"] ?? "")?.[1];
-  const area: Area = {
-    city: areaCity(a, hit.name, where),
-    region: isoRegion ?? SHORT_REGION[regionName] ?? clean(regionName, 60),
-    country: clean(a.country_code, 2).toUpperCase(),
-  };
-  const bbox = (hit.boundingbox ?? []).map(Number);
-  const relation = hit.osm_type === "relation" && !!hit.osm_id;
-  if (!relation && !(bbox.length === 4 && bbox.every(Number.isFinite))) return null;
-  return { osmType: hit.osm_type ?? "", osmId: hit.osm_id ?? 0, bbox: bbox.length === 4 ? bbox : [], area };
-}
-
-/** The Overpass query for an area: its boundary when OSM has one, else its box. */
-export function overpassQuery(scope: Scope, timeout = IMPORT_LIMITS.overpassTimeout): string {
-  const filters = [
-    `nwr["leisure"="fitness_centre"]`,
-    `nwr["leisure"="sports_centre"]["name"]`,
-    `nwr["amenity"="community_centre"]["name"~"${REC_NAME}",i]`,
-  ];
-  let body: string;
-  if (scope.osmType === "relation" && scope.osmId)
-    body = `area(${3_600_000_000 + scope.osmId})->.a;(${filters.map((f) => `${f}(area.a);`).join("")});`;
-  else {
-    const [south, north, west, east] = scope.bbox;
-    body = `(${filters.map((f) => `${f}(${south},${west},${north},${east});`).join("")});`;
-  }
-  return `[out:json][timeout:${timeout}];${body}out center tags;`;
-}
-
-async function cachedScope(key: string): Promise<Scope | null> {
-  const [row] = await query<{ scope: string }>("SELECT scope FROM gym_imports WHERE query = ? AND scope <> '' ORDER BY at DESC LIMIT 1", [
-    key,
-  ]);
-  if (!row) return null;
-  try {
-    const s = JSON.parse(row.scope) as Scope;
-    return s && typeof s.osmType === "string" && Array.isArray(s.bbox) && s.area ? s : null;
-  } catch {
-    return null;
-  }
-}
-
 /** Overpass answers some failures with a 200 and a "remark" instead of an error status. */
 const overpassFailure = (remark: unknown) =>
   typeof remark === "string" && /runtime error|timed out|out of memory|too busy|rate_limited/i.test(remark) ? remark : "";
@@ -220,59 +145,30 @@ const overpassFailure = (remark: unknown) =>
 export interface ImportOptions {
   /** Which Overpass server to try first (parallel imports pass different ones). */
   server?: number;
-  /** Look the area up again even when an earlier import found it. */
-  fresh?: boolean;
   /** How to wait between rounds (tests pass a quick one). */
   sleep?: (ms: number) => Promise<void>;
 }
 
-/** Looks up an area by name ("Langley, BC"), then pulls its fitness centres from OpenStreetMap and saves them. */
-export async function importArea(
-  where: string,
-  fetcher: typeof fetch = fetch,
-  now = Date.now(),
+/** One import's own state: its log, its time, and what each map server did. */
+interface Run {
+  started: number;
+  log: string[];
+  attempts: Attempt[];
+  say: (line: string) => void;
+}
+
+/**
+ * Asks the map servers one Overpass query, in the order planServers gives, waiting and asking again while they're all
+ * busy, inside what's left of the import's time. Returns the map elements and the server that answered.
+ */
+export async function askOverpass(
+  ql: string,
+  r: Run,
+  fetcher: typeof fetch,
+  now: number,
   opts: ImportOptions = {},
-): Promise<ImportResult> {
-  const started = Date.now();
-  const id = randomBytes(8).toString("hex");
-  const log: string[] = [];
-  const say = (line: string) => log.push(`+${secs(Date.now() - started)} ${line}`);
-  const key = importKey(where);
-  let scope: Scope | null = null;
-  const attempts: Attempt[] = [];
-  const finish = async (r: ImportResult) => {
-    await record(r, key, scope, now, attempts).catch(() => undefined);
-    return r;
-  };
-  const fail = (error: "where" | "map", detail: string) => finish({ ok: false, id, error, detail, ms: Date.now() - started, log });
-  if (!key) return { ok: false, id, error: "where", detail: "No place given.", ms: 0, log };
-  say(`import "${key}"`);
-
-  scope = opts.fresh ? null : await cachedScope(key);
-  // An area remembered from before this fix may carry a postcode for its city.
-  if (scope && badCity(scope.area.city)) scope = { ...scope, area: { ...scope.area, city: typedCity(where) } };
-  if (scope) say(`area from an earlier import: ${scope.osmType || "box"}${scope.osmId ? `/${scope.osmId}` : ""}, skipped Nominatim`);
-  else {
-    const t = Date.now();
-    const geo = await fetcher(`${NOMINATIM}?format=jsonv2&limit=1&addressdetails=1&q=${encodeURIComponent(key)}`, {
-      headers: { "User-Agent": UA, Accept: "application/json" },
-      signal: AbortSignal.timeout(IMPORT_LIMITS.lookupMs),
-    }).catch((e: unknown) => {
-      say(`nominatim failed after ${secs(Date.now() - t)}: ${String(e instanceof Error ? e.message : e)}`);
-      return null;
-    });
-    if (geo && !geo.ok) say(`nominatim answered ${geo.status} after ${secs(Date.now() - t)}`);
-    const hits = geo?.ok ? ((await geo.json().catch(() => [])) as Found[]) : [];
-    const hit = Array.isArray(hits) ? hits[0] : undefined;
-    if (!hit) return fail("where", geo?.ok ? "Nominatim found no place by that name." : "Nominatim didn't answer.");
-    scope = scopeFrom(hit, where);
-    if (!scope) return fail("where", `Nominatim found "${hit.name ?? "?"}" but no boundary or box for it.`);
-    say(`nominatim ${secs(Date.now() - t)}: ${hit.name ?? "?"} → ${scope.osmType}/${scope.osmId}`);
-  }
-  const areaName = [scope.area.city, scope.area.region].filter(Boolean).join(", ");
-  say(`area ${areaName || "?"} (${scope.area.country || "?"})`);
-
-  const body = `data=${encodeURIComponent(overpassQuery(scope))}`;
+): Promise<{ ok: true; elements: OsmElement[]; server: string } | { ok: false; detail: string }> {
+  const body = `data=${encodeURIComponent(ql)}`;
   // The last thing each server said, for the error line.
   const problems = new Map<string, string>();
   const health = await serverHealth(now).catch(() => ({}) as Health);
@@ -280,7 +176,7 @@ export async function importArea(
   const lately = Object.entries(health)
     .map(([h, c]) => `${h} ${c.ok} ok, ${c.busy} busy, ${c.timeout} hung`)
     .join("; ");
-  say(
+  r.say(
     `map servers in order: ${order.map(host).join(", ")}${slow.size ? ` (${[...slow].map(host).join(", ")} only after a busy round)` : ""}${lately ? `; last 30 min: ${lately}` : ""}`,
   );
   const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((ok) => setTimeout(ok, ms)));
@@ -291,9 +187,9 @@ export async function importArea(
   for (let round = 0; !outOfTime && round < IMPORT_LIMITS.rounds; round++) {
     for (const url of order) {
       if (dropped.has(url) || (round === 0 && slow.has(url) && fastLeft())) continue;
-      const left = IMPORT_LIMITS.budgetMs - (Date.now() - started);
+      const left = IMPORT_LIMITS.budgetMs - (Date.now() - r.started);
       if (left < 10_000) {
-        say("out of time for another map server");
+        r.say("out of time for another map server");
         outOfTime = true;
         break;
       }
@@ -301,14 +197,14 @@ export async function importArea(
       const t = Date.now();
       const limit = Math.min(IMPORT_LIMITS.serverMs, left);
       const note = (outcome: Outcome, why: string, line: string) => {
-        attempts.push({ host: name, outcome, ms: Date.now() - t });
+        r.attempts.push({ host: name, outcome, ms: Date.now() - t });
         if (outcome !== "busy") dropped.add(url);
         problems.set(name, why);
-        say(line);
+        r.say(line);
       };
-      let r: Response | null = null;
+      let res: Response | null = null;
       try {
-        r = await fetcher(url, {
+        res = await fetcher(url, {
           method: "POST",
           headers: { "User-Agent": UA, "Content-Type": "application/x-www-form-urlencoded" },
           body,
@@ -320,17 +216,17 @@ export async function importArea(
         note(hung ? "timeout" : "error", why, `${name} ${why}`);
         continue;
       }
-      if (!r.ok) {
-        const text = (await r.text().catch(() => ""))
+      if (!res.ok) {
+        const text = (await res.text().catch(() => ""))
           .replace(/<[^>]+>/g, " ")
           .replace(/\s+/g, " ")
           .trim();
-        const why = `HTTP ${r.status}${r.status === 429 ? " (too many requests)" : r.status >= 502 && r.status <= 504 ? " (server busy)" : ""}`;
-        const busy = r.status === 429 || (r.status >= 502 && r.status <= 504);
+        const why = `HTTP ${res.status}${res.status === 429 ? " (too many requests)" : res.status >= 502 && res.status <= 504 ? " (server busy)" : ""}`;
+        const busy = res.status === 429 || (res.status >= 502 && res.status <= 504);
         note(busy ? "busy" : "error", why, `${name} ${why} after ${secs(Date.now() - t)}${text ? `: ${text.slice(0, 200)}` : ""}`);
         continue;
       }
-      const j = (await r.json().catch(() => null)) as { elements?: OsmElement[]; remark?: string } | null;
+      const j = (await res.json().catch(() => null)) as { elements?: OsmElement[]; remark?: string } | null;
       const remark = overpassFailure(j?.remark);
       if (!j?.elements || remark) {
         const why = remark ? `error: ${remark.slice(0, 200)}` : "answer wasn't map data";
@@ -338,54 +234,344 @@ export async function importArea(
         note(remark && /timed out|out of memory/i.test(remark) ? "timeout" : "error", why, `${name} ${why} after ${secs(Date.now() - t)}`);
         continue;
       }
-      attempts.push({ host: name, outcome: "ok", ms: Date.now() - t });
-      say(`${name} ${secs(Date.now() - t)}: ${j.elements.length} map elements`);
-      const skipped: OsmSkips = { unnamed: 0, private: 0, notGym: 0, duplicate: 0 };
-      const drafts = placesFromOsm(j.elements, scope.area, skipped);
-      say(
-        `kept ${drafts.length}; left out ${skipped.unnamed} unnamed, ${skipped.private} private, ${skipped.notGym} without a gym, ${skipped.duplicate} repeated`,
-      );
-      const saved = await savePlaces(drafts, now);
-      say(
-        `database read ${secs(saved.readMs)}, wrote ${saved.statements} rows in ${secs(saved.writeMs)}: ${saved.added} new, ${saved.updated} changed, ${saved.unchanged} unchanged, ${saved.kept} claimed left alone`,
-      );
-      return finish({
-        ok: true,
-        id,
-        area: areaName,
-        found: drafts.length,
-        added: saved.added,
-        updated: saved.updated,
-        unchanged: saved.unchanged,
-        kept: saved.kept,
-        skipped,
-        server: name,
-        ms: Date.now() - started,
-        log,
-      });
+      r.attempts.push({ host: name, outcome: "ok", ms: Date.now() - t });
+      r.say(`${name} ${secs(Date.now() - t)}: ${j.elements.length} map elements`);
+      return { ok: true, elements: j.elements, server: name };
     }
     if (outOfTime || order.every((u) => dropped.has(u)) || round + 1 >= IMPORT_LIMITS.rounds) break;
     // Every server still in the running said it was busy: wait (longer each round) and ask again.
-    const wait = Math.min(IMPORT_LIMITS.waitMs * 2 ** round, IMPORT_LIMITS.budgetMs - (Date.now() - started) - 20_000);
+    const wait = Math.min(IMPORT_LIMITS.waitMs * 2 ** round, IMPORT_LIMITS.budgetMs - (Date.now() - r.started) - 20_000);
     if (wait <= 0) {
-      say("out of time to wait for a busy map server");
+      r.say("out of time to wait for a busy map server");
       break;
     }
-    say(`every map server busy; asking again in ${secs(wait)}`);
+    r.say(`every map server busy; asking again in ${secs(wait)}`);
     await sleep(wait);
   }
-  return fail("map", [...problems].map(([h, why]) => `${h}: ${why}`).join("; ") || "No map server answered in time.");
+  return { ok: false, detail: [...problems].map(([h, why]) => `${h}: ${why}`).join("; ") || "No map server answered in time." };
 }
 
-async function record(r: ImportResult, key: string, scope: Scope | null, now: number, attempts: Attempt[]) {
+// ---------- The queries ----------
+
+/** What counts as a gym on the map: fitness centres, and sports, rec and community centres whose name says gym. */
+const GYM_FILTERS = [
+  `nwr["leisure"="fitness_centre"]`,
+  `nwr["leisure"="sports_centre"]["name"]`,
+  `nwr["amenity"="community_centre"]["name"~"${REC_NAME}",i]`,
+];
+/** The places a gym's city can be named after (never a suburb or a hamlet). */
+const TOWNS = `["place"~"^(city|town|village)$"]`;
+/** A town as a small element: its name, kind and position (`convert` keeps Overpass from sending every name:xx tag). */
+const TOWN_OUT = `convert town ::id=id(),name=t["name"],place=t["place"],lat=lat(),lon=lon();out;`;
+
+const head = (timeout = IMPORT_LIMITS.overpassTimeout) => `[out:json][timeout:${timeout}];`;
+const code = (cc: string) => cc.replace(/[^A-Z]/g, "").slice(0, 2);
+
+/** A country's regions: admin level 4 boundaries with an ISO 3166-2 code that starts with the country's. */
+export const regionsQuery = (cc: string) =>
+  `${head()}rel["ISO3166-2"~"^${code(cc)}-"]["admin_level"="4"]["boundary"="administrative"];convert region ::id=id(),iso=t["ISO3166-2"],name=t["name"];out;`;
+
+/** The area to search: a region's boundary by its relation id, or a whole country by its code. */
+export const areaOf = (where: { relation: number } | { country: string }) =>
+  "relation" in where
+    ? `area(${3_600_000_000 + Math.trunc(where.relation)})->.a;`
+    : `(area["ISO3166-1"="${code(where.country)}"]["admin_level"="2"];area["ISO3166-1:alpha2"="${code(where.country)}"]["admin_level"="2"];)->.a;`;
+
+/** Every gym in an area, then the area's towns. */
+export const gymsQuery = (area: string) =>
+  `${head()}${area}(${GYM_FILTERS.map((f) => `${f}(area.a);`).join("")});out center tags;node${TOWNS}(area.a);${TOWN_OUT}`;
+
+/** Every gym added or edited on the map since `since`, anywhere in the world (the daily refresh). */
+export const newGymsQuery = (since: number) => {
+  const iso = new Date(since).toISOString().replace(/\.\d+Z$/, "Z");
+  return `${head()}(${GYM_FILTERS.map((f) => `${f}(newer:"${iso}");`).join("")});out center tags;`;
+};
+
+/**
+ * Where each of these points is: its country and region (the boundaries around it) and the towns within 15 km, each
+ * point's answers after a marker naming it (`make m i=…`), all in one request.
+ */
+export const locateQuery = (points: { lat: number; lon: number }[]) =>
+  head() +
+  points
+    .map(
+      (p, i) =>
+        `make m i="${i}";out;is_in(${p.lat},${p.lon})->.a;area.a["admin_level"~"^(2|4)$"]["boundary"="administrative"];` +
+        `convert boundary ::id=id(),level=t["admin_level"],cc=t["ISO3166-1"],cc2=t["ISO3166-1:alpha2"],iso=t["ISO3166-2"],name=t["name"];out;` +
+        `node(around:15000,${p.lat},${p.lon})${TOWNS};${TOWN_OUT}`,
+    )
+    .join("");
+
+// ---------- Reading the answers ----------
+
+export interface Town {
+  name: string;
+  place: string;
+  lat: number;
+  lon: number;
+}
+
+/** Towns in an answer, whether Overpass sent them converted (`town`) or as plain nodes. */
+export function townsOf(elements: OsmElement[]): Town[] {
+  const out: Town[] = [];
+  for (const e of elements) {
+    const t = e.tags ?? {};
+    if (e.type !== "town" && !(e.type === "node" && t.place)) continue;
+    const lat = Number(t.lat ?? e.lat);
+    const lon = Number(t.lon ?? e.lon);
+    const name = cityName(t.name);
+    if (name && Number.isFinite(lat) && Number.isFinite(lon)) out.push({ name, place: String(t.place ?? ""), lat, lon });
+  }
+  return out;
+}
+
+/** How far each kind of place reaches, in km: a gym this close belongs to it. */
+const REACH: Record<string, number> = { city: 15, town: 8, village: 4 };
+
+/**
+ * The town a gym is in, from the towns around it: the nearest one whose reach covers it (a city reaches further than a
+ * village, so a gym on a city's edge isn't filed under the hamlet next door), else simply the nearest.
+ */
+export function nearestTown(towns: Town[], lat: number, lon: number): string {
+  let best: { name: string; score: number } | null = null;
+  let nearest: { name: string; d: number } | null = null;
+  for (const t of towns) {
+    const d = km({ lat, lon }, t);
+    if (!nearest || d < nearest.d) nearest = { name: t.name, d };
+    const reach = REACH[t.place] ?? 4;
+    if (d <= reach && (!best || d / reach < best.score)) best = { name: t.name, score: d / reach };
+  }
+  return best?.name ?? nearest?.name ?? "";
+}
+
+/** A region as gym pages name it: the code for Canada, the US and Australia ("BC"), else the map's own name. */
+export function regionLabel(cc: string, iso: string, name: string): string {
+  const short = /^(?:CA|US|AU)-([A-Z]{2,3})$/.exec(iso)?.[1];
+  if (short && iso.startsWith(`${cc}-`)) return short;
+  return SHORT_REGION[name] ?? clean(name, 60);
+}
+
+/** The country's regions from regionsQuery's answer, as items to import. */
+export function regionItems(cc: string, elements: OsmElement[]): string[] {
+  const out = new Map<number, string>();
+  for (const e of elements) {
+    const t = e.tags ?? {};
+    const iso = String(t.iso ?? t["ISO3166-2"] ?? "");
+    if (!e.id || !iso.startsWith(`${cc}-`)) continue;
+    const label = regionLabel(cc, iso, String(t.name ?? "")).replace(/:/g, " ");
+    if (label) out.set(e.id, `region:${cc}:${e.id}:${label}`);
+  }
+  return [...out.values()];
+}
+
+/** Gym elements in an answer (towns, markers and boundaries are for working out where they are). */
+const gymsOf = (elements: OsmElement[]) => elements.filter((e) => e.type === "node" || e.type === "way" || e.type === "relation");
+const isGym = (e: OsmElement) => !!(e.tags?.leisure || e.tags?.amenity);
+
+export interface Located {
+  country: string;
+  region: string;
+  city: string;
+}
+
+/** locateQuery's answer, point by point. A point outside every country (at sea, say) has no answer. */
+export function locatedOf(elements: OsmElement[], points: { lat: number; lon: number }[]): (Located | null)[] {
+  const groups: OsmElement[][] = points.map(() => []);
+  let at = -1;
+  for (const e of elements) {
+    if (e.type === "m") at = Number(e.tags?.i ?? -1);
+    else if (at >= 0 && at < groups.length) groups[at]!.push(e);
+  }
+  return groups.map((g, i) => {
+    const country = g.find((e) => e.tags?.level === "2");
+    const cc = clean(country?.tags?.cc || country?.tags?.cc2, 2).toUpperCase();
+    if (!/^[A-Z]{2}$/.test(cc)) return null;
+    const region = g.find((e) => e.tags?.level === "4");
+    const p = points[i]!;
+    return {
+      country: cc,
+      region: region ? regionLabel(cc, String(region.tags?.iso ?? ""), String(region.tags?.name ?? "")) : "",
+      city: nearestTown(townsOf(g), p.lat, p.lon),
+    };
+  });
+}
+
+// ---------- One item ----------
+
+/** The admin setting that remembers how far the daily refresh got. */
+export const SINCE_KEY = "gym_refresh_since";
+
+export function describeItem(item: string): string {
+  const [kind, cc, , ...rest] = item.split(":");
+  if (kind === "country") return `country ${cc ?? "?"}`;
+  if (kind === "region") return `${rest.join(":") || "?"}, ${cc ?? "?"}`;
+  if (kind === "new") return `new on the map since ${new Date(Number(cc)).toISOString().slice(0, 16).replace("T", " ")} UTC`;
+  return item;
+}
+
+/** Imports one item of a job (see the top of this file). Every item leaves a row in gym_imports with its log. */
+export async function importItem(
+  item: string,
+  fetcher: typeof fetch = fetch,
+  now = Date.now(),
+  opts: ImportOptions = {},
+): Promise<ImportResult> {
+  const id = randomBytes(8).toString("hex");
+  const r: Run = {
+    started: Date.now(),
+    log: [],
+    attempts: [],
+    say: (line) => r.log.push(`+${secs(Date.now() - r.started)} ${line}`),
+  };
+  const key = importKey(item);
+  const label = describeItem(item);
+  const finish = async (res: ImportResult) => {
+    await record(res, key, label, now, r.attempts).catch(() => undefined);
+    return res;
+  };
+  const fail = (error: "where" | "map", detail: string) => finish({ ok: false, id, error, detail, ms: Date.now() - r.started, log: r.log });
+  const [kind, rawCc = "", rawRel = "", ...rest] = item.split(":");
+  const cc = code(rawCc.toUpperCase());
+  r.say(`import ${label}`);
+  const save = async (drafts: ReturnType<typeof placesFromOsm>, skipped: OsmSkips, server: string, split?: string[]) => {
+    r.say(
+      `kept ${drafts.length}; left out ${skipped.unnamed} unnamed, ${skipped.private} private, ${skipped.notGym} without a gym, ${skipped.duplicate} repeated`,
+    );
+    const saved = await savePlaces(drafts, now);
+    r.say(
+      `database read ${secs(saved.readMs)}, wrote ${saved.statements} rows in ${secs(saved.writeMs)}: ${saved.added} new, ${saved.updated} changed, ${saved.unchanged} unchanged, ${saved.kept} claimed or added by lifters left alone`,
+    );
+    return finish({
+      ok: true,
+      id,
+      area: label,
+      found: drafts.length,
+      added: saved.added,
+      updated: saved.updated,
+      unchanged: saved.unchanged,
+      kept: saved.kept,
+      skipped,
+      server,
+      ms: Date.now() - r.started,
+      log: r.log,
+      ...(split ? { split } : {}),
+    });
+  };
+  const skipped = (): OsmSkips => ({ unnamed: 0, private: 0, notGym: 0, duplicate: 0 });
+
+  if (kind === "country" || kind === "region") {
+    if (!/^[A-Z]{2}$/.test(cc)) return fail("where", "No country code.");
+    let area: string;
+    let region = "";
+    if (kind === "country") {
+      const regions = await askOverpass(regionsQuery(cc), r, fetcher, now, opts);
+      if (!regions.ok) return fail("map", regions.detail);
+      const items = regionItems(cc, regions.elements);
+      r.say(`${items.length} regions with a code`);
+      if (items.length >= 2) {
+        const nothing = skipped();
+        return finish({
+          ok: true,
+          id,
+          area: label,
+          found: 0,
+          added: 0,
+          updated: 0,
+          unchanged: 0,
+          kept: 0,
+          skipped: nothing,
+          server: regions.server,
+          ms: Date.now() - r.started,
+          log: r.log,
+          split: items,
+        });
+      }
+      // One region (or none): the whole country is one area.
+      region = items[0]?.split(":").slice(3).join(":") ?? "";
+      area = areaOf({ country: cc });
+    } else {
+      const relation = Number(rawRel);
+      if (!Number.isSafeInteger(relation) || relation <= 0) return fail("where", "No region id.");
+      region = rest.join(":");
+      area = areaOf({ relation });
+    }
+    const answer = await askOverpass(gymsQuery(area), r, fetcher, now, opts);
+    if (!answer.ok) return fail("map", answer.detail);
+    const towns = townsOf(answer.elements);
+    r.say(`${towns.length} towns to name gyms without a city after`);
+    const sk = skipped();
+    const where: Area = { city: "", region, country: cc };
+    const drafts = placesFromOsm(gymsOf(answer.elements).filter(isGym), where, sk, (lat, lon) => nearestTown(towns, lat, lon));
+    // A gym with no city on the map and no town anywhere in its region has no page to go on.
+    const located = drafts.filter((d) => d.city);
+    if (located.length < drafts.length) r.say(`${drafts.length - located.length} left out: no town on the map near them`);
+    return save(located, sk, answer.server);
+  }
+
+  if (kind === "new") {
+    const since = Number(rawCc);
+    if (!Number.isFinite(since) || since <= 0) return fail("where", "No date to look from.");
+    const asked = Date.now();
+    const answer = await askOverpass(newGymsQuery(since), r, fetcher, now, opts);
+    if (!answer.ok) return fail("map", answer.detail);
+    const sk = skipped();
+    // Gyms already listed keep their country, region and city (savePlaces); new ones are found on the map first.
+    const all = placesFromOsm(gymsOf(answer.elements).filter(isGym), { city: "", region: "", country: "" }, sk);
+    const known = new Set<string>();
+    for (let i = 0; i < all.length; i += 400) {
+      const part = all.slice(i, i + 400).map((d) => d.ref);
+      for (const row of await query(`SELECT source_ref FROM gym_places WHERE source_ref IN (${part.map(() => "?").join(",")})`, part))
+        known.add(String(row.source_ref));
+    }
+    const fresh = all.filter((d) => !known.has(d.ref));
+    r.say(`${all.length} gyms changed on the map, ${fresh.length} of them new to us`);
+    const placed: typeof all = all.filter((d) => known.has(d.ref));
+    let server = answer.server;
+    for (let i = 0; i < fresh.length; i += IMPORT_LIMITS.locateBatch) {
+      const part = fresh.slice(i, i + IMPORT_LIMITS.locateBatch);
+      const where = await askOverpass(locateQuery(part), r, fetcher, now, opts);
+      if (!where.ok) {
+        // Save what's located so far; the item runs again later and finds the rest still new.
+        if (placed.length) await savePlaces(placed, now);
+        return fail("map", where.detail);
+      }
+      server = where.server;
+      const found = locatedOf(where.elements, part);
+      part.forEach((d, k) => {
+        const at = found[k];
+        if (!at || !(d.city || at.city)) {
+          sk.notGym++;
+          return;
+        }
+        placed.push({
+          ...d,
+          country: d.country || at.country,
+          region: d.region || at.region,
+          city: d.city || at.city,
+          guessed: !d.city,
+        });
+      });
+    }
+    const res = await save(placed, sk, server);
+    // Next time, look from a little before this request (the map servers lag the map by a few minutes).
+    await run(
+      `INSERT INTO admin_settings (key, value, updated_at) VALUES (?, ?, ?)
+       ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+      [SINCE_KEY, String(asked - 3_600_000), Date.now()],
+    );
+    return res;
+  }
+  return fail("where", `Not an import item: ${item.slice(0, 80)}`);
+}
+
+async function record(r: ImportResult, key: string, label: string, now: number, attempts: Attempt[]) {
   await run(
     `INSERT INTO gym_imports (id, query, area, scope, ok, error, found, added, updated, unchanged, kept, server, ms, log, attempts, at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       r.id,
       key,
-      r.ok ? r.area : scope ? [scope.area.city, scope.area.region].filter(Boolean).join(", ") : "",
-      scope ? JSON.stringify(scope) : "",
+      label,
       r.ok ? 1 : 0,
       r.ok ? "" : `${r.error}: ${r.detail}`.slice(0, 1000),
       r.ok ? r.found : 0,
@@ -401,71 +587,4 @@ async function record(r: ImportResult, key: string, scope: Scope | null, now: nu
     ],
   );
   await run("DELETE FROM gym_imports WHERE at < ?", [now - IMPORT_LIMITS.keepMs]);
-}
-
-export interface ImportRow {
-  id: string;
-  query: string;
-  area: string;
-  ok: boolean;
-  error: string;
-  found: number;
-  added: number;
-  updated: number;
-  unchanged: number;
-  kept: number;
-  server: string;
-  ms: number;
-  log: string;
-  at: number;
-}
-
-/** The latest imports, newest first, for Admin › Gyms. */
-export async function recentImports(limit = 100): Promise<ImportRow[]> {
-  const rows = await query(
-    `SELECT id, query, area, ok, error, found, added, updated, unchanged, kept, server, ms, log, at FROM gym_imports ORDER BY at DESC LIMIT ?`,
-    [Math.max(1, Math.min(500, Math.trunc(limit) || 100))],
-  );
-  return rows.map((r) => ({
-    id: String(r.id),
-    query: String(r.query),
-    area: String(r.area),
-    ok: Number(r.ok) === 1,
-    error: String(r.error),
-    found: Number(r.found),
-    added: Number(r.added),
-    updated: Number(r.updated),
-    unchanged: Number(r.unchanged),
-    kept: Number(r.kept),
-    server: String(r.server),
-    ms: Number(r.ms),
-    log: String(r.log),
-    at: Number(r.at),
-  }));
-}
-
-/** When each of these places last imported cleanly (by import key), so a big run can skip recent ones. */
-export async function lastImported(places: readonly string[]): Promise<Record<string, number>> {
-  const keys = [...new Set(places.map(importKey).filter(Boolean))];
-  const out: Record<string, number> = {};
-  for (let i = 0; i < keys.length; i += 400) {
-    const part = keys.slice(i, i + 400);
-    const rows = await query(
-      `SELECT query, MAX(at) AS at FROM gym_imports WHERE ok = 1 AND query IN (${part.map(() => "?").join(",")}) GROUP BY query`,
-      part,
-    );
-    for (const r of rows) out[String(r.query)] = Number(r.at);
-  }
-  return out;
-}
-
-/**
- * Places whose latest import failed, among the last `limit` imports (a city that failed and then imported cleanly
- * isn't listed), for Recent imports' Retry failed. They're the import keys, which import the same place again.
- */
-export async function failedRecently(limit = 100): Promise<string[]> {
-  const rows = await recentImports(limit);
-  const latest = new Map<string, boolean>();
-  for (const r of rows) if (!latest.has(r.query)) latest.set(r.query, r.ok);
-  return [...latest].filter(([, ok]) => !ok).map(([q]) => q);
 }

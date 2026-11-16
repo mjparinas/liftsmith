@@ -88,6 +88,25 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     uses: [],
     noScan: ["social_profiles", "sp", "posts", "p"],
   },
+  {
+    name: "gym import: gyms due a website read (gymEnrich.ts enrichBatch)",
+    sql: "SELECT id FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at < ? ORDER BY enriched_at LIMIT ?",
+    uses: ["gym_places_web"],
+    noScan: ["gym_places"],
+  },
+  {
+    name: "gym import: gyms due an AI read (gymAutoFill.ts autoFillBatch)",
+    sql: "SELECT id FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0 AND ai_at < ? ORDER BY ai_at LIMIT ?",
+    uses: ["gym_places_ai"],
+    noScan: ["gym_places"],
+  },
+  {
+    name: "gym import: claimed and lifter-added gyms a new map gym may be (gymPlaces.ts savePlaces)",
+    sql: `SELECT id, name, lat, lon, source_ref FROM gym_places WHERE claimed_by <> '' AND claimed_by > ''
+          UNION SELECT id, name, lat, lon, source_ref FROM gym_places WHERE source <> 'osm' AND source > ''`,
+    uses: ["gym_places_claimed", "gym_places_own"],
+    noScan: ["gym_places"],
+  },
 ];
 
 describe("queries on growing tables use an index", () => {

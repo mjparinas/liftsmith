@@ -20,7 +20,7 @@ import {
 import { SHORT_REGION } from "@/lib/regions";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
-import { badCity, cityName, tidyAddress } from "./gymAddress";
+import { badCity, cityName, km, tidyAddress } from "./gymAddress";
 import { distanceKm } from "./gymDirectory";
 import { issuesOf, newsOf, trainersOf } from "./gymExtras";
 import { checkText } from "./moderation";
@@ -30,8 +30,10 @@ export const PLACE_LIMITS = {
   radiusKm: 15,
   /** Gyms one search returns. */
   results: 30,
-  /** Places one import may write, so a whole country can't be pulled by mistake. */
-  perImport: 5_000,
+  /** Places one import may write: one region of the world (California, Bavaria) has a few thousand. */
+  perImport: 20_000,
+  /** A new map gym this close to a claimed or lifter-added gym with a similar name is that gym, not a second one. */
+  sameGymM: 150,
 };
 
 export type PlaceKind = "gym" | "studio";
@@ -217,7 +219,16 @@ export function streetAddress(t: Record<string, string | undefined>): string {
 /** An address saved before streetAddress, with only a unit ("109-"), shows as no address until the next import. */
 const shownAddress = (a: string) => (/^[^\s]{1,12}-$/.test(a.trim()) ? "" : a);
 
-export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSkips): PlaceDraft[] {
+/**
+ * `cityAt` names the town a gym sits in when its own map address has none (the worldwide import's nearest city, town
+ * or village, gymImport.ts); without it the import's area city stands in.
+ */
+export function placesFromOsm(
+  elements: OsmElement[],
+  area: Area,
+  skips?: OsmSkips,
+  cityAt?: (lat: number, lon: number) => string,
+): PlaceDraft[] {
   const out: PlaceDraft[] = [];
   const seen = new Set<string>();
   const skip = (why: keyof OsmSkips) => {
@@ -251,7 +262,7 @@ export function placesFromOsm(elements: OsmElement[], area: Area, skips?: OsmSki
     // A postcode or house number in addr:city ("80145", "1") isn't a city: the import's own area stands in.
     const mapCity = cityName(t["addr:city"]) || cityName(t["is_in:city"]);
     const region = clean(t["addr:province"] ?? t["addr:state"], 60) || area.region;
-    const city = mapCity || area.city;
+    const city = mapCity || cityAt?.(lat, lon) || area.city;
     const postcode = clean(t["addr:postcode"], 20);
     out.push({
       ref,
@@ -342,6 +353,9 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
     ),
   );
   for (const rows of slugReads) for (const r of rows) taken.add(`${s(r.city_slug)}/${s(r.slug)}`);
+  // A gym a lifter added or an owner claimed may be on the map under another id (or none yet): a new map gym with a
+  // similar name within 150 m is that gym, so it's linked to it (its details untouched) rather than listed twice.
+  const anchors = fresh.length ? await ownGyms() : [];
   const readMs = Date.now() - t0;
   const stmts: { sql: string; args: (string | number)[] }[] = [];
   const out = { added: 0, updated: 0, unchanged: 0, kept: 0 };
@@ -356,8 +370,12 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
       }
       // The city came from the import's area, not the map: keep the one the gym already has, unless that one was a
       // postcode or a house number (an older import's mistake).
+      // Its region and country stay as they are: the worldwide import spells a region from the map's boundary, which
+      // may differ from an older import's ("Bavaria", "Bayern"), and a new spelling would move the page for nothing.
       const next =
-        d.guessed && !badCity(s(old.city)) ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) } : { ...d };
+        d.guessed && !badCity(s(old.city))
+          ? { ...d, city: s(old.city), region: s(old.region), country: s(old.country) }
+          : { ...d, region: s(old.region) || d.region, country: s(old.country) || d.country };
       if (citySlugOf(next.city, next.region) !== s(old.city_slug)) moves.push(s(old.id));
       for (const f of KEEP_IF_MAP_EMPTY) if (!next[f] && s(old[f])) (next as Record<string, unknown>)[f] = s(old[f]);
       if (SAME_FIELDS.every((f) => String(next[f]) === String(old[f] ?? ""))) {
@@ -389,6 +407,16 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
         ],
       });
       out.updated++;
+      continue;
+    }
+    const twin = anchors.find((a) => sameName(a.name, d.name) && km(a, d) * 1000 <= PLACE_LIMITS.sameGymM);
+    if (twin) {
+      // Remember the map's id on it, so the next import finds it at once. Nothing the gym shows changes.
+      if (!twin.ref) {
+        twin.ref = d.ref;
+        stmts.push({ sql: "UPDATE gym_places SET source_ref = ? WHERE id = ? AND source_ref = ''", args: [d.ref, twin.id] });
+      }
+      out.kept++;
       continue;
     }
     const id = randomBytes(8).toString("hex");
@@ -432,6 +460,18 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
   for (const part of chunks(stmts, 500)) await batch(part);
   for (const id of moves) await moveToCity(id, now);
   return { ...out, readMs, writeMs: Date.now() - t1, statements: stmts.length };
+}
+
+/**
+ * Gyms that aren't only the map's: claimed ones and ones lifters added. Both lists are small and each has its own
+ * partial index (the `<>` names the index, the `>` lets it seek), so this never reads the whole table.
+ */
+async function ownGyms(): Promise<{ id: string; name: string; lat: number; lon: number; ref: string }[]> {
+  const rows = await query(
+    `SELECT id, name, lat, lon, source_ref FROM gym_places WHERE claimed_by <> '' AND claimed_by > ''
+     UNION SELECT id, name, lat, lon, source_ref FROM gym_places WHERE source <> 'osm' AND source > ''`,
+  );
+  return rows.map((r) => ({ id: s(r.id), name: s(r.name), lat: n(r.lat), lon: n(r.lon), ref: s(r.source_ref) }));
 }
 
 function chunks<T>(xs: T[], size: number): T[][] {

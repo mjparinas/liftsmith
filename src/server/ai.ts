@@ -25,7 +25,7 @@ const PRICE: Record<AiModel, { input: number; output: number; cacheRead: number 
 const CACHE_WRITE = 1.25;
 
 /** What each helper is called on the panel and in the audit log. */
-export type AiTask = "triage" | "gymFill" | "gymDupes" | "ask" | "draft" | "digest";
+export type AiTask = "triage" | "gymFill" | "gymAuto" | "gymDupes" | "ask" | "draft" | "digest";
 
 /** The longest text one request may carry (characters), so one odd page or email can't run up the bill. */
 export const AI_INPUT_LIMIT = 200_000;

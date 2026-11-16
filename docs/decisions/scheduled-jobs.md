@@ -12,6 +12,7 @@ Static path schedules in `vercel.json` (`schedules`), each a `GET` to a route un
 | `admin` | `/api/cron/admin/` | 13:00 daily | System checks and alerts, database size, IndexNow, quiet-client alerts, expired suspensions |
 | `digest-pdt` | `/api/cron/digest/` | 15:00 daily | The admins' morning digest (8 AM Pacific in daylight time) |
 | `digest-pst` | `/api/cron/digest/` | 16:00 daily | The same, 8 AM Pacific in standard time; the digest goes out once per Pacific day |
+| `gym-refresh` | `/api/cron/gym-refresh/` | 10:00 daily | Starts the daily gym refresh: new gyms anywhere since the last run, then their websites and AI ([Gyms](gyms.md)) |
 | `gym-imports` | `/api/cron/gym-imports/` | every 5 minutes | Safety net for the gym import worker, which also hands over to itself ([Gyms](gyms.md)) |
 
 ## Rules
