@@ -713,6 +713,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "rehab-phases",
+        name: "Rehab protocols in phases, moved by pain",
+        body: "Every rehab program has three phases, from calming the area to full use. A plain pain rule reads the ratings after each exercise and the day after, says when a client is ready for the next phase or should go back one, and the physio sends it in one tap.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Clients follow it free. Liftsmith shows what clients log. It doesn't diagnose or treat anything.",
+        added: "2026-11-17",
+      },
+      {
         id: "coach-nutrition",
         name: "Nutrition targets for clients",
         body: "Set each client's daily calories, protein, carbs and fat, with a rest-day calorie number if you like, filled in from their own numbers in one tap. Their coach's notes check their food week against them, and you see how they're eating when they share it.",

@@ -758,3 +758,13 @@ Members can see this week's classes on your gym's page, in the app and on the we
 - Off for a holiday? Tap the date and the class shows as not running that day.
 - Members add the next class to their calendar in one tap.
 Did you know? Times are your gym's own clock, so members see 6 PM as 6 PM. Bookings stay with you. ([Gyms](gyms.md) "Class schedules")
+
+### W67 · Rehab in phases, moved by pain (**New**, 2026-11-17)
+Pro · Physios · No screenshot (the physio's own client report) · `fresh`, so it goes next to everyone already in the series
+Each rehab program now has three phases, from calming the area to full use, and a plain pain rule that says when to move.
+- Pick the phase to start in when you assign: Calm and move, Build strength or Back to full use.
+- After six sessions with pain 2 or less after the last three, and no flare the next day, the client's report says ready for the next phase.
+- Pain 5 or more after two of the last three, or a flare the next day, says go back a phase.
+- Send the next phase in one tap. It replaces the old one on their phone, so their history carries on.
+- Clients rate how the area feels the day after rehab, which is often what tells you the most.
+Did you know? Turn on Let them move phases on their own and their app offers the next phase when the rule says so. You still see every move. ([Trainer mode](trainer-mode.md) "Rehab protocols")

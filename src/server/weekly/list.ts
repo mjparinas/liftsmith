@@ -145,6 +145,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("seasons", "both", "season", { fresh: "2026-11-17" }),
   // New, 2026-11-17: class schedules on gym pages (docs/decisions/gyms.md "Class schedules").
   R("gym-classes", "gym", "free", "gym", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: rehab protocols in three phases, moved by a pain rule (docs/decisions/trainer-mode.md).
+  R("physio-protocols", "physio", "pro", "trainer", { fresh: "2026-11-17", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

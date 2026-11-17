@@ -8,6 +8,7 @@ import { inSentence, t } from "@/lib/i18n";
 import { PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { rehabInjuries } from "@/lib/partExtras";
+import { PHASES, phaseTitle } from "@/lib/rehab";
 import { MAX_ROUTINES } from "@/lib/routines";
 import { decodeRoutine, sameItems } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
@@ -48,8 +49,11 @@ function SharedPreview({ code }: { code?: string }) {
     );
   }
   const routines = profile.routines ?? [];
-  const existing = savedId ? routines.find((r) => r.id === savedId) : routines.find((r) => sameItems(r.items, shared.items));
-  const full = !existing && routines.length >= MAX_ROUTINES;
+  const existing = (savedId ? routines.find((r) => r.id === savedId) : undefined) ?? routines.find((r) => sameItems(r.items, shared.items));
+  // A new phase of a protocol already saved replaces that routine (2026-11-17).
+  const plan = shared.rehab ? shared.rehabPlan : undefined;
+  const replaces = plan && !existing ? routines.find((r) => r.rehab && r.rehabPlan?.id === plan.id) : undefined;
+  const full = !existing && !replaces && routines.length >= MAX_ROUTINES;
   const missing = shared.items.filter((i) => !can.has(i.exerciseId)).length;
   const letters = new Map<string, string>();
   for (const it of shared.items) if (it.group && !letters.has(it.group)) letters.set(it.group, String.fromCharCode(65 + letters.size));
@@ -71,6 +75,7 @@ function SharedPreview({ code }: { code?: string }) {
         ...(shared.rehab ? { rehab: true } : {}),
         ...(area ? { rehabPart: area } : {}),
         ...(shared.rehab && shared.perWeek ? { perWeek: shared.perWeek } : {}),
+        ...(plan ? { rehabPlan: plan } : {}),
         ...(shared.parts ? { parts: shared.parts } : {}),
       },
       logInjury,
@@ -96,6 +101,12 @@ function SharedPreview({ code }: { code?: string }) {
             ]
               .filter(Boolean)
               .join(" · ")}
+          </p>
+        )}
+        {plan && (
+          <p className="mt-2 text-sm text-muted" data-testid="shared-phase">
+            {t("rhp.phaseOf", { phase: plan.phase, of: PHASES, title: phaseTitle(plan.phase) })}
+            {replaces ? ` ${t("rhp.replaces", { name: replaces.name })}` : ""}
           </p>
         )}
         {shared.parts && (

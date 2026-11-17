@@ -26,10 +26,21 @@ import { track } from "./net";
 import { KCAL_DAYS, LOGGED_KCAL, loggedWeek, PROTEIN_SHORT, proteinOnly, weekProtein, type FoodDay } from "./nutrition";
 import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
+import { phaseTitle } from "./rehab";
+import { areaInjuries, phaseCheck, phaseTo, sessionPhase, type PhaseCheck } from "./rehabPhases";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
 import type { StickerId } from "./stickers";
-import { BODY_PARTS, type AppEvent, type BodyPart, type Experience, type Goal, type RoutinePart, type SetEvent } from "./types";
+import {
+  BODY_PARTS,
+  type AppEvent,
+  type BodyPart,
+  type Experience,
+  type Goal,
+  type RehabPlan,
+  type RoutinePart,
+  type SetEvent,
+} from "./types";
 import { fmtNum } from "./units";
 
 /** Personal trainer (one-on-one, sessions first) or coach (groups and teams, check-ins first); server coach.ts. */
@@ -392,6 +403,7 @@ export function cleanEvents(raw: readonly unknown[]): { events: AppEvent[]; name
         score: Math.round(e.score),
         ...(str(e.sessionId) ? { sessionId: e.sessionId } : {}),
         ...(str(e.exerciseId) ? { exerciseId: e.exerciseId } : {}),
+        ...(str(e.nextDay) ? { nextDay: e.nextDay } : {}),
       });
     } else if (e.type === "note" || e.type === "sessionNote") {
       // Only from a client who shares workout notes with this coach.
@@ -464,6 +476,8 @@ export type Flag =
   | { kind: "painUp"; part: BodyPart; from: number; to: number }
   | { kind: "newInjury"; part: BodyPart }
   | { kind: "lowAdherence"; name: string; done: number; want: number }
+  | { kind: "rehabReady"; name: string; phase: number }
+  | { kind: "rehabBack"; name: string; phase: number }
   | { kind: "kcalOff"; avg: number; target: number; days: number }
   | { kind: "proteinShort"; avg: number; target: number; days: number }
   | { kind: "noFood" }
@@ -488,6 +502,11 @@ export interface PlanProgress {
    * it ran that part, so a coach sees "cool-downs skipped" and can say something.
    */
   parts?: { kind: RoutinePart["kind"]; done: number; of: number }[];
+  /**
+   * Rehab protocols (2026-11-17): the protocol and the phase the client is in (the one assigned, or the one their latest
+   * workout followed when they may move on their own), and, when they share pain, what the phase rule says.
+   */
+  rehab?: { plan: RehabPlan; phase: number; part?: BodyPart; perWeek?: number; check?: PhaseCheck };
 }
 
 /** Pain at or above this in the last week is a "check in" item for the coach (the same 5 that stops a graded return). */
@@ -522,8 +541,16 @@ export interface RehabInjury {
 export function planProgress(plan: Plan, sessions: readonly SessionSummary[], now = Date.now()): PlanProgress {
   const routine = decodeRoutine(plan.code);
   const want = new Set(routine?.items.map((i) => i.exerciseId) ?? []);
+  // A protocol's workout follows it in any of its phases, so a client who moved phase on their own is still counted.
+  const protocol = routine?.rehab ? routine.rehabPlan?.id : undefined;
   const hits = want.size
-    ? sessions.filter((s) => s.start >= plan.at && s.exercises.filter((e) => want.has(e)).length >= Math.ceil(want.size * 0.6))
+    ? sessions.filter(
+        (s) =>
+          s.start >= plan.at &&
+          (protocol
+            ? sessionPhase(protocol, s.exercises) !== undefined
+            : s.exercises.filter((e) => want.has(e)).length >= Math.ceil(want.size * 0.6)),
+      )
     : [];
   const out: PlanProgress = { plan, done: hits.length, lastAt: hits[0]?.start ?? null };
   if (routine?.parts && hits.length)
@@ -539,6 +566,41 @@ export function planProgress(plan: Plan, sessions: readonly SessionSummary[], no
     out.adherence = { done, want: wanted, pct: Math.min(100, Math.round((done / wanted) * 100)) };
   }
   return out;
+}
+
+/**
+ * A protocol's phase on the client's report (2026-11-17): the phase assigned, or, when the physio lets them move on
+ * their own, the phase their latest workout followed; and with pain shared, the phase rule over that phase's workouts.
+ */
+export function withPhase(
+  p: PlanProgress,
+  sessions: readonly SessionSummary[],
+  events: readonly AppEvent[],
+  pain: boolean,
+  now: number,
+): PlanProgress {
+  const r = decodeRoutine(p.plan.code);
+  const plan = r?.rehab ? r.rehabPlan : undefined;
+  if (!r || !plan) return p;
+  const followed = sessions
+    .filter((s) => s.start >= p.plan.at)
+    .map((s) => ({ s, phase: sessionPhase(plan.id, s.exercises) }))
+    .filter((x): x is { s: SessionSummary; phase: number } => x.phase !== undefined)
+    .sort((a, b) => a.s.start - b.s.start);
+  const phase = (plan.self ? followed.at(-1)?.phase : undefined) ?? plan.phase;
+  const hurt = pain ? areaInjuries(events, r.rehabPart, now) : new Set<string>();
+  const inPhase = followed.filter((x) => x.phase === phase).map((x) => ({ sessionId: x.s.sessionId, start: x.s.start }));
+  const check = hurt.size ? phaseCheck(events, inPhase, hurt, phase) : undefined;
+  return {
+    ...p,
+    rehab: {
+      plan,
+      phase,
+      ...(r.rehabPart ? { part: r.rehabPart } : {}),
+      ...(r.perWeek ? { perWeek: r.perWeek } : {}),
+      ...(check ? { check } : {}),
+    },
+  };
 }
 
 /** The client's injuries for their coach, active first then healed in the last 90 days, newest first. */
@@ -634,10 +696,16 @@ export function clientReport(view: ClientView, now: number): Report {
   const prs = stats.prs.filter((p) => now - p.at <= 30 * DAY).sort((a, b) => b.at - a.at);
   const stalled = stalls(events, now);
   const flags: Flag[] = [];
-  const plans = (view.plans ?? []).map((p) => planProgress(p, sessions, now));
+  const plans = (view.plans ?? []).map((p) => withPhase(planProgress(p, sessions, now), sessions, events, !!view.pain, now));
   const rehab = view.pain ? rehabInjuries(events, now) : null;
   // Pain comes first: it's what a physio acts on before anything about training.
   if (rehab) flags.push(...painFlags(rehab, now));
+  // Then what the phase rule says about a protocol: back a phase before ready for the next.
+  for (const p of plans) {
+    const to = p.rehab?.check ? phaseTo(p.rehab.check) : undefined;
+    if (to === undefined) continue;
+    flags.push({ kind: p.rehab!.check!.status === "back" ? "rehabBack" : "rehabReady", name: p.plan.name, phase: to });
+  }
   const shares = view.shares ?? [...(view.body ? (["body"] as const) : []), ...(view.pain ? (["pain"] as const) : [])];
   const readiness = shares.includes("health") || shares.includes("cycle") ? readinessOf(events, now) : null;
   // How they feel comes next: a coach checks in before pushing someone who's unwell or worn out.
@@ -855,6 +923,18 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       return {
         title: t("trn.f.lowAdherence", { name: f.name, done: f.done, want: f.want }),
         advice: t("trn.f.lowAdherenceDo"),
+        tone: "warn",
+      };
+    case "rehabReady":
+      return {
+        title: t("rhp.f.ready", { name: f.name, phase: f.phase, title: phaseTitle(f.phase) }),
+        advice: t("rhp.f.readyDo"),
+        tone: "good",
+      };
+    case "rehabBack":
+      return {
+        title: t("rhp.f.back", { name: f.name, phase: f.phase, title: phaseTitle(f.phase) }),
+        advice: t("rhp.f.backDo"),
         tone: "warn",
       };
     case "kcalOff":

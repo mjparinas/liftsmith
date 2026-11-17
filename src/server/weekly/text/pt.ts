@@ -919,4 +919,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Os horários seguem o relógio da academia: 18h são 18h para todos. As reservas continuam com você.",
   },
+  "physio-protocols": {
+    title: "Reabilitação em fases, guiada pela dor",
+    intro:
+      "Cada programa de reabilitação agora tem três fases, de acalmar a região ao uso normal, e uma regra da dor simples que diz quando avançar.",
+    points: [
+      "Escolha a fase inicial ao atribuir: Acalmar e mexer, Ganhar força ou De volta ao uso normal.",
+      "Depois de seis sessões com dor 2 ou menos após as três últimas, e sem piora no dia seguinte, o relatório do aluno diz que ele está pronto para a próxima fase.",
+      "Dor 5 ou mais após duas das três últimas, ou piora no dia seguinte, indica voltar uma fase.",
+      "Mande a próxima fase com um toque. Ela substitui a anterior no celular dele, então o histórico continua.",
+      "Seus alunos avaliam como está a região no dia seguinte à reabilitação, que muitas vezes é o que mais diz.",
+    ],
+    dyk: "Ligue Deixar o aluno mudar de fase sozinho e o app dele oferece a próxima fase quando a regra indicar. Você continua vendo cada mudança.",
+  },
 };

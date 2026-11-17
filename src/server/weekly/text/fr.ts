@@ -922,4 +922,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Les heures sont celles de votre salle : 18 h reste 18 h pour tout le monde. Les réservations restent chez vous.",
   },
+  "physio-protocols": {
+    title: "La rééducation par phases, guidée par la douleur",
+    intro:
+      "Chaque programme de rééducation a maintenant trois phases, de calmer la zone à la pleine utilisation, et une règle de douleur simple qui dit quand avancer.",
+    points: [
+      "Choisissez la phase de départ en l’assignant : Calmer et bouger, Gagner en force ou Retour à la pleine utilisation.",
+      "Après six séances avec une douleur de 2 ou moins après les trois dernières, et pas de poussée le lendemain, le rapport du client indique qu’il est prêt pour la phase suivante.",
+      "Une douleur de 5 ou plus après deux des trois dernières, ou une poussée le lendemain, indique de revenir d’une phase.",
+      "Envoyez la phase suivante d’un geste. Elle remplace l’ancienne sur son téléphone, donc son historique continue.",
+      "Vos clients notent la zone le lendemain de la rééducation, ce qui vous en dit souvent le plus.",
+    ],
+    dyk: "Activez Le laisser changer de phase seul et son appli proposera la phase suivante quand la règle le dit. Vous voyez toujours chaque changement.",
+  },
 };

@@ -917,4 +917,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Las horas son las de tu gimnasio, así que las 18:00 son las 18:00 para todos. Las reservas siguen contigo.",
   },
+  "physio-protocols": {
+    title: "Rehabilitación por fases, guiada por el dolor",
+    intro:
+      "Cada programa de rehabilitación tiene ahora tres fases, de calmar la zona al uso normal, y una regla del dolor sencilla que dice cuándo avanzar.",
+    points: [
+      "Elige la fase de inicio al asignarlo: Calmar y mover, Ganar fuerza o Volver al uso normal.",
+      "Tras seis sesiones con dolor de 2 o menos en las tres últimas, y sin brote al día siguiente, el informe del cliente dice que está listo para la siguiente fase.",
+      "Un dolor de 5 o más en dos de las tres últimas, o un brote al día siguiente, indica volver una fase.",
+      "Envía la siguiente fase con un toque. Sustituye a la anterior en su teléfono, así que su historial continúa.",
+      "Tus clientes valoran cómo notan la zona el día después de la rehabilitación, que suele ser lo que más te dice.",
+    ],
+    dyk: "Activa Dejar que cambie de fase por su cuenta y su app le ofrecerá la siguiente fase cuando lo diga la regla. Tú sigues viendo cada cambio.",
+  },
 };

@@ -495,7 +495,8 @@ const PAIN_KEEP: Record<string, readonly string[]> = {
   injury: ["injuryId", "part"],
   injuryHealed: ["injuryId"],
   injuryReturn: ["injuryId"],
-  pain: ["injuryId", "score", "sessionId", "exerciseId"],
+  // nextDay: a rating the day after a rehab workout, for that workout (rehab protocols, 2026-11-17).
+  pain: ["injuryId", "score", "sessionId", "exerciseId", "nextDay"],
 };
 export const PAIN_TYPES = Object.keys(PAIN_KEEP);
 

@@ -387,6 +387,11 @@ export const fr: FeaturesText = {
       body: "Assignez des programmes de rééducation doux avec un nombre de fois par semaine, voyez à quelle fréquence vos clients les suivent, et voyez la douleur et les blessures qu'ils choisissent de partager, exercice par exercice, avec une notification quand la douleur est forte.",
       note: "Liftsmith montre ce que vos clients notent. Il ne pose aucun diagnostic et ne traite rien.",
     },
+    "rehab-phases": {
+      name: "Protocoles de rééducation par phases, guidés par la douleur",
+      body: "Chaque programme de rééducation a trois phases, de calmer la zone à la pleine utilisation. Une règle de douleur simple lit les notes après chaque exercice et le lendemain, dit quand un client est prêt pour la phase suivante ou doit revenir d’une phase, et le kinésithérapeute l’envoie d’un geste.",
+      note: "Les clients le suivent gratuitement. Liftsmith montre ce que vos clients enregistrent. Il ne pose aucun diagnostic et ne traite rien.",
+    },
     "coach-nutrition": {
       name: "Objectifs nutritionnels pour les clients",
       body: "Fixez les calories, protéines, glucides et lipides quotidiens de chaque client, avec d’autres calories les jours de repos si vous voulez, remplis avec ses propres données en un geste. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange quand il le partage.",

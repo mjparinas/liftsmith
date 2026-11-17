@@ -430,6 +430,20 @@ export interface RoutineItem {
   group?: string;
 }
 
+/** The built-in rehab protocols, one per area (rehab.ts). */
+export type RehabProtocolId = "knee" | "lowBack" | "shoulder" | "ankle" | "hip" | "neck";
+
+/** Where a rehab routine is in its protocol (2026-11-17). */
+export interface RehabPlan {
+  id: RehabProtocolId;
+  /** 1 to 3. */
+  phase: number;
+  /** The physio let the lifter move up or back a phase on their own when the pain rule says so. */
+  self?: true;
+  /** When this phase started on this phone (saved or moved), so only its own sessions count. */
+  since?: number;
+}
+
 export interface Routine {
   id: string;
   name: string;
@@ -449,6 +463,11 @@ export interface Routine {
   rehabPart?: BodyPart;
   /** Rehab: how many times a week the physio asked for (1 to 7). Missing: about every other day, as before. */
   perWeek?: number;
+  /**
+   * Rehab: the phased protocol it follows and the phase it's in (2026-11-17, rehab protocols; rehabPhases.ts). Missing on
+   * a routine that isn't one of the built-in protocols.
+   */
+  rehabPlan?: RehabPlan;
   /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.
@@ -913,6 +932,8 @@ export interface PainEvent extends EventBase {
   score: number;
   sessionId?: string;
   exerciseId?: string;
+  /** A rating the day after a rehab workout, for that workout's session (2026-11-17, rehab protocols). */
+  nextDay?: string;
 }
 
 /** The lifter chose a graded return (after reading the risks): skipped exercises come back lighter, step by step. */

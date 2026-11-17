@@ -380,6 +380,11 @@ export const it: FeaturesText = {
       body: "Assegna programmi di riabilitazione leggeri con le volte a settimana, guarda quanto spesso i clienti li seguono e vedi dolore e infortuni che scelgono di condividere, esercizio per esercizio, con una notifica quando il dolore è alto.",
       note: "Liftsmith mostra ciò che i clienti registrano. Non fa diagnosi né cure.",
     },
+    "rehab-phases": {
+      name: "Protocolli di riabilitazione a fasi, guidati dal dolore",
+      body: "Ogni programma di riabilitazione ha tre fasi, dal calmare la zona al pieno uso. Una semplice regola del dolore legge le valutazioni dopo ogni esercizio e il giorno dopo, dice quando un cliente è pronto per la fase successiva o deve tornare indietro, e il fisioterapista la invia con un tocco.",
+      note: "I clienti lo seguono gratis. Liftsmith mostra ciò che registrano i clienti. Non fa diagnosi e non cura nulla.",
+    },
     "coach-nutrition": {
       name: "Obiettivi nutrizionali per i clienti",
       body: "Fissa calorie, proteine, carboidrati e grassi giornalieri di ogni cliente, con calorie diverse nei giorni di riposo se vuoi, compilati con i suoi dati in un tocco. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",

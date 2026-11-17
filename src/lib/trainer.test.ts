@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { DAY, makeWorkout, NOW } from "@/test/factories";
 
+import { phaseItems, rehabProgram } from "./rehab";
+import { encodeRoutine } from "./routineShare";
 import {
   cleanEvents,
   clientReport,
@@ -253,5 +255,69 @@ describe("filling in a client's targets from their numbers", () => {
     };
     const food = [1, 2, 3, 4].map((ago) => ({ day: day(ago), kcal: 2420, protein: 150 }));
     expect(suggestTargets({ sex: null, heightCm: null, weights, measures: [], food }, NOW)).toMatchObject({ kcal: 2400, from: "week" });
+  });
+});
+
+describe("rehab protocols on a client's report (2026-11-17)", () => {
+  const injury = { id: "i1", at: NOW - 60 * DAY, type: "injury", injuryId: "knee1", part: "knee" };
+  const knee = rehabProgram("knee")!;
+  // Six phase-1 workouts, two days apart, each with a pain rating after it.
+  const workouts = (score: number, phase = 1) =>
+    [14, 12, 10, 8, 6, 4].flatMap((d, i) => [
+      ...makeWorkout(
+        `w${phase}-${i}`,
+        NOW - d * DAY,
+        phaseItems(knee, phase).map((x) => ({ exerciseId: x.exerciseId })),
+      ),
+      { id: `p${phase}-${i}`, at: NOW - d * DAY + 1800_000, type: "pain", injuryId: "knee1", score, sessionId: `w${phase}-${i}` },
+    ]);
+  const assigned = (phase: number, self = false): Plan => ({
+    id: "pl1",
+    coachId: "c",
+    clientId: "me",
+    name: `Knee rehab, phase ${phase}`,
+    code: encodeRoutine({
+      name: `Knee rehab, phase ${phase}`,
+      items: phaseItems(knee, phase),
+      rehab: true,
+      rehabPart: "knee",
+      perWeek: 3,
+      rehabPlan: { id: "knee", phase, ...(self ? { self: true as const } : {}) },
+    }),
+    at: NOW - 20 * DAY,
+    perWeek: 3,
+  });
+
+  it("says when the client is ready for the next phase, with why, and only with pain shared", () => {
+    const r = clientReport({ name: "Alex", daysPerWeek: null, events: [injury, ...workouts(1)], plans: [assigned(1)], pain: true }, NOW);
+    expect(r.plans[0]!.done).toBe(6);
+    expect(r.plans[0]!.rehab).toMatchObject({ phase: 1, check: { status: "ready", recent: [1, 1, 1] } });
+    expect(r.flags).toContainEqual({ kind: "rehabReady", name: "Knee rehab, phase 1", phase: 2 });
+    expect(flagText({ kind: "rehabReady", name: "Knee rehab, phase 1", phase: 2 }, new Map()).title).toBe(
+      "Knee rehab, phase 1: ready for phase 2 (Build strength)",
+    );
+    const hidden = clientReport({ name: "Alex", daysPerWeek: null, events: [injury, ...workouts(1)], plans: [assigned(1)] }, NOW);
+    expect(hidden.plans[0]!.rehab).toMatchObject({ phase: 1 });
+    expect(hidden.plans[0]!.rehab).not.toHaveProperty("check");
+  });
+
+  it("says back a phase when pain is high", () => {
+    const r = clientReport({ name: "Alex", daysPerWeek: null, events: [injury, ...workouts(6, 2)], plans: [assigned(2)], pain: true }, NOW);
+    expect(r.flags).toContainEqual({ kind: "rehabBack", name: "Knee rehab, phase 2", phase: 1 });
+  });
+
+  it("follows a client who moved phase on their own", () => {
+    const events = [injury, ...workouts(1, 2)];
+    const r = clientReport({ name: "Alex", daysPerWeek: null, events, plans: [assigned(1, true)], pain: true }, NOW);
+    expect(r.plans[0]!.done).toBe(6);
+    expect(r.plans[0]!.rehab).toMatchObject({ phase: 2, check: { status: "ready" } });
+    // Without the switch, the phase is the one assigned.
+    const fixed = clientReport({ name: "Alex", daysPerWeek: null, events, plans: [assigned(1)], pain: true }, NOW);
+    expect(fixed.plans[0]!.rehab).toMatchObject({ phase: 1, check: { status: "early", sessions: 0 } });
+  });
+
+  it("keeps the day-after rating on a pain event", () => {
+    const { events } = cleanEvents([{ id: "n", at: 1, type: "pain", injuryId: "knee1", score: 2, nextDay: "w1" }]);
+    expect(events[0]).toMatchObject({ nextDay: "w1" });
   });
 });

@@ -918,4 +918,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Gli orari sono quelli della tua palestra, quindi le 18:00 sono le 18:00 per tutti. Le prenotazioni restano a te.",
   },
+  "physio-protocols": {
+    title: "Riabilitazione a fasi, guidata dal dolore",
+    intro:
+      "Ogni programma di riabilitazione ora ha tre fasi, dal calmare la zona al pieno uso, e una semplice regola del dolore che dice quando avanzare.",
+    points: [
+      "Scegli la fase di partenza quando lo assegni: Calmare e muovere, Costruire forza o Ritorno al pieno uso.",
+      "Dopo sei sessioni con dolore 2 o meno dopo le ultime tre, e nessuna riacutizzazione il giorno dopo, il report del cliente dice che è pronto per la fase successiva.",
+      "Dolore 5 o più dopo due delle ultime tre, o una riacutizzazione il giorno dopo, indica di tornare indietro di una fase.",
+      "Invia la fase successiva con un tocco. Sostituisce la precedente sul suo telefono, così lo storico continua.",
+      "I clienti valutano come sentono la zona il giorno dopo la riabilitazione, che spesso è ciò che ti dice di più.",
+    ],
+    dyk: "Attiva Lascia che cambi fase da solo e la sua app proporrà la fase successiva quando lo dice la regola. Tu vedi comunque ogni cambio.",
+  },
 };

@@ -915,4 +915,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Saatler salonunun saatidir, yani 18.00 herkes için 18.00. Rezervasyonlar sende kalır.",
   },
+  "physio-protocols": {
+    title: "Ağrıyla ilerleyen aşamalı rehabilitasyon",
+    intro:
+      "Her rehabilitasyon programında artık bölgeyi sakinleştirmekten tam kullanıma kadar üç aşama ve ne zaman ilerleneceğini söyleyen basit bir ağrı kuralı var.",
+    points: [
+      "Atarken başlangıç aşamasını seç: Sakinleştir ve hareket ettir, Güç kazan ya da Tam kullanıma dönüş.",
+      "Altı seanstan sonra son üç seansın ardından ağrı 2 veya altındaysa ve ertesi gün alevlenme yoksa danışanın raporu sonraki aşamaya hazır olduğunu söyler.",
+      "Son üç seansın ikisinden sonra ağrı 5 veya üstündeyse ya da ertesi gün alevlenme olursa bir aşama geri dönülür.",
+      "Sonraki aşamayı tek dokunuşla gönder. Telefonunda eskisinin yerine geçer, böylece geçmişi devam eder.",
+      "Danışanlar rehabilitasyonun ertesi günü bölgenin nasıl olduğunu puanlar; çoğu zaman en çok şeyi bu söyler.",
+    ],
+    dyk: "Aşamayı kendisi değiştirebilsin'i açarsan kural söylediğinde uygulaması sonraki aşamayı önerir. Her değişikliği yine görürsün.",
+  },
 };
