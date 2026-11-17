@@ -36,3 +36,14 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - **Discarding a workout takes a second tap once sets are logged** (UX audit, 2026-11-13). End › Discard workout deletes every set of the workout and can't be undone, so with any set logged the first tap turns the button into "Tap again to delete N sets" and only the second tap deletes; closing the sheet resets it. A workout with no sets logged still discards in one tap. Shared web code, so Android, iOS and the web get it together.
 - **A quieter rest card** (UX audit, Melvin 2026-11-13). The drop set and rest-pause offer shows only after the last planned set of an exercise (`lastOfExercise` in `RestCard.tsx`), not after every set; "PR in reach" compares against bests from before this workout (`AlmostThere` gets the workout's start), so a first workout of a lift never claims one; the Breathe / Plate math / Neither choice has a visible "While you rest" label. **Coming up** names wrap to two lines instead of being cut off at large text sizes.
 - **The end screen is shorter** (same audit). The streak card shows only once there's a streak (no "0-week streak"), the league card stays on Today and Awards, and sharing a picture, sending to a friend, saving as a routine and the remix link sit behind one "Share or save" button. Posting to Friends stays where it was, because it can post by itself.
+
+## The 3D figure on the workout screen and in How to (2026-11-17)
+
+Melvin: "For the 3d model how to, I think there are too many controls, don't think we need speed or pause. Move works
+to below the model", and "Don't pause the animation of the model when resting". The How to sheet's figure lost its
+Tempo (0.5× / 1×) and Pause buttons: it always plays at normal speed. The "Works" line (primary muscles lit, secondary
+muscles plain) moved from the bottom of the controls to straight under the figure, above the view and overlay toggles
+(Orbit / Front / 3/4 / Side, Skeleton, Target muscles, Bar or Hand path). The website's 2D figure, which waits for a tap
+on phones without GPU WebGL, keeps a Play button until it starts, with no pause after. The demo card on the workout
+screen now keeps moving during rest instead of standing still; it still stops while a sheet covers it and when the app
+is in the background. Shared web code (`LiftDemoCore.tsx`, `Workout.tsx`), so Android, iOS and the web get it together.
