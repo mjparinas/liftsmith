@@ -60,6 +60,7 @@ export const NOTE_MAX = 1000;
 const REPORTED = `SELECT who, COUNT(*) AS total, SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) AS open FROM (
     SELECT r.status, CASE r.kind WHEN 'profile' THEN r.target_id
       WHEN 'post' THEN (SELECT account_id FROM posts WHERE id = r.target_id)
+      WHEN 'message' THEN (SELECT account_id FROM club_messages WHERE id = r.target_id)
       ELSE (SELECT account_id FROM post_comments WHERE id = r.target_id) END AS who
     FROM reports r) WHERE who IS NOT NULL GROUP BY who`;
 

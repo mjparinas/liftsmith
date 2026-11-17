@@ -398,6 +398,11 @@ export const pt: FeaturesText = {
       name: "Desafios, clubes e rankings",
       body: "Desafie um amigo, entre num clube ou turma da academia com ranking semanal e encare o desafio do mês com todo mundo.",
     },
+    "club-chat": {
+      name: "Chat do clube e treinos em grupo",
+      body: "Converse com seu clube entre os treinos, marque um horário e um lugar para treinar junto e veja quem vai. Quem vai recebe um lembrete uma hora antes, e ao postar seu treino depois você aparece como quem treinou, com os amigos que treinaram com você marcados.",
+      note: "Para maiores de 18 anos. As notificações são no Android e no iPhone; o app web mostra as mensagens novas enquanto o chat está aberto.",
+    },
     profiles: {
       name: "Perfis públicos",
       body: "Uma página pública opcional com seus melhores levantamentos e treinos.",

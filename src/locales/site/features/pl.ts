@@ -398,6 +398,11 @@ export const pl: FeaturesText = {
       name: "Wyzwania, kluby i rankingi",
       body: "Rzuć wyzwanie znajomemu, dołącz do klubu albo ekipy z siłowni z cotygodniowym rankingiem i podejmij miesięczne wyzwanie razem ze wszystkimi.",
     },
+    "club-chat": {
+      name: "Czat klubu i treningi ekipy",
+      body: "Rozmawiaj z klubem między treningami, podaj godzinę i miejsce na wspólny trening i zobacz, kto idzie. Każdy, kto idzie, dostaje przypomnienie godzinę wcześniej, a gdy potem opublikujesz trening, pojawisz się jako po treningu, z oznaczonymi znajomymi, z którymi ćwiczysz.",
+      note: "Dla osób, które mają co najmniej 18 lat. Powiadomienia działają na Androidzie i iPhonie; aplikacja webowa pokazuje nowe wiadomości, gdy czat jest otwarty.",
+    },
     profiles: {
       name: "Publiczne profile",
       body: "Opcjonalna publiczna strona z twoimi najlepszymi wynikami i treningami.",

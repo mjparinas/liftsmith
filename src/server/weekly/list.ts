@@ -134,6 +134,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("form-cues", "free", "exercise/back-squat", { fresh: "2026-11-16" }),
   // New, 2026-11-17: automatic supersets and the other adaptive workout options (docs/decisions/adaptive-options.md).
   L("auto-supersets", "free", "settings/training", { fresh: "2026-11-17" }),
+  // New, 2026-11-17: club chat and crew sessions (docs/decisions/friends.md "Club chat and crew sessions").
+  L("club-chat", "free", "friends", { fresh: "2026-11-17", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */
