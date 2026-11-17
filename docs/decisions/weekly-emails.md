@@ -740,3 +740,12 @@ Liftsmith has a community now: suggest ideas, vote for the ones you want and rep
 - Report a bug with a screenshot that only you and the team see.
 - Each post shows where it is, from Under review to Shipped, and you hear when an idea you voted for ships.
 Did you know? The roadmap and changelog are on the website too, at getliftsmith.com/community. ([Community](community.md))
+
+### W66 · Training seasons start Monday (**New**, 2026-11-17)
+Free + Pro · Lifters · Screen: the Season screen · `fresh`, so it goes next to everyone already in the series
+Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.
+- You climb by meeting your own weekly goal. Days past it earn nothing, so two days a week climbs as fast as five.
+- Tiers bring season-only badges, an avatar, an accent and the Ember theme with its app icon, yours to keep.
+- Miss a week and the next goal week pays its bonus twice. The last week counts double.
+- Every new best has a 1 in 6 chance to drop the season's rare plates.
+Did you know? Rather not see seasons? Turn off Training seasons in Settings › Look and feel. Your training still counts. ([Training seasons](seasons.md))

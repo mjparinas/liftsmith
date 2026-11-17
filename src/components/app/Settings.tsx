@@ -516,6 +516,12 @@ function LookGroup() {
       />
       <DelightSettings part="look" />
       <SwitchRow label={t("settings.quote")} on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
+      <SwitchRow
+        label={t("ssn.setting")}
+        hint={t("ssn.settingHint")}
+        on={profile.delight?.seasons !== false}
+        onChange={(v) => setProfile({ delight: { ...profile.delight, seasons: v } })}
+      />
       <Section title={t("settings.language")}>
         <LanguageChoices label={t("settings.language")} />
       </Section>

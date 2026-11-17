@@ -893,4 +893,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Koçluk › Durum kontrolleri bölümündeki yeni İlerleme kontrolü şablonuyla başla. 18 yaşından küçüklerden asla fotoğraf istenmez.",
   },
+  seasons: {
+    title: "Antrenman sezonları pazartesi başlıyor",
+    intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",
+    points: [
+      "Kendi haftalık hedefini tutturarak ilerlersin. Hedefin üstündeki günler puan getirmez, yani haftada iki gün de beş gün kadar hızlı ilerler.",
+      "Kademeler yalnızca bu sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle Kor temasını verir; hepsi hep senin kalır.",
+      "Bir haftayı mı kaçırdın? Hedefi tutturduğun sonraki hafta bonus iki kat. Son hafta tamamen iki kat sayılır.",
+      "Her yeni rekorun sezonun nadir plakalarını düşürme şansı 6'da 1.",
+    ],
+    dyk: "Sezonları görmek istemiyor musun? Ayarlar › Görünüm'den Antrenman sezonlarını kapat. Antrenmanın sayılmaya devam eder.",
+  },
 };

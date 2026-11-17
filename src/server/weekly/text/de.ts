@@ -896,4 +896,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Starte mit der neuen Vorlage Fortschritts-Check-in unter Coaching › Check-ins. Unter 18-Jährige werden nie nach Fotos gefragt.",
   },
+  seasons: {
+    title: "Am Montag starten die Trainingssaisons",
+    intro: "Saison 1, Glut, startet am Montag: zehn Wochen, ein Pfad mit 20 Stufen und Belohnungen, die es nur diesen Winter gibt.",
+    points: [
+      "Du steigst auf, indem du dein eigenes Wochenziel erreichst. Tage darüber bringen nichts, zwei Tage pro Woche kommen also so schnell voran wie fünf.",
+      "Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und das Glut-Design mit App-Symbol, nur in dieser Saison und für immer deins.",
+      "Eine Woche verpasst? In der nächsten Zielwoche zählt der Bonus doppelt. Die letzte Woche zählt ganz doppelt.",
+      "Jede neue Bestleistung bringt mit einer Chance von 1 zu 6 die seltenen Scheiben der Saison.",
+    ],
+    dyk: "Du willst keine Saisons sehen? Schalte Trainingssaisons in Einstellungen › Aussehen und Bedienung aus. Dein Training zählt weiter.",
+  },
 };

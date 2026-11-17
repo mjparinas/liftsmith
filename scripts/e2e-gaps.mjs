@@ -219,6 +219,7 @@ const ADMIN_TABS = [
   "Users",
   "Installs",
   "Flags",
+  "Seasons",
   "Automations",
   "System",
   "Log",

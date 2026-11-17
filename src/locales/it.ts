@@ -115,6 +115,7 @@ import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
 import * as social from "./text/social";
+import * as ssn from "./text/ssn";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -247,6 +248,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...save.it,
   ...sband.it,
   ...sea.it,
+  ...ssn.it,
   ...settings.it,
   ...setup.it,
   ...share.it,

@@ -8,6 +8,7 @@ import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
 import { gradedSet, TIMED } from "./progression";
 import { hash, rng } from "./random";
+import { seasonOwned } from "./seasons";
 import type { AppEvent, Profile, SetEvent } from "./types";
 
 // XP, levels, the training-week streak with freezes, weekly quests, leagues, crates and achievements.
@@ -441,6 +442,8 @@ export interface Cosmetic {
   rarity: Rarity;
   /** Colour for accents, a sound id for timer sounds, a finish for plates, the avatar id for avatars. */
   value: string;
+  /** From a training season (seasons.ts), never from a crate or a level. */
+  season?: true;
 }
 
 const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
@@ -474,6 +477,13 @@ const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
   { id: "av-trophy", kind: "avatar", rarity: "legendary", value: "av-trophy" },
   { id: "av-flame", kind: "avatar", rarity: "epic", value: "av-flame" },
   { id: "av-pro", kind: "avatar", rarity: "legendary", value: "av-pro" },
+  // Training seasons (seasons.ts KITS, 2026-11-17): earned on a season's track or dropped by a new best during it.
+  // Never in a crate, so every crate already opened still holds what it held.
+  { id: "av-ember", kind: "avatar", rarity: "rare", value: "av-ember", season: true },
+  { id: "accent-ember", kind: "accent", rarity: "epic", value: "#ff6a3d", season: true },
+  { id: "plates-ember", kind: "plates", rarity: "legendary", value: "ember", season: true },
+  { id: "av-ember-pro", kind: "avatar", rarity: "epic", value: "av-ember-pro", season: true },
+  { id: "accent-ember-pro", kind: "accent", rarity: "legendary", value: "#ffb02e", season: true },
 ];
 /** Cosmetics with their names in the current language (getters, so a language change shows at once). */
 export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
@@ -495,7 +505,7 @@ export const BADGE_ITEMS: readonly { id: string; badge: string; tier: Tier }[] =
 ];
 export const badgeForItem = (id: string) => BADGE_ITEMS.find((b) => b.id === id) ?? null;
 /** What crates can hold: everything but the starter set and the badge items. */
-const cratePool = () => COSMETICS.filter((c) => c.kind !== "avatar" && !STARTER.includes(c.id) && !badgeForItem(c.id));
+const cratePool = () => COSMETICS.filter((c) => c.kind !== "avatar" && !c.season && !STARTER.includes(c.id) && !badgeForItem(c.id));
 /** Badge items the lifter's achievements have earned. */
 export function badgeItems(list: readonly Achievement[]): string[] {
   const level = new Map(list.map((a) => [a.id, a.level]));
@@ -679,7 +689,13 @@ export function game(events: readonly AppEvent[], stats: Stats, profile: Profile
     achievements: list,
     badges: { earned: list.reduce((n, a) => n + a.level, 0), total },
     nearest: nearest(list),
-    owned: new Set([...STARTER, ...won, ...rewards.map((r) => r.item.id), ...badgeItems(list)]),
+    owned: new Set([
+      ...STARTER,
+      ...won,
+      ...rewards.map((r) => r.item.id),
+      ...badgeItems(list),
+      ...seasonOwned(events, stats, profile, now).items,
+    ]),
     rewards,
     next: nextReward(level.level),
   };

@@ -853,6 +853,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         note: "Earned app icons are on Android and iPhone only.",
         added: LAUNCH,
       },
+      {
+        id: "seasons",
+        name: "Training seasons",
+        body: "Ten-week seasons with a track of 20 tiers, climbed by training toward your own weekly goal, so two days a week climbs as fast as five and extra days earn nothing. Tiers bring season-only badges, an avatar, an accent and a theme with its app icon, yours to keep after the season ends. Season challenges, a rare drop from new bests, prestige stars, a catch-up week after a miss, a double-points finale and a recap card to share.",
+        tier: "both",
+        proPart: "Every tier and its rewards are free; Pro adds a bonus reward on three tiers.",
+        note: "Season app icons are on Android and iPhone; the web gets the theme. Seasons can be turned off in Settings.",
+        added: "2026-11-17",
+      },
     ],
   },
   {

@@ -33,6 +33,7 @@ import {
   xpTotal,
 } from "./game";
 import { setLanguage } from "./i18n";
+import { kitOfReward } from "./seasons";
 import { AVATAR_IDS } from "./socialTypes";
 import type { AppEvent, SetEvent, StretchEvent } from "./types";
 
@@ -321,8 +322,9 @@ describe("level rewards", () => {
     expect(levelForItem("accent-gold")).toBe(25);
     expect(levelForItem("accent-teal")).toBeNull();
     expect(levelRewards(50)).toHaveLength(LEVEL_ITEMS.length + TITLE_LEVELS.length);
-    // Every legendary has a sure path: a level, or a badge.
-    for (const c of COSMETICS.filter((c) => c.rarity === "legendary")) expect(levelForItem(c.id) ?? badgeForItem(c.id)).not.toBeNull();
+    // Every legendary has a sure path: a level, a badge, or a season's track or drop (seasons.ts).
+    for (const c of COSMETICS.filter((c) => c.rarity === "legendary"))
+      expect(levelForItem(c.id) ?? badgeForItem(c.id) ?? kitOfReward(c.id)).not.toBeNull();
     expect(nextReward(4)).toMatchObject({ level: 5, source: "item" });
     expect(nextReward(50)).toBeNull();
   });
@@ -333,7 +335,7 @@ describe("level rewards", () => {
     for (const id of ["av-dumbbell", "av-bolt", "av-leaf", "av-moon"]) expect(owned(derive([], NOW)).has(id)).toBe(true);
     for (const c of avatars) {
       expect(rarityOdds(c.id)).toBe(0);
-      if (!STARTER.includes(c.id)) expect(levelForItem(c.id) ?? badgeForItem(c.id)).not.toBeNull();
+      if (!STARTER.includes(c.id)) expect(levelForItem(c.id) ?? badgeForItem(c.id) ?? kitOfReward(c.id)).not.toBeNull();
     }
     for (let i = 0; i < 200; i++) expect(crateFor(`s${i}`).kind).not.toBe("avatar");
   });

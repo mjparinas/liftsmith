@@ -900,4 +900,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Partez du nouveau modèle Bilan de progrès dans Coaching › Bilans. On ne demande jamais de photo aux moins de 18 ans.",
   },
+  seasons: {
+    title: "Les saisons d'entraînement commencent lundi",
+    intro: "La saison 1, Braise, commence lundi : dix semaines, un parcours de 20 paliers et des récompenses à gagner seulement cet hiver.",
+    points: [
+      "Vous progressez en atteignant votre propre objectif hebdomadaire. Les jours en plus ne rapportent rien : deux jours par semaine avancent aussi vite que cinq.",
+      "Les paliers donnent des badges, un avatar, une couleur d'accent et le thème Braise avec son icône, propres à la saison et à vous pour toujours.",
+      "Une semaine manquée ? La suivante où vous atteignez l'objectif double le bonus. La dernière semaine compte double.",
+      "Chaque nouveau record a 1 chance sur 6 de faire tomber les disques rares de la saison.",
+    ],
+    dyk: "Vous préférez ne pas voir les saisons ? Désactivez Saisons d'entraînement dans Réglages › Apparence. Votre entraînement compte toujours.",
+  },
 };

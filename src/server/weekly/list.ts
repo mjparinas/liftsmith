@@ -141,6 +141,8 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-17: weight and photo questions, repeats every 1, 2 or 4 weeks and trends on check-in forms
   // (docs/decisions/trainer-mode.md "Check-in forms and questionnaires").
   R("coach-checkin-trends", "coach", "pro", "trainer/checkins", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: training seasons (docs/decisions/seasons.md).
+  L("seasons", "both", "season", { fresh: "2026-11-17" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

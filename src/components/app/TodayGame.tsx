@@ -2,10 +2,12 @@
 
 import { LEAGUE_LABEL } from "@/lib/game";
 import { num, t } from "@/lib/i18n";
+import { kitName } from "@/lib/seasons";
 
 import { Badge, Bar, QuestMark, TIER_COLOUR, useGame } from "./Achievements";
 import { Icon } from "./icons";
 import { go } from "./router";
+import { seasonLine, SeasonMedal, useSeason } from "./Season";
 
 // The game layer on Today: streak at risk, this week's quests and the closest badge. One glance, no taps
 // needed. Tapping the card opens Awards; tapping the "Almost there" row opens Awards at that badge.
@@ -15,6 +17,8 @@ export function TodayGame() {
   const s = g.streak;
   const near = g.nearest[0];
   const open = g.quests.filter((q) => !q.done);
+  // One row for the training season (seasons.ts), only while one is near and seasons are on (Settings).
+  const season = useSeason();
   return (
     <div className="card mt-4 overflow-hidden">
       <button type="button" onClick={() => go("achievements")} className="press block w-full p-4 text-left">
@@ -53,6 +57,25 @@ export function TodayGame() {
           ))}
         </ul>
       </button>
+      {season && (
+        <button
+          type="button"
+          onClick={() => go("season")}
+          className="press flex w-full items-center gap-3 border-t border-line px-4 py-3 text-left"
+        >
+          <SeasonMedal hue={season.kit.hue} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm">
+              <span className="font-medium">{kitName(season.kit.id)}</span> <span className="text-muted">{seasonLine(season)}</span>
+            </p>
+            {season.status !== "upcoming" && (
+              <div className="mt-1">
+                <Bar value={season.into / season.span} label={t("ssn.barLabel")} colour={season.kit.hue} />
+              </div>
+            )}
+          </div>
+        </button>
+      )}
       {near?.next && (
         <button
           type="button"

@@ -29,6 +29,7 @@ export const TAB_ICONS: Record<string, IconName> = {
   Users: "people",
   Installs: "layers",
   Flags: "toggle",
+  Seasons: "flame",
   Automations: "sparkle",
   System: "server",
   Log: "list",
@@ -39,7 +40,7 @@ export const TAB_GROUPS: readonly { label: string; tabs: readonly string[] }[] =
   { label: "Work", tabs: ["Overview", "To Do", "Inbox", "Reports", "Community", "Gyms"] },
   { label: "Numbers", tabs: ["Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Codes"] },
   { label: "People", tabs: ["Users", "Installs"] },
-  { label: "Running", tabs: ["Flags", "Automations", "System", "Log"] },
+  { label: "Running", tabs: ["Flags", "Seasons", "Automations", "System", "Log"] },
 ];
 
 /** The app icon (public/icon.svg), the same file as the favicon and the site header's mark. */

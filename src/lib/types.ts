@@ -497,6 +497,8 @@ export interface DelightPrefs {
   buddies?: { id: string; name: string }[];
   /** Moments already shown on Today, so each appears once. */
   seenMoments?: string[];
+  /** Training seasons on Today, Awards and the Locker (seasons.ts). On unless turned off; points still count while off. */
+  seasons?: boolean;
 }
 
 // --- Events: everything that happens is appended, and every stat is derived from them. ---

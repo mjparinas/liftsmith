@@ -7,7 +7,7 @@ import { fmtNum } from "@/lib/units";
 // A barbell with the plates to load on each side, heaviest nearest the collar. The point is that
 // nobody has to do plate maths between sets.
 
-export type PlateFinish = "classic" | "black" | "chrome" | "neon";
+export type PlateFinish = "classic" | "black" | "chrome" | "neon" | "ember";
 
 /** The words on the graphic. English here for the website; the app's PlateBar (app/Plates.tsx) passes its language's. */
 export const PLATE_WORDS = {
@@ -25,6 +25,8 @@ const fill = (s: string, v: Record<string, string>) => s.replace(/\{(\w+)\}/g, (
 function finished(s: ReturnType<typeof plateStyle>, finish: PlateFinish) {
   if (finish === "black") return { fill: "var(--plate-black)", stroke: s.rim, strokeWidth: 2.5, text: s.rim };
   if (finish === "chrome") return { fill: "url(#chrome)", stroke: s.rim, strokeWidth: 2.5, text: "var(--plate-ink-dark)" };
+  // Season 1's rare drop (seasons.ts): a glowing ember face, the weight colour still on the rim.
+  if (finish === "ember") return { fill: "url(#ember)", stroke: s.rim, strokeWidth: 3, text: "var(--plate-ink-dark)", glow: true };
   if (finish === "neon") return { fill: "var(--plate-black)", stroke: s.rim, strokeWidth: 3, text: s.rim, glow: true };
   return { fill: s.fill, stroke: "var(--plate-edge)", strokeWidth: 1, text: s.text };
 }
@@ -73,6 +75,11 @@ export function PlateBar({
             <stop offset="0.45" stopColor="#9aa6b4" />
             <stop offset="0.55" stopColor="#e2e8ef" />
             <stop offset="1" stopColor="#6b7684" />
+          </linearGradient>
+          <linearGradient id="ember" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#ffd27a" />
+            <stop offset="0.5" stopColor="#ff7a3d" />
+            <stop offset="1" stopColor="#b8321a" />
           </linearGradient>
           <filter id="neon" x="-50%" y="-20%" width="200%" height="140%">
             <feGaussianBlur stdDeviation="2.2" result="b" />

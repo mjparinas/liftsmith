@@ -895,4 +895,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Empieza con la nueva plantilla Revisión de progreso en Entrenador › Seguimientos. A los menores de 18 nunca se les piden fotos.",
   },
+  seasons: {
+    title: "Las temporadas de entrenamiento empiezan el lunes",
+    intro: "La temporada 1, Brasa, empieza el lunes: diez semanas, un recorrido de 20 niveles y premios que solo se ganan este invierno.",
+    points: [
+      "Subes cumpliendo tu propio objetivo semanal. Los días de más no suman, así que dos días a la semana avanzan igual que cinco.",
+      "Los niveles dan insignias, un avatar, un color de acento y el tema Brasa con su icono, solo de esta temporada y tuyos para siempre.",
+      "Si fallas una semana, la siguiente en que cumplas da el bonus doble. La última semana cuenta doble.",
+      "Cada nueva marca tiene 1 posibilidad entre 6 de soltar los discos raros de la temporada.",
+    ],
+    dyk: "¿Prefieres no ver las temporadas? Desactiva Temporadas de entrenamiento en Ajustes › Aspecto. Tu entrenamiento sigue contando.",
+  },
 };

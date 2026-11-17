@@ -897,4 +897,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Comece pelo novo modelo Check-in de progresso em Coaching › Check-ins. Menores de 18 anos nunca recebem pedido de foto.",
   },
+  seasons: {
+    title: "As temporadas de treino começam na segunda",
+    intro: "A temporada 1, Brasa, começa na segunda: dez semanas, uma trilha de 20 níveis e recompensas que só se ganham neste inverno.",
+    points: [
+      "Você sobe batendo sua própria meta semanal. Dias além dela não somam, então dois dias por semana sobem tão rápido quanto cinco.",
+      "Os níveis dão medalhas, um avatar, uma cor de destaque e o tema Brasa com ícone, só desta temporada e seus para sempre.",
+      "Perdeu uma semana? A próxima em que bater a meta dá o bônus em dobro. A última semana vale em dobro.",
+      "Cada novo recorde tem 1 chance em 6 de liberar as anilhas raras da temporada.",
+    ],
+    dyk: "Prefere não ver as temporadas? Desligue Temporadas de treino em Ajustes › Aparência. Seu treino continua contando.",
+  },
 };

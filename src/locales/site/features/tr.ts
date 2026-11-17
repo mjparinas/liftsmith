@@ -515,6 +515,12 @@ export const tr: FeaturesText = {
       name: "Başarımlar, seviyeler ve seriler",
       body: "Kademeli rozetler, ödüllü 50 seviye, haftalık görevler, seri dondurma ve adil ligler.",
     },
+    seasons: {
+      name: "Antrenman sezonları",
+      body: "Kendi haftalık hedefine doğru antrenman yaparak tırmandığın 20 kademelik yolu olan on haftalık sezonlar: haftada iki gün de beş gün kadar hızlı ilerler, fazladan günler puan getirmez. Kademeler sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir; sezon bitince de senin kalır. Sezon meydan okumaları, yeni rekorlardan nadir ganimet, prestij yıldızları, kaçırılan haftadan sonra telafi haftası, çift puanlı final ve paylaşılabilir özet kartı.",
+      proPart: "Tüm kademeler ve ödülleri ücretsiz; Pro üç kademeye bonus ödül ekler.",
+      note: "Sezon uygulama simgeleri Android ve iPhone'da; web'de tema var. Sezonlar Ayarlar'dan kapatılabilir.",
+    },
     locker: {
       name: "Temalar, vurgu renkleri ve uygulama simgeleri",
       body: "Tema ve vurgu renkleri kazan; telefonlarda da temanın renklerinde bir uygulama simgesi.",

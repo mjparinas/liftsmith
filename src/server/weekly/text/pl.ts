@@ -893,4 +893,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Zacznij od nowego szablonu Kontrola postępów w Trenowanie › Ankiety. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
   },
+  seasons: {
+    title: "Sezony treningowe startują w poniedziałek",
+    intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",
+    points: [
+      "Awansujesz, osiągając własny cel tygodniowy. Dni ponad cel nic nie dają, więc dwa dni w tygodniu awansują tak szybko jak pięć.",
+      "Poziomy dają odznaki, awatar, kolor akcentu i motyw Żar z ikoną aplikacji, tylko z tego sezonu i Twoje na zawsze.",
+      "Opuściłeś tydzień? Następny tydzień z osiągniętym celem daje podwójny bonus. Ostatni tydzień liczy się podwójnie.",
+      "Każdy nowy rekord ma szansę 1 na 6 na rzadkie talerze sezonu.",
+    ],
+    dyk: "Wolisz nie widzieć sezonów? Wyłącz Sezony treningowe w Ustawienia › Wygląd. Twój trening nadal się liczy.",
+  },
 };
