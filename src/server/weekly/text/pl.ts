@@ -860,4 +860,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "W tej samej sekcji jest przełącznik Serie rozgrzewkowe, na dni, gdy wolisz rozgrzać się po swojemu.",
   },
+  community: {
+    title: "Zagłosuj, co zbudujemy dalej",
+    intro: "Liftsmith ma teraz społeczność: proponuj pomysły, głosuj na te, które chcesz, i zgłaszaj błędy.",
+    points: [
+      "Otwórz Ustawienia › Pomoc › Społeczność.",
+      "Stuknij strzałkę obok pomysłu, by na niego zagłosować. Najbardziej chciane idą na górę.",
+      "Zgłoś błąd ze zrzutem ekranu, który widzisz tylko ty i zespół.",
+      "Przy każdym wpisie widać, na jakim jest etapie, od Analizowane do Wydane, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie.",
+    ],
+    dyk: "Plan rozwoju i lista zmian są też na stronie, pod adresem getliftsmith.com/community.",
+  },
 };

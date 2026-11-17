@@ -860,4 +860,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aynı bölümde, ısınmayı kendi yönteminle yapmak istediğin günler için bir Isınma setleri anahtarı var.",
   },
+  community: {
+    title: "Sırada ne yapacağımıza oy ver",
+    intro: "Liftsmith'in artık bir topluluğu var: fikir öner, istediklerine oy ver ve hata bildir.",
+    points: [
+      "Ayarlar › Yardım › Topluluk'u aç.",
+      "Oy vermek için bir fikrin yanındaki oka dokun. En çok istenenler üste çıkar.",
+      "Yalnızca senin ve ekibin gördüğü bir ekran görüntüsüyle hata bildir.",
+      "Her gönderi İnceleniyor'dan Yayınlandı'ya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın.",
+    ],
+    dyk: "Yol haritası ve değişiklik günlüğü web sitesinde de var: getliftsmith.com/community.",
+  },
 };

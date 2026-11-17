@@ -8,6 +8,7 @@ import { accessFor, type Access } from "./access";
 import { coachCleanup } from "./coach";
 import { forgetCoachPay } from "./coachPay";
 import { programCleanup } from "./coachPrograms";
+import { communityCleanup } from "./community";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { earnedDeletes } from "./earnedPro";
@@ -306,6 +307,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...claimDeletes(accountId),
     ...extrasDeletes(accountId),
     ...posterDeletes(accountId),
+    ...communityCleanup(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

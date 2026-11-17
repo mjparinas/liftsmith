@@ -41,6 +41,14 @@ export const FLAGS = {
     label: "Friends and the feed",
     description: "Follow people, post workouts, likes and comments. Turn off to hide Friends everywhere and stop new posts at once.",
   },
+  /** The Liftsmith community: ideas, bugs, votes and comments about the app itself (docs/decisions/community.md). */
+  community: {
+    default: true,
+    options: [true, false] as const,
+    label: "Community (ideas and bugs)",
+    description:
+      "Lifters post ideas and bugs, vote and comment. Turn off to hide it in the app and stop new posts at once; the website keeps showing what's there.",
+  },
   /** Labs: the Wear OS or Apple Watch app counts reps from wrist motion and fills in the phone's live set. */
   labWatchReps: {
     default: false,

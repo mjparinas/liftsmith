@@ -863,4 +863,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Im selben Bereich gibt es einen Schalter für Aufwärmsätze, für Tage, an denen du dich lieber selbst aufwärmst.",
   },
+  community: {
+    title: "Stimm ab, was wir als Nächstes bauen",
+    intro: "Liftsmith hat jetzt eine Community: Schlag Ideen vor, stimm für die, die du willst, und melde Fehler.",
+    points: [
+      "Öffne Einstellungen › Hilfe › Community.",
+      "Tippe auf den Pfeil neben einer Idee, um dafür zu stimmen. Die gefragtesten steigen nach oben.",
+      "Melde einen Fehler mit einem Screenshot, den nur du und das Team seht.",
+      "Bei jedem Beitrag siehst du, wo er steht, von Wird geprüft bis Veröffentlicht, und du erfährst es, wenn eine Idee erscheint, für die du gestimmt hast.",
+    ],
+    dyk: "Roadmap und Änderungsprotokoll findest du auch auf der Website unter getliftsmith.com/community.",
+  },
 };

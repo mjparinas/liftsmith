@@ -1225,6 +1225,83 @@ const SCHEMA = [
     count INTEGER NOT NULL,
     reset_at INTEGER NOT NULL
   )`,
+  // The Liftsmith community (community.ts, 2026-11-17): ideas and bugs about the app, their votes, comments, who gets
+  // updates on each, the author's screenshot (only they and staff see it), status changes with the team's note (the
+  // timeline and the changelog) and accounts staff blocked from posting. `votes` and `comments` are kept counts, so the
+  // board sorts on an index. `hidden`: 1 after reports, 2 by staff. `teen`: written by someone under 18, so it never
+  // carries their name and stays off the public website.
+  `CREATE TABLE IF NOT EXISTS community_posts (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL DEFAULT '',
+    handle TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'review',
+    votes INTEGER NOT NULL DEFAULT 0,
+    comments INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    status_at INTEGER NOT NULL DEFAULT 0,
+    merged_into TEXT NOT NULL DEFAULT '',
+    hidden INTEGER NOT NULL DEFAULT 0,
+    teen INTEGER NOT NULL DEFAULT 0,
+    platform TEXT NOT NULL DEFAULT '',
+    app_version TEXT NOT NULL DEFAULT ''
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_posts_board ON community_posts (hidden, votes DESC)",
+  "CREATE INDEX IF NOT EXISTS community_posts_new ON community_posts (hidden, created_at DESC)",
+  "CREATE INDEX IF NOT EXISTS community_posts_account ON community_posts (account_id)",
+  "CREATE INDEX IF NOT EXISTS community_posts_merged ON community_posts (merged_into)",
+  // Admin › Community lists every post newest first, hidden ones too.
+  "CREATE INDEX IF NOT EXISTS community_posts_created ON community_posts (created_at DESC)",
+  `CREATE TABLE IF NOT EXISTS community_votes (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_votes_account ON community_votes (account_id)",
+  `CREATE TABLE IF NOT EXISTS community_comments (
+    id TEXT PRIMARY KEY,
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    body TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    handle TEXT NOT NULL DEFAULT '',
+    staff INTEGER NOT NULL DEFAULT 0,
+    teen INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_comments_post ON community_comments (post_id, created_at)",
+  "CREATE INDEX IF NOT EXISTS community_comments_account ON community_comments (account_id)",
+  `CREATE TABLE IF NOT EXISTS community_follows (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    on_ INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_follows_account ON community_follows (account_id)",
+  `CREATE TABLE IF NOT EXISTS community_shots (
+    post_id TEXT PRIMARY KEY,
+    image BLOB NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS community_updates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_updates_post ON community_updates (post_id, at)",
+  "CREATE INDEX IF NOT EXISTS community_updates_status ON community_updates (status, at)",
+  `CREATE TABLE IF NOT EXISTS community_bans (
+    account_id TEXT PRIMARY KEY,
+    at INTEGER NOT NULL
+  )`,
 ];
 
 /**

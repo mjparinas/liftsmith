@@ -36,6 +36,7 @@ export const pl: SiteText = {
       coaches: "Dla trenerów",
       pricing: "Cennik",
       whatsNew: "Co nowego",
+      community: "Pomysły i plan rozwoju",
       exercises: "Atlas ćwiczeń",
       muscles: "Ćwiczenia na mięśnie",
       programs: "Plany treningowe",

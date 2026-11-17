@@ -25,6 +25,7 @@ import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as chk from "./text/chk";
+import * as cmty from "./text/cmty";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -165,6 +166,7 @@ export const pl: Partial<Record<MessageKey, Message>> = {
   ...cause.pl,
   ...chk.pl,
   ...coach.pl,
+  ...cmty.pl,
   ...conn.pl,
   ...cos.pl,
   ...count.pl,

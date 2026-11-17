@@ -881,4 +881,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "The same section has a Warm-up sets switch, for days you'd rather warm up your own way.",
   },
+  community: {
+    title: "Vote for what we build next",
+    intro: "Liftsmith has a community now: suggest ideas, vote for the ones you want and report bugs.",
+    points: [
+      "Open Settings › Help › Community.",
+      "Tap the arrow beside an idea to vote for it. The most wanted rise to the top.",
+      "Report a bug with a screenshot that only you and the team see.",
+      "Each post shows where it is, from Under review to Shipped, and you hear when an idea you voted for ships.",
+    ],
+    dyk: "The roadmap and changelog are on the website too, at getliftsmith.com/community.",
+  },
 };

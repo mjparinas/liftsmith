@@ -722,3 +722,12 @@ Your adaptive workouts can now pair exercises into supersets for you, with one s
 - The rest after each round is shorter, and the time saved fits more training into the length you pick.
 - Heavy squats and deadlifts stay on their own, and you can split any pair on Today.
 Did you know? The same section has a Warm-up sets switch, for days you'd rather warm up your own way. ([Adaptive workout options](adaptive-options.md))
+
+### W64 · Vote for what we build next (**New**, 2026-11-17)
+Free · Lifters · No screenshot (`shot: false`) · `fresh`, so it goes next to everyone already in the series
+Liftsmith has a community now: suggest ideas, vote for the ones you want and report bugs.
+- Open Settings › Help › Community.
+- Tap the arrow beside an idea to vote for it. The most wanted rise to the top.
+- Report a bug with a screenshot that only you and the team see.
+- Each post shows where it is, from Under review to Shipped, and you hear when an idea you voted for ships.
+Did you know? The roadmap and changelog are on the website too, at getliftsmith.com/community. ([Community](community.md))

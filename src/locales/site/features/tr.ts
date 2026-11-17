@@ -570,6 +570,10 @@ export const tr: FeaturesText = {
       name: "Gerçek sporculardan güç standartları",
       body: "Web sitesi, sporcuların squat, bench press, deadlift ve press'te gerçekte ne kadar kaldırdığını cinsiyete ve vücut ağırlığına göre gösterir; her gün, sayılan sporculardan hesaplanır. Yalnızca 30 veya daha fazla kişilik gruplar yüzdelik olarak gösterilir, kimsenin kendi sayıları asla gösterilmez. Ayarlar › Verilerin ve gizlilik'teki tek bir anahtar senin sayılıp sayılmayacağına karar verir; 18 yaş altındakiler asla sayılmaz.",
     },
+    community: {
+      name: "Topluluk: fikirler, hatalar ve yol haritası",
+      body: "Liftsmith'in sırada ne yapması gerektiğini öner, istediğin fikirlere oy ver, yalnızca ekibin gördüğü bir ekran görüntüsüyle hata bildir, yorum yap ya da @ ile birinden bahset. Her biri inceleniyordan yayınlandıya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın. Yol haritası ve değişiklik günlüğü web sitesinde de var.",
+    },
     languages: {
       name: "On dil",
       body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun ya da tarayıcının dilini takip eder veya karşılama ekranında ve ayarlarda istediğini seçersin.",

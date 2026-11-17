@@ -56,6 +56,7 @@ import {
 
 import { cleanCode, nameOf, newCode } from "./coach";
 import { resolveReview, reviewReport } from "./coachReviews";
+import { feedbackReport, resolveFeedback } from "./community";
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { inviteStatus, recordAccept } from "./earnedPro";
 import { isPlaceId } from "./gymPlaces";
@@ -895,7 +896,7 @@ export async function mute(accountId: string, b: Record<string, unknown>, now = 
   return lookup(accountId, b, now);
 }
 
-const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review"]);
+const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review", "feedback"]);
 /** Reported through Friends (`report` below); reviews are reported through coachReviews.ts. */
 const FRIENDS_KINDS = new Set<ReportKind>(["post", "comment", "profile"]);
 
@@ -2448,6 +2449,12 @@ export interface ReportGroup {
   hidden: boolean;
 }
 
+const countReasons = (list: string) => {
+  const reasons: Record<string, number> = {};
+  for (const x of list.split(",").filter(Boolean)) reasons[x] = (reasons[x] ?? 0) + 1;
+  return reasons;
+};
+
 export async function adminReports(): Promise<ReportGroup[]> {
   const rows = await query(
     `SELECT kind, target_id, COUNT(*) AS n, MIN(created_at) AS first_at, MAX(created_at) AS last_at,
@@ -2481,14 +2488,29 @@ export async function adminReports(): Promise<ReportGroup[]> {
       authorId = r?.authorId ?? "";
       hidden = !!r?.hidden;
       content = r ? r.content : "(deleted)";
+    } else if (kind === "feedback") {
+      // An idea, bug or comment in the community: its author needn't be in Friends, and "Ban author" blocks them there.
+      const f = await feedbackReport(target);
+      out.push({
+        kind,
+        targetId: target,
+        reports: n(r.n),
+        reasons: countReasons(s(r.reasons)),
+        notes: s(r.notes).split(" | ").filter(Boolean).slice(0, 10),
+        firstAt: n(r.first_at),
+        lastAt: n(r.last_at),
+        content: f ? `${target.startsWith("p:") ? "Community post" : "Community comment"}: ${f.content}` : "(deleted)",
+        author: f ? { accountId: f.authorId, handle: "", name: await nameOf(f.authorId), suspended: f.banned } : null,
+        hidden: !!f?.hidden,
+      });
+      continue;
     } else authorId = target;
     const [a] = authorId
       ? await query("SELECT handle, name, tagline, suspended FROM social_profiles WHERE account_id = ?", [authorId])
       : [];
     if (kind === "profile")
       content = a ? [`@${s(a.handle)}`, s(a.name), s(a.tagline) && `“${s(a.tagline)}”`].filter(Boolean).join(" · ") : "(left Friends)";
-    const reasons: Record<string, number> = {};
-    for (const x of s(r.reasons).split(",").filter(Boolean)) reasons[x] = (reasons[x] ?? 0) + 1;
+    const reasons = countReasons(s(r.reasons));
     out.push({
       kind,
       targetId: target,
@@ -2518,6 +2540,7 @@ export type ReportAction = "remove" | "dismiss" | "suspend" | "unsuspend";
  */
 export async function resolveReports(kind: ReportKind, targetId: string, action: ReportAction): Promise<boolean> {
   if (!REPORT_KINDS.has(kind) || !targetId) return false;
+  if (kind === "feedback") return resolveFeedback(targetId, action);
   // A coach review or reply: remove deletes it (a reply is cleared), dismiss shows it again. Banning applies to Friends.
   if (kind === "review" && (action === "remove" || action === "dismiss"))
     return resolveReview(targetId, action, action === "remove" ? "removed" : "dismissed");

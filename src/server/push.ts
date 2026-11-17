@@ -82,13 +82,24 @@ export type GymPushKind = "gymNews" | "gymIssue" | "gymTrainer";
 /** Give a month, get a month (earnedPro.ts): the invited friend's month landed, and the inviter's. */
 export type ReferralPushKind = "referralFriend" | "referralInviter";
 
+/** The community (community.ts): a post someone follows changed status, got a reply or named them. `name` is who wrote. */
+export type CommunityPushKind =
+  | "communityShipped"
+  | "communityFixed"
+  | "communityPlanned"
+  | "communityProgress"
+  | "communityWont"
+  | "communityComment"
+  | "communityTeam"
+  | "communityMention";
+
 export interface PushMessage {
   token: string;
   platform: "android" | "ios";
   body: string;
   /** The app screen a tap opens (#/friends, #/routine/<code> or #/trainer…). */
   route: string;
-  kind: PushKind | CoachPushKind | GymPushKind | ReferralPushKind;
+  kind: PushKind | CoachPushKind | GymPushKind | ReferralPushKind | CommunityPushKind;
 }
 /** Sends one message; "gone" means the token is dead and is deleted. */
 export type PushSender = (m: PushMessage) => Promise<"ok" | "gone" | "error">;
@@ -215,7 +226,7 @@ export async function notifyCoach(to: string, kind: CoachPushKind, vars: { name:
  */
 export async function notifyPlain(
   to: string,
-  kind: CoachPushKind | GymPushKind | ReferralPushKind,
+  kind: CoachPushKind | GymPushKind | ReferralPushKind | CommunityPushKind,
   vars: { name: string; text?: string },
   route: string,
 ) {
