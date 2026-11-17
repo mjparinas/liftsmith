@@ -19,6 +19,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - **Polish pass** (Melvin, 2026-11-12: "do them all", after a review of every tab on a phone and a desktop):
   - *Needs you* (`NeedsYou.tsx`) sits at the top of Overview: the To Do list's first five items, each with its own button, setup items last. Open Friends and gym reports are a To Do item (`reports` kind) and a line in the morning digest.
   - Overview tiles show the period before for the rates, workouts and trial starts too (`prevSetupRate`, `prevFirstWorkoutRate`, `prevWorkouts`, `prevTrialStarts`); rates move in points.
+  - *Ask AI* (Melvin, 2026-11-16): an admin-only button in the header's top row opens a panel under the header that reads the tab on screen and says what needs doing, with an Open button for an action on another tab. It replaced Overview's Ask your data card. Details in [Admin AI helpers](admin-ai.md).
   - *Header search*: an email (or part of one) opens Users with that search; an install or account id opens its page.
   - *Phones*: tables become one card per row under 768 px (`Table` in `charts.tsx`), and charts measure their width instead of scrolling sideways. The period picker shows only on tabs it changes.
   - *Installs* (`Installs.tsx`): search by id, model, source or campaign, filters for store, country, test installs and "worked out", and Load more (`recentInstalls` takes a cursor). Countries show their names everywhere.

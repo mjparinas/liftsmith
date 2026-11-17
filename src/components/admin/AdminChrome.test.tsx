@@ -2,7 +2,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { TABS } from "./AdminApp";
+import { ADMIN_TABS as TABS } from "@/lib/adminTabs";
+
 import { AdminShell, TAB_GROUPS, TAB_ICONS } from "./AdminChrome";
 
 afterEach(cleanup);
