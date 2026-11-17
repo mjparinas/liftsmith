@@ -216,3 +216,24 @@ public class ScreenshotsPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["supported": true])
     }
 }
+
+/// Keeps the screen on while a workout, a stretching routine or a timed tool is on screen (keepAwake in
+/// src/lib/juice.ts). WKWebView has the Screen Wake Lock only on recent iOS versions, so the app turns off
+/// the idle timer instead, which iOS applies only while the app is in front. Android counterpart:
+/// ScreenAwakePlugin.java (the window's keep-screen-on flag).
+@objc(ScreenAwakePlugin)
+public class ScreenAwakePlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "ScreenAwakePlugin"
+    public let jsName = "ScreenAwake"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "set", returnType: CAPPluginReturnPromise),
+    ]
+
+    @objc func set(_ call: CAPPluginCall) {
+        let on = call.getBool("on") ?? false
+        DispatchQueue.main.async {
+            UIApplication.shared.isIdleTimerDisabled = on
+            call.resolve()
+        }
+    }
+}

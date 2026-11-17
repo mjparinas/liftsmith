@@ -398,12 +398,21 @@ export async function confetti(big = false) {
 }
 
 /**
- * Keeps the screen on during a workout. The phone drops the lock itself when the app is hidden (it never
- * keeps a backgrounded screen on); the workout screen asks again on return, so `lock` is cleared then.
+ * Keeps the screen on during a workout, a stretching routine or a timed tool. The phone drops the lock itself
+ * when the app is hidden (it never keeps a backgrounded screen on); the screen asks again on return, so `lock`
+ * is cleared then. In the Android and iOS apps the native ScreenAwake plugin does it (the window's
+ * keep-screen-on flag, the idle timer), because the browser's Screen Wake Lock isn't in every WebView.
  */
 type Lock = { release(): Promise<void>; addEventListener?(type: "release", cb: () => void): void };
 let lock: Lock | null = null;
 export async function keepAwake(on: boolean) {
+  const awake = isNative() ? cap()?.Plugins?.ScreenAwake : undefined;
+  if (awake?.set) {
+    try {
+      await awake.set({ on });
+      return;
+    } catch {}
+  }
   try {
     const nav = navigator as Navigator & { wakeLock?: { request(t: "screen"): Promise<Lock> } };
     if (on && !lock && nav.wakeLock) {
