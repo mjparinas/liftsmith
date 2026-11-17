@@ -16,7 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const a = ARTICLE_BY_SLUG.get(`blog/${(await params).slug}`);
   if (!a) return {};
   return pageMeta({
-    title: a.title,
+    title: a.seoTitle ?? a.title,
+    shareTitle: a.title,
     description: a.description,
     path: `/blog/${a.slug}/`,
     type: "article",

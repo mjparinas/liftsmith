@@ -76,6 +76,9 @@ export interface Article {
   slug: string;
   kind: "guide" | "blog";
   title: string;
+  /** The title in search results when the headline doesn't carry the words people search ("beginner gym workout
+   * plan"). Under 60 characters. The page's own headline stays `title`. */
+  seoTitle?: string;
   /** Under 160 characters, for search results. */
   description: string;
   /** ISO date. */

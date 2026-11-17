@@ -204,6 +204,13 @@ export const en: SiteText = {
         { title: "No account needed", body: "Sign in with Google or Apple only if you want sync and backup." },
       ],
     },
+    learn: {
+      eyebrow: "Free guides",
+      title: "Learn the lifts, then let the app plan them",
+      body: "Step-by-step form, the muscles each lift works and what to do instead, plus free calculators.",
+      exercises: "Popular exercises",
+      tools: "Free tools",
+    },
     juice: {
       eyebrow: "Built for juice",
       title: "PRs get confetti. Rest days don't break your streak.",

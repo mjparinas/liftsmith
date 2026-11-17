@@ -26,6 +26,22 @@ import { filledFaqs, siteVars } from "@/locales/site/vars";
 
 const name = BRAND.name;
 
+/** The exercise guides the home page links to: the most searched lifts, each with a guide in every site language. */
+export const HOME_GUIDES = [
+  "bench-press",
+  "back-squat",
+  "deadlift",
+  "overhead-press",
+  "pull-up",
+  "db-row",
+  "romanian-deadlift",
+  "hip-thrust",
+  "lat-pulldown",
+  "bulgarian-split-squat",
+  "lateral-raise",
+  "ab-wheel",
+] as const;
+
 export function homeMetadata(lang: SiteLang): Metadata {
   const h = siteText(lang).home;
   const vars = siteVars(lang);
@@ -101,6 +117,7 @@ export function HomeView({ lang }: { lang: SiteLang }) {
   const p = h.pricing;
   const hero = t.hero;
   const vars = siteVars(lang);
+  const guideNames = exerciseNames(lang, HOME_GUIDES);
   const labels = muscleLabels(lang);
   const features = h.features.items.map((f, i) => ({ ...f, ...FEATURE_SHOTS[i]! }));
   const faqs = filledFaqs(t.faqs, vars);
@@ -336,6 +353,56 @@ export function HomeView({ lang }: { lang: SiteLang }) {
               </Link>
             </div>
             <Phone src="/screens/done.webp" alt={h.juice.alt} className="mx-auto w-full max-w-[260px]" />
+          </div>
+        </section>
+
+        {/* Free guides: links into the exercise guides and calculators, so the pages people search are a click from home */}
+        <section aria-labelledby="learn" className="mx-auto max-w-6xl px-4 pb-20">
+          <Eyebrow>{h.learn.eyebrow}</Eyebrow>
+          <h2 id="learn" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            {h.learn.title}
+          </h2>
+          <p className="mt-3 max-w-2xl text-muted">{h.learn.body}</p>
+          <div className="mt-8 grid gap-6 md:grid-cols-[2fr_1fr]">
+            <nav aria-label={h.learn.exercises} className="card p-6">
+              <h3 className="text-lg font-semibold">{h.learn.exercises}</h3>
+              <ul className="mt-3 grid gap-x-6 gap-y-1 sm:grid-cols-2">
+                {HOME_GUIDES.map((id) => (
+                  <li key={id}>
+                    <Link
+                      href={localPath(lang, `/exercises/${id}/`)}
+                      className="inline-flex min-h-11 items-center text-accent hover:underline"
+                    >
+                      {guideNames[id] ?? id}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/exercises/"
+                data-cta="home-exercises"
+                className="mt-3 inline-flex min-h-11 items-center gap-1 font-semibold hover:underline"
+              >
+                {t.chrome.links.exercises} <span aria-hidden>→</span>
+              </Link>
+            </nav>
+            <nav aria-label={h.learn.tools} className="card p-6">
+              <h3 className="text-lg font-semibold">{h.learn.tools}</h3>
+              <ul className="mt-3 space-y-1">
+                {[
+                  { href: localPath(lang, "/tools/plate-calculator/"), label: t.chrome.links.plates },
+                  { href: localPath(lang, "/tools/one-rep-max-calculator/"), label: t.chrome.links.oneRm },
+                  { href: localPath(lang, "/programs/"), label: t.chrome.links.programs },
+                  { href: localPath(lang, "/muscles/"), label: t.chrome.links.muscles },
+                ].map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="inline-flex min-h-11 items-center text-accent hover:underline">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </section>
 
