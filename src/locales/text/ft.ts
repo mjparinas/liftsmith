@@ -29,9 +29,9 @@ export const en = {
   "ft.hang.why":
     "Hang time leans on grip strength, one of the most studied markers of overall fitness as people age (Leong et al., The Lancet 2015, about 140,000 adults in 17 countries). The dead hang itself has no population norms yet, so treat it as a grip and shoulder check you can track.",
   "ft.balance.why":
-    "Standing on one leg checks balance, which tends to fade from your fifties and responds well to practice. Typical times: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adults aged 18 to 99).",
+    "In large studies, good balance is linked with healthy ageing (Araújo et al., British Journal of Sports Medicine 2022, about 1,700 adults aged 51 to 75). Standing on one leg checks balance, which tends to fade from your fifties and responds well to practice. Typical times: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adults aged 18 to 99).",
   "ft.chair.why":
-    "Getting up from a chair checks leg strength and power, the strength you use all day. Typical counts: Lein et al., International Journal of Sports Physical Therapy 2022 (ages 18 to 35), and Rikli and Jones, Journal of Aging and Physical Activity 1999 (ages 60 to 94).",
+    "In large studies, rising from a chair quickly is linked with healthy ageing (Cooper et al., BMJ 2010, a review of studies in older adults). Getting up from a chair checks leg strength and power, the strength you use all day. Typical counts: Lein et al., International Journal of Sports Physical Therapy 2022 (ages 18 to 35), and Rikli and Jones, Journal of Aging and Physical Activity 1999 (ages 60 to 94).",
   "ft.eyes": "Eyes",
   "ft.eyes.open": "Eyes open",
   "ft.eyes.closed": "Eyes closed",
@@ -115,9 +115,9 @@ export const es: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "El tiempo colgado depende de la fuerza de agarre, uno de los indicadores de forma física más estudiados con la edad (Leong et al., The Lancet 2015, unos 140.000 adultos de 17 países). El colgarse de la barra aún no tiene valores de referencia poblacionales, así que tómalo como un control de agarre y hombros para seguir tu evolución.",
   "ft.balance.why":
-    "Mantenerse a una pierna mide el equilibrio, que suele bajar a partir de los cincuenta y mejora bien con la práctica. Tiempos típicos: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adultos de 18 a 99 años).",
+    "En estudios amplios, un buen equilibrio se asocia con un envejecimiento saludable (Araújo et al., British Journal of Sports Medicine 2022, unos 1.700 adultos de 51 a 75 años). Mantenerse a una pierna mide el equilibrio, que suele bajar a partir de los cincuenta y mejora bien con la práctica. Tiempos típicos: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adultos de 18 a 99 años).",
   "ft.chair.why":
-    "Levantarse de una silla mide la fuerza y la potencia de piernas, la que usas todo el día. Valores típicos: Lein et al., International Journal of Sports Physical Therapy 2022 (18 a 35 años), y Rikli y Jones, Journal of Aging and Physical Activity 1999 (60 a 94 años).",
+    "En estudios amplios, levantarse rápido de una silla se asocia con un envejecimiento saludable (Cooper et al., BMJ 2010, una revisión de estudios en adultos mayores). Levantarse de una silla mide la fuerza y la potencia de piernas, la que usas todo el día. Valores típicos: Lein et al., International Journal of Sports Physical Therapy 2022 (18 a 35 años), y Rikli y Jones, Journal of Aging and Physical Activity 1999 (60 a 94 años).",
   "ft.eyes": "Ojos",
   "ft.eyes.open": "Ojos abiertos",
   "ft.eyes.closed": "Ojos cerrados",
@@ -198,9 +198,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "Le temps de suspension dépend de la force de préhension, l'un des marqueurs de forme les plus étudiés avec l'âge (Leong et al., The Lancet 2015, environ 140 000 adultes dans 17 pays). La suspension elle-même n'a pas encore de normes de population : voyez-la comme un contrôle de l'adhérence et des épaules à suivre dans le temps.",
   "ft.balance.why":
-    "Tenir sur une jambe mesure l'équilibre, qui baisse souvent à partir de la cinquantaine et progresse bien avec la pratique. Temps typiques : Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adultes de 18 à 99 ans).",
+    "Dans de grandes études, un bon équilibre est associé à un vieillissement en bonne santé (Araújo et al., British Journal of Sports Medicine 2022, environ 1 700 adultes de 51 à 75 ans). Tenir sur une jambe mesure l'équilibre, qui baisse souvent à partir de la cinquantaine et progresse bien avec la pratique. Temps typiques : Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adultes de 18 à 99 ans).",
   "ft.chair.why":
-    "Se lever d'une chaise mesure la force et la puissance des jambes, celles qui servent toute la journée. Valeurs typiques : Lein et al., International Journal of Sports Physical Therapy 2022 (18 à 35 ans), et Rikli et Jones, Journal of Aging and Physical Activity 1999 (60 à 94 ans).",
+    "Dans de grandes études, se lever vite d'une chaise est associé à un vieillissement en bonne santé (Cooper et al., BMJ 2010, une revue d'études chez des adultes âgés). Se lever d'une chaise mesure la force et la puissance des jambes, celles qui servent toute la journée. Valeurs typiques : Lein et al., International Journal of Sports Physical Therapy 2022 (18 à 35 ans), et Rikli et Jones, Journal of Aging and Physical Activity 1999 (60 à 94 ans).",
   "ft.eyes": "Yeux",
   "ft.eyes.open": "Yeux ouverts",
   "ft.eyes.closed": "Yeux fermés",
@@ -282,9 +282,9 @@ export const de: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "Die Hängezeit hängt an der Griffkraft, einem der am besten untersuchten Merkmale der allgemeinen Fitness im Alter (Leong et al., The Lancet 2015, rund 140.000 Erwachsene in 17 Ländern). Für das Hängen selbst gibt es noch keine Bevölkerungsnormen, sieh es also als Check für Griff und Schultern, den du verfolgen kannst.",
   "ft.balance.why":
-    "Der Einbeinstand prüft das Gleichgewicht, das ab den Fünfzigern oft nachlässt und sich gut trainieren lässt. Typische Zeiten: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 Erwachsene von 18 bis 99).",
+    "In großen Studien hängt ein gutes Gleichgewicht mit gesundem Altern zusammen (Araújo et al., British Journal of Sports Medicine 2022, rund 1.700 Erwachsene von 51 bis 75). Der Einbeinstand prüft das Gleichgewicht, das ab den Fünfzigern oft nachlässt und sich gut trainieren lässt. Typische Zeiten: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 Erwachsene von 18 bis 99).",
   "ft.chair.why":
-    "Aufstehen vom Stuhl prüft Kraft und Schnellkraft der Beine, die du den ganzen Tag brauchst. Typische Werte: Lein et al., International Journal of Sports Physical Therapy 2022 (18 bis 35 Jahre), und Rikli und Jones, Journal of Aging and Physical Activity 1999 (60 bis 94 Jahre).",
+    "In großen Studien hängt schnelles Aufstehen vom Stuhl mit gesundem Altern zusammen (Cooper et al., BMJ 2010, eine Übersicht über Studien mit älteren Erwachsenen). Aufstehen vom Stuhl prüft Kraft und Schnellkraft der Beine, die du den ganzen Tag brauchst. Typische Werte: Lein et al., International Journal of Sports Physical Therapy 2022 (18 bis 35 Jahre), und Rikli und Jones, Journal of Aging and Physical Activity 1999 (60 bis 94 Jahre).",
   "ft.eyes": "Augen",
   "ft.eyes.open": "Augen offen",
   "ft.eyes.closed": "Augen zu",
@@ -365,9 +365,9 @@ export const it: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "Il tempo in sospensione dipende dalla forza di presa, uno degli indicatori di forma più studiati con l'età (Leong et al., The Lancet 2015, circa 140.000 adulti in 17 paesi). La sospensione in sé non ha ancora valori di riferimento per la popolazione, quindi usala come controllo di presa e spalle da seguire nel tempo.",
   "ft.balance.why":
-    "Stare su una gamba misura l'equilibrio, che tende a calare dai cinquant'anni e migliora bene con la pratica. Tempi tipici: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adulti dai 18 ai 99 anni).",
+    "In ampi studi, un buon equilibrio è associato a un invecchiamento in salute (Araújo et al., British Journal of Sports Medicine 2022, circa 1.700 adulti dai 51 ai 75 anni). Stare su una gamba misura l'equilibrio, che tende a calare dai cinquant'anni e migliora bene con la pratica. Tempi tipici: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adulti dai 18 ai 99 anni).",
   "ft.chair.why":
-    "Alzarsi da una sedia misura forza e potenza delle gambe, quelle che usi tutto il giorno. Valori tipici: Lein et al., International Journal of Sports Physical Therapy 2022 (18-35 anni), e Rikli e Jones, Journal of Aging and Physical Activity 1999 (60-94 anni).",
+    "In ampi studi, alzarsi in fretta da una sedia è associato a un invecchiamento in salute (Cooper et al., BMJ 2010, una revisione di studi su adulti più anziani). Alzarsi da una sedia misura forza e potenza delle gambe, quelle che usi tutto il giorno. Valori tipici: Lein et al., International Journal of Sports Physical Therapy 2022 (18-35 anni), e Rikli e Jones, Journal of Aging and Physical Activity 1999 (60-94 anni).",
   "ft.eyes": "Occhi",
   "ft.eyes.open": "Occhi aperti",
   "ft.eyes.closed": "Occhi chiusi",
@@ -446,9 +446,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "ぶら下がる時間は握力に左右されます。握力は加齢とともに最もよく研究されている体力の指標の一つです（Leong ほか、The Lancet 2015年、17か国の約14万人）。デッドハング自体にはまだ集団の基準値がないため、記録を追える握力と肩のチェックとして使ってください。",
   "ft.balance.why":
-    "片脚立ちはバランスを確かめるテストです。バランスは50代ごろから落ちやすく、練習でよく伸びます。標準的な時間：Springer ほか、Journal of Geriatric Physical Therapy 2007年（18〜99歳の成人549人）。",
+    "大規模な研究では、良いバランスは健康的な加齢と関連しています（Araújo et al., British Journal of Sports Medicine 2022、51〜75歳の成人約1,700人）。片脚立ちはバランスを確かめるテストです。バランスは50代ごろから落ちやすく、練習でよく伸びます。標準的な時間：Springer ほか、Journal of Geriatric Physical Therapy 2007年（18〜99歳の成人549人）。",
   "ft.chair.why":
-    "椅子からの立ち上がりは、一日中使う脚の筋力とパワーを確かめるテストです。標準的な回数：Lein ほか、International Journal of Sports Physical Therapy 2022年（18〜35歳）、Rikli と Jones、Journal of Aging and Physical Activity 1999年（60〜94歳）。",
+    "大規模な研究では、椅子から素早く立ち上がれることは健康的な加齢と関連しています（Cooper et al., BMJ 2010、高齢者を対象とした研究のレビュー）。椅子からの立ち上がりは、一日中使う脚の筋力とパワーを確かめるテストです。標準的な回数：Lein ほか、International Journal of Sports Physical Therapy 2022年（18〜35歳）、Rikli と Jones、Journal of Aging and Physical Activity 1999年（60〜94歳）。",
   "ft.eyes": "目",
   "ft.eyes.open": "目を開けて",
   "ft.eyes.closed": "目を閉じて",
@@ -531,9 +531,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "O tempo pendurado depende da força de pegada, um dos marcadores de condicionamento geral mais estudados com o envelhecimento (Leong et al., The Lancet 2015, cerca de 140.000 adultos em 17 países). A suspensão na barra em si ainda não tem valores de referência populacionais, então use como uma checagem de pegada e ombros para acompanhar.",
   "ft.balance.why":
-    "Ficar numa perna só testa o equilíbrio, que tende a diminuir a partir dos 50 anos e melhora bem com prática. Tempos típicos: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adultos de 18 a 99 anos).",
+    "Em estudos grandes, um bom equilíbrio está ligado a um envelhecimento saudável (Araújo et al., British Journal of Sports Medicine 2022, cerca de 1.700 adultos de 51 a 75 anos). Ficar numa perna só testa o equilíbrio, que tende a diminuir a partir dos 50 anos e melhora bem com prática. Tempos típicos: Springer et al., Journal of Geriatric Physical Therapy 2007 (549 adultos de 18 a 99 anos).",
   "ft.chair.why":
-    "Levantar da cadeira testa a força e a potência das pernas, a força que você usa o dia todo. Contagens típicas: Lein et al., International Journal of Sports Physical Therapy 2022 (18 a 35 anos), e Rikli e Jones, Journal of Aging and Physical Activity 1999 (60 a 94 anos).",
+    "Em estudos grandes, levantar rápido de uma cadeira está ligado a um envelhecimento saudável (Cooper et al., BMJ 2010, uma revisão de estudos com adultos mais velhos). Levantar da cadeira testa a força e a potência das pernas, a força que você usa o dia todo. Contagens típicas: Lein et al., International Journal of Sports Physical Therapy 2022 (18 a 35 anos), e Rikli e Jones, Journal of Aging and Physical Activity 1999 (60 a 94 anos).",
   "ft.eyes": "Olhos",
   "ft.eyes.open": "Olhos abertos",
   "ft.eyes.closed": "Olhos fechados",
@@ -617,9 +617,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "매달리기 시간은 악력에 크게 좌우되는데, 악력은 나이가 들면서 전반적인 체력을 보여 주는 가장 많이 연구된 지표 중 하나예요(Leong 외, The Lancet 2015, 17개국 성인 약 14만 명). 데드 행 자체에는 아직 인구 기준치가 없으니 꾸준히 기록하는 악력과 어깨 점검으로 생각하세요.",
   "ft.balance.why":
-    "한 발 서기로 균형을 확인해요. 균형은 50대부터 떨어지기 쉽고 연습하면 잘 좋아져요. 일반적인 시간: Springer 외, Journal of Geriatric Physical Therapy 2007 (18~99세 성인 549명).",
+    "대규모 연구에서 좋은 균형 감각은 건강한 노화와 관련이 있어요(Araújo et al., British Journal of Sports Medicine 2022, 51~75세 성인 약 1,700명). 한 발 서기로 균형을 확인해요. 균형은 50대부터 떨어지기 쉽고 연습하면 잘 좋아져요. 일반적인 시간: Springer 외, Journal of Geriatric Physical Therapy 2007 (18~99세 성인 549명).",
   "ft.chair.why":
-    "의자에서 일어서기로 하루 종일 쓰는 하체 근력과 파워를 확인해요. 일반적인 횟수: Lein 외, International Journal of Sports Physical Therapy 2022 (18~35세), Rikli와 Jones, Journal of Aging and Physical Activity 1999 (60~94세).",
+    "대규모 연구에서 의자에서 빠르게 일어나는 능력은 건강한 노화와 관련이 있어요(Cooper et al., BMJ 2010, 고령층 대상 연구 리뷰). 의자에서 일어서기로 하루 종일 쓰는 하체 근력과 파워를 확인해요. 일반적인 횟수: Lein 외, International Journal of Sports Physical Therapy 2022 (18~35세), Rikli와 Jones, Journal of Aging and Physical Activity 1999 (60~94세).",
   "ft.eyes": "눈",
   "ft.eyes.open": "눈 뜨고",
   "ft.eyes.closed": "눈 감고",
@@ -702,9 +702,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "Asılı kalma süresi kavrama kuvvetine dayanır; kavrama kuvveti, insanlar yaşlandıkça genel kondisyonun en çok araştırılan göstergelerinden biridir (Leong ve diğerleri, The Lancet 2015, 17 ülkede yaklaşık 140.000 yetişkin). Asılmanın kendisi için henüz nüfus normları yok, bu yüzden onu takip edebileceğin bir kavrama ve omuz kontrolü olarak gör.",
   "ft.balance.why":
-    "Tek ayak üstünde durmak dengeyi ölçer; denge elli yaşlarından itibaren azalma eğilimindedir ve pratiğe iyi yanıt verir. Tipik süreler: Springer ve diğerleri, Journal of Geriatric Physical Therapy 2007 (18 ila 99 yaş arası 549 yetişkin).",
+    "Büyük çalışmalarda iyi denge, sağlıklı yaşlanmayla ilişkilendirilir (Araújo ve ark., British Journal of Sports Medicine 2022, 51-75 yaş arası yaklaşık 1.700 yetişkin). Tek ayak üstünde durmak dengeyi ölçer; denge elli yaşlarından itibaren azalma eğilimindedir ve pratiğe iyi yanıt verir. Tipik süreler: Springer ve diğerleri, Journal of Geriatric Physical Therapy 2007 (18 ila 99 yaş arası 549 yetişkin).",
   "ft.chair.why":
-    "Sandalyeden kalkmak, gün boyu kullandığın bacak kuvvetini ve gücünü ölçer. Tipik sayılar: Lein ve diğerleri, International Journal of Sports Physical Therapy 2022 (18 ila 35 yaş) ve Rikli ve Jones, Journal of Aging and Physical Activity 1999 (60 ila 94 yaş).",
+    "Büyük çalışmalarda sandalyeden hızlı kalkabilmek, sağlıklı yaşlanmayla ilişkilendirilir (Cooper ve ark., BMJ 2010, ileri yaştaki yetişkinlerle yapılan çalışmaların derlemesi). Sandalyeden kalkmak, gün boyu kullandığın bacak kuvvetini ve gücünü ölçer. Tipik sayılar: Lein ve diğerleri, International Journal of Sports Physical Therapy 2022 (18 ila 35 yaş) ve Rikli ve Jones, Journal of Aging and Physical Activity 1999 (60 ila 94 yaş).",
   "ft.eyes": "Gözler",
   "ft.eyes.open": "Gözler açık",
   "ft.eyes.closed": "Gözler kapalı",
@@ -792,9 +792,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "ft.hang.why":
     "Czas zwisu zależy od siły chwytu, jednego z najlepiej zbadanych wskaźników ogólnej sprawności z wiekiem (Leong i in., The Lancet 2015, ok. 140 000 dorosłych w 17 krajach). Dla samego zwisu nie ma jeszcze norm populacyjnych, więc traktuj go jako test chwytu i barków, który możesz śledzić.",
   "ft.balance.why":
-    "Stanie na jednej nodze sprawdza równowagę, która zwykle słabnie od pięćdziesiątki i dobrze reaguje na ćwiczenie. Typowe czasy: Springer i in., Journal of Geriatric Physical Therapy 2007 (549 dorosłych w wieku 18–99 lat).",
+    "W dużych badaniach dobra równowaga wiąże się ze zdrowym starzeniem się (Araújo i in., British Journal of Sports Medicine 2022, około 1700 dorosłych w wieku 51–75 lat). Stanie na jednej nodze sprawdza równowagę, która zwykle słabnie od pięćdziesiątki i dobrze reaguje na ćwiczenie. Typowe czasy: Springer i in., Journal of Geriatric Physical Therapy 2007 (549 dorosłych w wieku 18–99 lat).",
   "ft.chair.why":
-    "Wstawanie z krzesła sprawdza siłę i moc nóg, z których korzystasz cały dzień. Typowe wyniki: Lein i in., International Journal of Sports Physical Therapy 2022 (wiek 18–35 lat) oraz Rikli i Jones, Journal of Aging and Physical Activity 1999 (wiek 60–94 lata).",
+    "W dużych badaniach szybkie wstawanie z krzesła wiąże się ze zdrowym starzeniem się (Cooper i in., BMJ 2010, przegląd badań z udziałem starszych dorosłych). Wstawanie z krzesła sprawdza siłę i moc nóg, z których korzystasz cały dzień. Typowe wyniki: Lein i in., International Journal of Sports Physical Therapy 2022 (wiek 18–35 lat) oraz Rikli i Jones, Journal of Aging and Physical Activity 1999 (wiek 60–94 lata).",
   "ft.eyes": "Oczy",
   "ft.eyes.open": "Oczy otwarte",
   "ft.eyes.closed": "Oczy zamknięte",
