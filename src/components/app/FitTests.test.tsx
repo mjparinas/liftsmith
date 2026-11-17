@@ -58,6 +58,9 @@ describe("fitness tests", () => {
     const result = await within(sheet).findByTestId("ft-result");
     expect(result).toHaveTextContent("100 s");
     expect(result).toHaveTextContent("Above typical");
+    expect(
+      within(result).getByRole("img", { name: "Your result, 100 s, is in the Above typical range. Typical is 59 s to 96 s." }),
+    ).toBeTruthy();
     expect(result).toHaveTextContent("farmer's carries");
     expect(result).toHaveTextContent("Next time, aim for 110 s.");
     expect(useApp.getState().events.some((e) => e.type === "fitTest" && e.test === "hang" && e.value === 100)).toBe(true);

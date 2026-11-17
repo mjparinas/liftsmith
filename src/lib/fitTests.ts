@@ -221,3 +221,26 @@ export function cleanResult(test: FitTest, value: number): number | null {
   const [lo, hi] = FIT_RANGE[test];
   return v >= lo && v <= hi ? v : null;
 }
+
+/** A number line for a result: the bands as fractions of the line, where the result sits, and the line's end. */
+export interface FitLine {
+  /** The value at the right end of the line (the left end is 0). */
+  max: number;
+  /** Where Typical starts and ends, 0 to 1. */
+  low: number;
+  high: number;
+  /** Where the result sits, 0 to 1. */
+  at: number;
+}
+
+/**
+ * The number line under a result (Melvin, 2026-11-17: "a colored number line as well pointing them to where
+ * they reside"). It runs from 0 to the one-leg stand's 45-second limit, or for the others past Typical by as
+ * much again as Typical is wide (at least half its top end), far enough to fit the result, rounded up to 5.
+ */
+export function fitLine(test: FitTest, value: number, ref: Pick<FitReference, "low" | "high">): FitLine {
+  const span = ref.high - ref.low;
+  const max = test === "balance" ? BALANCE_CAP : Math.ceil(Math.max(ref.high + Math.max(span, ref.high / 2), value * 1.1, 1) / 5) * 5;
+  const frac = (n: number) => Math.min(1, Math.max(0, n / max));
+  return { max, low: frac(ref.low), high: frac(ref.high), at: frac(value) };
+}
