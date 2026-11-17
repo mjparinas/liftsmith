@@ -8,8 +8,10 @@ import {
   applyCall,
   drawWeight,
   generate,
+  LOADED_TWINS,
   orderRank,
   planSeconds,
+  preferLoaded,
   rankMuscles,
   recentFor,
   setSeconds,
@@ -339,5 +341,51 @@ describe("the whole plan", () => {
     const tired = makeSets(6, { exerciseId: "back-squat", at: NOW - 16 * 3600_000 });
     expect(recovery(tired, NOW).quads).toBe(53);
     expect(generate({ gym, profile, events: tired, minutes: 90, now: NOW }).items.map((i) => i.focus)).not.toContain("quads");
+  });
+});
+
+describe("preferLoaded", () => {
+  const none = () => false;
+  const ids = (list: ReturnType<typeof preferLoaded>) => list.map((e) => e.id);
+
+  it("knows the loaded versions of bodyweight moves", () => {
+    expect(LOADED_TWINS.get("reverse-lunge")).toEqual(["db-reverse-lunge", "barbell-reverse-lunge"]);
+    expect(LOADED_TWINS.get("step-up")).toContain("db-step-up");
+    for (const [id, twins] of LOADED_TWINS) {
+      expect(ex(id).load).toBe("bodyweight");
+      for (const twin of twins) {
+        expect(ex(twin).load).not.toBe("bodyweight");
+        expect(ex(twin).pattern).toBe(ex(id).pattern);
+      }
+    }
+  });
+
+  it("drops a bodyweight move when its loaded version is on offer", () => {
+    expect(ids(preferLoaded([ex("reverse-lunge"), ex("db-reverse-lunge"), ex("back-squat")], none))).toEqual([
+      "db-reverse-lunge",
+      "back-squat",
+    ]);
+  });
+
+  it("keeps it when no loaded version is on offer, the lifter keeps it, or never beside its loaded version", () => {
+    expect(ids(preferLoaded([ex("reverse-lunge"), ex("back-squat")], none))).toEqual(["reverse-lunge", "back-squat"]);
+    expect(ids(preferLoaded([ex("reverse-lunge"), ex("db-reverse-lunge")], (id) => id === "reverse-lunge"))).toEqual([
+      "reverse-lunge",
+      "db-reverse-lunge",
+    ]);
+    expect(ids(preferLoaded([ex("reverse-lunge")], none, new Set(["db-reverse-lunge"])))).toEqual([]);
+  });
+
+  it("a dumbbell gym never plans a bodyweight move that has a dumbbell version", () => {
+    const dbGym = makeTestGym("dumbbells");
+    const profile = makeProfile();
+    for (let d = 0; d < 28; d++)
+      for (const muscles of [undefined, ["quads", "glutes"] as const]) {
+        const plan = generate({ gym: dbGym, profile, events: [], minutes: 60, now: NOW + d * DAY, muscles: muscles && [...muscles] });
+        for (const i of plan.items) {
+          const twins = LOADED_TWINS.get(i.exerciseId) ?? [];
+          expect(twins.filter((id) => id.startsWith("db-"))).toEqual([]);
+        }
+      }
   });
 });
