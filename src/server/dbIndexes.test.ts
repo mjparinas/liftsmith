@@ -208,6 +208,25 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     uses: ["gym_places_claimed", "gym_places_own"],
     noScan: ["gym_places"],
   },
+  {
+    name: "check-in photos: one photo for the pair (coachForms.ts photoFor)",
+    sql: "SELECT data FROM coach_checkin_photos WHERE checkin_id = ? AND question_id = ? AND (coach_id = ? OR client_id = ?)",
+    uses: ["sqlite_autoindex_coach_checkin_photos_1"],
+    noScan: ["coach_checkin_photos"],
+  },
+  {
+    name: "check-in photos: dropping a pair's old ones (coachForms.ts prunePhotos)",
+    sql: `DELETE FROM coach_checkin_photos WHERE coach_id = ? AND client_id = ? AND checkin_id NOT IN
+            (SELECT id FROM coach_checkins WHERE coach_id = ? AND client_id = ? ORDER BY sent_at DESC LIMIT ?)`,
+    uses: ["coach_checkin_photos_pair", "coach_checkins_pair"],
+    noScan: ["coach_checkin_photos", "coach_checkins"],
+  },
+  {
+    name: "check-in photos: erasing an account's (coach.ts coachCleanup)",
+    sql: "DELETE FROM coach_checkin_photos WHERE coach_id = ? OR client_id = ?",
+    uses: ["coach_checkin_photos_pair", "coach_checkin_photos_client"],
+    noScan: ["coach_checkin_photos"],
+  },
 ];
 
 describe("queries on growing tables use an index", () => {

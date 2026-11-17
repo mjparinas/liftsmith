@@ -6,8 +6,9 @@
 import { randomBytes } from "node:crypto";
 
 import { isAccountId, isClient, nameOf } from "./coach";
-import { batch, query, run } from "./db";
+import { batch, query, rateLimit, run } from "./db";
 import { notifyCoach } from "./push";
+import { isMinor } from "./teams";
 
 export const FORM_LIMITS = {
   forms: 10,
@@ -17,14 +18,24 @@ export const FORM_LIMITS = {
   text: 1000,
   /** Unanswered check-ins a client can have from one coach; the oldest goes when another arrives. */
   pending: 3,
-  /** Answered check-ins a coach sees per client, newest first. */
-  history: 12,
-  /** A repeating check-in goes out again this long after the last one. */
-  everyMs: 7 * 86_400_000,
+  /** Check-ins a coach sees per client, newest first: about six months of weekly ones, for the trends. Photos are kept
+   *  only for these. */
+  history: 24,
+  /** A repeating check-in goes out again this many days after the last one: every week, two weeks or four weeks. */
+  everyDays: [7, 14, 28] as const,
+  /** Photo questions on one form. */
+  photos: 3,
+  /** A photo answer, as a JPEG data URL (the app sends it shrunk to 1080 px, usually 100 to 250 kB). */
+  photoChars: 700_000,
 };
+const DAY_MS = 86_400_000;
+export type Every = (typeof FORM_LIMITS.everyDays)[number];
+const isEvery = (x: unknown): x is Every => FORM_LIMITS.everyDays.includes(x as Every);
 
-export type QuestionKind = "scale" | "number" | "yesno" | "text";
-const KINDS = new Set<QuestionKind>(["scale", "number", "yesno", "text"]);
+// 2026-11-17 (Melvin: "coach client check-in forms"): a body weight question, answered in kilograms from the client's
+// latest weigh-in, and a photo question (never asked of a client under 18).
+export type QuestionKind = "scale" | "number" | "yesno" | "text" | "weight" | "photo";
+const KINDS = new Set<QuestionKind>(["scale", "number", "yesno", "text", "weight", "photo"]);
 export interface Question {
   id: string;
   kind: QuestionKind;
@@ -70,6 +81,7 @@ export function cleanForm(x: unknown): { title: string; questions: Question[] } 
     const r = (q ?? {}) as { id?: unknown; kind?: unknown; label?: unknown };
     const label = line(r.label, FORM_LIMITS.label);
     if (!label || !KINDS.has(r.kind as QuestionKind)) continue;
+    if (r.kind === "photo" && questions.filter((x) => x.kind === "photo").length >= FORM_LIMITS.photos) continue;
     let id = typeof r.id === "string" && /^[\w-]{1,24}$/.test(r.id) ? r.id : `q${questions.length + 1}`;
     while (ids.has(id)) id = `${id}x`;
     ids.add(id);
@@ -79,13 +91,18 @@ export function cleanForm(x: unknown): { title: string; questions: Question[] } 
   return title && questions.length ? { title, questions } : null;
 }
 
-/** Answers that fit their questions: scale 1 to 5, a number, yes or no, or text; anything else is left empty. */
-export function cleanAnswers(questions: readonly Question[], x: unknown): Record<string, Answer> {
+/** Answers that fit their questions: scale 1 to 5, a number, yes or no, text, or a body weight in kilograms; anything
+ *  else is left empty. A photo answer is true only when the photo itself reached the server (`photos`), whatever the
+ *  answers say. */
+export function cleanAnswers(questions: readonly Question[], x: unknown, photos: ReadonlySet<string> = new Set()): Record<string, Answer> {
   const a = (x ?? {}) as Record<string, unknown>;
   const out: Record<string, Answer> = {};
   for (const q of questions) {
     const v = a[q.id];
-    if (q.kind === "scale") out[q.id] = typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= 5 ? v : null;
+    if (q.kind === "photo") out[q.id] = photos.has(q.id) ? true : null;
+    else if (q.kind === "weight")
+      out[q.id] = typeof v === "number" && Number.isFinite(v) && v >= 20 && v <= 400 ? Math.round(v * 10) / 10 : null;
+    else if (q.kind === "scale") out[q.id] = typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= 5 ? v : null;
     else if (q.kind === "number")
       out[q.id] = typeof v === "number" && Number.isFinite(v) && Math.abs(v) < 1e6 ? Math.round(v * 100) / 100 : null;
     else if (q.kind === "yesno") out[q.id] = typeof v === "boolean" ? v : null;
@@ -184,7 +201,7 @@ export async function deleteForm(coachId: string, id: unknown): Promise<void> {
   ]);
 }
 
-export type SendError = "notClient" | "noForm";
+export type SendError = "notClient" | "noForm" | "teen";
 
 /** Sends one of the coach's forms to their client now, and tells the client's phones. */
 export async function sendForm(
@@ -201,7 +218,16 @@ export async function sendForm(
   return deliver(coachId, clientId, form(f), now, id);
 }
 
-async function deliver(coachId: string, clientId: string, f: Form, now: number, id: string): Promise<Checkin> {
+/** A form as a client gets it: a client under 18 is never asked for a photo (teen-safe, like body composition). */
+async function forClient(f: Form, clientId: string, now: number): Promise<Form | null> {
+  if (!f.questions.some((q) => q.kind === "photo") || !(await isMinor(clientId, now))) return f;
+  const questions = f.questions.filter((q) => q.kind !== "photo");
+  return questions.length ? { ...f, questions } : null;
+}
+
+async function deliver(coachId: string, clientId: string, whole: Form, now: number, id: string): Promise<Checkin | { error: "teen" }> {
+  const f = await forClient(whole, clientId, now);
+  if (!f) return { error: "teen" };
   await batch([
     {
       sql: `INSERT INTO coach_checkins (id, coach_id, client_id, form_id, title, questions, sent_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -213,37 +239,50 @@ async function deliver(coachId: string, clientId: string, f: Form, now: number, 
               (SELECT id FROM coach_checkins WHERE coach_id = ? AND client_id = ? AND answered_at IS NULL ORDER BY sent_at DESC LIMIT ?)`,
       args: [coachId, clientId, coachId, clientId, FORM_LIMITS.pending],
     },
+    prunePhotos(coachId, clientId),
   ]);
   await notifyCoach(clientId, "coachCheckin", { name: await nameOf(coachId), text: f.title }, `#/trainer/f.${id}`);
   return { id, coachId, clientId, formId: f.id, title: f.title, questions: f.questions, sentAt: now, answers: null, answeredAt: null };
 }
 
-/** Turns a weekly check-in on (sending it now) or off for one client. One repeating form per client. */
+export interface Repeat {
+  formId: string;
+  nextAt: number;
+  /** Days between check-ins: 7, 14 or 28. */
+  every: Every;
+}
+
+/** Turns a repeating check-in on (sending it now) every one, two or four weeks, or off, for one client. One repeating
+ *  form per client. */
 export async function setRepeat(
   coachId: string,
   clientId: unknown,
   formId: unknown,
   now = Date.now(),
-): Promise<{ formId: string; nextAt: number } | null | { error: SendError }> {
+  everyDays: unknown = 7,
+): Promise<Repeat | null | { error: SendError }> {
   if (!isAccountId(clientId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
   if (formId === null || formId === undefined || formId === "") {
     await run("DELETE FROM coach_checkin_repeats WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
     return null;
   }
+  const every = isEvery(everyDays) ? everyDays : 7;
   const sent = await sendForm(coachId, clientId, formId, now);
   if ("error" in sent) return sent;
-  const nextAt = now + FORM_LIMITS.everyMs;
+  const nextAt = now + every * DAY_MS;
   await run(
-    `INSERT INTO coach_checkin_repeats (coach_id, client_id, form_id, next_at) VALUES (?, ?, ?, ?)
-     ON CONFLICT (coach_id, client_id) DO UPDATE SET form_id = excluded.form_id, next_at = excluded.next_at`,
-    [coachId, clientId, sent.formId, nextAt],
+    `INSERT INTO coach_checkin_repeats (coach_id, client_id, form_id, next_at, every_days) VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT (coach_id, client_id) DO UPDATE SET form_id = excluded.form_id, next_at = excluded.next_at, every_days = excluded.every_days`,
+    [coachId, clientId, sent.formId, nextAt, every],
   );
-  return { formId: sent.formId, nextAt };
+  return { formId: sent.formId, nextAt, every };
 }
 
-/** The daily job: sends every weekly check-in that's due. Returns how many went out. */
+const everyOf = (x: unknown): Every => (isEvery(Number(x)) ? (Number(x) as Every) : 7);
+
+/** The daily job: sends every repeating check-in that's due. Returns how many went out. */
 export async function sendDueCheckins(now = Date.now()): Promise<number> {
-  const due = await query<{ coach_id: string; client_id: string; form_id: string; next_at: number }>(
+  const due = await query<{ coach_id: string; client_id: string; form_id: string; next_at: number; every_days: number }>(
     "SELECT * FROM coach_checkin_repeats WHERE next_at <= ?",
     [now],
   );
@@ -256,12 +295,12 @@ export async function sendDueCheckins(now = Date.now()): Promise<number> {
       await run("DELETE FROM coach_checkin_repeats WHERE coach_id = ? AND client_id = ?", [coach, client]);
       continue;
     }
-    // Steps forward a whole week at a time, so a missed day doesn't shift the client's check-in day.
+    // Steps forward whole periods at a time, so a missed day doesn't shift the client's check-in day.
+    const step = everyOf(r.every_days) * DAY_MS;
     let next = Number(r.next_at);
-    while (next <= now) next += FORM_LIMITS.everyMs;
+    while (next <= now) next += step;
     await run("UPDATE coach_checkin_repeats SET next_at = ? WHERE coach_id = ? AND client_id = ?", [next, coach, client]);
-    await deliver(coach, client, form(f), now, newId());
-    sent += 1;
+    if (!("error" in (await deliver(coach, client, form(f), now, newId())))) sent += 1;
   }
   return sent;
 }
@@ -278,7 +317,7 @@ export async function answerCheckin(
   if (!r) return { error: "unknown" };
   if (r.answered_at != null) return { error: "answered" };
   const c = checkin(r);
-  const clean = cleanAnswers(c.questions, answers);
+  const clean = cleanAnswers(c.questions, answers, await photosOf(c.id));
   if (Object.values(clean).every((v) => v === null)) return { error: "empty" };
   // Answered once: a second phone sending the same check-in finds it already done.
   const done = await query<{ id: string }>(
@@ -286,6 +325,8 @@ export async function answerCheckin(
     [JSON.stringify(clean), now, c.id],
   );
   if (!done.length) return { error: "answered" };
+  const prune = prunePhotos(c.coachId, clientId);
+  await run(prune.sql, prune.args);
   await notifyCoach(c.coachId, "coachCheckinDone", { name: await nameOf(clientId) }, `#/trainer/c.${clientId}`);
   return { ...c, answers: clean, answeredAt: now };
 }
@@ -305,18 +346,87 @@ export async function checkinFor(clientId: string, id: unknown): Promise<Checkin
 }
 
 /** What a coach sees for one client: the latest check-ins (answered or waiting), and the form that repeats. */
-export async function checkinsOf(
-  coachId: string,
-  clientId: string,
-): Promise<{ checkins: Checkin[]; repeat: { formId: string; nextAt: number } | null }> {
+export async function checkinsOf(coachId: string, clientId: string): Promise<{ checkins: Checkin[]; repeat: Repeat | null }> {
   const rows = await query<CheckinRow>("SELECT * FROM coach_checkins WHERE coach_id = ? AND client_id = ? ORDER BY sent_at DESC LIMIT ?", [
     coachId,
     clientId,
     FORM_LIMITS.history,
   ]);
-  const [rep] = await query<{ form_id: string; next_at: number }>(
+  const [rep] = await query<{ form_id: string; next_at: number; every_days: number }>(
     "SELECT * FROM coach_checkin_repeats WHERE coach_id = ? AND client_id = ?",
     [coachId, clientId],
   );
-  return { checkins: rows.map(checkin), repeat: rep ? { formId: String(rep.form_id), nextAt: Number(rep.next_at) } : null };
+  return {
+    checkins: rows.map(checkin),
+    repeat: rep ? { formId: String(rep.form_id), nextAt: Number(rep.next_at), every: everyOf(rep.every_days) } : null,
+  };
+}
+
+// ---------- Photo answers (2026-11-17) ----------
+// A photo goes up on its own before the answers (it's too big for the coach route's 8 kB body), into its own table so
+// listing check-ins never reads it. It is the client's choice, one photo per question, seen only by the coach who
+// asked and the client. Kept only for the check-ins a coach can still see (FORM_LIMITS.history), and deleted with the
+// check-in, on unlinking and with either account. Progress photos in the app stay on the phone (photos.ts); this is a
+// separate copy the client picked to send.
+
+/** The question ids of a check-in that have a photo on the server. */
+async function photosOf(checkinId: string): Promise<Set<string>> {
+  const rows = await query<{ question_id: string }>("SELECT question_id FROM coach_checkin_photos WHERE checkin_id = ?", [checkinId]);
+  return new Set(rows.map((r) => String(r.question_id)));
+}
+
+/** Photos of a pair whose check-in is gone or older than what the coach can see. */
+function prunePhotos(coachId: string, clientId: string): { sql: string; args: (string | number)[] } {
+  return {
+    sql: `DELETE FROM coach_checkin_photos WHERE coach_id = ? AND client_id = ? AND checkin_id NOT IN
+            (SELECT id FROM coach_checkins WHERE coach_id = ? AND client_id = ? ORDER BY sent_at DESC LIMIT ?)`,
+    args: [coachId, clientId, coachId, clientId, FORM_LIMITS.history],
+  };
+}
+
+/** A JPEG data URL of a sensible size, or null. Checks the bytes start like a JPEG, not only the label. */
+export function cleanPhoto(x: unknown): string | null {
+  if (typeof x !== "string" || x.length > FORM_LIMITS.photoChars) return null;
+  const m = /^data:image\/jpeg;base64,([A-Za-z0-9+/]+={0,2})$/.exec(x);
+  if (!m?.[1] || m[1].length < 200) return null;
+  const head = Buffer.from(m[1].slice(0, 8), "base64");
+  return head[0] === 0xff && head[1] === 0xd8 && head[2] === 0xff ? x : null;
+}
+
+export type PhotoError = "unknown" | "answered" | "bad" | "teen" | "busy";
+
+/** The client attaches a photo to a photo question of a check-in waiting for them. Sending again replaces it. */
+export async function savePhoto(
+  clientId: string,
+  id: unknown,
+  questionId: unknown,
+  data: unknown,
+  now = Date.now(),
+): Promise<true | { error: PhotoError }> {
+  const [r] =
+    typeof id === "string" ? await query<CheckinRow>("SELECT * FROM coach_checkins WHERE id = ? AND client_id = ?", [id, clientId]) : [];
+  if (!r) return { error: "unknown" };
+  if (r.answered_at != null) return { error: "answered" };
+  const c = checkin(r);
+  if (!c.questions.some((q) => q.id === questionId && q.kind === "photo")) return { error: "bad" };
+  const photo = cleanPhoto(data);
+  if (!photo) return { error: "bad" };
+  if (await isMinor(clientId, now)) return { error: "teen" };
+  if (!(await rateLimit(`checkinPhoto:${clientId}`, 30, 3_600_000, now))) return { error: "busy" };
+  await run(
+    `INSERT INTO coach_checkin_photos (checkin_id, question_id, coach_id, client_id, data, at) VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT (checkin_id, question_id) DO UPDATE SET data = excluded.data, at = excluded.at`,
+    [c.id, String(questionId), c.coachId, clientId, photo, now],
+  );
+  return true;
+}
+
+/** One photo answer, for the coach who sent the check-in or the client who answered it. */
+export async function photoFor(accountId: string, id: unknown, questionId: unknown): Promise<string | null> {
+  if (typeof id !== "string" || typeof questionId !== "string") return null;
+  const [r] = await query<{ data: string }>(
+    "SELECT data FROM coach_checkin_photos WHERE checkin_id = ? AND question_id = ? AND (coach_id = ? OR client_id = ?)",
+    [id, questionId, accountId, accountId],
+  );
+  return r ? String(r.data) : null;
 }
