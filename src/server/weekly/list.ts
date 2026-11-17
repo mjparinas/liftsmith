@@ -136,6 +136,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("auto-supersets", "free", "settings/training", { fresh: "2026-11-17" }),
   // New, 2026-11-17: club chat and crew sessions (docs/decisions/friends.md "Club chat and crew sessions").
   L("club-chat", "free", "friends", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: the Liftsmith community: ideas, bugs, votes and the roadmap (docs/decisions/community.md).
+  L("community", "free", "community", { fresh: "2026-11-17", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

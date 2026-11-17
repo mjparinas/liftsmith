@@ -74,6 +74,11 @@ const nextConfig: NextConfig = {
           // Coaches' programs and their ratings (src/server/programPage.ts); in the gym sitemap.
           { source: "/coach-programs/", destination: "/api/programs/page/" },
           { source: "/coach-programs/:p/", destination: "/api/programs/page/?p=:p" },
+          // The Liftsmith community: ideas, bugs, roadmap and changelog (src/server/communityPage.ts); in the gym sitemap.
+          { source: "/community/", destination: "/api/community/page/" },
+          { source: "/community/roadmap/", destination: "/api/community/page/?view=roadmap" },
+          { source: "/community/changelog/", destination: "/api/community/page/?view=changelog" },
+          { source: "/community/:p/", destination: "/api/community/page/?p=:p" },
         ],
       }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
@@ -93,6 +98,7 @@ const nextConfig: NextConfig = {
           { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/community/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),
   env: {

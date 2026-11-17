@@ -966,6 +966,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-15",
       },
+      {
+        id: "community",
+        name: "Community: ideas, bugs and roadmap",
+        body: "Suggest what Liftsmith should do next, vote for the ideas you want, report bugs with a screenshot only the team sees, and comment or @mention people. Each one shows where it is, from under review to shipped, and you hear when an idea you voted for ships. The roadmap and changelog are on the website too.",
+        tier: "free",
+        added: "2026-11-17",
+      },
     ],
   },
   {

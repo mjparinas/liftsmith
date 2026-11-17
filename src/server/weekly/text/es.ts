@@ -873,4 +873,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Avisarme, en el chat de cada club, apaga sus notificaciones, y un chat envía como mucho una por hora.",
   },
+  community: {
+    title: "Vota lo próximo que construimos",
+    intro: "Liftsmith ya tiene comunidad: sugiere ideas, vota las que quieres e informa de errores.",
+    points: [
+      "Abre Ajustes › Ayuda › Comunidad.",
+      "Toca la flecha junto a una idea para votarla. Las más pedidas suben arriba.",
+      "Informa de un error con una captura que solo ves tú y el equipo.",
+      "Cada publicación muestra en qué punto está, de En revisión a Publicada, y te avisamos cuando sale una idea que votaste.",
+    ],
+    dyk: "La hoja de ruta y el registro de cambios también están en la web, en getliftsmith.com/community.",
+  },
 };

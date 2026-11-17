@@ -16,6 +16,7 @@ export const TAB_ICONS: Record<string, IconName> = {
   "To Do": "check",
   Inbox: "mail",
   Reports: "flag",
+  Community: "lightbulb",
   Gyms: "gym",
   Traffic: "chart",
   Acquisition: "target",
@@ -35,7 +36,7 @@ export const TAB_ICONS: Record<string, IconName> = {
 
 /** The sections in groups, in the tab order: a label over each group in the sidebar. */
 export const TAB_GROUPS: readonly { label: string; tabs: readonly string[] }[] = [
-  { label: "Work", tabs: ["Overview", "To Do", "Inbox", "Reports", "Gyms"] },
+  { label: "Work", tabs: ["Overview", "To Do", "Inbox", "Reports", "Community", "Gyms"] },
   { label: "Numbers", tabs: ["Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Codes"] },
   { label: "People", tabs: ["Users", "Installs"] },
   { label: "Running", tabs: ["Flags", "Automations", "System", "Log"] },
