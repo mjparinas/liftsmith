@@ -67,7 +67,7 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
 
 /// Earned app icons (src/lib/themes.ts), iOS side (Android: AppIconPlugin.java, launcher aliases).
 /// The icon sets are AppIcon-<name> in Assets.xcassets, listed in ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES,
-/// drawn by scripts/make-theme-icons.py. iOS shows its own "You have changed the icon" alert; that can't be hidden.
+/// drawn by scripts/make-icons.mjs. iOS shows its own "You have changed the icon" alert; that can't be hidden.
 @objc(AppIconPlugin)
 public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "AppIconPlugin"
@@ -77,7 +77,7 @@ public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "get", returnType: CAPPluginReturnPromise),
     ]
 
-    static let icons = ["default", "forge", "glacier", "aurora", "royal"]
+    static let icons = ["default", "forge", "glacier", "aurora", "royal", "ember", "embergold"]
 
     @objc func set(_ call: CAPPluginCall) {
         let name = call.getString("name") ?? "default"

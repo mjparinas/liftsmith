@@ -9,10 +9,12 @@
 //     listing has its own join code, so "Train with me" opens the usual "Share my workouts" screen (coach.ts).
 import { randomBytes } from "node:crypto";
 
+import type { GymClass } from "@/lib/gymClasses";
 import { EXTRA_LIMITS, isEquipment, ISSUE_KINDS, type GymIssue, type GymNews, type GymTrainer, type IssueKind } from "@/lib/gymExtras";
 
 import { newCode, roleOf } from "./coach";
 import { query, rateLimit, run } from "./db";
+import { classesOf } from "./gymClasses";
 import { isPlaceId } from "./gymPlaces";
 import { canManage, managersOf } from "./gymStaff";
 import { checkText } from "./moderation";
@@ -268,13 +270,20 @@ export interface OwnerExtras {
   news: GymNews[];
   issues: GymIssue[];
   trainers: TrainerRow[];
+  /** The weekly class schedule (gymClasses.ts). */
+  classes: GymClass[];
 }
 
 export async function ownerExtras(accountId: string, placeId: unknown, now = Date.now()): Promise<OwnerExtras | null> {
   const p = await ownerOf(placeId);
   if (!p || !(await canManage(accountId, p.id))) return null;
-  const [news, issues, trainers] = await Promise.all([newsOf(p.id, now), issuesOf(p.id, now), trainersWhere(p.id, ["pending", "listed"])]);
-  return { news, issues, trainers };
+  const [news, issues, trainers, classes] = await Promise.all([
+    newsOf(p.id, now),
+    issuesOf(p.id, now),
+    trainersWhere(p.id, ["pending", "listed"]),
+    classesOf(p.id, now),
+  ]);
+  return { news, issues, trainers, classes };
 }
 
 /** Account deletion: their announcements and trainer listings go; their problem reports stay without them. */

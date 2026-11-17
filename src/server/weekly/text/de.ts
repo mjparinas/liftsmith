@@ -863,6 +863,61 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Im selben Bereich gibt es einen Schalter für Aufwärmsätze, für Tage, an denen du dich lieber selbst aufwärmst.",
   },
+  "club-chat": {
+    title: "Dein Club, zwischen den Trainings",
+    intro: "Clubs haben jetzt einen Chat und Crew-Trainings, damit die Leute, mit denen du trainierst, reden und sich verabreden können.",
+    points: [
+      "Öffne Freunde › Clubs, wähle einen Club und tippe auf Chat, um allen zu schreiben.",
+      "Plane ein Crew-Training mit Namen, Tag und Uhrzeit, und Mitglieder tippen auf Ich bin dabei.",
+      "Alle, die dabei sind, bekommen eine Stunde vorher eine Erinnerung.",
+      "Poste dein Training danach: Dann stehst du als trainiert da, mit den Freunden markiert, die mittrainiert haben.",
+    ],
+    dyk: "Benachrichtigen im Chat jedes Clubs schaltet seine Mitteilungen aus, und ein Chat schickt höchstens eine pro Stunde.",
+  },
+  community: {
+    title: "Stimm ab, was wir als Nächstes bauen",
+    intro: "Liftsmith hat jetzt eine Community: Schlag Ideen vor, stimm für die, die du willst, und melde Fehler.",
+    points: [
+      "Öffne Einstellungen › Hilfe › Community.",
+      "Tippe auf den Pfeil neben einer Idee, um dafür zu stimmen. Die gefragtesten steigen nach oben.",
+      "Melde einen Fehler mit einem Screenshot, den nur du und das Team seht.",
+      "Bei jedem Beitrag siehst du, wo er steht, von Wird geprüft bis Veröffentlicht, und du erfährst es, wenn eine Idee erscheint, für die du gestimmt hast.",
+    ],
+    dyk: "Roadmap und Änderungsprotokoll findest du auch auf der Website unter getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Check-ins mit Gewicht, Fotos und Verlauf",
+    intro: "Deine Check-in-Formulare können jetzt nach Körpergewicht und Fotos fragen und zeigen, wie sich jede Antwort entwickelt.",
+    points: [
+      "Füge eine Frage zum Körpergewicht hinzu: Sie startet beim letzten Wiegen und speichert das neue im Verlauf deiner Kundschaft.",
+      "Füge bis zu drei Fotofragen hinzu, etwa von vorne und von der Seite. Nur du siehst sie.",
+      "Schick ein Formular jede Woche, alle 2 Wochen oder alle 4 Wochen.",
+      "Der Bericht zeigt den Verlauf jeder Bewertung, jeder Zahl und des Gewichts und sagt Bescheid, wenn eine Bewertung fällt.",
+    ],
+    dyk: "Starte mit der neuen Vorlage Fortschritts-Check-in unter Coaching › Check-ins. Unter 18-Jährige werden nie nach Fotos gefragt.",
+  },
+  seasons: {
+    title: "Am Montag starten die Trainingssaisons",
+    intro: "Saison 1, Glut, startet am Montag: zehn Wochen, ein Pfad mit 20 Stufen und Belohnungen, die es nur diesen Winter gibt.",
+    points: [
+      "Du steigst auf, indem du dein eigenes Wochenziel erreichst. Tage darüber bringen nichts, zwei Tage pro Woche kommen also so schnell voran wie fünf.",
+      "Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und das Glut-Design mit App-Symbol, nur in dieser Saison und für immer deins.",
+      "Eine Woche verpasst? In der nächsten Zielwoche zählt der Bonus doppelt. Die letzte Woche zählt ganz doppelt.",
+      "Jede neue Bestleistung bringt mit einer Chance von 1 zu 6 die seltenen Scheiben der Saison.",
+    ],
+    dyk: "Du willst keine Saisons sehen? Schalte Trainingssaisons in Einstellungen › Aussehen und Bedienung aus. Dein Training zählt weiter.",
+  },
+  "gym-classes": {
+    title: "Dein Kursplan auf der Seite deines Studios",
+    intro: "Mitglieder sehen die Kurse der Woche auf der Seite deines Studios, in der App und auf der Website.",
+    points: [
+      "Lege jeden Kurs einmal an: Art, Tage, Beginn und Dauer. Tippen musst du fast nie.",
+      "Ergänze Trainer, Raum und einen kurzen Hinweis, etwa wie man bucht.",
+      "Feiertag? Tippe auf das Datum, und der Kurs erscheint an dem Tag als ausgefallen.",
+      "Mitglieder tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
+    ],
+    dyk: "Die Zeiten folgen der Uhr deines Studios: 18 Uhr bleibt für alle 18 Uhr. Buchungen bleiben bei dir.",
+  },
   "physio-protocols": {
     title: "Reha in Phasen, gesteuert vom Schmerz",
     intro:

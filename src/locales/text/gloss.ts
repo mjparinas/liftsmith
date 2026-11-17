@@ -115,6 +115,9 @@ export const en = {
   "gloss.crate.title": "Crates and the Locker",
   "gloss.crate.body":
     "Every finished workout gives you a crate on the Done screen. It holds one accent colour, rest timer sound or plate finish, picked at random: commons turn up most often and legendaries least.\nSome levels give a set item, and each new title gives a bonus crate, so even the rarest items have a sure path. Tap a locked item to see how to get it.\nIf you get something you already own, it turns into 25 bonus XP. Pick what you use here in the Locker.",
+  "gloss.season.title": "Training seasons",
+  "gloss.season.body":
+    "A season lasts about ten weeks and has a track of 20 tiers. You climb it with season points, earned by training toward your own weekly goal: a share for each training day, a bonus for meeting the goal, and more for weekly quests and three season challenges.\nDays past your goal earn nothing, so a lifter on two days a week climbs as fast as one on five, and rest is never wasted. After a missed week, meeting your goal pays the bonus twice, and the last week counts double.\nTiers bring season-only badges, an avatar, an accent and a theme with its app icon. They can only be earned during that season and stay yours after it ends. Each new season starts back at tier 0 with new rewards.",
   "gloss.badges.title": "Achievements and badges",
   "gloss.badges.body":
     "An achievement is a goal, like finishing workouts or setting personal bests. Each one has up to four badges, bronze, silver, gold and platinum, earned at bigger and bigger numbers.\nSome badges also unlock a colour theme for the app; the badge says which. Every badge gives XP, which raises your level.",
@@ -246,6 +249,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Cofres y la taquilla",
   "gloss.crate.body":
     "Cada entrenamiento terminado te da un cofre en la pantalla final. Trae un color de acento, un sonido del temporizador o un acabado de discos al azar: los comunes salen más a menudo y los legendarios menos.\nAlgunos niveles dan un objeto fijo y cada título nuevo da un cofre extra, así que hasta los objetos más raros tienen un camino seguro. Toca un objeto bloqueado para ver cómo conseguirlo.\nSi te toca algo que ya tienes, se convierte en 25 XP extra. Elige lo que usas aquí, en la taquilla.",
+  "gloss.season.title": "Temporadas de entrenamiento",
+  "gloss.season.body":
+    "Una temporada dura unas diez semanas y tiene un recorrido de 20 niveles. Subes con puntos de temporada, que ganas entrenando hacia tu propio objetivo semanal: una parte por cada día de entreno, un bonus por cumplir el objetivo y más por las misiones semanales y tres retos de temporada.\nLos días de más no dan puntos, así que quien entrena dos días a la semana sube igual de rápido que quien entrena cinco, y descansar nunca se pierde. Tras una semana fallada, cumplir el objetivo da el bonus doble, y la última semana cuenta doble.\nLos niveles dan insignias, un avatar, un color de acento y un tema con su icono que solo existen en esa temporada. Solo se ganan durante ella y siguen siendo tuyos al terminar. Cada temporada nueva empieza en el nivel 0 con premios nuevos.",
   "gloss.badges.title": "Logros e insignias",
   "gloss.badges.body":
     "Un logro es una meta, como terminar entrenamientos o batir marcas personales. Cada uno tiene hasta cuatro insignias, bronce, plata, oro y platino, que se ganan con cifras cada vez mayores.\nAlgunas insignias también desbloquean un tema de color para la app; la insignia dice cuál. Cada insignia da XP, que sube tu nivel.",
@@ -375,6 +381,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Coffres et vestiaire",
   "gloss.crate.body":
     "Chaque séance terminée vous donne un coffre sur l’écran de fin. Il contient une couleur d’accent, un son de minuteur ou une finition de disques, au hasard : les communs sortent le plus souvent, les légendaires le moins.\nCertains niveaux donnent un objet précis et chaque nouveau titre un coffre bonus : même les objets les plus rares ont un chemin sûr. Touchez un objet verrouillé pour voir comment l’obtenir.\nSi vous obtenez un objet que vous avez déjà, il devient 25 XP bonus. Choisissez ce que vous utilisez ici, dans le vestiaire.",
+  "gloss.season.title": "Saisons d'entraînement",
+  "gloss.season.body":
+    "Une saison dure une dizaine de semaines et propose un parcours de 20 paliers. Vous le grimpez avec des points de saison, gagnés en vous entraînant vers votre propre objectif hebdomadaire : une part pour chaque jour d'entraînement, un bonus quand l'objectif est atteint, et plus pour les quêtes de la semaine et trois défis de saison.\nLes jours en plus ne rapportent rien : à deux jours par semaine, on avance aussi vite qu'à cinq, et le repos n'est jamais perdu. Après une semaine manquée, atteindre l'objectif double le bonus, et la dernière semaine compte double.\nLes paliers donnent des badges, un avatar, une couleur d'accent et un thème avec son icône propres à la saison. Ils ne s'obtiennent que pendant celle-ci et restent à vous ensuite. Chaque nouvelle saison repart du palier 0 avec de nouvelles récompenses.",
   "gloss.badges.title": "Succès et badges",
   "gloss.badges.body":
     "Un succès est un objectif, comme terminer des séances ou battre des records personnels. Chacun a jusqu’à quatre badges, bronze, argent, or et platine, obtenus à des seuils de plus en plus hauts.\nCertains badges débloquent aussi un thème de couleur pour l’app ; le badge indique lequel. Chaque badge donne de l’XP, qui fait monter votre niveau.",
@@ -504,6 +513,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Kisten und Spind",
   "gloss.crate.body":
     "Jedes beendete Training gibt dir auf dem Abschlussbildschirm eine Kiste. Darin steckt zufällig eine Akzentfarbe, ein Pausentimer-Ton oder ein Scheiben-Finish: Gewöhnliches kommt am häufigsten, Legendäres am seltensten.\nManche Level geben ein festes Item und jeder neue Titel eine Bonuskiste, so haben auch die seltensten Items einen sicheren Weg. Tippe auf ein gesperrtes Item, um zu sehen, wie du es bekommst.\nBekommst du etwas, das du schon hast, wird es zu 25 Bonus-XP. Was du nutzt, wählst du hier im Spind.",
+  "gloss.season.title": "Trainingssaisons",
+  "gloss.season.body":
+    "Eine Saison dauert etwa zehn Wochen und hat einen Pfad mit 20 Stufen. Du steigst mit Saisonpunkten auf, die du bekommst, wenn du auf dein eigenes Wochenziel hin trainierst: einen Anteil für jeden Trainingstag, einen Bonus fürs erreichte Ziel und mehr für Wochenaufgaben und drei Saison-Challenges.\nTage über dem Ziel bringen nichts. Mit zwei Tagen pro Woche kommst du also genauso schnell voran wie mit fünf, und Pausen sind nie verschenkt. Nach einer verpassten Woche zählt der Bonus fürs Ziel doppelt, und die letzte Woche zählt ganz doppelt.\nDie Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und ein Design mit App-Symbol, die es nur in dieser Saison gibt. Du bekommst sie nur währenddessen, und sie bleiben danach deine. Jede neue Saison beginnt wieder bei Stufe 0 mit neuen Belohnungen.",
   "gloss.badges.title": "Erfolge und Abzeichen",
   "gloss.badges.body":
     "Ein Erfolg ist ein Ziel, zum Beispiel Trainings beenden oder persönliche Bestleistungen aufstellen. Jeder hat bis zu vier Abzeichen, Bronze, Silber, Gold und Platin, die du bei immer höheren Zahlen bekommst.\nManche Abzeichen schalten außerdem ein Farbdesign für die App frei; das Abzeichen sagt, welches. Jedes Abzeichen gibt XP, die dein Level erhöhen.",
@@ -633,6 +645,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Casse e armadietto",
   "gloss.crate.body":
     "Ogni allenamento finito ti dà una cassa nella schermata finale. Contiene a caso un colore d’accento, un suono del timer o una finitura dei dischi: i comuni escono più spesso, i leggendari meno.\nAlcuni livelli danno un oggetto preciso e ogni nuovo titolo una cassa bonus, così anche gli oggetti più rari hanno una strada sicura. Tocca un oggetto bloccato per vedere come ottenerlo.\nSe ricevi qualcosa che hai già, diventa 25 XP bonus. Scegli cosa usare qui, nell’armadietto.",
+  "gloss.season.title": "Stagioni di allenamento",
+  "gloss.season.body":
+    "Una stagione dura circa dieci settimane e ha un percorso di 20 livelli. Sali con i punti stagione, che guadagni allenandoti verso il tuo obiettivo settimanale: una parte per ogni giorno di allenamento, un bonus quando lo raggiungi e altro per le missioni settimanali e tre sfide di stagione.\nI giorni in più non danno punti: con due giorni a settimana sali veloce quanto con cinque, e il riposo non è mai sprecato. Dopo una settimana mancata, raggiungere l'obiettivo vale il bonus doppio, e l'ultima settimana vale doppio.\nI livelli danno badge, un avatar, un colore d'accento e un tema con la sua icona che esistono solo in quella stagione. Si ottengono solo durante la stagione e restano tuoi dopo. Ogni nuova stagione riparte dal livello 0 con nuovi premi.",
   "gloss.badges.title": "Traguardi e badge",
   "gloss.badges.body":
     "Un traguardo è un obiettivo, come finire allenamenti o battere record personali. Ognuno ha fino a quattro badge, bronzo, argento, oro e platino, che si ottengono con numeri sempre più alti.\nAlcuni badge sbloccano anche un tema di colore per l’app; il badge dice quale. Ogni badge dà XP, che fa salire il tuo livello.",
@@ -762,6 +777,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "クレートとロッカー",
   "gloss.crate.body":
     "ワークアウトを終えるたびに、完了画面でクレートが1個もらえます。中身はアクセントカラー、休憩タイマーの音、プレートの仕上げのどれかがランダムに入っています。コモンが最も出やすく、レジェンダリーが最も出にくくなっています。\n一部のレベルでは決まったアイテムが、新しい称号ごとにボーナスクレートがもらえるので、いちばん珍しいアイテムにも確実な入手方法があります。ロック中のアイテムをタップすると入手方法がわかります。\nすでに持っているものが出た場合は、25ボーナス XP になります。使うものはこのロッカーで選べます。",
+  "gloss.season.title": "トレーニングシーズン",
+  "gloss.season.body":
+    "シーズンは約10週間で、20ティアの道のりがあります。自分の週の目標に向けてトレーニングするとシーズンポイントがたまり、道のりを進めます。トレーニングした日ごとの分配、目標達成のボーナス、週のクエストと3つのシーズンチャレンジでポイントが入ります。\n目標を超えた日はポイントにならないので、週2日の人も週5日の人と同じ速さで進み、休んでも損はありません。目標に届かなかった週の次は目標ボーナスが2倍、最終週はすべて2倍です。\nティアではそのシーズンだけのバッジ、アバター、アクセントカラー、アプリアイコン付きのテーマがもらえます。シーズン中にしか手に入らず、終わった後も自分のものです。新しいシーズンはティア0から新しい報酬で始まります。",
   "gloss.badges.title": "実績とバッジ",
   "gloss.badges.body":
     "実績はワークアウトを終える、自己ベストを出すといった目標です。それぞれにブロンズ、シルバー、ゴールド、プラチナの最大4つのバッジがあり、数字が大きくなるごとにもらえます。\n一部のバッジはアプリのカラーテーマも解除します。どのテーマかはバッジに表示されます。どのバッジも XP がもらえ、レベルが上がります。",
@@ -891,6 +909,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Caixas e o Armário",
   "gloss.crate.body":
     "Cada treino concluído dá uma caixa na tela de Concluído. Ela traz uma cor de destaque, um som do timer de descanso ou um acabamento de anilha, sorteado: os comuns aparecem mais e os lendários, menos.\nAlguns níveis dão um item fixo, e cada novo título dá uma caixa bônus, então até os itens mais raros têm um caminho garantido. Toque num item bloqueado para ver como consegui-lo.\nSe vier algo que você já tem, vira 25 XP de bônus. Escolha o que usar aqui no Armário.",
+  "gloss.season.title": "Temporadas de treino",
+  "gloss.season.body":
+    "Uma temporada dura cerca de dez semanas e tem uma trilha de 20 níveis. Você sobe com pontos da temporada, ganhos treinando rumo à sua própria meta semanal: uma parte por dia de treino, um bônus ao bater a meta e mais pelas missões da semana e por três desafios da temporada.\nDias além da meta não dão pontos, então quem treina dois dias por semana sobe tão rápido quanto quem treina cinco, e descansar nunca é desperdício. Depois de uma semana perdida, bater a meta dá o bônus em dobro, e a última semana vale em dobro.\nOs níveis dão medalhas, um avatar, uma cor de destaque e um tema com ícone que só existem naquela temporada. Só se ganham durante ela e continuam seus depois. Cada temporada nova começa do nível 0 com recompensas novas.",
   "gloss.badges.title": "Conquistas e medalhas",
   "gloss.badges.body":
     "Uma conquista é uma meta, como concluir treinos ou bater recordes pessoais. Cada uma tem até quatro medalhas, bronze, prata, ouro e platina, ganhas em números cada vez maiores.\nAlgumas medalhas também desbloqueiam um tema de cores para o app; a medalha diz qual. Toda medalha dá XP, que sobe seu nível.",
@@ -1019,6 +1040,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "상자와 보관함",
   "gloss.crate.body":
     "운동을 마칠 때마다 완료 화면에서 상자를 하나 받아요. 상자에는 강조 색상, 휴식 타이머 소리, 원판 마감 중 하나가 무작위로 들어 있어요. 일반 아이템이 가장 자주, 전설 아이템이 가장 드물게 나와요.\n어떤 레벨에서는 정해진 아이템을 주고, 새 칭호마다 보너스 상자를 줘서 가장 희귀한 아이템도 확실히 얻을 방법이 있어요. 잠긴 아이템을 탭하면 얻는 방법을 볼 수 있어요.\n이미 가진 아이템이 나오면 보너스 25 XP로 바뀌어요. 쓸 아이템은 여기 보관함에서 고르세요.",
+  "gloss.season.title": "운동 시즌",
+  "gloss.season.body":
+    "시즌은 약 10주이고 20단계 트랙이 있어요. 내 주간 목표를 향해 운동하면 시즌 포인트가 쌓여 트랙을 올라가요. 운동한 날마다 나눠 받는 포인트, 목표 달성 보너스, 주간 퀘스트와 시즌 챌린지 3개로 포인트를 받아요.\n목표를 넘긴 날은 포인트가 없어서 주 2일 운동하는 사람도 주 5일만큼 빠르게 올라가고, 쉬어도 손해가 없어요. 목표를 놓친 다음 주에는 목표 보너스가 두 배, 마지막 주는 전부 두 배예요.\n단계마다 그 시즌에만 있는 배지, 아바타, 강조 색상, 앱 아이콘이 있는 테마를 받아요. 시즌 중에만 얻을 수 있고 시즌이 끝나도 내 것이에요. 새 시즌은 새 보상과 함께 0단계에서 시작해요.",
   "gloss.badges.title": "업적과 배지",
   "gloss.badges.body":
     "업적은 운동 완료나 개인 최고 기록 경신 같은 목표예요. 업적마다 브론즈, 실버, 골드, 플래티넘의 최대 네 개 배지가 있고, 숫자가 커질수록 다음 배지를 받아요.\n어떤 배지는 앱의 색상 테마도 열어 줘요. 배지에 표시돼 있어요. 모든 배지는 XP를 주고, XP가 쌓이면 레벨이 올라요.",
@@ -1147,6 +1171,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Sandıklar ve Dolap",
   "gloss.crate.body":
     "Biten her antrenman Bitti ekranında sana bir sandık verir. İçinde rastgele seçilmiş bir vurgu rengi, dinlenme sayacı sesi ya da plaka kaplaması vardır: yaygınlar en sık, efsaneviler en seyrek çıkar.\nBazı seviyeler belirli bir eşya verir ve her yeni unvan bonus bir sandık verir; böylece en nadir eşyaların bile kesin bir yolu vardır. Nasıl alınacağını görmek için kilitli bir eşyaya dokun.\nZaten sahip olduğun bir şey çıkarsa 25 bonus XP'ye dönüşür. Kullandıklarını burada, Dolap'ta seç.",
+  "gloss.season.title": "Antrenman sezonları",
+  "gloss.season.body":
+    "Bir sezon yaklaşık on hafta sürer ve 20 kademelik bir yolu vardır. Kendi haftalık hedefine doğru antrenman yaptıkça sezon puanı kazanır ve yolda ilerlersin: her antrenman günü için bir pay, hedefe ulaşınca bonus, haftalık görevler ve üç sezon meydan okuması için daha fazlası.\nHedefin üstündeki günler puan getirmez; haftada iki gün çalışan da beş gün çalışan kadar hızlı ilerler ve dinlenmek asla boşa gitmez. Kaçırılan bir haftadan sonra hedef bonusu iki kat, son hafta ise tamamen iki kat sayılır.\nKademeler yalnızca o sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir. Yalnızca sezon boyunca kazanılır ve sezon bitince de senin kalır. Her yeni sezon yeni ödüllerle 0. kademeden başlar.",
   "gloss.badges.title": "Başarımlar ve rozetler",
   "gloss.badges.body":
     "Başarım bir hedeftir, antrenman bitirmek ya da kişisel rekor kırmak gibi. Her birinin en fazla dört rozeti vardır: bronz, gümüş, altın ve platin; giderek büyüyen sayılarda kazanılır.\nBazı rozetler uygulama için bir renk teması da açar; rozet hangisi olduğunu söyler. Her rozet XP verir, bu da seviyeni yükseltir.",
@@ -1276,6 +1303,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "gloss.crate.title": "Skrzynki i Szafka",
   "gloss.crate.body":
     "Każdy ukończony trening daje skrzynkę na ekranie Gotowe. Zawiera jeden kolor akcentu, dźwięk minutnika przerwy albo wykończenie talerzy, wylosowane: zwykłe trafiają się najczęściej, a legendarne najrzadziej.\nNiektóre poziomy dają konkretny przedmiot, a każdy nowy tytuł daje dodatkową skrzynkę, więc nawet najrzadsze przedmioty mają pewną drogę. Stuknij zablokowany przedmiot, żeby zobaczyć, jak go zdobyć.\nJeśli dostaniesz coś, co już masz, zamienia się w 25 dodatkowych XP. Tutaj w Szafce wybierasz, czego używasz.",
+  "gloss.season.title": "Sezony treningowe",
+  "gloss.season.body":
+    "Sezon trwa około dziesięciu tygodni i ma ścieżkę z 20 poziomami. Wspinasz się po niej punktami sezonu, które zdobywasz, trenując w stronę własnego celu tygodniowego: część za każdy dzień treningu, bonus za osiągnięty cel i więcej za zadania tygodnia i trzy wyzwania sezonu.\nDni ponad cel nic nie dają, więc ktoś trenujący dwa dni w tygodniu awansuje tak szybko jak ktoś trenujący pięć, a odpoczynek nigdy się nie marnuje. Po nieudanym tygodniu bonus za cel liczy się podwójnie, a ostatni tydzień liczy się podwójnie w całości.\nPoziomy dają odznaki, awatar, kolor akcentu i motyw z ikoną aplikacji, które istnieją tylko w tym sezonie. Można je zdobyć tylko w jego trakcie i zostają Twoje po jego końcu. Każdy nowy sezon zaczyna się od poziomu 0 z nowymi nagrodami.",
   "gloss.badges.title": "Osiągnięcia i odznaki",
   "gloss.badges.body":
     "Osiągnięcie to cel, na przykład ukończone treningi albo rekordy życiowe. Każde ma do czterech odznak: brązową, srebrną, złotą i platynową, zdobywane przy coraz większych liczbach.\nNiektóre odznaki odblokowują też motyw kolorystyczny aplikacji; odznaka mówi który. Każda odznaka daje XP, które podnosi twój poziom.",

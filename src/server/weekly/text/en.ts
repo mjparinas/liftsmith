@@ -881,6 +881,61 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "The same section has a Warm-up sets switch, for days you'd rather warm up your own way.",
   },
+  "club-chat": {
+    title: "Your club, between workouts",
+    intro: "Clubs now have a chat and crew sessions, so the people you train with can talk and meet up.",
+    points: [
+      "Open Friends › Clubs, pick a club and tap Chat to message everyone in it.",
+      "Plan a crew session with a name, a day and a time, and members tap I'm in.",
+      "Everyone who's in gets a reminder an hour before.",
+      "Post your workout afterwards and you show as trained, with the friends you trained with tagged.",
+    ],
+    dyk: "Notify me in each club's chat turns its pushes off, and a chat sends at most one an hour.",
+  },
+  community: {
+    title: "Vote for what we build next",
+    intro: "Liftsmith has a community now: suggest ideas, vote for the ones you want and report bugs.",
+    points: [
+      "Open Settings › Help › Community.",
+      "Tap the arrow beside an idea to vote for it. The most wanted rise to the top.",
+      "Report a bug with a screenshot that only you and the team see.",
+      "Each post shows where it is, from Under review to Shipped, and you hear when an idea you voted for ships.",
+    ],
+    dyk: "The roadmap and changelog are on the website too, at getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Check-ins with weight, photos and trends",
+    intro: "Your check-in forms can now ask for body weight and photos, and show how each answer is moving.",
+    points: [
+      "Add a Body weight question: it fills in from the client's last weigh-in and saves the new one to their log.",
+      "Add up to three Photo questions, like front and side. Only you see them.",
+      "Send a form every week, every 2 weeks or every 4 weeks.",
+      "Each client's report shows the trend of every score, number and weight, and says when a score drops.",
+    ],
+    dyk: "Start from the new Progress check-in template in Coaching › Check-ins. Clients under 18 are never asked for photos.",
+  },
+  seasons: {
+    title: "Training seasons start Monday",
+    intro: "Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.",
+    points: [
+      "You climb by meeting your own weekly goal. Days past it earn nothing, so two days a week climbs as fast as five.",
+      "Tiers bring season-only badges, an avatar, an accent and the Ember theme with its app icon, yours to keep.",
+      "Miss a week and the next goal week pays its bonus twice. The last week counts double.",
+      "Every new best has a 1 in 6 chance to drop the season's rare plates.",
+    ],
+    dyk: "Rather not see seasons? Turn off Training seasons in Settings › Look and feel. Your training still counts.",
+  },
+  "gym-classes": {
+    title: "Put your class schedule on your gym's page",
+    intro: "Members can see this week's classes on your gym's page, in the app and on the website.",
+    points: [
+      "Add each class once: its type, days, start time and length. Most need no typing at all.",
+      "Add the instructor, the room and a short note, like how to book.",
+      "Off for a holiday? Tap the date and the class shows as not running that day.",
+      "Members add the next class to their calendar in one tap.",
+    ],
+    dyk: "Times are your gym's own clock, so members see 6 PM as 6 PM. Bookings stay with you.",
+  },
   "physio-protocols": {
     title: "Rehab in phases, moved by pain",
     intro: "Each rehab program now has three phases, from calming the area to full use, and a plain pain rule that says when to move.",

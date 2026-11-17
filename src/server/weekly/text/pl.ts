@@ -860,6 +860,61 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "W tej samej sekcji jest przełącznik Serie rozgrzewkowe, na dni, gdy wolisz rozgrzać się po swojemu.",
   },
+  "club-chat": {
+    title: "Twój klub, między treningami",
+    intro: "Kluby mają teraz czat i treningi ekipy, więc osoby, z którymi trenujesz, mogą rozmawiać i się umawiać.",
+    points: [
+      "Otwórz Znajomi › Kluby, wybierz klub i dotknij Czat, aby napisać do wszystkich.",
+      "Zaplanuj trening ekipy z nazwą, dniem i godziną, a członkowie dotykają Wchodzę.",
+      "Każdy, kto idzie, dostaje przypomnienie godzinę wcześniej.",
+      "Po treningu opublikuj go: pojawisz się jako po treningu, a znajomi, z którymi ćwiczysz, zostaną oznaczeni.",
+    ],
+    dyk: "Powiadamiaj mnie w czacie każdego klubu wyłącza jego powiadomienia, a czat wysyła najwyżej jedno na godzinę.",
+  },
+  community: {
+    title: "Zagłosuj, co zbudujemy dalej",
+    intro: "Liftsmith ma teraz społeczność: proponuj pomysły, głosuj na te, które chcesz, i zgłaszaj błędy.",
+    points: [
+      "Otwórz Ustawienia › Pomoc › Społeczność.",
+      "Stuknij strzałkę obok pomysłu, by na niego zagłosować. Najbardziej chciane idą na górę.",
+      "Zgłoś błąd ze zrzutem ekranu, który widzisz tylko ty i zespół.",
+      "Przy każdym wpisie widać, na jakim jest etapie, od Analizowane do Wydane, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie.",
+    ],
+    dyk: "Plan rozwoju i lista zmian są też na stronie, pod adresem getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Kontrole z wagą, zdjęciami i trendami",
+    intro: "Twoje formularze kontrolne mogą teraz pytać o masę ciała i zdjęcia oraz pokazywać, jak zmienia się każda odpowiedź.",
+    points: [
+      "Dodaj pytanie o masę ciała: wypełnia się z ostatniego ważenia klienta i zapisuje nowe w jego dzienniku.",
+      "Dodaj do trzech pytań ze zdjęciem, na przykład z przodu i z boku. Widzisz je tylko Ty.",
+      "Wysyłaj formularz co tydzień, co 2 tygodnie lub co 4 tygodnie.",
+      "Raport każdego klienta pokazuje trend każdej oceny, liczby i wagi oraz mówi, gdy ocena spada.",
+    ],
+    dyk: "Zacznij od nowego szablonu Kontrola postępów w Trenowanie › Ankiety. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
+  },
+  seasons: {
+    title: "Sezony treningowe startują w poniedziałek",
+    intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",
+    points: [
+      "Awansujesz, osiągając własny cel tygodniowy. Dni ponad cel nic nie dają, więc dwa dni w tygodniu awansują tak szybko jak pięć.",
+      "Poziomy dają odznaki, awatar, kolor akcentu i motyw Żar z ikoną aplikacji, tylko z tego sezonu i Twoje na zawsze.",
+      "Opuściłeś tydzień? Następny tydzień z osiągniętym celem daje podwójny bonus. Ostatni tydzień liczy się podwójnie.",
+      "Każdy nowy rekord ma szansę 1 na 6 na rzadkie talerze sezonu.",
+    ],
+    dyk: "Wolisz nie widzieć sezonów? Wyłącz Sezony treningowe w Ustawienia › Wygląd. Twój trening nadal się liczy.",
+  },
+  "gym-classes": {
+    title: "Grafik zajęć na stronie Twojej siłowni",
+    intro: "Bywalcy widzą zajęcia na ten tydzień na stronie siłowni, w aplikacji i na stronie internetowej.",
+    points: [
+      "Dodaj każde zajęcia raz: rodzaj, dni, godzinę i czas trwania. Prawie nic nie trzeba pisać.",
+      "Dopisz instruktora, salę i krótką uwagę, na przykład jak się zapisać.",
+      "Zamknięte w święto? Dotknij daty, a zajęcia pokażą się jako odwołane tego dnia.",
+      "Najbliższe zajęcia dodaje się do kalendarza jednym dotknięciem.",
+    ],
+    dyk: "Godziny są według zegara siłowni, więc 18:00 to 18:00 dla wszystkich. Zapisy zostają u Ciebie.",
+  },
   "physio-protocols": {
     title: "Rehabilitacja etapami, prowadzona przez ból",
     intro:

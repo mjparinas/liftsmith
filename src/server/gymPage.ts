@@ -5,6 +5,7 @@
 //   /gyms/<city>/<gym>/         one gym: address, map links, opening hours, equipment, lifters, add it to the app
 // They're for search and for the QR posters (step 4), so the facts come first and every page says how to add the gym.
 // Text: src/locales/text/gp.ts (gp.*), in the reader's language. Map credit: OpenStreetMap (ODbL).
+import { endTime, timetable, type GymClass } from "@/lib/gymClasses";
 import { money, PRICE_KINDS, type Prices } from "@/lib/gymExtras";
 import { decodeGym } from "@/lib/gymShare";
 import { readStarter } from "@/lib/gymStarter";
@@ -296,7 +297,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${reportLink}${credit}</main>`;
+<div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${classesHtml(p.classes ?? [], lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${reportLink}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, gymIndexable(p)), body, GYM_STYLE, "gym");
 }
 
@@ -305,6 +306,40 @@ export function priceLines(prices: Prices, lang: MsgLang): string[] {
   return PRICE_KINDS.flatMap((k) =>
     prices[k] === undefined ? [] : [say(lang, `gp.price.${k}`, { price: money(prices[k], prices.currency, lang) })],
   );
+}
+
+// --- Class schedule (gymClasses.ts) ---
+
+/** "6:00 PM" or "18:00" in the reader's language, for a time on the gym's own clock. */
+const classClock = (hhmm: string, lang: MsgLang) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  return new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(
+    Date.UTC(2024, 0, 1, h ?? 0, m ?? 0),
+  );
+};
+
+/** The gym's week of classes, Monday first; dates off show under the class until they're past. */
+export function classesHtml(classes: readonly GymClass[], lang: MsgLang): string {
+  if (!classes.length) return "";
+  const names = dayNames(lang);
+  const days = timetable(classes)
+    .map(({ weekday, classes: list }) => {
+      const items = list
+        .map((c) => {
+          const sub = [say(lang, `gp.classKind.${c.kind}` as GpKey), c.coach ? say(lang, "gp.classWith", { name: c.coach }) : "", c.room]
+            .filter(Boolean)
+            .join(" · ");
+          const off = c.off.length
+            ? `<p class="muted small">${esc(say(lang, "gp.classOffOn", { dates: new Intl.ListFormat(lang).format(c.off.map((d) => dayName(Date.parse(`${d}T12:00:00Z`), lang))) }))}</p>`
+            : "";
+          return `<li><span class="cl-time">${esc(`${classClock(c.start, lang)}–${classClock(endTime(c.start, c.minutes), lang)}`)}</span><span><span class="li-name">${esc(c.name)}</span><span class="muted small cl-sub">${esc(sub)}</span>${c.note ? `<span class="cl-note">${esc(c.note)}</span>` : ""}${off}</span></li>`;
+        })
+        .join("");
+      // dayNames counts Monday as 0; a class's weekday counts Sunday as 0.
+      return `<div class="cl-day"><h3>${esc(names[(weekday + 6) % 7]!)}</h3><ul class="classes">${items}</ul></div>`;
+    })
+    .join("");
+  return `<section class="card" aria-labelledby="classes-h"><h2 id="classes-h">${icon("calendar", 16)}${esc(say(lang, "gp.classesTitle"))}</h2><p class="muted small">${esc(say(lang, "gp.classesLocal"))} ${esc(say(lang, "gp.classBook"))}</p>${days}</section>`;
 }
 
 const dayName = (at: number, lang: MsgLang) =>
@@ -437,4 +472,8 @@ export const GYM_STYLE = `
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}
 .db{margin-top:12px}.claim{border-style:dashed}
 .credit{margin-top:24px;font-size:.75rem;color:var(--faint)}
-.report-link{margin-top:16px}.report-link .quiet{gap:6px}`;
+.report-link{margin-top:16px}.report-link .quiet{gap:6px}
+.cl-day{margin-top:12px}.cl-day h3{margin:0 0 6px;font-size:.875rem}.classes{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.classes li{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line)}.classes li:first-child{border-top:0;padding-top:0}
+.classes li>span:last-child{display:flex;flex-direction:column;gap:2px;min-width:0}.cl-time{flex:0 0 7.5rem;font-variant-numeric:tabular-nums;color:var(--muted)}
+.cl-note{font-size:.875rem;overflow-wrap:anywhere}.cl-sub{overflow-wrap:anywhere}`;

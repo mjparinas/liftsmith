@@ -591,6 +591,7 @@ function ClientScreen({ id }: { id: string }) {
         forms={checkins.forms ?? []}
         checkins={checkins.checkins ?? []}
         repeat={checkins.repeat ?? null}
+        teen={teen}
         onChange={() => setVersion((n) => n + 1)}
       />
       <ClientTargets

@@ -9,6 +9,7 @@ import { allDay, parseHours } from "@/lib/openingHours";
 import { SITE_URL } from "@/lib/site";
 import { EQUIPMENT_LABEL } from "@/lib/types";
 
+import { ClassSchedule } from "./GymClasses";
 import { priceText } from "./GymExtras";
 import { StarterCard } from "./GymStaff";
 import { Icon, type IconName } from "./icons";
@@ -103,6 +104,7 @@ export function PlaceDetails({ place }: { place: Place }) {
         </Section>
       )}
       {place.starter && <StarterCard code={place.starter} />}
+      <ClassSchedule classes={place.classes} gymName={place.name} />
       <Section title={t("gp.hours")}>
         <div className="card p-4">
           <Hours raw={place.hours} />

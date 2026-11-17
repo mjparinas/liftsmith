@@ -17,7 +17,7 @@
 // "status" (`status`, `until`: src/lib/coachStatus.ts), "typing" (`id`) and "send" with `sticker` (src/lib/stickers.ts).
 // Every GET marks you active (Online on Automatic; coachPresence.ts).
 // Check-ins (coachForms.ts): "form" (save a form: `form`), "deleteForm" (`id`), "sendForm" (`client`, `id`),
-// "repeatForm" (`client`, `id`, or no `id` to stop) and "answer" (the client: `id`, `answers`); GET ?checkin=<id> is
+// "repeatForm" (`client`, `id` and `every` 7, 14 or 28 days, or no `id` to stop) and "answer" (the client: `id`, `answers`); GET ?checkin=<id> is
 // one of the client's to fill in. The overview adds the coach's `forms` and the client's waiting `checkins`, and a
 // client's view adds `checkins`, `repeat` and the coach's `forms`.
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
@@ -146,6 +146,7 @@ export async function POST(req: Request) {
         protein?: unknown;
         form?: unknown;
         answers?: unknown;
+        every?: unknown;
         role?: unknown;
         slot?: Record<string, unknown>;
         label?: unknown;
@@ -207,7 +208,7 @@ export async function POST(req: Request) {
       const r =
         body.action === "sendForm"
           ? await sendForm(s.accountId, body.client, body.id)
-          : await setRepeat(s.accountId, body.client, body.id ?? null);
+          : await setRepeat(s.accountId, body.client, body.id ?? null, Date.now(), body.every);
       if (r && "error" in r) return reply(req, r.error === "notClient" ? 404 : 400, r);
       return reply(req, 200, body.action === "sendForm" ? { checkin: r } : { repeat: r });
     }

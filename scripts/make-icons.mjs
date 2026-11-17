@@ -47,6 +47,9 @@ const PALETTES = {
   glacier: { bg: "#08121a", glow: "#5fd4ff", stops: ["#c8f2ff", "#84dcff", "#3fc4ff"] },
   aurora: { bg: "#0b0d18", glow: "#3ee0a8", stops: ["#3ee0a8", "#64a6d4", "#8b6bff"] },
   royal: { bg: "#120b1b", glow: "#e0a42a", stops: ["#ffe08a", "#f0c25a", "#e0a42a"] },
+  // Season 1, Ember (src/lib/seasons.ts): the free track's icon and the Pro bonus row's.
+  ember: { bg: "#140a07", glow: "#ff6a3d", stops: ["#ffc06a", "#ff7a3d", "#e8402a"] },
+  embergold: { bg: "#130d06", glow: "#ffb02e", stops: ["#fff0b0", "#ffcf5a", "#ff9a1f"] },
 };
 const TINT_STOPS = ["#ffffff", "#f2f2f2", "#d9d9d9"];
 
@@ -190,6 +193,18 @@ async function main() {
   const browser = await chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
   page = await browser.newPage();
   const p = PALETTES.default;
+
+  // ONLY=ember,embergold draws just those theme icons (a new season's), leaving every other file as it is.
+  if (process.env.ONLY) {
+    for (const name of process.env.ONLY.split(",")) {
+      const tp = PALETTES[name];
+      if (!tp || name === "default") throw new Error(`No theme icon called ${name}`);
+      await androidSet(`ic_launcher_${name}`, tp, { legacy: false });
+      await iosSet(`AppIcon-${name}.appiconset`, "icon", tp);
+    }
+    await browser.close();
+    return;
+  }
 
   // Web.
   write(path.join(PUB, "icon.svg"), svg(p, { radius: 224 }).replace(/ width="1024" height="1024"/, "") + "\n");

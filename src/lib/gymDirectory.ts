@@ -6,6 +6,7 @@
 import { api, AuthError, readAccount } from "./auth";
 import { makeGym } from "./defaults";
 import { locate } from "./geo";
+import type { GymClass } from "./gymClasses";
 import type { Amenity, GymIssue, GymNews, GymTrainer, Prices } from "./gymExtras";
 import type { PlaceReportReason } from "./gymPlaceReport";
 import { decodeGym, encodeGym, kitOf, type GymKit } from "./gymShare";
@@ -63,6 +64,8 @@ export interface Place {
   news?: GymNews[];
   issues?: GymIssue[];
   trainers?: GymTrainer[];
+  /** Its weekly class schedule (gymClasses.ts), official gyms only; missing from servers older than 2026-11-17. */
+  classes?: GymClass[];
   /** The gym's starter program for new members (a routine share code, gymStarter.ts); missing or '' when it has none. */
   starter?: string;
 }

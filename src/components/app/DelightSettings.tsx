@@ -19,7 +19,7 @@ import {
 import { inSentence, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
-import { APP_ICONS, appIconSupported, setAppIcon, THEMES, unlockContext, unlocked } from "@/lib/themes";
+import { APP_ICONS, appIconSupported, setAppIcon, THEMES, themeShown, unlockContext, unlocked } from "@/lib/themes";
 import type { DelightPrefs } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { say, voiceSupported } from "@/lib/voice";
@@ -85,7 +85,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
         <h2 className={`mb-2 px-1 ${SECTION_LABEL}`}>{t("delight.themes")}</h2>
         {light && <p className="mb-2 px-1 text-sm text-muted">{t("delight.lightNote")}</p>}
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9.5rem),1fr))] gap-2">
-          {THEMES.map((th) => {
+          {THEMES.filter((th) => themeShown(th, ctx)).map((th) => {
             const open = unlocked(th, ctx);
             const on = (d.theme ?? "midnight") === th.id;
             return (
@@ -124,7 +124,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
       {appIconSupported() && (
         <Section title={t("delight.icon")}>
           <div className="flex flex-wrap gap-2">
-            {APP_ICONS.map(({ id, theme }) => {
+            {APP_ICONS.filter(({ theme }) => themeShown(theme, ctx)).map(({ id, theme }) => {
               const open = unlocked(theme, ctx);
               return (
                 <Chip

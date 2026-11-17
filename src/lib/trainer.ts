@@ -957,6 +957,8 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       return { title: t("trn.f.payFailed"), advice: t("trn.f.payFailedDo"), tone: "warn" };
     case "checkinLow":
       return { title: t("trn.f.checkinLow", { label: f.label, value: f.value }), advice: t("trn.f.checkinLowDo"), tone: "warn" };
+    case "checkinDrop":
+      return { title: t("chk.f.drop", { label: f.label, from: f.from, to: f.to }), advice: t("chk.f.dropDo"), tone: "warn" };
     case "feelLow":
       return { title: t(f.unwell ? "trn.f.unwell" : "trn.f.feelLow"), advice: t("trn.f.feelLowDo"), tone: "warn" };
     case "sleepShort":

@@ -310,6 +310,10 @@ export const es: FeaturesText = {
       name: "Cuentas de personal para gimnasios",
       body: "El propietario de un gimnasio oficial invita a gerentes y personal de recepción con un enlace de un solo uso. Cada uno usa su propia cuenta para mantener al día la página, los avisos y los problemas reportados.",
     },
+    "gym-classes": {
+      name: "Horarios de clases en las páginas de gimnasios",
+      body: "Los gimnasios oficiales publican las clases que dan cada semana, con instructor y sala, y marcan los días que no hay clase. Quienes entrenan allí ven la semana en la página del gimnasio en la app y la web, y añaden la próxima clase a su calendario con un toque.",
+    },
     "gym-starter": {
       name: "Programas de inicio de los gimnasios",
       body: "Los gimnasios oficiales sugieren un programa a quienes empiezan en su página de la app y la web, y se guarda con un toque. Liftsmith pone los pesos de cada persona.",
@@ -339,6 +343,11 @@ export const es: FeaturesText = {
     challenges: {
       name: "Retos, clubes y clasificaciones",
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
+    },
+    "club-chat": {
+      name: "Chat del club y sesiones en grupo",
+      body: "Habla con tu club entre entrenamientos, propón una hora y un sitio para entrenar juntos y mira quién se apunta. Quien se apunte recibe un recordatorio una hora antes, y al publicar tu entrenamiento después apareces como que entrenaste, con los amigos que entrenaron contigo etiquetados.",
+      note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra los mensajes nuevos mientras el chat está abierto.",
     },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
     "tagline-gym": {
@@ -389,6 +398,10 @@ export const es: FeaturesText = {
     "coach-checkins": {
       name: "Formularios de revisión y cuestionarios",
       body: "Envía a tus clientes una revisión semanal, un cuestionario inicial o tu propio formulario, una vez o cada semana. Responden con unos toques, y una puntuación baja o una respuesta tardía aparece arriba en su informe.",
+    },
+    "coach-checkin-trends": {
+      name: "Revisiones de progreso con peso, fotos y tendencias",
+      body: "Añade preguntas de peso corporal y de foto a cualquier formulario y envíalo cada semana, cada 2 semanas o cada 4. El peso se rellena con el último pesaje del cliente, las fotos solo las ves tú y la tendencia de cada respuesta aparece en su informe. A los menores de 18 nunca se les piden fotos.",
     },
     "coach-roles": {
       name: "Para entrenadores personales y coaches",
@@ -444,6 +457,12 @@ export const es: FeaturesText = {
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",
+    },
+    seasons: {
+      name: "Temporadas de entrenamiento",
+      body: "Temporadas de diez semanas con un recorrido de 20 niveles que subes entrenando hacia tu propio objetivo semanal: dos días a la semana avanzan igual que cinco y los días de más no suman. Los niveles dan insignias, un avatar, un color de acento y un tema con su icono exclusivos de la temporada, tuyos para siempre. Retos de temporada, un botín raro por nuevas marcas, estrellas de prestigio, una semana de recuperación tras un fallo, un final con puntos dobles y un resumen para compartir.",
+      proPart: "Todos los niveles y sus premios son gratis; Pro añade un premio extra en tres niveles.",
+      note: "Los iconos de temporada están en Android y iPhone; la web recibe el tema. Las temporadas se pueden desactivar en Ajustes.",
     },
     locker: {
       name: "Temas, colores e iconos de la app",
@@ -508,6 +527,10 @@ export const es: FeaturesText = {
     "strength-standards": {
       name: "Estándares de fuerza de levantadores reales",
       body: "La web muestra cuánto levantan de verdad en sentadilla, press de banca, peso muerto y press militar, por sexo y peso corporal, calculado cada día con quienes cuentan. Solo se muestran grupos de 30 o más, en percentiles, nunca los números de nadie. Un interruptor en Ajustes › Tus datos y privacidad decide si cuentas; los menores de 18 nunca cuentan.",
+    },
+    community: {
+      name: "Comunidad: ideas, errores y hoja de ruta",
+      body: "Sugiere lo próximo que debería hacer Liftsmith, vota las ideas que quieres, informa de errores con una captura que solo ve el equipo, y comenta o menciona a otros con @. Cada una muestra en qué punto está, de en revisión a publicada, y te avisamos cuando sale una idea que votaste. La hoja de ruta y el registro de cambios también están en la web.",
     },
     languages: {
       name: "Diez idiomas",

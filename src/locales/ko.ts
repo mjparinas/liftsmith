@@ -25,6 +25,7 @@ import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as chk from "./text/chk";
+import * as cmty from "./text/cmty";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -32,6 +33,7 @@ import * as count from "./text/count";
 import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
+import * as crew from "./text/crew";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
@@ -114,6 +116,7 @@ import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
 import * as social from "./text/social";
+import * as ssn from "./text/ssn";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -157,6 +160,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...bmi.ko,
   ...body.ko,
   ...buddy.ko,
+  ...crew.ko,
   ...buy.ko,
   ...cal.ko,
   ...calc.ko,
@@ -166,6 +170,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...cause.ko,
   ...chk.ko,
   ...coach.ko,
+  ...cmty.ko,
   ...conn.ko,
   ...cos.ko,
   ...count.ko,
@@ -245,6 +250,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...save.ko,
   ...sband.ko,
   ...sea.ko,
+  ...ssn.ko,
   ...settings.ko,
   ...setup.ko,
   ...share.ko,

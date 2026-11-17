@@ -308,6 +308,10 @@ export const it: FeaturesText = {
       name: "Account dello staff per le palestre",
       body: "Il titolare di una palestra ufficiale invita responsabili e reception con un link monouso. Ognuno usa il proprio account per tenere aggiornati la pagina, gli annunci e i problemi segnalati.",
     },
+    "gym-classes": {
+      name: "Orari dei corsi sulle pagine delle palestre",
+      body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
+    },
     "gym-starter": {
       name: "Programmi per iniziare delle palestre",
       body: "Le palestre ufficiali suggeriscono un programma ai nuovi iscritti sulla loro pagina nell’app e sul web, salvabile con un tocco. Liftsmith mette i pesi di ciascuno.",
@@ -337,6 +341,11 @@ export const it: FeaturesText = {
     challenges: {
       name: "Sfide, club e classifiche",
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
+    },
+    "club-chat": {
+      name: "Chat del club e allenamenti di gruppo",
+      body: "Parla con il tuo club tra un allenamento e l’altro, proponi un orario e un posto per allenarvi insieme e guarda chi c’è. Chi partecipa riceve un promemoria un’ora prima, e pubblicando l’allenamento dopo risulti allenato, con gli amici che erano con te taggati.",
+      note: "Per chi ha almeno 18 anni. Le notifiche sono su Android e iPhone; l’app web mostra i nuovi messaggi mentre la chat è aperta.",
     },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
     "tagline-gym": {
@@ -387,6 +396,10 @@ export const it: FeaturesText = {
     "coach-checkins": {
       name: "Moduli di check-in e questionari",
       body: "Invia ai clienti un check-in settimanale, un questionario iniziale o un tuo modulo, una volta o ogni settimana. Rispondono con pochi tocchi, e un punteggio basso o una risposta in ritardo finisce in cima al loro report.",
+    },
+    "coach-checkin-trends": {
+      name: "Check-in dei progressi con peso, foto e andamento",
+      body: "Aggiungi domande sul peso corporeo e con foto a qualsiasi modulo, e invialo ogni settimana, ogni 2 o ogni 4 settimane. Il peso parte dall'ultima pesata del cliente, le foto arrivano solo a te e l'andamento di ogni risposta compare nel suo report. Ai minori di 18 anni non si chiedono mai foto.",
     },
     "coach-roles": {
       name: "Per personal trainer e coach",
@@ -442,6 +455,12 @@ export const it: FeaturesText = {
     awards: {
       name: "Obiettivi, livelli e serie di giorni",
       body: "Badge a livelli, 50 livelli con ricompense, missioni settimanali, protezioni della serie e leghe oneste.",
+    },
+    seasons: {
+      name: "Stagioni di allenamento",
+      body: "Stagioni di dieci settimane con un percorso di 20 livelli che sali allenandoti verso il tuo obiettivo settimanale: due giorni a settimana salgono veloci quanto cinque e i giorni in più non danno punti. I livelli danno badge, un avatar, un colore d'accento e un tema con la sua icona esclusivi della stagione, tuoi per sempre. Sfide di stagione, un bottino raro dai nuovi record, stelle prestigio, una settimana di recupero dopo un passo falso, un finale a punti doppi e un riepilogo da condividere.",
+      proPart: "Tutti i livelli e i loro premi sono gratis; Pro aggiunge un premio bonus su tre livelli.",
+      note: "Le icone di stagione sono su Android e iPhone; il web riceve il tema. Le stagioni si possono disattivare nelle Impostazioni.",
     },
     locker: {
       name: "Temi, colori e icone dell’app",
@@ -506,6 +525,10 @@ export const it: FeaturesText = {
     "strength-standards": {
       name: "Standard di forza da atleti veri",
       body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
+    },
+    community: {
+      name: "Community: idee, bug e roadmap",
+      body: "Suggerisci cosa dovrebbe fare Liftsmith, vota le idee che vuoi, segnala i bug con uno screenshot che vede solo il team e commenta o menziona qualcuno con @. Ognuna mostra a che punto è, da in valutazione a rilasciata, e ti avvisiamo quando esce un'idea che hai votato. Roadmap e registro delle modifiche sono anche sul sito.",
     },
     languages: {
       name: "Dieci lingue",

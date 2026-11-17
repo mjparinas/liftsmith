@@ -5,6 +5,7 @@ import { exercise, EXERCISE_BY_ID } from "./exercises";
 import type { Game } from "./game";
 import { date, num, t } from "./i18n";
 import { fmtTonnage, type AnniversaryLook } from "./moments";
+import { kitName, type SeasonState } from "./seasons";
 import type { CardData } from "./shareImage";
 import { SITE_URL } from "./site";
 import { MUSCLE_LABEL, type AppEvent, type Muscle, type SetEvent, type Unit } from "./types";
@@ -151,6 +152,33 @@ export function badgeShare(a: Achievement, tier: Tier, ctx: ShareContext): Share
       medal: { icon: a.icon, colour: TIER_HEX[tier] },
       tiles: [],
       lines: [],
+      footer: footer(ctx.game),
+      accent: ctx.accent,
+      name: o.name,
+    }),
+  };
+}
+
+/** The season recap (seasons.ts): the tier reached, points, workouts, new bests and the best week. */
+export function seasonShare(s: SeasonState, workouts: number, ctx: ShareContext): Shareable {
+  const best = Math.max(0, ...s.weeks.map((w) => w.total));
+  const prs = s.challenges.find((c) => c.id === "prs");
+  return {
+    id: `season-${s.def.id}`,
+    kind: "recap",
+    label: t("ssn.card.pick"),
+    file: `liftsmith-season-${s.n}`,
+    card: (o) => ({
+      kicker: t("ssn.kicker", { n: s.n }),
+      headline: kitName(s.kit.id),
+      big: { value: t("ssn.tierN", { tier: s.tier }), label: t("ssn.points", { n: num(s.points) }) },
+      medal: { icon: "🔥", colour: s.kit.cardHex },
+      tiles: [
+        [t("ssn.card.workouts"), fmtNum(workouts)],
+        [t("ssn.card.prs"), fmtNum(prs?.have ?? 0)],
+        [t("ssn.card.best"), num(best)],
+      ],
+      lines: s.prestige > 0 ? [t("ssn.prestige", { count: s.prestige })] : [],
       footer: footer(ctx.game),
       accent: ctx.accent,
       name: o.name,

@@ -314,6 +314,10 @@ export const de: FeaturesText = {
       name: "Teamkonten für Studios",
       body: "Der Inhaber eines offiziellen Studios lädt Leitung und Empfangsteam mit einem Einmal-Link ein. Alle halten mit ihrem eigenen Konto die Seite, Ankündigungen und gemeldete Probleme aktuell.",
     },
+    "gym-classes": {
+      name: "Kurspläne auf Studioseiten",
+      body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
+    },
     "gym-starter": {
       name: "Einsteigerprogramme der Studios",
       body: "Offizielle Studios empfehlen neuen Mitgliedern ein Programm auf ihrer Seite in der App und im Web, mit einem Tippen gespeichert. Liftsmith setzt die eigenen Gewichte ein.",
@@ -343,6 +347,11 @@ export const de: FeaturesText = {
     challenges: {
       name: "Challenges, Clubs und Bestenlisten",
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
+    },
+    "club-chat": {
+      name: "Club-Chat und Crew-Trainings",
+      body: "Schreib mit deinem Club zwischen den Trainings, schlag eine Zeit und einen Ort für ein gemeinsames Training vor und sieh, wer dabei ist. Alle, die dabei sind, bekommen eine Stunde vorher eine Erinnerung, und wer danach sein Training postet, steht als trainiert da, mit den Freunden markiert, die mittrainiert haben.",
+      note: "Ab 18 Jahren. Mitteilungen gibt es auf Android und dem iPhone; die Web-App zeigt neue Nachrichten, solange der Chat offen ist.",
     },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
     "tagline-gym": {
@@ -393,6 +402,10 @@ export const de: FeaturesText = {
     "coach-checkins": {
       name: "Check-in-Formulare und Fragebögen",
       body: "Schick Kunden einen wöchentlichen Check-in, einen Aufnahmefragebogen oder dein eigenes Formular, einmal oder jede Woche. Sie antworten mit wenigen Tipps, und ein niedriger Wert oder eine fehlende Antwort steht oben in ihrem Bericht.",
+    },
+    "coach-checkin-trends": {
+      name: "Fortschritts-Check-ins mit Gewicht, Fotos und Verlauf",
+      body: "Füge jedem Formular Fragen zu Körpergewicht und Fotos hinzu und schick es jede Woche, alle 2 oder alle 4 Wochen. Das Gewicht startet beim letzten Wiegen deiner Kundschaft, Fotos sieht nur du, und der Verlauf jeder Antwort steht im Bericht. Unter 18-Jährige werden nie nach Fotos gefragt.",
     },
     "coach-roles": {
       name: "Für Personal Trainer und Coaches",
@@ -448,6 +461,12 @@ export const de: FeaturesText = {
     awards: {
       name: "Erfolge, Level und Serien",
       body: "Abzeichen in Stufen, 50 Level mit Belohnungen, Wochenaufgaben, Serienschutz und ehrliche Ligen.",
+    },
+    seasons: {
+      name: "Trainingssaisons",
+      body: "Zehnwöchige Saisons mit einem Pfad aus 20 Stufen, den du erklimmst, indem du auf dein eigenes Wochenziel hin trainierst: Zwei Tage pro Woche kommen so schnell voran wie fünf, und zusätzliche Tage bringen nichts. Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und ein Design mit App-Symbol, die es nur in dieser Saison gibt und die dir danach bleiben. Saison-Challenges, ein seltener Fund bei neuen Bestleistungen, Prestige-Sterne, eine Aufholwoche nach einer verpassten Woche, ein Finale mit doppelten Punkten und ein Rückblick zum Teilen.",
+      proPart: "Alle Stufen und ihre Belohnungen sind kostenlos; Pro legt auf drei Stufen eine Bonus-Belohnung dazu.",
+      note: "Saison-App-Symbole gibt es auf Android und iPhone; im Web gibt es das Design. Saisons lassen sich in den Einstellungen ausschalten.",
     },
     locker: {
       name: "Designs, Akzentfarben und App-Symbole",
@@ -512,6 +531,10 @@ export const de: FeaturesText = {
     "strength-standards": {
       name: "Kraftwerte von echten Lifterinnen und Liftern",
       body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
+    },
+    community: {
+      name: "Community: Ideen, Fehler und Roadmap",
+      body: "Schlag vor, was Liftsmith als Nächstes können soll, stimm für die Ideen, die du willst, melde Fehler mit einem Screenshot, den nur das Team sieht, und kommentiere oder erwähne andere mit @. Bei jedem Eintrag siehst du, wo er steht, von „Wird geprüft“ bis „Veröffentlicht“, und du erfährst es, wenn eine Idee, für die du gestimmt hast, erscheint. Roadmap und Änderungsprotokoll stehen auch auf der Website.",
     },
     languages: {
       name: "Zehn Sprachen",

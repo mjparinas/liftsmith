@@ -5,12 +5,13 @@
 // the poster ops (posters, posterStatus)
 // need a signed-in account; added, report and placeReport (a problem with a real gym's page) work signed out too. Round 3 (gymExtras.ts): issue, issueFixed and
 // issues (equipment problems) work signed out; news, newsDelete, extras (the owner's view), trainer, trainerLeave,
-// trainerGyms and trainerDecide need an account. Staff (gymStaff.ts): staff, staffInvite, staffCancel, staffPreview,
+// trainerGyms and trainerDecide need an account. Classes (gymClasses.ts): classSave and classDelete need an account. Staff (gymStaff.ts): staff, staffInvite, staffCancel, staffPreview,
 // staffJoin, staffRemove and staffLeave need an account.
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
 import { claimWithPosterCode, editGym, ownedGyms, releaseGym, startClaim, verifyClaim } from "@/server/gymClaims";
+import { deleteClass, saveClass } from "@/server/gymClasses";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
 import {
   decideTrainer,
@@ -182,6 +183,15 @@ export async function POST(req: Request) {
       if (r.ok) return reply(req, 200, r);
       return reply(req, r.error === "owner" ? 403 : r.error === "slow" ? 429 : 400, { error: r.error });
     }
+    // The gym's weekly class schedule (gymClasses.ts): the owner or staff add, change and remove classes.
+    case "classSave": {
+      const r = await saveClass(s.accountId, b.place, b.cls);
+      if (r.ok) return reply(req, 200, { cls: r.cls });
+      const status = r.error === "owner" ? 403 : r.error === "slow" ? 429 : r.error === "gone" ? 404 : r.error === "full" ? 409 : 400;
+      return reply(req, status, { error: r.error });
+    }
+    case "classDelete":
+      return (await deleteClass(s.accountId, b.place, b.id)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
     case "newsDelete":
       return (await deleteNews(s.accountId, b.place, b.id)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
     case "trainer": {
