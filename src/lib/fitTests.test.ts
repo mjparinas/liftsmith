@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { DAY, nextId, NOW } from "@/test/factories";
 
-import { cleanResult, nextGoal, reference, resultsOf, summarize, verdict } from "./fitTests";
+import { cleanResult, fitLine, nextGoal, reference, resultsOf, summarize, verdict } from "./fitTests";
 import type { FitTestEvent } from "./types";
 
 // Fitness tests (Melvin asked, 2026-11-11; docs/decisions/fitness-tests.md).
@@ -96,5 +96,30 @@ describe("cleanResult", () => {
     expect(cleanResult("balance", 46)).toBeNull();
     expect(cleanResult("chair", 0)).toBe(0);
     expect(cleanResult("chair", Number.NaN)).toBeNull();
+  });
+});
+
+describe("fitLine", () => {
+  it("runs past Typical by as much again, and fits a big result", () => {
+    // Men's hang: typical 59 to 96.4 s.
+    const ref = reference("hang", 35, "male")!;
+    const l = fitLine("hang", 70, ref);
+    expect(l.max).toBe(145);
+    expect(l.low).toBeCloseTo(59 / 145);
+    expect(l.high).toBeCloseTo(96.4 / 145);
+    expect(l.at).toBeCloseTo(70 / 145);
+    expect(fitLine("hang", 300, ref).max).toBe(330);
+    expect(fitLine("hang", 300, ref).at).toBeCloseTo(300 / 330);
+  });
+  it("ends the one-leg stand at its 45-second limit", () => {
+    const ref = reference("balance", 65, "female")!;
+    const l = fitLine("balance", 45, ref);
+    expect(l.max).toBe(45);
+    expect(l.at).toBe(1);
+  });
+  it("keeps the marker on the line", () => {
+    const l = fitLine("chair", 0, { low: 12, high: 17 });
+    expect(l.at).toBe(0);
+    expect(l.max).toBe(30);
   });
 });
