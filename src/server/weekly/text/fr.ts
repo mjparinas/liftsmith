@@ -889,4 +889,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La feuille de route et le journal des modifications sont aussi sur le site, à getliftsmith.com/community.",
   },
+  "coach-checkin-trends": {
+    title: "Bilans avec poids, photos et tendances",
+    intro: "Vos formulaires de bilan peuvent maintenant demander le poids et des photos, et montrer comment évolue chaque réponse.",
+    points: [
+      "Ajoutez une question Poids : elle part de la dernière pesée du client et enregistre la nouvelle dans son suivi.",
+      "Ajoutez jusqu'à trois questions Photo, de face et de profil par exemple. Vous seul les voyez.",
+      "Envoyez un formulaire chaque semaine, toutes les 2 semaines ou toutes les 4 semaines.",
+      "Le rapport de chaque client montre la tendance de chaque note, nombre et poids, et signale une note qui baisse.",
+    ],
+    dyk: "Partez du nouveau modèle Bilan de progrès dans Coaching › Bilans. On ne demande jamais de photo aux moins de 18 ans.",
+  },
 };

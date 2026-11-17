@@ -885,4 +885,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Roadmap und Änderungsprotokoll findest du auch auf der Website unter getliftsmith.com/community.",
   },
+  "coach-checkin-trends": {
+    title: "Check-ins mit Gewicht, Fotos und Verlauf",
+    intro: "Deine Check-in-Formulare können jetzt nach Körpergewicht und Fotos fragen und zeigen, wie sich jede Antwort entwickelt.",
+    points: [
+      "Füge eine Frage zum Körpergewicht hinzu: Sie startet beim letzten Wiegen und speichert das neue im Verlauf deiner Kundschaft.",
+      "Füge bis zu drei Fotofragen hinzu, etwa von vorne und von der Seite. Nur du siehst sie.",
+      "Schick ein Formular jede Woche, alle 2 Wochen oder alle 4 Wochen.",
+      "Der Bericht zeigt den Verlauf jeder Bewertung, jeder Zahl und des Gewichts und sagt Bescheid, wenn eine Bewertung fällt.",
+    ],
+    dyk: "Starte mit der neuen Vorlage Fortschritts-Check-in unter Coaching › Check-ins. Unter 18-Jährige werden nie nach Fotos gefragt.",
+  },
 };

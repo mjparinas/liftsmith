@@ -885,4 +885,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Roadmap e registro delle modifiche sono anche sul sito, su getliftsmith.com/community.",
   },
+  "coach-checkin-trends": {
+    title: "Check-in con peso, foto e andamento",
+    intro: "I tuoi moduli di check-in ora possono chiedere il peso corporeo e delle foto, e mostrare come va ogni risposta.",
+    points: [
+      "Aggiungi una domanda Peso corporeo: parte dall'ultima pesata del cliente e salva quella nuova nel suo registro.",
+      "Aggiungi fino a tre domande Foto, ad esempio di fronte e di lato. Le vedi solo tu.",
+      "Invia un modulo ogni settimana, ogni 2 settimane o ogni 4 settimane.",
+      "Il report di ogni cliente mostra l'andamento di ogni punteggio, numero e peso, e avvisa quando un punteggio cala.",
+    ],
+    dyk: "Parti dal nuovo modello Check-in dei progressi in Coaching › Check-in. Ai minori di 18 anni non si chiedono mai foto.",
+  },
 };

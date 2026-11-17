@@ -903,4 +903,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "The roadmap and changelog are on the website too, at getliftsmith.com/community.",
   },
+  "coach-checkin-trends": {
+    title: "Check-ins with weight, photos and trends",
+    intro: "Your check-in forms can now ask for body weight and photos, and show how each answer is moving.",
+    points: [
+      "Add a Body weight question: it fills in from the client's last weigh-in and saves the new one to their log.",
+      "Add up to three Photo questions, like front and side. Only you see them.",
+      "Send a form every week, every 2 weeks or every 4 weeks.",
+      "Each client's report shows the trend of every score, number and weight, and says when a score drops.",
+    ],
+    dyk: "Start from the new Progress check-in template in Coaching › Check-ins. Clients under 18 are never asked for photos.",
+  },
 };

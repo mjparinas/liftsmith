@@ -882,4 +882,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Plan rozwoju i lista zmian są też na stronie, pod adresem getliftsmith.com/community.",
   },
+  "coach-checkin-trends": {
+    title: "Kontrole z wagą, zdjęciami i trendami",
+    intro: "Twoje formularze kontrolne mogą teraz pytać o masę ciała i zdjęcia oraz pokazywać, jak zmienia się każda odpowiedź.",
+    points: [
+      "Dodaj pytanie o masę ciała: wypełnia się z ostatniego ważenia klienta i zapisuje nowe w jego dzienniku.",
+      "Dodaj do trzech pytań ze zdjęciem, na przykład z przodu i z boku. Widzisz je tylko Ty.",
+      "Wysyłaj formularz co tydzień, co 2 tygodnie lub co 4 tygodnie.",
+      "Raport każdego klienta pokazuje trend każdej oceny, liczby i wagi oraz mówi, gdy ocena spada.",
+    ],
+    dyk: "Zacznij od nowego szablonu Kontrola postępów w Trenowanie › Ankiety. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
+  },
 };

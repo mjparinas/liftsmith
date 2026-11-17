@@ -456,6 +456,10 @@ export const pt: FeaturesText = {
       name: "Formulários de check-in e questionários",
       body: "Mande aos alunos um check-in semanal, um questionário de avaliação inicial ou seu próprio formulário, uma vez ou toda semana. Eles respondem com poucos toques, e uma nota baixa ou uma resposta atrasada vai para o topo do relatório deles.",
     },
+    "coach-checkin-trends": {
+      name: "Check-ins de progresso com peso, fotos e tendências",
+      body: "Adicione perguntas de peso corporal e de foto a qualquer formulário e envie toda semana, a cada 2 ou a cada 4 semanas. O peso já vem da última pesagem do aluno, as fotos chegam só para você e a tendência de cada resposta aparece no relatório dele. Menores de 18 anos nunca recebem pedido de foto.",
+    },
     "coach-roles": {
       name: "Para personal trainers e coaches",
       body: "Diga se você é personal trainer com atendimento individual ou coach de grupos e equipes. Os alunos veem o termo certo para você, e as ferramentas que você mais usa vêm primeiro.",

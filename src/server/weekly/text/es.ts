@@ -884,4 +884,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La hoja de ruta y el registro de cambios también están en la web, en getliftsmith.com/community.",
   },
+  "coach-checkin-trends": {
+    title: "Revisiones con peso, fotos y tendencias",
+    intro: "Tus formularios de revisión ya pueden pedir el peso corporal y fotos, y mostrar cómo evoluciona cada respuesta.",
+    points: [
+      "Añade una pregunta de Peso corporal: se rellena con el último pesaje del cliente y guarda el nuevo en su registro.",
+      "Añade hasta tres preguntas de Foto, como de frente y de perfil. Solo las ves tú.",
+      "Envía un formulario cada semana, cada 2 semanas o cada 4 semanas.",
+      "El informe de cada cliente muestra la tendencia de cada puntuación, número y peso, y avisa cuando baja una puntuación.",
+    ],
+    dyk: "Empieza con la nueva plantilla Revisión de progreso en Entrenador › Seguimientos. A los menores de 18 nunca se les piden fotos.",
+  },
 };
