@@ -172,7 +172,7 @@ export const FLAGS = {
   },
   /**
    * The admin panel's AI helpers (src/server/ai.ts, docs/decisions/admin-ai.md): report suggestions, gym details and
-   * duplicates, Ask your data, Inbox drafts and the digest's summary. The kill switch: off stops every request at once.
+   * duplicates, Ask AI on every tab, Inbox drafts and the digest's summary. The kill switch: off stops every request at once.
    * Admin only; the app never reads it.
    */
   aiHelpers: {
@@ -181,7 +181,7 @@ export const FLAGS = {
     options: [true, false] as const,
     label: "Admin AI helpers",
     description:
-      "Claude suggests what to do with reports, fills in gym details, answers questions about the numbers, drafts Inbox replies and sums up the digest. Off stops every AI request at once.",
+      "Claude suggests what to do with reports, fills in gym details, says what needs doing on any tab, drafts Inbox replies and sums up the digest. Off stops every AI request at once.",
   },
   /**
    * The gym import's AI step (src/server/gymAutoFill.ts, docs/decisions/gyms.md "One button"): off, the import and the

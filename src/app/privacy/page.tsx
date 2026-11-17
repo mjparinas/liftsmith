@@ -300,9 +300,10 @@ export default function Privacy() {
           Anthropic&apos;s Claude for a first draft of our answer; your message is sent for that one request, and a person reads and sends
           every reply. When something is reported on Friends, we may also ask Claude to suggest what to do with it, sending only what was
           reported and the reports; a person always decides. Our staff also use Claude to suggest a gym&apos;s missing details from its own
-          website, spot gyms listed twice, and summarize our own totals; it&apos;s never sent your workouts, health readings or messages.
-          Map pictures and the gym map come from Mapbox through our own server, so Mapbox never receives anything about you. None of them
-          may use the data for their own purposes. We keep usage stats for up to 25 months.
+          website, spot gyms listed twice, summarize our own totals and say what needs doing on the admin screen they have open (with email
+          addresses taken out); it&apos;s never sent your workouts, health readings or messages. Map pictures and the gym map come from
+          Mapbox through our own server, so Mapbox never receives anything about you. None of them may use the data for their own purposes.
+          We keep usage stats for up to 25 months.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Your choices</h2>

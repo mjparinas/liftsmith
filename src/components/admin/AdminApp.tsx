@@ -6,11 +6,12 @@ import { useCallback, useEffect, useState } from "react";
 
 import { BuildStamp } from "@/components/BuildStamp";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
+import { ADMIN_TABS, type AdminTab } from "@/lib/adminTabs";
 import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CodeStatus, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 import type { InboxItem } from "@/server/inbox";
 
-import { AskData } from "./Ai";
+import { AskAiButton, AskAiPanel } from "./Ai";
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
@@ -37,28 +38,8 @@ import { Users } from "./Users";
 type Staff = { email: string; role: "admin" | "support" };
 type Data = Metrics & { staff: Staff };
 
-const TABS = [
-  "Overview",
-  "To Do",
-  "Inbox",
-  "Reports",
-  "Gyms",
-  "Traffic",
-  "Acquisition",
-  "Funnel",
-  "Retention",
-  "Engagement",
-  "Devices",
-  "Revenue",
-  "Codes",
-  "Users",
-  "Installs",
-  "Flags",
-  "Automations",
-  "System",
-  "Log",
-] as const;
-type Tab = (typeof TABS)[number];
+const TABS = ADMIN_TABS;
+type Tab = AdminTab;
 const PERIODS = [7, 28, 90, 365] as const;
 /** The tabs whose numbers follow the period picker; the picker is hidden on the rest, where it would do nothing. */
 /** The tabs drawn from the one stats answer (the others load their own). */
@@ -569,6 +550,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
 
 export function AdminApp() {
   const [days, setDays] = useState<(typeof PERIODS)[number]>(28);
+  const [askOpen, setAskOpen] = useState(false);
   const [view, setView] = useState<View>(readView);
   const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
@@ -695,6 +677,7 @@ export function AdminApp() {
               ))}
             </div>
           )}
+          {data.staff.role === "admin" && <AskAiButton open={askOpen} toggle={() => setAskOpen((o) => !o)} />}
           <span className="text-xs text-muted">
             {data.staff.email} ({data.staff.role})
           </span>
@@ -730,7 +713,18 @@ export function AdminApp() {
         </nav>
       </header>
 
-      <div className="mt-4 space-y-4">
+      {askOpen && data.staff.role === "admin" && (
+        <div className="mt-4">
+          <AskAiPanel
+            key={tab}
+            tab={tab}
+            metrics={STATS_TABS.has(tab) && !stale ? data : undefined}
+            go={go}
+            close={() => setAskOpen(false)}
+          />
+        </div>
+      )}
+      <div data-admin-page className="mt-4 space-y-4">
         <MaintenanceBanner state={maintenance[0]} admin={data.staff.role === "admin"} changed={maintenance[1]} />
         {stale && <TabSkeleton tab={tab} />}
         {!stale && tab === "Overview" && (
@@ -760,7 +754,6 @@ export function AdminApp() {
               <Tile label="Trial starts" value={fmtInt(o.trialStarts)} delta={delta(o.trialStarts, o.prevTrialStarts)} />
               <Tile label="MRR gross / net" value={`${fmtUsd(o.grossMrr)} / ${fmtUsd(o.netMrr)}`} sub={`${fmtInt(o.paying)} paying`} />
             </div>
-            {data.staff.role === "admin" && <AskData data={data} days={days} />}
             <Card title="New installs a day" subtitle="By store.">
               <StackedBars
                 rows={data.installsDaily}

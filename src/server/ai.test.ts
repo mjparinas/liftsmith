@@ -5,7 +5,7 @@ import * as aiRoute from "@/app/api/admin/ai/route.api";
 
 import { finishSignIn, startSignIn } from "./adminAuth";
 import { AI_MODEL, aiDay, AiError, aiStatus, askClaude, costMicros } from "./ai";
-import { digestSummary, fillGym, findDupes, pageText, saveGymFill, triagePlace, triageSocial } from "./aiHelpers";
+import { digestSummary, fillGym, findDupes, pageInsights, pageText, redact, saveGymFill, triagePlace, triageSocial } from "./aiHelpers";
 import { query, resetDb, run } from "./db";
 import { digestMail, type Digest } from "./digest";
 import { setFlag } from "./flags";
@@ -80,7 +80,7 @@ describe("the door to Claude", () => {
     expect(await aiStatus(NOW)).toMatchObject({ configured: true, on: true, cap: 2, spent: 0, calls: 0, ready: true });
     await setFlag("aiHelpers", false, 100, "owner@example.com");
     expect((await aiStatus(NOW)).why).toMatch(/switched off/);
-    await expect(askClaude({ task: "ask", system: "x", user: "y", now: NOW })).rejects.toThrow(AiError);
+    await expect(askClaude({ task: "page", system: "x", user: "y", now: NOW })).rejects.toThrow(AiError);
     await setFlag("aiHelpers", true, 100, "owner@example.com");
     await run("INSERT INTO admin_settings (key, value, updated_at) VALUES (?, '2500000', 0)", [`ai_spend:${aiDay(NOW)}`]);
     expect(await aiStatus(NOW)).toMatchObject({ spent: 2.5, ready: false });
@@ -92,8 +92,8 @@ describe("the door to Claude", () => {
 
   it("caches the instructions, asks for low effort and a schema, and adds the cost to the day", async () => {
     const { client, calls } = fakeClient({ ok: true });
-    await askClaude({ task: "ask", system: "rules", user: "question", schema: { type: "object" }, client, now: NOW });
-    await askClaude({ task: "ask", system: "rules", user: "question", client, now: NOW });
+    await askClaude({ task: "page", system: "rules", user: "question", schema: { type: "object" }, client, now: NOW });
+    await askClaude({ task: "page", system: "rules", user: "question", client, now: NOW });
     const p = calls[0]!;
     expect(p.model).toBe("claude-haiku-5-5");
     expect(p.fallbacks).toBeUndefined();
@@ -104,9 +104,9 @@ describe("the door to Claude", () => {
 
   it("turns a refusal or an empty answer into a line the panel can show", async () => {
     await expect(
-      askClaude({ task: "ask", system: "x", user: "y", client: fakeClient("no", { stop_reason: "refusal" }).client }),
+      askClaude({ task: "page", system: "x", user: "y", client: fakeClient("no", { stop_reason: "refusal" }).client }),
     ).rejects.toThrow(/wouldn't answer/);
-    await expect(askClaude({ task: "ask", system: "x", user: "y", client: fakeClient("  ").client })).rejects.toThrow(/empty/);
+    await expect(askClaude({ task: "page", system: "x", user: "y", client: fakeClient("  ").client })).rejects.toThrow(/empty/);
   });
 });
 
@@ -243,6 +243,50 @@ describe("gym cleanup", () => {
   });
 });
 
+describe("Ask AI in the header", () => {
+  const page = "Reports\n3 waiting\nPost by @lifter, reported as spam twice. Contact jo@example.com.";
+
+  it("sends the tab's words with emails taken out, and keeps only real tabs other than this one", async () => {
+    const { client, calls } = fakeClient({
+      summary: "Three reports are waiting.",
+      actions: [
+        { do: "Remove the spam post", why: "Reported as spam twice.", tab: "Reports" },
+        { do: "Check the Inbox", why: "A lifter wrote in.", tab: "Inbox" },
+        { do: "", why: "empty", tab: null },
+      ],
+    });
+    const r = await pageInsights({ tab: "Reports", page, question: "Anything urgent?" }, { client });
+    expect(r.summary).toBe("Three reports are waiting.");
+    expect(r.actions).toEqual([
+      { do: "Remove the spam post", why: "Reported as spam twice.", tab: null },
+      { do: "Check the Inbox", why: "A lifter wrote in.", tab: "Inbox" },
+    ]);
+    const user = JSON.stringify(calls[0]!.messages);
+    expect(user).toContain("[email]");
+    expect(user).not.toContain("jo@example.com");
+    expect(user).toContain("Anything urgent?");
+    expect(user).not.toContain("<numbers>");
+  });
+
+  it("adds a stats tab's numbers, and leaves them out when they're too big", async () => {
+    const { client, calls } = fakeClient({ summary: "Quiet.", actions: [] });
+    await pageInsights({ tab: "Overview", page: "Overview\nNew installs 12", metrics: { overview: { installs: 12 } } }, { client });
+    await pageInsights({ tab: "Overview", page: "Overview\nNew installs 12", metrics: { big: "x".repeat(130_000) } }, { client });
+    expect(JSON.stringify(calls[0]!.messages)).toContain("<numbers>");
+    expect(JSON.stringify(calls[1]!.messages)).not.toContain("<numbers>");
+  });
+
+  it("refuses an unknown tab or an empty page", async () => {
+    const { client } = fakeClient({ summary: "x", actions: [] });
+    await expect(pageInsights({ tab: "Nope", page }, { client })).rejects.toThrow(/Which tab/);
+    await expect(pageInsights({ tab: "Log", page: "   " }, { client })).rejects.toThrow(/loaded/);
+  });
+
+  it("takes out addresses and long tokens", () => {
+    expect(redact("mail a.b+c@mail.example.org or abcdefghijklmnopqrstuvwxyz0123456789 now")).toBe("mail [email] or [id] now");
+  });
+});
+
 describe("the digest's summary", () => {
   const digest: Digest = {
     subject: "Today",
@@ -278,9 +322,11 @@ describe("the route", () => {
     const owner = await cookieFor("owner@example.com");
     const status = await aiRoute.GET(new Request(`${SITE}/api/admin/ai/`, { headers: { cookie: help } }));
     expect(await status.json()).toMatchObject({ ready: true, cap: 2 });
-    expect((await aiRoute.POST(post(help, { task: "ask", question: "How many?", metrics: {} }))).status).toBe(404);
+    expect((await aiRoute.POST(post(help, { task: "page", tab: "Overview", page: "Overview with enough words" }))).status).toBe(404);
     await setFlag("aiHelpers", false, 100, "owner@example.com");
-    const off = await aiRoute.POST(post(owner, { task: "ask", question: "How many installs?", metrics: { overview: {} } }));
+    const off = await aiRoute.POST(
+      post(owner, { task: "page", tab: "Overview", page: "Overview with enough words", metrics: { overview: {} } }),
+    );
     expect(off.status).toBe(409);
     expect(((await off.json()) as { error: string }).error).toMatch(/switched off/);
     expect((await aiRoute.POST(post(owner, { task: "nope" }))).status).toBe(400);
