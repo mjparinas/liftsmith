@@ -257,7 +257,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Sonos](docs/decisions/sonos.md) (`src/lib/sonos.ts`, `src/server/sonos.ts`, `Sonos.tsx`, `connect.ts`)
 - [Speed](docs/decisions/speed.md) (`game.ts`, `Achievements.tsx` `useGame`, `sessionAhead.ts`, `scripts/locales.mjs`, `src/lib/liteDemos.ts`, `proxy.api.ts`)
 - [Stats and recovery map](docs/decisions/stats-and-recovery-map.md) (`RecoveryMap.tsx`, `engine.ts`, `colours.ts`, `src/components/BodyMap.tsx`, `History.tsx`)
-- [Stretching](docs/decisions/stretching.md) (`src/lib/stretches.ts`, `Stretch.tsx`, `src/lib/demo/stretchMotions.ts`)
+- [Stretching](docs/decisions/stretching.md) (`src/lib/stretches.ts`, `Stretch.tsx`, `src/lib/demo/stretchMotions.ts`; one-side stretches show the side named and mirror for the other, `drawnSide` and `mirrorMotion`, Melvin 2026-11-17)
 - [Tempo coach](docs/decisions/tempo-coach.md) (`src/lib/tempo.ts`, `workout/TempoCoach.tsx`, `juice.ts`)
 - [Today screen](docs/decisions/today-screen.md) (`src/lib/quotes.ts`)
 - [Tools: TDEE calculator and the other tools](docs/decisions/tools-tdee-calculator.md) (`src/lib/tdee.ts`, `src/lib/calculators.ts`, `src/lib/intervals.ts`, `src/components/app/Tools.tsx`, `src/components/app/tools/`, `health.ts`, `App.tsx`)

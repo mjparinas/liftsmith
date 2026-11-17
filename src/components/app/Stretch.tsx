@@ -264,12 +264,12 @@ function QuickStart({ icon, title, onClick }: { icon: "flame" | "leaf"; title: s
   );
 }
 
-function StretchDemo({ s, className = "", paused }: { s: Stretch; className?: string; paused?: boolean }) {
+function StretchDemo({ s, className = "", paused, side }: { s: Stretch; className?: string; paused?: boolean; side?: "L" | "R" }) {
   const { profile } = useApp();
   const shape = useMyShape();
   return (
     <LiftDemo
-      exerciseId={demoId(s.id)}
+      exerciseId={demoId(s.id, side)}
       name={s.name}
       highlight={highlight(s)}
       view={stretchView(s.id)}
@@ -540,7 +540,7 @@ function Player({
         <span className="num text-sm text-muted">{t("str.step", { n: i + 1, total: list.length })}</span>
       </div>
       <div className="card mt-2 overflow-hidden">
-        <StretchDemo s={s} className="h-72" paused={paused} />
+        <StretchDemo s={s} className="h-72" paused={paused} side={s.eachSide ? (side === 0 ? "L" : "R") : undefined} />
       </div>
       <h1 className={`mt-4 ${SCREEN_TITLE}`}>{s.name}</h1>
       <p className="mt-1 text-sm text-muted">{stretchWhy(s, moment === "pick" ? "pick" : moment, muscles)}</p>
