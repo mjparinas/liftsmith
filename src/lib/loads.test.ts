@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { makeTestGym } from "@/test/factories";
 
+import { makeGym } from "./defaults";
 import { EXERCISE_BY_ID } from "./exercises";
-import { barFor, roundLoad, stepLoad } from "./loads";
+import { barFor, machineStep, roundLoad, stepLoad } from "./loads";
 import { toKg } from "./units";
 
 // Rounding a wanted weight to one the gym can make, and the − / + steps on the workout screen
@@ -58,12 +59,23 @@ describe("roundLoad", () => {
   });
 
   it("rounds a machine to its step, at least one step, with a default step per unit", () => {
-    expect(roundLoad(42, ex("machine-chest-press"), gym).kg).toBe(40);
-    expect(roundLoad(43, ex("machine-chest-press"), gym).kg).toBe(45);
-    expect(roundLoad(1, ex("machine-chest-press"), gym).kg).toBe(5);
+    const fives = { ...gym, machineStep: 7.5 };
+    expect(roundLoad(43, ex("machine-chest-press"), fives).kg).toBe(45);
+    expect(roundLoad(1, ex("machine-chest-press"), fives).kg).toBe(7.5);
     expect(roundLoad(41, ex("machine-chest-press"), { ...gym, machineStep: 0 }).kg).toBe(40);
     expect(roundLoad(41.4, ex("machine-chest-press"), { ...gym, machineStep: 0 }).kg).toBe(42.5);
     expect(roundLoad(toKg(97, "lb"), ex("machine-chest-press"), { ...lbGym, machineStep: 0 }).kg).toBeCloseTo(toKg(95, "lb"), 6);
+  });
+
+  it("moves cable and machine stacks 5 lb or 2.5 kg at a time, old 10 lb and 5 kg gyms included", () => {
+    expect(machineStep(makeGym("commercial", "lb"))).toBe(5);
+    expect(machineStep(makeGym("commercial", "kg"))).toBe(2.5);
+    expect(machineStep({ unit: "lb", machineStep: 10 })).toBe(5);
+    expect(machineStep({ unit: "kg", machineStep: 5 })).toBe(2.5);
+    expect(stepLoad(toKg(100, "lb"), 1, ex("lat-pulldown"), { ...lbGym, machineStep: 10 })).toBeCloseTo(toKg(105, "lb"), 6);
+    expect(stepLoad(toKg(100, "lb"), -1, ex("lat-pulldown"), { ...lbGym, machineStep: 10 })).toBeCloseTo(toKg(95, "lb"), 6);
+    expect(roundLoad(toKg(103, "lb"), ex("lat-pulldown"), lbGym).kg).toBeCloseTo(toKg(105, "lb"), 6);
+    expect(stepLoad(40, 1, ex("lat-pulldown"), { ...gym, machineStep: 5 })).toBe(42.5);
   });
 
   it("gives bodyweight exercises no load", () => {
@@ -86,9 +98,10 @@ describe("stepLoad", () => {
   });
 
   it("steps machines by their step, never below zero", () => {
-    expect(stepLoad(40, 1, ex("machine-chest-press"), gym)).toBe(45);
-    expect(stepLoad(40, -1, ex("machine-chest-press"), gym)).toBe(35);
-    expect(stepLoad(3, -1, ex("machine-chest-press"), gym)).toBe(0);
+    const fives = { ...gym, machineStep: 7.5 };
+    expect(stepLoad(45, 1, ex("machine-chest-press"), fives)).toBe(52.5);
+    expect(stepLoad(45, -1, ex("machine-chest-press"), fives)).toBe(37.5);
+    expect(stepLoad(3, -1, ex("machine-chest-press"), fives)).toBe(0);
     expect(stepLoad(40, 1, ex("machine-chest-press"), { ...gym, machineStep: 0 })).toBe(42.5);
     expect(stepLoad(toKg(100, "lb"), 1, ex("machine-chest-press"), { ...lbGym, machineStep: 0 })).toBeCloseTo(toKg(105, "lb"), 6);
   });
