@@ -157,6 +157,11 @@ export function SonosBar({ resting }: { resting: boolean }) {
   const now = state?.now && state.now.group === prefs.group ? state.now : null;
   const group = state?.groups.find((g) => g.id === prefs.group);
   const shown = vol ?? now?.volume ?? null;
+  // Line-in, the TV and AirPlay have no song name: say which source is playing rather than "Nothing playing".
+  const title =
+    now?.track ??
+    (now?.source ? t(`conn.sonos.src.${now.source}`) : null) ??
+    (now?.playing ? t("conn.sonos.playing") : t("conn.sonos.nothing"));
 
   const slide = (next: number) => {
     setVol(next);
@@ -179,7 +184,7 @@ export function SonosBar({ resting }: { resting: boolean }) {
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{now?.track ?? t("conn.sonos.nothing")}</p>
+          <p className="truncate text-sm font-semibold">{title}</p>
           <p className="truncate text-xs text-muted">
             {[now?.artist, group ? t("conn.sonos.on", { speaker: group.name }) : null].filter(Boolean).join(" · ")}
           </p>
@@ -187,14 +192,17 @@ export function SonosBar({ resting }: { resting: boolean }) {
         <Round icon="settings" label={t("conn.sonos.settings")} onClick={() => setOpen(true)} />
       </div>
       <div className="mt-2 flex items-center justify-center gap-2">
-        <Round icon="skipPrev" label={t("conn.sonos.previous")} onClick={() => void sonosSend({ do: "previous" })} />
+        {/* Skips that can't do anything (line-in, the TV) aren't shown, so no button sits there dead. */}
+        {now?.canSkipBack !== false && (
+          <Round icon="skipPrev" label={t("conn.sonos.previous")} onClick={() => void sonosSend({ do: "previous" })} />
+        )}
         <Round
           big
           icon={now?.playing ? "pause" : "play"}
           label={now?.playing ? t("conn.sonos.pause") : t("conn.sonos.play")}
           onClick={() => void sonosSend({ do: now?.playing ? "pause" : "play" })}
         />
-        <Round icon="skipNext" label={t("conn.sonos.next")} onClick={() => void sonosSend({ do: "next" })} />
+        {now?.canSkip !== false && <Round icon="skipNext" label={t("conn.sonos.next")} onClick={() => void sonosSend({ do: "next" })} />}
       </div>
       {now &&
         (shown === null ? (

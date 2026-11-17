@@ -63,6 +63,18 @@ describe("ageFactor", () => {
   });
 });
 
+describe("target: timed holds talk in seconds, not reps", () => {
+  const plank = ex("side-plank");
+  const after = (events: AppEvent[]) => target(plank, events, profile, gym, NOW);
+
+  it("says a hold lasted or ended early, never one more rep", () => {
+    expect(after([])).toMatchObject({ reps: 20, note: t("note.firstLevel") });
+    expect(after(session("a", 2, "side-plank", 0, 30, [30, 31]))).toMatchObject({ reps: 31, note: t("note.timedLonger") });
+    expect(after(session("a", 2, "side-plank", 0, 30, [30, 22]))).toMatchObject({ reps: 30, note: t("note.timedSame") });
+    expect(t("note.timedLonger")).not.toBe(t("note.oneMoreRep"));
+  });
+});
+
 describe("target: bodyweight exercises", () => {
   const pushUps = ex("push-up");
   const after = (events: AppEvent[], p = profile) => target(pushUps, events, p, gym, NOW);

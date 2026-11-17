@@ -11,6 +11,7 @@ import { useApp } from "./store";
 import {
   effortAim,
   effortChoices,
+  effortKind,
   effortLabel,
   MAX_PRIORITIES,
   minutesForToday,
@@ -255,5 +256,16 @@ describe("rest timer auto-start", () => {
     s().logSet();
     const second = s().events.filter((e): e is SetEvent => e.type === "set")[1];
     expect(second.restSec).toBe(rest + 10);
+  });
+});
+
+describe("effort aim for timed sets and cardio", () => {
+  it("never asks a timed set or cardio for reps in the tank", () => {
+    expect(effortAim(2, undefined, effortKind({ id: "side-plank" }))).toBe("Stop a few seconds before your form slips");
+    expect(effortAim(0, "rir", "time")).toBe("Keep going until your form starts to slip");
+    expect(effortAim(2, "rpe", "time")).toBe("Aim for RPE 8");
+    expect(effortAim(2, undefined, effortKind({ id: "treadmill-run", cardio: "distance" }))).toBe("A steady pace you could still talk at");
+    expect(effortKind({ id: "bench-press" })).toBe("reps");
+    expect(effortAim(2, undefined, "reps")).toBe("Leave 2 reps in the tank");
   });
 });

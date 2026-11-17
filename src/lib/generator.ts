@@ -204,6 +204,27 @@ export function rankMuscles(
     .map((x) => x.m);
 }
 
+/**
+ * Bodyweight compounds that have a loaded version of their own in the library (Reverse lunge and Dumbbell
+ * reverse lunge, Step-up and Barbell step-up): the loaded ids, found by the library's id prefixes.
+ */
+export const LOADED_TWINS: ReadonlyMap<string, readonly string[]> = new Map(
+  EXERCISES.filter((e) => e.load === "bodyweight" && e.compound)
+    .map((e) => [e.id, ["db-", "kb-", "barbell-"].map((p) => p + e.id).filter((id) => EXERCISE_BY_ID.has(id))] as const)
+    .filter(([, twins]) => twins.length > 0),
+);
+
+/**
+ * When a loaded version of a bodyweight move is also on offer, the plan picks the loaded one, so a gym with
+ * dumbbells gets a Dumbbell reverse lunge with weights, not a bodyweight Reverse lunge (Melvin, 2026-11-17).
+ * The bodyweight move stays when the lifter keeps it (a favourite, or swapped into it), and never joins its
+ * loaded version already in the day (`used`).
+ */
+export function preferLoaded(cands: readonly Exercise[], keep: (id: string) => boolean, used: ReadonlySet<string> = new Set()): Exercise[] {
+  const ids = new Set([...cands.map((c) => c.id), ...used]);
+  return cands.filter((c) => keep(c.id) || !(LOADED_TWINS.get(c.id) ?? []).some((id) => ids.has(id)));
+}
+
 const BIG_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"]);
 
 /**
@@ -295,7 +316,11 @@ export function generate({
   const warmed = new Set<Muscle>();
 
   const pick = (m: Muscle, compoundFirst: boolean): Exercise | undefined => {
-    const cands = pool.filter((e) => e.primary.includes(m) && !used.has(e.id) && e.primary.every((p) => rec[p] >= 40));
+    const cands = preferLoaded(
+      pool.filter((e) => e.primary.includes(m) && !used.has(e.id) && e.primary.every((p) => rec[p] >= 40)),
+      (id) => favs.has(id) || prefs.taste(id).into > 0,
+      used,
+    );
     if (!cands.length) return undefined;
     const prev = (recent.get(m) ?? []).map((id) => cands.find((c) => c.id === id)).find(Boolean);
     // A favourite that fits beats keeping last time's exercise, unless last time's was a favourite too.
@@ -454,7 +479,12 @@ export function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym
       item.sets = Math.max(2, item.sets - 1);
       if (item.injuryPct) continue; // already lighter for the injury
       if (ex.load === "bodyweight" || TIMED.has(ex.id))
-        item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: t("note.easyReps") };
+        item.target = {
+          ...item.target,
+          reps: Math.max(3, item.target.reps - 2),
+          rir: item.target.rir + 1,
+          note: t(TIMED.has(ex.id) ? "note.timedEasy" : "note.easyReps"),
+        };
       else
         item.target = {
           ...item.target,

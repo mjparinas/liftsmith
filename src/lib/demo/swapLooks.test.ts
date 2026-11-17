@@ -321,6 +321,53 @@ describe("jumps and hops", () => {
     for (const id of ["jump-rope", "double-unders", "pogo-hops", "pogo-jumps", "tuck-jump", "squat-jack", "line-hops"])
       expect(air(id, 0.25), id).toBeGreaterThan(air(id, 0) + 0.04);
   });
+  // Melvin, 2026-11-17: ankle hops rose onto the toes but never left the floor, because pointing the
+  // toes in the air dropped them as far as the ankles rose. The whole foot clears the floor now.
+  const sole = (id: string, d: number) => {
+    const J = at(id, d);
+    return Math.min(J.toeL[1], J.toeR[1], J.heelL[1], J.heelR[1]);
+  };
+  const highest = (id: string) => Math.max(...Array.from({ length: 101 }, (_, i) => sole(id, i / 100)));
+  it("lifts the whole foot, toes included, off the floor on every jump", () => {
+    const jumps = [
+      "jump-rope",
+      "double-unders",
+      "pogo-hops",
+      "pogo-jumps",
+      "jump-rope-single-leg",
+      "jump-rope-crossover",
+      "jump-rope-boxer-skip",
+      "line-hops",
+      "squat-jack",
+      "in-and-out-jumps",
+      "single-leg-hop",
+      "single-leg-lateral-hop",
+      "lateral-hop",
+      "broad-jump",
+      "squat-jump-180",
+      "jump-squat",
+      "jumping-jacks",
+      "star-jump",
+      "seal-jack",
+      "cross-jack",
+      "burpee",
+    ];
+    for (const id of jumps) expect(highest(id), id).toBeGreaterThan(0.05);
+    // a step jack keeps a foot down
+    expect(highest("step-jack")).toBeLessThan(0.02);
+  });
+  it("bounces ankle hops off the balls of the feet with nearly straight knees", () => {
+    for (let i = 0; i <= 100; i++) {
+      const J = at("pogo-hops", i / 100);
+      // heels never touch down
+      expect(Math.min(J.heelL[1], J.heelR[1])).toBeGreaterThan(0.05);
+      // knees stay nearly straight: hip to ankle is almost the whole leg
+      const reach = Math.hypot(J.hipR[0] - J.ankleR[0], J.hipR[1] - J.ankleR[1], J.hipR[2] - J.ankleR[2]);
+      expect(reach).toBeGreaterThan((B.thigh + B.shin) * 0.95);
+    }
+    // and the whole body lifts: the hips rise more than 10 cm at the top of each hop
+    expect(at("pogo-hops", 0.25).hipC[1] - at("pogo-hops", 0).hipC[1]).toBeGreaterThan(0.1);
+  });
   it("travels: forward on broad and frog jumps, sideways on lateral hops and line hops", () => {
     expect(at("broad-jump", 0.5).hipC[0]).toBeGreaterThan(at("broad-jump", 0).hipC[0] + 0.8);
     expect(at("frog-jump", 0.5).hipC[0]).toBeGreaterThan(at("frog-jump", 0).hipC[0] + 0.6);

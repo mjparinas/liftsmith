@@ -1,3 +1,4 @@
+import { MACHINE_STEP } from "./loads";
 import { EQUIPMENT, type Equipment, type Gym, type Profile, type Unit } from "./types";
 
 export const PLATE_SETS: Record<Unit, { weight: number; count: number }[]> = {
@@ -71,7 +72,7 @@ export function makeGym(preset: GymPreset, unit: Unit, id = crypto.randomUUID())
     plates: PLATE_SETS[unit].map((x) => ({ ...x })),
     dumbbells: unit === "kg" ? range(2, home ? 30 : 50, 2) : range(5, home ? 60 : 120, 5),
     kettlebells: unit === "kg" ? [8, 12, 16, 20, 24, 28, 32] : [15, 25, 35, 45, 55, 70],
-    machineStep: unit === "kg" ? 5 : 10,
+    machineStep: MACHINE_STEP[unit],
     updatedAt: Date.now(),
   };
 }
