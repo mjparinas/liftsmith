@@ -224,6 +224,13 @@ export const es: SiteText = {
         },
       ],
     },
+    learn: {
+      eyebrow: "Guías gratis",
+      title: "Aprende los ejercicios y deja que la app los planifique",
+      body: "Técnica paso a paso, los músculos que trabaja cada ejercicio y qué hacer en su lugar, además de calculadoras gratis.",
+      exercises: "Ejercicios populares",
+      tools: "Herramientas gratis",
+    },
     juice: {
       eyebrow: "Hecho para motivar",
       title: "Los récords se celebran con confeti. Los días de descanso no rompen tu racha.",

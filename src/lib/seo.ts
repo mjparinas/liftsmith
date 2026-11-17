@@ -13,6 +13,7 @@ import { bestFor } from "./bestFor";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { HELP, helpPath } from "./faqs";
 import { alternatives } from "./generator";
+import { COMMON, STAPLE } from "./pickWeights";
 import { PROGRAMS } from "./programs";
 import { SITE_URL } from "./site";
 import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
@@ -160,12 +161,15 @@ export const pairsWith = (eq: Equipment) => pairs().filter((p) => p.equipment ==
 export const alternativesTo = (id: string, n = 12): Exercise[] => alternatives(id, null).slice(0, n);
 
 /**
- * Whether an exercise's alternatives page is offered to search engines. Only the most searched lifts (the ones with
- * a full guide, EXERCISE_GUIDES) are; the other ~950 pages read as near-copies of each other, which on a new domain
- * can slow how much of the site gets crawled and indexed. Those stay up for visitors, `noindex, follow`, out of the
- * sitemap (2026-11-12).
+ * Whether an exercise's alternatives page is offered to search engines. On 2026-11-12 only the ~50 lifts with a full
+ * guide (EXERCISE_GUIDES) were, because the ~1,000 pages read as near-copies on a new domain. Since 2026-11-17 the
+ * pages name their best swaps in the title, answer the common questions (FAQ data) and say what each swap needs, and
+ * Search Console showed people searching for alternatives to everyday lifts without a guide (the box squat), so the
+ * lifts people actually program (pick weights' STAPLE and COMMON lists) are indexed too, about 240 pages, when they
+ * have at least three alternatives. The niche rest stay up for visitors, `noindex, follow`, out of the sitemap.
  */
-export const indexAlternatives = (id: string): boolean => id in EXERCISE_GUIDES && alternativesTo(id).length > 0;
+export const indexAlternatives = (id: string): boolean =>
+  (id in EXERCISE_GUIDES && alternativesTo(id).length > 0) || ((STAPLE.has(id) || COMMON.has(id)) && alternativesTo(id).length >= 3);
 
 /** "Barbell, flat bench and squat rack", or "No equipment". */
 export function needsText(e: Exercise): string {

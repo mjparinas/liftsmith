@@ -6,6 +6,7 @@ export const BLOG_B: Article[] = [
     slug: "no-equipment-strength-workout",
     kind: "blog",
     title: "Strength training with no equipment",
+    seoTitle: "No-equipment strength workout: exercises and a weekly plan",
     description:
       "How to build strength at home, in a hotel or a park with no equipment: the key exercises, how to make them harder, and a simple weekly plan.",
     date: "2026-11-09",
@@ -314,6 +315,7 @@ export const BLOG_B: Article[] = [
     slug: "lifting-on-a-cut",
     kind: "blog",
     title: "How to keep your strength while losing fat",
+    seoTitle: "Lifting on a cut: keep your strength while losing fat",
     description:
       "How to lift on a diet without losing muscle or strength: calorie deficit size, protein, training volume and what to expect from your lifts.",
     date: "2026-11-09",
