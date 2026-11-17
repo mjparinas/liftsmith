@@ -105,7 +105,19 @@ jobs:
               title: `Promote staging to main (${date})`,
               body: 'Opened by the nightly "Promote staging" workflow after CI passed on staging.',
             })).data;
-            const merged = await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'merge', sha: staging, commit_title: `Promote staging to main (${date})` });
+            // A pull request opened a moment ago can answer 405 "Base branch was modified" while GitHub is still working out
+            // whether it can merge (2026-11-17: the merge came two seconds after the open and failed). Try again a few times.
+            let merged;
+            for (let attempt = 1; ; attempt++) {
+              try {
+                merged = await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'merge', sha: staging, commit_title: `Promote staging to main (${date})` });
+                break;
+              } catch (e) {
+                if (e.status !== 405 || attempt >= 6) throw e;
+                core.info(`Merge not ready yet (${e.message}); trying again in 10 s.`);
+                await new Promise((r) => setTimeout(r, 10000));
+              }
+            }
             core.notice(`Merged pull request #${pr.number}; main is now ${merged.data.sha.slice(0, 7)}.`);
             if (process.env.HAS_PROMOTE_TOKEN !== 'true') {
               // workflow_dispatch is the one way a GITHUB_TOKEN may start another workflow.
