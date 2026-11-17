@@ -327,7 +327,8 @@ export function LiftDemoCore({
             role="img"
             aria-label={alt}
             className="absolute inset-0 block h-full w-full"
-            style={{ touchAction: controls ? "pan-y" : "auto", cursor: controls ? "grab" : onClick ? "pointer" : "default" }}
+            // Every figure but a bare backdrop turns with a sideways drag; pan-y leaves a vertical swipe to the page.
+            style={{ touchAction: bare ? "auto" : "pan-y pinch-zoom", cursor: bare ? (onClick ? "pointer" : "default") : "grab" }}
             onClick={tap}
           />
         )}

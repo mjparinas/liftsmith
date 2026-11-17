@@ -130,6 +130,28 @@ export interface Loop {
   dispose(): void;
 }
 
+/** Degrees the figure turns for each CSS pixel dragged: about 300° across the canvas, so a small figure isn't stiff. */
+export function turnPerPx(width: number): number {
+  return clamp(300 / (width || 300), 0.35, 1);
+}
+/** The drag's speed in degrees a second, smoothed over the last few moves so one jittery event doesn't set the fling. */
+export function flingSpeed(v: number, deg: number, ms: number): number {
+  if (ms <= 0) return v;
+  const now = (deg * 1000) / ms;
+  const w = Math.min(1, ms / 50);
+  return v + (now - v) * w;
+}
+/** The spin left when the finger lifts: none if it stopped moving first (held still 80 ms), capped at two turns a second. */
+export function releaseSpin(v: number, msSinceMove: number): number {
+  if (msSinceMove > 80 || Math.abs(v) < 30) return 0;
+  return clamp(v, -720, 720);
+}
+/** Friction on a fling: it loses most of its speed in about a second, and stops below 6° a second. */
+export function decaySpin(v: number, dt: number): number {
+  const next = v * Math.exp(-dt * 3.2);
+  return Math.abs(next) < 6 ? 0 : next;
+}
+
 export function startLoop(
   canvas: HTMLCanvasElement,
   scene: Scene,
@@ -159,7 +181,9 @@ export function startLoop(
   let yaw = s.view === "orbit" ? 50 : VIEW_YAW[s.view],
     yawTarget = yaw,
     pitch = 10;
-  let drag: { x: number; y: number; yaw: number; pitch: number } | null = null;
+  // A drag turns the figure 1:1 under the finger; letting go with speed flings it on, slowing down (inertia).
+  let drag: { x: number; y: number; yaw: number; pitch: number; id: number; lx: number; lt: number; v: number } | null = null;
+  let spin = 0; // degrees a second left over from a fling
   let visible = true,
     raf = 0,
     last = 0,
@@ -192,18 +216,32 @@ export function startLoop(
 
   let down: { x: number; y: number } | null = null;
   const onDown = (e: PointerEvent) => {
-    drag = { x: e.clientX, y: e.clientY, yaw: yawTarget, pitch };
+    if (!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+    spin = 0;
+    drag = { x: e.clientX, y: e.clientY, yaw: yawTarget, pitch, id: e.pointerId, lx: e.clientX, lt: e.timeStamp, v: 0 };
     down = { x: e.clientX, y: e.clientY };
     canvas.setPointerCapture?.(e.pointerId);
   };
   const onMove = (e: PointerEvent) => {
-    if (!drag) return;
-    yawTarget = drag.yaw - (e.clientX - drag.x) * 0.45;
+    if (!drag || e.pointerId !== drag.id) return;
+    const k = turnPerPx(canvas.clientWidth);
+    yawTarget = drag.yaw - (e.clientX - drag.x) * k;
     yaw = yawTarget;
     pitch = clamp(drag.pitch + (e.clientY - drag.y) * 0.2, -5, 35);
+    drag.v = flingSpeed(drag.v, -(e.clientX - drag.lx) * k, e.timeStamp - drag.lt);
+    drag.lx = e.clientX;
+    drag.lt = e.timeStamp;
     kick();
   };
   const onUp = (e: PointerEvent) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    // The page scrolling took over (a mostly vertical swipe): the few degrees turned before it did go back.
+    if (e.type === "pointercancel") {
+      yawTarget = drag.yaw;
+      pitch = drag.pitch;
+    }
+    // A fling carries on only from a real release that was still moving; a scroll taking over (pointercancel) stops it.
+    spin = e.type === "pointerup" && !s.calm && !reduced ? releaseSpin(drag.v, e.timeStamp - drag.lt) : 0;
     drag = null;
     // a tap (not a drag) picks the muscle under the finger
     if (onPick && down && e.type === "pointerup" && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 8) {
@@ -211,11 +249,13 @@ export function startLoop(
       onPick(pick(e.clientX - r.left, e.clientY - r.top));
     }
     down = null;
+    kick();
   };
   canvas.addEventListener("pointerdown", onDown);
   canvas.addEventListener("pointermove", onMove);
   canvas.addEventListener("pointerup", onUp);
   canvas.addEventListener("pointercancel", onUp);
+  canvas.addEventListener("lostpointercapture", onUp);
 
   let size = [0, 0];
   const io =
@@ -245,18 +285,20 @@ export function startLoop(
         onDone?.();
       }
     }
-    if (s.view === "orbit" && !drag && s.playing) yawTarget += dt * 18;
+    if (spin && !drag) {
+      yawTarget += spin * dt;
+      yaw = yawTarget;
+      spin = decaySpin(spin, dt);
+    }
+    if (s.view === "orbit" && !drag && !spin && s.playing) yawTarget += dt * 18;
     yaw = s.calm ? yawTarget : yaw + (yawTarget - yaw) * Math.min(1, dt * 5);
     const target = s.follow?.() ?? null;
     if (target !== null) followD += (clamp(target, 0, 1) - followD) * Math.min(1, dt * 14);
-    const animating =
-      !!s.follow ||
-      (s.playing && !done) ||
-      (!!s.bpm && !reduced) ||
-      !!drag ||
-      Math.abs(yawTarget - yaw) > 0.05 ||
-      (s.view === "orbit" && s.playing);
-    if (changed || now - lastDraw >= 1000 / s.fps - 4) {
+    // While the camera turns (a drag, a fling, easing to a view) every frame is drawn, whatever the fps cap,
+    // so the figure keeps up with the finger; the cap only paces the motion playing on its own.
+    const turning = !!drag || spin !== 0 || Math.abs(yawTarget - yaw) > 0.05;
+    const animating = !!s.follow || (s.playing && !done) || (!!s.bpm && !reduced) || turning || (s.view === "orbit" && s.playing);
+    if (changed || turning || now - lastDraw >= 1000 / s.fps - 4) {
       lastDraw = now;
       const r = canvas.getBoundingClientRect();
       if (r.width !== size[0] || r.height !== size[1]) {
@@ -364,6 +406,7 @@ export function startLoop(
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerup", onUp);
       canvas.removeEventListener("pointercancel", onUp);
+      canvas.removeEventListener("lostpointercapture", onUp);
       scene.dispose();
     },
   };
