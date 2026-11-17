@@ -116,6 +116,10 @@ export const tr: FeaturesText = {
       body: "Salonunda yapılabilen ve kaslarının hazır olduğu egzersizleri seçer, sonra her ağırlığı ve tekrarı son antrenmanlarına göre belirler.",
       proPart: "Ücretsiz kullanıcılar ücretsiz programlarının yanında haftada bir uyarlanmış antrenman alır; Pro her günü planlar.",
     },
+    "auto-supersets": {
+      name: "Otomatik süper setler",
+      body: "Süper setleri aç, uyarlanabilir plan aynı kasları çalıştırmayan egzersizleri, örneğin bir press ve bir row'u eşleştirsin ve her turdan sonra daha kısa dinlenme versin, böylece süreye daha fazlası sığsın. Ağır squat ve deadlift'ler tek başına kalır, ısınma setlerini de kapatabilirsin.",
+    },
     "pick-weights": {
       name: "Sevdiğin hareketleri öğrenir",
       body: "Popüler hareketler en sık seçilir. Bir egzersizi yıldızla, çok daha sık gelsin; birini değiştirip çıkar, daha az gelsin ve bu etki birkaç ayda kaybolsun.",

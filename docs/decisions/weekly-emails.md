@@ -713,3 +713,12 @@ Every exercise and stretch now lists its two or three most common form mistakes,
 - Between sets, the rest timer shows one to watch on your next set, a different one each set.
 - They're part of the app, so they work with no signal, in every language.
 Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))
+
+### W63 · Supersets, built for you (**New**, 2026-11-17)
+Free · Lifters · Screen: Settings › Training at Adaptive workouts, with supersets switched on · `fresh`, so it goes next to everyone already in the series
+Your adaptive workouts can now pair exercises into supersets for you, with one switch.
+- Turn on Pair exercises into supersets in Settings › Training › Adaptive workouts.
+- Exercises that don't share muscles go back to back, like a press and a row, so each rests while you do the other.
+- The rest after each round is shorter, and the time saved fits more training into the length you pick.
+- Heavy squats and deadlifts stay on their own, and you can split any pair on Today.
+Did you know? The same section has a Warm-up sets switch, for days you'd rather warm up your own way. ([Adaptive workout options](adaptive-options.md))

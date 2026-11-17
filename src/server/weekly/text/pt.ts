@@ -853,4 +853,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Prefere não ver no cronômetro de descanso? Desligue Checagem de técnica no descanso em Ajustes › Treino.",
   },
+  "auto-supersets": {
+    title: "Supersets, montados para você",
+    intro: "Seus treinos adaptativos agora podem juntar exercícios em supersets para você, com um único botão.",
+    points: [
+      "Ative Juntar exercícios em supersets em Ajustes › Planejamento › Treinos adaptativos.",
+      "Exercícios que não usam os mesmos músculos são feitos em sequência, como um supino e uma remada, então cada um descansa enquanto você faz o outro.",
+      "O descanso depois de cada rodada é menor, e o tempo economizado põe mais treino na duração que você escolher.",
+      "Agachamentos e levantamentos terra pesados ficam sozinhos, e você pode separar qualquer par em Hoje.",
+    ],
+    dyk: "A mesma seção tem o botão Séries de aquecimento, para os dias em que você prefere aquecer do seu jeito.",
+  },
 };

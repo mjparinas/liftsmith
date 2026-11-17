@@ -116,6 +116,10 @@ export const pl: FeaturesText = {
       body: "Wybiera ćwiczenia, które da się zrobić na twojej siłowni i na które twoje mięśnie są gotowe, a potem ustala każdy ciężar i liczbę powtórzeń na podstawie ostatnich treningów.",
       proPart: "W wersji darmowej masz jeden adaptacyjny trening tygodniowo obok darmowego programu; Pro planuje każdy dzień.",
     },
+    "auto-supersets": {
+      name: "Automatyczne superserie",
+      body: "Włącz superserie, a plan adaptacyjny połączy ćwiczenia, które nie angażują tych samych mięśni, jak wyciskanie i wiosłowanie, z krótszą przerwą po każdej rundzie, więc w twoim czasie zmieści się więcej. Ciężkie przysiady i martwe ciągi zostają osobno, a serie rozgrzewkowe możesz też wyłączyć.",
+    },
     "pick-weights": {
       name: "Uczy się ćwiczeń, które lubisz",
       body: "Popularne ćwiczenia wybiera najczęściej. Oznacz ćwiczenie gwiazdką, a będzie pojawiać się dużo częściej; zamień je na inne, a pojawi się rzadziej, i to stopniowo słabnie przez kilka miesięcy.",

@@ -78,6 +78,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "auto-supersets",
+        name: "Automatic supersets",
+        body: "Turn on supersets and the adaptive plan pairs exercises that don't share muscles, like a press and a row, with a shorter rest after each round, so more fits in your time. Heavy squats and deadlifts stay on their own, and you can switch warm-up sets off too.",
+        tier: "free",
+        added: "2026-11-17",
+      },
+      {
         id: "splits",
         name: "Adaptive splits",
         body: "Push, pull, legs or upper and lower, still adjusted to your recovery each day.",

@@ -852,4 +852,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Preferisci non vederli durante il recupero? Disattiva Controlli tecnici durante il recupero in Impostazioni › Allenamento.",
   },
+  "auto-supersets": {
+    title: "Superserie, fatte per te",
+    intro: "I tuoi allenamenti adattivi ora possono abbinare gli esercizi in superserie per te, con un solo interruttore.",
+    points: [
+      "Attiva Abbina gli esercizi in superserie in Impostazioni › Programmazione › Allenamenti adattivi.",
+      "Gli esercizi che non usano gli stessi muscoli si fanno di seguito, come una spinta e un rematore, così ognuno recupera mentre fai l'altro.",
+      "Il recupero dopo ogni giro è più breve, e il tempo risparmiato porta più allenamento nella durata che scegli.",
+      "Squat e stacchi pesanti restano da soli, e puoi separare qualsiasi coppia in Oggi.",
+    ],
+    dyk: "Nella stessa sezione c'è l'interruttore Serie di riscaldamento, per i giorni in cui preferisci scaldarti a modo tuo.",
+  },
 };

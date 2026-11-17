@@ -9,6 +9,7 @@ import { BLOG_AB } from "./blog/ab";
 import { BLOG_AC } from "./blog/ac";
 import { BLOG_AD } from "./blog/ad";
 import { BLOG_AE } from "./blog/ae";
+import { BLOG_AUTO_SUPERSETS } from "./blog/autoSupersets";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
 import { BLOG_COACH_PROGRAMS } from "./blog/coachPrograms";
@@ -246,6 +247,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_COACH_PROGRAMS,
   ...BLOG_SCREENSHOT_SHARE,
   ...BLOG_FORM_CUES,
+  ...BLOG_AUTO_SUPERSETS,
   ...BLOG_SITE_PAGES,
   ...BLOG_WIDGETS,
 ];
