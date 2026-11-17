@@ -18,7 +18,7 @@ import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
 import { toast } from "../toast";
 import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine, SetTag } from "../types";
-import { WARMUP_REST, warmupFor } from "../warmup";
+import { WARMUP_REST, warmupFor, warmupsOn } from "../warmup";
 import { persistActive, setsDone, uid, type Ctx } from "./shared";
 
 // The workout in progress: start, log sets, rest, swaps, supersets, finish. Kept in localStorage too,
@@ -887,7 +887,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       }
       // The new exercise gets its own warm-ups, unless working sets were already done.
       const warmed = new Set(a.plan.items.slice(0, a.index).flatMap((i) => exercise(i.exerciseId).primary));
-      const wu = done ? [] : warmupFor(exercise(toId), t.target.weight, g, warmed);
+      const wu = done || !warmupsOn(get().profile) ? [] : warmupFor(exercise(toId), t.target.weight, g, warmed);
       newItem.warmup = wu.length ? wu : undefined;
       const items = [...a.plan.items];
       items[a.index] = newItem;
@@ -908,7 +908,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       // Cardio is one long set; anything else gets the usual three.
       const sets = ex.cardio ? 1 : 3;
       const warmed = new Set(a.plan.items.flatMap((i) => exercise(i.exerciseId).primary));
-      const wu = warmupFor(ex, t.target.weight, g, warmed);
+      const wu = warmupsOn(profile) ? warmupFor(ex, t.target.weight, g, warmed) : [];
       const item: PlanItem = {
         exerciseId,
         sets,

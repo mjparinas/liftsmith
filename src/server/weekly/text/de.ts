@@ -852,4 +852,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Lieber nicht in der Pause? Schalte Technik-Checks in der Pause unter Einstellungen › Training aus.",
   },
+  "auto-supersets": {
+    title: "Supersätze, für dich gebaut",
+    intro: "Deine adaptiven Workouts können Übungen jetzt mit einem Schalter für dich zu Supersätzen verbinden.",
+    points: [
+      "Schalte Übungen zu Supersätzen verbinden in Einstellungen › Trainingsplanung › Adaptive Workouts ein.",
+      "Übungen ohne gemeinsame Muskeln kommen direkt nacheinander, etwa Drücken und Rudern, so erholt sich jede, während du die andere machst.",
+      "Die Pause nach jeder Runde ist kürzer, und die gesparte Zeit bringt mehr Training in die Länge, die du wählst.",
+      "Schwere Kniebeugen und Kreuzheben bleiben einzeln, und auf Heute kannst du jedes Paar trennen.",
+    ],
+    dyk: "Im selben Bereich gibt es einen Schalter für Aufwärmsätze, für Tage, an denen du dich lieber selbst aufwärmst.",
+  },
 };

@@ -74,6 +74,10 @@ export const de: FeaturesText = {
       body: "Wählt Übungen, die dein Studio hergibt und für die deine Muskeln bereit sind, und legt jedes Gewicht und jede Wiederholung anhand deiner letzten Trainings fest.",
       proPart: "Ohne Pro bekommst du ein adaptives Training pro Woche neben deinem kostenlosen Programm; Pro plant jeden Tag.",
     },
+    "auto-supersets": {
+      name: "Automatische Supersätze",
+      body: "Schalte Supersätze ein und der adaptive Plan verbindet Übungen ohne gemeinsame Muskeln, etwa Drücken und Rudern, mit kürzerer Pause nach jeder Runde, damit mehr in deine Zeit passt. Schwere Kniebeugen und Kreuzheben bleiben einzeln, und Aufwärmsätze kannst du auch ausschalten.",
+    },
     "pick-weights": {
       name: "Lernt die Übungen, die du magst",
       body: "Beliebte Übungen werden am häufigsten gewählt. Markiere eine mit einem Stern und sie kommt viel öfter; tausche eine aus und sie kommt ein paar Monate lang seltener.",

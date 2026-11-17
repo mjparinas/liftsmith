@@ -70,6 +70,10 @@ export const es: FeaturesText = {
       body: "Elige ejercicios que tu gimnasio permite y para los que tus músculos están listos, y fija cada peso y repetición a partir de tus últimos entrenamientos.",
       proPart: "Sin Pro tienes un entrenamiento adaptativo a la semana junto a tu programa gratuito; Pro planifica todos los días.",
     },
+    "auto-supersets": {
+      name: "Superseries automáticas",
+      body: "Activa las superseries y el plan adaptativo junta ejercicios que no comparten músculos, como un press y un remo, con menos descanso tras cada ronda, para que quepa más en tu tiempo. Las sentadillas y los pesos muertos pesados van solos, y también puedes quitar las series de calentamiento.",
+    },
     "pick-weights": {
       name: "Aprende qué ejercicios te gustan",
       body: "Los ejercicios populares se eligen más a menudo. Marca uno con estrella y saldrá mucho más; cámbialo por otro y saldrá menos, durante unos meses.",

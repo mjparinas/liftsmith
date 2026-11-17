@@ -8,7 +8,7 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
-import { analyticsOn, askFirstHere, installId, setAnalytics } from "@/lib/analytics";
+import { analyticsOn, askFirstHere, installId, setAnalytics, track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
@@ -367,22 +367,12 @@ function TrainingGroup() {
           ["advanced", t("exp.advanced")],
         ]}
       />
+      <AdaptiveOptions />
       <CalendarSettings />
       <div className="mt-6">
         <NavRow title={t("settings.injuries")} icon="heart" onClick={() => go("injuries")} />
       </div>
       <Section title={t("settings.more")}>
-        <Row<Variability>
-          info="variety"
-          label={t("settings.variety")}
-          value={profile.variability}
-          onPick={(variability) => setProfile({ variability })}
-          options={[
-            ["consistent", t("variety.consistent")],
-            ["balanced", t("variety.balanced")],
-            ["variable", t("variety.variable")],
-          ]}
-        />
         <Row<number>
           info="deloadWeeks"
           label={t("settings.block")}
@@ -400,6 +390,57 @@ function TrainingGroup() {
         {t("settings.rerun")}
       </Button>
     </>
+  );
+}
+
+/**
+ * How the adaptive plan is built (Melvin, 2026-11-17: "options to tweak how adaptive workouts work"): automatic
+ * supersets, keeping heavy lifts on their own, warm-up sets and exercise variety. Switches and chips only.
+ * docs/decisions/adaptive-options.md.
+ */
+function AdaptiveOptions() {
+  const { profile, setProfile } = useApp();
+  const tp = profile.training ?? {};
+  const put = (patch: Partial<NonNullable<typeof profile.training>>) => setProfile({ training: { ...profile.training, ...patch } });
+  return (
+    <Section title={t("train.adapt")}>
+      <p className="mb-1 px-1 text-sm text-muted">{t("train.adaptNote")}</p>
+      <SwitchRow
+        info="superset"
+        label={t("train.ss")}
+        hint={t("train.ssHint")}
+        on={!!tp.supersets}
+        onChange={(v) => {
+          put({ supersets: v || undefined });
+          track("feature", { name: "autoSuperset", detail: v ? "on" : "off" });
+        }}
+      />
+      {tp.supersets && (
+        <SwitchRow
+          label={t("train.bigAlone")}
+          hint={t("train.bigAloneHint")}
+          on={tp.bigAlone !== false}
+          onChange={(v) => put({ bigAlone: v ? undefined : false })}
+        />
+      )}
+      <SwitchRow
+        label={t("train.warmups")}
+        hint={t("train.warmupsHint")}
+        on={tp.warmups !== false}
+        onChange={(v) => put({ warmups: v ? undefined : false })}
+      />
+      <Row<Variability>
+        info="variety"
+        label={t("settings.variety")}
+        value={profile.variability}
+        onPick={(variability) => setProfile({ variability })}
+        options={[
+          ["consistent", t("variety.consistent")],
+          ["balanced", t("variety.balanced")],
+          ["variable", t("variety.variable")],
+        ]}
+      />
+    </Section>
   );
 }
 

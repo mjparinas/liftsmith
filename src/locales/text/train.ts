@@ -67,6 +67,15 @@ export const en = {
   "train.aimTimedMax": "Keep going until your form starts to slip",
   "train.aimCardio": "A steady pace you could still talk at",
   "train.aimRir": { one: "Leave {count} rep in the tank", other: "Leave {count} reps in the tank" },
+  "train.adapt": "Adaptive workouts",
+  "train.adaptNote": "How the app builds your adaptive plan each day. Changes apply to the next plan.",
+  "train.ss": "Pair exercises into supersets",
+  "train.ssHint":
+    "Exercises that don't share muscles, like a press and a row, go back to back. The rest after each round is shorter, so more fits in your time. You can still split any pair on Today.",
+  "train.bigAlone": "Keep heavy squats and deadlifts on their own",
+  "train.bigAloneHint": "On a strength goal, every heavy barbell lift stays on its own.",
+  "train.warmups": "Warm-up sets",
+  "train.warmupsHint": "Lighter sets before your first heavy sets. Applies to every plan, programs and routines too.",
 } as const;
 
 type Key = keyof typeof en;
@@ -138,6 +147,16 @@ export const es: Partial<Record<Key, Message>> = {
   "train.aimTimedMax": "Sigue hasta que la técnica empiece a fallar",
   "train.aimCardio": "Un ritmo constante al que aún podrías hablar",
   "train.aimRir": { one: "Deja {count} repetición en reserva", other: "Deja {count} repeticiones en reserva" },
+  "train.adapt": "Entrenamientos adaptativos",
+  "train.adaptNote": "Cómo la app crea tu plan adaptativo cada día. Los cambios se aplican al próximo plan.",
+  "train.ss": "Agrupar ejercicios en superseries",
+  "train.ssHint":
+    "Los ejercicios que no comparten músculos, como un press y un remo, van seguidos. El descanso tras cada ronda es más corto, así que cabe más en tu tiempo. Puedes separar cualquier pareja en Hoy.",
+  "train.bigAlone": "Dejar solas las sentadillas y los pesos muertos pesados",
+  "train.bigAloneHint": "Con el objetivo de fuerza, todos los levantamientos pesados con barra van solos.",
+  "train.warmups": "Series de calentamiento",
+  "train.warmupsHint":
+    "Series más ligeras antes de tus primeras series pesadas. Se aplica a todos los planes, también programas y rutinas.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -208,6 +227,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "train.aimTimedMax": "Continuez jusqu’à ce que la technique commence à se dégrader",
   "train.aimCardio": "Une allure régulière qui vous permet encore de parler",
   "train.aimRir": { one: "Gardez {count} répétition en réserve", other: "Gardez {count} répétitions en réserve" },
+  "train.adapt": "Séances adaptatives",
+  "train.adaptNote": "Comment l'appli construit ton plan adaptatif chaque jour. Les changements s'appliquent au prochain plan.",
+  "train.ss": "Regrouper les exercices en supersets",
+  "train.ssHint":
+    "Les exercices qui ne sollicitent pas les mêmes muscles, comme un développé et un rowing, s'enchaînent. Le repos après chaque tour est plus court, donc ta séance en contient plus. Tu peux toujours séparer une paire dans Aujourd'hui.",
+  "train.bigAlone": "Garder les squats et soulevés de terre lourds seuls",
+  "train.bigAloneHint": "Avec l'objectif force, chaque mouvement lourd à la barre reste seul.",
+  "train.warmups": "Séries d'échauffement",
+  "train.warmupsHint":
+    "Des séries plus légères avant tes premières séries lourdes. S'applique à tous les plans, programmes et routines compris.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -279,6 +308,15 @@ export const de: Partial<Record<Key, Message>> = {
   "train.aimTimedMax": "Mach weiter, bis deine Technik nachzulassen beginnt",
   "train.aimCardio": "Ein gleichmäßiges Tempo, bei dem du noch reden kannst",
   "train.aimRir": { one: "Lass {count} Wiederholung im Tank", other: "Lass {count} Wiederholungen im Tank" },
+  "train.adapt": "Adaptive Workouts",
+  "train.adaptNote": "Wie die App jeden Tag deinen adaptiven Plan erstellt. Änderungen gelten ab dem nächsten Plan.",
+  "train.ss": "Übungen zu Supersätzen verbinden",
+  "train.ssHint":
+    "Übungen ohne gemeinsame Muskeln, etwa Drücken und Rudern, kommen direkt nacheinander. Die Pause nach jeder Runde ist kürzer, so passt mehr in deine Zeit. Auf Heute kannst du jedes Paar trennen.",
+  "train.bigAlone": "Schwere Kniebeugen und Kreuzheben einzeln lassen",
+  "train.bigAloneHint": "Beim Ziel Kraft bleibt jede schwere Langhantelübung einzeln.",
+  "train.warmups": "Aufwärmsätze",
+  "train.warmupsHint": "Leichtere Sätze vor deinen ersten schweren Sätzen. Gilt für jeden Plan, auch für Programme und Routinen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -349,6 +387,15 @@ export const it: Partial<Record<Key, Message>> = {
   "train.aimTimedMax": "Continua finché la tecnica non inizia a cedere",
   "train.aimCardio": "Un ritmo costante a cui riusciresti ancora a parlare",
   "train.aimRir": { one: "Tieni {count} ripetizione di riserva", other: "Tieni {count} ripetizioni di riserva" },
+  "train.adapt": "Allenamenti adattivi",
+  "train.adaptNote": "Come l'app crea ogni giorno il tuo piano adattivo. Le modifiche valgono dal prossimo piano.",
+  "train.ss": "Abbina gli esercizi in superserie",
+  "train.ssHint":
+    "Gli esercizi che non usano gli stessi muscoli, come una spinta e un rematore, si fanno di seguito. Il recupero dopo ogni giro è più breve, così nel tuo tempo ci sta di più. Puoi sempre separare una coppia in Oggi.",
+  "train.bigAlone": "Lascia da soli squat e stacchi pesanti",
+  "train.bigAloneHint": "Con l'obiettivo forza, ogni alzata pesante col bilanciere resta da sola.",
+  "train.warmups": "Serie di riscaldamento",
+  "train.warmupsHint": "Serie più leggere prima delle prime serie pesanti. Vale per ogni piano, anche programmi e routine.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -413,6 +460,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "train.aimTimedMax": "フォームが崩れ始めるまで続ける",
   "train.aimCardio": "会話ができる程度の一定のペースで",
   "train.aimRir": { other: "余力を{count}回残す" },
+  "train.adapt": "アダプティブワークアウト",
+  "train.adaptNote": "アプリが毎日アダプティブプランを組む方法です。変更は次のプランから反映されます。",
+  "train.ss": "種目をスーパーセットに組む",
+  "train.ssHint":
+    "プレスとロウのように使う筋肉が重ならない種目を続けて行います。各ラウンド後の休憩が短くなるので、同じ時間でより多くこなせます。ペアは今日の画面でいつでも分けられます。",
+  "train.bigAlone": "重いスクワットとデッドリフトは単独で行う",
+  "train.bigAloneHint": "目標が筋力のときは、重いバーベル種目はすべて単独で行います。",
+  "train.warmups": "ウォームアップセット",
+  "train.warmupsHint": "最初の重いセットの前に軽いセットを行います。プログラムやルーティンを含むすべてのプランに適用されます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -488,6 +544,16 @@ export const pt: Partial<Record<Key, Message>> = {
     one: "Deixe {count} rep no tanque",
     other: "Deixe {count} reps no tanque",
   },
+  "train.adapt": "Treinos adaptativos",
+  "train.adaptNote": "Como o app monta seu plano adaptativo a cada dia. As mudanças valem a partir do próximo plano.",
+  "train.ss": "Juntar exercícios em supersets",
+  "train.ssHint":
+    "Exercícios que não usam os mesmos músculos, como um supino e uma remada, são feitos em sequência. O descanso depois de cada rodada é menor, então cabe mais no seu tempo. Você ainda pode separar qualquer par em Hoje.",
+  "train.bigAlone": "Deixar agachamentos e levantamentos terra pesados sozinhos",
+  "train.bigAloneHint": "Com o objetivo força, todo levantamento pesado com barra fica sozinho.",
+  "train.warmups": "Séries de aquecimento",
+  "train.warmupsHint":
+    "Séries mais leves antes das suas primeiras séries pesadas. Vale para todos os planos, inclusive programas e rotinas.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -557,6 +623,15 @@ export const ko: Partial<Record<Key, Message>> = {
   "train.aimRir": {
     other: "{count}회 여유 남기기",
   },
+  "train.adapt": "맞춤 운동",
+  "train.adaptNote": "앱이 매일 맞춤 플랜을 짜는 방식입니다. 변경 사항은 다음 플랜부터 적용됩니다.",
+  "train.ss": "운동을 슈퍼세트로 묶기",
+  "train.ssHint":
+    "프레스와 로우처럼 쓰는 근육이 겹치지 않는 운동을 연달아 합니다. 라운드마다 휴식이 짧아져 같은 시간에 더 많이 할 수 있습니다. 오늘 화면에서 언제든 짝을 나눌 수 있습니다.",
+  "train.bigAlone": "무거운 스쿼트와 데드리프트는 따로 하기",
+  "train.bigAloneHint": "목표가 근력이면 무거운 바벨 운동은 모두 따로 합니다.",
+  "train.warmups": "워밍업 세트",
+  "train.warmupsHint": "첫 무거운 세트 전에 가벼운 세트를 합니다. 프로그램과 루틴을 포함한 모든 플랜에 적용됩니다.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -632,6 +707,15 @@ export const tr: Partial<Record<Key, Message>> = {
     one: "Yedekte {count} tekrar bırak",
     other: "Yedekte {count} tekrar bırak",
   },
+  "train.adapt": "Uyarlanabilir antrenmanlar",
+  "train.adaptNote": "Uygulamanın her gün uyarlanabilir planını nasıl kurduğu. Değişiklikler bir sonraki plandan itibaren geçerli olur.",
+  "train.ss": "Egzersizleri süper setlerde eşleştir",
+  "train.ssHint":
+    "Aynı kasları çalıştırmayan egzersizler, örneğin bir press ve bir row, art arda yapılır. Her turdan sonraki dinlenme daha kısadır, böylece süreye daha fazlası sığar. Bugün ekranında istediğin çifti yine ayırabilirsin.",
+  "train.bigAlone": "Ağır squat ve deadlift'leri tek başına bırak",
+  "train.bigAloneHint": "Hedef güç olduğunda her ağır halter hareketi tek başına kalır.",
+  "train.warmups": "Isınma setleri",
+  "train.warmupsHint": "İlk ağır setlerinden önce daha hafif setler. Programlar ve rutinler dahil her plana uygulanır.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -712,4 +796,13 @@ export const pl: Partial<Record<Key, Message>> = {
     many: "Zostaw {count} powtórzeń w zapasie",
     other: "Zostaw {count} powtórzenia w zapasie",
   },
+  "train.adapt": "Treningi adaptacyjne",
+  "train.adaptNote": "Jak aplikacja układa codziennie twój plan adaptacyjny. Zmiany obowiązują od następnego planu.",
+  "train.ss": "Łącz ćwiczenia w superserie",
+  "train.ssHint":
+    "Ćwiczenia, które nie angażują tych samych mięśni, jak wyciskanie i wiosłowanie, robisz jedno po drugim. Przerwa po każdej rundzie jest krótsza, więc w twoim czasie zmieści się więcej. Każdą parę możesz rozdzielić na ekranie Dziś.",
+  "train.bigAlone": "Ciężkie przysiady i martwe ciągi osobno",
+  "train.bigAloneHint": "Przy celu siła każde ciężkie ćwiczenie ze sztangą zostaje osobno.",
+  "train.warmups": "Serie rozgrzewkowe",
+  "train.warmupsHint": "Lżejsze serie przed pierwszymi ciężkimi seriami. Dotyczy każdego planu, także programów i rutyn.",
 };

@@ -71,6 +71,10 @@ export const it: FeaturesText = {
       body: "Sceglie esercizi che la tua palestra permette e per cui i tuoi muscoli sono pronti, poi fissa ogni peso e ripetizione in base ai tuoi ultimi allenamenti.",
       proPart: "Senza Pro hai un allenamento adattivo a settimana accanto al programma gratuito; Pro pianifica ogni giorno.",
     },
+    "auto-supersets": {
+      name: "Superserie automatiche",
+      body: "Attiva le superserie e il piano adattivo abbina esercizi che non usano gli stessi muscoli, come una spinta e un rematore, con un recupero più breve dopo ogni giro, così nel tuo tempo ci sta di più. Squat e stacchi pesanti restano da soli, e puoi anche togliere le serie di riscaldamento.",
+    },
     "pick-weights": {
       name: "Impara gli esercizi che ti piacciono",
       body: "Gli esercizi più popolari vengono scelti più spesso. Metti una stella a un esercizio e uscirà molto di più; sostituiscilo e uscirà meno, per qualche mese.",

@@ -855,4 +855,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Vous préférez ne pas les voir pendant le repos ? Désactivez Points techniques pendant le repos dans Réglages › Séance.",
   },
+  "auto-supersets": {
+    title: "Des supersets, faits pour toi",
+    intro: "Tes séances adaptatives peuvent maintenant regrouper les exercices en supersets pour toi, avec un seul interrupteur.",
+    points: [
+      "Active Regrouper les exercices en supersets dans Réglages › Entraînement › Séances adaptatives.",
+      "Les exercices qui ne sollicitent pas les mêmes muscles s'enchaînent, comme un développé et un rowing, donc chacun récupère pendant l'autre.",
+      "Le repos après chaque tour est plus court, et le temps gagné ajoute de l'entraînement dans la durée que tu choisis.",
+      "Les squats et soulevés de terre lourds restent seuls, et tu peux séparer une paire dans Aujourd'hui.",
+    ],
+    dyk: "La même section a un interrupteur Séries d'échauffement, pour les jours où tu préfères t'échauffer à ta façon.",
+  },
 };

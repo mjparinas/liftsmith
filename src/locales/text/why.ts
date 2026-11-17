@@ -28,6 +28,8 @@ export const en = {
   "why.short.planned": "Weights follow on from last time.",
   "why.short.push": "Your first big lift goes one rep closer to failure.",
   "why.short.easy": "One set fewer and a step lighter, so you come back stronger.",
+  "why.pair": "Superset with {other}: other muscles, so each rests during the other's set and the rest after a round is {rest}",
+  "why.pairRest": "Rest is {rest} in this superset, because these muscles rested during the other exercise",
 } as const;
 
 type Key = keyof typeof en;
@@ -57,6 +59,9 @@ export const es: Partial<Record<Key, Message>> = {
   "why.short.planned": "Los pesos siguen desde la última vez.",
   "why.short.push": "Tu primer ejercicio grande va una repetición más cerca del fallo.",
   "why.short.easy": "Una serie menos y un escalón más ligero, para volver más fuerte.",
+  "why.pair":
+    "Superserie con {other}: otros músculos, así que cada uno descansa durante la serie del otro y el descanso tras la ronda es de {rest}",
+  "why.pairRest": "El descanso es de {rest} en esta superserie, porque estos músculos descansaron durante el otro ejercicio",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -84,6 +89,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "why.short.planned": "Les charges suivent la dernière fois.",
   "why.short.push": "Votre premier gros exercice va une répétition plus près de l’échec.",
   "why.short.easy": "Une série de moins et un cran plus léger, pour revenir plus fort.",
+  "why.pair":
+    "Superset avec {other} : d'autres muscles, donc chacun récupère pendant la série de l'autre et le repos après un tour est de {rest}",
+  "why.pairRest": "Repos de {rest} dans ce superset, car ces muscles ont récupéré pendant l'autre exercice",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -111,6 +119,8 @@ export const de: Partial<Record<Key, Message>> = {
   "why.short.planned": "Die Gewichte schließen an letztes Mal an.",
   "why.short.push": "Deine erste große Übung geht eine Wiederholung näher ans Muskelversagen.",
   "why.short.easy": "Ein Satz weniger und etwas leichter, damit du stärker zurückkommst.",
+  "why.pair": "Supersatz mit {other}: andere Muskeln, also erholt sich jeder im Satz des anderen und die Pause nach einer Runde ist {rest}",
+  "why.pairRest": "Die Pause ist {rest} in diesem Supersatz, weil sich diese Muskeln während der anderen Übung erholt haben",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -138,6 +148,9 @@ export const it: Partial<Record<Key, Message>> = {
   "why.short.planned": "I pesi partono dall’ultima volta.",
   "why.short.push": "Il primo grande esercizio va una ripetizione più vicino al cedimento.",
   "why.short.easy": "Una serie in meno e un po’ più leggero, così torni più forte.",
+  "why.pair":
+    "Superserie con {other}: muscoli diversi, quindi ognuno recupera durante la serie dell'altro e il recupero dopo il giro è {rest}",
+  "why.pairRest": "Recupero di {rest} in questa superserie, perché questi muscoli hanno riposato durante l'altro esercizio",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -164,6 +177,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "why.short.planned": "重量は前回から引き継ぎます。",
   "why.short.push": "最初の主要種目は限界まであと1回近づけます。",
   "why.short.easy": "セットを1つ減らして少し軽くし、次はもっと強くなって戻りましょう。",
+  "why.pair": "{other}とスーパーセット：使う筋肉が違うので、もう一方のセット中に休め、ラウンド後の休憩は{rest}です",
+  "why.pairRest": "このスーパーセットでは休憩{rest}：もう一方の種目の間にこの筋肉は休めています",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -194,6 +209,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "why.short.planned": "Os pesos continuam de onde parou da última vez.",
   "why.short.push": "Seu primeiro exercício grande vai uma rep mais perto da falha.",
   "why.short.easy": "Uma série a menos e um pouco mais leve, para você voltar mais forte.",
+  "why.pair":
+    "Superset com {other}: outros músculos, então cada um descansa durante a série do outro e o descanso depois da rodada é de {rest}",
+  "why.pairRest": "Descanso de {rest} neste superset, porque estes músculos descansaram durante o outro exercício",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -222,6 +240,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "why.short.planned": "무게는 지난번에서 이어져요.",
   "why.short.push": "첫 큰 운동은 실패에 1회 더 가깝게 해요.",
   "why.short.easy": "한 세트 적게, 한 단계 가볍게 해서 더 강해져서 돌아와요.",
+  "why.pair": "{other}와 슈퍼세트: 다른 근육이라 서로의 세트 동안 쉬고, 라운드 후 휴식은 {rest}입니다",
+  "why.pairRest": "이 슈퍼세트의 휴식은 {rest}: 다른 운동을 하는 동안 이 근육은 쉬었습니다",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -252,6 +272,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "why.short.planned": "Ağırlıklar geçen seferden devam eder.",
   "why.short.push": "İlk büyük hareketin tükenişe bir tekrar daha yakın gider.",
   "why.short.easy": "Bir set eksik ve bir kademe hafif, böylece daha güçlü dönersin.",
+  "why.pair": "{other} ile süper set: farklı kaslar, bu yüzden her biri diğerinin setinde dinlenir ve tur sonrası dinlenme {rest}",
+  "why.pairRest": "Bu süper sette dinlenme {rest}, çünkü bu kaslar diğer egzersiz sırasında dinlendi",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -283,4 +305,6 @@ export const pl: Partial<Record<Key, Message>> = {
   "why.short.planned": "Ciężary są kontynuacją ostatniego razu.",
   "why.short.push": "Pierwsze duże ćwiczenie robisz o jedno powtórzenie bliżej upadku mięśniowego.",
   "why.short.easy": "Jedna seria mniej i trochę mniejszy ciężar, żeby nabrać sił na kolejny trening.",
+  "why.pair": "Superseria z: {other}. Inne mięśnie, więc każdy odpoczywa podczas serii drugiego, a przerwa po rundzie to {rest}",
+  "why.pairRest": "Przerwa w tej superserii to {rest}, bo te mięśnie odpoczęły podczas drugiego ćwiczenia",
 };

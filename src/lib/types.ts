@@ -408,6 +408,12 @@ export interface TrainingPrefs {
   minutes?: number;
   /** 1 Monday (default) or 0 Sunday: streaks, quests and weekly stats. */
   weekStart?: 0 | 1;
+  /** Adaptive workouts pair exercises that don't share muscles into supersets, with shorter rest (autoSuperset.ts). Missing means off. */
+  supersets?: boolean;
+  /** With supersets on: heavy barbell squats and hinges (every barbell compound on a strength goal) stay on their own. Missing means on. */
+  bigAlone?: boolean;
+  /** Lighter warm-up sets before the first heavy sets for each muscle (warmup.ts). Missing means on. */
+  warmups?: boolean;
 }
 
 export type PlanSource =

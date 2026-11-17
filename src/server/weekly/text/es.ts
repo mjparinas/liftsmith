@@ -851,4 +851,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "¿Prefieres no verlos en el descanso? Desactiva Revisar la técnica al descansar en Ajustes › Entrenamiento.",
   },
+  "auto-supersets": {
+    title: "Superseries, hechas para ti",
+    intro: "Tus entrenamientos adaptativos ahora pueden juntar ejercicios en superseries por ti, con un solo interruptor.",
+    points: [
+      "Activa Agrupar ejercicios en superseries en Ajustes › Entrenamiento › Entrenamientos adaptativos.",
+      "Los ejercicios que no comparten músculos van seguidos, como un press y un remo, así cada uno descansa mientras haces el otro.",
+      "El descanso tras cada ronda es más corto, y el tiempo ahorrado mete más entrenamiento en la duración que elijas.",
+      "Las sentadillas y los pesos muertos pesados van solos, y puedes separar cualquier pareja en Hoy.",
+    ],
+    dyk: "En la misma sección hay un interruptor de Series de calentamiento, para los días en que prefieras calentar a tu manera.",
+  },
 };
