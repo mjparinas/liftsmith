@@ -29,6 +29,38 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "club chat: a page of a club's messages (clubChat.ts clubChat)",
+    sql: `SELECT m.id FROM club_messages m JOIN social_profiles sp ON sp.account_id = m.account_id
+          WHERE m.club_id = ?1 AND m.hidden = 0 AND m.created_at < ?3 ORDER BY m.created_at DESC LIMIT 50`,
+    uses: ["club_messages_club"],
+    noScan: ["club_messages", "m"],
+  },
+  {
+    name: "club chat: unread messages on the club list (social.ts clubs)",
+    sql: `SELECT COUNT(*) FROM club_messages cmsg WHERE cmsg.club_id = ? AND cmsg.created_at > ? AND cmsg.account_id != ? AND cmsg.hidden = 0`,
+    uses: ["club_messages_club"],
+    noScan: ["club_messages", "cmsg"],
+  },
+  {
+    name: "crew sessions: a club's coming sessions (clubChat.ts sessionsFor)",
+    sql: `SELECT cs.id FROM crew_sessions cs WHERE cs.club_id = ?1 AND cs.starts_at > ?3 AND cs.starts_at < ?4 ORDER BY cs.starts_at LIMIT 20`,
+    uses: ["crew_sessions_club"],
+    noScan: ["crew_sessions", "cs"],
+  },
+  {
+    name: "crew sessions: reminders due (clubChat.ts crewReminders)",
+    sql: "SELECT id FROM crew_sessions WHERE reminded = 0 AND starts_at > ? AND starts_at <= ? ORDER BY starts_at LIMIT 200",
+    uses: ["crew_sessions_due"],
+    noScan: ["crew_sessions"],
+  },
+  {
+    name: "crew sessions: the lifter's sessions around a posted workout (clubChat.ts crewTrained)",
+    sql: `SELECT g.session_id FROM crew_going g JOIN crew_sessions cs ON cs.id = g.session_id
+          WHERE g.account_id = ? AND cs.starts_at BETWEEN ? AND ?`,
+    uses: ["crew_going_account"],
+    noScan: ["crew_going", "g", "crew_sessions", "cs"],
+  },
+  {
     name: "admin stats: an install's first event of a kind (adminData.ts)",
     sql: "SELECT MIN(at) FROM events e WHERE e.install_id = ? AND e.name = 'workout_start'",
     uses: ["events_install_name"],

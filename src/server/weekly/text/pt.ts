@@ -864,4 +864,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A mesma seção tem o botão Séries de aquecimento, para os dias em que você prefere aquecer do seu jeito.",
   },
+  "club-chat": {
+    title: "Seu clube, entre os treinos",
+    intro: "Os clubes agora têm chat e treinos em grupo, para quem treina com você poder conversar e se encontrar.",
+    points: [
+      "Abra Amigos › Clubes, escolha um clube e toque em Chat para falar com todo mundo.",
+      "Marque um treino em grupo com um nome, um dia e um horário, e os membros tocam em Eu vou.",
+      "Quem vai recebe um lembrete uma hora antes.",
+      "Poste seu treino depois e você aparece como quem treinou, com os amigos que treinaram com você marcados.",
+    ],
+    dyk: "Me avisar, no chat de cada clube, desliga as notificações dele, e um chat manda no máximo uma por hora.",
+  },
 };

@@ -830,6 +830,40 @@ const SCHEMA = [
     PRIMARY KEY (club_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS club_members_account ON club_members (account_id)`,
+  // Club chat and crew sessions (clubChat.ts, Melvin 2026-11-17): a club's messages, the times its members post to
+  // train together, and who's in for each (trained = they posted a workout around its time).
+  `CREATE TABLE IF NOT EXISTS club_messages (
+    id TEXT PRIMARY KEY,
+    club_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    hidden INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS club_messages_club ON club_messages (club_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS club_messages_account ON club_messages (account_id)`,
+  `CREATE TABLE IF NOT EXISTS crew_sessions (
+    id TEXT PRIMARY KEY,
+    club_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    starts_at INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    place TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    reminded INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_club ON crew_sessions (club_id, starts_at)`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_account ON crew_sessions (account_id)`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_starts ON crew_sessions (starts_at)`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_due ON crew_sessions (starts_at) WHERE reminded = 0`,
+  `CREATE TABLE IF NOT EXISTS crew_going (
+    session_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    trained INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (session_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS crew_going_account ON crew_going (account_id)`,
   // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
   `CREATE TABLE IF NOT EXISTS mutes (
     muter_id TEXT NOT NULL,
@@ -1297,6 +1331,10 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "added_by", "TEXT NOT NULL DEFAULT ''"],
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
+  // Club chat (clubChat.ts): when the member last opened it, last got a push about it, and their "Notify me" switch.
+  ["club_members", "read_at", "INTEGER NOT NULL DEFAULT 0"],
+  ["club_members", "pushed_at", "INTEGER NOT NULL DEFAULT 0"],
+  ["club_members", "chat_push", "INTEGER NOT NULL DEFAULT 1"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
   // Amenities (a comma list from gymExtras.ts AMENITIES) and prices (JSON), set by the owner (2026-11-13).
   ["gym_places", "amenities", "TEXT NOT NULL DEFAULT ''"],

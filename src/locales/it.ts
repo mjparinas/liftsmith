@@ -32,6 +32,7 @@ import * as count from "./text/count";
 import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
+import * as crew from "./text/crew";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
@@ -156,6 +157,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...bmi.it,
   ...body.it,
   ...buddy.it,
+  ...crew.it,
   ...buy.it,
   ...cal.it,
   ...calc.it,

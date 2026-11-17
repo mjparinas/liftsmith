@@ -38,7 +38,7 @@ describe("a gym's club", () => {
 
     expect((await call("acc-lifter", "clubJoin", { code: first.code })).code).toBe(200);
     const list = (await call("acc-lifter", "clubs")).body.clubs as { name: string; members: number }[];
-    expect(list).toEqual([{ id: first.id, name: "Iron Works", members: 2, mine: false }]);
+    expect(list).toEqual([{ id: first.id, name: "Iron Works", members: 2, mine: false, unread: 0, nextSession: null }]);
   });
 
   it("stays with its members as an ordinary club when the owner lets the gym go", async () => {
