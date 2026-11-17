@@ -5,6 +5,7 @@ import type { Stats } from "./derive";
 import { goalStreak } from "./game";
 import { t } from "./i18n";
 import { anniversaryYears } from "./moments";
+import { kitName, KITS, seasonOwned, stillOpen } from "./seasons";
 import type { AppEvent, Profile } from "./types";
 
 // Earned themes and app icons. A theme is a full palette (background tint plus accent) unlocked by
@@ -39,6 +40,8 @@ export interface Theme {
   earned?(ctx: UnlockContext): boolean;
   /** Months (0-11) when a seasonal theme is open to everyone. */
   season?: number[];
+  /** From a training season's track (seasons.ts): shown while its season can still be earned, or once owned. */
+  fromSeason?: string;
 }
 
 export interface UnlockContext {
@@ -46,16 +49,19 @@ export interface UnlockContext {
   /** Tiers reached per achievement id (Achievement.level). */
   badges: ReadonlyMap<string, number>;
   now: number;
+  /** Locker items and themes from training seasons (seasons.ts seasonOwned). */
+  items?: ReadonlySet<string>;
 }
 
 /** Everything unlocked() needs, from the event log. */
 export function unlockContext(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): UnlockContext {
-  return unlockFrom(achievements(context(events, stats, profile, goalStreak(stats, profile, now).best)), stats, now);
+  const list = achievements(context(events, stats, profile, goalStreak(stats, profile, now).best));
+  return unlockFrom(list, stats, now, seasonOwned(events, stats, profile, now).items);
 }
 
 /** The same, from achievements already worked out (`game().achievements`), so the app doesn't count them twice. */
-export function unlockFrom(list: readonly Achievement[], stats: Stats, now: number): UnlockContext {
-  return { stats, badges: new Map(list.map((a) => [a.id, a.level])), now };
+export function unlockFrom(list: readonly Achievement[], stats: Stats, now: number, items?: ReadonlySet<string>): UnlockContext {
+  return { stats, badges: new Map(list.map((a) => [a.id, a.level])), now, items };
 }
 
 /** Has the lifter reached this tier of this achievement? */
@@ -127,6 +133,21 @@ const DATA: Omit<Theme, "name" | "how">[] = [
     badge: { id: "pro", tier: "bronze" },
   },
   {
+    // Season 1's theme and icon (seasons.ts KITS.ember, tier 12), and the Pro bonus row's at tier 20.
+    id: "ember",
+    icon: "ember",
+    fromSeason: "ember",
+    palette: { bg: "#120a08", surface: "#1c110d", raised: "#271813", line: "#3a241c", accent: "#ff6a3d", accentInk: "#2a0c02" },
+    earned: (c) => !!c.items?.has("ember"),
+  },
+  {
+    id: "embergold",
+    icon: "embergold",
+    fromSeason: "ember",
+    palette: { bg: "#110c06", surface: "#1b140b", raised: "#261c10", line: "#3a2b18", accent: "#ffb02e", accentInk: "#2a1a00" },
+    earned: (c) => !!c.items?.has("embergold"),
+  },
+  {
     id: "pumpkin",
     icon: null,
     season: [9],
@@ -148,6 +169,10 @@ export const THEMES: Theme[] = DATA.map((d) => ({
     return t(`theme.${d.id}` as MessageKey);
   },
   get how() {
+    if (d.fromSeason) {
+      const r = KITS[d.fromSeason]?.rewards.find((x) => x.kind === "theme" && x.id === d.id);
+      return t(r?.pro ? "ssn.howPro" : "ssn.how", { name: kitName(d.fromSeason), tier: r?.tier ?? 0 });
+    }
     return d.badge
       ? t("theme.badge", { badge: achName(d.badge.id), tier: TIER_LABEL[d.badge.tier] })
       : t(`theme.${d.id}.how` as MessageKey);
@@ -159,6 +184,11 @@ export const THEME_BY_ID = new Map(THEMES.map((t) => [t.id, t]));
 export function unlocked(t: Theme, c: UnlockContext): boolean {
   if (t.season?.includes(new Date(c.now).getMonth())) return true;
   return (t.badge !== undefined && hasBadge(c, t.badge.id, t.badge.tier)) || (t.earned?.(c) ?? false);
+}
+
+/** Whether to list a theme (and its icon) at all: a season's theme goes once its season can't be earned, unless owned. */
+export function themeShown(t: Theme, c: UnlockContext): boolean {
+  return !t.fromSeason || unlocked(t, c) || stillOpen(t.id, c.now);
 }
 
 /** Themes a badge unlocks, for the badge's row on Awards. */

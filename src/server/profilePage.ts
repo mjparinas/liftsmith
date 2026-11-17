@@ -62,6 +62,8 @@ const FACES: Record<AvatarId, { icon: IconName | "mascot"; hue: string }> = {
   "av-trophy": { icon: "trophy", hue: "var(--gold)" },
   "av-flame": { icon: "flame", hue: "var(--ember)" },
   "av-pro": { icon: "sparkle", hue: "var(--violet)" },
+  "av-ember": { icon: "flame", hue: "var(--ember)" },
+  "av-ember-pro": { icon: "star", hue: "var(--gold)" },
 };
 
 const KETTLEBELL = `<svg width="62" height="62" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="kb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b9cff"/><stop offset=".55" stop-color="#7f8bff"/><stop offset="1" stop-color="#9b86ff"/></linearGradient></defs><path d="M25 56C18 30 24 10 50 10s32 20 25 46" fill="none" stroke="url(#kb)" stroke-width="11" stroke-linecap="round"/><path d="M50 36c20 0 33 12 33 29 0 9-3 17-9 24H26c-6-7-9-15-9-24 0-17 13-29 33-29z" fill="url(#kb)"/><circle cx="40" cy="62" r="3.5" fill="#06122a"/><circle cx="60" cy="62" r="3.5" fill="#06122a"/><path d="M43 72q7 6 14 0" fill="none" stroke="#06122a" stroke-width="3" stroke-linecap="round"/></svg>`;

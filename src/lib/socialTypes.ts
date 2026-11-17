@@ -129,6 +129,8 @@ export const AVATAR_IDS = [
   "av-trophy",
   "av-flame",
   "av-pro",
+  "av-ember",
+  "av-ember-pro",
 ] as const;
 export type AvatarId = (typeof AVATAR_IDS)[number];
 

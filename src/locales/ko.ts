@@ -113,6 +113,7 @@ import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
 import * as social from "./text/social";
+import * as ssn from "./text/ssn";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -243,6 +244,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...save.ko,
   ...sband.ko,
   ...sea.ko,
+  ...ssn.ko,
   ...settings.ko,
   ...setup.ko,
   ...share.ko,

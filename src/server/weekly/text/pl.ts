@@ -849,4 +849,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Wolisz ich nie widzieć na liczniku przerwy? Wyłącz Kontrola techniki w przerwie w Ustawienia › Trening.",
   },
+  seasons: {
+    title: "Sezony treningowe startują w poniedziałek",
+    intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",
+    points: [
+      "Awansujesz, osiągając własny cel tygodniowy. Dni ponad cel nic nie dają, więc dwa dni w tygodniu awansują tak szybko jak pięć.",
+      "Poziomy dają odznaki, awatar, kolor akcentu i motyw Żar z ikoną aplikacji, tylko z tego sezonu i Twoje na zawsze.",
+      "Opuściłeś tydzień? Następny tydzień z osiągniętym celem daje podwójny bonus. Ostatni tydzień liczy się podwójnie.",
+      "Każdy nowy rekord ma szansę 1 na 6 na rzadkie talerze sezonu.",
+    ],
+    dyk: "Wolisz nie widzieć sezonów? Wyłącz Sezony treningowe w Ustawienia › Wygląd. Twój trening nadal się liczy.",
+  },
 };

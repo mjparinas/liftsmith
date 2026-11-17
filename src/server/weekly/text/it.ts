@@ -852,4 +852,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Preferisci non vederli durante il recupero? Disattiva Controlli tecnici durante il recupero in Impostazioni › Allenamento.",
   },
+  seasons: {
+    title: "Le stagioni di allenamento iniziano lunedì",
+    intro: "La stagione 1, Brace, inizia lunedì: dieci settimane, un percorso di 20 livelli e premi che si ottengono solo quest'inverno.",
+    points: [
+      "Sali raggiungendo il tuo obiettivo settimanale. I giorni in più non danno punti, quindi due giorni a settimana salgono veloci quanto cinque.",
+      "I livelli danno badge, un avatar, un colore d'accento e il tema Brace con la sua icona, solo di questa stagione e tuoi per sempre.",
+      "Salti una settimana? La successiva in cui raggiungi l'obiettivo vale il bonus doppio. L'ultima settimana vale doppio.",
+      "Ogni nuovo record ha 1 possibilità su 6 di far cadere i dischi rari della stagione.",
+    ],
+    dyk: "Preferisci non vedere le stagioni? Disattiva Stagioni di allenamento in Impostazioni › Aspetto e stile. Il tuo allenamento conta comunque.",
+  },
 };

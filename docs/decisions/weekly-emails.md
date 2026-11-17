@@ -713,3 +713,12 @@ Every exercise and stretch now lists its two or three most common form mistakes,
 - Between sets, the rest timer shows one to watch on your next set, a different one each set.
 - They're part of the app, so they work with no signal, in every language.
 Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))
+
+### W63 · Training seasons start Monday (**New**, 2026-11-17)
+Free + Pro · Lifters · Screen: the Season screen · `fresh`, so it goes next to everyone already in the series
+Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.
+- You climb by meeting your own weekly goal. Days past it earn nothing, so two days a week climbs as fast as five.
+- Tiers bring season-only badges, an avatar, an accent and the Ember theme with its app icon, yours to keep.
+- Miss a week and the next goal week pays its bonus twice. The last week counts double.
+- Every new best has a 1 in 6 chance to drop the season's rare plates.
+Did you know? Rather not see seasons? Turn off Training seasons in Settings › Look and feel. Your training still counts. ([Training seasons](seasons.md))

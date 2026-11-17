@@ -132,6 +132,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("screenshot-share", "free", "stats", { fresh: "2026-11-16" }),
   // New, 2026-11-16: common mistakes and their fixes on every exercise (docs/decisions/form-cues.md).
   L("form-cues", "free", "exercise/back-squat", { fresh: "2026-11-16" }),
+  // New, 2026-11-17: training seasons (docs/decisions/seasons.md).
+  L("seasons", "both", "season", { fresh: "2026-11-17" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

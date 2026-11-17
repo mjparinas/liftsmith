@@ -42,6 +42,7 @@ export const ROUTES = [
   "gymadd",
   "log",
   "program",
+  "season",
 ] as const;
 export type Route = (typeof ROUTES)[number];
 

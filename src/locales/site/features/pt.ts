@@ -502,6 +502,12 @@ export const pt: FeaturesText = {
       name: "Conquistas, níveis e sequências",
       body: "Medalhas em níveis, 50 níveis com recompensas, missões semanais, congelamentos de sequência e ligas honestas.",
     },
+    seasons: {
+      name: "Temporadas de treino",
+      body: "Temporadas de dez semanas com uma trilha de 20 níveis, que você sobe treinando rumo à sua própria meta semanal: dois dias por semana sobem tão rápido quanto cinco, e dias extras não somam. Os níveis dão medalhas, um avatar, uma cor de destaque e um tema com ícone exclusivos da temporada, seus para sempre. Desafios da temporada, um item raro por novos recordes, estrelas de prestígio, uma semana de recuperação depois de uma falha, uma final com pontos em dobro e um resumo para compartilhar.",
+      proPart: "Todos os níveis e recompensas são grátis; o Pro adiciona uma recompensa bônus em três níveis.",
+      note: "Os ícones da temporada estão no Android e no iPhone; a web recebe o tema. As temporadas podem ser desligadas em Ajustes.",
+    },
     locker: {
       name: "Temas, cores de destaque e ícones do app",
       body: "Ganhe temas e cores de destaque e, nos celulares, um ícone do app nas cores do seu tema.",

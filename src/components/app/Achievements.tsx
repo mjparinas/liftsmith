@@ -19,6 +19,7 @@ import {
 } from "@/lib/game";
 import { currentLang, t } from "@/lib/i18n";
 import { applyAccent, calm, sound, type TimerSound } from "@/lib/juice";
+import { DROP_ODDS, kitName, kitOfReward, seasonsOn, stillOpen } from "@/lib/seasons";
 import { badgeShare, levelShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { themesForBadge } from "@/lib/themes";
@@ -31,6 +32,7 @@ import { Avatar } from "./AvatarFace";
 import { Icon, type IconName } from "./icons";
 import { MonthCard } from "./MonthChallenge";
 import { go, useRoute } from "./router";
+import { SeasonCard } from "./SeasonCard";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { HUE } from "./theme";
 import { Chip, ScreenHeader, Section } from "./ui";
@@ -305,55 +307,65 @@ function Locker({ g }: { g: Game }) {
     ["plates", t("awards.locker.plates"), "plates-classic"],
     ["avatar", t("awards.locker.avatar"), ""],
   ];
-  const have = COSMETICS.filter((c) => g.owned.has(c.id)).length;
+  const now = useNow(3600_000);
+  // A season's items show while that season can still be earned, or once owned (seasons.ts); seasons turned off hides the unowned ones.
+  const shown = COSMETICS.filter((c) => !c.season || g.owned.has(c.id) || (seasonsOn(profile) && stillOpen(c.id, now)));
+  const have = shown.filter((c) => g.owned.has(c.id)).length;
   return (
     <div className="space-y-4">
       <p className="num text-sm">
-        <span className="font-semibold">{t("awards.locker.count", { have, total: COSMETICS.length })}</span>{" "}
+        <span className="font-semibold">{t("awards.locker.count", { have, total: shown.length })}</span>{" "}
         <span className="text-muted">· {t("awards.locker.howTo")}</span>
       </p>
       {groups.map(([kind, label, def]) => {
-        const picked = COSMETICS.find((c) => c.id === hint && c.kind === kind);
+        const picked = shown.find((c) => c.id === hint && c.kind === kind);
+        const viaSeason = picked?.season ? kitOfReward(picked.id) : null;
         const at = picked ? levelForItem(picked.id) : null;
         const viaBadge = picked ? badgeForItem(picked.id) : null;
         return (
           <div key={kind}>
             <p className="mb-2 text-sm text-muted">{label}</p>
             <div className="flex flex-wrap gap-2">
-              {COSMETICS.filter((c) => c.kind === kind).map((c) => {
-                const mine = g.owned.has(c.id);
-                const on = (eq[kind] || def) === c.id;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    aria-pressed={mine ? on : undefined}
-                    aria-expanded={mine ? undefined : hint === c.id}
-                    onClick={() => (mine ? equip(c) : setHint(hint === c.id ? null : c.id))}
-                    className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface"} ${mine ? "" : "text-muted"}`}
-                  >
-                    {kind === "accent" && (
-                      <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
-                    )}
-                    {kind === "avatar" && <Avatar name={c.name} avatar={c.id} size={24} dim={!mine} />}
-                    {!mine && <Icon name="lock" size={14} />}
-                    {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
-                    <span>{c.name}</span>
-                    <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
-                      {RARITY_LABEL[c.rarity]}
-                    </span>
-                  </button>
-                );
-              })}
+              {shown
+                .filter((c) => c.kind === kind)
+                .map((c) => {
+                  const mine = g.owned.has(c.id);
+                  const on = (eq[kind] || def) === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      aria-pressed={mine ? on : undefined}
+                      aria-expanded={mine ? undefined : hint === c.id}
+                      onClick={() => (mine ? equip(c) : setHint(hint === c.id ? null : c.id))}
+                      className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface"} ${mine ? "" : "text-muted"}`}
+                    >
+                      {kind === "accent" && (
+                        <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
+                      )}
+                      {kind === "avatar" && <Avatar name={c.name} avatar={c.id} size={24} dim={!mine} />}
+                      {!mine && <Icon name="lock" size={14} />}
+                      {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
+                      <span>{c.name}</span>
+                      <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
+                        {RARITY_LABEL[c.rarity]}
+                      </span>
+                    </button>
+                  );
+                })}
             </div>
             <p aria-live="polite" className="text-sm text-muted">
               {picked && (
                 <span className="mt-2 block">
-                  {viaBadge
-                    ? t("awards.locker.badge", { name: picked.name, badge: achName(viaBadge.badge), tier: TIER_LABEL[viaBadge.tier] })
-                    : rarityOdds(picked.id) > 0
-                      ? `${t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}${at !== null ? ` ${t("awards.locker.atLevel", { level: at })}` : ""}`
-                      : at !== null && t("awards.locker.levelOnly", { name: picked.name, level: at })}
+                  {viaSeason
+                    ? viaSeason.reward
+                      ? t(viaSeason.reward.pro ? "ssn.howPro" : "ssn.how", { name: kitName(viaSeason.kit.id), tier: viaSeason.reward.tier })
+                      : t("ssn.dropHint", { name: kitName(viaSeason.kit.id), n: Math.round(1 / DROP_ODDS) })
+                    : viaBadge
+                      ? t("awards.locker.badge", { name: picked.name, badge: achName(viaBadge.badge), tier: TIER_LABEL[viaBadge.tier] })
+                      : rarityOdds(picked.id) > 0
+                        ? `${t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}${at !== null ? ` ${t("awards.locker.atLevel", { level: at })}` : ""}`
+                        : at !== null && t("awards.locker.levelOnly", { name: picked.name, level: at })}
                 </span>
               )}
             </p>
@@ -473,6 +485,7 @@ export function Achievements() {
         </p>
       </div>
       <MonthCard />
+      <SeasonCard />
       <Section title={t("awards.weekQuests")}>
         <QuestsCard g={g} />
       </Section>

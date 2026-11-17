@@ -295,6 +295,7 @@ export function TabSkeleton({ tab }: { tab: string }) {
           </>
         );
       case "Flags":
+      case "Seasons":
         return <CardBones body="rows" />;
       case "Users":
       case "Installs":

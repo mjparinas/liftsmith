@@ -26,6 +26,7 @@ import { NeedsYou } from "./NeedsYou";
 import { Reports } from "./Reports";
 import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
+import { Seasons } from "./Seasons";
 import { AdminSkeleton, CardBones, Loading, TabSkeleton, TileBones } from "./Skeletons";
 import { System } from "./System";
 import { countryName } from "./time";
@@ -54,6 +55,7 @@ const TABS = [
   "Users",
   "Installs",
   "Flags",
+  "Seasons",
   "Automations",
   "System",
   "Log",
@@ -1091,6 +1093,7 @@ export function AdminApp() {
         )}
         {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
+        {tab === "Seasons" && <Seasons admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
         {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
         {tab === "Log" && <Log />}
