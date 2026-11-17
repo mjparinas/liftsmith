@@ -132,8 +132,8 @@ export function searchStretches(q: { text?: string; kind?: StretchKind | "all"; 
   });
 }
 
-/** The id the 3D demo knows a stretch by (kept apart from exercise ids: "glute-bridge" is both). */
-export const demoId = (id: string) => `stretch:${id}`;
+/** The id the 3D demo knows a stretch by (kept apart from exercise ids: "glute-bridge" is both); `side` shows one side of a one-side stretch. */
+export const demoId = (id: string, side?: "L" | "R") => `stretch:${id}${side ? `@${side}` : ""}`;
 
 /** Rough time for a stretch: the hold, or reps at about 3 seconds each, twice when it's done on each side. */
 export function stretchSeconds(s: Stretch): number {

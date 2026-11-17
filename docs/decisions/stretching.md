@@ -33,6 +33,13 @@ Melvin asked on 2026-11-11: "add all kinds of different stretches, this should b
 - Sounds and haptics from the shared set (a switch-on pair for switching sides, the log pair for the next stretch, the goal-done run at the end). The screen stays on while it plays (`keepAwake`). A polite live region names each new stretch and side for screen readers; the countdown is a `timer`.
 - Finishing saves a `stretch` event (moment, ids, seconds), which syncs like any other event. Nothing reads it yet; it's there for streaks or insights later.
 
+## The figure shows the side named (Melvin, 2026-11-17)
+
+Melvin: "Lying twist stretch says left side and right side but you do them both at the same time", and "for stretches like standing quad stretch, it says stretch left side the animation should be left side then when it switches to right side so should the animation". Two fixes:
+
+- **Lying twist:** both knees used one mirrored knee pole, so they fell apart, one to each side, which looked like both sides at once. Now both poles point the same way and both knees fall to the one side together.
+- **Every one-side stretch mirrors itself.** Each motion is drawn on one side (`drawnSide` in `stretchMotions.ts`: the side being stretched or worked; the right for most, the left for the wall calf stretch and the kneeling hip flexor stretch). The player asks for `demoId(id, "L")` on Left side and `demoId(id, "R")` on Right side, and `mirrorMotion` flips the other one (z negated, left and right joints swapped, roll, turn and props mirrored). The library and other previews show the motion as drawn. Borrowed exercise motions (dead bug, the lateral lunge) already go both ways in one rep and aren't mirrored. A new one-side stretch drawn on the left goes in `DRAWN_LEFT`; `stretchMotions.test.ts` checks every one-side stretch mirrors exactly, the twist's knees go to the named side and the standing quad stretch lifts the named leg.
+
 ## Why lines
 
 Every suggested stretch says why (AGENTS.md "Every recommendation says why"), from `stretchWhy`: a pulse raiser "raises your heart rate", a warm-up move "readies today's muscles: …", a cool-down hold "worked today: …", a rest-day hold "trained in the last two days: …", and a library stretch "stretches: …". The muscle list goes after a colon so no language needs agreement with it.

@@ -5,7 +5,7 @@ import { demoId, searchStretches, STRETCHES } from "../stretches";
 import { MUSCLES } from "../types";
 import { jointsAt, placement, placeVec } from "./mesh";
 import { BODIES, cycleLength, len, sub, type BodyKey, type Vec } from "./rig";
-import { hasStretchMotion, stretchMotion } from "./stretchMotions";
+import { drawnSide, hasStretchMotion, OWN_MOTIONS, stretchMotion } from "./stretchMotions";
 
 const BODY_KEYS: BodyKey[] = ["male", "female"];
 const PHASES = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
@@ -101,5 +101,46 @@ describe("searchStretches", () => {
     } finally {
       setLanguage("en");
     }
+  });
+});
+
+describe("one-side stretches show the side named", () => {
+  const at = (id: string, side: "L" | "R", d = 1) =>
+    jointsAt(stretchMotion(demoId(id, side))!, BODIES.male, d) as unknown as Record<string, Vec>;
+
+  it("mirrors every one-side stretch for the other side", () => {
+    for (const s of STRETCHES.filter((x) => x.eachSide && OWN_MOTIONS.includes(x.id))) {
+      for (const d of [0, 0.5, 1]) {
+        const L = at(s.id, "L", d),
+          R = at(s.id, "R", d);
+        for (const j of JOINTS) {
+          const other = j.endsWith("L") ? j.slice(0, -1) + "R" : j.endsWith("R") ? j.slice(0, -1) + "L" : j;
+          const a = L[j]!,
+            b = R[other]!;
+          expect(len(sub(a, [b[0], b[1], -b[2]])), `${s.id} ${j} at ${d}`).toBeLessThan(1e-6);
+        }
+      }
+      const mL = stretchMotion(demoId(s.id, "L"))!,
+        mR = stretchMotion(demoId(s.id, "R"))!;
+      expect((mL.roll?.(1) ?? 0) + (mR.roll?.(1) ?? 0), s.id).toBe(0);
+    }
+  });
+
+  it("drops both knees to the same side in the lying twist (Melvin, 2026-11-17)", () => {
+    for (const side of ["L", "R"] as const) {
+      const J = at("supine-twist", side);
+      const sgn = side === "R" ? 1 : -1;
+      expect(J.kneeL![2] * sgn, side).toBeGreaterThan(0);
+      expect(J.kneeR![2] * sgn, side).toBeGreaterThan(0);
+    }
+  });
+
+  it("lifts the named leg in the standing quad stretch", () => {
+    expect(at("standing-quad", "L").ankleL![1]).toBeGreaterThan(at("standing-quad", "L").ankleR![1]);
+    expect(at("standing-quad", "R").ankleR![1]).toBeGreaterThan(at("standing-quad", "R").ankleL![1]);
+  });
+
+  it("leaves the plain id as drawn", () => {
+    expect(stretchMotion(demoId("pigeon"))).toBe(stretchMotion(demoId("pigeon", drawnSide("pigeon"))));
   });
 });
