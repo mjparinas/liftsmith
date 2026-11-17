@@ -441,7 +441,12 @@ export function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym
       item.sets = Math.max(2, item.sets - 1);
       if (item.injuryPct) continue; // already lighter for the injury
       if (ex.load === "bodyweight" || TIMED.has(ex.id))
-        item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: t("note.easyReps") };
+        item.target = {
+          ...item.target,
+          reps: Math.max(3, item.target.reps - 2),
+          rir: item.target.rir + 1,
+          note: t(TIMED.has(ex.id) ? "note.timedEasy" : "note.easyReps"),
+        };
       else
         item.target = {
           ...item.target,
