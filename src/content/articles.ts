@@ -16,6 +16,7 @@ import { BLOG_COACH_PROGRAMS } from "./blog/coachPrograms";
 import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
+import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_G } from "./blog/g";
 import { BLOG_H } from "./blog/h";
@@ -255,6 +256,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_SITE_PAGES,
   ...BLOG_WIDGETS,
   ...BLOG_NEW_FEATURES,
+  ...BLOG_FEATURE_GUIDES,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));
