@@ -13,7 +13,9 @@ export const en = {
   "explain.level.advanced": "an advanced lifter",
   "explain.earlierToday": "earlier today",
   "explain.on": "on {date}",
-  "explain.firstBw": "This is your first time, so start at {target} and find your level.",
+  "explain.firstBw": "This is your first time, so it starts at an easy {target}. Next time's target comes from what you manage today.",
+  "explain.rirTimed":
+    "{week} of this block: stop a few seconds before your form slips. A clean hold counts more than the last few seconds.",
   "explain.firstLoad": "This is your first time, so it starts from about {pct}% of your body weight ({bw}), the usual start for {level}.",
   "explain.firstLight": "It's on the light side on purpose. If it feels easy, say so after the last set and next time goes up.",
   "explain.firstTitle": "A cautious first try",
@@ -55,7 +57,10 @@ export const es: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "un nivel avanzado",
   "explain.earlierToday": "hoy, antes",
   "explain.on": "el {date}",
-  "explain.firstBw": "Es tu primera vez, así que empieza con {target} y encuentra tu nivel.",
+  "explain.firstBw":
+    "Es tu primera vez, así que empieza con {target}, algo fácil. El objetivo de la próxima vez sale de lo que consigas hoy.",
+  "explain.rirTimed":
+    "{week} de este bloque: para unos segundos antes de que se pierda la técnica. Una buena técnica cuenta más que los últimos segundos.",
   "explain.firstLoad":
     "Es tu primera vez, así que parte de aproximadamente el {pct}% de tu peso corporal ({bw}), el comienzo habitual para {level}.",
   "explain.firstLight": "Es ligero a propósito. Si te resulta fácil, dilo tras la última serie y la próxima vez sube.",
@@ -103,7 +108,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "un niveau avancé",
   "explain.earlierToday": "plus tôt aujourd’hui",
   "explain.on": "le {date}",
-  "explain.firstBw": "C’est votre première fois : commencez à {target} et trouvez votre niveau.",
+  "explain.firstBw":
+    "C’est votre première fois : on commence par {target}, une base facile. L’objectif de la prochaine fois vient de ce que vous ferez aujourd’hui.",
+  "explain.rirTimed":
+    "{week} de ce bloc : arrêtez quelques secondes avant que la technique ne se dégrade. Une bonne technique compte plus que les dernières secondes.",
   "explain.firstLoad": "C’est votre première fois : on part d’environ {pct} % de votre poids ({bw}), le départ habituel pour {level}.",
   "explain.firstLight": "C’est volontairement léger. Si c’est facile, dites-le après la dernière série et la prochaine fois ça monte.",
   "explain.firstTitle": "Un premier essai prudent",
@@ -148,7 +156,10 @@ export const de: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "Erfahrene",
   "explain.earlierToday": "heute früher",
   "explain.on": "am {date}",
-  "explain.firstBw": "Das ist dein erstes Mal, also starte mit {target} und finde dein Niveau.",
+  "explain.firstBw":
+    "Das ist dein erstes Mal, also startet es locker mit {target}. Das Ziel fürs nächste Mal richtet sich nach dem, was du heute schaffst.",
+  "explain.rirTimed":
+    "{week} dieses Blocks: Hör ein paar Sekunden auf, bevor deine Technik nachlässt. Saubere Technik zählt mehr als die letzten Sekunden.",
   "explain.firstLoad":
     "Das ist dein erstes Mal, also beginnt es bei etwa {pct} % deines Körpergewichts ({bw}), dem üblichen Start für {level}.",
   "explain.firstLight":
@@ -199,7 +210,10 @@ export const it: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "un atleta esperto",
   "explain.earlierToday": "oggi, prima",
   "explain.on": "il {date}",
-  "explain.firstBw": "È la prima volta, quindi inizia con {target} e trova il tuo livello.",
+  "explain.firstBw":
+    "È la prima volta, quindi si parte con {target}, una base facile. L’obiettivo della prossima volta dipende da quello che fai oggi.",
+  "explain.rirTimed":
+    "{week} di questo blocco: fermati qualche secondo prima che la tecnica ceda. Una buona tecnica conta più degli ultimi secondi.",
   "explain.firstLoad":
     "È la prima volta, quindi si parte da circa il {pct}% del tuo peso corporeo ({bw}), la partenza abituale per {level}.",
   "explain.firstLight": "È volutamente leggero. Se ti sembra facile, dillo dopo l’ultima serie e la prossima volta si sale.",
@@ -247,7 +261,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "上級者",
   "explain.earlierToday": "今日の早い時間",
   "explain.on": "{date}",
-  "explain.firstBw": "初めてなので、{target}から始めてレベルを確認しましょう。",
+  "explain.firstBw": "初めてなので、軽めの{target}から始めます。次回の目標は今日できた分をもとに決まります。",
+  "explain.rirTimed": "このブロックの{week}：フォームが崩れる数秒前にやめます。最後の数秒より、正しいフォームのほうが大切です。",
   "explain.firstLoad": "初めてなので、体重（{bw}）の約{pct}%から始めます。{level}の一般的なスタート重量です。",
   "explain.firstLight": "あえて軽めにしています。楽に感じたら最後のセットの後にそう答えてください。次回は重くなります。",
   "explain.firstTitle": "慎重な最初の1回",
@@ -291,7 +306,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "alguém de nível avançado",
   "explain.earlierToday": "hoje mais cedo",
   "explain.on": "em {date}",
-  "explain.firstBw": "É sua primeira vez, então comece com {target} e descubra seu nível.",
+  "explain.firstBw": "É sua primeira vez, então começa com {target}, algo leve. A meta da próxima vez vem do que você conseguir hoje.",
+  "explain.rirTimed":
+    "{week} deste bloco: pare alguns segundos antes de a técnica falhar. Uma boa técnica vale mais que os últimos segundos.",
   "explain.firstLoad": "É sua primeira vez, então começa com cerca de {pct}% do seu peso corporal ({bw}), o início comum para {level}.",
   "explain.firstLight": "Está leve de propósito. Se parecer fácil, diga isso depois da última série e na próxima vez sobe.",
   "explain.firstTitle": "Uma primeira tentativa cautelosa",
@@ -339,7 +356,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "상급자",
   "explain.earlierToday": "오늘 아까",
   "explain.on": "{date}",
-  "explain.firstBw": "처음이니 {target}부터 시작해서 내 수준을 찾아보세요.",
+  "explain.firstBw": "처음이니 가볍게 {target}부터 시작해요. 다음 목표는 오늘 해낸 만큼에 맞춰 정해져요.",
+  "explain.rirTimed": "이번 블록 {week}: 자세가 무너지기 몇 초 전에 멈추세요. 마지막 몇 초보다 바른 자세가 더 중요해요.",
   "explain.firstLoad": "처음이라 체중의 약 {pct}%({bw})로 시작해요. {level}의 일반적인 시작 무게예요.",
   "explain.firstLight": "일부러 가볍게 잡았어요. 쉬웠다면 마지막 세트 후에 알려 주세요. 다음엔 무게가 올라가요.",
   "explain.firstTitle": "조심스러운 첫 시도",
@@ -384,7 +402,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "ileri seviye sporcular",
   "explain.earlierToday": "bugün daha önce",
   "explain.on": "{date}",
-  "explain.firstBw": "İlk kez yapıyorsun, o yüzden {target} ile başla ve seviyeni bul.",
+  "explain.firstBw": "İlk kez yapıyorsun, o yüzden kolay bir {target} ile başlıyor. Bir dahaki hedef bugün yapabildiğine göre belirlenir.",
+  "explain.rirTimed": "Blokta {week}: formun bozulmadan birkaç saniye önce bırak. Temiz form, son birkaç saniyeden daha önemli.",
   "explain.firstLoad":
     "İlk kez yapıyorsun, o yüzden vücut ağırlığının yaklaşık %{pct} kadarıyla ({bw}) başlıyor; {level} için olağan başlangıç bu.",
   "explain.firstLight": "Bilerek hafif tutuldu. Kolay gelirse son setten sonra söyle, bir dahakine artar.",
@@ -435,7 +454,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "explain.level.advanced": "osoby zaawansowanej",
   "explain.earlierToday": "dziś wcześniej",
   "explain.on": "{date}",
-  "explain.firstBw": "To twój pierwszy raz, więc zacznij od {target} i znajdź swój poziom.",
+  "explain.firstBw": "To twój pierwszy raz, więc start to łatwe {target}. Cel na następny raz wynika z tego, co dziś zrobisz.",
+  "explain.rirTimed":
+    "{week} tego bloku: skończ kilka sekund przed tym, jak technika się posypie. Czysta technika liczy się bardziej niż ostatnie sekundy.",
   "explain.firstLoad": "To twój pierwszy raz, więc start to ok. {pct}% twojej masy ciała ({bw}), typowy początek dla {level}.",
   "explain.firstLight": "Celowo jest lżej. Jeśli będzie łatwo, powiedz to po ostatniej serii, a następnym razem pójdzie w górę.",
   "explain.firstTitle": "Ostrożna pierwsza próba",

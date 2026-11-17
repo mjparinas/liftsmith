@@ -282,7 +282,7 @@ function Body3D({
         role="img"
         aria-label={t("map.figure", { summary })}
         className="absolute inset-0 block h-full w-full"
-        style={{ touchAction: "pan-y", cursor: "pointer" }}
+        style={{ touchAction: "pan-y pinch-zoom", cursor: "pointer" }}
       />
       <div
         className="absolute right-2 top-2 inline-flex overflow-hidden rounded-xl border border-line bg-surface/80"

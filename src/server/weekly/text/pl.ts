@@ -849,6 +849,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Wolisz ich nie widzieć na liczniku przerwy? Wyłącz Kontrola techniki w przerwie w Ustawienia › Trening.",
   },
+  "auto-supersets": {
+    title: "Superserie ułożone dla ciebie",
+    intro: "Twoje treningi adaptacyjne mogą teraz same łączyć ćwiczenia w superserie, jednym przełącznikiem.",
+    points: [
+      "Włącz Łącz ćwiczenia w superserie w Ustawienia › Planowanie › Treningi adaptacyjne.",
+      "Ćwiczenia, które nie angażują tych samych mięśni, robisz jedno po drugim, jak wyciskanie i wiosłowanie, więc jedno odpoczywa, gdy robisz drugie.",
+      "Przerwa po każdej rundzie jest krótsza, a zaoszczędzony czas mieści więcej treningu w wybranej długości.",
+      "Ciężkie przysiady i martwe ciągi zostają osobno, a każdą parę rozdzielisz na ekranie Dziś.",
+    ],
+    dyk: "W tej samej sekcji jest przełącznik Serie rozgrzewkowe, na dni, gdy wolisz rozgrzać się po swojemu.",
+  },
   seasons: {
     title: "Sezony treningowe startują w poniedziałek",
     intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",

@@ -870,6 +870,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout.",
   },
+  "auto-supersets": {
+    title: "Supersets, built for you",
+    intro: "Your adaptive workouts can now pair exercises into supersets for you, with one switch.",
+    points: [
+      "Turn on Pair exercises into supersets in Settings › Training › Adaptive workouts.",
+      "Exercises that don't share muscles go back to back, like a press and a row, so each rests while you do the other.",
+      "The rest after each round is shorter, and the time saved fits more training into the length you pick.",
+      "Heavy squats and deadlifts stay on their own, and you can split any pair on Today.",
+    ],
+    dyk: "The same section has a Warm-up sets switch, for days you'd rather warm up your own way.",
+  },
   seasons: {
     title: "Training seasons start Monday",
     intro: "Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.",

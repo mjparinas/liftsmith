@@ -219,6 +219,13 @@ export const de: SiteText = {
         { title: "Kein Konto nötig", body: "Melde dich mit Google oder Apple nur an, wenn du Sync und Backup willst." },
       ],
     },
+    learn: {
+      eyebrow: "Kostenlose Anleitungen",
+      title: "Lerne die Übungen, die App plant sie für dich",
+      body: "Technik Schritt für Schritt, welche Muskeln jede Übung trainiert und was du stattdessen machen kannst, dazu kostenlose Rechner.",
+      exercises: "Beliebte Übungen",
+      tools: "Kostenlose Tools",
+    },
     juice: {
       eyebrow: "Macht Lust auf mehr",
       title: "Bestleistungen gibt’s mit Konfetti. Ruhetage unterbrechen deine Serie nicht.",

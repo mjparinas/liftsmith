@@ -107,7 +107,17 @@ export interface SonosNow {
   artist: string | null;
   /** Album art from the music service, https only. */
   image: string | null;
+  /**
+   * What's playing when it isn't a track from a music service: the speaker's line-in, the TV (HDMI or optical on
+   * a soundbar) or AirPlay. These have no song name, so the card names the source instead (Melvin, 2026-11-17).
+   */
+  source: SonosSource | null;
+  /** Whether next and previous do anything; false for line-in, the TV and some radio stations. */
+  canSkip: boolean;
+  canSkipBack: boolean;
 }
+
+export type SonosSource = "lineIn" | "tv" | "airplay";
 
 /** GET /api/connect/sonos/player/?group=<id> */
 export interface SonosState {

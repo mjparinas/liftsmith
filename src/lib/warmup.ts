@@ -43,6 +43,15 @@ function ramp(ex: Exercise, kg: number, warm: boolean): Step[] {
   ];
 }
 
+/** Warm-up sets are on unless the lifter turned them off (Settings › Training › Adaptive workouts). */
+export const warmupsOn = (profile: { training?: { warmups?: boolean } }): boolean => profile.training?.warmups !== false;
+
+/** A plan with its warm-up sets taken off, when the lifter turned them off (every plan: adaptive, program or routine). */
+export function withoutWarmups<P extends { items: { warmup?: WarmupSet[] }[] }>(plan: P, profile: { training?: { warmups?: boolean } }): P {
+  if (warmupsOn(profile) || !plan.items.some((i) => i.warmup)) return plan;
+  return { ...plan, items: plan.items.map((i) => (i.warmup ? { ...i, warmup: undefined } : i)) };
+}
+
 /**
  * Warm-up sets for one exercise at `kg` working weight. `warmMuscles` holds the muscles that
  * earlier exercises in the same workout already worked.

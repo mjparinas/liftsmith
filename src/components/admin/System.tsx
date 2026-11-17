@@ -48,7 +48,7 @@ function RestoreDrill({ done }: { done: () => void }) {
   };
   return (
     <section className="card min-w-0 p-4">
-      <h2 className="font-semibold">Record a restore practice</h2>
+      <h2 className="font-bold tracking-tight">Record a restore practice</h2>
       <p className="mt-0.5 text-xs text-muted">
         After restoring a Turso backup into a spare database and checking it (docs/RESTORE.md), note the day here.
       </p>
@@ -124,7 +124,7 @@ function CheckCard({
   return (
     <section className="card min-w-0 p-4" aria-busy={!c && !error}>
       <div className="flex items-start justify-between gap-3">
-        <h2 className="font-semibold">{title}</h2>
+        <h2 className="font-bold tracking-tight">{title}</h2>
         {c ? <Badge state={c.state} /> : !error && <Bone className="h-5 w-16 rounded-full" />}
       </div>
       {error && <p className="mt-1 text-sm text-bad">{error}</p>}
@@ -329,7 +329,7 @@ export function System({ admin = false, maintenance }: { admin?: boolean; mainte
         />
       )}
       <section className="card min-w-0 p-4">
-        <h2 className="font-semibold">Providers&apos; status pages</h2>
+        <h2 className="font-bold tracking-tight">Providers&apos; status pages</h2>
         <p className="mt-0.5 text-xs text-muted">What each service says about itself, read from its public status page.</p>
         <ul className="mt-2 divide-y divide-line/60">
           {STATUS_PAGES.map((p) => (

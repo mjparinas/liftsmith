@@ -216,6 +216,13 @@ export const it: SiteText = {
         { title: "Nessun account obbligatorio", body: "Accedi con Google o Apple solo se vuoi sincronizzazione e backup." },
       ],
     },
+    learn: {
+      eyebrow: "Guide gratuite",
+      title: "Impara gli esercizi, poi lascia che l'app li pianifichi",
+      body: "Tecnica passo per passo, i muscoli che allena ogni esercizio e cosa fare al suo posto, più calcolatori gratuiti.",
+      exercises: "Esercizi popolari",
+      tools: "Strumenti gratuiti",
+    },
     juice: {
       eyebrow: "Fatto per motivare",
       title: "I record si festeggiano con i coriandoli. I giorni di riposo non rompono la serie.",

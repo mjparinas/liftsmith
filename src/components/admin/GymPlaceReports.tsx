@@ -180,7 +180,7 @@ function Row({
               onChange={(e) => setD({ ...d, into: e.target.value })}
             />
           </label>
-          <button type="submit" className="press justify-self-start rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink">
+          <button type="submit" className="press justify-self-start rounded-lg btn-primary px-3 py-1.5 text-sm font-semibold">
             Merge into that gym
           </button>
         </form>
@@ -213,7 +213,7 @@ function Row({
             </select>
           </label>
           <p className="text-sm text-muted sm:col-span-2">The city is fixed on the Gyms tab, which keeps the old page address working.</p>
-          <button type="submit" className="press justify-self-start rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink">
+          <button type="submit" className="press justify-self-start rounded-lg btn-primary px-3 py-1.5 text-sm font-semibold">
             Save and close the reports
           </button>
         </form>

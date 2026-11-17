@@ -9,7 +9,7 @@ import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, type Active } from "@/lib/store";
-import { effortAim, restLabel } from "@/lib/training";
+import { effortAim, effortKind, restLabel } from "@/lib/training";
 import type { EffortScale, Exercise, Gym } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { workoutWhy } from "@/lib/why";
@@ -167,8 +167,9 @@ export function SetCard({
         </p>
       ) : (
         <p className="mt-4 text-center text-sm text-muted">
-          {effortAim(item.target.rir, scale)}
-          <Info term={scale === "rpe" ? "rpe" : "rir"} /> · {workoutWhy(item, active.plan)}{" "}
+          {effortAim(item.target.rir, scale, effortKind(ex))}
+          {(scale === "rpe" ? !ex.cardio : effortKind(ex) === "reps") && <Info term={scale === "rpe" ? "rpe" : "rir"} />} ·{" "}
+          {workoutWhy(item, active.plan)}{" "}
           <button
             type="button"
             onClick={onWhy}

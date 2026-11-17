@@ -103,6 +103,8 @@ export interface SiteText {
       /** Link to /features/ (the full list and the connections table; English only for now). */ all: string;
       items: Titled[];
     };
+    /** Links to the free exercise guides and calculators (internal links for search, 2026-11-17). */
+    learn: { eyebrow: string; title: string; body: string; exercises: string; tools: string };
     juice: { eyebrow: string; title: string; body: string; cta: string; alt: string };
     quotes: { eyebrow: string; title: string; sample: string; looking: string; lookingRest: string; cta: string };
     pricing: {

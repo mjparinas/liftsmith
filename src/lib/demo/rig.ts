@@ -286,6 +286,19 @@ export const BODIES: Record<BodyKey, Body> = {
 
 export const MIDFOOT = 0.07;
 export const ANKLE_H = 0.08;
+/** Heel and toe offsets about the ankle with the foot flat (pitched by `Pose.foot`). */
+const HEEL_X = -0.055,
+  TOE_X = 0.18,
+  SOLE_Y = -0.075;
+/**
+ * How far the toe tip drops below its flat-foot height when the toes point `deg` down. A jump
+ * raises the ankle by this much plus its flight, or the pointed toes stay on (or sink into) the
+ * floor and the figure looks like it's doing a calf raise instead of leaving the ground.
+ */
+export const toeDrop = (B: Body, deg: number) => {
+  const p = rad(deg);
+  return TOE_X * B.s * Math.sin(p) + SOLE_Y * (1 - Math.cos(p));
+};
 
 // ---------- poses ----------
 /** One value per side, or the same value mirrored across the body (z flipped for the left side). */
@@ -477,8 +490,8 @@ export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
     // feet: heel and toe offsets about the ankle, pitched
     const p = rad(pickN(pose.foot, side));
     const rot = (x: number, y: number): Vec => V(x * Math.cos(p) + y * Math.sin(p), -x * Math.sin(p) + y * Math.cos(p));
-    j["heel" + side] = add(ankle, rot(-0.055 * B.s, -0.075));
-    j["toe" + side] = add(ankle, add(rot(0.18 * B.s, -0.075), V(0, 0, sgn * 0.03)));
+    j["heel" + side] = add(ankle, rot(HEEL_X * B.s, SOLE_Y));
+    j["toe" + side] = add(ankle, add(rot(TOE_X * B.s, SOLE_Y), V(0, 0, sgn * 0.03)));
     const hand = pick(pose.hand, side, sgn, o.grip, V(0, 0, o.grip));
     // The shoulder sits shDrop below the top of the torso, but rides back up (the shoulder blade lifts)
     // when the hand needs it: hanging from a bar, locking out overhead.

@@ -75,6 +75,10 @@ export const fr: FeaturesText = {
       body: "Choisit des exercices que votre salle permet et pour lesquels vos muscles sont prêts, puis fixe chaque charge et chaque répétition d’après vos dernières séances.",
       proPart: "Sans Pro, vous avez une séance adaptative par semaine en plus de votre programme gratuit ; Pro planifie chaque jour.",
     },
+    "auto-supersets": {
+      name: "Supersets automatiques",
+      body: "Active les supersets et le plan adaptatif associe des exercices qui ne sollicitent pas les mêmes muscles, comme un développé et un rowing, avec un repos plus court après chaque tour, pour en faire plus dans ton temps. Les squats et soulevés de terre lourds restent seuls, et tu peux aussi couper les séries d'échauffement.",
+    },
     "pick-weights": {
       name: "Apprend les exercices que vous aimez",
       body: "Les exercices populaires sont choisis le plus souvent. Mettez une étoile à un exercice et il revient bien plus ; remplacez-le et il revient moins, pendant quelques mois.",
@@ -175,7 +179,7 @@ export const fr: FeaturesText = {
     },
     stretching: {
       name: "Étirements",
-      body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour.",
+      body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour. Quelques secondes pour te mettre en position avant chaque étirement et chaque côté, et l’écran reste allumé.",
     },
     "workout-parts": {
       name: "Séances en plusieurs parties",

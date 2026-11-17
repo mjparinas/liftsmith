@@ -4,7 +4,8 @@ import { weeklySets, type Plan, type PlanItem } from "./generator";
 import { inSentence, list, t } from "./i18n";
 import type { Readiness, Signal } from "./readiness";
 import { recovery } from "./recovery";
-import { PRIORITY_VOLUME } from "./training";
+import { groupRange, roundRest } from "./superset";
+import { PRIORITY_VOLUME, restLabel } from "./training";
 import { MUSCLE_LABEL, type AppEvent, type Muscle, type Profile } from "./types";
 
 // Every recommendation says why (Melvin, 2026-11-09: "action-oriented recommendations, not stats
@@ -20,6 +21,8 @@ export interface ItemWhy {
   sets?: string;
   /** Why this weight and these reps (progression's note). */
   load: string;
+  /** Why it's paired with the next or last exercise, for an automatic superset (`pairWhy`). */
+  pair?: string;
   /** All of the above in one line, for the plan list and the workout screen. */
   short: string;
 }
@@ -48,7 +51,7 @@ export function whyContext(plan: Plan, events: readonly AppEvent[], profile: Pro
 /** Lower-cases the first letter to continue a sentence, but leaves acronyms (HRV, VFC) alone. */
 const lower = (s: string) => (/^\p{Lu}{2}/u.test(s) ? s : inSentence(s));
 
-export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
+export function itemWhy(item: PlanItem, ctx: WhyContext, pair?: string): ItemWhy {
   const ex = EXERCISE_BY_ID.get(item.exerciseId);
   const training = ctx.profile.training;
   const prio = new Set(training?.priorities ?? []);
@@ -69,8 +72,8 @@ export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
 
   const load = item.target.note || "";
 
-  const short = [pick, sets, load && lower(load)].filter(Boolean).join(" · ");
-  return { pick, sets, load, short: short.charAt(0).toUpperCase() + short.slice(1) };
+  const short = [pick, sets, load && lower(load), pair && lower(pair)].filter(Boolean).join(" · ");
+  return { pick, sets, load, pair, short: short.charAt(0).toUpperCase() + short.slice(1) };
 }
 
 /**
@@ -79,7 +82,7 @@ export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
  * (UX audit, 2026-11-13).
  */
 export function itemWhyWithoutLoad(w: ItemWhy): string {
-  const short = [w.pick, w.sets].filter(Boolean).join(" · ");
+  const short = [w.pick, w.sets, w.pair && lower(w.pair)].filter(Boolean).join(" · ");
   return short.charAt(0).toUpperCase() + short.slice(1);
 }
 
@@ -119,8 +122,27 @@ export function callWhy(r: Readiness, chosen: Plan["call"], deload: boolean, sho
   return t("why.call.plannedBecause", { reasons: mixed, score });
 }
 
+/**
+ * Why an exercise is in an automatic superset (autoSuperset.ts): its partner works other muscles, so each rests
+ * during the other's set and the rest after a round is shorter. On the pair's first exercise only. Undefined for exercises on their own and for
+ * supersets the lifter or a routine made (they keep their own rests).
+ */
+export function pairWhy(items: readonly PlanItem[], i: number): string | undefined {
+  const item = items[i];
+  if (!item?.group) return undefined;
+  const [s, e] = groupRange(items, i);
+  // Said once, on the first exercise of the pair; the second carries the superset's label.
+  if (i !== s || !items.slice(s, e + 1).some((x) => x.soloRest !== undefined)) return undefined;
+  const other = items.slice(s, e + 1).find((x) => x !== item);
+  const ex = other && EXERCISE_BY_ID.get(other.exerciseId);
+  if (!ex) return undefined;
+  return t("why.pair", { other: ex.name, rest: restLabel(roundRest(items, i)) });
+}
+
 /** The line under the target on the workout screen: why that weight and reps, and the set count when the day changed it. */
-export function workoutWhy(item: PlanItem, plan: Pick<Plan, "week" | "call">): string {
+export function workoutWhy(item: PlanItem, plan: Pick<Plan, "week" | "call" | "items">): string {
   const sets = plan.week.deload ? t("why.deloadSets") : plan.call === "recover" ? t("why.easySets") : undefined;
-  return [item.target.note, sets].filter(Boolean).join(" · ");
+  // An automatic superset says why its rest is shorter.
+  const pair = item.group && item.soloRest !== undefined ? t("why.pairRest", { rest: restLabel(item.restSec) }) : undefined;
+  return [item.target.note, sets, pair].filter(Boolean).join(" · ");
 }

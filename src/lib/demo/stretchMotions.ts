@@ -1,5 +1,26 @@
 import { motionFor, type Motion } from "./motions";
-import { add, ANKLE_H, clamp, ik, len, lerp, lerpV, mul, norm, rad, sub, V, type Body, type PhaseRow, type Pose, type Vec } from "./rig";
+import {
+  add,
+  ANKLE_H,
+  clamp,
+  ik,
+  len,
+  lerp,
+  lerpV,
+  mul,
+  norm,
+  rad,
+  sub,
+  V,
+  type Anchor,
+  type Body,
+  type PerSide,
+  type PhaseRow,
+  type Pose,
+  type Prop,
+  type Side,
+  type Vec,
+} from "./rig";
 
 // One 3D motion per stretch in the library (src/lib/stretches.ts), drawn on the same figures as the exercise
 // demos (Melvin, 2026-11-11: "the stretch library should include 3d examples as well"). Kept apart from the
@@ -848,14 +869,16 @@ function supineTwist(): Motion {
     load: "none",
     pose(B, d) {
       const { hip, sh } = supine(B);
-      const pole = lerpV(V(0, 1, 0.1), V(0.2, 0.15, 1), d);
+      // Both knees fall to the same side (the right), so both poles point right: a single mirrored pole would
+      // spread the knees apart, one to each side, which looked like both sides at once (Melvin, 2026-11-17).
+      const pole = (sgn: number) => lerpV(V(0, 1, sgn * 0.1), V(0.2, 0.15, 1), d);
       const ankle = (sgn: number) => leg(B, hip, sgn, V(0.38, ANKLE_H + 0.02 + 0.06 * d, sgn * 0.1 + 0.22 * d));
       return {
         hip,
         sh,
         ankle: per(ankle(-1), ankle(1)),
         foot: 0,
-        kneePole: pole,
+        kneePole: per(pole(-1), pole(1)),
         hand: per(armsOut(B, hip, sh, -1), armsOut(B, hip, sh, 1)),
         elbowPole: V(0, 1, 0.2),
         headBlend: 0,
@@ -1097,17 +1120,85 @@ const REUSE: Record<string, string> = {
 const PREFIX = "stretch:";
 const cache = new Map<string, Motion>();
 
-/** The motion for a demo id like "stretch:pigeon", or null when it isn't a stretch. */
+/**
+ * The side each one-side stretch's motion is drawn on: the side being stretched or worked (the right arm across
+ * the chest, the right leg in pigeon, the knees falling to the right in the lying twist). Most are drawn on the
+ * right; these two on the left. The player mirrors the motion for the other side, so "Left side" shows the left
+ * (Melvin, 2026-11-17). Borrowed exercise motions (dead bug, the lateral lunge) already go both ways in one rep.
+ */
+const DRAWN_LEFT = new Set(["wall-calf", "kneeling-hip-flexor"]);
+export const drawnSide = (id: string): Side => (DRAWN_LEFT.has(id) ? "L" : "R");
+
+const flipZ = (v: Vec): Vec => V(v[0], v[1], -v[2]);
+/** A per-side value mirrored left to right: each side takes the other's value with z flipped. A shared value is already symmetric. */
+function mirrorPer(v: PerSide<Vec> | undefined): PerSide<Vec> | undefined {
+  if (v === undefined || !("L" in (v as object))) return v;
+  const p = v as { L: Vec; R: Vec };
+  return { L: flipZ(p.R), R: flipZ(p.L) };
+}
+const SWAP: Partial<Record<string, Anchor>> = {
+  handL: "handR",
+  handR: "handL",
+  ankleL: "ankleR",
+  ankleR: "ankleL",
+  kneeL: "kneeR",
+  kneeR: "kneeL",
+};
+const mirrorAnchor = (a: Anchor): Anchor => (typeof a === "string" ? (SWAP[a] ?? a) : flipZ(a));
+function mirrorProp(p: Prop): Prop {
+  switch (p.kind) {
+    case "box":
+      return { ...p, at: flipZ(p.at), follow: p.follow && mirrorAnchor(p.follow) };
+    case "rail":
+      return { ...p, at: flipZ(p.at) };
+    case "cable":
+    case "pole":
+      return { ...p, from: mirrorAnchor(p.from), to: mirrorAnchor(p.to) };
+    case "rope":
+      return { ...p, from: mirrorAnchor(p.from), to: flipZ(p.to), centre: flipZ(p.centre) };
+  }
+}
+/** The same motion done on the other side: every left joint does what the right did, mirrored. */
+export function mirrorMotion(m: Motion): Motion {
+  const { roll, yaw, props } = m;
+  return {
+    ...m,
+    pose(B, d) {
+      const p = m.pose(B, d);
+      const foot = p.foot;
+      return {
+        ...p,
+        hip: flipZ(p.hip),
+        sh: flipZ(p.sh),
+        hand: mirrorPer(p.hand)!,
+        ankle: mirrorPer(p.ankle),
+        kneePole: mirrorPer(p.kneePole),
+        elbowPole: mirrorPer(p.elbowPole),
+        foot: foot !== undefined && typeof foot === "object" ? { L: foot.R, R: foot.L } : foot,
+        headTilt: p.headTilt && -p.headTilt,
+        bar: p.bar && flipZ(p.bar),
+      };
+    },
+    hold: m.hold === "R" ? undefined : m.hold,
+    roll: roll && ((d) => -roll(d)),
+    yaw: yaw && ((d) => -yaw(d)),
+    props: props && ((B) => props(B).map(mirrorProp)),
+  };
+}
+
+/** The motion for a demo id like "stretch:pigeon" (or "stretch:pigeon@L" for one side), or null when it isn't a stretch. */
 export function stretchMotion(demoId?: string | null): Motion | null {
   if (!demoId?.startsWith(PREFIX)) return null;
-  const id = demoId.slice(PREFIX.length);
+  const [id = "", side] = demoId.slice(PREFIX.length).split("@");
   if (REUSE[id]) return motionFor(REUSE[id]);
   const make = MOTIONS[id];
   if (!make) return motionFor(null);
-  let m = cache.get(id);
+  const flip = (side === "L" || side === "R") && side !== drawnSide(id);
+  const key = flip ? `${id}@mirror` : id;
+  let m = cache.get(key);
   if (!m) {
-    m = make();
-    cache.set(id, m);
+    m = flip ? mirrorMotion(make()) : make();
+    cache.set(key, m);
   }
   return m;
 }

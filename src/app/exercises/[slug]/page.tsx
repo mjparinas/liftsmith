@@ -8,12 +8,22 @@ import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/comp
 import { VsLinks } from "@/components/site/VsView";
 import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { BRAND } from "@/lib/brand";
-import { exerciseMeta } from "@/lib/exerciseMeta";
+import { articlesLinking, exerciseFaq, exerciseMeta } from "@/lib/exerciseMeta";
 import { EXERCISES } from "@/lib/exercises";
 import { faultIdsFor } from "@/lib/formFaults";
 import { ogImage } from "@/lib/ogImages";
 import { pageMeta } from "@/lib/pageMeta";
-import { alternativesTo, EQUIPMENT_NAME, equipmentSlug, exerciseBySlug, exercisesFor, MUSCLE_NAME, muscleSlug, needsText } from "@/lib/seo";
+import {
+  alternativesTo,
+  articlePath,
+  EQUIPMENT_NAME,
+  equipmentSlug,
+  exerciseBySlug,
+  exercisesFor,
+  MUSCLE_NAME,
+  muscleSlug,
+  needsText,
+} from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { EXAMPLE, hasStartTable, startTable, type StartCell } from "@/lib/startTable";
 import type { Exercise } from "@/lib/types";
@@ -53,6 +63,9 @@ export default async function ExercisePage({ params }: Props) {
     .slice(0, 6);
   const steps = [e.setup, ...e.cues];
   const guide = EXERCISE_GUIDES[e.id];
+  // Exercises with a guide have its written questions; the rest answer the common ones from their own data.
+  const faq = guide ? guide.faq : exerciseFaq(e);
+  const reading = articlesLinking(`/exercises/${e.id}/`);
   const table = guide && hasStartTable(e) ? startTable(e) : null;
   const unit = e.load === "dumbbell" ? "per dumbbell" : e.load === "kettlebell" ? "kettlebell" : "";
   const jsonLd = {
@@ -68,12 +81,12 @@ export default async function ExercisePage({ params }: Props) {
   return (
     <SitePage kind="exercise" sticky={`Get ${e.name.toLowerCase()} in your plan`} path={guide ? `/exercises/${e.id}/` : undefined}>
       <JsonLd data={jsonLd} />
-      {guide && (
+      {faq.length > 0 && (
         <JsonLd
           data={{
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            mainEntity: guide.faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+            mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
           }}
         />
       )}
@@ -307,11 +320,17 @@ export default async function ExercisePage({ params }: Props) {
           <LinkGrid items={more.map((a) => ({ href: `/exercises/${a.id}/`, title: a.name, meta: needsText(a) }))} />
         </section>
       )}
-      {guide && (
+      {reading.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-2xl font-bold tracking-tight">Read more</h2>
+          <LinkGrid items={reading.map((a) => ({ href: articlePath(a), title: a.title, meta: a.tag, body: a.description }))} />
+        </section>
+      )}
+      {faq.length > 0 && (
         <section className="mt-10 max-w-3xl">
           <h2 className="text-2xl font-bold tracking-tight">Questions</h2>
           <dl className="mt-4 space-y-5">
-            {guide.faq.map(([q, a]) => (
+            {faq.map(([q, a]) => (
               <div key={q}>
                 <dt className="font-semibold">{q}</dt>
                 <dd className="mt-1 leading-relaxed text-muted">{rich(a)}</dd>

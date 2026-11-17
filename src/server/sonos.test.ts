@@ -4,7 +4,7 @@ import { checkSonosCommand } from "@/lib/cloud";
 
 import { callback, start, Unlinked } from "./connect";
 import { resetDb } from "./db";
-import { commandCall, Gone, SONOS_API, sonosCommand, sonosState, toNow } from "./sonos";
+import { commandCall, Gone, SONOS_API, sonosCommand, sonosState, sourceOf, toNow } from "./sonos";
 
 const NOW = 1_800_000_000_000;
 const ENV = { SONOS_CLIENT_ID: "sonos-key", SONOS_CLIENT_SECRET: "sonos-secret" } as unknown as NodeJS.ProcessEnv;
@@ -90,6 +90,9 @@ describe("Sonos state", () => {
       track: "Lift Off",
       artist: "The Plates",
       image: "https://img.example/a.jpg",
+      source: null,
+      canSkip: true,
+      canSkipBack: true,
     });
     expect((calls[0]!.init!.headers as Record<string, string>).Authorization).toBe("Bearer s-acc");
   });
@@ -118,7 +121,37 @@ describe("Sonos state", () => {
       { container: { name: "Radio One", imageUrl: "http://x/y.png" } },
       { fixed: true, volume: 50 },
     );
-    expect(n).toEqual({ group: "G", playing: false, volume: null, track: "Radio One", artist: null, image: null });
+    expect(n).toEqual({
+      group: "G",
+      playing: false,
+      volume: null,
+      track: "Radio One",
+      artist: null,
+      image: null,
+      source: null,
+      canSkip: true,
+      canSkipBack: true,
+    });
+  });
+
+  // Melvin, 2026-11-17: the card said "Nothing playing" while the Garage speaker's line-in was playing.
+  it("names line-in, the TV and AirPlay as the source, with no skips", () => {
+    const lineIn = toNow(
+      "G",
+      { playbackState: "PLAYBACK_STATE_PLAYING", availablePlaybackActions: { canSkip: true, canSkipBack: true } },
+      { container: { type: "linein", name: "Garage" } },
+      { volume: 36 },
+    );
+    expect(lineIn).toMatchObject({ playing: true, volume: 36, track: null, source: "lineIn", canSkip: false, canSkipBack: false });
+    expect(sourceOf({ container: { type: "linein.homeTheater" } })).toBe("tv");
+    expect(sourceOf({ container: { type: "linein.airplay" } })).toBe("airplay");
+    expect(sourceOf({ container: { type: "playlist" } })).toBeNull();
+    expect(sourceOf({})).toBeNull();
+  });
+
+  it("follows Sonos on which skips a music service allows", () => {
+    const n = toNow("G", { availablePlaybackActions: { canSkip: true, canSkipBack: false } }, { container: { type: "station" } }, {});
+    expect(n).toMatchObject({ source: null, canSkip: true, canSkipBack: false });
   });
 });
 

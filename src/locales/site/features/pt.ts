@@ -116,6 +116,10 @@ export const pt: FeaturesText = {
       body: "Escolhe exercícios que a sua academia permite e para os quais seus músculos estão prontos, e define cada peso e cada rep a partir dos seus últimos treinos.",
       proPart: "Quem usa o plano grátis ganha um treino adaptativo por semana junto do programa grátis; o Pro planeja todos os dias.",
     },
+    "auto-supersets": {
+      name: "Supersets automáticos",
+      body: "Ative os supersets e o plano adaptativo junta exercícios que não usam os mesmos músculos, como um supino e uma remada, com descanso menor depois de cada rodada, para caber mais no seu tempo. Agachamentos e levantamentos terra pesados ficam sozinhos, e você também pode desligar as séries de aquecimento.",
+    },
     "pick-weights": {
       name: "Aprende os exercícios de que você gosta",
       body: "Os exercícios populares são escolhidos com mais frequência. Marque um exercício com estrela e ele aparece bem mais; troque um e ele aparece menos, efeito que some ao longo de alguns meses.",
@@ -219,7 +223,7 @@ export const pt: FeaturesText = {
     },
     stretching: {
       name: "Alongamento",
-      body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia.",
+      body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",
     },
     "workout-parts": {
       name: "Treinos em partes",

@@ -849,6 +849,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Dinlenme sayacında görmek istemiyor musun? Ayarlar › Antrenman'da Dinlenirken form kontrolü'nü kapat.",
   },
+  "auto-supersets": {
+    title: "Senin için süper setler",
+    intro: "Uyarlanabilir antrenmanların artık tek bir anahtarla egzersizleri senin için süper setlerde eşleştirebilir.",
+    points: [
+      "Ayarlar › Program › Uyarlanabilir antrenmanlar'da Egzersizleri süper setlerde eşleştir'i aç.",
+      "Aynı kasları çalıştırmayan egzersizler art arda gelir, örneğin bir press ve bir row, böylece biri çalışırken diğeri dinlenir.",
+      "Her turdan sonraki dinlenme daha kısadır ve kazanılan süre seçtiğin uzunluğa daha fazla antrenman sığdırır.",
+      "Ağır squat ve deadlift'ler tek başına kalır, Bugün ekranında istediğin çifti ayırabilirsin.",
+    ],
+    dyk: "Aynı bölümde, ısınmayı kendi yönteminle yapmak istediğin günler için bir Isınma setleri anahtarı var.",
+  },
   seasons: {
     title: "Antrenman sezonları pazartesi başlıyor",
     intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",
