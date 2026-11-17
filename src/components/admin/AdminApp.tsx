@@ -17,6 +17,7 @@ import { AskAiButton, AskAiPanel } from "./Ai";
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
+import { Community } from "./Community";
 import { Flags } from "./Flags";
 import { GymPlaceReports } from "./GymPlaceReports";
 import { GymPlaces } from "./GymPlaces";
@@ -1053,6 +1054,7 @@ export function AdminApp() {
             <GymPlaceReports admin={data.staff.role === "admin"} />
           </>
         )}
+        {tab === "Community" && <Community admin={data.staff.role === "admin"} />}
         {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}

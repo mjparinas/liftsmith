@@ -34,6 +34,8 @@ export interface SiteText {
       coaches: string;
       pricing: string;
       whatsNew: string;
+      /** The community: ideas, bugs, roadmap (/community/). */
+      community: string;
       exercises: string;
       muscles: string;
       programs: string;

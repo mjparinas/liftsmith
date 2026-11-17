@@ -874,6 +874,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Avvisami, nella chat di ogni club, spegne le sue notifiche, e una chat ne invia al massimo una all’ora.",
   },
+  community: {
+    title: "Vota cosa costruiamo dopo",
+    intro: "Liftsmith ora ha una community: suggerisci idee, vota quelle che vuoi e segnala i bug.",
+    points: [
+      "Apri Impostazioni › Aiuto › Community.",
+      "Tocca la freccia accanto a un'idea per votarla. Le più richieste salgono in cima.",
+      "Segnala un bug con uno screenshot che vedete solo tu e il team.",
+      "Ogni post mostra a che punto è, da In valutazione a Rilasciata, e ti avvisiamo quando esce un'idea che hai votato.",
+    ],
+    dyk: "Roadmap e registro delle modifiche sono anche sul sito, su getliftsmith.com/community.",
+  },
   "coach-checkin-trends": {
     title: "Check-in con peso, foto e andamento",
     intro: "I tuoi moduli di check-in ora possono chiedere il peso corporeo e delle foto, e mostrare come va ogni risposta.",

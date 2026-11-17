@@ -579,6 +579,10 @@ export const pt: FeaturesText = {
       name: "Padrões de força de praticantes reais",
       body: "O site mostra quanto as pessoas realmente fazem no agachamento, supino, levantamento terra e desenvolvimento, por sexo e peso corporal, calculado todo dia a partir de quem participa. Só grupos de 30 ou mais aparecem, como percentis, nunca os números de alguém. Uma chave em Ajustes › Seus dados e privacidade decide se você participa; menores de 18 nunca participam.",
     },
+    community: {
+      name: "Comunidade: ideias, bugs e roteiro",
+      body: "Sugira o que o Liftsmith deve fazer em seguida, vote nas ideias que você quer, relate bugs com uma captura de tela que só a equipe vê, e comente ou mencione alguém com @. Cada uma mostra em que ponto está, de em análise a lançada, e você fica sabendo quando uma ideia que votou é lançada. O roteiro e o registro de mudanças também estão no site.",
+    },
     languages: {
       name: "Dez idiomas",
       body: "Inglês, espanhol, francês, alemão, italiano, japonês, português do Brasil, coreano, polonês e turco, seguindo o idioma do seu celular ou navegador, ou o que você escolher na tela de boas-vindas e nos ajustes.",

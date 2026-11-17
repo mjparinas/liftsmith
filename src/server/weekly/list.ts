@@ -136,6 +136,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("auto-supersets", "free", "settings/training", { fresh: "2026-11-17" }),
   // New, 2026-11-17: club chat and crew sessions (docs/decisions/friends.md "Club chat and crew sessions").
   L("club-chat", "free", "friends", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: the Liftsmith community: ideas, bugs, votes and the roadmap (docs/decisions/community.md).
+  L("community", "free", "community", { fresh: "2026-11-17", shot: false }),
   // New, 2026-11-17: weight and photo questions, repeats every 1, 2 or 4 weeks and trends on check-in forms
   // (docs/decisions/trainer-mode.md "Check-in forms and questionnaires").
   R("coach-checkin-trends", "coach", "pro", "trainer/checkins", { fresh: "2026-11-17", shot: false }),

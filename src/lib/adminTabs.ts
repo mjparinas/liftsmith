@@ -5,6 +5,7 @@ export const ADMIN_TABS = [
   "To Do",
   "Inbox",
   "Reports",
+  "Community",
   "Gyms",
   "Traffic",
   "Acquisition",

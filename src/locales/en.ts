@@ -27,6 +27,7 @@ import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as chk from "./text/chk";
+import * as cmty from "./text/cmty";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -169,6 +170,7 @@ export const en = {
   ...cause.en,
   ...chk.en,
   ...coach.en,
+  ...cmty.en,
   ...conn.en,
   ...cos.en,
   ...count.en,

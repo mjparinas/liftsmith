@@ -518,6 +518,10 @@ export const fr: FeaturesText = {
       name: "Niveaux de force de vrais pratiquants",
       body: "Le site montre ce que les pratiquants soulèvent vraiment au squat, au développé couché, au soulevé de terre et au développé militaire, par sexe et poids de corps, recalculé chaque jour avec ceux qui comptent. Seuls les groupes de 30 personnes ou plus sont affichés, en centiles, jamais les chiffres de quelqu'un. Un interrupteur dans Réglages › Vos données et confidentialité décide si vous comptez ; les moins de 18 ans ne comptent jamais.",
     },
+    community: {
+      name: "Communauté : idées, bugs et feuille de route",
+      body: "Proposez ce que Liftsmith devrait faire ensuite, votez pour les idées qui vous plaisent, signalez des bugs avec une capture que seule l'équipe voit, et commentez ou mentionnez quelqu'un avec @. Chacune montre où elle en est, d'en cours d'examen à livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort. La feuille de route et le journal des modifications sont aussi sur le site.",
+    },
     languages: {
       name: "Dix langues",
       body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone ou de votre navigateur, ou celle que vous choisissez sur l’écran d’accueil et dans les réglages.",

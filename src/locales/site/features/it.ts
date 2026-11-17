@@ -511,6 +511,10 @@ export const it: FeaturesText = {
       name: "Standard di forza da atleti veri",
       body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
     },
+    community: {
+      name: "Community: idee, bug e roadmap",
+      body: "Suggerisci cosa dovrebbe fare Liftsmith, vota le idee che vuoi, segnala i bug con uno screenshot che vede solo il team e commenta o menziona qualcuno con @. Ognuna mostra a che punto è, da in valutazione a rilasciata, e ti avvisiamo quando esce un'idea che hai votato. Roadmap e registro delle modifiche sono anche sul sito.",
+    },
     languages: {
       name: "Dieci lingue",
       body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono o del browser, oppure quella che scegli nella schermata di benvenuto e nelle impostazioni.",

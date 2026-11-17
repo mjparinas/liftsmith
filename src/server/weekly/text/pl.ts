@@ -871,6 +871,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Powiadamiaj mnie w czacie każdego klubu wyłącza jego powiadomienia, a czat wysyła najwyżej jedno na godzinę.",
   },
+  community: {
+    title: "Zagłosuj, co zbudujemy dalej",
+    intro: "Liftsmith ma teraz społeczność: proponuj pomysły, głosuj na te, które chcesz, i zgłaszaj błędy.",
+    points: [
+      "Otwórz Ustawienia › Pomoc › Społeczność.",
+      "Stuknij strzałkę obok pomysłu, by na niego zagłosować. Najbardziej chciane idą na górę.",
+      "Zgłoś błąd ze zrzutem ekranu, który widzisz tylko ty i zespół.",
+      "Przy każdym wpisie widać, na jakim jest etapie, od Analizowane do Wydane, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie.",
+    ],
+    dyk: "Plan rozwoju i lista zmian są też na stronie, pod adresem getliftsmith.com/community.",
+  },
   "coach-checkin-trends": {
     title: "Kontrole z wagą, zdjęciami i trendami",
     intro: "Twoje formularze kontrolne mogą teraz pytać o masę ciała i zdjęcia oraz pokazywać, jak zmienia się każda odpowiedź.",

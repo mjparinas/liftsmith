@@ -15,6 +15,7 @@ import { BLOG_C } from "./blog/c";
 import { BLOG_CLUB_CHAT } from "./blog/clubChat";
 import { BLOG_COACH_CHECKINS } from "./blog/coachCheckins";
 import { BLOG_COACH_PROGRAMS } from "./blog/coachPrograms";
+import { BLOG_COMMUNITY } from "./blog/community";
 import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
@@ -22,6 +23,7 @@ import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_G } from "./blog/g";
 import { BLOG_H } from "./blog/h";
+import { BLOG_HEALTH_TRENDS } from "./blog/healthTrends";
 import { BLOG_I } from "./blog/i";
 import { BLOG_INVITES } from "./blog/invites";
 import { BLOG_J } from "./blog/j";
@@ -37,6 +39,7 @@ import { BLOG_R } from "./blog/r";
 import { BLOG_REHAB_DONE } from "./blog/rehabDone";
 import { BLOG_S } from "./blog/s";
 import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
+import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
 import { BLOG_U } from "./blog/u";
@@ -256,11 +259,14 @@ export const ARTICLES: Article[] = [
   ...BLOG_FORM_CUES,
   ...BLOG_AUTO_SUPERSETS,
   ...BLOG_CLUB_CHAT,
+  ...BLOG_COMMUNITY,
   ...BLOG_COACH_CHECKINS,
   ...BLOG_SITE_PAGES,
   ...BLOG_WIDGETS,
   ...BLOG_NEW_FEATURES,
   ...BLOG_FEATURE_GUIDES,
+  ...BLOG_SEARCH_TOPICS,
+  ...BLOG_HEALTH_TRENDS,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

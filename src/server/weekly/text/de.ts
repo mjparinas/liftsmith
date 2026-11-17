@@ -874,6 +874,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Benachrichtigen im Chat jedes Clubs schaltet seine Mitteilungen aus, und ein Chat schickt höchstens eine pro Stunde.",
   },
+  community: {
+    title: "Stimm ab, was wir als Nächstes bauen",
+    intro: "Liftsmith hat jetzt eine Community: Schlag Ideen vor, stimm für die, die du willst, und melde Fehler.",
+    points: [
+      "Öffne Einstellungen › Hilfe › Community.",
+      "Tippe auf den Pfeil neben einer Idee, um dafür zu stimmen. Die gefragtesten steigen nach oben.",
+      "Melde einen Fehler mit einem Screenshot, den nur du und das Team seht.",
+      "Bei jedem Beitrag siehst du, wo er steht, von Wird geprüft bis Veröffentlicht, und du erfährst es, wenn eine Idee erscheint, für die du gestimmt hast.",
+    ],
+    dyk: "Roadmap und Änderungsprotokoll findest du auch auf der Website unter getliftsmith.com/community.",
+  },
   "coach-checkin-trends": {
     title: "Check-ins mit Gewicht, Fotos und Verlauf",
     intro: "Deine Check-in-Formulare können jetzt nach Körpergewicht und Fotos fragen und zeigen, wie sich jede Antwort entwickelt.",

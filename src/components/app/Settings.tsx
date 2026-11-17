@@ -13,6 +13,7 @@ import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { COMMIT, versionLabel } from "@/lib/build";
+import { communityOn } from "@/lib/community";
 import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
@@ -250,7 +251,10 @@ export function Settings() {
         />
       </div>
       <Section title={t("settings.g.help")}>
-        <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
+        <div className="space-y-3">
+          {communityOn() && <NavRow title={t("cmty.title")} sub={t("cmty.rowSub")} icon="lightbulb" onClick={() => go("community")} />}
+          <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
+        </div>
       </Section>
       {/* The app logo; seven quick taps open the lifetime total in elephants (an easter egg, LogoEgg.tsx). */}
       <div className="mt-8 flex justify-center">

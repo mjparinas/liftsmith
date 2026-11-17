@@ -878,6 +878,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Me prévenir, dans la discussion de chaque club, coupe ses notifications, et une discussion en envoie au plus une par heure.",
   },
+  community: {
+    title: "Votez pour ce qu'on construit ensuite",
+    intro: "Liftsmith a maintenant sa communauté : proposez des idées, votez pour celles que vous voulez et signalez des bugs.",
+    points: [
+      "Ouvrez Réglages › Aide › Communauté.",
+      "Touchez la flèche à côté d'une idée pour voter. Les plus demandées montent en tête.",
+      "Signalez un bug avec une capture que seuls vous et l'équipe voyez.",
+      "Chaque publication montre où elle en est, d'En cours d'examen à Livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort.",
+    ],
+    dyk: "La feuille de route et le journal des modifications sont aussi sur le site, à getliftsmith.com/community.",
+  },
   "coach-checkin-trends": {
     title: "Bilans avec poids, photos et tendances",
     intro: "Vos formulaires de bilan peuvent maintenant demander le poids et des photos, et montrer comment évolue chaque réponse.",

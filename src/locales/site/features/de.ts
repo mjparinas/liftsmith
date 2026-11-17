@@ -517,6 +517,10 @@ export const de: FeaturesText = {
       name: "Kraftwerte von echten Lifterinnen und Liftern",
       body: "Die Website zeigt, wie viel Lifter wirklich beugen, drücken, heben und überkopf drücken, nach Geschlecht und Körpergewicht, jeden Tag neu aus allen, die mitzählen. Gezeigt werden nur Gruppen ab 30 Personen, als Perzentile, nie die Werte einzelner. Ein Schalter unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob du mitzählst; unter 18 zählt niemand.",
     },
+    community: {
+      name: "Community: Ideen, Fehler und Roadmap",
+      body: "Schlag vor, was Liftsmith als Nächstes können soll, stimm für die Ideen, die du willst, melde Fehler mit einem Screenshot, den nur das Team sieht, und kommentiere oder erwähne andere mit @. Bei jedem Eintrag siehst du, wo er steht, von „Wird geprüft“ bis „Veröffentlicht“, und du erfährst es, wenn eine Idee, für die du gestimmt hast, erscheint. Roadmap und Änderungsprotokoll stehen auch auf der Website.",
+    },
     languages: {
       name: "Zehn Sprachen",
       body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys oder Browsers, oder frei wählbar auf dem Startbildschirm und in den Einstellungen.",

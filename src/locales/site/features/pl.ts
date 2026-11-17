@@ -579,6 +579,10 @@ export const pl: FeaturesText = {
       name: "Normy siłowe od prawdziwych ćwiczących",
       body: "Strona pokazuje, ile naprawdę przysiadają, wyciskają na ławce, ciągną w martwym ciągu i wyciskają nad głowę ćwiczący, według płci i masy ciała, liczone codziennie z osób, które biorą w tym udział. Pokazujemy tylko grupy liczące co najmniej 30 osób, jako percentyle, nigdy niczyje własne wyniki. Jeden przełącznik w Ustawienia › Twoje dane i prywatność decyduje, czy jesteś liczony; osoby poniżej 18 lat nigdy nie są.",
     },
+    community: {
+      name: "Społeczność: pomysły, błędy i plan rozwoju",
+      body: "Zaproponuj, co Liftsmith ma robić dalej, głosuj na pomysły, które chcesz, zgłaszaj błędy ze zrzutem ekranu widocznym tylko dla zespołu, komentuj i oznaczaj innych przez @. Przy każdym widać, na jakim jest etapie, od analizy po wydanie, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie. Plan rozwoju i lista zmian są też na stronie.",
+    },
     languages: {
       name: "Dziesięć języków",
       body: "Angielski, hiszpański, francuski, niemiecki, włoski, japoński, portugalski (Brazylia), koreański, polski i turecki, zgodnie z językiem telefonu lub przeglądarki albo do wyboru na ekranie powitalnym i w ustawieniach.",
