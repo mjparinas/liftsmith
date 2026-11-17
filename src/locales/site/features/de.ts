@@ -314,6 +314,10 @@ export const de: FeaturesText = {
       name: "Teamkonten für Studios",
       body: "Der Inhaber eines offiziellen Studios lädt Leitung und Empfangsteam mit einem Einmal-Link ein. Alle halten mit ihrem eigenen Konto die Seite, Ankündigungen und gemeldete Probleme aktuell.",
     },
+    "gym-classes": {
+      name: "Kurspläne auf Studioseiten",
+      body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
+    },
     "gym-starter": {
       name: "Einsteigerprogramme der Studios",
       body: "Offizielle Studios empfehlen neuen Mitgliedern ein Programm auf ihrer Seite in der App und im Web, mit einem Tippen gespeichert. Liftsmith setzt die eigenen Gewichte ein.",

@@ -904,4 +904,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Sezonları görmek istemiyor musun? Ayarlar › Görünüm'den Antrenman sezonlarını kapat. Antrenmanın sayılmaya devam eder.",
   },
+  "gym-classes": {
+    title: "Ders programını salonunun sayfasına koy",
+    intro: "Üyeler haftanın derslerini uygulamada ve web sitesinde salonunun sayfasında görür.",
+    points: [
+      "Her dersi bir kez ekle: tür, günler, başlangıç saati ve süre. Neredeyse hiç yazman gerekmez.",
+      "Eğitmeni, alanı ve rezervasyon gibi kısa bir notu ekle.",
+      "Tatilde kapalı mısın? Tarihe dokun, ders o gün yapılmıyor olarak görünsün.",
+      "Üyeler sıradaki dersi tek dokunuşla takvimine ekler.",
+    ],
+    dyk: "Saatler salonunun saatidir, yani 18.00 herkes için 18.00. Rezervasyonlar sende kalır.",
+  },
 };

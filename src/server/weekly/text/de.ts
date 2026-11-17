@@ -907,4 +907,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Du willst keine Saisons sehen? Schalte Trainingssaisons in Einstellungen › Aussehen und Bedienung aus. Dein Training zählt weiter.",
   },
+  "gym-classes": {
+    title: "Dein Kursplan auf der Seite deines Studios",
+    intro: "Mitglieder sehen die Kurse der Woche auf der Seite deines Studios, in der App und auf der Website.",
+    points: [
+      "Lege jeden Kurs einmal an: Art, Tage, Beginn und Dauer. Tippen musst du fast nie.",
+      "Ergänze Trainer, Raum und einen kurzen Hinweis, etwa wie man bucht.",
+      "Feiertag? Tippe auf das Datum, und der Kurs erscheint an dem Tag als ausgefallen.",
+      "Mitglieder tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
+    ],
+    dyk: "Die Zeiten folgen der Uhr deines Studios: 18 Uhr bleibt für alle 18 Uhr. Buchungen bleiben bei dir.",
+  },
 };

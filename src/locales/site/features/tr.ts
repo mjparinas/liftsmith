@@ -373,6 +373,10 @@ export const tr: FeaturesText = {
       name: "Salonlar için personel hesapları",
       body: "Resmi bir salonun sahibi, yöneticileri ve resepsiyon personelini tek kullanımlık bir linkle davet eder. Her biri kendi hesabıyla salonun sayfasını, duyurularını ve arıza bildirimlerini güncel tutar.",
     },
+    "gym-classes": {
+      name: "Salon sayfalarında ders programı",
+      body: "Resmî salonlar her hafta verdikleri dersleri eğitmen ve alanla birlikte paylaşır, dersin olmadığı günleri işaretler. Üyeler haftayı uygulamada ve webde salonun sayfasında görür, sıradaki dersi tek dokunuşla takvimine ekler.",
+    },
     "gym-starter": {
       name: "Salonların başlangıç programları",
       body: "Resmi salonlar uygulamadaki ve web'deki sayfalarında yeni üyelere bir program önerir, sporcular onu tek dokunuşla kaydeder. Liftsmith her sporcunun kendi ağırlıklarını doldurur.",

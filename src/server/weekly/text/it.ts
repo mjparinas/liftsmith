@@ -907,4 +907,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Preferisci non vedere le stagioni? Disattiva Stagioni di allenamento in Impostazioni › Aspetto e stile. Il tuo allenamento conta comunque.",
   },
+  "gym-classes": {
+    title: "Metti l'orario dei corsi sulla pagina della tua palestra",
+    intro: "Chi si allena da te vede i corsi della settimana sulla pagina della palestra, nell'app e sul sito.",
+    points: [
+      "Aggiungi ogni corso una volta: tipo, giorni, ora di inizio e durata. Quasi niente da scrivere.",
+      "Aggiungi l'istruttore, la sala e una breve nota, ad esempio come prenotare.",
+      "Chiuso per una festa? Tocca la data e il corso risulta sospeso quel giorno.",
+      "Si aggiunge il prossimo corso al calendario con un tocco.",
+    ],
+    dyk: "Gli orari sono quelli della tua palestra, quindi le 18:00 sono le 18:00 per tutti. Le prenotazioni restano a te.",
+  },
 };

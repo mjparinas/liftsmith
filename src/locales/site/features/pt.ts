@@ -373,6 +373,10 @@ export const pt: FeaturesText = {
       name: "Contas de equipe para academias",
       body: "O dono de uma academia oficial convida gerentes e recepcionistas com um link de uso único. Cada um usa a própria conta para manter em dia a página, os avisos e os relatos de problemas da academia.",
     },
+    "gym-classes": {
+      name: "Horários de aulas nas páginas das academias",
+      body: "Academias oficiais publicam as aulas de cada semana, com instrutor e sala, e marcam os dias sem aula. Quem treina lá vê a semana na página da academia no app e na web, e adiciona a próxima aula à agenda com um toque.",
+    },
     "gym-starter": {
       name: "Programas iniciais da academia",
       body: "Academias oficiais sugerem um programa para novos membros na sua página no app e na web, e a pessoa salva com um toque. O Liftsmith preenche os pesos de cada um.",

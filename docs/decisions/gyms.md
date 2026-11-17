@@ -233,3 +233,40 @@ Melvin, 2026-11-16: "i should be able to click on the gym name and it should ope
 at). Each listed gym's name and status line is one button that opens the gym's page in the app (`#/gymplace/<id>`,
 `CoachGyms.tsx`), with a › to show it goes somewhere; Save and Remove stay beside it. Pure web code, so Android, iOS and
 the web app get it together.
+
+## Class schedules (2026-11-17)
+
+Melvin picked "Gym class schedules" from the gap analysis (2026-11-17, thread "Find missing features to build next":
+"Class timetable on the gym page: classes and times the owner enters, shown on the public page and in the app").
+
+- **Who posts:** an official gym's owner and its staff (`canManage`, gymStaff.ts), from the gym's page in the app
+  (`#/gymedit/<id>`, Class schedule, `OwnerClassesSection` in `GymClasses.tsx`). Anyone reads them. A gym nobody has
+  claimed shows no schedule, and releasing or deleting a gym deletes its classes (`classEnds`), because nobody keeps
+  them up to date after that. Deleting an account keeps the gym's classes without saying who added them.
+- **A class** (`gym_classes`, `src/server/gymClasses.ts`, shared rules in `src/lib/gymClasses.ts`): a name (60), a
+  type (strength, HIIT, bootcamp, spin, yoga, Pilates, boxing, dance, mobility, aqua fit, cardio, other), the weekdays
+  it runs, a start time, a length (10 to 240 minutes; the editor offers 30, 45, 60, 75 and 90), and optionally the
+  instructor (60), the room (40) and a note (160: level, what to bring, how to book). Typed words go through the same
+  filter as announcements (no links, no blocked words). Up to 80 classes a gym and 200 changes a day.
+- **Little typing:** the type is a chip, and picking one names a class that has no name yet ("Yoga"); days are chips,
+  the start is the clock dial (`TimeField`), the length is chips.
+- **Every week, with dates off:** classes repeat weekly. Instead of one-off classes, the editor shows the next eight
+  dates the class runs as chips; tapping one marks it off (up to 20 dates), and members see that day struck out with
+  "Not running this day". Dates more than two days past are dropped when read.
+- **Times are the gym's clock.** A class is stored as weekdays plus "18:30", never converted between time zones, so the
+  timetable reads like the poster at the front desk wherever the reader is. The app works out "today" and the next
+  class on the phone's own calendar, which is right for members near the gym.
+- **Members** see the next seven days with classes on the gym's page in the app (`ClassSchedule` in `PlaceDetails.tsx`,
+  part of `placeById`, so it's kept and shown offline like the rest of the page). A class opens a sheet with its days,
+  time, type, instructor, room, note and coming dates off, and **Add the next one to my calendar** (`addEvent` in
+  calendar.ts: the phone's calendar on Android and iOS through the Calendar plugin, a `.ics` file on the web). The
+  website's gym page (`classesHtml`, gymPage.ts) shows the whole week Monday first, and a gym with classes counts as
+  having something of its own for indexing (`gymIndexable`).
+- **No booking** (decided 2026-11-17, after reading coach booking, trainer-mode.md "Booking"). Coach booking is one
+  coach's one-on-one times with their own clients. Gym classes need spots, waitlists, memberships and no-shows, which
+  gyms already run at the front desk or in their own software, and connecting that software is parked
+  (gym-software.md). So the schedule only shows classes and the note says how to book; each card says "Book a spot with
+  the gym directly." If gyms ask for it, the next step is a booking link per class, not our own booking.
+- Free for gyms and members, the same for under-18s (classes are the gym's, not a lifter's). Pure web code plus the
+  existing Calendar plugin, so Android, iOS and the web app get it together. Ten languages (`gp.class*` for what
+  members and the website read, `gym.cls.*` for the owner's editor).

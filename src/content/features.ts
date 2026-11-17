@@ -577,6 +577,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "gym-classes",
+        name: "Class schedules on gym pages",
+        body: "Official gyms post the classes they run every week, with the instructor and room, and mark the dates a class is off. Members see the week ahead on the gym's page in the app and on the web, and add the next class to their calendar in one tap.",
+        tier: "free",
+        added: "2026-11-17",
+      },
+      {
         id: "buy-next",
         name: "What to buy next",
         body: "For home gyms: the one piece of equipment that would open up the most exercises.",

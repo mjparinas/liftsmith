@@ -749,3 +749,12 @@ Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards y
 - Miss a week and the next goal week pays its bonus twice. The last week counts double.
 - Every new best has a 1 in 6 chance to drop the season's rare plates.
 Did you know? Rather not see seasons? Turn off Training seasons in Settings › Look and feel. Your training still counts. ([Training seasons](seasons.md))
+
+### G3 · Put your class schedule on your gym's page (**New**, 2026-11-17)
+Free · Gyms · No screen (it needs an official gym) · `fresh`, so it goes next to gyms already in the series
+Members can see this week's classes on your gym's page, in the app and on the website.
+- Add each class once: its type, days, start time and length. Most need no typing at all.
+- Add the instructor, the room and a short note, like how to book.
+- Off for a holiday? Tap the date and the class shows as not running that day.
+- Members add the next class to their calendar in one tap.
+Did you know? Times are your gym's own clock, so members see 6 PM as 6 PM. Bookings stay with you. ([Gyms](gyms.md) "Class schedules")

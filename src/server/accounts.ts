@@ -13,6 +13,7 @@ import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { earnedDeletes } from "./earnedPro";
 import { claimDeletes } from "./gymClaims";
+import { classDeletes } from "./gymClasses";
 import { gymDeletes } from "./gymDirectory";
 import { extrasDeletes } from "./gymExtras";
 import { placeReportDeletes } from "./gymPlaceReports";
@@ -306,6 +307,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...placeReportDeletes(accountId),
     ...claimDeletes(accountId),
     ...extrasDeletes(accountId),
+    ...classDeletes(accountId),
     ...posterDeletes(accountId),
     ...communityCleanup(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },

@@ -143,6 +143,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("coach-checkin-trends", "coach", "pro", "trainer/checkins", { fresh: "2026-11-17", shot: false }),
   // New, 2026-11-17: training seasons (docs/decisions/seasons.md).
   L("seasons", "both", "season", { fresh: "2026-11-17" }),
+  // New, 2026-11-17: class schedules on gym pages (docs/decisions/gyms.md "Class schedules").
+  R("gym-classes", "gym", "free", "gym", { fresh: "2026-11-17", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */
