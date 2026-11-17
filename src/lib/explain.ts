@@ -1,6 +1,6 @@
 import { blockWeek } from "./block";
 import { date, num, relative, t } from "./i18n";
-import { barFor } from "./loads";
+import { barFor, machineStep } from "./loads";
 import { smallestJump } from "./plates";
 import { repRange, sessionsOf, TIMED } from "./progression";
 import type { Call } from "./readiness";
@@ -108,8 +108,7 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
     const bar = barFor(ex, gym);
     if (jump > 0) lines.push(t("explain.barbell", { bar: `${fmtNum(bar.weight)} ${unit}`, jump: `${fmtNum(jump)} ${unit}` }));
   } else if (ex.load === "dumbbell" && gym.dumbbells.length) lines.push(t("explain.dumbbell"));
-  else if (ex.load === "machine")
-    lines.push(t("explain.machine", { step: `${fmtNum(gym.machineStep || (unit === "kg" ? 2.5 : 5))} ${unit}` }));
+  else if (ex.load === "machine") lines.push(t("explain.machine", { step: `${fmtNum(machineStep(gym))} ${unit}` }));
 
   return { title, lines };
 }

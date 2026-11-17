@@ -1,3 +1,4 @@
+import { MACHINE_STEP } from "./loads";
 import { APP_PATH, SITE_URL } from "./site";
 import { EQUIPMENT, type Bar, type Equipment, type Gym, type PlateStock } from "./types";
 
@@ -120,7 +121,7 @@ export function decodeGym(code: string): GymKit | null {
       if (weight !== null && count !== null && !plates.some((x) => x.weight === weight)) plates.push({ weight, count: Math.round(count) });
     }
   plates.sort((a, b) => b.weight - a.weight);
-  const machineStep = num(r.m, 0.5, 50) ?? (r.u === "kg" ? 5 : 10);
+  const machineStep = num(r.m, 0.5, 50) ?? MACHINE_STEP[r.u === "kg" ? "kg" : "lb"];
   return {
     name: cleanName(r.n),
     unit: r.u,
