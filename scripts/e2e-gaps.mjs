@@ -103,6 +103,7 @@ const SCREENS = [
   "#/exercises",
   "#/log",
   "#/feedback",
+  "#/community",
   "#/gymadd",
 ];
 

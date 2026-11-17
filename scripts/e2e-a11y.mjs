@@ -670,6 +670,92 @@ if (runs("app"))
     await page.getByRole("button", { name: "Send", exact: true }).click();
     await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
     await scan("feedback sent");
+    // The community (docs/decisions/community.md): the board, a post with the team's update and comments, the roadmap
+    // and the form, on a made-up board.
+    const cPost = (id, title, extra = {}) => ({
+      id,
+      kind: "idea",
+      title,
+      body: "",
+      status: "review",
+      votes: 3,
+      comments: 1,
+      name: "Blair",
+      handle: "blair",
+      createdAt: Date.now() - 86_400_000,
+      statusAt: Date.now() - 3_600_000,
+      ...extra,
+    });
+    const cBoard = {
+      posts: [
+        cPost("AbCdEfGh1234", "Rest timer on my watch face", { status: "planned", votes: 41 }),
+        cPost("AbCdEfGh1235", "Plate math in kilos", { votes: 7 }),
+        cPost("AbCdEfGh1236", "Rest timer stops when the screen locks", { kind: "bug", status: "progress" }),
+      ],
+      voted: ["AbCdEfGh1234"],
+      following: ["AbCdEfGh1234"],
+    };
+    await page.route(
+      (u) => u.pathname.startsWith("/api/community/"),
+      (r) => {
+        const u = new URL(r.request().url());
+        if (u.searchParams.has("changelog"))
+          return r.fulfill({
+            json: {
+              updates: [{ postId: "AbCdEfGh1237", status: "shipped", note: "In 0.2.", at: Date.now(), title: "Dark mode", kind: "idea" }],
+            },
+          });
+        if (u.searchParams.has("id"))
+          return r.fulfill({
+            json: {
+              post: cBoard.posts[0],
+              comments: [
+                { id: "0123456789abcdef", body: "Yes please @blair", name: "Casey", handle: "casey", staff: false, at: Date.now() },
+              ],
+              updates: [{ postId: "AbCdEfGh1234", status: "planned", note: "On the list for next month.", at: Date.now() }],
+              merged: null,
+              voted: true,
+              following: true,
+            },
+          });
+        return r.fulfill({ json: cBoard });
+      },
+    );
+    // Signed in for these screens (voting, comments, reporting), then back to how it was for the steps after.
+    const accountBefore = await page.evaluate(() => {
+      const was = localStorage.getItem("liftsmith.account");
+      localStorage.setItem("liftsmith.account", JSON.stringify({ token: "t", id: "a", email: null, providers: ["email"], via: "email" }));
+      return was;
+    });
+    await page.goto(`${server.url}/app/#/settings`);
+    await page.reload();
+    await page.getByRole("button", { name: /^Community/ }).click();
+    await page
+      .getByRole("button", { name: /Rest timer on my watch face/ })
+      .last()
+      .waitFor();
+    await scan("community");
+    await page.getByRole("button", { name: "Roadmap", exact: true }).click();
+    await page.getByRole("heading", { name: "Changelog" }).waitFor();
+    await scan("community roadmap");
+    await page
+      .getByRole("button", { name: /Rest timer on my watch face/ })
+      .first()
+      .click();
+    await page.getByRole("heading", { name: "Rest timer on my watch face" }).waitFor();
+    await scan("community post");
+    await page.getByRole("button", { name: "Report this post" }).click();
+    await scan("community report");
+    await page.keyboard.press("Escape");
+    await page.goto(`${server.url}/app/#/community/new-bug`);
+    await page.getByLabel("Title").fill("Rest timer stops on lock");
+    await scan("community new bug");
+    await page.evaluate(
+      (was) => (was ? localStorage.setItem("liftsmith.account", was) : localStorage.removeItem("liftsmith.account")),
+      accountBefore,
+    );
+    await page.goto(`${server.url}/app/#/settings`);
+    await page.reload();
     // Light mode: every main screen again, so the light tokens pass contrast too.
     await page.goto(`${server.url}/app/#/settings/look`);
     await page.getByRole("button", { name: "Light", exact: true }).click();

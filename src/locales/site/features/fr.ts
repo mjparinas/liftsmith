@@ -345,6 +345,11 @@ export const fr: FeaturesText = {
       name: "Défis, clubs et classements",
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
     },
+    "club-chat": {
+      name: "Discussion du club et séances en groupe",
+      body: "Discute avec ton club entre les séances, propose une heure et un lieu pour vous entraîner ensemble et vois qui vient. Chaque participant reçoit un rappel une heure avant, et publier ta séance après coup t’indique comme entraîné, avec les amis qui étaient là identifiés.",
+      note: "Pour les 18 ans et plus. Les notifications sont sur Android et iPhone ; l’app web affiche les nouveaux messages tant que la discussion est ouverte.",
+    },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
     "tagline-gym": {
       name: "Devise et salle habituelle",
@@ -514,6 +519,10 @@ export const fr: FeaturesText = {
     "strength-standards": {
       name: "Niveaux de force de vrais pratiquants",
       body: "Le site montre ce que les pratiquants soulèvent vraiment au squat, au développé couché, au soulevé de terre et au développé militaire, par sexe et poids de corps, recalculé chaque jour avec ceux qui comptent. Seuls les groupes de 30 personnes ou plus sont affichés, en centiles, jamais les chiffres de quelqu'un. Un interrupteur dans Réglages › Vos données et confidentialité décide si vous comptez ; les moins de 18 ans ne comptent jamais.",
+    },
+    community: {
+      name: "Communauté : idées, bugs et feuille de route",
+      body: "Proposez ce que Liftsmith devrait faire ensuite, votez pour les idées qui vous plaisent, signalez des bugs avec une capture que seule l'équipe voit, et commentez ou mentionnez quelqu'un avec @. Chacune montre où elle en est, d'en cours d'examen à livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort. La feuille de route et le journal des modifications sont aussi sur le site.",
     },
     languages: {
       name: "Dix langues",

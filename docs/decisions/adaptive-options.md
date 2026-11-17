@@ -17,6 +17,8 @@ What was already elsewhere stays there and isn't repeated: rest times, rep range
 
 **Not Pro-gated.** They change how a plan is built, not what the app does: the adaptive plan itself is the Pro feature (free lifters get one a week, and these options apply to it). Fixed programs and routines keep their own supersets; only Warm-up sets reaches them.
 
+**Basic automatic supersets stay free** (Melvin, 2026-11-17: "keep basic automatic supersets free"). The supersets switch, its rest maths and Keep heavy squats and deadlifts on their own are never behind Pro, and don't count as a Pro feature in `PRO_FEATURES`. A free lifter's weekly adaptive workout pairs exercises too when the switch is on. If richer superset options come later (a style choice, giant sets), each can be weighed for Pro on its own, but the basic switch stays free.
+
 ## How the pairing works (`src/lib/autoSuperset.ts`)
 
 - **Who can pair:** not a heavy lift kept alone (above), a challenge set, an exercise kept lighter for an injury, a carry, a rehab or cardio part, or anything already in a superset.

@@ -863,6 +863,28 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Nella stessa sezione c'è l'interruttore Serie di riscaldamento, per i giorni in cui preferisci scaldarti a modo tuo.",
   },
+  "club-chat": {
+    title: "Il tuo club, tra un allenamento e l’altro",
+    intro: "I club ora hanno una chat e gli allenamenti di gruppo, così le persone con cui ti alleni possono parlare e vedersi.",
+    points: [
+      "Apri Amici › Club, scegli un club e tocca Chat per scrivere a tutti.",
+      "Proponi un allenamento di gruppo con un nome, un giorno e un orario, e i membri toccano Ci sono.",
+      "Chi partecipa riceve un promemoria un’ora prima.",
+      "Pubblica l’allenamento dopo: risulterai allenato, con gli amici che erano con te taggati.",
+    ],
+    dyk: "Avvisami, nella chat di ogni club, spegne le sue notifiche, e una chat ne invia al massimo una all’ora.",
+  },
+  community: {
+    title: "Vota cosa costruiamo dopo",
+    intro: "Liftsmith ora ha una community: suggerisci idee, vota quelle che vuoi e segnala i bug.",
+    points: [
+      "Apri Impostazioni › Aiuto › Community.",
+      "Tocca la freccia accanto a un'idea per votarla. Le più richieste salgono in cima.",
+      "Segnala un bug con uno screenshot che vedete solo tu e il team.",
+      "Ogni post mostra a che punto è, da In valutazione a Rilasciata, e ti avvisiamo quando esce un'idea che hai votato.",
+    ],
+    dyk: "Roadmap e registro delle modifiche sono anche sul sito, su getliftsmith.com/community.",
+  },
   seasons: {
     title: "Le stagioni di allenamento iniziano lunedì",
     intro: "La stagione 1, Brace, inizia lunedì: dieci settimane, un percorso di 20 livelli e premi che si ottengono solo quest'inverno.",

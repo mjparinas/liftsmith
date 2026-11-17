@@ -830,6 +830,40 @@ const SCHEMA = [
     PRIMARY KEY (club_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS club_members_account ON club_members (account_id)`,
+  // Club chat and crew sessions (clubChat.ts, Melvin 2026-11-17): a club's messages, the times its members post to
+  // train together, and who's in for each (trained = they posted a workout around its time).
+  `CREATE TABLE IF NOT EXISTS club_messages (
+    id TEXT PRIMARY KEY,
+    club_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    hidden INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS club_messages_club ON club_messages (club_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS club_messages_account ON club_messages (account_id)`,
+  `CREATE TABLE IF NOT EXISTS crew_sessions (
+    id TEXT PRIMARY KEY,
+    club_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    starts_at INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    place TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    reminded INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_club ON crew_sessions (club_id, starts_at)`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_account ON crew_sessions (account_id)`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_starts ON crew_sessions (starts_at)`,
+  `CREATE INDEX IF NOT EXISTS crew_sessions_due ON crew_sessions (starts_at) WHERE reminded = 0`,
+  `CREATE TABLE IF NOT EXISTS crew_going (
+    session_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    trained INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (session_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS crew_going_account ON crew_going (account_id)`,
   // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
   `CREATE TABLE IF NOT EXISTS mutes (
     muter_id TEXT NOT NULL,
@@ -1225,6 +1259,83 @@ const SCHEMA = [
     count INTEGER NOT NULL,
     reset_at INTEGER NOT NULL
   )`,
+  // The Liftsmith community (community.ts, 2026-11-17): ideas and bugs about the app, their votes, comments, who gets
+  // updates on each, the author's screenshot (only they and staff see it), status changes with the team's note (the
+  // timeline and the changelog) and accounts staff blocked from posting. `votes` and `comments` are kept counts, so the
+  // board sorts on an index. `hidden`: 1 after reports, 2 by staff. `teen`: written by someone under 18, so it never
+  // carries their name and stays off the public website.
+  `CREATE TABLE IF NOT EXISTS community_posts (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL DEFAULT '',
+    handle TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'review',
+    votes INTEGER NOT NULL DEFAULT 0,
+    comments INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    status_at INTEGER NOT NULL DEFAULT 0,
+    merged_into TEXT NOT NULL DEFAULT '',
+    hidden INTEGER NOT NULL DEFAULT 0,
+    teen INTEGER NOT NULL DEFAULT 0,
+    platform TEXT NOT NULL DEFAULT '',
+    app_version TEXT NOT NULL DEFAULT ''
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_posts_board ON community_posts (hidden, votes DESC)",
+  "CREATE INDEX IF NOT EXISTS community_posts_new ON community_posts (hidden, created_at DESC)",
+  "CREATE INDEX IF NOT EXISTS community_posts_account ON community_posts (account_id)",
+  "CREATE INDEX IF NOT EXISTS community_posts_merged ON community_posts (merged_into)",
+  // Admin › Community lists every post newest first, hidden ones too.
+  "CREATE INDEX IF NOT EXISTS community_posts_created ON community_posts (created_at DESC)",
+  `CREATE TABLE IF NOT EXISTS community_votes (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_votes_account ON community_votes (account_id)",
+  `CREATE TABLE IF NOT EXISTS community_comments (
+    id TEXT PRIMARY KEY,
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    body TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    handle TEXT NOT NULL DEFAULT '',
+    staff INTEGER NOT NULL DEFAULT 0,
+    teen INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_comments_post ON community_comments (post_id, created_at)",
+  "CREATE INDEX IF NOT EXISTS community_comments_account ON community_comments (account_id)",
+  `CREATE TABLE IF NOT EXISTS community_follows (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    on_ INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_follows_account ON community_follows (account_id)",
+  `CREATE TABLE IF NOT EXISTS community_shots (
+    post_id TEXT PRIMARY KEY,
+    image BLOB NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS community_updates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS community_updates_post ON community_updates (post_id, at)",
+  "CREATE INDEX IF NOT EXISTS community_updates_status ON community_updates (status, at)",
+  `CREATE TABLE IF NOT EXISTS community_bans (
+    account_id TEXT PRIMARY KEY,
+    at INTEGER NOT NULL
+  )`,
 ];
 
 /**
@@ -1297,6 +1408,10 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "added_by", "TEXT NOT NULL DEFAULT ''"],
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
+  // Club chat (clubChat.ts): when the member last opened it, last got a push about it, and their "Notify me" switch.
+  ["club_members", "read_at", "INTEGER NOT NULL DEFAULT 0"],
+  ["club_members", "pushed_at", "INTEGER NOT NULL DEFAULT 0"],
+  ["club_members", "chat_push", "INTEGER NOT NULL DEFAULT 1"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
   // Amenities (a comma list from gymExtras.ts AMENITIES) and prices (JSON), set by the owner (2026-11-13).
   ["gym_places", "amenities", "TEXT NOT NULL DEFAULT ''"],

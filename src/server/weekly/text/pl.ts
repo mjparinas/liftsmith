@@ -860,6 +860,28 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "W tej samej sekcji jest przełącznik Serie rozgrzewkowe, na dni, gdy wolisz rozgrzać się po swojemu.",
   },
+  "club-chat": {
+    title: "Twój klub, między treningami",
+    intro: "Kluby mają teraz czat i treningi ekipy, więc osoby, z którymi trenujesz, mogą rozmawiać i się umawiać.",
+    points: [
+      "Otwórz Znajomi › Kluby, wybierz klub i dotknij Czat, aby napisać do wszystkich.",
+      "Zaplanuj trening ekipy z nazwą, dniem i godziną, a członkowie dotykają Wchodzę.",
+      "Każdy, kto idzie, dostaje przypomnienie godzinę wcześniej.",
+      "Po treningu opublikuj go: pojawisz się jako po treningu, a znajomi, z którymi ćwiczysz, zostaną oznaczeni.",
+    ],
+    dyk: "Powiadamiaj mnie w czacie każdego klubu wyłącza jego powiadomienia, a czat wysyła najwyżej jedno na godzinę.",
+  },
+  community: {
+    title: "Zagłosuj, co zbudujemy dalej",
+    intro: "Liftsmith ma teraz społeczność: proponuj pomysły, głosuj na te, które chcesz, i zgłaszaj błędy.",
+    points: [
+      "Otwórz Ustawienia › Pomoc › Społeczność.",
+      "Stuknij strzałkę obok pomysłu, by na niego zagłosować. Najbardziej chciane idą na górę.",
+      "Zgłoś błąd ze zrzutem ekranu, który widzisz tylko ty i zespół.",
+      "Przy każdym wpisie widać, na jakim jest etapie, od Analizowane do Wydane, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie.",
+    ],
+    dyk: "Plan rozwoju i lista zmian są też na stronie, pod adresem getliftsmith.com/community.",
+  },
   seasons: {
     title: "Sezony treningowe startują w poniedziałek",
     intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",

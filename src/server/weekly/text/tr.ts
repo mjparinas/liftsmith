@@ -860,6 +860,28 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aynı bölümde, ısınmayı kendi yönteminle yapmak istediğin günler için bir Isınma setleri anahtarı var.",
   },
+  "club-chat": {
+    title: "Antrenmanlar arasında kulübün",
+    intro: "Kulüplerde artık sohbet ve ekip antrenmanları var; birlikte çalıştığın kişiler konuşup buluşabilir.",
+    points: [
+      "Arkadaşlar › Kulüpler'i aç, bir kulüp seç ve herkese yazmak için Sohbet'e dokun.",
+      "Bir ad, gün ve saatle ekip antrenmanı planla; üyeler Ben de varım'a dokunur.",
+      "Katılan herkes bir saat önce hatırlatma alır.",
+      "Sonra antrenmanını paylaş; antrenman yapmış görünürsün ve birlikte çalıştığın arkadaşların etiketlenir.",
+    ],
+    dyk: "Her kulübün sohbetindeki Bana haber ver ile bildirimlerini kapatabilirsin; bir sohbet saatte en fazla bir bildirim gönderir.",
+  },
+  community: {
+    title: "Sırada ne yapacağımıza oy ver",
+    intro: "Liftsmith'in artık bir topluluğu var: fikir öner, istediklerine oy ver ve hata bildir.",
+    points: [
+      "Ayarlar › Yardım › Topluluk'u aç.",
+      "Oy vermek için bir fikrin yanındaki oka dokun. En çok istenenler üste çıkar.",
+      "Yalnızca senin ve ekibin gördüğü bir ekran görüntüsüyle hata bildir.",
+      "Her gönderi İnceleniyor'dan Yayınlandı'ya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın.",
+    ],
+    dyk: "Yol haritası ve değişiklik günlüğü web sitesinde de var: getliftsmith.com/community.",
+  },
   seasons: {
     title: "Antrenman sezonları pazartesi başlıyor",
     intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",

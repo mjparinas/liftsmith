@@ -863,6 +863,28 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Im selben Bereich gibt es einen Schalter für Aufwärmsätze, für Tage, an denen du dich lieber selbst aufwärmst.",
   },
+  "club-chat": {
+    title: "Dein Club, zwischen den Trainings",
+    intro: "Clubs haben jetzt einen Chat und Crew-Trainings, damit die Leute, mit denen du trainierst, reden und sich verabreden können.",
+    points: [
+      "Öffne Freunde › Clubs, wähle einen Club und tippe auf Chat, um allen zu schreiben.",
+      "Plane ein Crew-Training mit Namen, Tag und Uhrzeit, und Mitglieder tippen auf Ich bin dabei.",
+      "Alle, die dabei sind, bekommen eine Stunde vorher eine Erinnerung.",
+      "Poste dein Training danach: Dann stehst du als trainiert da, mit den Freunden markiert, die mittrainiert haben.",
+    ],
+    dyk: "Benachrichtigen im Chat jedes Clubs schaltet seine Mitteilungen aus, und ein Chat schickt höchstens eine pro Stunde.",
+  },
+  community: {
+    title: "Stimm ab, was wir als Nächstes bauen",
+    intro: "Liftsmith hat jetzt eine Community: Schlag Ideen vor, stimm für die, die du willst, und melde Fehler.",
+    points: [
+      "Öffne Einstellungen › Hilfe › Community.",
+      "Tippe auf den Pfeil neben einer Idee, um dafür zu stimmen. Die gefragtesten steigen nach oben.",
+      "Melde einen Fehler mit einem Screenshot, den nur du und das Team seht.",
+      "Bei jedem Beitrag siehst du, wo er steht, von Wird geprüft bis Veröffentlicht, und du erfährst es, wenn eine Idee erscheint, für die du gestimmt hast.",
+    ],
+    dyk: "Roadmap und Änderungsprotokoll findest du auch auf der Website unter getliftsmith.com/community.",
+  },
   seasons: {
     title: "Am Montag starten die Trainingssaisons",
     intro: "Saison 1, Glut, startet am Montag: zehn Wochen, ein Pfad mit 20 Stufen und Belohnungen, die es nur diesen Winter gibt.",

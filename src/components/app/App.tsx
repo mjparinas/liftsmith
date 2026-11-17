@@ -52,6 +52,7 @@ import { Achievements, useGame } from "./Achievements";
 import { ChatDock } from "./ChatDock";
 import { CheckinToasts } from "./CheckinToasts";
 import { CoachProgramScreen } from "./CoachProgram";
+import { Community } from "./Community";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExerciseLibrary } from "./ExerciseLibrary";
@@ -494,6 +495,7 @@ export function App() {
     gymadd: <GymAdd />,
     log: <LogPast />,
     program: <CoachProgramScreen key={arg ?? ""} arg={arg} />,
+    community: <Community key={arg ?? ""} arg={arg} />,
     season: <SeasonScreen />,
   };
   const screen = screens[route];
@@ -619,6 +621,7 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
   "connections",
   "training",
   "feedback",
+  "community",
   "gym",
   "gymlink",
   "gymplace",

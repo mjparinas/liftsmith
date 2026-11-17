@@ -864,6 +864,28 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A mesma seção tem o botão Séries de aquecimento, para os dias em que você prefere aquecer do seu jeito.",
   },
+  "club-chat": {
+    title: "Seu clube, entre os treinos",
+    intro: "Os clubes agora têm chat e treinos em grupo, para quem treina com você poder conversar e se encontrar.",
+    points: [
+      "Abra Amigos › Clubes, escolha um clube e toque em Chat para falar com todo mundo.",
+      "Marque um treino em grupo com um nome, um dia e um horário, e os membros tocam em Eu vou.",
+      "Quem vai recebe um lembrete uma hora antes.",
+      "Poste seu treino depois e você aparece como quem treinou, com os amigos que treinaram com você marcados.",
+    ],
+    dyk: "Me avisar, no chat de cada clube, desliga as notificações dele, e um chat manda no máximo uma por hora.",
+  },
+  community: {
+    title: "Vote no que vamos criar a seguir",
+    intro: "O Liftsmith agora tem uma comunidade: sugira ideias, vote nas que você quer e relate bugs.",
+    points: [
+      "Abra Ajustes › Ajuda › Comunidade.",
+      "Toque na seta ao lado de uma ideia para votar. As mais pedidas sobem para o topo.",
+      "Relate um bug com uma captura de tela que só você e a equipe veem.",
+      "Cada post mostra em que ponto está, de Em análise a Lançada, e você fica sabendo quando uma ideia que votou é lançada.",
+    ],
+    dyk: "O roteiro e o registro de mudanças também estão no site, em getliftsmith.com/community.",
+  },
   seasons: {
     title: "As temporadas de treino começam na segunda",
     intro: "A temporada 1, Brasa, começa na segunda: dez semanas, uma trilha de 20 níveis e recompensas que só se ganham neste inverno.",

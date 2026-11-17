@@ -398,6 +398,11 @@ export const pl: FeaturesText = {
       name: "Wyzwania, kluby i rankingi",
       body: "Rzuć wyzwanie znajomemu, dołącz do klubu albo ekipy z siłowni z cotygodniowym rankingiem i podejmij miesięczne wyzwanie razem ze wszystkimi.",
     },
+    "club-chat": {
+      name: "Czat klubu i treningi ekipy",
+      body: "Rozmawiaj z klubem między treningami, podaj godzinę i miejsce na wspólny trening i zobacz, kto idzie. Każdy, kto idzie, dostaje przypomnienie godzinę wcześniej, a gdy potem opublikujesz trening, pojawisz się jako po treningu, z oznaczonymi znajomymi, z którymi ćwiczysz.",
+      note: "Dla osób, które mają co najmniej 18 lat. Powiadomienia działają na Androidzie i iPhonie; aplikacja webowa pokazuje nowe wiadomości, gdy czat jest otwarty.",
+    },
     profiles: {
       name: "Publiczne profile",
       body: "Opcjonalna publiczna strona z twoimi najlepszymi wynikami i treningami.",
@@ -575,6 +580,10 @@ export const pl: FeaturesText = {
     "strength-standards": {
       name: "Normy siłowe od prawdziwych ćwiczących",
       body: "Strona pokazuje, ile naprawdę przysiadają, wyciskają na ławce, ciągną w martwym ciągu i wyciskają nad głowę ćwiczący, według płci i masy ciała, liczone codziennie z osób, które biorą w tym udział. Pokazujemy tylko grupy liczące co najmniej 30 osób, jako percentyle, nigdy niczyje własne wyniki. Jeden przełącznik w Ustawienia › Twoje dane i prywatność decyduje, czy jesteś liczony; osoby poniżej 18 lat nigdy nie są.",
+    },
+    community: {
+      name: "Społeczność: pomysły, błędy i plan rozwoju",
+      body: "Zaproponuj, co Liftsmith ma robić dalej, głosuj na pomysły, które chcesz, zgłaszaj błędy ze zrzutem ekranu widocznym tylko dla zespołu, komentuj i oznaczaj innych przez @. Przy każdym widać, na jakim jest etapie, od analizy po wydanie, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie. Plan rozwoju i lista zmian są też na stronie.",
     },
     languages: {
       name: "Dziesięć języków",

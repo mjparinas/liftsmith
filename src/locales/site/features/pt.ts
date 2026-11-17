@@ -398,6 +398,11 @@ export const pt: FeaturesText = {
       name: "Desafios, clubes e rankings",
       body: "Desafie um amigo, entre num clube ou turma da academia com ranking semanal e encare o desafio do mês com todo mundo.",
     },
+    "club-chat": {
+      name: "Chat do clube e treinos em grupo",
+      body: "Converse com seu clube entre os treinos, marque um horário e um lugar para treinar junto e veja quem vai. Quem vai recebe um lembrete uma hora antes, e ao postar seu treino depois você aparece como quem treinou, com os amigos que treinaram com você marcados.",
+      note: "Para maiores de 18 anos. As notificações são no Android e no iPhone; o app web mostra as mensagens novas enquanto o chat está aberto.",
+    },
     profiles: {
       name: "Perfis públicos",
       body: "Uma página pública opcional com seus melhores levantamentos e treinos.",
@@ -575,6 +580,10 @@ export const pt: FeaturesText = {
     "strength-standards": {
       name: "Padrões de força de praticantes reais",
       body: "O site mostra quanto as pessoas realmente fazem no agachamento, supino, levantamento terra e desenvolvimento, por sexo e peso corporal, calculado todo dia a partir de quem participa. Só grupos de 30 ou mais aparecem, como percentis, nunca os números de alguém. Uma chave em Ajustes › Seus dados e privacidade decide se você participa; menores de 18 nunca participam.",
+    },
+    community: {
+      name: "Comunidade: ideias, bugs e roteiro",
+      body: "Sugira o que o Liftsmith deve fazer em seguida, vote nas ideias que você quer, relate bugs com uma captura de tela que só a equipe vê, e comente ou mencione alguém com @. Cada uma mostra em que ponto está, de em análise a lançada, e você fica sabendo quando uma ideia que votou é lançada. O roteiro e o registro de mudanças também estão no site.",
     },
     languages: {
       name: "Dez idiomas",

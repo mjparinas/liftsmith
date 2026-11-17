@@ -25,6 +25,7 @@ import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as chk from "./text/chk";
+import * as cmty from "./text/cmty";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -32,6 +33,7 @@ import * as count from "./text/count";
 import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
+import * as crew from "./text/crew";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
@@ -157,6 +159,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...bmi.it,
   ...body.it,
   ...buddy.it,
+  ...crew.it,
   ...buy.it,
   ...cal.it,
   ...calc.it,
@@ -166,6 +169,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...cause.it,
   ...chk.it,
   ...coach.it,
+  ...cmty.it,
   ...conn.it,
   ...cos.it,
   ...count.it,

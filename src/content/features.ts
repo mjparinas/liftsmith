@@ -620,6 +620,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "club-chat",
+        name: "Club chat and crew sessions",
+        body: "Talk with your club between workouts, post a time and place to train together, and see who's in. Everyone in gets a reminder an hour before, and posting your workout afterwards marks you trained and tags the friends you trained with.",
+        tier: "free",
+        note: "For lifters 18 and over. Notifications are on Android and iPhone; the web app shows new messages while the chat is open.",
+        added: "2026-11-17",
+      },
+      {
         id: "profiles",
         name: "Public profiles",
         body: "An optional public page with your best lifts and workouts.",
@@ -966,6 +974,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "The website shows how much lifters really squat, bench, deadlift and press, by sex and body weight, built each day from lifters who count. Only groups of 30 or more are shown, as percentiles, never anyone's own numbers. One switch in Settings › Your data and privacy decides whether you count; under-18s never do.",
         tier: "free",
         added: "2026-11-15",
+      },
+      {
+        id: "community",
+        name: "Community: ideas, bugs and roadmap",
+        body: "Suggest what Liftsmith should do next, vote for the ideas you want, report bugs with a screenshot only the team sees, and comment or @mention people. Each one shows where it is, from under review to shipped, and you hear when an idea you voted for ships. The roadmap and changelog are on the website too.",
+        tier: "free",
+        added: "2026-11-17",
       },
     ],
   },

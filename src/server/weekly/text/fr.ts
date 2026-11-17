@@ -866,6 +866,29 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La même section a un interrupteur Séries d'échauffement, pour les jours où tu préfères t'échauffer à ta façon.",
   },
+  "club-chat": {
+    title: "Ton club, entre les séances",
+    intro:
+      "Les clubs ont maintenant une discussion et des séances en groupe, pour que les gens avec qui tu t’entraînes puissent parler et se retrouver.",
+    points: [
+      "Ouvre Amis › Clubs, choisis un club et touche Discussion pour écrire à tout le monde.",
+      "Propose une séance en groupe avec un nom, un jour et une heure, et les membres touchent Je viens.",
+      "Chaque participant reçoit un rappel une heure avant.",
+      "Publie ta séance après coup : tu apparais comme entraîné, et les amis qui étaient là sont identifiés.",
+    ],
+    dyk: "Me prévenir, dans la discussion de chaque club, coupe ses notifications, et une discussion en envoie au plus une par heure.",
+  },
+  community: {
+    title: "Votez pour ce qu'on construit ensuite",
+    intro: "Liftsmith a maintenant sa communauté : proposez des idées, votez pour celles que vous voulez et signalez des bugs.",
+    points: [
+      "Ouvrez Réglages › Aide › Communauté.",
+      "Touchez la flèche à côté d'une idée pour voter. Les plus demandées montent en tête.",
+      "Signalez un bug avec une capture que seuls vous et l'équipe voyez.",
+      "Chaque publication montre où elle en est, d'En cours d'examen à Livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort.",
+    ],
+    dyk: "La feuille de route et le journal des modifications sont aussi sur le site, à getliftsmith.com/community.",
+  },
   seasons: {
     title: "Les saisons d'entraînement commencent lundi",
     intro: "La saison 1, Braise, commence lundi : dix semaines, un parcours de 20 paliers et des récompenses à gagner seulement cet hiver.",

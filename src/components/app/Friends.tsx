@@ -11,6 +11,7 @@ import { track } from "@/lib/analytics";
 import { readAccount, useAccount } from "@/lib/auth";
 import { challengeNudge, daysLeft, isOver, standings, winners } from "@/lib/challenge";
 import { challengeDays, challengeResult, markResultSeen, rematchHandles, unseenResult } from "@/lib/challengeResult";
+import { crewWhen } from "@/lib/crew";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { badgeForItem, COSMETICS, game, levelForItem } from "@/lib/game";
@@ -91,7 +92,9 @@ import type { MessageKey } from "@/locales/en";
 
 import { Bar, useGame } from "./Achievements";
 import { Avatar } from "./AvatarFace";
+import { ClubChat } from "./ClubChat";
 import { CommentsSheet, LikersSheet } from "./Comments";
+import { CrewSessions } from "./CrewSessions";
 import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { TrainingNow } from "./FriendsLive";
@@ -586,7 +589,7 @@ export function NoticeCard({ notice }: { notice: ModerationNotice }) {
 }
 
 /** What Friends reports; coach reviews are reported from Coaching (CoachReviews.tsx). */
-type FriendsReportKind = Exclude<ReportKind, "review">;
+type FriendsReportKind = Exclude<ReportKind, "review" | "feedback">;
 
 /** Report a post, comment or profile: one tap on a reason, then Send. */
 export function ReportSheet(props: { open: boolean; onClose: () => void; kind: FriendsReportKind; id: string }) {
@@ -1932,10 +1935,11 @@ function StartChallengeBody({ rematch, onClose, onStarted }: { rematch?: Rematch
  * Friends › Clubs: the lifter's clubs and gym crews. Each opens to this week's board of its members, the join
  * link to share and, for the starter, removing members and a new link. Start one, or join with a code.
  */
-function Clubs() {
+function Clubs({ initial }: { initial?: string }) {
   const [list, setList] = useState<ClubSummary[] | null>(null);
   const [reload, setReload] = useState(0);
-  const [open, setOpen] = useState<string | null>(null);
+  const [open, setOpen] = useState<string | null>(initial ?? null);
+  const now = useNow();
   const [starting, setStarting] = useState(false);
   const [code, setCode] = useState("");
   const [note, setNote] = useState<string | null>(null);
@@ -1976,7 +1980,16 @@ function Clubs() {
                     {t("friends.club.members", { count: c.members })}
                     {c.mine ? ` · ${t("friends.club.yours")}` : ""}
                   </span>
+                  {c.nextSession ? (
+                    <span className="block text-xs text-ink">{t("crew.next", { when: crewWhen(c.nextSession, now) })}</span>
+                  ) : null}
                 </span>
+                {c.unread ? (
+                  <span className="num shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-bg">
+                    {c.unread}
+                    <span className="sr-only"> {t("crew.unread", { count: c.unread })}</span>
+                  </span>
+                ) : null}
                 <Icon name="chevronRight" size={18} className="text-faint" />
               </button>
             </li>
@@ -2078,7 +2091,8 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
   const unit = profile.unit;
   const [club, setClub] = useState<ClubDetail | null>(null);
   const [metric, setMetric] = useState<BoardMetric>("workouts");
-  const [view, setView] = useState<"week" | "posts">("week");
+  const [view, setView] = useState<"week" | "posts" | "chat">("week");
+  const teen = !!useSocial((st) => st.me?.teen) || isTeen(profile);
   const [reload, setReload] = useState(0);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
@@ -2146,6 +2160,11 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
           </Button>
           <p className="mt-1 px-1 text-xs text-muted">{t("friends.club.inviteHint", { code: club.code })}</p>
           <ClubGoalCard club={club} onSave={(goal) => void act({ goal }, "clubManage")} />
+          {teen ? (
+            <p className="mt-4 text-sm text-muted">{t("crew.teen")}</p>
+          ) : (
+            <CrewSessions club={club} onChange={(sessions) => (setClub({ ...club, sessions }), onChanged())} />
+          )}
           <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label={t("social.club.view")}>
             <Chip active={view === "week"} onClick={() => setView("week")}>
               {t("friends.club.thisWeek")}
@@ -2153,8 +2172,15 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
             <Chip active={view === "posts"} onClick={() => setView("posts")}>
               {t("social.club.posts")}
             </Chip>
+            {!teen && (
+              <Chip active={view === "chat"} onClick={() => (setView("chat"), onChanged())}>
+                {t("crew.chat")}
+              </Chip>
+            )}
           </div>
-          {view === "posts" ? (
+          {view === "chat" && !teen ? (
+            <ClubChat club={club} />
+          ) : view === "posts" ? (
             <div className="mt-3">
               <Posts
                 op="clubFeed"
@@ -2555,7 +2581,9 @@ function OfflineNote() {
 export function Friends({ tab: start }: { tab?: string } = {}) {
   const { account, me, error } = useSocialLoaded(true);
   useProfileSync();
-  const [tab, setTab] = useState<Tab>(TABS.find((x) => x === start) ?? "feed");
+  // A push about a club's chat or crew session opens #/friends/club.<id>: the Clubs tab with that club open.
+  const clubOpen = start?.startsWith("club.") ? start.slice(5) : undefined;
+  const [tab, setTab] = useState<Tab>(clubOpen ? "clubs" : (TABS.find((x) => x === start) ?? "feed"));
   const [view, setView] = useState<"following" | "discover">("following");
   const [settings, setSettings] = useState(false);
   const desktop = useDesktop();
@@ -2698,7 +2726,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
             <Board onPeople={() => setTab("people")} />
           </>
         )}
-        {tab === "clubs" && <Clubs />}
+        {tab === "clubs" && <Clubs initial={clubOpen} />}
         {tab === "activity" && <Activity onPeople={() => setTab("people")} onBoard={() => setTab("board")} />}
         {tab === "people" && <People />}
       </div>

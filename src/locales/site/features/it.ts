@@ -338,6 +338,11 @@ export const it: FeaturesText = {
       name: "Sfide, club e classifiche",
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
+    "club-chat": {
+      name: "Chat del club e allenamenti di gruppo",
+      body: "Parla con il tuo club tra un allenamento e l’altro, proponi un orario e un posto per allenarvi insieme e guarda chi c’è. Chi partecipa riceve un promemoria un’ora prima, e pubblicando l’allenamento dopo risulti allenato, con gli amici che erano con te taggati.",
+      note: "Per chi ha almeno 18 anni. Le notifiche sono su Android e iPhone; l’app web mostra i nuovi messaggi mentre la chat è aperta.",
+    },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
     "tagline-gym": {
       name: "Motto e palestra abituale",
@@ -507,6 +512,10 @@ export const it: FeaturesText = {
     "strength-standards": {
       name: "Standard di forza da atleti veri",
       body: "Il sito mostra quanto sollevano davvero gli atleti in squat, panca, stacco e lento avanti, per sesso e peso corporeo, ricalcolato ogni giorno da chi conta. Si vedono solo gruppi di almeno 30 persone, in percentili, mai i numeri di qualcuno. Un interruttore in Impostazioni › I tuoi dati e la privacy decide se conti; chi ha meno di 18 anni non conta mai.",
+    },
+    community: {
+      name: "Community: idee, bug e roadmap",
+      body: "Suggerisci cosa dovrebbe fare Liftsmith, vota le idee che vuoi, segnala i bug con uno screenshot che vede solo il team e commenta o menziona qualcuno con @. Ognuna mostra a che punto è, da in valutazione a rilasciata, e ti avvisiamo quando esce un'idea che hai votato. Roadmap e registro delle modifiche sono anche sul sito.",
     },
     languages: {
       name: "Dieci lingue",
