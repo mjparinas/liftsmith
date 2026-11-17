@@ -21,6 +21,7 @@ import { splitSession, STRETCH_PART_MIN, type SessionSplit } from "../sessionSpl
 import type { State } from "../store";
 import { healthExternal } from "../twin";
 import type { FeelEvent, Gym, Profile } from "../types";
+import { withoutWarmups } from "../warmup";
 import { relink, uid, type Ctx } from "./shared";
 import { partsOn } from "./workout";
 
@@ -224,6 +225,9 @@ export function planSlice(c: Ctx): PlanSlice {
           : { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
       // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
       if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
+      // Warm-up sets off (Settings › Training › Adaptive workouts) holds for programs and routines too.
+      const bare = withoutWarmups(plan, profile);
+      if (bare !== plan) plan = { ...bare, estMinutes: Math.round(planSeconds(bare.items) / 60) };
       set({
         readiness: r,
         split: fromRoutine || fromProgram?.program?.fixed ? null : split,

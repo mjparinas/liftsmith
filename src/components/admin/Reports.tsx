@@ -75,12 +75,13 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
     load();
   };
   return (
-    <Card title="Reports on Friends and coach reviews">
+    <Card title="Reports on Friends, coach reviews and the community">
       <p className="text-sm text-muted">
-        Posts, comments, profiles, coach reviews and coaches&apos; replies that people reported. Three reports hide a post, comment, review
-        or reply until it&apos;s decided here. Remove deletes it (for a profile, resets the name to the handle and clears the tagline; for a
-        reply, clears the reply and keeps the review), Dismiss shows it again, Ban author hides everything the author wrote on Friends and
-        tells them. For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
+        Posts, comments, profiles, coach reviews, coaches&apos; replies and community ideas, bugs and comments that people reported. Three
+        reports hide a post, comment, review or reply until it&apos;s decided here. Remove deletes it (for a profile, resets the name to the
+        handle and clears the tagline; for a reply, clears the reply and keeps the review), Dismiss shows it again, Ban author hides
+        everything the author wrote on Friends and tells them (for an idea, bug or comment in the community, Ban author blocks them from
+        posting there). For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
       </p>
       {admin && ai?.configured && rows && rows.length > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">

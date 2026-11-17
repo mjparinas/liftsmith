@@ -55,7 +55,17 @@ describe("pickGroup", () => {
 });
 
 describe("optimistic", () => {
-  const now: SonosNow = { group: "G1", playing: false, volume: 98, track: null, artist: null, image: null };
+  const now: SonosNow = {
+    group: "G1",
+    playing: false,
+    volume: 98,
+    track: null,
+    artist: null,
+    image: null,
+    source: null,
+    canSkip: true,
+    canSkipBack: true,
+  };
   it("shows the change straight away, within 0 to 100", () => {
     expect(optimistic(now, { do: "play" }).playing).toBe(true);
     expect(optimistic(now, { do: "nudge", delta: 5 }).volume).toBe(100);

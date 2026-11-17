@@ -29,6 +29,107 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "community: the board's top posts (community.ts board)",
+    sql: "SELECT p.id FROM community_posts p WHERE p.hidden = 0 AND p.status != 'merged' ORDER BY p.votes DESC LIMIT 300",
+    uses: ["community_posts_board"],
+    noScan: ["community_posts", "p"],
+  },
+  {
+    name: "community: the board's newest posts (community.ts board)",
+    sql: "SELECT p.id FROM community_posts p WHERE p.hidden = 0 AND p.status != 'merged' AND p.teen = 0 ORDER BY p.created_at DESC LIMIT 100",
+    uses: ["community_posts_new"],
+    noScan: ["community_posts", "p"],
+  },
+  {
+    name: "community: a lifter's own hidden posts (community.ts board)",
+    sql: "SELECT p.id FROM community_posts p WHERE p.account_id = ? AND p.hidden = 1",
+    uses: ["community_posts_account"],
+    noScan: ["community_posts", "p"],
+  },
+  {
+    name: "community: what a lifter voted for and follows (community.ts board)",
+    sql: "SELECT post_id FROM community_votes WHERE account_id = ?",
+    uses: ["community_votes_account"],
+    noScan: ["community_votes"],
+  },
+  {
+    name: "community: posts a lifter follows (community.ts board)",
+    sql: "SELECT post_id FROM community_follows WHERE account_id = ? AND on_ = 1",
+    uses: ["community_follows_account"],
+    noScan: ["community_follows"],
+  },
+  {
+    name: "community: a post's comments (community.ts thread)",
+    sql: "SELECT * FROM community_comments WHERE post_id = ? ORDER BY created_at LIMIT 500",
+    uses: ["community_comments_post"],
+    noScan: ["community_comments"],
+  },
+  {
+    name: "community: a post's timeline (community.ts thread)",
+    sql: "SELECT post_id, status, note, at FROM community_updates WHERE post_id = ? ORDER BY at",
+    uses: ["community_updates_post"],
+    noScan: ["community_updates"],
+  },
+  {
+    name: "community: the changelog (community.ts changelog)",
+    sql: `SELECT u.post_id, p.title FROM community_updates u JOIN community_posts p ON p.id = u.post_id
+          WHERE u.status = 'shipped' AND p.hidden = 0 AND p.teen = 0 ORDER BY u.at DESC LIMIT 100`,
+    uses: ["community_updates_status"],
+    noScan: ["community_updates", "u", "community_posts", "p"],
+  },
+  {
+    name: "community: posts merged into a duplicate (community.ts merge)",
+    sql: "UPDATE community_posts SET merged_into = ? WHERE merged_into = ?",
+    uses: ["community_posts_merged"],
+    noScan: ["community_posts"],
+  },
+  {
+    name: "community: Admin › Community, newest first (community.ts adminPosts)",
+    sql: `SELECT p.id, (SELECT COUNT(*) FROM reports r WHERE r.kind = 'feedback' AND r.target_id = 'p:' || p.id AND r.status = 'open') AS reports
+          FROM community_posts p ORDER BY p.created_at DESC LIMIT 1000`,
+    // Walks the newest posts in index order and stops at the limit; each post's reports come by index.
+    uses: ["community_posts_created", "reports_"],
+    noScan: ["reports", "r"],
+  },
+  {
+    name: "community: deleting an account (community.ts communityCleanup)",
+    sql: "DELETE FROM community_comments WHERE post_id IN (SELECT id FROM community_posts WHERE account_id = ? AND status = 'review')",
+    uses: ["community_posts_account"],
+    noScan: ["community_posts", "community_comments"],
+  },
+  {
+    name: "club chat: a page of a club's messages (clubChat.ts clubChat)",
+    sql: `SELECT m.id FROM club_messages m JOIN social_profiles sp ON sp.account_id = m.account_id
+          WHERE m.club_id = ?1 AND m.hidden = 0 AND m.created_at < ?3 ORDER BY m.created_at DESC LIMIT 50`,
+    uses: ["club_messages_club"],
+    noScan: ["club_messages", "m"],
+  },
+  {
+    name: "club chat: unread messages on the club list (social.ts clubs)",
+    sql: `SELECT COUNT(*) FROM club_messages cmsg WHERE cmsg.club_id = ? AND cmsg.created_at > ? AND cmsg.account_id != ? AND cmsg.hidden = 0`,
+    uses: ["club_messages_club"],
+    noScan: ["club_messages", "cmsg"],
+  },
+  {
+    name: "crew sessions: a club's coming sessions (clubChat.ts sessionsFor)",
+    sql: `SELECT cs.id FROM crew_sessions cs WHERE cs.club_id = ?1 AND cs.starts_at > ?3 AND cs.starts_at < ?4 ORDER BY cs.starts_at LIMIT 20`,
+    uses: ["crew_sessions_club"],
+    noScan: ["crew_sessions", "cs"],
+  },
+  {
+    name: "crew sessions: reminders due (clubChat.ts crewReminders)",
+    sql: "SELECT id FROM crew_sessions WHERE reminded = 0 AND starts_at > ? AND starts_at <= ? ORDER BY starts_at LIMIT 200",
+    uses: ["crew_sessions_due"],
+    noScan: ["crew_sessions"],
+  },
+  {
+    name: "crew sessions: the lifter's sessions around a posted workout (clubChat.ts crewTrained)",
+    sql: `SELECT g.session_id FROM crew_going g JOIN crew_sessions cs ON cs.id = g.session_id
+          WHERE g.account_id = ? AND cs.starts_at BETWEEN ? AND ?`,
+    uses: ["crew_going_account"],
+    noScan: ["crew_going", "g", "crew_sessions", "cs"],
+  },
+  {
     name: "admin stats: an install's first event of a kind (adminData.ts)",
     sql: "SELECT MIN(at) FROM events e WHERE e.install_id = ? AND e.name = 'workout_start'",
     uses: ["events_install_name"],
@@ -118,6 +219,25 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
           UNION SELECT id, name, lat, lon, source_ref FROM gym_places WHERE source <> 'osm' AND source > ''`,
     uses: ["gym_places_claimed", "gym_places_own"],
     noScan: ["gym_places"],
+  },
+  {
+    name: "check-in photos: one photo for the pair (coachForms.ts photoFor)",
+    sql: "SELECT data FROM coach_checkin_photos WHERE checkin_id = ? AND question_id = ? AND (coach_id = ? OR client_id = ?)",
+    uses: ["sqlite_autoindex_coach_checkin_photos_1"],
+    noScan: ["coach_checkin_photos"],
+  },
+  {
+    name: "check-in photos: dropping a pair's old ones (coachForms.ts prunePhotos)",
+    sql: `DELETE FROM coach_checkin_photos WHERE coach_id = ? AND client_id = ? AND checkin_id NOT IN
+            (SELECT id FROM coach_checkins WHERE coach_id = ? AND client_id = ? ORDER BY sent_at DESC LIMIT ?)`,
+    uses: ["coach_checkin_photos_pair", "coach_checkins_pair"],
+    noScan: ["coach_checkin_photos", "coach_checkins"],
+  },
+  {
+    name: "check-in photos: erasing an account's (coach.ts coachCleanup)",
+    sql: "DELETE FROM coach_checkin_photos WHERE coach_id = ? OR client_id = ?",
+    uses: ["coach_checkin_photos_pair", "coach_checkin_photos_client"],
+    noScan: ["coach_checkin_photos"],
   },
 ];
 

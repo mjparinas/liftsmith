@@ -340,7 +340,7 @@ export const SETTINGS: Setting[] = [
     label: "Admin AI helpers",
     group: "Admin panel",
     need: "optional",
-    what: "Claude in the admin panel: report suggestions, gym details and duplicates, Ask your data, Inbox drafts and the digest's summary (Flags › Admin AI helpers and AI daily cap).",
+    what: "Claude in the admin panel: report suggestions, gym details and duplicates, Ask AI on every tab, Inbox drafts and the digest's summary (Flags › Admin AI helpers and AI daily cap).",
   },
   // Sign-in
   {

@@ -70,6 +70,10 @@ export const es: FeaturesText = {
       body: "Elige ejercicios que tu gimnasio permite y para los que tus músculos están listos, y fija cada peso y repetición a partir de tus últimos entrenamientos.",
       proPart: "Sin Pro tienes un entrenamiento adaptativo a la semana junto a tu programa gratuito; Pro planifica todos los días.",
     },
+    "auto-supersets": {
+      name: "Superseries automáticas",
+      body: "Activa las superseries y el plan adaptativo junta ejercicios que no comparten músculos, como un press y un remo, con menos descanso tras cada ronda, para que quepa más en tu tiempo. Las sentadillas y los pesos muertos pesados van solos, y también puedes quitar las series de calentamiento.",
+    },
     "pick-weights": {
       name: "Aprende qué ejercicios te gustan",
       body: "Los ejercicios populares se eligen más a menudo. Marca uno con estrella y saldrá mucho más; cámbialo por otro y saldrá menos, durante unos meses.",
@@ -167,7 +171,7 @@ export const es: FeaturesText = {
     },
     stretching: {
       name: "Estiramientos",
-      body: "48 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día.",
+      body: "48 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día. Unos segundos para colocarte antes de cada estiramiento y cada lado, y la pantalla sigue encendida.",
     },
     "workout-parts": {
       name: "Entrenamientos por partes",
@@ -340,6 +344,11 @@ export const es: FeaturesText = {
       name: "Retos, clubes y clasificaciones",
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
     },
+    "club-chat": {
+      name: "Chat del club y sesiones en grupo",
+      body: "Habla con tu club entre entrenamientos, propón una hora y un sitio para entrenar juntos y mira quién se apunta. Quien se apunte recibe un recordatorio una hora antes, y al publicar tu entrenamiento después apareces como que entrenaste, con los amigos que entrenaron contigo etiquetados.",
+      note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra los mensajes nuevos mientras el chat está abierto.",
+    },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
     "tagline-gym": {
       name: "Lema y gimnasio habitual",
@@ -384,6 +393,10 @@ export const es: FeaturesText = {
     "coach-checkins": {
       name: "Formularios de revisión y cuestionarios",
       body: "Envía a tus clientes una revisión semanal, un cuestionario inicial o tu propio formulario, una vez o cada semana. Responden con unos toques, y una puntuación baja o una respuesta tardía aparece arriba en su informe.",
+    },
+    "coach-checkin-trends": {
+      name: "Revisiones de progreso con peso, fotos y tendencias",
+      body: "Añade preguntas de peso corporal y de foto a cualquier formulario y envíalo cada semana, cada 2 semanas o cada 4. El peso se rellena con el último pesaje del cliente, las fotos solo las ves tú y la tendencia de cada respuesta aparece en su informe. A los menores de 18 nunca se les piden fotos.",
     },
     "coach-roles": {
       name: "Para entrenadores personales y coaches",
@@ -439,6 +452,12 @@ export const es: FeaturesText = {
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",
+    },
+    seasons: {
+      name: "Temporadas de entrenamiento",
+      body: "Temporadas de diez semanas con un recorrido de 20 niveles que subes entrenando hacia tu propio objetivo semanal: dos días a la semana avanzan igual que cinco y los días de más no suman. Los niveles dan insignias, un avatar, un color de acento y un tema con su icono exclusivos de la temporada, tuyos para siempre. Retos de temporada, un botín raro por nuevas marcas, estrellas de prestigio, una semana de recuperación tras un fallo, un final con puntos dobles y un resumen para compartir.",
+      proPart: "Todos los niveles y sus premios son gratis; Pro añade un premio extra en tres niveles.",
+      note: "Los iconos de temporada están en Android y iPhone; la web recibe el tema. Las temporadas se pueden desactivar en Ajustes.",
     },
     locker: {
       name: "Temas, colores e iconos de la app",
@@ -503,6 +522,10 @@ export const es: FeaturesText = {
     "strength-standards": {
       name: "Estándares de fuerza de levantadores reales",
       body: "La web muestra cuánto levantan de verdad en sentadilla, press de banca, peso muerto y press militar, por sexo y peso corporal, calculado cada día con quienes cuentan. Solo se muestran grupos de 30 o más, en percentiles, nunca los números de nadie. Un interruptor en Ajustes › Tus datos y privacidad decide si cuentas; los menores de 18 nunca cuentan.",
+    },
+    community: {
+      name: "Comunidad: ideas, errores y hoja de ruta",
+      body: "Sugiere lo próximo que debería hacer Liftsmith, vota las ideas que quieres, informa de errores con una captura que solo ve el equipo, y comenta o menciona a otros con @. Cada una muestra en qué punto está, de en revisión a publicada, y te avisamos cuando sale una idea que votaste. La hoja de ruta y el registro de cambios también están en la web.",
     },
     languages: {
       name: "Diez idiomas",

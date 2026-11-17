@@ -132,6 +132,17 @@ export const WEEKLY: WeeklyEmail[] = [
   L("screenshot-share", "free", "stats", { fresh: "2026-11-16" }),
   // New, 2026-11-16: common mistakes and their fixes on every exercise (docs/decisions/form-cues.md).
   L("form-cues", "free", "exercise/back-squat", { fresh: "2026-11-16" }),
+  // New, 2026-11-17: automatic supersets and the other adaptive workout options (docs/decisions/adaptive-options.md).
+  L("auto-supersets", "free", "settings/training", { fresh: "2026-11-17" }),
+  // New, 2026-11-17: club chat and crew sessions (docs/decisions/friends.md "Club chat and crew sessions").
+  L("club-chat", "free", "friends", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: the Liftsmith community: ideas, bugs, votes and the roadmap (docs/decisions/community.md).
+  L("community", "free", "community", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: weight and photo questions, repeats every 1, 2 or 4 weeks and trends on check-in forms
+  // (docs/decisions/trainer-mode.md "Check-in forms and questionnaires").
+  R("coach-checkin-trends", "coach", "pro", "trainer/checkins", { fresh: "2026-11-17", shot: false }),
+  // New, 2026-11-17: training seasons (docs/decisions/seasons.md).
+  L("seasons", "both", "season", { fresh: "2026-11-17" }),
   // New, 2026-11-17: class schedules on gym pages (docs/decisions/gyms.md "Class schedules").
   R("gym-classes", "gym", "free", "gym", { fresh: "2026-11-17", shot: false }),
 ];

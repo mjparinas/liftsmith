@@ -853,6 +853,61 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Prefere não ver no cronômetro de descanso? Desligue Checagem de técnica no descanso em Ajustes › Treino.",
   },
+  "auto-supersets": {
+    title: "Supersets, montados para você",
+    intro: "Seus treinos adaptativos agora podem juntar exercícios em supersets para você, com um único botão.",
+    points: [
+      "Ative Juntar exercícios em supersets em Ajustes › Planejamento › Treinos adaptativos.",
+      "Exercícios que não usam os mesmos músculos são feitos em sequência, como um supino e uma remada, então cada um descansa enquanto você faz o outro.",
+      "O descanso depois de cada rodada é menor, e o tempo economizado põe mais treino na duração que você escolher.",
+      "Agachamentos e levantamentos terra pesados ficam sozinhos, e você pode separar qualquer par em Hoje.",
+    ],
+    dyk: "A mesma seção tem o botão Séries de aquecimento, para os dias em que você prefere aquecer do seu jeito.",
+  },
+  "club-chat": {
+    title: "Seu clube, entre os treinos",
+    intro: "Os clubes agora têm chat e treinos em grupo, para quem treina com você poder conversar e se encontrar.",
+    points: [
+      "Abra Amigos › Clubes, escolha um clube e toque em Chat para falar com todo mundo.",
+      "Marque um treino em grupo com um nome, um dia e um horário, e os membros tocam em Eu vou.",
+      "Quem vai recebe um lembrete uma hora antes.",
+      "Poste seu treino depois e você aparece como quem treinou, com os amigos que treinaram com você marcados.",
+    ],
+    dyk: "Me avisar, no chat de cada clube, desliga as notificações dele, e um chat manda no máximo uma por hora.",
+  },
+  community: {
+    title: "Vote no que vamos criar a seguir",
+    intro: "O Liftsmith agora tem uma comunidade: sugira ideias, vote nas que você quer e relate bugs.",
+    points: [
+      "Abra Ajustes › Ajuda › Comunidade.",
+      "Toque na seta ao lado de uma ideia para votar. As mais pedidas sobem para o topo.",
+      "Relate um bug com uma captura de tela que só você e a equipe veem.",
+      "Cada post mostra em que ponto está, de Em análise a Lançada, e você fica sabendo quando uma ideia que votou é lançada.",
+    ],
+    dyk: "O roteiro e o registro de mudanças também estão no site, em getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Check-ins com peso, fotos e tendências",
+    intro: "Seus formulários de check-in agora podem pedir peso corporal e fotos, e mostrar como cada resposta está mudando.",
+    points: [
+      "Adicione uma pergunta de Peso corporal: ela vem da última pesagem do aluno e salva a nova no registro dele.",
+      "Adicione até três perguntas de Foto, como de frente e de lado. Só você vê.",
+      "Envie um formulário toda semana, a cada 2 semanas ou a cada 4 semanas.",
+      "O relatório de cada aluno mostra a tendência de cada nota, número e peso, e avisa quando uma nota cai.",
+    ],
+    dyk: "Comece pelo novo modelo Check-in de progresso em Coaching › Check-ins. Menores de 18 anos nunca recebem pedido de foto.",
+  },
+  seasons: {
+    title: "As temporadas de treino começam na segunda",
+    intro: "A temporada 1, Brasa, começa na segunda: dez semanas, uma trilha de 20 níveis e recompensas que só se ganham neste inverno.",
+    points: [
+      "Você sobe batendo sua própria meta semanal. Dias além dela não somam, então dois dias por semana sobem tão rápido quanto cinco.",
+      "Os níveis dão medalhas, um avatar, uma cor de destaque e o tema Brasa com ícone, só desta temporada e seus para sempre.",
+      "Perdeu uma semana? A próxima em que bater a meta dá o bônus em dobro. A última semana vale em dobro.",
+      "Cada novo recorde tem 1 chance em 6 de liberar as anilhas raras da temporada.",
+    ],
+    dyk: "Prefere não ver as temporadas? Desligue Temporadas de treino em Ajustes › Aparência. Seu treino continua contando.",
+  },
   "gym-classes": {
     title: "Coloque o horário das aulas na página da sua academia",
     intro: "Quem treina aí vê as aulas da semana na página da academia, no app e no site.",

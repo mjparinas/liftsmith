@@ -19,7 +19,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "AppIcon")
 public class AppIconPlugin extends Plugin {
 
-    static final String[] ICONS = { "default", "forge", "glacier", "aurora", "royal" };
+    static final String[] ICONS = { "default", "forge", "glacier", "aurora", "royal", "ember", "embergold" };
     private static final String PREFS = "liftsmith.appIcon";
 
     @PluginMethod

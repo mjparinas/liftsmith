@@ -21,6 +21,7 @@ import { useNow } from "@/lib/useNow";
 import { exerciseCue, restCue, say, setCue, voice } from "@/lib/voice";
 
 import { clock } from "./format";
+import { Icon } from "./icons";
 import { PlateBar } from "./Plates";
 
 export function useGhost(events: readonly AppEvent[], exerciseId: string | undefined, sessionId: string | undefined): Ghost | null {
@@ -225,27 +226,36 @@ export function useVoiceCoach(v: VoiceState | null, enabled: boolean) {
 export function RestExtra({ left, gym }: { left: number; gym: Gym }) {
   const { profile, setProfile } = useApp();
   const mode = profile.delight?.restExtra ?? "off";
-  const pick = (m: "breathe" | "game" | "off") => {
-    haptic("tick");
-    setProfile({ delight: { ...profile.delight, restExtra: m } });
+  // Two toggles, no "Neither": tapping the one that's on turns it off (Melvin, 2026-11-17: a "Neither"
+  // button that was already picked did nothing when pressed).
+  const pick = (m: "breathe" | "game") => {
+    const next = mode === m ? "off" : m;
+    haptic("toggle");
+    sound.toggle(next !== "off");
+    setProfile({ delight: { ...profile.delight, restExtra: next } });
   };
   return (
     <div className="mt-4 w-full">
       {mode === "breathe" && <Breathe left={left} />}
       {mode === "game" && <PlateMath gym={gym} />}
-      {/* A visible label, so "Neither" reads as a choice of what to do while resting. */}
+      {/* A visible label, so the toggles read as a choice of what to do while resting. */}
       <div className="mt-2 flex flex-wrap items-center justify-center gap-1 text-xs" role="group" aria-labelledby="rest-extra-label">
         <span id="rest-extra-label" className="px-1 text-faint">
           {t("extra.group")}
         </span>
-        {(["breathe", "game", "off"] as const).map((m) => (
+        {(["breathe", "game"] as const).map((m) => (
           <button
             key={m}
             type="button"
             aria-pressed={mode === m}
             onClick={() => pick(m)}
-            className={`press min-h-11 rounded-full px-3 ${mode === m ? "bg-raised text-ink" : "text-muted"}`}
+            className={`press inline-flex min-h-11 items-center gap-1 rounded-full border px-3 ${mode === m ? "border-accent/70 bg-accent/15 text-ink" : "border-line text-muted"}`}
           >
+            {mode === m && (
+              <span className="-ml-1 inline-flex text-accent">
+                <Icon name="check" size={14} />
+              </span>
+            )}
             {t(`extra.${m}`)}
           </button>
         ))}

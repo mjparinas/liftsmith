@@ -6,8 +6,9 @@ export const BLOG_C: Article[] = [
     slug: "30-minute-strength-workout",
     kind: "blog",
     title: "30-minute workouts that still build strength",
+    seoTitle: "30-minute strength workout: 3 quick gym sessions",
     description:
-      "How to make a 30-minute gym session count: pick big lifts, pair exercises, trim warm-ups and rest smartly. Plus three sample short workouts.",
+      "Three 30-minute strength workouts you can do today, plus how to make a short gym session count: big lifts, paired exercises, short warm-ups and smart rest.",
     date: "2026-11-09",
     tag: "Short workouts",
     cta: "time",

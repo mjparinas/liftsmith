@@ -32,7 +32,7 @@ import { effortLabel } from "@/lib/training";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
-import { callWhy, itemWhy, itemWhyWithoutLoad, sharedLoadNote, whyContext } from "@/lib/why";
+import { callWhy, itemWhy, itemWhyWithoutLoad, pairWhy, sharedLoadNote, whyContext } from "@/lib/why";
 import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
@@ -222,7 +222,7 @@ export function Today() {
   // reordering what's left happen in one place, Coming up on the workout screen.
   const live = !!active;
   const items = useMemo(() => active?.plan.items ?? preview?.items ?? [], [active?.plan.items, preview?.items]);
-  const whys = useMemo(() => (why ? items.map((it) => itemWhy(it, why)) : null), [items, why]);
+  const whys = useMemo(() => (why ? items.map((it, i) => itemWhy(it, why, pairWhy(items, i))) : null), [items, why]);
   // A note every exercise shares is said once above the list instead of on every row (UX audit, 2026-11-13).
   const shared = whys ? sharedLoadNote(whys) : "";
   const last = stats.sessions[0];

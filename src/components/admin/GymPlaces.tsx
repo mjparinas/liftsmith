@@ -72,10 +72,7 @@ export function GymPlaces({ admin }: { admin: boolean }) {
           >
             {t}
             {badge[t] ? (
-              <span
-                className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-ink"
-                aria-label={`${badge[t]} waiting`}
-              >
+              <span className="ml-1.5 rounded-full btn-primary px-1.5 text-xs font-semibold" aria-label={`${badge[t]} waiting`}>
                 {badge[t]}
               </span>
             ) : null}

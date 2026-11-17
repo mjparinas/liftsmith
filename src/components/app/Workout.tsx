@@ -751,8 +751,8 @@ export function Workout() {
                 shape={shape}
                 bpm={bpm}
                 hrTrend={active.hr}
-                // Still during rest: the figure only moves while there's a set to do (docs/decisions/speed.md).
-                paused={infoOpen || swapOpen || endOpen || resting}
+                // Keeps moving during rest too (Melvin, 2026-11-17), so the next set's lift is on show (docs/decisions/speed.md).
+                paused={infoOpen || swapOpen || endOpen}
                 className="h-full"
               />
               {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}

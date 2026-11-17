@@ -27,6 +27,7 @@ import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as chk from "./text/chk";
+import * as cmty from "./text/cmty";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -34,6 +35,7 @@ import * as count from "./text/count";
 import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
+import * as crew from "./text/crew";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
@@ -115,6 +117,7 @@ import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
 import * as social from "./text/social";
+import * as ssn from "./text/ssn";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -158,6 +161,7 @@ export const en = {
   ...bmi.en,
   ...body.en,
   ...buddy.en,
+  ...crew.en,
   ...buy.en,
   ...cal.en,
   ...calc.en,
@@ -167,6 +171,7 @@ export const en = {
   ...cause.en,
   ...chk.en,
   ...coach.en,
+  ...cmty.en,
   ...conn.en,
   ...cos.en,
   ...count.en,
@@ -245,6 +250,7 @@ export const en = {
   ...save.en,
   ...sband.en,
   ...sea.en,
+  ...ssn.en,
   ...settings.en,
   ...setup.en,
   ...share.en,

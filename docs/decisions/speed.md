@@ -59,8 +59,9 @@ Melvin asked for "a slow phone mode" with a better name. **Settings › Look and
 device pixel per CSS pixel (instead of up to two) and half the frame rate (15 instead of 30, 30 instead of 60 where
 the figure can be turned). Shared web code, so Android, iOS and the web app get it together.
 
-**The demo on the workout screen stands still during rest**, whatever the setting: it only moves while there's a set
-to do. The heart still beats with a live heart rate.
+**The demo on the workout screen keeps moving during rest** (Melvin, 2026-11-17: "Don't pause the animation of the
+model when resting"; it used to stand still between sets to save battery). It pauses only while a sheet covers it (How
+to, swap, end workout) or the app is in the background, and the battery saver above still halves its frame rate.
 
 ## Maintenance check only where it matters (2026-11-13)
 

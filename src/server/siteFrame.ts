@@ -15,7 +15,7 @@ import { siteText } from "@/locales/site";
 import * as pub from "@/locales/text/pub";
 
 /** Which page the frame is on, for the store links' referrer (the only links that carry a source). */
-export type FrameSource = "profile" | "share" | "gym" | "standards" | "trainers" | "programs";
+export type FrameSource = "profile" | "share" | "gym" | "standards" | "trainers" | "programs" | "community";
 
 type PubKey = keyof typeof pub.en;
 const CATALOG: Record<MsgLang, Partial<Record<PubKey, unknown>>> = {
@@ -94,6 +94,7 @@ ${col(t.cols.product, [
   ["/trainers/", l.trainers],
   [localPath(lang, "/pricing/"), l.pricing],
   ["/whats-new/", l.whatsNew],
+  ["/community/", l.community],
 ])}
 ${col(t.cols.learn, [
   ["/exercises/", l.exercises],

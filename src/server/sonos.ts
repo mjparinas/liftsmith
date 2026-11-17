@@ -2,7 +2,15 @@
 // The OAuth tokens live with the other connections (connect.ts, provider "sonos"); this file only makes the
 // calls: which groups and favourites the household has, what a group is playing, and play, pause, skip,
 // volume and "play this favourite". Nothing from Sonos is stored here.
-import { isSonosId, type SonosCommand, type SonosFavourite, type SonosGroup, type SonosNow, type SonosState } from "@/lib/cloud";
+import {
+  isSonosId,
+  type SonosCommand,
+  type SonosFavourite,
+  type SonosGroup,
+  type SonosNow,
+  type SonosSource,
+  type SonosState,
+} from "@/lib/cloud";
 
 import { accessToken, Unlinked } from "./connect";
 
@@ -56,25 +64,45 @@ export function toFavourites(household: string, raw: readonly { id?: string; nam
 }
 
 interface RawMeta {
-  currentItem?: { track?: { name?: string; artist?: { name?: string }; imageUrl?: string; images?: { url?: string }[] } };
-  container?: { name?: string; imageUrl?: string };
+  currentItem?: { track?: { type?: string; name?: string; artist?: { name?: string }; imageUrl?: string; images?: { url?: string }[] } };
+  container?: { type?: string; name?: string; imageUrl?: string };
 }
 
-export function toNow(
-  group: string,
-  playback: { playbackState?: string },
-  meta: RawMeta,
-  vol: { volume?: number; fixed?: boolean },
-): SonosNow {
+interface RawPlayback {
+  playbackState?: string;
+  availablePlaybackActions?: { canSkip?: boolean; canSkipBack?: boolean };
+}
+
+/**
+ * The container type Sonos gives a source that isn't a music service: "linein", "linein.homeTheater" (a soundbar's
+ * HDMI or optical TV input) and "linein.airplay". Exported for tests.
+ */
+export function sourceOf(meta: RawMeta): SonosSource | null {
+  const type = `${meta.container?.type ?? ""} ${meta.currentItem?.track?.type ?? ""}`.toLowerCase();
+  if (/hometheater|\btv\b|hdmi|spdif/.test(type)) return "tv";
+  if (type.includes("airplay")) return "airplay";
+  if (/line-?in/.test(type)) return "lineIn";
+  return null;
+}
+
+export function toNow(group: string, playback: RawPlayback, meta: RawMeta, vol: { volume?: number; fixed?: boolean }): SonosNow {
   const track = meta.currentItem?.track;
+  const source = sourceOf(meta);
+  const actions = playback.availablePlaybackActions;
+  // A source plays whatever comes in on the wire, so there's nothing to skip to, whatever Sonos says.
+  const can = (v: boolean | undefined) => !source && v !== false;
   return {
     group,
     playing: isPlaying(playback.playbackState),
     volume: vol.fixed || typeof vol.volume !== "number" ? null : Math.round(Math.min(100, Math.max(0, vol.volume))),
-    // A radio station has no track; its name is the container's.
-    track: str(track?.name) ?? str(meta.container?.name),
-    artist: str(track?.artist?.name),
-    image: https(track?.imageUrl) ?? https(track?.images?.[0]?.url) ?? https(meta.container?.imageUrl),
+    // A radio station has no track; its name is the container's. A source's container is named after the
+    // speaker or the input, which the card shows as the source's own label instead.
+    track: source ? null : (str(track?.name) ?? str(meta.container?.name)),
+    artist: source ? null : str(track?.artist?.name),
+    image: source ? null : (https(track?.imageUrl) ?? https(track?.images?.[0]?.url) ?? https(meta.container?.imageUrl)),
+    source,
+    canSkip: can(actions?.canSkip),
+    canSkipBack: can(actions?.canSkipBack),
   };
 }
 
@@ -106,7 +134,7 @@ export async function sonosState(
   if (group && groups.some((g) => g.id === group)) {
     const id = encodeURIComponent(group);
     const [playback, meta, vol] = await Promise.all([
-      call<{ playbackState?: string }>(t, `/groups/${id}/playback`, f),
+      call<RawPlayback>(t, `/groups/${id}/playback`, f),
       call<RawMeta>(t, `/groups/${id}/playbackMetadata`, f).catch(() => ({})),
       call<{ volume?: number; fixed?: boolean }>(t, `/groups/${id}/groupVolume`, f).catch(() => ({})),
     ]);

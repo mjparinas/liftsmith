@@ -71,17 +71,30 @@ export function Button({
  * A pick chip. `hue` (a colour token) colour-codes it: a dot before it's picked, then its border,
  * fill and tick in that colour once picked (Today's "How do you feel?" chips).
  */
-export function Chip({ children, active, onClick, hue }: { children: ReactNode; active?: boolean; onClick?: () => void; hue?: string }) {
+export function Chip({
+  children,
+  active,
+  onClick,
+  hue,
+  disabled,
+}: {
+  children: ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+  hue?: string;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       aria-pressed={active}
+      disabled={disabled}
       onClick={() => {
         haptic("select");
         sound.tick();
         onClick?.();
       }}
-      className={`press inline-flex items-center gap-1 rounded-full border px-3.5 py-2 text-sm ${active ? `font-medium text-ink ${hue ? "" : "border-accent/70 bg-accent/15 shadow-[0_0_0_3px_rgb(76_141_255/0.12)]"}` : "border-line bg-surface text-muted"}`}
+      className={`press inline-flex items-center gap-1 rounded-full border px-3.5 py-2 text-sm disabled:opacity-50 ${active ? `font-medium text-ink ${hue ? "" : "border-accent/70 bg-accent/15 shadow-[0_0_0_3px_rgb(76_141_255/0.12)]"}` : "border-line bg-surface text-muted"}`}
       style={
         active && hue
           ? {

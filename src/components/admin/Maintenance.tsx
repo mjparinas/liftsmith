@@ -56,7 +56,7 @@ export function MaintenanceBanner({ state, admin, changed }: { state: State | nu
       {admin && (
         <button
           type="button"
-          className="press ml-auto rounded-lg bg-accent px-3 py-1 font-semibold text-accent-ink"
+          className="press ml-auto rounded-lg btn-primary px-3 py-1 font-semibold"
           onClick={() => void put(false).then(changed)}
         >
           Turn off maintenance mode
@@ -71,7 +71,7 @@ export function MaintenanceCard({ state, admin, changed }: { state: State | null
   const [msg, setMsg] = useState<string | null>(null);
   return (
     <section className="card p-4">
-      <h2 className="font-semibold">Maintenance mode</h2>
+      <h2 className="font-bold tracking-tight">Maintenance mode</h2>
       <p className="mt-0.5 text-xs text-muted">
         While it&apos;s on, every page but the home page, privacy policy, account deletion and the web app answers 503, and so does the API
         (sync and usage stats wait on the device). This panel, sign-in to it, the store webhook, scheduled jobs, reminder links and the

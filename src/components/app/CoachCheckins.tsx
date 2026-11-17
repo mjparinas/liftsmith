@@ -12,26 +12,38 @@ import { track } from "@/lib/analytics";
 import {
   answerCheckin,
   answerText,
+  checkinTrends,
   deleteForm,
+  EVERY,
   FORM_MAX,
   fromTemplate,
   KINDS,
   loadCheckin,
+  loadPhoto,
+  PHOTO_SIDE,
   repeatForm,
   saveForm,
   sendForm,
+  sendPhoto,
   TEMPLATES,
+  trendText,
   type Answer,
   type Checkin,
+  type Every,
   type Form,
   type Question,
   type QuestionKind,
   type Repeat,
+  type Trend,
 } from "@/lib/checkins";
+import { shrinkImage } from "@/lib/feedback";
 import { date, parseNum, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
+import { useApp } from "@/lib/store";
+import { currentKg } from "@/lib/tdee";
 import { checkinDone, loadOverview, trainerError, useCoachNotes } from "@/lib/trainer";
+import { fromKg, plainNum, toKg } from "@/lib/units";
 
 import { Icon } from "./icons";
 import { go } from "./router";
@@ -42,26 +54,33 @@ const FIELD = "mt-1 w-full rounded-xl border border-line bg-raised px-3 py-2";
 
 // --- The coach's side ---
 
-/** On a client's report: send a form now or weekly, and read the answers. */
+/** On a client's report: send a form now or every one, two or four weeks, see each question's trend, and read the
+ *  answers. */
 export function ClientCheckins({
   clientId,
   forms,
   checkins,
   repeat,
+  teen = false,
   onChange,
 }: {
   clientId: string;
   forms: Form[];
   checkins: Checkin[];
   repeat: Repeat | null;
+  /** Under 18: photo questions are left out when the form is sent (the server does it; this says so). */
+  teen?: boolean;
   onChange: () => void;
 }) {
+  const unit = useApp((s) => s.profile.unit);
   const [pick, setPick] = useState(repeat?.formId ?? forms[0]?.id ?? "");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState<Checkin | null>(null);
   const form = forms.find((f) => f.id === pick) ?? forms[0];
-  const weekly = !!form && repeat?.formId === form.id;
+  const every: Every | null = form && repeat?.formId === form.id ? (repeat.every ?? 7) : null;
+  const trends = checkinTrends(checkins);
+  const trendForm = checkins.find((c) => c.answeredAt && c.formId === checkins.find((x) => x.answeredAt)?.formId);
 
   const run = async (what: () => Promise<unknown>, done: string, detail: string) => {
     setBusy(true);
@@ -103,15 +122,26 @@ export function ClientCheckins({
             >
               {t("chk.send")}
             </Button>
-            <InlineSwitch
-              className="mt-3"
-              label={t("chk.weekly")}
-              hint={weekly && repeat ? t("chk.weeklyNext", { date: short(repeat.nextAt) }) : undefined}
-              on={weekly}
-              onChange={(on) =>
-                void run(() => repeatForm(clientId, on ? form.id : null), on ? t("chk.sent") : "", on ? "checkinWeekly" : "checkinOnce")
-              }
-            />
+            <p className="mt-3 text-sm font-medium" id="chk-every">
+              {t("chk.repeat")}
+            </p>
+            <div className="mt-1 flex flex-wrap gap-2" role="group" aria-labelledby="chk-every">
+              <Chip active={every === null} onClick={() => every !== null && void run(() => repeatForm(clientId, null), "", "checkinOnce")}>
+                {t("chk.every.once")}
+              </Chip>
+              {EVERY.map((d) => (
+                <Chip
+                  key={d}
+                  active={every === d}
+                  disabled={busy}
+                  onClick={() => every !== d && void run(() => repeatForm(clientId, form.id, d), t("chk.sent"), `checkinEvery${d}`)}
+                >
+                  {t(`chk.every.${d}`)}
+                </Chip>
+              ))}
+            </div>
+            {every !== null && repeat && <p className="mt-1 text-sm text-muted">{t("chk.weeklyNext", { date: short(repeat.nextAt) })}</p>}
+            {teen && form.questions.some((q) => q.kind === "photo") && <p className="mt-2 text-sm text-muted">{t("chk.teenPhotos")}</p>}
           </>
         ) : (
           <p className="mt-3 text-sm text-muted">{t("chk.noForms")}</p>
@@ -125,6 +155,17 @@ export function ClientCheckins({
           </p>
         )}
       </div>
+      {trends.length > 0 && trendForm && (
+        <div className="card mt-2 p-4">
+          <p className="font-semibold">{t("chk.trends")}</p>
+          <p className="text-sm text-muted">{t("chk.trendsHint", { title: trendForm.title, count: trends[0]!.points.length })}</p>
+          <ul className="mt-2 space-y-3">
+            {trends.map((tr) => (
+              <TrendRow key={tr.id} tr={tr} unit={unit} />
+            ))}
+          </ul>
+        </div>
+      )}
       {checkins.length > 0 ? (
         <ul className="card mt-2 divide-y divide-line">
           {checkins.map((c) => (
@@ -159,7 +200,13 @@ export function ClientCheckins({
             {open.questions.map((q) => (
               <div key={q.id}>
                 <dt className="text-sm text-muted">{q.label}</dt>
-                <dd className="mt-0.5 whitespace-pre-line break-words font-medium">{answerText(q, open.answers?.[q.id])}</dd>
+                <dd className="mt-0.5 whitespace-pre-line break-words font-medium">
+                  {q.kind === "photo" && open.answers?.[q.id] === true ? (
+                    <PhotoAnswer checkin={open.id} q={q} />
+                  ) : (
+                    answerText(q, open.answers?.[q.id], unit)
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
@@ -167,6 +214,72 @@ export function ClientCheckins({
       </Sheet>
     </Section>
   );
+}
+
+/** One question's line in Trends: its latest answer and change, and a small line chart. */
+function TrendRow({ tr, unit }: { tr: Trend; unit: "kg" | "lb" }) {
+  const shown = tr.kind === "weight" ? tr.points.map((p) => Math.round(fromKg(p, unit) * 10) / 10) : tr.points;
+  return (
+    <li>
+      <p className="text-sm text-muted">{tr.label}</p>
+      <div className="flex items-center gap-3">
+        <p className="num shrink-0 font-medium">{trendText(tr, unit)}</p>
+        {tr.kind !== "yesno" && (
+          <TrendLine
+            points={shown}
+            min={tr.kind === "scale" ? 1 : undefined}
+            max={tr.kind === "scale" ? 5 : undefined}
+            label={t("chk.trend.spark", { label: tr.label, points: shown.join(", ") })}
+          />
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** A small line chart that fits its own range (1 to 5 for scores). */
+function TrendLine({ points, min, max, label }: { points: number[]; min?: number; max?: number; label: string }) {
+  const w = 160;
+  const h = 36;
+  const lo = min ?? Math.min(...points);
+  const hi = max ?? Math.max(...points);
+  const span = hi - lo || 1;
+  const x = (i: number) => (points.length === 1 ? w / 2 : (i / (points.length - 1)) * (w - 8) + 4);
+  const y = (v: number) => h - 4 - ((v - lo) / span) * (h - 8);
+  return (
+    <svg role="img" aria-label={label} viewBox={`0 0 ${w} ${h}`} className="h-9 min-w-0 flex-1">
+      <polyline
+        fill="none"
+        stroke="var(--color-accent)"
+        strokeWidth="2"
+        strokeLinejoin="round"
+        points={points.map((v, i) => `${x(i)},${y(v)}`).join(" ")}
+      />
+      {points.map((v, i) => (
+        <circle key={i} cx={x(i)} cy={y(v)} r="2.5" fill="var(--color-accent)" />
+      ))}
+    </svg>
+  );
+}
+
+/** A photo answer, loaded when the coach opens the answers (never kept on the device). */
+function PhotoAnswer({ checkin, q }: { checkin: string; q: Question }) {
+  const [src, setSrc] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let live = true;
+    loadPhoto(checkin, q.id).then(
+      (p) => live && setSrc(p),
+      () => live && setFailed(true),
+    );
+    return () => {
+      live = false;
+    };
+  }, [checkin, q.id]);
+  if (failed) return <span className="text-muted">{t("chk.photoGone")}</span>;
+  if (!src) return <span className="text-muted">{t("chk.photoLoading")}</span>;
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt={t("chk.photoAlt", { label: q.label })} className="mt-1 max-h-96 w-auto rounded-xl border border-line" />;
 }
 
 type Draft = { id?: string; title: string; questions: Question[] };
@@ -229,6 +342,7 @@ export function FormsScreen({ embedded = false }: { embedded?: boolean }) {
       setBusy(false);
     }
   };
+  const photos = draft?.questions.filter((q) => q.kind === "photo").length ?? 0;
   const edit = (i: number, x: Partial<Question>) =>
     setDraft((d) => d && { ...d, questions: d.questions.map((q, j) => (j === i ? { ...q, ...x } : q)) });
 
@@ -315,7 +429,13 @@ export function FormsScreen({ embedded = false }: { embedded?: boolean }) {
                   />
                   <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("chk.kind")}>
                     {KINDS.map((k: QuestionKind) => (
-                      <Chip key={k} active={q.kind === k} onClick={() => edit(i, { kind: k })}>
+                      <Chip
+                        key={k}
+                        active={q.kind === k}
+                        // Up to three photo questions a form.
+                        disabled={k === "photo" && q.kind !== "photo" && photos >= FORM_MAX.photos}
+                        onClick={() => edit(i, { kind: k })}
+                      >
                         {t(`chk.kind.${k}`)}
                       </Chip>
                     ))}
@@ -411,6 +531,13 @@ export function CheckinScreen({ id }: { id: string }) {
   const [raw, setRaw] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  // Photo answers as shrunk JPEG data URLs, sent on their own before the answers.
+  const [photos, setPhotos] = useState<Record<string, string>>({});
+  const [photoNote, setPhotoNote] = useState<string | null>(null);
+  // Weight questions start from the latest weigh-in, in the lifter's unit, and are saved as a weigh-in too.
+  const unit = useApp((s) => s.profile.unit);
+  const lastKg = useApp((s) => currentKg(s.events, s.profile));
+  const [logWeight, setLogWeight] = useState(true);
   useEffect(() => {
     let live = true;
     liveRead(
@@ -446,12 +573,24 @@ export function CheckinScreen({ id }: { id: string }) {
     setBusy(true);
     try {
       const all = { ...answers };
+      let weighIn: number | null = null;
       for (const q of c.questions) {
-        if (q.kind !== "number") continue;
-        const n = parseNum(raw[q.id] ?? "");
-        all[q.id] = Number.isFinite(n) && (raw[q.id] ?? "").trim() !== "" ? n : null;
+        if (q.kind !== "number" && q.kind !== "weight") continue;
+        const text = raw[q.id] ?? (q.kind === "weight" && lastKg > 0 ? plainNum(Math.round(fromKg(lastKg, unit) * 10) / 10) : "");
+        const n = parseNum(text);
+        const v = Number.isFinite(n) && text.trim() !== "" ? n : null;
+        all[q.id] = v === null ? null : q.kind === "weight" ? Math.round(toKg(v, unit) * 10) / 10 : v;
+        if (q.kind === "weight" && v !== null) weighIn ??= all[q.id] as number;
+      }
+      for (const q of c.questions) {
+        const p = photos[q.id];
+        if (q.kind !== "photo" || !p) continue;
+        await sendPhoto(c.id, q.id, p);
+        all[q.id] = true;
       }
       await answerCheckin(c.id, all);
+      // The weight answered goes into the lifter's own weigh-ins (and so into sync), unless it's the one already there.
+      if (logWeight && weighIn !== null && Math.abs(weighIn - lastKg) >= 0.05) useApp.getState().logBodyweight(weighIn);
       checkinDone(c.id);
       sound.done();
       haptic("success");
@@ -474,9 +613,9 @@ export function CheckinScreen({ id }: { id: string }) {
           const lid = `chk-a-${q.id}`;
           return (
             <li key={q.id} className="card p-4">
-              {q.kind === "text" || q.kind === "number" ? (
+              {q.kind === "text" || q.kind === "number" || q.kind === "weight" ? (
                 <label htmlFor={lid} className="block font-medium">
-                  {q.label}
+                  {q.kind === "weight" ? `${q.label} (${unit})` : q.label}
                 </label>
               ) : (
                 <p id={lid} className="font-medium">
@@ -522,6 +661,32 @@ export function CheckinScreen({ id }: { id: string }) {
                   className="mt-2"
                 />
               )}
+              {q.kind === "weight" && (
+                <>
+                  <BumpField
+                    id={lid}
+                    label={`${q.label} (${unit})`}
+                    value={raw[q.id] ?? (lastKg > 0 ? plainNum(Math.round(fromKg(lastKg, unit) * 10) / 10) : "")}
+                    onChange={(s) => setRaw((r) => ({ ...r, [q.id]: s }))}
+                    step={unit === "lb" ? 0.2 : 0.1}
+                    start={unit === "lb" ? 170 : 75}
+                    min={unit === "lb" ? 45 : 20}
+                    max={unit === "lb" ? 880 : 400}
+                    className="mt-2"
+                  />
+                  <InlineSwitch className="mt-2" label={t("chk.weightLog")} on={logWeight} onChange={setLogWeight} />
+                </>
+              )}
+              {q.kind === "photo" && (
+                <PhotoPick
+                  q={q}
+                  photo={photos[q.id]}
+                  coach={name}
+                  onPick={(p) => setPhotos((x) => ({ ...x, [q.id]: p }))}
+                  onRemove={() => setPhotos((x) => Object.fromEntries(Object.entries(x).filter(([k]) => k !== q.id)))}
+                  onFail={() => setPhotoNote(t("chk.photoFailed"))}
+                />
+              )}
               {q.kind === "text" && (
                 <textarea
                   id={lid}
@@ -537,9 +702,68 @@ export function CheckinScreen({ id }: { id: string }) {
           );
         })}
       </ol>
+      {photoNote && (
+        <p className="mt-3 text-sm text-muted" role="status">
+          {photoNote}
+        </p>
+      )}
       <Button className="mt-4 w-full" icon="send" disabled={busy} onClick={() => void submit()}>
-        {t("chk.submit")}
+        {busy ? t("chk.sending") : t("chk.submit")}
       </Button>
+    </div>
+  );
+}
+
+/** A photo question: pick or take one (the phone's own picker, which offers the camera), see it, change or remove it.
+ *  Shrunk to 1080 px JPEG on the phone, which also drops the camera's location data. */
+function PhotoPick({
+  q,
+  photo,
+  coach,
+  onPick,
+  onRemove,
+  onFail,
+}: {
+  q: Question;
+  photo: string | undefined;
+  coach: string;
+  onPick: (p: string) => void;
+  onRemove: () => void;
+  onFail: () => void;
+}) {
+  return (
+    <div className="mt-2">
+      {photo && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={photo} alt={t("chk.photoPreview", { label: q.label })} className="mb-2 max-h-64 w-auto rounded-xl border border-line" />
+      )}
+      <div className="flex flex-wrap gap-2">
+        <label className="press card flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-semibold">
+          <Icon name="camera" size={18} />
+          {photo ? t("chk.photoChange") : t("chk.photoAdd")}
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (!f) return;
+              const p = await shrinkImage(f, PHOTO_SIDE);
+              if (p) {
+                haptic("select");
+                onPick(p);
+              } else onFail();
+            }}
+          />
+        </label>
+        {photo && (
+          <Button kind="quiet" onClick={onRemove}>
+            {t("chk.photoRemove")}
+          </Button>
+        )}
+      </div>
+      <p className="mt-1 text-sm text-muted">{t("chk.photoPrivate", { name: coach })}</p>
     </div>
   );
 }

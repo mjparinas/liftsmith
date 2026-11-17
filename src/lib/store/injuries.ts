@@ -3,7 +3,7 @@ import { alternatives, injuredTarget, injuryPass, type PlanItem } from "../gener
 import { activeInjuries, effectFor } from "../injury";
 import { target } from "../progression";
 import type { BodyPart, InjuryRuleEvent } from "../types";
-import { warmupFor } from "../warmup";
+import { warmupFor, warmupsOn } from "../warmup";
 import { persistActive, setsDone, uid, type Ctx } from "./shared";
 import { loadItem } from "./workout";
 
@@ -49,7 +49,7 @@ function afterInjuryChange(c: Ctx) {
       const t = injuredTarget(ex, target(ex, events, profile, g, now), hurt, g);
       // Warm-ups follow the new exercise and load.
       const warmed = new Set(items.flatMap((i) => exercise(i.exerciseId).primary));
-      const wu = warmupFor(ex, t.target.weight, g, warmed);
+      const wu = warmupsOn(profile) ? warmupFor(ex, t.target.weight, g, warmed) : [];
       items.push({
         ...item,
         exerciseId: ex.id,

@@ -390,7 +390,7 @@ export function Users({
             placeholder="Email, @handle or account id"
             className="card w-full max-w-md px-3 py-2 text-sm"
           />
-          <button type="submit" className="press rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-ink">
+          <button type="submit" className="press rounded-lg btn-primary px-3 py-2 text-sm font-semibold">
             Search
           </button>
         </form>

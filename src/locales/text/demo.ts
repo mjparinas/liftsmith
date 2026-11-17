@@ -22,8 +22,6 @@ export const en = {
   "demo.muscles": "Target muscles",
   "demo.barPath": "Bar path",
   "demo.handPath": "Hand path",
-  "demo.tempo": "Tempo",
-  "demo.pause": "Pause",
   "demo.play": "Play",
   "demo.works": "Works",
 } as const;
@@ -48,8 +46,6 @@ export const es: Partial<Record<Key, Message>> = {
   "demo.muscles": "Músculos trabajados",
   "demo.barPath": "Recorrido de la barra",
   "demo.handPath": "Recorrido de las manos",
-  "demo.tempo": "Ritmo",
-  "demo.pause": "Pausa",
   "demo.play": "Reproducir",
   "demo.works": "Trabaja",
 };
@@ -72,8 +68,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "demo.muscles": "Muscles ciblés",
   "demo.barPath": "Trajet de la barre",
   "demo.handPath": "Trajet des mains",
-  "demo.tempo": "Tempo",
-  "demo.pause": "Pause",
   "demo.play": "Lecture",
   "demo.works": "Travaille",
 };
@@ -96,8 +90,6 @@ export const de: Partial<Record<Key, Message>> = {
   "demo.muscles": "Zielmuskeln",
   "demo.barPath": "Stangenweg",
   "demo.handPath": "Handweg",
-  "demo.tempo": "Tempo",
-  "demo.pause": "Pause",
   "demo.play": "Abspielen",
   "demo.works": "Trainiert",
 };
@@ -120,8 +112,6 @@ export const it: Partial<Record<Key, Message>> = {
   "demo.muscles": "Muscoli target",
   "demo.barPath": "Traiettoria del bilanciere",
   "demo.handPath": "Traiettoria delle mani",
-  "demo.tempo": "Tempo",
-  "demo.pause": "Pausa",
   "demo.play": "Riproduci",
   "demo.works": "Allena",
 };
@@ -144,8 +134,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "demo.muscles": "対象の筋肉",
   "demo.barPath": "バーの軌道",
   "demo.handPath": "手の軌道",
-  "demo.tempo": "テンポ",
-  "demo.pause": "一時停止",
   "demo.play": "再生",
   "demo.works": "鍛える部位",
 };
@@ -168,8 +156,6 @@ export const pt: Partial<Record<Key, Message>> = {
   "demo.muscles": "Músculos-alvo",
   "demo.barPath": "Trajetória da barra",
   "demo.handPath": "Trajetória das mãos",
-  "demo.tempo": "Cadência",
-  "demo.pause": "Pausar",
   "demo.play": "Reproduzir",
   "demo.works": "Trabalha",
 };
@@ -192,8 +178,6 @@ export const ko: Partial<Record<Key, Message>> = {
   "demo.muscles": "타깃 근육",
   "demo.barPath": "바 경로",
   "demo.handPath": "손 경로",
-  "demo.tempo": "템포",
-  "demo.pause": "일시정지",
   "demo.play": "재생",
   "demo.works": "자극 부위",
 };
@@ -216,8 +200,6 @@ export const tr: Partial<Record<Key, Message>> = {
   "demo.muscles": "Hedef kaslar",
   "demo.barPath": "Bar yolu",
   "demo.handPath": "El yolu",
-  "demo.tempo": "Tempo",
-  "demo.pause": "Duraklat",
   "demo.play": "Oynat",
   "demo.works": "Çalıştırdığı",
 };
@@ -240,8 +222,6 @@ export const pl: Partial<Record<Key, Message>> = {
   "demo.muscles": "Mięśnie docelowe",
   "demo.barPath": "Tor sztangi",
   "demo.handPath": "Tor dłoni",
-  "demo.tempo": "Tempo",
-  "demo.pause": "Pauza",
   "demo.play": "Odtwórz",
   "demo.works": "Angażuje",
 };

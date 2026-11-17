@@ -32,6 +32,7 @@ export const ja: SiteText = {
       coaches: "コーチの方へ",
       pricing: "料金",
       whatsNew: "最新情報",
+      community: "アイデアとロードマップ",
       exercises: "種目ライブラリ",
       muscles: "部位別の種目",
       programs: "トレーニングプログラム",
@@ -213,6 +214,13 @@ export const ja: SiteText = {
         { title: "カレンダーに合わせて", body: "トレーニング日をカレンダーに入れ、忙しい時間を避けてワークアウトを組みます。" },
         { title: "アカウントは不要", body: "同期やバックアップが必要なときだけ、Google か Apple でログインしてください。" },
       ],
+    },
+    learn: {
+      eyebrow: "無料ガイド",
+      title: "種目を覚えたら、計画はアプリにおまかせ",
+      body: "ステップごとのフォーム、各種目で鍛えられる筋肉、代わりにできる種目、そして無料の計算ツール。",
+      exercises: "人気の種目",
+      tools: "無料ツール",
     },
     juice: {
       eyebrow: "続けたくなる仕掛け",

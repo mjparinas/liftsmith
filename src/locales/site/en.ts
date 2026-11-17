@@ -25,6 +25,7 @@ export const en: SiteText = {
       coaches: "For coaches",
       pricing: "Pricing",
       whatsNew: "What's new",
+      community: "Ideas and roadmap",
       exercises: "Exercise library",
       muscles: "Exercises by muscle",
       programs: "Workout programs",
@@ -203,6 +204,13 @@ export const en: SiteText = {
         { title: "Fits your calendar", body: "Training days go in your calendar and workouts fit around busy times." },
         { title: "No account needed", body: "Sign in with Google or Apple only if you want sync and backup." },
       ],
+    },
+    learn: {
+      eyebrow: "Free guides",
+      title: "Learn the lifts, then let the app plan them",
+      body: "Step-by-step form, the muscles each lift works and what to do instead, plus free calculators.",
+      exercises: "Popular exercises",
+      tools: "Free tools",
     },
     juice: {
       eyebrow: "Built for juice",

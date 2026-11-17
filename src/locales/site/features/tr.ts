@@ -116,6 +116,10 @@ export const tr: FeaturesText = {
       body: "Salonunda yapılabilen ve kaslarının hazır olduğu egzersizleri seçer, sonra her ağırlığı ve tekrarı son antrenmanlarına göre belirler.",
       proPart: "Ücretsiz kullanıcılar ücretsiz programlarının yanında haftada bir uyarlanmış antrenman alır; Pro her günü planlar.",
     },
+    "auto-supersets": {
+      name: "Otomatik süper setler",
+      body: "Süper setleri aç, uyarlanabilir plan aynı kasları çalıştırmayan egzersizleri, örneğin bir press ve bir row'u eşleştirsin ve her turdan sonra daha kısa dinlenme versin, böylece süreye daha fazlası sığsın. Ağır squat ve deadlift'ler tek başına kalır, ısınma setlerini de kapatabilirsin.",
+    },
     "pick-weights": {
       name: "Sevdiğin hareketleri öğrenir",
       body: "Popüler hareketler en sık seçilir. Bir egzersizi yıldızla, çok daha sık gelsin; birini değiştirip çıkar, daha az gelsin ve bu etki birkaç ayda kaybolsun.",
@@ -219,7 +223,7 @@ export const tr: FeaturesText = {
     },
     stretching: {
       name: "Esneme",
-      body: "3D gösterimli 48 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini.",
+      body: "3D gösterimli 48 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini. Her esneme ve her taraf öncesinde pozisyon almak için birkaç saniye var ve ekran açık kalır.",
     },
     "workout-parts": {
       name: "Bölümlü antrenmanlar",
@@ -398,6 +402,11 @@ export const tr: FeaturesText = {
       name: "Meydan okumalar, kulüpler ve sıralamalar",
       body: "Bir arkadaşına meydan oku, haftalık sıralaması olan bir kulübe ya da salon ekibine katıl ve herkesle aylık meydan okumaya gir.",
     },
+    "club-chat": {
+      name: "Kulüp sohbeti ve ekip antrenmanları",
+      body: "Antrenmanlar arasında kulübünle konuş, birlikte çalışmak için bir saat ve yer paylaş, kimlerin geldiğini gör. Katılan herkes bir saat önce hatırlatma alır; sonra antrenmanını paylaşınca antrenman yapmış görünürsün ve birlikte çalıştığın arkadaşların etiketlenir.",
+      note: "18 yaş ve üzeri içindir. Bildirimler Android ve iPhone'da; web uygulaması sohbet açıkken yeni mesajları gösterir.",
+    },
     profiles: {
       name: "Herkese açık profiller",
       body: "En iyi kaldırışların ve antrenmanlarınla isteğe bağlı, herkese açık bir sayfa.",
@@ -450,6 +459,10 @@ export const tr: FeaturesText = {
     "coach-checkins": {
       name: "Check-in formları ve anketler",
       body: "Danışanlarına haftalık bir check-in, bir ön değerlendirme anketi ya da kendi formunu gönder; bir kez ya da her hafta. Birkaç dokunuşla yanıtlarlar; düşük bir puan ya da geç bir yanıt raporlarının en üstüne çıkar.",
+    },
+    "coach-checkin-trends": {
+      name: "Ağırlık, fotoğraf ve gidişatla ilerleme kontrolleri",
+      body: "Herhangi bir forma vücut ağırlığı ve fotoğraf soruları ekle, her hafta, 2 haftada veya 4 haftada bir gönder. Ağırlık danışanın son tartımından gelir, fotoğrafları yalnızca sen görürsün ve her cevabın gidişatı raporda görünür. 18 yaşından küçüklerden asla fotoğraf istenmez.",
     },
     "coach-roles": {
       name: "Kişisel antrenörler ve koçlar için",
@@ -505,6 +518,12 @@ export const tr: FeaturesText = {
     awards: {
       name: "Başarımlar, seviyeler ve seriler",
       body: "Kademeli rozetler, ödüllü 50 seviye, haftalık görevler, seri dondurma ve adil ligler.",
+    },
+    seasons: {
+      name: "Antrenman sezonları",
+      body: "Kendi haftalık hedefine doğru antrenman yaparak tırmandığın 20 kademelik yolu olan on haftalık sezonlar: haftada iki gün de beş gün kadar hızlı ilerler, fazladan günler puan getirmez. Kademeler sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir; sezon bitince de senin kalır. Sezon meydan okumaları, yeni rekorlardan nadir ganimet, prestij yıldızları, kaçırılan haftadan sonra telafi haftası, çift puanlı final ve paylaşılabilir özet kartı.",
+      proPart: "Tüm kademeler ve ödülleri ücretsiz; Pro üç kademeye bonus ödül ekler.",
+      note: "Sezon uygulama simgeleri Android ve iPhone'da; web'de tema var. Sezonlar Ayarlar'dan kapatılabilir.",
     },
     locker: {
       name: "Temalar, vurgu renkleri ve uygulama simgeleri",
@@ -569,6 +588,10 @@ export const tr: FeaturesText = {
     "strength-standards": {
       name: "Gerçek sporculardan güç standartları",
       body: "Web sitesi, sporcuların squat, bench press, deadlift ve press'te gerçekte ne kadar kaldırdığını cinsiyete ve vücut ağırlığına göre gösterir; her gün, sayılan sporculardan hesaplanır. Yalnızca 30 veya daha fazla kişilik gruplar yüzdelik olarak gösterilir, kimsenin kendi sayıları asla gösterilmez. Ayarlar › Verilerin ve gizlilik'teki tek bir anahtar senin sayılıp sayılmayacağına karar verir; 18 yaş altındakiler asla sayılmaz.",
+    },
+    community: {
+      name: "Topluluk: fikirler, hatalar ve yol haritası",
+      body: "Liftsmith'in sırada ne yapması gerektiğini öner, istediğin fikirlere oy ver, yalnızca ekibin gördüğü bir ekran görüntüsüyle hata bildir, yorum yap ya da @ ile birinden bahset. Her biri inceleniyordan yayınlandıya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın. Yol haritası ve değişiklik günlüğü web sitesinde de var.",
     },
     languages: {
       name: "On dil",

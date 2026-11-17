@@ -855,6 +855,62 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Vous préférez ne pas les voir pendant le repos ? Désactivez Points techniques pendant le repos dans Réglages › Séance.",
   },
+  "auto-supersets": {
+    title: "Des supersets, faits pour toi",
+    intro: "Tes séances adaptatives peuvent maintenant regrouper les exercices en supersets pour toi, avec un seul interrupteur.",
+    points: [
+      "Active Regrouper les exercices en supersets dans Réglages › Entraînement › Séances adaptatives.",
+      "Les exercices qui ne sollicitent pas les mêmes muscles s'enchaînent, comme un développé et un rowing, donc chacun récupère pendant l'autre.",
+      "Le repos après chaque tour est plus court, et le temps gagné ajoute de l'entraînement dans la durée que tu choisis.",
+      "Les squats et soulevés de terre lourds restent seuls, et tu peux séparer une paire dans Aujourd'hui.",
+    ],
+    dyk: "La même section a un interrupteur Séries d'échauffement, pour les jours où tu préfères t'échauffer à ta façon.",
+  },
+  "club-chat": {
+    title: "Ton club, entre les séances",
+    intro:
+      "Les clubs ont maintenant une discussion et des séances en groupe, pour que les gens avec qui tu t’entraînes puissent parler et se retrouver.",
+    points: [
+      "Ouvre Amis › Clubs, choisis un club et touche Discussion pour écrire à tout le monde.",
+      "Propose une séance en groupe avec un nom, un jour et une heure, et les membres touchent Je viens.",
+      "Chaque participant reçoit un rappel une heure avant.",
+      "Publie ta séance après coup : tu apparais comme entraîné, et les amis qui étaient là sont identifiés.",
+    ],
+    dyk: "Me prévenir, dans la discussion de chaque club, coupe ses notifications, et une discussion en envoie au plus une par heure.",
+  },
+  community: {
+    title: "Votez pour ce qu'on construit ensuite",
+    intro: "Liftsmith a maintenant sa communauté : proposez des idées, votez pour celles que vous voulez et signalez des bugs.",
+    points: [
+      "Ouvrez Réglages › Aide › Communauté.",
+      "Touchez la flèche à côté d'une idée pour voter. Les plus demandées montent en tête.",
+      "Signalez un bug avec une capture que seuls vous et l'équipe voyez.",
+      "Chaque publication montre où elle en est, d'En cours d'examen à Livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort.",
+    ],
+    dyk: "La feuille de route et le journal des modifications sont aussi sur le site, à getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Bilans avec poids, photos et tendances",
+    intro: "Vos formulaires de bilan peuvent maintenant demander le poids et des photos, et montrer comment évolue chaque réponse.",
+    points: [
+      "Ajoutez une question Poids : elle part de la dernière pesée du client et enregistre la nouvelle dans son suivi.",
+      "Ajoutez jusqu'à trois questions Photo, de face et de profil par exemple. Vous seul les voyez.",
+      "Envoyez un formulaire chaque semaine, toutes les 2 semaines ou toutes les 4 semaines.",
+      "Le rapport de chaque client montre la tendance de chaque note, nombre et poids, et signale une note qui baisse.",
+    ],
+    dyk: "Partez du nouveau modèle Bilan de progrès dans Coaching › Bilans. On ne demande jamais de photo aux moins de 18 ans.",
+  },
+  seasons: {
+    title: "Les saisons d'entraînement commencent lundi",
+    intro: "La saison 1, Braise, commence lundi : dix semaines, un parcours de 20 paliers et des récompenses à gagner seulement cet hiver.",
+    points: [
+      "Vous progressez en atteignant votre propre objectif hebdomadaire. Les jours en plus ne rapportent rien : deux jours par semaine avancent aussi vite que cinq.",
+      "Les paliers donnent des badges, un avatar, une couleur d'accent et le thème Braise avec son icône, propres à la saison et à vous pour toujours.",
+      "Une semaine manquée ? La suivante où vous atteignez l'objectif double le bonus. La dernière semaine compte double.",
+      "Chaque nouveau record a 1 chance sur 6 de faire tomber les disques rares de la saison.",
+    ],
+    dyk: "Vous préférez ne pas voir les saisons ? Désactivez Saisons d'entraînement dans Réglages › Apparence. Votre entraînement compte toujours.",
+  },
   "gym-classes": {
     title: "Mettez l'horaire de vos cours sur la page de votre salle",
     intro: "Vos membres voient les cours de la semaine sur la page de votre salle, dans l'appli et sur le site.",

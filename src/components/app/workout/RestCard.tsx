@@ -12,7 +12,7 @@ import { rehabInjuries } from "@/lib/partExtras";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { useApp, type Active } from "@/lib/store";
-import { effortChoices } from "@/lib/training";
+import { effortChoices, effortKind } from "@/lib/training";
 import type { EffortScale, Exercise, Gym, Routine, SetEvent, SetTag } from "@/lib/types";
 
 import { clock, loadText, repsText } from "../format";
@@ -114,7 +114,8 @@ export function RestCard({
       {lastSet && !rated && (
         <Effort
           target={lastSet.rir}
-          scale={scale}
+          // Reps left in the tank only fits sets counted in reps: timed sets and cardio ask how hard it was (RPE).
+          scale={effortKind(exercise(lastSet.exerciseId)) === "reps" ? scale : "rpe"}
           onPick={(r) => {
             haptic("tick");
             s.rateEffort(lastSet.id, r);
