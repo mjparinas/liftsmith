@@ -500,8 +500,10 @@ describe("check-ins", () => {
     await u.click(screen.getByRole("button", { name: "Send now" }));
     expect(await screen.findByText("Sent. They'll get a notification.")).toBeInTheDocument();
     expect(calls.find((c) => (c.body as { action?: string })?.action === "sendForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
-    await u.click(screen.getByRole("switch", { name: /Send this form every week/ }));
-    expect(calls.find((c) => (c.body as { action?: string })?.action === "repeatForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
+    await u.click(screen.getByRole("button", { name: "Every week" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "repeatForm")).toMatchObject({
+      body: { client: "c1", id: "f1", every: 7 },
+    });
   });
 
   it("a coach reads a client's answers, and a low score goes first", async () => {

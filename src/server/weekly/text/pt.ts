@@ -864,4 +864,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A mesma seção tem o botão Séries de aquecimento, para os dias em que você prefere aquecer do seu jeito.",
   },
+  "coach-checkin-trends": {
+    title: "Check-ins com peso, fotos e tendências",
+    intro: "Seus formulários de check-in agora podem pedir peso corporal e fotos, e mostrar como cada resposta está mudando.",
+    points: [
+      "Adicione uma pergunta de Peso corporal: ela vem da última pesagem do aluno e salva a nova no registro dele.",
+      "Adicione até três perguntas de Foto, como de frente e de lado. Só você vê.",
+      "Envie um formulário toda semana, a cada 2 semanas ou a cada 4 semanas.",
+      "O relatório de cada aluno mostra a tendência de cada nota, número e peso, e avisa quando uma nota cai.",
+    ],
+    dyk: "Comece pelo novo modelo Check-in de progresso em Coaching › Check-ins. Menores de 18 anos nunca recebem pedido de foto.",
+  },
 };

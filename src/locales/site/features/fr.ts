@@ -390,6 +390,10 @@ export const fr: FeaturesText = {
       name: "Formulaires de bilan et questionnaires",
       body: "Envoyez à vos clients un bilan hebdomadaire, un questionnaire d'accueil ou votre propre formulaire, une fois ou chaque semaine. Ils répondent en quelques touches, et une note basse ou une réponse en retard remonte en haut de leur rapport.",
     },
+    "coach-checkin-trends": {
+      name: "Bilans de progrès avec poids, photos et tendances",
+      body: "Ajoutez des questions de poids et de photo à n'importe quel formulaire, et envoyez-le chaque semaine, toutes les 2 ou toutes les 4 semaines. Le poids part de la dernière pesée du client, les photos ne vont qu'à vous, et la tendance de chaque réponse s'affiche dans son rapport. On ne demande jamais de photo aux moins de 18 ans.",
+    },
     "coach-roles": {
       name: "Pour les coachs personnels et les entraîneurs",
       body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",

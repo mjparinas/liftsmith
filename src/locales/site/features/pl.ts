@@ -451,6 +451,10 @@ export const pl: FeaturesText = {
       name: "Formularze kontrolne i ankiety",
       body: "Wysyłaj podopiecznym cotygodniową ankietę kontrolną, ankietę wstępną albo własny formularz, raz lub co tydzień. Odpowiadają kilkoma dotknięciami, a niski wynik albo spóźniona odpowiedź trafia na górę ich raportu.",
     },
+    "coach-checkin-trends": {
+      name: "Kontrole postępów z wagą, zdjęciami i trendami",
+      body: "Dodaj do dowolnego formularza pytania o masę ciała i zdjęcia, i wysyłaj go co tydzień, co 2 lub co 4 tygodnie. Waga wypełnia się z ostatniego ważenia klienta, zdjęcia widzisz tylko Ty, a trend każdej odpowiedzi widać w raporcie. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
+    },
     "coach-roles": {
       name: "Dla trenerów personalnych i trenerów",
       body: "Powiedz, czy jesteś trenerem personalnym pracującym jeden na jeden, czy trenerem prowadzącym grupy i drużyny. Podopieczni widzą właściwe określenie, a narzędzia, których używasz najczęściej, są na początku.",

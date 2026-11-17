@@ -1087,6 +1087,18 @@ const SCHEMA = [
     next_at INTEGER NOT NULL,
     PRIMARY KEY (coach_id, client_id)
   )`,
+  // Photo answers to check-ins (2026-11-17), apart from the check-ins so listing them never reads a photo.
+  `CREATE TABLE IF NOT EXISTS coach_checkin_photos (
+    checkin_id TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    data TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (checkin_id, question_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_checkin_photos_pair ON coach_checkin_photos (coach_id, client_id)`,
+  `CREATE INDEX IF NOT EXISTS coach_checkin_photos_client ON coach_checkin_photos (client_id)`,
   // Booking (coachBooking.ts): a coach's open or booked session times, UTC ms.
   `CREATE TABLE IF NOT EXISTS coach_slots (
     id TEXT PRIMARY KEY,
@@ -1333,6 +1345,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Physio support (2026-11-13, docs/decisions/trainer-mode.md): a client shares pain and injuries with one coach;
   // a coach works as a trainer or a physio; a routine can say how many times a week it's meant to be done.
   ["coach_shares", "pain", "INTEGER NOT NULL DEFAULT 0"],
+  // Repeating check-ins every one, two or four weeks (2026-11-17).
+  ["coach_checkin_repeats", "every_days", "INTEGER NOT NULL DEFAULT 7"],
   ["coach_prefs", "kind", "TEXT NOT NULL DEFAULT 'trainer'"],
   ["coach_plans", "per_week", "INTEGER"],
   // Sharing item by item (2026-11-13, docs/decisions/trainer-mode.md "What a client shares"): heart rate, workout

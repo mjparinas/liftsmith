@@ -451,6 +451,10 @@ export const tr: FeaturesText = {
       name: "Check-in formları ve anketler",
       body: "Danışanlarına haftalık bir check-in, bir ön değerlendirme anketi ya da kendi formunu gönder; bir kez ya da her hafta. Birkaç dokunuşla yanıtlarlar; düşük bir puan ya da geç bir yanıt raporlarının en üstüne çıkar.",
     },
+    "coach-checkin-trends": {
+      name: "Ağırlık, fotoğraf ve gidişatla ilerleme kontrolleri",
+      body: "Herhangi bir forma vücut ağırlığı ve fotoğraf soruları ekle, her hafta, 2 haftada veya 4 haftada bir gönder. Ağırlık danışanın son tartımından gelir, fotoğrafları yalnızca sen görürsün ve her cevabın gidişatı raporda görünür. 18 yaşından küçüklerden asla fotoğraf istenmez.",
+    },
     "coach-roles": {
       name: "Kişisel antrenörler ve koçlar için",
       body: "Birebir çalışan bir kişisel antrenör mü, grupları ve takımları yöneten bir koç mu olduğunu söyle. Danışanlar sana uygun unvanı görür, en çok kullandığın araçlar da öne gelir.",

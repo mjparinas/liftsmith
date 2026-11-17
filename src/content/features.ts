@@ -721,6 +721,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "coach-checkin-trends",
+        name: "Progress check-ins with weight, photos and trends",
+        body: "Add body weight and photo questions to any form, and send it every week, two weeks or four. Weight fills in from the client's last weigh-in, photos go only to you, and each answer's trend shows on their report. Clients under 18 are never asked for photos.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-17",
+      },
+      {
         id: "coach-roles",
         name: "For personal trainers and coaches",
         body: "Say whether you're a personal trainer working one-on-one or a coach running groups and teams. Clients see the right word for you, and the tools you use most come first.",

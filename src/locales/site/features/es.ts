@@ -385,6 +385,10 @@ export const es: FeaturesText = {
       name: "Formularios de revisión y cuestionarios",
       body: "Envía a tus clientes una revisión semanal, un cuestionario inicial o tu propio formulario, una vez o cada semana. Responden con unos toques, y una puntuación baja o una respuesta tardía aparece arriba en su informe.",
     },
+    "coach-checkin-trends": {
+      name: "Revisiones de progreso con peso, fotos y tendencias",
+      body: "Añade preguntas de peso corporal y de foto a cualquier formulario y envíalo cada semana, cada 2 semanas o cada 4. El peso se rellena con el último pesaje del cliente, las fotos solo las ves tú y la tendencia de cada respuesta aparece en su informe. A los menores de 18 nunca se les piden fotos.",
+    },
     "coach-roles": {
       name: "Para entrenadores personales y coaches",
       body: "Indica si eres entrenador personal uno a uno o coach de grupos y equipos. Tus clientes ven la palabra correcta y lo que más usas va primero.",

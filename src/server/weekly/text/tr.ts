@@ -860,4 +860,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aynı bölümde, ısınmayı kendi yönteminle yapmak istediğin günler için bir Isınma setleri anahtarı var.",
   },
+  "coach-checkin-trends": {
+    title: "Ağırlık, fotoğraf ve gidişatla kontroller",
+    intro: "Kontrol formların artık vücut ağırlığı ve fotoğraf isteyebilir ve her cevabın gidişatını gösterir.",
+    points: [
+      "Vücut ağırlığı sorusu ekle: danışanın son tartımından gelir ve yenisini kaydına ekler.",
+      "Önden ve yandan gibi en fazla üç fotoğraf sorusu ekle. Onları yalnızca sen görürsün.",
+      "Bir formu her hafta, 2 haftada bir veya 4 haftada bir gönder.",
+      "Her danışanın raporu her puanın, sayının ve ağırlığın gidişatını gösterir ve bir puan düştüğünde söyler.",
+    ],
+    dyk: "Koçluk › Durum kontrolleri bölümündeki yeni İlerleme kontrolü şablonuyla başla. 18 yaşından küçüklerden asla fotoğraf istenmez.",
+  },
 };

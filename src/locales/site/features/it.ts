@@ -383,6 +383,10 @@ export const it: FeaturesText = {
       name: "Moduli di check-in e questionari",
       body: "Invia ai clienti un check-in settimanale, un questionario iniziale o un tuo modulo, una volta o ogni settimana. Rispondono con pochi tocchi, e un punteggio basso o una risposta in ritardo finisce in cima al loro report.",
     },
+    "coach-checkin-trends": {
+      name: "Check-in dei progressi con peso, foto e andamento",
+      body: "Aggiungi domande sul peso corporeo e con foto a qualsiasi modulo, e invialo ogni settimana, ogni 2 o ogni 4 settimane. Il peso parte dall'ultima pesata del cliente, le foto arrivano solo a te e l'andamento di ogni risposta compare nel suo report. Ai minori di 18 anni non si chiedono mai foto.",
+    },
     "coach-roles": {
       name: "Per personal trainer e coach",
       body: "Indica se sei un personal trainer che lavora uno a uno o un coach di gruppi e squadre. I clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
