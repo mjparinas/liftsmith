@@ -48,6 +48,18 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["live_sessions", "l", "social_profiles", "sp"],
   },
   {
+    name: "gym classes: a gym's schedule (gymClasses.ts classesOf)",
+    sql: `SELECT c.id, c.name FROM gym_classes c JOIN gym_places p ON p.id = c.place_id WHERE c.place_id = ? AND p.claimed_by <> '' LIMIT 80`,
+    uses: ["gym_classes_place"],
+    noScan: ["gym_classes", "c"],
+  },
+  {
+    name: "gym classes: account deletion (gymClasses.ts classDeletes)",
+    sql: "UPDATE gym_classes SET account_id = '' WHERE account_id = ?",
+    uses: ["gym_classes_account"],
+    noScan: ["gym_classes"],
+  },
+  {
     name: "gym owner: count of claimed gyms (gymClaims.ts)",
     sql: "SELECT COUNT(*) AS n FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?",
     uses: ["gym_places_claimed"],

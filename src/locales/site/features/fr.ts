@@ -311,6 +311,10 @@ export const fr: FeaturesText = {
       name: "Comptes d’équipe pour les salles",
       body: "Le propriétaire d’une salle officielle invite gérants et personnel d’accueil avec un lien à usage unique. Chacun utilise son propre compte pour tenir à jour la page, les annonces et les problèmes signalés.",
     },
+    "gym-classes": {
+      name: "Horaires des cours sur les pages des salles",
+      body: "Les salles officielles publient les cours qu'elles donnent chaque semaine, avec l'instructeur et la salle, et indiquent les jours sans cours. Les membres voient la semaine sur la page de la salle dans l'appli et sur le web, et ajoutent le prochain cours à leur agenda d'un toucher.",
+    },
     "gym-starter": {
       name: "Programmes de départ des salles",
       body: "Les salles officielles proposent un programme aux nouveaux membres sur leur page dans l’app et sur le web, enregistré d’un toucher. Liftsmith fixe les charges de chacun.",

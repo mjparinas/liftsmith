@@ -855,4 +855,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Vous préférez ne pas les voir pendant le repos ? Désactivez Points techniques pendant le repos dans Réglages › Séance.",
   },
+  "gym-classes": {
+    title: "Mettez l'horaire de vos cours sur la page de votre salle",
+    intro: "Vos membres voient les cours de la semaine sur la page de votre salle, dans l'appli et sur le site.",
+    points: [
+      "Ajoutez chaque cours une fois : type, jours, heure de début et durée. Presque rien à taper.",
+      "Ajoutez l'instructeur, la salle et une courte note, par exemple comment réserver.",
+      "Fermé un jour férié ? Touchez la date et le cours s'affiche comme annulé ce jour-là.",
+      "Les membres ajoutent le prochain cours à leur agenda d'un toucher.",
+    ],
+    dyk: "Les heures sont celles de votre salle : 18 h reste 18 h pour tout le monde. Les réservations restent chez vous.",
+  },
 };

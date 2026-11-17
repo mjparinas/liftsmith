@@ -369,6 +369,10 @@ export const pl: FeaturesText = {
       name: "Konta personelu siłowni",
       body: "Właściciel oficjalnej siłowni zaprasza menedżerów i obsługę recepcji jednorazowym linkiem. Każdy korzysta z własnego konta, żeby dbać o aktualność strony siłowni, ogłoszeń i zgłoszeń usterek.",
     },
+    "gym-classes": {
+      name: "Grafiki zajęć na stronach siłowni",
+      body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
+    },
     "gym-starter": {
       name: "Programy startowe siłowni",
       body: "Oficjalne siłownie polecają nowym członkom jeden program na swojej stronie w aplikacji i w sieci, a ćwiczący zapisują go jednym dotknięciem. Liftsmith wpisuje każdemu jego własne ciężary.",

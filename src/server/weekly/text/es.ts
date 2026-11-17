@@ -851,4 +851,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "¿Prefieres no verlos en el descanso? Desactiva Revisar la técnica al descansar en Ajustes › Entrenamiento.",
   },
+  "gym-classes": {
+    title: "Publica el horario de clases en la página de tu gimnasio",
+    intro: "Quienes entrenan contigo ven las clases de la semana en la página de tu gimnasio, en la app y en la web.",
+    points: [
+      "Añade cada clase una vez: tipo, días, hora de inicio y duración. Casi nunca hay que escribir.",
+      "Añade el instructor, la sala y una nota breve, como cómo reservar.",
+      "¿Cierras un festivo? Toca la fecha y la clase aparece como suspendida ese día.",
+      "Se añade la próxima clase al calendario con un toque.",
+    ],
+    dyk: "Las horas son las de tu gimnasio, así que las 18:00 son las 18:00 para todos. Las reservas siguen contigo.",
+  },
 };

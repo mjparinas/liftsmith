@@ -6,6 +6,7 @@
 import { create } from "zustand";
 
 import { api, AuthError, readAccount } from "./auth";
+import type { GymClass } from "./gymClasses";
 import type { GymIssue, GymNews, IssueKind } from "./gymExtras";
 import { keepRead, readKept } from "./liveRead";
 import { track } from "./net";
@@ -132,6 +133,8 @@ export interface OwnerExtras {
   news: GymNews[];
   issues: GymIssue[];
   trainers: OwnerTrainer[];
+  /** The weekly class schedule (gymClasses.ts); missing from servers older than 2026-11-17. */
+  classes?: GymClass[];
 }
 
 export async function ownerExtras(place: string): Promise<OwnerExtras | null> {
@@ -153,6 +156,29 @@ export async function postNews(place: string, text: string): Promise<{ id: strin
 export async function deleteNews(place: string, id: string): Promise<boolean> {
   try {
     await api("/api/gyms/", { token: token(), body: { op: "newsDelete", place, id } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// --- The class schedule (gymClasses.ts) ---
+
+/** Adds a class (no `id`) or saves changes to one; the server's tidied copy comes back. */
+export async function saveClass(
+  place: string,
+  cls: Omit<GymClass, "id"> & { id?: string },
+): Promise<{ cls: GymClass } | { error: string }> {
+  try {
+    return await api<{ cls: GymClass }>("/api/gyms/", { token: token(), body: { op: "classSave", place, cls } });
+  } catch (e) {
+    return { error: err(e) };
+  }
+}
+
+export async function deleteClass(place: string, id: string): Promise<boolean> {
+  try {
+    await api("/api/gyms/", { token: token(), body: { op: "classDelete", place, id } });
     return true;
   } catch {
     return false;

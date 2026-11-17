@@ -713,3 +713,12 @@ Every exercise and stretch now lists its two or three most common form mistakes,
 - Between sets, the rest timer shows one to watch on your next set, a different one each set.
 - They're part of the app, so they work with no signal, in every language.
 Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))
+
+### G3 · Put your class schedule on your gym's page (**New**, 2026-11-17)
+Free · Gyms · No screen (it needs an official gym) · `fresh`, so it goes next to gyms already in the series
+Members can see this week's classes on your gym's page, in the app and on the website.
+- Add each class once: its type, days, start time and length. Most need no typing at all.
+- Add the instructor, the room and a short note, like how to book.
+- Off for a holiday? Tap the date and the class shows as not running that day.
+- Members add the next class to their calendar in one tap.
+Did you know? Times are your gym's own clock, so members see 6 PM as 6 PM. Bookings stay with you. ([Gyms](gyms.md) "Class schedules")

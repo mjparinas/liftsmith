@@ -641,6 +641,26 @@ const SCHEMA = [
     PRIMARY KEY (place_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS gym_trainers_account ON gym_trainers (account_id)`,
+  // A gym's weekly class schedule (gymClasses.ts, 2026-11-17): `days` is the weekdays it runs ("1,3", Sunday = 0),
+  // `start` the gym's own clock ("18:30") and `off` the dates it won't run ("2026-12-24,2026-12-31").
+  `CREATE TABLE IF NOT EXISTS gym_classes (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    days TEXT NOT NULL,
+    start TEXT NOT NULL,
+    minutes INTEGER NOT NULL,
+    coach TEXT NOT NULL DEFAULT '',
+    room TEXT NOT NULL DEFAULT '',
+    note TEXT NOT NULL DEFAULT '',
+    off TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_classes_place ON gym_classes (place_id)`,
+  `CREATE INDEX IF NOT EXISTS gym_classes_account ON gym_classes (account_id)`,
   // Strength standards from lifters who count their lifts (standards.ts, 2026-11-15): one row per lift, sex and body
   // weight group with at least MIN_CELL lifters, rebuilt each morning. Only percentiles and counts, never an account.
   `CREATE TABLE IF NOT EXISTS strength_standards (

@@ -853,4 +853,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Prefere não ver no cronômetro de descanso? Desligue Checagem de técnica no descanso em Ajustes › Treino.",
   },
+  "gym-classes": {
+    title: "Coloque o horário das aulas na página da sua academia",
+    intro: "Quem treina aí vê as aulas da semana na página da academia, no app e no site.",
+    points: [
+      "Adicione cada aula uma vez: tipo, dias, horário e duração. Quase nada para digitar.",
+      "Inclua o instrutor, a sala e uma nota curta, como reservar.",
+      "Fechado no feriado? Toque na data e a aula aparece como cancelada naquele dia.",
+      "Os alunos adicionam a próxima aula à agenda com um toque.",
+    ],
+    dyk: "Os horários seguem o relógio da academia: 18h são 18h para todos. As reservas continuam com você.",
+  },
 };

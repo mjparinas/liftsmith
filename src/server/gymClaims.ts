@@ -14,6 +14,7 @@ import { parseHours } from "@/lib/openingHours";
 
 import { cleanEmail, type SendMail } from "./accounts";
 import { batch, query, rateLimit, run } from "./db";
+import { classEnds } from "./gymClasses";
 import { isPlaceId } from "./gymPlaces";
 import { canManage, MANAGES, staffDeletes, staffEnds } from "./gymStaff";
 import { checkText } from "./moderation";
@@ -357,7 +358,12 @@ export async function releaseGym(accountId: string, placeId: unknown, now = Date
       accountId,
     ])) > 0;
   // The gym's club stays with its members as an ordinary club; the next owner starts the gym's own.
-  if (gone) await batch([{ sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [placeId] }, ...staffEnds(placeId)]);
+  if (gone)
+    await batch([
+      { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [placeId] },
+      ...staffEnds(placeId),
+      ...classEnds(placeId),
+    ]);
   return gone;
 }
 

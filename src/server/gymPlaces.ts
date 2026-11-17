@@ -7,6 +7,7 @@
 // These are businesses on a public map, not anything about a lifter, so the position is kept as the map has it.
 import { randomBytes } from "node:crypto";
 
+import type { GymClass } from "@/lib/gymClasses";
 import {
   cleanAmenities,
   cleanPrices,
@@ -21,6 +22,7 @@ import { SHORT_REGION } from "@/lib/regions";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { badCity, cityName, km, tidyAddress } from "./gymAddress";
+import { classesOf } from "./gymClasses";
 import { distanceKm } from "./gymDirectory";
 import { issuesOf, newsOf, trainersOf } from "./gymExtras";
 import { checkText } from "./moderation";
@@ -88,6 +90,8 @@ export interface Place {
   news: GymNews[];
   issues: GymIssue[];
   trainers: GymTrainer[];
+  /** Its weekly class schedule (gymClasses.ts), official gyms only; empty in lists. */
+  classes: GymClass[];
   /** The gym's starter program for new members (a routine share code, gymStarter.ts), '' for none. */
   starter: string;
 }
@@ -700,18 +704,20 @@ const toPlace = (r: Row, km: number): Place => ({
   news: [],
   issues: [],
   trainers: [],
+  classes: [],
   starter: s(r.starter),
 });
 
 /** One gym's photos, oldest first (gymMedia.ts). */
 async function withPhotos(p: Place): Promise<Place> {
-  const [rows, news, issues, trainers] = await Promise.all([
+  const [rows, news, issues, trainers, classes] = await Promise.all([
     query("SELECT id FROM gym_photos WHERE place_id = ? AND kind = 'photo' ORDER BY created_at, id", [p.id]),
     newsOf(p.id),
     issuesOf(p.id),
     trainersOf(p.id),
+    p.official ? classesOf(p.id) : Promise.resolve([]),
   ]);
-  return { ...p, photos: rows.map((r) => s(r.id)), news, issues, trainers };
+  return { ...p, photos: rows.map((r) => s(r.id)), news, issues, trainers, classes };
 }
 
 /** Gyms within `PLACE_LIMITS.radiusKm`: official ones first, then nearest. Studios only when asked for. */
@@ -873,7 +879,8 @@ export const gymIndexable = (p: Place): boolean =>
     p.prices ||
     p.photos.length ||
     p.trainers.length ||
-    p.news.length
+    p.news.length ||
+    !!p.classes?.length
   );
 export const INDEXABLE_SQL =
   "kind = 'gym' AND (claimed_by <> '' OR website <> '' OR phone <> '' OR hours <> '' OR lifters > 0 OR code <> '')";
@@ -1087,7 +1094,7 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
         { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_photos WHERE place_id = ?", args: [id] },
-        ...["gym_news", "gym_issues", "gym_trainers", "gym_staff", "gym_staff_invites"].map((t) => ({
+        ...["gym_news", "gym_issues", "gym_trainers", "gym_staff", "gym_staff_invites", "gym_classes"].map((t) => ({
           sql: `DELETE FROM ${t} WHERE place_id = ?`,
           args: [id],
         })),

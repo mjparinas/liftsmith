@@ -32,6 +32,7 @@ import { haptic, oops } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL, type Equipment, type Gym } from "@/lib/types";
 
+import { OwnerClassesSection } from "./GymClasses";
 import { BumpField, Button, Chip, Section, Sheet } from "./ui";
 
 // The owner's page, round 3 (docs/decisions/gyms.md): amenities and prices, announcements to the gym's club, equipment
@@ -133,7 +134,7 @@ export function OwnerExtrasSections({ gym }: { gym: OwnedGym }) {
   const [tries, setTries] = useState(0);
   useEffect(() => {
     let live = true;
-    void ownerExtras(gym.id).then((d) => live && setData(d ?? { news: [], issues: [], trainers: [] }));
+    void ownerExtras(gym.id).then((d) => live && setData(d ?? { news: [], issues: [], trainers: [], classes: [] }));
     return () => {
       live = false;
     };
@@ -142,6 +143,7 @@ export function OwnerExtrasSections({ gym }: { gym: OwnedGym }) {
   return (
     <>
       <NewsSection gym={gym} news={data?.news ?? []} onChange={reload} />
+      <OwnerClassesSection place={gym.id} classes={data ? (data.classes ?? []) : null} onChange={reload} />
       <IssuesSection gym={gym} data={data} onChange={reload} />
       <TrainersSection gym={gym} data={data} onChange={reload} />
     </>

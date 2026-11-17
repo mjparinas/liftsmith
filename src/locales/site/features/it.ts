@@ -304,6 +304,10 @@ export const it: FeaturesText = {
       name: "Account dello staff per le palestre",
       body: "Il titolare di una palestra ufficiale invita responsabili e reception con un link monouso. Ognuno usa il proprio account per tenere aggiornati la pagina, gli annunci e i problemi segnalati.",
     },
+    "gym-classes": {
+      name: "Orari dei corsi sulle pagine delle palestre",
+      body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
+    },
     "gym-starter": {
       name: "Programmi per iniziare delle palestre",
       body: "Le palestre ufficiali suggeriscono un programma ai nuovi iscritti sulla loro pagina nell’app e sul web, salvabile con un tocco. Liftsmith mette i pesi di ciascuno.",

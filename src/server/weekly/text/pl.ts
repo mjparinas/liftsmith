@@ -849,4 +849,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Wolisz ich nie widzieć na liczniku przerwy? Wyłącz Kontrola techniki w przerwie w Ustawienia › Trening.",
   },
+  "gym-classes": {
+    title: "Grafik zajęć na stronie Twojej siłowni",
+    intro: "Bywalcy widzą zajęcia na ten tydzień na stronie siłowni, w aplikacji i na stronie internetowej.",
+    points: [
+      "Dodaj każde zajęcia raz: rodzaj, dni, godzinę i czas trwania. Prawie nic nie trzeba pisać.",
+      "Dopisz instruktora, salę i krótką uwagę, na przykład jak się zapisać.",
+      "Zamknięte w święto? Dotknij daty, a zajęcia pokażą się jako odwołane tego dnia.",
+      "Najbliższe zajęcia dodaje się do kalendarza jednym dotknięciem.",
+    ],
+    dyk: "Godziny są według zegara siłowni, więc 18:00 to 18:00 dla wszystkich. Zapisy zostają u Ciebie.",
+  },
 };

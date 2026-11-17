@@ -870,4 +870,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout.",
   },
+  "gym-classes": {
+    title: "Put your class schedule on your gym's page",
+    intro: "Members can see this week's classes on your gym's page, in the app and on the website.",
+    points: [
+      "Add each class once: its type, days, start time and length. Most need no typing at all.",
+      "Add the instructor, the room and a short note, like how to book.",
+      "Off for a holiday? Tap the date and the class shows as not running that day.",
+      "Members add the next class to their calendar in one tap.",
+    ],
+    dyk: "Times are your gym's own clock, so members see 6 PM as 6 PM. Bookings stay with you.",
+  },
 };

@@ -306,6 +306,10 @@ export const es: FeaturesText = {
       name: "Cuentas de personal para gimnasios",
       body: "El propietario de un gimnasio oficial invita a gerentes y personal de recepción con un enlace de un solo uso. Cada uno usa su propia cuenta para mantener al día la página, los avisos y los problemas reportados.",
     },
+    "gym-classes": {
+      name: "Horarios de clases en las páginas de gimnasios",
+      body: "Los gimnasios oficiales publican las clases que dan cada semana, con instructor y sala, y marcan los días que no hay clase. Quienes entrenan allí ven la semana en la página del gimnasio en la app y la web, y añaden la próxima clase a su calendario con un toque.",
+    },
     "gym-starter": {
       name: "Programas de inicio de los gimnasios",
       body: "Los gimnasios oficiales sugieren un programa a quienes empiezan en su página de la app y la web, y se guarda con un toque. Liftsmith pone los pesos de cada persona.",
