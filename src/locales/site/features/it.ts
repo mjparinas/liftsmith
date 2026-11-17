@@ -338,6 +338,11 @@ export const it: FeaturesText = {
       name: "Sfide, club e classifiche",
       body: "Sfida un amico, entra in un club o nel gruppo della tua palestra con una classifica settimanale e affronta la sfida del mese con tutti.",
     },
+    "club-chat": {
+      name: "Chat del club e allenamenti di gruppo",
+      body: "Parla con il tuo club tra un allenamento e l’altro, proponi un orario e un posto per allenarvi insieme e guarda chi c’è. Chi partecipa riceve un promemoria un’ora prima, e pubblicando l’allenamento dopo risulti allenato, con gli amici che erano con te taggati.",
+      note: "Per chi ha almeno 18 anni. Le notifiche sono su Android e iPhone; l’app web mostra i nuovi messaggi mentre la chat è aperta.",
+    },
     profiles: { name: "Profili pubblici", body: "Una pagina pubblica facoltativa con i tuoi migliori sollevamenti e allenamenti." },
     "tagline-gym": {
       name: "Motto e palestra abituale",

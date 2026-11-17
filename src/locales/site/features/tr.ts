@@ -398,6 +398,11 @@ export const tr: FeaturesText = {
       name: "Meydan okumalar, kulüpler ve sıralamalar",
       body: "Bir arkadaşına meydan oku, haftalık sıralaması olan bir kulübe ya da salon ekibine katıl ve herkesle aylık meydan okumaya gir.",
     },
+    "club-chat": {
+      name: "Kulüp sohbeti ve ekip antrenmanları",
+      body: "Antrenmanlar arasında kulübünle konuş, birlikte çalışmak için bir saat ve yer paylaş, kimlerin geldiğini gör. Katılan herkes bir saat önce hatırlatma alır; sonra antrenmanını paylaşınca antrenman yapmış görünürsün ve birlikte çalıştığın arkadaşların etiketlenir.",
+      note: "18 yaş ve üzeri içindir. Bildirimler Android ve iPhone'da; web uygulaması sohbet açıkken yeni mesajları gösterir.",
+    },
     profiles: {
       name: "Herkese açık profiller",
       body: "En iyi kaldırışların ve antrenmanlarınla isteğe bağlı, herkese açık bir sayfa.",

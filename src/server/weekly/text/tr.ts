@@ -860,6 +860,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aynı bölümde, ısınmayı kendi yönteminle yapmak istediğin günler için bir Isınma setleri anahtarı var.",
   },
+  "club-chat": {
+    title: "Antrenmanlar arasında kulübün",
+    intro: "Kulüplerde artık sohbet ve ekip antrenmanları var; birlikte çalıştığın kişiler konuşup buluşabilir.",
+    points: [
+      "Arkadaşlar › Kulüpler'i aç, bir kulüp seç ve herkese yazmak için Sohbet'e dokun.",
+      "Bir ad, gün ve saatle ekip antrenmanı planla; üyeler Ben de varım'a dokunur.",
+      "Katılan herkes bir saat önce hatırlatma alır.",
+      "Sonra antrenmanını paylaş; antrenman yapmış görünürsün ve birlikte çalıştığın arkadaşların etiketlenir.",
+    ],
+    dyk: "Her kulübün sohbetindeki Bana haber ver ile bildirimlerini kapatabilirsin; bir sohbet saatte en fazla bir bildirim gönderir.",
+  },
   "coach-checkin-trends": {
     title: "Ağırlık, fotoğraf ve gidişatla kontroller",
     intro: "Kontrol formların artık vücut ağırlığı ve fotoğraf isteyebilir ve her cevabın gidişatını gösterir.",

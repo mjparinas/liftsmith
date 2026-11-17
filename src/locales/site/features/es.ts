@@ -340,6 +340,11 @@ export const es: FeaturesText = {
       name: "Retos, clubes y clasificaciones",
       body: "Reta a un amigo, únete a un club o al grupo de tu gimnasio con una tabla semanal y acepta el reto mensual con todos.",
     },
+    "club-chat": {
+      name: "Chat del club y sesiones en grupo",
+      body: "Habla con tu club entre entrenamientos, propón una hora y un sitio para entrenar juntos y mira quién se apunta. Quien se apunte recibe un recordatorio una hora antes, y al publicar tu entrenamiento después apareces como que entrenaste, con los amigos que entrenaron contigo etiquetados.",
+      note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra los mensajes nuevos mientras el chat está abierto.",
+    },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
     "tagline-gym": {
       name: "Lema y gimnasio habitual",

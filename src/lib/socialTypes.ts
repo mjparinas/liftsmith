@@ -259,7 +259,7 @@ export interface ActivityItem {
 }
 
 /** A coach review or a coach's reply to one is "review" (src/server/coachReviews.ts). */
-export type ReportKind = "post" | "comment" | "profile" | "review";
+export type ReportKind = "post" | "comment" | "profile" | "review" | "message";
 export const REPORT_REASONS = [
   "spam",
   "abuse",
@@ -284,6 +284,7 @@ export const REASONS_FOR: Record<ReportKind, readonly ReportReason[]> = {
   comment: ["spam", "abuse", "hate", "sexual", "danger", "other"],
   profile: ["spam", "abuse", "hate", "impersonation", "name", "underage", "cheating", "other"],
   review: ["spam", "abuse", "hate", "sexual", "impersonation", "other"],
+  message: ["spam", "abuse", "hate", "sexual", "danger", "other"],
 };
 /** A report's optional note (only staff read it). */
 export const REPORT_NOTE_MAX = 280;
@@ -317,6 +318,15 @@ export const SOCIAL_LIMITS = {
   /** Challenges one lifter can have running that they started. */
   challengesActive: 10,
   clubName: 40,
+  /** A club chat message. */
+  clubMessage: 500,
+  /** A crew session's name and its place. */
+  crewTitle: 60,
+  crewPlace: 60,
+  /** Crew sessions waiting to happen in one club. */
+  crewUpcoming: 20,
+  /** How far ahead a crew session can be (days). */
+  crewDays: 30,
   /** People in one club, the starter included. */
   clubMembers: 100,
   /** People in an official gym's club (docs/decisions/gyms.md): a whole gym's members, not a crew. */
@@ -403,6 +413,10 @@ export interface ClubSummary {
   members: number;
   /** The reader started it (they run it). */
   mine: boolean;
+  /** Chat messages from others since the reader last opened the club's chat (clubChat.ts). */
+  unread?: number;
+  /** The next crew session the reader said they're in for, if any (ms). */
+  nextSession?: number | null;
 }
 
 /** One club as a member sees it: its members, this week's board from their posts, and its join code. */
@@ -412,6 +426,46 @@ export interface ClubDetail extends ClubSummary {
   rows: BoardRow[];
   /** The crew's goal for the week, everyone's posted workouts added up; null when the starter hasn't set one. */
   goal?: ClubGoal | null;
+  /** Crew sessions from three hours ago to 30 days ahead, soonest first (clubChat.ts). */
+  sessions?: CrewSession[];
+  /** The reader's "notify me" switch for this club's chat. */
+  chatPush?: boolean;
+  /** An official gym's own club (no chat pushes there). */
+  gymClub?: boolean;
+}
+
+/**
+ * A message in a club's chat (Melvin, 2026-11-17: community gap 1). Members only; under 18s don't get the chat. Words go
+ * through the same filter as comments, no links, and anyone can report one (three reports hide it until staff look).
+ */
+export interface ClubMessage {
+  id: string;
+  handle: string;
+  name: string;
+  avatar: string;
+  at: number;
+  body: string;
+  mine: boolean;
+  /** The writer, or the club's starter. */
+  canDelete: boolean;
+}
+
+/**
+ * A crew session (community gap 2): a time and place someone in the club posted, who's in, and who trained. A member
+ * who posts a workout to Friends around its time counts as trained, and the others in it who are their friends are
+ * tagged as training partners.
+ */
+export interface CrewSession {
+  id: string;
+  at: number;
+  title: string;
+  place: string;
+  by: { handle: string; name: string };
+  going: { handle: string; name: string; avatar: string; trained: boolean }[];
+  /** The reader said they're in. */
+  in: boolean;
+  /** The poster or the club's starter can cancel it. */
+  canCancel: boolean;
 }
 
 /** A mutual friend who has gone quiet: no post lately after training regularly before (coach's notes). */

@@ -344,6 +344,11 @@ export const de: FeaturesText = {
       name: "Challenges, Clubs und Bestenlisten",
       body: "Fordere einen Freund heraus, tritt einem Club oder der Crew deines Studios mit Wochenrangliste bei und nimm mit allen die Monats-Challenge an.",
     },
+    "club-chat": {
+      name: "Club-Chat und Crew-Trainings",
+      body: "Schreib mit deinem Club zwischen den Trainings, schlag eine Zeit und einen Ort für ein gemeinsames Training vor und sieh, wer dabei ist. Alle, die dabei sind, bekommen eine Stunde vorher eine Erinnerung, und wer danach sein Training postet, steht als trainiert da, mit den Freunden markiert, die mittrainiert haben.",
+      note: "Ab 18 Jahren. Mitteilungen gibt es auf Android und dem iPhone; die Web-App zeigt neue Nachrichten, solange der Chat offen ist.",
+    },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
     "tagline-gym": {
       name: "Motto und Stammstudio",
