@@ -16,7 +16,7 @@ import { can } from "@/lib/entitlements";
 import { date, list, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
-import { rehabName } from "@/lib/rehab";
+import { phaseRoutineName, rehabProgram, type RehabProgram } from "@/lib/rehab";
 import { encodeRoutine } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
 import { teamCodeFrom } from "@/lib/teams";
@@ -54,7 +54,7 @@ import { backToCoaching, ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen } from "./CoachCheckins";
 import { CoachHome, NoteCard } from "./CoachHome";
 import { ClientPayments } from "./CoachPay";
-import { ClientPain, PerWeekPicker, RehabPrograms } from "./CoachRehab";
+import { ClientPain, PerWeekPicker, PlanPhase, protocolRoutine, RehabPrograms } from "./CoachRehab";
 import { ClientSessions, SessionToday } from "./CoachSessions";
 import { ClientTargets } from "./CoachTargets";
 import { Icon } from "./icons";
@@ -247,13 +247,13 @@ function ClientPlans({
   const [picking, setPicking] = useState(false);
   const [perWeek, setPerWeek] = useState<number | undefined>(physio ? 3 : undefined);
   const [note, setNote] = useState<string | null>(null);
-  const give = async (r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart">) => {
+  const give = async (r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart" | "rehabPlan">, times = perWeek) => {
     try {
       // A rehab program carries its area and the times a week, so the client's app can follow them (2026-11-15).
-      await assignPlan(clientId, r.name, encodeRoutine(r.rehab ? { ...r, perWeek } : r), perWeek);
+      await assignPlan(clientId, r.name, encodeRoutine(r.rehab ? { ...r, perWeek: times } : r), times);
       haptic("success");
       sound.done();
-      track("feature", { name: "trainer", detail: r.rehab ? "rehab" : "assign" });
+      track("feature", { name: "trainer", detail: r.rehabPlan ? `rehabPhase${r.rehabPlan.phase}` : r.rehab ? "rehab" : "assign" });
       setPicking(false);
       setNote(t("trn.assigned"));
       onChange();
@@ -262,6 +262,29 @@ function ClientPlans({
       setNote(trainerError(e));
     }
   };
+  // Rehab protocols (2026-11-17): moving a phase sends the client that phase and takes the old one back.
+  const move = async (p: PlanProgress, phase: number) => {
+    const proto = rehabProgram(p.rehab?.plan.id);
+    if (!proto || !p.rehab) return;
+    try {
+      await assignPlan(
+        clientId,
+        phaseRoutineName(proto, phase),
+        encodeRoutine({ ...protocolRoutine(proto, phase, !!p.rehab.plan.self), perWeek: p.rehab.perWeek }),
+        p.plan.perWeek,
+      );
+      await removePlan(p.plan.id);
+      haptic("success");
+      sound.done();
+      track("feature", { name: "trainer", detail: "rehabPhaseMove" });
+      setNote(t("rhp.coach.sent", { phase }));
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+  };
+  const pickProtocol = (p: RehabProgram, phase: number, self: boolean) => void give(protocolRoutine(p, phase, self));
   const takeBack = async (p: PlanProgress) => {
     try {
       await removePlan(p.plan.id);
@@ -298,6 +321,7 @@ function ClientPlans({
                       : t("trn.perWeekShort", { count: p.plan.perWeek })}
                   </span>
                 )}
+                {p.rehab && <PlanPhase rehab={p.rehab} onMove={(phase) => void move(p, phase)} />}
               </span>
               <button
                 type="button"
@@ -322,7 +346,7 @@ function ClientPlans({
       <Sheet open={picking} onClose={() => setPicking(false)} title={t("trn.assignTitle")}>
         <PerWeekPicker value={perWeek} onChange={setPerWeek} />
         {/* A physio sees the rehab programs first; a trainer sees their own routines first. */}
-        {physio && <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true, rehabPart: p.part })} />}
+        {physio && <RehabPrograms onPick={pickProtocol} />}
         {(physio || routines.length > 0) && <p className="mb-2 text-sm font-semibold">{t("trn.assignOwn")}</p>}
         {routines.length ? (
           <ul className="space-y-2">
@@ -354,7 +378,7 @@ function ClientPlans({
         )}
         {!physio && (
           <div className="mt-4">
-            <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true, rehabPart: p.part })} />
+            <RehabPrograms onPick={pickProtocol} />
           </div>
         )}
       </Sheet>

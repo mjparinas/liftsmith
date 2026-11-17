@@ -377,6 +377,11 @@ export const de: FeaturesText = {
       body: "Weise sanfte Reha-Programme mit Häufigkeit pro Woche zu, sieh, wie oft deine Klienten sie einhalten, und sieh Schmerzen und Verletzungen, die sie teilen, Übung für Übung, mit einer Benachrichtigung bei starken Schmerzen.",
       note: "Liftsmith zeigt, was Klienten eintragen. Es stellt keine Diagnosen und behandelt nichts.",
     },
+    "rehab-phases": {
+      name: "Reha-Protokolle in Phasen, gesteuert vom Schmerz",
+      body: "Jedes Reha-Programm hat drei Phasen, vom Beruhigen bis zur vollen Belastung. Eine einfache Schmerzregel liest die Bewertungen nach jeder Übung und am nächsten Tag, sagt, wann jemand bereit für die nächste Phase ist oder eine zurück sollte, und die Physiotherapie schickt sie mit einem Tipp.",
+      note: "Für Kundinnen und Kunden kostenlos. Liftsmith zeigt, was erfasst wird. Es stellt keine Diagnosen und behandelt nichts.",
+    },
     "coach-nutrition": {
       name: "Ernährungsziele für Kunden",
       body: "Lege für jede Person Kalorien, Protein, Kohlenhydrate und Fett pro Tag fest, auf Wunsch mit anderen Kalorien an Ruhetagen, mit einem Tipp aus den eigenen Werten ausgefüllt. Die Hinweise des Coaches prüfen die Ernährungswoche daran, und du siehst, wie gegessen wird, wenn es geteilt wird.",

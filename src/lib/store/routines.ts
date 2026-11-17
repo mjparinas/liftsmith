@@ -1,5 +1,7 @@
 import { track } from "../analytics";
 import { rehabInjuries } from "../partExtras";
+import { phaseRoutineName, rehabProgram } from "../rehab";
+import { movePhase } from "../rehabPhases";
 import { upsertRoutine } from "../routines";
 import type { Routine } from "../types";
 import type { Ctx } from "./shared";
@@ -21,6 +23,11 @@ export interface RoutinesSlice {
    * (2026-11-15). Returns the injury id it logged, if any.
    */
   saveShared(r: Routine, logInjury?: boolean): string | undefined;
+  /**
+   * Moves a rehab routine to another phase of its protocol (2026-11-17): that phase's exercises and name, counted from
+   * now. The lifter does this only when their physio allowed it and the pain rule says so (rehabPhases.ts).
+   */
+  moveRehabPhase(routineId: string, phase: number): void;
 }
 
 export function routinesSlice(c: Ctx): RoutinesSlice {
@@ -43,11 +50,25 @@ export function routinesSlice(c: Ctx): RoutinesSlice {
     },
 
     saveShared(r, logInjury = true) {
-      get().saveRoutine(r);
+      // A new phase of a protocol already saved replaces it in place, so Today, reminders and the rehab history carry on.
+      const same = r.rehabPlan ? (get().profile.routines ?? []).find((x) => x.rehab && x.rehabPlan?.id === r.rehabPlan!.id) : undefined;
+      const now = Date.now();
+      const plan = r.rehabPlan ? { ...r.rehabPlan, since: now } : undefined;
+      const fresh = plan ? { ...r, rehabPlan: plan } : r;
+      get().saveRoutine(same ? { ...fresh, id: same.id, createdAt: same.createdAt } : fresh);
+      if (same) track("feature", { name: "trainer", detail: "rehabPhaseSaved" });
       const part = r.rehab ? r.rehabPart : undefined;
       if (!part || !logInjury || rehabInjuries(get().events, r).length) return undefined;
       track("feature", { name: "trainer", detail: "rehabInjury" });
       return get().logInjury(part);
+    },
+
+    moveRehabPhase(routineId, phase) {
+      const r = (get().profile.routines ?? []).find((x) => x.id === routineId);
+      const p = rehabProgram(r?.rehabPlan?.id);
+      if (!r || !p) return;
+      get().saveRoutine(movePhase(r, phase, phaseRoutineName(p, phase), Date.now()));
+      track("feature", { name: "trainer", detail: "rehabPhaseSelf" });
     },
 
     deleteRoutine(id) {

@@ -72,7 +72,7 @@ export interface InjuriesSlice {
   setInjuryRule(injuryId: string, rule: Pick<InjuryRuleEvent, "exerciseId" | "action" | "pct" | "ack">): void;
   healInjury(injuryId: string): void;
   /** A 0–10 pain rating, optionally tied to this workout and exercise. */
-  ratePain(injuryId: string, score: number, ctx?: { sessionId?: string; exerciseId?: string }): void;
+  ratePain(injuryId: string, score: number, ctx?: { sessionId?: string; exerciseId?: string; nextDay?: string }): void;
   /** Start a graded return (the lifter accepted the risks). */
   startReturn(injuryId: string): void;
 }

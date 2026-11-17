@@ -33,6 +33,7 @@ import { BLOG_P } from "./blog/p";
 import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
 import { BLOG_REHAB_DONE } from "./blog/rehabDone";
+import { BLOG_REHAB_PHASES } from "./blog/rehabPhases";
 import { BLOG_S } from "./blog/s";
 import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
@@ -249,6 +250,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_AE,
   ...BLOG_INVITES,
   ...BLOG_REHAB_DONE,
+  ...BLOG_REHAB_PHASES,
   ...BLOG_COACH_PROGRAMS,
   ...BLOG_SCREENSHOT_SHARE,
   ...BLOG_FORM_CUES,

@@ -439,6 +439,11 @@ export const pl: FeaturesText = {
       body: "Przydzielaj łagodne programy rehabilitacyjne z liczbą razy w tygodniu, sprawdzaj, jak często pacjenci się ich trzymają, i oglądaj oceny bólu i kontuzje, które zdecydują się udostępnić, ćwiczenie po ćwiczeniu, z powiadomieniem, gdy ból jest wysoki.",
       note: "Liftsmith pokazuje to, co zapisują podopieczni. Niczego nie diagnozuje ani nie leczy.",
     },
+    "rehab-phases": {
+      name: "Protokoły rehabilitacji etapami, prowadzone przez ból",
+      body: "Każdy program rehabilitacji ma trzy etapy, od wyciszenia okolicy do pełnej sprawności. Prosta reguła bólu czyta oceny po każdym ćwiczeniu i następnego dnia, mówi, kiedy podopieczny jest gotowy na następny etap albo powinien wrócić, a fizjoterapeuta wysyła go jednym dotknięciem.",
+      note: "Podopieczni korzystają za darmo. Liftsmith pokazuje, co zapisują podopieczni. Nie diagnozuje ani nie leczy.",
+    },
     "coach-nutrition": {
       name: "Cele żywieniowe dla podopiecznych",
       body: "Ustal każdemu podopiecznemu dzienne kalorie, białko, węglowodany i tłuszcz, jeśli chcesz z osobną liczbą kalorii na dni wolne, uzupełniane jednym dotknięciem z jego własnych danych. Jego notatki trenera sprawdzają z nimi tydzień jedzenia, a ty widzisz, jak się odżywia, gdy to udostępni.",

@@ -860,4 +860,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "W tej samej sekcji jest przełącznik Serie rozgrzewkowe, na dni, gdy wolisz rozgrzać się po swojemu.",
   },
+  "physio-protocols": {
+    title: "Rehabilitacja etapami, prowadzona przez ból",
+    intro:
+      "Każdy program rehabilitacji ma teraz trzy etapy, od wyciszenia okolicy do pełnej sprawności, i prostą regułę bólu, która mówi, kiedy iść dalej.",
+    points: [
+      "Przy przypisywaniu wybierz etap startowy: Wyciszyć i ruszać, Budować siłę albo Powrót do pełnej sprawności.",
+      "Po sześciu sesjach z bólem 2 lub mniej po ostatnich trzech i bez zaostrzenia następnego dnia raport podopiecznego pokazuje gotowość na następny etap.",
+      "Ból 5 lub więcej po dwóch z ostatnich trzech albo zaostrzenie następnego dnia oznacza powrót o etap.",
+      "Wyślij następny etap jednym dotknięciem. Zastępuje poprzedni w telefonie podopiecznego, więc historia trwa dalej.",
+      "Podopieczni oceniają okolicę dzień po rehabilitacji, a to często mówi najwięcej.",
+    ],
+    dyk: "Włącz Pozwól zmieniać etapy samodzielnie, a aplikacja podopiecznego zaproponuje następny etap, gdy wskaże na to reguła. Nadal widzisz każdą zmianę.",
+  },
 };

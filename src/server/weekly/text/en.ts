@@ -881,4 +881,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "The same section has a Warm-up sets switch, for days you'd rather warm up your own way.",
   },
+  "physio-protocols": {
+    title: "Rehab in phases, moved by pain",
+    intro: "Each rehab program now has three phases, from calming the area to full use, and a plain pain rule that says when to move.",
+    points: [
+      "Pick the phase to start in when you assign: Calm and move, Build strength or Back to full use.",
+      "After six sessions with pain 2 or less after the last three, and no flare the next day, the client's report says ready for the next phase.",
+      "Pain 5 or more after two of the last three, or a flare the next day, says go back a phase.",
+      "Send the next phase in one tap. It replaces the old one on their phone, so their history carries on.",
+      "Clients rate how the area feels the day after rehab, which is often what tells you the most.",
+    ],
+    dyk: "Turn on Let them move phases on their own and their app offers the next phase when the rule says so. You still see every move.",
+  },
 };

@@ -439,6 +439,11 @@ export const pt: FeaturesText = {
       body: "Passe programas leves de reabilitação com vezes por semana, veja com que frequência os pacientes os seguem e veja as notas de dor e as lesões que eles escolhem compartilhar, exercício por exercício, com uma notificação quando a dor fica alta.",
       note: "O Liftsmith mostra o que os alunos registram. Ele não diagnostica nem trata nada.",
     },
+    "rehab-phases": {
+      name: "Protocolos de reabilitação em fases, guiados pela dor",
+      body: "Cada programa de reabilitação tem três fases, de acalmar a região ao uso normal. Uma regra da dor simples lê as avaliações depois de cada exercício e no dia seguinte, diz quando o aluno está pronto para a próxima fase ou deve voltar uma, e o fisioterapeuta envia com um toque.",
+      note: "Os alunos seguem de graça. O Liftsmith mostra o que seus alunos registram. Ele não diagnostica nem trata nada.",
+    },
     "coach-nutrition": {
       name: "Metas de nutrição para alunos",
       body: "Defina as calorias, proteínas, carboidratos e gorduras diárias de cada aluno, com um número de calorias para dias de descanso se quiser, preenchido com os números do próprio aluno em um toque. As Notas do coach dele comparam a semana de alimentação com essas metas, e você vê como ele está comendo quando ele compartilha.",

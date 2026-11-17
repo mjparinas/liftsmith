@@ -863,4 +863,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Im selben Bereich gibt es einen Schalter für Aufwärmsätze, für Tage, an denen du dich lieber selbst aufwärmst.",
   },
+  "physio-protocols": {
+    title: "Reha in Phasen, gesteuert vom Schmerz",
+    intro:
+      "Jedes Reha-Programm hat jetzt drei Phasen, vom Beruhigen bis zur vollen Belastung, und eine einfache Schmerzregel, die sagt, wann es weitergeht.",
+    points: [
+      "Wähle beim Zuweisen die Startphase: Beruhigen und bewegen, Kraft aufbauen oder Zurück zur vollen Belastung.",
+      "Nach sechs Einheiten mit Schmerz 2 oder weniger nach den letzten drei und ohne Reaktion am nächsten Tag zeigt der Bericht: bereit für die nächste Phase.",
+      "Schmerz 5 oder mehr nach zwei der letzten drei oder eine Reaktion am nächsten Tag heißt: eine Phase zurück.",
+      "Schick die nächste Phase mit einem Tipp. Sie ersetzt die alte auf dem Handy, der Verlauf bleibt erhalten.",
+      "Deine Kundinnen und Kunden bewerten den Bereich am Tag nach der Reha, und das sagt oft am meisten.",
+    ],
+    dyk: "Mit Phasen selbst wechseln lassen bietet ihre App die nächste Phase an, wenn die Regel es sagt. Du siehst trotzdem jeden Wechsel.",
+  },
 };

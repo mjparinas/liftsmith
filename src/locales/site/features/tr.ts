@@ -439,6 +439,11 @@ export const tr: FeaturesText = {
       body: "Haftalık sıklıkla hafif rehabilitasyon programları ata, danışanların bunlara ne kadar uyduğunu gör; paylaşmayı seçtikleri ağrı puanlarını ve sakatlıkları egzersiz egzersiz izle, ağrı yükseldiğinde bildirim al.",
       note: "Liftsmith danışanların kaydettiklerini gösterir. Hiçbir şeyi teşhis etmez ya da tedavi etmez.",
     },
+    "rehab-phases": {
+      name: "Ağrıyla ilerleyen aşamalı rehabilitasyon protokolleri",
+      body: "Her rehabilitasyon programının bölgeyi sakinleştirmekten tam kullanıma kadar üç aşaması var. Basit bir ağrı kuralı her egzersizden sonraki ve ertesi günkü puanları okur, danışanın sonraki aşamaya ne zaman hazır olduğunu ya da ne zaman geri dönmesi gerektiğini söyler; fizyoterapist de tek dokunuşla gönderir.",
+      note: "Danışanlar ücretsiz kullanır. Liftsmith danışanların kaydettiklerini gösterir. Teşhis koymaz ve tedavi etmez.",
+    },
     "coach-nutrition": {
       name: "Danışanlar için beslenme hedefleri",
       body: "Her danışanın günlük kalori, protein, karbonhidrat ve yağ hedefini belirle, istersen dinlenme günü için ayrı bir kalori sayısıyla; tek dokunuşla onların kendi sayılarından doldurulur. Koç notları haftalık beslenmelerini bunlara göre kontrol eder, paylaştıklarında nasıl beslendiklerini görürsün.",
