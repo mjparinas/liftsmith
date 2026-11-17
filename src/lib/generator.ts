@@ -1,3 +1,4 @@
+import { autoPair } from "./autoSuperset";
 import { blockWeek, weekStart, type BlockWeek } from "./block";
 import { available, englishName, EXERCISE_BY_ID, EXERCISES, LADDER_ONLY } from "./exercises";
 import { t } from "./i18n";
@@ -11,7 +12,7 @@ import { recovery } from "./recovery";
 import { groupedSeconds } from "./superset";
 import { PRIORITY_VOLUME } from "./training";
 import { MUSCLES, type AppEvent, type Exercise, type Gym, type ItemPart, type Muscle, type Profile } from "./types";
-import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
+import { WARMUP_REST, warmupFor, warmupsOn, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
 // recovered and furthest below this week's set target, sized to fit the minutes asked for.
@@ -43,6 +44,8 @@ export interface PlanItem {
   label?: string;
   /** Superset: neighbours with the same group are done back to back (superset.ts). */
   group?: string;
+  /** An automatic superset shortened this exercise's rest; this is its rest on its own, used again if the pair is split (autoSuperset.ts). */
+  soloRest?: number;
 }
 
 export interface SetTarget {
@@ -91,6 +94,12 @@ export interface GenerateInput {
 }
 
 const KEEP = { consistent: 0.75, balanced: 0.5, variable: 0.25 } as const;
+
+/**
+ * With automatic supersets the plan picks exercises for this much more time than asked for, because the pairs
+ * share their rests; then it's trimmed back to the real length (autoSuperset.ts).
+ */
+export const SUPERSET_ROOM = 1.3;
 
 /** Rest between sets: the lifter's time for this exercise, then their compound or isolation default, then by goal. */
 export function restFor(ex: Exercise, goal: Profile["goal"], training?: Profile["training"]): number {
@@ -195,6 +204,27 @@ export function rankMuscles(
     .map((x) => x.m);
 }
 
+/**
+ * Bodyweight compounds that have a loaded version of their own in the library (Reverse lunge and Dumbbell
+ * reverse lunge, Step-up and Barbell step-up): the loaded ids, found by the library's id prefixes.
+ */
+export const LOADED_TWINS: ReadonlyMap<string, readonly string[]> = new Map(
+  EXERCISES.filter((e) => e.load === "bodyweight" && e.compound)
+    .map((e) => [e.id, ["db-", "kb-", "barbell-"].map((p) => p + e.id).filter((id) => EXERCISE_BY_ID.has(id))] as const)
+    .filter(([, twins]) => twins.length > 0),
+);
+
+/**
+ * When a loaded version of a bodyweight move is also on offer, the plan picks the loaded one, so a gym with
+ * dumbbells gets a Dumbbell reverse lunge with weights, not a bodyweight Reverse lunge (Melvin, 2026-11-17).
+ * The bodyweight move stays when the lifter keeps it (a favourite, or swapped into it), and never joins its
+ * loaded version already in the day (`used`).
+ */
+export function preferLoaded(cands: readonly Exercise[], keep: (id: string) => boolean, used: ReadonlySet<string> = new Set()): Exercise[] {
+  const ids = new Set([...cands.map((c) => c.id), ...used]);
+  return cands.filter((c) => keep(c.id) || !(LOADED_TWINS.get(c.id) ?? []).some((id) => ids.has(id)));
+}
+
 const BIG_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"]);
 
 /**
@@ -271,6 +301,10 @@ export function generate({
   // How likely each exercise is to be picked for this lifter: popularity, likes and swaps (pickWeights.ts).
   const prefs = pickWeights(events, profile, now, cache);
   const budget = minutes * 60;
+  // Automatic supersets (Settings › Training › Adaptive workouts): pairs share their rest, so more fits.
+  const pairs = !!training?.supersets;
+  const warmups = warmupsOn(profile);
+  const room = pairs ? Math.round(budget * SUPERSET_ROOM) : budget;
 
   // Muscles ranked by how ready they are and how much of this week's target is left.
   // A split day trains its muscles unless they're actually fatigued (40%), not only when fresh.
@@ -282,7 +316,11 @@ export function generate({
   const warmed = new Set<Muscle>();
 
   const pick = (m: Muscle, compoundFirst: boolean): Exercise | undefined => {
-    const cands = pool.filter((e) => e.primary.includes(m) && !used.has(e.id) && e.primary.every((p) => rec[p] >= 40));
+    const cands = preferLoaded(
+      pool.filter((e) => e.primary.includes(m) && !used.has(e.id) && e.primary.every((p) => rec[p] >= 40)),
+      (id) => favs.has(id) || prefs.taste(id).into > 0,
+      used,
+    );
     if (!cands.length) return undefined;
     const prev = (recent.get(m) ?? []).map((id) => cands.find((c) => c.id === id)).find(Boolean);
     // A favourite that fits beats keeping last time's exercise, unless last time's was a favourite too.
@@ -304,7 +342,7 @@ export function generate({
     const chosen = training?.exercises?.[ex.id]?.sets ?? training?.sets;
     const baseSets = chosen ?? (ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3);
     const sets = week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets;
-    const warmup = warmupFor(ex, t.target.weight, gym, warmed);
+    const warmup = warmups ? warmupFor(ex, t.target.weight, gym, warmed) : [];
     const item: PlanItem = {
       exerciseId: ex.id,
       sets,
@@ -315,7 +353,7 @@ export function generate({
       warmup: warmup.length ? warmup : undefined,
     };
     const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
-    if (total + cost > budget) return;
+    if (total + cost > room) return;
     total += cost;
     for (const p of ex.primary) warmed.add(p);
     used.add(ex.id);
@@ -325,7 +363,7 @@ export function generate({
   // Round one: one exercise per ranked muscle, compounds favoured. Round two: second exercises.
   for (const round of [true, false]) {
     for (const m of ranked) {
-      if (budget - total < 240) break;
+      if (room - total < 240) break;
       const covered = items.some((i) => EXERCISE_BY_ID.get(i.exerciseId)!.primary.includes(m));
       if (round && covered) continue;
       tryAdd(m, round);
@@ -334,19 +372,44 @@ export function generate({
 
   // Leftover time: an extra set on the earliest exercises, priority muscles first.
   const fixed = (id: string) => (training?.exercises?.[id]?.sets ?? training?.sets) !== undefined;
-  addLeftoverSets(items, { prio, fixed, deload: week.deload, call, budget, total });
+  // With supersets, extra sets wait until the pairs are made and the plan is back to its real length.
+  if (!pairs) addLeftoverSets(items, { prio, fixed, deload: week.deload, call, budget, total });
 
   items.sort((a, b) => order(EXERCISE_BY_ID.get(a.exerciseId)!, EXERCISE_BY_ID.get(b.exerciseId)!));
   applyCall(items, call, challenge && call === "push" && !week.deload, gym);
   // Sorting and the day's call change which lift comes first and its weight, so the warm-ups are
   // worked out again in the final order. If that tips the plan over the time asked for, extra
   // sets come off the end first.
-  const final = trimToFit(
-    withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!),
-    budget,
-  );
+  const warm = warmups ? withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!) : items;
+  let final: PlanItem[];
+  if (pairs) {
+    final = fitPaired(warm, budget, {
+      goal: profile.goal,
+      bigAlone: training?.bigAlone,
+      ownRest: (id) => !!training?.exercises?.[id]?.rest,
+    });
+    addLeftoverSets(final, { prio, fixed, deload: week.deload, call, budget, total: planSeconds(final) });
+    final = trimToFit(final, budget);
+  } else final = trimToFit(warm, budget);
   const est = planSeconds(final);
   return { gymId: gym.id, minutes, estMinutes: Math.round(est / 60), week, call, challenge: final.some((i) => i.challenge), items: final };
+}
+
+/**
+ * Automatic supersets, sized to the time asked for: pairs the exercises, then while the plan runs more than 5%
+ * over (or trimming sets can't bring it down to the time), drops the last exercise left on its own (or the last one, once everything is paired),
+ * re-pairing each time, and finally trims sets the usual way.
+ */
+export function fitPaired(items: readonly PlanItem[], budget: number, opts: Parameters<typeof autoPair>[1]): PlanItem[] {
+  let kept = [...items];
+  let paired = autoPair(kept, opts);
+  // A small overrun comes off as sets; a bigger one costs an exercise, so the rest keep three or more sets.
+  while (kept.length > 2 && (planSeconds(paired) > budget * 1.05 || planSeconds(trimToFit(paired, budget)) > budget)) {
+    const alone = paired.findLast((i) => !i.group) ?? paired.at(-1)!;
+    kept = kept.filter((i) => i.exerciseId !== alone.exerciseId);
+    paired = autoPair(kept, opts);
+  }
+  return trimToFit(paired, budget);
 }
 
 /** Today's target for an exercise after any injury: the usual one, or lighter when the lifter chose that. */
@@ -416,7 +479,12 @@ export function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym
       item.sets = Math.max(2, item.sets - 1);
       if (item.injuryPct) continue; // already lighter for the injury
       if (ex.load === "bodyweight" || TIMED.has(ex.id))
-        item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: t("note.easyReps") };
+        item.target = {
+          ...item.target,
+          reps: Math.max(3, item.target.reps - 2),
+          rir: item.target.rir + 1,
+          note: t(TIMED.has(ex.id) ? "note.timedEasy" : "note.easyReps"),
+        };
       else
         item.target = {
           ...item.target,

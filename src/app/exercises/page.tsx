@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
+import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
 import { pageMeta } from "@/lib/pageMeta";
@@ -14,6 +15,9 @@ export const metadata: Metadata = pageMeta({
   description: `How to do ${EXERCISES.length} strength exercises, from barbell lifts to bodyweight moves: setup, form cues, muscles worked, equipment, alternatives and a 3D demo for each.`,
   path: "/exercises/",
 });
+
+/** The lifts with a full written guide, linked first: the pages people search most. */
+const GUIDED = EXERCISES.filter((e) => e.id in EXERCISE_GUIDES);
 
 export default function ExercisesIndex() {
   const jsonLd = {
@@ -54,6 +58,22 @@ export default function ExercisesIndex() {
         body={`${BRAND.name} picks the exercises, sets, reps and weights for you from what your gym has and what's recovered.`}
         button="Get today's workout"
       />
+      <section className="mt-8">
+        <h2 className="text-xl font-bold">Full guides for the most popular lifts</h2>
+        <p className="mt-1 text-sm text-muted">Form, common mistakes, sets and reps, starting weights and alternatives.</p>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {GUIDED.map((e) => (
+            <li key={e.id}>
+              <Link
+                href={`/exercises/${e.id}/`}
+                className="press inline-flex min-h-11 items-center rounded-full border border-accent/50 bg-accent/10 px-4 text-sm font-medium"
+              >
+                {e.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
       {MUSCLES.filter((m) => exercisesFor(m).length).map((m) => (
         <section key={m} className="mt-8">
           <h2 className="text-xl font-bold">

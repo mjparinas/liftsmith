@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { ArticleView, relatedTo } from "@/components/site/ArticleView";
@@ -80,6 +80,26 @@ describe("SEO pages", () => {
       expectCtas();
       cleanup();
     }
+  });
+
+  it("answers the common questions on exercise and alternatives pages, with FAQ data", async () => {
+    const faqData = (c: HTMLElement) =>
+      [...c.querySelectorAll('script[type="application/ld+json"]')].map((x) => JSON.parse(x.textContent ?? "{}") as { "@type"?: string });
+    const { container: plain } = render(await ExercisePage({ params: Promise.resolve({ slug: "towel-row" }) }));
+    expect(screen.getByText("What muscles does the doorway towel row work?")).toBeInTheDocument();
+    expect(faqData(plain).some((d) => d["@type"] === "FAQPage")).toBe(true);
+    cleanup();
+    const { container: alts } = render(await AlternativesPage({ params: Promise.resolve({ slug: "db-row" }) }));
+    expect(screen.getByText("What is the best alternative to the one-arm dumbbell row?")).toBeInTheDocument();
+    expect(faqData(alts).some((d) => d["@type"] === "FAQPage")).toBe(true);
+    cleanup();
+  });
+
+  it("shows the plates per side chart, with the numbers people search", () => {
+    render(<PlatePage />);
+    expect(within(screen.getByRole("region", { name: "Plates per side chart" })).getByRole("table")).toBeInTheDocument();
+    expect(screen.getByText("How much is 2 plates and a 25 on each side?")).toBeInTheDocument();
+    cleanup();
   });
 
   it("renders the indexes and the calculators", () => {

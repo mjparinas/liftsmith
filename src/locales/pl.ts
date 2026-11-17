@@ -25,6 +25,7 @@ import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as chk from "./text/chk";
+import * as cmty from "./text/cmty";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -32,6 +33,7 @@ import * as count from "./text/count";
 import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
+import * as crew from "./text/crew";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
@@ -103,6 +105,7 @@ import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
 import * as rev from "./text/rev";
+import * as rhp from "./text/rhp";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -113,6 +116,7 @@ import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
 import * as social from "./text/social";
+import * as ssn from "./text/ssn";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -156,6 +160,7 @@ export const pl: Partial<Record<MessageKey, Message>> = {
   ...bmi.pl,
   ...body.pl,
   ...buddy.pl,
+  ...crew.pl,
   ...buy.pl,
   ...cal.pl,
   ...calc.pl,
@@ -165,6 +170,7 @@ export const pl: Partial<Record<MessageKey, Message>> = {
   ...cause.pl,
   ...chk.pl,
   ...coach.pl,
+  ...cmty.pl,
   ...conn.pl,
   ...cos.pl,
   ...count.pl,
@@ -239,10 +245,12 @@ export const pl: Partial<Record<MessageKey, Message>> = {
   ...cpg.pl,
   ...rev.pl,
   ...rmd.pl,
+  ...rhp.pl,
   ...rt.pl,
   ...save.pl,
   ...sband.pl,
   ...sea.pl,
+  ...ssn.pl,
   ...settings.pl,
   ...setup.pl,
   ...share.pl,

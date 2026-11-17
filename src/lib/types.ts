@@ -396,6 +396,8 @@ export interface TrainingPrefs {
   nowPlaying?: boolean;
   /** Start opens the day's warm-up stretches first (Stretch.tsx; skippable). Missing means off. */
   warmFirst?: boolean;
+  /** Seconds of get-ready countdown before each stretch and each side (0 is off). Missing means 5 (readySeconds in stretches.ts). */
+  stretchReady?: number;
   /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
   coolDown?: boolean;
   /** Liked exercises: the adaptive planner picks them much more often (pickWeights.ts). */
@@ -408,6 +410,12 @@ export interface TrainingPrefs {
   minutes?: number;
   /** 1 Monday (default) or 0 Sunday: streaks, quests and weekly stats. */
   weekStart?: 0 | 1;
+  /** Adaptive workouts pair exercises that don't share muscles into supersets, with shorter rest (autoSuperset.ts). Missing means off. */
+  supersets?: boolean;
+  /** With supersets on: heavy barbell squats and hinges (every barbell compound on a strength goal) stay on their own. Missing means on. */
+  bigAlone?: boolean;
+  /** Lighter warm-up sets before the first heavy sets for each muscle (warmup.ts). Missing means on. */
+  warmups?: boolean;
 }
 
 export type PlanSource =
@@ -420,6 +428,20 @@ export interface RoutineItem {
   sets: number;
   /** Superset: neighbours with the same group are done back to back. */
   group?: string;
+}
+
+/** The built-in rehab protocols, one per area (rehab.ts). */
+export type RehabProtocolId = "knee" | "lowBack" | "shoulder" | "ankle" | "hip" | "neck";
+
+/** Where a rehab routine is in its protocol (2026-11-17). */
+export interface RehabPlan {
+  id: RehabProtocolId;
+  /** 1 to 3. */
+  phase: number;
+  /** The physio let the lifter move up or back a phase on their own when the pain rule says so. */
+  self?: true;
+  /** When this phase started on this phone (saved or moved), so only its own sessions count. */
+  since?: number;
 }
 
 export interface Routine {
@@ -441,6 +463,11 @@ export interface Routine {
   rehabPart?: BodyPart;
   /** Rehab: how many times a week the physio asked for (1 to 7). Missing: about every other day, as before. */
   perWeek?: number;
+  /**
+   * Rehab: the phased protocol it follows and the phase it's in (2026-11-17, rehab protocols; rehabPhases.ts). Missing on
+   * a routine that isn't one of the built-in protocols.
+   */
+  rehabPlan?: RehabPlan;
   /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.
@@ -489,6 +516,8 @@ export interface DelightPrefs {
   buddies?: { id: string; name: string }[];
   /** Moments already shown on Today, so each appears once. */
   seenMoments?: string[];
+  /** Training seasons on Today, Awards and the Locker (seasons.ts). On unless turned off; points still count while off. */
+  seasons?: boolean;
 }
 
 // --- Events: everything that happens is appended, and every stat is derived from them. ---
@@ -903,6 +932,8 @@ export interface PainEvent extends EventBase {
   score: number;
   sessionId?: string;
   exerciseId?: string;
+  /** A rating the day after a rehab workout, for that workout's session (2026-11-17, rehab protocols). */
+  nextDay?: string;
 }
 
 /** The lifter chose a graded return (after reading the risks): skipped exercises come back lighter, step by step. */

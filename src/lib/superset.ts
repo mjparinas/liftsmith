@@ -1,13 +1,20 @@
 import type { PlanItem } from "./generator";
 import { t } from "./i18n";
 
+/** Undoes an automatic superset's shorter rest on an exercise that's no longer in one (autoSuperset.ts). */
+export function restoreSolo<T extends { group?: string; restSec?: number; soloRest?: number }>(item: T): T {
+  if (item.group || item.soloRest === undefined) return item;
+  const { soloRest, ...rest } = item;
+  return { ...rest, restSec: soloRest } as T;
+}
+
 // Supersets: two or more exercises done back to back, one set of each, then the rest.
 // Exercises in a superset sit next to each other in the plan and share `group`.
 
 /** Seconds to move from one exercise to the next inside a round. */
 export const SWITCH_REST = 15;
 
-type Linkable = { exerciseId: string; group?: string };
+type Linkable = { exerciseId: string; group?: string; restSec?: number; soloRest?: number };
 type Item = Pick<PlanItem, "exerciseId" | "sets" | "restSec"> & Linkable;
 
 /** First and last index (inclusive) of the superset that item i is in, or [i, i] on its own. */
@@ -35,7 +42,8 @@ export function withLinks<T extends Linkable>(items: readonly T[], links: readon
     const joinsNext = i < items.length - 1 && !!links[i];
     if (!joinsPrev) id = joinsNext ? `ss-${it.exerciseId}` : undefined;
     const { group: _old, ...rest } = it; // eslint-disable-line @typescript-eslint/no-unused-vars
-    out.push((id ? { ...rest, group: id } : rest) as T);
+    // An exercise split out of an automatic superset gets its own rest back (autoSuperset.ts).
+    out.push((id ? { ...rest, group: id } : restoreSolo(rest)) as T);
   });
   return out;
 }

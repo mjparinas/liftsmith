@@ -116,6 +116,10 @@ export const pl: FeaturesText = {
       body: "Wybiera ćwiczenia, które da się zrobić na twojej siłowni i na które twoje mięśnie są gotowe, a potem ustala każdy ciężar i liczbę powtórzeń na podstawie ostatnich treningów.",
       proPart: "W wersji darmowej masz jeden adaptacyjny trening tygodniowo obok darmowego programu; Pro planuje każdy dzień.",
     },
+    "auto-supersets": {
+      name: "Automatyczne superserie",
+      body: "Włącz superserie, a plan adaptacyjny połączy ćwiczenia, które nie angażują tych samych mięśni, jak wyciskanie i wiosłowanie, z krótszą przerwą po każdej rundzie, więc w twoim czasie zmieści się więcej. Ciężkie przysiady i martwe ciągi zostają osobno, a serie rozgrzewkowe możesz też wyłączyć.",
+    },
     "pick-weights": {
       name: "Uczy się ćwiczeń, które lubisz",
       body: "Popularne ćwiczenia wybiera najczęściej. Oznacz ćwiczenie gwiazdką, a będzie pojawiać się dużo częściej; zamień je na inne, a pojawi się rzadziej, i to stopniowo słabnie przez kilka miesięcy.",
@@ -219,7 +223,7 @@ export const pl: FeaturesText = {
     },
     stretching: {
       name: "Rozciąganie",
-      body: "48 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień.",
+      body: "48 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień. Kilka sekund na przyjęcie pozycji przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie.",
     },
     "workout-parts": {
       name: "Treningi z częściami",
@@ -369,6 +373,10 @@ export const pl: FeaturesText = {
       name: "Konta personelu siłowni",
       body: "Właściciel oficjalnej siłowni zaprasza menedżerów i obsługę recepcji jednorazowym linkiem. Każdy korzysta z własnego konta, żeby dbać o aktualność strony siłowni, ogłoszeń i zgłoszeń usterek.",
     },
+    "gym-classes": {
+      name: "Grafiki zajęć na stronach siłowni",
+      body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
+    },
     "gym-starter": {
       name: "Programy startowe siłowni",
       body: "Oficjalne siłownie polecają nowym członkom jeden program na swojej stronie w aplikacji i w sieci, a ćwiczący zapisują go jednym dotknięciem. Liftsmith wpisuje każdemu jego własne ciężary.",
@@ -393,6 +401,11 @@ export const pl: FeaturesText = {
     challenges: {
       name: "Wyzwania, kluby i rankingi",
       body: "Rzuć wyzwanie znajomemu, dołącz do klubu albo ekipy z siłowni z cotygodniowym rankingiem i podejmij miesięczne wyzwanie razem ze wszystkimi.",
+    },
+    "club-chat": {
+      name: "Czat klubu i treningi ekipy",
+      body: "Rozmawiaj z klubem między treningami, podaj godzinę i miejsce na wspólny trening i zobacz, kto idzie. Każdy, kto idzie, dostaje przypomnienie godzinę wcześniej, a gdy potem opublikujesz trening, pojawisz się jako po treningu, z oznaczonymi znajomymi, z którymi ćwiczysz.",
+      note: "Dla osób, które mają co najmniej 18 lat. Powiadomienia działają na Androidzie i iPhonie; aplikacja webowa pokazuje nowe wiadomości, gdy czat jest otwarty.",
     },
     profiles: {
       name: "Publiczne profile",
@@ -435,6 +448,11 @@ export const pl: FeaturesText = {
       body: "Przydzielaj łagodne programy rehabilitacyjne z liczbą razy w tygodniu, sprawdzaj, jak często pacjenci się ich trzymają, i oglądaj oceny bólu i kontuzje, które zdecydują się udostępnić, ćwiczenie po ćwiczeniu, z powiadomieniem, gdy ból jest wysoki.",
       note: "Liftsmith pokazuje to, co zapisują podopieczni. Niczego nie diagnozuje ani nie leczy.",
     },
+    "rehab-phases": {
+      name: "Protokoły rehabilitacji etapami, prowadzone przez ból",
+      body: "Każdy program rehabilitacji ma trzy etapy, od wyciszenia okolicy do pełnej sprawności. Prosta reguła bólu czyta oceny po każdym ćwiczeniu i następnego dnia, mówi, kiedy podopieczny jest gotowy na następny etap albo powinien wrócić, a fizjoterapeuta wysyła go jednym dotknięciem.",
+      note: "Podopieczni korzystają za darmo. Liftsmith pokazuje, co zapisują podopieczni. Nie diagnozuje ani nie leczy.",
+    },
     "coach-nutrition": {
       name: "Cele żywieniowe dla podopiecznych",
       body: "Ustal każdemu podopiecznemu dzienne kalorie, białko, węglowodany i tłuszcz, jeśli chcesz z osobną liczbą kalorii na dni wolne, uzupełniane jednym dotknięciem z jego własnych danych. Jego notatki trenera sprawdzają z nimi tydzień jedzenia, a ty widzisz, jak się odżywia, gdy to udostępni.",
@@ -446,6 +464,10 @@ export const pl: FeaturesText = {
     "coach-checkins": {
       name: "Formularze kontrolne i ankiety",
       body: "Wysyłaj podopiecznym cotygodniową ankietę kontrolną, ankietę wstępną albo własny formularz, raz lub co tydzień. Odpowiadają kilkoma dotknięciami, a niski wynik albo spóźniona odpowiedź trafia na górę ich raportu.",
+    },
+    "coach-checkin-trends": {
+      name: "Kontrole postępów z wagą, zdjęciami i trendami",
+      body: "Dodaj do dowolnego formularza pytania o masę ciała i zdjęcia, i wysyłaj go co tydzień, co 2 lub co 4 tygodnie. Waga wypełnia się z ostatniego ważenia klienta, zdjęcia widzisz tylko Ty, a trend każdej odpowiedzi widać w raporcie. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
     },
     "coach-roles": {
       name: "Dla trenerów personalnych i trenerów",
@@ -501,6 +523,12 @@ export const pl: FeaturesText = {
     awards: {
       name: "Osiągnięcia, poziomy i passy",
       body: "Odznaki w stopniach, 50 poziomów z nagrodami, cotygodniowe zadania, zamrożenia passy i uczciwe ligi.",
+    },
+    seasons: {
+      name: "Sezony treningowe",
+      body: "Dziesięciotygodniowe sezony ze ścieżką 20 poziomów, którą pokonujesz, trenując w stronę własnego celu tygodniowego: dwa dni w tygodniu awansują tak szybko jak pięć, a dodatkowe dni nic nie dają. Poziomy dają odznaki, awatar, kolor akcentu i motyw z ikoną aplikacji dostępne tylko w tym sezonie, które zostają Twoje na zawsze. Wyzwania sezonu, rzadki łup za nowe rekordy, gwiazdki prestiżu, tydzień nadrabiania po potknięciu, finał z podwójnymi punktami i podsumowanie do udostępnienia.",
+      proPart: "Wszystkie poziomy i nagrody są darmowe; Pro dodaje nagrodę bonusową na trzech poziomach.",
+      note: "Ikony sezonu są na Androidzie i iPhonie; w przeglądarce jest motyw. Sezony można wyłączyć w Ustawieniach.",
     },
     locker: {
       name: "Motywy, akcenty i ikony aplikacji",
@@ -565,6 +593,10 @@ export const pl: FeaturesText = {
     "strength-standards": {
       name: "Normy siłowe od prawdziwych ćwiczących",
       body: "Strona pokazuje, ile naprawdę przysiadają, wyciskają na ławce, ciągną w martwym ciągu i wyciskają nad głowę ćwiczący, według płci i masy ciała, liczone codziennie z osób, które biorą w tym udział. Pokazujemy tylko grupy liczące co najmniej 30 osób, jako percentyle, nigdy niczyje własne wyniki. Jeden przełącznik w Ustawienia › Twoje dane i prywatność decyduje, czy jesteś liczony; osoby poniżej 18 lat nigdy nie są.",
+    },
+    community: {
+      name: "Społeczność: pomysły, błędy i plan rozwoju",
+      body: "Zaproponuj, co Liftsmith ma robić dalej, głosuj na pomysły, które chcesz, zgłaszaj błędy ze zrzutem ekranu widocznym tylko dla zespołu, komentuj i oznaczaj innych przez @. Przy każdym widać, na jakim jest etapie, od analizy po wydanie, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie. Plan rozwoju i lista zmian są też na stronie.",
     },
     languages: {
       name: "Dziesięć języków",

@@ -36,6 +36,7 @@ export const ko: SiteText = {
       coaches: "코치용",
       pricing: "요금제",
       whatsNew: "새로운 기능",
+      community: "아이디어와 로드맵",
       exercises: "운동 라이브러리",
       muscles: "근육별 운동",
       programs: "운동 프로그램",
@@ -244,6 +245,13 @@ export const ko: SiteText = {
           body: "동기화와 백업이 필요할 때만 Google이나 Apple로 로그인하세요.",
         },
       ],
+    },
+    learn: {
+      eyebrow: "무료 가이드",
+      title: "운동을 익히고, 계획은 앱에 맡기세요",
+      body: "단계별 자세, 각 운동이 쓰는 근육과 대체 운동, 그리고 무료 계산기.",
+      exercises: "인기 운동",
+      tools: "무료 도구",
     },
     juice: {
       eyebrow: "재미를 더해서",

@@ -54,7 +54,10 @@ export interface LiftDemoProps {
   still?: boolean;
   /** Pause without unmounting (for example while a sheet covers it). */
   paused?: boolean;
-  /** Show the body, view, overlay and tempo controls and the muscle legend. */
+  /**
+   * Show the muscles worked under the figure, then the body, view and overlay toggles. No tempo or pause controls:
+   * the figure always plays at its own pace (Melvin, 2026-11-17: "too many controls").
+   */
   controls?: boolean;
   highlight?: Partial<Record<Muscle, number>>;
   /** Live heart rate: the figure's heart beats at this rate. Leave out when no monitor is connected. */
@@ -119,8 +122,6 @@ export const DEMO_WORDS = {
   muscles: "Target muscles",
   barPath: "Bar path",
   handPath: "Hand path",
-  tempo: "Tempo",
-  pause: "Pause",
   play: "Play",
   works: "Works",
 };
@@ -187,7 +188,6 @@ export function LiftDemoCore({
   const [skeleton, setSkeleton] = useState(false);
   const [muscles, setMuscles] = useState(true);
   const [path, setPath] = useState(false);
-  const [speed, setSpeed] = useState(1);
   const [playPick, setPlayPick] = useState<boolean | null>(null);
   const [dancing, setDancing] = useState(false);
   const taps = useRef<number[]>([]);
@@ -215,7 +215,7 @@ export function LiftDemoCore({
     skeleton,
     muscles,
     path,
-    speed,
+    speed: 1,
     playing: playing && !paused && (dancing || !still),
     reps: dancing ? 1 : reps,
     highlight,
@@ -292,7 +292,6 @@ export function LiftDemoCore({
     skeleton,
     muscles,
     path,
-    speed,
     playing,
     paused,
     still,
@@ -328,7 +327,8 @@ export function LiftDemoCore({
             role="img"
             aria-label={alt}
             className="absolute inset-0 block h-full w-full"
-            style={{ touchAction: controls ? "pan-y" : "auto", cursor: controls ? "grab" : onClick ? "pointer" : "default" }}
+            // Every figure but a bare backdrop turns with a sideways drag; pan-y leaves a vertical swipe to the page.
+            style={{ touchAction: bare ? "auto" : "pan-y pinch-zoom", cursor: bare ? (onClick ? "pointer" : "default") : "grab" }}
             onClick={tap}
           />
         )}
@@ -351,6 +351,24 @@ export function LiftDemoCore({
       </div>
       {controls && (
         <div className="mt-3 space-y-3">
+          {ex && (
+            <p className="flex flex-wrap items-center gap-1.5 text-sm">
+              <span className="font-mono text-[0.6875rem] uppercase tracking-wider text-muted">{w.works}</span>
+              {ex.primary.map((m) => (
+                <span
+                  key={m}
+                  className="rounded-full border border-[#ff5b3a]/60 bg-[#ff5b3a]/10 px-2.5 py-0.5 text-[0.8125rem] text-[#ffb3a3]"
+                >
+                  {labels[m] ?? m}
+                </span>
+              ))}
+              {ex.secondary.map((m) => (
+                <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[0.8125rem] text-muted">
+                  {labels[m] ?? m}
+                </span>
+              ))}
+            </p>
+          )}
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label={w.controls}>
             {bodyToggle && (
               <Seg
@@ -375,42 +393,17 @@ export function LiftDemoCore({
             <Toggle on={path} onClick={() => setPath((v) => !v)} dot="#d4e0ea">
               {ex && ex.load === "barbell" ? w.barPath : w.handPath}
             </Toggle>
-            <Seg
-              label={w.tempo}
-              value={String(speed)}
-              options={[
-                ["0.5", "0.5×"],
-                ["1", "1×"],
-              ]}
-              onPick={(v) => setSpeed(Number(v))}
-            />
-            <button
-              type="button"
-              onClick={() => setPlayPick(!playing)}
-              aria-pressed={playing}
-              className="press min-h-11 rounded-xl border border-line bg-surface px-3 text-sm"
-            >
-              {playing ? w.pause : w.play}
-            </button>
+            {/* Only where the 2D figure waits to be started (the public site); once it plays there's no pause. */}
+            {!playing && !still && (
+              <button
+                type="button"
+                onClick={() => setPlayPick(true)}
+                className="press min-h-11 rounded-xl border border-line bg-surface px-3 text-sm"
+              >
+                {w.play}
+              </button>
+            )}
           </div>
-          {ex && (
-            <p className="flex flex-wrap items-center gap-1.5 text-sm">
-              <span className="font-mono text-[0.6875rem] uppercase tracking-wider text-muted">{w.works}</span>
-              {ex.primary.map((m) => (
-                <span
-                  key={m}
-                  className="rounded-full border border-[#ff5b3a]/60 bg-[#ff5b3a]/10 px-2.5 py-0.5 text-[0.8125rem] text-[#ffb3a3]"
-                >
-                  {labels[m] ?? m}
-                </span>
-              ))}
-              {ex.secondary.map((m) => (
-                <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[0.8125rem] text-muted">
-                  {labels[m] ?? m}
-                </span>
-              ))}
-            </p>
-          )}
         </div>
       )}
     </div>

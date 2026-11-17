@@ -851,4 +851,83 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "¿Prefieres no verlos en el descanso? Desactiva Revisar la técnica al descansar en Ajustes › Entrenamiento.",
   },
+  "auto-supersets": {
+    title: "Superseries, hechas para ti",
+    intro: "Tus entrenamientos adaptativos ahora pueden juntar ejercicios en superseries por ti, con un solo interruptor.",
+    points: [
+      "Activa Agrupar ejercicios en superseries en Ajustes › Entrenamiento › Entrenamientos adaptativos.",
+      "Los ejercicios que no comparten músculos van seguidos, como un press y un remo, así cada uno descansa mientras haces el otro.",
+      "El descanso tras cada ronda es más corto, y el tiempo ahorrado mete más entrenamiento en la duración que elijas.",
+      "Las sentadillas y los pesos muertos pesados van solos, y puedes separar cualquier pareja en Hoy.",
+    ],
+    dyk: "En la misma sección hay un interruptor de Series de calentamiento, para los días en que prefieras calentar a tu manera.",
+  },
+  "club-chat": {
+    title: "Tu club, entre entrenamientos",
+    intro: "Los clubes ahora tienen chat y sesiones en grupo, para que la gente con la que entrenas pueda hablar y quedar.",
+    points: [
+      "Abre Amigos › Clubes, elige un club y toca Chat para escribir a todos.",
+      "Propón una sesión en grupo con un nombre, un día y una hora, y los miembros tocan Me apunto.",
+      "Quien se apunte recibe un recordatorio una hora antes.",
+      "Publica tu entrenamiento después y aparecerás como que entrenaste, con los amigos que entrenaron contigo etiquetados.",
+    ],
+    dyk: "Avisarme, en el chat de cada club, apaga sus notificaciones, y un chat envía como mucho una por hora.",
+  },
+  community: {
+    title: "Vota lo próximo que construimos",
+    intro: "Liftsmith ya tiene comunidad: sugiere ideas, vota las que quieres e informa de errores.",
+    points: [
+      "Abre Ajustes › Ayuda › Comunidad.",
+      "Toca la flecha junto a una idea para votarla. Las más pedidas suben arriba.",
+      "Informa de un error con una captura que solo ves tú y el equipo.",
+      "Cada publicación muestra en qué punto está, de En revisión a Publicada, y te avisamos cuando sale una idea que votaste.",
+    ],
+    dyk: "La hoja de ruta y el registro de cambios también están en la web, en getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Revisiones con peso, fotos y tendencias",
+    intro: "Tus formularios de revisión ya pueden pedir el peso corporal y fotos, y mostrar cómo evoluciona cada respuesta.",
+    points: [
+      "Añade una pregunta de Peso corporal: se rellena con el último pesaje del cliente y guarda el nuevo en su registro.",
+      "Añade hasta tres preguntas de Foto, como de frente y de perfil. Solo las ves tú.",
+      "Envía un formulario cada semana, cada 2 semanas o cada 4 semanas.",
+      "El informe de cada cliente muestra la tendencia de cada puntuación, número y peso, y avisa cuando baja una puntuación.",
+    ],
+    dyk: "Empieza con la nueva plantilla Revisión de progreso en Entrenador › Seguimientos. A los menores de 18 nunca se les piden fotos.",
+  },
+  seasons: {
+    title: "Las temporadas de entrenamiento empiezan el lunes",
+    intro: "La temporada 1, Brasa, empieza el lunes: diez semanas, un recorrido de 20 niveles y premios que solo se ganan este invierno.",
+    points: [
+      "Subes cumpliendo tu propio objetivo semanal. Los días de más no suman, así que dos días a la semana avanzan igual que cinco.",
+      "Los niveles dan insignias, un avatar, un color de acento y el tema Brasa con su icono, solo de esta temporada y tuyos para siempre.",
+      "Si fallas una semana, la siguiente en que cumplas da el bonus doble. La última semana cuenta doble.",
+      "Cada nueva marca tiene 1 posibilidad entre 6 de soltar los discos raros de la temporada.",
+    ],
+    dyk: "¿Prefieres no ver las temporadas? Desactiva Temporadas de entrenamiento en Ajustes › Aspecto. Tu entrenamiento sigue contando.",
+  },
+  "gym-classes": {
+    title: "Publica el horario de clases en la página de tu gimnasio",
+    intro: "Quienes entrenan contigo ven las clases de la semana en la página de tu gimnasio, en la app y en la web.",
+    points: [
+      "Añade cada clase una vez: tipo, días, hora de inicio y duración. Casi nunca hay que escribir.",
+      "Añade el instructor, la sala y una nota breve, como cómo reservar.",
+      "¿Cierras un festivo? Toca la fecha y la clase aparece como suspendida ese día.",
+      "Se añade la próxima clase al calendario con un toque.",
+    ],
+    dyk: "Las horas son las de tu gimnasio, así que las 18:00 son las 18:00 para todos. Las reservas siguen contigo.",
+  },
+  "physio-protocols": {
+    title: "Rehabilitación por fases, guiada por el dolor",
+    intro:
+      "Cada programa de rehabilitación tiene ahora tres fases, de calmar la zona al uso normal, y una regla del dolor sencilla que dice cuándo avanzar.",
+    points: [
+      "Elige la fase de inicio al asignarlo: Calmar y mover, Ganar fuerza o Volver al uso normal.",
+      "Tras seis sesiones con dolor de 2 o menos en las tres últimas, y sin brote al día siguiente, el informe del cliente dice que está listo para la siguiente fase.",
+      "Un dolor de 5 o más en dos de las tres últimas, o un brote al día siguiente, indica volver una fase.",
+      "Envía la siguiente fase con un toque. Sustituye a la anterior en su teléfono, así que su historial continúa.",
+      "Tus clientes valoran cómo notan la zona el día después de la rehabilitación, que suele ser lo que más te dice.",
+    ],
+    dyk: "Activa Dejar que cambie de fase por su cuenta y su app le ofrecerá la siguiente fase cuando lo diga la regla. Tú sigues viendo cada cambio.",
+  },
 };

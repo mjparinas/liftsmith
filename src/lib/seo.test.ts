@@ -7,6 +7,7 @@ import { allFacts, COMPETITORS, OURS, TOPIC_LABEL } from "@/content/compare";
 import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { COMMON, STAPLE } from "./pickWeights";
 import {
   absolute,
   alternativesTo,
@@ -60,13 +61,17 @@ describe("SEO routes", () => {
     for (const a of alts) expect(a.primary.some((m) => EXERCISE_BY_ID.get("bench-press")!.primary.includes(m))).toBe(true);
   });
 
-  it("lists alternatives pages only for the lifts with a full guide", () => {
+  it("lists alternatives pages for the guided lifts and the lifts people program, never the niche ones", () => {
     const listed = EXERCISES.filter((e) => paths.has(`/exercises/${e.id}/alternatives/`)).map((e) => e.id);
-    expect(listed.length).toBeGreaterThan(30);
-    for (const id of listed) expect(id in EXERCISE_GUIDES).toBe(true);
+    expect(listed.length).toBeGreaterThan(150);
+    expect(listed.length).toBeLessThan(350);
+    for (const id of listed) expect(id in EXERCISE_GUIDES || STAPLE.has(id) || COMMON.has(id)).toBe(true);
     expect(indexAlternatives("back-squat")).toBe(true);
-    const plain = EXERCISES.find((e) => !(e.id in EXERCISE_GUIDES) && alternativesTo(e.id).length)!;
-    expect(indexAlternatives(plain.id)).toBe(false);
+    expect(indexAlternatives("box-squat")).toBe(true);
+    const niche = EXERCISES.find(
+      (e) => !(e.id in EXERCISE_GUIDES) && !STAPLE.has(e.id) && !COMMON.has(e.id) && alternativesTo(e.id).length,
+    )!;
+    expect(indexAlternatives(niche.id)).toBe(false);
   });
 
   it("builds the sitemap on the www host with trailing slashes, and leaves private pages out", () => {

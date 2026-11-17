@@ -116,6 +116,10 @@ export const pt: FeaturesText = {
       body: "Escolhe exercícios que a sua academia permite e para os quais seus músculos estão prontos, e define cada peso e cada rep a partir dos seus últimos treinos.",
       proPart: "Quem usa o plano grátis ganha um treino adaptativo por semana junto do programa grátis; o Pro planeja todos os dias.",
     },
+    "auto-supersets": {
+      name: "Supersets automáticos",
+      body: "Ative os supersets e o plano adaptativo junta exercícios que não usam os mesmos músculos, como um supino e uma remada, com descanso menor depois de cada rodada, para caber mais no seu tempo. Agachamentos e levantamentos terra pesados ficam sozinhos, e você também pode desligar as séries de aquecimento.",
+    },
     "pick-weights": {
       name: "Aprende os exercícios de que você gosta",
       body: "Os exercícios populares são escolhidos com mais frequência. Marque um exercício com estrela e ele aparece bem mais; troque um e ele aparece menos, efeito que some ao longo de alguns meses.",
@@ -219,7 +223,7 @@ export const pt: FeaturesText = {
     },
     stretching: {
       name: "Alongamento",
-      body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia.",
+      body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",
     },
     "workout-parts": {
       name: "Treinos em partes",
@@ -369,6 +373,10 @@ export const pt: FeaturesText = {
       name: "Contas de equipe para academias",
       body: "O dono de uma academia oficial convida gerentes e recepcionistas com um link de uso único. Cada um usa a própria conta para manter em dia a página, os avisos e os relatos de problemas da academia.",
     },
+    "gym-classes": {
+      name: "Horários de aulas nas páginas das academias",
+      body: "Academias oficiais publicam as aulas de cada semana, com instrutor e sala, e marcam os dias sem aula. Quem treina lá vê a semana na página da academia no app e na web, e adiciona a próxima aula à agenda com um toque.",
+    },
     "gym-starter": {
       name: "Programas iniciais da academia",
       body: "Academias oficiais sugerem um programa para novos membros na sua página no app e na web, e a pessoa salva com um toque. O Liftsmith preenche os pesos de cada um.",
@@ -393,6 +401,11 @@ export const pt: FeaturesText = {
     challenges: {
       name: "Desafios, clubes e rankings",
       body: "Desafie um amigo, entre num clube ou turma da academia com ranking semanal e encare o desafio do mês com todo mundo.",
+    },
+    "club-chat": {
+      name: "Chat do clube e treinos em grupo",
+      body: "Converse com seu clube entre os treinos, marque um horário e um lugar para treinar junto e veja quem vai. Quem vai recebe um lembrete uma hora antes, e ao postar seu treino depois você aparece como quem treinou, com os amigos que treinaram com você marcados.",
+      note: "Para maiores de 18 anos. As notificações são no Android e no iPhone; o app web mostra as mensagens novas enquanto o chat está aberto.",
     },
     profiles: {
       name: "Perfis públicos",
@@ -435,6 +448,11 @@ export const pt: FeaturesText = {
       body: "Passe programas leves de reabilitação com vezes por semana, veja com que frequência os pacientes os seguem e veja as notas de dor e as lesões que eles escolhem compartilhar, exercício por exercício, com uma notificação quando a dor fica alta.",
       note: "O Liftsmith mostra o que os alunos registram. Ele não diagnostica nem trata nada.",
     },
+    "rehab-phases": {
+      name: "Protocolos de reabilitação em fases, guiados pela dor",
+      body: "Cada programa de reabilitação tem três fases, de acalmar a região ao uso normal. Uma regra da dor simples lê as avaliações depois de cada exercício e no dia seguinte, diz quando o aluno está pronto para a próxima fase ou deve voltar uma, e o fisioterapeuta envia com um toque.",
+      note: "Os alunos seguem de graça. O Liftsmith mostra o que seus alunos registram. Ele não diagnostica nem trata nada.",
+    },
     "coach-nutrition": {
       name: "Metas de nutrição para alunos",
       body: "Defina as calorias, proteínas, carboidratos e gorduras diárias de cada aluno, com um número de calorias para dias de descanso se quiser, preenchido com os números do próprio aluno em um toque. As Notas do coach dele comparam a semana de alimentação com essas metas, e você vê como ele está comendo quando ele compartilha.",
@@ -446,6 +464,10 @@ export const pt: FeaturesText = {
     "coach-checkins": {
       name: "Formulários de check-in e questionários",
       body: "Mande aos alunos um check-in semanal, um questionário de avaliação inicial ou seu próprio formulário, uma vez ou toda semana. Eles respondem com poucos toques, e uma nota baixa ou uma resposta atrasada vai para o topo do relatório deles.",
+    },
+    "coach-checkin-trends": {
+      name: "Check-ins de progresso com peso, fotos e tendências",
+      body: "Adicione perguntas de peso corporal e de foto a qualquer formulário e envie toda semana, a cada 2 ou a cada 4 semanas. O peso já vem da última pesagem do aluno, as fotos chegam só para você e a tendência de cada resposta aparece no relatório dele. Menores de 18 anos nunca recebem pedido de foto.",
     },
     "coach-roles": {
       name: "Para personal trainers e coaches",
@@ -501,6 +523,12 @@ export const pt: FeaturesText = {
     awards: {
       name: "Conquistas, níveis e sequências",
       body: "Medalhas em níveis, 50 níveis com recompensas, missões semanais, congelamentos de sequência e ligas honestas.",
+    },
+    seasons: {
+      name: "Temporadas de treino",
+      body: "Temporadas de dez semanas com uma trilha de 20 níveis, que você sobe treinando rumo à sua própria meta semanal: dois dias por semana sobem tão rápido quanto cinco, e dias extras não somam. Os níveis dão medalhas, um avatar, uma cor de destaque e um tema com ícone exclusivos da temporada, seus para sempre. Desafios da temporada, um item raro por novos recordes, estrelas de prestígio, uma semana de recuperação depois de uma falha, uma final com pontos em dobro e um resumo para compartilhar.",
+      proPart: "Todos os níveis e recompensas são grátis; o Pro adiciona uma recompensa bônus em três níveis.",
+      note: "Os ícones da temporada estão no Android e no iPhone; a web recebe o tema. As temporadas podem ser desligadas em Ajustes.",
     },
     locker: {
       name: "Temas, cores de destaque e ícones do app",
@@ -565,6 +593,10 @@ export const pt: FeaturesText = {
     "strength-standards": {
       name: "Padrões de força de praticantes reais",
       body: "O site mostra quanto as pessoas realmente fazem no agachamento, supino, levantamento terra e desenvolvimento, por sexo e peso corporal, calculado todo dia a partir de quem participa. Só grupos de 30 ou mais aparecem, como percentis, nunca os números de alguém. Uma chave em Ajustes › Seus dados e privacidade decide se você participa; menores de 18 nunca participam.",
+    },
+    community: {
+      name: "Comunidade: ideias, bugs e roteiro",
+      body: "Sugira o que o Liftsmith deve fazer em seguida, vote nas ideias que você quer, relate bugs com uma captura de tela que só a equipe vê, e comente ou mencione alguém com @. Cada uma mostra em que ponto está, de em análise a lançada, e você fica sabendo quando uma ideia que votou é lançada. O roteiro e o registro de mudanças também estão no site.",
     },
     languages: {
       name: "Dez idiomas",

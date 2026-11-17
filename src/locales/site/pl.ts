@@ -36,6 +36,7 @@ export const pl: SiteText = {
       coaches: "Dla trenerów",
       pricing: "Cennik",
       whatsNew: "Co nowego",
+      community: "Pomysły i plan rozwoju",
       exercises: "Atlas ćwiczeń",
       muscles: "Ćwiczenia na mięśnie",
       programs: "Plany treningowe",
@@ -244,6 +245,13 @@ export const pl: SiteText = {
           body: "Zaloguj się przez Google lub Apple tylko wtedy, gdy chcesz synchronizacji i kopii zapasowej.",
         },
       ],
+    },
+    learn: {
+      eyebrow: "Darmowe poradniki",
+      title: "Naucz się ćwiczeń, a aplikacja je zaplanuje",
+      body: "Technika krok po kroku, mięśnie, które pracują w każdym ćwiczeniu, i czym je zastąpić, a do tego darmowe kalkulatory.",
+      exercises: "Popularne ćwiczenia",
+      tools: "Darmowe narzędzia",
     },
     juice: {
       eyebrow: "Z frajdą",

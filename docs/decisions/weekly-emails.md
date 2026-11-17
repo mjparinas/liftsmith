@@ -713,3 +713,58 @@ Every exercise and stretch now lists its two or three most common form mistakes,
 - Between sets, the rest timer shows one to watch on your next set, a different one each set.
 - They're part of the app, so they work with no signal, in every language.
 Did you know? Rather not see them on the rest timer? Turn off Form checks while resting in Settings › Workout. ([Form cues](form-cues.md))
+
+### W63 · Supersets, built for you (**New**, 2026-11-17)
+Free · Lifters · Screen: Settings › Training at Adaptive workouts, with supersets switched on · `fresh`, so it goes next to everyone already in the series
+Your adaptive workouts can now pair exercises into supersets for you, with one switch.
+- Turn on Pair exercises into supersets in Settings › Training › Adaptive workouts.
+- Exercises that don't share muscles go back to back, like a press and a row, so each rests while you do the other.
+- The rest after each round is shorter, and the time saved fits more training into the length you pick.
+- Heavy squats and deadlifts stay on their own, and you can split any pair on Today.
+Did you know? The same section has a Warm-up sets switch, for days you'd rather warm up your own way. ([Adaptive workout options](adaptive-options.md))
+
+### W64 · Your club, between workouts (**New**, 2026-11-17)
+Free · Lifters · Screen: none (Friends › Clubs is a signed-in screen, `shot: false`) · `fresh`, so it goes next to everyone already in the series
+Clubs now have a chat and crew sessions, so the people you train with can talk and meet up.
+- Open Friends › Clubs, pick a club and tap Chat to message everyone in it.
+- Plan a crew session with a name, a day and a time, and members tap I'm in.
+- Everyone who's in gets a reminder an hour before.
+- Post your workout afterwards and you show as trained, with the friends you trained with tagged.
+Did you know? Notify me in each club's chat turns its pushes off, and a chat sends at most one an hour. ([Friends](friends.md))
+
+### W65 · Vote for what we build next (**New**, 2026-11-17)
+Free · Lifters · No screenshot (`shot: false`) · `fresh`, so it goes next to everyone already in the series
+Liftsmith has a community now: suggest ideas, vote for the ones you want and report bugs.
+- Open Settings › Help › Community.
+- Tap the arrow beside an idea to vote for it. The most wanted rise to the top.
+- Report a bug with a screenshot that only you and the team see.
+- Each post shows where it is, from Under review to Shipped, and you hear when an idea you voted for ships.
+Did you know? The roadmap and changelog are on the website too, at getliftsmith.com/community. ([Community](community.md))
+
+### W66 · Training seasons start Monday (**New**, 2026-11-17)
+Free + Pro · Lifters · Screen: the Season screen · `fresh`, so it goes next to everyone already in the series
+Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.
+- You climb by meeting your own weekly goal. Days past it earn nothing, so two days a week climbs as fast as five.
+- Tiers bring season-only badges, an avatar, an accent and the Ember theme with its app icon, yours to keep.
+- Miss a week and the next goal week pays its bonus twice. The last week counts double.
+- Every new best has a 1 in 6 chance to drop the season's rare plates.
+Did you know? Rather not see seasons? Turn off Training seasons in Settings › Look and feel. Your training still counts. ([Training seasons](seasons.md))
+
+### G3 · Put your class schedule on your gym's page (**New**, 2026-11-17)
+Free · Gyms · No screen (it needs an official gym) · `fresh`, so it goes next to gyms already in the series
+Members can see this week's classes on your gym's page, in the app and on the website.
+- Add each class once: its type, days, start time and length. Most need no typing at all.
+- Add the instructor, the room and a short note, like how to book.
+- Off for a holiday? Tap the date and the class shows as not running that day.
+- Members add the next class to their calendar in one tap.
+Did you know? Times are your gym's own clock, so members see 6 PM as 6 PM. Bookings stay with you. ([Gyms](gyms.md) "Class schedules")
+
+### W67 · Rehab in phases, moved by pain (**New**, 2026-11-17)
+Pro · Physios · No screenshot (the physio's own client report) · `fresh`, so it goes next to everyone already in the series
+Each rehab program now has three phases, from calming the area to full use, and a plain pain rule that says when to move.
+- Pick the phase to start in when you assign: Calm and move, Build strength or Back to full use.
+- After six sessions with pain 2 or less after the last three, and no flare the next day, the client's report says ready for the next phase.
+- Pain 5 or more after two of the last three, or a flare the next day, says go back a phase.
+- Send the next phase in one tap. It replaces the old one on their phone, so their history carries on.
+- Clients rate how the area feels the day after rehab, which is often what tells you the most.
+Did you know? Turn on Let them move phases on their own and their app offers the next phase when the rule says so. You still see every move. ([Trainer mode](trainer-mode.md) "Rehab protocols")

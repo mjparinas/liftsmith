@@ -47,20 +47,11 @@ function Item({ item, admin, go, changed }: { item: TodoItem; admin: boolean; go
       </div>
       <div className="flex flex-wrap items-center gap-2 text-sm">
         {item.action.tab ? (
-          <button
-            type="button"
-            onClick={() => go(item.action.tab!)}
-            className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-          >
+          <button type="button" onClick={() => go(item.action.tab!)} className="press rounded-lg btn-primary px-3 py-1.5 font-semibold">
             {item.action.label}
           </button>
         ) : (
-          <a
-            href={item.action.href}
-            target="_blank"
-            rel="noreferrer"
-            className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-          >
+          <a href={item.action.href} target="_blank" rel="noreferrer" className="press rounded-lg btn-primary px-3 py-1.5 font-semibold">
             {item.action.label}
           </a>
         )}
@@ -241,7 +232,7 @@ export function Todo({ admin, go, onList }: { admin: boolean; go: (tab: string) 
               type="button"
               disabled={!form.title.trim()}
               onClick={() => void add()}
-              className="press rounded-xl bg-accent px-4 py-2 font-semibold text-accent-ink disabled:opacity-50"
+              className="press rounded-xl btn-primary px-4 py-2 font-semibold disabled:opacity-50"
             >
               Add
             </button>

@@ -1,9 +1,10 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
+import { PHASES, REHAB_PROGRAMS } from "./rehab";
 import { clampSets, cleanParts, MAX_ITEMS, NAME_MAX } from "./routines";
 import { APP_PATH, SITE_URL } from "./site";
 import { linksOf, withLinks } from "./superset";
-import { BODY_PARTS, type BodyPart, type Routine, type RoutineItem, type RoutinePart } from "./types";
+import { BODY_PARTS, type BodyPart, type RehabPlan, type RehabProtocolId, type Routine, type RoutineItem, type RoutinePart } from "./types";
 
 // Sharing a routine (Melvin, 2026-11-11: "share routines with other users"). The routine travels in
 // the link itself, like a remix link: its name, the exercises in order, set counts and supersets.
@@ -31,11 +32,26 @@ const PART_MARK: Record<RoutinePart["kind"], string> = { warm: "w", cool: "d", c
  * (either may be empty). No dot, so older apps drop it like the part marks and still read the rehab mark last.
  */
 const REHAB_INFO = "h";
+/**
+ * Rehab protocols (2026-11-17): the protocol and phase follow in the same segment, `h:<part>:<times>:<protocol>:<phase>`,
+ * with `:a` at the end when the physio lets the lifter move phases on their own. Older apps read only the first two.
+ */
+const SELF_MARK = "a";
 
-function rehabOut(r: Pick<Routine, "rehab" | "rehabPart" | "perWeek">): string[] {
+function rehabOut(r: Pick<Routine, "rehab" | "rehabPart" | "perWeek" | "rehabPlan">): string[] {
   if (!r.rehab) return [];
   const w = cleanTimes(r.perWeek);
-  return [...(r.rehabPart || w ? [`${REHAB_INFO}:${r.rehabPart ?? ""}:${w ?? ""}`] : []), REHAB_MARK];
+  const plan = cleanPlan(r.rehabPlan);
+  const tail = plan ? `:${plan.id}:${plan.phase}${plan.self ? `:${SELF_MARK}` : ""}` : "";
+  return [...(r.rehabPart || w || plan ? [`${REHAB_INFO}:${r.rehabPart ?? ""}:${w ?? ""}${tail}`] : []), REHAB_MARK];
+}
+
+/** A protocol and phase that the app knows (rehab.ts ids, phases 1 to 3), without `since`, which stays on the phone. */
+export function cleanPlan(p: Partial<RehabPlan> | undefined): RehabPlan | undefined {
+  if (!p || !REHAB_PROGRAMS.some((x) => x.id === p.id)) return undefined;
+  const phase = Number(p.phase);
+  if (!Number.isInteger(phase) || phase < 1 || phase > PHASES) return undefined;
+  return { id: p.id!, phase, ...(p.self ? { self: true as const } : {}) };
 }
 
 /** Times a week, 1 to 7, or undefined. */
@@ -43,14 +59,18 @@ export function cleanTimes(n: unknown): number | undefined {
   return typeof n === "number" && Number.isInteger(n) && n >= 1 && n <= 7 ? n : undefined;
 }
 
-function rehabIn(segments: readonly string[]): { rehabPart?: BodyPart; perWeek?: number } {
+function rehabIn(segments: readonly string[]): { rehabPart?: BodyPart; perWeek?: number; rehabPlan?: RehabPlan } {
   const seg = segments.find((s) => s.startsWith(`${REHAB_INFO}:`));
   if (!seg) return {};
-  const [, part = "", times = ""] = seg.split(":");
+  const [, part = "", times = "", protocol = "", phase = "", self = ""] = seg.split(":");
   const w = cleanTimes(Number(times));
+  const plan = protocol
+    ? cleanPlan({ id: protocol as RehabProtocolId, phase: Number(phase), ...(self === SELF_MARK ? { self: true } : {}) })
+    : undefined;
   return {
     ...((BODY_PARTS as readonly string[]).includes(part) ? { rehabPart: part as BodyPart } : {}),
     ...(times && w ? { perWeek: w } : {}),
+    ...(plan ? { rehabPlan: plan } : {}),
   };
 }
 
@@ -107,11 +127,11 @@ function nameIn(code: string): string {
 }
 
 /**
- * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~h:part:times][~rehab]`,
+ * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~h:part:times[:protocol:phase[:a]]][~rehab]`,
  * where `.s`
  * links an exercise to the next.
  */
-export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart" | "perWeek">): string {
+export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart" | "perWeek" | "rehabPlan">): string {
   const items = r.items.filter((i) => EXERCISE_BY_ID.has(i.exerciseId)).slice(0, MAX_ITEMS);
   const links = linksOf(items);
   const name = nameOut(r.name.trim().slice(0, NAME_MAX));
@@ -124,9 +144,15 @@ export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "par
  * between two exercises that both survive and were next to each other), so a link from a newer app
  * still opens. Null when nothing usable is left.
  */
-export function decodeRoutine(
-  code: string,
-): { name: string; items: RoutineItem[]; rehab?: true; parts?: RoutinePart[]; rehabPart?: BodyPart; perWeek?: number } | null {
+export function decodeRoutine(code: string): {
+  name: string;
+  items: RoutineItem[];
+  rehab?: true;
+  parts?: RoutinePart[];
+  rehabPart?: BodyPart;
+  perWeek?: number;
+  rehabPlan?: RehabPlan;
+} | null {
   // Some apps encode the fragment again; the separators are plain, so decode once if they're missing.
   const raw = code.includes("~") ? code : safeDecode(code);
   const [v, rawName = "", ...parts] = raw.split("~");

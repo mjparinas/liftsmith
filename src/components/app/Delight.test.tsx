@@ -121,6 +121,13 @@ describe("workout extras", () => {
     expect(screen.getByText("Breathe in through the nose")).toBeInTheDocument();
     expect(screen.getByText("Box breathing · 4-4-4-4")).toBeInTheDocument();
     expect(useApp.getState().profile.delight?.restExtra).toBe("breathe");
+    // No "Neither" button: tapping the guide that's on hides it, and tapping it again brings it back.
+    expect(screen.queryByRole("button", { name: "Neither" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Breathe", pressed: true }));
+    expect(screen.queryByText("Breathe in through the nose")).not.toBeInTheDocument();
+    expect(useApp.getState().profile.delight?.restExtra).toBe("off");
+    await user.click(screen.getByRole("button", { name: "Breathe", pressed: false }));
+    expect(screen.getByText("Breathe in through the nose")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Skip rest" }));
     // A heavier next set: only the change is shown.
     await user.click(screen.getByRole("button", { name: "More weight" }));

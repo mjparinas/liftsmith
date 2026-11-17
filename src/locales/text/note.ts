@@ -4,7 +4,13 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
-  "note.firstLevel": "First time: find your level",
+  "note.firstLevel": "First time: an easy start, and next time adjusts to how it went",
+  "note.timedLonger": "Lasted the full time on every set: a little longer",
+  "note.timedSame": "A set ended early last time: same time until they all last",
+  "note.timedDeload": "Deload: shorter, easy sets",
+  "note.timedShort": "Stopped 2+ seconds early last time: a step lighter",
+  "note.timedTop": "Reached the longest time in your range: weight up",
+  "note.timedEasy": "Easy day: shorter sets",
   "note.deloadEasy": "Deload: easy reps",
   "note.oneMoreRep": "Hit every set last time: one more rep",
   "note.sameAgain": "A set came up short last time: same again until they all hit",
@@ -44,7 +50,13 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "Primera vez: encuentra tu nivel",
+  "note.firstLevel": "Primera vez: un comienzo fácil, y la próxima vez se ajusta según cómo te fue",
+  "note.timedLonger": "Aguantaste todo el tiempo en cada serie: un poco más",
+  "note.timedSame": "Una serie terminó antes de tiempo la última vez: el mismo tiempo hasta completarlas todas",
+  "note.timedDeload": "Descarga: series más cortas y fáciles",
+  "note.timedShort": "Paraste 2 o más segundos antes la última vez: un escalón más ligero",
+  "note.timedTop": "Llegaste al tiempo máximo de tu rango: más peso",
+  "note.timedEasy": "Día suave: series más cortas",
   "note.deloadEasy": "Descarga: repeticiones fáciles",
   "note.oneMoreRep": "Completaste todas las series la última vez: una repetición más",
   "note.sameAgain": "Una serie se quedó corta la última vez: lo mismo hasta completarlas todas",
@@ -82,7 +94,13 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "Première fois : trouvez votre niveau",
+  "note.firstLevel": "Première fois : un départ facile, la prochaine fois s’ajuste selon votre séance",
+  "note.timedLonger": "Durée complète tenue à chaque série : un peu plus long",
+  "note.timedSame": "Une série s’est arrêtée trop tôt la dernière fois : même durée jusqu’à toutes les tenir",
+  "note.timedDeload": "Décharge : séries plus courtes et faciles",
+  "note.timedShort": "Arrêt 2 secondes ou plus trop tôt la dernière fois : un cran plus léger",
+  "note.timedTop": "Durée maximale de votre fourchette atteinte : on augmente la charge",
+  "note.timedEasy": "Jour tranquille : séries plus courtes",
   "note.deloadEasy": "Décharge : répétitions faciles",
   "note.oneMoreRep": "Toutes les séries réussies la dernière fois : une répétition de plus",
   "note.sameAgain": "Une série a manqué la dernière fois : on refait pareil jusqu’à toutes les réussir",
@@ -120,7 +138,13 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "Erstes Mal: dein Niveau finden",
+  "note.firstLevel": "Erstes Mal: ein leichter Start, beim nächsten Mal passt es sich deinem Ergebnis an",
+  "note.timedLonger": "Jeden Satz die volle Zeit geschafft: etwas länger",
+  "note.timedSame": "Ein Satz endete letztes Mal zu früh: gleiche Zeit, bis alle klappen",
+  "note.timedDeload": "Deload: kürzere, lockere Sätze",
+  "note.timedShort": "Letztes Mal 2+ Sekunden zu früh aufgehört: etwas leichter",
+  "note.timedTop": "Längste Zeit deines Bereichs erreicht: mehr Gewicht",
+  "note.timedEasy": "Lockerer Tag: kürzere Sätze",
   "note.deloadEasy": "Deload: lockere Wiederholungen",
   "note.oneMoreRep": "Letztes Mal jeden Satz geschafft: eine Wiederholung mehr",
   "note.sameAgain": "Letztes Mal blieb ein Satz zurück: gleich noch einmal, bis alle sitzen",
@@ -158,7 +182,13 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "Prima volta: trova il tuo livello",
+  "note.firstLevel": "Prima volta: un inizio facile, la prossima volta si adatta a come è andata",
+  "note.timedLonger": "Hai tenuto tutto il tempo in ogni serie: un po’ di più",
+  "note.timedSame": "Una serie è finita prima l’ultima volta: stesso tempo finché non le completi tutte",
+  "note.timedDeload": "Scarico: serie più brevi e facili",
+  "note.timedShort": "L’ultima volta ti sei fermato 2+ secondi prima: un po’ più leggero",
+  "note.timedTop": "Raggiunto il tempo massimo del tuo intervallo: più peso",
+  "note.timedEasy": "Giorno leggero: serie più brevi",
   "note.deloadEasy": "Scarico: ripetizioni facili",
   "note.oneMoreRep": "L’ultima volta hai completato ogni serie: una ripetizione in più",
   "note.sameAgain": "L’ultima volta una serie è rimasta corta: di nuovo uguale finché non le completi tutte",
@@ -196,7 +226,13 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "初回：自分のレベルを確認",
+  "note.firstLevel": "初回：軽めのスタート。次回は今回の結果に合わせて調整します",
+  "note.timedLonger": "前回は全セット時間いっぱいできました：少し長めに",
+  "note.timedSame": "前回は途中で止まったセットがありました：全セットできるまで同じ時間で",
+  "note.timedDeload": "ディロード：短めで楽なセット",
+  "note.timedShort": "前回2秒以上早く終了：少し軽く",
+  "note.timedTop": "時間範囲の上限に到達：重量アップ",
+  "note.timedEasy": "軽めの日：セットを短めに",
   "note.deloadEasy": "ディロード：楽なレップで",
   "note.oneMoreRep": "前回は全セット達成：1回増やす",
   "note.sameAgain": "前回は届かないセットがあった：全セット達成まで同じ内容で",
@@ -228,7 +264,13 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "Primeira vez: encontre seu nível",
+  "note.firstLevel": "Primeira vez: um começo leve, e da próxima vez se ajusta ao que você fez",
+  "note.timedLonger": "Aguentou o tempo todo em cada série: um pouco mais",
+  "note.timedSame": "Uma série terminou antes da hora na última vez: o mesmo tempo até completar todas",
+  "note.timedDeload": "Deload: séries mais curtas e leves",
+  "note.timedShort": "Parou 2+ segundos antes da última vez: um passo mais leve",
+  "note.timedTop": "Chegou ao tempo máximo da sua faixa: mais peso",
+  "note.timedEasy": "Dia leve: séries mais curtas",
   "note.deloadEasy": "Deload: reps leves",
   "note.oneMoreRep": "Fechou todas as séries da última vez: mais uma rep",
   "note.sameAgain": "Uma série ficou abaixo da última vez: repita até fechar todas",
@@ -266,7 +308,13 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "처음: 내 수준 찾기",
+  "note.firstLevel": "처음: 가볍게 시작하고, 다음에는 결과에 맞춰 조정해요",
+  "note.timedLonger": "지난번 모든 세트를 끝까지 버텼어요: 조금 더 길게",
+  "note.timedSame": "지난번 일찍 끝난 세트가 있었어요: 모두 버틸 때까지 같은 시간으로",
+  "note.timedDeload": "디로드: 짧고 가벼운 세트",
+  "note.timedShort": "지난번 2초 이상 일찍 멈춤: 한 단계 가볍게",
+  "note.timedTop": "시간 범위 상단 달성: 무게 올림",
+  "note.timedEasy": "가볍게 하는 날: 세트 짧게",
   "note.deloadEasy": "디로드: 가벼운 반복",
   "note.oneMoreRep": "지난번 모든 세트 달성: 1회 더",
   "note.sameAgain": "지난번 한 세트가 모자람: 모두 달성할 때까지 같게",
@@ -302,7 +350,13 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "İlk kez: seviyeni bul",
+  "note.firstLevel": "İlk kez: kolay bir başlangıç, bir dahaki sefere nasıl geçtiğine göre ayarlanır",
+  "note.timedLonger": "Her seti sonuna kadar sürdürdün: biraz daha uzun",
+  "note.timedSame": "Geçen sefer bir set erken bitti: hepsi tamamlanana kadar aynı süre",
+  "note.timedDeload": "Deload: daha kısa, kolay setler",
+  "note.timedShort": "Geçen sefer 2+ saniye erken bıraktın: bir kademe hafif",
+  "note.timedTop": "Süre aralığının tepesine ulaştın: ağırlık artıyor",
+  "note.timedEasy": "Hafif gün: daha kısa setler",
   "note.deloadEasy": "Deload: kolay tekrarlar",
   "note.oneMoreRep": "Geçen sefer tüm setleri tutturdun: bir tekrar daha",
   "note.sameAgain": "Geçen sefer bir set eksik kaldı: hepsi tutana kadar aynısı",
@@ -340,7 +394,13 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
-  "note.firstLevel": "Pierwszy raz: znajdź swój poziom",
+  "note.firstLevel": "Pierwszy raz: łatwy start, a następnym razem plan dopasuje się do wyniku",
+  "note.timedLonger": "Każda seria przez pełny czas: trochę dłużej",
+  "note.timedSame": "Ostatnio jedna seria skończyła się za wcześnie: ten sam czas, aż wszystkie wyjdą",
+  "note.timedDeload": "Deload: krótsze, lekkie serie",
+  "note.timedShort": "Ostatnio 2+ sekundy za wcześnie: o stopień lżej",
+  "note.timedTop": "Najdłuższy czas z zakresu: więcej ciężaru",
+  "note.timedEasy": "Lżejszy dzień: krótsze serie",
   "note.deloadEasy": "Deload: lekkie powtórzenia",
   "note.oneMoreRep": "Ostatnio wszystkie serie zrobione: jedno powtórzenie więcej",
   "note.sameAgain": "Ostatnio w jednej serii zabrakło: to samo, aż wszystkie wejdą",

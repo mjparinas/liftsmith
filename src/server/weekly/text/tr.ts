@@ -849,4 +849,83 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Dinlenme sayacında görmek istemiyor musun? Ayarlar › Antrenman'da Dinlenirken form kontrolü'nü kapat.",
   },
+  "auto-supersets": {
+    title: "Senin için süper setler",
+    intro: "Uyarlanabilir antrenmanların artık tek bir anahtarla egzersizleri senin için süper setlerde eşleştirebilir.",
+    points: [
+      "Ayarlar › Program › Uyarlanabilir antrenmanlar'da Egzersizleri süper setlerde eşleştir'i aç.",
+      "Aynı kasları çalıştırmayan egzersizler art arda gelir, örneğin bir press ve bir row, böylece biri çalışırken diğeri dinlenir.",
+      "Her turdan sonraki dinlenme daha kısadır ve kazanılan süre seçtiğin uzunluğa daha fazla antrenman sığdırır.",
+      "Ağır squat ve deadlift'ler tek başına kalır, Bugün ekranında istediğin çifti ayırabilirsin.",
+    ],
+    dyk: "Aynı bölümde, ısınmayı kendi yönteminle yapmak istediğin günler için bir Isınma setleri anahtarı var.",
+  },
+  "club-chat": {
+    title: "Antrenmanlar arasında kulübün",
+    intro: "Kulüplerde artık sohbet ve ekip antrenmanları var; birlikte çalıştığın kişiler konuşup buluşabilir.",
+    points: [
+      "Arkadaşlar › Kulüpler'i aç, bir kulüp seç ve herkese yazmak için Sohbet'e dokun.",
+      "Bir ad, gün ve saatle ekip antrenmanı planla; üyeler Ben de varım'a dokunur.",
+      "Katılan herkes bir saat önce hatırlatma alır.",
+      "Sonra antrenmanını paylaş; antrenman yapmış görünürsün ve birlikte çalıştığın arkadaşların etiketlenir.",
+    ],
+    dyk: "Her kulübün sohbetindeki Bana haber ver ile bildirimlerini kapatabilirsin; bir sohbet saatte en fazla bir bildirim gönderir.",
+  },
+  community: {
+    title: "Sırada ne yapacağımıza oy ver",
+    intro: "Liftsmith'in artık bir topluluğu var: fikir öner, istediklerine oy ver ve hata bildir.",
+    points: [
+      "Ayarlar › Yardım › Topluluk'u aç.",
+      "Oy vermek için bir fikrin yanındaki oka dokun. En çok istenenler üste çıkar.",
+      "Yalnızca senin ve ekibin gördüğü bir ekran görüntüsüyle hata bildir.",
+      "Her gönderi İnceleniyor'dan Yayınlandı'ya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın.",
+    ],
+    dyk: "Yol haritası ve değişiklik günlüğü web sitesinde de var: getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Ağırlık, fotoğraf ve gidişatla kontroller",
+    intro: "Kontrol formların artık vücut ağırlığı ve fotoğraf isteyebilir ve her cevabın gidişatını gösterir.",
+    points: [
+      "Vücut ağırlığı sorusu ekle: danışanın son tartımından gelir ve yenisini kaydına ekler.",
+      "Önden ve yandan gibi en fazla üç fotoğraf sorusu ekle. Onları yalnızca sen görürsün.",
+      "Bir formu her hafta, 2 haftada bir veya 4 haftada bir gönder.",
+      "Her danışanın raporu her puanın, sayının ve ağırlığın gidişatını gösterir ve bir puan düştüğünde söyler.",
+    ],
+    dyk: "Koçluk › Durum kontrolleri bölümündeki yeni İlerleme kontrolü şablonuyla başla. 18 yaşından küçüklerden asla fotoğraf istenmez.",
+  },
+  seasons: {
+    title: "Antrenman sezonları pazartesi başlıyor",
+    intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",
+    points: [
+      "Kendi haftalık hedefini tutturarak ilerlersin. Hedefin üstündeki günler puan getirmez, yani haftada iki gün de beş gün kadar hızlı ilerler.",
+      "Kademeler yalnızca bu sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle Kor temasını verir; hepsi hep senin kalır.",
+      "Bir haftayı mı kaçırdın? Hedefi tutturduğun sonraki hafta bonus iki kat. Son hafta tamamen iki kat sayılır.",
+      "Her yeni rekorun sezonun nadir plakalarını düşürme şansı 6'da 1.",
+    ],
+    dyk: "Sezonları görmek istemiyor musun? Ayarlar › Görünüm'den Antrenman sezonlarını kapat. Antrenmanın sayılmaya devam eder.",
+  },
+  "gym-classes": {
+    title: "Ders programını salonunun sayfasına koy",
+    intro: "Üyeler haftanın derslerini uygulamada ve web sitesinde salonunun sayfasında görür.",
+    points: [
+      "Her dersi bir kez ekle: tür, günler, başlangıç saati ve süre. Neredeyse hiç yazman gerekmez.",
+      "Eğitmeni, alanı ve rezervasyon gibi kısa bir notu ekle.",
+      "Tatilde kapalı mısın? Tarihe dokun, ders o gün yapılmıyor olarak görünsün.",
+      "Üyeler sıradaki dersi tek dokunuşla takvimine ekler.",
+    ],
+    dyk: "Saatler salonunun saatidir, yani 18.00 herkes için 18.00. Rezervasyonlar sende kalır.",
+  },
+  "physio-protocols": {
+    title: "Ağrıyla ilerleyen aşamalı rehabilitasyon",
+    intro:
+      "Her rehabilitasyon programında artık bölgeyi sakinleştirmekten tam kullanıma kadar üç aşama ve ne zaman ilerleneceğini söyleyen basit bir ağrı kuralı var.",
+    points: [
+      "Atarken başlangıç aşamasını seç: Sakinleştir ve hareket ettir, Güç kazan ya da Tam kullanıma dönüş.",
+      "Altı seanstan sonra son üç seansın ardından ağrı 2 veya altındaysa ve ertesi gün alevlenme yoksa danışanın raporu sonraki aşamaya hazır olduğunu söyler.",
+      "Son üç seansın ikisinden sonra ağrı 5 veya üstündeyse ya da ertesi gün alevlenme olursa bir aşama geri dönülür.",
+      "Sonraki aşamayı tek dokunuşla gönder. Telefonunda eskisinin yerine geçer, böylece geçmişi devam eder.",
+      "Danışanlar rehabilitasyonun ertesi günü bölgenin nasıl olduğunu puanlar; çoğu zaman en çok şeyi bu söyler.",
+    ],
+    dyk: "Aşamayı kendisi değiştirebilsin'i açarsan kural söylediğinde uygulaması sonraki aşamayı önerir. Her değişikliği yine görürsün.",
+  },
 };

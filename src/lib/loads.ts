@@ -17,6 +17,19 @@ function nearest(list: number[], v: number): number {
   );
 }
 
+/**
+ * The weight a machine or cable stack moves per pin: 5 lb or 2.5 kg (Melvin, 2026-11-17: "lat pull downs should
+ * increase by increments of 5"). Gyms made before then saved the old 10 lb or 5 kg default, and nothing in the app
+ * lets a lifter pick another step, so those read as the new default too.
+ */
+export const MACHINE_STEP = { kg: 2.5, lb: 5 } as const;
+const OLD_MACHINE_STEP = { kg: 5, lb: 10 } as const;
+
+export function machineStep(gym: Pick<Gym, "unit" | "machineStep">): number {
+  const s = gym.machineStep;
+  return !s || s === OLD_MACHINE_STEP[gym.unit] ? MACHINE_STEP[gym.unit] : s;
+}
+
 export interface Rounded {
   kg: number;
   loading?: Loading;
@@ -37,7 +50,7 @@ export function roundLoad(kg: number, ex: Exercise, gym: Gym): Rounded {
     case "kettlebell":
       return { kg: toKg(nearest(gym.kettlebells, want), u) };
     case "machine": {
-      const step = gym.machineStep || (u === "kg" ? 2.5 : 5);
+      const step = machineStep(gym);
       return { kg: toKg(Math.max(step, Math.round(want / step) * step), u) };
     }
     case "bodyweight":
@@ -55,7 +68,7 @@ export function stepLoad(kg: number, dir: 1 | -1, ex: Exercise, gym: Gym): numbe
     return toKg(next ?? cur, u);
   }
   if (ex.load === "machine") {
-    const step = gym.machineStep || (u === "kg" ? 2.5 : 5);
+    const step = machineStep(gym);
     return toKg(Math.max(0, cur + dir * step), u);
   }
   if (ex.load === "barbell") {

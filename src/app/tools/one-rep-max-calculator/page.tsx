@@ -10,14 +10,18 @@ import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
-  title: "One-rep max calculator: estimate your 1RM from any set",
+  title: "1RM calculator: one rep max calculator for any lift",
   description:
-    "Estimate your one-rep max from weight, reps and reps in reserve, with a reps-to-weight table and the answers from Epley, Brzycki and six other formulas.",
+    "Free 1 rep max calculator: enter the weight and reps of any set to estimate your 1RM in kg or lb, with a reps-to-weight table and 8 formulas compared.",
   path: "/tools/one-rep-max-calculator/",
   translated: true,
 });
 
 const FAQ: [string, string][] = [
+  [
+    "What is a one-rep max (1RM)?",
+    "The most weight you can lift for one full rep with good form. Lifters use it to compare strength over time and to set training weights as a percentage, such as 75% of 1RM for sets of about 8 to 10.",
+  ],
   [
     "How is the one-rep max estimated?",
     "From the weight and the reps you could have done to failure (your reps plus the reps you had left). Up to 10 reps to failure it averages Brzycki, Epley and a 2026 weight-dependent equation; above 10 it uses Mayhew, Wathan and the same newer equation, which hold up better at higher reps.",
@@ -58,9 +62,9 @@ export default function OneRmPage() {
     <SitePage kind="tool" sticky="Your max, tracked from every set" path="/tools/one-rep-max-calculator/">
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/tools/", label: "Tools" }, { label: "One-rep max calculator" }]} />
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">One-rep max calculator</h1>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">One-rep max (1RM) calculator</h1>
       <p className="mt-3 max-w-2xl text-lg text-muted">
-        Your estimated max from any set, without testing it. Tap + and − to enter a set; hold a button to go faster.
+        Your estimated 1 rep max from any set, without testing it. Tap + and − to enter a set; hold a button to go faster.
       </p>
       <div className="mt-8">
         <OneRmCalculator />

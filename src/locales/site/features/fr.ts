@@ -75,6 +75,10 @@ export const fr: FeaturesText = {
       body: "Choisit des exercices que votre salle permet et pour lesquels vos muscles sont prêts, puis fixe chaque charge et chaque répétition d’après vos dernières séances.",
       proPart: "Sans Pro, vous avez une séance adaptative par semaine en plus de votre programme gratuit ; Pro planifie chaque jour.",
     },
+    "auto-supersets": {
+      name: "Supersets automatiques",
+      body: "Active les supersets et le plan adaptatif associe des exercices qui ne sollicitent pas les mêmes muscles, comme un développé et un rowing, avec un repos plus court après chaque tour, pour en faire plus dans ton temps. Les squats et soulevés de terre lourds restent seuls, et tu peux aussi couper les séries d'échauffement.",
+    },
     "pick-weights": {
       name: "Apprend les exercices que vous aimez",
       body: "Les exercices populaires sont choisis le plus souvent. Mettez une étoile à un exercice et il revient bien plus ; remplacez-le et il revient moins, pendant quelques mois.",
@@ -175,7 +179,7 @@ export const fr: FeaturesText = {
     },
     stretching: {
       name: "Étirements",
-      body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour.",
+      body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour. Quelques secondes pour te mettre en position avant chaque étirement et chaque côté, et l’écran reste allumé.",
     },
     "workout-parts": {
       name: "Séances en plusieurs parties",
@@ -311,6 +315,10 @@ export const fr: FeaturesText = {
       name: "Comptes d’équipe pour les salles",
       body: "Le propriétaire d’une salle officielle invite gérants et personnel d’accueil avec un lien à usage unique. Chacun utilise son propre compte pour tenir à jour la page, les annonces et les problèmes signalés.",
     },
+    "gym-classes": {
+      name: "Horaires des cours sur les pages des salles",
+      body: "Les salles officielles publient les cours qu'elles donnent chaque semaine, avec l'instructeur et la salle, et indiquent les jours sans cours. Les membres voient la semaine sur la page de la salle dans l'appli et sur le web, et ajoutent le prochain cours à leur agenda d'un toucher.",
+    },
     "gym-starter": {
       name: "Programmes de départ des salles",
       body: "Les salles officielles proposent un programme aux nouveaux membres sur leur page dans l’app et sur le web, enregistré d’un toucher. Liftsmith fixe les charges de chacun.",
@@ -340,6 +348,11 @@ export const fr: FeaturesText = {
     challenges: {
       name: "Défis, clubs et classements",
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
+    },
+    "club-chat": {
+      name: "Discussion du club et séances en groupe",
+      body: "Discute avec ton club entre les séances, propose une heure et un lieu pour vous entraîner ensemble et vois qui vient. Chaque participant reçoit un rappel une heure avant, et publier ta séance après coup t’indique comme entraîné, avec les amis qui étaient là identifiés.",
+      note: "Pour les 18 ans et plus. Les notifications sont sur Android et iPhone ; l’app web affiche les nouveaux messages tant que la discussion est ouverte.",
     },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
     "tagline-gym": {
@@ -374,6 +387,11 @@ export const fr: FeaturesText = {
       body: "Assignez des programmes de rééducation doux avec un nombre de fois par semaine, voyez à quelle fréquence vos clients les suivent, et voyez la douleur et les blessures qu'ils choisissent de partager, exercice par exercice, avec une notification quand la douleur est forte.",
       note: "Liftsmith montre ce que vos clients notent. Il ne pose aucun diagnostic et ne traite rien.",
     },
+    "rehab-phases": {
+      name: "Protocoles de rééducation par phases, guidés par la douleur",
+      body: "Chaque programme de rééducation a trois phases, de calmer la zone à la pleine utilisation. Une règle de douleur simple lit les notes après chaque exercice et le lendemain, dit quand un client est prêt pour la phase suivante ou doit revenir d’une phase, et le kinésithérapeute l’envoie d’un geste.",
+      note: "Les clients le suivent gratuitement. Liftsmith montre ce que vos clients enregistrent. Il ne pose aucun diagnostic et ne traite rien.",
+    },
     "coach-nutrition": {
       name: "Objectifs nutritionnels pour les clients",
       body: "Fixez les calories, protéines, glucides et lipides quotidiens de chaque client, avec d’autres calories les jours de repos si vous voulez, remplis avec ses propres données en un geste. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange quand il le partage.",
@@ -385,6 +403,10 @@ export const fr: FeaturesText = {
     "coach-checkins": {
       name: "Formulaires de bilan et questionnaires",
       body: "Envoyez à vos clients un bilan hebdomadaire, un questionnaire d'accueil ou votre propre formulaire, une fois ou chaque semaine. Ils répondent en quelques touches, et une note basse ou une réponse en retard remonte en haut de leur rapport.",
+    },
+    "coach-checkin-trends": {
+      name: "Bilans de progrès avec poids, photos et tendances",
+      body: "Ajoutez des questions de poids et de photo à n'importe quel formulaire, et envoyez-le chaque semaine, toutes les 2 ou toutes les 4 semaines. Le poids part de la dernière pesée du client, les photos ne vont qu'à vous, et la tendance de chaque réponse s'affiche dans son rapport. On ne demande jamais de photo aux moins de 18 ans.",
     },
     "coach-roles": {
       name: "Pour les coachs personnels et les entraîneurs",
@@ -440,6 +462,12 @@ export const fr: FeaturesText = {
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",
+    },
+    seasons: {
+      name: "Saisons d'entraînement",
+      body: "Des saisons de dix semaines avec un parcours de 20 paliers, gravi en vous entraînant vers votre propre objectif hebdomadaire : deux jours par semaine avancent aussi vite que cinq, et les jours en plus ne rapportent rien. Les paliers donnent des badges, un avatar, une couleur d'accent et un thème avec son icône propres à la saison, à vous pour toujours. Défis de saison, butin rare sur les nouveaux records, étoiles de prestige, semaine de rattrapage après un raté, finale à points doubles et bilan à partager.",
+      proPart: "Tous les paliers et leurs récompenses sont gratuits ; Pro ajoute une récompense bonus sur trois paliers.",
+      note: "Les icônes de saison sont sur Android et iPhone ; le web reçoit le thème. Les saisons peuvent être désactivées dans les Réglages.",
     },
     locker: {
       name: "Thèmes, couleurs et icônes d’appli",
@@ -504,6 +532,10 @@ export const fr: FeaturesText = {
     "strength-standards": {
       name: "Niveaux de force de vrais pratiquants",
       body: "Le site montre ce que les pratiquants soulèvent vraiment au squat, au développé couché, au soulevé de terre et au développé militaire, par sexe et poids de corps, recalculé chaque jour avec ceux qui comptent. Seuls les groupes de 30 personnes ou plus sont affichés, en centiles, jamais les chiffres de quelqu'un. Un interrupteur dans Réglages › Vos données et confidentialité décide si vous comptez ; les moins de 18 ans ne comptent jamais.",
+    },
+    community: {
+      name: "Communauté : idées, bugs et feuille de route",
+      body: "Proposez ce que Liftsmith devrait faire ensuite, votez pour les idées qui vous plaisent, signalez des bugs avec une capture que seule l'équipe voit, et commentez ou mentionnez quelqu'un avec @. Chacune montre où elle en est, d'en cours d'examen à livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort. La feuille de route et le journal des modifications sont aussi sur le site.",
     },
     languages: {
       name: "Dix langues",

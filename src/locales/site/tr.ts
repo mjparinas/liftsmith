@@ -36,6 +36,7 @@ export const tr: SiteText = {
       coaches: "Koçlar için",
       pricing: "Fiyatlar",
       whatsNew: "Yenilikler",
+      community: "Fikirler ve yol haritası",
       exercises: "Egzersiz kütüphanesi",
       muscles: "Kas gruplarına göre egzersizler",
       programs: "Antrenman programları",
@@ -244,6 +245,13 @@ export const tr: SiteText = {
           body: "Yalnızca eşitleme ve yedekleme istersen Google veya Apple ile giriş yap.",
         },
       ],
+    },
+    learn: {
+      eyebrow: "Ücretsiz rehberler",
+      title: "Hareketleri öğren, planı uygulamaya bırak",
+      body: "Adım adım teknik, her hareketin çalıştırdığı kaslar ve yerine ne yapılacağı, ayrıca ücretsiz hesaplayıcılar.",
+      exercises: "Popüler egzersizler",
+      tools: "Ücretsiz araçlar",
     },
     juice: {
       eyebrow: "Keyif için tasarlandı",

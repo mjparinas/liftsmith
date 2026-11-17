@@ -7,10 +7,13 @@ import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 
 
 import { forgetAccount, useAccount } from "@/lib/auth";
 import { setBillingLive } from "@/lib/billing";
+import { rehabProgram } from "@/lib/rehab";
+import { encodeRoutine } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { makeWorkout, NOW } from "@/test/factories";
 
+import { protocolRoutine } from "./CoachRehab";
 import { CoachNoteToday, Trainer } from "./Trainer";
 
 const calls: { url: string; body: unknown; auth?: string }[] = [];
@@ -451,10 +454,64 @@ describe("chat and body data", () => {
     await u.click(screen.getByRole("button", { name: "Assign a routine" }));
     // A physio's sheet starts at 3 times a week, with rehab programs first.
     expect(screen.getByRole("button", { name: "3" })).toHaveAttribute("aria-pressed", "true");
-    await u.click(screen.getByRole("button", { name: /Knee: gentle start/ }));
+    // Rehab protocols (2026-11-17): pick the phase to start in, and whether the client may move phases on their own.
+    expect(screen.getByRole("button", { name: "Phase 1: Calm and move" })).toHaveAttribute("aria-pressed", "true");
+    await u.click(screen.getByRole("button", { name: "Phase 2: Build strength" }));
+    await u.click(screen.getByRole("switch", { name: /Let them move phases on their own/ }));
+    await u.click(screen.getByRole("button", { name: /Knee rehab/ }));
     const sent = calls.find((c) => (c.body as { action?: string } | undefined)?.action === "assign")!.body as Record<string, unknown>;
-    expect(sent).toMatchObject({ client: "c1", name: "Knee: gentle start", perWeek: 3 });
-    expect(String(sent.code).endsWith("~rehab")).toBe(true);
+    expect(sent).toMatchObject({ client: "c1", name: "Knee rehab, phase 2", perWeek: 3 });
+    expect(String(sent.code).endsWith("~h:knee:3:knee:2:a~rehab")).toBe(true);
+  });
+
+  it("a physio sees a protocol ready for its next phase and sends it in one tap (rehab protocols)", async () => {
+    const knee = rehabProgram("knee")!;
+    const now = Date.now();
+    const code = encodeRoutine({ ...protocolRoutine(knee, 1, false), perWeek: 3 });
+    assigned = [{ id: "old", coachId: "me", clientId: "c1", name: "Knee rehab, phase 1", code, at: now - 20 * 86_400_000, perWeek: 3 }];
+    const workouts = [14, 12, 10, 8, 6, 4].flatMap((d, i) => [
+      ...makeWorkout(
+        `w${i}`,
+        now - d * 86_400_000,
+        knee.items.map((x) => ({ exerciseId: x.exerciseId })),
+      ),
+      {
+        id: `p${i}`,
+        at: now - d * 86_400_000 + 1800_000,
+        type: "pain",
+        injuryId: "k",
+        score: 1,
+        sessionId: `w${i}`,
+        exerciseId: "wall-sit",
+      },
+    ]);
+    const base = fetch;
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit = {}) => {
+      if (url === "/api/coach/?client=c1")
+        return Response.json({
+          name: "Alex",
+          daysPerWeek: 3,
+          role: "physio",
+          pain: true,
+          plans: assigned,
+          events: [{ id: "i1", at: now - 60 * 86_400_000, type: "injury", injuryId: "k", part: "knee" }, ...workouts],
+        });
+      return base(url, init);
+    });
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Knee rehab, phase 1: ready for phase 2 (Build strength)")).toBeInTheDocument();
+    const row = screen.getByTestId("plan-phase");
+    expect(row).toHaveTextContent("Phase 1 of 3: Calm and move.");
+    expect(row).toHaveTextContent("Pain 2 or less after each of the last 3 sessions, and no flare the next day.");
+    await u.click(within(row).getByRole("button", { name: "Move to phase 2" }));
+    const sent = calls.find((c) => (c.body as { action?: string } | undefined)?.action === "assign")!.body as Record<string, unknown>;
+    expect(sent).toMatchObject({ client: "c1", name: "Knee rehab, phase 2", perWeek: 3 });
+    expect(String(sent.code)).toContain("~h:knee:3:knee:2~rehab");
+    expect(calls.find((c) => (c.body as { action?: string } | undefined)?.action === "unassign")?.body).toEqual({
+      action: "unassign",
+      id: "old",
+    });
   });
 
   it("a client can share pain and injuries with each coach, off to start", async () => {
@@ -500,8 +557,10 @@ describe("check-ins", () => {
     await u.click(screen.getByRole("button", { name: "Send now" }));
     expect(await screen.findByText("Sent. They'll get a notification.")).toBeInTheDocument();
     expect(calls.find((c) => (c.body as { action?: string })?.action === "sendForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
-    await u.click(screen.getByRole("switch", { name: /Send this form every week/ }));
-    expect(calls.find((c) => (c.body as { action?: string })?.action === "repeatForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
+    await u.click(screen.getByRole("button", { name: "Every week" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "repeatForm")).toMatchObject({
+      body: { client: "c1", id: "f1", every: 7 },
+    });
   });
 
   it("a coach reads a client's answers, and a low score goes first", async () => {

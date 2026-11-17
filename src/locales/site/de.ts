@@ -31,6 +31,7 @@ export const de: SiteText = {
       coaches: "Für Coaches",
       pricing: "Preise",
       whatsNew: "Neuigkeiten",
+      community: "Ideen und Roadmap",
       exercises: "Übungsbibliothek",
       muscles: "Übungen nach Muskel",
       programs: "Trainingsprogramme",
@@ -218,6 +219,13 @@ export const de: SiteText = {
         { title: "Passt in deinen Kalender", body: "Trainingstage landen in deinem Kalender und Workouts passen sich an volle Tage an." },
         { title: "Kein Konto nötig", body: "Melde dich mit Google oder Apple nur an, wenn du Sync und Backup willst." },
       ],
+    },
+    learn: {
+      eyebrow: "Kostenlose Anleitungen",
+      title: "Lerne die Übungen, die App plant sie für dich",
+      body: "Technik Schritt für Schritt, welche Muskeln jede Übung trainiert und was du stattdessen machen kannst, dazu kostenlose Rechner.",
+      exercises: "Beliebte Übungen",
+      tools: "Kostenlose Tools",
     },
     juice: {
       eyebrow: "Macht Lust auf mehr",

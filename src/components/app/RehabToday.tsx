@@ -22,6 +22,7 @@ import type { Routine } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
+import { phaseLine } from "./RehabPhase";
 import { go } from "./router";
 import { Button } from "./ui";
 
@@ -47,8 +48,12 @@ export function PlanToday() {
   const saved = profile.routines;
   const waiting = useMemo(() => waitingPlan(plans, seen, saved ?? []), [plans, seen, saved]);
   const routines = saved ?? [];
-  if (!waiting || routines.length >= MAX_ROUTINES) return null;
+  if (!waiting) return null;
   const { plan, routine } = waiting;
+  // A new phase of a protocol already saved replaces it (2026-11-17), so it fits even with the routine list full.
+  const phase = routine.rehab ? routine.rehabPlan : undefined;
+  const replaces = phase ? routines.find((r) => r.rehab && r.rehabPlan?.id === phase.id) : undefined;
+  if (!replaces && routines.length >= MAX_ROUTINES) return null;
   const coach = plan.coach || t("trn.noName");
   const area = routine.rehab ? routine.rehabPart : undefined;
   const perWeek = routine.rehab ? (routine.perWeek ?? plan.perWeek) : undefined;
@@ -73,6 +78,7 @@ export function PlanToday() {
       ...(routine.rehab ? { rehab: true } : {}),
       ...(area ? { rehabPart: area } : {}),
       ...(perWeek ? { perWeek } : {}),
+      ...(routine.rehab && routine.rehabPlan ? { rehabPlan: routine.rehabPlan } : {}),
       ...(routine.parts ? { parts: routine.parts } : {}),
     });
     track("feature", { name: "trainer", detail: "planTodaySave" });
@@ -88,6 +94,12 @@ export function PlanToday() {
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold break-words">{t("trn.planToday.title", { name: coach, plan: plan.name })}</h2>
           <p className="mt-1 text-sm text-muted">{body}</p>
+          {phase ? (
+            <p className="mt-1 text-sm text-muted" data-testid="plan-today-phase">
+              {phaseLine(phase.phase)}
+              {replaces ? ` ${t("rhp.replaces", { name: replaces.name })}` : ""}
+            </p>
+          ) : null}
           {perWeek ? <p className="mt-1 text-sm text-muted">{t("trn.planToday.week", { name: coach, count: perWeek })}</p> : null}
         </div>
       </div>
@@ -137,6 +149,7 @@ export function RehabToday() {
         <Icon name="bandage" />
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold break-words">{t("str.rehabDay.title", { name: routine.name })}</h2>
+          {routine.rehabPlan && <p className="mt-1 text-sm text-muted">{phaseLine(routine.rehabPlan.phase)}</p>}
           <p className="mt-1 text-sm text-muted">{rehabDueWhy(due)}</p>
           <p className="num mt-1 text-xs text-muted">{t("str.rehabDay.minutes", { count: minutes })}</p>
         </div>

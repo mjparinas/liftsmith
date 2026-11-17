@@ -30,6 +30,7 @@ export const es: SiteText = {
       coaches: "Para entrenadores",
       pricing: "Precios",
       whatsNew: "Novedades",
+      community: "Ideas y hoja de ruta",
       exercises: "Biblioteca de ejercicios",
       muscles: "Ejercicios por músculo",
       programs: "Programas de entrenamiento",
@@ -223,6 +224,13 @@ export const es: SiteText = {
           body: "Inicia sesión con Google o Apple solo si quieres sincronizar y tener copia de seguridad.",
         },
       ],
+    },
+    learn: {
+      eyebrow: "Guías gratis",
+      title: "Aprende los ejercicios y deja que la app los planifique",
+      body: "Técnica paso a paso, los músculos que trabaja cada ejercicio y qué hacer en su lugar, además de calculadoras gratis.",
+      exercises: "Ejercicios populares",
+      tools: "Herramientas gratis",
     },
     juice: {
       eyebrow: "Hecho para motivar",

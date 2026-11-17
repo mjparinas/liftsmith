@@ -103,6 +103,7 @@ const SCREENS = [
   "#/exercises",
   "#/log",
   "#/feedback",
+  "#/community",
   "#/gymadd",
 ];
 
@@ -218,6 +219,7 @@ const ADMIN_TABS = [
   "Users",
   "Installs",
   "Flags",
+  "Seasons",
   "Automations",
   "System",
   "Log",

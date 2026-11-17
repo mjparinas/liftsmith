@@ -1,6 +1,6 @@
 import { blockWeek } from "./block";
 import { date, num, relative, t } from "./i18n";
-import { barFor } from "./loads";
+import { barFor, machineStep } from "./loads";
 import { smallestJump } from "./plates";
 import { repRange, sessionsOf, TIMED } from "./progression";
 import type { Call } from "./readiness";
@@ -95,7 +95,8 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   if (item?.pick) lines.unshift(t("explain.picked", { pick: item.pick }));
   if (item?.sets && !wk.deload && call !== "recover") lines.push(`${item.sets.charAt(0).toUpperCase()}${item.sets.slice(1)}.`);
 
-  if (!wk.deload) lines.push(t("explain.rir", { week: wk.label, count: target.rir }));
+  if (!wk.deload && !ex.cardio)
+    lines.push(timed ? t("explain.rirTimed", { week: wk.label }) : t("explain.rir", { week: wk.label, count: target.rir }));
 
   const scored = readiness !== undefined;
   if (call === "recover") lines.push(scored ? t("explain.easyScore", { score: readiness }) : t("explain.easy"));
@@ -108,8 +109,7 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
     const bar = barFor(ex, gym);
     if (jump > 0) lines.push(t("explain.barbell", { bar: `${fmtNum(bar.weight)} ${unit}`, jump: `${fmtNum(jump)} ${unit}` }));
   } else if (ex.load === "dumbbell" && gym.dumbbells.length) lines.push(t("explain.dumbbell"));
-  else if (ex.load === "machine")
-    lines.push(t("explain.machine", { step: `${fmtNum(gym.machineStep || (unit === "kg" ? 2.5 : 5))} ${unit}` }));
+  else if (ex.load === "machine") lines.push(t("explain.machine", { step: `${fmtNum(machineStep(gym))} ${unit}` }));
 
   return { title, lines };
 }

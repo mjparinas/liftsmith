@@ -1,6 +1,7 @@
 import { t } from "./i18n";
+import { TIMED } from "./progression";
 import { dayKey } from "./random";
-import type { ExercisePrefs, Muscle, Profile, RestAlert, TrainingPrefs } from "./types";
+import type { Exercise, ExercisePrefs, Muscle, Profile, RestAlert, TrainingPrefs } from "./types";
 
 // Workout preferences (Melvin, 2026-11-09): rest times, rep ranges and set counts, RIR or RPE, the
 // rest timer, favourite exercises, muscle priorities, the default workout length and the first day of
@@ -85,9 +86,22 @@ export function effortLabel(rir: number, scale: TrainingPrefs["effort"]): string
   return scale === "rpe" ? `RPE ${rpeOf(rir)}` : `RIR ${rir}`;
 }
 
-/** The aim under the numbers on the workout screen. */
-export function effortAim(rir: number, scale: TrainingPrefs["effort"]): string {
+/** How a set is measured: reps, a time (holds, carries, intervals) or cardio (minutes at a pace). */
+export type EffortKind = "reps" | "time" | "cardio";
+
+export function effortKind(ex: Pick<Exercise, "id" | "cardio">): EffortKind {
+  if (ex.cardio) return "cardio";
+  return TIMED.has(ex.id) ? "time" : "reps";
+}
+
+/**
+ * The aim under the numbers on the workout screen. Reps in reserve only make sense for sets counted in reps:
+ * a timed set stops a few seconds before form slips, and cardio is a pace you could talk at.
+ */
+export function effortAim(rir: number, scale: TrainingPrefs["effort"], kind: EffortKind = "reps"): string {
+  if (kind === "cardio") return t("train.aimCardio");
   if (scale === "rpe") return t("train.aimRpe", { rpe: rpeOf(rir) });
+  if (kind === "time") return t(rir > 0 ? "train.aimTimed" : "train.aimTimedMax");
   return t("train.aimRir", { count: rir });
 }
 

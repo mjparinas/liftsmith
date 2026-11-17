@@ -31,6 +31,7 @@ export const fr: SiteText = {
       coaches: "Pour les coachs",
       pricing: "Tarifs",
       whatsNew: "Nouveautés",
+      community: "Idées et feuille de route",
       exercises: "Bibliothèque d’exercices",
       muscles: "Exercices par muscle",
       programs: "Programmes d’entraînement",
@@ -224,6 +225,13 @@ export const fr: SiteText = {
           body: "Connectez-vous avec Google ou Apple seulement si vous voulez la synchronisation et la sauvegarde.",
         },
       ],
+    },
+    learn: {
+      eyebrow: "Guides gratuits",
+      title: "Apprenez les exercices, l'app les planifie",
+      body: "La technique pas à pas, les muscles travaillés et quoi faire à la place, plus des calculateurs gratuits.",
+      exercises: "Exercices populaires",
+      tools: "Outils gratuits",
     },
     juice: {
       eyebrow: "Fait pour motiver",

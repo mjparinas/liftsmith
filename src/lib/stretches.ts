@@ -132,10 +132,18 @@ export function searchStretches(q: { text?: string; kind?: StretchKind | "all"; 
   });
 }
 
-/** The id the 3D demo knows a stretch by (kept apart from exercise ids: "glute-bridge" is both). */
-export const demoId = (id: string) => `stretch:${id}`;
+/** The id the 3D demo knows a stretch by (kept apart from exercise ids: "glute-bridge" is both); `side` shows one side of a one-side stretch. */
+export const demoId = (id: string, side?: "L" | "R") => `stretch:${id}${side ? `@${side}` : ""}`;
 
 /** Rough time for a stretch: the hold, or reps at about 3 seconds each, twice when it's done on each side. */
+/** Get-ready seconds before each stretch and each side, from Settings › Workout. */
+export const READY_CHOICES = [0, 3, 5, 10] as const;
+export const READY_DEFAULT = 5;
+/** The lifter's get-ready time: missing means the default, anything not offered falls back to it. */
+export function readySeconds(setting: number | undefined): number {
+  return setting !== undefined && (READY_CHOICES as readonly number[]).includes(setting) ? setting : READY_DEFAULT;
+}
+
 export function stretchSeconds(s: Stretch): number {
   const one = s.reps ? s.reps * 3 : s.seconds;
   return one * (s.eachSide ? 2 : 1);

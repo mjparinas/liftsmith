@@ -67,7 +67,7 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
 
 /// Earned app icons (src/lib/themes.ts), iOS side (Android: AppIconPlugin.java, launcher aliases).
 /// The icon sets are AppIcon-<name> in Assets.xcassets, listed in ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES,
-/// drawn by scripts/make-theme-icons.py. iOS shows its own "You have changed the icon" alert; that can't be hidden.
+/// drawn by scripts/make-icons.mjs. iOS shows its own "You have changed the icon" alert; that can't be hidden.
 @objc(AppIconPlugin)
 public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "AppIconPlugin"
@@ -77,7 +77,7 @@ public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "get", returnType: CAPPluginReturnPromise),
     ]
 
-    static let icons = ["default", "forge", "glacier", "aurora", "royal"]
+    static let icons = ["default", "forge", "glacier", "aurora", "royal", "ember", "embergold"]
 
     @objc func set(_ call: CAPPluginCall) {
         let name = call.getString("name") ?? "default"
@@ -214,5 +214,26 @@ public class ScreenshotsPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func isSupported(_ call: CAPPluginCall) {
         call.resolve(["supported": true])
+    }
+}
+
+/// Keeps the screen on while a workout, a stretching routine or a timed tool is on screen (keepAwake in
+/// src/lib/juice.ts). WKWebView has the Screen Wake Lock only on recent iOS versions, so the app turns off
+/// the idle timer instead, which iOS applies only while the app is in front. Android counterpart:
+/// ScreenAwakePlugin.java (the window's keep-screen-on flag).
+@objc(ScreenAwakePlugin)
+public class ScreenAwakePlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "ScreenAwakePlugin"
+    public let jsName = "ScreenAwake"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "set", returnType: CAPPluginReturnPromise),
+    ]
+
+    @objc func set(_ call: CAPPluginCall) {
+        let on = call.getBool("on") ?? false
+        DispatchQueue.main.async {
+            UIApplication.shared.isIdleTimerDisabled = on
+            call.resolve()
+        }
     }
 }

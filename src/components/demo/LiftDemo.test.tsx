@@ -12,7 +12,7 @@ describe("LiftDemo", () => {
     expect(screen.getByText("Back squat")).toBeInTheDocument();
   });
 
-  it("offers body, view, overlay and tempo controls and lists the muscles worked", () => {
+  it("offers body, view and overlay controls and lists the muscles worked, with no tempo or pause", () => {
     render(<LiftDemo exerciseId="deadlift" controls />);
     const skeleton = screen.getByRole("button", { name: "Skeleton" });
     expect(skeleton).toHaveAttribute("aria-pressed", "false");
@@ -23,8 +23,12 @@ describe("LiftDemo", () => {
     fireEvent.click(screen.getByRole("button", { name: "Side" }));
     expect(screen.getByRole("button", { name: "Side" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText("Hamstrings")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Pause" }));
-    expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Pause" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Play" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Tempo" })).toBeNull();
+    // the muscles worked come straight under the figure, before the toggles
+    const works = screen.getByText("Works");
+    expect(works.compareDocumentPosition(skeleton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows no body toggle or body label in the app; the figure follows the body it's given", () => {

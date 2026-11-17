@@ -852,4 +852,83 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Preferisci non vederli durante il recupero? Disattiva Controlli tecnici durante il recupero in Impostazioni › Allenamento.",
   },
+  "auto-supersets": {
+    title: "Superserie, fatte per te",
+    intro: "I tuoi allenamenti adattivi ora possono abbinare gli esercizi in superserie per te, con un solo interruttore.",
+    points: [
+      "Attiva Abbina gli esercizi in superserie in Impostazioni › Programmazione › Allenamenti adattivi.",
+      "Gli esercizi che non usano gli stessi muscoli si fanno di seguito, come una spinta e un rematore, così ognuno recupera mentre fai l'altro.",
+      "Il recupero dopo ogni giro è più breve, e il tempo risparmiato porta più allenamento nella durata che scegli.",
+      "Squat e stacchi pesanti restano da soli, e puoi separare qualsiasi coppia in Oggi.",
+    ],
+    dyk: "Nella stessa sezione c'è l'interruttore Serie di riscaldamento, per i giorni in cui preferisci scaldarti a modo tuo.",
+  },
+  "club-chat": {
+    title: "Il tuo club, tra un allenamento e l’altro",
+    intro: "I club ora hanno una chat e gli allenamenti di gruppo, così le persone con cui ti alleni possono parlare e vedersi.",
+    points: [
+      "Apri Amici › Club, scegli un club e tocca Chat per scrivere a tutti.",
+      "Proponi un allenamento di gruppo con un nome, un giorno e un orario, e i membri toccano Ci sono.",
+      "Chi partecipa riceve un promemoria un’ora prima.",
+      "Pubblica l’allenamento dopo: risulterai allenato, con gli amici che erano con te taggati.",
+    ],
+    dyk: "Avvisami, nella chat di ogni club, spegne le sue notifiche, e una chat ne invia al massimo una all’ora.",
+  },
+  community: {
+    title: "Vota cosa costruiamo dopo",
+    intro: "Liftsmith ora ha una community: suggerisci idee, vota quelle che vuoi e segnala i bug.",
+    points: [
+      "Apri Impostazioni › Aiuto › Community.",
+      "Tocca la freccia accanto a un'idea per votarla. Le più richieste salgono in cima.",
+      "Segnala un bug con uno screenshot che vedete solo tu e il team.",
+      "Ogni post mostra a che punto è, da In valutazione a Rilasciata, e ti avvisiamo quando esce un'idea che hai votato.",
+    ],
+    dyk: "Roadmap e registro delle modifiche sono anche sul sito, su getliftsmith.com/community.",
+  },
+  "coach-checkin-trends": {
+    title: "Check-in con peso, foto e andamento",
+    intro: "I tuoi moduli di check-in ora possono chiedere il peso corporeo e delle foto, e mostrare come va ogni risposta.",
+    points: [
+      "Aggiungi una domanda Peso corporeo: parte dall'ultima pesata del cliente e salva quella nuova nel suo registro.",
+      "Aggiungi fino a tre domande Foto, ad esempio di fronte e di lato. Le vedi solo tu.",
+      "Invia un modulo ogni settimana, ogni 2 settimane o ogni 4 settimane.",
+      "Il report di ogni cliente mostra l'andamento di ogni punteggio, numero e peso, e avvisa quando un punteggio cala.",
+    ],
+    dyk: "Parti dal nuovo modello Check-in dei progressi in Coaching › Check-in. Ai minori di 18 anni non si chiedono mai foto.",
+  },
+  seasons: {
+    title: "Le stagioni di allenamento iniziano lunedì",
+    intro: "La stagione 1, Brace, inizia lunedì: dieci settimane, un percorso di 20 livelli e premi che si ottengono solo quest'inverno.",
+    points: [
+      "Sali raggiungendo il tuo obiettivo settimanale. I giorni in più non danno punti, quindi due giorni a settimana salgono veloci quanto cinque.",
+      "I livelli danno badge, un avatar, un colore d'accento e il tema Brace con la sua icona, solo di questa stagione e tuoi per sempre.",
+      "Salti una settimana? La successiva in cui raggiungi l'obiettivo vale il bonus doppio. L'ultima settimana vale doppio.",
+      "Ogni nuovo record ha 1 possibilità su 6 di far cadere i dischi rari della stagione.",
+    ],
+    dyk: "Preferisci non vedere le stagioni? Disattiva Stagioni di allenamento in Impostazioni › Aspetto e stile. Il tuo allenamento conta comunque.",
+  },
+  "gym-classes": {
+    title: "Metti l'orario dei corsi sulla pagina della tua palestra",
+    intro: "Chi si allena da te vede i corsi della settimana sulla pagina della palestra, nell'app e sul sito.",
+    points: [
+      "Aggiungi ogni corso una volta: tipo, giorni, ora di inizio e durata. Quasi niente da scrivere.",
+      "Aggiungi l'istruttore, la sala e una breve nota, ad esempio come prenotare.",
+      "Chiuso per una festa? Tocca la data e il corso risulta sospeso quel giorno.",
+      "Si aggiunge il prossimo corso al calendario con un tocco.",
+    ],
+    dyk: "Gli orari sono quelli della tua palestra, quindi le 18:00 sono le 18:00 per tutti. Le prenotazioni restano a te.",
+  },
+  "physio-protocols": {
+    title: "Riabilitazione a fasi, guidata dal dolore",
+    intro:
+      "Ogni programma di riabilitazione ora ha tre fasi, dal calmare la zona al pieno uso, e una semplice regola del dolore che dice quando avanzare.",
+    points: [
+      "Scegli la fase di partenza quando lo assegni: Calmare e muovere, Costruire forza o Ritorno al pieno uso.",
+      "Dopo sei sessioni con dolore 2 o meno dopo le ultime tre, e nessuna riacutizzazione il giorno dopo, il report del cliente dice che è pronto per la fase successiva.",
+      "Dolore 5 o più dopo due delle ultime tre, o una riacutizzazione il giorno dopo, indica di tornare indietro di una fase.",
+      "Invia la fase successiva con un tocco. Sostituisce la precedente sul suo telefono, così lo storico continua.",
+      "I clienti valutano come sentono la zona il giorno dopo la riabilitazione, che spesso è ciò che ti dice di più.",
+    ],
+    dyk: "Attiva Lascia che cambi fase da solo e la sua app proporrà la fase successiva quando lo dice la regola. Tu vedi comunque ogni cambio.",
+  },
 };

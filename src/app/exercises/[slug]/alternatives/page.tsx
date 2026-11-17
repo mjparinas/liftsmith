@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { alternativesMeta } from "@/lib/exerciseMeta";
 import { EXERCISES } from "@/lib/exercises";
 import { pageMeta } from "@/lib/pageMeta";
 import { alternativesTo, exerciseBySlug, indexAlternatives, MUSCLE_NAME, needsText } from "@/lib/seo";
@@ -18,19 +19,58 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = exerciseBySlug((await params).slug);
   if (!e) return {};
-  const n = alternativesTo(e.id).length;
   return pageMeta({
-    title: `${n} ${e.name.toLowerCase()} alternatives for any gym`,
-    description: `The best substitutes for the ${e.name.toLowerCase()} that train the same muscles, for a full gym, a home gym or no equipment at all.`,
+    ...alternativesMeta(e),
     path: `/exercises/${e.id}/alternatives/`,
     noindex: !indexAlternatives(e.id),
   });
 }
 
+const KIND_WORDS: Partial<Record<Exercise["load"], string>> = {
+  dumbbell: "dumbbell",
+  machine: "machine or cable",
+  kettlebell: "kettlebell",
+};
+
+/** The questions people search about swapping a lift, answered from the same list the page shows. */
+function alternativesFaq(e: Exercise, alts: Exercise[]): [string, string][] {
+  const l = e.name.toLowerCase();
+  const name = (a: Exercise) => `the ${a.name.toLowerCase()}`;
+  const faq: [string, string][] = [];
+  const [best, ...rest] = alts;
+  if (!best) return faq;
+  const next = rest.slice(0, 2).map(name);
+  faq.push([
+    `What is the best alternative to the ${l}?`,
+    `${best.name}: ${why(e, best).toLowerCase()}.${next.length ? ` If you can't do that one either, ${next.join(" and ")} ${next.length > 1 ? "are" : "is"} the next closest.` : ""}`,
+  ]);
+  const free = alts.filter((a) => !a.needs.length).slice(0, 2);
+  if (e.needs.length && free.length)
+    faq.push([
+      `What can I do instead of the ${l} at home with no equipment?`,
+      `Try ${free.map(name).join(" or ")}. ${free.length > 1 ? "Both train" : "It trains"} the ${shared(e, free[0]!)} with only your body weight; make ${free.length > 1 ? "them" : "it"} harder with slower reps or more reps once 15 feel easy.`,
+    ]);
+  for (const kind of ["dumbbell", "machine", "kettlebell"] as const) {
+    if (e.load === kind) continue;
+    const a = alts.find((x) => x.load === kind);
+    if (a) faq.push([`What is a ${KIND_WORDS[kind]} alternative to the ${l}?`, `${a.name}: ${why(e, a).toLowerCase()}.`]);
+  }
+  faq.push([
+    `What muscles should a ${l} alternative work?`,
+    `The ${l} mainly works the ${e.primary.map((m) => MUSCLE_NAME[m].toLowerCase()).join(" and ")}${e.secondary.length ? `, with help from the ${e.secondary.map((m) => MUSCLE_NAME[m].toLowerCase()).join(", ")}` : ""}. A good swap trains the same main muscles, ideally with the same kind of movement, so every exercise here does.`,
+  ]);
+  return faq;
+}
+
+const shared = (e: Exercise, a: Exercise) =>
+  a.primary
+    .filter((m) => e.primary.includes(m))
+    .map((m) => MUSCLE_NAME[m].toLowerCase())
+    .join(" and ");
+
 /** Why an alternative fits, in a few words. */
 function why(e: Exercise, a: Exercise): string {
-  const shared = a.primary.filter((m) => e.primary.includes(m)).map((m) => MUSCLE_NAME[m].toLowerCase());
-  const bits = [`Trains the ${shared.join(" and ")}`];
+  const bits = [`Trains the ${shared(e, a)}`];
   if (a.pattern === e.pattern) bits.push("same movement");
   if (!a.needs.length) bits.push("no equipment");
   else if (a.needs.some((n) => !e.needs.includes(n)) || a.needs.length < e.needs.length) bits.push(`needs ${needsText(a).toLowerCase()}`);
@@ -41,6 +81,7 @@ export default async function AlternativesPage({ params }: Props) {
   const e = exerciseBySlug((await params).slug);
   if (!e) notFound();
   const alts = alternativesTo(e.id);
+  const faq = alternativesFaq(e, alts);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -51,6 +92,15 @@ export default async function AlternativesPage({ params }: Props) {
   return (
     <SitePage kind="alternatives" sticky="Swap exercises in one tap">
       <JsonLd data={jsonLd} />
+      {faq.length > 0 && (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+          }}
+        />
+      )}
       <Crumbs
         items={[{ href: "/exercises/", label: "Exercises" }, { href: `/exercises/${e.id}/`, label: e.name }, { label: "Alternatives" }]}
       />
@@ -83,6 +133,26 @@ export default async function AlternativesPage({ params }: Props) {
           </li>
         ))}
       </ol>
+      {faq.length > 0 && (
+        <section className="mt-10 max-w-3xl">
+          <h2 className="text-2xl font-bold tracking-tight">Questions</h2>
+          <dl className="mt-4 space-y-5">
+            {faq.map(([q, a]) => (
+              <div key={q}>
+                <dt className="font-semibold">{q}</dt>
+                <dd className="mt-1 leading-relaxed text-muted">{a}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-5 text-muted">
+            How to do the original:{" "}
+            <Link href={`/exercises/${e.id}/`} className="text-accent underline underline-offset-2">
+              {e.name.toLowerCase()} form, muscles and cues
+            </Link>
+            .
+          </p>
+        </section>
+      )}
       <CtaBanner
         cta="alternatives-end"
         title="A plan that only uses what your gym has"

@@ -32,6 +32,7 @@ import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, provideNextPlan, refreshReminders, startDefaultEmail } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
+import { startSeasons } from "@/lib/remoteSeasons";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
@@ -51,6 +52,7 @@ import { Achievements, useGame } from "./Achievements";
 import { ChatDock } from "./ChatDock";
 import { CheckinToasts } from "./CheckinToasts";
 import { CoachProgramScreen } from "./CoachProgram";
+import { Community } from "./Community";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExerciseLibrary } from "./ExerciseLibrary";
@@ -78,6 +80,7 @@ import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
 import { go, goBack, historyDepth, isRoute, parse, useRoute, type Route } from "./router";
 import { ScreenBoundary } from "./ScreenBoundary";
+import { SeasonScreen } from "./Season";
 import { Settings } from "./Settings";
 import { SharedGym } from "./SharedGym";
 import { SharedRoutine } from "./SharedRoutine";
@@ -106,7 +109,7 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
 
 // Screens with a desktop layout of their own (two columns or more, docs/decisions/desktop-layout.md stage 3): they get
 // the full width on the desktop layout. Every other screen keeps a comfortable single column.
-const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise", "trainer"]);
+const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise", "trainer", "season"]);
 
 // Screens that hide the tab bar.
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
@@ -125,8 +128,9 @@ export function App() {
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
   // The achievements come from the shared game result (useGame), not a second count of their own.
-  const achieved = useGame().achievements;
-  const unlockCtx = useMemo(() => unlockFrom(achieved, stats, now), [achieved, stats, now]);
+  const played = useGame();
+  const achieved = played.achievements;
+  const unlockCtx = useMemo(() => unlockFrom(achieved, stats, now, played.owned), [achieved, stats, now, played.owned]);
   const theme = activeTheme(profile.delight?.theme, unlockCtx);
   const themeId = theme.id;
   // Colours, in order: Appearance (dark, light or match system), then the earned theme (only its
@@ -199,6 +203,8 @@ export function App() {
     startAnalytics();
     // Feature flags from the server (remoteFlags.ts); the last answer stays for offline use.
     startFlags();
+    // The season schedule (remoteSeasons.ts). A change redraws the game parts, which are worked out per event list.
+    startSeasons(() => useApp.setState((s) => ({ events: [...s.events] })));
     // Feedback written offline goes out as soon as there's a connection.
     void flushFeedback();
     // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
@@ -489,6 +495,8 @@ export function App() {
     gymadd: <GymAdd />,
     log: <LogPast />,
     program: <CoachProgramScreen key={arg ?? ""} arg={arg} />,
+    community: <Community key={arg ?? ""} arg={arg} />,
+    season: <SeasonScreen />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
@@ -613,6 +621,7 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
   "connections",
   "training",
   "feedback",
+  "community",
   "gym",
   "gymlink",
   "gymplace",

@@ -5,13 +5,53 @@
 // injuries on their report when they share them, and the rehab programs and times a week in the assign sheet. The
 // client's own "Share pain and injuries" switch sits with the other sharing switches (CoachShare.tsx). Liftsmith shows
 // what the client logs; it never diagnoses or says what's safe for an injury, and every screen here says so.
+import { useState } from "react";
+
 import { date, t } from "@/lib/i18n";
 import { PART_LABEL } from "@/lib/injury";
-import { REHAB_PROGRAMS, rehabBody, rehabName, type RehabProgram } from "@/lib/rehab";
-import { liftName, type RehabInjury } from "@/lib/trainer";
+import {
+  phaseBody,
+  phaseItems,
+  phaseRoutineName,
+  PHASES,
+  phaseTitle,
+  protocolName,
+  REHAB_PROGRAMS,
+  rehabBody,
+  type RehabProgram,
+} from "@/lib/rehab";
+import { PAIN_EASY, PAIN_HIGH, PHASE_MIN_SESSIONS, phaseTo } from "@/lib/rehabPhases";
+import { liftName, type PlanProgress, type RehabInjury } from "@/lib/trainer";
+import type { Routine } from "@/lib/types";
 
 import { Sparkline } from "./Injuries";
-import { Chip, Section } from "./ui";
+import { phaseLine, phaseWhy } from "./RehabPhase";
+import { Button, Chip, InlineSwitch, Section } from "./ui";
+
+/** "Phase 2: Build strength", on the phase chips. */
+const phaseLabel = (n: number) => t("rhp.chip", { phase: n, title: phaseTitle(n) });
+
+/**
+ * Under an assigned protocol on the client's report: its phase, what the pain rule says and why, and the one-tap move
+ * to the phase it points to (which sends the client that phase, replacing this one).
+ */
+export function PlanPhase({ rehab, onMove }: { rehab: NonNullable<PlanProgress["rehab"]>; onMove: (phase: number) => void }) {
+  const to = rehab.check ? phaseTo(rehab.check) : undefined;
+  return (
+    <span className="mt-0.5 block text-xs text-muted" data-testid="plan-phase">
+      <span className="block">
+        {phaseLine(rehab.phase)}
+        {rehab.plan.self ? ` · ${t("rhp.selfShort")}` : ""}
+      </span>
+      <span className="block">{rehab.check ? phaseWhy(rehab.check) : t("rhp.noPain")}</span>
+      {to !== undefined && (
+        <Button kind="ghost" className="mt-1.5" onClick={() => onMove(to)}>
+          {rehab.check!.status === "back" ? t("rhp.coach.back", { phase: to }) : t("rhp.coach.up", { phase: to })}
+        </Button>
+      )}
+    </span>
+  );
+}
 
 /** On a client's report: each injury with its pain trend and the latest rating on each exercise. */
 export function ClientPain({ name, rehab, names }: { name: string; rehab: RehabInjury[] | null; names: ReadonlyMap<string, string> }) {
@@ -104,20 +144,61 @@ export function PerWeekPicker({ value, onChange }: { value: number | undefined; 
   );
 }
 
-/** The rehab programs a coach can assign in one tap (rehab.ts). */
-export function RehabPrograms({ onPick }: { onPick: (p: RehabProgram) => void }) {
+/** A rehab protocol as it's assigned: its phase's name and exercises, the area, and the phase it starts in. */
+export function protocolRoutine(
+  p: RehabProgram,
+  phase: number,
+  self: boolean,
+): Pick<Routine, "name" | "items" | "rehab" | "rehabPart" | "rehabPlan"> {
+  return {
+    name: phaseRoutineName(p, phase),
+    items: phaseItems(p, phase),
+    rehab: true,
+    rehabPart: p.part,
+    rehabPlan: { id: p.id, phase, ...(self ? { self: true as const } : {}) },
+  };
+}
+
+/**
+ * The rehab protocols a coach can assign in one tap (rehab.ts), with the phase to start in and whether the client may
+ * move phases on their own when the pain rule says so (off by default: the physio decides).
+ */
+export function RehabPrograms({ onPick }: { onPick: (p: RehabProgram, phase: number, self: boolean) => void }) {
+  const [phase, setPhase] = useState(1);
+  const [self, setSelf] = useState(false);
   return (
     <div className="mb-4">
       <p className="mb-1 text-sm font-semibold">{t("trn.rehabTitle")}</p>
       <p className="mb-2 text-xs text-muted">{t("trn.rehabHint")}</p>
+      <p className="text-sm font-medium" id="rhp-start">
+        {t("rhp.startAt")}
+      </p>
+      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="rhp-start">
+        {Array.from({ length: PHASES }, (_, i) => i + 1).map((n) => (
+          <Chip key={n} active={phase === n} onClick={() => setPhase(n)}>
+            {phaseLabel(n)}
+          </Chip>
+        ))}
+      </div>
+      <p className="mt-1 text-xs text-muted">{phaseBody(phase)}</p>
+      <InlineSwitch className="mt-2" label={t("rhp.selfLabel")} hint={t("rhp.selfHint")} on={self} onChange={setSelf} />
+      <p className="mt-1 mb-2 text-xs text-muted">{t("rhp.rule", { need: PHASE_MIN_SESSIONS, easy: PAIN_EASY, high: PAIN_HIGH })}</p>
       <ul className="space-y-2">
         {REHAB_PROGRAMS.map((p) => (
           <li key={p.id}>
-            <button type="button" onClick={() => onPick(p)} className="press card flex w-full items-center gap-3 px-4 py-3 text-left">
+            <button
+              type="button"
+              onClick={() => onPick(p, phase, self)}
+              className="press card flex w-full items-center gap-3 px-4 py-3 text-left"
+            >
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{rehabName(p)}</span>
-                <span className="block text-sm text-muted">{rehabBody(p)}</span>
-                <span className="mt-0.5 block text-xs text-muted">{p.items.map((i) => liftName(i.exerciseId, new Map())).join(", ")}</span>
+                <span className="block truncate font-semibold">{protocolName(p)}</span>
+                {phase === 1 && <span className="block text-sm text-muted">{rehabBody(p)}</span>}
+                <span className="mt-0.5 block text-xs text-muted">
+                  {phaseItems(p, phase)
+                    .map((i) => liftName(i.exerciseId, new Map()))
+                    .join(", ")}
+                </span>
               </span>
               <span aria-hidden className="text-faint">
                 ›

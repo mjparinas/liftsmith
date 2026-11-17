@@ -81,7 +81,7 @@ export function GymFillPanel({ id, done }: { id: string; done: (note: string | n
             </label>
           ))}
           <div className="flex flex-wrap gap-2 sm:col-span-2">
-            <button type="submit" disabled={saving} className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink">
+            <button type="submit" disabled={saving} className="press rounded-lg btn-primary px-3 py-1.5 font-semibold">
               Save
             </button>
             <button type="button" onClick={() => done(null)} className="press rounded-lg border border-line px-3 py-1.5 text-muted">
@@ -155,11 +155,7 @@ export function FindDupes({ citySlug, cityLabel, changed }: { citySlug: string; 
               {merged.has(p.drop.id) ? (
                 <span className="text-muted">Merged</span>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => void merge(p)}
-                  className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-                >
+                <button type="button" onClick={() => void merge(p)} className="press rounded-lg btn-primary px-3 py-1.5 font-semibold">
                   Merge
                 </button>
               )}

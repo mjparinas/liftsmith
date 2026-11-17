@@ -193,6 +193,23 @@ export function gradedSet(s: Pick<SetEvent, "exerciseId" | "tag" | "challenge">)
   return !s.tag && !s.challenge && !EXERCISE_BY_ID.get(s.exerciseId)?.cardio;
 }
 
+/**
+ * Notes that talk about reps, and their versions for timed sets (holds, carries, intervals), which are
+ * counted in seconds. A timed set never hears "one more rep".
+ */
+const TIMED_NOTE = {
+  "note.oneMoreRep": "note.timedLonger",
+  "note.sameAgain": "note.timedSame",
+  "note.deloadEasy": "note.timedDeload",
+  "note.missedTwo": "note.timedShort",
+  "note.topOfRange": "note.timedTop",
+} as const;
+
+/** The note for a target, in seconds for a timed exercise. */
+export function noteFor(ex: Pick<Exercise, "id">, key: keyof typeof TIMED_NOTE): string {
+  return t(TIMED.has(ex.id) ? TIMED_NOTE[key] : key);
+}
+
 /** A first cardio session's time (seconds), and its range. */
 export const CARDIO_START_SEC = 20 * 60;
 
@@ -331,7 +348,7 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
     const reps = Math.min(hi, Math.max(lo, last?.[0]!.targetReps ?? lo));
     return { weight: w, reps, rir: base.rir, note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }) };
   }
-  const struggled = base.note === t("note.tooHard") || base.note === t("note.missedTwo");
+  const struggled = base.note === t("note.tooHard") || base.note === noteFor(ex, "note.missedTwo");
   if (!struggled && w > base.weight + 1e-6) return { ...base, weight: w, note: t("note.rampBack") };
   return base;
 }
@@ -359,8 +376,8 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
     if (fb > 0) reps += 1;
     if (fb < 0) reps = Math.max(lo, reps - 2);
     reps = Math.min(Math.max(lo, reps), Math.max(hi, best + 1));
-    if (wk.deload) return { weight: 0, reps: lo, rir, note: t("note.deloadEasy") };
-    return { weight: 0, reps, rir, note: hit ? t("note.oneMoreRep") : t("note.sameAgain") };
+    if (wk.deload) return { weight: 0, reps: lo, rir, note: noteFor(ex, "note.deloadEasy") };
+    return { weight: 0, reps, rir, note: hit ? noteFor(ex, "note.oneMoreRep") : noteFor(ex, "note.sameAgain") };
   }
 
   if (!last) {
@@ -401,18 +418,18 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
 
   let weight = lastWeight;
   let reps = Math.min(hi, Math.max(lo, lastTarget));
-  let note = t("note.sameAgain");
+  let note = noteFor(ex, "note.sameAgain");
   if (bigMiss || fb < 0) {
     weight = stepLoad(lastWeight, -1, ex, gym);
     reps = lo;
-    note = fb < 0 ? t("note.tooHard") : t("note.missedTwo");
+    note = fb < 0 ? t("note.tooHard") : noteFor(ex, "note.missedTwo");
   } else if (allHit && (lastTarget >= hi || fb > 0)) {
     weight = stepLoad(lastWeight, 1, ex, gym);
     reps = lo;
-    note = fb > 0 && lastTarget < hi ? t("note.feltEasy") : t("note.topOfRange");
+    note = fb > 0 && lastTarget < hi ? t("note.feltEasy") : noteFor(ex, "note.topOfRange");
   } else if (allHit) {
     reps = Math.min(hi, lastTarget + 1);
-    note = t("note.oneMoreRep");
+    note = noteFor(ex, "note.oneMoreRep");
   }
   return { weight: roundLoad(weight, ex, gym).kg, reps, rir, note };
 }

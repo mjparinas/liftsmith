@@ -15,6 +15,7 @@
     "src/lib/explain.ts",
     "src/lib/game.ts",
     "src/lib/generator.ts",
+    "src/lib/autoSuperset.ts",
     "src/lib/goals.ts",
     "src/lib/injury.ts",
     "src/lib/layoff.ts",

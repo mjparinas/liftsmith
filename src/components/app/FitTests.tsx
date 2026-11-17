@@ -14,6 +14,7 @@ import {
   FIT_RANGE,
   FIT_START,
   FIT_TESTS,
+  fitLine,
   reference,
   resultsOf,
   summarize,
@@ -230,8 +231,81 @@ function Result({ s }: { s: FitSummary }) {
           <> · {t("ft.change", { change: `${s.change > 0 ? "+" : "−"}${fmtResult(test, Math.abs(s.change))}` })}</>
         )}
       </p>
+      {s.ref && s.verdict && <NumberLine test={test} value={s.last.value} range={s.ref} verdict={s.verdict} />}
       <p className="mt-2 text-sm text-ink">{t(todo)}</p>
       {s.goal !== null && <p className="mt-1 text-sm font-semibold">{t("ft.goal", { value: fmtResult(test, s.goal) })}</p>}
+    </div>
+  );
+}
+
+/** Band colours on the number line; the same hues as the verdict chip, never red or amber. */
+const BAND: Record<"below" | "typical" | "above", string> = { below: "bg-faint/45", typical: "bg-cyan", above: "bg-good" };
+
+/**
+ * Where the result sits on a coloured line from 0: Room to build, Typical and Above typical, with a marker at
+ * the result (Melvin, 2026-11-17). The verdict chip above says the same in words, and screen readers hear one
+ * sentence (`ft.line`), so colour is never the only cue.
+ */
+function NumberLine({ test, value, range: ref, verdict }: { test: FitTest; value: number; range: FitReference; verdict: FitVerdict }) {
+  const line = fitLine(test, value, ref);
+  const r = (n: number) => Math.round(n);
+  const label = t("ft.line", {
+    value: fmtResult(test, value),
+    band: t(`ft.v.${verdict}`),
+    low: fmtResult(test, r(ref.low)),
+    high: fmtResult(test, r(ref.high)),
+  });
+  const segs = (
+    [
+      ["below", 0, line.low],
+      ["typical", line.low, line.high],
+      ["above", line.high, 1],
+    ] as const
+  ).filter(([, a, b]) => b - a > 0.001);
+  const pct = (n: number) => `${n * 100}%`;
+  const together = line.high - line.low < 0.14;
+  const ticks: [number, string][] = together
+    ? [[(line.low + line.high) / 2, `${r(ref.low)}–${r(ref.high)}`]]
+    : [
+        [line.low, String(r(ref.low))],
+        [line.high, String(r(ref.high))],
+      ];
+  return (
+    <div className="mt-3" role="img" aria-label={label} data-testid="ft-line">
+      <div aria-hidden className="relative px-2 pt-4">
+        <div className="relative flex h-2.5 gap-0.5">
+          {segs.map(([band, a, b]) => (
+            <span key={band} className={`h-full basis-0 rounded-full ${BAND[band]}`} style={{ flexGrow: b - a }} />
+          ))}
+        </div>
+        <span
+          className="absolute top-0 flex -translate-x-1/2 flex-col items-center"
+          style={{ left: `calc(0.5rem + (100% - 1rem) * ${line.at})` }}
+          data-testid="ft-marker"
+        >
+          <svg width="14" height="10" viewBox="0 0 14 10" className="text-ink" aria-hidden>
+            <path d="M1 1h12L7 9z" fill="currentColor" />
+          </svg>
+          <span className="h-3.5 w-0.5 rounded-full bg-ink" />
+        </span>
+        <div className="num relative mt-1 h-4 text-xs text-muted">
+          <span className="absolute left-0">0</span>
+          {ticks.map(([at, text]) => (
+            <span key={text} className="absolute -translate-x-1/2" style={{ left: pct(at) }}>
+              {text}
+            </span>
+          ))}
+          {line.high < 0.9 && <span className="absolute right-0">{line.max}</span>}
+        </div>
+      </div>
+      <ul aria-hidden className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
+        {segs.map(([band]) => (
+          <li key={band} className="flex items-center gap-1.5">
+            <span className={`h-2 w-2 rounded-full ${BAND[band]}`} />
+            {t(`ft.v.${band}`)}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

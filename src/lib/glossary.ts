@@ -50,6 +50,7 @@ const TERMS = [
   "schoolTeams",
   "coachPrograms",
   "strengthStandards",
+  "season",
 ] as const;
 
 export type Term = (typeof TERMS)[number];

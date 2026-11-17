@@ -210,8 +210,9 @@ export const BLOG_A: Article[] = [
     slug: "beginner-gym-workout-plan",
     kind: "blog",
     title: "Your first 8 weeks in the gym: a beginner plan",
+    seoTitle: "Beginner gym workout plan: 3 days a week for 8 weeks",
     description:
-      "A simple beginner gym plan: three full-body days a week, which lifts to learn, how to pick starting weights, and how to add weight safely.",
+      "A free beginner gym workout plan: three full-body days a week for 8 weeks, the lifts to learn, sets and reps, starting weights and when to add weight.",
     date: "2026-11-09",
     tag: "Beginners",
     cta: "plan",
@@ -302,6 +303,7 @@ export const BLOG_A: Article[] = [
     slug: "home-gym-dumbbell-workout",
     kind: "blog",
     title: "Dumbbell-only home workouts that build real strength",
+    seoTitle: "Dumbbell home workout: a full-body plan for strength",
     description:
       "How to train every muscle with just dumbbells and a bench: the best exercises, a weekly plan, and how to keep progressing with a limited set.",
     date: "2026-11-09",

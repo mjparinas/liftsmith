@@ -59,6 +59,7 @@ describe("stretch library", () => {
   });
 
   it("runs picked stretches one at a time, switching sides, and saves them", async () => {
+    useApp.getState().setProfile({ training: { stretchReady: 0 } });
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const { unmount } = render(<StretchScreen />);
@@ -85,6 +86,63 @@ describe("stretch library", () => {
     await user.click(screen.getByRole("button", { name: "Next ›" }));
     expect(screen.getByText("All stretched out")).toBeInTheDocument();
     expect(stretchEvents()).toEqual([expect.objectContaining({ moment: "pick", ids: ["cobra", "wall-calf"] })]);
+  });
+});
+
+describe("get ready", () => {
+  const pickAndStart = async (user: ReturnType<typeof userEvent.setup>, names: string[]) => {
+    const { unmount } = render(<StretchScreen />);
+    for (const n of names) await user.click(screen.getByRole("button", { name: `Pick ${n}` }));
+    await user.click(screen.getByRole("button", { name: `Start ${names.length} stretch${names.length > 1 ? "es" : ""}` }));
+    unmount();
+    render(<StretchScreen arg="picked" />);
+    await user.click(screen.getByRole("button", { name: "Start" }));
+  };
+
+  it("counts down 5 seconds to get into position before each stretch and each side", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await pickAndStart(user, ["Cobra", "Wall calf stretch"]);
+    // The first stretch is shown, with its get-ready countdown, before its hold starts.
+    expect(screen.getByRole("heading", { name: "Cobra" })).toBeInTheDocument();
+    expect(screen.getByRole("timer", { name: "Get ready" })).toHaveTextContent("5");
+    await act(() => vi.advanceTimersByTimeAsync(5_500));
+    expect(screen.getByRole("timer", { name: "Time left" })).toHaveTextContent("30");
+    await act(() => vi.advanceTimersByTimeAsync(30_500));
+    // The next stretch gets its own countdown, and so does the second side.
+    expect(screen.getByRole("heading", { name: "Wall calf stretch" })).toBeInTheDocument();
+    expect(screen.getByRole("timer", { name: "Get ready" })).toBeInTheDocument();
+    expect(screen.getByText("Left side")).toBeInTheDocument();
+    await act(() => vi.advanceTimersByTimeAsync(5_500));
+    await act(() => vi.advanceTimersByTimeAsync(30_500));
+    expect(screen.getByText("Right side")).toBeInTheDocument();
+    expect(screen.getByRole("timer", { name: "Get ready" })).toBeInTheDocument();
+  });
+
+  it("starts the hold at once on Start now, and follows the setting", async () => {
+    useApp.getState().setProfile({ training: { stretchReady: 10 } });
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    await pickAndStart(user, ["Cobra"]);
+    expect(screen.getByRole("timer", { name: "Get ready" })).toHaveTextContent("10");
+    await user.click(screen.getByRole("button", { name: "Start now" }));
+    expect(screen.getByRole("timer", { name: "Time left" })).toHaveTextContent("30");
+    expect(screen.queryByRole("button", { name: "Start now" })).not.toBeInTheDocument();
+  });
+
+  it("keeps the screen on through the native plugin in the apps", async () => {
+    const set = vi.fn(() => Promise.resolve());
+    const w = window as unknown as { Capacitor?: unknown };
+    w.Capacitor = { isNativePlatform: () => true, Plugins: { ScreenAwake: { set } } };
+    try {
+      const user = userEvent.setup();
+      await pickAndStart(user, ["Cobra"]);
+      expect(set).toHaveBeenCalledWith({ on: true });
+      cleanup();
+      expect(set).toHaveBeenLastCalledWith({ on: false });
+    } finally {
+      delete w.Capacitor;
+    }
   });
 });
 
