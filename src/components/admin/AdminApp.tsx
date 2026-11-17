@@ -4,13 +4,15 @@
 // each area, tiles for the headline numbers and charts below. Sign-in is an emailed one-time link.
 import { useCallback, useEffect, useState } from "react";
 
-import { BuildStamp } from "@/components/BuildStamp";
+import { Icon } from "@/components/app/icons";
+import { SECTION_LABEL } from "@/components/titles";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { ADMIN_TABS, type AdminTab } from "@/lib/adminTabs";
 import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CodeStatus, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 import type { InboxItem } from "@/server/inbox";
 
+import { AdminAuthCard, AdminShell } from "./AdminChrome";
 import { AskAiButton, AskAiPanel } from "./Ai";
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
@@ -109,7 +111,7 @@ function HeaderSearch({ navigate }: { navigate: (v: View) => void }) {
   return (
     <form
       role="search"
-      className="order-last w-full sm:order-none sm:w-auto"
+      className="relative order-last w-full sm:order-none sm:w-auto"
       onSubmit={(e) => {
         e.preventDefault();
         void find();
@@ -125,8 +127,9 @@ function HeaderSearch({ navigate }: { navigate: (v: View) => void }) {
         onChange={(e) => setQ(e.target.value)}
         disabled={busy}
         placeholder="Find an email, account or install id"
-        className="card w-full px-3 py-1.5 text-sm sm:w-72"
+        className="w-full rounded-full border border-line/70 bg-surface/70 py-2 pl-9 pr-3 text-sm placeholder:text-faint focus:border-accent sm:w-72"
       />
+      <Icon name="search" size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
     </form>
   );
 }
@@ -151,16 +154,14 @@ export function SignIn() {
     setDev(j.devLink ?? null);
   };
   return (
-    <main className="mx-auto max-w-sm px-5 py-20">
-      <h1 className="text-2xl font-bold">Liftsmith admin</h1>
-      <p className="mt-2 text-sm text-muted">We&apos;ll email you a link that signs you in once.</p>
+    <AdminAuthCard title="Sign in" sub="We'll email you a link that signs you in once.">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           void send();
         }}
       >
-        <label className="mt-6 block text-sm" htmlFor="admin-email">
+        <label className="block text-sm font-semibold" htmlFor="admin-email">
           Email
         </label>
         <input
@@ -169,9 +170,9 @@ export function SignIn() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="card mt-1 w-full px-4 py-3"
+          className="mt-1.5 w-full rounded-2xl border border-line bg-bg/60 px-4 py-3 focus:border-accent"
         />
-        <button type="submit" className="press mt-3 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
+        <button type="submit" className="btn-primary press mt-4 w-full rounded-2xl px-5 py-3 font-bold">
           Email me a link
         </button>
       </form>
@@ -185,7 +186,7 @@ export function SignIn() {
           Development sign-in link
         </a>
       )}
-    </main>
+    </AdminAuthCard>
   );
 }
 
@@ -519,11 +520,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
             Active (a paused or ended code stops working for new sign-ups; people who already used it keep what it gave)
           </label>
           <div className="mt-3 flex gap-3">
-            <button
-              type="button"
-              onClick={() => void save()}
-              className="press rounded-xl bg-accent px-4 py-2 font-semibold text-accent-ink"
-            >
+            <button type="button" onClick={() => void save()} className="press rounded-xl btn-primary px-4 py-2 font-semibold">
               Save code
             </button>
             <button type="button" onClick={() => setForm(blank)} className="press rounded-xl px-4 py-2 text-muted">
@@ -551,7 +548,9 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
 export function AdminApp() {
   const [days, setDays] = useState<(typeof PERIODS)[number]>(28);
   const [askOpen, setAskOpen] = useState(false);
-  const [view, setView] = useState<View>(readView);
+  // The server draws the panel without an address, so the first paint is Overview's and the address's own tab
+  // follows straight after (reading it during the first render would not match the server's HTML).
+  const [view, setView] = useState<View>({ tab: "Overview", open: null });
   const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
   // The period the shown numbers are for: a new period keeps the header and tabs and shows the tab's skeleton
@@ -584,6 +583,7 @@ export function AdminApp() {
   const openIn = useCallback((t: Tab) => (id: string | null) => navigate({ tab: t, open: id }), [navigate]);
   useEffect(() => {
     const back = () => setView(readView());
+    back();
     addEventListener("popstate", back);
     return () => removeEventListener("popstate", back);
   }, []);
@@ -654,23 +654,26 @@ export function AdminApp() {
   const rev = data.revenue;
   const site = data.site;
 
+  const signOut = () => void fetch("/api/admin/logout/", { method: "POST" }).then(() => setState("signin"));
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-16">
-      <header data-admin-header className="z-20 -mx-4 md:sticky md:top-0 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="mr-auto text-lg font-bold">
-            Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
-          </h1>
+    <AdminShell
+      tab={tab}
+      onTab={go}
+      badges={badges}
+      staff={data.staff}
+      onSignOut={signOut}
+      tools={
+        <>
           <HeaderSearch navigate={navigate} />
           {PERIOD_TABS.has(tab) && (
-            <div className="flex gap-1" role="group" aria-label="Period">
+            <div className="flex gap-1 rounded-full border border-line/70 bg-surface/70 p-1" role="group" aria-label="Period">
               {PERIODS.map((p) => (
                 <button
                   key={p}
                   type="button"
                   aria-pressed={days === p}
                   onClick={() => setDays(p)}
-                  className={`press rounded-full border px-3 py-1.5 text-sm ${days === p ? "border-accent bg-accent/15" : "border-line text-muted"}`}
+                  className={`press rounded-full px-3 py-1 text-sm font-semibold ${days === p ? "btn-primary" : "text-muted hover:text-ink"}`}
                 >
                   {p === 365 ? "1 year" : `${p} days`}
                 </button>
@@ -678,41 +681,9 @@ export function AdminApp() {
             </div>
           )}
           {data.staff.role === "admin" && <AskAiButton open={askOpen} toggle={() => setAskOpen((o) => !o)} />}
-          <span className="text-xs text-muted">
-            {data.staff.email} ({data.staff.role})
-          </span>
-          <button
-            type="button"
-            className="text-xs text-muted underline"
-            onClick={() => void fetch("/api/admin/logout/", { method: "POST" }).then(() => setState("signin"))}
-          >
-            Sign out
-          </button>
-        </div>
-        {/* Every section stays in view: the tabs wrap onto more lines instead of scrolling sideways (Melvin, 2026-11-12). */}
-        <nav className="mt-3 flex flex-wrap gap-1" aria-label="Sections">
-          {TABS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              aria-current={tab === t ? "page" : undefined}
-              onClick={() => setTab(t)}
-              className={`press shrink-0 rounded-lg px-3 py-1.5 text-sm ${tab === t ? "bg-raised text-ink" : "text-muted"}`}
-            >
-              {t}
-              {badges[t] ? (
-                <span
-                  className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-ink"
-                  aria-label={`${badges[t]} waiting`}
-                >
-                  {badges[t]}
-                </span>
-              ) : null}
-            </button>
-          ))}
-        </nav>
-      </header>
-
+        </>
+      }
+    >
       {askOpen && data.staff.role === "admin" && (
         <div className="mt-4">
           <AskAiPanel
@@ -784,7 +755,7 @@ export function AdminApp() {
           <div className="flex flex-col gap-4">
             <SearchConsole days={days} />
             <BingSearch days={days} />
-            <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
+            <h2 className={`pt-4 ${SECTION_LABEL}`}>Visits to the website</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="Visitors" value={fmtInt(site.visitors)} delta={delta(site.visitors, site.prevVisitors)} />
               <Tile label="Page views" value={fmtInt(site.views)} delta={delta(site.views, site.prevViews)} />
@@ -1088,6 +1059,6 @@ export function AdminApp() {
         {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
         {tab === "Log" && <Log />}
       </div>
-    </div>
+    </AdminShell>
   );
 }

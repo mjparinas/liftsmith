@@ -53,7 +53,7 @@ export async function aiPost<T>(body: Record<string, unknown>): Promise<{ ok: tr
   }
 }
 
-export const aiBtn = "press rounded-lg border border-accent/40 px-3 py-1.5 text-accent disabled:opacity-50";
+export const aiBtn = "press rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 font-semibold text-accent disabled:opacity-50";
 
 /** A line under a helper: the day's spend, or why it can't run. */
 export function AiNote({ s }: { s: AiStatus | null }) {
@@ -94,7 +94,7 @@ export function AiSuggestion({
               setBusy(true);
               void Promise.resolve(doIt()).finally(() => setBusy(false));
             }}
-            className={`press rounded-lg px-3 py-1.5 font-semibold ${danger ? "border border-bad/40 text-bad" : "bg-accent text-accent-ink"}`}
+            className={`press rounded-lg px-3 py-1.5 font-semibold ${danger ? "border border-bad/40 text-bad" : "btn-primary"}`}
           >
             {label}
           </button>
@@ -157,7 +157,7 @@ export function AskAiPanel({ tab, metrics, go, close }: { tab: string; metrics?:
   return (
     <section id="ask-ai" aria-label={`Ask AI about ${tab}`} className="card rounded-xl border border-accent/30 p-4">
       <div className="flex items-start gap-3">
-        <h2 className="mr-auto font-semibold">What needs doing on {tab}</h2>
+        <h2 className="mr-auto font-bold tracking-tight">What needs doing on {tab}</h2>
         <button type="button" onClick={close} className="press text-sm text-muted" aria-label="Close Ask AI">
           ✕
         </button>

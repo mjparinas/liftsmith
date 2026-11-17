@@ -7,6 +7,8 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { QrCode } from "@/components/QrCode";
 
+import { AdminAuthCard } from "./AdminChrome";
+
 export interface TwoFactorInfo {
   enabled: boolean;
   enabledAt: number | null;
@@ -18,7 +20,7 @@ export interface TwoFactorInfo {
   others: string[];
 }
 
-const primary = "press rounded-lg bg-accent px-4 py-2 font-semibold text-accent-ink disabled:opacity-50";
+const primary = "press rounded-lg btn-primary px-4 py-2 font-semibold disabled:opacity-50";
 const quiet = "press rounded-lg border border-line px-4 py-2 disabled:opacity-50";
 const field = "card mt-1 w-full px-3 py-2 font-mono tracking-widest";
 
@@ -193,10 +195,8 @@ export function TwoFactorGate({ info }: { info: TwoFactorInfo }) {
     location.reload();
   };
   return (
-    <main className="mx-auto max-w-md px-5 py-16">
-      <h1 className="text-2xl font-bold">Two-step sign-in</h1>
-      <p className="mt-1 text-sm text-muted">Signed in as {info.email}.</p>
-      <div className="card mt-5 p-5">
+    <AdminAuthCard title="Two-step sign-in" sub={`Signed in as ${info.email}.`}>
+      <div>
         {codes ? (
           <RecoveryCodes codes={codes} onDone={done} />
         ) : info.enabled ? (
@@ -228,7 +228,7 @@ export function TwoFactorGate({ info }: { info: TwoFactorInfo }) {
       <button type="button" className="mt-4 text-sm text-muted underline" onClick={() => void signOut()}>
         Sign out
       </button>
-    </main>
+    </AdminAuthCard>
   );
 }
 
@@ -259,7 +259,7 @@ export function TwoFactorCard() {
   };
   return (
     <section className="card p-4">
-      <h2 className="font-semibold">Two-step sign-in</h2>
+      <h2 className="font-bold tracking-tight">Two-step sign-in</h2>
       {codes ? (
         <div className="mt-3">
           <RecoveryCodes
