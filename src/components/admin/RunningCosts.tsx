@@ -113,11 +113,7 @@ export function RunningCosts({ admin, netMrr }: { admin: boolean; netMrr: number
                 Add a cost
               </button>
             )}
-            <button
-              type="button"
-              className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-              onClick={() => void save()}
-            >
+            <button type="button" className="press rounded-lg btn-primary px-3 py-1.5 font-semibold" onClick={() => void save()}>
               Save costs
             </button>
             <button type="button" className="press rounded-lg border border-line px-3 py-1.5" onClick={() => setDraft(null)}>

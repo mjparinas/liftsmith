@@ -91,11 +91,7 @@ export function SavedReplies() {
                 Add a reply
               </button>
             )}
-            <button
-              type="button"
-              className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
-              onClick={() => void save()}
-            >
+            <button type="button" className="press rounded-lg btn-primary px-3 py-1.5 font-semibold" onClick={() => void save()}>
               Save replies
             </button>
           </div>

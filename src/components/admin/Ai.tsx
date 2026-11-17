@@ -95,7 +95,7 @@ export function AiSuggestion({
               setBusy(true);
               void Promise.resolve(doIt()).finally(() => setBusy(false));
             }}
-            className={`press rounded-lg px-3 py-1.5 font-semibold ${danger ? "border border-bad/40 text-bad" : "bg-accent text-accent-ink"}`}
+            className={`press rounded-lg px-3 py-1.5 font-semibold ${danger ? "border border-bad/40 text-bad" : "btn-primary"}`}
           >
             {label}
           </button>

@@ -4,6 +4,8 @@
 // themselves are hidden from it.
 import type { CSSProperties, ReactNode } from "react";
 
+import { AdminShell } from "./AdminChrome";
+
 /** One grey shape. */
 export function Bone({ className = "", style }: { className?: string; style?: CSSProperties }) {
   return <div className={`skeleton rounded-md ${className}`} style={style} aria-hidden />;
@@ -155,7 +157,7 @@ export function CardBones({ title, body = "lines", className = "" }: { title?: s
   return (
     <section className={`card p-4 ${className}`}>
       <div className="mb-4">
-        {title ? <h2 className="font-semibold">{title}</h2> : <Bone className="h-4 w-40" />}
+        {title ? <h2 className="font-bold tracking-tight">{title}</h2> : <Bone className="h-4 w-40" />}
         <Bone className="mt-2 h-3 w-2/3 max-w-sm" />
       </div>
       <BodyBones body={body} />
@@ -327,22 +329,10 @@ export function TabSkeleton({ tab }: { tab: string }) {
 /** The whole panel before the first answer: the header, the tab row and the tab's own shape. */
 export function AdminSkeleton({ tab }: { tab: string }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-16">
-      <div className="-mx-4 border-b border-line px-4 py-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="mr-auto text-lg font-bold">Liftsmith admin</h1>
-          <Bone className="h-8 w-48 rounded-lg" />
-          <Bone className="h-8 w-56 rounded-full" />
-        </div>
-        <div className="mt-3 flex flex-wrap gap-1">
-          {Array.from({ length: 20 }, (_, i) => (
-            <Bone key={i} className={`h-8 rounded-lg ${["w-20", "w-16", "w-24", "w-14"][i % 4]}`} />
-          ))}
-        </div>
-      </div>
+    <AdminShell tab={tab} tools={<Bone className="h-9 w-56 rounded-full" />}>
       <div className="mt-4">
         <TabSkeleton tab={tab} />
       </div>
-    </div>
+    </AdminShell>
   );
 }

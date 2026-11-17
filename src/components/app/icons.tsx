@@ -84,6 +84,16 @@ const PATHS = {
     "M3 3l18 18M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2",
   // A rating star (coach reviews); drawn filled for the stars given.
   star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
+  // The admin panel's sections (AdminChrome.tsx): mail, money, a funnel, a ticket, a server, a list, a switch, a line chart.
+  mail: "M3.5 6h17v12h-17zM3.5 7l8.5 6 8.5-6",
+  dollar: "M12 3v18M16.5 7.5C15.8 6 14.1 5 12 5 9.5 5 7.5 6.4 7.5 8.3c0 4.3 9 2.4 9 6.9 0 1.9-2 3.3-4.5 3.3-2.2 0-4-1-4.7-2.6",
+  funnel: "M3.5 5h17l-6.5 7.5V19l-4 2v-8.5z",
+  ticket: "M3.5 7h17v3a2 2 0 0 0 0 4v3h-17v-3a2 2 0 0 0 0-4zM14.5 7v2M14.5 11v2M14.5 15v2",
+  server: "M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01",
+  list: "M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01",
+  toggle: "M8 7h8a5 5 0 0 1 0 10H8A5 5 0 0 1 8 7zM16 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4z",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20.5 20.5 16 16",
+  chart: "M3.5 20h17M4.5 15.5l4.5-5.5 4 3.5 6.5-7.5",
 } as const;
 
 export type IconName = keyof typeof PATHS;
