@@ -396,6 +396,8 @@ export interface TrainingPrefs {
   nowPlaying?: boolean;
   /** Start opens the day's warm-up stretches first (Stretch.tsx; skippable). Missing means off. */
   warmFirst?: boolean;
+  /** Seconds of get-ready countdown before each stretch and each side (0 is off). Missing means 5 (readySeconds in stretches.ts). */
+  stretchReady?: number;
   /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
   coolDown?: boolean;
   /** Liked exercises: the adaptive planner picks them much more often (pickWeights.ts). */

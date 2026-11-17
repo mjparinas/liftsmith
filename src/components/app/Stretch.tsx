@@ -26,6 +26,9 @@ import { LIFT_FLOOR, splitParts, type SessionSplit, type SplitPart } from "@/lib
 import { partNow, useApp } from "@/lib/store";
 import {
   demoId,
+  READY_CHOICES,
+  READY_DEFAULT,
+  readySeconds,
   routineSeconds,
   searchStretches,
   stretch,
@@ -39,6 +42,7 @@ import {
 } from "@/lib/stretches";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Routine, type RoutinePart, type StretchEvent } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
+import { useVisible } from "@/lib/visibility";
 
 import { FaultList, stretchFaults } from "./FormFaults";
 import { Icon } from "./icons";
@@ -453,29 +457,53 @@ function Player({
   onStop: () => void;
   onDone: (seconds: number) => void;
 }) {
+  const { profile } = useApp();
+  const readyMs = readySeconds(profile.training?.stretchReady) * 1000;
   const [i, setI] = useState(0);
   const [side, setSide] = useState<0 | 1>(0);
   const [paused, setPaused] = useState(false);
+  // "ready": a short get-ready countdown before each stretch and each side, so the lifter can get into
+  // position before the hold starts (Settings › Workout › Get ready time; off skips it).
+  const [phase, setPhase] = useState<"ready" | "hold">(readyMs > 0 ? "ready" : "hold");
   const segment = (s: Stretch) => (s.eachSide ? stretchSeconds(s) / 2 : stretchSeconds(s)) * 1000;
-  const [endsAt, setEndsAt] = useState(() => Date.now() + segment(list[0]!));
-  const [left, setLeft] = useState(segment(list[0]!));
-  const [say, setSay] = useState("");
+  const first = readyMs > 0 ? readyMs : segment(list[0]!);
+  const [endsAt, setEndsAt] = useState(() => Date.now() + first);
+  const [left, setLeft] = useState(first);
+  const [say, setSay] = useState(() => (readyMs > 0 ? `${t("str.ready")}: ${list[0]!.name}` : ""));
   const [startedAt] = useState(() => Date.now());
   const s = list[i]!;
   const nextUp = list[i + 1];
 
+  // The screen stays on for the whole routine. The phone drops the lock when the app is hidden, so it's
+  // asked for again on return (like the workout screen).
+  const visible = useVisible();
   useEffect(() => {
-    void keepAwake(true);
+    void keepAwake(visible);
     return () => void keepAwake(false);
-  }, []);
+  }, [visible]);
+
+  /** Start the next hold: through the get-ready countdown when it's on. */
+  const begin = (st: Stretch) => {
+    const ms = readyMs > 0 ? readyMs : segment(st);
+    setPhase(readyMs > 0 ? "ready" : "hold");
+    setEndsAt(Date.now() + ms);
+    setLeft(ms);
+  };
+  /** The get-ready countdown is over (or skipped): the hold starts now. */
+  const startHold = () => {
+    haptic("tap");
+    setPhase("hold");
+    setEndsAt(Date.now() + segment(s));
+    setLeft(segment(s));
+    setSay(s.eachSide ? (side === 0 ? t("str.left") : t("str.right")) : s.name);
+  };
 
   const advance = () => {
     if (s.eachSide && side === 0) {
       haptic("toggle");
       sound.toggle(true);
       setSide(1);
-      setEndsAt(Date.now() + segment(s));
-      setLeft(segment(s));
+      begin(s);
       setSay(t("str.switch"));
       return;
     }
@@ -490,21 +518,24 @@ function Player({
     sound.log();
     setI(n);
     setSide(0);
-    setEndsAt(Date.now() + segment(list[n]!));
-    setLeft(segment(list[n]!));
-    setSay(list[n]!.name);
+    begin(list[n]!);
+    setSay(readyMs > 0 ? `${t("str.ready")}: ${list[n]!.name}` : list[n]!.name);
   };
   const tick = useEffectEvent(() => {
     const ms = endsAt - Date.now();
+    // The last three seconds of getting ready tick like the end of rest.
+    if (phase === "ready" && Math.ceil(ms / 1000) !== Math.ceil(left / 1000) && ms > 0 && ms <= 3000) sound.countdown();
     setLeft(Math.max(0, ms));
-    if (ms <= 0) advance();
+    if (ms > 0) return;
+    if (phase === "ready") startHold();
+    else advance();
   });
 
   useEffect(() => {
     if (paused) return;
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [paused, endsAt]);
+  }, [paused, endsAt, phase]);
 
   // The live notification (Android), Live Activity (iOS) and the watches: the part, the stretch and its countdown,
   // through the same fields the lifting uses, so every platform shows it with no code of its own.
@@ -524,12 +555,18 @@ function Player({
       ahead: [],
       timer: paused
         ? undefined
-        : [{ from: endsAt - segment(s), to: endsAt, label: s.eachSide ? (side === 0 ? t("str.left") : t("str.right")) : s.name }],
+        : phase === "ready"
+          ? [
+              { from: endsAt - readyMs, to: endsAt, label: t("str.ready") },
+              { from: endsAt, to: endsAt + segment(s), label: s.eachSide ? (side === 0 ? t("str.left") : t("str.right")) : s.name },
+            ]
+          : [{ from: endsAt - segment(s), to: endsAt, label: s.eachSide ? (side === 0 ? t("str.left") : t("str.right")) : s.name }],
       timerOver: paused ? undefined : t("timer.over"),
     });
-  }, [i, side, paused, endsAt]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [i, side, paused, endsAt, phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const segMs = segment(s);
+  const ready = phase === "ready";
+  const segMs = ready ? readyMs : segment(s);
   const secs = Math.ceil(left / 1000);
   return (
     <div className="pb-4">
@@ -546,20 +583,30 @@ function Player({
       <p className="mt-1 text-sm text-muted">{stretchWhy(s, moment === "pick" ? "pick" : moment, muscles)}</p>
       <div className="mt-4 flex items-end justify-between gap-3">
         <div>
+          {ready && <p className="text-sm font-semibold text-cyan">{t("str.ready")}</p>}
           {s.eachSide && <p className="text-sm font-semibold text-accent">{side === 0 ? t("str.left") : t("str.right")}</p>}
           <p className="num text-sm text-muted">{dose(s)}</p>
         </div>
-        <div role="timer" aria-label={t("str.timeLeft")} className="display text-[3rem] leading-none">
+        <div
+          role="timer"
+          aria-label={ready ? t("str.ready") : t("str.timeLeft")}
+          className={`display text-[3rem] leading-none${ready ? " text-cyan" : ""}`}
+        >
           {secs}
           <span className="ml-1 text-base font-semibold tracking-normal text-muted">s</span>
         </div>
       </div>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-line" aria-hidden>
         <div
-          className="h-full rounded-full bg-accent transition-[width] duration-200"
+          className={`h-full rounded-full transition-[width] duration-200 ${ready ? "bg-cyan" : "bg-accent"}`}
           style={{ width: `${100 - (left / segMs) * 100}%` }}
         />
       </div>
+      {ready && (
+        <Button className="mt-4 w-full" onClick={startHold}>
+          {t("str.startNow")}
+        </Button>
+      )}
       <p className="mt-4">{s.how}</p>
       <div className="mt-5 grid grid-cols-2 gap-3">
         <Button
@@ -671,6 +718,23 @@ export function StretchSettings() {
         on={tp.coolDown !== false}
         onChange={(v) => setProfile({ training: { ...profile.training, coolDown: v ? undefined : false } })}
       />
+      <div className="card mt-3 px-4 py-3">
+        <p id="str-ready-label" className="font-medium">
+          {t("str.readySetting")}
+        </p>
+        <p className="mt-0.5 text-xs text-muted">{t("str.readyHint")}</p>
+        <div role="group" aria-labelledby="str-ready-label" className="mt-2 flex flex-wrap gap-2">
+          {READY_CHOICES.map((n) => (
+            <Chip
+              key={n}
+              active={readySeconds(tp.stretchReady) === n}
+              onClick={() => setProfile({ training: { ...profile.training, stretchReady: n === READY_DEFAULT ? undefined : n } })}
+            >
+              {n === 0 ? t("str.readyOff") : t("str.secs", { n })}
+            </Chip>
+          ))}
+        </div>
+      </div>
     </>
   );
 }

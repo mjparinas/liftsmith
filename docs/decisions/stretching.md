@@ -30,7 +30,8 @@ Melvin asked on 2026-11-11: "add all kinds of different stretches, this should b
 ## The player
 
 - One stretch at a time: the figure, the name, why it's there, a countdown, how to do it, Pause and Next, and what's next. One-sided stretches split the time and say "Switch sides" halfway. Rep moves get about three seconds a rep.
-- Sounds and haptics from the shared set (a switch-on pair for switching sides, the log pair for the next stretch, the goal-done run at the end). The screen stays on while it plays (`keepAwake`). A polite live region names each new stretch and side for screen readers; the countdown is a `timer`.
+- **Get ready** (Melvin, 2026-11-17: "Should give stretches a few seconds between each one for users to get ready"). Before every stretch, the first one included, and before the second side of a one-sided stretch, a short countdown shows the stretch (name, figure, how to) with "Get ready" and the seconds in cyan, so the lifter can get into position before the hold starts. The last three seconds tick like the end of rest; Start now begins the hold at once, and Pause and Next work as in the hold. Settings › Workout › *Get ready time*: Off, 3, 5 (default) or 10 seconds (`training.stretchReady`, missing means 5; `readySeconds` in `stretches.ts`). The lock screen and watches count the get-ready time and then the hold as two timer phases. The "about N min" length of a routine doesn't count it.
+- Sounds and haptics from the shared set (a switch-on pair for switching sides, the log pair for the next stretch, the goal-done run at the end). **The screen stays on for the whole routine** (Melvin, 2026-11-17: "Stretching routines should keep the screen on"): the player holds `keepAwake` and asks again when the app comes back to the front, like the workout screen. In the Android and iOS apps `keepAwake` goes through the native `ScreenAwake` plugin (the window's keep-screen-on flag in `ScreenAwakePlugin.java`, the idle timer in `ScreenAwakePlugin` in `DelightPlugins.swift`), because the browser's Screen Wake Lock isn't in every WebView; the web uses the Screen Wake Lock. That also keeps the workout screen, fitness tests and the interval timer on in the apps. A polite live region names each new stretch and side for screen readers; the countdown is a `timer`.
 - Finishing saves a `stretch` event (moment, ids, seconds), which syncs like any other event. Nothing reads it yet; it's there for streaks or insights later.
 
 ## Why lines
@@ -43,7 +44,7 @@ The library has a search box like the exercise browser's (PR #185), using the sa
 
 ## Platforms
 
-Pure web code: Android, iOS and the web app get the same screens. No native code is needed (no notification for a stretch routine; the screen stays on instead).
+Shared web code: Android, iOS and the web app get the same screens. The only native code is `ScreenAwake` (above), on both phones.
 
 ## Follow-ups
 

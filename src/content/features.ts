@@ -270,7 +270,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "stretching",
         name: "Stretching",
-        body: "48 stretches with 3D demos: an optional warm-up before, a cool-down after, or a stretch routine any day.",
+        body: "48 stretches with 3D demos: an optional warm-up before, a cool-down after, or a stretch routine any day. A few seconds to get into position before each stretch and each side, and the screen stays on.",
         tier: "free",
         added: "2026-11-10",
       },
