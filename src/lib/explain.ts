@@ -95,7 +95,8 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   if (item?.pick) lines.unshift(t("explain.picked", { pick: item.pick }));
   if (item?.sets && !wk.deload && call !== "recover") lines.push(`${item.sets.charAt(0).toUpperCase()}${item.sets.slice(1)}.`);
 
-  if (!wk.deload) lines.push(t("explain.rir", { week: wk.label, count: target.rir }));
+  if (!wk.deload && !ex.cardio)
+    lines.push(timed ? t("explain.rirTimed", { week: wk.label }) : t("explain.rir", { week: wk.label, count: target.rir }));
 
   const scored = readiness !== undefined;
   if (call === "recover") lines.push(scored ? t("explain.easyScore", { score: readiness }) : t("explain.easy"));
