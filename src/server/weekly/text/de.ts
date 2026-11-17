@@ -863,6 +863,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Im selben Bereich gibt es einen Schalter für Aufwärmsätze, für Tage, an denen du dich lieber selbst aufwärmst.",
   },
+  "club-chat": {
+    title: "Dein Club, zwischen den Trainings",
+    intro: "Clubs haben jetzt einen Chat und Crew-Trainings, damit die Leute, mit denen du trainierst, reden und sich verabreden können.",
+    points: [
+      "Öffne Freunde › Clubs, wähle einen Club und tippe auf Chat, um allen zu schreiben.",
+      "Plane ein Crew-Training mit Namen, Tag und Uhrzeit, und Mitglieder tippen auf Ich bin dabei.",
+      "Alle, die dabei sind, bekommen eine Stunde vorher eine Erinnerung.",
+      "Poste dein Training danach: Dann stehst du als trainiert da, mit den Freunden markiert, die mittrainiert haben.",
+    ],
+    dyk: "Benachrichtigen im Chat jedes Clubs schaltet seine Mitteilungen aus, und ein Chat schickt höchstens eine pro Stunde.",
+  },
   community: {
     title: "Stimm ab, was wir als Nächstes bauen",
     intro: "Liftsmith hat jetzt eine Community: Schlag Ideen vor, stimm für die, die du willst, und melde Fehler.",

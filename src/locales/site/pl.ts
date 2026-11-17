@@ -246,6 +246,13 @@ export const pl: SiteText = {
         },
       ],
     },
+    learn: {
+      eyebrow: "Darmowe poradniki",
+      title: "Naucz się ćwiczeń, a aplikacja je zaplanuje",
+      body: "Technika krok po kroku, mięśnie, które pracują w każdym ćwiczeniu, i czym je zastąpić, a do tego darmowe kalkulatory.",
+      exercises: "Popularne ćwiczenia",
+      tools: "Darmowe narzędzia",
+    },
     juice: {
       eyebrow: "Z frajdą",
       title: "Rekordy dostają konfetti. Dni odpoczynku nie przerywają passy.",

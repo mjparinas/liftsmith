@@ -84,7 +84,7 @@ function Row({ item, go }: { item: TodoItem; go: (tab: string) => void }) {
           href={item.action.href}
           target="_blank"
           rel="noreferrer"
-          className="press rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink"
+          className="press rounded-lg btn-primary px-3 py-1.5 text-sm font-semibold"
         >
           {item.action.label}
         </a>
@@ -95,7 +95,7 @@ function Row({ item, go }: { item: TodoItem; go: (tab: string) => void }) {
 
 function OpenButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="press rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink">
+    <button type="button" onClick={onClick} className="press rounded-lg btn-primary px-3 py-1.5 text-sm font-semibold">
       {label}
     </button>
   );

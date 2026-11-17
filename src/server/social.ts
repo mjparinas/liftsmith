@@ -54,6 +54,19 @@ import {
   type TrainingNow,
 } from "@/lib/socialTypes";
 
+import {
+  chatDeletes,
+  clubChat,
+  clubChatDeletes,
+  clubChatPush,
+  clubSay,
+  clubUnsay,
+  crewCancel,
+  crewGoing,
+  crewPost,
+  crewTrained,
+  sessionsFor,
+} from "./clubChat";
 import { cleanCode, nameOf, newCode } from "./coach";
 import { resolveReview, reviewReport } from "./coachReviews";
 import { feedbackReport, resolveFeedback } from "./community";
@@ -461,6 +474,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM challenge_members WHERE challenge_id IN (SELECT id FROM challenges WHERE owner_id = ?)", args: a },
     { sql: "DELETE FROM challenges WHERE owner_id = ?", args: a },
     { sql: "DELETE FROM challenge_members WHERE account_id = ?", args: a },
+    ...chatDeletes(accountId),
     { sql: "DELETE FROM club_members WHERE club_id IN (SELECT id FROM clubs WHERE owner_id = ?)", args: a },
     { sql: "DELETE FROM clubs WHERE owner_id = ?", args: a },
     { sql: "DELETE FROM club_members WHERE account_id = ?", args: a },
@@ -896,9 +910,11 @@ export async function mute(accountId: string, b: Record<string, unknown>, now = 
   return lookup(accountId, b, now);
 }
 
-const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review", "feedback"]);
+const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review", "message", "feedback"]);
 /** Reported through Friends (`report` below); reviews are reported through coachReviews.ts. */
-const FRIENDS_KINDS = new Set<ReportKind>(["post", "comment", "profile"]);
+const FRIENDS_KINDS = new Set<ReportKind>(["post", "comment", "profile", "message"]);
+/** The table each reportable thing lives in (a profile is reported by handle). */
+const REPORT_TABLE: Partial<Record<ReportKind, string>> = { post: "posts", comment: "post_comments", message: "club_messages" };
 
 export async function report(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
@@ -914,7 +930,7 @@ export async function report(accountId: string, b: Record<string, unknown>, now 
     if (!p) return fail(404, "noOne");
     target = s(p.account_id);
   } else {
-    const [exists] = await query(`SELECT 1 AS x FROM ${kind === "post" ? "posts" : "post_comments"} WHERE id = ?`, [target]);
+    const [exists] = await query(`SELECT 1 AS x FROM ${REPORT_TABLE[kind]} WHERE id = ?`, [target]);
     if (!exists) return fail(404, "gone");
   }
   if (target === accountId) return fail(400, "Bad request.");
@@ -928,7 +944,7 @@ export async function report(accountId: string, b: Record<string, unknown>, now 
       kind,
       target,
     ]);
-    if (n(c?.n) >= HIDE_AFTER) await run(`UPDATE ${kind === "post" ? "posts" : "post_comments"} SET hidden = 1 WHERE id = ?`, [target]);
+    if (n(c?.n) >= HIDE_AFTER) await run(`UPDATE ${REPORT_TABLE[kind]} SET hidden = 1 WHERE id = ?`, [target]);
   }
   return ok();
 }
@@ -1038,8 +1054,11 @@ export async function post(accountId: string, b: Record<string, unknown>, now = 
   const [row] = await query("SELECT id FROM posts WHERE account_id = ? AND workout_id = ?", [accountId, p.workoutId]);
   const postId = s(row?.id ?? id);
   const audience = p.audience ?? audienceOf(mine.audience);
+  // A crew session around this workout's time marks the lifter trained, and tags the others in it (clubChat.ts).
+  const crew = await crewTrained(accountId, p.at);
   if (audience !== "me") {
-    await tagPartners(accountId, postId, b.partners, now);
+    const asked = Array.isArray(b.partners) ? b.partners : [];
+    await tagPartners(accountId, postId, crew.length ? [...asked, ...crew.filter((h) => !asked.includes(h))] : b.partners, now);
     await ringBells(accountId, s(mine.handle), postId, p.body.prs);
   }
   return ok({ id: postId });
@@ -2136,21 +2155,29 @@ export async function gymClubStart(accountId: string, placeId: unknown, now = Da
 }
 
 /** The lifter's clubs, with how many are in each. */
-export async function clubs(accountId: string): Promise<Result> {
+export async function clubs(accountId: string, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
+  // Under 18s get no club chat or crew sessions (clubChat.ts), so nothing waits for them there.
+  const teen = await isMinor(accountId, now);
   const rows = await query(
     `SELECT c.id AS id, c.name AS name, c.owner_id AS owner_id,
        (SELECT COUNT(*) FROM club_members m JOIN social_profiles sp ON sp.account_id = m.account_id
-         WHERE m.club_id = c.id AND sp.suspended = 0) AS members
-     FROM club_members cm JOIN clubs c ON c.id = cm.club_id WHERE cm.account_id = ? ORDER BY c.name LIMIT 50`,
-    [accountId],
+         WHERE m.club_id = c.id AND sp.suspended = 0) AS members,
+       (SELECT COUNT(*) FROM club_messages cmsg WHERE cmsg.club_id = c.id AND cmsg.created_at > cm.read_at
+         AND cmsg.account_id != cm.account_id AND cmsg.hidden = 0) AS unread,
+       (SELECT MIN(cs.starts_at) FROM crew_sessions cs JOIN crew_going g ON g.session_id = cs.id AND g.account_id = cm.account_id
+         WHERE cs.club_id = c.id AND cs.starts_at > ?2) AS next_session
+     FROM club_members cm JOIN clubs c ON c.id = cm.club_id WHERE cm.account_id = ?1 ORDER BY c.name LIMIT 50`,
+    [accountId, now],
   );
   const list: ClubSummary[] = rows.map((r) => ({
     id: s(r.id),
     name: s(r.name),
     members: n(r.members),
     mine: s(r.owner_id) === accountId,
+    unread: teen ? 0 : Math.min(99, n(r.unread)),
+    nextSession: teen || r.next_session == null ? null : n(r.next_session),
   }));
   return ok({ clubs: list });
 }
@@ -2167,7 +2194,7 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
   if (!Number.isFinite(from) || from > now + day || from < now - 60 * day) return fail(400, "Bad request.");
   const [c] = await query(
     `SELECT c.id AS id, c.name AS name, c.code AS code, c.owner_id AS owner_id, op.handle AS owner_handle, op.name AS owner_name,
-       c.goal_metric AS goal_metric, c.goal_target AS goal_target
+       c.goal_metric AS goal_metric, c.goal_target AS goal_target, cm.chat_push AS chat_push, c.place_id AS place_id
      FROM clubs c JOIN club_members cm ON cm.club_id = c.id AND cm.account_id = ? JOIN social_profiles op ON op.account_id = c.owner_id
      WHERE c.id = ?`,
     [accountId, s(b.id)],
@@ -2196,6 +2223,9 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
     owner: { handle: s(c.owner_handle), name: s(c.owner_name) },
     members: rows.length,
     goal: goalOf(c.goal_metric, c.goal_target),
+    sessions: (await isMinor(accountId, now)) ? [] : await sessionsFor(accountId, s(c.id), s(c.owner_id), now),
+    chatPush: n(c.chat_push) !== 0,
+    gymClub: !!s(c.place_id),
     rows: rows.map((r) => ({
       handle: s(r.handle),
       name: s(r.name),
@@ -2302,6 +2332,7 @@ export async function clubLeave(accountId: string, b: Record<string, unknown>): 
   if (!c) return ok();
   if (s(c.owner_id) === accountId)
     await batch([
+      ...clubChatDeletes(id),
       { sql: "DELETE FROM club_members WHERE club_id = ?", args: [id] },
       { sql: "DELETE FROM clubs WHERE id = ?", args: [id] },
     ]);
@@ -2415,12 +2446,19 @@ export const OPS: Record<string, Op> = {
   challengeLeave: (a, b) => challengeLeave(a, b),
   untag: (a, b) => untag(a, b),
   clubCreate,
-  clubs: (a) => clubs(a),
+  clubs: (a, _b, now) => clubs(a, now),
   club,
   clubInfo,
   clubJoin,
   clubLeave: (a, b) => clubLeave(a, b),
   clubManage: (a, b) => clubManage(a, b),
+  clubChat,
+  clubSay,
+  clubUnsay: (a, b) => clubUnsay(a, b),
+  clubChatPush: (a, b) => clubChatPush(a, b),
+  crewPost,
+  crewGoing,
+  crewCancel,
   pushToken,
   pushOff: async (a, b) => (await dropToken(a, s(b.token)), ok()),
 };
@@ -2478,8 +2516,8 @@ export async function adminReports(): Promise<ReportGroup[]> {
       } catch {
         content = p ? "" : "(deleted)";
       }
-    } else if (kind === "comment") {
-      const [c] = await query("SELECT account_id, body, hidden FROM post_comments WHERE id = ?", [target]);
+    } else if (kind === "comment" || kind === "message") {
+      const [c] = await query(`SELECT account_id, body, hidden FROM ${REPORT_TABLE[kind]} WHERE id = ?`, [target]);
       authorId = s(c?.account_id);
       hidden = !!n(c?.hidden);
       content = c ? s(c.body) : "(deleted)";
@@ -2544,7 +2582,7 @@ export async function resolveReports(kind: ReportKind, targetId: string, action:
   // A coach review or reply: remove deletes it (a reply is cleared), dismiss shows it again. Banning applies to Friends.
   if (kind === "review" && (action === "remove" || action === "dismiss"))
     return resolveReview(targetId, action, action === "remove" ? "removed" : "dismissed");
-  const table = kind === "post" ? "posts" : kind === "comment" ? "post_comments" : null;
+  const table = REPORT_TABLE[kind] ?? null;
   let author = kind === "profile" ? targetId : "";
   if (table) author = s((await query(`SELECT account_id FROM ${table} WHERE id = ?`, [targetId]))[0]?.account_id);
   if (kind === "review") author = (await reviewReport(targetId))?.authorId ?? "";
@@ -2561,7 +2599,8 @@ export async function resolveReports(kind: ReportKind, targetId: string, action:
           { sql: "DELETE FROM posts WHERE id = ?", args: [targetId] },
           close("removed"),
         ]);
-      else if (kind === "comment") await batch([{ sql: "DELETE FROM post_comments WHERE id = ?", args: [targetId] }, close("removed")]);
+      else if (kind === "comment" || kind === "message")
+        await batch([{ sql: `DELETE FROM ${table} WHERE id = ?`, args: [targetId] }, close("removed")]);
       else
         await batch([
           { sql: "UPDATE social_profiles SET name = handle, tagline = '' WHERE account_id = ?", args: [targetId] },

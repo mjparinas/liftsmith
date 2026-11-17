@@ -197,7 +197,7 @@ function Message({
                 type="button"
                 title="Key: e"
                 onClick={() => void thenNext({ action: "archive", archived: true }, "Archived.")}
-                className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
+                className="press rounded-lg btn-primary px-3 py-1.5 font-semibold"
               >
                 Archive and next
               </button>
@@ -294,7 +294,7 @@ function Message({
             type="button"
             disabled={!reply.trim()}
             onClick={() => void send()}
-            className="press mt-2 rounded-xl bg-accent px-4 py-2 font-semibold text-accent-ink disabled:opacity-50"
+            className="press mt-2 rounded-xl btn-primary px-4 py-2 font-semibold disabled:opacity-50"
           >
             Send reply
           </button>

@@ -55,8 +55,8 @@ export function Tile({
   const pts = points != null && Number.isFinite(points) ? Math.round(points * 100) : null;
   return (
     <div className="card p-4" title={hint}>
-      <div className="text-xs uppercase tracking-wider text-muted">{label}</div>
-      <div className="num mt-1 text-2xl font-bold">{value}</div>
+      <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{label}</div>
+      <div className="display mt-2 text-[1.75rem]">{value}</div>
       {(sub || delta != null || pts != null) && (
         <div className="mt-1 text-xs text-muted">
           {pts != null && (
@@ -96,10 +96,10 @@ export function Card({
   id?: string;
 }) {
   return (
-    <section id={id} className="card scroll-mt-4 p-4">
+    <section id={id} className="card scroll-mt-4 p-5">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold">{title}</h2>
+          <h2 className="font-bold tracking-tight">{title}</h2>
           {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
         </div>
         {right}

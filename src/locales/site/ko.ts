@@ -246,6 +246,13 @@ export const ko: SiteText = {
         },
       ],
     },
+    learn: {
+      eyebrow: "무료 가이드",
+      title: "운동을 익히고, 계획은 앱에 맡기세요",
+      body: "단계별 자세, 각 운동이 쓰는 근육과 대체 운동, 그리고 무료 계산기.",
+      exercises: "인기 운동",
+      tools: "무료 도구",
+    },
     juice: {
       eyebrow: "재미를 더해서",
       title: "개인 최고 기록엔 축하 폭죽, 쉬는 날에도 연속 기록은 그대로.",

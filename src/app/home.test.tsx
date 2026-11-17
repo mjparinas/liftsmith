@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { DEMO_LIFTS } from "@/components/site/DemoPicker";
 import { perSide } from "@/components/site/heroPlates";
 import { epley, HERO_PROGRAM, labelled, muscleAnchor } from "@/components/site/heroProgram";
+import { HOME_GUIDES } from "@/components/site/HomeView";
+import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { QUOTES, visibleQuotes } from "@/content/testimonials";
 import { jointsAt } from "@/lib/demo/mesh";
 import { hasMotion, motionFor } from "@/lib/demo/motions";
@@ -31,6 +33,22 @@ describe("home page", () => {
         .getByRole("link", { name: /Use it in your browser today/ })
         .getAttribute("href"),
     ).toMatch(/^\/app\/?$/);
+  });
+
+  it("links to the popular exercise guides and the calculators, by name", () => {
+    render(<Home />);
+    const guides = screen.getByRole("navigation", { name: "Popular exercises" });
+    for (const id of HOME_GUIDES) {
+      expect(id in EXERCISE_GUIDES, id).toBe(true);
+      expect(
+        within(guides)
+          .getAllByRole("link")
+          .map((a) => a.getAttribute("href")),
+      ).toContain(`/exercises/${id}`);
+    }
+    expect(within(guides).getByRole("link", { name: "One-arm dumbbell row" })).toBeInTheDocument();
+    const tools = screen.getByRole("navigation", { name: "Free tools" });
+    expect(within(tools).getByRole("link", { name: "Plate calculator" }).getAttribute("href")).toMatch(/^\/tools\/plate-calculator\/?$/);
   });
 
   it("has plenty of calls to action, each one counted", () => {

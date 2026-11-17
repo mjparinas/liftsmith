@@ -109,7 +109,7 @@ function FlagLine({ f, admin, changed }: { f: FlagRow; admin: boolean; changed: 
           <button
             type="button"
             disabled={!dirty}
-            className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink disabled:opacity-40"
+            className="press rounded-lg btn-primary px-3 py-1.5 font-semibold disabled:opacity-40"
             onClick={() => void save({ value: parse(value, f.options), rollout: Number(rollout) })}
           >
             Save

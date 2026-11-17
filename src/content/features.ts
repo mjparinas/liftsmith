@@ -620,6 +620,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "club-chat",
+        name: "Club chat and crew sessions",
+        body: "Talk with your club between workouts, post a time and place to train together, and see who's in. Everyone in gets a reminder an hour before, and posting your workout afterwards marks you trained and tags the friends you trained with.",
+        tier: "free",
+        note: "For lifters 18 and over. Notifications are on Android and iPhone; the web app shows new messages while the chat is open.",
+        added: "2026-11-17",
+      },
+      {
         id: "profiles",
         name: "Public profiles",
         body: "An optional public page with your best lifts and workouts.",

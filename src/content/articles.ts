@@ -12,11 +12,13 @@ import { BLOG_AE } from "./blog/ae";
 import { BLOG_AUTO_SUPERSETS } from "./blog/autoSupersets";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
+import { BLOG_CLUB_CHAT } from "./blog/clubChat";
 import { BLOG_COACH_PROGRAMS } from "./blog/coachPrograms";
 import { BLOG_COMMUNITY } from "./blog/community";
 import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
+import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_G } from "./blog/g";
 import { BLOG_H } from "./blog/h";
@@ -27,6 +29,7 @@ import { BLOG_K } from "./blog/k";
 import { BLOG_L } from "./blog/l";
 import { BLOG_M } from "./blog/m";
 import { BLOG_N } from "./blog/n";
+import { BLOG_NEW_FEATURES } from "./blog/newFeatures";
 import { BLOG_O } from "./blog/o";
 import { BLOG_P } from "./blog/p";
 import { BLOG_Q } from "./blog/q";
@@ -77,6 +80,9 @@ export interface Article {
   slug: string;
   kind: "guide" | "blog";
   title: string;
+  /** The title in search results when the headline doesn't carry the words people search ("beginner gym workout
+   * plan"). Under 60 characters. The page's own headline stays `title`. */
+  seoTitle?: string;
   /** Under 160 characters, for search results. */
   description: string;
   /** ISO date. */
@@ -249,9 +255,12 @@ export const ARTICLES: Article[] = [
   ...BLOG_SCREENSHOT_SHARE,
   ...BLOG_FORM_CUES,
   ...BLOG_AUTO_SUPERSETS,
+  ...BLOG_CLUB_CHAT,
   ...BLOG_COMMUNITY,
   ...BLOG_SITE_PAGES,
   ...BLOG_WIDGETS,
+  ...BLOG_NEW_FEATURES,
+  ...BLOG_FEATURE_GUIDES,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

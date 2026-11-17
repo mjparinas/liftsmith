@@ -246,6 +246,13 @@ export const tr: SiteText = {
         },
       ],
     },
+    learn: {
+      eyebrow: "Ücretsiz rehberler",
+      title: "Hareketleri öğren, planı uygulamaya bırak",
+      body: "Adım adım teknik, her hareketin çalıştırdığı kaslar ve yerine ne yapılacağı, ayrıca ücretsiz hesaplayıcılar.",
+      exercises: "Popüler egzersizler",
+      tools: "Ücretsiz araçlar",
+    },
     juice: {
       eyebrow: "Keyif için tasarlandı",
       title: "Rekorlara konfeti. Dinlenme günleri serini bozmaz.",

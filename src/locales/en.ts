@@ -35,6 +35,7 @@ import * as count from "./text/count";
 import * as cpg from "./text/cpg";
 import * as cpl from "./text/cpl";
 import * as creator from "./text/creator";
+import * as crew from "./text/crew";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
@@ -159,6 +160,7 @@ export const en = {
   ...bmi.en,
   ...body.en,
   ...buddy.en,
+  ...crew.en,
   ...buy.en,
   ...cal.en,
   ...calc.en,

@@ -863,6 +863,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Nella stessa sezione c'è l'interruttore Serie di riscaldamento, per i giorni in cui preferisci scaldarti a modo tuo.",
   },
+  "club-chat": {
+    title: "Il tuo club, tra un allenamento e l’altro",
+    intro: "I club ora hanno una chat e gli allenamenti di gruppo, così le persone con cui ti alleni possono parlare e vedersi.",
+    points: [
+      "Apri Amici › Club, scegli un club e tocca Chat per scrivere a tutti.",
+      "Proponi un allenamento di gruppo con un nome, un giorno e un orario, e i membri toccano Ci sono.",
+      "Chi partecipa riceve un promemoria un’ora prima.",
+      "Pubblica l’allenamento dopo: risulterai allenato, con gli amici che erano con te taggati.",
+    ],
+    dyk: "Avvisami, nella chat di ogni club, spegne le sue notifiche, e una chat ne invia al massimo una all’ora.",
+  },
   community: {
     title: "Vota cosa costruiamo dopo",
     intro: "Liftsmith ora ha una community: suggerisci idee, vota quelle che vuoi e segnala i bug.",

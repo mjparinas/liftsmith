@@ -345,6 +345,11 @@ export const fr: FeaturesText = {
       name: "Défis, clubs et classements",
       body: "Défiez un ami, rejoignez un club ou l’équipe de votre salle avec un classement hebdomadaire, et relevez le défi du mois avec tout le monde.",
     },
+    "club-chat": {
+      name: "Discussion du club et séances en groupe",
+      body: "Discute avec ton club entre les séances, propose une heure et un lieu pour vous entraîner ensemble et vois qui vient. Chaque participant reçoit un rappel une heure avant, et publier ta séance après coup t’indique comme entraîné, avec les amis qui étaient là identifiés.",
+      note: "Pour les 18 ans et plus. Les notifications sont sur Android et iPhone ; l’app web affiche les nouveaux messages tant que la discussion est ouverte.",
+    },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
     "tagline-gym": {
       name: "Devise et salle habituelle",

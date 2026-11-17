@@ -124,7 +124,8 @@ const closeReports = (accountId: string, status: string) => [
     sql: `UPDATE reports SET status = ? WHERE status = 'open' AND (
       (kind = 'profile' AND target_id = ?2)
       OR (kind = 'post' AND target_id IN (SELECT id FROM posts WHERE account_id = ?2))
-      OR (kind = 'comment' AND target_id IN (SELECT id FROM post_comments WHERE account_id = ?2)))`,
+      OR (kind = 'comment' AND target_id IN (SELECT id FROM post_comments WHERE account_id = ?2))
+      OR (kind = 'message' AND target_id IN (SELECT id FROM club_messages WHERE account_id = ?2)))`,
     args: [status, accountId],
   },
 ];
@@ -217,6 +218,7 @@ export async function moderate(accountId: string, a: ModAction, now = Date.now()
         // Posts and comments hidden by reports show again, the same as Dismiss on the Reports tab.
         { sql: "UPDATE posts SET hidden = 0 WHERE account_id = ? AND hidden = 1", args: [accountId] },
         { sql: "UPDATE post_comments SET hidden = 0 WHERE account_id = ? AND hidden = 1", args: [accountId] },
+        { sql: "UPDATE club_messages SET hidden = 0 WHERE account_id = ? AND hidden = 1", args: [accountId] },
       ]);
       return true;
     default:
@@ -275,17 +277,19 @@ export interface ModerationDetail {
 
 const AGAINST = `SELECT r.id, r.created_at, r.kind, r.target_id, r.reason, r.note, r.status, r.reporter_id,
     rp.handle AS reporter_handle, ra.email AS reporter_email,
-    CASE r.kind WHEN 'post' THEN p.body WHEN 'comment' THEN c.body ELSE '' END AS content
+    CASE r.kind WHEN 'post' THEN p.body WHEN 'comment' THEN c.body WHEN 'message' THEN cm.body ELSE '' END AS content
   FROM reports r
   LEFT JOIN posts p ON r.kind = 'post' AND p.id = r.target_id
   LEFT JOIN post_comments c ON r.kind = 'comment' AND c.id = r.target_id
+  LEFT JOIN club_messages cm ON r.kind = 'message' AND cm.id = r.target_id
   LEFT JOIN social_profiles rp ON rp.account_id = r.reporter_id
   LEFT JOIN accounts ra ON ra.id = r.reporter_id
-  WHERE (r.kind = 'profile' AND r.target_id = ?1) OR p.account_id = ?1 OR c.account_id = ?1`;
+  WHERE (r.kind = 'profile' AND r.target_id = ?1) OR p.account_id = ?1 OR c.account_id = ?1 OR cm.account_id = ?1`;
 
 function contentOf(kind: string, raw: unknown): string {
   if (kind === "profile") return "Profile";
   if (kind === "comment") return s(raw) || "(deleted)";
+  if (kind === "message") return s(raw) ? `Club chat: ${s(raw)}` : "(deleted)";
   try {
     const body = JSON.parse(s(raw)) as { exercises?: { name?: string; id?: string }[] };
     return `Workout: ${(body.exercises ?? []).map((e) => e.name || e.id).join(", ")}`;
