@@ -22,6 +22,7 @@ import {
   townsOf,
 } from "./gymImport";
 import type { OsmElement } from "./gymPlaces";
+import { gymsFrom, middleOf, osmRef, qGymShapes, qGymTags, QLEVER_HOST, qRegions, qTowns } from "./gymQlever";
 
 const NOW = 1_800_000_000_000;
 const GYMS: OsmElement[] = [
@@ -46,20 +47,22 @@ const REGIONS: OsmElement[] = [
 
 /** A fake map: each Overpass query gets `answer(query)`, unless `servers` says otherwise for that host. */
 function fakeMap(
-  servers: Record<string, () => Response | Promise<Response>> = {},
+  servers: Record<string, (url: string, init?: RequestInit) => Response | Promise<Response>> = {},
   answer = (ql: string): OsmElement[] => defaultAnswer(ql),
 ) {
   const calls: { host: string; ql: string }[] = [];
   const fetcher = (async (url: string | URL | Request, init?: RequestInit) => {
     const u = new URL(String(url));
-    const ql = decodeURIComponent(String(init?.body ?? "").replace(/^data=/, ""));
-    calls.push({ host: u.host, ql });
     const own = servers[u.host];
+    // QLever is tried first in production; these tests are about Overpass, so it's down unless a test says otherwise.
+    if (u.host === QLEVER_HOST && !own) return new Response("down", { status: 503 });
+    const ql = decodeURIComponent(String(init?.body ?? "").replace(/^(data|query)=/, ""));
+    calls.push({ host: u.host, ql });
     if (!own) return Response.json({ elements: answer(ql) });
     // Honour the time limit the way fetch does.
     return await new Promise<Response>((ok, no) => {
       init?.signal?.addEventListener("abort", () => no(Object.assign(new Error("timed out"), { name: "TimeoutError" })));
-      void Promise.resolve(own()).then(ok, no);
+      void Promise.resolve(own(String(url), init)).then(ok, no);
     });
   }) as typeof fetch;
   return { fetcher, calls };
@@ -154,6 +157,120 @@ describe("importing the world, region by region", () => {
   it("refuses an item it doesn't know", async () => {
     expect(await importItem("Langley, BC", fakeMap().fetcher, NOW)).toMatchObject({ ok: false, error: "where" });
     expect(await importItem("region:CA:x:BC", fakeMap().fetcher, NOW)).toMatchObject({ ok: false, error: "where" });
+  });
+});
+
+/** GYMS and TOWNS as QLever would answer each query (gymQlever.ts), or nothing when `empty`. */
+function fakeQlever(opts: { empty?: boolean; seen?: string[] } = {}) {
+  const uri = (value: string) => ({ type: "uri", value });
+  const lit = (value: string) => ({ type: "literal", value });
+  const iri = (e: OsmElement) => `https://www.openstreetmap.org/${e.type}/${e.id}`;
+  const rows = (sparql: string) => {
+    if (opts.empty) return [];
+    if (sparql.includes("ISO3166-2"))
+      return REGIONS.map((r) => ({
+        r: uri(`https://www.openstreetmap.org/relation/${r.id}`),
+        iso: lit(r.tags!.iso!),
+        name: lit(r.tags!.name!),
+      }));
+    if (sparql.includes("?g ?k ?v"))
+      return GYMS.flatMap((g) =>
+        Object.entries(g.tags!).map(([k, v]) => ({ g: uri(iri(g)), k: uri(`https://www.openstreetmap.org/wiki/Key:${k}`), v: lit(v) })),
+      );
+    if (sparql.includes("?g ?w"))
+      return GYMS.map((g) => {
+        const at = g.center ?? { lat: g.lat!, lon: g.lon! };
+        const d = 0.0002;
+        const w = g.center
+          ? `POLYGON((${at.lon - d} ${at.lat - d},${at.lon + d} ${at.lat - d},${at.lon + d} ${at.lat + d},${at.lon - d} ${at.lat + d},${at.lon - d} ${at.lat - d}))`
+          : `POINT(${at.lon} ${at.lat})`;
+        return { g: uri(iri(g)), w: lit(w) };
+      });
+    return TOWNS.map((t) => ({
+      t: uri(`https://www.openstreetmap.org/node/${t.id}`),
+      name: lit(t.tags!.name!),
+      place: lit(t.tags!.place!),
+      w: lit(`POINT(${t.tags!.lon} ${t.tags!.lat})`),
+    }));
+  };
+  return async (_: string, init?: RequestInit) => {
+    const sparql = new URLSearchParams(String(init?.body ?? "")).get("query") ?? "";
+    opts.seen?.push(sparql);
+    return Response.json({ head: { vars: [] }, results: { bindings: rows(sparql) } });
+  };
+}
+
+describe("QLever first", () => {
+  it("imports a region from QLever in a few requests, without asking Overpass", async () => {
+    const seen: string[] = [];
+    const { fetcher, calls } = fakeMap({ [QLEVER_HOST]: fakeQlever({ seen }) });
+    const r = await importItem(BC, fetcher, NOW);
+    expect(r).toMatchObject({ ok: true, found: 3, added: 3, server: QLEVER_HOST });
+    expect(calls.filter((c) => c.host !== QLEVER_HOST)).toEqual([]);
+    expect(seen.sort()).toEqual([qGymShapes({ relation: 390_867 }), qGymTags({ relation: 390_867 }), qTowns({ relation: 390_867 })].sort());
+    // The same gyms, cities and details as from Overpass: the outline's middle stands in for Overpass's centre.
+    const rows = await query("SELECT name, city, region, country, hours, lat, lon FROM gym_places ORDER BY name");
+    expect(rows).toEqual([
+      { name: "Club Pilates", city: "Langley", region: "BC", country: "CA", hours: "", lat: 49.1148, lon: -122.6694 },
+      { name: "Planet Fitness", city: "Langley", region: "BC", country: "CA", hours: "24/7", lat: 49.1025, lon: -122.6579 },
+      { name: "Steve Nash Fitness World", city: "Langley", region: "BC", country: "CA", hours: "", lat: 49.11734, lon: -122.67041 },
+    ]);
+  });
+
+  it("splits a country into its regions from QLever", async () => {
+    const seen: string[] = [];
+    const { fetcher, calls } = fakeMap({ [QLEVER_HOST]: fakeQlever({ seen }) });
+    expect(await importItem("country:CA", fetcher, NOW)).toMatchObject({
+      ok: true,
+      server: QLEVER_HOST,
+      split: ["region:CA:390867:BC", "region:CA:224299:AB"],
+    });
+    expect(seen).toEqual([qRegions("CA")]);
+    expect(calls.filter((c) => c.host !== QLEVER_HOST)).toEqual([]);
+  });
+
+  it("asks Overpass when QLever is down, or finds nothing at all in the area", async () => {
+    const down = await importItem(BC, fakeMap().fetcher, NOW);
+    expect(down).toMatchObject({ ok: true, found: 3, server: "overpass-api.de" });
+    expect(down.log.join("\n")).toMatch(/qlever\.cs\.uni-freiburg\.de gym tags: HTTP 503/);
+    const blank = await importItem(BC, fakeMap({ [QLEVER_HOST]: fakeQlever({ empty: true }) }).fetcher, NOW + 1);
+    expect(blank).toMatchObject({ ok: true, found: 3, server: "overpass-api.de" });
+    expect(blank.log.join("\n")).toMatch(/found nothing at all in this area; asking Overpass/);
+  });
+
+  it("can be switched off", async () => {
+    const seen: string[] = [];
+    const r = await importItem(BC, fakeMap({ [QLEVER_HOST]: fakeQlever({ seen }) }).fetcher, NOW, { qlever: false });
+    expect(r).toMatchObject({ ok: true, server: "overpass-api.de" });
+    expect(seen).toEqual([]);
+  });
+
+  it("stops asking the map when the worker's time is up, instead of running past it", async () => {
+    const { fetcher, calls } = fakeMap();
+    const r = await importItem(BC, fetcher, NOW, { until: Date.now() + 5_000 });
+    expect(r).toMatchObject({ ok: false, error: "map" });
+    expect(calls).toEqual([]);
+    expect(r.log.join("\n")).toMatch(/out of time for another map server/);
+  });
+
+  it("reads QLever's answers: map ids, the middle of a shape, and tags gathered per gym", () => {
+    expect(osmRef("https://www.openstreetmap.org/way/42")).toEqual({ type: "way", id: 42 });
+    expect(osmRef("https://example.com/way/42")).toBeNull();
+    expect(middleOf("POINT(-122.5 49.25)")).toEqual({ lat: 49.25, lon: -122.5 });
+    expect(middleOf("POLYGON((0 0,2 0,2 4,0 4,0 0))")).toEqual({ lat: 2, lon: 1 });
+    expect(middleOf("MULTIPOLYGON(((1 1,3 1,3 3,1 1)),((5 5,7 5,7 7,5 5)))")).toEqual({ lat: 4, lon: 4 });
+    expect(middleOf("GEOMETRYCOLLECTION EMPTY")).toBeNull();
+    const g = "https://www.openstreetmap.org/node/7";
+    const K = "https://www.openstreetmap.org/wiki/Key:";
+    expect(
+      gymsFrom(
+        [
+          { g: { type: "uri", value: g }, k: { type: "uri", value: `${K}name` }, v: { type: "literal", value: "Iron Den" } },
+          { g: { type: "uri", value: g }, k: { type: "uri", value: `${K}addr:city` }, v: { type: "literal", value: "Surrey" } },
+        ],
+        [{ g: { type: "uri", value: g }, w: { type: "literal", value: "POINT(-122.8 49.1)" } }],
+      ),
+    ).toEqual([{ type: "node", id: 7, lat: 49.1, lon: -122.8, tags: { name: "Iron Den", "addr:city": "Surrey" } }]);
   });
 });
 
