@@ -26,18 +26,27 @@ import { COUNTRIES } from "./countries";
 import { batch, query, run } from "./db";
 import { autoFillBatch } from "./gymAutoFill";
 import { enrichBatch } from "./gymEnrich";
-import { describeItem, IMPORT_LIMITS, importItem, SINCE_KEY, type ImportResult } from "./gymImport";
+import { describeItem, importItem, SINCE_KEY, type ImportResult } from "./gymImport";
 import { repairStep } from "./gymRepair";
 
-/** Two items at a time: each on its own map server, which stays within each server's per-client slots. */
-export const IMPORT_WORKERS = 2;
+/**
+ * Three items at a time. Most are answered by QLever in seconds (gymQlever.ts); an item that falls back to Overpass
+ * starts on its own map server, one per lane, which stays within each server's per-client slots.
+ */
+export const IMPORT_WORKERS = 3;
 /** An item whose map servers were all busy goes back in line this many times, after these pauses. */
 export const RETRY_AFTER_MS = [3 * 60_000, 10 * 60_000];
 export const JOB_LIMITS = {
   /** A worker's own time: the cron route's 800 seconds, less room to hand over. */
   runMs: 760_000,
-  /** An item isn't started unless one whole item import still fits before the worker's time is up. */
-  cityMs: IMPORT_LIMITS.budgetMs + 20_000,
+  /**
+   * An item isn't started with less time than this left. Items are told when the worker's time ends (`until`) and
+   * stop asking the map by then, so a worker no longer idles its last five minutes waiting for a whole Overpass budget
+   * (2026-11-18); one that runs out goes back in line like a busy one.
+   */
+  cityMs: 90_000,
+  /** Room an item leaves after its own end for saving and handing over. */
+  saveMs: 25_000,
   /** The website, AI and tidy steps start no new batch with less time than this left. */
   stepMs: 75_000,
   /** The lease outlives the worker's time a little, so a crashed worker's job is picked up a minute later. */
@@ -397,14 +406,16 @@ export async function runWorker(opts: WorkerOptions = {}): Promise<WorkerResult>
   const lane = async (w: number) => {
     if (w) await sleep(opts.staggerMs ?? 1500);
     for (let item = await take(); item; item = await take()) {
-      const r = await importer(item.place, fetch, Date.now(), { server: w }).catch((e: unknown): ImportResult => ({
-        ok: false,
-        id: "",
-        error: "map",
-        detail: String(e instanceof Error ? e.message : e),
-        ms: 0,
-        log: [],
-      }));
+      const r = await importer(item.place, fetch, Date.now(), { server: w, until: deadline - JOB_LIMITS.saveMs }).catch(
+        (e: unknown): ImportResult => ({
+          ok: false,
+          id: "",
+          error: "map",
+          detail: String(e instanceof Error ? e.message : e),
+          ms: 0,
+          log: [],
+        }),
+      );
       imported++;
       const now = Date.now();
       const res = strip(r);
