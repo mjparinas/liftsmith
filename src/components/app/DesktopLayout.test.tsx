@@ -68,7 +68,11 @@ describe("desktop layout", () => {
     const user = userEvent.setup();
     await onboard(user);
     expect(document.documentElement.dataset.layout).toBe("desktop");
-    const nav = screen.getByRole("navigation", { name: "Main" });
+    // A new lifter starts with three; Awards and Friends join after the first and third workouts (unlocks.ts).
+    expect(within(screen.getByRole("navigation", { name: "Main" })).queryByRole("button", { name: "Awards" })).toBeNull();
+    useApp.getState().setProfile({ reveal: { all: true } });
+    const nav = await screen.findByRole("navigation", { name: "Main" });
+    await within(nav).findByRole("button", { name: "Awards" });
     expect(nav.className).toContain("w-60");
     expect(within(nav).getByText("Liftsmith")).toBeInTheDocument();
     for (const tab of ["Today", "Body", "Progress", "Friends", "Awards"])

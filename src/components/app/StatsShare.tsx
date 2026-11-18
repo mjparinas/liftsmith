@@ -29,6 +29,7 @@ import { Icon } from "./icons";
 import { loadPrefs, savePrefs, still, useShareContext, type Prefs } from "./ShareSheet";
 import { Button, Sheet, SwitchRow } from "./ui";
 import { useShareInvite } from "./useShareInvite";
+import { useUnlocked } from "./useUnlocked";
 
 const SPAN_KEY = "liftsmith.shotSpan";
 function loadSpan(): Span {
@@ -252,7 +253,9 @@ function StatsBody({ from, onClose }: { from: StatsShareFrom; onClose: () => voi
  * workout or setup, not over another sheet, not twice within 20 seconds, and only once there's a workout to share.
  */
 export function ScreenshotShare({ route }: { route: string }) {
-  const enabled = useApp((s) => s.profile.shotShare !== false);
+  // Waits for a new lifter's third workout, with Friends and the invite (unlocks.ts).
+  const unlocked = useUnlocked("friends");
+  const enabled = useApp((s) => s.profile.shotShare !== false) && unlocked;
   const has = useApp((s) => hasStats(s.events));
   const [open, setOpen] = useState(false);
   const last = useRef<number | null>(null);

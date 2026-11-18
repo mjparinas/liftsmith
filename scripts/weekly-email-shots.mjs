@@ -9,7 +9,7 @@ import { createJiti } from "jiti";
 import { chromium } from "playwright";
 import sharp from "sharp";
 
-import { base } from "./helpers.mjs";
+import { base, showEverything } from "./helpers.mjs";
 
 const jiti = createJiti(import.meta.url, { alias: { "@": `${process.cwd()}/src` } });
 const { WEEKLY } = await jiti.import(`${process.cwd()}/src/server/weekly/list.ts`);
@@ -122,6 +122,8 @@ async function setup() {
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Save" }).click();
   await page.getByText("Today's workout").waitFor();
+  // The screenshots show the whole app, not a new lifter's first days (docs/decisions/unlocks.md).
+  await showEverything(page);
 }
 
 async function workout() {

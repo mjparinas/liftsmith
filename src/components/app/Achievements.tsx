@@ -36,6 +36,7 @@ import { SeasonCard } from "./SeasonCard";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { HUE } from "./theme";
 import { Chip, ScreenHeader, Section } from "./ui";
+import { useUnlocked } from "./useUnlocked";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
@@ -418,6 +419,9 @@ export function Achievements() {
   const { arg } = useRoute();
   // Highlights (earned plus the closest few) keeps the screen short; a link to one badge opens on All so it's there.
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>(arg ? "all" : "next");
+  const quests = useUnlocked("quests");
+  const seasons = useUnlocked("seasons");
+  const more = useUnlocked("more");
   const focus = useFocusBadge();
   const list = g.achievements.filter((a) =>
     filter === "all" || filter === "next" ? true : filter === "earned" ? a.level > 0 : a.category === filter,
@@ -484,14 +488,20 @@ export function Achievements() {
           <span className="text-muted">{t("awards.badgesOf", { total: g.badges.total })}</span>
         </p>
       </div>
-      <MonthCard />
-      <SeasonCard />
-      <Section title={t("awards.weekQuests")}>
-        <QuestsCard g={g} />
-      </Section>
-      <Section title={t("awards.leagueTitle")}>
-        <LeagueCard g={g} />
-      </Section>
+      {/* Quests and the league, seasons and the locker, and the monthly challenge appear as a new lifter gets used to
+          the app (unlocks.ts). */}
+      {more && <MonthCard />}
+      {seasons && <SeasonCard />}
+      {quests && (
+        <>
+          <Section title={t("awards.weekQuests")}>
+            <QuestsCard g={g} />
+          </Section>
+          <Section title={t("awards.leagueTitle")}>
+            <LeagueCard g={g} />
+          </Section>
+        </>
+      )}
       <Section title={t("awards.streakTitle")}>
         <StreakCard g={g} />
       </Section>
@@ -550,9 +560,11 @@ export function Achievements() {
           {!sorted.length && <li className="px-4 py-3 text-muted">{t("awards.none")}</li>}
         </ul>
       </Section>
-      <Section title={t("awards.locker")} info="crate">
-        <Locker g={g} />
-      </Section>
+      {seasons && (
+        <Section title={t("awards.locker")} info="crate">
+          <Locker g={g} />
+        </Section>
+      )}
     </div>
   );
 }

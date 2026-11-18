@@ -136,6 +136,7 @@ import * as trl from "./text/trl";
 import * as trn from "./text/trn";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
+import * as unl from "./text/unl";
 import * as variety from "./text/variety";
 import * as vc from "./text/vc";
 import * as vl from "./text/vl";
@@ -271,6 +272,7 @@ export const tr: Partial<Record<MessageKey, Message>> = {
   ...today.tr,
   ...ton.tr,
   ...egg.tr,
+  ...unl.tr,
   ...hx.tr,
   ...lift.tr,
   ...tools.tr,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { SECTION_LABEL } from "@/components/titles";
@@ -18,6 +18,7 @@ import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/l
 import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
 import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
+import { isUnlocked, justUnlocked, unlockCount, type UnlockId } from "@/lib/unlocks";
 import { useNow } from "@/lib/useNow";
 import { doneCue, say, voice } from "@/lib/voice";
 
@@ -27,7 +28,7 @@ import { WorkoutNoteCard } from "./EditWorkout";
 import { DoneMoments, lean } from "./Extras";
 import { clock } from "./format";
 import { PostToFriends } from "./Friends";
-import { Icon } from "./icons";
+import { Icon, type IconName } from "./icons";
 import { PainSelect } from "./Injuries";
 import { DoneInvite } from "./Invites";
 import { Mascot } from "./Mascot";
@@ -39,6 +40,7 @@ import { SaveDoneAsRoutine } from "./Routines";
 import { SendToFriend } from "./SendToFriend";
 import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
+import { HUE } from "./theme";
 import { TrialDone } from "./TrialMoments";
 import { Button } from "./ui";
 
@@ -164,6 +166,18 @@ export function Done() {
   const [sharing, setSharing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const inFriends = useSocial((st) => !!st.me?.profile) && socialOn();
+  // What this workout unlocked (unlocks.ts), worked out once from the profile as it was before the workout, then
+  // the highest count is kept so nothing hides again if a workout is deleted.
+  const setProfile = useApp((st) => st.setProfile);
+  const opened = useMemo(() => (s ? justUnlocked(profile, stats.sessions.length) : []), [s?.sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const count = stats.sessions.length;
+  const quests = isUnlocked("quests", profile, count);
+  const seasons = isUnlocked("seasons", profile, count);
+  const friends = isUnlocked("friends", profile, count);
+  useEffect(() => {
+    const r = profile.reveal;
+    if (r && !r.all && unlockCount(r, count) > (r.peak ?? 0)) setProfile({ reveal: { ...r, peak: unlockCount(r, count) } });
+  }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     void confetti(prs.length > 0 || levelUp);
@@ -268,6 +282,7 @@ export function Done() {
         </ul>
       )}
       <PrReplayButton prs={prs} />
+      <NewForYou ids={opened} />
       <TrialDone sessionId={s.sessionId} />
       <NextUpCard sessionId={s.sessionId} />
       <CoolDownCard />
@@ -297,7 +312,7 @@ export function Done() {
         </section>
       )}
 
-      {questsDone.length > 0 && (
+      {quests && questsDone.length > 0 && (
         <ul className="card mt-4 divide-y divide-line text-left" aria-label={t("done.quests")}>
           {questsDone.map((q) => (
             <li key={q.id} className="flex justify-between px-4 py-3">
@@ -314,9 +329,7 @@ export function Done() {
       <PainAfter sessionId={s.sessionId} />
       <WorkoutNoteCard sessionId={s.sessionId} />
 
-      {prizes.map((p) => (
-        <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />
-      ))}
+      {seasons && prizes.map((p) => <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />)}
 
       {/* The streak only once there is one; the weekly league lives on Today and Awards. */}
       {after.streak.weeks > 0 && (
@@ -325,7 +338,7 @@ export function Done() {
         </div>
       )}
 
-      <PostToFriends summary={s} />
+      {friends && <PostToFriends summary={s} />}
       {/* One button for every way to share or keep this workout, so the end screen stays short. */}
       <button
         type="button"
@@ -348,7 +361,7 @@ export function Done() {
           />
           <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
           <ShareWorkout sessionId={s.sessionId} />
-          {inFriends && <DoneInvite />}
+          {inFriends && friends && <DoneInvite />}
         </div>
       )}
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
@@ -378,6 +391,53 @@ function PainAfter({ sessionId }: { sessionId: string }) {
         />
       ))}
       <p className="text-xs text-muted">{t("done.painNote")}</p>
+    </section>
+  );
+}
+
+const UNLOCK_ICON: Record<UnlockId, IconName> = {
+  awards: "trophy",
+  quests: "target",
+  friends: "people",
+  seasons: "medal",
+  more: "sparkle",
+};
+
+/** Where each unlock's button goes: the place the new thing lives. */
+const UNLOCK_GO: Record<UnlockId, () => void> = {
+  awards: () => go("achievements"),
+  quests: () => go("achievements"),
+  friends: () => go("friends"),
+  seasons: () => go("season"),
+  more: () => go("achievements"),
+};
+
+/** "New for you": what this workout unlocked, each with one line on why it helps and a button to it (unlocks.ts). */
+function NewForYou({ ids }: { ids: readonly UnlockId[] }) {
+  if (!ids.length) return null;
+  return (
+    <section className="mt-4 text-left" aria-label={t("unl.new")}>
+      <h2 className={`mb-2 ${SECTION_LABEL}`}>{t("unl.new")}</h2>
+      <ul className="space-y-3">
+        {ids.map((id, i) => (
+          <li
+            key={id}
+            className="card card-tint animate-rise flex items-start gap-3 p-4"
+            style={{ "--tint": HUE.violet, animationDelay: `${400 + i * 150}ms`, animationFillMode: "both" } as CSSProperties}
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet/15 text-violet" aria-hidden>
+              <Icon name={UNLOCK_ICON[id]} size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">{t(`unl.${id}.title`)}</p>
+              <p className="mt-0.5 text-sm text-muted">{t(`unl.${id}.body`)}</p>
+              <Button kind="ghost" className="mt-2" onClick={UNLOCK_GO[id]}>
+                {t(`unl.${id}.go`)}
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
