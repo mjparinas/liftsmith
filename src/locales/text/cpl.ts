@@ -39,6 +39,7 @@ export const en = {
   "cpl.otherBill.store":
     "Your Pro is billed through your phone's app store. Once your coach plan starts, cancel Pro there, because coach plans include Pro.",
   "cpl.unavailable": "Coach plans can't be shown right now. Check your connection and try again.",
+  "cpl.notYet": "Coach plans aren't on sale here yet. Your clients stay linked, and this sheet will show the plans once they are.",
   "cpl.retry": "Try again",
   "cpl.manage": "Manage plan",
   "cpl.done": "{tier} is on. It can take a minute to reach your account.",
@@ -85,6 +86,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Tu Pro se cobra a través de la tienda de apps de tu teléfono. Cuando empiece tu plan de entrenador, cancela Pro allí, porque los planes de entrenador incluyen Pro.",
   "cpl.unavailable": "Ahora no se pueden mostrar los planes de entrenador. Revisa tu conexión y vuelve a intentarlo.",
+  "cpl.notYet":
+    "Los planes de entrenador aún no están a la venta aquí. Tus clientes siguen vinculados y esta hoja mostrará los planes cuando lo estén.",
   "cpl.retry": "Reintentar",
   "cpl.manage": "Gestionar plan",
   "cpl.done": "{tier} está activo. Puede tardar un minuto en llegar a tu cuenta.",
@@ -131,6 +134,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Votre Pro est facturé par la boutique d'applications de votre téléphone. Une fois votre forfait coach commencé, résiliez Pro là-bas, car les forfaits coach incluent Pro.",
   "cpl.unavailable": "Impossible d'afficher les forfaits coach pour l'instant. Vérifiez votre connexion et réessayez.",
+  "cpl.notYet":
+    "Les forfaits coach ne sont pas encore en vente ici. Vos clients restent liés, et cette fenêtre affichera les forfaits dès qu'ils le seront.",
   "cpl.retry": "Réessayer",
   "cpl.manage": "Gérer le forfait",
   "cpl.done": "{tier} est activé. Il peut falloir une minute pour qu'il arrive sur votre compte.",
@@ -175,6 +180,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Dein Pro wird über den App-Store deines Handys abgerechnet. Kündige Pro dort, sobald dein Coach-Plan läuft, denn Coach-Pläne enthalten Pro.",
   "cpl.unavailable": "Die Coach-Pläne können gerade nicht angezeigt werden. Prüfe deine Verbindung und versuche es noch einmal.",
+  "cpl.notYet":
+    "Die Coach-Pläne gibt es hier noch nicht zu kaufen. Deine Klienten bleiben verbunden, und hier erscheinen die Pläne, sobald es so weit ist.",
   "cpl.retry": "Noch einmal versuchen",
   "cpl.manage": "Plan verwalten",
   "cpl.done": "{tier} ist aktiv. Es kann eine Minute dauern, bis es in deinem Konto ankommt.",
@@ -220,6 +227,8 @@ export const it: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Il tuo Pro viene addebitato tramite lo store del telefono. Quando parte il piano da coach, annulla Pro lì, perché i piani da coach includono Pro.",
   "cpl.unavailable": "Al momento non è possibile mostrare i piani da coach. Controlla la connessione e riprova.",
+  "cpl.notYet":
+    "I piani da coach non sono ancora in vendita qui. I tuoi clienti restano collegati e qui vedrai i piani appena saranno disponibili.",
   "cpl.retry": "Riprova",
   "cpl.manage": "Gestisci piano",
   "cpl.done": "{tier} è attivo. Può volerci un minuto perché arrivi al tuo account.",
@@ -265,6 +274,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Pro はスマートフォンのアプリストアで請求されています。コーチプランが始まったら、そちらで Pro を解約してください。コーチプランには Pro が含まれます。",
   "cpl.unavailable": "今はコーチプランを表示できません。接続を確認して、もう一度お試しください。",
+  "cpl.notYet":
+    "コーチプランはまだここで販売していません。クライアントとのつながりはそのままです。販売が始まるとここにプランが表示されます。",
   "cpl.retry": "もう一度試す",
   "cpl.manage": "プランを管理",
   "cpl.done": "{tier} が有効になりました。アカウントに反映されるまで1分ほどかかることがあります。",
@@ -309,6 +320,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Seu Pro é cobrado pela loja de apps do seu celular. Quando seu plano de coach começar, cancele o Pro lá, porque os planos de coach incluem o Pro.",
   "cpl.unavailable": "Os planos de coach não podem ser mostrados agora. Verifique sua conexão e tente de novo.",
+  "cpl.notYet":
+    "Os planos de coach ainda não estão à venda aqui. Seus clientes continuam vinculados, e os planos aparecem aqui assim que estiverem disponíveis.",
   "cpl.retry": "Tentar de novo",
   "cpl.manage": "Gerenciar plano",
   "cpl.done": "{tier} está ativo. Pode levar um minuto para chegar à sua conta.",
@@ -353,6 +366,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Pro는 휴대폰의 앱 스토어에서 결제되고 있어요. 코치 요금제에 Pro가 포함되니, 코치 요금제가 시작되면 앱 스토어에서 Pro를 해지하세요.",
   "cpl.unavailable": "지금은 코치 요금제를 표시할 수 없어요. 연결을 확인하고 다시 시도하세요.",
+  "cpl.notYet": "코치 요금제는 아직 여기서 판매하지 않아요. 고객 연결은 그대로 유지되고, 판매가 시작되면 여기에 요금제가 표시돼요.",
   "cpl.retry": "다시 시도",
   "cpl.manage": "요금제 관리",
   "cpl.done": "{tier}이(가) 켜졌어요. 계정에 반영되는 데 1분 정도 걸릴 수 있어요.",
@@ -398,6 +412,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Pro'n telefonunun uygulama mağazası üzerinden faturalanıyor. Koç planın başlayınca Pro'yu orada iptal et, çünkü koç planları Pro'yu içerir.",
   "cpl.unavailable": "Koç planları şu an gösterilemiyor. Bağlantını kontrol et ve yeniden dene.",
+  "cpl.notYet": "Koç planları burada henüz satışta değil. Danışanların bağlı kalır ve planlar satışa çıktığında burada görünür.",
   "cpl.retry": "Yeniden dene",
   "cpl.manage": "Planı yönet",
   "cpl.done": "{tier} açık. Hesabına ulaşması bir dakika sürebilir.",
@@ -442,6 +457,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Twoje Pro jest rozliczane przez sklep z aplikacjami w telefonie. Gdy plan trenerski się zacznie, anuluj tam Pro, bo plany trenerskie zawierają Pro.",
   "cpl.unavailable": "Nie można teraz pokazać planów trenerskich. Sprawdź połączenie i spróbuj ponownie.",
+  "cpl.notYet":
+    "Plany trenerskie nie są tu jeszcze w sprzedaży. Twoi podopieczni pozostają połączeni, a plany pojawią się tutaj, gdy tylko będą dostępne.",
   "cpl.retry": "Spróbuj ponownie",
   "cpl.manage": "Zarządzaj planem",
   "cpl.done": "{tier} jest aktywny. Może minąć chwila, zanim pojawi się na Twoim koncie.",

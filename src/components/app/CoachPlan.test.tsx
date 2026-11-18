@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { useBilling } from "@/lib/billing";
-import { setCoachOffers } from "@/lib/coachBilling";
+import { setCoachOffers, useCoachBilling } from "@/lib/coachBilling";
 import { DEFAULT_LIMITS } from "@/lib/coachPlans";
 import { t } from "@/lib/i18n";
 import type { CoachPlanInfo } from "@/lib/trainer";
@@ -62,6 +62,16 @@ describe("the coach plan card", () => {
       expect.stringContaining("$399.99"),
       expect.stringContaining("$39.99"),
     ]);
+  });
+
+  it("before the store or Stripe has the plans, says they aren't on sale yet instead of blaming the connection", async () => {
+    const user = userEvent.setup();
+    useCoachBilling.setState({ offers: [], error: null, notForSale: true });
+    render(<CoachPlanCard plan={plan({ clients: 3 })} onChange={() => {}} />);
+    await user.click(screen.getByRole("button", { name: t("cpl.see") }));
+    expect(screen.getByText(t("cpl.notYet"))).toBeTruthy();
+    expect(screen.queryByText(t("cpl.unavailable"))).toBeNull();
+    expect(screen.queryByRole("button", { name: t("cpl.retry") })).toBeNull();
   });
 
   it("during the grace, says until when the old limit holds", () => {

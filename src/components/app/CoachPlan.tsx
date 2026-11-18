@@ -149,7 +149,7 @@ function PlansSheet({
   tier: CoachTier;
   onDone: (r: CoachBuyResult, tier: PaidCoachTier) => void;
 }) {
-  const { offers, busy, error } = useCoachBilling();
+  const { offers, busy, error, notForSale } = useCoachBilling();
   const proVia = useAccount((s) => s.account?.proVia ?? null);
   useEffect(() => {
     if (open) void loadCoachOffers();
@@ -210,7 +210,8 @@ function PlansSheet({
           </section>
         );
       })}
-      {!offers?.length && (
+      {notForSale && !offers?.length && <p className="mt-4 text-sm text-muted">{t("cpl.notYet")}</p>}
+      {!notForSale && !offers?.length && (
         <div className="mt-4">
           <p className="text-sm text-muted">{t("cpl.unavailable")}</p>
           {error && <p className="mt-1 text-xs break-words text-faint">{t("pro.errorDetail", { detail: error })}</p>}
