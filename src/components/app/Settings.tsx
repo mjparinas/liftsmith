@@ -32,6 +32,7 @@ import { isTeen } from "@/lib/teen";
 import { useCoachNotes } from "@/lib/trainer";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtBodyweight } from "@/lib/units";
+import { anyLocked } from "@/lib/unlocks";
 import { useNow } from "@/lib/useNow";
 
 import { BodyStats } from "./BodyStats";
@@ -50,6 +51,7 @@ import { SavingSettings } from "./Saving";
 import { StretchSettings } from "./Stretch";
 import { RestTimerSettings } from "./TrainingSettings";
 import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
+import { useUnlocked } from "./useUnlocked";
 
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
@@ -198,6 +200,7 @@ export function Settings() {
   const { arg } = useRoute();
   const desktop = useDesktop();
   const coaching = useCoachNotes((s) => s.coaching);
+  const more = useUnlocked("more");
   const legacy = arg ? LEGACY[arg] : undefined;
   const group: Group | null = legacy ? legacy[0] : (GROUPS as readonly string[]).includes(arg ?? "") ? (arg as Group) : null;
   const anchor = legacy?.[1];
@@ -241,15 +244,18 @@ export function Settings() {
           </li>
         ))}
       </ul>
-      <div className="mt-2">
-        <NavRow
-          title={t("lab.row")}
-          sub={t("lab.rowNote")}
-          icon="lightbulb"
-          pro={!can("labs")}
-          onClick={() => (can("labs") ? go("settings", "labs") : go("pro", "labs"))}
-        />
-      </div>
+      {/* Labs waits for a new lifter's eighth workout (unlocks.ts); while waiting, links to it still open. */}
+      {more && (
+        <div className="mt-2">
+          <NavRow
+            title={t("lab.row")}
+            sub={t("lab.rowNote")}
+            icon="lightbulb"
+            pro={!can("labs")}
+            onClick={() => (can("labs") ? go("settings", "labs") : go("pro", "labs"))}
+          />
+        </div>
+      )}
       <Section title={t("settings.g.help")}>
         <div className="space-y-3">
           {communityOn() && <NavRow title={t("cmty.title")} sub={t("cmty.rowSub")} icon="lightbulb" onClick={() => go("community")} />}
@@ -338,6 +344,8 @@ function GroupPage({ group }: { group: Group }) {
 function TrainingGroup() {
   const { profile, setProfile } = useApp();
   const desktop = useDesktop();
+  // Adaptive workout options wait for a new lifter's eighth workout (unlocks.ts).
+  const more = useUnlocked("more");
   return (
     <>
       {/* On desktop the sidebar has Programs (App.tsx), so the row is a phone thing. */}
@@ -371,7 +379,7 @@ function TrainingGroup() {
           ["advanced", t("exp.advanced")],
         ]}
       />
-      <AdaptiveOptions />
+      {more && <AdaptiveOptions />}
       <CalendarSettings />
       <div className="mt-6">
         <NavRow title={t("settings.injuries")} icon="heart" onClick={() => go("injuries")} />
@@ -502,6 +510,11 @@ function WorkoutGroup() {
 /** Look and feel: appearance, earned themes and icons, the daily quote, language, and accessibility. */
 function LookGroup() {
   const { profile, setProfile } = useApp();
+  const workouts = useApp((s) => s.stats.sessions.length);
+  const seasons = useUnlocked("seasons");
+  // Show everything (unlocks.ts): only for a lifter who still has something waiting, or has it on.
+  const reveal = profile.reveal;
+  const showAll = !!reveal && (reveal.all || anyLocked(profile, workouts));
   return (
     <>
       <Row<"dark" | "light" | "system">
@@ -516,12 +529,22 @@ function LookGroup() {
       />
       <DelightSettings part="look" />
       <SwitchRow label={t("settings.quote")} on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
-      <SwitchRow
-        label={t("ssn.setting")}
-        hint={t("ssn.settingHint")}
-        on={profile.delight?.seasons !== false}
-        onChange={(v) => setProfile({ delight: { ...profile.delight, seasons: v } })}
-      />
+      {seasons && (
+        <SwitchRow
+          label={t("ssn.setting")}
+          hint={t("ssn.settingHint")}
+          on={profile.delight?.seasons !== false}
+          onChange={(v) => setProfile({ delight: { ...profile.delight, seasons: v } })}
+        />
+      )}
+      {showAll && (
+        <SwitchRow
+          label={t("unl.all")}
+          hint={t("unl.allHint")}
+          on={!!reveal.all}
+          onChange={(v) => setProfile({ reveal: { ...reveal, all: v } })}
+        />
+      )}
       <Section title={t("settings.language")}>
         <LanguageChoices label={t("settings.language")} />
       </Section>

@@ -31,6 +31,7 @@ Melvin asked (2026-11-17): "games like diablo have this concept of a season, whe
 - **Today:** one row at the foot of the This week card (kit name, tier and days left, a thin bar), only while a season is running or starts within two weeks, or ended within two weeks. It opens the Season screen.
 - **Awards:** a Seasons card under the monthly challenge (the season, one tap to its screen, and every season badge earned).
 - **Season screen** (`#/season`, `Season.tsx`): tier, points and prestige; this week's points with why ("2 of 3 days, 400 points; 1 more day meets your goal (+200 bonus). Days past your goal add nothing"), the catch-up and finale notes; the free track and the Pro bonus row; challenges; the rare drop; Share my season once it ends (the recap card: tier, points, workouts, new bests, best week; the invite rides along through the share sheet like every card, never for under 18s).
+- **Waits for a new lifter's fifth workout** (Melvin, 2026-11-18: "seasons shouldn't be available right away for new users"): the Today row, the Awards card, the switch below, the locker and the crates on Done appear then, with a "New for you" card on Done; points count from the start ([Features that unlock as you train](unlocks.md)).
 - **Turn it off** (Melvin: "consider an opt-out toggle"): **Settings › Look and feel › Training seasons** (`profile.delight.seasons`, on by default, syncs with the profile). Off hides the Today row, the Awards card and unowned season items; points still count, and owned rewards stay usable.
 
 ## Teen-safe

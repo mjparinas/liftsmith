@@ -661,7 +661,7 @@ describe("game layer", () => {
     expect(await screen.findByRole("button", { name: "Rest-pause" })).toBeInTheDocument();
   });
 
-  it("finishing a workout unlocks badges and a crate, and Awards shows quests, league and badges", async () => {
+  it("finishing a first workout unlocks badges and Awards, and Show everything brings quests and the league", async () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
@@ -673,17 +673,24 @@ describe("game layer", () => {
     await user.click(screen.getByRole("button", { name: "Finish and save" }));
     const unlockedList = await screen.findByRole("region", { name: "Badges unlocked" });
     expect(within(unlockedList).getByText("Showing up")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: /You earned a crate/ }));
-    expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
+    // The first workout opens Awards with a New for you card; crates wait for the fifth (unlocks.ts).
+    const fresh = screen.getByRole("region", { name: "New for you" });
+    expect(within(fresh).getByText("Awards are open")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /You earned a crate/ })).toBeNull();
     // No streak yet after one workout, so the end screen leaves the streak card out; the league is on Awards.
     expect(screen.queryByText(/-week streak/)).toBeNull();
     expect(screen.queryByText(/Bronze league/)).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "See all awards" }));
     expect(await screen.findByRole("heading", { name: "Awards" })).toBeInTheDocument();
-    expect(screen.getByRole("list", { name: "Weekly quests" }).children).toHaveLength(3);
-    expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
     expect(screen.getByText(/of \d+ badges earned/)).toBeInTheDocument();
+    // Quests and the league open with the second workout, seasons and the locker with the fifth.
+    expect(screen.queryByRole("list", { name: "Weekly quests" })).toBeNull();
+    expect(screen.queryByText(/Bronze league/)).toBeNull();
+    // Show everything (Settings › Look and feel) opens the rest now.
+    useApp.getState().setProfile({ reveal: { ...useApp.getState().profile.reveal, all: true } });
+    expect((await screen.findByRole("list", { name: "Weekly quests" })).children).toHaveLength(3);
+    expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Secret" }));
     expect(screen.getAllByText("Secret achievement").length).toBeGreaterThan(5);
   });
@@ -743,12 +750,16 @@ describe("Labs", () => {
   });
 
   async function startSquat(user: ReturnType<typeof userEvent.setup>) {
+    showAll();
     await user.click(screen.getByRole("button", { name: "Today" }));
     await user.click(await screen.findByRole("button", { name: "Start workout" }));
     const skip = screen.queryByRole("button", { name: "Skip warm-up" });
     if (skip) await user.click(skip);
     await screen.findByRole("button", { name: /Log set/ });
   }
+
+  // The Labs row waits for a new lifter's eighth workout (unlocks.ts); these tests are about Labs, so show everything.
+  const showAll = () => useApp.getState().setProfile({ reveal: { all: true } });
 
   it("is Pro: without it the Labs row is marked Pro and opens Pro, and the workout has no Count reps", async () => {
     setBillingLive(true, null, [{ plan: "annual", price: "$39.99", perMonth: "$3.33", trialDays: 14 }]);
@@ -789,6 +800,7 @@ describe("Labs", () => {
   it("phone motion rep counting works on its own, without camera counting", async () => {
     const user = userEvent.setup();
     await onboard(user);
+    showAll();
     location.hash = "#/settings";
     await user.click(await screen.findByRole("button", { name: /Labs/ }));
     // Its own switch, shown with camera counting off.
@@ -804,6 +816,7 @@ describe("Labs", () => {
   it("heart-rate rest timer: cuts the rest once the heart rate is back down, and says why", async () => {
     const user = userEvent.setup();
     await onboard(user);
+    showAll();
     location.hash = "#/settings";
     await user.click(await screen.findByRole("button", { name: /Labs/ }));
     await user.click(await screen.findByRole("switch", { name: /Heart-rate rest timer/ }));
