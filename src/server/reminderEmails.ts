@@ -124,8 +124,8 @@ export function welcomeMail(footer: Footer, lang?: MsgLang, next?: { names: stri
 /** A planned message (messages.ts) or a milestone, as an email. */
 export function messageMail(m: { title: string; body: string; route?: string; kind: string }, footer: Footer, lang?: MsgLang): Mail {
   const pro = m.kind === "pro" || m.kind === "trial";
-  // Recaps, bests and friends point at what they're about, not today's workout.
-  const elsewhere = m.kind === "recap" || m.kind === "records" || m.kind === "friends";
+  // Recaps, bests, friends and seasons point at what they're about, not today's workout.
+  const elsewhere = m.kind === "recap" || m.kind === "records" || m.kind === "friends" || m.kind === "season";
   const cta = pro
     ? { label: say(lang, "rmd.mail.seePro"), url: appUrl("settings") }
     : {

@@ -260,6 +260,28 @@ function extras(x: Record<string, unknown>): Partial<PlanFields> {
     (n.minutes as number) <= 300
   )
     out.next = { names: n.names as string[], minutes: Math.round(n.minutes as number) };
+  const z = x.season as Record<string, unknown> | null | undefined;
+  if (
+    z &&
+    str(z.title, 80) &&
+    Number.isInteger(z.weeks) &&
+    (z.weeks as number) >= 1 &&
+    (z.weeks as number) <= 12 &&
+    [z.start, z.finale, z.end].every((v) => num(v) && (v as number) < 1e14) &&
+    (z.start as number) <= (z.finale as number) &&
+    (z.finale as number) < (z.end as number) &&
+    Number.isInteger(z.tier) &&
+    (z.tier as number) >= 0 &&
+    (z.tier as number) <= 20
+  )
+    out.season = {
+      title: z.title as string,
+      weeks: z.weeks as number,
+      start: z.start as number,
+      finale: z.finale as number,
+      end: z.end as number,
+      tier: z.tier as number,
+    };
   return out;
 }
 

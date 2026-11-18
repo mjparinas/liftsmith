@@ -338,3 +338,51 @@ describe("rehab reminders (2026-11-15)", () => {
     expect(off.some((m) => m.kind === "rehab")).toBe(false);
   });
 });
+
+describe("training seasons (2026-11-18)", () => {
+  // A ten-week season that starts next Monday (16 November); its finale week starts 18 January, it ends 25 January.
+  const season = {
+    title: "Season 1: Ember",
+    weeks: 10,
+    start: addDays(MON, 7, TZ),
+    finale: addDays(MON, 70, TZ),
+    end: addDays(MON, 77, TZ),
+    tier: 7,
+  };
+  const only = { kinds: { reminder: false, missed: false, streak: false, recap: false }, season };
+  const on = (from: number, days: number, channel: "push" | "email" = "push") =>
+    plan(input(only), from, addDays(from, days, TZ), channel).filter((m) => m.kind === "season");
+
+  it("says when a season starts, when its finale week begins and three days before it ends", () => {
+    const start = on(addDays(MON, 7, TZ), 1);
+    expect(start).toMatchObject([{ title: "Season 1: Ember starts today", route: "season" }]);
+    expect(start[0]!.body).toContain("10 weeks");
+    expect(parts(start[0]!.at, TZ).h).toBe(9);
+    expect(on(addDays(MON, 70, TZ), 1)[0]).toMatchObject({
+      title: "Finale week: Season 1: Ember",
+      body: expect.stringContaining("tier 7"),
+    });
+    const ending = on(addDays(MON, 71, TZ), 6);
+    expect(ending.map((m) => dayStart(m.at, TZ))).toEqual([addDays(MON, 74, TZ)]);
+    expect(ending[0]!.title).toBe("3 days left in Season 1: Ember");
+    // Nothing on the other days.
+    expect(on(addDays(MON, 8, TZ), 60)).toEqual([]);
+  });
+
+  it("goes by email too, at 08:00, and can be switched off", () => {
+    expect(parts(on(addDays(MON, 70, TZ), 1, "email")[0]!.at, TZ).h).toBe(8);
+    const off = plan(input({ ...only, kinds: { ...only.kinds, season: false } }), addDays(MON, 7, TZ), addDays(MON, 8, TZ), "push");
+    expect(off).toEqual([]);
+    expect(plan(input({ kinds: only.kinds }), addDays(MON, 7, TZ), addDays(MON, 8, TZ), "push")).toEqual([]);
+  });
+
+  it("rides along in the reminder on a day that has one, so it isn't lost to the one-a-day rule", () => {
+    // The season starts on a Monday, a training day, and the weekly email's day.
+    const push = plan(input({ season }), addDays(MON, 7, TZ), addDays(MON, 8, TZ), "push");
+    expect(push.map((m) => m.kind)).toEqual(["reminder"]);
+    expect(push[0]!.body).toMatch(/^Season 1: Ember starts today\. 10 weeks/);
+    const email = plan(input({ season }), addDays(MON, 7, TZ), addDays(MON, 8, TZ), "email");
+    expect(email.map((m) => m.kind)).toEqual(["reminder"]);
+    expect(email[0]!.body).toContain("Season 1: Ember starts today.");
+  });
+});

@@ -28,6 +28,8 @@ export const en = {
   "msgKind.friends.blurb": "Thursday evening, which friends trained this week.",
   "msgKind.rehab": "Rehab reminders",
   "msgKind.rehab.blurb": "Your physio's exercises on the days they're due, at your workout time. Not on days with a workout reminder.",
+  "msgKind.season": "Training seasons",
+  "msgKind.season.blurb": "When a season starts, when its finale week begins and three days before it ends.",
 } as const;
 
 type Key = keyof typeof en;
@@ -58,6 +60,8 @@ export const es: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Recordatorios de rehabilitación",
   "msgKind.rehab.blurb":
     "Los ejercicios de tu fisioterapeuta los días que tocan, a tu hora de entreno. No los días con recordatorio de entrenamiento.",
+  "msgKind.season": "Temporadas de entrenamiento",
+  "msgKind.season.blurb": "Cuando empieza una temporada, cuando arranca su semana final y tres días antes de que termine.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -86,6 +90,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Rappels de rééducation",
   "msgKind.rehab.blurb":
     "Les exercices de votre kiné les jours prévus, à votre heure d’entraînement. Pas les jours avec un rappel d’entraînement.",
+  "msgKind.season": "Saisons d’entraînement",
+  "msgKind.season.blurb": "Quand une saison commence, quand sa semaine finale débute et trois jours avant qu’elle se termine.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -114,6 +120,8 @@ export const de: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Reha-Erinnerungen",
   "msgKind.rehab.blurb":
     "Die Übungen deiner Physiotherapie an den fälligen Tagen, zu deiner Trainingszeit. Nicht an Tagen mit Trainingserinnerung.",
+  "msgKind.season": "Trainingssaisons",
+  "msgKind.season.blurb": "Wenn eine Saison beginnt, wenn ihre Finalwoche anfängt und drei Tage vor ihrem Ende.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -143,6 +151,8 @@ export const it: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Promemoria di riabilitazione",
   "msgKind.rehab.blurb":
     "Gli esercizi del fisioterapista nei giorni previsti, all’ora del tuo allenamento. Non nei giorni con un promemoria di allenamento.",
+  "msgKind.season": "Stagioni di allenamento",
+  "msgKind.season.blurb": "Quando inizia una stagione, quando parte la settimana finale e tre giorni prima che finisca.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -171,6 +181,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "リハビリのリマインダー",
   "msgKind.rehab.blurb":
     "理学療法士のエクササイズの日に、トレーニングの時刻にお知らせします。トレーニングのリマインダーがある日は送りません。",
+  "msgKind.season": "トレーニングシーズン",
+  "msgKind.season.blurb": "シーズンの開始日、最終週の始まり、終了の3日前にお知らせします。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -197,6 +209,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Lembretes de reabilitação",
   "msgKind.rehab.blurb":
     "Os exercícios do seu fisioterapeuta nos dias certos, no seu horário de treino. Não nos dias com lembrete de treino.",
+  "msgKind.season": "Temporadas de treino",
+  "msgKind.season.blurb": "Quando uma temporada começa, quando a semana final começa e três dias antes de ela acabar.",
   "msgKind.weekly": "Dicas semanais",
   "msgKind.weekly.blurb": "Depois das Dicas para começar, um e-mail por semana sobre outra coisa que o app faz.",
 };
@@ -224,6 +238,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "msgKind.friends.blurb": "목요일 저녁, 이번 주에 운동한 친구를 알려 드려요.",
   "msgKind.rehab": "재활 알림",
   "msgKind.rehab.blurb": "물리치료사가 정한 운동을 해야 하는 날, 운동 시간에 알려 드려요. 운동 알림이 있는 날에는 보내지 않아요.",
+  "msgKind.season": "트레이닝 시즌",
+  "msgKind.season.blurb": "시즌이 시작될 때, 마지막 주가 시작될 때, 끝나기 3일 전에 알려 드려요.",
   "msgKind.weekly": "주간 팁",
   "msgKind.weekly.blurb": "시작하기 팁이 끝나면, 앱으로 할 수 있는 다른 기능을 주 1회 이메일로 알려 드려요.",
 };
@@ -252,6 +268,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Rehabilitasyon hatırlatıcıları",
   "msgKind.rehab.blurb":
     "Fizyoterapistinin egzersizleri, zamanı geldiği günlerde antrenman saatinde. Antrenman hatırlatıcısı olan günlerde değil.",
+  "msgKind.season": "Antrenman sezonları",
+  "msgKind.season.blurb": "Bir sezon başladığında, final haftası başladığında ve bitmesine üç gün kala.",
   "msgKind.weekly": "Haftalık ipuçları",
   "msgKind.weekly.blurb": "Başlangıç ipuçlarından sonra haftada bir e-posta, uygulamanın yapabildiği başka bir şey hakkında.",
 };
@@ -280,6 +298,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "msgKind.rehab": "Przypomnienia o rehabilitacji",
   "msgKind.rehab.blurb":
     "Ćwiczenia od fizjoterapeuty w dni, w które je zaplanował, o porze treningu. Nie w dni z przypomnieniem o treningu.",
+  "msgKind.season": "Sezony treningowe",
+  "msgKind.season.blurb": "Gdy sezon się zaczyna, gdy zaczyna się jego tydzień finałowy i trzy dni przed jego końcem.",
   "msgKind.weekly": "Cotygodniowe porady",
   "msgKind.weekly.blurb": "Po wskazówkach na start jeden e-mail w tygodniu o czymś innym, co potrafi aplikacja.",
 };
