@@ -20,7 +20,19 @@ import { LB, weightIn } from "./unitMath";
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
 export type MessageKind =
-  "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab";
+  | "reminder"
+  | "missed"
+  | "streak"
+  | "milestone"
+  | "pro"
+  | "tour"
+  | "weekly"
+  | "trial"
+  | "recap"
+  | "records"
+  | "friends"
+  | "rehab"
+  | "season";
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
@@ -59,6 +71,13 @@ export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push
   friends: { label: "Friend activity", blurb: "Thursday evening, which friends trained this week.", push: false, email: true },
   // The physio's rehab on a day without a workout reminder, when it's due (2026-11-15). Push only: the phone knows.
   rehab: { label: "Rehab reminders", blurb: "Your physio's exercises on days they're due.", push: true, email: false },
+  // Training seasons (seasons.ts, 2026-11-18): the day one starts, its finale week and three days before it ends.
+  season: {
+    label: "Training seasons",
+    blurb: "When a season starts, when its finale week begins and three days before it ends.",
+    push: true,
+    email: true,
+  },
   // The feature tour: one email a day about one thing the app does, with a real screenshot (server/tour.ts).
   tour: {
     label: "Getting started tips",
@@ -93,6 +112,7 @@ export const DEFAULT_ON: Record<MessageKind, boolean> = {
   records: true,
   friends: true,
   rehab: true,
+  season: true,
 };
 
 /** A stretch of training, for the recaps: from the phone's own workouts (reminders.ts planInput). */
@@ -153,6 +173,12 @@ export interface PlanInput {
    * the times a week asked for and when it was done (start times; the plan assumes it isn't done again after `from`).
    */
   rehab?: { name: string; perWeek?: number; times: number[] };
+  /**
+   * The training season running or about to start (seasons.ts seasonReminder), only while seasons are on and unlocked:
+   * its title in the app's language, its weeks, its first day, the first day of its finale week, the day after it
+   * ends (local midnights) and the tier now.
+   */
+  season?: { title: string; weeks: number; start: number; finale: number; end: number; tier: number };
 }
 
 /** Whether the rehab is due on the local day starting at `day`, from what was done before then (partExtras rehabDue). */
@@ -357,6 +383,27 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
 
     if (streakLine) add("streak", atTime(day, sendHour, tz), say(lang, "rmd.keepStreak"), streakLine);
 
+    // Training seasons: the day one starts, the first day of its finale week (points count twice) and three days
+    // before it ends. Not a nudge to train more: points stop at the lifter's own weekly goal.
+    const sz = input.season;
+    if (sz) {
+      const same = (ms: number) => dateKey(ms + 12 * 3600_000, tz) === key;
+      const at = atTime(day, sendHour, tz);
+      const tier = sz.tier;
+      if (same(sz.start))
+        add(
+          "season",
+          at,
+          say(lang, "rmd.seasonStart", { season: sz.title }),
+          say(lang, "rmd.seasonStartBody", { weeks: sz.weeks }),
+          "season",
+        );
+      else if (same(sz.finale) && sz.finale > sz.start)
+        add("season", at, say(lang, "rmd.seasonFinale", { season: sz.title }), say(lang, "rmd.seasonFinaleBody", { tier }), "season");
+      else if (same(addDays(sz.end, -3, tz)))
+        add("season", at, say(lang, "rmd.seasonEnding", { season: sz.title }), say(lang, "rmd.seasonEndingBody", { tier }), "season");
+    }
+
     // Rehab (push): the physio's exercises at the workout time on a day without a workout reminder (that day's Today
     // offers the rehab beside the lifting), when they're due. Done today means it isn't.
     if (!email && input.rehab && !input.days.includes(wd)) {
@@ -453,9 +500,17 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       if (offer) add("pro", atTime(day, "12:00", tz), say(lang, offer), say(lang, `${offer}.body`), "settings");
     }
 
-    // One a day: the reminder (the lifter asked for it) wins, then the physio's rehab, then the trial ending, recaps, streak, missed, Pro.
-    const order: MessageKind[] = ["reminder", "rehab", "trial", "recap", "streak", "missed", "pro"];
+    // One a day: the reminder (the lifter asked for it) wins, then the physio's rehab, then the trial ending, recaps, streak, season, missed, Pro.
+    const order: MessageKind[] = ["reminder", "rehab", "trial", "recap", "streak", "season", "missed", "pro"];
     const best = candidates.sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind))[0];
+    // A season day that's also a reminder day says the season in the reminder, so it isn't lost to the one-a-day rule
+    // (a season starts on the first day of the week, which is the weekly email's day too). A streak warning comes first.
+    const season = candidates.find((c) => c.kind === "season");
+    if (best?.kind === "reminder" && season && !streakLine) {
+      const line = say(lang, "rmd.seasonFold", { title: season.title, body: season.body });
+      best.body = email ? `${best.body} ${line}` : line;
+      best.key += ":season";
+    }
     if (best && (best.kind === "reminder" || best.kind === "rehab" || !inQuiet(best.at, tz))) out.push(best);
   }
   return out.sort((a, b) => a.at - b.at);

@@ -118,6 +118,10 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/recap`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan("recap");
+    // Training seasons: the track, challenges and rewards (or the between-seasons note).
+    await page.goto(`${server.url}/app/#/season`);
+    await page.getByRole("heading", { level: 1 }).waitFor();
+    await scan("season");
     await page.goto(`${server.url}/app/#/photos`);
     await page.getByRole("heading", { name: "Body and photos" }).waitFor();
     await scan("photos");

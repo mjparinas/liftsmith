@@ -58,6 +58,10 @@ export const en = {
   "ssn.noneBody": "The next season shows here two weeks before it starts.",
   "ssn.setting": "Training seasons",
   "ssn.settingHint": "Ten-week seasons with a track of season-only rewards. Off hides them from Today, Awards and the Locker.",
+  "ssn.done.points": "+{points} season points",
+  "ssn.done.tier": "Tier {tier} reached",
+  "ssn.done.drop": "Rare drop: {name}",
+  "ssn.done.open": "See the season",
 } as const;
 
 type Key = keyof typeof en;
@@ -120,6 +124,10 @@ export const es: Partial<Record<Key, Message>> = {
   "ssn.setting": "Temporadas de entrenamiento",
   "ssn.settingHint":
     "Temporadas de diez semanas con un recorrido de premios exclusivos. Desactivadas, no aparecen en Hoy, Logros ni la taquilla.",
+  "ssn.done.points": "+{points} puntos de temporada",
+  "ssn.done.tier": "Nivel {tier} alcanzado",
+  "ssn.done.drop": "Botín raro: {name}",
+  "ssn.done.open": "Ver la temporada",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -180,6 +188,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "ssn.setting": "Saisons d'entraînement",
   "ssn.settingHint":
     "Des saisons de dix semaines avec un parcours de récompenses exclusives. Désactivées, elles disparaissent d'Aujourd'hui, des Trophées et du vestiaire.",
+  "ssn.done.points": "+{points} points de saison",
+  "ssn.done.tier": "Palier {tier} atteint",
+  "ssn.done.drop": "Butin rare : {name}",
+  "ssn.done.open": "Voir la saison",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -243,6 +255,10 @@ export const de: Partial<Record<Key, Message>> = {
   "ssn.setting": "Trainingssaisons",
   "ssn.settingHint":
     "Zehnwöchige Saisons mit einem Pfad aus Belohnungen, die es nur dann gibt. Aus blendet sie in Heute, Erfolge und dem Spind aus.",
+  "ssn.done.points": "+{points} Saisonpunkte",
+  "ssn.done.tier": "Stufe {tier} erreicht",
+  "ssn.done.drop": "Seltener Fund: {name}",
+  "ssn.done.open": "Saison ansehen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -305,6 +321,10 @@ export const it: Partial<Record<Key, Message>> = {
   "ssn.noneBody": "La prossima stagione appare qui due settimane prima dell'inizio.",
   "ssn.setting": "Stagioni di allenamento",
   "ssn.settingHint": "Stagioni di dieci settimane con un percorso di premi esclusivi. Disattivate, spariscono da Oggi, Premi e armadietto.",
+  "ssn.done.points": "+{points} punti stagione",
+  "ssn.done.tier": "Livello {tier} raggiunto",
+  "ssn.done.drop": "Bottino raro: {name}",
+  "ssn.done.open": "Vedi la stagione",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -362,6 +382,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "ssn.noneBody": "次のシーズンは始まる2週間前にここに表示されます。",
   "ssn.setting": "トレーニングシーズン",
   "ssn.settingHint": "10週間のシーズンと、その期間だけの報酬。オフにすると今日、実績、ロッカーに表示されません。",
+  "ssn.done.points": "シーズンポイント +{points}",
+  "ssn.done.tier": "ティア{tier}に到達",
+  "ssn.done.drop": "レアドロップ:{name}",
+  "ssn.done.open": "シーズンを見る",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -421,6 +445,10 @@ export const pt: Partial<Record<Key, Message>> = {
   "ssn.noneBody": "A próxima temporada aparece aqui duas semanas antes de começar.",
   "ssn.setting": "Temporadas de treino",
   "ssn.settingHint": "Temporadas de dez semanas com uma trilha de recompensas exclusivas. Desligadas, somem de Hoje, Prêmios e do armário.",
+  "ssn.done.points": "+{points} pontos da temporada",
+  "ssn.done.tier": "Nível {tier} alcançado",
+  "ssn.done.drop": "Item raro: {name}",
+  "ssn.done.open": "Ver a temporada",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -478,6 +506,10 @@ export const ko: Partial<Record<Key, Message>> = {
   "ssn.noneBody": "다음 시즌은 시작 2주 전에 여기 나타나요.",
   "ssn.setting": "운동 시즌",
   "ssn.settingHint": "시즌 한정 보상 트랙이 있는 10주 시즌. 끄면 오늘, 업적, 보관함에서 숨겨져요.",
+  "ssn.done.points": "시즌 포인트 +{points}",
+  "ssn.done.tier": "티어 {tier} 달성",
+  "ssn.done.drop": "희귀 드롭: {name}",
+  "ssn.done.open": "시즌 보기",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -564,6 +596,10 @@ export const pl: Partial<Record<Key, Message>> = {
   "ssn.noneBody": "Następny sezon pojawi się tu dwa tygodnie przed startem.",
   "ssn.setting": "Sezony treningowe",
   "ssn.settingHint": "Dziesięciotygodniowe sezony ze ścieżką nagród dostępnych tylko wtedy. Wyłączone znikają z Dziś, Nagród i szafki.",
+  "ssn.done.points": "+{points} pkt sezonu",
+  "ssn.done.tier": "Osiągnięto poziom {tier}",
+  "ssn.done.drop": "Rzadki łup: {name}",
+  "ssn.done.open": "Zobacz sezon",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -623,4 +659,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "ssn.noneBody": "Sonraki sezon başlamadan iki hafta önce burada görünür.",
   "ssn.setting": "Antrenman sezonları",
   "ssn.settingHint": "Sezona özel ödül yolu olan on haftalık sezonlar. Kapalıyken Bugün, Ödüller ve dolaptan gizlenir.",
+  "ssn.done.points": "+{points} sezon puanı",
+  "ssn.done.tier": "{tier}. kademeye ulaştın",
+  "ssn.done.drop": "Nadir ganimet: {name}",
+  "ssn.done.open": "Sezonu gör",
 };

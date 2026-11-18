@@ -306,7 +306,19 @@ export interface Profile {
   messages?: {
     push: Partial<
       Record<
-        "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab",
+        | "reminder"
+        | "missed"
+        | "streak"
+        | "milestone"
+        | "pro"
+        | "tour"
+        | "weekly"
+        | "trial"
+        | "recap"
+        | "records"
+        | "friends"
+        | "rehab"
+        | "season",
         boolean
       >
     >;
@@ -316,7 +328,19 @@ export interface Profile {
       status: "pending" | "confirmed" | "unsubscribed";
       kinds: Partial<
         Record<
-          "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab",
+          | "reminder"
+          | "missed"
+          | "streak"
+          | "milestone"
+          | "pro"
+          | "tour"
+          | "weekly"
+          | "trial"
+          | "recap"
+          | "records"
+          | "friends"
+          | "rehab"
+          | "season",
           boolean
         >
       >;

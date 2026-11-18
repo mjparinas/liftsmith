@@ -14,6 +14,7 @@ import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, calm, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
+import { currentSeason, rewardLabel, seasonGain, seasonsOn, seasonState, TIERS, type SeasonGain, type SeasonState } from "@/lib/seasons";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
@@ -21,6 +22,7 @@ import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { isUnlocked, justUnlocked, unlockCount, type UnlockId } from "@/lib/unlocks";
 import { useNow } from "@/lib/useNow";
 import { doneCue, say, voice } from "@/lib/voice";
+import type { MessageKey } from "@/locales/en";
 
 import { Badge, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { burst } from "./burst";
@@ -37,6 +39,7 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { SeasonMedal } from "./Season";
 import { SendToFriend } from "./SendToFriend";
 import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
@@ -125,6 +128,58 @@ function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean;
   );
 }
 
+/** The season after this workout: its points, a new tier with what it brought, and the rare drop if a best found it. */
+export function SeasonDone({ s, gain }: { s: SeasonState; gain: SeasonGain }) {
+  const up = gain.to > gain.from;
+  const drop = gain.drop ? COSMETICS.find((c) => c.id === s.kit.drop) : undefined;
+  const next = s.tier < TIERS ? t("ssn.toTier", { points: num(s.span - s.into), tier: s.tier + 1 }) : null;
+  return (
+    <section
+      className={`card card-tint mt-4 p-4 text-left ${up ? "animate-bump" : "animate-rise"}`}
+      style={{ "--tint": s.kit.hue } as CSSProperties}
+      aria-label={s.title}
+      data-testid="done-season"
+    >
+      <div className="flex items-center gap-3">
+        <SeasonMedal size={44} hue={s.kit.hue} />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: s.kit.hue }}>
+            {s.title}
+          </p>
+          <p className="text-lg font-bold" role={up ? "status" : undefined}>
+            {up ? t("ssn.done.tier", { tier: gain.to }) : t("ssn.tierN", { tier: s.tier })}
+          </p>
+          <p className="num text-sm text-muted">
+            {t("ssn.done.points", { points: num(gain.points) })}
+            {next && ` · ${next}`}
+          </p>
+        </div>
+      </div>
+      {(gain.rewards.length > 0 || drop) && (
+        <ul className="mt-3 space-y-1 text-sm">
+          {gain.rewards.map((r) => (
+            <li key={`${r.tier}-${r.id}`} className="flex items-center gap-2">
+              <Icon name="check" size={16} strokeWidth={2.6} className="shrink-0 text-good" />
+              <span>{rewardLabel(r, s.kit)}</span>
+            </li>
+          ))}
+          {drop && (
+            <li className="flex items-center gap-2">
+              <span className="shrink-0" style={{ color: s.kit.hue }}>
+                <Icon name="sparkle" size={16} />
+              </span>
+              <span>{t("ssn.done.drop", { name: t(`cos.${drop.id}` as MessageKey) })}</span>
+            </li>
+          )}
+        </ul>
+      )}
+      <Button kind="ghost" className="mt-3 w-full" onClick={() => go("season")}>
+        {t("ssn.done.open")}
+      </Button>
+    </section>
+  );
+}
+
 export function Done() {
   const { stats, profile, events } = useApp();
   const now = useNow();
@@ -132,11 +187,12 @@ export function Done() {
   const s = stats.sessions[0];
   const prs = s ? stats.prs.filter((p) => p.at >= s.start) : [];
   // The same numbers without this workout, to show what it changed.
-  const before = useMemo(() => {
-    if (!s) return after;
+  const without = useMemo(() => {
+    if (!s) return null;
     const ev = events.filter((e) => !("sessionId" in e) || e.sessionId !== s.sessionId);
-    return game(ev, derive(ev, now), profile, now);
+    return { ev, stats: derive(ev, now) };
   }, [s?.sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const before = useMemo(() => (without ? game(without.ev, without.stats, profile, now) : after), [without]); // eslint-disable-line react-hooks/exhaustive-deps
   const gained = Math.max(0, after.xp - before.xp);
   const levelUp = after.level.level > before.level.level;
   const badges = unlocked(before.achievements, after.achievements);
@@ -173,6 +229,14 @@ export function Done() {
   const count = stats.sessions.length;
   const quests = isUnlocked("quests", profile, count);
   const seasons = isUnlocked("seasons", profile, count);
+  // What this workout did for the running season: points, a new tier, its rewards and the rare drop.
+  const season = useMemo(() => {
+    if (!without || !seasons || !seasonsOn(profile)) return null;
+    const nowS = currentSeason(events, stats, profile, now);
+    if (!nowS || nowS.status !== "live") return null;
+    const gain = seasonGain(seasonState(nowS.def, without.ev, without.stats, profile, now), nowS);
+    return gain ? { s: nowS, gain } : null;
+  }, [without, seasons]); // eslint-disable-line react-hooks/exhaustive-deps
   const friends = isUnlocked("friends", profile, count);
   useEffect(() => {
     const r = profile.reveal;
@@ -329,6 +393,7 @@ export function Done() {
       <PainAfter sessionId={s.sessionId} />
       <WorkoutNoteCard sessionId={s.sessionId} />
 
+      {season && <SeasonDone s={season.s} gain={season.gain} />}
       {seasons && prizes.map((p) => <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />)}
 
       {/* The streak only once there is one; the weekly league lives on Today and Awards. */}

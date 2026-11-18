@@ -35,9 +35,11 @@ import {
   type Totals,
 } from "./messages";
 import { rehabInjuries, rehabRoutine, rehabTimes } from "./partExtras";
+import { currentSeason, seasonReminder, seasonsOn } from "./seasons";
 import { SITE_URL } from "./site";
 import { isTeen } from "./teen";
 import type { AppEvent, Profile } from "./types";
+import { isUnlocked } from "./unlocks";
 
 export const HORIZON_DAYS = 14;
 const DAY = 86_400_000;
@@ -110,6 +112,12 @@ export function rehabInput(profile: Profile, events: readonly AppEvent[], now: n
   };
 }
 
+/** The training season for both planners, while seasons are on and unlocked (Settings › Look and feel; unlocks.ts). */
+export function seasonInput(profile: Profile, events: readonly AppEvent[], stats: Stats, now: number): PlanInput["season"] {
+  if (!seasonsOn(profile) || !isUnlocked("seasons", profile, stats.sessions.length)) return undefined;
+  return seasonReminder(currentSeason(events, stats, profile, now)) ?? undefined;
+}
+
 export function planInput(profile: Profile, stats: Stats, now: number, channel: "push" | "email", tz = deviceTz()): PlanInput {
   const starts = stats.sessions.map((s) => s.start);
   const first = firstDayOf(profile);
@@ -177,7 +185,8 @@ export async function schedulePush(profile: Profile, stats: Stats, now = Date.no
     if (ours.length) await LocalNotifications.cancel({ notifications: ours.map((n) => ({ id: n.id })) });
     if (!(await pushAllowed())) return [];
     const rehab = events ? rehabInput(profile, events, now) : undefined;
-    const input = { ...planInput(profile, stats, now, "push"), ...(rehab ? { rehab } : {}) };
+    const season = events ? seasonInput(profile, events, stats, now) : undefined;
+    const input = { ...planInput(profile, stats, now, "push"), ...(rehab ? { rehab } : {}), ...(season ? { season } : {}) };
     const msgs = plan(input, now + 60_000, now + HORIZON_DAYS * DAY, "push");
     if (!msgs.length) return [];
     if (!channelMade) {
@@ -253,9 +262,17 @@ function ensureSub(): MailSub {
 }
 
 /** The body the server stores. Only these fields, nothing about workouts beyond the planner's numbers. */
-export function subscriptionBody(profile: Profile, stats: Stats, now: number, sub: MailSub, resubscribe = false) {
+export function subscriptionBody(
+  profile: Profile,
+  stats: Stats,
+  now: number,
+  sub: MailSub,
+  resubscribe = false,
+  events?: readonly AppEvent[],
+) {
   const email = profile.messages?.email;
   const i = { ...planInput(profile, stats, now, "email"), ...emailExtras(profile, stats, now) };
+  const season = events ? seasonInput(profile, events, stats, now) : undefined;
   return {
     id: sub.id,
     token: sub.token,
@@ -281,6 +298,7 @@ export function subscriptionBody(profile: Profile, stats: Stats, now: number, su
     lastMonth: i.lastMonth,
     best: i.best ?? null,
     next: i.next ?? null,
+    season: season ?? null,
   };
 }
 
@@ -291,7 +309,7 @@ export function subscriptionBody(profile: Profile, stats: Stats, now: number, su
 export async function syncEmail(
   profile: Profile,
   stats: Stats,
-  opts: { resubscribe?: boolean; now?: number } = {},
+  opts: { resubscribe?: boolean; now?: number; events?: readonly AppEvent[] } = {},
 ): Promise<MailStatus | null> {
   if (!profile.messages?.email?.address) return null;
   const sub = ensureSub();
@@ -301,7 +319,7 @@ export async function syncEmail(
     const r = await fetch(remindersUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify(subscriptionBody(profile, stats, opts.now ?? Date.now(), sub, opts.resubscribe)),
+      body: JSON.stringify(subscriptionBody(profile, stats, opts.now ?? Date.now(), sub, opts.resubscribe, opts.events)),
     });
     if (!r.ok) return null;
     return ((await r.json()) as { status: MailStatus }).status;
@@ -386,9 +404,9 @@ export function refreshReminders(
     const email = mine && saved.status === "pending" ? { ...saved, address: mine } : saved;
     const profile = email === saved ? p : { ...p, messages: { ...p.messages!, email } };
     const now = Date.now();
-    const body = JSON.stringify({ ...subscriptionBody(profile, stats, now, sub), consentAt: 0, signedIn: !!mine });
+    const body = JSON.stringify({ ...subscriptionBody(profile, stats, now, sub, false, events), consentAt: 0, signedIn: !!mine });
     if (body === lastEmailBody) return;
-    const status = await syncEmail(profile, stats, { now });
+    const status = await syncEmail(profile, stats, { now, events });
     if (status) {
       lastEmailBody = body;
       if (status !== saved.status || email.address !== saved.address) onStatus?.(status, email.address);

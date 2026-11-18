@@ -463,3 +463,37 @@ export function rewardLabel(r: SeasonReward, kit: Kit): string {
 
 /** Seasons are on unless the lifter turned them off (Settings › Look and feel; Melvin, 2026-11-17). */
 export const seasonsOn = (p: Pick<Profile, "delight">) => p.delight?.seasons !== false;
+
+/** What one workout did for the season: the points, the tier before and after and the rewards it reached (Done). */
+export interface SeasonGain {
+  points: number;
+  from: number;
+  to: number;
+  /** Tier rewards owned now that weren't before, in tier order. */
+  rewards: TierReward[];
+  /** This workout's new best dropped the season's rare item. */
+  drop: boolean;
+}
+
+/** Compares the season without and with a workout. Null when the season isn't running or nothing moved. */
+export function seasonGain(before: SeasonState, after: SeasonState): SeasonGain | null {
+  if (after.status !== "live" || before.def.id !== after.def.id) return null;
+  const points = Math.max(0, after.points - before.points);
+  const had = new Set(before.rewards.filter((r) => r.owned).map((r) => `${r.tier}:${r.id}`));
+  const rewards = after.rewards.filter((r) => r.owned && !had.has(`${r.tier}:${r.id}`)).sort((a, b) => a.tier - b.tier);
+  const drop = after.drop && !before.drop;
+  if (!points && !rewards.length && !drop) return null;
+  return { points, from: before.tier, to: after.tier, rewards, drop };
+}
+
+/**
+ * The season as the reminder planner needs it (messages.ts `season`): its title, length, first day, finale week,
+ * end and the tier now. Only while it's running or about to start, and never when seasons are off.
+ */
+export function seasonReminder(
+  s: SeasonState | null,
+): { title: string; weeks: number; start: number; finale: number; end: number; tier: number } | null {
+  if (!s || s.status === "ended") return null;
+  const finale = weekOf(s.end - DAY / 2);
+  return { title: s.title, weeks: s.def.weeks, start: s.start, finale, end: s.end, tier: s.tier };
+}

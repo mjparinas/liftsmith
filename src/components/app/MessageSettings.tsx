@@ -52,7 +52,7 @@ function Toggle({
  * so nothing to type or confirm); signed out, the switch opens sign-in. Every email has an unsubscribe link.
  */
 export function MessageSettings() {
-  const { profile, stats, setProfile } = useApp();
+  const { profile, stats, events, setProfile } = useApp();
   const prefs: Prefs = profile.messages ?? { push: {} };
   const save = (p: Partial<Prefs>) => setProfile({ messages: { ...prefs, startedAt: startedAt(prefs), ...p } });
   const native = pushSupported();
@@ -104,7 +104,7 @@ export function MessageSettings() {
       emailOff: undefined,
     };
     setProfile({ messages: next });
-    const s = await syncEmail({ ...profile, messages: next }, stats, { resubscribe });
+    const s = await syncEmail({ ...profile, messages: next }, stats, { resubscribe, events });
     setBusy(false);
     if (!s) {
       oops();
@@ -118,7 +118,7 @@ export function MessageSettings() {
   const resend = async () => {
     if (!email) return;
     setBusy(true);
-    const s = await syncEmail(profile, stats, { resubscribe: true });
+    const s = await syncEmail(profile, stats, { resubscribe: true, events });
     setBusy(false);
     if (!s) {
       oops();
