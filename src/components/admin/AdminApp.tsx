@@ -549,11 +549,15 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
 
 export function AdminApp() {
   const [days, setDays] = useState<(typeof PERIODS)[number]>(28);
-  const [askOpen, setAskOpen] = useState(false);
+  // The tab Ask AI was opened on. Its answer belongs to that tab, so moving to another tab closes it, and it asks
+  // again only when the button is pressed (Melvin, 2026-11-18).
+  const [askTab, setAskTab] = useState<string | null>(null);
   // The server draws the panel without an address, so the first paint is Overview's and the address's own tab
   // follows straight after (reading it during the first render would not match the server's HTML).
   const [view, setView] = useState<View>({ tab: "Overview", open: null });
   const tab = view.tab;
+  if (askTab != null && askTab !== tab) setAskTab(null);
+  const askOpen = askTab === tab;
   const [data, setData] = useState<Data | null>(null);
   // The period the shown numbers are for: a new period keeps the header and tabs and shows the tab's skeleton
   // until its numbers arrive, instead of last period's numbers under the new label.
@@ -682,7 +686,7 @@ export function AdminApp() {
               ))}
             </div>
           )}
-          {data.staff.role === "admin" && <AskAiButton open={askOpen} toggle={() => setAskOpen((o) => !o)} />}
+          {data.staff.role === "admin" && <AskAiButton open={askOpen} toggle={() => setAskTab(askOpen ? null : tab)} />}
         </>
       }
     >
@@ -693,7 +697,7 @@ export function AdminApp() {
             tab={tab}
             metrics={STATS_TABS.has(tab) && !stale ? data : undefined}
             go={go}
-            close={() => setAskOpen(false)}
+            close={() => setAskTab(null)}
           />
         </div>
       )}

@@ -9,7 +9,7 @@
 import fs from "node:fs";
 import { chromium } from "playwright";
 
-import { base } from "./helpers.mjs";
+import { base, showEverything } from "./helpers.mjs";
 
 const LANG = process.env.PLAY_LANG || "";
 const OUT = LANG ? `store/play/raw/${LANG}` : "store/play/raw";
@@ -202,6 +202,8 @@ async function setup() {
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Save" }).click();
   await page.getByText("Today's workout").waitFor();
+  // The screenshots show the whole app, not a new lifter's first days (docs/decisions/unlocks.md).
+  await showEverything(page);
 }
 
 const nav = (tab) => page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();

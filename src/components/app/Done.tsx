@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { SECTION_LABEL } from "@/components/titles";
@@ -14,12 +14,15 @@ import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, calm, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
+import { currentSeason, rewardLabel, seasonGain, seasonsOn, seasonState, TIERS, type SeasonGain, type SeasonState } from "@/lib/seasons";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
 import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
+import { isUnlocked, justUnlocked, unlockCount, type UnlockId } from "@/lib/unlocks";
 import { useNow } from "@/lib/useNow";
 import { doneCue, say, voice } from "@/lib/voice";
+import type { MessageKey } from "@/locales/en";
 
 import { Badge, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { burst } from "./burst";
@@ -27,7 +30,7 @@ import { WorkoutNoteCard } from "./EditWorkout";
 import { DoneMoments, lean } from "./Extras";
 import { clock } from "./format";
 import { PostToFriends } from "./Friends";
-import { Icon } from "./icons";
+import { Icon, type IconName } from "./icons";
 import { PainSelect } from "./Injuries";
 import { DoneInvite } from "./Invites";
 import { Mascot } from "./Mascot";
@@ -36,9 +39,11 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { SeasonMedal } from "./Season";
 import { SendToFriend } from "./SendToFriend";
 import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
+import { HUE } from "./theme";
 import { TrialDone } from "./TrialMoments";
 import { Button } from "./ui";
 
@@ -123,6 +128,58 @@ function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean;
   );
 }
 
+/** The season after this workout: its points, a new tier with what it brought, and the rare drop if a best found it. */
+export function SeasonDone({ s, gain }: { s: SeasonState; gain: SeasonGain }) {
+  const up = gain.to > gain.from;
+  const drop = gain.drop ? COSMETICS.find((c) => c.id === s.kit.drop) : undefined;
+  const next = s.tier < TIERS ? t("ssn.toTier", { points: num(s.span - s.into), tier: s.tier + 1 }) : null;
+  return (
+    <section
+      className={`card card-tint mt-4 p-4 text-left ${up ? "animate-bump" : "animate-rise"}`}
+      style={{ "--tint": s.kit.hue } as CSSProperties}
+      aria-label={s.title}
+      data-testid="done-season"
+    >
+      <div className="flex items-center gap-3">
+        <SeasonMedal size={44} hue={s.kit.hue} />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: s.kit.hue }}>
+            {s.title}
+          </p>
+          <p className="text-lg font-bold" role={up ? "status" : undefined}>
+            {up ? t("ssn.done.tier", { tier: gain.to }) : t("ssn.tierN", { tier: s.tier })}
+          </p>
+          <p className="num text-sm text-muted">
+            {t("ssn.done.points", { points: num(gain.points) })}
+            {next && ` · ${next}`}
+          </p>
+        </div>
+      </div>
+      {(gain.rewards.length > 0 || drop) && (
+        <ul className="mt-3 space-y-1 text-sm">
+          {gain.rewards.map((r) => (
+            <li key={`${r.tier}-${r.id}`} className="flex items-center gap-2">
+              <Icon name="check" size={16} strokeWidth={2.6} className="shrink-0 text-good" />
+              <span>{rewardLabel(r, s.kit)}</span>
+            </li>
+          ))}
+          {drop && (
+            <li className="flex items-center gap-2">
+              <span className="shrink-0" style={{ color: s.kit.hue }}>
+                <Icon name="sparkle" size={16} />
+              </span>
+              <span>{t("ssn.done.drop", { name: t(`cos.${drop.id}` as MessageKey) })}</span>
+            </li>
+          )}
+        </ul>
+      )}
+      <Button kind="ghost" className="mt-3 w-full" onClick={() => go("season")}>
+        {t("ssn.done.open")}
+      </Button>
+    </section>
+  );
+}
+
 export function Done() {
   const { stats, profile, events } = useApp();
   const now = useNow();
@@ -130,11 +187,12 @@ export function Done() {
   const s = stats.sessions[0];
   const prs = s ? stats.prs.filter((p) => p.at >= s.start) : [];
   // The same numbers without this workout, to show what it changed.
-  const before = useMemo(() => {
-    if (!s) return after;
+  const without = useMemo(() => {
+    if (!s) return null;
     const ev = events.filter((e) => !("sessionId" in e) || e.sessionId !== s.sessionId);
-    return game(ev, derive(ev, now), profile, now);
+    return { ev, stats: derive(ev, now) };
   }, [s?.sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const before = useMemo(() => (without ? game(without.ev, without.stats, profile, now) : after), [without]); // eslint-disable-line react-hooks/exhaustive-deps
   const gained = Math.max(0, after.xp - before.xp);
   const levelUp = after.level.level > before.level.level;
   const badges = unlocked(before.achievements, after.achievements);
@@ -164,6 +222,26 @@ export function Done() {
   const [sharing, setSharing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const inFriends = useSocial((st) => !!st.me?.profile) && socialOn();
+  // What this workout unlocked (unlocks.ts), worked out once from the profile as it was before the workout, then
+  // the highest count is kept so nothing hides again if a workout is deleted.
+  const setProfile = useApp((st) => st.setProfile);
+  const opened = useMemo(() => (s ? justUnlocked(profile, stats.sessions.length) : []), [s?.sessionId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const count = stats.sessions.length;
+  const quests = isUnlocked("quests", profile, count);
+  const seasons = isUnlocked("seasons", profile, count);
+  // What this workout did for the running season: points, a new tier, its rewards and the rare drop.
+  const season = useMemo(() => {
+    if (!without || !seasons || !seasonsOn(profile)) return null;
+    const nowS = currentSeason(events, stats, profile, now);
+    if (!nowS || nowS.status !== "live") return null;
+    const gain = seasonGain(seasonState(nowS.def, without.ev, without.stats, profile, now), nowS);
+    return gain ? { s: nowS, gain } : null;
+  }, [without, seasons]); // eslint-disable-line react-hooks/exhaustive-deps
+  const friends = isUnlocked("friends", profile, count);
+  useEffect(() => {
+    const r = profile.reveal;
+    if (r && !r.all && unlockCount(r, count) > (r.peak ?? 0)) setProfile({ reveal: { ...r, peak: unlockCount(r, count) } });
+  }, [count]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     void confetti(prs.length > 0 || levelUp);
@@ -268,6 +346,7 @@ export function Done() {
         </ul>
       )}
       <PrReplayButton prs={prs} />
+      <NewForYou ids={opened} />
       <TrialDone sessionId={s.sessionId} />
       <NextUpCard sessionId={s.sessionId} />
       <CoolDownCard />
@@ -297,7 +376,7 @@ export function Done() {
         </section>
       )}
 
-      {questsDone.length > 0 && (
+      {quests && questsDone.length > 0 && (
         <ul className="card mt-4 divide-y divide-line text-left" aria-label={t("done.quests")}>
           {questsDone.map((q) => (
             <li key={q.id} className="flex justify-between px-4 py-3">
@@ -314,9 +393,8 @@ export function Done() {
       <PainAfter sessionId={s.sessionId} />
       <WorkoutNoteCard sessionId={s.sessionId} />
 
-      {prizes.map((p) => (
-        <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />
-      ))}
+      {season && <SeasonDone s={season.s} gain={season.gain} />}
+      {seasons && prizes.map((p) => <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />)}
 
       {/* The streak only once there is one; the weekly league lives on Today and Awards. */}
       {after.streak.weeks > 0 && (
@@ -325,7 +403,7 @@ export function Done() {
         </div>
       )}
 
-      <PostToFriends summary={s} />
+      {friends && <PostToFriends summary={s} />}
       {/* One button for every way to share or keep this workout, so the end screen stays short. */}
       <button
         type="button"
@@ -348,7 +426,7 @@ export function Done() {
           />
           <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
           <ShareWorkout sessionId={s.sessionId} />
-          {inFriends && <DoneInvite />}
+          {inFriends && friends && <DoneInvite />}
         </div>
       )}
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
@@ -378,6 +456,53 @@ function PainAfter({ sessionId }: { sessionId: string }) {
         />
       ))}
       <p className="text-xs text-muted">{t("done.painNote")}</p>
+    </section>
+  );
+}
+
+const UNLOCK_ICON: Record<UnlockId, IconName> = {
+  awards: "trophy",
+  quests: "target",
+  friends: "people",
+  seasons: "medal",
+  more: "sparkle",
+};
+
+/** Where each unlock's button goes: the place the new thing lives. */
+const UNLOCK_GO: Record<UnlockId, () => void> = {
+  awards: () => go("achievements"),
+  quests: () => go("achievements"),
+  friends: () => go("friends"),
+  seasons: () => go("season"),
+  more: () => go("achievements"),
+};
+
+/** "New for you": what this workout unlocked, each with one line on why it helps and a button to it (unlocks.ts). */
+function NewForYou({ ids }: { ids: readonly UnlockId[] }) {
+  if (!ids.length) return null;
+  return (
+    <section className="mt-4 text-left" aria-label={t("unl.new")}>
+      <h2 className={`mb-2 ${SECTION_LABEL}`}>{t("unl.new")}</h2>
+      <ul className="space-y-3">
+        {ids.map((id, i) => (
+          <li
+            key={id}
+            className="card card-tint animate-rise flex items-start gap-3 p-4"
+            style={{ "--tint": HUE.violet, animationDelay: `${400 + i * 150}ms`, animationFillMode: "both" } as CSSProperties}
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet/15 text-violet" aria-hidden>
+              <Icon name={UNLOCK_ICON[id]} size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">{t(`unl.${id}.title`)}</p>
+              <p className="mt-0.5 text-sm text-muted">{t(`unl.${id}.body`)}</p>
+              <Button kind="ghost" className="mt-2" onClick={UNLOCK_GO[id]}>
+                {t(`unl.${id}.go`)}
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

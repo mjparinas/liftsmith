@@ -18,6 +18,9 @@
 // answered most lately first and a server that mostly hangs only after a busy round, and when every server says it's
 // busy the import waits (8 s, doubling) and asks again instead of failing. Every item leaves a row in gym_imports with a
 // step-by-step log (timings, which server, what it said), in the job's debug log.
+//
+// QLever first (2026-11-18, gymQlever.ts): countries and regions are asked of QLever's copy of the map, which answers
+// a region in seconds where Overpass took minutes or said it was busy; Overpass is only asked when QLever can't answer.
 import { randomBytes } from "node:crypto";
 
 import { SHORT_REGION } from "@/lib/regions";
@@ -25,6 +28,7 @@ import { SHORT_REGION } from "@/lib/regions";
 import { query, run } from "./db";
 import { cityName, km } from "./gymAddress";
 import { clean, placesFromOsm, REC_NAME, savePlaces, UA, type Area, type OsmElement, type OsmSkips } from "./gymPlaces";
+import { askQlever, gymsFrom, qGymShapes, qGymTags, QLEVER_HOST, qRegions, qTowns, regionsFrom, townsFrom } from "./gymQlever";
 
 export const OVERPASS = [
   "https://overpass-api.de/api/interpreter",
@@ -49,6 +53,8 @@ export const IMPORT_LIMITS = {
   keepMs: 90 * 86_400_000,
   /** New gyms located in one Overpass request (the daily refresh). */
   locateBatch: 60,
+  /** One QLever query gets at most this long before the import falls back to Overpass. */
+  qleverMs: 60_000,
 };
 
 export type ImportResult =
@@ -138,6 +144,10 @@ export function planServers(health: Health = {}, start = 0): { order: string[]; 
   return { order: [...spread, ...ranked.filter((url) => slow.has(url))], slow };
 }
 
+/** What's left of an item's time: its own budget, or the worker's, whichever ends first. */
+const timeLeft = (r: Run, opts: ImportOptions) =>
+  Math.min(IMPORT_LIMITS.budgetMs - (Date.now() - r.started), (opts.until ?? Infinity) - Date.now());
+
 /** Overpass answers some failures with a 200 and a "remark" instead of an error status. */
 const overpassFailure = (remark: unknown) =>
   typeof remark === "string" && /runtime error|timed out|out of memory|too busy|rate_limited/i.test(remark) ? remark : "";
@@ -147,6 +157,10 @@ export interface ImportOptions {
   server?: number;
   /** How to wait between rounds (tests pass a quick one). */
   sleep?: (ms: number) => Promise<void>;
+  /** Whether to ask QLever first (gymQlever.ts); on unless switched off. */
+  qlever?: boolean;
+  /** When the item must be done by (the worker's time), if sooner than its own budget. */
+  until?: number;
 }
 
 /** One import's own state: its log, its time, and what each map server did. */
@@ -187,7 +201,7 @@ export async function askOverpass(
   for (let round = 0; !outOfTime && round < IMPORT_LIMITS.rounds; round++) {
     for (const url of order) {
       if (dropped.has(url) || (round === 0 && slow.has(url) && fastLeft())) continue;
-      const left = IMPORT_LIMITS.budgetMs - (Date.now() - r.started);
+      const left = timeLeft(r, opts);
       if (left < 10_000) {
         r.say("out of time for another map server");
         outOfTime = true;
@@ -240,7 +254,7 @@ export async function askOverpass(
     }
     if (outOfTime || order.every((u) => dropped.has(u)) || round + 1 >= IMPORT_LIMITS.rounds) break;
     // Every server still in the running said it was busy: wait (longer each round) and ask again.
-    const wait = Math.min(IMPORT_LIMITS.waitMs * 2 ** round, IMPORT_LIMITS.budgetMs - (Date.now() - r.started) - 20_000);
+    const wait = Math.min(IMPORT_LIMITS.waitMs * 2 ** round, timeLeft(r, opts) - 20_000);
     if (wait <= 0) {
       r.say("out of time to wait for a busy map server");
       break;
@@ -409,6 +423,44 @@ export function describeItem(item: string): string {
   return item;
 }
 
+/** Asks QLever, logging how it went. Null when it can't answer, so the caller asks Overpass instead. */
+async function qlever(sparql: string, what: string, r: Run, fetcher: typeof fetch, opts: ImportOptions) {
+  const limit = Math.min(IMPORT_LIMITS.qleverMs, timeLeft(r, opts) - 20_000);
+  if (limit < 5_000) return null;
+  const a = await askQlever(sparql, fetcher, limit);
+  r.say(
+    a.ok ? `${QLEVER_HOST} ${secs(a.ms)}: ${a.rows.length} rows of ${what}` : `${QLEVER_HOST} ${what}: ${a.detail} after ${secs(a.ms)}`,
+  );
+  return a.ok ? a.rows : null;
+}
+
+/**
+ * An area's gyms (and its towns, when a gym's address has no city) from QLever. Null when QLever can't answer, or
+ * when it finds neither a gym nor a town in the area, which means it doesn't know the area: Overpass is asked then.
+ */
+async function qleverArea(
+  where: { relation: number } | { country: string },
+  r: Run,
+  fetcher: typeof fetch,
+  opts: ImportOptions,
+): Promise<OsmElement[] | null> {
+  const [tags, shapes] = await Promise.all([
+    qlever(qGymTags(where), "gym tags", r, fetcher, opts),
+    qlever(qGymShapes(where), "gym places", r, fetcher, opts),
+  ]);
+  if (!tags || !shapes) return null;
+  const gyms = gymsFrom(tags, shapes);
+  const noCity = gyms.some((g) => !cityName(g.tags?.["addr:city"]) && !cityName(g.tags?.["is_in:city"]));
+  if (!noCity && gyms.length) return gyms;
+  const towns = await qlever(qTowns(where), "towns", r, fetcher, opts);
+  if (!towns) return null;
+  if (!gyms.length && !towns.length) {
+    r.say(`${QLEVER_HOST} found nothing at all in this area; asking Overpass`);
+    return null;
+  }
+  return [...gyms, ...townsFrom(towns)];
+}
+
 /** Imports one item of a job (see the top of this file). Every item leaves a row in gym_imports with its log. */
 export async function importItem(
   item: string,
@@ -461,10 +513,14 @@ export async function importItem(
 
   if (kind === "country" || kind === "region") {
     if (!/^[A-Z]{2}$/.test(cc)) return fail("where", "No country code.");
-    let area: string;
+    let where: { relation: number } | { country: string };
     let region = "";
+    const fast = opts.qlever !== false;
     if (kind === "country") {
-      const regions = await askOverpass(regionsQuery(cc), r, fetcher, now, opts);
+      const quick = fast ? await qlever(qRegions(cc), "regions", r, fetcher, opts) : null;
+      const regions = quick
+        ? { ok: true as const, elements: regionsFrom(quick), server: QLEVER_HOST }
+        : await askOverpass(regionsQuery(cc), r, fetcher, now, opts);
       if (!regions.ok) return fail("map", regions.detail);
       const items = regionItems(cc, regions.elements);
       r.say(`${items.length} regions with a code`);
@@ -488,20 +544,23 @@ export async function importItem(
       }
       // One region (or none): the whole country is one area.
       region = items[0]?.split(":").slice(3).join(":") ?? "";
-      area = areaOf({ country: cc });
+      where = { country: cc };
     } else {
       const relation = Number(rawRel);
       if (!Number.isSafeInteger(relation) || relation <= 0) return fail("where", "No region id.");
       region = rest.join(":");
-      area = areaOf({ relation });
+      where = { relation };
     }
-    const answer = await askOverpass(gymsQuery(area), r, fetcher, now, opts);
+    const quick = fast ? await qleverArea(where, r, fetcher, opts) : null;
+    const answer = quick
+      ? { ok: true as const, elements: quick, server: QLEVER_HOST }
+      : await askOverpass(gymsQuery(areaOf(where)), r, fetcher, now, opts);
     if (!answer.ok) return fail("map", answer.detail);
     const towns = townsOf(answer.elements);
     r.say(`${towns.length} towns to name gyms without a city after`);
     const sk = skipped();
-    const where: Area = { city: "", region, country: cc };
-    const drafts = placesFromOsm(gymsOf(answer.elements).filter(isGym), where, sk, (lat, lon) => nearestTown(towns, lat, lon));
+    const home: Area = { city: "", region, country: cc };
+    const drafts = placesFromOsm(gymsOf(answer.elements).filter(isGym), home, sk, (lat, lon) => nearestTown(towns, lat, lon));
     // A gym with no city on the map and no town anywhere in its region has no page to go on.
     const located = drafts.filter((d) => d.city);
     if (located.length < drafts.length) r.say(`${drafts.length - located.length} left out: no town on the map near them`);

@@ -354,6 +354,21 @@ describe("scheduling", () => {
     if (c.ok) expect([c.body.plan.week, c.body.plan.best, c.body.plan.next]).toEqual([undefined, undefined, undefined]);
   });
 
+  it("keeps a well-formed training season and drops a malformed one", () => {
+    const season = { title: "Season 1: Ember", weeks: 10, start: MON, finale: MON + 63 * 86_400_000, end: MON + 70 * 86_400_000, tier: 4 };
+    const good = checkBody(body({ season }));
+    expect(good.ok && good.body.plan.season).toEqual(season);
+    for (const bad of [
+      { ...season, weeks: 30 },
+      { ...season, tier: -1 },
+      { ...season, finale: season.end },
+      { ...season, title: "" },
+    ]) {
+      const c = checkBody(body({ season: bad }));
+      expect(c.ok && c.body.plan.season).toBeUndefined();
+    }
+  });
+
   it("sends nothing while a subscription is unconfirmed", async () => {
     const store = memoryStore();
     const { mail, sent } = fakeMail();

@@ -29,6 +29,7 @@ import { tooYoung } from "@/lib/teen";
 import { declineTrial, startTrial } from "@/lib/trial";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
+import { firstReveal } from "@/lib/unlocks";
 
 import { CoachJoin } from "./CoachJoin";
 import { Mascot } from "./Mascot";
@@ -295,6 +296,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       knownMaxes: knownMaxes(maxes, unit, profile.knownMaxes),
       activeGymId: id,
       onboarded: true,
+      // A first setup starts unlocks (unlocks.ts): an experienced lifter starts three workouts in. A rerun, or a
+      // profile from before unlocks, keeps what it has.
+      ...(!rerun && !profile.onboarded && !profile.reveal ? { reveal: firstReveal(exp) } : {}),
       ...(pro ? { pro } : {}),
     });
     setAnalytics(stats);

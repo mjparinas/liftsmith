@@ -15,7 +15,9 @@ import {
   KITS,
   PRESTIGE_POINTS,
   scheduleProblem,
+  seasonGain,
   seasonOwned,
+  seasonReminder,
   seasonState,
   seasonWindow,
   setScheduleForTest,
@@ -218,5 +220,37 @@ describe("season items", () => {
       expect(fs.existsSync(`ios/App/App/Assets.xcassets/AppIcon-${id}.appiconset/icon.png`)).toBe(true);
       expect(fs.existsSync(`android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_${id}.xml`)).toBe(true);
     }
+  });
+});
+
+describe("after a workout (2026-11-18)", () => {
+  it("says what the workout added: points, the new tier and the reward it reached", () => {
+    const two = [...workout(0), ...workout(2)];
+    const three = [...two, ...workout(4)];
+    const now = MON + 4 * DAY + 3600_000;
+    const gain = seasonGain(state(two, now), state(three, now))!;
+    // 2 of 3 days is 400 points (tier 1); the third day, the goal bonus and the weekly quest it finished add 450,
+    // tier 2 and its avatar.
+    expect(gain).toMatchObject({ points: 200 + GOAL_BONUS + 50, from: 1, to: 2, drop: false });
+    expect(gain.rewards.map((r) => r.id)).toEqual(["av-ember"]);
+  });
+
+  it("says nothing outside a running season or when nothing moved", () => {
+    const ev = [...workout(0)];
+    const now = MON + DAY;
+    expect(seasonGain(state(ev, now), state(ev, now))).toBeNull();
+    expect(seasonGain(state([], MON - 3 * DAY), state(workout(-3), MON - 3 * DAY))).toBeNull();
+  });
+});
+
+describe("for the reminder planner", () => {
+  it("gives the first day, the finale week and the end while it runs or is about to start", () => {
+    const r = seasonReminder(state([], MON - 2 * DAY))!;
+    const { start, end } = seasonWindow(S1);
+    expect(r).toMatchObject({ weeks: 10, start, end, tier: 0 });
+    expect(new Date(r.finale).getDay()).toBe(1);
+    expect(Math.round((r.finale - start) / (7 * DAY))).toBe(9);
+    expect(seasonReminder(state([], end + DAY))).toBeNull();
+    expect(seasonReminder(null)).toBeNull();
   });
 });

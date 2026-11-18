@@ -107,6 +107,7 @@ import { ScanToFollow } from "./ScanToFollow";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 import { useShareInvite } from "./useShareInvite";
+import { useUnlocked } from "./useUnlocked";
 
 // --- Small pieces ---
 
@@ -2722,7 +2723,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
         {tab === "board" && (
           <>
             <Challenges />
-            <MonthFriends />
+            <MonthOnceUnlocked />
             <Board onPeople={() => setTab("people")} />
           </>
         )}
@@ -3146,4 +3147,9 @@ export function PostToFriends({ summary }: { summary: SessionSummary }) {
       />
     </div>
   );
+}
+
+/** The monthly challenge waits for a new lifter's eighth workout, like on Awards (unlocks.ts). */
+function MonthOnceUnlocked() {
+  return useUnlocked("more") ? <MonthFriends /> : null;
 }

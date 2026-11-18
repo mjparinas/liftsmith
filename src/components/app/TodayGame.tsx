@@ -8,6 +8,7 @@ import { Badge, Bar, QuestMark, TIER_COLOUR, useGame } from "./Achievements";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { seasonLine, SeasonMedal, useSeason } from "./Season";
+import { useUnlocked } from "./useUnlocked";
 
 // The game layer on Today: streak at risk, this week's quests and the closest badge. One glance, no taps
 // needed. Tapping the card opens Awards; tapping the "Almost there" row opens Awards at that badge.
@@ -19,6 +20,21 @@ export function TodayGame() {
   const open = g.quests.filter((q) => !q.done);
   // One row for the training season (seasons.ts), only while one is near and seasons are on (Settings).
   const season = useSeason();
+  // A new lifter sees only the weekly goal at first; XP and badges, quests and the season row appear with their
+  // first, second and fifth workouts (unlocks.ts).
+  const awards = useUnlocked("awards");
+  const quests = useUnlocked("quests");
+  const seasons = useUnlocked("seasons");
+  if (!awards)
+    return (
+      <div className="card mt-4 p-4">
+        <span className="font-semibold">{t("game.thisWeek")}</span>
+        <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+          <Icon name="target" size={14} className="shrink-0 text-ember" />
+          {t("today.goalMore", { count: Math.max(1, s.needed) })}
+        </p>
+      </div>
+    );
   return (
     <div className="card mt-4 overflow-hidden">
       <button type="button" onClick={() => go("achievements")} className="press block w-full p-4 text-left">
@@ -32,10 +48,14 @@ export function TodayGame() {
         )}
         <div className="flex items-baseline justify-between">
           <span className="font-semibold">{t("game.thisWeek")}</span>
-          <span className="inline-flex items-center gap-1 text-sm text-muted">
-            <Icon name="medal" size={14} className="text-gold" />
-            {LEAGUE_LABEL[g.league.league]} · <span className="num">{num(g.league.weekXp)} XP</span>
-          </span>
+          {quests ? (
+            <span className="inline-flex items-center gap-1 text-sm text-muted">
+              <Icon name="medal" size={14} className="text-gold" />
+              {LEAGUE_LABEL[g.league.league]} · <span className="num">{num(g.league.weekXp)} XP</span>
+            </span>
+          ) : (
+            <span className="num text-sm text-muted">{num(g.league.weekXp)} XP</span>
+          )}
         </div>
         {/* How many more workouts start or keep the streak: here with the week's quests rather than as a chip on
             Today's header (UX audit, 2026-11-13). */}
@@ -45,19 +65,21 @@ export function TodayGame() {
             {s.weeks > 0 ? t("today.goalMore", { count: s.needed }) : t("today.streakStart", { count: s.needed })}
           </p>
         )}
-        <ul className="mt-2 space-y-2">
-          {(open.length ? open : g.quests).slice(0, 3).map((q) => (
-            <li key={q.id} className="flex items-center gap-2 text-sm">
-              <QuestMark icon={q.icon} done={q.done} size={24} />
-              <span className={`min-w-0 flex-1 truncate ${q.done ? "text-muted line-through" : ""}`}>{q.title}</span>
-              <span className="num w-10 text-right text-xs text-faint">
-                {q.have}/{q.goal}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {quests && (
+          <ul className="mt-2 space-y-2">
+            {(open.length ? open : g.quests).slice(0, 3).map((q) => (
+              <li key={q.id} className="flex items-center gap-2 text-sm">
+                <QuestMark icon={q.icon} done={q.done} size={24} />
+                <span className={`min-w-0 flex-1 truncate ${q.done ? "text-muted line-through" : ""}`}>{q.title}</span>
+                <span className="num w-10 text-right text-xs text-faint">
+                  {q.have}/{q.goal}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </button>
-      {season && (
+      {season && seasons && (
         <button
           type="button"
           onClick={() => go("season")}

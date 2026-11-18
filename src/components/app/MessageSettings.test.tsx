@@ -65,6 +65,7 @@ describe("Settings › Reminders on the web", () => {
         "next",
         "pro",
         "resubscribe",
+        "season",
         "startedAt",
         "streakWeeks",
         "teen",

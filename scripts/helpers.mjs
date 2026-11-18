@@ -49,7 +49,8 @@ export function watchErrors(page, errors) {
   page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text()}`));
 }
 
-export async function onboard(page, gym = /Commercial gym/) {
+/** Runs the setup wizard; with `all` (the default) it then shows everything, see `showEverything`. */
+export async function onboard(page, gym = /Commercial gym/, { all = true } = {}) {
   await page.getByRole("button", { name: "Get started" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: gym }).click();
@@ -57,6 +58,18 @@ export async function onboard(page, gym = /Commercial gym/) {
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Save" }).click();
+  await page.getByText("Today's workout").waitFor();
+  if (all) await showEverything(page);
+}
+
+/**
+ * Turns on Settings › Look and feel › Show everything, so a run sees the features a new lifter unlocks as they train
+ * (docs/decisions/unlocks.md): the Awards and Friends tabs, quests, seasons, crates, the monthly challenge and Labs.
+ */
+export async function showEverything(page) {
+  await page.evaluate(() => (location.hash = "#/settings/look"));
+  await page.getByRole("switch", { name: /^Show everything/ }).click();
+  await page.evaluate(() => (location.hash = "#/today"));
   await page.getByText("Today's workout").waitFor();
 }
 

@@ -116,6 +116,13 @@ export const en = {
   "rmd.rehab": "Time for {name}",
   "rmd.rehabWeek": "{done} of {want} in the last 7 days, as your physio asked.",
   "rmd.rehabBody": "Your physio's exercises are due today.",
+  "rmd.seasonStart": "{season} starts today",
+  "rmd.seasonStartBody": "{weeks} weeks and 20 tiers of season-only rewards. Points come from your own weekly goal, never past it.",
+  "rmd.seasonFinale": "Finale week: {season}",
+  "rmd.seasonFinaleBody": "Every season point counts twice this week. You're at tier {tier}.",
+  "rmd.seasonEnding": "3 days left in {season}",
+  "rmd.seasonEndingBody": "You're at tier {tier}. Meeting this week's goal still counts twice.",
+  "rmd.seasonFold": "{title}. {body}",
 } as const;
 
 type Key = keyof typeof en;
@@ -240,6 +247,14 @@ export const es: Partial<Record<Key, Message>> = {
   "rmd.rehab": "Hora de {name}",
   "rmd.rehabWeek": "{done} de {want} en los últimos 7 días, como pidió tu fisioterapeuta.",
   "rmd.rehabBody": "Hoy tocan los ejercicios de tu fisioterapeuta.",
+  "rmd.seasonStart": "{season} empieza hoy",
+  "rmd.seasonStartBody":
+    "{weeks} semanas y 20 niveles de recompensas exclusivas. Los puntos salen de tu propio objetivo semanal, nunca de más.",
+  "rmd.seasonFinale": "Semana final: {season}",
+  "rmd.seasonFinaleBody": "Esta semana cada punto de temporada cuenta doble. Estás en el nivel {tier}.",
+  "rmd.seasonEnding": "Quedan 3 días de {season}",
+  "rmd.seasonEndingBody": "Estás en el nivel {tier}. Cumplir el objetivo de esta semana todavía cuenta doble.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -364,6 +379,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "rmd.rehab": "C’est l’heure de {name}",
   "rmd.rehabWeek": "{done} sur {want} ces 7 derniers jours, comme votre kiné l’a demandé.",
   "rmd.rehabBody": "Les exercices de votre kiné sont prévus aujourd’hui.",
+  "rmd.seasonStart": "{season} commence aujourd’hui",
+  "rmd.seasonStartBody":
+    "{weeks} semaines et 20 paliers de récompenses de saison. Les points viennent de votre propre objectif de la semaine, jamais au-delà.",
+  "rmd.seasonFinale": "Semaine finale : {season}",
+  "rmd.seasonFinaleBody": "Cette semaine, chaque point de saison compte double. Vous êtes au palier {tier}.",
+  "rmd.seasonEnding": "Plus que 3 jours dans {season}",
+  "rmd.seasonEndingBody": "Vous êtes au palier {tier}. Atteindre l’objectif de cette semaine compte encore double.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -487,6 +510,14 @@ export const de: Partial<Record<Key, Message>> = {
   "rmd.rehab": "Zeit für {name}",
   "rmd.rehabWeek": "{done} von {want} in den letzten 7 Tagen, wie deine Physiotherapie es wünscht.",
   "rmd.rehabBody": "Heute stehen die Übungen deiner Physiotherapie an.",
+  "rmd.seasonStart": "{season} beginnt heute",
+  "rmd.seasonStartBody":
+    "{weeks} Wochen und 20 Stufen mit Belohnungen nur für diese Saison. Punkte gibt es für dein eigenes Wochenziel, nie darüber hinaus.",
+  "rmd.seasonFinale": "Finalwoche: {season}",
+  "rmd.seasonFinaleBody": "Diese Woche zählt jeder Saisonpunkt doppelt. Du bist auf Stufe {tier}.",
+  "rmd.seasonEnding": "Noch 3 Tage in {season}",
+  "rmd.seasonEndingBody": "Du bist auf Stufe {tier}. Dein Wochenziel zählt diese Woche noch doppelt.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -608,6 +639,14 @@ export const it: Partial<Record<Key, Message>> = {
   "rmd.rehab": "È ora di {name}",
   "rmd.rehabWeek": "{done} su {want} negli ultimi 7 giorni, come ha chiesto il tuo fisioterapista.",
   "rmd.rehabBody": "Oggi tocca agli esercizi del tuo fisioterapista.",
+  "rmd.seasonStart": "{season} inizia oggi",
+  "rmd.seasonStartBody":
+    "{weeks} settimane e 20 livelli di premi esclusivi della stagione. I punti arrivano dal tuo obiettivo settimanale, mai oltre.",
+  "rmd.seasonFinale": "Settimana finale: {season}",
+  "rmd.seasonFinaleBody": "Questa settimana ogni punto stagione vale doppio. Sei al livello {tier}.",
+  "rmd.seasonEnding": "Mancano 3 giorni alla fine di {season}",
+  "rmd.seasonEndingBody": "Sei al livello {tier}. Raggiungere l’obiettivo di questa settimana vale ancora doppio.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -719,6 +758,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "rmd.rehab": "「{name}」の時間です",
   "rmd.rehabWeek": "直近7日間で{want}回中{done}回（理学療法士の指定）。",
   "rmd.rehabBody": "今日は理学療法士のエクササイズの日です。",
+  "rmd.seasonStart": "{season}が今日から始まります",
+  "rmd.seasonStartBody": "{weeks}週間、20段階のシーズン限定報酬。ポイントは自分の週の目標の分だけ貯まり、それ以上は増えません。",
+  "rmd.seasonFinale": "最終週:{season}",
+  "rmd.seasonFinaleBody": "今週はシーズンポイントがすべて2倍です。現在ティア{tier}です。",
+  "rmd.seasonEnding": "{season}は残り3日です",
+  "rmd.seasonEndingBody": "現在ティア{tier}です。今週の目標達成はまだ2倍でカウントされます。",
+  "rmd.seasonFold": "{title}。{body}",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -857,6 +903,14 @@ export const pt: Partial<Record<Key, Message>> = {
   "rmd.rehab": "Hora de {name}",
   "rmd.rehabWeek": "{done} de {want} nos últimos 7 dias, como seu fisioterapeuta pediu.",
   "rmd.rehabBody": "Os exercícios do seu fisioterapeuta são para hoje.",
+  "rmd.seasonStart": "{season} começa hoje",
+  "rmd.seasonStartBody":
+    "{weeks} semanas e 20 níveis de recompensas exclusivas da temporada. Os pontos vêm da sua própria meta semanal, nunca além dela.",
+  "rmd.seasonFinale": "Semana final: {season}",
+  "rmd.seasonFinaleBody": "Nesta semana cada ponto da temporada vale em dobro. Você está no nível {tier}.",
+  "rmd.seasonEnding": "Faltam 3 dias para o fim de {season}",
+  "rmd.seasonEndingBody": "Você está no nível {tier}. Bater a meta desta semana ainda vale em dobro.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -982,6 +1036,13 @@ export const ko: Partial<Record<Key, Message>> = {
   "rmd.rehab": "{name} 할 시간이에요",
   "rmd.rehabWeek": "물리치료사가 요청한 대로 최근 7일 동안 {want}번 중 {done}번 했어요.",
   "rmd.rehabBody": "오늘은 물리치료사가 준 운동을 할 날이에요.",
+  "rmd.seasonStart": "{season}, 오늘 시작해요",
+  "rmd.seasonStartBody": "{weeks}주 동안 시즌 한정 보상 20티어. 포인트는 내 주간 목표만큼만 쌓이고, 그 이상은 늘지 않아요.",
+  "rmd.seasonFinale": "마지막 주: {season}",
+  "rmd.seasonFinaleBody": "이번 주에는 모든 시즌 포인트가 두 배예요. 지금 티어 {tier}예요.",
+  "rmd.seasonEnding": "{season} 종료까지 3일 남았어요",
+  "rmd.seasonEndingBody": "지금 티어 {tier}예요. 이번 주 목표를 달성하면 아직 두 배로 쳐요.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1123,6 +1184,13 @@ export const tr: Partial<Record<Key, Message>> = {
   "rmd.rehab": "{name} zamanı",
   "rmd.rehabWeek": "Fizyoterapistinin istediği gibi, son 7 günde {want} seansın {done} seansı.",
   "rmd.rehabBody": "Fizyoterapistinin egzersizlerinin günü bugün.",
+  "rmd.seasonStart": "{season} bugün başlıyor",
+  "rmd.seasonStartBody": "{weeks} hafta ve sezona özel ödüllerle 20 kademe. Puanlar kendi haftalık hedefinden gelir, ötesinden asla.",
+  "rmd.seasonFinale": "Final haftası: {season}",
+  "rmd.seasonFinaleBody": "Bu hafta her sezon puanı iki kat sayılır. Şu an {tier}. kademedesin.",
+  "rmd.seasonEnding": "{season} için 3 gün kaldı",
+  "rmd.seasonEndingBody": "Şu an {tier}. kademedesin. Bu haftanın hedefine ulaşmak hâlâ iki kat sayılır.",
+  "rmd.seasonFold": "{title}. {body}",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1273,4 +1341,12 @@ export const pl: Partial<Record<Key, Message>> = {
   "rmd.rehab": "Czas na: {name}",
   "rmd.rehabWeek": "{done} z {want} w ostatnich 7 dniach, tak jak prosił fizjoterapeuta.",
   "rmd.rehabBody": "Dziś czas na ćwiczenia od fizjoterapeuty.",
+  "rmd.seasonStart": "{season} zaczyna się dziś",
+  "rmd.seasonStartBody":
+    "{weeks} tygodni i 20 poziomów nagród dostępnych tylko w tym sezonie. Punkty dają twój własny cel tygodniowy, nigdy więcej.",
+  "rmd.seasonFinale": "Tydzień finałowy: {season}",
+  "rmd.seasonFinaleBody": "W tym tygodniu każdy punkt sezonu liczy się podwójnie. Jesteś na poziomie {tier}.",
+  "rmd.seasonEnding": "Zostały 3 dni sezonu: {season}",
+  "rmd.seasonEndingBody": "Jesteś na poziomie {tier}. Cel na ten tydzień nadal liczy się podwójnie.",
+  "rmd.seasonFold": "{title}. {body}",
 };

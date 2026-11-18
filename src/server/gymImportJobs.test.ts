@@ -58,7 +58,7 @@ beforeEach(async () => {
 });
 
 describe("gym imports on the server", () => {
-  it("imports every city of a job, two lanes on different map servers, and finishes it", async () => {
+  it("imports every city of a job, three lanes on different map servers, each told when the worker's time ends", async () => {
     const made = await createJob({
       label: "Canada",
       places: ["Langley, BC", "Surrey, BC", "Delta, BC"],
@@ -67,15 +67,21 @@ describe("gym imports on the server", () => {
     });
     expect("id" in made).toBe(true);
     const servers: number[] = [];
+    const until: number[] = [];
+    const deadline = later();
     const r = await runWorker({
       ...quick,
+      deadline,
       importer: async (where, _f, _n, o) => {
         servers.push(o?.server ?? -1);
+        until.push(o?.until ?? 0);
         return ok(where);
       },
     });
     expect(r).toMatchObject({ imported: 3, more: false, finished: true });
-    expect(new Set(servers)).toEqual(new Set([0, 1]));
+    expect(new Set(servers)).toEqual(new Set([0, 1, 2]));
+    // Stops asking the map in time to save and hand over, instead of the worker idling its last minutes.
+    expect(until).toEqual([1, 2, 3].map(() => deadline - JOB_LIMITS.saveMs));
     const s = (await jobStatus())!;
     expect(s).toMatchObject({ state: "done", done: 3, total: 3, failed: [], active: [] });
     expect(s.sums).toMatchObject({ found: 9, added: 6, updated: 3 });
@@ -111,7 +117,7 @@ describe("gym imports on the server", () => {
     // Its pause is over: tried again, then again after 10 minutes, then failed.
     for (let i = 0; i < RETRY_AFTER_MS.length; i++) {
       await run("UPDATE gym_import_items SET not_before = 0");
-      r = await runWorker({ ...quick, importer });
+      r = await runWorker({ ...quick, importer, deadline: Date.now() + JOB_LIMITS.cityMs + 60_000 });
     }
     expect(r.finished).toBe(true);
     s = (await jobStatus())!;
@@ -148,8 +154,8 @@ describe("gym imports on the server", () => {
   });
 
   it("hands over when its time is up, and the next worker carries on", async () => {
-    await createJob({ label: "Canada", places: ["A, X", "B, X", "C, X"], startedBy: "", notify: false });
-    // Time for exactly one city per lane... and a clock that runs out after the first two.
+    await createJob({ label: "Canada", places: ["A, X", "B, X", "C, X", "D, X"], startedBy: "", notify: false });
+    // Time for exactly one city per lane... and a clock that runs out after the first three.
     let calls = 0;
     const deadline = Date.now() + JOB_LIMITS.cityMs + 1_000;
     const first = await runWorker({
@@ -162,8 +168,8 @@ describe("gym imports on the server", () => {
         return ok(w);
       },
     });
-    expect(first).toMatchObject({ imported: 2, more: true, finished: false });
-    expect(calls).toBe(2);
+    expect(first).toMatchObject({ imported: 3, more: true, finished: false });
+    expect(calls).toBe(3);
     const second = await runWorker({ ...quick, importer: async (w) => ok(w) });
     expect(second).toMatchObject({ imported: 1, finished: true });
   });
@@ -179,7 +185,8 @@ describe("gym imports on the server", () => {
   });
 
   it("stops: nothing new starts, and Retry gets the cities it didn't reach", async () => {
-    const made = (await createJob({ label: "Canada", places: ["A, X", "B, X", "C, X"], startedBy: "", notify: false })) as { id: string };
+    const places = ["A, X", "B, X", "C, X", "D, X", "E, X"];
+    const made = (await createJob({ label: "Canada", places, startedBy: "", notify: false })) as { id: string };
     let n = 0;
     await runWorker({
       ...quick,
@@ -190,9 +197,9 @@ describe("gym imports on the server", () => {
     });
     const s = (await jobStatus())!;
     expect(s.state).toBe("stopped");
-    expect(s.done).toBeLessThan(3);
+    expect(s.done).toBeLessThan(places.length);
     const left = await unfinishedPlaces(made.id);
-    expect(left.length).toBe(3 - s.recent.filter((x) => x.r.ok).length);
+    expect(left.length).toBe(places.length - s.recent.filter((x) => x.r.ok).length);
     expect(await dismissJob(made.id)).toBe(true);
     expect(await jobStatus()).toBeNull();
     // A new job of those cities can start now.

@@ -26,13 +26,18 @@ interface CoachBillingState {
   offers: CoachOffer[] | null;
   busy: boolean;
   error: string | null;
+  /**
+   * Coach plans aren't set up where this device buys (no `coach` offering or packages in RevenueCat, no Stripe coach
+   * prices): a setup gap, not a connection problem, so the sheet says "not on sale here yet" with no Try again.
+   */
+  notForSale: boolean;
 }
 
-export const useCoachBilling = create<CoachBillingState>(() => ({ offers: null, busy: false, error: null }));
+export const useCoachBilling = create<CoachBillingState>(() => ({ offers: null, busy: false, error: null, notForSale: false }));
 
 /** Tests set the plans for sale; nothing else should. */
 export function setCoachOffers(offers: CoachOffer[] | null) {
-  useCoachBilling.setState({ offers, error: null });
+  useCoachBilling.setState({ offers, error: null, notForSale: false });
 }
 
 const TIERS: PaidCoachTier[] = ["coach", "coachPlus"];
@@ -70,8 +75,8 @@ export async function loadCoachOffers(): Promise<CoachOffer[] | null> {
       const all = await sdk.getOfferings();
       const offering = all.all[COACH_STORE.offering];
       if (!offering) {
-        useCoachBilling.setState({ offers: null, error: `No "${COACH_STORE.offering}" offering in RevenueCat` });
-        return null;
+        useCoachBilling.setState({ offers: [], error: null, notForSale: true });
+        return [];
       }
       const offers: CoachOffer[] = [];
       for (const tier of TIERS)
@@ -85,17 +90,17 @@ export async function loadCoachOffers(): Promise<CoachOffer[] | null> {
             perMonth: plan === "annual" ? (p.product.pricePerMonthString ?? undefined) : undefined,
           });
         }
-      useCoachBilling.setState({ offers, error: offers.length ? null : "The coach offering has no packages for this store" });
+      useCoachBilling.setState({ offers, error: null, notForSale: !offers.length });
       return offers;
     }
     if (webBilling()) {
       const r = await api<{ coach?: WebCoachPrice[] }>("/api/billing/stripe/", { token: readAccount()?.token });
       const offers = webCoachOffers(r.coach ?? []);
-      useCoachBilling.setState({ offers, error: null });
+      useCoachBilling.setState({ offers, error: null, notForSale: !offers.length });
       return offers;
     }
   } catch (e) {
-    useCoachBilling.setState({ error: errorText(e) });
+    useCoachBilling.setState({ error: errorText(e), notForSale: false });
   }
   return null;
 }

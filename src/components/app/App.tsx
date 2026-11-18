@@ -95,6 +95,7 @@ import { Trainer } from "./Trainer";
 import { TrainingSettings } from "./TrainingSettings";
 import { TodaySkeleton } from "./ui";
 import { UpdateToast } from "./UpdateToast";
+import { useUnlocked } from "./useUnlocked";
 import { Workout } from "./Workout";
 
 const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
@@ -569,14 +570,16 @@ function TabBar({ route }: { route: Route }) {
     };
   }, []);
   const waiting = useFriendsWaiting();
-  const tabs = visibleTabs();
+  const tabs = useTabs();
   return (
     <nav
       ref={ref}
       className="tab-bar safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
       aria-label={t("nav.main")}
     >
-      <ul className={`mx-auto grid max-w-lg px-1 pt-1.5 ${tabs.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
+      <ul
+        className={`mx-auto grid max-w-lg px-1 pt-1.5 ${tabs.length === 5 ? "grid-cols-5" : tabs.length === 4 ? "grid-cols-4" : "grid-cols-3"}`}
+      >
         {tabs.map((tab) => {
           const on = route === tab.route;
           // Friends carries a dot while follows, requests, likes or comments are waiting, and says so to screen readers.
@@ -609,9 +612,14 @@ function TabBar({ route }: { route: Route }) {
   );
 }
 
-/** The tabs on screen: Friends hides while the social flag is off. */
-function visibleTabs() {
-  return TABS.filter((tab) => tab.route !== "friends" || socialOn());
+/**
+ * The tabs on screen: Friends hides while the social flag is off, and Awards and Friends wait for a new lifter's
+ * first and third workouts (unlocks.ts).
+ */
+function useTabs() {
+  const awards = useUnlocked("awards");
+  const friends = useUnlocked("friends");
+  return TABS.filter((tab) => (tab.route === "friends" ? friends && socialOn() : tab.route !== "achievements" || awards));
 }
 
 // Screens reached from Settings: the sidebar's Settings item stays lit on them, as the tab bar keeps a tab lit.
@@ -647,6 +655,7 @@ function Sidebar({ route }: { route: Route }) {
     };
   }, []);
   const waiting = useFriendsWaiting();
+  const tabs = useTabs();
   const coaching = useCoachNotes((s) => s.coaching);
   const coachUnread = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
   return (
@@ -660,7 +669,7 @@ function Sidebar({ route }: { route: Route }) {
         {BRAND.name}
       </div>
       <ul className="flex flex-col gap-1">
-        {visibleTabs().map((tab) => (
+        {tabs.map((tab) => (
           <SideItem
             key={tab.route}
             route={tab.route}

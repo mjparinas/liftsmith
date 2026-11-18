@@ -256,6 +256,11 @@ export interface Profile {
   lean?: boolean;
   /** Share cards when a screenshot is taken (StatsShare.tsx); on unless turned off (Settings › Your data and privacy). */
   shotShare?: boolean;
+  /**
+   * Features that appear as the lifter gets used to the app (unlocks.ts, docs/decisions/unlocks.md). Missing means
+   * an account from before unlocks (2026-11-18), which keeps everything. Set by the first setup.
+   */
+  reveal?: import("./unlocks").Reveal;
   /** Battery saver for the 3D figures: lower resolution and frame rate (Settings, src/lib/liteDemos.ts). */
   liteDemos?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
@@ -301,7 +306,19 @@ export interface Profile {
   messages?: {
     push: Partial<
       Record<
-        "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab",
+        | "reminder"
+        | "missed"
+        | "streak"
+        | "milestone"
+        | "pro"
+        | "tour"
+        | "weekly"
+        | "trial"
+        | "recap"
+        | "records"
+        | "friends"
+        | "rehab"
+        | "season",
         boolean
       >
     >;
@@ -311,7 +328,19 @@ export interface Profile {
       status: "pending" | "confirmed" | "unsubscribed";
       kinds: Partial<
         Record<
-          "reminder" | "missed" | "streak" | "milestone" | "pro" | "tour" | "weekly" | "trial" | "recap" | "records" | "friends" | "rehab",
+          | "reminder"
+          | "missed"
+          | "streak"
+          | "milestone"
+          | "pro"
+          | "tour"
+          | "weekly"
+          | "trial"
+          | "recap"
+          | "records"
+          | "friends"
+          | "rehab"
+          | "season",
           boolean
         >
       >;

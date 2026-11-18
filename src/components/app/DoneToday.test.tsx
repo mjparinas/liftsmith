@@ -45,8 +45,11 @@ describe("Today after training", () => {
     const card = screen.getByRole("region", { name: /Train as planned|Go easy|Push/ });
     expect(within(card).getByRole("button", { name: "Something hurts?" })).toBeInTheDocument();
     expect(within(card).getAllByRole("button", { name: /^What is/ })).toHaveLength(1);
-    // A brand new lifter has no streak yet: no flat 0, the This week card says what starts one.
-    expect(screen.getByText(/more this week to start a streak/)).toBeInTheDocument();
+    // A brand new lifter sees only the weekly goal on This week: no XP, quests or Awards tab until they've trained
+    // (unlocks.ts).
+    expect(screen.getByText(/more this week for your goal/)).toBeInTheDocument();
+    expect(screen.queryByText(/XP/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Awards" })).toBeNull();
     // Before the first workout the card has no score or call picker yet, only what happens first.
     expect(within(card).getByText(/Your first workout sets the baseline/)).toBeInTheDocument();
     expect(screen.queryByRole("group", { name: "Today's call" })).toBeNull();
