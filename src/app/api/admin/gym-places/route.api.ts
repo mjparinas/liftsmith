@@ -4,7 +4,7 @@
 // POST (admins, audited): {action: "importWorld", notify?} the one button, every gym in the world from OpenStreetMap,
 // then their websites, then AI for what's missing (docs/decisions/gyms.md "One button: every gym in the world");
 // {action: "importRetry", job} a new job of the areas a job didn't import; {action: "importStop" | "importClose", job}
-// stops or closes one; ?fix=1 and {action: "fixStart" | "fixStop" | "fixClose", job?} | {action: "fixUndo", change} the AI
+// stops or closes one; ?fix=1 and {action: "fixStart" | "fixStop" | "fixClose", job?} | {action: "fixUndo" | "fixApply" | "fixDismiss", change} the AI
 // fix-up pass over unclaimed gyms (gymAiFix.ts, docs/decisions/gyms.md "AI fix-up pass"); {id, action: hide | show | gym | studio | delete | approve | reject} changes one gym
 // (src/server/gymPlaces.ts).
 import { after } from "next/server";
@@ -12,7 +12,7 @@ import { after } from "next/server";
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { setFlag } from "@/server/flags";
-import { dismissFix, fixStatus, runFixWorker, startFix, stopFix, undoFix } from "@/server/gymAiFix";
+import { applyFix, dismissFix, dismissSuggestion, fixStatus, runFixWorker, startFix, stopFix, undoFix } from "@/server/gymAiFix";
 import {
   createJob,
   dismissJob,
@@ -113,6 +113,16 @@ export async function POST(req: Request) {
     const r = await undoFix(change);
     if (!r.ok) return json(400, { error: r.error });
     await audit(gate.staff.email, "gyms.aiFixUndo", change);
+    return json(200, { fix: await fixStatus() });
+  }
+  // A suggestion (a filled field the page states differently) is written only when staff press Apply.
+  if (body.action === "fixApply" || body.action === "fixDismiss") {
+    const change = String(body.change ?? "");
+    if (body.action === "fixApply") {
+      const r = await applyFix(change);
+      if (!r.ok) return json(400, { error: r.error });
+    } else if (!(await dismissSuggestion(change))) return json(400, { error: "That suggestion is gone." });
+    await audit(gate.staff.email, body.action === "fixApply" ? "gyms.aiFixApply" : "gyms.aiFixDismiss", change);
     return json(200, { fix: await fixStatus() });
   }
   if (body.action === "importStop" || body.action === "importClose") {
