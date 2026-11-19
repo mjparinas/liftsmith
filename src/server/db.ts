@@ -1534,6 +1534,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "notice", "TEXT NOT NULL DEFAULT ''"],
   ["social_profiles", "notice_reason", "TEXT NOT NULL DEFAULT ''"],
   ["social_profiles", "notice_at", "INTEGER NOT NULL DEFAULT 0"],
+  // How big a gym website's icon is (the smaller side, in pixels; 2026-11-19, docs/decisions/gyms.md "Sharper icons"):
+  // 0 for an icon kept before it was measured, so gymEnrich.ts measureIcons measures it once from its first bytes.
+  ["gym_photos", "px", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 /**
@@ -1557,6 +1560,8 @@ const LATE_SCHEMA = [
   // The import job's website and AI steps walk the gyms due a read through these (gymEnrich.ts, gymAutoFill.ts), and
   // a new map gym is checked against the claimed and lifter-added ones (savePlaces), never the whole table (2026-11-16).
   `CREATE INDEX IF NOT EXISTS gym_places_web ON gym_places (enriched_at) WHERE claimed_by = '' AND hidden = 0 AND website <> ''`,
+  // Website icons kept before they were measured (gymEnrich.ts measureIcons); empty once they all are.
+  `CREATE INDEX IF NOT EXISTS gym_photos_unmeasured ON gym_photos (place_id) WHERE kind = 'icon' AND px = 0`,
   `CREATE INDEX IF NOT EXISTS gym_places_ai ON gym_places (ai_at) WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0`,
   // The AI fix-up pass takes each unclaimed gym with a website once, ever (gymAiFix.ts).
   `CREATE INDEX IF NOT EXISTS gym_places_ai_fix ON gym_places (ai_fix_at) WHERE claimed_by = '' AND hidden = 0 AND pending = 0 AND website <> ''`,
