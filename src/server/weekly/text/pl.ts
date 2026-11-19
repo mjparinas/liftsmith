@@ -943,4 +943,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Złe godziny? Zgłoś problem na stronie siłowni albo przejmij ją i popraw je sam.",
   },
+  "outside-workouts": {
+    title: "Twoje biegi i mecze liczą się teraz w regeneracji",
+    intro:
+      "Włącz Licz treningi z innych aplikacji, a treningi z aplikacji zdrowotnej w telefonie wpłyną na mapę regeneracji i plan na jutro.",
+    points: [
+      "Biegi, rower, sporty i zajęcia trafiają do aplikacji przy każdym jej otwarciu.",
+      "Każdy męczy mięśnie, których używa, tym bardziej, im dłużej trwał.",
+      "Plan na jutro oszczędza zmęczone nogi po długim biegu lub meczu.",
+      "Nigdy nie liczą się jako treningi Liftsmith i nic nie liczy się podwójnie.",
+    ],
+    dyk: "Znajdziesz to w Ustawieniach › Połączone aplikacje, a lista pod mapą regeneracji w zakładce Ciało pokazuje, co jest liczone.",
+  },
 };

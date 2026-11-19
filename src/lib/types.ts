@@ -379,6 +379,13 @@ export interface Profile {
    * means yes).
    */
   connections?: { stravaPost?: boolean };
+  /**
+   * Count workouts from other apps (Settings › Connected apps; outside.ts): read runs, rides, sports and classes
+   * from Health Connect or Apple Health into recovery and the plan. When it was turned on (ms), or missing when
+   * off. The time goes into each imported workout's id, because a deleted event id is never synced again: turning
+   * it off deletes them, and turning it back on reads them under new ids.
+   */
+  outsideWorkouts?: number;
   /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
   training?: TrainingPrefs;
   /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
@@ -967,6 +974,26 @@ export interface PainEvent extends EventBase {
   nextDay?: string;
 }
 
+/** What kind of workout an outside workout was (outside.ts), for its fatigue and its name. */
+export type OutsideKind =
+  "run" | "walk" | "hike" | "ride" | "swim" | "row" | "cardio" | "hiit" | "strength" | "sport" | "climb" | "snow" | "mind" | "other";
+
+/**
+ * A workout done outside Liftsmith that another app saved to Health Connect or Apple Health (outside.ts,
+ * docs/decisions/outside-workouts.md), read only while Count workouts from other apps is on. Id `hw-<Health's id>`.
+ * `at` is its start. It tires muscles in the recovery map and can be a readiness signal; it never counts as a
+ * Liftsmith workout.
+ */
+export interface OutsideEvent extends EventBase {
+  type: "outside";
+  kind: OutsideKind;
+  seconds: number;
+  distanceM?: number;
+  kcal?: number;
+  /** The app or device that recorded it, as Health names it. */
+  source?: string;
+}
+
 /** The lifter chose a graded return (after reading the risks): skipped exercises come back lighter, step by step. */
 export interface InjuryReturnEvent extends EventBase {
   type: "injuryReturn";
@@ -1002,4 +1029,5 @@ export type AppEvent =
   | InjuryRuleEvent
   | InjuryHealedEvent
   | PainEvent
-  | InjuryReturnEvent;
+  | InjuryReturnEvent
+  | OutsideEvent;
