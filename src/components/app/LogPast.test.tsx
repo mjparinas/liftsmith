@@ -59,7 +59,10 @@ describe("log a past workout", () => {
     );
     await user.click(screen.getByRole("button", { name: /More.*Barbell bench press set 1 reps/ }));
     await user.click(screen.getByRole("button", { name: "Save workout" }));
-    const start = useApp.getState().stats.sessions[0]!.start;
+    // The day picked is the workout's start event. Not stats' session start, which is the first set's time: run just
+    // after midnight, yesterday's late start puts that set in the middle of the hour, on today.
+    const started = useApp.getState().events.find((e) => e.type === "sessionStart");
+    const start = started!.at;
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     expect(new Date(start).toDateString()).toBe(yesterday.toDateString());
