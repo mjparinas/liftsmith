@@ -880,7 +880,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "seasons",
         name: "Training seasons",
-        body: "Ten-week seasons with a track of 20 tiers, climbed by training toward your own weekly goal, so two days a week climbs as fast as five and extra days earn nothing. Tiers bring season-only badges, an avatar, an accent and a theme with its app icon, yours to keep after the season ends. Season challenges, a rare drop from new bests, prestige stars, a catch-up week after a miss, a double-points finale and a recap card to share.",
+        body: "Ten-week seasons with a track of 20 tiers, climbed by training toward your own weekly goal, so two days a week climbs as fast as five and extra days earn nothing. Tiers bring season-only badges, an avatar, an accent and a theme with its app icon, yours to keep after the season ends. Season challenges, a rare drop from new bests, prestige stars, a catch-up week after a miss, a double-points finale and a recap card to share. Six seasons are planned back to back through 2027 (Ember, Tempest, Bloom, Solstice, Maple and Obsidian), each with its own look and its own three challenges.",
         tier: "both",
         proPart: "Every tier and its rewards are free; Pro adds a bonus reward on three tiers.",
         note: "Season app icons are on Android and iPhone; the web gets the theme. Seasons can be turned off in Settings.",

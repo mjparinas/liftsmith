@@ -48,6 +48,30 @@ export interface SeasonDef {
   weeks: number;
 }
 
+/**
+ * A built-in season the admin panel took off the schedule: `{ id, off: true }` in the server's list hides the
+ * built-in season with that id. It has no kit, so builds from before 2026-11-19 drop it like any unknown season.
+ */
+export interface SeasonOff {
+  id: string;
+  off: true;
+}
+export type ScheduleRow = SeasonDef | SeasonOff;
+const isOff = (s: unknown): s is SeasonOff => !!s && typeof s === "object" && (s as SeasonOff).off === true;
+
+/**
+ * The season challenges (500 points each). Every kit picks its own three, so no two seasons ask the same:
+ * `goal-weeks` meet the goal in n% of the season's weeks; `prs` set n new bests; `new-ex` try n exercises never
+ * done before; `streak` meet the goal n weeks in a row; `pr-lifts` new bests on n different exercises; `quests`
+ * finish n weekly quests; `bookends` meet the goal in the first and the last week; `stretch` stretch on its own
+ * for 10 minutes or more on n days. None asks for days past the weekly goal.
+ */
+export type ChallengeId = "goal-weeks" | "prs" | "new-ex" | "streak" | "pr-lifts" | "quests" | "bookends" | "stretch";
+export interface ChallengeDef {
+  id: ChallengeId;
+  n: number;
+}
+
 export type RewardKind = "badge" | "item" | "theme";
 export interface SeasonReward {
   tier: number;
@@ -66,9 +90,31 @@ export interface Kit {
   rewards: SeasonReward[];
   /** The rare item a new best can drop during the season (a Locker item id). */
   drop: string;
+  /** The season's own three challenges. */
+  challenges: ChallengeDef[];
 }
 
-/** Reward sets this build knows. Ember is season 1: a warm red and gold look for the winter. */
+/** A kit's track: the same tiers for every kit, with that kit's own items and themes. */
+function track(kit: string, pro: { theme: string }): SeasonReward[] {
+  return [
+    { tier: 2, kind: "item", id: `av-${kit}` },
+    { tier: 5, kind: "badge", id: "bronze" },
+    { tier: 7, kind: "item", id: `accent-${kit}` },
+    { tier: 10, kind: "badge", id: "silver" },
+    { tier: 12, kind: "theme", id: kit },
+    { tier: 15, kind: "badge", id: "gold" },
+    { tier: 20, kind: "badge", id: "platinum" },
+    { tier: 6, kind: "item", id: `av-${kit}-pro`, pro: true },
+    { tier: 14, kind: "item", id: `accent-${kit}-pro`, pro: true },
+    { tier: 20, kind: "theme", id: pro.theme, pro: true },
+  ];
+}
+
+/**
+ * Reward sets this build knows, one per season, never reused (Melvin, 2026-11-19: "keep them unique, plan it out
+ * until end of 2027"). Each has its own look (a free theme and app icon, a Pro theme and icon, two avatars, two
+ * accents and a rare plate finish) and its own three challenges. Ember is season 1: a warm red and gold winter.
+ */
 export const KITS: Record<string, Kit> = {
   ember: {
     id: "ember",
@@ -87,11 +133,95 @@ export const KITS: Record<string, Kit> = {
       { tier: 14, kind: "item", id: "accent-ember-pro", pro: true },
       { tier: 20, kind: "theme", id: "embergold", pro: true },
     ],
+    challenges: [
+      { id: "goal-weeks", n: 60 },
+      { id: "prs", n: 5 },
+      { id: "new-ex", n: 8 },
+    ],
+  },
+  // Season 2, late winter: storm indigo, and lightning silver on the Pro row.
+  tempest: {
+    id: "tempest",
+    hue: "var(--color-tempest)",
+    cardHex: "#7c83ff",
+    drop: "plates-tempest",
+    rewards: track("tempest", { theme: "tempestsilver" }),
+    challenges: [
+      { id: "streak", n: 4 },
+      { id: "pr-lifts", n: 4 },
+      { id: "quests", n: 8 },
+    ],
+  },
+  // Season 3, spring: blossom pink, and meadow green on the Pro row. Its challenges lean on trying and stretching.
+  bloom: {
+    id: "bloom",
+    hue: "var(--color-bloom)",
+    cardHex: "#ff7ae0",
+    drop: "plates-bloom",
+    rewards: track("bloom", { theme: "bloommeadow" }),
+    challenges: [
+      { id: "new-ex", n: 10 },
+      { id: "stretch", n: 6 },
+      { id: "bookends", n: 2 },
+    ],
+  },
+  // Season 4, midsummer: bright sun yellow, and dusk coral on the Pro row.
+  solstice: {
+    id: "solstice",
+    hue: "var(--color-solstice)",
+    cardHex: "#ffe95c",
+    drop: "plates-solstice",
+    rewards: track("solstice", { theme: "solsticedusk" }),
+    challenges: [
+      { id: "goal-weeks", n: 70 },
+      { id: "streak", n: 3 },
+      { id: "pr-lifts", n: 5 },
+    ],
+  },
+  // Season 5, autumn: maple-leaf red, and copper on the Pro row.
+  maple: {
+    id: "maple",
+    hue: "var(--color-maple)",
+    cardHex: "#ff4d4d",
+    drop: "plates-maple",
+    rewards: track("maple", { theme: "maplecopper" }),
+    challenges: [
+      { id: "bookends", n: 2 },
+      { id: "prs", n: 4 },
+      { id: "quests", n: 12 },
+    ],
+  },
+  // Season 6, the holidays and New Year (to mid-January 2028): volcanic-glass violet, and ice on the Pro row.
+  obsidian: {
+    id: "obsidian",
+    hue: "var(--color-obsidian)",
+    cardHex: "#9d6bff",
+    drop: "plates-obsidian",
+    rewards: track("obsidian", { theme: "obsidianice" }),
+    challenges: [
+      { id: "streak", n: 5 },
+      { id: "stretch", n: 5 },
+      { id: "new-ex", n: 6 },
+    ],
   },
 };
 
-/** Season 1, used until the app has heard the schedule from the server. */
-export const DEFAULT_SEASONS: readonly SeasonDef[] = [{ id: "s1", kit: "ember", start: "2026-11-23", weeks: 10 }];
+/**
+ * The built-in schedule, back to back through the end of 2027 (Melvin, 2026-11-19), every season ten weeks (the
+ * length where meeting the goal about eight weeks in ten reaches tier 20; shorter ones can't), so the last one runs
+ * over New Year to 16 January 2028. Every season starts and ends
+ * on its own with no admin step and works offline. The admin Seasons tab can still move, resize, swap or take off
+ * any that hasn't started; the server's list wins for an id it has.
+ */
+export const DEFAULT_SEASONS: readonly SeasonDef[] = [
+  { id: "s1", kit: "ember", start: "2026-11-23", weeks: 10 },
+  { id: "s2", kit: "tempest", start: "2027-02-01", weeks: 10 },
+  { id: "s3", kit: "bloom", start: "2027-04-12", weeks: 10 },
+  { id: "s4", kit: "solstice", start: "2027-06-21", weeks: 10 },
+  { id: "s5", kit: "maple", start: "2027-08-30", weeks: 10 },
+  { id: "s6", kit: "obsidian", start: "2027-11-08", weeks: 10 },
+];
+export const BUILT_IN = new Set(DEFAULT_SEASONS.map((s) => s.id));
 
 /** Every Locker item and theme a kit can give, with where it comes from. */
 export function kitOfReward(id: string): { kit: Kit; reward: SeasonReward | null } | null {
@@ -116,11 +246,13 @@ export function scheduleProblem(list: unknown): string | null {
   if (!Array.isArray(list)) return "The schedule must be a list.";
   const seen = new Set<string>();
   const kits = new Set<string>();
-  const rows = list as SeasonDef[];
-  for (const s of rows) {
+  const rows: SeasonDef[] = [];
+  for (const s of list as ScheduleRow[]) {
     if (!s || typeof s.id !== "string" || !/^[a-z0-9-]{1,24}$/.test(s.id)) return "Each season needs a short id (a-z, 0-9, -).";
     if (seen.has(s.id)) return `Season ${s.id} is listed twice.`;
     seen.add(s.id);
+    if (isOff(s)) continue;
+    rows.push(s);
     if (typeof s.kit !== "string" || !KITS[s.kit]) return `Season ${s.id} uses a reward set this app doesn't have.`;
     if (kits.has(s.kit)) return `Two seasons use the ${s.kit} reward set. Each set is used once.`;
     kits.add(s.kit);
@@ -143,6 +275,7 @@ export function scheduleProblem(list: unknown): string | null {
  * reward set, or go, so nobody's tier or rewards change after the fact. `now` is the server's time.
  */
 export function changeProblem(before: readonly SeasonDef[], after: readonly SeasonDef[], now: number): string | null {
+  if (after.some(isOff)) return "Send the seasons themselves; a removed season is left out.";
   const shape = scheduleProblem(after);
   if (shape) return shape;
   // A day's grace either side of the start, for time zones.
@@ -159,11 +292,23 @@ export function changeProblem(before: readonly SeasonDef[], after: readonly Seas
   return null;
 }
 
-/** The server's list merged over the built-in one: the server wins for an id it has. */
-export function mergeSchedule(server: readonly SeasonDef[]): SeasonDef[] {
+/** The server's list merged over the built-in one: the server wins for an id it has, and `off` takes one away. */
+export function mergeSchedule(server: readonly ScheduleRow[]): SeasonDef[] {
   const ids = new Set(server.map((s) => s.id));
-  return [...DEFAULT_SEASONS.filter((s) => !ids.has(s.id)), ...server].sort((a, b) => a.start.localeCompare(b.start));
+  const kept = server.filter((s): s is SeasonDef => !isOff(s));
+  return [...DEFAULT_SEASONS.filter((s) => !ids.has(s.id)), ...kept].sort((a, b) => a.start.localeCompare(b.start));
 }
+
+/** What to keep on the server for a schedule: the seasons, plus `off` for each built-in one left out. */
+export function toSaved(next: readonly SeasonDef[]): ScheduleRow[] {
+  const ids = new Set(next.map((s) => s.id));
+  const off: SeasonOff[] = DEFAULT_SEASONS.filter((s) => !ids.has(s.id)).map((s) => ({ id: s.id, off: true }));
+  return [...next.map((s) => ({ id: s.id, kit: s.kit, start: s.start, weeks: s.weeks })), ...off];
+}
+
+/** Rows a build can use: seasons whose kit it has, and `off` markers. */
+const usable = (rows: readonly unknown[]) =>
+  rows.filter((s): s is ScheduleRow => isOff(s) || (!!s && typeof (s as SeasonDef).kit === "string" && !!KITS[(s as SeasonDef).kit]));
 
 const CACHE = "liftsmith.seasons";
 let memo: SeasonDef[] | null = null;
@@ -177,7 +322,7 @@ export function seasonList(): SeasonDef[] {
     const parsed = raw ? (JSON.parse(raw) as unknown) : null;
     // A schedule this build can't read (a kit from a newer app) falls back to the seasons it can.
     if (Array.isArray(parsed)) {
-      const known = (parsed as SeasonDef[]).filter((s) => s && typeof s.kit === "string" && KITS[s.kit]);
+      const known = usable(parsed);
       if (!scheduleProblem(known)) list = mergeSchedule(known);
     }
   } catch {
@@ -188,8 +333,8 @@ export function seasonList(): SeasonDef[] {
 }
 
 /** Keeps the server's schedule (remoteSeasons.ts). Returns whether it changed. */
-export function rememberSchedule(list: readonly SeasonDef[]): boolean {
-  const known = list.filter((s) => KITS[s.kit]);
+export function rememberSchedule(list: readonly ScheduleRow[]): boolean {
+  const known = usable(list);
   if (scheduleProblem(known)) return false;
   const next = mergeSchedule(known);
   const changed = JSON.stringify(next) !== JSON.stringify(seasonList());
@@ -238,7 +383,7 @@ export interface WeekPoints {
 }
 
 export interface Challenge {
-  id: "goal-weeks" | "prs" | "new-ex";
+  id: ChallengeId;
   goal: number;
   have: number;
   done: boolean;
@@ -322,6 +467,14 @@ export function tierOf(points: number): { tier: number; into: number; span: numb
   return { tier: Math.floor(points / TIER_POINTS), into: points % TIER_POINTS, span: TIER_POINTS, prestige: 0 };
 }
 
+/** How many a challenge asks for in a season of `weeks` weeks (a share of the weeks, or capped by them). */
+export function challengeGoal(c: ChallengeDef, weeks: number): number {
+  if (c.id === "goal-weeks") return Math.ceil((weeks * c.n) / 100);
+  if (c.id === "bookends") return 2;
+  if (c.id === "streak") return Math.min(c.n, weeks);
+  return c.n;
+}
+
 /** Whether a new best (by its exercise and time) drops the season's rare item, seeded so every device agrees. */
 export const drops = (seasonId: string, exerciseId: string, at: number) => rng(hash(`drop:${seasonId}:${exerciseId}:${at}`))() < DROP_ODDS;
 
@@ -342,12 +495,21 @@ export function seasonState(
   const weeks: WeekPoints[] = [];
   let missed = false;
   let goalWeeks = 0;
+  let run = 0;
+  let longest = 0;
+  let questsDone = 0;
+  const met: boolean[] = [];
   for (let w = start, i = 0; w < end && w <= now; w = weekOf(w + WEEK + DAY), i++) {
     const n = days.get(w)?.size ?? 0;
     const quests = questsFor(events, profile, w).filter((q) => q.done).length;
     const p = weekPoints(n, goal, quests, missed, i === def.weeks - 1);
     weeks.push({ start: w, ...p });
-    if (n >= goal) goalWeeks++;
+    questsDone += quests;
+    met.push(n >= goal);
+    if (n >= goal) {
+      goalWeeks++;
+      longest = Math.max(longest, ++run);
+    } else run = 0;
     // Only a finished week can be missed.
     const over = weekOf(w + WEEK + DAY) <= now;
     missed = over && n < goal;
@@ -356,14 +518,20 @@ export function seasonState(
   const sets = events.filter((e): e is SetEvent => e.type === "set");
   const before = new Set(sets.filter((s) => s.at < start).map((s) => s.exerciseId));
   const fresh = new Set(sets.filter((s) => s.at >= start && s.at < end && !before.has(s.exerciseId)).map((s) => s.exerciseId)).size;
-  const need = { "goal-weeks": Math.ceil(def.weeks * 0.6), prs: 5, "new-ex": 8 };
-  const challenges: Challenge[] = (
-    [
-      ["goal-weeks", goalWeeks],
-      ["prs", prs.length],
-      ["new-ex", fresh],
-    ] as const
-  ).map(([id, have]) => ({ id, goal: need[id], have: Math.min(need[id], have), done: have >= need[id] }));
+  const have: Record<ChallengeId, number> = {
+    "goal-weeks": goalWeeks,
+    prs: prs.length,
+    "new-ex": fresh,
+    streak: longest,
+    "pr-lifts": new Set(prs.map((p) => p.exerciseId)).size,
+    quests: questsDone,
+    bookends: (met[0] ? 1 : 0) + (met.length === def.weeks && met[def.weeks - 1] ? 1 : 0),
+    stretch: stats.stretchDays.filter((d) => d >= start && d < end).length,
+  };
+  const challenges: Challenge[] = kit.challenges.map((c) => {
+    const need = challengeGoal(c, def.weeks);
+    return { id: c.id, goal: need, have: Math.min(need, have[c.id]), done: have[c.id] >= need };
+  });
   const points = weeks.reduce((n, w) => n + w.total, 0) + challenges.filter((c) => c.done).length * CHALLENGE_POINTS;
   const level = tierOf(points);
   const months = new Set<string>();

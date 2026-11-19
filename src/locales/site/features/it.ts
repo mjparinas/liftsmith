@@ -463,7 +463,7 @@ export const it: FeaturesText = {
     },
     seasons: {
       name: "Stagioni di allenamento",
-      body: "Stagioni di dieci settimane con un percorso di 20 livelli che sali allenandoti verso il tuo obiettivo settimanale: due giorni a settimana salgono veloci quanto cinque e i giorni in più non danno punti. I livelli danno badge, un avatar, un colore d'accento e un tema con la sua icona esclusivi della stagione, tuoi per sempre. Sfide di stagione, un bottino raro dai nuovi record, stelle prestigio, una settimana di recupero dopo un passo falso, un finale a punti doppi e un riepilogo da condividere.",
+      body: "Stagioni di dieci settimane con un percorso di 20 livelli che sali allenandoti verso il tuo obiettivo settimanale: due giorni a settimana salgono veloci quanto cinque e i giorni in più non danno punti. I livelli danno badge, un avatar, un colore d'accento e un tema con la sua icona esclusivi della stagione, tuoi per sempre. Sfide di stagione, un bottino raro dai nuovi record, stelle prestigio, una settimana di recupero dopo un passo falso, un finale a punti doppi e un riepilogo da condividere. Sei stagioni sono in programma una dopo l'altra fino alla fine del 2027 (Brace, Tempesta, Fioritura, Solstizio, Acero e Ossidiana), ognuna con stile e tre sfide proprie.",
       proPart: "Tutti i livelli e i loro premi sono gratis; Pro aggiunge un premio bonus su tre livelli.",
       note: "Le icone di stagione sono su Android e iPhone; il web riceve il tema. Le stagioni si possono disattivare nelle Impostazioni.",
     },

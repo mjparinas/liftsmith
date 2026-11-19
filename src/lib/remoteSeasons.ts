@@ -3,7 +3,7 @@
 // static web export with no API, the last answer (or the built-in season 1) stays.
 import { canSend } from "./analytics";
 import { isNative } from "./juice";
-import { rememberSchedule, type SeasonDef } from "./seasons";
+import { rememberSchedule, type ScheduleRow } from "./seasons";
 import { SITE_URL } from "./site";
 
 export const seasonsUrl = () => `${isNative() || typeof location === "undefined" ? SITE_URL : ""}/api/seasons/`;
@@ -15,7 +15,7 @@ export async function refreshSeasons(get: typeof fetch = fetch): Promise<boolean
     const r = await get(seasonsUrl(), { cache: "no-store" });
     if (!r.ok) return false;
     const j = (await r.json()) as { seasons?: unknown };
-    return Array.isArray(j.seasons) && rememberSchedule(j.seasons as SeasonDef[]);
+    return Array.isArray(j.seasons) && rememberSchedule(j.seasons as ScheduleRow[]);
   } catch {
     return false;
   }

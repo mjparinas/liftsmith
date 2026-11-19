@@ -7,7 +7,16 @@ import { fmtNum } from "@/lib/units";
 // A barbell with the plates to load on each side, heaviest nearest the collar. The point is that
 // nobody has to do plate maths between sets.
 
-export type PlateFinish = "classic" | "black" | "chrome" | "neon" | "ember";
+export type PlateFinish = "classic" | "black" | "chrome" | "neon" | "ember" | "tempest" | "bloom" | "solstice" | "maple" | "obsidian";
+
+/** The rare drops of seasons 2 to 6 (2027, seasons.ts KITS): a gradient face each, the weight colour on the rim. */
+const SEASON_FACES: Partial<Record<PlateFinish, [string, string, string]>> = {
+  tempest: ["#c9ccff", "#7c83ff", "#3b2fb0"],
+  bloom: ["#ffd0f2", "#ff7ae0", "#b0369f"],
+  solstice: ["#fffbd0", "#ffe95c", "#e8a01f"],
+  maple: ["#ffb08a", "#ff4d4d", "#9e1a24"],
+  obsidian: ["#4a3a7a", "#1a1426", "#0a0812"],
+};
 
 /** The words on the graphic. English here for the website; the app's PlateBar (app/Plates.tsx) passes its language's. */
 export const PLATE_WORDS = {
@@ -27,6 +36,15 @@ function finished(s: ReturnType<typeof plateStyle>, finish: PlateFinish) {
   if (finish === "chrome") return { fill: "url(#chrome)", stroke: s.rim, strokeWidth: 2.5, text: "var(--plate-ink-dark)" };
   // Season 1's rare drop (seasons.ts): a glowing ember face, the weight colour still on the rim.
   if (finish === "ember") return { fill: "url(#ember)", stroke: s.rim, strokeWidth: 3, text: "var(--plate-ink-dark)", glow: true };
+  // Obsidian is dark glass, so its numbers are light; the others are bright faces with dark numbers.
+  if (SEASON_FACES[finish])
+    return {
+      fill: `url(#plate-${finish})`,
+      stroke: s.rim,
+      strokeWidth: 3,
+      text: finish === "obsidian" ? "var(--plate-ink-light)" : "var(--plate-ink-dark)",
+      glow: true,
+    };
   if (finish === "neon") return { fill: "var(--plate-black)", stroke: s.rim, strokeWidth: 3, text: s.rim, glow: true };
   return { fill: s.fill, stroke: "var(--plate-edge)", strokeWidth: 1, text: s.text };
 }
@@ -81,6 +99,13 @@ export function PlateBar({
             <stop offset="0.5" stopColor="#ff7a3d" />
             <stop offset="1" stopColor="#b8321a" />
           </linearGradient>
+          {Object.entries(SEASON_FACES).map(([id, [a, b, c]]) => (
+            <linearGradient key={id} id={`plate-${id}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor={a} />
+              <stop offset="0.5" stopColor={b} />
+              <stop offset="1" stopColor={c} />
+            </linearGradient>
+          ))}
           <filter id="neon" x="-50%" y="-20%" width="200%" height="140%">
             <feGaussianBlur stdDeviation="2.2" result="b" />
             <feMerge>

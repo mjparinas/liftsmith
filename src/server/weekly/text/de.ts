@@ -906,6 +906,7 @@ export const emails: Record<string, Words> = {
       "Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und das Glut-Design mit App-Symbol, nur in dieser Saison und für immer deins.",
       "Eine Woche verpasst? In der nächsten Zielwoche zählt der Bonus doppelt. Die letzte Woche zählt ganz doppelt.",
       "Jede neue Bestleistung bringt mit einer Chance von 1 zu 6 die seltenen Scheiben der Saison.",
+      "Nach Glut kommen Sturm, Blüte, Sonnwende, Ahorn und Obsidian, eine nach der anderen durch 2027, jede mit eigenem Look und eigenen Challenges.",
     ],
     dyk: "Du willst keine Saisons sehen? Schalte Trainingssaisons in Einstellungen › Aussehen und Bedienung aus. Dein Training zählt weiter.",
   },

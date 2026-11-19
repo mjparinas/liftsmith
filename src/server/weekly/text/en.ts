@@ -924,6 +924,7 @@ export const emails: Record<string, Words> = {
       "Tiers bring season-only badges, an avatar, an accent and the Ember theme with its app icon, yours to keep.",
       "Miss a week and the next goal week pays its bonus twice. The last week counts double.",
       "Every new best has a 1 in 6 chance to drop the season's rare plates.",
+      "After Ember come Tempest, Bloom, Solstice, Maple and Obsidian, back to back through 2027, each with its own look and challenges.",
     ],
     dyk: "Rather not see seasons? Turn off Training seasons in Settings › Look and feel. Your training still counts.",
   },

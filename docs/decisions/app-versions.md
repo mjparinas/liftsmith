@@ -35,3 +35,4 @@ Two threads branching from the same staging both bump to the same number. When a
 
 - 0.1.0: every build up to Release 44 (2026-11-19).
 - 0.2.0: open now in the gym finder, settings search, the map-first finder and What's new itself (2026-11-19, promoted 2026-11-20).
+- 0.3.0: five new training seasons planned through 2027 (2026-11-19).

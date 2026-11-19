@@ -903,6 +903,7 @@ export const emails: Record<string, Words> = {
       "Poziomy dają odznaki, awatar, kolor akcentu i motyw Żar z ikoną aplikacji, tylko z tego sezonu i Twoje na zawsze.",
       "Opuściłeś tydzień? Następny tydzień z osiągniętym celem daje podwójny bonus. Ostatni tydzień liczy się podwójnie.",
       "Każdy nowy rekord ma szansę 1 na 6 na rzadkie talerze sezonu.",
+      "Po Żarze przychodzą Burza, Rozkwit, Przesilenie, Klon i Obsydian, jeden po drugim przez cały 2027, każdy z własnym wyglądem i wyzwaniami.",
     ],
     dyk: "Wolisz nie widzieć sezonów? Wyłącz Sezony treningowe w Ustawienia › Wygląd. Twój trening nadal się liczy.",
   },

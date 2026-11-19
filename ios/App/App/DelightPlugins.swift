@@ -77,7 +77,10 @@ public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "get", returnType: CAPPluginReturnPromise),
     ]
 
-    static let icons = ["default", "forge", "glacier", "aurora", "royal", "ember", "embergold"]
+    static let icons = [
+        "default", "forge", "glacier", "aurora", "royal", "ember", "embergold",
+        "tempest", "tempestsilver", "bloom", "bloommeadow", "solstice", "solsticedusk", "maple", "maplecopper", "obsidian", "obsidianice",
+    ]
 
     @objc func set(_ call: CAPPluginCall) {
         let name = call.getString("name") ?? "default"

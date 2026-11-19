@@ -23,6 +23,16 @@ const FACES: Record<AvatarId, { icon: IconName | "mascot"; hue: string }> = {
   "av-pro": { icon: "sparkle", hue: "var(--color-violet)" },
   "av-ember": { icon: "flame", hue: HUE.ember },
   "av-ember-pro": { icon: "star", hue: HUE.gold },
+  "av-tempest": { icon: "bolt", hue: HUE.violet },
+  "av-tempest-pro": { icon: "star", hue: HUE.cyan },
+  "av-bloom": { icon: "leaf", hue: HUE.violet },
+  "av-bloom-pro": { icon: "sparkle", hue: HUE.mint },
+  "av-solstice": { icon: "sparkle", hue: HUE.gold },
+  "av-solstice-pro": { icon: "star", hue: HUE.ember },
+  "av-maple": { icon: "leaf", hue: HUE.ember },
+  "av-maple-pro": { icon: "medal", hue: HUE.gold },
+  "av-obsidian": { icon: "moon", hue: HUE.cyan },
+  "av-obsidian-pro": { icon: "snowflake", hue: HUE.violet },
 };
 
 export const isAvatar = (id: string | undefined): id is AvatarId => !!id && id in FACES;

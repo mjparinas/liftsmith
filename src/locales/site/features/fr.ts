@@ -470,7 +470,7 @@ export const fr: FeaturesText = {
     },
     seasons: {
       name: "Saisons d'entraînement",
-      body: "Des saisons de dix semaines avec un parcours de 20 paliers, gravi en vous entraînant vers votre propre objectif hebdomadaire : deux jours par semaine avancent aussi vite que cinq, et les jours en plus ne rapportent rien. Les paliers donnent des badges, un avatar, une couleur d'accent et un thème avec son icône propres à la saison, à vous pour toujours. Défis de saison, butin rare sur les nouveaux records, étoiles de prestige, semaine de rattrapage après un raté, finale à points doubles et bilan à partager.",
+      body: "Des saisons de dix semaines avec un parcours de 20 paliers, gravi en vous entraînant vers votre propre objectif hebdomadaire : deux jours par semaine avancent aussi vite que cinq, et les jours en plus ne rapportent rien. Les paliers donnent des badges, un avatar, une couleur d'accent et un thème avec son icône propres à la saison, à vous pour toujours. Défis de saison, butin rare sur les nouveaux records, étoiles de prestige, semaine de rattrapage après un raté, finale à points doubles et bilan à partager. Six saisons sont prévues à la suite jusqu'à fin 2027 (Braise, Tempête, Floraison, Solstice, Érable et Obsidienne), chacune avec son style et ses trois défis.",
       proPart: "Tous les paliers et leurs récompenses sont gratuits ; Pro ajoute une récompense bonus sur trois paliers.",
       note: "Les icônes de saison sont sur Android et iPhone ; le web reçoit le thème. Les saisons peuvent être désactivées dans les Réglages.",
     },

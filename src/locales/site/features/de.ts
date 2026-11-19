@@ -469,7 +469,7 @@ export const de: FeaturesText = {
     },
     seasons: {
       name: "Trainingssaisons",
-      body: "Zehnwöchige Saisons mit einem Pfad aus 20 Stufen, den du erklimmst, indem du auf dein eigenes Wochenziel hin trainierst: Zwei Tage pro Woche kommen so schnell voran wie fünf, und zusätzliche Tage bringen nichts. Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und ein Design mit App-Symbol, die es nur in dieser Saison gibt und die dir danach bleiben. Saison-Challenges, ein seltener Fund bei neuen Bestleistungen, Prestige-Sterne, eine Aufholwoche nach einer verpassten Woche, ein Finale mit doppelten Punkten und ein Rückblick zum Teilen.",
+      body: "Zehnwöchige Saisons mit einem Pfad aus 20 Stufen, den du erklimmst, indem du auf dein eigenes Wochenziel hin trainierst: Zwei Tage pro Woche kommen so schnell voran wie fünf, und zusätzliche Tage bringen nichts. Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und ein Design mit App-Symbol, die es nur in dieser Saison gibt und die dir danach bleiben. Saison-Challenges, ein seltener Fund bei neuen Bestleistungen, Prestige-Sterne, eine Aufholwoche nach einer verpassten Woche, ein Finale mit doppelten Punkten und ein Rückblick zum Teilen. Sechs Saisons folgen bis Ende 2027 aufeinander (Glut, Sturm, Blüte, Sonnwende, Ahorn und Obsidian), jede mit eigenem Look und drei eigenen Challenges.",
       proPart: "Alle Stufen und ihre Belohnungen sind kostenlos; Pro legt auf drei Stufen eine Bonus-Belohnung dazu.",
       note: "Saison-App-Symbole gibt es auf Android und iPhone; im Web gibt es das Design. Saisons lassen sich in den Einstellungen ausschalten.",
     },
