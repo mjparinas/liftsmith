@@ -15,5 +15,5 @@ export const PLACE_REPORT_LIMITS = {
 } as const;
 
 /** What staff can do with a reported gym page (Admin › Reports). */
-export const PLACE_REPORT_ACTIONS = ["dismiss", "hide", "merge", "edit"] as const;
+export const PLACE_REPORT_ACTIONS = ["dismiss", "hide", "merge", "edit", "delete"] as const;
 export type PlaceReportAction = (typeof PLACE_REPORT_ACTIONS)[number];

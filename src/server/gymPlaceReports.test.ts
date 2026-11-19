@@ -106,6 +106,39 @@ describe("staff deciding", () => {
     expect(await placeById(b)).not.toBeNull();
   });
 
+  it("delete removes a non-gym for good, and no import brings it back", async () => {
+    await joinPlace("acc:1", a, NOW);
+    await reportPlace("ip:1", a, "notGym", "A knife shop", NOW);
+    const ref = String((await query("SELECT source_ref FROM gym_places WHERE id = ?", [a]))[0]!.source_ref);
+    expect(await decidePlace("staff@x", a, "delete", {}, NOW)).toEqual({ ok: true });
+    expect(await query("SELECT id FROM gym_places WHERE id = ?", [a])).toEqual([]);
+    expect(await query("SELECT * FROM gym_place_lifters WHERE place_id = ?", [a])).toEqual([]);
+    expect(await query("SELECT name, deleted_by FROM gym_places_deleted WHERE source_ref = ?", [ref])).toEqual([
+      { name: "Iron Works", deleted_by: "staff@x" },
+    ]);
+    expect(await reportedPlaces()).toEqual([]);
+    // The same map gym comes in again on a re-import or the daily refresh: it stays deleted, the other one is kept.
+    const r = await savePlaces(
+      placesFromOsm(
+        [
+          { type: "node", id: 1, lat: 49.1, lon: -122.6, tags: { leisure: "fitness_centre", name: "Iron Works" } },
+          { type: "node", id: 2, lat: 49.1001, lon: -122.6001, tags: { leisure: "fitness_centre", name: "Iron Works Gym" } },
+        ],
+        { city: "Langley", region: "BC", country: "CA" },
+      ),
+      NOW + 1,
+    );
+    expect(r.added).toBe(0);
+    expect((await query("SELECT id FROM gym_places")).map((x) => String(x.id))).toEqual([b]);
+    expect(await decidePlace("staff@x", a, "delete", {}, NOW)).toEqual({ ok: false, error: "That gym is gone." });
+  });
+
+  it("won't delete a claimed gym", async () => {
+    await run("UPDATE gym_places SET claimed_by = 'acc-owner' WHERE id = ?", [b]);
+    expect((await decidePlace("staff@x", b, "delete", {}, NOW)).ok).toBe(false);
+    expect(await placeById(b)).not.toBeNull();
+  });
+
   it("reads a gym from its id or its page address", async () => {
     const s = await slugOf(a);
     expect(await placeIdFrom(a)).toBe(a);

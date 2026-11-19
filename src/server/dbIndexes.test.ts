@@ -29,6 +29,12 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "gym imports: map gyms staff deleted (gymPlaces.ts deletedRefs)",
+    sql: "SELECT source_ref FROM gym_places_deleted WHERE source_ref IN (?, ?, ?)",
+    uses: ["sqlite_autoindex_gym_places_deleted_1"],
+    noScan: ["gym_places_deleted"],
+  },
+  {
     name: "form videos: a lifter's videos as coach or client (formVideos.ts videosOf)",
     sql: "SELECT * FROM coach_videos WHERE (coach_id = ? OR client_id = ?) AND ready = 1 ORDER BY at DESC LIMIT 300",
     uses: ["coach_videos_pair", "coach_videos_client"],

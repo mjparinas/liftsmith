@@ -9,7 +9,11 @@ import { randomBytes } from "node:crypto";
 import { isPlaceReportReason, PLACE_REPORT_LIMITS, type PlaceReportAction, type PlaceReportReason } from "@/lib/gymPlaceReport";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
+import { dropPictures, pictureUrls } from "./gymBlob";
+import { refreshChainsQuietly } from "./gymChains";
+import { classEnds } from "./gymClasses";
 import { isPlaceId, type PlaceKind } from "./gymPlaces";
+import { staffEnds } from "./gymStaff";
 
 const s = (x: unknown) => (typeof x === "string" ? x : "");
 const n = (x: unknown) => (typeof x === "number" ? x : Number(x ?? 0));
@@ -147,7 +151,8 @@ export type DecideResult = { ok: true } | { ok: false; error: string };
 /**
  * Staff decide on a reported gym page. `dismiss` closes the reports and changes nothing; `hide` takes the page down;
  * `merge` moves its lifters to the gym it duplicates (`into`: that gym's page address or id), hides it and sends its
- * page and app link there; `edit` fixes its details. Every action but dismiss closes the reports as done.
+ * page and app link there; `edit` fixes its details; `delete` removes it for good (deletePlace). Every action but
+ * dismiss closes the reports as done.
  */
 export async function decidePlace(
   staff: string,
@@ -215,9 +220,58 @@ export async function decidePlace(
       ]);
       return { ok: true };
     }
+    case "delete":
+      return deletePlace(staff, id, now);
     default:
-      return { ok: false, error: "Dismiss, hide, merge or edit?" };
+      return { ok: false, error: "Dismiss, hide, merge, edit or delete?" };
   }
+}
+
+/**
+ * Deletes a gym that was never a gym (a knife shop, a parked domain) for good (Melvin, 2026-11-19: "these gyms need to be
+ * deleted not edited"). Its page and app link stop working, its pictures leave the picture store, lifters who linked it
+ * keep their own gym without the link, and its map id is remembered (gym_places_deleted) so no import or daily refresh
+ * adds it again. A claimed gym can't be deleted: it's a business's own page, so staff hide it instead. Its reports stay,
+ * closed as done, for the record; its chain's counts are worked out again.
+ */
+export async function deletePlace(staff: string, id: string, now = Date.now()): Promise<DecideResult> {
+  const [p] = await query("SELECT id, name, city, region, source_ref, chain, claimed_by FROM gym_places WHERE id = ?", [id]);
+  if (!p) return { ok: false, error: "That gym is gone." };
+  if (s(p.claimed_by)) return { ok: false, error: "This gym is claimed by its owner, so it can't be deleted. Hide it instead." };
+  const urls = await pictureUrls(id);
+  const ref = s(p.source_ref);
+  const city = [s(p.city), s(p.region)].filter(Boolean).join(", ");
+  await batch([
+    ...(ref
+      ? [
+          {
+            sql: "INSERT OR REPLACE INTO gym_places_deleted (source_ref, name, city, deleted_by, at) VALUES (?, ?, ?, ?, ?)",
+            args: [ref, s(p.name), city, staff, now],
+          },
+        ]
+      : []),
+    { sql: "DELETE FROM gym_photos WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
+    { sql: "UPDATE public_gyms SET place_id = '' WHERE place_id = ?", args: [id] },
+    { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_news WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_issues WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_trainers WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_scan_days WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_posters WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_claims WHERE place_id = ?", args: [id] },
+    { sql: "DELETE FROM gym_moves WHERE place_id = ?", args: [id] },
+    ...staffEnds(id),
+    ...classEnds(id),
+    { sql: "DELETE FROM gym_places WHERE id = ? AND claimed_by = ''", args: [id] },
+    {
+      sql: "UPDATE gym_place_reports SET status = 'done', decided_at = ?, decided_by = ? WHERE place_id = ? AND status = 'open'",
+      args: [now, staff, id],
+    },
+  ]);
+  await dropPictures(urls);
+  if (s(p.chain)) await refreshChainsQuietly(now);
+  return { ok: true };
 }
 
 /** Where a merged gym went: its id → the kept gym's id, following a chain at most a few steps. */

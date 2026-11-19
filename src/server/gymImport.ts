@@ -27,7 +27,7 @@ import { SHORT_REGION } from "@/lib/regions";
 
 import { query, run } from "./db";
 import { cityName, km } from "./gymAddress";
-import { clean, placesFromOsm, REC_NAME, savePlaces, UA, type Area, type OsmElement, type OsmSkips } from "./gymPlaces";
+import { clean, deletedRefs, placesFromOsm, REC_NAME, savePlaces, UA, type Area, type OsmElement, type OsmSkips } from "./gymPlaces";
 import { askQlever, gymsFrom, qGymShapes, qGymTags, QLEVER_HOST, qRegions, qTowns, regionsFrom, townsFrom } from "./gymQlever";
 
 export const OVERPASS = [
@@ -582,7 +582,9 @@ export async function importItem(
       for (const row of await query(`SELECT source_ref FROM gym_places WHERE source_ref IN (${part.map(() => "?").join(",")})`, part))
         known.add(String(row.source_ref));
     }
-    const fresh = all.filter((d) => !known.has(d.ref));
+    // Gyms staff deleted aren't new: they're never looked up again, and savePlaces skips them.
+    const gone = await deletedRefs(all.map((d) => d.ref));
+    const fresh = all.filter((d) => !known.has(d.ref) && !gone.has(d.ref));
     r.say(`${all.length} gyms changed on the map, ${fresh.length} of them new to us`);
     const placed: typeof all = all.filter((d) => known.has(d.ref));
     let server = answer.server;

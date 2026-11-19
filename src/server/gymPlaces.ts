@@ -358,6 +358,18 @@ const KEEP_IF_MAP_EMPTY = [
   "chain",
 ] as const;
 
+/** Which of these map ids staff deleted (gym_places_deleted), read by its primary key 400 at a time. */
+export async function deletedRefs(refs: readonly string[]): Promise<Set<string>> {
+  const out = new Set<string>();
+  const reads = await Promise.all(
+    chunks([...new Set(refs.filter(Boolean))], 400).map((part) =>
+      query(`SELECT source_ref FROM gym_places_deleted WHERE source_ref IN (${part.map(() => "?").join(",")})`, part),
+    ),
+  );
+  for (const rows of reads) for (const r of rows) out.add(s(r.source_ref));
+  return out;
+}
+
 /**
  * Writes imported places, keyed on the map's own id (`source_ref`, unique), so running an import again is safe: new
  * ones are added, unclaimed ones refreshed only where the map changed, and claimed ones left exactly as their owner
@@ -393,7 +405,9 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
     ),
   );
   for (const rows of reads) for (const r of rows) had.set(s(r.source_ref), r);
-  const fresh = list.filter((d) => !had.has(d.ref));
+  // Gyms staff deleted (not a gym, a dead listing) stay deleted: the map may still have them, so they're skipped.
+  const gone = await deletedRefs(list.map((d) => d.ref));
+  const fresh = list.filter((d) => !had.has(d.ref) && !gone.has(d.ref));
   const taken = new Set<string>();
   const slugReads = await Promise.all(
     chunks([...new Set(fresh.map((d) => citySlugOf(d.city, d.region)))], 400).map((part) =>
@@ -413,6 +427,7 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
   // Gyms whose city changed: their pages move, with a redirect from the old address (moveToCity).
   const moves: string[] = [];
   for (const d of list) {
+    if (gone.has(d.ref) && !had.has(d.ref)) continue;
     const old = had.get(d.ref);
     if (old) {
       if (s(old.claimed_by)) {
