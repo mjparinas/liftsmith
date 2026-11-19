@@ -154,6 +154,12 @@ export interface Exercise {
    * picked by the generator; added to a routine or a workout by the lifter.
    */
   cardio?: "distance" | "time";
+  /**
+   * A barbell move loaded on one end only, the other end pivoting in a landmine or a corner (landmine
+   * presses, rows and squats, the T-bar row). Its plates go on that one end, so the plate graphic and
+   * "One end: 10 lb" show them once, and the weight is the whole bar plus those plates.
+   */
+  oneEnd?: boolean;
 }
 
 export interface Bar {

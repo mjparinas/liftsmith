@@ -166,3 +166,30 @@ describe("plateStyle", () => {
     expect(plateStyle(25, "lb").height).toBe(34 + Math.round(((25 * 0.45359237) / 25) * 66));
   });
 });
+
+// Landmine and T-bar moves load one end only (Melvin, 2026-11-19: "the weights should only show on one side").
+describe("one end loaded", () => {
+  const lb = [
+    { weight: 45, count: 2 },
+    { weight: 10, count: 2 },
+    { weight: 5, count: 2 },
+    { weight: 2.5, count: 2 },
+  ];
+
+  it("puts every plate for the load on the one free end, and the whole bar counts", () => {
+    // 55 lb on a 45 lb bar: one 10 on the end, not a 5 on each side.
+    expect(loadBar(55, 45, lb, true)).toEqual({ total: 55, perSide: [10], exact: true, oneEnd: true });
+    expect(loadBar(55, 45, lb).perSide).toEqual([5]);
+  });
+
+  it("can use an odd plate, since nothing has to match it on the other side", () => {
+    // One 45 owned: no pair, but it can go on the end.
+    expect(loadBar(90, 45, [{ weight: 45, count: 1 }], true)).toMatchObject({ total: 90, perSide: [45], exact: true });
+    expect(loadBar(90, 45, [{ weight: 45, count: 1 }]).perSide).toEqual([]);
+  });
+
+  it("steps by one of the lightest plate", () => {
+    expect(smallestJump(lb, true)).toBe(2.5);
+    expect(smallestJump(lb)).toBe(5);
+  });
+});

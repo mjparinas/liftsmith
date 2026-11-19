@@ -4,7 +4,8 @@ import { plateStyle, type Loading } from "@/lib/plates";
 import type { Unit } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 
-// A barbell with the plates to load on each side, heaviest nearest the collar. The point is that
+// A barbell with the plates to load on each side, heaviest nearest the collar. A landmine move
+// (`loading.oneEnd`) shows its plates on the free end only, the other end sitting in the pivot. The point is that
 // nobody has to do plate maths between sets.
 
 export type PlateFinish = "classic" | "black" | "chrome" | "neon" | "ember" | "tempest" | "bloom" | "solstice" | "maple" | "obsidian";
@@ -24,6 +25,8 @@ export const PLATE_WORDS = {
   noPlates: "no plates",
   bar: "{bar} {unit} bar",
   eachSide: "Each side:",
+  oneEnd: "One end:",
+  labelEnd: "Load {plates} {unit} on one end of a {bar} {unit} bar",
   empty: "Empty bar",
   nearest: "nearest you can load",
 };
@@ -65,6 +68,7 @@ export function PlateBar({
   words?: PlateWords;
 }) {
   const plates = loading.perSide;
+  const oneEnd = !!loading.oneEnd;
   const W = 360;
   const cy = 60;
   const collar = 118; // x where the left sleeve's collar sits
@@ -80,7 +84,11 @@ export function PlateBar({
         viewBox={`0 0 ${W} 120`}
         className="w-full"
         role="img"
-        aria-label={fill(w.label, { plates: plates.length ? plates.map(fmtNum).join(", ") : w.noPlates, unit, bar: fmtNum(bar) })}
+        aria-label={fill(oneEnd ? w.labelEnd : w.label, {
+          plates: plates.length ? plates.map(fmtNum).join(", ") : w.noPlates,
+          unit,
+          bar: fmtNum(bar),
+        })}
       >
         <defs>
           <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
@@ -119,10 +127,24 @@ export function PlateBar({
         <rect x={W / 2 - 34} y={cy - 3.5} width={68} height={7} rx={2} fill="#6f7a87" opacity={0.5} />
         {/* sleeves */}
         <rect x={6} y={cy - 6} width={collar - 6} height={12} rx={3} fill="url(#steel)" />
-        <rect x={W - collar} y={cy - 6} width={collar - 6} height={12} rx={3} fill="url(#steel)" />
         <rect x={collar - 2} y={cy - 11} width={6} height={22} rx={2} fill="#aeb7c2" />
-        <rect x={W - collar - 4} y={cy - 11} width={6} height={22} rx={2} fill="#aeb7c2" />
-        {[false, true].map((mirror) => (
+        {oneEnd ? (
+          // The other end sits in the landmine: a pivot sleeve on a base, nothing loaded there.
+          <g data-testid="landmine-pivot">
+            <rect x={W - collar} y={cy - 8} width={46} height={16} rx={4} fill="#4b5560" />
+            <circle cx={W - collar + 30} cy={cy} r={4} fill="#aeb7c2" />
+            <path
+              d={`M${W - collar + 14} ${cy + 8} L${W - collar + 46} ${cy + 8} L${W - collar + 54} ${cy + 22} L${W - collar + 6} ${cy + 22} Z`}
+              fill="#4b5560"
+            />
+          </g>
+        ) : (
+          <>
+            <rect x={W - collar} y={cy - 6} width={collar - 6} height={12} rx={3} fill="url(#steel)" />
+            <rect x={W - collar - 4} y={cy - 11} width={6} height={22} rx={2} fill="#aeb7c2" />
+          </>
+        )}
+        {(oneEnd ? [false] : [false, true]).map((mirror) => (
           <g key={String(mirror)} transform={mirror ? `translate(${W},0) scale(-1,1)` : undefined}>
             {left.map(({ w, s, x }, i) => {
               const f = finished(s, finish);
@@ -165,7 +187,7 @@ export function PlateBar({
       <p className="text-center text-sm text-muted num">
         {plates.length ? (
           <>
-            {w.eachSide} <span className="font-semibold text-ink">{plates.map(fmtNum).join(" + ")}</span> {unit}
+            {oneEnd ? w.oneEnd : w.eachSide} <span className="font-semibold text-ink">{plates.map(fmtNum).join(" + ")}</span> {unit}
           </>
         ) : (
           w.empty

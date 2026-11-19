@@ -529,7 +529,7 @@ export function Workout() {
         : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
-  const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
+  const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates, ex.oneEnd) : null;
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
