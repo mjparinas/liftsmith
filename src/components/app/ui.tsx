@@ -838,13 +838,14 @@ export function LinkToggle({
 export function CountDot({ n, className = "" }: { n: number; className?: string }) {
   if (n <= 0) return null;
   return (
+    // The number is drawn by CSS (`.count-dot::after`), not as text, so it never joins the visible text of the tab or
+    // link it sits on: their accessible names start with their own words (WCAG 2.5.3, axe label-content-name-mismatch).
     <span
       aria-hidden
       data-count={n}
-      className={`num grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full border-2 border-bg bg-bad px-1 text-[0.625rem] font-extrabold leading-none text-bad-ink ${className}`}
-    >
-      {countText(n)}
-    </span>
+      data-label={countText(n)}
+      className={`count-dot num grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full border-2 border-bg bg-bad px-1 text-[0.625rem] font-extrabold leading-none text-bad-ink ${className}`}
+    />
   );
 }
 

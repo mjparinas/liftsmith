@@ -722,3 +722,8 @@ input[type="range"].slider::-moz-range-thumb { width: 18px; height: 18px; border
 }
 .gyms-map.leaflet-container .leaflet-bar a:hover, .gyms-map.leaflet-container .leaflet-bar a:focus-visible { background: var(--color-raised, var(--color-surface)); }
 .gyms-map.leaflet-container .leaflet-control-attribution { background: color-mix(in srgb, var(--color-bg) 75%, transparent); color: var(--color-ink); font-size: 0.6875rem; }
+
+/* A red count (CountDot in ui.tsx): the number comes from data-label, so it isn't part of the control's text. */
+.count-dot::after {
+  content: attr(data-label);
+}
