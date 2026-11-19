@@ -113,6 +113,10 @@ export const es: FeaturesText = {
       note: "Los recordatorios de rehabilitación y el aviso de programa nuevo son para Android y iPhone.",
     },
     cycle: { name: "Preparación según el ciclo", body: "Si quieres, registra tu ciclo y la decisión de hoy lo tiene en cuenta." },
+    pregnancy: {
+      name: "Modo embarazo y posparto",
+      body: "Dile que estás embarazada o que has tenido a tu bebé y cada entrenamiento se adapta a la semana: cargas más ligeras, ninguna serie al límite, nada boca arriba al final del embarazo y una vuelta gradual de unas 16 semanas después del parto.",
+    },
     "goal-planner": {
       name: "Planificador de metas",
       body: "Elige un ejercicio y un objetivo, y calcula una fecha realista y el camino para llegar.",

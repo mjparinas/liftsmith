@@ -46,6 +46,7 @@ const SCROLL = {
   "labs-gear": ["lab.sonos.title"],
   "form-cues": ["ff.title"],
   "auto-supersets": ["train.adapt"],
+  pregnancy: ["preg.title"],
 };
 /**
  * What to tap before the picture (a catalogue key): the button that opens a sheet, or a switch that shows more, turned
@@ -56,6 +57,8 @@ const TAP = {
   "screenshot-share": { role: "button", key: "card.shot.open" },
   "labs-coach": { role: "switch", key: "lab.repCount.title", undo: true },
   "auto-supersets": { role: "switch", key: "train.ss", undo: true },
+  // The pregnancy setting shows only when Your stats don't say male; the playthrough's lifter is male, so switch and back.
+  pregnancy: { role: "button", key: "stats.female", back: "stats.male" },
 };
 const tap = (T, e) => page.getByRole(TAP[e.id].role, { name: T[TAP[e.id].key] }).first().click();
 /** Emails shown at desktop size, because they're about the computer. */
@@ -210,6 +213,10 @@ try {
       if (TAP[e.id]?.undo) {
         await page.evaluate(() => window.scrollTo(0, 0));
         await tap(T, e);
+      }
+      if (TAP[e.id]?.back) {
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.getByRole(TAP[e.id].role, { name: T[TAP[e.id].back] }).first().click();
       }
       if (TAP[e.id]) {
         await page.reload();

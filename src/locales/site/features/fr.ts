@@ -118,6 +118,10 @@ export const fr: FeaturesText = {
       note: "Les rappels de rééducation et la notification de nouveau programme sont sur Android et iPhone.",
     },
     cycle: { name: "Forme selon le cycle", body: "Si vous le souhaitez, notez votre cycle et la décision du jour en tient compte." },
+    pregnancy: {
+      name: "Mode grossesse et post-partum",
+      body: "Indiquez que vous êtes enceinte ou que vous avez eu votre bébé et chaque séance s’adapte à la semaine : charges plus légères, aucune série à fond, rien sur le dos en fin de grossesse et une reprise progressive d’environ 16 semaines après l’accouchement.",
+    },
     "goal-planner": {
       name: "Planificateur d’objectifs",
       body: "Choisissez un mouvement et une cible : l’appli calcule une date réaliste et le chemin pour y arriver.",

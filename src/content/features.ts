@@ -155,6 +155,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "pregnancy",
+        name: "Pregnancy and postpartum mode",
+        body: "Tell it you're pregnant or have had a baby and every workout fits the week: lighter loads, no all-out sets, nothing lying on your back later in pregnancy, and a gradual return over about 16 weeks after birth.",
+        tier: "free",
+        added: "2026-11-19",
+      },
+      {
         id: "goal-planner",
         name: "Goal planner",
         body: "Pick a lift and a target, and it works out a realistic date and the path to it.",

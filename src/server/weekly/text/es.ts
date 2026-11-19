@@ -945,4 +945,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "¿Un horario está mal? Informa de un problema en su página, o reclámala y ponlo tú.",
   },
+  pregnancy: {
+    title: "Entrenar durante el embarazo y después del parto",
+    intro: "El modo embarazo y posparto cambia cada entrenamiento según la semana, como hace el modo lesión.",
+    points: [
+      "Actívalo en Ajustes › Cuerpo y unidades: elige embarazada o ya he tenido a mi bebé y luego las semanas con el selector.",
+      "Las cargas bajan con las semanas y cada serie se queda lejos del fallo.",
+      "Al final del embarazo, nada boca arriba ni boca abajo, sin saltos ni abdominales.",
+      "Después del parto, una vuelta gradual de unas 16 semanas, dos más tras una cesárea.",
+    ],
+    dyk: "Es gratis, se queda en tu teléfono y cada cambio dice por qué en Hoy.",
+  },
 };

@@ -946,4 +946,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
   },
+  pregnancy: {
+    title: "Training in der Schwangerschaft und nach der Geburt",
+    intro: "Der Modus für Schwangerschaft und Rückbildung passt jedes Training an die Woche an, so wie der Verletzungsmodus.",
+    points: [
+      "Richte ihn ein unter Einstellungen › Körper und Einheiten: wähle schwanger oder Baby ist da, dann die Wochen mit − / +.",
+      "Die Lasten sinken mit den Wochen, und jeder Satz endet weit vor dem Muskelversagen.",
+      "Später in der Schwangerschaft nichts in Rücken- oder Bauchlage, keine Sprünge und keine Crunches.",
+      "Nach der Geburt ein schrittweiser Wiedereinstieg über etwa 16 Wochen, nach einem Kaiserschnitt zwei Wochen länger.",
+    ],
+    dyk: "Er ist kostenlos, bleibt auf deinem Handy, und jede Änderung sagt auf Heute, warum.",
+  },
 };

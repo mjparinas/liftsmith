@@ -943,4 +943,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Złe godziny? Zgłoś problem na stronie siłowni albo przejmij ją i popraw je sam.",
   },
+  pregnancy: {
+    title: "Trening w ciąży i po porodzie",
+    intro: "Tryb ciąży i połogu dopasowuje każdy trening do tygodnia, tak jak tryb kontuzji.",
+    points: [
+      "Włącz go w Ustawienia › Ciało i jednostki: wybierz ciążę albo poród, a potem tygodnie przyciskami − / +.",
+      "Ciężary spadają z tygodniami, a każda seria kończy się daleko od upadku.",
+      "W późnej ciąży nic na plecach ani na brzuchu, bez skoków i bez brzuszków.",
+      "Po porodzie stopniowy powrót przez około 16 tygodni, po cesarskim cięciu o dwa tygodnie dłużej.",
+    ],
+    dyk: "Jest za darmo, zostaje w Twoim telefonie, a każda zmiana mówi na ekranie Dziś, dlaczego.",
+  },
 };

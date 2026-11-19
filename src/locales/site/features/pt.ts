@@ -162,6 +162,10 @@ export const pt: FeaturesText = {
       name: "Prontidão que considera o ciclo",
       body: "Se quiser, registre seu ciclo menstrual e a decisão do dia passa a levá-lo em conta.",
     },
+    pregnancy: {
+      name: "Modo gravidez e pós-parto",
+      body: "Conte que você está grávida ou já teve seu bebê e cada treino se ajusta à semana: cargas mais leves, nenhuma série até a falha, nada de costas no fim da gravidez e uma volta gradual de cerca de 16 semanas depois do parto.",
+    },
     "goal-planner": {
       name: "Planejador de metas",
       body: "Escolha um exercício e uma meta, e ele calcula uma data realista e o caminho até lá.",

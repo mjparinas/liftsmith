@@ -963,4 +963,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
   },
+  pregnancy: {
+    title: "Training through pregnancy and after birth",
+    intro: "Pregnancy and postpartum mode changes every workout with the week, the way injury mode does.",
+    points: [
+      "Set it up in Settings › Body and units: pick pregnant or had my baby, then the weeks on a stepper.",
+      "Loads come down as the weeks go by, and every set stops well short of failure.",
+      "Later in pregnancy, nothing lying on your back or belly, no jumps and no crunches.",
+      "After birth, a gradual return over about 16 weeks, two weeks longer after a C-section.",
+    ],
+    dyk: "It's free, it stays on your phone, and every change says why on Today.",
+  },
 };

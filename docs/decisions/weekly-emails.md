@@ -778,3 +778,12 @@ Find gyms near you now says which gyms are open, and when they close or open nex
 - Tap Open now above the list to hide the closed ones, on the map too.
 - It's worked out on your own clock, for gyms near you.
 Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")
+
+### W69 · Training through pregnancy and after birth (**New**, 2026-11-19)
+Free · Lifters, but not accounts whose synced profile says male (`notMale`) · Screenshot of the setting · `fresh`, so it goes next to everyone already in the series
+Pregnancy and postpartum mode changes every workout with the week, the way injury mode does.
+- Set it up in Settings › Body and units: pick pregnant or had my baby, then the weeks on a stepper.
+- Loads come down as the weeks go by, and every set stops well short of failure.
+- Later in pregnancy, nothing lying on your back or belly, no jumps and no crunches.
+- After birth, a gradual return over about 16 weeks, two weeks longer after a C-section.
+Did you know? It's free, it stays on your phone, and every change says why on Today. ([Pregnancy and postpartum mode](pregnancy.md))

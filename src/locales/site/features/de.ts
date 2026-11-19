@@ -120,6 +120,10 @@ export const de: FeaturesText = {
       name: "Bereitschaft nach Zyklus",
       body: "Wenn du möchtest, trägst du deinen Zyklus ein, und die heutige Ansage berücksichtigt ihn.",
     },
+    pregnancy: {
+      name: "Modus für Schwangerschaft und Rückbildung",
+      body: "Sag, dass du schwanger bist oder dein Baby da ist, und jedes Training passt zur Woche: leichtere Lasten, keine Sätze bis zum Limit, später in der Schwangerschaft nichts in Rückenlage und ein schrittweiser Wiedereinstieg über etwa 16 Wochen nach der Geburt.",
+    },
     "goal-planner": {
       name: "Zielplaner",
       body: "Wähle eine Übung und ein Ziel, und es berechnet ein realistisches Datum und den Weg dorthin.",

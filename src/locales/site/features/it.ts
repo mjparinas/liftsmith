@@ -114,6 +114,10 @@ export const it: FeaturesText = {
       note: "I promemoria di riabilitazione e la notifica di un nuovo programma sono su Android e iPhone.",
     },
     cycle: { name: "Prontezza secondo il ciclo", body: "Se vuoi, registra il tuo ciclo e la scelta di oggi ne tiene conto." },
+    pregnancy: {
+      name: "Modalità gravidanza e post-parto",
+      body: "Digli che sei incinta o che hai avuto il tuo bambino e ogni allenamento si adatta alla settimana: carichi più leggeri, nessuna serie al limite, niente supina a fine gravidanza e un ritorno graduale di circa 16 settimane dopo il parto.",
+    },
     "goal-planner": {
       name: "Pianificatore di obiettivi",
       body: "Scegli un esercizio e un obiettivo: calcola una data realistica e la strada per arrivarci.",

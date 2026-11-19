@@ -18,6 +18,7 @@
     "src/lib/autoSuperset.ts",
     "src/lib/goals.ts",
     "src/lib/injury.ts",
+    "src/lib/pregnancy.ts",
     "src/lib/layoff.ts",
     "src/lib/liftPage.ts",
     "src/lib/liftStats.ts",
