@@ -797,3 +797,11 @@ Clients can now film a set in the app and send it to you, and you answer right o
 - They tap a note to jump to that moment, and can answer with a note of their own.
 - Videos stay private to the two of you and go when either of you ends coaching.
 Did you know? Clients under 18 can't send form videos. Sending one is free for clients. ([Trainer mode](trainer-mode.md) "Form videos")
+### W71 · Find a routine another lifter made (**New**, 2026-11-19)
+Free · Lifters · No screenshot (the routines come from our server in lifters' own words) · `fresh`, so it goes next to everyone already in the series
+The new routine library has routines other lifters published, ready to save in a tap.
+- Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.
+- Save one and it lands in your routines, ready to start or change.
+- Rate it with stars once you've saved it. Stars show from three ratings.
+- Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.
+Did you know? Every published routine gets its own page on the website, so you can share it with anyone. ([Routine library](routine-library.md))

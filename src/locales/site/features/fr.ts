@@ -277,6 +277,11 @@ export const fr: FeaturesText = {
       name: "Vos propres routines",
       body: "Créez des routines depuis le catalogue d’exercices, sans limite de nombre, et partagez-les par lien.",
     },
+    "routine-library": {
+      name: "Bibliothèque de routines",
+      body: "Cherchez les routines publiées par d'autres selon l'objectif, des mots et ce que votre salle propose, enregistrez-en une d'un geste et notez-la avec des étoiles. Publiez la vôtre depuis son éditeur, avec ou sans votre nom, et elle a sa propre page sur le site. Seuls les exercices et les séries sont partagés, jamais vos charges ni vos notes.",
+      note: "Publier demande un compte et 18 ans. Tout le monde peut parcourir.",
+    },
     library: {
       name: "1 000 exercices",
       body: "Force, poids du corps, machines, élastiques, kettlebells et cardio, avec recherche, filtres par muscle et un filtre pour cette salle. Le cardio enregistre la durée et la distance.",

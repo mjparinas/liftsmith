@@ -329,6 +329,11 @@ export const pl: FeaturesText = {
       name: "Twoje własne rutyny",
       body: "Buduj rutyny z przeglądarki ćwiczeń, bez limitu liczby, i udostępniaj je jako link.",
     },
+    "routine-library": {
+      name: "Biblioteka rutyn",
+      body: "Szukaj rutyn opublikowanych przez innych według celu, słów i sprzętu na twojej siłowni, zapisz jedną jednym dotknięciem i oceń ją gwiazdkami. Opublikuj własną z jej edytora, z imieniem lub bez, a dostanie własną stronę w serwisie. Wychodzą tylko ćwiczenia i serie, nigdy twoje ciężary ani notatki.",
+      note: "Publikowanie wymaga konta i ukończonych 18 lat. Przeglądać może każdy.",
+    },
     library: {
       name: "1000 ćwiczeń",
       body: "Siłowe, z masą ciała, na maszynach, z gumami, z kettlebellami i cardio, z wyszukiwarką, filtrami mięśni i filtrem „ta siłownia”. Cardio zapisuje czas i dystans.",

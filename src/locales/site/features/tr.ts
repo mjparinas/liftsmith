@@ -329,6 +329,11 @@ export const tr: FeaturesText = {
       name: "Kendi rutinlerin",
       body: "Egzersiz tarayıcısından sınırsız sayıda rutin oluştur ve link olarak paylaş.",
     },
+    "routine-library": {
+      name: "Rutin kütüphanesi",
+      body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
+      note: "Yayımlamak için hesap ve 18 yaş gerekir. Herkes göz atabilir.",
+    },
     library: {
       name: "1.000 egzersiz",
       body: "Serbest ağırlık, vücut ağırlığı, makineler, lastik bantlar, kettlebell ve kardiyo; arama, kas filtreleri ve bu salon filtresiyle. Kardiyo süre ve mesafe kaydeder.",

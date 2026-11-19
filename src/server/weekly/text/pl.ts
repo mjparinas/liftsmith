@@ -966,4 +966,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Znajdziesz to w Ustawieniach › Połączone aplikacje, a lista pod mapą regeneracji w zakładce Ciało pokazuje, co jest liczone.",
   },
+  "routine-library": {
+    title: "Znajdź rutynę ułożoną przez kogoś innego",
+    intro: "Nowa biblioteka rutyn zbiera rutyny opublikowane przez innych, gotowe do zapisania jednym dotknięciem.",
+    points: [
+      "Szukaj po słowach, wybierz cel albo włącz Pasuje do mojej siłowni, by widzieć tylko rutyny, na które pozwala twój sprzęt.",
+      "Zapisana rutyna trafia do twoich rutyn, gotowa do startu albo zmian.",
+      "Oceń ją gwiazdkami po zapisaniu. Gwiazdki widać od trzech ocen.",
+      "Opublikuj własną z jej edytora, z imieniem lub bez. Wychodzą tylko ćwiczenia i serie, nigdy ciężary ani notatki.",
+    ],
+    dyk: "Każda opublikowana rutyna ma własną stronę w serwisie, którą możesz wysłać komu chcesz.",
+  },
 };
