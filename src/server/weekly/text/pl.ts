@@ -988,4 +988,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Brak zasięgu na siłowni? Serie czekają na tablecie i pójdą, gdy wróci.",
   },
+  "gym-chains": {
+    title: "Wszystkie lokalizacje Twojej sieci",
+    intro: "Siłownie należące do sieci pokazują teraz jej logo i link do wszystkich lokalizacji.",
+    points: [
+      "Na stronie siłowni z sieci dotknij Zobacz wszystkie lokalizacje pod jej nazwą.",
+      "Lista zaczyna się od lokalizacji najbliższych miejscu, w którym ostatnio szukano siłowni.",
+      "Dotknij lokalizacji, aby zobaczyć godziny otwarcia i dodać ją razem ze sprzętem jednym dotknięciem.",
+      "Na stronie internetowej każda sieć ma własną stronę ze wszystkimi lokalizacjami.",
+    ],
+    dyk: "Trenujesz w dwóch lokalizacjach? Dodaj obie jako siłownie, a Liftsmith zaplanuje każdy trening pod sprzęt tam, gdzie jesteś.",
+  },
 };

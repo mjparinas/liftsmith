@@ -323,6 +323,11 @@ export const de: FeaturesText = {
       name: "Kurspläne auf Studioseiten",
       body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
     },
+    "gym-chains": {
+      name: "Alle Standorte einer Studiokette",
+      body: "Studios einer Kette zeigen ihr Logo und verlinken auf eine Seite mit allen Standorten, in der App die nächsten zuerst. Auf der Website hat jede Kette ihre eigene Seite.",
+      note: "Ketten erkennen wir an der Marke auf der Karte oder an einem Namen, den Studios in mehreren Städten tragen. Beanspruchte Studios behalten ihr eigenes Logo.",
+    },
     "gym-open-now": {
       name: "Jetzt geöffnet in der Studiosuche",
       body: "Studios in deiner Nähe zeigen, ob sie gerade geöffnet haben und wann sie schließen oder wieder öffnen. Ein Tippen auf Jetzt geöffnet zeigt nur die, in die du gleich gehen kannst.",

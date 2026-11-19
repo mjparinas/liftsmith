@@ -77,6 +77,9 @@ export const en = {
   "wn.c.outsideWorkouts.title": "Workouts from other apps count",
   "wn.c.outsideWorkouts.body":
     "Turn on Count workouts from other apps in Connected apps, and runs, rides, sports and classes from Health shape your recovery and tomorrow's plan.",
+  "wn.c.gymChains.title": "Every location of a gym chain",
+  "wn.c.gymChains.body":
+    "Gyms that belong to a chain show its logo and a link to a page with every one of its locations, nearest first, so you can find and add your branch in a tap.",
 } as const;
 
 type Key = keyof typeof en;
@@ -163,6 +166,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Cuentan los entrenamientos de otras apps",
   "wn.c.outsideWorkouts.body":
     "Activa Contar entrenamientos de otras apps en Apps conectadas y las carreras, salidas en bici, deportes y clases de Salud ajustan tu recuperación y el plan de mañana.",
+  "wn.c.gymChains.title": "Todas las sedes de una cadena",
+  "wn.c.gymChains.body":
+    "Los gimnasios de una cadena muestran su logo y un enlace a una página con todas sus sedes, las más cercanas primero, para encontrar y añadir la tuya con un toque.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -249,6 +255,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Les séances d'autres apps comptent",
   "wn.c.outsideWorkouts.body":
     "Active Compter les séances d'autres apps dans Apps connectées : courses, vélo, sports et cours de Santé ajustent ta récupération et le plan de demain.",
+  "wn.c.gymChains.title": "Toutes les adresses d'une chaîne",
+  "wn.c.gymChains.body":
+    "Les salles d'une chaîne affichent son logo et un lien vers une page avec toutes ses adresses, les plus proches d'abord, pour trouver et ajouter la vôtre d'un toucher.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -333,6 +342,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Trainings aus anderen Apps zählen",
   "wn.c.outsideWorkouts.body":
     "Schalte unter Verbundene Apps Trainings aus anderen Apps zählen ein, dann prägen Läufe, Radtouren, Sport und Kurse aus Health deine Erholung und den Plan für morgen.",
+  "wn.c.gymChains.title": "Alle Standorte einer Studiokette",
+  "wn.c.gymChains.body":
+    "Studios einer Kette zeigen ihr Logo und einen Link zu einer Seite mit allen Standorten, die nächsten zuerst, damit du deinen mit einem Tippen findest und hinzufügst.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -417,6 +429,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Contano gli allenamenti di altre app",
   "wn.c.outsideWorkouts.body":
     "Attiva Conta gli allenamenti di altre app in App collegate: corse, bici, sport e corsi da Salute regolano il tuo recupero e il piano di domani.",
+  "wn.c.gymChains.title": "Tutte le sedi di una catena",
+  "wn.c.gymChains.body":
+    "Le palestre di una catena mostrano il suo logo e un link a una pagina con tutte le sedi, prima le più vicine, così trovi e aggiungi la tua con un tocco.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -493,6 +508,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "他のアプリのワークアウトも反映",
   "wn.c.outsideWorkouts.body":
     "連携アプリで「他のアプリのワークアウトを反映」をオンにすると、ヘルスケアのランニング、サイクリング、スポーツ、クラスが回復と明日のプランに反映されます。",
+  "wn.c.gymChains.title": "ジムチェーンの全店舗",
+  "wn.c.gymChains.body":
+    "チェーンのジムにはロゴと全店舗のページへのリンクが表示されます。近い順に並ぶので、自分の店舗をタップひとつで見つけて追加できます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -573,6 +591,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Treinos de outros apps contam",
   "wn.c.outsideWorkouts.body":
     "Ligue Contar treinos de outros apps em Apps conectados e corridas, pedais, esportes e aulas do Saúde ajustam sua recuperação e o plano de amanhã.",
+  "wn.c.gymChains.title": "Todas as unidades de uma rede",
+  "wn.c.gymChains.body":
+    "Academias de uma rede mostram o logo dela e um link para uma página com todas as unidades, as mais próximas primeiro, para você achar e adicionar a sua com um toque.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -646,6 +667,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "다른 앱의 운동도 반영",
   "wn.c.outsideWorkouts.body":
     "연결된 앱에서 '다른 앱의 운동 반영'을 켜면 건강 앱의 달리기, 자전거, 스포츠, 수업이 회복과 내일 계획에 반영돼요.",
+  "wn.c.gymChains.title": "헬스장 체인의 모든 지점",
+  "wn.c.gymChains.body":
+    "체인 헬스장에는 체인 로고와 모든 지점을 모은 페이지 링크가 나옵니다. 가까운 순으로 보여 주니 탭 한 번으로 내 지점을 찾아 추가하세요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -726,6 +750,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Liczą się treningi z innych aplikacji",
   "wn.c.outsideWorkouts.body":
     "Włącz Licz treningi z innych aplikacji w Połączonych aplikacjach, a biegi, rower, sporty i zajęcia ze Zdrowia wpłyną na regenerację i plan na jutro.",
+  "wn.c.gymChains.title": "Wszystkie lokalizacje sieci siłowni",
+  "wn.c.gymChains.body":
+    "Siłownie należące do sieci pokazują jej logo i link do strony ze wszystkimi lokalizacjami, od najbliższych, więc znajdziesz i dodasz swoją jednym dotknięciem.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -807,4 +834,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.outsideWorkouts.title": "Diğer uygulamalardaki antrenmanlar sayılıyor",
   "wn.c.outsideWorkouts.body":
     "Bağlı uygulamalarda Diğer uygulamalardaki antrenmanları say seçeneğini aç; Sağlık'taki koşu, bisiklet, spor ve dersler toparlanmanı ve yarının planını şekillendirsin.",
+  "wn.c.gymChains.title": "Bir zincirin tüm şubeleri",
+  "wn.c.gymChains.body":
+    "Bir zincire ait salonlar zincirin logosunu ve tüm şubelerinin olduğu sayfaya bir bağlantı gösterir; en yakınlar önce, böylece kendi şubeni tek dokunuşla bulup eklersin.",
 };

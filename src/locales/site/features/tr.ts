@@ -382,6 +382,11 @@ export const tr: FeaturesText = {
       name: "Salon sayfalarında ders programı",
       body: "Resmî salonlar her hafta verdikleri dersleri eğitmen ve alanla birlikte paylaşır, dersin olmadığı günleri işaretler. Üyeler haftayı uygulamada ve webde salonun sayfasında görür, sıradaki dersi tek dokunuşla takvimine ekler.",
     },
+    "gym-chains": {
+      name: "Bir salon zincirinin tüm şubeleri",
+      body: "Bir zincire ait salonlar zincirin logosunu gösterir ve tüm şubelerinin olduğu bir sayfaya bağlanır; uygulamada en yakınlar önce. Web sitesinde her zincirin kendi sayfası var.",
+      note: "Zincirleri haritadaki marka bilgisinden ya da birkaç şehirdeki salonların paylaştığı bir addan tanırız. Sahiplenilmiş salonlar kendi logolarını korur.",
+    },
     "gym-open-now": {
       name: "Salon bulucuda Şu an açık",
       body: "Yakındaki salonlar şu an açık olup olmadığını, ne zaman kapanıp yeniden açılacağını gösterir. Şu an açık'a bir dokunuş yalnızca hemen gidebileceğin salonları bırakır.",

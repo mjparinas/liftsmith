@@ -991,4 +991,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Kein Empfang im Kraftraum? Die Sätze warten auf dem Tablet und gehen raus, sobald er wieder da ist.",
   },
+  "gym-chains": {
+    title: "Alle Standorte deiner Studiokette",
+    intro: "Studios einer Kette zeigen jetzt ihr Logo und einen Link zu allen ihren Standorten.",
+    points: [
+      "Tippe auf der Seite eines Kettenstudios unter dem Namen auf Alle Standorte ansehen.",
+      "Die Liste beginnt mit den Standorten, die dem Ort deiner letzten Studiosuche am nächsten sind.",
+      "Tippe auf einen Standort, um die Öffnungszeiten zu sehen und ihn mit einem Tippen samt Geräten hinzuzufügen.",
+      "Auf der Website hat jede Kette ihre eigene Seite mit allen Standorten.",
+    ],
+    dyk: "Du trainierst in zwei Standorten? Füge beide als Studios hinzu, und Liftsmith plant jedes Training mit den Geräten vor Ort.",
+  },
 };

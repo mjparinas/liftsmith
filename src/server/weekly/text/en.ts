@@ -1008,4 +1008,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "No reception in the weight room? Sets wait on the tablet and go up when it's back.",
   },
+  "gym-chains": {
+    title: "Every location of your gym chain",
+    intro: "Gyms that belong to a chain now show its logo and a link to every one of its locations.",
+    points: [
+      "On a chain gym's page, tap See all locations under its name.",
+      "The list starts with the branches nearest where you last looked for gyms.",
+      "Tap a branch to see its hours and add it with its equipment in one tap.",
+      "On the website, each chain has its own page listing every branch.",
+    ],
+    dyk: "Train at two branches? Add both as gyms and Liftsmith plans each workout for the equipment where you are.",
+  },
 };

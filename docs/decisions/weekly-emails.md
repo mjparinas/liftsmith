@@ -816,3 +816,12 @@ Team sessions put one workout for your whole team on one tablet.
 - The board shows who hasn't logged a set yet, never a weight.
 - End it and each athlete's sets are saved to their own account.
 Did you know? No reception in the weight room? Sets wait on the tablet and go up when it's back. ([School teams](school-teams.md) "Team sessions")
+
+### W73 · Every location of your gym chain (**New**, 2026-11-19)
+Free · Lifters · No screenshot (a chain's page needs gyms from the server) · `fresh`, so it goes next to everyone already in the series
+Gyms that belong to a chain now show its logo and a link to every one of its locations.
+- On a chain gym's page, tap See all locations under its name.
+- The list starts with the branches nearest where you last looked for gyms.
+- Tap a branch to see its hours and add it with its equipment in one tap.
+- On the website, each chain has its own page listing every branch.
+Did you know? Train at two branches? Add both as gyms and Liftsmith plans each workout for the equipment where you are. ([Gyms](gyms.md) "Gym chains")

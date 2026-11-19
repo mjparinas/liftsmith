@@ -992,4 +992,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Sem sinal na sala de musculação? As séries esperam no tablet e sobem quando ele voltar.",
   },
+  "gym-chains": {
+    title: "Todas as unidades da sua rede",
+    intro: "Academias de uma rede agora mostram o logo dela e um link para todas as unidades.",
+    points: [
+      "Na página de uma academia de rede, toque em Ver as unidades abaixo do nome.",
+      "A lista começa pelas unidades mais próximas de onde você procurou academias pela última vez.",
+      "Toque em uma unidade para ver o horário e adicioná-la com os equipamentos em um toque.",
+      "No site, cada rede tem sua própria página com todas as unidades.",
+    ],
+    dyk: "Treina em duas unidades? Adicione as duas e o Liftsmith planeja cada treino com os equipamentos de onde você estiver.",
+  },
 };
