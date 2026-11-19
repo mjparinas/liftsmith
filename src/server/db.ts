@@ -1584,6 +1584,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // How big a gym website's icon is (the smaller side, in pixels; 2026-11-19, docs/decisions/gyms.md "Sharper icons"):
   // 0 for an icon kept before it was measured, so gymEnrich.ts measureIcons measures it once from its first bytes.
   ["gym_photos", "px", "INTEGER NOT NULL DEFAULT 0"],
+  // Where the picture's file lives in Vercel Blob (gymBlob.ts, 2026-11-19); '' while its bytes are still in `image`.
+  // Once it's set, `image` is left empty.
+  ["gym_photos", "url", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 /**
@@ -1609,6 +1612,8 @@ const LATE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS gym_places_web ON gym_places (enriched_at) WHERE claimed_by = '' AND hidden = 0 AND website <> ''`,
   // Website icons kept before they were measured (gymEnrich.ts measureIcons); empty once they all are.
   `CREATE INDEX IF NOT EXISTS gym_photos_unmeasured ON gym_photos (place_id) WHERE kind = 'icon' AND px = 0`,
+  // Pictures whose bytes are still in the database (gymBlob.ts movePictures); empty once they've all moved to Blob.
+  `CREATE INDEX IF NOT EXISTS gym_photos_unmoved ON gym_photos (place_id) WHERE url = ''`,
   `CREATE INDEX IF NOT EXISTS gym_places_ai ON gym_places (ai_at) WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0`,
   // The AI fix-up pass takes each unclaimed gym with a website once, ever (gymAiFix.ts).
   `CREATE INDEX IF NOT EXISTS gym_places_ai_fix ON gym_places (ai_fix_at) WHERE claimed_by = '' AND hidden = 0 AND pending = 0 AND website <> ''`,
