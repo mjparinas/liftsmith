@@ -9,7 +9,7 @@ import { BRAND } from "@/lib/brand";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 /** The day this page's claims were last checked against the code. */
-export const TRUST_UPDATED = "16 November 2026";
+export const TRUST_UPDATED = "19 November 2026";
 
 export interface Control {
   title: string;
@@ -105,6 +105,70 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
   },
 ];
 
+/** One outside service and what it gets, for "What leaves your phone". Each service gets something only while the lifter
+ *  uses the feature named in `when`; anything not listed never leaves the phone (`STAYS`). */
+export interface DataFlow {
+  service: string;
+  gets: string;
+  when: string;
+}
+
+export const DATA_FLOWS: DataFlow[] = [
+  {
+    service: `${BRAND.name} (Vercel and Turso)`,
+    gets: "Your training, settings and health readings, kept under your account",
+    when: "Only once you sign in, to back up and sync your devices",
+  },
+  {
+    service: `${BRAND.name} usage stats`,
+    gets: "Which screens and features are used, under a random install id. No health data",
+    when: "Unless you turn usage stats off (off by default in the EU and UK)",
+  },
+  { service: "Google or Apple", gets: "That you signed in to " + BRAND.name, when: "When you sign in with Google or Apple" },
+  {
+    service: "Google Play, App Store, RevenueCat",
+    gets: "Your purchase and a random install id. Never your name, email or workouts",
+    when: "When you start a trial or buy Pro in the app",
+  },
+  { service: "Stripe", gets: "Your card and email, on Stripe's own page", when: "When you buy Pro or a coach's program on the web" },
+  {
+    service: "Firebase and Apple push",
+    gets: "Your device's push address and the text of each notification",
+    when: "When you allow notifications for Friends, clubs or a coach",
+  },
+  { service: "Resend", gets: "Your email address and the emails we send you", when: "While Email me is on" },
+  {
+    service: "Strava",
+    gets: "Each finished workout: its time and the sets, one line per exercise",
+    when: "Only if you connect Strava and leave posting on",
+  },
+  {
+    service: "Oura, WHOOP, Withings, Polar, Concept2, Garmin",
+    gets: "Our requests for your readings or sessions, and nothing else",
+    when: "Only if you connect that service",
+  },
+  { service: "Sonos", gets: "Play, pause, skip and volume for your speaker", when: "Only if you connect Sonos in Labs" },
+  {
+    service: "Anthropic (Claude)",
+    gets: "An email you sent us, or a reported post, for one suggestion. Never your training",
+    when: "When staff answer your email or review a report",
+  },
+  {
+    service: "Mapbox",
+    gets: "Nothing about you: map tiles come through our own server",
+    when: "When a gym map is on screen",
+  },
+];
+
+/** What never leaves the phone, whatever is switched on. */
+export const STAYS = [
+  "Progress photos",
+  "The camera, for rep counting, bar speed and form checks",
+  "Your voice, for voice set logging",
+  "Bluetooth heart rate straps, scales and gym machines",
+  "Health Connect and Apple Health, until you sign in to sync",
+];
+
 function Shield({ status }: { status: "live" | "progress" }) {
   const live = status === "live";
   return (
@@ -176,6 +240,47 @@ export function TrustCentre() {
           </section>
         ))}
       </div>
+      <section className="mt-8" aria-labelledby="trust-flows">
+        <h2 id="trust-flows" className="text-xl font-bold">
+          What leaves your phone
+        </h2>
+        <p className="mt-1 max-w-2xl text-muted">
+          Every outside service the app talks to, what it gets and when. Each one gets something only while you use that feature.
+        </p>
+        <div className="card mt-3 p-4">
+          <div
+            aria-hidden="true"
+            className="hidden gap-4 pb-2 text-xs font-semibold tracking-wide text-muted uppercase md:grid md:grid-cols-[14rem_1fr_1fr]"
+          >
+            <span>Service</span>
+            <span>What it gets</span>
+            <span>When</span>
+          </div>
+          <ul className="divide-y divide-line">
+            {DATA_FLOWS.map((f) => (
+              <li key={f.service} className="grid gap-1 py-2.5 md:grid-cols-[14rem_1fr_1fr] md:gap-4">
+                <h3 className="leading-snug font-semibold">{f.service}</h3>
+                <p className="text-sm">
+                  <span className="sr-only">What it gets: </span>
+                  {f.gets}
+                </p>
+                <p className="text-sm text-muted">
+                  <span className="sr-only">When: </span>
+                  {f.when}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="card mt-4 p-4">
+          <h3 className="font-semibold">Never leaves your phone</h3>
+          <ul className="mt-1 list-disc pl-5 text-sm text-muted">
+            {STAYS.map((s) => (
+              <li key={s}>{s}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
       <section className="mt-8 max-w-2xl">
         <h2 className="text-xl font-bold">Report a security problem</h2>
         <p className="mt-1">

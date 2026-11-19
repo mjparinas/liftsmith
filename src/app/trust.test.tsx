@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { TRUST_GROUPS } from "@/components/site/TrustCentre";
+import { DATA_FLOWS, STAYS, TRUST_GROUPS } from "@/components/site/TrustCentre";
 import { siteRoutes } from "@/lib/seo";
 import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 
@@ -33,6 +33,26 @@ describe("trust centre", () => {
       expect(g.controls.length).toBeGreaterThan(0);
       for (const c of g.controls) expect(c.note.length, c.title).toBeLessThanOrEqual(90);
     }
+  });
+
+  // "What leaves your phone": one row per outside service, each saying what it gets and when, plus what never leaves.
+  it("lists every outside service once, with what it gets and when", () => {
+    render(<TrustPage />);
+    expect(screen.getByRole("heading", { level: 2, name: "What leaves your phone" })).toBeTruthy();
+    const names = DATA_FLOWS.map((f) => f.service);
+    expect(new Set(names).size).toBe(names.length);
+    for (const f of DATA_FLOWS) {
+      expect(screen.getByRole("heading", { level: 3, name: f.service })).toBeTruthy();
+      expect(f.gets.length, f.service).toBeLessThanOrEqual(90);
+      expect(f.when.length, f.service).toBeLessThanOrEqual(90);
+    }
+    // the processors the privacy policy names all have a row
+    for (const p of ["Turso", "Vercel", "Resend", "RevenueCat", "Stripe", "Anthropic", "Mapbox", "Strava"])
+      expect(
+        names.some((n) => n.includes(p)),
+        p,
+      ).toBe(true);
+    for (const s of STAYS) expect(screen.getByText(s)).toBeTruthy();
   });
 
   it("is in the sitemap", () => {
