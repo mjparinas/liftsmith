@@ -51,8 +51,10 @@ export function setText(
 export function plateText(ex: Exercise, kg: number, gym: Gym): string | undefined {
   if (ex.load !== "barbell") return undefined;
   const bar = barFor(ex, gym);
-  const l = loadBar(fromKg(kg, gym.unit), bar.weight, gym.plates);
-  return l.perSide.length ? t("fmt.eachSide", { plates: l.perSide.map(fmtNum).join(" + "), unit: gym.unit }) : t("fmt.emptyBar");
+  const l = loadBar(fromKg(kg, gym.unit), bar.weight, gym.plates, ex.oneEnd);
+  return l.perSide.length
+    ? t(ex.oneEnd ? "fmt.oneEnd" : "fmt.eachSide", { plates: l.perSide.map(fmtNum).join(" + "), unit: gym.unit })
+    : t("fmt.emptyBar");
 }
 
 export function clock(sec: number): string {

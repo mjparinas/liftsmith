@@ -73,7 +73,7 @@ function Replay({ pr }: { pr: Pr }) {
   const done = t >= pr.reps * REP_MS;
   const unit = profile.unit;
   const bar = ex.load === "barbell" && gym ? barFor(ex, gym) : null;
-  const loading = bar && gym ? loadBar(fromKg(pr.weight, gym.unit), bar.weight, gym.plates) : null;
+  const loading = bar && gym ? loadBar(fromKg(pr.weight, gym.unit), bar.weight, gym.plates, ex.oneEnd) : null;
   return (
     <div className="text-center">
       <p className="text-sm uppercase tracking-wider text-gold">{tr("pr.newBest")}</p>

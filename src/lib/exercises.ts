@@ -12180,6 +12180,31 @@ export function englishName(e: Pick<Exercise, "id" | "name">): string {
   return ENGLISH_NAME.get(e.id) ?? e.name;
 }
 
+/**
+ * Barbell moves loaded on one end only (Melvin, 2026-11-19: "for landmine or similar exercises, the weights should
+ * only show on one side"): the other end sits in a landmine or a corner. See `Exercise.oneEnd`.
+ */
+export const ONE_END: ReadonlySet<string> = new Set([
+  "half-kneeling-landmine-press",
+  "landmine-anti-rotation",
+  "landmine-chest-press",
+  "landmine-lateral-raise",
+  "landmine-one-arm-row",
+  "landmine-press",
+  "landmine-rdl",
+  "landmine-reverse-lunge",
+  "landmine-rotation",
+  "landmine-row",
+  "landmine-single-arm-push-press",
+  "landmine-single-leg-rdl",
+  "landmine-split-squat",
+  "landmine-squat",
+  "landmine-squeeze-press",
+  "landmine-thruster",
+  "tall-kneeling-landmine-press",
+  "t-bar-row",
+]);
+
 export const EXERCISES: Exercise[] = ROWS.map(([id, name, primary, secondary, needs, load, pattern, start, setup, cues]) => ({
   id,
   get name() {
@@ -12199,6 +12224,7 @@ export const EXERCISES: Exercise[] = ROWS.map(([id, name, primary, secondary, ne
     return cues.map((c, i) => local(`ex.${id}.cue${i + 1}`, c));
   },
   ...(CARDIO[id] ? { cardio: CARDIO[id] } : {}),
+  ...(ONE_END.has(id) ? { oneEnd: true } : {}),
 }));
 
 /** Each built-in exercise's English text, as written in ROWS (a test checks the catalogue matches). */

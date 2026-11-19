@@ -105,7 +105,7 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   if (target.note.includes(t("note.challenge"))) lines.push(t("explain.challenge"));
 
   if (ex.load === "barbell") {
-    const jump = smallestJump(gym.plates);
+    const jump = smallestJump(gym.plates, ex.oneEnd);
     const bar = barFor(ex, gym);
     if (jump > 0) lines.push(t("explain.barbell", { bar: `${fmtNum(bar.weight)} ${unit}`, jump: `${fmtNum(jump)} ${unit}` }));
   } else if (ex.load === "dumbbell" && gym.dumbbells.length) lines.push(t("explain.dumbbell"));

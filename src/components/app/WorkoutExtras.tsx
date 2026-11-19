@@ -37,8 +37,8 @@ export function PlateChange({ ex, gym, kg, sessionId }: { ex: Exercise; gym: Gym
   const prev = lastLoadedKg(events, sessionId, ex.id);
   if (prev === null) return null;
   const bar = barFor(ex, gym);
-  const from = loadBar(fromKg(prev, gym.unit), bar.weight, gym.plates).perSide;
-  const to = loadBar(fromKg(kg, gym.unit), bar.weight, gym.plates).perSide;
+  const from = loadBar(fromKg(prev, gym.unit), bar.weight, gym.plates, ex.oneEnd).perSide;
+  const to = loadBar(fromKg(kg, gym.unit), bar.weight, gym.plates, ex.oneEnd).perSide;
   const c = plateChange(from, to);
   const same = !c.add.length && !c.remove.length;
   return (
@@ -67,7 +67,7 @@ export function PlateChange({ ex, gym, kg, sessionId }: { ex: Exercise; gym: Gym
           ))}
         </div>
       )}
-      <p aria-live="polite">{changeText(c, gym.unit, fmtNum)}</p>
+      <p aria-live="polite">{changeText(c, gym.unit, fmtNum, ex.oneEnd)}</p>
     </div>
   );
 }

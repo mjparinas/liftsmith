@@ -10,13 +10,19 @@ export interface Loading {
   /** Plates for one side, heaviest first. */
   perSide: number[];
   exact: boolean;
+  /**
+   * Plates go on one end only (landmine and T-bar moves, `Exercise.oneEnd`): `perSide` is then everything
+   * on that end, and the total is the bar plus those plates once.
+   */
+  oneEnd?: boolean;
 }
 
 const SCALE = 100;
 
-function sidesAvailable(plates: PlateStock[]): { w: number; pairs: number }[] {
+/** What can go on one end: half the plates (a pair each) on a normal bar, every plate when only one end is loaded. */
+function sidesAvailable(plates: PlateStock[], oneEnd = false): { w: number; pairs: number }[] {
   return plates
-    .map((p) => ({ w: Math.round(p.weight * SCALE), pairs: Math.floor(p.count / 2) }))
+    .map((p) => ({ w: Math.round(p.weight * SCALE), pairs: oneEnd ? p.count : Math.floor(p.count / 2) }))
     .filter((p) => p.w > 0 && p.pairs > 0)
     .sort((a, b) => b.w - a.w);
 }
@@ -29,9 +35,9 @@ function better(a: number[], b: number[]): boolean {
 }
 
 /** Every per-side load you can make, with the fewest-plates way to make it. */
-function reachable(plates: PlateStock[], maxSide: number): Map<number, number[]> {
+function reachable(plates: PlateStock[], maxSide: number, oneEnd = false): Map<number, number[]> {
   const best = new Map<number, number[]>([[0, []]]);
-  for (const { w, pairs } of sidesAvailable(plates)) {
+  for (const { w, pairs } of sidesAvailable(plates, oneEnd)) {
     const entries = [...best.entries()];
     for (const [sum, combo] of entries) {
       for (let k = 1; k <= pairs; k++) {
@@ -48,13 +54,15 @@ function reachable(plates: PlateStock[], maxSide: number): Map<number, number[]>
 
 /**
  * Load `target` on a bar of `bar` with the plates owned. Returns the exact loading when possible,
- * otherwise the nearest one (below wins a tie, because a lighter set is the safer miss).
+ * otherwise the nearest one (below wins a tie, because a lighter set is the safer miss). With `oneEnd`
+ * (a landmine), every plate goes on the one free end and the whole bar still counts in the total.
  */
-export function loadBar(target: number, bar: number, plates: PlateStock[]): Loading {
+export function loadBar(target: number, bar: number, plates: PlateStock[], oneEnd = false): Loading {
+  const ends = oneEnd ? 1 : 2;
   const barU = Math.round(bar * SCALE);
-  const wantSide = Math.max(0, (Math.round(target * SCALE) - barU) / 2);
-  const totalPerSide = sidesAvailable(plates).reduce((s, p) => s + p.w * p.pairs, 0);
-  const options = reachable(plates, Math.min(totalPerSide, Math.ceil(wantSide) + 5000));
+  const wantSide = Math.max(0, (Math.round(target * SCALE) - barU) / ends);
+  const totalPerSide = sidesAvailable(plates, oneEnd).reduce((s, p) => s + p.w * p.pairs, 0);
+  const options = reachable(plates, Math.min(totalPerSide, Math.ceil(wantSide) + 5000), oneEnd);
   let pick = 0;
   let dist = Infinity;
   for (const s of options.keys()) {
@@ -65,7 +73,7 @@ export function loadBar(target: number, bar: number, plates: PlateStock[]): Load
     }
   }
   const perSide = options.get(pick)!.map((w) => w / SCALE);
-  return { total: (barU + pick * 2) / SCALE, perSide, exact: dist < 1e-9 };
+  return { total: (barU + pick * ends) / SCALE, perSide, exact: dist < 1e-9, ...(oneEnd ? { oneEnd: true } : {}) };
 }
 
 /** The loadable totals nearest below and above a target (for "can't make 101, try 100 or 102.5"). */
@@ -82,10 +90,10 @@ export function nearestLoads(target: number, bar: number, plates: PlateStock[]):
   return { below, above };
 }
 
-/** The smallest jump the plates allow (two of the lightest plate). */
-export function smallestJump(plates: PlateStock[]): number {
-  const light = sidesAvailable(plates).at(-1);
-  return light ? (light.w * 2) / SCALE : 0;
+/** The smallest jump the plates allow (two of the lightest plate, or one when only one end is loaded). */
+export function smallestJump(plates: PlateStock[], oneEnd = false): number {
+  const light = sidesAvailable(plates, oneEnd).at(-1);
+  return light ? (light.w * (oneEnd ? 1 : 2)) / SCALE : 0;
 }
 
 type PlateHue = "red" | "blue" | "yellow" | "green" | "white" | "black" | "silver" | "orange" | "purple";
