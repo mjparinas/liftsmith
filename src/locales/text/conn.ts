@@ -127,6 +127,27 @@ export const en = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Logged with Liftsmith",
+  "conn.outside.title": "Count workouts from other apps",
+  "conn.outside.note":
+    "Runs, rides, sports and classes that other apps save to {store} count in your recovery map and tomorrow's plan. They don't count as Liftsmith workouts. Turning this off takes them out again.",
+  "conn.outside.denied": "{store} isn't sharing workouts with Liftsmith yet. Allow exercise (workouts) for Liftsmith in {store}.",
+  "conn.outside.list": "From other apps",
+  "conn.outside.line": "{what} · {minutes} min",
+  "conn.outside.listNote": "Counted in your recovery. You can turn this off in Connected apps.",
+  "conn.outside.kind.run": "Run",
+  "conn.outside.kind.walk": "Walk",
+  "conn.outside.kind.hike": "Hike",
+  "conn.outside.kind.ride": "Ride",
+  "conn.outside.kind.swim": "Swim",
+  "conn.outside.kind.row": "Row or paddle",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "HIIT class",
+  "conn.outside.kind.strength": "Strength workout",
+  "conn.outside.kind.sport": "Sport",
+  "conn.outside.kind.climb": "Climbing",
+  "conn.outside.kind.snow": "Snow or skating",
+  "conn.outside.kind.mind": "Yoga or Pilates",
+  "conn.outside.kind.other": "Workout",
 } as const;
 
 type Key = keyof typeof en;
@@ -262,6 +283,28 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Registrado con Liftsmith",
+  "conn.outside.title": "Contar entrenamientos de otras apps",
+  "conn.outside.note":
+    "Las carreras, salidas en bici, deportes y clases que otras apps guardan en {store} cuentan en tu mapa de recuperación y en el plan de mañana. No cuentan como entrenamientos de Liftsmith. Si lo desactivas, se quitan de nuevo.",
+  "conn.outside.denied":
+    "{store} aún no comparte entrenamientos con Liftsmith. Permite el ejercicio (entrenamientos) para Liftsmith en {store}.",
+  "conn.outside.list": "De otras apps",
+  "conn.outside.line": "{what} · {minutes} min",
+  "conn.outside.listNote": "Cuenta en tu recuperación. Puedes desactivarlo en Apps conectadas.",
+  "conn.outside.kind.run": "Carrera",
+  "conn.outside.kind.walk": "Caminata",
+  "conn.outside.kind.hike": "Senderismo",
+  "conn.outside.kind.ride": "Bici",
+  "conn.outside.kind.swim": "Natación",
+  "conn.outside.kind.row": "Remo o pádel en agua",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "Clase HIIT",
+  "conn.outside.kind.strength": "Entrenamiento de fuerza",
+  "conn.outside.kind.sport": "Deporte",
+  "conn.outside.kind.climb": "Escalada",
+  "conn.outside.kind.snow": "Nieve o patinaje",
+  "conn.outside.kind.mind": "Yoga o pilates",
+  "conn.outside.kind.other": "Entrenamiento",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -395,6 +438,28 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name} : {sets}",
   "conn.strava.footer": "Enregistré avec Liftsmith",
+  "conn.outside.title": "Compter les séances d'autres apps",
+  "conn.outside.note":
+    "Les courses, sorties vélo, sports et cours que d'autres apps enregistrent dans {store} comptent dans ta carte de récupération et le plan de demain. Ils ne comptent pas comme des séances Liftsmith. Désactive l'option pour les retirer.",
+  "conn.outside.denied":
+    "{store} ne partage pas encore les séances avec Liftsmith. Autorise l'exercice (séances) pour Liftsmith dans {store}.",
+  "conn.outside.list": "D'autres apps",
+  "conn.outside.line": "{what} · {minutes} min",
+  "conn.outside.listNote": "Compté dans ta récupération. Tu peux le désactiver dans Apps connectées.",
+  "conn.outside.kind.run": "Course",
+  "conn.outside.kind.walk": "Marche",
+  "conn.outside.kind.hike": "Randonnée",
+  "conn.outside.kind.ride": "Vélo",
+  "conn.outside.kind.swim": "Natation",
+  "conn.outside.kind.row": "Aviron ou pagaie",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "Cours HIIT",
+  "conn.outside.kind.strength": "Séance de force",
+  "conn.outside.kind.sport": "Sport",
+  "conn.outside.kind.climb": "Escalade",
+  "conn.outside.kind.snow": "Glisse ou patin",
+  "conn.outside.kind.mind": "Yoga ou Pilates",
+  "conn.outside.kind.other": "Séance",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -527,6 +592,28 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Mit Liftsmith eingetragen",
+  "conn.outside.title": "Trainings aus anderen Apps zählen",
+  "conn.outside.note":
+    "Läufe, Radtouren, Sport und Kurse, die andere Apps in {store} speichern, zählen in deiner Erholungskarte und im Plan für morgen. Sie zählen nicht als Liftsmith-Trainings. Schaltest du es aus, fallen sie wieder heraus.",
+  "conn.outside.denied":
+    "{store} teilt noch keine Trainings mit Liftsmith. Erlaube Liftsmith in {store} den Zugriff auf Training (Workouts).",
+  "conn.outside.list": "Aus anderen Apps",
+  "conn.outside.line": "{what} · {minutes} Min.",
+  "conn.outside.listNote": "Zählt in deiner Erholung. Du kannst es unter Verbundene Apps ausschalten.",
+  "conn.outside.kind.run": "Lauf",
+  "conn.outside.kind.walk": "Spaziergang",
+  "conn.outside.kind.hike": "Wanderung",
+  "conn.outside.kind.ride": "Radfahren",
+  "conn.outside.kind.swim": "Schwimmen",
+  "conn.outside.kind.row": "Rudern oder Paddeln",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "HIIT-Kurs",
+  "conn.outside.kind.strength": "Krafttraining",
+  "conn.outside.kind.sport": "Sport",
+  "conn.outside.kind.climb": "Klettern",
+  "conn.outside.kind.snow": "Schnee oder Eislauf",
+  "conn.outside.kind.mind": "Yoga oder Pilates",
+  "conn.outside.kind.other": "Training",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -661,6 +748,28 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
   "conn.strava.footer": "Registrato con Liftsmith",
+  "conn.outside.title": "Conta gli allenamenti di altre app",
+  "conn.outside.note":
+    "Corse, uscite in bici, sport e corsi che altre app salvano in {store} contano nella tua mappa di recupero e nel piano di domani. Non contano come allenamenti Liftsmith. Disattivandolo vengono tolti di nuovo.",
+  "conn.outside.denied":
+    "{store} non condivide ancora gli allenamenti con Liftsmith. Consenti l'esercizio (allenamenti) a Liftsmith in {store}.",
+  "conn.outside.list": "Da altre app",
+  "conn.outside.line": "{what} · {minutes} min",
+  "conn.outside.listNote": "Conta nel tuo recupero. Puoi disattivarlo in App collegate.",
+  "conn.outside.kind.run": "Corsa",
+  "conn.outside.kind.walk": "Camminata",
+  "conn.outside.kind.hike": "Escursione",
+  "conn.outside.kind.ride": "Bici",
+  "conn.outside.kind.swim": "Nuoto",
+  "conn.outside.kind.row": "Canottaggio o pagaia",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "Corso HIIT",
+  "conn.outside.kind.strength": "Allenamento di forza",
+  "conn.outside.kind.sport": "Sport",
+  "conn.outside.kind.climb": "Arrampicata",
+  "conn.outside.kind.snow": "Neve o pattinaggio",
+  "conn.outside.kind.mind": "Yoga o Pilates",
+  "conn.outside.kind.other": "Allenamento",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -787,6 +896,28 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}：{sets}",
   "conn.strava.footer": "Liftsmith で記録",
+  "conn.outside.title": "他のアプリのワークアウトを反映",
+  "conn.outside.note":
+    "他のアプリが{store}に保存したランニング、サイクリング、スポーツ、クラスを回復マップと明日のプランに反映します。Liftsmithのワークアウトとしては数えません。オフにすると再び外れます。",
+  "conn.outside.denied":
+    "{store}はまだLiftsmithとワークアウトを共有していません。{store}でLiftsmithにエクササイズ（ワークアウト）を許可してください。",
+  "conn.outside.list": "他のアプリから",
+  "conn.outside.line": "{what}・{minutes}分",
+  "conn.outside.listNote": "回復に反映されています。連携アプリでオフにできます。",
+  "conn.outside.kind.run": "ランニング",
+  "conn.outside.kind.walk": "ウォーキング",
+  "conn.outside.kind.hike": "ハイキング",
+  "conn.outside.kind.ride": "サイクリング",
+  "conn.outside.kind.swim": "水泳",
+  "conn.outside.kind.row": "ローイング・パドル",
+  "conn.outside.kind.cardio": "有酸素運動",
+  "conn.outside.kind.hiit": "HIITクラス",
+  "conn.outside.kind.strength": "筋トレ",
+  "conn.outside.kind.sport": "スポーツ",
+  "conn.outside.kind.climb": "クライミング",
+  "conn.outside.kind.snow": "スノー・スケート",
+  "conn.outside.kind.mind": "ヨガ・ピラティス",
+  "conn.outside.kind.other": "ワークアウト",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -926,6 +1057,28 @@ export const pt: Partial<Record<Key, Message>> = {
   "conn.strava.footer": "Registrado com o Liftsmith",
   "conn.garminConnect.what":
     "Envia sono, variabilidade da frequência cardíaca noturna, frequência cardíaca em repouso, passos e pesagens da balança Index para a decisão de prontidão de Hoje, e as corridas, pedaladas e remadas indoor do relógio como treinos de cardio.",
+  "conn.outside.title": "Contar treinos de outros apps",
+  "conn.outside.note":
+    "Corridas, pedais, esportes e aulas que outros apps salvam no {store} contam no seu mapa de recuperação e no plano de amanhã. Eles não contam como treinos do Liftsmith. Ao desligar, eles saem de novo.",
+  "conn.outside.denied":
+    "O {store} ainda não compartilha treinos com o Liftsmith. Permita exercício (treinos) para o Liftsmith no {store}.",
+  "conn.outside.list": "De outros apps",
+  "conn.outside.line": "{what} · {minutes} min",
+  "conn.outside.listNote": "Conta na sua recuperação. Você pode desligar em Apps conectados.",
+  "conn.outside.kind.run": "Corrida",
+  "conn.outside.kind.walk": "Caminhada",
+  "conn.outside.kind.hike": "Trilha",
+  "conn.outside.kind.ride": "Pedal",
+  "conn.outside.kind.swim": "Natação",
+  "conn.outside.kind.row": "Remo ou canoa",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "Aula de HIIT",
+  "conn.outside.kind.strength": "Treino de força",
+  "conn.outside.kind.sport": "Esporte",
+  "conn.outside.kind.climb": "Escalada",
+  "conn.outside.kind.snow": "Neve ou patinação",
+  "conn.outside.kind.mind": "Yoga ou pilates",
+  "conn.outside.kind.other": "Treino",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1055,6 +1208,27 @@ export const ko: Partial<Record<Key, Message>> = {
   "conn.strava.footer": "Liftsmith로 기록함",
   "conn.garminConnect.what":
     "수면, 밤사이 심박 변이도, 안정 시 심박수, 걸음 수와 Index 체중계 측정값을 오늘의 컨디션 판단에 보내고, 워치의 달리기, 라이딩, 실내 로잉을 유산소 운동으로 가져와요.",
+  "conn.outside.title": "다른 앱의 운동 반영",
+  "conn.outside.note":
+    "다른 앱이 {store}에 저장한 달리기, 자전거, 스포츠, 수업을 회복 지도와 내일 계획에 반영해요. Liftsmith 운동으로는 세지 않아요. 끄면 다시 빠져요.",
+  "conn.outside.denied": "{store}이(가) 아직 Liftsmith와 운동을 공유하지 않아요. {store}에서 Liftsmith에 운동(워크아웃)을 허용해 주세요.",
+  "conn.outside.list": "다른 앱에서",
+  "conn.outside.line": "{what} · {minutes}분",
+  "conn.outside.listNote": "회복에 반영돼요. 연결된 앱에서 끌 수 있어요.",
+  "conn.outside.kind.run": "달리기",
+  "conn.outside.kind.walk": "걷기",
+  "conn.outside.kind.hike": "하이킹",
+  "conn.outside.kind.ride": "자전거",
+  "conn.outside.kind.swim": "수영",
+  "conn.outside.kind.row": "로잉·패들",
+  "conn.outside.kind.cardio": "유산소",
+  "conn.outside.kind.hiit": "HIIT 수업",
+  "conn.outside.kind.strength": "근력 운동",
+  "conn.outside.kind.sport": "스포츠",
+  "conn.outside.kind.climb": "클라이밍",
+  "conn.outside.kind.snow": "스노·스케이트",
+  "conn.outside.kind.mind": "요가·필라테스",
+  "conn.outside.kind.other": "운동",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1190,6 +1364,28 @@ export const tr: Partial<Record<Key, Message>> = {
   "conn.strava.footer": "Liftsmith ile kaydedildi",
   "conn.garminConnect.what":
     "Uykuyu, gece kalp atış hızı değişkenliğini, dinlenik nabzı, adımları ve Index tartı ölçümlerini Bugün'ün hazırlık kararına gönderir; saatindeki koşu, bisiklet ve kapalı alan kürek seanslarını kardiyo antrenmanı olarak getirir.",
+  "conn.outside.title": "Diğer uygulamalardaki antrenmanları say",
+  "conn.outside.note":
+    "Diğer uygulamaların {store} uygulamasına kaydettiği koşu, bisiklet, spor ve dersler toparlanma haritanda ve yarının planında sayılır. Liftsmith antrenmanı olarak sayılmazlar. Kapatırsan yeniden çıkarılırlar.",
+  "conn.outside.denied":
+    "{store} henüz antrenmanları Liftsmith ile paylaşmıyor. {store} içinde Liftsmith için egzersize (antrenmanlar) izin ver.",
+  "conn.outside.list": "Diğer uygulamalardan",
+  "conn.outside.line": "{what} · {minutes} dk",
+  "conn.outside.listNote": "Toparlanmanda sayılıyor. Bağlı uygulamalar bölümünden kapatabilirsin.",
+  "conn.outside.kind.run": "Koşu",
+  "conn.outside.kind.walk": "Yürüyüş",
+  "conn.outside.kind.hike": "Doğa yürüyüşü",
+  "conn.outside.kind.ride": "Bisiklet",
+  "conn.outside.kind.swim": "Yüzme",
+  "conn.outside.kind.row": "Kürek",
+  "conn.outside.kind.cardio": "Kardiyo",
+  "conn.outside.kind.hiit": "HIIT dersi",
+  "conn.outside.kind.strength": "Kuvvet antrenmanı",
+  "conn.outside.kind.sport": "Spor",
+  "conn.outside.kind.climb": "Tırmanış",
+  "conn.outside.kind.snow": "Kar veya paten",
+  "conn.outside.kind.mind": "Yoga veya pilates",
+  "conn.outside.kind.other": "Antrenman",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1329,4 +1525,25 @@ export const pl: Partial<Record<Key, Message>> = {
   "conn.strava.footer": "Zapisano w Liftsmith",
   "conn.garminConnect.what":
     "Przesyła sen, nocną zmienność rytmu serca, tętno spoczynkowe, kroki i pomiary z wagi Index do dzisiejszej oceny gotowości, a biegi, jazdy na rowerze i wiosłowanie w pomieszczeniu z zegarka jako treningi cardio.",
+  "conn.outside.title": "Licz treningi z innych aplikacji",
+  "conn.outside.note":
+    "Biegi, jazdy na rowerze, sporty i zajęcia, które inne aplikacje zapisują w {store}, liczą się w mapie regeneracji i w planie na jutro. Nie liczą się jako treningi Liftsmith. Po wyłączeniu znów znikają.",
+  "conn.outside.denied": "{store} nie udostępnia jeszcze treningów Liftsmith. Zezwól Liftsmith na ćwiczenia (treningi) w {store}.",
+  "conn.outside.list": "Z innych aplikacji",
+  "conn.outside.line": "{what} · {minutes} min",
+  "conn.outside.listNote": "Liczy się w regeneracji. Możesz to wyłączyć w Połączonych aplikacjach.",
+  "conn.outside.kind.run": "Bieg",
+  "conn.outside.kind.walk": "Spacer",
+  "conn.outside.kind.hike": "Wędrówka",
+  "conn.outside.kind.ride": "Rower",
+  "conn.outside.kind.swim": "Pływanie",
+  "conn.outside.kind.row": "Wioślarstwo lub kajak",
+  "conn.outside.kind.cardio": "Cardio",
+  "conn.outside.kind.hiit": "Zajęcia HIIT",
+  "conn.outside.kind.strength": "Trening siłowy",
+  "conn.outside.kind.sport": "Sport",
+  "conn.outside.kind.climb": "Wspinaczka",
+  "conn.outside.kind.snow": "Śnieg lub łyżwy",
+  "conn.outside.kind.mind": "Joga lub pilates",
+  "conn.outside.kind.other": "Trening",
 };

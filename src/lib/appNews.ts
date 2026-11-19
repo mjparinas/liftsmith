@@ -46,12 +46,13 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.5.0",
+    version: "0.6.0",
     day: "2026-11-21",
-    headline: "Five new training seasons, a number on the app icon and team sessions for school coaches",
+    headline: "Five new training seasons, a number on the app icon, workouts from other apps and team sessions for school coaches",
     changes: [
       { id: "seasonPlan", kind: "new", icon: "medal", unlock: "seasons" },
       { id: "iconBadge", kind: "new", icon: "bell" },
+      { id: "outsideWorkouts", kind: "new", icon: "bolt", gate: "native" },
       { id: "teamSession", kind: "new", icon: "people" },
     ],
   },

@@ -513,6 +513,10 @@ export const es: FeaturesText = {
       name: "Entrenamientos guardados en tu app de salud",
       body: "Cada entrenamiento terminado se guarda en Health Connect o Apple Salud como entrenamiento de fuerza, con calorías y pulso.",
     },
+    "outside-workouts": {
+      name: "Cuentan los entrenamientos de otras apps",
+      body: "Si lo activas, las carreras, salidas en bici, deportes y clases que otras apps guardan en tu app de salud cuentan en tu mapa de recuperación y en el plan de mañana. Un partido largo ayer deja las piernas en recuperación y el plan lo tiene en cuenta.",
+    },
     offline: {
       name: "Funciona sin conexión",
       body: "Todo funciona en tu dispositivo y se sincroniza en segundo plano, así que no pasa nada si no hay señal en el gimnasio del sótano.",
@@ -667,11 +671,11 @@ export const es: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos y comida; salen los entrenamientos terminados",
+      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos y comida; salen los entrenamientos terminados; y, si lo activas, entrenamientos de otras apps",
     },
     "apple-health": {
       name: "Apple Salud",
-      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos, comida, altura, edad y sexo; salen los entrenamientos terminados",
+      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos, comida, altura, edad y sexo; salen los entrenamientos terminados; y, si lo activas, entrenamientos de otras apps",
     },
     "samsung-health": { does: "Sus datos, cuando los compartes con Health Connect" },
     "health-devices": {

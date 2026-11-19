@@ -963,6 +963,18 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
   },
+  "outside-workouts": {
+    title: "Your runs and matches now count in your recovery",
+    intro:
+      "Turn on Count workouts from other apps, and the workouts in your phone's health app shape your recovery map and tomorrow's plan.",
+    points: [
+      "Runs, rides, sports and classes come in each time you open the app.",
+      "Each one tires the muscles it uses, more the longer it ran.",
+      "Tomorrow's plan works around tired legs after a long run or match.",
+      "They never count as Liftsmith workouts, and nothing counts twice.",
+    ],
+    dyk: "It's in Settings › Connected apps, and the list under the recovery map on Body shows what's being counted.",
+  },
   "team-session": {
     title: "Run the whole team's lift from one tablet",
     intro: "Team sessions put one workout for your whole team on one tablet.",

@@ -518,6 +518,10 @@ export const fr: FeaturesText = {
       name: "Séances enregistrées dans votre appli santé",
       body: "Chaque séance terminée est enregistrée dans Health Connect ou Apple Santé comme séance de musculation, avec les calories et le pouls.",
     },
+    "outside-workouts": {
+      name: "Les séances d'autres apps comptent",
+      body: "Une fois activé, les courses, sorties vélo, sports et cours que d'autres apps enregistrent dans votre appli santé comptent dans votre carte de récupération et le plan de demain. Un long match hier laisse les jambes en récupération, et le plan en tient compte.",
+    },
     offline: {
       name: "Fonctionne hors ligne",
       body: "Tout tourne sur votre appareil et se synchronise en arrière-plan : pas de réseau au sous-sol de la salle, pas de souci.",
@@ -672,11 +676,11 @@ export const fr: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas et alimentation en entrée ; séances terminées en sortie",
+      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas et alimentation en entrée ; séances terminées en sortie; et, si vous l'activez, les séances d'autres apps en entrée",
     },
     "apple-health": {
       name: "Apple Santé",
-      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas, alimentation, taille, âge et sexe en entrée ; séances terminées en sortie",
+      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas, alimentation, taille, âge et sexe en entrée ; séances terminées en sortie; et, si vous l'activez, les séances d'autres apps en entrée",
     },
     "samsung-health": { does: "Ses données, une fois partagées avec Health Connect" },
     "health-devices": {

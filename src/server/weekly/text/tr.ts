@@ -943,6 +943,18 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
   },
+  "outside-workouts": {
+    title: "Koşuların ve maçların artık toparlanmanda sayılıyor",
+    intro:
+      "Diğer uygulamalardaki antrenmanları say seçeneğini aç; telefonunun sağlık uygulamasındaki antrenmanlar toparlanma haritanı ve yarının planını şekillendirsin.",
+    points: [
+      "Koşu, bisiklet, spor ve dersler uygulamayı her açtığında gelir.",
+      "Her biri kullandığı kasları yorar; ne kadar uzun sürdüyse o kadar çok.",
+      "Uzun bir koşu ya da maçtan sonra yarının planı yorgun bacakları korur.",
+      "Asla Liftsmith antrenmanı sayılmazlar ve hiçbir şey iki kez sayılmaz.",
+    ],
+    dyk: "Ayarlar › Bağlı uygulamalar bölümünde; Vücut ekranındaki toparlanma haritasının altındaki liste neyin sayıldığını gösterir.",
+  },
   "team-session": {
     title: "Takımın tüm antrenmanı tek tablette",
     intro: "Takım seansları tüm takımın antrenmanını tek bir tablete koyar.",

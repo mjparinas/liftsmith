@@ -149,6 +149,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("physio-protocols", "physio", "pro", "trainer", { fresh: "2026-11-17", shot: false }),
   // New, 2026-11-19: open now in the gym finder, with an Open now filter (docs/decisions/gyms.md "Open now").
   L("gym-open-now", "free", "gym", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: workouts from other apps count in recovery and the plan (docs/decisions/outside-workouts.md).
+  L("outside-workouts", "free", "muscles", { fresh: "2026-11-19" }),
   // New, 2026-11-19: team sessions on one tablet for school coaches (docs/decisions/school-teams.md "Team sessions").
   R("team-session", "school", "free", "trainer/teams", { fresh: "2026-11-19", shot: false }),
 ];

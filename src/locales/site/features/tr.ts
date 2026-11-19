@@ -579,6 +579,10 @@ export const tr: FeaturesText = {
       name: "Antrenmanlar sağlık uygulamana kaydedilir",
       body: "Biten her antrenman Health Connect'e ya da Apple Sağlık'a kalori ve nabızla birlikte kuvvet antrenmanı olarak kaydedilir.",
     },
+    "outside-workouts": {
+      name: "Diğer uygulamalardaki antrenmanlar sayılır",
+      body: "Açarsan, diğer uygulamaların sağlık uygulamana kaydettiği koşu, bisiklet, spor ve dersler toparlanma haritanda ve yarının planında sayılır. Dün uzun bir maç oynadıysan bacaklar toparlanıyor görünür ve plan buna göre ayarlanır.",
+    },
     offline: {
       name: "Çevrimdışı çalışır",
       body: "Her şey cihazında çalışır ve arka planda eşitlenir; bodrumdaki salonda çekmese de sorun yok.",
@@ -729,11 +733,11 @@ export const tr: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar ve beslenme gelir; biten antrenmanlar gider",
+      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar ve beslenme gelir; biten antrenmanlar gider; açarsan diğer uygulamaların antrenmanları da gelir",
     },
     "apple-health": {
       name: "Apple Sağlık",
-      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar, beslenme, boy, yaş ve cinsiyet gelir; biten antrenmanlar gider",
+      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar, beslenme, boy, yaş ve cinsiyet gelir; biten antrenmanlar gider; açarsan diğer uygulamaların antrenmanları da gelir",
     },
     "samsung-health": {
       name: "Samsung Health",

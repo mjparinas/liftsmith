@@ -1,5 +1,6 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
+import { countedOutside, LOAD, outsideEnd, outsideSets } from "./outside";
 import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Muscle } from "./types";
 
 // Each hard set adds fatigue to the muscles it works: full for primary, half for secondary, a
@@ -81,5 +82,17 @@ export function recovery(events: readonly AppEvent[], now: number): Record<Muscl
     for (const m of ex.primary) fatigue[m] += PER_SET * effort * Math.exp(-age / tau(m));
     for (const m of ex.secondary) fatigue[m] += PER_SET * 0.5 * effort * Math.exp(-age / tau(m));
   }
+  // Workouts from other apps (outside.ts), only there while Count workouts from other apps is on: their hard sets'
+  // worth of fatigue, counted from when they ended.
+  if (events.some((e) => e.type === "outside"))
+    for (const o of countedOutside(events)) {
+      const end = outsideEnd(o);
+      if (end < horizon || end > now) continue;
+      const load = LOAD[o.kind];
+      const sets = outsideSets(o);
+      const age = now - end;
+      for (const m of load.primary) fatigue[m] += PER_SET * sets * Math.exp(-age / tau(m));
+      for (const m of load.secondary) fatigue[m] += PER_SET * 0.5 * sets * Math.exp(-age / tau(m));
+    }
   return Object.fromEntries(MUSCLES.map((m) => [m, Math.round(Math.max(0, 100 - Math.min(100, fatigue[m])))])) as Record<Muscle, number>;
 }
