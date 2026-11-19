@@ -17,6 +17,7 @@ import { claimDeletes } from "./gymClaims";
 import { classDeletes } from "./gymClasses";
 import { gymDeletes } from "./gymDirectory";
 import { extrasDeletes } from "./gymExtras";
+import { visitDeletes } from "./gymInsights";
 import { placeReportDeletes } from "./gymPlaceReports";
 import { placeDeletes } from "./gymPlaces";
 import { posterDeletes } from "./gymPosters";
@@ -314,6 +315,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...placeReportDeletes(accountId),
     ...claimDeletes(accountId),
     ...extrasDeletes(accountId),
+    ...visitDeletes(accountId),
     ...classDeletes(accountId),
     ...posterDeletes(accountId),
     ...communityCleanup(accountId),

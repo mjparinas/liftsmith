@@ -834,3 +834,11 @@ Pregnancy and postpartum mode changes every workout with the week, the way injur
 - Later in pregnancy, nothing lying on your back or belly, no jumps and no crunches.
 - After birth, a gradual return over about 16 weeks, two weeks longer after a C-section.
 Did you know? It's free, it stays on your phone, and every change says why on Today. ([Pregnancy and postpartum mode](pregnancy.md))
+### G4 · See how members use your gym (**New**, 2026-11-19)
+Free · Gyms · No screen (it needs an official gym with five lifters) · `fresh`, so it goes next to gyms already in the series
+Your gym's page in the app now shows how lifters train there, with one thing to do next.
+- How many lifters trained there in the last four weeks, and how that compares with the four weeks before.
+- The busy hours, with the busiest day and time, and your quietest weekday hour to tell members about.
+- The equipment members use most, and any in your setup nobody has touched.
+- Open equipment problem reports come first, because lifters' plans skip that equipment until you tap Fixed.
+Did you know? It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who. ([Gyms](gyms.md) "Owner insights")

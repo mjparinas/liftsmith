@@ -111,6 +111,11 @@ export const tr: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Salon sahipleri için içgörüler",
+      body: "Resmî salonların sahipleri ve personeli, son dört haftada orada kaç sporcunun antrenman yaptığını, yoğun ve sakin saatleri, kullanılan ekipmanı ve açık sorun bildirimlerini bir sonraki adımla görür.",
+      note: "Yalnızca toplamlar ve paylar, ziyaretlerini saydıran sporculardan ve ancak beş sporcu antrenman yaptıktan sonra.",
+    },
     adaptive: {
       name: "Her gün uyarlanan antrenmanlar",
       body: "Salonunda yapılabilen ve kaslarının hazır olduğu egzersizleri seçer, sonra her ağırlığı ve tekrarı son antrenmanlarına göre belirler.",

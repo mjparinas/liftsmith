@@ -192,6 +192,15 @@ export default function Privacy() {
           from those totals.
         </p>
         <p className="mt-2">
+          When you finish a workout of 10 minutes or more at a gym you added from the map, the app sends us an anonymous visit for that
+          gym&apos;s owner insights: the weekday and hour it started, how long it lasted and the kinds of equipment used (such as barbell or
+          leg press), never a weight, a rep, an exercise or where you are. We keep who it was only as a one-way code made from your account
+          (or, signed out, a random install id), so you count once, and clear visits after ten weeks. The gym&apos;s owner and staff see
+          totals and percentages only, and nothing about hours or equipment until five lifters have trained there in four weeks. Turn off
+          Count my gym visits in Settings › Your data and privacy to stop; it starts off where the law asks for a yes first, and under-18s
+          are never counted. Deleting your account deletes your visits.
+        </p>
+        <p className="mt-2">
           If you claim a gym as its owner, manager or staff, we keep your name, role, the work email you give, and optionally a phone number
           and a note, with your account, so we can check the claim. A claim from an address at the gym&apos;s own website gets a code by
           email; any other claim is read by our team. The gym&apos;s details you then set (hours, website, phone, a description and its

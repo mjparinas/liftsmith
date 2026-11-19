@@ -111,6 +111,11 @@ export const pl: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Statystyki dla właścicieli siłowni",
+      body: "Właściciele i personel oficjalnych siłowni widzą, ile osób trenowało tam w ostatnich czterech tygodniach, godziny tłoku i spokoju, używany sprzęt i otwarte zgłoszenia, z jednym następnym krokiem.",
+      note: "Tylko sumy i udziały, od osób, które liczą swoje wizyty, i dopiero gdy trenowało tam pięć osób.",
+    },
     adaptive: {
       name: "Codzienne adaptacyjne treningi",
       body: "Wybiera ćwiczenia, które da się zrobić na twojej siłowni i na które twoje mięśnie są gotowe, a potem ustala każdy ciężar i liczbę powtórzeń na podstawie ostatnich treningów.",

@@ -20,6 +20,7 @@ import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
+import { flushVisits } from "@/lib/gymVisits";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
 import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
@@ -248,6 +249,14 @@ export function App() {
   useEffect(() => {
     if (!ready) return;
     return startHealthRefresh(() => useApp.getState());
+  }, [ready]);
+  // Gym visits a workout left waiting for reception (gymVisits.ts): sent on open and when back online.
+  useEffect(() => {
+    if (!ready) return;
+    void flushVisits();
+    const online = () => void flushVisits();
+    window.addEventListener("online", online);
+    return () => window.removeEventListener("online", online);
   }, [ready]);
   // Sync with the lifter's account, when signed in (sync.ts): on open, on return, when online, after changes.
   const signedIn = useAccount((s) => !!s.account);

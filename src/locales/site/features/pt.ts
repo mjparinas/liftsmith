@@ -111,6 +111,11 @@ export const pt: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Dados para donos de academia",
+      body: "Donos e equipe de academias oficiais veem quantos atletas treinaram lá nas últimas quatro semanas, os horários cheios e tranquilos, os equipamentos usados e os problemas abertos, com um próximo passo.",
+      note: "Só totais e porcentagens, de atletas que contam suas visitas, e só depois que cinco treinaram lá.",
+    },
     adaptive: {
       name: "Treinos adaptativos diários",
       body: "Escolhe exercícios que a sua academia permite e para os quais seus músculos estão prontos, e define cada peso e cada rep a partir dos seus últimos treinos.",

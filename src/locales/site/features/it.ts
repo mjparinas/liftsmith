@@ -66,6 +66,11 @@ export const it: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Dati per i titolari di palestre",
+      body: "Titolari e staff delle palestre ufficiali vedono quanti atleti si sono allenati lì nelle ultime quattro settimane, gli orari pieni e tranquilli, l'attrezzatura usata e i problemi aperti, con un passo successivo.",
+      note: "Solo totali e quote, dagli atleti che contano le visite, e solo quando se ne sono allenati lì almeno cinque.",
+    },
     adaptive: {
       name: "Allenamenti adattivi ogni giorno",
       body: "Sceglie esercizi che la tua palestra permette e per cui i tuoi muscoli sono pronti, poi fissa ogni peso e ripetizione in base ai tuoi ultimi allenamenti.",

@@ -164,6 +164,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("gym-chains", "free", "gym", { fresh: "2026-11-19", shot: false }),
   // New, 2026-11-19: pregnancy and postpartum mode (docs/decisions/pregnancy.md). Not to accounts that say male.
   L("pregnancy", "free", "settings/body", { fresh: "2026-11-19", notMale: true }),
+  // New, 2026-11-19: insights for gym owners (docs/decisions/gyms.md "Owner insights").
+  R("gym-insights", "gym", "free", "gym", { fresh: "2026-11-19", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

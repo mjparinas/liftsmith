@@ -1013,4 +1013,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "È gratis, resta sul tuo telefono e ogni modifica dice il perché su Oggi.",
   },
+  "gym-insights": {
+    title: "Guarda come i soci usano la tua palestra",
+    intro: "La pagina della tua palestra nell'app mostra come ci si allena lì, con un passo successivo.",
+    points: [
+      "Quanti atleti si sono allenati lì nelle ultime quattro settimane, rispetto alle quattro prima.",
+      "Gli orari di punta, con il giorno e l'ora più affollati, e l'ora più tranquilla nei giorni feriali da comunicare ai soci.",
+      "L'attrezzatura più usata e quella che nessuno ha toccato.",
+      "I problemi di attrezzatura aperti vengono prima, perché i piani evitano quell'attrezzo finché non tocchi Riparato.",
+    ],
+    dyk: "Sono solo totali, dagli atleti che contano le visite, e partono quando cinque si sono allenati lì. Non vedi mai chi.",
+  },
 };

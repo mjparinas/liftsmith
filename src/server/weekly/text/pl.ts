@@ -1010,4 +1010,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Jest za darmo, zostaje w Twoim telefonie, a każda zmiana mówi na ekranie Dziś, dlaczego.",
   },
+  "gym-insights": {
+    title: "Zobacz, jak członkowie korzystają z siłowni",
+    intro: "Strona Twojej siłowni w aplikacji pokazuje, jak się tam trenuje, z jednym następnym krokiem.",
+    points: [
+      "Ile osób trenowało tam w ostatnich czterech tygodniach i jak to wypada wobec czterech tygodni wcześniej.",
+      "Godziny szczytu z najtłoczniejszym dniem i godziną oraz najspokojniejszą godziną w dni robocze, o której warto powiedzieć członkom.",
+      "Najczęściej używany sprzęt i ten, którego nikt nie dotknął.",
+      "Otwarte zgłoszenia sprzętu są pierwsze, bo plany omijają ten sprzęt, dopóki nie stukniesz Naprawione.",
+    ],
+    dyk: "To tylko sumy, od osób, które liczą swoje wizyty, i ruszają, gdy trenuje tam pięć osób. Nigdy nie widzisz, kto.",
+  },
 };

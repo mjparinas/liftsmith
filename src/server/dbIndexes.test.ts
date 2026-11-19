@@ -235,6 +235,24 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["gym_classes"],
   },
   {
+    name: "gym insights: a gym's visits in the last 8 weeks (gymInsights.ts gymInsights)",
+    sql: "SELECT who, date, day, hour, minutes, gear FROM gym_visits WHERE place_id = ? AND date > ?",
+    uses: ["gym_visits_place"],
+    noScan: ["gym_visits"],
+  },
+  {
+    name: "gym insights: clearing a gym's old visits (gymInsights.ts countVisit)",
+    sql: "DELETE FROM gym_visits WHERE place_id = ? AND date < ?",
+    uses: ["gym_visits_place"],
+    noScan: ["gym_visits"],
+  },
+  {
+    name: "gym insights: account deletion (gymInsights.ts visitDeletes)",
+    sql: "DELETE FROM gym_visits WHERE who = ?",
+    uses: ["gym_visits_who"],
+    noScan: ["gym_visits"],
+  },
+  {
     name: "gym owner: count of claimed gyms (gymClaims.ts)",
     sql: "SELECT COUNT(*) AS n FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?",
     uses: ["gym_places_claimed"],

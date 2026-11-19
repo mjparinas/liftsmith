@@ -1013,4 +1013,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Er ist kostenlos, bleibt auf deinem Handy, und jede Änderung sagt auf Heute, warum.",
   },
+  "gym-insights": {
+    title: "Sieh, wie Mitglieder dein Gym nutzen",
+    intro: "Die Seite deines Gyms in der App zeigt jetzt, wie dort trainiert wird, mit einem nächsten Schritt.",
+    points: [
+      "Wie viele Sportler in den letzten vier Wochen dort trainiert haben, im Vergleich zu den vier Wochen davor.",
+      "Die Stoßzeiten mit dem vollsten Tag und der vollsten Uhrzeit, und deine ruhigste Stunde unter der Woche für die Mitglieder.",
+      "Die meistgenutzten Geräte und die, die niemand angerührt hat.",
+      "Offene Geräteprobleme stehen zuerst, weil die Pläne diese Geräte auslassen, bis du auf Behoben tippst.",
+    ],
+    dyk: "Es sind nur Summen, von Sportlern, die ihre Besuche mitzählen lassen, und es beginnt ab fünf Sportlern. Du siehst nie, wer.",
+  },
 };

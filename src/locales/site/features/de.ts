@@ -69,6 +69,11 @@ export const de: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Einblicke für Gym-Betreiber",
+      body: "Betreiber und Team offizieller Gyms sehen, wie viele Sportler dort in den letzten vier Wochen trainiert haben, die vollen und ruhigen Stunden, die genutzten Geräte und offene Problemmeldungen, mit einem nächsten Schritt.",
+      note: "Nur Summen und Anteile, von Sportlern, die ihre Besuche mitzählen lassen, und erst ab fünf Sportlern.",
+    },
     adaptive: {
       name: "Tägliche adaptive Trainings",
       body: "Wählt Übungen, die dein Studio hergibt und für die deine Muskeln bereit sind, und legt jedes Gewicht und jede Wiederholung anhand deiner letzten Trainings fest.",

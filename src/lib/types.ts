@@ -284,6 +284,12 @@ export interface Profile {
    * not inside them. Under-18s never count. Settings › Your data and privacy › Strength standards.
    */
   standards?: boolean;
+  /**
+   * Whether a workout at a gym added from the map counts, anonymously, toward that gym's owner insights (gymVisits.ts):
+   * weekday, hour, length and kinds of equipment only. Missing means on, except where data choices need a yes first.
+   * Under-18s never count. Settings › Your data and privacy › Gym insights.
+   */
+  gymStats?: boolean;
   /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
   /** Under 18 only: body fat and the shaped figure turned on in Body › Health (teen.ts). Off by default. */

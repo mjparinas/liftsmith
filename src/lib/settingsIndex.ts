@@ -116,6 +116,7 @@ export const SETTINGS_INDEX: SettingRef[] = [
   S("settings.data", "data"),
   S("settings.stats", "data", ["settings.stats.on"]),
   S("settings.standards", "data"),
+  S("settings.gymStats", "data", ["settings.gymStats.on"]),
   S("card.shot.settingTitle", "data", ["card.shot.setting"]),
   S("settings.erase", "data"),
   // Labs (Pro): the whole page is one place; each experiment is found by its name.

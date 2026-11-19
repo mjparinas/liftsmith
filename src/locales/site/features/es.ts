@@ -65,6 +65,11 @@ export const es: FeaturesText = {
     labs: { title: "Labs", intro: "Experimentos que quien tiene Pro puede activar en Ajustes › Labs. Pueden cambiar o desaparecer." },
   },
   features: {
+    "gym-insights": {
+      name: "Datos para dueños de gimnasios",
+      body: "Los dueños y el personal de gimnasios oficiales ven cuántos atletas entrenaron allí en las últimas cuatro semanas, las horas llenas y tranquilas, el equipo usado y los problemas abiertos, con un siguiente paso.",
+      note: "Solo totales y porcentajes, de atletas que cuentan sus visitas, y solo cuando ya entrenaron allí cinco.",
+    },
     adaptive: {
       name: "Entrenamientos adaptativos diarios",
       body: "Elige ejercicios que tu gimnasio permite y para los que tus músculos están listos, y fija cada peso y repetición a partir de tus últimos entrenamientos.",

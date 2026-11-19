@@ -18,6 +18,7 @@ import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
+import { visitsOn } from "@/lib/gymVisits";
 import { english, t } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
@@ -820,6 +821,16 @@ function DataGroup() {
                 </a>
               </>
             }
+          />
+        </Section>
+      )}
+      {!isTeen(profile) && (
+        <Section title={t("settings.gymStats")}>
+          <SwitchRow
+            label={t("settings.gymStats.on")}
+            on={visitsOn(profile)}
+            onChange={(v) => setProfile({ gymStats: v })}
+            hint={t("settings.gymStats.note")}
           />
         </Section>
       )}

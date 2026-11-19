@@ -691,6 +691,21 @@ const SCHEMA = [
     fixed_by TEXT NOT NULL DEFAULT ''
   )`,
   `CREATE INDEX IF NOT EXISTS gym_issues_place ON gym_issues (place_id, fixed_at)`,
+  // Owner insights (gymInsights.ts, 2026-11-19): one anonymous visit per workout at a real gym. `who` is a one-way code
+  // (account or install), `date` days since 1970, `day` and `hour` the lifter's own weekday and hour, `gear` the kinds of
+  // equipment used. Kept KEEP_DAYS (70), cleared per gym as new visits come in.
+  `CREATE TABLE IF NOT EXISTS gym_visits (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    who TEXT NOT NULL,
+    date INTEGER NOT NULL,
+    day INTEGER NOT NULL,
+    hour INTEGER NOT NULL,
+    minutes INTEGER NOT NULL,
+    gear TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_visits_place ON gym_visits (place_id, date)`,
+  `CREATE INDEX IF NOT EXISTS gym_visits_who ON gym_visits (who)`,
   `CREATE TABLE IF NOT EXISTS gym_trainers (
     place_id TEXT NOT NULL,
     account_id TEXT NOT NULL,

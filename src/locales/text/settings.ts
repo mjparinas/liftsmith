@@ -4,6 +4,10 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "settings.gymStats": "Gym insights",
+  "settings.gymStats.on": "Count my gym visits",
+  "settings.gymStats.note":
+    "When you train at a gym you added from the map, its owner sees totals: how many lifters, the busy hours and the kinds of equipment used. Never your name, weights or exercises.",
   "settings.title": "Settings",
   "settings.rerun": "Run setup again",
   "settings.injuries": "Injuries and sore spots",
@@ -95,6 +99,10 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Datos para gimnasios",
+  "settings.gymStats.on": "Contar mis visitas al gimnasio",
+  "settings.gymStats.note":
+    "Cuando entrenas en un gimnasio que añadiste desde el mapa, su dueño ve totales: cuántos atletas, las horas punta y los tipos de equipo usados. Nunca tu nombre, pesos ni ejercicios.",
   "settings.title": "Ajustes",
   "settings.rerun": "Repetir la configuración",
   "settings.injuries": "Lesiones y molestias",
@@ -189,6 +197,10 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Statistiques de salle",
+  "settings.gymStats.on": "Compter mes visites en salle",
+  "settings.gymStats.note":
+    "Quand vous vous entraînez dans une salle ajoutée depuis la carte, son propriétaire voit des totaux : combien de sportifs, les heures d’affluence et les types de matériel utilisés. Jamais votre nom, vos charges ni vos exercices.",
   "settings.title": "Réglages",
   "settings.rerun": "Refaire la configuration",
   "settings.injuries": "Blessures et douleurs",
@@ -283,6 +295,10 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Gym-Einblicke",
+  "settings.gymStats.on": "Meine Gym-Besuche mitzählen",
+  "settings.gymStats.note":
+    "Wenn du in einem Gym trainierst, das du über die Karte hinzugefügt hast, sieht der Betreiber nur Summen: wie viele Sportler, die Stoßzeiten und welche Gerätearten genutzt werden. Nie deinen Namen, deine Gewichte oder Übungen.",
   "settings.title": "Einstellungen",
   "settings.rerun": "Einrichtung erneut ausführen",
   "settings.injuries": "Verletzungen und wunde Stellen",
@@ -374,6 +390,10 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Dati per le palestre",
+  "settings.gymStats.on": "Conta le mie visite in palestra",
+  "settings.gymStats.note":
+    "Quando ti alleni in una palestra aggiunta dalla mappa, il titolare vede solo totali: quanti atleti, gli orari di punta e i tipi di attrezzatura usati. Mai il tuo nome, i pesi o gli esercizi.",
   "settings.title": "Impostazioni",
   "settings.rerun": "Ripeti la configurazione",
   "settings.injuries": "Infortuni e punti doloranti",
@@ -467,6 +487,10 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "ジム向けの分析",
+  "settings.gymStats.on": "ジムへの来館を数える",
+  "settings.gymStats.note":
+    "マップから追加したジムでトレーニングすると、オーナーには合計だけが表示されます：利用者数、混む時間帯、使われた器具の種類。名前、重量、種目は表示されません。",
   "settings.title": "設定",
   "settings.rerun": "初期設定をやり直す",
   "settings.injuries": "ケガと痛む箇所",
@@ -557,6 +581,10 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Dados para academias",
+  "settings.gymStats.on": "Contar minhas visitas à academia",
+  "settings.gymStats.note":
+    "Quando você treina numa academia que adicionou pelo mapa, o dono vê só totais: quantos atletas, os horários de pico e os tipos de equipamento usados. Nunca seu nome, cargas ou exercícios.",
   "settings.title": "Ajustes",
   "settings.rerun": "Refazer a configuração",
   "settings.injuries": "Lesões e pontos doloridos",
@@ -652,6 +680,10 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "체육관 인사이트",
+  "settings.gymStats.on": "내 체육관 방문 집계",
+  "settings.gymStats.note":
+    "지도에서 추가한 체육관에서 운동하면 운영자는 합계만 봅니다: 이용자 수, 붐비는 시간, 사용된 기구 종류. 이름, 무게, 운동 종목은 보이지 않습니다.",
   "settings.title": "설정",
   "settings.rerun": "설정 다시 하기",
   "settings.injuries": "부상 및 아픈 부위",
@@ -745,6 +777,10 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Salon içgörüleri",
+  "settings.gymStats.on": "Salon ziyaretlerimi say",
+  "settings.gymStats.note":
+    "Haritadan eklediğin bir salonda antrenman yaptığında sahibi yalnızca toplamları görür: kaç sporcu, yoğun saatler ve kullanılan ekipman türleri. Asla adını, ağırlıklarını ya da egzersizlerini değil.",
   "settings.title": "Ayarlar",
   "settings.rerun": "Kurulumu yeniden çalıştır",
   "settings.injuries": "Sakatlıklar ve ağrıyan yerler",
@@ -840,6 +876,10 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "settings.gymStats": "Statystyki siłowni",
+  "settings.gymStats.on": "Licz moje wizyty na siłowni",
+  "settings.gymStats.note":
+    "Gdy trenujesz na siłowni dodanej z mapy, jej właściciel widzi tylko sumy: ile osób, godziny szczytu i rodzaje używanego sprzętu. Nigdy Twojego imienia, ciężarów ani ćwiczeń.",
   "settings.title": "Ustawienia",
   "settings.rerun": "Uruchom konfigurację ponownie",
   "settings.injuries": "Kontuzje i bolesne miejsca",

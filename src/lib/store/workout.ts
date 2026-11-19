@@ -4,6 +4,7 @@ import { derive } from "../derive";
 import { markJoke, plateJoke, seenJokes } from "../eggs";
 import { exercise } from "../exercises";
 import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
+import { noteVisit, visitFor } from "../gymVisits";
 import { t } from "../i18n";
 import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
@@ -1003,6 +1004,8 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           bpm: hr,
         });
       commit(evs);
+      // One anonymous visit for the gym's owner insights, when it's a real gym and the lifter left it on (gymVisits.ts).
+      noteVisit(visitFor(get(), a.sessionId, a.startedAt, at));
       // Counts and length only: no weights, reps or heart rate leave the device.
       track("workout_finish", {
         sets: sets.length,

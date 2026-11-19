@@ -349,3 +349,34 @@ Melvin, 2026-11-19: "Logos and 'all locations' pages for gym chains" (one of the
   - *Gym pages*: "Part of Planet Fitness · See all 2,431 locations" in the hero (website) and as one button in the gym's details in the app (`PlaceDetails.tsx`).
   - *App* (`GymChain.tsx`, `#/gymchain/<slug>`, `GET /api/gyms/?chain=`): the logo, "N locations", then every branch, **nearest first from the spot the lifter last searched for gyms** (`lastNearby`, never a new location request), 50 at a time with Show more, each opening its gym page; the chain's website at the foot.
 - **Reads** (docs/decisions/database-reads.md): pages and counts read only gyms in a chain through the partial index `gym_places_chain` (`WHERE chain <> ''`, repeated in each query); the chains step's name pass is the one full read, once per worldwide import, like the tidy step. Text: `gp.chain*` in `src/locales/text/gp.ts`, ten languages.
+## Owner insights (2026-11-19)
+
+Melvin picked item 8 of the 2026-11-17 gap list: insights for owners of claimed gyms (how many lifters train there, busy
+hours, which equipment gets used, open problem reports), aggregate only, no lifter exposed.
+
+- **Where the numbers come from: an anonymous visit per workout** (`src/lib/gymVisits.ts`, `src/server/gymInsights.ts`).
+  When a workout of 10 minutes or more ends at a gym the lifter added from the map (`Gym.placeId`), the app sends the
+  weekday and hour it started (the lifter's own clock, which is the gym's, since they're there), its length and the kinds
+  of equipment its exercises need (`needs`, so "barbell", "rack", never the exercise, a weight or a rep). Who it was is a
+  one-way code from the account, or the install id when signed out, so a lifter counts once; the row's id is a code from
+  that and the workout, so a retry never counts twice. Visits are kept on the device until sent (gyms have bad
+  reception: on finish, on open and back online) and on the server for 70 days, cleared per gym as new ones arrive
+  (no scheduled job). We didn't read the synced workouts instead: those are private to the lifter's own account, and
+  signed-out lifters would be missed.
+- **A switch, on by default:** Settings › Your data and privacy › Gym insights › **Count my gym visits**
+  (`profile.gymStats`), like Strength standards: on unless the device is where data choices need a yes first
+  (`askFirstHere`). **Under-18s are never counted** and don't see the switch. Deleting the account deletes its visits
+  (`visitDeletes`). Privacy policy and `docs/PRIVACY_LABELS.md` say so.
+- **What the owner and staff see** (`GymInsights.tsx`, op `insights`, `canManage`): under the owner's results on the
+  owner's page, for the last four weeks (`WINDOW_DAYS`, so each weekday counts four times) against the four before:
+  lifters, workouts, the typical (median) length, a bar for each hour from 5 AM to 11 PM with the busiest day and hour
+  named (only once a cell has 3 visits), and the equipment used as a share of workouts. **Shares, never counts per hour
+  or per lifter, and nothing but the lifter count until five different lifters trained there** (`MIN_LIFTERS`), so no
+  one lifter stands out.
+- **Led by one thing to do** (`insightStep`, "Action over stats"), the first that applies: fix the open equipment problem
+  reports (plans work around that equipment until Fixed); before five lifters, how many more; equipment in the gym's
+  setup nobody logged in four weeks (once there are 20 workouts); workouts down a fifth or more on the four weeks before
+  (with 10+ before); else the quietest weekday hour within opening hours, 6 AM to 9 PM, to tell members in an
+  announcement, with the busiest beside it.
+- One answer per gym per server for ten minutes, and the visit queries use `gym_visits_place` (`dbIndexes.test.ts`).
+- Free, like everything else for gyms. Pure web code plus the server, so Android, iOS and the web app get it together.

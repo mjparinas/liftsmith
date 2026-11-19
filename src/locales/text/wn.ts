@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.gymInsights.title": "Insights for gym owners",
+  "wn.c.gymInsights.body":
+    "Own a gym on Liftsmith? Its page now shows how many lifters train there, the busy and quiet hours and the equipment they use, with one thing to do next. Totals only, never who. Turn off Count my gym visits in Settings if you'd rather not count.",
   "wn.title": "What's new",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Version {version}",
@@ -88,6 +91,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Datos para dueños de gimnasios",
+  "wn.c.gymInsights.body":
+    "¿Tienes un gimnasio en Liftsmith? Su página muestra cuántos atletas entrenan allí, las horas llenas y tranquilas y el equipo que usan, con un siguiente paso. Solo totales, nunca quién. Desactiva Contar mis visitas al gimnasio en Ajustes si prefieres no contar.",
   "wn.title": "Novedades",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Versión {version}",
@@ -178,6 +184,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Des statistiques pour les propriétaires de salle",
+  "wn.c.gymInsights.body":
+    "Vous gérez une salle sur Liftsmith ? Sa page montre combien de sportifs s'y entraînent, les heures pleines et calmes et le matériel utilisé, avec une prochaine étape. Des totaux seulement, jamais qui. Désactivez Compter mes visites en salle dans Réglages si vous préférez.",
   "wn.title": "Nouveautés",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Version {version}",
@@ -270,6 +279,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Einblicke für Gym-Betreiber",
+  "wn.c.gymInsights.body":
+    "Du betreibst ein Gym auf Liftsmith? Seine Seite zeigt jetzt, wie viele Sportler dort trainieren, die vollen und ruhigen Stunden und die genutzten Geräte, mit einem nächsten Schritt. Nur Summen, nie wer. Schalte Meine Gym-Besuche mitzählen in den Einstellungen aus, wenn du nicht mitzählen willst.",
   "wn.title": "Neuigkeiten",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Version {version}",
@@ -360,6 +372,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Dati per i titolari di palestre",
+  "wn.c.gymInsights.body":
+    "Hai una palestra su Liftsmith? La sua pagina ora mostra quanti atleti si allenano lì, gli orari pieni e tranquilli e l'attrezzatura usata, con un passo successivo. Solo totali, mai chi. Disattiva Conta le mie visite in palestra nelle Impostazioni se preferisci.",
   "wn.title": "Novità",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Versione {version}",
@@ -450,6 +465,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "ジムオーナー向けの分析",
+  "wn.c.gymInsights.body":
+    "Liftsmithでジムを運営していますか？ジムのページに、利用者数、混む時間と空いている時間、使われた器具が、次の一手とともに表示されます。合計のみで、誰かは表示されません。数えられたくない場合は設定の「ジムへの来館を数える」をオフに。",
   "wn.title": "新機能",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "バージョン {version}",
@@ -532,6 +550,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Dados para donos de academia",
+  "wn.c.gymInsights.body":
+    "Tem uma academia no Liftsmith? A página dela agora mostra quantos atletas treinam lá, os horários cheios e tranquilos e os equipamentos usados, com um próximo passo. Só totais, nunca quem. Desative Contar minhas visitas à academia em Ajustes se preferir não contar.",
   "wn.title": "Novidades",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Versão {version}",
@@ -618,6 +639,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "체육관 운영자를 위한 인사이트",
+  "wn.c.gymInsights.body":
+    "Liftsmith에 체육관이 있나요? 이제 체육관 페이지에 이용자 수, 붐비는 시간과 한산한 시간, 사용된 기구가 다음 할 일과 함께 표시됩니다. 합계만 보이고 누구인지는 보이지 않습니다. 집계를 원하지 않으면 설정에서 내 체육관 방문 집계를 끄세요.",
   "wn.title": "새로운 기능",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "버전 {version}",
@@ -697,6 +721,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Statystyki dla właścicieli siłowni",
+  "wn.c.gymInsights.body":
+    "Masz siłownię w Liftsmith? Jej strona pokazuje teraz, ile osób tam trenuje, godziny tłoku i spokoju oraz używany sprzęt, z jednym następnym krokiem. Tylko sumy, nigdy kto. Wyłącz Licz moje wizyty na siłowni w Ustawieniach, jeśli wolisz nie być liczony.",
   "wn.title": "Co nowego",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Wersja {version}",
@@ -783,6 +810,9 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.gymInsights.title": "Salon sahipleri için içgörüler",
+  "wn.c.gymInsights.body":
+    "Liftsmith'te bir salonun mu var? Salonun sayfası artık kaç sporcunun orada antrenman yaptığını, yoğun ve sakin saatleri ve kullanılan ekipmanı, bir sonraki adımla birlikte gösteriyor. Yalnızca toplamlar, asla kim olduğu değil. Sayılmak istemezsen Ayarlar'da Salon ziyaretlerimi say'ı kapat.",
   "wn.title": "Yenilikler",
   "wn.kicker": "{brand} · {date}",
   "wn.version": "Sürüm {version}",
