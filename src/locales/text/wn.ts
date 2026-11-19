@@ -58,6 +58,9 @@ export const en = {
   "wn.c.iconBadge.title": "A number on the app icon",
   "wn.c.iconBadge.body":
     "See how many messages, likes, comments and follow requests are waiting without opening the app. Inside, red counts on Friends and your coach show where they are.",
+  "wn.c.routineLibrary.title": "A routine library",
+  "wn.c.routineLibrary.body":
+    "Find routines other lifters published, save one in a tap and rate it. Publish your own from its editor in your routines.",
   "wn.c.openNow.title": "Open now in the gym finder",
   "wn.c.openNow.body":
     "Every gym with its hours says whether it's open now and when it closes or opens, and an Open now chip shows only the open ones.",
@@ -130,6 +133,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Un número en el icono de la app",
   "wn.c.iconBadge.body":
     "Mira cuántos mensajes, me gusta, comentarios y solicitudes de seguimiento te esperan sin abrir la app. Dentro, los números rojos en Amigos y en tu entrenador te dicen dónde están.",
+  "wn.c.routineLibrary.title": "Una biblioteca de rutinas",
+  "wn.c.routineLibrary.body":
+    "Encuentra rutinas que publicaron otros atletas, guarda una con un toque y valórala. Publica las tuyas desde su editor en tus rutinas.",
   "wn.c.openNow.title": "Abierto ahora en el buscador de gimnasios",
   "wn.c.openNow.body":
     "Cada gimnasio con horario dice si está abierto ahora y cuándo cierra o abre, y el filtro Abierto ahora muestra solo los abiertos.",
@@ -204,6 +210,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Un nombre sur l'icône de l'app",
   "wn.c.iconBadge.body":
     "Voyez combien de messages, j'aime, commentaires et demandes d'abonnement vous attendent sans ouvrir l'app. Dedans, des nombres rouges sur Amis et sur votre coach montrent où ils sont.",
+  "wn.c.routineLibrary.title": "Une bibliothèque de routines",
+  "wn.c.routineLibrary.body":
+    "Trouvez des routines publiées par d'autres pratiquants, enregistrez-en une d'un geste et notez-la. Publiez les vôtres depuis leur éditeur dans vos routines.",
   "wn.c.openNow.title": "Ouvert maintenant dans la recherche de salles",
   "wn.c.openNow.body":
     "Chaque salle avec ses horaires indique si elle est ouverte et quand elle ferme ou ouvre, et le filtre Ouvert maintenant ne montre que celles qui sont ouvertes.",
@@ -277,6 +286,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Eine Zahl auf dem App-Symbol",
   "wn.c.iconBadge.body":
     "Sieh, wie viele Nachrichten, Likes, Kommentare und Follower-Anfragen warten, ohne die App zu öffnen. In der App zeigen rote Zahlen bei Freunde und deinem Coach, wo sie sind.",
+  "wn.c.routineLibrary.title": "Eine Routinen-Bibliothek",
+  "wn.c.routineLibrary.body":
+    "Finde Routinen, die andere veröffentlicht haben, speichere eine mit einem Tippen und bewerte sie. Deine eigenen veröffentlichst du in ihrem Editor in deinen Routinen.",
   "wn.c.openNow.title": "Jetzt geöffnet in der Studiosuche",
   "wn.c.openNow.body":
     "Jedes Studio mit Öffnungszeiten zeigt, ob es gerade offen ist und wann es schließt oder öffnet, und der Filter Jetzt geöffnet zeigt nur die offenen.",
@@ -349,6 +361,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Un numero sull'icona dell'app",
   "wn.c.iconBadge.body":
     "Vedi quanti messaggi, mi piace, commenti e richieste di follow ti aspettano senza aprire l'app. Dentro, numeri rossi su Amici e sul tuo coach ti dicono dove sono.",
+  "wn.c.routineLibrary.title": "Una libreria di routine",
+  "wn.c.routineLibrary.body":
+    "Trova le routine pubblicate da altri atleti, salvane una con un tocco e votala. Pubblica le tue dal loro editor nelle tue routine.",
   "wn.c.openNow.title": "Aperto ora nella ricerca palestre",
   "wn.c.openNow.body":
     "Ogni palestra con gli orari dice se è aperta ora e quando chiude o apre, e il filtro Aperto ora mostra solo quelle aperte.",
@@ -414,6 +429,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "アプリアイコンに数字",
   "wn.c.iconBadge.body":
     "アプリを開かなくても、届いているメッセージ、いいね、コメント、フォローリクエストの数がわかります。アプリ内では「フレンド」とコーチの赤い数字で場所がわかります。",
+  "wn.c.routineLibrary.title": "ルーティンライブラリ",
+  "wn.c.routineLibrary.body":
+    "ほかのリフターが公開したルーティンを探して、ワンタップで保存して評価できます。自分のルーティンは編集画面から公開できます。",
   "wn.c.openNow.title": "ジム検索に「営業中」",
   "wn.c.openNow.body":
     "営業時間のあるジムは、今開いているか、いつ閉まるか開くかを表示します。「営業中」チップで開いているジムだけを表示できます。",
@@ -482,6 +500,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Um número no ícone do app",
   "wn.c.iconBadge.body":
     "Veja quantas mensagens, curtidas, comentários e pedidos para seguir estão esperando sem abrir o app. Dentro dele, números vermelhos em Amigos e no seu treinador mostram onde estão.",
+  "wn.c.routineLibrary.title": "Uma biblioteca de rotinas",
+  "wn.c.routineLibrary.body":
+    "Encontre rotinas que outros atletas publicaram, salve uma com um toque e avalie. Publique as suas pelo editor delas nas suas rotinas.",
   "wn.c.openNow.title": "Aberto agora na busca de academias",
   "wn.c.openNow.body":
     "Cada academia com horário mostra se está aberta agora e quando fecha ou abre, e o filtro Aberto agora mostra só as abertas.",
@@ -546,6 +567,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "앱 아이콘에 숫자",
   "wn.c.iconBadge.body":
     "앱을 열지 않아도 기다리는 메시지, 좋아요, 댓글, 팔로우 요청 수를 볼 수 있습니다. 앱 안에서는 친구와 코치의 빨간 숫자가 어디에 있는지 알려 줍니다.",
+  "wn.c.routineLibrary.title": "루틴 라이브러리",
+  "wn.c.routineLibrary.body": "다른 리프터가 공개한 루틴을 찾아 한 번에 저장하고 평가하세요. 내 루틴은 편집 화면에서 공개할 수 있어요.",
   "wn.c.openNow.title": "헬스장 찾기에 '영업 중'",
   "wn.c.openNow.body": "영업시간이 있는 헬스장은 지금 열었는지, 언제 닫거나 여는지 보여 주고, '영업 중' 칩으로 열린 곳만 볼 수 있습니다.",
   "wn.c.settingsSearch.title": "설정 검색",
@@ -613,6 +636,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Liczba na ikonie aplikacji",
   "wn.c.iconBadge.body":
     "Zobacz, ile wiadomości, polubień, komentarzy i próśb o obserwowanie czeka, bez otwierania aplikacji. W środku czerwone liczby przy Znajomych i Twoim trenerze pokazują, gdzie są.",
+  "wn.c.routineLibrary.title": "Biblioteka rutyn",
+  "wn.c.routineLibrary.body":
+    "Znajdź rutyny opublikowane przez innych, zapisz jedną jednym dotknięciem i oceń ją. Swoje opublikujesz w ich edytorze w rutynach.",
   "wn.c.openNow.title": "Otwarte teraz w wyszukiwarce siłowni",
   "wn.c.openNow.body":
     "Każda siłownia z godzinami pokazuje, czy jest teraz otwarta i kiedy się zamyka lub otwiera, a filtr Otwarte teraz pokazuje tylko otwarte.",
@@ -682,6 +708,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Uygulama simgesinde bir sayı",
   "wn.c.iconBadge.body":
     "Uygulamayı açmadan kaç mesaj, beğeni, yorum ve takip isteği beklediğini gör. İçeride Arkadaşlar'daki ve koçundaki kırmızı sayılar nerede olduklarını gösterir.",
+  "wn.c.routineLibrary.title": "Rutin kütüphanesi",
+  "wn.c.routineLibrary.body":
+    "Diğer sporcuların yayınladığı rutinleri bul, birini tek dokunuşla kaydet ve puanla. Kendi rutinlerini düzenleyicilerinden yayınla.",
   "wn.c.openNow.title": "Spor salonu bulucuda Şimdi açık",
   "wn.c.openNow.body":
     "Saatleri olan her salon şu an açık olup olmadığını ve ne zaman kapanıp açılacağını gösteriyor; Şimdi açık çipi yalnızca açık olanları listeliyor.",

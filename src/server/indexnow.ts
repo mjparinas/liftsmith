@@ -14,6 +14,7 @@ import { absolute, siteRoutes, type Route } from "@/lib/seo";
 
 import { communityEntries, publicBoard } from "./communityPage";
 import { batch, query } from "./db";
+import { libraryEntries, publicRoutines } from "./libraryPage";
 import { programEntries, publicPrograms } from "./programPage";
 import { sitemapPeople } from "./publicProfile";
 import { publishedLifts } from "./standards";
@@ -36,11 +37,12 @@ export async function peopleRoutes(): Promise<Route[]> {
 
 /** Server-drawn pages worth indexing that aren't in the site's own sitemap: standards and the trainer directory. Undated, so each goes once. */
 export async function serverRoutes(): Promise<Route[]> {
-  const [lifts, cities, programs, community] = await Promise.all([
+  const [lifts, cities, programs, community, routines] = await Promise.all([
     publishedLifts().catch(() => []),
     trainerCities().catch(() => []),
     publicPrograms().catch(() => []),
     publicBoard().catch(() => ({ posts: [], shipped: [] })),
+    publicRoutines().catch(() => []),
   ]);
   const paths = [
     ...(lifts.length ? [standardsPath(), ...lifts.map((l) => standardsPath(l.lift))] : []),
@@ -48,11 +50,14 @@ export async function serverRoutes(): Promise<Route[]> {
   ];
   // Coaches' programs are dated by their last change, so an edited program goes again (programPage.ts).
   // Community posts are dated too: a status change sends the page again (communityPage.ts).
-  const dated = [...programEntries(programs), ...communityEntries(community.posts, community.shipped)].map((e) => ({
-    path: e.path,
-    date: new Date(e.lastModified).toISOString().slice(0, 10),
-    priority: 0.5,
-  }));
+  // Library routines too, dated by their last change (libraryPage.ts).
+  const dated = [...programEntries(programs), ...communityEntries(community.posts, community.shipped), ...libraryEntries(routines)].map(
+    (e) => ({
+      path: e.path,
+      date: new Date(e.lastModified).toISOString().slice(0, 10),
+      priority: 0.5,
+    }),
+  );
   return [...paths.map((path) => ({ path, priority: 0.5 })), ...dated];
 }
 

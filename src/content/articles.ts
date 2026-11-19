@@ -41,6 +41,7 @@ import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
 import { BLOG_REHAB_DONE } from "./blog/rehabDone";
 import { BLOG_REHAB_PHASES } from "./blog/rehabPhases";
+import { BLOG_ROUTINE_LIBRARY } from "./blog/routineLibrary";
 import { BLOG_S } from "./blog/s";
 import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
@@ -279,6 +280,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_GYM_OPEN_NOW,
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
+  ...BLOG_ROUTINE_LIBRARY,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

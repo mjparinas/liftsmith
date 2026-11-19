@@ -963,4 +963,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
   },
+  "routine-library": {
+    title: "Find a routine another lifter made",
+    intro: "The new routine library has routines other lifters published, ready to save in a tap.",
+    points: [
+      "Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.",
+      "Save one and it lands in your routines, ready to start or change.",
+      "Rate it with stars once you've saved it. Stars show from three ratings.",
+      "Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.",
+    ],
+    dyk: "Every published routine gets its own page on the website, so you can share it with anyone.",
+  },
 };

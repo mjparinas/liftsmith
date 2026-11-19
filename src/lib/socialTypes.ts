@@ -272,7 +272,7 @@ export interface ActivityItem {
 
 /** A coach review or a coach's reply to one is "review" (src/server/coachReviews.ts). */
 /** What can be reported. "feedback" is an idea, bug or comment in the Liftsmith community (src/server/community.ts). */
-export type ReportKind = "post" | "comment" | "profile" | "review" | "message" | "feedback";
+export type ReportKind = "post" | "comment" | "profile" | "review" | "message" | "feedback" | "routine";
 export const REPORT_REASONS = [
   "spam",
   "abuse",
@@ -299,6 +299,7 @@ export const REASONS_FOR: Record<ReportKind, readonly ReportReason[]> = {
   review: ["spam", "abuse", "hate", "sexual", "impersonation", "other"],
   message: ["spam", "abuse", "hate", "sexual", "danger", "other"],
   feedback: ["spam", "abuse", "hate", "sexual", "danger", "other"],
+  routine: ["spam", "abuse", "danger", "other"],
 };
 /** A report's optional note (only staff read it). */
 export const REPORT_NOTE_MAX = 280;

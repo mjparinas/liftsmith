@@ -950,4 +950,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
   },
+  "routine-library": {
+    title: "Trouvez une routine créée par quelqu'un d'autre",
+    intro: "La nouvelle bibliothèque de routines rassemble celles que d'autres ont publiées, prêtes à enregistrer d'un geste.",
+    points: [
+      "Cherchez par mots, choisissez un objectif ou activez Adaptées à ma salle pour ne voir que celles que votre salle permet.",
+      "Enregistrez-en une et elle rejoint vos routines, prête à lancer ou à modifier.",
+      "Notez-la avec des étoiles une fois enregistrée. Les étoiles s'affichent à partir de trois notes.",
+      "Publiez la vôtre depuis son éditeur, avec ou sans votre nom. Seuls les exercices et les séries sont partagés, jamais les charges ni les notes.",
+    ],
+    dyk: "Chaque routine publiée a sa propre page sur le site, à partager avec qui vous voulez.",
+  },
 };

@@ -106,6 +106,7 @@ import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
 import * as rev from "./text/rev";
 import * as rhp from "./text/rhp";
+import * as rl from "./text/rl";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -245,6 +246,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...recovery.ko,
   ...remix.ko,
   ...cpg.ko,
+  ...rl.ko,
   ...rev.ko,
   ...rmd.ko,
   ...rhp.ko,

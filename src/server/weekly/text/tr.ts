@@ -943,4 +943,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
   },
+  "routine-library": {
+    title: "Başka bir sporcunun hazırladığı rutini bul",
+    intro: "Yeni rutin kütüphanesi, başkalarının yayımladığı rutinleri tek dokunuşla kaydetmeye hazır sunuyor.",
+    points: [
+      "Kelimelerle ara, bir hedef seç ya da yalnızca salonunun ekipmanıyla yapılabilenleri görmek için Salonuma uygun'u aç.",
+      "Kaydettiğin rutin, başlamaya ya da değiştirmeye hazır şekilde rutinlerine eklenir.",
+      "Kaydettikten sonra yıldızla puanla. Yıldızlar üç puandan itibaren görünür.",
+      "Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla. Yalnızca hareketler ve setler paylaşılır, ağırlıklar ya da notlar asla.",
+    ],
+    dyk: "Yayımlanan her rutinin web sitesinde kendi sayfası olur, istediğin kişiyle paylaşabilirsin.",
+  },
 };

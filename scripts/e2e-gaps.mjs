@@ -104,6 +104,7 @@ const SCREENS = [
   "#/log",
   "#/feedback",
   "#/community",
+  "#/library",
   "#/season",
   "#/gymadd",
 ];

@@ -106,6 +106,7 @@ import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
 import * as rev from "./text/rev";
 import * as rhp from "./text/rhp";
+import * as rl from "./text/rl";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -227,6 +228,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...part.es,
   ...past.es,
   ...cpg.es,
+  ...rl.es,
   ...pay.es,
   ...pgm.es,
   ...photos.es,

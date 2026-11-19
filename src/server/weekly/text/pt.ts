@@ -947,4 +947,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
   },
+  "routine-library": {
+    title: "Encontre uma rotina feita por outra pessoa",
+    intro: "A nova biblioteca de rotinas reúne rotinas que outras pessoas publicaram, prontas para salvar com um toque.",
+    points: [
+      "Busque por palavras, escolha um objetivo ou ative Serve na minha academia para ver só o que a sua academia permite.",
+      "Salve uma e ela vai para as suas rotinas, pronta para começar ou mudar.",
+      "Avalie com estrelas depois de salvar. As estrelas aparecem a partir de três avaliações.",
+      "Publique a sua pelo editor, com ou sem seu nome. Só saem exercícios e séries, nunca cargas ou anotações.",
+    ],
+    dyk: "Cada rotina publicada ganha uma página própria no site, para compartilhar com quem quiser.",
+  },
 };

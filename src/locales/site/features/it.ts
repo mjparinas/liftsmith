@@ -270,6 +270,11 @@ export const it: FeaturesText = {
       name: "Le tue routine",
       body: "Crea routine dal catalogo esercizi, senza limiti di numero, e condividile con un link.",
     },
+    "routine-library": {
+      name: "Libreria di routine",
+      body: "Cerca le routine pubblicate da altri per obiettivo, parole e attrezzatura della tua palestra, salvane una con un tocco e valutala con le stelle. Pubblica la tua dal suo editor, con o senza il tuo nome, e avrà una sua pagina sul sito. Escono solo esercizi e serie, mai i tuoi carichi o le tue note.",
+      note: "Per pubblicare servono un account e 18 anni. Chiunque può sfogliare.",
+    },
     library: {
       name: "1.000 esercizi",
       body: "Forza, corpo libero, macchine, elastici, kettlebell e cardio, con ricerca, filtri per muscolo e un filtro per questa palestra. Il cardio registra tempo e distanza.",

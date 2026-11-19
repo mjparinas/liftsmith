@@ -1303,6 +1303,44 @@ const SCHEMA = [
     PRIMARY KEY (program_id, account_id)
   )`,
   "CREATE INDEX IF NOT EXISTS program_reviews_account ON program_reviews (account_id)",
+  // The public routine library (routineLibrary.ts, docs/decisions/routine-library.md, 2026-11-19): routines lifters
+  // published, who saved each from the library (counted once) and their stars. Ratings are summed onto the routine.
+  `CREATE TABLE IF NOT EXISTS library_routines (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    code TEXT NOT NULL,
+    title TEXT NOT NULL,
+    about TEXT NOT NULL DEFAULT '',
+    goal TEXT NOT NULL,
+    level TEXT NOT NULL,
+    equipment TEXT NOT NULL DEFAULT '',
+    minutes INTEGER NOT NULL,
+    show_name INTEGER NOT NULL DEFAULT 1,
+    author TEXT NOT NULL DEFAULT '',
+    saves INTEGER NOT NULL DEFAULT 0,
+    star_sum INTEGER NOT NULL DEFAULT 0,
+    ratings INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS library_routines_account ON library_routines (account_id, code)",
+  "CREATE INDEX IF NOT EXISTS library_routines_list ON library_routines (hidden, saves)",
+  `CREATE TABLE IF NOT EXISTS library_saves (
+    routine_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (routine_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS library_saves_account ON library_saves (account_id)",
+  `CREATE TABLE IF NOT EXISTS library_ratings (
+    routine_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    stars INTEGER NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (routine_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS library_ratings_account ON library_ratings (account_id)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (
