@@ -4,13 +4,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { BADGE_MAX, badgeCount, badgeOn, countText } from "./badgeCount";
 import { badgeSupported, resetIconBadge, setIconBadge } from "./iconBadge";
 
-type Nav = Navigator & { setAppBadge?: unknown; clearAppBadge?: unknown };
-
 afterEach(() => {
   resetIconBadge();
-  delete (navigator as Nav).setAppBadge;
-  delete (navigator as Nav).clearAppBadge;
-  delete (window as unknown as { Capacitor?: unknown }).Capacitor;
+  Reflect.deleteProperty(navigator, "setAppBadge");
+  Reflect.deleteProperty(navigator, "clearAppBadge");
+  Reflect.deleteProperty(window, "Capacitor");
 });
 
 describe("the app icon's number", () => {
