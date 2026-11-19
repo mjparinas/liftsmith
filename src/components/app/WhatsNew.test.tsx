@@ -13,6 +13,14 @@ import { useApp } from "@/lib/store";
 import { VersionRow, WhatsNewNote } from "./WhatsNew";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
+// The sheet is checked against a fixed release (0.1.0, which has every kind and a change behind an unlock), so a
+// new release at the top of RELEASES doesn't change what these tests read. Its day stays the real newest one,
+// because that's what the note and the seen mark go by.
+vi.mock("@/lib/appNews", async (load) => {
+  const real = await load<typeof import("@/lib/appNews")>();
+  const fixed = { ...real.RELEASES.find((r) => r.version === "0.1.0")!, day: real.LATEST.day };
+  return { ...real, LATEST: fixed, RELEASES: [fixed] };
+});
 
 const trained = () => useApp.setState((s) => ({ stats: { ...s.stats, sessions: [{} as (typeof s.stats.sessions)[number]] } }));
 

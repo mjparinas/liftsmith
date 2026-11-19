@@ -21,6 +21,8 @@ export type NewsItem = {
 };
 export type NewsDay = {
   /** ISO day, e.g. 2026-11-09 (Pacific time). Used as the anchor. */ day: string;
+  /** The app version it shipped as, for the app's releases (src/lib/appNews.ts). */
+  version?: string;
   headline: string;
   items: NewsItem[];
 };
@@ -36,6 +38,7 @@ const words = (key: string): string => {
 /** The app's releases, in English. */
 const FROM_APP: NewsDay[] = RELEASES.map((r) => ({
   day: r.day,
+  version: r.version,
   headline: r.headline,
   items: r.changes.map((c) => ({ kind: c.kind, title: words(`wn.c.${c.id}.title`), body: words(`wn.c.${c.id}.body`) })),
 }));
