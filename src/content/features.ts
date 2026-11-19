@@ -958,6 +958,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         where: "phones",
         added: "2026-11-10",
       },
+      {
+        id: "outside-workouts",
+        name: "Workouts from other apps count",
+        body: "Turn it on and the runs, rides, sports and classes other apps save to your phone's health app count in your recovery map and tomorrow's plan. A long match yesterday leaves your legs recovering, and the plan works around it.",
+        tier: "free",
+        where: "phones",
+        added: "2026-11-19",
+      },
     ],
   },
   {
@@ -1298,7 +1306,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       {
         id: "health-connect",
         name: "Health Connect",
-        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps and food in; finished workouts out",
+        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps and food in; finished workouts out; other apps' workouts in, if you turn it on",
         android: "yes",
         ios: "no",
         web: "no",
@@ -1307,7 +1315,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       {
         id: "apple-health",
         name: "Apple Health",
-        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps, food, height, age and sex in; finished workouts out",
+        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps, food, height, age and sex in; finished workouts out; other apps' workouts in, if you turn it on",
         android: "no",
         ios: "yes",
         web: "no",

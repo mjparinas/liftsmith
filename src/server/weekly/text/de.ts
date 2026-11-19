@@ -946,4 +946,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
   },
+  "outside-workouts": {
+    title: "Deine Läufe und Spiele zählen jetzt in deiner Erholung",
+    intro:
+      "Schalte Trainings aus anderen Apps zählen ein, dann prägen die Trainings aus der Gesundheits-App deines Handys deine Erholungskarte und den Plan für morgen.",
+    points: [
+      "Läufe, Radtouren, Sport und Kurse kommen jedes Mal rein, wenn du die App öffnest.",
+      "Jedes ermüdet die Muskeln, die es nutzt, umso mehr, je länger es lief.",
+      "Der Plan für morgen schont müde Beine nach einem langen Lauf oder Spiel.",
+      "Sie zählen nie als Liftsmith-Trainings, und nichts zählt doppelt.",
+    ],
+    dyk: "Du findest es unter Einstellungen › Verbundene Apps, und die Liste unter der Erholungskarte auf Körper zeigt, was gezählt wird.",
+  },
 };

@@ -513,6 +513,10 @@ export const de: FeaturesText = {
       name: "Trainings in deiner Gesundheits-App",
       body: "Jedes beendete Training wird als Krafttraining in Health Connect oder Apple Health gespeichert, mit Kalorien und Puls.",
     },
+    "outside-workouts": {
+      name: "Trainings aus anderen Apps zählen",
+      body: "Eingeschaltet zählen Läufe, Radtouren, Sport und Kurse, die andere Apps in deiner Gesundheits-App speichern, in deiner Erholungskarte und im Plan für morgen. Ein langes Spiel gestern lässt die Beine in Erholung, und der Plan richtet sich danach.",
+    },
     offline: {
       name: "Funktioniert offline",
       body: "Alles läuft auf deinem Gerät und synchronisiert sich im Hintergrund, also ist kein Empfang im Kellerstudio kein Problem.",
@@ -667,10 +671,10 @@ export const de: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte und Ernährung rein; beendete Trainings raus",
+      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte und Ernährung rein; beendete Trainings raus; eingeschaltet auch Trainings aus anderen Apps rein",
     },
     "apple-health": {
-      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte, Ernährung, Größe, Alter und Geschlecht rein; beendete Trainings raus",
+      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte, Ernährung, Größe, Alter und Geschlecht rein; beendete Trainings raus; eingeschaltet auch Trainings aus anderen Apps rein",
     },
     "samsung-health": { does: "Seine Werte, sobald du sie mit Health Connect teilst" },
     "health-devices": {

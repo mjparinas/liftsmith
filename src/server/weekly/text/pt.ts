@@ -947,4 +947,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
   },
+  "outside-workouts": {
+    title: "Suas corridas e partidas agora contam na recuperação",
+    intro:
+      "Ligue Contar treinos de outros apps e os treinos do app de saúde do seu celular ajustam o mapa de recuperação e o plano de amanhã.",
+    points: [
+      "Corridas, pedais, esportes e aulas chegam sempre que você abre o app.",
+      "Cada um cansa os músculos que usa, mais quanto mais tempo durou.",
+      "O plano de amanhã poupa as pernas cansadas depois de uma corrida ou partida longa.",
+      "Eles nunca contam como treinos do Liftsmith, e nada conta duas vezes.",
+    ],
+    dyk: "Fica em Ajustes › Apps conectados, e a lista abaixo do mapa de recuperação em Corpo mostra o que está sendo contado.",
+  },
 };
