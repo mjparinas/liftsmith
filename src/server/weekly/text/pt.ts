@@ -947,4 +947,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
   },
+  "gym-insights": {
+    title: "Veja como os alunos usam sua academia",
+    intro: "A página da sua academia no app mostra como se treina lá, com um próximo passo.",
+    points: [
+      "Quantos atletas treinaram lá nas últimas quatro semanas, comparado às quatro anteriores.",
+      "Os horários de pico, com o dia e a hora mais cheios, e o horário mais tranquilo dos dias úteis para contar aos alunos.",
+      "Os equipamentos mais usados e os que ninguém tocou.",
+      "Problemas de equipamento abertos vêm primeiro, porque os planos evitam esse equipamento até você tocar em Consertado.",
+    ],
+    dyk: "São só totais, de atletas que contam suas visitas, e começa quando cinco treinaram lá. Você nunca vê quem.",
+  },
 };

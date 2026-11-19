@@ -70,6 +70,11 @@ export const fr: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Statistiques pour les propriétaires de salle",
+      body: "Les propriétaires et le personnel des salles officielles voient combien de sportifs s'y sont entraînés ces quatre dernières semaines, les heures pleines et calmes, le matériel utilisé et les problèmes signalés, avec une prochaine étape.",
+      note: "Des totaux et des parts seulement, d'après les sportifs qui comptent leurs visites, et seulement dès que cinq s'y sont entraînés.",
+    },
     adaptive: {
       name: "Séances adaptatives quotidiennes",
       body: "Choisit des exercices que votre salle permet et pour lesquels vos muscles sont prêts, puis fixe chaque charge et chaque répétition d’après vos dernières séances.",

@@ -778,3 +778,12 @@ Find gyms near you now says which gyms are open, and when they close or open nex
 - Tap Open now above the list to hide the closed ones, on the map too.
 - It's worked out on your own clock, for gyms near you.
 Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")
+
+### G4 · See how members use your gym (**New**, 2026-11-19)
+Free · Gyms · No screen (it needs an official gym with five lifters) · `fresh`, so it goes next to gyms already in the series
+Your gym's page in the app now shows how lifters train there, with one thing to do next.
+- How many lifters trained there in the last four weeks, and how that compares with the four weeks before.
+- The busy hours, with the busiest day and time, and your quietest weekday hour to tell members about.
+- The equipment members use most, and any in your setup nobody has touched.
+- Open equipment problem reports come first, because lifters' plans skip that equipment until you tap Fixed.
+Did you know? It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who. ([Gyms](gyms.md) "Owner insights")

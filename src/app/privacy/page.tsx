@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMeta({
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
-const UPDATED = "16 November 2026";
+const UPDATED = "19 November 2026";
 
 export default function Privacy() {
   return (
@@ -187,6 +187,15 @@ export default function Privacy() {
           how many lifters train there: we keep that you added it with your account (or a one-way code from your internet address), and show
           only the total. If you list a gym you added this way, the listing says which real gym it is. Deleting your account removes you
           from those totals.
+        </p>
+        <p className="mt-2">
+          When you finish a workout of 10 minutes or more at a gym you added from the map, the app sends us an anonymous visit for that
+          gym&apos;s owner insights: the weekday and hour it started, how long it lasted and the kinds of equipment used (such as barbell or
+          leg press), never a weight, a rep, an exercise or where you are. We keep who it was only as a one-way code made from your account
+          (or, signed out, a random install id), so you count once, and clear visits after ten weeks. The gym&apos;s owner and staff see
+          totals and percentages only, and nothing about hours or equipment until five lifters have trained there in four weeks. Turn off
+          Count my gym visits in Settings › Your data and privacy to stop; it starts off where the law asks for a yes first, and under-18s
+          are never counted. Deleting your account deletes your visits.
         </p>
         <p className="mt-2">
           If you claim a gym as its owner, manager or staff, we keep your name, role, the work email you give, and optionally a phone number

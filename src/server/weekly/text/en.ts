@@ -963,4 +963,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
   },
+  "gym-insights": {
+    title: "See how members use your gym",
+    intro: "Your gym's page in the app now shows how lifters train there, with one thing to do next.",
+    points: [
+      "How many lifters trained there in the last four weeks, and how that compares with the four weeks before.",
+      "The busy hours, with the busiest day and time, and your quietest weekday hour to tell members about.",
+      "The equipment members use most, and any in your setup nobody has touched.",
+      "Open equipment problem reports come first, because lifters' plans skip that equipment until you tap Fixed.",
+    ],
+    dyk: "It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who.",
+  },
 };

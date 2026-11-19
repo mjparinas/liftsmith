@@ -26,6 +26,7 @@ import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 
 import { AmenitiesSection, OwnerExtrasSections, priceDraft, pricesOf, type PriceDraft } from "./GymExtras";
+import { InsightsSection } from "./GymInsights";
 import { StaffSection, StarterSection } from "./GymStaff";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
@@ -154,6 +155,7 @@ export function GymEdit({ id }: { id?: string }) {
       <ScreenHeader title={t("gym.edit.title")} kicker={gymName(gym.name)} back={{ label: t("gym.back"), onClick: goBack }} />
 
       <Results gym={gym} />
+      <InsightsSection gym={gym} />
       <ClubSection gym={gym} />
       <OwnerExtrasSections gym={gym} />
       <PicturesSection gym={gym} />

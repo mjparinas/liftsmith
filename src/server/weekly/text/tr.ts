@@ -943,4 +943,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
   },
+  "gym-insights": {
+    title: "Üyelerin salonunu nasıl kullandığını gör",
+    intro: "Uygulamadaki salon sayfan artık orada nasıl antrenman yapıldığını bir sonraki adımla gösteriyor.",
+    points: [
+      "Son dört haftada orada kaç sporcunun antrenman yaptığı ve bunun önceki dört haftayla karşılaştırması.",
+      "Yoğun saatler, en yoğun gün ve saat, ve üyelere söyleyebileceğin hafta içi en sakin saat.",
+      "En çok kullanılan ekipman ve kimsenin dokunmadığı ekipman.",
+      "Açık ekipman sorunları önce gelir, çünkü Onarıldı'ya dokunana kadar planlar o ekipmanı atlar.",
+    ],
+    dyk: "Yalnızca toplamlar, ziyaretlerini saydıran sporculardan, ve beş sporcu antrenman yapınca başlar. Kim olduğunu asla görmezsin.",
+  },
 };

@@ -950,4 +950,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
   },
+  "gym-insights": {
+    title: "Voyez comment les membres utilisent votre salle",
+    intro: "La page de votre salle dans l'app montre comment on s'y entraîne, avec une prochaine étape.",
+    points: [
+      "Combien de sportifs s'y sont entraînés ces quatre dernières semaines, comparé aux quatre d'avant.",
+      "Les heures pleines, avec le jour et l'heure les plus chargés, et votre heure la plus calme en semaine à annoncer aux membres.",
+      "Le matériel le plus utilisé, et celui que personne n'a touché.",
+      "Les problèmes de matériel ouverts passent en premier, car les programmes évitent ce matériel jusqu'à ce que vous touchiez Réparé.",
+    ],
+    dyk: "Ce sont des totaux seulement, d'après les sportifs qui comptent leurs visites, et ça démarre dès que cinq s'y sont entraînés. Vous ne voyez jamais qui.",
+  },
 };

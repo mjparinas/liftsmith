@@ -592,6 +592,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-19",
       },
       {
+        id: "gym-insights",
+        name: "Insights for gym owners",
+        body: "Owners and staff of official gyms see how many lifters trained there in the last four weeks, the busy and quiet hours, the equipment they used and open problem reports, led by one thing to do next.",
+        tier: "free",
+        note: "Totals and shares only, from lifters who count their gym visits, and only once five lifters trained there.",
+        added: "2026-11-19",
+      },
+      {
         id: "buy-next",
         name: "What to buy next",
         body: "For home gyms: the one piece of equipment that would open up the most exercises.",

@@ -319,3 +319,35 @@ Melvin, 2026-11-19: "for the gyms we scrape, is it possible find higher resoluti
 - **Measured, not trusted** (`imageSize`, `iconPx`): each file fetched is measured from its own bytes (PNG, GIF, ICO's biggest picture, JPEG, WebP), must be square within 25%, and the biggest wins. It stops at the first of 180 px or more, after at most five icon files, still within the 150 KB cap. Its size is kept in `gym_photos.px` (the smaller side).
 - **Small icons get another look**: an icon under 128 px counts as missing, so the gym is read again when its site is next due (a month, like any other missing field), and a sharper icon replaces it only if it's bigger. The replacement gets a new id, because pictures are cached for good. Claimed gyms and gyms with an owner's logo are never touched (the statement checks both).
 - **Backfill of icons kept before this** (no button): every website step (the import job's and each daily refresh's, `enrichBatch`) first measures up to 500 icons with `px = 0` from their first 4 KB only (`substr(image, 1, 4096)`), so Turso's bandwidth never pays for whole images, through the partial index `gym_photos_unmeasured`, which is empty once they're all measured, so it costs nothing after that. An unclaimed gym whose old icon is small goes to the front of the website step's line (`enriched_at = 1`, which still counts as read for the AI step), so the next daily refresh looks for a sharper one. One that can't be measured counts as 1 px.
+
+## Owner insights (2026-11-19)
+
+Melvin picked item 8 of the 2026-11-17 gap list: insights for owners of claimed gyms (how many lifters train there, busy
+hours, which equipment gets used, open problem reports), aggregate only, no lifter exposed.
+
+- **Where the numbers come from: an anonymous visit per workout** (`src/lib/gymVisits.ts`, `src/server/gymInsights.ts`).
+  When a workout of 10 minutes or more ends at a gym the lifter added from the map (`Gym.placeId`), the app sends the
+  weekday and hour it started (the lifter's own clock, which is the gym's, since they're there), its length and the kinds
+  of equipment its exercises need (`needs`, so "barbell", "rack", never the exercise, a weight or a rep). Who it was is a
+  one-way code from the account, or the install id when signed out, so a lifter counts once; the row's id is a code from
+  that and the workout, so a retry never counts twice. Visits are kept on the device until sent (gyms have bad
+  reception: on finish, on open and back online) and on the server for 70 days, cleared per gym as new ones arrive
+  (no scheduled job). We didn't read the synced workouts instead: those are private to the lifter's own account, and
+  signed-out lifters would be missed.
+- **A switch, on by default:** Settings › Your data and privacy › Gym insights › **Count my gym visits**
+  (`profile.gymStats`), like Strength standards: on unless the device is where data choices need a yes first
+  (`askFirstHere`). **Under-18s are never counted** and don't see the switch. Deleting the account deletes its visits
+  (`visitDeletes`). Privacy policy and `docs/PRIVACY_LABELS.md` say so.
+- **What the owner and staff see** (`GymInsights.tsx`, op `insights`, `canManage`): under the owner's results on the
+  owner's page, for the last four weeks (`WINDOW_DAYS`, so each weekday counts four times) against the four before:
+  lifters, workouts, the typical (median) length, a bar for each hour from 5 AM to 11 PM with the busiest day and hour
+  named (only once a cell has 3 visits), and the equipment used as a share of workouts. **Shares, never counts per hour
+  or per lifter, and nothing but the lifter count until five different lifters trained there** (`MIN_LIFTERS`), so no
+  one lifter stands out.
+- **Led by one thing to do** (`insightStep`, "Action over stats"), the first that applies: fix the open equipment problem
+  reports (plans work around that equipment until Fixed); before five lifters, how many more; equipment in the gym's
+  setup nobody logged in four weeks (once there are 20 workouts); workouts down a fifth or more on the four weeks before
+  (with 10+ before); else the quietest weekday hour within opening hours, 6 AM to 9 PM, to tell members in an
+  announcement, with the busiest beside it.
+- One answer per gym per server for ten minutes, and the visit queries use `gym_visits_place` (`dbIndexes.test.ts`).
+- Free, like everything else for gyms. Pure web code plus the server, so Android, iOS and the web app get it together.

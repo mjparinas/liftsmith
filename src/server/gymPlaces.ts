@@ -1094,7 +1094,7 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
         { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_photos WHERE place_id = ?", args: [id] },
-        ...["gym_news", "gym_issues", "gym_trainers", "gym_staff", "gym_staff_invites", "gym_classes"].map((t) => ({
+        ...["gym_news", "gym_issues", "gym_trainers", "gym_staff", "gym_staff_invites", "gym_classes", "gym_visits"].map((t) => ({
           sql: `DELETE FROM ${t} WHERE place_id = ?`,
           args: [id],
         })),

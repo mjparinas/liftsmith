@@ -149,6 +149,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("physio-protocols", "physio", "pro", "trainer", { fresh: "2026-11-17", shot: false }),
   // New, 2026-11-19: open now in the gym finder, with an Open now filter (docs/decisions/gyms.md "Open now").
   L("gym-open-now", "free", "gym", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: insights for gym owners (docs/decisions/gyms.md "Owner insights").
+  R("gym-insights", "gym", "free", "gym", { fresh: "2026-11-19", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

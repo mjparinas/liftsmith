@@ -1,7 +1,7 @@
 // Find a gym near you (src/server/gymDirectory.ts, docs/decisions/gym-sharing.md). Server build only.
 // GET ?lat=&lon=[&studios=1]: real gyms (gymPlaces.ts, official ones first) and listed setups near a position the
 // app already rounded to about 1 km. Anyone, rate-limited. `gyms` stays as it was for older apps; `places` is new.
-// POST {op}: publish, unpublish, mine, suggest (add a gym the map doesn't have), the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release), gymClub and
+// POST {op}: visit (one anonymous visit for a gym's insights, signed out too), insights (the owner's view), publish, unpublish, mine, suggest (add a gym the map doesn't have), the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release), gymClub and
 // the poster ops (posters, posterStatus)
 // need a signed-in account; added, report and placeReport (a problem with a real gym's page) work signed out too. Round 3 (gymExtras.ts): issue, issueFixed and
 // issues (equipment problems) work signed out; news, newsDelete, extras (the owner's view), trainer, trainerLeave,
@@ -25,6 +25,7 @@ import {
   postNews,
   reportIssue,
 } from "@/server/gymExtras";
+import { countVisit, gymInsights } from "@/server/gymInsights";
 import { areaMapPath } from "@/server/gymMedia";
 import { mergedTarget, reportPlace } from "@/server/gymPlaceReports";
 import { closestPlaces, isPlaceId, joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
@@ -104,6 +105,16 @@ export async function POST(req: Request) {
     const r = await reportIssue(who, b);
     if (r.ok) return reply(req, 200, r);
     return reply(req, r.error === "slow" ? 429 : r.error === "gone" ? 404 : 400, { error: r.error });
+  }
+  // One anonymous visit when a workout ends at a real gym, for its owner's insights (gymInsights.ts). Signed out, the
+  // install counts instead of the account.
+  if (b.op === "visit") {
+    const s = await sessionOf(req).catch(() => null);
+    const install = typeof b.install === "string" && /^[\w-]{8,64}$/.test(b.install) ? b.install : "";
+    if (!s && !install) return reply(req, 400, { error: "Bad request." });
+    if (!(await rateLimit(`gyms:visit:${ipOf(req)}`, 60, 86_400_000))) return reply(req, 429, { error: "slow" });
+    const r = await countVisit(s ? `acc:${s.accountId}` : `install:${install}`, b.visit);
+    return r.ok ? reply(req, 200, r) : reply(req, r.error === "slow" ? 429 : 400, { error: r.error });
   }
   // A problem with a real gym's page (wrong details, closed, listed twice, not a gym), for staff (gymPlaceReports.ts).
   if (b.op === "placeReport") {
@@ -193,6 +204,11 @@ export async function POST(req: Request) {
     }
     case "classDelete":
       return (await deleteClass(s.accountId, b.place, b.id)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
+    // How lifters use the gym: lifters, busy hours, equipment, open problems (gymInsights.ts), for its owner and staff.
+    case "insights": {
+      const r = await gymInsights(s.accountId, b.place);
+      return r ? reply(req, 200, { insights: r }) : reply(req, 403, { error: "owner" });
+    }
     case "newsDelete":
       return (await deleteNews(s.accountId, b.place, b.id)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
     case "trainer": {
