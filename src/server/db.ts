@@ -1425,6 +1425,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
   // Coaching: personal trainer or coach (Melvin, 2026-11-13: "differentiate between personal trainers and coaches").
   ["coach_prefs", "role", "TEXT"],
+  // Whether pushes to this phone set the number on the app icon (Settings › Reminders, badge.ts; 2026-11-19).
+  ["push_tokens", "badge", "INTEGER NOT NULL DEFAULT 1"],
   // Friends stage 2: which push notifications the lifter wants (push.ts). Likes start off.
   ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],

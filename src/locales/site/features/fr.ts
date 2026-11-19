@@ -546,6 +546,11 @@ export const fr: FeaturesText = {
       name: "Les nouveautés dans l’app",
       body: "Les Réglages affichent votre version avec un bouton Nouveautés : ce qui est nouveau, mieux ou corrigé, en mots simples. Après une mise à jour, Aujourd’hui le signale une fois, et ne liste que ce que vous pouvez déjà utiliser.",
     },
+    "icon-badge": {
+      name: "Un nombre sur l'icône de l'app",
+      body: "L'icône de l'app montre combien de messages, j'aime, commentaires et demandes d'abonnement vous attendent. Dans l'app, des nombres rouges sur Amis et sur votre coach disent où ils sont, et le nombre disparaît une fois vus. Un interrupteur dans Réglages › Rappels l'éteint.",
+      note: "Android et iPhone. L'app web l'affiche si elle est installée depuis Chrome, Edge ou Safari.",
+    },
     languages: {
       name: "Dix langues",
       body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone ou de votre navigateur, ou celle que vous choisissez sur l’écran d’accueil et dans les réglages.",

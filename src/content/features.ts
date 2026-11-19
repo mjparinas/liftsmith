@@ -1021,6 +1021,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-19",
       },
+      {
+        id: "icon-badge",
+        name: "A number on the app icon",
+        body: "The app icon shows how many messages, likes, comments and follow requests are waiting. Inside the app, red counts on Friends and your coach say where they are, and the number goes once you've seen them. One switch in Settings › Reminders turns it off.",
+        tier: "free",
+        note: "Android and iPhone. The web app shows it when it's installed from Chrome, Edge or Safari.",
+        added: "2026-11-19",
+      },
     ],
   },
   {

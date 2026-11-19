@@ -26,6 +26,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(NowPlayingPlugin.class);
         registerPlugin(ScreenshotsPlugin.class);
         registerPlugin(ScreenAwakePlugin.class);
+        registerPlugin(AppBadgePlugin.class);
         // Edge to edge on every Android version, not only 15+ where it's enforced: the page draws under the
         // status and navigation bars and keeps clear of them with env(safe-area-inset-*) (Capacitor's SystemBars
         // passes the insets through). Transparent bars with light icons to start, as the app opens dark; the

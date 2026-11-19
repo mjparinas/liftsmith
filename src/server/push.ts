@@ -102,6 +102,8 @@ export interface PushMessage {
   /** The app screen a tap opens (#/friends, #/routine/<code> or #/trainer…). */
   route: string;
   kind: PushKind | CoachPushKind | GymPushKind | ReferralPushKind | ClubPushKind | CommunityPushKind;
+  /** The number for the app icon (badge.ts): set unless the lifter turned it off on that phone. */
+  badge?: number;
 }
 /** Sends one message; "gone" means the token is dead and is deleted. */
 export type PushSender = (m: PushMessage) => Promise<"ok" | "gone" | "error">;
@@ -124,12 +126,20 @@ export const pushText = (lang: MsgLang, key: Key, vars: Record<string, string>) 
 
 // --- Tokens ---
 
-export async function saveToken(accountId: string, token: string, platform: string, lang: string, now = Date.now()): Promise<boolean> {
+export async function saveToken(
+  accountId: string,
+  token: string,
+  platform: string,
+  lang: string,
+  now = Date.now(),
+  badge = true,
+): Promise<boolean> {
   if (!/^[\w:.-]{20,4096}$/.test(token) || (platform !== "android" && platform !== "ios")) return false;
   await run(
-    `INSERT INTO push_tokens (token, account_id, platform, lang, updated_at) VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT (token) DO UPDATE SET account_id = excluded.account_id, platform = excluded.platform, lang = excluded.lang, updated_at = excluded.updated_at`,
-    [token, accountId, platform, isMsgLang(lang) ? lang : "en", now],
+    `INSERT INTO push_tokens (token, account_id, platform, lang, updated_at, badge) VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT (token) DO UPDATE SET account_id = excluded.account_id, platform = excluded.platform, lang = excluded.lang,
+       updated_at = excluded.updated_at, badge = excluded.badge`,
+    [token, accountId, platform, isMsgLang(lang) ? lang : "en", now, badge ? 1 : 0],
   );
   await run(
     `DELETE FROM push_tokens WHERE account_id = ?1 AND token NOT IN
@@ -184,8 +194,8 @@ async function send(
     to,
   ]);
   if (!who || !prefs || !Number(prefs.on_)) return;
-  const tokens = await query<{ token: string; platform: "android" | "ios"; lang: string }>(
-    "SELECT token, platform, lang FROM push_tokens WHERE account_id = ?",
+  const tokens = await query<{ token: string; platform: "android" | "ios"; lang: string; badge: number }>(
+    "SELECT token, platform, lang, badge FROM push_tokens WHERE account_id = ?",
     [to],
   );
   // No ids or tokens in the logs: the kind and the outcome are enough to see where a push stopped.
@@ -202,11 +212,12 @@ async function send(
           ? `#/person/${vars.code}`
           : "#/friends";
   const short = (s = "") => (s.length > 120 ? `${s.slice(0, 119)}…` : s);
+  const badge = await badgeOf(to, tokens);
   await Promise.all(
     tokens.map(async (t) => {
       const lang: MsgLang = isMsgLang(t.lang) ? t.lang : "en";
       const body = pushText(lang, `push.${kind}`, { name, text: short(vars.text), workout: vars.workout ?? "" });
-      const r = await sender({ token: String(t.token), platform: t.platform, body, route, kind });
+      const r = await sender({ token: String(t.token), platform: t.platform, body, route, kind, ...withBadge(t, badge) });
       if (r !== "ok") console.warn(`push ${kind} to ${t.platform}: ${r}`);
       if (r === "gone") await run("DELETE FROM push_tokens WHERE token = ?", [t.token]);
     }),
@@ -237,16 +248,17 @@ export async function notifyPlain(
   try {
     await Promise.race([
       (async () => {
-        const tokens = await query<{ token: string; platform: "android" | "ios"; lang: string }>(
-          "SELECT token, platform, lang FROM push_tokens WHERE account_id = ?",
+        const tokens = await query<{ token: string; platform: "android" | "ios"; lang: string; badge: number }>(
+          "SELECT token, platform, lang, badge FROM push_tokens WHERE account_id = ?",
           [to],
         );
         const short = (s = "") => (s.length > 120 ? `${s.slice(0, 119)}…` : s);
+        const badge = await badgeOf(to, tokens);
         await Promise.all(
           tokens.map(async (t) => {
             const lang: MsgLang = isMsgLang(t.lang) ? t.lang : "en";
             const body = pushText(lang, `push.${kind}`, { name: vars.name || pushText(lang, "push.someone", {}), text: short(vars.text) });
-            const r = await sender({ token: String(t.token), platform: t.platform, body, route, kind });
+            const r = await sender({ token: String(t.token), platform: t.platform, body, route, kind, ...withBadge(t, badge) });
             if (r === "gone") await run("DELETE FROM push_tokens WHERE token = ?", [t.token]);
           }),
         );
@@ -257,6 +269,17 @@ export async function notifyPlain(
     console.warn(`push ${kind}: ${e instanceof Error ? e.message : "failed"}`);
   }
 }
+
+/**
+ * The app icon's number for a push (badge.ts), counted once per recipient and only when one of their phones wants it.
+ * Loaded on demand: badge.ts reads Friends and coaching, which send pushes through this file.
+ */
+async function badgeOf(to: string, tokens: { badge: number }[]): Promise<number | undefined> {
+  if (!tokens.some((t) => Number(t.badge ?? 1) === 1)) return undefined;
+  const { badgeFor } = await import("./badge");
+  return badgeFor(to);
+}
+const withBadge = (t: { badge: number }, badge: number | undefined) => (badge !== undefined && Number(t.badge ?? 1) === 1 ? { badge } : {});
 
 const networkSender: PushSender = (m) => (m.platform === "android" ? sendFcm(m) : sendApns(m));
 
@@ -307,6 +330,8 @@ async function sendFcm(m: PushMessage): Promise<"ok" | "gone" | "error"> {
           notification: {
             channel_id: "friends",
             tag: m.kind === "like" ? "friends-like" : m.kind === "cheer" ? "friends-cheer" : undefined,
+            // The launcher's badge count (Android 8+ draws it from the notification; iconBadge.ts).
+            ...(m.badge !== undefined ? { notification_count: m.badge } : {}),
           },
         },
       },
@@ -374,7 +399,13 @@ function sendApns(m: PushMessage): Promise<"ok" | "gone" | "error"> {
     req.on("error", () => resolve("error"));
     req.end(
       JSON.stringify({
-        aps: { alert: { body: m.body }, sound: "default", "thread-id": `friends-${m.kind}` },
+        aps: {
+          alert: { body: m.body },
+          sound: "default",
+          "thread-id": `friends-${m.kind}`,
+          // The number on the app icon (iconBadge.ts); left out when the lifter turned it off on this phone.
+          ...(m.badge !== undefined ? { badge: m.badge } : {}),
+        },
         route: m.route,
         kind: m.kind,
       }),

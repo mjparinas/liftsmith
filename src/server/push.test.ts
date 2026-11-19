@@ -28,6 +28,22 @@ describe("Friends push notifications", () => {
     expect(sent[1]).toMatchObject({ platform: "ios", body: "Alex accepted your follow request." });
   });
 
+  it("puts what's waiting on the app icon, unless the lifter turned the number off on that phone", async () => {
+    await call("acc-a", "pushToken", { token: TOKEN("a"), platform: "android", lang: "en" });
+    await call("acc-a", "pushToken", { token: TOKEN("i"), platform: "ios", lang: "en", badge: false });
+    await call("acc-b", "follow", { handle: "alex" });
+    // The follow request is waiting: the same count as the Friends tab's red number.
+    expect(sent.find((m) => m.token === TOKEN("a"))?.badge).toBe(1);
+    expect(sent.find((m) => m.token === TOKEN("i"))).not.toHaveProperty("badge");
+    await call("acc-c", "join", { handle: "casey", name: "Casey", agree: true });
+    sent = [];
+    await call("acc-c", "follow", { handle: "alex" });
+    // Always the Friends tab's own count (`me`: unread activity plus follow requests).
+    const me = (await call("acc-a", "me")).body as { unread: number; requests: number };
+    expect(me.unread + me.requests).toBeGreaterThan(1);
+    expect(sent.find((m) => m.token === TOKEN("a"))?.badge).toBe(me.unread + me.requests);
+  });
+
   it("leaves likes off until the lifter turns them on, and respects every switch", async () => {
     await call("acc-a", "pushToken", { token: TOKEN("a"), platform: "android", lang: "en" });
     await call("acc-a", "update", { open: true });

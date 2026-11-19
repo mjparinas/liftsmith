@@ -55,6 +55,9 @@ export const en = {
   "wn.c.seasonPlan.title": "Five new training seasons for 2027",
   "wn.c.seasonPlan.body":
     "Tempest, Bloom, Solstice, Maple and Obsidian follow Ember back to back through 2027, each with its own themes, app icons, avatars, rare plates and three challenges of its own.",
+  "wn.c.iconBadge.title": "A number on the app icon",
+  "wn.c.iconBadge.body":
+    "See how many messages, likes, comments and follow requests are waiting without opening the app. Inside, red counts on Friends and your coach show where they are.",
   "wn.c.openNow.title": "Open now in the gym finder",
   "wn.c.openNow.body":
     "Every gym with its hours says whether it's open now and when it closes or opens, and an Open now chip shows only the open ones.",
@@ -124,6 +127,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "Cinco nuevas temporadas de entrenamiento para 2027",
   "wn.c.seasonPlan.body":
     "Tempestad, Floración, Solsticio, Arce y Obsidiana siguen a Brasa una tras otra durante 2027, cada una con sus temas, iconos, avatares, discos raros y tres retos propios.",
+  "wn.c.iconBadge.title": "Un número en el icono de la app",
+  "wn.c.iconBadge.body":
+    "Mira cuántos mensajes, me gusta, comentarios y solicitudes de seguimiento te esperan sin abrir la app. Dentro, los números rojos en Amigos y en tu entrenador te dicen dónde están.",
   "wn.c.openNow.title": "Abierto ahora en el buscador de gimnasios",
   "wn.c.openNow.body":
     "Cada gimnasio con horario dice si está abierto ahora y cuándo cierra o abre, y el filtro Abierto ahora muestra solo los abiertos.",
@@ -195,6 +201,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "Cinq nouvelles saisons d'entraînement pour 2027",
   "wn.c.seasonPlan.body":
     "Tempête, Floraison, Solstice, Érable et Obsidienne suivent Braise tout au long de 2027, chacune avec ses thèmes, icônes, avatars, disques rares et trois défis bien à elle.",
+  "wn.c.iconBadge.title": "Un nombre sur l'icône de l'app",
+  "wn.c.iconBadge.body":
+    "Voyez combien de messages, j'aime, commentaires et demandes d'abonnement vous attendent sans ouvrir l'app. Dedans, des nombres rouges sur Amis et sur votre coach montrent où ils sont.",
   "wn.c.openNow.title": "Ouvert maintenant dans la recherche de salles",
   "wn.c.openNow.body":
     "Chaque salle avec ses horaires indique si elle est ouverte et quand elle ferme ou ouvre, et le filtre Ouvert maintenant ne montre que celles qui sont ouvertes.",
@@ -265,6 +274,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "Fünf neue Trainingssaisons für 2027",
   "wn.c.seasonPlan.body":
     "Sturm, Blüte, Sonnwende, Ahorn und Obsidian folgen auf Glut, eine nach der anderen durch 2027, jede mit eigenen Designs, App-Symbolen, Avataren, seltenen Scheiben und drei eigenen Challenges.",
+  "wn.c.iconBadge.title": "Eine Zahl auf dem App-Symbol",
+  "wn.c.iconBadge.body":
+    "Sieh, wie viele Nachrichten, Likes, Kommentare und Follower-Anfragen warten, ohne die App zu öffnen. In der App zeigen rote Zahlen bei Freunde und deinem Coach, wo sie sind.",
   "wn.c.openNow.title": "Jetzt geöffnet in der Studiosuche",
   "wn.c.openNow.body":
     "Jedes Studio mit Öffnungszeiten zeigt, ob es gerade offen ist und wann es schließt oder öffnet, und der Filter Jetzt geöffnet zeigt nur die offenen.",
@@ -334,6 +346,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "Cinque nuove stagioni di allenamento per il 2027",
   "wn.c.seasonPlan.body":
     "Tempesta, Fioritura, Solstizio, Acero e Ossidiana seguono Brace una dopo l'altra per tutto il 2027, ognuna con temi, icone, avatar, dischi rari e tre sfide tutte sue.",
+  "wn.c.iconBadge.title": "Un numero sull'icona dell'app",
+  "wn.c.iconBadge.body":
+    "Vedi quanti messaggi, mi piace, commenti e richieste di follow ti aspettano senza aprire l'app. Dentro, numeri rossi su Amici e sul tuo coach ti dicono dove sono.",
   "wn.c.openNow.title": "Aperto ora nella ricerca palestre",
   "wn.c.openNow.body":
     "Ogni palestra con gli orari dice se è aperta ora e quando chiude o apre, e il filtro Aperto ora mostra solo quelle aperte.",
@@ -396,6 +411,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "2027年の新しいトレーニングシーズン5つ",
   "wn.c.seasonPlan.body":
     "テンペスト、ブルーム、ソルスティス、メープル、オブシディアンがエンバーに続いて2027年を通して開催。それぞれ専用のテーマ、アプリアイコン、アバター、レアプレート、3つのチャレンジがあります。",
+  "wn.c.iconBadge.title": "アプリアイコンに数字",
+  "wn.c.iconBadge.body":
+    "アプリを開かなくても、届いているメッセージ、いいね、コメント、フォローリクエストの数がわかります。アプリ内では「フレンド」とコーチの赤い数字で場所がわかります。",
   "wn.c.openNow.title": "ジム検索に「営業中」",
   "wn.c.openNow.body":
     "営業時間のあるジムは、今開いているか、いつ閉まるか開くかを表示します。「営業中」チップで開いているジムだけを表示できます。",
@@ -461,6 +479,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "Cinco novas temporadas de treino para 2027",
   "wn.c.seasonPlan.body":
     "Tempestade, Florada, Solstício, Bordo e Obsidiana seguem a Brasa uma após a outra em 2027, cada uma com seus temas, ícones, avatares, anilhas raras e três desafios próprios.",
+  "wn.c.iconBadge.title": "Um número no ícone do app",
+  "wn.c.iconBadge.body":
+    "Veja quantas mensagens, curtidas, comentários e pedidos para seguir estão esperando sem abrir o app. Dentro dele, números vermelhos em Amigos e no seu treinador mostram onde estão.",
   "wn.c.openNow.title": "Aberto agora na busca de academias",
   "wn.c.openNow.body":
     "Cada academia com horário mostra se está aberta agora e quando fecha ou abre, e o filtro Aberto agora mostra só as abertas.",
@@ -522,6 +543,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "2027년 새 트레이닝 시즌 5개",
   "wn.c.seasonPlan.body":
     "템페스트, 블룸, 솔스티스, 메이플, 옵시디언이 엠버에 이어 2027년 내내 차례로 열려요. 시즌마다 고유한 테마, 앱 아이콘, 아바타, 희귀 원판, 챌린지 3개가 있어요.",
+  "wn.c.iconBadge.title": "앱 아이콘에 숫자",
+  "wn.c.iconBadge.body":
+    "앱을 열지 않아도 기다리는 메시지, 좋아요, 댓글, 팔로우 요청 수를 볼 수 있습니다. 앱 안에서는 친구와 코치의 빨간 숫자가 어디에 있는지 알려 줍니다.",
   "wn.c.openNow.title": "헬스장 찾기에 '영업 중'",
   "wn.c.openNow.body": "영업시간이 있는 헬스장은 지금 열었는지, 언제 닫거나 여는지 보여 주고, '영업 중' 칩으로 열린 곳만 볼 수 있습니다.",
   "wn.c.settingsSearch.title": "설정 검색",
@@ -586,6 +610,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "Pięć nowych sezonów treningowych na 2027",
   "wn.c.seasonPlan.body":
     "Burza, Rozkwit, Przesilenie, Klon i Obsydian następują po Żarze jeden po drugim przez cały 2027, każdy z własnymi motywami, ikonami, awatarami, rzadkimi talerzami i trzema własnymi wyzwaniami.",
+  "wn.c.iconBadge.title": "Liczba na ikonie aplikacji",
+  "wn.c.iconBadge.body":
+    "Zobacz, ile wiadomości, polubień, komentarzy i próśb o obserwowanie czeka, bez otwierania aplikacji. W środku czerwone liczby przy Znajomych i Twoim trenerze pokazują, gdzie są.",
   "wn.c.openNow.title": "Otwarte teraz w wyszukiwarce siłowni",
   "wn.c.openNow.body":
     "Każda siłownia z godzinami pokazuje, czy jest teraz otwarta i kiedy się zamyka lub otwiera, a filtr Otwarte teraz pokazuje tylko otwarte.",
@@ -652,6 +679,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.seasonPlan.title": "2027 için beş yeni antrenman sezonu",
   "wn.c.seasonPlan.body":
     "Fırtına, Çiçek, Gündönümü, Akçaağaç ve Obsidyen, 2027 boyunca Kor'un ardından arka arkaya gelir; her birinin kendi temaları, uygulama simgeleri, avatarları, nadir plakaları ve üç kendi meydan okuması var.",
+  "wn.c.iconBadge.title": "Uygulama simgesinde bir sayı",
+  "wn.c.iconBadge.body":
+    "Uygulamayı açmadan kaç mesaj, beğeni, yorum ve takip isteği beklediğini gör. İçeride Arkadaşlar'daki ve koçundaki kırmızı sayılar nerede olduklarını gösterir.",
   "wn.c.openNow.title": "Spor salonu bulucuda Şimdi açık",
   "wn.c.openNow.body":
     "Saatleri olan her salon şu an açık olup olmadığını ve ne zaman kapanıp açılacağını gösteriyor; Şimdi açık çipi yalnızca açık olanları listeliyor.",

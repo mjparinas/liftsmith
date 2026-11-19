@@ -607,6 +607,11 @@ export const tr: FeaturesText = {
       name: "Uygulamadaki yenilikler",
       body: "Ayarlar sürümünü bir Yenilikler düğmesiyle gösterir: yeni, daha iyi ve düzeltilmiş olanlar, sade bir dille. Bir güncellemeden sonra Bugün bunu bir kez söyler ve yalnızca zaten kullanabildiklerini listeler.",
     },
+    "icon-badge": {
+      name: "Uygulama simgesinde bir sayı",
+      body: "Uygulama simgesi kaç mesaj, beğeni, yorum ve takip isteğinin beklediğini gösterir. Uygulamada Arkadaşlar'daki ve koçundaki kırmızı sayılar nerede olduklarını söyler, gördüğünde sayı kaybolur. Ayarlar › Hatırlatıcılar'daki bir anahtar kapatır.",
+      note: "Android ve iPhone. Web uygulaması Chrome, Edge veya Safari'den yüklendiğinde gösterir.",
+    },
     languages: {
       name: "On dil",
       body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun ya da tarayıcının dilini takip eder veya karşılama ekranında ve ayarlarda istediğini seçersin.",

@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { useAccount } from "@/lib/auth";
+import { badgeOn } from "@/lib/badgeCount";
 import { trainingDays } from "@/lib/calendar";
 import { clockTime, list, t, weekday } from "@/lib/i18n";
+import { badgeSupported } from "@/lib/iconBadge";
 import { oops } from "@/lib/juice";
 import { clampTime, DEFAULT_ON, EMAIL_KINDS, PUSH_KINDS, type MessageKind } from "@/lib/messages";
+import { resendPushToken } from "@/lib/push";
 import { askPush, deleteEmail, pushAllowed, pushSupported, syncEmail } from "@/lib/reminders";
 import { useApp } from "@/lib/store";
 import type { Profile } from "@/lib/types";
@@ -175,6 +178,23 @@ export function MessageSettings() {
             <p className="mt-1 text-xs text-muted">{t("msg.webOnly")}</p>
           )}
         </div>
+
+        {/* The number on the app icon (iconBadge.ts): what's waiting in Friends and coaching. The web shows it only
+            when the web app is installed, so the switch is there only where the browser can draw it. */}
+        {badgeSupported() && (
+          <div className="border-t border-line pt-2">
+            <Toggle
+              id="icon-badge"
+              label={t("msg.badge")}
+              blurb={t("msg.badgeBlurb")}
+              on={badgeOn(profile)}
+              onChange={(v) => {
+                save({ badge: v });
+                void resendPushToken();
+              }}
+            />
+          </div>
+        )}
 
         <div className="border-t border-line pt-4">
           <h3 className="text-sm font-semibold">{t("msg.email")}</h3>

@@ -92,6 +92,7 @@ export const SETTINGS_INDEX: SettingRef[] = [
   // Reminders
   S("msg.push", "reminders", ["msg.title"]),
   S("msg.emailMe", "reminders"),
+  S("msg.badge", "reminders", ["msg.badgeBlurb"]),
   // Look and feel
   S("settings.appearance", "look", ["appearance.dark", "appearance.light", "appearance.system"]),
   S("delight.icon", "look"),

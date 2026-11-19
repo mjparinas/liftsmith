@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Eine Kachel in den Schnelleinstellungen auf Android; Kontrollzentrum und Siri auf dem iPhone.",
       "Deine Trainingstage in deinem Kalender.",
       "Sanfte Erinnerungen an Trainingstagen.",
+      "Eine Zahl auf dem App-Symbol für wartende Nachrichten, Likes und Follower-Anfragen.",
     ],
     dyk: "„Satz eintragen“ und +30 s auf dem Sperrbildschirm funktionieren auch bei geschlossener App.",
   },

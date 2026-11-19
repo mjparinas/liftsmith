@@ -34,6 +34,8 @@
   --color-good: #34d399;
   --color-warn: #f5b544;
   --color-bad: #f0605d;
+  /* Text on a red count (CountDot): dark on the dark theme's coral, white on the light theme's deep red. */
+  --color-bad-ink: #080b10;
   /* The live heart rate badge: always red, even with colour-blind safe colours, because it's an
      identity colour (the heart icon and the number carry the meaning), not a status. */
   --color-heart: #f0605d;
@@ -296,6 +298,7 @@
   --color-faint: #5c6876;
   --color-accent: #1d4fc4;
   --color-accent-ink: #ffffff;
+  --color-bad-ink: #ffffff;
   --good-std: #0a7350;
   --warn-std: #8a5100;
   --bad-std: #a82222;
@@ -372,6 +375,7 @@
     --color-faint: #5c6876;
     --color-accent: #1d4fc4;
     --color-accent-ink: #ffffff;
+    --color-bad-ink: #ffffff;
     --good-std: #0a7350;
     --warn-std: #8a5100;
     --bad-std: #a82222;

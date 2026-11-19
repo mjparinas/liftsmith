@@ -350,6 +350,8 @@ export interface Profile {
     /** The lifter turned "Email me" off. Email is on by default for signed-in adults (Melvin, 2026-11-14), so this
      *  is what keeps it off on every device. */
     emailOff?: boolean;
+    /** The number on the app icon (iconBadge.ts, Melvin 2026-11-19). Missing means on. */
+    badge?: boolean;
   };
   /** One-rep max goals with a date (goals.ts). */
   goals?: import("./goals").LiftGoal[];

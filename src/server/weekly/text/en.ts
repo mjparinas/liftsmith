@@ -567,6 +567,7 @@ export const emails: Record<string, Words> = {
       "A Quick Settings tile on Android; Control Center and Siri on iPhone.",
       "Your training days in your calendar.",
       "Gentle reminders on training days.",
+      "A number on the app icon for messages, likes and follow requests waiting.",
     ],
     dyk: "Log set and +30 s on the lock screen work with the app closed.",
   },
