@@ -19,6 +19,7 @@ import { DAYS, formatHours, type Week } from "@/lib/openingHours";
 
 import { batch, query, run } from "./db";
 import { km, postcodeFor, sameCity, tidyAddress } from "./gymAddress";
+import { dropPictures, MOVED, pictureUrls, storePicture } from "./gymBlob";
 import { clean, cleanEmail, socialUrl, UA } from "./gymPlaces";
 
 export const ENRICH_LIMITS = {
@@ -734,26 +735,36 @@ async function readSite(
   return done(filled, filled.length ? "" : "nothing new on the page", set);
 }
 
-/** Keeps a site's icon for an unclaimed gym with no owner's logo: a new one, or in place of a smaller one. */
+/**
+ * Keeps a site's icon for an unclaimed gym with no owner's logo: a new one, or in place of a smaller one. The file goes
+ * to Vercel Blob first (gymBlob.ts); if the row's conditions no longer hold, the new file is taken back out, and a
+ * replaced icon's old file goes too.
+ */
 async function keepIcon(placeId: string, icon: { bytes: Uint8Array; px: number }, replace: boolean, now: number): Promise<boolean> {
   const id = randomBytes(8).toString("hex");
-  if (replace)
-    return (
+  const url = await storePicture(id, icon.bytes);
+  const image = url ? MOVED : icon.bytes;
+  let kept: boolean;
+  if (replace) {
+    const old = await pictureUrls(placeId, "icon");
+    kept =
       (await run(
-        `UPDATE gym_photos SET id = ?, image = ?, px = ?, created_at = ? WHERE place_id = ? AND kind = 'icon' AND px < ?
+        `UPDATE gym_photos SET id = ?, image = ?, url = ?, px = ?, created_at = ? WHERE place_id = ? AND kind = 'icon' AND px < ?
            AND EXISTS (SELECT 1 FROM gym_places g WHERE g.id = ? AND g.claimed_by = '')
            AND NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = ? AND m.kind = 'logo')`,
-        [id, icon.bytes, icon.px, now, placeId, icon.px, placeId, placeId],
-      )) > 0
-    );
-  return (
-    (await run(
-      `INSERT INTO gym_photos (id, place_id, kind, image, px, created_at)
-       SELECT ?, id, 'icon', ?, ?, ? FROM gym_places WHERE id = ? AND claimed_by = ''
+        [id, image, url, icon.px, now, placeId, icon.px, placeId, placeId],
+      )) > 0;
+    if (kept) await dropPictures(old);
+  } else
+    kept =
+      (await run(
+        `INSERT INTO gym_photos (id, place_id, kind, image, url, px, created_at)
+       SELECT ?, id, 'icon', ?, ?, ?, ? FROM gym_places WHERE id = ? AND claimed_by = ''
          AND NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = ? AND m.kind IN ('logo', 'icon'))`,
-      [id, icon.bytes, icon.px, now, placeId, placeId],
-    )) > 0
-  );
+        [id, image, url, icon.px, now, placeId, placeId],
+      )) > 0;
+  if (!kept && url) await dropPictures([url]);
+  return kept;
 }
 
 /**

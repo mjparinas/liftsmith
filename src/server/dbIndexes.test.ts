@@ -257,6 +257,19 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: [],
   },
   {
+    name: "gym pictures: ones still to move to Blob (gymBlob.ts movePictures)",
+    sql: "SELECT id, image FROM gym_photos WHERE url = '' AND (kind <> 'icon' OR px > 0) LIMIT ?",
+    // Like the one above: the partial index holds only pictures not moved yet, and it ends up empty.
+    uses: ["gym_photos_unmoved"],
+    noScan: [],
+  },
+  {
+    name: "gym pictures: a gym's files before its rows go (gymBlob.ts pictureUrls)",
+    sql: "SELECT url FROM gym_photos WHERE place_id = ? AND kind = ? AND url <> ''",
+    uses: ["gym_photos_place"],
+    noScan: ["gym_photos"],
+  },
+  {
     name: "gym import: gyms due an AI read (gymAutoFill.ts autoFillBatch)",
     sql: "SELECT id FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0 AND ai_at < ? ORDER BY ai_at LIMIT ?",
     uses: ["gym_places_ai"],

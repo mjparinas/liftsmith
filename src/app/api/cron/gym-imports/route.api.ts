@@ -2,10 +2,12 @@
 // ("gym-imports" in vercel.json) calls GET every five minutes as a safety net; Admin › Gyms and a worker whose time is up call POST to
 // start the next worker at once. Both answer straight away and import in the background for up to 800 seconds; a
 // worker that finds the job already held, or no job running, does nothing. "Authorization: Bearer $CRON_SECRET".
-// The AI fix-up pass (gymAiFix.ts) runs beside it in the same invocation, with its own job and lease.
+// The AI fix-up pass (gymAiFix.ts) runs beside it in the same invocation, with its own job and lease, and so does the
+// mover that takes gym pictures still in the database to Vercel Blob (gymBlob.ts runMover; nothing once they've moved).
 import { after } from "next/server";
 
 import { runFixWorker } from "@/server/gymAiFix";
+import { runMover } from "@/server/gymBlob";
 import { kickWorker, runWorker } from "@/server/gymImportJobs";
 import { authorized } from "@/server/revenuecat";
 
@@ -26,6 +28,7 @@ function work(req: Request) {
         console.error("[gym-imports] AI fix-up worker failed", e instanceof Error ? e.message : e);
         return null;
       }),
+      runMover().catch((e: unknown) => console.error("[gym-imports] picture mover failed", e instanceof Error ? e.message : e)),
     ]);
     // Out of time with work still to go: a fresh worker carries on.
     if (r?.more || f?.more) await kickWorker(origin);

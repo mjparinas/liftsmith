@@ -5,11 +5,13 @@
 // until MAPBOX_TOKEN is set in Vercel.
 //
 // The logo and photos: the owner adds them on the owner's page. The app turns each into a JPEG (a logo up to 512 px, a
-// photo up to 1600 px) before it's sent, and we keep it in the database, like share cards. One logo and six photos a
-// gym; staff can take them all down from Admin › Gyms (actOnPlace "pictures").
+// photo up to 1600 px) before it's sent, and we keep it in Vercel Blob with its address in `gym_photos` (gymBlob.ts;
+// in the database itself until Blob is set up). One logo and six photos a gym; staff can take them all down from
+// Admin › Gyms (actOnPlace "pictures").
 import { randomBytes } from "node:crypto";
 
 import { query, rateLimit, run } from "./db";
+import { dropPictures, MOVED, pictureUrls, readPicture, storePicture } from "./gymBlob";
 import { isPlaceId } from "./gymPlaces";
 import { canManage } from "./gymStaff";
 
@@ -57,9 +59,21 @@ export async function addMedia(accountId: string, body: Record<string, unknown>,
     if (Number(c?.n ?? 0) >= MEDIA_LIMITS.photos) return { ok: false, error: "full" };
   }
   if (!(await rateLimit(`gyms:media:${accountId}`, 30, 86_400_000, now))) return { ok: false, error: "slow" };
-  if (kind === "logo") await run("DELETE FROM gym_photos WHERE place_id = ? AND kind = 'logo'", [body.place]);
   const id = randomBytes(8).toString("hex");
-  await run("INSERT INTO gym_photos (id, place_id, kind, image, created_at) VALUES (?, ?, ?, ?, ?)", [id, body.place, kind, image, now]);
+  const url = await storePicture(id, image);
+  if (kind === "logo") {
+    const old = await pictureUrls(body.place, "logo");
+    await run("DELETE FROM gym_photos WHERE place_id = ? AND kind = 'logo'", [body.place]);
+    await dropPictures(old);
+  }
+  await run("INSERT INTO gym_photos (id, place_id, kind, image, url, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+    id,
+    body.place,
+    kind,
+    url ? MOVED : image,
+    url,
+    now,
+  ]);
   await run("UPDATE gym_places SET updated_at = ? WHERE id = ?", [now, body.place]);
   return { ok: true, id };
 }
@@ -68,16 +82,31 @@ export async function addMedia(accountId: string, body: Record<string, unknown>,
 export async function removeMedia(accountId: string, placeId: unknown, id: unknown): Promise<boolean> {
   if (!isPlaceId(placeId) || !isMediaId(id)) return false;
   if (!(await canManage(accountId, placeId))) return false;
-  return (await run("DELETE FROM gym_photos WHERE id = ? AND place_id = ?", [id, placeId])) > 0;
+  const [r] = await query<{ url: string }>("SELECT url FROM gym_photos WHERE id = ? AND place_id = ?", [id, placeId]);
+  if (!r) return false;
+  await run("DELETE FROM gym_photos WHERE id = ? AND place_id = ?", [id, placeId]);
+  await dropPictures([String(r.url)]);
+  return true;
 }
 
 /** One picture's bytes, for /api/gyms/photo/?id= (the route names its type from the bytes: an owner's JPEG, or a
  * website's PNG, ICO, GIF, JPEG or WebP icon). */
 export async function mediaImage(id: unknown): Promise<Buffer | null> {
   if (!isMediaId(id)) return null;
-  const [r] = await query<{ image: ArrayBuffer | Uint8Array }>("SELECT image FROM gym_photos WHERE id = ?", [id]);
-  if (!r?.image) return null;
-  return Buffer.from(r.image instanceof Uint8Array ? r.image : new Uint8Array(r.image));
+  // A moved picture's bytes aren't read from the database at all: only its address.
+  const [r] = await query<{ url: string; image: ArrayBuffer | Uint8Array | null }>(
+    "SELECT url, CASE WHEN url = '' THEN image END AS image FROM gym_photos WHERE id = ?",
+    [id],
+  );
+  if (!r) return null;
+  const bytes = r.url
+    ? await readPicture(String(r.url))
+    : r.image
+      ? r.image instanceof Uint8Array
+        ? r.image
+        : new Uint8Array(r.image)
+      : null;
+  return bytes?.length ? Buffer.from(bytes) : null;
 }
 
 // --- The map ---
