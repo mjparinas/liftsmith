@@ -232,7 +232,7 @@ export interface Member {
   since: number;
 }
 
-type TeamRow = { id: string; coach_id: string; name: string; code: string; created_at: number };
+export type TeamRow = { id: string; coach_id: string; name: string; code: string; created_at: number };
 
 async function teamOut(r: TeamRow): Promise<Team> {
   const [c] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM team_members WHERE team_id = ?", [r.id]);
@@ -267,7 +267,7 @@ export async function makeTeam(
   return teamOut({ id, coach_id: coachId, name, code, created_at: now });
 }
 
-async function ownTeam(coachId: string, teamId: unknown): Promise<TeamRow | null> {
+export async function ownTeam(coachId: string, teamId: unknown): Promise<TeamRow | null> {
   if (typeof teamId !== "string" || !/^[2-9A-HJ-NP-Z]{8}$/.test(teamId)) return null;
   const [r] = await query<TeamRow>("SELECT * FROM teams WHERE id = ? AND coach_id = ?", [teamId, coachId]);
   return r ?? null;
@@ -288,6 +288,9 @@ export async function deleteTeam(coachId: string, teamId: unknown): Promise<bool
   const members = await query<{ account_id: string }>("SELECT account_id FROM team_members WHERE team_id = ?", [r.id]);
   await batch([
     { sql: "DELETE FROM team_members WHERE team_id = ?", args: [r.id] },
+    // Its team sessions go too (teamSessions.ts); workouts already written into athletes' accounts stay theirs.
+    { sql: "DELETE FROM team_session_sets WHERE session_id IN (SELECT id FROM team_sessions WHERE team_id = ?)", args: [r.id] },
+    { sql: "DELETE FROM team_sessions WHERE team_id = ?", args: [r.id] },
     { sql: "DELETE FROM teams WHERE id = ?", args: [r.id] },
   ]);
   for (const m of members) await unlinkUnlessOtherTeam(coachId, s(m.account_id));

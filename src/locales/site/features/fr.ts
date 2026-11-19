@@ -410,6 +410,10 @@ export const fr: FeaturesText = {
       name: "Gratuit pour les équipes d’école secondaire",
       body: "Les entraîneurs d’école secondaire qui confirment un courriel scolaire ont Pro gratuitement, tout comme les athlètes de 13 à 18 ans de leurs équipes, avec un tableau d’équipe chaque semaine. La masse grasse et les profils publics restent désactivés pour les moins de 18 ans.",
     },
+    "team-session": {
+      name: "Séances d'équipe sur une tablette",
+      body: "Un coach de lycée mène une séance pour toute l'équipe depuis une tablette : chaque athlète touche son prénom et note ses séries, la charge reprenant là où il en était, et le tableau montre qui n'a pas commencé. À la fin, les séries de chacun sont enregistrées dans son propre compte. Fonctionne sans réseau.",
+    },
     "coach-checkins": {
       name: "Formulaires de bilan et questionnaires",
       body: "Envoyez à vos clients un bilan hebdomadaire, un questionnaire d'accueil ou votre propre formulaire, une fois ou chaque semaine. Ils répondent en quelques touches, et une note basse ou une réponse en retard remonte en haut de leur rapport.",

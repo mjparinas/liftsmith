@@ -805,3 +805,14 @@ The new routine library has routines other lifters published, ready to save in a
 - Rate it with stars once you've saved it. Stars show from three ratings.
 - Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.
 Did you know? Every published routine gets its own page on the website, so you can share it with anyone. ([Routine library](routine-library.md))
+
+
+### W72 · Run the whole team's lift from one tablet (**New**, 2026-11-19)
+Free · School coaches · No screenshot (Coaching's team page needs a verified school coach) · `fresh`, so it goes next to everyone already in the series
+
+Team sessions put one workout for your whole team on one tablet.
+- Start one from your team's card in Coaching and pick a routine.
+- Athletes tap their first name and log their own sets, the weight starting where they left off.
+- The board shows who hasn't logged a set yet, never a weight.
+- End it and each athlete's sets are saved to their own account.
+Did you know? No reception in the weight room? Sets wait on the tablet and go up when it's back. ([School teams](school-teams.md) "Team sessions")

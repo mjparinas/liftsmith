@@ -981,4 +981,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Cada rotina publicada ganha uma página própria no site, para compartilhar com quem quiser.",
   },
+  "team-session": {
+    title: "O treino do time todo em um tablet",
+    intro: "As sessões do time colocam um treino para o time todo em um único tablet.",
+    points: [
+      "Comece uma pelo cartão do time em Coaching e escolha uma rotina.",
+      "Cada atleta toca no próprio nome e registra as séries, com o peso de onde parou.",
+      "O painel mostra quem ainda não registrou uma série, nunca um peso.",
+      "No fim, as séries de cada atleta ficam salvas na própria conta.",
+    ],
+    dyk: "Sem sinal na sala de musculação? As séries esperam no tablet e sobem quando ele voltar.",
+  },
 };

@@ -656,6 +656,8 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** Logged on a school coach's team session tablet (teamSessions.ts on the server): the team's name. */
+  team?: string;
   /** The program and day the plan came from (programs.ts). */
   program?: { id: string; day: number };
   /** The saved routine the workout came from, if any. */

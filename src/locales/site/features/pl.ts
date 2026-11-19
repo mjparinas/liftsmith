@@ -471,6 +471,10 @@ export const pl: FeaturesText = {
       name: "Za darmo dla drużyn szkolnych",
       body: "Trenerzy szkół średnich, którzy potwierdzą szkolny adres e-mail, dostają Pro za darmo, podobnie jak zawodnicy w wieku od 13 do 18 lat z ich drużyn, z cotygodniowym rankingiem drużyny. Tkanka tłuszczowa i publiczne profile pozostają wyłączone dla osób poniżej 18 lat.",
     },
+    "team-session": {
+      name: "Treningi drużyny na jednym tablecie",
+      body: "Trener szkolny prowadzi jeden trening dla całej drużyny z jednego tabletu: każdy zawodnik stuka swoje imię i zapisuje swoje serie, ciężar zaczyna się tam, gdzie skończył, a tablica pokazuje, kto jeszcze nie zaczął. Na koniec serie każdego trafiają na jego konto. Działa bez zasięgu.",
+    },
     "coach-checkins": {
       name: "Formularze kontrolne i ankiety",
       body: "Wysyłaj podopiecznym cotygodniową ankietę kontrolną, ankietę wstępną albo własny formularz, raz lub co tydzień. Odpowiadają kilkoma dotknięciami, a niski wynik albo spóźniona odpowiedź trafia na górę ich raportu.",

@@ -471,6 +471,10 @@ export const tr: FeaturesText = {
       name: "Lise takımlarına ücretsiz",
       body: "Okul e-posta adresini doğrulayan lise koçları Pro'yu ücretsiz alır; takımlarındaki 13–18 yaş arası sporcular da öyle, haftalık takım sıralamasıyla. Vücut yağı ve herkese açık profiller 18 yaş altı için kapalı kalır.",
     },
+    "team-session": {
+      name: "Tek tablette takım seansları",
+      body: "Lise koçu tüm takımın antrenmanını tek tabletten yönetir: her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar ve pano kimin başlamadığını gösterir. Bitince her sporcunun setleri kendi hesabına kaydedilir. Çekim olmadan da çalışır.",
+    },
     "coach-checkins": {
       name: "Check-in formları ve anketler",
       body: "Danışanlarına haftalık bir check-in, bir ön değerlendirme anketi ya da kendi formunu gönder; bir kez ya da her hafta. Birkaç dokunuşla yanıtlarlar; düşük bir puan ya da geç bir yanıt raporlarının en üstüne çıkar.",
