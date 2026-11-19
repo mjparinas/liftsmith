@@ -85,7 +85,12 @@ export function sourceOf(meta: RawMeta): SonosSource | null {
   return null;
 }
 
-export function toNow(group: string, playback: RawPlayback, meta: RawMeta, vol: { volume?: number; fixed?: boolean }): SonosNow {
+export function toNow(
+  group: string,
+  playback: RawPlayback,
+  meta: RawMeta,
+  vol: { volume?: number; fixed?: boolean; muted?: boolean },
+): SonosNow {
   const track = meta.currentItem?.track;
   const source = sourceOf(meta);
   const actions = playback.availablePlaybackActions;
@@ -95,6 +100,7 @@ export function toNow(group: string, playback: RawPlayback, meta: RawMeta, vol: 
     group,
     playing: isPlaying(playback.playbackState),
     volume: vol.fixed || typeof vol.volume !== "number" ? null : Math.round(Math.min(100, Math.max(0, vol.volume))),
+    muted: vol.muted === true,
     // A radio station has no track; its name is the container's. A source's container is named after the
     // speaker or the input, which the card shows as the source's own label instead.
     track: source ? null : (str(track?.name) ?? str(meta.container?.name)),
@@ -136,7 +142,7 @@ export async function sonosState(
     const [playback, meta, vol] = await Promise.all([
       call<RawPlayback>(t, `/groups/${id}/playback`, f),
       call<RawMeta>(t, `/groups/${id}/playbackMetadata`, f).catch(() => ({})),
-      call<{ volume?: number; fixed?: boolean }>(t, `/groups/${id}/groupVolume`, f).catch(() => ({})),
+      call<{ volume?: number; fixed?: boolean; muted?: boolean }>(t, `/groups/${id}/groupVolume`, f).catch(() => ({})),
     ]);
     nowPlaying = toNow(group, playback, meta, vol);
   }
@@ -158,6 +164,9 @@ export function commandCall(c: SonosCommand): { path: string; body: unknown } {
       return { path: "/groupVolume", body: { volume: c.level } };
     case "nudge":
       return { path: "/groupVolume/relative", body: { volumeDelta: c.delta } };
+    case "mute":
+      // Sonos keeps the volume while muted, so unmuting brings back the level it was at.
+      return { path: "/groupVolume/mute", body: { muted: c.muted } };
     case "favourite":
       return { path: "/favorites", body: { favoriteId: c.id, playOnCompletion: true, action: "REPLACE" } };
   }
