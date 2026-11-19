@@ -18,6 +18,7 @@ import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem, type RoutinePar
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
+import { PublishRoutine } from "./PublishRoutine";
 import { go } from "./router";
 import { SendToFriend } from "./SendToFriend";
 import { RoutinePartsEditor, routinePartsLine } from "./Stretch";
@@ -148,6 +149,17 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
           }}
         >
           {t("rt.build")}
+        </Button>
+        <Button
+          kind="quiet"
+          icon="search"
+          className="w-full"
+          onClick={() => {
+            close();
+            go("library");
+          }}
+        >
+          {t("rl.find")}
         </Button>
         <AddFromLink onOpen={close} />
       </div>
@@ -442,6 +454,7 @@ function RoutineEditor({
             {t("rt.save")}
           </Button>
           {shareable && <ShareRoutine routine={initial} />}
+          {shareable && <PublishRoutine routine={initial} />}
           {shareable && <SendToFriend name={initial.name} items={initial.items} />}
           {onDelete && (
             <Button kind="danger" className="w-full" onClick={onDelete}>

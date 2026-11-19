@@ -19,7 +19,8 @@
 // Check-ins (coachForms.ts): "form" (save a form: `form`), "deleteForm" (`id`), "sendForm" (`client`, `id`),
 // "repeatForm" (`client`, `id` and `every` 7, 14 or 28 days, or no `id` to stop) and "answer" (the client: `id`, `answers`); GET ?checkin=<id> is
 // one of the client's to fill in. The overview adds the coach's `forms` and the client's waiting `checkins`, and a
-// client's view adds `checkins`, `repeat` and the coach's `forms`.
+// client's view adds `checkins`, `repeat` and the coach's `forms`. The overview's `videos` counts form videos and
+// notes waiting (formVideos.ts; the videos themselves are /api/coach/video/).
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { accountInfo } from "@/server/accounts";
 import {
@@ -73,6 +74,7 @@ import {
 import { coachPlanOf } from "@/server/coachPlan";
 import { setStatus, setTyping, touchSeen } from "@/server/coachPresence";
 import { rateLimit } from "@/server/db";
+import { dropPairVideos, videosWaiting } from "@/server/formVideos";
 import { saveToken } from "@/server/push";
 
 export const OPTIONS = preflight;
@@ -96,19 +98,20 @@ export async function GET(req: Request) {
   const client = q.get("client");
   if (client === null) {
     await touchSeen(s.accountId);
-    const [o, mine, pending, slots, sessions, plan] = await Promise.all([
+    const [o, mine, pending, slots, sessions, plan, videos] = await Promise.all([
       overview(s.accountId),
       forms(s.accountId),
       pendingCheckins(s.accountId),
       coachSlots(s.accountId),
       clientSlots(s.accountId),
       coachPlanOf(s.accountId),
+      videosWaiting(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
     const pay = payConfig()
       ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId), fee: await feeFor(s.accountId) }
       : null;
-    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan });
+    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan, videos });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
   const view = await clientView(s.accountId, client);
@@ -302,6 +305,8 @@ export async function POST(req: Request) {
       // A monthly plan between them ends first, so nobody keeps paying (coachPay.ts).
       await endPair(s.accountId, body.id).catch(() => null);
       await endPair(body.id, s.accountId).catch(() => null);
+      // Form videos between them, files and all (formVideos.ts).
+      await dropPairVideos(s.accountId, body.id).catch(() => null);
       await unlink(s.accountId, body.id);
       return reply(req, 200, { ok: true });
     default:

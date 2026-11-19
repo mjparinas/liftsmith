@@ -37,6 +37,7 @@ export const ja: SiteText = {
       muscles: "部位別の種目",
       programs: "トレーニングプログラム",
       coachPrograms: "コーチのプログラム",
+      routineLibrary: "みんなのルーティン",
       equipment: "器具別の種目",
       guides: "トレーニングガイド",
       blog: "ブログ",

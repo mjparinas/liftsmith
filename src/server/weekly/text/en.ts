@@ -917,6 +917,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Start from the new Progress check-in template in Coaching › Check-ins. Clients under 18 are never asked for photos.",
   },
+  "coach-form-videos": {
+    title: "Form videos with notes in the video",
+    intro: "Clients can now film a set in the app and send it to you, and you answer right on the video.",
+    points: [
+      "They tap Send a form video in Coaching, pick the lift and say what to check. The app gives them five seconds to get into place and records up to a minute.",
+      "You get a notification. Slow the clip to half or quarter speed, pause where it matters and add a note pinned to that second.",
+      "They tap a note to jump to that moment, and can answer with a note of their own.",
+      "Videos stay private to the two of you and go when either of you ends coaching.",
+    ],
+    dyk: "Clients under 18 can't send form videos. Sending one is free for clients.",
+  },
   seasons: {
     title: "Training seasons start Monday",
     intro: "Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.",
@@ -962,6 +973,29 @@ export const emails: Record<string, Words> = {
       "It's worked out on your own clock, for gyms near you.",
     ],
     dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
+  },
+  "outside-workouts": {
+    title: "Your runs and matches now count in your recovery",
+    intro:
+      "Turn on Count workouts from other apps, and the workouts in your phone's health app shape your recovery map and tomorrow's plan.",
+    points: [
+      "Runs, rides, sports and classes come in each time you open the app.",
+      "Each one tires the muscles it uses, more the longer it ran.",
+      "Tomorrow's plan works around tired legs after a long run or match.",
+      "They never count as Liftsmith workouts, and nothing counts twice.",
+    ],
+    dyk: "It's in Settings › Connected apps, and the list under the recovery map on Body shows what's being counted.",
+  },
+  "routine-library": {
+    title: "Find a routine another lifter made",
+    intro: "The new routine library has routines other lifters published, ready to save in a tap.",
+    points: [
+      "Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.",
+      "Save one and it lands in your routines, ready to start or change.",
+      "Rate it with stars once you've saved it. Stars show from three ratings.",
+      "Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.",
+    ],
+    dyk: "Every published routine gets its own page on the website, so you can share it with anyone.",
   },
   pregnancy: {
     title: "Training through pregnancy and after birth",

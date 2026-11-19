@@ -41,7 +41,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { go, useRoute } from "./router";
 import { SonosSettings } from "./Sonos";
-import { Button, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
+import { Button, InlineSwitch, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
   const s = Math.round((ms - Date.now()) / 1000);
@@ -71,6 +71,8 @@ function HealthCard() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [workouts, setWorkouts] = useState<boolean | null>(null);
+  const outsideOn = useApp((s) => !!s.profile.outsideWorkouts);
+  const [outsideBusy, setOutsideBusy] = useState(false);
 
   const check = () =>
     healthAvailable().then(async (a) => {
@@ -122,6 +124,21 @@ function HealthCard() {
     }
   };
 
+  // Count workouts from other apps (outside.ts): asks Health for workouts only when it's turned on.
+  const toggleOutside = async (on: boolean) => {
+    if (outsideBusy) return;
+    setOutsideBusy(true);
+    try {
+      const r = await useApp.getState().setOutsideWorkouts(on);
+      if (r === "denied") {
+        oops();
+        setNote(t("conn.outside.denied", { store }));
+      } else if (r === "on") setLast(healthLastSync());
+    } finally {
+      setOutsideBusy(false);
+    }
+  };
+
   const allowed = (k: HealthPerm) => ((WRITE as readonly string[]).includes(k) ? perms?.writes.includes(k) : perms?.reads?.includes(k));
 
   return (
@@ -170,6 +187,13 @@ function HealthCard() {
             </Button>
           )}
           {p === "ios" && <p className="mt-2 text-xs text-muted">{t("conn.health.iosReads")}</p>}
+          <InlineSwitch
+            className="mt-3"
+            label={t("conn.outside.title")}
+            hint={t("conn.outside.note", { store })}
+            on={outsideOn}
+            onChange={(v) => void toggleOutside(v)}
+          />
           <Button className="mt-3 w-full" onClick={() => void sync()} disabled={busy}>
             {connected ? t("conn.syncNow") : t("conn.connect")}
           </Button>

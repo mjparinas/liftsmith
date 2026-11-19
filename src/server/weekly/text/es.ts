@@ -898,6 +898,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Empieza con la nueva plantilla Revisión de progreso en Entrenador › Seguimientos. A los menores de 18 nunca se les piden fotos.",
   },
+  "coach-form-videos": {
+    title: "Vídeos de técnica con notas en el vídeo",
+    intro: "Tus clientes ya pueden grabar una serie en la app y enviártela, y tú respondes sobre el propio vídeo.",
+    points: [
+      "Tocan Enviar un vídeo de técnica en Entrenamiento personal, eligen el ejercicio y dicen qué revisar. La app les da cinco segundos para colocarse y graba hasta un minuto.",
+      "Te llega una notificación. Pon el vídeo a la mitad o a un cuarto de velocidad, pausa donde importa y añade una nota fijada en ese segundo.",
+      "Tocan una nota para ir a ese momento y pueden responder con una nota suya.",
+      "Los vídeos son privados entre los dos y se borran si cualquiera deja de entrenar con el otro.",
+    ],
+    dyk: "Los clientes menores de 18 años no pueden enviar vídeos de técnica. Enviarlos es gratis para los clientes.",
+  },
   seasons: {
     title: "Las temporadas de entrenamiento empiezan el lunes",
     intro: "La temporada 1, Brasa, empieza el lunes: diez semanas, un recorrido de 20 niveles y premios que solo se ganan este invierno.",
@@ -944,6 +955,29 @@ export const emails: Record<string, Words> = {
       "Se calcula con tu propia hora, para gimnasios cerca de ti.",
     ],
     dyk: "¿Un horario está mal? Informa de un problema en su página, o reclámala y ponlo tú.",
+  },
+  "outside-workouts": {
+    title: "Tus carreras y partidos ya cuentan en tu recuperación",
+    intro:
+      "Activa Contar entrenamientos de otras apps y los entrenamientos de la app de salud de tu teléfono ajustan tu mapa de recuperación y el plan de mañana.",
+    points: [
+      "Las carreras, salidas en bici, deportes y clases llegan cada vez que abres la app.",
+      "Cada uno cansa los músculos que usa, más cuanto más dura.",
+      "El plan de mañana tiene en cuenta las piernas cansadas tras una carrera o un partido largos.",
+      "Nunca cuentan como entrenamientos de Liftsmith y nada cuenta dos veces.",
+    ],
+    dyk: "Está en Ajustes › Apps conectadas, y la lista bajo el mapa de recuperación en Cuerpo muestra lo que se cuenta.",
+  },
+  "routine-library": {
+    title: "Encuentra una rutina hecha por otra persona",
+    intro: "La nueva biblioteca de rutinas reúne rutinas que otras personas publicaron, listas para guardar con un toque.",
+    points: [
+      "Busca por palabras, elige un objetivo o activa Para mi gimnasio para ver solo las que tu gimnasio puede hacer.",
+      "Guarda una y aparecerá en tus rutinas, lista para empezar o cambiar.",
+      "Puntúala con estrellas después de guardarla. Las estrellas se muestran desde tres valoraciones.",
+      "Publica la tuya desde su editor, con o sin tu nombre. Solo salen ejercicios y series, nunca pesos ni notas.",
+    ],
+    dyk: "Cada rutina publicada tiene su propia página en la web, para compartirla con quien quieras.",
   },
   pregnancy: {
     title: "Entrenar durante el embarazo y después del parto",

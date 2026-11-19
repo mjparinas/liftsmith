@@ -25,5 +25,5 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - **Every change says why:** each target's note names the week and the share (`preg.note.*`), Today shows a chip ("Pregnancy · week 22", "After birth · week 8") that opens the setting, and the setting lists what the workouts do now and when it changes next. Stop signs (ACOG's warning signs in pregnancy; heavier bleeding, pain, leaking, pelvic heaviness or a tummy bulge after birth) and "not medical advice" are on the card.
 - **Never shared:** not in analytics, feedback reports or a coach's view (coach.ts reads only named profile fields). The privacy policy lists it with cycle data.
 - **Parity:** pure web code, so Android, iOS and the web get it together. No native code.
-- **Weekly email** W69 (`pregnancy`) skips accounts whose synced profile says male (`notMale`, `WeeklyFacts.male`).
+- **Weekly email** W72 (`pregnancy`) skips accounts whose synced profile says male (`notMale`, `WeeklyFacts.male`).
 - Not built: reading pregnancy from Health Connect or Apple Health (neither plugin exposes it), a pelvic floor program of its own (a physio's rehab routine covers it), or changes to readiness beyond no push days.

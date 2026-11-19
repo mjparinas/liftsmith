@@ -18,7 +18,7 @@ import { BADGE_MAX, badgeCount, badgeOn, type Waiting } from "./badgeCount";
 import { isNative } from "./juice";
 import { socialOn, useSocial } from "./social";
 import { useApp } from "./store";
-import { useCoachNotes } from "./trainer";
+import { coachWaiting, useCoachNotes } from "./trainer";
 
 /** Whether this device can show a number on the app icon at all. */
 export function badgeSupported(): boolean {
@@ -60,7 +60,7 @@ export function resetIconBadge() {
 /** What's waiting, from what Friends and coaching already loaded (no extra requests). */
 export function useWaiting(): Waiting {
   const me = useSocial((s) => s.me);
-  const coach = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
+  const coach = useCoachNotes(coachWaiting);
   const signedIn = useAccount((s) => !!s.account);
   if (!signedIn) return { friends: 0, coach: 0 };
   return { friends: socialOn() ? (me?.unread ?? 0) + (me?.requests ?? 0) : 0, coach };

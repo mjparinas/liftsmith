@@ -896,6 +896,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Zacznij od nowego szablonu Kontrola postępów w Trenowanie › Ankiety. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
   },
+  "coach-form-videos": {
+    title: "Nagrania techniki z notatkami w nagraniu",
+    intro: "Klienci mogą teraz nagrać serię w aplikacji i wysłać ją tobie, a ty odpowiadasz bezpośrednio w nagraniu.",
+    points: [
+      "Dotykają Wyślij nagranie techniki w sekcji Coaching, wybierają ćwiczenie i piszą, co sprawdzić. Aplikacja daje pięć sekund na ustawienie się i nagrywa do minuty.",
+      "Dostajesz powiadomienie. Zwolnij nagranie do połowy lub ćwierci prędkości, zatrzymaj w ważnym miejscu i dodaj notatkę przypiętą do tej sekundy.",
+      "Klienci dotykają notatki, by przejść do tego momentu, i mogą odpowiedzieć własną notatką.",
+      "Nagrania widzicie tylko wy dwoje i są usuwane, gdy któreś z was zakończy współpracę.",
+    ],
+    dyk: "Klienci poniżej 18 lat nie mogą wysyłać nagrań techniki. Dla klientów wysyłanie jest bezpłatne.",
+  },
   seasons: {
     title: "Sezony treningowe startują w poniedziałek",
     intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",
@@ -942,6 +953,29 @@ export const emails: Record<string, Words> = {
       "Liczone według Twojego zegara, dla siłowni w pobliżu.",
     ],
     dyk: "Złe godziny? Zgłoś problem na stronie siłowni albo przejmij ją i popraw je sam.",
+  },
+  "outside-workouts": {
+    title: "Twoje biegi i mecze liczą się teraz w regeneracji",
+    intro:
+      "Włącz Licz treningi z innych aplikacji, a treningi z aplikacji zdrowotnej w telefonie wpłyną na mapę regeneracji i plan na jutro.",
+    points: [
+      "Biegi, rower, sporty i zajęcia trafiają do aplikacji przy każdym jej otwarciu.",
+      "Każdy męczy mięśnie, których używa, tym bardziej, im dłużej trwał.",
+      "Plan na jutro oszczędza zmęczone nogi po długim biegu lub meczu.",
+      "Nigdy nie liczą się jako treningi Liftsmith i nic nie liczy się podwójnie.",
+    ],
+    dyk: "Znajdziesz to w Ustawieniach › Połączone aplikacje, a lista pod mapą regeneracji w zakładce Ciało pokazuje, co jest liczone.",
+  },
+  "routine-library": {
+    title: "Znajdź rutynę ułożoną przez kogoś innego",
+    intro: "Nowa biblioteka rutyn zbiera rutyny opublikowane przez innych, gotowe do zapisania jednym dotknięciem.",
+    points: [
+      "Szukaj po słowach, wybierz cel albo włącz Pasuje do mojej siłowni, by widzieć tylko rutyny, na które pozwala twój sprzęt.",
+      "Zapisana rutyna trafia do twoich rutyn, gotowa do startu albo zmian.",
+      "Oceń ją gwiazdkami po zapisaniu. Gwiazdki widać od trzech ocen.",
+      "Opublikuj własną z jej edytora, z imieniem lub bez. Wychodzą tylko ćwiczenia i serie, nigdy ciężary ani notatki.",
+    ],
+    dyk: "Każda opublikowana rutyna ma własną stronę w serwisie, którą możesz wysłać komu chcesz.",
   },
   pregnancy: {
     title: "Trening w ciąży i po porodzie",

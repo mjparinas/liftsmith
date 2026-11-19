@@ -28,7 +28,7 @@ import { hasOtherParts } from "@/lib/sessionSplit";
 import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { toast } from "@/lib/toast";
-import { useCoachNotes } from "@/lib/trainer";
+import { coachWaiting, useCoachNotes } from "@/lib/trainer";
 import { effortLabel } from "@/lib/training";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
@@ -959,7 +959,7 @@ function FitAroundCalendar() {
  */
 function TodayCoachBadge() {
   const shown = useCoachNotes((s) => s.who.coaches.length > 0 || s.who.clients > 0);
-  const unread = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
+  const unread = useCoachNotes(coachWaiting);
   if (!shown) return null;
   return (
     <button type="button" onClick={() => go("trainer")} className="press flex min-h-8 max-w-full items-center gap-1.5">

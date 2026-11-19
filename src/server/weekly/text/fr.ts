@@ -903,6 +903,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Partez du nouveau modèle Bilan de progrès dans Coaching › Bilans. On ne demande jamais de photo aux moins de 18 ans.",
   },
+  "coach-form-videos": {
+    title: "Vidéos de technique avec notes dans la vidéo",
+    intro: "Vos clients peuvent maintenant filmer une série dans l'app et vous l'envoyer, et vous répondez directement sur la vidéo.",
+    points: [
+      "Ils touchent Envoyer une vidéo de technique dans Coaching, choisissent l'exercice et disent quoi vérifier. L'app leur laisse cinq secondes pour se placer et filme jusqu'à une minute.",
+      "Vous recevez une notification. Passez la vidéo à demi ou quart de vitesse, mettez en pause là où c'est important et ajoutez une note épinglée à cette seconde.",
+      "Ils touchent une note pour aller à ce moment et peuvent répondre avec leur propre note.",
+      "Les vidéos restent privées entre vous deux et sont supprimées si l'un de vous met fin au coaching.",
+    ],
+    dyk: "Les clients de moins de 18 ans ne peuvent pas envoyer de vidéos de technique. L'envoi est gratuit pour les clients.",
+  },
   seasons: {
     title: "Les saisons d'entraînement commencent lundi",
     intro: "La saison 1, Braise, commence lundi : dix semaines, un parcours de 20 paliers et des récompenses à gagner seulement cet hiver.",
@@ -949,6 +960,29 @@ export const emails: Record<string, Words> = {
       "C'est calculé sur votre propre heure, pour les salles près de vous.",
     ],
     dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
+  },
+  "outside-workouts": {
+    title: "Tes courses et tes matchs comptent dans ta récupération",
+    intro:
+      "Active Compter les séances d'autres apps, et les séances de l'appli santé de ton téléphone ajustent ta carte de récupération et le plan de demain.",
+    points: [
+      "Courses, vélo, sports et cours arrivent à chaque ouverture de l'app.",
+      "Chacun fatigue les muscles qu'il sollicite, d'autant plus qu'il a duré.",
+      "Le plan de demain ménage les jambes fatiguées après une longue course ou un match.",
+      "Ils ne comptent jamais comme des séances Liftsmith, et rien ne compte deux fois.",
+    ],
+    dyk: "C'est dans Réglages › Apps connectées, et la liste sous la carte de récupération dans Corps montre ce qui est compté.",
+  },
+  "routine-library": {
+    title: "Trouvez une routine créée par quelqu'un d'autre",
+    intro: "La nouvelle bibliothèque de routines rassemble celles que d'autres ont publiées, prêtes à enregistrer d'un geste.",
+    points: [
+      "Cherchez par mots, choisissez un objectif ou activez Adaptées à ma salle pour ne voir que celles que votre salle permet.",
+      "Enregistrez-en une et elle rejoint vos routines, prête à lancer ou à modifier.",
+      "Notez-la avec des étoiles une fois enregistrée. Les étoiles s'affichent à partir de trois notes.",
+      "Publiez la vôtre depuis son éditeur, avec ou sans votre nom. Seuls les exercices et les séries sont partagés, jamais les charges ni les notes.",
+    ],
+    dyk: "Chaque routine publiée a sa propre page sur le site, à partager avec qui vous voulez.",
   },
   pregnancy: {
     title: "S’entraîner pendant la grossesse et après l’accouchement",

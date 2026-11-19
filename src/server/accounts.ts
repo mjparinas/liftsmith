@@ -12,6 +12,7 @@ import { communityCleanup } from "./community";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { earnedDeletes } from "./earnedPro";
+import { dropVideosOf } from "./formVideos";
 import { claimDeletes } from "./gymClaims";
 import { classDeletes } from "./gymClasses";
 import { gymDeletes } from "./gymDirectory";
@@ -22,6 +23,7 @@ import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { programReviewCleanup } from "./programReviews";
 import { isReviewEmail, reviewCodeMatches } from "./review";
+import { libraryCleanup } from "./routineLibrary";
 import { socialDeletes } from "./social";
 import { forgetStripe } from "./stripe";
 import { teamDeletes } from "./teams";
@@ -287,6 +289,8 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
   await forgetStripe(accountId).catch(() => null);
   // Monthly coaching plans this account pays or is paid end now (coachPay.ts).
   await forgetCoachPay(accountId).catch(() => null);
+  // Form videos it sent or was sent: the files in Vercel Blob as well as the rows (formVideos.ts).
+  await dropVideosOf(accountId).catch(() => null);
   await batch([
     { sql: "DELETE FROM account_installs WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
@@ -300,6 +304,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...coachCleanup(accountId),
     ...programReviewCleanup(accountId),
     ...programCleanup(accountId),
+    ...libraryCleanup(accountId),
     ...earnedDeletes(accountId),
     ...teamDeletes(accountId),
     ...gymDeletes(accountId),
@@ -327,6 +332,7 @@ export async function resetAccount(accountId: string): Promise<void> {
   await forgetAll(accountId).catch(() => null);
   const [p] = await query("SELECT suspended FROM social_profiles WHERE account_id = ?", [accountId]);
   const keepProfile = Number(p?.suspended ?? 0) !== 0;
+  await dropVideosOf(accountId).catch(() => null);
   await batch([
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_usage WHERE account_id = ?", args: [accountId] },

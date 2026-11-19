@@ -71,6 +71,7 @@ import { CoachRatingPreview, MyReviews, RateCoach } from "./CoachReviews";
 import { CoachSessions, YourSessions } from "./CoachSessions";
 import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
+import { ClientVideos } from "./FormVideos";
 import { Icon, type IconName } from "./icons";
 import { go, replaceRoute } from "./router";
 import { AthleteTeams, CoachTeams, useTeams } from "./SchoolTeams";
@@ -408,6 +409,7 @@ function ClientPage({
         checkins={(data.checkins ?? []).map((c) => ({ ...c, coach: coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
       />
       <FromCoach coaches={coaches} plans={data.plans} notes={data.notes ?? []} targets={data.targets ?? []} />
+      <ClientVideos coaches={coaches} />
       {data.sessions && <YourSessions sessions={data.sessions} coaches={coaches} onChange={onChange} />}
       {data.pay && <YourPayments pay={data.pay} coaches={coaches} onChange={onChange} />}
       {teams.joined.length > 0 && (

@@ -333,6 +333,11 @@ export const pl: FeaturesText = {
       name: "Twoje własne rutyny",
       body: "Buduj rutyny z przeglądarki ćwiczeń, bez limitu liczby, i udostępniaj je jako link.",
     },
+    "routine-library": {
+      name: "Biblioteka rutyn",
+      body: "Szukaj rutyn opublikowanych przez innych według celu, słów i sprzętu na twojej siłowni, zapisz jedną jednym dotknięciem i oceń ją gwiazdkami. Opublikuj własną z jej edytora, z imieniem lub bez, a dostanie własną stronę w serwisie. Wychodzą tylko ćwiczenia i serie, nigdy twoje ciężary ani notatki.",
+      note: "Publikowanie wymaga konta i ukończonych 18 lat. Przeglądać może każdy.",
+    },
     library: {
       name: "1000 ćwiczeń",
       body: "Siłowe, z masą ciała, na maszynach, z gumami, z kettlebellami i cardio, z wyszukiwarką, filtrami mięśni i filtrem „ta siłownia”. Cardio zapisuje czas i dystans.",
@@ -478,6 +483,11 @@ export const pl: FeaturesText = {
       name: "Kontrole postępów z wagą, zdjęciami i trendami",
       body: "Dodaj do dowolnego formularza pytania o masę ciała i zdjęcia, i wysyłaj go co tydzień, co 2 lub co 4 tygodnie. Waga wypełnia się z ostatniego ważenia klienta, zdjęcia widzisz tylko Ty, a trend każdej odpowiedzi widać w raporcie. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
     },
+    "coach-form-videos": {
+      name: "Nagrania techniki z notatkami w nagraniu",
+      body: "Klienci nagrywają serię w aplikacji i wysyłają ją tobie. Obejrzyj ją w zwolnionym tempie, przypnij notatki do konkretnych momentów, a klienci odpowiedzą w tych samych notatkach. Widzicie je tylko wy dwoje; osoby poniżej 18 lat nie mogą ich wysyłać.",
+      note: "Wysłanie nagrania jest dla klientów bezpłatne. Android, iPhone i przeglądarka.",
+    },
     "coach-roles": {
       name: "Dla trenerów personalnych i trenerów",
       body: "Powiedz, czy jesteś trenerem personalnym pracującym jeden na jeden, czy trenerem prowadzącym grupy i drużyny. Podopieczni widzą właściwe określenie, a narzędzia, których używasz najczęściej, są na początku.",
@@ -578,6 +588,10 @@ export const pl: FeaturesText = {
     "health-save": {
       name: "Treningi zapisywane w aplikacji zdrowotnej",
       body: "Każdy ukończony trening trafia do Health Connect albo Apple Zdrowie jako trening siłowy, z kaloriami i tętnem.",
+    },
+    "outside-workouts": {
+      name: "Liczą się treningi z innych aplikacji",
+      body: "Po włączeniu biegi, jazdy na rowerze, sporty i zajęcia, które inne aplikacje zapisują w aplikacji zdrowotnej, liczą się w mapie regeneracji i w planie na jutro. Długi mecz wczoraj zostawia nogi w regeneracji, a plan to uwzględnia.",
     },
     offline: {
       name: "Działa offline",
@@ -729,11 +743,11 @@ export const pl: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki i jedzenie do aplikacji; ukończone treningi na zewnątrz",
+      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki i jedzenie do aplikacji; ukończone treningi na zewnątrz; po włączeniu także treningi z innych aplikacji do aplikacji",
     },
     "apple-health": {
       name: "Apple Zdrowie",
-      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki, jedzenie, wzrost, wiek i płeć do aplikacji; ukończone treningi na zewnątrz",
+      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki, jedzenie, wzrost, wiek i płeć do aplikacji; ukończone treningi na zewnątrz; po włączeniu także treningi z innych aplikacji do aplikacji",
     },
     "samsung-health": {
       name: "Samsung Health",

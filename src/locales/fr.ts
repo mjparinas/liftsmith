@@ -54,6 +54,7 @@ import * as fmt from "./text/fmt";
 import * as food from "./text/food";
 import * as friends from "./text/friends";
 import * as ft from "./text/ft";
+import * as fv from "./text/fv";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -107,6 +108,7 @@ import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
 import * as rev from "./text/rev";
 import * as rhp from "./text/rhp";
+import * as rl from "./text/rl";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -164,6 +166,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...body.fr,
   ...buddy.fr,
   ...crew.fr,
+  ...fv.fr,
   ...buy.fr,
   ...cal.fr,
   ...calc.fr,
@@ -229,6 +232,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...part.fr,
   ...past.fr,
   ...cpg.fr,
+  ...rl.fr,
   ...pay.fr,
   ...pgm.fr,
   ...photos.fr,
