@@ -478,6 +478,11 @@ export const pl: FeaturesText = {
       name: "Kontrole postępów z wagą, zdjęciami i trendami",
       body: "Dodaj do dowolnego formularza pytania o masę ciała i zdjęcia, i wysyłaj go co tydzień, co 2 lub co 4 tygodnie. Waga wypełnia się z ostatniego ważenia klienta, zdjęcia widzisz tylko Ty, a trend każdej odpowiedzi widać w raporcie. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
     },
+    "coach-form-videos": {
+      name: "Nagrania techniki z notatkami w nagraniu",
+      body: "Klienci nagrywają serię w aplikacji i wysyłają ją tobie. Obejrzyj ją w zwolnionym tempie, przypnij notatki do konkretnych momentów, a klienci odpowiedzą w tych samych notatkach. Widzicie je tylko wy dwoje; osoby poniżej 18 lat nie mogą ich wysyłać.",
+      note: "Wysłanie nagrania jest dla klientów bezpłatne. Android, iPhone i przeglądarka.",
+    },
     "coach-roles": {
       name: "Dla trenerów personalnych i trenerów",
       body: "Powiedz, czy jesteś trenerem personalnym pracującym jeden na jeden, czy trenerem prowadzącym grupy i drużyny. Podopieczni widzą właściwe określenie, a narzędzia, których używasz najczęściej, są na początku.",

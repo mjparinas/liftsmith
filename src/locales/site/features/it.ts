@@ -410,6 +410,11 @@ export const it: FeaturesText = {
       name: "Check-in dei progressi con peso, foto e andamento",
       body: "Aggiungi domande sul peso corporeo e con foto a qualsiasi modulo, e invialo ogni settimana, ogni 2 o ogni 4 settimane. Il peso parte dall'ultima pesata del cliente, le foto arrivano solo a te e l'andamento di ogni risposta compare nel suo report. Ai minori di 18 anni non si chiedono mai foto.",
     },
+    "coach-form-videos": {
+      name: "Video della tecnica con note nel video",
+      body: "I clienti riprendono una serie nell'app e te la inviano. Guardala al rallentatore, fissa note nei momenti esatti e rispondono sulle stesse note. La vedete solo voi due; i minori di 18 anni non possono inviarne.",
+      note: "Inviare un video è gratis per i clienti. Android, iPhone e web.",
+    },
     "coach-roles": {
       name: "Per personal trainer e coach",
       body: "Indica se sei un personal trainer che lavora uno a uno o un coach di gruppi e squadre. I clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",

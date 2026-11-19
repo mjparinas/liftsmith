@@ -899,6 +899,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Starte mit der neuen Vorlage Fortschritts-Check-in unter Coaching › Check-ins. Unter 18-Jährige werden nie nach Fotos gefragt.",
   },
+  "coach-form-videos": {
+    title: "Technikvideos mit Notizen im Video",
+    intro: "Kunden können jetzt einen Satz in der App filmen und dir schicken, und du antwortest direkt im Video.",
+    points: [
+      "Sie tippen in Coaching auf Technikvideo senden, wählen die Übung und sagen, worauf du achten sollst. Die App gibt ihnen fünf Sekunden, um sich aufzustellen, und nimmt bis zu einer Minute auf.",
+      "Du bekommst eine Benachrichtigung. Spiel das Video mit halbem oder Viertel-Tempo ab, halte an der wichtigen Stelle an und hefte eine Notiz an genau diese Sekunde.",
+      "Sie tippen auf eine Notiz, um zu dieser Stelle zu springen, und können mit einer eigenen Notiz antworten.",
+      "Die Videos sehen nur ihr beide, und sie werden gelöscht, wenn einer von euch das Coaching beendet.",
+    ],
+    dyk: "Klienten unter 18 können keine Technikvideos senden. Für Klienten ist das Senden kostenlos.",
+  },
   seasons: {
     title: "Am Montag starten die Trainingssaisons",
     intro: "Saison 1, Glut, startet am Montag: zehn Wochen, ein Pfad mit 20 Stufen und Belohnungen, die es nur diesen Winter gibt.",

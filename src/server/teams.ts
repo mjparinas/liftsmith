@@ -18,6 +18,7 @@ import { createHash, randomInt } from "node:crypto";
 import { cleanEmail, type SendMail } from "./accounts";
 import { cleanCode, COACH_LIMITS, nameOf, newCode, unlink } from "./coach";
 import { batch, query, rateLimit, run } from "./db";
+import { dropPairVideos } from "./formVideos";
 
 const DAY = 86_400_000;
 
@@ -302,7 +303,9 @@ async function unlinkUnlessOtherTeam(coachId: string, athleteId: string): Promis
     "SELECT COUNT(*) AS n FROM team_members tm JOIN teams t ON t.id = tm.team_id WHERE t.coach_id = ? AND tm.account_id = ?",
     [coachId, athleteId],
   );
-  if (n(still?.n) === 0) await unlink(coachId, athleteId);
+  if (n(still?.n) > 0) return;
+  await dropPairVideos(coachId, athleteId).catch(() => null);
+  await unlink(coachId, athleteId);
 }
 
 /** The coach takes an athlete off a team. */

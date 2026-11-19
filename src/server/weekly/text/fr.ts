@@ -903,6 +903,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Partez du nouveau modèle Bilan de progrès dans Coaching › Bilans. On ne demande jamais de photo aux moins de 18 ans.",
   },
+  "coach-form-videos": {
+    title: "Vidéos de technique avec notes dans la vidéo",
+    intro: "Vos clients peuvent maintenant filmer une série dans l'app et vous l'envoyer, et vous répondez directement sur la vidéo.",
+    points: [
+      "Ils touchent Envoyer une vidéo de technique dans Coaching, choisissent l'exercice et disent quoi vérifier. L'app leur laisse cinq secondes pour se placer et filme jusqu'à une minute.",
+      "Vous recevez une notification. Passez la vidéo à demi ou quart de vitesse, mettez en pause là où c'est important et ajoutez une note épinglée à cette seconde.",
+      "Ils touchent une note pour aller à ce moment et peuvent répondre avec leur propre note.",
+      "Les vidéos restent privées entre vous deux et sont supprimées si l'un de vous met fin au coaching.",
+    ],
+    dyk: "Les clients de moins de 18 ans ne peuvent pas envoyer de vidéos de technique. L'envoi est gratuit pour les clients.",
+  },
   seasons: {
     title: "Les saisons d'entraînement commencent lundi",
     intro: "La saison 1, Braise, commence lundi : dix semaines, un parcours de 20 paliers et des récompenses à gagner seulement cet hiver.",
