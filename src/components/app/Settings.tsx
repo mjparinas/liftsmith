@@ -49,6 +49,7 @@ import { ImportWorkouts } from "./ImportCsv";
 import { LanguageChoices } from "./LanguagePicker";
 import { LogoEgg } from "./LogoEgg";
 import { MessageSettings } from "./MessageSettings";
+import { PregnancySettings } from "./PregnancySettings";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
@@ -760,6 +761,7 @@ function BodyGroup() {
         <p className="mt-2 px-1 text-xs text-faint">{t("settings.bw.note")}</p>
       </Section>
       <CycleSettings />
+      <PregnancySettings />
     </>
   );
 }

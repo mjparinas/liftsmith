@@ -123,6 +123,10 @@ export const fr: FeaturesText = {
       note: "Les rappels de rééducation et la notification de nouveau programme sont sur Android et iPhone.",
     },
     cycle: { name: "Forme selon le cycle", body: "Si vous le souhaitez, notez votre cycle et la décision du jour en tient compte." },
+    pregnancy: {
+      name: "Mode grossesse et post-partum",
+      body: "Indiquez que vous êtes enceinte ou que vous avez eu votre bébé et chaque séance s’adapte à la semaine : charges plus légères, aucune série à fond, rien sur le dos en fin de grossesse et une reprise progressive d’environ 16 semaines après l’accouchement.",
+    },
     "goal-planner": {
       name: "Planificateur d’objectifs",
       body: "Choisissez un mouvement et une cible : l’appli calcule une date réaliste et le chemin pour y arriver.",
@@ -329,6 +333,11 @@ export const fr: FeaturesText = {
       name: "Horaires des cours sur les pages des salles",
       body: "Les salles officielles publient les cours qu'elles donnent chaque semaine, avec l'instructeur et la salle, et indiquent les jours sans cours. Les membres voient la semaine sur la page de la salle dans l'appli et sur le web, et ajoutent le prochain cours à leur agenda d'un toucher.",
     },
+    "gym-chains": {
+      name: "Toutes les adresses d'une chaîne",
+      body: "Les salles d'une chaîne affichent son logo et mènent à une page avec toutes ses adresses, dans l'app les plus proches d'abord. Sur le web, chaque chaîne a sa propre page.",
+      note: "Nous reconnaissons une chaîne à la marque indiquée sur la carte ou à un nom partagé par des salles de plusieurs villes. Les salles revendiquées gardent leur propre logo.",
+    },
     "gym-open-now": {
       name: "Ouvert maintenant dans la recherche de salles",
       body: "Les salles proches indiquent si elles sont ouvertes et quand elles ferment ou rouvrent, et un toucher sur Ouvert maintenant ne montre que celles où vous pouvez entrer tout de suite.",
@@ -414,6 +423,10 @@ export const fr: FeaturesText = {
     "school-teams": {
       name: "Gratuit pour les équipes d’école secondaire",
       body: "Les entraîneurs d’école secondaire qui confirment un courriel scolaire ont Pro gratuitement, tout comme les athlètes de 13 à 18 ans de leurs équipes, avec un tableau d’équipe chaque semaine. La masse grasse et les profils publics restent désactivés pour les moins de 18 ans.",
+    },
+    "team-session": {
+      name: "Séances d'équipe sur une tablette",
+      body: "Un coach de lycée mène une séance pour toute l'équipe depuis une tablette : chaque athlète touche son prénom et note ses séries, la charge reprenant là où il en était, et le tableau montre qui n'a pas commencé. À la fin, les séries de chacun sont enregistrées dans son propre compte. Fonctionne sans réseau.",
     },
     "coach-checkins": {
       name: "Formulaires de bilan et questionnaires",

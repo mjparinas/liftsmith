@@ -119,6 +119,10 @@ export const it: FeaturesText = {
       note: "I promemoria di riabilitazione e la notifica di un nuovo programma sono su Android e iPhone.",
     },
     cycle: { name: "Prontezza secondo il ciclo", body: "Se vuoi, registra il tuo ciclo e la scelta di oggi ne tiene conto." },
+    pregnancy: {
+      name: "Modalità gravidanza e post-parto",
+      body: "Digli che sei incinta o che hai avuto il tuo bambino e ogni allenamento si adatta alla settimana: carichi più leggeri, nessuna serie al limite, niente supina a fine gravidanza e un ritorno graduale di circa 16 settimane dopo il parto.",
+    },
     "goal-planner": {
       name: "Pianificatore di obiettivi",
       body: "Scegli un esercizio e un obiettivo: calcola una data realistica e la strada per arrivarci.",
@@ -322,6 +326,11 @@ export const it: FeaturesText = {
       name: "Orari dei corsi sulle pagine delle palestre",
       body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
     },
+    "gym-chains": {
+      name: "Tutte le sedi di una catena",
+      body: "Le palestre di una catena mostrano il suo logo e portano a una pagina con tutte le sedi, nell'app prima le più vicine. Sul web ogni catena ha la sua pagina.",
+      note: "Riconosciamo le catene dal marchio sulla mappa o da un nome condiviso da palestre in più città. Le palestre rivendicate mantengono il proprio logo.",
+    },
     "gym-open-now": {
       name: "Aperto ora nella ricerca palestre",
       body: "Le palestre vicine dicono se sono aperte adesso e quando chiudono o riaprono, e un tocco su Aperto ora mostra solo quelle dove puoi entrare subito.",
@@ -407,6 +416,10 @@ export const it: FeaturesText = {
     "school-teams": {
       name: "Gratis per le squadre delle superiori",
       body: "Gli allenatori delle superiori che confermano un’email scolastica hanno Pro gratis, come gli atleti dai 13 ai 18 anni delle loro squadre, con una classifica settimanale della squadra. Massa grassa e profili pubblici restano disattivati per i minori di 18 anni.",
+    },
+    "team-session": {
+      name: "Sessioni di squadra su un tablet",
+      body: "Un allenatore scolastico guida un allenamento per tutta la squadra da un tablet: ogni atleta tocca il proprio nome e registra le sue serie, con il peso da dove aveva lasciato, e il tabellone mostra chi non ha iniziato. Alla fine, le serie di ognuno vengono salvate nel suo account. Funziona senza campo.",
     },
     "coach-checkins": {
       name: "Moduli di check-in e questionari",

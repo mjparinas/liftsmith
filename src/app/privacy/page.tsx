@@ -57,8 +57,9 @@ export default function Privacy() {
         </ul>
         <p className="mt-2">
           We never collect, in usage stats, the weights or reps you lift, heart rate, body weight, readings from Health Connect or Apple
-          Health, cycle data, your location, your name or email, or anything you type. We don&apos;t use any advertising id (IDFA or Android
-          advertising id) and don&apos;t track you across other companies&apos; apps or websites, so there&apos;s no tracking prompt.
+          Health, cycle data, pregnancy and postpartum dates, your location, your name or email, or anything you type. We don&apos;t use any
+          advertising id (IDFA or Android advertising id) and don&apos;t track you across other companies&apos; apps or websites, so
+          there&apos;s no tracking prompt.
         </p>
         <p className="mt-2">
           We use these stats to see what works and what doesn&apos;t: how many people finish setup, which features get used, which devices
@@ -119,13 +120,13 @@ export default function Privacy() {
           An account is optional. If you sign in (with Google, with Apple, or with a code we email you), we keep your email address, which
           sign-in methods you used, and a copy of what you log in the app so it&apos;s backed up and on every device you sign in on: your
           workouts and sets, notes, body weight, gyms, routines and settings, and, if you use them, health readings from Health Connect or
-          Apple Health, injuries and cycle logs. Progress photos are never uploaded; they go into a backup file only if you switch that on.
-          This copy is used to give it back to you on your devices and, unless you say no, to count your best big lifts in strength
-          standards (below). It&apos;s never part of usage stats, never used for advertising, never shared, and never read by people unless
-          you ask us for help with it. Sign-in with Google or Apple gives us only your account id there and your email (Apple can give a
-          private relay address instead). Signing out of a device first saves anything not yet synced to your account, then erases that
-          device&apos;s copy, photos included (it offers a backup file first). Delete your account in Settings › Account and sync, which
-          deletes your account and our copy at once.
+          Apple Health, injuries, cycle logs and pregnancy or postpartum dates. Progress photos are never uploaded; they go into a backup
+          file only if you switch that on. This copy is used to give it back to you on your devices and, unless you say no, to count your
+          best big lifts in strength standards (below). It&apos;s never part of usage stats, never used for advertising, never shared, and
+          never read by people unless you ask us for help with it. Sign-in with Google or Apple gives us only your account id there and your
+          email (Apple can give a private relay address instead). Signing out of a device first saves anything not yet synced to your
+          account, then erases that device&apos;s copy, photos included (it offers a backup file first). Delete your account in Settings ›
+          Account and sync, which deletes your account and our copy at once.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Strength standards</h2>
@@ -151,9 +152,9 @@ export default function Privacy() {
           exercises (no weights or notes) so it shows in their activity. If you allow notifications, we keep your phone&apos;s push token
           with your account and send it through Google&apos;s Firebase Cloud Messaging (Android) or Apple&apos;s push service (iPhone) to
           tell you about follows, comments and workouts sent to you; signing out or leaving Friends removes it. A post never includes heart
-          rate, body weight or fat, measurements, cycle data, injuries, gyms or places. If you report something, we keep the report and who
-          made it so we can review it, and the person you reported isn&apos;t told who reported them. Leave Friends in its settings, or
-          delete your account, and all of this is deleted.
+          rate, body weight or fat, measurements, cycle data, pregnancy, injuries, gyms or places. If you report something, we keep the
+          report and who made it so we can review it, and the person you reported isn&apos;t told who reported them. Leave Friends in its
+          settings, or delete your account, and all of this is deleted.
         </p>
         <p className="mt-2">
           Your invite link carries a code tied to your account. If someone joins with it, we keep whose link it was, so you follow each

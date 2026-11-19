@@ -5,6 +5,7 @@ import { t } from "./i18n";
 import { activeInjuries, effectFor, lighten, skippedIds, type Injury } from "./injury";
 import { stepLoad } from "./loads";
 import { BASE_FRESH, draw, pickWeights, type SwapCache } from "./pickWeights";
+import { bodyMode, modeAvoids, modeSkipped, modeTarget, type BodyMode } from "./pregnancy";
 import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import type { Call } from "./readiness";
@@ -29,6 +30,8 @@ export interface PlanItem {
   challenge?: boolean;
   /** Kept lighter for an injury, at this share of the usual load (injury.ts). */
   injuryPct?: number;
+  /** Lighter or eased for pregnancy or after birth (pregnancy.ts); with `injuryPct` when the load came down. */
+  mode?: BodyMode["kind"];
   /** Lighter sets before the working sets (warmup.ts). */
   warmup?: WarmupSet[];
   /** A rehab or cardio part added beside the lifting at Start (sessions-with-parts.md, stage 5). Missing: the main part. */
@@ -246,7 +249,16 @@ export function drawWeight(ex: Exercise, compoundFirst: boolean, gym: Gym, pickW
  */
 export function addLeftoverSets(
   items: readonly PlanItem[],
-  opts: { prio: ReadonlySet<Muscle>; fixed: (id: string) => boolean; deload: boolean; call: Call; budget: number; total: number },
+  opts: {
+    prio: ReadonlySet<Muscle>;
+    fixed: (id: string) => boolean;
+    deload: boolean;
+    call: Call;
+    budget: number;
+    total: number;
+    /** Most sets an exercise may have (pregnancy.ts); five without it. */
+    cap?: number;
+  },
 ): number {
   let total = opts.total;
   if (opts.deload || opts.call === "recover") return total;
@@ -254,7 +266,7 @@ export function addLeftoverSets(
     if (opts.fixed(item.exerciseId) || item.injuryPct) continue;
     const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
     const extra = setSeconds(ex, item.target.reps) + item.restSec;
-    if (item.sets < 5 && total + extra <= opts.budget) {
+    if (item.sets < Math.min(5, opts.cap ?? 5) && total + extra <= opts.budget) {
       item.sets += 1;
       total += extra;
     }
@@ -279,17 +291,21 @@ export function generate({
   minutes,
   now,
   exclude = [],
-  call = "normal",
-  challenge = false,
+  call: asked = "normal",
+  challenge: challengeAsked = false,
   muscles,
   cache,
 }: GenerateInput): Plan {
   const day = muscles ? new Set(muscles) : null;
+  // Pregnancy and after birth (pregnancy.ts): no push days or challenges, and some exercises left out.
+  const mode = bodyMode(profile, now);
+  const call: Call = mode && asked === "push" ? "normal" : asked;
+  const challenge = challengeAsked && !mode;
   const week = blockWeek(profile, now);
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
   const hurt = activeInjuries(events, now);
-  const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
+  const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt), ...modeSkipped(EXERCISES, mode)]);
   const pool = available(gym.equipment).filter(
     (e) => !skip.has(e.id) && !e.custom && e.pattern !== "cardio" && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))),
   );
@@ -337,11 +353,11 @@ export function generate({
   const tryAdd = (m: Muscle, compoundFirst: boolean): void => {
     const ex = pick(m, compoundFirst);
     if (!ex) return;
-    const t = injuredTarget(ex, target(ex, events, profile, gym, now), hurt, gym);
+    const t = injuredTarget(ex, target(ex, events, profile, gym, now), hurt, gym, mode);
     // The lifter's set count (for this exercise, then for every exercise) replaces the automatic one.
     const chosen = training?.exercises?.[ex.id]?.sets ?? training?.sets;
     const baseSets = chosen ?? (ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3);
-    const sets = week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets;
+    const sets = Math.min(mode?.maxSets ?? Infinity, week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets);
     const warmup = warmups ? warmupFor(ex, t.target.weight, gym, warmed) : [];
     const item: PlanItem = {
       exerciseId: ex.id,
@@ -350,6 +366,7 @@ export function generate({
       focus: m,
       target: t.target,
       injuryPct: t.injuryPct,
+      ...(t.mode ? { mode: t.mode } : {}),
       warmup: warmup.length ? warmup : undefined,
     };
     const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
@@ -373,7 +390,7 @@ export function generate({
   // Leftover time: an extra set on the earliest exercises, priority muscles first.
   const fixed = (id: string) => (training?.exercises?.[id]?.sets ?? training?.sets) !== undefined;
   // With supersets, extra sets wait until the pairs are made and the plan is back to its real length.
-  if (!pairs) addLeftoverSets(items, { prio, fixed, deload: week.deload, call, budget, total });
+  if (!pairs) addLeftoverSets(items, { prio, fixed, deload: week.deload, call, budget, total, cap: mode?.maxSets });
 
   items.sort((a, b) => order(EXERCISE_BY_ID.get(a.exerciseId)!, EXERCISE_BY_ID.get(b.exerciseId)!));
   applyCall(items, call, challenge && call === "push" && !week.deload, gym);
@@ -388,7 +405,7 @@ export function generate({
       bigAlone: training?.bigAlone,
       ownRest: (id) => !!training?.exercises?.[id]?.rest,
     });
-    addLeftoverSets(final, { prio, fixed, deload: week.deload, call, budget, total: planSeconds(final) });
+    addLeftoverSets(final, { prio, fixed, deload: week.deload, call, budget, total: planSeconds(final), cap: mode?.maxSets });
     final = trimToFit(final, budget);
   } else final = trimToFit(warm, budget);
   const est = planSeconds(final);
@@ -412,11 +429,22 @@ export function fitPaired(items: readonly PlanItem[], budget: number, opts: Para
   return trimToFit(paired, budget);
 }
 
-/** Today's target for an exercise after any injury: the usual one, or lighter when the lifter chose that. */
-export function injuredTarget(ex: Exercise, t: Target, hurt: readonly Injury[], gym: Gym): { target: Target; injuryPct?: number } {
+/**
+ * Today's target for an exercise after any injury: the usual one, or lighter when the lifter chose that. In pregnancy
+ * or after birth (pregnancy.ts) the mode's share and reps in reserve apply too; the lighter of the two wins.
+ */
+export function injuredTarget(
+  ex: Exercise,
+  t: Target,
+  hurt: readonly Injury[],
+  gym: Gym,
+  mode: BodyMode | null = null,
+): { target: Target; injuryPct?: number; mode?: BodyMode["kind"] } {
   const eff = effectFor(ex, hurt);
-  if (eff?.action !== "light") return { target: t };
-  return { target: lighten(t, ex, eff.pct, gym), injuryPct: eff.pct };
+  const injured = eff?.action === "light" ? { target: lighten(t, ex, eff.pct, gym), injuryPct: eff.pct } : { target: t };
+  if (!mode || (injured.injuryPct !== undefined && injured.injuryPct <= mode.pct)) return injured;
+  const m = modeTarget(t, ex, mode, gym);
+  return { target: m.target, injuryPct: m.pct, mode: mode.kind };
 }
 
 /**
@@ -426,17 +454,19 @@ export function injuredTarget(ex: Exercise, t: Target, hurt: readonly Injury[], 
  */
 export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Plan {
   const hurt = activeInjuries(events, now);
-  if (!hurt.length) return plan;
+  const mode = bodyMode(profile, now);
+  if (!hurt.length && !mode) return plan;
   const items: PlanItem[] = [];
   for (const item of plan.items) {
     let ex = EXERCISE_BY_ID.get(item.exerciseId)!;
     let next: PlanItem = item;
-    if (effectFor(ex, hurt)?.action === "skip") {
+    if (effectFor(ex, hurt)?.action === "skip" || modeAvoids(ex, mode)) {
       const alt = alternatives(
         ex.id,
         gym,
         [...items, ...plan.items].map((i) => i.exerciseId),
         hurt,
+        mode,
       ).find((e) => !LADDER_ONLY.has(e.id));
       if (!alt) continue;
       ex = alt;
@@ -466,6 +496,28 @@ export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Pro
         warmup: undefined,
       };
     }
+    // Pregnancy and after birth: the mode's share, reps in reserve and set count, set by set, and no challenge.
+    if (mode && (next.injuryPct === undefined || next.injuryPct > mode.pct)) {
+      // Already lighter for an injury: scale what's left to reach the mode's share of the usual load.
+      const by = next.injuryPct ? { ...mode, pct: Math.round((mode.pct * 100) / next.injuryPct) } : mode;
+      const m = { ...modeTarget(next.target, ex, by, gym, mode.pct), pct: by.pct < 100 ? mode.pct : undefined };
+      const lit = (w: number, reps: number) => modeTarget({ weight: w, reps, rir: next.target.rir, note: "" }, ex, by, gym).target;
+      next = {
+        ...next,
+        target: m.target,
+        sets: Math.min(next.sets, mode.maxSets),
+        setTargets: next.setTargets?.slice(0, mode.maxSets).map((x) => ({
+          ...x,
+          weight: lit(x.weight, x.reps).weight,
+          reps: lit(x.weight, x.reps).reps,
+          amrap: undefined,
+        })),
+        injuryPct: m.pct,
+        mode: mode.kind,
+        challenge: undefined,
+        ...(m.pct ? { warmup: undefined } : {}),
+      };
+    } else if (mode) next = { ...next, sets: Math.min(next.sets, mode.maxSets), challenge: undefined };
     items.push(next);
   }
   return { ...plan, items, challenge: items.some((i) => i.challenge) };
@@ -510,7 +562,13 @@ export function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym
  * Swaps for an exercise: same main muscles, doable at this gym, best match first. With active injuries,
  * exercises they skip are left out and ones that avoid the injured area come first.
  */
-export function alternatives(exerciseId: string, gym: Gym | null, skip: readonly string[] = [], hurt: readonly Injury[] = []): Exercise[] {
+export function alternatives(
+  exerciseId: string,
+  gym: Gym | null,
+  skip: readonly string[] = [],
+  hurt: readonly Injury[] = [],
+  mode: BodyMode | null = null,
+): Exercise[] {
   const ex = EXERCISE_BY_ID.get(exerciseId);
   if (!ex) return [];
   const pool = gym ? available(gym.equipment) : [...EXERCISE_BY_ID.values()];
@@ -523,7 +581,8 @@ export function alternatives(exerciseId: string, gym: Gym | null, skip: readonly
         // Cardio swaps for cardio, strength for strength.
         !e.cardio === !ex.cardio &&
         e.primary.some((m) => ex.primary.includes(m)) &&
-        eff(e)?.action !== "skip",
+        eff(e)?.action !== "skip" &&
+        !modeAvoids(e, mode),
     )
     .map((e) => {
       const shared =

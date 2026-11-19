@@ -977,6 +977,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Każda opublikowana rutyna ma własną stronę w serwisie, którą możesz wysłać komu chcesz.",
   },
+  "team-session": {
+    title: "Cały trening drużyny na jednym tablecie",
+    intro: "Treningi drużyny mieszczą jeden trening dla całej drużyny na jednym tablecie.",
+    points: [
+      "Zacznij go z karty drużyny w Coaching i wybierz rutynę.",
+      "Każdy zawodnik stuka swoje imię i zapisuje serie, a ciężar zaczyna się tam, gdzie skończył.",
+      "Tablica pokazuje, kto nie zapisał jeszcze serii, nigdy ciężar.",
+      "Na koniec serie każdego trafiają na jego konto.",
+    ],
+    dyk: "Brak zasięgu na siłowni? Serie czekają na tablecie i pójdą, gdy wróci.",
+  },
+  "gym-chains": {
+    title: "Wszystkie lokalizacje Twojej sieci",
+    intro: "Siłownie należące do sieci pokazują teraz jej logo i link do wszystkich lokalizacji.",
+    points: [
+      "Na stronie siłowni z sieci dotknij Zobacz wszystkie lokalizacje pod jej nazwą.",
+      "Lista zaczyna się od lokalizacji najbliższych miejscu, w którym ostatnio szukano siłowni.",
+      "Dotknij lokalizacji, aby zobaczyć godziny otwarcia i dodać ją razem ze sprzętem jednym dotknięciem.",
+      "Na stronie internetowej każda sieć ma własną stronę ze wszystkimi lokalizacjami.",
+    ],
+    dyk: "Trenujesz w dwóch lokalizacjach? Dodaj obie jako siłownie, a Liftsmith zaplanuje każdy trening pod sprzęt tam, gdzie jesteś.",
+  },
+  pregnancy: {
+    title: "Trening w ciąży i po porodzie",
+    intro: "Tryb ciąży i połogu dopasowuje każdy trening do tygodnia, tak jak tryb kontuzji.",
+    points: [
+      "Włącz go w Ustawienia › Ciało i jednostki: wybierz ciążę albo poród, a potem tygodnie przyciskami − / +.",
+      "Ciężary spadają z tygodniami, a każda seria kończy się daleko od upadku.",
+      "W późnej ciąży nic na plecach ani na brzuchu, bez skoków i bez brzuszków.",
+      "Po porodzie stopniowy powrót przez około 16 tygodni, po cesarskim cięciu o dwa tygodnie dłużej.",
+    ],
+    dyk: "Jest za darmo, zostaje w Twoim telefonie, a każda zmiana mówi na ekranie Dziś, dlaczego.",
+  },
   "gym-insights": {
     title: "Zobacz, jak członkowie korzystają z siłowni",
     intro: "Strona Twojej siłowni w aplikacji pokazuje, jak się tam trenuje, z jednym następnym krokiem.",

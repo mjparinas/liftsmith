@@ -63,6 +63,9 @@ const nextConfig: NextConfig = {
           { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
           { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
           { source: "/gyms/:city/:gym/report/", destination: "/api/gyms/page/?city=:city&gym=:gym&report=1" },
+          // Gym chains and every branch of each (src/server/gymChainPage.ts); in the gym sitemap.
+          { source: "/gym-chains/", destination: "/api/gyms/chain/" },
+          { source: "/gym-chains/:chain/", destination: "/api/gyms/chain/?chain=:chain" },
           { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
           // Strength standards from real lifters (src/server/standardsPage.ts, docs/decisions/public-pages-and-seo.md).
           { source: "/strength-standards/", destination: "/api/standards/page/" },
@@ -99,6 +102,7 @@ const nextConfig: NextConfig = {
           // A gym's Report a problem page posts its one form back to this site (src/server/gymReportPage.ts).
           { source: "/gyms/:city/:gym/report/", headers: [{ key: "Content-Security-Policy", value: REPORT_PAGE_CSP }] },
           { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/gym-chains/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/routines/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },

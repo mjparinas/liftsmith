@@ -167,6 +167,10 @@ export const tr: FeaturesText = {
       name: "Döngüye duyarlı hazırlık",
       body: "İstersen döngünü kaydet, günün kararı bunu da hesaba katsın.",
     },
+    pregnancy: {
+      name: "Hamilelik ve doğum sonrası modu",
+      body: "Hamile olduğunu ya da bebeğini doğurduğunu söyle, her antrenman haftana uysun: daha hafif yükler, sınıra kadar set yok, hamileliğin sonlarında sırtüstü hareket yok ve doğumdan sonra yaklaşık 16 haftalık kademeli dönüş.",
+    },
     "goal-planner": {
       name: "Hedef planlayıcı",
       body: "Bir hareket ve hedef seç; gerçekçi bir tarih ve oraya giden yolu hesaplasın.",
@@ -387,6 +391,11 @@ export const tr: FeaturesText = {
       name: "Salon sayfalarında ders programı",
       body: "Resmî salonlar her hafta verdikleri dersleri eğitmen ve alanla birlikte paylaşır, dersin olmadığı günleri işaretler. Üyeler haftayı uygulamada ve webde salonun sayfasında görür, sıradaki dersi tek dokunuşla takvimine ekler.",
     },
+    "gym-chains": {
+      name: "Bir salon zincirinin tüm şubeleri",
+      body: "Bir zincire ait salonlar zincirin logosunu gösterir ve tüm şubelerinin olduğu bir sayfaya bağlanır; uygulamada en yakınlar önce. Web sitesinde her zincirin kendi sayfası var.",
+      note: "Zincirleri haritadaki marka bilgisinden ya da birkaç şehirdeki salonların paylaştığı bir addan tanırız. Sahiplenilmiş salonlar kendi logolarını korur.",
+    },
     "gym-open-now": {
       name: "Salon bulucuda Şu an açık",
       body: "Yakındaki salonlar şu an açık olup olmadığını, ne zaman kapanıp yeniden açılacağını gösterir. Şu an açık'a bir dokunuş yalnızca hemen gidebileceğin salonları bırakır.",
@@ -475,6 +484,10 @@ export const tr: FeaturesText = {
     "school-teams": {
       name: "Lise takımlarına ücretsiz",
       body: "Okul e-posta adresini doğrulayan lise koçları Pro'yu ücretsiz alır; takımlarındaki 13–18 yaş arası sporcular da öyle, haftalık takım sıralamasıyla. Vücut yağı ve herkese açık profiller 18 yaş altı için kapalı kalır.",
+    },
+    "team-session": {
+      name: "Tek tablette takım seansları",
+      body: "Lise koçu tüm takımın antrenmanını tek tabletten yönetir: her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar ve pano kimin başlamadığını gösterir. Bitince her sporcunun setleri kendi hesabına kaydedilir. Çekim olmadan da çalışır.",
     },
     "coach-checkins": {
       name: "Check-in formları ve anketler",

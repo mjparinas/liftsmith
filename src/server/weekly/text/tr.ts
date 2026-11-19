@@ -977,6 +977,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Yayımlanan her rutinin web sitesinde kendi sayfası olur, istediğin kişiyle paylaşabilirsin.",
   },
+  "team-session": {
+    title: "Takımın tüm antrenmanı tek tablette",
+    intro: "Takım seansları tüm takımın antrenmanını tek bir tablete koyar.",
+    points: [
+      "Koçluk'taki takım kartından başlat ve bir rutin seç.",
+      "Her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar.",
+      "Pano henüz set kaydetmeyenleri gösterir, asla ağırlığı değil.",
+      "Bitirince her sporcunun setleri kendi hesabına kaydedilir.",
+    ],
+    dyk: "Ağırlık salonunda çekim yok mu? Setler tablette bekler ve bağlantı gelince gönderilir.",
+  },
+  "gym-chains": {
+    title: "Zincirinin tüm şubeleri",
+    intro: "Bir zincire ait salonlar artık zincirin logosunu ve tüm şubelerine giden bir bağlantıyı gösteriyor.",
+    points: [
+      "Zincir salonunun sayfasında, adının altındaki tüm şubeleri gör'e dokun.",
+      "Liste, en son salon aradığın yere en yakın şubelerle başlar.",
+      "Saatlerini görmek ve ekipmanıyla tek dokunuşla eklemek için bir şubeye dokun.",
+      "Web sitesinde her zincirin tüm şubelerini listeleyen kendi sayfası var.",
+    ],
+    dyk: "İki şubede mi çalışıyorsun? İkisini de salon olarak ekle, Liftsmith her antrenmanı bulunduğun yerin ekipmanına göre planlasın.",
+  },
+  pregnancy: {
+    title: "Hamilelikte ve doğumdan sonra antrenman",
+    intro: "Hamilelik ve doğum sonrası modu, sakatlık modu gibi her antrenmanı haftana göre değiştirir.",
+    points: [
+      "Ayarlar › Vücut ve birimler'den aç: hamileyim ya da bebeğimi doğurdum seç, sonra haftaları − / + ile ayarla.",
+      "Haftalar geçtikçe yükler azalır ve her set tükenmenin çok gerisinde biter.",
+      "Hamileliğin sonlarında sırtüstü ya da yüzüstü hareket, zıplama ve mekik yok.",
+      "Doğumdan sonra yaklaşık 16 haftalık kademeli bir dönüş, sezaryenden sonra iki hafta daha uzun.",
+    ],
+    dyk: "Ücretsizdir, telefonunda kalır ve her değişikliğin nedeni Bugün ekranında yazar.",
+  },
   "gym-insights": {
     title: "Üyelerin salonunu nasıl kullandığını gör",
     intro: "Uygulamadaki salon sayfan artık orada nasıl antrenman yapıldığını bir sonraki adımla gösteriyor.",

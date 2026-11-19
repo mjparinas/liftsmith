@@ -24,6 +24,7 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
 import { meanFullSpeed } from "@/lib/partMetrics";
 import { loadBar } from "@/lib/plates";
+import { bodyMode } from "@/lib/pregnancy";
 import { TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
@@ -1077,7 +1078,9 @@ function SwapList({
 }) {
   const [avoid, setAvoid] = useState(false);
   const [browsing, setBrowsing] = useState(false);
-  const list = alternatives(fromId, gymEquipment, skip, hurt).slice(0, 12);
+  const profile = useApp((s) => s.profile);
+  const now = useNow(60_000);
+  const list = alternatives(fromId, gymEquipment, skip, hurt, bodyMode(profile, now)).slice(0, 12);
   return (
     <div>
       <InlineSwitch className="mb-3 rounded-xl bg-raised px-3 py-1.5 text-sm" label={t("wk.notHere")} on={avoid} onChange={setAvoid} />

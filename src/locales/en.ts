@@ -96,6 +96,7 @@ import * as plate from "./text/plate";
 import * as pm from "./text/pm";
 import * as pol from "./text/pol";
 import * as pr from "./text/pr";
+import * as preg from "./text/preg";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
@@ -184,6 +185,7 @@ export const en = {
   ...cpl.en,
   ...creator.en,
   ...cycle.en,
+  ...preg.en,
   ...dash.en,
   ...delight.en,
   ...demo.en,

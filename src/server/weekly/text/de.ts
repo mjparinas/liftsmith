@@ -980,6 +980,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Jede veröffentlichte Routine bekommt eine eigene Seite auf der Website, die du mit allen teilen kannst.",
   },
+  "team-session": {
+    title: "Das ganze Teamtraining auf einem Tablet",
+    intro: "Mit Teamtraining läuft ein Training für dein ganzes Team auf einem einzigen Tablet.",
+    points: [
+      "Starte es auf der Karte deines Teams unter Coaching und wähle eine Routine.",
+      "Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht beim letzten Stand.",
+      "Die Tafel zeigt, wer noch keinen Satz eingetragen hat, nie ein Gewicht.",
+      "Am Ende landen die Sätze aller im eigenen Konto.",
+    ],
+    dyk: "Kein Empfang im Kraftraum? Die Sätze warten auf dem Tablet und gehen raus, sobald er wieder da ist.",
+  },
+  "gym-chains": {
+    title: "Alle Standorte deiner Studiokette",
+    intro: "Studios einer Kette zeigen jetzt ihr Logo und einen Link zu allen ihren Standorten.",
+    points: [
+      "Tippe auf der Seite eines Kettenstudios unter dem Namen auf Alle Standorte ansehen.",
+      "Die Liste beginnt mit den Standorten, die dem Ort deiner letzten Studiosuche am nächsten sind.",
+      "Tippe auf einen Standort, um die Öffnungszeiten zu sehen und ihn mit einem Tippen samt Geräten hinzuzufügen.",
+      "Auf der Website hat jede Kette ihre eigene Seite mit allen Standorten.",
+    ],
+    dyk: "Du trainierst in zwei Standorten? Füge beide als Studios hinzu, und Liftsmith plant jedes Training mit den Geräten vor Ort.",
+  },
+  pregnancy: {
+    title: "Training in der Schwangerschaft und nach der Geburt",
+    intro: "Der Modus für Schwangerschaft und Rückbildung passt jedes Training an die Woche an, so wie der Verletzungsmodus.",
+    points: [
+      "Richte ihn ein unter Einstellungen › Körper und Einheiten: wähle schwanger oder Baby ist da, dann die Wochen mit − / +.",
+      "Die Lasten sinken mit den Wochen, und jeder Satz endet weit vor dem Muskelversagen.",
+      "Später in der Schwangerschaft nichts in Rücken- oder Bauchlage, keine Sprünge und keine Crunches.",
+      "Nach der Geburt ein schrittweiser Wiedereinstieg über etwa 16 Wochen, nach einem Kaiserschnitt zwei Wochen länger.",
+    ],
+    dyk: "Er ist kostenlos, bleibt auf deinem Handy, und jede Änderung sagt auf Heute, warum.",
+  },
   "gym-insights": {
     title: "Sieh, wie Mitglieder dein Gym nutzen",
     intro: "Die Seite deines Gyms in der App zeigt jetzt, wie dort trainiert wird, mit einem nächsten Schritt.",

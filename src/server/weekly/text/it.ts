@@ -980,6 +980,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ogni routine pubblicata ha una sua pagina sul sito, da condividere con chiunque.",
   },
+  "team-session": {
+    title: "Tutto l'allenamento della squadra su un tablet",
+    intro: "Le sessioni di squadra mettono un allenamento per tutta la squadra su un solo tablet.",
+    points: [
+      "Avviane una dalla scheda della squadra in Coaching e scegli una routine.",
+      "Ogni atleta tocca il proprio nome e registra le serie, con il peso da dove aveva lasciato.",
+      "Il tabellone mostra chi non ha ancora registrato una serie, mai un peso.",
+      "Alla fine, le serie di ognuno vengono salvate nel suo account.",
+    ],
+    dyk: "Niente campo in sala pesi? Le serie aspettano sul tablet e partono quando torna.",
+  },
+  "gym-chains": {
+    title: "Tutte le sedi della tua catena",
+    intro: "Le palestre di una catena ora mostrano il suo logo e un link a tutte le sue sedi.",
+    points: [
+      "Nella pagina di una palestra di catena, tocca Vedi tutte le sedi sotto il nome.",
+      "L'elenco parte dalle sedi più vicine a dove hai cercato palestre l'ultima volta.",
+      "Tocca una sede per vederne gli orari e aggiungerla con la sua attrezzatura con un tocco.",
+      "Sul web ogni catena ha la sua pagina con tutte le sedi.",
+    ],
+    dyk: "Ti alleni in due sedi? Aggiungile entrambe e Liftsmith pianifica ogni allenamento con l'attrezzatura di quella in cui sei.",
+  },
+  pregnancy: {
+    title: "Allenarsi in gravidanza e dopo il parto",
+    intro: "La modalità gravidanza e post-parto adatta ogni allenamento alla settimana, come la modalità infortunio.",
+    points: [
+      "Attivala in Impostazioni › Corpo e unità: scegli incinta o ho avuto il mio bambino, poi le settimane con − / +.",
+      "I carichi scendono con le settimane e ogni serie si ferma lontano dal cedimento.",
+      "A fine gravidanza niente supina né prona, niente salti e niente crunch.",
+      "Dopo il parto, un ritorno graduale di circa 16 settimane, due in più dopo un cesareo.",
+    ],
+    dyk: "È gratis, resta sul tuo telefono e ogni modifica dice il perché su Oggi.",
+  },
   "gym-insights": {
     title: "Guarda come i soci usano la tua palestra",
     intro: "La pagina della tua palestra nell'app mostra come ci si allena lì, con un passo successivo.",

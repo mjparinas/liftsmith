@@ -30,6 +30,7 @@ const job = (over: Partial<JobStatus> = {}): JobStatus => ({
   web: { read: 0, filled: 0 },
   ai: { read: 0, filled: 0 },
   tidy: { fixed: 0 },
+  chains: { chained: 0 },
   note: "",
   ...over,
 });

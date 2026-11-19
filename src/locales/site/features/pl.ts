@@ -167,6 +167,10 @@ export const pl: FeaturesText = {
       name: "Gotowość z uwzględnieniem cyklu",
       body: "Jeśli chcesz, zapisuj cykl, a decyzja na dziś weźmie go pod uwagę.",
     },
+    pregnancy: {
+      name: "Tryb ciąży i połogu",
+      body: "Powiedz, że jesteś w ciąży albo urodziłaś, a każdy trening dopasuje się do tygodnia: lżejsze ciężary, żadnych serii do upadku, w późnej ciąży nic na plecach i stopniowy powrót przez około 16 tygodni po porodzie.",
+    },
     "goal-planner": {
       name: "Planer celów",
       body: "Wybierz ćwiczenie i cel, a aplikacja wyznaczy realną datę i drogę do niego.",
@@ -387,6 +391,11 @@ export const pl: FeaturesText = {
       name: "Grafiki zajęć na stronach siłowni",
       body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
     },
+    "gym-chains": {
+      name: "Wszystkie lokalizacje sieci siłowni",
+      body: "Siłownie należące do sieci pokazują jej logo i prowadzą do strony ze wszystkimi lokalizacjami, w aplikacji od najbliższych. Na stronie internetowej każda sieć ma własną stronę.",
+      note: "Sieci rozpoznajemy po marce na mapie albo po nazwie, którą noszą siłownie w kilku miastach. Przejęte siłownie zachowują własne logo.",
+    },
     "gym-open-now": {
       name: "Otwarte teraz w wyszukiwarce siłowni",
       body: "Siłownie w pobliżu pokazują, czy są teraz otwarte i kiedy zamykają lub znów otwierają, a jedno dotknięcie Otwarte teraz zostawia tylko te, do których możesz wejść od razu.",
@@ -475,6 +484,10 @@ export const pl: FeaturesText = {
     "school-teams": {
       name: "Za darmo dla drużyn szkolnych",
       body: "Trenerzy szkół średnich, którzy potwierdzą szkolny adres e-mail, dostają Pro za darmo, podobnie jak zawodnicy w wieku od 13 do 18 lat z ich drużyn, z cotygodniowym rankingiem drużyny. Tkanka tłuszczowa i publiczne profile pozostają wyłączone dla osób poniżej 18 lat.",
+    },
+    "team-session": {
+      name: "Treningi drużyny na jednym tablecie",
+      body: "Trener szkolny prowadzi jeden trening dla całej drużyny z jednego tabletu: każdy zawodnik stuka swoje imię i zapisuje swoje serie, ciężar zaczyna się tam, gdzie skończył, a tablica pokazuje, kto jeszcze nie zaczął. Na koniec serie każdego trafiają na jego konto. Działa bez zasięgu.",
     },
     "coach-checkins": {
       name: "Formularze kontrolne i ankiety",

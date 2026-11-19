@@ -237,6 +237,12 @@ export interface Profile {
    */
   cycle?: { enabled: boolean; consentAt: number };
   /**
+   * Pregnancy and postpartum mode (Melvin, 2026-11-19; pregnancy.ts). Opt-in with its own consent; the due date, and
+   * the birth (start of a day, ms) once the baby's here. Stays on the device and the user's own sync, never in
+   * analytics or feedback reports. Turning it off removes it.
+   */
+  pregnancy?: { consentAt: number; due?: number; birth?: number; csection?: boolean };
+  /**
    * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
    * choice; billing will read it to start the store trial.
    */
@@ -662,6 +668,8 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** Logged on a school coach's team session tablet (teamSessions.ts on the server): the team's name. */
+  team?: string;
   /** The program and day the plan came from (programs.ts). */
   program?: { id: string; day: number };
   /** The saved routine the workout came from, if any. */

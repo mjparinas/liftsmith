@@ -118,6 +118,10 @@ export const es: FeaturesText = {
       note: "Los recordatorios de rehabilitación y el aviso de programa nuevo son para Android y iPhone.",
     },
     cycle: { name: "Preparación según el ciclo", body: "Si quieres, registra tu ciclo y la decisión de hoy lo tiene en cuenta." },
+    pregnancy: {
+      name: "Modo embarazo y posparto",
+      body: "Dile que estás embarazada o que has tenido a tu bebé y cada entrenamiento se adapta a la semana: cargas más ligeras, ninguna serie al límite, nada boca arriba al final del embarazo y una vuelta gradual de unas 16 semanas después del parto.",
+    },
     "goal-planner": {
       name: "Planificador de metas",
       body: "Elige un ejercicio y un objetivo, y calcula una fecha realista y el camino para llegar.",
@@ -324,6 +328,11 @@ export const es: FeaturesText = {
       name: "Horarios de clases en las páginas de gimnasios",
       body: "Los gimnasios oficiales publican las clases que dan cada semana, con instructor y sala, y marcan los días que no hay clase. Quienes entrenan allí ven la semana en la página del gimnasio en la app y la web, y añaden la próxima clase a su calendario con un toque.",
     },
+    "gym-chains": {
+      name: "Todas las sedes de una cadena",
+      body: "Los gimnasios de una cadena muestran su logo y enlazan a una página con todas sus sedes, en la app las más cercanas primero. En la web, cada cadena tiene su propia página.",
+      note: "Reconocemos las cadenas por la marca del mapa o por un nombre que comparten gimnasios de varias ciudades. Los gimnasios reclamados conservan su propio logo.",
+    },
     "gym-open-now": {
       name: "Abierto ahora en el buscador de gimnasios",
       body: "Los gimnasios cercanos dicen si están abiertos ahora y cuándo cierran o vuelven a abrir, y un toque en Abierto ahora muestra solo los que puedes visitar ya.",
@@ -409,6 +418,10 @@ export const es: FeaturesText = {
     "school-teams": {
       name: "Gratis para equipos de secundaria",
       body: "Los entrenadores de secundaria que confirman un correo escolar tienen Pro gratis, igual que los atletas de 13 a 18 años de sus equipos, con una tabla semanal del equipo. La grasa corporal y los perfiles públicos siguen desactivados para menores de 18.",
+    },
+    "team-session": {
+      name: "Sesiones de equipo en una tableta",
+      body: "Un entrenador de secundaria dirige un entrenamiento para todo el equipo desde una tableta: cada atleta toca su nombre y anota sus series, con el peso donde lo dejó, y el tablero muestra quién no ha empezado. Al terminar, las series de cada atleta se guardan en su propia cuenta. Funciona sin cobertura.",
     },
     "coach-checkins": {
       name: "Formularios de revisión y cuestionarios",

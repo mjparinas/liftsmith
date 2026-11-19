@@ -107,6 +107,22 @@ export function PlaceDetails({ place }: { place: Place }) {
         <span>{lifters}</span>
       </p>
       {place.wheelchair && <p className="mt-1 text-sm text-muted">{t(`gp.wheelchair.${place.wheelchair}`)}</p>}
+      {place.chain && (
+        <button
+          type="button"
+          onClick={() => go("gymchain", place.chain!.slug)}
+          className="press card mt-3 flex min-h-11 w-full items-center gap-3 px-4 py-3 text-left text-sm"
+        >
+          <Icon name="gym" size={18} />
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold break-words">{t("gp.chainPart", { chain: place.chain.name })}</span>
+            <span className="block text-muted">{t("gp.chainAll", { count: num(place.chain.places) })}</span>
+          </span>
+          <span aria-hidden className="text-muted">
+            ›
+          </span>
+        </button>
+      )}
       {!!place.news?.length && (
         <Section title={t("gp.newsTitle")}>
           <ul className="card divide-y divide-line">

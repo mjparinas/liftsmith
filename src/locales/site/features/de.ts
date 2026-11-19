@@ -125,6 +125,10 @@ export const de: FeaturesText = {
       name: "Bereitschaft nach Zyklus",
       body: "Wenn du möchtest, trägst du deinen Zyklus ein, und die heutige Ansage berücksichtigt ihn.",
     },
+    pregnancy: {
+      name: "Modus für Schwangerschaft und Rückbildung",
+      body: "Sag, dass du schwanger bist oder dein Baby da ist, und jedes Training passt zur Woche: leichtere Lasten, keine Sätze bis zum Limit, später in der Schwangerschaft nichts in Rückenlage und ein schrittweiser Wiedereinstieg über etwa 16 Wochen nach der Geburt.",
+    },
     "goal-planner": {
       name: "Zielplaner",
       body: "Wähle eine Übung und ein Ziel, und es berechnet ein realistisches Datum und den Weg dorthin.",
@@ -328,6 +332,11 @@ export const de: FeaturesText = {
       name: "Kurspläne auf Studioseiten",
       body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
     },
+    "gym-chains": {
+      name: "Alle Standorte einer Studiokette",
+      body: "Studios einer Kette zeigen ihr Logo und verlinken auf eine Seite mit allen Standorten, in der App die nächsten zuerst. Auf der Website hat jede Kette ihre eigene Seite.",
+      note: "Ketten erkennen wir an der Marke auf der Karte oder an einem Namen, den Studios in mehreren Städten tragen. Beanspruchte Studios behalten ihr eigenes Logo.",
+    },
     "gym-open-now": {
       name: "Jetzt geöffnet in der Studiosuche",
       body: "Studios in deiner Nähe zeigen, ob sie gerade geöffnet haben und wann sie schließen oder wieder öffnen. Ein Tippen auf Jetzt geöffnet zeigt nur die, in die du gleich gehen kannst.",
@@ -413,6 +422,10 @@ export const de: FeaturesText = {
     "school-teams": {
       name: "Kostenlos für Schulteams",
       body: "Trainer an weiterführenden Schulen, die eine Schul-E-Mail-Adresse bestätigen, bekommen Pro kostenlos, ebenso die 13- bis 18-jährigen Sportler ihrer Teams, mit einer wöchentlichen Teamtabelle. Körperfett und öffentliche Profile bleiben für unter 18-Jährige aus.",
+    },
+    "team-session": {
+      name: "Teamtraining auf einem Tablet",
+      body: "Ein Schultrainer leitet ein Training für das ganze Team von einem Tablet aus: Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht startet beim letzten Stand, und die Tafel zeigt, wer noch nicht angefangen hat. Am Ende landen die Sätze im eigenen Konto. Funktioniert ohne Empfang.",
     },
     "coach-checkins": {
       name: "Check-in-Formulare und Fragebögen",

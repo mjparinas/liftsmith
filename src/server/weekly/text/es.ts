@@ -979,6 +979,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Cada rutina publicada tiene su propia página en la web, para compartirla con quien quieras.",
   },
+  "team-session": {
+    title: "Todo el entrenamiento del equipo en una tableta",
+    intro: "Las sesiones de equipo ponen un entrenamiento para todo tu equipo en una sola tableta.",
+    points: [
+      "Empieza una desde la tarjeta de tu equipo en Coaching y elige una rutina.",
+      "Cada atleta toca su nombre y anota sus series, con el peso donde lo dejó.",
+      "El tablero muestra quién no ha anotado una serie, nunca un peso.",
+      "Al terminar, las series de cada atleta se guardan en su propia cuenta.",
+    ],
+    dyk: "¿Sin cobertura en la sala de pesas? Las series esperan en la tableta y se suben cuando vuelva.",
+  },
+  "gym-chains": {
+    title: "Todas las sedes de tu cadena",
+    intro: "Los gimnasios de una cadena ahora muestran su logo y un enlace a todas sus sedes.",
+    points: [
+      "En la página de un gimnasio de cadena, toca Ver las sedes bajo su nombre.",
+      "La lista empieza por las sedes más cercanas a donde buscaste gimnasios por última vez.",
+      "Toca una sede para ver su horario y añadirla con su equipamiento en un toque.",
+      "En la web, cada cadena tiene su propia página con todas sus sedes.",
+    ],
+    dyk: "¿Entrenas en dos sedes? Añade las dos como gimnasios y Liftsmith planifica cada entrenamiento con el equipamiento de donde estés.",
+  },
+  pregnancy: {
+    title: "Entrenar durante el embarazo y después del parto",
+    intro: "El modo embarazo y posparto cambia cada entrenamiento según la semana, como hace el modo lesión.",
+    points: [
+      "Actívalo en Ajustes › Cuerpo y unidades: elige embarazada o ya he tenido a mi bebé y luego las semanas con el selector.",
+      "Las cargas bajan con las semanas y cada serie se queda lejos del fallo.",
+      "Al final del embarazo, nada boca arriba ni boca abajo, sin saltos ni abdominales.",
+      "Después del parto, una vuelta gradual de unas 16 semanas, dos más tras una cesárea.",
+    ],
+    dyk: "Es gratis, se queda en tu teléfono y cada cambio dice por qué en Hoy.",
+  },
   "gym-insights": {
     title: "Mira cómo usan tu gimnasio",
     intro: "La página de tu gimnasio en la app muestra cómo entrenan allí, con un siguiente paso.",

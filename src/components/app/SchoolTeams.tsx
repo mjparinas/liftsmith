@@ -34,9 +34,13 @@ import {
   type Team,
   type TeamsOverview,
 } from "@/lib/teams";
+import { loadLiveBoard, useTeamSession, type LiveBoard } from "@/lib/teamSession";
 import { ageOf } from "@/lib/teen";
 import { showCode } from "@/lib/trainer";
+import { useVisible } from "@/lib/visibility";
 
+import { go } from "./router";
+import { BoardList } from "./TeamBoardList";
 import { Button, Chip, Sheet } from "./ui";
 
 const INPUT = "min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2";
@@ -55,9 +59,10 @@ export function useTeams(): { data: TeamsOverview | null; error: string | null; 
         teams: o.teams ?? [],
         joined: o.joined ?? [],
         members: o.members ?? {},
+        live: o.live ?? {},
       }),
     ).catch((e: unknown) => {
-      setData({ school: null, codeSent: false, teams: [], joined: [], members: {} });
+      setData({ school: null, codeSent: false, teams: [], joined: [], members: {}, live: {} });
       setError(teamError(e));
     });
   }, []);
@@ -268,7 +273,14 @@ function CoachSide({ data, onBoard, onChange }: { data: TeamsOverview; onBoard: 
           {t("team.verified", { school: s.school, date: date(s.until ?? 0, { month: "short", day: "numeric", year: "numeric" }) })}
         </p>
         {data.teams.map((tm) => (
-          <CoachTeam key={tm.id} team={tm} members={data.members[tm.id] ?? []} onBoard={() => onBoard(tm.id)} onChange={onChange} />
+          <CoachTeam
+            key={tm.id}
+            team={tm}
+            members={data.members[tm.id] ?? []}
+            live={data.live[tm.id]}
+            onBoard={() => onBoard(tm.id)}
+            onChange={onChange}
+          />
         ))}
         {data.teams.length < 5 && <NewTeam onChange={onChange} />}
       </div>
@@ -401,15 +413,22 @@ function Verify({ data, onChange }: { data: TeamsOverview; onChange: () => void 
 function CoachTeam({
   team,
   members,
+  live,
   onBoard,
   onChange,
 }: {
   team: Team;
   members: { id: string; name: string; since: number }[];
+  /** A team session for this team running on another device. */
+  live?: string;
   onBoard: () => void;
   onChange: () => void;
 }) {
   const [note, setNote] = useState<string | null>(null);
+  const [watch, setWatch] = useState(false);
+  // A session on this device opens it again; one on another device (the tablet) offers its live board here.
+  const here = useTeamSession((s) => s.session);
+  const runningHere = !!here && here.endedAt === undefined;
   const act = async (f: () => Promise<unknown>, detail: string) => {
     try {
       await f();
@@ -444,6 +463,26 @@ function CoachTeam({
           {t("team.board")}
         </Button>
       </div>
+      {/* Team session (TeamSession.tsx): one workout for the whole team on one tablet. */}
+      {members.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {runningHere ? (
+            <Button kind="ghost" icon="people" className="flex-1" onClick={() => go("teamsession", here.team)}>
+              {t("team.ses.resume")}
+            </Button>
+          ) : (
+            <Button kind="ghost" icon="people" className="flex-1" onClick={() => go("teamsession", team.id)}>
+              {t("team.ses.start")}
+            </Button>
+          )}
+          {live && live !== here?.id && (
+            <Button kind="ghost" icon="eye" onClick={() => setWatch(true)}>
+              {t("team.ses.live")}
+            </Button>
+          )}
+        </div>
+      )}
+      {watch && live && <LiveBoardSheet id={live} onClose={() => setWatch(false)} />}
       {members.length > 0 && (
         <details className="mt-3">
           <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{t("team.roster")}</summary>
@@ -579,6 +618,60 @@ function Board({ team, onClose }: { team: string | null; onClose: () => void }) 
             ))}
           </ol>
         </>
+      )}
+    </Sheet>
+  );
+}
+
+// --- A team session's live board, on the coach's other devices ---
+
+/** The board of a session running on the tablet: refreshed every 15 seconds while it's on screen, never in the background. */
+function LiveBoardSheet({ id, onClose }: { id: string; onClose: () => void }) {
+  const [board, setBoard] = useState<LiveBoard | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const visible = useVisible();
+  useEffect(() => {
+    if (!visible) return;
+    let live = true;
+    const load = () =>
+      loadLiveBoard(id)
+        .then((b) => {
+          if (!live) return;
+          setBoard(b);
+          setError(null);
+        })
+        .catch((e: unknown) => {
+          if (live) setError(teamError(e));
+        });
+    void load();
+    const timer = setInterval(() => void load(), 15_000);
+    return () => {
+      live = false;
+      clearInterval(timer);
+    };
+  }, [id, visible]);
+  const rows = board?.rows ?? [];
+  const notStarted = rows.filter((r) => r.done === 0).length;
+  const nudge = !board
+    ? ""
+    : board.endedAt !== null
+      ? t("team.ses.liveEnded")
+      : rows.every((r) => r.done === 0)
+        ? t("team.ses.boardNone")
+        : notStarted > 0
+          ? t("team.ses.boardNudge", { count: notStarted })
+          : rows.every((r) => r.done >= r.total)
+            ? t("team.ses.boardAllDone")
+            : t("team.ses.boardStarted");
+  return (
+    <Sheet open onClose={onClose} title={board ? `${board.teamName} · ${board.name}` : t("team.ses.live")}>
+      <p className="text-sm text-muted">{t("team.ses.liveLead")}</p>
+      {error && <p className="mt-3 text-sm text-warn">{error}</p>}
+      {!board && !error && <p className="mt-3 text-sm text-muted">{t("team.loading")}</p>}
+      {board && (
+        <div className="mt-3">
+          <BoardList rows={rows} nudge={nudge} />
+        </div>
       )}
     </Sheet>
   );

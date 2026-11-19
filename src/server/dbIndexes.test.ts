@@ -71,6 +71,32 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["coach_video_notes"],
   },
   {
+    name: "gym chains: a chain's branches (gymChains.ts chainPage)",
+    sql: "SELECT id, name FROM gym_places WHERE chain = ? AND chain <> '' AND hidden = 0 LIMIT 2000",
+    uses: ["gym_places_chain"],
+    noScan: ["gym_places"],
+  },
+  {
+    name: "gym chains: each chain's counts (gymChains.ts refreshChains)",
+    sql: "SELECT chain, COUNT(*) AS n, COUNT(DISTINCT city_slug) AS c FROM gym_places WHERE chain <> '' AND hidden = 0 GROUP BY chain",
+    // Walks the partial index from end to end: it holds only gyms in a chain, never the whole table.
+    uses: ["SCAN gym_places USING INDEX gym_places_chain"],
+    noScan: [],
+  },
+  {
+    name: "gym chains: branches' websites and icons (gymChains.ts refreshChains)",
+    sql: `SELECT p.chain, p.website, m.id, m.px FROM gym_places p LEFT JOIN gym_photos m ON m.place_id = p.id AND m.kind = 'icon'
+      WHERE p.chain <> '' AND p.hidden = 0 AND p.website <> ''`,
+    uses: ["SCAN p USING INDEX gym_places_chain", "gym_photos_place"],
+    noScan: ["gym_photos", "m"],
+  },
+  {
+    name: "gym chains: the chains big enough for the sitemap (gymChains.ts sitemapChains)",
+    sql: "SELECT slug, updated_at FROM gym_chains WHERE places >= ? ORDER BY places DESC LIMIT 5000",
+    uses: ["gym_chains_places"],
+    noScan: ["gym_chains"],
+  },
+  {
     name: "community: the board's top posts (community.ts board)",
     sql: "SELECT p.id FROM community_posts p WHERE p.hidden = 0 AND p.status != 'merged' ORDER BY p.votes DESC LIMIT 300",
     uses: ["community_posts_board"],
@@ -385,6 +411,30 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     sql: "SELECT routine_id FROM library_saves WHERE account_id = ?",
     uses: ["library_saves_account"],
     noScan: ["library_saves"],
+  },
+  {
+    name: "team sessions: a session's sets (teamSessions.ts pushSession, liveBoard)",
+    sql: "SELECT athlete_id, exercise_id, COUNT(*) AS c FROM team_session_sets WHERE session_id = ? AND reps > 0 GROUP BY athlete_id, exercise_id",
+    uses: ["sqlite_autoindex_team_session_sets_1"],
+    noScan: ["team_session_sets"],
+  },
+  {
+    name: "team sessions: a team's last sessions (teamSessions.ts lastWeights)",
+    sql: "SELECT id FROM team_sessions WHERE team_id = ? ORDER BY started_at DESC LIMIT 3",
+    uses: ["team_sessions_team"],
+    noScan: ["team_sessions"],
+  },
+  {
+    name: "team sessions: a coach's sessions still running (teamSessions.ts liveSessions)",
+    sql: "SELECT id, team_id FROM team_sessions WHERE coach_id = ? AND ended_at IS NULL AND started_at > ? ORDER BY started_at",
+    uses: ["team_sessions_coach"],
+    noScan: ["team_sessions"],
+  },
+  {
+    name: "team sessions: an athlete's sets, when their account goes (teamSessions.ts sessionDeletes)",
+    sql: "DELETE FROM team_session_sets WHERE athlete_id = ?",
+    uses: ["team_session_sets_athlete"],
+    noScan: ["team_session_sets"],
   },
 ];
 

@@ -10,6 +10,7 @@
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
+import { keptChainPage } from "@/server/gymChains";
 import { claimWithPosterCode, editGym, ownedGyms, releaseGym, startClaim, verifyClaim } from "@/server/gymClaims";
 import { deleteClass, saveClass } from "@/server/gymClasses";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
@@ -50,6 +51,12 @@ export async function GET(req: Request) {
     const merged = found || !isPlaceId(u.get("place")) ? null : await mergedTarget(u.get("place")!);
     const place = found ?? (merged ? await placeById(merged) : null);
     return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
+  }
+  // ?chain=<slug>: a gym chain and every branch, for its page in the app (GymChain.tsx; gymChains.ts).
+  if (u.has("chain")) {
+    const [ok, page] = await Promise.all([allowed, keptChainPage(u.get("chain") ?? "")]);
+    if (!ok) return reply(req, 429, { error: "slow" });
+    return page ? reply(req, 200, page) : reply(req, 404, { error: "gone" });
   }
   // ?closest=1[&lat=&lon=]: the ten gyms closest to the visitor for the website's /gyms/ map (gymsNear.ts). Without a
   // position from the browser it goes by the rough spot Vercel works out from the visitor's address. &tz= (the browser's

@@ -1,6 +1,7 @@
 import { exercise } from "../exercises";
 import { alternatives, injuredTarget, injuryPass, type PlanItem } from "../generator";
 import { activeInjuries, effectFor } from "../injury";
+import { bodyMode } from "../pregnancy";
 import { target } from "../progression";
 import type { BodyPart, InjuryRuleEvent } from "../types";
 import { warmupFor, warmupsOn } from "../warmup";
@@ -42,11 +43,12 @@ function afterInjuryChange(c: Ctx) {
           g,
           [...items, ...a.plan.items].map((i) => i.exerciseId),
           hurt,
+          bodyMode(profile, now),
         )[0];
         if (!alt) continue;
         ex = alt;
       }
-      const t = injuredTarget(ex, target(ex, events, profile, g, now), hurt, g);
+      const t = injuredTarget(ex, target(ex, events, profile, g, now), hurt, g, bodyMode(profile, now));
       // Warm-ups follow the new exercise and load.
       const warmed = new Set(items.flatMap((i) => exercise(i.exerciseId).primary));
       const wu = warmupsOn(profile) ? warmupFor(ex, t.target.weight, g, warmed) : [];
@@ -55,7 +57,8 @@ function afterInjuryChange(c: Ctx) {
         exerciseId: ex.id,
         target: t.target,
         injuryPct: t.injuryPct,
-        challenge: t.injuryPct ? undefined : item.challenge,
+        mode: t.mode,
+        challenge: t.injuryPct || t.mode ? undefined : item.challenge,
         warmup: wu.length ? wu : undefined,
       });
     }

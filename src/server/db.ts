@@ -634,6 +634,23 @@ const SCHEMA = [
     created_at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS gym_photos_place ON gym_photos (place_id)`,
+  // Gym chains (gymChains.ts, Melvin 2026-11-19): one row per chain the map names (its brand tag) or whose name
+  // repeats in three cities or more. `logo` is a copy of the sharpest website icon among its branches (gym_photos kind
+  // 'chain', `logo_from` the icon it was copied from), shown on every unclaimed branch; `places` and `cities` count
+  // its visible branches, so a page needs no count of its own.
+  `CREATE TABLE IF NOT EXISTS gym_chains (
+    slug TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    website TEXT NOT NULL DEFAULT '',
+    logo TEXT NOT NULL DEFAULT '',
+    logo_from TEXT NOT NULL DEFAULT '',
+    places INTEGER NOT NULL DEFAULT 0,
+    cities INTEGER NOT NULL DEFAULT 0,
+    countries INTEGER NOT NULL DEFAULT 0,
+    source TEXT NOT NULL DEFAULT 'brand',
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_chains_places ON gym_chains (places)`,
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
     who TEXT NOT NULL,
@@ -1159,6 +1176,32 @@ const SCHEMA = [
     PRIMARY KEY (team_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS team_members_account ON team_members (account_id)`,
+  // Team sessions (2026-11-19, teamSessions.ts): one workout a coach runs for a whole team from one tablet, and the
+  // sets each athlete logs there. Written into the athletes' own accounts when it ends (`written`).
+  `CREATE TABLE IF NOT EXISTS team_sessions (
+    id TEXT PRIMARY KEY,
+    team_id TEXT NOT NULL,
+    coach_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    plan TEXT NOT NULL,
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER,
+    written INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_sessions_team ON team_sessions (team_id, started_at)`,
+  `CREATE INDEX IF NOT EXISTS team_sessions_coach ON team_sessions (coach_id, ended_at, started_at)`,
+  `CREATE TABLE IF NOT EXISTS team_session_sets (
+    session_id TEXT NOT NULL,
+    id TEXT NOT NULL,
+    athlete_id TEXT NOT NULL,
+    exercise_id TEXT NOT NULL,
+    weight REAL NOT NULL,
+    reps INTEGER NOT NULL,
+    target INTEGER NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (session_id, id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_session_sets_athlete ON team_session_sets (athlete_id)`,
   // Check-in forms and questionnaires (2026-11-13): a coach's forms, each one sent to a client (with the questions as
   // they were then), the client's answers, and at most one form per client that goes out again every week.
   `CREATE TABLE IF NOT EXISTS coach_forms (
@@ -1580,6 +1623,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // and the job's kind (world or daily), step (map, web, ai, tidy) and what each step did.
   ["gym_places", "ai_at", "INTEGER NOT NULL DEFAULT 0"],
   ["gym_places", "ai_fix_at", "INTEGER NOT NULL DEFAULT 0"],
+  // The chain a gym belongs to (gymChains.ts, 2026-11-19): a gym_chains slug, '' for none.
+  ["gym_places", "chain", "TEXT NOT NULL DEFAULT ''"],
   // The fix-up's strict rules (2026-11-19, second version): the rules a job ran under (1 = the first run, whose
   // corrections are undone), whether that's done, how many suggestions it left, and each change's state (applied,
   // suggested for staff to Apply, dismissed).
@@ -1596,6 +1641,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_import_jobs", "tidy_after", "TEXT NOT NULL DEFAULT ''"],
   ["gym_import_jobs", "tidy_fixed", "INTEGER NOT NULL DEFAULT 0"],
   ["gym_import_jobs", "note", "TEXT NOT NULL DEFAULT ''"],
+  // The chains step (gymChains.ts chainStep): the last gym id it read, and how many gyms it put in a chain by name.
+  ["gym_import_jobs", "chain_after", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_import_jobs", "chain_fixed", "INTEGER NOT NULL DEFAULT 0"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],
@@ -1659,6 +1707,8 @@ const LATE_SCHEMA = [
   // The AI fix-up pass takes each unclaimed gym with a website once, ever (gymAiFix.ts).
   `CREATE INDEX IF NOT EXISTS gym_places_ai_fix ON gym_places (ai_fix_at) WHERE claimed_by = '' AND hidden = 0 AND pending = 0 AND website <> ''`,
   `CREATE INDEX IF NOT EXISTS gym_places_own ON gym_places (source) WHERE source <> 'osm'`,
+  // A chain's branches (gymChains.ts): its page, its counts and its logo read only the gyms in a chain.
+  `CREATE INDEX IF NOT EXISTS gym_places_chain ON gym_places (chain) WHERE chain <> ''`,
   // Friends activity (replies to your comments) and erasing an account's comments.
   `CREATE INDEX IF NOT EXISTS post_comments_account ON post_comments (account_id)`,
   `CREATE INDEX IF NOT EXISTS post_comments_reply ON post_comments (reply_to) WHERE reply_to <> ''`,

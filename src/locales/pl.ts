@@ -94,6 +94,7 @@ import * as plate from "./text/plate";
 import * as pm from "./text/pm";
 import * as pol from "./text/pol";
 import * as pr from "./text/pr";
+import * as preg from "./text/preg";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
@@ -182,6 +183,7 @@ export const pl: Partial<Record<MessageKey, Message>> = {
   ...cpl.pl,
   ...creator.pl,
   ...cycle.pl,
+  ...preg.pl,
   ...dash.pl,
   ...delight.pl,
   ...demo.pl,

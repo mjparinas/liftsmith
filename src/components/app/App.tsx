@@ -63,6 +63,7 @@ import { Feedback } from "./Feedback";
 import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
 import { Gym } from "./Gym";
 import { GymAdd } from "./GymAdd";
+import { GymChain } from "./GymChain";
 import { GymClaim } from "./GymClaim";
 import { GymEdit } from "./GymEdit";
 import { GymPlace } from "./GymPlace";
@@ -91,6 +92,7 @@ import { Stats } from "./Stats";
 import { ScreenshotShare } from "./StatsShare";
 import { StretchScreen } from "./Stretch";
 import { SyncSpinner } from "./SyncSpinner";
+import TeamSession from "./TeamSession";
 import { Toaster } from "./Toaster";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
@@ -117,7 +119,8 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
 const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise", "trainer", "season"]);
 
 // Screens that hide the tab bar.
-const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
+// The team session (TeamSession.tsx) is full screen too: the tablet is handed round a team, so no tab bar to wander off on.
+const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro", "teamsession"]);
 
 export function App() {
   const { ready, init, profile, active, stats } = useApp();
@@ -504,6 +507,7 @@ export function App() {
     exercises: <ExerciseLibrary />,
     gymlink: <SharedGym key={arg ?? ""} code={arg} />,
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
+    gymchain: <GymChain key={arg ?? ""} slug={arg} />,
     gymclaim: <GymClaim key={arg ?? ""} id={arg} />,
     gymedit: <GymEdit key={arg ?? ""} id={arg} />,
     gymstaff: <GymStaffJoin key={arg ?? ""} code={arg} />,
@@ -513,6 +517,7 @@ export function App() {
     community: <Community key={arg ?? ""} arg={arg} />,
     season: <SeasonScreen />,
     library: <Library key={arg ?? ""} arg={arg} />,
+    teamsession: <TeamSession key={arg ?? ""} arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
@@ -537,7 +542,7 @@ export function App() {
       <div className={sidebar ? "pl-60" : undefined}>
         <main
           key={route}
-          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `side-page ${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
+          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `side-page ${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : route === "teamsession" ? "max-w-3xl" : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
         >
           {/* Friends' check-ins stay at the top of every screen but the workout until closed (Check in, 2026-11-14).
               In the page rather than over it, so they never cover a screen's own header. */}
@@ -651,6 +656,7 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
   "gym",
   "gymlink",
   "gymplace",
+  "gymchain",
   "gymclaim",
   "gymedit",
   "gymstaff",

@@ -155,6 +155,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "pregnancy",
+        name: "Pregnancy and postpartum mode",
+        body: "Tell it you're pregnant or have had a baby and every workout fits the week: lighter loads, no all-out sets, nothing lying on your back later in pregnancy, and a gradual return over about 16 weeks after birth.",
+        tier: "free",
+        added: "2026-11-19",
+      },
+      {
         id: "goal-planner",
         name: "Goal planner",
         body: "Pick a lift and a target, and it works out a realistic date and the path to it.",
@@ -600,6 +607,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-19",
       },
       {
+        id: "gym-chains",
+        name: "Every location of a gym chain",
+        body: "Gyms that belong to a chain show its logo and link to a page with every one of its locations, nearest first in the app. On the website, each chain has a page of its own.",
+        tier: "free",
+        note: "We know a chain from the brand on the map, or a name shared by gyms in several cities. Claimed gyms keep their own logo.",
+        added: "2026-11-19",
+      },
+      {
         id: "gym-insights",
         name: "Insights for gym owners",
         body: "Owners and staff of official gyms see how many lifters trained there in the last four weeks, the busy and quiet hours, the equipment they used and open problem reports, led by one thing to do next.",
@@ -759,6 +774,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "High school coaches who confirm a school email address get Pro free, and so do the athletes aged 13 to 18 on their teams, with a weekly team board. Body fat and public profiles stay off for under 18s.",
         tier: "free",
         added: "2026-11-13",
+      },
+      {
+        id: "team-session",
+        name: "Team sessions on one tablet",
+        body: "A high school coach runs one workout for the whole team from one tablet: each athlete taps their first name and logs their own sets, the weight starting where they left off, and the board shows who hasn't started. When it ends, each athlete's sets are saved to their own account. Works with no reception.",
+        tier: "free",
+        added: "2026-11-19",
       },
       {
         id: "coach-checkins",
