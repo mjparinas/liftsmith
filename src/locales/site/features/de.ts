@@ -318,6 +318,11 @@ export const de: FeaturesText = {
       name: "Kurspläne auf Studioseiten",
       body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
     },
+    "gym-open-now": {
+      name: "Jetzt geöffnet in der Studiosuche",
+      body: "Studios in deiner Nähe zeigen, ob sie gerade geöffnet haben und wann sie schließen oder wieder öffnen. Ein Tippen auf Jetzt geöffnet zeigt nur die, in die du gleich gehen kannst.",
+      note: "Berechnet aus den Öffnungszeiten jedes Studios und deiner eigenen Uhrzeit, für Studios in deiner Nähe.",
+    },
     "gym-starter": {
       name: "Einsteigerprogramme der Studios",
       body: "Offizielle Studios empfehlen neuen Mitgliedern ein Programm auf ihrer Seite in der App und im Web, mit einem Tippen gespeichert. Liftsmith setzt die eigenen Gewichte ein.",

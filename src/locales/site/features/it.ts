@@ -312,6 +312,11 @@ export const it: FeaturesText = {
       name: "Orari dei corsi sulle pagine delle palestre",
       body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
     },
+    "gym-open-now": {
+      name: "Aperto ora nella ricerca palestre",
+      body: "Le palestre vicine dicono se sono aperte adesso e quando chiudono o riaprono, e un tocco su Aperto ora mostra solo quelle dove puoi entrare subito.",
+      note: "Calcolato dagli orari di ogni palestra e dalla tua ora, per le palestre vicine.",
+    },
     "gym-starter": {
       name: "Programmi per iniziare delle palestre",
       body: "Le palestre ufficiali suggeriscono un programma ai nuovi iscritti sulla loro pagina nell’app e sul web, salvabile con un tocco. Liftsmith mette i pesi di ciascuno.",

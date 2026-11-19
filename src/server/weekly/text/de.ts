@@ -931,4 +931,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Mit Phasen selbst wechseln lassen bietet ihre App die nächste Phase an, wenn die Regel es sagt. Du siehst trotzdem jeden Wechsel.",
   },
+  "gym-open-now": {
+    title: "Finde ein Studio, das gerade geöffnet hat",
+    intro: "Die Studiosuche in deiner Nähe zeigt jetzt, welche Studios geöffnet haben und wann sie schließen oder wieder öffnen.",
+    points: [
+      "Jetzt geöffnet zeigt die Schließzeit, und Schließt bald wird in der letzten Stunde bernsteinfarben.",
+      "Geschlossene Studios sagen, wann sie öffnen: später heute, morgen oder an welchem Tag.",
+      "Tippe über der Liste auf Jetzt geöffnet, um geschlossene auszublenden, auch auf der Karte.",
+      "Berechnet mit deiner eigenen Uhrzeit, für Studios in deiner Nähe.",
+    ],
+    dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
+  },
 };

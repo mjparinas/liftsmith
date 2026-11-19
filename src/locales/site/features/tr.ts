@@ -377,6 +377,11 @@ export const tr: FeaturesText = {
       name: "Salon sayfalarında ders programı",
       body: "Resmî salonlar her hafta verdikleri dersleri eğitmen ve alanla birlikte paylaşır, dersin olmadığı günleri işaretler. Üyeler haftayı uygulamada ve webde salonun sayfasında görür, sıradaki dersi tek dokunuşla takvimine ekler.",
     },
+    "gym-open-now": {
+      name: "Salon bulucuda Şu an açık",
+      body: "Yakındaki salonlar şu an açık olup olmadığını, ne zaman kapanıp yeniden açılacağını gösterir. Şu an açık'a bir dokunuş yalnızca hemen gidebileceğin salonları bırakır.",
+      note: "Her salonun çalışma saatleri ve kendi saatinle hesaplanır, yakındaki salonlar için.",
+    },
     "gym-starter": {
       name: "Salonların başlangıç programları",
       body: "Resmi salonlar uygulamadaki ve web'deki sayfalarında yeni üyelere bir program önerir, sporcular onu tek dokunuşla kaydeder. Liftsmith her sporcunun kendi ağırlıklarını doldurur.",

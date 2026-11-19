@@ -928,4 +928,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Włącz Pozwól zmieniać etapy samodzielnie, a aplikacja podopiecznego zaproponuje następny etap, gdy wskaże na to reguła. Nadal widzisz każdą zmianę.",
   },
+  "gym-open-now": {
+    title: "Znajdź siłownię otwartą teraz",
+    intro: "Wyszukiwarka siłowni w pobliżu pokazuje teraz, które są otwarte i kiedy zamykają lub znów otwierają.",
+    points: [
+      "Otwarte pokazuje godzinę zamknięcia, a Wkrótce zamknięcie robi się bursztynowe w ostatniej godzinie.",
+      "Zamknięte mówią, kiedy otwierają: później dziś, jutro lub w który dzień.",
+      "Dotknij Otwarte teraz nad listą, by ukryć zamknięte, także na mapie.",
+      "Liczone według Twojego zegara, dla siłowni w pobliżu.",
+    ],
+    dyk: "Złe godziny? Zgłoś problem na stronie siłowni albo przejmij ją i popraw je sam.",
+  },
 };

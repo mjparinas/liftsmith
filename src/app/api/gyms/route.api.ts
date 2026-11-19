@@ -29,7 +29,7 @@ import { areaMapPath } from "@/server/gymMedia";
 import { mergedTarget, reportPlace } from "@/server/gymPlaceReports";
 import { closestPlaces, isPlaceId, joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
 import { latestOrder, requestPosters } from "@/server/gymPosters";
-import { closestReply, ipSpot } from "@/server/gymsNear";
+import { closestReply, ipSpot, visitorClock } from "@/server/gymsNear";
 import { cancelInvite, invitePreview, inviteStaff, joinStaff, removeStaff, staffOf } from "@/server/gymStaff";
 import { gymClubStart } from "@/server/social";
 
@@ -51,14 +51,15 @@ export async function GET(req: Request) {
     return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
   }
   // ?closest=1[&lat=&lon=]: the ten gyms closest to the visitor for the website's /gyms/ map (gymsNear.ts). Without a
-  // position from the browser it goes by the rough spot Vercel works out from the visitor's address.
+  // position from the browser it goes by the rough spot Vercel works out from the visitor's address. &tz= (the browser's
+  // time zone) adds whether each gym is open now on the visitor's clock.
   if (u.has("closest")) {
     const asked = u.has("lat") && u.has("lon") ? { lat: Number(u.get("lat")), lon: Number(u.get("lon")), from: "device" as const } : null;
     const spot = asked ?? ipSpot(req.headers);
     const [ok, places] = await Promise.all([allowed, spot ? closestPlaces(spot.lat, spot.lon) : Promise.resolve([])]);
     if (!ok) return reply(req, 429, { error: "slow" });
     if (!places) return reply(req, 400, { error: "Bad request." });
-    const res = reply(req, 200, closestReply(spot, places));
+    const res = reply(req, 200, closestReply(spot, places, visitorClock(u.get("tz"))));
     res.headers.set("Cache-Control", "private, no-store");
     return res;
   }

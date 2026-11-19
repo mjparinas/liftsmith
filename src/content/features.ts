@@ -584,6 +584,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-17",
       },
       {
+        id: "gym-open-now",
+        name: "Open now in the gym finder",
+        body: "Gyms near you say whether they're open right now and when they close or open next, and one tap on Open now shows only the ones you can walk into.",
+        tier: "free",
+        note: "Worked out from each gym's opening hours on your own clock, for gyms near you.",
+        added: "2026-11-19",
+      },
+      {
         id: "buy-next",
         name: "What to buy next",
         body: "For home gyms: the one piece of equipment that would open up the most exercises.",

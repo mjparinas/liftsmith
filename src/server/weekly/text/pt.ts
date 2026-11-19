@@ -932,4 +932,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ligue Deixar o aluno mudar de fase sozinho e o app dele oferece a próxima fase quando a regra indicar. Você continua vendo cada mudança.",
   },
+  "gym-open-now": {
+    title: "Encontre uma academia aberta agora",
+    intro: "Buscar academias perto agora mostra quais estão abertas e quando fecham ou abrem de novo.",
+    points: [
+      "Aberto agora mostra a hora de fechar, e Fecha em breve fica âmbar na última hora.",
+      "As fechadas dizem quando abrem: mais tarde, amanhã ou em que dia.",
+      "Toque em Aberto agora acima da lista para esconder as fechadas, no mapa também.",
+      "É calculado pela sua própria hora, para academias perto de você.",
+    ],
+    dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
+  },
 };

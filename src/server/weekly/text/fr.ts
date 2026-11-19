@@ -935,4 +935,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Activez Le laisser changer de phase seul et son appli proposera la phase suivante quand la règle le dit. Vous voyez toujours chaque changement.",
   },
+  "gym-open-now": {
+    title: "Trouvez une salle ouverte tout de suite",
+    intro: "La recherche de salles proches indique maintenant celles qui sont ouvertes, et quand elles ferment ou rouvrent.",
+    points: [
+      "Ouvert affiche l'heure de fermeture, et Ferme bientôt passe à l'ambre la dernière heure.",
+      "Les salles fermées disent quand elles ouvrent : plus tard, demain ou quel jour.",
+      "Touchez Ouvert maintenant au-dessus de la liste pour masquer les salles fermées, sur la carte aussi.",
+      "C'est calculé sur votre propre heure, pour les salles près de vous.",
+    ],
+    dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
+  },
 };
