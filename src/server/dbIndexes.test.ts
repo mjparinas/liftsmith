@@ -208,6 +208,13 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["gym_places"],
   },
   {
+    name: "gym import: old website icons still to measure (gymEnrich.ts measureIcons)",
+    sql: "SELECT id, place_id, substr(image, 1, 4096) AS head FROM gym_photos WHERE kind = 'icon' AND px = 0 LIMIT ?",
+    // A scan of this partial index reads only the icons not measured yet, never the table, and it ends up empty.
+    uses: ["gym_photos_unmeasured"],
+    noScan: [],
+  },
+  {
     name: "gym import: gyms due an AI read (gymAutoFill.ts autoFillBatch)",
     sql: "SELECT id FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0 AND ai_at < ? ORDER BY ai_at LIMIT ?",
     uses: ["gym_places_ai"],

@@ -17,7 +17,7 @@ import { randomBytes } from "node:crypto";
 
 import { DAYS, formatHours, type Week } from "@/lib/openingHours";
 
-import { query, run } from "./db";
+import { batch, query, run } from "./db";
 import { km, postcodeFor, sameCity, tidyAddress } from "./gymAddress";
 import { clean, cleanEmail, socialUrl, UA } from "./gymPlaces";
 
@@ -440,45 +440,128 @@ export async function fetchText(
   fetcher: typeof fetch,
   url: string,
   accept: string,
+  maxBytes?: number,
 ): Promise<{ status: number; text: string; type: string } | null> {
-  const r = await fetchBytes(fetcher, url, accept);
+  const r = await fetchBytes(fetcher, url, accept, maxBytes);
   return r && { status: r.status, text: new TextDecoder().decode(r.bytes), type: r.type };
 }
 
 // --- The site's icon ---
+//
+// Melvin, 2026-11-19: "is it possible find higher resolution icons from the favicon? some websites have iphone / ios /
+// tablet resolution icons". A gym's logo is drawn at 64 px, so a 16 or 32 px favicon looks blurry on a phone. Every
+// place a site names an icon is a candidate: link rel icon and apple-touch-icon (with their sizes), the web app
+// manifest's icons, Windows tile images, the /apple-touch-icon.png that iPhones ask for even when no page names it,
+// /favicon.ico, and last of all a square og:image. Each one fetched is measured from its own bytes, and the sharpest
+// square one wins (docs/decisions/gyms.md "Sharper icons").
 
-/** Where a page's icons are, best first: the touch icon (usually 180 px), then the largest declared icon, then
- * /favicon.ico. SVG is left out (it can carry script, and it's served from our own origin). */
-export function iconLinks(html: string, site: string): string[] {
-  const found: { url: string; size: number }[] = [];
-  for (const tag of html.match(/<link\b[^>]*>/gi) ?? []) {
-    const attr = (name: string) => new RegExp(`\\b${name}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, "i").exec(tag);
-    const value = (name: string) => {
-      const m = attr(name);
-      return decode(m?.[2] ?? m?.[3] ?? m?.[4] ?? "").trim();
-    };
-    const rel = value("rel").toLowerCase();
-    if (!/(^|\s)(icon|apple-touch-icon|apple-touch-icon-precomposed)(\s|$)/.test(rel)) continue;
-    const href = value("href");
-    if (!href || /^data:/i.test(href) || /svg/i.test(value("type")) || /\.svg(\?|#|$)/i.test(href)) continue;
-    let url = "";
-    try {
-      url = new URL(href, site).toString();
-    } catch {
-      continue;
-    }
-    const sizes = /(\d+)x\d+/i.exec(value("sizes"));
-    const size = sizes ? Number(sizes[1]) : rel.includes("apple-touch-icon") ? 180 : 16;
-    found.push({ url, size });
-  }
-  found.sort((a, b) => b.size - a.size);
-  let fallback = "";
+/** An icon at least this big (its smaller side) is sharp enough at 64 px on a phone: no need to look further. */
+export const ICON_SHARP_PX = 180;
+/** An icon smaller than this is read again when the site is next due, in case a sharper one is there now. */
+export const ICON_GOOD_PX = 128;
+/** Icon files fetched for one gym at most, besides the page and its manifest. */
+const ICON_TRIES = 5;
+
+export interface IconCandidate {
+  url: string;
+  /** The size the page declares (or the usual one for its kind); the real size is measured from the bytes. */
+  size: number;
+  /** og:image: only when nothing else gave an icon, and only if it's square. */
+  last?: boolean;
+}
+
+const tagAttr = (tag: string, name: string) => {
+  const m = new RegExp(`\\b${name}\\s*=\\s*("([^"]*)"|'([^']*)'|([^\\s>]+))`, "i").exec(tag);
+  return decode(m?.[2] ?? m?.[3] ?? m?.[4] ?? "").trim();
+};
+const absolute = (href: string, base: string) => {
   try {
-    fallback = new URL("/favicon.ico", site).toString();
+    const u = new URL(href, base);
+    return /^https?:$/.test(u.protocol) ? u.toString() : "";
   } catch {
-    // no fallback
+    return "";
   }
-  return [...new Set([...found.map((f) => f.url), fallback].filter(Boolean))].slice(0, 4);
+};
+/** SVG is left out everywhere: it can carry script, and it's served from our own origin. */
+const isSvg = (href: string, type: string) => /svg/i.test(type) || /\.svg(\?|#|$)/i.test(href);
+const biggest = (sizes: string) => Math.max(0, ...[...sizes.matchAll(/(\d+)\s*x\s*(\d+)/gi)].map((m) => Math.min(+m[1]!, +m[2]!)));
+
+/**
+ * The order to try candidates in: sharp ones up to 512 px biggest first, then bigger ones smallest first (they cost
+ * more to fetch and serve and look no better at 64 px), then the small ones biggest first. og:image stays last.
+ */
+export function rankIcons(list: IconCandidate[]): IconCandidate[] {
+  const band = (c: IconCandidate) => (c.last ? 3 : c.size >= ICON_SHARP_PX && c.size <= 512 ? 0 : c.size > 512 ? 1 : 2);
+  const seen = new Set<string>();
+  return list
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => band(a.c) - band(b.c) || (band(a.c) === 1 ? a.c.size - b.c.size : b.c.size - a.c.size) || a.i - b.i)
+    .map((x) => x.c)
+    .filter((c) => !seen.has(c.url) && !!seen.add(c.url));
+}
+
+/** Where a page says its icons are, plus the usual places (/apple-touch-icon.png, /favicon.ico), best first. */
+export function iconCandidates(html: string, site: string): IconCandidate[] {
+  const found: IconCandidate[] = [];
+  for (const tag of html.match(/<link\b[^>]*>/gi) ?? []) {
+    const rel = tagAttr(tag, "rel").toLowerCase();
+    if (!/(^|\s)(icon|apple-touch-icon|apple-touch-icon-precomposed)(\s|$)/.test(rel)) continue;
+    const href = tagAttr(tag, "href");
+    if (!href || /^data:/i.test(href) || isSvg(href, tagAttr(tag, "type"))) continue;
+    const url = absolute(href, site);
+    if (!url) continue;
+    // A touch icon with no sizes is 180 px on every iPhone since 2014; a plain icon with none is a favicon.
+    found.push({ url, size: biggest(tagAttr(tag, "sizes")) || (rel.includes("apple-touch-icon") ? 180 : 16) });
+  }
+  for (const tag of html.match(/<meta\b[^>]*>/gi) ?? []) {
+    const name = (tagAttr(tag, "name") || tagAttr(tag, "property")).toLowerCase();
+    const content = tagAttr(tag, "content");
+    if (!content || isSvg(content, "")) continue;
+    // Windows' tile images: TileImage is 144 px, the square logos say their size in their name.
+    const tile = name === "msapplication-tileimage" ? 144 : /^msapplication-square(\d+)x\d+logo$/.exec(name)?.[1];
+    const url = absolute(content, site);
+    if (!url) continue;
+    if (tile) found.push({ url, size: Number(tile) });
+    else if (name === "og:image" || name === "og:image:url" || name === "og:image:secure_url") found.push({ url, size: 0, last: true });
+  }
+  const guess = (path: string, size: number) => {
+    const url = absolute(path, site);
+    if (url) found.push({ url, size });
+  };
+  // iPhones ask for /apple-touch-icon.png whether or not a page names it, so many sites have one there.
+  guess("/apple-touch-icon.png", 180);
+  guess("/favicon.ico", 16);
+  return rankIcons(found);
+}
+
+/** The manifest a page links to, if any. */
+export function manifestLink(html: string, site: string): string {
+  for (const tag of html.match(/<link\b[^>]*>/gi) ?? [])
+    if (/(^|\s)manifest(\s|$)/i.test(tagAttr(tag, "rel"))) return absolute(tagAttr(tag, "href"), site);
+  return "";
+}
+
+/** A web app manifest's icons (never SVG or monochrome ones), as candidates. */
+export function manifestIcons(json: string, manifestUrl: string): IconCandidate[] {
+  let icons: unknown;
+  try {
+    icons = (JSON.parse(json) as { icons?: unknown }).icons;
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(icons)) return [];
+  const out: IconCandidate[] = [];
+  for (const i of icons.slice(0, 30)) {
+    if (!i || typeof i !== "object") continue;
+    const { src, sizes, type, purpose } = i as Record<string, unknown>;
+    if (typeof src !== "string" || !src || /^data:/i.test(src) || isSvg(src, typeof type === "string" ? type : "")) continue;
+    const kinds = typeof purpose === "string" ? purpose.toLowerCase().split(/\s+/) : ["any"];
+    if (!kinds.includes("any") && !kinds.includes("maskable")) continue;
+    const url = absolute(src, manifestUrl);
+    // A maskable icon has padding around the mark, so the same size counts a little less than a plain one.
+    if (url) out.push({ url, size: biggest(typeof sizes === "string" ? sizes : "") - (kinds.includes("any") ? 0 : 1) });
+  }
+  return out;
 }
 
 /** The image type from its first bytes: PNG, ICO, GIF, JPEG or WebP. Anything else (SVG, HTML) is refused. */
@@ -492,14 +575,100 @@ export function imageType(b: Uint8Array): string {
   return "";
 }
 
-/** The site's icon, as bytes we're willing to keep and serve, or null. */
-async function siteIcon(fetcher: typeof fetch, html: string, site: string): Promise<Uint8Array | null> {
-  for (const url of iconLinks(html, site)) {
-    const r = await fetchBytes(fetcher, url, "image/*", ENRICH_LIMITS.iconBytes);
-    if (!r || r.status >= 400 || r.over || r.bytes.length < ENRICH_LIMITS.iconMinBytes) continue;
-    if (imageType(r.bytes)) return r.bytes;
+/**
+ * An image's width and height from its first bytes (an .ico: its biggest picture), or null when they can't be read.
+ * Only the header is needed, so a stored icon is measured from its first few kilobytes (measureIcons).
+ */
+export function imageSize(b: Uint8Array): { w: number; h: number } | null {
+  const type = imageType(b);
+  const u16 = (i: number) => (b[i]! << 8) | b[i + 1]!;
+  const le16 = (i: number) => b[i]! | (b[i + 1]! << 8);
+  const u32 = (i: number) => ((b[i]! << 24) | (b[i + 1]! << 16) | (b[i + 2]! << 8) | b[i + 3]!) >>> 0;
+  const ok = (w: number, h: number) => (w > 0 && h > 0 ? { w, h } : null);
+  if (type === "image/png") return b.length >= 24 ? ok(u32(16), u32(20)) : null;
+  if (type === "image/gif") return ok(le16(6), le16(8));
+  if (type === "image/x-icon") {
+    let best: { w: number; h: number } | null = null;
+    const n = Math.min(le16(4), 64);
+    for (let k = 0; k < n && 6 + k * 16 + 1 < b.length; k++) {
+      const w = b[6 + k * 16] || 256;
+      const h = b[7 + k * 16] || 256;
+      if (!best || Math.min(w, h) > Math.min(best.w, best.h)) best = { w, h };
+    }
+    return best;
+  }
+  if (type === "image/webp") {
+    const chunk = String.fromCharCode(...b.slice(12, 16));
+    if (chunk === "VP8 " && b.length >= 30) return ok(le16(26) & 0x3fff, le16(28) & 0x3fff);
+    if (chunk === "VP8L" && b.length >= 25) {
+      const bits = b[21]! | (b[22]! << 8) | (b[23]! << 16) | (b[24]! << 24);
+      return ok((bits & 0x3fff) + 1, ((bits >>> 14) & 0x3fff) + 1);
+    }
+    if (chunk === "VP8X" && b.length >= 30)
+      return ok((b[24]! | (b[25]! << 8) | (b[26]! << 16)) + 1, (b[27]! | (b[28]! << 8) | (b[29]! << 16)) + 1);
+    return null;
+  }
+  if (type === "image/jpeg") {
+    // Walk the markers to the frame header (SOF0 to SOF15, less DHT, JPG and DAC), which holds the size.
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xff) return null;
+      const m = b[i + 1]!;
+      if (m === 0xff) {
+        i++;
+        continue;
+      }
+      if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return ok(u16(i + 7), u16(i + 5));
+      if (m === 0xd8 || (m >= 0xd0 && m <= 0xd7) || m === 0x01) {
+        i += 2;
+        continue;
+      }
+      i += 2 + u16(i + 2);
+    }
+    return null;
   }
   return null;
+}
+
+/** An icon's size in pixels (its smaller side) when it's square enough to be a logo, else 0. */
+export function iconPx(b: Uint8Array, strict = false): number {
+  const s = imageSize(b);
+  if (!s) return 0;
+  const ratio = Math.max(s.w, s.h) / Math.min(s.w, s.h);
+  return ratio <= (strict ? 1.1 : 1.25) ? Math.min(s.w, s.h) : 0;
+}
+
+/**
+ * The site's sharpest square icon, as bytes we're willing to keep and serve and its size, or null. Stops at the first
+ * one of ICON_SHARP_PX or more; at most ICON_TRIES icon files, plus the manifest when the page names one and nothing
+ * it names directly is sharp. Only one bigger than `beat` counts (the icon the gym has already).
+ */
+export async function siteIcon(
+  fetcher: typeof fetch,
+  html: string,
+  site: string,
+  beat = 0,
+): Promise<{ bytes: Uint8Array; px: number } | null> {
+  let list = iconCandidates(html, site);
+  const named = list.filter((c) => !c.last && !/\/(apple-touch-icon\.png|favicon\.ico)$/.test(new URL(c.url).pathname));
+  const manifest = manifestLink(html, site);
+  if (manifest && !named.some((c) => c.size >= ICON_SHARP_PX)) {
+    const m = await fetchText(fetcher, manifest, "application/manifest+json, application/json", 64_000);
+    if (m && m.status < 400) list = rankIcons([...manifestIcons(m.text, manifest), ...list]);
+  }
+  let best: { bytes: Uint8Array; px: number } | null = null;
+  let tries = 0;
+  for (const c of list) {
+    if (c.last && best) break;
+    if (tries++ >= ICON_TRIES + (c.last ? 1 : 0)) break;
+    const r = await fetchBytes(fetcher, c.url, "image/*", ENRICH_LIMITS.iconBytes);
+    if (!r || r.status >= 400 || r.over || r.bytes.length < ENRICH_LIMITS.iconMinBytes || !imageType(r.bytes)) continue;
+    const px = iconPx(r.bytes, c.last);
+    if (!px || (c.last && px < ICON_GOOD_PX)) continue;
+    if (!best || px > best.px) best = { bytes: r.bytes, px };
+    if (px >= ICON_SHARP_PX) break;
+  }
+  return best && best.px > beat ? best : null;
 }
 
 export interface EnrichOne {
@@ -515,7 +684,7 @@ export interface EnrichOne {
 
 /** Reads one gym's website and fills its empty fields. */
 export async function enrichPlace(
-  p: { id: string; name: string; website: string; hasIcon?: boolean; near?: Near } & Partial<SiteDetails>,
+  p: { id: string; name: string; website: string; iconPx?: number; near?: Near } & Partial<SiteDetails>,
   fetcher: typeof fetch = fetch,
   now = Date.now(),
 ): Promise<EnrichOne> {
@@ -542,7 +711,7 @@ export async function enrichPlace(
 }
 
 async function readSite(
-  p: { id: string; website: string; hasIcon?: boolean; near?: Near } & Partial<SiteDetails>,
+  p: { id: string; website: string; iconPx?: number; near?: Near } & Partial<SiteDetails>,
   fetcher: typeof fetch,
   now: number,
   done: (filled: EnrichOne["filled"], skipped: string, set?: Partial<SiteDetails>) => Promise<EnrichOne>,
@@ -555,21 +724,68 @@ async function readSite(
   const set: Partial<SiteDetails> = {};
   for (const k of Object.keys(found) as (keyof SiteDetails)[]) if (found[k] && !p[k]) set[k] = found[k];
   const filled: EnrichOne["filled"] = Object.keys(set) as (keyof SiteDetails)[];
-  // The site's icon stands in for a logo until an owner adds one: kept only for an unclaimed gym with neither.
-  if (!p.hasIcon) {
-    const icon = await siteIcon(fetcher, page.text, p.website);
-    if (
-      icon &&
-      (await run(
-        `INSERT INTO gym_photos (id, place_id, kind, image, created_at)
-         SELECT ?, id, 'icon', ?, ? FROM gym_places WHERE id = ? AND claimed_by = ''
-           AND NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = ? AND m.kind IN ('logo', 'icon'))`,
-        [randomBytes(8).toString("hex"), icon, now, p.id, p.id],
-      )) > 0
-    )
-      filled.push("icon");
+  // The site's icon stands in for a logo until an owner adds one: kept only for an unclaimed gym with neither, and a
+  // small one is swapped for a sharper one when the site has it (under a new id, since photos are cached for good).
+  const have = p.iconPx ?? 0;
+  if (have < ICON_GOOD_PX) {
+    const icon = await siteIcon(fetcher, page.text, p.website, have);
+    if (icon && (await keepIcon(p.id, icon, have > 0, now))) filled.push("icon");
   }
   return done(filled, filled.length ? "" : "nothing new on the page", set);
+}
+
+/** Keeps a site's icon for an unclaimed gym with no owner's logo: a new one, or in place of a smaller one. */
+async function keepIcon(placeId: string, icon: { bytes: Uint8Array; px: number }, replace: boolean, now: number): Promise<boolean> {
+  const id = randomBytes(8).toString("hex");
+  if (replace)
+    return (
+      (await run(
+        `UPDATE gym_photos SET id = ?, image = ?, px = ?, created_at = ? WHERE place_id = ? AND kind = 'icon' AND px < ?
+           AND EXISTS (SELECT 1 FROM gym_places g WHERE g.id = ? AND g.claimed_by = '')
+           AND NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = ? AND m.kind = 'logo')`,
+        [id, icon.bytes, icon.px, now, placeId, icon.px, placeId, placeId],
+      )) > 0
+    );
+  return (
+    (await run(
+      `INSERT INTO gym_photos (id, place_id, kind, image, px, created_at)
+       SELECT ?, id, 'icon', ?, ?, ? FROM gym_places WHERE id = ? AND claimed_by = ''
+         AND NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = ? AND m.kind IN ('logo', 'icon'))`,
+      [id, icon.bytes, icon.px, now, placeId, placeId],
+    )) > 0
+  );
+}
+
+/**
+ * Measures icons kept before their size was (px = 0), from their first 4 KB only, so neither Turso's rows nor its
+ * bandwidth pay for whole images; one that can't be measured counts as 1 px. An unclaimed gym whose icon is small is
+ * moved to the front of the website step's line (enriched_at = 1, which still counts as read for the AI step), so the
+ * next import or daily refresh looks for a sharper one. Through the partial index gym_photos_unmeasured, which is
+ * empty once every old icon is measured, so this costs nothing after that.
+ */
+export async function measureIcons(limit = 500): Promise<{ measured: number; small: number }> {
+  const rows = await query<{ id: string; place_id: string; head: Uint8Array | ArrayBuffer }>(
+    `SELECT id, place_id, substr(image, 1, 4096) AS head FROM gym_photos WHERE kind = 'icon' AND px = 0 LIMIT ?`,
+    [limit],
+  );
+  if (!rows.length) return { measured: 0, small: 0 };
+  const sized = rows.map((r) => {
+    const head = r.head instanceof Uint8Array ? r.head : new Uint8Array(r.head);
+    return { id: String(r.id), place: String(r.place_id), px: Math.max(1, iconPx(head)) };
+  });
+  const small = sized.filter((s) => s.px < ICON_GOOD_PX);
+  await batch([
+    ...sized.map((s) => ({ sql: "UPDATE gym_photos SET px = ? WHERE id = ?", args: [s.px, s.id] })),
+    ...(small.length
+      ? [
+          {
+            sql: `UPDATE gym_places SET enriched_at = 1 WHERE id IN (${small.map(() => "?").join(",")}) AND claimed_by = ''`,
+            args: small.map((s) => s.place),
+          },
+        ]
+      : []),
+  ]);
+  return { measured: sized.length, small: small.length };
 }
 
 // --- A batch, for the import job ---
@@ -582,7 +798,9 @@ export interface EnrichBatch {
   more: boolean;
 }
 
-const NO_ICON = `NOT EXISTS (SELECT 1 FROM gym_photos m WHERE m.place_id = gym_places.id AND m.kind IN ('logo', 'icon'))`;
+/** The size of the gym's icon, an owner's logo counting as big enough; NULL for neither. */
+const ICON_PX = `(SELECT MAX(CASE WHEN m.kind = 'logo' THEN 100000 ELSE m.px END) FROM gym_photos m
+  WHERE m.place_id = gym_places.id AND m.kind IN ('logo', 'icon'))`;
 /**
  * Gyms due a read, oldest read first, through the partial index gym_places_web (its WHERE repeated here, so the query
  * walks the index instead of the whole table; Turso bills every row read). A gym that has everything is stamped
@@ -594,8 +812,10 @@ export const ENRICH_DUE_SQL = `SELECT id ${DUE} ORDER BY enriched_at LIMIT ?`;
 /** Reads the next batch of gyms that have a website, several sites at once, and fills what each is missing. */
 export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(), size = ENRICH_LIMITS.batch): Promise<EnrichBatch> {
   const since = now - ENRICH_LIMITS.againMs;
+  // Old icons are measured first, so a small one is looked at again in this very batch.
+  await measureIcons();
   const rows = await query(
-    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, city, region, country, lat, lon, ${NO_ICON} AS no_icon ${DUE} ORDER BY enriched_at LIMIT ?`,
+    `SELECT id, name, website, phone, email, hours, address, postcode, instagram, facebook, city, region, country, lat, lon, ${ICON_PX} AS icon_px ${DUE} ORDER BY enriched_at LIMIT ?`,
     [since, size],
   );
   const all = rows.map((r) => ({
@@ -609,7 +829,8 @@ export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(
     postcode: String(r.postcode),
     instagram: String(r.instagram),
     facebook: String(r.facebook),
-    hasIcon: !Number(r.no_icon),
+    // An icon not measured yet (px 0) counts as 1 px, so a sharper one replaces it.
+    iconPx: r.icon_px === null || r.icon_px === undefined ? 0 : Math.max(1, Number(r.icon_px)),
     near: {
       city: String(r.city ?? ""),
       region: String(r.region ?? ""),
@@ -619,7 +840,7 @@ export async function enrichBatch(fetcher: typeof fetch = fetch, now = Date.now(
     },
   }));
   const missing = (g: (typeof all)[number]) =>
-    !g.hasIcon || (["phone", "email", "hours", "address", "postcode", "instagram", "facebook"] as const).some((k) => !g[k]);
+    g.iconPx < ICON_GOOD_PX || (["phone", "email", "hours", "address", "postcode", "instagram", "facebook"] as const).some((k) => !g[k]);
   const complete = all.filter((g) => !missing(g));
   if (complete.length)
     await run(`UPDATE gym_places SET enriched_at = ? WHERE id IN (${complete.map(() => "?").join(",")}) AND claimed_by = ''`, [
