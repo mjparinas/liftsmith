@@ -1499,6 +1499,13 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // and the job's kind (world or daily), step (map, web, ai, tidy) and what each step did.
   ["gym_places", "ai_at", "INTEGER NOT NULL DEFAULT 0"],
   ["gym_places", "ai_fix_at", "INTEGER NOT NULL DEFAULT 0"],
+  // The fix-up's strict rules (2026-11-19, second version): the rules a job ran under (1 = the first run, whose
+  // corrections are undone), whether that's done, how many suggestions it left, and each change's state (applied,
+  // suggested for staff to Apply, dismissed).
+  ["gym_ai_fix_jobs", "rules", "INTEGER NOT NULL DEFAULT 1"],
+  ["gym_ai_fix_jobs", "reverted", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_ai_fix_jobs", "suggested", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_ai_fixes", "state", "TEXT NOT NULL DEFAULT 'applied'"],
   ["gym_import_jobs", "kind", "TEXT NOT NULL DEFAULT ''"],
   ["gym_import_jobs", "phase", "TEXT NOT NULL DEFAULT 'map'"],
   ["gym_import_jobs", "web_read", "INTEGER NOT NULL DEFAULT 0"],

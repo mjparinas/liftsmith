@@ -14,7 +14,8 @@ const fix = (over: Partial<FixStatus> = {}): FixStatus => ({
   total: 1200,
   done: 300,
   filled: 120,
-  fixed: 40,
+  fixed: 0,
+  suggested: 40,
   flagged: 3,
   skipped: 20,
   note: "",
@@ -23,6 +24,20 @@ const fix = (over: Partial<FixStatus> = {}): FixStatus => ({
   endedAt: 0,
   activeAt: T0,
   pausedUntil: 0,
+  oldRules: false,
+  suggestions: [
+    {
+      id: "s1",
+      placeId: "osm-node-12",
+      name: "Studio Lagree",
+      field: "phone",
+      before: "+1 647-352-2775",
+      after: "+1-416-551-9194",
+      at: T0,
+      undone: false,
+      state: "suggested",
+    },
+  ],
   recent: [
     {
       id: "c1",
@@ -33,8 +48,19 @@ const fix = (over: Partial<FixStatus> = {}): FixStatus => ({
       after: "+1 604-555-0199",
       at: T0,
       undone: false,
+      state: "applied",
     },
-    { id: "c2", placeId: "osm-node-11", name: "Bar Hall", field: "city", before: "80145", after: "Napoli", at: T0, undone: false },
+    {
+      id: "c2",
+      placeId: "osm-node-11",
+      name: "Bar Hall",
+      field: "city",
+      before: "80145",
+      after: "Napoli",
+      at: T0,
+      undone: false,
+      state: "applied",
+    },
   ],
   ...over,
 });
@@ -50,6 +76,7 @@ beforeEach(() => {
     posts.push(body);
     if (body.action === "fixStart") onServer = fix({ done: 0, recent: [] });
     if (body.action === "fixUndo") onServer = fix({ recent: [{ ...fix().recent[0]!, undone: true }] });
+    if (body.action === "fixApply") onServer = fix({ suggestions: [] });
     return Response.json({ fix: onServer });
   });
 });
@@ -80,10 +107,24 @@ describe("Admin › Gyms › AI fix-up", () => {
     expect(screen.getByText("Phone: 604-555-0000 → +1 604-555-0199")).toBeInTheDocument();
     // One Undo: the city change moved the page, so it has none.
     const undo = screen.getAllByRole("button", { name: "Undo" });
+    // (the suggestion has Apply and Dismiss instead)
     expect(undo).toHaveLength(1);
     await userEvent.click(undo[0]!);
     expect(posts).toEqual([{ action: "fixUndo", change: "c1" }]);
     await waitFor(() => expect(screen.getByText("undone")).toBeInTheDocument());
+    expect(changed).toHaveBeenCalled();
+  });
+
+  it("applies a suggestion only when staff press Apply", async () => {
+    onServer = fix();
+    const changed = vi.fn();
+    render(<GymAiFix admin changed={changed} />);
+    expect(await screen.findByText("Suggestions waiting for you (1)")).toBeInTheDocument();
+    expect(screen.getByText("Phone: +1 647-352-2775 → +1-416-551-9194")).toBeInTheDocument();
+    expect(screen.getByText(/40 have suggestions for you/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Apply" }));
+    expect(posts).toEqual([{ action: "fixApply", change: "s1" }]);
+    await waitFor(() => expect(screen.queryByText(/Suggestions waiting/)).toBeNull());
     expect(changed).toHaveBeenCalled();
   });
 

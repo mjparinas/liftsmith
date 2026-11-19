@@ -4,16 +4,23 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { AiError } from "./ai";
 import { query, resetDb, run } from "./db";
 import {
+  applyFix,
+  dismissSuggestion,
   FIX_REPORTER,
   fixBatch,
   fixesFor,
   fixStatus,
   nextPacificDay,
   pauseFor,
+  revertOldRules,
   runFixWorker,
+  sameStreet,
+  showsAddress,
   startFix,
   stopFix,
+  sureOf,
   undoFix,
+  unitFirst,
   type FixBatch,
 } from "./gymAiFix";
 import { placesFromOsm, savePlaces } from "./gymPlaces";
@@ -49,6 +56,7 @@ const page = (async () =>
   })) as unknown as typeof fetch;
 
 const ANSWER = {
+  locations: 1,
   address: "100 Main Street",
   city: "Langley",
   postcode: "V2Y 1A1",
@@ -106,35 +114,98 @@ beforeEach(async () => {
   await resetDb();
 });
 
+const SINGLE = { ours: false, single: true };
+const OURS = { ours: true, single: false };
+const CHAIN = { ours: false, single: false };
+
+describe("how sure the fix-up is of the location", () => {
+  it("knows a page about this gym: our street on it, or a one-location site", () => {
+    expect(showsAddress("907 Kingston Road", "YMCA … Visit us at 907 Kingston Rd, Toronto. Call 416-…")).toBe(true);
+    expect(showsAddress("6334A Rue Saint-Hubert", "Studio: 6334-A rue St-Hubert, Montréal")).toBe(true);
+    expect(showsAddress("435 Spadina Road", "Studio Lagree, 672 Queen St. East, Toronto")).toBe(false);
+    expect(sureOf({ address: "1 A St" }, { locations: 1 }, "Welcome to our gym")).toEqual({ ours: false, single: true });
+    // A chain's page: several locations, or the words a chain uses for them.
+    expect(sureOf({ address: "" }, { locations: 4 }, "Welcome")).toEqual({ ours: false, single: false });
+    expect(sureOf({ address: "" }, { locations: 1 }, "Find a gym near you. All our locations are open 24/7.").single).toBe(false);
+    expect(sureOf({ address: "" }, { locations: 1 }, "Trouvez nos succursales").single).toBe(false);
+  });
+
+  it("treats a unit moved, dropped or written another way as the same address", () => {
+    expect(sameStreet("200-1377 The Queensway", "1377 The Queensway")).toBe(true);
+    expect(sameStreet("6334A Rue Saint-Hubert", "6334-A rue St-Hubert")).toBe(true);
+    expect(sameStreet("206-2710 Rue Masson", "2710 rue Masson, bureau 206")).toBe(true);
+    expect(sameStreet("6036 Boul Métropolitain E", "6036 Boul. Métropolitain East")).toBe(true);
+    expect(sameStreet("3645 Rue Notre-Dame Ouest", "3645 Notre-Dame O.")).toBe(true);
+    expect(sameStreet("123 Dundas Street West", "140 Spadina Ave.")).toBe(false);
+    expect(sameStreet("4236 Rue Sainte-Catherine Est", "4787 Rue Sainte-Catherine E")).toBe(false);
+  });
+
+  it("keeps the unit in front", () => {
+    expect(unitFirst("1440 Bathurst Street, Unit 111")).toBe("111-1440 Bathurst Street");
+    expect(unitFirst("Unit 103, 1201 Dundas Street East")).toBe("103-1201 Dundas Street East");
+    expect(unitFirst("10 Lower Spadina Avenue, Suite 100")).toBe("100-10 Lower Spadina Avenue");
+    expect(unitFirst("2710 rue Masson, bureau 206")).toBe("206-2710 rue Masson");
+    expect(unitFirst("100 Main Street")).toBe("100 Main Street");
+  });
+});
+
 describe("what the fix-up changes", () => {
-  it("fills empty fields and corrects filled ones the page clearly states differently", () => {
-    expect(fixesFor(BASE, ANSWER)).toEqual([
-      { field: "address", before: "5 Old Road", after: "100 Main Street" },
-      { field: "postcode", before: "", after: "V2Y 1A1" },
-      { field: "phone", before: "604-555-0000", after: "+1 604-555-0199" },
-      { field: "hours", before: "", after: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00" },
-      { field: "email", before: "", after: "hello@ironworks.example.com" },
-      { field: "instagram", before: "", after: "https://www.instagram.com/ironworksgym" },
+  it("fills empty fields and only suggests the rest, from a one-location site", () => {
+    expect(fixesFor(BASE, ANSWER, SINGLE)).toEqual([
+      { field: "address", before: "5 Old Road", after: "100 Main Street", kind: "suggest" },
+      { field: "postcode", before: "", after: "V2Y 1A1", kind: "fill" },
+      { field: "phone", before: "604-555-0000", after: "+1 604-555-0199", kind: "suggest" },
+      { field: "hours", before: "", after: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00", kind: "fill" },
+      { field: "email", before: "", after: "hello@ironworks.example.com", kind: "fill" },
+      { field: "instagram", before: "", after: "https://www.instagram.com/ironworksgym", kind: "fill" },
     ]);
   });
 
-  it("leaves what's the same, and never moves a street, city or postcode on a page about somewhere else", () => {
-    const g = { ...BASE, postcode: "V3A 4B5", phone: "(604) 555 0000", hours: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00" };
-    expect(fixesFor(g, { ...ANSWER, city: "Vancouver", phone: "+1 604 555 0000", email: "", instagram: "" })).toEqual([]);
+  it("does nothing from a chain's page that doesn't show our address (the head office's number, another branch)", () => {
+    expect(fixesFor({ ...BASE, phone: "+1-514-321-9027" }, { ...ANSWER, phone: "(514) 394-9366", locations: 30 }, CHAIN)).toEqual([]);
+  });
+
+  it("never suggests another street from a page that shows ours, nor hours with conditions over plain ones", () => {
+    const g = { ...BASE, address: "907 Kingston Road", hours: 'Mo-Fr 06:00-23:00 "Members"' };
+    const out = fixesFor(g, { ...ANSWER, address: "907 Kingston Rd", hours: "24/7", phone: "" }, OURS);
+    expect(out.map((c) => c.field)).toEqual(["postcode", "email", "instagram"]);
+  });
+
+  it("leaves what's the same written another way, and a street or city from somewhere else", () => {
+    const g = {
+      ...BASE,
+      address: "200-1377 Main Street",
+      postcode: "V3A 4B5",
+      phone: "(604) 555 0000",
+      hours: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00",
+      facebook: "https://www.facebook.com/IronWorks,",
+    };
+    const same = {
+      ...ANSWER,
+      address: "1377 Main St",
+      phone: "+1 604 555 0000",
+      email: "",
+      instagram: "",
+      facebook: "https://www.facebook.com/IronWorks",
+    };
+    expect(fixesFor(g, same, SINGLE)).toEqual([]);
+    expect(fixesFor({ ...g, address: "" }, { ...same, city: "Vancouver" }, SINGLE)).toEqual([]);
   });
 
   it("fixes a city that's a postcode, and refuses answers that fail the checks", () => {
     const g = { ...BASE, city: "80145", country: "IT", region: "Campania", address: "" };
-    expect(fixesFor(g, { ...ANSWER, city: "Napoli", address: "Call us", phone: "call us", email: "a@designer.example.org" })).toEqual([
-      { field: "city", before: "80145", after: "Napoli" },
-      { field: "hours", before: "", after: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00" },
-      { field: "instagram", before: "", after: "https://www.instagram.com/ironworksgym" },
+    expect(
+      fixesFor(g, { ...ANSWER, city: "Napoli", address: "Call us", phone: "call us", email: "a@designer.example.org" }, SINGLE),
+    ).toEqual([
+      { field: "city", before: "80145", after: "Napoli", kind: "fill" },
+      { field: "hours", before: "", after: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00", kind: "fill" },
+      { field: "instagram", before: "", after: "https://www.instagram.com/ironworksgym", kind: "fill" },
     ]);
   });
 });
 
 describe("the fix-up batch", () => {
-  it("changes a gym once, ever, keeps each change for Undo and never touches a claimed gym", async () => {
+  it("fills a gym once, ever, keeps suggestions for staff and never touches a claimed gym", async () => {
     await gyms(2);
     await run("UPDATE gym_places SET claimed_by = 'acc-owner' WHERE name = 'Iron Works 2'");
     const { id } = (await startFix("admin@example.com", NOW)) as { id: string };
@@ -145,7 +216,13 @@ describe("the fix-up batch", () => {
     // The prompt shows our entry and the page, both as data.
     expect(String((calls[0]!.messages as { content: string }[])[0]!.content)).toMatch(/<entry>\nname: Iron Works 1[\s\S]*<page>/);
     const [row] = await query("SELECT phone, address, hours, ai_fix_at FROM gym_places WHERE name = 'Iron Works 1'");
-    expect(row).toMatchObject({ phone: "+1 604-555-0199", address: "100 Main Street", ai_fix_at: NOW });
+    // Filled what was empty; the phone and street we had stay until staff apply the suggestion.
+    expect(row).toMatchObject({
+      phone: "604-555-0000",
+      address: "5 Old Road",
+      hours: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00",
+      ai_fix_at: NOW,
+    });
     const [owned] = await query("SELECT phone, ai_fix_at FROM gym_places WHERE name = 'Iron Works 2'");
     expect(owned).toEqual({ phone: "604-555-0000", ai_fix_at: 0 });
     // Run again, even as a new pass: nothing is due, nothing is asked.
@@ -155,11 +232,65 @@ describe("the fix-up batch", () => {
     expect(calls).toHaveLength(1);
 
     const status = await fixStatus(id);
-    const phone = status!.recent.find((c) => c.field === "phone")!;
-    expect(phone).toMatchObject({ name: "Iron Works 1", before: "604-555-0000", after: "+1 604-555-0199", undone: false });
-    expect(await undoFix(phone.id, NOW + 4000)).toEqual({ ok: true });
-    expect((await query("SELECT phone FROM gym_places WHERE name = 'Iron Works 1'"))[0]!.phone).toBe("604-555-0000");
+    expect(status!.suggestions.map((c) => c.field).sort()).toEqual(["address", "phone"]);
+    const phone = status!.suggestions.find((c) => c.field === "phone")!;
+    expect(phone).toMatchObject({ name: "Iron Works 1", before: "604-555-0000", after: "+1 604-555-0199", state: "suggested" });
     expect((await undoFix(phone.id)).ok).toBe(false);
+    expect(await applyFix(phone.id, NOW + 4000)).toEqual({ ok: true });
+    expect((await query("SELECT phone FROM gym_places WHERE name = 'Iron Works 1'"))[0]!.phone).toBe("+1 604-555-0199");
+    const street = status!.suggestions.find((c) => c.field === "address")!;
+    expect(await dismissSuggestion(street.id)).toBe(true);
+    expect((await fixStatus(id))!.suggestions).toEqual([]);
+    const hours = (await fixStatus(id))!.recent.find((c) => c.field === "hours")!;
+    expect(await undoFix(hours.id, NOW + 5000)).toEqual({ ok: true });
+    expect((await query("SELECT hours FROM gym_places WHERE name = 'Iron Works 1'"))[0]!.hours).toBe("");
+  });
+
+  it("changes nothing from a chain's page that doesn't show the branch", async () => {
+    await gyms(1);
+    const { id } = (await startFix("admin@example.com", NOW)) as { id: string };
+    const chain = (async () =>
+      new Response(
+        "<html><body><h1>Iron Works</h1><p>Find a gym near you: 30 locations across Canada. Head office (514) 394-9366.</p></body></html>",
+        {
+          headers: { "content-type": "text/html" },
+        },
+      )) as unknown as typeof fetch;
+    const { client } = fakeClient({ ...ANSWER, locations: 30, phone: "(514) 394-9366" });
+    const b = await fixBatch(id, { client, fetcher: chain, now: NOW });
+    expect(b.done[0]!.changes).toEqual([]);
+    expect((await query("SELECT phone, hours FROM gym_places"))[0]).toEqual({ phone: "604-555-0000", hours: "" });
+  });
+
+  it("puts right the first run: undoes its corrections, keeps its fills, and gives its gyms a fresh go", async () => {
+    await gyms(2);
+    await run("INSERT INTO gym_ai_fix_jobs (id, state, total, started_at, fixed, filled) VALUES ('old', 'stopped', 2, ?, 1, 1)", [NOW]);
+    const [one, two] = (await query("SELECT id FROM gym_places ORDER BY name")).map((r) => String(r.id));
+    // What the first run wrote: a phone and a street over ours, and an Instagram where there was none.
+    await run(
+      "UPDATE gym_places SET phone = '1 (416) 928-1875', address = '140 Spadina Ave.', instagram = 'https://www.instagram.com/iw', ai_fix_at = ? WHERE id = ?",
+      [NOW, one],
+    );
+    await run("UPDATE gym_places SET ai_fix_at = ? WHERE id = ?", [NOW, two]);
+    await run(
+      `INSERT INTO gym_ai_fixes (id, job, place_id, field, before, after, at) VALUES
+       ('c1', 'old', ?, 'phone', '604-555-0000', '1 (416) 928-1875', ?),
+       ('c2', 'old', ?, 'address', '5 Old Road', '140 Spadina Ave.', ?),
+       ('c3', 'old', ?, 'instagram', '', 'https://www.instagram.com/iw', ?)`,
+      [one, NOW, one, NOW, one, NOW],
+    );
+    expect(await revertOldRules(NOW + 1)).toEqual({ undone: 2, left: 0, kept: 1, gyms: 2 });
+    expect((await query("SELECT phone, address, instagram FROM gym_places WHERE id = ?", [one]))[0]).toEqual({
+      phone: "604-555-0000",
+      address: "5 Old Road",
+      instagram: "https://www.instagram.com/iw",
+    });
+    expect((await query("SELECT ai_fix_at FROM gym_places")).map((r) => r.ai_fix_at)).toEqual([0, 0]);
+    expect((await fixStatus("old"))!.note).toMatch(/2 of its corrections were undone/);
+    // Once only, and a new pass runs under the new rules.
+    expect(await revertOldRules(NOW + 2)).toBeNull();
+    const made = (await startFix("admin@example.com", NOW + 3)) as { id: string };
+    expect((await fixStatus(made.id))!).toMatchObject({ total: 2, oldRules: false });
   });
 
   it("sends a gym whose page says it closed to Reports instead of hiding it", async () => {
@@ -199,7 +330,9 @@ describe("the fix-up batch", () => {
 
 describe("the fix-up job", () => {
   const one = (over: Partial<FixBatch> = {}): FixBatch => ({
-    done: [{ id: "a", name: "A", changes: [{ field: "phone", before: "", after: "604-555-0100" }], flagged: "", skipped: "" }],
+    done: [
+      { id: "a", name: "A", changes: [{ field: "phone", before: "", after: "604-555-0100", kind: "fill" }], flagged: "", skipped: "" },
+    ],
     more: true,
     stopped: "",
     ...over,

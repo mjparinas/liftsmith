@@ -3,8 +3,8 @@
 // Admin › Gyms › Import › AI fix-up (Melvin, 2026-11-19: "a pass on ai fixing stuff … that respects the ai cost limit
 // … only run against unclaimed gyms and … only run on them once"; docs/decisions/gyms.md "AI fix-up pass"). One button
 // starts the pass on the server (src/server/gymAiFix.ts); the card shows how far it got, why it's paused (the day's AI
-// cap, until midnight Pacific), and every change it made with its old value and Undo. Admins start, stop and undo;
-// support staff watch.
+// cap, until midnight Pacific), every detail it filled with Undo, and the suggestions it wasn't allowed to write (a filled
+// field the gym's page states differently) with Apply and Dismiss. Admins start, stop, undo and apply; support staff watch.
 import { useCallback, useEffect, useState } from "react";
 
 import { isVisible, onVisibility } from "@/lib/visibility";
@@ -74,23 +74,29 @@ export function GymAiFix({ admin, changed }: { admin: boolean; changed: () => vo
     setBusy(false);
     if (r.error) setProblem(r.error);
     if (r.fix !== undefined) setFix(r.fix);
-    if (body.action === "fixUndo" && !r.error) changed();
+    if ((body.action === "fixUndo" || body.action === "fixApply") && !r.error) changed();
   };
 
   return (
     <Card title="AI fix-up">
       <HowItWorks>
         <p>
-          A pass over every unclaimed gym with a website, once each: Claude reads the gym&apos;s own home page next to what we have, fills
-          what&apos;s empty and corrects what the page clearly says is different (phone, opening hours, email, Instagram, Facebook, and the
-          street address when the page puts it in the gym&apos;s own city). Every answer is checked in code like the import&apos;s AI step.
-          The city is only fixed when ours is missing or a postcode, and postcodes are only filled. A page that says the gym closed for good
-          or isn&apos;t a gym goes to Admin › Reports for you to decide; nothing is hidden.
+          A pass over every unclaimed gym with a website, once each: Claude reads the gym&apos;s own home page next to what we have. It only
+          acts when it&apos;s sure the page is about this gym: the page shows our street address, or it&apos;s a one-location site. A
+          chain&apos;s or head office&apos;s page that doesn&apos;t show our address changes nothing, so a branch never gets another
+          branch&apos;s phone or hours.
+        </p>
+        <p>
+          It only fills what&apos;s empty (phone, opening hours, email, Instagram, Facebook, the street address in the gym&apos;s own city
+          with any unit kept in front, a missing city or postcode). It never changes a detail we already have: when the page says something
+          else, that&apos;s a suggestion below for you to Apply or Dismiss. Writing the same thing another way (St and Street, a unit moved,
+          a phone written differently) is never a change. A page that says the gym closed for good or isn&apos;t a gym goes to Admin ›
+          Reports; nothing is hidden.
         </p>
         <p>
           A gym gets its one go and never another, even if the pass is stopped and started again; claimed gyms are never touched. It spends
           from the same AI daily cap as the other helpers (Flags › AI daily cap): at the cap it pauses and carries on by itself after
-          midnight Pacific. Every change is listed below with its old value and Undo.
+          midnight Pacific.
         </p>
       </HowItWorks>
       {admin && !running && (
@@ -172,14 +178,50 @@ function FixCard({
         <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
       </div>
       <p className="text-muted">
-        {fix.filled} got missing details, {fix.fixed} had details corrected, {fix.flagged} sent to Reports, {fix.skipped} couldn&apos;t be
-        read.
+        {fix.oldRules
+          ? `${fix.filled} got missing details, ${fix.fixed} had details corrected (first run, old rules), ${fix.flagged} sent to Reports, ${fix.skipped} couldn't be read.`
+          : `${fix.filled} got missing details, ${fix.suggested} have suggestions for you, ${fix.flagged} sent to Reports, ${fix.skipped} couldn't be read.`}
       </p>
       <p className="text-xs text-faint">
         Started by {fix.startedBy || "an admin"} {new Date(fix.startedAt).toLocaleString()}
         {running ? ". Runs on the server, so this page can be closed." : "."}
       </p>
       {fix.note && <p className="text-muted">{fix.note}</p>}
+      {fix.suggestions.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-muted">Suggestions waiting for you ({fix.suggestions.length})</p>
+          <ul className="mt-1 grid max-h-72 gap-1 overflow-y-auto text-xs">
+            {fix.suggestions.map((c) => (
+              <li key={c.id} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span className="font-semibold">{c.name}</span>
+                <span className="text-muted">
+                  {FIELD[c.field]}: {c.before} → {c.after}
+                </span>
+                {admin && (
+                  <span className="flex gap-1">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void act({ action: "fixApply", change: c.id })}
+                      className="press rounded border border-line px-2 py-0.5 text-muted"
+                    >
+                      Apply
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void act({ action: "fixDismiss", change: c.id })}
+                      className="press rounded border border-line px-2 py-0.5 text-muted"
+                    >
+                      Dismiss
+                    </button>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {fix.recent.length > 0 && (
         <details>
           <summary className="cursor-pointer text-xs text-faint">Latest changes ({fix.recent.length})</summary>
