@@ -6,11 +6,15 @@ import {
   enrichBatch,
   enrichPlace,
   hoursFromSpec,
-  iconLinks,
+  iconCandidates,
+  imageSize,
   imageType,
   looksLikeStreet,
+  manifestIcons,
+  measureIcons,
   pickAddress,
   publicHost,
+  siteIcon,
 } from "./gymEnrich";
 import { placeById, placesFromOsm, savePlaces, socialUrl, type OsmElement } from "./gymPlaces";
 
@@ -153,8 +157,12 @@ describe("filling in a gym", () => {
     const { fetcher, calls } = site("User-agent: *\nDisallow: /", PAGE);
     const r = await enrichPlace({ id: String(p!.id), name: "Iron Works", website: "https://ironworks.example.com/" }, fetcher, NOW);
     expect(r.filled).toContain("hours");
-    // The home page, then its icon (this page names none, so /favicon.ico).
-    expect(calls).toEqual(["https://ironworks.example.com/", "https://ironworks.example.com/favicon.ico"]);
+    // The home page, then its icon (this page names none, so the usual places).
+    expect(calls).toEqual([
+      "https://ironworks.example.com/",
+      "https://ironworks.example.com/apple-touch-icon.png",
+      "https://ironworks.example.com/favicon.ico",
+    ]);
   });
 
   it("reads gyms in batches, each at most once a month, and stamps one that has everything without a visit", async () => {
@@ -183,6 +191,7 @@ describe("filling in a gym", () => {
          instagram = 'https://www.instagram.com/a', facebook = 'https://www.facebook.com/a', enriched_at = 0`,
     );
     await run("INSERT INTO gym_photos (id, place_id, kind, image, created_at) SELECT 'p' || id, id, 'icon', x'00', 0 FROM gym_places");
+    await run("UPDATE gym_photos SET px = 180");
     const quiet = site(null, "");
     const stamped = await enrichBatch(quiet.fetcher, NOW + 63 * 86_400_000);
     expect(stamped).toMatchObject({ done: [], complete: 2 });
@@ -222,18 +231,146 @@ describe("what the map says", () => {
   });
 });
 
+/** A PNG header of this size, padded past the smallest icon we keep. */
+function png(w: number, h: number) {
+  const b = new Uint8Array(200).fill(7);
+  b.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]);
+  new DataView(b.buffer).setUint32(16, w);
+  new DataView(b.buffer).setUint32(20, h);
+  return b;
+}
+
 describe("the gym's own icon", () => {
-  const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, ...Array.from({ length: 200 }, () => 7)]);
+  const PNG = png(32, 32);
   const HEAD = `<html><head><link rel="icon" href="/favicon-32.png" sizes="32x32"><link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png"></head><body>Hi</body></html>`;
 
-  it("picks the touch icon, then the largest icon, then /favicon.ico, and never SVG", () => {
-    expect(iconLinks(HEAD, "https://ironworks.example.com/")).toEqual([
+  it("tries the touch icon, then the largest icon, then the usual places, and never SVG", () => {
+    expect(iconCandidates(HEAD, "https://ironworks.example.com/").map((c) => c.url)).toEqual([
       "https://ironworks.example.com/apple-touch-icon.png",
       "https://ironworks.example.com/favicon-32.png",
       "https://ironworks.example.com/favicon.ico",
     ]);
-    expect(iconLinks("<p>no head</p>", "https://ironworks.example.com/")).toEqual(["https://ironworks.example.com/favicon.ico"]);
+    expect(iconCandidates("<p>no head</p>", "https://ironworks.example.com/").map((c) => c.url)).toEqual([
+      "https://ironworks.example.com/apple-touch-icon.png",
+      "https://ironworks.example.com/favicon.ico",
+    ]);
+  });
+
+  it("ranks sharp icons up to 512 px first, then bigger ones, then small ones, with og:image last", () => {
+    const html = `<link rel="icon" sizes="16x16" href="/16.png"><link rel="icon" sizes="1024x1024" href="/1024.png">
+      <link rel="icon" sizes="192x192" href="/192.png"><link rel="apple-touch-icon-precomposed" sizes="152x152" href="/152.png">
+      <meta name="msapplication-TileImage" content="/tile.png"><meta name="msapplication-square310x310logo" content="/310.png">
+      <meta property="og:image" content="https://cdn.example.com/hero.jpg"><link rel="icon" href="data:image/png;base64,AA==">`;
+    expect(iconCandidates(html, "https://ironworks.example.com/").map((c) => new URL(c.url).pathname)).toEqual([
+      "/310.png",
+      "/192.png",
+      "/apple-touch-icon.png",
+      "/1024.png",
+      "/152.png",
+      "/tile.png",
+      "/16.png",
+      "/favicon.ico",
+      "/hero.jpg",
+    ]);
+  });
+
+  it("reads a manifest's icons, leaving out SVG and monochrome ones", () => {
+    const json = JSON.stringify({
+      icons: [
+        { src: "icons/512.png", sizes: "512x512", type: "image/png" },
+        { src: "icons/mask.png", sizes: "512x512", purpose: "maskable" },
+        { src: "icons/mono.png", sizes: "512x512", purpose: "monochrome" },
+        { src: "icons/logo.svg", sizes: "any", type: "image/svg+xml" },
+        { src: "icons/192.png", sizes: "96x96 192x192" },
+      ],
+    });
+    expect(manifestIcons(json, "https://ironworks.example.com/site.webmanifest")).toEqual([
+      { url: "https://ironworks.example.com/icons/512.png", size: 512 },
+      { url: "https://ironworks.example.com/icons/mask.png", size: 511 },
+      { url: "https://ironworks.example.com/icons/192.png", size: 192 },
+    ]);
+    expect(manifestIcons("not json", "https://ironworks.example.com/m.json")).toEqual([]);
+  });
+
+  it("measures PNG, GIF, ICO, JPEG and WebP from their headers", () => {
+    expect(imageSize(png(180, 180))).toEqual({ w: 180, h: 180 });
+    expect(imageSize(new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 48, 0, 48, 0, 0, 0]))).toEqual({ w: 48, h: 48 });
+    // An .ico with a 16 px and a 256 px picture (0 means 256).
+    const ico = new Uint8Array(6 + 32);
+    ico.set([0, 0, 1, 0, 2, 0]);
+    ico.set([16, 16], 6);
+    ico.set([0, 0], 22);
+    expect(imageSize(ico)).toEqual({ w: 256, h: 256 });
+    // A JPEG with an APP0 segment before its frame header.
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 4, 0, 0, 0xff, 0xc0, 0, 17, 8, 0, 120, 0, 160, 3, 0, 0]);
+    expect(imageSize(jpeg)).toEqual({ w: 160, h: 120 });
+    const webp = new Uint8Array(30);
+    webp.set([...new TextEncoder().encode("RIFF"), 0, 0, 0, 0, ...new TextEncoder().encode("WEBPVP8X")]);
+    webp.set([191, 0, 0, 191, 0, 0], 24);
+    expect(imageSize(webp)).toEqual({ w: 192, h: 192 });
+    expect(imageSize(new TextEncoder().encode("<html>not an image</html>"))).toBeNull();
+  });
+
+  it("takes the sharpest square icon, from the manifest when the page names nothing sharp, and og:image only as a last resort", async () => {
+    const files: Record<string, Uint8Array<ArrayBuffer> | string> = {
+      "/favicon-32.png": png(32, 32),
+      "/site.webmanifest": JSON.stringify({ icons: [{ src: "/android-chrome-192.png", sizes: "192x192" }] }),
+      "/android-chrome-192.png": png(192, 192),
+      "/banner.png": png(1200, 630),
+      "/square.png": png(400, 400),
+    };
+    const calls: string[] = [];
+    const fetcher = (async (url: string | URL | Request) => {
+      const path = new URL(String(url)).pathname;
+      calls.push(path);
+      const f = files[path];
+      return f === undefined ? new Response("nope", { status: 404 }) : new Response(f);
+    }) as typeof fetch;
+    const page = `<link rel="icon" sizes="32x32" href="/favicon-32.png"><link rel="manifest" href="/site.webmanifest">`;
+    expect((await siteIcon(fetcher, page, "https://ironworks.example.com/"))?.px).toBe(192);
+    // It stopped at the first sharp one.
+    expect(calls).toEqual(["/site.webmanifest", "/android-chrome-192.png"]);
+    // Not bigger than the icon the gym already has: nothing.
+    expect(await siteIcon(fetcher, page, "https://ironworks.example.com/", 192)).toBeNull();
+    // A wide og:image is never taken; a square one is, but only when nothing else is there.
+    expect(await siteIcon(fetcher, `<meta property="og:image" content="/banner.png">`, "https://ironworks.example.com/")).toBeNull();
+    expect((await siteIcon(fetcher, `<meta property="og:image" content="/square.png">`, "https://ironworks.example.com/"))?.px).toBe(400);
+    files["/favicon.ico"] = png(16, 16);
+    expect((await siteIcon(fetcher, `<meta property="og:image" content="/square.png">`, "https://ironworks.example.com/"))?.px).toBe(16);
+  });
+
+  it("measures old icons once from their first bytes, and swaps a small one for a sharper one", async () => {
+    await savePlaces(placesFromOsm([GYM], AREA), NOW);
+    const [p] = await query("SELECT id FROM gym_places");
+    const id = String(p!.id);
+    await run("UPDATE gym_places SET enriched_at = ?", [NOW]);
+    await run("INSERT INTO gym_photos (id, place_id, kind, image, created_at) VALUES ('0000000000000001', ?, 'icon', ?, 0)", [
+      id,
+      png(16, 16),
+    ]);
+    expect(await measureIcons()).toEqual({ measured: 1, small: 1 });
+    expect(await query("SELECT px FROM gym_photos")).toEqual([{ px: 16 }]);
+    // Moved to the front of the line, still counting as read for the AI step.
+    expect(await query("SELECT enriched_at FROM gym_places")).toEqual([{ enriched_at: 1 }]);
+    expect(await measureIcons()).toEqual({ measured: 0, small: 0 });
+    const fetcher = (async (url: string | URL | Request) => {
+      const u = String(url);
+      if (u.endsWith("/apple-touch-icon.png")) return new Response(png(180, 180));
+      return new Response("<html><body>Hi</body></html>", { headers: { "content-type": "text/html" } });
+    }) as typeof fetch;
+    const b = await enrichBatch(fetcher, NOW);
+    expect(b.done[0]!.filled).toContain("icon");
+    const [icon] = await query("SELECT id, px FROM gym_photos");
+    expect(icon!.px).toBe(180);
+    // A new id, so the forever-cached old picture isn't served for it.
+    expect(icon!.id).not.toBe("0000000000000001");
+    expect((await placeById(id))!.logo).toBe(icon!.id);
+    // An owner's logo is never replaced by an icon, and a claimed gym's icon is left alone.
+    await run("UPDATE gym_photos SET px = 16");
+    await run("UPDATE gym_places SET claimed_by = 'acc-owner'");
+    await enrichPlace({ id, name: "Iron Works", website: "https://ironworks.example.com/", iconPx: 16 }, fetcher, NOW + 1);
+    expect(await query("SELECT px FROM gym_photos")).toEqual([{ px: 16 }]);
   });
 
   it("knows an image from its first bytes and refuses anything else", () => {

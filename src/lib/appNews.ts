@@ -26,6 +26,11 @@ export interface AppChange {
 }
 
 export interface AppRelease {
+  /**
+   * The app version it ships as (package.json, docs/decisions/app-versions.md). A feature bumps the minor version
+   * and a fix the patch; several bumps between two promotions share one release, which takes the newest version.
+   */
+  version: string;
   /** The day it reached the apps (ISO, Pacific time): also the anchor on /whats-new/. */
   day: string;
   /** English, for the website's page only. */
@@ -35,9 +40,23 @@ export interface AppRelease {
 
 export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
 
-/** Newest first. Add a release at the top when a promotion ships something a lifter will notice. */
+/**
+ * Newest first. Add a release at the top when a promotion ships something a lifter will notice, with the version it
+ * ships as; a change landing before that promotion joins the top release and moves its version up.
+ */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.2.0",
+    day: "2026-11-20",
+    headline: "Open now in the gym finder, a map-first finder and search in Settings",
+    changes: [
+      { id: "openNow", kind: "new", icon: "clock" },
+      { id: "settingsSearch", kind: "new", icon: "search" },
+      { id: "mapFinder", kind: "better", icon: "pin" },
+    ],
+  },
+  {
+    version: "0.1.0",
     day: "2026-11-19",
     headline: "Training seasons, a community board, club chat, automatic supersets and ten languages",
     changes: [
