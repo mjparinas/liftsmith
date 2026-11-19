@@ -546,6 +546,7 @@ export const emails: Record<string, Words> = {
       "Un acceso en Ajustes rápidos de Android; Centro de control y Siri en iPhone.",
       "Tus días de entrenamiento en tu calendario.",
       "Recordatorios suaves los días de entrenamiento.",
+      "Un número en el icono de la app con los mensajes, me gusta y solicitudes de seguimiento que te esperan.",
     ],
     dyk: "Registrar serie y +30 s en la pantalla de bloqueo funcionan con la app cerrada.",
   },

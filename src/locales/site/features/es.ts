@@ -541,6 +541,11 @@ export const es: FeaturesText = {
       name: "Novedades en la app",
       body: "Ajustes muestra tu versión con un botón Novedades: lo nuevo, lo mejorado y lo arreglado, en palabras sencillas. Tras una actualización, Hoy lo menciona una vez, y solo lista lo que ya puedes usar.",
     },
+    "icon-badge": {
+      name: "Un número en el icono de la app",
+      body: "El icono de la app muestra cuántos mensajes, me gusta, comentarios y solicitudes de seguimiento te esperan. Dentro de la app, números rojos en Amigos y en tu entrenador dicen dónde están, y el número se va cuando los ves. Un interruptor en Ajustes › Recordatorios lo apaga.",
+      note: "Android y iPhone. La app web lo muestra si la instalas desde Chrome, Edge o Safari.",
+    },
     languages: {
       name: "Diez idiomas",
       body: "Inglés, español, francés, alemán, italiano, japonés, portugués de Brasil, coreano, polaco y turco, según el idioma de tu teléfono o navegador, o el que elijas en la pantalla de bienvenida y en Ajustes.",

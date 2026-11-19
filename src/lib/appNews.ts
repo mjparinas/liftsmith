@@ -46,10 +46,13 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.3.0",
+    version: "0.4.0",
     day: "2026-11-21",
-    headline: "Five new training seasons, planned through 2027",
-    changes: [{ id: "seasonPlan", kind: "new", icon: "medal", unlock: "seasons" }],
+    headline: "Five new training seasons, and a number on the app icon",
+    changes: [
+      { id: "seasonPlan", kind: "new", icon: "medal", unlock: "seasons" },
+      { id: "iconBadge", kind: "new", icon: "bell" },
+    ],
   },
   {
     version: "0.2.0",

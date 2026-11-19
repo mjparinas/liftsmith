@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Un riquadro nelle Impostazioni rapide di Android; Centro di Controllo e Siri su iPhone.",
       "I tuoi giorni di allenamento nel calendario.",
       "Promemoria discreti nei giorni di allenamento.",
+      "Un numero sull'icona dell'app per messaggi, mi piace e richieste di follow in attesa.",
     ],
     dyk: "Registra serie e +30 s sulla schermata di blocco funzionano anche con l'app chiusa.",
   },

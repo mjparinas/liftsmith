@@ -10,10 +10,12 @@
 // it once the lifter has a coach or a client, asking for permission when they send their first message.
 import { PushNotifications, type Token } from "@capacitor/push-notifications";
 
+import { badgeOn } from "./badgeCount";
 import { currentLang, t } from "./i18n";
 import { installInfo } from "./installInfo";
 import { isNative } from "./juice";
 import { social } from "./social";
+import { useApp } from "./store";
 import { coachPushToken } from "./trainer";
 
 const TOKEN_KEY = "liftsmith.pushToken";
@@ -54,16 +56,34 @@ function listen() {
       (window as unknown as { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.() === "ios" ? "ios" : "android";
     // Friends takes it only after joining; coaching takes it from any signed-in account (trainer-mode.md), so a coach
     // or client who never joined Friends still gets messages and alerts.
-    const lang = currentLang();
-    void Promise.allSettled([social("pushToken", { token: tok.value, platform, lang }), coachPushToken(tok.value, platform, lang)]).then(
-      (r) => {
-        if (!r.some((x) => x.status === "fulfilled")) return;
-        try {
-          localStorage.setItem(TOKEN_KEY, tok.value);
-        } catch {}
-      },
-    );
+    void sendToken(tok.value, platform);
   });
+}
+
+/**
+ * Gives the account this phone's token, its language and whether pushes may set the number on the app icon
+ * (Settings › Reminders, iconBadge.ts).
+ */
+async function sendToken(token: string, platform: "ios" | "android") {
+  const lang = currentLang();
+  const badge = badgeOn(useApp.getState().profile);
+  const r = await Promise.allSettled([social("pushToken", { token, platform, lang, badge }), coachPushToken(token, platform, lang, badge)]);
+  if (!r.some((x) => x.status === "fulfilled")) return;
+  try {
+    localStorage.setItem(TOKEN_KEY, token);
+  } catch {}
+}
+
+/** After the app icon switch changes, tells the server again, so pushes stop (or start) setting the number. */
+export async function resendPushToken(): Promise<void> {
+  let token: string | null = null;
+  try {
+    token = localStorage.getItem(TOKEN_KEY);
+  } catch {}
+  if (!token || !isNative()) return;
+  const platform =
+    (window as unknown as { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.() === "ios" ? "ios" : "android";
+  await sendToken(token, platform);
 }
 
 /**

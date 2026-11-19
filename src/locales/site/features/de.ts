@@ -545,6 +545,11 @@ export const de: FeaturesText = {
       name: "Neuigkeiten in der App",
       body: "Die Einstellungen zeigen deine Version mit einer Taste Neuigkeiten: was neu, besser oder behoben ist, in einfachen Worten. Nach einem Update weist Heute einmal darauf hin, und es listet nur, was du schon nutzen kannst.",
     },
+    "icon-badge": {
+      name: "Eine Zahl auf dem App-Symbol",
+      body: "Das App-Symbol zeigt, wie viele Nachrichten, Likes, Kommentare und Follower-Anfragen warten. In der App zeigen rote Zahlen bei Freunde und deinem Coach, wo sie sind, und die Zahl verschwindet, sobald du sie gesehen hast. Ein Schalter unter Einstellungen › Erinnerungen schaltet sie aus.",
+      note: "Android und iPhone. Die Web-App zeigt sie, wenn sie aus Chrome, Edge oder Safari installiert ist.",
+    },
     languages: {
       name: "Zehn Sprachen",
       body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys oder Browsers, oder frei wählbar auf dem Startbildschirm und in den Einstellungen.",

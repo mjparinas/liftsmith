@@ -546,6 +546,7 @@ export const emails: Record<string, Words> = {
       "Android'de bir Hızlı Ayarlar kutucuğu; iPhone'da Denetim Merkezi ve Siri.",
       "Antrenman günlerin takviminde.",
       "Antrenman günlerinde nazik hatırlatıcılar.",
+      "Bekleyen mesaj, beğeni ve takip istekleri için uygulama simgesinde bir sayı.",
     ],
     dyk: "Kilit ekranındaki Seti kaydet ve +30 sn, uygulama kapalıyken de çalışır.",
   },

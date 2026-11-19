@@ -135,6 +135,7 @@ export async function POST(req: Request) {
         token?: unknown;
         platform?: unknown;
         lang?: unknown;
+        badge?: unknown;
         what?: unknown;
         shares?: unknown;
         kind?: unknown;
@@ -289,7 +290,7 @@ export async function POST(req: Request) {
       return reply(req, 200, { on: await setAlerts(s.accountId, body.on) });
     case "pushToken": {
       const str = (x: unknown) => (typeof x === "string" ? x : "");
-      return (await saveToken(s.accountId, str(body.token), str(body.platform), str(body.lang)))
+      return (await saveToken(s.accountId, str(body.token), str(body.platform), str(body.lang), Date.now(), body.badge !== false))
         ? reply(req, 200, { ok: true })
         : reply(req, 400, { error: "token" });
     }

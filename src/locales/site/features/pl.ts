@@ -607,6 +607,11 @@ export const pl: FeaturesText = {
       name: "Co nowego w aplikacji",
       body: "Ustawienia pokazują Twoją wersję z przyciskiem Co nowego: co jest nowe, lepsze i naprawione, prostymi słowami. Po aktualizacji ekran Dziś wspomina o tym raz i pokazuje tylko to, z czego już możesz korzystać.",
     },
+    "icon-badge": {
+      name: "Liczba na ikonie aplikacji",
+      body: "Ikona aplikacji pokazuje, ile wiadomości, polubień, komentarzy i próśb o obserwowanie czeka. W aplikacji czerwone liczby przy Znajomych i Twoim trenerze pokazują, gdzie są, a liczba znika, gdy je zobaczysz. Wyłącza ją przełącznik w Ustawienia › Przypomnienia.",
+      note: "Android i iPhone. Aplikacja internetowa pokazuje ją po instalacji z Chrome, Edge lub Safari.",
+    },
     languages: {
       name: "Dziesięć języków",
       body: "Angielski, hiszpański, francuski, niemiecki, włoski, japoński, portugalski (Brazylia), koreański, polski i turecki, zgodnie z językiem telefonu lub przeglądarki albo do wyboru na ekranie powitalnym i w ustawieniach.",

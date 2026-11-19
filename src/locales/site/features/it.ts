@@ -539,6 +539,11 @@ export const it: FeaturesText = {
       name: "Le novità nell'app",
       body: "Le Impostazioni mostrano la tua versione con un pulsante Novità: cosa c'è di nuovo, di migliore e di corretto, in parole semplici. Dopo un aggiornamento, Oggi lo segnala una volta, ed elenca solo ciò che puoi già usare.",
     },
+    "icon-badge": {
+      name: "Un numero sull'icona dell'app",
+      body: "L'icona dell'app mostra quanti messaggi, mi piace, commenti e richieste di follow ti aspettano. Nell'app, numeri rossi su Amici e sul tuo coach dicono dove sono, e il numero sparisce quando li hai visti. Un interruttore in Impostazioni › Promemoria lo spegne.",
+      note: "Android e iPhone. L'app web lo mostra se è installata da Chrome, Edge o Safari.",
+    },
     languages: {
       name: "Dieci lingue",
       body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono o del browser, oppure quella che scegli nella schermata di benvenuto e nelle impostazioni.",

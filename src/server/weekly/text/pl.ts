@@ -545,6 +545,7 @@ export const emails: Record<string, Words> = {
       "Kafelek Szybkich ustawień na Androidzie; Centrum sterowania i Siri na iPhonie.",
       "Twoje dni treningowe w kalendarzu.",
       "Delikatne przypomnienia w dni treningowe.",
+      "Liczba na ikonie aplikacji: czekające wiadomości, polubienia i prośby o obserwowanie.",
     ],
     dyk: "Zapisz serię i +30 s na ekranie blokady działają przy zamkniętej aplikacji.",
   },

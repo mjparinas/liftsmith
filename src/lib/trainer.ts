@@ -333,8 +333,8 @@ export const trainersOnly = (people: readonly Pick<Person, "role">[]) => people.
 export const setCoachAlerts = async (on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "alerts", on } })).on;
 /** This phone's push token for coaching pushes, which don't need Friends (push.ts calls it). */
-export const coachPushToken = async (tokenValue: string, platform: string, lang: string) =>
-  void (await api("/api/coach/", { token: token(), body: { action: "pushToken", token: tokenValue, platform, lang } }));
+export const coachPushToken = async (tokenValue: string, platform: string, lang: string, badge = true) =>
+  void (await api("/api/coach/", { token: token(), body: { action: "pushToken", token: tokenValue, platform, lang, badge } }));
 export const unlinkPerson = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unlink", id } }));
 
 /** A code as it's shown and read out: ABCD-EFGH. */

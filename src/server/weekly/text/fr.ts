@@ -548,6 +548,7 @@ export const emails: Record<string, Words> = {
       "Une vignette dans les réglages rapides d'Android ; le centre de contrôle et Siri sur iPhone.",
       "Vos jours d'entraînement dans votre agenda.",
       "Des rappels discrets les jours d'entraînement.",
+      "Un nombre sur l'icône de l'app pour les messages, j'aime et demandes d'abonnement en attente.",
     ],
     dyk: "Enregistrer la série et +30 s sur l'écran verrouillé fonctionnent même app fermée.",
   },
