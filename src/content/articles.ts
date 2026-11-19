@@ -21,6 +21,7 @@ import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
 import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
+import { BLOG_FORM_VIDEOS } from "./blog/formVideos";
 import { BLOG_G } from "./blog/g";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
 import { BLOG_GYM_OPEN_NOW } from "./blog/gymOpenNow";
@@ -282,6 +283,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
   ...BLOG_OUTSIDE_WORKOUTS,
+  ...BLOG_FORM_VIDEOS,
   ...BLOG_ROUTINE_LIBRARY,
 ];
 

@@ -769,6 +769,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-17",
       },
       {
+        id: "coach-form-videos",
+        name: "Form videos with notes pinned in the video",
+        body: "Clients film a set in the app and send it to you. Watch it slowed down, pin notes to the exact moments that matter, and they answer on the same notes. Only the two of you can see it, and clients under 18 can't send one.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Sending a video is free for clients. Android, iPhone and the web.",
+        added: "2026-11-19",
+      },
+      {
         id: "coach-roles",
         name: "For personal trainers and coaches",
         body: "Say whether you're a personal trainer working one-on-one or a coach running groups and teams. Clients see the right word for you, and the tools you use most come first.",

@@ -896,6 +896,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Zacznij od nowego szablonu Kontrola postępów w Trenowanie › Ankiety. Osoby poniżej 18 lat nigdy nie są proszone o zdjęcia.",
   },
+  "coach-form-videos": {
+    title: "Nagrania techniki z notatkami w nagraniu",
+    intro: "Klienci mogą teraz nagrać serię w aplikacji i wysłać ją tobie, a ty odpowiadasz bezpośrednio w nagraniu.",
+    points: [
+      "Dotykają Wyślij nagranie techniki w sekcji Coaching, wybierają ćwiczenie i piszą, co sprawdzić. Aplikacja daje pięć sekund na ustawienie się i nagrywa do minuty.",
+      "Dostajesz powiadomienie. Zwolnij nagranie do połowy lub ćwierci prędkości, zatrzymaj w ważnym miejscu i dodaj notatkę przypiętą do tej sekundy.",
+      "Klienci dotykają notatki, by przejść do tego momentu, i mogą odpowiedzieć własną notatką.",
+      "Nagrania widzicie tylko wy dwoje i są usuwane, gdy któreś z was zakończy współpracę.",
+    ],
+    dyk: "Klienci poniżej 18 lat nie mogą wysyłać nagrań techniki. Dla klientów wysyłanie jest bezpłatne.",
+  },
   seasons: {
     title: "Sezony treningowe startują w poniedziałek",
     intro: "Sezon 1, Żar, startuje w poniedziałek: dziesięć tygodni, ścieżka 20 poziomów i nagrody do zdobycia tylko tej zimy.",

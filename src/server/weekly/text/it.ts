@@ -899,6 +899,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Parti dal nuovo modello Check-in dei progressi in Coaching › Check-in. Ai minori di 18 anni non si chiedono mai foto.",
   },
+  "coach-form-videos": {
+    title: "Video della tecnica con note nel video",
+    intro: "Ora i clienti possono riprendere una serie nell'app e inviartela, e tu rispondi direttamente sul video.",
+    points: [
+      "Toccano Invia un video della tecnica in Coaching, scelgono l'esercizio e dicono cosa controllare. L'app dà loro cinque secondi per mettersi in posizione e registra fino a un minuto.",
+      "Ricevi una notifica. Rallenta il video a metà o a un quarto della velocità, metti in pausa dove conta e aggiungi una nota fissata a quel secondo.",
+      "Toccano una nota per andare a quel momento e possono rispondere con una nota loro.",
+      "I video restano privati tra voi due e vengono eliminati se uno dei due chiude il coaching.",
+    ],
+    dyk: "I clienti sotto i 18 anni non possono inviare video della tecnica. Per i clienti l'invio è gratis.",
+  },
   seasons: {
     title: "Le stagioni di allenamento iniziano lunedì",
     intro: "La stagione 1, Brace, inizia lunedì: dieci settimane, un percorso di 20 livelli e premi che si ottengono solo quest'inverno.",

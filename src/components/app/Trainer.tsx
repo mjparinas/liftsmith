@@ -57,6 +57,7 @@ import { ClientPayments } from "./CoachPay";
 import { ClientPain, PerWeekPicker, PlanPhase, protocolRoutine, RehabPrograms } from "./CoachRehab";
 import { ClientSessions, SessionToday } from "./CoachSessions";
 import { ClientTargets } from "./CoachTargets";
+import { CoachVideos, VideoScreen } from "./FormVideos";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { partLabel } from "./Stretch";
@@ -66,6 +67,8 @@ const CLIENT = "c.";
 const CHAT = "m.";
 const TEAM = "team.";
 const CHECKIN = "f.";
+// A form video (FormVideos.tsx), for the coach or the client.
+const VIDEO = "v.";
 
 export function Trainer({ arg }: { arg?: string }) {
   const account = useAccount((s) => s.account);
@@ -76,6 +79,7 @@ export function Trainer({ arg }: { arg?: string }) {
   // A school team's link (#/trainer/team.<code>, SchoolTeams.tsx) fills in the team code instead.
   if (arg?.startsWith(TEAM)) return <CoachHome team={teamCodeFrom(arg.slice(TEAM.length))} />;
   if (arg?.startsWith(CHECKIN)) return <CheckinScreen id={arg.slice(CHECKIN.length)} />;
+  if (arg?.startsWith(VIDEO)) return <VideoScreen id={arg.slice(VIDEO.length)} />;
   if (arg === "forms") return <FormsScreen />;
   // Back from paying a coach on Stripe's page.
   if (arg === "paid") return <CoachHome tab="mine" paid />;
@@ -594,6 +598,7 @@ function ClientScreen({ id }: { id: string }) {
         teen={teen}
         onChange={() => setVersion((n) => n + 1)}
       />
+      <CoachVideos clientId={id} name={report.name} teen={teen} />
       <ClientTargets
         key={targets?.at ?? 0}
         clientId={id}

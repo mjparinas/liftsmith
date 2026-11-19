@@ -106,6 +106,8 @@ export interface Overview {
   /** How this account coaches, and how each of its coaches does, by id. */
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets?: Targets[];
+  /** Form videos and notes on them waiting for this account (formVideos.ts), counted with unread messages. */
+  videos?: number;
   /** This coach's check-in forms, and the check-ins waiting for this lifter to answer. */
   forms?: Form[];
   checkins?: Checkin[];
@@ -998,6 +1000,8 @@ interface NotesState {
   unread: Unread[];
   /** Check-ins waiting for this lifter to answer, for Today. */
   checkins: (Checkin & { coach: string })[];
+  /** Form videos and notes on them waiting for this account (formVideo.ts): counted with unread messages. */
+  videos: number;
   /** Sessions this lifter booked with a coach, for Today. */
   sessions: (Slot & { coach: string })[];
   /** The newest daily nutrition targets from a coach, with the coach's name, for coach's notes and Health. */
@@ -1047,6 +1051,7 @@ export const useCoachNotes = create<NotesState>(() => ({
   notes: typeof window === "undefined" ? [] : readJson<ShownNote[]>(CACHE, []),
   unread: [],
   checkins: [],
+  videos: 0,
   sessions: [],
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
@@ -1074,7 +1079,7 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
   o: Pick<Overview, "notes" | "coaches"> &
-    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans">>,
+    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans" | "videos">>,
 ): void {
   const notes = shownNotes(o);
   const coaching = usesCoaching(o);
@@ -1099,7 +1104,7 @@ export function keepNotes(
     return { ...p, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
   });
   writeJson(PLANS, plans);
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans });
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans, videos: o.videos ?? 0 });
 }
 
 /** "Not now" on Today's card for a program from a coach: it stays in Coaching, and Today stops asking. */
@@ -1107,6 +1112,14 @@ export function dismissPlan(id: string): void {
   const plansSeen = [...useCoachNotes.getState().plansSeen.filter((x) => x !== id), id].slice(-50);
   writeJson(PLANS_SEEN, plansSeen);
   useCoachNotes.setState({ plansSeen });
+}
+
+/** Everything waiting in coaching: unread messages, plus form videos and their notes. */
+export const coachWaiting = (s: Pick<NotesState, "unread" | "videos">) => s.unread.reduce((n, u) => n + u.count, 0) + (s.videos || 0);
+
+/** A form video or its notes were opened here: that many fewer wait, until the next load says otherwise. */
+export function videosSeen(n: number): void {
+  if (n > 0) useCoachNotes.setState((s) => ({ videos: Math.max(0, s.videos - n) }));
 }
 
 /** A check-in was answered: it no longer waits on Today. */

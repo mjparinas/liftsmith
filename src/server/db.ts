@@ -1186,6 +1186,32 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS coach_checkin_photos_pair ON coach_checkin_photos (coach_id, client_id)`,
   `CREATE INDEX IF NOT EXISTS coach_checkin_photos_client ON coach_checkin_photos (client_id)`,
+  // Form video check-ins (formVideos.ts, 2026-11-19): the row and its pinned notes; the video itself is in Vercel Blob.
+  `CREATE TABLE IF NOT EXISTS coach_videos (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    path TEXT NOT NULL,
+    lift TEXT NOT NULL DEFAULT '',
+    question TEXT NOT NULL DEFAULT '',
+    bytes INTEGER NOT NULL DEFAULT 0,
+    secs REAL NOT NULL DEFAULT 0,
+    ready INTEGER NOT NULL DEFAULT 0,
+    at INTEGER NOT NULL,
+    coach_seen INTEGER NOT NULL DEFAULT 0,
+    client_seen INTEGER NOT NULL DEFAULT 0
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_videos_pair ON coach_videos (coach_id, client_id, ready, at)",
+  "CREATE INDEX IF NOT EXISTS coach_videos_client ON coach_videos (client_id, ready, at)",
+  `CREATE TABLE IF NOT EXISTS coach_video_notes (
+    id TEXT PRIMARY KEY,
+    video_id TEXT NOT NULL,
+    author_id TEXT NOT NULL,
+    ms INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_video_notes_video ON coach_video_notes (video_id, ms)",
   // Booking (coachBooking.ts): a coach's open or booked session times, UTC ms.
   `CREATE TABLE IF NOT EXISTS coach_slots (
     id TEXT PRIMARY KEY,

@@ -900,6 +900,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Comece pelo novo modelo Check-in de progresso em Coaching › Check-ins. Menores de 18 anos nunca recebem pedido de foto.",
   },
+  "coach-form-videos": {
+    title: "Vídeos de execução com notas no vídeo",
+    intro: "Agora seus clientes podem gravar uma série no app e enviar para você, e você responde direto no vídeo.",
+    points: [
+      "Eles tocam em Enviar um vídeo de execução no Coaching, escolhem o exercício e dizem o que verificar. O app dá cinco segundos para se posicionar e grava até um minuto.",
+      "Você recebe uma notificação. Deixe o vídeo na metade ou em um quarto da velocidade, pause onde importa e adicione uma nota fixada naquele segundo.",
+      "Eles tocam numa nota para ir àquele momento e podem responder com uma nota deles.",
+      "Os vídeos ficam privados entre vocês dois e são apagados se qualquer um encerrar o coaching.",
+    ],
+    dyk: "Clientes menores de 18 anos não podem enviar vídeos de execução. Enviar é grátis para clientes.",
+  },
   seasons: {
     title: "As temporadas de treino começam na segunda",
     intro: "A temporada 1, Brasa, começa na segunda: dez semanas, uma trilha de 20 níveis e recompensas que só se ganham neste inverno.",
