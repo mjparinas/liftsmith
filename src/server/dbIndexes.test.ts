@@ -29,6 +29,48 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "form videos: a lifter's videos as coach or client (formVideos.ts videosOf)",
+    sql: "SELECT * FROM coach_videos WHERE (coach_id = ? OR client_id = ?) AND ready = 1 ORDER BY at DESC LIMIT 300",
+    uses: ["coach_videos_pair", "coach_videos_client"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: the notes on a page of videos (formVideos.ts notesOf)",
+    sql: "SELECT * FROM coach_video_notes WHERE video_id IN (?, ?, ?) ORDER BY video_id, ms, at",
+    uses: ["coach_video_notes_video"],
+    noScan: ["coach_video_notes"],
+  },
+  {
+    name: "form videos: the pair's oldest past the keep (formVideos.ts finishVideo)",
+    sql: "SELECT * FROM coach_videos WHERE coach_id = ? AND client_id = ? AND ready = 1 ORDER BY at DESC LIMIT -1 OFFSET ?",
+    uses: ["coach_videos_pair"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: a client's unfinished uploads (formVideos.ts dropStale)",
+    sql: "SELECT * FROM coach_videos WHERE client_id = ? AND ready = 0 AND at < ?",
+    uses: ["coach_videos_client"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: everything between a coach and client (formVideos.ts dropPairVideos)",
+    sql: "SELECT * FROM coach_videos WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)",
+    uses: ["coach_videos_pair"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: an account's videos when it's deleted (formVideos.ts dropVideosOf)",
+    sql: "SELECT * FROM coach_videos WHERE coach_id = ? OR client_id = ?",
+    uses: ["coach_videos_pair", "coach_videos_client"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: notes on one video (formVideos.ts addNote)",
+    sql: "SELECT COUNT(*) AS n FROM coach_video_notes WHERE video_id = ?",
+    uses: ["coach_video_notes_video"],
+    noScan: ["coach_video_notes"],
+  },
+  {
     name: "community: the board's top posts (community.ts board)",
     sql: "SELECT p.id FROM community_posts p WHERE p.hidden = 0 AND p.status != 'merged' ORDER BY p.votes DESC LIMIT 300",
     uses: ["community_posts_board"],
@@ -213,6 +255,19 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     // A scan of this partial index reads only the icons not measured yet, never the table, and it ends up empty.
     uses: ["gym_photos_unmeasured"],
     noScan: [],
+  },
+  {
+    name: "gym pictures: ones still to move to Blob (gymBlob.ts movePictures)",
+    sql: "SELECT id, image FROM gym_photos WHERE url = '' AND (kind <> 'icon' OR px > 0) LIMIT ?",
+    // Like the one above: the partial index holds only pictures not moved yet, and it ends up empty.
+    uses: ["gym_photos_unmoved"],
+    noScan: [],
+  },
+  {
+    name: "gym pictures: a gym's files before its rows go (gymBlob.ts pictureUrls)",
+    sql: "SELECT url FROM gym_photos WHERE place_id = ? AND kind = ? AND url <> ''",
+    uses: ["gym_photos_place"],
+    noScan: ["gym_photos"],
   },
   {
     name: "gym import: gyms due an AI read (gymAutoFill.ts autoFillBatch)",

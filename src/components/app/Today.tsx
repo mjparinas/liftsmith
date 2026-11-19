@@ -27,7 +27,7 @@ import { hasOtherParts } from "@/lib/sessionSplit";
 import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { toast } from "@/lib/toast";
-import { useCoachNotes } from "@/lib/trainer";
+import { coachWaiting, useCoachNotes } from "@/lib/trainer";
 import { effortLabel } from "@/lib/training";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
@@ -55,7 +55,7 @@ import { CoolDownCard, SplitBar, StretchLibraryCard, TodayParts } from "./Stretc
 import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
-import { Button, Chip, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section } from "./ui";
+import { Button, Chip, CountDot, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -939,13 +939,20 @@ function FitAroundCalendar() {
   );
 }
 
-/** The coaching badge under the greeting, as the way to the lifter's coach (or to a coach's clients). */
+/**
+ * The coaching badge under the greeting, as the way to the lifter's coach (or to a coach's clients). Unread messages
+ * put a red count on it (Melvin, 2026-11-19: "make it clear where the notifications are coming from"), the same
+ * number that's part of the app icon's badge (iconBadge.ts).
+ */
 function TodayCoachBadge() {
   const shown = useCoachNotes((s) => s.who.coaches.length > 0 || s.who.clients > 0);
+  const unread = useCoachNotes(coachWaiting);
   if (!shown) return null;
   return (
-    <button type="button" onClick={() => go("trainer")} className="press flex min-h-8 max-w-full items-center">
+    <button type="button" onClick={() => go("trainer")} className="press flex min-h-8 max-w-full items-center gap-1.5">
       <CoachBadge />
+      <CountDot n={unread} />
+      {unread > 0 && <span className="sr-only">{t("trn.unread", { count: unread })}</span>}
     </button>
   );
 }

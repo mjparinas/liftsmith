@@ -205,6 +205,13 @@ export const SETTINGS: Setting[] = [
     what: "The database's auth token, paired with the address above.",
   },
   {
+    names: ["VIDEO_BLOB_READ_WRITE_TOKEN"],
+    label: "Vercel Blob (form videos)",
+    group: "Core",
+    need: "optional",
+    what: "The private Blob store for coaching form videos (formVideos.ts), apart from the public one for gym pictures: set by connecting a private store to the project with the prefix VIDEO_BLOB. Without it clients can't send form videos and the section doesn't show.",
+  },
+  {
     names: ["NEXT_PUBLIC_SITE_URL"],
     label: "Site address",
     group: "Core",
@@ -459,6 +466,13 @@ export const SETTINGS: Setting[] = [
     group: "Gyms",
     need: "optional",
     what: "Maps of gyms: the picture on gym and city pages, and the map you can drag and zoom in Find gyms near you. Without it they show no map.",
+  },
+  {
+    names: ["BLOB_READ_WRITE_TOKEN"],
+    label: "Vercel Blob",
+    group: "Gyms",
+    need: "optional",
+    what: "Where gym logos, photos and website icons are kept (set by connecting a Blob store to the project). Without it they stay in the database; once set, the gym import worker moves the old ones over.",
   },
   // Search and monitoring
   {

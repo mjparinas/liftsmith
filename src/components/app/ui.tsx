@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 import { Info } from "@/components/Info";
 import { SCREEN_TITLE, SECTION_LABEL, SHEET_TITLE } from "@/components/titles";
 import { useBack } from "@/lib/back";
+import { countText } from "@/lib/badgeCount";
 import type { Term } from "@/lib/glossary";
 import { due, HAPTIC_GAP, HOLD_DELAY, MOVE_SLOP, repeatGap, repeatSize, SOUND_GAP } from "@/lib/holdRepeat";
 import { parseNum, t } from "@/lib/i18n";
@@ -830,6 +831,24 @@ export function LinkToggle({
  * stretches while pressed; turning it gives a medium haptic and a soft two-note sound. Preferred over
  * On/Off chips: one tap, one thumb, no reading.
  */
+/**
+ * A red count over a tab, a link or a badge, saying something waits there (the same numbers that make up the app
+ * icon's badge, iconBadge.ts). Hidden from screen readers: the control it sits on says the count in its label.
+ */
+export function CountDot({ n, className = "" }: { n: number; className?: string }) {
+  if (n <= 0) return null;
+  return (
+    // The number is drawn by CSS (`.count-dot::after`), not as text, so it never joins the visible text of the tab or
+    // link it sits on: their accessible names start with their own words (WCAG 2.5.3, axe label-content-name-mismatch).
+    <span
+      aria-hidden
+      data-count={n}
+      data-label={countText(n)}
+      className={`count-dot num grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full border-2 border-bg bg-bad px-1 text-[0.625rem] font-extrabold leading-none text-bad-ink ${className}`}
+    />
+  );
+}
+
 export function Switch({
   on,
   onChange,

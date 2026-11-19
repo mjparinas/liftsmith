@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Um bloco nas Configurações rápidas do Android; Central de Controle e Siri no iPhone.",
       "Seus dias de treino na sua agenda.",
       "Lembretes gentis nos dias de treino.",
+      "Um número no ícone do app com as mensagens, curtidas e pedidos para seguir esperando.",
     ],
     dyk: "Registrar série e +30 s na tela de bloqueio funcionam com o app fechado.",
   },
@@ -899,6 +900,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Comece pelo novo modelo Check-in de progresso em Coaching › Check-ins. Menores de 18 anos nunca recebem pedido de foto.",
   },
+  "coach-form-videos": {
+    title: "Vídeos de execução com notas no vídeo",
+    intro: "Agora seus clientes podem gravar uma série no app e enviar para você, e você responde direto no vídeo.",
+    points: [
+      "Eles tocam em Enviar um vídeo de execução no Coaching, escolhem o exercício e dizem o que verificar. O app dá cinco segundos para se posicionar e grava até um minuto.",
+      "Você recebe uma notificação. Deixe o vídeo na metade ou em um quarto da velocidade, pause onde importa e adicione uma nota fixada naquele segundo.",
+      "Eles tocam numa nota para ir àquele momento e podem responder com uma nota deles.",
+      "Os vídeos ficam privados entre vocês dois e são apagados se qualquer um encerrar o coaching.",
+    ],
+    dyk: "Clientes menores de 18 anos não podem enviar vídeos de execução. Enviar é grátis para clientes.",
+  },
   seasons: {
     title: "As temporadas de treino começam na segunda",
     intro: "A temporada 1, Brasa, começa na segunda: dez semanas, uma trilha de 20 níveis e recompensas que só se ganham neste inverno.",
@@ -907,6 +919,7 @@ export const emails: Record<string, Words> = {
       "Os níveis dão medalhas, um avatar, uma cor de destaque e o tema Brasa com ícone, só desta temporada e seus para sempre.",
       "Perdeu uma semana? A próxima em que bater a meta dá o bônus em dobro. A última semana vale em dobro.",
       "Cada novo recorde tem 1 chance em 6 de liberar as anilhas raras da temporada.",
+      "Depois da Brasa vêm Tempestade, Florada, Solstício, Bordo e Obsidiana, uma após a outra em 2027, cada uma com visual e desafios próprios.",
     ],
     dyk: "Prefere não ver as temporadas? Desligue Temporadas de treino em Ajustes › Aparência. Seu treino continua contando.",
   },
@@ -944,5 +957,17 @@ export const emails: Record<string, Words> = {
       "É calculado pela sua própria hora, para academias perto de você.",
     ],
     dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
+  },
+  "outside-workouts": {
+    title: "Suas corridas e partidas agora contam na recuperação",
+    intro:
+      "Ligue Contar treinos de outros apps e os treinos do app de saúde do seu celular ajustam o mapa de recuperação e o plano de amanhã.",
+    points: [
+      "Corridas, pedais, esportes e aulas chegam sempre que você abre o app.",
+      "Cada um cansa os músculos que usa, mais quanto mais tempo durou.",
+      "O plano de amanhã poupa as pernas cansadas depois de uma corrida ou partida longa.",
+      "Eles nunca contam como treinos do Liftsmith, e nada conta duas vezes.",
+    ],
+    dyk: "Fica em Ajustes › Apps conectados, e a lista abaixo do mapa de recuperação em Corpo mostra o que está sendo contado.",
   },
 };

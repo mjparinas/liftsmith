@@ -24,10 +24,18 @@
   --color-violet: #a78bfa;
   --color-cyan: #38d6e8;
   --color-ember: #ff8a3d;
+  /* Training seasons' kit hues (seasons.ts KITS), tints for their cards, medals and bars. */
+  --color-tempest: #8f95ff;
+  --color-bloom: #ff8ae6;
+  --color-solstice: #ffe066;
+  --color-maple: #ff6b6b;
+  --color-obsidian: #b08cff;
   --color-mint: #34d399;
   --color-good: #34d399;
   --color-warn: #f5b544;
   --color-bad: #f0605d;
+  /* Text on a red count (CountDot): dark on the dark theme's coral, white on the light theme's deep red. */
+  --color-bad-ink: #080b10;
   /* The live heart rate badge: always red, even with colour-blind safe colours, because it's an
      identity colour (the heart icon and the number carry the meaning), not a status. */
   --color-heart: #f0605d;
@@ -262,6 +270,11 @@
   --color-violet: #5f3fc4;
   --color-cyan: #0b6f80;
   --color-ember: #b24a00;
+  --color-tempest: #3d43c4;
+  --color-bloom: #a3237f;
+  --color-solstice: #7d6400;
+  --color-maple: #b3262b;
+  --color-obsidian: #5b2fb0;
   --color-mint: #0a7350;
   --color-accent-2: #4a3fc9;
   --grad-a: #1d4fc4;
@@ -285,6 +298,7 @@
   --color-faint: #5c6876;
   --color-accent: #1d4fc4;
   --color-accent-ink: #ffffff;
+  --color-bad-ink: #ffffff;
   --good-std: #0a7350;
   --warn-std: #8a5100;
   --bad-std: #a82222;
@@ -333,6 +347,11 @@
     --color-violet: #5f3fc4;
     --color-cyan: #0b6f80;
     --color-ember: #b24a00;
+    --color-tempest: #3d43c4;
+    --color-bloom: #a3237f;
+    --color-solstice: #7d6400;
+    --color-maple: #b3262b;
+    --color-obsidian: #5b2fb0;
     --color-mint: #0a7350;
     --color-accent-2: #4a3fc9;
     --grad-a: #1d4fc4;
@@ -356,6 +375,7 @@
     --color-faint: #5c6876;
     --color-accent: #1d4fc4;
     --color-accent-ink: #ffffff;
+    --color-bad-ink: #ffffff;
     --good-std: #0a7350;
     --warn-std: #8a5100;
     --bad-std: #a82222;
@@ -702,3 +722,8 @@ input[type="range"].slider::-moz-range-thumb { width: 18px; height: 18px; border
 }
 .gyms-map.leaflet-container .leaflet-bar a:hover, .gyms-map.leaflet-container .leaflet-bar a:focus-visible { background: var(--color-raised, var(--color-surface)); }
 .gyms-map.leaflet-container .leaflet-control-attribution { background: color-mix(in srgb, var(--color-bg) 75%, transparent); color: var(--color-ink); font-size: 0.6875rem; }
+
+/* A red count (CountDot in ui.tsx): the number comes from data-label, so it isn't part of the control's text. */
+.count-dot::after {
+  content: attr(data-label);
+}

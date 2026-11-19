@@ -474,6 +474,11 @@ export const tr: FeaturesText = {
       name: "Ağırlık, fotoğraf ve gidişatla ilerleme kontrolleri",
       body: "Herhangi bir forma vücut ağırlığı ve fotoğraf soruları ekle, her hafta, 2 haftada veya 4 haftada bir gönder. Ağırlık danışanın son tartımından gelir, fotoğrafları yalnızca sen görürsün ve her cevabın gidişatı raporda görünür. 18 yaşından küçüklerden asla fotoğraf istenmez.",
     },
+    "coach-form-videos": {
+      name: "Videoda notlu form videoları",
+      body: "Danışanların uygulamada bir set çekip sana gönderir. Yavaşlatarak izle, tam önemli anlara not iliştir; onlar da aynı notlara yanıt verir. Yalnızca ikiniz görürsünüz; 18 yaşından küçükler gönderemez.",
+      note: "Video göndermek danışanlar için ücretsiz. Android, iPhone ve web.",
+    },
     "coach-roles": {
       name: "Kişisel antrenörler ve koçlar için",
       body: "Birebir çalışan bir kişisel antrenör mü, grupları ve takımları yöneten bir koç mu olduğunu söyle. Danışanlar sana uygun unvanı görür, en çok kullandığın araçlar da öne gelir.",
@@ -531,7 +536,7 @@ export const tr: FeaturesText = {
     },
     seasons: {
       name: "Antrenman sezonları",
-      body: "Kendi haftalık hedefine doğru antrenman yaparak tırmandığın 20 kademelik yolu olan on haftalık sezonlar: haftada iki gün de beş gün kadar hızlı ilerler, fazladan günler puan getirmez. Kademeler sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir; sezon bitince de senin kalır. Sezon meydan okumaları, yeni rekorlardan nadir ganimet, prestij yıldızları, kaçırılan haftadan sonra telafi haftası, çift puanlı final ve paylaşılabilir özet kartı.",
+      body: "Kendi haftalık hedefine doğru antrenman yaparak tırmandığın 20 kademelik yolu olan on haftalık sezonlar: haftada iki gün de beş gün kadar hızlı ilerler, fazladan günler puan getirmez. Kademeler sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir; sezon bitince de senin kalır. Sezon meydan okumaları, yeni rekorlardan nadir ganimet, prestij yıldızları, kaçırılan haftadan sonra telafi haftası, çift puanlı final ve paylaşılabilir özet kartı. 2027 sonuna kadar arka arkaya altı sezon planlandı (Kor, Fırtına, Çiçek, Gündönümü, Akçaağaç ve Obsidyen); her birinin kendi görünümü ve üç meydan okuması var.",
       proPart: "Tüm kademeler ve ödülleri ücretsiz; Pro üç kademeye bonus ödül ekler.",
       note: "Sezon uygulama simgeleri Android ve iPhone'da; web'de tema var. Sezonlar Ayarlar'dan kapatılabilir.",
     },
@@ -575,6 +580,10 @@ export const tr: FeaturesText = {
       name: "Antrenmanlar sağlık uygulamana kaydedilir",
       body: "Biten her antrenman Health Connect'e ya da Apple Sağlık'a kalori ve nabızla birlikte kuvvet antrenmanı olarak kaydedilir.",
     },
+    "outside-workouts": {
+      name: "Diğer uygulamalardaki antrenmanlar sayılır",
+      body: "Açarsan, diğer uygulamaların sağlık uygulamana kaydettiği koşu, bisiklet, spor ve dersler toparlanma haritanda ve yarının planında sayılır. Dün uzun bir maç oynadıysan bacaklar toparlanıyor görünür ve plan buna göre ayarlanır.",
+    },
     offline: {
       name: "Çevrimdışı çalışır",
       body: "Her şey cihazında çalışır ve arka planda eşitlenir; bodrumdaki salonda çekmese de sorun yok.",
@@ -606,6 +615,11 @@ export const tr: FeaturesText = {
     whatsNew: {
       name: "Uygulamadaki yenilikler",
       body: "Ayarlar sürümünü bir Yenilikler düğmesiyle gösterir: yeni, daha iyi ve düzeltilmiş olanlar, sade bir dille. Bir güncellemeden sonra Bugün bunu bir kez söyler ve yalnızca zaten kullanabildiklerini listeler.",
+    },
+    "icon-badge": {
+      name: "Uygulama simgesinde bir sayı",
+      body: "Uygulama simgesi kaç mesaj, beğeni, yorum ve takip isteğinin beklediğini gösterir. Uygulamada Arkadaşlar'daki ve koçundaki kırmızı sayılar nerede olduklarını söyler, gördüğünde sayı kaybolur. Ayarlar › Hatırlatıcılar'daki bir anahtar kapatır.",
+      note: "Android ve iPhone. Web uygulaması Chrome, Edge veya Safari'den yüklendiğinde gösterir.",
     },
     languages: {
       name: "On dil",
@@ -720,11 +734,11 @@ export const tr: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar ve beslenme gelir; biten antrenmanlar gider",
+      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar ve beslenme gelir; biten antrenmanlar gider; açarsan diğer uygulamaların antrenmanları da gelir",
     },
     "apple-health": {
       name: "Apple Sağlık",
-      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar, beslenme, boy, yaş ve cinsiyet gelir; biten antrenmanlar gider",
+      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar, beslenme, boy, yaş ve cinsiyet gelir; biten antrenmanlar gider; açarsan diğer uygulamaların antrenmanları da gelir",
     },
     "samsung-health": {
       name: "Samsung Health",

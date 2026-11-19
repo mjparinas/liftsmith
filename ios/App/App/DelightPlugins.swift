@@ -2,6 +2,7 @@ import AVFoundation
 import StoreKit
 import Capacitor
 import UIKit
+import UserNotifications
 
 /// The voice coach (src/lib/voice.ts), iOS side (Android: VoiceCoachPlugin.java). Spoken cues through
 /// AVSpeechSynthesizer; other audio (music, podcasts) is ducked while it talks and restored after.
@@ -77,7 +78,10 @@ public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "get", returnType: CAPPluginReturnPromise),
     ]
 
-    static let icons = ["default", "forge", "glacier", "aurora", "royal", "ember", "embergold"]
+    static let icons = [
+        "default", "forge", "glacier", "aurora", "royal", "ember", "embergold",
+        "tempest", "tempestsilver", "bloom", "bloommeadow", "solstice", "solsticedusk", "maple", "maplecopper", "obsidian", "obsidianice",
+    ]
 
     @objc func set(_ call: CAPPluginCall) {
         let name = call.getString("name") ?? "default"
@@ -234,6 +238,32 @@ public class ScreenAwakePlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async {
             UIApplication.shared.isIdleTimerDisabled = on
             call.resolve()
+        }
+    }
+}
+
+/// The number on the app icon (src/lib/iconBadge.ts): what's waiting in Friends and coaching. While the app is
+/// closed each push sets it (APNs' `badge`, src/server/push.ts); while it's open the app keeps it equal to what it
+/// shows, so reading everything clears it. Needs the notification permission the app already asks for (Capacitor's
+/// push plugin asks for alerts, sounds and badges together). Android counterpart: AppBadgePlugin.java (launchers draw
+/// the badge from notifications, so it clears seen pushes instead).
+@objc(AppBadgePlugin)
+public class AppBadgePlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "AppBadgePlugin"
+    public let jsName = "AppBadge"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "set", returnType: CAPPluginReturnPromise),
+    ]
+
+    @objc func set(_ call: CAPPluginCall) {
+        let count = max(0, call.getInt("count") ?? 0)
+        DispatchQueue.main.async {
+            if #available(iOS 16.0, *) {
+                UNUserNotificationCenter.current().setBadgeCount(count) { _ in call.resolve() }
+            } else {
+                UIApplication.shared.applicationIconBadgeNumber = count
+                call.resolve()
+            }
         }
     }
 }

@@ -408,6 +408,11 @@ export const es: FeaturesText = {
       name: "Revisiones de progreso con peso, fotos y tendencias",
       body: "Añade preguntas de peso corporal y de foto a cualquier formulario y envíalo cada semana, cada 2 semanas o cada 4. El peso se rellena con el último pesaje del cliente, las fotos solo las ves tú y la tendencia de cada respuesta aparece en su informe. A los menores de 18 nunca se les piden fotos.",
     },
+    "coach-form-videos": {
+      name: "Vídeos de técnica con notas en el vídeo",
+      body: "Tus clientes graban una serie en la app y te la envían. Mírala a cámara lenta, fija notas en los momentos exactos y responden en las mismas notas. Solo lo ven ustedes dos; los menores de 18 no pueden enviar vídeos.",
+      note: "Enviar un vídeo es gratis para los clientes. Android, iPhone y web.",
+    },
     "coach-roles": {
       name: "Para entrenadores personales y coaches",
       body: "Indica si eres entrenador personal uno a uno o coach de grupos y equipos. Tus clientes ven la palabra correcta y lo que más usas va primero.",
@@ -465,7 +470,7 @@ export const es: FeaturesText = {
     },
     seasons: {
       name: "Temporadas de entrenamiento",
-      body: "Temporadas de diez semanas con un recorrido de 20 niveles que subes entrenando hacia tu propio objetivo semanal: dos días a la semana avanzan igual que cinco y los días de más no suman. Los niveles dan insignias, un avatar, un color de acento y un tema con su icono exclusivos de la temporada, tuyos para siempre. Retos de temporada, un botín raro por nuevas marcas, estrellas de prestigio, una semana de recuperación tras un fallo, un final con puntos dobles y un resumen para compartir.",
+      body: "Temporadas de diez semanas con un recorrido de 20 niveles que subes entrenando hacia tu propio objetivo semanal: dos días a la semana avanzan igual que cinco y los días de más no suman. Los niveles dan insignias, un avatar, un color de acento y un tema con su icono exclusivos de la temporada, tuyos para siempre. Retos de temporada, un botín raro por nuevas marcas, estrellas de prestigio, una semana de recuperación tras un fallo, un final con puntos dobles y un resumen para compartir. Hay seis temporadas planeadas una tras otra hasta finales de 2027 (Brasa, Tempestad, Floración, Solsticio, Arce y Obsidiana), cada una con su estilo y sus tres retos propios.",
       proPart: "Todos los niveles y sus premios son gratis; Pro añade un premio extra en tres niveles.",
       note: "Los iconos de temporada están en Android y iPhone; la web recibe el tema. Las temporadas se pueden desactivar en Ajustes.",
     },
@@ -509,6 +514,10 @@ export const es: FeaturesText = {
       name: "Entrenamientos guardados en tu app de salud",
       body: "Cada entrenamiento terminado se guarda en Health Connect o Apple Salud como entrenamiento de fuerza, con calorías y pulso.",
     },
+    "outside-workouts": {
+      name: "Cuentan los entrenamientos de otras apps",
+      body: "Si lo activas, las carreras, salidas en bici, deportes y clases que otras apps guardan en tu app de salud cuentan en tu mapa de recuperación y en el plan de mañana. Un partido largo ayer deja las piernas en recuperación y el plan lo tiene en cuenta.",
+    },
     offline: {
       name: "Funciona sin conexión",
       body: "Todo funciona en tu dispositivo y se sincroniza en segundo plano, así que no pasa nada si no hay señal en el gimnasio del sótano.",
@@ -540,6 +549,11 @@ export const es: FeaturesText = {
     whatsNew: {
       name: "Novedades en la app",
       body: "Ajustes muestra tu versión con un botón Novedades: lo nuevo, lo mejorado y lo arreglado, en palabras sencillas. Tras una actualización, Hoy lo menciona una vez, y solo lista lo que ya puedes usar.",
+    },
+    "icon-badge": {
+      name: "Un número en el icono de la app",
+      body: "El icono de la app muestra cuántos mensajes, me gusta, comentarios y solicitudes de seguimiento te esperan. Dentro de la app, números rojos en Amigos y en tu entrenador dicen dónde están, y el número se va cuando los ves. Un interruptor en Ajustes › Recordatorios lo apaga.",
+      note: "Android y iPhone. La app web lo muestra si la instalas desde Chrome, Edge o Safari.",
     },
     languages: {
       name: "Diez idiomas",
@@ -658,11 +672,11 @@ export const es: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos y comida; salen los entrenamientos terminados",
+      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos y comida; salen los entrenamientos terminados; y, si lo activas, entrenamientos de otras apps",
     },
     "apple-health": {
       name: "Apple Salud",
-      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos, comida, altura, edad y sexo; salen los entrenamientos terminados",
+      does: "Entran peso, grasa corporal, sueño, VFC, pulso, pasos, comida, altura, edad y sexo; salen los entrenamientos terminados; y, si lo activas, entrenamientos de otras apps",
     },
     "samsung-health": { does: "Sus datos, cuando los compartes con Health Connect" },
     "health-devices": {

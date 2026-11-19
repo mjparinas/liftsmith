@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Eine Kachel in den Schnelleinstellungen auf Android; Kontrollzentrum und Siri auf dem iPhone.",
       "Deine Trainingstage in deinem Kalender.",
       "Sanfte Erinnerungen an Trainingstagen.",
+      "Eine Zahl auf dem App-Symbol für wartende Nachrichten, Likes und Follower-Anfragen.",
     ],
     dyk: "„Satz eintragen“ und +30 s auf dem Sperrbildschirm funktionieren auch bei geschlossener App.",
   },
@@ -898,6 +899,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Starte mit der neuen Vorlage Fortschritts-Check-in unter Coaching › Check-ins. Unter 18-Jährige werden nie nach Fotos gefragt.",
   },
+  "coach-form-videos": {
+    title: "Technikvideos mit Notizen im Video",
+    intro: "Kunden können jetzt einen Satz in der App filmen und dir schicken, und du antwortest direkt im Video.",
+    points: [
+      "Sie tippen in Coaching auf Technikvideo senden, wählen die Übung und sagen, worauf du achten sollst. Die App gibt ihnen fünf Sekunden, um sich aufzustellen, und nimmt bis zu einer Minute auf.",
+      "Du bekommst eine Benachrichtigung. Spiel das Video mit halbem oder Viertel-Tempo ab, halte an der wichtigen Stelle an und hefte eine Notiz an genau diese Sekunde.",
+      "Sie tippen auf eine Notiz, um zu dieser Stelle zu springen, und können mit einer eigenen Notiz antworten.",
+      "Die Videos sehen nur ihr beide, und sie werden gelöscht, wenn einer von euch das Coaching beendet.",
+    ],
+    dyk: "Klienten unter 18 können keine Technikvideos senden. Für Klienten ist das Senden kostenlos.",
+  },
   seasons: {
     title: "Am Montag starten die Trainingssaisons",
     intro: "Saison 1, Glut, startet am Montag: zehn Wochen, ein Pfad mit 20 Stufen und Belohnungen, die es nur diesen Winter gibt.",
@@ -906,6 +918,7 @@ export const emails: Record<string, Words> = {
       "Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und das Glut-Design mit App-Symbol, nur in dieser Saison und für immer deins.",
       "Eine Woche verpasst? In der nächsten Zielwoche zählt der Bonus doppelt. Die letzte Woche zählt ganz doppelt.",
       "Jede neue Bestleistung bringt mit einer Chance von 1 zu 6 die seltenen Scheiben der Saison.",
+      "Nach Glut kommen Sturm, Blüte, Sonnwende, Ahorn und Obsidian, eine nach der anderen durch 2027, jede mit eigenem Look und eigenen Challenges.",
     ],
     dyk: "Du willst keine Saisons sehen? Schalte Trainingssaisons in Einstellungen › Aussehen und Bedienung aus. Dein Training zählt weiter.",
   },
@@ -943,5 +956,17 @@ export const emails: Record<string, Words> = {
       "Berechnet mit deiner eigenen Uhrzeit, für Studios in deiner Nähe.",
     ],
     dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
+  },
+  "outside-workouts": {
+    title: "Deine Läufe und Spiele zählen jetzt in deiner Erholung",
+    intro:
+      "Schalte Trainings aus anderen Apps zählen ein, dann prägen die Trainings aus der Gesundheits-App deines Handys deine Erholungskarte und den Plan für morgen.",
+    points: [
+      "Läufe, Radtouren, Sport und Kurse kommen jedes Mal rein, wenn du die App öffnest.",
+      "Jedes ermüdet die Muskeln, die es nutzt, umso mehr, je länger es lief.",
+      "Der Plan für morgen schont müde Beine nach einem langen Lauf oder Spiel.",
+      "Sie zählen nie als Liftsmith-Trainings, und nichts zählt doppelt.",
+    ],
+    dyk: "Du findest es unter Einstellungen › Verbundene Apps, und die Liste unter der Erholungskarte auf Körper zeigt, was gezählt wird.",
   },
 };

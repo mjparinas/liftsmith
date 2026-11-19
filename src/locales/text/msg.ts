@@ -26,6 +26,9 @@ export const en = {
   "msg.offline": "Couldn't reach the server. Try again when you're online.",
   "msg.check": "Check {email} for a confirmation link. Nothing is sent until you tap it.",
   "msg.stopped": "Email stopped, and your address is deleted from our server.",
+  "msg.badge": "Number on the app icon",
+  "msg.badgeBlurb":
+    "Shows how many messages, likes, comments and follow requests are waiting, on the app's icon. The same counts show in red on Friends and your coach in the app.",
 } as const;
 
 type Key = keyof typeof en;
@@ -55,6 +58,9 @@ export const es: Partial<Record<Key, Message>> = {
   "msg.offline": "No se pudo conectar con el servidor. Inténtalo de nuevo cuando tengas conexión.",
   "msg.check": "Busca en {email} un enlace de confirmación. No se envía nada hasta que lo pulses.",
   "msg.stopped": "Correos detenidos, y tu dirección se ha borrado de nuestro servidor.",
+  "msg.badge": "Número en el icono de la app",
+  "msg.badgeBlurb":
+    "Muestra en el icono de la app cuántos mensajes, me gusta, comentarios y solicitudes de seguimiento te esperan. Los mismos números salen en rojo en Amigos y en tu entrenador dentro de la app.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -81,6 +87,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "msg.offline": "Impossible de joindre le serveur. Réessayez quand vous serez en ligne.",
   "msg.check": "Cherchez un lien de confirmation dans {email}. Rien n’est envoyé avant que vous ne l’ouvriez.",
   "msg.stopped": "E-mails arrêtés, et votre adresse est supprimée de notre serveur.",
+  "msg.badge": "Nombre sur l'icône de l'app",
+  "msg.badgeBlurb":
+    "Affiche sur l'icône de l'app combien de messages, j'aime, commentaires et demandes d'abonnement vous attendent. Les mêmes nombres s'affichent en rouge sur Amis et sur votre coach dans l'app.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -108,6 +117,9 @@ export const de: Partial<Record<Key, Message>> = {
   "msg.offline": "Der Server war nicht erreichbar. Versuch es wieder, wenn du online bist.",
   "msg.check": "Schau in {email} nach einem Bestätigungslink. Bis du darauf tippst, wird nichts gesendet.",
   "msg.stopped": "E-Mails gestoppt, und deine Adresse ist von unserem Server gelöscht.",
+  "msg.badge": "Zahl auf dem App-Symbol",
+  "msg.badgeBlurb":
+    "Zeigt auf dem App-Symbol, wie viele Nachrichten, Likes, Kommentare und Follower-Anfragen warten. Dieselben Zahlen stehen in der App rot bei Freunde und bei deinem Coach.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -134,6 +146,9 @@ export const it: Partial<Record<Key, Message>> = {
   "msg.offline": "Impossibile raggiungere il server. Riprova quando sei online.",
   "msg.check": "Cerca in {email} un link di conferma. Non inviamo nulla finché non lo tocchi.",
   "msg.stopped": "Email interrotte, e il tuo indirizzo è stato eliminato dal nostro server.",
+  "msg.badge": "Numero sull'icona dell'app",
+  "msg.badgeBlurb":
+    "Mostra sull'icona dell'app quanti messaggi, mi piace, commenti e richieste di follow ti aspettano. Gli stessi numeri compaiono in rosso su Amici e sul tuo coach nell'app.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -159,6 +174,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "msg.offline": "サーバーに接続できませんでした。オンラインになってからもう一度お試しください。",
   "msg.check": "{email}に届いた確認リンクをタップしてください。タップするまで何も送信されません。",
   "msg.stopped": "メールを停止し、アドレスをサーバーから削除しました。",
+  "msg.badge": "アプリアイコンの数字",
+  "msg.badgeBlurb":
+    "届いているメッセージ、いいね、コメント、フォローリクエストの数をアプリのアイコンに表示します。アプリ内でも同じ数が「フレンド」とコーチに赤く表示されます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -185,6 +203,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "msg.offline": "Não foi possível falar com o servidor. Tente de novo quando estiver online.",
   "msg.check": "Procure em {email} um link de confirmação. Nada é enviado até você tocar nele.",
   "msg.stopped": "E-mails parados, e seu endereço foi apagado do nosso servidor.",
+  "msg.badge": "Número no ícone do app",
+  "msg.badgeBlurb":
+    "Mostra no ícone do app quantas mensagens, curtidas, comentários e pedidos para seguir estão esperando. Os mesmos números aparecem em vermelho em Amigos e no seu treinador dentro do app.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -210,6 +231,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "msg.offline": "서버에 연결하지 못했어요. 온라인이 되면 다시 시도하세요.",
   "msg.check": "{email}에서 확인 링크를 확인하세요. 링크를 탭하기 전까지는 아무것도 보내지 않아요.",
   "msg.stopped": "이메일을 중지했고, 주소는 서버에서 삭제했어요.",
+  "msg.badge": "앱 아이콘의 숫자",
+  "msg.badgeBlurb":
+    "기다리고 있는 메시지, 좋아요, 댓글, 팔로우 요청 수를 앱 아이콘에 표시합니다. 앱 안에서도 같은 숫자가 친구와 코치에 빨간색으로 표시됩니다.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -235,6 +259,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "msg.offline": "Sunucuya ulaşılamadı. Çevrimiçi olduğunda tekrar dene.",
   "msg.check": "Onay bağlantısı için {email} adresini kontrol et. Ona dokunana kadar hiçbir şey gönderilmez.",
   "msg.stopped": "E-postalar durduruldu ve adresin sunucumuzdan silindi.",
+  "msg.badge": "Uygulama simgesinde sayı",
+  "msg.badgeBlurb":
+    "Bekleyen mesaj, beğeni, yorum ve takip isteği sayısını uygulamanın simgesinde gösterir. Aynı sayılar uygulamada Arkadaşlar'da ve koçunda kırmızı görünür.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -261,4 +288,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "msg.offline": "Brak połączenia z serwerem. Spróbuj ponownie, gdy będziesz online.",
   "msg.check": "Sprawdź {email}, tam jest link potwierdzający. Nic nie wyślemy, dopóki go nie stukniesz.",
   "msg.stopped": "E-maile wyłączone, a twój adres został usunięty z naszego serwera.",
+  "msg.badge": "Liczba na ikonie aplikacji",
+  "msg.badgeBlurb":
+    "Pokazuje na ikonie aplikacji, ile wiadomości, polubień, komentarzy i próśb o obserwowanie czeka. Te same liczby widać na czerwono przy Znajomych i Twoim trenerze w aplikacji.",
 };

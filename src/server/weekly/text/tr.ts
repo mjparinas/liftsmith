@@ -546,6 +546,7 @@ export const emails: Record<string, Words> = {
       "Android'de bir Hızlı Ayarlar kutucuğu; iPhone'da Denetim Merkezi ve Siri.",
       "Antrenman günlerin takviminde.",
       "Antrenman günlerinde nazik hatırlatıcılar.",
+      "Bekleyen mesaj, beğeni ve takip istekleri için uygulama simgesinde bir sayı.",
     ],
     dyk: "Kilit ekranındaki Seti kaydet ve +30 sn, uygulama kapalıyken de çalışır.",
   },
@@ -895,6 +896,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Koçluk › Durum kontrolleri bölümündeki yeni İlerleme kontrolü şablonuyla başla. 18 yaşından küçüklerden asla fotoğraf istenmez.",
   },
+  "coach-form-videos": {
+    title: "Videoda notlu form videoları",
+    intro: "Danışanların artık uygulamada bir set çekip sana gönderebilir, sen de doğrudan videonun üzerinde yanıt verirsin.",
+    points: [
+      "Koçluk'ta Form videosu gönder'e dokunur, hareketi seçer ve neye bakılacağını yazarlar. Uygulama yerleşmeleri için beş saniye verir ve bir dakikaya kadar kaydeder.",
+      "Bir bildirim alırsın. Videoyu yarım ya da çeyrek hıza al, önemli yerde durdur ve o saniyeye iliştirilmiş bir not ekle.",
+      "O ana gitmek için bir nota dokunurlar ve kendi notlarıyla yanıt verebilirler.",
+      "Videolar yalnızca ikinize özeldir ve biriniz koçluğu bitirirse silinir.",
+    ],
+    dyk: "18 yaşından küçük danışanlar form videosu gönderemez. Göndermek danışanlar için ücretsizdir.",
+  },
   seasons: {
     title: "Antrenman sezonları pazartesi başlıyor",
     intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",
@@ -903,6 +915,7 @@ export const emails: Record<string, Words> = {
       "Kademeler yalnızca bu sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle Kor temasını verir; hepsi hep senin kalır.",
       "Bir haftayı mı kaçırdın? Hedefi tutturduğun sonraki hafta bonus iki kat. Son hafta tamamen iki kat sayılır.",
       "Her yeni rekorun sezonun nadir plakalarını düşürme şansı 6'da 1.",
+      "Kor'dan sonra Fırtına, Çiçek, Gündönümü, Akçaağaç ve Obsidyen 2027 boyunca arka arkaya gelir; her birinin kendi görünümü ve meydan okumaları var.",
     ],
     dyk: "Sezonları görmek istemiyor musun? Ayarlar › Görünüm'den Antrenman sezonlarını kapat. Antrenmanın sayılmaya devam eder.",
   },
@@ -940,5 +953,17 @@ export const emails: Record<string, Words> = {
       "Kendi saatinle, yakındaki salonlar için hesaplanır.",
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
+  },
+  "outside-workouts": {
+    title: "Koşuların ve maçların artık toparlanmanda sayılıyor",
+    intro:
+      "Diğer uygulamalardaki antrenmanları say seçeneğini aç; telefonunun sağlık uygulamasındaki antrenmanlar toparlanma haritanı ve yarının planını şekillendirsin.",
+    points: [
+      "Koşu, bisiklet, spor ve dersler uygulamayı her açtığında gelir.",
+      "Her biri kullandığı kasları yorar; ne kadar uzun sürdüyse o kadar çok.",
+      "Uzun bir koşu ya da maçtan sonra yarının planı yorgun bacakları korur.",
+      "Asla Liftsmith antrenmanı sayılmazlar ve hiçbir şey iki kez sayılmaz.",
+    ],
+    dyk: "Ayarlar › Bağlı uygulamalar bölümünde; Vücut ekranındaki toparlanma haritasının altındaki liste neyin sayıldığını gösterir.",
   },
 };

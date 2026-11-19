@@ -413,6 +413,11 @@ export const fr: FeaturesText = {
       name: "Bilans de progrès avec poids, photos et tendances",
       body: "Ajoutez des questions de poids et de photo à n'importe quel formulaire, et envoyez-le chaque semaine, toutes les 2 ou toutes les 4 semaines. Le poids part de la dernière pesée du client, les photos ne vont qu'à vous, et la tendance de chaque réponse s'affiche dans son rapport. On ne demande jamais de photo aux moins de 18 ans.",
     },
+    "coach-form-videos": {
+      name: "Vidéos de technique avec notes dans la vidéo",
+      body: "Vos clients filment une série dans l'app et vous l'envoient. Regardez-la au ralenti, épinglez des notes aux moments précis, et ils répondent sur les mêmes notes. Seuls vous deux la voyez ; les moins de 18 ans ne peuvent pas en envoyer.",
+      note: "Envoyer une vidéo est gratuit pour les clients. Android, iPhone et web.",
+    },
     "coach-roles": {
       name: "Pour les coachs personnels et les entraîneurs",
       body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",
@@ -470,7 +475,7 @@ export const fr: FeaturesText = {
     },
     seasons: {
       name: "Saisons d'entraînement",
-      body: "Des saisons de dix semaines avec un parcours de 20 paliers, gravi en vous entraînant vers votre propre objectif hebdomadaire : deux jours par semaine avancent aussi vite que cinq, et les jours en plus ne rapportent rien. Les paliers donnent des badges, un avatar, une couleur d'accent et un thème avec son icône propres à la saison, à vous pour toujours. Défis de saison, butin rare sur les nouveaux records, étoiles de prestige, semaine de rattrapage après un raté, finale à points doubles et bilan à partager.",
+      body: "Des saisons de dix semaines avec un parcours de 20 paliers, gravi en vous entraînant vers votre propre objectif hebdomadaire : deux jours par semaine avancent aussi vite que cinq, et les jours en plus ne rapportent rien. Les paliers donnent des badges, un avatar, une couleur d'accent et un thème avec son icône propres à la saison, à vous pour toujours. Défis de saison, butin rare sur les nouveaux records, étoiles de prestige, semaine de rattrapage après un raté, finale à points doubles et bilan à partager. Six saisons sont prévues à la suite jusqu'à fin 2027 (Braise, Tempête, Floraison, Solstice, Érable et Obsidienne), chacune avec son style et ses trois défis.",
       proPart: "Tous les paliers et leurs récompenses sont gratuits ; Pro ajoute une récompense bonus sur trois paliers.",
       note: "Les icônes de saison sont sur Android et iPhone ; le web reçoit le thème. Les saisons peuvent être désactivées dans les Réglages.",
     },
@@ -514,6 +519,10 @@ export const fr: FeaturesText = {
       name: "Séances enregistrées dans votre appli santé",
       body: "Chaque séance terminée est enregistrée dans Health Connect ou Apple Santé comme séance de musculation, avec les calories et le pouls.",
     },
+    "outside-workouts": {
+      name: "Les séances d'autres apps comptent",
+      body: "Une fois activé, les courses, sorties vélo, sports et cours que d'autres apps enregistrent dans votre appli santé comptent dans votre carte de récupération et le plan de demain. Un long match hier laisse les jambes en récupération, et le plan en tient compte.",
+    },
     offline: {
       name: "Fonctionne hors ligne",
       body: "Tout tourne sur votre appareil et se synchronise en arrière-plan : pas de réseau au sous-sol de la salle, pas de souci.",
@@ -545,6 +554,11 @@ export const fr: FeaturesText = {
     whatsNew: {
       name: "Les nouveautés dans l’app",
       body: "Les Réglages affichent votre version avec un bouton Nouveautés : ce qui est nouveau, mieux ou corrigé, en mots simples. Après une mise à jour, Aujourd’hui le signale une fois, et ne liste que ce que vous pouvez déjà utiliser.",
+    },
+    "icon-badge": {
+      name: "Un nombre sur l'icône de l'app",
+      body: "L'icône de l'app montre combien de messages, j'aime, commentaires et demandes d'abonnement vous attendent. Dans l'app, des nombres rouges sur Amis et sur votre coach disent où ils sont, et le nombre disparaît une fois vus. Un interrupteur dans Réglages › Rappels l'éteint.",
+      note: "Android et iPhone. L'app web l'affiche si elle est installée depuis Chrome, Edge ou Safari.",
     },
     languages: {
       name: "Dix langues",
@@ -663,11 +677,11 @@ export const fr: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas et alimentation en entrée ; séances terminées en sortie",
+      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas et alimentation en entrée ; séances terminées en sortie; et, si vous l'activez, les séances d'autres apps en entrée",
     },
     "apple-health": {
       name: "Apple Santé",
-      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas, alimentation, taille, âge et sexe en entrée ; séances terminées en sortie",
+      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas, alimentation, taille, âge et sexe en entrée ; séances terminées en sortie; et, si vous l'activez, les séances d'autres apps en entrée",
     },
     "samsung-health": { does: "Ses données, une fois partagées avec Health Connect" },
     "health-devices": {

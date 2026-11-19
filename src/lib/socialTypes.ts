@@ -131,6 +131,16 @@ export const AVATAR_IDS = [
   "av-pro",
   "av-ember",
   "av-ember-pro",
+  "av-tempest",
+  "av-tempest-pro",
+  "av-bloom",
+  "av-bloom-pro",
+  "av-solstice",
+  "av-solstice-pro",
+  "av-maple",
+  "av-maple-pro",
+  "av-obsidian",
+  "av-obsidian-pro",
 ] as const;
 export type AvatarId = (typeof AVATAR_IDS)[number];
 

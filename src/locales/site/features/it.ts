@@ -406,6 +406,11 @@ export const it: FeaturesText = {
       name: "Check-in dei progressi con peso, foto e andamento",
       body: "Aggiungi domande sul peso corporeo e con foto a qualsiasi modulo, e invialo ogni settimana, ogni 2 o ogni 4 settimane. Il peso parte dall'ultima pesata del cliente, le foto arrivano solo a te e l'andamento di ogni risposta compare nel suo report. Ai minori di 18 anni non si chiedono mai foto.",
     },
+    "coach-form-videos": {
+      name: "Video della tecnica con note nel video",
+      body: "I clienti riprendono una serie nell'app e te la inviano. Guardala al rallentatore, fissa note nei momenti esatti e rispondono sulle stesse note. La vedete solo voi due; i minori di 18 anni non possono inviarne.",
+      note: "Inviare un video è gratis per i clienti. Android, iPhone e web.",
+    },
     "coach-roles": {
       name: "Per personal trainer e coach",
       body: "Indica se sei un personal trainer che lavora uno a uno o un coach di gruppi e squadre. I clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
@@ -463,7 +468,7 @@ export const it: FeaturesText = {
     },
     seasons: {
       name: "Stagioni di allenamento",
-      body: "Stagioni di dieci settimane con un percorso di 20 livelli che sali allenandoti verso il tuo obiettivo settimanale: due giorni a settimana salgono veloci quanto cinque e i giorni in più non danno punti. I livelli danno badge, un avatar, un colore d'accento e un tema con la sua icona esclusivi della stagione, tuoi per sempre. Sfide di stagione, un bottino raro dai nuovi record, stelle prestigio, una settimana di recupero dopo un passo falso, un finale a punti doppi e un riepilogo da condividere.",
+      body: "Stagioni di dieci settimane con un percorso di 20 livelli che sali allenandoti verso il tuo obiettivo settimanale: due giorni a settimana salgono veloci quanto cinque e i giorni in più non danno punti. I livelli danno badge, un avatar, un colore d'accento e un tema con la sua icona esclusivi della stagione, tuoi per sempre. Sfide di stagione, un bottino raro dai nuovi record, stelle prestigio, una settimana di recupero dopo un passo falso, un finale a punti doppi e un riepilogo da condividere. Sei stagioni sono in programma una dopo l'altra fino alla fine del 2027 (Brace, Tempesta, Fioritura, Solstizio, Acero e Ossidiana), ognuna con stile e tre sfide proprie.",
       proPart: "Tutti i livelli e i loro premi sono gratis; Pro aggiunge un premio bonus su tre livelli.",
       note: "Le icone di stagione sono su Android e iPhone; il web riceve il tema. Le stagioni si possono disattivare nelle Impostazioni.",
     },
@@ -507,6 +512,10 @@ export const it: FeaturesText = {
       name: "Allenamenti salvati nella tua app di salute",
       body: "Ogni allenamento finito viene salvato in Health Connect o Apple Salute come allenamento di forza, con calorie e battito.",
     },
+    "outside-workouts": {
+      name: "Contano gli allenamenti di altre app",
+      body: "Se lo attivi, corse, uscite in bici, sport e corsi che altre app salvano nella tua app di salute contano nella mappa di recupero e nel piano di domani. Una lunga partita ieri lascia le gambe in recupero e il piano ne tiene conto.",
+    },
     offline: {
       name: "Funziona offline",
       body: "Tutto gira sul tuo dispositivo e si sincronizza in background, quindi nessun problema se in palestra nel seminterrato non c’è campo.",
@@ -538,6 +547,11 @@ export const it: FeaturesText = {
     whatsNew: {
       name: "Le novità nell'app",
       body: "Le Impostazioni mostrano la tua versione con un pulsante Novità: cosa c'è di nuovo, di migliore e di corretto, in parole semplici. Dopo un aggiornamento, Oggi lo segnala una volta, ed elenca solo ciò che puoi già usare.",
+    },
+    "icon-badge": {
+      name: "Un numero sull'icona dell'app",
+      body: "L'icona dell'app mostra quanti messaggi, mi piace, commenti e richieste di follow ti aspettano. Nell'app, numeri rossi su Amici e sul tuo coach dicono dove sono, e il numero sparisce quando li hai visti. Un interruttore in Impostazioni › Promemoria lo spegne.",
+      note: "Android e iPhone. L'app web lo mostra se è installata da Chrome, Edge o Safari.",
     },
     languages: {
       name: "Dieci lingue",
@@ -656,11 +670,11 @@ export const it: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "In entrata peso, massa grassa, sonno, HRV, battito, passi e alimentazione; in uscita gli allenamenti finiti",
+      does: "In entrata peso, massa grassa, sonno, HRV, battito, passi e alimentazione; in uscita gli allenamenti finiti; e, se lo attivi, gli allenamenti di altre app in entrata",
     },
     "apple-health": {
       name: "Apple Salute",
-      does: "In entrata peso, massa grassa, sonno, HRV, battito, passi, alimentazione, altezza, età e sesso; in uscita gli allenamenti finiti",
+      does: "In entrata peso, massa grassa, sonno, HRV, battito, passi, alimentazione, altezza, età e sesso; in uscita gli allenamenti finiti; e, se lo attivi, gli allenamenti di altre app in entrata",
     },
     "samsung-health": { does: "I suoi dati, quando li condividi con Health Connect" },
     "health-devices": {

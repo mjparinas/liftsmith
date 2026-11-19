@@ -474,6 +474,11 @@ export const pt: FeaturesText = {
       name: "Check-ins de progresso com peso, fotos e tendências",
       body: "Adicione perguntas de peso corporal e de foto a qualquer formulário e envie toda semana, a cada 2 ou a cada 4 semanas. O peso já vem da última pesagem do aluno, as fotos chegam só para você e a tendência de cada resposta aparece no relatório dele. Menores de 18 anos nunca recebem pedido de foto.",
     },
+    "coach-form-videos": {
+      name: "Vídeos de execução com notas no vídeo",
+      body: "Seus clientes gravam uma série no app e enviam para você. Veja em câmera lenta, fixe notas nos momentos exatos e eles respondem nas mesmas notas. Só vocês dois veem; menores de 18 anos não podem enviar.",
+      note: "Enviar um vídeo é grátis para clientes. Android, iPhone e web.",
+    },
     "coach-roles": {
       name: "Para personal trainers e coaches",
       body: "Diga se você é personal trainer com atendimento individual ou coach de grupos e equipes. Os alunos veem o termo certo para você, e as ferramentas que você mais usa vêm primeiro.",
@@ -531,7 +536,7 @@ export const pt: FeaturesText = {
     },
     seasons: {
       name: "Temporadas de treino",
-      body: "Temporadas de dez semanas com uma trilha de 20 níveis, que você sobe treinando rumo à sua própria meta semanal: dois dias por semana sobem tão rápido quanto cinco, e dias extras não somam. Os níveis dão medalhas, um avatar, uma cor de destaque e um tema com ícone exclusivos da temporada, seus para sempre. Desafios da temporada, um item raro por novos recordes, estrelas de prestígio, uma semana de recuperação depois de uma falha, uma final com pontos em dobro e um resumo para compartilhar.",
+      body: "Temporadas de dez semanas com uma trilha de 20 níveis, que você sobe treinando rumo à sua própria meta semanal: dois dias por semana sobem tão rápido quanto cinco, e dias extras não somam. Os níveis dão medalhas, um avatar, uma cor de destaque e um tema com ícone exclusivos da temporada, seus para sempre. Desafios da temporada, um item raro por novos recordes, estrelas de prestígio, uma semana de recuperação depois de uma falha, uma final com pontos em dobro e um resumo para compartilhar. Seis temporadas estão planejadas uma após a outra até o fim de 2027 (Brasa, Tempestade, Florada, Solstício, Bordo e Obsidiana), cada uma com visual e três desafios próprios.",
       proPart: "Todos os níveis e recompensas são grátis; o Pro adiciona uma recompensa bônus em três níveis.",
       note: "Os ícones da temporada estão no Android e no iPhone; a web recebe o tema. As temporadas podem ser desligadas em Ajustes.",
     },
@@ -575,6 +580,10 @@ export const pt: FeaturesText = {
       name: "Treinos salvos no seu app de saúde",
       body: "Cada treino concluído é salvo no Health Connect ou no Apple Saúde como treino de força, com calorias e frequência cardíaca.",
     },
+    "outside-workouts": {
+      name: "Treinos de outros apps contam",
+      body: "Ligado, corridas, pedais, esportes e aulas que outros apps salvam no seu app de saúde contam no mapa de recuperação e no plano de amanhã. Uma partida longa ontem deixa as pernas em recuperação, e o plano leva isso em conta.",
+    },
     offline: {
       name: "Funciona offline",
       body: "Tudo roda no seu aparelho e sincroniza em segundo plano, então ficar sem sinal na academia do subsolo não é problema.",
@@ -606,6 +615,11 @@ export const pt: FeaturesText = {
     whatsNew: {
       name: "Novidades no app",
       body: "Os Ajustes mostram sua versão com um botão Novidades: o que é novo, melhor e corrigido, em palavras simples. Depois de uma atualização, Hoje avisa uma vez, e só lista o que você já pode usar.",
+    },
+    "icon-badge": {
+      name: "Um número no ícone do app",
+      body: "O ícone do app mostra quantas mensagens, curtidas, comentários e pedidos para seguir estão esperando. Dentro do app, números vermelhos em Amigos e no seu treinador mostram onde estão, e o número some quando você os vê. Um botão em Ajustes › Lembretes desliga.",
+      note: "Android e iPhone. O app web mostra quando instalado pelo Chrome, Edge ou Safari.",
     },
     languages: {
       name: "Dez idiomas",
@@ -720,11 +734,11 @@ export const pt: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos e alimentação; envia os treinos concluídos",
+      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos e alimentação; envia os treinos concluídos; e, se ligado, recebe treinos de outros apps",
     },
     "apple-health": {
       name: "Apple Saúde",
-      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos, alimentação, altura, idade e sexo; envia os treinos concluídos",
+      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos, alimentação, altura, idade e sexo; envia os treinos concluídos; e, se ligado, recebe treinos de outros apps",
     },
     "samsung-health": {
       name: "Samsung Health",

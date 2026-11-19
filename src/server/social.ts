@@ -1527,6 +1527,22 @@ const ACTIVITY = `
 const ACTIVITY_VISIBLE = `a JOIN social_profiles sp ON sp.account_id = a.who
   WHERE sp.suspended = 0 AND a.who NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)`;
 
+/**
+ * What's waiting in Friends, as the app's Friends tab counts it (`me`: unseen activity plus follow requests), for the
+ * number a push puts on the app icon (badge.ts). 0 for someone who hasn't joined or is suspended.
+ */
+export async function friendsWaiting(accountId: string): Promise<number> {
+  const [r] = await query(
+    `SELECT
+      (SELECT COUNT(*) FROM social_profiles WHERE account_id = ?1 AND suspended = 0) AS joined,
+      (SELECT COUNT(*) FROM follows WHERE followee_id = ?1 AND accepted = 0) AS requests,
+      (SELECT COUNT(*) FROM (${ACTIVITY}) ${ACTIVITY_VISIBLE}
+        AND a.at > COALESCE((SELECT seen_at FROM social_profiles WHERE account_id = ?1), 0)) AS unread`,
+    [accountId],
+  );
+  return n(r?.joined) ? n(r?.requests) + n(r?.unread) : 0;
+}
+
 /** What happened to the lifter lately (new followers, requests, likes, comments), and marks it all seen. */
 export async function activity(accountId: string, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
@@ -2368,7 +2384,7 @@ export async function clubManage(accountId: string, b: Record<string, unknown>):
 export async function pushToken(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
-  return (await saveToken(accountId, s(b.token), s(b.platform), s(b.lang), now)) ? ok() : fail(400, "token");
+  return (await saveToken(accountId, s(b.token), s(b.platform), s(b.lang), now, b.badge !== false)) ? ok() : fail(400, "token");
 }
 
 /**

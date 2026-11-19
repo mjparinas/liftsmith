@@ -761,6 +761,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-17",
       },
       {
+        id: "coach-form-videos",
+        name: "Form videos with notes pinned in the video",
+        body: "Clients film a set in the app and send it to you. Watch it slowed down, pin notes to the exact moments that matter, and they answer on the same notes. Only the two of you can see it, and clients under 18 can't send one.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Sending a video is free for clients. Android, iPhone and the web.",
+        added: "2026-11-19",
+      },
+      {
         id: "coach-roles",
         name: "For personal trainers and coaches",
         body: "Say whether you're a personal trainer working one-on-one or a coach running groups and teams. Clients see the right word for you, and the tools you use most come first.",
@@ -880,7 +889,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "seasons",
         name: "Training seasons",
-        body: "Ten-week seasons with a track of 20 tiers, climbed by training toward your own weekly goal, so two days a week climbs as fast as five and extra days earn nothing. Tiers bring season-only badges, an avatar, an accent and a theme with its app icon, yours to keep after the season ends. Season challenges, a rare drop from new bests, prestige stars, a catch-up week after a miss, a double-points finale and a recap card to share.",
+        body: "Ten-week seasons with a track of 20 tiers, climbed by training toward your own weekly goal, so two days a week climbs as fast as five and extra days earn nothing. Tiers bring season-only badges, an avatar, an accent and a theme with its app icon, yours to keep after the season ends. Season challenges, a rare drop from new bests, prestige stars, a catch-up week after a miss, a double-points finale and a recap card to share. Six seasons are planned back to back through 2027 (Ember, Tempest, Bloom, Solstice, Maple and Obsidian), each with its own look and its own three challenges.",
         tier: "both",
         proPart: "Every tier and its rewards are free; Pro adds a bonus reward on three tiers.",
         note: "Season app icons are on Android and iPhone; the web gets the theme. Seasons can be turned off in Settings.",
@@ -958,6 +967,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         where: "phones",
         added: "2026-11-10",
       },
+      {
+        id: "outside-workouts",
+        name: "Workouts from other apps count",
+        body: "Turn it on and the runs, rides, sports and classes other apps save to your phone's health app count in your recovery map and tomorrow's plan. A long match yesterday leaves your legs recovering, and the plan works around it.",
+        tier: "free",
+        where: "phones",
+        added: "2026-11-19",
+      },
     ],
   },
   {
@@ -1019,6 +1036,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         name: "What's new in the app",
         body: "Settings shows your version with a What's new button: what's new, better and fixed, in plain words. After an update, Today mentions it once, and it only lists what you can already use.",
         tier: "free",
+        added: "2026-11-19",
+      },
+      {
+        id: "icon-badge",
+        name: "A number on the app icon",
+        body: "The app icon shows how many messages, likes, comments and follow requests are waiting. Inside the app, red counts on Friends and your coach say where they are, and the number goes once you've seen them. One switch in Settings › Reminders turns it off.",
+        tier: "free",
+        note: "Android and iPhone. The web app shows it when it's installed from Chrome, Edge or Safari.",
         added: "2026-11-19",
       },
     ],
@@ -1290,7 +1315,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       {
         id: "health-connect",
         name: "Health Connect",
-        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps and food in; finished workouts out",
+        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps and food in; finished workouts out; other apps' workouts in, if you turn it on",
         android: "yes",
         ios: "no",
         web: "no",
@@ -1299,7 +1324,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       {
         id: "apple-health",
         name: "Apple Health",
-        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps, food, height, age and sex in; finished workouts out",
+        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps, food, height, age and sex in; finished workouts out; other apps' workouts in, if you turn it on",
         android: "no",
         ios: "yes",
         web: "no",

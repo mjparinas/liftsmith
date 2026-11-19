@@ -94,9 +94,11 @@ export default function Privacy() {
           respiratory rate and the calories, protein, carbs and fat a food app logs from Health Connect or Apple Health to fill in setup,
           bring in weigh-ins and body fat, keep your TDEE (daily calories) current, show the Health view on the Body tab against your own
           normal, give coach&apos;s notes about what you eat, and (with Pro) adjust how hard today&apos;s workout is, and saves each
-          finished workout back as a strength training workout with its time, title, sets, active calories and average heart rate. These
-          readings stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so
-          your other devices have them, and nowhere else.{" "}
+          finished workout back as a strength training workout with its time, title, sets, active calories and average heart rate. If you
+          turn on Count workouts from other apps, it also reads the workouts other apps saved (type, time, length, distance, calories and
+          the app that recorded them) to count them in your recovery and tomorrow&apos;s plan; turning it off removes them. These readings
+          stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so your
+          other devices have them, and nowhere else.{" "}
           <a className="text-accent underline" href="/privacypolicy.html">
             More about health data
           </a>

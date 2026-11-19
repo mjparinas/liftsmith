@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Un riquadro nelle Impostazioni rapide di Android; Centro di Controllo e Siri su iPhone.",
       "I tuoi giorni di allenamento nel calendario.",
       "Promemoria discreti nei giorni di allenamento.",
+      "Un numero sull'icona dell'app per messaggi, mi piace e richieste di follow in attesa.",
     ],
     dyk: "Registra serie e +30 s sulla schermata di blocco funzionano anche con l'app chiusa.",
   },
@@ -898,6 +899,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Parti dal nuovo modello Check-in dei progressi in Coaching › Check-in. Ai minori di 18 anni non si chiedono mai foto.",
   },
+  "coach-form-videos": {
+    title: "Video della tecnica con note nel video",
+    intro: "Ora i clienti possono riprendere una serie nell'app e inviartela, e tu rispondi direttamente sul video.",
+    points: [
+      "Toccano Invia un video della tecnica in Coaching, scelgono l'esercizio e dicono cosa controllare. L'app dà loro cinque secondi per mettersi in posizione e registra fino a un minuto.",
+      "Ricevi una notifica. Rallenta il video a metà o a un quarto della velocità, metti in pausa dove conta e aggiungi una nota fissata a quel secondo.",
+      "Toccano una nota per andare a quel momento e possono rispondere con una nota loro.",
+      "I video restano privati tra voi due e vengono eliminati se uno dei due chiude il coaching.",
+    ],
+    dyk: "I clienti sotto i 18 anni non possono inviare video della tecnica. Per i clienti l'invio è gratis.",
+  },
   seasons: {
     title: "Le stagioni di allenamento iniziano lunedì",
     intro: "La stagione 1, Brace, inizia lunedì: dieci settimane, un percorso di 20 livelli e premi che si ottengono solo quest'inverno.",
@@ -906,6 +918,7 @@ export const emails: Record<string, Words> = {
       "I livelli danno badge, un avatar, un colore d'accento e il tema Brace con la sua icona, solo di questa stagione e tuoi per sempre.",
       "Salti una settimana? La successiva in cui raggiungi l'obiettivo vale il bonus doppio. L'ultima settimana vale doppio.",
       "Ogni nuovo record ha 1 possibilità su 6 di far cadere i dischi rari della stagione.",
+      "Dopo Brace arrivano Tempesta, Fioritura, Solstizio, Acero e Ossidiana, una dopo l'altra per tutto il 2027, ognuna con stile e sfide proprie.",
     ],
     dyk: "Preferisci non vedere le stagioni? Disattiva Stagioni di allenamento in Impostazioni › Aspetto e stile. Il tuo allenamento conta comunque.",
   },
@@ -943,5 +956,17 @@ export const emails: Record<string, Words> = {
       "È calcolato sulla tua ora, per le palestre vicine.",
     ],
     dyk: "Orari sbagliati? Segnala un problema sulla sua pagina, oppure rivendicala e correggili tu.",
+  },
+  "outside-workouts": {
+    title: "Corse e partite ora contano nel tuo recupero",
+    intro:
+      "Attiva Conta gli allenamenti di altre app e gli allenamenti nell'app di salute del telefono regolano la mappa di recupero e il piano di domani.",
+    points: [
+      "Corse, bici, sport e corsi arrivano ogni volta che apri l'app.",
+      "Ognuno affatica i muscoli che usa, di più quanto più è durato.",
+      "Il piano di domani tiene conto delle gambe stanche dopo una lunga corsa o partita.",
+      "Non contano mai come allenamenti Liftsmith e niente conta due volte.",
+    ],
+    dyk: "Lo trovi in Impostazioni › App collegate, e l'elenco sotto la mappa di recupero in Corpo mostra cosa viene contato.",
   },
 };

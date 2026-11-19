@@ -54,6 +54,7 @@ import * as fmt from "./text/fmt";
 import * as food from "./text/food";
 import * as friends from "./text/friends";
 import * as ft from "./text/ft";
+import * as fv from "./text/fv";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -163,6 +164,7 @@ export const pt: Partial<Record<MessageKey, Message>> = {
   ...body.pt,
   ...buddy.pt,
   ...crew.pt,
+  ...fv.pt,
   ...buy.pt,
   ...cal.pt,
   ...calc.pt,

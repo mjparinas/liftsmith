@@ -23,6 +23,7 @@ import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
 import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
+import { useIconBadge } from "@/lib/iconBadge";
 import { catchInviteInAddress, startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
@@ -41,7 +42,7 @@ import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync, useSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
-import { forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
+import { coachWaiting, forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -93,7 +94,7 @@ import { Today } from "./Today";
 import { Tools } from "./Tools";
 import { Trainer } from "./Trainer";
 import { TrainingSettings } from "./TrainingSettings";
-import { TodaySkeleton } from "./ui";
+import { CountDot, TodaySkeleton } from "./ui";
 import { UpdateToast } from "./UpdateToast";
 import { useUnlocked } from "./useUnlocked";
 import { WhatsNewNote } from "./WhatsNew";
@@ -124,6 +125,8 @@ export function App() {
   const langWaiting = useSyncExternalStore(subscribeLang, languagePending, () => false);
 
   const { route, arg } = useRoute();
+  // The number on the app icon follows what's waiting in Friends and coaching (iconBadge.ts).
+  useIconBadge();
   const desktop = useDesktop();
   useEffect(() => applyLayout(desktop), [desktop]);
   useEffect(() => setLiteDemos(!!profile.liteDemos), [profile.liteDemos]);
@@ -585,7 +588,8 @@ function TabBar({ route }: { route: Route }) {
       >
         {tabs.map((tab) => {
           const on = route === tab.route;
-          // Friends carries a dot while follows, requests, likes or comments are waiting, and says so to screen readers.
+          // Friends carries a red count while follows, requests, likes or comments are waiting (the same number that's
+          // on the app icon, iconBadge.ts), and says so to screen readers.
           const dot = tab.route === "friends" && waiting > 0;
           return (
             <li key={tab.route}>
@@ -603,7 +607,7 @@ function TabBar({ route }: { route: Route }) {
                   className={`relative grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}
                 >
                   <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
-                  {dot && <span aria-hidden className="absolute right-2 top-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
+                  {dot && <CountDot n={waiting} className="absolute -top-1 right-0.5" />}
                 </span>
                 {t(tab.label)}
               </button>
@@ -660,7 +664,7 @@ function Sidebar({ route }: { route: Route }) {
   const waiting = useFriendsWaiting();
   const tabs = useTabs();
   const coaching = useCoachNotes((s) => s.coaching);
-  const coachUnread = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
+  const coachUnread = useCoachNotes(coachWaiting);
   return (
     <nav
       className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 overflow-y-auto border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
@@ -680,6 +684,7 @@ function Sidebar({ route }: { route: Route }) {
             icon={tab.icon}
             on={route === tab.route}
             dot={tab.route === "friends" && waiting > 0 ? t("friends.openWaiting", { count: waiting }) : undefined}
+            count={tab.route === "friends" ? waiting : 0}
           />
         ))}
         <SideItem route="programs" label={t("prog.title")} icon="layers" on={route === "programs"} />
@@ -691,6 +696,7 @@ function Sidebar({ route }: { route: Route }) {
             icon="target"
             on={route === "trainer"}
             dot={coachUnread > 0 ? `${t("trn.title")}, ${t("trn.unread", { count: coachUnread })}` : undefined}
+            count={coachUnread}
           />
         )}
       </ul>
@@ -701,8 +707,22 @@ function Sidebar({ route }: { route: Route }) {
   );
 }
 
-/** One sidebar link: lit while its screen (or one under it) is open, with a dot when something waits there. */
-function SideItem({ route, label, icon, on, dot }: { route: Route; label: string; icon: IconName; on: boolean; dot?: string }) {
+/** One sidebar link: lit while its screen (or one under it) is open, with a red count when something waits there. */
+function SideItem({
+  route,
+  label,
+  icon,
+  on,
+  dot,
+  count = 0,
+}: {
+  route: Route;
+  label: string;
+  icon: IconName;
+  on: boolean;
+  dot?: string;
+  count?: number;
+}) {
   return (
     <li>
       <button
@@ -717,7 +737,7 @@ function SideItem({ route, label, icon, on, dot }: { route: Route; label: string
       >
         <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
           <Icon name={icon} size={22} strokeWidth={on ? 2.4 : 2} />
-          {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
+          {dot && <CountDot n={count} className="absolute -right-2 -top-2" />}
         </span>
         {label}
       </button>

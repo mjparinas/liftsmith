@@ -412,6 +412,11 @@ export const de: FeaturesText = {
       name: "Fortschritts-Check-ins mit Gewicht, Fotos und Verlauf",
       body: "Füge jedem Formular Fragen zu Körpergewicht und Fotos hinzu und schick es jede Woche, alle 2 oder alle 4 Wochen. Das Gewicht startet beim letzten Wiegen deiner Kundschaft, Fotos sieht nur du, und der Verlauf jeder Antwort steht im Bericht. Unter 18-Jährige werden nie nach Fotos gefragt.",
     },
+    "coach-form-videos": {
+      name: "Technikvideos mit Notizen im Video",
+      body: "Kunden filmen einen Satz in der App und schicken ihn dir. Sieh ihn dir verlangsamt an, hefte Notizen genau an die wichtigen Momente, und sie antworten auf dieselben Notizen. Videos sehen nur ihr beide; unter 18-Jährige können keine senden.",
+      note: "Ein Video zu senden ist für Kunden kostenlos. Android, iPhone und Web.",
+    },
     "coach-roles": {
       name: "Für Personal Trainer und Coaches",
       body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",
@@ -469,7 +474,7 @@ export const de: FeaturesText = {
     },
     seasons: {
       name: "Trainingssaisons",
-      body: "Zehnwöchige Saisons mit einem Pfad aus 20 Stufen, den du erklimmst, indem du auf dein eigenes Wochenziel hin trainierst: Zwei Tage pro Woche kommen so schnell voran wie fünf, und zusätzliche Tage bringen nichts. Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und ein Design mit App-Symbol, die es nur in dieser Saison gibt und die dir danach bleiben. Saison-Challenges, ein seltener Fund bei neuen Bestleistungen, Prestige-Sterne, eine Aufholwoche nach einer verpassten Woche, ein Finale mit doppelten Punkten und ein Rückblick zum Teilen.",
+      body: "Zehnwöchige Saisons mit einem Pfad aus 20 Stufen, den du erklimmst, indem du auf dein eigenes Wochenziel hin trainierst: Zwei Tage pro Woche kommen so schnell voran wie fünf, und zusätzliche Tage bringen nichts. Die Stufen bringen Abzeichen, einen Avatar, eine Akzentfarbe und ein Design mit App-Symbol, die es nur in dieser Saison gibt und die dir danach bleiben. Saison-Challenges, ein seltener Fund bei neuen Bestleistungen, Prestige-Sterne, eine Aufholwoche nach einer verpassten Woche, ein Finale mit doppelten Punkten und ein Rückblick zum Teilen. Sechs Saisons folgen bis Ende 2027 aufeinander (Glut, Sturm, Blüte, Sonnwende, Ahorn und Obsidian), jede mit eigenem Look und drei eigenen Challenges.",
       proPart: "Alle Stufen und ihre Belohnungen sind kostenlos; Pro legt auf drei Stufen eine Bonus-Belohnung dazu.",
       note: "Saison-App-Symbole gibt es auf Android und iPhone; im Web gibt es das Design. Saisons lassen sich in den Einstellungen ausschalten.",
     },
@@ -513,6 +518,10 @@ export const de: FeaturesText = {
       name: "Trainings in deiner Gesundheits-App",
       body: "Jedes beendete Training wird als Krafttraining in Health Connect oder Apple Health gespeichert, mit Kalorien und Puls.",
     },
+    "outside-workouts": {
+      name: "Trainings aus anderen Apps zählen",
+      body: "Eingeschaltet zählen Läufe, Radtouren, Sport und Kurse, die andere Apps in deiner Gesundheits-App speichern, in deiner Erholungskarte und im Plan für morgen. Ein langes Spiel gestern lässt die Beine in Erholung, und der Plan richtet sich danach.",
+    },
     offline: {
       name: "Funktioniert offline",
       body: "Alles läuft auf deinem Gerät und synchronisiert sich im Hintergrund, also ist kein Empfang im Kellerstudio kein Problem.",
@@ -544,6 +553,11 @@ export const de: FeaturesText = {
     whatsNew: {
       name: "Neuigkeiten in der App",
       body: "Die Einstellungen zeigen deine Version mit einer Taste Neuigkeiten: was neu, besser oder behoben ist, in einfachen Worten. Nach einem Update weist Heute einmal darauf hin, und es listet nur, was du schon nutzen kannst.",
+    },
+    "icon-badge": {
+      name: "Eine Zahl auf dem App-Symbol",
+      body: "Das App-Symbol zeigt, wie viele Nachrichten, Likes, Kommentare und Follower-Anfragen warten. In der App zeigen rote Zahlen bei Freunde und deinem Coach, wo sie sind, und die Zahl verschwindet, sobald du sie gesehen hast. Ein Schalter unter Einstellungen › Erinnerungen schaltet sie aus.",
+      note: "Android und iPhone. Die Web-App zeigt sie, wenn sie aus Chrome, Edge oder Safari installiert ist.",
     },
     languages: {
       name: "Zehn Sprachen",
@@ -662,10 +676,10 @@ export const de: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte und Ernährung rein; beendete Trainings raus",
+      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte und Ernährung rein; beendete Trainings raus; eingeschaltet auch Trainings aus anderen Apps rein",
     },
     "apple-health": {
-      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte, Ernährung, Größe, Alter und Geschlecht rein; beendete Trainings raus",
+      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte, Ernährung, Größe, Alter und Geschlecht rein; beendete Trainings raus; eingeschaltet auch Trainings aus anderen Apps rein",
     },
     "samsung-health": { does: "Seine Werte, sobald du sie mit Health Connect teilst" },
     "health-devices": {

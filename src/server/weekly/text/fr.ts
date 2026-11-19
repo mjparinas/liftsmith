@@ -548,6 +548,7 @@ export const emails: Record<string, Words> = {
       "Une vignette dans les réglages rapides d'Android ; le centre de contrôle et Siri sur iPhone.",
       "Vos jours d'entraînement dans votre agenda.",
       "Des rappels discrets les jours d'entraînement.",
+      "Un nombre sur l'icône de l'app pour les messages, j'aime et demandes d'abonnement en attente.",
     ],
     dyk: "Enregistrer la série et +30 s sur l'écran verrouillé fonctionnent même app fermée.",
   },
@@ -902,6 +903,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Partez du nouveau modèle Bilan de progrès dans Coaching › Bilans. On ne demande jamais de photo aux moins de 18 ans.",
   },
+  "coach-form-videos": {
+    title: "Vidéos de technique avec notes dans la vidéo",
+    intro: "Vos clients peuvent maintenant filmer une série dans l'app et vous l'envoyer, et vous répondez directement sur la vidéo.",
+    points: [
+      "Ils touchent Envoyer une vidéo de technique dans Coaching, choisissent l'exercice et disent quoi vérifier. L'app leur laisse cinq secondes pour se placer et filme jusqu'à une minute.",
+      "Vous recevez une notification. Passez la vidéo à demi ou quart de vitesse, mettez en pause là où c'est important et ajoutez une note épinglée à cette seconde.",
+      "Ils touchent une note pour aller à ce moment et peuvent répondre avec leur propre note.",
+      "Les vidéos restent privées entre vous deux et sont supprimées si l'un de vous met fin au coaching.",
+    ],
+    dyk: "Les clients de moins de 18 ans ne peuvent pas envoyer de vidéos de technique. L'envoi est gratuit pour les clients.",
+  },
   seasons: {
     title: "Les saisons d'entraînement commencent lundi",
     intro: "La saison 1, Braise, commence lundi : dix semaines, un parcours de 20 paliers et des récompenses à gagner seulement cet hiver.",
@@ -910,6 +922,7 @@ export const emails: Record<string, Words> = {
       "Les paliers donnent des badges, un avatar, une couleur d'accent et le thème Braise avec son icône, propres à la saison et à vous pour toujours.",
       "Une semaine manquée ? La suivante où vous atteignez l'objectif double le bonus. La dernière semaine compte double.",
       "Chaque nouveau record a 1 chance sur 6 de faire tomber les disques rares de la saison.",
+      "Après Braise viennent Tempête, Floraison, Solstice, Érable et Obsidienne, à la suite tout au long de 2027, chacune avec son style et ses défis.",
     ],
     dyk: "Vous préférez ne pas voir les saisons ? Désactivez Saisons d'entraînement dans Réglages › Apparence. Votre entraînement compte toujours.",
   },
@@ -947,5 +960,17 @@ export const emails: Record<string, Words> = {
       "C'est calculé sur votre propre heure, pour les salles près de vous.",
     ],
     dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
+  },
+  "outside-workouts": {
+    title: "Tes courses et tes matchs comptent dans ta récupération",
+    intro:
+      "Active Compter les séances d'autres apps, et les séances de l'appli santé de ton téléphone ajustent ta carte de récupération et le plan de demain.",
+    points: [
+      "Courses, vélo, sports et cours arrivent à chaque ouverture de l'app.",
+      "Chacun fatigue les muscles qu'il sollicite, d'autant plus qu'il a duré.",
+      "Le plan de demain ménage les jambes fatiguées après une longue course ou un match.",
+      "Ils ne comptent jamais comme des séances Liftsmith, et rien ne compte deux fois.",
+    ],
+    dyk: "C'est dans Réglages › Apps connectées, et la liste sous la carte de récupération dans Corps montre ce qui est compté.",
   },
 };

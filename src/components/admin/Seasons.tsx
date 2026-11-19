@@ -6,7 +6,17 @@
 // or rewards move after the fact. The app reads the schedule from /api/seasons/.
 import { useEffect, useState } from "react";
 
-import { changeProblem, MAX_WEEKS, MIN_WEEKS, seasonWindow, type SeasonDef } from "@/lib/seasons";
+import {
+  BUILT_IN,
+  challengeGoal,
+  changeProblem,
+  KITS,
+  MAX_WEEKS,
+  MIN_WEEKS,
+  seasonWindow,
+  type ChallengeDef,
+  type SeasonDef,
+} from "@/lib/seasons";
 
 import { Card } from "./charts";
 
@@ -17,6 +27,43 @@ function nextMonday(ms: number): string {
   const d = new Date(ms);
   d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7));
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** The season challenges in the admin's English (the app's words are ssn.ch.* in every language). */
+function challengeLine(c: ChallengeDef, weeks: number): string {
+  const n = challengeGoal(c, weeks);
+  switch (c.id) {
+    case "goal-weeks":
+      return `Meet the weekly goal in ${n} weeks`;
+    case "prs":
+      return `${n} new bests`;
+    case "new-ex":
+      return `Try ${n} new exercises`;
+    case "streak":
+      return `Meet the goal ${n} weeks in a row`;
+    case "pr-lifts":
+      return `New bests on ${n} different exercises`;
+    case "quests":
+      return `${n} weekly quests`;
+    case "bookends":
+      return "Meet the goal in the first and last week";
+    case "stretch":
+      return `${n} stretch routines of 10+ minutes on their own`;
+  }
+}
+
+/** A reward set's look and challenges, so the schedule shows what each season brings. */
+function KitSummary({ kit, weeks }: { kit: string; weeks: number }) {
+  const k = KITS[kit];
+  if (!k) return null;
+  const themes = k.rewards.filter((r) => r.kind === "theme");
+  return (
+    <span className="block w-full text-xs text-muted">
+      <span aria-hidden className="mr-1.5 inline-block size-2.5 rounded-full align-middle" style={{ background: k.hue }} />
+      Themes and app icons: {themes.map((r) => `${r.id}${r.pro ? " (Pro)" : ""}`).join(", ")} · rare drop {k.drop} · challenges:{" "}
+      {k.challenges.map((c) => challengeLine(c, weeks)).join("; ")}
+    </span>
+  );
 }
 
 export function Seasons({ admin }: { admin: boolean }) {
@@ -71,7 +118,7 @@ export function Seasons({ admin }: { admin: boolean }) {
     <div className="space-y-4">
       <Card
         title="Season schedule"
-        subtitle={`Training seasons of ${MIN_WEEKS} to ${MAX_WEEKS} weeks, each starting on a Monday with a reward set that ships with the app. A season that has started can't change.`}
+        subtitle={`Training seasons of ${MIN_WEEKS} to ${MAX_WEEKS} weeks, each starting on a Monday with a reward set that ships with the app. The built-in plan runs back to back through 2027 and starts and ends on its own; change or remove any season that hasn't started. A season that has started can't change.`}
       >
         <ul className="divide-y divide-line text-sm">
           {list.map((s, i) => {
@@ -82,7 +129,10 @@ export function Seasons({ admin }: { admin: boolean }) {
               <li key={s.id} className="flex flex-wrap items-end gap-3 py-3">
                 <span className="w-24">
                   <span className="block font-semibold">Season {i + 1}</span>
-                  <span className="block text-xs text-muted">{status}</span>
+                  <span className="block text-xs text-muted">
+                    {status}
+                    {BUILT_IN.has(s.id) ? " · built in" : ""}
+                  </span>
                 </span>
                 <label className="block">
                   <span className="block text-xs text-muted">Reward set</span>
@@ -129,6 +179,7 @@ export function Seasons({ admin }: { admin: boolean }) {
                     Remove
                   </button>
                 )}
+                <KitSummary kit={s.kit} weeks={s.weeks} />
               </li>
             );
           })}
@@ -168,6 +219,7 @@ export function Seasons({ admin }: { admin: boolean }) {
           </li>
           <li>The last week counts double. Each new best during the season has a 1 in 6 chance to drop the rare item.</li>
           <li>Pro bonus rewards count when the lifter had Pro in any month of the season.</li>
+          <li>Each reward set brings its own three season challenges, so no two seasons ask the same.</li>
         </ul>
       </Card>
     </div>

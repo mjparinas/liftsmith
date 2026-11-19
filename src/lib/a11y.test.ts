@@ -130,6 +130,10 @@ describe("colour tokens", () => {
         }
       });
 
+      it(`${name} ${set}: a red count's number is readable on its red (CountDot)`, () => {
+        expect(contrast(t["--color-bad-ink"], t[`--bad-${set}`])).toBeGreaterThanOrEqual(4.5);
+      });
+
       it(`${name} ${set}: recovery colours stand out from the card (3:1 for graphics)`, () => {
         for (const b of BANDS) expect(contrast(t[`--band-${b}-${set}`], t["--color-surface"]), b).toBeGreaterThanOrEqual(3);
       });

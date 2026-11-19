@@ -43,6 +43,7 @@ export const SETTINGS_INDEX: SettingRef[] = [
   S("account.row", "account", ["account.row.out"]),
   S("gym.row", "gym", ["gym.rowNote"]),
   S("conn.row", "connections", ["conn.rowNote"]),
+  S("conn.outside.title", "connections", ["conn.outside.list"]),
   S("trn.row", "trainer", ["trn.rowNote"]),
   S("settings.injuries", "injuries"),
   S("settings.feedback", "feedback"),
@@ -92,6 +93,7 @@ export const SETTINGS_INDEX: SettingRef[] = [
   // Reminders
   S("msg.push", "reminders", ["msg.title"]),
   S("msg.emailMe", "reminders"),
+  S("msg.badge", "reminders", ["msg.badgeBlurb"]),
   // Look and feel
   S("settings.appearance", "look", ["appearance.dark", "appearance.light", "appearance.system"]),
   S("delight.icon", "look"),
