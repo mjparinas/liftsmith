@@ -26,3 +26,7 @@ Pure web code, so Android, iOS and the web app get it together (platform parity)
 ## The first release (2026-11-19)
 
 Covers what shipped from 2026-11-15 to 2026-11-18: training seasons, the community board, club chat and crew sessions, gym class schedules, common mistakes and fixes, the This week and Recovery widgets (phones), automatic supersets, fitness tests on a number line, the stretch get-ready countdown, 5 lb machine steps, smoother 3D figures, ten languages, coach check-ins with weight and photos, jumps that leave the floor and one-side stretches showing the right side.
+
+## Releases carry their version (2026-11-19)
+
+Each release has a `version` (package.json's at the promotion it ships in), and the website shows it beside the day. The first release is 0.1.0; 0.2.0 (dated 2026-11-20, the next promotion) adds open now in the gym finder, settings search and the map-first finder. A feature bumps the minor version and joins the top release; see [App versions](app-versions.md).

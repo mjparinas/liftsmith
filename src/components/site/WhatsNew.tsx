@@ -9,6 +9,7 @@ export function NewsDayCard({ entry }: { entry: NewsDay }) {
     <section id={entry.day} aria-labelledby={`d-${entry.day}`} className="card scroll-mt-20 p-6">
       <p className="text-sm text-muted">
         <time dateTime={entry.day}>{dayLabel(entry.day)}</time>
+        {entry.version ? <> · Version {entry.version}</> : null}
       </p>
       <h2 id={`d-${entry.day}`} className="mt-1 text-2xl font-bold tracking-tight">
         {entry.headline}

@@ -13,7 +13,7 @@ android {
         // Play needs every bundle of one app to have its own version code, so the watch's sits well above the
         // phone's (both come from the release run number; see .github/workflows/release.yml).
         versionCode(((System.getenv("VERSION_CODE") ?: "1") as int) + 100000000)
-        versionName(System.getenv("VERSION_NAME") ?: "0.1.0")
+        versionName(System.getenv("VERSION_NAME") ?: new groovy.json.JsonSlurper().parse(rootProject.file("../package.json")).version)
     }
     signingConfigs {
         release {

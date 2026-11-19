@@ -52,6 +52,13 @@ export const en = {
   "wn.c.jumps.body": "Ankle hops, squat jumps and the other jumps in the how-to figures now really leave the ground.",
   "wn.c.sides.title": "One-side stretches show the right side",
   "wn.c.sides.body": "A stretch for one side now shows the side it names, and mirrors for the other.",
+  "wn.c.openNow.title": "Open now in the gym finder",
+  "wn.c.openNow.body":
+    "Every gym with its hours says whether it's open now and when it closes or opens, and an Open now chip shows only the open ones.",
+  "wn.c.settingsSearch.title": "Search your settings",
+  "wn.c.settingsSearch.body": "Type in the box at the top of Settings to find any setting, and it opens with that setting in view.",
+  "wn.c.mapFinder.title": "A map-first gym finder",
+  "wn.c.mapFinder.body": "The gym finder is now a tall map with each gym on a see-through card you can swipe through.",
 } as const;
 
 type Key = keyof typeof en;
@@ -111,6 +118,15 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Los saltos de tobillo, sentadillas con salto y demás saltos de las figuras ya despegan de verdad del suelo.",
   "wn.c.sides.title": "Los estiramientos de un lado muestran el lado correcto",
   "wn.c.sides.body": "Un estiramiento para un lado muestra ahora el lado que nombra, y se refleja para el otro.",
+  "wn.c.openNow.title": "Abierto ahora en el buscador de gimnasios",
+  "wn.c.openNow.body":
+    "Cada gimnasio con horario dice si está abierto ahora y cuándo cierra o abre, y el filtro Abierto ahora muestra solo los abiertos.",
+  "wn.c.settingsSearch.title": "Busca en tus ajustes",
+  "wn.c.settingsSearch.body":
+    "Escribe en la casilla de arriba de Ajustes para encontrar cualquier ajuste, y se abre con ese ajuste a la vista.",
+  "wn.c.mapFinder.title": "Un buscador de gimnasios con el mapa primero",
+  "wn.c.mapFinder.body":
+    "El buscador de gimnasios es ahora un mapa grande con cada gimnasio en una tarjeta transparente que puedes deslizar.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -170,6 +186,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Les sauts de cheville, squats sautés et autres sauts des figures de démonstration quittent vraiment le sol.",
   "wn.c.sides.title": "Les étirements d’un côté montrent le bon côté",
   "wn.c.sides.body": "Un étirement d’un côté montre désormais le côté indiqué, et s’inverse pour l’autre.",
+  "wn.c.openNow.title": "Ouvert maintenant dans la recherche de salles",
+  "wn.c.openNow.body":
+    "Chaque salle avec ses horaires indique si elle est ouverte et quand elle ferme ou ouvre, et le filtre Ouvert maintenant ne montre que celles qui sont ouvertes.",
+  "wn.c.settingsSearch.title": "Recherchez dans vos réglages",
+  "wn.c.settingsSearch.body":
+    "Tapez dans le champ en haut des Réglages pour trouver n’importe quel réglage : il s’ouvre avec ce réglage en vue.",
+  "wn.c.mapFinder.title": "Une recherche de salles centrée sur la carte",
+  "wn.c.mapFinder.body":
+    "La recherche de salles est maintenant une grande carte, avec chaque salle sur une carte transparente à faire défiler.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -228,6 +253,14 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Fußgelenksprünge, Sprungkniebeugen und die anderen Sprünge der Anleitungsfiguren verlassen jetzt wirklich den Boden.",
   "wn.c.sides.title": "Einseitige Dehnungen zeigen die richtige Seite",
   "wn.c.sides.body": "Eine Dehnung für eine Seite zeigt jetzt die genannte Seite und wird für die andere gespiegelt.",
+  "wn.c.openNow.title": "Jetzt geöffnet in der Studiosuche",
+  "wn.c.openNow.body":
+    "Jedes Studio mit Öffnungszeiten zeigt, ob es gerade offen ist und wann es schließt oder öffnet, und der Filter Jetzt geöffnet zeigt nur die offenen.",
+  "wn.c.settingsSearch.title": "Einstellungen durchsuchen",
+  "wn.c.settingsSearch.body":
+    "Tippe oben in den Einstellungen ins Suchfeld, um jede Einstellung zu finden. Sie öffnet sich mit dieser Einstellung im Blick.",
+  "wn.c.mapFinder.title": "Studiosuche mit der Karte vorn",
+  "wn.c.mapFinder.body": "Die Studiosuche ist jetzt eine große Karte, jedes Studio auf einer durchsichtigen Karte zum Durchwischen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -286,6 +319,14 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Saltelli sulle caviglie, squat jump e gli altri salti delle figure dimostrative ora si staccano davvero da terra.",
   "wn.c.sides.title": "Gli allungamenti di un lato mostrano il lato giusto",
   "wn.c.sides.body": "Un allungamento per un lato ora mostra il lato indicato e si specchia per l'altro.",
+  "wn.c.openNow.title": "Aperto ora nella ricerca palestre",
+  "wn.c.openNow.body":
+    "Ogni palestra con gli orari dice se è aperta ora e quando chiude o apre, e il filtro Aperto ora mostra solo quelle aperte.",
+  "wn.c.settingsSearch.title": "Cerca nelle impostazioni",
+  "wn.c.settingsSearch.body":
+    "Scrivi nella casella in cima a Impostazioni per trovare qualsiasi impostazione: si apre con quell'impostazione in vista.",
+  "wn.c.mapFinder.title": "Ricerca palestre con la mappa in primo piano",
+  "wn.c.mapFinder.body": "La ricerca palestre ora è una grande mappa, con ogni palestra su una scheda trasparente da scorrere.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -337,6 +378,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "アンクルホップ、スクワットジャンプなど、お手本フィギュアのジャンプが本当に床から離れるようになりました。",
   "wn.c.sides.title": "片側ストレッチが正しい側を表示",
   "wn.c.sides.body": "片側のストレッチは名前どおりの側を表示し、反対側では左右反転します。",
+  "wn.c.openNow.title": "ジム検索に「営業中」",
+  "wn.c.openNow.body":
+    "営業時間のあるジムは、今開いているか、いつ閉まるか開くかを表示します。「営業中」チップで開いているジムだけを表示できます。",
+  "wn.c.settingsSearch.title": "設定を検索",
+  "wn.c.settingsSearch.body": "設定画面の上の検索ボックスに入力すると、どの設定でも見つかり、その設定が見える位置で開きます。",
+  "wn.c.mapFinder.title": "地図が主役のジム検索",
+  "wn.c.mapFinder.body": "ジム検索が大きな地図になり、各ジムは透けて見えるカードでスワイプして選べます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -392,6 +440,13 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Saltitos de tornozelo, agachamentos com salto e os outros saltos das figuras agora saem mesmo do chão.",
   "wn.c.sides.title": "Alongamentos de um lado mostram o lado certo",
   "wn.c.sides.body": "Um alongamento de um lado agora mostra o lado indicado e espelha para o outro.",
+  "wn.c.openNow.title": "Aberto agora na busca de academias",
+  "wn.c.openNow.body":
+    "Cada academia com horário mostra se está aberta agora e quando fecha ou abre, e o filtro Aberto agora mostra só as abertas.",
+  "wn.c.settingsSearch.title": "Busque nas configurações",
+  "wn.c.settingsSearch.body": "Digite na caixa no topo das Configurações para achar qualquer ajuste, que abre já com ele à vista.",
+  "wn.c.mapFinder.title": "Busca de academias com o mapa em primeiro lugar",
+  "wn.c.mapFinder.body": "A busca de academias agora é um mapa grande, com cada academia em um cartão transparente para deslizar.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -443,6 +498,12 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "앵클 홉, 스쿼트 점프 등 동작 안내 피규어의 점프가 이제 정말로 바닥에서 뜹니다.",
   "wn.c.sides.title": "한쪽 스트레칭이 맞는 쪽을 보여 줘요",
   "wn.c.sides.body": "한쪽 스트레칭은 이름에 있는 쪽을 보여 주고, 반대쪽은 좌우를 뒤집어 보여 줍니다.",
+  "wn.c.openNow.title": "헬스장 찾기에 '영업 중'",
+  "wn.c.openNow.body": "영업시간이 있는 헬스장은 지금 열었는지, 언제 닫거나 여는지 보여 주고, '영업 중' 칩으로 열린 곳만 볼 수 있습니다.",
+  "wn.c.settingsSearch.title": "설정 검색",
+  "wn.c.settingsSearch.body": "설정 맨 위 검색창에 입력하면 어떤 설정이든 찾을 수 있고, 그 설정이 보이는 위치로 열립니다.",
+  "wn.c.mapFinder.title": "지도 중심의 헬스장 찾기",
+  "wn.c.mapFinder.body": "헬스장 찾기가 큰 지도로 바뀌었고, 각 헬스장은 넘겨 볼 수 있는 반투명 카드에 있습니다.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -498,6 +559,13 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Podskoki na kostkach, przysiady z wyskokiem i inne skoki w instrukcjach naprawdę odrywają się teraz od podłogi.",
   "wn.c.sides.title": "Rozciąganie jednej strony pokazuje właściwą stronę",
   "wn.c.sides.body": "Rozciąganie jednej strony pokazuje teraz stronę z nazwy, a dla drugiej odbija się lustrzanie.",
+  "wn.c.openNow.title": "Otwarte teraz w wyszukiwarce siłowni",
+  "wn.c.openNow.body":
+    "Każda siłownia z godzinami pokazuje, czy jest teraz otwarta i kiedy się zamyka lub otwiera, a filtr Otwarte teraz pokazuje tylko otwarte.",
+  "wn.c.settingsSearch.title": "Szukaj w ustawieniach",
+  "wn.c.settingsSearch.body": "Wpisz w pole u góry Ustawień, aby znaleźć dowolne ustawienie. Otworzy się z tym ustawieniem na widoku.",
+  "wn.c.mapFinder.title": "Wyszukiwarka siłowni z mapą na pierwszym planie",
+  "wn.c.mapFinder.body": "Wyszukiwarka siłowni to teraz duża mapa, a każda siłownia jest na przezroczystej karcie do przewijania.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -554,4 +622,11 @@ export const tr: Partial<Record<Key, Message>> = {
     "Ayak bileği sekmeleri, sıçramalı squat'lar ve nasıl yapılır figürlerindeki diğer sıçramalar artık gerçekten yerden kalkıyor.",
   "wn.c.sides.title": "Tek taraflı esnemeler doğru tarafı gösteriyor",
   "wn.c.sides.body": "Tek taraflı bir esneme artık adındaki tarafı gösteriyor, diğer taraf için de aynalanıyor.",
+  "wn.c.openNow.title": "Spor salonu bulucuda Şimdi açık",
+  "wn.c.openNow.body":
+    "Saatleri olan her salon şu an açık olup olmadığını ve ne zaman kapanıp açılacağını gösteriyor; Şimdi açık çipi yalnızca açık olanları listeliyor.",
+  "wn.c.settingsSearch.title": "Ayarlarda ara",
+  "wn.c.settingsSearch.body": "Ayarlar'ın üstündeki kutuya yazarak istediğin ayarı bul; o ayar görünür şekilde açılır.",
+  "wn.c.mapFinder.title": "Haritayı öne çıkaran salon bulucu",
+  "wn.c.mapFinder.body": "Salon bulucu artık büyük bir harita; her salon kaydırabileceğin yarı saydam bir kartta.",
 };
