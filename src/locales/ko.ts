@@ -144,6 +144,7 @@ import * as warm from "./text/warm";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
 import * as wk from "./text/wk";
+import * as wn from "./text/wn";
 import * as workout from "./text/workout";
 import * as x from "./text/x";
 
@@ -273,6 +274,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...ton.ko,
   ...egg.ko,
   ...unl.ko,
+  ...wn.ko,
   ...hx.ko,
   ...lift.ko,
   ...tools.ko,

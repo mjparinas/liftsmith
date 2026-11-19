@@ -318,7 +318,7 @@ export const emails: Record<string, Words> = {
     title: "Find a gym near you",
     intro: "Travelling, moving or looking for a new gym? The finder shows what's near.",
     points: [
-      "Gyms on a map with a list beneath it, official ones first.",
+      "Gyms on a full map, each on a see-through card over it, official ones first.",
       "Each has its own page: equipment, hours, a map and how many lifters train there.",
       "Missing one? Add it.",
       "Add a gym to yours and the plan fits its equipment.",
@@ -755,6 +755,7 @@ export const emails: Record<string, Words> = {
       "Why? under a target shows the rule that set it.",
       "Send feedback or report a bug from Settings; it reaches the team with what's needed to fix it.",
       "The Features page on the website lists everything the app does, and what's new.",
+      "Can't find a setting? Type a word into the search box at the top of Settings and it takes you straight there.",
     ],
     dyk: "The version and build at the foot of Settings help us find your bug faster.",
   },
@@ -796,6 +797,7 @@ export const emails: Record<string, Words> = {
     intro: "The app keeps changing. Here's how to keep up, and how to steer it.",
     points: [
       "The Features page on the website lists every feature, with the newest at the top.",
+      "Settings › Help shows your version, and What's new beside it lists what's new, better and fixed.",
       "Each new feature gets its own tip email, so you hear about it once, here.",
       "Labs is where new ideas land first.",
       "Send feedback from Settings to tell us what to build next.",
@@ -947,5 +949,16 @@ export const emails: Record<string, Words> = {
       "Clients rate how the area feels the day after rehab, which is often what tells you the most.",
     ],
     dyk: "Turn on Let them move phases on their own and their app offers the next phase when the rule says so. You still see every move.",
+  },
+  "gym-open-now": {
+    title: "Find a gym that's open right now",
+    intro: "Find gyms near you now says which gyms are open, and when they close or open next.",
+    points: [
+      "Open now shows the closing time, and Closes soon turns amber in the last hour.",
+      "Closed gyms say when they open: later today, tomorrow or which day.",
+      "Tap Open now above the list to hide the closed ones, on the map too.",
+      "It's worked out on your own clock, for gyms near you.",
+    ],
+    dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
   },
 };

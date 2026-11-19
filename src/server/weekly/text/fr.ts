@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Trouvez une salle près de chez vous",
     intro: "En voyage, en déménagement ou en quête d'une nouvelle salle ? Le localisateur montre ce qu'il y a autour.",
     points: [
-      "Les salles sur une carte avec une liste dessous, les officielles en premier.",
+      "Les salles sur une grande carte, chacune sur une fiche translucide par-dessus, les officielles en premier.",
       "Chacune a sa page : matériel, horaires, carte et nombre de pratiquants qui s'y entraînent.",
       "Il en manque une ? Ajoutez-la.",
       "Ajoutez une salle aux vôtres et le plan s'adapte à son matériel.",
@@ -736,6 +736,7 @@ export const emails: Record<string, Words> = {
       "Pourquoi ? sous un objectif montre la règle qui l'a fixé.",
       "Envoyez un avis ou signalez un bogue depuis Réglages ; il arrive à l'équipe avec ce qu'il faut pour le corriger.",
       "La page Fonctionnalités du site liste tout ce que fait l'app, et les nouveautés.",
+      "Un réglage introuvable ? Tapez un mot dans la recherche en haut des Réglages et vous y êtes.",
     ],
     dyk: "La version et le build en bas des Réglages nous aident à trouver votre bogue plus vite.",
   },
@@ -777,6 +778,7 @@ export const emails: Record<string, Words> = {
     intro: "L'app évolue sans cesse. Voici comment suivre, et comment l'orienter.",
     points: [
       "La page Fonctionnalités du site liste chaque fonction, les plus récentes en tête.",
+      "Réglages › Aide affiche votre version, et Nouveautés, juste à côté, liste ce qui est nouveau, mieux ou corrigé.",
       "Chaque nouvelle fonction a son propre e-mail de conseil : vous en entendez parler une fois, ici.",
       "Les Labs accueillent les nouvelles idées en premier.",
       "Envoyez un avis depuis Réglages pour nous dire quoi créer ensuite.",
@@ -934,5 +936,16 @@ export const emails: Record<string, Words> = {
       "Vos clients notent la zone le lendemain de la rééducation, ce qui vous en dit souvent le plus.",
     ],
     dyk: "Activez Le laisser changer de phase seul et son appli proposera la phase suivante quand la règle le dit. Vous voyez toujours chaque changement.",
+  },
+  "gym-open-now": {
+    title: "Trouvez une salle ouverte tout de suite",
+    intro: "La recherche de salles proches indique maintenant celles qui sont ouvertes, et quand elles ferment ou rouvrent.",
+    points: [
+      "Ouvert affiche l'heure de fermeture, et Ferme bientôt passe à l'ambre la dernière heure.",
+      "Les salles fermées disent quand elles ouvrent : plus tard, demain ou quel jour.",
+      "Touchez Ouvert maintenant au-dessus de la liste pour masquer les salles fermées, sur la carte aussi.",
+      "C'est calculé sur votre propre heure, pour les salles près de vous.",
+    ],
+    dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
   },
 };

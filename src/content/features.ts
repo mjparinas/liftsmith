@@ -530,7 +530,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "gym-finder",
         name: "Gym finder and gym pages",
-        body: "Find gyms near you on a map with the list beneath it, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard. Something wrong on a page? Report it, and our team fixes it.",
+        body: "Find gyms near you on a full map with each gym on a see-through card over it, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard. Something wrong on a page? Report it, and our team fixes it.",
         tier: "free",
         added: "2026-11-12",
       },
@@ -582,6 +582,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "Official gyms post the classes they run every week, with the instructor and room, and mark the dates a class is off. Members see the week ahead on the gym's page in the app and on the web, and add the next class to their calendar in one tap.",
         tier: "free",
         added: "2026-11-17",
+      },
+      {
+        id: "gym-open-now",
+        name: "Open now in the gym finder",
+        body: "Gyms near you say whether they're open right now and when they close or open next, and one tap on Open now shows only the ones you can walk into.",
+        tier: "free",
+        note: "Worked out from each gym's opening hours on your own clock, for gyms near you.",
+        added: "2026-11-19",
       },
       {
         id: "buy-next",
@@ -1006,6 +1014,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-17",
       },
+      {
+        id: "whatsNew",
+        name: "What's new in the app",
+        body: "Settings shows your version with a What's new button: what's new, better and fixed, in plain words. After an update, Today mentions it once, and it only lists what you can already use.",
+        tier: "free",
+        added: "2026-11-19",
+      },
     ],
   },
   {
@@ -1019,6 +1034,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         body: "English, Spanish, French, German, Italian, Japanese, Brazilian Portuguese, Korean, Polish and Turkish, following your phone's or browser's language, or the one you pick on the welcome screen and in Settings.",
         tier: "free",
         added: "2026-11-15",
+      },
+      {
+        id: "settings-search",
+        name: "Search settings",
+        body: "Type a word at the top of Settings and every matching setting shows with where it lives. Tap one and it opens with that setting in view.",
+        tier: "free",
+        added: "2026-11-19",
       },
       {
         id: "appearance",

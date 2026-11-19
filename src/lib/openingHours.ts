@@ -101,3 +101,113 @@ export function formatHours(week: Week): string {
   }
   return rules.join("; ");
 }
+
+// --- Open now (idea borrowed from a sat-nav app's place cards, 2026-11-19; docs/decisions/gyms.md "Open now") ---
+
+/** A moment on a gym's clock: the weekday, Monday = 0 as OSM counts, and minutes since midnight. */
+export interface Clock {
+  day: number;
+  min: number;
+}
+
+/**
+ * Whether a gym is open at `at`, and the next change: open with the time it closes ("22:00"; null when it never closes
+ * this week), "soon" within an hour of closing; or closed with when it opens next and how many days ahead (0 today,
+ * 1 tomorrow; null when it never opens). A range that ends before it starts ("22:00-02:00") runs past midnight, and a
+ * range that ends at 24:00 joins the next day's 00:00 start.
+ */
+export type OpenState = { open: true; closes: string | null; soon: boolean } | { open: false; opens: string | null; inDays: number | null };
+
+/** How close to closing counts as "closes soon". */
+export const SOON_MIN = 60;
+const WEEK_MIN = 7 * 24 * 60;
+
+const mins = (hhmm: string) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h! * 60 + m!;
+};
+
+/** Every open stretch of the week in minutes from Monday 00:00, overlapping ones and ones that touch merged. */
+function stretches(week: Week): [number, number][] {
+  const raw: [number, number][] = [];
+  week.forEach((ranges, d) => {
+    for (const r of ranges) {
+      const [a, b] = r.split("-");
+      const start = d * 1440 + mins(a!);
+      let end = d * 1440 + mins(b!);
+      if (end <= start) end += 1440;
+      raw.push([start, end]);
+    }
+  });
+  // Stretches past Sunday midnight wrap to Monday: lay each one down a week earlier too, so a lookup on Monday sees it.
+  const all = raw.flatMap(([a, b]) => [[a, b] as [number, number], [a - WEEK_MIN, b - WEEK_MIN] as [number, number]]);
+  all.sort((x, y) => x[0] - y[0]);
+  const out: [number, number][] = [];
+  for (const s of all) {
+    const last = out.at(-1);
+    if (last && s[0] <= last[1]) last[1] = Math.max(last[1], s[1]);
+    else out.push([s[0], s[1]]);
+  }
+  return out;
+}
+
+const hhmm = (m: number) => {
+  const x = ((m % 1440) + 1440) % 1440;
+  return `${String(Math.floor(x / 60)).padStart(2, "0")}:${String(x % 60).padStart(2, "0")}`;
+};
+
+export function openState(week: Week, at: Clock): OpenState {
+  const now = at.day * 1440 + at.min;
+  const list = stretches(week);
+  if (!list.length) return { open: false, opens: null, inDays: null };
+  // Look a week either side so a stretch that started last Sunday or opens next Monday is found.
+  for (const [a, b] of list) {
+    for (const shift of [0, WEEK_MIN]) {
+      if (now >= a + shift && now < b + shift) {
+        const end = b + shift;
+        // Open all week long (24/7, or every day joined up): no closing time to give.
+        if (b - a >= WEEK_MIN) return { open: true, closes: null, soon: false };
+        return { open: true, closes: hhmm(end), soon: end - now <= SOON_MIN };
+      }
+    }
+  }
+  let next = Infinity;
+  for (const [a] of list) for (const shift of [0, WEEK_MIN]) if (a + shift > now && a + shift < next) next = a + shift;
+  const inDays = Math.floor(next / 1440) - at.day;
+  return { open: false, opens: hhmm(next), inDays };
+}
+
+/** The clock right now in a time zone (the viewer's own when none is given), as `openState` wants it. */
+export function clockAt(date: Date, timeZone?: string): Clock {
+  let parts: Intl.DateTimeFormatPart[];
+  try {
+    parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(date);
+  } catch {
+    parts = new Intl.DateTimeFormat("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(
+      date,
+    );
+  }
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  const day = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(get("weekday"));
+  return { day: Math.max(0, day), min: (Number(get("hour")) % 24) * 60 + Number(get("minute")) };
+}
+
+/**
+ * Hours are on the gym's own clock, and we don't store its time zone, so "open now" is worked out on the viewer's clock
+ * and only for gyms close enough to share it. 300 km keeps every gym a finder shows near home inside one zone almost
+ * everywhere, and a gym further away shows its hours without a guess.
+ */
+export const OPEN_NEAR_KM = 300;
+
+/** The open state of a gym's raw OSM hours at `at`, or null when the hours are missing, unreadable or too far to trust. */
+export function openNow(raw: string, at: Clock, km?: number | null): OpenState | null {
+  if (km != null && km > OPEN_NEAR_KM) return null;
+  const week = parseHours(raw);
+  return week ? openState(week, at) : null;
+}

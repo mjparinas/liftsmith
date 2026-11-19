@@ -1,7 +1,7 @@
 // GET /api/admin/flags/: every flag in src/lib/flags.ts with its default, options and what an admin set (staff).
 // POST (admins, audited): {name, value, rollout} sets it for that share of installs; {name, reset: true} goes back
 // to the default in code.
-import { allowed, FLAGS, isFlagName } from "@/lib/flags";
+import { allowed, flagAmount, FLAGS, isFlagName } from "@/lib/flags";
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { flagStates, resetFlag, setFlag } from "@/server/flags";
@@ -20,6 +20,7 @@ export async function GET(req: Request) {
       description: d.description,
       default: d.default,
       options: [...d.options],
+      amount: flagAmount(name),
       state: states.get(name) ?? null,
     };
   });
@@ -36,7 +37,11 @@ export async function POST(req: Request) {
     await audit(gate.staff.email, "flag.reset", body.name);
     return json(200, { ok: true });
   }
-  if (!allowed(body.name, body.value)) return json(400, { error: `Pick one of ${FLAGS[body.name].options.join(", ")}.` });
+  const amount = flagAmount(body.name);
+  if (!allowed(body.name, body.value))
+    return json(400, {
+      error: amount ? `Enter an amount from $${amount.min} to $${amount.max}.` : `Pick one of ${FLAGS[body.name].options.join(", ")}.`,
+    });
   const rollout = Number(body.rollout ?? 100);
   if (!Number.isInteger(rollout) || rollout < 0 || rollout > 100) return json(400, { error: "Roll out to 0 to 100% of installs." });
   await setFlag(body.name, body.value, rollout, gate.staff.email);

@@ -296,7 +296,7 @@ export const emails: Record<string, Words> = {
     title: "Znajdź siłownię w pobliżu",
     intro: "Podróż, przeprowadzka albo szukasz nowej siłowni? Wyszukiwarka pokaże, co jest w pobliżu.",
     points: [
-      "Siłownie na mapie z listą pod spodem, oficjalne na początku.",
+      "Siłownie na dużej mapie, każda na półprzezroczystej karcie nad nią, oficjalne na początku.",
       "Każda ma własną stronę: sprzęt, godziny otwarcia, mapa i liczba osób, które tam trenują.",
       "Brakuje jakiejś? Dodaj ją.",
       "Dodaj siłownię do swoich, a plan dopasuje się do jej sprzętu.",
@@ -733,6 +733,7 @@ export const emails: Record<string, Words> = {
       "Dlaczego? pod celem pokazuje regułę, która go ustaliła.",
       "Wyślij opinię lub zgłoś błąd z Ustawień; trafia do zespołu razem z tym, czego trzeba, żeby go naprawić.",
       "Strona Funkcje na stronie internetowej wymienia wszystko, co robi aplikacja, i co nowego.",
+      "Nie możesz znaleźć ustawienia? Wpisz słowo w wyszukiwarkę na górze Ustawień, a przeniesie Cię prosto do niego.",
     ],
     dyk: "Wersja i numer kompilacji na dole Ustawień pomagają nam szybciej znaleźć twój błąd.",
   },
@@ -774,6 +775,7 @@ export const emails: Record<string, Words> = {
     intro: "Aplikacja ciągle się zmienia. Oto jak być na bieżąco i jak wpływać na jej kierunek.",
     points: [
       "Strona Funkcje na stronie internetowej wymienia każdą funkcję, najnowsze na górze.",
+      "Ustawienia › Pomoc pokazują Twoją wersję, a Co nowego obok wymienia nowości, ulepszenia i poprawki.",
       "Każda nowa funkcja dostaje własny e-mail z poradą, więc usłyszysz o niej raz, właśnie tutaj.",
       "Nowe pomysły trafiają najpierw do Laboratorium.",
       "Wyślij opinię z Ustawień i powiedz nam, co zbudować dalej.",
@@ -927,5 +929,16 @@ export const emails: Record<string, Words> = {
       "Podopieczni oceniają okolicę dzień po rehabilitacji, a to często mówi najwięcej.",
     ],
     dyk: "Włącz Pozwól zmieniać etapy samodzielnie, a aplikacja podopiecznego zaproponuje następny etap, gdy wskaże na to reguła. Nadal widzisz każdą zmianę.",
+  },
+  "gym-open-now": {
+    title: "Znajdź siłownię otwartą teraz",
+    intro: "Wyszukiwarka siłowni w pobliżu pokazuje teraz, które są otwarte i kiedy zamykają lub znów otwierają.",
+    points: [
+      "Otwarte pokazuje godzinę zamknięcia, a Wkrótce zamknięcie robi się bursztynowe w ostatniej godzinie.",
+      "Zamknięte mówią, kiedy otwierają: później dziś, jutro lub w który dzień.",
+      "Dotknij Otwarte teraz nad listą, by ukryć zamknięte, także na mapie.",
+      "Liczone według Twojego zegara, dla siłowni w pobliżu.",
+    ],
+    dyk: "Złe godziny? Zgłoś problem na stronie siłowni albo przejmij ją i popraw je sam.",
   },
 };

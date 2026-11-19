@@ -6,19 +6,21 @@ import { SECTION_LABEL } from "@/components/titles";
 import { AREA_PINS, findNearby, placeLine, type Found, type Listing, type Place } from "@/lib/gymDirectory";
 import { decodeGym } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
-import { haptic } from "@/lib/juice";
+import { calm, haptic } from "@/lib/juice";
+import { clockAt, openNow } from "@/lib/openingHours";
 import { fmtNum } from "@/lib/units";
 
 import { Icon } from "./icons";
-import { Button, Skeleton } from "./ui";
+import { OpenNow } from "./OpenNow";
+import { Button, Chip, Skeleton } from "./ui";
 
 // Leaflet and its CSS load only once a search has gyms to show, so the screens around it stay as light as before.
 const GymsMap = lazy(() => import("./GymsMap"));
 
-/** Takes the lifter from a pin on the map to that gym's row. */
+/** Takes the lifter from a pin on the map to that gym's card, sliding the strip over the map to it. */
 const showRow = (id: string) => {
   const row = document.getElementById(`near-${id}`);
-  row?.scrollIntoView({ block: "center", behavior: "smooth" });
+  row?.scrollIntoView({ block: "nearest", inline: "center", behavior: calm() ? "auto" : "smooth" });
   row?.focus({ preventScroll: true });
 };
 
@@ -43,6 +45,8 @@ export function NearbyGyms({
   const [found, setFound] = useState<Found | null>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  // "Open now" narrows the real gyms to the ones open on the viewer's clock (docs/decisions/gyms.md "Open now").
+  const [openOnly, setOpenOnly] = useState(false);
   const find = async () => {
     haptic("tick");
     setBusy(true);
@@ -91,13 +95,24 @@ export function NearbyGyms({
         {add}
       </div>
     );
-  const row = (key: string, active: boolean, onClick: () => void, title: ReactNode, line: string, pin?: number) => (
-    <li key={key}>
+  // On the map (map-first, 2026-11-19), each gym is a see-through card in a strip along the map's foot; without a map
+  // they're a plain list. Either way a gym has exactly one card, the one button that picks it.
+  const row = (
+    key: string,
+    active: boolean,
+    onClick: () => void,
+    title: ReactNode,
+    line: string,
+    pin?: number,
+    extra?: ReactNode,
+    onMap = false,
+  ) => (
+    <li key={key} className={onMap ? "w-[82%] max-w-80 shrink-0 snap-center" : undefined}>
       <button
         id={`near-${key}`}
         type="button"
         aria-pressed={active}
-        className={`press card w-full p-3 text-left ${active ? "border-accent" : ""}`}
+        className={`press w-full p-3 text-left ${onMap ? "glass h-full rounded-2xl border" : "card"} ${active ? "border-accent" : onMap ? "border-line" : ""}`}
         onClick={() => {
           haptic("select");
           onClick();
@@ -114,46 +129,87 @@ export function NearbyGyms({
           )}
           {title}
         </span>
+        {extra && <span className="block text-sm">{extra}</span>}
         <span className="num block text-sm text-muted">{line}</span>
       </button>
     </li>
   );
+  const clock = clockAt(new Date());
+  const hours = new Map(state.places.map((p) => [p.id, openNow(p.hours, clock, p.km)]));
+  const anyHours = [...hours.values()].some(Boolean);
+  const places = openOnly && anyHours ? state.places.filter((p) => hours.get(p.id)?.open) : state.places;
+  const onMap = !!state.map && state.places.length > 0;
+  const filter = anyHours && (
+    <Chip active={openOnly} onClick={() => setOpenOnly(!openOnly)}>
+      {t("gp.openFilter")}
+    </Chip>
+  );
+  const none = openOnly && anyHours && !places.length && (
+    <p className={`text-sm ${onMap ? "glass rounded-2xl border border-line px-3 py-2 text-ink" : "text-muted"}`} role="status">
+      {t("gp.openNone")}
+    </p>
+  );
+  const cards = places.map((p, i) =>
+    row(
+      p.id,
+      picked === p.id,
+      () => onPickPlace(p),
+      <>
+        <span className="min-w-0 break-words">{p.name}</span>
+        {p.official && (
+          <span className="inline-flex shrink-0 text-accent" title={t("gym.place.official")}>
+            <Icon name="verified" size={18} />
+            <span className="sr-only">{t("gym.place.official")}</span>
+          </span>
+        )}
+      </>,
+      [
+        t("gym.near.away", { km: fmtNum(p.km) }),
+        placeLine({ address: p.address, city: p.city, region: "" }),
+        p.code ? t("gym.place.kitReady") : "",
+        p.lifters > 0 ? t("gym.place.lifters", { count: p.lifters }) : "",
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      state.map && i < AREA_PINS ? i + 1 : undefined,
+      hours.get(p.id) ? <OpenNow state={hours.get(p.id)!} today={clock.day} /> : undefined,
+      onMap,
+    ),
+  );
   return (
     <div className="grid gap-3">
       {status}
-      {state.map && state.places.length > 0 && (
-        <Suspense fallback={<Skeleton className="aspect-[16/9] w-full" />}>
-          <GymsMap pins={state.places.slice(0, AREA_PINS)} here={state.at} onPin={showRow} />
-        </Suspense>
-      )}
-      {state.places.length > 0 && (
-        <ul className="grid gap-2" aria-label={t("gym.near.title")}>
-          {state.places.map((p, i) =>
-            row(
-              p.id,
-              picked === p.id,
-              () => onPickPlace(p),
-              <>
-                <span className="min-w-0 break-words">{p.name}</span>
-                {p.official && (
-                  <span className="inline-flex shrink-0 text-accent" title={t("gym.place.official")}>
-                    <Icon name="verified" size={18} />
-                    <span className="sr-only">{t("gym.place.official")}</span>
-                  </span>
-                )}
-              </>,
-              [
-                t("gym.near.away", { km: fmtNum(p.km) }),
-                placeLine({ address: p.address, city: p.city, region: "" }),
-                p.code ? t("gym.place.kitReady") : "",
-                p.lifters > 0 ? t("gym.place.lifters", { count: p.lifters }) : "",
-              ]
-                .filter(Boolean)
-                .join(" · "),
-              state.map && i < AREA_PINS ? i + 1 : undefined,
-            ),
+      {onMap ? (
+        // Map-first (Melvin, 2026-11-19, an idea borrowed from an open-source sat-nav app): the map fills the space and
+        // the gyms ride on see-through cards over its foot, with Open now on top. docs/decisions/gyms.md "Map-first".
+        <div className="relative isolate">
+          <Suspense fallback={<Skeleton className="near-map-tall w-full" />}>
+            <GymsMap pins={places.slice(0, AREA_PINS)} here={state.at} onPin={showRow} className="near-map-tall" coverBottom={150} />
+          </Suspense>
+          {filter && <div className="absolute top-3 right-3 z-[500] rounded-full shadow-lg">{filter}</div>}
+          <div className="pointer-events-none absolute inset-x-0 bottom-7 z-[500] grid gap-2 px-3">
+            {none}
+            {places.length > 0 && (
+              <ul
+                className="pointer-events-auto -mx-3 flex snap-x snap-mandatory gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none]"
+                aria-label={t("gym.near.title")}
+                data-no-swipe
+              >
+                {cards}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          {filter && <div>{filter}</div>}
+          {none}
+          {places.length > 0 && (
+            <ul className="grid gap-2" aria-label={t("gym.near.title")}>
+              {cards}
+            </ul>
           )}
-        </ul>
+        </>
       )}
       {state.gyms.length > 0 && (
         <div>

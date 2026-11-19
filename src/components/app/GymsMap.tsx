@@ -30,10 +30,16 @@ export default function GymsMap({
   pins,
   here,
   onPin,
+  className = "aspect-[16/9]",
+  coverBottom = 0,
 }: {
   pins: MapPin[];
   here?: { lat: number; lon: number };
   onPin: (id: string) => void;
+  /** Its size: 16:9 by default; the map-first finder makes it tall (`near-map-tall`). */
+  className?: string;
+  /** Pixels at the foot covered by cards laid over the map, kept clear of pins when fitting them in. */
+  coverBottom?: number;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const key = pins.map((p) => p.id).join(".");
@@ -77,20 +83,20 @@ export default function GymsMap({
       }).addTo(map);
       points.push([here.lat, here.lon]);
     }
-    map.fitBounds(L.latLngBounds(points), { padding: [28, 28], maxZoom: 15 });
+    map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [28, 56], paddingBottomRight: [28, 28 + coverBottom], maxZoom: 15 });
     map.on("focus click", () => map.scrollWheelZoom.enable());
     map.on("blur", () => map.scrollWheelZoom.disable());
     return () => void map.remove();
     // The map is drawn again only when the gyms change, not on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, here?.lat, here?.lon]);
+  }, [key, here?.lat, here?.lon, coverBottom]);
   return (
     <div
       ref={box}
       data-no-swipe
       role="region"
       aria-label={t("gym.near.mapAlt")}
-      className="gyms-map card aspect-[16/9] w-full overflow-hidden p-0"
+      className={`gyms-map card w-full overflow-hidden p-0 ${className}`}
     />
   );
 }

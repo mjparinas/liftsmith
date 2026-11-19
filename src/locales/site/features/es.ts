@@ -288,7 +288,7 @@ export const es: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador y páginas de gimnasios",
-      body: "Encuentra gimnasios cerca de ti en un mapa con la lista debajo, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal. ¿Algo mal en una página? Avísanos y nuestro equipo lo corrige.",
+      body: "Encuentra gimnasios cerca de ti en un mapa grande con cada gimnasio en una tarjeta translúcida encima, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal. ¿Algo mal en una página? Avísanos y nuestro equipo lo corrige.",
     },
     "gym-amenities": {
       name: "Servicios y precios en las páginas de gimnasios",
@@ -313,6 +313,11 @@ export const es: FeaturesText = {
     "gym-classes": {
       name: "Horarios de clases en las páginas de gimnasios",
       body: "Los gimnasios oficiales publican las clases que dan cada semana, con instructor y sala, y marcan los días que no hay clase. Quienes entrenan allí ven la semana en la página del gimnasio en la app y la web, y añaden la próxima clase a su calendario con un toque.",
+    },
+    "gym-open-now": {
+      name: "Abierto ahora en el buscador de gimnasios",
+      body: "Los gimnasios cercanos dicen si están abiertos ahora y cuándo cierran o vuelven a abrir, y un toque en Abierto ahora muestra solo los que puedes visitar ya.",
+      note: "Se calcula con el horario de cada gimnasio y tu propia hora, para gimnasios cerca de ti.",
     },
     "gym-starter": {
       name: "Programas de inicio de los gimnasios",
@@ -532,9 +537,17 @@ export const es: FeaturesText = {
       name: "Comunidad: ideas, errores y hoja de ruta",
       body: "Sugiere lo próximo que debería hacer Liftsmith, vota las ideas que quieres, informa de errores con una captura que solo ve el equipo, y comenta o menciona a otros con @. Cada una muestra en qué punto está, de en revisión a publicada, y te avisamos cuando sale una idea que votaste. La hoja de ruta y el registro de cambios también están en la web.",
     },
+    whatsNew: {
+      name: "Novedades en la app",
+      body: "Ajustes muestra tu versión con un botón Novedades: lo nuevo, lo mejorado y lo arreglado, en palabras sencillas. Tras una actualización, Hoy lo menciona una vez, y solo lista lo que ya puedes usar.",
+    },
     languages: {
       name: "Diez idiomas",
       body: "Inglés, español, francés, alemán, italiano, japonés, portugués de Brasil, coreano, polaco y turco, según el idioma de tu teléfono o navegador, o el que elijas en la pantalla de bienvenida y en Ajustes.",
+    },
+    "settings-search": {
+      name: "Buscar en ajustes",
+      body: "Escribe una palabra arriba en Ajustes y aparece cada ajuste que coincide, con dónde está. Tócalo y se abre con ese ajuste a la vista.",
     },
     appearance: {
       name: "Oscuro, claro o como tu teléfono",

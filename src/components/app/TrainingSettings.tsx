@@ -8,6 +8,7 @@ import { t, weekday } from "@/lib/i18n";
 import { nowPlayingSupported } from "@/lib/nowPlaying";
 import { pickWeights } from "@/lib/pickWeights";
 import { repRange, TIMED } from "@/lib/progression";
+import { useSettingJump } from "@/lib/settingsJump";
 import { useApp } from "@/lib/store";
 import {
   isFavourite,
@@ -99,6 +100,7 @@ export function RestTimerSettings() {
 }
 
 export function TrainingSettings() {
+  useSettingJump();
   const { profile, setProfile } = useApp();
   const tp = profile.training ?? {};
   const put = (patch: Partial<TrainingPrefs>) => setProfile({ training: { ...profile.training, ...patch } });

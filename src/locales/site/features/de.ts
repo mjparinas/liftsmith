@@ -292,7 +292,7 @@ export const de: FeaturesText = {
     },
     "gym-finder": {
       name: "Studiosuche und Studioseiten",
-      body: "Finde Studios in deiner Nähe auf einer Karte mit der Liste darunter, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen. Stimmt etwas auf einer Seite nicht? Melde es, und unser Team korrigiert es.",
+      body: "Finde Studios in deiner Nähe auf einer großen Karte, jedes Studio auf einer durchscheinenden Karte darüber, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen. Stimmt etwas auf einer Seite nicht? Melde es, und unser Team korrigiert es.",
     },
     "gym-amenities": {
       name: "Ausstattung und Preise auf Studioseiten",
@@ -317,6 +317,11 @@ export const de: FeaturesText = {
     "gym-classes": {
       name: "Kurspläne auf Studioseiten",
       body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
+    },
+    "gym-open-now": {
+      name: "Jetzt geöffnet in der Studiosuche",
+      body: "Studios in deiner Nähe zeigen, ob sie gerade geöffnet haben und wann sie schließen oder wieder öffnen. Ein Tippen auf Jetzt geöffnet zeigt nur die, in die du gleich gehen kannst.",
+      note: "Berechnet aus den Öffnungszeiten jedes Studios und deiner eigenen Uhrzeit, für Studios in deiner Nähe.",
     },
     "gym-starter": {
       name: "Einsteigerprogramme der Studios",
@@ -536,9 +541,17 @@ export const de: FeaturesText = {
       name: "Community: Ideen, Fehler und Roadmap",
       body: "Schlag vor, was Liftsmith als Nächstes können soll, stimm für die Ideen, die du willst, melde Fehler mit einem Screenshot, den nur das Team sieht, und kommentiere oder erwähne andere mit @. Bei jedem Eintrag siehst du, wo er steht, von „Wird geprüft“ bis „Veröffentlicht“, und du erfährst es, wenn eine Idee, für die du gestimmt hast, erscheint. Roadmap und Änderungsprotokoll stehen auch auf der Website.",
     },
+    whatsNew: {
+      name: "Neuigkeiten in der App",
+      body: "Die Einstellungen zeigen deine Version mit einer Taste Neuigkeiten: was neu, besser oder behoben ist, in einfachen Worten. Nach einem Update weist Heute einmal darauf hin, und es listet nur, was du schon nutzen kannst.",
+    },
     languages: {
       name: "Zehn Sprachen",
       body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys oder Browsers, oder frei wählbar auf dem Startbildschirm und in den Einstellungen.",
+    },
+    "settings-search": {
+      name: "Einstellungen durchsuchen",
+      body: "Tippe oben in den Einstellungen ein Wort ein, und jede passende Einstellung erscheint mit ihrem Ort. Ein Tippen öffnet sie, die Einstellung direkt im Blick.",
     },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",

@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Encontre uma academia perto de você",
     intro: "Viajando, de mudança ou procurando uma academia nova? O buscador mostra o que há por perto.",
     points: [
-      "Academias num mapa com uma lista embaixo, as oficiais primeiro.",
+      "Academias num mapa grande, cada uma num cartão translúcido por cima, as oficiais primeiro.",
       "Cada uma tem sua própria página: equipamentos, horários, um mapa e quantas pessoas treinam lá.",
       "Falta alguma? Adicione.",
       "Adicione uma academia às suas e o plano se ajusta aos equipamentos dela.",
@@ -735,6 +735,7 @@ export const emails: Record<string, Words> = {
       "Por quê? embaixo de uma meta mostra a regra que a definiu.",
       "Envie feedback ou relate um bug em Ajustes; chega à equipe com o que é preciso para corrigir.",
       "A página de Recursos no site lista tudo o que o app faz, e o que há de novo.",
+      "Não acha uma configuração? Digite uma palavra na busca no topo das Configurações e vá direto até ela.",
     ],
     dyk: "A versão e a build no fim de Ajustes nos ajudam a encontrar o seu bug mais rápido.",
   },
@@ -776,6 +777,7 @@ export const emails: Record<string, Words> = {
     intro: "O app não para de mudar. Veja como acompanhar, e como ajudar a direcioná-lo.",
     points: [
       "A página de Recursos no site lista todos os recursos, com os mais novos no topo.",
+      "Ajustes › Ajuda mostra sua versão, e Novidades, ao lado, lista o que é novo, melhor e corrigido.",
       "Cada recurso novo ganha seu próprio e-mail de dica, então você fica sabendo uma vez, aqui.",
       "O Labs é onde as ideias novas chegam primeiro.",
       "Envie feedback em Ajustes para nos dizer o que construir em seguida.",
@@ -931,5 +933,16 @@ export const emails: Record<string, Words> = {
       "Seus alunos avaliam como está a região no dia seguinte à reabilitação, que muitas vezes é o que mais diz.",
     ],
     dyk: "Ligue Deixar o aluno mudar de fase sozinho e o app dele oferece a próxima fase quando a regra indicar. Você continua vendo cada mudança.",
+  },
+  "gym-open-now": {
+    title: "Encontre uma academia aberta agora",
+    intro: "Buscar academias perto agora mostra quais estão abertas e quando fecham ou abrem de novo.",
+    points: [
+      "Aberto agora mostra a hora de fechar, e Fecha em breve fica âmbar na última hora.",
+      "As fechadas dizem quando abrem: mais tarde, amanhã ou em que dia.",
+      "Toque em Aberto agora acima da lista para esconder as fechadas, no mapa também.",
+      "É calculado pela sua própria hora, para academias perto de você.",
+    ],
+    dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
   },
 };

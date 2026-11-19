@@ -214,6 +214,19 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["gym_places"],
   },
   {
+    name: "AI fix-up: the next gyms that never had their go (gymAiFix.ts fixBatch)",
+    sql: "SELECT id FROM gym_places WHERE ai_fix_at = 0 AND claimed_by = '' AND hidden = 0 AND pending = 0 AND website <> '' LIMIT ?",
+    uses: ["gym_places_ai_fix"],
+    noScan: ["gym_places"],
+  },
+  {
+    name: "AI fix-up: a pass's latest changes (gymAiFix.ts fixStatus)",
+    sql: `SELECT f.id, f.place_id, f.field, f.before, f.after, f.at, f.undone, p.name FROM gym_ai_fixes f
+          LEFT JOIN gym_places p ON p.id = f.place_id WHERE f.job = ? ORDER BY f.at DESC LIMIT ?`,
+    uses: ["gym_ai_fixes_job"],
+    noScan: ["gym_ai_fixes", "f", "gym_places", "p"],
+  },
+  {
     name: "gym import: claimed and lifter-added gyms a new map gym may be (gymPlaces.ts savePlaces)",
     sql: `SELECT id, name, lat, lon, source_ref FROM gym_places WHERE claimed_by <> '' AND claimed_by > ''
           UNION SELECT id, name, lat, lon, source_ref FROM gym_places WHERE source <> 'osm' AND source > ''`,

@@ -55,6 +55,24 @@ describe("Settings, grouped (2026-11-10)", () => {
     expect(screen.getByRole("switch", { name: "Lean mode" })).toBeTruthy();
   });
 
+  // docs/decisions/settings-screen.md "Search": the box finds a setting by its words and opens it in view.
+  it("searches settings and opens the one picked, lit up", async () => {
+    const user = userEvent.setup();
+    render(<Settings />);
+    await user.type(screen.getByRole("searchbox", { name: "Search settings" }), "vibra");
+    expect(screen.queryByRole("heading", { name: "Liftsmith Pro" })).toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent("1 setting found");
+    await user.click(screen.getByRole("button", { name: /^Vibration.*Workout/ }));
+    expect(location.hash).toContain("settings");
+    open("#/settings/workout");
+    expect(screen.getByRole("heading", { level: 1, name: "Workout" })).toBeTruthy();
+    await act(() => new Promise((r) => setTimeout(r, 5)));
+    expect(document.querySelector(".setting-hit")?.textContent).toContain("Vibration");
+    open("#/settings");
+    await user.type(screen.getByRole("searchbox", { name: "Search settings" }), "zzzz");
+    expect(screen.getByRole("status")).toHaveTextContent("No settings match “zzzz”.");
+  });
+
   it("sets the days a week from the training-day chips, keeping at least one", async () => {
     const user = userEvent.setup();
     open("#/settings/training");

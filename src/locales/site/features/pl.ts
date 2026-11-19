@@ -351,7 +351,7 @@ export const pl: FeaturesText = {
     },
     "gym-finder": {
       name: "Wyszukiwarka siłowni i strony siłowni",
-      body: "Znajdź siłownie w pobliżu na mapie z listą pod nią, oficjalne na początku, każda z własną stroną: sprzęt, godziny otwarcia, mapa i członkowie. Właściciele mogą przejąć swoją siłownię i dodać logo oraz zdjęcia. Brakuje siłowni? Dodaj ją. Właściciele widzą, ile osób ją dodało i zeskanowało plakat, oraz co zrobić dalej. Oficjalne siłownie mogą prowadzić klub z cotygodniowym rankingiem. Coś jest nie tak na stronie? Zgłoś to, a nasz zespół to poprawi.",
+      body: "Znajdź siłownie w pobliżu na dużej mapie, każdą na półprzezroczystej karcie nad nią, oficjalne na początku, każda z własną stroną: sprzęt, godziny otwarcia, mapa i członkowie. Właściciele mogą przejąć swoją siłownię i dodać logo oraz zdjęcia. Brakuje siłowni? Dodaj ją. Właściciele widzą, ile osób ją dodało i zeskanowało plakat, oraz co zrobić dalej. Oficjalne siłownie mogą prowadzić klub z cotygodniowym rankingiem. Coś jest nie tak na stronie? Zgłoś to, a nasz zespół to poprawi.",
     },
     "gym-amenities": {
       name: "Udogodnienia i ceny na stronach siłowni",
@@ -376,6 +376,11 @@ export const pl: FeaturesText = {
     "gym-classes": {
       name: "Grafiki zajęć na stronach siłowni",
       body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
+    },
+    "gym-open-now": {
+      name: "Otwarte teraz w wyszukiwarce siłowni",
+      body: "Siłownie w pobliżu pokazują, czy są teraz otwarte i kiedy zamykają lub znów otwierają, a jedno dotknięcie Otwarte teraz zostawia tylko te, do których możesz wejść od razu.",
+      note: "Liczone z godzin otwarcia każdej siłowni i Twojego zegara, dla siłowni w pobliżu.",
     },
     "gym-starter": {
       name: "Programy startowe siłowni",
@@ -598,9 +603,17 @@ export const pl: FeaturesText = {
       name: "Społeczność: pomysły, błędy i plan rozwoju",
       body: "Zaproponuj, co Liftsmith ma robić dalej, głosuj na pomysły, które chcesz, zgłaszaj błędy ze zrzutem ekranu widocznym tylko dla zespołu, komentuj i oznaczaj innych przez @. Przy każdym widać, na jakim jest etapie, od analizy po wydanie, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie. Plan rozwoju i lista zmian są też na stronie.",
     },
+    whatsNew: {
+      name: "Co nowego w aplikacji",
+      body: "Ustawienia pokazują Twoją wersję z przyciskiem Co nowego: co jest nowe, lepsze i naprawione, prostymi słowami. Po aktualizacji ekran Dziś wspomina o tym raz i pokazuje tylko to, z czego już możesz korzystać.",
+    },
     languages: {
       name: "Dziesięć języków",
       body: "Angielski, hiszpański, francuski, niemiecki, włoski, japoński, portugalski (Brazylia), koreański, polski i turecki, zgodnie z językiem telefonu lub przeglądarki albo do wyboru na ekranie powitalnym i w ustawieniach.",
+    },
+    "settings-search": {
+      name: "Szukaj w ustawieniach",
+      body: "Wpisz słowo na górze Ustawień, a pojawi się każde pasujące ustawienie z miejscem, gdzie jest. Dotknij, a otworzy się z tym ustawieniem na widoku.",
     },
     appearance: {
       name: "Ciemny, jasny albo jak w telefonie",

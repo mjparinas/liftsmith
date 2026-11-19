@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Finde ein Studio in deiner Nähe",
     intro: "Auf Reisen, beim Umzug oder auf der Suche nach einem neuen Studio? Die Suche zeigt, was in der Nähe ist.",
     points: [
-      "Studios auf einer Karte mit einer Liste darunter, offizielle zuerst.",
+      "Studios auf einer großen Karte, jedes auf einer durchscheinenden Karte darüber, offizielle zuerst.",
       "Jedes hat seine eigene Seite: Ausstattung, Öffnungszeiten, eine Karte und wie viele dort trainieren.",
       "Eins fehlt? Füg es hinzu.",
       "Füg ein Studio zu deinen hinzu, und der Plan passt sich seiner Ausstattung an.",
@@ -735,6 +735,7 @@ export const emails: Record<string, Words> = {
       "Warum? unter einem Ziel zeigt die Regel, die es festgelegt hat.",
       "Sende Feedback oder melde einen Fehler über Einstellungen; es erreicht das Team mit allem, was zum Beheben nötig ist.",
       "Die Funktionsseite auf der Website listet alles, was die App kann, und was neu ist.",
+      "Eine Einstellung nicht gefunden? Tippe oben in den Einstellungen ein Wort in die Suche, und du landest direkt dort.",
     ],
     dyk: "Version und Build unten in den Einstellungen helfen uns, deinen Fehler schneller zu finden.",
   },
@@ -776,6 +777,7 @@ export const emails: Record<string, Words> = {
     intro: "Die App entwickelt sich ständig weiter. So bleibst du auf dem Laufenden und bestimmst mit.",
     points: [
       "Die Funktionsseite auf der Website listet jede Funktion, die neuesten oben.",
+      "Einstellungen › Hilfe zeigt deine Version, und Neuigkeiten daneben listet, was neu, besser und behoben ist.",
       "Jede neue Funktion bekommt ihre eigene Tipp-E-Mail, du hörst also einmal davon, hier.",
       "In Labs landen neue Ideen zuerst.",
       "Sende Feedback über Einstellungen, um uns zu sagen, was wir als Nächstes bauen sollen.",
@@ -930,5 +932,16 @@ export const emails: Record<string, Words> = {
       "Deine Kundinnen und Kunden bewerten den Bereich am Tag nach der Reha, und das sagt oft am meisten.",
     ],
     dyk: "Mit Phasen selbst wechseln lassen bietet ihre App die nächste Phase an, wenn die Regel es sagt. Du siehst trotzdem jeden Wechsel.",
+  },
+  "gym-open-now": {
+    title: "Finde ein Studio, das gerade geöffnet hat",
+    intro: "Die Studiosuche in deiner Nähe zeigt jetzt, welche Studios geöffnet haben und wann sie schließen oder wieder öffnen.",
+    points: [
+      "Jetzt geöffnet zeigt die Schließzeit, und Schließt bald wird in der letzten Stunde bernsteinfarben.",
+      "Geschlossene Studios sagen, wann sie öffnen: später heute, morgen oder an welchem Tag.",
+      "Tippe über der Liste auf Jetzt geöffnet, um geschlossene auszublenden, auch auf der Karte.",
+      "Berechnet mit deiner eigenen Uhrzeit, für Studios in deiner Nähe.",
+    ],
+    dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
   },
 };

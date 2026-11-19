@@ -52,7 +52,7 @@ const SCHEMA = {
   additionalProperties: false,
 };
 
-interface Gym {
+export interface Gym {
   id: string;
   name: string;
   website: string;
@@ -68,38 +68,54 @@ interface Gym {
   facebook: string;
 }
 
-const s = (x: unknown) => (typeof x === "string" ? x : x == null ? "" : String(x));
-const clip = (x: unknown, max: number) => s(x).replace(/\s+/g, " ").trim().slice(0, max);
+export const s = (x: unknown) => (typeof x === "string" ? x : x == null ? "" : String(x));
+export const clip = (x: unknown, max: number) => s(x).replace(/\s+/g, " ").trim().slice(0, max);
 
 /** What's still missing on a gym: empty fields, and the city when it's empty or a postcode. */
 export const missingOf = (g: Gym): AutoField[] => AUTO_FIELDS.filter((k) => (k === "city" ? badCity(g.city) : !g[k]));
 
 /** A phone number as written: digits with the usual separators, 7 to 15 digits. */
-const phoneOf = (x: string) => {
+export const phoneOf = (x: string) => {
   const v = clip(x, 40);
   const digits = v.replace(/\D/g, "").length;
   return /^[+()\d\s./-]+$/.test(v) && digits >= 7 && digits <= 15 ? v : "";
 };
 
+/** The city and postcode an answer is checked against: the gym's own, or the answer's when the gym's is missing. */
+export function answerPlace(g: Gym, answer: Partial<Record<AutoField, unknown>>): { city: string; postcode: string } {
+  return {
+    city: badCity(g.city) ? cityName(clip(answer.city, 80)) : g.city,
+    postcode: g.postcode || postcodeFor(clip(answer.postcode, 20), g.country),
+  };
+}
+
+/**
+ * One field of Claude's answer, kept only if it passes the same checks a map or website value would (empty if not).
+ * `place` is the city and postcode the address is tidied with.
+ */
+export function checkedField(g: Gym, k: AutoField, value: unknown, place: { city: string; postcode: string }): string {
+  const raw = clip(value, k === "hours" ? 300 : 200);
+  if (!raw) return "";
+  const { city, postcode } = place;
+  if (k === "address")
+    return looksLikeStreet(raw) ? clean(tidyAddress(raw, { city, region: g.region, postcode, country: g.country }), 120) : "";
+  if (k === "city") return city && !badCity(city) ? city : "";
+  if (k === "postcode") return postcode;
+  if (k === "phone") return phoneOf(raw);
+  if (k === "hours") {
+    const week = parseHours(raw);
+    return week ? formatHours(week) : "";
+  }
+  if (k === "email") return siteEmail(raw, g.website);
+  return socialUrl(raw, k);
+}
+
 /** Claude's answer, field by field, kept only where it passes the same checks a map or website value would. */
 export function checkedFill(g: Gym, answer: Partial<Record<AutoField, unknown>>): Partial<Record<AutoField, string>> {
   const out: Partial<Record<AutoField, string>> = {};
-  const city = badCity(g.city) ? cityName(clip(answer.city, 80)) : g.city;
-  const postcode = g.postcode || postcodeFor(clip(answer.postcode, 20), g.country);
+  const place = answerPlace(g, answer);
   for (const k of missingOf(g)) {
-    const raw = clip(answer[k], k === "hours" ? 300 : 200);
-    if (!raw) continue;
-    let v = "";
-    if (k === "address")
-      v = looksLikeStreet(raw) ? clean(tidyAddress(raw, { city, region: g.region, postcode, country: g.country }), 120) : "";
-    else if (k === "city") v = city && !badCity(city) ? city : "";
-    else if (k === "postcode") v = postcode;
-    else if (k === "phone") v = phoneOf(raw);
-    else if (k === "hours") {
-      const week = parseHours(raw);
-      v = week ? formatHours(week) : "";
-    } else if (k === "email") v = siteEmail(raw, g.website);
-    else v = socialUrl(raw, k);
+    const v = checkedField(g, k, answer[k], place);
     if (v) out[k] = v;
   }
   return out;
@@ -163,7 +179,7 @@ ${text}
 }
 
 /** AiError lines that mean no request can go now, as opposed to one page going wrong. */
-const STOP = /switched off|cap|ANTHROPIC_API_KEY|refused the API key|reach Anthropic|Too many AI requests/;
+export const STOP = /switched off|cap|ANTHROPIC_API_KEY|refused the API key|reach Anthropic|Too many AI requests/;
 
 export interface AutoBatch {
   done: AutoOne[];

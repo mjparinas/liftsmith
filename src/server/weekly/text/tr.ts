@@ -297,7 +297,7 @@ export const emails: Record<string, Words> = {
     title: "Yakınındaki bir salonu bul",
     intro: "Seyahatte misin, taşınıyor musun ya da yeni bir salon mu arıyorsun? Salon bulucu yakındakileri gösterir.",
     points: [
-      "Salonlar bir haritada, altında bir listeyle; önce resmî olanlar.",
+      "Salonlar büyük bir haritada, her biri üstünde yarı saydam bir kartla; önce resmî olanlar.",
       "Her birinin kendi sayfası var: ekipman, çalışma saatleri, harita ve orada kaç sporcunun antrenman yaptığı.",
       "Eksik bir salon mu var? Ekle.",
       "Bir salonu kendi salonlarına ekle; plan onun ekipmanına uyar.",
@@ -734,6 +734,7 @@ export const emails: Record<string, Words> = {
       "Bir hedefin altındaki Neden?, onu belirleyen kuralı gösterir.",
       "Ayarlar'dan geri bildirim gönder ya da hata bildir; düzeltmek için gerekenlerle birlikte ekibe ulaşır.",
       "Web sitesindeki Özellikler sayfası, uygulamanın yaptığı her şeyi ve yenilikleri listeler.",
+      "Bir ayarı bulamıyor musun? Ayarlar'ın en üstündeki arama kutusuna bir kelime yaz, seni doğrudan oraya götürsün.",
     ],
     dyk: "Ayarlar'ın en altındaki sürüm ve derleme numarası, hatanı daha hızlı bulmamıza yardımcı olur.",
   },
@@ -775,6 +776,7 @@ export const emails: Record<string, Words> = {
     intro: "Uygulama sürekli değişiyor. Gelişmeleri nasıl takip edeceğin ve onlara nasıl yön vereceğin burada.",
     points: [
       "Web sitesindeki Özellikler sayfası, en yenileri en üstte olmak üzere tüm özellikleri listeler.",
+      "Ayarlar › Yardım sürümünü gösterir; yanındaki Yenilikler yeni, daha iyi ve düzeltilmiş olanları listeler.",
       "Her yeni özellik kendi ipucu e-postasını alır; ondan bir kez, burada haberin olur.",
       "Yeni fikirler önce Laboratuvar'a gelir.",
       "Sırada ne yapmamız gerektiğini söylemek için Ayarlar'dan geri bildirim gönder.",
@@ -927,5 +929,16 @@ export const emails: Record<string, Words> = {
       "Danışanlar rehabilitasyonun ertesi günü bölgenin nasıl olduğunu puanlar; çoğu zaman en çok şeyi bu söyler.",
     ],
     dyk: "Aşamayı kendisi değiştirebilsin'i açarsan kural söylediğinde uygulaması sonraki aşamayı önerir. Her değişikliği yine görürsün.",
+  },
+  "gym-open-now": {
+    title: "Şu an açık bir salon bul",
+    intro: "Yakındaki salonları bul artık hangi salonların açık olduğunu, ne zaman kapanıp açılacağını gösteriyor.",
+    points: [
+      "Şu an açık kapanış saatini gösterir; son saatte Yakında kapanıyor kehribar rengine döner.",
+      "Kapalı salonlar ne zaman açılacağını söyler: bugün daha sonra, yarın ya da hangi gün.",
+      "Listenin üstündeki Şu an açık'a dokun, kapalılar haritadan da gizlensin.",
+      "Kendi saatinle, yakındaki salonlar için hesaplanır.",
+    ],
+    dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
   },
 };

@@ -8,7 +8,7 @@
 // millionths of a dollar and `ai_calls:<day>`), each read and written by its key, so a check is two key lookups.
 import Anthropic from "@anthropic-ai/sdk";
 
-import { FLAGS } from "@/lib/flags";
+import { allowed, FLAGS } from "@/lib/flags";
 
 import { batch, query } from "./db";
 
@@ -25,7 +25,7 @@ const PRICE: Record<AiModel, { input: number; output: number; cacheRead: number 
 const CACHE_WRITE = 1.25;
 
 /** What each helper is called on the panel and in the audit log. */
-export type AiTask = "triage" | "gymFill" | "gymAuto" | "gymDupes" | "page" | "draft" | "digest";
+export type AiTask = "triage" | "gymFill" | "gymAuto" | "gymFix" | "gymDupes" | "page" | "draft" | "digest";
 
 /** The longest text one request may carry (characters), so one odd page or email can't run up the bill. */
 export const AI_INPUT_LIMIT = 200_000;
@@ -70,7 +70,7 @@ const flagValue = (rows: Record<string, unknown>[], name: "aiHelpers" | "aiDaily
   const row = rows.find((r) => r.name === name);
   try {
     const v = row ? (JSON.parse(String(row.value)) as unknown) : undefined;
-    if ((FLAGS[name].options as readonly unknown[]).includes(v)) return v;
+    if (allowed(name, v)) return v;
   } catch {
     // A broken value falls back to the default.
   }

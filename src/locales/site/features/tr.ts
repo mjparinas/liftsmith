@@ -351,7 +351,7 @@ export const tr: FeaturesText = {
     },
     "gym-finder": {
       name: "Salon bulucu ve salon sayfaları",
-      body: "Yakınındaki salonları haritada ve altındaki listede bul; önce resmi olanlar, her biri kendi sayfasıyla: ekipman, çalışma saatleri, harita ve üyeler. Sahipler salonlarını sahiplenip logo ve fotoğraf ekleyebilir. Bir salon eksik mi? Ekle. Sahipler kaç kişinin salonu eklediğini ve afişi taradığını, sırada ne yapacaklarını görür. Resmi salonlar haftalık sıralamalı bir kulüp yürütebilir. Bir sayfada yanlış bir şey mi var? Bildir, ekibimiz düzeltsin.",
+      body: "Yakınındaki salonları büyük bir haritada, her biri üstünde yarı saydam bir kartla bul; önce resmi olanlar, her biri kendi sayfasıyla: ekipman, çalışma saatleri, harita ve üyeler. Sahipler salonlarını sahiplenip logo ve fotoğraf ekleyebilir. Bir salon eksik mi? Ekle. Sahipler kaç kişinin salonu eklediğini ve afişi taradığını, sırada ne yapacaklarını görür. Resmi salonlar haftalık sıralamalı bir kulüp yürütebilir. Bir sayfada yanlış bir şey mi var? Bildir, ekibimiz düzeltsin.",
     },
     "gym-amenities": {
       name: "Salon sayfalarında olanaklar ve fiyatlar",
@@ -376,6 +376,11 @@ export const tr: FeaturesText = {
     "gym-classes": {
       name: "Salon sayfalarında ders programı",
       body: "Resmî salonlar her hafta verdikleri dersleri eğitmen ve alanla birlikte paylaşır, dersin olmadığı günleri işaretler. Üyeler haftayı uygulamada ve webde salonun sayfasında görür, sıradaki dersi tek dokunuşla takvimine ekler.",
+    },
+    "gym-open-now": {
+      name: "Salon bulucuda Şu an açık",
+      body: "Yakındaki salonlar şu an açık olup olmadığını, ne zaman kapanıp yeniden açılacağını gösterir. Şu an açık'a bir dokunuş yalnızca hemen gidebileceğin salonları bırakır.",
+      note: "Her salonun çalışma saatleri ve kendi saatinle hesaplanır, yakındaki salonlar için.",
     },
     "gym-starter": {
       name: "Salonların başlangıç programları",
@@ -598,9 +603,17 @@ export const tr: FeaturesText = {
       name: "Topluluk: fikirler, hatalar ve yol haritası",
       body: "Liftsmith'in sırada ne yapması gerektiğini öner, istediğin fikirlere oy ver, yalnızca ekibin gördüğü bir ekran görüntüsüyle hata bildir, yorum yap ya da @ ile birinden bahset. Her biri inceleniyordan yayınlandıya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın. Yol haritası ve değişiklik günlüğü web sitesinde de var.",
     },
+    whatsNew: {
+      name: "Uygulamadaki yenilikler",
+      body: "Ayarlar sürümünü bir Yenilikler düğmesiyle gösterir: yeni, daha iyi ve düzeltilmiş olanlar, sade bir dille. Bir güncellemeden sonra Bugün bunu bir kez söyler ve yalnızca zaten kullanabildiklerini listeler.",
+    },
     languages: {
       name: "On dil",
       body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun ya da tarayıcının dilini takip eder veya karşılama ekranında ve ayarlarda istediğini seçersin.",
+    },
+    "settings-search": {
+      name: "Ayarlarda ara",
+      body: "Ayarlar'ın en üstüne bir kelime yaz, eşleşen her ayar nerede olduğuyla birlikte görünsün. Dokun, o ayar görünür şekilde açılsın.",
     },
     appearance: {
       name: "Koyu, açık ya da telefonuna uygun",

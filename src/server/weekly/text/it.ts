@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Trova una palestra vicino a te",
     intro: "In viaggio, in trasloco o in cerca di una nuova palestra? La ricerca ti mostra cosa c'è vicino.",
     points: [
-      "Palestre su una mappa con un elenco sotto, prima quelle ufficiali.",
+      "Palestre su una mappa grande, ognuna su una scheda trasparente sopra, prima quelle ufficiali.",
       "Ognuna ha la sua pagina: attrezzatura, orari, una mappa e quante persone ci si allenano.",
       "Ne manca una? Aggiungila.",
       "Aggiungi una palestra alle tue e il piano si adatta alla sua attrezzatura.",
@@ -735,6 +735,7 @@ export const emails: Record<string, Words> = {
       "Perché? sotto un obiettivo mostra la regola che l'ha fissato.",
       "Invia un feedback o segnala un bug da Impostazioni; arriva al team con ciò che serve per correggerlo.",
       "La pagina Funzioni del sito elenca tutto ciò che fa l'app, e le novità.",
+      "Non trovi un'impostazione? Scrivi una parola nella ricerca in cima alle Impostazioni e ci arrivi subito.",
     ],
     dyk: "Versione e build in fondo a Impostazioni ci aiutano a trovare prima il tuo bug.",
   },
@@ -776,6 +777,7 @@ export const emails: Record<string, Words> = {
     intro: "L'app cambia di continuo. Ecco come restare aggiornato, e come indirizzarla.",
     points: [
       "La pagina Funzioni del sito elenca ogni funzione, con le più nuove in cima.",
+      "Impostazioni › Aiuto mostra la tua versione, e Novità, lì accanto, elenca cosa c'è di nuovo, migliore e corretto.",
       "Ogni nuova funzione ha la sua email di consigli, così ne senti parlare una volta, qui.",
       "I Labs sono dove arrivano per prime le nuove idee.",
       "Invia un feedback da Impostazioni per dirci cosa costruire dopo.",
@@ -930,5 +932,16 @@ export const emails: Record<string, Words> = {
       "I clienti valutano come sentono la zona il giorno dopo la riabilitazione, che spesso è ciò che ti dice di più.",
     ],
     dyk: "Attiva Lascia che cambi fase da solo e la sua app proporrà la fase successiva quando lo dice la regola. Tu vedi comunque ogni cambio.",
+  },
+  "gym-open-now": {
+    title: "Trova una palestra aperta adesso",
+    intro: "La ricerca di palestre vicine ora dice quali sono aperte e quando chiudono o riaprono.",
+    points: [
+      "Aperto ora mostra l'orario di chiusura, e Chiude a breve diventa ambra nell'ultima ora.",
+      "Le palestre chiuse dicono quando aprono: più tardi, domani o quale giorno.",
+      "Tocca Aperto ora sopra l'elenco per nascondere quelle chiuse, anche sulla mappa.",
+      "È calcolato sulla tua ora, per le palestre vicine.",
+    ],
+    dyk: "Orari sbagliati? Segnala un problema sulla sua pagina, oppure rivendicala e correggili tu.",
   },
 };

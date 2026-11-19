@@ -27,6 +27,17 @@
       return k in vars ? String(vars[k]) : all;
     });
   };
+  var openBtn = document.getElementById("near-open");
+  var openNone = document.getElementById("near-open-none");
+  var openOnly = false;
+  var lastGyms = [];
+  var lastHere = null;
+  var zone = "";
+  try {
+    zone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  } catch {
+    zone = "";
+  }
   var map = null;
   var layer = null;
   var hadDevice = false;
@@ -45,6 +56,26 @@
 
   function tileStyle() {
     return "dark"; // The website is dark (siteFrame.ts).
+  }
+
+  // "Open now · closes 10 PM": the server works out the state on the visitor's clock (openingHours.ts, sent as tz);
+  // this only says it in the page's language. Times are "22:00" on the gym's clock.
+  function clock(hhmm) {
+    var p = hhmm.split(":");
+    var d = new Date(2000, 0, 1, Number(p[0]) % 24, Number(p[1]));
+    return new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit" }).format(d);
+  }
+  function openText(s) {
+    if (s.open) {
+      if (s.closes == null) return T.openAllHours;
+      return fill(s.soon ? T.openSoon : T.openNow, { time: clock(s.closes) });
+    }
+    if (s.opens == null || s.inDays == null) return T.closedNow;
+    if (s.inDays === 0) return fill(T.closedOpens, { time: clock(s.opens) });
+    if (s.inDays === 1) return fill(T.closedOpensTomorrow, { time: clock(s.opens) });
+    var day = new Date();
+    day.setDate(day.getDate() + s.inDays);
+    return fill(T.closedOpensDay, { day: new Intl.DateTimeFormat(lang, { weekday: "long" }).format(day), time: clock(s.opens) });
   }
 
   function focusRow(i) {
@@ -73,6 +104,12 @@
       line.className = "muted small";
       line.textContent = [distance(g.km), g.where].filter(Boolean).join(" · ");
       txt.appendChild(name);
+      if (g.open) {
+        var open = document.createElement("span");
+        open.className = "small open" + (g.open.open ? (g.open.soon ? " is-soon" : " is-open") : "");
+        open.textContent = openText(g.open);
+        txt.appendChild(open);
+      }
       txt.appendChild(line);
       if (g.official) {
         var on = document.createElement("span");
@@ -127,12 +164,15 @@
       );
       points.push([here.lat, here.lon]);
     }
-    if (points.length) map.fitBounds(L.latLngBounds(points), { padding: [28, 28], maxZoom: 15 });
+    // On a wide screen the list floats over the map's right side, so keep the pins clear of it.
+    var side = window.matchMedia("(min-width: 960px)").matches ? 364 : 0;
+    if (points.length) map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [28, 28], paddingBottomRight: [28 + side, 28], maxZoom: 15 });
     else map.setView([20, 0], 3);
   }
 
   function lookFor(spot) {
-    var q = "/api/gyms/?closest=1" + (spot ? "&lat=" + spot.lat + "&lon=" + spot.lon : "");
+    var q =
+      "/api/gyms/?closest=1" + (spot ? "&lat=" + spot.lat + "&lon=" + spot.lon : "") + (zone ? "&tz=" + encodeURIComponent(zone) : "");
     return fetch(q, { headers: { accept: "application/json" } })
       .then(function (r) {
         if (!r.ok) throw new Error(String(r.status));
@@ -152,8 +192,13 @@
         else if (here.from === "device") say(T.fromDevice);
         else say(here.city ? fill(T.fromIpCity, { city: here.city }) : T.fromIp);
         if (body) body.hidden = !gyms.length;
-        drawList(gyms);
-        drawMap(here, gyms);
+        lastGyms = gyms;
+        lastHere = here;
+        if (openBtn)
+          openBtn.hidden = !gyms.some(function (g) {
+            return g.open;
+          });
+        show();
         if (here.from === "device") hideLocate();
         else showLocate();
       })
@@ -161,6 +206,25 @@
         say(T.failed);
         if (body && !map) body.hidden = true;
       });
+  }
+
+  // The Open now filter narrows the list and the pins to gyms open on the visitor's clock.
+  function show() {
+    var gyms = openOnly
+      ? lastGyms.filter(function (g) {
+          return g.open && g.open.open;
+        })
+      : lastGyms;
+    if (openNone) openNone.hidden = !(openOnly && !gyms.length);
+    drawList(gyms);
+    drawMap(lastHere, gyms);
+  }
+  if (openBtn) {
+    openBtn.addEventListener("click", function () {
+      openOnly = !openOnly;
+      openBtn.setAttribute("aria-pressed", openOnly ? "true" : "false");
+      show();
+    });
   }
 
   function showLocate() {

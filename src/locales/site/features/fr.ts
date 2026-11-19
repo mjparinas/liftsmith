@@ -293,7 +293,7 @@ export const fr: FeaturesText = {
     },
     "gym-finder": {
       name: "Recherche de salles et pages de salle",
-      body: "Trouvez des salles près de chez vous sur une carte avec la liste en dessous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire. Une erreur sur une page ? Signalez-la et notre équipe la corrige.",
+      body: "Trouvez des salles près de chez vous sur une grande carte, chaque salle sur une fiche translucide par-dessus, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire. Une erreur sur une page ? Signalez-la et notre équipe la corrige.",
     },
     "gym-amenities": {
       name: "Services et tarifs sur les pages des salles",
@@ -318,6 +318,11 @@ export const fr: FeaturesText = {
     "gym-classes": {
       name: "Horaires des cours sur les pages des salles",
       body: "Les salles officielles publient les cours qu'elles donnent chaque semaine, avec l'instructeur et la salle, et indiquent les jours sans cours. Les membres voient la semaine sur la page de la salle dans l'appli et sur le web, et ajoutent le prochain cours à leur agenda d'un toucher.",
+    },
+    "gym-open-now": {
+      name: "Ouvert maintenant dans la recherche de salles",
+      body: "Les salles proches indiquent si elles sont ouvertes et quand elles ferment ou rouvrent, et un toucher sur Ouvert maintenant ne montre que celles où vous pouvez entrer tout de suite.",
+      note: "Calculé à partir des horaires de chaque salle et de votre propre heure, pour les salles près de vous.",
     },
     "gym-starter": {
       name: "Programmes de départ des salles",
@@ -537,9 +542,17 @@ export const fr: FeaturesText = {
       name: "Communauté : idées, bugs et feuille de route",
       body: "Proposez ce que Liftsmith devrait faire ensuite, votez pour les idées qui vous plaisent, signalez des bugs avec une capture que seule l'équipe voit, et commentez ou mentionnez quelqu'un avec @. Chacune montre où elle en est, d'en cours d'examen à livrée, et vous êtes prévenu quand une idée pour laquelle vous avez voté sort. La feuille de route et le journal des modifications sont aussi sur le site.",
     },
+    whatsNew: {
+      name: "Les nouveautés dans l’app",
+      body: "Les Réglages affichent votre version avec un bouton Nouveautés : ce qui est nouveau, mieux ou corrigé, en mots simples. Après une mise à jour, Aujourd’hui le signale une fois, et ne liste que ce que vous pouvez déjà utiliser.",
+    },
     languages: {
       name: "Dix langues",
       body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone ou de votre navigateur, ou celle que vous choisissez sur l’écran d’accueil et dans les réglages.",
+    },
+    "settings-search": {
+      name: "Rechercher dans les réglages",
+      body: "Tapez un mot en haut des Réglages et chaque réglage correspondant s'affiche avec son emplacement. Touchez-le et il s'ouvre, ce réglage bien en vue.",
     },
     appearance: {
       name: "Sombre, clair ou comme votre téléphone",

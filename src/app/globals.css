@@ -158,6 +158,14 @@
   background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-gold) 55%, transparent) 100%);
   animation: gold-flash 900ms ease-out forwards;
 }
+/* The setting a Settings search picked (settingsJump.ts): a ring in the accent for a moment. A ring, not a
+   colour change, so it shows in every theme and with forced colours; Lean mode keeps it and drops the fade. */
+.setting-hit {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 1rem;
+  transition: outline-color 300ms ease-out;
+}
 @keyframes beat {
   0%, 100% { transform: scale(1); }
   15% { transform: scale(1.22); }
@@ -668,6 +676,18 @@ input[type="range"].slider::-moz-range-thumb { width: 18px; height: 18px; border
 /* The map in Find gyms near you (GymsMap.tsx, Leaflet over Mapbox tiles): our colours, numbered pins like the list,
    and zoom buttons big enough to hit (doubled classes, because Leaflet's own CSS loads after ours). */
 .gyms-map.leaflet-container { background: var(--color-surface); font: inherit; z-index: 0; }
+/* Map-first finder (NearbyGyms.tsx, 2026-11-19): a tall map with the gyms on see-through cards over its foot. */
+.near-map-tall { height: min(68vh, 34rem); min-height: 22rem; }
+.glass {
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 8px 24px -12px var(--shadow);
+}
+/* With more contrast the cards turn solid, so nothing on the map shows through behind the words. */
+:root[data-contrast="more"] .glass { background: var(--color-surface); }
+@media (prefers-contrast: more) { :root[data-contrast="system"] .glass { background: var(--color-surface); } }
+@media (forced-colors: active) { .glass { background: Canvas; -webkit-backdrop-filter: none; backdrop-filter: none; } }
 .gyms-map .gym-pin { display: grid; place-items: center; }
 .gyms-map .gym-pin span {
   display: grid; place-items: center; width: 28px; height: 28px; border-radius: 999px;

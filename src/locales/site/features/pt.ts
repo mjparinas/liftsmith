@@ -351,7 +351,7 @@ export const pt: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador de academias e páginas de academia",
-      body: "Encontre academias perto de você num mapa com a lista embaixo, as oficiais primeiro, cada uma com sua página: equipamentos, horários, mapa e membros. Donos podem reivindicar a academia e adicionar logo e fotos. Falta uma academia? Adicione. Os donos veem quantas pessoas adicionaram a academia e escanearam o cartaz, e o que fazer em seguida. Academias oficiais podem ter um clube com ranking semanal. Algo errado numa página? Relate, e nossa equipe corrige.",
+      body: "Encontre academias perto de você num mapa grande com cada academia num cartão translúcido por cima, as oficiais primeiro, cada uma com sua página: equipamentos, horários, mapa e membros. Donos podem reivindicar a academia e adicionar logo e fotos. Falta uma academia? Adicione. Os donos veem quantas pessoas adicionaram a academia e escanearam o cartaz, e o que fazer em seguida. Academias oficiais podem ter um clube com ranking semanal. Algo errado numa página? Relate, e nossa equipe corrige.",
     },
     "gym-amenities": {
       name: "Comodidades e preços nas páginas de academia",
@@ -376,6 +376,11 @@ export const pt: FeaturesText = {
     "gym-classes": {
       name: "Horários de aulas nas páginas das academias",
       body: "Academias oficiais publicam as aulas de cada semana, com instrutor e sala, e marcam os dias sem aula. Quem treina lá vê a semana na página da academia no app e na web, e adiciona a próxima aula à agenda com um toque.",
+    },
+    "gym-open-now": {
+      name: "Aberto agora na busca de academias",
+      body: "As academias perto de você mostram se estão abertas agora e quando fecham ou abrem de novo, e um toque em Aberto agora mostra só as que você pode visitar já.",
+      note: "Calculado pelo horário de cada academia e pela sua própria hora, para academias perto de você.",
     },
     "gym-starter": {
       name: "Programas iniciais da academia",
@@ -598,9 +603,17 @@ export const pt: FeaturesText = {
       name: "Comunidade: ideias, bugs e roteiro",
       body: "Sugira o que o Liftsmith deve fazer em seguida, vote nas ideias que você quer, relate bugs com uma captura de tela que só a equipe vê, e comente ou mencione alguém com @. Cada uma mostra em que ponto está, de em análise a lançada, e você fica sabendo quando uma ideia que votou é lançada. O roteiro e o registro de mudanças também estão no site.",
     },
+    whatsNew: {
+      name: "Novidades no app",
+      body: "Os Ajustes mostram sua versão com um botão Novidades: o que é novo, melhor e corrigido, em palavras simples. Depois de uma atualização, Hoje avisa uma vez, e só lista o que você já pode usar.",
+    },
     languages: {
       name: "Dez idiomas",
       body: "Inglês, espanhol, francês, alemão, italiano, japonês, português do Brasil, coreano, polonês e turco, seguindo o idioma do seu celular ou navegador, ou o que você escolher na tela de boas-vindas e nos ajustes.",
+    },
+    "settings-search": {
+      name: "Buscar nas configurações",
+      body: "Digite uma palavra no topo das Configurações e cada configuração que corresponde aparece com onde fica. Toque e ela abre com essa configuração à vista.",
     },
     appearance: {
       name: "Escuro, claro ou igual ao celular",

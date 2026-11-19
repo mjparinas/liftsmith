@@ -286,7 +286,7 @@ export const it: FeaturesText = {
     },
     "gym-finder": {
       name: "Ricerca palestre e pagine delle palestre",
-      body: "Trova palestre vicino a te su una mappa con l’elenco sotto, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra e aggiungere logo e foto. Manca una palestra? Aggiungila. I gestori vedono quanti atleti l’hanno aggiunta o hanno scansionato il poster, e cosa fare dopo. Le palestre ufficiali possono avere un club con classifica settimanale. Qualcosa non va in una pagina? Segnalalo e il nostro team lo corregge.",
+      body: "Trova palestre vicino a te su una mappa grande con ogni palestra su una scheda trasparente sopra, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra e aggiungere logo e foto. Manca una palestra? Aggiungila. I gestori vedono quanti atleti l’hanno aggiunta o hanno scansionato il poster, e cosa fare dopo. Le palestre ufficiali possono avere un club con classifica settimanale. Qualcosa non va in una pagina? Segnalalo e il nostro team lo corregge.",
     },
     "gym-amenities": {
       name: "Servizi e prezzi sulle pagine delle palestre",
@@ -311,6 +311,11 @@ export const it: FeaturesText = {
     "gym-classes": {
       name: "Orari dei corsi sulle pagine delle palestre",
       body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
+    },
+    "gym-open-now": {
+      name: "Aperto ora nella ricerca palestre",
+      body: "Le palestre vicine dicono se sono aperte adesso e quando chiudono o riaprono, e un tocco su Aperto ora mostra solo quelle dove puoi entrare subito.",
+      note: "Calcolato dagli orari di ogni palestra e dalla tua ora, per le palestre vicine.",
     },
     "gym-starter": {
       name: "Programmi per iniziare delle palestre",
@@ -530,9 +535,17 @@ export const it: FeaturesText = {
       name: "Community: idee, bug e roadmap",
       body: "Suggerisci cosa dovrebbe fare Liftsmith, vota le idee che vuoi, segnala i bug con uno screenshot che vede solo il team e commenta o menziona qualcuno con @. Ognuna mostra a che punto è, da in valutazione a rilasciata, e ti avvisiamo quando esce un'idea che hai votato. Roadmap e registro delle modifiche sono anche sul sito.",
     },
+    whatsNew: {
+      name: "Le novità nell'app",
+      body: "Le Impostazioni mostrano la tua versione con un pulsante Novità: cosa c'è di nuovo, di migliore e di corretto, in parole semplici. Dopo un aggiornamento, Oggi lo segnala una volta, ed elenca solo ciò che puoi già usare.",
+    },
     languages: {
       name: "Dieci lingue",
       body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono o del browser, oppure quella che scegli nella schermata di benvenuto e nelle impostazioni.",
+    },
+    "settings-search": {
+      name: "Cerca nelle impostazioni",
+      body: "Scrivi una parola in cima alle Impostazioni e compare ogni impostazione che corrisponde, con dove si trova. Toccala e si apre con quell'impostazione in vista.",
     },
     appearance: {
       name: "Scuro, chiaro o come il telefono",
