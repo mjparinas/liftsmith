@@ -74,6 +74,9 @@ const nextConfig: NextConfig = {
           // Coaches' programs and their ratings (src/server/programPage.ts); in the gym sitemap.
           { source: "/coach-programs/", destination: "/api/programs/page/" },
           { source: "/coach-programs/:p/", destination: "/api/programs/page/?p=:p" },
+          // The public routine library (src/server/libraryPage.ts); in the gym sitemap.
+          { source: "/routines/", destination: "/api/library/page/" },
+          { source: "/routines/:r/", destination: "/api/library/page/?r=:r" },
           // The Liftsmith community: ideas, bugs, roadmap and changelog (src/server/communityPage.ts); in the gym sitemap.
           { source: "/community/", destination: "/api/community/page/" },
           { source: "/community/roadmap/", destination: "/api/community/page/?view=roadmap" },
@@ -98,6 +101,7 @@ const nextConfig: NextConfig = {
           { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/routines/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/community/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),

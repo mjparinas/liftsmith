@@ -61,6 +61,9 @@ export const en = {
   "wn.c.formVideos.title": "Form videos for your coach",
   "wn.c.formVideos.body":
     "Film a set in the app and send it to your coach or physio. They slow it down and pin notes to the exact moments that matter.",
+  "wn.c.routineLibrary.title": "A routine library",
+  "wn.c.routineLibrary.body":
+    "Find routines other lifters published, save one in a tap and rate it. Publish your own from its editor in your routines.",
   "wn.c.teamSession.title": "A team session for school coaches",
   "wn.c.teamSession.body":
     "High school coaches can run one workout for the whole team from one tablet. Each athlete taps their name to log their sets, and the board shows who hasn't started.",
@@ -142,6 +145,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Vídeos de técnica para tu entrenador",
   "wn.c.formVideos.body":
     "Graba una serie en la app y envíasela a tu entrenador o fisio. La ve a cámara lenta y fija notas en los momentos exactos que importan.",
+  "wn.c.routineLibrary.title": "Una biblioteca de rutinas",
+  "wn.c.routineLibrary.body":
+    "Encuentra rutinas que publicaron otros atletas, guarda una con un toque y valórala. Publica las tuyas desde su editor en tus rutinas.",
   "wn.c.teamSession.title": "Sesiones de equipo para entrenadores escolares",
   "wn.c.teamSession.body":
     "Los entrenadores de secundaria pueden dirigir un entrenamiento para todo el equipo desde una tableta. Cada atleta toca su nombre para anotar sus series, y el tablero muestra quién no ha empezado.",
@@ -225,6 +231,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Des vidéos de technique pour votre coach",
   "wn.c.formVideos.body":
     "Filmez une série dans l'app et envoyez-la à votre coach ou kiné. Il la ralentit et épingle des notes aux moments précis qui comptent.",
+  "wn.c.routineLibrary.title": "Une bibliothèque de routines",
+  "wn.c.routineLibrary.body":
+    "Trouvez des routines publiées par d'autres pratiquants, enregistrez-en une d'un geste et notez-la. Publiez les vôtres depuis leur éditeur dans vos routines.",
   "wn.c.teamSession.title": "Séances d'équipe pour les coachs scolaires",
   "wn.c.teamSession.body":
     "Les coachs de lycée peuvent mener une séance pour toute l'équipe depuis une tablette. Chaque athlète touche son prénom pour noter ses séries, et le tableau montre qui n'a pas commencé.",
@@ -307,6 +316,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Technikvideos für deinen Coach",
   "wn.c.formVideos.body":
     "Filme einen Satz in der App und schick ihn deinem Coach oder Physio. Er verlangsamt ihn und heftet Notizen genau an die wichtigen Momente.",
+  "wn.c.routineLibrary.title": "Eine Routinen-Bibliothek",
+  "wn.c.routineLibrary.body":
+    "Finde Routinen, die andere veröffentlicht haben, speichere eine mit einem Tippen und bewerte sie. Deine eigenen veröffentlichst du in ihrem Editor in deinen Routinen.",
   "wn.c.teamSession.title": "Teamtraining für Schultrainer",
   "wn.c.teamSession.body":
     "Schultrainer können ein Training für das ganze Team von einem Tablet aus leiten. Alle tippen auf ihren Namen und tragen ihre Sätze ein, und die Tafel zeigt, wer noch nicht angefangen hat.",
@@ -388,6 +400,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Video della tecnica per il tuo coach",
   "wn.c.formVideos.body":
     "Riprendi una serie nell'app e inviala al tuo coach o fisioterapista. La rallenta e fissa note nei momenti esatti che contano.",
+  "wn.c.routineLibrary.title": "Una libreria di routine",
+  "wn.c.routineLibrary.body":
+    "Trova le routine pubblicate da altri atleti, salvane una con un tocco e votala. Pubblica le tue dal loro editor nelle tue routine.",
   "wn.c.teamSession.title": "Sessioni di squadra per gli allenatori scolastici",
   "wn.c.teamSession.body":
     "Gli allenatori scolastici possono guidare un allenamento per tutta la squadra da un tablet. Ogni atleta tocca il proprio nome per registrare le serie, e il tabellone mostra chi non ha iniziato.",
@@ -462,6 +477,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "コーチにフォーム動画を",
   "wn.c.formVideos.body":
     "アプリでセットを撮影してコーチや理学療法士に送れます。スロー再生して、大事な瞬間にピンポイントでメモを付けてくれます。",
+  "wn.c.routineLibrary.title": "ルーティンライブラリ",
+  "wn.c.routineLibrary.body":
+    "ほかのリフターが公開したルーティンを探して、ワンタップで保存して評価できます。自分のルーティンは編集画面から公開できます。",
   "wn.c.teamSession.title": "学校のコーチ向けチームセッション",
   "wn.c.teamSession.body":
     "高校のコーチがタブレット1台でチーム全員の練習を進められます。選手は名前をタップしてセットを記録し、ボードでまだ始めていない人がわかります。",
@@ -539,6 +557,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Vídeos de execução para o seu treinador",
   "wn.c.formVideos.body":
     "Grave uma série no app e envie ao seu treinador ou fisio. Ele vê em câmera lenta e fixa notas nos momentos exatos que importam.",
+  "wn.c.routineLibrary.title": "Uma biblioteca de rotinas",
+  "wn.c.routineLibrary.body":
+    "Encontre rotinas que outros atletas publicaram, salve uma com um toque e avalie. Publique as suas pelo editor delas nas suas rotinas.",
   "wn.c.teamSession.title": "Sessões do time para técnicos escolares",
   "wn.c.teamSession.body":
     "Técnicos do ensino médio podem conduzir um treino para o time todo em um tablet. Cada atleta toca no nome para registrar as séries, e o painel mostra quem não começou.",
@@ -611,6 +632,8 @@ export const ko: Partial<Record<Key, Message>> = {
     "앱을 열지 않아도 기다리는 메시지, 좋아요, 댓글, 팔로우 요청 수를 볼 수 있습니다. 앱 안에서는 친구와 코치의 빨간 숫자가 어디에 있는지 알려 줍니다.",
   "wn.c.formVideos.title": "코치에게 자세 영상을",
   "wn.c.formVideos.body": "앱에서 세트를 촬영해 코치나 물리치료사에게 보내세요. 느리게 돌려 보며 중요한 순간에 정확히 메모를 남겨 줘요.",
+  "wn.c.routineLibrary.title": "루틴 라이브러리",
+  "wn.c.routineLibrary.body": "다른 리프터가 공개한 루틴을 찾아 한 번에 저장하고 평가하세요. 내 루틴은 편집 화면에서 공개할 수 있어요.",
   "wn.c.teamSession.title": "학교 코치를 위한 팀 세션",
   "wn.c.teamSession.body":
     "고등학교 코치가 태블릿 하나로 팀 전체의 운동을 진행할 수 있습니다. 선수는 이름을 눌러 세트를 기록하고, 보드에서 아직 시작하지 않은 사람을 볼 수 있습니다.",
@@ -687,6 +710,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Nagrania techniki dla trenera",
   "wn.c.formVideos.body":
     "Nagraj serię w aplikacji i wyślij ją trenerowi lub fizjoterapeucie. Zwolni nagranie i przypnie notatki dokładnie do ważnych momentów.",
+  "wn.c.routineLibrary.title": "Biblioteka rutyn",
+  "wn.c.routineLibrary.body":
+    "Znajdź rutyny opublikowane przez innych, zapisz jedną jednym dotknięciem i oceń ją. Swoje opublikujesz w ich edytorze w rutynach.",
   "wn.c.teamSession.title": "Treningi drużyny dla trenerów szkolnych",
   "wn.c.teamSession.body":
     "Trenerzy szkolni mogą poprowadzić jeden trening dla całej drużyny z jednego tabletu. Każdy zawodnik stuka swoje imię, żeby zapisać serie, a tablica pokazuje, kto jeszcze nie zaczął.",
@@ -765,6 +791,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.title": "Koçun için form videoları",
   "wn.c.formVideos.body":
     "Uygulamada bir set çek ve koçuna ya da fizyoterapistine gönder. Videoyu yavaşlatıp tam önemli anlara not iliştirir.",
+  "wn.c.routineLibrary.title": "Rutin kütüphanesi",
+  "wn.c.routineLibrary.body":
+    "Diğer sporcuların yayınladığı rutinleri bul, birini tek dokunuşla kaydet ve puanla. Kendi rutinlerini düzenleyicilerinden yayınla.",
   "wn.c.teamSession.title": "Okul koçları için takım seansı",
   "wn.c.teamSession.body":
     "Lise koçları tüm takımın antrenmanını tek tabletten yönetebilir. Her sporcu setlerini kaydetmek için adına dokunur, pano kimin başlamadığını gösterir.",

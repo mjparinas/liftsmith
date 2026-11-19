@@ -973,6 +973,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "C'est dans Réglages › Apps connectées, et la liste sous la carte de récupération dans Corps montre ce qui est compté.",
   },
+  "routine-library": {
+    title: "Trouvez une routine créée par quelqu'un d'autre",
+    intro: "La nouvelle bibliothèque de routines rassemble celles que d'autres ont publiées, prêtes à enregistrer d'un geste.",
+    points: [
+      "Cherchez par mots, choisissez un objectif ou activez Adaptées à ma salle pour ne voir que celles que votre salle permet.",
+      "Enregistrez-en une et elle rejoint vos routines, prête à lancer ou à modifier.",
+      "Notez-la avec des étoiles une fois enregistrée. Les étoiles s'affichent à partir de trois notes.",
+      "Publiez la vôtre depuis son éditeur, avec ou sans votre nom. Seuls les exercices et les séries sont partagés, jamais les charges ni les notes.",
+    ],
+    dyk: "Chaque routine publiée a sa propre page sur le site, à partager avec qui vous voulez.",
+  },
   "team-session": {
     title: "Toute la séance de l'équipe sur une tablette",
     intro: "Les séances d'équipe mettent un entraînement pour toute votre équipe sur une seule tablette.",

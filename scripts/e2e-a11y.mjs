@@ -792,6 +792,41 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/community/new-bug`);
     await page.getByLabel("Title").fill("Rest timer stops on lock");
     await scan("community new bug");
+    // The routine library (docs/decisions/routine-library.md): browsing, one routine with its stars, and the report
+    // sheet, on a made-up library.
+    const libRoutine = {
+      id: "AbCdEfGh1234",
+      title: "Push day for beginners",
+      about: "Three presses, short rests.",
+      goal: "muscle",
+      level: "beginner",
+      equipment: ["barbell", "bench"],
+      minutes: 40,
+      code: "r1~UHVzaA~bench-press.4~overhead-press.3",
+      by: "Blair",
+      saves: 12,
+      rating: { average: 4.3, count: 5 },
+      createdAt: Date.now() - 86_400_000,
+      updatedAt: Date.now() - 86_400_000,
+    };
+    await page.route(
+      (u) => u.pathname.startsWith("/api/library/"),
+      (r) => {
+        const u = new URL(r.request().url());
+        if (u.searchParams.has("id")) return r.fulfill({ json: { routine: { ...libRoutine, myStars: 0, saved: true } } });
+        if (u.searchParams.has("mine")) return r.fulfill({ json: { mine: [] } });
+        return r.fulfill({ json: { routines: [libRoutine, { ...libRoutine, id: "AbCdEfGh1235", title: "Squat day", goal: "strength" }] } });
+      },
+    );
+    await page.goto(`${server.url}/app/#/library`);
+    await page.getByRole("button", { name: /Squat day/ }).waitFor();
+    await scan("routine library");
+    await page.goto(`${server.url}/app/#/library/AbCdEfGh1234`);
+    await page.getByRole("heading", { name: "Push day for beginners" }).waitFor();
+    await scan("library routine");
+    await page.getByRole("button", { name: "Report this routine" }).click();
+    await scan("library report");
+    await page.keyboard.press("Escape");
     await page.evaluate(
       (was) => (was ? localStorage.setItem("liftsmith.account", was) : localStorage.removeItem("liftsmith.account")),
       accountBefore,

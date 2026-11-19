@@ -276,6 +276,11 @@ export const de: FeaturesText = {
       name: "Eigene Routinen",
       body: "Baue Routinen aus dem Übungskatalog, so viele du willst, und teile sie als Link.",
     },
+    "routine-library": {
+      name: "Routinen-Bibliothek",
+      body: "Durchsuche Routinen, die andere veröffentlicht haben, nach Ziel, Stichwort und dem, was dein Studio hat, speichere eine mit einem Tippen und bewerte sie mit Sternen. Veröffentliche deine eigene aus ihrem Editor, mit oder ohne deinen Namen, und sie bekommt eine eigene Seite auf der Website. Nur Übungen und Sätze gehen raus, nie deine Gewichte oder Notizen.",
+      note: "Zum Veröffentlichen brauchst du ein Konto und musst 18 sein. Stöbern kann jeder.",
+    },
     library: {
       name: "1.000 Übungen",
       body: "Kraft, Körpergewicht, Maschinen, Bänder, Kettlebells und Cardio, mit Suche, Muskel-Filtern und einem Filter für dieses Studio. Cardio speichert Zeit und Strecke.",

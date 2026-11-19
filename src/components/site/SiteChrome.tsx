@@ -151,6 +151,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: localPath(lang, "/muscles/"), label: l.muscles },
           { href: localPath(lang, "/programs/"), label: l.programs },
           { href: "/coach-programs/", label: l.coachPrograms },
+          { href: "/routines/", label: l.routineLibrary },
           { href: "/equipment/", label: l.equipment },
           { href: "/guides/", label: l.guides },
           { href: "/blog/", label: l.blog },

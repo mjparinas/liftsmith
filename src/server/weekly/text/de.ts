@@ -969,6 +969,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Du findest es unter Einstellungen › Verbundene Apps, und die Liste unter der Erholungskarte auf Körper zeigt, was gezählt wird.",
   },
+  "routine-library": {
+    title: "Finde eine Routine, die jemand anderes gebaut hat",
+    intro: "Die neue Routinen-Bibliothek sammelt Routinen, die andere veröffentlicht haben, mit einem Tippen gespeichert.",
+    points: [
+      "Suche nach Stichworten, wähle ein Ziel oder schalte Passt zu meinem Studio ein, um nur Routinen zu sehen, die dein Studio hergibt.",
+      "Gespeichert landet sie bei deinen Routinen, bereit zum Starten oder Ändern.",
+      "Bewerte sie mit Sternen, sobald du sie gespeichert hast. Sterne erscheinen ab drei Bewertungen.",
+      "Veröffentliche deine eigene aus ihrem Editor, mit oder ohne Namen. Nur Übungen und Sätze gehen raus, nie Gewichte oder Notizen.",
+    ],
+    dyk: "Jede veröffentlichte Routine bekommt eine eigene Seite auf der Website, die du mit allen teilen kannst.",
+  },
   "team-session": {
     title: "Das ganze Teamtraining auf einem Tablet",
     intro: "Mit Teamtraining läuft ein Training für dein ganzes Team auf einem einzigen Tablet.",

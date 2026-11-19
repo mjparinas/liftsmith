@@ -269,6 +269,11 @@ export const es: FeaturesText = {
       name: "Tus propias rutinas",
       body: "Crea rutinas desde el buscador de ejercicios, sin límite de cantidad, y compártelas con un enlace.",
     },
+    "routine-library": {
+      name: "Biblioteca de rutinas",
+      body: "Busca rutinas que otros publicaron por objetivo, palabras y lo que tiene tu gimnasio, guarda una con un toque y puntúala con estrellas. Publica la tuya desde su editor, con o sin tu nombre, y tendrá su propia página en la web. Solo salen los ejercicios y las series, nunca tus pesos ni tus notas.",
+      note: "Para publicar necesitas una cuenta y tener 18 años. Cualquiera puede explorar.",
+    },
     library: {
       name: "1000 ejercicios",
       body: "Fuerza, peso corporal, máquinas, bandas, pesas rusas y cardio, con búsqueda, filtros por músculo y un filtro de este gimnasio. El cardio registra tiempo y distancia.",

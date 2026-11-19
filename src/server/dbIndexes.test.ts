@@ -327,6 +327,48 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["coach_checkin_photos"],
   },
   {
+    name: "routine library: the browsing list (routineLibrary.ts listed)",
+    sql: "SELECT id, title FROM library_routines WHERE hidden = 0 ORDER BY saves DESC LIMIT 3000",
+    uses: ["library_routines_list"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: a lifter's own routines (routineLibrary.ts myLibrary)",
+    sql: "SELECT * FROM library_routines WHERE account_id = ? ORDER BY updated_at DESC",
+    uses: ["library_routines_account"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: the same routine published again (routineLibrary.ts publishRoutine)",
+    sql: "SELECT id FROM library_routines WHERE account_id = ? AND code = ?",
+    uses: ["library_routines_account"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: a lifter's stars on a routine (routineLibrary.ts libraryRoutine)",
+    sql: "SELECT stars FROM library_ratings WHERE routine_id = ? AND account_id = ?",
+    uses: ["sqlite_autoindex_library_ratings_1"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a routine's rating summed (routineLibrary.ts rateRoutine)",
+    sql: "SELECT COALESCE(SUM(stars), 0) FROM library_ratings WHERE routine_id = ?",
+    uses: ["sqlite_autoindex_library_ratings_1"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a deleted account's stars (routineLibrary.ts libraryCleanup)",
+    sql: "SELECT routine_id FROM library_ratings WHERE account_id = ?",
+    uses: ["library_ratings_account"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a deleted account's saves (routineLibrary.ts libraryCleanup)",
+    sql: "SELECT routine_id FROM library_saves WHERE account_id = ?",
+    uses: ["library_saves_account"],
+    noScan: ["library_saves"],
+  },
+  {
     name: "team sessions: a session's sets (teamSessions.ts pushSession, liveBoard)",
     sql: "SELECT athlete_id, exercise_id, COUNT(*) AS c FROM team_session_sets WHERE session_id = ? AND reps > 0 GROUP BY athlete_id, exercise_id",
     uses: ["sqlite_autoindex_team_session_sets_1"],

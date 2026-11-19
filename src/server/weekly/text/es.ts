@@ -968,6 +968,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Está en Ajustes › Apps conectadas, y la lista bajo el mapa de recuperación en Cuerpo muestra lo que se cuenta.",
   },
+  "routine-library": {
+    title: "Encuentra una rutina hecha por otra persona",
+    intro: "La nueva biblioteca de rutinas reúne rutinas que otras personas publicaron, listas para guardar con un toque.",
+    points: [
+      "Busca por palabras, elige un objetivo o activa Para mi gimnasio para ver solo las que tu gimnasio puede hacer.",
+      "Guarda una y aparecerá en tus rutinas, lista para empezar o cambiar.",
+      "Puntúala con estrellas después de guardarla. Las estrellas se muestran desde tres valoraciones.",
+      "Publica la tuya desde su editor, con o sin tu nombre. Solo salen ejercicios y series, nunca pesos ni notas.",
+    ],
+    dyk: "Cada rutina publicada tiene su propia página en la web, para compartirla con quien quieras.",
+  },
   "team-session": {
     title: "Todo el entrenamiento del equipo en una tableta",
     intro: "Las sesiones de equipo ponen un entrenamiento para todo tu equipo en una sola tableta.",

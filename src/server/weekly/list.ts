@@ -154,6 +154,8 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-19: form video check-ins, with notes pinned to moments in the video (docs/decisions/trainer-mode.md
   // "Form videos").
   R("coach-form-videos", "coach", "pro", "trainer/clients", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: the public routine library (docs/decisions/routine-library.md).
+  L("routine-library", "free", "library", { fresh: "2026-11-19", shot: false }),
   // New, 2026-11-19: team sessions on one tablet for school coaches (docs/decisions/school-teams.md "Team sessions").
   R("team-session", "school", "free", "trainer/teams", { fresh: "2026-11-19", shot: false }),
 ];

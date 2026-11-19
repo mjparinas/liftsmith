@@ -970,6 +970,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Fica em Ajustes › Apps conectados, e a lista abaixo do mapa de recuperação em Corpo mostra o que está sendo contado.",
   },
+  "routine-library": {
+    title: "Encontre uma rotina feita por outra pessoa",
+    intro: "A nova biblioteca de rotinas reúne rotinas que outras pessoas publicaram, prontas para salvar com um toque.",
+    points: [
+      "Busque por palavras, escolha um objetivo ou ative Serve na minha academia para ver só o que a sua academia permite.",
+      "Salve uma e ela vai para as suas rotinas, pronta para começar ou mudar.",
+      "Avalie com estrelas depois de salvar. As estrelas aparecem a partir de três avaliações.",
+      "Publique a sua pelo editor, com ou sem seu nome. Só saem exercícios e séries, nunca cargas ou anotações.",
+    ],
+    dyk: "Cada rotina publicada ganha uma página própria no site, para compartilhar com quem quiser.",
+  },
   "team-session": {
     title: "O treino do time todo em um tablet",
     intro: "As sessões do time colocam um treino para o time todo em um único tablet.",

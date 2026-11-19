@@ -40,6 +40,7 @@ export interface SiteText {
       muscles: string;
       programs: string;
       coachPrograms: string;
+      routineLibrary: string;
       equipment: string;
       guides: string;
       blog: string;

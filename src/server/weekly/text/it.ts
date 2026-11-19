@@ -969,6 +969,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Lo trovi in Impostazioni › App collegate, e l'elenco sotto la mappa di recupero in Corpo mostra cosa viene contato.",
   },
+  "routine-library": {
+    title: "Trova una routine creata da altri",
+    intro: "La nuova libreria di routine raccoglie quelle pubblicate da altri, da salvare con un tocco.",
+    points: [
+      "Cerca per parole, scegli un obiettivo o attiva Adatte alla mia palestra per vedere solo quelle che la tua palestra permette.",
+      "Salvane una e finisce tra le tue routine, pronta da iniziare o modificare.",
+      "Valutala con le stelle dopo averla salvata. Le stelle compaiono da tre valutazioni.",
+      "Pubblica la tua dal suo editor, con o senza il tuo nome. Escono solo esercizi e serie, mai carichi o note.",
+    ],
+    dyk: "Ogni routine pubblicata ha una sua pagina sul sito, da condividere con chiunque.",
+  },
   "team-session": {
     title: "Tutto l'allenamento della squadra su un tablet",
     intro: "Le sessioni di squadra mettono un allenamento per tutta la squadra su un solo tablet.",

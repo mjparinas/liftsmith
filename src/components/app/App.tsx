@@ -69,6 +69,7 @@ import { GymStaffJoin } from "./GymStaff";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
+import { Library } from "./Library";
 import { LogoEgg } from "./LogoEgg";
 import { LogPast } from "./LogPast";
 import { Onboarding } from "./Onboarding";
@@ -504,6 +505,7 @@ export function App() {
     program: <CoachProgramScreen key={arg ?? ""} arg={arg} />,
     community: <Community key={arg ?? ""} arg={arg} />,
     season: <SeasonScreen />,
+    library: <Library key={arg ?? ""} arg={arg} />,
     teamsession: <TeamSession key={arg ?? ""} arg={arg} />,
   };
   const screen = screens[route];

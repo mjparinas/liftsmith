@@ -44,6 +44,7 @@ export const ROUTES = [
   "program",
   "community",
   "season",
+  "library",
   "teamsession",
 ] as const;
 export type Route = (typeof ROUTES)[number];

@@ -485,6 +485,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "routine-library",
+        name: "Routine library",
+        body: "Search routines other lifters published by goal, words and what your gym has, save one in a tap and rate it with stars. Publish your own from its editor, with or without your name, and it gets its own page on the website. Only the exercises and sets go out, never your weights or notes.",
+        tier: "free",
+        note: "Publishing needs an account and opens at 18. Anyone can browse.",
+        added: "2026-11-19",
+      },
+      {
         id: "library",
         name: "1,000 exercises",
         body: "Strength, bodyweight, machines, bands, kettlebells and cardio, with search, muscle chips and a this-gym filter. Cardio logs time and distance.",

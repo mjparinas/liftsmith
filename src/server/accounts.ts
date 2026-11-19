@@ -23,6 +23,7 @@ import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { programReviewCleanup } from "./programReviews";
 import { isReviewEmail, reviewCodeMatches } from "./review";
+import { libraryCleanup } from "./routineLibrary";
 import { socialDeletes } from "./social";
 import { forgetStripe } from "./stripe";
 import { teamDeletes } from "./teams";
@@ -304,6 +305,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...coachCleanup(accountId),
     ...programReviewCleanup(accountId),
     ...programCleanup(accountId),
+    ...libraryCleanup(accountId),
     ...earnedDeletes(accountId),
     ...sessionDeletes(accountId),
     ...teamDeletes(accountId),
