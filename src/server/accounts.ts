@@ -27,6 +27,7 @@ import { libraryCleanup } from "./routineLibrary";
 import { socialDeletes } from "./social";
 import { forgetStripe } from "./stripe";
 import { teamDeletes } from "./teams";
+import { sessionDeletes } from "./teamSessions";
 
 export const SESSION_MS = 365 * 86_400_000;
 /** How often use pushes the expiry forward again (sliding renewal on every platform: web, Android and iOS). */
@@ -306,6 +307,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...programCleanup(accountId),
     ...libraryCleanup(accountId),
     ...earnedDeletes(accountId),
+    ...sessionDeletes(accountId),
     ...teamDeletes(accountId),
     ...gymDeletes(accountId),
     ...placeDeletes(accountId),

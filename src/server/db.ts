@@ -1161,6 +1161,32 @@ const SCHEMA = [
     PRIMARY KEY (team_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS team_members_account ON team_members (account_id)`,
+  // Team sessions (2026-11-19, teamSessions.ts): one workout a coach runs for a whole team from one tablet, and the
+  // sets each athlete logs there. Written into the athletes' own accounts when it ends (`written`).
+  `CREATE TABLE IF NOT EXISTS team_sessions (
+    id TEXT PRIMARY KEY,
+    team_id TEXT NOT NULL,
+    coach_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    plan TEXT NOT NULL,
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER,
+    written INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_sessions_team ON team_sessions (team_id, started_at)`,
+  `CREATE INDEX IF NOT EXISTS team_sessions_coach ON team_sessions (coach_id, ended_at, started_at)`,
+  `CREATE TABLE IF NOT EXISTS team_session_sets (
+    session_id TEXT NOT NULL,
+    id TEXT NOT NULL,
+    athlete_id TEXT NOT NULL,
+    exercise_id TEXT NOT NULL,
+    weight REAL NOT NULL,
+    reps INTEGER NOT NULL,
+    target INTEGER NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (session_id, id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_session_sets_athlete ON team_session_sets (athlete_id)`,
   // Check-in forms and questionnaires (2026-11-13): a coach's forms, each one sent to a client (with the questions as
   // they were then), the client's answers, and at most one form per client that goes out again every week.
   `CREATE TABLE IF NOT EXISTS coach_forms (

@@ -408,6 +408,10 @@ export const it: FeaturesText = {
       name: "Gratis per le squadre delle superiori",
       body: "Gli allenatori delle superiori che confermano un’email scolastica hanno Pro gratis, come gli atleti dai 13 ai 18 anni delle loro squadre, con una classifica settimanale della squadra. Massa grassa e profili pubblici restano disattivati per i minori di 18 anni.",
     },
+    "team-session": {
+      name: "Sessioni di squadra su un tablet",
+      body: "Un allenatore scolastico guida un allenamento per tutta la squadra da un tablet: ogni atleta tocca il proprio nome e registra le sue serie, con il peso da dove aveva lasciato, e il tabellone mostra chi non ha iniziato. Alla fine, le serie di ognuno vengono salvate nel suo account. Funziona senza campo.",
+    },
     "coach-checkins": {
       name: "Moduli di check-in e questionari",
       body: "Invia ai clienti un check-in settimanale, un questionario iniziale o un tuo modulo, una volta o ogni settimana. Rispondono con pochi tocchi, e un punteggio basso o una risposta in ritardo finisce in cima al loro report.",

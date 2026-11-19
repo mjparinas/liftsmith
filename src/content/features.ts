@@ -761,6 +761,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "team-session",
+        name: "Team sessions on one tablet",
+        body: "A high school coach runs one workout for the whole team from one tablet: each athlete taps their first name and logs their own sets, the weight starting where they left off, and the board shows who hasn't started. When it ends, each athlete's sets are saved to their own account. Works with no reception.",
+        tier: "free",
+        added: "2026-11-19",
+      },
+      {
         id: "coach-checkins",
         name: "Check-in forms and questionnaires",
         body: "Send clients a weekly check-in, an intake questionnaire or your own form, once or every week. They answer with a few taps, and a low score or a late answer lands at the top of their report.",
