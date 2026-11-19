@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Trova una palestra vicino a te",
     intro: "In viaggio, in trasloco o in cerca di una nuova palestra? La ricerca ti mostra cosa c'è vicino.",
     points: [
-      "Palestre su una mappa con un elenco sotto, prima quelle ufficiali.",
+      "Palestre su una mappa grande, ognuna su una scheda trasparente sopra, prima quelle ufficiali.",
       "Ognuna ha la sua pagina: attrezzatura, orari, una mappa e quante persone ci si allenano.",
       "Ne manca una? Aggiungila.",
       "Aggiungi una palestra alle tue e il piano si adatta alla sua attrezzatura.",

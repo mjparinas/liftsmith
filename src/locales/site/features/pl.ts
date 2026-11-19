@@ -351,7 +351,7 @@ export const pl: FeaturesText = {
     },
     "gym-finder": {
       name: "Wyszukiwarka siłowni i strony siłowni",
-      body: "Znajdź siłownie w pobliżu na mapie z listą pod nią, oficjalne na początku, każda z własną stroną: sprzęt, godziny otwarcia, mapa i członkowie. Właściciele mogą przejąć swoją siłownię i dodać logo oraz zdjęcia. Brakuje siłowni? Dodaj ją. Właściciele widzą, ile osób ją dodało i zeskanowało plakat, oraz co zrobić dalej. Oficjalne siłownie mogą prowadzić klub z cotygodniowym rankingiem. Coś jest nie tak na stronie? Zgłoś to, a nasz zespół to poprawi.",
+      body: "Znajdź siłownie w pobliżu na dużej mapie, każdą na półprzezroczystej karcie nad nią, oficjalne na początku, każda z własną stroną: sprzęt, godziny otwarcia, mapa i członkowie. Właściciele mogą przejąć swoją siłownię i dodać logo oraz zdjęcia. Brakuje siłowni? Dodaj ją. Właściciele widzą, ile osób ją dodało i zeskanowało plakat, oraz co zrobić dalej. Oficjalne siłownie mogą prowadzić klub z cotygodniowym rankingiem. Coś jest nie tak na stronie? Zgłoś to, a nasz zespół to poprawi.",
     },
     "gym-amenities": {
       name: "Udogodnienia i ceny na stronach siłowni",

@@ -351,7 +351,7 @@ export const pt: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador de academias e páginas de academia",
-      body: "Encontre academias perto de você num mapa com a lista embaixo, as oficiais primeiro, cada uma com sua página: equipamentos, horários, mapa e membros. Donos podem reivindicar a academia e adicionar logo e fotos. Falta uma academia? Adicione. Os donos veem quantas pessoas adicionaram a academia e escanearam o cartaz, e o que fazer em seguida. Academias oficiais podem ter um clube com ranking semanal. Algo errado numa página? Relate, e nossa equipe corrige.",
+      body: "Encontre academias perto de você num mapa grande com cada academia num cartão translúcido por cima, as oficiais primeiro, cada uma com sua página: equipamentos, horários, mapa e membros. Donos podem reivindicar a academia e adicionar logo e fotos. Falta uma academia? Adicione. Os donos veem quantas pessoas adicionaram a academia e escanearam o cartaz, e o que fazer em seguida. Academias oficiais podem ter um clube com ranking semanal. Algo errado numa página? Relate, e nossa equipe corrige.",
     },
     "gym-amenities": {
       name: "Comodidades e preços nas páginas de academia",

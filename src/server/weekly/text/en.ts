@@ -318,7 +318,7 @@ export const emails: Record<string, Words> = {
     title: "Find a gym near you",
     intro: "Travelling, moving or looking for a new gym? The finder shows what's near.",
     points: [
-      "Gyms on a map with a list beneath it, official ones first.",
+      "Gyms on a full map, each on a see-through card over it, official ones first.",
       "Each has its own page: equipment, hours, a map and how many lifters train there.",
       "Missing one? Add it.",
       "Add a gym to yours and the plan fits its equipment.",

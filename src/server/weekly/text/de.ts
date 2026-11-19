@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Finde ein Studio in deiner Nähe",
     intro: "Auf Reisen, beim Umzug oder auf der Suche nach einem neuen Studio? Die Suche zeigt, was in der Nähe ist.",
     points: [
-      "Studios auf einer Karte mit einer Liste darunter, offizielle zuerst.",
+      "Studios auf einer großen Karte, jedes auf einer durchscheinenden Karte darüber, offizielle zuerst.",
       "Jedes hat seine eigene Seite: Ausstattung, Öffnungszeiten, eine Karte und wie viele dort trainieren.",
       "Eins fehlt? Füg es hinzu.",
       "Füg ein Studio zu deinen hinzu, und der Plan passt sich seiner Ausstattung an.",

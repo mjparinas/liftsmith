@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Trouvez une salle près de chez vous",
     intro: "En voyage, en déménagement ou en quête d'une nouvelle salle ? Le localisateur montre ce qu'il y a autour.",
     points: [
-      "Les salles sur une carte avec une liste dessous, les officielles en premier.",
+      "Les salles sur une grande carte, chacune sur une fiche translucide par-dessus, les officielles en premier.",
       "Chacune a sa page : matériel, horaires, carte et nombre de pratiquants qui s'y entraînent.",
       "Il en manque une ? Ajoutez-la.",
       "Ajoutez une salle aux vôtres et le plan s'adapte à son matériel.",

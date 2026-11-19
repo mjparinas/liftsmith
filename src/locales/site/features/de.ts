@@ -292,7 +292,7 @@ export const de: FeaturesText = {
     },
     "gym-finder": {
       name: "Studiosuche und Studioseiten",
-      body: "Finde Studios in deiner Nähe auf einer Karte mit der Liste darunter, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen. Stimmt etwas auf einer Seite nicht? Melde es, und unser Team korrigiert es.",
+      body: "Finde Studios in deiner Nähe auf einer großen Karte, jedes Studio auf einer durchscheinenden Karte darüber, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen. Stimmt etwas auf einer Seite nicht? Melde es, und unser Team korrigiert es.",
     },
     "gym-amenities": {
       name: "Ausstattung und Preise auf Studioseiten",

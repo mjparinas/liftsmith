@@ -31,7 +31,11 @@ export const BLOG_GYM_OPEN_NOW: Article[] = [
       { cta: "plan" },
       { h2: "One tap for the ones that are open" },
       {
-        p: "Tap Open now above the list and the gyms that are closed drop out, from the list and the map. Tap it again to see them all.",
+        p: "Tap Open now, at the top of the map, and the gyms that are closed drop out, from the list and the map. Tap it again to see them all.",
+      },
+      { h2: "More map, less list" },
+      {
+        p: "The finder is now map first. The map fills the space, and each gym sits on its own see-through card over the bottom of it: swipe the cards to go through the gyms, or tap a pin and its card slides into view. On a computer, the list floats in a panel over the right of the map on the website's gyms page.",
       },
       { h2: "Where the hours come from" },
       {
