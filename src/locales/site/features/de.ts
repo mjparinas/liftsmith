@@ -545,6 +545,10 @@ export const de: FeaturesText = {
       name: "Zehn Sprachen",
       body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys oder Browsers, oder frei wählbar auf dem Startbildschirm und in den Einstellungen.",
     },
+    "settings-search": {
+      name: "Einstellungen durchsuchen",
+      body: "Tippe oben in den Einstellungen ein Wort ein, und jede passende Einstellung erscheint mit ihrem Ort. Ein Tippen öffnet sie, die Einstellung direkt im Blick.",
+    },
     appearance: {
       name: "Dunkel, hell oder wie dein Handy",
       body: "Standardmäßig dunkel, hell oder so, wie dein Handy eingestellt ist.",

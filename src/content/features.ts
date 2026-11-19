@@ -1029,6 +1029,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "settings-search",
+        name: "Search settings",
+        body: "Type a word at the top of Settings and every matching setting shows with where it lives. Tap one and it opens with that setting in view.",
+        tier: "free",
+        added: "2026-11-19",
+      },
+      {
         id: "appearance",
         name: "Dark, light or match your phone",
         body: "A dark look by default, a light one, or whichever your phone uses.",

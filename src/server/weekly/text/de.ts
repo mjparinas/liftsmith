@@ -735,6 +735,7 @@ export const emails: Record<string, Words> = {
       "Warum? unter einem Ziel zeigt die Regel, die es festgelegt hat.",
       "Sende Feedback oder melde einen Fehler über Einstellungen; es erreicht das Team mit allem, was zum Beheben nötig ist.",
       "Die Funktionsseite auf der Website listet alles, was die App kann, und was neu ist.",
+      "Eine Einstellung nicht gefunden? Tippe oben in den Einstellungen ein Wort in die Suche, und du landest direkt dort.",
     ],
     dyk: "Version und Build unten in den Einstellungen helfen uns, deinen Fehler schneller zu finden.",
   },

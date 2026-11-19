@@ -4,7 +4,7 @@
 // row per group, each opening its own page (#/settings/<group>) with a line saying what's in it. Every
 // setting lives in exactly one group. Old deep links still land: #/settings/saving opens Your data at
 // Saving and backup, #/settings/themes and #/settings/accessibility open Look and feel at that section.
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
@@ -18,13 +18,15 @@ import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
-import { t } from "@/lib/i18n";
+import { english, t } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { useDesktop } from "@/lib/layout";
 import { deleteEmail } from "@/lib/reminders";
 import { screenshotsSupported } from "@/lib/screenshots";
+import { searchSettings, SETTINGS_INDEX, type Place, type SettingRef } from "@/lib/settingsIndex";
+import { jumpTo, useSettingJump } from "@/lib/settingsJump";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
@@ -34,6 +36,7 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtBodyweight } from "@/lib/units";
 import { anyLocked } from "@/lib/unlocks";
 import { useNow } from "@/lib/useNow";
+import type { MessageKey } from "@/locales/en";
 
 import { BodyStats } from "./BodyStats";
 import { CalendarSettings } from "./CalendarSettings";
@@ -195,12 +198,117 @@ function AccountRow() {
   );
 }
 
+/** Where each place in the search index is, as the results line says it and as the pick opens it. */
+const PLACE_TITLE: Record<Place, MessageKey> = {
+  training: "settings.g.training",
+  workout: "settings.g.workout",
+  reminders: "settings.g.reminders",
+  look: "settings.g.look",
+  body: "settings.g.body",
+  data: "settings.g.data",
+  labs: "lab.row",
+  plan: "train.title",
+  account: "settings.title",
+  gym: "settings.title",
+  connections: "settings.title",
+  trainer: "settings.title",
+  injuries: "settings.g.training",
+  feedback: "settings.g.help",
+  community: "settings.g.help",
+  pro: "settings.title",
+};
+
+function openPlace(place: Place) {
+  switch (place) {
+    case "training":
+    case "workout":
+    case "reminders":
+    case "look":
+    case "body":
+    case "data":
+      return go("settings", place);
+    case "labs":
+      return can("labs") ? go("settings", "labs") : go("pro", "labs");
+    case "plan":
+      return go("training");
+    case "pro":
+      return go("pro", "settings");
+    case "account":
+    case "gym":
+    case "connections":
+    case "trainer":
+    case "injuries":
+    case "feedback":
+    case "community":
+      return go(place);
+  }
+}
+
+/** A key's words in the app's language, and in English too so an English word still finds it. */
+const words = (key: MessageKey): string[] => {
+  const here = t(key);
+  const en = english(key);
+  return typeof en === "string" && en !== here ? [here, en] : [here];
+};
+
+/**
+ * Search settings (Melvin, 2026-11-19; settingsIndex.ts): a box at the top of Settings. While it holds words the
+ * page shows only the settings that match, each saying where it is; a pick opens that page with the setting in view.
+ */
+function SettingsSearch({ query, onQuery }: { query: string; onQuery: (q: string) => void }) {
+  const id = useId();
+  const labs: SettingRef[] = LABS.map((l) => ({ key: `lab.${l.key}.title` as MessageKey, place: "labs" }));
+  const hits = searchSettings(query, [...SETTINGS_INDEX, ...labs], words);
+  return (
+    <div className="mt-4">
+      <label className="sr-only" htmlFor={`${id}-q`}>
+        {t("settings.search")}
+      </label>
+      <input
+        id={`${id}-q`}
+        type="search"
+        value={query}
+        onChange={(e) => onQuery(e.target.value)}
+        placeholder={t("settings.search")}
+        autoComplete="off"
+        enterKeyHint="search"
+        className="w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+      />
+      {query.trim() && (
+        <div className="mt-3">
+          <p className="sr-only" role="status">
+            {hits.length ? t("settings.searchCount", { count: hits.length }) : t("settings.searchNone", { q: query.trim() })}
+          </p>
+          {hits.length ? (
+            <ul className="space-y-2" aria-label={t("settings.search")}>
+              {hits.map((h) => (
+                <li key={h.key}>
+                  <NavRow
+                    title={t(h.key)}
+                    sub={t(PLACE_TITLE[h.place])}
+                    onClick={() => {
+                      jumpTo(t(h.key));
+                      onQuery("");
+                      openPlace(h.place);
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="px-1 text-sm text-muted" aria-hidden>
+              {t("settings.searchNone", { q: query.trim() })}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Settings() {
-  const { profile } = useApp();
   const { arg } = useRoute();
-  const desktop = useDesktop();
-  const coaching = useCoachNotes((s) => s.coaching);
-  const more = useUnlocked("more");
+  const [query, setQuery] = useState("");
   const legacy = arg ? LEGACY[arg] : undefined;
   const group: Group | null = legacy ? legacy[0] : (GROUPS as readonly string[]).includes(arg ?? "") ? (arg as Group) : null;
   const anchor = legacy?.[1];
@@ -209,7 +317,21 @@ export function Settings() {
   }, [anchor]);
   if (arg === "labs") return <LabsPage />;
   if (group) return <GroupPage group={group} />;
+  return (
+    <div className="pb-2">
+      <ScreenHeader back={{ label: `‹ ${t("nav.back.today")}`, onClick: () => go("today") }} title={t("settings.title")} />
+      <SettingsSearch query={query} onQuery={setQuery} />
+      {query.trim() ? null : <SettingsMain />}
+    </div>
+  );
+}
 
+/** Settings' own list, under the search box. */
+function SettingsMain() {
+  const { profile } = useApp();
+  const desktop = useDesktop();
+  const coaching = useCoachNotes((s) => s.coaching);
+  const more = useUnlocked("more");
   const goal = t(`goal.${profile.goal}`);
   const program = programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive");
   const sums: Record<Group, string> = {
@@ -221,8 +343,7 @@ export function Settings() {
     data: t("settings.g.data.sum"),
   };
   return (
-    <div className="pb-2">
-      <ScreenHeader back={{ label: `‹ ${t("nav.back.today")}`, onClick: () => go("today") }} title={t("settings.title")} />
+    <>
       <ProCard />
       <AccountRow />
       <div className="mt-2">
@@ -273,7 +394,7 @@ export function Settings() {
         </a>
       </p>
       <BuildLine />
-    </div>
+    </>
   );
 }
 
@@ -282,6 +403,7 @@ export function Settings() {
  * the row on Settings opens Pro without it, and this page says so if reached another way.
  */
 function LabsPage() {
+  useSettingJump();
   const [, redraw] = useState(0);
   const pro = can("labs");
   const title = (f: LabFlag) => {
@@ -324,6 +446,7 @@ function LabsPage() {
 
 /** One group's page: "‹ Settings", its title, and its settings. */
 function GroupPage({ group }: { group: Group }) {
+  useSettingJump();
   const body: Record<Group, ReactNode> = {
     training: <TrainingGroup />,
     workout: <WorkoutGroup />,

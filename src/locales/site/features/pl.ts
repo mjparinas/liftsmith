@@ -607,6 +607,10 @@ export const pl: FeaturesText = {
       name: "Dziesięć języków",
       body: "Angielski, hiszpański, francuski, niemiecki, włoski, japoński, portugalski (Brazylia), koreański, polski i turecki, zgodnie z językiem telefonu lub przeglądarki albo do wyboru na ekranie powitalnym i w ustawieniach.",
     },
+    "settings-search": {
+      name: "Szukaj w ustawieniach",
+      body: "Wpisz słowo na górze Ustawień, a pojawi się każde pasujące ustawienie z miejscem, gdzie jest. Dotknij, a otworzy się z tym ustawieniem na widoku.",
+    },
     appearance: {
       name: "Ciemny, jasny albo jak w telefonie",
       body: "Domyślnie ciemny wygląd, do wyboru jasny albo taki, jakiego używa telefon.",

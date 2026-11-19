@@ -735,6 +735,7 @@ export const emails: Record<string, Words> = {
       "Por quê? embaixo de uma meta mostra a regra que a definiu.",
       "Envie feedback ou relate um bug em Ajustes; chega à equipe com o que é preciso para corrigir.",
       "A página de Recursos no site lista tudo o que o app faz, e o que há de novo.",
+      "Não acha uma configuração? Digite uma palavra na busca no topo das Configurações e vá direto até ela.",
     ],
     dyk: "A versão e a build no fim de Ajustes nos ajudam a encontrar o seu bug mais rápido.",
   },
