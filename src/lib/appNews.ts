@@ -62,6 +62,7 @@ export const RELEASES: readonly AppRelease[] = [
       { id: "gymInsights", kind: "new", icon: "chart" },
       { id: "deleteWorkout", kind: "better", icon: "trash" },
       { id: "landmineEnd", kind: "fixed", icon: "dumbbell" },
+      { id: "sonosVolume", kind: "better", icon: "volume", unlock: "more" },
     ],
   },
   {

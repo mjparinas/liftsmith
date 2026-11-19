@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
-import { clampVol, refreshSonos, setSonosPrefs, sonosSend, useSonos } from "@/lib/sonos";
+import { clampVol, followVolume, refreshSonos, setSonosPrefs, sonosMute, sonosSend, useSonos } from "@/lib/sonos";
 import { useVisible } from "@/lib/visibility";
 
 import { Icon, type IconName } from "./icons";
@@ -23,11 +23,39 @@ function SonosError() {
   );
 }
 
-/** A speaker icon, a 0 to 100 slider and the number: the set and rest volumes and the live volume on the workout card. */
-function VolumeSlider({ value, label, onChange }: { value: number; label: string; onChange: (v: number) => void }) {
+/**
+ * A speaker icon, a 0 to 100 slider and the number: the set and rest volumes and the live volume on the workout card.
+ * With `onMute` (the workout card) the icon is a button that mutes and unmutes, and shows which (Melvin, 2026-11-19).
+ */
+function VolumeSlider({
+  value,
+  label,
+  onChange,
+  muted,
+  onMute,
+}: {
+  value: number;
+  label: string;
+  onChange: (v: number) => void;
+  muted?: boolean;
+  onMute?: () => void;
+}) {
   return (
-    <div className="mt-1 flex min-h-11 items-center gap-3 px-1">
-      <Icon name="volume" size={20} className="shrink-0 text-muted" />
+    <div className={`mt-1 flex min-h-11 items-center gap-3 ${onMute ? "" : "px-1"}`}>
+      {onMute ? (
+        <button
+          type="button"
+          onClick={onMute}
+          aria-label={muted ? t("conn.sonos.unmute") : t("conn.sonos.mute")}
+          aria-pressed={!!muted}
+          data-testid="sonos-mute"
+          className={`press -my-1.5 grid h-11 w-11 shrink-0 place-items-center rounded-full ${muted ? "text-accent" : "text-muted"}`}
+        >
+          <Icon name={muted ? "volumeOff" : "volume"} size={20} />
+        </button>
+      ) : (
+        <Icon name="volume" size={20} className="shrink-0 text-muted" />
+      )}
       <input
         type="range"
         min={0}
@@ -44,7 +72,7 @@ function VolumeSlider({ value, label, onChange }: { value: number; label: string
           }
           onChange(next);
         }}
-        className="slider min-w-0 flex-1"
+        className={`slider min-w-0 flex-1 ${muted ? "opacity-50" : ""}`}
         style={{ "--fill": `${value}%` } as CSSProperties}
       />
       <span className="num w-8 text-right text-sm font-semibold" aria-hidden>
@@ -168,8 +196,20 @@ export function SonosBar({ resting }: { resting: boolean }) {
     clearTimeout(wait.current);
     wait.current = setTimeout(() => {
       setVol(null);
+      // Turning it up or down while muted means "I want to hear it": unmute first.
+      if (useSonos.getState().state?.now?.muted) void sonosMute(false);
       void sonosSend({ do: "volume", level: next });
+      // Follow my workout: the level chosen becomes this set's (or this rest's) volume, so the next set or rest keeps it.
+      const keep = followVolume(useSonos.getState().prefs, resting, next);
+      if (keep) setSonosPrefs(keep);
     }, VOLUME_WAIT_MS);
+  };
+
+  const mute = () => {
+    const muted = !now?.muted;
+    haptic("toggle");
+    sound.toggle(!muted);
+    void sonosMute(muted);
   };
 
   return (
@@ -211,7 +251,7 @@ export function SonosBar({ resting }: { resting: boolean }) {
             <span className="text-sm text-muted">{t("conn.sonos.fixed")}</span>
           </div>
         ) : (
-          <VolumeSlider value={shown} label={t("conn.sonos.volume")} onChange={slide} />
+          <VolumeSlider value={shown} label={t("conn.sonos.volume")} onChange={slide} muted={now.muted} onMute={mute} />
         ))}
       <SonosError />
       <Sheet open={open} onClose={() => setOpen(false)} title={t("conn.sonos.settings")}>

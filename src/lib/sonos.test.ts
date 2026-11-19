@@ -5,7 +5,17 @@ import { create } from "zustand";
 import type { SonosGroup, SonosNow } from "./cloud";
 import { useCloud } from "./connections";
 import { setLab } from "./labs";
-import { followWorkout, musicSteps, optimistic, pickGroup, setSonosPrefs, SONOS_DEFAULTS, useSonos, type SonosPrefs } from "./sonos";
+import {
+  followVolume,
+  followWorkout,
+  musicSteps,
+  optimistic,
+  pickGroup,
+  setSonosPrefs,
+  SONOS_DEFAULTS,
+  useSonos,
+  type SonosPrefs,
+} from "./sonos";
 import type { Active } from "./store/workout";
 import { ACCOUNT_KEY } from "./syncOutbox";
 
@@ -43,6 +53,26 @@ describe("musicSteps", () => {
   });
 });
 
+describe("followVolume", () => {
+  it("makes the level chosen during a set the set volume, and during rest the rest volume", () => {
+    expect(followVolume(prefs, false, 55)).toEqual({ setVolume: 55 });
+    expect(followVolume(prefs, true, 15)).toEqual({ restVolume: 15 });
+  });
+  it("lifts the set volume with a rest volume above it, so rest is never louder", () => {
+    expect(followVolume(prefs, true, 50)).toEqual({ restVolume: 50, setVolume: 50 });
+  });
+  it("saves nothing when the level is unchanged or Follow my workout is off", () => {
+    expect(followVolume(prefs, false, 40)).toBeNull();
+    expect(followVolume(prefs, true, 25)).toBeNull();
+    expect(followVolume({ ...prefs, follow: false }, false, 70)).toBeNull();
+  });
+  it("keeps the next set and rest at the new levels", () => {
+    const next = { ...prefs, ...followVolume(prefs, false, 60)! };
+    const rest = active({ restUntil: NOW + 90_000 });
+    expect(musicSteps(rest, active({ restUntil: null }), next, NOW)).toEqual([{ do: "volume", level: 60 }]);
+  });
+});
+
 describe("pickGroup", () => {
   const g = (id: string, name: string, playing = false): SonosGroup => ({ id, name, household: "H", playing });
   it("keeps the saved speaker, finds it by name after regrouping, else the one playing", () => {
@@ -59,6 +89,7 @@ describe("optimistic", () => {
     group: "G1",
     playing: false,
     volume: 98,
+    muted: false,
     track: null,
     artist: null,
     image: null,
@@ -70,6 +101,7 @@ describe("optimistic", () => {
     expect(optimistic(now, { do: "play" }).playing).toBe(true);
     expect(optimistic(now, { do: "nudge", delta: 5 }).volume).toBe(100);
     expect(optimistic({ ...now, volume: null }, { do: "volume", level: 10 }).volume).toBeNull();
+    expect(optimistic(now, { do: "mute", muted: true })).toMatchObject({ muted: true, volume: 98 });
   });
 });
 

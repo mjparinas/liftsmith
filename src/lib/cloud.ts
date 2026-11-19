@@ -103,6 +103,8 @@ export interface SonosNow {
   playing: boolean;
   /** 0 to 100; null when the speaker has fixed volume (a line out to an amplifier). */
   volume: number | null;
+  /** Muted with the speaker button (or in the Sonos app): the volume above is kept for when it's unmuted. */
+  muted: boolean;
   track: string | null;
   artist: string | null;
   /** Album art from the music service, https only. */
@@ -134,6 +136,7 @@ export type SonosCommand =
   | { do: "previous" }
   | { do: "volume"; level: number }
   | { do: "nudge"; delta: number }
+  | { do: "mute"; muted: boolean }
   | { do: "favourite"; id: string };
 
 /** Sonos ids are short and plain (RINCON_…:12, household ids, favourite numbers). */
@@ -157,6 +160,8 @@ export function checkSonosCommand(raw: unknown): SonosCommand | null {
       return typeof c.delta === "number" && Number.isFinite(c.delta) && c.delta !== 0
         ? { do: "nudge", delta: Math.round(Math.min(100, Math.max(-100, c.delta))) }
         : null;
+    case "mute":
+      return typeof c.muted === "boolean" ? { do: "mute", muted: c.muted } : null;
     case "favourite":
       return isSonosId(c.id) ? { do: "favourite", id: c.id } : null;
     default:
