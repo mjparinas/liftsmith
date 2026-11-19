@@ -4,13 +4,15 @@
 // POST (admins, audited): {action: "importWorld", notify?} the one button, every gym in the world from OpenStreetMap,
 // then their websites, then AI for what's missing (docs/decisions/gyms.md "One button: every gym in the world");
 // {action: "importRetry", job} a new job of the areas a job didn't import; {action: "importStop" | "importClose", job}
-// stops or closes one; {id, action: hide | show | gym | studio | delete | approve | reject} changes one gym
+// stops or closes one; ?fix=1 and {action: "fixStart" | "fixStop" | "fixClose", job?} | {action: "fixUndo", change} the AI
+// fix-up pass over unclaimed gyms (gymAiFix.ts, docs/decisions/gyms.md "AI fix-up pass"); {id, action: hide | show | gym | studio | delete | approve | reject} changes one gym
 // (src/server/gymPlaces.ts).
 import { after } from "next/server";
 
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { setFlag } from "@/server/flags";
+import { dismissFix, fixStatus, runFixWorker, startFix, stopFix, undoFix } from "@/server/gymAiFix";
 import {
   createJob,
   dismissJob,
@@ -33,6 +35,8 @@ export async function GET(req: Request) {
   const gate = await requireStaff(req);
   if ("response" in gate) return gate.response;
   const u = new URL(req.url).searchParams;
+  // The AI fix-up pass (gymAiFix.ts): its job and latest changes.
+  if (u.get("fix") !== null) return json(200, { fix: await fixStatus() });
   const job = u.get("job");
   if (job !== null) {
     if (u.get("log") !== null) {
@@ -82,6 +86,34 @@ export async function POST(req: Request) {
     await setFlag("gymImportAi", on, 100, gate.staff.email);
     await audit(gate.staff.email, "flag.set", "gymImportAi", { value: on, rollout: 100 });
     return json(200, { ai: on });
+  }
+  // The AI fix-up pass: start (admins), stop, close, and undo one change.
+  if (body.action === "fixStart") {
+    const made = await startFix(gate.staff.email);
+    if ("error" in made)
+      return made.error === "running"
+        ? json(409, { error: "The AI fix-up is already running.", fix: await fixStatus(made.id) })
+        : json(400, { error: "Every unclaimed gym with a website has had its AI fix-up. New gyms get theirs on the next run." });
+    await audit(gate.staff.email, "gyms.aiFixStart", made.id);
+    const origin = new URL(req.url).origin;
+    after(async () => {
+      if (!(await kickWorker(origin))) await runFixWorker({ deadline: Date.now() + 280_000 }).catch(() => null);
+    });
+    return json(200, { fix: await fixStatus(made.id) });
+  }
+  if (body.action === "fixStop" || body.action === "fixClose") {
+    const id = String(body.job ?? "");
+    const done = body.action === "fixStop" ? await stopFix(id) : await dismissFix(id);
+    if (!done) return json(400, { error: body.action === "fixStop" ? "The AI fix-up isn't running." : "That AI fix-up is still running." });
+    if (body.action === "fixStop") await audit(gate.staff.email, "gyms.aiFixStop", id);
+    return json(200, { fix: body.action === "fixStop" ? await fixStatus(id) : null });
+  }
+  if (body.action === "fixUndo") {
+    const change = String(body.change ?? "");
+    const r = await undoFix(change);
+    if (!r.ok) return json(400, { error: r.error });
+    await audit(gate.staff.email, "gyms.aiFixUndo", change);
+    return json(200, { fix: await fixStatus() });
   }
   if (body.action === "importStop" || body.action === "importClose") {
     const id = String(body.job ?? "");

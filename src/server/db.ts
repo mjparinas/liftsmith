@@ -530,6 +530,39 @@ const SCHEMA = [
     lease_until INTEGER NOT NULL DEFAULT 0
   )`,
   `CREATE INDEX IF NOT EXISTS gym_import_jobs_state ON gym_import_jobs (state, started_at)`,
+  // The AI fix-up pass (gymAiFix.ts, docs/decisions/gyms.md "AI fix-up pass"): one job at a time, paused until midnight
+  // Pacific when the day's AI cap is reached, and every change it made to a gym with the value before, so staff can undo
+  // it. Public map and website data plus the staff address that started it.
+  `CREATE TABLE IF NOT EXISTS gym_ai_fix_jobs (
+    id TEXT PRIMARY KEY,
+    state TEXT NOT NULL,
+    total INTEGER NOT NULL DEFAULT 0,
+    done INTEGER NOT NULL DEFAULT 0,
+    filled INTEGER NOT NULL DEFAULT 0,
+    fixed INTEGER NOT NULL DEFAULT 0,
+    flagged INTEGER NOT NULL DEFAULT 0,
+    skipped INTEGER NOT NULL DEFAULT 0,
+    note TEXT NOT NULL DEFAULT '',
+    started_by TEXT NOT NULL DEFAULT '',
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER NOT NULL DEFAULT 0,
+    active_at INTEGER NOT NULL DEFAULT 0,
+    lease_until INTEGER NOT NULL DEFAULT 0,
+    paused_until INTEGER NOT NULL DEFAULT 0,
+    dismissed INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_ai_fix_jobs_state ON gym_ai_fix_jobs (state, started_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_ai_fixes (
+    id TEXT PRIMARY KEY,
+    job TEXT NOT NULL,
+    place_id TEXT NOT NULL,
+    field TEXT NOT NULL,
+    before TEXT NOT NULL DEFAULT '',
+    after TEXT NOT NULL DEFAULT '',
+    at INTEGER NOT NULL,
+    undone INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_ai_fixes_job ON gym_ai_fixes (job, at)`,
   `CREATE TABLE IF NOT EXISTS gym_import_items (
     job TEXT NOT NULL,
     idx INTEGER NOT NULL,
@@ -1465,6 +1498,7 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // The one-button worldwide import (gymImportJobs.ts, 2026-11-16): when Claude last read the gym's site (gymAutoFill.ts),
   // and the job's kind (world or daily), step (map, web, ai, tidy) and what each step did.
   ["gym_places", "ai_at", "INTEGER NOT NULL DEFAULT 0"],
+  ["gym_places", "ai_fix_at", "INTEGER NOT NULL DEFAULT 0"],
   ["gym_import_jobs", "kind", "TEXT NOT NULL DEFAULT ''"],
   ["gym_import_jobs", "phase", "TEXT NOT NULL DEFAULT 'map'"],
   ["gym_import_jobs", "web_read", "INTEGER NOT NULL DEFAULT 0"],
@@ -1524,6 +1558,8 @@ const LATE_SCHEMA = [
   // a new map gym is checked against the claimed and lifter-added ones (savePlaces), never the whole table (2026-11-16).
   `CREATE INDEX IF NOT EXISTS gym_places_web ON gym_places (enriched_at) WHERE claimed_by = '' AND hidden = 0 AND website <> ''`,
   `CREATE INDEX IF NOT EXISTS gym_places_ai ON gym_places (ai_at) WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0`,
+  // The AI fix-up pass takes each unclaimed gym with a website once, ever (gymAiFix.ts).
+  `CREATE INDEX IF NOT EXISTS gym_places_ai_fix ON gym_places (ai_fix_at) WHERE claimed_by = '' AND hidden = 0 AND pending = 0 AND website <> ''`,
   `CREATE INDEX IF NOT EXISTS gym_places_own ON gym_places (source) WHERE source <> 'osm'`,
   // Friends activity (replies to your comments) and erasing an account's comments.
   `CREATE INDEX IF NOT EXISTS post_comments_account ON post_comments (account_id)`,

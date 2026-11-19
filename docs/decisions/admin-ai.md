@@ -49,3 +49,7 @@ Melvin, 2026-11-16: the gym import should "use AI to backfill the rest of the da
 - **Its own switch**: the AI step switch on Admin › Gyms › Import (flag `gymImportAi`, on by default) turns only this step off; the other helpers keep running.
 - **Asked once per gym per 180 days** (`ai_at`, index `gym_places_ai`), 12 gyms a batch, 4 at a time.
 
+## The AI fix-up pass (2026-11-19)
+
+The second place Claude's answer is written without a person pressing a button (Melvin, 2026-11-19), held to the same checks: a button on Admin › Gyms › Import runs Claude once ever over every unclaimed gym with a website (`src/server/gymAiFix.ts`, task `gymFix`). It fills empty fields and, unlike the backfill, corrects a filled phone, hours, email, Instagram, Facebook or street address when the gym's own page clearly says otherwise (a street only when the page puts it in the gym's own city). Pages that say the gym closed or isn't one become reports for staff rather than hiding anything, every change is listed with its old value and Undo, and it pauses at `aiDailyCap` until midnight Pacific and carries on by itself. Details in [Gyms](gyms.md) "AI fix-up pass".
+
