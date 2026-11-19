@@ -203,11 +203,15 @@ export const FLAGS = {
     description:
       "After reading gym websites, Claude fills what's still missing (checked answers, empty fields of unclaimed gyms only). Off: imports and the daily refresh skip the AI step.",
   },
-  /** The most the admin AI helpers may spend in a Pacific day, in US dollars (Melvin has $100 of credit until 2026-12-11). */
+  /**
+   * The most the admin AI helpers may spend in a Pacific day, in US dollars (Melvin has $100 of credit until 2026-12-11).
+   * Typed as a dollar amount, not picked from a list (Melvin, 2026-11-19); over $50 the Flags tab asks "Are you sure?".
+   */
   aiDailyCap: {
     adminOnly: true,
     default: 2,
-    options: [0.5, 1, 2, 4] as const,
+    options: [] as number[],
+    amount: { min: 0.01, max: 1000, confirmAbove: 50 },
     label: "AI daily cap (US$)",
     description: "The most the admin AI helpers may spend in a day (midnight to midnight Pacific). Once reached, they stop until tomorrow.",
   },
@@ -228,8 +232,21 @@ export const FLAG_CACHE_KEY = "liftsmith.flags";
 export const FLAG_LOCAL_KEY = "liftsmith.flags.local";
 
 export const isFlagName = (v: unknown): v is FlagName => typeof v === "string" && Object.prototype.hasOwnProperty.call(FLAGS, v);
-/** Whether `v` is one of the flag's allowed values. */
-export const allowed = (name: FlagName, v: unknown): v is AnyFlagValue => (FLAGS[name].options as readonly unknown[]).includes(v);
+/** A flag typed as an amount instead of picked from `options`: any number from `min` to `max`, in whole cents. */
+export type FlagAmount = { min: number; max: number; confirmAbove: number };
+export const flagAmount = (name: FlagName): FlagAmount | null => {
+  const d = FLAGS[name];
+  return "amount" in d ? d.amount : null;
+};
+/** Whether `v` is an amount in range with at most two decimals. */
+export const validAmount = (a: FlagAmount, v: unknown): v is number =>
+  typeof v === "number" && Number.isFinite(v) && v >= a.min && v <= a.max && Math.abs(Math.round(v * 100) - v * 100) < 1e-6;
+
+/** Whether `v` is one of the flag's allowed values (or, for an amount flag, an amount in its range). */
+export const allowed = (name: FlagName, v: unknown): v is AnyFlagValue => {
+  const a = flagAmount(name);
+  return a ? validAmount(a, v) : (FLAGS[name].options as readonly unknown[]).includes(v);
+};
 
 function read(key: string): Partial<Record<FlagName, unknown>> {
   try {
