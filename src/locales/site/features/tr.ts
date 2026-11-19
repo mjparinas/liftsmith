@@ -474,6 +474,11 @@ export const tr: FeaturesText = {
       name: "Ağırlık, fotoğraf ve gidişatla ilerleme kontrolleri",
       body: "Herhangi bir forma vücut ağırlığı ve fotoğraf soruları ekle, her hafta, 2 haftada veya 4 haftada bir gönder. Ağırlık danışanın son tartımından gelir, fotoğrafları yalnızca sen görürsün ve her cevabın gidişatı raporda görünür. 18 yaşından küçüklerden asla fotoğraf istenmez.",
     },
+    "coach-form-videos": {
+      name: "Videoda notlu form videoları",
+      body: "Danışanların uygulamada bir set çekip sana gönderir. Yavaşlatarak izle, tam önemli anlara not iliştir; onlar da aynı notlara yanıt verir. Yalnızca ikiniz görürsünüz; 18 yaşından küçükler gönderemez.",
+      note: "Video göndermek danışanlar için ücretsiz. Android, iPhone ve web.",
+    },
     "coach-roles": {
       name: "Kişisel antrenörler ve koçlar için",
       body: "Birebir çalışan bir kişisel antrenör mü, grupları ve takımları yöneten bir koç mu olduğunu söyle. Danışanlar sana uygun unvanı görür, en çok kullandığın araçlar da öne gelir.",

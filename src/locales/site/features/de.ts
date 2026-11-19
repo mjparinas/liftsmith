@@ -412,6 +412,11 @@ export const de: FeaturesText = {
       name: "Fortschritts-Check-ins mit Gewicht, Fotos und Verlauf",
       body: "Füge jedem Formular Fragen zu Körpergewicht und Fotos hinzu und schick es jede Woche, alle 2 oder alle 4 Wochen. Das Gewicht startet beim letzten Wiegen deiner Kundschaft, Fotos sieht nur du, und der Verlauf jeder Antwort steht im Bericht. Unter 18-Jährige werden nie nach Fotos gefragt.",
     },
+    "coach-form-videos": {
+      name: "Technikvideos mit Notizen im Video",
+      body: "Kunden filmen einen Satz in der App und schicken ihn dir. Sieh ihn dir verlangsamt an, hefte Notizen genau an die wichtigen Momente, und sie antworten auf dieselben Notizen. Videos sehen nur ihr beide; unter 18-Jährige können keine senden.",
+      note: "Ein Video zu senden ist für Kunden kostenlos. Android, iPhone und Web.",
+    },
     "coach-roles": {
       name: "Für Personal Trainer und Coaches",
       body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",

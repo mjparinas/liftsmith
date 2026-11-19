@@ -788,3 +788,12 @@ Turn on Count workouts from other apps, and the workouts in your phone's health 
 - Tomorrow's plan works around tired legs after a long run or match.
 - They never count as Liftsmith workouts, and nothing counts twice.
 Did you know? It's in Settings › Connected apps, and the list under the recovery map on Body shows what's being counted. ([Workouts from other apps](outside-workouts.md))
+
+### W70 · Form videos with notes in the video (**New**, 2026-11-19)
+Pro (coaching) · Coaches · No screenshot (needs a client and a video) · `fresh`, so it goes next to every coach already in the series
+Clients can now film a set in the app and send it to you, and you answer right on the video.
+- They tap Send a form video in Coaching, pick the lift and say what to check; five seconds to get into place, up to a minute.
+- You get a notification. Slow it to half or quarter speed, pause where it matters and add a note pinned to that second.
+- They tap a note to jump to that moment, and can answer with a note of their own.
+- Videos stay private to the two of you and go when either of you ends coaching.
+Did you know? Clients under 18 can't send form videos. Sending one is free for clients. ([Trainer mode](trainer-mode.md) "Form videos")

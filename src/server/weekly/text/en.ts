@@ -917,6 +917,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Start from the new Progress check-in template in Coaching › Check-ins. Clients under 18 are never asked for photos.",
   },
+  "coach-form-videos": {
+    title: "Form videos with notes in the video",
+    intro: "Clients can now film a set in the app and send it to you, and you answer right on the video.",
+    points: [
+      "They tap Send a form video in Coaching, pick the lift and say what to check. The app gives them five seconds to get into place and records up to a minute.",
+      "You get a notification. Slow the clip to half or quarter speed, pause where it matters and add a note pinned to that second.",
+      "They tap a note to jump to that moment, and can answer with a note of their own.",
+      "Videos stay private to the two of you and go when either of you ends coaching.",
+    ],
+    dyk: "Clients under 18 can't send form videos. Sending one is free for clients.",
+  },
   seasons: {
     title: "Training seasons start Monday",
     intro: "Season 1, Ember, starts on Monday: ten weeks, a track of 20 tiers, and rewards you can only earn this winter.",

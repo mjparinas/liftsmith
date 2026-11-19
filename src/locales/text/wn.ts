@@ -58,6 +58,9 @@ export const en = {
   "wn.c.iconBadge.title": "A number on the app icon",
   "wn.c.iconBadge.body":
     "See how many messages, likes, comments and follow requests are waiting without opening the app. Inside, red counts on Friends and your coach show where they are.",
+  "wn.c.formVideos.title": "Form videos for your coach",
+  "wn.c.formVideos.body":
+    "Film a set in the app and send it to your coach or physio. They slow it down and pin notes to the exact moments that matter.",
   "wn.c.openNow.title": "Open now in the gym finder",
   "wn.c.openNow.body":
     "Every gym with its hours says whether it's open now and when it closes or opens, and an Open now chip shows only the open ones.",
@@ -133,6 +136,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Un número en el icono de la app",
   "wn.c.iconBadge.body":
     "Mira cuántos mensajes, me gusta, comentarios y solicitudes de seguimiento te esperan sin abrir la app. Dentro, los números rojos en Amigos y en tu entrenador te dicen dónde están.",
+  "wn.c.formVideos.title": "Vídeos de técnica para tu entrenador",
+  "wn.c.formVideos.body":
+    "Graba una serie en la app y envíasela a tu entrenador o fisio. La ve a cámara lenta y fija notas en los momentos exactos que importan.",
   "wn.c.openNow.title": "Abierto ahora en el buscador de gimnasios",
   "wn.c.openNow.body":
     "Cada gimnasio con horario dice si está abierto ahora y cuándo cierra o abre, y el filtro Abierto ahora muestra solo los abiertos.",
@@ -210,6 +216,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Un nombre sur l'icône de l'app",
   "wn.c.iconBadge.body":
     "Voyez combien de messages, j'aime, commentaires et demandes d'abonnement vous attendent sans ouvrir l'app. Dedans, des nombres rouges sur Amis et sur votre coach montrent où ils sont.",
+  "wn.c.formVideos.title": "Des vidéos de technique pour votre coach",
+  "wn.c.formVideos.body":
+    "Filmez une série dans l'app et envoyez-la à votre coach ou kiné. Il la ralentit et épingle des notes aux moments précis qui comptent.",
   "wn.c.openNow.title": "Ouvert maintenant dans la recherche de salles",
   "wn.c.openNow.body":
     "Chaque salle avec ses horaires indique si elle est ouverte et quand elle ferme ou ouvre, et le filtre Ouvert maintenant ne montre que celles qui sont ouvertes.",
@@ -286,6 +295,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Eine Zahl auf dem App-Symbol",
   "wn.c.iconBadge.body":
     "Sieh, wie viele Nachrichten, Likes, Kommentare und Follower-Anfragen warten, ohne die App zu öffnen. In der App zeigen rote Zahlen bei Freunde und deinem Coach, wo sie sind.",
+  "wn.c.formVideos.title": "Technikvideos für deinen Coach",
+  "wn.c.formVideos.body":
+    "Filme einen Satz in der App und schick ihn deinem Coach oder Physio. Er verlangsamt ihn und heftet Notizen genau an die wichtigen Momente.",
   "wn.c.openNow.title": "Jetzt geöffnet in der Studiosuche",
   "wn.c.openNow.body":
     "Jedes Studio mit Öffnungszeiten zeigt, ob es gerade offen ist und wann es schließt oder öffnet, und der Filter Jetzt geöffnet zeigt nur die offenen.",
@@ -361,6 +373,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Un numero sull'icona dell'app",
   "wn.c.iconBadge.body":
     "Vedi quanti messaggi, mi piace, commenti e richieste di follow ti aspettano senza aprire l'app. Dentro, numeri rossi su Amici e sul tuo coach ti dicono dove sono.",
+  "wn.c.formVideos.title": "Video della tecnica per il tuo coach",
+  "wn.c.formVideos.body":
+    "Riprendi una serie nell'app e inviala al tuo coach o fisioterapista. La rallenta e fissa note nei momenti esatti che contano.",
   "wn.c.openNow.title": "Aperto ora nella ricerca palestre",
   "wn.c.openNow.body":
     "Ogni palestra con gli orari dice se è aperta ora e quando chiude o apre, e il filtro Aperto ora mostra solo quelle aperte.",
@@ -429,6 +444,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "アプリアイコンに数字",
   "wn.c.iconBadge.body":
     "アプリを開かなくても、届いているメッセージ、いいね、コメント、フォローリクエストの数がわかります。アプリ内では「フレンド」とコーチの赤い数字で場所がわかります。",
+  "wn.c.formVideos.title": "コーチにフォーム動画を",
+  "wn.c.formVideos.body":
+    "アプリでセットを撮影してコーチや理学療法士に送れます。スロー再生して、大事な瞬間にピンポイントでメモを付けてくれます。",
   "wn.c.openNow.title": "ジム検索に「営業中」",
   "wn.c.openNow.body":
     "営業時間のあるジムは、今開いているか、いつ閉まるか開くかを表示します。「営業中」チップで開いているジムだけを表示できます。",
@@ -500,6 +518,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Um número no ícone do app",
   "wn.c.iconBadge.body":
     "Veja quantas mensagens, curtidas, comentários e pedidos para seguir estão esperando sem abrir o app. Dentro dele, números vermelhos em Amigos e no seu treinador mostram onde estão.",
+  "wn.c.formVideos.title": "Vídeos de execução para o seu treinador",
+  "wn.c.formVideos.body":
+    "Grave uma série no app e envie ao seu treinador ou fisio. Ele vê em câmera lenta e fixa notas nos momentos exatos que importam.",
   "wn.c.openNow.title": "Aberto agora na busca de academias",
   "wn.c.openNow.body":
     "Cada academia com horário mostra se está aberta agora e quando fecha ou abre, e o filtro Aberto agora mostra só as abertas.",
@@ -567,6 +588,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "앱 아이콘에 숫자",
   "wn.c.iconBadge.body":
     "앱을 열지 않아도 기다리는 메시지, 좋아요, 댓글, 팔로우 요청 수를 볼 수 있습니다. 앱 안에서는 친구와 코치의 빨간 숫자가 어디에 있는지 알려 줍니다.",
+  "wn.c.formVideos.title": "코치에게 자세 영상을",
+  "wn.c.formVideos.body": "앱에서 세트를 촬영해 코치나 물리치료사에게 보내세요. 느리게 돌려 보며 중요한 순간에 정확히 메모를 남겨 줘요.",
   "wn.c.openNow.title": "헬스장 찾기에 '영업 중'",
   "wn.c.openNow.body": "영업시간이 있는 헬스장은 지금 열었는지, 언제 닫거나 여는지 보여 주고, '영업 중' 칩으로 열린 곳만 볼 수 있습니다.",
   "wn.c.settingsSearch.title": "설정 검색",
@@ -637,6 +660,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Liczba na ikonie aplikacji",
   "wn.c.iconBadge.body":
     "Zobacz, ile wiadomości, polubień, komentarzy i próśb o obserwowanie czeka, bez otwierania aplikacji. W środku czerwone liczby przy Znajomych i Twoim trenerze pokazują, gdzie są.",
+  "wn.c.formVideos.title": "Nagrania techniki dla trenera",
+  "wn.c.formVideos.body":
+    "Nagraj serię w aplikacji i wyślij ją trenerowi lub fizjoterapeucie. Zwolni nagranie i przypnie notatki dokładnie do ważnych momentów.",
   "wn.c.openNow.title": "Otwarte teraz w wyszukiwarce siłowni",
   "wn.c.openNow.body":
     "Każda siłownia z godzinami pokazuje, czy jest teraz otwarta i kiedy się zamyka lub otwiera, a filtr Otwarte teraz pokazuje tylko otwarte.",
@@ -709,6 +735,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.iconBadge.title": "Uygulama simgesinde bir sayı",
   "wn.c.iconBadge.body":
     "Uygulamayı açmadan kaç mesaj, beğeni, yorum ve takip isteği beklediğini gör. İçeride Arkadaşlar'daki ve koçundaki kırmızı sayılar nerede olduklarını gösterir.",
+  "wn.c.formVideos.title": "Koçun için form videoları",
+  "wn.c.formVideos.body":
+    "Uygulamada bir set çek ve koçuna ya da fizyoterapistine gönder. Videoyu yavaşlatıp tam önemli anlara not iliştirir.",
   "wn.c.openNow.title": "Spor salonu bulucuda Şimdi açık",
   "wn.c.openNow.body":
     "Saatleri olan her salon şu an açık olup olmadığını ve ne zaman kapanıp açılacağını gösteriyor; Şimdi açık çipi yalnızca açık olanları listeliyor.",

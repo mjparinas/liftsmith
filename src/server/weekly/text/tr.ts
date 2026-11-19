@@ -896,6 +896,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Koçluk › Durum kontrolleri bölümündeki yeni İlerleme kontrolü şablonuyla başla. 18 yaşından küçüklerden asla fotoğraf istenmez.",
   },
+  "coach-form-videos": {
+    title: "Videoda notlu form videoları",
+    intro: "Danışanların artık uygulamada bir set çekip sana gönderebilir, sen de doğrudan videonun üzerinde yanıt verirsin.",
+    points: [
+      "Koçluk'ta Form videosu gönder'e dokunur, hareketi seçer ve neye bakılacağını yazarlar. Uygulama yerleşmeleri için beş saniye verir ve bir dakikaya kadar kaydeder.",
+      "Bir bildirim alırsın. Videoyu yarım ya da çeyrek hıza al, önemli yerde durdur ve o saniyeye iliştirilmiş bir not ekle.",
+      "O ana gitmek için bir nota dokunurlar ve kendi notlarıyla yanıt verebilirler.",
+      "Videolar yalnızca ikinize özeldir ve biriniz koçluğu bitirirse silinir.",
+    ],
+    dyk: "18 yaşından küçük danışanlar form videosu gönderemez. Göndermek danışanlar için ücretsizdir.",
+  },
   seasons: {
     title: "Antrenman sezonları pazartesi başlıyor",
     intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",
