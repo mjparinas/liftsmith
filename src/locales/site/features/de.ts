@@ -541,6 +541,10 @@ export const de: FeaturesText = {
       name: "Community: Ideen, Fehler und Roadmap",
       body: "Schlag vor, was Liftsmith als Nächstes können soll, stimm für die Ideen, die du willst, melde Fehler mit einem Screenshot, den nur das Team sieht, und kommentiere oder erwähne andere mit @. Bei jedem Eintrag siehst du, wo er steht, von „Wird geprüft“ bis „Veröffentlicht“, und du erfährst es, wenn eine Idee, für die du gestimmt hast, erscheint. Roadmap und Änderungsprotokoll stehen auch auf der Website.",
     },
+    whatsNew: {
+      name: "Neuigkeiten in der App",
+      body: "Die Einstellungen zeigen deine Version mit einer Taste Neuigkeiten: was neu, besser oder behoben ist, in einfachen Worten. Nach einem Update weist Heute einmal darauf hin, und es listet nur, was du schon nutzen kannst.",
+    },
     languages: {
       name: "Zehn Sprachen",
       body: "Englisch, Spanisch, Französisch, Deutsch, Italienisch, Japanisch, brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, passend zur Sprache deines Handys oder Browsers, oder frei wählbar auf dem Startbildschirm und in den Einstellungen.",

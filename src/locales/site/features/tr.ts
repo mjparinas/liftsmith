@@ -603,6 +603,10 @@ export const tr: FeaturesText = {
       name: "Topluluk: fikirler, hatalar ve yol haritası",
       body: "Liftsmith'in sırada ne yapması gerektiğini öner, istediğin fikirlere oy ver, yalnızca ekibin gördüğü bir ekran görüntüsüyle hata bildir, yorum yap ya da @ ile birinden bahset. Her biri inceleniyordan yayınlandıya kadar nerede olduğunu gösterir ve oy verdiğin bir fikir yayınlanınca haber alırsın. Yol haritası ve değişiklik günlüğü web sitesinde de var.",
     },
+    whatsNew: {
+      name: "Uygulamadaki yenilikler",
+      body: "Ayarlar sürümünü bir Yenilikler düğmesiyle gösterir: yeni, daha iyi ve düzeltilmiş olanlar, sade bir dille. Bir güncellemeden sonra Bugün bunu bir kez söyler ve yalnızca zaten kullanabildiklerini listeler.",
+    },
     languages: {
       name: "On dil",
       body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun ya da tarayıcının dilini takip eder veya karşılama ekranında ve ayarlarda istediğini seçersin.",

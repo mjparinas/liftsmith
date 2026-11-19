@@ -537,6 +537,10 @@ export const es: FeaturesText = {
       name: "Comunidad: ideas, errores y hoja de ruta",
       body: "Sugiere lo próximo que debería hacer Liftsmith, vota las ideas que quieres, informa de errores con una captura que solo ve el equipo, y comenta o menciona a otros con @. Cada una muestra en qué punto está, de en revisión a publicada, y te avisamos cuando sale una idea que votaste. La hoja de ruta y el registro de cambios también están en la web.",
     },
+    whatsNew: {
+      name: "Novedades en la app",
+      body: "Ajustes muestra tu versión con un botón Novedades: lo nuevo, lo mejorado y lo arreglado, en palabras sencillas. Tras una actualización, Hoy lo menciona una vez, y solo lista lo que ya puedes usar.",
+    },
     languages: {
       name: "Diez idiomas",
       body: "Inglés, español, francés, alemán, italiano, japonés, portugués de Brasil, coreano, polaco y turco, según el idioma de tu teléfono o navegador, o el que elijas en la pantalla de bienvenida y en Ajustes.",
