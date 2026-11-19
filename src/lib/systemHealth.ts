@@ -205,11 +205,11 @@ export const SETTINGS: Setting[] = [
     what: "The database's auth token, paired with the address above.",
   },
   {
-    names: ["VIDEO_BLOB_READ_WRITE_TOKEN"],
+    names: ["VIDEO_BLOB_READ_WRITE_TOKEN", "VIDEO_BLOB_STORE_ID"],
     label: "Vercel Blob (form videos)",
     group: "Core",
     need: "optional",
-    what: "The private Blob store for coaching form videos (formVideos.ts), apart from the public one for gym pictures: set by connecting a private store to the project with the prefix VIDEO_BLOB. Without it clients can't send form videos and the section doesn't show.",
+    what: "The private Blob store for coaching form videos (formVideos.ts), apart from the public one for gym pictures: set by connecting a private store to the project with the prefix VIDEO_BLOB (a read-write token on older connections, only the store id through OIDC). Without it clients can't send form videos and the section doesn't show.",
   },
   {
     names: ["NEXT_PUBLIC_SITE_URL"],

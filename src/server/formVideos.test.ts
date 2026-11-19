@@ -4,6 +4,7 @@ import { joinCoach, makeInvite } from "./coach";
 import { batch, query, resetDb, run } from "./db";
 import {
   addNote,
+  blobConfigured,
   cleanMs,
   cleanNote,
   deleteNote,
@@ -12,6 +13,8 @@ import {
   dropVideosOf,
   finishVideo,
   openVideo,
+  presignedPayload,
+  presignVideo,
   sendState,
   setVideoStore,
   startVideo,
@@ -26,14 +29,20 @@ const NOW = 1_800_000_000_000;
 const MB = 1024 * 1024;
 
 /** A store in memory: what was uploaded, what was removed, and the tokens handed out. */
-function memoryStore() {
+function memoryStore(oidc = false) {
   const files = new Map<string, number>();
   const removed: string[] = [];
   const tokens: { path: string; bytes: number; types: string[] }[] = [];
+  const presigned: { path: string; bytes: number; until: number }[] = [];
   const s: VideoStore = {
     uploadToken: async (path, bytes, types) => {
+      if (oidc) return null;
       tokens.push({ path, bytes, types });
       return `token-for-${path}`;
+    },
+    presignUpload: async (path, bytes, _types, until) => {
+      presigned.push({ path, bytes, until });
+      return { delegationToken: `d-${path}`, signature: "sig", params: {} };
     },
     size: async (path) => files.get(path) ?? null,
     watchUrl: async (path, until) => `https://blob.test/${path}?until=${until}`,
@@ -44,7 +53,7 @@ function memoryStore() {
       }
     },
   };
-  return { s, files, removed, tokens };
+  return { s, files, removed, tokens, presigned };
 }
 
 let mem = memoryStore();
@@ -247,5 +256,50 @@ describe("cleaning", () => {
     expect(cleanMs(20_000, 10)).toBe(10_000);
     expect(cleanMs(Number.NaN, 10)).toBeNull();
     expect(cleanMs("5", 10)).toBeNull();
+  });
+});
+
+describe("a store connected through OIDC", () => {
+  beforeEach(() => {
+    mem = memoryStore(true);
+    setVideoStore(mem.s);
+  });
+
+  it("hands back no token, and presigns only the client's own unfinished upload while its window lasts", async () => {
+    const s = await startVideo("client", SQUAT, NOW, "v1");
+    expect(s).toEqual({ id: "v1", path: "form-videos/v1.mp4", token: null });
+    expect(await presignVideo("client", "form-videos/v1.mp4", NOW + 60_000)).toEqual({
+      delegationToken: "d-form-videos/v1.mp4",
+      signature: "sig",
+      params: {},
+    });
+    expect(mem.presigned[0]).toMatchObject({ path: "form-videos/v1.mp4", until: NOW + VIDEO_LIMITS.uploadMs });
+    expect(mem.presigned[0]!.bytes).toBeGreaterThanOrEqual(SQUAT.bytes);
+    expect(mem.presigned[0]!.bytes).toBeLessThanOrEqual(VIDEO_LIMITS.bytes);
+    // Someone else, another path, after the window, or once it's finished: nothing.
+    expect(await presignVideo("coach", "form-videos/v1.mp4", NOW)).toBeNull();
+    expect(await presignVideo("client", "form-videos/other.mp4", NOW)).toBeNull();
+    expect(await presignVideo("client", 42, NOW)).toBeNull();
+    expect(await presignVideo("client", "form-videos/v1.mp4", NOW + VIDEO_LIMITS.uploadMs)).toBeNull();
+    mem.files.set("form-videos/v1.mp4", SQUAT.bytes);
+    await finishVideo("client", "v1", NOW + 60_000);
+    expect(await presignVideo("client", "form-videos/v1.mp4", NOW + 120_000)).toBeNull();
+    expect(mem.presigned).toHaveLength(1);
+  });
+
+  it("turns a presigned link back into the payload the Blob client sends", () => {
+    const link =
+      "https://vercel.com/api/blob/?pathname=form-videos%2Fv1.mp4&vercel-blob-valid-until=5&vercel-blob-maximum-size-in-bytes=9" +
+      "&vercel-blob-delegation=DEL.SIG&vercel-blob-signature=abc";
+    expect(presignedPayload(link)).toEqual({
+      delegationToken: "DEL.SIG",
+      signature: "abc",
+      params: { "vercel-blob-valid-until": "5", "vercel-blob-maximum-size-in-bytes": "9" },
+    });
+  });
+
+  it("counts the store id alone as set up", () => {
+    expect(blobConfigured({ VIDEO_BLOB_STORE_ID: "store_x" } as unknown as NodeJS.ProcessEnv)).toBe(true);
+    expect(blobConfigured({} as unknown as NodeJS.ProcessEnv)).toBe(false);
   });
 });

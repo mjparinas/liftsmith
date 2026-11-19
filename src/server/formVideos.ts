@@ -39,8 +39,13 @@ export const VIDEO_TYPES: Record<string, string> = { "video/mp4": "mp4", "video/
 
 /** Where the bytes live. Vercel Blob in production (vercelStore below); tests swap in their own. */
 export interface VideoStore {
-  /** A client token that lets one upload of up to `bytes` reach `path`, of one of `types`, before `until`. */
-  uploadToken(path: string, bytes: number, types: string[], until: number): Promise<string>;
+  /**
+   * A client token that lets one upload of up to `bytes` reach `path`, of one of `types`, before `until`; null when the
+   * store has no read-write token to sign one with (connected through OIDC), and the phone asks `presignUpload` instead.
+   */
+  uploadToken(path: string, bytes: number, types: string[], until: number): Promise<string | null>;
+  /** The same one upload as a presigned link, for a store connected through OIDC. */
+  presignUpload(path: string, bytes: number, types: string[], until: number): Promise<PresignedUpload>;
   /** The stored size, or null when nothing reached `path`. */
   size(path: string): Promise<number | null>;
   /** A link that plays the video until `until`. */
@@ -48,18 +53,40 @@ export interface VideoStore {
   remove(paths: string[]): Promise<void>;
 }
 
+/** What the Blob client's presigned upload needs: the store's delegation, its signature and the signed query. */
+export interface PresignedUpload {
+  delegationToken: string;
+  signature: string;
+  params: Record<string, string>;
+}
+
 /**
  * Vercel Blob, in a private store of its own: gym pictures use a public store under BLOB_READ_WRITE_TOKEN, and a store
- * is public or private as a whole. Connecting this one to the project with the prefix VIDEO_BLOB sets the token.
+ * is public or private as a whole. Connecting this one to the project with the prefix VIDEO_BLOB sets either
+ * VIDEO_BLOB_READ_WRITE_TOKEN (older connections) or, through OIDC, only VIDEO_BLOB_STORE_ID, with the function's own
+ * OIDC token as the key. Both work.
  */
-export const blobConfigured = (env: NodeJS.ProcessEnv = process.env) => !!env.VIDEO_BLOB_READ_WRITE_TOKEN;
-const token = () => process.env.VIDEO_BLOB_READ_WRITE_TOKEN!;
+export const blobConfigured = (env: NodeJS.ProcessEnv = process.env) => !!(env.VIDEO_BLOB_READ_WRITE_TOKEN || env.VIDEO_BLOB_STORE_ID);
+const auth = (): { token: string } | { storeId: string } =>
+  process.env.VIDEO_BLOB_READ_WRITE_TOKEN
+    ? { token: process.env.VIDEO_BLOB_READ_WRITE_TOKEN }
+    : { storeId: process.env.VIDEO_BLOB_STORE_ID! };
+
+/** A presigned link back into the payload the Blob client sends with each request (the SDK keeps its own helper private). */
+export function presignedPayload(link: string): PresignedUpload {
+  const q = new URL(link).searchParams;
+  const params: Record<string, string> = {};
+  for (const [k, v] of q) if (k !== "pathname" && k !== "vercel-blob-delegation" && k !== "vercel-blob-signature") params[k] = v;
+  return { delegationToken: q.get("vercel-blob-delegation") ?? "", signature: q.get("vercel-blob-signature") ?? "", params };
+}
 
 const vercelStore: VideoStore = {
   async uploadToken(path, bytes, types, until) {
+    const a = auth();
+    if (!("token" in a)) return null;
     const { generateClientTokenFromReadWriteToken } = await import("@vercel/blob/client");
     return generateClientTokenFromReadWriteToken({
-      token: token(),
+      token: a.token,
       pathname: path,
       maximumSizeInBytes: bytes,
       allowedContentTypes: types,
@@ -68,23 +95,45 @@ const vercelStore: VideoStore = {
       allowOverwrite: false,
     });
   },
+  async presignUpload(path, bytes, types, until) {
+    const { issueSignedToken, presignUrl } = await import("@vercel/blob");
+    const signed = await issueSignedToken({
+      ...auth(),
+      pathname: path,
+      operations: ["put"],
+      validUntil: until,
+      maximumSizeInBytes: bytes,
+      allowedContentTypes: types,
+    });
+    const { presignedUrl } = await presignUrl(signed, {
+      operation: "put",
+      access: "private",
+      pathname: path,
+      validUntil: until,
+      maximumSizeInBytes: bytes,
+      allowedContentTypes: types,
+      addRandomSuffix: false,
+      allowOverwrite: false,
+    });
+    return presignedPayload(presignedUrl);
+  },
   async size(path) {
     const { head } = await import("@vercel/blob");
     try {
-      return (await head(path, { token: token() })).size;
+      return (await head(path, auth())).size;
     } catch {
       return null;
     }
   },
   async watchUrl(path, until) {
     const { issueSignedToken, presignUrl } = await import("@vercel/blob");
-    const signed = await issueSignedToken({ token: token(), pathname: path, operations: ["get"], validUntil: until });
+    const signed = await issueSignedToken({ ...auth(), pathname: path, operations: ["get"], validUntil: until });
     return (await presignUrl(signed, { operation: "get", pathname: path, validUntil: until, access: "private" })).presignedUrl;
   },
   async remove(paths) {
     if (!paths.length) return;
     const { del } = await import("@vercel/blob");
-    await del(paths, { token: token() });
+    await del(paths, auth());
   },
 };
 
@@ -224,7 +273,7 @@ export async function startVideo(
   x: unknown,
   now = Date.now(),
   id = newId(),
-): Promise<{ id: string; path: string; token: string } | { error: StartError }> {
+): Promise<{ id: string; path: string; token: string | null } | { error: StartError }> {
   const b = (x ?? {}) as { coach?: unknown; lift?: unknown; question?: unknown; bytes?: unknown; secs?: unknown; type?: unknown };
   const s = theStore();
   if (!s) return { error: "off" };
@@ -246,13 +295,25 @@ export async function startVideo(
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 0, ?)`,
     [id, b.coach, clientId, path, line(b.lift, VIDEO_LIMITS.lift), line(b.question, VIDEO_LIMITS.question), bytes, secs, now, now],
   );
-  const token = await s.uploadToken(
-    path,
-    Math.min(VIDEO_LIMITS.bytes, Math.ceil(bytes * 1.05) + 65_536),
-    Object.keys(VIDEO_TYPES),
-    now + VIDEO_LIMITS.uploadMs,
-  );
+  const token = await s.uploadToken(path, uploadCap(bytes), Object.keys(VIDEO_TYPES), now + VIDEO_LIMITS.uploadMs);
   return { id, path, token };
+}
+
+/** The most one upload may hold: what the phone declared, with a little room for the container, never past the limit. */
+const uploadCap = (bytes: number) => Math.min(VIDEO_LIMITS.bytes, Math.ceil(bytes * 1.05) + 65_536);
+
+/**
+ * A store connected through OIDC can't sign client tokens, so `startVideo` hands back no token and the phone's Blob
+ * client asks here for a presigned upload of the same one path: only the client who started it, only while it's
+ * unfinished, and only until the upload window of its start runs out.
+ */
+export async function presignVideo(clientId: string, pathname: unknown, now = Date.now()): Promise<PresignedUpload | null> {
+  const s = theStore();
+  if (!s || typeof pathname !== "string") return null;
+  const [row] = await query<Row>("SELECT * FROM coach_videos WHERE client_id = ? AND ready = 0 AND path = ?", [clientId, pathname]);
+  const until = row ? row.at + VIDEO_LIMITS.uploadMs : 0;
+  if (!row || until <= now) return null;
+  return s.presignUpload(row.path, uploadCap(row.bytes), Object.keys(VIDEO_TYPES), until);
 }
 
 /** Uploads a client started over an hour ago and never finished: their rows go, and any bytes that did arrive. */
