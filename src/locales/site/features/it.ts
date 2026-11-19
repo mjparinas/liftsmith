@@ -217,7 +217,7 @@ export const it: FeaturesText = {
     },
     "edit-history": {
       name: "Modifica e ripeti gli allenamenti passati",
-      body: "Correggi una serie, aggiungi una nota, dai un nome a un allenamento o ripetilo, e ogni esercizio ha la sua pagina con la sua cronologia.",
+      body: "Correggi una serie, aggiungi una nota, dai un nome a un allenamento o ripetilo, e ogni esercizio ha la sua pagina con la sua cronologia. Eliminane uno con Annulla e tutte le statistiche vengono ricalcolate.",
     },
     "exercise-stats": {
       name: "Statistiche di ogni esercizio",

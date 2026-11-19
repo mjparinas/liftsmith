@@ -466,6 +466,7 @@ export const emails: Record<string, Words> = {
       "Edit a set, add a note or name a workout.",
       "Forgot your phone? Log a past workout and it counts.",
       "Do any workout again with today's weights.",
+      "Deleted one by mistake? Undo brings it back, and every stat follows.",
     ],
     dyk: "Every exercise has its own page with its full history.",
   },

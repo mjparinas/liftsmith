@@ -273,7 +273,7 @@ export const tr: FeaturesText = {
     },
     "edit-history": {
       name: "Geçmiş antrenmanları düzenle ve tekrarla",
-      body: "Bir seti düzelt, not ekle, antrenmana ad ver ya da tekrarla; her hareketin geçmişiyle birlikte kendi sayfası var.",
+      body: "Bir seti düzelt, not ekle, antrenmana ad ver ya da tekrarla; her hareketin geçmişiyle birlikte kendi sayfası var. Geri alma seçeneğiyle sil; tüm istatistikler yeniden hesaplanır.",
     },
     "exercise-stats": {
       name: "Her egzersiz için istatistik",

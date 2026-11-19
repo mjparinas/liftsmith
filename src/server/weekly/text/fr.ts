@@ -447,6 +447,7 @@ export const emails: Record<string, Words> = {
       "Modifiez une série, ajoutez une note ou nommez une séance.",
       "Téléphone oublié ? Enregistrez une séance passée et elle compte.",
       "Refaites n'importe quelle séance avec les charges du jour.",
+      "Supprimé une séance par erreur ? Annuler la ramène, et toutes les stats suivent.",
     ],
     dyk: "Chaque exercice a sa propre page avec tout son historique.",
   },

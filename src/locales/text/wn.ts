@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.deleteWorkout.title": "Undo after deleting a workout",
+  "wn.c.deleteWorkout.body":
+    "Deleted a workout by mistake? Tap Undo for a few seconds after. A deleted workout now also leaves your Friends feed and Health Connect or Apple Health, and every stat is worked out again from what's left.",
   "wn.c.landmineEnd.title": "Landmine plates on one end",
   "wn.c.landmineEnd.body": "Landmine and T-bar moves show their plates on the one free end, and plate changes stop saying each side.",
   "wn.c.gymInsights.title": "Insights for gym owners",
@@ -96,6 +99,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Deshacer al eliminar un entrenamiento",
+  "wn.c.deleteWorkout.body":
+    "¿Eliminaste un entrenamiento por error? Toca Deshacer durante unos segundos. Ahora un entrenamiento eliminado también sale de Amigos y de Health Connect o Salud, y todas las estadísticas se recalculan con lo que queda.",
   "wn.c.landmineEnd.title": "Discos del landmine en un extremo",
   "wn.c.landmineEnd.body":
     "Los ejercicios con landmine y la remada en T muestran los discos en el único extremo libre, y los cambios de discos ya no dicen por lado.",
@@ -195,6 +201,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Annuler après avoir supprimé une séance",
+  "wn.c.deleteWorkout.body":
+    "Une séance supprimée par erreur ? Touchez Annuler pendant quelques secondes. Une séance supprimée quitte aussi Amis et Health Connect ou Santé, et toutes les stats sont recalculées avec ce qui reste.",
   "wn.c.landmineEnd.title": "Disques du landmine sur une extrémité",
   "wn.c.landmineEnd.body":
     "Les mouvements au landmine et le rowing T-bar montrent leurs disques sur la seule extrémité libre, sans « de chaque côté ».",
@@ -296,6 +305,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Rückgängig nach dem Löschen eines Trainings",
+  "wn.c.deleteWorkout.body":
+    "Ein Training aus Versehen gelöscht? Tippe ein paar Sekunden lang auf Rückgängig. Ein gelöschtes Training verschwindet jetzt auch aus Freunde und aus Health Connect oder Apple Health, und alle Werte werden aus dem Rest neu berechnet.",
   "wn.c.landmineEnd.title": "Landmine-Scheiben an einem Ende",
   "wn.c.landmineEnd.body": "Landmine-Übungen und T-Bar-Rudern zeigen die Scheiben am freien Ende, ohne „pro Seite“.",
   "wn.c.gymInsights.title": "Einblicke für Gym-Betreiber",
@@ -394,6 +406,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Annulla dopo aver eliminato un allenamento",
+  "wn.c.deleteWorkout.body":
+    "Hai eliminato un allenamento per sbaglio? Tocca Annulla per qualche secondo. Ora un allenamento eliminato sparisce anche da Amici e da Health Connect o Apple Salute, e tutte le statistiche vengono ricalcolate da ciò che resta.",
   "wn.c.landmineEnd.title": "Dischi del landmine su un'estremità",
   "wn.c.landmineEnd.body": "Gli esercizi al landmine e il T-bar row mostrano i dischi sull'unica estremità libera, senza più «per lato».",
   "wn.c.gymInsights.title": "Dati per i titolari di palestre",
@@ -492,6 +507,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "ワークアウト削除の取り消し",
+  "wn.c.deleteWorkout.body":
+    "間違えて削除しても、数秒間は「元に戻す」をタップできます。削除したワークアウトは友達のフィードやヘルスコネクト、Apple ヘルスケアからも消え、統計はすべて残りのデータから計算し直されます。",
   "wn.c.landmineEnd.title": "ランドマインのプレートは片端に",
   "wn.c.landmineEnd.body": "ランドマイン種目とTバーロウは、空いている片端だけにプレートを表示し、「片側」と言わなくなりました。",
   "wn.c.gymInsights.title": "ジムオーナー向けの分析",
@@ -582,6 +600,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Desfazer ao excluir um treino",
+  "wn.c.deleteWorkout.body":
+    "Excluiu um treino sem querer? Toque em Desfazer por alguns segundos. Agora um treino excluído também sai de Amigos e do Health Connect ou Apple Saúde, e todas as estatísticas são recalculadas com o que sobrou.",
   "wn.c.landmineEnd.title": "Anilhas do landmine em uma ponta",
   "wn.c.landmineEnd.body": "Exercícios no landmine e a remada cavalinho mostram as anilhas na única ponta livre, sem dizer de cada lado.",
   "wn.c.gymInsights.title": "Dados para donos de academia",
@@ -676,6 +697,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "운동 삭제 실행 취소",
+  "wn.c.deleteWorkout.body":
+    "실수로 운동을 삭제했나요? 몇 초 동안 실행 취소를 누를 수 있어요. 이제 삭제한 운동은 친구 피드와 헬스 커넥트나 Apple 건강에서도 사라지고, 모든 통계는 남은 기록으로 다시 계산돼요.",
   "wn.c.landmineEnd.title": "랜드마인 원판은 한쪽 끝에",
   "wn.c.landmineEnd.body": "랜드마인 운동과 T바 로우는 비어 있는 한쪽 끝에만 원판을 보여 주고, 더 이상 한쪽당이라고 하지 않아요.",
   "wn.c.gymInsights.title": "체육관 운영자를 위한 인사이트",
@@ -763,6 +787,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Cofnij po usunięciu treningu",
+  "wn.c.deleteWorkout.body":
+    "Usunięto trening przez pomyłkę? Przez kilka sekund możesz dotknąć Cofnij. Usunięty trening znika teraz także ze Znajomych i z Health Connect lub Apple Zdrowie, a wszystkie statystyki są przeliczane z tego, co zostało.",
   "wn.c.landmineEnd.title": "Talerze na landmine na jednym końcu",
   "wn.c.landmineEnd.body": "Ćwiczenia z landmine i wiosłowanie T-bar pokazują talerze na jedynym wolnym końcu, bez „z każdej strony”.",
   "wn.c.gymInsights.title": "Statystyki dla właścicieli siłowni",
@@ -857,6 +884,9 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.deleteWorkout.title": "Antrenman silmeyi geri al",
+  "wn.c.deleteWorkout.body":
+    "Bir antrenmanı yanlışlıkla mı sildin? Birkaç saniye boyunca Geri al'a dokunabilirsin. Silinen antrenman artık Arkadaşlar'dan ve Health Connect ya da Apple Sağlık'tan da kalkar; tüm istatistikler kalanlardan yeniden hesaplanır.",
   "wn.c.landmineEnd.title": "Landmine plakaları tek uçta",
   "wn.c.landmineEnd.body": "Landmine hareketleri ve T-bar row, plakaları yalnızca boştaki uçta gösterir ve artık her yana demez.",
   "wn.c.gymInsights.title": "Salon sahipleri için içgörüler",

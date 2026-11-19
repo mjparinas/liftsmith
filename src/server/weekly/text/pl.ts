@@ -444,6 +444,7 @@ export const emails: Record<string, Words> = {
       "Popraw serię, dodaj notatkę lub nazwij trening.",
       "Telefon został w domu? Dodaj trening z przeszłości, a też się liczy.",
       "Powtórz dowolny trening z dzisiejszymi ciężarami.",
+      "Usunięto przez pomyłkę? Cofnij przywraca trening, a statystyki razem z nim.",
     ],
     dyk: "Każde ćwiczenie ma własną stronę z pełną historią.",
   },

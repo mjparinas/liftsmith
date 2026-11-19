@@ -223,7 +223,7 @@ export const de: FeaturesText = {
     },
     "edit-history": {
       name: "Vergangene Trainings bearbeiten und wiederholen",
-      body: "Korrigiere einen Satz, füge eine Notiz hinzu, benenne ein Training oder mach es noch einmal, und jede Übung hat ihre eigene Seite mit ihrem Verlauf.",
+      body: "Korrigiere einen Satz, füge eine Notiz hinzu, benenne ein Training oder mach es noch einmal, und jede Übung hat ihre eigene Seite mit ihrem Verlauf. Lösche eines mit Rückgängig, und alle Werte werden neu berechnet.",
     },
     "exercise-stats": {
       name: "Werte für jede Übung",

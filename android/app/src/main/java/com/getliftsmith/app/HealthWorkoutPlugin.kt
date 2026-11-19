@@ -8,7 +8,9 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseSegment
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.records.metadata.Metadata
@@ -226,6 +228,39 @@ class HealthWorkoutPlugin : Plugin() {
                 answer(call, "saved", true)
             } catch (e: Exception) {
                 answer(call, "saved", false)
+            }
+        }
+    }
+
+    /**
+     * A deleted workout (src/lib/workoutDelete.ts): the session this app saved under the workout's id goes, and so do
+     * this app's own calories and heart rate records inside the workout's time (written beside it, see save). Health
+     * Connect only lets an app delete its own records, so nothing another app wrote is touched. iOS: HealthWorkoutPlugin.swift.
+     */
+    @PluginMethod
+    fun remove(call: PluginCall) {
+        val id = call.getString("id")
+        if (id.isNullOrEmpty()) return call.reject("Bad workout")
+        val start = call.getDouble("start")
+        val end = call.getDouble("end")
+        val c = client() ?: return answer(call, "removed", false)
+        scope.launch {
+            try {
+                if (!c.permissionController.getGrantedPermissions().contains(permission)) return@launch answer(call, "removed", false)
+                c.deleteRecords(ExerciseSessionRecord::class, recordIdsList = emptyList(), clientRecordIdsList = listOf(id))
+                if (start != null && end != null && end > start) {
+                    val range = TimeRangeFilter.between(Instant.ofEpochMilli(start.toLong()), Instant.ofEpochMilli(end.toLong()))
+                    for (type in listOf(ActiveCaloriesBurnedRecord::class, HeartRateRecord::class)) {
+                        try {
+                            c.deleteRecords(type, range)
+                        } catch (e: Exception) {
+                            // No write permission for that type: it was never written, so there's nothing to remove.
+                        }
+                    }
+                }
+                answer(call, "removed", true)
+            } catch (e: Exception) {
+                answer(call, "removed", false)
             }
         }
     }

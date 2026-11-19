@@ -46,10 +46,10 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.11.2",
+    version: "0.12.0",
     day: "2026-11-21",
     headline:
-      "Pregnancy and postpartum mode, five new training seasons, a number on the app icon, workouts from other apps, form videos, a routine library, team sessions for school coaches, every location of a gym chain and insights for gym owners",
+      "Pregnancy and postpartum mode, five new training seasons, a number on the app icon, workouts from other apps, form videos, a routine library, team sessions for school coaches, every location of a gym chain, insights for gym owners and Undo after deleting a workout",
     changes: [
       { id: "pregnancy", kind: "new", icon: "heart" },
       { id: "seasonPlan", kind: "new", icon: "medal", unlock: "seasons" },
@@ -60,6 +60,7 @@ export const RELEASES: readonly AppRelease[] = [
       { id: "teamSession", kind: "new", icon: "people" },
       { id: "gymChains", kind: "new", icon: "gym" },
       { id: "gymInsights", kind: "new", icon: "chart" },
+      { id: "deleteWorkout", kind: "better", icon: "trash" },
       { id: "landmineEnd", kind: "fixed", icon: "dumbbell" },
       { id: "sonosVolume", kind: "better", icon: "volume", unlock: "more" },
     ],

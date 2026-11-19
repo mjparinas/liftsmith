@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { DAY, makeSet, makeWorkout, NOW } from "@/test/factories";
 
 import { derive } from "./derive";
-import { editSet, removeSet, sessionNoteOf, setSessionNote, workoutEventIds, type EventChange } from "./editHistory";
-import type { AppEvent, EffortEvent } from "./types";
+import { editSet, removeSet, restoreWorkout, sessionNoteOf, setSessionNote, workoutEventIds, type EventChange } from "./editHistory";
+import type { AppEvent, EffortEvent, SetEvent } from "./types";
 
 // Fixing a finished workout: every change is deletes plus new events, never an edit in place.
 
@@ -93,5 +93,47 @@ describe("a workout's name and note", () => {
   it("is never counted as a workout", () => {
     const events = setSessionNote([], "w9", { name: "Legs", text: "" }, NOW, id).add;
     expect(derive(events, NOW).sessions).toEqual([]);
+  });
+});
+
+describe("deleting a workout and undoing it", () => {
+  // Two workouts a week apart; the second holds the bench best. Deleting it takes the best, the volume and the
+  // session away; Undo brings every number back under new ids (a delete is a tombstone sync never undoes).
+  const older = makeWorkout("w1", NOW - 7 * DAY, [{ weight: 60, reps: 8 }]);
+  const newer = makeWorkout("w2", NOW, [
+    { weight: 80, reps: 5 },
+    { weight: 80, reps: 5 },
+  ]);
+  const rating: EffortEvent = { type: "effort", id: "eff2", at: NOW + 70_000, setId: newer[1]!.id, rir: 2 };
+  const events = [...older, ...newer, rating];
+
+  it("recalculates every stat from what's left", () => {
+    const ids = workoutEventIds(events, "w2");
+    const before = derive(events, NOW);
+    const after = derive(apply(events, { add: [], remove: ids }), NOW);
+    expect(before.sessions).toHaveLength(2);
+    expect(after.sessions.map((x) => x.sessionId)).toEqual(["w1"]);
+    expect(after.totalSets).toBe(1);
+    expect(after.totalVolume).toBe(60 * 8);
+    expect(Math.max(...after.e1rmSeries.get((older[1] as SetEvent).exerciseId)!.map((p) => p.e1rm))).toBeLessThan(
+      Math.max(...before.e1rmSeries.get((older[1] as SetEvent).exerciseId)!.map((p) => p.e1rm)),
+    );
+  });
+
+  it("Undo brings the same workout back under new ids, with each rating on its set's new id", () => {
+    const ids = workoutEventIds(events, "w2");
+    const removed = events.filter((e) => ids.includes(e.id));
+    const back = restoreWorkout(removed, id);
+    expect(back).toHaveLength(removed.length);
+    for (const e of back) expect(ids).not.toContain(e.id);
+    const eff = back.find((e): e is EffortEvent => e.type === "effort")!;
+    const sets = back.filter((e) => e.type === "set");
+    expect(sets.map((e) => e.id)).toContain(eff.setId);
+    expect(back.every((e) => !("sessionId" in e) || e.sessionId === "w2")).toBe(true);
+    const restored = [...apply(events, { add: [], remove: ids }), ...back];
+    const a = derive(events, NOW);
+    const b = derive(restored, NOW);
+    expect(b.sessions.map((x) => x.sessionId)).toEqual(a.sessions.map((x) => x.sessionId));
+    expect([b.totalSets, b.totalVolume, b.weekStreak, b.prs.length]).toEqual([a.totalSets, a.totalVolume, a.weekStreak, a.prs.length]);
   });
 });

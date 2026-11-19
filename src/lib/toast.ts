@@ -2,7 +2,8 @@
 // time: a new one replaces the one showing. The Toaster in App.tsx draws it, over sheets too.
 import { useSyncExternalStore } from "react";
 
-export type Toast = { id: number; text: string };
+/** `action`: one button on the toast (Undo after deleting a workout), which hides the toast when tapped. */
+export type Toast = { id: number; text: string; action?: { label: string; run: () => void } };
 
 /** How long a toast stays up. */
 export const TOAST_MS = 2200;
@@ -14,14 +15,14 @@ const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
 /** Show a toast; it hides itself after TOAST_MS. */
-export function toast(text: string): void {
-  current = { id: ++seq, text };
+export function toast(text: string, opts: { action?: Toast["action"]; ms?: number } = {}): void {
+  current = { id: ++seq, text, ...(opts.action ? { action: opts.action } : {}) };
   if (timer) clearTimeout(timer);
   timer = setTimeout(() => {
     current = null;
     timer = undefined;
     emit();
-  }, TOAST_MS);
+  }, opts.ms ?? TOAST_MS);
   emit();
 }
 
