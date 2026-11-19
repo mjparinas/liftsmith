@@ -7,6 +7,7 @@
 // workout sessions yet. On the web every call is a no-op. Live heart rate never comes from
 // here: Health Connect is batched, so live HR uses Bluetooth (heartRate.ts).
 import { isNative } from "./juice";
+import type { HealthWorkout } from "./outside";
 import type { HealthMetric } from "./types";
 
 type HealthModule = typeof import("@capgo/capacitor-health");
@@ -32,6 +33,11 @@ export const READ = [
   "dietaryEnergyConsumed",
 ] as const;
 export const WRITE = ["calories", "heartRate"] as const;
+/**
+ * Read only when the lifter turns on Count workouts from other apps (outside.ts), never with the rest: workouts
+ * other apps saved (Health Connect's READ_EXERCISE, Apple Health's workouts).
+ */
+export const OUTSIDE_READ = ["workouts"] as const;
 
 export async function healthAvailable(): Promise<boolean> {
   if (!isNative()) return false;
@@ -539,6 +545,39 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
     ...st,
     ...food,
   ];
+}
+
+// --- Workouts from other apps (outside.ts), only while Count workouts from other apps is on ---
+
+/**
+ * Asks to read workouts other apps saved. True when allowed; on iOS (which never says whether a read was allowed)
+ * true once it asked, and an empty read is the only sign of a no.
+ */
+export async function askOutside(): Promise<boolean> {
+  if (!(await healthAvailable())) return false;
+  try {
+    const { Capacitor } = await import("@capacitor/core");
+    const r = await (await health()).Health.requestAuthorization({ read: [...OUTSIDE_READ], write: [] });
+    return askResult(Capacitor.getPlatform() === "android", [...OUTSIDE_READ], r.readAuthorized as string[]);
+  } catch {
+    return false;
+  }
+}
+
+/** Workouts other apps saved in the last `days` days, a week at a time (like readDaily). Empty on the web or without permission. */
+export async function readOutside(days: number, now = Date.now()): Promise<HealthWorkout[]> {
+  if (!(await healthAvailable())) return [];
+  const { Health } = await health();
+  const out: HealthWorkout[] = [];
+  for (const [from, to] of weekWindows(now - days * 86_400_000, now)) {
+    try {
+      const r = await Health.queryWorkouts({ startDate: from, endDate: to, limit: SAMPLE_LIMIT, ascending: true });
+      out.push(...(r.workouts as HealthWorkout[]));
+    } catch {
+      // Not allowed, or this window failed: keep the rest.
+    }
+  }
+  return out;
 }
 
 // --- Connected apps (Connections.tsx): status, permissions and Sync now ---

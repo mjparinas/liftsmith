@@ -37,6 +37,7 @@ import { BLOG_M } from "./blog/m";
 import { BLOG_N } from "./blog/n";
 import { BLOG_NEW_FEATURES } from "./blog/newFeatures";
 import { BLOG_O } from "./blog/o";
+import { BLOG_OUTSIDE_WORKOUTS } from "./blog/outsideWorkouts";
 import { BLOG_P } from "./blog/p";
 import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
@@ -280,6 +281,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_GYM_OPEN_NOW,
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
+  ...BLOG_OUTSIDE_WORKOUTS,
   ...BLOG_FORM_VIDEOS,
 ];
 

@@ -580,6 +580,10 @@ export const pl: FeaturesText = {
       name: "Treningi zapisywane w aplikacji zdrowotnej",
       body: "Każdy ukończony trening trafia do Health Connect albo Apple Zdrowie jako trening siłowy, z kaloriami i tętnem.",
     },
+    "outside-workouts": {
+      name: "Liczą się treningi z innych aplikacji",
+      body: "Po włączeniu biegi, jazdy na rowerze, sporty i zajęcia, które inne aplikacje zapisują w aplikacji zdrowotnej, liczą się w mapie regeneracji i w planie na jutro. Długi mecz wczoraj zostawia nogi w regeneracji, a plan to uwzględnia.",
+    },
     offline: {
       name: "Działa offline",
       body: "Wszystko działa na twoim urządzeniu i synchronizuje się w tle, więc brak zasięgu na siłowni w piwnicy to żaden problem.",
@@ -730,11 +734,11 @@ export const pl: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki i jedzenie do aplikacji; ukończone treningi na zewnątrz",
+      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki i jedzenie do aplikacji; ukończone treningi na zewnątrz; po włączeniu także treningi z innych aplikacji do aplikacji",
     },
     "apple-health": {
       name: "Apple Zdrowie",
-      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki, jedzenie, wzrost, wiek i płeć do aplikacji; ukończone treningi na zewnątrz",
+      does: "Ważenia, tkanka tłuszczowa, sen, HRV, tętno, kroki, jedzenie, wzrost, wiek i płeć do aplikacji; ukończone treningi na zewnątrz; po włączeniu także treningi z innych aplikacji do aplikacji",
     },
     "samsung-health": {
       name: "Samsung Health",

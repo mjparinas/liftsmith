@@ -68,6 +68,9 @@ export const en = {
   "wn.c.settingsSearch.body": "Type in the box at the top of Settings to find any setting, and it opens with that setting in view.",
   "wn.c.mapFinder.title": "A map-first gym finder",
   "wn.c.mapFinder.body": "The gym finder is now a tall map with each gym on a see-through card you can swipe through.",
+  "wn.c.outsideWorkouts.title": "Workouts from other apps count",
+  "wn.c.outsideWorkouts.body":
+    "Turn on Count workouts from other apps in Connected apps, and runs, rides, sports and classes from Health shape your recovery and tomorrow's plan.",
 } as const;
 
 type Key = keyof typeof en;
@@ -145,6 +148,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.mapFinder.title": "Un buscador de gimnasios con el mapa primero",
   "wn.c.mapFinder.body":
     "El buscador de gimnasios es ahora un mapa grande con cada gimnasio en una tarjeta transparente que puedes deslizar.",
+  "wn.c.outsideWorkouts.title": "Cuentan los entrenamientos de otras apps",
+  "wn.c.outsideWorkouts.body":
+    "Activa Contar entrenamientos de otras apps en Apps conectadas y las carreras, salidas en bici, deportes y clases de Salud ajustan tu recuperación y el plan de mañana.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -222,6 +228,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.mapFinder.title": "Une recherche de salles centrée sur la carte",
   "wn.c.mapFinder.body":
     "La recherche de salles est maintenant une grande carte, avec chaque salle sur une carte transparente à faire défiler.",
+  "wn.c.outsideWorkouts.title": "Les séances d'autres apps comptent",
+  "wn.c.outsideWorkouts.body":
+    "Active Compter les séances d'autres apps dans Apps connectées : courses, vélo, sports et cours de Santé ajustent ta récupération et le plan de demain.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -297,6 +306,9 @@ export const de: Partial<Record<Key, Message>> = {
     "Tippe oben in den Einstellungen ins Suchfeld, um jede Einstellung zu finden. Sie öffnet sich mit dieser Einstellung im Blick.",
   "wn.c.mapFinder.title": "Studiosuche mit der Karte vorn",
   "wn.c.mapFinder.body": "Die Studiosuche ist jetzt eine große Karte, jedes Studio auf einer durchsichtigen Karte zum Durchwischen.",
+  "wn.c.outsideWorkouts.title": "Trainings aus anderen Apps zählen",
+  "wn.c.outsideWorkouts.body":
+    "Schalte unter Verbundene Apps Trainings aus anderen Apps zählen ein, dann prägen Läufe, Radtouren, Sport und Kurse aus Health deine Erholung und den Plan für morgen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -372,6 +384,9 @@ export const it: Partial<Record<Key, Message>> = {
     "Scrivi nella casella in cima a Impostazioni per trovare qualsiasi impostazione: si apre con quell'impostazione in vista.",
   "wn.c.mapFinder.title": "Ricerca palestre con la mappa in primo piano",
   "wn.c.mapFinder.body": "La ricerca palestre ora è una grande mappa, con ogni palestra su una scheda trasparente da scorrere.",
+  "wn.c.outsideWorkouts.title": "Contano gli allenamenti di altre app",
+  "wn.c.outsideWorkouts.body":
+    "Attiva Conta gli allenamenti di altre app in App collegate: corse, bici, sport e corsi da Salute regolano il tuo recupero e il piano di domani.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -439,6 +454,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "設定画面の上の検索ボックスに入力すると、どの設定でも見つかり、その設定が見える位置で開きます。",
   "wn.c.mapFinder.title": "地図が主役のジム検索",
   "wn.c.mapFinder.body": "ジム検索が大きな地図になり、各ジムは透けて見えるカードでスワイプして選べます。",
+  "wn.c.outsideWorkouts.title": "他のアプリのワークアウトも反映",
+  "wn.c.outsideWorkouts.body":
+    "連携アプリで「他のアプリのワークアウトを反映」をオンにすると、ヘルスケアのランニング、サイクリング、スポーツ、クラスが回復と明日のプランに反映されます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -510,6 +528,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "Digite na caixa no topo das Configurações para achar qualquer ajuste, que abre já com ele à vista.",
   "wn.c.mapFinder.title": "Busca de academias com o mapa em primeiro lugar",
   "wn.c.mapFinder.body": "A busca de academias agora é um mapa grande, com cada academia em um cartão transparente para deslizar.",
+  "wn.c.outsideWorkouts.title": "Treinos de outros apps contam",
+  "wn.c.outsideWorkouts.body":
+    "Ligue Contar treinos de outros apps em Apps conectados e corridas, pedais, esportes e aulas do Saúde ajustam sua recuperação e o plano de amanhã.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -575,6 +596,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "설정 맨 위 검색창에 입력하면 어떤 설정이든 찾을 수 있고, 그 설정이 보이는 위치로 열립니다.",
   "wn.c.mapFinder.title": "지도 중심의 헬스장 찾기",
   "wn.c.mapFinder.body": "헬스장 찾기가 큰 지도로 바뀌었고, 각 헬스장은 넘겨 볼 수 있는 반투명 카드에 있습니다.",
+  "wn.c.outsideWorkouts.title": "다른 앱의 운동도 반영",
+  "wn.c.outsideWorkouts.body":
+    "연결된 앱에서 '다른 앱의 운동 반영'을 켜면 건강 앱의 달리기, 자전거, 스포츠, 수업이 회복과 내일 계획에 반영돼요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -646,6 +670,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "Wpisz w pole u góry Ustawień, aby znaleźć dowolne ustawienie. Otworzy się z tym ustawieniem na widoku.",
   "wn.c.mapFinder.title": "Wyszukiwarka siłowni z mapą na pierwszym planie",
   "wn.c.mapFinder.body": "Wyszukiwarka siłowni to teraz duża mapa, a każda siłownia jest na przezroczystej karcie do przewijania.",
+  "wn.c.outsideWorkouts.title": "Liczą się treningi z innych aplikacji",
+  "wn.c.outsideWorkouts.body":
+    "Włącz Licz treningi z innych aplikacji w Połączonych aplikacjach, a biegi, rower, sporty i zajęcia ze Zdrowia wpłyną na regenerację i plan na jutro.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -718,4 +745,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "Ayarlar'ın üstündeki kutuya yazarak istediğin ayarı bul; o ayar görünür şekilde açılır.",
   "wn.c.mapFinder.title": "Haritayı öne çıkaran salon bulucu",
   "wn.c.mapFinder.body": "Salon bulucu artık büyük bir harita; her salon kaydırabileceğin yarı saydam bir kartta.",
+  "wn.c.outsideWorkouts.title": "Diğer uygulamalardaki antrenmanlar sayılıyor",
+  "wn.c.outsideWorkouts.body":
+    "Bağlı uygulamalarda Diğer uygulamalardaki antrenmanları say seçeneğini aç; Sağlık'taki koşu, bisiklet, spor ve dersler toparlanmanı ve yarının planını şekillendirsin.",
 };

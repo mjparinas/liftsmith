@@ -2,7 +2,7 @@
 "NSCameraUsageDescription" = "진행 사진을 찍고, 친구의 Liftsmith 코드를 스캔하고, 켜 두었다면 반복 횟수를 세는 데 사용해요. 사진은 이 iPhone에만 저장되고 업로드되지 않아요. 횟수 세기는 이 iPhone에서 영상을 분석할 뿐, 녹화하거나 전송하지 않아요.";
 "NSBluetoothAlwaysUsageDescription" = "Liftsmith는 심박 벨트나 워치에 연결해 운동 중 실시간 심박수를 보여 주고, Bluetooth 헬스장 기구에 연결해 유산소 기록을, Bluetooth 체중계에 연결해 체중 기록을 채워 줘요.";
 "NSLocationWhenInUseUsageDescription" = "Liftsmith는 앱을 열 때 대략적인 위치를 사용해 지금 있는 헬스장을 골라요. 백그라운드에서 위치를 추적하지 않으며, 위치 정보는 휴대폰 밖으로 나가지 않아요.";
-"NSHealthShareUsageDescription" = "Liftsmith는 체중, 키, 성별, 생년월일, 체지방, 안정 시 심박수, 수면, 심박 변이도, 걸음 수, VO2 Max, 호흡수, 그리고 식단 앱이 기록한 칼로리, 단백질, 탄수화물, 지방을 읽어 운동을 계획하고, 체중 기록과 하루 소비 칼로리를 최신으로 유지하고, 회복 상태를 보여 주고, 식단에 대해 조언해요.";
+"NSHealthShareUsageDescription" = "Liftsmith는 체중, 키, 성별, 생년월일, 체지방, 안정 시 심박수, 수면, 심박 변이도, 걸음 수, VO2 Max, 호흡수, 그리고 식단 앱이 기록한 칼로리, 단백질, 탄수화물, 지방을 읽어 운동을 계획하고, 체중 기록과 하루 소비 칼로리를 최신으로 유지하고, 회복 상태를 보여 주고, 식단에 대해 조언해요. '다른 앱의 운동 반영'을 켜면 다른 앱이 저장한 운동도 읽어 회복에 반영해요.";
 "NSHealthUpdateUsageDescription" = "Liftsmith는 마친 운동을 칼로리, 심박수와 함께 건강 앱에 저장해요.";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith는 운동하는 날을 캘린더에 추가하고, 켜 두었다면 바쁜 시간을 확인해 일정에 맞는 운동을 제안해요. 시간만 확인하고, 일정 내용은 절대 보지 않아요.";
 "NSCalendarsUsageDescription" = "Liftsmith는 운동하는 날을 캘린더에 추가하고, 켜 두었다면 바쁜 시간을 확인해 일정에 맞는 운동을 제안해요. 시간만 확인하고, 일정 내용은 절대 보지 않아요.";
