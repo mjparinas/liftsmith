@@ -312,6 +312,11 @@ export const it: FeaturesText = {
       name: "Orari dei corsi sulle pagine delle palestre",
       body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
     },
+    "gym-chains": {
+      name: "Tutte le sedi di una catena",
+      body: "Le palestre di una catena mostrano il suo logo e portano a una pagina con tutte le sedi, nell'app prima le più vicine. Sul web ogni catena ha la sua pagina.",
+      note: "Riconosciamo le catene dal marchio sulla mappa o da un nome condiviso da palestre in più città. Le palestre rivendicate mantengono il proprio logo.",
+    },
     "gym-open-now": {
       name: "Aperto ora nella ricerca palestre",
       body: "Le palestre vicine dicono se sono aperte adesso e quando chiudono o riaprono, e un tocco su Aperto ora mostra solo quelle dove puoi entrare subito.",

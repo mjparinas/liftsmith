@@ -950,4 +950,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
   },
+  "gym-chains": {
+    title: "Toutes les adresses de votre chaîne",
+    intro: "Les salles d'une chaîne affichent maintenant son logo et un lien vers toutes ses adresses.",
+    points: [
+      "Sur la page d'une salle de chaîne, touchez Voir les adresses sous son nom.",
+      "La liste commence par les salles les plus proches de votre dernière recherche.",
+      "Touchez une adresse pour voir ses horaires et l'ajouter avec son équipement d'un toucher.",
+      "Sur le web, chaque chaîne a sa propre page avec toutes ses adresses.",
+    ],
+    dyk: "Vous allez dans deux salles ? Ajoutez les deux et Liftsmith prévoit chaque séance avec l'équipement de celle où vous êtes.",
+  },
 };

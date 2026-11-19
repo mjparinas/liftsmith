@@ -164,6 +164,13 @@ function liftersLine(p: Place, lang: MsgLang): string {
   return say(lang, "gp.liftersN", { count: new Intl.NumberFormat(lang).format(p.lifters) });
 }
 
+/** "Part of Planet Fitness · See all 2,431 locations", linking to the chain's page (gymChainPage.ts). */
+function chainLine(p: Place, lang: MsgLang): string {
+  if (!p.chain) return "";
+  const all = say(lang, "gp.chainAll", { count: new Intl.NumberFormat(lang).format(p.chain.places) });
+  return `<p class="people">${icon("gym", 18)}<span>${esc(say(lang, "gp.chainPart", { chain: p.chain.name }))} · <a href="/gym-chains/${esc(p.chain.slug)}/">${esc(all)}</a></span></p>`;
+}
+
 export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
   const city = cityName(p);
   const title = `${say(lang, "gp.title", { name: p.name, city: p.city || city })} | Liftsmith`;
@@ -225,7 +232,7 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
 <h1 id="gym-h"><span>${esc(p.name)}</span>${p.official ? officialMark(lang) : ""}</h1>
 <p class="muted where">${icon("pin", 18)}<span>${esc([p.address, city].filter(Boolean).join(", "))}</span></p>
 <p class="status ${p.official ? "on" : ""}">${esc(p.official ? say(lang, "gp.officialNote") : say(lang, "gp.unofficial"))}</p>
-<p class="people">${icon("people", 18)}<span>${esc(liftersLine(p, lang))}</span></p>
+<p class="people">${icon("people", 18)}<span>${esc(liftersLine(p, lang))}</span></p>${chainLine(p, lang)}
 <a class="btn btn-primary wide" href="${esc(appGymPath(p.id))}">${icon("plus", 18)}${esc(say(lang, "gp.add"))}</a>
 <p class="muted small add-note">${esc(say(lang, p.code ? "gp.addKit" : "gp.addNoKit"))}</p></section>`;
   const place = `<section class="card" aria-labelledby="addr-h"><h2 id="addr-h">${icon("pin", 16)}${esc(say(lang, "gp.address"))}</h2>
@@ -418,7 +425,7 @@ ${nearSection(lang)}
       ? `<div class="find" id="find" hidden><label for="city-search">${esc(say(lang, "gp.searchLabel"))}</label><input id="city-search" type="search" autocomplete="off" enterkeyhint="search" placeholder="${esc(say(lang, "gp.searchHint"))}"></div>
 <details class="dir" id="directory"><summary>${esc(say(lang, "gp.directoryShow", { count: n.format(list.length) }))}</summary><section class="card" aria-label="${esc(say(lang, "gp.directoryTitle"))}"><ul class="list" id="city-list">${items}</ul><p class="muted small" id="city-none" hidden>${esc(say(lang, "gp.searchNone"))}</p></section></details>`
       : ""
-  }${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></div></main>`;
+  }<p><a class="quiet" href="/gym-chains/">${esc(say(lang, "gp.chainsLink"))} ›</a></p>${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></div></main>`;
   return framePage(lang, title, metaTags(title, desc, "/gyms/", ld) + NEAR_HEAD, body, GYM_STYLE + NEAR_STYLE, "gym");
 }
 

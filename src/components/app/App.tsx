@@ -62,6 +62,7 @@ import { Feedback } from "./Feedback";
 import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
 import { Gym } from "./Gym";
 import { GymAdd } from "./GymAdd";
+import { GymChain } from "./GymChain";
 import { GymClaim } from "./GymClaim";
 import { GymEdit } from "./GymEdit";
 import { GymPlace } from "./GymPlace";
@@ -494,6 +495,7 @@ export function App() {
     exercises: <ExerciseLibrary />,
     gymlink: <SharedGym key={arg ?? ""} code={arg} />,
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
+    gymchain: <GymChain key={arg ?? ""} slug={arg} />,
     gymclaim: <GymClaim key={arg ?? ""} id={arg} />,
     gymedit: <GymEdit key={arg ?? ""} id={arg} />,
     gymstaff: <GymStaffJoin key={arg ?? ""} code={arg} />,
@@ -640,6 +642,7 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
   "gym",
   "gymlink",
   "gymplace",
+  "gymchain",
   "gymclaim",
   "gymedit",
   "gymstaff",

@@ -65,6 +65,9 @@ export const en = {
   "wn.c.settingsSearch.body": "Type in the box at the top of Settings to find any setting, and it opens with that setting in view.",
   "wn.c.mapFinder.title": "A map-first gym finder",
   "wn.c.mapFinder.body": "The gym finder is now a tall map with each gym on a see-through card you can swipe through.",
+  "wn.c.gymChains.title": "Every location of a gym chain",
+  "wn.c.gymChains.body":
+    "Gyms that belong to a chain show its logo and a link to a page with every one of its locations, nearest first, so you can find and add your branch in a tap.",
 } as const;
 
 type Key = keyof typeof en;
@@ -139,6 +142,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.mapFinder.title": "Un buscador de gimnasios con el mapa primero",
   "wn.c.mapFinder.body":
     "El buscador de gimnasios es ahora un mapa grande con cada gimnasio en una tarjeta transparente que puedes deslizar.",
+  "wn.c.gymChains.title": "Todas las sedes de una cadena",
+  "wn.c.gymChains.body":
+    "Los gimnasios de una cadena muestran su logo y un enlace a una página con todas sus sedes, las más cercanas primero, para encontrar y añadir la tuya con un toque.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -213,6 +219,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.mapFinder.title": "Une recherche de salles centrée sur la carte",
   "wn.c.mapFinder.body":
     "La recherche de salles est maintenant une grande carte, avec chaque salle sur une carte transparente à faire défiler.",
+  "wn.c.gymChains.title": "Toutes les adresses d'une chaîne",
+  "wn.c.gymChains.body":
+    "Les salles d'une chaîne affichent son logo et un lien vers une page avec toutes ses adresses, les plus proches d'abord, pour trouver et ajouter la vôtre d'un toucher.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -285,6 +294,9 @@ export const de: Partial<Record<Key, Message>> = {
     "Tippe oben in den Einstellungen ins Suchfeld, um jede Einstellung zu finden. Sie öffnet sich mit dieser Einstellung im Blick.",
   "wn.c.mapFinder.title": "Studiosuche mit der Karte vorn",
   "wn.c.mapFinder.body": "Die Studiosuche ist jetzt eine große Karte, jedes Studio auf einer durchsichtigen Karte zum Durchwischen.",
+  "wn.c.gymChains.title": "Alle Standorte einer Studiokette",
+  "wn.c.gymChains.body":
+    "Studios einer Kette zeigen ihr Logo und einen Link zu einer Seite mit allen Standorten, die nächsten zuerst, damit du deinen mit einem Tippen findest und hinzufügst.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -357,6 +369,9 @@ export const it: Partial<Record<Key, Message>> = {
     "Scrivi nella casella in cima a Impostazioni per trovare qualsiasi impostazione: si apre con quell'impostazione in vista.",
   "wn.c.mapFinder.title": "Ricerca palestre con la mappa in primo piano",
   "wn.c.mapFinder.body": "La ricerca palestre ora è una grande mappa, con ogni palestra su una scheda trasparente da scorrere.",
+  "wn.c.gymChains.title": "Tutte le sedi di una catena",
+  "wn.c.gymChains.body":
+    "Le palestre di una catena mostrano il suo logo e un link a una pagina con tutte le sedi, prima le più vicine, così trovi e aggiungi la tua con un tocco.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -421,6 +436,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "設定画面の上の検索ボックスに入力すると、どの設定でも見つかり、その設定が見える位置で開きます。",
   "wn.c.mapFinder.title": "地図が主役のジム検索",
   "wn.c.mapFinder.body": "ジム検索が大きな地図になり、各ジムは透けて見えるカードでスワイプして選べます。",
+  "wn.c.gymChains.title": "ジムチェーンの全店舗",
+  "wn.c.gymChains.body":
+    "チェーンのジムにはロゴと全店舗のページへのリンクが表示されます。近い順に並ぶので、自分の店舗をタップひとつで見つけて追加できます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -489,6 +507,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "Digite na caixa no topo das Configurações para achar qualquer ajuste, que abre já com ele à vista.",
   "wn.c.mapFinder.title": "Busca de academias com o mapa em primeiro lugar",
   "wn.c.mapFinder.body": "A busca de academias agora é um mapa grande, com cada academia em um cartão transparente para deslizar.",
+  "wn.c.gymChains.title": "Todas as unidades de uma rede",
+  "wn.c.gymChains.body":
+    "Academias de uma rede mostram o logo dela e um link para uma página com todas as unidades, as mais próximas primeiro, para você achar e adicionar a sua com um toque.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -552,6 +573,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "설정 맨 위 검색창에 입력하면 어떤 설정이든 찾을 수 있고, 그 설정이 보이는 위치로 열립니다.",
   "wn.c.mapFinder.title": "지도 중심의 헬스장 찾기",
   "wn.c.mapFinder.body": "헬스장 찾기가 큰 지도로 바뀌었고, 각 헬스장은 넘겨 볼 수 있는 반투명 카드에 있습니다.",
+  "wn.c.gymChains.title": "헬스장 체인의 모든 지점",
+  "wn.c.gymChains.body":
+    "체인 헬스장에는 체인 로고와 모든 지점을 모은 페이지 링크가 나옵니다. 가까운 순으로 보여 주니 탭 한 번으로 내 지점을 찾아 추가하세요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -620,6 +644,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "Wpisz w pole u góry Ustawień, aby znaleźć dowolne ustawienie. Otworzy się z tym ustawieniem na widoku.",
   "wn.c.mapFinder.title": "Wyszukiwarka siłowni z mapą na pierwszym planie",
   "wn.c.mapFinder.body": "Wyszukiwarka siłowni to teraz duża mapa, a każda siłownia jest na przezroczystej karcie do przewijania.",
+  "wn.c.gymChains.title": "Wszystkie lokalizacje sieci siłowni",
+  "wn.c.gymChains.body":
+    "Siłownie należące do sieci pokazują jej logo i link do strony ze wszystkimi lokalizacjami, od najbliższych, więc znajdziesz i dodasz swoją jednym dotknięciem.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -689,4 +716,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.settingsSearch.body": "Ayarlar'ın üstündeki kutuya yazarak istediğin ayarı bul; o ayar görünür şekilde açılır.",
   "wn.c.mapFinder.title": "Haritayı öne çıkaran salon bulucu",
   "wn.c.mapFinder.body": "Salon bulucu artık büyük bir harita; her salon kaydırabileceğin yarı saydam bir kartta.",
+  "wn.c.gymChains.title": "Bir zincirin tüm şubeleri",
+  "wn.c.gymChains.body":
+    "Bir zincire ait salonlar zincirin logosunu ve tüm şubelerinin olduğu sayfaya bir bağlantı gösterir; en yakınlar önce, böylece kendi şubeni tek dokunuşla bulup eklersin.",
 };

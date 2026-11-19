@@ -29,6 +29,32 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "gym chains: a chain's branches (gymChains.ts chainPage)",
+    sql: "SELECT id, name FROM gym_places WHERE chain = ? AND chain <> '' AND hidden = 0 LIMIT 2000",
+    uses: ["gym_places_chain"],
+    noScan: ["gym_places"],
+  },
+  {
+    name: "gym chains: each chain's counts (gymChains.ts refreshChains)",
+    sql: "SELECT chain, COUNT(*) AS n, COUNT(DISTINCT city_slug) AS c FROM gym_places WHERE chain <> '' AND hidden = 0 GROUP BY chain",
+    // Walks the partial index from end to end: it holds only gyms in a chain, never the whole table.
+    uses: ["SCAN gym_places USING INDEX gym_places_chain"],
+    noScan: [],
+  },
+  {
+    name: "gym chains: branches' websites and icons (gymChains.ts refreshChains)",
+    sql: `SELECT p.chain, p.website, m.id, m.px FROM gym_places p LEFT JOIN gym_photos m ON m.place_id = p.id AND m.kind = 'icon'
+      WHERE p.chain <> '' AND p.hidden = 0 AND p.website <> ''`,
+    uses: ["SCAN p USING INDEX gym_places_chain", "gym_photos_place"],
+    noScan: ["gym_photos", "m"],
+  },
+  {
+    name: "gym chains: the chains big enough for the sitemap (gymChains.ts sitemapChains)",
+    sql: "SELECT slug, updated_at FROM gym_chains WHERE places >= ? ORDER BY places DESC LIMIT 5000",
+    uses: ["gym_chains_places"],
+    noScan: ["gym_chains"],
+  },
+  {
     name: "community: the board's top posts (community.ts board)",
     sql: "SELECT p.id FROM community_posts p WHERE p.hidden = 0 AND p.status != 'merged' ORDER BY p.votes DESC LIMIT 300",
     uses: ["community_posts_board"],

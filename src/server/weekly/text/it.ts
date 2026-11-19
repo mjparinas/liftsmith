@@ -946,4 +946,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Orari sbagliati? Segnala un problema sulla sua pagina, oppure rivendicala e correggili tu.",
   },
+  "gym-chains": {
+    title: "Tutte le sedi della tua catena",
+    intro: "Le palestre di una catena ora mostrano il suo logo e un link a tutte le sue sedi.",
+    points: [
+      "Nella pagina di una palestra di catena, tocca Vedi tutte le sedi sotto il nome.",
+      "L'elenco parte dalle sedi più vicine a dove hai cercato palestre l'ultima volta.",
+      "Tocca una sede per vederne gli orari e aggiungerla con la sua attrezzatura con un tocco.",
+      "Sul web ogni catena ha la sua pagina con tutte le sedi.",
+    ],
+    dyk: "Ti alleni in due sedi? Aggiungile entrambe e Liftsmith pianifica ogni allenamento con l'attrezzatura di quella in cui sei.",
+  },
 };

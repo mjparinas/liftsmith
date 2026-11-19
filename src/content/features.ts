@@ -592,6 +592,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-19",
       },
       {
+        id: "gym-chains",
+        name: "Every location of a gym chain",
+        body: "Gyms that belong to a chain show its logo and link to a page with every one of its locations, nearest first in the app. On the website, each chain has a page of its own.",
+        tier: "free",
+        note: "We know a chain from the brand on the map, or a name shared by gyms in several cities. Claimed gyms keep their own logo.",
+        added: "2026-11-19",
+      },
+      {
         id: "buy-next",
         name: "What to buy next",
         body: "For home gyms: the one piece of equipment that would open up the most exercises.",

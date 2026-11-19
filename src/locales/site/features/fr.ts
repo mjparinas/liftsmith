@@ -319,6 +319,11 @@ export const fr: FeaturesText = {
       name: "Horaires des cours sur les pages des salles",
       body: "Les salles officielles publient les cours qu'elles donnent chaque semaine, avec l'instructeur et la salle, et indiquent les jours sans cours. Les membres voient la semaine sur la page de la salle dans l'appli et sur le web, et ajoutent le prochain cours à leur agenda d'un toucher.",
     },
+    "gym-chains": {
+      name: "Toutes les adresses d'une chaîne",
+      body: "Les salles d'une chaîne affichent son logo et mènent à une page avec toutes ses adresses, dans l'app les plus proches d'abord. Sur le web, chaque chaîne a sa propre page.",
+      note: "Nous reconnaissons une chaîne à la marque indiquée sur la carte ou à un nom partagé par des salles de plusieurs villes. Les salles revendiquées gardent leur propre logo.",
+    },
     "gym-open-now": {
       name: "Ouvert maintenant dans la recherche de salles",
       body: "Les salles proches indiquent si elles sont ouvertes et quand elles ferment ou rouvrent, et un toucher sur Ouvert maintenant ne montre que celles où vous pouvez entrer tout de suite.",

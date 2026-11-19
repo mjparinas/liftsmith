@@ -22,6 +22,8 @@ import { SHORT_REGION } from "@/lib/regions";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { badCity, cityName, km, tidyAddress } from "./gymAddress";
+import { brandOf, chainKey, chainSlug, matchChain } from "./gymChainNames";
+import { CHAIN_LIMITS, keptChainNames } from "./gymChains";
 import { classesOf } from "./gymClasses";
 import { distanceKm } from "./gymDirectory";
 import { issuesOf, newsOf, trainersOf } from "./gymExtras";
@@ -94,6 +96,15 @@ export interface Place {
   classes: GymClass[];
   /** The gym's starter program for new members (a routine share code, gymStarter.ts), '' for none. */
   starter: string;
+  /** The chain it's a branch of (gymChains.ts), when the chain has two places or more: its page is /gym-chains/<slug>/. */
+  chain: PlaceChain | null;
+}
+
+/** A gym's chain as its page shows it: "Part of Planet Fitness · See all 2,431 locations". */
+export interface PlaceChain {
+  slug: string;
+  name: string;
+  places: number;
 }
 
 const s = (x: unknown) => (typeof x === "string" ? x : "");
@@ -161,6 +172,10 @@ export interface PlaceDraft {
   instagram: string;
   facebook: string;
   wheelchair: Wheelchair;
+  /** The chain the map names on it (its `brand` tag, gymChainNames.ts brandOf), '' for none. */
+  brand?: string;
+  /** Its chain's slug, worked out when it's saved (the brand, else a known chain's name); '' for none. */
+  chain?: string;
   /** True when the map gave no city and the import's own area filled it in. A gym near a border falls inside two
    * cities' areas, so a refresh keeps the city it already has instead of flipping it with each import. */
   guessed?: boolean;
@@ -287,6 +302,7 @@ export function placesFromOsm(
       instagram: socialUrl(t["contact:instagram"] ?? t.instagram, "instagram"),
       facebook: socialUrl(t["contact:facebook"] ?? t.facebook, "facebook"),
       wheelchair: wheelchairOf(t.wheelchair),
+      brand: brandOf(t),
       guessed: !mapCity,
     });
   }
@@ -322,9 +338,24 @@ const SAME_FIELDS = [
   "instagram",
   "facebook",
   "wheelchair",
+  "chain",
 ] as const;
-/** Details the gym's own website may have filled in (gymEnrich.ts): the map never blanks one, only replaces it. */
-const KEEP_IF_MAP_EMPTY = ["address", "hours", "website", "phone", "postcode", "email", "instagram", "facebook", "wheelchair"] as const;
+/**
+ * Details the gym's own website may have filled in (gymEnrich.ts), and a chain found from the names of others
+ * (gymChains.ts): the map never blanks one, only replaces it.
+ */
+const KEEP_IF_MAP_EMPTY = [
+  "address",
+  "hours",
+  "website",
+  "phone",
+  "postcode",
+  "email",
+  "instagram",
+  "facebook",
+  "wheelchair",
+  "chain",
+] as const;
 
 /**
  * Writes imported places, keyed on the map's own id (`source_ref`, unique), so running an import again is safe: new
@@ -334,8 +365,20 @@ const KEEP_IF_MAP_EMPTY = ["address", "hours", "website", "phone", "postcode", "
 export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promise<SaveResult> {
   // A big city has thousands of gyms, and each statement is a trip to the database, so read what's there in a few
   // queries (in parallel) and write in batches (one at a time, New York took minutes).
-  const list = drafts.slice(0, PLACE_LIMITS.perImport);
   const t0 = Date.now();
+  // Each gym's chain: the brand the map names, else a known chain's name (gymChainNames.ts). New brands get their
+  // chain's row, so its page has a name to show (gymChains.ts refreshChains counts and dresses it).
+  const known = drafts.length ? new Map(await keptChainNames().catch(() => new Map<string, string>())) : new Map<string, string>();
+  const brands = new Map<string, string>();
+  for (const d of drafts) {
+    const slug = d.brand ? chainSlug(d.brand) : "";
+    if (slug && !brands.has(slug)) brands.set(slug, d.brand!);
+    if (slug) known.set(chainKey(d.brand!), slug);
+  }
+  const list = drafts.slice(0, PLACE_LIMITS.perImport).map((d) => ({
+    ...d,
+    chain: d.brand ? chainSlug(d.brand) : matchChain(d.name, known),
+  }));
   const had = new Map<string, Row>();
   const reads = await Promise.all(
     chunks(
@@ -361,7 +404,10 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
   // similar name within 150 m is that gym, so it's linked to it (its details untouched) rather than listed twice.
   const anchors = fresh.length ? await ownGyms() : [];
   const readMs = Date.now() - t0;
-  const stmts: { sql: string; args: (string | number)[] }[] = [];
+  const stmts: { sql: string; args: (string | number)[] }[] = [...brands].map(([slug, name]) => ({
+    sql: "INSERT OR IGNORE INTO gym_chains (slug, name, source, updated_at) VALUES (?, ?, 'brand', ?)",
+    args: [slug, name, now],
+  }));
   const out = { added: 0, updated: 0, unchanged: 0, kept: 0 };
   // Gyms whose city changed: their pages move, with a redirect from the old address (moveToCity).
   const moves: string[] = [];
@@ -388,7 +434,7 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
       }
       stmts.push({
         sql: `UPDATE gym_places SET name = ?, address = ?, city = ?, region = ?, country = ?, lat = ?, lon = ?, hours = ?,
-           website = ?, phone = ?, postcode = ?, email = ?, instagram = ?, facebook = ?, wheelchair = ?, updated_at = ?
+           website = ?, phone = ?, postcode = ?, email = ?, instagram = ?, facebook = ?, wheelchair = ?, chain = ?, updated_at = ?
            WHERE id = ? AND claimed_by = ''`,
         args: [
           next.name,
@@ -406,6 +452,7 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
           next.instagram,
           next.facebook,
           next.wheelchair,
+          next.chain,
           now,
           s(old.id),
         ],
@@ -431,8 +478,8 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
     taken.add(`${city}/${slug}`);
     stmts.push({
       sql: `INSERT OR IGNORE INTO gym_places (id, city_slug, slug, name, kind, address, city, region, country, lat, lon, hours, website, phone,
-         postcode, email, instagram, facebook, wheelchair, source, source_ref, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)`,
+         postcode, email, instagram, facebook, wheelchair, chain, source, source_ref, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'osm', ?, ?, ?)`,
       args: [
         id,
         city,
@@ -453,6 +500,7 @@ export async function savePlaces(drafts: PlaceDraft[], now = Date.now()): Promis
         d.instagram,
         d.facebook,
         d.wheelchair,
+        d.chain,
         d.ref,
         now,
         now,
@@ -666,8 +714,24 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
   p.postcode, p.email, p.instagram, p.facebook, p.wheelchair, p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
-  (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
-  (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind IN ('logo', 'icon') ORDER BY m.kind = 'icon' LIMIT 1) AS logo`;
+  (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club, p.chain,
+  CASE WHEN p.chain <> '' THEN (SELECT c.name || char(31) || c.places || char(31) || c.logo FROM gym_chains c WHERE c.slug = p.chain) END AS chain_row,
+  (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind IN ('logo', 'icon') ORDER BY m.kind = 'icon' LIMIT 1) AS logo,
+  (SELECT m.kind FROM gym_photos m WHERE m.place_id = p.id AND m.kind IN ('logo', 'icon') ORDER BY m.kind = 'icon' LIMIT 1) AS logo_kind`;
+
+/**
+ * A gym's chain from `chain_row`, and the logo it shows: the owner's, else (unclaimed gyms only) the chain's shared
+ * logo, else its own website's icon. A claimed gym is left exactly as its owner set it.
+ */
+function chainOf(r: Row): { chain: PlaceChain | null; logo: string } {
+  const [name = "", places = "0", logo = ""] = s(r.chain_row).split("\u001f");
+  const own = s(r.logo);
+  const shared = !s(r.claimed_by) && logo && s(r.logo_kind) !== "logo" ? logo : "";
+  return {
+    chain: s(r.chain) && name && Number(places) >= CHAIN_LIMITS.shown ? { slug: s(r.chain), name, places: Number(places) } : null,
+    logo: shared || own,
+  };
+}
 
 const toPlace = (r: Row, km: number): Place => ({
   id: s(r.id),
@@ -697,7 +761,7 @@ const toPlace = (r: Row, km: number): Place => ({
   source: (["staff", "owner", "lifter"] as const).find((x) => x === s(r.source)) ?? "osm",
   club: s(r.club),
   map: process.env.MAPBOX_TOKEN ? `/api/gyms/map/?place=${s(r.id)}` : "",
-  logo: s(r.logo),
+  ...chainOf(r),
   photos: [],
   amenities: cleanAmenities(s(r.amenities)),
   prices: cleanPrices(s(r.prices), currencyFor(s(r.country))),

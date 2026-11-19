@@ -68,6 +68,37 @@ export interface Place {
   classes?: GymClass[];
   /** The gym's starter program for new members (a routine share code, gymStarter.ts); missing or '' when it has none. */
   starter?: string;
+  /** The chain it's a branch of (#/gymchain/<slug>), null or missing when none; missing from servers before 2026-11-19. */
+  chain?: { slug: string; name: string; places: number } | null;
+}
+
+/** A gym chain (server: gymChains.ts): its shared logo, its own website and how many places it has. */
+export interface GymChain {
+  slug: string;
+  name: string;
+  website: string;
+  logo: string;
+  places: number;
+  cities: number;
+  countries: number;
+}
+
+/** One of a chain's branches, enough to list it and open its page. */
+export interface ChainBranch {
+  id: string;
+  citySlug: string;
+  slug: string;
+  name: string;
+  kind: "gym" | "studio";
+  address: string;
+  city: string;
+  region: string;
+  country: string;
+  lat: number;
+  lon: number;
+  hours: string;
+  official: boolean;
+  lifters: number;
 }
 
 export interface MyListing {
@@ -161,6 +192,15 @@ export async function findNearby(
 export async function fetchPlace(id: string): Promise<Place | "gone" | "offline"> {
   try {
     return (await api<{ place: Place }>(`/api/gyms/?place=${encodeURIComponent(id)}`)).place;
+  } catch (e) {
+    return e instanceof AuthError && e.status === 404 ? "gone" : "offline";
+  }
+}
+
+/** A gym chain and every branch (its page in the app, GymChain.tsx). */
+export async function fetchChain(slug: string): Promise<{ chain: GymChain; branches: ChainBranch[] } | "gone" | "offline"> {
+  try {
+    return await track(api<{ chain: GymChain; branches: ChainBranch[] }>(`/api/gyms/?chain=${encodeURIComponent(slug)}`));
   } catch (e) {
     return e instanceof AuthError && e.status === 404 ? "gone" : "offline";
   }

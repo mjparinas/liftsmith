@@ -945,4 +945,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "¿Un horario está mal? Informa de un problema en su página, o reclámala y ponlo tú.",
   },
+  "gym-chains": {
+    title: "Todas las sedes de tu cadena",
+    intro: "Los gimnasios de una cadena ahora muestran su logo y un enlace a todas sus sedes.",
+    points: [
+      "En la página de un gimnasio de cadena, toca Ver las sedes bajo su nombre.",
+      "La lista empieza por las sedes más cercanas a donde buscaste gimnasios por última vez.",
+      "Toca una sede para ver su horario y añadirla con su equipamiento en un toque.",
+      "En la web, cada cadena tiene su propia página con todas sus sedes.",
+    ],
+    dyk: "¿Entrenas en dos sedes? Añade las dos como gimnasios y Liftsmith planifica cada entrenamiento con el equipamiento de donde estés.",
+  },
 };

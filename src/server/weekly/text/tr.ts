@@ -943,4 +943,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
   },
+  "gym-chains": {
+    title: "Zincirinin tüm şubeleri",
+    intro: "Bir zincire ait salonlar artık zincirin logosunu ve tüm şubelerine giden bir bağlantıyı gösteriyor.",
+    points: [
+      "Zincir salonunun sayfasında, adının altındaki tüm şubeleri gör'e dokun.",
+      "Liste, en son salon aradığın yere en yakın şubelerle başlar.",
+      "Saatlerini görmek ve ekipmanıyla tek dokunuşla eklemek için bir şubeye dokun.",
+      "Web sitesinde her zincirin tüm şubelerini listeleyen kendi sayfası var.",
+    ],
+    dyk: "İki şubede mi çalışıyorsun? İkisini de salon olarak ekle, Liftsmith her antrenmanı bulunduğun yerin ekipmanına göre planlasın.",
+  },
 };
