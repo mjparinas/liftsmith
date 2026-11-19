@@ -6,7 +6,8 @@
 //   worldwide import's last step, for gyms whose names repeat across cities (`chainStep`).
 // - `refreshChains` (the end of every import, worldwide and daily) counts each chain's visible branches and picks its
 //   website and logo: the sharpest icon from the site most of its branches link to, copied into the chain's own row in
-//   gym_photos (kind 'chain'), so it stays when that branch goes.
+//   gym_photos (kind 'chain'), so it stays when that branch goes. An icon kept in Vercel Blob is copied to a file of the
+//   chain's own (gymBlob.ts), so a branch replacing or losing its icon never takes the chain's with it.
 // - Claimed gyms are left exactly as their owner set them: the import never writes them, and they never show the chain's
 //   logo in place of their own (gymPlaces.ts chainOf).
 // - Reads go through the partial index gym_places_chain, so a chain's page reads only its own branches; the name step
@@ -14,6 +15,7 @@
 import { randomBytes } from "node:crypto";
 
 import { batch, query, type Row } from "./db";
+import { dropPictures, MOVED, readPicture, storePicture } from "./gymBlob";
 import { chainKey, chainSlug, genericName, matchChain, pickChainSite, type IconChoice } from "./gymChainNames";
 import { keptList } from "./gymPlaces";
 
@@ -135,7 +137,9 @@ export async function refreshChains(now = Date.now()): Promise<ChainRefresh> {
     byChain.set(s(r.chain), c);
   }
   const counted = new Map(counts.map((r) => [s(r.chain), r] as const));
-  const stmts: { sql: string; args: (string | number)[] }[] = [];
+  const stmts: Stmt[] = [];
+  const stale: string[] = [];
+  const fresh: string[] = [];
   let logos = 0;
   for (const c of chains) {
     const slug = s(c.slug);
@@ -151,25 +155,59 @@ export async function refreshChains(now = Date.now()): Promise<ChainRefresh> {
     if (same) continue;
     let logo = s(c.logo);
     if (site.icon !== s(c.logo_from)) {
-      if (logo) stmts.push({ sql: "DELETE FROM gym_photos WHERE id = ? AND kind = 'chain'", args: [logo] });
-      logo = "";
-      if (site.icon) {
-        logo = randomBytes(8).toString("hex");
-        stmts.push({
-          sql: `INSERT INTO gym_photos (id, place_id, kind, image, created_at, px)
-                SELECT ?, ?, 'chain', image, ?, px FROM gym_photos WHERE id = ?`,
-          args: [logo, `chain:${slug}`, now, site.icon],
-        });
-        logos++;
+      if (logo) {
+        stale.push(...(await pictureUrlsById(logo)));
+        stmts.push({ sql: "DELETE FROM gym_photos WHERE id = ? AND kind = 'chain'", args: [logo] });
       }
+      logo = site.icon ? await copyLogo(site.icon, slug, now, stmts, fresh) : "";
+      if (logo) logos++;
     }
     stmts.push({
       sql: `UPDATE gym_chains SET places = ?, cities = ?, countries = ?, website = ?, logo = ?, logo_from = ?, updated_at = ? WHERE slug = ?`,
       args: [places, n(k?.c), n(k?.k), site.website, logo, logo ? site.icon : "", now, slug],
     });
   }
-  for (let i = 0; i < stmts.length; i += 500) await batch(stmts.slice(i, i + 500));
+  try {
+    for (let i = 0; i < stmts.length; i += 500) await batch(stmts.slice(i, i + 500));
+  } catch (e) {
+    // The rows didn't change, so the files copied for them would never be shown: take them back out.
+    await dropPictures(fresh);
+    throw e;
+  }
+  await dropPictures(stale);
   return { chains: chains.length, logos };
+}
+
+type Stmt = { sql: string; args: (string | number | Uint8Array)[] };
+
+const pictureUrlsById = async (id: string) =>
+  (await query<{ url: string }>("SELECT url FROM gym_photos WHERE id = ? AND url <> ''", [id])).map((r) => String(r.url));
+
+/**
+ * A new copy of a branch's icon as the chain's own picture, under a new id. An icon still in the database is copied
+ * row to row; one in Blob is read and stored again as the chain's own file. '' when the icon can't be read.
+ */
+async function copyLogo(icon: string, slug: string, now: number, stmts: Stmt[], fresh: string[]): Promise<string> {
+  const id = randomBytes(8).toString("hex");
+  const [src] = await query<{ url: string; px: number }>("SELECT url, px FROM gym_photos WHERE id = ?", [icon]);
+  if (!src) return "";
+  if (!s(src.url)) {
+    stmts.push({
+      sql: `INSERT INTO gym_photos (id, place_id, kind, image, created_at, px)
+            SELECT ?, ?, 'chain', image, ?, px FROM gym_photos WHERE id = ?`,
+      args: [id, `chain:${slug}`, now, icon],
+    });
+    return id;
+  }
+  const bytes = await readPicture(s(src.url));
+  const url = bytes?.length ? await storePicture(id, bytes) : "";
+  if (!url) return "";
+  fresh.push(url);
+  stmts.push({
+    sql: "INSERT INTO gym_photos (id, place_id, kind, image, created_at, px, url) VALUES (?, ?, 'chain', ?, ?, ?, ?)",
+    args: [id, `chain:${slug}`, MOVED, now, n(src.px), url],
+  });
+  return id;
 }
 
 // --- Pages ---

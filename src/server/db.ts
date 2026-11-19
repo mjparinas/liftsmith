@@ -1203,6 +1203,32 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS coach_checkin_photos_pair ON coach_checkin_photos (coach_id, client_id)`,
   `CREATE INDEX IF NOT EXISTS coach_checkin_photos_client ON coach_checkin_photos (client_id)`,
+  // Form video check-ins (formVideos.ts, 2026-11-19): the row and its pinned notes; the video itself is in Vercel Blob.
+  `CREATE TABLE IF NOT EXISTS coach_videos (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    path TEXT NOT NULL,
+    lift TEXT NOT NULL DEFAULT '',
+    question TEXT NOT NULL DEFAULT '',
+    bytes INTEGER NOT NULL DEFAULT 0,
+    secs REAL NOT NULL DEFAULT 0,
+    ready INTEGER NOT NULL DEFAULT 0,
+    at INTEGER NOT NULL,
+    coach_seen INTEGER NOT NULL DEFAULT 0,
+    client_seen INTEGER NOT NULL DEFAULT 0
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_videos_pair ON coach_videos (coach_id, client_id, ready, at)",
+  "CREATE INDEX IF NOT EXISTS coach_videos_client ON coach_videos (client_id, ready, at)",
+  `CREATE TABLE IF NOT EXISTS coach_video_notes (
+    id TEXT PRIMARY KEY,
+    video_id TEXT NOT NULL,
+    author_id TEXT NOT NULL,
+    ms INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_video_notes_video ON coach_video_notes (video_id, ms)",
   // Booking (coachBooking.ts): a coach's open or booked session times, UTC ms.
   `CREATE TABLE IF NOT EXISTS coach_slots (
     id TEXT PRIMARY KEY,
@@ -1320,6 +1346,44 @@ const SCHEMA = [
     PRIMARY KEY (program_id, account_id)
   )`,
   "CREATE INDEX IF NOT EXISTS program_reviews_account ON program_reviews (account_id)",
+  // The public routine library (routineLibrary.ts, docs/decisions/routine-library.md, 2026-11-19): routines lifters
+  // published, who saved each from the library (counted once) and their stars. Ratings are summed onto the routine.
+  `CREATE TABLE IF NOT EXISTS library_routines (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    code TEXT NOT NULL,
+    title TEXT NOT NULL,
+    about TEXT NOT NULL DEFAULT '',
+    goal TEXT NOT NULL,
+    level TEXT NOT NULL,
+    equipment TEXT NOT NULL DEFAULT '',
+    minutes INTEGER NOT NULL,
+    show_name INTEGER NOT NULL DEFAULT 1,
+    author TEXT NOT NULL DEFAULT '',
+    saves INTEGER NOT NULL DEFAULT 0,
+    star_sum INTEGER NOT NULL DEFAULT 0,
+    ratings INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS library_routines_account ON library_routines (account_id, code)",
+  "CREATE INDEX IF NOT EXISTS library_routines_list ON library_routines (hidden, saves)",
+  `CREATE TABLE IF NOT EXISTS library_saves (
+    routine_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (routine_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS library_saves_account ON library_saves (account_id)",
+  `CREATE TABLE IF NOT EXISTS library_ratings (
+    routine_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    stars INTEGER NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (routine_id, account_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS library_ratings_account ON library_ratings (account_id)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (
@@ -1568,6 +1632,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // How big a gym website's icon is (the smaller side, in pixels; 2026-11-19, docs/decisions/gyms.md "Sharper icons"):
   // 0 for an icon kept before it was measured, so gymEnrich.ts measureIcons measures it once from its first bytes.
   ["gym_photos", "px", "INTEGER NOT NULL DEFAULT 0"],
+  // Where the picture's file lives in Vercel Blob (gymBlob.ts, 2026-11-19); '' while its bytes are still in `image`.
+  // Once it's set, `image` is left empty.
+  ["gym_photos", "url", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 /**
@@ -1593,6 +1660,8 @@ const LATE_SCHEMA = [
   `CREATE INDEX IF NOT EXISTS gym_places_web ON gym_places (enriched_at) WHERE claimed_by = '' AND hidden = 0 AND website <> ''`,
   // Website icons kept before they were measured (gymEnrich.ts measureIcons); empty once they all are.
   `CREATE INDEX IF NOT EXISTS gym_photos_unmeasured ON gym_photos (place_id) WHERE kind = 'icon' AND px = 0`,
+  // Pictures whose bytes are still in the database (gymBlob.ts movePictures); empty once they've all moved to Blob.
+  `CREATE INDEX IF NOT EXISTS gym_photos_unmoved ON gym_photos (place_id) WHERE url = ''`,
   `CREATE INDEX IF NOT EXISTS gym_places_ai ON gym_places (ai_at) WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0`,
   // The AI fix-up pass takes each unclaimed gym with a website once, ever (gymAiFix.ts).
   `CREATE INDEX IF NOT EXISTS gym_places_ai_fix ON gym_places (ai_fix_at) WHERE claimed_by = '' AND hidden = 0 AND pending = 0 AND website <> ''`,

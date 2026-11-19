@@ -29,6 +29,48 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "form videos: a lifter's videos as coach or client (formVideos.ts videosOf)",
+    sql: "SELECT * FROM coach_videos WHERE (coach_id = ? OR client_id = ?) AND ready = 1 ORDER BY at DESC LIMIT 300",
+    uses: ["coach_videos_pair", "coach_videos_client"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: the notes on a page of videos (formVideos.ts notesOf)",
+    sql: "SELECT * FROM coach_video_notes WHERE video_id IN (?, ?, ?) ORDER BY video_id, ms, at",
+    uses: ["coach_video_notes_video"],
+    noScan: ["coach_video_notes"],
+  },
+  {
+    name: "form videos: the pair's oldest past the keep (formVideos.ts finishVideo)",
+    sql: "SELECT * FROM coach_videos WHERE coach_id = ? AND client_id = ? AND ready = 1 ORDER BY at DESC LIMIT -1 OFFSET ?",
+    uses: ["coach_videos_pair"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: a client's unfinished uploads (formVideos.ts dropStale)",
+    sql: "SELECT * FROM coach_videos WHERE client_id = ? AND ready = 0 AND at < ?",
+    uses: ["coach_videos_client"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: everything between a coach and client (formVideos.ts dropPairVideos)",
+    sql: "SELECT * FROM coach_videos WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)",
+    uses: ["coach_videos_pair"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: an account's videos when it's deleted (formVideos.ts dropVideosOf)",
+    sql: "SELECT * FROM coach_videos WHERE coach_id = ? OR client_id = ?",
+    uses: ["coach_videos_pair", "coach_videos_client"],
+    noScan: ["coach_videos"],
+  },
+  {
+    name: "form videos: notes on one video (formVideos.ts addNote)",
+    sql: "SELECT COUNT(*) AS n FROM coach_video_notes WHERE video_id = ?",
+    uses: ["coach_video_notes_video"],
+    noScan: ["coach_video_notes"],
+  },
+  {
     name: "gym chains: a chain's branches (gymChains.ts chainPage)",
     sql: "SELECT id, name FROM gym_places WHERE chain = ? AND chain <> '' AND hidden = 0 LIMIT 2000",
     uses: ["gym_places_chain"],
@@ -241,6 +283,19 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: [],
   },
   {
+    name: "gym pictures: ones still to move to Blob (gymBlob.ts movePictures)",
+    sql: "SELECT id, image FROM gym_photos WHERE url = '' AND (kind <> 'icon' OR px > 0) LIMIT ?",
+    // Like the one above: the partial index holds only pictures not moved yet, and it ends up empty.
+    uses: ["gym_photos_unmoved"],
+    noScan: [],
+  },
+  {
+    name: "gym pictures: a gym's files before its rows go (gymBlob.ts pictureUrls)",
+    sql: "SELECT url FROM gym_photos WHERE place_id = ? AND kind = ? AND url <> ''",
+    uses: ["gym_photos_place"],
+    noScan: ["gym_photos"],
+  },
+  {
     name: "gym import: gyms due an AI read (gymAutoFill.ts autoFillBatch)",
     sql: "SELECT id FROM gym_places WHERE claimed_by = '' AND hidden = 0 AND website <> '' AND enriched_at > 0 AND ai_at < ? ORDER BY ai_at LIMIT ?",
     uses: ["gym_places_ai"],
@@ -296,6 +351,48 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     sql: "DELETE FROM coach_checkin_photos WHERE coach_id = ? OR client_id = ?",
     uses: ["coach_checkin_photos_pair", "coach_checkin_photos_client"],
     noScan: ["coach_checkin_photos"],
+  },
+  {
+    name: "routine library: the browsing list (routineLibrary.ts listed)",
+    sql: "SELECT id, title FROM library_routines WHERE hidden = 0 ORDER BY saves DESC LIMIT 3000",
+    uses: ["library_routines_list"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: a lifter's own routines (routineLibrary.ts myLibrary)",
+    sql: "SELECT * FROM library_routines WHERE account_id = ? ORDER BY updated_at DESC",
+    uses: ["library_routines_account"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: the same routine published again (routineLibrary.ts publishRoutine)",
+    sql: "SELECT id FROM library_routines WHERE account_id = ? AND code = ?",
+    uses: ["library_routines_account"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: a lifter's stars on a routine (routineLibrary.ts libraryRoutine)",
+    sql: "SELECT stars FROM library_ratings WHERE routine_id = ? AND account_id = ?",
+    uses: ["sqlite_autoindex_library_ratings_1"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a routine's rating summed (routineLibrary.ts rateRoutine)",
+    sql: "SELECT COALESCE(SUM(stars), 0) FROM library_ratings WHERE routine_id = ?",
+    uses: ["sqlite_autoindex_library_ratings_1"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a deleted account's stars (routineLibrary.ts libraryCleanup)",
+    sql: "SELECT routine_id FROM library_ratings WHERE account_id = ?",
+    uses: ["library_ratings_account"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a deleted account's saves (routineLibrary.ts libraryCleanup)",
+    sql: "SELECT routine_id FROM library_saves WHERE account_id = ?",
+    uses: ["library_saves_account"],
+    noScan: ["library_saves"],
   },
 ];
 

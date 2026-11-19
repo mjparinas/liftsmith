@@ -329,6 +329,11 @@ export const tr: FeaturesText = {
       name: "Kendi rutinlerin",
       body: "Egzersiz tarayıcısından sınırsız sayıda rutin oluştur ve link olarak paylaş.",
     },
+    "routine-library": {
+      name: "Rutin kütüphanesi",
+      body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
+      note: "Yayımlamak için hesap ve 18 yaş gerekir. Herkes göz atabilir.",
+    },
     library: {
       name: "1.000 egzersiz",
       body: "Serbest ağırlık, vücut ağırlığı, makineler, lastik bantlar, kettlebell ve kardiyo; arama, kas filtreleri ve bu salon filtresiyle. Kardiyo süre ve mesafe kaydeder.",
@@ -479,6 +484,11 @@ export const tr: FeaturesText = {
       name: "Ağırlık, fotoğraf ve gidişatla ilerleme kontrolleri",
       body: "Herhangi bir forma vücut ağırlığı ve fotoğraf soruları ekle, her hafta, 2 haftada veya 4 haftada bir gönder. Ağırlık danışanın son tartımından gelir, fotoğrafları yalnızca sen görürsün ve her cevabın gidişatı raporda görünür. 18 yaşından küçüklerden asla fotoğraf istenmez.",
     },
+    "coach-form-videos": {
+      name: "Videoda notlu form videoları",
+      body: "Danışanların uygulamada bir set çekip sana gönderir. Yavaşlatarak izle, tam önemli anlara not iliştir; onlar da aynı notlara yanıt verir. Yalnızca ikiniz görürsünüz; 18 yaşından küçükler gönderemez.",
+      note: "Video göndermek danışanlar için ücretsiz. Android, iPhone ve web.",
+    },
     "coach-roles": {
       name: "Kişisel antrenörler ve koçlar için",
       body: "Birebir çalışan bir kişisel antrenör mü, grupları ve takımları yöneten bir koç mu olduğunu söyle. Danışanlar sana uygun unvanı görür, en çok kullandığın araçlar da öne gelir.",
@@ -579,6 +589,10 @@ export const tr: FeaturesText = {
     "health-save": {
       name: "Antrenmanlar sağlık uygulamana kaydedilir",
       body: "Biten her antrenman Health Connect'e ya da Apple Sağlık'a kalori ve nabızla birlikte kuvvet antrenmanı olarak kaydedilir.",
+    },
+    "outside-workouts": {
+      name: "Diğer uygulamalardaki antrenmanlar sayılır",
+      body: "Açarsan, diğer uygulamaların sağlık uygulamana kaydettiği koşu, bisiklet, spor ve dersler toparlanma haritanda ve yarının planında sayılır. Dün uzun bir maç oynadıysan bacaklar toparlanıyor görünür ve plan buna göre ayarlanır.",
     },
     offline: {
       name: "Çevrimdışı çalışır",
@@ -730,11 +744,11 @@ export const tr: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar ve beslenme gelir; biten antrenmanlar gider",
+      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar ve beslenme gelir; biten antrenmanlar gider; açarsan diğer uygulamaların antrenmanları da gelir",
     },
     "apple-health": {
       name: "Apple Sağlık",
-      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar, beslenme, boy, yaş ve cinsiyet gelir; biten antrenmanlar gider",
+      does: "Tartılar, vücut yağı, uyku, HRV, nabız, adımlar, beslenme, boy, yaş ve cinsiyet gelir; biten antrenmanlar gider; açarsan diğer uygulamaların antrenmanları da gelir",
     },
     "samsung-health": {
       name: "Samsung Health",

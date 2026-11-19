@@ -130,7 +130,9 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
               {admin && (
                 <div className="flex flex-wrap gap-2 text-sm">
                   {ACTIONS.filter(
-                    (a) => !(a.action === "remove" && !g.content) && !(a.action === "suspend" && g.kind === "review" && !g.author?.handle),
+                    (a) =>
+                      !(a.action === "remove" && !g.content) &&
+                      !(a.action === "suspend" && (g.kind === "review" || g.kind === "routine") && !g.author?.handle),
                   ).map((a) => (
                     <button
                       key={a.action}

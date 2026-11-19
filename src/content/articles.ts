@@ -21,6 +21,7 @@ import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
 import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
+import { BLOG_FORM_VIDEOS } from "./blog/formVideos";
 import { BLOG_G } from "./blog/g";
 import { BLOG_GYM_CHAINS } from "./blog/gymChains";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
@@ -37,11 +38,13 @@ import { BLOG_M } from "./blog/m";
 import { BLOG_N } from "./blog/n";
 import { BLOG_NEW_FEATURES } from "./blog/newFeatures";
 import { BLOG_O } from "./blog/o";
+import { BLOG_OUTSIDE_WORKOUTS } from "./blog/outsideWorkouts";
 import { BLOG_P } from "./blog/p";
 import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
 import { BLOG_REHAB_DONE } from "./blog/rehabDone";
 import { BLOG_REHAB_PHASES } from "./blog/rehabPhases";
+import { BLOG_ROUTINE_LIBRARY } from "./blog/routineLibrary";
 import { BLOG_S } from "./blog/s";
 import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
@@ -281,6 +284,9 @@ export const ARTICLES: Article[] = [
   ...BLOG_GYM_CHAINS,
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
+  ...BLOG_OUTSIDE_WORKOUTS,
+  ...BLOG_FORM_VIDEOS,
+  ...BLOG_ROUTINE_LIBRARY,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

@@ -896,6 +896,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Koçluk › Durum kontrolleri bölümündeki yeni İlerleme kontrolü şablonuyla başla. 18 yaşından küçüklerden asla fotoğraf istenmez.",
   },
+  "coach-form-videos": {
+    title: "Videoda notlu form videoları",
+    intro: "Danışanların artık uygulamada bir set çekip sana gönderebilir, sen de doğrudan videonun üzerinde yanıt verirsin.",
+    points: [
+      "Koçluk'ta Form videosu gönder'e dokunur, hareketi seçer ve neye bakılacağını yazarlar. Uygulama yerleşmeleri için beş saniye verir ve bir dakikaya kadar kaydeder.",
+      "Bir bildirim alırsın. Videoyu yarım ya da çeyrek hıza al, önemli yerde durdur ve o saniyeye iliştirilmiş bir not ekle.",
+      "O ana gitmek için bir nota dokunurlar ve kendi notlarıyla yanıt verebilirler.",
+      "Videolar yalnızca ikinize özeldir ve biriniz koçluğu bitirirse silinir.",
+    ],
+    dyk: "18 yaşından küçük danışanlar form videosu gönderemez. Göndermek danışanlar için ücretsizdir.",
+  },
   seasons: {
     title: "Antrenman sezonları pazartesi başlıyor",
     intro: "Sezon 1, Kor, pazartesi başlıyor: on hafta, 20 kademelik bir yol ve yalnızca bu kış kazanılabilen ödüller.",
@@ -942,6 +953,29 @@ export const emails: Record<string, Words> = {
       "Kendi saatinle, yakındaki salonlar için hesaplanır.",
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
+  },
+  "outside-workouts": {
+    title: "Koşuların ve maçların artık toparlanmanda sayılıyor",
+    intro:
+      "Diğer uygulamalardaki antrenmanları say seçeneğini aç; telefonunun sağlık uygulamasındaki antrenmanlar toparlanma haritanı ve yarının planını şekillendirsin.",
+    points: [
+      "Koşu, bisiklet, spor ve dersler uygulamayı her açtığında gelir.",
+      "Her biri kullandığı kasları yorar; ne kadar uzun sürdüyse o kadar çok.",
+      "Uzun bir koşu ya da maçtan sonra yarının planı yorgun bacakları korur.",
+      "Asla Liftsmith antrenmanı sayılmazlar ve hiçbir şey iki kez sayılmaz.",
+    ],
+    dyk: "Ayarlar › Bağlı uygulamalar bölümünde; Vücut ekranındaki toparlanma haritasının altındaki liste neyin sayıldığını gösterir.",
+  },
+  "routine-library": {
+    title: "Başka bir sporcunun hazırladığı rutini bul",
+    intro: "Yeni rutin kütüphanesi, başkalarının yayımladığı rutinleri tek dokunuşla kaydetmeye hazır sunuyor.",
+    points: [
+      "Kelimelerle ara, bir hedef seç ya da yalnızca salonunun ekipmanıyla yapılabilenleri görmek için Salonuma uygun'u aç.",
+      "Kaydettiğin rutin, başlamaya ya da değiştirmeye hazır şekilde rutinlerine eklenir.",
+      "Kaydettikten sonra yıldızla puanla. Yıldızlar üç puandan itibaren görünür.",
+      "Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla. Yalnızca hareketler ve setler paylaşılır, ağırlıklar ya da notlar asla.",
+    ],
+    dyk: "Yayımlanan her rutinin web sitesinde kendi sayfası olur, istediğin kişiyle paylaşabilirsin.",
   },
   "gym-chains": {
     title: "Zincirinin tüm şubeleri",

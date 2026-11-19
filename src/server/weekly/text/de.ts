@@ -899,6 +899,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Starte mit der neuen Vorlage Fortschritts-Check-in unter Coaching › Check-ins. Unter 18-Jährige werden nie nach Fotos gefragt.",
   },
+  "coach-form-videos": {
+    title: "Technikvideos mit Notizen im Video",
+    intro: "Kunden können jetzt einen Satz in der App filmen und dir schicken, und du antwortest direkt im Video.",
+    points: [
+      "Sie tippen in Coaching auf Technikvideo senden, wählen die Übung und sagen, worauf du achten sollst. Die App gibt ihnen fünf Sekunden, um sich aufzustellen, und nimmt bis zu einer Minute auf.",
+      "Du bekommst eine Benachrichtigung. Spiel das Video mit halbem oder Viertel-Tempo ab, halte an der wichtigen Stelle an und hefte eine Notiz an genau diese Sekunde.",
+      "Sie tippen auf eine Notiz, um zu dieser Stelle zu springen, und können mit einer eigenen Notiz antworten.",
+      "Die Videos sehen nur ihr beide, und sie werden gelöscht, wenn einer von euch das Coaching beendet.",
+    ],
+    dyk: "Klienten unter 18 können keine Technikvideos senden. Für Klienten ist das Senden kostenlos.",
+  },
   seasons: {
     title: "Am Montag starten die Trainingssaisons",
     intro: "Saison 1, Glut, startet am Montag: zehn Wochen, ein Pfad mit 20 Stufen und Belohnungen, die es nur diesen Winter gibt.",
@@ -945,6 +956,29 @@ export const emails: Record<string, Words> = {
       "Berechnet mit deiner eigenen Uhrzeit, für Studios in deiner Nähe.",
     ],
     dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
+  },
+  "outside-workouts": {
+    title: "Deine Läufe und Spiele zählen jetzt in deiner Erholung",
+    intro:
+      "Schalte Trainings aus anderen Apps zählen ein, dann prägen die Trainings aus der Gesundheits-App deines Handys deine Erholungskarte und den Plan für morgen.",
+    points: [
+      "Läufe, Radtouren, Sport und Kurse kommen jedes Mal rein, wenn du die App öffnest.",
+      "Jedes ermüdet die Muskeln, die es nutzt, umso mehr, je länger es lief.",
+      "Der Plan für morgen schont müde Beine nach einem langen Lauf oder Spiel.",
+      "Sie zählen nie als Liftsmith-Trainings, und nichts zählt doppelt.",
+    ],
+    dyk: "Du findest es unter Einstellungen › Verbundene Apps, und die Liste unter der Erholungskarte auf Körper zeigt, was gezählt wird.",
+  },
+  "routine-library": {
+    title: "Finde eine Routine, die jemand anderes gebaut hat",
+    intro: "Die neue Routinen-Bibliothek sammelt Routinen, die andere veröffentlicht haben, mit einem Tippen gespeichert.",
+    points: [
+      "Suche nach Stichworten, wähle ein Ziel oder schalte Passt zu meinem Studio ein, um nur Routinen zu sehen, die dein Studio hergibt.",
+      "Gespeichert landet sie bei deinen Routinen, bereit zum Starten oder Ändern.",
+      "Bewerte sie mit Sternen, sobald du sie gespeichert hast. Sterne erscheinen ab drei Bewertungen.",
+      "Veröffentliche deine eigene aus ihrem Editor, mit oder ohne Namen. Nur Übungen und Sätze gehen raus, nie Gewichte oder Notizen.",
+    ],
+    dyk: "Jede veröffentlichte Routine bekommt eine eigene Seite auf der Website, die du mit allen teilen kannst.",
   },
   "gym-chains": {
     title: "Alle Standorte deiner Studiokette",

@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { query, resetDb, run } from "./db";
+import { usePictureStore, type PictureStore } from "./gymBlob";
 import { brandOf, chainKey, chainSlug, genericName, matchChain, pickChainSite } from "./gymChainNames";
 import { chainHtml, chainsIndexHtml } from "./gymChainPage";
 import { CHAIN_LIMITS, chainPage, chains, chainStep, refreshChains, sitemapChains } from "./gymChains";
@@ -166,6 +167,7 @@ describe("chains from the import", () => {
 });
 
 describe("counts, logo and pages", () => {
+  afterEach(() => usePictureStore(null));
   const seed = async () => {
     await savePlaces(
       [
@@ -207,6 +209,39 @@ describe("counts, logo and pages", () => {
     // Nothing changed: nothing written.
     expect(await refreshChains(NOW + 1)).toEqual({ chains: 1, logos: 0 });
     expect(String((await query("SELECT logo FROM gym_chains"))[0]?.logo)).toBe(logo);
+  });
+
+  it("copies an icon kept in Vercel Blob to a file of the chain's own, and drops the old copy when the pick changes", async () => {
+    const files = new Map<string, Uint8Array>();
+    const store: PictureStore = {
+      async put(path, bytes) {
+        const url = `https://blob.example.com/${path}`;
+        files.set(url, new Uint8Array(bytes));
+        return url;
+      },
+      async del(urls) {
+        for (const u of urls) files.delete(u);
+      },
+      async get(url) {
+        return files.get(url) ?? null;
+      },
+    };
+    usePictureStore(store);
+    const { langley } = await seed();
+    files.set("https://blob.example.com/gyms/00000000000000a1", new Uint8Array([0x89, 0x50, 0x4e, 0x47]));
+    await run("UPDATE gym_photos SET url = 'https://blob.example.com/gyms/00000000000000a1', image = x'' WHERE id = '00000000000000a1'");
+    expect(await refreshChains(NOW)).toEqual({ chains: 1, logos: 1 });
+    const logo = String((await query("SELECT logo FROM gym_chains"))[0]!.logo);
+    const [row] = await query("SELECT kind, url, px FROM gym_photos WHERE id = ?", [logo]);
+    expect(row).toEqual({ kind: "chain", url: `https://blob.example.com/gyms/${logo}`, px: 192 });
+    expect(files.get(`https://blob.example.com/gyms/${logo}`)).toEqual(new Uint8Array([0x89, 0x50, 0x4e, 0x47]));
+    // The branch's icon goes: the chain's copy goes with the pick, and the branch's own file is never touched by it.
+    await run("DELETE FROM gym_photos WHERE id = '00000000000000a1'");
+    expect(langley).toBeTruthy();
+    expect(await refreshChains(NOW + 1)).toEqual({ chains: 1, logos: 0 });
+    expect(String((await query("SELECT logo FROM gym_chains"))[0]!.logo)).toBe("");
+    expect(files.has(`https://blob.example.com/gyms/${logo}`)).toBe(false);
+    expect(files.has("https://blob.example.com/gyms/00000000000000a1")).toBe(true);
   });
 
   it("shows the chain's logo on unclaimed branches, never on a claimed one", async () => {
