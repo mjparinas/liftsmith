@@ -3,7 +3,7 @@
 // it goes straight to private storage, and the coach pins notes to moments in it. Pure web code: the camera is
 // getUserMedia (the same permission camera rep counting uses on Android and iOS), the clip is a file input, and
 // playback is a <video>, so Android, iOS and the web get it together.
-import { api, AuthError, readAccount } from "./auth";
+import { api, apiUrl, AuthError, readAccount } from "./auth";
 
 export interface VideoNote {
   id: string;
@@ -117,7 +117,7 @@ export async function sendVideo(
   signal?: AbortSignal,
 ): Promise<FormVideo> {
   const type = baseType(clip.type);
-  const start = await post<{ id: string; path: string; token: string }>({
+  const start = await post<{ id: string; path: string; token: string | null }>({
     action: "start",
     coach: to.coach,
     lift: to.lift,
@@ -126,16 +126,30 @@ export async function sendVideo(
     secs: Math.round(clip.secs * 10) / 10,
     type,
   });
-  const { put } = await import("@vercel/blob/client");
+  const { put, uploadPresigned } = await import("@vercel/blob/client");
+  const progress = (e: { percentage: number }) => onProgress(Math.min(1, e.percentage / 100));
   try {
-    await put(start.path, clip.file, {
-      access: "private",
-      token: start.token,
-      contentType: type,
-      multipart: clip.file.size > 8 * 1024 * 1024,
-      abortSignal: signal,
-      onUploadProgress: (e) => onProgress(Math.min(1, e.percentage / 100)),
-    });
+    if (start.token) {
+      await put(start.path, clip.file, {
+        access: "private",
+        token: start.token,
+        contentType: type,
+        multipart: clip.file.size > 8 * 1024 * 1024,
+        abortSignal: signal,
+        onUploadProgress: progress,
+      });
+    } else {
+      // No token: the store is connected through OIDC, so the Blob client asks our route for a presigned upload of
+      // this one path. One request, retried by the client (presigned links don't cover multipart parts).
+      await uploadPresigned(start.path, clip.file, {
+        access: "private",
+        handleUploadUrl: apiUrl("/api/coach/video/"),
+        headers: { Authorization: `Bearer ${token()}` },
+        contentType: type,
+        abortSignal: signal,
+        onUploadProgress: progress,
+      });
+    }
   } catch (e) {
     if (signal?.aborted) throw new AuthError("cancelled");
     throw new AuthError(e instanceof Error && /network|fetch|offline/i.test(e.message) ? "offline" : "upload");
