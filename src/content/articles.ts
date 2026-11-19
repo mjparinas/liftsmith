@@ -23,7 +23,9 @@ import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_FORM_VIDEOS } from "./blog/formVideos";
 import { BLOG_G } from "./blog/g";
+import { BLOG_GYM_CHAINS } from "./blog/gymChains";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
+import { BLOG_GYM_INSIGHTS } from "./blog/gymInsights";
 import { BLOG_GYM_OPEN_NOW } from "./blog/gymOpenNow";
 import { BLOG_H } from "./blog/h";
 import { BLOG_HEALTH_TRENDS } from "./blog/healthTrends";
@@ -39,10 +41,12 @@ import { BLOG_NEW_FEATURES } from "./blog/newFeatures";
 import { BLOG_O } from "./blog/o";
 import { BLOG_OUTSIDE_WORKOUTS } from "./blog/outsideWorkouts";
 import { BLOG_P } from "./blog/p";
+import { BLOG_PREGNANCY } from "./blog/pregnancy";
 import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
 import { BLOG_REHAB_DONE } from "./blog/rehabDone";
 import { BLOG_REHAB_PHASES } from "./blog/rehabPhases";
+import { BLOG_ROUTINE_LIBRARY } from "./blog/routineLibrary";
 import { BLOG_S } from "./blog/s";
 import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
@@ -50,6 +54,7 @@ import { BLOG_SEASONS } from "./blog/seasons";
 import { BLOG_SETTINGS_SEARCH } from "./blog/settingsSearch";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
+import { BLOG_TEAM_SESSION } from "./blog/teamSession";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
@@ -279,10 +284,15 @@ export const ARTICLES: Article[] = [
   ...BLOG_SEASONS,
   ...BLOG_GYM_CLASSES,
   ...BLOG_GYM_OPEN_NOW,
+  ...BLOG_GYM_CHAINS,
+  ...BLOG_GYM_INSIGHTS,
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
   ...BLOG_OUTSIDE_WORKOUTS,
   ...BLOG_FORM_VIDEOS,
+  ...BLOG_ROUTINE_LIBRARY,
+  ...BLOG_TEAM_SESSION,
+  ...BLOG_PREGNANCY,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

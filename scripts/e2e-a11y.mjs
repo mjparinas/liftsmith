@@ -122,6 +122,44 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/season`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan("season");
+    // A school coach's team session on the tablet (docs/decisions/school-teams.md "Team sessions"): the roster, one
+    // athlete's log sheet and the board. Seeded on the device, signed out, so nothing goes to a server.
+    await page.evaluate(() =>
+      localStorage.setItem(
+        "liftsmith.teamSession",
+        JSON.stringify({
+          id: "11111111-2222-3333-4444-555555555555",
+          team: "T1",
+          teamName: "Senior girls",
+          name: "Leg day",
+          plan: [
+            { exerciseId: "back-squat", sets: 3, reps: 5 },
+            { exerciseId: "push-up", sets: 2, reps: 12 },
+          ],
+          roster: [
+            { id: "ana", name: "Ana" },
+            { id: "bo", name: "Bo" },
+          ],
+          startedAt: Date.now(),
+          sets: [{ id: "s1", athlete: "bo", exercise: "back-squat", weight: 40, reps: 5, target: 5, at: Date.now() }],
+          last: {},
+          sent: [],
+          removed: [],
+        }),
+      ),
+    );
+    await page.goto(`${server.url}/app/#/team-session`);
+    await page.reload();
+    await page.getByText("Tap your name to log a set.").waitFor();
+    await scan("team session");
+    await page.getByRole("button", { name: /^Ana/ }).click();
+    await page.getByRole("dialog").waitFor();
+    await scan("team session log");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Board", exact: true }).click();
+    await scan("team session board");
+    await page.evaluate(() => localStorage.removeItem("liftsmith.teamSession"));
+    await page.reload();
     await page.goto(`${server.url}/app/#/photos`);
     await page.getByRole("heading", { name: "Body and photos" }).waitFor();
     await scan("photos");
@@ -754,6 +792,41 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/community/new-bug`);
     await page.getByLabel("Title").fill("Rest timer stops on lock");
     await scan("community new bug");
+    // The routine library (docs/decisions/routine-library.md): browsing, one routine with its stars, and the report
+    // sheet, on a made-up library.
+    const libRoutine = {
+      id: "AbCdEfGh1234",
+      title: "Push day for beginners",
+      about: "Three presses, short rests.",
+      goal: "muscle",
+      level: "beginner",
+      equipment: ["barbell", "bench"],
+      minutes: 40,
+      code: "r1~UHVzaA~bench-press.4~overhead-press.3",
+      by: "Blair",
+      saves: 12,
+      rating: { average: 4.3, count: 5 },
+      createdAt: Date.now() - 86_400_000,
+      updatedAt: Date.now() - 86_400_000,
+    };
+    await page.route(
+      (u) => u.pathname.startsWith("/api/library/"),
+      (r) => {
+        const u = new URL(r.request().url());
+        if (u.searchParams.has("id")) return r.fulfill({ json: { routine: { ...libRoutine, myStars: 0, saved: true } } });
+        if (u.searchParams.has("mine")) return r.fulfill({ json: { mine: [] } });
+        return r.fulfill({ json: { routines: [libRoutine, { ...libRoutine, id: "AbCdEfGh1235", title: "Squat day", goal: "strength" }] } });
+      },
+    );
+    await page.goto(`${server.url}/app/#/library`);
+    await page.getByRole("button", { name: /Squat day/ }).waitFor();
+    await scan("routine library");
+    await page.goto(`${server.url}/app/#/library/AbCdEfGh1234`);
+    await page.getByRole("heading", { name: "Push day for beginners" }).waitFor();
+    await scan("library routine");
+    await page.getByRole("button", { name: "Report this routine" }).click();
+    await scan("library report");
+    await page.keyboard.press("Escape");
     await page.evaluate(
       (was) => (was ? localStorage.setItem("liftsmith.account", was) : localStorage.removeItem("liftsmith.account")),
       accountBefore,

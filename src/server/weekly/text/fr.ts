@@ -447,6 +447,7 @@ export const emails: Record<string, Words> = {
       "Modifiez une série, ajoutez une note ou nommez une séance.",
       "Téléphone oublié ? Enregistrez une séance passée et elle compte.",
       "Refaites n'importe quelle séance avec les charges du jour.",
+      "Supprimé une séance par erreur ? Annuler la ramène, et toutes les stats suivent.",
     ],
     dyk: "Chaque exercice a sa propre page avec tout son historique.",
   },
@@ -972,5 +973,60 @@ export const emails: Record<string, Words> = {
       "Ils ne comptent jamais comme des séances Liftsmith, et rien ne compte deux fois.",
     ],
     dyk: "C'est dans Réglages › Apps connectées, et la liste sous la carte de récupération dans Corps montre ce qui est compté.",
+  },
+  "routine-library": {
+    title: "Trouvez une routine créée par quelqu'un d'autre",
+    intro: "La nouvelle bibliothèque de routines rassemble celles que d'autres ont publiées, prêtes à enregistrer d'un geste.",
+    points: [
+      "Cherchez par mots, choisissez un objectif ou activez Adaptées à ma salle pour ne voir que celles que votre salle permet.",
+      "Enregistrez-en une et elle rejoint vos routines, prête à lancer ou à modifier.",
+      "Notez-la avec des étoiles une fois enregistrée. Les étoiles s'affichent à partir de trois notes.",
+      "Publiez la vôtre depuis son éditeur, avec ou sans votre nom. Seuls les exercices et les séries sont partagés, jamais les charges ni les notes.",
+    ],
+    dyk: "Chaque routine publiée a sa propre page sur le site, à partager avec qui vous voulez.",
+  },
+  "team-session": {
+    title: "Toute la séance de l'équipe sur une tablette",
+    intro: "Les séances d'équipe mettent un entraînement pour toute votre équipe sur une seule tablette.",
+    points: [
+      "Lancez-en une depuis la carte de votre équipe dans Coaching et choisissez une routine.",
+      "Chaque athlète touche son prénom et note ses séries, la charge reprenant là où il en était.",
+      "Le tableau montre qui n'a pas encore noté de série, jamais une charge.",
+      "À la fin, les séries de chacun sont enregistrées dans son propre compte.",
+    ],
+    dyk: "Pas de réseau dans la salle ? Les séries attendent sur la tablette et partent dès son retour.",
+  },
+  "gym-chains": {
+    title: "Toutes les adresses de votre chaîne",
+    intro: "Les salles d'une chaîne affichent maintenant son logo et un lien vers toutes ses adresses.",
+    points: [
+      "Sur la page d'une salle de chaîne, touchez Voir les adresses sous son nom.",
+      "La liste commence par les salles les plus proches de votre dernière recherche.",
+      "Touchez une adresse pour voir ses horaires et l'ajouter avec son équipement d'un toucher.",
+      "Sur le web, chaque chaîne a sa propre page avec toutes ses adresses.",
+    ],
+    dyk: "Vous allez dans deux salles ? Ajoutez les deux et Liftsmith prévoit chaque séance avec l'équipement de celle où vous êtes.",
+  },
+  pregnancy: {
+    title: "S’entraîner pendant la grossesse et après l’accouchement",
+    intro: "Le mode grossesse et post-partum adapte chaque séance à la semaine, comme le mode blessure.",
+    points: [
+      "Activez-le dans Réglages › Corps et unités : choisissez enceinte ou j’ai eu mon bébé, puis les semaines avec le sélecteur.",
+      "Les charges baissent au fil des semaines et chaque série s’arrête loin de l’échec.",
+      "En fin de grossesse, rien sur le dos ni sur le ventre, pas de sauts ni de crunchs.",
+      "Après l’accouchement, une reprise progressive d’environ 16 semaines, deux de plus après une césarienne.",
+    ],
+    dyk: "C’est gratuit, ça reste sur votre téléphone et chaque changement dit pourquoi sur Aujourd’hui.",
+  },
+  "gym-insights": {
+    title: "Voyez comment les membres utilisent votre salle",
+    intro: "La page de votre salle dans l'app montre comment on s'y entraîne, avec une prochaine étape.",
+    points: [
+      "Combien de sportifs s'y sont entraînés ces quatre dernières semaines, comparé aux quatre d'avant.",
+      "Les heures pleines, avec le jour et l'heure les plus chargés, et votre heure la plus calme en semaine à annoncer aux membres.",
+      "Le matériel le plus utilisé, et celui que personne n'a touché.",
+      "Les problèmes de matériel ouverts passent en premier, car les programmes évitent ce matériel jusqu'à ce que vous touchiez Réparé.",
+    ],
+    dyk: "Ce sont des totaux seulement, d'après les sportifs qui comptent leurs visites, et ça démarre dès que cinq s'y sont entraînés. Vous ne voyez jamais qui.",
   },
 };

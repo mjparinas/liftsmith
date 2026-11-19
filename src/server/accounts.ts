@@ -17,15 +17,18 @@ import { claimDeletes } from "./gymClaims";
 import { classDeletes } from "./gymClasses";
 import { gymDeletes } from "./gymDirectory";
 import { extrasDeletes } from "./gymExtras";
+import { visitDeletes } from "./gymInsights";
 import { placeReportDeletes } from "./gymPlaceReports";
 import { placeDeletes } from "./gymPlaces";
 import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { programReviewCleanup } from "./programReviews";
 import { isReviewEmail, reviewCodeMatches } from "./review";
+import { libraryCleanup } from "./routineLibrary";
 import { socialDeletes } from "./social";
 import { forgetStripe } from "./stripe";
 import { teamDeletes } from "./teams";
+import { sessionDeletes } from "./teamSessions";
 
 export const SESSION_MS = 365 * 86_400_000;
 /** How often use pushes the expiry forward again (sliding renewal on every platform: web, Android and iOS). */
@@ -303,13 +306,16 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...coachCleanup(accountId),
     ...programReviewCleanup(accountId),
     ...programCleanup(accountId),
+    ...libraryCleanup(accountId),
     ...earnedDeletes(accountId),
+    ...sessionDeletes(accountId),
     ...teamDeletes(accountId),
     ...gymDeletes(accountId),
     ...placeDeletes(accountId),
     ...placeReportDeletes(accountId),
     ...claimDeletes(accountId),
     ...extrasDeletes(accountId),
+    ...visitDeletes(accountId),
     ...classDeletes(accountId),
     ...posterDeletes(accountId),
     ...communityCleanup(accountId),

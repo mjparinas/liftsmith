@@ -69,6 +69,11 @@ export const de: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Einblicke für Gym-Betreiber",
+      body: "Betreiber und Team offizieller Gyms sehen, wie viele Sportler dort in den letzten vier Wochen trainiert haben, die vollen und ruhigen Stunden, die genutzten Geräte und offene Problemmeldungen, mit einem nächsten Schritt.",
+      note: "Nur Summen und Anteile, von Sportlern, die ihre Besuche mitzählen lassen, und erst ab fünf Sportlern.",
+    },
     adaptive: {
       name: "Tägliche adaptive Trainings",
       body: "Wählt Übungen, die dein Studio hergibt und für die deine Muskeln bereit sind, und legt jedes Gewicht und jede Wiederholung anhand deiner letzten Trainings fest.",
@@ -119,6 +124,10 @@ export const de: FeaturesText = {
     cycle: {
       name: "Bereitschaft nach Zyklus",
       body: "Wenn du möchtest, trägst du deinen Zyklus ein, und die heutige Ansage berücksichtigt ihn.",
+    },
+    pregnancy: {
+      name: "Modus für Schwangerschaft und Rückbildung",
+      body: "Sag, dass du schwanger bist oder dein Baby da ist, und jedes Training passt zur Woche: leichtere Lasten, keine Sätze bis zum Limit, später in der Schwangerschaft nichts in Rückenlage und ein schrittweiser Wiedereinstieg über etwa 16 Wochen nach der Geburt.",
     },
     "goal-planner": {
       name: "Zielplaner",
@@ -214,7 +223,7 @@ export const de: FeaturesText = {
     },
     "edit-history": {
       name: "Vergangene Trainings bearbeiten und wiederholen",
-      body: "Korrigiere einen Satz, füge eine Notiz hinzu, benenne ein Training oder mach es noch einmal, und jede Übung hat ihre eigene Seite mit ihrem Verlauf.",
+      body: "Korrigiere einen Satz, füge eine Notiz hinzu, benenne ein Training oder mach es noch einmal, und jede Übung hat ihre eigene Seite mit ihrem Verlauf. Lösche eines mit Rückgängig, und alle Werte werden neu berechnet.",
     },
     "exercise-stats": {
       name: "Werte für jede Übung",
@@ -276,6 +285,11 @@ export const de: FeaturesText = {
       name: "Eigene Routinen",
       body: "Baue Routinen aus dem Übungskatalog, so viele du willst, und teile sie als Link.",
     },
+    "routine-library": {
+      name: "Routinen-Bibliothek",
+      body: "Durchsuche Routinen, die andere veröffentlicht haben, nach Ziel, Stichwort und dem, was dein Studio hat, speichere eine mit einem Tippen und bewerte sie mit Sternen. Veröffentliche deine eigene aus ihrem Editor, mit oder ohne deinen Namen, und sie bekommt eine eigene Seite auf der Website. Nur Übungen und Sätze gehen raus, nie deine Gewichte oder Notizen.",
+      note: "Zum Veröffentlichen brauchst du ein Konto und musst 18 sein. Stöbern kann jeder.",
+    },
     library: {
       name: "1.000 Übungen",
       body: "Kraft, Körpergewicht, Maschinen, Bänder, Kettlebells und Cardio, mit Suche, Muskel-Filtern und einem Filter für dieses Studio. Cardio speichert Zeit und Strecke.",
@@ -317,6 +331,11 @@ export const de: FeaturesText = {
     "gym-classes": {
       name: "Kurspläne auf Studioseiten",
       body: "Offizielle Studios stellen ihre wöchentlichen Kurse mit Trainer und Raum ein und markieren Tage, an denen ein Kurs ausfällt. Mitglieder sehen die Woche auf der Studioseite in der App und im Web und tragen den nächsten Kurs mit einem Tippen in ihren Kalender ein.",
+    },
+    "gym-chains": {
+      name: "Alle Standorte einer Studiokette",
+      body: "Studios einer Kette zeigen ihr Logo und verlinken auf eine Seite mit allen Standorten, in der App die nächsten zuerst. Auf der Website hat jede Kette ihre eigene Seite.",
+      note: "Ketten erkennen wir an der Marke auf der Karte oder an einem Namen, den Studios in mehreren Städten tragen. Beanspruchte Studios behalten ihr eigenes Logo.",
     },
     "gym-open-now": {
       name: "Jetzt geöffnet in der Studiosuche",
@@ -403,6 +422,10 @@ export const de: FeaturesText = {
     "school-teams": {
       name: "Kostenlos für Schulteams",
       body: "Trainer an weiterführenden Schulen, die eine Schul-E-Mail-Adresse bestätigen, bekommen Pro kostenlos, ebenso die 13- bis 18-jährigen Sportler ihrer Teams, mit einer wöchentlichen Teamtabelle. Körperfett und öffentliche Profile bleiben für unter 18-Jährige aus.",
+    },
+    "team-session": {
+      name: "Teamtraining auf einem Tablet",
+      body: "Ein Schultrainer leitet ein Training für das ganze Team von einem Tablet aus: Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht startet beim letzten Stand, und die Tafel zeigt, wer noch nicht angefangen hat. Am Ende landen die Sätze im eigenen Konto. Funktioniert ohne Empfang.",
     },
     "coach-checkins": {
       name: "Check-in-Formulare und Fragebögen",

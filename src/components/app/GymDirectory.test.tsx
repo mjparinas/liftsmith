@@ -76,6 +76,34 @@ beforeEach(async () => {
       calls.push({ url, body });
       if (url === `/api/gyms/?place=${OFFICIAL.id}`)
         return Response.json({ place: { ...OFFICIAL, hours: "Mo-Fr 05:00-23:00; Sa,Su off" } });
+      if (url === `/api/gyms/?place=${PLACE.id}`)
+        return Response.json({
+          place: { ...PLACE, chain: { slug: "steve-nash-fitness-world", name: "Steve Nash Fitness World", places: 2 } },
+        });
+      if (url === "/api/gyms/?chain=steve-nash-fitness-world")
+        return Response.json({
+          chain: {
+            slug: "steve-nash-fitness-world",
+            name: "Steve Nash Fitness World",
+            website: "https://www.snfc.example/",
+            logo: "",
+            places: 2,
+            cities: 2,
+            countries: 1,
+          },
+          branches: [
+            {
+              ...PLACE,
+              id: OFFICIAL.id,
+              name: "Steve Nash Fitness World",
+              city: "Surrey",
+              address: "1 King George Blvd",
+              country: "CA",
+            },
+            { ...PLACE, country: "CA" },
+          ],
+        });
+      if (url.startsWith("/api/gyms/?chain=")) return Response.json({ error: "gone" }, { status: 404 });
       if (url.startsWith("/api/gyms/?place=")) return Response.json({ error: "gone" }, { status: 404 });
       if (url.startsWith("/api/gyms/?")) return Response.json({ gyms: [LISTED], places: [OFFICIAL, PLACE] });
       if (url === "/api/gyms/") return Response.json({ ok: true });
@@ -227,6 +255,24 @@ describe("gyms near you", () => {
     expect(calls.at(-1)!.body).toEqual({ op: "added", place: OFFICIAL.id });
 
     location.hash = "#/gymplace/0000000000000000";
+    expect(await screen.findByText("This gym isn’t listed")).toBeInTheDocument();
+  });
+
+  it("opens every location of a gym's chain from its page", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = `#/gymplace/${PLACE.id}`;
+    await user.click(await screen.findByRole("button", { name: /Part of Steve Nash Fitness World.*See all 2 locations/ }));
+    expect(await screen.findByRole("heading", { name: "Steve Nash Fitness World locations" })).toBeInTheDocument();
+    expect(screen.getByText("2 locations. Pick yours to see its hours and add it to Liftsmith with its equipment.")).toBeInTheDocument();
+    const branches = screen.getAllByRole("button", { name: /Steve Nash Fitness World/ });
+    expect(branches).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "Steve Nash Fitness World website" })).toHaveAttribute("href", "https://www.snfc.example/");
+    await user.click(screen.getByRole("button", { name: /1 King George Blvd/ }));
+    expect(location.hash).toBe(`#/gymplace/${OFFICIAL.id}`);
+    expect(await screen.findByRole("heading", { name: /Planet Fitness/ })).toBeInTheDocument();
+
+    location.hash = "#/gymchain/nope";
     expect(await screen.findByText("This gym isn’t listed")).toBeInTheDocument();
   });
 

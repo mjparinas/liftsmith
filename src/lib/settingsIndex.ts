@@ -111,10 +111,12 @@ export const SETTINGS_INDEX: SettingRef[] = [
   S("settings.units", "body", ["units.kg", "units.lb"]),
   S("settings.bodyweight.label", "body"),
   S("cycle.title", "body"),
+  S("preg.title", "body", ["preg.stage.pregnant", "preg.stage.postpartum"]),
   // Your data and privacy
   S("settings.data", "data"),
   S("settings.stats", "data", ["settings.stats.on"]),
   S("settings.standards", "data"),
+  S("settings.gymStats", "data", ["settings.gymStats.on"]),
   S("card.shot.settingTitle", "data", ["card.shot.setting"]),
   S("settings.erase", "data"),
   // Labs (Pro): the whole page is one place; each experiment is found by its name.

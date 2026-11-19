@@ -5,8 +5,11 @@
 // GET ?open=<id>: that video and a link to watch it for an hour; marks it seen.
 // POST { action }: "start" (a client: `coach`, `lift`, `question`, `bytes`, `secs`, `type`), "finish" (`id`, once the
 // upload is done), "note" (either side: `id`, `ms`, `text`), "deleteNote" (`id`, your own) and "delete" (`id`).
+// POST { type: "blob.generate-presigned-url", payload: { pathname } }: the Blob client's own request for a presigned
+// upload, made when "start" handed back no token (a store connected through OIDC); only for the client's own unfinished
+// upload.
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
-import { addNote, deleteNote, deleteVideo, finishVideo, openVideo, startVideo, videoOverview } from "@/server/formVideos";
+import { addNote, deleteNote, deleteVideo, finishVideo, openVideo, presignVideo, startVideo, videoOverview } from "@/server/formVideos";
 
 export const OPTIONS = preflight;
 
@@ -36,8 +39,12 @@ const STATUS: Record<string, number> = {
 export async function POST(req: Request) {
   const s = await signedIn(req);
   if (s instanceof Response) return s;
-  const body = (await readJson(req)) as { action?: unknown; id?: unknown } | undefined;
+  const body = (await readJson(req)) as { action?: unknown; id?: unknown; type?: unknown; payload?: { pathname?: unknown } } | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
+  if (body.type === "blob.generate-presigned-url") {
+    const presignedUrlPayload = await presignVideo(s.accountId, body.payload?.pathname);
+    return presignedUrlPayload ? reply(req, 200, { type: body.type, presignedUrlPayload }) : reply(req, 404, { error: "gone" });
+  }
   const answer = (r: object) => ("error" in r ? reply(req, STATUS[String(r.error)] ?? 400, r) : reply(req, 200, r));
   switch (body.action) {
     case "start":

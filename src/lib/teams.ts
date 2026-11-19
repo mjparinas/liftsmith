@@ -36,6 +36,8 @@ export interface TeamsOverview {
   teams: Team[];
   joined: Team[];
   members: Record<string, Member[]>;
+  /** The coach's team sessions still running, by team id (teamSessions.ts): Coaching offers their live board. */
+  live: Record<string, string>;
 }
 export interface BoardRow {
   id: string;

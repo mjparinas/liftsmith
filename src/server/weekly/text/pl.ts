@@ -444,6 +444,7 @@ export const emails: Record<string, Words> = {
       "Popraw serię, dodaj notatkę lub nazwij trening.",
       "Telefon został w domu? Dodaj trening z przeszłości, a też się liczy.",
       "Powtórz dowolny trening z dzisiejszymi ciężarami.",
+      "Usunięto przez pomyłkę? Cofnij przywraca trening, a statystyki razem z nim.",
     ],
     dyk: "Każde ćwiczenie ma własną stronę z pełną historią.",
   },
@@ -965,5 +966,60 @@ export const emails: Record<string, Words> = {
       "Nigdy nie liczą się jako treningi Liftsmith i nic nie liczy się podwójnie.",
     ],
     dyk: "Znajdziesz to w Ustawieniach › Połączone aplikacje, a lista pod mapą regeneracji w zakładce Ciało pokazuje, co jest liczone.",
+  },
+  "routine-library": {
+    title: "Znajdź rutynę ułożoną przez kogoś innego",
+    intro: "Nowa biblioteka rutyn zbiera rutyny opublikowane przez innych, gotowe do zapisania jednym dotknięciem.",
+    points: [
+      "Szukaj po słowach, wybierz cel albo włącz Pasuje do mojej siłowni, by widzieć tylko rutyny, na które pozwala twój sprzęt.",
+      "Zapisana rutyna trafia do twoich rutyn, gotowa do startu albo zmian.",
+      "Oceń ją gwiazdkami po zapisaniu. Gwiazdki widać od trzech ocen.",
+      "Opublikuj własną z jej edytora, z imieniem lub bez. Wychodzą tylko ćwiczenia i serie, nigdy ciężary ani notatki.",
+    ],
+    dyk: "Każda opublikowana rutyna ma własną stronę w serwisie, którą możesz wysłać komu chcesz.",
+  },
+  "team-session": {
+    title: "Cały trening drużyny na jednym tablecie",
+    intro: "Treningi drużyny mieszczą jeden trening dla całej drużyny na jednym tablecie.",
+    points: [
+      "Zacznij go z karty drużyny w Coaching i wybierz rutynę.",
+      "Każdy zawodnik stuka swoje imię i zapisuje serie, a ciężar zaczyna się tam, gdzie skończył.",
+      "Tablica pokazuje, kto nie zapisał jeszcze serii, nigdy ciężar.",
+      "Na koniec serie każdego trafiają na jego konto.",
+    ],
+    dyk: "Brak zasięgu na siłowni? Serie czekają na tablecie i pójdą, gdy wróci.",
+  },
+  "gym-chains": {
+    title: "Wszystkie lokalizacje Twojej sieci",
+    intro: "Siłownie należące do sieci pokazują teraz jej logo i link do wszystkich lokalizacji.",
+    points: [
+      "Na stronie siłowni z sieci dotknij Zobacz wszystkie lokalizacje pod jej nazwą.",
+      "Lista zaczyna się od lokalizacji najbliższych miejscu, w którym ostatnio szukano siłowni.",
+      "Dotknij lokalizacji, aby zobaczyć godziny otwarcia i dodać ją razem ze sprzętem jednym dotknięciem.",
+      "Na stronie internetowej każda sieć ma własną stronę ze wszystkimi lokalizacjami.",
+    ],
+    dyk: "Trenujesz w dwóch lokalizacjach? Dodaj obie jako siłownie, a Liftsmith zaplanuje każdy trening pod sprzęt tam, gdzie jesteś.",
+  },
+  pregnancy: {
+    title: "Trening w ciąży i po porodzie",
+    intro: "Tryb ciąży i połogu dopasowuje każdy trening do tygodnia, tak jak tryb kontuzji.",
+    points: [
+      "Włącz go w Ustawienia › Ciało i jednostki: wybierz ciążę albo poród, a potem tygodnie przyciskami − / +.",
+      "Ciężary spadają z tygodniami, a każda seria kończy się daleko od upadku.",
+      "W późnej ciąży nic na plecach ani na brzuchu, bez skoków i bez brzuszków.",
+      "Po porodzie stopniowy powrót przez około 16 tygodni, po cesarskim cięciu o dwa tygodnie dłużej.",
+    ],
+    dyk: "Jest za darmo, zostaje w Twoim telefonie, a każda zmiana mówi na ekranie Dziś, dlaczego.",
+  },
+  "gym-insights": {
+    title: "Zobacz, jak członkowie korzystają z siłowni",
+    intro: "Strona Twojej siłowni w aplikacji pokazuje, jak się tam trenuje, z jednym następnym krokiem.",
+    points: [
+      "Ile osób trenowało tam w ostatnich czterech tygodniach i jak to wypada wobec czterech tygodni wcześniej.",
+      "Godziny szczytu z najtłoczniejszym dniem i godziną oraz najspokojniejszą godziną w dni robocze, o której warto powiedzieć członkom.",
+      "Najczęściej używany sprzęt i ten, którego nikt nie dotknął.",
+      "Otwarte zgłoszenia sprzętu są pierwsze, bo plany omijają ten sprzęt, dopóki nie stukniesz Naprawione.",
+    ],
+    dyk: "To tylko sumy, od osób, które liczą swoje wizyty, i ruszają, gdy trenuje tam pięć osób. Nigdy nie widzisz, kto.",
   },
 };

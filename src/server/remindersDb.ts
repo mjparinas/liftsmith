@@ -156,7 +156,7 @@ export function dbStore(): Store {
       // The roles the weekly tips are aimed at, from the tables that make them (coach.ts, teams.ts, gymClaims.ts,
       // gymStaff.ts). A school coach gets the school emails rather than the paid coaching ones.
       const yes = async (sql: string) => ((await query(sql, [accountId]).catch(() => [])).length ? true : false);
-      const [coach, physio, school, gym, states] = await Promise.all([
+      const [coach, physio, school, gym, states, male] = await Promise.all([
         yes("SELECT 1 FROM coach_accounts WHERE account_id = ?1 UNION ALL SELECT 1 FROM coach_links WHERE coach_id = ?1 LIMIT 1"),
         yes("SELECT 1 FROM coach_prefs WHERE account_id = ? AND kind = 'physio'"),
         yes("SELECT 1 FROM school_coaches WHERE account_id = ? AND status = 'approved'"),
@@ -164,13 +164,15 @@ export function dbStore(): Store {
           "SELECT 1 FROM gym_claims WHERE account_id = ?1 AND status = 'approved' UNION ALL SELECT 1 FROM gym_staff WHERE account_id = ?1 LIMIT 1",
         ),
         flagStates().catch(() => new Map() as Awaited<ReturnType<typeof flagStates>>),
+        // Pregnancy and postpartum emails skip accounts whose own synced profile says male (Your stats).
+        yes("SELECT 1 FROM sync_records WHERE account_id = ? AND key = 'profile' AND json_extract(body, '$.sex') = 'male'"),
       ]);
       const roles: Role[] = [];
       if ((coach || physio) && !school) roles.push("coach");
       if (physio) roles.push("physio");
       if (school) roles.push("school");
       if (gym) roles.push("gym");
-      return { roles, flags: { coachPlans: states.get("coachPlans")?.value === true } };
+      return { roles, flags: { coachPlans: states.get("coachPlans")?.value === true }, male };
     },
   };
 }

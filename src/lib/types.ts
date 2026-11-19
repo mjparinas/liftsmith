@@ -154,6 +154,12 @@ export interface Exercise {
    * picked by the generator; added to a routine or a workout by the lifter.
    */
   cardio?: "distance" | "time";
+  /**
+   * A barbell move loaded on one end only, the other end pivoting in a landmine or a corner (landmine
+   * presses, rows and squats, the T-bar row). Its plates go on that one end, so the plate graphic and
+   * "One end: 10 lb" show them once, and the weight is the whole bar plus those plates.
+   */
+  oneEnd?: boolean;
 }
 
 export interface Bar {
@@ -237,6 +243,12 @@ export interface Profile {
    */
   cycle?: { enabled: boolean; consentAt: number };
   /**
+   * Pregnancy and postpartum mode (Melvin, 2026-11-19; pregnancy.ts). Opt-in with its own consent; the due date, and
+   * the birth (start of a day, ms) once the baby's here. Stays on the device and the user's own sync, never in
+   * analytics or feedback reports. Turning it off removes it.
+   */
+  pregnancy?: { consentAt: number; due?: number; birth?: number; csection?: boolean };
+  /**
    * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
    * choice; billing will read it to start the store trial.
    */
@@ -278,6 +290,12 @@ export interface Profile {
    * not inside them. Under-18s never count. Settings › Your data and privacy › Strength standards.
    */
   standards?: boolean;
+  /**
+   * Whether a workout at a gym added from the map counts, anonymously, toward that gym's owner insights (gymVisits.ts):
+   * weekday, hour, length and kinds of equipment only. Missing means on, except where data choices need a yes first.
+   * Under-18s never count. Settings › Your data and privacy › Gym insights.
+   */
+  gymStats?: boolean;
   /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
   /** Under 18 only: body fat and the shaped figure turned on in Body › Health (teen.ts). Off by default. */
@@ -656,6 +674,8 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** Logged on a school coach's team session tablet (teamSessions.ts on the server): the team's name. */
+  team?: string;
   /** The program and day the plan came from (programs.ts). */
   program?: { id: string; day: number };
   /** The saved routine the workout came from, if any. */

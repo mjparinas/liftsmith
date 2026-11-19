@@ -18,6 +18,7 @@ import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
+import { visitsOn } from "@/lib/gymVisits";
 import { english, t } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
@@ -48,6 +49,7 @@ import { ImportWorkouts } from "./ImportCsv";
 import { LanguageChoices } from "./LanguagePicker";
 import { LogoEgg } from "./LogoEgg";
 import { MessageSettings } from "./MessageSettings";
+import { PregnancySettings } from "./PregnancySettings";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
@@ -759,6 +761,7 @@ function BodyGroup() {
         <p className="mt-2 px-1 text-xs text-faint">{t("settings.bw.note")}</p>
       </Section>
       <CycleSettings />
+      <PregnancySettings />
     </>
   );
 }
@@ -818,6 +821,16 @@ function DataGroup() {
                 </a>
               </>
             }
+          />
+        </Section>
+      )}
+      {!isTeen(profile) && (
+        <Section title={t("settings.gymStats")}>
+          <SwitchRow
+            label={t("settings.gymStats.on")}
+            on={visitsOn(profile)}
+            onChange={(v) => setProfile({ gymStats: v })}
+            hint={t("settings.gymStats.note")}
           />
         </Section>
       )}

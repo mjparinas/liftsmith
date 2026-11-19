@@ -63,6 +63,9 @@ const nextConfig: NextConfig = {
           { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
           { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
           { source: "/gyms/:city/:gym/report/", destination: "/api/gyms/page/?city=:city&gym=:gym&report=1" },
+          // Gym chains and every branch of each (src/server/gymChainPage.ts); in the gym sitemap.
+          { source: "/gym-chains/", destination: "/api/gyms/chain/" },
+          { source: "/gym-chains/:chain/", destination: "/api/gyms/chain/?chain=:chain" },
           { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
           // Strength standards from real lifters (src/server/standardsPage.ts, docs/decisions/public-pages-and-seo.md).
           { source: "/strength-standards/", destination: "/api/standards/page/" },
@@ -74,6 +77,9 @@ const nextConfig: NextConfig = {
           // Coaches' programs and their ratings (src/server/programPage.ts); in the gym sitemap.
           { source: "/coach-programs/", destination: "/api/programs/page/" },
           { source: "/coach-programs/:p/", destination: "/api/programs/page/?p=:p" },
+          // The public routine library (src/server/libraryPage.ts); in the gym sitemap.
+          { source: "/routines/", destination: "/api/library/page/" },
+          { source: "/routines/:r/", destination: "/api/library/page/?r=:r" },
           // The Liftsmith community: ideas, bugs, roadmap and changelog (src/server/communityPage.ts); in the gym sitemap.
           { source: "/community/", destination: "/api/community/page/" },
           { source: "/community/roadmap/", destination: "/api/community/page/?view=roadmap" },
@@ -96,8 +102,10 @@ const nextConfig: NextConfig = {
           // A gym's Report a problem page posts its one form back to this site (src/server/gymReportPage.ts).
           { source: "/gyms/:city/:gym/report/", headers: [{ key: "Content-Security-Policy", value: REPORT_PAGE_CSP }] },
           { source: "/strength-standards/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/gym-chains/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/routines/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/community/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),

@@ -446,6 +446,7 @@ export const emails: Record<string, Words> = {
       "Bearbeite einen Satz, füg eine Notiz hinzu oder benenne ein Training.",
       "Handy vergessen? Trag ein vergangenes Training nach, und es zählt.",
       "Mach jedes Training noch einmal, mit den Gewichten von heute.",
+      "Aus Versehen gelöscht? Rückgängig holt es zurück, und alle Werte ziehen mit.",
     ],
     dyk: "Jede Übung hat ihre eigene Seite mit ihrer ganzen Historie.",
   },
@@ -968,5 +969,60 @@ export const emails: Record<string, Words> = {
       "Sie zählen nie als Liftsmith-Trainings, und nichts zählt doppelt.",
     ],
     dyk: "Du findest es unter Einstellungen › Verbundene Apps, und die Liste unter der Erholungskarte auf Körper zeigt, was gezählt wird.",
+  },
+  "routine-library": {
+    title: "Finde eine Routine, die jemand anderes gebaut hat",
+    intro: "Die neue Routinen-Bibliothek sammelt Routinen, die andere veröffentlicht haben, mit einem Tippen gespeichert.",
+    points: [
+      "Suche nach Stichworten, wähle ein Ziel oder schalte Passt zu meinem Studio ein, um nur Routinen zu sehen, die dein Studio hergibt.",
+      "Gespeichert landet sie bei deinen Routinen, bereit zum Starten oder Ändern.",
+      "Bewerte sie mit Sternen, sobald du sie gespeichert hast. Sterne erscheinen ab drei Bewertungen.",
+      "Veröffentliche deine eigene aus ihrem Editor, mit oder ohne Namen. Nur Übungen und Sätze gehen raus, nie Gewichte oder Notizen.",
+    ],
+    dyk: "Jede veröffentlichte Routine bekommt eine eigene Seite auf der Website, die du mit allen teilen kannst.",
+  },
+  "team-session": {
+    title: "Das ganze Teamtraining auf einem Tablet",
+    intro: "Mit Teamtraining läuft ein Training für dein ganzes Team auf einem einzigen Tablet.",
+    points: [
+      "Starte es auf der Karte deines Teams unter Coaching und wähle eine Routine.",
+      "Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht beim letzten Stand.",
+      "Die Tafel zeigt, wer noch keinen Satz eingetragen hat, nie ein Gewicht.",
+      "Am Ende landen die Sätze aller im eigenen Konto.",
+    ],
+    dyk: "Kein Empfang im Kraftraum? Die Sätze warten auf dem Tablet und gehen raus, sobald er wieder da ist.",
+  },
+  "gym-chains": {
+    title: "Alle Standorte deiner Studiokette",
+    intro: "Studios einer Kette zeigen jetzt ihr Logo und einen Link zu allen ihren Standorten.",
+    points: [
+      "Tippe auf der Seite eines Kettenstudios unter dem Namen auf Alle Standorte ansehen.",
+      "Die Liste beginnt mit den Standorten, die dem Ort deiner letzten Studiosuche am nächsten sind.",
+      "Tippe auf einen Standort, um die Öffnungszeiten zu sehen und ihn mit einem Tippen samt Geräten hinzuzufügen.",
+      "Auf der Website hat jede Kette ihre eigene Seite mit allen Standorten.",
+    ],
+    dyk: "Du trainierst in zwei Standorten? Füge beide als Studios hinzu, und Liftsmith plant jedes Training mit den Geräten vor Ort.",
+  },
+  pregnancy: {
+    title: "Training in der Schwangerschaft und nach der Geburt",
+    intro: "Der Modus für Schwangerschaft und Rückbildung passt jedes Training an die Woche an, so wie der Verletzungsmodus.",
+    points: [
+      "Richte ihn ein unter Einstellungen › Körper und Einheiten: wähle schwanger oder Baby ist da, dann die Wochen mit − / +.",
+      "Die Lasten sinken mit den Wochen, und jeder Satz endet weit vor dem Muskelversagen.",
+      "Später in der Schwangerschaft nichts in Rücken- oder Bauchlage, keine Sprünge und keine Crunches.",
+      "Nach der Geburt ein schrittweiser Wiedereinstieg über etwa 16 Wochen, nach einem Kaiserschnitt zwei Wochen länger.",
+    ],
+    dyk: "Er ist kostenlos, bleibt auf deinem Handy, und jede Änderung sagt auf Heute, warum.",
+  },
+  "gym-insights": {
+    title: "Sieh, wie Mitglieder dein Gym nutzen",
+    intro: "Die Seite deines Gyms in der App zeigt jetzt, wie dort trainiert wird, mit einem nächsten Schritt.",
+    points: [
+      "Wie viele Sportler in den letzten vier Wochen dort trainiert haben, im Vergleich zu den vier Wochen davor.",
+      "Die Stoßzeiten mit dem vollsten Tag und der vollsten Uhrzeit, und deine ruhigste Stunde unter der Woche für die Mitglieder.",
+      "Die meistgenutzten Geräte und die, die niemand angerührt hat.",
+      "Offene Geräteprobleme stehen zuerst, weil die Pläne diese Geräte auslassen, bis du auf Behoben tippst.",
+    ],
+    dyk: "Es sind nur Summen, von Sportlern, die ihre Besuche mitzählen lassen, und es beginnt ab fünf Sportlern. Du siehst nie, wer.",
   },
 };

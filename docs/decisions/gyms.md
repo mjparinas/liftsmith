@@ -187,6 +187,7 @@ Melvin, 2026-11-15: "how do i report an unclaimed gym, i don't see it here" (on 
 - **The website's form has no scripts**, like the gym pages: a plain form that posts back to the same address, with a hidden box that bots fill in (dropped quietly). Its page is never indexed and has its own policy, the gym pages' with `form-action 'self'` (`REPORT_PAGE_CSP`; the other gym pages keep `form-action 'none'`).
 - **Reports never hide a page by themselves**, unlike shared setups (three hide one): a gym's page is a business's listing, and a rival could take it down. Staff decide on **Admin › Reports › Reported gym pages** (`GymPlaceReports.tsx`), and the reports count in To do. Actions: **Edit** (name, address, website, phone, opening hours, gym or studio; the page address stays the same, and the city is fixed on Admin › Gyms, which keeps the old address working), **Merge** (paste the page address of the gym to keep: the duplicate's lifters and shared setups move there, it's hidden with `gym_places.merged_into`, and its page answers 301 to the kept gym's while its app link opens the kept gym; a claimed gym can't be merged away), **Hide** and **Dismiss**. Every action is in the admin log.
 - Not built: telling a claimed gym's owner about reports on their page (staff handle them for now), and hiding after several reports.
+- **Delete** (Melvin, 2026-11-19: "these gyms need to be deleted not edited, can you add a delete button with an are you sure confirmation"; the AI fix-up pass had sent a knife shop and a parked, expired domain to Reports as not a gym). A red **Delete** beside Dismiss opens an inline "Are you sure? Delete <name> for good?" that says what goes, with **Yes, delete it** and Cancel; nothing is sent before Yes. `deletePlace` (`src/server/gymPlaceReports.ts`) removes the gym's row and what hangs off it (its pictures from the database and from Blob, lifters' links to it, announcements, equipment problems, trainers, poster orders, claims, QR counts, old addresses, staff and classes), leaves lifters' own shared gyms and any club in place without the link, closes the reports as done (kept for the record) and recounts its chain. Its map id goes into `gym_places_deleted`, and `savePlaces` and the daily refresh's new-gym lookup skip those ids, so a re-import or the worldwide refresh never adds it back (`deletedRefs`, a primary key read). **A claimed gym can't be deleted** (no button, and the server refuses): it's a business's own page, so staff hide it. Hide stays for a real gym that should be off the site for a while. Admin only, web, English; no app version bump (admin-only changes bump nothing, [App versions](app-versions.md)).
 
 ## The admin Gyms tab (2026-11-15)
 
@@ -331,3 +332,51 @@ Melvin, 2026-11-19 (from the open items' Later list): gym logos, photos and webs
 - **Off until Blob is set up**: without `BLOB_READ_WRITE_TOKEN` (Vercel sets it when a Blob store is connected to the project) everything stays in the database as before, and an upload that fails falls back to the database too. It's on the admin System tab's Settings card.
 - Server only, so Android, iOS and the web get it together.
 
+## Gym chains (2026-11-19)
+
+Melvin, 2026-11-19: "Logos and 'all locations' pages for gym chains" (one of the sat-nav ideas). Chains used to wait until a chain asked for them; Melvin asked for them now, so they're built for every chain the map knows, with no sign-up from the chain. Pure web code plus the server, so Android, iOS and the web get it together.
+
+- **Which gyms are a chain** (`src/server/gymChainNames.ts`, `gym_places.chain`, a `gym_chains` slug):
+  1. The map's `brand` tag (or `brand:en`; the first of a `;` list), set when the gym is imported (`savePlaces`). A new brand gets its `gym_chains` row there, with the brand as the chain's name.
+  2. Without a brand, a gym whose name is a known chain's name, or starts with it ("Planet Fitness Langley"), matched on folded words (`chainKey`, `matchChain`), at import and in the chains step.
+  3. A name shared by **3 gyms or more in 3 cities or more** (`CHAIN_LIMITS`) becomes a chain of its own (`discoverNameChains`, source `name`), unless every word is a common one (`genericName`: "Fitness Centre", "Gimnasio Municipal", "Hotel Gym", in the app's languages and the map's usual ones).
+  A chain the map has once stays when a later import has no brand (`chain` is in `KEEP_IF_MAP_EMPTY`).
+- **Claimed gyms are untouched**: the import never writes them (as before), the chains step skips them, and they never show the chain's logo in place of their own. A claimed gym that was already a branch is still listed on its chain's page.
+- **The shared logo** (`refreshChains`): the site host most of a chain's branches link to (two at least) is the chain's website, and the sharpest website icon read from that host (`gym_photos.px`, "Sharper icons") is copied into the chain's own picture (`gym_photos` kind `chain`, `place_id` `chain:<slug>`, `gym_chains.logo`, its source in `logo_from`), so it stays when that branch goes, under a new id when the pick changes (pictures are cached a year). An icon already in Vercel Blob ("Pictures in Vercel Blob") is read and stored again as the chain's own file, and the old copy's file goes when the pick changes, so a branch replacing its icon never takes the chain's with it. A franchise branch's own site never gives the chain its logo. Every **unclaimed** branch shows the chain's logo in place of its own icon (`chainOf` in `gymPlaces.ts`), so branches without a website get one too.
+- **The import job's last step, `chains`** (`gymImportJobs.ts`, Admin › Gyms › Import shows it as "Gym chains"): the worldwide job finds name chains (one grouped read of the unclaimed gyms) and then matches every unclaimed gym without a chain by name, 2,000 at a time by id (`chainStep`, `chain_after` and `chain_fixed` on the job), then counts each chain's visible branches, cities and countries and picks its logo; the daily refresh does only the counting and logos. That count is what the pages read, so no page counts a chain itself.
+- **Pages**: a chain shows (its link and its page) once it has **2 visible branches**, and is indexed and in the gym sitemap from **3** (`CHAIN_LIMITS.indexed`; fewer is a thin page, the same thinking as noindex for bare gym pages). 
+  - *Website* (`src/server/gymChainPage.ts`, `/api/gyms/chain/`, rewrites in `next.config.ts`, no scripts, the share pages' CSP): `/gym-chains/` lists every chain, biggest first (linked from `/gyms/`), and `/gym-chains/<slug>/` shows the logo, the chain's website and every branch by country (Intl region names) and city, each linking to its gym page, with an `Organization` and its branches as `subOrganization` in JSON-LD. Up to 2,000 branches. Kept on the server 15 minutes (`keptList`) and an hour at the edge.
+  - *Gym pages*: "Part of Planet Fitness · See all 2,431 locations" in the hero (website) and as one button in the gym's details in the app (`PlaceDetails.tsx`).
+  - *App* (`GymChain.tsx`, `#/gymchain/<slug>`, `GET /api/gyms/?chain=`): the logo, "N locations", then every branch, **nearest first from the spot the lifter last searched for gyms** (`lastNearby`, never a new location request), 50 at a time with Show more, each opening its gym page; the chain's website at the foot.
+- **Reads** (docs/decisions/database-reads.md): pages and counts read only gyms in a chain through the partial index `gym_places_chain` (`WHERE chain <> ''`, repeated in each query); the chains step's name pass is the one full read, once per worldwide import, like the tidy step. Text: `gp.chain*` in `src/locales/text/gp.ts`, ten languages.
+## Owner insights (2026-11-19)
+
+Melvin picked item 8 of the 2026-11-17 gap list: insights for owners of claimed gyms (how many lifters train there, busy
+hours, which equipment gets used, open problem reports), aggregate only, no lifter exposed.
+
+- **Where the numbers come from: an anonymous visit per workout** (`src/lib/gymVisits.ts`, `src/server/gymInsights.ts`).
+  When a workout of 10 minutes or more ends at a gym the lifter added from the map (`Gym.placeId`), the app sends the
+  weekday and hour it started (the lifter's own clock, which is the gym's, since they're there), its length and the kinds
+  of equipment its exercises need (`needs`, so "barbell", "rack", never the exercise, a weight or a rep). Who it was is a
+  one-way code from the account, or the install id when signed out, so a lifter counts once; the row's id is a code from
+  that and the workout, so a retry never counts twice. Visits are kept on the device until sent (gyms have bad
+  reception: on finish, on open and back online) and on the server for 70 days, cleared per gym as new ones arrive
+  (no scheduled job). We didn't read the synced workouts instead: those are private to the lifter's own account, and
+  signed-out lifters would be missed.
+- **A switch, on by default:** Settings › Your data and privacy › Gym insights › **Count my gym visits**
+  (`profile.gymStats`), like Strength standards: on unless the device is where data choices need a yes first
+  (`askFirstHere`). **Under-18s are never counted** and don't see the switch. Deleting the account deletes its visits
+  (`visitDeletes`). Privacy policy and `docs/PRIVACY_LABELS.md` say so.
+- **What the owner and staff see** (`GymInsights.tsx`, op `insights`, `canManage`): under the owner's results on the
+  owner's page, for the last four weeks (`WINDOW_DAYS`, so each weekday counts four times) against the four before:
+  lifters, workouts, the typical (median) length, a bar for each hour from 5 AM to 11 PM with the busiest day and hour
+  named (only once a cell has 3 visits), and the equipment used as a share of workouts. **Shares, never counts per hour
+  or per lifter, and nothing but the lifter count until five different lifters trained there** (`MIN_LIFTERS`), so no
+  one lifter stands out.
+- **Led by one thing to do** (`insightStep`, "Action over stats"), the first that applies: fix the open equipment problem
+  reports (plans work around that equipment until Fixed); before five lifters, how many more; equipment in the gym's
+  setup nobody logged in four weeks (once there are 20 workouts); workouts down a fifth or more on the four weeks before
+  (with 10+ before); else the quietest weekday hour within opening hours, 6 AM to 9 PM, to tell members in an
+  announcement, with the busiest beside it.
+- One answer per gym per server for ten minutes, and the visit queries use `gym_visits_place` (`dbIndexes.test.ts`).
+- Free, like everything else for gyms. Pure web code plus the server, so Android, iOS and the web app get it together.

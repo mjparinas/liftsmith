@@ -66,6 +66,11 @@ export const it: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Dati per i titolari di palestre",
+      body: "Titolari e staff delle palestre ufficiali vedono quanti atleti si sono allenati lì nelle ultime quattro settimane, gli orari pieni e tranquilli, l'attrezzatura usata e i problemi aperti, con un passo successivo.",
+      note: "Solo totali e quote, dagli atleti che contano le visite, e solo quando se ne sono allenati lì almeno cinque.",
+    },
     adaptive: {
       name: "Allenamenti adattivi ogni giorno",
       body: "Sceglie esercizi che la tua palestra permette e per cui i tuoi muscoli sono pronti, poi fissa ogni peso e ripetizione in base ai tuoi ultimi allenamenti.",
@@ -114,6 +119,10 @@ export const it: FeaturesText = {
       note: "I promemoria di riabilitazione e la notifica di un nuovo programma sono su Android e iPhone.",
     },
     cycle: { name: "Prontezza secondo il ciclo", body: "Se vuoi, registra il tuo ciclo e la scelta di oggi ne tiene conto." },
+    pregnancy: {
+      name: "Modalità gravidanza e post-parto",
+      body: "Digli che sei incinta o che hai avuto il tuo bambino e ogni allenamento si adatta alla settimana: carichi più leggeri, nessuna serie al limite, niente supina a fine gravidanza e un ritorno graduale di circa 16 settimane dopo il parto.",
+    },
     "goal-planner": {
       name: "Pianificatore di obiettivi",
       body: "Scegli un esercizio e un obiettivo: calcola una data realistica e la strada per arrivarci.",
@@ -208,7 +217,7 @@ export const it: FeaturesText = {
     },
     "edit-history": {
       name: "Modifica e ripeti gli allenamenti passati",
-      body: "Correggi una serie, aggiungi una nota, dai un nome a un allenamento o ripetilo, e ogni esercizio ha la sua pagina con la sua cronologia.",
+      body: "Correggi una serie, aggiungi una nota, dai un nome a un allenamento o ripetilo, e ogni esercizio ha la sua pagina con la sua cronologia. Eliminane uno con Annulla e tutte le statistiche vengono ricalcolate.",
     },
     "exercise-stats": {
       name: "Statistiche di ogni esercizio",
@@ -270,6 +279,11 @@ export const it: FeaturesText = {
       name: "Le tue routine",
       body: "Crea routine dal catalogo esercizi, senza limiti di numero, e condividile con un link.",
     },
+    "routine-library": {
+      name: "Libreria di routine",
+      body: "Cerca le routine pubblicate da altri per obiettivo, parole e attrezzatura della tua palestra, salvane una con un tocco e valutala con le stelle. Pubblica la tua dal suo editor, con o senza il tuo nome, e avrà una sua pagina sul sito. Escono solo esercizi e serie, mai i tuoi carichi o le tue note.",
+      note: "Per pubblicare servono un account e 18 anni. Chiunque può sfogliare.",
+    },
     library: {
       name: "1.000 esercizi",
       body: "Forza, corpo libero, macchine, elastici, kettlebell e cardio, con ricerca, filtri per muscolo e un filtro per questa palestra. Il cardio registra tempo e distanza.",
@@ -311,6 +325,11 @@ export const it: FeaturesText = {
     "gym-classes": {
       name: "Orari dei corsi sulle pagine delle palestre",
       body: "Le palestre ufficiali pubblicano i corsi che tengono ogni settimana, con istruttore e sala, e segnano i giorni in cui un corso salta. Chi si allena lì vede la settimana sulla pagina della palestra nell'app e sul web, e aggiunge il prossimo corso al calendario con un tocco.",
+    },
+    "gym-chains": {
+      name: "Tutte le sedi di una catena",
+      body: "Le palestre di una catena mostrano il suo logo e portano a una pagina con tutte le sedi, nell'app prima le più vicine. Sul web ogni catena ha la sua pagina.",
+      note: "Riconosciamo le catene dal marchio sulla mappa o da un nome condiviso da palestre in più città. Le palestre rivendicate mantengono il proprio logo.",
     },
     "gym-open-now": {
       name: "Aperto ora nella ricerca palestre",
@@ -397,6 +416,10 @@ export const it: FeaturesText = {
     "school-teams": {
       name: "Gratis per le squadre delle superiori",
       body: "Gli allenatori delle superiori che confermano un’email scolastica hanno Pro gratis, come gli atleti dai 13 ai 18 anni delle loro squadre, con una classifica settimanale della squadra. Massa grassa e profili pubblici restano disattivati per i minori di 18 anni.",
+    },
+    "team-session": {
+      name: "Sessioni di squadra su un tablet",
+      body: "Un allenatore scolastico guida un allenamento per tutta la squadra da un tablet: ogni atleta tocca il proprio nome e registra le sue serie, con il peso da dove aveva lasciato, e il tabellone mostra chi non ha iniziato. Alla fine, le serie di ognuno vengono salvate nel suo account. Funziona senza campo.",
     },
     "coach-checkins": {
       name: "Moduli di check-in e questionari",

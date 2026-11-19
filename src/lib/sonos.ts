@@ -143,6 +143,8 @@ export function optimistic(now: SonosNow, c: SonosCommand): SonosNow {
       return now.volume === null ? now : { ...now, volume: clampVol(c.level) };
     case "nudge":
       return now.volume === null ? now : { ...now, volume: clampVol(now.volume + c.delta) };
+    case "mute":
+      return { ...now, muted: c.muted };
     case "next":
     case "previous":
       return now;
@@ -174,6 +176,27 @@ export async function sonosSend(c: SonosCommand, retry = true): Promise<boolean>
     useSonos.setState({ error: fail(e) });
     return false;
   }
+}
+
+/**
+ * The volume moved by hand on the workout card while Follow my workout is on: what it becomes for the rest of the
+ * workout and the next ones (Melvin, 2026-11-19: "if I increase the volume, the set volume should be increased to
+ * match"). During a set it's the set volume, during rest the rest volume, so the next switch between them doesn't
+ * undo it. Rest is never louder than sets, so a rest volume above the set volume lifts the set volume with it (and
+ * a set volume below the rest volume brings rest down, in setSonosPrefs). Null when nothing should be saved.
+ * Pure, exported for tests.
+ */
+export function followVolume(prefs: SonosPrefs, resting: boolean, level: number): Partial<SonosPrefs> | null {
+  if (!prefs.follow) return null;
+  const v = clampVol(level);
+  if (!resting) return v === prefs.setVolume ? null : { setVolume: v };
+  if (v === prefs.restVolume) return null;
+  return v > prefs.setVolume ? { restVolume: v, setVolume: v } : { restVolume: v };
+}
+
+/** The speaker button: mutes, or unmutes back to the volume it was at (Sonos keeps it while muted). */
+export function sonosMute(muted: boolean): Promise<boolean> {
+  return sonosSend({ do: "mute", muted });
 }
 
 // --- Follow my workout ---

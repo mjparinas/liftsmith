@@ -111,6 +111,11 @@ export const tr: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Salon sahipleri için içgörüler",
+      body: "Resmî salonların sahipleri ve personeli, son dört haftada orada kaç sporcunun antrenman yaptığını, yoğun ve sakin saatleri, kullanılan ekipmanı ve açık sorun bildirimlerini bir sonraki adımla görür.",
+      note: "Yalnızca toplamlar ve paylar, ziyaretlerini saydıran sporculardan ve ancak beş sporcu antrenman yaptıktan sonra.",
+    },
     adaptive: {
       name: "Her gün uyarlanan antrenmanlar",
       body: "Salonunda yapılabilen ve kaslarının hazır olduğu egzersizleri seçer, sonra her ağırlığı ve tekrarı son antrenmanlarına göre belirler.",
@@ -161,6 +166,10 @@ export const tr: FeaturesText = {
     cycle: {
       name: "Döngüye duyarlı hazırlık",
       body: "İstersen döngünü kaydet, günün kararı bunu da hesaba katsın.",
+    },
+    pregnancy: {
+      name: "Hamilelik ve doğum sonrası modu",
+      body: "Hamile olduğunu ya da bebeğini doğurduğunu söyle, her antrenman haftana uysun: daha hafif yükler, sınıra kadar set yok, hamileliğin sonlarında sırtüstü hareket yok ve doğumdan sonra yaklaşık 16 haftalık kademeli dönüş.",
     },
     "goal-planner": {
       name: "Hedef planlayıcı",
@@ -264,7 +273,7 @@ export const tr: FeaturesText = {
     },
     "edit-history": {
       name: "Geçmiş antrenmanları düzenle ve tekrarla",
-      body: "Bir seti düzelt, not ekle, antrenmana ad ver ya da tekrarla; her hareketin geçmişiyle birlikte kendi sayfası var.",
+      body: "Bir seti düzelt, not ekle, antrenmana ad ver ya da tekrarla; her hareketin geçmişiyle birlikte kendi sayfası var. Geri alma seçeneğiyle sil; tüm istatistikler yeniden hesaplanır.",
     },
     "exercise-stats": {
       name: "Her egzersiz için istatistik",
@@ -329,6 +338,11 @@ export const tr: FeaturesText = {
       name: "Kendi rutinlerin",
       body: "Egzersiz tarayıcısından sınırsız sayıda rutin oluştur ve link olarak paylaş.",
     },
+    "routine-library": {
+      name: "Rutin kütüphanesi",
+      body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
+      note: "Yayımlamak için hesap ve 18 yaş gerekir. Herkes göz atabilir.",
+    },
     library: {
       name: "1.000 egzersiz",
       body: "Serbest ağırlık, vücut ağırlığı, makineler, lastik bantlar, kettlebell ve kardiyo; arama, kas filtreleri ve bu salon filtresiyle. Kardiyo süre ve mesafe kaydeder.",
@@ -376,6 +390,11 @@ export const tr: FeaturesText = {
     "gym-classes": {
       name: "Salon sayfalarında ders programı",
       body: "Resmî salonlar her hafta verdikleri dersleri eğitmen ve alanla birlikte paylaşır, dersin olmadığı günleri işaretler. Üyeler haftayı uygulamada ve webde salonun sayfasında görür, sıradaki dersi tek dokunuşla takvimine ekler.",
+    },
+    "gym-chains": {
+      name: "Bir salon zincirinin tüm şubeleri",
+      body: "Bir zincire ait salonlar zincirin logosunu gösterir ve tüm şubelerinin olduğu bir sayfaya bağlanır; uygulamada en yakınlar önce. Web sitesinde her zincirin kendi sayfası var.",
+      note: "Zincirleri haritadaki marka bilgisinden ya da birkaç şehirdeki salonların paylaştığı bir addan tanırız. Sahiplenilmiş salonlar kendi logolarını korur.",
     },
     "gym-open-now": {
       name: "Salon bulucuda Şu an açık",
@@ -465,6 +484,10 @@ export const tr: FeaturesText = {
     "school-teams": {
       name: "Lise takımlarına ücretsiz",
       body: "Okul e-posta adresini doğrulayan lise koçları Pro'yu ücretsiz alır; takımlarındaki 13–18 yaş arası sporcular da öyle, haftalık takım sıralamasıyla. Vücut yağı ve herkese açık profiller 18 yaş altı için kapalı kalır.",
+    },
+    "team-session": {
+      name: "Tek tablette takım seansları",
+      body: "Lise koçu tüm takımın antrenmanını tek tabletten yönetir: her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar ve pano kimin başlamadığını gösterir. Bitince her sporcunun setleri kendi hesabına kaydedilir. Çekim olmadan da çalışır.",
     },
     "coach-checkins": {
       name: "Check-in formları ve anketler",

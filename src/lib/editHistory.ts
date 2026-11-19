@@ -25,6 +25,21 @@ export function workoutEventIds(events: readonly AppEvent[], sessionId: string):
 }
 
 /**
+ * Undo for a deleted workout (Melvin, 2026-11-19): the deleted events come back as copies under new ids, because a
+ * delete is a tombstone that sync never undoes. Each set's reps-left rating follows its set's new id; the session id
+ * stays, so the workout is the same workout (its Friends post and Health copy are found by it).
+ */
+export function restoreWorkout(removed: readonly AppEvent[], newId: () => string): AppEvent[] {
+  const ids = new Map<string, string>();
+  for (const e of removed) ids.set(e.id, newId());
+  return removed.map((e) => {
+    const copy = { ...e, id: ids.get(e.id)! } as AppEvent;
+    if (copy.type === "effort") copy.setId = ids.get(copy.setId) ?? copy.setId;
+    return copy;
+  });
+}
+
+/**
  * A new weight and reps for one logged set. The set comes back under a new id at the same moment (so it
  * stays in its place in the workout), and its reps-left rating moves with it. Per-side reps are dropped,
  * because the new reps are for both sides. Nothing changes when the numbers are the same.

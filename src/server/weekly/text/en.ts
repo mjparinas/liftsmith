@@ -466,6 +466,7 @@ export const emails: Record<string, Words> = {
       "Edit a set, add a note or name a workout.",
       "Forgot your phone? Log a past workout and it counts.",
       "Do any workout again with today's weights.",
+      "Deleted one by mistake? Undo brings it back, and every stat follows.",
     ],
     dyk: "Every exercise has its own page with its full history.",
   },
@@ -985,5 +986,60 @@ export const emails: Record<string, Words> = {
       "They never count as Liftsmith workouts, and nothing counts twice.",
     ],
     dyk: "It's in Settings › Connected apps, and the list under the recovery map on Body shows what's being counted.",
+  },
+  "routine-library": {
+    title: "Find a routine another lifter made",
+    intro: "The new routine library has routines other lifters published, ready to save in a tap.",
+    points: [
+      "Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.",
+      "Save one and it lands in your routines, ready to start or change.",
+      "Rate it with stars once you've saved it. Stars show from three ratings.",
+      "Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.",
+    ],
+    dyk: "Every published routine gets its own page on the website, so you can share it with anyone.",
+  },
+  "team-session": {
+    title: "Run the whole team's lift from one tablet",
+    intro: "Team sessions put one workout for your whole team on one tablet.",
+    points: [
+      "Start one from your team's card in Coaching and pick a routine.",
+      "Athletes tap their first name and log their own sets, the weight starting where they left off.",
+      "The board shows who hasn't logged a set yet, never a weight.",
+      "End it and each athlete's sets are saved to their own account.",
+    ],
+    dyk: "No reception in the weight room? Sets wait on the tablet and go up when it's back.",
+  },
+  "gym-chains": {
+    title: "Every location of your gym chain",
+    intro: "Gyms that belong to a chain now show its logo and a link to every one of its locations.",
+    points: [
+      "On a chain gym's page, tap See all locations under its name.",
+      "The list starts with the branches nearest where you last looked for gyms.",
+      "Tap a branch to see its hours and add it with its equipment in one tap.",
+      "On the website, each chain has its own page listing every branch.",
+    ],
+    dyk: "Train at two branches? Add both as gyms and Liftsmith plans each workout for the equipment where you are.",
+  },
+  pregnancy: {
+    title: "Training through pregnancy and after birth",
+    intro: "Pregnancy and postpartum mode changes every workout with the week, the way injury mode does.",
+    points: [
+      "Set it up in Settings › Body and units: pick pregnant or had my baby, then the weeks on a stepper.",
+      "Loads come down as the weeks go by, and every set stops well short of failure.",
+      "Later in pregnancy, nothing lying on your back or belly, no jumps and no crunches.",
+      "After birth, a gradual return over about 16 weeks, two weeks longer after a C-section.",
+    ],
+    dyk: "It's free, it stays on your phone, and every change says why on Today.",
+  },
+  "gym-insights": {
+    title: "See how members use your gym",
+    intro: "Your gym's page in the app now shows how lifters train there, with one thing to do next.",
+    points: [
+      "How many lifters trained there in the last four weeks, and how that compares with the four weeks before.",
+      "The busy hours, with the busiest day and time, and your quietest weekday hour to tell members about.",
+      "The equipment members use most, and any in your setup nobody has touched.",
+      "Open equipment problem reports come first, because lifters' plans skip that equipment until you tap Fixed.",
+    ],
+    dyk: "It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who.",
   },
 };

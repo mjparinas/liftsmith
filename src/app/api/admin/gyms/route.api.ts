@@ -1,6 +1,6 @@
 // GET /api/admin/gyms/: listed gyms with open reports, and real gyms' pages with open reports (staff). POST {id, action}
 // (admins, audited): for a listing, remove deletes it and dismiss closes its reports and shows it again
-// (src/server/gymDirectory.ts); with `place: true`, a reported gym page: dismiss, hide, merge {into} or edit {name,
+// (src/server/gymDirectory.ts); with `place: true`, a reported gym page: dismiss, hide, delete, merge {into} or edit {name,
 // address, website, phone, hours, kind} (src/server/gymPlaceReports.ts).
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";

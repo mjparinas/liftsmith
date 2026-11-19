@@ -94,6 +94,7 @@ import * as plate from "./text/plate";
 import * as pm from "./text/pm";
 import * as pol from "./text/pol";
 import * as pr from "./text/pr";
+import * as preg from "./text/preg";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
@@ -107,6 +108,7 @@ import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
 import * as rev from "./text/rev";
 import * as rhp from "./text/rhp";
+import * as rl from "./text/rl";
 import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
@@ -181,6 +183,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...cpl.es,
   ...creator.es,
   ...cycle.es,
+  ...preg.es,
   ...dash.es,
   ...delight.es,
   ...demo.es,
@@ -229,6 +232,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...part.es,
   ...past.es,
   ...cpg.es,
+  ...rl.es,
   ...pay.es,
   ...pgm.es,
   ...photos.es,

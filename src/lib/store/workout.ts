@@ -4,11 +4,13 @@ import { derive } from "../derive";
 import { markJoke, plateJoke, seenJokes } from "../eggs";
 import { exercise } from "../exercises";
 import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
+import { noteVisit, visitFor } from "../gymVisits";
 import { t } from "../i18n";
 import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
 import { cardioItem, extraOffer, rehabItems, type ExtraOffer } from "../partExtras";
+import { bodyMode } from "../pregnancy";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
@@ -868,13 +870,20 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       if (!a || !g) return;
       const item = a.plan.items[a.index];
       const to = exercise(toId);
-      const t = injuredTarget(to, target(to, get().events, get().profile, g, Date.now()), activeInjuries(get().events), g);
+      const t = injuredTarget(
+        to,
+        target(to, get().events, get().profile, g, Date.now()),
+        activeInjuries(get().events),
+        g,
+        bodyMode(get().profile, Date.now()),
+      );
       const done = setsDone(get().events, a.sessionId, item.exerciseId);
       const newItem: PlanItem = {
         ...item,
         exerciseId: toId,
         target: t.target,
         injuryPct: t.injuryPct,
+        mode: t.mode,
         sets: Math.max(1, item.sets - done),
       };
       // A program keeps its sets and reps (and the lift the sets count for); only the weight changes,
@@ -904,7 +913,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       if (!a || !g) return;
       const ex = exercise(exerciseId);
       const { profile, events } = get();
-      const t = injuredTarget(ex, target(ex, events, profile, g, Date.now()), activeInjuries(events), g);
+      const t = injuredTarget(ex, target(ex, events, profile, g, Date.now()), activeInjuries(events), g, bodyMode(profile, Date.now()));
       // Cardio is one long set; anything else gets the usual three.
       const sets = ex.cardio ? 1 : 3;
       const warmed = new Set(a.plan.items.flatMap((i) => exercise(i.exerciseId).primary));
@@ -916,6 +925,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         focus: ex.primary[0]!,
         target: t.target,
         ...(t.injuryPct ? { injuryPct: t.injuryPct } : {}),
+        ...(t.mode ? { mode: t.mode } : {}),
         ...(wu.length ? { warmup: wu } : {}),
       };
       const items = [...a.plan.items, item];
@@ -994,6 +1004,8 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           bpm: hr,
         });
       commit(evs);
+      // One anonymous visit for the gym's owner insights, when it's a real gym and the lifter left it on (gymVisits.ts).
+      noteVisit(visitFor(get(), a.sessionId, a.startedAt, at));
       // Counts and length only: no weights, reps or heart rate leave the device.
       track("workout_finish", {
         sets: sets.length,

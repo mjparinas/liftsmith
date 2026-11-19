@@ -18,6 +18,7 @@ import {
   teamBoard,
   teamsOverview,
 } from "@/server/teams";
+import { liveSessions } from "@/server/teamSessions";
 
 export const OPTIONS = preflight;
 
@@ -25,7 +26,8 @@ export async function GET(req: Request) {
   const s = await signedIn(req);
   if (s instanceof Response) return s;
   const board = new URL(req.url).searchParams.get("board");
-  if (board === null) return reply(req, 200, await teamsOverview(s.accountId));
+  // `live`: the coach's team sessions still running, by team (teamSessions.ts), so Coaching can open their board.
+  if (board === null) return reply(req, 200, { ...(await teamsOverview(s.accountId)), live: await liveSessions(s.accountId) });
   const b = await teamBoard(s.accountId, board);
   return b ? reply(req, 200, b) : reply(req, 404, { error: "gone" });
 }

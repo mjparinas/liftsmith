@@ -797,3 +797,48 @@ Clients can now film a set in the app and send it to you, and you answer right o
 - They tap a note to jump to that moment, and can answer with a note of their own.
 - Videos stay private to the two of you and go when either of you ends coaching.
 Did you know? Clients under 18 can't send form videos. Sending one is free for clients. ([Trainer mode](trainer-mode.md) "Form videos")
+### W71 · Find a routine another lifter made (**New**, 2026-11-19)
+Free · Lifters · No screenshot (the routines come from our server in lifters' own words) · `fresh`, so it goes next to everyone already in the series
+The new routine library has routines other lifters published, ready to save in a tap.
+- Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.
+- Save one and it lands in your routines, ready to start or change.
+- Rate it with stars once you've saved it. Stars show from three ratings.
+- Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.
+Did you know? Every published routine gets its own page on the website, so you can share it with anyone. ([Routine library](routine-library.md))
+
+
+### W72 · Run the whole team's lift from one tablet (**New**, 2026-11-19)
+Free · School coaches · No screenshot (Coaching's team page needs a verified school coach) · `fresh`, so it goes next to everyone already in the series
+
+Team sessions put one workout for your whole team on one tablet.
+- Start one from your team's card in Coaching and pick a routine.
+- Athletes tap their first name and log their own sets, the weight starting where they left off.
+- The board shows who hasn't logged a set yet, never a weight.
+- End it and each athlete's sets are saved to their own account.
+Did you know? No reception in the weight room? Sets wait on the tablet and go up when it's back. ([School teams](school-teams.md) "Team sessions")
+
+### W73 · Every location of your gym chain (**New**, 2026-11-19)
+Free · Lifters · No screenshot (a chain's page needs gyms from the server) · `fresh`, so it goes next to everyone already in the series
+Gyms that belong to a chain now show its logo and a link to every one of its locations.
+- On a chain gym's page, tap See all locations under its name.
+- The list starts with the branches nearest where you last looked for gyms.
+- Tap a branch to see its hours and add it with its equipment in one tap.
+- On the website, each chain has its own page listing every branch.
+Did you know? Train at two branches? Add both as gyms and Liftsmith plans each workout for the equipment where you are. ([Gyms](gyms.md) "Gym chains")
+
+### W74 · Training through pregnancy and after birth (**New**, 2026-11-19)
+Free · Lifters, but not accounts whose synced profile says male (`notMale`) · Screenshot of the setting · `fresh`, so it goes next to everyone already in the series
+Pregnancy and postpartum mode changes every workout with the week, the way injury mode does.
+- Set it up in Settings › Body and units: pick pregnant or had my baby, then the weeks on a stepper.
+- Loads come down as the weeks go by, and every set stops well short of failure.
+- Later in pregnancy, nothing lying on your back or belly, no jumps and no crunches.
+- After birth, a gradual return over about 16 weeks, two weeks longer after a C-section.
+Did you know? It's free, it stays on your phone, and every change says why on Today. ([Pregnancy and postpartum mode](pregnancy.md))
+### G4 · See how members use your gym (**New**, 2026-11-19)
+Free · Gyms · No screen (it needs an official gym with five lifters) · `fresh`, so it goes next to gyms already in the series
+Your gym's page in the app now shows how lifters train there, with one thing to do next.
+- How many lifters trained there in the last four weeks, and how that compares with the four weeks before.
+- The busy hours, with the busiest day and time, and your quietest weekday hour to tell members about.
+- The equipment members use most, and any in your setup nobody has touched.
+- Open equipment problem reports come first, because lifters' plans skip that equipment until you tap Fixed.
+Did you know? It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who. ([Gyms](gyms.md) "Owner insights")

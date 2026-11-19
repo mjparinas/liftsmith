@@ -191,6 +191,8 @@ async function run(): Promise<void> {
       const left = readSync();
       if (!reply.more && !left.out.length && !left.del.length && left.rev === left.sentRev) break;
     }
+    // The server answered, so Friends posts of deleted workouts that couldn't go before can go now (workoutDelete.ts).
+    void import("./workoutDelete").then((m) => m.retryUnposts());
   } catch (e) {
     if (e instanceof AuthError && e.signedOut) {
       // The server says the session ended (signed out elsewhere, the account deleted, or a year unused). Like signing out,

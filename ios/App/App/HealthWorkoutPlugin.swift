@@ -16,6 +16,7 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "save", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "remove", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "characteristics", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "openPermissions", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "nutrition", returnType: CAPPluginReturnPromise),
@@ -179,6 +180,37 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
             self.write(id: id, start: start, end: end, kcal: kcal, avgHr: avgHr, title: title, segments: segments, call: call)
         }
         store.execute(query)
+    }
+
+    /// A deleted workout (src/lib/workoutDelete.ts): the workout this app saved with that id (HKMetadataKeyExternalUUID)
+    /// goes, and so do this app's own active energy and heart rate samples inside its time (inside the workout, or
+    /// written beside it without the workout permission). HealthKit only lets an app delete what it saved itself.
+    /// Android: HealthWorkoutPlugin.kt.
+    @objc func remove(_ call: CAPPluginCall) {
+        guard let id = call.getString("id"), !id.isEmpty else { return call.reject("Bad workout") }
+        guard HKHealthStore.isHealthDataAvailable() else { return call.resolve(["removed": false]) }
+        let mine = HKQuery.predicateForObjects(from: HKSource.default())
+        let byId = HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeyExternalUUID, allowedValues: [id])
+        let samples: NSPredicate? = {
+            guard let a = call.getDouble("start"), let b = call.getDouble("end"), b > a else { return nil }
+            let range = HKQuery.predicateForSamples(
+                withStart: Date(timeIntervalSince1970: a / 1000), end: Date(timeIntervalSince1970: b / 1000), options: [.strictStartDate, .strictEndDate])
+            return NSCompoundPredicate(andPredicateWithSubpredicates: [range, mine])
+        }()
+        let removeSamples = { [weak self] (done: Bool) in
+            guard let self, let samples else { return call.resolve(["removed": done]) }
+            let group = DispatchGroup()
+            for type in [self.energy, self.heart] where self.store.authorizationStatus(for: type) == .sharingAuthorized {
+                group.enter()
+                self.store.deleteObjects(of: type, predicate: samples) { _, _, _ in group.leave() }
+            }
+            group.notify(queue: .main) { call.resolve(["removed": done]) }
+        }
+        guard granted else { return removeSamples(false) }
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [byId, mine])
+        store.deleteObjects(of: HKObjectType.workoutType(), predicate: predicate) { ok, count, _ in
+            removeSamples(ok && count > 0)
+        }
     }
 
     /** A part's HealthKit activity type: flexibility for stretching, the machine's own for cardio, else strength. */

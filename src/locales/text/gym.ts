@@ -4,6 +4,39 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "gym.ins.title": "How lifters train here",
+  "gym.ins.lifters": "Lifters",
+  "gym.ins.workouts": "Workouts",
+  "gym.ins.length": "Typical workout",
+  "gym.ins.min": "{n} min",
+  "gym.ins.new": "First 4 weeks",
+  "gym.ins.same": "Same as the 4 weeks before",
+  "gym.ins.up": "Up {pct}%",
+  "gym.ins.down": "Down {pct}%",
+  "gym.ins.hours": "Busy hours",
+  "gym.ins.peak": "Busiest: {day} around {time}",
+  "gym.ins.hoursLabel": "Share of workouts by hour of the day",
+  "gym.ins.gear": "Equipment used",
+  "gym.ins.share": "{pct}%",
+  "gym.ins.gearNote": "Share of workouts that used each",
+  "gym.ins.soon": "Busy hours and equipment show once {need} lifters have trained here in 4 weeks. {count} so far.",
+  "gym.ins.privacy": "Last 4 weeks, from lifters who count their gym visits. Totals only: you never see who.",
+  "gym.ins.next.issues": {
+    one: "Next: fix the open equipment problem below. Lifters' plans skip that equipment until you tap Fixed.",
+    other: "Next: fix the {count} open equipment problems below. Lifters' plans skip that equipment until you tap Fixed.",
+  },
+  "gym.ins.next.wait": {
+    one: "Next: 1 more lifter training here and your insights start. The free poster brings members in.",
+    other: "Next: {count} more lifters training here and your insights start. The free poster brings members in.",
+  },
+  "gym.ins.next.unused":
+    "Next: nobody logged {equipment} here in 4 weeks. Check it works, or show members how to use it in an announcement.",
+  "gym.ins.next.down":
+    "Next: workouts are down {pct}% on the 4 weeks before. An announcement or a new class gives members a reason to come back.",
+  "gym.ins.next.quiet":
+    "Next: tell members in an announcement that {quiet} is your quietest weekday hour. {day} around {busy} is the busiest, when racks are hardest to get.",
+  "gym.ins.next.quietOnly": "Next: tell members in an announcement that {quiet} is your quietest weekday hour, so the busy times thin out.",
+  "gym.ins.next.keep": "Lifters are training here steadily. Keep the poster where members check in.",
   "gym.title": "Gyms",
   "gym.back": "‹ Back",
   "gym.row": "Gyms and equipment",
@@ -374,6 +407,41 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "Cómo entrenan aquí",
+  "gym.ins.lifters": "Atletas",
+  "gym.ins.workouts": "Entrenamientos",
+  "gym.ins.length": "Entrenamiento típico",
+  "gym.ins.min": "{n} min",
+  "gym.ins.new": "Primeras 4 semanas",
+  "gym.ins.same": "Igual que las 4 semanas anteriores",
+  "gym.ins.up": "Sube un {pct} %",
+  "gym.ins.down": "Baja un {pct} %",
+  "gym.ins.hours": "Horas de más afluencia",
+  "gym.ins.peak": "Más lleno: {day} hacia las {time}",
+  "gym.ins.hoursLabel": "Parte de los entrenamientos por hora del día",
+  "gym.ins.gear": "Equipo usado",
+  "gym.ins.share": "{pct} %",
+  "gym.ins.gearNote": "Parte de los entrenamientos que usó cada uno",
+  "gym.ins.soon": "Las horas y el equipo se muestran cuando {need} atletas hayan entrenado aquí en 4 semanas. Van {count}.",
+  "gym.ins.privacy": "Últimas 4 semanas, de atletas que cuentan sus visitas. Solo totales: nunca ves quién.",
+  "gym.ins.next.issues": {
+    one: "Siguiente paso: arregla el problema de equipo abierto de abajo. Los planes de los atletas evitan ese equipo hasta que toques Arreglado.",
+    other:
+      "Siguiente paso: arregla los {count} problemas de equipo abiertos de abajo. Los planes de los atletas evitan ese equipo hasta que toques Arreglado.",
+  },
+  "gym.ins.next.wait": {
+    one: "Siguiente paso: 1 atleta más entrenando aquí y empiezan tus datos. El cartel gratis atrae a los socios.",
+    other: "Siguiente paso: {count} atletas más entrenando aquí y empiezan tus datos. El cartel gratis atrae a los socios.",
+  },
+  "gym.ins.next.unused":
+    "Siguiente paso: nadie registró {equipment} aquí en 4 semanas. Comprueba que funciona o enseña a usarlo en un anuncio.",
+  "gym.ins.next.down":
+    "Siguiente paso: los entrenamientos bajan un {pct} % respecto a las 4 semanas anteriores. Un anuncio o una clase nueva da a los socios un motivo para volver.",
+  "gym.ins.next.quiet":
+    "Siguiente paso: di a los socios en un anuncio que las {quiet} es tu hora más tranquila entre semana. El {day} hacia las {busy} es la más llena, cuando cuesta más conseguir un rack.",
+  "gym.ins.next.quietOnly":
+    "Siguiente paso: di a los socios en un anuncio que las {quiet} es tu hora más tranquila entre semana, para repartir las horas punta.",
+  "gym.ins.next.keep": "Los atletas entrenan aquí con constancia. Deja el cartel donde los socios entran.",
   "gym.title": "Gimnasios",
   "gym.back": "‹ Atrás",
   "gym.row": "Gimnasios y equipo",
@@ -751,6 +819,44 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "Comment on s’entraîne ici",
+  "gym.ins.lifters": "Sportifs",
+  "gym.ins.workouts": "Séances",
+  "gym.ins.length": "Séance type",
+  "gym.ins.min": "{n} min",
+  "gym.ins.new": "4 premières semaines",
+  "gym.ins.same": "Comme les 4 semaines d’avant",
+  "gym.ins.up": "En hausse de {pct} %",
+  "gym.ins.down": "En baisse de {pct} %",
+  "gym.ins.hours": "Heures d’affluence",
+  "gym.ins.peak": "Le plus de monde : {day} vers {time}",
+  "gym.ins.hoursLabel": "Part des séances par heure de la journée",
+  "gym.ins.gear": "Matériel utilisé",
+  "gym.ins.share": "{pct} %",
+  "gym.ins.gearNote": "Part des séances qui l’ont utilisé",
+  "gym.ins.soon":
+    "Les heures et le matériel s’affichent dès que {need} sportifs se sont entraînés ici en 4 semaines. {count} pour l’instant.",
+  "gym.ins.privacy":
+    "4 dernières semaines, d’après les sportifs qui comptent leurs visites. Des totaux seulement : vous ne voyez jamais qui.",
+  "gym.ins.next.issues": {
+    one: "Prochaine étape : réglez le problème de matériel ouvert ci-dessous. Les programmes des sportifs évitent ce matériel jusqu’à ce que vous touchiez Réparé.",
+    other:
+      "Prochaine étape : réglez les {count} problèmes de matériel ouverts ci-dessous. Les programmes des sportifs évitent ce matériel jusqu’à ce que vous touchiez Réparé.",
+  },
+  "gym.ins.next.wait": {
+    one: "Prochaine étape : encore 1 sportif qui s’entraîne ici et vos statistiques démarrent. L’affiche gratuite attire les membres.",
+    other:
+      "Prochaine étape : encore {count} sportifs qui s’entraînent ici et vos statistiques démarrent. L’affiche gratuite attire les membres.",
+  },
+  "gym.ins.next.unused":
+    "Prochaine étape : personne n’a utilisé {equipment} ici en 4 semaines. Vérifiez qu’il fonctionne, ou montrez comment s’en servir dans une annonce.",
+  "gym.ins.next.down":
+    "Prochaine étape : les séances baissent de {pct} % par rapport aux 4 semaines d’avant. Une annonce ou un nouveau cours donne aux membres une raison de revenir.",
+  "gym.ins.next.quiet":
+    "Prochaine étape : dites aux membres dans une annonce que {quiet} est votre heure la plus calme en semaine. Le {day} vers {busy}, c’est le plus chargé, quand les racks sont les plus durs à avoir.",
+  "gym.ins.next.quietOnly":
+    "Prochaine étape : dites aux membres dans une annonce que {quiet} est votre heure la plus calme en semaine, pour étaler les heures de pointe.",
+  "gym.ins.next.keep": "Les sportifs s’entraînent ici régulièrement. Gardez l’affiche là où les membres arrivent.",
   "gym.title": "Salles",
   "gym.back": "‹ Retour",
   "gym.row": "Salles et matériel",
@@ -1138,6 +1244,42 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "So wird hier trainiert",
+  "gym.ins.lifters": "Sportler",
+  "gym.ins.workouts": "Trainings",
+  "gym.ins.length": "Typisches Training",
+  "gym.ins.min": "{n} Min.",
+  "gym.ins.new": "Erste 4 Wochen",
+  "gym.ins.same": "Wie in den 4 Wochen davor",
+  "gym.ins.up": "{pct} % mehr",
+  "gym.ins.down": "{pct} % weniger",
+  "gym.ins.hours": "Stoßzeiten",
+  "gym.ins.peak": "Am vollsten: {day} gegen {time}",
+  "gym.ins.hoursLabel": "Anteil der Trainings nach Tageszeit",
+  "gym.ins.gear": "Genutzte Geräte",
+  "gym.ins.share": "{pct} %",
+  "gym.ins.gearNote": "Anteil der Trainings, die es genutzt haben",
+  "gym.ins.soon": "Stoßzeiten und Geräte erscheinen, sobald {need} Sportler hier in 4 Wochen trainiert haben. Bisher {count}.",
+  "gym.ins.privacy": "Letzte 4 Wochen, von Sportlern, die ihre Besuche mitzählen lassen. Nur Summen: Du siehst nie, wer.",
+  "gym.ins.next.issues": {
+    one: "Nächster Schritt: Behebe das offene Geräteproblem unten. Die Pläne der Sportler lassen dieses Gerät aus, bis du auf Behoben tippst.",
+    other:
+      "Nächster Schritt: Behebe die {count} offenen Geräteprobleme unten. Die Pläne der Sportler lassen diese Geräte aus, bis du auf Behoben tippst.",
+  },
+  "gym.ins.next.wait": {
+    one: "Nächster Schritt: Noch 1 Sportler, der hier trainiert, und deine Einblicke starten. Das kostenlose Poster bringt Mitglieder dazu.",
+    other:
+      "Nächster Schritt: Noch {count} Sportler, die hier trainieren, und deine Einblicke starten. Das kostenlose Poster bringt Mitglieder dazu.",
+  },
+  "gym.ins.next.unused":
+    "Nächster Schritt: Niemand hat hier in 4 Wochen {equipment} genutzt. Prüfe, ob es funktioniert, oder zeig den Mitgliedern in einer Ankündigung, wie man es nutzt.",
+  "gym.ins.next.down":
+    "Nächster Schritt: Die Trainings sind {pct} % weniger als in den 4 Wochen davor. Eine Ankündigung oder ein neuer Kurs gibt Mitgliedern einen Grund wiederzukommen.",
+  "gym.ins.next.quiet":
+    "Nächster Schritt: Sag den Mitgliedern in einer Ankündigung, dass {quiet} unter der Woche deine ruhigste Stunde ist. {day} gegen {busy} ist am vollsten, dann sind die Racks am schwersten zu bekommen.",
+  "gym.ins.next.quietOnly":
+    "Nächster Schritt: Sag den Mitgliedern in einer Ankündigung, dass {quiet} unter der Woche deine ruhigste Stunde ist, damit sich die Stoßzeiten verteilen.",
+  "gym.ins.next.keep": "Hier wird regelmäßig trainiert. Lass das Poster dort, wo die Mitglieder einchecken.",
   "gym.title": "Studios",
   "gym.back": "‹ Zurück",
   "gym.row": "Studios und Ausrüstung",
@@ -1526,6 +1668,41 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "Come ci si allena qui",
+  "gym.ins.lifters": "Atleti",
+  "gym.ins.workouts": "Allenamenti",
+  "gym.ins.length": "Allenamento tipico",
+  "gym.ins.min": "{n} min",
+  "gym.ins.new": "Prime 4 settimane",
+  "gym.ins.same": "Come le 4 settimane prima",
+  "gym.ins.up": "Su del {pct}%",
+  "gym.ins.down": "Giù del {pct}%",
+  "gym.ins.hours": "Orari di punta",
+  "gym.ins.peak": "Più affollato: {day} verso le {time}",
+  "gym.ins.hoursLabel": "Quota di allenamenti per ora del giorno",
+  "gym.ins.gear": "Attrezzatura usata",
+  "gym.ins.share": "{pct}%",
+  "gym.ins.gearNote": "Quota di allenamenti che l'hanno usato",
+  "gym.ins.soon": "Orari e attrezzatura compaiono quando {need} atleti si saranno allenati qui in 4 settimane. Finora {count}.",
+  "gym.ins.privacy": "Ultime 4 settimane, dagli atleti che contano le loro visite. Solo totali: non vedi mai chi.",
+  "gym.ins.next.issues": {
+    one: "Prossimo passo: risolvi il problema di attrezzatura aperto qui sotto. I piani degli atleti evitano quell'attrezzo finché non tocchi Riparato.",
+    other:
+      "Prossimo passo: risolvi i {count} problemi di attrezzatura aperti qui sotto. I piani degli atleti evitano quegli attrezzi finché non tocchi Riparato.",
+  },
+  "gym.ins.next.wait": {
+    one: "Prossimo passo: ancora 1 atleta che si allena qui e i tuoi dati partono. Il poster gratuito porta i soci.",
+    other: "Prossimo passo: ancora {count} atleti che si allenano qui e i tuoi dati partono. Il poster gratuito porta i soci.",
+  },
+  "gym.ins.next.unused":
+    "Prossimo passo: nessuno ha usato {equipment} qui in 4 settimane. Controlla che funzioni, o mostra ai soci come usarlo in un annuncio.",
+  "gym.ins.next.down":
+    "Prossimo passo: gli allenamenti sono giù del {pct}% rispetto alle 4 settimane prima. Un annuncio o un nuovo corso dà ai soci un motivo per tornare.",
+  "gym.ins.next.quiet":
+    "Prossimo passo: di' ai soci in un annuncio che le {quiet} sono l'ora più tranquilla nei giorni feriali. {day} verso le {busy} è il momento più affollato, quando i rack sono più difficili da trovare.",
+  "gym.ins.next.quietOnly":
+    "Prossimo passo: di' ai soci in un annuncio che le {quiet} sono l'ora più tranquilla nei giorni feriali, così le ore di punta si alleggeriscono.",
+  "gym.ins.next.keep": "Qui ci si allena con costanza. Tieni il poster dove i soci entrano.",
   "gym.title": "Palestre",
   "gym.back": "‹ Indietro",
   "gym.row": "Palestre e attrezzatura",
@@ -1906,6 +2083,38 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "このジムでのトレーニング",
+  "gym.ins.lifters": "利用者",
+  "gym.ins.workouts": "ワークアウト",
+  "gym.ins.length": "標準的な長さ",
+  "gym.ins.min": "{n}分",
+  "gym.ins.new": "最初の4週間",
+  "gym.ins.same": "前の4週間と同じ",
+  "gym.ins.up": "{pct}%増",
+  "gym.ins.down": "{pct}%減",
+  "gym.ins.hours": "混む時間帯",
+  "gym.ins.peak": "最も混む時間：{day}の{time}ごろ",
+  "gym.ins.hoursLabel": "時間帯別のワークアウトの割合",
+  "gym.ins.gear": "使われた器具",
+  "gym.ins.share": "{pct}%",
+  "gym.ins.gearNote": "それぞれを使ったワークアウトの割合",
+  "gym.ins.soon": "4週間で{need}人がここでトレーニングすると、混む時間帯と器具が表示されます。現在{count}人。",
+  "gym.ins.privacy": "直近4週間、来館を数えることに同意した利用者のデータ。合計のみで、誰かは表示されません。",
+  "gym.ins.next.issues": {
+    other:
+      "次のステップ：下の未解決の器具の問題（{count}件）を直しましょう。「修理済み」をタップするまで、利用者のプランはその器具を避けます。",
+  },
+  "gym.ins.next.wait": {
+    other: "次のステップ：あと{count}人がここでトレーニングすると、分析が始まります。無料ポスターで会員を呼び込みましょう。",
+  },
+  "gym.ins.next.unused":
+    "次のステップ：この4週間、ここで{equipment}を記録した人はいません。動くか確認するか、お知らせで使い方を紹介しましょう。",
+  "gym.ins.next.down":
+    "次のステップ：ワークアウトが前の4週間より{pct}%減っています。お知らせや新しいクラスで、会員が戻るきっかけを作りましょう。",
+  "gym.ins.next.quiet":
+    "次のステップ：平日は{quiet}が一番空いていることを、お知らせで会員に伝えましょう。{day}の{busy}ごろが最も混み、ラックが取りにくい時間です。",
+  "gym.ins.next.quietOnly": "次のステップ：平日は{quiet}が一番空いていることを、お知らせで会員に伝えて混雑を分散させましょう。",
+  "gym.ins.next.keep": "ここでは安定してトレーニングが続いています。ポスターは会員がチェックインする場所に置いておきましょう。",
   "gym.title": "ジム",
   "gym.back": "‹ 戻る",
   "gym.row": "ジムと器具",
@@ -2263,6 +2472,40 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "Como se treina aqui",
+  "gym.ins.lifters": "Atletas",
+  "gym.ins.workouts": "Treinos",
+  "gym.ins.length": "Treino típico",
+  "gym.ins.min": "{n} min",
+  "gym.ins.new": "Primeiras 4 semanas",
+  "gym.ins.same": "Igual às 4 semanas anteriores",
+  "gym.ins.up": "Alta de {pct}%",
+  "gym.ins.down": "Queda de {pct}%",
+  "gym.ins.hours": "Horários de pico",
+  "gym.ins.peak": "Mais cheio: {day} por volta das {time}",
+  "gym.ins.hoursLabel": "Parcela dos treinos por hora do dia",
+  "gym.ins.gear": "Equipamentos usados",
+  "gym.ins.share": "{pct}%",
+  "gym.ins.gearNote": "Parcela dos treinos que usou cada um",
+  "gym.ins.soon": "Horários e equipamentos aparecem quando {need} atletas tiverem treinado aqui em 4 semanas. Até agora, {count}.",
+  "gym.ins.privacy": "Últimas 4 semanas, de atletas que contam suas visitas. Só totais: você nunca vê quem.",
+  "gym.ins.next.issues": {
+    one: "Próximo passo: resolva o problema de equipamento aberto abaixo. Os planos dos atletas evitam esse equipamento até você tocar em Consertado.",
+    other:
+      "Próximo passo: resolva os {count} problemas de equipamento abertos abaixo. Os planos dos atletas evitam esses equipamentos até você tocar em Consertado.",
+  },
+  "gym.ins.next.wait": {
+    one: "Próximo passo: mais 1 atleta treinando aqui e seus dados começam. O cartaz grátis traz os alunos.",
+    other: "Próximo passo: mais {count} atletas treinando aqui e seus dados começam. O cartaz grátis traz os alunos.",
+  },
+  "gym.ins.next.unused": "Próximo passo: ninguém registrou {equipment} aqui em 4 semanas. Veja se funciona ou mostre como usar num aviso.",
+  "gym.ins.next.down":
+    "Próximo passo: os treinos caíram {pct}% em relação às 4 semanas anteriores. Um aviso ou uma aula nova dá aos alunos um motivo para voltar.",
+  "gym.ins.next.quiet":
+    "Próximo passo: conte aos alunos num aviso que {quiet} é o horário mais tranquilo nos dias úteis. {day} por volta das {busy} é o mais cheio, quando é mais difícil pegar um rack.",
+  "gym.ins.next.quietOnly":
+    "Próximo passo: conte aos alunos num aviso que {quiet} é o horário mais tranquilo nos dias úteis, para espalhar os horários de pico.",
+  "gym.ins.next.keep": "Os atletas treinam aqui com constância. Deixe o cartaz onde os alunos fazem check-in.",
   "gym.title": "Academias",
   "gym.back": "‹ Voltar",
   "gym.row": "Academias e equipamentos",
@@ -2664,6 +2907,34 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "이 체육관의 운동 현황",
+  "gym.ins.lifters": "이용자",
+  "gym.ins.workouts": "운동",
+  "gym.ins.length": "보통 운동 시간",
+  "gym.ins.min": "{n}분",
+  "gym.ins.new": "첫 4주",
+  "gym.ins.same": "이전 4주와 같음",
+  "gym.ins.up": "{pct}% 증가",
+  "gym.ins.down": "{pct}% 감소",
+  "gym.ins.hours": "붐비는 시간",
+  "gym.ins.peak": "가장 붐빔: {day} {time}쯤",
+  "gym.ins.hoursLabel": "시간대별 운동 비율",
+  "gym.ins.gear": "사용된 기구",
+  "gym.ins.share": "{pct}%",
+  "gym.ins.gearNote": "각 기구를 사용한 운동의 비율",
+  "gym.ins.soon": "4주 동안 {need}명이 여기서 운동하면 붐비는 시간과 기구가 표시됩니다. 지금까지 {count}명.",
+  "gym.ins.privacy": "최근 4주, 방문 집계에 동의한 이용자 기준. 합계만 보이며 누구인지는 알 수 없습니다.",
+  "gym.ins.next.issues": {
+    other: "다음 단계: 아래의 열린 기구 문제 {count}건을 해결하세요. 수리됨을 누를 때까지 이용자의 플랜은 그 기구를 피합니다.",
+  },
+  "gym.ins.next.wait": { other: "다음 단계: {count}명이 더 여기서 운동하면 인사이트가 시작됩니다. 무료 포스터로 회원을 모아 보세요." },
+  "gym.ins.next.unused":
+    "다음 단계: 지난 4주 동안 여기서 {equipment}을(를) 기록한 사람이 없습니다. 작동하는지 확인하거나 공지로 사용법을 알려 주세요.",
+  "gym.ins.next.down": "다음 단계: 운동이 이전 4주보다 {pct}% 줄었습니다. 공지나 새 수업으로 회원이 돌아올 이유를 만들어 보세요.",
+  "gym.ins.next.quiet":
+    "다음 단계: 평일에는 {quiet}가 가장 한산하다고 공지로 알려 주세요. {day} {busy}쯤이 가장 붐벼 랙을 잡기 어렵습니다.",
+  "gym.ins.next.quietOnly": "다음 단계: 평일에는 {quiet}가 가장 한산하다고 공지로 알려 붐비는 시간을 분산하세요.",
+  "gym.ins.next.keep": "이곳에서 꾸준히 운동하고 있습니다. 포스터는 회원이 체크인하는 곳에 두세요.",
   "gym.title": "헬스장",
   "gym.back": "‹ 뒤로",
   "gym.row": "헬스장 및 장비",
@@ -3038,6 +3309,40 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "Burada nasıl antrenman yapılıyor",
+  "gym.ins.lifters": "Sporcular",
+  "gym.ins.workouts": "Antrenmanlar",
+  "gym.ins.length": "Tipik antrenman",
+  "gym.ins.min": "{n} dk",
+  "gym.ins.new": "İlk 4 hafta",
+  "gym.ins.same": "Önceki 4 haftayla aynı",
+  "gym.ins.up": "%{pct} artış",
+  "gym.ins.down": "%{pct} düşüş",
+  "gym.ins.hours": "Yoğun saatler",
+  "gym.ins.peak": "En yoğun: {day} {time} civarı",
+  "gym.ins.hoursLabel": "Günün saatlerine göre antrenman payı",
+  "gym.ins.gear": "Kullanılan ekipman",
+  "gym.ins.share": "%{pct}",
+  "gym.ins.gearNote": "Her birini kullanan antrenmanların payı",
+  "gym.ins.soon": "Yoğun saatler ve ekipman, 4 haftada {need} sporcu burada antrenman yapınca görünür. Şimdiye kadar {count}.",
+  "gym.ins.privacy": "Son 4 hafta, ziyaretlerini saydıran sporculardan. Yalnızca toplamlar: kim olduğunu asla görmezsin.",
+  "gym.ins.next.issues": {
+    one: "Sıradaki adım: aşağıdaki açık ekipman sorununu çöz. Onarıldı'ya dokunana kadar sporcuların planları o ekipmanı atlar.",
+    other: "Sıradaki adım: aşağıdaki {count} açık ekipman sorununu çöz. Onarıldı'ya dokunana kadar sporcuların planları o ekipmanı atlar.",
+  },
+  "gym.ins.next.wait": {
+    one: "Sıradaki adım: burada 1 sporcu daha antrenman yapınca içgörülerin başlar. Ücretsiz poster üyeleri getirir.",
+    other: "Sıradaki adım: burada {count} sporcu daha antrenman yapınca içgörülerin başlar. Ücretsiz poster üyeleri getirir.",
+  },
+  "gym.ins.next.unused":
+    "Sıradaki adım: 4 haftadır burada kimse {equipment} kaydetmedi. Çalıştığını kontrol et ya da bir duyuruda nasıl kullanılacağını göster.",
+  "gym.ins.next.down":
+    "Sıradaki adım: antrenmanlar önceki 4 haftaya göre %{pct} düştü. Bir duyuru ya da yeni bir ders üyelere geri gelmek için bir neden verir.",
+  "gym.ins.next.quiet":
+    "Sıradaki adım: bir duyuruyla üyelere hafta içi en sakin saatin {quiet} olduğunu söyle. En yoğunu {day} {busy} civarı; rack bulmak o zaman en zor.",
+  "gym.ins.next.quietOnly":
+    "Sıradaki adım: bir duyuruyla üyelere hafta içi en sakin saatin {quiet} olduğunu söyle, böylece yoğun saatler hafifler.",
+  "gym.ins.next.keep": "Burada düzenli antrenman yapılıyor. Posteri üyelerin giriş yaptığı yerde tut.",
   "gym.title": "Salonlar",
   "gym.back": "‹ Geri",
   "gym.row": "Salonlar ve ekipman",
@@ -3431,6 +3736,45 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "gym.ins.title": "Jak się tu trenuje",
+  "gym.ins.lifters": "Ćwiczący",
+  "gym.ins.workouts": "Treningi",
+  "gym.ins.length": "Typowy trening",
+  "gym.ins.min": "{n} min",
+  "gym.ins.new": "Pierwsze 4 tygodnie",
+  "gym.ins.same": "Tak samo jak 4 tygodnie wcześniej",
+  "gym.ins.up": "Wzrost o {pct}%",
+  "gym.ins.down": "Spadek o {pct}%",
+  "gym.ins.hours": "Godziny szczytu",
+  "gym.ins.peak": "Najwięcej osób: {day} około {time}",
+  "gym.ins.hoursLabel": "Udział treningów według godziny dnia",
+  "gym.ins.gear": "Używany sprzęt",
+  "gym.ins.share": "{pct}%",
+  "gym.ins.gearNote": "Udział treningów, w których go użyto",
+  "gym.ins.soon": "Godziny i sprzęt pojawią się, gdy w ciągu 4 tygodni potrenuje tu {need} osób. Na razie: {count}.",
+  "gym.ins.privacy": "Ostatnie 4 tygodnie, od osób, które liczą swoje wizyty. Tylko sumy: nigdy nie widzisz, kto.",
+  "gym.ins.next.issues": {
+    one: "Następny krok: napraw otwarty problem ze sprzętem poniżej. Plany ćwiczących omijają ten sprzęt, dopóki nie stukniesz Naprawione.",
+    few: "Następny krok: napraw {count} otwarte problemy ze sprzętem poniżej. Plany ćwiczących omijają ten sprzęt, dopóki nie stukniesz Naprawione.",
+    many: "Następny krok: napraw {count} otwartych problemów ze sprzętem poniżej. Plany ćwiczących omijają ten sprzęt, dopóki nie stukniesz Naprawione.",
+    other:
+      "Następny krok: napraw {count} otwartego problemu ze sprzętem poniżej. Plany ćwiczących omijają ten sprzęt, dopóki nie stukniesz Naprawione.",
+  },
+  "gym.ins.next.wait": {
+    one: "Następny krok: jeszcze 1 osoba trenująca tutaj i Twoje statystyki ruszą. Darmowy plakat przyciąga członków.",
+    few: "Następny krok: jeszcze {count} osoby trenujące tutaj i Twoje statystyki ruszą. Darmowy plakat przyciąga członków.",
+    many: "Następny krok: jeszcze {count} osób trenujących tutaj i Twoje statystyki ruszą. Darmowy plakat przyciąga członków.",
+    other: "Następny krok: jeszcze {count} osoby trenującej tutaj i Twoje statystyki ruszą. Darmowy plakat przyciąga członków.",
+  },
+  "gym.ins.next.unused":
+    "Następny krok: przez 4 tygodnie nikt nie zapisał tu sprzętu: {equipment}. Sprawdź, czy działa, albo pokaż w ogłoszeniu, jak go używać.",
+  "gym.ins.next.down":
+    "Następny krok: treningów jest o {pct}% mniej niż 4 tygodnie wcześniej. Ogłoszenie albo nowe zajęcia dadzą członkom powód, by wrócić.",
+  "gym.ins.next.quiet":
+    "Następny krok: napisz członkom w ogłoszeniu, że {quiet} to najspokojniejsza godzina w dni robocze. {day} około {busy} jest najtłoczniej i najtrudniej o stojak.",
+  "gym.ins.next.quietOnly":
+    "Następny krok: napisz członkom w ogłoszeniu, że {quiet} to najspokojniejsza godzina w dni robocze, żeby rozładować tłok.",
+  "gym.ins.next.keep": "Tutaj trenuje się regularnie. Zostaw plakat tam, gdzie członkowie się meldują.",
   "gym.title": "Siłownie",
   "gym.back": "‹ Wstecz",
   "gym.row": "Siłownie i sprzęt",

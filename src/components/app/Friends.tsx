@@ -590,7 +590,7 @@ export function NoticeCard({ notice }: { notice: ModerationNotice }) {
 }
 
 /** What Friends reports; coach reviews are reported from Coaching (CoachReviews.tsx). */
-type FriendsReportKind = Exclude<ReportKind, "review" | "feedback">;
+type FriendsReportKind = Exclude<ReportKind, "review" | "feedback" | "routine">;
 
 /** Report a post, comment or profile: one tap on a reason, then Send. */
 export function ReportSheet(props: { open: boolean; onClose: () => void; kind: FriendsReportKind; id: string }) {

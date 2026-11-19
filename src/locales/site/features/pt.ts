@@ -111,6 +111,11 @@ export const pt: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Dados para donos de academia",
+      body: "Donos e equipe de academias oficiais veem quantos atletas treinaram lá nas últimas quatro semanas, os horários cheios e tranquilos, os equipamentos usados e os problemas abertos, com um próximo passo.",
+      note: "Só totais e porcentagens, de atletas que contam suas visitas, e só depois que cinco treinaram lá.",
+    },
     adaptive: {
       name: "Treinos adaptativos diários",
       body: "Escolhe exercícios que a sua academia permite e para os quais seus músculos estão prontos, e define cada peso e cada rep a partir dos seus últimos treinos.",
@@ -161,6 +166,10 @@ export const pt: FeaturesText = {
     cycle: {
       name: "Prontidão que considera o ciclo",
       body: "Se quiser, registre seu ciclo menstrual e a decisão do dia passa a levá-lo em conta.",
+    },
+    pregnancy: {
+      name: "Modo gravidez e pós-parto",
+      body: "Conte que você está grávida ou já teve seu bebê e cada treino se ajusta à semana: cargas mais leves, nenhuma série até a falha, nada de costas no fim da gravidez e uma volta gradual de cerca de 16 semanas depois do parto.",
     },
     "goal-planner": {
       name: "Planejador de metas",
@@ -264,7 +273,7 @@ export const pt: FeaturesText = {
     },
     "edit-history": {
       name: "Edite treinos passados e repita",
-      body: "Corrija uma série, adicione uma anotação, dê nome a um treino ou repita, e cada exercício tem sua própria página com o histórico.",
+      body: "Corrija uma série, adicione uma anotação, dê nome a um treino ou repita, e cada exercício tem sua própria página com o histórico. Exclua um com opção de desfazer, e todas as estatísticas são recalculadas.",
     },
     "exercise-stats": {
       name: "Estatísticas de cada exercício",
@@ -329,6 +338,11 @@ export const pt: FeaturesText = {
       name: "Suas próprias rotinas",
       body: "Monte rotinas a partir do catálogo de exercícios, sem limite de quantidade, e compartilhe como link.",
     },
+    "routine-library": {
+      name: "Biblioteca de rotinas",
+      body: "Busque rotinas que outras pessoas publicaram por objetivo, palavras e o que a sua academia tem, salve uma com um toque e avalie com estrelas. Publique a sua pelo editor, com ou sem seu nome, e ela ganha uma página própria no site. Só os exercícios e as séries são publicados, nunca suas cargas ou anotações.",
+      note: "Publicar exige uma conta e 18 anos. Qualquer pessoa pode navegar.",
+    },
     library: {
       name: "1.000 exercícios",
       body: "Musculação, peso corporal, máquinas, elásticos, kettlebells e cardio, com busca, filtros por músculo e um filtro desta academia. O cardio registra tempo e distância.",
@@ -376,6 +390,11 @@ export const pt: FeaturesText = {
     "gym-classes": {
       name: "Horários de aulas nas páginas das academias",
       body: "Academias oficiais publicam as aulas de cada semana, com instrutor e sala, e marcam os dias sem aula. Quem treina lá vê a semana na página da academia no app e na web, e adiciona a próxima aula à agenda com um toque.",
+    },
+    "gym-chains": {
+      name: "Todas as unidades de uma rede",
+      body: "Academias de uma rede mostram o logo dela e levam a uma página com todas as unidades, no app as mais próximas primeiro. No site, cada rede tem sua própria página.",
+      note: "Reconhecemos as redes pela marca no mapa ou por um nome usado por academias em várias cidades. Academias reivindicadas mantêm o próprio logo.",
     },
     "gym-open-now": {
       name: "Aberto agora na busca de academias",
@@ -465,6 +484,10 @@ export const pt: FeaturesText = {
     "school-teams": {
       name: "Grátis para equipes escolares",
       body: "Treinadores de escolas de ensino médio que confirmam um e-mail da escola ganham o Pro grátis, assim como os atletas de 13 a 18 anos das suas equipes, com um ranking semanal da equipe. Gordura corporal e perfis públicos ficam desligados para menores de 18.",
+    },
+    "team-session": {
+      name: "Sessões do time em um tablet",
+      body: "Um técnico do ensino médio conduz um treino para o time todo em um tablet: cada atleta toca no próprio nome e registra suas séries, com o peso de onde parou, e o painel mostra quem não começou. No fim, as séries de cada atleta ficam salvas na própria conta. Funciona sem sinal.",
     },
     "coach-checkins": {
       name: "Formulários de check-in e questionários",

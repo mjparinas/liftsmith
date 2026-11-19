@@ -32,6 +32,8 @@ export interface WeeklyEmail {
   plain?: boolean;
   /** False when the screen can't be shown without someone's account (coaching, Friends): the email goes without one. */
   shot?: false;
+  /** Not sent to accounts whose synced profile says male (Your stats): pregnancy and postpartum mode. */
+  notMale?: true;
 }
 
 const L = (id: string, tier: Tier, route: string, more: Partial<WeeklyEmail> = {}): WeeklyEmail => ({
@@ -154,6 +156,16 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-19: form video check-ins, with notes pinned to moments in the video (docs/decisions/trainer-mode.md
   // "Form videos").
   R("coach-form-videos", "coach", "pro", "trainer/clients", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: the public routine library (docs/decisions/routine-library.md).
+  L("routine-library", "free", "library", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: team sessions on one tablet for school coaches (docs/decisions/school-teams.md "Team sessions").
+  R("team-session", "school", "free", "trainer/teams", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: every location of a gym chain, with its shared logo (docs/decisions/gyms.md "Gym chains").
+  L("gym-chains", "free", "gym", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: pregnancy and postpartum mode (docs/decisions/pregnancy.md). Not to accounts that say male.
+  L("pregnancy", "free", "settings/body", { fresh: "2026-11-19", notMale: true }),
+  // New, 2026-11-19: insights for gym owners (docs/decisions/gyms.md "Owner insights").
+  R("gym-insights", "gym", "free", "gym", { fresh: "2026-11-19", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

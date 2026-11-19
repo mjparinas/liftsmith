@@ -29,6 +29,12 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "gym imports: map gyms staff deleted (gymPlaces.ts deletedRefs)",
+    sql: "SELECT source_ref FROM gym_places_deleted WHERE source_ref IN (?, ?, ?)",
+    uses: ["sqlite_autoindex_gym_places_deleted_1"],
+    noScan: ["gym_places_deleted"],
+  },
+  {
     name: "form videos: a lifter's videos as coach or client (formVideos.ts videosOf)",
     sql: "SELECT * FROM coach_videos WHERE (coach_id = ? OR client_id = ?) AND ready = 1 ORDER BY at DESC LIMIT 300",
     uses: ["coach_videos_pair", "coach_videos_client"],
@@ -69,6 +75,32 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     sql: "SELECT COUNT(*) AS n FROM coach_video_notes WHERE video_id = ?",
     uses: ["coach_video_notes_video"],
     noScan: ["coach_video_notes"],
+  },
+  {
+    name: "gym chains: a chain's branches (gymChains.ts chainPage)",
+    sql: "SELECT id, name FROM gym_places WHERE chain = ? AND chain <> '' AND hidden = 0 LIMIT 2000",
+    uses: ["gym_places_chain"],
+    noScan: ["gym_places"],
+  },
+  {
+    name: "gym chains: each chain's counts (gymChains.ts refreshChains)",
+    sql: "SELECT chain, COUNT(*) AS n, COUNT(DISTINCT city_slug) AS c FROM gym_places WHERE chain <> '' AND hidden = 0 GROUP BY chain",
+    // Walks the partial index from end to end: it holds only gyms in a chain, never the whole table.
+    uses: ["SCAN gym_places USING INDEX gym_places_chain"],
+    noScan: [],
+  },
+  {
+    name: "gym chains: branches' websites and icons (gymChains.ts refreshChains)",
+    sql: `SELECT p.chain, p.website, m.id, m.px FROM gym_places p LEFT JOIN gym_photos m ON m.place_id = p.id AND m.kind = 'icon'
+      WHERE p.chain <> '' AND p.hidden = 0 AND p.website <> ''`,
+    uses: ["SCAN p USING INDEX gym_places_chain", "gym_photos_place"],
+    noScan: ["gym_photos", "m"],
+  },
+  {
+    name: "gym chains: the chains big enough for the sitemap (gymChains.ts sitemapChains)",
+    sql: "SELECT slug, updated_at FROM gym_chains WHERE places >= ? ORDER BY places DESC LIMIT 5000",
+    uses: ["gym_chains_places"],
+    noScan: ["gym_chains"],
   },
   {
     name: "community: the board's top posts (community.ts board)",
@@ -203,6 +235,24 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["gym_classes"],
   },
   {
+    name: "gym insights: a gym's visits in the last 8 weeks (gymInsights.ts gymInsights)",
+    sql: "SELECT who, date, day, hour, minutes, gear FROM gym_visits WHERE place_id = ? AND date > ?",
+    uses: ["gym_visits_place"],
+    noScan: ["gym_visits"],
+  },
+  {
+    name: "gym insights: clearing a gym's old visits (gymInsights.ts countVisit)",
+    sql: "DELETE FROM gym_visits WHERE place_id = ? AND date < ?",
+    uses: ["gym_visits_place"],
+    noScan: ["gym_visits"],
+  },
+  {
+    name: "gym insights: account deletion (gymInsights.ts visitDeletes)",
+    sql: "DELETE FROM gym_visits WHERE who = ?",
+    uses: ["gym_visits_who"],
+    noScan: ["gym_visits"],
+  },
+  {
     name: "gym owner: count of claimed gyms (gymClaims.ts)",
     sql: "SELECT COUNT(*) AS n FROM gym_places WHERE claimed_by <> '' AND claimed_by = ?",
     uses: ["gym_places_claimed"],
@@ -325,6 +375,72 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     sql: "DELETE FROM coach_checkin_photos WHERE coach_id = ? OR client_id = ?",
     uses: ["coach_checkin_photos_pair", "coach_checkin_photos_client"],
     noScan: ["coach_checkin_photos"],
+  },
+  {
+    name: "routine library: the browsing list (routineLibrary.ts listed)",
+    sql: "SELECT id, title FROM library_routines WHERE hidden = 0 ORDER BY saves DESC LIMIT 3000",
+    uses: ["library_routines_list"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: a lifter's own routines (routineLibrary.ts myLibrary)",
+    sql: "SELECT * FROM library_routines WHERE account_id = ? ORDER BY updated_at DESC",
+    uses: ["library_routines_account"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: the same routine published again (routineLibrary.ts publishRoutine)",
+    sql: "SELECT id FROM library_routines WHERE account_id = ? AND code = ?",
+    uses: ["library_routines_account"],
+    noScan: ["library_routines"],
+  },
+  {
+    name: "routine library: a lifter's stars on a routine (routineLibrary.ts libraryRoutine)",
+    sql: "SELECT stars FROM library_ratings WHERE routine_id = ? AND account_id = ?",
+    uses: ["sqlite_autoindex_library_ratings_1"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a routine's rating summed (routineLibrary.ts rateRoutine)",
+    sql: "SELECT COALESCE(SUM(stars), 0) FROM library_ratings WHERE routine_id = ?",
+    uses: ["sqlite_autoindex_library_ratings_1"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a deleted account's stars (routineLibrary.ts libraryCleanup)",
+    sql: "SELECT routine_id FROM library_ratings WHERE account_id = ?",
+    uses: ["library_ratings_account"],
+    noScan: ["library_ratings"],
+  },
+  {
+    name: "routine library: a deleted account's saves (routineLibrary.ts libraryCleanup)",
+    sql: "SELECT routine_id FROM library_saves WHERE account_id = ?",
+    uses: ["library_saves_account"],
+    noScan: ["library_saves"],
+  },
+  {
+    name: "team sessions: a session's sets (teamSessions.ts pushSession, liveBoard)",
+    sql: "SELECT athlete_id, exercise_id, COUNT(*) AS c FROM team_session_sets WHERE session_id = ? AND reps > 0 GROUP BY athlete_id, exercise_id",
+    uses: ["sqlite_autoindex_team_session_sets_1"],
+    noScan: ["team_session_sets"],
+  },
+  {
+    name: "team sessions: a team's last sessions (teamSessions.ts lastWeights)",
+    sql: "SELECT id FROM team_sessions WHERE team_id = ? ORDER BY started_at DESC LIMIT 3",
+    uses: ["team_sessions_team"],
+    noScan: ["team_sessions"],
+  },
+  {
+    name: "team sessions: a coach's sessions still running (teamSessions.ts liveSessions)",
+    sql: "SELECT id, team_id FROM team_sessions WHERE coach_id = ? AND ended_at IS NULL AND started_at > ? ORDER BY started_at",
+    uses: ["team_sessions_coach"],
+    noScan: ["team_sessions"],
+  },
+  {
+    name: "team sessions: an athlete's sets, when their account goes (teamSessions.ts sessionDeletes)",
+    sql: "DELETE FROM team_session_sets WHERE athlete_id = ?",
+    uses: ["team_session_sets_athlete"],
+    noScan: ["team_session_sets"],
   },
 ];
 

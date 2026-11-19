@@ -111,6 +111,11 @@ export const pl: FeaturesText = {
     },
   },
   features: {
+    "gym-insights": {
+      name: "Statystyki dla właścicieli siłowni",
+      body: "Właściciele i personel oficjalnych siłowni widzą, ile osób trenowało tam w ostatnich czterech tygodniach, godziny tłoku i spokoju, używany sprzęt i otwarte zgłoszenia, z jednym następnym krokiem.",
+      note: "Tylko sumy i udziały, od osób, które liczą swoje wizyty, i dopiero gdy trenowało tam pięć osób.",
+    },
     adaptive: {
       name: "Codzienne adaptacyjne treningi",
       body: "Wybiera ćwiczenia, które da się zrobić na twojej siłowni i na które twoje mięśnie są gotowe, a potem ustala każdy ciężar i liczbę powtórzeń na podstawie ostatnich treningów.",
@@ -161,6 +166,10 @@ export const pl: FeaturesText = {
     cycle: {
       name: "Gotowość z uwzględnieniem cyklu",
       body: "Jeśli chcesz, zapisuj cykl, a decyzja na dziś weźmie go pod uwagę.",
+    },
+    pregnancy: {
+      name: "Tryb ciąży i połogu",
+      body: "Powiedz, że jesteś w ciąży albo urodziłaś, a każdy trening dopasuje się do tygodnia: lżejsze ciężary, żadnych serii do upadku, w późnej ciąży nic na plecach i stopniowy powrót przez około 16 tygodni po porodzie.",
     },
     "goal-planner": {
       name: "Planer celów",
@@ -264,7 +273,7 @@ export const pl: FeaturesText = {
     },
     "edit-history": {
       name: "Edytuj dawne treningi i powtarzaj je",
-      body: "Popraw serię, dodaj notatkę, nazwij trening albo go powtórz, a każde ćwiczenie ma własną stronę z historią.",
+      body: "Popraw serię, dodaj notatkę, nazwij trening albo go powtórz, a każde ćwiczenie ma własną stronę z historią. Usuń trening z opcją Cofnij, a wszystkie statystyki zostaną przeliczone.",
     },
     "exercise-stats": {
       name: "Statystyki każdego ćwiczenia",
@@ -329,6 +338,11 @@ export const pl: FeaturesText = {
       name: "Twoje własne rutyny",
       body: "Buduj rutyny z przeglądarki ćwiczeń, bez limitu liczby, i udostępniaj je jako link.",
     },
+    "routine-library": {
+      name: "Biblioteka rutyn",
+      body: "Szukaj rutyn opublikowanych przez innych według celu, słów i sprzętu na twojej siłowni, zapisz jedną jednym dotknięciem i oceń ją gwiazdkami. Opublikuj własną z jej edytora, z imieniem lub bez, a dostanie własną stronę w serwisie. Wychodzą tylko ćwiczenia i serie, nigdy twoje ciężary ani notatki.",
+      note: "Publikowanie wymaga konta i ukończonych 18 lat. Przeglądać może każdy.",
+    },
     library: {
       name: "1000 ćwiczeń",
       body: "Siłowe, z masą ciała, na maszynach, z gumami, z kettlebellami i cardio, z wyszukiwarką, filtrami mięśni i filtrem „ta siłownia”. Cardio zapisuje czas i dystans.",
@@ -376,6 +390,11 @@ export const pl: FeaturesText = {
     "gym-classes": {
       name: "Grafiki zajęć na stronach siłowni",
       body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
+    },
+    "gym-chains": {
+      name: "Wszystkie lokalizacje sieci siłowni",
+      body: "Siłownie należące do sieci pokazują jej logo i prowadzą do strony ze wszystkimi lokalizacjami, w aplikacji od najbliższych. Na stronie internetowej każda sieć ma własną stronę.",
+      note: "Sieci rozpoznajemy po marce na mapie albo po nazwie, którą noszą siłownie w kilku miastach. Przejęte siłownie zachowują własne logo.",
     },
     "gym-open-now": {
       name: "Otwarte teraz w wyszukiwarce siłowni",
@@ -465,6 +484,10 @@ export const pl: FeaturesText = {
     "school-teams": {
       name: "Za darmo dla drużyn szkolnych",
       body: "Trenerzy szkół średnich, którzy potwierdzą szkolny adres e-mail, dostają Pro za darmo, podobnie jak zawodnicy w wieku od 13 do 18 lat z ich drużyn, z cotygodniowym rankingiem drużyny. Tkanka tłuszczowa i publiczne profile pozostają wyłączone dla osób poniżej 18 lat.",
+    },
+    "team-session": {
+      name: "Treningi drużyny na jednym tablecie",
+      body: "Trener szkolny prowadzi jeden trening dla całej drużyny z jednego tabletu: każdy zawodnik stuka swoje imię i zapisuje swoje serie, ciężar zaczyna się tam, gdzie skończył, a tablica pokazuje, kto jeszcze nie zaczął. Na koniec serie każdego trafiają na jego konto. Działa bez zasięgu.",
     },
     "coach-checkins": {
       name: "Formularze kontrolne i ankiety",

@@ -13,6 +13,7 @@ import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
 import { rehabItems } from "../partExtras";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
+import { bodyMode } from "../pregnancy";
 import { freeProgramFor, pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
@@ -149,6 +150,7 @@ export function planSlice(c: Ctx): PlanSlice {
       if (
         "minutes" in p ||
         "training" in p ||
+        "pregnancy" in p ||
         "planSource" in p ||
         "activeGymId" in p ||
         "variability" in p ||
@@ -197,10 +199,12 @@ export function planSlice(c: Ctx): PlanSlice {
       const { profile, events, callOverride } = get();
       const now = Date.now();
       // Health signals (sleep, HRV, resting HR, breathing rate) move the call for Pro only (AGENTS.md "Health twin").
-      const r = readiness(events, profile, now, {
+      const read = readiness(events, profile, now, {
         cycle: !!profile.cycle?.enabled,
         ...(can("healthReadiness") ? healthExternal(events, now, profile) : {}),
       });
+      // Pregnancy and after birth (pregnancy.ts): never a push day or a challenge.
+      const r = bodyMode(profile, now) ? { ...read, call: read.call === "push" ? ("normal" as const) : read.call, challenge: false } : read;
       const call = callOverride ?? r.call;
       // This week's free adaptive workout replaces the free program's day (Melvin, 2026-11-12).
       const trying = get().tryAdaptive && !can("adaptive") && freeAdaptiveLeft(events, now);
