@@ -12,6 +12,7 @@ import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces
 import { useAiStatus } from "./Ai";
 import { Card } from "./charts";
 import { FindDupes, GymFillPanel } from "./GymAi";
+import { GymAiFix } from "./GymAiFix";
 import { GymClaims } from "./GymClaims";
 import { GymImport } from "./GymImport";
 import { GymPosters } from "./GymPosters";
@@ -94,6 +95,7 @@ export function GymPlaces({ admin }: { admin: boolean }) {
       </div>
       <div hidden={part !== "Import"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
         <GymImport admin={admin} changed={changed} />
+        <GymAiFix admin={admin} changed={changed} />
       </div>
       <div hidden={part !== "Gym list"} className="grid min-w-0 gap-4 [&>*]:min-w-0">
         <GymList admin={admin} version={version} changed={changed} act={act} setNote={setNote} />
