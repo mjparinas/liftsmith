@@ -445,6 +445,7 @@ export const emails: Record<string, Words> = {
       "Bir seti düzenle, not ekle ya da bir antrenmana ad ver.",
       "Telefonunu mu unuttun? Geçmiş bir antrenmanı kaydet, o da sayılır.",
       "Herhangi bir antrenmanı bugünün ağırlıklarıyla yeniden yap.",
+      "Yanlışlıkla mı sildin? Geri al onu geri getirir, tüm istatistikler de onunla gelir.",
     ],
     dyk: "Her egzersizin tüm geçmişini gösteren kendi sayfası var.",
   },

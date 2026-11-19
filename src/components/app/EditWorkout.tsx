@@ -9,8 +9,10 @@ import { date, t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import { TIMED } from "@/lib/progression";
 import { useApp } from "@/lib/store";
+import { toast } from "@/lib/toast";
 import type { Exercise, SetEvent, Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
+import { UNDO_MS } from "@/lib/workoutDelete";
 
 import { setText } from "./format";
 import { Icon } from "./icons";
@@ -85,7 +87,15 @@ function NameNoteFields({
 }
 
 export function EditWorkoutSheet({ sessionId, onClose }: { sessionId: string; onClose: () => void }) {
-  const { events, profile, editPastSet, removePastSet, deleteWorkout, noteWorkout } = useApp();
+  const { events, profile, editPastSet, removePastSet, deleteWorkout, undoDeleteWorkout, noteWorkout } = useApp();
+  // Deleted: a toast with Undo for a few seconds (the Health copy and Friends post wait as long, workoutDelete.ts).
+  const deleteIt = () => {
+    if (!deleteWorkout(sessionId)) return;
+    toast(t("hx.deleted"), {
+      ms: UNDO_MS,
+      action: { label: t("hx.undoDelete"), run: () => void (undoDeleteWorkout() && haptic("success")) },
+    });
+  };
   const unit = profile.unit;
   const detail = useMemo(() => sessionDetail(events, sessionId), [events, sessionId]);
   const saved = sessionNoteOf(events, sessionId);
@@ -109,7 +119,7 @@ export function EditWorkoutSheet({ sessionId, onClose }: { sessionId: string; on
     const all = detail.exercises.flatMap((g) => g.sets);
     // Every set taken out: that's deleting the workout.
     if (all.every((s) => removed.has(s.id))) {
-      deleteWorkout(sessionId);
+      deleteIt();
       onClose();
       return;
     }
@@ -230,7 +240,7 @@ export function EditWorkoutSheet({ sessionId, onClose }: { sessionId: string; on
               <Button
                 kind="danger"
                 onClick={() => {
-                  deleteWorkout(sessionId);
+                  deleteIt();
                   sound.back();
                   haptic("warning");
                   onClose();

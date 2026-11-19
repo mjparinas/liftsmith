@@ -216,7 +216,7 @@ export const es: FeaturesText = {
     },
     "edit-history": {
       name: "Editar entrenamientos pasados y repetirlos",
-      body: "Corrige una serie, añade una nota, ponle nombre a un entrenamiento o repítelo, y cada ejercicio tiene su página con su historial.",
+      body: "Corrige una serie, añade una nota, ponle nombre a un entrenamiento o repítelo, y cada ejercicio tiene su página con su historial. Elimina uno con opción de deshacer y todas las estadísticas se recalculan.",
     },
     "exercise-stats": {
       name: "Estadísticas de cada ejercicio",

@@ -361,7 +361,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "edit-history",
         name: "Edit past workouts and do them again",
-        body: "Fix a set, add a note, name a workout or repeat it, and every lift has its own page with its history.",
+        body: "Fix a set, add a note, name a workout or repeat it, and every lift has its own page with its history. Delete one with Undo, and every stat is worked out again.",
         tier: "free",
         added: "2026-11-11",
       },

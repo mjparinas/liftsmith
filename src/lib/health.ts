@@ -258,6 +258,8 @@ interface WorkoutPlugin {
      */
     segments?: { kind: string; start: number; end: number; activity?: string }[];
   }): Promise<{ saved: boolean }>;
+  /** Removes the workout this app saved under that id (a deleted workout). Missing on older app builds. */
+  remove?(o: { id: string; start?: number; end?: number }): Promise<{ removed: boolean }>;
   /** Apple Health's sex and birth year (iOS). Android answers with nothing: Health Connect has no such records. */
   characteristics?(o: { ask: boolean }): Promise<{ sex?: string; birthYear?: number }>;
   /** Opens where Health permissions are changed (or Google Play for Health Connect). Missing on older app builds. */
@@ -279,6 +281,21 @@ const workoutPlugin = (): WorkoutPlugin | undefined =>
   isNative()
     ? (window as unknown as { Capacitor?: { Plugins?: { HealthWorkout?: WorkoutPlugin } } }).Capacitor?.Plugins?.HealthWorkout
     : undefined;
+
+/**
+ * Takes a deleted workout out of Health Connect or Apple Health: the workout session this app saved under its
+ * session id (with, on iOS, the calories and heart rate inside it). Only our own records can go; false when there
+ * was nothing to remove or the phone can't (the web, an older app build).
+ */
+export async function removeWorkout(id: string, span?: { start: number; end: number }): Promise<boolean> {
+  const plugin = workoutPlugin();
+  if (!plugin?.remove) return false;
+  try {
+    return (await plugin.remove({ id, ...span })).removed;
+  } catch {
+    return false;
+  }
+}
 
 /** Whether finished workouts may be saved as workouts (Health Connect's exercise permission, Apple Health's workouts). */
 export async function workoutsAllowed(): Promise<boolean> {

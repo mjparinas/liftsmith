@@ -224,7 +224,7 @@ export const fr: FeaturesText = {
     },
     "edit-history": {
       name: "Modifier les séances passées et les refaire",
-      body: "Corrigez une série, ajoutez une note, nommez une séance ou refaites-la, et chaque mouvement a sa page avec son historique.",
+      body: "Corrigez une série, ajoutez une note, nommez une séance ou refaites-la, et chaque mouvement a sa page avec son historique. Supprimez-en une avec Annuler, et toutes les stats sont recalculées.",
     },
     "exercise-stats": {
       name: "Statistiques de chaque exercice",

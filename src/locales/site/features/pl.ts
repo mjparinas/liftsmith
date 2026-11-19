@@ -273,7 +273,7 @@ export const pl: FeaturesText = {
     },
     "edit-history": {
       name: "Edytuj dawne treningi i powtarzaj je",
-      body: "Popraw serię, dodaj notatkę, nazwij trening albo go powtórz, a każde ćwiczenie ma własną stronę z historią.",
+      body: "Popraw serię, dodaj notatkę, nazwij trening albo go powtórz, a każde ćwiczenie ma własną stronę z historią. Usuń trening z opcją Cofnij, a wszystkie statystyki zostaną przeliczone.",
     },
     "exercise-stats": {
       name: "Statystyki każdego ćwiczenia",

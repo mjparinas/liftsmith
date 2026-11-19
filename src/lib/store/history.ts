@@ -1,8 +1,10 @@
 import { track } from "../analytics";
 import { derive } from "../derive";
-import { editSet, removeSet, setSessionNote, workoutEventIds, type EventChange } from "../editHistory";
+import { editSet, removeSet, restoreWorkout, setSessionNote, workoutEventIds, type EventChange } from "../editHistory";
 import { repeatPlan } from "../ghost";
 import { appendEvents, deleteEvents } from "../localdb";
+import type { AppEvent } from "../types";
+import { afterDelete, cancelDelete } from "../workoutDelete";
 import { uid, type Ctx } from "./shared";
 
 // Finished workouts: fixing a set, taking one out, deleting a whole workout, naming it and writing a note
@@ -14,8 +16,13 @@ export interface HistorySlice {
   editPastSet(setId: string, change: { weight: number; reps: number }): void;
   /** Takes a set out of a finished workout (its last set takes the whole workout). */
   removePastSet(setId: string): void;
-  /** Deletes a finished workout and everything logged with it. */
-  deleteWorkout(sessionId: string): void;
+  /**
+   * Deletes a finished workout and everything logged with it; every stat is derived again from what's left. Its
+   * Health copy and Friends post go once Undo is over (workoutDelete.ts). True when something was deleted.
+   */
+  deleteWorkout(sessionId: string): boolean;
+  /** Brings back the workout deleted last (Undo), under new event ids. False when there's nothing to bring back. */
+  undoDeleteWorkout(): boolean;
   /** The workout's own name and note (both empty clears them). */
   noteWorkout(sessionId: string, input: { name: string; text: string }): void;
   /** Today's plan becomes this past workout's exercises and set counts. False when nothing in it can be done here. */
@@ -36,6 +43,8 @@ export function historySlice(c: Ctx): HistorySlice {
   };
   // A finished workout only: the one running now changes through the workout screen.
   const finished = (sessionId: string) => get().active?.sessionId !== sessionId;
+  // The workout deleted last, for Undo (in memory only: Undo is a few seconds on screen).
+  let lastDeleted: { sessionId: string; events: AppEvent[] } | null = null;
   const sessionOf = (setId: string) => {
     const e = get().events.find((x) => x.id === setId);
     return e?.type === "set" ? e.sessionId : undefined;
@@ -60,11 +69,28 @@ export function historySlice(c: Ctx): HistorySlice {
     },
 
     deleteWorkout(sessionId) {
-      if (!finished(sessionId)) return;
-      if (apply({ add: [], remove: workoutEventIds(get().events, sessionId) })) {
-        track("feature", { name: "delete_workout" });
-        get().replan();
-      }
+      if (!finished(sessionId)) return false;
+      const ids = new Set(workoutEventIds(get().events, sessionId));
+      const removed = get().events.filter((e) => ids.has(e.id));
+      if (!apply({ add: [], remove: [...ids] })) return false;
+      lastDeleted = { sessionId, events: removed };
+      const start = removed.find((e) => e.type === "sessionStart")?.at;
+      const end = removed.find((e) => e.type === "sessionEnd")?.at;
+      afterDelete(sessionId, start !== undefined && end !== undefined ? { start, end } : undefined);
+      track("feature", { name: "delete_workout" });
+      get().replan();
+      return true;
+    },
+
+    undoDeleteWorkout() {
+      const last = lastDeleted;
+      lastDeleted = null;
+      if (!last) return false;
+      cancelDelete(last.sessionId);
+      if (!apply({ add: restoreWorkout(last.events, uid), remove: [] })) return false;
+      track("feature", { name: "undo_delete_workout" });
+      get().replan();
+      return true;
     },
 
     noteWorkout(sessionId, input) {

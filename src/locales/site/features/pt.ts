@@ -273,7 +273,7 @@ export const pt: FeaturesText = {
     },
     "edit-history": {
       name: "Edite treinos passados e repita",
-      body: "Corrija uma série, adicione uma anotação, dê nome a um treino ou repita, e cada exercício tem sua própria página com o histórico.",
+      body: "Corrija uma série, adicione uma anotação, dê nome a um treino ou repita, e cada exercício tem sua própria página com o histórico. Exclua um com opção de desfazer, e todas as estatísticas são recalculadas.",
     },
     "exercise-stats": {
       name: "Estatísticas de cada exercício",
