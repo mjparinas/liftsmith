@@ -733,6 +733,7 @@ export const emails: Record<string, Words> = {
       "Dlaczego? pod celem pokazuje regułę, która go ustaliła.",
       "Wyślij opinię lub zgłoś błąd z Ustawień; trafia do zespołu razem z tym, czego trzeba, żeby go naprawić.",
       "Strona Funkcje na stronie internetowej wymienia wszystko, co robi aplikacja, i co nowego.",
+      "Nie możesz znaleźć ustawienia? Wpisz słowo w wyszukiwarkę na górze Ustawień, a przeniesie Cię prosto do niego.",
     ],
     dyk: "Wersja i numer kompilacji na dole Ustawień pomagają nam szybciej znaleźć twój błąd.",
   },

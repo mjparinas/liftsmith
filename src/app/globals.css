@@ -158,6 +158,14 @@
   background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--color-gold) 55%, transparent) 100%);
   animation: gold-flash 900ms ease-out forwards;
 }
+/* The setting a Settings search picked (settingsJump.ts): a ring in the accent for a moment. A ring, not a
+   colour change, so it shows in every theme and with forced colours; Lean mode keeps it and drops the fade. */
+.setting-hit {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 1rem;
+  transition: outline-color 300ms ease-out;
+}
 @keyframes beat {
   0%, 100% { transform: scale(1); }
   15% { transform: scale(1.22); }

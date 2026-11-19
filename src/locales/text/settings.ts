@@ -29,6 +29,9 @@ export const en = {
   "settings.vibration": "Vibration",
   "settings.quote": "Daily quote on Today",
   "settings.lean": "Lean mode",
+  "settings.search": "Search settings",
+  "settings.searchCount": { one: "{count} setting found", other: "{count} settings found" },
+  "settings.searchNone": "No settings match “{q}”.",
   "settings.lean.note":
     "Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.",
   "settings.liteDemos": "Battery saver for 3D figures",
@@ -117,6 +120,9 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.vibration": "Vibración",
   "settings.quote": "Cita del día en Hoy",
   "settings.lean": "Modo sobrio",
+  "settings.search": "Buscar en ajustes",
+  "settings.searchCount": { one: "{count} ajuste encontrado", other: "{count} ajustes encontrados" },
+  "settings.searchNone": "Ningún ajuste coincide con «{q}».",
   "settings.lean.note":
     "El modo sobrio quita el confeti, los sonidos de celebración y las animaciones. Los sonidos del temporizador y la vibración siguen. La XP, las rachas y las insignias cuentan igual.",
   "settings.liteDemos": "Ahorro de batería en las figuras 3D",
@@ -208,6 +214,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.vibration": "Vibration",
   "settings.quote": "Citation du jour sur Aujourd’hui",
   "settings.lean": "Mode sobre",
+  "settings.search": "Rechercher dans les réglages",
+  "settings.searchCount": { one: "{count} réglage trouvé", other: "{count} réglages trouvés" },
+  "settings.searchNone": "Aucun réglage ne correspond à « {q} ».",
   "settings.lean.note":
     "Le mode sobre coupe les confettis, les sons de célébration et les animations. Les sons du minuteur et les vibrations restent. L’XP, les séries et les badges comptent toujours.",
   "settings.liteDemos": "Économie de batterie pour les figures 3D",
@@ -299,6 +308,9 @@ export const de: Partial<Record<Key, Message>> = {
   "settings.vibration": "Vibration",
   "settings.quote": "Tageszitat unter Heute",
   "settings.lean": "Schlank-Modus",
+  "settings.search": "Einstellungen durchsuchen",
+  "settings.searchCount": { one: "{count} Einstellung gefunden", other: "{count} Einstellungen gefunden" },
+  "settings.searchNone": "Keine Einstellung passt zu „{q}“.",
   "settings.lean.note":
     "Der Schlank-Modus schaltet Konfetti, Jubeltöne und Animationen aus. Pausentimer-Töne und Haptik bleiben an. XP, Serien und Abzeichen zählen in jedem Fall weiter.",
   "settings.liteDemos": "Akkusparen bei 3D-Figuren",
@@ -387,6 +399,9 @@ export const it: Partial<Record<Key, Message>> = {
   "settings.vibration": "Vibrazione",
   "settings.quote": "Citazione del giorno in Oggi",
   "settings.lean": "Modalità essenziale",
+  "settings.search": "Cerca nelle impostazioni",
+  "settings.searchCount": { one: "{count} impostazione trovata", other: "{count} impostazioni trovate" },
+  "settings.searchNone": "Nessuna impostazione corrisponde a «{q}».",
   "settings.lean.note":
     "La modalità essenziale disattiva coriandoli, suoni di festa e animazioni. Suoni e vibrazioni del timer di riposo restano. XP, serie e badge continuano a contare in ogni caso.",
   "settings.liteDemos": "Risparmio batteria per le figure 3D",
@@ -477,6 +492,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "settings.vibration": "バイブレーション",
   "settings.quote": "「今日」に毎日の名言を表示",
   "settings.lean": "リーンモード",
+  "settings.search": "設定を検索",
+  "settings.searchCount": { other: "{count} 件の設定" },
+  "settings.searchNone": "「{q}」に一致する設定はありません。",
   "settings.lean.note":
     "リーンモードでは紙吹雪、お祝いのサウンド、アニメーションがオフになります。休憩タイマーの音と振動はそのまま。XP、連続記録、バッジはどちらでもカウントされます。",
   "settings.liteDemos": "3D フィギュアの省電力",
@@ -567,6 +585,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "settings.vibration": "Vibração",
   "settings.quote": "Frase do dia em Hoje",
   "settings.lean": "Modo enxuto",
+  "settings.search": "Buscar nas configurações",
+  "settings.searchCount": { one: "{count} configuração encontrada", other: "{count} configurações encontradas" },
+  "settings.searchNone": "Nenhuma configuração corresponde a “{q}”.",
   "settings.lean.note":
     "O Modo enxuto desliga confetes, sons de comemoração e animações. Os sons e a vibração do timer de descanso continuam. XP, sequências e insígnias continuam contando de qualquer jeito.",
   "settings.liteDemos": "Economia de bateria nas figuras 3D",
@@ -658,6 +679,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "settings.vibration": "진동",
   "settings.quote": "오늘 화면에 오늘의 명언",
   "settings.lean": "간결 모드",
+  "settings.search": "설정 검색",
+  "settings.searchCount": { other: "설정 {count}개" },
+  "settings.searchNone": "“{q}”와 일치하는 설정이 없어요.",
   "settings.lean.note":
     "간결 모드는 색종이 효과, 축하 소리, 애니메이션을 꺼요. 휴식 타이머 소리와 진동은 그대로예요. XP, 연속 기록, 배지는 어느 쪽이든 계속 쌓여요.",
   "settings.liteDemos": "3D 모델 배터리 절약",
@@ -749,6 +773,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "settings.vibration": "Titreşim",
   "settings.quote": "Bugün'de günün sözü",
   "settings.lean": "Sade mod",
+  "settings.search": "Ayarlarda ara",
+  "settings.searchCount": { one: "{count} ayar bulundu", other: "{count} ayar bulundu" },
+  "settings.searchNone": "“{q}” ile eşleşen ayar yok.",
   "settings.lean.note":
     "Sade mod konfetiyi, kutlama seslerini ve animasyonları kapatır. Dinlenme sayacı sesleri ve titreşimler açık kalır. XP, seriler ve rozetler her durumda sayılmaya devam eder.",
   "settings.liteDemos": "3B figürler için pil tasarrufu",
@@ -843,6 +870,14 @@ export const pl: Partial<Record<Key, Message>> = {
   "settings.vibration": "Wibracje",
   "settings.quote": "Codzienny cytat w Dziś",
   "settings.lean": "Tryb oszczędny",
+  "settings.search": "Szukaj w ustawieniach",
+  "settings.searchCount": {
+    one: "Znaleziono {count} ustawienie",
+    few: "Znaleziono {count} ustawienia",
+    many: "Znaleziono {count} ustawień",
+    other: "Znaleziono {count} ustawienia",
+  },
+  "settings.searchNone": "Żadne ustawienie nie pasuje do „{q}”.",
   "settings.lean.note":
     "Tryb oszczędny wyłącza konfetti, dźwięki świętowania i animacje. Dźwięki i wibracje minutnika przerwy zostają. XP, passa i odznaki liczą się tak czy inaczej.",
   "settings.liteDemos": "Oszczędzanie baterii dla modeli 3D",

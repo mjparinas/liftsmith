@@ -543,6 +543,10 @@ export const it: FeaturesText = {
       name: "Dieci lingue",
       body: "Inglese, spagnolo, francese, tedesco, italiano, giapponese, portoghese brasiliano, coreano, polacco e turco, secondo la lingua del telefono o del browser, oppure quella che scegli nella schermata di benvenuto e nelle impostazioni.",
     },
+    "settings-search": {
+      name: "Cerca nelle impostazioni",
+      body: "Scrivi una parola in cima alle Impostazioni e compare ogni impostazione che corrisponde, con dove si trova. Toccala e si apre con quell'impostazione in vista.",
+    },
     appearance: {
       name: "Scuro, chiaro o come il telefono",
       body: "Un aspetto scuro di base, uno chiaro, o quello che usa il tuo telefono.",

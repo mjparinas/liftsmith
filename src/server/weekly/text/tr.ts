@@ -734,6 +734,7 @@ export const emails: Record<string, Words> = {
       "Bir hedefin altındaki Neden?, onu belirleyen kuralı gösterir.",
       "Ayarlar'dan geri bildirim gönder ya da hata bildir; düzeltmek için gerekenlerle birlikte ekibe ulaşır.",
       "Web sitesindeki Özellikler sayfası, uygulamanın yaptığı her şeyi ve yenilikleri listeler.",
+      "Bir ayarı bulamıyor musun? Ayarlar'ın en üstündeki arama kutusuna bir kelime yaz, seni doğrudan oraya götürsün.",
     ],
     dyk: "Ayarlar'ın en altındaki sürüm ve derleme numarası, hatanı daha hızlı bulmamıza yardımcı olur.",
   },

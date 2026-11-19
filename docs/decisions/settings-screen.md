@@ -28,6 +28,16 @@ Melvin asked on 2026-11-10 whether Settings had too much. The audit found one lo
 - The note at the foot of Settings says where the data lives: signed in, "saved on this device and synced to your account" (`settings.footer.synced`); signed out, "saved on this device only" (`settings.footer.local`). It used to say "everything is stored on this device" for everyone, which was wrong once accounts and sync landed.
 - Sonos is first on Settings › Labs (`LABS` in `src/lib/labs.ts`); the rest keep their order.
 
+## Search (Melvin, 2026-11-19)
+
+Picked from ideas borrowed from an open-source sat-nav app's settings index (Horizon Maps, GPL-3.0; the idea only, our own code).
+
+- **A search box at the top of Settings** (`SettingsSearch` in `Settings.tsx`), above the Pro card. While it holds words, the rest of the page steps aside for the matching settings, each a row with the setting's name and where it lives (Workout, Look and feel, Workout preferences, Labs…); a screen reader hears how many matched or "No settings match". Empty again, Settings is as before.
+- **The index is the app's own words** (`SETTINGS_INDEX` in `src/lib/settingsIndex.ts`): each entry is the catalogue key of the label its page already shows, plus optional `also` keys (a control's choices: Dark, Light; Kilograms, Pounds), so it speaks all ten languages with no new text except the box's own three lines. Matching folds case and accents, needs every word, looks in the app's language and English, and ranks labels that start with the query first. Every lab is found by its name and opens Labs (or Pro without it).
+- **A pick opens the setting in view** (`src/lib/settingsJump.ts`): the search hands the label over, the page that opens (a group page, Labs, Workout preferences) finds the element showing exactly those words, scrolls it to the middle and rings it in the accent for under two seconds (`.setting-hit`, an outline so it shows in every theme and with forced colours; Lean mode keeps the ring and drops the fade). No setting needs an id. Screens of their own (Account, Gyms, Connected apps, Coaching, Injuries, feedback, Community, Pro) just open.
+- **Keep it current:** a new setting gets a line in `SETTINGS_INDEX` in the same change. `settingsIndex.test.ts` checks each key is a real plain catalogue line; `Settings.test.tsx` searches, opens and checks the ring.
+- Pure web code, so Android, iOS and the web get it together. Typing is the fallback here: the group rows stay for browsing.
+
 ## Tests
 
 `Settings.test.tsx` (order, groups, deep links, training days setting days a week, body weight read-only), the App and Delight tests open the group pages, and `scripts/e2e-a11y.mjs` runs axe on every group page.

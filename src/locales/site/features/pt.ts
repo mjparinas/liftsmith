@@ -611,6 +611,10 @@ export const pt: FeaturesText = {
       name: "Dez idiomas",
       body: "Inglês, espanhol, francês, alemão, italiano, japonês, português do Brasil, coreano, polonês e turco, seguindo o idioma do seu celular ou navegador, ou o que você escolher na tela de boas-vindas e nos ajustes.",
     },
+    "settings-search": {
+      name: "Buscar nas configurações",
+      body: "Digite uma palavra no topo das Configurações e cada configuração que corresponde aparece com onde fica. Toque e ela abre com essa configuração à vista.",
+    },
     appearance: {
       name: "Escuro, claro ou igual ao celular",
       body: "Visual escuro por padrão, um claro ou o que o seu celular estiver usando.",

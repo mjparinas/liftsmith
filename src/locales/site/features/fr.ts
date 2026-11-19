@@ -550,6 +550,10 @@ export const fr: FeaturesText = {
       name: "Dix langues",
       body: "Anglais, espagnol, français, allemand, italien, japonais, portugais du Brésil, coréen, polonais et turc, selon la langue de votre téléphone ou de votre navigateur, ou celle que vous choisissez sur l’écran d’accueil et dans les réglages.",
     },
+    "settings-search": {
+      name: "Rechercher dans les réglages",
+      body: "Tapez un mot en haut des Réglages et chaque réglage correspondant s'affiche avec son emplacement. Touchez-le et il s'ouvre, ce réglage bien en vue.",
+    },
     appearance: {
       name: "Sombre, clair ou comme votre téléphone",
       body: "Un thème sombre par défaut, un thème clair, ou celui de votre téléphone.",

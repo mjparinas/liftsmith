@@ -611,6 +611,10 @@ export const tr: FeaturesText = {
       name: "On dil",
       body: "İngilizce, İspanyolca, Fransızca, Almanca, İtalyanca, Japonca, Brezilya Portekizcesi, Korece, Lehçe ve Türkçe; telefonunun ya da tarayıcının dilini takip eder veya karşılama ekranında ve ayarlarda istediğini seçersin.",
     },
+    "settings-search": {
+      name: "Ayarlarda ara",
+      body: "Ayarlar'ın en üstüne bir kelime yaz, eşleşen her ayar nerede olduğuyla birlikte görünsün. Dokun, o ayar görünür şekilde açılsın.",
+    },
     appearance: {
       name: "Koyu, açık ya da telefonuna uygun",
       body: "Varsayılan olarak koyu bir görünüm, açık bir görünüm ya da telefonun hangisini kullanıyorsa o.",

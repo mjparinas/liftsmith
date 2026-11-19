@@ -755,6 +755,7 @@ export const emails: Record<string, Words> = {
       "Why? under a target shows the rule that set it.",
       "Send feedback or report a bug from Settings; it reaches the team with what's needed to fix it.",
       "The Features page on the website lists everything the app does, and what's new.",
+      "Can't find a setting? Type a word into the search box at the top of Settings and it takes you straight there.",
     ],
     dyk: "The version and build at the foot of Settings help us find your bug faster.",
   },
