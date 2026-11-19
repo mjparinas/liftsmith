@@ -817,7 +817,16 @@ Team sessions put one workout for your whole team on one tablet.
 - End it and each athlete's sets are saved to their own account.
 Did you know? No reception in the weight room? Sets wait on the tablet and go up when it's back. ([School teams](school-teams.md) "Team sessions")
 
-### W73 · Training through pregnancy and after birth (**New**, 2026-11-19)
+### W73 · Every location of your gym chain (**New**, 2026-11-19)
+Free · Lifters · No screenshot (a chain's page needs gyms from the server) · `fresh`, so it goes next to everyone already in the series
+Gyms that belong to a chain now show its logo and a link to every one of its locations.
+- On a chain gym's page, tap See all locations under its name.
+- The list starts with the branches nearest where you last looked for gyms.
+- Tap a branch to see its hours and add it with its equipment in one tap.
+- On the website, each chain has its own page listing every branch.
+Did you know? Train at two branches? Add both as gyms and Liftsmith plans each workout for the equipment where you are. ([Gyms](gyms.md) "Gym chains")
+
+### W74 · Training through pregnancy and after birth (**New**, 2026-11-19)
 Free · Lifters, but not accounts whose synced profile says male (`notMale`) · Screenshot of the setting · `fresh`, so it goes next to everyone already in the series
 Pregnancy and postpartum mode changes every workout with the week, the way injury mode does.
 - Set it up in Settings › Body and units: pick pregnant or had my baby, then the weeks on a stepper.

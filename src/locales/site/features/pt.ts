@@ -386,6 +386,11 @@ export const pt: FeaturesText = {
       name: "Horários de aulas nas páginas das academias",
       body: "Academias oficiais publicam as aulas de cada semana, com instrutor e sala, e marcam os dias sem aula. Quem treina lá vê a semana na página da academia no app e na web, e adiciona a próxima aula à agenda com um toque.",
     },
+    "gym-chains": {
+      name: "Todas as unidades de uma rede",
+      body: "Academias de uma rede mostram o logo dela e levam a uma página com todas as unidades, no app as mais próximas primeiro. No site, cada rede tem sua própria página.",
+      note: "Reconhecemos as redes pela marca no mapa ou por um nome usado por academias em várias cidades. Academias reivindicadas mantêm o próprio logo.",
+    },
     "gym-open-now": {
       name: "Aberto agora na busca de academias",
       body: "As academias perto de você mostram se estão abertas agora e quando fecham ou abrem de novo, e um toque em Aberto agora mostra só as que você pode visitar já.",

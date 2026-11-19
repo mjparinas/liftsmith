@@ -160,6 +160,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("routine-library", "free", "library", { fresh: "2026-11-19", shot: false }),
   // New, 2026-11-19: team sessions on one tablet for school coaches (docs/decisions/school-teams.md "Team sessions").
   R("team-session", "school", "free", "trainer/teams", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: every location of a gym chain, with its shared logo (docs/decisions/gyms.md "Gym chains").
+  L("gym-chains", "free", "gym", { fresh: "2026-11-19", shot: false }),
   // New, 2026-11-19: pregnancy and postpartum mode (docs/decisions/pregnancy.md). Not to accounts that say male.
   L("pregnancy", "free", "settings/body", { fresh: "2026-11-19", notMale: true }),
 ];

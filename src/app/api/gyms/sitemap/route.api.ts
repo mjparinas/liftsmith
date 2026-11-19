@@ -1,8 +1,9 @@
 // GET /sitemap-gyms.xml (rewritten here): the gym finder's pages (src/server/gymPage.ts), listed in robots.txt next to
-// the site's own sitemap: /gyms/, every city with gyms, every gym that isn't hidden or a studio, and the trainer
+// the site's own sitemap: /gyms/, every city with gyms, every gym that isn't hidden or a studio, gym chains with three locations or more (gymChains.ts), and the trainer
 // directory's cities with enough people listed (trainerPage.ts), coaches' listed programs (programPage.ts) and the
 // community's pages (communityPage.ts) and the public routine library (libraryPage.ts). Server build only.
 import { communityEntries, publicBoard } from "@/server/communityPage";
+import { keptSitemapChains } from "@/server/gymChains";
 import { gymSitemapXml } from "@/server/gymPage";
 import { keptCities, keptSitemapGyms } from "@/server/gymPlaces";
 import { libraryEntries, publicRoutines } from "@/server/libraryPage";
@@ -13,9 +14,10 @@ import { directoryEntries } from "@/server/trainerPage";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const [list, gyms, trainers, programs, community, routines] = await Promise.all([
+  const [list, gyms, chains, trainers, programs, community, routines] = await Promise.all([
     keptCities().catch(() => []),
     keptSitemapGyms().catch(() => []),
+    keptSitemapChains().catch(() => []),
     trainerCities().catch(() => []),
     publicPrograms().catch(() => []),
     publicBoard().catch(() => ({ posts: [], shipped: [] })),
@@ -26,6 +28,7 @@ export async function GET() {
     { path: "/gyms/", lastModified: newest },
     ...list.map((c) => ({ path: `/gyms/${c.citySlug}/`, lastModified: c.updatedAt })),
     ...gyms,
+    ...(chains.length ? [{ path: "/gym-chains/", lastModified: Math.max(...chains.map((c) => c.lastModified)) }, ...chains] : []),
     ...directoryEntries(trainers, newest),
     ...programEntries(programs),
     ...communityEntries(community.posts, community.shipped),

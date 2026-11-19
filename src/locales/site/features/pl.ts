@@ -386,6 +386,11 @@ export const pl: FeaturesText = {
       name: "Grafiki zajęć na stronach siłowni",
       body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
     },
+    "gym-chains": {
+      name: "Wszystkie lokalizacje sieci siłowni",
+      body: "Siłownie należące do sieci pokazują jej logo i prowadzą do strony ze wszystkimi lokalizacjami, w aplikacji od najbliższych. Na stronie internetowej każda sieć ma własną stronę.",
+      note: "Sieci rozpoznajemy po marce na mapie albo po nazwie, którą noszą siłownie w kilku miastach. Przejęte siłownie zachowują własne logo.",
+    },
     "gym-open-now": {
       name: "Otwarte teraz w wyszukiwarce siłowni",
       body: "Siłownie w pobliżu pokazują, czy są teraz otwarte i kiedy zamykają lub znów otwierają, a jedno dotknięcie Otwarte teraz zostawia tylko te, do których możesz wejść od razu.",

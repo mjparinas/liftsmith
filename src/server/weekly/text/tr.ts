@@ -988,6 +988,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ağırlık salonunda çekim yok mu? Setler tablette bekler ve bağlantı gelince gönderilir.",
   },
+  "gym-chains": {
+    title: "Zincirinin tüm şubeleri",
+    intro: "Bir zincire ait salonlar artık zincirin logosunu ve tüm şubelerine giden bir bağlantıyı gösteriyor.",
+    points: [
+      "Zincir salonunun sayfasında, adının altındaki tüm şubeleri gör'e dokun.",
+      "Liste, en son salon aradığın yere en yakın şubelerle başlar.",
+      "Saatlerini görmek ve ekipmanıyla tek dokunuşla eklemek için bir şubeye dokun.",
+      "Web sitesinde her zincirin tüm şubelerini listeleyen kendi sayfası var.",
+    ],
+    dyk: "İki şubede mi çalışıyorsun? İkisini de salon olarak ekle, Liftsmith her antrenmanı bulunduğun yerin ekipmanına göre planlasın.",
+  },
   pregnancy: {
     title: "Hamilelikte ve doğumdan sonra antrenman",
     intro: "Hamilelik ve doğum sonrası modu, sakatlık modu gibi her antrenmanı haftana göre değiştirir.",

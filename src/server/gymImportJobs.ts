@@ -10,6 +10,8 @@
 //    empty fields. It stops for the day at the AI cap or when AI is switched off, and the next daily job carries on.
 // 4. **tidy** (worldwide job only): city names that are postcodes or house numbers and untidy addresses are fixed
 //    (gymRepair.ts), so pages land under real cities.
+// 5. **chains**: each chain's branches are counted and its logo and website picked (gymChains.ts refreshChains); the
+//    worldwide job first gives gyms whose names repeat across cities their chain (chainStep).
 //
 // A worker holds the job's lease (`lease_until`), works for up to its own time, writes everything as it goes, and when
 // its time runs out hands over to a fresh invocation of /api/cron/gym-imports/ (`kickWorker`). That cron route also
@@ -25,6 +27,7 @@ import { resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { COUNTRIES } from "./countries";
 import { batch, query, run } from "./db";
 import { autoFillBatch } from "./gymAutoFill";
+import { chainStep, refreshChainsQuietly } from "./gymChains";
 import { enrichBatch } from "./gymEnrich";
 import { describeItem, importItem, SINCE_KEY, type ImportResult } from "./gymImport";
 import { repairStep } from "./gymRepair";
@@ -61,7 +64,7 @@ export const JOB_LIMITS = {
 
 export type JobState = "running" | "stopped" | "done";
 export type JobKind = "world" | "daily";
-export type JobPhase = "map" | "web" | "ai" | "tidy" | "done";
+export type JobPhase = "map" | "web" | "ai" | "tidy" | "chains" | "done";
 type ItemState = "pending" | "running" | "waiting" | "ok" | "failed";
 type Ok = Extract<ImportResult, { ok: true }>;
 
@@ -98,6 +101,8 @@ export interface JobStatus {
   web: { read: number; filled: number };
   ai: { read: number; filled: number };
   tidy: { fixed: number };
+  /** Gyms the chains step put in a chain by their name (worldwide job). */
+  chains: { chained: number };
   /** Why a step stopped short (AI off or over its cap), shown on the page. */
   note: string;
 }
@@ -217,7 +222,7 @@ const line = (r: Record<string, unknown>): CityLine => ({
   r: parse<CityResult>(r.result, { ok: false, error: "No result." }),
 });
 
-const PHASES: readonly JobPhase[] = ["map", "web", "ai", "tidy", "done"];
+const PHASES: readonly JobPhase[] = ["map", "web", "ai", "tidy", "chains", "done"];
 
 /** The job the page shows: the one running, else the latest not closed. Null when there's none. */
 export async function jobStatus(id?: string): Promise<JobStatus | null> {
@@ -272,6 +277,7 @@ export async function jobStatus(id?: string): Promise<JobStatus | null> {
     web: { read: Number(job.web_read ?? 0), filled: Number(job.web_filled ?? 0) },
     ai: { read: Number(job.ai_read ?? 0), filled: Number(job.ai_filled ?? 0) },
     tidy: { fixed: Number(job.tidy_fixed ?? 0) },
+    chains: { chained: Number(job.chain_fixed ?? 0) },
     note: String(job.note ?? ""),
   };
 }
@@ -337,6 +343,8 @@ export interface WorkerOptions {
   /** Whether the AI step is switched on (tests). */
   aiOn?: () => Promise<boolean>;
   tidy?: (after: string) => ReturnType<typeof repairStep>;
+  chains?: (after: string) => ReturnType<typeof chainStep>;
+  refreshChains?: () => Promise<unknown>;
   sleep?: (ms: number) => Promise<void>;
   mail?: Mailer | null;
   /** The pause before the second lane starts, so two lanes don't hit the map servers at the same moment. */
@@ -489,7 +497,7 @@ export async function runWorker(opts: WorkerOptions = {}): Promise<WorkerResult>
     // The AI step: what the site's code didn't give, Claude reads from the page; it stops at the day's cap. Switched off
     // in Admin › Gyms (the gymImportAi flag), the job goes straight on.
     if (phase === "ai" && !(await (opts.aiOn ?? importAiOn)()))
-      await setPhase(kind === "world" ? "tidy" : "done", "AI step skipped: it's switched off in Admin › Gyms › Import.");
+      await setPhase(kind === "world" ? "tidy" : "chains", "AI step skipped: it's switched off in Admin › Gyms › Import.");
     while (phase === "ai" && timeFor(JOB_LIMITS.stepMs) && (await stillRunning())) {
       const b = await (opts.autoFill ?? (() => autoFillBatch()))();
       await run("UPDATE gym_import_jobs SET ai_read = ai_read + ?, ai_filled = ai_filled + ? WHERE id = ?", [
@@ -498,7 +506,7 @@ export async function runWorker(opts: WorkerOptions = {}): Promise<WorkerResult>
         id,
       ]);
       await touch();
-      const next = kind === "world" ? "tidy" : "done";
+      const next = kind === "world" ? "tidy" : "chains";
       if (b.stopped) await setPhase(next, `AI stopped: ${b.stopped} The next daily run carries on.`);
       else if (!b.more) await setPhase(next);
     }
@@ -512,7 +520,23 @@ export async function runWorker(opts: WorkerOptions = {}): Promise<WorkerResult>
         id,
       ]);
       await touch();
-      if (!step.next) await setPhase("done");
+      if (!step.next) await setPhase("chains");
+    }
+    // Gym chains: the worldwide job first matches every gym's name to the chains (gymChains.ts chainStep, a page of
+    // gyms a step); both jobs then count each chain's branches and pick its logo.
+    while (phase === "chains" && timeFor(JOB_LIMITS.stepMs) && (await stillRunning())) {
+      let next = "";
+      if (kind === "world") {
+        const [row] = await query<{ chain_after: string }>("SELECT chain_after FROM gym_import_jobs WHERE id = ?", [id]);
+        const step = await (opts.chains ?? ((a: string) => chainStep(a)))(String(row?.chain_after ?? ""));
+        next = step.next;
+        await run("UPDATE gym_import_jobs SET chain_after = ?, chain_fixed = chain_fixed + ? WHERE id = ?", [step.next, step.chained, id]);
+      }
+      if (!next) {
+        await (opts.refreshChains ?? refreshChainsQuietly)();
+        await setPhase("done");
+      }
+      await touch();
     }
   } finally {
     // Items this worker started and didn't finish (it can't happen short of a crash) go back in line.
@@ -552,7 +576,7 @@ export async function emailDone(id: string, mail: Mailer | null): Promise<boolea
   const lines = [
     `The gym import of ${s.label} is done in ${mins(s.endedAt - s.startedAt)}: ${s.done - failed.length} of ${s.total} areas imported.`,
     `Gyms: ${s.sums.found} found, ${s.sums.added} new, ${s.sums.updated} changed${s.sums.kept ? `, ${s.sums.kept} claimed or added by lifters left alone` : ""}.`,
-    `Websites: ${s.web.read} read, ${s.web.filled} gyms got details. AI: ${s.ai.read} read, ${s.ai.filled} gyms got details.${s.tidy.fixed ? ` ${s.tidy.fixed} city names or addresses tidied.` : ""}`,
+    `Websites: ${s.web.read} read, ${s.web.filled} gyms got details. AI: ${s.ai.read} read, ${s.ai.filled} gyms got details.${s.tidy.fixed ? ` ${s.tidy.fixed} city names or addresses tidied.` : ""}${s.chains.chained ? ` ${s.chains.chained} gyms put in their chain by name.` : ""}`,
     ...(s.note ? [s.note] : []),
     ...(failed.length
       ? [

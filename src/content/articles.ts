@@ -23,6 +23,7 @@ import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_FORM_VIDEOS } from "./blog/formVideos";
 import { BLOG_G } from "./blog/g";
+import { BLOG_GYM_CHAINS } from "./blog/gymChains";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
 import { BLOG_GYM_OPEN_NOW } from "./blog/gymOpenNow";
 import { BLOG_H } from "./blog/h";
@@ -282,6 +283,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_SEASONS,
   ...BLOG_GYM_CLASSES,
   ...BLOG_GYM_OPEN_NOW,
+  ...BLOG_GYM_CHAINS,
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
   ...BLOG_OUTSIDE_WORKOUTS,

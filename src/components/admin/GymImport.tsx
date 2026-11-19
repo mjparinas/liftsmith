@@ -166,8 +166,14 @@ export function GymImport({ admin, changed }: { admin: boolean; changed: () => v
           postcodes and untidy addresses are fixed, and moved pages redirect.
         </p>
         <p>
-          Every day at 10:00 UTC the daily refresh adds gyms that are new or changed on the map anywhere, and carries on the website and AI
-          steps.
+          Gym chains come last: a gym is a chain&apos;s branch when the map names its brand, or when its name is a chain&apos;s name (a name
+          used by three or more gyms in three or more cities, unless it&apos;s only common words like Fitness Centre). Each chain gets a
+          page listing every branch, and its logo (the sharpest icon from the site most of its branches link to) shows on every unclaimed
+          branch. Claimed gyms keep their own.
+        </p>
+        <p>
+          Every day at 10:00 UTC the daily refresh adds gyms that are new or changed on the map anywhere, carries on the website and AI
+          steps, and recounts the chains.
         </p>
       </HowItWorks>
       {admin && !running && (
@@ -243,8 +249,9 @@ const STEPS: { phase: JobPhase; label: string }[] = [
   { phase: "web", label: "Gym websites" },
   { phase: "ai", label: "AI for what's missing" },
   { phase: "tidy", label: "City names and addresses" },
+  { phase: "chains", label: "Gym chains" },
 ];
-const ORDER: JobPhase[] = ["map", "web", "ai", "tidy", "done"];
+const ORDER: JobPhase[] = ["map", "web", "ai", "tidy", "chains", "done"];
 
 /** Where each step is: done, running now or still to come. */
 export function stepState(job: Pick<JobStatus, "phase" | "state">, step: JobPhase): "done" | "now" | "next" {
@@ -288,6 +295,7 @@ function JobCard({
     web: `${job.web.read} read, ${job.web.filled} gyms got details`,
     ai: `${job.ai.read} read, ${job.ai.filled} gyms got details`,
     tidy: `${job.tidy.fixed} city names or addresses fixed`,
+    chains: job.kind === "world" ? `${job.chains.chained} gyms put in their chain by name, logos picked` : "Branches counted, logos picked",
     done: "",
   };
   return (

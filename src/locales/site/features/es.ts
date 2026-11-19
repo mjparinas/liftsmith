@@ -323,6 +323,11 @@ export const es: FeaturesText = {
       name: "Horarios de clases en las páginas de gimnasios",
       body: "Los gimnasios oficiales publican las clases que dan cada semana, con instructor y sala, y marcan los días que no hay clase. Quienes entrenan allí ven la semana en la página del gimnasio en la app y la web, y añaden la próxima clase a su calendario con un toque.",
     },
+    "gym-chains": {
+      name: "Todas las sedes de una cadena",
+      body: "Los gimnasios de una cadena muestran su logo y enlazan a una página con todas sus sedes, en la app las más cercanas primero. En la web, cada cadena tiene su propia página.",
+      note: "Reconocemos las cadenas por la marca del mapa o por un nombre que comparten gimnasios de varias ciudades. Los gimnasios reclamados conservan su propio logo.",
+    },
     "gym-open-now": {
       name: "Abierto ahora en el buscador de gimnasios",
       body: "Los gimnasios cercanos dicen si están abiertos ahora y cuándo cierran o vuelven a abrir, y un toque en Abierto ahora muestra solo los que puedes visitar ya.",
