@@ -7,10 +7,12 @@ import { AREA_PINS, findNearby, placeLine, type Found, type Listing, type Place 
 import { decodeGym } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
+import { clockAt, openNow } from "@/lib/openingHours";
 import { fmtNum } from "@/lib/units";
 
 import { Icon } from "./icons";
-import { Button, Skeleton } from "./ui";
+import { OpenNow } from "./OpenNow";
+import { Button, Chip, Skeleton } from "./ui";
 
 // Leaflet and its CSS load only once a search has gyms to show, so the screens around it stay as light as before.
 const GymsMap = lazy(() => import("./GymsMap"));
@@ -43,6 +45,8 @@ export function NearbyGyms({
   const [found, setFound] = useState<Found | null>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  // "Open now" narrows the real gyms to the ones open on the viewer's clock (docs/decisions/gyms.md "Open now").
+  const [openOnly, setOpenOnly] = useState(false);
   const find = async () => {
     haptic("tick");
     setBusy(true);
@@ -91,7 +95,7 @@ export function NearbyGyms({
         {add}
       </div>
     );
-  const row = (key: string, active: boolean, onClick: () => void, title: ReactNode, line: string, pin?: number) => (
+  const row = (key: string, active: boolean, onClick: () => void, title: ReactNode, line: string, pin?: number, extra?: ReactNode) => (
     <li key={key}>
       <button
         id={`near-${key}`}
@@ -114,21 +118,38 @@ export function NearbyGyms({
           )}
           {title}
         </span>
+        {extra && <span className="block text-sm">{extra}</span>}
         <span className="num block text-sm text-muted">{line}</span>
       </button>
     </li>
   );
+  const clock = clockAt(new Date());
+  const hours = new Map(state.places.map((p) => [p.id, openNow(p.hours, clock, p.km)]));
+  const anyHours = [...hours.values()].some(Boolean);
+  const places = openOnly && anyHours ? state.places.filter((p) => hours.get(p.id)?.open) : state.places;
   return (
     <div className="grid gap-3">
       {status}
-      {state.map && state.places.length > 0 && (
+      {state.map && places.length > 0 && (
         <Suspense fallback={<Skeleton className="aspect-[16/9] w-full" />}>
-          <GymsMap pins={state.places.slice(0, AREA_PINS)} here={state.at} onPin={showRow} />
+          <GymsMap pins={places.slice(0, AREA_PINS)} here={state.at} onPin={showRow} />
         </Suspense>
       )}
-      {state.places.length > 0 && (
+      {anyHours && (
+        <div>
+          <Chip active={openOnly} onClick={() => setOpenOnly(!openOnly)}>
+            {t("gp.openFilter")}
+          </Chip>
+        </div>
+      )}
+      {openOnly && anyHours && !places.length && (
+        <p className="text-sm text-muted" role="status">
+          {t("gp.openNone")}
+        </p>
+      )}
+      {places.length > 0 && (
         <ul className="grid gap-2" aria-label={t("gym.near.title")}>
-          {state.places.map((p, i) =>
+          {places.map((p, i) =>
             row(
               p.id,
               picked === p.id,
@@ -151,6 +172,7 @@ export function NearbyGyms({
                 .filter(Boolean)
                 .join(" · "),
               state.map && i < AREA_PINS ? i + 1 : undefined,
+              hours.get(p.id) ? <OpenNow state={hours.get(p.id)!} today={clock.day} /> : undefined,
             ),
           )}
         </ul>

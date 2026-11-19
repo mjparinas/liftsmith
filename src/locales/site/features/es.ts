@@ -314,6 +314,11 @@ export const es: FeaturesText = {
       name: "Horarios de clases en las páginas de gimnasios",
       body: "Los gimnasios oficiales publican las clases que dan cada semana, con instructor y sala, y marcan los días que no hay clase. Quienes entrenan allí ven la semana en la página del gimnasio en la app y la web, y añaden la próxima clase a su calendario con un toque.",
     },
+    "gym-open-now": {
+      name: "Abierto ahora en el buscador de gimnasios",
+      body: "Los gimnasios cercanos dicen si están abiertos ahora y cuándo cierran o vuelven a abrir, y un toque en Abierto ahora muestra solo los que puedes visitar ya.",
+      note: "Se calcula con el horario de cada gimnasio y tu propia hora, para gimnasios cerca de ti.",
+    },
     "gym-starter": {
       name: "Programas de inicio de los gimnasios",
       body: "Los gimnasios oficiales sugieren un programa a quienes empiezan en su página de la app y la web, y se guarda con un toque. Liftsmith pone los pesos de cada persona.",

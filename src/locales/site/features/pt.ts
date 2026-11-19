@@ -377,6 +377,11 @@ export const pt: FeaturesText = {
       name: "Horários de aulas nas páginas das academias",
       body: "Academias oficiais publicam as aulas de cada semana, com instrutor e sala, e marcam os dias sem aula. Quem treina lá vê a semana na página da academia no app e na web, e adiciona a próxima aula à agenda com um toque.",
     },
+    "gym-open-now": {
+      name: "Aberto agora na busca de academias",
+      body: "As academias perto de você mostram se estão abertas agora e quando fecham ou abrem de novo, e um toque em Aberto agora mostra só as que você pode visitar já.",
+      note: "Calculado pelo horário de cada academia e pela sua própria hora, para academias perto de você.",
+    },
     "gym-starter": {
       name: "Programas iniciais da academia",
       body: "Academias oficiais sugerem um programa para novos membros na sua página no app e na web, e a pessoa salva com um toque. O Liftsmith preenche os pesos de cada um.",

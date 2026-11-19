@@ -930,4 +930,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Activa Dejar que cambie de fase por su cuenta y su app le ofrecerá la siguiente fase cuando lo diga la regla. Tú sigues viendo cada cambio.",
   },
+  "gym-open-now": {
+    title: "Encuentra un gimnasio abierto ahora mismo",
+    intro: "Buscar gimnasios cerca ahora dice cuáles están abiertos y cuándo cierran o vuelven a abrir.",
+    points: [
+      "Abierto ahora muestra la hora de cierre, y Cierra pronto se pone ámbar en la última hora.",
+      "Los cerrados dicen cuándo abren: más tarde hoy, mañana o qué día.",
+      "Toca Abierto ahora sobre la lista para ocultar los cerrados, también en el mapa.",
+      "Se calcula con tu propia hora, para gimnasios cerca de ti.",
+    ],
+    dyk: "¿Un horario está mal? Informa de un problema en su página, o reclámala y ponlo tú.",
+  },
 };

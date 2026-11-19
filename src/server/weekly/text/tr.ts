@@ -928,4 +928,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aşamayı kendisi değiştirebilsin'i açarsan kural söylediğinde uygulaması sonraki aşamayı önerir. Her değişikliği yine görürsün.",
   },
+  "gym-open-now": {
+    title: "Şu an açık bir salon bul",
+    intro: "Yakındaki salonları bul artık hangi salonların açık olduğunu, ne zaman kapanıp açılacağını gösteriyor.",
+    points: [
+      "Şu an açık kapanış saatini gösterir; son saatte Yakında kapanıyor kehribar rengine döner.",
+      "Kapalı salonlar ne zaman açılacağını söyler: bugün daha sonra, yarın ya da hangi gün.",
+      "Listenin üstündeki Şu an açık'a dokun, kapalılar haritadan da gizlensin.",
+      "Kendi saatinle, yakındaki salonlar için hesaplanır.",
+    ],
+    dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
+  },
 };

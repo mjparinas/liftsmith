@@ -23,6 +23,7 @@ import { BLOG_FEATURE_GUIDES } from "./blog/featureGuides";
 import { BLOG_FORM_CUES } from "./blog/formCues";
 import { BLOG_G } from "./blog/g";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
+import { BLOG_GYM_OPEN_NOW } from "./blog/gymOpenNow";
 import { BLOG_H } from "./blog/h";
 import { BLOG_HEALTH_TRENDS } from "./blog/healthTrends";
 import { BLOG_I } from "./blog/i";
@@ -273,6 +274,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_HEALTH_TRENDS,
   ...BLOG_SEASONS,
   ...BLOG_GYM_CLASSES,
+  ...BLOG_GYM_OPEN_NOW,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

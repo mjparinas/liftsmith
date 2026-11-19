@@ -931,4 +931,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Attiva Lascia che cambi fase da solo e la sua app proporrà la fase successiva quando lo dice la regola. Tu vedi comunque ogni cambio.",
   },
+  "gym-open-now": {
+    title: "Trova una palestra aperta adesso",
+    intro: "La ricerca di palestre vicine ora dice quali sono aperte e quando chiudono o riaprono.",
+    points: [
+      "Aperto ora mostra l'orario di chiusura, e Chiude a breve diventa ambra nell'ultima ora.",
+      "Le palestre chiuse dicono quando aprono: più tardi, domani o quale giorno.",
+      "Tocca Aperto ora sopra l'elenco per nascondere quelle chiuse, anche sulla mappa.",
+      "È calcolato sulla tua ora, per le palestre vicine.",
+    ],
+    dyk: "Orari sbagliati? Segnala un problema sulla sua pagina, oppure rivendicala e correggili tu.",
+  },
 };

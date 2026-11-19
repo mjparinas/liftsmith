@@ -3,9 +3,10 @@
 
 import { useState } from "react";
 
-import type { Place } from "@/lib/gymDirectory";
+import { distanceM } from "@/lib/geo";
+import { lastNearby, type Place } from "@/lib/gymDirectory";
 import { clockTime, date, num, t, weekday } from "@/lib/i18n";
-import { allDay, parseHours } from "@/lib/openingHours";
+import { allDay, clockAt, openNow, parseHours } from "@/lib/openingHours";
 import { SITE_URL } from "@/lib/site";
 import { EQUIPMENT_LABEL } from "@/lib/types";
 
@@ -13,6 +14,7 @@ import { ClassSchedule } from "./GymClasses";
 import { priceText } from "./GymExtras";
 import { StarterCard } from "./GymStaff";
 import { Icon, type IconName } from "./icons";
+import { OpenNow } from "./OpenNow";
 import { go } from "./router";
 import { Button, Section } from "./ui";
 
@@ -40,6 +42,20 @@ function Hours({ raw }: { raw: string }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+/** "Open now · closes …" over the week, when the lifter last searched for gyms near enough to share the gym's clock. */
+function OpenHere({ place }: { place: Place }) {
+  const last = lastNearby();
+  if (!last || !place.hours) return null;
+  const clock = clockAt(new Date());
+  const state = openNow(place.hours, clock, distanceM(last, place) / 1000);
+  if (!state) return null;
+  return (
+    <p className="mb-2 text-sm">
+      <OpenNow state={state} today={clock.day} />
+    </p>
   );
 }
 
@@ -107,6 +123,7 @@ export function PlaceDetails({ place }: { place: Place }) {
       <ClassSchedule classes={place.classes} gymName={place.name} />
       <Section title={t("gp.hours")}>
         <div className="card p-4">
+          <OpenHere place={place} />
           <Hours raw={place.hours} />
         </div>
       </Section>

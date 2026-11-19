@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetDb, run } from "./db";
 import { cityHtml, indexHtml } from "./gymPage";
 import { cities, cityPlaces, closestPlaces, placesFromOsm, savePlaces, streetAddress, type OsmElement } from "./gymPlaces";
-import { closestReply, GYMS_INDEX_CSP, ipSpot } from "./gymsNear";
+import { closestReply, GYMS_INDEX_CSP, ipSpot, visitorClock } from "./gymsNear";
 
 const NOW = 1_800_000_000_000;
 const gym = (id: number, name: string, lat: number, lon: number): OsmElement => ({
@@ -81,6 +81,29 @@ describe("where the visitor is", () => {
     expect(out.here).toEqual({ lat: 49.12, lon: -122.65, from: "device" });
     expect(out.gyms[0]).toMatchObject({ name: "Gym 1", where: "Langley", path: "/gyms/langley-bc/gym-1/", official: false });
     expect(closestReply(null, [])).toEqual({ here: null, gyms: [] });
+  });
+
+  // docs/decisions/gyms.md "Open now": on the visitor's clock, only for readable hours and gyms near enough.
+  it("says whether each gym is open now when the script sends its time zone", async () => {
+    const places = (await closestPlaces(HERE.lat, HERE.lon))!;
+    const withHours = places.map((p, i) => ({
+      ...p,
+      hours: i === 0 ? "Mo-Su 06:00-22:00" : i === 1 ? "24/7" : "",
+      km: i === 1 ? 900 : p.km,
+    }));
+    const out = closestReply(null, withHours, { day: 2, min: 21 * 60 + 30 });
+    expect(out.gyms[0]!.open).toEqual({ open: true, closes: "22:00", soon: true });
+    expect(out.gyms[1]!.open).toBeUndefined(); // too far to share the visitor's clock
+    expect(out.gyms[2]!.open).toBeUndefined(); // no hours
+    expect(closestReply(null, withHours).gyms[0]!.open).toBeUndefined(); // no time zone sent
+  });
+
+  it("reads only a real time zone", () => {
+    const monday = new Date(Date.UTC(2026, 10, 16, 15, 30));
+    expect(visitorClock("Asia/Tokyo", monday)).toEqual({ day: 1, min: 30 });
+    expect(visitorClock("Not/AZone", monday)).toBeNull();
+    expect(visitorClock("<script>", monday)).toBeNull();
+    expect(visitorClock(null, monday)).toBeNull();
   });
 });
 

@@ -319,6 +319,11 @@ export const fr: FeaturesText = {
       name: "Horaires des cours sur les pages des salles",
       body: "Les salles officielles publient les cours qu'elles donnent chaque semaine, avec l'instructeur et la salle, et indiquent les jours sans cours. Les membres voient la semaine sur la page de la salle dans l'appli et sur le web, et ajoutent le prochain cours à leur agenda d'un toucher.",
     },
+    "gym-open-now": {
+      name: "Ouvert maintenant dans la recherche de salles",
+      body: "Les salles proches indiquent si elles sont ouvertes et quand elles ferment ou rouvrent, et un toucher sur Ouvert maintenant ne montre que celles où vous pouvez entrer tout de suite.",
+      note: "Calculé à partir des horaires de chaque salle et de votre propre heure, pour les salles près de vous.",
+    },
     "gym-starter": {
       name: "Programmes de départ des salles",
       body: "Les salles officielles proposent un programme aux nouveaux membres sur leur page dans l’app et sur le web, enregistré d’un toucher. Liftsmith fixe les charges de chacun.",

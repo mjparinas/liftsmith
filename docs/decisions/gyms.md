@@ -285,3 +285,13 @@ Melvin picked "Gym class schedules" from the gap analysis (2026-11-17, thread "F
 - Free for gyms and members, the same for under-18s (classes are the gym's, not a lifter's). Pure web code plus the
   existing Calendar plugin, so Android, iOS and the web app get it together. Ten languages (`gp.class*` for what
   members and the website read, `gym.cls.*` for the owner's editor).
+
+## Open now (2026-11-19)
+
+Melvin picked it from ideas borrowed from an open-source sat-nav app (Horizon Maps, GPL-3.0; the idea only, our own code). A gym's hours already came from OSM's `opening_hours` or its owner; nothing said whether it was open.
+
+- **Where:** each real gym's row in Find gyms near you (`NearbyGyms.tsx`, every platform), above the week on a gym's details in the app (`PlaceDetails.tsx`), and each row of the map list on the website's `/gyms/` page (`gyms-near.js`). Lines: "Open now · closes 10:00 PM" (green), "Closes soon · 10:00 PM" in the last hour (amber, `SOON_MIN`), "Closed · opens 6:00 AM" / "opens tomorrow …" / "opens Monday …" (muted), and "Open now · 24 hours". The words always say it, so colour is never the only cue. Text is `gp.*`, shared by the app and the website, in all ten languages.
+- **Open now filter:** a chip above the finder's list (and a matching button on `/gyms/`), shown only when at least one gym has readable hours; it narrows the list and the pins to gyms open now, with "None of these gyms is open right now." when none are.
+- **One rule, one function:** `openState` and `openNow` in `src/lib/openingHours.ts`. Ranges that end before they start run past midnight, a day ending 24:00 joins the next day's 00:00, and a week that never closes has no closing time. Hours we can't read (anything `parseHours` gives up on) show no line rather than a guess; public holiday rules are skipped, as on the week list.
+- **Whose clock:** we don't store a gym's time zone, so it's worked out on the viewer's clock and only for gyms within 300 km (`OPEN_NEAR_KM`), close enough to share it almost everywhere. In the app that's the finder's distance, or for a gym's details the distance from the lifter's last finder search; with neither, no line. On `/gyms/` the script sends the browser's time zone (`&tz=`, an IANA name, checked by `visitorClock`) and the server answers each gym's state, so the rule isn't written twice; the script only words it.
+- **Not on the website's own gym pages** (`/gyms/<city>/<gym>/`): they're drawn on the server with no scripts and cached, and the server doesn't know the reader's clock, so they keep the plain week.

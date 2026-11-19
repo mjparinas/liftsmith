@@ -377,6 +377,11 @@ export const pl: FeaturesText = {
       name: "Grafiki zajęć na stronach siłowni",
       body: "Oficjalne siłownie publikują zajęcia, które prowadzą co tydzień, z instruktorem i salą, i zaznaczają dni bez zajęć. Bywalcy widzą cały tydzień na stronie siłowni w aplikacji i w sieci, a najbliższe zajęcia dodają do kalendarza jednym dotknięciem.",
     },
+    "gym-open-now": {
+      name: "Otwarte teraz w wyszukiwarce siłowni",
+      body: "Siłownie w pobliżu pokazują, czy są teraz otwarte i kiedy zamykają lub znów otwierają, a jedno dotknięcie Otwarte teraz zostawia tylko te, do których możesz wejść od razu.",
+      note: "Liczone z godzin otwarcia każdej siłowni i Twojego zegara, dla siłowni w pobliżu.",
+    },
     "gym-starter": {
       name: "Programy startowe siłowni",
       body: "Oficjalne siłownie polecają nowym członkom jeden program na swojej stronie w aplikacji i w sieci, a ćwiczący zapisują go jednym dotknięciem. Liftsmith wpisuje każdemu jego własne ciężary.",

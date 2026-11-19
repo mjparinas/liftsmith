@@ -768,3 +768,12 @@ Each rehab program now has three phases, from calming the area to full use, and 
 - Send the next phase in one tap. It replaces the old one on their phone, so their history carries on.
 - Clients rate how the area feels the day after rehab, which is often what tells you the most.
 Did you know? Turn on Let them move phases on their own and their app offers the next phase when the rule says so. You still see every move. ([Trainer mode](trainer-mode.md) "Rehab protocols")
+
+### W68 · Find a gym that's open right now (**New**, 2026-11-19)
+Free · Lifters · No screenshot (the finder needs the reader's location) · `fresh`, so it goes next to everyone already in the series
+Find gyms near you now says which gyms are open, and when they close or open next.
+- Open now shows the closing time, and Closes soon turns amber in the last hour.
+- Closed gyms say when they open: later today, tomorrow or which day.
+- Tap Open now above the list to hide the closed ones, on the map too.
+- It's worked out on your own clock, for gyms near you.
+Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")

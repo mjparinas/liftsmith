@@ -948,4 +948,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Turn on Let them move phases on their own and their app offers the next phase when the rule says so. You still see every move.",
   },
+  "gym-open-now": {
+    title: "Find a gym that's open right now",
+    intro: "Find gyms near you now says which gyms are open, and when they close or open next.",
+    points: [
+      "Open now shows the closing time, and Closes soon turns amber in the last hour.",
+      "Closed gyms say when they open: later today, tomorrow or which day.",
+      "Tap Open now above the list to hide the closed ones, on the map too.",
+      "It's worked out on your own clock, for gyms near you.",
+    ],
+    dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
+  },
 };
