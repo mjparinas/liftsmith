@@ -33,6 +33,7 @@ export const en = {
   "sig.cycle.follicular": "Cycle day {day}: often a good time to push",
   "sig.cycle.day": "Cycle day {day}",
   "sig.underFuelled": "Ate well under maintenance the last two days",
+  "sig.outside": "{what} in the last day ({minutes} min)",
 } as const;
 
 type Key = keyof typeof en;
@@ -67,6 +68,7 @@ export const es: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Día {day} del ciclo: suele ser buen momento para apretar",
   "sig.cycle.day": "Día {day} del ciclo",
   "sig.underFuelled": "Comiste muy por debajo del mantenimiento los dos últimos días",
+  "sig.outside": "{what} en el último día ({minutes} min)",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -99,6 +101,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Jour {day} du cycle : souvent un bon moment pour pousser",
   "sig.cycle.day": "Jour {day} du cycle",
   "sig.underFuelled": "Bien moins mangé que votre maintien ces deux derniers jours",
+  "sig.outside": "{what} ces dernières 24 h ({minutes} min)",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -131,6 +134,7 @@ export const de: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Zyklustag {day}: oft eine gute Zeit, um Gas zu geben",
   "sig.cycle.day": "Zyklustag {day}",
   "sig.underFuelled": "Die letzten zwei Tage deutlich unter dem Erhaltungsbedarf gegessen",
+  "sig.outside": "{what} in den letzten 24 Stunden ({minutes} Min.)",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -163,6 +167,7 @@ export const it: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Giorno {day} del ciclo: spesso un buon momento per spingere",
   "sig.cycle.day": "Giorno {day} del ciclo",
   "sig.underFuelled": "Mangiato molto sotto il mantenimento negli ultimi due giorni",
+  "sig.outside": "{what} nelle ultime 24 ore ({minutes} min)",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -195,6 +200,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "周期{day}日目：攻めやすいことが多い時期",
   "sig.cycle.day": "周期{day}日目",
   "sig.underFuelled": "この2日間、維持カロリーを大きく下回る食事",
+  "sig.outside": "直近24時間に{what}（{minutes}分）",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -227,6 +233,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Dia {day} do ciclo: muitas vezes um bom momento para forçar",
   "sig.cycle.day": "Dia {day} do ciclo",
   "sig.underFuelled": "Comeu bem abaixo da manutenção nos últimos dois dias",
+  "sig.outside": "{what} nas últimas 24 horas ({minutes} min)",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -259,6 +266,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "주기 {day}일차: 강하게 하기 좋은 때인 경우가 많아요",
   "sig.cycle.day": "주기 {day}일차",
   "sig.underFuelled": "지난 이틀 동안 유지 칼로리보다 훨씬 적게 먹음",
+  "sig.outside": "최근 24시간 내 {what} ({minutes}분)",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -291,6 +299,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Döngünün {day}. günü: çoğu zaman yüklenmek için iyi bir dönem",
   "sig.cycle.day": "Döngünün {day}. günü",
   "sig.underFuelled": "Son iki gün idame kalorisinin epey altında yedin",
+  "sig.outside": "Son 24 saatte {what} ({minutes} dk)",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -323,4 +332,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "sig.cycle.follicular": "Dzień cyklu {day}: często dobry moment, żeby docisnąć",
   "sig.cycle.day": "Dzień cyklu {day}",
   "sig.underFuelled": "Przez ostatnie dwa dni jadłeś sporo poniżej zapotrzebowania",
+  "sig.outside": "{what} w ostatniej dobie ({minutes} min)",
 };

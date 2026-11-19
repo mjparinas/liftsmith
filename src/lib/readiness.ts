@@ -1,6 +1,7 @@
 import { blockWeek } from "./block";
 import { cycleSignal, cycleState } from "./cycle";
 import { t } from "./i18n";
+import { hardOutside, outsideName } from "./outside";
 import { gradedSet } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
@@ -122,6 +123,12 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const big = BIG.reduce((s, m) => s + rec[m], 0) / BIG.length;
   if (big >= 90) add(10, t("sig.bigRecovered"));
   else if (big < 60) add(-15, t("sig.bigRecovering"));
+
+  // 1b. A hard workout from another app in the last day (outside.ts; only there while Count workouts from other apps
+  // is on). Recovery already counts its fatigue on the muscles it used; this says it out loud and leans the call a
+  // little easier, because a long match or run tires more than the legs.
+  const outside = hardOutside(events, now);
+  if (outside) add(-8, t("sig.outside", { what: outsideName(outside.kind), minutes: Math.round(outside.seconds / 60) }));
 
   // 2. Days since the last workout, and how many in a row.
   const gap = (now - sessions[0]!.at) / DAY;

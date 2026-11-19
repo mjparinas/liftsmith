@@ -779,7 +779,17 @@ Find gyms near you now says which gyms are open, and when they close or open nex
 - It's worked out on your own clock, for gyms near you.
 Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")
 
-### W69 · Find a routine another lifter made (**New**, 2026-11-19)
+### W69 · Your runs and matches now count in your recovery (**New**, 2026-11-19)
+Free · Lifters · Screenshot of Body › Muscles · `fresh`, so it goes next to everyone already in the series
+
+Turn on Count workouts from other apps, and the workouts in your phone's health app shape your recovery map and tomorrow's plan.
+- Runs, rides, sports and classes come in each time you open the app.
+- Each one tires the muscles it uses, more the longer it ran.
+- Tomorrow's plan works around tired legs after a long run or match.
+- They never count as Liftsmith workouts, and nothing counts twice.
+Did you know? It's in Settings › Connected apps, and the list under the recovery map on Body shows what's being counted. ([Workouts from other apps](outside-workouts.md))
+
+### W70 · Find a routine another lifter made (**New**, 2026-11-19)
 Free · Lifters · No screenshot (the routines come from our server in lifters' own words) · `fresh`, so it goes next to everyone already in the series
 The new routine library has routines other lifters published, ready to save in a tap.
 - Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.

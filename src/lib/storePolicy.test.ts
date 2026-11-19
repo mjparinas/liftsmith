@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { READ, WRITE } from "./health";
+import { OUTSIDE_READ, READ, WRITE } from "./health";
 import { CONTACT_EMAIL } from "./site";
 
 const root = join(__dirname, "..", "..");
@@ -26,6 +26,7 @@ const PERMISSION: Record<string, string> = {
   respiratoryRate: "RESPIRATORY_RATE",
   dietaryEnergyConsumed: "NUTRITION",
   calories: "ACTIVE_CALORIES_BURNED",
+  workouts: "EXERCISE",
 };
 
 const tags = [...manifest.matchAll(/<uses-permission[^>]*android:name="android\.permission\.health\.([A-Z0-9_]+)"([^>]*)\/>/g)];
@@ -34,21 +35,19 @@ const kept = tags.filter((m) => !m[2].includes('tools:node="remove"')).map((m) =
 describe("Play store policy config", () => {
   it("declares exactly the Health Connect permissions health.ts requests", () => {
     // WRITE_EXERCISE is asked for by our own HealthWorkoutPlugin.kt (workouts as exercise sessions).
-    const wanted = [...READ.map((t) => `READ_${PERMISSION[t]}`), ...WRITE.map((t) => `WRITE_${PERMISSION[t]}`), "WRITE_EXERCISE"];
+    // READ_EXERCISE (OUTSIDE_READ) is asked for only when Count workouts from other apps goes on (outside.ts).
+    const wanted = [
+      ...[...READ, ...OUTSIDE_READ].map((t) => `READ_${PERMISSION[t]}`),
+      ...WRITE.map((t) => `WRITE_${PERMISSION[t]}`),
+      "WRITE_EXERCISE",
+    ];
     expect(wanted.every((w) => !w.includes("undefined"))).toBe(true);
     expect([...kept].sort()).toEqual([...wanted].sort());
   });
 
   it("removes every other health permission the plugin adds", () => {
     const removed = tags.filter((m) => m[2].includes('tools:node="remove"')).map((m) => m[1]);
-    for (const p of [
-      "READ_HEART_RATE",
-      "READ_OXYGEN_SATURATION",
-      "READ_BLOOD_PRESSURE",
-      "READ_BLOOD_GLUCOSE",
-      "READ_EXERCISE",
-      "WRITE_WEIGHT",
-    ]) {
+    for (const p of ["READ_HEART_RATE", "READ_OXYGEN_SATURATION", "READ_BLOOD_PRESSURE", "READ_BLOOD_GLUCOSE", "WRITE_WEIGHT"]) {
       expect(removed).toContain(p);
     }
   });

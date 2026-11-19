@@ -7,9 +7,10 @@ import { Info } from "@/components/Info";
 import { blockWeek, weekStart } from "@/lib/block";
 import { can } from "@/lib/entitlements";
 import { weeklySets } from "@/lib/generator";
-import { t } from "@/lib/i18n";
+import { relative, t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import { isDesktop } from "@/lib/layout";
+import { outsideName, recentOutside } from "@/lib/outside";
 import { bandOf, recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type Muscle } from "@/lib/types";
@@ -148,6 +149,47 @@ function Muscles() {
             );
           })}
         </ul>
+      </Section>
+      <OutsideList />
+    </div>
+  );
+}
+
+/** Calendar days between two times, on the lifter's clock. */
+const daysAgo = (at: number, now: number) => {
+  const a = new Date(at);
+  const b = new Date(now);
+  a.setHours(0, 0, 0, 0);
+  b.setHours(0, 0, 0, 0);
+  return Math.round((b.getTime() - a.getTime()) / 86_400_000);
+};
+
+/**
+ * This week's workouts from other apps (outside.ts), when Count workouts from other apps brought any in: what the
+ * map is counting besides the lifting, so tired legs after a long run make sense.
+ */
+function OutsideList() {
+  const events = useApp((s) => s.events);
+  const now = useNow();
+  const list = recentOutside(events, now);
+  if (!list.length) return null;
+  return (
+    <div className="desk:col-span-2">
+      <Section title={t("conn.outside.list")} icon="bolt">
+        <ul className="card divide-y divide-line/70 overflow-hidden">
+          {list.map((e) => (
+            <li key={e.id} className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-3">
+              <span className="min-w-0">
+                <span className="font-medium">
+                  {t("conn.outside.line", { what: outsideName(e.kind), minutes: Math.round(e.seconds / 60) })}
+                </span>
+                {e.source && <span className="block text-xs text-muted">{e.source}</span>}
+              </span>
+              <span className="text-sm text-muted">{relative(-daysAgo(e.at, now), "day")}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 text-sm text-muted">{t("conn.outside.listNote")}</p>
       </Section>
     </div>
   );

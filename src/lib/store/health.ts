@@ -2,9 +2,10 @@ import type { CardioCloud, CloudCardio, CloudReading } from "../cloud";
 import { cloudCardioEvents, cloudReadingEvents } from "../cloudImport";
 import { derive } from "../derive";
 import { cleanResult } from "../fitTests";
-import { healthAvailable, noteHealthSync, readBody, readDaily } from "../health";
+import { askOutside, healthAvailable, noteHealthSync, readBody, readDaily, readOutside } from "../health";
 import { deleteEvents } from "../localdb";
 import { MEASURE_RANGE } from "../measure";
+import { outsideEvents, sessionWindows } from "../outside";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "../tdee";
 import type { AppEvent, FitTest, MeasureSite } from "../types";
 import { uid, type Ctx } from "./shared";
@@ -27,6 +28,13 @@ export interface HealthSlice {
   importHealthBody(): Promise<number>;
   /** Sleep, HRV, resting HR, steps, VO2 max and breathing rate from Health, one reading a day (the health twin). */
   importHealthDaily(): Promise<number>;
+  /** Workouts other apps saved to Health (outside.ts), while Count workouts from other apps is on. */
+  importOutside(now?: number): Promise<number>;
+  /**
+   * Turns Count workouts from other apps on (asks Health first; "denied" leaves it off) or off (removes every
+   * workout it brought in).
+   */
+  setOutsideWorkouts(on: boolean): Promise<"on" | "off" | "denied">;
   /**
    * Readings from a connected cloud service (Oura, Whoop, Withings, Polar: connections.ts), stored like Health's
    * so the health twin and the readiness call use them; a scale's weight and body fat become a weigh-in. Ids
@@ -119,7 +127,49 @@ export function healthSlice(c: Ctx): HealthSlice {
         if (!get().active) get().replan();
         if (fresh.some((e) => e.metric === "steps")) get().refreshTdee();
       }
+      const outside = get().profile.outsideWorkouts
+        ? await get()
+            .importOutside()
+            .catch(() => 0)
+        : 0;
+      return fresh.length + outside;
+    },
+
+    async importOutside(now = Date.now()) {
+      const since = get().profile.outsideWorkouts;
+      if (!since) return 0;
+      const workouts = await readOutside(45, now);
+      const events = get().events;
+      // The switch may have gone off while Health was being read.
+      if (get().profile.outsideWorkouts !== since) return 0;
+      const fresh = outsideEvents(workouts, new Set(events.map((e) => e.id)), sessionWindows(events), now, since);
+      if (fresh.length) {
+        commit(fresh);
+        if (!get().active) get().replan();
+      }
       return fresh.length;
+    },
+
+    async setOutsideWorkouts(on) {
+      if (on) {
+        if (!(await askOutside())) return "denied";
+        get().setProfile({ outsideWorkouts: Date.now() });
+        await get()
+          .importOutside()
+          .catch(() => 0);
+        return "on";
+      }
+      get().setProfile({ outsideWorkouts: undefined });
+      const ids = get()
+        .events.filter((e) => e.type === "outside")
+        .map((e) => e.id);
+      if (ids.length) {
+        const events = get().events.filter((e) => e.type !== "outside");
+        set({ events, stats: derive(events, Date.now()) });
+        await deleteEvents(ids);
+        if (!get().active) get().replan();
+      }
+      return "off";
     },
 
     importCloudReadings(source, readings) {

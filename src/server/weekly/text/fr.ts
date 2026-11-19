@@ -950,6 +950,18 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Des horaires faux ? Signalez un problème sur sa page, ou revendiquez-la et corrigez-les.",
   },
+  "outside-workouts": {
+    title: "Tes courses et tes matchs comptent dans ta récupération",
+    intro:
+      "Active Compter les séances d'autres apps, et les séances de l'appli santé de ton téléphone ajustent ta carte de récupération et le plan de demain.",
+    points: [
+      "Courses, vélo, sports et cours arrivent à chaque ouverture de l'app.",
+      "Chacun fatigue les muscles qu'il sollicite, d'autant plus qu'il a duré.",
+      "Le plan de demain ménage les jambes fatiguées après une longue course ou un match.",
+      "Ils ne comptent jamais comme des séances Liftsmith, et rien ne compte deux fois.",
+    ],
+    dyk: "C'est dans Réglages › Apps connectées, et la liste sous la carte de récupération dans Corps montre ce qui est compté.",
+  },
   "routine-library": {
     title: "Trouvez une routine créée par quelqu'un d'autre",
     intro: "La nouvelle bibliothèque de routines rassemble celles que d'autres ont publiées, prêtes à enregistrer d'un geste.",
