@@ -22,6 +22,7 @@ import { SHORT_REGION } from "@/lib/regions";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { badCity, cityName, km, tidyAddress } from "./gymAddress";
+import { dropPictures, pictureUrls } from "./gymBlob";
 import { classesOf } from "./gymClasses";
 import { distanceKm } from "./gymDirectory";
 import { issuesOf, newsOf, trainersOf } from "./gymExtras";
@@ -1076,10 +1077,13 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
     case "gym":
     case "studio":
       return (await run("UPDATE gym_places SET kind = ?, updated_at = ? WHERE id = ?", [action, now, id])) > 0;
-    case "pictures":
-      // Staff take down every picture the owner added (gymMedia.ts).
+    case "pictures": {
+      // Staff take down every picture the owner added (gymMedia.ts), and their files (gymBlob.ts).
+      const files = await pictureUrls(id);
       await run("DELETE FROM gym_photos WHERE place_id = ?", [id]);
+      await dropPictures(files);
       return true;
+    }
     case "approve":
       return (await run("UPDATE gym_places SET pending = 0, hidden = 0, updated_at = ? WHERE id = ? AND pending = 1", [now, id])) > 0;
     case "reject": {
@@ -1088,7 +1092,8 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
       await run("DELETE FROM gym_places WHERE id = ? AND pending = 1", [id]);
       return true;
     }
-    case "delete":
+    case "delete": {
+      const files = await pictureUrls(id);
       await batch([
         { sql: "UPDATE public_gyms SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
@@ -1100,7 +1105,9 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
         })),
         { sql: "DELETE FROM gym_places WHERE id = ?", args: [id] },
       ]);
+      await dropPictures(files);
       return true;
+    }
     default:
       return false;
   }

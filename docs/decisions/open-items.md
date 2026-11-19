@@ -24,10 +24,6 @@ After launch, not blocking it:
 - A dedicated RevenueCat service account in Google Cloud, so `liftsmith-admin@` can drop Pub/Sub Admin.
 - Profile links (`/app/#/person/<handle>`) open the installed app on Android (App Links) and the web app on iPhone until Universal Links exist. Public profiles' own pages (`/u/<handle>/`) are web pages anyway.
 
-## Later
-
-- **Gym pictures out of Turso** (Melvin, 2026-11-19: noted for later). Gym logos, website icons and photos are blobs in `gym_photos` (`gymMedia.ts`, `gymEnrich.ts`), served from `/api/gyms/photo/` with a one-year immutable cache, so Turso is read about once per picture per CDN region. If storage or rows read start to matter (owner photos are up to 450 KB each), move the bytes to Vercel Blob or R2 and keep only the URL in Turso: migrate the existing rows, and allow the new host in the gym pages' image CSP.
-
 ## iOS (deferred)
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
