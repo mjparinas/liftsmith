@@ -460,6 +460,13 @@ export const SETTINGS: Setting[] = [
     need: "optional",
     what: "Maps of gyms: the picture on gym and city pages, and the map you can drag and zoom in Find gyms near you. Without it they show no map.",
   },
+  {
+    names: ["BLOB_READ_WRITE_TOKEN"],
+    label: "Vercel Blob",
+    group: "Gyms",
+    need: "optional",
+    what: "Where gym logos, photos and website icons are kept (set by connecting a Blob store to the project). Without it they stay in the database; once set, the gym import worker moves the old ones over.",
+  },
   // Search and monitoring
   {
     names: ["GOOGLE_SERVICE_ACCOUNT_KEY"],

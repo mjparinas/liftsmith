@@ -1,6 +1,6 @@
 {
   "name": "liftsmith",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "scripts": {
     "predev": "node scripts/mediapipe.mjs && node scripts/leaflet.mjs",
@@ -45,6 +45,7 @@
     "@revenuecat/purchases-capacitor": "^14.1.0",
     "@types/canvas-confetti": "^1.9.0",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.9.0",
     "canvas-confetti": "^1.9.4",
     "jsqr": "1.4.0",
     "leaflet": "^1.9.4",
