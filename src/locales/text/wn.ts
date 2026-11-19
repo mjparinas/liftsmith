@@ -7,6 +7,8 @@ export const en = {
   "wn.c.deleteWorkout.title": "Undo after deleting a workout",
   "wn.c.deleteWorkout.body":
     "Deleted a workout by mistake? Tap Undo for a few seconds after. A deleted workout now also leaves your Friends feed and Health Connect or Apple Health, and every stat is worked out again from what's left.",
+  "wn.c.landmineEnd.title": "Landmine plates on one end",
+  "wn.c.landmineEnd.body": "Landmine and T-bar moves show their plates on the one free end, and plate changes stop saying each side.",
   "wn.c.gymInsights.title": "Insights for gym owners",
   "wn.c.gymInsights.body":
     "Own a gym on Liftsmith? Its page now shows how many lifters train there, the busy and quiet hours and the equipment they use, with one thing to do next. Totals only, never who. Turn off Count my gym visits in Settings if you'd rather not count.",
@@ -97,6 +99,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Deshacer al eliminar un entrenamiento",
   "wn.c.deleteWorkout.body":
     "¿Eliminaste un entrenamiento por error? Toca Deshacer durante unos segundos. Ahora un entrenamiento eliminado también sale de Amigos y de Health Connect o Salud, y todas las estadísticas se recalculan con lo que queda.",
+  "wn.c.landmineEnd.title": "Discos del landmine en un extremo",
+  "wn.c.landmineEnd.body":
+    "Los ejercicios con landmine y la remada en T muestran los discos en el único extremo libre, y los cambios de discos ya no dicen por lado.",
   "wn.c.gymInsights.title": "Datos para dueños de gimnasios",
   "wn.c.gymInsights.body":
     "¿Tienes un gimnasio en Liftsmith? Su página muestra cuántos atletas entrenan allí, las horas llenas y tranquilas y el equipo que usan, con un siguiente paso. Solo totales, nunca quién. Desactiva Contar mis visitas al gimnasio en Ajustes si prefieres no contar.",
@@ -193,6 +198,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Annuler après avoir supprimé une séance",
   "wn.c.deleteWorkout.body":
     "Une séance supprimée par erreur ? Touchez Annuler pendant quelques secondes. Une séance supprimée quitte aussi Amis et Health Connect ou Santé, et toutes les stats sont recalculées avec ce qui reste.",
+  "wn.c.landmineEnd.title": "Disques du landmine sur une extrémité",
+  "wn.c.landmineEnd.body":
+    "Les mouvements au landmine et le rowing T-bar montrent leurs disques sur la seule extrémité libre, sans « de chaque côté ».",
   "wn.c.gymInsights.title": "Des statistiques pour les propriétaires de salle",
   "wn.c.gymInsights.body":
     "Vous gérez une salle sur Liftsmith ? Sa page montre combien de sportifs s'y entraînent, les heures pleines et calmes et le matériel utilisé, avec une prochaine étape. Des totaux seulement, jamais qui. Désactivez Compter mes visites en salle dans Réglages si vous préférez.",
@@ -291,6 +299,8 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Rückgängig nach dem Löschen eines Trainings",
   "wn.c.deleteWorkout.body":
     "Ein Training aus Versehen gelöscht? Tippe ein paar Sekunden lang auf Rückgängig. Ein gelöschtes Training verschwindet jetzt auch aus Freunde und aus Health Connect oder Apple Health, und alle Werte werden aus dem Rest neu berechnet.",
+  "wn.c.landmineEnd.title": "Landmine-Scheiben an einem Ende",
+  "wn.c.landmineEnd.body": "Landmine-Übungen und T-Bar-Rudern zeigen die Scheiben am freien Ende, ohne „pro Seite“.",
   "wn.c.gymInsights.title": "Einblicke für Gym-Betreiber",
   "wn.c.gymInsights.body":
     "Du betreibst ein Gym auf Liftsmith? Seine Seite zeigt jetzt, wie viele Sportler dort trainieren, die vollen und ruhigen Stunden und die genutzten Geräte, mit einem nächsten Schritt. Nur Summen, nie wer. Schalte Meine Gym-Besuche mitzählen in den Einstellungen aus, wenn du nicht mitzählen willst.",
@@ -387,6 +397,8 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Annulla dopo aver eliminato un allenamento",
   "wn.c.deleteWorkout.body":
     "Hai eliminato un allenamento per sbaglio? Tocca Annulla per qualche secondo. Ora un allenamento eliminato sparisce anche da Amici e da Health Connect o Apple Salute, e tutte le statistiche vengono ricalcolate da ciò che resta.",
+  "wn.c.landmineEnd.title": "Dischi del landmine su un'estremità",
+  "wn.c.landmineEnd.body": "Gli esercizi al landmine e il T-bar row mostrano i dischi sull'unica estremità libera, senza più «per lato».",
   "wn.c.gymInsights.title": "Dati per i titolari di palestre",
   "wn.c.gymInsights.body":
     "Hai una palestra su Liftsmith? La sua pagina ora mostra quanti atleti si allenano lì, gli orari pieni e tranquilli e l'attrezzatura usata, con un passo successivo. Solo totali, mai chi. Disattiva Conta le mie visite in palestra nelle Impostazioni se preferisci.",
@@ -483,6 +495,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "ワークアウト削除の取り消し",
   "wn.c.deleteWorkout.body":
     "間違えて削除しても、数秒間は「元に戻す」をタップできます。削除したワークアウトは友達のフィードやヘルスコネクト、Apple ヘルスケアからも消え、統計はすべて残りのデータから計算し直されます。",
+  "wn.c.landmineEnd.title": "ランドマインのプレートは片端に",
+  "wn.c.landmineEnd.body": "ランドマイン種目とTバーロウは、空いている片端だけにプレートを表示し、「片側」と言わなくなりました。",
   "wn.c.gymInsights.title": "ジムオーナー向けの分析",
   "wn.c.gymInsights.body":
     "Liftsmithでジムを運営していますか？ジムのページに、利用者数、混む時間と空いている時間、使われた器具が、次の一手とともに表示されます。合計のみで、誰かは表示されません。数えられたくない場合は設定の「ジムへの来館を数える」をオフに。",
@@ -571,6 +585,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Desfazer ao excluir um treino",
   "wn.c.deleteWorkout.body":
     "Excluiu um treino sem querer? Toque em Desfazer por alguns segundos. Agora um treino excluído também sai de Amigos e do Health Connect ou Apple Saúde, e todas as estatísticas são recalculadas com o que sobrou.",
+  "wn.c.landmineEnd.title": "Anilhas do landmine em uma ponta",
+  "wn.c.landmineEnd.body": "Exercícios no landmine e a remada cavalinho mostram as anilhas na única ponta livre, sem dizer de cada lado.",
   "wn.c.gymInsights.title": "Dados para donos de academia",
   "wn.c.gymInsights.body":
     "Tem uma academia no Liftsmith? A página dela agora mostra quantos atletas treinam lá, os horários cheios e tranquilos e os equipamentos usados, com um próximo passo. Só totais, nunca quem. Desative Contar minhas visitas à academia em Ajustes se preferir não contar.",
@@ -663,6 +679,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "운동 삭제 실행 취소",
   "wn.c.deleteWorkout.body":
     "실수로 운동을 삭제했나요? 몇 초 동안 실행 취소를 누를 수 있어요. 이제 삭제한 운동은 친구 피드와 헬스 커넥트나 Apple 건강에서도 사라지고, 모든 통계는 남은 기록으로 다시 계산돼요.",
+  "wn.c.landmineEnd.title": "랜드마인 원판은 한쪽 끝에",
+  "wn.c.landmineEnd.body": "랜드마인 운동과 T바 로우는 비어 있는 한쪽 끝에만 원판을 보여 주고, 더 이상 한쪽당이라고 하지 않아요.",
   "wn.c.gymInsights.title": "체육관 운영자를 위한 인사이트",
   "wn.c.gymInsights.body":
     "Liftsmith에 체육관이 있나요? 이제 체육관 페이지에 이용자 수, 붐비는 시간과 한산한 시간, 사용된 기구가 다음 할 일과 함께 표시됩니다. 합계만 보이고 누구인지는 보이지 않습니다. 집계를 원하지 않으면 설정에서 내 체육관 방문 집계를 끄세요.",
@@ -748,6 +766,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Cofnij po usunięciu treningu",
   "wn.c.deleteWorkout.body":
     "Usunięto trening przez pomyłkę? Przez kilka sekund możesz dotknąć Cofnij. Usunięty trening znika teraz także ze Znajomych i z Health Connect lub Apple Zdrowie, a wszystkie statystyki są przeliczane z tego, co zostało.",
+  "wn.c.landmineEnd.title": "Talerze na landmine na jednym końcu",
+  "wn.c.landmineEnd.body": "Ćwiczenia z landmine i wiosłowanie T-bar pokazują talerze na jedynym wolnym końcu, bez „z każdej strony”.",
   "wn.c.gymInsights.title": "Statystyki dla właścicieli siłowni",
   "wn.c.gymInsights.body":
     "Masz siłownię w Liftsmith? Jej strona pokazuje teraz, ile osób tam trenuje, godziny tłoku i spokoju oraz używany sprzęt, z jednym następnym krokiem. Tylko sumy, nigdy kto. Wyłącz Licz moje wizyty na siłowni w Ustawieniach, jeśli wolisz nie być liczony.",
@@ -840,6 +860,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.deleteWorkout.title": "Antrenman silmeyi geri al",
   "wn.c.deleteWorkout.body":
     "Bir antrenmanı yanlışlıkla mı sildin? Birkaç saniye boyunca Geri al'a dokunabilirsin. Silinen antrenman artık Arkadaşlar'dan ve Health Connect ya da Apple Sağlık'tan da kalkar; tüm istatistikler kalanlardan yeniden hesaplanır.",
+  "wn.c.landmineEnd.title": "Landmine plakaları tek uçta",
+  "wn.c.landmineEnd.body": "Landmine hareketleri ve T-bar row, plakaları yalnızca boştaki uçta gösterir ve artık her yana demez.",
   "wn.c.gymInsights.title": "Salon sahipleri için içgörüler",
   "wn.c.gymInsights.body":
     "Liftsmith'te bir salonun mu var? Salonun sayfası artık kaç sporcunun orada antrenman yaptığını, yoğun ve sakin saatleri ve kullanılan ekipmanı, bir sonraki adımla birlikte gösteriyor. Yalnızca toplamlar, asla kim olduğu değil. Sayılmak istemezsen Ayarlar'da Salon ziyaretlerimi say'ı kapat.",

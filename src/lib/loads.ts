@@ -42,7 +42,7 @@ export function roundLoad(kg: number, ex: Exercise, gym: Gym): Rounded {
   switch (ex.load) {
     case "barbell": {
       const bar = barFor(ex, gym);
-      const loading = loadBar(Math.max(bar.weight, want), bar.weight, gym.plates);
+      const loading = loadBar(Math.max(bar.weight, want), bar.weight, gym.plates, ex.oneEnd);
       return { kg: toKg(loading.total, u), loading };
     }
     case "dumbbell":
@@ -75,7 +75,7 @@ export function stepLoad(kg: number, dir: 1 | -1, ex: Exercise, gym: Gym): numbe
     const bar = barFor(ex, gym);
     // Try growing jumps until the plates give a different total.
     for (let jump = 0.5; jump <= 50; jump += 0.5) {
-      const l = loadBar(cur + dir * jump, bar.weight, gym.plates);
+      const l = loadBar(cur + dir * jump, bar.weight, gym.plates, ex.oneEnd);
       if ((dir > 0 && l.total > cur + 1e-6) || (dir < 0 && l.total < cur - 1e-6)) return toKg(l.total, u);
     }
     return kg;

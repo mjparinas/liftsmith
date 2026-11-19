@@ -27,12 +27,13 @@ const list = (xs: readonly number[], fmt: (n: number) => string) => {
 };
 
 /** "Take off 2.5, add 5 (each side)", "No change", or null when the bar starts empty. */
-export function changeText(c: PlateChange, unit: string, fmt: (n: number) => string): string {
+export function changeText(c: PlateChange, unit: string, fmt: (n: number) => string, oneEnd = false): string {
   if (!c.remove.length && !c.add.length) return t("pm.same");
   const off = list(c.remove, fmt);
   const add = list(c.add, fmt);
-  if (c.remove.length && c.add.length) return t("pm.offAdd", { off, add, unit });
-  return c.remove.length ? t("pm.off", { off, unit }) : t("pm.add", { add, unit });
+  // A landmine's plates go on its one free end, so there's no "each side".
+  if (c.remove.length && c.add.length) return t(oneEnd ? "pm.offAddEnd" : "pm.offAdd", { off, add, unit });
+  return c.remove.length ? t(oneEnd ? "pm.offEnd" : "pm.off", { off, unit }) : t(oneEnd ? "pm.addEnd" : "pm.add", { add, unit });
 }
 
 /**
