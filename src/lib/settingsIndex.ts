@@ -111,6 +111,7 @@ export const SETTINGS_INDEX: SettingRef[] = [
   S("settings.units", "body", ["units.kg", "units.lb"]),
   S("settings.bodyweight.label", "body"),
   S("cycle.title", "body"),
+  S("preg.title", "body", ["preg.stage.pregnant", "preg.stage.postpartum"]),
   // Your data and privacy
   S("settings.data", "data"),
   S("settings.stats", "data", ["settings.stats.on"]),

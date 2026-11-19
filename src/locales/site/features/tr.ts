@@ -162,6 +162,10 @@ export const tr: FeaturesText = {
       name: "Döngüye duyarlı hazırlık",
       body: "İstersen döngünü kaydet, günün kararı bunu da hesaba katsın.",
     },
+    pregnancy: {
+      name: "Hamilelik ve doğum sonrası modu",
+      body: "Hamile olduğunu ya da bebeğini doğurduğunu söyle, her antrenman haftana uysun: daha hafif yükler, sınıra kadar set yok, hamileliğin sonlarında sırtüstü hareket yok ve doğumdan sonra yaklaşık 16 haftalık kademeli dönüş.",
+    },
     "goal-planner": {
       name: "Hedef planlayıcı",
       body: "Bir hareket ve hedef seç; gerçekçi bir tarih ve oraya giden yolu hesaplasın.",

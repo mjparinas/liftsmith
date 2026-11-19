@@ -32,6 +32,8 @@ export interface WeeklyEmail {
   plain?: boolean;
   /** False when the screen can't be shown without someone's account (coaching, Friends): the email goes without one. */
   shot?: false;
+  /** Not sent to accounts whose synced profile says male (Your stats): pregnancy and postpartum mode. */
+  notMale?: true;
 }
 
 const L = (id: string, tier: Tier, route: string, more: Partial<WeeklyEmail> = {}): WeeklyEmail => ({
@@ -160,6 +162,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("team-session", "school", "free", "trainer/teams", { fresh: "2026-11-19", shot: false }),
   // New, 2026-11-19: every location of a gym chain, with its shared logo (docs/decisions/gyms.md "Gym chains").
   L("gym-chains", "free", "gym", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-19: pregnancy and postpartum mode (docs/decisions/pregnancy.md). Not to accounts that say male.
+  L("pregnancy", "free", "settings/body", { fresh: "2026-11-19", notMale: true }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

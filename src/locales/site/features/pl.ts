@@ -162,6 +162,10 @@ export const pl: FeaturesText = {
       name: "Gotowość z uwzględnieniem cyklu",
       body: "Jeśli chcesz, zapisuj cykl, a decyzja na dziś weźmie go pod uwagę.",
     },
+    pregnancy: {
+      name: "Tryb ciąży i połogu",
+      body: "Powiedz, że jesteś w ciąży albo urodziłaś, a każdy trening dopasuje się do tygodnia: lżejsze ciężary, żadnych serii do upadku, w późnej ciąży nic na plecach i stopniowy powrót przez około 16 tygodni po porodzie.",
+    },
     "goal-planner": {
       name: "Planer celów",
       body: "Wybierz ćwiczenie i cel, a aplikacja wyznaczy realną datę i drogę do niego.",

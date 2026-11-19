@@ -237,6 +237,12 @@ export interface Profile {
    */
   cycle?: { enabled: boolean; consentAt: number };
   /**
+   * Pregnancy and postpartum mode (Melvin, 2026-11-19; pregnancy.ts). Opt-in with its own consent; the due date, and
+   * the birth (start of a day, ms) once the baby's here. Stays on the device and the user's own sync, never in
+   * analytics or feedback reports. Turning it off removes it.
+   */
+  pregnancy?: { consentAt: number; due?: number; birth?: number; csection?: boolean };
+  /**
    * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
    * choice; billing will read it to start the store trial.
    */

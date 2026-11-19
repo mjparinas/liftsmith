@@ -1003,4 +1003,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Treina em duas unidades? Adicione as duas e o Liftsmith planeja cada treino com os equipamentos de onde você estiver.",
   },
+  pregnancy: {
+    title: "Treinar na gravidez e depois do parto",
+    intro: "O modo gravidez e pós-parto ajusta cada treino à semana, como o modo lesão faz.",
+    points: [
+      "Ative em Ajustes › Corpo e unidades: escolha grávida ou já tive meu bebê e depois as semanas no seletor.",
+      "As cargas caem com as semanas e cada série para longe da falha.",
+      "No fim da gravidez, nada de costas nem de bruços, sem saltos e sem abdominais.",
+      "Depois do parto, uma volta gradual de cerca de 16 semanas, duas a mais após uma cesárea.",
+    ],
+    dyk: "É grátis, fica no seu celular e cada mudança diz o porquê em Hoje.",
+  },
 };

@@ -999,4 +999,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "İki şubede mi çalışıyorsun? İkisini de salon olarak ekle, Liftsmith her antrenmanı bulunduğun yerin ekipmanına göre planlasın.",
   },
+  pregnancy: {
+    title: "Hamilelikte ve doğumdan sonra antrenman",
+    intro: "Hamilelik ve doğum sonrası modu, sakatlık modu gibi her antrenmanı haftana göre değiştirir.",
+    points: [
+      "Ayarlar › Vücut ve birimler'den aç: hamileyim ya da bebeğimi doğurdum seç, sonra haftaları − / + ile ayarla.",
+      "Haftalar geçtikçe yükler azalır ve her set tükenmenin çok gerisinde biter.",
+      "Hamileliğin sonlarında sırtüstü ya da yüzüstü hareket, zıplama ve mekik yok.",
+      "Doğumdan sonra yaklaşık 16 haftalık kademeli bir dönüş, sezaryenden sonra iki hafta daha uzun.",
+    ],
+    dyk: "Ücretsizdir, telefonunda kalır ve her değişikliğin nedeni Bugün ekranında yazar.",
+  },
 };

@@ -19,6 +19,7 @@ import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
+import { bodyMode } from "@/lib/pregnancy";
 import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
 import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
@@ -206,6 +207,7 @@ export function Today() {
   const lvl = g.level;
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
   const hurt = useMemo(() => activeInjuries(events), [events]);
+  const mode = bodyMode(profile, now);
   const hello = greeting(new Date(now).getHours(), profile.name);
   const call = preview ? CALL_STYLE[preview.call] : null;
   // Where the thumb's centre sits: the browser keeps the 28 px thumb inside the track, so a value's spot is half a
@@ -365,6 +367,17 @@ export function Today() {
         {!active && !resting && <CheckInChip />}
         {/* "Something hurts?" sits with How do you feel? in the readiness card when that's on screen; an injury
             being trained around stays up here, where it reads as today's status. */}
+        {/* Pregnancy and after birth (pregnancy.ts): today's status, and the way to the setting that explains it. */}
+        {mode && (
+          <button
+            type="button"
+            onClick={() => go("settings", "body")}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/12 px-3 py-1.5 text-violet"
+          >
+            <Icon name="heart" size={15} />
+            {t(`preg.chip.${mode.kind}`, { week: mode.week })}
+          </button>
+        )}
         {(hurt.length > 0 || !showCall) && (
           <button
             type="button"
@@ -647,7 +660,7 @@ export function Today() {
                             />
                           ) : it.injuryPct ? (
                             <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">
-                              {t("td.injury", { n: it.injuryPct })}
+                              {t(it.mode ? `preg.td.${it.mode}` : "td.injury", { n: it.injuryPct })}
                             </span>
                           ) : (
                             <span

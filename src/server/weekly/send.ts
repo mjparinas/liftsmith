@@ -40,6 +40,8 @@ const DAYS = new Set([2, 3, 4, 5, 6]);
 export interface WeeklyFacts {
   roles: Role[];
   flags: { coachPlans: boolean };
+  /** The synced profile says male (Your stats), for emails marked `notMale`. Missing means not known. */
+  male?: boolean;
 }
 
 export const NO_FACTS: WeeklyFacts = { roles: [], flags: { coachPlans: false } };
@@ -59,6 +61,7 @@ export function forAccount(e: WeeklyEmail, f: WeeklyFacts): boolean {
   if (e.audience !== "lifter" && !f.roles.includes(e.audience)) return false;
   if (e.notFor?.some((r) => f.roles.includes(r))) return false;
   if (e.needsFlag && !f.flags[e.needsFlag]) return false;
+  if (e.notMale && f.male) return false;
   return true;
 }
 

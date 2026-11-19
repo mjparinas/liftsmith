@@ -1006,4 +1006,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Vous allez dans deux salles ? Ajoutez les deux et Liftsmith prévoit chaque séance avec l'équipement de celle où vous êtes.",
   },
+  pregnancy: {
+    title: "S’entraîner pendant la grossesse et après l’accouchement",
+    intro: "Le mode grossesse et post-partum adapte chaque séance à la semaine, comme le mode blessure.",
+    points: [
+      "Activez-le dans Réglages › Corps et unités : choisissez enceinte ou j’ai eu mon bébé, puis les semaines avec le sélecteur.",
+      "Les charges baissent au fil des semaines et chaque série s’arrête loin de l’échec.",
+      "En fin de grossesse, rien sur le dos ni sur le ventre, pas de sauts ni de crunchs.",
+      "Après l’accouchement, une reprise progressive d’environ 16 semaines, deux de plus après une césarienne.",
+    ],
+    dyk: "C’est gratuit, ça reste sur votre téléphone et chaque changement dit pourquoi sur Aujourd’hui.",
+  },
 };

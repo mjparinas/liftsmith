@@ -1002,4 +1002,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ti alleni in due sedi? Aggiungile entrambe e Liftsmith pianifica ogni allenamento con l'attrezzatura di quella in cui sei.",
   },
+  pregnancy: {
+    title: "Allenarsi in gravidanza e dopo il parto",
+    intro: "La modalità gravidanza e post-parto adatta ogni allenamento alla settimana, come la modalità infortunio.",
+    points: [
+      "Attivala in Impostazioni › Corpo e unità: scegli incinta o ho avuto il mio bambino, poi le settimane con − / +.",
+      "I carichi scendono con le settimane e ogni serie si ferma lontano dal cedimento.",
+      "A fine gravidanza niente supina né prona, niente salti e niente crunch.",
+      "Dopo il parto, un ritorno graduale di circa 16 settimane, due in più dopo un cesareo.",
+    ],
+    dyk: "È gratis, resta sul tuo telefono e ogni modifica dice il perché su Oggi.",
+  },
 };
