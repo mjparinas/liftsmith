@@ -946,4 +946,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Orari sbagliati? Segnala un problema sulla sua pagina, oppure rivendicala e correggili tu.",
   },
+  "team-session": {
+    title: "Tutto l'allenamento della squadra su un tablet",
+    intro: "Le sessioni di squadra mettono un allenamento per tutta la squadra su un solo tablet.",
+    points: [
+      "Avviane una dalla scheda della squadra in Coaching e scegli una routine.",
+      "Ogni atleta tocca il proprio nome e registra le serie, con il peso da dove aveva lasciato.",
+      "Il tabellone mostra chi non ha ancora registrato una serie, mai un peso.",
+      "Alla fine, le serie di ognuno vengono salvate nel suo account.",
+    ],
+    dyk: "Niente campo in sala pesi? Le serie aspettano sul tablet e partono quando torna.",
+  },
 };

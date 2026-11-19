@@ -963,4 +963,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A gym's hours wrong? Report a problem on its page, or claim it and set them yourself.",
   },
+  "team-session": {
+    title: "Run the whole team's lift from one tablet",
+    intro: "Team sessions put one workout for your whole team on one tablet.",
+    points: [
+      "Start one from your team's card in Coaching and pick a routine.",
+      "Athletes tap their first name and log their own sets, the weight starting where they left off.",
+      "The board shows who hasn't logged a set yet, never a weight.",
+      "End it and each athlete's sets are saved to their own account.",
+    ],
+    dyk: "No reception in the weight room? Sets wait on the tablet and go up when it's back.",
+  },
 };

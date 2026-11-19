@@ -943,4 +943,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Złe godziny? Zgłoś problem na stronie siłowni albo przejmij ją i popraw je sam.",
   },
+  "team-session": {
+    title: "Cały trening drużyny na jednym tablecie",
+    intro: "Treningi drużyny mieszczą jeden trening dla całej drużyny na jednym tablecie.",
+    points: [
+      "Zacznij go z karty drużyny w Coaching i wybierz rutynę.",
+      "Każdy zawodnik stuka swoje imię i zapisuje serie, a ciężar zaczyna się tam, gdzie skończył.",
+      "Tablica pokazuje, kto nie zapisał jeszcze serii, nigdy ciężar.",
+      "Na koniec serie każdego trafiają na jego konto.",
+    ],
+    dyk: "Brak zasięgu na siłowni? Serie czekają na tablecie i pójdą, gdy wróci.",
+  },
 };

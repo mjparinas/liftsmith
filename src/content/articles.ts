@@ -48,6 +48,7 @@ import { BLOG_SEASONS } from "./blog/seasons";
 import { BLOG_SETTINGS_SEARCH } from "./blog/settingsSearch";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
+import { BLOG_TEAM_SESSION } from "./blog/teamSession";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
@@ -279,6 +280,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_GYM_OPEN_NOW,
   ...BLOG_SETTINGS_SEARCH,
   ...BLOG_ICON_BADGE,
+  ...BLOG_TEAM_SESSION,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

@@ -945,4 +945,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "¿Un horario está mal? Informa de un problema en su página, o reclámala y ponlo tú.",
   },
+  "team-session": {
+    title: "Todo el entrenamiento del equipo en una tableta",
+    intro: "Las sesiones de equipo ponen un entrenamiento para todo tu equipo en una sola tableta.",
+    points: [
+      "Empieza una desde la tarjeta de tu equipo en Coaching y elige una rutina.",
+      "Cada atleta toca su nombre y anota sus series, con el peso donde lo dejó.",
+      "El tablero muestra quién no ha anotado una serie, nunca un peso.",
+      "Al terminar, las series de cada atleta se guardan en su propia cuenta.",
+    ],
+    dyk: "¿Sin cobertura en la sala de pesas? Las series esperan en la tableta y se suben cuando vuelva.",
+  },
 };

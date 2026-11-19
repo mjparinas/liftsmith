@@ -44,6 +44,7 @@ export const ROUTES = [
   "program",
   "community",
   "season",
+  "teamsession",
 ] as const;
 export type Route = (typeof ROUTES)[number];
 
@@ -58,6 +59,7 @@ export const URL_NAMES: Partial<Record<Route, string>> = {
   gym: "gyms",
   stretch: "stretching",
   training: "workout-preferences",
+  teamsession: "team-session",
 };
 // The Body tab's two views have their own addresses (#/muscles, #/health); the old #/recovery opens the view the
 // tab would open. The route stays "recovery", with the view as its argument.

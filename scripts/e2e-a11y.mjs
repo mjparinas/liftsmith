@@ -122,6 +122,44 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/season`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan("season");
+    // A school coach's team session on the tablet (docs/decisions/school-teams.md "Team sessions"): the roster, one
+    // athlete's log sheet and the board. Seeded on the device, signed out, so nothing goes to a server.
+    await page.evaluate(() =>
+      localStorage.setItem(
+        "liftsmith.teamSession",
+        JSON.stringify({
+          id: "11111111-2222-3333-4444-555555555555",
+          team: "T1",
+          teamName: "Senior girls",
+          name: "Leg day",
+          plan: [
+            { exerciseId: "back-squat", sets: 3, reps: 5 },
+            { exerciseId: "push-up", sets: 2, reps: 12 },
+          ],
+          roster: [
+            { id: "ana", name: "Ana" },
+            { id: "bo", name: "Bo" },
+          ],
+          startedAt: Date.now(),
+          sets: [{ id: "s1", athlete: "bo", exercise: "back-squat", weight: 40, reps: 5, target: 5, at: Date.now() }],
+          last: {},
+          sent: [],
+          removed: [],
+        }),
+      ),
+    );
+    await page.goto(`${server.url}/app/#/team-session`);
+    await page.reload();
+    await page.getByText("Tap your name to log a set.").waitFor();
+    await scan("team session");
+    await page.getByRole("button", { name: /^Ana/ }).click();
+    await page.getByRole("dialog").waitFor();
+    await scan("team session log");
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Board", exact: true }).click();
+    await scan("team session board");
+    await page.evaluate(() => localStorage.removeItem("liftsmith.teamSession"));
+    await page.reload();
     await page.goto(`${server.url}/app/#/photos`);
     await page.getByRole("heading", { name: "Body and photos" }).waitFor();
     await scan("photos");

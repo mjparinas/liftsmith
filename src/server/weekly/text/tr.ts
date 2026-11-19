@@ -943,4 +943,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Saatler yanlış mı? Sayfasında sorun bildir ya da salonu sahiplenip saatleri kendin gir.",
   },
+  "team-session": {
+    title: "Takımın tüm antrenmanı tek tablette",
+    intro: "Takım seansları tüm takımın antrenmanını tek bir tablete koyar.",
+    points: [
+      "Koçluk'taki takım kartından başlat ve bir rutin seç.",
+      "Her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar.",
+      "Pano henüz set kaydetmeyenleri gösterir, asla ağırlığı değil.",
+      "Bitirince her sporcunun setleri kendi hesabına kaydedilir.",
+    ],
+    dyk: "Ağırlık salonunda çekim yok mu? Setler tablette bekler ve bağlantı gelince gönderilir.",
+  },
 };

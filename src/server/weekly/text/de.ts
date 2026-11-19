@@ -946,4 +946,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Öffnungszeiten falsch? Melde ein Problem auf der Seite oder beanspruche sie und trage sie selbst ein.",
   },
+  "team-session": {
+    title: "Das ganze Teamtraining auf einem Tablet",
+    intro: "Mit Teamtraining läuft ein Training für dein ganzes Team auf einem einzigen Tablet.",
+    points: [
+      "Starte es auf der Karte deines Teams unter Coaching und wähle eine Routine.",
+      "Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht beim letzten Stand.",
+      "Die Tafel zeigt, wer noch keinen Satz eingetragen hat, nie ein Gewicht.",
+      "Am Ende landen die Sätze aller im eigenen Konto.",
+    ],
+    dyk: "Kein Empfang im Kraftraum? Die Sätze warten auf dem Tablet und gehen raus, sobald er wieder da ist.",
+  },
 };

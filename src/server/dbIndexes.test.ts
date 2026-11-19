@@ -271,6 +271,30 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     uses: ["coach_checkin_photos_pair", "coach_checkin_photos_client"],
     noScan: ["coach_checkin_photos"],
   },
+  {
+    name: "team sessions: a session's sets (teamSessions.ts pushSession, liveBoard)",
+    sql: "SELECT athlete_id, exercise_id, COUNT(*) AS c FROM team_session_sets WHERE session_id = ? AND reps > 0 GROUP BY athlete_id, exercise_id",
+    uses: ["sqlite_autoindex_team_session_sets_1"],
+    noScan: ["team_session_sets"],
+  },
+  {
+    name: "team sessions: a team's last sessions (teamSessions.ts lastWeights)",
+    sql: "SELECT id FROM team_sessions WHERE team_id = ? ORDER BY started_at DESC LIMIT 3",
+    uses: ["team_sessions_team"],
+    noScan: ["team_sessions"],
+  },
+  {
+    name: "team sessions: a coach's sessions still running (teamSessions.ts liveSessions)",
+    sql: "SELECT id, team_id FROM team_sessions WHERE coach_id = ? AND ended_at IS NULL AND started_at > ? ORDER BY started_at",
+    uses: ["team_sessions_coach"],
+    noScan: ["team_sessions"],
+  },
+  {
+    name: "team sessions: an athlete's sets, when their account goes (teamSessions.ts sessionDeletes)",
+    sql: "DELETE FROM team_session_sets WHERE athlete_id = ?",
+    uses: ["team_session_sets_athlete"],
+    noScan: ["team_session_sets"],
+  },
 ];
 
 describe("queries on growing tables use an index", () => {

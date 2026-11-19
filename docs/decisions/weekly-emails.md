@@ -778,3 +778,12 @@ Find gyms near you now says which gyms are open, and when they close or open nex
 - Tap Open now above the list to hide the closed ones, on the map too.
 - It's worked out on your own clock, for gyms near you.
 Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")
+
+### W69 · Run the whole team's lift from one tablet (**New**, 2026-11-19)
+Free · School coaches · No screenshot (Coaching's team page needs a verified school coach) · `fresh`, so it goes next to everyone already in the series
+Team sessions put one workout for your whole team on one tablet.
+- Start one from your team's card in Coaching and pick a routine.
+- Athletes tap their first name and log their own sets, the weight starting where they left off.
+- The board shows who hasn't logged a set yet, never a weight.
+- End it and each athlete's sets are saved to their own account.
+Did you know? No reception in the weight room? Sets wait on the tablet and go up when it's back. ([School teams](school-teams.md) "Team sessions")
