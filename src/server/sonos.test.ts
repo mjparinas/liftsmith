@@ -87,6 +87,7 @@ describe("Sonos state", () => {
       group: "RINCON_A:1",
       playing: true,
       volume: 34,
+      muted: false,
       track: "Lift Off",
       artist: "The Plates",
       image: "https://img.example/a.jpg",
@@ -121,10 +122,12 @@ describe("Sonos state", () => {
       { container: { name: "Radio One", imageUrl: "http://x/y.png" } },
       { fixed: true, volume: 50 },
     );
+    expect(toNow("G", {}, {}, { volume: 20, muted: true })).toMatchObject({ volume: 20, muted: true });
     expect(n).toEqual({
       group: "G",
       playing: false,
       volume: null,
+      muted: false,
       track: "Radio One",
       artist: null,
       image: null,
@@ -160,6 +163,7 @@ describe("Sonos commands", () => {
     expect(commandCall({ do: "next" })).toEqual({ path: "/playback/skipToNextTrack", body: {} });
     expect(commandCall({ do: "volume", level: 40 })).toEqual({ path: "/groupVolume", body: { volume: 40 } });
     expect(commandCall({ do: "nudge", delta: -5 })).toEqual({ path: "/groupVolume/relative", body: { volumeDelta: -5 } });
+    expect(commandCall({ do: "mute", muted: true })).toEqual({ path: "/groupVolume/mute", body: { muted: true } });
     expect(commandCall({ do: "favourite", id: "7" })).toEqual({
       path: "/favorites",
       body: { favoriteId: "7", playOnCompletion: true, action: "REPLACE" },
@@ -181,6 +185,8 @@ describe("Sonos commands", () => {
   it("checks commands from the app", () => {
     expect(checkSonosCommand({ do: "volume", level: 140 })).toEqual({ do: "volume", level: 100 });
     expect(checkSonosCommand({ do: "nudge", delta: 0 })).toBeNull();
+    expect(checkSonosCommand({ do: "mute", muted: false })).toEqual({ do: "mute", muted: false });
+    expect(checkSonosCommand({ do: "mute", muted: "yes" })).toBeNull();
     expect(checkSonosCommand({ do: "favourite", id: "../../x y" })).toBeNull();
     expect(checkSonosCommand({ do: "rm -rf" })).toBeNull();
     expect(checkSonosCommand(null)).toBeNull();

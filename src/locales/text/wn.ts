@@ -7,6 +7,9 @@ export const en = {
   "wn.c.landmineEnd.title": "Landmine plates on one end",
   "wn.c.landmineEnd.body": "Landmine and T-bar moves show their plates on the one free end, and plate changes stop saying each side.",
   "wn.c.gymInsights.title": "Insights for gym owners",
+  "wn.c.sonosVolume.title": "Sonos keeps your volume, and mutes in one tap",
+  "wn.c.sonosVolume.body":
+    "Turn the music up during a set and that becomes your set volume, the same for rest. Tap the speaker to mute, and again to bring it back.",
   "wn.c.gymInsights.body":
     "Own a gym on Liftsmith? Its page now shows how many lifters train there, the busy and quiet hours and the equipment they use, with one thing to do next. Totals only, never who. Turn off Count my gym visits in Settings if you'd rather not count.",
   "wn.title": "What's new",
@@ -96,6 +99,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Discos del landmine en un extremo",
   "wn.c.landmineEnd.body":
     "Los ejercicios con landmine y la remada en T muestran los discos en el único extremo libre, y los cambios de discos ya no dicen por lado.",
+  "wn.c.sonosVolume.title": "Sonos recuerda tu volumen y se silencia con un toque",
+  "wn.c.sonosVolume.body":
+    "Sube la música durante una serie y ese será tu volumen de series; lo mismo en el descanso. Toca el altavoz para silenciar y otra vez para recuperarlo.",
   "wn.c.gymInsights.title": "Datos para dueños de gimnasios",
   "wn.c.gymInsights.body":
     "¿Tienes un gimnasio en Liftsmith? Su página muestra cuántos atletas entrenan allí, las horas llenas y tranquilas y el equipo que usan, con un siguiente paso. Solo totales, nunca quién. Desactiva Contar mis visitas al gimnasio en Ajustes si prefieres no contar.",
@@ -192,6 +198,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Disques du landmine sur une extrémité",
   "wn.c.landmineEnd.body":
     "Les mouvements au landmine et le rowing T-bar montrent leurs disques sur la seule extrémité libre, sans « de chaque côté ».",
+  "wn.c.sonosVolume.title": "Sonos garde ton volume et se coupe d'un toucher",
+  "wn.c.sonosVolume.body":
+    "Monte la musique pendant une série et ce sera ton volume de série, pareil pour le repos. Touche le haut-parleur pour couper le son, et encore pour le rétablir.",
   "wn.c.gymInsights.title": "Des statistiques pour les propriétaires de salle",
   "wn.c.gymInsights.body":
     "Vous gérez une salle sur Liftsmith ? Sa page montre combien de sportifs s'y entraînent, les heures pleines et calmes et le matériel utilisé, avec une prochaine étape. Des totaux seulement, jamais qui. Désactivez Compter mes visites en salle dans Réglages si vous préférez.",
@@ -290,6 +299,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Landmine-Scheiben an einem Ende",
   "wn.c.landmineEnd.body": "Landmine-Übungen und T-Bar-Rudern zeigen die Scheiben am freien Ende, ohne „pro Seite“.",
   "wn.c.gymInsights.title": "Einblicke für Gym-Betreiber",
+  "wn.c.sonosVolume.title": "Sonos merkt sich deine Lautstärke und schaltet mit einem Tippen stumm",
+  "wn.c.sonosVolume.body":
+    "Drehst du die Musik während eines Satzes lauter, wird das deine Satzlautstärke, genauso in der Pause. Tippe auf den Lautsprecher zum Stummschalten und noch einmal, um den Ton zurückzuholen.",
   "wn.c.gymInsights.body":
     "Du betreibst ein Gym auf Liftsmith? Seine Seite zeigt jetzt, wie viele Sportler dort trainieren, die vollen und ruhigen Stunden und die genutzten Geräte, mit einem nächsten Schritt. Nur Summen, nie wer. Schalte Meine Gym-Besuche mitzählen in den Einstellungen aus, wenn du nicht mitzählen willst.",
   "wn.title": "Neuigkeiten",
@@ -385,6 +397,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Dischi del landmine su un'estremità",
   "wn.c.landmineEnd.body": "Gli esercizi al landmine e il T-bar row mostrano i dischi sull'unica estremità libera, senza più «per lato».",
   "wn.c.gymInsights.title": "Dati per i titolari di palestre",
+  "wn.c.sonosVolume.title": "Sonos ricorda il tuo volume e si silenzia con un tocco",
+  "wn.c.sonosVolume.body":
+    "Alza la musica durante una serie e diventa il tuo volume per le serie, lo stesso per il recupero. Tocca l'altoparlante per silenziare e di nuovo per riattivarlo.",
   "wn.c.gymInsights.body":
     "Hai una palestra su Liftsmith? La sua pagina ora mostra quanti atleti si allenano lì, gli orari pieni e tranquilli e l'attrezzatura usata, con un passo successivo. Solo totali, mai chi. Disattiva Conta le mie visite in palestra nelle Impostazioni se preferisci.",
   "wn.title": "Novità",
@@ -480,6 +495,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "ランドマインのプレートは片端に",
   "wn.c.landmineEnd.body": "ランドマイン種目とTバーロウは、空いている片端だけにプレートを表示し、「片側」と言わなくなりました。",
   "wn.c.gymInsights.title": "ジムオーナー向けの分析",
+  "wn.c.sonosVolume.title": "Sonosが音量を覚え、タップでミュート",
+  "wn.c.sonosVolume.body":
+    "セット中に音量を上げると、それがセットの音量になります。休憩中も同じです。スピーカーをタップするとミュート、もう一度で元に戻ります。",
   "wn.c.gymInsights.body":
     "Liftsmithでジムを運営していますか？ジムのページに、利用者数、混む時間と空いている時間、使われた器具が、次の一手とともに表示されます。合計のみで、誰かは表示されません。数えられたくない場合は設定の「ジムへの来館を数える」をオフに。",
   "wn.title": "新機能",
@@ -567,6 +585,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Anilhas do landmine em uma ponta",
   "wn.c.landmineEnd.body": "Exercícios no landmine e a remada cavalinho mostram as anilhas na única ponta livre, sem dizer de cada lado.",
   "wn.c.gymInsights.title": "Dados para donos de academia",
+  "wn.c.sonosVolume.title": "O Sonos guarda seu volume e silencia com um toque",
+  "wn.c.sonosVolume.body":
+    "Aumente a música durante uma série e esse vira seu volume de série; o mesmo no descanso. Toque no alto-falante para silenciar e de novo para voltar.",
   "wn.c.gymInsights.body":
     "Tem uma academia no Liftsmith? A página dela agora mostra quantos atletas treinam lá, os horários cheios e tranquilos e os equipamentos usados, com um próximo passo. Só totais, nunca quem. Desative Contar minhas visitas à academia em Ajustes se preferir não contar.",
   "wn.title": "Novidades",
@@ -658,6 +679,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "랜드마인 원판은 한쪽 끝에",
   "wn.c.landmineEnd.body": "랜드마인 운동과 T바 로우는 비어 있는 한쪽 끝에만 원판을 보여 주고, 더 이상 한쪽당이라고 하지 않아요.",
   "wn.c.gymInsights.title": "체육관 운영자를 위한 인사이트",
+  "wn.c.sonosVolume.title": "Sonos가 볼륨을 기억하고 한 번에 음소거",
+  "wn.c.sonosVolume.body":
+    "세트 중에 볼륨을 올리면 그게 세트 볼륨이 됩니다. 휴식도 마찬가지예요. 스피커를 탭하면 음소거, 다시 탭하면 돌아옵니다.",
   "wn.c.gymInsights.body":
     "Liftsmith에 체육관이 있나요? 이제 체육관 페이지에 이용자 수, 붐비는 시간과 한산한 시간, 사용된 기구가 다음 할 일과 함께 표시됩니다. 합계만 보이고 누구인지는 보이지 않습니다. 집계를 원하지 않으면 설정에서 내 체육관 방문 집계를 끄세요.",
   "wn.title": "새로운 기능",
@@ -742,6 +766,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Talerze na landmine na jednym końcu",
   "wn.c.landmineEnd.body": "Ćwiczenia z landmine i wiosłowanie T-bar pokazują talerze na jedynym wolnym końcu, bez „z każdej strony”.",
   "wn.c.gymInsights.title": "Statystyki dla właścicieli siłowni",
+  "wn.c.sonosVolume.title": "Sonos pamięta głośność i wycisza jednym dotknięciem",
+  "wn.c.sonosVolume.body":
+    "Podgłośnij muzykę w trakcie serii, a stanie się to Twoją głośnością serii; tak samo w przerwie. Dotknij głośnika, by wyciszyć, i jeszcze raz, by przywrócić.",
   "wn.c.gymInsights.body":
     "Masz siłownię w Liftsmith? Jej strona pokazuje teraz, ile osób tam trenuje, godziny tłoku i spokoju oraz używany sprzęt, z jednym następnym krokiem. Tylko sumy, nigdy kto. Wyłącz Licz moje wizyty na siłowni w Ustawieniach, jeśli wolisz nie być liczony.",
   "wn.title": "Co nowego",
@@ -833,6 +860,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.landmineEnd.title": "Landmine plakaları tek uçta",
   "wn.c.landmineEnd.body": "Landmine hareketleri ve T-bar row, plakaları yalnızca boştaki uçta gösterir ve artık her yana demez.",
   "wn.c.gymInsights.title": "Salon sahipleri için içgörüler",
+  "wn.c.sonosVolume.title": "Sonos ses düzeyini hatırlar, tek dokunuşla susar",
+  "wn.c.sonosVolume.body":
+    "Set sırasında müziği açarsan bu senin set ses düzeyin olur, dinlenmede de aynısı. Sesi kapatmak için hoparlöre dokun, geri getirmek için yine dokun.",
   "wn.c.gymInsights.body":
     "Liftsmith'te bir salonun mu var? Salonun sayfası artık kaç sporcunun orada antrenman yaptığını, yoğun ve sakin saatleri ve kullanılan ekipmanı, bir sonraki adımla birlikte gösteriyor. Yalnızca toplamlar, asla kim olduğu değil. Sayılmak istemezsen Ayarlar'da Salon ziyaretlerimi say'ı kapat.",
   "wn.title": "Yenilikler",
