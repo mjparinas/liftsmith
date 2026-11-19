@@ -28,6 +28,7 @@
     "src/lib/measure.ts",
     "src/lib/monthly.ts",
     "src/lib/nutrition.ts",
+    "src/lib/outside.ts",
     "src/lib/cardio.ts",
     "src/lib/calculators.ts",
     "src/lib/intervals.ts",

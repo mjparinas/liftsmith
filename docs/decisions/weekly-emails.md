@@ -779,6 +779,32 @@ Find gyms near you now says which gyms are open, and when they close or open nex
 - It's worked out on your own clock, for gyms near you.
 Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")
 
+### W69 · Your runs and matches now count in your recovery (**New**, 2026-11-19)
+Free · Lifters · Screenshot of Body › Muscles · `fresh`, so it goes next to everyone already in the series
+
+Turn on Count workouts from other apps, and the workouts in your phone's health app shape your recovery map and tomorrow's plan.
+- Runs, rides, sports and classes come in each time you open the app.
+- Each one tires the muscles it uses, more the longer it ran.
+- Tomorrow's plan works around tired legs after a long run or match.
+- They never count as Liftsmith workouts, and nothing counts twice.
+Did you know? It's in Settings › Connected apps, and the list under the recovery map on Body shows what's being counted. ([Workouts from other apps](outside-workouts.md))
+
+### W70 · Form videos with notes in the video (**New**, 2026-11-19)
+Pro (coaching) · Coaches · No screenshot (needs a client and a video) · `fresh`, so it goes next to every coach already in the series
+Clients can now film a set in the app and send it to you, and you answer right on the video.
+- They tap Send a form video in Coaching, pick the lift and say what to check; five seconds to get into place, up to a minute.
+- You get a notification. Slow it to half or quarter speed, pause where it matters and add a note pinned to that second.
+- They tap a note to jump to that moment, and can answer with a note of their own.
+- Videos stay private to the two of you and go when either of you ends coaching.
+Did you know? Clients under 18 can't send form videos. Sending one is free for clients. ([Trainer mode](trainer-mode.md) "Form videos")
+### W71 · Find a routine another lifter made (**New**, 2026-11-19)
+Free · Lifters · No screenshot (the routines come from our server in lifters' own words) · `fresh`, so it goes next to everyone already in the series
+The new routine library has routines other lifters published, ready to save in a tap.
+- Search by words, pick a goal, or turn on Fits my gym to see only routines your gym has everything for.
+- Save one and it lands in your routines, ready to start or change.
+- Rate it with stars once you've saved it. Stars show from three ratings.
+- Publish your own from its editor, with or without your name. Only exercises and sets go out, never weights or notes.
+Did you know? Every published routine gets its own page on the website, so you can share it with anyone. ([Routine library](routine-library.md))
 ### G4 · See how members use your gym (**New**, 2026-11-19)
 Free · Gyms · No screen (it needs an official gym with five lifters) · `fresh`, so it goes next to gyms already in the series
 Your gym's page in the app now shows how lifters train there, with one thing to do next.

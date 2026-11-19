@@ -320,6 +320,17 @@ Melvin, 2026-11-19: "for the gyms we scrape, is it possible find higher resoluti
 - **Small icons get another look**: an icon under 128 px counts as missing, so the gym is read again when its site is next due (a month, like any other missing field), and a sharper icon replaces it only if it's bigger. The replacement gets a new id, because pictures are cached for good. Claimed gyms and gyms with an owner's logo are never touched (the statement checks both).
 - **Backfill of icons kept before this** (no button): every website step (the import job's and each daily refresh's, `enrichBatch`) first measures up to 500 icons with `px = 0` from their first 4 KB only (`substr(image, 1, 4096)`), so Turso's bandwidth never pays for whole images, through the partial index `gym_photos_unmeasured`, which is empty once they're all measured, so it costs nothing after that. An unclaimed gym whose old icon is small goes to the front of the website step's line (`enriched_at = 1`, which still counts as read for the AI step), so the next daily refresh looks for a sharper one. One that can't be measured counts as 1 px.
 
+## Pictures in Vercel Blob
+
+Melvin, 2026-11-19 (from the open items' Later list): gym logos, photos and website icons move out of Turso. They were blobs in `gym_photos.image` (owner photos up to 450 KB each), so every one sat in the database and each CDN miss read its bytes from Turso.
+
+- **Where they live** (`src/server/gymBlob.ts`): each picture is a public file in Vercel Blob at `gyms/<id>`, cached a year, and `gym_photos` keeps only its address in `url` (with `image` left empty). Owners' uploads (`addMedia`) and website icons (`keepIcon` in `gymEnrich.ts`) go to Blob first and then write the row.
+- **Nothing outside the server changes**: pages and the apps still load `/api/gyms/photo/?id=`, which reads one indexed row for the address, fetches the file and answers with the same one-year immutable cache. So the gym pages' image policy (our origin only) stays, ids stay, and the copies the apps and browsers already cached keep working. A moved picture's bytes are never read from Turso again.
+- **Removing**: a new logo, the owner's Remove, staff's Remove pictures, a deleted gym and a replaced website icon delete the old files after the rows (best effort; a file left behind is never shown). A new file whose row couldn't be written is taken back out.
+- **Moving the old ones** (no button): while the gym import worker runs every five minutes (`/api/cron/gym-imports/`, `runMover`), it first measures old website icons (`measureIcons`, which reads their first bytes from the database), then moves pictures in batches of 100, eight uploads at once, for up to four minutes, through the partial index `gym_photos_unmoved`, which is empty once they've all moved, so after that it costs one empty read. A failed upload leaves that picture in the database and it's tried again next run.
+- **Off until Blob is set up**: without `BLOB_READ_WRITE_TOKEN` (Vercel sets it when a Blob store is connected to the project) everything stays in the database as before, and an upload that fails falls back to the database too. It's on the admin System tab's Settings card.
+- Server only, so Android, iOS and the web get it together.
+
 ## Owner insights (2026-11-19)
 
 Melvin picked item 8 of the 2026-11-17 gap list: insights for owners of claimed gyms (how many lifters train there, busy

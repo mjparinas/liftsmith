@@ -334,6 +334,11 @@ export const pt: FeaturesText = {
       name: "Suas próprias rotinas",
       body: "Monte rotinas a partir do catálogo de exercícios, sem limite de quantidade, e compartilhe como link.",
     },
+    "routine-library": {
+      name: "Biblioteca de rotinas",
+      body: "Busque rotinas que outras pessoas publicaram por objetivo, palavras e o que a sua academia tem, salve uma com um toque e avalie com estrelas. Publique a sua pelo editor, com ou sem seu nome, e ela ganha uma página própria no site. Só os exercícios e as séries são publicados, nunca suas cargas ou anotações.",
+      note: "Publicar exige uma conta e 18 anos. Qualquer pessoa pode navegar.",
+    },
     library: {
       name: "1.000 exercícios",
       body: "Musculação, peso corporal, máquinas, elásticos, kettlebells e cardio, com busca, filtros por músculo e um filtro desta academia. O cardio registra tempo e distância.",
@@ -479,6 +484,11 @@ export const pt: FeaturesText = {
       name: "Check-ins de progresso com peso, fotos e tendências",
       body: "Adicione perguntas de peso corporal e de foto a qualquer formulário e envie toda semana, a cada 2 ou a cada 4 semanas. O peso já vem da última pesagem do aluno, as fotos chegam só para você e a tendência de cada resposta aparece no relatório dele. Menores de 18 anos nunca recebem pedido de foto.",
     },
+    "coach-form-videos": {
+      name: "Vídeos de execução com notas no vídeo",
+      body: "Seus clientes gravam uma série no app e enviam para você. Veja em câmera lenta, fixe notas nos momentos exatos e eles respondem nas mesmas notas. Só vocês dois veem; menores de 18 anos não podem enviar.",
+      note: "Enviar um vídeo é grátis para clientes. Android, iPhone e web.",
+    },
     "coach-roles": {
       name: "Para personal trainers e coaches",
       body: "Diga se você é personal trainer com atendimento individual ou coach de grupos e equipes. Os alunos veem o termo certo para você, e as ferramentas que você mais usa vêm primeiro.",
@@ -579,6 +589,10 @@ export const pt: FeaturesText = {
     "health-save": {
       name: "Treinos salvos no seu app de saúde",
       body: "Cada treino concluído é salvo no Health Connect ou no Apple Saúde como treino de força, com calorias e frequência cardíaca.",
+    },
+    "outside-workouts": {
+      name: "Treinos de outros apps contam",
+      body: "Ligado, corridas, pedais, esportes e aulas que outros apps salvam no seu app de saúde contam no mapa de recuperação e no plano de amanhã. Uma partida longa ontem deixa as pernas em recuperação, e o plano leva isso em conta.",
     },
     offline: {
       name: "Funciona offline",
@@ -730,11 +744,11 @@ export const pt: FeaturesText = {
   connections: {
     "health-connect": {
       name: "Health Connect",
-      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos e alimentação; envia os treinos concluídos",
+      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos e alimentação; envia os treinos concluídos; e, se ligado, recebe treinos de outros apps",
     },
     "apple-health": {
       name: "Apple Saúde",
-      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos, alimentação, altura, idade e sexo; envia os treinos concluídos",
+      does: "Recebe pesagens, gordura corporal, sono, VFC, frequência cardíaca, passos, alimentação, altura, idade e sexo; envia os treinos concluídos; e, se ligado, recebe treinos de outros apps",
     },
     "samsung-health": {
       name: "Samsung Health",

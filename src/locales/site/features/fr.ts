@@ -282,6 +282,11 @@ export const fr: FeaturesText = {
       name: "Vos propres routines",
       body: "Créez des routines depuis le catalogue d’exercices, sans limite de nombre, et partagez-les par lien.",
     },
+    "routine-library": {
+      name: "Bibliothèque de routines",
+      body: "Cherchez les routines publiées par d'autres selon l'objectif, des mots et ce que votre salle propose, enregistrez-en une d'un geste et notez-la avec des étoiles. Publiez la vôtre depuis son éditeur, avec ou sans votre nom, et elle a sa propre page sur le site. Seuls les exercices et les séries sont partagés, jamais vos charges ni vos notes.",
+      note: "Publier demande un compte et 18 ans. Tout le monde peut parcourir.",
+    },
     library: {
       name: "1 000 exercices",
       body: "Force, poids du corps, machines, élastiques, kettlebells et cardio, avec recherche, filtres par muscle et un filtre pour cette salle. Le cardio enregistre la durée et la distance.",
@@ -418,6 +423,11 @@ export const fr: FeaturesText = {
       name: "Bilans de progrès avec poids, photos et tendances",
       body: "Ajoutez des questions de poids et de photo à n'importe quel formulaire, et envoyez-le chaque semaine, toutes les 2 ou toutes les 4 semaines. Le poids part de la dernière pesée du client, les photos ne vont qu'à vous, et la tendance de chaque réponse s'affiche dans son rapport. On ne demande jamais de photo aux moins de 18 ans.",
     },
+    "coach-form-videos": {
+      name: "Vidéos de technique avec notes dans la vidéo",
+      body: "Vos clients filment une série dans l'app et vous l'envoient. Regardez-la au ralenti, épinglez des notes aux moments précis, et ils répondent sur les mêmes notes. Seuls vous deux la voyez ; les moins de 18 ans ne peuvent pas en envoyer.",
+      note: "Envoyer une vidéo est gratuit pour les clients. Android, iPhone et web.",
+    },
     "coach-roles": {
       name: "Pour les coachs personnels et les entraîneurs",
       body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",
@@ -518,6 +528,10 @@ export const fr: FeaturesText = {
     "health-save": {
       name: "Séances enregistrées dans votre appli santé",
       body: "Chaque séance terminée est enregistrée dans Health Connect ou Apple Santé comme séance de musculation, avec les calories et le pouls.",
+    },
+    "outside-workouts": {
+      name: "Les séances d'autres apps comptent",
+      body: "Une fois activé, les courses, sorties vélo, sports et cours que d'autres apps enregistrent dans votre appli santé comptent dans votre carte de récupération et le plan de demain. Un long match hier laisse les jambes en récupération, et le plan en tient compte.",
     },
     offline: {
       name: "Fonctionne hors ligne",
@@ -673,11 +687,11 @@ export const fr: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas et alimentation en entrée ; séances terminées en sortie",
+      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas et alimentation en entrée ; séances terminées en sortie; et, si vous l'activez, les séances d'autres apps en entrée",
     },
     "apple-health": {
       name: "Apple Santé",
-      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas, alimentation, taille, âge et sexe en entrée ; séances terminées en sortie",
+      does: "Pesées, masse grasse, sommeil, VFC, pouls, pas, alimentation, taille, âge et sexe en entrée ; séances terminées en sortie; et, si vous l'activez, les séances d'autres apps en entrée",
     },
     "samsung-health": { does: "Ses données, une fois partagées avec Health Connect" },
     "health-devices": {

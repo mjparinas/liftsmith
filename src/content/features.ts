@@ -485,6 +485,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "routine-library",
+        name: "Routine library",
+        body: "Search routines other lifters published by goal, words and what your gym has, save one in a tap and rate it with stars. Publish your own from its editor, with or without your name, and it gets its own page on the website. Only the exercises and sets go out, never your weights or notes.",
+        tier: "free",
+        note: "Publishing needs an account and opens at 18. Anyone can browse.",
+        added: "2026-11-19",
+      },
+      {
         id: "library",
         name: "1,000 exercises",
         body: "Strength, bodyweight, machines, bands, kettlebells and cardio, with search, muscle chips and a this-gym filter. Cardio logs time and distance.",
@@ -769,6 +777,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-17",
       },
       {
+        id: "coach-form-videos",
+        name: "Form videos with notes pinned in the video",
+        body: "Clients film a set in the app and send it to you. Watch it slowed down, pin notes to the exact moments that matter, and they answer on the same notes. Only the two of you can see it, and clients under 18 can't send one.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Sending a video is free for clients. Android, iPhone and the web.",
+        added: "2026-11-19",
+      },
+      {
         id: "coach-roles",
         name: "For personal trainers and coaches",
         body: "Say whether you're a personal trainer working one-on-one or a coach running groups and teams. Clients see the right word for you, and the tools you use most come first.",
@@ -965,6 +982,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         where: "phones",
         added: "2026-11-10",
+      },
+      {
+        id: "outside-workouts",
+        name: "Workouts from other apps count",
+        body: "Turn it on and the runs, rides, sports and classes other apps save to your phone's health app count in your recovery map and tomorrow's plan. A long match yesterday leaves your legs recovering, and the plan works around it.",
+        tier: "free",
+        where: "phones",
+        added: "2026-11-19",
       },
     ],
   },
@@ -1306,7 +1331,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       {
         id: "health-connect",
         name: "Health Connect",
-        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps and food in; finished workouts out",
+        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps and food in; finished workouts out; other apps' workouts in, if you turn it on",
         android: "yes",
         ios: "no",
         web: "no",
@@ -1315,7 +1340,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       {
         id: "apple-health",
         name: "Apple Health",
-        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps, food, height, age and sex in; finished workouts out",
+        does: "Weigh-ins, body fat, sleep, HRV, heart rate, steps, food, height, age and sex in; finished workouts out; other apps' workouts in, if you turn it on",
         android: "no",
         ios: "yes",
         web: "no",

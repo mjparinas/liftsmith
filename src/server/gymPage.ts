@@ -51,7 +51,7 @@ const EQ: Record<MsgLang, Partial<Record<string, unknown>>> = {
 
 export const say = (lang: MsgLang, key: GpKey, vars: Record<string, string | number> = {}) =>
   String(GP[lang][key] ?? gp.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => (k in vars ? String(vars[k]) : all));
-const equipName = (lang: MsgLang, e: Equipment) =>
+export const equipName = (lang: MsgLang, e: Equipment) =>
   String(EQ[lang][`equipment.${e}`] ?? equipment.en[`equipment.${e}` as keyof typeof equipment.en] ?? e);
 
 const EX: Record<MsgLang, Partial<Record<string, unknown>>> = {

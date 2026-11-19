@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { track } from "@/lib/analytics";
 import { available, exercise } from "@/lib/exercises";
@@ -28,7 +28,21 @@ export function SharedRoutine({ code }: { code?: string }) {
   return <SharedPreview key={code ?? ""} code={code} />;
 }
 
-function SharedPreview({ code }: { code?: string }) {
+/**
+ * The preview and its Save button. The routine library (Library.tsx) shows it under its own header (`header`, which
+ * replaces the title card) and hears about a save (`onSaved`); `onBack` replaces the way out to Today.
+ */
+export function SharedPreview({
+  code,
+  header,
+  onSaved,
+  onBack,
+}: {
+  code?: string;
+  header?: ReactNode;
+  onSaved?: () => void;
+  onBack?: () => void;
+}) {
   const { profile, gyms, active, events, saveShared, pickRoutine } = useApp();
   const shared = useMemo(() => (code ? decodeRoutine(code) : null), [code]);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -82,13 +96,14 @@ function SharedPreview({ code }: { code?: string }) {
     );
     track("feature", { name: "routine_share", detail: "import" });
     setSavedId(id);
+    onSaved?.();
   };
   return (
     <div className="pb-2">
-      <ScreenHeader title={t("rt.sharedTitle")} kicker={t("rt.sharedKicker")} />
+      {header ?? <ScreenHeader title={t("rt.sharedTitle")} kicker={t("rt.sharedKicker")} />}
       <section className="card card-tint mt-4 p-4" style={{ ["--tint" as string]: "var(--color-accent)" }}>
-        <h2 className="text-xl font-bold break-words">{shared.name}</h2>
-        <p className="num mt-1 text-sm text-muted">
+        {!header && <h2 className="text-xl font-bold break-words">{shared.name}</h2>}
+        <p className={`num text-sm text-muted ${header ? "" : "mt-1"}`}>
           {t("rt.summary", { exercises: t("rt.exercises", { count: shared.items.length }), sets: t("rt.sets", { count: sets }) })}
         </p>
         <p className="mt-2 text-sm text-muted">{t("rt.sharedWhy")}</p>
@@ -182,9 +197,15 @@ function SharedPreview({ code }: { code?: string }) {
             {t("rt.sharedSave")}
           </Button>
         )}
-        <Button kind="quiet" className="w-full" onClick={() => go("today")}>
-          {existing ? t("remix.back") : t("remix.notNow")}
-        </Button>
+        {onBack ? (
+          <Button kind="quiet" className="w-full" onClick={onBack}>
+            {t("rl.backToLibrary")}
+          </Button>
+        ) : (
+          <Button kind="quiet" className="w-full" onClick={() => go("today")}>
+            {existing ? t("remix.back") : t("remix.notNow")}
+          </Button>
+        )}
       </div>
     </div>
   );

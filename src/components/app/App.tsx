@@ -43,7 +43,7 @@ import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync, useSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
-import { forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
+import { coachWaiting, forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -70,6 +70,7 @@ import { GymStaffJoin } from "./GymStaff";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
+import { Library } from "./Library";
 import { LogoEgg } from "./LogoEgg";
 import { LogPast } from "./LogPast";
 import { Onboarding } from "./Onboarding";
@@ -511,6 +512,7 @@ export function App() {
     program: <CoachProgramScreen key={arg ?? ""} arg={arg} />,
     community: <Community key={arg ?? ""} arg={arg} />,
     season: <SeasonScreen />,
+    library: <Library key={arg ?? ""} arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
@@ -673,7 +675,7 @@ function Sidebar({ route }: { route: Route }) {
   const waiting = useFriendsWaiting();
   const tabs = useTabs();
   const coaching = useCoachNotes((s) => s.coaching);
-  const coachUnread = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
+  const coachUnread = useCoachNotes(coachWaiting);
   return (
     <nav
       className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 overflow-y-auto border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"

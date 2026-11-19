@@ -900,6 +900,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Comece pelo novo modelo Check-in de progresso em Coaching › Check-ins. Menores de 18 anos nunca recebem pedido de foto.",
   },
+  "coach-form-videos": {
+    title: "Vídeos de execução com notas no vídeo",
+    intro: "Agora seus clientes podem gravar uma série no app e enviar para você, e você responde direto no vídeo.",
+    points: [
+      "Eles tocam em Enviar um vídeo de execução no Coaching, escolhem o exercício e dizem o que verificar. O app dá cinco segundos para se posicionar e grava até um minuto.",
+      "Você recebe uma notificação. Deixe o vídeo na metade ou em um quarto da velocidade, pause onde importa e adicione uma nota fixada naquele segundo.",
+      "Eles tocam numa nota para ir àquele momento e podem responder com uma nota deles.",
+      "Os vídeos ficam privados entre vocês dois e são apagados se qualquer um encerrar o coaching.",
+    ],
+    dyk: "Clientes menores de 18 anos não podem enviar vídeos de execução. Enviar é grátis para clientes.",
+  },
   seasons: {
     title: "As temporadas de treino começam na segunda",
     intro: "A temporada 1, Brasa, começa na segunda: dez semanas, uma trilha de 20 níveis e recompensas que só se ganham neste inverno.",
@@ -946,6 +957,29 @@ export const emails: Record<string, Words> = {
       "É calculado pela sua própria hora, para academias perto de você.",
     ],
     dyk: "Horário errado? Informe um problema na página, ou reivindique a academia e ajuste você mesmo.",
+  },
+  "outside-workouts": {
+    title: "Suas corridas e partidas agora contam na recuperação",
+    intro:
+      "Ligue Contar treinos de outros apps e os treinos do app de saúde do seu celular ajustam o mapa de recuperação e o plano de amanhã.",
+    points: [
+      "Corridas, pedais, esportes e aulas chegam sempre que você abre o app.",
+      "Cada um cansa os músculos que usa, mais quanto mais tempo durou.",
+      "O plano de amanhã poupa as pernas cansadas depois de uma corrida ou partida longa.",
+      "Eles nunca contam como treinos do Liftsmith, e nada conta duas vezes.",
+    ],
+    dyk: "Fica em Ajustes › Apps conectados, e a lista abaixo do mapa de recuperação em Corpo mostra o que está sendo contado.",
+  },
+  "routine-library": {
+    title: "Encontre uma rotina feita por outra pessoa",
+    intro: "A nova biblioteca de rotinas reúne rotinas que outras pessoas publicaram, prontas para salvar com um toque.",
+    points: [
+      "Busque por palavras, escolha um objetivo ou ative Serve na minha academia para ver só o que a sua academia permite.",
+      "Salve uma e ela vai para as suas rotinas, pronta para começar ou mudar.",
+      "Avalie com estrelas depois de salvar. As estrelas aparecem a partir de três avaliações.",
+      "Publique a sua pelo editor, com ou sem seu nome. Só saem exercícios e séries, nunca cargas ou anotações.",
+    ],
+    dyk: "Cada rotina publicada ganha uma página própria no site, para compartilhar com quem quiser.",
   },
   "gym-insights": {
     title: "Veja como os alunos usam sua academia",

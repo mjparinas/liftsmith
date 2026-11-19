@@ -30,6 +30,7 @@ export const en: SiteText = {
       muscles: "Exercises by muscle",
       programs: "Workout programs",
       coachPrograms: "Programs from coaches",
+      routineLibrary: "Routines from lifters",
       equipment: "Exercises by equipment",
       guides: "Training guides",
       blog: "Blog",

@@ -43,6 +43,7 @@ export const SETTINGS_INDEX: SettingRef[] = [
   S("account.row", "account", ["account.row.out"]),
   S("gym.row", "gym", ["gym.rowNote"]),
   S("conn.row", "connections", ["conn.rowNote"]),
+  S("conn.outside.title", "connections", ["conn.outside.list"]),
   S("trn.row", "trainer", ["trn.rowNote"]),
   S("settings.injuries", "injuries"),
   S("settings.feedback", "feedback"),

@@ -281,6 +281,11 @@ export const de: FeaturesText = {
       name: "Eigene Routinen",
       body: "Baue Routinen aus dem Übungskatalog, so viele du willst, und teile sie als Link.",
     },
+    "routine-library": {
+      name: "Routinen-Bibliothek",
+      body: "Durchsuche Routinen, die andere veröffentlicht haben, nach Ziel, Stichwort und dem, was dein Studio hat, speichere eine mit einem Tippen und bewerte sie mit Sternen. Veröffentliche deine eigene aus ihrem Editor, mit oder ohne deinen Namen, und sie bekommt eine eigene Seite auf der Website. Nur Übungen und Sätze gehen raus, nie deine Gewichte oder Notizen.",
+      note: "Zum Veröffentlichen brauchst du ein Konto und musst 18 sein. Stöbern kann jeder.",
+    },
     library: {
       name: "1.000 Übungen",
       body: "Kraft, Körpergewicht, Maschinen, Bänder, Kettlebells und Cardio, mit Suche, Muskel-Filtern und einem Filter für dieses Studio. Cardio speichert Zeit und Strecke.",
@@ -417,6 +422,11 @@ export const de: FeaturesText = {
       name: "Fortschritts-Check-ins mit Gewicht, Fotos und Verlauf",
       body: "Füge jedem Formular Fragen zu Körpergewicht und Fotos hinzu und schick es jede Woche, alle 2 oder alle 4 Wochen. Das Gewicht startet beim letzten Wiegen deiner Kundschaft, Fotos sieht nur du, und der Verlauf jeder Antwort steht im Bericht. Unter 18-Jährige werden nie nach Fotos gefragt.",
     },
+    "coach-form-videos": {
+      name: "Technikvideos mit Notizen im Video",
+      body: "Kunden filmen einen Satz in der App und schicken ihn dir. Sieh ihn dir verlangsamt an, hefte Notizen genau an die wichtigen Momente, und sie antworten auf dieselben Notizen. Videos sehen nur ihr beide; unter 18-Jährige können keine senden.",
+      note: "Ein Video zu senden ist für Kunden kostenlos. Android, iPhone und Web.",
+    },
     "coach-roles": {
       name: "Für Personal Trainer und Coaches",
       body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",
@@ -517,6 +527,10 @@ export const de: FeaturesText = {
     "health-save": {
       name: "Trainings in deiner Gesundheits-App",
       body: "Jedes beendete Training wird als Krafttraining in Health Connect oder Apple Health gespeichert, mit Kalorien und Puls.",
+    },
+    "outside-workouts": {
+      name: "Trainings aus anderen Apps zählen",
+      body: "Eingeschaltet zählen Läufe, Radtouren, Sport und Kurse, die andere Apps in deiner Gesundheits-App speichern, in deiner Erholungskarte und im Plan für morgen. Ein langes Spiel gestern lässt die Beine in Erholung, und der Plan richtet sich danach.",
     },
     offline: {
       name: "Funktioniert offline",
@@ -672,10 +686,10 @@ export const de: FeaturesText = {
   },
   connections: {
     "health-connect": {
-      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte und Ernährung rein; beendete Trainings raus",
+      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte und Ernährung rein; beendete Trainings raus; eingeschaltet auch Trainings aus anderen Apps rein",
     },
     "apple-health": {
-      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte, Ernährung, Größe, Alter und Geschlecht rein; beendete Trainings raus",
+      does: "Gewicht, Körperfett, Schlaf, HRV, Puls, Schritte, Ernährung, Größe, Alter und Geschlecht rein; beendete Trainings raus; eingeschaltet auch Trainings aus anderen Apps rein",
     },
     "samsung-health": { does: "Seine Werte, sobald du sie mit Health Connect teilst" },
     "health-devices": {

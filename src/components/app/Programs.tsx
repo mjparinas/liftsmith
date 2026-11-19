@@ -102,6 +102,7 @@ export function Programs() {
       </ul>
 
       <FromCoaches />
+      <FromLifters />
 
       <Sheet open={!!open} onClose={() => setOpen(null)} title={open?.name ?? ""}>
         {open && gym && <Detail p={open} current={currentId === open.id} onStart={() => choose(open.id)} />}
@@ -194,6 +195,18 @@ function FromCoaches() {
       )}
       <Button kind="ghost" icon="layers" className="w-full" onClick={() => go("program")}>
         {t("cpg.browse")}
+      </Button>
+    </Section>
+  );
+}
+
+/** The public routine library (docs/decisions/routine-library.md): routines lifters published, to search and save. */
+function FromLifters() {
+  return (
+    <Section title={t("rl.fromLifters")} icon="search">
+      <p className="mb-3 px-1 text-sm text-muted">{t("rl.introShort")}</p>
+      <Button kind="ghost" icon="search" className="w-full" onClick={() => go("library")}>
+        {t("rl.browse")}
       </Button>
     </Section>
   );

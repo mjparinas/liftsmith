@@ -76,6 +76,7 @@ import { isPlaceId } from "./gymPlaces";
 import { MANAGES } from "./gymStaff";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
+import { resolveRoutine, routineReport } from "./routineLibrary";
 import { emailBanned, liftIfOver, moderate, noticeOf } from "./socialModeration";
 import { isMinor } from "./teams";
 
@@ -910,7 +911,7 @@ export async function mute(accountId: string, b: Record<string, unknown>, now = 
   return lookup(accountId, b, now);
 }
 
-const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review", "message", "feedback"]);
+const REPORT_KINDS = new Set<ReportKind>(["post", "comment", "profile", "review", "message", "feedback", "routine"]);
 /** Reported through Friends (`report` below); reviews are reported through coachReviews.ts. */
 const FRIENDS_KINDS = new Set<ReportKind>(["post", "comment", "profile", "message"]);
 /** The table each reportable thing lives in (a profile is reported by handle). */
@@ -2542,6 +2543,12 @@ export async function adminReports(): Promise<ReportGroup[]> {
       authorId = r?.authorId ?? "";
       hidden = !!r?.hidden;
       content = r ? r.content : "(deleted)";
+    } else if (kind === "routine") {
+      // A routine in the public library (routineLibrary.ts): its publisher needn't be in Friends.
+      const x = await routineReport(target);
+      authorId = x?.authorId ?? "";
+      hidden = !!x?.hidden;
+      content = x ? x.content : "(deleted)";
     } else if (kind === "feedback") {
       // An idea, bug or comment in the community: its author needn't be in Friends, and "Ban author" blocks them there.
       const f = await feedbackReport(target);
@@ -2576,7 +2583,7 @@ export async function adminReports(): Promise<ReportGroup[]> {
       content,
       author: a
         ? { accountId: authorId, handle: s(a.handle), name: s(a.name), suspended: !!n(a.suspended) }
-        : kind === "review" && authorId
+        : (kind === "review" || kind === "routine") && authorId
           ? { accountId: authorId, handle: "", name: await nameOf(authorId), suspended: false }
           : null,
       hidden,
@@ -2595,6 +2602,8 @@ export type ReportAction = "remove" | "dismiss" | "suspend" | "unsuspend";
 export async function resolveReports(kind: ReportKind, targetId: string, action: ReportAction): Promise<boolean> {
   if (!REPORT_KINDS.has(kind) || !targetId) return false;
   if (kind === "feedback") return resolveFeedback(targetId, action);
+  // A library routine: remove takes it out of the library, dismiss shows it again. Banning applies to Friends.
+  if (kind === "routine" && (action === "remove" || action === "dismiss")) return resolveRoutine(targetId, action);
   // A coach review or reply: remove deletes it (a reply is cleared), dismiss shows it again. Banning applies to Friends.
   if (kind === "review" && (action === "remove" || action === "dismiss"))
     return resolveReview(targetId, action, action === "remove" ? "removed" : "dismissed");
