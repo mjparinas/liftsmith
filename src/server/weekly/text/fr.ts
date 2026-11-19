@@ -984,6 +984,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Chaque routine publiée a sa propre page sur le site, à partager avec qui vous voulez.",
   },
+  "team-session": {
+    title: "Toute la séance de l'équipe sur une tablette",
+    intro: "Les séances d'équipe mettent un entraînement pour toute votre équipe sur une seule tablette.",
+    points: [
+      "Lancez-en une depuis la carte de votre équipe dans Coaching et choisissez une routine.",
+      "Chaque athlète touche son prénom et note ses séries, la charge reprenant là où il en était.",
+      "Le tableau montre qui n'a pas encore noté de série, jamais une charge.",
+      "À la fin, les séries de chacun sont enregistrées dans son propre compte.",
+    ],
+    dyk: "Pas de réseau dans la salle ? Les séries attendent sur la tablette et partent dès son retour.",
+  },
   pregnancy: {
     title: "S’entraîner pendant la grossesse et après l’accouchement",
     intro: "Le mode grossesse et post-partum adapte chaque séance à la semaine, comme le mode blessure.",

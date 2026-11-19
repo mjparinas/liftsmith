@@ -475,6 +475,10 @@ export const pt: FeaturesText = {
       name: "Grátis para equipes escolares",
       body: "Treinadores de escolas de ensino médio que confirmam um e-mail da escola ganham o Pro grátis, assim como os atletas de 13 a 18 anos das suas equipes, com um ranking semanal da equipe. Gordura corporal e perfis públicos ficam desligados para menores de 18.",
     },
+    "team-session": {
+      name: "Sessões do time em um tablet",
+      body: "Um técnico do ensino médio conduz um treino para o time todo em um tablet: cada atleta toca no próprio nome e registra suas séries, com o peso de onde parou, e o painel mostra quem não começou. No fim, as séries de cada atleta ficam salvas na própria conta. Funciona sem sinal.",
+    },
     "coach-checkins": {
       name: "Formulários de check-in e questionários",
       body: "Mande aos alunos um check-in semanal, um questionário de avaliação inicial ou seu próprio formulário, uma vez ou toda semana. Eles respondem com poucos toques, e uma nota baixa ou uma resposta atrasada vai para o topo do relatório deles.",

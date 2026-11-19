@@ -67,6 +67,9 @@ export const en = {
   "wn.c.routineLibrary.title": "A routine library",
   "wn.c.routineLibrary.body":
     "Find routines other lifters published, save one in a tap and rate it. Publish your own from its editor in your routines.",
+  "wn.c.teamSession.title": "A team session for school coaches",
+  "wn.c.teamSession.body":
+    "High school coaches can run one workout for the whole team from one tablet. Each athlete taps their name to log their sets, and the board shows who hasn't started.",
   "wn.c.openNow.title": "Open now in the gym finder",
   "wn.c.openNow.body":
     "Every gym with its hours says whether it's open now and when it closes or opens, and an Open now chip shows only the open ones.",
@@ -151,6 +154,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Una biblioteca de rutinas",
   "wn.c.routineLibrary.body":
     "Encuentra rutinas que publicaron otros atletas, guarda una con un toque y valórala. Publica las tuyas desde su editor en tus rutinas.",
+  "wn.c.teamSession.title": "Sesiones de equipo para entrenadores escolares",
+  "wn.c.teamSession.body":
+    "Los entrenadores de secundaria pueden dirigir un entrenamiento para todo el equipo desde una tableta. Cada atleta toca su nombre para anotar sus series, y el tablero muestra quién no ha empezado.",
   "wn.c.openNow.title": "Abierto ahora en el buscador de gimnasios",
   "wn.c.openNow.body":
     "Cada gimnasio con horario dice si está abierto ahora y cuándo cierra o abre, y el filtro Abierto ahora muestra solo los abiertos.",
@@ -237,6 +243,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Une bibliothèque de routines",
   "wn.c.routineLibrary.body":
     "Trouvez des routines publiées par d'autres pratiquants, enregistrez-en une d'un geste et notez-la. Publiez les vôtres depuis leur éditeur dans vos routines.",
+  "wn.c.teamSession.title": "Séances d'équipe pour les coachs scolaires",
+  "wn.c.teamSession.body":
+    "Les coachs de lycée peuvent mener une séance pour toute l'équipe depuis une tablette. Chaque athlète touche son prénom pour noter ses séries, et le tableau montre qui n'a pas commencé.",
   "wn.c.openNow.title": "Ouvert maintenant dans la recherche de salles",
   "wn.c.openNow.body":
     "Chaque salle avec ses horaires indique si elle est ouverte et quand elle ferme ou ouvre, et le filtre Ouvert maintenant ne montre que celles qui sont ouvertes.",
@@ -322,6 +331,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Eine Routinen-Bibliothek",
   "wn.c.routineLibrary.body":
     "Finde Routinen, die andere veröffentlicht haben, speichere eine mit einem Tippen und bewerte sie. Deine eigenen veröffentlichst du in ihrem Editor in deinen Routinen.",
+  "wn.c.teamSession.title": "Teamtraining für Schultrainer",
+  "wn.c.teamSession.body":
+    "Schultrainer können ein Training für das ganze Team von einem Tablet aus leiten. Alle tippen auf ihren Namen und tragen ihre Sätze ein, und die Tafel zeigt, wer noch nicht angefangen hat.",
   "wn.c.openNow.title": "Jetzt geöffnet in der Studiosuche",
   "wn.c.openNow.body":
     "Jedes Studio mit Öffnungszeiten zeigt, ob es gerade offen ist und wann es schließt oder öffnet, und der Filter Jetzt geöffnet zeigt nur die offenen.",
@@ -406,6 +418,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Una libreria di routine",
   "wn.c.routineLibrary.body":
     "Trova le routine pubblicate da altri atleti, salvane una con un tocco e votala. Pubblica le tue dal loro editor nelle tue routine.",
+  "wn.c.teamSession.title": "Sessioni di squadra per gli allenatori scolastici",
+  "wn.c.teamSession.body":
+    "Gli allenatori scolastici possono guidare un allenamento per tutta la squadra da un tablet. Ogni atleta tocca il proprio nome per registrare le serie, e il tabellone mostra chi non ha iniziato.",
   "wn.c.openNow.title": "Aperto ora nella ricerca palestre",
   "wn.c.openNow.body":
     "Ogni palestra con gli orari dice se è aperta ora e quando chiude o apre, e il filtro Aperto ora mostra solo quelle aperte.",
@@ -483,6 +498,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "ルーティンライブラリ",
   "wn.c.routineLibrary.body":
     "ほかのリフターが公開したルーティンを探して、ワンタップで保存して評価できます。自分のルーティンは編集画面から公開できます。",
+  "wn.c.teamSession.title": "学校のコーチ向けチームセッション",
+  "wn.c.teamSession.body":
+    "高校のコーチがタブレット1台でチーム全員の練習を進められます。選手は名前をタップしてセットを記録し、ボードでまだ始めていない人がわかります。",
   "wn.c.openNow.title": "ジム検索に「営業中」",
   "wn.c.openNow.body":
     "営業時間のあるジムは、今開いているか、いつ閉まるか開くかを表示します。「営業中」チップで開いているジムだけを表示できます。",
@@ -563,6 +581,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Uma biblioteca de rotinas",
   "wn.c.routineLibrary.body":
     "Encontre rotinas que outros atletas publicaram, salve uma com um toque e avalie. Publique as suas pelo editor delas nas suas rotinas.",
+  "wn.c.teamSession.title": "Sessões do time para técnicos escolares",
+  "wn.c.teamSession.body":
+    "Técnicos do ensino médio podem conduzir um treino para o time todo em um tablet. Cada atleta toca no nome para registrar as séries, e o painel mostra quem não começou.",
   "wn.c.openNow.title": "Aberto agora na busca de academias",
   "wn.c.openNow.body":
     "Cada academia com horário mostra se está aberta agora e quando fecha ou abre, e o filtro Aberto agora mostra só as abertas.",
@@ -637,6 +658,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.formVideos.body": "앱에서 세트를 촬영해 코치나 물리치료사에게 보내세요. 느리게 돌려 보며 중요한 순간에 정확히 메모를 남겨 줘요.",
   "wn.c.routineLibrary.title": "루틴 라이브러리",
   "wn.c.routineLibrary.body": "다른 리프터가 공개한 루틴을 찾아 한 번에 저장하고 평가하세요. 내 루틴은 편집 화면에서 공개할 수 있어요.",
+  "wn.c.teamSession.title": "학교 코치를 위한 팀 세션",
+  "wn.c.teamSession.body":
+    "고등학교 코치가 태블릿 하나로 팀 전체의 운동을 진행할 수 있습니다. 선수는 이름을 눌러 세트를 기록하고, 보드에서 아직 시작하지 않은 사람을 볼 수 있습니다.",
   "wn.c.openNow.title": "헬스장 찾기에 '영업 중'",
   "wn.c.openNow.body": "영업시간이 있는 헬스장은 지금 열었는지, 언제 닫거나 여는지 보여 주고, '영업 중' 칩으로 열린 곳만 볼 수 있습니다.",
   "wn.c.settingsSearch.title": "설정 검색",
@@ -716,6 +740,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Biblioteka rutyn",
   "wn.c.routineLibrary.body":
     "Znajdź rutyny opublikowane przez innych, zapisz jedną jednym dotknięciem i oceń ją. Swoje opublikujesz w ich edytorze w rutynach.",
+  "wn.c.teamSession.title": "Treningi drużyny dla trenerów szkolnych",
+  "wn.c.teamSession.body":
+    "Trenerzy szkolni mogą poprowadzić jeden trening dla całej drużyny z jednego tabletu. Każdy zawodnik stuka swoje imię, żeby zapisać serie, a tablica pokazuje, kto jeszcze nie zaczął.",
   "wn.c.openNow.title": "Otwarte teraz w wyszukiwarce siłowni",
   "wn.c.openNow.body":
     "Każda siłownia z godzinami pokazuje, czy jest teraz otwarta i kiedy się zamyka lub otwiera, a filtr Otwarte teraz pokazuje tylko otwarte.",
@@ -797,6 +824,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.routineLibrary.title": "Rutin kütüphanesi",
   "wn.c.routineLibrary.body":
     "Diğer sporcuların yayınladığı rutinleri bul, birini tek dokunuşla kaydet ve puanla. Kendi rutinlerini düzenleyicilerinden yayınla.",
+  "wn.c.teamSession.title": "Okul koçları için takım seansı",
+  "wn.c.teamSession.body":
+    "Lise koçları tüm takımın antrenmanını tek tabletten yönetebilir. Her sporcu setlerini kaydetmek için adına dokunur, pano kimin başlamadığını gösterir.",
   "wn.c.openNow.title": "Spor salonu bulucuda Şimdi açık",
   "wn.c.openNow.body":
     "Saatleri olan her salon şu an açık olup olmadığını ve ne zaman kapanıp açılacağını gösteriyor; Şimdi açık çipi yalnızca açık olanları listeliyor.",

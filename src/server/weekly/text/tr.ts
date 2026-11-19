@@ -977,6 +977,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Yayımlanan her rutinin web sitesinde kendi sayfası olur, istediğin kişiyle paylaşabilirsin.",
   },
+  "team-session": {
+    title: "Takımın tüm antrenmanı tek tablette",
+    intro: "Takım seansları tüm takımın antrenmanını tek bir tablete koyar.",
+    points: [
+      "Koçluk'taki takım kartından başlat ve bir rutin seç.",
+      "Her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar.",
+      "Pano henüz set kaydetmeyenleri gösterir, asla ağırlığı değil.",
+      "Bitirince her sporcunun setleri kendi hesabına kaydedilir.",
+    ],
+    dyk: "Ağırlık salonunda çekim yok mu? Setler tablette bekler ve bağlantı gelince gönderilir.",
+  },
   pregnancy: {
     title: "Hamilelikte ve doğumdan sonra antrenman",
     intro: "Hamilelik ve doğum sonrası modu, sakatlık modu gibi her antrenmanı haftana göre değiştirir.",
