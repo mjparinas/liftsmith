@@ -157,6 +157,28 @@ describe("gyms near you", () => {
     expect(sheet.getByRole("button", { name: /Steve Nash/ })).toBeInTheDocument();
   });
 
+  // docs/decisions/gyms.md "Map-first": with a map, the gyms ride on see-through cards over its foot, one per gym.
+  it("puts the gyms on cards over the map when there is one", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const plain = vi.mocked(fetch).getMockImplementation()!;
+    vi.mocked(fetch).mockImplementation(async (url, init) =>
+      String(url).startsWith("/api/gyms/?lat=")
+        ? Response.json({ gyms: [], map: "/api/gyms/map/?ids=x", places: [{ ...OFFICIAL, hours: "24/7" }, PLACE] })
+        : plain(url, init),
+    );
+    location.hash = "#/gym";
+    await user.click(await screen.findByRole("button", { name: "+ Add gym" }));
+    const sheet = within(screen.getByRole("dialog"));
+    await user.click(sheet.getByRole("button", { name: "Find gyms near you" }));
+    const card = await sheet.findByRole("button", { name: /Planet Fitness/ });
+    expect(card).toHaveClass("glass");
+    const strip = card.closest("ul")!;
+    expect(strip).toHaveAttribute("data-no-swipe");
+    expect(within(strip).getAllByRole("button")).toHaveLength(2);
+    expect(sheet.getByRole("button", { name: "Open now", pressed: false })).toBeInTheDocument();
+  });
+
   it("lists real gyms first, the official one with its mark, and adds one nobody set up as a typical gym", async () => {
     const user = userEvent.setup();
     await onboard(user);

@@ -298,7 +298,7 @@ export const emails: Record<string, Words> = {
     title: "Encontre uma academia perto de você",
     intro: "Viajando, de mudança ou procurando uma academia nova? O buscador mostra o que há por perto.",
     points: [
-      "Academias num mapa com uma lista embaixo, as oficiais primeiro.",
+      "Academias num mapa grande, cada uma num cartão translúcido por cima, as oficiais primeiro.",
       "Cada uma tem sua própria página: equipamentos, horários, um mapa e quantas pessoas treinam lá.",
       "Falta alguma? Adicione.",
       "Adicione uma academia às suas e o plano se ajusta aos equipamentos dela.",

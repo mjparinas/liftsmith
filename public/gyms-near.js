@@ -164,7 +164,9 @@
       );
       points.push([here.lat, here.lon]);
     }
-    if (points.length) map.fitBounds(L.latLngBounds(points), { padding: [28, 28], maxZoom: 15 });
+    // On a wide screen the list floats over the map's right side, so keep the pins clear of it.
+    var side = window.matchMedia("(min-width: 960px)").matches ? 364 : 0;
+    if (points.length) map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [28, 28], paddingBottomRight: [28 + side, 28], maxZoom: 15 });
     else map.setView([20, 0], 3);
   }
 

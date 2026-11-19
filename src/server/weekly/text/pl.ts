@@ -296,7 +296,7 @@ export const emails: Record<string, Words> = {
     title: "Znajdź siłownię w pobliżu",
     intro: "Podróż, przeprowadzka albo szukasz nowej siłowni? Wyszukiwarka pokaże, co jest w pobliżu.",
     points: [
-      "Siłownie na mapie z listą pod spodem, oficjalne na początku.",
+      "Siłownie na dużej mapie, każda na półprzezroczystej karcie nad nią, oficjalne na początku.",
       "Każda ma własną stronę: sprzęt, godziny otwarcia, mapa i liczba osób, które tam trenują.",
       "Brakuje jakiejś? Dodaj ją.",
       "Dodaj siłownię do swoich, a plan dopasuje się do jej sprzętu.",

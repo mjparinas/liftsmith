@@ -297,7 +297,7 @@ export const emails: Record<string, Words> = {
     title: "Encuentra un gimnasio cerca",
     intro: "¿De viaje, de mudanza o buscando gimnasio nuevo? El buscador te enseña lo que hay cerca.",
     points: [
-      "Gimnasios en un mapa con una lista debajo, primero los oficiales.",
+      "Gimnasios en un mapa grande, cada uno en una tarjeta translúcida encima, primero los oficiales.",
       "Cada uno tiene su página: equipamiento, horarios, un mapa y cuánta gente entrena allí.",
       "¿Falta uno? Añádelo.",
       "Añade un gimnasio a los tuyos y el plan se ajusta a su equipamiento.",

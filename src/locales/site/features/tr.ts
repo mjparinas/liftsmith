@@ -351,7 +351,7 @@ export const tr: FeaturesText = {
     },
     "gym-finder": {
       name: "Salon bulucu ve salon sayfaları",
-      body: "Yakınındaki salonları haritada ve altındaki listede bul; önce resmi olanlar, her biri kendi sayfasıyla: ekipman, çalışma saatleri, harita ve üyeler. Sahipler salonlarını sahiplenip logo ve fotoğraf ekleyebilir. Bir salon eksik mi? Ekle. Sahipler kaç kişinin salonu eklediğini ve afişi taradığını, sırada ne yapacaklarını görür. Resmi salonlar haftalık sıralamalı bir kulüp yürütebilir. Bir sayfada yanlış bir şey mi var? Bildir, ekibimiz düzeltsin.",
+      body: "Yakınındaki salonları büyük bir haritada, her biri üstünde yarı saydam bir kartla bul; önce resmi olanlar, her biri kendi sayfasıyla: ekipman, çalışma saatleri, harita ve üyeler. Sahipler salonlarını sahiplenip logo ve fotoğraf ekleyebilir. Bir salon eksik mi? Ekle. Sahipler kaç kişinin salonu eklediğini ve afişi taradığını, sırada ne yapacaklarını görür. Resmi salonlar haftalık sıralamalı bir kulüp yürütebilir. Bir sayfada yanlış bir şey mi var? Bildir, ekibimiz düzeltsin.",
     },
     "gym-amenities": {
       name: "Salon sayfalarında olanaklar ve fiyatlar",

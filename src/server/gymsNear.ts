@@ -148,7 +148,14 @@ export const NEAR_STYLE = `
 .near-body{display:grid;gap:16px}
 .near-map{width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--raised);border:1px solid var(--line)}
 @media (min-width:960px){.near-body{grid-template-columns:minmax(0,1fr) 340px;align-items:start}.near-map{aspect-ratio:auto;height:520px}
-.near-list{max-height:520px;overflow:auto}}
+.near-list{max-height:520px;overflow:auto}
+.near-body:has(>.near-map:not([hidden])){display:block;position:relative}.near-body:has(>.near-map:not([hidden])) .near-map{height:560px}
+.near-body:has(>.near-map:not([hidden]))>.near-side{position:absolute;z-index:500;top:12px;right:12px;bottom:32px;width:340px;padding:12px;border-radius:14px;
+border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);
+box-shadow:0 12px 32px -12px rgb(0 0 0/.6);grid-template-rows:auto auto minmax(0,1fr)}
+.near-body:has(>.near-map:not([hidden])) .near-list{max-height:none;min-height:0}}
+@media (min-width:960px) and (prefers-contrast:more){.near-body>.near-side{background:var(--surface)!important}}
+@media (forced-colors:active){.near-side{background:Canvas!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 .near-list li a{flex-direction:row;align-items:center;justify-content:flex-start;gap:12px}.near-list .txt{display:flex;flex-direction:column;gap:2px;min-width:0}
 .near-list li a:focus-visible{outline-offset:-3px}
 .list li.lead a{border-top:0;padding-top:0}.near-side{display:grid;gap:12px;align-content:start;min-width:0}

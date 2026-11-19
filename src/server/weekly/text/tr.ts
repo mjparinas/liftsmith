@@ -297,7 +297,7 @@ export const emails: Record<string, Words> = {
     title: "Yakınındaki bir salonu bul",
     intro: "Seyahatte misin, taşınıyor musun ya da yeni bir salon mu arıyorsun? Salon bulucu yakındakileri gösterir.",
     points: [
-      "Salonlar bir haritada, altında bir listeyle; önce resmî olanlar.",
+      "Salonlar büyük bir haritada, her biri üstünde yarı saydam bir kartla; önce resmî olanlar.",
       "Her birinin kendi sayfası var: ekipman, çalışma saatleri, harita ve orada kaç sporcunun antrenman yaptığı.",
       "Eksik bir salon mu var? Ekle.",
       "Bir salonu kendi salonlarına ekle; plan onun ekipmanına uyar.",
