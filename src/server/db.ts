@@ -480,6 +480,16 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_places_at ON gym_places (lat, lon)`,
   `CREATE UNIQUE INDEX IF NOT EXISTS gym_places_ref ON gym_places (source_ref) WHERE source_ref <> ''`,
+  // Gyms staff deleted from Admin › Reports (gymPlaceReports.ts, Melvin 2026-11-19: "these gyms need to be deleted not
+  // edited"): the map's id of each, so no import or daily refresh brings it back (savePlaces skips them). The name and
+  // city are for staff reading the table later. Public map data and a staff address only.
+  `CREATE TABLE IF NOT EXISTS gym_places_deleted (
+    source_ref TEXT PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT '',
+    city TEXT NOT NULL DEFAULT '',
+    deleted_by TEXT NOT NULL DEFAULT '',
+    at INTEGER NOT NULL
+  )`,
   // One row per city import from OpenStreetMap (gymImport.ts, 2026-11-14): what happened, how long each step took and
   // which map server answered, for Admin › Gyms' recent imports and its debug log. `scope` keeps the area Nominatim
   // found, so a re-import skips that lookup. Staff work on public map data, nothing about a lifter; kept 90 days.

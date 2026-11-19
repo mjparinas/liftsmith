@@ -3,7 +3,8 @@
 // Reported gym pages (docs/decisions/gyms.md "Reporting a gym page"), on the admin Reports tab under reported listings.
 // Anyone can report a real gym's page from the website or the app: wrong details, closed, listed twice, not a gym.
 // Staff hide the page, merge it into the gym it duplicates (its lifters move and its page redirects), fix its details,
-// or dismiss the reports. Support staff can read; only admins act.
+// delete a place that was never a gym (after "Are you sure?"; Melvin, 2026-11-19), or dismiss the reports. Support
+// staff can read; only admins act.
 import { useEffect, useState } from "react";
 
 import type { PlaceReportAction, PlaceReportReason } from "@/lib/gymPlaceReport";
@@ -26,11 +27,17 @@ const REASON: Record<PlaceReportReason, string> = {
 const box = "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm";
 const btn = "press rounded-lg border border-line px-3 py-1.5 text-muted";
 
-type Open = { id: string; mode: "merge" | "edit" } | null;
+type Open = { id: string; mode: "merge" | "edit" | "delete" } | null;
 type Tip = PlaceSuggestion | "…" | { error: string };
 type Draft = { into: string; name: string; address: string; website: string; phone: string; hours: string; kind: "gym" | "studio" };
 
-const LABEL: Record<PlaceReportAction, string> = { dismiss: "Dismiss", hide: "Hide", merge: "Merge", edit: "Save the fix" };
+const LABEL: Record<PlaceReportAction, string> = {
+  dismiss: "Dismiss",
+  hide: "Hide",
+  merge: "Merge",
+  edit: "Save the fix",
+  delete: "Delete",
+};
 
 /** Claude's suggestion for one reported gym: what it would do and why, with the button that does it. */
 function suggestionLabel(t: PlaceSuggestion): { label: string; reason: string } {
@@ -137,6 +144,15 @@ function Row({
                 Hide
               </button>
             )}
+            {!g.official && (
+              <button
+                type="button"
+                onClick={() => setOpen(open?.mode === "delete" ? null : { id: g.id, mode: "delete" })}
+                className="press rounded-lg border border-bad bg-bad/10 px-3 py-1.5 font-semibold text-bad"
+              >
+                Delete
+              </button>
+            )}
             <button type="button" onClick={() => void act(g, "dismiss")} className={btn}>
               Dismiss
             </button>
@@ -160,6 +176,33 @@ function Row({
           }
           dismiss={drop}
         />
+      )}
+      {admin && open?.mode === "delete" && (
+        <div role="alertdialog" aria-labelledby={`del-${g.id}`} className="mt-3 grid gap-2 rounded-lg border border-bad/50 p-3 text-sm">
+          <p id={`del-${g.id}`} className="font-semibold text-bad">
+            Are you sure? Delete {g.name} for good?
+          </p>
+          <p className="text-muted">
+            Its page and app link stop working, its pictures are removed
+            {g.lifters > 0
+              ? `, the ${g.lifters} ${g.lifters === 1 ? "lifter" : "lifters"} who added it keep their own gym without the link`
+              : ""}
+            , and the map import and daily refresh won&apos;t add it back. This can&apos;t be undone. To keep a real gym off the site for
+            now, use Hide.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void act(g, "delete").then((ok) => ok && setOpen(null))}
+              className="press rounded-lg border border-bad bg-bad px-3 py-1.5 font-semibold text-bg"
+            >
+              Yes, delete it
+            </button>
+            <button type="button" onClick={() => setOpen(null)} className={btn}>
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
       {admin && open?.mode === "merge" && (
         <form
@@ -269,7 +312,8 @@ export function GymPlaceReports({ admin }: { admin: boolean }) {
     <Card title="Reported gym pages">
       <p className="text-sm text-muted">
         Real gyms whose page someone reported from the website or the app. Reports never hide a page by themselves. Edit fixes the details,
-        Merge sends a duplicate to the gym it copies, Hide takes the page down, Dismiss leaves it as it is.
+        Merge sends a duplicate to the gym it copies, Hide takes the page down, Delete removes a place that isn&apos;t a gym for good (the
+        map import won&apos;t bring it back), Dismiss leaves it as it is.
       </p>
       {admin && ai?.configured && rows && rows.length > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
