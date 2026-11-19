@@ -125,13 +125,13 @@ describe("sending", () => {
 
   it("is off when storage isn't set up", async () => {
     setVideoStore(null);
-    const was = process.env.BLOB_READ_WRITE_TOKEN;
-    delete process.env.BLOB_READ_WRITE_TOKEN;
+    const was = process.env.VIDEO_BLOB_READ_WRITE_TOKEN;
+    delete process.env.VIDEO_BLOB_READ_WRITE_TOKEN;
     try {
       expect(await startVideo("client", SQUAT, NOW)).toEqual({ error: "off" });
       expect(await sendState("client", NOW)).toBe("off");
     } finally {
-      if (was !== undefined) process.env.BLOB_READ_WRITE_TOKEN = was;
+      if (was !== undefined) process.env.VIDEO_BLOB_READ_WRITE_TOKEN = was;
     }
   });
 

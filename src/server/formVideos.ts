@@ -48,13 +48,18 @@ export interface VideoStore {
   remove(paths: string[]): Promise<void>;
 }
 
-/** Vercel Blob, private, read with BLOB_READ_WRITE_TOKEN (set when the store is connected to the project). */
-export const blobConfigured = (env: NodeJS.ProcessEnv = process.env) => !!env.BLOB_READ_WRITE_TOKEN;
+/**
+ * Vercel Blob, in a private store of its own: gym pictures use a public store under BLOB_READ_WRITE_TOKEN, and a store
+ * is public or private as a whole. Connecting this one to the project with the prefix VIDEO_BLOB sets the token.
+ */
+export const blobConfigured = (env: NodeJS.ProcessEnv = process.env) => !!env.VIDEO_BLOB_READ_WRITE_TOKEN;
+const token = () => process.env.VIDEO_BLOB_READ_WRITE_TOKEN!;
 
 const vercelStore: VideoStore = {
   async uploadToken(path, bytes, types, until) {
     const { generateClientTokenFromReadWriteToken } = await import("@vercel/blob/client");
     return generateClientTokenFromReadWriteToken({
+      token: token(),
       pathname: path,
       maximumSizeInBytes: bytes,
       allowedContentTypes: types,
@@ -66,20 +71,20 @@ const vercelStore: VideoStore = {
   async size(path) {
     const { head } = await import("@vercel/blob");
     try {
-      return (await head(path)).size;
+      return (await head(path, { token: token() })).size;
     } catch {
       return null;
     }
   },
   async watchUrl(path, until) {
     const { issueSignedToken, presignUrl } = await import("@vercel/blob");
-    const signed = await issueSignedToken({ pathname: path, operations: ["get"], validUntil: until });
+    const signed = await issueSignedToken({ token: token(), pathname: path, operations: ["get"], validUntil: until });
     return (await presignUrl(signed, { operation: "get", pathname: path, validUntil: until, access: "private" })).presignedUrl;
   },
   async remove(paths) {
     if (!paths.length) return;
     const { del } = await import("@vercel/blob");
-    await del(paths);
+    await del(paths, { token: token() });
   },
 };
 
