@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
+import { markSeen } from "@/lib/appNews";
 import { readAccount } from "@/lib/auth";
 import { useBack } from "@/lib/back";
 import { billingLive, useBilling, webBilling } from "@/lib/billing";
@@ -301,6 +302,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       ...(!rerun && !profile.onboarded && !profile.reveal ? { reveal: firstReveal(exp) } : {}),
       ...(pro ? { pro } : {}),
     });
+    // A first setup has nothing to catch up on: the current release isn't announced to it (appNews.ts).
+    if (!rerun && !profile.onboarded) markSeen();
     setAnalytics(stats);
     // In a browser, ask it to keep this site's storage, so the workouts saved here aren't cleared (saving.ts).
     void keepStorage();

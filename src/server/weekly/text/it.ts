@@ -776,6 +776,7 @@ export const emails: Record<string, Words> = {
     intro: "L'app cambia di continuo. Ecco come restare aggiornato, e come indirizzarla.",
     points: [
       "La pagina Funzioni del sito elenca ogni funzione, con le più nuove in cima.",
+      "Impostazioni › Aiuto mostra la tua versione, e Novità, lì accanto, elenca cosa c'è di nuovo, migliore e corretto.",
       "Ogni nuova funzione ha la sua email di consigli, così ne senti parlare una volta, qui.",
       "I Labs sono dove arrivano per prime le nuove idee.",
       "Invia un feedback da Impostazioni per dirci cosa costruire dopo.",

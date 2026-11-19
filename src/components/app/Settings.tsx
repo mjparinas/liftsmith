@@ -52,6 +52,7 @@ import { StretchSettings } from "./Stretch";
 import { RestTimerSettings } from "./TrainingSettings";
 import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 import { useUnlocked } from "./useUnlocked";
+import { VersionRow } from "./WhatsNew";
 
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
@@ -260,6 +261,8 @@ export function Settings() {
         <div className="space-y-3">
           {communityOn() && <NavRow title={t("cmty.title")} sub={t("cmty.rowSub")} icon="lightbulb" onClick={() => go("community")} />}
           <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
+          {/* The version and What's new (WhatsNew.tsx, docs/decisions/whats-new.md). */}
+          <VersionRow />
         </div>
       </Section>
       {/* The app logo; seven quick taps open the lifetime total in elephants (an easter egg, LogoEgg.tsx). */}

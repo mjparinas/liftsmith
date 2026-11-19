@@ -775,6 +775,7 @@ export const emails: Record<string, Words> = {
     intro: "Uygulama sürekli değişiyor. Gelişmeleri nasıl takip edeceğin ve onlara nasıl yön vereceğin burada.",
     points: [
       "Web sitesindeki Özellikler sayfası, en yenileri en üstte olmak üzere tüm özellikleri listeler.",
+      "Ayarlar › Yardım sürümünü gösterir; yanındaki Yenilikler yeni, daha iyi ve düzeltilmiş olanları listeler.",
       "Her yeni özellik kendi ipucu e-postasını alır; ondan bir kez, burada haberin olur.",
       "Yeni fikirler önce Laboratuvar'a gelir.",
       "Sırada ne yapmamız gerektiğini söylemek için Ayarlar'dan geri bildirim gönder.",

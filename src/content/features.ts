@@ -1006,6 +1006,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-17",
       },
+      {
+        id: "whatsNew",
+        name: "What's new in the app",
+        body: "Settings shows your version with a What's new button: what's new, better and fixed, in plain words. After an update, Today mentions it once, and it only lists what you can already use.",
+        tier: "free",
+        added: "2026-11-19",
+      },
     ],
   },
   {

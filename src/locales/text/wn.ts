@@ -1,0 +1,557 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "wn.", What's new (src/lib/appNews.ts, WhatsNew.tsx), in every language. English is the
+// source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
+
+export const en = {
+  "wn.title": "What's new",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Version {version}",
+  "wn.count.new": { one: "{count} new", other: "{count} new" },
+  "wn.count.better": { one: "{count} better", other: "{count} better" },
+  "wn.count.fixed": { one: "{count} fixed", other: "{count} fixed" },
+  "wn.kind.new": "New",
+  "wn.kind.better": "Better",
+  "wn.kind.fixed": "Fixed",
+  "wn.go": "Let's go",
+  "wn.row": "Version",
+  "wn.open": "What's new",
+  "wn.note": "What's new in {brand}",
+  "wn.see": "See all",
+  "wn.c.seasons.title": "Training seasons",
+  "wn.c.seasons.body":
+    "Ten-week seasons with badges, themes and an app icon you can only earn then, paced to your own weekly goal. Every tier is free.",
+  "wn.c.community.title": "Ideas, bugs and a roadmap",
+  "wn.c.community.body": "Community, under Help in Settings: suggest ideas, report bugs, vote and follow each one from Planned to Shipped.",
+  "wn.c.crew.title": "Club chat and crew sessions",
+  "wn.c.crew.body": "Every club has a chat, and crew sessions let you pick a time, say you're in and get a reminder an hour before.",
+  "wn.c.classes.title": "Class schedules at your gym",
+  "wn.c.classes.body": "Gyms can post their weekly classes. See the next seven days on the gym's page and add one to your calendar.",
+  "wn.c.faults.title": "Common mistakes and their fixes",
+  "wn.c.faults.body": "Every exercise and stretch lists the mistakes people make most, and how to fix each one.",
+  "wn.c.widgets.title": "This week and Recovery widgets",
+  "wn.c.widgets.body": "Two new home screen widgets: your week's workouts at a glance, and which muscles are ready to train.",
+  "wn.c.supersets.title": "Automatic supersets",
+  "wn.c.supersets.body":
+    "Adaptive workouts can pair exercises that don't share muscles, so more fits into the same time. Turn it on in Settings, and every pair says why.",
+  "wn.c.fitTests.title": "Fitness tests on a number line",
+  "wn.c.fitTests.body": "Dead hang, one-leg stand and chair stand results now sit on a coloured line beside the typical range.",
+  "wn.c.getReady.title": "Time to get ready between stretches",
+  "wn.c.getReady.body": "A short countdown before each stretch and each side, and the screen stays on for the whole routine.",
+  "wn.c.machineSteps.title": "Machines step by 5 lb",
+  "wn.c.machineSteps.body": "Machine and cable exercises now go up by 5 lb or 2.5 kg, on the buttons and in the suggested weights.",
+  "wn.c.figures.title": "Smoother 3D figures",
+  "wn.c.figures.body": "Drag any 3D figure to turn it, or flick it to spin. The how-to figure keeps moving while you rest.",
+  "wn.c.languages.title": "Ten languages",
+  "wn.c.languages.body":
+    "Liftsmith now speaks Brazilian Portuguese, Korean, Polish and Turkish too, and you can pick your language on the welcome screen.",
+  "wn.c.checkins.title": "Coach check-ins with weight and photos",
+  "wn.c.checkins.body":
+    "Coaches can ask for your weight and photos in a check-in, every one, two or four weeks, and see how each answer trends.",
+  "wn.c.jumps.title": "Jumps leave the floor",
+  "wn.c.jumps.body": "Ankle hops, squat jumps and the other jumps in the how-to figures now really leave the ground.",
+  "wn.c.sides.title": "One-side stretches show the right side",
+  "wn.c.sides.body": "A stretch for one side now shows the side it names, and mirrors for the other.",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "wn.title": "Novedades",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Versión {version}",
+  "wn.count.new": { one: "{count} novedad", other: "{count} novedades" },
+  "wn.count.better": { one: "{count} mejora", other: "{count} mejoras" },
+  "wn.count.fixed": { one: "{count} arreglo", other: "{count} arreglos" },
+  "wn.kind.new": "Nuevo",
+  "wn.kind.better": "Mejor",
+  "wn.kind.fixed": "Arreglado",
+  "wn.go": "¡Vamos!",
+  "wn.row": "Versión",
+  "wn.open": "Novedades",
+  "wn.note": "Novedades en {brand}",
+  "wn.see": "Ver todo",
+  "wn.c.seasons.title": "Temporadas de entrenamiento",
+  "wn.c.seasons.body":
+    "Temporadas de diez semanas con insignias, temas y un icono de la app que solo se ganan entonces, al ritmo de tu objetivo semanal. Todos los niveles son gratis.",
+  "wn.c.community.title": "Ideas, errores y hoja de ruta",
+  "wn.c.community.body":
+    "Comunidad, en Ayuda dentro de Ajustes: propón ideas, informa de errores, vota y sigue cada una de Planificado a Publicado.",
+  "wn.c.crew.title": "Chat del club y sesiones en grupo",
+  "wn.c.crew.body":
+    "Cada club tiene un chat, y las sesiones en grupo te dejan elegir una hora, apuntarte y recibir un aviso una hora antes.",
+  "wn.c.classes.title": "Horario de clases de tu gimnasio",
+  "wn.c.classes.body":
+    "Los gimnasios pueden publicar sus clases semanales. Mira los próximos siete días en la página del gimnasio y añade una a tu calendario.",
+  "wn.c.faults.title": "Errores comunes y cómo corregirlos",
+  "wn.c.faults.body": "Cada ejercicio y estiramiento muestra los errores más habituales y cómo corregir cada uno.",
+  "wn.c.widgets.title": "Widgets Esta semana y Recuperación",
+  "wn.c.widgets.body":
+    "Dos widgets nuevos para la pantalla de inicio: tus entrenamientos de la semana de un vistazo y qué músculos están listos.",
+  "wn.c.supersets.title": "Superseries automáticas",
+  "wn.c.supersets.body":
+    "Los entrenamientos adaptativos pueden emparejar ejercicios que no comparten músculos, para hacer más en el mismo tiempo. Actívalo en Ajustes; cada pareja explica por qué.",
+  "wn.c.fitTests.title": "Pruebas de forma en una línea de valores",
+  "wn.c.fitTests.body":
+    "Los resultados de colgarse de la barra, apoyo a una pierna y levantarse de la silla aparecen en una línea de colores junto al rango habitual.",
+  "wn.c.getReady.title": "Tiempo para prepararte entre estiramientos",
+  "wn.c.getReady.body": "Una breve cuenta atrás antes de cada estiramiento y cada lado, y la pantalla sigue encendida toda la rutina.",
+  "wn.c.machineSteps.title": "Las máquinas suben de 2,5 kg en 2,5 kg",
+  "wn.c.machineSteps.body": "Los ejercicios en máquina y polea suben de 2,5 kg o 5 lb, en los botones y en los pesos sugeridos.",
+  "wn.c.figures.title": "Figuras 3D más fluidas",
+  "wn.c.figures.body":
+    "Arrastra cualquier figura 3D para girarla, o lánzala para que gire sola. La figura de la demostración sigue moviéndose mientras descansas.",
+  "wn.c.languages.title": "Diez idiomas",
+  "wn.c.languages.body":
+    "Liftsmith ya habla también portugués de Brasil, coreano, polaco y turco, y puedes elegir el idioma en la pantalla de bienvenida.",
+  "wn.c.checkins.title": "Revisiones del entrenador con peso y fotos",
+  "wn.c.checkins.body":
+    "Tu entrenador puede pedirte el peso y fotos en una revisión, cada una, dos o cuatro semanas, y ver la tendencia de cada respuesta.",
+  "wn.c.jumps.title": "Los saltos despegan del suelo",
+  "wn.c.jumps.body": "Los saltos de tobillo, sentadillas con salto y demás saltos de las figuras ya despegan de verdad del suelo.",
+  "wn.c.sides.title": "Los estiramientos de un lado muestran el lado correcto",
+  "wn.c.sides.body": "Un estiramiento para un lado muestra ahora el lado que nombra, y se refleja para el otro.",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "wn.title": "Nouveautés",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Version {version}",
+  "wn.count.new": { one: "{count} nouveauté", other: "{count} nouveautés" },
+  "wn.count.better": { one: "{count} amélioration", other: "{count} améliorations" },
+  "wn.count.fixed": { one: "{count} correction", other: "{count} corrections" },
+  "wn.kind.new": "Nouveau",
+  "wn.kind.better": "Mieux",
+  "wn.kind.fixed": "Corrigé",
+  "wn.go": "C’est parti",
+  "wn.row": "Version",
+  "wn.open": "Nouveautés",
+  "wn.note": "Nouveautés dans {brand}",
+  "wn.see": "Tout voir",
+  "wn.c.seasons.title": "Saisons d’entraînement",
+  "wn.c.seasons.body":
+    "Des saisons de dix semaines avec des badges, des thèmes et une icône d’app à gagner seulement pendant la saison, au rythme de votre objectif hebdomadaire. Tous les paliers sont gratuits.",
+  "wn.c.community.title": "Idées, bugs et feuille de route",
+  "wn.c.community.body":
+    "Communauté, dans Aide des Réglages : proposez des idées, signalez des bugs, votez et suivez chacun de Prévu à Livré.",
+  "wn.c.crew.title": "Discussion du club et séances en groupe",
+  "wn.c.crew.body":
+    "Chaque club a sa discussion, et les séances en groupe permettent de choisir une heure, de dire que vous venez et d’avoir un rappel une heure avant.",
+  "wn.c.classes.title": "Le planning des cours de votre salle",
+  "wn.c.classes.body":
+    "Les salles peuvent publier leurs cours de la semaine. Voyez les sept prochains jours sur la page de la salle et ajoutez un cours à votre agenda.",
+  "wn.c.faults.title": "Erreurs fréquentes et corrections",
+  "wn.c.faults.body": "Chaque exercice et étirement liste les erreurs les plus courantes, et comment corriger chacune.",
+  "wn.c.widgets.title": "Widgets Cette semaine et Récupération",
+  "wn.c.widgets.body":
+    "Deux nouveaux widgets d’écran d’accueil : vos séances de la semaine d’un coup d’œil, et les muscles prêts à travailler.",
+  "wn.c.supersets.title": "Supersets automatiques",
+  "wn.c.supersets.body":
+    "Les séances adaptatives peuvent associer des exercices qui ne sollicitent pas les mêmes muscles, pour en faire plus dans le même temps. À activer dans les Réglages ; chaque paire dit pourquoi.",
+  "wn.c.fitTests.title": "Tests de forme sur une échelle",
+  "wn.c.fitTests.body":
+    "Les résultats de la suspension, de l’équilibre sur une jambe et du lever de chaise s’affichent sur une ligne colorée à côté de la plage habituelle.",
+  "wn.c.getReady.title": "Le temps de se préparer entre les étirements",
+  "wn.c.getReady.body":
+    "Un court compte à rebours avant chaque étirement et chaque côté, et l’écran reste allumé pendant toute la routine.",
+  "wn.c.machineSteps.title": "Les machines montent par 2,5 kg",
+  "wn.c.machineSteps.body":
+    "Les exercices sur machine et à la poulie montent par 2,5 kg ou 5 lb, sur les boutons et dans les charges proposées.",
+  "wn.c.figures.title": "Des figures 3D plus fluides",
+  "wn.c.figures.body":
+    "Faites glisser une figure 3D pour la tourner, ou lancez-la pour qu’elle pivote. La figure de démonstration continue de bouger pendant le repos.",
+  "wn.c.languages.title": "Dix langues",
+  "wn.c.languages.body":
+    "Liftsmith parle désormais aussi le portugais du Brésil, le coréen, le polonais et le turc, et vous pouvez choisir la langue dès l’écran d’accueil.",
+  "wn.c.checkins.title": "Bilans du coach avec poids et photos",
+  "wn.c.checkins.body":
+    "Votre coach peut demander votre poids et des photos dans un bilan, toutes les une, deux ou quatre semaines, et voir l’évolution de chaque réponse.",
+  "wn.c.jumps.title": "Les sauts décollent du sol",
+  "wn.c.jumps.body": "Les sauts de cheville, squats sautés et autres sauts des figures de démonstration quittent vraiment le sol.",
+  "wn.c.sides.title": "Les étirements d’un côté montrent le bon côté",
+  "wn.c.sides.body": "Un étirement d’un côté montre désormais le côté indiqué, et s’inverse pour l’autre.",
+};
+
+export const de: Partial<Record<Key, Message>> = {
+  "wn.title": "Neuigkeiten",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Version {version}",
+  "wn.count.new": { one: "{count} neu", other: "{count} neu" },
+  "wn.count.better": { one: "{count} besser", other: "{count} besser" },
+  "wn.count.fixed": { one: "{count} behoben", other: "{count} behoben" },
+  "wn.kind.new": "Neu",
+  "wn.kind.better": "Besser",
+  "wn.kind.fixed": "Behoben",
+  "wn.go": "Los geht’s",
+  "wn.row": "Version",
+  "wn.open": "Neuigkeiten",
+  "wn.note": "Neu in {brand}",
+  "wn.see": "Alle ansehen",
+  "wn.c.seasons.title": "Trainingssaisons",
+  "wn.c.seasons.body":
+    "Zehnwöchige Saisons mit Abzeichen, Designs und einem App-Symbol, die es nur dann gibt, im Tempo deines eigenen Wochenziels. Jede Stufe ist kostenlos.",
+  "wn.c.community.title": "Ideen, Fehler und Roadmap",
+  "wn.c.community.body":
+    "Community, unter Hilfe in den Einstellungen: Ideen vorschlagen, Fehler melden, abstimmen und jeden Beitrag von Geplant bis Veröffentlicht verfolgen.",
+  "wn.c.crew.title": "Club-Chat und Crew-Termine",
+  "wn.c.crew.body":
+    "Jeder Club hat einen Chat, und bei Crew-Terminen wählst du eine Zeit, sagst zu und bekommst eine Stunde vorher eine Erinnerung.",
+  "wn.c.classes.title": "Kursplan deines Studios",
+  "wn.c.classes.body":
+    "Studios können ihre wöchentlichen Kurse eintragen. Sieh dir die nächsten sieben Tage auf der Seite des Studios an und trag einen in deinen Kalender ein.",
+  "wn.c.faults.title": "Häufige Fehler und wie du sie behebst",
+  "wn.c.faults.body": "Jede Übung und Dehnung zeigt die häufigsten Fehler und wie du jeden davon behebst.",
+  "wn.c.widgets.title": "Widgets Diese Woche und Erholung",
+  "wn.c.widgets.body":
+    "Zwei neue Widgets für den Startbildschirm: deine Trainings der Woche auf einen Blick und welche Muskeln bereit sind.",
+  "wn.c.supersets.title": "Automatische Supersätze",
+  "wn.c.supersets.body":
+    "Adaptive Trainings können Übungen ohne gemeinsame Muskeln paaren, damit mehr in dieselbe Zeit passt. Schalte es in den Einstellungen ein; jedes Paar sagt, warum.",
+  "wn.c.fitTests.title": "Fitnesstests auf einer Skala",
+  "wn.c.fitTests.body":
+    "Ergebnisse von Hängen, Einbeinstand und Aufstehtest stehen jetzt auf einer farbigen Linie neben dem üblichen Bereich.",
+  "wn.c.getReady.title": "Zeit zum Bereitmachen zwischen Dehnungen",
+  "wn.c.getReady.body": "Ein kurzer Countdown vor jeder Dehnung und jeder Seite, und der Bildschirm bleibt die ganze Routine über an.",
+  "wn.c.machineSteps.title": "Maschinen steigen um 2,5 kg",
+  "wn.c.machineSteps.body":
+    "Übungen an Maschine und Kabelzug steigen jetzt um 2,5 kg oder 5 lb, bei den Tasten und den vorgeschlagenen Gewichten.",
+  "wn.c.figures.title": "Flüssigere 3D-Figuren",
+  "wn.c.figures.body":
+    "Zieh an einer 3D-Figur, um sie zu drehen, oder gib ihr Schwung. Die Anleitungsfigur bewegt sich auch in der Pause weiter.",
+  "wn.c.languages.title": "Zehn Sprachen",
+  "wn.c.languages.body":
+    "Liftsmith spricht jetzt auch brasilianisches Portugiesisch, Koreanisch, Polnisch und Türkisch, und du kannst die Sprache schon auf dem Begrüßungsbildschirm wählen.",
+  "wn.c.checkins.title": "Coach-Check-ins mit Gewicht und Fotos",
+  "wn.c.checkins.body":
+    "Coaches können in einem Check-in nach deinem Gewicht und Fotos fragen, alle ein, zwei oder vier Wochen, und den Verlauf jeder Antwort sehen.",
+  "wn.c.jumps.title": "Sprünge heben ab",
+  "wn.c.jumps.body": "Fußgelenksprünge, Sprungkniebeugen und die anderen Sprünge der Anleitungsfiguren verlassen jetzt wirklich den Boden.",
+  "wn.c.sides.title": "Einseitige Dehnungen zeigen die richtige Seite",
+  "wn.c.sides.body": "Eine Dehnung für eine Seite zeigt jetzt die genannte Seite und wird für die andere gespiegelt.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "wn.title": "Novità",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Versione {version}",
+  "wn.count.new": { one: "{count} novità", other: "{count} novità" },
+  "wn.count.better": { one: "{count} miglioramento", other: "{count} miglioramenti" },
+  "wn.count.fixed": { one: "{count} correzione", other: "{count} correzioni" },
+  "wn.kind.new": "Nuovo",
+  "wn.kind.better": "Meglio",
+  "wn.kind.fixed": "Corretto",
+  "wn.go": "Andiamo",
+  "wn.row": "Versione",
+  "wn.open": "Novità",
+  "wn.note": "Novità in {brand}",
+  "wn.see": "Vedi tutto",
+  "wn.c.seasons.title": "Stagioni di allenamento",
+  "wn.c.seasons.body":
+    "Stagioni di dieci settimane con badge, temi e un'icona dell'app che si ottengono solo allora, al ritmo del tuo obiettivo settimanale. Ogni livello è gratuito.",
+  "wn.c.community.title": "Idee, bug e roadmap",
+  "wn.c.community.body":
+    "Community, in Aiuto nelle Impostazioni: proponi idee, segnala bug, vota e segui ognuno da Pianificato a Rilasciato.",
+  "wn.c.crew.title": "Chat del club e sessioni di gruppo",
+  "wn.c.crew.body":
+    "Ogni club ha una chat, e le sessioni di gruppo ti fanno scegliere un orario, dire che ci sei e ricevere un promemoria un'ora prima.",
+  "wn.c.classes.title": "Orario dei corsi della tua palestra",
+  "wn.c.classes.body":
+    "Le palestre possono pubblicare i corsi settimanali. Guarda i prossimi sette giorni nella pagina della palestra e aggiungine uno al calendario.",
+  "wn.c.faults.title": "Errori comuni e come correggerli",
+  "wn.c.faults.body": "Ogni esercizio e allungamento elenca gli errori più frequenti e come correggere ciascuno.",
+  "wn.c.widgets.title": "Widget Questa settimana e Recupero",
+  "wn.c.widgets.body":
+    "Due nuovi widget per la schermata Home: gli allenamenti della settimana a colpo d'occhio e quali muscoli sono pronti.",
+  "wn.c.supersets.title": "Superserie automatiche",
+  "wn.c.supersets.body":
+    "Gli allenamenti adattivi possono abbinare esercizi che non usano gli stessi muscoli, per fare di più nello stesso tempo. Attivalo nelle Impostazioni; ogni coppia dice perché.",
+  "wn.c.fitTests.title": "Test di forma su una scala",
+  "wn.c.fitTests.body":
+    "I risultati di sospensione alla sbarra, equilibrio su una gamba e alzata dalla sedia ora stanno su una linea colorata accanto all'intervallo tipico.",
+  "wn.c.getReady.title": "Il tempo di prepararsi tra gli allungamenti",
+  "wn.c.getReady.body":
+    "Un breve conto alla rovescia prima di ogni allungamento e di ogni lato, e lo schermo resta acceso per tutta la routine.",
+  "wn.c.machineSteps.title": "Le macchine salgono di 2,5 kg",
+  "wn.c.machineSteps.body": "Gli esercizi alle macchine e ai cavi ora salgono di 2,5 kg o 5 lb, sui pulsanti e nei pesi suggeriti.",
+  "wn.c.figures.title": "Figure 3D più fluide",
+  "wn.c.figures.body":
+    "Trascina una figura 3D per girarla, o dalle una spinta per farla ruotare. La figura dimostrativa continua a muoversi durante il recupero.",
+  "wn.c.languages.title": "Dieci lingue",
+  "wn.c.languages.body":
+    "Liftsmith ora parla anche portoghese brasiliano, coreano, polacco e turco, e puoi scegliere la lingua già dalla schermata di benvenuto.",
+  "wn.c.checkins.title": "Check-in del coach con peso e foto",
+  "wn.c.checkins.body":
+    "Il coach può chiederti il peso e delle foto in un check-in, ogni una, due o quattro settimane, e vedere l'andamento di ogni risposta.",
+  "wn.c.jumps.title": "I salti si staccano da terra",
+  "wn.c.jumps.body": "Saltelli sulle caviglie, squat jump e gli altri salti delle figure dimostrative ora si staccano davvero da terra.",
+  "wn.c.sides.title": "Gli allungamenti di un lato mostrano il lato giusto",
+  "wn.c.sides.body": "Un allungamento per un lato ora mostra il lato indicato e si specchia per l'altro.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "wn.title": "新機能",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "バージョン {version}",
+  "wn.count.new": { other: "新機能 {count}件" },
+  "wn.count.better": { other: "改善 {count}件" },
+  "wn.count.fixed": { other: "修正 {count}件" },
+  "wn.kind.new": "新機能",
+  "wn.kind.better": "改善",
+  "wn.kind.fixed": "修正",
+  "wn.go": "はじめる",
+  "wn.row": "バージョン",
+  "wn.open": "新機能",
+  "wn.note": "{brand}の新機能",
+  "wn.see": "すべて見る",
+  "wn.c.seasons.title": "トレーニングシーズン",
+  "wn.c.seasons.body":
+    "10週間のシーズンで、その期間だけ手に入るバッジ、テーマ、アプリアイコンを獲得できます。ペースは自分の週間目標に合わせて決まり、すべてのティアが無料です。",
+  "wn.c.community.title": "アイデア、不具合、ロードマップ",
+  "wn.c.community.body":
+    "設定のヘルプにあるコミュニティで、アイデアの提案、不具合の報告、投票ができ、それぞれが「予定」から「リリース済み」になるまで追えます。",
+  "wn.c.crew.title": "クラブチャットとクルーセッション",
+  "wn.c.crew.body": "どのクラブにもチャットがあり、クルーセッションでは時間を決めて参加を伝えると、1時間前にリマインダーが届きます。",
+  "wn.c.classes.title": "ジムのクラススケジュール",
+  "wn.c.classes.body": "ジムが毎週のクラスを掲載できるようになりました。ジムのページで今後7日間を確認し、カレンダーに追加できます。",
+  "wn.c.faults.title": "よくある間違いと直し方",
+  "wn.c.faults.body": "すべての種目とストレッチに、よくある間違いとそれぞれの直し方が載りました。",
+  "wn.c.widgets.title": "今週と回復のウィジェット",
+  "wn.c.widgets.body": "ホーム画面に新しいウィジェットが2つ。今週のワークアウトがひと目でわかり、どの筋肉が回復しているかもわかります。",
+  "wn.c.supersets.title": "自動スーパーセット",
+  "wn.c.supersets.body":
+    "アダプティブワークアウトで、使う筋肉が重ならない種目をペアにして、同じ時間でより多くこなせます。設定でオンにでき、各ペアに理由が表示されます。",
+  "wn.c.fitTests.title": "体力テストを数直線で表示",
+  "wn.c.fitTests.body": "ぶら下がり、片脚立ち、椅子立ち上がりの結果を、一般的な範囲と並べて色付きの線の上に表示します。",
+  "wn.c.getReady.title": "ストレッチの間に準備時間",
+  "wn.c.getReady.body": "各ストレッチと左右それぞれの前に短いカウントダウンが入り、ルーティン中は画面がつきっぱなしになります。",
+  "wn.c.machineSteps.title": "マシンは2.5 kgずつ",
+  "wn.c.machineSteps.body": "マシンとケーブルの種目は、ボタンでも提案重量でも2.5 kg(5 lb)ずつ上がるようになりました。",
+  "wn.c.figures.title": "なめらかな3Dフィギュア",
+  "wn.c.figures.body": "3Dフィギュアはドラッグで回転し、はじくと回り続けます。お手本のフィギュアは休憩中も動き続けます。",
+  "wn.c.languages.title": "10言語に対応",
+  "wn.c.languages.body":
+    "Liftsmithはブラジルポルトガル語、韓国語、ポーランド語、トルコ語にも対応し、ようこそ画面で言語を選べるようになりました。",
+  "wn.c.checkins.title": "体重と写真つきのコーチチェックイン",
+  "wn.c.checkins.body": "コーチはチェックインで体重と写真を1週、2週、4週ごとに尋ねられ、それぞれの回答の推移を確認できます。",
+  "wn.c.jumps.title": "ジャンプがしっかり床を離れる",
+  "wn.c.jumps.body": "アンクルホップ、スクワットジャンプなど、お手本フィギュアのジャンプが本当に床から離れるようになりました。",
+  "wn.c.sides.title": "片側ストレッチが正しい側を表示",
+  "wn.c.sides.body": "片側のストレッチは名前どおりの側を表示し、反対側では左右反転します。",
+};
+
+export const pt: Partial<Record<Key, Message>> = {
+  "wn.title": "Novidades",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Versão {version}",
+  "wn.count.new": { one: "{count} novidade", other: "{count} novidades" },
+  "wn.count.better": { one: "{count} melhoria", other: "{count} melhorias" },
+  "wn.count.fixed": { one: "{count} correção", other: "{count} correções" },
+  "wn.kind.new": "Novo",
+  "wn.kind.better": "Melhor",
+  "wn.kind.fixed": "Corrigido",
+  "wn.go": "Bora!",
+  "wn.row": "Versão",
+  "wn.open": "Novidades",
+  "wn.note": "Novidades no {brand}",
+  "wn.see": "Ver tudo",
+  "wn.c.seasons.title": "Temporadas de treino",
+  "wn.c.seasons.body":
+    "Temporadas de dez semanas com emblemas, temas e um ícone do app que só dá para ganhar nelas, no ritmo da sua meta semanal. Todos os níveis são grátis.",
+  "wn.c.community.title": "Ideias, bugs e roadmap",
+  "wn.c.community.body": "Comunidade, em Ajuda nos Ajustes: sugira ideias, relate bugs, vote e acompanhe cada um de Planejado a Lançado.",
+  "wn.c.crew.title": "Chat do clube e sessões em grupo",
+  "wn.c.crew.body":
+    "Todo clube tem um chat, e as sessões em grupo deixam você escolher um horário, confirmar presença e receber um lembrete uma hora antes.",
+  "wn.c.classes.title": "Horário das aulas da sua academia",
+  "wn.c.classes.body":
+    "As academias podem publicar as aulas da semana. Veja os próximos sete dias na página da academia e adicione uma à sua agenda.",
+  "wn.c.faults.title": "Erros comuns e como corrigi-los",
+  "wn.c.faults.body": "Cada exercício e alongamento mostra os erros mais comuns e como corrigir cada um.",
+  "wn.c.widgets.title": "Widgets Esta semana e Recuperação",
+  "wn.c.widgets.body": "Dois novos widgets para a tela inicial: os treinos da semana de relance e quais músculos estão prontos.",
+  "wn.c.supersets.title": "Supersets automáticos",
+  "wn.c.supersets.body":
+    "Os treinos adaptativos podem juntar exercícios que não usam os mesmos músculos, para caber mais no mesmo tempo. Ative nos Ajustes; cada par explica o porquê.",
+  "wn.c.fitTests.title": "Testes físicos numa escala",
+  "wn.c.fitTests.body":
+    "Os resultados de suspensão na barra, equilíbrio numa perna e levantar da cadeira agora aparecem numa linha colorida ao lado da faixa típica.",
+  "wn.c.getReady.title": "Tempo para se preparar entre alongamentos",
+  "wn.c.getReady.body": "Uma contagem curta antes de cada alongamento e de cada lado, e a tela fica ligada durante toda a rotina.",
+  "wn.c.machineSteps.title": "Máquinas sobem de 2,5 kg em 2,5 kg",
+  "wn.c.machineSteps.body": "Exercícios em máquina e polia agora sobem 2,5 kg ou 5 lb, nos botões e nos pesos sugeridos.",
+  "wn.c.figures.title": "Figuras 3D mais suaves",
+  "wn.c.figures.body":
+    "Arraste qualquer figura 3D para girá-la, ou dê um impulso para ela rodar. A figura de demonstração continua se mexendo no descanso.",
+  "wn.c.languages.title": "Dez idiomas",
+  "wn.c.languages.body":
+    "O Liftsmith agora também fala português do Brasil, coreano, polonês e turco, e você pode escolher o idioma na tela de boas-vindas.",
+  "wn.c.checkins.title": "Check-ins do treinador com peso e fotos",
+  "wn.c.checkins.body":
+    "O treinador pode pedir seu peso e fotos num check-in, a cada uma, duas ou quatro semanas, e ver a tendência de cada resposta.",
+  "wn.c.jumps.title": "Os saltos saem do chão",
+  "wn.c.jumps.body": "Saltitos de tornozelo, agachamentos com salto e os outros saltos das figuras agora saem mesmo do chão.",
+  "wn.c.sides.title": "Alongamentos de um lado mostram o lado certo",
+  "wn.c.sides.body": "Um alongamento de um lado agora mostra o lado indicado e espelha para o outro.",
+};
+
+export const ko: Partial<Record<Key, Message>> = {
+  "wn.title": "새로운 기능",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "버전 {version}",
+  "wn.count.new": { other: "새 기능 {count}개" },
+  "wn.count.better": { other: "개선 {count}개" },
+  "wn.count.fixed": { other: "수정 {count}개" },
+  "wn.kind.new": "새 기능",
+  "wn.kind.better": "개선",
+  "wn.kind.fixed": "수정",
+  "wn.go": "시작하기",
+  "wn.row": "버전",
+  "wn.open": "새로운 기능",
+  "wn.note": "{brand}의 새로운 기능",
+  "wn.see": "모두 보기",
+  "wn.c.seasons.title": "트레이닝 시즌",
+  "wn.c.seasons.body":
+    "10주 시즌 동안만 얻을 수 있는 배지, 테마, 앱 아이콘이 있으며, 진행 속도는 나의 주간 목표에 맞춰집니다. 모든 단계가 무료입니다.",
+  "wn.c.community.title": "아이디어, 버그, 로드맵",
+  "wn.c.community.body":
+    "설정의 도움말에 있는 커뮤니티에서 아이디어를 제안하고, 버그를 신고하고, 투표하고, 각 항목이 계획됨에서 출시됨까지 가는 과정을 볼 수 있습니다.",
+  "wn.c.crew.title": "클럽 채팅과 크루 세션",
+  "wn.c.crew.body": "모든 클럽에 채팅이 있고, 크루 세션에서 시간을 정해 참여를 알리면 한 시간 전에 알림을 받습니다.",
+  "wn.c.classes.title": "내 헬스장의 수업 시간표",
+  "wn.c.classes.body": "헬스장이 매주 수업을 올릴 수 있습니다. 헬스장 페이지에서 앞으로 7일을 확인하고 원하는 수업을 캘린더에 추가하세요.",
+  "wn.c.faults.title": "흔한 실수와 고치는 법",
+  "wn.c.faults.body": "모든 운동과 스트레칭에 가장 흔한 실수와 각각을 고치는 방법이 나옵니다.",
+  "wn.c.widgets.title": "이번 주와 회복 위젯",
+  "wn.c.widgets.body": "홈 화면용 새 위젯 2개: 이번 주 운동을 한눈에, 그리고 어떤 근육이 준비됐는지 보여 줍니다.",
+  "wn.c.supersets.title": "자동 슈퍼세트",
+  "wn.c.supersets.body":
+    "적응형 운동이 같은 근육을 쓰지 않는 운동을 짝지어 같은 시간에 더 많이 할 수 있게 합니다. 설정에서 켤 수 있고, 각 짝마다 이유가 표시됩니다.",
+  "wn.c.fitTests.title": "수직선으로 보는 체력 테스트",
+  "wn.c.fitTests.body": "매달리기, 한 발 서기, 의자 일어서기 결과가 일반적인 범위와 함께 색깔 있는 선 위에 표시됩니다.",
+  "wn.c.getReady.title": "스트레칭 사이 준비 시간",
+  "wn.c.getReady.body": "각 스트레칭과 양쪽 각각의 시작 전에 짧은 카운트다운이 나오고, 루틴 내내 화면이 켜져 있습니다.",
+  "wn.c.machineSteps.title": "머신은 2.5 kg씩",
+  "wn.c.machineSteps.body": "머신과 케이블 운동이 버튼과 추천 무게 모두에서 2.5 kg(5 lb)씩 올라갑니다.",
+  "wn.c.figures.title": "더 부드러운 3D 피규어",
+  "wn.c.figures.body": "3D 피규어를 드래그해 돌리거나 튕겨서 회전시킬 수 있습니다. 동작 안내 피규어는 휴식 중에도 계속 움직입니다.",
+  "wn.c.languages.title": "10개 언어",
+  "wn.c.languages.body":
+    "Liftsmith가 이제 브라질 포르투갈어, 한국어, 폴란드어, 튀르키예어도 지원하며, 시작 화면에서 언어를 고를 수 있습니다.",
+  "wn.c.checkins.title": "체중과 사진이 있는 코치 체크인",
+  "wn.c.checkins.body": "코치가 체크인에서 1주, 2주, 4주마다 체중과 사진을 요청하고 각 답변의 추세를 볼 수 있습니다.",
+  "wn.c.jumps.title": "점프가 바닥을 떠나요",
+  "wn.c.jumps.body": "앵클 홉, 스쿼트 점프 등 동작 안내 피규어의 점프가 이제 정말로 바닥에서 뜹니다.",
+  "wn.c.sides.title": "한쪽 스트레칭이 맞는 쪽을 보여 줘요",
+  "wn.c.sides.body": "한쪽 스트레칭은 이름에 있는 쪽을 보여 주고, 반대쪽은 좌우를 뒤집어 보여 줍니다.",
+};
+
+export const pl: Partial<Record<Key, Message>> = {
+  "wn.title": "Co nowego",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Wersja {version}",
+  "wn.count.new": { one: "{count} nowość", few: "{count} nowości", many: "{count} nowości", other: "{count} nowości" },
+  "wn.count.better": { one: "{count} ulepszenie", few: "{count} ulepszenia", many: "{count} ulepszeń", other: "{count} ulepszenia" },
+  "wn.count.fixed": { one: "{count} poprawka", few: "{count} poprawki", many: "{count} poprawek", other: "{count} poprawki" },
+  "wn.kind.new": "Nowość",
+  "wn.kind.better": "Lepiej",
+  "wn.kind.fixed": "Naprawione",
+  "wn.go": "Do dzieła",
+  "wn.row": "Wersja",
+  "wn.open": "Co nowego",
+  "wn.note": "Co nowego w {brand}",
+  "wn.see": "Zobacz wszystko",
+  "wn.c.seasons.title": "Sezony treningowe",
+  "wn.c.seasons.body":
+    "Dziesięciotygodniowe sezony z odznakami, motywami i ikoną aplikacji, które zdobędziesz tylko wtedy, w tempie Twojego tygodniowego celu. Każdy poziom jest darmowy.",
+  "wn.c.community.title": "Pomysły, błędy i plan rozwoju",
+  "wn.c.community.body": "Społeczność, w Pomocy w Ustawieniach: zgłaszaj pomysły i błędy, głosuj i śledź każdy od Zaplanowane do Wydane.",
+  "wn.c.crew.title": "Czat klubu i wspólne treningi",
+  "wn.c.crew.body":
+    "Każdy klub ma czat, a przy wspólnych treningach wybierasz godzinę, dajesz znać, że będziesz, i dostajesz przypomnienie godzinę wcześniej.",
+  "wn.c.classes.title": "Grafik zajęć Twojej siłowni",
+  "wn.c.classes.body":
+    "Siłownie mogą publikować cotygodniowe zajęcia. Zobacz najbliższe siedem dni na stronie siłowni i dodaj zajęcia do kalendarza.",
+  "wn.c.faults.title": "Częste błędy i jak je poprawić",
+  "wn.c.faults.body": "Każde ćwiczenie i rozciąganie pokazuje najczęstsze błędy i sposób na poprawienie każdego z nich.",
+  "wn.c.widgets.title": "Widżety Ten tydzień i Regeneracja",
+  "wn.c.widgets.body": "Dwa nowe widżety na ekran główny: treningi z tego tygodnia w skrócie i które mięśnie są gotowe.",
+  "wn.c.supersets.title": "Automatyczne superserie",
+  "wn.c.supersets.body":
+    "Treningi adaptacyjne mogą łączyć w pary ćwiczenia na różne mięśnie, żeby zmieścić więcej w tym samym czasie. Włącz to w Ustawieniach; każda para mówi dlaczego.",
+  "wn.c.fitTests.title": "Testy sprawności na skali",
+  "wn.c.fitTests.body":
+    "Wyniki zwisu na drążku, stania na jednej nodze i wstawania z krzesła są teraz na kolorowej linii obok typowego zakresu.",
+  "wn.c.getReady.title": "Czas na przygotowanie między rozciąganiami",
+  "wn.c.getReady.body": "Krótkie odliczanie przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie przez całą sesję.",
+  "wn.c.machineSteps.title": "Maszyny rosną o 2,5 kg",
+  "wn.c.machineSteps.body": "Ćwiczenia na maszynach i wyciągach rosną teraz o 2,5 kg lub 5 lb, na przyciskach i w proponowanych ciężarach.",
+  "wn.c.figures.title": "Płynniejsze postacie 3D",
+  "wn.c.figures.body":
+    "Przeciągnij postać 3D, żeby ją obrócić, albo pchnij, żeby się kręciła. Postać z instrukcją rusza się też w przerwie.",
+  "wn.c.languages.title": "Dziesięć języków",
+  "wn.c.languages.body":
+    "Liftsmith mówi teraz także po portugalsku (Brazylia), koreańsku, polsku i turecku, a język wybierzesz już na ekranie powitalnym.",
+  "wn.c.checkins.title": "Raporty dla trenera z wagą i zdjęciami",
+  "wn.c.checkins.body":
+    "Trener może poprosić w raporcie o Twoją wagę i zdjęcia, co jeden, dwa lub cztery tygodnie, i widzieć trend każdej odpowiedzi.",
+  "wn.c.jumps.title": "Skoki odrywają się od ziemi",
+  "wn.c.jumps.body": "Podskoki na kostkach, przysiady z wyskokiem i inne skoki w instrukcjach naprawdę odrywają się teraz od podłogi.",
+  "wn.c.sides.title": "Rozciąganie jednej strony pokazuje właściwą stronę",
+  "wn.c.sides.body": "Rozciąganie jednej strony pokazuje teraz stronę z nazwy, a dla drugiej odbija się lustrzanie.",
+};
+
+export const tr: Partial<Record<Key, Message>> = {
+  "wn.title": "Yenilikler",
+  "wn.kicker": "{brand} · {date}",
+  "wn.version": "Sürüm {version}",
+  "wn.count.new": { one: "{count} yeni", other: "{count} yeni" },
+  "wn.count.better": { one: "{count} iyileştirme", other: "{count} iyileştirme" },
+  "wn.count.fixed": { one: "{count} düzeltme", other: "{count} düzeltme" },
+  "wn.kind.new": "Yeni",
+  "wn.kind.better": "Daha iyi",
+  "wn.kind.fixed": "Düzeltildi",
+  "wn.go": "Başlayalım",
+  "wn.row": "Sürüm",
+  "wn.open": "Yenilikler",
+  "wn.note": "{brand} yenilikleri",
+  "wn.see": "Tümünü gör",
+  "wn.c.seasons.title": "Antrenman sezonları",
+  "wn.c.seasons.body":
+    "Yalnızca o dönemde kazanılabilen rozetler, temalar ve uygulama simgesiyle on haftalık sezonlar; tempo kendi haftalık hedefine göre. Her kademe ücretsiz.",
+  "wn.c.community.title": "Fikirler, hatalar ve yol haritası",
+  "wn.c.community.body":
+    "Ayarlar'daki Yardım altında Topluluk: fikir öner, hata bildir, oy ver ve her birini Planlandı'dan Yayınlandı'ya kadar takip et.",
+  "wn.c.crew.title": "Kulüp sohbeti ve ekip seansları",
+  "wn.c.crew.body":
+    "Her kulübün bir sohbeti var; ekip seanslarında bir saat seçip katılacağını söylersin ve bir saat önce hatırlatma alırsın.",
+  "wn.c.classes.title": "Spor salonunun ders programı",
+  "wn.c.classes.body":
+    "Salonlar haftalık derslerini paylaşabilir. Salonun sayfasında önümüzdeki yedi günü gör ve bir dersi takvimine ekle.",
+  "wn.c.faults.title": "Sık yapılan hatalar ve düzeltmeleri",
+  "wn.c.faults.body": "Her egzersiz ve esneme, en sık yapılan hataları ve her birinin nasıl düzeltileceğini gösteriyor.",
+  "wn.c.widgets.title": "Bu hafta ve Toparlanma widget'ları",
+  "wn.c.widgets.body": "Ana ekran için iki yeni widget: haftanın antrenmanlarına bir bakışta göz at ve hangi kasların hazır olduğunu gör.",
+  "wn.c.supersets.title": "Otomatik süpersetler",
+  "wn.c.supersets.body":
+    "Uyarlanabilir antrenmanlar aynı kasları kullanmayan egzersizleri eşleyerek aynı sürede daha fazlasını sığdırabilir. Ayarlar'dan aç; her eşleşme nedenini söyler.",
+  "wn.c.fitTests.title": "Bir sayı doğrusunda kondisyon testleri",
+  "wn.c.fitTests.body": "Barfiks asılma, tek ayak duruş ve sandalyeden kalkma sonuçları artık tipik aralığın yanında renkli bir çizgide.",
+  "wn.c.getReady.title": "Esnemeler arasında hazırlanma süresi",
+  "wn.c.getReady.body": "Her esnemeden ve her taraftan önce kısa bir geri sayım var, ekran da rutin boyunca açık kalıyor.",
+  "wn.c.machineSteps.title": "Makineler 2,5 kg artıyor",
+  "wn.c.machineSteps.body": "Makine ve kablo egzersizleri artık hem düğmelerde hem önerilen ağırlıklarda 2,5 kg ya da 5 lb artıyor.",
+  "wn.c.figures.title": "Daha akıcı 3D figürler",
+  "wn.c.figures.body":
+    "Herhangi bir 3D figürü sürükleyerek çevir ya da fırlatıp döndür. Nasıl yapılır figürü dinlenirken de hareket etmeye devam ediyor.",
+  "wn.c.languages.title": "On dil",
+  "wn.c.languages.body":
+    "Liftsmith artık Brezilya Portekizcesi, Korece, Lehçe ve Türkçe de konuşuyor; dilini karşılama ekranında seçebilirsin.",
+  "wn.c.checkins.title": "Kilo ve fotoğraflı koç check-in'leri",
+  "wn.c.checkins.body":
+    "Koçun bir check-in'de bir, iki ya da dört haftada bir kilonu ve fotoğraflarını isteyip her cevabın gidişatını görebilir.",
+  "wn.c.jumps.title": "Sıçramalar yerden kalkıyor",
+  "wn.c.jumps.body":
+    "Ayak bileği sekmeleri, sıçramalı squat'lar ve nasıl yapılır figürlerindeki diğer sıçramalar artık gerçekten yerden kalkıyor.",
+  "wn.c.sides.title": "Tek taraflı esnemeler doğru tarafı gösteriyor",
+  "wn.c.sides.body": "Tek taraflı bir esneme artık adındaki tarafı gösteriyor, diğer taraf için de aynalanıyor.",
+};

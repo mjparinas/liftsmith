@@ -96,6 +96,7 @@ import { TrainingSettings } from "./TrainingSettings";
 import { TodaySkeleton } from "./ui";
 import { UpdateToast } from "./UpdateToast";
 import { useUnlocked } from "./useUnlocked";
+import { WhatsNewNote } from "./WhatsNew";
 import { Workout } from "./Workout";
 
 const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
@@ -529,6 +530,8 @@ export function App() {
           <CheckinToasts hidden={route === "workout"} />
           {/* A newer version in the store (appUpdate.ts): same place, never during a workout. */}
           <UpdateToast hidden={route === "workout"} />
+          {/* Once after an update, on Today only: what's new (WhatsNew.tsx, docs/decisions/whats-new.md). */}
+          {route === "today" && <WhatsNewNote />}
           <ScreenBoundary>{screen}</ScreenBoundary>
         </main>
       </div>

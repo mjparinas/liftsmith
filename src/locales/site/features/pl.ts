@@ -598,6 +598,10 @@ export const pl: FeaturesText = {
       name: "Społeczność: pomysły, błędy i plan rozwoju",
       body: "Zaproponuj, co Liftsmith ma robić dalej, głosuj na pomysły, które chcesz, zgłaszaj błędy ze zrzutem ekranu widocznym tylko dla zespołu, komentuj i oznaczaj innych przez @. Przy każdym widać, na jakim jest etapie, od analizy po wydanie, a gdy pomysł, na który głosujesz, trafi do aplikacji, dostaniesz powiadomienie. Plan rozwoju i lista zmian są też na stronie.",
     },
+    whatsNew: {
+      name: "Co nowego w aplikacji",
+      body: "Ustawienia pokazują Twoją wersję z przyciskiem Co nowego: co jest nowe, lepsze i naprawione, prostymi słowami. Po aktualizacji ekran Dziś wspomina o tym raz i pokazuje tylko to, z czego już możesz korzystać.",
+    },
     languages: {
       name: "Dziesięć języków",
       body: "Angielski, hiszpański, francuski, niemiecki, włoski, japoński, portugalski (Brazylia), koreański, polski i turecki, zgodnie z językiem telefonu lub przeglądarki albo do wyboru na ekranie powitalnym i w ustawieniach.",

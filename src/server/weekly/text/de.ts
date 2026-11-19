@@ -776,6 +776,7 @@ export const emails: Record<string, Words> = {
     intro: "Die App entwickelt sich ständig weiter. So bleibst du auf dem Laufenden und bestimmst mit.",
     points: [
       "Die Funktionsseite auf der Website listet jede Funktion, die neuesten oben.",
+      "Einstellungen › Hilfe zeigt deine Version, und Neuigkeiten daneben listet, was neu, besser und behoben ist.",
       "Jede neue Funktion bekommt ihre eigene Tipp-E-Mail, du hörst also einmal davon, hier.",
       "In Labs landen neue Ideen zuerst.",
       "Sende Feedback über Einstellungen, um uns zu sagen, was wir als Nächstes bauen sollen.",
