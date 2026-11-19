@@ -23,7 +23,7 @@ Every helper only reads and suggests (one exception since 2026-11-16, the gym im
 ## Switches and the cap
 
 - **Flags › Admin AI helpers** (`aiHelpers`, on by default) is the kill switch: off stops every AI request at once, the digest included.
-- **Flags › AI daily cap (US$)** (`aiDailyCap`: 0.5, 1, 2 or 4; default 2) is the most the helpers spend in a Pacific day. Once reached, every helper says so until midnight Pacific. $4 a day for the 25 days left on the credit is the $100.
+- **Flags › AI daily cap (US$)** (`aiDailyCap`, default 2) is the most the helpers spend in a Pacific day. It's a typed dollar amount, not a list (Melvin, 2026-11-19: "instead of ai daily cap being a dropdown, make it an input box. if it exceeds 50 dollars, there should be an, are you sure?"): any amount from $0.01 to $1,000 in whole cents (`amount` on the flag, checked by `allowed` on the server too), and over $50 (`confirmAbove`) the Flags tab asks "Are you sure?" with Yes, save and Cancel before it saves. Once reached, every helper says so until midnight Pacific. $4 a day for the 25 days left on the credit is the $100.
 - Spend is counted from each response's token usage at list prices into two `admin_settings` rows per day (`ai_spend:<day>` in millionths of a dollar, `ai_calls:<day>`), added in one statement each so parallel requests don't lose each other's. A check reads four rows by their keys. Each helper's line on the panel shows today's spend against the cap.
 - Each use is in the audit log (`ai.triage`, `ai.triagePlace`, `ai.gymFill`, `ai.gymFillSave`, `ai.gymDupes`, `ai.page`, `inbox.draft`). Only admins run helpers; support staff see the state.
 
