@@ -12,6 +12,7 @@ import { communityCleanup } from "./community";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { earnedDeletes } from "./earnedPro";
+import { dropVideosOf } from "./formVideos";
 import { claimDeletes } from "./gymClaims";
 import { classDeletes } from "./gymClasses";
 import { gymDeletes } from "./gymDirectory";
@@ -287,6 +288,8 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
   await forgetStripe(accountId).catch(() => null);
   // Monthly coaching plans this account pays or is paid end now (coachPay.ts).
   await forgetCoachPay(accountId).catch(() => null);
+  // Form videos it sent or was sent: the files in Vercel Blob as well as the rows (formVideos.ts).
+  await dropVideosOf(accountId).catch(() => null);
   await batch([
     { sql: "DELETE FROM account_installs WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
@@ -327,6 +330,7 @@ export async function resetAccount(accountId: string): Promise<void> {
   await forgetAll(accountId).catch(() => null);
   const [p] = await query("SELECT suspended FROM social_profiles WHERE account_id = ?", [accountId]);
   const keepProfile = Number(p?.suspended ?? 0) !== 0;
+  await dropVideosOf(accountId).catch(() => null);
   await batch([
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_usage WHERE account_id = ?", args: [accountId] },

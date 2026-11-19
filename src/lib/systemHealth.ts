@@ -205,6 +205,13 @@ export const SETTINGS: Setting[] = [
     what: "The database's auth token, paired with the address above.",
   },
   {
+    names: ["BLOB_READ_WRITE_TOKEN"],
+    label: "Vercel Blob (form videos)",
+    group: "Core",
+    need: "optional",
+    what: "The private Blob store for coaching form videos (formVideos.ts): set by connecting the store to the project. Without it clients can't send form videos and the section doesn't show.",
+  },
+  {
     names: ["NEXT_PUBLIC_SITE_URL"],
     label: "Site address",
     group: "Core",

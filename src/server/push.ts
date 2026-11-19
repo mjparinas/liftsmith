@@ -66,6 +66,8 @@ export type CoachPushKind =
   | "coachQuiet"
   | "coachCheckin"
   | "coachCheckinDone"
+  | "coachVideo"
+  | "coachVideoNote"
   | "coachBooked"
   | "coachCancelled"
   | "coachPaid"

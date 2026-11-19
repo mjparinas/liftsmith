@@ -413,6 +413,11 @@ export const fr: FeaturesText = {
       name: "Bilans de progrès avec poids, photos et tendances",
       body: "Ajoutez des questions de poids et de photo à n'importe quel formulaire, et envoyez-le chaque semaine, toutes les 2 ou toutes les 4 semaines. Le poids part de la dernière pesée du client, les photos ne vont qu'à vous, et la tendance de chaque réponse s'affiche dans son rapport. On ne demande jamais de photo aux moins de 18 ans.",
     },
+    "coach-form-videos": {
+      name: "Vidéos de technique avec notes dans la vidéo",
+      body: "Vos clients filment une série dans l'app et vous l'envoient. Regardez-la au ralenti, épinglez des notes aux moments précis, et ils répondent sur les mêmes notes. Seuls vous deux la voyez ; les moins de 18 ans ne peuvent pas en envoyer.",
+      note: "Envoyer une vidéo est gratuit pour les clients. Android, iPhone et web.",
+    },
     "coach-roles": {
       name: "Pour les coachs personnels et les entraîneurs",
       body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",

@@ -778,3 +778,12 @@ Find gyms near you now says which gyms are open, and when they close or open nex
 - Tap Open now above the list to hide the closed ones, on the map too.
 - It's worked out on your own clock, for gyms near you.
 Did you know? A gym's hours wrong? Report a problem on its page, or claim it and set them yourself. ([Gyms](gyms.md) "Open now")
+
+### W69 · Form videos with notes in the video (**New**, 2026-11-19)
+Pro (coaching) · Coaches · No screenshot (needs a client and a video) · `fresh`, so it goes next to every coach already in the series
+Clients can now film a set in the app and send it to you, and you answer right on the video.
+- They tap Send a form video in Coaching, pick the lift and say what to check; five seconds to get into place, up to a minute.
+- You get a notification. Slow it to half or quarter speed, pause where it matters and add a note pinned to that second.
+- They tap a note to jump to that moment, and can answer with a note of their own.
+- Videos stay private to the two of you and go when either of you ends coaching.
+Did you know? Clients under 18 can't send form videos. Sending one is free for clients. ([Trainer mode](trainer-mode.md) "Form videos")
