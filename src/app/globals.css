@@ -24,6 +24,12 @@
   --color-violet: #a78bfa;
   --color-cyan: #38d6e8;
   --color-ember: #ff8a3d;
+  /* Training seasons' kit hues (seasons.ts KITS), tints for their cards, medals and bars. */
+  --color-tempest: #8f95ff;
+  --color-bloom: #ff8ae6;
+  --color-solstice: #ffe066;
+  --color-maple: #ff6b6b;
+  --color-obsidian: #b08cff;
   --color-mint: #34d399;
   --color-good: #34d399;
   --color-warn: #f5b544;
@@ -262,6 +268,11 @@
   --color-violet: #5f3fc4;
   --color-cyan: #0b6f80;
   --color-ember: #b24a00;
+  --color-tempest: #3d43c4;
+  --color-bloom: #a3237f;
+  --color-solstice: #7d6400;
+  --color-maple: #b3262b;
+  --color-obsidian: #5b2fb0;
   --color-mint: #0a7350;
   --color-accent-2: #4a3fc9;
   --grad-a: #1d4fc4;
@@ -333,6 +344,11 @@
     --color-violet: #5f3fc4;
     --color-cyan: #0b6f80;
     --color-ember: #b24a00;
+    --color-tempest: #3d43c4;
+    --color-bloom: #a3237f;
+    --color-solstice: #7d6400;
+    --color-maple: #b3262b;
+    --color-obsidian: #5b2fb0;
     --color-mint: #0a7350;
     --color-accent-2: #4a3fc9;
     --grad-a: #1d4fc4;

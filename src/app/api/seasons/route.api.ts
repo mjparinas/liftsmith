@@ -3,7 +3,7 @@
 import { NATIVE_ORIGINS } from "@/lib/feedbackServer";
 import { DEFAULT_SEASONS } from "@/lib/seasons";
 import { rateLimit } from "@/server/db";
-import { seasonSchedule } from "@/server/seasons";
+import { seasonFeed } from "@/server/seasons";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "?";
     if (!(await rateLimit(`seasons-ip:${ip}`, 300, 3_600_000))) return Response.json({ error: "Slow down" }, { status: 429, headers: h });
-    return Response.json({ seasons: await seasonSchedule() }, { headers: h });
+    return Response.json({ seasons: await seasonFeed() }, { headers: h });
   } catch {
     // No database: the built-in schedule.
     return Response.json({ seasons: DEFAULT_SEASONS }, { headers: h });

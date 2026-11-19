@@ -531,7 +531,7 @@ export const tr: FeaturesText = {
     },
     seasons: {
       name: "Antrenman sezonları",
-      body: "Kendi haftalık hedefine doğru antrenman yaparak tırmandığın 20 kademelik yolu olan on haftalık sezonlar: haftada iki gün de beş gün kadar hızlı ilerler, fazladan günler puan getirmez. Kademeler sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir; sezon bitince de senin kalır. Sezon meydan okumaları, yeni rekorlardan nadir ganimet, prestij yıldızları, kaçırılan haftadan sonra telafi haftası, çift puanlı final ve paylaşılabilir özet kartı.",
+      body: "Kendi haftalık hedefine doğru antrenman yaparak tırmandığın 20 kademelik yolu olan on haftalık sezonlar: haftada iki gün de beş gün kadar hızlı ilerler, fazladan günler puan getirmez. Kademeler sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle bir tema verir; sezon bitince de senin kalır. Sezon meydan okumaları, yeni rekorlardan nadir ganimet, prestij yıldızları, kaçırılan haftadan sonra telafi haftası, çift puanlı final ve paylaşılabilir özet kartı. 2027 sonuna kadar arka arkaya altı sezon planlandı (Kor, Fırtına, Çiçek, Gündönümü, Akçaağaç ve Obsidyen); her birinin kendi görünümü ve üç meydan okuması var.",
       proPart: "Tüm kademeler ve ödülleri ücretsiz; Pro üç kademeye bonus ödül ekler.",
       note: "Sezon uygulama simgeleri Android ve iPhone'da; web'de tema var. Sezonlar Ayarlar'dan kapatılabilir.",
     },

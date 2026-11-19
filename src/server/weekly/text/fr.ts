@@ -910,6 +910,7 @@ export const emails: Record<string, Words> = {
       "Les paliers donnent des badges, un avatar, une couleur d'accent et le thème Braise avec son icône, propres à la saison et à vous pour toujours.",
       "Une semaine manquée ? La suivante où vous atteignez l'objectif double le bonus. La dernière semaine compte double.",
       "Chaque nouveau record a 1 chance sur 6 de faire tomber les disques rares de la saison.",
+      "Après Braise viennent Tempête, Floraison, Solstice, Érable et Obsidienne, à la suite tout au long de 2027, chacune avec son style et ses défis.",
     ],
     dyk: "Vous préférez ne pas voir les saisons ? Désactivez Saisons d'entraînement dans Réglages › Apparence. Votre entraînement compte toujours.",
   },

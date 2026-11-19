@@ -46,6 +46,12 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.3.0",
+    day: "2026-11-21",
+    headline: "Five new training seasons, planned through 2027",
+    changes: [{ id: "seasonPlan", kind: "new", icon: "medal", unlock: "seasons" }],
+  },
+  {
     version: "0.2.0",
     day: "2026-11-20",
     headline: "Open now in the gym finder, a map-first finder and search in Settings",

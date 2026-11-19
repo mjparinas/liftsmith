@@ -531,7 +531,7 @@ export const pl: FeaturesText = {
     },
     seasons: {
       name: "Sezony treningowe",
-      body: "Dziesięciotygodniowe sezony ze ścieżką 20 poziomów, którą pokonujesz, trenując w stronę własnego celu tygodniowego: dwa dni w tygodniu awansują tak szybko jak pięć, a dodatkowe dni nic nie dają. Poziomy dają odznaki, awatar, kolor akcentu i motyw z ikoną aplikacji dostępne tylko w tym sezonie, które zostają Twoje na zawsze. Wyzwania sezonu, rzadki łup za nowe rekordy, gwiazdki prestiżu, tydzień nadrabiania po potknięciu, finał z podwójnymi punktami i podsumowanie do udostępnienia.",
+      body: "Dziesięciotygodniowe sezony ze ścieżką 20 poziomów, którą pokonujesz, trenując w stronę własnego celu tygodniowego: dwa dni w tygodniu awansują tak szybko jak pięć, a dodatkowe dni nic nie dają. Poziomy dają odznaki, awatar, kolor akcentu i motyw z ikoną aplikacji dostępne tylko w tym sezonie, które zostają Twoje na zawsze. Wyzwania sezonu, rzadki łup za nowe rekordy, gwiazdki prestiżu, tydzień nadrabiania po potknięciu, finał z podwójnymi punktami i podsumowanie do udostępnienia. Do końca 2027 zaplanowano sześć sezonów jeden po drugim (Żar, Burza, Rozkwit, Przesilenie, Klon i Obsydian), każdy z własnym wyglądem i trzema własnymi wyzwaniami.",
       proPart: "Wszystkie poziomy i nagrody są darmowe; Pro dodaje nagrodę bonusową na trzech poziomach.",
       note: "Ikony sezonu są na Androidzie i iPhonie; w przeglądarce jest motyw. Sezony można wyłączyć w Ustawieniach.",
     },

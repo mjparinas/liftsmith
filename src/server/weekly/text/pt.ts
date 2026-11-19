@@ -907,6 +907,7 @@ export const emails: Record<string, Words> = {
       "Os níveis dão medalhas, um avatar, uma cor de destaque e o tema Brasa com ícone, só desta temporada e seus para sempre.",
       "Perdeu uma semana? A próxima em que bater a meta dá o bônus em dobro. A última semana vale em dobro.",
       "Cada novo recorde tem 1 chance em 6 de liberar as anilhas raras da temporada.",
+      "Depois da Brasa vêm Tempestade, Florada, Solstício, Bordo e Obsidiana, uma após a outra em 2027, cada uma com visual e desafios próprios.",
     ],
     dyk: "Prefere não ver as temporadas? Desligue Temporadas de treino em Ajustes › Aparência. Seu treino continua contando.",
   },

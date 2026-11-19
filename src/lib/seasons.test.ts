@@ -7,12 +7,14 @@ import { derive } from "./derive";
 import { COSMETICS, crateFor, game, rarityOdds } from "./game";
 import {
   CHALLENGE_POINTS,
+  challengeGoal,
   changeProblem,
   currentSeason,
   DEFAULT_SEASONS,
   drops,
   GOAL_BONUS,
   KITS,
+  mergeSchedule,
   PRESTIGE_POINTS,
   scheduleProblem,
   seasonGain,
@@ -25,6 +27,7 @@ import {
   TIER_POINTS,
   tierOf,
   TIERS,
+  toSaved,
   WEEK_DAY_POINTS,
   weekPoints,
   type SeasonDef,
@@ -176,6 +179,93 @@ describe("the schedule", () => {
     expect(changeProblem([S1], [{ ...S1, weeks: 12 }], after)).toMatch(/started/);
     expect(changeProblem([S1], [], after)).toMatch(/started/);
     expect(changeProblem([S1], [{ ...S1, weeks: 12 }], MON - 10 * DAY)).toBeNull();
+  });
+});
+
+describe("the plan through 2027 (Melvin, 2026-11-19)", () => {
+  it("runs back to back from season 1 to the end of 2027, with no gap or overlap", () => {
+    expect(scheduleProblem(DEFAULT_SEASONS)).toBeNull();
+    for (let i = 1; i < DEFAULT_SEASONS.length; i++)
+      expect(seasonWindow(DEFAULT_SEASONS[i]!).start).toBe(seasonWindow(DEFAULT_SEASONS[i - 1]!).end);
+    // The last one runs over New Year, so every day of 2027 is in a season.
+    const last = seasonWindow(DEFAULT_SEASONS.at(-1)!);
+    expect(last.start).toBeLessThan(new Date(2027, 11, 31).getTime());
+    expect(last.end).toBeGreaterThan(new Date(2028, 0, 1).getTime());
+    for (const s of DEFAULT_SEASONS) expect(s.weeks).toBe(10);
+  });
+
+  it("gives every season its own kit, look and challenges", () => {
+    const kits = DEFAULT_SEASONS.map((s) => KITS[s.kit]!);
+    expect(new Set(kits.map((k) => k.id)).size).toBe(kits.length);
+    expect(Object.keys(KITS).sort()).toEqual(kits.map((k) => k.id).sort());
+    const themes = kits.flatMap((k) => k.rewards.filter((r) => r.kind !== "badge").map((r) => r.id));
+    expect(new Set(themes).size).toBe(themes.length);
+    expect(new Set(kits.map((k) => k.drop)).size).toBe(kits.length);
+    expect(new Set(kits.map((k) => k.cardHex)).size).toBe(kits.length);
+    const accents = COSMETICS.filter((c) => c.season && c.kind === "accent").map((c) => c.value);
+    expect(new Set(accents).size).toBe(accents.length);
+    const sets = kits.map((k) =>
+      k.challenges
+        .map((c) => `${c.id}:${c.n}`)
+        .sort()
+        .join(),
+    );
+    expect(new Set(sets).size).toBe(kits.length);
+    for (const k of kits) {
+      expect(k.challenges).toHaveLength(3);
+      expect(new Set(k.challenges.map((c) => c.id)).size).toBe(3);
+    }
+  });
+
+  it("asks for nothing a season's length can't hold", () => {
+    for (const def of DEFAULT_SEASONS)
+      for (const c of KITS[def.kit]!.challenges) {
+        const goal = challengeGoal(c, def.weeks);
+        expect(goal).toBeGreaterThan(0);
+        if (c.id === "goal-weeks" || c.id === "streak" || c.id === "bookends") expect(goal).toBeLessThanOrEqual(def.weeks);
+      }
+    expect(challengeGoal({ id: "goal-weeks", n: 60 }, 10)).toBe(6);
+    expect(challengeGoal({ id: "streak", n: 5 }, 4)).toBe(4);
+  });
+
+  it("counts streaks, quests, bests on different lifts, the first and last week and stretch days", () => {
+    const S2 = DEFAULT_SEASONS.find((s) => s.kit === "tempest")!;
+    const mon = new Date(2027, 1, 1, 18).getTime();
+    const lift = (d: number, ex: string, w: number) => makeWorkout(`t${d}-${ex}`, mon + d * DAY, [{ exerciseId: ex, weight: w, reps: 5 }]);
+    // Weeks 1 to 3 meet a two-day goal, week 4 misses, week 5 meets it again: the longest run is 3.
+    const events = [0, 7, 14, 28].flatMap((w) => [...lift(w, "back-squat", 100 + w), ...lift(w + 2, "bench-press", 60 + w)]);
+    const p = makeProfile({ daysPerWeek: 2 });
+    const now = mon + 33 * DAY;
+    const s = seasonState(S2, events, derive(events, now), p, now, [...DEFAULT_SEASONS]);
+    const by = (id: string) => s.challenges.find((c) => c.id === id)!;
+    expect(by("streak").have).toBe(3);
+    expect(by("pr-lifts").have).toBe(2);
+    expect(by("quests").have).toBeGreaterThan(0);
+    const S3 = DEFAULT_SEASONS.find((x) => x.kit === "bloom")!;
+    const b = seasonState(S3, [], derive([], now), p, now, [...DEFAULT_SEASONS]);
+    expect(b.challenges.map((c) => c.id)).toEqual(["new-ex", "stretch", "bookends"]);
+    expect(b.challenges.find((c) => c.id === "bookends")!.goal).toBe(2);
+  });
+
+  it("reaches tier 20 in every season when the goal is met about eight weeks in ten", () => {
+    for (const def of DEFAULT_SEASONS) {
+      const week = weekPoints(3, 3, 1, false, false).total;
+      const hit = Math.round(def.weeks * 0.8);
+      const best = (hit - 1) * week + weekPoints(3, 3, 1, false, true).total + CHALLENGE_POINTS;
+      expect(tierOf(best).tier, def.kit).toBe(TIERS);
+    }
+  });
+
+  it("lets the admin take a built-in season off, and the apps drop it too", () => {
+    const without = DEFAULT_SEASONS.filter((s) => s.id !== "s4");
+    const saved = toSaved(without);
+    expect(saved).toContainEqual({ id: "s4", off: true });
+    expect(mergeSchedule(saved).map((s) => s.id)).toEqual(without.map((s) => s.id));
+    expect(scheduleProblem(saved)).toBeNull();
+    // A schedule from before the plan still gets every built-in season.
+    expect(mergeSchedule([S1]).map((s) => s.kit)).toEqual(DEFAULT_SEASONS.map((s) => s.kit));
+    expect(changeProblem(DEFAULT_SEASONS, without, MON + 3 * DAY)).toBeNull();
+    expect(changeProblem(DEFAULT_SEASONS, DEFAULT_SEASONS.slice(1), MON + 3 * DAY)).toMatch(/started/);
   });
 });
 

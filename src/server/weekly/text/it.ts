@@ -906,6 +906,7 @@ export const emails: Record<string, Words> = {
       "I livelli danno badge, un avatar, un colore d'accento e il tema Brace con la sua icona, solo di questa stagione e tuoi per sempre.",
       "Salti una settimana? La successiva in cui raggiungi l'obiettivo vale il bonus doppio. L'ultima settimana vale doppio.",
       "Ogni nuovo record ha 1 possibilità su 6 di far cadere i dischi rari della stagione.",
+      "Dopo Brace arrivano Tempesta, Fioritura, Solstizio, Acero e Ossidiana, una dopo l'altra per tutto il 2027, ognuna con stile e sfide proprie.",
     ],
     dyk: "Preferisci non vedere le stagioni? Disattiva Stagioni di allenamento in Impostazioni › Aspetto e stile. Il tuo allenamento conta comunque.",
   },

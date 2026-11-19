@@ -465,7 +465,7 @@ export const es: FeaturesText = {
     },
     seasons: {
       name: "Temporadas de entrenamiento",
-      body: "Temporadas de diez semanas con un recorrido de 20 niveles que subes entrenando hacia tu propio objetivo semanal: dos días a la semana avanzan igual que cinco y los días de más no suman. Los niveles dan insignias, un avatar, un color de acento y un tema con su icono exclusivos de la temporada, tuyos para siempre. Retos de temporada, un botín raro por nuevas marcas, estrellas de prestigio, una semana de recuperación tras un fallo, un final con puntos dobles y un resumen para compartir.",
+      body: "Temporadas de diez semanas con un recorrido de 20 niveles que subes entrenando hacia tu propio objetivo semanal: dos días a la semana avanzan igual que cinco y los días de más no suman. Los niveles dan insignias, un avatar, un color de acento y un tema con su icono exclusivos de la temporada, tuyos para siempre. Retos de temporada, un botín raro por nuevas marcas, estrellas de prestigio, una semana de recuperación tras un fallo, un final con puntos dobles y un resumen para compartir. Hay seis temporadas planeadas una tras otra hasta finales de 2027 (Brasa, Tempestad, Floración, Solsticio, Arce y Obsidiana), cada una con su estilo y sus tres retos propios.",
       proPart: "Todos los niveles y sus premios son gratis; Pro añade un premio extra en tres niveles.",
       note: "Los iconos de temporada están en Android y iPhone; la web recibe el tema. Las temporadas se pueden desactivar en Ajustes.",
     },

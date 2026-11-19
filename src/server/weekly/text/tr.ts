@@ -903,6 +903,7 @@ export const emails: Record<string, Words> = {
       "Kademeler yalnızca bu sezona özel rozetler, bir avatar, bir vurgu rengi ve uygulama simgesiyle Kor temasını verir; hepsi hep senin kalır.",
       "Bir haftayı mı kaçırdın? Hedefi tutturduğun sonraki hafta bonus iki kat. Son hafta tamamen iki kat sayılır.",
       "Her yeni rekorun sezonun nadir plakalarını düşürme şansı 6'da 1.",
+      "Kor'dan sonra Fırtına, Çiçek, Gündönümü, Akçaağaç ve Obsidyen 2027 boyunca arka arkaya gelir; her birinin kendi görünümü ve meydan okumaları var.",
     ],
     dyk: "Sezonları görmek istemiyor musun? Ayarlar › Görünüm'den Antrenman sezonlarını kapat. Antrenmanın sayılmaya devam eder.",
   },

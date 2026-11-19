@@ -52,6 +52,9 @@ export const en = {
   "wn.c.jumps.body": "Ankle hops, squat jumps and the other jumps in the how-to figures now really leave the ground.",
   "wn.c.sides.title": "One-side stretches show the right side",
   "wn.c.sides.body": "A stretch for one side now shows the side it names, and mirrors for the other.",
+  "wn.c.seasonPlan.title": "Five new training seasons for 2027",
+  "wn.c.seasonPlan.body":
+    "Tempest, Bloom, Solstice, Maple and Obsidian follow Ember back to back through 2027, each with its own themes, app icons, avatars, rare plates and three challenges of its own.",
   "wn.c.openNow.title": "Open now in the gym finder",
   "wn.c.openNow.body":
     "Every gym with its hours says whether it's open now and when it closes or opens, and an Open now chip shows only the open ones.",
@@ -118,6 +121,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Los saltos de tobillo, sentadillas con salto y demás saltos de las figuras ya despegan de verdad del suelo.",
   "wn.c.sides.title": "Los estiramientos de un lado muestran el lado correcto",
   "wn.c.sides.body": "Un estiramiento para un lado muestra ahora el lado que nombra, y se refleja para el otro.",
+  "wn.c.seasonPlan.title": "Cinco nuevas temporadas de entrenamiento para 2027",
+  "wn.c.seasonPlan.body":
+    "Tempestad, Floración, Solsticio, Arce y Obsidiana siguen a Brasa una tras otra durante 2027, cada una con sus temas, iconos, avatares, discos raros y tres retos propios.",
   "wn.c.openNow.title": "Abierto ahora en el buscador de gimnasios",
   "wn.c.openNow.body":
     "Cada gimnasio con horario dice si está abierto ahora y cuándo cierra o abre, y el filtro Abierto ahora muestra solo los abiertos.",
@@ -186,6 +192,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Les sauts de cheville, squats sautés et autres sauts des figures de démonstration quittent vraiment le sol.",
   "wn.c.sides.title": "Les étirements d’un côté montrent le bon côté",
   "wn.c.sides.body": "Un étirement d’un côté montre désormais le côté indiqué, et s’inverse pour l’autre.",
+  "wn.c.seasonPlan.title": "Cinq nouvelles saisons d'entraînement pour 2027",
+  "wn.c.seasonPlan.body":
+    "Tempête, Floraison, Solstice, Érable et Obsidienne suivent Braise tout au long de 2027, chacune avec ses thèmes, icônes, avatars, disques rares et trois défis bien à elle.",
   "wn.c.openNow.title": "Ouvert maintenant dans la recherche de salles",
   "wn.c.openNow.body":
     "Chaque salle avec ses horaires indique si elle est ouverte et quand elle ferme ou ouvre, et le filtre Ouvert maintenant ne montre que celles qui sont ouvertes.",
@@ -253,6 +262,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Fußgelenksprünge, Sprungkniebeugen und die anderen Sprünge der Anleitungsfiguren verlassen jetzt wirklich den Boden.",
   "wn.c.sides.title": "Einseitige Dehnungen zeigen die richtige Seite",
   "wn.c.sides.body": "Eine Dehnung für eine Seite zeigt jetzt die genannte Seite und wird für die andere gespiegelt.",
+  "wn.c.seasonPlan.title": "Fünf neue Trainingssaisons für 2027",
+  "wn.c.seasonPlan.body":
+    "Sturm, Blüte, Sonnwende, Ahorn und Obsidian folgen auf Glut, eine nach der anderen durch 2027, jede mit eigenen Designs, App-Symbolen, Avataren, seltenen Scheiben und drei eigenen Challenges.",
   "wn.c.openNow.title": "Jetzt geöffnet in der Studiosuche",
   "wn.c.openNow.body":
     "Jedes Studio mit Öffnungszeiten zeigt, ob es gerade offen ist und wann es schließt oder öffnet, und der Filter Jetzt geöffnet zeigt nur die offenen.",
@@ -319,6 +331,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Saltelli sulle caviglie, squat jump e gli altri salti delle figure dimostrative ora si staccano davvero da terra.",
   "wn.c.sides.title": "Gli allungamenti di un lato mostrano il lato giusto",
   "wn.c.sides.body": "Un allungamento per un lato ora mostra il lato indicato e si specchia per l'altro.",
+  "wn.c.seasonPlan.title": "Cinque nuove stagioni di allenamento per il 2027",
+  "wn.c.seasonPlan.body":
+    "Tempesta, Fioritura, Solstizio, Acero e Ossidiana seguono Brace una dopo l'altra per tutto il 2027, ognuna con temi, icone, avatar, dischi rari e tre sfide tutte sue.",
   "wn.c.openNow.title": "Aperto ora nella ricerca palestre",
   "wn.c.openNow.body":
     "Ogni palestra con gli orari dice se è aperta ora e quando chiude o apre, e il filtro Aperto ora mostra solo quelle aperte.",
@@ -378,6 +393,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "アンクルホップ、スクワットジャンプなど、お手本フィギュアのジャンプが本当に床から離れるようになりました。",
   "wn.c.sides.title": "片側ストレッチが正しい側を表示",
   "wn.c.sides.body": "片側のストレッチは名前どおりの側を表示し、反対側では左右反転します。",
+  "wn.c.seasonPlan.title": "2027年の新しいトレーニングシーズン5つ",
+  "wn.c.seasonPlan.body":
+    "テンペスト、ブルーム、ソルスティス、メープル、オブシディアンがエンバーに続いて2027年を通して開催。それぞれ専用のテーマ、アプリアイコン、アバター、レアプレート、3つのチャレンジがあります。",
   "wn.c.openNow.title": "ジム検索に「営業中」",
   "wn.c.openNow.body":
     "営業時間のあるジムは、今開いているか、いつ閉まるか開くかを表示します。「営業中」チップで開いているジムだけを表示できます。",
@@ -440,6 +458,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Saltitos de tornozelo, agachamentos com salto e os outros saltos das figuras agora saem mesmo do chão.",
   "wn.c.sides.title": "Alongamentos de um lado mostram o lado certo",
   "wn.c.sides.body": "Um alongamento de um lado agora mostra o lado indicado e espelha para o outro.",
+  "wn.c.seasonPlan.title": "Cinco novas temporadas de treino para 2027",
+  "wn.c.seasonPlan.body":
+    "Tempestade, Florada, Solstício, Bordo e Obsidiana seguem a Brasa uma após a outra em 2027, cada uma com seus temas, ícones, avatares, anilhas raras e três desafios próprios.",
   "wn.c.openNow.title": "Aberto agora na busca de academias",
   "wn.c.openNow.body":
     "Cada academia com horário mostra se está aberta agora e quando fecha ou abre, e o filtro Aberto agora mostra só as abertas.",
@@ -498,6 +519,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "앵클 홉, 스쿼트 점프 등 동작 안내 피규어의 점프가 이제 정말로 바닥에서 뜹니다.",
   "wn.c.sides.title": "한쪽 스트레칭이 맞는 쪽을 보여 줘요",
   "wn.c.sides.body": "한쪽 스트레칭은 이름에 있는 쪽을 보여 주고, 반대쪽은 좌우를 뒤집어 보여 줍니다.",
+  "wn.c.seasonPlan.title": "2027년 새 트레이닝 시즌 5개",
+  "wn.c.seasonPlan.body":
+    "템페스트, 블룸, 솔스티스, 메이플, 옵시디언이 엠버에 이어 2027년 내내 차례로 열려요. 시즌마다 고유한 테마, 앱 아이콘, 아바타, 희귀 원판, 챌린지 3개가 있어요.",
   "wn.c.openNow.title": "헬스장 찾기에 '영업 중'",
   "wn.c.openNow.body": "영업시간이 있는 헬스장은 지금 열었는지, 언제 닫거나 여는지 보여 주고, '영업 중' 칩으로 열린 곳만 볼 수 있습니다.",
   "wn.c.settingsSearch.title": "설정 검색",
@@ -559,6 +583,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.jumps.body": "Podskoki na kostkach, przysiady z wyskokiem i inne skoki w instrukcjach naprawdę odrywają się teraz od podłogi.",
   "wn.c.sides.title": "Rozciąganie jednej strony pokazuje właściwą stronę",
   "wn.c.sides.body": "Rozciąganie jednej strony pokazuje teraz stronę z nazwy, a dla drugiej odbija się lustrzanie.",
+  "wn.c.seasonPlan.title": "Pięć nowych sezonów treningowych na 2027",
+  "wn.c.seasonPlan.body":
+    "Burza, Rozkwit, Przesilenie, Klon i Obsydian następują po Żarze jeden po drugim przez cały 2027, każdy z własnymi motywami, ikonami, awatarami, rzadkimi talerzami i trzema własnymi wyzwaniami.",
   "wn.c.openNow.title": "Otwarte teraz w wyszukiwarce siłowni",
   "wn.c.openNow.body":
     "Każda siłownia z godzinami pokazuje, czy jest teraz otwarta i kiedy się zamyka lub otwiera, a filtr Otwarte teraz pokazuje tylko otwarte.",
@@ -622,6 +649,9 @@ export const tr: Partial<Record<Key, Message>> = {
     "Ayak bileği sekmeleri, sıçramalı squat'lar ve nasıl yapılır figürlerindeki diğer sıçramalar artık gerçekten yerden kalkıyor.",
   "wn.c.sides.title": "Tek taraflı esnemeler doğru tarafı gösteriyor",
   "wn.c.sides.body": "Tek taraflı bir esneme artık adındaki tarafı gösteriyor, diğer taraf için de aynalanıyor.",
+  "wn.c.seasonPlan.title": "2027 için beş yeni antrenman sezonu",
+  "wn.c.seasonPlan.body":
+    "Fırtına, Çiçek, Gündönümü, Akçaağaç ve Obsidyen, 2027 boyunca Kor'un ardından arka arkaya gelir; her birinin kendi temaları, uygulama simgeleri, avatarları, nadir plakaları ve üç kendi meydan okuması var.",
   "wn.c.openNow.title": "Spor salonu bulucuda Şimdi açık",
   "wn.c.openNow.body":
     "Saatleri olan her salon şu an açık olup olmadığını ve ne zaman kapanıp açılacağını gösteriyor; Şimdi açık çipi yalnızca açık olanları listeliyor.",

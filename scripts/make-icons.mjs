@@ -50,6 +50,17 @@ const PALETTES = {
   // Season 1, Ember (src/lib/seasons.ts): the free track's icon and the Pro bonus row's.
   ember: { bg: "#140a07", glow: "#ff6a3d", stops: ["#ffc06a", "#ff7a3d", "#e8402a"] },
   embergold: { bg: "#130d06", glow: "#ffb02e", stops: ["#fff0b0", "#ffcf5a", "#ff9a1f"] },
+  // Seasons 2 to 6 (2027): each kit's free and Pro icons.
+  tempest: { bg: "#0b0c17", glow: "#7c83ff", stops: ["#c9ccff", "#8f95ff", "#5a4fe8"] },
+  tempestsilver: { bg: "#0c0e12", glow: "#d3dae6", stops: ["#ffffff", "#d3dae6", "#8e99a6"] },
+  bloom: { bg: "#140a12", glow: "#ff7ae0", stops: ["#ffd0f2", "#ff8ae6", "#d24fd0"] },
+  bloommeadow: { bg: "#08130c", glow: "#5be37a", stops: ["#d4ffb0", "#6fe885", "#22b866"] },
+  solstice: { bg: "#121007", glow: "#ffe95c", stops: ["#fffbd0", "#ffe95c", "#ffb83d"] },
+  solsticedusk: { bg: "#150a0e", glow: "#ff5f7e", stops: ["#ffc2a8", "#ff7a8a", "#d63a6e"] },
+  maple: { bg: "#150909", glow: "#ff4d4d", stops: ["#ffb08a", "#ff5c4d", "#c41e2e"] },
+  maplecopper: { bg: "#130d09", glow: "#e0915c", stops: ["#ffd2a8", "#e0915c", "#a8572e"] },
+  obsidian: { bg: "#0a0812", glow: "#9d6bff", stops: ["#d8c4ff", "#9d6bff", "#5a2fd0"] },
+  obsidianice: { bg: "#070e12", glow: "#a8f0ff", stops: ["#ffffff", "#a8f0ff", "#4fc4e8"] },
 };
 const TINT_STOPS = ["#ffffff", "#f2f2f2", "#d9d9d9"];
 

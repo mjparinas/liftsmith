@@ -905,6 +905,7 @@ export const emails: Record<string, Words> = {
       "Los niveles dan insignias, un avatar, un color de acento y el tema Brasa con su icono, solo de esta temporada y tuyos para siempre.",
       "Si fallas una semana, la siguiente en que cumplas da el bonus doble. La última semana cuenta doble.",
       "Cada nueva marca tiene 1 posibilidad entre 6 de soltar los discos raros de la temporada.",
+      "Después de Brasa llegan Tempestad, Floración, Solsticio, Arce y Obsidiana, una tras otra durante 2027, cada una con su estilo y sus retos.",
     ],
     dyk: "¿Prefieres no ver las temporadas? Desactiva Temporadas de entrenamiento en Ajustes › Aspecto. Tu entrenamiento sigue contando.",
   },
