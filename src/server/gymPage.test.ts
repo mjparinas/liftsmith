@@ -4,7 +4,17 @@ import { encodeGym, kitOf } from "@/lib/gymShare";
 import { makeTestGym } from "@/test/factories";
 
 import { resetDb, run } from "./db";
-import { cityHtml, goneHtml, gymHtml, gymSitemapXml, hoursHtml, indexHtml } from "./gymPage";
+import {
+  cityHtml,
+  goneHtml,
+  gymHtml,
+  gymSitemapIndexXml,
+  gymSitemapXml,
+  hoursHtml,
+  indexHtml,
+  SITEMAP_PART,
+  sitemapParts,
+} from "./gymPage";
 import { cities, cityPlaces, placeBySlug, placesFromOsm, savePlaces, sitemapGyms, type OsmElement } from "./gymPlaces";
 
 const NOW = 1_800_000_000_000;
@@ -47,8 +57,17 @@ describe("a gym's page", () => {
     expect(html).toContain('href="/gyms/langley-bc/planet-fitness/"');
     // Studios aren't offered as "more gyms".
     expect(html).not.toContain("Club Pilates");
-    const ld = JSON.parse(/application\/ld\+json">(.*?)<\/script>/.exec(html)![1]!) as Record<string, unknown>;
+    const [ld, trail] = JSON.parse(/application\/ld\+json">(.*?)<\/script>/.exec(html)![1]!) as Record<string, unknown>[];
     expect(ld).toMatchObject({ "@type": "ExerciseGym", openingHours: ["Mo-Fr 05:00-23:00", "Sa,Su 07:00-20:00"] });
+    // The visible breadcrumb trail, for search results: Gyms › Langley, BC › the gym.
+    expect(trail).toMatchObject({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { position: 1, item: "https://www.getliftsmith.com/gyms/" },
+        { position: 2, item: "https://www.getliftsmith.com/gyms/langley-bc/" },
+        { position: 3, item: "https://www.getliftsmith.com/gyms/langley-bc/steve-nash-fitness-world/" },
+      ],
+    });
     expect(html).not.toContain('content="noindex"');
     expect(html).not.toMatch(/<script(?! type="application\/ld\+json")/);
   });
@@ -146,5 +165,18 @@ describe("cities and the sitemap", () => {
     expect(xml).toContain("https://www.getliftsmith.com/gyms/langley-bc/steve-nash-fitness-world/");
     expect(xml).not.toContain("planet-fitness");
     expect(xml).not.toContain("club-pilates");
+  });
+
+  it("splits the sitemap into parts well under 50,000 addresses, named by an index", () => {
+    const gyms = Array.from({ length: SITEMAP_PART * 2 + 5 }, (_, i) => ({ path: `/gyms/x/g${i}/`, lastModified: NOW - i }));
+    const parts = sitemapParts([{ path: "/gyms/", lastModified: NOW + 1 }], gyms);
+    expect(parts.map((p) => p.length)).toEqual([1, SITEMAP_PART, SITEMAP_PART, 5]);
+    expect(SITEMAP_PART).toBeLessThan(50_000);
+    const index = gymSitemapIndexXml(parts);
+    expect(index).toContain("<sitemapindex");
+    expect(index).toContain("<loc>https://www.getliftsmith.com/sitemap-gyms-1.xml</loc>");
+    expect(index).toContain("<loc>https://www.getliftsmith.com/sitemap-gyms-4.xml</loc>");
+    expect(index).not.toContain("sitemap-gyms-5.xml");
+    expect(sitemapParts([], []).length).toBe(1);
   });
 });

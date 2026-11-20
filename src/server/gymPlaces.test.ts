@@ -100,7 +100,8 @@ describe("reading OpenStreetMap", () => {
   it("makes plain web addresses", () => {
     expect(slugify("Steve Nash Fitness World", "Langley")).toBe("steve-nash-fitness-world-langley");
     expect(slugify("Évolution Pilates & Yoga", "Montréal")).toBe("evolution-pilates-and-yoga-montreal");
-    expect(slugify("ジム")).toBe("");
+    expect(slugify("ジム")).toBe("jimu");
+    expect(slugify("東京")).toBe("");
   });
 });
 

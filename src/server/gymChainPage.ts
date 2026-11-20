@@ -7,7 +7,7 @@ import type { MsgLang } from "@/lib/messageText";
 import { SITE_URL } from "@/lib/site";
 
 import { chainIndexable, type Chain, type ChainBranch } from "./gymChains";
-import { crumbs, GYM_STYLE, gymPath, metaTags, say } from "./gymPage";
+import { crumbs, crumbsLd, GYM_STYLE, gymPath, metaTags, say } from "./gymPage";
 import { esc, framePage, icon } from "./siteFrame";
 
 export const chainPath = (slug: string) => `/gym-chains/${slug}/`;
@@ -77,14 +77,22 @@ export function chainHtml(chain: Chain, branches: readonly ChainBranch[], lang: 
   const site = chain.website
     ? `<p><a class="quiet" href="${esc(chain.website)}" rel="nofollow noopener">${icon("link", 16)}${esc(say(lang, "gp.chainWebsite", { chain: chain.name }))}</a></p>`
     : "";
-  const body = `<main id="main" class="wrap page narrow">${crumbs(lang, [
+  const trail: [string, string | null][] = [
     [say(lang, "gp.crumbs"), "/gyms/"],
     [say(lang, "gp.chainsTitle"), "/gym-chains/"],
     [chain.name, null],
-  ])}
+  ];
+  const body = `<main id="main" class="wrap page narrow">${crumbs(lang, trail)}
 <header class="head chain-head">${logoImg(chain, lang, 64)}<p class="kicker">${esc(say(lang, "gp.chainKicker"))}</p><h1>${esc(heading)}</h1><p class="muted">${esc(say(lang, "gp.chainBody", { count }))}</p>${site}</header>
 ${lists}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
-  return framePage(lang, title, metaTags(title, desc, path, ld, chainIndexable(chain)), body, GYM_STYLE + CHAIN_STYLE, "gym");
+  return framePage(
+    lang,
+    title,
+    metaTags(title, desc, path, [ld, crumbsLd(trail, path)], chainIndexable(chain)),
+    body,
+    GYM_STYLE + CHAIN_STYLE,
+    "gym",
+  );
 }
 
 /** Every chain with two locations or more, the biggest first. */
