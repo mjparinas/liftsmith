@@ -9,4 +9,13 @@
     <string name="up_next">次：%1$s</string>
     <string name="rest_left">休憩、残り %1$s</string>
     <string name="bpm">♥ %1$d bpm</string>
+    <string name="start_on_phone">スマホで開始</string>
+    <string name="install_on_phone">スマホにインストール</string>
+    <string name="no_app_title">スマホにLiftsmithを入れましょう</string>
+    <string name="no_app_body">ウォッチにはスマホのアプリで行うワークアウトが表示されます。</string>
+    <string name="offline_title">スマホが接続されていません</string>
+    <string name="offline_body">スマホを近くに置き、Bluetoothをオンにしてください。</string>
+    <string name="check_phone">スマホを確認してください</string>
+    <string name="open_failed">スマホでLiftsmithを開いてください。</string>
+    <string name="install_failed">スマホのGoogle PlayからLiftsmithを入れてください。</string>
 </resources>

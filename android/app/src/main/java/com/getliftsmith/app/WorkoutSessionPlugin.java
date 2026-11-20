@@ -174,11 +174,11 @@ public class WorkoutSessionPlugin extends Plugin {
         JSArray timer = call.getArray("timer");
         i.putExtra("timer", timer == null ? "[]" : timer.toString());
         i.putExtra("timerOver", call.getString("timerOver", ""));
-        ContextCompat.startForegroundService(getContext(), i);
-        // The same workout on a Wear OS watch (WatchLink, android/wear).
+        // The same workout on a Wear OS watch (WatchLink, android/wear) and a Garmin watch (GarminLink, garmin/), sent
+        // before the service starts, so a watch never misses a change because the phone's service couldn't start.
         WatchLink.update(getContext(), call.getData());
-        // And on a Garmin watch (GarminLink, garmin/).
         GarminLink.update(getContext(), call.getData());
+        ContextCompat.startForegroundService(getContext(), i);
         call.resolve();
     }
 

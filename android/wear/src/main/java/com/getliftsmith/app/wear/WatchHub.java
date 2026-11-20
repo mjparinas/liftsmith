@@ -9,7 +9,6 @@ import android.os.Vibrator;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -55,6 +54,8 @@ final class WatchHub {
         if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 40, 90, 40 }, -1));
     };
     private static List<String> phones = new ArrayList<>();
+    private static PhoneLink.Status phoneStatus = PhoneLink.Status.CHECKING;
+    private static String phoneNode;
 
     private WatchHub() {}
 
@@ -140,11 +141,26 @@ final class WatchHub {
         findPhones(app, () -> {});
     }
 
-    private static void findPhones(Context app, Runnable then) {
-        Wearable.getNodeClient(app).getConnectedNodes().addOnSuccessListener((List<Node> nodes) -> {
-            List<String> ids = new ArrayList<>();
-            for (Node n : nodes) ids.add(n.getId());
-            phones = ids;
+    /** The phone, and whether it has Liftsmith (PhoneLink): the screen's idle state and where messages go. */
+    static PhoneLink.Status phone() {
+        return phoneStatus;
+    }
+
+    /** The first phone with Liftsmith, for Start on phone, or the first connected one, for Install on phone. */
+    static String phoneNode() {
+        return phoneNode;
+    }
+
+    /** Looks for the phone again (the screen opened, or a phone came or went), then tells the listeners. */
+    static void findPhones(Context app, Runnable then) {
+        PhoneLink.check(app, (PhoneLink.Result r) -> {
+            // Messages go to phones with the app; when the capability isn't known yet, to every connected node.
+            phones = r.phones.isEmpty() ? r.connected : r.phones;
+            phoneNode = !r.phones.isEmpty() ? r.phones.get(0) : r.connected.isEmpty() ? null : r.connected.get(0);
+            phoneStatus = r.status;
+            main.post(() -> {
+                for (Listener l : listeners) l.changed();
+            });
             then.run();
         });
     }

@@ -9,4 +9,13 @@
     <string name="up_next">Als Nächstes: %1$s</string>
     <string name="rest_left">Pause, noch %1$s</string>
     <string name="bpm">♥ %1$d bpm</string>
+    <string name="start_on_phone">Am Handy starten</string>
+    <string name="install_on_phone">Auf dem Handy installieren</string>
+    <string name="no_app_title">Hol dir Liftsmith aufs Handy</string>
+    <string name="no_app_body">Die Uhr zeigt das Training, das du in der Handy-App machst.</string>
+    <string name="offline_title">Handy nicht verbunden</string>
+    <string name="offline_body">Halte dein Handy in der Nähe und Bluetooth an.</string>
+    <string name="check_phone">Schau auf dein Handy</string>
+    <string name="open_failed">Öffne Liftsmith auf deinem Handy.</string>
+    <string name="install_failed">Lade Liftsmith bei Google Play auf dein Handy.</string>
 </resources>

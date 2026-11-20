@@ -30,6 +30,19 @@ Melvin approved building them on 2026-11-10 ("Yes to all", after the list of wha
 - **Play Console:** Wear OS has to be added as a form factor once (Test and release › Advanced settings › Form factors › Add Wear OS) before Play takes a Wear bundle. Until then the release's Wear upload step fails on its own (`continue-on-error`) and the phone release goes ahead. Wear OS apps are reviewed against Google's Wear OS quality guidelines, which need watch screenshots in the listing.
 - **App Store Connect:** nothing extra. The archive's automatic signing (`-allowProvisioningUpdates`) registers the watch app's bundle id with HealthKit the first time. If it can't, register `com.getliftsmith.app.watchkitapp` with the HealthKit capability in the Apple Developer portal.
 
+## Finding the phone (Play review, 2026-11-20)
+
+Google Play rejected the Wear OS app (version code 100000023): it's marked not standalone, and the reviewer found the watch didn't connect to the phone app as described. The watch only ever said "No workout running · Start one on your phone", with nothing to tap, and it never checked whether the phone had Liftsmith at all. Melvin (2026-11-20): "Fix the wear os but remove the release for now in Google play".
+
+- **It stays not standalone** (`com.google.android.wearable.standalone` false). The watch shows and logs the phone's workout; it has no plan of its own, so calling it standalone would be untrue and fail review the other way.
+- **The phone app declares a capability, `liftsmith_phone`** (`android/app/src/main/res/values/wear.xml`), as the watch's `liftsmith_watch` already did. The watch's `PhoneLink` reads the connected nodes and which of them have it, every time the screen opens, whenever the capability changes, and every 15 s while no phone with the app is found.
+- **What the idle screen says** (`WorkoutActivity`): phone with Liftsmith, "No workout running" with **Start on phone**, which opens `liftsmith://start` on the phone (the voice shortcut's link, so it opens the app and starts today's workout, which then shows on the watch); phone without Liftsmith, "Get Liftsmith on your phone" with **Install on phone**, which opens the app's Play page on the phone; no phone, "Phone not connected · Keep your phone nearby with Bluetooth on." After a tap it says "Check your phone", or what to do by hand when the phone couldn't be reached. Both open through `RemoteActivityHelper`, the watch-to-phone way Google's guidelines name.
+- **During a workout with the phone out of reach** the screen says "Phone not connected" under the buttons, so Log set doesn't fail quietly.
+- **Messages go to phones with Liftsmith** (the capability's nodes), falling back to every connected node until that's known.
+- **The phone sends the watch's state before starting its notification service**, so a service that can't start never keeps the watch behind.
+- **Play Console**: the Wear OS release type is turned off until the fixed bundle is ready, so the phone release isn't held by it (Melvin, 2026-11-20). Turn it back on (Test and release › Advanced settings › Release types › Wear OS, Opt in), then the next Release run uploads the Wear bundle again and it can go for review.
+- **Apple Watch**: nothing to change. It ships inside the iPhone app, so it can't be installed without its phone app, and watchOS can't open the iPhone app from the watch ([Platform deltas](platform-deltas.md)).
+
 ## Garmin (Connect IQ app, 2026-11-10)
 
 Melvin asked for every "coming later" connection to be built (2026-11-10), and Garmin was the first.
