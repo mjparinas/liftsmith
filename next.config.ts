@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+import { join } from "node:path";
 import type { NextConfig } from "next";
 
 import { EMBED_HEADERS, GYMS_INDEX_CSP, NOT_EMBED, REPORT_PAGE_CSP, SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
@@ -33,6 +34,9 @@ const LANG_FILES = ["en", "es", "fr", "de", "it", "ja", "pt", "ko", "pl", "tr"];
 
 const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),
+  // Vercel builds with its own deployment adapter (NEXT_ADAPTER_PATH), which copies the pages into its output before
+  // `postbuild` runs. Ours adds the script policy to every page first, then hands over to it (scripts/csp-adapter.mjs).
+  ...(!isStatic && process.env.NEXT_ADAPTER_PATH ? { adapterPath: join(process.cwd(), "scripts", "csp-adapter.mjs") } : {}),
   ...(building
     ? { turbopack: { resolveAlias: Object.fromEntries(LANG_FILES.map((l) => [`@/locales/load/${l}`, `./src/locales/gen/${l}.json`])) } }
     : {}),

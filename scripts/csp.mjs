@@ -4,7 +4,9 @@
 // inline scripts and puts the policy in a <meta> at the top of <head>. Scripts then run only if they come from
 // our origin, are one of those exact inline scripts, or are Google's or Apple's sign-in library. Pages rendered per
 // request (none of the public pages) keep only the header policy from securityHeaders.ts.
-// Usage: node scripts/csp.mjs [dir]   (default .next/server/app)
+// On Vercel the build runs with Vercel's deployment adapter, which copies the pages into its output inside
+// `next build`, before `postbuild` runs, so there the policy is added by scripts/csp-adapter.mjs instead.
+// Usage: node scripts/csp.mjs [dir]   (default .next/server)
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -50,8 +52,9 @@ function* htmlFiles(dir) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const dir = process.argv[2] ?? join(".next", "server", "app");
+/** Adds the policy to every page under `dir` and says how many changed. Next writes prerendered pages to
+ *  .next/server/app, or, when a deployment adapter is set (Vercel sets one), to .next/server/route-cache. */
+export function addPolicies(dir) {
   let n = 0;
   for (const file of htmlFiles(dir)) {
     const html = readFileSync(file, "utf8");
@@ -61,5 +64,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       n++;
     }
   }
-  console.log(`Script policy added to ${n} pages in ${dir}`);
+  return n;
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const dir = process.argv[2] ?? join(".next", "server");
+  console.log(`Script policy added to ${addPolicies(dir)} pages in ${dir}`);
 }
