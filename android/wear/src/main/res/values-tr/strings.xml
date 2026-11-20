@@ -9,4 +9,13 @@
     <string name="up_next">Sıradaki: %1$s</string>
     <string name="rest_left">Dinlenme, %1$s kaldı</string>
     <string name="bpm">♥ %1$d bpm</string>
+    <string name="start_on_phone">Telefonda başlat</string>
+    <string name="install_on_phone">Telefona yükle</string>
+    <string name="no_app_title">Liftsmith\'i telefonuna yükle</string>
+    <string name="no_app_body">Saat, telefon uygulamasında yaptığın antrenmanı gösterir.</string>
+    <string name="offline_title">Telefon bağlı değil</string>
+    <string name="offline_body">Telefonunu yakında ve Bluetooth\'u açık tut.</string>
+    <string name="check_phone">Telefonuna bak</string>
+    <string name="open_failed">Liftsmith\'i telefonunda aç.</string>
+    <string name="install_failed">Liftsmith\'i telefonundaki Google Play\'den indir.</string>
 </resources>

@@ -3,3 +3,4 @@ export declare const SCRIPT_SOURCES: string[];
 export declare function inlineScripts(html: string): string[];
 export declare function policyFor(html: string): string;
 export declare function withPolicy(html: string): string;
+export function addPolicies(dir: string): number;

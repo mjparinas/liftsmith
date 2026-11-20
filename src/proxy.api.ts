@@ -35,5 +35,13 @@ export async function proxy(request: NextRequest) {
 // the database, so it stays up during maintenance and doesn't pay for a function call on every visit (about 70 ms,
 // plus a cold start now and then; Melvin, 2026-11-13, docs/decisions/speed.md).
 export const config = {
-  matcher: ["/api/:path*", "/w/:path*", "/u/:path*", "/gyms/:path*", "/sitemap-people.xml", "/sitemap-gyms.xml"],
+  matcher: [
+    "/api/:path*",
+    "/w/:path*",
+    "/u/:path*",
+    "/gyms/:path*",
+    "/sitemap-people.xml",
+    "/sitemap-gyms.xml",
+    "/sitemap-gyms-:part(\\d+).xml",
+  ],
 };

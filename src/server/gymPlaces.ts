@@ -29,6 +29,7 @@ import { classesOf } from "./gymClasses";
 import { distanceKm } from "./gymDirectory";
 import { issuesOf, newsOf, trainersOf } from "./gymExtras";
 import { checkText } from "./moderation";
+import { shortHash, translit } from "./translit";
 
 export const PLACE_LIMITS = {
   /** How far "Find gyms near you" looks, in km. */
@@ -114,10 +115,12 @@ const validLat = (x: unknown): x is number => typeof x === "number" && Number.is
 const validLon = (x: unknown): x is number => typeof x === "number" && Number.isFinite(x) && x >= -180 && x <= 180;
 export const isPlaceId = (x: unknown): x is string => typeof x === "string" && /^[0-9a-f]{16}$/.test(x);
 
-/** "Steve Nash Fitness World", "Langley" → "steve-nash-fitness-world-langley". Accents folded; other scripts dropped. */
+/**
+ * "Steve Nash Fitness World", "Langley" → "steve-nash-fitness-world-langley". Accents folded; Cyrillic, Greek,
+ * Armenian, Georgian, Korean and kana spelled in Latin letters (translit.ts); other scripts dropped.
+ */
 export function slugify(...parts: string[]): string {
-  return parts
-    .join(" ")
+  return translit(parts.join(" "))
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
@@ -549,7 +552,13 @@ function chunks<T>(xs: T[], size: number): T[][] {
 }
 
 /** "Langley", "BC" → "langley-bc": a city's page, and the folder its gyms' pages sit in. */
-export const citySlugOf = (city: string, region: string) => slugify(city, region) || "gyms";
+/**
+ * A city's folder: "langley-bc", "moskva-moskva". A name no table spells in Latin letters (Chinese characters, Arabic,
+ * Thai…) gets a short stable code of its own ("city-3f2a91bc"), never a shared folder: until 2026-11-20 every such
+ * city fell back to /gyms/gyms/, one page for 5,000 gyms from Tokyo to Tehran (docs/decisions/seo.md).
+ */
+export const citySlugOf = (city: string, region: string) =>
+  slugify(city, region) || (city || region ? `city-${shortHash(`${city}|${region}`)}` : "gyms");
 
 async function freeSlug(name: string, citySlug: string, id: string): Promise<string> {
   const base = slugify(name) || id;
@@ -965,10 +974,11 @@ export const gymIndexable = (p: Place): boolean =>
 export const INDEXABLE_SQL =
   "kind = 'gym' AND (claimed_by <> '' OR website <> '' OR phone <> '' OR hours <> '' OR lifters > 0 OR code <> '')";
 
-/** Every gym page worth indexing (gymIndexable): gyms that aren't hidden and have something of their own. */
+/** Every gym page worth indexing (gymIndexable): gyms that aren't hidden and have something of their own. The sitemap
+ * lists them in parts (sitemapParts in gymPage.ts), so this can pass the 50,000 one sitemap holds. */
 export async function sitemapGyms(): Promise<{ path: string; lastModified: number }[]> {
   const rows = await query(
-    `SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND ${INDEXABLE_SQL} ORDER BY updated_at DESC LIMIT 45000`,
+    `SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND ${INDEXABLE_SQL} ORDER BY updated_at DESC LIMIT 200000`,
   );
   return rows.map((r) => ({ path: `/gyms/${s(r.city_slug)}/${s(r.slug)}/`, lastModified: n(r.updated_at) }));
 }
