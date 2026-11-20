@@ -113,6 +113,16 @@ export const metaTags = (title: string, desc: string, path: string, ld: unknown,
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, "\\u003c")}</script>`;
 };
 
+/**
+ * The same trail as `crumbs` for search engines (a BreadcrumbList, so results show "Gyms › Toronto, ON" instead of
+ * the address). The last item is the page itself at `path`.
+ */
+export const crumbsLd = (items: [string, string | null][], path: string) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: items.map(([name, href], i) => ({ "@type": "ListItem", position: i + 1, name, item: `${SITE_URL}${href ?? path}` })),
+});
+
 export const crumbs = (lang: MsgLang, items: [string, string | null][]) =>
   `<nav class="crumbs" aria-label="Breadcrumb"><ol>${items
     .map(
@@ -192,6 +202,8 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
       ...(p.country ? { addressCountry: p.country } : {}),
     },
     ...(p.website || p.instagram || p.facebook ? { sameAs: [p.website, p.instagram, p.facebook].filter(Boolean) } : {}),
+    ...(p.logo ? { image: `${SITE_URL}/api/gyms/photo/?id=${p.logo}` } : {}),
+    ...(p.chain ? { brand: { "@type": "Brand", name: p.chain.name, url: `${SITE_URL}/gym-chains/${p.chain.slug}/` } } : {}),
     ...(p.phone ? { telephone: p.phone } : {}),
     ...(p.email ? { email: p.email } : {}),
     ...(p.amenities.length
@@ -298,14 +310,15 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
   // Anyone can say the page is wrong, closed, listed twice or not a gym (gymReportPage.ts, gymPlaceReports.ts).
   const reportLink = `<p class="report-link"><a class="quiet" href="${esc(`${gymPath(p)}report/`)}" rel="nofollow">${icon("flag", 16)}${esc(say(lang, "gp.reportLink"))}</a></p>`;
   const credit = p.source === "osm" ? `<p class="credit">${esc(say(lang, "gp.osm"))}</p>` : "";
-  const body = `<div class="strip"><div class="wrap row strip-row"><p>${esc(say(lang, "gp.strip"))}</p></div></div>
-<main id="main" class="wrap page">${crumbs(lang, [
+  const trail: [string, string | null][] = [
     [say(lang, "gp.crumbs"), "/gyms/"],
     [city, cityPath(p.citySlug)],
     [p.name, null],
-  ])}
+  ];
+  const body = `<div class="strip"><div class="wrap row strip-row"><p>${esc(say(lang, "gp.strip"))}</p></div></div>
+<main id="main" class="wrap page">${crumbs(lang, trail)}
 <div class="grid"><div class="col">${hero}${news}${starterHtml(p, lang)}${classesHtml(p.classes ?? [], lang)}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${reportLink}${credit}</main>`;
-  return framePage(lang, title, metaTags(title, desc, path, ld, gymIndexable(p)), body, GYM_STYLE, "gym");
+  return framePage(lang, title, metaTags(title, desc, path, [ld, crumbsLd(trail, path)], gymIndexable(p)), body, GYM_STYLE, "gym");
 }
 
 /** "Day pass $15", "Membership from $49 a month": the prices the owner set, in the reader's language. */
@@ -386,15 +399,16 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang, train
       ? `<section class="card" aria-labelledby="${id}"><h2 id="${id}">${icon("gym", 16)}${esc(label)}</h2><ul class="list">${list.map((p, i) => listItem(p, lang, pinOf(p, i))).join("")}</ul></section>`
       : "";
   const credit = places.some((p) => p.source === "osm") ? `<p class="credit">${esc(say(lang, "gp.osm"))}</p>` : "";
-  const body = `<main id="main" class="wrap page narrow">${crumbs(lang, [
+  const trail: [string, string | null][] = [
     [say(lang, "gp.crumbs"), "/gyms/"],
     [city, null],
-  ])}
+  ];
+  const body = `<main id="main" class="wrap page narrow">${crumbs(lang, trail)}
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.cityTitle", { city }))}</h1><p class="muted">${esc(desc)}</p></header>
 ${figure}${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${
     trainers ? `<p><a class="quiet" href="/trainers/${esc(citySlug)}/">${esc(say(lang, "gp.dirLink", { city }))} ›</a></p>` : ""
   }${missing(lang)}${credit}</main>`;
-  return framePage(lang, title, metaTags(title, desc, path, ld, gyms.length > 0), body, GYM_STYLE, "gym");
+  return framePage(lang, title, metaTags(title, desc, path, [ld, crumbsLd(trail, path)], gyms.length > 0), body, GYM_STYLE, "gym");
 }
 
 /** "Gym not listed? Add it in the app": the app's add form (GymAdd.tsx), which staff check. */
@@ -436,6 +450,29 @@ export function goneHtml(lang: MsgLang): string {
 }
 
 // --- The gym sitemap ---
+
+/** How many addresses one part of the gym sitemap holds: well under the 50,000 (and 50 MB) a sitemap may have. */
+export const SITEMAP_PART = 20_000;
+
+/**
+ * The gym sitemap in parts (2026-11-20: it had reached 46,745 of the 50,000 addresses one sitemap may hold, and
+ * Google skips a sitemap over the limit whole). Part 1 is the hubs (/gyms/, cities, chains, trainers, programs,
+ * community, routines), then the gym pages `SITEMAP_PART` at a time.
+ */
+export function sitemapParts<T>(hubs: T[], gyms: T[]): T[][] {
+  const parts = [hubs];
+  for (let i = 0; i < gyms.length; i += SITEMAP_PART) parts.push(gyms.slice(i, i + SITEMAP_PART));
+  return parts;
+}
+
+/** /sitemap-gyms.xml: a sitemap index naming /sitemap-gyms-1.xml and on, each with its newest change. */
+export function gymSitemapIndexXml(parts: { lastModified: number }[][]): string {
+  const items = parts.map((part, i) => {
+    const newest = Math.max(0, ...part.map((e) => e.lastModified));
+    return `<sitemap><loc>${esc(`${SITE_URL}/sitemap-gyms-${i + 1}.xml`)}</loc>${newest ? `<lastmod>${new Date(newest).toISOString().slice(0, 10)}</lastmod>` : ""}</sitemap>`;
+  });
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items.join("\n")}\n</sitemapindex>\n`;
+}
 
 export function gymSitemapXml(entries: { path: string; lastModified: number }[]): string {
   const urls = entries.map(

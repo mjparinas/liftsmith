@@ -66,7 +66,9 @@ const nextConfig: NextConfig = {
           // Gym chains and every branch of each (src/server/gymChainPage.ts); in the gym sitemap.
           { source: "/gym-chains/", destination: "/api/gyms/chain/" },
           { source: "/gym-chains/:chain/", destination: "/api/gyms/chain/?chain=:chain" },
+          // A sitemap index of parts, because one sitemap holds at most 50,000 addresses (gymSitemapIndexXml).
           { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
+          { source: "/sitemap-gyms-:part(\\d+).xml", destination: "/api/gyms/sitemap-part/:part/" },
           // Strength standards from real lifters (src/server/standardsPage.ts, docs/decisions/public-pages-and-seo.md).
           { source: "/strength-standards/", destination: "/api/standards/page/" },
           { source: "/strength-standards/:lift/", destination: "/api/standards/page/?lift=:lift" },
@@ -107,6 +109,13 @@ const nextConfig: NextConfig = {
           { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/routines/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/community/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          // Each translated page says its language (docs/decisions/seo.md "Page language"): the shared root layout
+          // writes <html lang="en"> into every page and DocLang fixes it only once the page runs, so a crawler that
+          // reads the HTML as served (Bing weighs it) saw English on all nine other languages.
+          ...LANG_FILES.filter((l) => l !== "en").map((l) => ({
+            source: `/${l}/:path*`,
+            headers: [{ key: "Content-Language", value: l }],
+          })),
         ],
       }),
   env: {
