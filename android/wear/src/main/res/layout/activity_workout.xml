@@ -92,5 +92,30 @@
             android:textAllCaps="false"
             android:textColor="@color/ink"
             android:textSize="15sp" />
+
+        <!-- Start on phone, or Install on phone when the phone hasn't got Liftsmith (PhoneLink). -->
+        <Button
+            android:id="@+id/phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_primary"
+            android:textAllCaps="false"
+            android:textColor="@color/accent_ink"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center"
+            android:textColor="@color/dim"
+            android:textSize="12sp"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

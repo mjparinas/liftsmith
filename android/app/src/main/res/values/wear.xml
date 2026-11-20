@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@array/android_wear_capabilities">
+    <!-- The watch app (android/wear, PhoneLink.CAPABILITY) looks for this to know the phone has Liftsmith: it then
+         offers Start on phone, and otherwise Install on phone (Wear OS app quality: a non-standalone app finds its
+         companion). -->
+    <string-array name="android_wear_capabilities" translatable="false">
+        <item>liftsmith_phone</item>
+    </string-array>
+</resources>

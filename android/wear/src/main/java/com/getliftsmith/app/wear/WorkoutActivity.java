@@ -11,6 +11,8 @@ import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.google.android.gms.wearable.CapabilityClient;
+import com.google.android.gms.wearable.Wearable;
 
 /**
  * The watch screen: the set, the weight and reps (or the rest countdown), plates, heart rate, and Log set and
@@ -23,13 +25,24 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
     private final Runnable everySecond = new Runnable() {
         @Override
         public void run() {
+            // Without a phone that has the app, look again every 15 s (a phone that just got Liftsmith, or came back).
+            if (WatchHub.phone() != PhoneLink.Status.READY && ++sinceCheck >= 15) {
+                sinceCheck = 0;
+                WatchHub.findPhones(getApplicationContext(), () -> {});
+            }
             render();
             tick.postDelayed(this, 1000);
         }
     };
     private boolean asked = false;
-    private TextView set, title, big, sub, hr;
-    private Button log, add;
+    private TextView set, title, big, sub, hr, note;
+    private Button log, add, phone;
+    /** What the last Start on phone or Install on phone tap said ("Check your phone"), until the state changes. */
+    private int tapNote = 0;
+    private PhoneLink.Status tapFor = null;
+    private int sinceCheck = 0;
+    /** A phone with Liftsmith came or went (PhoneLink.CAPABILITY): look again. */
+    private final CapabilityClient.OnCapabilityChangedListener capability = (info) -> WatchHub.findPhones(getApplicationContext(), () -> {});
 
     /** The heart rate permission: Wear OS 6 (API 36) has its own, older watches use body sensors. */
     static String hrPermission() {
@@ -51,8 +64,25 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         hr = findViewById(R.id.hr);
         log = findViewById(R.id.log);
         add = findViewById(R.id.add);
+        phone = findViewById(R.id.phone);
+        note = findViewById(R.id.note);
         log.setOnClickListener((v) -> tap(v, "log"));
         add.setOnClickListener((v) -> tap(v, "add30"));
+        phone.setOnClickListener(this::openOnPhone);
+    }
+
+    /** Start on phone (the app's start shortcut) or Install on phone (Play's page for the app), on the phone. */
+    private void openOnPhone(View v) {
+        String node = WatchHub.phoneNode();
+        PhoneLink.Status status = WatchHub.phone();
+        if (node == null || (status != PhoneLink.Status.READY && status != PhoneLink.Status.NO_APP)) return;
+        v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+        boolean install = status == PhoneLink.Status.NO_APP;
+        PhoneLink.open(this, install ? PhoneLink.STORE_URI : PhoneLink.START_URI, node, (Boolean ok) -> {
+            tapFor = status;
+            tapNote = ok ? R.string.check_phone : install ? R.string.install_failed : R.string.open_failed;
+            render();
+        });
     }
 
     private void tap(View v, String action) {
@@ -65,12 +95,22 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         super.onResume();
         WatchHub.listen(this);
         WatchHub.refresh(this);
+        try {
+            Wearable.getCapabilityClient(this).addListener(capability, PhoneLink.CAPABILITY);
+        } catch (Exception ignored) {
+            // No Play services on this watch: the screen says the phone isn't connected.
+        }
         tick.post(everySecond);
     }
 
     @Override
     protected void onPause() {
         WatchHub.unlisten(this);
+        try {
+            Wearable.getCapabilityClient(this).removeListener(capability, PhoneLink.CAPABILITY);
+        } catch (Exception ignored) {
+            // No Play services.
+        }
         tick.removeCallbacks(everySecond);
         super.onPause();
     }
@@ -101,16 +141,49 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
     private void render() {
         WorkoutState s = WatchHub.state();
         long now = System.currentTimeMillis();
+        PhoneLink.Status link = WatchHub.phone();
+        if (tapFor != link) tapNote = 0;
         if (s == null) {
             set.setVisibility(View.GONE);
             big.setVisibility(View.GONE);
             hr.setVisibility(View.GONE);
             log.setVisibility(View.GONE);
             add.setVisibility(View.GONE);
-            title.setText(R.string.none_title);
-            sub.setText(R.string.none_body);
+            // Not standalone: say what the phone needs, and offer the one step that gets there.
+            switch (link) {
+                case NO_APP:
+                    title.setText(R.string.no_app_title);
+                    sub.setText(R.string.no_app_body);
+                    phone.setText(R.string.install_on_phone);
+                    phone.setVisibility(View.VISIBLE);
+                    break;
+                case OFFLINE:
+                    title.setText(R.string.offline_title);
+                    sub.setText(R.string.offline_body);
+                    phone.setVisibility(View.GONE);
+                    break;
+                case READY:
+                    title.setText(R.string.none_title);
+                    sub.setText(R.string.none_body);
+                    phone.setText(R.string.start_on_phone);
+                    phone.setVisibility(View.VISIBLE);
+                    break;
+                case CHECKING:
+                default:
+                    title.setText(R.string.none_title);
+                    sub.setText(R.string.none_body);
+                    phone.setVisibility(View.GONE);
+                    break;
+            }
+            sub.setVisibility(View.VISIBLE);
+            note.setVisibility(tapNote == 0 ? View.GONE : View.VISIBLE);
+            if (tapNote != 0) note.setText(tapNote);
             return;
         }
+        phone.setVisibility(View.GONE);
+        // Mid-workout with the phone out of reach: taps can't arrive, so say so instead of failing quietly.
+        note.setVisibility(link == PhoneLink.Status.OFFLINE ? View.VISIBLE : View.GONE);
+        if (link == PhoneLink.Status.OFFLINE) note.setText(R.string.offline_title);
         boolean resting = s.resting(now);
         // The set timer (holds, carries, cardio): its clock in the big line and what it's counting under it.
         WorkoutState.Phase phase = s.phase(now);

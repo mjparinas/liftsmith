@@ -9,4 +9,13 @@
     <string name="up_next">Siguiente: %1$s</string>
     <string name="rest_left">Descanso, quedan %1$s</string>
     <string name="bpm">♥ %1$d lpm</string>
+    <string name="start_on_phone">Empezar en el móvil</string>
+    <string name="install_on_phone">Instalar en el móvil</string>
+    <string name="no_app_title">Instala Liftsmith en tu móvil</string>
+    <string name="no_app_body">El reloj muestra el entrenamiento que haces con la app del móvil.</string>
+    <string name="offline_title">Móvil no conectado</string>
+    <string name="offline_body">Ten el móvil cerca y con el Bluetooth activado.</string>
+    <string name="check_phone">Mira tu móvil</string>
+    <string name="open_failed">Abre Liftsmith en tu móvil.</string>
+    <string name="install_failed">Instala Liftsmith desde Google Play en tu móvil.</string>
 </resources>

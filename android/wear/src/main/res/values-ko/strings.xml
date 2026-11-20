@@ -9,4 +9,13 @@
     <string name="up_next">다음: %1$s</string>
     <string name="rest_left">휴식, %1$s 남음</string>
     <string name="bpm">♥ %1$d bpm</string>
+    <string name="start_on_phone">휴대폰에서 시작</string>
+    <string name="install_on_phone">휴대폰에 설치</string>
+    <string name="no_app_title">휴대폰에 Liftsmith를 설치하세요</string>
+    <string name="no_app_body">워치에는 휴대폰 앱에서 하는 운동이 표시됩니다.</string>
+    <string name="offline_title">휴대폰이 연결되지 않음</string>
+    <string name="offline_body">휴대폰을 가까이 두고 블루투스를 켜 주세요.</string>
+    <string name="check_phone">휴대폰을 확인하세요</string>
+    <string name="open_failed">휴대폰에서 Liftsmith를 여세요.</string>
+    <string name="install_failed">휴대폰의 Google Play에서 Liftsmith를 설치하세요.</string>
 </resources>
