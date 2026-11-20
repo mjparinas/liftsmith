@@ -564,6 +564,8 @@ export const NOT_SETTINGS: string[] = [
   "VERCEL_GIT_COMMIT_MESSAGE",
   "VERCEL_GIT_REPO_OWNER",
   "VERCEL_GIT_REPO_SLUG",
+  // Set by Vercel's builder to its own Next deployment adapter; next.config.ts wraps it (scripts/csp-adapter.mjs).
+  "NEXT_ADAPTER_PATH",
 ];
 
 /**
