@@ -125,6 +125,9 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
+          # Play refuses an upload that would send the app's pending changes for review on its own ("Changes cannot
+          # be sent for review automatically"), so the bundle lands on the track and review is sent from Play Console.
+          changesNotSentForReview: true
       # The Wear OS app goes to Play's Wear OS internal track. Play takes it only once the Wear OS form factor is
       # added in Play Console (Test and release › Advanced settings › Form factors), so until then this step fails
       # without stopping the phone release (docs/decisions/watch-apps.md).
@@ -138,6 +141,7 @@ jobs:
           releaseFiles: android/wear/build/outputs/bundle/release/wear-release.aab
           track: wear:internal
           status: completed
+          changesNotSentForReview: true
 
   ios:
     name: iOS · TestFlight
