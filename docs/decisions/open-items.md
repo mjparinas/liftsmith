@@ -11,6 +11,18 @@ Done before launch: Google sign-in for the web and Android, Android billing (Pla
 1. **Wear OS production release** (build 100000017): it wasn't in submission 1. In Production, switch the form factor to Wear OS, accept "Proceed anyway" on the version code warning (the +100000000 offset in `android/wear/build.gradle` is on purpose, and Wear version codes can't go back below it), save, and send it from Publishing overview.
 2. **Once the listing is live:** set `NEXT_PUBLIC_GOOGLE_PLAY_URL` in Vercel (Production and Preview) to `https://play.google.com/store/apps/details?id=com.getliftsmith.app` and redeploy, so the site's Google Play badges stop saying "Coming soon"; the App Store badge keeps saying it until iOS ships.
 
+### Blocking Android Release uploads (2026-11-22)
+
+Play's API refuses every `r0adkll/upload-google-play` commit with **"You must let us know whether your app includes any health features"** until the Health apps declaration is current (Release runs 48–50 and the ones after `changesNotSentForReview: true`). The AAB uploads; committing the edit fails. Web and iOS jobs are fine. This is Play Console only — the workflow already passes `changesNotSentForReview: true` ([#634](https://github.com/mjparinas/liftsmith/pull/634)).
+
+1. Play Console › Policy › App content › **Health apps** (or the critical Health policy banner under Monitor and Improve › Policy and programs › App content).
+2. Declare health features (see [Google Play review](google-play-review.md)): Activity and fitness, Nutrition and weight management, Period tracking; **and Exercise** for Health Connect's `READ_EXERCISE` ([Workouts from other apps](outside-workouts.md)). Not Sleep management or Physical therapy.
+3. Save / submit the form. If it was already filled before Exercise was added, open it, add Exercise, and submit again so the API sees a complete declaration.
+4. Wait until the form is no longer a critical issue (often under an hour after submit).
+5. Re-run **Release** on `main` (Actions › Release › Run workflow). The phone AAB should land on the internal track; send review from Publishing overview when ready.
+
+Also still due on that form / Data safety when those releases reach production: approximate location purpose for gym listings, and Health Connect's Exercise (read) as below.
+
 After launch, not blocking it:
 
 - **Play Data safety, gym listings** (2026-11-12, [Gym sharing](gym-sharing.md)): in App content › Data safety, add App functionality to Location › Approximate location's purposes, because a listed gym's area (about 1 km) is kept with the account. Do it before the release that carries gym listings reaches production.
