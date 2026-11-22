@@ -13,8 +13,8 @@ import { Capacitor } from "@capacitor/core";
 import { useEffect, useRef, useState } from "react";
 
 import { t } from "@/lib/i18n";
-import { pushTokenOnDevice } from "@/lib/push";
 import { calm } from "@/lib/juice";
+import { pushTokenOnDevice } from "@/lib/push";
 import { useSocial } from "@/lib/social";
 import { loadCheers, onCheerPush } from "@/lib/socialLive";
 import type { CheerIn } from "@/lib/socialTypes";
@@ -98,7 +98,8 @@ export function CheerRain({ sessionId, startedAt }: { sessionId: string; started
     return () => {
       live = false;
     };
-  }, [sharing, sessionId, startedAt, setsDone, pushes, ...(timedPoll ? [tick] : [])]);
+    // Tick is always a dep: with timed polling off it only moves once a day (long useNow interval).
+  }, [sharing, sessionId, startedAt, setsDone, pushes, tick]);
 
   useEffect(() => {
     const all = timers.current;
