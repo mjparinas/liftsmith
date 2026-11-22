@@ -1022,4 +1022,38 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Yalnızca toplamlar, ziyaretlerini saydıran sporculardan, ve beş sporcu antrenman yapınca başlar. Kim olduğunu asla görmezsin.",
   },
+  "rehab-self": {
+    title: "Bir yer ağrıdığında hafif bir rutin",
+    intro:
+      "Bir sakatlık kaydettin ve fizyoterapistin yok mu? Kısa bir vücut ağırlığı rutini, hazır olduğunda Sakatlıklar'da ve bir koç notunda seni bekler.",
+    points: [
+      "Zaten kaydettiğin bir sakatlık için, o bölgeyi başka bir şey kapsamıyorsa görünür.",
+      "Sakatlıklar'dan ya da Bugün'deki nottan aç ve tek dokunuşla ekle.",
+      "Vücut ağırlığıyla, evde yapılacak kadar kısa, ve antrenmanın yanında durabilir.",
+      "Neyin yanlış olduğunu ya da neyin düzelteceğini hiç söylemez. Bu bir başlangıçtır, tedavi değildir.",
+    ],
+    dyk: "Aynı bölge için bir fizyoterapist programı onun yerini alır, böylece iki kez sorulmaz.",
+  },
+  "rehab-shape": {
+    title: "Tekrarları, saniyeleri ve bir ipucunu ayarla",
+    intro: "Bir rehabilitasyon rutini artık her egzersizde istediğin şeyi taşıyabilir: tekrarlar ya da saniyeler ve kısa bir ipucu.",
+    points: [
+      "Rutin düzenleyicide her egzersizin tekrarını ya da saniyesini yükselt. Boş bırakırsan uygulama tekrarları seçer.",
+      "Tutuşlar saniye ile başlar, böylece süreli bir egzersiz tekrarda değil, zamanda kalır.",
+      "Egzersizin altına kısa bir ipucu ekle, hatırlamalarını istediğin tek şey.",
+      "Danışanlar yazıldığı gibi uygular. Daha eski bir telefon rutini yine açar ve ipucunu yalnızca atlar.",
+    ],
+    dyk: "Ağrı soruları, haftalık sıklık ve üç aşama eskisi gibi çalışır.",
+  },
+  "campus-clubs": {
+    title: "Antrenmana devam eden bir kulüp için Pro",
+    intro: "İnsanların gerçekten antrenman yaptığı bir kulübü yönet, onlar sürdürdükçe Pro senin için ücretsiz kalsın.",
+    points: [
+      "Sen dahil beş veya daha fazla üye son 14 günde birer antrenman bitirir.",
+      "Bunu tek bir kulüp karşılamalı. İki daha sakin kulüp toplanmaz.",
+      "Yalnızca katıldığın bir kulüp sayılmaz. Onu senin başlatmış olman gerekir.",
+      "Kulüp antrenman yaptığı sürece sürer ve o iki hafta sessizleşince biter.",
+    ],
+    dyk: "Kulüp bunu kendi sayfasında söyler, Pro ekranı da hesabınla geldiğini söyler.",
+  },
 };

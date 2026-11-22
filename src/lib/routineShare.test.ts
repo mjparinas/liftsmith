@@ -60,6 +60,36 @@ describe("routine links", () => {
     expect(codeFromLink("https://www.getliftsmith.com/app/#/today")).toBeNull();
   });
 
+  it("carries a physio's reps, seconds and cue, which an older app can ignore (2026-11-22)", () => {
+    const prescribed = [
+      { exerciseId: "bench-press", sets: 3, reps: 8, cue: "Soft knees" },
+      { exerciseId: "wall-sit", sets: 2, reps: 30, group: "ss-wall-sit" },
+      { exerciseId: "glute-bridge", sets: 2, group: "ss-wall-sit" },
+    ];
+    const code = encodeRoutine({ name: "Knee", items: prescribed, rehab: true, rehabPart: "knee" });
+    expect(code).toContain("bench-press.3.r8.c");
+    expect(code).toContain("wall-sit.2.s.r30");
+    expect(decodeRoutine(code)).toEqual({ name: "Knee", items: prescribed, rehab: true, rehabPart: "knee" });
+    // An older reader keeps the third piece only when it is the superset mark, and drops the rest.
+    const older = (seg: string) => {
+      const [id, sets, flag] = seg.split(".");
+      return { id, sets, link: flag === "s" };
+    };
+    expect(
+      code
+        .split("~")
+        .slice(2)
+        .filter((p) => p.includes("."))
+        .map(older),
+    ).toEqual([
+      { id: "bench-press", sets: "3", link: false },
+      { id: "wall-sit", sets: "2", link: true },
+      { id: "glute-bridge", sets: "2", link: false },
+    ]);
+    expect(decodeRoutine("r1~QQ~wall-sit.2.r200.c!!")!.items[0]).toMatchObject({ sets: 2, reps: 120 });
+    expect(decodeRoutine("r1~QQ~wall-sit.2.r200.c!!")!.items[0]).not.toHaveProperty("cue");
+  });
+
   it("tells the same routine from a different one", () => {
     expect(
       sameItems(

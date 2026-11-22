@@ -1025,4 +1025,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Sono solo totali, dagli atleti che contano le visite, e partono quando cinque si sono allenati lì. Non vedi mai chi.",
   },
+  "rehab-self": {
+    title: "Una routine leggera quando qualcosa fa male",
+    intro:
+      "Hai registrato un infortunio e non hai un fisioterapista? Una breve routine a corpo libero ti aspetta, in Infortuni e in una nota del coach.",
+    points: [
+      "Compare per un infortunio che hai già registrato, quando nient’altro copre quella zona.",
+      "Aprila da Infortuni o dalla nota in Oggi e aggiungila con un tocco.",
+      "È a corpo libero, abbastanza corta da fare a casa, e può stare accanto al tuo allenamento.",
+      "Non dice mai cosa non va né cosa lo sistemerà. È un punto di partenza, non una cura.",
+    ],
+    dyk: "Un programma di un fisioterapista per la stessa zona la sostituisce, così non te lo chiedono due volte.",
+  },
+  "rehab-shape": {
+    title: "Imposta le ripetizioni, i secondi e uno spunto",
+    intro:
+      "Una routine di riabilitazione può ora portare esattamente ciò che vuoi per ogni esercizio: le ripetizioni o i secondi, e un breve spunto.",
+    points: [
+      "Nell’editor delle routine, alza le ripetizioni o i secondi di ogni esercizio. Lascialo vuoto e l’app sceglie le ripetizioni.",
+      "Le tenute partono in secondi, così un esercizio a tempo resta a tempo, non in ripetizioni.",
+      "Aggiungi un breve spunto sotto l’esercizio, l’unica cosa che vuoi che ricordino.",
+      "I clienti la seguono così com’è scritta. Un telefono più vecchio apre comunque la routine e lascia semplicemente fuori lo spunto.",
+    ],
+    dyk: "Le domande sul dolore, le volte a settimana e le tre fasi funzionano come prima.",
+  },
+  "campus-clubs": {
+    title: "Pro per un club che continua ad allenarsi",
+    intro: "Guida un club dove le persone si allenano davvero, e Pro è gratis per te finché tengono il ritmo.",
+    points: [
+      "Cinque o più membri, tu compreso, finiscono ciascuno un allenamento negli ultimi 14 giorni.",
+      "Deve farcela un solo club. Due club più tranquilli non si sommano.",
+      "Un club a cui ti sei solo unito non conta. Devi essere tu ad averlo avviato.",
+      "Resta finché il club si allena e si ferma quando quella quindicina resta in silenzio.",
+    ],
+    dyk: "Il club lo dice sulla sua pagina, e la schermata Pro dice che arriva con il tuo account.",
+  },
 };

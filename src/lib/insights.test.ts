@@ -221,6 +221,41 @@ describe("insights: coach's notes", () => {
     expect(note.action).toEqual({ kind: "minutes", minutes: 30, label: "Make today 30 minutes" });
   });
 
+  it("offers a gentle routine once an injury has been logged a week with no rehab", () => {
+    const injury: AppEvent = {
+      type: "injury",
+      id: "i",
+      at: NOW - 8 * D,
+      injuryId: "knee-1",
+      part: "knee",
+    };
+    const note = insights({ events: [injury], profile: base, now: NOW }).find((n) => n.id.startsWith("rehab-self"));
+    expect(note?.title).toBe("A gentle routine for your knee");
+    expect(note?.action).toEqual({ kind: "go", route: "injuries/rehab", label: "Add gentle rehab" });
+    expect(insights({ events: [{ ...injury, at: NOW - 6 * D }], profile: base, now: NOW }).some((n) => n.id.startsWith("rehab-self"))).toBe(
+      false,
+    );
+    const covered = insights({
+      events: [injury],
+      profile: {
+        ...base,
+        routines: [
+          {
+            id: "k",
+            name: "Knee",
+            items: [{ exerciseId: "wall-sit", sets: 2 }],
+            rehab: true,
+            rehabPart: "knee",
+            createdAt: NOW,
+            updatedAt: NOW,
+          },
+        ],
+      },
+      now: NOW,
+    });
+    expect(covered.some((n) => n.id.startsWith("rehab-self"))).toBe(false);
+  });
+
   it("says nothing when there's nothing to act on", () => {
     expect(insights({ events: [], profile: base, now: NOW })).toEqual([]);
   });

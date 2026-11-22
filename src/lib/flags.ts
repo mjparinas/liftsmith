@@ -179,6 +179,17 @@ export const FLAGS = {
       "A friend who joins with a lifter's invite link and finishes three workouts gives both a month of Pro. Off: invites still connect friends, but nothing is paid out and the app stops mentioning it.",
   },
   /**
+   * Campus clubs (src/server/earnedPro.ts `clubEarnsPro`, docs/decisions/growth.md). Off: clubs stay as they are,
+   * nobody earns Pro for running one, and the app stops saying so.
+   */
+  campusClubs: {
+    default: true,
+    options: [true, false] as const,
+    label: "Campus club Pro",
+    description:
+      "A club leader has Pro free while 5 or more members of a club they started, the leader included, each finished a workout in the last 14 days. Off: clubs stay as they are, and nobody earns Pro this way.",
+  },
+  /**
    * The admin panel's AI helpers (src/server/ai.ts, docs/decisions/admin-ai.md): report suggestions, gym details and
    * duplicates, Ask AI on every tab, Inbox drafts and the digest's summary. The kill switch: off stops every request at once.
    * Admin only; the app never reads it.

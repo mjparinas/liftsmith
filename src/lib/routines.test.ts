@@ -25,6 +25,22 @@ describe("routines", () => {
     expect(cleanRoutine({ ...r, name: "   " }).name).toBe("My routine");
   });
 
+  it("clamps a physio's reps and trims a cue, and drops them when it isn't rehab", () => {
+    const rehab = cleanRoutine({
+      ...routine([{ exerciseId: "wall-sit", sets: 2, reps: 400, cue: "  Hold the wall.  " }]),
+      rehab: true,
+      rehabPart: "knee",
+      perWeek: 3,
+    });
+    expect(rehab.items[0]).toMatchObject({ reps: 120, cue: "Hold the wall." });
+    expect(rehab.rehabPart).toBe("knee");
+    const plain = cleanRoutine({ ...rehab, rehab: undefined, rehabPart: "knee", perWeek: 9 });
+    expect(plain.items[0]).not.toHaveProperty("reps");
+    expect(plain.items[0]).not.toHaveProperty("cue");
+    expect(plain.rehabPart).toBeUndefined();
+    expect(plain.perWeek).toBeUndefined();
+  });
+
   it("builds today's plan from a routine at this gym, with targets, warm-ups and supersets", () => {
     const gym = makeGym("commercial", "kg", "g");
     const profile = { ...defaultProfile(NOW), activeGymId: "g", onboarded: true };
@@ -47,6 +63,23 @@ describe("routines", () => {
     expect(out.plan.items[1].group).toBeDefined();
     expect(out.plan.items[2].group).toBe(out.plan.items[1].group);
     expect(out.plan.estMinutes).toBeGreaterThan(10);
+  });
+
+  it("uses a physio's reps and cue on a rehab program", () => {
+    const gym = makeGym("commercial", "kg", "g");
+    const profile = { ...defaultProfile(NOW), activeGymId: "g", onboarded: true };
+    const base = generate({ gym, profile, events: [], minutes: 45, now: NOW });
+    const r = {
+      ...routine([{ exerciseId: "bench-press", sets: 3, reps: 4, cue: "Soft knees" }]),
+      rehab: true,
+      rehabPart: "knee" as const,
+    };
+    const out = planFromRoutine(base, r, [], profile, gym, NOW)!;
+    expect(out.plan.items[0]!.target.reps).toBe(4);
+    expect(out.plan.items[0]!.target.note).toBe("Soft knees");
+    const plain = planFromRoutine(base, { ...r, rehab: undefined }, [], profile, gym, NOW)!;
+    expect(plain.plan.items[0]!.target.reps).not.toBe(4);
+    expect(plain.plan.items[0]!.target.note).not.toBe("Soft knees");
   });
 
   it("leaves out what the gym can't do, and a superset that loses a partner", () => {

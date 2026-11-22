@@ -76,7 +76,8 @@ export type CoachPushKind =
   | "coachPain"
   | "coachReview"
   | "coachProgramReview"
-  | "coachPlan";
+  | "coachPlan"
+  | "coachPlanEnd";
 
 /** A real gym's pushes (gymExtras.ts): an announcement to the gym's club, and a problem report or trainer to its owner. */
 export type GymPushKind = "gymNews" | "gymIssue" | "gymTrainer";

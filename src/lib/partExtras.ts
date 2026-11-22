@@ -3,6 +3,7 @@ import { restFor, type PlanItem } from "./generator";
 import { t as tr } from "./i18n";
 import { activeInjuries, type Injury } from "./injury";
 import { target, type Target } from "./progression";
+import { cleanCue, cleanReps } from "./routines";
 import type { AppEvent, Gym, Profile, Routine, RoutinePart, SetEvent } from "./types";
 
 // Workouts with parts, stage 5 (sessions-with-parts.md): the physio's rehab done beside the lifting in the same
@@ -136,9 +137,11 @@ export function rehabItems(routine: Routine, gym: Gym, events: readonly AppEvent
     if (!ex || !can.has(ex.id)) return [];
     const base = target(ex, events, profile, gym, now);
     const last = lastInPart(events, "rehab", ex.id);
+    const reps = cleanReps(i.reps);
+    const cue = cleanCue(i.cue);
     const t: Target = last
-      ? { ...base, weight: last.targetWeight ?? last.weight, reps: last.targetReps, note: tr("note.rehabAgain") }
-      : { ...base, note: tr("note.rehabFirst") };
+      ? { ...base, weight: last.targetWeight ?? last.weight, reps: reps ?? last.targetReps, note: cue ?? tr("note.rehabAgain") }
+      : { ...base, ...(reps ? { reps } : {}), note: cue ?? tr("note.rehabFirst") };
     return [
       {
         exerciseId: ex.id,

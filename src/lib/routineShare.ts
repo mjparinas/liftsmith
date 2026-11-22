@@ -1,15 +1,17 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { PHASES, REHAB_PROGRAMS } from "./rehab";
-import { clampSets, cleanParts, MAX_ITEMS, NAME_MAX } from "./routines";
+import { clampSets, cleanCue, cleanParts, cleanReps, MAX_ITEMS, NAME_MAX } from "./routines";
 import { APP_PATH, SITE_URL } from "./site";
 import { linksOf, withLinks } from "./superset";
 import { BODY_PARTS, type BodyPart, type RehabPlan, type RehabProtocolId, type Routine, type RoutineItem, type RoutinePart } from "./types";
 
 // Sharing a routine (Melvin, 2026-11-11: "share routines with other users"). The routine travels in
 // the link itself, like a remix link: its name, the exercises in order, set counts and supersets.
-// No weights, reps, notes or anything personal, because the other lifter's own progression fills
-// those in. Nothing is uploaded, so it works signed out and offline, on every platform.
+// No weights or anything personal, because the other lifter's own progression fills those in.
+// A rehab program may also carry a physio's reps or seconds and a short cue (2026-11-22); older apps
+// keep the exercise and the sets and drop the extra pieces. Nothing is uploaded, so it works signed
+// out and offline, on every platform.
 
 const SHARE_VERSION = "r1";
 /**
@@ -111,6 +113,22 @@ const safeDecode = (s: string) => {
 };
 
 // The name goes in as base64url of its UTF-8, so no app that encodes the link again can change it.
+/** An exercise segment: `id.sets`, `.s` when linked to the next, `.rN` for prescribed reps or seconds, `.c` plus a cue. */
+function itemOut(i: RoutineItem, link: boolean): string {
+  const reps = cleanReps(i.reps);
+  const cue = cleanCue(i.cue);
+  // `.s` stays the third piece when there is no prescription, so an older app still sees the superset.
+  // With a prescription it follows `.s` (`id.sets.s.rN`) or stands in the third place (`id.sets.rN`).
+  let seg = `${i.exerciseId}.${clampSets(i.sets)}`;
+  if (link) seg += ".s";
+  if (reps) seg += `.r${reps}`;
+  if (cue) {
+    const enc = nameOut(cue);
+    if (enc) seg += `.c${enc}`;
+  }
+  return seg;
+}
+
 function nameOut(name: string): string {
   let bin = "";
   for (const b of new TextEncoder().encode(name)) bin += String.fromCharCode(b);
@@ -127,15 +145,14 @@ function nameIn(code: string): string {
 }
 
 /**
- * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~h:part:times[:protocol:phase[:a]]][~rehab]`,
- * where `.s`
- * links an exercise to the next.
+ * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s][.rN][.c<cue>]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~h:part:times[:protocol:phase[:a]]][~rehab]`,
+ * where `.s` links an exercise to the next, `.rN` is a physio's reps or seconds, and `.c` is a short cue older apps drop.
  */
 export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts" | "rehabPart" | "perWeek" | "rehabPlan">): string {
   const items = r.items.filter((i) => EXERCISE_BY_ID.has(i.exerciseId)).slice(0, MAX_ITEMS);
   const links = linksOf(items);
   const name = nameOut(r.name.trim().slice(0, NAME_MAX));
-  const parts = items.map((i, k) => `${i.exerciseId}.${clampSets(i.sets)}${links[k] ? ".s" : ""}`);
+  const parts = items.map((i, k) => itemOut(i, !!links[k]));
   return [SHARE_VERSION, name, ...parts, ...partsOut(r.parts), ...rehabOut(r)].join("~");
 }
 
@@ -157,16 +174,24 @@ export function decodeRoutine(code: string): {
   const raw = code.includes("~") ? code : safeDecode(code);
   const [v, rawName = "", ...parts] = raw.split("~");
   if (v !== SHARE_VERSION) return null;
-  const kept: { exerciseId: string; sets: number; at: number; link: boolean }[] = [];
+  const kept: { exerciseId: string; sets: number; reps?: number; cue?: string; at: number; link: boolean }[] = [];
   parts.slice(0, MAX_ITEMS).forEach((p, at) => {
-    const [exerciseId = "", s, flag] = p.split(".");
+    const [exerciseId = "", s, ...rest] = p.split(".");
     const sets = Number(s);
     if (!EXERCISE_BY_ID.has(exerciseId) || !Number.isInteger(sets) || sets < 1 || sets > 10) return;
-    kept.push({ exerciseId, sets, at, link: flag === "s" });
+    let link = false;
+    let reps: number | undefined;
+    let cue: string | undefined;
+    for (const bit of rest) {
+      if (bit === "s") link = true;
+      else if (/^r\d+$/.test(bit)) reps = cleanReps(Number(bit.slice(1)));
+      else if (bit.startsWith("c") && bit.length > 1) cue = cleanCue(nameIn(bit.slice(1)));
+    }
+    kept.push({ exerciseId, sets, at, link, ...(reps ? { reps } : {}), ...(cue ? { cue } : {}) });
   });
   if (!kept.length) return null;
   const items = withLinks(
-    kept.map(({ exerciseId, sets }) => ({ exerciseId, sets })),
+    kept.map(({ exerciseId, sets, reps, cue }) => ({ exerciseId, sets, ...(reps ? { reps } : {}), ...(cue ? { cue } : {}) })),
     kept.slice(0, -1).map((k, i) => k.link && kept[i + 1]!.at === k.at + 1),
   );
   // Control characters never belong in a name; the rest is shown as plain text.
@@ -201,5 +226,9 @@ export function sameItems(a: readonly RoutineItem[], b: readonly RoutineItem[]):
   if (a.length !== b.length) return false;
   const la = linksOf(a);
   const lb = linksOf(b);
-  return a.every((x, i) => x.exerciseId === b[i]!.exerciseId && x.sets === b[i]!.sets) && la.every((on, i) => on === lb[i]);
+  return (
+    a.every(
+      (x, i) => x.exerciseId === b[i]!.exerciseId && x.sets === b[i]!.sets && x.reps === b[i]!.reps && (x.cue ?? "") === (b[i]!.cue ?? ""),
+    ) && la.every((on, i) => on === lb[i])
+  );
 }

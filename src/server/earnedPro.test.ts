@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { accessFor } from "./access";
 import { deleteAccount } from "./accounts";
 import { query, resetDb, run } from "./db";
-import { coachEarnsPro, EARNED, earnedUntil, inviteStatus, recordAccept, settleReferral } from "./earnedPro";
+import { clubEarnsPro, coachEarnsPro, EARNED, earnedUntil, inviteStatus, recordAccept, settleReferral } from "./earnedPro";
 import { setFlag } from "./flags";
 import { saveToken, setPushSender, type PushMessage } from "./push";
 import { sync } from "./sync";
@@ -128,6 +128,79 @@ describe("give a month, get a month", () => {
     await deleteAccount("inviter", async () => null);
     expect(await earnedUntil("inviter")).toBeNull();
     expect(await earnedUntil("friend")).not.toBeNull();
+  });
+});
+
+describe("campus clubs earn Pro", () => {
+  const club = (owner: string, id: string) =>
+    run("INSERT INTO clubs (id, owner_id, name, code, created_at) VALUES (?, ?, ?, ?, ?)", [id, owner, id, id, NOW]);
+  const join = (clubId: string, accountId: string) =>
+    run("INSERT INTO club_members (club_id, account_id, created_at) VALUES (?, ?, ?)", [clubId, accountId, NOW]);
+
+  /** The leader plus `others` members, each with one real workout at `at` (the leader too, unless `leaderTrains` is false). */
+  const crew = async (others: number, at = NOW - DAY, leaderTrains = true) => {
+    await club("leader", "crew");
+    await join("crew", "leader");
+    if (leaderTrains) await workouts("leader", 1, at);
+    for (let i = 0; i < others; i++) {
+      const id = `m${i}`;
+      await join("crew", id);
+      await workouts(id, 1, at);
+    }
+  };
+
+  it("while 5 or more members, the leader included, each trained in the last 14 days", async () => {
+    await crew(EARNED.clubMembers - 2);
+    expect(await clubEarnsPro("leader", NOW)).toBe(false);
+    await join("crew", "m-old");
+    await workouts("m-old", 1, NOW - 20 * DAY);
+    expect(await clubEarnsPro("leader", NOW)).toBe(false);
+    await join("crew", "m-new");
+    await workouts("m-new", 1, NOW - 13 * DAY);
+    expect(await clubEarnsPro("leader", NOW)).toBe(true);
+    expect(await accessFor("leader", null, NOW)).toMatchObject({ pro: true, via: "club" });
+    // Two weeks later nobody has trained: Pro goes.
+    expect(await clubEarnsPro("leader", NOW + 15 * DAY)).toBe(false);
+  });
+
+  it("doesn't count a bare finished workout, a club they only joined, or members split across two clubs", async () => {
+    await club("leader", "crew");
+    await join("crew", "leader");
+    await workouts("leader", 1, NOW - DAY, 0);
+    for (let i = 0; i < EARNED.clubMembers - 1; i++) {
+      await join("crew", `bare${i}`);
+      await workouts(`bare${i}`, 1, NOW - DAY, EARNED.setsPerWorkout - 1);
+    }
+    expect(await clubEarnsPro("leader", NOW)).toBe(false);
+
+    await club("someone", "theirs");
+    await join("theirs", "leader");
+    for (let i = 0; i < EARNED.clubMembers; i++) {
+      await join("theirs", `t${i}`);
+      await workouts(`t${i}`, 1, NOW - DAY);
+    }
+    expect(await clubEarnsPro("leader", NOW)).toBe(false);
+    expect(await clubEarnsPro("someone", NOW)).toBe(true);
+
+    await club("leader", "other");
+    await join("other", "leader");
+    await workouts("leader", 1, NOW - DAY);
+    for (let i = 0; i < EARNED.clubMembers - 2; i++) {
+      await join("crew", `a${i}`);
+      await join("other", `b${i}`);
+      await workouts(`a${i}`, 1, NOW - DAY);
+      await workouts(`b${i}`, 1, NOW - DAY);
+    }
+    // The leader plus three others on each club they started: neither club reaches 5.
+    expect(await clubEarnsPro("leader", NOW)).toBe(false);
+  });
+
+  it("stops when the campusClubs flag is off", async () => {
+    await crew(EARNED.clubMembers - 1);
+    expect(await clubEarnsPro("leader", NOW)).toBe(true);
+    await setFlag("campusClubs", false, 100, "test", NOW);
+    expect(await clubEarnsPro("leader", NOW)).toBe(false);
+    expect((await accessFor("leader", null, NOW)).pro).toBe(false);
   });
 });
 

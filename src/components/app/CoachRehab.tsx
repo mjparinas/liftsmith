@@ -162,10 +162,44 @@ export function protocolRoutine(
 /**
  * The rehab protocols a coach can assign in one tap (rehab.ts), with the phase to start in and whether the client may
  * move phases on their own when the pain rule says so (off by default: the physio decides).
+ * `selfServe` is the lifter's own sheet (2026-11-22): phase 1, and they move phases when the pain rule says so.
  */
-export function RehabPrograms({ onPick }: { onPick: (p: RehabProgram, phase: number, self: boolean) => void }) {
+export function RehabPrograms({
+  onPick,
+  selfServe = false,
+}: {
+  onPick: (p: RehabProgram, phase: number, self: boolean) => void;
+  selfServe?: boolean;
+}) {
   const [phase, setPhase] = useState(1);
   const [self, setSelf] = useState(false);
+  const programs = (
+    <ul className="space-y-2">
+      {REHAB_PROGRAMS.map((p) => (
+        <li key={p.id}>
+          <button
+            type="button"
+            onClick={() => onPick(p, selfServe ? 1 : phase, selfServe ? true : self)}
+            className="press card flex w-full items-center gap-3 px-4 py-3 text-left"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-semibold">{protocolName(p)}</span>
+              {(selfServe || phase === 1) && <span className="block text-sm text-muted">{rehabBody(p)}</span>}
+              <span className="mt-0.5 block text-xs text-muted">
+                {phaseItems(p, selfServe ? 1 : phase)
+                  .map((i) => liftName(i.exerciseId, new Map()))
+                  .join(", ")}
+              </span>
+            </span>
+            <span aria-hidden className="text-faint">
+              ›
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+  if (selfServe) return programs;
   return (
     <div className="mb-4">
       <p className="mb-1 text-sm font-semibold">{t("trn.rehabTitle")}</p>
@@ -183,30 +217,7 @@ export function RehabPrograms({ onPick }: { onPick: (p: RehabProgram, phase: num
       <p className="mt-1 text-xs text-muted">{phaseBody(phase)}</p>
       <InlineSwitch className="mt-2" label={t("rhp.selfLabel")} hint={t("rhp.selfHint")} on={self} onChange={setSelf} />
       <p className="mt-1 mb-2 text-xs text-muted">{t("rhp.rule", { need: PHASE_MIN_SESSIONS, easy: PAIN_EASY, high: PAIN_HIGH })}</p>
-      <ul className="space-y-2">
-        {REHAB_PROGRAMS.map((p) => (
-          <li key={p.id}>
-            <button
-              type="button"
-              onClick={() => onPick(p, phase, self)}
-              className="press card flex w-full items-center gap-3 px-4 py-3 text-left"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{protocolName(p)}</span>
-                {phase === 1 && <span className="block text-sm text-muted">{rehabBody(p)}</span>}
-                <span className="mt-0.5 block text-xs text-muted">
-                  {phaseItems(p, phase)
-                    .map((i) => liftName(i.exerciseId, new Map()))
-                    .join(", ")}
-                </span>
-              </span>
-              <span aria-hidden className="text-faint">
-                ›
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {programs}
     </div>
   );
 }

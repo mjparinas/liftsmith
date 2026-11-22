@@ -2,7 +2,7 @@
 // platform"). Pro can come from:
 // - the store review account (review.ts) or a lifetime code (pro_grants, creators.ts): Pro with nothing to manage;
 // - a web subscription through Stripe (stripe.ts), managed in Stripe's customer portal;
-// - months earned from invites, or coaching 3+ training clients (earnedPro.ts);
+// - months earned from invites, coaching 3+ training clients, or running a club with 5+ members training (earnedPro.ts);
 // - a Google Play or App Store subscription (RevenueCat's webhook keeps `entitlements` per install), once a phone that
 //   holds it has synced while signed in to the account (account_installs, written by the sync route);
 // - a high school coach's proven school address, or a place on their team for an athlete aged 13 to 18 (teams.ts).
@@ -11,12 +11,12 @@ import { isCoachTier } from "@/lib/coachPlans";
 
 import { hasLifetimePro } from "./creators";
 import { query, run } from "./db";
-import { coachEarnsPro, earnedUntil } from "./earnedPro";
+import { clubEarnsPro, coachEarnsPro, earnedUntil } from "./earnedPro";
 import { accountHasPro } from "./review";
 import { webSub, type WebSub } from "./stripe";
 import { schoolPro } from "./teams";
 
-export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach" | "school" | "team";
+export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach" | "club" | "school" | "team";
 
 export interface AccountSub extends WebSub {
   store: "web" | "play" | "appstore";
@@ -83,10 +83,12 @@ export async function accessFor(accountId: string, email: string | null, now = D
   if (web) return { pro: true, via: "web", sub: { ...web, store: "web" } };
   const store = await storeSub(accountId, now);
   if (store) return { pro: true, via: store.store, sub: store };
-  // Earned, not bought (earnedPro.ts): months from friends' invites, then coaching 3+ clients who are training.
+  // Earned, not bought (earnedPro.ts): months from friends' invites, then coaching 3+ clients who are training,
+  // then a club the lifter started with 5+ members who each trained in the last 14 days.
   const until = await earnedUntil(accountId);
   if (until != null && until > now) return { pro: true, via: "referral", sub: null };
   if (await coachEarnsPro(accountId, now)) return { pro: true, via: "coach", sub: null };
+  if (await clubEarnsPro(accountId, now)) return { pro: true, via: "club", sub: null };
   // School teams (teams.ts): free for verified high school coaches and their athletes aged 13 to 18.
   const school = await schoolPro(accountId, now);
   if (school) return { pro: true, via: school, sub: null };

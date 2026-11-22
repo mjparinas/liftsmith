@@ -163,6 +163,14 @@ export const pl: FeaturesText = {
       body: "Program od fizjoterapeuty czeka na ekranie Dziś, zapisujesz go jednym dotknięciem i od razu notuje kontuzję, której dotyczy. Trzyma się zaleconej liczby razy w tygodniu, pokazuje się w dni wolne i pyta o ból tylko przy tej kontuzji.",
       note: "Przypomnienia o rehabilitacji i powiadomienie o nowym programie są na Androidzie i iPhonie.",
     },
+    "rehab-self": {
+      name: "Łagodna rehabilitacja bez fizjoterapeuty",
+      body: "Zapisujesz kontuzję i nie masz fizjoterapeuty? Kontuzje i notatka coacha proponują krótką rutynę z ciężarem ciała do zrobienia w domu. To punkt wyjścia, nie leczenie.",
+    },
+    "rehab-end": {
+      name: "Gdy fizjoterapeuta zabiera program",
+      body: "Jeśli fizjoterapeuta zabiera program, Dziś pyta, czy go zatrzymać, czy ćwiczyć dalej na własną rękę. Zatrzymanie usuwa rutynę i jej przypomnienia.",
+    },
     cycle: {
       name: "Gotowość z uwzględnieniem cyklu",
       body: "Jeśli chcesz, zapisuj cykl, a decyzja na dziś weźmie go pod uwagę.",
@@ -431,6 +439,11 @@ export const pl: FeaturesText = {
       body: "Rozmawiaj z klubem między treningami, podaj godzinę i miejsce na wspólny trening i zobacz, kto idzie. Każdy, kto idzie, dostaje przypomnienie godzinę wcześniej, a gdy potem opublikujesz trening, pojawisz się jako po treningu, z oznaczonymi znajomymi, z którymi ćwiczysz.",
       note: "Dla osób, które mają co najmniej 18 lat. Powiadomienia działają na Androidzie i iPhonie; aplikacja webowa pokazuje nowe wiadomości, gdy czat jest otwarty.",
     },
+    "campus-clubs": {
+      name: "Pro dla liderów aktywnego klubu",
+      body: "Prowadź klub, w którym 5 lub więcej członków, razem z Tobą, skończyło trening w ostatnich 14 dniach, a Pro jest dla Ciebie za darmo, dopóki tak zostaje.",
+      note: "Dołączenie do cudzego klubu się nie liczy, a dwa kluby się nie sumują.",
+    },
     profiles: {
       name: "Publiczne profile",
       body: "Opcjonalna publiczna strona z twoimi najlepszymi wynikami i treningami.",
@@ -475,6 +488,11 @@ export const pl: FeaturesText = {
     "rehab-phases": {
       name: "Protokoły rehabilitacji etapami, prowadzone przez ból",
       body: "Każdy program rehabilitacji ma trzy etapy, od wyciszenia okolicy do pełnej sprawności. Prosta reguła bólu czyta oceny po każdym ćwiczeniu i następnego dnia, mówi, kiedy podopieczny jest gotowy na następny etap albo powinien wrócić, a fizjoterapeuta wysyła go jednym dotknięciem.",
+      note: "Podopieczni korzystają za darmo. Liftsmith pokazuje, co zapisują podopieczni. Nie diagnozuje ani nie leczy.",
+    },
+    "rehab-shape": {
+      name: "Ułóż rutynę rehabilitacji",
+      body: "Fizjoterapeuci ustawiają powtórzenia albo sekundy każdego ćwiczenia w rutynie rehabilitacji i dodają krótką wskazówkę, w edytorze rutyn. Podopieczni robią ją tak, jak jest zapisana.",
       note: "Podopieczni korzystają za darmo. Liftsmith pokazuje, co zapisują podopieczni. Nie diagnozuje ani nie leczy.",
     },
     "coach-nutrition": {

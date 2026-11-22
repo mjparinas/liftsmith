@@ -97,6 +97,12 @@ export const en = {
   "inj.ret.stopped": "The graded return stopped when pain reached {score}. Skipped exercises stay out until it settles again.",
   "inj.noneTitle": "Nothing hurts",
   "inj.noneBody": "Your plans use every exercise your gym allows.",
+  "inj.rehabTitle": "Add gentle rehab",
+  "inj.rehabBody": "A short starting routine for your {part}. It isn't a treatment, and you can stop if it feels wrong.",
+  "inj.rehabBodyMany": "Short starting routines for {parts}. They aren't a treatment, and you can stop if one feels wrong.",
+  "inj.rehabAdd": "Add gentle rehab",
+  "inj.rehabSheet": "Gentle rehab",
+  "inj.rehabDisclaimer": "A starting point you can do at home, not a treatment. Stop if anything feels sharp or wrong.",
 } as const;
 
 type Key = keyof typeof en;
@@ -196,6 +202,12 @@ export const es: Partial<Record<Key, Message>> = {
     "La vuelta gradual se detuvo cuando el dolor llegó a {score}. Los ejercicios omitidos siguen fuera hasta que se calme de nuevo.",
   "inj.noneTitle": "Nada te duele",
   "inj.noneBody": "Tus planes usan todos los ejercicios que permite tu gimnasio.",
+  "inj.rehabTitle": "Añadir rehabilitación suave",
+  "inj.rehabBody": "Una rutina corta de partida para tu {part}. No es un tratamiento, y puedes parar si se siente mal.",
+  "inj.rehabBodyMany": "Rutinas cortas de partida para {parts}. No son un tratamiento, y puedes parar si alguna se siente mal.",
+  "inj.rehabAdd": "Añadir rehabilitación suave",
+  "inj.rehabSheet": "Rehabilitación suave",
+  "inj.rehabDisclaimer": "Un punto de partida para hacer en casa, no un tratamiento. Para si algo se siente agudo o mal.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -294,6 +306,12 @@ export const fr: Partial<Record<Key, Message>> = {
     "La reprise progressive s’est arrêtée quand la douleur a atteint {score}. Les exercices ignorés restent écartés jusqu’à ce que ça se calme.",
   "inj.noneTitle": "Rien ne fait mal",
   "inj.noneBody": "Vos plans utilisent tous les exercices que votre salle permet.",
+  "inj.rehabTitle": "Ajouter une rééducation douce",
+  "inj.rehabBody": "Une courte routine de départ pour votre {part}. Ce n'est pas un traitement, et vous pouvez arrêter si ça ne va pas.",
+  "inj.rehabBodyMany": "De courtes routines de départ pour {parts}. Ce n'est pas un traitement, et vous pouvez arrêter si l'une ne va pas.",
+  "inj.rehabAdd": "Ajouter une rééducation douce",
+  "inj.rehabSheet": "Rééducation douce",
+  "inj.rehabDisclaimer": "Un point de départ à faire à la maison, pas un traitement. Arrêtez si quelque chose pique ou semble faux.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -393,6 +411,13 @@ export const de: Partial<Record<Key, Message>> = {
     "Die schrittweise Rückkehr wurde gestoppt, als der Schmerz {score} erreichte. Übersprungene Übungen bleiben weg, bis es wieder abklingt.",
   "inj.noneTitle": "Nichts tut weh",
   "inj.noneBody": "Deine Pläne nutzen jede Übung, die dein Studio erlaubt.",
+  "inj.rehabTitle": "Sanfte Reha hinzufügen",
+  "inj.rehabBody":
+    "Eine kurze Startroutine für dein {part}. Sie ist keine Behandlung, und du kannst aufhören, wenn sich etwas falsch anfühlt.",
+  "inj.rehabBodyMany": "Kurze Startroutinen für {parts}. Sie sind keine Behandlung, und du kannst aufhören, wenn sich eine falsch anfühlt.",
+  "inj.rehabAdd": "Sanfte Reha hinzufügen",
+  "inj.rehabSheet": "Sanfte Reha",
+  "inj.rehabDisclaimer": "Ein Anfang für zu Hause, keine Behandlung. Hör auf, wenn sich etwas stechend oder falsch anfühlt.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -491,6 +516,12 @@ export const it: Partial<Record<Key, Message>> = {
     "Il ritorno graduale si è interrotto quando il dolore ha raggiunto {score}. Gli esercizi saltati restano fuori finché non si calma di nuovo.",
   "inj.noneTitle": "Nessun dolore",
   "inj.noneBody": "I tuoi piani usano tutti gli esercizi che la palestra consente.",
+  "inj.rehabTitle": "Aggiungi una riabilitazione dolce",
+  "inj.rehabBody": "Una breve routine di partenza per il tuo {part}. Non è una cura, e puoi fermarti se non va.",
+  "inj.rehabBodyMany": "Brevi routine di partenza per {parts}. Non sono una cura, e puoi fermarti se una non va.",
+  "inj.rehabAdd": "Aggiungi una riabilitazione dolce",
+  "inj.rehabSheet": "Riabilitazione dolce",
+  "inj.rehabDisclaimer": "Un punto di partenza da fare a casa, non una cura. Fermati se qualcosa punge o non va.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -586,6 +617,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "inj.ret.stopped": "痛みが{score}に達したため、段階的な復帰を中止しました。落ち着くまで、スキップした種目は外したままにします。",
   "inj.noneTitle": "痛みはありません",
   "inj.noneBody": "プランではジムで可能なすべての種目を使います。",
+  "inj.rehabTitle": "やさしいリハビリを追加",
+  "inj.rehabBody": "{part}のための短い出発ルーティンです。治療ではなく、違和感があれば中止できます。",
+  "inj.rehabBodyMany": "{parts}のための短い出発ルーティンです。治療ではなく、違和感があれば中止できます。",
+  "inj.rehabAdd": "やさしいリハビリを追加",
+  "inj.rehabSheet": "やさしいリハビリ",
+  "inj.rehabDisclaimer": "家でできる出発点であり、治療ではありません。鋭い痛みや違和感があれば中止してください。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -695,6 +732,12 @@ export const pt: Partial<Record<Key, Message>> = {
   "inj.ret.stopped": "O retorno gradual parou quando a dor chegou a {score}. Os exercícios pulados ficam de fora até melhorar de novo.",
   "inj.noneTitle": "Nada dói",
   "inj.noneBody": "Seus planos usam todos os exercícios que sua academia permite.",
+  "inj.rehabTitle": "Adicionar reabilitação leve",
+  "inj.rehabBody": "Uma rotina curta de partida para o seu {part}. Não é um tratamento, e você pode parar se parecer errado.",
+  "inj.rehabBodyMany": "Rotinas curtas de partida para {parts}. Não são um tratamento, e você pode parar se uma parecer errada.",
+  "inj.rehabAdd": "Adicionar reabilitação leve",
+  "inj.rehabSheet": "Reabilitação leve",
+  "inj.rehabDisclaimer": "Um ponto de partida para fazer em casa, não um tratamento. Pare se algo doer de forma aguda ou parecer errado.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -798,6 +841,12 @@ export const ko: Partial<Record<Key, Message>> = {
   "inj.ret.stopped": "통증이 {score}에 도달해 단계적 복귀를 멈췄어요. 건너뛴 운동 동작은 통증이 다시 가라앉을 때까지 빠져 있어요.",
   "inj.noneTitle": "아픈 곳 없음",
   "inj.noneBody": "헬스장에서 할 수 있는 모든 운동 동작으로 계획해요.",
+  "inj.rehabTitle": "가벼운 재활 추가",
+  "inj.rehabBody": "{part}를 위한 짧은 시작 루틴이에요. 치료가 아니며, 이상하면 멈출 수 있어요.",
+  "inj.rehabBodyMany": "{parts}를 위한 짧은 시작 루틴이에요. 치료가 아니며, 이상하면 멈출 수 있어요.",
+  "inj.rehabAdd": "가벼운 재활 추가",
+  "inj.rehabSheet": "가벼운 재활",
+  "inj.rehabDisclaimer": "집에서 할 수 있는 출발점이지 치료가 아니에요. 날카롭거나 이상하면 멈추세요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -907,6 +956,12 @@ export const tr: Partial<Record<Key, Message>> = {
   "inj.ret.stopped": "Kademeli dönüş, ağrı {score} olunca durdu. Atlanan egzersizler ağrı tekrar geçene kadar dışarıda kalır.",
   "inj.noneTitle": "Ağrıyan bir yer yok",
   "inj.noneBody": "Planların salonunun izin verdiği her egzersizi kullanır.",
+  "inj.rehabTitle": "Hafif rehabilitasyon ekle",
+  "inj.rehabBody": "{part} için kısa bir başlangıç rutini. Tedavi değildir ve yanlış gelirse durabilirsin.",
+  "inj.rehabBodyMany": "{parts} için kısa başlangıç rutinleri. Tedavi değildir ve biri yanlış gelirse durabilirsin.",
+  "inj.rehabAdd": "Hafif rehabilitasyon ekle",
+  "inj.rehabSheet": "Hafif rehabilitasyon",
+  "inj.rehabDisclaimer": "Evde yapabileceğin bir başlangıç, tedavi değil. Keskin veya yanlış gelirse dur.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1024,4 +1079,10 @@ export const pl: Partial<Record<Key, Message>> = {
     "Stopniowy powrót zatrzymał się, gdy ból doszedł do {score}. Pominięte ćwiczenia zostają wyłączone, dopóki ból znów nie ustąpi.",
   "inj.noneTitle": "Nic nie boli",
   "inj.noneBody": "Twoje plany używają każdego ćwiczenia, na które pozwala twoja siłownia.",
+  "inj.rehabTitle": "Dodaj łagodną rehabilitację",
+  "inj.rehabBody": "Krótka rutyna na start dla: {part}. To nie leczenie i możesz przerwać, jeśli coś wyda się nie tak.",
+  "inj.rehabBodyMany": "Krótkie rutyny na start dla: {parts}. To nie leczenie i możesz przerwać, jeśli któraś wyda się nie tak.",
+  "inj.rehabAdd": "Dodaj łagodną rehabilitację",
+  "inj.rehabSheet": "Łagodna rehabilitacja",
+  "inj.rehabDisclaimer": "Punkt wyjścia do zrobienia w domu, nie leczenie. Przerwij, jeśli coś zakłuje albo wyda się nie tak.",
 };

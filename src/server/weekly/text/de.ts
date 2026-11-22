@@ -1025,4 +1025,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Es sind nur Summen, von Sportlern, die ihre Besuche mitzählen lassen, und es beginnt ab fünf Sportlern. Du siehst nie, wer.",
   },
+  "rehab-self": {
+    title: "Eine sanfte Routine, wenn etwas wehtut",
+    intro:
+      "Du hast eine Verletzung eingetragen und keine Physiotherapie? Eine kurze Routine mit dem eigenen Körpergewicht wartet, unter Verletzungen und in einem Hinweis des Coaches.",
+    points: [
+      "Sie erscheint für eine Verletzung, die du schon eingetragen hast, sobald nichts anderes diese Stelle abdeckt.",
+      "Öffne sie unter Verletzungen oder über den Hinweis auf Heute und füge sie mit einem Tipp hinzu.",
+      "Sie ist mit dem eigenen Körpergewicht, kurz genug für zu Hause, und kann neben deinem Training stehen.",
+      "Sie sagt nie, was nicht stimmt oder was es behebt. Es ist ein Anfang, keine Behandlung.",
+    ],
+    dyk: "Ein Programm der Physiotherapie für dieselbe Stelle ersetzt sie, damit du nicht zweimal gefragt wirst.",
+  },
+  "rehab-shape": {
+    title: "Wiederholungen, Sekunden und einen Hinweis setzen",
+    intro:
+      "Eine Reha-Routine kann jetzt genau das tragen, was du für jede Übung willst: die Wiederholungen oder die Sekunden, und einen kurzen Hinweis.",
+    points: [
+      "Im Routine-Editor setzt du die Wiederholungen oder die Sekunden jeder Übung. Leer lassen, und die App wählt die Wiederholungen.",
+      "Halteübungen starten in Sekunden, damit eine zeitliche Übung in der Zeit bleibt, nicht in Wiederholungen.",
+      "Füge unter der Übung einen kurzen Hinweis hinzu, das eine, woran sie denken sollen.",
+      "Klienten folgen ihr so, wie sie geschrieben ist. Ein älteres Telefon öffnet die Routine und lässt den Hinweis einfach weg.",
+    ],
+    dyk: "Die Schmerzfragen, die Male pro Woche und die drei Phasen funktionieren wie bisher.",
+  },
+  "campus-clubs": {
+    title: "Pro für einen Club, der weiter trainiert",
+    intro: "Leite einen Club, in dem wirklich trainiert wird, und Pro ist für dich kostenlos, solange das so bleibt.",
+    points: [
+      "Fünf oder mehr Mitglieder, du eingeschlossen, beenden in den letzten 14 Tagen je ein Training.",
+      "Ein Club muss es schaffen. Zwei ruhigere Clubs werden nicht zusammengerechnet.",
+      "Ein Club, dem du nur beigetreten bist, zählt nicht. Du musst ihn gegründet haben.",
+      "Es bleibt, solange der Club trainiert, und endet, wenn diese zwei Wochen still werden.",
+    ],
+    dyk: "Der Club sagt es auf seiner Seite, und der Pro-Bildschirm sagt, dass es mit deinem Konto kommt.",
+  },
 };

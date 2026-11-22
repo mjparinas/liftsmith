@@ -166,6 +166,12 @@ export const WEEKLY: WeeklyEmail[] = [
   L("pregnancy", "free", "settings/body", { fresh: "2026-11-19", notMale: true }),
   // New, 2026-11-19: insights for gym owners (docs/decisions/gyms.md "Owner insights").
   R("gym-insights", "gym", "free", "gym", { fresh: "2026-11-19", shot: false }),
+  // New, 2026-11-22: gentle rehab without a physio (Injuries and a coach's note).
+  L("rehab-self", "free", "injuries", { fresh: "2026-11-22" }),
+  // New, 2026-11-22: physios set reps or seconds and a cue on a rehab routine (docs/decisions/trainer-mode.md).
+  R("rehab-shape", "physio", "pro", "trainer", { fresh: "2026-11-22", shot: false }),
+  // New, 2026-11-22: club leaders earn Pro while the club keeps training (docs/decisions/growth.md "Campus clubs").
+  L("campus-clubs", "free", "friends", { fresh: "2026-11-22", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

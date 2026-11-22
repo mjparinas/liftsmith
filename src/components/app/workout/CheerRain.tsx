@@ -7,10 +7,13 @@
 // screen reader hears "Alex cheered you on 🔥" once.
 //
 // Cheers are read when the screen opens, after each logged set, when a cheer's push arrives while the app is open
-// (phones), and every 30 seconds while the screen is on and the lifter shares their training. Nothing while away.
+// (phones), and every 30 seconds while the screen is on on iPhone (until APNs) and the web (no push). Android skips
+// the timed read once a push token is on the device; open, each set and cheer pushes still refresh. Nothing while away.
+import { Capacitor } from "@capacitor/core";
 import { useEffect, useRef, useState } from "react";
 
 import { t } from "@/lib/i18n";
+import { pushTokenOnDevice } from "@/lib/push";
 import { calm } from "@/lib/juice";
 import { useSocial } from "@/lib/social";
 import { loadCheers, onCheerPush } from "@/lib/socialLive";
@@ -59,10 +62,16 @@ function drain(queue: CheerIn[], timers: ReturnType<typeof setTimeout>[], setSho
   if (queue.length) timers.push(setTimeout(() => drain(queue, timers, setShown), take.length * STAGGER_MS + FLOAT_MS));
 }
 
+function cheersTimedPoll(): boolean {
+  if (Capacitor.getPlatform() === "android" && pushTokenOnDevice()) return false;
+  return true;
+}
+
 export function CheerRain({ sessionId, startedAt }: { sessionId: string; startedAt: number }) {
   const sharing = useSocial((s) => !!s.me?.profile?.live && s.me.profile.cheers !== false);
   const setsDone = useApp((s) => s.events.length);
-  const tick = useNow(30_000);
+  const timedPoll = cheersTimedPoll();
+  const tick = useNow(timedPoll ? 30_000 : 86_400_000);
   const [shown, setShown] = useState<Shown[]>([]);
   const [said, setSaid] = useState("");
   const since = useRef(0);
@@ -89,7 +98,7 @@ export function CheerRain({ sessionId, startedAt }: { sessionId: string; started
     return () => {
       live = false;
     };
-  }, [sharing, sessionId, startedAt, setsDone, tick, pushes]);
+  }, [sharing, sessionId, startedAt, setsDone, pushes, ...(timedPoll ? [tick] : [])]);
 
   useEffect(() => {
     const all = timers.current;

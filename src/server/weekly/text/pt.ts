@@ -1026,4 +1026,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "São só totais, de atletas que contam suas visitas, e começa quando cinco treinaram lá. Você nunca vê quem.",
   },
+  "rehab-self": {
+    title: "Uma rotina leve quando algo dói",
+    intro:
+      "Registrou uma lesão e não tem fisioterapeuta? Uma rotina curta com o peso do corpo fica pronta quando você quiser, em Lesões e numa nota do coach.",
+    points: [
+      "Ela aparece para uma lesão que você já registrou, quando nada mais cobre essa região.",
+      "Abra em Lesões ou pela nota em Hoje e adicione com um toque.",
+      "É com o peso do corpo, curta o bastante para fazer em casa, e pode ficar ao lado do seu treino.",
+      "Ela nunca diz o que está errado nem o que vai resolver. É um ponto de partida, não um tratamento.",
+    ],
+    dyk: "Um programa de um fisioterapeuta para a mesma região substitui essa rotina, então você não é perguntado duas vezes.",
+  },
+  "rehab-shape": {
+    title: "Defina as repetições, os segundos e uma dica",
+    intro:
+      "Uma rotina de reabilitação agora pode levar exatamente o que você quer em cada exercício: as repetições ou os segundos, e uma dica curta.",
+    points: [
+      "No editor de rotinas, aumente as repetições ou os segundos de cada exercício. Deixe vazio e o app escolhe as repetições.",
+      "As isometrias começam em segundos, então um exercício cronometrado fica no tempo, não em repetições.",
+      "Acrescente uma dica curta sob o exercício, a única coisa que você quer que lembrem.",
+      "Os alunos seguem como está escrito. Um telefone mais antigo ainda abre a rotina e simplesmente deixa a dica de fora.",
+    ],
+    dyk: "As perguntas de dor, as vezes por semana e as três fases funcionam como antes.",
+  },
+  "campus-clubs": {
+    title: "Pro para um clube que continua treinando",
+    intro: "Lidere um clube onde as pessoas realmente treinam, e o Pro fica grátis para você enquanto isso continuar.",
+    points: [
+      "Cinco ou mais membros, você incluído, terminam cada um um treino nos últimos 14 dias.",
+      "Um clube só precisa chegar lá. Dois clubes mais quietos não se somam.",
+      "Um clube em que você só entrou não conta. Você precisa ser quem começou.",
+      "Continua enquanto o clube treina e para quando essa quinzena fica em silêncio.",
+    ],
+    dyk: "O clube diz isso na página dele, e a tela do Pro diz que vem com a sua conta.",
+  },
 };

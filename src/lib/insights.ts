@@ -12,6 +12,7 @@ import { foodDays, loggedWeek, proteinShort, weekIntake } from "./nutrition";
 import { coolHrHigh, rehabPainTrends } from "./partMetrics";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
 import { gradedSet, sessionsOf, TIMED } from "./progression";
+import { rehabSelfNote } from "./rehabSelf";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -499,6 +500,18 @@ export function insights({ events, profile, now, streak, coachTargets }: Insight
       why: t("ins.rehabPain.why", nums),
       advice: t(down ? "ins.rehabPainDown.advice" : "ins.rehabPainUp.advice"),
       action: { kind: "go", route: "injuries", label: t("ins.rehabPain.action") },
+    });
+  }
+  const selfRehab = rehabSelfNote(events, profile.routines, now);
+  if (selfRehab) {
+    const area = inSentence(PART_LABEL[selfRehab.part]);
+    out.push({
+      id: `rehab-self-${selfRehab.id}`,
+      tone: "info",
+      title: t("ins.rehabSelf.title", { area }),
+      why: t("ins.rehabSelf.why", { area, days: selfRehab.days, count: selfRehab.days }),
+      advice: t("ins.rehabSelf.advice"),
+      action: { kind: "go", route: "injuries/rehab", label: t("ins.rehabSelf.action") },
     });
   }
   const cool = coolHrHigh(events, now);

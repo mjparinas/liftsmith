@@ -121,6 +121,14 @@ export const de: FeaturesText = {
       body: "Ein Programm deiner Physiotherapie wartet auf Heute und ist mit einem Tipp gespeichert, samt der Verletzung, für die es gedacht ist. Es folgt den gewünschten Malen pro Woche, erscheint an Ruhetagen und fragt nur für diese Verletzung nach Schmerzen.",
       note: "Reha-Erinnerungen und die Mitteilung zu einem neuen Programm gibt es auf Android und iPhone.",
     },
+    "rehab-self": {
+      name: "Sanfte Reha ohne Physiotherapie",
+      body: "Du hast eine Verletzung eingetragen und keine Physiotherapie? Verletzungen und ein Hinweis des Coaches bieten eine kurze Routine mit dem eigenen Körpergewicht für zu Hause. Es ist ein Anfang, keine Behandlung.",
+    },
+    "rehab-end": {
+      name: "Wenn die Physiotherapie ein Programm zurücknimmt",
+      body: "Nimmt deine Physiotherapie ein Programm zurück, fragt Heute, ob du es beendest oder allein weiterführst. Beenden entfernt die Routine und ihre Erinnerungen.",
+    },
     cycle: {
       name: "Bereitschaft nach Zyklus",
       body: "Wenn du möchtest, trägst du deinen Zyklus ein, und die heutige Ansage berücksichtigt ihn.",
@@ -377,6 +385,11 @@ export const de: FeaturesText = {
       body: "Schreib mit deinem Club zwischen den Trainings, schlag eine Zeit und einen Ort für ein gemeinsames Training vor und sieh, wer dabei ist. Alle, die dabei sind, bekommen eine Stunde vorher eine Erinnerung, und wer danach sein Training postet, steht als trainiert da, mit den Freunden markiert, die mittrainiert haben.",
       note: "Ab 18 Jahren. Mitteilungen gibt es auf Android und dem iPhone; die Web-App zeigt neue Nachrichten, solange der Chat offen ist.",
     },
+    "campus-clubs": {
+      name: "Pro für aktive Club-Leitungen",
+      body: "Leite einen Club, in dem 5 oder mehr Mitglieder, du eingeschlossen, in den letzten 14 Tagen je ein Training beendet haben, und Pro ist für dich kostenlos, solange das so bleibt.",
+      note: "Einem fremden Club beizutreten zählt nicht, und zwei Clubs werden nicht zusammengerechnet.",
+    },
     profiles: { name: "Öffentliche Profile", body: "Eine optionale öffentliche Seite mit deinen besten Lifts und Trainings." },
     "tagline-gym": {
       name: "Motto und Stammstudio",
@@ -413,6 +426,11 @@ export const de: FeaturesText = {
     "rehab-phases": {
       name: "Reha-Protokolle in Phasen, gesteuert vom Schmerz",
       body: "Jedes Reha-Programm hat drei Phasen, vom Beruhigen bis zur vollen Belastung. Eine einfache Schmerzregel liest die Bewertungen nach jeder Übung und am nächsten Tag, sagt, wann jemand bereit für die nächste Phase ist oder eine zurück sollte, und die Physiotherapie schickt sie mit einem Tipp.",
+      note: "Für Kundinnen und Kunden kostenlos. Liftsmith zeigt, was erfasst wird. Es stellt keine Diagnosen und behandelt nichts.",
+    },
+    "rehab-shape": {
+      name: "Eine Reha-Routine formen",
+      body: "Physiotherapeutinnen und Physiotherapeuten legen die Wiederholungen oder die Sekunden jeder Übung einer Reha-Routine fest und fügen einen kurzen Hinweis hinzu, im Routine-Editor. Klienten folgen ihr so, wie sie geschrieben ist.",
       note: "Für Kundinnen und Kunden kostenlos. Liftsmith zeigt, was erfasst wird. Es stellt keine Diagnosen und behandelt nichts.",
     },
     "coach-nutrition": {

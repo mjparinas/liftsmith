@@ -484,6 +484,13 @@ export interface RoutineItem {
   sets: number;
   /** Superset: neighbours with the same group are done back to back. */
   group?: string;
+  /**
+   * A physio's prescribed reps, or seconds when the exercise is timed (1 to 120). Missing: progression picks them.
+   * Only used when the routine is a rehab program (2026-11-22).
+   */
+  reps?: number;
+  /** A short cue from the physio (about 80 characters). Missing: the usual target note. */
+  cue?: string;
 }
 
 /** The built-in rehab protocols, one per area (rehab.ts). */
@@ -524,6 +531,11 @@ export interface Routine {
    * a routine that isn't one of the built-in protocols.
    */
   rehabPlan?: RehabPlan;
+  /**
+   * The coach plan this routine was saved from (2026-11-22). When that plan disappears, Today asks whether to stop
+   * the program or keep doing it. Stays on the phone with the routine; it does not travel in a share code.
+   */
+  assignedPlan?: { id: string; coachId: string };
   /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.

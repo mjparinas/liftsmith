@@ -112,6 +112,13 @@ export const en = {
   "ins.food.measuredToo": "Maintenance here is measured from {days} days of your own food and weigh-ins.",
   "ins.stall.cutToo":
     "You've also eaten about {gap} a day under maintenance this past week, and strength rarely climbs in a deficit, so holding it is a fair result.",
+  "ins.rehabSelf.title": "A gentle routine for your {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} has been logged for {days} day, and there's no gentle rehab routine for it.",
+    other: "{area} has been logged for {days} days, and there's no gentle rehab routine for it.",
+  },
+  "ins.rehabSelf.advice": "A short bodyweight routine is a starting point you can do at home. It isn't a treatment.",
+  "ins.rehabSelf.action": "Add gentle rehab",
 } as const;
 
 type Key = keyof typeof en;
@@ -231,6 +238,13 @@ export const es: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "Aquí el mantenimiento se mide con {days} días de tu propia comida y tus pesajes.",
   "ins.stall.cutToo":
     "Además, esta semana has comido unas {gap} al día por debajo del mantenimiento, y la fuerza rara vez sube en déficit, así que mantenerla es un buen resultado.",
+  "ins.rehabSelf.title": "Una rutina suave para tu {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} lleva {days} día registrado y no hay una rutina suave de rehabilitación para esa zona.",
+    other: "{area} lleva {days} días registrado y no hay una rutina suave de rehabilitación para esa zona.",
+  },
+  "ins.rehabSelf.advice": "Una rutina corta con el peso del cuerpo es un punto de partida para hacer en casa. No es un tratamiento.",
+  "ins.rehabSelf.action": "Añadir rehabilitación suave",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -351,6 +365,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "Ici, le maintien est mesuré sur {days} jours de vos propres repas et pesées.",
   "ins.stall.cutToo":
     "Vous avez aussi mangé environ {gap} par jour sous votre maintien cette semaine, et la force monte rarement en déficit : la garder est un bon résultat.",
+  "ins.rehabSelf.title": "Une routine douce pour votre {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} est noté depuis {days} jour, et il n'y a pas de routine de rééducation douce pour cette zone.",
+    other: "{area} est noté depuis {days} jours, et il n'y a pas de routine de rééducation douce pour cette zone.",
+  },
+  "ins.rehabSelf.advice": "Une courte routine au poids du corps est un point de départ à faire à la maison. Ce n'est pas un traitement.",
+  "ins.rehabSelf.action": "Ajouter une rééducation douce",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -469,6 +490,13 @@ export const de: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "Der Erhaltungsbedarf ist hier aus {days} Tagen deiner eigenen Ernährung und Wiegungen gemessen.",
   "ins.stall.cutToo":
     "Du hast diese Woche außerdem etwa {gap} am Tag unter deinem Erhaltungsbedarf gegessen, und im Defizit steigt die Kraft selten, sie zu halten ist also ein gutes Ergebnis.",
+  "ins.rehabSelf.title": "Eine sanfte Routine für dein {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} ist seit {days} Tag eingetragen, und es gibt noch keine sanfte Reha-Routine dafür.",
+    other: "{area} ist seit {days} Tagen eingetragen, und es gibt noch keine sanfte Reha-Routine dafür.",
+  },
+  "ins.rehabSelf.advice": "Eine kurze Routine mit dem eigenen Körpergewicht ist ein Anfang für zu Hause. Sie ist keine Behandlung.",
+  "ins.rehabSelf.action": "Sanfte Reha hinzufügen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -588,6 +616,13 @@ export const it: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "Qui il mantenimento è misurato su {days} giorni dei tuoi pasti e delle tue pesate.",
   "ins.stall.cutToo":
     "Questa settimana hai anche mangiato circa {gap} al giorno sotto il mantenimento, e in deficit la forza sale di rado, quindi mantenerla è un buon risultato.",
+  "ins.rehabSelf.title": "Una routine dolce per il tuo {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} è segnato da {days} giorno e non c'è una routine di riabilitazione dolce per quella zona.",
+    other: "{area} è segnato da {days} giorni e non c'è una routine di riabilitazione dolce per quella zona.",
+  },
+  "ins.rehabSelf.advice": "Una breve routine a corpo libero è un punto di partenza da fare a casa. Non è una cura.",
+  "ins.rehabSelf.action": "Aggiungi una riabilitazione dolce",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -689,6 +724,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "ここでの維持カロリーは、あなた自身の{days}日分の食事と体重記録から測っています。",
   "ins.stall.cutToo":
     "この1週間は維持カロリーより1日約{gap}少なく食べています。カロリー不足の間は筋力が伸びにくいので、維持できていれば十分な結果です。",
+  "ins.rehabSelf.title": "{area}のやさしいルーティン",
+  "ins.rehabSelf.why": {
+    other: "{area}を記録してから{days}日たち、その部位のやさしいリハビリがまだありません。",
+  },
+  "ins.rehabSelf.advice": "短い自重のルーティンは、家でできる出発点です。治療ではありません。",
+  "ins.rehabSelf.action": "やさしいリハビリを追加",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -814,6 +855,13 @@ export const pt: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "A manutenção aqui é medida a partir de {days} dias da sua própria alimentação e pesagens.",
   "ins.stall.cutToo":
     "Você também comeu cerca de {gap} por dia abaixo da manutenção na última semana, e a força raramente sobe em déficit, então mantê-la já é um bom resultado.",
+  "ins.rehabSelf.title": "Uma rotina leve para o seu {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} está registrado há {days} dia e não há uma rotina leve de reabilitação para essa região.",
+    other: "{area} está registrado há {days} dias e não há uma rotina leve de reabilitação para essa região.",
+  },
+  "ins.rehabSelf.advice": "Uma rotina curta com o peso do corpo é um ponto de partida para fazer em casa. Não é um tratamento.",
+  "ins.rehabSelf.action": "Adicionar reabilitação leve",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -923,6 +971,12 @@ export const ko: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "여기서 유지 칼로리는 {days}일간의 내 식단과 체중 기록으로 측정했어요.",
   "ins.stall.cutToo":
     "지난주에는 유지 칼로리보다 하루 약 {gap} 적게 먹기도 했어요. 칼로리 적자 상태에서는 근력이 잘 오르지 않으니, 유지한 것만으로도 괜찮은 결과예요.",
+  "ins.rehabSelf.title": "{area}를 위한 가벼운 루틴",
+  "ins.rehabSelf.why": {
+    other: "{area}를 기록한 지 {days}일이 지났고, 그 부위의 가벼운 재활 루틴이 없어요.",
+  },
+  "ins.rehabSelf.advice": "짧은 맨몸 루틴은 집에서 할 수 있는 출발점이에요. 치료가 아니에요.",
+  "ins.rehabSelf.action": "가벼운 재활 추가",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1044,6 +1098,13 @@ export const tr: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "Buradaki koruma değeri, {days} günlük kendi yemek ve tartı kayıtlarından ölçüldü.",
   "ins.stall.cutToo":
     "Geçen hafta günde yaklaşık {gap} koruma değerinin altında da yedin ve kalori açığında güç nadiren artar; bu yüzden onu korumak iyi bir sonuç.",
+  "ins.rehabSelf.title": "{area} için hafif bir rutin",
+  "ins.rehabSelf.why": {
+    one: "{area} {days} gündür kayıtlı ve bu bölge için hafif bir rehabilitasyon rutini yok.",
+    other: "{area} {days} gündür kayıtlı ve bu bölge için hafif bir rehabilitasyon rutini yok.",
+  },
+  "ins.rehabSelf.advice": "Kısa bir vücut ağırlığı rutini evde yapabileceğin bir başlangıçtır. Tedavi değildir.",
+  "ins.rehabSelf.action": "Hafif rehabilitasyon ekle",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1176,4 +1237,13 @@ export const pl: Partial<Record<Key, Message>> = {
   "ins.food.measuredToo": "Zapotrzebowanie jest tu wyliczone z {days} dni twojego jedzenia i ważeń.",
   "ins.stall.cutToo":
     "W ostatnim tygodniu jadłeś też około {gap} dziennie poniżej zapotrzebowania, a na deficycie siła rzadko rośnie, więc utrzymanie jej to dobry wynik.",
+  "ins.rehabSelf.title": "Łagodna rutyna na: {area}",
+  "ins.rehabSelf.why": {
+    one: "{area} jest zapisane od {days} dnia i nie ma łagodnej rehabilitacji na ten obszar.",
+    few: "{area} jest zapisane od {days} dni i nie ma łagodnej rehabilitacji na ten obszar.",
+    many: "{area} jest zapisane od {days} dni i nie ma łagodnej rehabilitacji na ten obszar.",
+    other: "{area} jest zapisane od {days} dnia i nie ma łagodnej rehabilitacji na ten obszar.",
+  },
+  "ins.rehabSelf.advice": "Krótka rutyna z ciężarem ciała to punkt wyjścia do zrobienia w domu. To nie leczenie.",
+  "ins.rehabSelf.action": "Dodaj łagodną rehabilitację",
 };

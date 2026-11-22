@@ -20,6 +20,15 @@ import { coachPushToken } from "./trainer";
 
 const TOKEN_KEY = "liftsmith.pushToken";
 
+/** Whether this device has a Friends push token stored after a successful registration (`sendToken`). */
+export function pushTokenOnDevice(): boolean {
+  try {
+    return !!localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return false;
+  }
+}
+
 let listening = false;
 
 async function canPush(): Promise<boolean> {
