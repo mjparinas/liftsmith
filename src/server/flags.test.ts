@@ -50,6 +50,7 @@ describe("flags for an install", () => {
       coachPayFee: 2,
       labSonos: false,
       referralReward: true,
+      campusClubs: true,
       social: true,
       community: true,
     });
@@ -86,6 +87,7 @@ describe("the flag routes", () => {
         coachPayFee: 2,
         labSonos: false,
         referralReward: true,
+        campusClubs: true,
         social: true,
         community: true,
       },

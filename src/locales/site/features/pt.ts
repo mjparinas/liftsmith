@@ -163,6 +163,14 @@ export const pt: FeaturesText = {
       body: "Um programa do seu fisioterapeuta espera em Hoje para ser salvo com um toque e registra a lesão a que se refere. Segue as vezes por semana que ele pediu, aparece nos dias de descanso e pergunta sobre a dor só dessa lesão.",
       note: "Os lembretes de reabilitação e o aviso de programa novo estão no Android e no iPhone.",
     },
+    "rehab-self": {
+      name: "Reabilitação leve sem fisioterapeuta",
+      body: "Registrou uma lesão e não tem fisioterapeuta? Lesões e uma nota do coach oferecem uma rotina curta com o peso do corpo para fazer em casa. É um ponto de partida, não um tratamento.",
+    },
+    "rehab-end": {
+      name: "Quando o fisioterapeuta retira um programa",
+      body: "Se o seu fisioterapeuta retira um programa, Hoje pergunta se você para ou continua por conta própria. Parar remove a rotina e os lembretes dela.",
+    },
     cycle: {
       name: "Prontidão que considera o ciclo",
       body: "Se quiser, registre seu ciclo menstrual e a decisão do dia passa a levá-lo em conta.",
@@ -431,6 +439,11 @@ export const pt: FeaturesText = {
       body: "Converse com seu clube entre os treinos, marque um horário e um lugar para treinar junto e veja quem vai. Quem vai recebe um lembrete uma hora antes, e ao postar seu treino depois você aparece como quem treinou, com os amigos que treinaram com você marcados.",
       note: "Para maiores de 18 anos. As notificações são no Android e no iPhone; o app web mostra as mensagens novas enquanto o chat está aberto.",
     },
+    "campus-clubs": {
+      name: "Pro para quem lidera um clube ativo",
+      body: "Lidere um clube em que 5 ou mais membros, você incluído, terminem cada um um treino nos últimos 14 dias, e o Pro fica grátis para você enquanto isso continuar.",
+      note: "Entrar no clube de outra pessoa não conta, e dois clubes não se somam.",
+    },
     profiles: {
       name: "Perfis públicos",
       body: "Uma página pública opcional com seus melhores levantamentos e treinos.",
@@ -475,6 +488,11 @@ export const pt: FeaturesText = {
     "rehab-phases": {
       name: "Protocolos de reabilitação em fases, guiados pela dor",
       body: "Cada programa de reabilitação tem três fases, de acalmar a região ao uso normal. Uma regra da dor simples lê as avaliações depois de cada exercício e no dia seguinte, diz quando o aluno está pronto para a próxima fase ou deve voltar uma, e o fisioterapeuta envia com um toque.",
+      note: "Os alunos seguem de graça. O Liftsmith mostra o que seus alunos registram. Ele não diagnostica nem trata nada.",
+    },
+    "rehab-shape": {
+      name: "Modele uma rotina de reabilitação",
+      body: "Fisioterapeutas definem as repetições ou os segundos de cada exercício de uma rotina de reabilitação e acrescentam uma dica curta, no editor de rotinas. Os alunos seguem como está escrito.",
       note: "Os alunos seguem de graça. O Liftsmith mostra o que seus alunos registram. Ele não diagnostica nem trata nada.",
     },
     "coach-nutrition": {

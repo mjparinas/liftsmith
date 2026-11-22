@@ -4,7 +4,7 @@ import { t } from "./i18n";
 import { target } from "./progression";
 import { stretch } from "./stretches";
 import { linksOf, withLinks } from "./superset";
-import type { AppEvent, Gym, Profile, Routine, RoutineItem, RoutinePart } from "./types";
+import { BODY_PARTS, type AppEvent, type Gym, type Profile, type Routine, type RoutineItem, type RoutinePart } from "./types";
 import { withWarmups } from "./warmup";
 
 // Saved routines (table stakes, Melvin, 2026-11-09): the lifter's own list of exercises and set
@@ -17,6 +17,39 @@ export const MAX_ITEMS = 20;
 export const NAME_MAX = 40;
 
 export const clampSets = (n: number) => Math.min(10, Math.max(1, Math.round(n) || 1));
+/** A physio's prescribed reps or seconds (routine builder, 2026-11-22). */
+export const REPS_MAX = 120;
+/** A physio's cue, kept short enough to sit under the target. */
+export const CUE_MAX = 80;
+
+/** 1 to 120, or undefined when it isn't a number. Out-of-range values clamp. */
+export function cleanReps(n: unknown): number | undefined {
+  if (typeof n !== "number" || !Number.isFinite(n)) return undefined;
+  return Math.min(REPS_MAX, Math.max(1, Math.round(n)));
+}
+
+/** A cue with control characters removed, trimmed, and cut to CUE_MAX. Undefined when nothing is left. */
+export function cleanCue(s: unknown): string | undefined {
+  if (typeof s !== "string") return undefined;
+  const cue = s
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .trim()
+    .slice(0, CUE_MAX);
+  return cue || undefined;
+}
+
+/** Times a week, 1 to 7, or undefined. Kept here so a saved routine doesn't depend on the share code. */
+function cleanWeek(n: unknown): number | undefined {
+  return typeof n === "number" && Number.isInteger(n) && n >= 1 && n <= 7 ? n : undefined;
+}
+
+function cleanAssigned(a: Routine["assignedPlan"]): Routine["assignedPlan"] | undefined {
+  if (!a || typeof a.id !== "string" || typeof a.coachId !== "string") return undefined;
+  const id = a.id.trim().slice(0, 80);
+  const coachId = a.coachId.trim().slice(0, 80);
+  if (!id || !coachId) return undefined;
+  return { id, coachId };
+}
 /** The most stretches a routine's warm-up or cool-down holds. */
 export const MAX_PART_STRETCHES = 12;
 
@@ -60,17 +93,46 @@ export function partDefaults(
 /** The routine's warm-up or cool-down part, if it has one. */
 export const routinePart = (r: Pick<Routine, "parts"> | undefined, kind: RoutinePart["kind"]) => r?.parts?.find((p) => p.kind === kind);
 
+/** One exercise row: sane sets, and a physio's reps and cue only on a rehab program. */
+function tidyItem(i: RoutineItem, rehab: boolean): RoutineItem {
+  const reps = rehab ? cleanReps(i.reps) : undefined;
+  const cue = rehab ? cleanCue(i.cue) : undefined;
+  return {
+    exerciseId: i.exerciseId,
+    sets: clampSets(i.sets),
+    ...(i.group ? { group: i.group } : {}),
+    ...(reps ? { reps } : {}),
+    ...(cue ? { cue } : {}),
+  };
+}
+
 /** Tidies a routine: a trimmed name, known exercises only, sane set counts, valid supersets. */
 export function cleanRoutine(r: Routine): Routine {
-  const kept = r.items.filter((i) => EXERCISE_BY_ID.has(i.exerciseId)).slice(0, MAX_ITEMS);
-  const items = withLinks(
-    kept.map((i) => ({ ...i, sets: clampSets(i.sets) })),
-    linksOf(kept),
-  );
+  const rehab = !!r.rehab;
+  const kept = r.items
+    .filter((i) => EXERCISE_BY_ID.has(i.exerciseId))
+    .slice(0, MAX_ITEMS)
+    .map((i) => tidyItem(i, rehab));
+  const items = withLinks(kept, linksOf(kept));
   const out: Routine = { ...r, name: r.name.trim().slice(0, NAME_MAX) || t("rt.defaultName"), items };
   const parts = cleanParts(r.parts);
   if (parts) out.parts = parts;
   else delete out.parts;
+  const assigned = cleanAssigned(r.assignedPlan);
+  if (assigned) out.assignedPlan = assigned;
+  else delete out.assignedPlan;
+  if (!rehab) {
+    delete out.rehab;
+    delete out.rehabPart;
+    delete out.perWeek;
+    delete out.rehabPlan;
+  } else {
+    out.rehab = true;
+    if (!r.rehabPart || !(BODY_PARTS as readonly string[]).includes(r.rehabPart)) delete out.rehabPart;
+    const week = cleanWeek(r.perWeek);
+    if (week) out.perWeek = week;
+    else delete out.perWeek;
+  }
   return out;
 }
 
@@ -126,12 +188,15 @@ export function planFromRoutine(
   if (!kept.length) return null;
   const plain: PlanItem[] = kept.map((i) => {
     const ex = EXERCISE_BY_ID.get(i.exerciseId)!;
+    const base = target(ex, events, profile, gym, now);
+    const reps = routine.rehab ? cleanReps(i.reps) : undefined;
+    const cue = routine.rehab ? cleanCue(i.cue) : undefined;
     return {
       exerciseId: ex.id,
       sets: i.sets,
       restSec: restFor(ex, profile.goal, profile.training),
       focus: ex.primary[0]!,
-      target: target(ex, events, profile, gym, now),
+      target: { ...base, ...(reps ? { reps } : {}), ...(cue ? { note: cue } : {}) },
     };
   });
   // A superset only holds where both exercises are still here and next to each other.

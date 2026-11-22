@@ -321,6 +321,8 @@ export const en = {
   "friends.club.title": "Club",
   "friends.club.members": { one: "{count} member", other: "{count} members" },
   "friends.club.yours": "you run it",
+  "friends.club.proFree":
+    "Pro is free for you while 5 or more members of this club each finish a workout in the last 14 days. Yours counts too.",
   "friends.club.by": "run by {name}",
   "friends.club.none": "No clubs yet",
   "friends.club.noneBody": "Start a club for your gym crew or training group, or join one with its link.",
@@ -671,6 +673,8 @@ export const es: Partial<Record<Key, Message>> = {
   "friends.club.title": "Club",
   "friends.club.members": { one: "{count} miembro", other: "{count} miembros" },
   "friends.club.yours": "lo diriges tú",
+  "friends.club.proFree":
+    "Pro es gratis para ti mientras 5 o más miembros de este club terminen un entrenamiento en los últimos 14 días. El tuyo también cuenta.",
   "friends.club.by": "dirigido por {name}",
   "friends.club.none": "Aún no hay clubes",
   "friends.club.noneBody": "Crea un club para tu grupo del gimnasio o de entrenamiento, o únete a uno con su enlace.",
@@ -1026,6 +1030,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "friends.club.title": "Club",
   "friends.club.members": { one: "{count} membre", other: "{count} membres" },
   "friends.club.yours": "tu le gères",
+  "friends.club.proFree":
+    "Pro est gratuit pour toi tant que 5 membres ou plus de ce club terminent chacun un entraînement dans les 14 derniers jours. Le tien compte aussi.",
   "friends.club.by": "géré par {name}",
   "friends.club.none": "Aucun club pour l’instant",
   "friends.club.noneBody": "Crée un club pour ta bande de la salle ou ton groupe d’entraînement, ou rejoins-en un avec son lien.",
@@ -1376,6 +1382,8 @@ export const de: Partial<Record<Key, Message>> = {
   "friends.club.title": "Club",
   "friends.club.members": { one: "{count} Mitglied", other: "{count} Mitglieder" },
   "friends.club.yours": "du leitest ihn",
+  "friends.club.proFree":
+    "Pro ist für dich kostenlos, solange 5 oder mehr Mitglieder dieses Clubs in den letzten 14 Tagen jeweils ein Training beenden. Deins zählt mit.",
   "friends.club.by": "geleitet von {name}",
   "friends.club.none": "Noch keine Clubs",
   "friends.club.noneBody": "Gründe einen Club für deine Gym-Crew oder Trainingsgruppe oder tritt einem über seinen Link bei.",
@@ -1724,6 +1732,8 @@ export const it: Partial<Record<Key, Message>> = {
   "friends.club.title": "Club",
   "friends.club.members": { one: "{count} membro", other: "{count} membri" },
   "friends.club.yours": "lo gestisci tu",
+  "friends.club.proFree":
+    "Pro è gratis per te finché 5 o più membri di questo club completano ciascuno un allenamento negli ultimi 14 giorni. Conta anche il tuo.",
   "friends.club.by": "gestito da {name}",
   "friends.club.none": "Ancora nessun club",
   "friends.club.noneBody": "Crea un club per il tuo gruppo della palestra o di allenamento, oppure entra in uno con il suo link.",
@@ -2060,6 +2070,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "friends.club.title": "クラブ",
   "friends.club.members": { other: "メンバー{count}人" },
   "friends.club.yours": "あなたが管理",
+  "friends.club.proFree":
+    "このクラブのメンバーが5人以上、それぞれ直近14日以内にワークアウトを終えている間、Pro は無料です。あなたの分も数えます。",
   "friends.club.by": "{name}さんが管理",
   "friends.club.none": "クラブはまだありません",
   "friends.club.noneBody": "ジム仲間やトレーニンググループのクラブを作るか、リンクからクラブに参加しましょう。",
@@ -2437,6 +2449,8 @@ export const pt: Partial<Record<Key, Message>> = {
     other: "{count} membros",
   },
   "friends.club.yours": "você administra",
+  "friends.club.proFree":
+    "O Pro é grátis para você enquanto 5 ou mais membros deste clube terminarem um treino nos últimos 14 dias. O seu também conta.",
   "friends.club.by": "administrado por {name}",
   "friends.club.none": "Nenhum clube ainda",
   "friends.club.noneBody": "Crie um clube para a turma da academia ou seu grupo de treino, ou entre em um pelo link.",
@@ -2797,6 +2811,7 @@ export const ko: Partial<Record<Key, Message>> = {
     other: "멤버 {count}명",
   },
   "friends.club.yours": "내가 운영 중",
+  "friends.club.proFree": "이 클럽 멤버 5명 이상이 각자 최근 14일 안에 운동을 마치는 동안 Pro가 무료예요. 내 운동도 포함돼요.",
   "friends.club.by": "운영자: {name}",
   "friends.club.none": "아직 클럽이 없어요",
   "friends.club.noneBody": "헬스장 동료나 운동 모임을 위한 클럽을 만들거나, 링크로 가입하세요.",
@@ -3174,6 +3189,8 @@ export const tr: Partial<Record<Key, Message>> = {
     other: "{count} üye",
   },
   "friends.club.yours": "yöneticisi sensin",
+  "friends.club.proFree":
+    "Bu kulübün 5 ya da daha fazla üyesi son 14 günde birer antrenman bitirdiği sürece Pro senin için ücretsiz. Seninki de sayılır.",
   "friends.club.by": "yönetici: {name}",
   "friends.club.none": "Henüz kulüp yok",
   "friends.club.noneBody": "Salon ekibin ya da antrenman grubun için bir kulüp kur ya da bağlantısıyla birine katıl.",
@@ -3580,6 +3597,8 @@ export const pl: Partial<Record<Key, Message>> = {
     other: "{count} członka",
   },
   "friends.club.yours": "prowadzisz go",
+  "friends.club.proFree":
+    "Pro jest dla ciebie darmowy, dopóki co najmniej 5 członków tego klubu kończy trening w ciągu ostatnich 14 dni. Twój też się liczy.",
   "friends.club.by": "prowadzi: {name}",
   "friends.club.none": "Jeszcze brak klubów",
   "friends.club.noneBody": "Załóż klub dla ekipy z siłowni lub grupy treningowej albo dołącz do istniejącego przez link.",

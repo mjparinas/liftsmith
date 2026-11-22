@@ -443,9 +443,19 @@ export async function assignPlan(
   return w ? { id, coachId, clientId, name: title, code, at: now, perWeek: w } : { id, coachId, clientId, name: title, code, at: now };
 }
 
-/** The coach takes a routine back. */
+/**
+ * The coach takes a routine back. The client hears (`coachPlanEnd`) so Today can offer to stop the saved program or
+ * keep doing it; the saved routine itself stays until they choose (2026-11-22).
+ */
 export async function removePlan(coachId: string, id: unknown): Promise<void> {
-  if (typeof id === "string") await run("DELETE FROM coach_plans WHERE id = ? AND coach_id = ?", [id, coachId]);
+  if (typeof id !== "string") return;
+  const [row] = await query<{ client_id: string; name: string }>("SELECT client_id, name FROM coach_plans WHERE id = ? AND coach_id = ?", [
+    id,
+    coachId,
+  ]);
+  if (!row) return;
+  await run("DELETE FROM coach_plans WHERE id = ? AND coach_id = ?", [id, coachId]);
+  await notifyCoach(String(row.client_id), "coachPlanEnd", { name: await nameOf(coachId), text: String(row.name) }, "#/today");
 }
 
 export async function isClient(coachId: string, clientId: string): Promise<boolean> {

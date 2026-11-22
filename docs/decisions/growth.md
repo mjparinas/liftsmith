@@ -6,7 +6,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 
 - **Follow Hevy's model** (Melvin, 2026-11-12: "Can we try to follow Hevy's growth strategy? Organic growth, minimal spend, customer delight"). Growth comes from the product and the people who use it, not from buying installs. Still no paid ads and no ads in the app, ever ([Marketing and growth](marketing-and-growth.md), [Money](money.md)).
 - **Who we grow through** (Melvin, 2026-11-12): regular gym users, trainers and their clients, and gyms themselves. The other groups below are Claude's suggestions until Melvin picks.
-- **What to build and do** (Melvin, 2026-11-12: "do 1, 2, 3, agree with 4, 5, 6, 7, 8"): items 1, 2, 3, 5 and 6 of the ranked list below are built (each has its own section under "Built"), 4 is the gym thread's with the spend suggestion agreed, and 7 and 8 are drafted for Melvin to do in the store consoles and partner sites. 9 and 10 wait.
+- **What to build and do** (Melvin, 2026-11-12: "do 1, 2, 3, agree with 4, 5, 6, 7, 8"): items 1, 2, 3, 5, 6 and 10 of the ranked list below are built (each has its own section under "Built"), 4 is the gym thread's with the spend suggestion agreed, and 7 and 8 are for Melvin to do in the store consoles and partner sites (checklists under "Still for Melvin" and in [Open items](open-items.md)). 9 waits.
 - **Gyms: claimed gyms, a gym finder and gym pages, with a poster and QR stand** (Melvin, 2026-11-12). Being built in its own thread ("Let gyms claim their page and find gyms"); its decisions go in that thread's own topic file, not here. This file only says how it fits the growth plan (below).
 
 ## What Hevy did (sources, read 2026-11-12)
@@ -63,7 +63,7 @@ Ranked by expected growth per hour of Melvin's time and per dollar. Each says wh
 7. **Store listing experiments (do).** Play Console store listing experiments on the icon, first screenshot and short description, one at a time, plus the listing in all six languages. Free, and it compounds with every visitor search and the gym program send.
 8. **Partner directories (do, after Play approval).** Garmin Connect IQ store, Health Connect and Apple Health app lists, Oura and Withings partner pages, AlternativeTo, SaaSHub, Product Hunt. Each is a free, permanent link from a page lifters already visit.
 9. **A public routine library (build, larger, later).** Shared routines become indexable pages (`/routines/<slug>/`), opt-in, with the builder's handle, like Hevy's explore. Good for search and for creators, but it needs moderation first, so it waits until Friends has real users.
-10. **Campus clubs (do, later).** Free Pro for the club leader (a promo code) in exchange for running their club in a Liftsmith club. Only after the gym program shows the club board works in the wild.
+10. **Campus clubs (built, 2026-11-22).** Free Pro for the club leader while their club has enough members training. The gym program is live, so this shipped. See Built.
 
 ## Built
 
@@ -121,7 +121,58 @@ Melvin, 2026-11-15: "all share functionality should include the users share link
 
 ### Translated store listings (item 7, 2026-11-12)
 
-Melvin: "Do the translations". The Play listing in Spanish, French, German, Italian and Japanese, with phone screenshots of the app and captions in each language, is in `docs/PLAY_LISTING_TRANSLATIONS.md`; Melvin pastes it into Play Console. Listing experiments (item 7) run after it, one language at a time. Doing it showed the workout's big weight breaking between digits in Japanese and German (their `overflow-wrap: anywhere`); a stepper's number now never wraps.
+Melvin: "Do the translations". The Play listing in Spanish, French, German, Italian and Japanese, with phone screenshots of the app and captions in each language, is in `docs/PLAY_LISTING_TRANSLATIONS.md`; Melvin pastes it into Play Console. Listing experiments (item 7) run after it, one at a time. Doing it showed the workout's big weight breaking between digits in Japanese and German (their `overflow-wrap: anywhere`); a stepper's number now never wraps. The experiments, the remaining languages and the App Store listing are in "Still for Melvin" below.
+
+### Campus clubs (item 10, 2026-11-22)
+
+The gym program is live, so a club leader earns Pro for running a real club. It is the same shape as coaches with active clients, not a promo code.
+
+- **The deal** (`EARNED.clubMembers` in `src/server/earnedPro.ts`, 5): the lifter who started a club has Pro while that one club has 5 or more members, the leader included, who each finished a workout in the last 14 days (`EARNED.activeDays`, the same window as coaches). A workout counts the same way: at least 3 logged sets with reps or seconds (`EARNED.setsPerWorkout`). Any club they started counts, including a gym's official club. Joining someone else's club doesn't, and two clubs don't add together. Nothing is stored; `clubEarnsPro` is worked out on every access check. `via: "club"`, after referral months and a coach's free Pro, and before school and team Pro.
+- **Where it shows:** the Pro screen says "Pro comes with your account while 5 or more members of a club you run are training." On a club the leader runs, Friends says Pro is free while 5 or more members each finish a workout in the last 14 days, and that their own workouts count.
+- **Admin flag** `campusClubs` (on by default). Off: clubs work as before, nobody earns Pro this way, and the line is hidden.
+- **Under 18:** a lifter under 18 can already start and run a club. Club chat and crew sessions stay adult-only ([Friends](friends.md)). There is no separate rule that bars them from leading, so the same line shows on a club they lead and the same rule gives them Pro. There is no extra reward pitch, push or email.
+
+## Still for Melvin
+
+Items 7 and 8, and the connected-app keys. The steps Melvin does are also on [Open items](open-items.md). Callback URLs and the key-by-key setup are in [Connected apps](connected-apps.md) "Keys Melvin creates".
+
+### Store listing experiments (item 7)
+
+One experiment at a time in Play Console, on the live listing:
+
+1. App icon.
+2. First screenshot.
+3. Short description.
+
+Spanish, French, German, Italian and Japanese are drafted in `docs/PLAY_LISTING_TRANSLATIONS.md` (paste those in, then experiment one language at a time). Still to write: Portuguese (Brazil), Korean, Polish and Turkish. The App Store listing and its experiments wait until iOS ships.
+
+### Partner directories (item 8)
+
+Free listings, after the Play listing is approved. [Connected apps](connected-apps.md) records the developer consoles for the keys, not a submission URL for these directories, so the names are the list:
+
+- Garmin Connect IQ store
+- Health Connect app list
+- Apple Health app list
+- Oura partner page
+- Withings partner page
+- AlternativeTo
+- SaaSHub
+- Product Hunt
+
+### Connected keys
+
+Melvin creates these and sets them in Vercel (Production and Preview). Oura is done (keys are in; app review and the written-consent ask are still open, and new apps stay capped at about 10 users). The others are not created yet. Full steps are in [Connected apps](connected-apps.md).
+
+| Service | Where | Callback |
+| --- | --- | --- |
+| Strava | https://www.strava.com/settings/api | Authorization Callback Domain `www.getliftsmith.com` |
+| WHOOP | https://developer-dashboard.whoop.com | `https://www.getliftsmith.com/api/connect/whoop/callback/` |
+| Garmin Connect | https://developer.garmin.com/gc-developer-program/overview | Redirect `https://www.getliftsmith.com/api/connect/garmin/callback/`. Ping (not Push) for Dailies, Sleeps, HRV, Body Compositions, Activities and Deregistration, each to `https://www.getliftsmith.com/api/connect/garmin/push/` |
+| Withings | https://developer.withings.com | `https://www.getliftsmith.com/api/connect/withings/callback/` |
+| Polar | https://admin.polaraccesslink.com | `https://www.getliftsmith.com/api/connect/polar/callback/` |
+| Concept2 | https://log.concept2.com/developers | `https://www.getliftsmith.com/api/connect/concept2/callback/` |
+
+**Not doing:** Garmin's Training API (sending a planned workout to the watch) and posting finished lifts to Garmin Connect. [Connected apps](connected-apps.md) already leaves both out. They stay out unless Melvin reopens them. The Connect IQ watch app already shows the live workout.
 
 ## How we'll know (no public numbers)
 

@@ -1042,4 +1042,38 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who.",
   },
+  "rehab-self": {
+    title: "A gentle routine when something hurts",
+    intro:
+      "Logged an injury and you don't have a physio? A short bodyweight routine is there when you're ready, on Injuries and in a coach's note.",
+    points: [
+      "It shows for an injury you've already logged, once nothing else covers that area.",
+      "Open it from Injuries, or from the note on Today, and add it in one tap.",
+      "It's bodyweight, short enough to do at home, and it can sit beside your lifting.",
+      "It never says what's wrong or what will fix it. It's a starting point, not a treatment.",
+    ],
+    dyk: "A program from a physio for the same area replaces it, so you aren't asked twice.",
+  },
+  "rehab-shape": {
+    title: "Set the reps, the seconds and a cue",
+    intro: "A rehab routine can now carry exactly what you want each exercise to be: the reps or the seconds, and a short cue.",
+    points: [
+      "In the routine builder, step the reps or the seconds on each exercise. Leave it empty and the app picks the reps.",
+      "Holds start in seconds, so a timed exercise stays in time, not in reps.",
+      "Add a short cue under the exercise, the one thing you want them to remember.",
+      "Clients follow it as written. An older phone still opens the routine and simply leaves the cue out.",
+    ],
+    dyk: "The pain checks, the times a week and the three phases work the same as before.",
+  },
+  "campus-clubs": {
+    title: "Pro for a club that keeps training",
+    intro: "Run a club where people actually train, and Pro is free for you while they keep it up.",
+    points: [
+      "Five or more members, you included, each finish a workout in the last 14 days.",
+      "One club has to reach it. Two quieter clubs don't add together.",
+      "A club you only joined doesn't count. You have to be the one who started it.",
+      "It stays on while the club keeps training, and it stops when that fortnight goes quiet.",
+    ],
+    dyk: "The club says so on its page, and the Pro screen says it comes with your account.",
+  },
 };

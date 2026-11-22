@@ -113,6 +113,16 @@ describe("rehab beside the lifting", () => {
     const last = makeSet({ exerciseId: "glute-bridge", weight: 0, reps: 15, targetReps: 12, partId: "rehab", at: NOW - DAY });
     const again = rehabItems(rehab, gym, [last], profile, NOW);
     expect(again[0]!.target.reps).toBe(12);
+    const prescribed = {
+      ...rehab,
+      items: [
+        { exerciseId: "glute-bridge", sets: 3, reps: 10, cue: "Pause at the top" },
+        { exerciseId: "wall-sit", sets: 2, reps: 20 },
+      ],
+    };
+    const written = rehabItems(prescribed, gym, [last], profile, NOW);
+    expect(written[0]!.target).toMatchObject({ reps: 10, note: "Pause at the top" });
+    expect(written[1]!.target.reps).toBe(20);
   });
 
   it("leaves out exercises the gym can't do", () => {

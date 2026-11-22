@@ -979,6 +979,8 @@ const COACHING = "liftsmith.coaching";
 const WHO = "liftsmith.coachWho";
 const PLANS = "liftsmith.coachPlans";
 const PLANS_SEEN = "liftsmith.coachPlans.seen";
+const PLANS_READY = "liftsmith.coachPlans.ready";
+const PLANS_ENDED = "liftsmith.coachPlans.ended";
 const NOBODY: Who = { coaches: [], clients: 0 };
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
@@ -1019,6 +1021,10 @@ interface NotesState {
   plans: ShownPlan[];
   /** Plans "Not now" hid on Today, by id. */
   plansSeen: string[];
+  /** An overview has loaded, so a missing plan id is really gone and not just "not fetched yet". */
+  plansReady: boolean;
+  /** Plan ids the lifter already answered on the "taken back" card (stop or keep). */
+  plansEnded: string[];
 }
 /** A program from a coach, with who sent it. */
 export interface ShownPlan extends Plan {
@@ -1029,6 +1035,11 @@ export interface ShownPlan extends Plan {
 export interface Who {
   coaches: Pick<Person, "id" | "name" | "role">[];
   clients: number;
+  /**
+   * This account coaches (a role, an invite, or at least one client). Missing on a cache from before 2026-11-22;
+   * `clients` still says so once someone has joined.
+   */
+  self?: boolean;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -1059,6 +1070,8 @@ export const useCoachNotes = create<NotesState>(() => ({
   who: typeof window === "undefined" ? NOBODY : readJson<Who>(WHO, NOBODY),
   plans: typeof window === "undefined" ? [] : readJson<ShownPlan[]>(PLANS, []),
   plansSeen: typeof window === "undefined" ? [] : readJson<string[]>(PLANS_SEEN, []),
+  plansReady: typeof window === "undefined" ? false : readJson<boolean>(PLANS_READY, false),
+  plansEnded: typeof window === "undefined" ? [] : readJson<string[]>(PLANS_ENDED, []),
 }));
 
 /** Whether an account takes part in coaching, as a coach or a client. */
@@ -1097,6 +1110,7 @@ export function keepNotes(
   const who: Who = {
     coaches: o.coaches.map((c) => ({ id: c.id, name: c.name, ...(c.role ? { role: c.role } : {}) })),
     clients: o.clients?.length ?? 0,
+    self: !!(o.coach || o.invite || (o.clients?.length ?? 0) > 0 || o.role),
   };
   writeJson(WHO, who);
   const plans: ShownPlan[] = (o.plans ?? []).map((p) => {
@@ -1104,7 +1118,34 @@ export function keepNotes(
     return { ...p, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
   });
   writeJson(PLANS, plans);
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans, videos: o.videos ?? 0 });
+  writeJson(PLANS_READY, true);
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans, videos: o.videos ?? 0, plansReady: true });
+}
+
+/**
+ * A saved routine whose coach plan is no longer on the account (2026-11-22). Only after an overview has loaded, so an
+ * empty cache before the first fetch isn't read as "taken back". Dismissed ids stay quiet.
+ */
+export function endedPrograms<T extends { assignedPlan?: { id: string } }>(
+  routines: readonly T[],
+  plans: readonly { id: string }[],
+  ready: boolean,
+  dismissed: readonly string[],
+): T[] {
+  if (!ready) return [];
+  const live = new Set(plans.map((p) => p.id));
+  const hide = new Set(dismissed);
+  return routines.filter((r) => {
+    const id = r.assignedPlan?.id;
+    return !!id && !live.has(id) && !hide.has(id);
+  });
+}
+
+/** "Stop this program" or "Keep on my own": Today stops asking about this plan id. */
+export function dismissEnded(id: string): void {
+  const plansEnded = [...useCoachNotes.getState().plansEnded.filter((x) => x !== id), id].slice(-50);
+  writeJson(PLANS_ENDED, plansEnded);
+  useCoachNotes.setState({ plansEnded });
 }
 
 /** "Not now" on Today's card for a program from a coach: it stays in Coaching, and Today stops asking. */
@@ -1178,6 +1219,8 @@ export function forgetNotes(): void {
   writeJson(WHO, NOBODY);
   writeJson(PLANS, []);
   writeJson(PLANS_SEEN, []);
+  writeJson(PLANS_READY, false);
+  writeJson(PLANS_ENDED, []);
   useCoachNotes.setState({
     notes: [],
     unread: [],
@@ -1188,5 +1231,7 @@ export function forgetNotes(): void {
     who: NOBODY,
     plans: [],
     plansSeen: [],
+    plansReady: false,
+    plansEnded: [],
   });
 }

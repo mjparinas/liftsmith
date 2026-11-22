@@ -62,6 +62,21 @@ export const en = {
   "rt.rehabLogWhy":
     "Its pain checks, reminders and your physio's report follow that injury. Lifts that load it are skipped until you mark them fine or the injury healed.",
   "rt.rehabLinked": "Linked to your {part} injury.",
+  "rt.rehabSwitch": "Rehab program",
+  "rt.rehabSwitchHint": "Keeps every exercise as written and asks about pain between sets.",
+  "rt.rehabNote": "A starting point to adjust, not a treatment. Stop if anything feels sharp or wrong.",
+  "rt.rehabArea": "Area",
+  "rt.rehabAreaNeed": "Pick the area this is for.",
+  "rt.repsUnset": "Reps",
+  "rt.secsUnset": "Seconds",
+  "rt.repsCount": { one: "{count} rep", other: "{count} reps" },
+  "rt.secsCount": { one: "{count} second", other: "{count} seconds" },
+  "rt.repsFewer": "Fewer reps of {name}",
+  "rt.repsMore": "More reps of {name}",
+  "rt.secsFewer": "Fewer seconds of {name}",
+  "rt.secsMore": "More seconds of {name}",
+  "rt.cue": "Cue for {name}",
+  "rt.cuePlaceholder": "Short cue, optional",
 } as const;
 
 type Key = keyof typeof en;
@@ -127,6 +142,21 @@ export const es: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "Las preguntas de dolor, los recordatorios y el informe de tu fisioterapeuta siguen esa lesión. Los ejercicios que la cargan se saltan hasta que los marques como bien o la lesión como curada.",
   "rt.rehabLinked": "Vinculado a tu lesión: {part}.",
+  "rt.rehabSwitch": "Programa de rehabilitación",
+  "rt.rehabSwitchHint": "Mantiene cada ejercicio tal como está y pregunta por el dolor entre series.",
+  "rt.rehabNote": "Un punto de partida para ajustar, no un tratamiento. Para si algo se siente agudo o mal.",
+  "rt.rehabArea": "Zona",
+  "rt.rehabAreaNeed": "Elige la zona.",
+  "rt.repsUnset": "Repeticiones",
+  "rt.secsUnset": "Segundos",
+  "rt.repsCount": { one: "{count} repetición", other: "{count} repeticiones" },
+  "rt.secsCount": { one: "{count} segundo", other: "{count} segundos" },
+  "rt.repsFewer": "Menos repeticiones de {name}",
+  "rt.repsMore": "Más repeticiones de {name}",
+  "rt.secsFewer": "Menos segundos de {name}",
+  "rt.secsMore": "Más segundos de {name}",
+  "rt.cue": "Indicación para {name}",
+  "rt.cuePlaceholder": "Indicación breve, opcional",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -190,6 +220,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "Les questions sur la douleur, les rappels et le rapport de votre kiné suivent cette blessure. Les exercices qui la sollicitent sont sautés jusqu’à ce que vous les marquiez sans douleur ou la blessure guérie.",
   "rt.rehabLinked": "Lié à votre blessure : {part}.",
+  "rt.rehabSwitch": "Programme de rééducation",
+  "rt.rehabSwitchHint": "Garde chaque exercice tel quel et demande la douleur entre les séries.",
+  "rt.rehabNote": "Un point de départ à ajuster, pas un traitement. Arrêtez si quelque chose pique ou semble faux.",
+  "rt.rehabArea": "Zone",
+  "rt.rehabAreaNeed": "Choisissez la zone.",
+  "rt.repsUnset": "Répétitions",
+  "rt.secsUnset": "Secondes",
+  "rt.repsCount": { one: "{count} répétition", other: "{count} répétitions" },
+  "rt.secsCount": { one: "{count} seconde", other: "{count} secondes" },
+  "rt.repsFewer": "Moins de répétitions de {name}",
+  "rt.repsMore": "Plus de répétitions de {name}",
+  "rt.secsFewer": "Moins de secondes de {name}",
+  "rt.secsMore": "Plus de secondes de {name}",
+  "rt.cue": "Consigne pour {name}",
+  "rt.cuePlaceholder": "Courte consigne, facultative",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -256,6 +301,21 @@ export const de: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "Schmerzabfragen, Erinnerungen und der Bericht deiner Physiotherapie richten sich nach dieser Verletzung. Übungen, die sie belasten, werden ausgelassen, bis du sie als unproblematisch oder die Verletzung als verheilt markierst.",
   "rt.rehabLinked": "Mit deiner Verletzung verknüpft: {part}.",
+  "rt.rehabSwitch": "Reha-Programm",
+  "rt.rehabSwitchHint": "Behält jede Übung wie geschrieben und fragt zwischen den Sätzen nach Schmerzen.",
+  "rt.rehabNote": "Ein Anfang zum Anpassen, keine Behandlung. Hör auf, wenn sich etwas stechend oder falsch anfühlt.",
+  "rt.rehabArea": "Bereich",
+  "rt.rehabAreaNeed": "Wähle den Bereich.",
+  "rt.repsUnset": "Wiederholungen",
+  "rt.secsUnset": "Sekunden",
+  "rt.repsCount": { one: "{count} Wiederholung", other: "{count} Wiederholungen" },
+  "rt.secsCount": { one: "{count} Sekunde", other: "{count} Sekunden" },
+  "rt.repsFewer": "Weniger Wiederholungen von {name}",
+  "rt.repsMore": "Mehr Wiederholungen von {name}",
+  "rt.secsFewer": "Weniger Sekunden von {name}",
+  "rt.secsMore": "Mehr Sekunden von {name}",
+  "rt.cue": "Hinweis für {name}",
+  "rt.cuePlaceholder": "Kurzer Hinweis, optional",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -322,6 +382,21 @@ export const it: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "Le domande sul dolore, i promemoria e il resoconto del fisioterapista seguono quell’infortunio. Gli esercizi che lo caricano vengono saltati finché non li segni come ok o l’infortunio come guarito.",
   "rt.rehabLinked": "Collegato al tuo infortunio: {part}.",
+  "rt.rehabSwitch": "Programma di riabilitazione",
+  "rt.rehabSwitchHint": "Mantiene ogni esercizio così com'è e chiede del dolore tra le serie.",
+  "rt.rehabNote": "Un punto di partenza da adattare, non una cura. Fermati se qualcosa punge o non va.",
+  "rt.rehabArea": "Zona",
+  "rt.rehabAreaNeed": "Scegli la zona.",
+  "rt.repsUnset": "Ripetizioni",
+  "rt.secsUnset": "Secondi",
+  "rt.repsCount": { one: "{count} ripetizione", other: "{count} ripetizioni" },
+  "rt.secsCount": { one: "{count} secondo", other: "{count} secondi" },
+  "rt.repsFewer": "Meno ripetizioni di {name}",
+  "rt.repsMore": "Più ripetizioni di {name}",
+  "rt.secsFewer": "Meno secondi di {name}",
+  "rt.secsMore": "Più secondi di {name}",
+  "rt.cue": "Indicazione per {name}",
+  "rt.cuePlaceholder": "Indicazione breve, facoltativa",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -383,6 +458,21 @@ export const ja: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "痛みの確認、リマインダー、理学療法士への報告はこのケガに合わせて行われます。その部位に負担がかかる種目は、問題なしと記録するか治ったと記録するまで外されます。",
   "rt.rehabLinked": "{part}のケガと連携しています。",
+  "rt.rehabSwitch": "リハビリプログラム",
+  "rt.rehabSwitchHint": "各種目を書いたとおりに残し、セットの間に痛みを尋ねます。",
+  "rt.rehabNote": "調整するための出発点であり、治療ではありません。鋭い痛みや違和感があれば中止してください。",
+  "rt.rehabArea": "部位",
+  "rt.rehabAreaNeed": "部位を選んでください。",
+  "rt.repsUnset": "回数",
+  "rt.secsUnset": "秒",
+  "rt.repsCount": { other: "{count}回" },
+  "rt.secsCount": { other: "{count}秒" },
+  "rt.repsFewer": "{name}の回数を減らす",
+  "rt.repsMore": "{name}の回数を増やす",
+  "rt.secsFewer": "{name}の秒数を減らす",
+  "rt.secsMore": "{name}の秒数を増やす",
+  "rt.cue": "{name}の合図",
+  "rt.cuePlaceholder": "短い合図（任意）",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -453,6 +543,21 @@ export const pt: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "As checagens de dor, os lembretes e o relatório do seu fisioterapeuta seguem essa lesão. Os exercícios que a sobrecarregam são pulados até você marcá-los como ok ou a lesão como curada.",
   "rt.rehabLinked": "Ligado à sua lesão: {part}.",
+  "rt.rehabSwitch": "Programa de reabilitação",
+  "rt.rehabSwitchHint": "Mantém cada exercício como está e pergunta sobre a dor entre as séries.",
+  "rt.rehabNote": "Um ponto de partida para ajustar, não um tratamento. Pare se algo doer de forma aguda ou parecer errado.",
+  "rt.rehabArea": "Região",
+  "rt.rehabAreaNeed": "Escolha a região.",
+  "rt.repsUnset": "Repetições",
+  "rt.secsUnset": "Segundos",
+  "rt.repsCount": { one: "{count} repetição", other: "{count} repetições" },
+  "rt.secsCount": { one: "{count} segundo", other: "{count} segundos" },
+  "rt.repsFewer": "Menos repetições de {name}",
+  "rt.repsMore": "Mais repetições de {name}",
+  "rt.secsFewer": "Menos segundos de {name}",
+  "rt.secsMore": "Mais segundos de {name}",
+  "rt.cue": "Dica para {name}",
+  "rt.cuePlaceholder": "Dica curta, opcional",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -520,6 +625,21 @@ export const ko: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "통증 확인, 알림, 물리치료사 보고서가 그 부상을 따라가요. 해당 부위에 부담을 주는 종목은 괜찮다고 표시하거나 부상이 나았다고 할 때까지 건너뛰어요.",
   "rt.rehabLinked": "{part} 부상과 연결됐어요.",
+  "rt.rehabSwitch": "재활 프로그램",
+  "rt.rehabSwitchHint": "각 동작을 적은 그대로 두고, 세트 사이에 통증을 묻습니다.",
+  "rt.rehabNote": "조정할 출발점이지 치료가 아니에요. 날카롭거나 이상하면 멈추세요.",
+  "rt.rehabArea": "부위",
+  "rt.rehabAreaNeed": "부위를 고르세요.",
+  "rt.repsUnset": "횟수",
+  "rt.secsUnset": "초",
+  "rt.repsCount": { other: "{count}회" },
+  "rt.secsCount": { other: "{count}초" },
+  "rt.repsFewer": "{name} 횟수 줄이기",
+  "rt.repsMore": "{name} 횟수 늘리기",
+  "rt.secsFewer": "{name} 초 줄이기",
+  "rt.secsMore": "{name} 초 늘리기",
+  "rt.cue": "{name} 신호",
+  "rt.cuePlaceholder": "짧은 신호, 선택",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -590,6 +710,21 @@ export const tr: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "Ağrı kontrolleri, hatırlatıcılar ve fizyoterapistinin raporu o sakatlığa bağlanır. O bölgeyi yükleyen hareketler, sen onları sorunsuz ya da sakatlığı iyileşmiş olarak işaretleyene kadar atlanır.",
   "rt.rehabLinked": "{part} sakatlığına bağlandı.",
+  "rt.rehabSwitch": "Rehabilitasyon programı",
+  "rt.rehabSwitchHint": "Her hareketi yazıldığı gibi tutar ve setler arasında ağrıyı sorar.",
+  "rt.rehabNote": "Ayarlanacak bir başlangıçtır, tedavi değildir. Keskin veya yanlış gelirse dur.",
+  "rt.rehabArea": "Bölge",
+  "rt.rehabAreaNeed": "Bölgeyi seç.",
+  "rt.repsUnset": "Tekrar",
+  "rt.secsUnset": "Saniye",
+  "rt.repsCount": { one: "{count} tekrar", other: "{count} tekrar" },
+  "rt.secsCount": { one: "{count} saniye", other: "{count} saniye" },
+  "rt.repsFewer": "{name} tekrarını azalt",
+  "rt.repsMore": "{name} tekrarını artır",
+  "rt.secsFewer": "{name} saniyesini azalt",
+  "rt.secsMore": "{name} saniyesini artır",
+  "rt.cue": "{name} için ipucu",
+  "rt.cuePlaceholder": "Kısa ipucu, isteğe bağlı",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -666,4 +801,19 @@ export const pl: Partial<Record<Key, Message>> = {
   "rt.rehabLogWhy":
     "Jego kontrole bólu, przypomnienia i raport dla fizjoterapeuty idą za tą kontuzją. Ćwiczenia, które ją obciążają, są pomijane, dopóki nie oznaczysz ich jako w porządku albo kontuzji jako wyleczonej.",
   "rt.rehabLinked": "Połączono z kontuzją: {part}.",
+  "rt.rehabSwitch": "Program rehabilitacyjny",
+  "rt.rehabSwitchHint": "Zostawia każde ćwiczenie tak, jak je zapisano, i pyta o ból między seriami.",
+  "rt.rehabNote": "Punkt wyjścia do dopasowania, nie leczenie. Przerwij, jeśli coś zakłuje albo wyda się nie tak.",
+  "rt.rehabArea": "Obszar",
+  "rt.rehabAreaNeed": "Wybierz obszar.",
+  "rt.repsUnset": "Powtórzenia",
+  "rt.secsUnset": "Sekundy",
+  "rt.repsCount": { one: "{count} powtórzenie", few: "{count} powtórzenia", many: "{count} powtórzeń", other: "{count} powtórzenia" },
+  "rt.secsCount": { one: "{count} sekunda", few: "{count} sekundy", many: "{count} sekund", other: "{count} sekundy" },
+  "rt.repsFewer": "Mniej powtórzeń: {name}",
+  "rt.repsMore": "Więcej powtórzeń: {name}",
+  "rt.secsFewer": "Mniej sekund: {name}",
+  "rt.secsMore": "Więcej sekund: {name}",
+  "rt.cue": "Wskazówka do {name}",
+  "rt.cuePlaceholder": "Krótka wskazówka, opcjonalnie",
 };

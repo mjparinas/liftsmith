@@ -117,6 +117,14 @@ export const es: FeaturesText = {
       body: "Un programa de tu fisioterapeuta espera en Hoy para guardarlo con un toque y registra la lesión para la que es. Sigue las veces por semana que pidió, aparece en los días de descanso y pregunta por el dolor solo de esa lesión.",
       note: "Los recordatorios de rehabilitación y el aviso de programa nuevo son para Android y iPhone.",
     },
+    "rehab-self": {
+      name: "Rehabilitación suave sin fisioterapeuta",
+      body: "¿Has registrado una lesión y no tienes fisioterapeuta? Lesiones y una nota del entrenador ofrecen una rutina corta con el peso del cuerpo para hacer en casa. Es un punto de partida, no un tratamiento.",
+    },
+    "rehab-end": {
+      name: "Cuando tu fisioterapeuta retira un programa",
+      body: "Si tu fisioterapeuta retira un programa, Hoy te pregunta si lo paras o lo sigues por tu cuenta. Pararlo quita la rutina y sus recordatorios.",
+    },
     cycle: { name: "Preparación según el ciclo", body: "Si quieres, registra tu ciclo y la decisión de hoy lo tiene en cuenta." },
     pregnancy: {
       name: "Modo embarazo y posparto",
@@ -373,6 +381,11 @@ export const es: FeaturesText = {
       body: "Habla con tu club entre entrenamientos, propón una hora y un sitio para entrenar juntos y mira quién se apunta. Quien se apunte recibe un recordatorio una hora antes, y al publicar tu entrenamiento después apareces como que entrenaste, con los amigos que entrenaron contigo etiquetados.",
       note: "Para mayores de 18 años. Las notificaciones son para Android y iPhone; la app web muestra los mensajes nuevos mientras el chat está abierto.",
     },
+    "campus-clubs": {
+      name: "Pro para quien lleva un club activo",
+      body: "Dirige un club en el que 5 o más miembros, tú incluido, terminen cada uno un entrenamiento en los últimos 14 días, y Pro es gratis para ti mientras siga siendo así.",
+      note: "Unirte al club de otra persona no cuenta, y dos clubes no se suman.",
+    },
     profiles: { name: "Perfiles públicos", body: "Una página pública opcional con tus mejores marcas y entrenamientos." },
     "tagline-gym": {
       name: "Lema y gimnasio habitual",
@@ -409,6 +422,11 @@ export const es: FeaturesText = {
     "rehab-phases": {
       name: "Protocolos de rehabilitación por fases, guiados por el dolor",
       body: "Cada programa de rehabilitación tiene tres fases, de calmar la zona al uso normal. Una regla del dolor sencilla lee las valoraciones tras cada ejercicio y al día siguiente, dice cuándo un cliente está listo para la siguiente fase o debe volver una, y el fisioterapeuta la envía con un toque.",
+      note: "Los clientes lo siguen gratis. Liftsmith muestra lo que registran tus clientes. No diagnostica ni trata nada.",
+    },
+    "rehab-shape": {
+      name: "Da forma a una rutina de rehabilitación",
+      body: "Los fisioterapeutas fijan las repeticiones o los segundos de cada ejercicio de una rutina de rehabilitación y añaden una indicación breve, en el editor de rutinas. Los clientes la siguen tal como está escrita.",
       note: "Los clientes lo siguen gratis. Liftsmith muestra lo que registran tus clientes. No diagnostica ni trata nada.",
     },
     "coach-nutrition": {

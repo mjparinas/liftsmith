@@ -7,6 +7,9 @@
 //
 // Coaches: an account with 3 or more clients who each finished a workout in the last 14 days has Pro for as long as
 // that holds (`coachEarnsPro`). Nothing is stored for it; it's worked out on every access check.
+//
+// Campus clubs: the lifter who started a club has Pro while that club has 5 or more members (the leader included)
+// who each finished a workout in the same 14-day window (`clubEarnsPro`). The admin flag `campusClubs` turns it off.
 import { FLAGS } from "@/lib/flags";
 import type { InviteFriend, InviteStatus } from "@/lib/referral";
 
@@ -29,6 +32,11 @@ export const EARNED = {
   perYear: 12,
   /** Clients training, each with a workout in the last `activeDays`, for a coach's free Pro. */
   coachClients: 3,
+  /**
+   * Members of one club the lifter started, the leader included, who each finished a workout in the last
+   * `activeDays`, for that leader's free Pro (growth item 10).
+   */
+  clubMembers: 5,
   activeDays: 14,
 } as const;
 
@@ -65,6 +73,16 @@ export async function referralOn(): Promise<boolean> {
     return typeof v === "boolean" ? v : FLAGS.referralReward.default;
   } catch {
     return FLAGS.referralReward.default;
+  }
+}
+
+/** Whether a club leader can earn Pro (the admin flag `campusClubs`; on when the flags can't be read). */
+async function campusClubsOn(): Promise<boolean> {
+  try {
+    const v = (await flagStates()).get("campusClubs")?.value;
+    return typeof v === "boolean" ? v : FLAGS.campusClubs.default;
+  } catch {
+    return FLAGS.campusClubs.default;
   }
 }
 
@@ -174,6 +192,26 @@ export async function earnedUntil(accountId: string): Promise<number | null> {
   let until: number | null = null;
   for (const r of rows) until = Math.max(until ?? 0, Number(r.at)) + Number(r.days) * DAY;
   return until;
+}
+
+/**
+ * Whether a club leader has one club with enough members training right now for free Pro. The leader is a member, so
+ * their own workout counts toward `EARNED.clubMembers`. One club has to reach the bar; two clubs don't add together.
+ * A club they only joined doesn't count. Off while `campusClubs` is off.
+ */
+export async function clubEarnsPro(accountId: string, now = Date.now()): Promise<boolean> {
+  if (!(await campusClubsOn())) return false;
+  const owned = await query<{ id: string }>("SELECT id FROM clubs WHERE owner_id = ?", [accountId]);
+  const since = now - EARNED.activeDays * DAY;
+  for (const c of owned) {
+    const members = await query<{ account_id: string }>("SELECT account_id FROM club_members WHERE club_id = ?", [String(c.id)]);
+    let active = 0;
+    for (const m of members) {
+      if ((await workoutsSince(String(m.account_id), since)) > 0) active++;
+      if (active >= EARNED.clubMembers) return true;
+    }
+  }
+  return false;
 }
 
 /** Whether a coach has enough clients training right now for free Pro. */

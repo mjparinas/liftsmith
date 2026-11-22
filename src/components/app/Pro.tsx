@@ -300,11 +300,13 @@ export function Pro() {
             ? t("pro.status.referral")
             : proVia === "coach"
               ? t("pro.status.coach")
-              : proVia === "school"
-                ? t("pro.status.school")
-                : proVia === "team"
-                  ? t("pro.status.team")
-                  : t("pro.status.account");
+              : proVia === "club"
+                ? t("pro.status.club")
+                : proVia === "school"
+                  ? t("pro.status.school")
+                  : proVia === "team"
+                    ? t("pro.status.team")
+                    : t("pro.status.account");
 
   return (
     <div className="pb-24">

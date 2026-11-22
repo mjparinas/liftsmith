@@ -49,7 +49,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - **Kept until the app pulls them:** readings in `cloud_readings` (one row per metric and day, a later ping replaces it) and sessions in `cloud_sessions`. Readings are deleted after 100 days and sessions after a year; Disconnect, a deregistration and deleting the account delete them at once. The app reads them through the same routes as the others (`/daily/` and `/results/`), so `pullCloud` treats Garmin like Oura for readings and like Concept2 for sessions (event ids `garmin-…`). Today's steps wait until the day is over, as with Oura. This is the one service whose data is stored on our server for a while; the privacy policy says so.
 - **No doubles:** a Garmin session that overlaps a workout already on the device is skipped (`cloudCardioEvents`' `busy`), because the watch also records the cardio part of a Liftsmith workout and a row the Concept2 Logbook already sent.
 - **Disconnect** deletes the lifter's registration at Garmin (`DELETE /wellness-api/rest/user/registration`), which ends our access.
-- **Not done:** Garmin's Training API (sending a planned workout to the watch's own workout list) and posting finished lifting sessions to Garmin Connect. The Connect IQ watch app already shows the live workout, and Garmin gives no public way to upload a finished activity, so neither was worth the extra permission. Weekly email and blog post: once Garmin leaves "Coming soon" (a lifter can't act on it before), add a `garmin-connect` weekly email and a post, like the Strava and WHOOP ones will need.
+- **Not doing, unless Melvin reopens it:** Garmin's Training API (sending a planned workout to the watch's own workout list) and posting finished lifting sessions to Garmin Connect. The Connect IQ watch app already shows the live workout, and Garmin gives no public way to upload a finished activity, so neither was worth the extra permission. This is a decision, not a leftover task ([Open items](open-items.md)). Weekly email and blog post: once Garmin leaves "Coming soon" (a lifter can't act on it before), add a `garmin-connect` weekly email and a post, like the Strava and WHOOP ones will need.
 
 ## Music
 
@@ -60,6 +60,18 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 Sonos uses the same server flow (provider `sonos`, `SONOS_CLIENT_ID` / `SONOS_CLIENT_SECRET`, scope `playback-control-all`, Basic auth on the token call like Polar, no revoke) but sends commands rather than data. Its card shows only while the `labSonos` lab is on. Everything else is in [Sonos](sonos.md).
 
 ## Keys Melvin creates (set in Vercel, Production and Preview)
+
+Checklist (also on [Open items](open-items.md) and [Growth](growth.md) "Still for Melvin"). Oura is done. The rest are still to create.
+
+- [x] **Oura** — keys are in Vercel (2026-11-11); connecting and syncing work. Still open: Oura's app review (new apps are capped at about 10 users) and written consent to use the data in a paid feature. Redirect `https://www.getliftsmith.com/api/connect/oura/callback/`.
+- [ ] **Strava** — https://www.strava.com/settings/api. Authorization Callback Domain `www.getliftsmith.com`. `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`. Then ask Strava for more athletes than the starting limit.
+- [ ] **WHOOP** — https://developer-dashboard.whoop.com. Redirect `https://www.getliftsmith.com/api/connect/whoop/callback/`. `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET`.
+- [ ] **Garmin Connect** — apply at https://developer.garmin.com/gc-developer-program/overview (Health API and Activity API). Redirect `https://www.getliftsmith.com/api/connect/garmin/callback/`. Ping (not Push) for Dailies, Sleeps, HRV, Body Compositions, Activities and Deregistration, each to `https://www.getliftsmith.com/api/connect/garmin/push/`. `GARMIN_CLIENT_ID`, `GARMIN_CLIENT_SECRET`.
+- [ ] **Withings** — https://developer.withings.com. Callback `https://www.getliftsmith.com/api/connect/withings/callback/`. `WITHINGS_CLIENT_ID`, `WITHINGS_CLIENT_SECRET`.
+- [ ] **Polar** — https://admin.polaraccesslink.com. Callback `https://www.getliftsmith.com/api/connect/polar/callback/`. `POLAR_CLIENT_ID`, `POLAR_CLIENT_SECRET`.
+- [ ] **Concept2** — https://log.concept2.com/developers. Redirect `https://www.getliftsmith.com/api/connect/concept2/callback/`. `CONCEPT2_CLIENT_ID`, `CONCEPT2_CLIENT_SECRET`. Then ask Concept2 to move the app off the development server.
+
+The same steps, in full, follow.
 
 - **Strava:** https://www.strava.com/settings/api → create an app (category Training, website https://www.getliftsmith.com, **Authorization Callback Domain `www.getliftsmith.com`**) → `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`. Then ask Strava for more athletes than the starting limit.
 - **Oura:** https://cloud.ouraring.com/oauth/applications → new application, redirect URI `https://www.getliftsmith.com/api/connect/oura/callback/`, scopes daily and heartrate → `OURA_CLIENT_ID`, `OURA_CLIENT_SECRET`. Oura's terms need written consent to use their data in a paid feature (readiness auto-adjust is Pro). **Done 2026-11-11:** Melvin created the Oura app and set both keys in Vercel; connecting and syncing work. Still to do before launch: apply for Oura's app review (new apps are capped at about 10 users) and ask for that written consent. Oura only shares data from rings with an active membership.

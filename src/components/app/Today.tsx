@@ -48,7 +48,7 @@ import { NowPlayingBar } from "./NowPlaying";
 import { programName } from "./Programs";
 import { RecoveryMap } from "./RecoveryMap";
 import { NextDayPain, RehabPhaseToday } from "./RehabPhase";
-import { PlanToday, RehabToday } from "./RehabToday";
+import { PlanEnded, PlanToday, RehabToday } from "./RehabToday";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
@@ -513,6 +513,7 @@ export function Today() {
           )}
 
           {!active && <PlanToday />}
+          {!active && <PlanEnded />}
           {!active && <NextDayPain />}
           {!active && <RehabPhaseToday />}
           {/* The physio's rehab on a day without lifting; beside the lifting it's the Rehab row in the parts. */}

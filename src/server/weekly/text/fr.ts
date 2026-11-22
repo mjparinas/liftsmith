@@ -1029,4 +1029,39 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ce sont des totaux seulement, d'après les sportifs qui comptent leurs visites, et ça démarre dès que cinq s'y sont entraînés. Vous ne voyez jamais qui.",
   },
+  "rehab-self": {
+    title: "Une routine douce quand quelque chose fait mal",
+    intro:
+      "Vous avez noté une blessure et vous n’avez pas de kiné ? Une courte routine au poids du corps vous attend, dans Blessures et dans une note du coach.",
+    points: [
+      "Elle s’affiche pour une blessure déjà notée, dès que rien d’autre ne couvre cette zone.",
+      "Ouvrez-la depuis Blessures, ou depuis la note sur Aujourd’hui, et ajoutez-la d’un geste.",
+      "C’est au poids du corps, assez court pour la maison, et elle peut accompagner votre entraînement.",
+      "Elle ne dit jamais ce qui ne va pas ni ce qui va le régler. C’est un point de départ, pas un traitement.",
+    ],
+    dyk: "Un programme d’un kiné pour la même zone la remplace, donc on ne vous le demande pas deux fois.",
+  },
+  "rehab-shape": {
+    title: "Réglez les répétitions, les secondes et une consigne",
+    intro:
+      "Une routine de rééducation peut maintenant porter exactement ce que vous voulez pour chaque exercice : les répétitions ou les secondes, et une courte consigne.",
+    points: [
+      "Dans l’éditeur de routines, augmentez les répétitions ou les secondes de chaque exercice. Laissez vide et l’appli choisit les répétitions.",
+      "Les maintiens commencent en secondes, donc un exercice minuté reste en temps, pas en répétitions.",
+      "Ajoutez une courte consigne sous l’exercice, la seule chose que vous voulez qu’ils retiennent.",
+      "Les clients la suivent telle qu’elle est écrite. Un téléphone plus ancien ouvre encore la routine et laisse simplement la consigne de côté.",
+    ],
+    dyk: "Les questions sur la douleur, les fois par semaine et les trois phases fonctionnent comme avant.",
+  },
+  "campus-clubs": {
+    title: "Pro pour un club qui continue de s’entraîner",
+    intro: "Animez un club où les gens s’entraînent vraiment, et Pro est gratuit pour vous tant qu’ils tiennent le rythme.",
+    points: [
+      "Cinq membres ou plus, vous compris, terminent chacun une séance dans les 14 derniers jours.",
+      "Un seul club doit y arriver. Deux clubs plus calmes ne s’additionnent pas.",
+      "Un club que vous avez seulement rejoint ne compte pas. C’est vous qui devez l’avoir créé.",
+      "Ça reste tant que le club s’entraîne, et ça s’arrête quand cette quinzaine se tait.",
+    ],
+    dyk: "Le club le dit sur sa page, et l’écran Pro dit que ça vient avec votre compte.",
+  },
 };

@@ -1,28 +1,33 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { readPicked } from "@/lib/coachMode";
 import { available, exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
+import { PART_LABEL } from "@/lib/injury";
 import { withInvite } from "@/lib/inviteLink";
 import { haptic, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
+import { TIMED } from "@/lib/progression";
 import { moveItem as moveTo } from "@/lib/reorder";
-import { MAX_ITEMS, moveItem, NAME_MAX, routineFrom } from "@/lib/routines";
+import { CUE_MAX, MAX_ITEMS, moveItem, NAME_MAX, REPS_MAX, routineFrom } from "@/lib/routines";
 import { codeFromLink, encodeRoutine, routineUrl } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import { linkedToNext, linksOf, toggleLink, withLinks } from "@/lib/superset";
-import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem, type RoutinePart } from "@/lib/types";
+import { useCoachNotes } from "@/lib/trainer";
+import { BODY_PARTS, MUSCLE_LABEL, type BodyPart, type Gym, type Routine, type RoutineItem, type RoutinePart } from "@/lib/types";
 
+import { PerWeekPicker } from "./CoachRehab";
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
 import { PublishRoutine } from "./PublishRoutine";
 import { go } from "./router";
 import { SendToFriend } from "./SendToFriend";
 import { RoutinePartsEditor, routinePartsLine } from "./Stretch";
-import { Bump, Button, EmptyState, LinkToggle, Sheet } from "./ui";
+import { Bump, Button, Chip, EmptyState, InlineSwitch, LinkToggle, Sheet } from "./ui";
 import { useShareInvite } from "./useShareInvite";
 
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
@@ -282,9 +287,17 @@ function RoutineEditor({
 }) {
   const { gyms, profile } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
+  const who = useCoachNotes((s) => s.who);
+  const areaLabel = useId();
+  // A coach (or a routine that is already a rehab program) can mark it as one. Clients who don't coach don't see the switch.
+  const isCoach = !!who.self || who.clients > 0 || readPicked() === "coach" || readPicked() === "school";
   const [name, setName] = useState(initial.name);
   const [items, setItems] = useState<RoutineItem[]>(initial.items);
   const [parts, setParts] = useState<RoutinePart[] | undefined>(initial.parts);
+  const [rehab, setRehab] = useState(!!initial.rehab);
+  const [rehabPart, setRehabPart] = useState<BodyPart | undefined>(initial.rehabPart);
+  const [perWeek, setPerWeek] = useState<number | undefined>(initial.perWeek);
+  const showRehab = isCoach || !!initial.rehab;
   const [adding, setAdding] = useState(initial.items.length === 0);
   // Desktop layout (layout.ts): the exercise browser stays open beside the routine, and rows drag to a new place
   // (the up and down buttons still work, for the keyboard).
@@ -301,6 +314,26 @@ function RoutineEditor({
     const sets = Math.min(10, Math.max(1, it.sets + d));
     if (sets === it.sets) return false;
     setItems(items.map((x, k) => (k === i ? { ...x, sets } : x)));
+    return true;
+  };
+  // Empty means the app picks the reps. The first step up starts at 8, or 20 seconds for a hold.
+  const setReps = (i: number, d: number) => {
+    const it = items[i];
+    if (!it) return false;
+    const cur = it.reps;
+    if (cur === undefined) {
+      if (d < 0) return false;
+      const start = TIMED.has(it.exerciseId) ? 20 : 8;
+      setItems(items.map((x, k) => (k === i ? { ...x, reps: start } : x)));
+      return true;
+    }
+    const next = cur + d;
+    if (next > REPS_MAX) return false;
+    if (next < 1) {
+      setItems(items.map((x, k) => (k === i ? { ...x, reps: undefined } : x)));
+      return true;
+    }
+    setItems(items.map((x, k) => (k === i ? { ...x, reps: next } : x)));
     return true;
   };
   const remove = (i: number) => {
@@ -329,6 +362,30 @@ function RoutineEditor({
           placeholder={t("rt.namePlaceholder")}
           className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
         />
+        {showRehab && (
+          <div className="mt-4">
+            <InlineSwitch label={t("rt.rehabSwitch")} hint={t("rt.rehabSwitchHint")} on={rehab} onChange={setRehab} />
+            {rehab && (
+              <>
+                <p className="mt-2 text-xs text-muted">{t("rt.rehabNote")}</p>
+                <p className="mt-3 text-sm font-medium" id={areaLabel}>
+                  {t("rt.rehabArea")}
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby={areaLabel}>
+                  {BODY_PARTS.map((p) => (
+                    <Chip key={p} active={rehabPart === p} onClick={() => setRehabPart(rehabPart === p ? undefined : p)}>
+                      {PART_LABEL[p]}
+                    </Chip>
+                  ))}
+                </div>
+                {!rehabPart && <p className="mt-1 text-xs text-muted">{t("rt.rehabAreaNeed")}</p>}
+                <div className="mt-3">
+                  <PerWeekPicker value={perWeek} onChange={setPerWeek} />
+                </div>
+              </>
+            )}
+          </div>
+        )}
         {items.length > 0 && (
           <ol className="mt-4 divide-y divide-line/70 overflow-hidden rounded-2xl border border-line">
             {items.map((it, i) => {
@@ -424,6 +481,37 @@ function RoutineEditor({
                       </button>
                     </div>
                   </div>
+                  {rehab && (
+                    <div className="mt-1 space-y-2 pl-[52px]">
+                      <div className="flex items-center gap-1">
+                        <Bump
+                          dir={-1}
+                          size="sm"
+                          aria={t(TIMED.has(it.exerciseId) ? "rt.secsFewer" : "rt.repsFewer", { name: ex.name })}
+                          onStep={(d) => setReps(i, d)}
+                        />
+                        <span className="num w-28 text-center text-sm font-semibold">
+                          {it.reps
+                            ? t(TIMED.has(it.exerciseId) ? "rt.secsCount" : "rt.repsCount", { count: it.reps })
+                            : t(TIMED.has(it.exerciseId) ? "rt.secsUnset" : "rt.repsUnset")}
+                        </span>
+                        <Bump
+                          dir={1}
+                          size="sm"
+                          aria={t(TIMED.has(it.exerciseId) ? "rt.secsMore" : "rt.repsMore", { name: ex.name })}
+                          onStep={(d) => setReps(i, d)}
+                        />
+                      </div>
+                      <input
+                        value={it.cue ?? ""}
+                        maxLength={CUE_MAX}
+                        aria-label={t("rt.cue", { name: ex.name })}
+                        placeholder={t("rt.cuePlaceholder")}
+                        onChange={(e) => setItems(items.map((x, k) => (k === i ? { ...x, cue: e.target.value } : x)))}
+                        className="w-full rounded-xl border border-line bg-raised px-3 py-2 text-sm outline-none focus:border-accent"
+                      />
+                    </div>
+                  )}
                 </li>
               );
             })}
@@ -443,11 +531,30 @@ function RoutineEditor({
           <Button
             icon="check"
             className="w-full"
-            disabled={!items.length}
+            disabled={!items.length || (rehab && !rehabPart)}
             onClick={() => {
-              const out: Routine = { ...initial, name, items };
+              const plain = items.map((item) => {
+                const next = { ...item };
+                delete next.reps;
+                delete next.cue;
+                return next;
+              });
+              const out: Routine = { ...initial, name, items: rehab ? items : plain };
               if (parts) out.parts = parts;
               else delete out.parts;
+              if (rehab) {
+                out.rehab = true;
+                if (rehabPart) out.rehabPart = rehabPart;
+                else delete out.rehabPart;
+                if (perWeek) out.perWeek = perWeek;
+                else delete out.perWeek;
+                if (!(initial.rehabPlan && rehabPart === initial.rehabPart)) delete out.rehabPlan;
+              } else {
+                delete out.rehab;
+                delete out.rehabPart;
+                delete out.perWeek;
+                delete out.rehabPlan;
+              }
               onSave(out);
             }}
           >

@@ -17,7 +17,7 @@ import { rehabDue, rehabInjuries, rehabItems, rehabRoutine, type RehabDue } from
 import { MAX_ROUTINES } from "@/lib/routines";
 import { decodeRoutine, sameItems } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
-import { dismissPlan, useCoachNotes, type ShownPlan } from "@/lib/trainer";
+import { dismissEnded, dismissPlan, endedPrograms, useCoachNotes, type ShownPlan } from "@/lib/trainer";
 import type { Routine } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
@@ -80,6 +80,7 @@ export function PlanToday() {
       ...(perWeek ? { perWeek } : {}),
       ...(routine.rehab && routine.rehabPlan ? { rehabPlan: routine.rehabPlan } : {}),
       ...(routine.parts ? { parts: routine.parts } : {}),
+      assignedPlan: { id: plan.id, coachId: plan.coachId },
     });
     track("feature", { name: "trainer", detail: "planTodaySave" });
   };
@@ -112,6 +113,54 @@ export function PlanToday() {
         </Button>
         <Button kind="quiet" onClick={() => dismissPlan(plan.id)}>
           {t("trn.planToday.later")}
+        </Button>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * A program the coach took back (2026-11-22). The saved routine is still here; one tap stops it, the other keeps it
+ * without the coach's plan. Shown only after an overview has loaded, so a cold start doesn't guess.
+ */
+export function PlanEnded() {
+  const plans = useCoachNotes((s) => s.plans);
+  const ready = useCoachNotes((s) => s.plansReady);
+  const dismissed = useCoachNotes((s) => s.plansEnded);
+  const coaches = useCoachNotes((s) => s.who.coaches);
+  const { profile, saveRoutine, deleteRoutine } = useApp();
+  const ended = useMemo(() => endedPrograms(profile.routines ?? [], plans, ready, dismissed), [profile.routines, plans, ready, dismissed]);
+  const routine = ended[0];
+  const planId = routine?.assignedPlan?.id;
+  if (!routine || !planId || !routine.assignedPlan) return null;
+  const coach = coaches.find((c) => c.id === routine.assignedPlan?.coachId)?.name || t("trn.noName");
+  const stop = () => {
+    haptic("tap");
+    deleteRoutine(routine.id);
+    dismissEnded(planId);
+  };
+  const keep = () => {
+    haptic("tap");
+    const rest = { ...routine };
+    delete rest.assignedPlan;
+    saveRoutine(rest);
+    dismissEnded(planId);
+  };
+  return (
+    <section className="card card-tint mt-3 p-4" style={{ ["--tint" as string]: "var(--color-violet)" }} data-testid="plan-ended">
+      <div className="flex items-start gap-3">
+        <Icon name="bandage" />
+        <div className="min-w-0 flex-1">
+          <h2 className="font-semibold break-words">{t("trn.planEnd.title", { name: coach, plan: routine.name })}</h2>
+          <p className="mt-1 text-sm text-muted">{t("trn.planEnd.body")}</p>
+        </div>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button kind="ghost" className="flex-1" onClick={stop}>
+          {t("trn.planEnd.stop")}
+        </Button>
+        <Button kind="quiet" onClick={keep}>
+          {t("trn.planEnd.keep")}
         </Button>
       </div>
     </section>
