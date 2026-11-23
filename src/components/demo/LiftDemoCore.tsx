@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { loadingKey } from "@/lib/demo/barPlates";
 import { DANCE_ID, tapStreak } from "@/lib/demo/dance";
 import type { Body, BodyKey } from "@/lib/demo/rig";
 import { EXERCISES } from "@/lib/exercises";
 import { LITE, useLiteDemos } from "@/lib/liteDemos";
-import type { Muscle } from "@/lib/types";
+import type { Loading } from "@/lib/plates";
+import type { Muscle, Unit } from "@/lib/types";
 import { probeWebGL } from "@/lib/webgl";
 
 import type { DemoSettings, Loop, View } from "./engine";
@@ -70,6 +72,10 @@ export interface LiftDemoProps {
   follow?: () => number | null;
   /** Tilt the whole figure to one side, in degrees (positive to the figure's right): camera form check shows a lean. */
   lean?: number;
+  /** Real bar loading for the figure's plates (workout screen); leave out for the decorative stack. */
+  loading?: Loading | null;
+  /** Gym unit paired with `loading`. */
+  unit?: Unit | null;
   className?: string;
   /** No frame, backdrop or phase readout: the figure stands on the screen itself (the welcome screen). */
   bare?: boolean;
@@ -156,6 +162,8 @@ export function LiftDemoCore({
   fps,
   follow,
   lean,
+  loading = null,
+  unit = null,
   className = "",
   bare = false,
   onDone,
@@ -225,7 +233,10 @@ export function LiftDemoCore({
     maxDpr: lite ? Math.min(maxDpr ?? 2, LITE.maxDpr) : maxDpr,
     follow: follow ?? null,
     lean: lean ?? 0,
+    loading,
+    unit,
   };
+  const loadSig = loadingKey(loading, unit);
   const latest = useRef(settings);
   const onDoneRef = useRef(onDone);
   useEffect(() => {
@@ -302,6 +313,7 @@ export function LiftDemoCore({
     maxDpr,
     follow,
     lean,
+    loadSig,
     dancing,
   ]);
 

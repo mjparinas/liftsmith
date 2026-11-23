@@ -1,3 +1,4 @@
+import { barDiscs, poleRadii, trapDiscs } from "@/lib/demo/barPlates";
 import { partIndices, placeVec } from "@/lib/demo/mesh";
 import { anchorAt, poleSegments, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
 
@@ -147,16 +148,11 @@ export function createScene2D(canvas: HTMLCanvasElement): Scene {
         hold = f.motion.hold ?? "each";
       if ((load === "barbell" || load === "trapbar") && J.bar) {
         const b = J.bar;
-        line([b[0], b[1], -1.05], [b[0], b[1], 1.05]);
-        const k = f.motion.plates ?? 1,
-          z0 = k < 1 ? 0.44 : 0.52;
-        for (const sg of [-1, 1])
-          for (const [z, r] of [
-            [z0, 0.225],
-            [z0 + 0.05, 0.19],
-            [z0 + 0.08, 0.14],
-          ])
-            ring([b[0], b[1], sg * z], r * k, "z");
+        const small = (f.motion.plates ?? 1) < 1;
+        line([b[0], b[1], small ? -0.75 : -1.05], [b[0], b[1], small ? 0.75 : 1.05]);
+        const discs = load === "trapbar" ? trapDiscs(f.s.loading, f.s.unit) : barDiscs(f.s.loading, f.s.unit, small);
+        const sides = f.s.loading?.oneEnd ? [1] : [-1, 1];
+        for (const sg of sides) for (const d of discs) ring([b[0], b[1], sg * d.z], d.r, "z");
       }
       const hands = [J.handL, J.handR];
       const mid: Vec = [(J.handL[0] + J.handR[0]) / 2, (J.handL[1] + J.handR[1]) / 2, (J.handL[2] + J.handR[2]) / 2];
@@ -176,7 +172,11 @@ export function createScene2D(canvas: HTMLCanvasElement): Scene {
         ring(mid, 0.12, "y");
       }
       if (load === "wheel") ring([mid[0], 0.1, mid[2]], 0.09, "z");
-      for (const p of f.motion.props?.(f.body) ?? []) drawProp(p, J, line);
+      const radii = poleRadii(f.s.loading, f.s.unit);
+      for (const p of f.motion.props?.(f.body) ?? []) {
+        const prop = radii !== null && p.kind === "pole" ? { ...p, plates: radii, plate: undefined } : p;
+        drawProp(prop, J, line);
+      }
       ctx.stroke();
 
       if (f.heart) {
