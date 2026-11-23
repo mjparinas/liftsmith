@@ -1,0 +1,5 @@
+Amy voice (en_US-amy-low)
+Model: https://huggingface.co/rhasspy/piper-voices (en/en_US/amy/low)
+Dataset lineage: Mycroft Mimic voices (CC BY-SA 4.0)
+Piper phonemizer WASM: @diffusionstudio/piper-wasm (MIT)
+ONNX Runtime Web: Microsoft (MIT)
