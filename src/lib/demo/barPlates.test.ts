@@ -83,12 +83,11 @@ describe("landmine pole rings", () => {
     const J = {
       handL: [0.2, 1.2, -0.05] as [number, number, number],
       handR: [0.2, 1.2, 0.05] as [number, number, number],
-      hand: [0.2, 1.2, 0] as [number, number, number],
     };
-    // minimal joints the pole reader needs
+    // minimal joints the pole reader needs (Proxy fills the rest)
     const joints = new Proxy(J, {
       get: (t, k) => (k in t ? t[k as keyof typeof J] : ([0, 0, 0] as [number, number, number])),
-    }) as import("./rig").Joints;
+    }) as unknown as import("./rig").Joints;
     const none = poleSegments({ kind: "pole", from: [1.4, 0.03, 0], to: "hands", past: 0.08, plates: [] }, joints);
     const many = poleSegments({ kind: "pole", from: [1.4, 0.03, 0], to: "hands", past: 0.08, plates: [0.22, 0.22, 0.18] }, joints);
     expect(none).toHaveLength(POLE_SEGMENTS);
