@@ -193,6 +193,10 @@ export const de: FeaturesText = {
       body: "Spricht während des Trainings, etwa wenn die Pause vorbei ist, damit du nicht aufs Handy schauen musst.",
       note: "Android sagt das Pausenende auch bei gesperrtem Bildschirm an; iPhone und Web, solange die App offen ist.",
     },
+    "voice-amy": {
+      name: "Amy-Stimme",
+      body: "Eine klare englische Stimme in der App für den Sprachcoach. Wähle Amy oder die Telefon-Sprachausgabe unter Einstellungen › Training; Amy fällt auf die Telefonstimme zurück, wenn sie nicht lädt.",
+    },
     stretching: {
       name: "Dehnen",
       body: "48 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag. Ein paar Sekunden, um vor jeder Dehnung und jeder Seite in Position zu kommen, und der Bildschirm bleibt an.",

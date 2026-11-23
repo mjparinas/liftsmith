@@ -289,6 +289,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "voice-amy",
+        name: "Amy voice",
+        body: "A clear English voice built into the app for the voice coach. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
+        tier: "pro",
+        pro: "voiceAmy",
+        added: "2026-11-23",
+      },
+      {
         id: "stretching",
         name: "Stretching",
         body: "48 stretches with 3D demos: an optional warm-up before, a cool-down after, or a stretch routine any day. A few seconds to get into position before each stretch and each side, and the screen stays on.",

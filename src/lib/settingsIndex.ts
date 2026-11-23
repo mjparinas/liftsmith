@@ -75,6 +75,8 @@ export const SETTINGS_INDEX: SettingRef[] = [
   S("str.readySetting", "workout"),
   S("pol.hf.title", "workout"),
   S("delight.voice", "workout"),
+  S("delight.voiceEngine", "workout"),
+  S("delight.voiceAmy", "workout"),
   S("delight.ghost", "workout"),
   S("delight.plates", "workout"),
   S("ff.setting", "workout"),

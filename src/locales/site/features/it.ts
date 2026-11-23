@@ -187,6 +187,10 @@ export const it: FeaturesText = {
       body: "Parla durante l’allenamento, per esempio quando finisce il riposo, così non devi guardare il telefono.",
       note: "Android avvisa della fine del riposo anche a schermo bloccato; iPhone e web finché l’app è aperta.",
     },
+    "voice-amy": {
+      name: "Voce Amy",
+      body: "Una voce inglese chiara inclusa nell’app per il coach vocale. Scegli Amy o la sintesi del telefono in Impostazioni › Allenamento; Amy torna alla voce del telefono se non si carica.",
+    },
     stretching: {
       name: "Stretching",
       body: "48 allungamenti con dimostrazioni in 3D: un riscaldamento facoltativo prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno. Qualche secondo per metterti in posizione prima di ogni allungamento e di ogni lato, e lo schermo resta acceso.",

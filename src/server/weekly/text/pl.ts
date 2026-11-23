@@ -1057,4 +1057,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Klub mówi o tym na swojej stronie, a ekran Pro mówi, że idzie z Twoim kontem.",
   },
+  "voice-amy": {
+    title: "Amy zapowiada serie",
+    intro: "Trener głosowy może teraz używać Amy, wyraźnego angielskiego głosu w aplikacji, albo zostać przy syntezie telefonu.",
+    points: [
+          "Włącz trenera głosowego w Ustawieniach › Trening i wybierz Głos telefonu albo Amy.",
+          "Amy jest w Pro i tylko po angielsku. Po instalacji działa offline.",
+          "Jeśli Amy się nie załaduje, podpowiedzi wracają automatycznie do głosu telefonu.",
+          "Głos telefonu może wybierać spośród głosów wymienionych przez urządzenie, w każdym języku aplikacji."
+    ],
+    dyk: "Darmowy trener i zapowiedzi przerwy na zablokowanym ekranie nadal używają syntezy systemowej, gdy jej potrzebujesz.",
+  },
+
 };

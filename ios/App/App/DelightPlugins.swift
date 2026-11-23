@@ -15,6 +15,7 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "speak", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "voices", returnType: CAPPluginReturnPromise),
     ]
 
     private let synth = AVSpeechSynthesizer()
@@ -28,6 +29,7 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
         let rate = call.getFloat("rate") ?? 1
         // The app's language (it can differ from the phone's), so a Spanish cue gets a Spanish voice.
         let lang = call.getString("lang") ?? ""
+        let voiceId = call.getString("voiceId") ?? ""
         guard !text.isEmpty else { return call.resolve() }
         DispatchQueue.main.async {
             let session = AVAudioSession.sharedInstance()
@@ -36,8 +38,12 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
             if self.synth.isSpeaking { self.synth.stopSpeaking(at: .immediate) }
             let u = AVSpeechUtterance(string: text)
             u.rate = AVSpeechUtteranceDefaultSpeechRate * rate
-            u.voice = AVSpeechSynthesisVoice(language: lang.isEmpty ? Locale.current.identifier.replacingOccurrences(of: "_", with: "-") : lang)
-                ?? AVSpeechSynthesisVoice(language: String(lang.prefix(2)))
+            if !voiceId.isEmpty, let picked = AVSpeechSynthesisVoice(identifier: voiceId) {
+                u.voice = picked
+            } else {
+                u.voice = AVSpeechSynthesisVoice(language: lang.isEmpty ? Locale.current.identifier.replacingOccurrences(of: "_", with: "-") : lang)
+                    ?? AVSpeechSynthesisVoice(language: String(lang.prefix(2)))
+            }
             self.synth.speak(u)
             call.resolve()
         }
@@ -49,6 +55,13 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
             self.release()
             call.resolve()
         }
+    }
+
+    @objc func voices(_ call: CAPPluginCall) {
+        let list: [[String: String]] = AVSpeechSynthesisVoice.speechVoices().map { v in
+            ["id": v.identifier, "name": v.name, "lang": v.language]
+        }
+        call.resolve(["voices": list])
     }
 
     public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

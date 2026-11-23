@@ -238,6 +238,10 @@ export const tr: FeaturesText = {
       body: "Antrenman sırasında, örneğin dinlenme bittiğinde sesli söyler; telefona bakmana gerek kalmaz.",
       note: "Android dinlenmenin bittiğini ekran kilitliyken de söyler; iPhone ve web uygulama açıkken.",
     },
+    "voice-amy": {
+      name: "Amy sesi",
+      body: "Sesli koç için uygulamaya gömülü net bir İngilizce ses. Ayarlar › Antrenman’da Amy veya telefon metin okumayı seç; Amy yüklenemezse telefon sesine döner.",
+    },
     stretching: {
       name: "Esneme",
       body: "3D gösterimli 48 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini. Her esneme ve her taraf öncesinde pozisyon almak için birkaç saniye var ve ekran açık kalır.",

@@ -1061,4 +1061,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "O clube diz isso na página dele, e a tela do Pro diz que vem com a sua conta.",
   },
+  "voice-amy": {
+    title: "A Amy diz as tuas séries",
+    intro: "O coach por voz pode usar a Amy, uma voz inglesa clara na app, ou manter a síntese do telemóvel.",
+    points: [
+          "Liga o coach por voz em Definições › Treino e escolhe Voz do telemóvel ou Amy.",
+          "A Amy é Pro e só em inglês. Fica offline depois de a app estar instalada.",
+          "Se a Amy não carregar, as indicações voltam sozinhas à voz do telemóvel.",
+          "A voz do telemóvel pode escolher entre as que o dispositivo lista, em cada idioma da app."
+    ],
+    dyk: "O coach grátis e os avisos de descanso no ecrã bloqueado continuam a usar a fala do sistema quando precisas.",
+  },
+
 };

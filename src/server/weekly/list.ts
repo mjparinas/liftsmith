@@ -172,6 +172,8 @@ export const WEEKLY: WeeklyEmail[] = [
   R("rehab-shape", "physio", "pro", "trainer", { fresh: "2026-11-22", shot: false }),
   // New, 2026-11-22: club leaders earn Pro while the club keeps training (docs/decisions/growth.md "Campus clubs").
   L("campus-clubs", "free", "friends", { fresh: "2026-11-22", shot: false }),
+  // New, 2026-11-23: Amy voice for the voice coach (docs/decisions/delightful-extras.md).
+  L("voice-amy", "pro", "settings/workout", { fresh: "2026-11-23", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

@@ -89,11 +89,15 @@ describe("the weekly tips' words", () => {
         const shot = imageOf(e);
         if (shot) expect(existsSync(join(process.cwd(), "public/email", lang, `${shot}.jpg`)), `${lang} ${e.id}`).toBe(true);
       }
-    // The ones without a picture are the screens that need someone's account, the gym's own pages, and the community
-    // and the routine library, whose posts and routines come from our server in the lifters' own words.
+    // The ones without a picture are the screens that need someone's account, the gym's own pages, Settings that
+    // only show the lifter's own prefs, and the community and the routine library, whose posts and routines come
+    // from our server in the lifters' own words.
     expect(
       WEEKLY.filter((e) => !imageOf(e)).every(
-        (e) => e.route.startsWith("trainer") || ["friends", "gym", "community", "library"].includes(e.route),
+        (e) =>
+          e.route.startsWith("trainer") ||
+          e.route.startsWith("settings") ||
+          ["friends", "gym", "community", "library"].includes(e.route),
       ),
     ).toBe(true);
     expect(weeklyMail({ email: byId("friends-feed"), n: 0 }, footer, "en", { state: "pro" }).html).not.toContain("/email/en/w/");

@@ -59,7 +59,7 @@ describe("native web files", () => {
 
   it("keeps what the app page loads", () => {
     // Everything the app's <head> links to by a root path (icons, manifest) must be on the list.
-    for (const name of ["favicon.ico", "icon.svg", "apple-touch-icon.png", "icon-192.png", "manifest.webmanifest", "sw.js", "mediapipe"]) {
+    for (const name of ["favicon.ico", "icon.svg", "apple-touch-icon.png", "icon-192.png", "manifest.webmanifest", "sw.js", "mediapipe", "piper"]) {
       expect(KEEP).toContain(name);
     }
   });

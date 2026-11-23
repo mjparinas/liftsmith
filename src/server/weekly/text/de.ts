@@ -1060,4 +1060,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Der Club sagt es auf seiner Seite, und der Pro-Bildschirm sagt, dass es mit deinem Konto kommt.",
   },
+  "voice-amy": {
+    title: "Amy sagt deine Sätze an",
+    intro: "Der Sprachcoach kann jetzt Amy nutzen, eine klare englische Stimme in der App, oder bei der Telefon-Sprachausgabe bleiben.",
+    points: [
+          "Schalte den Sprachcoach unter Einstellungen › Training ein und wähle Telefonstimme oder Amy.",
+          "Amy ist Pro und nur auf Englisch. Sie bleibt offline, sobald die App installiert ist.",
+          "Wenn Amy nicht lädt, fallen die Ansagen automatisch auf die Telefonstimme zurück.",
+          "Die Telefonstimme kann unter den Stimmen wählen, die das Gerät auflistet, in jeder App-Sprache."
+    ],
+    dyk: "Der kostenlose Sprachcoach und die Pausenansagen auf dem Sperrbildschirm nutzen weiter die Systemstimme, wenn du sie brauchst.",
+  },
+
 };

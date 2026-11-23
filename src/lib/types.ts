@@ -560,6 +560,13 @@ export interface RoutinePart {
 export interface DelightPrefs {
   /** Spoken cues between sets. Off by default. */
   voice?: boolean;
+  /**
+   * Which voice speaks the cues: the phone's system TTS (default), or Piper Amy (Pro, English, bundled
+   * under /piper/). System is used whenever Amy isn't available (no Pro, another language, or Piper fails).
+   */
+  voiceEngine?: "system" | "amy";
+  /** Optional system TTS voice id (platform voice URI / name) when `voiceEngine` is system. */
+  voiceId?: string;
   /** Race last time's pace on the rest timer. On unless turned off. */
   ghost?: boolean;
   /** Show only the plates to add or take off between sets. On unless turned off. */
