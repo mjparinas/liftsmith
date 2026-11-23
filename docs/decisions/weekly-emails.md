@@ -842,3 +842,40 @@ Your gym's page in the app now shows how lifters train there, with one thing to 
 - The equipment members use most, and any in your setup nobody has touched.
 - Open equipment problem reports come first, because lifters' plans skip that equipment until you tap Fixed.
 Did you know? It's totals only, from lifters who count their gym visits, and it starts once five lifters have trained there. You never see who. ([Gyms](gyms.md) "Owner insights")
+
+### W75 · A gentle routine when something hurts (**New**, 2026-11-22)
+Free · Lifters · Screenshot of Injuries · `fresh`, so it goes next to everyone already in the series
+Logged an injury and you don't have a physio? A short bodyweight routine is there when you're ready, on Injuries and in a coach's note.
+- It shows for an injury you've already logged, once nothing else covers that area.
+- Open it from Injuries, or from the note on Today, and add it in one tap.
+- It's bodyweight, short enough to do at home, and it can sit beside your lifting.
+- It never says what's wrong or what will fix it. It's a starting point, not a treatment.
+Did you know? A program from a physio for the same area replaces it, so you aren't asked twice.
+
+### P2 · Set the reps, the seconds and a cue (**New**, 2026-11-22)
+Pro · Physios · No screenshot (the routine builder for a physio's own clients) · `fresh`, so it goes next to physios already in the series
+A rehab routine can now carry exactly what you want each exercise to be: the reps or the seconds, and a short cue.
+- In the routine builder, step the reps or the seconds on each exercise. Leave it empty and the app picks the reps.
+- Holds start in seconds, so a timed exercise stays in time, not in reps.
+- Add a short cue under the exercise, the one thing you want them to remember.
+- Clients follow it as written. An older phone still opens the routine and simply leaves the cue out.
+Did you know? The pain checks, the times a week and the three phases work the same as before. ([Trainer mode](trainer-mode.md))
+
+### W76 · Pro for a club that keeps training (**New**, 2026-11-22)
+Free · Lifters · No screenshot (Friends needs an account) · `fresh`, so it goes next to everyone already in the series
+Run a club where people actually train, and Pro is free for you while they keep it up.
+- Five or more members, you included, each finish a workout in the last 14 days.
+- One club has to reach it. Two quieter clubs don't add together.
+- A club you only joined doesn't count. You have to be the one who started it.
+- It stays on while the club keeps training, and it stops when that fortnight goes quiet.
+Did you know? The club says so on its page, and the Pro screen says it comes with your account. ([Growth](growth.md) "Campus clubs")
+
+### W77 · Amy speaks your sets (**New**, 2026-11-23)
+Pro · Lifters · No screenshot (Settings › Workout) · `fresh`, so it goes next to everyone already in the series
+The voice coach can now use Amy, a clear English voice built into the app, or keep your phone's text-to-speech.
+- Turn on Voice coach in Settings › Workout, then pick Phone voice or Amy.
+- Amy is Pro and English only. She stays offline once the app is installed.
+- If Amy can't load, cues fall back to your phone's voice automatically.
+- Phone voice can pick among the voices your device lists, in every app language.
+Did you know? The free voice coach and lock-screen rest cues still use system speech when you need them. ([Delightful extras](delightful-extras.md))
+

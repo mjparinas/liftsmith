@@ -163,6 +163,14 @@ export const tr: FeaturesText = {
       body: "Fizyoterapistinden gelen program Bugün ekranında seni bekler, tek dokunuşla kaydedilir ve ilgili sakatlığı kaydeder. İstedikleri haftalık sıklığa uyar, dinlenme günlerinde de görünür ve yalnızca o sakatlık için ağrıyı sorar.",
       note: "Rehabilitasyon hatırlatıcıları ve yeni program bildirimi Android ve iPhone'da.",
     },
+    "rehab-self": {
+      name: "Fizyoterapist olmadan hafif rehabilitasyon",
+      body: "Bir sakatlık kaydettin ve fizyoterapistin yok mu? Sakatlıklar ve bir koç notu, evde yapabileceğin kısa bir vücut ağırlığı rutini sunar. Bu bir başlangıçtır, tedavi değildir.",
+    },
+    "rehab-end": {
+      name: "Fizyoterapist bir programı geri aldığında",
+      body: "Fizyoterapistin bir programı geri alırsa Bugün durdurmanı ya da kendi başına sürdürmeni sorar. Durdurmak rutini ve hatırlatıcılarını kaldırır.",
+    },
     cycle: {
       name: "Döngüye duyarlı hazırlık",
       body: "İstersen döngünü kaydet, günün kararı bunu da hesaba katsın.",
@@ -229,6 +237,10 @@ export const tr: FeaturesText = {
       name: "Sesli koç",
       body: "Antrenman sırasında, örneğin dinlenme bittiğinde sesli söyler; telefona bakmana gerek kalmaz.",
       note: "Android dinlenmenin bittiğini ekran kilitliyken de söyler; iPhone ve web uygulama açıkken.",
+    },
+    "voice-amy": {
+      name: "Amy sesi",
+      body: "Sesli koç için uygulamaya gömülü net bir İngilizce ses. Ayarlar › Antrenman’da Amy veya telefon metin okumayı seç; Amy yüklenemezse telefon sesine döner.",
     },
     stretching: {
       name: "Esneme",
@@ -431,6 +443,11 @@ export const tr: FeaturesText = {
       body: "Antrenmanlar arasında kulübünle konuş, birlikte çalışmak için bir saat ve yer paylaş, kimlerin geldiğini gör. Katılan herkes bir saat önce hatırlatma alır; sonra antrenmanını paylaşınca antrenman yapmış görünürsün ve birlikte çalıştığın arkadaşların etiketlenir.",
       note: "18 yaş ve üzeri içindir. Bildirimler Android ve iPhone'da; web uygulaması sohbet açıkken yeni mesajları gösterir.",
     },
+    "campus-clubs": {
+      name: "Aktif kulüp liderleri için Pro",
+      body: "Sen dahil 5 veya daha fazla üyenin son 14 günde birer antrenman bitirdiği bir kulübü yönetirken Pro senin için ücretsiz kalır.",
+      note: "Başkasının kulübüne katılmak sayılmaz ve iki kulüp toplanmaz.",
+    },
     profiles: {
       name: "Herkese açık profiller",
       body: "En iyi kaldırışların ve antrenmanlarınla isteğe bağlı, herkese açık bir sayfa.",
@@ -475,6 +492,11 @@ export const tr: FeaturesText = {
     "rehab-phases": {
       name: "Ağrıyla ilerleyen aşamalı rehabilitasyon protokolleri",
       body: "Her rehabilitasyon programının bölgeyi sakinleştirmekten tam kullanıma kadar üç aşaması var. Basit bir ağrı kuralı her egzersizden sonraki ve ertesi günkü puanları okur, danışanın sonraki aşamaya ne zaman hazır olduğunu ya da ne zaman geri dönmesi gerektiğini söyler; fizyoterapist de tek dokunuşla gönderir.",
+      note: "Danışanlar ücretsiz kullanır. Liftsmith danışanların kaydettiklerini gösterir. Teşhis koymaz ve tedavi etmez.",
+    },
+    "rehab-shape": {
+      name: "Bir rehabilitasyon rutinini şekillendir",
+      body: "Fizyoterapistler rutin düzenleyicide bir rehabilitasyon rutininin her egzersizine tekrar ya da saniye koyar ve kısa bir ipucu ekler. Danışanlar yazıldığı gibi uygular.",
       note: "Danışanlar ücretsiz kullanır. Liftsmith danışanların kaydettiklerini gösterir. Teşhis koymaz ve tedavi etmez.",
     },
     "coach-nutrition": {

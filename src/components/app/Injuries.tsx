@@ -1,8 +1,9 @@
 "use client";
 
-import { useId, useState, type CSSProperties } from "react";
+import { useId, useMemo, useState, type CSSProperties } from "react";
 
 import { CARD_TITLE } from "@/components/titles";
+import { track } from "@/lib/analytics";
 import { available } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { date, inSentence, list, t } from "@/lib/i18n";
@@ -22,10 +23,12 @@ import {
   type InjuryAction,
 } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
+import { rehabSelfOffer } from "@/lib/rehabSelf";
 import { useApp } from "@/lib/store";
 import { BODY_PARTS, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
+import { protocolRoutine, RehabPrograms } from "./CoachRehab";
 import { go } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
@@ -39,10 +42,20 @@ type Warn = { injuryId: string; exerciseId?: string; name: string; action: "ligh
 
 const day = (ms: number) => date(ms, { month: "short", day: "numeric" });
 const lower = (part: Injury["part"]) => inSentence(PART_LABEL[part], true);
+const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
-export function Injuries() {
-  const { events, gyms, profile, logInjury, setInjuryRule, healInjury, ratePain, startReturn, active: workout } = useApp();
+export function Injuries({ openRehab = false }: { openRehab?: boolean }) {
+  const { events, gyms, profile, logInjury, setInjuryRule, healInjury, ratePain, startReturn, saveShared, active: workout } = useApp();
+  const now = useNow();
   const [rating, setRating] = useState<string | null>(null);
+  const offer = useMemo(() => rehabSelfOffer(events, profile.routines, now), [events, profile.routines, now]);
+  const [rehabPicked, setRehabPicked] = useState(false);
+  const [rehabClosed, setRehabClosed] = useState(false);
+  const rehabOpen = offer.length > 0 && (rehabPicked || (openRehab && !rehabClosed));
+  const closeRehab = () => {
+    setRehabPicked(false);
+    setRehabClosed(true);
+  };
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const all = injuries(events);
   const active = all.filter((i) => i.healedAt === undefined);
@@ -71,6 +84,20 @@ export function Injuries() {
       <Button className="mt-4 w-full" onClick={() => setAdding(true)}>
         {t("inj.log")}
       </Button>
+
+      {offer.length > 0 && (
+        <section className="card mt-4 p-4" data-testid="rehab-self">
+          <h2 className={CARD_TITLE}>{t("inj.rehabTitle")}</h2>
+          <p className="mt-1 text-sm text-muted">
+            {offer.length === 1
+              ? t("inj.rehabBody", { part: inSentence(PART_LABEL[offer[0]!.part]) })
+              : t("inj.rehabBodyMany", { parts: list(offer.map((o) => PART_LABEL[o.part])) })}
+          </p>
+          <Button kind="ghost" className="mt-3 w-full" onClick={() => setRehabPicked(true)}>
+            {t("inj.rehabAdd")}
+          </Button>
+        </section>
+      )}
 
       {active.map(
         (inj) =>
@@ -106,6 +133,27 @@ export function Injuries() {
           </ul>
         </Section>
       )}
+
+      <Sheet open={rehabOpen} onClose={closeRehab} title={t("inj.rehabSheet")}>
+        <p className="mb-3 text-sm text-muted">{t("inj.rehabDisclaimer")}</p>
+        <RehabPrograms
+          selfServe
+          onPick={(p) => {
+            const at = Date.now();
+            haptic("success");
+            sound.tick();
+            saveShared({
+              id: newId(),
+              createdAt: at,
+              updatedAt: at,
+              ...protocolRoutine(p, 1, true),
+              perWeek: p.perWeek,
+            });
+            track("feature", { name: "trainer", detail: "rehabSelf" });
+            closeRehab();
+          }}
+        />
+      </Sheet>
 
       <Sheet open={adding} onClose={() => setAdding(false)} title={t("inj.whatHurts")}>
         <div className="grid grid-cols-2 gap-2">

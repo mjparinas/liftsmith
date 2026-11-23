@@ -82,6 +82,9 @@ export const en = {
   "gloss.breathPattern.title": "Breathing patterns",
   "gloss.breathPattern.body":
     "A guide for the rest between sets: follow the dot round the box, and the square as it grows and shrinks. Each change of step gives a soft sound and a light buzz, so you can follow it with your eyes closed.\nBox breathing: in, hold, out and hold, 4 seconds each. Steady and calming.\n4-7-8: in for 4, hold for 7, out for 8. The long breath out slows the heart the most.\nDouble sigh: a breath in, a short second sip on top, then a long breath out. The quickest way to settle.\nSlow breaths: in for 4, out for 6.\nYour own: set each side of the box yourself. A hold of 0 leaves it out.",
+  "gloss.voiceEngine.title": "Voice coach voice",
+  "gloss.voiceEngine.body":
+    "Phone voice uses your device's text-to-speech, in every language the app speaks.\nAmy is a clear English voice stored in the app (Pro). She stays offline once the app is installed. If Amy can't load, or the app isn't in English, cues use the phone voice instead.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "How much oxygen your body can use at full effort, in millilitres per kilogram a minute. Watches estimate it from walks and runs. It's the best single measure of heart fitness.\nLifting barely moves it. Two 20-minute hard cardio sessions a week do.",
@@ -216,6 +219,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Patrones de respiración",
   "gloss.breathPattern.body":
     "Una guía para el descanso entre series: sigue el punto alrededor del cuadrado y el cuadrado que crece y se encoge. Cada cambio de paso suena suave y vibra un poco, para que puedas seguirla con los ojos cerrados.\nRespiración cuadrada: inspira, mantén, espira y mantén, 4 segundos cada uno. Constante y calmante.\n4-7-8: inspira 4, mantén 7, espira 8. La espiración larga es lo que más frena el corazón.\nDoble suspiro: una inspiración, un segundo sorbo corto encima y luego una espiración larga. La forma más rápida de calmarte.\nRespiración lenta: inspira 4, espira 6.\nPersonalizada: elige tú cada lado del cuadrado. Un 0 en una pausa la quita.",
+  "gloss.voiceEngine.title": "Voz del entrenador por voz",
+  "gloss.voiceEngine.body":
+    "La voz del teléfono usa el texto a voz del dispositivo, en todos los idiomas de la app.\nAmy es una voz inglesa clara guardada en la app (Pro). Funciona sin conexión una vez instalada. Si no puede cargar, o la app no está en inglés, las indicaciones usan la voz del teléfono.",
   "gloss.vo2max.title": "VO₂ máx",
   "gloss.vo2max.body":
     "Cuánto oxígeno puede usar tu cuerpo al máximo esfuerzo, en mililitros por kilo y minuto. Los relojes lo estiman a partir de paseos y carreras. Es la mejor medida única de la forma del corazón.\nLevantar pesas apenas lo mueve. Dos sesiones de cardio intenso de 20 minutos a la semana, sí.",
@@ -348,6 +354,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Rythmes de respiration",
   "gloss.breathPattern.body":
     "Un guide pour le repos entre les séries : suivez le point autour du carré, et le carré qui grandit et rétrécit. Chaque changement d’étape donne un son doux et une légère vibration, pour le suivre les yeux fermés.\nRespiration carrée : inspirez, retenez, expirez et retenez, 4 secondes chacun. Régulière et apaisante.\n4-7-8 : inspirez 4, retenez 7, expirez 8. La longue expiration ralentit le plus le cœur.\nDouble soupir : une inspiration, une deuxième petite gorgée d’air, puis une longue expiration. Le moyen le plus rapide de se calmer.\nRespiration lente : inspirez 4, expirez 6.\nPersonnalisée : réglez vous-même chaque côté du carré. Une pause à 0 est retirée.",
+  "gloss.voiceEngine.title": "Voix du coach vocal",
+  "gloss.voiceEngine.body":
+    "La voix du téléphone utilise la synthèse vocale de l’appareil, dans toutes les langues de l’app.\nAmy est une voix anglaise claire stockée dans l’app (Pro). Elle reste hors ligne une fois installée. Si elle ne charge pas, ou si l’app n’est pas en anglais, les indications utilisent la voix du téléphone.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "La quantité d’oxygène que votre corps peut utiliser à l’effort maximal, en millilitres par kilo et par minute. Les montres l’estiment à partir de la marche et de la course. C’est la meilleure mesure unique de la forme cardiaque.\nLa musculation la fait à peine bouger. Deux séances de cardio intense de 20 minutes par semaine, si.",
@@ -480,6 +489,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Atemmuster",
   "gloss.breathPattern.body":
     "Eine Anleitung für die Pause zwischen den Sätzen: Folge dem Punkt um das Quadrat und dem Quadrat, das wächst und schrumpft. Jeder Schrittwechsel gibt einen leisen Ton und ein leichtes Vibrieren, so kannst du mit geschlossenen Augen folgen.\nBox-Atmung: einatmen, halten, ausatmen und halten, je 4 Sekunden. Gleichmäßig und beruhigend.\n4-7-8: 4 ein, 7 halten, 8 aus. Das lange Ausatmen verlangsamt das Herz am stärksten.\nDoppelseufzer: einatmen, kurz nachatmen, dann lange ausatmen. Der schnellste Weg zur Ruhe.\nLangsames Atmen: 4 ein, 6 aus.\nEigenes Muster: Stell jede Seite des Quadrats selbst ein. Eine Pause von 0 fällt weg.",
+  "gloss.voiceEngine.title": "Stimme des Sprachcoachs",
+  "gloss.voiceEngine.body":
+    "Die Telefonstimme nutzt die Sprachausgabe des Geräts, in jeder Sprache der App.\nAmy ist eine klare englische Stimme in der App (Pro). Sie bleibt offline, sobald die App installiert ist. Wenn Amy nicht lädt oder die App nicht auf Englisch ist, nutzen die Ansagen die Telefonstimme.",
   "gloss.vo2max.title": "VO₂max",
   "gloss.vo2max.body":
     "Wie viel Sauerstoff dein Körper bei voller Anstrengung nutzen kann, in Millilitern pro Kilogramm und Minute. Uhren schätzen ihn aus Spaziergängen und Läufen. Er ist das beste Einzelmaß für die Fitness deines Herzens.\nKrafttraining bewegt ihn kaum. Zwei harte Ausdauereinheiten von 20 Minuten pro Woche schon.",
@@ -612,6 +624,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Schemi di respirazione",
   "gloss.breathPattern.body":
     "Una guida per il riposo tra le serie: segui il punto lungo il quadrato e il quadrato che cresce e si restringe. Ogni cambio di fase dà un suono leggero e una breve vibrazione, così puoi seguirla a occhi chiusi.\nRespirazione quadrata: inspira, trattieni, espira e trattieni, 4 secondi ciascuno. Regolare e calmante.\n4-7-8: inspira 4, trattieni 7, espira 8. La lunga espirazione rallenta di più il cuore.\nDoppio sospiro: un’inspirazione, un secondo piccolo sorso d’aria, poi una lunga espirazione. Il modo più rapido per calmarti.\nRespiro lento: inspira 4, espira 6.\nPersonalizzata: imposta tu ogni lato del quadrato. Una pausa a 0 viene tolta.",
+  "gloss.voiceEngine.title": "Voce del coach vocale",
+  "gloss.voiceEngine.body":
+    "La voce del telefono usa la sintesi vocale del dispositivo, in ogni lingua dell’app.\nAmy è una voce inglese chiara salvata nell’app (Pro). Resta offline una volta installata. Se non si carica, o l’app non è in inglese, i suggerimenti usano la voce del telefono.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "Quanto ossigeno il corpo riesce a usare al massimo sforzo, in millilitri per chilo al minuto. Gli orologi lo stimano da camminate e corse. È la migliore misura singola della forma del cuore.\nI pesi lo spostano appena. Due sessioni di cardio intenso da 20 minuti a settimana sì.",
@@ -744,6 +759,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "呼吸パターン",
   "gloss.breathPattern.body":
     "セット間の休憩のガイドです。四角を回る点と、大きくなったり小さくなったりする四角に合わせて呼吸します。段階が変わるたびにやさしい音と軽い振動があるので、目を閉じても続けられます。\nボックス呼吸：吸う、止める、吐く、止めるを各4秒。一定のリズムで落ち着きます。\n4-7-8：4秒吸って、7秒止めて、8秒吐きます。長く吐くことが心拍を最も下げます。\n生理的ため息：吸ったあと、もう少しだけ吸い足し、長く吐きます。最も早く落ち着く方法です。\nゆっくり呼吸：4秒吸って、6秒吐きます。\nカスタム：四角の各辺を自分で決めます。止める時間を0にするとその段階はなくなります。",
+  "gloss.voiceEngine.title": "音声コーチの声",
+  "gloss.voiceEngine.body":
+    "端末の声は、アプリが話すすべての言語で端末の音声読み上げを使います。\nAmyはアプリに保存された明瞭な英語ボイスです（Pro）。インストール後はオフラインでも使えます。Amyが使えないときや英語以外のときは、端末の声になります。",
   "gloss.vo2max.title": "VO₂max",
   "gloss.vo2max.body":
     "全力を出したときに体が使える酸素の量で、体重1kgあたり1分間のミリリットルで表します。ウォッチがウォーキングやランニングから推定します。心肺の体力を表す最も優れた単一の指標です。\n筋トレではほとんど変わりません。週2回、20分のきつめの有酸素運動なら変わります。",
@@ -876,6 +894,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Padrões de respiração",
   "gloss.breathPattern.body":
     "Um guia para o descanso entre séries: siga o ponto ao redor do quadrado e o quadrado enquanto ele cresce e diminui. Cada mudança de etapa faz um som suave e uma vibração leve, para você acompanhar de olhos fechados.\nRespiração quadrada: inspire, segure, expire e segure, 4 segundos cada. Estável e calmante.\n4-7-8: inspire por 4, segure por 7, expire por 8. A expiração longa é a que mais desacelera o coração.\nSuspiro duplo: uma inspiração, um segundo gole curto por cima, depois uma expiração longa. O jeito mais rápido de se acalmar.\nRespiração lenta: inspire por 4, expire por 6.\nPersonalizado: defina você mesmo cada lado do quadrado. Uma pausa de 0 a deixa de fora.",
+  "gloss.voiceEngine.title": "Voz do coach por voz",
+  "gloss.voiceEngine.body":
+    "A voz do telemóvel usa a síntese de voz do dispositivo, em todos os idiomas da app.\nAmy é uma voz inglesa clara guardada na app (Pro). Fica offline depois de instalada. Se não carregar, ou a app não estiver em inglês, as indicações usam a voz do telemóvel.",
   "gloss.vo2max.title": "VO₂ máx.",
   "gloss.vo2max.body":
     "Quanto oxigênio seu corpo consegue usar no esforço máximo, em mililitros por quilo por minuto. Relógios estimam a partir de caminhadas e corridas. É a melhor medida isolada de condicionamento cardiovascular.\nMusculação quase não mexe nele. Duas sessões de cardio intenso de 20 minutos por semana mexem.",
@@ -1007,6 +1028,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "호흡 패턴",
   "gloss.breathPattern.body":
     "세트 사이 휴식을 위한 가이드예요. 상자 둘레를 도는 점과 커졌다 작아지는 사각형을 따라가세요. 단계가 바뀔 때마다 부드러운 소리와 가벼운 진동이 나서 눈을 감고도 따라 할 수 있어요.\n박스 호흡: 들이쉬고, 참고, 내쉬고, 참기를 각 4초씩. 안정되고 차분해져요.\n4-7-8: 4초 들이쉬고, 7초 참고, 8초 내쉬어요. 긴 날숨이 심박을 가장 많이 늦춰요.\n이중 한숨: 숨을 들이쉬고 짧게 한 번 더 들이쉰 다음 길게 내쉬어요. 가장 빨리 진정되는 방법이에요.\n느린 호흡: 4초 들이쉬고 6초 내쉬어요.\n내 패턴: 상자의 각 변을 직접 정해요. 참기를 0으로 하면 빠져요.",
+  "gloss.voiceEngine.title": "음성 코치 목소리",
+  "gloss.voiceEngine.body":
+    "휴대폰 음성은 앱이 쓰는 모든 언어에서 기기 텍스트 음성 변환을 씁니다.\nAmy는 앱에 저장된 또렷한 영어 음성이에요(Pro). 설치 후에는 오프라인에서도 됩니다. Amy를 쓸 수 없거나 영어가 아니면 휴대폰 음성을 씁니다.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "최대 노력에서 몸이 쓸 수 있는 산소량으로, 1분에 체중 1킬로그램당 밀리리터로 나타내요. 워치가 걷기와 달리기로 추정해요. 심폐 체력을 보여 주는 가장 좋은 단일 지표예요.\n웨이트로는 거의 변하지 않아요. 주 2회 20분 고강도 유산소 운동이면 올라가요.",
@@ -1138,6 +1162,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Nefes kalıpları",
   "gloss.breathPattern.body":
     "Setler arası dinlenme için bir rehber: noktayı kutunun etrafında, kareyi de büyüyüp küçülürken takip et. Her adım değişiminde yumuşak bir ses ve hafif bir titreşim gelir, böylece gözlerin kapalı da takip edebilirsin.\nKutu nefesi: al, tut, ver ve tut, her biri 4 saniye. Dengeli ve sakinleştirici.\n4-7-8: 4'te al, 7 tut, 8'de ver. Uzun nefes verme kalbi en çok yavaşlatır.\nÇift iç çekiş: bir nefes al, üstüne kısa ikinci bir yudum, sonra uzun bir nefes ver. Sakinleşmenin en hızlı yolu.\nYavaş nefesler: 4'te al, 6'da ver.\nSenin kalıbın: kutunun her kenarını kendin ayarla. 0 tutma onu çıkarır.",
+  "gloss.voiceEngine.title": "Sesli koç sesi",
+  "gloss.voiceEngine.body":
+    "Telefon sesi, uygulamanın konuştuğu her dilde cihazın metin okumasını kullanır.\nAmy, uygulamada saklanan net bir İngilizce sestir (Pro). Kurulumdan sonra çevrimdışı kalır. Yüklenemezse veya uygulama İngilizce değilse ipuçları telefon sesini kullanır.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "Vücudunun tam eforda kullanabildiği oksijen miktarı, kilogram başına dakikada mililitre olarak. Saatler bunu yürüyüş ve koşulardan tahmin eder. Kalp kondisyonunun en iyi tek ölçüsü.\nAğırlık çalışmak onu pek değiştirmez. Haftada iki kez 20 dakikalık zorlu kardiyo değiştirir.",
@@ -1270,6 +1297,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "gloss.breathPattern.title": "Wzorce oddechu",
   "gloss.breathPattern.body":
     "Przewodnik na przerwę między seriami: śledź kropkę wokół kwadratu i kwadrat, gdy rośnie i maleje. Każda zmiana fazy daje cichy dźwięk i lekką wibrację, więc możesz oddychać z zamkniętymi oczami.\nOddech pudełkowy: wdech, wstrzymanie, wydech i wstrzymanie, po 4 sekundy. Równy i uspokajający.\n4-7-8: wdech na 4, wstrzymanie na 7, wydech na 8. Długi wydech najbardziej zwalnia serce.\nPodwójne westchnienie: wdech, krótki drugi wdech na wierzchu, potem długi wydech. Najszybszy sposób, żeby się uspokoić.\nSpokojne oddechy: wdech na 4, wydech na 6.\nWłasny: ustaw każdy bok kwadratu sam. Wstrzymanie 0 je pomija.",
+  "gloss.voiceEngine.title": "Głos trenera głosowego",
+  "gloss.voiceEngine.body":
+    "Głos telefonu używa syntezy mowy urządzenia w każdym języku aplikacji.\nAmy to wyraźny angielski głos zapisany w aplikacji (Pro). Po instalacji działa offline. Jeśli się nie załaduje albo aplikacja nie jest po angielsku, podpowiedzi używają głosu telefonu.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "Ile tlenu twoje ciało może wykorzystać przy pełnym wysiłku, w mililitrach na kilogram na minutę. Zegarki szacują je ze spacerów i biegów. To najlepsza pojedyncza miara wydolności serca.\nTrening siłowy prawie go nie zmienia. Dwie 20-minutowe intensywne sesje cardio w tygodniu już tak.",

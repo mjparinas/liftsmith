@@ -403,6 +403,10 @@ export const en = {
   "trn.planToday.save": "Save it",
   "trn.planToday.see": "See it",
   "trn.planToday.later": "Not now",
+  "trn.planEnd.title": "{name} took {plan} back",
+  "trn.planEnd.body": "You can stop this program, or keep doing it on your own. Stopping removes the routine and its reminders.",
+  "trn.planEnd.stop": "Stop this program",
+  "trn.planEnd.keep": "Keep on my own",
 };
 
 type Key = keyof typeof en;
@@ -811,6 +815,10 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Guardar",
   "trn.planToday.see": "Verla",
   "trn.planToday.later": "Ahora no",
+  "trn.planEnd.title": "{name} retiró {plan}",
+  "trn.planEnd.body": "Puedes dejar este programa o seguir haciéndolo por tu cuenta. Dejarlo quita la rutina y sus recordatorios.",
+  "trn.planEnd.stop": "Dejar este programa",
+  "trn.planEnd.keep": "Seguir por mi cuenta",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -1234,6 +1242,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Enregistrer",
   "trn.planToday.see": "Voir",
   "trn.planToday.later": "Plus tard",
+  "trn.planEnd.title": "{name} a repris {plan}",
+  "trn.planEnd.body": "Vous pouvez arrêter ce programme ou le continuer seul. L’arrêter retire la routine et ses rappels.",
+  "trn.planEnd.stop": "Arrêter ce programme",
+  "trn.planEnd.keep": "Continuer seul",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -1652,6 +1664,10 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Speichern",
   "trn.planToday.see": "Ansehen",
   "trn.planToday.later": "Nicht jetzt",
+  "trn.planEnd.title": "{name} hat {plan} zurückgenommen",
+  "trn.planEnd.body": "Du kannst dieses Programm beenden oder allein weitermachen. Beenden entfernt die Routine und ihre Erinnerungen.",
+  "trn.planEnd.stop": "Dieses Programm beenden",
+  "trn.planEnd.keep": "Allein weitermachen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -2058,6 +2074,10 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Salva",
   "trn.planToday.see": "Vedi",
   "trn.planToday.later": "Non ora",
+  "trn.planEnd.title": "{name} ha ritirato {plan}",
+  "trn.planEnd.body": "Puoi interrompere questo programma o continuare da solo. Interromperlo toglie la routine e i suoi promemoria.",
+  "trn.planEnd.stop": "Interrompi questo programma",
+  "trn.planEnd.keep": "Continua da solo",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -2448,6 +2468,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "保存する",
   "trn.planToday.see": "見る",
   "trn.planToday.later": "あとで",
+  "trn.planEnd.title": "{name}さんが{plan}を取り下げました",
+  "trn.planEnd.body": "このプログラムをやめるか、自分で続けるかを選べます。やめるとルーティンとそのリマインダーが消えます。",
+  "trn.planEnd.stop": "このプログラムをやめる",
+  "trn.planEnd.keep": "自分で続ける",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -2839,6 +2863,10 @@ export const pt: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Salvar",
   "trn.planToday.see": "Ver",
   "trn.planToday.later": "Agora não",
+  "trn.planEnd.title": "{name} retirou {plan}",
+  "trn.planEnd.body": "Você pode parar este programa ou continuar por conta própria. Parar remove a rotina e os lembretes.",
+  "trn.planEnd.stop": "Parar este programa",
+  "trn.planEnd.keep": "Continuar por conta própria",
   "trn.chatWith": "Mensagens com {name}",
   "trn.seen": "Visto {time}",
   "trn.sent": "Enviada",
@@ -3259,6 +3287,10 @@ export const ko: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "저장",
   "trn.planToday.see": "보기",
   "trn.planToday.later": "나중에",
+  "trn.planEnd.title": "{name}님이 {plan}을(를) 거뒀어요",
+  "trn.planEnd.body": "이 프로그램을 멈추거나 혼자 이어갈 수 있어요. 멈추면 루틴과 알림이 사라져요.",
+  "trn.planEnd.stop": "이 프로그램 멈추기",
+  "trn.planEnd.keep": "혼자 이어가기",
   "trn.chatWith": "{name}님과의 메시지",
   "trn.seen": "{time}에 읽음",
   "trn.sent": "보냄",
@@ -3709,6 +3741,10 @@ export const tr: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Kaydet",
   "trn.planToday.see": "Gör",
   "trn.planToday.later": "Şimdi değil",
+  "trn.planEnd.title": "{name} {plan} programını geri aldı",
+  "trn.planEnd.body": "Bu programı durdurabilir veya kendi başına sürdürebilirsin. Durdurmak rutini ve anımsatıcılarını siler.",
+  "trn.planEnd.stop": "Bu programı durdur",
+  "trn.planEnd.keep": "Kendi başıma sürdür",
   "trn.chatWith": "{name} ile mesajlar",
   "trn.seen": "Görüldü {time}",
   "trn.sent": "Gönderildi",
@@ -4201,6 +4237,10 @@ export const pl: Partial<Record<Key, Message>> = {
   "trn.planToday.save": "Zapisz",
   "trn.planToday.see": "Zobacz",
   "trn.planToday.later": "Nie teraz",
+  "trn.planEnd.title": "{name} wycofuje {plan}",
+  "trn.planEnd.body": "Możesz zatrzymać ten program albo robić go dalej samodzielnie. Zatrzymanie usuwa zestaw i jego przypomnienia.",
+  "trn.planEnd.stop": "Zatrzymaj ten program",
+  "trn.planEnd.keep": "Rób dalej samodzielnie",
   "trn.chatWith": "Wiadomości: {name}",
   "trn.seen": "Wyświetlono {time}",
   "trn.sent": "Wysłano",

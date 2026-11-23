@@ -216,6 +216,8 @@ export function Workout() {
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
   const voiceOn = !!profile.delight?.voice;
+  const voiceEngine = profile.delight?.voiceEngine === "amy" ? "amy" : "system";
+  const voiceId = profile.delight?.voiceId ?? "";
   const voiceState: VoiceState | null =
     active && ex && item
       ? {
@@ -235,7 +237,7 @@ export function Workout() {
           warmup: warming,
         }
       : null;
-  useVoiceCoach(voiceState, voiceOn);
+  useVoiceCoach(voiceState, voiceOn, voiceEngine, voiceId);
 
   // The set timer (SetTimer.tsx): holds, carries and hangs count down from the seconds dialled in (each side, one
   // after the other, for a hold done on each side) and log the set when they run out; cardio counts up.
@@ -752,6 +754,8 @@ export function Workout() {
                 shape={shape}
                 bpm={bpm}
                 hrTrend={active.hr}
+                loading={loading}
+                unit={unit}
                 // Keeps moving during rest too (Melvin, 2026-11-17), so the next set's lift is on show (docs/decisions/speed.md).
                 paused={infoOpen || swapOpen || endOpen}
                 className="h-full"

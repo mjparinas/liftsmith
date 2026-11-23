@@ -94,6 +94,20 @@ export const en = {
   "wn.c.gymChains.title": "Every location of a gym chain",
   "wn.c.gymChains.body":
     "Gyms that belong to a chain show its logo and a link to a page with every one of its locations, nearest first, so you can find and add your branch in a tap.",
+  "wn.c.rehabSelf.title": "Gentle rehab without a physio",
+  "wn.c.rehabSelf.body":
+    "Logged an injury? Injuries and a coach's note offer a short bodyweight routine you can do at home. It's a starting point, not a treatment.",
+  "wn.c.rehabShape.title": "Shape a rehab routine",
+  "wn.c.rehabShape.body":
+    "Physios can set the reps or the seconds on each exercise, and a short cue, in the routine builder. You follow it as written.",
+  "wn.c.rehabEnd.title": "When a program is taken back",
+  "wn.c.rehabEnd.body": "If your physio takes a program back, Today asks you to stop it or keep doing it on your own.",
+  "wn.c.campusClubs.title": "Pro for an active club",
+  "wn.c.campusClubs.body":
+    "Lead a club where 5 or more members, you included, each finish a workout in the last 14 days, and Pro is free while that stays true.",
+  "wn.c.voiceAmy.title": "Amy for the voice coach",
+  "wn.c.voiceAmy.body":
+    "Pro unlocks Amy, a clear English voice built into the app. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
 } as const;
 
 type Key = keyof typeof en;
@@ -198,6 +212,21 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Todas las sedes de una cadena",
   "wn.c.gymChains.body":
     "Los gimnasios de una cadena muestran su logo y un enlace a una página con todas sus sedes, las más cercanas primero, para encontrar y añadir la tuya con un toque.",
+  "wn.c.rehabSelf.title": "Rehabilitación suave sin fisioterapeuta",
+  "wn.c.rehabSelf.body":
+    "¿Has registrado una lesión? Lesiones y una nota del entrenador ofrecen una rutina corta con el peso del cuerpo para hacer en casa. Es un punto de partida, no un tratamiento.",
+  "wn.c.rehabShape.title": "Da forma a una rutina de rehabilitación",
+  "wn.c.rehabShape.body":
+    "Los fisioterapeutas pueden fijar las repeticiones o los segundos de cada ejercicio, y una indicación breve, en el editor de rutinas. Tú la sigues tal como está escrita.",
+  "wn.c.rehabEnd.title": "Cuando retiran un programa",
+  "wn.c.rehabEnd.body": "Si tu fisioterapeuta retira un programa, Hoy te pregunta si lo paras o lo sigues por tu cuenta.",
+  "wn.c.campusClubs.title": "Pro para un club activo",
+  "wn.c.campusClubs.body":
+    "Dirige un club en el que 5 o más miembros, tú incluido, terminen cada uno un entrenamiento en los últimos 14 días, y Pro es gratis mientras siga siendo así.",
+  "wn.c.voiceAmy.title": "Amy para el entrenador por voz",
+  "wn.c.voiceAmy.body":
+    "Pro desbloquea Amy, una voz inglesa clara incluida en la app. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
+
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -302,6 +331,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Toutes les adresses d'une chaîne",
   "wn.c.gymChains.body":
     "Les salles d'une chaîne affichent son logo et un lien vers une page avec toutes ses adresses, les plus proches d'abord, pour trouver et ajouter la vôtre d'un toucher.",
+  "wn.c.rehabSelf.title": "Une rééducation douce sans kiné",
+  "wn.c.rehabSelf.body":
+    "Vous avez noté une blessure ? Blessures et une note du coach proposent une courte routine au poids du corps à faire chez vous. C’est un point de départ, pas un traitement.",
+  "wn.c.rehabShape.title": "Façonner une routine de rééducation",
+  "wn.c.rehabShape.body":
+    "Les kinés peuvent fixer les répétitions ou les secondes de chaque exercice, et une courte consigne, dans l’éditeur de routines. Vous la suivez telle qu’elle est écrite.",
+  "wn.c.rehabEnd.title": "Quand un programme est repris",
+  "wn.c.rehabEnd.body": "Si votre kiné reprend un programme, Aujourd’hui vous demande de l’arrêter ou de le continuer de votre côté.",
+  "wn.c.campusClubs.title": "Pro pour un club actif",
+  "wn.c.campusClubs.body":
+    "Animez un club où 5 membres ou plus, vous compris, terminent chacun une séance dans les 14 derniers jours, et Pro est gratuit tant que c’est le cas.",
+  "wn.c.voiceAmy.title": "Amy pour le coach vocal",
+  "wn.c.voiceAmy.body":
+    "Pro débloque Amy, une voix anglaise claire intégrée à l’app. Choisissez Amy ou la synthèse du téléphone dans Réglages › Entraînement ; Amy revient à la voix du téléphone si elle ne charge pas.",
+
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -403,6 +447,21 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Alle Standorte einer Studiokette",
   "wn.c.gymChains.body":
     "Studios einer Kette zeigen ihr Logo und einen Link zu einer Seite mit allen Standorten, die nächsten zuerst, damit du deinen mit einem Tippen findest und hinzufügst.",
+  "wn.c.rehabSelf.title": "Sanfte Reha ohne Physiotherapie",
+  "wn.c.rehabSelf.body":
+    "Du hast eine Verletzung eingetragen? Verletzungen und ein Hinweis des Coaches bieten eine kurze Routine mit dem eigenen Körpergewicht für zu Hause. Es ist ein Anfang, keine Behandlung.",
+  "wn.c.rehabShape.title": "Eine Reha-Routine formen",
+  "wn.c.rehabShape.body":
+    "Physiotherapie kann die Wiederholungen oder die Sekunden jeder Übung und einen kurzen Hinweis im Routine-Editor festlegen. Du folgst ihr so, wie sie geschrieben ist.",
+  "wn.c.rehabEnd.title": "Wenn ein Programm zurückgenommen wird",
+  "wn.c.rehabEnd.body": "Nimmt deine Physiotherapie ein Programm zurück, fragt Heute, ob du es beendest oder allein weiterführst.",
+  "wn.c.campusClubs.title": "Pro für einen aktiven Club",
+  "wn.c.campusClubs.body":
+    "Leite einen Club, in dem 5 oder mehr Mitglieder, du eingeschlossen, in den letzten 14 Tagen je ein Training beendet haben, und Pro ist kostenlos, solange das so bleibt.",
+  "wn.c.voiceAmy.title": "Amy für den Sprachcoach",
+  "wn.c.voiceAmy.body":
+    "Pro schaltet Amy frei, eine klare englische Stimme in der App. Wähle Amy oder die Telefon-Sprachausgabe unter Einstellungen › Training; Amy fällt auf die Telefonstimme zurück, wenn sie nicht lädt.",
+
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -504,6 +563,21 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Tutte le sedi di una catena",
   "wn.c.gymChains.body":
     "Le palestre di una catena mostrano il suo logo e un link a una pagina con tutte le sedi, prima le più vicine, così trovi e aggiungi la tua con un tocco.",
+  "wn.c.rehabSelf.title": "Riabilitazione leggera senza fisioterapista",
+  "wn.c.rehabSelf.body":
+    "Hai registrato un infortunio? Infortuni e una nota del coach offrono una breve routine a corpo libero da fare a casa. È un punto di partenza, non una cura.",
+  "wn.c.rehabShape.title": "Dai forma a una routine di riabilitazione",
+  "wn.c.rehabShape.body":
+    "I fisioterapisti possono fissare le ripetizioni o i secondi di ogni esercizio, e un breve spunto, nell’editor delle routine. La segui così com’è scritta.",
+  "wn.c.rehabEnd.title": "Quando un programma viene ritirato",
+  "wn.c.rehabEnd.body": "Se il tuo fisioterapista ritira un programma, Oggi ti chiede di fermarlo o di continuarlo per conto tuo.",
+  "wn.c.campusClubs.title": "Pro per un club attivo",
+  "wn.c.campusClubs.body":
+    "Guida un club in cui 5 o più membri, tu compreso, finiscono ciascuno un allenamento negli ultimi 14 giorni, e Pro è gratis finché resta così.",
+  "wn.c.voiceAmy.title": "Amy per il coach vocale",
+  "wn.c.voiceAmy.body":
+    "Pro sblocca Amy, una voce inglese chiara inclusa nell’app. Scegli Amy o la sintesi del telefono in Impostazioni › Allenamento; Amy torna alla voce del telefono se non si carica.",
+
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -597,6 +671,20 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "ジムチェーンの全店舗",
   "wn.c.gymChains.body":
     "チェーンのジムにはロゴと全店舗のページへのリンクが表示されます。近い順に並ぶので、自分の店舗をタップひとつで見つけて追加できます。",
+  "wn.c.rehabSelf.title": "理学療法士がいなくても、やさしいリハビリ",
+  "wn.c.rehabSelf.body":
+    "ケガを記録しましたか。ケガの画面とコーチのメモが、家でできる短い自重ルーティンを提案します。出発点であり、治療ではありません。",
+  "wn.c.rehabShape.title": "リハビリルーティンを形にする",
+  "wn.c.rehabShape.body": "理学療法士はルーティン編集で、各種目の回数か秒数と短いキューを決められます。書かれたとおりに進めます。",
+  "wn.c.rehabEnd.title": "プログラムが取り下げられたとき",
+  "wn.c.rehabEnd.body": "理学療法士がプログラムを取り下げると、「今日」で止めるか自分で続けるかを選べます。",
+  "wn.c.campusClubs.title": "活発なクラブにPro",
+  "wn.c.campusClubs.body":
+    "自分を含めてメンバー5人以上が、それぞれ直近14日以内にワークアウトを終えているクラブを運営しているあいだ、Proが無料です。",
+  "wn.c.voiceAmy.title": "音声コーチのAmy",
+  "wn.c.voiceAmy.body":
+    "ProでAmyが使えます。アプリ内蔵の明瞭な英語ボイスです。設定 › ワークアウトでAmyか端末の音声を選べ、Amyが使えないときは端末の声に戻ります。",
+
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -694,6 +782,21 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Todas as unidades de uma rede",
   "wn.c.gymChains.body":
     "Academias de uma rede mostram o logo dela e um link para uma página com todas as unidades, as mais próximas primeiro, para você achar e adicionar a sua com um toque.",
+  "wn.c.rehabSelf.title": "Reabilitação leve sem fisioterapeuta",
+  "wn.c.rehabSelf.body":
+    "Registrou uma lesão? Lesões e uma nota do coach oferecem uma rotina curta com o peso do corpo para fazer em casa. É um ponto de partida, não um tratamento.",
+  "wn.c.rehabShape.title": "Modele uma rotina de reabilitação",
+  "wn.c.rehabShape.body":
+    "Fisioterapeutas podem definir as repetições ou os segundos de cada exercício, e uma dica curta, no editor de rotinas. Você segue como está escrito.",
+  "wn.c.rehabEnd.title": "Quando um programa é retirado",
+  "wn.c.rehabEnd.body": "Se o seu fisioterapeuta retira um programa, Hoje pergunta se você para ou continua por conta própria.",
+  "wn.c.campusClubs.title": "Pro para um clube ativo",
+  "wn.c.campusClubs.body":
+    "Lidere um clube em que 5 ou mais membros, você incluído, terminem cada um um treino nos últimos 14 dias, e o Pro fica grátis enquanto isso continuar.",
+  "wn.c.voiceAmy.title": "Amy no coach por voz",
+  "wn.c.voiceAmy.body":
+    "O Pro liberta a Amy, uma voz inglesa clara na app. Escolha Amy ou a síntese do telemóvel em Definições › Treino; a Amy volta à voz do telemóvel se não carregar.",
+
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -784,6 +887,19 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "헬스장 체인의 모든 지점",
   "wn.c.gymChains.body":
     "체인 헬스장에는 체인 로고와 모든 지점을 모은 페이지 링크가 나옵니다. 가까운 순으로 보여 주니 탭 한 번으로 내 지점을 찾아 추가하세요.",
+  "wn.c.rehabSelf.title": "물리치료사 없이 하는 가벼운 재활",
+  "wn.c.rehabSelf.body":
+    "부상을 기록했나요? 부상 화면과 코치 메모가 집에서 할 수 있는 짧은 맨몸 루틴을 제안해요. 시작점일 뿐, 치료는 아니에요.",
+  "wn.c.rehabShape.title": "재활 루틴을 다듬기",
+  "wn.c.rehabShape.body": "물리치료사는 루틴 편집에서 동작마다 횟수나 초, 그리고 짧은 큐를 정할 수 있어요. 적힌 그대로 따라 해요.",
+  "wn.c.rehabEnd.title": "프로그램이 거둬들여질 때",
+  "wn.c.rehabEnd.body": "물리치료사가 프로그램을 거둬가면 오늘 화면에서 멈출지, 혼자 이어 갈지 물어봐요.",
+  "wn.c.campusClubs.title": "활발한 클럽에 Pro",
+  "wn.c.campusClubs.body": "나를 포함해 멤버 5명 이상이 각자 최근 14일 안에 운동을 마친 클럽을 이끄는 동안 Pro가 무료예요.",
+  "wn.c.voiceAmy.title": "음성 코치 Amy",
+  "wn.c.voiceAmy.body":
+    "Pro로 Amy를 쓸 수 있어요. 앱에 들어 있는 또렷한 영어 음성이에요. 설정 › 운동에서 Amy 또는 휴대폰 음성을 고르고, Amy를 쓸 수 없으면 휴대폰 음성으로 돌아가요.",
+
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -881,6 +997,21 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Wszystkie lokalizacje sieci siłowni",
   "wn.c.gymChains.body":
     "Siłownie należące do sieci pokazują jej logo i link do strony ze wszystkimi lokalizacjami, od najbliższych, więc znajdziesz i dodasz swoją jednym dotknięciem.",
+  "wn.c.rehabSelf.title": "Łagodna rehabilitacja bez fizjoterapeuty",
+  "wn.c.rehabSelf.body":
+    "Zapisujesz kontuzję? Kontuzje i notatka coacha proponują krótką rutynę z ciężarem ciała do zrobienia w domu. To punkt wyjścia, nie leczenie.",
+  "wn.c.rehabShape.title": "Ułóż rutynę rehabilitacji",
+  "wn.c.rehabShape.body":
+    "Fizjoterapeuci mogą ustawić powtórzenia albo sekundy każdego ćwiczenia i krótką wskazówkę w edytorze rutyn. Robisz ją tak, jak jest zapisana.",
+  "wn.c.rehabEnd.title": "Gdy program zostaje zabrany",
+  "wn.c.rehabEnd.body": "Jeśli fizjoterapeuta zabiera program, Dziś pyta, czy go zatrzymać, czy ćwiczyć dalej na własną rękę.",
+  "wn.c.campusClubs.title": "Pro dla aktywnego klubu",
+  "wn.c.campusClubs.body":
+    "Prowadź klub, w którym 5 lub więcej członków, razem z Tobą, skończyło trening w ostatnich 14 dniach, a Pro jest za darmo, dopóki tak zostaje.",
+  "wn.c.voiceAmy.title": "Amy w trenerze głosowym",
+  "wn.c.voiceAmy.body":
+    "Pro odblokowuje Amy, wyraźny angielski głos w aplikacji. Wybierz Amy lub syntezę telefonu w Ustawieniach › Trening; Amy wraca do głosu telefonu, gdy nie załaduje się.",
+
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -979,4 +1110,19 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.gymChains.title": "Bir zincirin tüm şubeleri",
   "wn.c.gymChains.body":
     "Bir zincire ait salonlar zincirin logosunu ve tüm şubelerinin olduğu sayfaya bir bağlantı gösterir; en yakınlar önce, böylece kendi şubeni tek dokunuşla bulup eklersin.",
+  "wn.c.rehabSelf.title": "Fizyoterapist olmadan hafif rehabilitasyon",
+  "wn.c.rehabSelf.body":
+    "Bir sakatlık mı kaydettin? Sakatlıklar ve bir koç notu, evde yapabileceğin kısa bir vücut ağırlığı rutini sunar. Bu bir başlangıçtır, tedavi değildir.",
+  "wn.c.rehabShape.title": "Bir rehabilitasyon rutinini şekillendir",
+  "wn.c.rehabShape.body":
+    "Fizyoterapistler rutin düzenleyicide her egzersize tekrar ya da saniye ve kısa bir ipucu koyabilir. Sen yazıldığı gibi uygularsın.",
+  "wn.c.rehabEnd.title": "Bir program geri alındığında",
+  "wn.c.rehabEnd.body": "Fizyoterapistin bir programı geri alırsa Bugün durdurmanı ya da kendi başına sürdürmeni sorar.",
+  "wn.c.campusClubs.title": "Aktif bir kulüp için Pro",
+  "wn.c.campusClubs.body":
+    "Sen dahil 5 veya daha fazla üyenin son 14 günde birer antrenman bitirdiği bir kulübü yönetirken Pro ücretsiz kalır.",
+  "wn.c.voiceAmy.title": "Sesli koç için Amy",
+  "wn.c.voiceAmy.body":
+    "Pro, uygulamaya gömülü net İngilizce ses Amy’yi açar. Ayarlar › Antrenman’da Amy veya telefon metin okumayı seç; Amy yüklenemezse telefon sesine döner.",
+
 };

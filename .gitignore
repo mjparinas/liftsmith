@@ -1,6 +1,10 @@
 node_modules/
 # Copied from node_modules by scripts/mediapipe.mjs (the pose model next to it is committed)
 public/mediapipe/tasks-vision-*/
+# Piper Amy: the voice under public/piper/voices/ is committed (like MediaPipe's pose model).
+# Phonemizer and ONNX Runtime WASM are copied from node_modules by scripts/piper.mjs.
+public/piper/phonemize/
+public/piper/onnx/
 # Copied from node_modules by scripts/leaflet.mjs (the /gyms/ page's map)
 public/vendor/leaflet/
 .next/

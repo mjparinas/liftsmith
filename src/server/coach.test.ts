@@ -722,6 +722,22 @@ describe("physio support", () => {
     setPushSender(null);
   });
 
+  it("tells the client when a program is taken back (2026-11-22)", async () => {
+    const sent: PushMessage[] = [];
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    await saveToken("client", "tok-client-0123456789abcdef", "android", "en", NOW);
+    await assignPlan("coach", "client", "Knee", "r1~S25lZQ~wall-sit.3~rehab", NOW, "p1");
+    sent.length = 0;
+    await removePlan("coach", "p1");
+    expect((await overview("client", NOW)).plans).toEqual([]);
+    expect(sent.map((m) => [m.kind, m.route])).toEqual([["coachPlanEnd", "#/today"]]);
+    expect(sent[0]!.body).toMatch(/took back Knee/);
+    setPushSender(null);
+  });
+
   it("high pain pushes the coach once in a day, only when shared and with alerts on", async () => {
     const sent: PushMessage[] = [];
     setPushSender(async (m) => {

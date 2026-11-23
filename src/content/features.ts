@@ -148,6 +148,20 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "rehab-self",
+        name: "Gentle rehab without a physio",
+        body: "Logged an injury and you don't have a physio? Injuries and a coach's note offer a short bodyweight routine you can do at home. It's a starting point, not a treatment.",
+        tier: "free",
+        added: "2026-11-22",
+      },
+      {
+        id: "rehab-end",
+        name: "When a physio takes a program back",
+        body: "If your physio takes a program back, Today asks you to stop it or keep doing it on your own. Stopping removes the routine and its reminders.",
+        tier: "free",
+        added: "2026-11-22",
+      },
+      {
         id: "cycle",
         name: "Cycle-aware readiness",
         body: "Optionally log your cycle and today's call takes it into account.",
@@ -273,6 +287,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         note: "Android says rest over with the screen locked; iPhone and the web while the app is open.",
         added: LAUNCH,
+      },
+      {
+        id: "voice-amy",
+        name: "Amy voice",
+        body: "A clear English voice built into the app for the voice coach. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
+        tier: "pro",
+        pro: "voiceAmy",
+        added: "2026-11-23",
       },
       {
         id: "stretching",
@@ -674,6 +696,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-17",
       },
       {
+        id: "campus-clubs",
+        name: "Pro for active club leaders",
+        body: "Lead a club where 5 or more members, you included, each finish a workout in the last 14 days, and Pro is free for you while that stays true.",
+        tier: "free",
+        note: "Joining someone else's club doesn't count, and two clubs don't add together.",
+        added: "2026-11-22",
+      },
+      {
         id: "profiles",
         name: "Public profiles",
         body: "An optional public page with your best lifts and workouts.",
@@ -759,6 +789,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         pro: "coaching",
         note: "Clients follow it free. Liftsmith shows what clients log. It doesn't diagnose or treat anything.",
         added: "2026-11-17",
+      },
+      {
+        id: "rehab-shape",
+        name: "Shape a rehab routine",
+        body: "Physios set the reps or the seconds on each exercise in a rehab routine, and add a short cue, in the routine builder. Clients follow it as written.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Clients follow it free. Liftsmith shows what clients log. It doesn't diagnose or treat anything.",
+        added: "2026-11-22",
       },
       {
         id: "coach-nutrition",

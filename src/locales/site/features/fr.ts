@@ -122,6 +122,14 @@ export const fr: FeaturesText = {
       body: "Un programme de votre kiné attend sur Aujourd’hui pour être enregistré d’un geste et note la blessure qu’il concerne. Il suit le nombre de fois par semaine demandé, s’affiche les jours de repos et ne demande la douleur que pour cette blessure.",
       note: "Les rappels de rééducation et la notification de nouveau programme sont sur Android et iPhone.",
     },
+    "rehab-self": {
+      name: "Une rééducation douce sans kiné",
+      body: "Vous avez noté une blessure et vous n’avez pas de kiné ? Blessures et une note du coach proposent une courte routine au poids du corps à faire chez vous. C’est un point de départ, pas un traitement.",
+    },
+    "rehab-end": {
+      name: "Quand votre kiné reprend un programme",
+      body: "Si votre kiné reprend un programme, Aujourd’hui vous demande de l’arrêter ou de le continuer de votre côté. L’arrêter retire la routine et ses rappels.",
+    },
     cycle: { name: "Forme selon le cycle", body: "Si vous le souhaitez, notez votre cycle et la décision du jour en tient compte." },
     pregnancy: {
       name: "Mode grossesse et post-partum",
@@ -185,6 +193,10 @@ export const fr: FeaturesText = {
       name: "Coach vocal",
       body: "Il parle pendant la séance, par exemple à la fin du repos, pour que vous n’ayez pas à regarder le téléphone.",
       note: "Android annonce la fin du repos écran verrouillé ; l’iPhone et le Web tant que l’appli est ouverte.",
+    },
+    "voice-amy": {
+      name: "Voix Amy",
+      body: "Une voix anglaise claire intégrée à l’app pour le coach vocal. Choisissez Amy ou la synthèse du téléphone dans Réglages › Entraînement ; Amy revient à la voix du téléphone si elle ne charge pas.",
     },
     stretching: {
       name: "Étirements",
@@ -378,6 +390,11 @@ export const fr: FeaturesText = {
       body: "Discute avec ton club entre les séances, propose une heure et un lieu pour vous entraîner ensemble et vois qui vient. Chaque participant reçoit un rappel une heure avant, et publier ta séance après coup t’indique comme entraîné, avec les amis qui étaient là identifiés.",
       note: "Pour les 18 ans et plus. Les notifications sont sur Android et iPhone ; l’app web affiche les nouveaux messages tant que la discussion est ouverte.",
     },
+    "campus-clubs": {
+      name: "Pro pour qui anime un club actif",
+      body: "Animez un club où 5 membres ou plus, vous compris, terminent chacun une séance dans les 14 derniers jours, et Pro est gratuit pour vous tant que c’est le cas.",
+      note: "Rejoindre le club de quelqu’un d’autre ne compte pas, et deux clubs ne s’additionnent pas.",
+    },
     profiles: { name: "Profils publics", body: "Une page publique facultative avec vos meilleures charges et vos séances." },
     "tagline-gym": {
       name: "Devise et salle habituelle",
@@ -414,6 +431,11 @@ export const fr: FeaturesText = {
     "rehab-phases": {
       name: "Protocoles de rééducation par phases, guidés par la douleur",
       body: "Chaque programme de rééducation a trois phases, de calmer la zone à la pleine utilisation. Une règle de douleur simple lit les notes après chaque exercice et le lendemain, dit quand un client est prêt pour la phase suivante ou doit revenir d’une phase, et le kinésithérapeute l’envoie d’un geste.",
+      note: "Les clients le suivent gratuitement. Liftsmith montre ce que vos clients enregistrent. Il ne pose aucun diagnostic et ne traite rien.",
+    },
+    "rehab-shape": {
+      name: "Façonner une routine de rééducation",
+      body: "Les kinés fixent les répétitions ou les secondes de chaque exercice d’une routine de rééducation, et ajoutent une courte consigne, dans l’éditeur de routines. Les clients la suivent telle qu’elle est écrite.",
       note: "Les clients le suivent gratuitement. Liftsmith montre ce que vos clients enregistrent. Il ne pose aucun diagnostic et ne traite rien.",
     },
     "coach-nutrition": {

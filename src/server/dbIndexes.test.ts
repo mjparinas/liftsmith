@@ -437,6 +437,24 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["team_sessions"],
   },
   {
+    name: "campus clubs: clubs a leader started (earnedPro.ts clubEarnsPro)",
+    sql: "SELECT id FROM clubs WHERE owner_id = ?",
+    uses: ["clubs_owner"],
+    noScan: ["clubs"],
+  },
+  {
+    name: "campus clubs: a club's members (earnedPro.ts clubEarnsPro)",
+    sql: "SELECT account_id FROM club_members WHERE club_id = ?",
+    uses: ["sqlite_autoindex_club_members_1"],
+    noScan: ["club_members"],
+  },
+  {
+    name: "a coach taking a program back reads it by id first (coach.ts removePlan)",
+    sql: "SELECT client_id, name FROM coach_plans WHERE id = ? AND coach_id = ?",
+    uses: ["sqlite_autoindex_coach_plans_1"],
+    noScan: ["coach_plans"],
+  },
+  {
     name: "team sessions: an athlete's sets, when their account goes (teamSessions.ts sessionDeletes)",
     sql: "DELETE FROM team_session_sets WHERE athlete_id = ?",
     uses: ["team_session_sets_athlete"],

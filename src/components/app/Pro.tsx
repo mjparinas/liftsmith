@@ -55,6 +55,7 @@ const FROM: Record<string, { feature?: Feature; back: Route }> = {
   lift: { feature: "advancedStats", back: "stats" },
   connections: { feature: "cloudConnections", back: "connections" },
   coaching: { feature: "coaching", back: "trainer" },
+  voiceAmy: { feature: "voiceAmy", back: "settings" },
   settings: { back: "settings" },
   // Back from Stripe Checkout on the web (src/server/stripe.ts RETURN_URLS).
   paid: { back: "today" },
@@ -300,11 +301,13 @@ export function Pro() {
             ? t("pro.status.referral")
             : proVia === "coach"
               ? t("pro.status.coach")
-              : proVia === "school"
-                ? t("pro.status.school")
-                : proVia === "team"
-                  ? t("pro.status.team")
-                  : t("pro.status.account");
+              : proVia === "club"
+                ? t("pro.status.club")
+                : proVia === "school"
+                  ? t("pro.status.school")
+                  : proVia === "team"
+                    ? t("pro.status.team")
+                    : t("pro.status.account");
 
   return (
     <div className="pb-24">

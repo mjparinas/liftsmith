@@ -328,12 +328,19 @@ export interface PoleProp {
   from: Anchor;
   to: Anchor;
   past: number;
-  /** The plate's radius (0.2 when left out; 0 draws none, for a machine's lever arm). */
+  /** The plate's radius (0.2 when left out; 0 draws none, for a machine's lever arm). Ignored when `plates` is set. */
   plate?: number;
+  /**
+   * Several plate radii along the sleeve (heaviest first, nearest the hands), from a real set loading.
+   * An empty list draws no plates (empty bar); leave out for the single default ring.
+   */
+  plates?: number[];
 }
 
-/** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, and a plate ring by the hands. */
-export const POLE_SEGMENTS = 4 + 16;
+/** Max rings a landmine sleeve can show (matches the demo bar's disc cap). */
+export const POLE_MAX_PLATES = 8;
+/** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, then up to POLE_MAX_PLATES plate rings. */
+export const POLE_SEGMENTS = 4 + 16 * POLE_MAX_PLATES;
 export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
   const a = anchorAt(J, p.from),
     h = anchorAt(J, p.to);
@@ -355,13 +362,16 @@ export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
     const t = (i * Math.PI) / 2;
     out.push([off(a, 0.018, t), off(b, 0.018, t)]);
   }
-  // the plates sit on the sleeve just short of the hands
-  const plate: Vec = [h[0] - u[0] * 0.14, h[1] - u[1] * 0.14, h[2] - u[2] * 0.14];
-  const pr = p.plate ?? 0.2;
-  for (let i = 0; i < 16; i++) {
-    // no plate: the unused segments collapse onto the bar's end
-    if (!pr) out.push([b, b]);
-    else out.push([off(plate, pr, (i * Math.PI) / 8), off(plate, pr, ((i + 1) * Math.PI) / 8)]);
+  // plates on the sleeve just short of the hands (heaviest nearest when `plates` is set)
+  const radii = p.plates !== undefined ? p.plates.slice(0, POLE_MAX_PLATES) : p.plate === 0 ? [] : [p.plate ?? 0.2];
+  for (let n = 0; n < POLE_MAX_PLATES; n++) {
+    const pr = radii[n];
+    const along = 0.14 + n * 0.045;
+    const plate: Vec = [h[0] - u[0] * along, h[1] - u[1] * along, h[2] - u[2] * along];
+    for (let i = 0; i < 16; i++) {
+      if (!pr) out.push([b, b]);
+      else out.push([off(plate, pr, (i * Math.PI) / 8), off(plate, pr, ((i + 1) * Math.PI) / 8)]);
+    }
   }
   return out;
 }

@@ -484,6 +484,13 @@ export interface RoutineItem {
   sets: number;
   /** Superset: neighbours with the same group are done back to back. */
   group?: string;
+  /**
+   * A physio's prescribed reps, or seconds when the exercise is timed (1 to 120). Missing: progression picks them.
+   * Only used when the routine is a rehab program (2026-11-22).
+   */
+  reps?: number;
+  /** A short cue from the physio (about 80 characters). Missing: the usual target note. */
+  cue?: string;
 }
 
 /** The built-in rehab protocols, one per area (rehab.ts). */
@@ -525,6 +532,11 @@ export interface Routine {
    */
   rehabPlan?: RehabPlan;
   /**
+   * The coach plan this routine was saved from (2026-11-22). When that plan disappears, Today asks whether to stop
+   * the program or keep doing it. Stays on the phone with the routine; it does not travel in a share code.
+   */
+  assignedPlan?: { id: string; coachId: string };
+  /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.
    */
@@ -548,6 +560,13 @@ export interface RoutinePart {
 export interface DelightPrefs {
   /** Spoken cues between sets. Off by default. */
   voice?: boolean;
+  /**
+   * Which voice speaks the cues: the phone's system TTS (default), or Piper Amy (Pro, English, bundled
+   * under /piper/). System is used whenever Amy isn't available (no Pro, another language, or Piper fails).
+   */
+  voiceEngine?: "system" | "amy";
+  /** Optional system TTS voice id (platform voice URI / name) when `voiceEngine` is system. */
+  voiceId?: string;
   /** Race last time's pace on the rest timer. On unless turned off. */
   ghost?: boolean;
   /** Show only the plates to add or take off between sets. On unless turned off. */

@@ -39,6 +39,7 @@ export const PRO_FEATURES = [
   "labs",
   "cloudConnections",
   "coaching",
+  "voiceAmy",
 ] as const;
 export type Feature = (typeof PRO_FEATURES)[number];
 const PRO: ReadonlySet<Feature> = new Set(PRO_FEATURES);

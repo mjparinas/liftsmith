@@ -12,6 +12,7 @@ import { PHASES, phaseTitle } from "@/lib/rehab";
 import { MAX_ROUTINES } from "@/lib/routines";
 import { decodeRoutine, sameItems } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
+import { useCoachNotes } from "@/lib/trainer";
 import { MUSCLE_LABEL } from "@/lib/types";
 
 import { go } from "./router";
@@ -44,6 +45,7 @@ export function SharedPreview({
   onBack?: () => void;
 }) {
   const { profile, gyms, active, events, saveShared, pickRoutine } = useApp();
+  const plans = useCoachNotes((s) => s.plans);
   const shared = useMemo(() => (code ? decodeRoutine(code) : null), [code]);
   const [savedId, setSavedId] = useState<string | null>(null);
   // A rehab program for an area with no injury logged there: saving it adds that injury, unless switched off.
@@ -74,6 +76,7 @@ export function SharedPreview({
   const sets = shared.items.reduce((n, i) => n + i.sets, 0);
   const area = shared.rehab ? shared.rehabPart : undefined;
   const linked = !!area && rehabInjuries(events, shared).length > 0;
+  const fromCoach = plans.find((p) => p.code === code);
   const save = () => {
     const id = newId();
     const at = Date.now();
@@ -91,6 +94,7 @@ export function SharedPreview({
         ...(shared.rehab && shared.perWeek ? { perWeek: shared.perWeek } : {}),
         ...(plan ? { rehabPlan: plan } : {}),
         ...(shared.parts ? { parts: shared.parts } : {}),
+        ...(fromCoach ? { assignedPlan: { id: fromCoach.id, coachId: fromCoach.coachId } } : {}),
       },
       logInjury,
     );

@@ -1022,4 +1022,51 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "To tylko sumy, od osób, które liczą swoje wizyty, i ruszają, gdy trenuje tam pięć osób. Nigdy nie widzisz, kto.",
   },
+  "rehab-self": {
+    title: "Łagodna rutyna, gdy coś boli",
+    intro:
+      "Zapisujesz kontuzję i nie masz fizjoterapeuty? Krótka rutyna z ciężarem ciała czeka, gdy będziesz gotów, w Kontuzjach i w notatce coacha.",
+    points: [
+      "Pojawia się przy kontuzji, którą już zapisano, gdy nic innego nie obejmuje tej okolicy.",
+      "Otwórz ją z Kontuzji albo z notatki na ekranie Dziś i dodaj jednym dotknięciem.",
+      "Jest z ciężarem ciała, na tyle krótka, by zrobić ją w domu, i może stać obok Twojego treningu.",
+      "Nigdy nie mówi, co jest nie tak ani co to naprawi. To punkt wyjścia, nie leczenie.",
+    ],
+    dyk: "Program fizjoterapeuty na tę samą okolicę ją zastępuje, więc nie pytamy dwa razy.",
+  },
+  "rehab-shape": {
+    title: "Ustaw powtórzenia, sekundy i wskazówkę",
+    intro:
+      "Rutyna rehabilitacji może teraz nieść dokładnie to, czego chcesz w każdym ćwiczeniu: powtórzenia albo sekundy i krótką wskazówkę.",
+    points: [
+      "W edytorze rutyn podnieś powtórzenia albo sekundy każdego ćwiczenia. Zostaw puste, a aplikacja wybierze powtórzenia.",
+      "Przytrzymania zaczynają się w sekundach, więc ćwiczenie na czas zostaje w czasie, nie w powtórzeniach.",
+      "Dodaj krótką wskazówkę pod ćwiczeniem, tę jedną rzecz, którą mają zapamiętać.",
+      "Podopieczni robią ją tak, jak jest zapisana. Starszy telefon i tak otwiera rutynę i po prostu pomija wskazówkę.",
+    ],
+    dyk: "Pytania o ból, razy w tygodniu i trzy etapy działają tak jak wcześniej.",
+  },
+  "campus-clubs": {
+    title: "Pro dla klubu, który dalej trenuje",
+    intro: "Prowadź klub, w którym ludzie naprawdę trenują, a Pro jest dla Ciebie za darmo, dopóki tak zostaje.",
+    points: [
+      "Pięciu lub więcej członków, razem z Tobą, kończy trening w ostatnich 14 dniach.",
+      "Musi to osiągnąć jeden klub. Dwa spokojniejsze kluby się nie sumują.",
+      "Klub, do którego tylko dołączyłeś, się nie liczy. To Ty musisz go założyć.",
+      "Zostaje, dopóki klub trenuje, i kończy się, gdy te dwa tygodnie cichną.",
+    ],
+    dyk: "Klub mówi o tym na swojej stronie, a ekran Pro mówi, że idzie z Twoim kontem.",
+  },
+  "voice-amy": {
+    title: "Amy zapowiada serie",
+    intro: "Trener głosowy może teraz używać Amy, wyraźnego angielskiego głosu w aplikacji, albo zostać przy syntezie telefonu.",
+    points: [
+          "Włącz trenera głosowego w Ustawieniach › Trening i wybierz Głos telefonu albo Amy.",
+          "Amy jest w Pro i tylko po angielsku. Po instalacji działa offline.",
+          "Jeśli Amy się nie załaduje, podpowiedzi wracają automatycznie do głosu telefonu.",
+          "Głos telefonu może wybierać spośród głosów wymienionych przez urządzenie, w każdym języku aplikacji."
+    ],
+    dyk: "Darmowy trener i zapowiedzi przerwy na zablokowanym ekranie nadal używają syntezy systemowej, gdy jej potrzebujesz.",
+  },
+
 };

@@ -489,7 +489,7 @@ export function App() {
     recap: <Recap arg={arg} />,
     photos: <Photos />,
     programs: <Programs />,
-    injuries: <Injuries />,
+    injuries: <Injuries openRehab={arg === "rehab"} />,
     training: <TrainingSettings />,
     tools: <Tools arg={arg} />,
     remix: <Remix code={arg} />,

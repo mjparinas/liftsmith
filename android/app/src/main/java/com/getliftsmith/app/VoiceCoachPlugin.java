@@ -7,11 +7,15 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.Voice;
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * The voice coach (src/lib/voice.ts): spoken cues through the system TextToSpeech engine. Music is lowered
@@ -29,7 +33,7 @@ public class VoiceCoachPlugin extends Plugin {
 
     @PluginMethod
     public void speak(PluginCall call) {
-        speak(getContext(), call.getString("text", ""), call.getFloat("rate", 1f), call.getString("lang", ""));
+        speak(getContext(), call.getString("text", ""), call.getFloat("rate", 1f), call.getString("lang", ""), call.getString("voiceId", ""));
         call.resolve();
     }
 
@@ -40,12 +44,40 @@ public class VoiceCoachPlugin extends Plugin {
         call.resolve();
     }
 
+    @PluginMethod
+    public void voices(PluginCall call) {
+        ensure(getContext(), () -> {
+            JSArray list = new JSArray();
+            if (tts != null) {
+                Set<Voice> all = tts.getVoices();
+                if (all != null) {
+                    for (Voice v : all) {
+                        JSObject o = new JSObject();
+                        o.put("id", v.getName());
+                        o.put("name", v.getName());
+                        o.put("lang", v.getLocale() != null ? v.getLocale().toLanguageTag() : "");
+                        list.put(o);
+                    }
+                }
+            }
+            JSObject r = new JSObject();
+            r.put("voices", list);
+            call.resolve(r);
+        });
+    }
+
     /** The app's language (a BCP 47 tag such as "es-MX"), which can differ from the phone's; empty means the phone's. */
     private static String lang = "";
+    private static String voiceId = "";
 
     static synchronized void speak(Context ctx, String text, float rate, String language) {
+        speak(ctx, text, rate, language, "");
+    }
+
+    static synchronized void speak(Context ctx, String text, float rate, String language, String voice) {
         if (text == null || text.isEmpty()) return;
         lang = language == null ? "" : language;
+        voiceId = voice == null ? "" : voice;
         final Context app = ctx.getApplicationContext();
         if (tts == null) {
             pending = text;
@@ -53,7 +85,7 @@ public class VoiceCoachPlugin extends Plugin {
                 synchronized (VoiceCoachPlugin.class) {
                     ready = status == TextToSpeech.SUCCESS;
                     if (!ready) return;
-                    tts.setLanguage(locale());
+                    applyVoice();
                     tts.setAudioAttributes(attrs());
                     tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override public void onStart(String id) {}
@@ -71,8 +103,40 @@ public class VoiceCoachPlugin extends Plugin {
             return;
         }
         tts.setSpeechRate(rate);
-        tts.setLanguage(locale());
+        applyVoice();
         say(app, text, rate);
+    }
+
+    private static void ensure(Context ctx, Runnable whenReady) {
+        final Context app = ctx.getApplicationContext();
+        if (tts != null && ready) {
+            whenReady.run();
+            return;
+        }
+        if (tts == null) {
+            tts = new TextToSpeech(app, status -> {
+                synchronized (VoiceCoachPlugin.class) {
+                    ready = status == TextToSpeech.SUCCESS;
+                    if (ready) whenReady.run();
+                }
+            });
+            return;
+        }
+        whenReady.run();
+    }
+
+    private static void applyVoice() {
+        if (tts == null) return;
+        tts.setLanguage(locale());
+        if (voiceId.isEmpty()) return;
+        Set<Voice> all = tts.getVoices();
+        if (all == null) return;
+        for (Voice v : all) {
+            if (voiceId.equals(v.getName())) {
+                tts.setVoice(v);
+                return;
+            }
+        }
     }
 
     /** The cue's language: the app's when it's set, else the phone's. */

@@ -14,6 +14,7 @@ import { challengeDays, challengeResult, markResultSeen, rematchHandles, unseenR
 import { crewWhen } from "@/lib/crew";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
+import { flag } from "@/lib/flags";
 import { badgeForItem, COSMETICS, game, levelForItem } from "@/lib/game";
 import { date as fmtDate, list as fmtList, inSentence, t } from "@/lib/i18n";
 import {
@@ -2160,6 +2161,7 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
             {t("friends.club.invite")}
           </Button>
           <p className="mt-1 px-1 text-xs text-muted">{t("friends.club.inviteHint", { code: club.code })}</p>
+          {club.mine && flag("campusClubs") !== false && <p className="mt-2 px-1 text-xs text-muted">{t("friends.club.proFree")}</p>}
           <ClubGoalCard club={club} onSave={(goal) => void act({ goal }, "clubManage")} />
           {teen ? (
             <p className="mt-4 text-sm text-muted">{t("crew.teen")}</p>

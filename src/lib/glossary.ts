@@ -29,6 +29,7 @@ const TERMS = [
   "restingHr",
   "breathingRate",
   "breathPattern",
+  "voiceEngine",
   "vo2max",
   "bodyFat",
   "leanMass",

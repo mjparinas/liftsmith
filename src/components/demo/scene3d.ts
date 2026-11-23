@@ -27,6 +27,7 @@ import {
   type Material,
 } from "three";
 
+import { barDiscs, loadingKey, poleRadii, trapDiscs, type DemoDisc } from "@/lib/demo/barPlates";
 import { partIndices, REGIONS } from "@/lib/demo/mesh";
 import {
   anchorAt,
@@ -222,31 +223,46 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     const e = new LineSegments(keep(new EdgesGeometry(keep(g), 1)), mat);
     return e;
   };
-  const cylZ = (r: number, w: number, seg: number, z: number) => {
+  const cylZ = (r: number, w: number, seg: number, z: number, track = true) => {
     const g = new CylinderGeometry(r, r, w, seg, 1);
     g.rotateX(Math.PI / 2);
-    const e = edges(g);
+    const eg = new EdgesGeometry(g, 1);
+    g.dispose();
+    const e = new LineSegments(eg, steelMat);
+    if (track) keep(eg);
     e.position.z = z;
     return e;
   };
-  const makeBarbell = (k: number) => {
-    const g = new Group();
-    g.add(cylZ(0.014, k < 1 ? 1.5 : 2.1, 8, 0));
-    for (const sg of [-1, 1]) {
-      const z = k < 1 ? 0.42 : 0.5;
-      for (const [z0, w, r] of [
-        [z, 0.05, 0.225],
-        [z + 0.055, 0.035, 0.19],
-        [z + 0.095, 0.025, 0.14],
-      ])
-        g.add(cylZ(r * k, w * (k < 1 ? 0.6 : 1), 36, sg * (z0 + w / 2)));
-      g.add(cylZ(0.03, 0.04, 12, sg * (z - 0.03)));
+  /** Clear rebuilt plate discs without touching the shaft (and hex frame on a trap bar). */
+  const clearPlates = (plates: Group) => {
+    for (const c of [...plates.children]) {
+      plates.remove(c);
+      const geo = (c as LineSegments).geometry;
+      if (geo) geo.dispose();
     }
-    return g;
   };
-  const barbell = makeBarbell(1),
-    smallBar = makeBarbell(0.55);
+  const fillSleeve = (plates: Group, discs: readonly DemoDisc[], oneEnd: boolean, collarZ: number) => {
+    const sides = oneEnd ? [1] : [-1, 1];
+    for (const sg of sides) {
+      for (const d of discs) plates.add(cylZ(d.r, d.w, 36, sg * d.z, false));
+      plates.add(cylZ(0.03, 0.04, 12, sg * (collarZ - 0.03), false));
+    }
+  };
+  const makeBarbell = (small: boolean) => {
+    const g = new Group();
+    g.add(cylZ(0.014, small ? 1.5 : 2.1, 8, 0));
+    const plates = new Group();
+    g.add(plates);
+    return { bar: g, plates };
+  };
+  const full = makeBarbell(false),
+    small = makeBarbell(true);
+  const barbell = full.bar,
+    smallBar = small.bar;
+  const barbellPlates = full.plates,
+    smallBarPlates = small.plates;
   const trapbar = new Group();
+  const trapPlates = new Group();
   {
     const hex: Vec[] = [
       [0.32, 0, 0],
@@ -259,16 +275,27 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     const g = keep(new BufferGeometry().setFromPoints([...hex, hex[0]].map((p) => new Vector3(...p))));
     trapbar.add(new Line(g, steelMat));
     trapbar.add(cylZ(0.014, 0.6, 8, 0));
-    for (const sg of [-1, 1]) {
-      const sleeve = cylZ(0.016, 0.5, 8, sg * 0.55);
-      trapbar.add(sleeve);
-      for (const [z0, w, r] of [
-        [0.42, 0.05, 0.225],
-        [0.47, 0.035, 0.19],
-      ])
-        trapbar.add(cylZ(r, w, 36, sg * (z0 + w / 2)));
-    }
+    for (const sg of [-1, 1]) trapbar.add(cylZ(0.016, 0.5, 8, sg * 0.55));
+    trapbar.add(trapPlates);
   }
+  let barLoadKey = "\0";
+  const rebuildBars = (f: Frame) => {
+    const key = loadingKey(f.s.loading, f.s.unit);
+    if (key === barLoadKey) return;
+    barLoadKey = key;
+    const oneEnd = !!f.s.loading?.oneEnd;
+    clearPlates(barbellPlates);
+    clearPlates(smallBarPlates);
+    clearPlates(trapPlates);
+    fillSleeve(barbellPlates, barDiscs(f.s.loading, f.s.unit, false), oneEnd, 0.5);
+    fillSleeve(smallBarPlates, barDiscs(f.s.loading, f.s.unit, true), oneEnd, 0.42);
+    fillSleeve(trapPlates, trapDiscs(f.s.loading, f.s.unit), oneEnd, 0.42);
+  };
+  const withPoleLoad = (props: Prop[], f: Frame): Prop[] => {
+    const radii = poleRadii(f.s.loading, f.s.unit);
+    if (radii === null) return props;
+    return props.map((p) => (p.kind === "pole" ? { ...p, plates: radii, plate: undefined } : p));
+  };
   const makeDumbbell = () => {
     const g = new Group();
     g.add(cylZ(0.014, 0.3, 6, 0));
@@ -548,7 +575,8 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
       ensureParts(f);
       const { s, J } = f;
       if (f.changed) {
-        buildProps(f.motion.props?.(f.body) ?? []);
+        rebuildBars(f);
+        buildProps(withPoleLoad(f.motion.props?.(f.body) ?? [], f));
         const a = pathGeo.attributes.position.array as Float32Array;
         f.path.forEach((p, i) => {
           a[i * 3] = p[0];

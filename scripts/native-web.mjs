@@ -16,6 +16,7 @@ export const KEEP = [
   "app",
   "_next",
   "mediapipe",
+  "piper",
   "index.html",
   "404.html",
   "favicon.ico",

@@ -46,6 +46,24 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.14.0",
+    day: "2026-11-23",
+    headline: "Amy voice for the voice coach, with your phone's text-to-speech still free as a fallback",
+    changes: [{ id: "voiceAmy", kind: "new", icon: "speaker" }],
+  },
+  {
+    version: "0.13.0",
+    day: "2026-11-22",
+    headline:
+      "Gentle rehab without a physio, rehab routines shaped with reps and cues, a choice when a program is taken back, and Pro for active club leaders",
+    changes: [
+      { id: "rehabSelf", kind: "new", icon: "bandage" },
+      { id: "rehabShape", kind: "new", icon: "edit" },
+      { id: "rehabEnd", kind: "new", icon: "undo" },
+      { id: "campusClubs", kind: "new", icon: "people", unlock: "friends" },
+    ],
+  },
+  {
     version: "0.12.0",
     day: "2026-11-21",
     headline:
