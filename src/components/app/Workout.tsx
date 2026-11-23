@@ -752,6 +752,8 @@ export function Workout() {
                 shape={shape}
                 bpm={bpm}
                 hrTrend={active.hr}
+                loading={loading}
+                unit={unit}
                 // Keeps moving during rest too (Melvin, 2026-11-17), so the next set's lift is on show (docs/decisions/speed.md).
                 paused={infoOpen || swapOpen || endOpen}
                 className="h-full"

@@ -30,7 +30,8 @@ import {
   type Vec,
 } from "@/lib/demo/rig";
 import { stretchMotion } from "@/lib/demo/stretchMotions";
-import type { Muscle } from "@/lib/types";
+import type { Loading } from "@/lib/plates";
+import type { Muscle, Unit } from "@/lib/types";
 
 // The demo loop shared by the WebGL scene and the 2D canvas drawing: time, reps, the camera, drag to
 // rotate, and the mesh buffers. Scenes only draw what this hands them.
@@ -80,6 +81,13 @@ export interface DemoSettings {
   follow?: (() => number | null) | null;
   /** Tilts the whole figure sideways, in degrees (positive to its right), on top of a motion's own roll. */
   lean?: number;
+  /**
+   * Real plates for the bar on the figure (from `loadBar` on the workout). Without it the bar keeps
+   * its fixed decorative discs. Landmine moves use `oneEnd` for rings on the pole sleeve.
+   */
+  loading?: Loading | null;
+  /** Gym unit for plate sizes when `loading` is set. */
+  unit?: Unit | null;
 }
 
 export interface Camera {
