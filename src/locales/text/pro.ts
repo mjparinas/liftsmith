@@ -102,6 +102,9 @@ export const en = {
   "pro.welcome.trialNote.web": "Free for {days} days. You can cancel any time under Manage subscription before it ends.",
   "pro.ft.coaching": "Coach clients",
   "pro.fb.coaching": "Invite clients, see what each one needs first, and send them routines and notes. Being a client is free.",
+  "pro.ft.voiceAmy": "Amy voice coach",
+  "pro.fb.voiceAmy":
+    "A clear English voice built into the app for spoken cues between sets. Your phone's text-to-speech stays free, and Amy falls back to it if anything goes wrong.",
   "pro.status.school":
     "Pro comes with your account because you coach a high school team with a confirmed school address. There is nothing to buy or manage.",
   "pro.status.team": "Pro comes with your account because you're on a high school team. There is nothing to buy or manage.",
@@ -212,6 +215,9 @@ export const es: Partial<Record<Key, Message>> = {
     "Gratis durante {days} días. Puedes cancelarla cuando quieras en Gestionar suscripción antes de que termine.",
   "pro.ft.coaching": "Entrenar a clientes",
   "pro.fb.coaching": "Invita a clientes, mira qué necesita cada uno primero y envíales rutinas y notas. Ser cliente es gratis.",
+  "pro.ft.voiceAmy": "Amy como voz del entrenador",
+  "pro.fb.voiceAmy":
+    "Una voz inglesa clara incluida en la app para las indicaciones entre series. El texto a voz del teléfono sigue siendo gratis, y Amy vuelve a él si algo falla.",
   "pro.status.school":
     "Pro viene con tu cuenta porque entrenas a un equipo de secundaria con una dirección escolar confirmada. No hay nada que comprar ni gestionar.",
   "pro.status.team": "Pro viene con tu cuenta porque estás en un equipo de secundaria. No hay nada que comprar ni gestionar.",
@@ -325,6 +331,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.ft.coaching": "Coacher des clients",
   "pro.fb.coaching":
     "Invitez des clients, voyez d'abord ce dont chacun a besoin et envoyez-leur des routines et des notes. Être client est gratuit.",
+  "pro.ft.voiceAmy": "Voix Amy pour le coach",
+  "pro.fb.voiceAmy":
+    "Une voix anglaise claire intégrée à l’app pour les indications entre les séries. La synthèse du téléphone reste gratuite, et Amy y revient si quelque chose échoue.",
   "pro.status.school":
     "Pro est inclus avec votre compte parce que vous entraînez une équipe d’école secondaire avec une adresse scolaire confirmée. Il n’y a rien à acheter ni à gérer.",
   "pro.status.team":
@@ -436,6 +445,9 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote.web": "{days} Tage gratis. Du kannst jederzeit vor dem Ende unter „Abo verwalten“ kündigen.",
   "pro.ft.coaching": "Kunden coachen",
   "pro.fb.coaching": "Lade Kunden ein, sieh zuerst, was jeder braucht, und schick ihnen Routinen und Notizen. Kunde sein ist kostenlos.",
+  "pro.ft.voiceAmy": "Amy als Sprachcoach",
+  "pro.fb.voiceAmy":
+    "Eine klare englische Stimme in der App für Ansagen zwischen den Sätzen. Die Telefon-Sprachausgabe bleibt kostenlos, und Amy fällt darauf zurück, wenn etwas schiefgeht.",
   "pro.status.school":
     "Pro ist in deinem Konto enthalten, weil du ein Schulteam mit bestätigter Schuladresse trainierst. Du musst nichts kaufen oder verwalten.",
   "pro.status.team": "Pro ist in deinem Konto enthalten, weil du in einem Schulteam bist. Du musst nichts kaufen oder verwalten.",
@@ -544,6 +556,9 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote.web": "Gratis per {days} giorni. Puoi annullare quando vuoi in Gestisci abbonamento prima della fine.",
   "pro.ft.coaching": "Segui dei clienti",
   "pro.fb.coaching": "Invita clienti, guarda prima di cosa ha bisogno ciascuno e mandagli routine e note. Essere cliente è gratis.",
+  "pro.ft.voiceAmy": "Voce Amy per il coach",
+  "pro.fb.voiceAmy":
+    "Una voce inglese chiara inclusa nell’app per i suggerimenti tra le serie. La sintesi del telefono resta gratis, e Amy ci torna se qualcosa non va.",
   "pro.status.school":
     "Pro è incluso nel tuo account perché alleni una squadra delle superiori con un indirizzo scolastico confermato. Non c’è nulla da comprare o gestire.",
   "pro.status.team": "Pro è incluso nel tuo account perché fai parte di una squadra delle superiori. Non c’è nulla da comprare o gestire.",
@@ -651,6 +666,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.ft.coaching": "クライアントの指導",
   "pro.fb.coaching":
     "クライアントを招待して、一人ひとりがまず必要なことを確認し、ルーティンやメモを送れます。クライアントになるのは無料です。",
+  "pro.ft.voiceAmy": "Amyボイスコーチ",
+  "pro.fb.voiceAmy":
+    "セット間の音声ガイド用にアプリへ内蔵した明瞭な英語ボイス。端末の音声読み上げは無料のまま、Amyが使えないときはそちらに戻ります。",
   "pro.status.school": "学校のアドレスを確認した高校のコーチなので、アカウントに Pro が含まれます。購入や管理は不要です。",
   "pro.status.team": "高校のチームに参加しているので、アカウントに Pro が含まれます。購入や管理は不要です。",
 };
@@ -758,6 +776,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote.web": "Grátis por {days} dias. Você pode cancelar quando quiser em Gerenciar assinatura antes de terminar.",
   "pro.ft.coaching": "Treine alunos",
   "pro.fb.coaching": "Convide alunos, veja do que cada um precisa primeiro e envie rotinas e notas. Ser aluno é grátis.",
+  "pro.ft.voiceAmy": "Voz Amy no coach",
+  "pro.fb.voiceAmy":
+    "Uma voz inglesa clara na app para as indicações entre séries. A síntese do telemóvel continua grátis, e a Amy volta a ela se algo falhar.",
   "pro.status.school":
     "O Pro vem com a sua conta porque você treina uma equipe de ensino médio com um endereço escolar confirmado. Não há nada para comprar ou gerenciar.",
   "pro.status.team":
@@ -861,6 +882,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote.web": "{days}일 동안 무료예요. 끝나기 전에 구독 관리에서 언제든 취소할 수 있어요.",
   "pro.ft.coaching": "회원 코칭",
   "pro.fb.coaching": "회원을 초대하고, 각 회원에게 먼저 필요한 것을 확인하고, 루틴과 노트를 보내세요. 회원은 무료예요.",
+  "pro.ft.voiceAmy": "Amy 음성 코치",
+  "pro.fb.voiceAmy":
+    "세트 사이 안내를 위한 앱 내장 또렷한 영어 음성. 휴대폰 음성은 무료로 그대로이고, Amy를 쓸 수 없으면 그쪽으로 돌아갑니다.",
   "pro.status.school": "확인된 학교 주소로 고등학교 팀을 코칭하고 있어서 Pro가 계정에 포함돼 있어요. 구매하거나 관리할 건 없어요.",
   "pro.status.team": "고등학교 팀 소속이라 Pro가 계정에 포함돼 있어요. 구매하거나 관리할 건 없어요.",
 };
@@ -968,6 +992,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "pro.ft.coaching": "Danışanlara koçluk",
   "pro.fb.coaching":
     "Danışanlarını davet et, her birinin öncelikle neye ihtiyacı olduğunu gör, onlara rutinler ve notlar gönder. Danışan olmak ücretsiz.",
+  "pro.ft.voiceAmy": "Amy sesli koç",
+  "pro.fb.voiceAmy":
+    "Setler arasındaki ipuçları için uygulamaya gömülü net bir İngilizce ses. Telefon metin okuma ücretsiz kalır; Amy yüklenemezse ona döner.",
   "pro.status.school":
     "Onaylanmış bir okul adresiyle bir lise takımına koçluk yaptığın için Pro hesabınla birlikte gelir. Satın alacak ya da yönetecek bir şey yok.",
   "pro.status.team": "Bir lise takımında olduğun için Pro hesabınla birlikte gelir. Satın alacak ya da yönetecek bir şey yok.",
@@ -1077,6 +1104,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "pro.ft.coaching": "Prowadzenie podopiecznych",
   "pro.fb.coaching":
     "Zapraszaj podopiecznych, zobacz, czego każdy potrzebuje najpierw, i wysyłaj im zestawy i notatki. Bycie podopiecznym jest darmowe.",
+  "pro.ft.voiceAmy": "Głos Amy w trenerze",
+  "pro.fb.voiceAmy":
+    "Wyraźny angielski głos w aplikacji do podpowiedzi między seriami. Synteza telefonu zostaje darmowa, a Amy wraca do niej, gdy coś pójdzie nie tak.",
   "pro.status.school":
     "Pro masz w ramach konta, bo trenujesz szkolną drużynę z potwierdzonym adresem szkoły. Nie musisz niczego kupować ani niczym zarządzać.",
   "pro.status.team": "Pro masz w ramach konta, bo jesteś w szkolnej drużynie. Nie musisz niczego kupować ani niczym zarządzać.",

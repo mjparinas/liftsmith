@@ -1064,4 +1064,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Le club le dit sur sa page, et l’écran Pro dit que ça vient avec votre compte.",
   },
+  "voice-amy": {
+    title: "Amy annonce vos séries",
+    intro: "Le coach vocal peut maintenant utiliser Amy, une voix anglaise claire intégrée à l’app, ou garder la synthèse du téléphone.",
+    points: [
+          "Activez le coach vocal dans Réglages › Entraînement, puis choisissez Voix du téléphone ou Amy.",
+          "Amy est Pro et en anglais seulement. Elle reste hors ligne une fois l’app installée.",
+          "Si Amy ne charge pas, les indications repassent automatiquement sur la voix du téléphone.",
+          "La voix du téléphone peut choisir parmi celles listées par l’appareil, dans chaque langue de l’app."
+    ],
+    dyk: "Le coach gratuit et les annonces de repos sur l’écran verrouillé utilisent encore la synthèse système quand il le faut.",
+  },
+
 };

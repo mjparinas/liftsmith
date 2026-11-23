@@ -186,6 +186,10 @@ export const es: FeaturesText = {
       body: "Te habla durante el entrenamiento, por ejemplo cuando termina el descanso, para que no tengas que mirar el teléfono.",
       note: "Android avisa del fin del descanso con la pantalla bloqueada; iPhone y la web mientras la app está abierta.",
     },
+    "voice-amy": {
+      name: "Voz Amy",
+      body: "Una voz inglesa clara incluida en la app para el entrenador por voz. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
+    },
     stretching: {
       name: "Estiramientos",
       body: "48 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día. Unos segundos para colocarte antes de cada estiramiento y cada lado, y la pantalla sigue encendida.",

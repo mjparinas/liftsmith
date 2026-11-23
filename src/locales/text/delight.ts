@@ -7,6 +7,13 @@ export const en = {
   "delight.voice": "Voice coach",
   "delight.voiceHint":
     "Spoken cues between sets: the next weight and reps, the last set, ten seconds left, and new bests. Music dips while it talks.",
+  "delight.voiceEngine": "Voice",
+  "delight.voiceSystem": "Phone voice",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Uses your phone's text-to-speech. Pick a voice below when the phone lists more than one.",
+  "delight.voiceAmyHint":
+    "Amy is a clear English voice built into the app (Pro). Other languages, and Amy if it can't load, use the phone voice.",
+  "delight.voiceDefault": "Default",
   "delight.ghost": "Ghost mode",
   "delight.ghostHint": "Race your last session of each exercise: its weights, reps and rests show on the rest timer.",
   "delight.plates": "Smart plate memory",
@@ -61,6 +68,12 @@ export const es: Partial<Record<Key, Message>> = {
   "delight.iconDone": "Hecho. En Android, la pantalla de inicio se actualiza al salir de la app.",
   "delight.iconFailed": "No se pudo cambiar el icono en este teléfono.",
   "delight.classic": "Clásico",
+  "delight.voiceEngine": "Voz",
+  "delight.voiceSystem": "Voz del teléfono",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Usa el texto a voz del teléfono. Elige una voz abajo si el teléfono muestra más de una.",
+  "delight.voiceAmyHint": "Amy es una voz clara en inglés incluida en la app (Pro). Otros idiomas, y Amy si no puede cargar, usan la voz del teléfono.",
+  "delight.voiceDefault": "Predeterminada",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -90,6 +103,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "delight.iconDone": "C’est fait. Sur Android, l’écran d’accueil se met à jour quand vous quittez l’app.",
   "delight.iconFailed": "Impossible de changer l’icône sur ce téléphone.",
   "delight.classic": "Classique",
+  "delight.voiceEngine": "Voix",
+  "delight.voiceSystem": "Voix du téléphone",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Utilise la synthèse vocale du téléphone. Choisissez une voix ci-dessous s’il en propose plusieurs.",
+  "delight.voiceAmyHint": "Amy est une voix anglaise claire intégrée à l’app (Pro). Les autres langues, et Amy si elle ne charge pas, utilisent la voix du téléphone.",
+  "delight.voiceDefault": "Par défaut",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -120,6 +139,12 @@ export const de: Partial<Record<Key, Message>> = {
   "delight.iconDone": "Erledigt. Unter Android aktualisiert sich der Startbildschirm, sobald du die App verlässt.",
   "delight.iconFailed": "Das Symbol ließ sich auf diesem Telefon nicht ändern.",
   "delight.classic": "Klassisch",
+  "delight.voiceEngine": "Stimme",
+  "delight.voiceSystem": "Telefonstimme",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Nutzt die Text-to-Speech-Funktion deines Telefons. Wähle unten eine Stimme, wenn mehrere angeboten werden.",
+  "delight.voiceAmyHint": "Amy ist eine klare englische Stimme in der App (Pro). Andere Sprachen und Amy, falls sie nicht lädt, nutzen die Telefonstimme.",
+  "delight.voiceDefault": "Standard",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -149,6 +174,12 @@ export const it: Partial<Record<Key, Message>> = {
   "delight.iconDone": "Fatto. Su Android la schermata Home si aggiorna quando esci dall’app.",
   "delight.iconFailed": "Non è stato possibile cambiare l’icona su questo telefono.",
   "delight.classic": "Classica",
+  "delight.voiceEngine": "Voce",
+  "delight.voiceSystem": "Voce del telefono",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Usa la sintesi vocale del telefono. Scegli una voce sotto se ne vengono elencate più di una.",
+  "delight.voiceAmyHint": "Amy è una voce inglese chiara inclusa nell’app (Pro). Le altre lingue, e Amy se non si carica, usano la voce del telefono.",
+  "delight.voiceDefault": "Predefinita",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -178,6 +209,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "delight.iconDone": "完了しました。Android ではアプリを閉じるとホーム画面に反映されます。",
   "delight.iconFailed": "この端末ではアイコンを変更できませんでした。",
   "delight.classic": "クラシック",
+  "delight.voiceEngine": "声",
+  "delight.voiceSystem": "端末の声",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "端末の音声読み上げを使います。複数ある場合は下から選べます。",
+  "delight.voiceAmyHint": "Amyはアプリ内蔵の明瞭な英語ボイスです（Pro）。ほかの言語や、Amyが使えないときは端末の声になります。",
+  "delight.voiceDefault": "標準",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -207,6 +244,12 @@ export const pt: Partial<Record<Key, Message>> = {
   "delight.iconDone": "Pronto. No Android, a tela inicial atualiza quando você sai do app.",
   "delight.iconFailed": "Não foi possível mudar o ícone neste celular.",
   "delight.classic": "Clássico",
+  "delight.voiceEngine": "Voz",
+  "delight.voiceSystem": "Voz do telemóvel",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Usa a síntese de voz do telemóvel. Escolha uma voz abaixo se houver mais de uma.",
+  "delight.voiceAmyHint": "Amy é uma voz inglesa clara incluída na app (Pro). Outros idiomas, e a Amy se não carregar, usam a voz do telemóvel.",
+  "delight.voiceDefault": "Predefinida",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -235,6 +278,12 @@ export const ko: Partial<Record<Key, Message>> = {
   "delight.iconDone": "완료했어요. Android에서는 앱을 나가면 홈 화면이 업데이트돼요.",
   "delight.iconFailed": "이 휴대폰에서는 아이콘을 바꿀 수 없어요.",
   "delight.classic": "클래식",
+  "delight.voiceEngine": "목소리",
+  "delight.voiceSystem": "휴대폰 음성",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "휴대폰의 텍스트 음성 변환을 씁니다. 음성이 여러 개면 아래에서 고르세요.",
+  "delight.voiceAmyHint": "Amy는 앱에 들어 있는 또렷한 영어 음성이에요(Pro). 다른 언어이거나 Amy를 쓸 수 없으면 휴대폰 음성을 씁니다.",
+  "delight.voiceDefault": "기본",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -264,6 +313,12 @@ export const tr: Partial<Record<Key, Message>> = {
   "delight.iconDone": "Tamam. Android'de ana ekran, uygulamadan çıkınca güncellenir.",
   "delight.iconFailed": "Bu telefonda simge değiştirilemedi.",
   "delight.classic": "Klasik",
+  "delight.voiceEngine": "Ses",
+  "delight.voiceSystem": "Telefon sesi",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Telefonunuzun metin okuma sesini kullanır. Birden fazla ses varsa aşağıdan seçin.",
+  "delight.voiceAmyHint": "Amy, uygulamaya gömülü net bir İngilizce sestir (Pro). Diğer diller ve Amy yüklenemezse telefon sesi kullanılır.",
+  "delight.voiceDefault": "Varsayılan",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -293,4 +348,10 @@ export const pl: Partial<Record<Key, Message>> = {
   "delight.iconDone": "Gotowe. Na Androidzie ekran główny zaktualizuje się, gdy wyjdziesz z aplikacji.",
   "delight.iconFailed": "Nie udało się zmienić ikony na tym telefonie.",
   "delight.classic": "Klasyczna",
+  "delight.voiceEngine": "Głos",
+  "delight.voiceSystem": "Głos telefonu",
+  "delight.voiceAmy": "Amy",
+  "delight.voiceSystemHint": "Używa syntezy mowy telefonu. Wybierz głos poniżej, jeśli telefon oferuje więcej niż jeden.",
+  "delight.voiceAmyHint": "Amy to wyraźny angielski głos w aplikacji (Pro). Inne języki oraz Amy, gdy nie załaduje się, używają głosu telefonu.",
+  "delight.voiceDefault": "Domyślny",
 };

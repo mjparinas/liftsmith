@@ -105,6 +105,9 @@ export const en = {
   "wn.c.campusClubs.title": "Pro for an active club",
   "wn.c.campusClubs.body":
     "Lead a club where 5 or more members, you included, each finish a workout in the last 14 days, and Pro is free while that stays true.",
+  "wn.c.voiceAmy.title": "Amy for the voice coach",
+  "wn.c.voiceAmy.body":
+    "Pro unlocks Amy, a clear English voice built into the app. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
 } as const;
 
 type Key = keyof typeof en;
@@ -220,6 +223,10 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Pro para un club activo",
   "wn.c.campusClubs.body":
     "Dirige un club en el que 5 o más miembros, tú incluido, terminen cada uno un entrenamiento en los últimos 14 días, y Pro es gratis mientras siga siendo así.",
+  "wn.c.voiceAmy.title": "Amy para el entrenador por voz",
+  "wn.c.voiceAmy.body":
+    "Pro desbloquea Amy, una voz inglesa clara incluida en la app. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
+
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -335,6 +342,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Pro pour un club actif",
   "wn.c.campusClubs.body":
     "Animez un club où 5 membres ou plus, vous compris, terminent chacun une séance dans les 14 derniers jours, et Pro est gratuit tant que c’est le cas.",
+  "wn.c.voiceAmy.title": "Amy pour le coach vocal",
+  "wn.c.voiceAmy.body":
+    "Pro débloque Amy, une voix anglaise claire intégrée à l’app. Choisissez Amy ou la synthèse du téléphone dans Réglages › Entraînement ; Amy revient à la voix du téléphone si elle ne charge pas.",
+
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -447,6 +458,10 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Pro für einen aktiven Club",
   "wn.c.campusClubs.body":
     "Leite einen Club, in dem 5 oder mehr Mitglieder, du eingeschlossen, in den letzten 14 Tagen je ein Training beendet haben, und Pro ist kostenlos, solange das so bleibt.",
+  "wn.c.voiceAmy.title": "Amy für den Sprachcoach",
+  "wn.c.voiceAmy.body":
+    "Pro schaltet Amy frei, eine klare englische Stimme in der App. Wähle Amy oder die Telefon-Sprachausgabe unter Einstellungen › Training; Amy fällt auf die Telefonstimme zurück, wenn sie nicht lädt.",
+
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -559,6 +574,10 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Pro per un club attivo",
   "wn.c.campusClubs.body":
     "Guida un club in cui 5 o più membri, tu compreso, finiscono ciascuno un allenamento negli ultimi 14 giorni, e Pro è gratis finché resta così.",
+  "wn.c.voiceAmy.title": "Amy per il coach vocale",
+  "wn.c.voiceAmy.body":
+    "Pro sblocca Amy, una voce inglese chiara inclusa nell’app. Scegli Amy o la sintesi del telefono in Impostazioni › Allenamento; Amy torna alla voce del telefono se non si carica.",
+
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -662,6 +681,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "活発なクラブにPro",
   "wn.c.campusClubs.body":
     "自分を含めてメンバー5人以上が、それぞれ直近14日以内にワークアウトを終えているクラブを運営しているあいだ、Proが無料です。",
+  "wn.c.voiceAmy.title": "音声コーチのAmy",
+  "wn.c.voiceAmy.body":
+    "ProでAmyが使えます。アプリ内蔵の明瞭な英語ボイスです。設定 › ワークアウトでAmyか端末の音声を選べ、Amyが使えないときは端末の声に戻ります。",
+
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -770,6 +793,10 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Pro para um clube ativo",
   "wn.c.campusClubs.body":
     "Lidere um clube em que 5 ou mais membros, você incluído, terminem cada um um treino nos últimos 14 dias, e o Pro fica grátis enquanto isso continuar.",
+  "wn.c.voiceAmy.title": "Amy no coach por voz",
+  "wn.c.voiceAmy.body":
+    "O Pro liberta a Amy, uma voz inglesa clara na app. Escolha Amy ou a síntese do telemóvel em Definições › Treino; a Amy volta à voz do telemóvel se não carregar.",
+
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -869,6 +896,10 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.rehabEnd.body": "물리치료사가 프로그램을 거둬가면 오늘 화면에서 멈출지, 혼자 이어 갈지 물어봐요.",
   "wn.c.campusClubs.title": "활발한 클럽에 Pro",
   "wn.c.campusClubs.body": "나를 포함해 멤버 5명 이상이 각자 최근 14일 안에 운동을 마친 클럽을 이끄는 동안 Pro가 무료예요.",
+  "wn.c.voiceAmy.title": "음성 코치 Amy",
+  "wn.c.voiceAmy.body":
+    "Pro로 Amy를 쓸 수 있어요. 앱에 들어 있는 또렷한 영어 음성이에요. 설정 › 운동에서 Amy 또는 휴대폰 음성을 고르고, Amy를 쓸 수 없으면 휴대폰 음성으로 돌아가요.",
+
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -977,6 +1008,10 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Pro dla aktywnego klubu",
   "wn.c.campusClubs.body":
     "Prowadź klub, w którym 5 lub więcej członków, razem z Tobą, skończyło trening w ostatnich 14 dniach, a Pro jest za darmo, dopóki tak zostaje.",
+  "wn.c.voiceAmy.title": "Amy w trenerze głosowym",
+  "wn.c.voiceAmy.body":
+    "Pro odblokowuje Amy, wyraźny angielski głos w aplikacji. Wybierz Amy lub syntezę telefonu w Ustawieniach › Trening; Amy wraca do głosu telefonu, gdy nie załaduje się.",
+
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1086,4 +1121,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.campusClubs.title": "Aktif bir kulüp için Pro",
   "wn.c.campusClubs.body":
     "Sen dahil 5 veya daha fazla üyenin son 14 günde birer antrenman bitirdiği bir kulübü yönetirken Pro ücretsiz kalır.",
+  "wn.c.voiceAmy.title": "Sesli koç için Amy",
+  "wn.c.voiceAmy.body":
+    "Pro, uygulamaya gömülü net İngilizce ses Amy’yi açar. Ayarlar › Antrenman’da Amy veya telefon metin okumayı seç; Amy yüklenemezse telefon sesine döner.",
+
 };

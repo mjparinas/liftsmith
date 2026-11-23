@@ -3,7 +3,7 @@
 // Settings for the delightful extras, in two places: Settings › Workout has the voice coach, ghost mode,
 // plate memory and rest timer extras (part "workout"); Settings › Look and feel has earned themes and app
 // icons (part "look").
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
 import { useLight } from "@/lib/appearance";
@@ -16,16 +16,19 @@ import {
   patternCounts,
   type BreathCustom,
 } from "@/lib/breathing";
+import { can } from "@/lib/entitlements";
 import { inSentence, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
+import { amyWarm } from "@/lib/piperAmy";
 import { useApp } from "@/lib/store";
 import { APP_ICONS, appIconSupported, setAppIcon, THEMES, themeShown, unlockContext, unlocked } from "@/lib/themes";
 import type { DelightPrefs } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
-import { say, voiceSupported } from "@/lib/voice";
+import { listSystemVoices, say, setVoicePrefs, voiceSupported, type VoiceEngine } from "@/lib/voice";
 
 import { Icon } from "./icons";
-import { Bump, Chip, Section, SwitchRow } from "./ui";
+import { go } from "./router";
+import { Bump, Chip, ProTag, Section, SwitchRow } from "./ui";
 
 function Toggle({ label, on, set, hint }: { label: string; on: boolean; set: (v: boolean) => void; hint?: string }) {
   return <SwitchRow label={label} hint={hint} on={on} onChange={set} />;
@@ -39,19 +42,92 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
   const put = (p: Partial<DelightPrefs>) => setProfile({ delight: { ...d, ...p } });
   const ctx = useMemo(() => unlockContext(events, stats, profile, now), [events, stats, profile, now]);
   const [iconNote, setIconNote] = useState<string | null>(null);
+  const [sysVoices, setSysVoices] = useState<{ id: string; name: string; lang: string }[]>([]);
+  const engine: VoiceEngine = d.voiceEngine === "amy" ? "amy" : "system";
+  const amyPro = can("voiceAmy");
+
+  useEffect(() => {
+    if (!d.voice) return;
+    setVoicePrefs({ enabled: true, engine, voiceId: d.voiceId ?? "" });
+    if (engine === "amy" && amyPro) amyWarm();
+    void listSystemVoices().then(setSysVoices);
+  }, [d.voice, engine, d.voiceId, amyPro]);
+
   if (part === "workout")
     return (
       <>
         {voiceSupported() && (
-          <Toggle
-            label={t("delight.voice")}
-            on={!!d.voice}
-            set={(voice) => {
-              put({ voice });
-              if (voice) say(t("vc.on"), true);
-            }}
-            hint={t("delight.voiceHint")}
-          />
+          <>
+            <Toggle
+              label={t("delight.voice")}
+              on={!!d.voice}
+              set={(voice) => {
+                put({ voice });
+                if (voice) say(t("vc.on"), true);
+              }}
+              hint={t("delight.voiceHint")}
+            />
+            {!!d.voice && (
+              <Section title={t("delight.voiceEngine")} info="voiceEngine">
+                <div className="flex flex-wrap gap-2">
+                  <Chip
+                    active={engine === "system"}
+                    onClick={() => {
+                      haptic("select");
+                      put({ voiceEngine: "system" });
+                      setVoicePrefs({ engine: "system" });
+                      say(t("vc.on"), true);
+                    }}
+                  >
+                    {t("delight.voiceSystem")}
+                  </Chip>
+                  <Chip
+                    active={engine === "amy"}
+                    onClick={() => {
+                      haptic("select");
+                      if (!amyPro) return go("pro", "voiceAmy");
+                      put({ voiceEngine: "amy" });
+                      setVoicePrefs({ engine: "amy" });
+                      amyWarm();
+                      say(t("vc.on"), true);
+                    }}
+                  >
+                    {t("delight.voiceAmy")}
+                    {!amyPro && <ProTag className="ml-1" />}
+                  </Chip>
+                </div>
+                <p className="mt-2 text-sm text-muted">{t(engine === "amy" ? "delight.voiceAmyHint" : "delight.voiceSystemHint")}</p>
+                {engine === "system" && sysVoices.length > 1 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Chip
+                      active={!d.voiceId}
+                      onClick={() => {
+                        haptic("select");
+                        put({ voiceId: "" });
+                        setVoicePrefs({ voiceId: "" });
+                      }}
+                    >
+                      {t("delight.voiceDefault")}
+                    </Chip>
+                    {sysVoices.slice(0, 12).map((v) => (
+                      <Chip
+                        key={v.id}
+                        active={d.voiceId === v.id}
+                        onClick={() => {
+                          haptic("select");
+                          put({ voiceId: v.id });
+                          setVoicePrefs({ voiceId: v.id });
+                          say(t("vc.on"), true);
+                        }}
+                      >
+                        {v.name}
+                      </Chip>
+                    ))}
+                  </div>
+                )}
+              </Section>
+            )}
+          </>
         )}
         <Toggle label={t("delight.ghost")} on={d.ghost !== false} set={(ghost) => put({ ghost })} hint={t("delight.ghostHint")} />
         <Toggle

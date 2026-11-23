@@ -194,6 +194,10 @@ export const fr: FeaturesText = {
       body: "Il parle pendant la séance, par exemple à la fin du repos, pour que vous n’ayez pas à regarder le téléphone.",
       note: "Android annonce la fin du repos écran verrouillé ; l’iPhone et le Web tant que l’appli est ouverte.",
     },
+    "voice-amy": {
+      name: "Voix Amy",
+      body: "Une voix anglaise claire intégrée à l’app pour le coach vocal. Choisissez Amy ou la synthèse du téléphone dans Réglages › Entraînement ; Amy revient à la voix du téléphone si elle ne charge pas.",
+    },
     stretching: {
       name: "Étirements",
       body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour. Quelques secondes pour te mettre en position avant chaque étirement et chaque côté, et l’écran reste allumé.",

@@ -238,6 +238,10 @@ export const pt: FeaturesText = {
       body: "Fala durante o treino, por exemplo quando o descanso acaba, para você não precisar olhar o celular.",
       note: "O Android avisa o fim do descanso com a tela bloqueada; o iPhone e a web, enquanto o app está aberto.",
     },
+    "voice-amy": {
+      name: "Voz Amy",
+      body: "Uma voz inglesa clara incluída na app para o coach por voz. Escolha Amy ou a síntese do telemóvel em Definições › Treino; a Amy volta à voz do telemóvel se não carregar.",
+    },
     stretching: {
       name: "Alongamento",
       body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",

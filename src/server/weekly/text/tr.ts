@@ -1056,4 +1056,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Kulüp bunu kendi sayfasında söyler, Pro ekranı da hesabınla geldiğini söyler.",
   },
+  "voice-amy": {
+    title: "Amy setlerini söylüyor",
+    intro: "Sesli koç artık uygulamaya gömülü net İngilizce ses Amy’yi kullanabilir ya da telefon metin okumada kalabilir.",
+    points: [
+          "Ayarlar › Antrenman’da sesli koçu açıp Telefon sesi veya Amy’yi seç.",
+          "Amy Pro’dur ve yalnızca İngilizcedir. Uygulama kurulduktan sonra çevrimdışı kalır.",
+          "Amy yüklenemezse ipuçları otomatik olarak telefon sesine döner.",
+          "Telefon sesi, uygulamanın her dilinde cihazın listelediği sesler arasından seçilebilir."
+    ],
+    dyk: "Ücretsiz sesli koç ve kilit ekranı dinlenme uyarıları gerektiğinde hâlâ sistem konuşmasını kullanır.",
+  },
+
 };

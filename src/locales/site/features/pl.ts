@@ -238,6 +238,10 @@ export const pl: FeaturesText = {
       body: "Odzywa się w trakcie treningu, na przykład gdy kończy się przerwa, żebyś nie musiał patrzeć na telefon.",
       note: "Android mówi o końcu przerwy przy zablokowanym ekranie; iPhone i przeglądarka, gdy aplikacja jest otwarta.",
     },
+    "voice-amy": {
+      name: "Głos Amy",
+      body: "Wyraźny angielski głos w aplikacji dla trenera głosowego. Wybierz Amy lub syntezę telefonu w Ustawieniach › Trening; Amy wraca do głosu telefonu, gdy nie załaduje się.",
+    },
     stretching: {
       name: "Rozciąganie",
       body: "48 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień. Kilka sekund na przyjęcie pozycji przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie.",

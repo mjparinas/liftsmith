@@ -18,7 +18,7 @@ import { useApp } from "@/lib/store";
 import type { AppEvent, Exercise, Gym, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
-import { exerciseCue, restCue, say, setCue, voice } from "@/lib/voice";
+import { exerciseCue, restCue, say, setCue, setVoicePrefs, voice } from "@/lib/voice";
 
 import { clock } from "./format";
 import { Icon } from "./icons";
@@ -195,10 +195,10 @@ export function restEndCue(v: VoiceState): string {
   });
 }
 
-export function useVoiceCoach(v: VoiceState | null, enabled: boolean) {
+export function useVoiceCoach(v: VoiceState | null, enabled: boolean, engine: "system" | "amy" = "system", voiceId = "") {
   useEffect(() => {
-    voice.enabled = enabled;
-  }, [enabled]);
+    setVoicePrefs({ enabled, engine, voiceId });
+  }, [enabled, engine, voiceId]);
   const lastIndex = useRef<number | null>(null);
   const said10 = useRef(false);
   const wasResting = useRef(false);

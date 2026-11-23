@@ -869,3 +869,13 @@ Run a club where people actually train, and Pro is free for you while they keep 
 - A club you only joined doesn't count. You have to be the one who started it.
 - It stays on while the club keeps training, and it stops when that fortnight goes quiet.
 Did you know? The club says so on its page, and the Pro screen says it comes with your account. ([Growth](growth.md) "Campus clubs")
+
+### W77 · Amy speaks your sets (**New**, 2026-11-23)
+Pro · Lifters · No screenshot (Settings › Workout) · `fresh`, so it goes next to everyone already in the series
+The voice coach can now use Amy, a clear English voice built into the app, or keep your phone's text-to-speech.
+- Turn on Voice coach in Settings › Workout, then pick Phone voice or Amy.
+- Amy is Pro and English only. She stays offline once the app is installed.
+- If Amy can't load, cues fall back to your phone's voice automatically.
+- Phone voice can pick among the voices your device lists, in every app language.
+Did you know? The free voice coach and lock-screen rest cues still use system speech when you need them. ([Delightful extras](delightful-extras.md))
+
