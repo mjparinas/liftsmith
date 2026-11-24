@@ -1380,6 +1380,26 @@ const SCHEMA = [
   )`,
   "CREATE INDEX IF NOT EXISTS program_owners_account ON program_owners (account_id)",
   "CREATE INDEX IF NOT EXISTS program_owners_payment ON program_owners (payment_id)",
+  // Season programs a coach assigns to clients or a school team (coachProgramAssign.ts): weekday-bound standing plans.
+  `CREATE TABLE IF NOT EXISTS coach_program_assigns (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    program_id TEXT NOT NULL,
+    team_id TEXT,
+    title TEXT NOT NULL,
+    weeks INTEGER NOT NULL,
+    days TEXT NOT NULL,
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    accepted_at INTEGER,
+    started_at INTEGER,
+    ended_at INTEGER
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_program_assigns_client ON coach_program_assigns (client_id, status, created_at)",
+  "CREATE INDEX IF NOT EXISTS coach_program_assigns_coach ON coach_program_assigns (coach_id, program_id, status)",
+  "CREATE INDEX IF NOT EXISTS coach_program_assigns_team ON coach_program_assigns (team_id, status, created_at)",
+  "CREATE INDEX IF NOT EXISTS coach_program_assigns_pair ON coach_program_assigns (coach_id, client_id, status)",
   // Ratings and reviews of programs (programReviews.ts, 2026-11-16): one per lifter and program, from adults who've had
   // it two weeks, with one public reply from its coach. Hidden and reply_hidden work as in coach_reviews.
   `CREATE TABLE IF NOT EXISTS program_reviews (

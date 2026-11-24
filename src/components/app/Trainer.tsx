@@ -12,6 +12,8 @@ import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { savePendingCoach } from "@/lib/coachInvite";
 import { COACH_TABS } from "@/lib/coachMode";
+import { assignProgram, endProgramAssign, type ProgramAssign } from "@/lib/coachProgramAssign";
+import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
 import { can } from "@/lib/entitlements";
 import { date, list, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
@@ -59,6 +61,7 @@ import { ClientSessions, SessionToday } from "./CoachSessions";
 import { ClientTargets } from "./CoachTargets";
 import { CoachVideos, VideoScreen } from "./FormVideos";
 import { Icon } from "./icons";
+import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { partLabel } from "./Stretch";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
@@ -230,6 +233,107 @@ function NoteToClient({ clientId, saved, onChange }: { clientId: string; saved: 
           </p>
         )}
       </div>
+    </Section>
+  );
+}
+
+/** Season program assign + this client's month calendar (docs/decisions/coach-programs.md). */
+function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string; assigns: ProgramAssign[]; onChange: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [cal, setCal] = useState(false);
+  const [programs, setPrograms] = useState<CoachProgram[] | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  const openOnes = assigns.filter((a) => a.status === "pending" || a.status === "active");
+  const active = openOnes.find((a) => a.status === "active") ?? openOnes[0];
+  const openAssign = () => {
+    setOpen(true);
+    void loadMine()
+      .then((m) => setPrograms(m.mine))
+      .catch(() => setPrograms([]));
+  };
+  const assignOne = async (p: CoachProgram) => {
+    try {
+      const weekdays = p.days.map((d, i) => d.weekdays ?? [[1], [2], [4], [5], [3], [6]][i] ?? [1 + (i % 5)]);
+      const r = await assignProgram(p.id, { type: "clients", ids: [clientId] }, weekdays);
+      haptic("success");
+      track("feature", { name: "trainer", detail: "assignProgram" });
+      setNote(t("cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+      setOpen(false);
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+  };
+  return (
+    <Section title={t("cpg.clientAssign")} icon="calendar">
+      {active && (
+        <div className="card mb-3 p-4">
+          <p className="font-semibold">{active.title}</p>
+          <p className="mt-1 text-sm text-muted">
+            {active.status === "active" && active.startedAt
+              ? t("cpg.clientFollowing", {
+                  week: Math.min(active.weeks, Math.floor((Date.now() - active.startedAt) / (7 * 86_400_000)) + 1),
+                  weeks: active.weeks,
+                })
+              : t("cpg.clientPending")}
+          </p>
+          {active.status === "active" && (
+            <Button kind="ghost" className="mt-2" onClick={() => setCal(true)}>
+              {t("cpg.assignCalendar")}
+            </Button>
+          )}
+        </div>
+      )}
+      {note && (
+        <p className="mb-2 text-sm text-muted" role="status">
+          {note}
+        </p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <Button kind="ghost" icon="layers" onClick={openAssign}>
+          {t("cpg.clientAssign")}
+        </Button>
+        {active && (
+          <Button
+            kind="danger"
+            onClick={() =>
+              void endProgramAssign(active.id)
+                .then(() => {
+                  haptic("toggle");
+                  setNote(t("cpg.assignTaken"));
+                  onChange();
+                })
+                .catch((e: unknown) => setNote(trainerError(e)))
+            }
+          >
+            {t("cpg.assignTakeBack")}
+          </Button>
+        )}
+      </div>
+      <Sheet open={open} onClose={() => setOpen(false)} title={t("cpg.clientAssign")}>
+        <p className="text-sm text-muted">{t("cpg.assignHint")}</p>
+        {!programs ? (
+          <p className="mt-3 text-sm text-muted">…</p>
+        ) : programs.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">{t("cpg.noneMineBody")}</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {programs.map((p) => (
+              <li key={p.id}>
+                <Button kind="ghost" className="w-full" onClick={() => void assignOne(p)}>
+                  {p.title}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Sheet>
+      {active && (
+        <Sheet open={cal} onClose={() => setCal(false)} title={t("cpg.cal.title")} wide>
+          <ProgramCalendar programId={active.programId} clientId={clientId} />
+        </Sheet>
+      )}
     </Section>
   );
 }
@@ -445,6 +549,7 @@ function ClientScreen({ id }: { id: string }) {
   const [targets, setTargets] = useState<Targets | null>(null);
   const [teen, setTeen] = useState(false);
   const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots" | "pay" | "role">>({});
+  const [programAssigns, setProgramAssigns] = useState<ProgramAssign[]>([]);
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -464,6 +569,7 @@ function ClientScreen({ id }: { id: string }) {
         setTargets(v.targets ?? null);
         setTeen(v.teen === true);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
+        setProgramAssigns(v.programAssigns ?? []);
       },
     ).catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -589,6 +695,7 @@ function ClientScreen({ id }: { id: string }) {
         )}
       </Section>
       <ClientPlans key={String(physio)} clientId={id} plans={report.plans} physio={physio} onChange={() => setVersion((n) => n + 1)} />
+      <ClientProgramAssign clientId={id} assigns={programAssigns} onChange={() => setVersion((n) => n + 1)} />
       {!physio && report.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
       <ClientCheckins
         clientId={id}

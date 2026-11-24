@@ -495,6 +495,11 @@ export const de: FeaturesText = {
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
     },
+    "coach-assign-program": {
+      name: "Saisonprogramm an Klienten oder ein Team zuweisen",
+      body: "Coaches weisen ein mehrtägiges Programm (Upper/Lower, Push/Pull/Legs oder eigenes) als wochentagsgebundenen Plan für N Wochen zu. Athletinnen folgen einmal; Heute zeigt das Training des Tages. Ein Programmkalender zeigt, wer jeden Tag gemacht hat und wer noch nicht — nur Vornamen bei Schulteams, nie Gewichte.",
+      proPart: "Ein Programm zu folgen ist kostenlos; Zuweisen gehört zum Coaching, das Pro ist.",
+    },
     "trainer-directory": {
       name: "Im Trainerverzeichnis gelistet",
       body: "Trag dich in deinem Studio als Personal Trainer, Coach oder Physio ein, dann stehst du auf der Seite des Studios und im Trainerverzeichnis seiner Stadt auf der Website, mit deinem Text und einem Link, über den neue Kunden mit dir trainieren können. Gelistet werden nur Erwachsene.",

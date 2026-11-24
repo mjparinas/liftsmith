@@ -491,6 +491,11 @@ export const es: FeaturesText = {
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",
       proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
     },
+    "coach-assign-program": {
+      name: "Asignar un programa de temporada a clientes o a un equipo",
+      body: "Los entrenadores asignan un programa de varios días (Upper/Lower, Push/Pull/Legs o el suyo) como plan fijo por días de la semana durante N semanas. Los atletas lo siguen una vez; Hoy muestra el entrenamiento de ese día. Un calendario del programa muestra quién ha hecho cada día y quién aún no — solo nombres de pila en equipos escolares, nunca pesos.",
+      proPart: "Seguir un programa es gratis; asignarlo forma parte del coaching, que es Pro.",
+    },
     "trainer-directory": {
       name: "En el directorio de entrenadores",
       body: "Apúntate como entrenador personal, coach o fisioterapeuta en tu gimnasio y aparecerás en la página del gimnasio y en el directorio de entrenadores de su ciudad en la web, con tu presentación y un enlace para que nuevos clientes entrenen contigo. Solo aparecen adultos.",

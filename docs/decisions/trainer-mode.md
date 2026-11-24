@@ -74,6 +74,10 @@ Melvin, 2026-11-13, on the coaches page's "You never see" list: "clients should 
 - **The client** sees **From your coach** at the top of Your coach: each routine with who sent it and when. Tapping it opens the shared routine preview (`#/routine/<code>`, `SharedRoutine.tsx`), where one tap saves it to their routines, and they start it like any other. Saving stays the client's choice, and the routine is theirs to change.
 - **The coach sees how each is going** (`planProgress`): workouts since it was assigned that have 60%+ of its exercises count as done, shown as "Done 3 times · last Nov 9" or "Not done yet". The client's saved copy has its own id on their phone, so the match is by what was trained. A routine given a week or more ago and not done yet becomes a **What to do** item ("Push day not started yet": check they saved it). The trash icon takes a routine back; unlinking either way removes the pair's routines, and so does deleting either account.
 
+## Season programs (built 2026-11-24)
+
+A multi-day Coach Program can be assigned as a weekday-bound standing plan for N weeks (clients and school teams). Athletes Follow once on Today; `planSource` becomes `coachProgram`. The coach opens a **program calendar** (Done / Not yet roster; never weights for under-18s). One active coach program per client from that coach; single-routine `coach_plans` still sit beside it. Full rules in [Coaches' programs](coach-programs.md) "Assign to clients and teams".
+
 ## Chat, body data and alerts (built 2026-11-12)
 
 Melvin picked "Chat, body data, alerts" from the gap list against Hevy Coach and other coaching apps (2026-11-12), then asked for a 3D body of the client from their health data ("users need to approve this").

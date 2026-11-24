@@ -1075,4 +1075,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Le coach gratuit et les annonces de repos sur l’écran verrouillé utilisent encore la synthèse système quand il le faut.",
   },
+  "coach-assign-program": {
+    title: "Assignez un programme de saison à tout le groupe",
+    intro: "Mettez Upper/Lower ou Push/Pull/Legs sur vos clients ou votre équipe scolaire pour N semaines — ils suivent une fois, Aujourd’hui lance le bon jour, et un calendrier montre qui a soulevé.",
+    points: [
+      "Dans Coaching › Programmes, partez d’Upper/Lower ou Push/Pull/Legs, réglez les jours, puis Assignation… clients ou équipe.",
+      "Les athlètes reçoivent une notif et Suivre ce programme une fois. Leur progression choisit les charges.",
+      "Un jour prévu, Aujourd’hui montre cet entraînement. Les jours sans séance restent au repos.",
+      "Le calendrier du programme montre Fait et Pas encore. Les équipes scolaires : prénoms seulement, jamais de poids.",
+    ],
+    dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client.",
+  },
+
 };

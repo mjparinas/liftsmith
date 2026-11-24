@@ -118,12 +118,21 @@ export function codeItems(code: string): { id: string; sets: number }[] {
 /** Whether a coach is under 18 by their profile (their programs then never show to anyone else). */
 export const coachIsTeen = (accountId: string, now = Date.now()) => isTeen(accountId, now);
 
-function readDays(raw: string): { name: string; code: string }[] {
+function readDays(raw: string): { name: string; code: string; weekdays?: number[] }[] {
   try {
     const v = JSON.parse(raw) as unknown;
-    return Array.isArray(v)
-      ? v.filter((d): d is { name: string; code: string } => !!d && typeof d.name === "string" && isRoutineCode(d.code))
-      : [];
+    if (!Array.isArray(v)) return [];
+    return v.flatMap((d) => {
+      if (!d || typeof d !== "object") return [];
+      const row = d as { name?: unknown; code?: unknown; weekdays?: unknown };
+      if (typeof row.name !== "string" || !isRoutineCode(row.code)) return [];
+      const weekdays = Array.isArray(row.weekdays)
+        ? [...new Set(row.weekdays.filter((w): w is number => typeof w === "number" && Number.isInteger(w) && w >= 0 && w <= 6))].sort(
+            (a, b) => a - b,
+          )
+        : [];
+      return [{ name: row.name, code: row.code, ...(weekdays.length ? { weekdays } : {}) }];
+    });
   } catch {
     return [];
   }
@@ -143,7 +152,12 @@ async function shape(r: Row, viewer: string | null, ownedIds: Set<string>, sales
     level: pick(LEVELS, r.level, "any"),
     goal: pick(GOALS, r.goal, "strength"),
     weeks: Number(r.weeks),
-    days: readDays(String(r.days)).map((d) => ({ name: d.name, ...countCode(d.code), ...(owned || free ? { code: d.code } : {}) })),
+    days: readDays(String(r.days)).map((d) => ({
+      name: d.name,
+      ...countCode(d.code),
+      ...(d.weekdays ? { weekdays: d.weekdays } : {}),
+      ...(owned || free ? { code: d.code } : {}),
+    })),
     price: Number(r.price),
     currency: String(r.currency),
     listed: Number(r.listed) === 1,
@@ -181,11 +195,16 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
   if (!about.ok) return { error: "about" };
   const days = Array.isArray(p.days) ? p.days : [];
   if (days.length < PROGRAM_LIMITS.days[0] || days.length > PROGRAM_LIMITS.days[1]) return { error: "bad" };
-  const clean: { name: string; code: string }[] = [];
+  const clean: { name: string; code: string; weekdays?: number[] }[] = [];
   for (const d of days as Record<string, unknown>[]) {
     const name = tidy(d?.name, PROGRAM_LIMITS.dayName);
     if (!name || !isRoutineCode(d?.code) || countCode(d.code).exercises === 0) return { error: "bad" };
-    clean.push({ name, code: d.code });
+    const weekdays = Array.isArray(d.weekdays)
+      ? [...new Set(d.weekdays.filter((w): w is number => typeof w === "number" && Number.isInteger(w) && w >= 0 && w <= 6))].sort(
+          (a, b) => a - b,
+        )
+      : [];
+    clean.push({ name, code: d.code, ...(weekdays.length ? { weekdays } : {}) });
   }
   if (!inRange(p.weeks, PROGRAM_LIMITS.weeks)) return { error: "bad" };
   const price = p.price === 0 || p.price === undefined || p.price === null ? 0 : p.price;

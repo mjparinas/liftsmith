@@ -908,6 +908,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "coach-assign-program",
+        name: "Assign a season program to clients or a team",
+        body: "Coaches assign a multi-day program (Upper/Lower, Push/Pull/Legs, or their own) as a weekday standing plan for N weeks. Athletes follow once; Today shows that day's workout. A program calendar shows who has done each day and who hasn't yet — first names only for school teams, never weights.",
+        tier: "both",
+        proPart: "Following a program is free; assigning one is part of coaching, which is Pro.",
+        pro: "coaching",
+        added: "2026-11-24",
+      },
+      {
         id: "trainer-directory",
         name: "Listed in the trainer directory",
         body: "List yourself as a trainer, coach or physio at your gym and you show on that gym's page and in the trainer directory for its city on the website, with your bio and a link for new clients to start training with you. Only adults are listed.",

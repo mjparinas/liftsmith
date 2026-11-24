@@ -879,3 +879,12 @@ The voice coach can now use Amy, a clear English voice built into the app, or ke
 - Phone voice can pick among the voices your device lists, in every app language.
 Did you know? The free voice coach and lock-screen rest cues still use system speech when you need them. ([Delightful extras](delightful-extras.md))
 
+### C10 · Assign a season program to the whole roster (**New**, 2026-11-24)
+Pro · Coaches · No screenshot (Coaching › Programs) · `fresh`, so it goes next to coaches already in the series
+Put Upper/Lower or Push/Pull/Legs on your clients or school team for N weeks — athletes follow once, Today runs the right day, and a calendar shows who has lifted.
+- In Coaching › Programs, start from Upper/Lower or Push/Pull/Legs, set the weekdays, then Assign to… clients or a team.
+- Athletes get a push and Follow this program once on Today. Their own progression picks the weights.
+- On a scheduled weekday, Today shows that day's workout. Off days stay rest — no lift scheduled.
+- Open the program calendar to see Done and Not yet for each day. School teams show first names only, never weights.
+Did you know? You can assign the same way from a school team card or a single client's report. ([Coaches' programs](coach-programs.md))
+

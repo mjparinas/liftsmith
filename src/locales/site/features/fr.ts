@@ -496,6 +496,11 @@ export const fr: FeaturesText = {
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
     },
+    "coach-assign-program": {
+      name: "Assigner un programme de saison aux clients ou à une équipe",
+      body: "Les coachs assignent un programme de plusieurs jours (Upper/Lower, Push/Pull/Legs ou le leur) comme plan fixe par jour de la semaine pendant N semaines. Les athlètes le suivent une fois ; Aujourd’hui montre l’entraînement du jour. Un calendrier montre qui a fait chaque jour et qui pas encore — prénoms seulement pour les équipes scolaires, jamais de poids.",
+      proPart: "Suivre un programme est gratuit ; l’assigner fait partie du coaching, qui est Pro.",
+    },
     "trainer-directory": {
       name: "Dans l'annuaire des coachs",
       body: "Inscrivez-vous comme coach sportif, coach ou kiné dans votre salle et vous apparaissez sur la page de la salle et dans l'annuaire des coachs de sa ville sur le site, avec votre présentation et un lien pour que de nouveaux clients s'entraînent avec vous. Seuls les adultes y figurent.",

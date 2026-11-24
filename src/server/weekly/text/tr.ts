@@ -1067,4 +1067,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ücretsiz sesli koç ve kilit ekranı dinlenme uyarıları gerektiğinde hâlâ sistem konuşmasını kullanır.",
   },
+  "coach-assign-program": {
+    title: "Sezon programını tüm gruba ata",
+    intro: "Upper/Lower veya Push/Pull/Legs’i danışanlara ya da okul takımına N hafta koyun — bir kez takip ederler, Bugün doğru günü çalıştırır, takvim kim kaldırdı gösterir.",
+    points: [
+      "Koçluk › Programlar’da Upper/Lower veya Push/Pull/Legs ile başlayın, günleri ayarlayıp danışanlara veya takıma atayın.",
+      "Sporcular bir push alır ve Bugün’de bir kez takip eder. Ağırlıkları kendi ilerlemeleri seçer.",
+      "Planlı bir günde Bugün o antrenmanı gösterir. Boş günler dinlenme kalır.",
+      "Program takvimi Yapıldı ve Henüz değil’i gösterir. Okul takımları: yalnızca adlar, asla ağırlık yok.",
+    ],
+    dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz.",
+  },
+
 };

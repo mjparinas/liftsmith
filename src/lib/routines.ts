@@ -121,6 +121,14 @@ export function cleanRoutine(r: Routine): Routine {
   const assigned = cleanAssigned(r.assignedPlan);
   if (assigned) out.assignedPlan = assigned;
   else delete out.assignedPlan;
+  const ap = r.assignedProgram;
+  if (ap && typeof ap.assignId === "string" && typeof ap.coachId === "string" && Number.isInteger(ap.dayIndex) && ap.dayIndex >= 0) {
+    out.assignedProgram = {
+      assignId: ap.assignId.trim().slice(0, 80),
+      coachId: ap.coachId.trim().slice(0, 80),
+      dayIndex: ap.dayIndex,
+    };
+  } else delete out.assignedProgram;
   if (!rehab) {
     delete out.rehab;
     delete out.rehabPart;

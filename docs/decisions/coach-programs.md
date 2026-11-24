@@ -55,6 +55,17 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 - Plain HTML with no scripts, in the reader's language, under the share pages' strict CSP, drawn per request like the trainer directory (`src/server/programPage.ts`, `/api/programs/page/`, rewritten in `next.config.ts`). An old slug redirects to the program's own address; an unlisted, removed or under-18 coach's program is a noindex 404 showing the list. Structured data: `ItemList` on the list and a `Course` provided by the coach (`provider`, `offers`, and `aggregateRating` and `review` once it has three) on each program, never a `Product`, which Google reads as a merchant listing (`appSchema.test.ts`).
 - In `/sitemap-gyms.xml` and the daily IndexNow ping (dated by `updatedAt`), and linked from the site footer (Programs from coaches). Web only: these are website pages, so there is nothing for the apps to do.
 
+## Assign to clients and teams (Melvin, 2026-11-24; built)
+
+A coach assigns a multi-day program as a **weekday-bound standing plan** for N weeks — school teams and personal-training clients share the path (athletes are already coach clients).
+
+- **Templates:** New program offers **Upper / Lower** and **Push / Pull / Legs** (`coachProgramTemplates.ts`): creates day routines with default weekdays; the coach can edit before saving.
+- **Assign to…** on a program (and from a school team or client report): all clients, pick clients, or a team. Snapshots days and weekdays into `coach_program_assigns`. Athletes get a push and Today **Follow this program** once; that sets `planSource.kind = "coachProgram"`. Today shows that weekday's day; off days show rest / "no lift scheduled".
+- **Program calendar:** month grid (desktop two-column like Schedule; phone grid + day card) with Done / Not yet / Scheduled roster (first names, never weights). Separate from Coaching › Schedule (booking).
+- **Coaching delivery, not purchase:** assign sends day codes even if the program is priced; never creates paid `program_owners` (teens never buy). Free programs may still grant ownership.
+- Code: `src/server/coachProgramAssign.ts`, `src/lib/coachProgramAssign.ts`, `ProgramCalendar.tsx`, `ProgramAssignToday.tsx`. Feature `coach-assign-program`.
+
 ## Not built yet
 
 - Listing a coach's programs on their trainer directory entry, and staff hiding a program from the admin panel (the `hidden` column is there; programs pass the text filter on the way in).
+- Writing every programmed day into the phone OS calendar; assigning built-in Pro adaptive splits as `planSource`.

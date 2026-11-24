@@ -174,6 +174,8 @@ export const WEEKLY: WeeklyEmail[] = [
   L("campus-clubs", "free", "friends", { fresh: "2026-11-22", shot: false }),
   // New, 2026-11-23: Amy voice for the voice coach (docs/decisions/delightful-extras.md).
   L("voice-amy", "pro", "settings/workout", { fresh: "2026-11-23", shot: false }),
+  // New, 2026-11-24: assign a season program to clients or a school team (docs/decisions/coach-programs.md).
+  R("coach-assign-program", "coach", "pro", "trainer/programs", { fresh: "2026-11-24", shot: false }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

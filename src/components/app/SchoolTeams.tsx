@@ -9,6 +9,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
+import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
+import { assignProgram, endProgramAssigns } from "@/lib/coachProgramAssign";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
@@ -36,9 +38,10 @@ import {
 } from "@/lib/teams";
 import { loadLiveBoard, useTeamSession, type LiveBoard } from "@/lib/teamSession";
 import { ageOf } from "@/lib/teen";
-import { showCode } from "@/lib/trainer";
+import { showCode, trainerError } from "@/lib/trainer";
 import { useVisible } from "@/lib/visibility";
 
+import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { BoardList } from "./TeamBoardList";
 import { Button, Chip, Sheet } from "./ui";
@@ -426,6 +429,9 @@ function CoachTeam({
 }) {
   const [note, setNote] = useState<string | null>(null);
   const [watch, setWatch] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [calOpen, setCalOpen] = useState(false);
+  const [programs, setPrograms] = useState<CoachProgram[] | null>(null);
   // A session on this device opens it again; one on another device (the tablet) offers its live board here.
   const here = useTeamSession((s) => s.session);
   const runningHere = !!here && here.endedAt === undefined;
@@ -446,6 +452,25 @@ function CoachTeam({
       setNote((await copyText(url)) ? t("trn.copied") : url);
     }
     track("feature", { name: "team", detail: "invite" });
+  };
+  const openAssign = () => {
+    setAssignOpen(true);
+    void loadMine()
+      .then((m) => setPrograms(m.mine))
+      .catch(() => setPrograms([]));
+  };
+  const assignToTeam = async (p: CoachProgram) => {
+    try {
+      const weekdays = p.days.map((d, i) => d.weekdays ?? ([[1], [2], [4], [5], [3], [6]][i] ?? [1 + (i % 5)]));
+      const r = await assignProgram(p.id, { type: "team", teamId: team.id }, weekdays);
+      haptic("success");
+      track("feature", { name: "trainer", detail: "assignProgram" });
+      setNote(t("cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+      setAssignOpen(false);
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
   };
   return (
     <section className="card p-4">
@@ -482,7 +507,53 @@ function CoachTeam({
           )}
         </div>
       )}
+      {members.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Button kind="ghost" icon="layers" className="flex-1" onClick={openAssign}>
+            {t("cpg.clientAssign")}
+          </Button>
+          <Button kind="ghost" icon="calendar" onClick={() => setCalOpen(true)}>
+            {t("cpg.assignCalendar")}
+          </Button>
+        </div>
+      )}
       {watch && live && <LiveBoardSheet id={live} onClose={() => setWatch(false)} />}
+      <Sheet open={assignOpen} onClose={() => setAssignOpen(false)} title={t("cpg.clientAssign")}>
+        <p className="text-sm text-muted">{t("cpg.assignHint")}</p>
+        {!programs ? (
+          <p className="mt-3 text-sm text-muted">…</p>
+        ) : programs.length === 0 ? (
+          <p className="mt-3 text-sm text-muted">{t("cpg.noneMineBody")}</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {programs.map((p) => (
+              <li key={p.id}>
+                <Button kind="ghost" className="w-full" onClick={() => void assignToTeam(p)}>
+                  {p.title}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Button
+          kind="danger"
+          className="mt-3 w-full"
+          onClick={() =>
+            void endProgramAssigns({ teamId: team.id })
+              .then(() => {
+                haptic("toggle");
+                setNote(t("cpg.assignTaken"));
+                setAssignOpen(false);
+              })
+              .catch((e: unknown) => setNote(trainerError(e)))
+          }
+        >
+          {t("cpg.assignTakeBack")}
+        </Button>
+      </Sheet>
+      <Sheet open={calOpen} onClose={() => setCalOpen(false)} title={t("cpg.cal.title")} wide>
+        <ProgramCalendar teamId={team.id} />
+      </Sheet>
       {members.length > 0 && (
         <details className="mt-3">
           <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{t("team.roster")}</summary>
