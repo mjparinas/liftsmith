@@ -67,7 +67,7 @@ The original ask: "sending a workout directly to gym buddies".
   - The release build writes `android/app/google-services.json` from the `GOOGLE_SERVICES_JSON` secret.
   - Without it the app builds the same, but `InstallInfo` reports `push: false` (no `google_app_id` resource), so the app never asks Firebase for a token (that would crash).
   - Pushes use a "Friends" channel (created by the app; its name is `push.channel`) and the app's status bar icon, set as Firebase defaults in `AndroidManifest.xml`.
-- **iOS:** `AppDelegate.swift` hands the APNs token to Capacitor. It needs the Push Notifications capability and the `aps-environment` entitlement, which are under "iOS (deferred)" in Open items. Until then registration fails quietly.
+- **iOS:** `AppDelegate.swift` hands the APNs token to Capacitor. `App.entitlements` has `aps-environment` production and Vercel has the APNs auth key (`APNS_*`); the App ID still needs the Push Notifications capability in the Developer portal ([Open items](open-items.md)). Until that capability is on (and a build with the entitlement is installed), registration fails quietly.
 - **Web app:** no push; the dot and Activity carry it (Platform deltas).
 - **Tests:** `src/server/push.test.ts` covers language, the switches with likes off by default, a sent workout's route, dead tokens, the token limit and sign-out, and staying off without keys.
 

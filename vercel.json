@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+    }
+  ],
   "schedules": {
     "reminders": { "path": "/api/cron/reminders/", "schedule": "5 0 * * *", "requestMethod": "GET" },
     "admin": { "path": "/api/cron/admin/", "schedule": "0 13 * * *", "requestMethod": "GET" },

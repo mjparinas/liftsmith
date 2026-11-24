@@ -41,22 +41,29 @@ After launch, not blocking it:
 - A dedicated RevenueCat service account in Google Cloud, so `liftsmith-admin@` can drop Pub/Sub Admin.
 - Profile links (`/app/#/person/<handle>`) open the installed app on Android (App Links) and the web app on iPhone until Universal Links exist. Public profiles' own pages (`/u/<handle>/`) are web pages anyway.
 
-## iOS (deferred)
+## iOS (App Store path, 2026-11-23)
 
-Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
+Code and site wiring for the iPhone release. Console steps Melvin still finishes are marked **Melvin**. Listing copy to paste is in [APP_STORE_LISTING.md](../APP_STORE_LISTING.md).
 
-- **Coach plans on iPhone** (2026-11-13, [Money](money.md) "Coach plans"): in App Store Connect, add `coach_monthly` ($19.99), `coach_annual` ($199.99), `coach_plus_monthly` ($39.99) and `coach_plus_annual` ($399.99) to the "Pro" subscription group, ranked Coach Plus, then Coach, then Pro (so moving up is an upgrade Apple prorates), no intro offers and no Family Sharing; import them into RevenueCat's App Store app and attach them to the `pro`, `coach` (and for Coach Plus `coach_plus`) entitlements and the `coach` offering's packages.
-- **Billing on iPhone:** App Store Connect Paid Apps agreement, banking and tax, the "Pro" group (`pro_monthly`, `pro_annual`, 14-day free intro offers, Family Sharing on annual) and sandbox testers; the App Store app in RevenueCat with Apple's server notification URL; a `creator30` offering with its own products for creator codes; then the GitHub secret `REVENUECAT_IOS_KEY`. App Store App Privacy and age rating answers from `docs/PRIVACY_LABELS.md` and [Friends](friends.md).
+### Done in the repo / Vercel (2026-11-23)
+- `App.entitlements`: `aps-environment` production, Associated Domains `applinks:www.getliftsmith.com` (Push and Associated Domains must also be on the App ID in the Developer portal — **Melvin** if not already).
+- `Info.plist`: `remote-notification` background mode; `ITSAppUsesNonExemptEncryption` false (export compliance).
+- `public/.well-known/apple-app-site-association` for team `VLJC5F4469` on `/app` and `/invite`; `vercel.json` serves it as `application/json`.
+- `startAppLinks` handles iOS Universal Links as well as Android App Links.
+- Friends push server keys: `APNS_KEY_P8` / `APNS_KEY_ID` (`49G753BURJ`) / `APNS_TEAM_ID` in Vercel (from the APNs auth key in Downloads). Redeploy production so the running server picks them up.
 
+### Still Melvin (blocks TestFlight / review)
+- **GitHub Release secrets** (`gh auth` was expired on this machine, so these weren't set from here): `APPLE_TEAM_ID` (`VLJC5F4469`), `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8` (App Store Connect API key, App Manager). Without these, `release.yml` skips the iOS · TestFlight job. After `gh auth refresh`: `printf '%s' 'VLJC5F4469' | gh secret set APPLE_TEAM_ID`.
+- **App Store Connect app** for `com.getliftsmith.app` (create if missing), listing from [APP_STORE_LISTING.md](../APP_STORE_LISTING.md), App Privacy from `docs/PRIVACY_LABELS.md`, age rating from [Friends](friends.md) "Store answers", review account notes (same as Play).
+- **Billing on iPhone:** Paid Apps agreement, banking and tax; Pro group `pro_monthly` / `pro_annual` (14-day free intro, Family Sharing on annual); coach products `coach_monthly` / `coach_annual` / `coach_plus_monthly` / `coach_plus_annual` ranked above Pro; sandbox testers; RevenueCat App Store app + Apple server notifications; GitHub `REVENUECAT_IOS_KEY` (`appl_…`).
+- **App ID capabilities in the Developer portal:** Push Notifications, Associated Domains, Sign in with Apple, HealthKit (and watch app HealthKit if automatic signing doesn't register it).
+- **Sign in with Google on iPhone:** create an iOS OAuth client in Google Cloud (project `liftsmith-514303`, bundle `com.getliftsmith.app`) and put its id in `GOOGLE_IOS_CLIENT_ID` (`src/lib/authIds.ts`). Until then the iPhone app has no Google button (Apple + email still work).
+- After approval: set `NEXT_PUBLIC_APP_STORE_URL` so the site badge links to the listing.
+
+### Device checks (not blocking first review)
 - **Volume button logs a set on iPhone** (Labs, `VolumeKeysPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check that a press from the buttons and from earbuds logs once, music keeps playing, and no volume pop-up shows.
 - **Voice set logging on iPhone** (Labs, `SpeechLogPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check the speech recognition and microphone prompts, that recognition stays on the device for each of the six languages, and that music comes back after listening.
-
-- **Friends push on iPhone** (2026-11-11): turn on the Push Notifications capability for the App ID `com.getliftsmith.app`, and add `aps-environment` (`production`) to `App.entitlements`. Create an APNs auth key (Keys › Apple Push Notifications service), and put it in Vercel as `APNS_KEY_P8` (the .p8 text), `APNS_KEY_ID` and `APNS_TEAM_ID`. Then retake the App Store age rating with the answers in [Friends](friends.md) "Store answers". Until then the iPhone shows Friends activity in the app only.
-
 - **Share cards on screenshot on iPhone** (2026-11-16, [Sharing](sharing.md)): `ScreenshotsPlugin` in `DelightPlugins.swift` is built and compiled in CI but not tried on an iPhone. Check that a screenshot opens the sheet once, not during a workout or over another sheet, and that the screenshot is still saved to Photos.
-- **Universal Links** for remix, shared routine and invite (`/invite/<code>`) links: the Associated Domains entitlement (`applinks:www.getliftsmith.com`) on the App ID and in `App.entitlements`, plus `public/.well-known/apple-app-site-association` with the team id and `/app/*`. Until then those links open in Safari, and the in-app paste box (Routines › Add a routine from a link) brings a routine into the app.
-
-- **Sign in with Google on iPhone:** create an iOS OAuth client in Google Cloud (project `liftsmith-514303`, bundle `com.getliftsmith.app`) and put its id in `GOOGLE_IOS_CLIENT_ID` (`src/lib/authIds.ts`). Until then the iPhone app has no Google button.
 - ~~**Sign in with Apple**~~ (done 2026-11-23): Services ID `com.getliftsmith.web`, Vercel `NEXT_PUBLIC_APPLE_SERVICES_ID` + `APPLE_TEAM_ID` / `APPLE_KEY_ID` / `APPLE_PRIVATE_KEY`; web smoke test signed in. iPhone native path still to try when an iOS build is on a device.
 - **Watch rep counting on Apple Watch** (Labs, 2026-11-11): the watch app streams Core Motion during a set (`MotionStream` in `WatchModel.swift`) and the phone counts it like Wear OS's. It hasn't been tried on an Apple Watch yet; check a set of squats and curls counts, and that the sign of "up" is right (if every count comes out at zero on a lift that should count, flip the sign in `MotionStream.add`).
 - **Health twin's "Open the Health app" on iPhone** (2026-11-11): `HealthWorkout.openPermissions` opens the Health app with `x-apple-health://` and falls back to Liftsmith's page in Settings. It hasn't been tried on an iPhone yet; check it opens Health when the HRV or VO₂ max tile has no data.

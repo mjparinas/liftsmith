@@ -52,4 +52,18 @@ describe("app links", () => {
     expect(entry!.target.sha256_cert_fingerprints.length).toBeGreaterThan(0);
     for (const f of entry!.target.sha256_cert_fingerprints) expect(f).toMatch(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
   });
+
+  it("publishes apple-app-site-association for the iPhone app on /app and /invite", () => {
+    const aasa = JSON.parse(readFileSync("public/.well-known/apple-app-site-association", "utf8")) as {
+      applinks: { details: { appIDs: string[]; components: { "/": string }[] }[] };
+    };
+    const [detail] = aasa.applinks.details;
+    expect(detail!.appIDs).toEqual(["VLJC5F4469.com.getliftsmith.app"]);
+    expect(detail!.components.map((c) => c["/"]).sort()).toEqual(["/app", "/app/*", "/invite/*"]);
+    const entitlements = readFileSync("ios/App/App/App.entitlements", "utf8");
+    expect(entitlements).toContain("aps-environment");
+    expect(entitlements).toContain("<string>production</string>");
+    expect(entitlements).toContain("applinks:www.getliftsmith.com");
+  });
 });
+
