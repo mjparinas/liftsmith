@@ -3,7 +3,7 @@
 // it saves through the store, so the workout counts at once, and /me/ links land on the right app screen.
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { appHashFor } from "@/components/MeRedirect";
 import { useApp } from "@/lib/store";
@@ -11,9 +11,15 @@ import { useApp } from "@/lib/store";
 import { LogPast } from "./LogPast";
 
 beforeEach(async () => {
+  // Midday so "Earlier start" can move the quarter-hour stepper (at midnight it is already at the floor).
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  vi.setSystemTime(new Date(2026, 10, 23, 15, 0, 0));
   await useApp.getState().reset();
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 describe("log a past workout", () => {
   it("adds an exercise from the browser, bumps a set and saves it as a finished workout", async () => {

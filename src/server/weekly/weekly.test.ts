@@ -95,9 +95,7 @@ describe("the weekly tips' words", () => {
     expect(
       WEEKLY.filter((e) => !imageOf(e)).every(
         (e) =>
-          e.route.startsWith("trainer") ||
-          e.route.startsWith("settings") ||
-          ["friends", "gym", "community", "library"].includes(e.route),
+          e.route.startsWith("trainer") || e.route.startsWith("settings") || ["friends", "gym", "community", "library"].includes(e.route),
       ),
     ).toBe(true);
     expect(weeklyMail({ email: byId("friends-feed"), n: 0 }, footer, "en", { state: "pro" }).html).not.toContain("/email/en/w/");

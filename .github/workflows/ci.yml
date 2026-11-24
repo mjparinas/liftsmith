@@ -159,6 +159,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
+      # Piper Amy phonemizer/ONNX WASM (gitignored); piperAmy.assets.test.ts checks they landed.
+      - run: node scripts/piper.mjs
       - run: npx vitest run --coverage --shard=${{ matrix.shard }}/2 --reporter=default --reporter=blob
       - uses: actions/upload-artifact@v7
         with:
