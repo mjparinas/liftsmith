@@ -29,6 +29,7 @@ import {
   type Joints,
   type Vec,
 } from "@/lib/demo/rig";
+import { loadingKey } from "@/lib/demo/barPlates";
 import { stretchMotion } from "@/lib/demo/stretchMotions";
 import type { Loading } from "@/lib/plates";
 import type { Muscle, Unit } from "@/lib/types";
@@ -386,8 +387,13 @@ export function startLoop(
       s = { ...s, ...p };
       if (reduced) s.playing = false;
       const differs = (k: keyof DemoSettings) => k in p && p[k] !== prev[k];
+      // Plates are compared by stack, not object identity: the workout passes a fresh `loadBar` result on
+      // every React render (heart rate, rest clock), and rebuilding props from that made the figure flicker.
+      const loadChanged = loadingKey(s.loading, s.unit) !== loadingKey(prev.loading, prev.unit);
+      const rebuild =
+        differs("exerciseId") || differs("body") || differs("shape") || differs("highlight") || differs("paint");
       if (differs("exerciseId")) t = reduced ? 1.8 : 0;
-      if (differs("exerciseId") || differs("body") || differs("shape") || differs("highlight") || differs("paint")) setup();
+      if (rebuild) setup();
       // A new pixel ratio cap (battery saver) redraws at the new resolution.
       if (differs("maxDpr")) size = [0, 0];
       if (differs("reps")) {
@@ -403,7 +409,21 @@ export function startLoop(
         }
         pitch = s.view === "orbit" ? 10 : 6;
       }
-      changed = true;
+      // Heart rate, play/pause, lean and follow only need the loop kicked; marking every update as a
+      // geometry change disposed and rebuilt the bar and props each time (visible flicker after a hard set).
+      if (
+        rebuild ||
+        loadChanged ||
+        differs("muscles") ||
+        differs("skeleton") ||
+        differs("path") ||
+        differs("view") ||
+        differs("selected") ||
+        differs("hatch") ||
+        differs("maxDpr")
+      ) {
+        changed = true;
+      }
       kick();
     },
     dispose() {
