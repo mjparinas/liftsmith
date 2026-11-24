@@ -23,7 +23,7 @@ export const FAQS: Faq[] = [
   { q: "Are there ads?", a: "No, and there never will be. The subscription is the only way we make money." },
   {
     q: "Is it on Android and iPhone?",
-    a: "Both apps are on the way to Google Play and the App Store and ship with the same features. Until then, the full app runs in your browser and works offline once it has loaded.",
+    a: "Yes. The Android app is on Google Play now. The iPhone app is on the way to the App Store, with the same features. The full app also runs in your browser and works offline once it has loaded.",
   },
   {
     q: "What equipment do I need?",

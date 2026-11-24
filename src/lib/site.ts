@@ -6,10 +6,10 @@ export const CONTACT_EMAIL = "hello@getliftsmith.com";
 export const MAILING_ADDRESS = process.env.MAIL_POSTAL_ADDRESS?.trim() || null;
 
 /**
- * Store listings. Neither app is published yet, so both are null and the badges show "Coming soon".
- * When a listing goes live, set its URL here (or through the environment) and every badge on the site links to it.
+ * Store listings. A live URL makes that badge a link; without one the badge shows "Coming soon".
+ * Google Play is live (2026-11-23); the App Store waits on iOS. `NEXT_PUBLIC_*` can override either.
  */
 export const STORE_LINKS: { googlePlay: string | null; appStore: string | null } = {
-  googlePlay: process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL || null,
+  googlePlay: process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL || "https://play.google.com/store/apps/details?id=com.getliftsmith.app",
   appStore: process.env.NEXT_PUBLIC_APP_STORE_URL || null,
 };

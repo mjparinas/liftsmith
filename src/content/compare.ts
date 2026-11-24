@@ -43,7 +43,7 @@ export const OURS: Record<Topic, string> = {
   rest: "Starts itself after each set, counts down on the lock screen (Android notification, iPhone Live Activity) with Log set and +30 s, free.",
   social: "Share a workout as an image or a link someone can open at their own weights. No feed yet.",
   platforms:
-    "Android and iPhone apps (store listings coming soon), Wear OS and Apple Watch apps for the live workout, and the full app in any browser today.",
+    "Android on Google Play, iPhone app on the way to the App Store, Wear OS and Apple Watch apps for the live workout, and the full app in any browser today.",
   health:
     "Health Connect and Apple Health for weight, height, body fat and resting heart rate; live heart rate from any Bluetooth strap or watch.",
   data: "CSV export and a full backup, and import from other apps' CSV exports. Works offline with no account.",

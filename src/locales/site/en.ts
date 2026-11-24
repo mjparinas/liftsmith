@@ -73,7 +73,7 @@ export const en: SiteText = {
       appleSmall: "Download on the",
       soon: "Soon",
       comingSoon: "{store}: coming soon",
-      web: "The apps are coming soon. Use it in your browser today →",
+      web: "iPhone app coming soon. Use it in your browser today →",
     },
   },
   home: {

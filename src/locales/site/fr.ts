@@ -79,7 +79,7 @@ export const fr: SiteText = {
       appleSmall: "Télécharger dans l’",
       soon: "Bientôt",
       comingSoon: "{store} : bientôt disponible",
-      web: "Les apps arrivent bientôt. Utilisez-la dès aujourd’hui dans votre navigateur →",
+      web: "L’app iPhone arrive bientôt. Utilisez-la dès aujourd’hui dans votre navigateur →",
     },
   },
   home: {
@@ -341,7 +341,7 @@ export const fr: SiteText = {
     { q: "Y a-t-il des publicités ?", a: "Non, et il n’y en aura jamais. L’abonnement est notre seule source de revenus." },
     {
       q: "Est-ce disponible sur Android et iPhone ?",
-      a: "Les deux apps arrivent sur Google Play et l’App Store, avec les mêmes fonctions. D’ici là, l’app complète tourne dans votre navigateur et fonctionne hors ligne une fois chargée.",
+      a: "Oui. L’app Android est déjà sur Google Play. L’app iPhone arrive sur l’App Store, avec les mêmes fonctions. L’app complète tourne aussi dans votre navigateur et fonctionne hors ligne une fois chargée.",
     },
     {
       q: "De quel matériel ai-je besoin ?",
