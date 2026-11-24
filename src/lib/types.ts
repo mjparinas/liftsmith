@@ -477,7 +477,24 @@ export interface TrainingPrefs {
 export type PlanSource =
   | { kind: "adaptive" }
   | { kind: "program"; id: string; startedAt: number; start: Record<string, number> }
-  | { kind: "routine"; id: string };
+  | { kind: "routine"; id: string }
+  /**
+   * A multi-day coach program the lifter is following (coachProgramAssign.ts): Today picks the day whose weekdays
+   * include today, for `weeks` weeks from `startedAt`.
+   */
+  | {
+      kind: "coachProgram";
+      assignId: string;
+      coachId: string;
+      programId: string;
+      title: string;
+      startedAt: number;
+      weeks: number;
+      /** Local routine ids in day order. */
+      dayIds: string[];
+      /** Parallel to dayIds: JS getDay() weekdays (0=Sun … 6=Sat) each day runs. */
+      weekdays: number[][];
+    };
 /** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
 export interface RoutineItem {
   exerciseId: string;
@@ -536,6 +553,10 @@ export interface Routine {
    * the program or keep doing it. Stays on the phone with the routine; it does not travel in a share code.
    */
   assignedPlan?: { id: string; coachId: string };
+  /**
+   * A day of a season program assigned by a coach (coachProgramAssign.ts). Stays on the phone; not in a share code.
+   */
+  assignedProgram?: { assignId: string; coachId: string; dayIndex: number };
   /**
    * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
    * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.

@@ -1071,4 +1071,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Der kostenlose Sprachcoach und die Pausenansagen auf dem Sperrbildschirm nutzen weiter die Systemstimme, wenn du sie brauchst.",
   },
+  "coach-assign-program": {
+    title: "Saisonprogramm für die ganze Gruppe zuweisen",
+    intro: "Upper/Lower oder Push/Pull/Legs für N Wochen an Klienten oder Schulteam — einmal folgen, Heute zeigt den richtigen Tag, der Kalender wer schon gehoben hat.",
+    points: [
+      "Unter Coaching › Programme mit Upper/Lower oder Push/Pull/Legs starten, Wochentage setzen, dann Zuweisen an… Klienten oder Team.",
+      "Athletinnen bekommen eine Push und folgen einmal auf Heute. Die eigene Progression wählt die Gewichte.",
+      "Am geplanten Wochentag zeigt Heute dieses Training. Freie Tage bleiben Ruhe.",
+      "Der Programmkalender zeigt Erledigt und Noch nicht. Schulteams: nur Vornamen, nie Gewichte.",
+    ],
+    dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten.",
+  },
+
 };

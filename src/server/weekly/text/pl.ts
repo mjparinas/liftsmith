@@ -1068,4 +1068,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Darmowy trener i zapowiedzi przerwy na zablokowanym ekranie nadal używają syntezy systemowej, gdy jej potrzebujesz.",
   },
+  "coach-assign-program": {
+    title: "Przypisz program sezonowy całej grupie",
+    intro: "Włącz Upper/Lower lub Push/Pull/Legs klientom albo drużynie szkolnej na N tygodni — śledzą raz, Dziś odpala właściwy dzień, a kalendarz pokazuje kto podnosił.",
+    points: [
+      "W Coaching › Programy zacznij od Upper/Lower lub Push/Pull/Legs, ustaw dni tygodnia i Przypisz do… klientów lub drużyny.",
+      "Sportowcy dostają push i śledzą raz na Dziś. Ich własna progresja wybiera ciężary.",
+      "W zaplanowany dzień Dziś pokazuje ten trening. Dni wolne zostają odpoczynkiem.",
+      "Kalendarz programu pokazuje Zrobione i Jeszcze nie. Drużyny szkolne: tylko imiona, nigdy ciężary.",
+    ],
+    dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta.",
+  },
+
 };

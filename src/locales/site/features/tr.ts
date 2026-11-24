@@ -561,6 +561,11 @@ export const tr: FeaturesText = {
       note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
       proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
     },
+    "coach-assign-program": {
+      name: "Sezon programını danışanlara veya bir takıma ata",
+      body: "Koçlar çok günlük bir programı (Upper/Lower, Push/Pull/Legs veya kendi) N hafta boyunca haftanın günlerine bağlı bir plan olarak atar. Sporcular bir kez takip eder; Bugün o günün antrenmanını gösterir. Program takvimi her günü kim yaptı, kim henüz yapmadı gösterir — okul takımlarında yalnızca adlar, asla ağırlık yok.",
+      proPart: "Programı takip etmek ücretsiz; atamak Pro olan koçluğun parçasıdır.",
+    },
     "coach-reviews": {
       name: "Gerçek danışanlardan puanlar ve değerlendirmeler",
       body: "Danışanlar, dört hafta ya da birlikte iki seanstan sonra koçlarını, kişisel antrenörlerini ya da fizyoterapistlerini yıldızla ve kısa bir değerlendirmeyle puanlar. Puan, koçun üç değerlendirmesi olunca görünür; yanında son iki haftada danışanlarından kaçının antrenman yaptığı yer alır, davetinde ve antrenör dizininde. Koçlar her birine bir kez yanıt verir ve herkes bir değerlendirmeyi bildirebilir. Yalnızca yetişkinler değerlendirme bırakabilir.",
