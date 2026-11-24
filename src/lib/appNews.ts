@@ -46,10 +46,14 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.14.0",
+    version: "0.15.0",
     day: "2026-11-23",
-    headline: "Amy voice for the voice coach, with your phone's text-to-speech still free as a fallback",
-    changes: [{ id: "voiceAmy", kind: "new", icon: "speaker" }],
+    headline:
+      "Amy voice for the voice coach, and check for updates from Settings on the phones",
+    changes: [
+      { id: "voiceAmy", kind: "new", icon: "speaker" },
+      { id: "checkUpdates", kind: "new", icon: "repeat", gate: "native" },
+    ],
   },
   {
     version: "0.13.0",

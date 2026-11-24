@@ -740,7 +740,7 @@ export const emails: Record<string, Words> = {
       "La page Fonctionnalités du site liste tout ce que fait l'app, et les nouveautés.",
       "Un réglage introuvable ? Tapez un mot dans la recherche en haut des Réglages et vous y êtes.",
     ],
-    dyk: "La version et le build en bas des Réglages nous aident à trouver votre bogue plus vite.",
+    dyk: "Sur les apps téléphone, Réglages › Version peut chercher des mises à jour et en installer une quand elle est prête.",
   },
   "body-3d": {
     title: "Votre corps en 3D",

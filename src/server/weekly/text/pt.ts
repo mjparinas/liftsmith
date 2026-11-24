@@ -739,7 +739,7 @@ export const emails: Record<string, Words> = {
       "A página de Recursos no site lista tudo o que o app faz, e o que há de novo.",
       "Não acha uma configuração? Digite uma palavra na busca no topo das Configurações e vá direto até ela.",
     ],
-    dyk: "A versão e a build no fim de Ajustes nos ajudam a encontrar o seu bug mais rápido.",
+    dyk: "Nos apps do celular, Ajustes › Versão pode verificar atualizações e instalar uma quando estiver pronta.",
   },
   "body-3d": {
     title: "Seu corpo em 3D",
