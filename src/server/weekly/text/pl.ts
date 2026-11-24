@@ -737,7 +737,7 @@ export const emails: Record<string, Words> = {
       "Strona Funkcje na stronie internetowej wymienia wszystko, co robi aplikacja, i co nowego.",
       "Nie możesz znaleźć ustawienia? Wpisz słowo w wyszukiwarkę na górze Ustawień, a przeniesie Cię prosto do niego.",
     ],
-    dyk: "Wersja i numer kompilacji na dole Ustawień pomagają nam szybciej znaleźć twój błąd.",
+    dyk: "W aplikacjach na telefonie Ustawienia › Wersja mogą sprawdzić aktualizacje i zainstalować jedną, gdy będzie gotowa.",
   },
   "body-3d": {
     title: "Twoje ciało w 3D",
