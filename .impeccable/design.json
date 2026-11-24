@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T22:56:12Z",
+  "title": "Design System: Liftsmith",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Forge Void",
+        "canonical": "#080b10",
+        "tonalRamp": ["#05070a", "#080b10", "#0c1018", "#10151d", "#18202b", "#232d3a", "#3a4656", "#94a1b2"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Forge Surface",
+        "canonical": "#10151d",
+        "tonalRamp": ["#080b10", "#0c1018", "#10151d", "#141b24", "#18202b", "#1e2834", "#232d3a", "#3a4656"]
+      },
+      "raised": {
+        "role": "neutral",
+        "displayName": "Forge Raised",
+        "canonical": "#18202b",
+        "tonalRamp": ["#10151d", "#141b24", "#18202b", "#1c2632", "#232d3a", "#2c3848", "#3a4656", "#5c6876"]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Forge Line",
+        "canonical": "#232d3a",
+        "tonalRamp": ["#18202b", "#1c2632", "#232d3a", "#2c3848", "#3a4656", "#5c6876", "#94a1b2", "#c3ccd8"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Forge Ink",
+        "canonical": "#eef2f7",
+        "tonalRamp": ["#808c9d", "#94a1b2", "#b8c2ce", "#d3dae3", "#e2e8ef", "#eef2f7", "#f5f7fa", "#ffffff"]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Forge Muted",
+        "canonical": "#94a1b2",
+        "tonalRamp": ["#3a4656", "#5c6876", "#6f7c8c", "#808c9d", "#94a1b2", "#a8b4c3", "#c3ccd8", "#e2e8ef"]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Forge Faint",
+        "canonical": "#808c9d",
+        "tonalRamp": ["#3a4656", "#5c6876", "#6f7c8c", "#808c9d", "#94a1b2", "#a8b4c3", "#c3ccd8", "#e2e8ef"]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Trust Cobalt",
+        "canonical": "#4c8dff",
+        "tonalRamp": ["#06122a", "#0a2a5c", "#1d4fc4", "#2f6fdb", "#4c8dff", "#5b9cff", "#7fb0ff", "#c5dbff"]
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Trust Cobalt (Light)",
+        "canonical": "#1d4fc4",
+        "tonalRamp": ["#06122a", "#0a2a5c", "#143a9a", "#1d4fc4", "#2f6fdb", "#4c8dff", "#7fb0ff", "#c5dbff"]
+      },
+      "accent-2": {
+        "role": "secondary",
+        "displayName": "Accent Violet Soft",
+        "canonical": "#8b7bff",
+        "tonalRamp": ["#2a1f6b", "#3a2a9a", "#4a3fc9", "#5f3fc4", "#8b7bff", "#a78bfa", "#c9b8ff", "#ebe4ff"]
+      },
+      "accent-ink": {
+        "role": "neutral",
+        "displayName": "Accent Ink",
+        "canonical": "#06122a",
+        "tonalRamp": ["#02060e", "#06122a", "#0a1a3a", "#102448", "#1d4fc4", "#4c8dff", "#94a1b2", "#eef2f7"]
+      },
+      "btn-ink": {
+        "role": "neutral",
+        "displayName": "Button Ink",
+        "canonical": "#06122a",
+        "tonalRamp": ["#02060e", "#06122a", "#0a1a3a", "#102448", "#1d4fc4", "#4c8dff", "#94a1b2", "#eef2f7"]
+      },
+      "forge-violet": {
+        "role": "secondary",
+        "displayName": "Forge Violet",
+        "canonical": "#a78bfa",
+        "tonalRamp": ["#2a1f6b", "#3d2a8a", "#5f3fc4", "#7a5ce0", "#a78bfa", "#c9b8ff", "#ddd3ff", "#f3efff"]
+      },
+      "rest-cyan": {
+        "role": "secondary",
+        "displayName": "Rest Cyan",
+        "canonical": "#38d6e8",
+        "tonalRamp": ["#0b3a42", "#0b6f80", "#1299ad", "#38d6e8", "#5cc8ff", "#7fdff0", "#b6f0f8", "#e5fafc"]
+      },
+      "ember": {
+        "role": "secondary",
+        "displayName": "Ember",
+        "canonical": "#ff8a3d",
+        "tonalRamp": ["#4a1f00", "#b24a00", "#d96512", "#ff8a3d", "#ff9f5c", "#ffb88a", "#ffd4b8", "#fff0e6"]
+      },
+      "done-mint": {
+        "role": "secondary",
+        "displayName": "Done Mint",
+        "canonical": "#34d399",
+        "tonalRamp": ["#0a3a2a", "#0a7350", "#12a06e", "#34d399", "#5ee0b0", "#8aebc8", "#c4f5e3", "#e8fbf4"]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Warn Amber",
+        "canonical": "#f5b544",
+        "tonalRamp": ["#4a3200", "#8a5100", "#b36b00", "#f5b544", "#f7c56a", "#fad690", "#fce8c0", "#fff8ea"]
+      },
+      "bad": {
+        "role": "tertiary",
+        "displayName": "Bad Coral",
+        "canonical": "#f0605d",
+        "tonalRamp": ["#4a1010", "#a82222", "#c4262b", "#f0605d", "#f47f7c", "#f8a5a3", "#fcd0cf", "#ffecec"]
+      },
+      "gold": {
+        "role": "tertiary",
+        "displayName": "Gold",
+        "canonical": "#f2c14e",
+        "tonalRamp": ["#3a2e00", "#775600", "#a88400", "#f2c14e", "#f5ce70", "#f8db96", "#fcecc4", "#fff9e8"]
+      },
+      "grad-a": {
+        "role": "primary",
+        "displayName": "Gradient Start",
+        "canonical": "#5b9cff",
+        "tonalRamp": ["#0a2a5c", "#1d4fc4", "#2f6fdb", "#4c8dff", "#5b9cff", "#7fb0ff", "#a8c9ff", "#d6e6ff"]
+      },
+      "grad-b": {
+        "role": "primary",
+        "displayName": "Gradient Mid",
+        "canonical": "#7f8bff",
+        "tonalRamp": ["#2a1f6b", "#3a45c8", "#5a3dc6", "#7f8bff", "#9b86ff", "#b3a6ff", "#d0c8ff", "#ebe6ff"]
+      },
+      "grad-c": {
+        "role": "primary",
+        "displayName": "Gradient End",
+        "canonical": "#9b86ff",
+        "tonalRamp": ["#2a1f6b", "#5a3dc6", "#7f8bff", "#9b86ff", "#b3a6ff", "#c9b8ff", "#ddd3ff", "#f3efff"]
+      },
+      "light-bg": {
+        "role": "neutral",
+        "displayName": "Light Paper",
+        "canonical": "#f4f6f9",
+        "tonalRamp": ["#d3dae3", "#e2e8ef", "#eaeef3", "#f4f6f9", "#f7f8fa", "#fafbfc", "#fcfcfd", "#ffffff"]
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Light Surface",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#eaeef3", "#f0f3f6", "#f4f6f9", "#f7f8fa", "#fafbfc", "#fcfcfd", "#fefefe", "#ffffff"]
+      },
+      "light-raised": {
+        "role": "neutral",
+        "displayName": "Light Raised",
+        "canonical": "#eaeef3",
+        "tonalRamp": ["#d3dae3", "#dde3ea", "#e2e8ef", "#eaeef3", "#f0f3f6", "#f4f6f9", "#f7f8fa", "#ffffff"]
+      },
+      "light-line": {
+        "role": "neutral",
+        "displayName": "Light Line",
+        "canonical": "#d3dae3",
+        "tonalRamp": ["#94a1b2", "#a8b4c3", "#c3ccd8", "#d3dae3", "#e2e8ef", "#eaeef3", "#f4f6f9", "#ffffff"]
+      },
+      "light-ink": {
+        "role": "neutral",
+        "displayName": "Light Ink",
+        "canonical": "#0e1621",
+        "tonalRamp": ["#080b10", "#0e1621", "#1a2430", "#2c3848", "#4b5868", "#5c6876", "#94a1b2", "#eef2f7"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Weights, reps, timers — extrabold tabular figures." },
+      "screen-title": { "displayName": "Screen title", "purpose": "Every screen h1 via ScreenHeader." },
+      "sheet-title": { "displayName": "Sheet title", "purpose": "Sheets and dialogs." },
+      "card-title": { "displayName": "Card title", "purpose": "In-card headings." },
+      "body": { "displayName": "Body", "purpose": "Default UI copy; rem-based for a11y scaling." },
+      "label": { "displayName": "Section label", "purpose": "Small-caps muted labels above card groups." }
+    },
+    "shadows": [
+      {
+        "name": "card-lift",
+        "value": "inset 0 1px 0 var(--sheen-edge), 0 8px 24px -16px var(--shadow)",
+        "purpose": "Default raised glass card."
+      },
+      {
+        "name": "card-tint-lift",
+        "value": "inset 0 1px 0 var(--sheen-edge), 0 12px 32px -18px color-mix(in srgb, var(--tint) 50%, transparent)",
+        "purpose": "Hero / tinted cards."
+      },
+      {
+        "name": "primary-glow",
+        "value": "inset 0 1px 0 rgb(255 255 255 / 0.35), 0 10px 28px -10px color-mix(in srgb, var(--grad-a) 65%, transparent)",
+        "purpose": "Primary gradient button."
+      },
+      {
+        "name": "toast-float",
+        "value": "0 8px 24px var(--shadow)",
+        "purpose": "Transient toasts."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-bounce",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Press release spring; real linear() spring where supported."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Rise / burst entrances."
+      },
+      {
+        "name": "press",
+        "value": "transform 70ms ease-out in, 460ms bounce out",
+        "purpose": "Tactile squash on press; primary stretches."
+      },
+      {
+        "name": "rise",
+        "value": "rise 360ms var(--ease-out-expo)",
+        "purpose": "List stagger entrances (never mid-set)."
+      }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "360px" },
+      { "name": "desktop-layout", "value": "wide window + pointer (data-layout=desktop)" },
+      { "name": "desk-btn-max", "value": "25rem" },
+      { "name": "desk-col-max", "value": "42rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "One primary per screen — blue→violet gradient with dark ink.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Start workout</button>",
+      "css": ".ds-btn-primary { font-family: Inter, Roboto, system-ui, sans-serif; font-weight: 600; font-size: 1rem; padding: 12px 20px; border: none; border-radius: 1rem; cursor: pointer; color: #06122a; background: linear-gradient(135deg, #5b9cff 0%, #7f8bff 55%, #9b86ff 100%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 10px 28px -10px rgb(91 156 255 / 0.65); transition: transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease; } .ds-btn-primary:hover { filter: brightness(1.04); } .ds-btn-primary:active { transform: scale(1.02, 0.9); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 4px 14px -8px rgb(91 156 255 / 0.6); } .ds-btn-primary:focus-visible { outline: 2px solid #4c8dff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary raised control with hairline border.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">Swap exercise</button>",
+      "css": ".ds-btn-ghost { font-family: Inter, Roboto, system-ui, sans-serif; font-weight: 600; font-size: 1rem; padding: 12px 20px; border-radius: 1rem; cursor: pointer; color: #eef2f7; background: #18202b; border: 1px solid #232d3a; transition: border-color 150ms ease, transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-btn-ghost:hover { border-color: rgb(76 141 255 / 0.4); } .ds-btn-ghost:active { transform: scale(0.95); } .ds-btn-ghost:focus-visible { outline: 2px solid #4c8dff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Raised glass tile — hairline, top sheen, soft lift.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card-title\">Today's workout</h3><p class=\"ds-card-body\">Push · 48 min · plates matched to your gym</p></article>",
+      "css": ".ds-card { background: linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 40%), #10151d; border: 1px solid #232d3a; border-radius: 20px; padding: 16px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 8px 24px -16px rgb(0 0 0 / 0.6); color: #eef2f7; font-family: Inter, Roboto, system-ui, sans-serif; } .ds-card-title { margin: 0 0 6px; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.375; } .ds-card-body { margin: 0; font-size: 0.9375rem; line-height: 1.5; color: #94a1b2; }"
+    },
+    {
+      "name": "Pick Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filter / feel chip; selected state adds accent wash and tick cue.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" type=\"button\">Okay</button><button class=\"ds-chip ds-chip-active\" type=\"button\"><span class=\"ds-chip-tick\" aria-hidden=\"true\"></span>Great</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; font-family: Inter, Roboto, system-ui, sans-serif; } .ds-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 1px solid #232d3a; background: #18202b; color: #eef2f7; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background 150ms ease, border-color 150ms ease; } .ds-chip:hover { border-color: rgb(76 141 255 / 0.4); } .ds-chip:focus-visible { outline: 2px solid #4c8dff; outline-offset: 2px; } .ds-chip-active { background: color-mix(in srgb, #4c8dff 22%, transparent); border-color: #4c8dff; } .ds-chip-tick { width: 8px; height: 8px; border-radius: 999px; background: #4c8dff; box-shadow: inset 0 0 0 1.5px #06122a; }"
+    },
+    {
+      "name": "Number Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Bump-style numeric field: minus, value, plus — gym-floor default.",
+      "html": "<div class=\"ds-bump\" role=\"group\" aria-label=\"Weight\"><button class=\"ds-bump-btn\" type=\"button\" aria-label=\"Decrease\">−</button><input class=\"ds-bump-input\" type=\"text\" inputmode=\"decimal\" value=\"100\" aria-label=\"Weight\" /><button class=\"ds-bump-btn\" type=\"button\" aria-label=\"Increase\">+</button></div>",
+      "css": ".ds-bump { display: inline-flex; align-items: center; gap: 8px; font-family: Inter, Roboto, system-ui, sans-serif; } .ds-bump-btn { width: 44px; height: 44px; border-radius: 1rem; border: 1px solid #232d3a; background: #18202b; color: #eef2f7; font-size: 1.25rem; font-weight: 600; cursor: pointer; transition: transform 70ms ease-out, border-color 150ms ease; } .ds-bump-btn:hover { border-color: rgb(76 141 255 / 0.4); } .ds-bump-btn:active { transform: scale(0.95); } .ds-bump-btn:focus-visible { outline: 2px solid #4c8dff; outline-offset: 2px; } .ds-bump-input { width: 5.5rem; height: 44px; text-align: center; font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; color: #eef2f7; background: #18202b; border: 1px solid #232d3a; border-radius: 1rem; } .ds-bump-input:focus { outline: 2px solid #4c8dff; outline-offset: 2px; border-color: #4c8dff; }"
+    },
+    {
+      "name": "Switch",
+      "kind": "custom",
+      "refersTo": "chip",
+      "description": "On/off switch — thumb springs across; never On/Off chip pairs.",
+      "html": "<button class=\"ds-switch\" type=\"button\" role=\"switch\" aria-checked=\"true\" aria-label=\"Sounds\"><span class=\"ds-switch-thumb\"></span></button>",
+      "css": ".ds-switch { position: relative; width: 52px; height: 32px; padding: 0; border: none; border-radius: 999px; background: #4c8dff; cursor: pointer; transition: background 150ms ease; } .ds-switch:focus-visible { outline: 2px solid #4c8dff; outline-offset: 3px; } .ds-switch-thumb { position: absolute; top: 4px; left: 24px; width: 24px; height: 24px; border-radius: 999px; background: #ffffff; box-shadow: 0 2px 6px rgb(0 0 0 / 0.35); transition: left 200ms cubic-bezier(0.34, 1.56, 0.64, 1); } .ds-switch[aria-checked=\"false\"] { background: #232d3a; } .ds-switch[aria-checked=\"false\"] .ds-switch-thumb { left: 4px; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "chip",
+      "description": "Five-tab phone navigation with accent active state.",
+      "html": "<nav class=\"ds-tabbar\" aria-label=\"Main\"><button class=\"ds-tab ds-tab-active\" type=\"button\">Today</button><button class=\"ds-tab\" type=\"button\">Body</button><button class=\"ds-tab\" type=\"button\">Progress</button><button class=\"ds-tab\" type=\"button\">Friends</button><button class=\"ds-tab\" type=\"button\">Awards</button></nav>",
+      "css": ".ds-tabbar { display: flex; gap: 4px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px)); background: #10151d; border-top: 1px solid #232d3a; font-family: Inter, Roboto, system-ui, sans-serif; } .ds-tab { flex: 1; min-height: 44px; border: none; border-radius: 12px; background: transparent; color: #94a1b2; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.02em; cursor: pointer; } .ds-tab:hover { color: #eef2f7; } .ds-tab:focus-visible { outline: 2px solid #4c8dff; outline-offset: 2px; } .ds-tab-active { color: #4c8dff; background: color-mix(in srgb, #4c8dff 14%, transparent); }"
+    },
+    {
+      "name": "Section Label",
+      "kind": "custom",
+      "refersTo": "label",
+      "description": "Small-caps muted label above a card group.",
+      "html": "<div class=\"ds-section\"><p class=\"ds-section-label\">This week</p><article class=\"ds-card\"><p class=\"ds-card-body\">3 of 4 sessions done</p></article></div>",
+      "css": ".ds-section { display: flex; flex-direction: column; gap: 8px; font-family: Inter, Roboto, system-ui, sans-serif; } .ds-section-label { margin: 0; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #94a1b2; } .ds-card { background: linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 40%), #10151d; border: 1px solid #232d3a; border-radius: 20px; padding: 16px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 8px 24px -16px rgb(0 0 0 / 0.6); color: #eef2f7; } .ds-card-body { margin: 0; font-size: 0.9375rem; line-height: 1.5; color: #94a1b2; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Midnight Forge",
+    "overview": "Liftsmith looks like a dark, trustworthy forge for serious lifting: deep navy-black surfaces, one Trust Cobalt accent, and raised glass cards under a soft top aurora. The system is professional and calm on the gym floor — lively in small springs and bursts, never loud mid-set. Brand lives in precise tokens, tabular numbers, and a single primary action per screen.\n\nPersonality is dark-default, tactile glass, and restrained craft. Supporting hues (Forge Violet, Rest Cyan, Ember, Done Mint) tint marks and cards; they never become body text. Status colours (mint / amber / coral) keep their meaning. Light mode keeps the same structure with deeper cobalt for contrast. Accessibility is part of the identity: WCAG 2.2 AA, colour-blind safe tokens, Lean mode, and rem-based type.\n\nConfirmed visual rejections: competitor fitness-app skins; purple-on-white SaaS gradients; cream-serif “wellness brochure”; emoji chrome; loud gamification neon on core workout UI.",
+    "keyCharacteristics": [
+      "Dark navy forge base with Trust Cobalt as the rare accent",
+      "Blue→violet primary gradient; one primary per screen",
+      "Raised glass cards (20px) with hairline + top sheen",
+      "System sans (Inter / Roboto); extrabold screen titles; tabular display numbers",
+      "Soft glass lift + aurora glow; motion short and purposeful (none during a set except what was touched)"
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Trust Cobalt (and its gradient) is the only brand accent on a screen; supporting hues are tints for marks and card glows, never body copy.", "section": "colors" },
+      { "name": "The Status Means Status Rule", "body": "Mint, amber, and coral communicate recovery and feedback only — never pure decoration on core workout chrome.", "section": "colors" },
+      { "name": "The Token Rule", "body": "Every colour is a CSS variable in globals.css with dark and light values; never hard-code a hex in a component.", "section": "colors" },
+      { "name": "The One Title Scale Rule", "body": "Never invent heading sizes by hand — use ScreenHeader, Section, Sheet, or the shared title classes.", "section": "typography" },
+      { "name": "The Tabular Numbers Rule", "body": "Any weight, rep, timer, or readiness figure uses tabular numerals.", "section": "typography" },
+      { "name": "The No Touching Cards Rule", "body": "Two bordered rounded surfaces never sit closer than a visible gap (CI e2e-gaps.mjs).", "section": "colors" },
+      { "name": "The One Primary Rule", "body": "Exactly one primary action per screen.", "section": "colors" },
+      { "name": "The Soft Glass Rule", "body": "Prefer hairline + sheen + short shadow over large multi-layer drop shadows.", "section": "elevation" },
+      { "name": "The Calm Motion Rule", "body": "Springs and bursts are short; Lean mode and prefers-reduced-motion cut them. Nothing moves during a set except what the lifter just touched.", "section": "elevation" },
+      { "name": "The Glass Tile Rule", "body": "Cards are rounded rectangles with sheen — not floating opaque blobs or hard Material cards.", "section": "colors" }
+    ],
+    "dos": [
+      "Do use CSS tokens from globals.css for every colour, including status and CVD variants.",
+      "Do put screen titles through ScreenHeader / SCREEN_TITLE and section labels through Section.",
+      "Do keep one primary gradient button per screen and gap every card stack.",
+      "Do prefer steppers, chips, and switches over typing on the gym floor.",
+      "Do honour dark default, light theme, colour-blind safe, and more-contrast modes."
+    ],
+    "donts": [
+      "Don't hard-code hex colours in components.",
+      "Don't use competitor names, art, or look-alikes; don't put emoji in app chrome.",
+      "Don't add a second control that opens the same sheet/page already reachable on that screen.",
+      "Don't animate for decoration during a set, or stretch desktop side-page buttons past 25rem.",
+      "Don't invent purple-on-white, cream-serif wellness, or neon gamification for core workout UI."
+    ]
+  }
+}
