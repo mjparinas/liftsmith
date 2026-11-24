@@ -11,15 +11,9 @@ Done before launch: Google sign-in for the web and Android, Android billing (Pla
 1. **Wear OS on Play** (paused 2026-11-23 after a Wear App Quality rejection): the Wear OS form factor was removed from Play Console (Advanced settings › Form factors), and Release no longer uploads the Wear AAB (`release.yml`; the bundle still builds into the artifact). When ready again: add Wear OS as a form factor, restore the `wear:internal` upload step, put a build on Wear production (version code +100,000,000 in `android/wear/build.gradle`), accept "Proceed anyway" on the version code warning if shown, and send it from Publishing overview. Fix the Wear quality issue first ([Watch apps](watch-apps.md) "Finding the phone").
 2. **Once the listing is live:** set `NEXT_PUBLIC_GOOGLE_PLAY_URL` in Vercel (Production and Preview) to `https://play.google.com/store/apps/details?id=com.getliftsmith.app` and redeploy, so the site's Google Play badges stop saying "Coming soon"; the App Store badge keeps saying it until iOS ships.
 
-### Blocking Android Release uploads (2026-11-22)
+### Android Release uploads (Health apps, 2026-11-22 → resolved 2026-11-23)
 
-Play's API refuses every `r0adkll/upload-google-play` commit with **"You must let us know whether your app includes any health features"** until the Health apps declaration is current (Release runs 48–50 and the ones after `changesNotSentForReview: true`). The AAB uploads; committing the edit fails. Web and iOS jobs are fine. This is Play Console only — the workflow already passes `changesNotSentForReview: true` ([#634](https://github.com/mjparinas/liftsmith/pull/634)).
-
-1. Play Console › Policy › App content › **Health apps** (or the critical Health policy banner under Monitor and Improve › Policy and programs › App content).
-2. Declare health features (see [Google Play review](google-play-review.md)): Activity and fitness, Nutrition and weight management, Period tracking; **and Exercise** for Health Connect's `READ_EXERCISE` ([Workouts from other apps](outside-workouts.md)). Not Sleep management or Physical therapy.
-3. Save / submit the form. If it was already filled before Exercise was added, open it, add Exercise, and submit again so the API sees a complete declaration.
-4. Wait until the form is no longer a critical issue (often under an hour after submit).
-5. Re-run **Release** on `main` (Actions › Release › Run workflow). The phone AAB should land on the internal track; send review from Publishing overview when ready.
+Play blocked commits with **"You must let us know whether your app includes any health features"** until App content › **Health apps** was current (Activity and fitness, Nutrition and weight management, Period tracking, and **Exercise** for `READ_EXERCISE`; not Sleep or Physical therapy). While that was critical, [#634](https://github.com/mjparinas/liftsmith/pull/634) set `changesNotSentForReview: true` so the AAB could land without auto-sending review. Once the form cleared, Play started auto-sending review and refused that flag (**"The query parameter changesNotSentForReview must not be set"** — Release run 62). The flag and the misleading Health apps follow-up step are removed; upload failures show Play's own error again.
 
 Also still due on that form / Data safety when those releases reach production: approximate location purpose for gym listings, and Health Connect's Exercise (read) as below.
 
