@@ -6,8 +6,8 @@ import { fill, type SiteLang } from "@/lib/siteLang";
 import { siteText } from "@/locales/site";
 
 // Google Play and App Store badges in the stores' standard black style. Until a listing exists
-// (STORE_LINKS in src/lib/site.ts), the badge is shown dimmed with "Coming soon" and isn't a link,
-// and a link to the web app sits beside them so nobody hits a dead end.
+// (STORE_LINKS in src/lib/site.ts), that badge is dimmed with "Coming soon" and isn't a link.
+// While either store is still soon, a link to the web app sits beside them so nobody hits a dead end.
 // TODO before launch: swap these drawn badges for the official artwork from Apple's and Google's badge
 // pages (the cloud session that built them couldn't reach either site).
 

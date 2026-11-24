@@ -84,7 +84,7 @@ export const ko: SiteText = {
       appleSmall: "다운로드하기",
       soon: "곧 출시",
       comingSoon: "{store}: 곧 출시",
-      web: "앱은 곧 출시돼요. 지금은 브라우저에서 사용하세요 →",
+      web: "iPhone 앱은 곧 출시돼요. 지금은 브라우저에서 사용하세요 →",
     },
   },
   home: {
@@ -363,7 +363,7 @@ export const ko: SiteText = {
     },
     {
       q: "Android와 iPhone에서 쓸 수 있나요?",
-      a: "두 앱 모두 Google Play와 App Store 출시를 준비 중이며 같은 기능으로 나와요. 그전까지는 브라우저에서 전체 앱을 쓸 수 있고, 한 번 불러오면 오프라인에서도 작동해요.",
+      a: "네. Android 앱은 지금 Google Play에 있어요. iPhone 앱은 같은 기능으로 App Store 출시를 준비 중이에요. 전체 앱은 브라우저에서도 쓸 수 있고, 한 번 불러오면 오프라인에서도 작동해요.",
     },
     {
       q: "어떤 장비가 필요한가요?",

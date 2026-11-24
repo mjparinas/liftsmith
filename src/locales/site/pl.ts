@@ -84,7 +84,7 @@ export const pl: SiteText = {
       appleSmall: "Pobierz z",
       soon: "Wkrótce",
       comingSoon: "{store}: już wkrótce",
-      web: "Aplikacje będą wkrótce. Już dziś korzystaj w przeglądarce →",
+      web: "Aplikacja na iPhone’a będzie wkrótce. Już dziś korzystaj w przeglądarce →",
     },
   },
   home: {
@@ -365,7 +365,7 @@ export const pl: SiteText = {
     },
     {
       q: "Czy jest na Androida i iPhone’a?",
-      a: "Obie aplikacje są w drodze do Google Play i App Store i mają te same funkcje. Do tego czasu pełna aplikacja działa w przeglądarce, a po załadowaniu także offline.",
+      a: "Tak. Aplikacja na Androida jest już w Google Play. Aplikacja na iPhone’a jest w drodze do App Store, z tymi samymi funkcjami. Pełna aplikacja działa też w przeglądarce, a po załadowaniu także offline.",
     },
     {
       q: "Jakiego sprzętu potrzebuję?",

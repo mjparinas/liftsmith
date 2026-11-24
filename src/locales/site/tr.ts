@@ -84,7 +84,7 @@ export const tr: SiteText = {
       appleSmall: "Şuradan indirin:",
       soon: "Yakında",
       comingSoon: "{store}: yakında",
-      web: "Uygulamalar yakında geliyor. Bugün tarayıcında kullan →",
+      web: "iPhone uygulaması yakında geliyor. Bugün tarayıcında kullan →",
     },
   },
   home: {
@@ -365,7 +365,7 @@ export const tr: SiteText = {
     },
     {
       q: "Android ve iPhone'da var mı?",
-      a: "İki uygulama da Google Play ve App Store'a gelmek üzere ve aynı özelliklerle çıkacak. O zamana kadar uygulamanın tamamı tarayıcında çalışır ve bir kez yüklendikten sonra çevrimdışı da çalışır.",
+      a: "Evet. Android uygulaması artık Google Play'de. iPhone uygulaması aynı özelliklerle App Store'a gelmek üzere. Uygulamanın tamamı tarayıcında da çalışır ve bir kez yüklendikten sonra çevrimdışı da çalışır.",
     },
     {
       q: "Hangi ekipmana ihtiyacım var?",
