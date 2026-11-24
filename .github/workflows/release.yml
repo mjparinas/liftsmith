@@ -140,20 +140,9 @@ jobs:
         run: |
           echo "::error::Play refused to commit the phone upload. Complete Policy › App content › Health apps (include Exercise for outside workouts), wait until it is not a critical issue, then re-run Release. Steps: docs/decisions/open-items.md (Blocking Android Release uploads)."
           exit 1
-      # The Wear OS app goes to Play's Wear OS internal track. Play takes it only once the Wear OS form factor is
-      # added in Play Console (Test and release › Advanced settings › Form factors), so until then this step fails
-      # without stopping the phone release (docs/decisions/watch-apps.md).
-      - name: Upload the Wear OS app to Play (Wear OS internal)
-        if: env.HAS_KEY == 'true' && env.HAS_PLAY == 'true' && steps.play_phone.outcome == 'success'
-        continue-on-error: true
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: com.getliftsmith.app
-          releaseFiles: android/wear/build/outputs/bundle/release/wear-release.aab
-          track: wear:internal
-          status: completed
-          changesNotSentForReview: true
+      # Wear OS Play upload paused (2026-11-23): form factor removed after a Wear quality rejection. The Wear AAB
+      # still builds into liftsmith-release-aab. Restore a wear:internal upload when Wear is ready again
+      # (docs/decisions/watch-apps.md, open-items.md).
 
   ios:
     name: iOS · TestFlight
