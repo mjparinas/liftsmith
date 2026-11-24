@@ -319,9 +319,15 @@ export type Prop =
   | PoleProp
   | RopeProp;
 
+/** A disc on a landmine sleeve: radius and thickness in demo metres (same idea as a barbell plate). */
+export interface PoleDisc {
+  r: number;
+  w: number;
+}
+
 /**
  * A landmine bar: a thick bar from a pivot on the floor to the hands, running on past them by `past`,
- * with a plate on the sleeve just short of the hands. It follows the hands, so it tilts and swings as they move.
+ * with plates on the sleeve just short of the hands. It follows the hands, so it tilts and swings as they move.
  */
 export interface PoleProp {
   kind: "pole";
@@ -331,16 +337,20 @@ export interface PoleProp {
   /** The plate's radius (0.2 when left out; 0 draws none, for a machine's lever arm). Ignored when `plates` is set. */
   plate?: number;
   /**
-   * Several plate radii along the sleeve (heaviest first, nearest the hands), from a real set loading.
-   * An empty list draws no plates (empty bar); leave out for the single default ring.
+   * Several discs along the sleeve (heaviest first, nearest the hands), from a real set loading.
+   * An empty list draws no plates (empty bar); leave out for the single default disc.
    */
-  plates?: number[];
+  plates?: PoleDisc[];
 }
 
-/** Max rings a landmine sleeve can show (matches the demo bar's disc cap). */
+/** Max discs a landmine sleeve can show (matches the demo bar's disc cap). */
 export const POLE_MAX_PLATES = 8;
-/** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, then up to POLE_MAX_PLATES plate rings. */
-export const POLE_SEGMENTS = 4 + 16 * POLE_MAX_PLATES;
+/** Per disc: near ring, far ring, then eight edges joining them (a short cylinder like a barbell plate). */
+const POLE_PLATE_SEGS = 16 + 16 + 8;
+/** POLE_SEGMENTS line segments that draw a pole: the bar as a thin tube of four lines, then up to POLE_MAX_PLATES discs. */
+export const POLE_SEGMENTS = 4 + POLE_PLATE_SEGS * POLE_MAX_PLATES;
+const POLE_DISC_GAP = 0.004;
+
 export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
   const a = anchorAt(J, p.from),
     h = anchorAt(J, p.to);
@@ -363,15 +373,32 @@ export function poleSegments(p: PoleProp, J: Joints): [Vec, Vec][] {
     out.push([off(a, 0.018, t), off(b, 0.018, t)]);
   }
   // plates on the sleeve just short of the hands (heaviest nearest when `plates` is set)
-  const radii = p.plates !== undefined ? p.plates.slice(0, POLE_MAX_PLATES) : p.plate === 0 ? [] : [p.plate ?? 0.2];
+  const discs: PoleDisc[] =
+    p.plates !== undefined ? p.plates.slice(0, POLE_MAX_PLATES) : p.plate === 0 ? [] : [{ r: p.plate ?? 0.2, w: 0.045 }];
+  let along = 0.12;
   for (let n = 0; n < POLE_MAX_PLATES; n++) {
-    const pr = radii[n];
-    const along = 0.14 + n * 0.045;
-    const plate: Vec = [h[0] - u[0] * along, h[1] - u[1] * along, h[2] - u[2] * along];
-    for (let i = 0; i < 16; i++) {
-      if (!pr) out.push([b, b]);
-      else out.push([off(plate, pr, (i * Math.PI) / 8), off(plate, pr, ((i + 1) * Math.PI) / 8)]);
+    const disc = discs[n];
+    if (!disc) {
+      for (let i = 0; i < POLE_PLATE_SEGS; i++) out.push([b, b]);
+      continue;
     }
+    const near: Vec = [h[0] - u[0] * along, h[1] - u[1] * along, h[2] - u[2] * along];
+    const far: Vec = [h[0] - u[0] * (along + disc.w), h[1] - u[1] * (along + disc.w), h[2] - u[2] * (along + disc.w)];
+    for (let i = 0; i < 16; i++) {
+      const t0 = (i * Math.PI) / 8,
+        t1 = ((i + 1) * Math.PI) / 8;
+      out.push([off(near, disc.r, t0), off(near, disc.r, t1)]);
+    }
+    for (let i = 0; i < 16; i++) {
+      const t0 = (i * Math.PI) / 8,
+        t1 = ((i + 1) * Math.PI) / 8;
+      out.push([off(far, disc.r, t0), off(far, disc.r, t1)]);
+    }
+    for (let i = 0; i < 8; i++) {
+      const t = (i * Math.PI) / 4;
+      out.push([off(near, disc.r, t), off(far, disc.r, t)]);
+    }
+    along += disc.w + POLE_DISC_GAP;
   }
   return out;
 }
