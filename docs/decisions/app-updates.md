@@ -16,4 +16,11 @@ Melvin, 2026-11-14: "on start up (in the background) … see if there is a newer
 - A small note at the top of every screen except the workout, in the page (not over it), the same place as friends' check-ins (`UpdateToast.tsx`): "A new version of Liftsmith is out" with **Update** and ✕. Not a primary button: the screen's own primary stays the one primary.
 - **No nagging:** ✕ hides that version for seven days (`DISMISS_DAYS`). A newer version than the one closed shows at once. A downloaded update always offers Restart.
 - Never during a workout (the note is hidden on the workout screen and Restart is only offered off it).
-- Text in `x.update*`, all six languages.
+- Text in `x.update*` (the note) and `wn.check*` / `wn.install` (Settings), all ten languages.
+
+## Check for updates in Settings (2026-11-23)
+
+Melvin asked for a way on Settings' Version row to check for updates and install when one is found.
+
+- **Where:** Settings › Help › Version (`VersionRow` in `WhatsNew.tsx`), under What's new, **phones only** (same store plugins as the background check; the web app still needs none of this).
+- **Check for updates** asks the store at once (`checkForUpdate({ force: true })`). A closed note for that version is cleared, so Install and the toast agree. Up to date, or offline, shows a short line on the row; a newer version turns the button into **Install** (or **Restart** when Play has already downloaded it), which runs the same `updateNow` / `restartNow` as the toast.

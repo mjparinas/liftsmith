@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { BODIES } from "@/lib/demo/rig";
 import { useApp } from "@/lib/store";
+import { makeSet } from "@/test/factories";
 
 import { HealthTwin } from "./HealthTwin";
 import { useMyShape } from "./myShape";
@@ -77,6 +78,16 @@ describe("Shape the figure like me", () => {
     rerender();
     expect(result.current).toBeDefined();
     expect(result.current!.shW).toBeGreaterThan(BODIES.male.shW);
+  });
+
+  it("keeps the same Body reference when a set is logged, so the 3D demo does not rebuild", () => {
+    useApp.getState().setProfile({ heightCm: 175, bodyweight: 105, shapeFigure: true });
+    const { result, rerender } = renderHook(() => useMyShape());
+    const before = result.current;
+    expect(before).toBeDefined();
+    useApp.setState((s) => ({ events: [...s.events, makeSet({ exerciseId: "back-squat", weight: 140, reps: 5 })] }));
+    rerender();
+    expect(result.current).toBe(before);
   });
 
   it("keeps the average figure when there's nothing to shape from, even with the switch on", () => {

@@ -992,7 +992,15 @@ export function Workout() {
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
-            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} shape={shape} bpm={bpm} controls />
+            <LiftDemo
+              exerciseId={ex.id}
+              body={bodyFor(profile.sex)}
+              shape={shape}
+              bpm={bpm}
+              loading={loading}
+              unit={unit}
+              controls
+            />
             <FavouriteButton exerciseId={ex.id} />
             <SetHints ex={ex} />
             <p className="text-muted">{ex.setup}</p>

@@ -9,6 +9,7 @@ import {
   DECORATIVE_TRAP,
   discSize,
   loadingKey,
+  poleDiscs,
   poleRadii,
   sleeveStack,
   trapDiscs,
@@ -28,6 +29,7 @@ describe("barPlates", () => {
     expect(barDiscs(null, null, false)).toEqual([...DECORATIVE]);
     expect(barDiscs(undefined, "lb", true)).toEqual([...DECORATIVE_SMALL]);
     expect(trapDiscs(null, "kg")).toEqual([...DECORATIVE_TRAP]);
+    expect(poleDiscs(null, "lb")).toBeNull();
     expect(poleRadii(null, "lb")).toBeNull();
   });
 
@@ -57,13 +59,14 @@ describe("barPlates", () => {
     expect(small[0]!.z).toBeLessThan(0.5);
   });
 
-  it("puts landmine plates on one end as pole radii, heaviest first", () => {
+  it("puts landmine plates on one end as discs with thickness, heaviest first", () => {
     const loading = loadBar(135, 45, LB, true); // 90 on one end → two 45s
     expect(loading.oneEnd).toBe(true);
     expect(loading.perSide).toEqual([45, 45]);
-    const radii = poleRadii(loading, "lb");
-    expect(radii).toEqual([discSize(45, "lb").r, discSize(45, "lb").r]);
-    expect(poleRadii({ ...loading, perSide: [] }, "lb")).toEqual([]);
+    const size = discSize(45, "lb");
+    expect(poleDiscs(loading, "lb")).toEqual([size, size]);
+    expect(poleRadii(loading, "lb")).toEqual([size.r, size.r]);
+    expect(poleDiscs({ ...loading, perSide: [] }, "lb")).toEqual([]);
   });
 
   it("sizes heavier plates larger", () => {
@@ -77,7 +80,7 @@ describe("barPlates", () => {
   });
 });
 
-describe("landmine pole rings", () => {
+describe("landmine pole discs", () => {
   it("always returns a fixed segment count so the 3D buffer stays sized", async () => {
     const { POLE_SEGMENTS, POLE_MAX_PLATES, poleSegments } = await import("./rig");
     const J = {
@@ -89,9 +92,23 @@ describe("landmine pole rings", () => {
       get: (t, k) => (k in t ? t[k as keyof typeof J] : ([0, 0, 0] as [number, number, number])),
     }) as unknown as import("./rig").Joints;
     const none = poleSegments({ kind: "pole", from: [1.4, 0.03, 0], to: "hands", past: 0.08, plates: [] }, joints);
-    const many = poleSegments({ kind: "pole", from: [1.4, 0.03, 0], to: "hands", past: 0.08, plates: [0.22, 0.22, 0.18] }, joints);
+    const many = poleSegments(
+      {
+        kind: "pole",
+        from: [1.4, 0.03, 0],
+        to: "hands",
+        past: 0.08,
+        plates: [
+          { r: 0.22, w: 0.05 },
+          { r: 0.22, w: 0.05 },
+          { r: 0.18, w: 0.035 },
+        ],
+      },
+      joints,
+    );
     expect(none).toHaveLength(POLE_SEGMENTS);
     expect(many).toHaveLength(POLE_SEGMENTS);
-    expect(POLE_SEGMENTS).toBe(4 + 16 * POLE_MAX_PLATES);
+    // shaft (4) + per disc: two 16-seg rings + 8 thickness edges
+    expect(POLE_SEGMENTS).toBe(4 + (16 + 16 + 8) * POLE_MAX_PLATES);
   });
 });

@@ -738,7 +738,7 @@ export const emails: Record<string, Words> = {
       "La página de funciones de la web enumera todo lo que hace la app, y lo nuevo.",
       "¿No encuentras un ajuste? Escribe una palabra en el buscador de arriba en Ajustes y te lleva directo a él.",
     ],
-    dyk: "La versión y la compilación al pie de Ajustes nos ayudan a encontrar tu fallo antes.",
+    dyk: "En las apps del teléfono, Ajustes › Versión puede buscar actualizaciones e instalar una cuando esté lista.",
   },
   "body-3d": {
     title: "Tu cuerpo en 3D",

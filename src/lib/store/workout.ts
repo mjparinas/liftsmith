@@ -1,6 +1,7 @@
 import { track } from "../analytics";
 import { startDistance } from "../cardio";
 import { derive } from "../derive";
+import { workoutEventIds } from "../editHistory";
 import { markJoke, plateJoke, seenJokes } from "../eggs";
 import { exercise } from "../exercises";
 import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
@@ -1023,11 +1024,12 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
     discard() {
       const a = get().active;
       if (!a) return;
-      const ids = get()
-        .events.filter((e) => "sessionId" in e && e.sessionId === a.sessionId)
-        .map((e) => e.id);
+      // Same sweep as deleting a finished workout: every event on the session, plus each set's reps-left rating
+      // (effort has no sessionId). Stats, PRs, XP, crates and streaks are derived again from what's left.
+      const ids = workoutEventIds(get().events, a.sessionId);
       track("workout_discard", { sets: get().events.filter((e) => e.type === "set" && e.sessionId === a.sessionId).length });
-      const events = get().events.filter((e) => !ids.includes(e.id));
+      const gone = new Set(ids);
+      const events = get().events.filter((e) => !gone.has(e.id));
       set({ events, stats: derive(events, Date.now()), active: null, undoable: null });
       void deleteEvents(ids);
       persistActive(null);

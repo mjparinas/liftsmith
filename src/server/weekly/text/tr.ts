@@ -738,7 +738,7 @@ export const emails: Record<string, Words> = {
       "Web sitesindeki Özellikler sayfası, uygulamanın yaptığı her şeyi ve yenilikleri listeler.",
       "Bir ayarı bulamıyor musun? Ayarlar'ın en üstündeki arama kutusuna bir kelime yaz, seni doğrudan oraya götürsün.",
     ],
-    dyk: "Ayarlar'ın en altındaki sürüm ve derleme numarası, hatanı daha hızlı bulmamıza yardımcı olur.",
+    dyk: "Telefon uygulamalarında Ayarlar › Sürüm, güncellemeleri denetleyip hazır olunca yükleyebilir.",
   },
   "body-3d": {
     title: "3B vücudun",
