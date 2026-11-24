@@ -5,6 +5,7 @@ import { defaultProfile } from "@/lib/defaults";
 import { derive } from "@/lib/derive";
 import { crates, game, isPr, xpTotal } from "@/lib/game";
 import { useApp } from "@/lib/store";
+import type { SetEvent } from "@/lib/types";
 import { DAY, makeWorkout, NOW } from "@/test/factories";
 
 // Discarding a workout must erase every mark it left: sets, PRs, XP, crates, effort ratings. Stats are
@@ -56,12 +57,13 @@ describe("discarding a workout that hit a PR", () => {
       active: { ...useApp.getState().active!, warm: a.plan.items[0]?.warmup?.length ?? 0, weight: 120, reps: 5 },
     });
     useApp.getState().logSet(NOW);
-    const logged = useApp.getState().events.filter((e) => e.type === "set" && e.sessionId === a.sessionId);
+    const logged = useApp.getState().events.filter((e): e is SetEvent => e.type === "set" && e.sessionId === a.sessionId);
     expect(logged).toHaveLength(1);
-    expect(isPr(useApp.getState().events, logged[0]!)).toBe(true);
+    const set = logged[0]!;
+    expect(isPr(useApp.getState().events, set)).toBe(true);
 
-    useApp.getState().rateEffort(logged[0]!.id, 1);
-    expect(useApp.getState().events.some((e) => e.type === "effort" && e.setId === logged[0]!.id)).toBe(true);
+    useApp.getState().rateEffort(set.id, 1);
+    expect(useApp.getState().events.some((e) => e.type === "effort" && e.setId === set.id)).toBe(true);
     expect(useApp.getState().stats.prs.length).toBe(beforePrs + 1);
     expect(xpTotal(useApp.getState().stats)).toBeGreaterThan(beforeXp);
     expect(crates(useApp.getState().stats).some((c) => c.sessionId === a.sessionId)).toBe(true);
@@ -71,7 +73,7 @@ describe("discarding a workout that hit a PR", () => {
     const after = useApp.getState();
     expect(after.active).toBeNull();
     expect(after.events.some((e) => "sessionId" in e && e.sessionId === a.sessionId)).toBe(false);
-    expect(after.events.some((e) => e.type === "effort" && e.setId === logged[0]!.id)).toBe(false);
+    expect(after.events.some((e) => e.type === "effort" && e.setId === set.id)).toBe(false);
     expect(after.stats.prs).toHaveLength(beforePrs);
     expect(after.stats.sessions).toHaveLength(beforeSessions);
     expect(xpTotal(after.stats)).toBe(beforeXp);

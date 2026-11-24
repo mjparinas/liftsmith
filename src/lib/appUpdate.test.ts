@@ -3,16 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DAY, NOW } from "@/test/factories";
 
-import {
-  CHECK_GAP,
-  checkForUpdate,
-  dismissUpdate,
-  dueCheck,
-  offerUpdate,
-  updateNow,
-  useAppUpdate,
-  type UpdateInfo,
-} from "./appUpdate";
+import { CHECK_GAP, checkForUpdate, dismissUpdate, dueCheck, offerUpdate, updateNow, useAppUpdate, type UpdateInfo } from "./appUpdate";
 
 describe("offerUpdate", () => {
   it("offers a newer version", () => {

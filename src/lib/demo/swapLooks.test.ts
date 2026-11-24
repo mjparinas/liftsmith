@@ -118,34 +118,20 @@ describe("the gear each exercise needs is drawn", () => {
     expect(motionFor("machine-row").load).toBe("handle");
   });
 
-  it("keeps the landmine bar a fixed length and tilts it through the rep", () => {
+  it("keeps landmine hands on a narrow sleeve grip within arm reach", () => {
     for (const id of ["landmine-press", "landmine-chest-press", "landmine-row", "landmine-squat"]) {
       const m = motionFor(id);
-      const pole = props(id).find((p) => p.kind === "pole");
-      expect(pole?.kind).toBe("pole");
-      if (!pole || pole.kind !== "pole" || typeof pole.from === "string") throw new Error(id);
-      const pivot = pole.from;
-      const samples = [0, 0.5, 1].map((d) => {
+      expect(m.grip, id).toBe(0.06);
+      expect(
+        props(id).some((p) => p.kind === "pole"),
+        id,
+      ).toBe(true);
+      for (const d of [0, 0.5, 1]) {
         const J = jointsAt(m, B, d);
-        const mid: [number, number, number] = [
-          (J.handL[0] + J.handR[0]) / 2,
-          (J.handL[1] + J.handR[1]) / 2,
-          (J.handL[2] + J.handR[2]) / 2,
-        ];
-        const dx = mid[0] - pivot[0],
-          dy = mid[1] - pivot[1],
-          dz = mid[2] - pivot[2];
-        return {
-          len: Math.hypot(dx, dy, dz),
-          elev: Math.atan2(dy, Math.hypot(dx, dz)),
-        };
-      });
-      // Fixed sleeve length (no rubber-banding along the bar).
-      expect(Math.abs(samples[0]!.len - samples[1]!.len), id).toBeLessThan(0.02);
-      expect(Math.abs(samples[0]!.len - samples[2]!.len), id).toBeLessThan(0.02);
-      // Clear tilt: at least ~25° between the ends of the rep.
-      const sweep = Math.abs(samples[0]!.elev - samples[2]!.elev) * (180 / Math.PI);
-      expect(sweep, id).toBeGreaterThan(25);
+        const reach = B.upper + B.fore + 0.03;
+        expect(Math.hypot(J.handL[0] - J.shL[0], J.handL[1] - J.shL[1], J.handL[2] - J.shL[2]), `${id} L at ${d}`).toBeLessThan(reach);
+        expect(Math.hypot(J.handR[0] - J.shR[0], J.handR[1] - J.shR[1], J.handR[2] - J.shR[2]), `${id} R at ${d}`).toBeLessThan(reach);
+      }
     }
   });
 });
