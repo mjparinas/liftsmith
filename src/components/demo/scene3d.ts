@@ -27,7 +27,7 @@ import {
   type Material,
 } from "three";
 
-import { barDiscs, loadingKey, poleRadii, trapDiscs, type DemoDisc } from "@/lib/demo/barPlates";
+import { barDiscs, loadingKey, poleDiscs, trapDiscs, type DemoDisc } from "@/lib/demo/barPlates";
 import { partIndices, REGIONS } from "@/lib/demo/mesh";
 import {
   anchorAt,
@@ -292,9 +292,9 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     fillSleeve(trapPlates, trapDiscs(f.s.loading, f.s.unit), oneEnd, 0.42);
   };
   const withPoleLoad = (props: Prop[], f: Frame): Prop[] => {
-    const radii = poleRadii(f.s.loading, f.s.unit);
-    if (radii === null) return props;
-    return props.map((p) => (p.kind === "pole" ? { ...p, plates: radii, plate: undefined } : p));
+    const discs = poleDiscs(f.s.loading, f.s.unit);
+    if (discs === null) return props;
+    return props.map((p) => (p.kind === "pole" ? { ...p, plates: discs, plate: undefined } : p));
   };
   const makeDumbbell = () => {
     const g = new Group();

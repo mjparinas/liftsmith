@@ -10,11 +10,33 @@ import { EXERCISE_BY_ID } from "../exercises";
 import { implementsFor, perSide } from "../sides";
 import type { Equipment, Exercise } from "../types";
 import type { Motion } from "./motions";
-import { BODIES, type Anchor, type Body, type Hold, type Load, type Pose, type Prop, type Vec } from "./rig";
+import {
+  BODIES,
+  add,
+  clamp,
+  len,
+  lerp,
+  norm,
+  rad,
+  sub,
+  type Anchor,
+  type Body,
+  type Hold,
+  type Load,
+  type Pose,
+  type Prop,
+  type Vec,
+} from "./rig";
 
 const WEIGHTS: Equipment[] = ["barbell", "ezBar", "trapBar", "dumbbells", "kettlebells", "medicineBall"];
 const PULLS: Equipment[] = ["cable", "latPulldown", "seatedRow"];
 const HAND_LOADS: Load[] = ["barbell", "dumbbell", "kettlebell", "ball", "handle", "none"];
+/** Narrow grip on the free sleeve; landmine / T-bar hands sit close together. */
+const LANDMINE_GRIP = 0.06;
+/** Floor pivot sits this far past the start hands (metres). */
+const LANDMINE_PIVOT_AHEAD = 1.2;
+/** Free motions often travel nearly radially from that pivot; amplify elevation so the bar clearly tilts. */
+const LANDMINE_MIN_SWEEP = rad(30);
 
 const cable = (from: Anchor, to: Anchor): Prop => ({ kind: "cable", from, to });
 const rail = (at: Vec, length: number): Prop => ({ kind: "rail", at, length, axis: "y" });
@@ -42,26 +64,69 @@ function handsOf(p: Pose, grip: number): [Vec, Vec] {
   return [h.L, h.R];
 }
 
+/** Midpoint of the working hands (right only on a one-arm landmine). */
+function landmineHold(p: Pose, oneHand: boolean): Vec {
+  const [l, r] = handsOf(p, LANDMINE_GRIP);
+  return oneHand ? r : [(l[0] + r[0]) / 2, (l[1] + r[1]) / 2, 0];
+}
+
+/** Elevation of a point above the landmine pivot (0 = flat along the floor). */
+function elevFrom(pivot: Vec, at: Vec) {
+  return Math.atan2(at[1] - pivot[1], Math.hypot(at[0] - pivot[0], at[2] - pivot[2]));
+}
+
 /**
- * A landmine move: the hands hold the end of a bar whose other end pivots on the floor ahead, so it
- * draws that bar (a `pole`) instead of a level barbell or a handle, the hands close together on it.
+ * A landmine move: the hands hold the end of a bar whose other end pivots on the floor ahead.
+ * The free family's hand path often runs nearly along that bar (so it only looked like it was
+ * getting longer); hands are snapped onto a fixed-length arc so the bar tilts through the rep.
  */
 function landmine(m: Motion): Motion {
   const oneHand = m.hold === "R";
+  const layout = (B: Body) => {
+    const h0 = landmineHold(m.pose(B, 0), oneHand);
+    const h1 = landmineHold(m.pose(B, 1), oneHand);
+    const pivot: Vec = [Math.max(h0[0], h1[0]) + LANDMINE_PIVOT_AHEAD, 0.03, 0];
+    const barLen = Math.max(len(sub(h0, pivot)), len(sub(h1, pivot)));
+    let e0 = elevFrom(pivot, h0);
+    let e1 = elevFrom(pivot, h1);
+    if (Math.abs(e1 - e0) < LANDMINE_MIN_SWEEP) {
+      const mid = (e0 + e1) / 2;
+      const half = LANDMINE_MIN_SWEEP / 2;
+      if (e1 >= e0) {
+        e0 = mid - half;
+        e1 = mid + half;
+      } else {
+        e0 = mid + half;
+        e1 = mid - half;
+      }
+    }
+    return { pivot, barLen, e0, e1, r0: elevFrom(pivot, h0), r1: elevFrom(pivot, h1) };
+  };
   const pose: Motion["pose"] = (B, d) => {
     const p = m.pose(B, d);
-    const h = p.hand;
-    return { ...p, bar: undefined, hand: Array.isArray(h) ? [h[0], h[1], 0.06] : h };
+    const { pivot, barLen, e0, e1, r0, r1 } = layout(B);
+    const free = landmineHold(p, oneHand);
+    const span = r1 - r0;
+    // When the free motion barely changes height, drive the arc from the phase itself.
+    const t = Math.abs(span) < 1e-4 ? d : clamp((elevFrom(pivot, free) - r0) / span, 0, 1);
+    const elev = lerp(e0, e1, t);
+    // Keep the free hand's left/right heading; only the elevation is remapped onto the arc.
+    const flat = norm([free[0] - pivot[0], 0, free[2] - pivot[2]]);
+    const target = add(pivot, [flat[0] * Math.cos(elev) * barLen, Math.sin(elev) * barLen, flat[2] * Math.cos(elev) * barLen]);
+    if (oneHand) {
+      const [l] = handsOf(p, LANDMINE_GRIP);
+      return { ...p, bar: undefined, hand: { L: l, R: target } };
+    }
+    return { ...p, bar: undefined, hand: [target[0], target[1], LANDMINE_GRIP] };
   };
   return {
     ...m,
     load: "none",
-    grip: 0.06,
+    grip: LANDMINE_GRIP,
     pose,
     props: (B) => {
-      const [l, r] = handsOf(pose(B, 0), 0.06);
-      const x = Math.max(l[0], r[0]);
-      const pole: Prop = { kind: "pole", from: [x + 1.4, 0.03, 0], to: oneHand ? "handR" : "hands", past: 0.08 };
+      const { pivot } = layout(B);
+      const pole: Prop = { kind: "pole", from: pivot, to: oneHand ? "handR" : "hands", past: 0.08 };
       return [...(m.props?.(B) ?? []).filter((q) => q.kind !== "cable"), pole];
     },
   };
