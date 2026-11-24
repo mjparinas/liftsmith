@@ -205,7 +205,8 @@ export function TabSkeleton({ tab }: { tab: string }) {
         return (
           <>
             <CardBones body="rows" />
-            <TileBones n={8} />
+            <TileBones n={4} />
+            <CardBones body="rows" />
             <CardBones body="chart" />
             <CardBones body="chart" />
           </>

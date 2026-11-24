@@ -23,10 +23,18 @@ const ACTIONS: { action: ReportAction; label: string; danger?: boolean }[] = [
   { action: "suspend", label: "Ban author", danger: true },
 ];
 
+/** Danger actions need a second tap naming the effect; Dismiss stays one tap. */
+const CONFIRM_LABEL: Partial<Record<ReportAction, string>> = {
+  remove: "Confirm remove?",
+  suspend: "Confirm ban?",
+};
+
 export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: number) => void }) {
   const [rows, setRows] = useState<ReportGroup[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  /** Armed danger action: same row + action a second time runs it. */
+  const [armed, setArmed] = useState<{ id: string; action: ReportAction } | null>(null);
   useEffect(() => {
     let live = true;
     fetch("/api/admin/reports/")
@@ -72,7 +80,19 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
       body: JSON.stringify({ kind: g.kind, id: g.targetId, action }),
     });
     if (!r.ok) setError(((await r.json().catch(() => ({}))) as { error?: string }).error ?? "That didn't work.");
+    setArmed(null);
     load();
+  };
+  /** Remove and Ban need two taps; Dismiss and Unban run at once. Returns true when the request was sent. */
+  const requestAct = (g: ReportGroup, action: ReportAction): boolean => {
+    const needsConfirm = action === "remove" || action === "suspend";
+    const id = key(g);
+    if (needsConfirm && !(armed?.id === id && armed.action === action)) {
+      setArmed({ id, action });
+      return false;
+    }
+    void act(g, action);
+    return true;
   };
   return (
     <Card title="Reports on Friends, coach reviews and the community">
@@ -122,7 +142,7 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                 {admin && (
                   <Tip
                     tip={tips[key(g)]}
-                    act={(a) => act(g, a)}
+                    act={(a) => requestAct(g, a)}
                     drop={() => setTips((t) => Object.fromEntries(Object.entries(t).filter(([k]) => k !== key(g))))}
                   />
                 )}
@@ -133,16 +153,25 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                     (a) =>
                       !(a.action === "remove" && !g.content) &&
                       !(a.action === "suspend" && (g.kind === "review" || g.kind === "routine") && !g.author?.handle),
-                  ).map((a) => (
-                    <button
-                      key={a.action}
-                      type="button"
-                      onClick={() => void act(g, a.action)}
-                      className={`press rounded-lg px-3 py-1.5 ${a.danger ? "border border-bad/40 text-bad" : "border border-line text-muted"}`}
-                    >
-                      {a.label}
-                    </button>
-                  ))}
+                  ).map((a) => {
+                    const ready = armed?.id === key(g) && armed.action === a.action;
+                    return (
+                      <button
+                        key={a.action}
+                        type="button"
+                        onClick={() => requestAct(g, a.action)}
+                        className={`press rounded-lg px-3 py-1.5 ${
+                          a.danger
+                            ? ready
+                              ? "border border-bad bg-bad/15 font-semibold text-bad"
+                              : "border border-bad/40 text-bad"
+                            : "border border-line text-muted"
+                        }`}
+                      >
+                        {ready ? (CONFIRM_LABEL[a.action] ?? `Confirm ${a.label}?`) : a.label}
+                      </button>
+                    );
+                  })}
                   {ai?.ready && !tips[key(g)] && (
                     <button type="button" onClick={() => void suggest(g)} className={aiBtn}>
                       Suggest
@@ -175,7 +204,8 @@ function Tip({
   drop,
 }: {
   tip: Suggestion | "…" | { error: string } | undefined;
-  act: (a: ReportAction) => Promise<void>;
+  /** Returns true when the action was sent (not merely armed). */
+  act: (a: ReportAction) => boolean;
   drop: () => void;
 }) {
   if (!tip) return null;
@@ -191,7 +221,9 @@ function Tip({
       label={LABEL[tip.action]}
       reason={tip.reason}
       danger={tip.action !== "dismiss"}
-      doIt={() => act(tip.action).then(drop)}
+      doIt={() => {
+        if (act(tip.action)) drop();
+      }}
       dismiss={drop}
     />
   );
