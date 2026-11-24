@@ -75,6 +75,19 @@ export interface Factors {
 export const canShape = (s: BodyStats) =>
   !!(s.heightCm && s.weightKg) || s.bodyFat != null || Object.values(s.measures ?? {}).some((v) => v != null && v > 0);
 
+/** Stable key for the numbers that shape the figure, so logging a set doesn't rebuild a new Body object. */
+export function statsKey(s: BodyStats): string {
+  const m = s.measures ?? {};
+  const sites = (Object.keys(m) as MeasureSite[]).sort();
+  return [
+    s.sex ?? "",
+    s.heightCm ?? "",
+    s.weightKg ?? "",
+    s.bodyFat ?? "",
+    ...sites.map((k) => `${k}:${m[k] ?? ""}`),
+  ].join("|");
+}
+
 export function factors(key: BodyKey, s: BodyStats): Factors {
   const avg = AVERAGE[key];
   const height = s.heightCm && s.heightCm >= 120 && s.heightCm <= 230 ? s.heightCm : avg.heightCm;
