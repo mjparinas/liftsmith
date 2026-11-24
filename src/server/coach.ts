@@ -15,6 +15,7 @@ import { liveStatus, muted, shownState, type Presence, type Shown } from "@/lib/
 import { isSticker, stickerEmoji, type StickerId } from "@/lib/stickers";
 
 import { hasRoom } from "./coachPlan";
+import { assignsForClient, assignsForPair, type ProgramAssign } from "./coachProgramAssign";
 import { presenceCleanup, presenceOf, presences, stopTyping, touchSeen, typingTo } from "./coachPresence";
 import { batch, query, rateLimit, run } from "./db";
 import { notifyCoach } from "./push";
@@ -251,6 +252,8 @@ export async function overview(
   role: Role | null;
   /** Whether this account has ever coached (its first invite made it a coach), so the app opens the coach's pages. */
   coach: boolean;
+  /** Season programs this lifter's coaches assigned (pending or active). */
+  programAssigns: ProgramAssign[];
 }> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
@@ -274,6 +277,7 @@ export async function overview(
     coaches: await people(coaches, true),
     plans: plans.map(plan),
     notes: notes.map(note),
+    programAssigns: await assignsForClient(accountId),
     setup: await setupOf(accountId),
     unread: await unreadFrom(accountId),
     bodyShared: (await query<{ id: string }>("SELECT coach_id AS id FROM coach_shares WHERE client_id = ? AND body = 1", [accountId])).map(
@@ -398,6 +402,7 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
       sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)",
       args: pair,
     },
+    { sql: "DELETE FROM coach_program_assigns WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
   ]);
 }
 
@@ -560,6 +565,8 @@ export interface ClientView {
   events: Record<string, unknown>[];
   /** The routines this coach assigned to the client. */
   plans: Plan[];
+  /** Season programs this coach assigned to the client. */
+  programAssigns: ProgramAssign[];
   /** This coach's note to the client, if any. */
   note: Note | null;
   /** The client's body data, only when they share it with this coach. */
@@ -629,6 +636,7 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     daysPerWeek,
     events: events.reverse(),
     plans: plans.map(plan),
+    programAssigns: await assignsForPair(coachId, clientId),
     note: n ? note(n) : null,
     body: shares.body ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
     pain,
@@ -1246,4 +1254,5 @@ export const coachCleanup = (accountId: string) => [
   ...presenceCleanup(accountId),
   // Reviews it wrote and reviews of it (coachReviews.ts).
   { sql: "DELETE FROM coach_reviews WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_program_assigns WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

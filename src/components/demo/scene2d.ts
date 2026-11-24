@@ -1,4 +1,4 @@
-import { barDiscs, poleRadii, trapDiscs } from "@/lib/demo/barPlates";
+import { barDiscs, poleDiscs, trapDiscs } from "@/lib/demo/barPlates";
 import { partIndices, placeVec } from "@/lib/demo/mesh";
 import { anchorAt, poleSegments, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
 
@@ -172,9 +172,9 @@ export function createScene2D(canvas: HTMLCanvasElement): Scene {
         ring(mid, 0.12, "y");
       }
       if (load === "wheel") ring([mid[0], 0.1, mid[2]], 0.09, "z");
-      const radii = poleRadii(f.s.loading, f.s.unit);
+      const discs = poleDiscs(f.s.loading, f.s.unit);
       for (const p of f.motion.props?.(f.body) ?? []) {
-        const prop = radii !== null && p.kind === "pole" ? { ...p, plates: radii, plate: undefined } : p;
+        const prop = discs !== null && p.kind === "pole" ? { ...p, plates: discs, plate: undefined } : p;
         drawProp(prop, J, line);
       }
       ctx.stroke();

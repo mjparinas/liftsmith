@@ -29,6 +29,30 @@ async function plan(sql: string): Promise<string[]> {
 
 const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] = [
   {
+    name: "season programs: client's pending/active assigns (coachProgramAssign.ts assignsForClient)",
+    sql: "SELECT * FROM coach_program_assigns WHERE client_id = ? AND status IN ('pending', 'active') ORDER BY created_at DESC",
+    uses: ["coach_program_assigns_client"],
+    noScan: ["coach_program_assigns"],
+  },
+  {
+    name: "season programs: coach's program cohort (coachProgramAssign.ts assignsForProgram)",
+    sql: "SELECT * FROM coach_program_assigns WHERE coach_id = ? AND program_id = ? AND status IN ('pending', 'active') ORDER BY created_at DESC",
+    uses: ["coach_program_assigns_coach"],
+    noScan: ["coach_program_assigns"],
+  },
+  {
+    name: "season programs: team assigns (coachProgramAssign.ts assignsForTeam)",
+    sql: "SELECT * FROM coach_program_assigns WHERE coach_id = ? AND team_id = ? AND status IN ('pending', 'active') ORDER BY created_at DESC",
+    uses: ["coach_program_assigns_team"],
+    noScan: ["coach_program_assigns"],
+  },
+  {
+    name: "season programs: open assigns for a pair (coachProgramAssign.ts endOpen)",
+    sql: "SELECT id, title FROM coach_program_assigns WHERE coach_id = ? AND client_id = ? AND status IN ('pending', 'active')",
+    uses: ["coach_program_assigns_pair"],
+    noScan: ["coach_program_assigns"],
+  },
+  {
     name: "gym imports: map gyms staff deleted (gymPlaces.ts deletedRefs)",
     sql: "SELECT source_ref FROM gym_places_deleted WHERE source_ref IN (?, ?, ?)",
     uses: ["sqlite_autoindex_gym_places_deleted_1"],

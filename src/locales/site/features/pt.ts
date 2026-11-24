@@ -561,6 +561,11 @@ export const pt: FeaturesText = {
       note: "Programas pagos são comprados no site; os apps de Android e iPhone mostram os programas grátis e os que você já tem.",
       proPart: "Pegar programas é grátis; criá-los faz parte do coaching, que é Pro.",
     },
+    "coach-assign-program": {
+      name: "Atribuir um programa de temporada a clientes ou a uma equipa",
+      body: "Os treinadores atribuem um programa de vários dias (Upper/Lower, Push/Pull/Legs ou o seu) como plano fixo por dias da semana durante N semanas. Os atletas seguem uma vez; Hoje mostra o treino desse dia. Um calendário do programa mostra quem fez cada dia e quem ainda não — só primeiros nomes em equipas escolares, nunca pesos.",
+      proPart: "Seguir um programa é grátis; atribuir faz parte do coaching, que é Pro.",
+    },
     "coach-reviews": {
       name: "Notas e avaliações de alunos reais",
       body: "Os alunos dão estrelas e uma avaliação curta ao seu coach, personal trainer ou fisioterapeuta depois de quatro semanas ou duas sessões juntos. A nota aparece quando o coach tem três avaliações, ao lado de quantos alunos dele treinaram nas últimas duas semanas, no convite dele e na lista de personal trainers. Os coaches respondem uma vez a cada uma, e qualquer pessoa pode denunciar uma avaliação. Só adultos podem avaliar.",

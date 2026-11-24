@@ -26,5 +26,7 @@ describe("admin frame", () => {
     expect(screen.getByLabelText("3 waiting")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1, name: "Liftsmith admin" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Users" })).toBeInTheDocument();
+    // Group labels stay visible on every width (phone chips used to hide them).
+    for (const g of TAB_GROUPS) expect(screen.getByText(g.label)).toBeInTheDocument();
   });
 });

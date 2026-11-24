@@ -36,7 +36,7 @@ import { System } from "./System";
 import { countryName } from "./time";
 import { Todo } from "./Todo";
 import { summarizeTodo, todoBadge, type TodoSummary } from "./todoCount";
-import { sessionGate, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
+import { loadTwoFactor, sessionGate, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
 import { Users } from "./Users";
 
 type Staff = { email: string; role: "admin" | "support" };
@@ -49,6 +49,21 @@ const PERIODS = [7, 28, 90, 365] as const;
 /** The tabs drawn from the one stats answer (the others load their own). */
 const STATS_TABS = new Set<Tab>(["Overview", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue"]);
 const PERIOD_TABS = new Set<Tab>(["Overview", "Traffic", "Acquisition", "Funnel", "Engagement", "Devices", "Revenue", "Codes"]);
+/** Tabs that fetch their own data — still usable when the stats payload fails. */
+const WORK_WITHOUT_STATS = new Set<Tab>([
+  "To Do",
+  "Inbox",
+  "Reports",
+  "Community",
+  "Gyms",
+  "Users",
+  "Installs",
+  "Flags",
+  "Seasons",
+  "Automations",
+  "System",
+  "Log",
+]);
 
 /** Where the panel is: a tab, and an account (Users) or install (Installs) open on it. In the address as ?tab=&open=. */
 type View = { tab: Tab; open: string | null; q?: string };
@@ -564,6 +579,9 @@ export function AdminApp() {
   const [dataDays, setDataDays] = useState<number | null>(null);
   const [state, setState] = useState<"loading" | "signin" | "twofactor" | "ok" | "error">("loading");
   const [twoFactor, setTwoFactor] = useState<TwoFactorInfo | null>(null);
+  /** Staff identity kept when stats fail, so the shell and Work tabs still have Sign out and role. */
+  const [staff, setStaff] = useState<Staff | null>(null);
+  const [statsEpoch, setStatsEpoch] = useState(0);
   // Maintenance mode's state, for the banner on every tab and the switch on System.
   const maintenance = useMaintenance();
   const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
@@ -618,6 +636,12 @@ export function AdminApp() {
   }, [state, inboxCount, todoList, reportsCount]);
   useEffect(() => {
     let live = true;
+    const fail = async () => {
+      const info = await loadTwoFactor();
+      if (!live) return;
+      if (info) setStaff({ email: info.email, role: info.role });
+      setState("error");
+    };
     const stats = () => fetch(`/api/admin/stats/?days=${days}`);
     stats()
       // A lone 404 is asked again once before it counts, so one odd answer doesn't look like a sign-out.
@@ -629,30 +653,83 @@ export function AdminApp() {
           const gate = await sessionGate();
           if (!live) return;
           setTwoFactor(gate.info);
+          if (gate.info) setStaff({ email: gate.info.email, role: gate.info.role });
           return setState(gate.state);
         }
-        if (!r.ok) return setState("error");
+        if (!r.ok) return fail();
         const j = (await r.json()) as Data;
         if (!live) return;
         setData(j);
+        setStaff(j.staff);
         setDataDays(days);
         setState("ok");
       })
-      .catch(() => live && setState("error"));
+      .catch(() => live && void fail());
     return () => {
       live = false;
     };
-  }, [days]);
+  }, [days, statsEpoch]);
 
   if (state === "signin") return <SignIn />;
   if (state === "twofactor" && twoFactor) return <TwoFactorGate info={twoFactor} />;
-  if (state === "error")
+
+  const who = data?.staff ?? staff;
+  const signOut = () =>
+    void fetch("/api/admin/logout/", { method: "POST" }).then(() => {
+      setData(null);
+      setStaff(null);
+      setState("signin");
+    });
+  const retryStats = () => {
+    setState("loading");
+    setStatsEpoch((n) => n + 1);
+  };
+
+  const workPanels = (isAdmin: boolean, me: string) => (
+    <>
+      {tab === "Users" && (
+        <Users key={view.q ?? ""} admin={isAdmin} me={me} open={view.open} setOpen={openIn("Users")} initialQuery={view.q} />
+      )}
+      {tab === "Installs" && <Installs admin={isAdmin} open={view.open} setOpen={openIn("Installs")} />}
+      {tab === "To Do" && <Todo admin={isAdmin} go={go} onList={todoList} />}
+      {tab === "Inbox" && <Inbox admin={isAdmin} onCount={inboxCount} onMail={setMail} open={view.open} setOpen={openIn("Inbox")} />}
+      {tab === "Reports" && (
+        <>
+          <Reports admin={isAdmin} onCount={reportsCount} />
+          <GymReports admin={isAdmin} />
+          <GymPlaceReports admin={isAdmin} />
+        </>
+      )}
+      {tab === "Community" && <Community admin={isAdmin} />}
+      {tab === "Gyms" && <GymPlaces admin={isAdmin} />}
+      {tab === "Flags" && <Flags admin={isAdmin} />}
+      {tab === "Seasons" && <Seasons admin={isAdmin} />}
+      {tab === "Automations" && <Automations admin={isAdmin} />}
+      {tab === "System" && <System admin={isAdmin} maintenance={maintenance} />}
+      {tab === "Log" && <Log />}
+    </>
+  );
+
+  if (state === "error") {
     return (
-      <main className="p-8 text-muted">
-        The stats didn&apos;t load. You&apos;re still signed in: reload to try again. If it keeps happening, check the database
-        (DATABASE_URL or TURSO_DATABASE_URL).
-      </main>
+      <AdminShell tab={tab} onTab={go} badges={badges} staff={who ?? undefined} onSignOut={who ? signOut : undefined}>
+        <div className="card mt-4 space-y-3 p-4" role="alert">
+          <p className="text-sm text-muted">
+            The stats didn&apos;t load. You&apos;re still signed in. Try again, or open To Do, Inbox or Reports — those load on their own.
+            If it keeps happening, check the database (DATABASE_URL or TURSO_DATABASE_URL).
+          </p>
+          <button type="button" className="btn press btn-primary px-4 py-2 font-semibold" onClick={retryStats}>
+            Try again
+          </button>
+          {!WORK_WITHOUT_STATS.has(tab) && (
+            <p className="text-sm text-muted">This tab needs the stats payload. Switch to a Work tab while it retries.</p>
+          )}
+        </div>
+        {who && WORK_WITHOUT_STATS.has(tab) && <div className="mt-4 space-y-4">{workPanels(who.role === "admin", who.email)}</div>}
+      </AdminShell>
     );
+  }
+
   if (!data) return <AdminSkeleton tab={tab} />;
   // Tabs drawn from the stats answer, while a new period's answer is on its way.
   const stale = dataDays !== days && STATS_TABS.has(tab);
@@ -660,7 +737,6 @@ export function AdminApp() {
   const rev = data.revenue;
   const site = data.site;
 
-  const signOut = () => void fetch("/api/admin/logout/", { method: "POST" }).then(() => setState("signin"));
   return (
     <AdminShell
       tab={tab}
@@ -707,30 +783,42 @@ export function AdminApp() {
         {!stale && tab === "Overview" && (
           <>
             <NeedsYou go={go} onList={todoList} />
+            {/* Four action-linked KPIs; the rest sit under More metrics so Overview stays a triage desk. */}
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="New installs" value={fmtInt(o.installs)} delta={delta(o.installs, o.prevInstalls)} sub="vs the period before" />
-              <Tile label="Site visitors" value={fmtInt(o.visitors)} delta={delta(o.visitors, o.prevVisitors)} sub="daily unique, summed" />
               <Tile
                 label="Active today / week / month"
                 value={`${fmtInt(o.dau)} / ${fmtInt(o.wau)} / ${fmtInt(o.mau)}`}
                 sub={`stickiness ${fmtPct(o.stickiness, 0)} (DAU/MAU)`}
               />
               <Tile label="Workouts finished" value={fmtInt(o.workouts)} delta={delta(o.workouts, o.prevWorkouts ?? 0)} />
-              <Tile
-                label="Finished setup"
-                value={fmtPct(o.setupRate, 0)}
-                points={pts(o.setupRate, o.prevSetupRate)}
-                sub={o.minutesToSetup != null ? `median ${o.minutesToSetup} min after install` : undefined}
-              />
-              <Tile
-                label="Started a workout"
-                value={fmtPct(o.firstWorkoutRate, 0)}
-                points={pts(o.firstWorkoutRate, o.prevFirstWorkoutRate)}
-                sub={o.hoursToFirstWorkout != null ? `median ${o.hoursToFirstWorkout} h after install` : undefined}
-              />
-              <Tile label="Trial starts" value={fmtInt(o.trialStarts)} delta={delta(o.trialStarts, o.prevTrialStarts)} />
               <Tile label="MRR gross / net" value={`${fmtUsd(o.grossMrr)} / ${fmtUsd(o.netMrr)}`} sub={`${fmtInt(o.paying)} paying`} />
             </div>
+            <details className="card group p-3">
+              <summary className="cursor-pointer text-sm font-semibold text-muted marker:text-accent hover:text-ink">More metrics</summary>
+              <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                <Tile
+                  label="Site visitors"
+                  value={fmtInt(o.visitors)}
+                  delta={delta(o.visitors, o.prevVisitors)}
+                  sub="daily unique, summed"
+                />
+                <Tile
+                  label="Finished setup"
+                  value={fmtPct(o.setupRate, 0)}
+                  points={pts(o.setupRate, o.prevSetupRate)}
+                  sub={o.minutesToSetup != null ? `median ${o.minutesToSetup} min after install` : undefined}
+                />
+                <Tile
+                  label="Started a workout"
+                  value={fmtPct(o.firstWorkoutRate, 0)}
+                  points={pts(o.firstWorkoutRate, o.prevFirstWorkoutRate)}
+                  sub={o.hoursToFirstWorkout != null ? `median ${o.hoursToFirstWorkout} h after install` : undefined}
+                />
+                <Tile label="Trial starts" value={fmtInt(o.trialStarts)} delta={delta(o.trialStarts, o.prevTrialStarts)} />
+              </div>
+              <p className="mt-2 text-xs text-faint">Traffic, Funnel and Revenue tabs have the full breakdowns.</p>
+            </details>
             <Card title="New installs a day" subtitle="By store.">
               <StackedBars
                 rows={data.installsDaily}
@@ -1037,35 +1125,7 @@ export function AdminApp() {
         )}
 
         {tab === "Codes" && <Creators admin={data.staff.role === "admin"} days={days} />}
-        {tab === "Users" && (
-          <Users
-            key={view.q ?? ""}
-            admin={data.staff.role === "admin"}
-            me={data.staff.email}
-            open={view.open}
-            setOpen={openIn("Users")}
-            initialQuery={view.q}
-          />
-        )}
-        {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
-        {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onList={todoList} />}
-        {tab === "Inbox" && (
-          <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} onMail={setMail} open={view.open} setOpen={openIn("Inbox")} />
-        )}
-        {tab === "Reports" && (
-          <>
-            <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />
-            <GymReports admin={data.staff.role === "admin"} />
-            <GymPlaceReports admin={data.staff.role === "admin"} />
-          </>
-        )}
-        {tab === "Community" && <Community admin={data.staff.role === "admin"} />}
-        {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
-        {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
-        {tab === "Seasons" && <Seasons admin={data.staff.role === "admin"} />}
-        {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
-        {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
-        {tab === "Log" && <Log />}
+        {workPanels(data.staff.role === "admin", data.staff.email)}
       </div>
     </AdminShell>
   );

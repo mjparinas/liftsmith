@@ -174,61 +174,72 @@ function Message({
         </button>
       }
     >
-      <div className="mb-3 flex flex-wrap gap-2 text-sm">
-        {m.hasHtml && (
+      <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
+        {admin && !m.archivedAt && onNext && (
           <button
             type="button"
-            aria-pressed={plain}
-            onClick={() => setPlain(!plain)}
+            title="Key: e"
+            onClick={() => void thenNext({ action: "archive", archived: true }, "Archived.")}
+            className="press rounded-lg btn-primary px-3 py-1.5 font-semibold"
+          >
+            Archive and next
+          </button>
+        )}
+        {admin && !m.handledAt && onNext && (
+          <button
+            type="button"
+            title="Key: d"
+            onClick={() => void thenNext({ action: "handled", handled: true }, "Marked as done.")}
             className="press rounded-lg border border-line px-3 py-1.5"
           >
-            {plain ? "Show formatted" : "Plain text"}
+            Done and next
           </button>
         )}
-        {m.hasHtml && !plain && m.remoteImages && !images && (
-          <button type="button" onClick={() => setImages(true)} className="press rounded-lg border border-line px-3 py-1.5">
-            Load images
-          </button>
-        )}
-        {admin && (
-          <>
-            {!m.archivedAt && onNext && (
-              <button
-                type="button"
-                title="Key: e"
-                onClick={() => void thenNext({ action: "archive", archived: true }, "Archived.")}
-                className="press rounded-lg btn-primary px-3 py-1.5 font-semibold"
-              >
-                Archive and next
-              </button>
-            )}
-            {!m.handledAt && onNext && (
-              <button
-                type="button"
-                title="Key: d"
-                onClick={() => void thenNext({ action: "handled", handled: true }, "Marked as done.")}
-                className="press rounded-lg border border-line px-3 py-1.5"
-              >
-                Done and next
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => void act({ action: "handled", handled: !m.handledAt }, m.handledAt ? "Marked as waiting." : "Marked as done.")}
-              className="press rounded-lg border border-line px-3 py-1.5"
-            >
-              {m.handledAt ? "Mark as waiting" : "Mark as done"}
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                void act({ action: "archive", archived: !m.archivedAt }, m.archivedAt ? "Moved back to the inbox." : "Archived.")
-              }
-              className="press rounded-lg border border-line px-3 py-1.5"
-            >
-              {m.archivedAt ? "Move to inbox" : "Archive"}
-            </button>
-          </>
+        {(admin || m.hasHtml) && (
+          <details className="relative">
+            <summary className="press cursor-pointer list-none rounded-lg border border-line px-3 py-1.5 marker:content-none [&::-webkit-details-marker]:hidden">
+              More
+            </summary>
+            <div className="absolute left-0 z-10 mt-1 flex min-w-[11rem] flex-col gap-1 rounded-xl border border-line bg-surface p-2 shadow-lg">
+              {m.hasHtml && (
+                <button
+                  type="button"
+                  aria-pressed={plain}
+                  onClick={() => setPlain(!plain)}
+                  className="press rounded-lg px-3 py-1.5 text-left hover:bg-raised"
+                >
+                  {plain ? "Show formatted" : "Plain text"}
+                </button>
+              )}
+              {m.hasHtml && !plain && m.remoteImages && !images && (
+                <button type="button" onClick={() => setImages(true)} className="press rounded-lg px-3 py-1.5 text-left hover:bg-raised">
+                  Load images
+                </button>
+              )}
+              {admin && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void act({ action: "handled", handled: !m.handledAt }, m.handledAt ? "Marked as waiting." : "Marked as done.")
+                    }
+                    className="press rounded-lg px-3 py-1.5 text-left hover:bg-raised"
+                  >
+                    {m.handledAt ? "Mark as waiting" : "Mark as done"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void act({ action: "archive", archived: !m.archivedAt }, m.archivedAt ? "Moved back to the inbox." : "Archived.")
+                    }
+                    className="press rounded-lg px-3 py-1.5 text-left hover:bg-raised"
+                  >
+                    {m.archivedAt ? "Move to inbox" : "Archive"}
+                  </button>
+                </>
+              )}
+            </div>
+          </details>
         )}
       </div>
       {m.remoteImages && !images && !plain && (
@@ -436,7 +447,7 @@ export function Inbox({
           Refresh
         </button>
       </div>
-      <p className="hidden text-xs text-faint md:block">
+      <p className="text-xs text-faint">
         Keys: j and k move through the list, e archives and opens the next, d marks done and opens the next, r replies, / searches, Esc
         closes.
       </p>

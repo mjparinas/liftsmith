@@ -15,6 +15,8 @@ import { BODIES, type Anchor, type Body, type Hold, type Load, type Pose, type P
 const WEIGHTS: Equipment[] = ["barbell", "ezBar", "trapBar", "dumbbells", "kettlebells", "medicineBall"];
 const PULLS: Equipment[] = ["cable", "latPulldown", "seatedRow"];
 const HAND_LOADS: Load[] = ["barbell", "dumbbell", "kettlebell", "ball", "handle", "none"];
+/** Narrow grip on the free sleeve; landmine / T-bar hands sit close together. */
+const LANDMINE_GRIP = 0.06;
 
 const cable = (from: Anchor, to: Anchor): Prop => ({ kind: "cable", from, to });
 const rail = (at: Vec, length: number): Prop => ({ kind: "rail", at, length, axis: "y" });
@@ -45,21 +47,22 @@ function handsOf(p: Pose, grip: number): [Vec, Vec] {
 /**
  * A landmine move: the hands hold the end of a bar whose other end pivots on the floor ahead, so it
  * draws that bar (a `pole`) instead of a level barbell or a handle, the hands close together on it.
+ * Hands keep the free family's path (so arms stay in reach); only the grip is narrowed onto the sleeve.
  */
 function landmine(m: Motion): Motion {
   const oneHand = m.hold === "R";
   const pose: Motion["pose"] = (B, d) => {
     const p = m.pose(B, d);
     const h = p.hand;
-    return { ...p, bar: undefined, hand: Array.isArray(h) ? [h[0], h[1], 0.06] : h };
+    return { ...p, bar: undefined, hand: Array.isArray(h) ? [h[0], h[1], LANDMINE_GRIP] : h };
   };
   return {
     ...m,
     load: "none",
-    grip: 0.06,
+    grip: LANDMINE_GRIP,
     pose,
     props: (B) => {
-      const [l, r] = handsOf(pose(B, 0), 0.06);
+      const [l, r] = handsOf(pose(B, 0), LANDMINE_GRIP);
       const x = Math.max(l[0], r[0]);
       const pole: Prop = { kind: "pole", from: [x + 1.4, 0.03, 0], to: oneHand ? "handR" : "hands", past: 0.08 };
       return [...(m.props?.(B) ?? []).filter((q) => q.kind !== "cable"), pole];

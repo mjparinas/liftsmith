@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { AVERAGE, canShape, factors, LIMITS, shapeBody, statsFrom } from "./bodyShape";
+import { AVERAGE, canShape, factors, LIMITS, shapeBody, statsFrom, statsKey } from "./bodyShape";
 import { BODIES } from "./demo/rig";
 import type { AppEvent } from "./types";
 
@@ -75,5 +75,12 @@ describe("body shape", () => {
       bodyFat: 25,
       measures: { waist: 86 },
     });
+  });
+
+  it("keeps the same stats key when only the object identity changes", () => {
+    const a = { sex: "male" as const, heightCm: 180, weightKg: 85, bodyFat: 20, measures: { waist: 86, arm: 33 } };
+    const b = { ...a, measures: { arm: 33, waist: 86 } };
+    expect(statsKey(a)).toBe(statsKey(b));
+    expect(statsKey({ ...a, weightKg: 86 })).not.toBe(statsKey(a));
   });
 });

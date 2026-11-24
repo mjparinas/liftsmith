@@ -561,6 +561,11 @@ export const pl: FeaturesText = {
       note: "Płatne programy kupuje się na stronie; aplikacje na Androida i iPhone'a pokazują programy darmowe i te, które już masz.",
       proPart: "Pobieranie programów jest darmowe; tworzenie ich to część coachingu, który jest w Pro.",
     },
+    "coach-assign-program": {
+      name: "Przypisz program sezonowy klientom lub drużynie",
+      body: "Trenerzy przypisują wielodniowy program (Upper/Lower, Push/Pull/Legs lub własny) jako plan przypięty do dni tygodnia na N tygodni. Sportowcy śledzą go raz; Dziś pokazuje trening tego dnia. Kalendarz programu pokazuje, kto zrobił każdy dzień, a kto jeszcze nie — tylko imiona w drużynach szkolnych, nigdy ciężary.",
+      proPart: "Śledzenie programu jest darmowe; przypisywanie należy do coachingu, który jest Pro.",
+    },
     "coach-reviews": {
       name: "Oceny i opinie od prawdziwych podopiecznych",
       body: "Podopieczni oceniają swojego trenera, trenera personalnego albo fizjoterapeutę gwiazdkami i krótką opinią po czterech tygodniach lub dwóch wspólnych sesjach. Ocena pojawia się, gdy trener ma trzy opinie, obok liczby jego podopiecznych, którzy trenowali w ostatnich dwóch tygodniach, w zaproszeniu i w katalogu trenerów. Trener może raz odpowiedzieć na każdą opinię, a każdy może opinię zgłosić. Opinie mogą wystawiać tylko osoby pełnoletnie.",

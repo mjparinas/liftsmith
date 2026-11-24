@@ -1,6 +1,8 @@
 import { plateStyle, type Loading } from "@/lib/plates";
 import type { Unit } from "@/lib/types";
 
+import type { PoleDisc } from "./rig";
+
 // Turns a real bar loading (`loadBar`) into disc sizes and sleeve positions for the 3D/2D demos.
 // Without a loading the demos keep their fixed decorative stack.
 
@@ -80,11 +82,17 @@ export function trapDiscs(loading: Loading | null | undefined, unit: Unit | null
 }
 
 /**
- * Radii for landmine pole rings (heaviest nearest the hands). Empty when there's no loading;
- * the pole then keeps its single default ring.
+ * Discs for a landmine sleeve (heaviest nearest the hands). `null` when there's no loading (keep the
+ * pole's single default disc); empty when the bar is unloaded.
  */
-export function poleRadii(loading: Loading | null | undefined, unit: Unit | null | undefined): number[] | null {
+export function poleDiscs(loading: Loading | null | undefined, unit: Unit | null | undefined): PoleDisc[] | null {
   if (!loading?.oneEnd || !unit) return null;
   if (!loading.perSide.length) return [];
-  return loading.perSide.slice(0, MAX_DISCS).map((w) => discSize(w, unit).r);
+  return loading.perSide.slice(0, MAX_DISCS).map((w) => discSize(w, unit));
+}
+
+/** Radii only (from `poleDiscs`); kept for callers that don't need thickness. */
+export function poleRadii(loading: Loading | null | undefined, unit: Unit | null | undefined): number[] | null {
+  const discs = poleDiscs(loading, unit);
+  return discs === null ? null : discs.map((d) => d.r);
 }

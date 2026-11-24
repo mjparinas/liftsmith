@@ -132,13 +132,11 @@ export function AdminShell({
           )}
           <BuildStamp className="hidden lg:block" />
         </div>
-        <nav className="order-3 flex w-full flex-wrap gap-1 lg:order-2 lg:block" aria-label="Sections">
+        <nav className="order-3 flex w-full flex-col gap-3 lg:order-2 lg:block lg:gap-0" aria-label="Sections">
           {TAB_GROUPS.map((g) => (
-            <div key={g.label} className="contents lg:mb-3 lg:block">
-              <div className={`${SECTION_LABEL} hidden px-3 pb-1.5 lg:block`} aria-hidden>
-                {g.label}
-              </div>
-              <ul className="contents lg:flex lg:flex-col lg:gap-0.5">
+            <div key={g.label} className="min-w-0 lg:mb-3">
+              <div className={`${SECTION_LABEL} px-1 pb-1 lg:px-3 lg:pb-1.5`}>{g.label}</div>
+              <ul className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
                 {g.tabs.map((t) => (
                   <NavItem key={t} tab={t} on={tab === t} badge={badges[t]} onClick={() => onTab?.(t)} />
                 ))}

@@ -117,6 +117,23 @@ describe("the gear each exercise needs is drawn", () => {
     expect(motionFor("seal-row").load).toBe("barbell");
     expect(motionFor("machine-row").load).toBe("handle");
   });
+
+  it("keeps landmine hands on a narrow sleeve grip within arm reach", () => {
+    for (const id of ["landmine-press", "landmine-chest-press", "landmine-row", "landmine-squat"]) {
+      const m = motionFor(id);
+      expect(m.grip, id).toBe(0.06);
+      expect(
+        props(id).some((p) => p.kind === "pole"),
+        id,
+      ).toBe(true);
+      for (const d of [0, 0.5, 1]) {
+        const J = jointsAt(m, B, d);
+        const reach = B.upper + B.fore + 0.03;
+        expect(Math.hypot(J.handL[0] - J.shL[0], J.handL[1] - J.shL[1], J.handL[2] - J.shL[2]), `${id} L at ${d}`).toBeLessThan(reach);
+        expect(Math.hypot(J.handR[0] - J.shR[0], J.handR[1] - J.shR[1], J.handR[2] - J.shR[2]), `${id} R at ${d}`).toBeLessThan(reach);
+      }
+    }
+  });
 });
 
 describe("variations the name gives", () => {
