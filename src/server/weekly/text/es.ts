@@ -1063,12 +1063,11 @@ export const emails: Record<string, Words> = {
     title: "Amy dice tus series",
     intro: "El entrenador por voz puede usar Amy, una voz inglesa clara incluida en la app, o seguir con el texto a voz del teléfono.",
     points: [
-          "Activa el entrenador por voz en Ajustes › Entrenamiento y elige Voz del teléfono o Amy.",
-          "Amy es Pro y solo en inglés. Funciona sin conexión una vez instalada la app.",
-          "Si Amy no puede cargar, las indicaciones vuelven a la voz del teléfono solas.",
-          "La voz del teléfono puede elegir entre las que lista el dispositivo, en cada idioma de la app."
+      "Activa el entrenador por voz en Ajustes › Entrenamiento y elige Voz del teléfono o Amy.",
+      "Amy es Pro y solo en inglés. Funciona sin conexión una vez instalada la app.",
+      "Si Amy no puede cargar, las indicaciones vuelven a la voz del teléfono solas.",
+      "La voz del teléfono puede elegir entre las que lista el dispositivo, en cada idioma de la app.",
     ],
     dyk: "El entrenador gratis y los avisos de descanso en la pantalla bloqueada siguen usando la voz del sistema cuando hace falta.",
   },
-
 };

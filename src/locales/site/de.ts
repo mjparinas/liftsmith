@@ -79,7 +79,7 @@ export const de: SiteText = {
       appleSmall: "Laden im",
       soon: "Bald",
       comingSoon: "{store}: bald verfügbar",
-      web: "Die Apps kommen bald. Nutze sie heute schon im Browser →",
+      web: "Die iPhone-App kommt bald. Nutze sie heute schon im Browser →",
     },
   },
   home: {
@@ -333,7 +333,7 @@ export const de: SiteText = {
     { q: "Gibt es Werbung?", a: "Nein, und es wird nie welche geben. Das Abo ist unsere einzige Einnahmequelle." },
     {
       q: "Gibt es die App für Android und iPhone?",
-      a: "Beide Apps sind auf dem Weg zu Google Play und in den App Store und kommen mit denselben Funktionen. Bis dahin läuft die komplette App in deinem Browser und funktioniert nach dem ersten Laden auch offline.",
+      a: "Ja. Die Android-App ist jetzt bei Google Play. Die iPhone-App ist auf dem Weg in den App Store, mit denselben Funktionen. Die komplette App läuft auch in deinem Browser und funktioniert nach dem ersten Laden offline.",
     },
     {
       q: "Welche Ausrüstung brauche ich?",

@@ -72,7 +72,8 @@ export const es: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Voz del teléfono",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Usa el texto a voz del teléfono. Elige una voz abajo si el teléfono muestra más de una.",
-  "delight.voiceAmyHint": "Amy es una voz clara en inglés incluida en la app (Pro). Otros idiomas, y Amy si no puede cargar, usan la voz del teléfono.",
+  "delight.voiceAmyHint":
+    "Amy es una voz clara en inglés incluida en la app (Pro). Otros idiomas, y Amy si no puede cargar, usan la voz del teléfono.",
   "delight.voiceDefault": "Predeterminada",
 };
 
@@ -107,7 +108,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Voix du téléphone",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Utilise la synthèse vocale du téléphone. Choisissez une voix ci-dessous s’il en propose plusieurs.",
-  "delight.voiceAmyHint": "Amy est une voix anglaise claire intégrée à l’app (Pro). Les autres langues, et Amy si elle ne charge pas, utilisent la voix du téléphone.",
+  "delight.voiceAmyHint":
+    "Amy est une voix anglaise claire intégrée à l’app (Pro). Les autres langues, et Amy si elle ne charge pas, utilisent la voix du téléphone.",
   "delight.voiceDefault": "Par défaut",
 };
 
@@ -143,7 +145,8 @@ export const de: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Telefonstimme",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Nutzt die Text-to-Speech-Funktion deines Telefons. Wähle unten eine Stimme, wenn mehrere angeboten werden.",
-  "delight.voiceAmyHint": "Amy ist eine klare englische Stimme in der App (Pro). Andere Sprachen und Amy, falls sie nicht lädt, nutzen die Telefonstimme.",
+  "delight.voiceAmyHint":
+    "Amy ist eine klare englische Stimme in der App (Pro). Andere Sprachen und Amy, falls sie nicht lädt, nutzen die Telefonstimme.",
   "delight.voiceDefault": "Standard",
 };
 
@@ -178,7 +181,8 @@ export const it: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Voce del telefono",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Usa la sintesi vocale del telefono. Scegli una voce sotto se ne vengono elencate più di una.",
-  "delight.voiceAmyHint": "Amy è una voce inglese chiara inclusa nell’app (Pro). Le altre lingue, e Amy se non si carica, usano la voce del telefono.",
+  "delight.voiceAmyHint":
+    "Amy è una voce inglese chiara inclusa nell’app (Pro). Le altre lingue, e Amy se non si carica, usano la voce del telefono.",
   "delight.voiceDefault": "Predefinita",
 };
 
@@ -248,7 +252,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Voz do telemóvel",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Usa a síntese de voz do telemóvel. Escolha uma voz abaixo se houver mais de uma.",
-  "delight.voiceAmyHint": "Amy é uma voz inglesa clara incluída na app (Pro). Outros idiomas, e a Amy se não carregar, usam a voz do telemóvel.",
+  "delight.voiceAmyHint":
+    "Amy é uma voz inglesa clara incluída na app (Pro). Outros idiomas, e a Amy se não carregar, usam a voz do telemóvel.",
   "delight.voiceDefault": "Predefinida",
 };
 
@@ -317,7 +322,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Telefon sesi",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Telefonunuzun metin okuma sesini kullanır. Birden fazla ses varsa aşağıdan seçin.",
-  "delight.voiceAmyHint": "Amy, uygulamaya gömülü net bir İngilizce sestir (Pro). Diğer diller ve Amy yüklenemezse telefon sesi kullanılır.",
+  "delight.voiceAmyHint":
+    "Amy, uygulamaya gömülü net bir İngilizce sestir (Pro). Diğer diller ve Amy yüklenemezse telefon sesi kullanılır.",
   "delight.voiceDefault": "Varsayılan",
 };
 
@@ -352,6 +358,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "delight.voiceSystem": "Głos telefonu",
   "delight.voiceAmy": "Amy",
   "delight.voiceSystemHint": "Używa syntezy mowy telefonu. Wybierz głos poniżej, jeśli telefon oferuje więcej niż jeden.",
-  "delight.voiceAmyHint": "Amy to wyraźny angielski głos w aplikacji (Pro). Inne języki oraz Amy, gdy nie załaduje się, używają głosu telefonu.",
+  "delight.voiceAmyHint":
+    "Amy to wyraźny angielski głos w aplikacji (Pro). Inne języki oraz Amy, gdy nie załaduje się, używają głosu telefonu.",
   "delight.voiceDefault": "Domyślny",
 };

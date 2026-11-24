@@ -1064,12 +1064,11 @@ export const emails: Record<string, Words> = {
     title: "Amy annuncia le serie",
     intro: "Il coach vocale può usare Amy, una voce inglese chiara inclusa nell’app, oppure restare sulla sintesi del telefono.",
     points: [
-          "Attiva il coach vocale in Impostazioni › Allenamento, poi scegli Voce del telefono o Amy.",
-          "Amy è Pro e solo in inglese. Resta offline una volta installata l’app.",
-          "Se Amy non si carica, i suggerimenti tornano automaticamente alla voce del telefono.",
-          "La voce del telefono può scegliere tra quelle elencate dal dispositivo, in ogni lingua dell’app."
+      "Attiva il coach vocale in Impostazioni › Allenamento, poi scegli Voce del telefono o Amy.",
+      "Amy è Pro e solo in inglese. Resta offline una volta installata l’app.",
+      "Se Amy non si carica, i suggerimenti tornano automaticamente alla voce del telefono.",
+      "La voce del telefono può scegliere tra quelle elencate dal dispositivo, in ogni lingua dell’app.",
     ],
     dyk: "Il coach gratuito e gli avvisi di riposo a schermo bloccato usano ancora la sintesi di sistema quando serve.",
   },
-
 };

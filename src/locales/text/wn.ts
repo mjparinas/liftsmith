@@ -226,7 +226,6 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy para el entrenador por voz",
   "wn.c.voiceAmy.body":
     "Pro desbloquea Amy, una voz inglesa clara incluida en la app. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
-
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -345,7 +344,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy pour le coach vocal",
   "wn.c.voiceAmy.body":
     "Pro débloque Amy, une voix anglaise claire intégrée à l’app. Choisissez Amy ou la synthèse du téléphone dans Réglages › Entraînement ; Amy revient à la voix du téléphone si elle ne charge pas.",
-
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -461,7 +459,6 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy für den Sprachcoach",
   "wn.c.voiceAmy.body":
     "Pro schaltet Amy frei, eine klare englische Stimme in der App. Wähle Amy oder die Telefon-Sprachausgabe unter Einstellungen › Training; Amy fällt auf die Telefonstimme zurück, wenn sie nicht lädt.",
-
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -577,7 +574,6 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy per il coach vocale",
   "wn.c.voiceAmy.body":
     "Pro sblocca Amy, una voce inglese chiara inclusa nell’app. Scegli Amy o la sintesi del telefono in Impostazioni › Allenamento; Amy torna alla voce del telefono se non si carica.",
-
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -684,7 +680,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "音声コーチのAmy",
   "wn.c.voiceAmy.body":
     "ProでAmyが使えます。アプリ内蔵の明瞭な英語ボイスです。設定 › ワークアウトでAmyか端末の音声を選べ、Amyが使えないときは端末の声に戻ります。",
-
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -796,7 +791,6 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy no coach por voz",
   "wn.c.voiceAmy.body":
     "O Pro liberta a Amy, uma voz inglesa clara na app. Escolha Amy ou a síntese do telemóvel em Definições › Treino; a Amy volta à voz do telemóvel se não carregar.",
-
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -899,7 +893,6 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "음성 코치 Amy",
   "wn.c.voiceAmy.body":
     "Pro로 Amy를 쓸 수 있어요. 앱에 들어 있는 또렷한 영어 음성이에요. 설정 › 운동에서 Amy 또는 휴대폰 음성을 고르고, Amy를 쓸 수 없으면 휴대폰 음성으로 돌아가요.",
-
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1011,7 +1004,6 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy w trenerze głosowym",
   "wn.c.voiceAmy.body":
     "Pro odblokowuje Amy, wyraźny angielski głos w aplikacji. Wybierz Amy lub syntezę telefonu w Ustawieniach › Trening; Amy wraca do głosu telefonu, gdy nie załaduje się.",
-
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1124,5 +1116,4 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Sesli koç için Amy",
   "wn.c.voiceAmy.body":
     "Pro, uygulamaya gömülü net İngilizce ses Amy’yi açar. Ayarlar › Antrenman’da Amy veya telefon metin okumayı seç; Amy yüklenemezse telefon sesine döner.",
-
 };
