@@ -54,41 +54,9 @@ function Replay({ pr }: { pr: Pr }) {
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const ex = exercise(pr.exerciseId);
   const reduced = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // Only the rep counter and "done" flip re-render: a setState every animation frame was remounting work
-  // on the 3D figure and made the replay flicker (the figure already advances on its own RAF).
-  const [rep, setRep] = useState(reduced ? pr.reps : 1);
-  const [done, setDone] = useState(reduced);
+  // Remount on "Again" so rep state resets without a sync setState in an effect (keeps the 3D figure
+  // from flickering, and satisfies react-hooks/set-state-in-effect).
   const [run, setRun] = useState(0);
-  useEffect(() => {
-    if (reduced) {
-      setRep(pr.reps);
-      setDone(true);
-      return;
-    }
-    setRep(1);
-    setDone(false);
-    const t0 = performance.now();
-    const total = pr.reps * REP_MS;
-    let raf = 0;
-    let shown = 1;
-    const tick = (now: number) => {
-      const el = now - t0;
-      if (el >= total) {
-        setRep(pr.reps);
-        setDone(true);
-        haptic("success");
-        return;
-      }
-      const next = Math.min(pr.reps, Math.floor(el / REP_MS) + 1);
-      if (next !== shown) {
-        shown = next;
-        setRep(next);
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [run, pr.reps, reduced]);
   const unit = profile.unit;
   const bar = ex.load === "barbell" && gym ? barFor(ex, gym) : null;
   const loading = bar && gym ? loadBar(fromKg(pr.weight, gym.unit), bar.weight, gym.plates, ex.oneEnd) : null;
@@ -116,19 +84,52 @@ function Replay({ pr }: { pr: Pr }) {
           </div>
         )}
       </div>
+      <ReplayCount key={run} pr={pr} reduced={reduced} onAgain={() => setRun((r) => r + 1)} />
+      <p className="num text-sm text-muted">{tr("pr.estMax", { weight: `${fmtNum(Math.round(fromKg(pr.e1rm, unit)))} ${unit}` })}</p>
+    </div>
+  );
+}
+
+/** Rep counter and Again control. Keyed by `run` so a replay remounts with fresh state. */
+function ReplayCount({ pr, reduced, onAgain }: { pr: Pr; reduced: boolean; onAgain: () => void }) {
+  // Only the rep counter and "done" flip re-render: a setState every animation frame was remounting work
+  // on the 3D figure and made the replay flicker (the figure already advances on its own RAF).
+  const [rep, setRep] = useState(reduced ? pr.reps : 1);
+  const [done, setDone] = useState(reduced);
+  useEffect(() => {
+    if (reduced) return;
+    const t0 = performance.now();
+    const total = pr.reps * REP_MS;
+    let raf = 0;
+    let shown = 1;
+    const tick = (now: number) => {
+      const el = now - t0;
+      if (el >= total) {
+        setRep(pr.reps);
+        setDone(true);
+        haptic("success");
+        return;
+      }
+      const next = Math.min(pr.reps, Math.floor(el / REP_MS) + 1);
+      if (next !== shown) {
+        shown = next;
+        setRep(next);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [pr.reps, reduced]);
+  return (
+    <>
       <p className="num mt-3 text-lg font-semibold" aria-live="polite">
         {done ? tr("pr.allReps", { count: pr.reps }) : tr("pr.rep", { n: rep })}
       </p>
-      <p className="num text-sm text-muted">{tr("pr.estMax", { weight: `${fmtNum(Math.round(fromKg(pr.e1rm, unit)))} ${unit}` })}</p>
       {done && !reduced && (
-        <button
-          type="button"
-          onClick={() => setRun((r) => r + 1)}
-          className="press mt-3 min-h-11 rounded-full border border-line px-4 text-sm text-muted"
-        >
+        <button type="button" onClick={onAgain} className="press mt-3 min-h-11 rounded-full border border-line px-4 text-sm text-muted">
           {tr("pr.again")}
         </button>
       )}
-    </div>
+    </>
   );
 }

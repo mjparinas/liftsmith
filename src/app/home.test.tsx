@@ -26,9 +26,11 @@ describe("home page", () => {
     expect(first).toHaveTextContent("Build my first workout");
     expect(first.getAttribute("href")).toMatch(/^\/app\/?$/);
     // Google Play is live; the App Store badge stays "coming soon" until iOS ships.
-    expect(within(hero).getByRole("link", { name: /Google Play/ }).getAttribute("href")).toBe(
-      "https://play.google.com/store/apps/details?id=com.getliftsmith.app",
-    );
+    expect(
+      within(hero)
+        .getByRole("link", { name: /Google Play/ })
+        .getAttribute("href"),
+    ).toBe("https://play.google.com/store/apps/details?id=com.getliftsmith.app");
     expect(within(hero).getByRole("img", { name: "App Store: coming soon" })).toBeInTheDocument();
     expect(
       within(hero)

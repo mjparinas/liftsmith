@@ -1,3 +1,4 @@
+import { loadingKey } from "@/lib/demo/barPlates";
 import { DANCE_ID, danceMotion } from "@/lib/demo/dance";
 import {
   boneFrame,
@@ -29,7 +30,6 @@ import {
   type Joints,
   type Vec,
 } from "@/lib/demo/rig";
-import { loadingKey } from "@/lib/demo/barPlates";
 import { stretchMotion } from "@/lib/demo/stretchMotions";
 import type { Loading } from "@/lib/plates";
 import type { Muscle, Unit } from "@/lib/types";
@@ -390,8 +390,7 @@ export function startLoop(
       // Plates are compared by stack, not object identity: the workout passes a fresh `loadBar` result on
       // every React render (heart rate, rest clock), and rebuilding props from that made the figure flicker.
       const loadChanged = loadingKey(s.loading, s.unit) !== loadingKey(prev.loading, prev.unit);
-      const rebuild =
-        differs("exerciseId") || differs("body") || differs("shape") || differs("highlight") || differs("paint");
+      const rebuild = differs("exerciseId") || differs("body") || differs("shape") || differs("highlight") || differs("paint");
       if (differs("exerciseId")) t = reduced ? 1.8 : 0;
       if (rebuild) setup();
       // A new pixel ratio cap (battery saver) redraws at the new resolution.

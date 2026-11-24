@@ -114,8 +114,7 @@ export const en = {
   "wn.c.voiceAmy.body":
     "Pro unlocks Amy, a clear English voice built into the app. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
   "wn.c.checkUpdates.title": "Check for updates in Settings",
-  "wn.c.checkUpdates.body":
-    "On Android and iPhone, Settings › Version lets you check for a newer app and install it when one is ready.",
+  "wn.c.checkUpdates.body": "On Android and iPhone, Settings › Version lets you check for a newer app and install it when one is ready.",
 } as const;
 
 type Key = keyof typeof en;
@@ -240,8 +239,7 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.body":
     "Pro desbloquea Amy, una voz inglesa clara incluida en la app. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
   "wn.c.checkUpdates.title": "Buscar actualizaciones en Ajustes",
-  "wn.c.checkUpdates.body":
-    "En Android e iPhone, Ajustes › Versión te deja buscar una app más nueva e instalarla cuando esté lista.",
+  "wn.c.checkUpdates.body": "En Android e iPhone, Ajustes › Versión te deja buscar una app más nueva e instalarla cuando esté lista.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -726,8 +724,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.body":
     "ProでAmyが使えます。アプリ内蔵の明瞭な英語ボイスです。設定 › ワークアウトでAmyか端末の音声を選べ、Amyが使えないときは端末の声に戻ります。",
   "wn.c.checkUpdates.title": "設定でアップデートを確認",
-  "wn.c.checkUpdates.body":
-    "AndroidとiPhoneでは、設定 › バージョンから新しいアプリを確認し、準備ができたらインストールできます。",
+  "wn.c.checkUpdates.body": "AndroidとiPhoneでは、設定 › バージョンから新しいアプリを確認し、準備ができたらインストールできます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -955,8 +952,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.body":
     "Pro로 Amy를 쓸 수 있어요. 앱에 들어 있는 또렷한 영어 음성이에요. 설정 › 운동에서 Amy 또는 휴대폰 음성을 고르고, Amy를 쓸 수 없으면 휴대폰 음성으로 돌아가요.",
   "wn.c.checkUpdates.title": "설정에서 업데이트 확인",
-  "wn.c.checkUpdates.body":
-    "Android와 iPhone에서는 설정 › 버전에서 새 앱이 있는지 확인하고, 준비되면 설치할 수 있어요.",
+  "wn.c.checkUpdates.body": "Android와 iPhone에서는 설정 › 버전에서 새 앱이 있는지 확인하고, 준비되면 설치할 수 있어요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {

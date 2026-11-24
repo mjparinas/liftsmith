@@ -79,13 +79,7 @@ export const canShape = (s: BodyStats) =>
 export function statsKey(s: BodyStats): string {
   const m = s.measures ?? {};
   const sites = (Object.keys(m) as MeasureSite[]).sort();
-  return [
-    s.sex ?? "",
-    s.heightCm ?? "",
-    s.weightKg ?? "",
-    s.bodyFat ?? "",
-    ...sites.map((k) => `${k}:${m[k] ?? ""}`),
-  ].join("|");
+  return [s.sex ?? "", s.heightCm ?? "", s.weightKg ?? "", s.bodyFat ?? "", ...sites.map((k) => `${k}:${m[k] ?? ""}`)].join("|");
 }
 
 export function factors(key: BodyKey, s: BodyStats): Factors {
