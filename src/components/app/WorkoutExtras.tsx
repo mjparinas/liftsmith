@@ -18,7 +18,7 @@ import { useApp } from "@/lib/store";
 import type { AppEvent, Exercise, Gym, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
-import { exerciseCue, restCue, say, setCue, setVoicePrefs, voice } from "@/lib/voice";
+import { exerciseCue, restCue, say, setCue, setVoicePrefs } from "@/lib/voice";
 
 import { clock } from "./format";
 import { Icon } from "./icons";
