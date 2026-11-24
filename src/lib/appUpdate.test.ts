@@ -3,7 +3,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DAY, NOW } from "@/test/factories";
 
-import { CHECK_GAP, checkForUpdate, dismissUpdate, dueCheck, offerUpdate, updateNow, useAppUpdate, type UpdateInfo } from "./appUpdate";
+import {
+  CHECK_GAP,
+  checkForUpdate,
+  dismissUpdate,
+  dueCheck,
+  offerUpdate,
+  updateNow,
+  useAppUpdate,
+  type UpdateInfo,
+} from "./appUpdate";
 
 describe("offerUpdate", () => {
   it("offers a newer version", () => {
@@ -57,7 +66,7 @@ describe("checking the store", () => {
 
   it("shows the note when the store has a newer version, and remembers when it asked", async () => {
     info = { available: true, version: "20" };
-    await checkForUpdate(NOW);
+    expect(await checkForUpdate(NOW)).toBe("available");
     expect(useAppUpdate.getState()).toEqual({ phase: "available", version: "20" });
     expect(JSON.parse(localStorage.getItem("liftsmith.appUpdate")!)).toMatchObject({ checkedAt: NOW });
   });
@@ -67,26 +76,40 @@ describe("checking the store", () => {
     await checkForUpdate(NOW);
     dismissUpdate(NOW);
     expect(useAppUpdate.getState().phase).toBe("none");
-    await checkForUpdate(NOW + DAY);
+    expect(await checkForUpdate(NOW + DAY)).toBe("upToDate");
     expect(useAppUpdate.getState().phase).toBe("none");
+  });
+
+  it("a forced check from Settings still offers a version that was closed", async () => {
+    info = { available: true, version: "20" };
+    await checkForUpdate(NOW);
+    dismissUpdate(NOW);
+    expect(await checkForUpdate(NOW + DAY, { force: true })).toBe("available");
+    expect(useAppUpdate.getState()).toEqual({ phase: "available", version: "20" });
   });
 
   it("a downloaded update shows Restart", async () => {
     info = { available: true, version: "20", downloaded: true };
-    await checkForUpdate(NOW);
+    expect(await checkForUpdate(NOW)).toBe("ready");
     expect(useAppUpdate.getState().phase).toBe("ready");
+  });
+
+  it("says up to date when the store has nothing newer", async () => {
+    info = { available: false };
+    expect(await checkForUpdate(NOW)).toBe("upToDate");
+    expect(useAppUpdate.getState().phase).toBe("none");
   });
 
   it("does nothing in a browser", async () => {
     delete (window as unknown as { Capacitor?: unknown }).Capacitor;
     info = { available: true, version: "20" };
-    await checkForUpdate(NOW);
+    expect(await checkForUpdate(NOW)).toBe("skipped");
     expect(useAppUpdate.getState().phase).toBe("none");
   });
 
   it("a store that can't be reached shows nothing", async () => {
     plugin.check.mockImplementationOnce(() => Promise.reject(new Error("offline")));
-    await checkForUpdate(NOW);
+    expect(await checkForUpdate(NOW)).toBe("error");
     expect(useAppUpdate.getState().phase).toBe("none");
   });
 

@@ -4,7 +4,7 @@ Melvin, 2026-11-19: "Can you add similar whats new button for the latest changes
 
 ## What it is
 
-- **Settings › Help › Version** shows the app's version (with the store build number on Android and iOS, `versionLabel` in `build.ts`) and a **What's new** button beside it. One control, one destination: nothing else on Settings opens the sheet.
+- **Settings › Help › Version** shows the app's version (with the store build number on Android and iOS, `versionLabel` in `build.ts`) and a **What's new** button beside it. One control, one destination: nothing else on Settings opens the sheet. On the phones, the same row has **Check for updates** / **Install** for the store (`appUpdate.ts`, [App updates](app-updates.md)).
 - **The sheet** (`WhatsNew.tsx`, `WhatsNewSheet`): a tinted header card with the release day, the version and a summary ("6 new · 7 better · 2 fixed"), then the changes grouped under **New**, **Better** and **Fixed** chips (mint, blue and violet tints), each a card with an icon, a bold title and one or two plain sentences, and a **Let's go** button that closes it. Same kinds as the website's `/whats-new/` page.
 - **Once after an update**, a small note at the top of **Today** (in the page like the update note, not over it): "What's new in Liftsmith", the summary, **See all** and ✕. Either one, or opening the sheet from Settings, marks the release seen, so it never comes back for that release. It never shows during a workout or on another screen.
 - **A lifter with no workouts never gets the note**: a first setup marks the current release seen (`Onboarding.tsx`), and so does Today with no finished workouts (`autoAction` in `appNews.ts`). Everything is new to them; announcing it would be noise.

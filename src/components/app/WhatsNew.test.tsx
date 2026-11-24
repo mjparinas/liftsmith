@@ -8,6 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LATEST, SEEN_KEY } from "@/lib/appNews";
+import { useAppUpdate } from "@/lib/appUpdate";
 import { useApp } from "@/lib/store";
 
 import { VersionRow, WhatsNewNote } from "./WhatsNew";
@@ -51,6 +52,35 @@ describe("What's new", () => {
     await user.click(screen.getByRole("button", { name: "Let's go" }));
     expect(screen.queryByTestId("whats-new")).toBeNull();
     expect(localStorage.getItem(SEEN_KEY)).toBe(LATEST.day);
+  });
+
+  it("on the phones, Check for updates becomes Install when the store has a newer version", async () => {
+    const plugin = {
+      check: vi.fn(() => Promise.resolve({ available: true, version: "20" })),
+      start: vi.fn(() => Promise.resolve({ started: false })),
+      complete: vi.fn(() => Promise.resolve()),
+      open: vi.fn(() => Promise.resolve()),
+    };
+    (window as unknown as { Capacitor: unknown }).Capacitor = {
+      isNativePlatform: () => true,
+      Plugins: { AppUpdate: plugin },
+    };
+    useAppUpdate.setState({ phase: "none", version: "" });
+    const user = userEvent.setup();
+    render(<VersionRow />);
+    await user.click(screen.getByRole("button", { name: "Check for updates" }));
+    expect(await screen.findByRole("button", { name: "Install" })).toBeTruthy();
+    expect(screen.getByText("Update for the latest fixes and features.")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Install" }));
+    expect(plugin.start).toHaveBeenCalled();
+    expect(plugin.open).toHaveBeenCalled();
+    delete (window as unknown as { Capacitor?: unknown }).Capacitor;
+    useAppUpdate.setState({ phase: "none", version: "" });
+  });
+
+  it("hides Check for updates in the browser", () => {
+    render(<VersionRow />);
+    expect(screen.queryByRole("button", { name: "Check for updates" })).toBeNull();
   });
 
   it("hides changes a new lifter hasn't unlocked", async () => {

@@ -759,7 +759,7 @@ export const emails: Record<string, Words> = {
       "The Features page on the website lists everything the app does, and what's new.",
       "Can't find a setting? Type a word into the search box at the top of Settings and it takes you straight there.",
     ],
-    dyk: "The version and build at the foot of Settings help us find your bug faster.",
+    dyk: "On the phone apps, Settings › Version can check for updates and install one when it's ready.",
   },
   "body-3d": {
     title: "Your body in 3D",

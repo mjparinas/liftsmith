@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { autoAction, countKinds, KINDS, LATEST, markSeen, readSeen, visibleChanges, type AppChange, type NewsKind } from "@/lib/appNews";
+import { checkForUpdate, restartNow, updateNow, useAppUpdate } from "@/lib/appUpdate";
 import { BRAND } from "@/lib/brand";
 import { versionLabel } from "@/lib/build";
 import { communityOn } from "@/lib/community";
@@ -119,19 +120,67 @@ export function WhatsNewSheet({ open, onClose }: { open: boolean; onClose: () =>
   );
 }
 
-/** Settings › Help: the version, with What's new beside it. */
+/** Settings › Help: the version, What's new, and on the phones Check for updates / Install (appUpdate.ts). */
 export function VersionRow() {
   const [open, setOpen] = useState(false);
   const version = useVersion();
+  const native = isNative();
+  const phase = useAppUpdate((s) => s.phase);
+  const [checking, setChecking] = useState(false);
+  const [note, setNote] = useState<"idle" | "current" | "error">("idle");
+  const busy = checking || phase === "downloading";
+  const canInstall = phase === "available" || phase === "ready" || phase === "downloading";
+  const status =
+    phase === "ready"
+      ? t("x.updateReadyBody")
+      : phase === "downloading"
+        ? t("x.updateDownloading")
+        : phase === "available"
+          ? t("x.updateNewBody")
+          : note === "current"
+            ? t("wn.current")
+            : note === "error"
+              ? t("wn.checkFail")
+              : null;
+  const onCheck = async () => {
+    haptic("tick");
+    setChecking(true);
+    setNote("idle");
+    const result = await checkForUpdate(Date.now(), { force: true });
+    setChecking(false);
+    if (result === "upToDate") setNote("current");
+    else if (result === "error") setNote("error");
+    else setNote("idle");
+  };
+  const onInstall = () => {
+    haptic("tick");
+    void (phase === "ready" ? restartNow() : updateNow());
+  };
   return (
-    <div className="card flex items-center gap-3 px-4 py-3">
-      <span className="min-w-0 flex-1">
-        <span className="block font-semibold">{t("wn.row")}</span>
-        <span className="block text-sm text-muted tabular-nums">{version}</span>
-      </span>
-      <Button kind="ghost" className="min-h-11 shrink-0 !rounded-full px-4" onClick={() => setOpen(true)}>
-        {t("wn.open")}
-      </Button>
+    <div className="card space-y-3 px-4 py-3">
+      <div className="flex items-center gap-3">
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">{t("wn.row")}</span>
+          <span className="block text-sm text-muted tabular-nums">{version}</span>
+        </span>
+        <Button kind="ghost" className="min-h-11 shrink-0 !rounded-full px-4" onClick={() => setOpen(true)}>
+          {t("wn.open")}
+        </Button>
+      </div>
+      {native && (
+        <div className="flex items-center gap-3 border-t border-line pt-3">
+          <span className="min-w-0 flex-1 text-sm text-muted">{status ?? "\u00a0"}</span>
+          {canInstall ? (
+            <Button kind="ghost" className="min-h-11 shrink-0 !rounded-full px-4" disabled={busy && phase !== "ready"} onClick={onInstall}>
+              {phase === "ready" ? t("x.updateRestart") : t("wn.install")}
+            </Button>
+          ) : (
+            <Button kind="ghost" className="min-h-11 shrink-0 !rounded-full px-4" disabled={busy} onClick={() => void onCheck()}>
+              {checking ? t("wn.checking") : t("wn.check")}
+            </Button>
+          )}
+        </div>
+      )}
       <WhatsNewSheet open={open} onClose={() => setOpen(false)} />
     </div>
   );

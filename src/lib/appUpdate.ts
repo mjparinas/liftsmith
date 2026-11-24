@@ -9,8 +9,10 @@
 // there is one, a small note sits at the top of every screen but the workout (UpdateToast.tsx). Update starts
 // Play's own flexible update on Android (it downloads while the lifter keeps using the app, then the note says
 // Restart), or opens the store page when Play's flow can't run, and on iOS opens the App Store page. Closing the
-// note hides it for that version for a week, so it never nags. The web app needs none of this: every open loads
-// the newest page (public/sw.js is network first).
+// note hides it for that version for a week, so it never nags. Settings › Help › Version also has Check for
+// updates (WhatsNew.tsx): a tap asks the store at once and, when one is found, Install (or Restart when Play has
+// already downloaded it). The web app needs none of this: every open loads the newest page (public/sw.js is
+// network first).
 import { create } from "zustand";
 
 import { isNative } from "./juice";
@@ -41,6 +43,9 @@ interface Saved {
 }
 
 export type UpdatePhase = "none" | "available" | "downloading" | "ready";
+
+/** What a check found, for Settings' Check for updates. */
+export type CheckResult = "upToDate" | "available" | "ready" | "busy" | "error" | "skipped";
 
 export const useAppUpdate = create<{ phase: UpdatePhase; version: string }>(() => ({ phase: "none", version: "" }));
 
@@ -90,23 +95,42 @@ function write(s: Saved): void {
 
 let checking = false;
 
-/** Asks the store once. Never throws, never blocks. */
-export async function checkForUpdate(now = Date.now()): Promise<void> {
+/**
+ * Asks the store once. Never throws, never blocks. Background checks honour a closed note; a Settings tap
+ * passes `{ force: true }` so a version the lifter closed still shows Install.
+ */
+export async function checkForUpdate(now = Date.now(), opts?: { force?: boolean }): Promise<CheckResult> {
   const p = plugin();
-  if (!p || !isNative() || checking) return;
+  if (!p || !isNative()) return "skipped";
+  if (checking) return "busy";
   checking = true;
   try {
     const info = await p.check();
     const saved = read();
-    write({ ...saved, checkedAt: now });
-    if (useAppUpdate.getState().phase === "downloading" && !info.downloaded) return;
-    if (offerUpdate(info, saved.dismissed, now)) {
-      useAppUpdate.setState({ phase: info.downloaded ? "ready" : "available", version: info.version ?? "" });
-    } else if (!info.available) {
-      useAppUpdate.setState({ phase: "none", version: "" });
+    const force = !!opts?.force;
+    write({
+      checkedAt: now,
+      // A deliberate check clears a closed note for that version, so Install and the toast agree.
+      dismissed: force && info.available && saved.dismissed?.version === (info.version ?? "") ? undefined : saved.dismissed,
+    });
+    if (useAppUpdate.getState().phase === "downloading" && !info.downloaded) return "busy";
+    if (info.downloaded) {
+      useAppUpdate.setState({ phase: "ready", version: info.version ?? "" });
+      return "ready";
     }
+    if (info.available && (force || offerUpdate(info, saved.dismissed, now))) {
+      useAppUpdate.setState({ phase: "available", version: info.version ?? "" });
+      return "available";
+    }
+    if (!info.available) {
+      useAppUpdate.setState({ phase: "none", version: "" });
+      return "upToDate";
+    }
+    // Still available in the store, but the note was closed for this version.
+    return "upToDate";
   } catch {
     // Offline or no store: try again next time.
+    return "error";
   } finally {
     checking = false;
   }
@@ -136,7 +160,7 @@ export function startAppUpdates(): () => void {
   };
 }
 
-/** The note's Update: Play's own update on Android, else the store page. */
+/** The note's Update / Settings' Install: Play's own update on Android, else the store page. */
 export async function updateNow(): Promise<void> {
   const p = plugin();
   if (!p) return;

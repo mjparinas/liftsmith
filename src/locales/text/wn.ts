@@ -27,6 +27,11 @@ export const en = {
   "wn.go": "Let's go",
   "wn.row": "Version",
   "wn.open": "What's new",
+  "wn.check": "Check for updates",
+  "wn.checking": "Checking…",
+  "wn.current": "You're up to date",
+  "wn.install": "Install",
+  "wn.checkFail": "Couldn't check. Try again when you're online.",
   "wn.note": "What's new in {brand}",
   "wn.see": "See all",
   "wn.c.seasons.title": "Training seasons",
@@ -108,6 +113,9 @@ export const en = {
   "wn.c.voiceAmy.title": "Amy for the voice coach",
   "wn.c.voiceAmy.body":
     "Pro unlocks Amy, a clear English voice built into the app. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
+  "wn.c.checkUpdates.title": "Check for updates in Settings",
+  "wn.c.checkUpdates.body":
+    "On Android and iPhone, Settings › Version lets you check for a newer app and install it when one is ready.",
 } as const;
 
 type Key = keyof typeof en;
@@ -137,6 +145,11 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.go": "¡Vamos!",
   "wn.row": "Versión",
   "wn.open": "Novedades",
+  "wn.check": "Buscar actualizaciones",
+  "wn.checking": "Buscando…",
+  "wn.current": "Ya estás al día",
+  "wn.install": "Instalar",
+  "wn.checkFail": "No se pudo comprobar. Inténtalo de nuevo cuando tengas conexión.",
   "wn.note": "Novedades en {brand}",
   "wn.see": "Ver todo",
   "wn.c.seasons.title": "Temporadas de entrenamiento",
@@ -226,6 +239,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy para el entrenador por voz",
   "wn.c.voiceAmy.body":
     "Pro desbloquea Amy, una voz inglesa clara incluida en la app. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
+  "wn.c.checkUpdates.title": "Buscar actualizaciones en Ajustes",
+  "wn.c.checkUpdates.body":
+    "En Android e iPhone, Ajustes › Versión te deja buscar una app más nueva e instalarla cuando esté lista.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -253,6 +269,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.go": "C’est parti",
   "wn.row": "Version",
   "wn.open": "Nouveautés",
+  "wn.check": "Rechercher des mises à jour",
+  "wn.checking": "Recherche…",
+  "wn.current": "Vous êtes à jour",
+  "wn.install": "Installer",
+  "wn.checkFail": "Impossible de vérifier. Réessayez quand vous serez en ligne.",
   "wn.note": "Nouveautés dans {brand}",
   "wn.see": "Tout voir",
   "wn.c.seasons.title": "Saisons d’entraînement",
@@ -344,6 +365,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy pour le coach vocal",
   "wn.c.voiceAmy.body":
     "Pro débloque Amy, une voix anglaise claire intégrée à l’app. Choisissez Amy ou la synthèse du téléphone dans Réglages › Entraînement ; Amy revient à la voix du téléphone si elle ne charge pas.",
+  "wn.c.checkUpdates.title": "Chercher les mises à jour dans Réglages",
+  "wn.c.checkUpdates.body":
+    "Sur Android et iPhone, Réglages › Version permet de chercher une app plus récente et de l'installer quand elle est prête.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -370,6 +394,11 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.go": "Los geht’s",
   "wn.row": "Version",
   "wn.open": "Neuigkeiten",
+  "wn.check": "Nach Updates suchen",
+  "wn.checking": "Suche…",
+  "wn.current": "Du bist auf dem neuesten Stand",
+  "wn.install": "Installieren",
+  "wn.checkFail": "Prüfung fehlgeschlagen. Versuch es erneut, wenn du online bist.",
   "wn.note": "Neu in {brand}",
   "wn.see": "Alle ansehen",
   "wn.c.seasons.title": "Trainingssaisons",
@@ -459,6 +488,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy für den Sprachcoach",
   "wn.c.voiceAmy.body":
     "Pro schaltet Amy frei, eine klare englische Stimme in der App. Wähle Amy oder die Telefon-Sprachausgabe unter Einstellungen › Training; Amy fällt auf die Telefonstimme zurück, wenn sie nicht lädt.",
+  "wn.c.checkUpdates.title": "In den Einstellungen nach Updates suchen",
+  "wn.c.checkUpdates.body":
+    "Auf Android und iPhone kannst du unter Einstellungen › Version nach einer neueren App suchen und sie installieren, wenn eine bereit ist.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -485,6 +517,11 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.go": "Andiamo",
   "wn.row": "Versione",
   "wn.open": "Novità",
+  "wn.check": "Cerca aggiornamenti",
+  "wn.checking": "Ricerca…",
+  "wn.current": "Sei già aggiornato",
+  "wn.install": "Installa",
+  "wn.checkFail": "Impossibile controllare. Riprova quando sei online.",
   "wn.note": "Novità in {brand}",
   "wn.see": "Vedi tutto",
   "wn.c.seasons.title": "Stagioni di allenamento",
@@ -574,6 +611,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy per il coach vocale",
   "wn.c.voiceAmy.body":
     "Pro sblocca Amy, una voce inglese chiara inclusa nell’app. Scegli Amy o la sintesi del telefono in Impostazioni › Allenamento; Amy torna alla voce del telefono se non si carica.",
+  "wn.c.checkUpdates.title": "Cerca aggiornamenti in Impostazioni",
+  "wn.c.checkUpdates.body":
+    "Su Android e iPhone, Impostazioni › Versione ti permette di cercare un'app più recente e installarla quando è pronta.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -600,6 +640,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.go": "はじめる",
   "wn.row": "バージョン",
   "wn.open": "新機能",
+  "wn.check": "アップデートを確認",
+  "wn.checking": "確認中…",
+  "wn.current": "最新です",
+  "wn.install": "インストール",
+  "wn.checkFail": "確認できませんでした。オンラインのときに再試行してください。",
   "wn.note": "{brand}の新機能",
   "wn.see": "すべて見る",
   "wn.c.seasons.title": "トレーニングシーズン",
@@ -680,6 +725,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "音声コーチのAmy",
   "wn.c.voiceAmy.body":
     "ProでAmyが使えます。アプリ内蔵の明瞭な英語ボイスです。設定 › ワークアウトでAmyか端末の音声を選べ、Amyが使えないときは端末の声に戻ります。",
+  "wn.c.checkUpdates.title": "設定でアップデートを確認",
+  "wn.c.checkUpdates.body":
+    "AndroidとiPhoneでは、設定 › バージョンから新しいアプリを確認し、準備ができたらインストールできます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -706,6 +754,11 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.go": "Bora!",
   "wn.row": "Versão",
   "wn.open": "Novidades",
+  "wn.check": "Verificar atualizações",
+  "wn.checking": "Verificando…",
+  "wn.current": "Você está em dia",
+  "wn.install": "Instalar",
+  "wn.checkFail": "Não foi possível verificar. Tente de novo quando estiver online.",
   "wn.note": "Novidades no {brand}",
   "wn.see": "Ver tudo",
   "wn.c.seasons.title": "Temporadas de treino",
@@ -791,6 +844,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy no coach por voz",
   "wn.c.voiceAmy.body":
     "O Pro liberta a Amy, uma voz inglesa clara na app. Escolha Amy ou a síntese do telemóvel em Definições › Treino; a Amy volta à voz do telemóvel se não carregar.",
+  "wn.c.checkUpdates.title": "Verificar atualizações em Ajustes",
+  "wn.c.checkUpdates.body":
+    "No Android e no iPhone, Ajustes › Versão deixa você procurar um app mais novo e instalá-lo quando estiver pronto.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -817,6 +873,11 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.go": "시작하기",
   "wn.row": "버전",
   "wn.open": "새로운 기능",
+  "wn.check": "업데이트 확인",
+  "wn.checking": "확인 중…",
+  "wn.current": "최신 버전이에요",
+  "wn.install": "설치",
+  "wn.checkFail": "확인할 수 없어요. 온라인일 때 다시 시도하세요.",
   "wn.note": "{brand}의 새로운 기능",
   "wn.see": "모두 보기",
   "wn.c.seasons.title": "트레이닝 시즌",
@@ -893,6 +954,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "음성 코치 Amy",
   "wn.c.voiceAmy.body":
     "Pro로 Amy를 쓸 수 있어요. 앱에 들어 있는 또렷한 영어 음성이에요. 설정 › 운동에서 Amy 또는 휴대폰 음성을 고르고, Amy를 쓸 수 없으면 휴대폰 음성으로 돌아가요.",
+  "wn.c.checkUpdates.title": "설정에서 업데이트 확인",
+  "wn.c.checkUpdates.body":
+    "Android와 iPhone에서는 설정 › 버전에서 새 앱이 있는지 확인하고, 준비되면 설치할 수 있어요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -919,6 +983,11 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.go": "Do dzieła",
   "wn.row": "Wersja",
   "wn.open": "Co nowego",
+  "wn.check": "Sprawdź aktualizacje",
+  "wn.checking": "Sprawdzanie…",
+  "wn.current": "Masz najnowszą wersję",
+  "wn.install": "Zainstaluj",
+  "wn.checkFail": "Nie udało się sprawdzić. Spróbuj ponownie, gdy będziesz online.",
   "wn.note": "Co nowego w {brand}",
   "wn.see": "Zobacz wszystko",
   "wn.c.seasons.title": "Sezony treningowe",
@@ -1004,6 +1073,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Amy w trenerze głosowym",
   "wn.c.voiceAmy.body":
     "Pro odblokowuje Amy, wyraźny angielski głos w aplikacji. Wybierz Amy lub syntezę telefonu w Ustawieniach › Trening; Amy wraca do głosu telefonu, gdy nie załaduje się.",
+  "wn.c.checkUpdates.title": "Sprawdzanie aktualizacji w Ustawieniach",
+  "wn.c.checkUpdates.body":
+    "Na Androidzie i iPhonie w Ustawienia › Wersja możesz sprawdzić nowszą aplikację i zainstalować ją, gdy będzie gotowa.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1030,6 +1102,11 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.go": "Başlayalım",
   "wn.row": "Sürüm",
   "wn.open": "Yenilikler",
+  "wn.check": "Güncellemeleri denetle",
+  "wn.checking": "Denetleniyor…",
+  "wn.current": "Güncelsin",
+  "wn.install": "Yükle",
+  "wn.checkFail": "Denetlenemedi. Çevrimiçiyken yeniden dene.",
   "wn.note": "{brand} yenilikleri",
   "wn.see": "Tümünü gör",
   "wn.c.seasons.title": "Antrenman sezonları",
@@ -1116,4 +1193,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.voiceAmy.title": "Sesli koç için Amy",
   "wn.c.voiceAmy.body":
     "Pro, uygulamaya gömülü net İngilizce ses Amy’yi açar. Ayarlar › Antrenman’da Amy veya telefon metin okumayı seç; Amy yüklenemezse telefon sesine döner.",
+  "wn.c.checkUpdates.title": "Ayarlar'da güncelleme denetle",
+  "wn.c.checkUpdates.body":
+    "Android ve iPhone'da Ayarlar › Sürüm, daha yeni bir uygulama olup olmadığını denetlemeni ve hazır olduğunda yüklemeni sağlar.",
 };
