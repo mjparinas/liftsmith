@@ -355,8 +355,8 @@ function SettingsMain() {
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
-      {/* On desktop, an account that coaches or is coached has Coaching in the sidebar (App.tsx), so the row goes. */}
-      {!(desktop && coaching) && (
+      {/* The sidebar owns Coaching on desktop; on phones it appears only for active coaching accounts. */}
+      {coaching && !desktop && (
         <div className="mt-2">
           <CoachingRow />
         </div>

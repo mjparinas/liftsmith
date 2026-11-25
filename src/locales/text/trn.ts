@@ -318,6 +318,8 @@ export const en = {
   "trn.role.physioHint":
     "For physios and rehab clinicians: reports lead with pain and injuries your clients share, and rehab programs come first when you assign.",
   "trn.role.pick": "Pick one so clients see the right word for you, and only the tools for that role show.",
+  "trn.stopCoach": "Stop coaching",
+  "trn.stopCoachAsk": "Stop coaching? Your coach links, invite and coaching tools will be removed.",
   "trn.err.taken": "That time was just booked or removed. Pick another.",
   "trn.err.slotsFull": "You have as many upcoming times as you can open. Remove some first.",
   "trn.f.payFailed": "Monthly payment didn't go through",
@@ -762,6 +764,8 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Para fisioterapeutas y profesionales de rehabilitación: los informes empiezan por el dolor y las lesiones que comparten tus clientes, y los programas de rehabilitación aparecen primero al asignar.",
   "trn.role.pick": "Elige uno para que tus clientes vean la palabra correcta y solo se muestren las herramientas de ese rol.",
+  "trn.stopCoach": "Dejar de entrenar",
+  "trn.stopCoachAsk": "¿Dejar de entrenar? Se quitarán tus enlaces con clientes, tu invitación y las herramientas de coaching.",
   "trn.err.taken": "Esa hora se acaba de reservar o eliminar. Elige otra.",
   "trn.err.slotsFull": "Ya tienes el máximo de horas próximas. Quita algunas primero.",
   "trn.f.payFailed": "El pago mensual no se completó",
@@ -1221,6 +1225,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Pour les kinés et les professionnels de la rééducation : les rapports commencent par la douleur et les blessures que vos clients partagent, et les programmes de rééducation passent en premier quand vous en assignez.",
   "trn.role.pick": "Choisissez-en un pour que vos clients voient le bon mot et que seuls les outils de ce rôle s'affichent.",
+  "trn.stopCoach": "Arrêter le coaching",
+  "trn.stopCoachAsk": "Arrêter le coaching ? Vos liens clients, votre invitation et vos outils de coaching seront supprimés.",
   "trn.err.taken": "Ce créneau vient d'être réservé ou supprimé. Choisissez-en un autre.",
   "trn.err.slotsFull": "Vous avez atteint le nombre maximal de créneaux à venir. Supprimez-en d'abord.",
   "trn.f.payFailed": "Le paiement mensuel n'est pas passé",
@@ -1674,6 +1680,8 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Für Physiotherapeuten und Reha-Fachleute: Die Berichte beginnen mit Schmerzen und Verletzungen, die deine Klienten teilen, und Reha-Programme stehen beim Zuweisen ganz oben.",
   "trn.role.pick": "Wähle eines, damit Kunden das richtige Wort sehen und nur die Tools dieser Rolle erscheinen.",
+  "trn.stopCoach": "Coaching beenden",
+  "trn.stopCoachAsk": "Coaching beenden? Deine Kundenlinks, Einladungen und Coaching-Tools werden entfernt.",
   "trn.err.taken": "Diese Zeit wurde gerade gebucht oder entfernt. Wähl eine andere.",
   "trn.err.slotsFull": "Du hast schon die meisten kommenden Zeiten, die möglich sind. Entfern zuerst welche.",
   "trn.f.payFailed": "Die Monatszahlung ist nicht durchgegangen",
@@ -2122,6 +2130,9 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Per fisioterapisti e professionisti della riabilitazione: i report partono da dolore e infortuni che i tuoi clienti condividono, e i programmi di riabilitazione compaiono per primi quando assegni.",
   "trn.role.pick": "Scegline uno così i clienti vedono la parola giusta e compaiono solo gli strumenti di quel ruolo.",
+  "trn.stopCoach": "Smetti di fare coaching",
+  "trn.stopCoachAsk":
+    "Smettere di fare coaching? I tuoi collegamenti con i clienti, l'invito e gli strumenti di coaching verranno rimossi.",
   "trn.err.taken": "Quell'orario è appena stato prenotato o rimosso. Scegline un altro.",
   "trn.err.slotsFull": "Hai già il numero massimo di orari futuri. Rimuovine qualcuno prima.",
   "trn.f.payFailed": "Il pagamento mensile non è andato a buon fine",
@@ -2554,6 +2565,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "理学療法士やリハビリ専門職向けです。レポートはクライアントが共有した痛みとけがから始まり、割り当てではリハビリプログラムが先に表示されます。",
   "trn.role.pick": "選ぶと、クライアントに正しい呼び方が表示され、その役割のツールだけが出ます。",
+  "trn.stopCoach": "コーチングをやめる",
+  "trn.stopCoachAsk": "コーチングをやめますか？クライアントとのリンク、招待、コーチングツールが削除されます。",
   "trn.err.taken": "その時間はたった今予約されたか削除されました。別の時間を選んでください。",
   "trn.err.slotsFull": "公開できる今後の時間の上限に達しています。先にいくつか削除してください。",
   "trn.f.payFailed": "月額の支払いができませんでした",
@@ -2968,6 +2981,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Para fisioterapeutas e profissionais de reabilitação: os relatórios começam pelas dores e lesões que seus pacientes compartilham, e os programas de reabilitação vêm primeiro ao atribuir.",
   "trn.role.pick": "Escolha um para que os clientes vejam a palavra certa e só apareçam as ferramentas desse papel.",
+  "trn.stopCoach": "Parar de fazer coaching",
+  "trn.stopCoachAsk": "Parar de fazer coaching? Seus links com alunos, convite e ferramentas de coaching serão removidos.",
   "trn.err.taken": "Esse horário acabou de ser reservado ou removido. Escolha outro.",
   "trn.err.slotsFull": "Você já tem o máximo de horários futuros que pode abrir. Remova alguns primeiro.",
   "trn.f.payFailed": "O pagamento mensal não foi aprovado",
@@ -3432,6 +3447,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "물리치료사와 재활 전문가용: 리포트가 회원이 공유한 통증과 부상부터 보여 주고, 배정할 때 재활 프로그램이 먼저 나와요.",
   "trn.role.pick": "하나를 고르면 회원이 맞는 호칭을 보고, 그 역할의 도구만 표시됩니다.",
+  "trn.stopCoach": "코칭 종료",
+  "trn.stopCoachAsk": "코칭을 종료할까요? 회원 연결, 초대 및 코칭 도구가 제거됩니다.",
   "trn.err.taken": "방금 예약됐거나 삭제된 시간이에요. 다른 시간을 고르세요.",
   "trn.err.slotsFull": "열 수 있는 예정 시간을 모두 열었어요. 먼저 일부를 삭제하세요.",
   "trn.f.payFailed": "월 결제가 처리되지 않았어요",
@@ -3912,6 +3929,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Fizyoterapistler ve rehabilitasyon uzmanları için: raporlar danışanlarının paylaştığı ağrı ve sakatlıklarla başlar, atama yaparken rehabilitasyon programları önce gelir.",
   "trn.role.pick": "Birini seçin; danışanlar doğru kelimeyi görsün ve yalnızca o rolün araçları çıksın.",
+  "trn.stopCoach": "Koçluğu bırak",
+  "trn.stopCoachAsk": "Koçluğu bırakmak istiyor musunuz? Danışan bağlantılarınız, davetiniz ve koçluk araçlarınız kaldırılacak.",
   "trn.err.taken": "Bu saat az önce alındı ya da kaldırıldı. Başka birini seç.",
   "trn.err.slotsFull": "Açabileceğin kadar yaklaşan saatin var. Önce bazılarını kaldır.",
   "trn.f.payFailed": "Aylık ödeme gerçekleşmedi",
@@ -4432,6 +4451,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "trn.role.physioHint":
     "Dla fizjoterapeutów i specjalistów rehabilitacji: raporty zaczynają się od bólu i kontuzji udostępnianych przez podopiecznych, a przy przypisywaniu na pierwszym miejscu są programy rehabilitacyjne.",
   "trn.role.pick": "Wybierz jedno, żeby klienci widzieli właściwe słowo i tylko narzędzia tej roli.",
+  "trn.stopCoach": "Zakończ coaching",
+  "trn.stopCoachAsk": "Zakończyć coaching? Powiązania z podopiecznymi, zaproszenie i narzędzia coachingowe zostaną usunięte.",
   "trn.err.taken": "Ten termin został właśnie zarezerwowany lub usunięty. Wybierz inny.",
   "trn.err.slotsFull": "Masz już maksymalną liczbę nadchodzących terminów. Najpierw usuń część.",
   "trn.f.payFailed": "Miesięczna płatność nie przeszła",

@@ -132,7 +132,7 @@ describe("desktop layout", () => {
     const nav = screen.getByRole("navigation", { name: "Main" });
     expect(within(nav).queryByRole("button", { name: "Coaching" })).toBeNull();
     await user.click(within(nav).getByRole("button", { name: "Settings" }));
-    expect(screen.getByRole("button", { name: /^Coaching/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Coaching/ })).toBeNull();
 
     act(() => useCoachNotes.setState({ coaching: true, unread: [{ id: "c1", count: 2, name: "Ana" }] }));
     expect(within(nav).getByRole("button", { name: "Coaching, 2 new messages" })).toBeInTheDocument();

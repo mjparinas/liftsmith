@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.stopCoach.title": "Stop coaching",
+  "wn.c.stopCoach.body":
+    "Coach, trainer and physio accounts can now choose Stop coaching in Coaching setup. It removes the coach role, live invite and coach-side links.",
   "wn.c.coachCalendar.title": "Workout calendar",
   "wn.c.coachCalendar.body":
     "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",
@@ -129,6 +132,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Dejar de entrenar",
+  "wn.c.stopCoach.body":
+    "Las cuentas de coach, entrenador y fisioterapeuta pueden elegir Dejar de entrenar en la configuración de Coaching. Se elimina el papel de coach, la invitación activa y los enlaces como coach.",
   "wn.c.coachCalendar.title": "Calendario de entrenamientos",
   "wn.c.coachCalendar.body":
     "Asigna entrenamientos o días de descanso en un calendario mensual. Los atletas ven lo programado en Hoy. Invita a entrenadores asistentes a editar un calendario y revisa la actividad del equipo.",
@@ -261,6 +267,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Arrêter le coaching",
+  "wn.c.stopCoach.body":
+    "Les comptes coach, coach personnel et kinésithérapeute peuvent choisir Arrêter le coaching dans la configuration. Le rôle, l'invitation active et les liens comme coach sont supprimés.",
   "wn.c.coachCalendar.title": "Calendrier des entraînements",
   "wn.c.coachCalendar.body":
     "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui. Invitez des coachs adjoints à modifier un calendrier et consultez l’activité de vos athlètes.",
@@ -396,6 +405,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Coaching beenden",
+  "wn.c.stopCoach.body":
+    "Coach-, Trainer- und Physiotherapie-Konten können jetzt Coaching beenden wählen. Rolle, aktive Einladung und Coach-Verknüpfungen werden entfernt.",
   "wn.c.coachCalendar.title": "Trainingskalender",
   "wn.c.coachCalendar.body":
     "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute. Lade Assistenzcoaches zum Bearbeiten eines Kalenders ein und prüfe die Trainingsaktivität deiner Athleten.",
@@ -528,6 +540,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Smetti di fare coaching",
+  "wn.c.stopCoach.body":
+    "Gli account coach, personal trainer e fisioterapista possono scegliere Smetti di fare coaching in Configurazione. Ruolo, invito attivo e collegamenti come coach vengono rimossi.",
   "wn.c.coachCalendar.title": "Calendario degli allenamenti",
   "wn.c.coachCalendar.body":
     "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi. Invita gli assistenti a modificare un calendario e controlla l’attività degli atleti.",
@@ -660,6 +675,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "コーチングをやめる",
+  "wn.c.stopCoach.body":
+    "コーチ、パーソナルトレーナー、理学療法士のアカウントは設定からコーチングを終了できます。役割、有効な招待、コーチとしてのリンクが削除されます。",
   "wn.c.coachCalendar.title": "トレーニングカレンダー",
   "wn.c.coachCalendar.body":
     "月間カレンダーでトレーニングや休養日を設定できます。選手は「今日」でその日の予定を確認できます。アシスタントコーチをカレンダー編集に招待し、選手のトレーニング記録を確認できます。",
@@ -782,6 +800,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Parar de fazer coaching",
+  "wn.c.stopCoach.body":
+    "Contas de coach, personal trainer e fisioterapeuta podem escolher Parar de fazer coaching nas configurações. O papel, o convite ativo e os links como coach serão removidos.",
   "wn.c.coachCalendar.title": "Calendário de treinos",
   "wn.c.coachCalendar.body":
     "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",
@@ -910,6 +931,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "코칭 종료",
+  "wn.c.stopCoach.body":
+    "코치, 퍼스널 트레이너, 물리치료사 계정은 설정에서 코칭 종료를 선택할 수 있습니다. 역할, 활성 초대와 코치 링크가 제거됩니다.",
   "wn.c.coachCalendar.title": "운동 캘린더",
   "wn.c.coachCalendar.body":
     "월간 캘린더에서 운동이나 휴식일을 배정하세요. 선수는 오늘 화면에서 일정을 확인할 수 있습니다. 보조 코치를 초대해 캘린더를 편집하게 하고 선수들의 운동 활동을 확인하세요.",
@@ -1028,6 +1052,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Zakończ coaching",
+  "wn.c.stopCoach.body":
+    "Konta trenera, trenera personalnego i fizjoterapeuty mogą wybrać Zakończ coaching w ustawieniach. Zostaną usunięte role, aktywne zaproszenie i powiązania trenerskie.",
   "wn.c.coachCalendar.title": "Kalendarz treningów",
   "wn.c.coachCalendar.body":
     "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",
@@ -1156,6 +1183,9 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.stopCoach.title": "Koçluğu bırak",
+  "wn.c.stopCoach.body":
+    "Koç, kişisel antrenör ve fizyoterapist hesapları ayarlarda Koçluğu bırak seçebilir. Rol, aktif davet ve koç bağlantıları kaldırılır.",
   "wn.c.coachCalendar.title": "Antrenman takvimi",
   "wn.c.coachCalendar.body":
     "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

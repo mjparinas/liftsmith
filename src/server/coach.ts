@@ -1144,6 +1144,34 @@ export async function setRole(coachId: string, role: unknown, now = Date.now()):
   return r;
 }
 
+/** Stop an account coaching other people. Incoming coach/client relationships stay intact. */
+export async function stopCoach(coachId: string): Promise<void> {
+  await batch([
+    {
+      sql: `INSERT INTO coach_prefs (account_id, alerts, role, kind, updated_at) VALUES (?, 1, NULL, 'trainer', ?)
+            ON CONFLICT (account_id) DO UPDATE SET role = NULL, kind = 'trainer', updated_at = excluded.updated_at`,
+      args: [coachId, Date.now()],
+    },
+    { sql: "DELETE FROM coach_invites WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_accounts WHERE account_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_links WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_plans WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_defaults WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_notes WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_messages WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_reads WHERE other_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_shares WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_alerts WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_targets WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_forms WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_slots WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_checkins WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_program_assigns WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_programs WHERE coach_id = ?", args: [coachId] },
+  ]);
+}
+
 /**
  * A client's phone synced a finished workout: tell each of their coaches who has alerts on. Called from sync with the
  * events it just stored; a workout logged long ago (an import, a backup) says nothing.
