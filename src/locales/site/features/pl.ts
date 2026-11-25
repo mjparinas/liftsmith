@@ -557,7 +557,7 @@ export const pl: FeaturesText = {
     },
     "coach-programs": {
       name: "Programy trenerów",
-      body: "Trenerzy i trenerzy personalni zamieniają swoje rutyny w program z poziomem, celem i liczbą tygodni, darmowy lub płatny, i udostępniają link. Jednym dotknięciem zapisujesz jego dni w swoich rutynach, a ciężary dobiera twój własny postęp. Za płatne programy płacisz trenerowi przez jego własne konto Stripe.",
+      body: "Trenerzy i trenerzy personalni zamieniają swoje rutyny w program z poziomem, celem i liczbą tygodni, darmowy lub płatny, i udostępniają link. Jednym dotknięciem zapisujesz jego dni w swoich rutynach, a ciężary dobiera twój własny postęp. Za płatne programy płacisz trenerowi przez jego własne konto Stripe. Widok tygodnia układa każdą rutynę na jej dni z odpoczynkiem, widok miesiąca pokazuje przebieg, a Ułóż automatycznie rozkłada rutyny za ciebie.",
       note: "Płatne programy kupuje się na stronie; aplikacje na Androida i iPhone'a pokazują programy darmowe i te, które już masz.",
       proPart: "Pobieranie programów jest darmowe; tworzenie ich to część coachingu, który jest w Pro.",
     },

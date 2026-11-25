@@ -900,7 +900,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-programs",
         name: "Programs from coaches",
-        body: "Coaches and personal trainers turn their routines into a program, with a level, a goal and how many weeks to run it, free or with a price, and share its link. Lifters save its days to their routines in one tap, and their own progression picks the weights. Paid programs pay the coach through their own Stripe account.",
+        body: "Coaches and personal trainers turn their routines into a program, with a level, a goal and how many weeks to run it, free or with a price, and share its link. Lifters save its days to their routines in one tap, and their own progression picks the weights. Paid programs pay the coach through their own Stripe account. A week view puts each routine on its weekdays with rest days, a month view shows how it runs, and Auto-arrange spreads the routines out for you.",
         tier: "both",
         note: "Paid programs are bought on the website; the Android and iPhone apps show free programs and the ones you have.",
         proPart: "Getting programs is free; making them is part of coaching, which is Pro.",

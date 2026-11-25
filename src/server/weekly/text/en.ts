@@ -843,7 +843,7 @@ export const emails: Record<string, Words> = {
     title: "Share and sell your programs",
     intro: "Turn the programs you hand out again and again into something anyone can follow, free or for a price.",
     points: [
-      "Under Coaching › Programs, pick up to seven of your routines as its days, then add a name, a level, a goal and how many weeks.",
+      "Under Coaching › Programs, put your routines on the days of a week with rest days in between (Auto-arrange can do it for you), check it on the month, then add a name, a level, a goal and how many weeks.",
       "Leave the price empty for a free program, or set one once payments with Stripe are on.",
       "Paid programs are bought on the website, and the money goes to your Stripe account.",
       "Share its link anywhere. People who have it keep it, even after you take it off the list.",

@@ -826,7 +826,7 @@ export const emails: Record<string, Words> = {
     title: "Partagez et vendez vos programmes",
     intro: "Faites des programmes que vous donnez encore et encore quelque chose que tout le monde peut suivre, gratuit ou payant.",
     points: [
-      "Dans Coaching › Programmes, choisissez jusqu'à sept de vos routines comme jours, puis ajoutez un nom, un niveau, un objectif et un nombre de semaines.",
+      "Dans Coaching › Programmes, placez vos routines sur les jours d'une semaine avec des repos entre elles (Organiser automatiquement le fait pour vous), vérifiez le mois, puis ajoutez un nom, un niveau, un objectif et le nombre de semaines.",
       "Laissez le prix vide pour un programme gratuit, ou fixez-en un une fois les paiements Stripe activés.",
       "Les programmes payants s'achètent sur le site, et l'argent va sur votre compte Stripe.",
       "Partagez son lien partout. Ceux qui l'ont le gardent, même après l'avoir retiré de la liste.",

@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.programBuilder.title": "Program builder for coaches",
+  "wn.c.programBuilder.body": "Put routines on the days of a week with rest days, see the month, and let Auto-arrange spread them out.",
   "wn.c.programDays.title": "Clearer program days",
   "wn.c.programDays.body": "Picked days show in order, identical routine copies show once, and templates stop making new copies.",
   "wn.c.stopCoach.title": "Stop coaching",
@@ -134,6 +136,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Creador de programas para entrenadores",
+  "wn.c.programBuilder.body": "Pon rutinas en los días de la semana con descansos, mira el mes y deja que Organizar solo las reparta.",
   "wn.c.programDays.title": "Días del programa más claros",
   "wn.c.programDays.body":
     "Los días elegidos salen en orden, las copias idénticas de una rutina salen una vez y las plantillas ya no crean copias nuevas.",
@@ -272,6 +276,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Créateur de programmes pour les coachs",
+  "wn.c.programBuilder.body":
+    "Placez les routines sur les jours de la semaine avec des repos, voyez le mois et laissez Organiser automatiquement les répartir.",
   "wn.c.programDays.title": "Des jours de programme plus clairs",
   "wn.c.programDays.body":
     "Les jours choisis s'affichent dans l'ordre, les copies identiques d'une routine n'apparaissent qu'une fois et les modèles ne créent plus de nouvelles copies.",
@@ -413,6 +420,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Programm-Baukasten für Coaches",
+  "wn.c.programBuilder.body": "Lege Routinen mit Ruhetagen auf die Wochentage, sieh den Monat und lass Automatisch planen sie verteilen.",
   "wn.c.programDays.title": "Klarere Programmtage",
   "wn.c.programDays.body":
     "Gewählte Tage stehen in Reihenfolge, identische Routinekopien erscheinen nur einmal und Vorlagen legen keine neuen Kopien mehr an.",
@@ -551,6 +560,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Costruttore di programmi per coach",
+  "wn.c.programBuilder.body":
+    "Metti le routine nei giorni della settimana con i riposi, guarda il mese e lascia che Organizza da solo le distribuisca.",
   "wn.c.programDays.title": "Giorni del programma più chiari",
   "wn.c.programDays.body":
     "I giorni scelti appaiono in ordine, le copie identiche di una routine compaiono una volta sola e i modelli non creano più nuove copie.",
@@ -689,6 +701,8 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "コーチ向けプログラム作成",
+  "wn.c.programBuilder.body": "ルーティンを曜日に置いて休みを入れ、月で確認し、自動で配置に振り分けを任せられます。",
   "wn.c.programDays.title": "プログラムの日がわかりやすく",
   "wn.c.programDays.body":
     "選んだ日が順番どおりに並び、同じルーティンのコピーは1つだけ表示され、テンプレートが新しいコピーを作らなくなりました。",
@@ -817,6 +831,8 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Criador de programas para treinadores",
+  "wn.c.programBuilder.body": "Coloque rotinas nos dias da semana com descansos, veja o mês e deixe Organizar sozinho distribuí-las.",
   "wn.c.programDays.title": "Dias do programa mais claros",
   "wn.c.programDays.body":
     "Os dias escolhidos aparecem em ordem, cópias idênticas de uma rotina aparecem uma vez só e os modelos não criam mais cópias novas.",
@@ -951,6 +967,8 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "코치용 프로그램 빌더",
+  "wn.c.programBuilder.body": "루틴을 요일에 놓고 휴식일을 넣고, 월로 확인하고, 자동 배치로 나눠 보세요.",
   "wn.c.programDays.title": "프로그램 일정이 더 명확해졌어요",
   "wn.c.programDays.body": "고른 날이 순서대로 보이고, 같은 루틴 사본은 한 번만 보이며, 템플릿이 더 이상 새 사본을 만들지 않아요.",
   "wn.c.stopCoach.title": "코칭 종료",
@@ -1074,6 +1092,8 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Kreator programów dla trenerów",
+  "wn.c.programBuilder.body": "Rozłóż rutyny na dni tygodnia z odpoczynkiem, zobacz miesiąc i pozwól, by Ułóż automatycznie je rozłożyło.",
   "wn.c.programDays.title": "Czytelniejsze dni programu",
   "wn.c.programDays.body": "Wybrane dni są po kolei, identyczne kopie rutyny pojawiają się raz, a szablony nie tworzą już nowych kopii.",
   "wn.c.stopCoach.title": "Zakończ coaching",
@@ -1207,6 +1227,8 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Koçlar için program oluşturucu",
+  "wn.c.programBuilder.body": "Rutinleri dinlenme günleriyle haftanın günlerine koy, ayı gör ve Otomatik yerleştir onları dağıtsın.",
   "wn.c.programDays.title": "Daha anlaşılır program günleri",
   "wn.c.programDays.body":
     "Seçilen günler sırayla görünür, aynı rutinin kopyaları bir kez görünür ve şablonlar artık yeni kopya oluşturmaz.",

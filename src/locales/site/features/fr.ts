@@ -487,7 +487,7 @@ export const fr: FeaturesText = {
     },
     "coach-programs": {
       name: "Programmes de coachs",
-      body: "Les coachs et entraîneurs personnels font de leurs routines un programme, avec un niveau, un objectif et un nombre de semaines, gratuit ou payant, et partagent son lien. Vous enregistrez ses jours dans vos routines d'un toucher, et votre propre progression choisit les charges. Les programmes payants paient le coach par son propre compte Stripe.",
+      body: "Les coachs et entraîneurs personnels font de leurs routines un programme, avec un niveau, un objectif et un nombre de semaines, gratuit ou payant, et partagent son lien. Vous enregistrez ses jours dans vos routines d'un toucher, et votre propre progression choisit les charges. Les programmes payants paient le coach par son propre compte Stripe. Une vue semaine place chaque routine sur ses jours avec des repos, une vue mois montre son déroulement et Organiser automatiquement répartit les routines pour vous.",
       note: "Les programmes payants s'achètent sur le site ; les apps Android et iPhone montrent les programmes gratuits et ceux que vous avez.",
       proPart: "Obtenir des programmes est gratuit ; en créer fait partie du coaching, qui est Pro.",
     },

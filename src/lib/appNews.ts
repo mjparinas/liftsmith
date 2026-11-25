@@ -46,10 +46,13 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.18.2",
+    version: "0.19.0",
     day: "2026-11-26",
-    headline: "Coach programs: clearer days, and no more piles of template copies",
-    changes: [{ id: "programDays", kind: "fixed", icon: "layers" }],
+    headline: "Coaches lay out programs on a week and a month, with Auto-arrange for rest days",
+    changes: [
+      { id: "programBuilder", kind: "new", icon: "calendar" },
+      { id: "programDays", kind: "fixed", icon: "layers" },
+    ],
   },
   {
     version: "0.18.1",

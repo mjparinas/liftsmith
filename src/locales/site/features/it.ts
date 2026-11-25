@@ -480,7 +480,7 @@ export const it: FeaturesText = {
     },
     "coach-programs": {
       name: "Programmi dei coach",
-      body: "Coach e personal trainer trasformano le loro routine in un programma, con livello, obiettivo e numero di settimane, gratuito o a pagamento, e ne condividono il link. Salvi i suoi giorni nelle tue routine con un tocco e la tua progressione sceglie i carichi. I programmi a pagamento pagano il coach tramite il suo account Stripe.",
+      body: "Coach e personal trainer trasformano le loro routine in un programma, con livello, obiettivo e numero di settimane, gratuito o a pagamento, e ne condividono il link. Salvi i suoi giorni nelle tue routine con un tocco e la tua progressione sceglie i carichi. I programmi a pagamento pagano il coach tramite il suo account Stripe. Una vista settimana mette ogni routine nei suoi giorni con i riposi, una vista mese mostra come procede e Organizza da solo distribuisce le routine per te.",
       note: "I programmi a pagamento si acquistano sul sito; le app per Android e iPhone mostrano quelli gratuiti e quelli che hai.",
       proPart: "Ottenere programmi è gratis; crearli fa parte del coaching, che è Pro.",
     },

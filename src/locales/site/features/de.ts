@@ -486,7 +486,7 @@ export const de: FeaturesText = {
     },
     "coach-programs": {
       name: "Programme von Coaches",
-      body: "Coaches und Personal Trainer machen aus ihren Routinen ein Programm, mit Level, Ziel und Anzahl Wochen, kostenlos oder mit Preis, und teilen den Link. Du speicherst seine Tage mit einem Tippen in deinen Routinen, und deine eigene Progression wählt die Gewichte. Kostenpflichtige Programme bezahlst du dem Coach über sein eigenes Stripe-Konto.",
+      body: "Coaches und Personal Trainer machen aus ihren Routinen ein Programm, mit Level, Ziel und Anzahl Wochen, kostenlos oder mit Preis, und teilen den Link. Du speicherst seine Tage mit einem Tippen in deinen Routinen, und deine eigene Progression wählt die Gewichte. Kostenpflichtige Programme bezahlst du dem Coach über sein eigenes Stripe-Konto. Eine Wochenansicht legt jede Routine auf ihre Wochentage mit Ruhetagen, eine Monatsansicht zeigt den Ablauf, und Automatisch planen verteilt die Routinen für dich.",
       note: "Kostenpflichtige Programme werden auf der Website gekauft; die Android- und iPhone-Apps zeigen kostenlose Programme und die, die du hast.",
       proPart: "Programme zu bekommen ist kostenlos; sie zu erstellen gehört zum Coaching, das Pro ist.",
     },
