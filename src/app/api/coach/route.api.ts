@@ -21,6 +21,7 @@
 // one of the client's to fill in. The overview adds the coach's `forms` and the client's waiting `checkins`, and a
 // client's view adds `checkins`, `repeat` and the coach's `forms`. The overview's `videos` counts form videos and
 // notes waiting (formVideos.ts; the videos themselves are /api/coach/video/).
+import { pickCell, shiftDay, utcDay } from "@/lib/scheduleDays";
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { accountInfo } from "@/server/accounts";
 import {
@@ -81,6 +82,19 @@ import {
   programCalendar,
   type AssignScope,
 } from "@/server/coachProgramAssign";
+import {
+  acceptCalendarInvite,
+  athleteSchedule,
+  calendarAccess,
+  calendarOwner,
+  clearScheduleDay,
+  inviteCalendarAssistant,
+  revokeCalendarAccess,
+  scheduleMonth,
+  setScheduleDay,
+  trainingActivity,
+  upcomingSchedule,
+} from "@/server/coachSchedule";
 import { rateLimit } from "@/server/db";
 import { dropPairVideos, videosWaiting } from "@/server/formVideos";
 import { saveToken } from "@/server/push";
@@ -91,6 +105,15 @@ export async function GET(req: Request) {
   const s = await signedIn(req);
   if (s instanceof Response) return s;
   const q = new URL(req.url).searchParams;
+  if (q.has("trainingActivity")) return reply(req, 200, { athletes: await trainingActivity(s.accountId) });
+  if (q.has("calendarAccess")) return reply(req, 200, { access: await calendarAccess(s.accountId) });
+  const scope = q.get("schedule");
+  if (scope !== null) {
+    const owner = await calendarOwner(s.accountId, q.get("access"), scope);
+    if (!owner) return reply(req, 404, { error: "gone" });
+    const result = await scheduleMonth(owner, scope, q.get("year"), q.get("month"));
+    return reply(req, "error" in result ? 400 : 200, result);
+  }
   const chat = q.get("chat");
   if (chat !== null) {
     const num = (k: string) => (q.has(k) ? Number(q.get(k)) : undefined);
@@ -118,7 +141,7 @@ export async function GET(req: Request) {
   const client = q.get("client");
   if (client === null) {
     await touchSeen(s.accountId);
-    const [o, mine, pending, slots, sessions, plan, videos] = await Promise.all([
+    const [o, mine, pending, slots, sessions, plan, videos, schedule] = await Promise.all([
       overview(s.accountId),
       forms(s.accountId),
       pendingCheckins(s.accountId),
@@ -126,19 +149,37 @@ export async function GET(req: Request) {
       clientSlots(s.accountId),
       coachPlanOf(s.accountId),
       videosWaiting(s.accountId),
+      upcomingSchedule(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
     const pay = payConfig()
       ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId), fee: await feeFor(s.accountId) }
       : null;
-    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan, videos });
+    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan, videos, schedule });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
   const view = await clientView(s.accountId, client);
   if (!view) return reply(req, 404, { error: "gone" });
-  const [mine, sent, slots] = await Promise.all([forms(s.accountId), checkinsOf(s.accountId, client), slotsWith(s.accountId, client)]);
+  const today = utcDay(Date.now());
+  const [mine, sent, slots, schedule] = await Promise.all([
+    forms(s.accountId),
+    checkinsOf(s.accountId, client),
+    slotsWith(s.accountId, client),
+    athleteSchedule(client, shiftDay(today, -28), shiftDay(today, 1)),
+  ]);
   const pay = payConfig() ? { account: await payAccount(s.accountId), ...(await paymentsOf(s.accountId, client)) } : null;
-  return reply(req, 200, { ...view, ...sent, forms: mine, slots, pay, role: await roleOf(s.accountId) });
+  return reply(req, 200, {
+    ...view,
+    ...sent,
+    schedule: [...new Set(schedule.map((d) => d.date))].flatMap((date) => {
+      const day = pickCell(schedule, date);
+      return day?.coachId === s.accountId ? [day] : [];
+    }),
+    forms: mine,
+    slots,
+    pay,
+    role: await roleOf(s.accountId),
+  });
 }
 
 export async function POST(req: Request) {
@@ -180,12 +221,34 @@ export async function POST(req: Request) {
         sticker?: unknown;
         programId?: unknown;
         scope?: unknown;
+        date?: unknown;
+        access?: unknown;
         weekdays?: unknown;
         teamId?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
   switch (body.action) {
+    case "inviteCalendarAssistant": {
+      const code = await inviteCalendarAssistant(s.accountId, body.scope);
+      return code ? reply(req, 200, { code }) : reply(req, 404, { error: "gone" });
+    }
+    case "acceptCalendarInvite":
+      return (await acceptCalendarInvite(s.accountId, body.code)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
+    case "revokeCalendarAccess":
+      await revokeCalendarAccess(s.accountId, body.id);
+      return reply(req, 200, { ok: true });
+    case "scheduleDay":
+    case "scheduleClear": {
+      const owner = await calendarOwner(s.accountId, body.access, body.scope);
+      if (!owner) return reply(req, 404, { error: "gone" });
+      const result =
+        body.action === "scheduleDay"
+          ? await setScheduleDay(owner, body.scope, body.date, body.kind, body.name, body.code)
+          : await clearScheduleDay(owner, body.scope, body.date);
+      if ("error" in result) return reply(req, result.error === "gone" ? 404 : 400, result);
+      return reply(req, 200, "date" in result ? { day: result } : result);
+    }
     case "invite":
       return reply(req, 200, { invite: await makeInvite(s.accountId, Date.now(), undefined, body.via) });
     case "cancel":

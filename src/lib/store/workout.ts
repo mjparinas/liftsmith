@@ -1,5 +1,6 @@
 import { track } from "../analytics";
 import { startDistance } from "../cardio";
+import { scheduledRoutine } from "../coachSchedule";
 import { derive } from "../derive";
 import { workoutEventIds } from "../editHistory";
 import { markJoke, plateJoke, seenJokes } from "../eggs";
@@ -412,7 +413,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const g = gym();
       const { preview, profile, events } = get();
       if (g && preview) {
-        const routine = profile.routines?.find((x) => x.id === preview.routineId);
+        const routine = profile.routines?.find((x) => x.id === preview.routineId) ?? scheduledRoutine(preview.routineId);
         const was = partsOn(picks, profile, routine, preview, g, events, Date.now());
         // Lifting off needs cardio or rehab to do: switching it off turns the cardio on, and switching the last of
         // them off brings the lifting back (Melvin, 2026-11-14: "only do cardio and stretch").
@@ -582,12 +583,18 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const base = given ?? get().preview;
       const g = gym();
       if (!base || !g || !base.items.length) return;
+      if (base.routineId?.startsWith("coach-schedule-") && !scheduledRoutine(base.routineId)) {
+        get().pickRoutine(null);
+        return;
+      }
       let plan: Plan = base;
       const sessionId = uid();
       const now = Date.now();
       const r = get().readiness;
       const picks = get().partPicks;
-      const routine = plan.routineId ? get().profile.routines?.find((x) => x.id === plan.routineId) : undefined;
+      const routine = plan.routineId
+        ? (get().profile.routines?.find((x) => x.id === plan.routineId) ?? scheduledRoutine(plan.routineId, now))
+        : undefined;
       // Rehab beside the lifting and cardio after it (stage 5): added to the end of the plan, each exercise marked
       // with its part, so the workout runs them like any exercise and the sets say which part they were.
       const { events, profile } = get();

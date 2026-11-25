@@ -496,6 +496,10 @@ export const fr: FeaturesText = {
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
     },
+    "coach-calendar": {
+      name: "Calendrier des entraînements",
+      body: "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui. Invitez des coachs adjoints à modifier un calendrier et consultez l’activité de vos athlètes.",
+    },
     "coach-assign-program": {
       name: "Assigner un programme de saison aux clients ou à une équipe",
       body: "Les coachs assignent un programme de plusieurs jours (Upper/Lower, Push/Pull/Legs ou le leur) comme plan fixe par jour de la semaine pendant N semaines. Les athlètes le suivent une fois ; Aujourd’hui montre l’entraînement du jour. Un calendrier montre qui a fait chaque jour et qui pas encore — prénoms seulement pour les équipes scolaires, jamais de poids.",

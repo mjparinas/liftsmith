@@ -1400,6 +1400,27 @@ const SCHEMA = [
   "CREATE INDEX IF NOT EXISTS coach_program_assigns_coach ON coach_program_assigns (coach_id, program_id, status)",
   "CREATE INDEX IF NOT EXISTS coach_program_assigns_team ON coach_program_assigns (team_id, status, created_at)",
   "CREATE INDEX IF NOT EXISTS coach_program_assigns_pair ON coach_program_assigns (coach_id, client_id, status)",
+  // A coach's calendar (coachSchedule.ts): one cell per coach, scope and civil date. scope is `all`, `team:<id>` or `client:<id>`.
+  `CREATE TABLE IF NOT EXISTS coach_schedule_days (
+    coach_id TEXT NOT NULL,
+    scope TEXT NOT NULL,
+    date TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    code TEXT NOT NULL DEFAULT '',
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, scope, date)
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_schedule_days_scope ON coach_schedule_days (scope, date)",
+  `CREATE TABLE IF NOT EXISTS coach_calendar_access (
+    id TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    scope TEXT NOT NULL,
+    assistant_id TEXT,
+    expires_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_calendar_access_owner ON coach_calendar_access (owner_id)",
+  "CREATE INDEX IF NOT EXISTS coach_calendar_access_assistant ON coach_calendar_access (assistant_id)",
   // Ratings and reviews of programs (programReviews.ts, 2026-11-16): one per lifter and program, from adults who've had
   // it two weeks, with one public reply from its coach. Hidden and reply_hidden work as in coach_reviews.
   `CREATE TABLE IF NOT EXISTS program_reviews (

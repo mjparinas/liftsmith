@@ -6,7 +6,8 @@ import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
 import { useProMember } from "@/lib/billing";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
-import { sessionDetail } from "@/lib/dashboard";
+import { scheduleOn } from "@/lib/coachSchedule";
+import { dayKey as calendarDayKey, sessionDetail } from "@/lib/dashboard";
 import type { SessionSummary } from "@/lib/derive";
 import { flameTaps } from "@/lib/eggs";
 import { can } from "@/lib/entitlements";
@@ -37,6 +38,7 @@ import { callWhy, itemWhy, itemWhyWithoutLoad, pairWhy, sharedLoadNote, whyConte
 import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
+import { ScheduleToday } from "./CoachCalendar";
 import { CoachBadge } from "./CoachHome";
 import { CheckInChip, PlanExtras, TodayMoments } from "./Extras";
 import { loadText, repsText, setText } from "./format";
@@ -201,6 +203,7 @@ export function Today() {
   // Press and hold an exercise to drag it, or tap its number to move it with buttons (Reorder.tsx).
   const reorder = useReorder(moveExercise, { min: 0, max: (preview?.items.length ?? 1) - 1 });
   const now = useNow();
+  const assignment = useCoachNotes(() => scheduleOn(calendarDayKey(now)));
   const rec = useMemo(() => recovery(events, now), [events, now]);
   const g = useGame();
   const member = useProMember();
@@ -395,6 +398,8 @@ export function Today() {
 
       <NowPlayingBar className="mt-3" />
 
+      {!active && assignment && <ScheduleToday cell={assignment} />}
+
       <TodayMoments />
 
       {/* Phone order (UX audit, 2026-11-13): the call and any coach's notes, then the plan, then the quote, saving
@@ -513,7 +518,7 @@ export function Today() {
             </section>
           )}
 
-          {!active && <ProgramAssignToday />}
+          {!active && !assignment && <ProgramAssignToday />}
           {!active && <CoachProgramEndedToday />}
           {!active && <PlanToday />}
           {!active && <PlanEnded />}

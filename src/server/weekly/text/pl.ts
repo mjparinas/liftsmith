@@ -1077,6 +1077,7 @@ export const emails: Record<string, Words> = {
       "Sportowcy dostają push i śledzą raz na Dziś. Ich własna progresja wybiera ciężary.",
       "W zaplanowany dzień Dziś pokazuje ten trening. Dni wolne zostają odpoczynkiem.",
       "Kalendarz programu pokazuje Zrobione i Jeszcze nie. Drużyny szkolne: tylko imiona, nigdy ciężary.",
+      "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj.",
     ],
     dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta.",
   },
