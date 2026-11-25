@@ -192,6 +192,18 @@ export function t(key: MessageKey, vars?: Record<string, string | number>): stri
   });
 }
 
+/**
+ * The same line for a personal trainer or physio (`key`, which says client) and a sports coach (`key.ath`, which says
+ * athlete). A missing athlete line falls back to the client one.
+ */
+export function tFor(athlete: boolean, key: MessageKey, vars?: Record<string, string | number>): string {
+  if (athlete) {
+    const alt = `${key}.ath` as MessageKey;
+    if (english(alt) !== undefined) return t(alt, vars);
+  }
+  return t(key, vars);
+}
+
 const nf = new Map<string, Intl.NumberFormat>();
 /** A number for display in the current language: whole numbers stay whole, up to two decimals. */
 export function num(n: number, opts: Intl.NumberFormatOptions = { maximumFractionDigits: 2 }): string {

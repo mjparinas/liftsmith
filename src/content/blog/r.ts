@@ -26,7 +26,7 @@ export const BLOG_R: Article[] = [
       },
       { h2: "What stays free" },
       {
-        p: "Your clients always train free, on Android, iPhone and the web. They never need Pro to follow your routines, answer a check-in, book a session or pay you. High school coaches who confirm a school email address still get Pro free, and so do their athletes aged 13 to 18, with room for whole teams. On Coach and Coach Plus, Liftsmith takes nothing from what your clients pay you: payments go straight to your own Stripe account, less Stripe's usual card fees. On Pro, Liftsmith keeps 2% of each client payment.",
+        p: "Your clients always train free, on Android, iPhone and the web. They never need Pro to follow your routines, answer a check-in, book a session or pay you. High school coaches who confirm a school email address still get Pro free, and so do their athletes aged 13 to 18, with room for whole teams. On Coach and Coach Plus, Liftsmith takes nothing from what your personal-training clients pay you: those payments go straight to your own Stripe account, less Stripe's usual card fees. On Pro, Liftsmith keeps 2% of each of those payments.",
       },
       { cta: "coach" },
       { h2: "When you reach your limit" },

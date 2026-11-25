@@ -120,7 +120,7 @@ export const en = {
     "Pick personal trainer, sports coach or physio under Coaching › Setup. Each role shows only its tools — sports coaches lead with season programs and teams; messaging stays for everyone.",
   "wn.c.assignProgram.title": "Assign a season program",
   "wn.c.assignProgram.body":
-    "Coaches put Upper/Lower, Push/Pull/Legs or their own multi-day program on clients or a school team for N weeks. Athletes follow once; Today shows that weekday’s workout. A program calendar shows Done and Not yet — first names only for school teams, never weights.",
+    "Coaches put Upper/Lower, Push/Pull/Legs or their own multi-day program on athletes or a school team for N weeks. Athletes follow once; Today shows that weekday’s workout. A program calendar shows Done and Not yet — first names only for school teams, never weights.",
 } as const;
 
 type Key = keyof typeof en;

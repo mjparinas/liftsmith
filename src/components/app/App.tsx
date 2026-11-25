@@ -13,6 +13,7 @@ import { startBilling, useBilling, useProMember } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { refreshCheckins, useCheckins } from "@/lib/buddy";
 import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInvite";
+import { coachingNav } from "@/lib/coachMode";
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
@@ -664,10 +665,11 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
 ]);
 
 // The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the phone's tabs down the left
-// side, then Programs and Tools, Coaching for accounts that coach or are coached, and Settings at the foot (Melvin,
-// 2026-11-13). On the phone these stay a tap away from Today, Progress and Settings; on desktop the sidebar is their
-// one control, so the other links to them hide there (one control, one destination). It sets --nav-h to 0 (nothing covers
-// the bottom of the page) and --side-w to its width, so bars pinned to the bottom of a screen and toasts start after it.
+// side, then Programs and Tools, then the coaching item only for a personal trainer, sports coach or physio (named
+// and icon'd for that role, Melvin 2026-11-24), and Settings at the foot (Melvin, 2026-11-13). On the phone these stay
+// a tap away from Today, Progress and Settings; on desktop the sidebar is their one control, so the other links to them
+// hide there (one control, one destination). It sets --nav-h to 0 (nothing covers the bottom of the page) and --side-w
+// to its width, so bars pinned to the bottom of a screen and toasts start after it.
 function Sidebar({ route }: { route: Route }) {
   useEffect(() => {
     const root = document.documentElement;
@@ -680,8 +682,9 @@ function Sidebar({ route }: { route: Route }) {
   }, []);
   const waiting = useFriendsWaiting();
   const tabs = useTabs();
-  const coaching = useCoachNotes((s) => s.coaching);
+  const navRole = coachingNav(useCoachNotes((s) => s.who.role ?? null));
   const coachUnread = useCoachNotes(coachWaiting);
+  const coachLabel = navRole ? t(`trn.role.${navRole.role}`) : "";
   return (
     <nav
       className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 overflow-y-auto border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
@@ -706,13 +709,13 @@ function Sidebar({ route }: { route: Route }) {
         ))}
         <SideItem route="programs" label={t("prog.title")} icon="layers" on={route === "programs"} />
         <SideItem route="tools" label={t("tools.title")} icon="bolt" on={route === "tools"} />
-        {coaching && (
+        {navRole && (
           <SideItem
             route="trainer"
-            label={t("trn.title")}
-            icon="target"
+            label={coachLabel}
+            icon={navRole.icon}
             on={route === "trainer"}
-            dot={coachUnread > 0 ? `${t("trn.title")}, ${t("trn.unread", { count: coachUnread })}` : undefined}
+            dot={coachUnread > 0 ? `${coachLabel}, ${t("trn.unread", { count: coachUnread })}` : undefined}
             count={coachUnread}
           />
         )}

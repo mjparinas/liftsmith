@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { useBilling } from "@/lib/billing";
 import { setCoachOffers, useCoachBilling } from "@/lib/coachBilling";
 import { DEFAULT_LIMITS } from "@/lib/coachPlans";
-import { t } from "@/lib/i18n";
+import { t, tFor } from "@/lib/i18n";
 import type { CoachPlanInfo } from "@/lib/trainer";
 
 import { CoachPlanCard, effectivePlan } from "./CoachPlan";
@@ -97,5 +97,18 @@ describe("the coach plan card", () => {
     render(<CoachPlanCard plan={plan({ via: "school", limit: 300, clients: 40 })} onChange={() => {}} />);
     expect(screen.getByText(t("cpl.school", { limit: 300 }))).toBeTruthy();
     expect(screen.queryByRole("button", { name: t("cpl.see") })).toBeNull();
+  });
+
+  it("a sports coach's school plan does not mention athlete payments", () => {
+    render(<CoachPlanCard athlete plan={plan({ via: "school", limit: 300, clients: 40 })} onChange={() => {}} />);
+    expect(screen.getByText(tFor(true, "cpl.school", { limit: 300 }))).toBeTruthy();
+    expect(screen.queryByRole("button", { name: t("cpl.see") })).toBeNull();
+    expect(screen.queryByText(/pay you|Stripe|2%/i)).toBeNull();
+  });
+
+  it("a sports coach on Coach Plus does not see a cut of what athletes pay", () => {
+    render(<CoachPlanCard athlete plan={plan({ tier: "coachPlus", limit: 1000, clients: 4 })} onChange={() => {}} />);
+    expect(screen.getByText(tFor(true, "cpl.free"))).toBeTruthy();
+    expect(screen.queryByText(/pay you|2%/i)).toBeNull();
   });
 });

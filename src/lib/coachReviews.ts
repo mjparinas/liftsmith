@@ -4,7 +4,7 @@
 // docs/decisions/coach-reviews.md). A client rates their coach after four weeks together or two sessions; nobody sees a
 // coach's rating until they have three reviews; the coach replies once to each; anyone can report a review or reply.
 import { api, AuthError, readAccount } from "./auth";
-import { t } from "./i18n";
+import { t, tFor } from "./i18n";
 
 /** The server's REVIEW_LIMITS, for the words around the form. */
 export const REVIEW_RULES = { days: 28, sessions: 2, shown: 3, text: 500, outcomeDays: 14 } as const;
@@ -67,8 +67,8 @@ export const reportReview = async (id: string, part: "review" | "reply", reason:
 /** The share of a coach's clients who trained in the last two weeks, as a whole percent. */
 export const activeShare = (o: NonNullable<Rating["outcome"]>) => (o.clients ? Math.round((o.active / o.clients) * 100) : 0);
 
-/** What went wrong, in the lifter's words. */
-export function reviewError(e: unknown): string {
+/** What went wrong, in the lifter's words. A sports coach's own screen says athlete (`athlete`). */
+export function reviewError(e: unknown, athlete = false): string {
   if (e instanceof AuthError) {
     if (e.message === "offline") return t("trn.err.offline");
     if (e.message === "slow") return t("trn.err.slow");
@@ -76,7 +76,7 @@ export function reviewError(e: unknown): string {
     if (e.message === "words") return t("rev.err.words");
     if (e.message === "teen") return t("rev.teen");
     if (e.message === "wait") return t("rev.err.wait");
-    if (e.message === "gone" || e.message === "notClient") return t("trn.err.gone");
+    if (e.message === "gone" || e.message === "notClient") return tFor(athlete, "trn.err.gone");
   }
   return t("trn.err.failed");
 }

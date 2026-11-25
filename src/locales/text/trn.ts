@@ -4,6 +4,27 @@ import type { Message } from "@/lib/i18n";
 // English is the source: add a key here first, then the other five languages.
 
 export const en = {
+  "trn.proFree.ath": "Pro is free for you while 3 or more of your athletes are training (each with a workout in the last 14 days).",
+  "trn.yourClients.ath": "Your athletes",
+  "trn.inviteNone.ath": "Make an invite code to give to your athletes.",
+  "trn.noClients.ath": "No athletes yet. Send someone your invite.",
+  "trn.client.ath": "Athlete",
+  "trn.remove.ath": "Remove athlete",
+  "trn.plans.ath": "Routines for this athlete",
+  "trn.err.plansFull.ath": "This athlete already has 10 routines from you. Take one back first.",
+  "trn.err.self.ath": "That's your own code. Give it to your athletes.",
+  "trn.err.gone.ath": "This athlete stopped sharing with you.",
+  "trn.inviteHint.ath": "New athletes open your invite link, or enter this code when they set up the app or under Coaching › Your coach. It works for a week.",
+  "trn.setupTitle.ath": "New athletes start with",
+  "trn.setupHint.ath": "Pick what fits most of your athletes. They skip these questions when they set up the app, and can change them later in Settings. Tap a picked answer again to let them choose.",
+  "trn.setupSaved.ath": "Saved. New athletes start with this.",
+  "trn.alerts.ath": "Athlete alerts",
+  "trn.alertsHint.ath": "A notification when an athlete finishes a workout, or hasn't trained for a week.",
+  "trn.invite.ath": "Invite athletes",
+  "trn.msg.noneBody.ath": "Athletes show here once they join. Send your invite from Athletes.",
+  "trn.badge.coaching.ath": { one: "Coach · {count} athlete", other: "Coach · {count} athletes" },
+  "trn.rowCoach.ath": { one: "{count} athlete · messages and programs", other: "{count} athletes · messages and programs" },
+  "trn.whatYouSee.ath": "You see this athlete's training, plus anything they choose to share. They can change what they share, or stop sharing, at any time.",
   "trn.proFree": "Pro is free for you while 3 or more of your clients are training (each with a workout in the last 14 days).",
   "trn.row": "Coaching",
   "trn.rowNote": "Train with a coach, or coach athletes and clients",
@@ -284,7 +305,7 @@ export const en = {
   "trn.role.trainerHint":
     "One-on-one clients. You get sessions, booking, check-ins, payments and programs. Teams and sports tools stay hidden.",
   "trn.role.coachHint":
-    "Sports and teams. You set season programs for athletes, message them and run school teams. Booking, check-ins and payments stay hidden.",
+    "Sports and teams. You set season programs for athletes, message them and run school teams. Booking and check-ins stay hidden.",
   "trn.role.physio": "Physio",
   "trn.role.physioHint":
     "For physios and rehab clinicians: reports lead with pain and injuries your clients share, and rehab programs come first when you assign.",
@@ -418,6 +439,27 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "Pro es gratis para ti mientras 3 o más de tus atletas entrenen (cada uno con un entrenamiento en los últimos 14 días).",
+  "trn.yourClients.ath": "Tus atletas",
+  "trn.inviteNone.ath": "Crea un código de invitación para dárselo a tus atletas.",
+  "trn.noClients.ath": "Aún no tienes atletas. Envía tu invitación a alguien.",
+  "trn.client.ath": "Atleta",
+  "trn.remove.ath": "Quitar atleta",
+  "trn.plans.ath": "Rutinas para este atleta",
+  "trn.err.plansFull.ath": "Este atleta ya tiene 10 rutinas tuyas. Retira una primero.",
+  "trn.err.self.ath": "Es tu propio código. Dáselo a tus atletas.",
+  "trn.err.gone.ath": "Este atleta dejó de compartir contigo.",
+  "trn.inviteHint.ath": "Los atletas nuevos abren tu enlace de invitación o escriben este código al configurar la app o en Entrenador › Tu entrenador. Sirve durante una semana.",
+  "trn.setupTitle.ath": "Los atletas nuevos empiezan con",
+  "trn.setupHint.ath": "Elige lo que encaja con la mayoría de tus atletas. Se saltan estas preguntas al configurar la app y pueden cambiarlas luego en Ajustes. Vuelve a tocar una respuesta elegida para dejar que la elijan ellos.",
+  "trn.setupSaved.ath": "Guardado. Los atletas nuevos empiezan con esto.",
+  "trn.alerts.ath": "Avisos de atletas",
+  "trn.alertsHint.ath": "Una notificación cuando un atleta termina un entrenamiento o lleva una semana sin entrenar.",
+  "trn.invite.ath": "Invitar a atletas",
+  "trn.msg.noneBody.ath": "Tus atletas aparecen aquí cuando se unen. Envía tu invitación desde Atletas.",
+  "trn.badge.coaching.ath": { one: "Entrenador · {count} atleta", other: "Entrenador · {count} atletas" },
+  "trn.rowCoach.ath": { one: "{count} atleta · mensajes, agenda y seguimientos", other: "{count} atletas · mensajes, agenda y seguimientos" },
+  "trn.whatYouSee.ath": "Ves el entrenamiento de este atleta y lo que decida compartir. Puede cambiar lo que comparte, o dejar de compartir, cuando quiera.",
   "trn.proFree": "Pro es gratis para ti mientras 3 o más de tus clientes entrenen (cada uno con un entrenamiento en los últimos 14 días).",
   "trn.row": "Entrenador",
   "trn.rowNote": "Trabaja con un entrenador o entrena a tus propios clientes",
@@ -700,7 +742,7 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Clientes uno a uno. Sesiones, reservas, seguimientos, pagos y programas. Los equipos y herramientas deportivas quedan ocultos.",
   "trn.role.coachHint":
-    "Deportes y equipos. Programas de temporada para atletas, mensajes y equipos escolares. Reservas, seguimientos y pagos quedan ocultos.",
+    "Deportes y equipos. Programas de temporada para atletas, mensajes y equipos escolares. Reservas y seguimientos quedan ocultos.",
   "trn.role.physio": "Fisioterapeuta",
   "trn.role.physioHint":
     "Para fisioterapeutas y profesionales de rehabilitación: los informes empiezan por el dolor y las lesiones que comparten tus clientes, y los programas de rehabilitación aparecen primero al asignar.",
@@ -832,6 +874,27 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "Pro est gratuit pour vous tant que 3 de vos athlètes ou plus s’entraînent (chacun avec une séance dans les 14 derniers jours).",
+  "trn.setupHint.ath": "Choisissez ce qui convient à la plupart de vos athlètes. Ils sautent ces questions en configurant l'app et pourront les modifier plus tard dans Réglages. Touchez de nouveau une réponse choisie pour les laisser choisir.",
+  "trn.yourClients.ath": "Vos athlètes",
+  "trn.inviteNone.ath": "Créez un code d'invitation à donner à vos athlètes.",
+  "trn.noClients.ath": "Pas encore d'athlètes. Envoyez votre invitation à quelqu'un.",
+  "trn.client.ath": "Athlète",
+  "trn.remove.ath": "Retirer cet athlète",
+  "trn.plans.ath": "Routines pour cet athlète",
+  "trn.err.plansFull.ath": "Cet athlète a déjà 10 routines de votre part. Reprenez-en une d'abord.",
+  "trn.err.self.ath": "C'est votre propre code. Donnez-le à vos athlètes.",
+  "trn.err.gone.ath": "Cet athlète ne partage plus avec vous.",
+  "trn.inviteHint.ath": "Les nouveaux athlètes ouvrent votre lien d'invitation, ou saisissent ce code en configurant l'app ou dans Coaching › Votre coach. Il est valable une semaine.",
+  "trn.setupTitle.ath": "Les nouveaux athlètes commencent avec",
+  "trn.setupSaved.ath": "Enregistré. Les nouveaux athlètes commencent avec ces choix.",
+  "trn.alerts.ath": "Alertes athlètes",
+  "trn.alertsHint.ath": "Une notification quand un athlète termine une séance, ou n'a pas fait de séance depuis une semaine.",
+  "trn.invite.ath": "Inviter des athlètes",
+  "trn.msg.noneBody.ath": "Vos athlètes s'affichent ici dès qu'ils vous rejoignent. Envoyez votre invitation depuis Athlètes.",
+  "trn.badge.coaching.ath": { one: "Coach · {count} athlète", other: "Coach · {count} athlètes" },
+  "trn.rowCoach.ath": { one: "{count} athlète · messages, agenda et bilans", other: "{count} athlètes · messages, agenda et bilans" },
+  "trn.whatYouSee.ath": "Vous voyez l'entraînement de cet athlète, et ce qu'il choisit de partager. Il peut changer ce qu'il partage, ou arrêter, à tout moment.",
   "trn.proFree":
     "Pro est gratuit pour vous tant que 3 de vos clients ou plus s’entraînent (chacun avec une séance dans les 14 derniers jours).",
   "trn.row": "Coaching",
@@ -1129,7 +1192,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Clients en tête-à-tête. Séances, réservations, bilans, paiements et programmes. Les équipes et outils sportifs restent masqués.",
   "trn.role.coachHint":
-    "Sport et équipes. Programmes de saison pour les athlètes, messages et équipes scolaires. Réservations, bilans et paiements restent masqués.",
+    "Sport et équipes. Programmes de saison pour les athlètes, messages et équipes scolaires. Réservations et bilans restent masqués.",
   "trn.role.physio": "Kinésithérapeute",
   "trn.role.physioHint":
     "Pour les kinés et les professionnels de la rééducation : les rapports commencent par la douleur et les blessures que vos clients partagent, et les programmes de rééducation passent en premier quand vous en assignez.",
@@ -1263,6 +1326,27 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "Pro ist für dich kostenlos, solange 3 oder mehr deiner Athleten trainieren (jeweils mit einem Workout in den letzten 14 Tagen).",
+  "trn.yourClients.ath": "Deine Athleten",
+  "trn.inviteNone.ath": "Erstell einen Einladungscode für deine Athleten.",
+  "trn.noClients.ath": "Noch keine Athleten. Schick jemandem deine Einladung.",
+  "trn.client.ath": "Athlet",
+  "trn.remove.ath": "Athleten entfernen",
+  "trn.plans.ath": "Routinen für diesen Athleten",
+  "trn.err.plansFull.ath": "Dieser Athlet hat schon 10 Routinen von dir. Nimm zuerst eine zurück.",
+  "trn.err.self.ath": "Das ist dein eigener Code. Gib ihn deinen Athleten.",
+  "trn.err.gone.ath": "Dieser Athlet teilt nicht mehr mit dir.",
+  "trn.inviteHint.ath": "Neue Athleten öffnen deinen Einladungslink oder geben diesen Code beim Einrichten der App oder unter Coaching › Dein Coach ein. Er gilt eine Woche.",
+  "trn.setupTitle.ath": "Neue Athleten starten mit",
+  "trn.setupHint.ath": "Wähle, was zu den meisten deiner Athleten passt. Sie überspringen diese Fragen beim Einrichten der App und können sie später in den Einstellungen ändern. Tippe eine gewählte Antwort noch einmal an, damit sie selbst wählen.",
+  "trn.setupSaved.ath": "Gespeichert. Neue Athleten starten damit.",
+  "trn.alerts.ath": "Hinweise zu Athleten",
+  "trn.alertsHint.ath": "Eine Mitteilung, wenn ein Athlet ein Training beendet oder eine Woche nicht trainiert hat.",
+  "trn.invite.ath": "Athleten einladen",
+  "trn.msg.noneBody.ath": "Athleten erscheinen hier, sobald sie beitreten. Schick deine Einladung unter Athleten.",
+  "trn.badge.coaching.ath": { one: "Coach · {count} Athlet", other: "Coach · {count} Athleten" },
+  "trn.rowCoach.ath": { one: "{count} Athlet · Nachrichten, Termine und Check-ins", other: "{count} Athleten · Nachrichten, Termine und Check-ins" },
+  "trn.whatYouSee.ath": "Du siehst das Training dieses Athleten und alles, was er teilen möchte. Er kann jederzeit ändern, was er teilt, oder das Teilen beenden.",
   "trn.proFree":
     "Pro ist für dich kostenlos, solange 3 oder mehr deiner Klienten trainieren (jeweils mit einem Workout in den letzten 14 Tagen).",
   "trn.row": "Coaching",
@@ -1552,7 +1636,7 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Kunden einzeln. Sitzungen, Buchungen, Check-ins, Zahlungen und Programme. Teams und Sport-Tools bleiben ausgeblendet.",
   "trn.role.coachHint":
-    "Sport und Teams. Saisonprogramme für Athleten, Nachrichten und Schulteams. Buchungen, Check-ins und Zahlungen bleiben ausgeblendet.",
+    "Sport und Teams. Saisonprogramme für Athleten, Nachrichten und Schulteams. Buchungen und Check-ins bleiben ausgeblendet.",
   "trn.role.physio": "Physiotherapeut",
   "trn.role.physioHint":
     "Für Physiotherapeuten und Reha-Fachleute: Die Berichte beginnen mit Schmerzen und Verletzungen, die deine Klienten teilen, und Reha-Programme stehen beim Zuweisen ganz oben.",
@@ -1689,6 +1773,27 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "Pro è gratis per te finché 3 o più dei tuoi atleti si allenano (ognuno con un allenamento negli ultimi 14 giorni).",
+  "trn.yourClients.ath": "I tuoi atleti",
+  "trn.inviteNone.ath": "Crea un codice d'invito da dare ai tuoi atleti.",
+  "trn.noClients.ath": "Ancora nessun atleta. Manda il tuo invito a qualcuno.",
+  "trn.client.ath": "Atleta",
+  "trn.remove.ath": "Rimuovi l'atleta",
+  "trn.plans.ath": "Routine per questo atleta",
+  "trn.err.plansFull.ath": "Questo atleta ha già 10 routine da te. Ritirane prima una.",
+  "trn.err.self.ath": "È il tuo codice. Dallo ai tuoi atleti.",
+  "trn.err.gone.ath": "Questo atleta non condivide più con te.",
+  "trn.inviteHint.ath": "I nuovi atleti aprono il tuo link d'invito, oppure inseriscono questo codice quando configurano l'app o in Coaching › Il tuo coach. Vale per una settimana.",
+  "trn.setupTitle.ath": "I nuovi atleti partono con",
+  "trn.setupHint.ath": "Scegli cosa va bene per la maggior parte dei tuoi atleti. Saltano queste domande quando configurano l'app e potranno cambiarle più tardi in Impostazioni. Tocca di nuovo una risposta scelta per lasciarla scegliere a loro.",
+  "trn.setupSaved.ath": "Salvato. I nuovi atleti partono da qui.",
+  "trn.alerts.ath": "Avvisi sugli atleti",
+  "trn.alertsHint.ath": "Una notifica quando un atleta finisce un allenamento o non si allena da una settimana.",
+  "trn.invite.ath": "Invita atleti",
+  "trn.msg.noneBody.ath": "Gli atleti compaiono qui quando si uniscono. Invia l'invito da Atleti.",
+  "trn.badge.coaching.ath": { one: "Coach · {count} atleta", other: "Coach · {count} atleti" },
+  "trn.rowCoach.ath": { one: "{count} atleta · messaggi, agenda e check-in", other: "{count} atleti · messaggi, agenda e check-in" },
+  "trn.whatYouSee.ath": "Vedi l'allenamento di questo atleta e ciò che sceglie di condividere. Può cambiare cosa condivide, o smettere, in qualsiasi momento.",
   "trn.proFree": "Pro è gratis per te finché 3 o più dei tuoi clienti si allenano (ognuno con un allenamento negli ultimi 14 giorni).",
   "trn.row": "Coaching",
   "trn.rowNote": "Allenati con un coach o segui i tuoi clienti",
@@ -1970,7 +2075,7 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Clienti uno a uno. Sessioni, prenotazioni, check-in, pagamenti e programmi. Squadre e strumenti sportivi restano nascosti.",
   "trn.role.coachHint":
-    "Sport e squadre. Programmi di stagione per atleti, messaggi e squadre scolastiche. Prenotazioni, check-in e pagamenti restano nascosti.",
+    "Sport e squadre. Programmi di stagione per atleti, messaggi e squadre scolastiche. Prenotazioni e check-in restano nascosti.",
   "trn.role.physio": "Fisioterapista",
   "trn.role.physioHint":
     "Per fisioterapisti e professionisti della riabilitazione: i report partono da dolore e infortuni che i tuoi clienti condividono, e i programmi di riabilitazione compaiono per primi quando assegni.",
@@ -2103,6 +2208,27 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "選手が3人以上トレーニングを続けている間 (それぞれ直近14日以内にワークアウトあり)、Pro は無料です。",
+  "trn.yourClients.ath": "あなたの選手",
+  "trn.inviteNone.ath": "選手に渡す招待コードを作成しましょう。",
+  "trn.noClients.ath": "選手はまだいません。誰かに招待を送ってみましょう。",
+  "trn.client.ath": "選手",
+  "trn.remove.ath": "選手を外す",
+  "trn.plans.ath": "この選手のルーティン",
+  "trn.err.plansFull.ath": "この選手にはすでに10件のルーティンを渡しています。先にどれかを取り消してください。",
+  "trn.err.self.ath": "これはあなた自身のコードです。選手に渡してください。",
+  "trn.err.gone.ath": "この選手はあなたとの共有を止めました。",
+  "trn.inviteHint.ath": "新しい選手は招待リンクを開くか、アプリの初期設定中または「コーチング › あなたのコーチ」でこのコードを入力します。1週間有効です。",
+  "trn.setupTitle.ath": "新しい選手の初期設定",
+  "trn.setupHint.ath": "多くの選手に合う内容を選んでください。選手は初期設定でこれらの質問を省略でき、あとから設定で変更できます。選んだ答えをもう一度タップすると、選手が自分で選びます。",
+  "trn.setupSaved.ath": "保存しました。新しい選手はこの内容で始まります。",
+  "trn.alerts.ath": "選手の通知",
+  "trn.alertsHint.ath": "選手がワークアウトを終えたとき、または1週間トレーニングしていないときに通知します。",
+  "trn.invite.ath": "選手を招待",
+  "trn.msg.noneBody.ath": "選手が参加するとここに表示されます。「選手」から招待を送りましょう。",
+  "trn.badge.coaching.ath": { other: "コーチ・選手{count}人" },
+  "trn.rowCoach.ath": { other: "選手{count}人・メッセージ、予定、チェックイン" },
+  "trn.whatYouSee.ath": "この選手のトレーニングと、本人が共有を選んだものが見られます。共有する内容の変更や停止はいつでもできます。",
   "trn.proFree": "クライアントが3人以上トレーニングを続けている間 (それぞれ直近14日以内にワークアウトあり)、Pro は無料です。",
   "trn.row": "コーチング",
   "trn.rowNote": "コーチと一緒にトレーニング、または自分のクライアントを指導",
@@ -2371,7 +2497,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.role.coach": "コーチ",
   "trn.role.trainerHint": "マンツーマンのクライアント向け。セッション、予約、チェックイン、支払い、プログラムが表示されます。チームやスポーツ向けの機能は非表示です。",
   "trn.role.coachHint":
-    "スポーツとチーム向け。選手へのシーズンプログラム、メッセージ、学校チーム。予約・チェックイン・支払いは非表示です。",
+    "スポーツとチーム向け。選手へのシーズンプログラム、メッセージ、学校チーム。予約とチェックインは非表示です。",
   "trn.role.physio": "理学療法士",
   "trn.role.physioHint":
     "理学療法士やリハビリ専門職向けです。レポートはクライアントが共有した痛みとけがから始まり、割り当てではリハビリプログラムが先に表示されます。",
@@ -2501,6 +2627,27 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "O Pro é grátis para você enquanto 3 ou mais atletas seus estiverem treinando (cada um com um treino nos últimos 14 dias).",
+  "trn.yourClients.ath": "Seus atletas",
+  "trn.inviteNone.ath": "Crie um código de convite para dar aos seus atletas.",
+  "trn.noClients.ath": "Nenhum atleta ainda. Envie seu convite para alguém.",
+  "trn.client.ath": "Atleta",
+  "trn.remove.ath": "Remover atleta",
+  "trn.plans.ath": "Rotinas para este atleta",
+  "trn.err.plansFull.ath": "Este atleta já tem 10 rotinas suas. Retire uma primeiro.",
+  "trn.err.self.ath": "Esse é o seu próprio código. Dê para os seus atletas.",
+  "trn.err.gone.ath": "Este atleta parou de compartilhar com você.",
+  "trn.inviteHint.ath": "Novos atletas abrem seu link de convite, ou digitam este código ao configurar o app ou em Coaching › Seu coach. Vale por uma semana.",
+  "trn.setupTitle.ath": "Novos atletas começam com",
+  "trn.setupHint.ath": "Escolha o que serve para a maioria dos seus atletas. Eles pulam essas perguntas ao configurar o app e podem mudar depois em Ajustes. Toque de novo numa resposta escolhida para deixar que eles escolham.",
+  "trn.setupSaved.ath": "Salvo. Novos atletas começam com isto.",
+  "trn.alerts.ath": "Alertas de atletas",
+  "trn.alertsHint.ath": "Uma notificação quando um atleta termina um treino ou passa uma semana sem treinar.",
+  "trn.invite.ath": "Convidar atletas",
+  "trn.msg.noneBody.ath": "Os atletas aparecem aqui quando entram. Envie seu convite em Atletas.",
+  "trn.badge.coaching.ath": { one: "Coach · {count} atleta", other: "Coach · {count} atletas" },
+  "trn.rowCoach.ath": { one: "{count} atleta · mensagens, agenda e check-ins", other: "{count} atletas · mensagens, agenda e check-ins" },
+  "trn.whatYouSee.ath": "Você vê os treinos deste atleta, além do que ele escolher compartilhar. Ele pode mudar o que compartilha, ou parar de compartilhar, a qualquer momento.",
   "trn.proFree": "O Pro é grátis para você enquanto 3 ou mais alunos seus estiverem treinando (cada um com um treino nos últimos 14 dias).",
   "trn.row": "Coaching",
   "trn.rowNote": "Treine com um coach ou acompanhe seus próprios alunos",
@@ -2756,7 +2903,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Clientes um a um. Sessões, reservas, check-ins, pagamentos e programas. Equipes e ferramentas esportivas ficam ocultas.",
   "trn.role.coachHint":
-    "Esportes e equipes. Programas de temporada para atletas, mensagens e equipes escolares. Reservas, check-ins e pagamentos ficam ocultos.",
+    "Esportes e equipes. Programas de temporada para atletas, mensagens e equipes escolares. Reservas e check-ins ficam ocultos.",
   "trn.role.physio": "Fisioterapeuta",
   "trn.role.physioHint":
     "Para fisioterapeutas e profissionais de reabilitação: os relatórios começam pelas dores e lesões que seus pacientes compartilham, e os programas de reabilitação vêm primeiro ao atribuir.",
@@ -2961,6 +3108,27 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "선수 3명 이상이 운동하는 동안(각자 최근 14일 안에 운동 기록 1회 이상) Pro가 무료예요.",
+  "trn.yourClients.ath": "내 선수",
+  "trn.inviteNone.ath": "선수에게 줄 초대 코드를 만드세요.",
+  "trn.noClients.ath": "아직 선수가 없어요. 누군가에게 초대를 보내세요.",
+  "trn.client.ath": "선수",
+  "trn.remove.ath": "선수 삭제",
+  "trn.plans.ath": "이 선수의 루틴",
+  "trn.err.plansFull.ath": "이 선수는 이미 내 루틴을 10개 갖고 있어요. 먼저 하나를 회수하세요.",
+  "trn.err.self.ath": "내 코드예요. 선수에게 주세요.",
+  "trn.err.gone.ath": "이 선수가 공유를 중지했어요.",
+  "trn.inviteHint.ath": "새 선수는 초대 링크를 열거나, 앱을 설정할 때 또는 코칭 › 내 코치에서 이 코드를 입력해요. 일주일 동안 유효해요.",
+  "trn.setupTitle.ath": "새 선수의 기본 설정",
+  "trn.setupHint.ath": "대부분 선수에게 맞는 답을 고르세요. 앱을 설정할 때 이 질문을 건너뛰고, 나중에 설정에서 바꿀 수 있어요. 고른 답을 다시 누르면 선수가 직접 고릅니다.",
+  "trn.setupSaved.ath": "저장했어요. 새 선수는 이 설정으로 시작해요.",
+  "trn.alerts.ath": "선수 알림",
+  "trn.alertsHint.ath": "선수가 운동을 마쳤거나 일주일 동안 운동하지 않으면 알림을 받아요.",
+  "trn.invite.ath": "선수 초대",
+  "trn.msg.noneBody.ath": "선수가 들어오면 여기에 표시돼요. 선수 탭에서 초대를 보내세요.",
+  "trn.badge.coaching.ath": { other: "코치 · 선수 {count}명" },
+  "trn.rowCoach.ath": { other: "선수 {count}명 · 메시지, 일정, 체크인" },
+  "trn.whatYouSee.ath": "이 선수의 운동과 선수가 공유하기로 한 항목을 볼 수 있어요. 선수는 언제든 공유 항목을 바꾸거나 공유를 중지할 수 있어요.",
   "trn.proFree": "회원 3명 이상이 운동하는 동안(각자 최근 14일 안에 운동 기록 1회 이상) Pro가 무료예요.",
   "trn.row": "코칭",
   "trn.rowNote": "코치와 함께하거나 직접 회원을 코칭하세요",
@@ -3191,7 +3359,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "trn.role.trainer": "퍼스널 트레이너",
   "trn.role.coach": "코치",
   "trn.role.trainerHint": "일대일 회원. 세션, 예약, 체크인, 결제, 프로그램이 보입니다. 팀·스포츠 도구는 숨깁니다.",
-  "trn.role.coachHint": "스포츠와 팀. 선수에게 시즌 프로그램을 주고, 메시지와 학교 팀을 씁니다. 예약·체크인·결제는 숨깁니다.",
+  "trn.role.coachHint": "스포츠와 팀. 선수에게 시즌 프로그램을 주고, 메시지와 학교 팀을 씁니다. 예약과 체크인은 숨깁니다.",
   "trn.role.physio": "물리치료사",
   "trn.role.physioHint":
     "물리치료사와 재활 전문가용: 리포트가 회원이 공유한 통증과 부상부터 보여 주고, 배정할 때 재활 프로그램이 먼저 나와요.",
@@ -3388,6 +3556,27 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "Sporcularından 3 veya daha fazlası antrenman yaptığı sürece (her biri son 14 günde bir antrenmanla) Pro senin için ücretsiz.",
+  "trn.yourClients.ath": "Sporcuların",
+  "trn.inviteNone.ath": "Sporcularına vermek için bir davet kodu oluştur.",
+  "trn.noClients.ath": "Henüz sporcu yok. Birine davetini gönder.",
+  "trn.client.ath": "Sporcu",
+  "trn.remove.ath": "Sporcuyu çıkar",
+  "trn.plans.ath": "Bu sporcunun rutinleri",
+  "trn.err.plansFull.ath": "Bu sporcunun senden zaten 10 rutini var. Önce birini geri al.",
+  "trn.err.self.ath": "Bu senin kendi kodun. Sporcularına ver.",
+  "trn.err.gone.ath": "Bu sporcu seninle paylaşımı durdurdu.",
+  "trn.inviteHint.ath": "Yeni sporcular davet bağlantını açar ya da uygulamayı kurarken veya Koçluk › Koçun bölümünde bu kodu girer. Bir hafta geçerli.",
+  "trn.setupTitle.ath": "Yeni sporcular şununla başlar",
+  "trn.setupHint.ath": "Sporcularının çoğuna uyanı seç. Uygulamayı kurarken bu soruları atlarlar ve sonra Ayarlar'dan değiştirebilirler. Kendileri seçsin istersen seçili cevaba yeniden dokun.",
+  "trn.setupSaved.ath": "Kaydedildi. Yeni sporcular bununla başlar.",
+  "trn.alerts.ath": "Sporcu uyarıları",
+  "trn.alertsHint.ath": "Bir sporcu antrenmanı bitirdiğinde ya da bir haftadır antrenman yapmadığında bildirim.",
+  "trn.invite.ath": "Sporcu davet et",
+  "trn.msg.noneBody.ath": "Sporcular katıldıklarında burada görünür. Davetini Sporcular'dan gönder.",
+  "trn.badge.coaching.ath": { one: "Koç · {count} sporcu", other: "Koç · {count} sporcu" },
+  "trn.rowCoach.ath": { one: "{count} sporcu · mesajlar, takvim ve durum kontrolleri", other: "{count} sporcu · mesajlar, takvim ve durum kontrolleri" },
+  "trn.whatYouSee.ath": "Bu sporcunun antrenmanlarını ve paylaşmayı seçtiği her şeyi görürsün. Neyi paylaştığını istediği zaman değiştirebilir ya da paylaşımı durdurabilir.",
   "trn.proFree":
     "Danışanlarından 3 veya daha fazlası antrenman yaptığı sürece (her biri son 14 günde bir antrenmanla) Pro senin için ücretsiz.",
   "trn.row": "Koçluk",
@@ -3642,7 +3831,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Bire bir danışanlar. Seanslar, rezervasyon, check-in, ödemeler ve programlar. Takımlar ve spor araçları gizli kalır.",
   "trn.role.coachHint":
-    "Spor ve takımlar. Sporcular için sezon programları, mesajlar ve okul takımları. Rezervasyon, check-in ve ödemeler gizli kalır.",
+    "Spor ve takımlar. Sporcular için sezon programları, mesajlar ve okul takımları. Rezervasyon ve check-in gizli kalır.",
   "trn.role.physio": "Fizyoterapist",
   "trn.role.physioHint":
     "Fizyoterapistler ve rehabilitasyon uzmanları için: raporlar danışanlarının paylaştığı ağrı ve sakatlıklarla başlar, atama yaparken rehabilitasyon programları önce gelir.",
@@ -3847,6 +4036,27 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "trn.proFree.ath": "Pro jest dla ciebie darmowy, dopóki trenuje co najmniej 3 twoich zawodników (każdy z treningiem w ostatnich 14 dniach).",
+  "trn.yourClients.ath": "Twoi zawodnicy",
+  "trn.inviteNone.ath": "Utwórz kod zaproszenia dla swoich zawodników.",
+  "trn.noClients.ath": "Nie masz jeszcze zawodników. Wyślij komuś zaproszenie.",
+  "trn.client.ath": "Zawodnik",
+  "trn.remove.ath": "Usuń zawodnika",
+  "trn.plans.ath": "Plany dla tego zawodnika",
+  "trn.err.plansFull.ath": "Ten zawodnik ma już od ciebie 10 planów. Najpierw jeden wycofaj.",
+  "trn.err.self.ath": "To twój własny kod. Daj go swoim zawodnikom.",
+  "trn.err.gone.ath": "Ten zawodnik przestał ci udostępniać dane.",
+  "trn.inviteHint.ath": "Nowi zawodnicy otwierają twój link z zaproszeniem albo wpisują ten kod podczas konfiguracji aplikacji lub w Trenowanie › Twój trener. Działa przez tydzień.",
+  "trn.setupTitle.ath": "Nowi zawodnicy zaczynają z",
+  "trn.setupHint.ath": "Wybierz to, co pasuje do większości zawodników. Pominą te pytania przy konfiguracji aplikacji i mogą je później zmienić w Ustawieniach. Dotknij wybranej odpowiedzi ponownie, żeby pozwolić im wybrać.",
+  "trn.setupSaved.ath": "Zapisano. Nowi zawodnicy zaczną z tym.",
+  "trn.alerts.ath": "Alerty o zawodnikach",
+  "trn.alertsHint.ath": "Powiadomienie, gdy zawodnik skończy trening albo nie trenował przez tydzień.",
+  "trn.invite.ath": "Zaproś zawodników",
+  "trn.msg.noneBody.ath": "Zawodnicy pojawiają się tutaj, gdy dołączą. Wyślij zaproszenie z zakładki Zawodnicy.",
+  "trn.badge.coaching.ath": { one: "Trener · {count} zawodnik", other: "Trener · {count} zawodników" },
+  "trn.rowCoach.ath": { one: "{count} zawodnik · wiadomości i programy", other: "{count} zawodników · wiadomości i programy" },
+  "trn.whatYouSee.ath": "Widzisz trening tego zawodnika i to, co sam zdecyduje się udostępnić. Może to zmienić albo przestać udostępniać w dowolnej chwili.",
   "trn.proFree":
     "Pro jest dla ciebie darmowy, dopóki trenuje co najmniej 3 twoich podopiecznych (każdy z treningiem w ostatnich 14 dniach).",
   "trn.row": "Trenowanie",
@@ -4133,7 +4343,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint":
     "Klienci jeden na jednego. Sesje, rezerwacje, ankiety, płatności i programy. Drużyny i narzędzia sportowe pozostają ukryte.",
   "trn.role.coachHint":
-    "Sport i drużyny. Programy sezonowe dla zawodników, wiadomości i drużyny szkolne. Rezerwacje, ankiety i płatności pozostają ukryte.",
+    "Sport i drużyny. Programy sezonowe dla zawodników, wiadomości i drużyny szkolne. Rezerwacje i ankiety pozostają ukryte.",
   "trn.role.physio": "Fizjoterapeuta",
   "trn.role.physioHint":
     "Dla fizjoterapeutów i specjalistów rehabilitacji: raporty zaczynają się od bólu i kontuzji udostępnianych przez podopiecznych, a przy przypisywaniu na pierwszym miejscu są programy rehabilitacyjne.",

@@ -249,7 +249,7 @@ Tactile glass: controls should feel pressable (`.press` squash) and readable at 
 
 ### Navigation
 - **Phone:** five-tab bar with safe area; active state uses accent; Friends can show a count dot
-- **Desktop:** left sidebar with the same destinations plus Programs, Tools, Coaching, Settings
+- **Desktop:** left sidebar with the same destinations plus Programs, Tools, then Personal trainer, Coach or Physio (only for that role), Settings
 - **Sheets:** modal dialogs with ✕ Close, drag-to-dismiss, Escape; labelled by title
 
 ### Signature: Display numbers & empty states
