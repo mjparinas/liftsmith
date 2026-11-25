@@ -662,9 +662,8 @@ if (runs("app"))
     await page.getByTestId("schedule-calendar").waitFor();
     await scan("coaching schedule");
     await page.goto(`${server.url}/app/#/trainer/programs`);
-    await page.getByRole("heading", { name: "Workout calendar" }).waitFor();
-    await page.getByRole("combobox", { name: "Choose a workout or rest" }).waitFor();
-    await scan("coach workout calendar");
+    await page.getByRole("heading", { name: "Your programs" }).waitFor();
+    await scan("coach programs");
     await page.goto(`${server.url}/app/#/trainer/setup`);
     await page.getByText("Fixed my squat in a month.").waitFor();
     await scan("coaching reviews");

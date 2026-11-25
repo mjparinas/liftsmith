@@ -413,7 +413,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Achat vérifié",
   "cpg.assign": "Assigner à…",
   "cpg.assignTitle": "Assigner {title}",
-  "cpg.assignHint.ath": "Les athlètes le suivent une fois. Aujourd’hui affiche l’entraînement de chaque jour aux jours de la semaine choisis.",
+  "cpg.assignHint.ath":
+    "Les athlètes le suivent une fois. Aujourd’hui affiche l’entraînement de chaque jour aux jours de la semaine choisis.",
   "cpg.assignHint": "Les clients le suivent une fois. Aujourd’hui affiche l’entraînement de chaque jour aux jours de la semaine choisis.",
   "cpg.assignAll": "Tous les clients ({count})",
   "cpg.assignPick": "Choisir des clients",

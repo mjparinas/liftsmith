@@ -6,7 +6,8 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "cpl.count.ath": "Athletes: {count} of {limit}",
   "cpl.countNoLimit.ath": "Athletes: {count}, no set limit",
-  "cpl.full.ath": "You're at your plan's limit, so new athletes can't join yet. Remove an athlete you no longer coach, or move to a plan with more room.",
+  "cpl.full.ath":
+    "You're at your plan's limit, so new athletes can't join yet. Remove an athlete you no longer coach, or move to a plan with more room.",
   "cpl.over.ath": "Everyone you coach stays linked. To add new athletes, move to a plan with more room.",
   "cpl.school.ath": "Free for verified high school coaches, up to {limit} athletes.",
   "cpl.title": "Your coaching plan",
@@ -25,7 +26,8 @@ export const en = {
   "cpl.school": "Free for verified high school coaches, up to {limit} clients.",
   "cpl.see": "See coach plans",
   "cpl.sheetTitle": "Coach plans",
-  "cpl.sheetLead.ath": "Pro covers up to {pro} athletes. Coach plans add room as your athlete list grows, and include everything in Pro. Every coaching tool works on every plan.",
+  "cpl.sheetLead.ath":
+    "Pro covers up to {pro} athletes. Coach plans add room as your athlete list grows, and include everything in Pro. Every coaching tool works on every plan.",
   "cpl.sheetLead":
     "Pro covers up to {pro} clients. Coach plans add room as your client list grows, and include everything in Pro. Every coaching tool works on every plan.",
   "cpl.clients.coach.ath": "Up to {limit} athletes",
@@ -65,7 +67,8 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Atletas: {count} de {limit}",
   "cpl.countNoLimit.ath": "Atletas: {count}, sin límite fijo",
-  "cpl.full.ath": "Has llegado al límite de tu plan, así que aún no pueden unirse atletas nuevos. Quita a un atleta que ya no entrenes o pasa a un plan con más espacio.",
+  "cpl.full.ath":
+    "Has llegado al límite de tu plan, así que aún no pueden unirse atletas nuevos. Quita a un atleta que ya no entrenes o pasa a un plan con más espacio.",
   "cpl.over.ath": "Todos tus atletas siguen contigo. Para añadir atletas nuevos, pasa a un plan con más espacio.",
   "cpl.school.ath": "Gratis para entrenadores de secundaria verificados, hasta {limit} atletas.",
   "cpl.title": "Tu plan de entrenador",
@@ -84,7 +87,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cpl.school": "Gratis para entrenadores de secundaria verificados, hasta {limit} clientes.",
   "cpl.see": "Ver planes de entrenador",
   "cpl.sheetTitle": "Planes de entrenador",
-  "cpl.sheetLead.ath": "Pro cubre hasta {pro} atletas. Los planes de entrenador añaden espacio a medida que crece tu lista de atletas e incluyen todo lo de Pro. Todas las herramientas de entrenador funcionan en todos los planes.",
+  "cpl.sheetLead.ath":
+    "Pro cubre hasta {pro} atletas. Los planes de entrenador añaden espacio a medida que crece tu lista de atletas e incluyen todo lo de Pro. Todas las herramientas de entrenador funcionan en todos los planes.",
   "cpl.sheetLead":
     "Pro cubre hasta {pro} clientes. Los planes de entrenador añaden espacio a medida que crece tu lista e incluyen todo lo de Pro. Todas las herramientas de entrenador funcionan en todos los planes.",
   "cpl.clients.coach.ath": "Hasta {limit} atletas",
@@ -109,7 +113,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Tu Pro se cobra a través de la tienda de apps de tu teléfono. Cuando empiece tu plan de entrenador, cancela Pro allí, porque los planes de entrenador incluyen Pro.",
   "cpl.unavailable": "Ahora no se pueden mostrar los planes de entrenador. Revisa tu conexión y vuelve a intentarlo.",
-  "cpl.notYet.ath": "Los planes de entrenador aún no están a la venta aquí. Tus atletas siguen vinculados y esta hoja mostrará los planes cuando lo estén.",
+  "cpl.notYet.ath":
+    "Los planes de entrenador aún no están a la venta aquí. Tus atletas siguen vinculados y esta hoja mostrará los planes cuando lo estén.",
   "cpl.notYet":
     "Los planes de entrenador aún no están a la venta aquí. Tus clientes siguen vinculados y esta hoja mostrará los planes cuando lo estén.",
   "cpl.retry": "Reintentar",
@@ -123,7 +128,8 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Athlètes : {count} sur {limit}",
   "cpl.countNoLimit.ath": "Athlètes : {count}, sans limite fixe",
-  "cpl.full.ath": "Vous avez atteint la limite de votre forfait : les nouveaux athlètes ne peuvent pas encore vous rejoindre. Retirez un athlète que vous ne suivez plus, ou passez à un forfait plus grand.",
+  "cpl.full.ath":
+    "Vous avez atteint la limite de votre forfait : les nouveaux athlètes ne peuvent pas encore vous rejoindre. Retirez un athlète que vous ne suivez plus, ou passez à un forfait plus grand.",
   "cpl.over.ath": "Tous vos athlètes restent liés. Pour en ajouter de nouveaux, passez à un forfait avec plus de places.",
   "cpl.school.ath": "Gratuit pour les entraîneurs de lycée vérifiés, jusqu'à {limit} athlètes.",
   "cpl.title": "Votre forfait coach",
@@ -142,14 +148,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpl.school": "Gratuit pour les entraîneurs de lycée vérifiés, jusqu'à {limit} clients.",
   "cpl.see": "Voir les forfaits coach",
   "cpl.sheetTitle": "Forfaits coach",
-  "cpl.sheetLead.ath": "Pro couvre jusqu'à {pro} athlètes. Les forfaits coach ajoutent des places à mesure que votre liste d'athlètes grandit et incluent tout Pro. Tous les outils de coaching fonctionnent avec chaque forfait.",
+  "cpl.sheetLead.ath":
+    "Pro couvre jusqu'à {pro} athlètes. Les forfaits coach ajoutent des places à mesure que votre liste d'athlètes grandit et incluent tout Pro. Tous les outils de coaching fonctionnent avec chaque forfait.",
   "cpl.sheetLead":
     "Pro couvre jusqu'à {pro} clients. Les forfaits coach ajoutent des places à mesure que votre liste grandit et incluent tout Pro. Tous les outils de coaching fonctionnent avec chaque forfait.",
   "cpl.clients.coach.ath": "Jusqu'à {limit} athlètes",
   "cpl.clients.coach": "Jusqu'à {limit} clients",
   "cpl.clients.coachPlus.ath": "Sans limite fixe d'athlètes",
   "cpl.clients.coachPlus": "Sans limite fixe de clients",
-  "cpl.what.coach.ath": "Rapports, routines, messagerie, bilans, réservations et objectifs nutritionnels pour une liste complète d'athlètes.",
+  "cpl.what.coach.ath":
+    "Rapports, routines, messagerie, bilans, réservations et objectifs nutritionnels pour une liste complète d'athlètes.",
   "cpl.what.coach":
     "Rapports, routines, messagerie, bilans, réservations, paiements et objectifs nutritionnels pour une liste complète de clients.",
   "cpl.what.coachPlus.ath": "Les mêmes outils sans limite fixe, pour un grand groupe d'athlètes.",
@@ -169,7 +177,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Votre Pro est facturé par la boutique d'applications de votre téléphone. Une fois votre forfait coach commencé, résiliez Pro là-bas, car les forfaits coach incluent Pro.",
   "cpl.unavailable": "Impossible d'afficher les forfaits coach pour l'instant. Vérifiez votre connexion et réessayez.",
-  "cpl.notYet.ath": "Les forfaits coach ne sont pas encore en vente ici. Vos athlètes restent liés, et cette fenêtre affichera les forfaits dès qu'ils le seront.",
+  "cpl.notYet.ath":
+    "Les forfaits coach ne sont pas encore en vente ici. Vos athlètes restent liés, et cette fenêtre affichera les forfaits dès qu'ils le seront.",
   "cpl.notYet":
     "Les forfaits coach ne sont pas encore en vente ici. Vos clients restent liés, et cette fenêtre affichera les forfaits dès qu'ils le seront.",
   "cpl.retry": "Réessayer",
@@ -183,7 +192,8 @@ export const fr: Partial<Record<Key, Message>> = {
 export const de: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Athleten: {count} von {limit}",
   "cpl.countNoLimit.ath": "Athleten: {count}, keine feste Grenze",
-  "cpl.full.ath": "Du bist an der Grenze deines Plans, darum können noch keine neuen Athleten beitreten. Entferne einen Athleten, den du nicht mehr betreust, oder wechsle zu einem Plan mit mehr Platz.",
+  "cpl.full.ath":
+    "Du bist an der Grenze deines Plans, darum können noch keine neuen Athleten beitreten. Entferne einen Athleten, den du nicht mehr betreust, oder wechsle zu einem Plan mit mehr Platz.",
   "cpl.over.ath": "Alle, die du betreust, bleiben verknüpft. Für neue Athleten wechsle zu einem Plan mit mehr Platz.",
   "cpl.school.ath": "Kostenlos für geprüfte Highschool-Coaches, bis zu {limit} Athleten.",
   "cpl.title": "Dein Coaching-Plan",
@@ -202,7 +212,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cpl.school": "Kostenlos für bestätigte Schulsport-Coaches, bis zu {limit} Kunden.",
   "cpl.see": "Coach-Pläne ansehen",
   "cpl.sheetTitle": "Coach-Pläne",
-  "cpl.sheetLead.ath": "Pro deckt bis zu {pro} Athleten ab. Coach-Pläne geben dir mehr Platz, wenn deine Athletenliste wächst, und enthalten alles aus Pro. Jedes Coaching-Werkzeug funktioniert in jedem Plan.",
+  "cpl.sheetLead.ath":
+    "Pro deckt bis zu {pro} Athleten ab. Coach-Pläne geben dir mehr Platz, wenn deine Athletenliste wächst, und enthalten alles aus Pro. Jedes Coaching-Werkzeug funktioniert in jedem Plan.",
   "cpl.sheetLead":
     "Pro deckt bis zu {pro} Kunden ab. Coach-Pläne geben dir mehr Platz, wenn deine Kundenliste wächst, und enthalten alles aus Pro. Jedes Coaching-Werkzeug funktioniert in jedem Plan.",
   "cpl.clients.coach.ath": "Bis zu {limit} Athleten",
@@ -227,7 +238,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Dein Pro wird über den App-Store deines Handys abgerechnet. Kündige Pro dort, sobald dein Coach-Plan läuft, denn Coach-Pläne enthalten Pro.",
   "cpl.unavailable": "Die Coach-Pläne können gerade nicht angezeigt werden. Prüfe deine Verbindung und versuche es noch einmal.",
-  "cpl.notYet.ath": "Die Coach-Pläne gibt es hier noch nicht zu kaufen. Deine Athleten bleiben verbunden, und hier erscheinen die Pläne, sobald es so weit ist.",
+  "cpl.notYet.ath":
+    "Die Coach-Pläne gibt es hier noch nicht zu kaufen. Deine Athleten bleiben verbunden, und hier erscheinen die Pläne, sobald es so weit ist.",
   "cpl.notYet":
     "Die Coach-Pläne gibt es hier noch nicht zu kaufen. Deine Klienten bleiben verbunden, und hier erscheinen die Pläne, sobald es so weit ist.",
   "cpl.retry": "Noch einmal versuchen",
@@ -241,7 +253,8 @@ export const de: Partial<Record<Key, Message>> = {
 export const it: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Atleti: {count} di {limit}",
   "cpl.countNoLimit.ath": "Atleti: {count}, nessun limite fisso",
-  "cpl.full.ath": "Hai raggiunto il limite del tuo piano, quindi i nuovi atleti non possono ancora unirsi. Rimuovi un atleta che non segui più o passa a un piano con più posti.",
+  "cpl.full.ath":
+    "Hai raggiunto il limite del tuo piano, quindi i nuovi atleti non possono ancora unirsi. Rimuovi un atleta che non segui più o passa a un piano con più posti.",
   "cpl.over.ath": "Tutti gli atleti che segui restano collegati. Per aggiungerne di nuovi, passa a un piano con più posti.",
   "cpl.school.ath": "Gratis per gli allenatori delle scuole superiori verificati, fino a {limit} atleti.",
   "cpl.title": "Il tuo piano da coach",
@@ -260,7 +273,8 @@ export const it: Partial<Record<Key, Message>> = {
   "cpl.school": "Gratis per gli allenatori delle scuole superiori verificati, fino a {limit} clienti.",
   "cpl.see": "Vedi i piani da coach",
   "cpl.sheetTitle": "Piani da coach",
-  "cpl.sheetLead.ath": "Pro copre fino a {pro} atleti. I piani da coach aggiungono posti man mano che la tua lista di atleti cresce e includono tutto Pro. Ogni strumento da coach funziona con ogni piano.",
+  "cpl.sheetLead.ath":
+    "Pro copre fino a {pro} atleti. I piani da coach aggiungono posti man mano che la tua lista di atleti cresce e includono tutto Pro. Ogni strumento da coach funziona con ogni piano.",
   "cpl.sheetLead":
     "Pro copre fino a {pro} clienti. I piani da coach aggiungono posti man mano che la tua lista cresce e includono tutto Pro. Ogni strumento da coach funziona con ogni piano.",
   "cpl.clients.coach.ath": "Fino a {limit} atleti",
@@ -286,7 +300,8 @@ export const it: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Il tuo Pro viene addebitato tramite lo store del telefono. Quando parte il piano da coach, annulla Pro lì, perché i piani da coach includono Pro.",
   "cpl.unavailable": "Al momento non è possibile mostrare i piani da coach. Controlla la connessione e riprova.",
-  "cpl.notYet.ath": "I piani da coach non sono ancora in vendita qui. I tuoi atleti restano collegati e qui vedrai i piani appena saranno disponibili.",
+  "cpl.notYet.ath":
+    "I piani da coach non sono ancora in vendita qui. I tuoi atleti restano collegati e qui vedrai i piani appena saranno disponibili.",
   "cpl.notYet":
     "I piani da coach non sono ancora in vendita qui. I tuoi clienti restano collegati e qui vedrai i piani appena saranno disponibili.",
   "cpl.retry": "Riprova",
@@ -300,7 +315,8 @@ export const it: Partial<Record<Key, Message>> = {
 export const ja: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "選手: {count} / {limit}",
   "cpl.countNoLimit.ath": "選手: {count}人、上限なし",
-  "cpl.full.ath": "プランの上限に達しているため、新しい選手はまだ参加できません。指導を終えた選手を外すか、枠の多いプランに移ってください。",
+  "cpl.full.ath":
+    "プランの上限に達しているため、新しい選手はまだ参加できません。指導を終えた選手を外すか、枠の多いプランに移ってください。",
   "cpl.over.ath": "今つながっている人はそのままです。新しい選手を加えるには、枠の多いプランに移ってください。",
   "cpl.school.ath": "確認済みの高校コーチは無料で、選手は{limit}人までです。",
   "cpl.title": "コーチングのプラン",
@@ -320,7 +336,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpl.school": "認証済みの高校のコーチは無料で、クライアント{limit}人まで。",
   "cpl.see": "コーチプランを見る",
   "cpl.sheetTitle": "コーチプラン",
-  "cpl.sheetLead.ath": "Pro は選手{pro}人まで。コーチプランは選手が増えるにつれて枠を広げ、Pro のすべてを含みます。コーチング機能はどのプランでもすべて使えます。",
+  "cpl.sheetLead.ath":
+    "Pro は選手{pro}人まで。コーチプランは選手が増えるにつれて枠を広げ、Pro のすべてを含みます。コーチング機能はどのプランでもすべて使えます。",
   "cpl.sheetLead":
     "Pro はクライアント{pro}人まで。コーチプランはクライアントが増えるにつれて枠を広げ、Pro のすべてを含みます。コーチング機能はどのプランでもすべて使えます。",
   "cpl.clients.coach.ath": "選手{limit}人まで",
@@ -359,7 +376,8 @@ export const ja: Partial<Record<Key, Message>> = {
 export const pt: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Atletas: {count} de {limit}",
   "cpl.countNoLimit.ath": "Atletas: {count}, sem limite definido",
-  "cpl.full.ath": "Você chegou ao limite do plano, então novos atletas ainda não podem entrar. Remova um atleta que você não acompanha mais ou mude para um plano com mais vagas.",
+  "cpl.full.ath":
+    "Você chegou ao limite do plano, então novos atletas ainda não podem entrar. Remova um atleta que você não acompanha mais ou mude para um plano com mais vagas.",
   "cpl.over.ath": "Quem você acompanha continua vinculado. Para adicionar novos atletas, mude para um plano com mais vagas.",
   "cpl.school.ath": "Grátis para treinadores de ensino médio verificados, até {limit} atletas.",
   "cpl.title": "Seu plano de coaching",
@@ -378,7 +396,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpl.school": "Grátis para coaches de ensino médio verificados, até {limit} alunos.",
   "cpl.see": "Ver planos de coach",
   "cpl.sheetTitle": "Planos de coach",
-  "cpl.sheetLead.ath": "O Pro cobre até {pro} atletas. Os planos de coach dão mais espaço conforme sua lista de atletas cresce, e incluem tudo do Pro. Todas as ferramentas de coaching funcionam em todos os planos.",
+  "cpl.sheetLead.ath":
+    "O Pro cobre até {pro} atletas. Os planos de coach dão mais espaço conforme sua lista de atletas cresce, e incluem tudo do Pro. Todas as ferramentas de coaching funcionam em todos os planos.",
   "cpl.sheetLead":
     "O Pro cobre até {pro} alunos. Os planos de coach dão mais espaço conforme sua lista de alunos cresce, e incluem tudo do Pro. Todas as ferramentas de coaching funcionam em todos os planos.",
   "cpl.clients.coach.ath": "Até {limit} atletas",
@@ -403,7 +422,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Seu Pro é cobrado pela loja de apps do seu celular. Quando seu plano de coach começar, cancele o Pro lá, porque os planos de coach incluem o Pro.",
   "cpl.unavailable": "Os planos de coach não podem ser mostrados agora. Verifique sua conexão e tente de novo.",
-  "cpl.notYet.ath": "Os planos de coach ainda não estão à venda aqui. Seus atletas continuam vinculados, e os planos aparecem aqui assim que estiverem disponíveis.",
+  "cpl.notYet.ath":
+    "Os planos de coach ainda não estão à venda aqui. Seus atletas continuam vinculados, e os planos aparecem aqui assim que estiverem disponíveis.",
   "cpl.notYet":
     "Os planos de coach ainda não estão à venda aqui. Seus clientes continuam vinculados, e os planos aparecem aqui assim que estiverem disponíveis.",
   "cpl.retry": "Tentar de novo",
@@ -417,7 +437,8 @@ export const pt: Partial<Record<Key, Message>> = {
 export const ko: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "선수: {count} / {limit}",
   "cpl.countNoLimit.ath": "선수: {count}명, 인원 제한 없음",
-  "cpl.full.ath": "요금제 한도에 도달해서 새 선수는 아직 들어올 수 없어요. 더 이상 지도하지 않는 선수를 빼거나, 자리가 더 많은 요금제로 바꾸세요.",
+  "cpl.full.ath":
+    "요금제 한도에 도달해서 새 선수는 아직 들어올 수 없어요. 더 이상 지도하지 않는 선수를 빼거나, 자리가 더 많은 요금제로 바꾸세요.",
   "cpl.over.ath": "지금 연결된 사람은 그대로예요. 새 선수를 더하려면 자리가 더 많은 요금제로 바꾸세요.",
   "cpl.school.ath": "인증된 고등학교 코치는 무료이고, 선수는 최대 {limit}명이에요.",
   "cpl.title": "내 코칭 요금제",
@@ -436,7 +457,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpl.school": "인증된 고등학교 코치는 회원 {limit}명까지 무료예요.",
   "cpl.see": "코치 요금제 보기",
   "cpl.sheetTitle": "코치 요금제",
-  "cpl.sheetLead.ath": "Pro는 선수 {pro}명까지 지원해요. 코치 요금제는 선수가 늘어날수록 자리를 더해 주고, Pro의 모든 기능을 포함해요. 모든 코칭 도구는 모든 요금제에서 쓸 수 있어요.",
+  "cpl.sheetLead.ath":
+    "Pro는 선수 {pro}명까지 지원해요. 코치 요금제는 선수가 늘어날수록 자리를 더해 주고, Pro의 모든 기능을 포함해요. 모든 코칭 도구는 모든 요금제에서 쓸 수 있어요.",
   "cpl.sheetLead":
     "Pro는 회원 {pro}명까지 지원해요. 코치 요금제는 회원이 늘어날수록 자리를 더해 주고, Pro의 모든 기능을 포함해요. 모든 코칭 도구는 모든 요금제에서 쓸 수 있어요.",
   "cpl.clients.coach.ath": "선수 최대 {limit}명",
@@ -474,7 +496,8 @@ export const ko: Partial<Record<Key, Message>> = {
 export const tr: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Sporcular: {count} / {limit}",
   "cpl.countNoLimit.ath": "Sporcular: {count}, sınır yok",
-  "cpl.full.ath": "Planının sınırındasın, bu yüzden yeni sporcular henüz katılamaz. Artık çalışmadığın bir sporcuyu çıkar ya da daha geniş bir plana geç.",
+  "cpl.full.ath":
+    "Planının sınırındasın, bu yüzden yeni sporcular henüz katılamaz. Artık çalışmadığın bir sporcuyu çıkar ya da daha geniş bir plana geç.",
   "cpl.over.ath": "Çalıştığın herkes bağlı kalır. Yeni sporcu eklemek için daha geniş bir plana geç.",
   "cpl.school.ath": "Doğrulanmış lise koçları için ücretsiz, en fazla {limit} sporcu.",
   "cpl.title": "Koçluk planın",
@@ -493,7 +516,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpl.school": "Doğrulanmış lise koçları için ücretsiz, en fazla {limit} danışan.",
   "cpl.see": "Koç planlarını gör",
   "cpl.sheetTitle": "Koç planları",
-  "cpl.sheetLead.ath": "Pro en fazla {pro} sporcuyu kapsar. Koç planları, sporcu listen büyüdükçe yer açar ve Pro'daki her şeyi içerir. Her koçluk aracı her planda çalışır.",
+  "cpl.sheetLead.ath":
+    "Pro en fazla {pro} sporcuyu kapsar. Koç planları, sporcu listen büyüdükçe yer açar ve Pro'daki her şeyi içerir. Her koçluk aracı her planda çalışır.",
   "cpl.sheetLead":
     "Pro en fazla {pro} danışanı kapsar. Koç planları, danışan listen büyüdükçe yer açar ve Pro'daki her şeyi içerir. Her koçluk aracı her planda çalışır.",
   "cpl.clients.coach.ath": "En fazla {limit} sporcu",
@@ -532,7 +556,8 @@ export const tr: Partial<Record<Key, Message>> = {
 export const pl: Partial<Record<Key, Message>> = {
   "cpl.count.ath": "Zawodnicy: {count} z {limit}",
   "cpl.countNoLimit.ath": "Zawodnicy: {count}, bez limitu",
-  "cpl.full.ath": "Osiągasz limit planu, więc nowi zawodnicy nie mogą jeszcze dołączyć. Usuń zawodnika, którego już nie prowadzisz, albo przejdź na plan z większą liczbą miejsc.",
+  "cpl.full.ath":
+    "Osiągasz limit planu, więc nowi zawodnicy nie mogą jeszcze dołączyć. Usuń zawodnika, którego już nie prowadzisz, albo przejdź na plan z większą liczbą miejsc.",
   "cpl.over.ath": "Wszyscy, których prowadzisz, zostają połączeni. Żeby dodać nowych zawodników, przejdź na plan z większą liczbą miejsc.",
   "cpl.school.ath": "Za darmo dla zweryfikowanych trenerów liceum, do {limit} zawodników.",
   "cpl.title": "Twój plan trenerski",
@@ -551,7 +576,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpl.school": "Za darmo dla zweryfikowanych trenerów szkół średnich, do {limit} podopiecznych.",
   "cpl.see": "Zobacz plany trenerskie",
   "cpl.sheetTitle": "Plany trenerskie",
-  "cpl.sheetLead.ath": "Pro obejmuje do {pro} zawodników. Plany trenerskie dają więcej miejsca, gdy lista zawodników rośnie, i zawierają wszystko z Pro. Każde narzędzie trenerskie działa w każdym planie.",
+  "cpl.sheetLead.ath":
+    "Pro obejmuje do {pro} zawodników. Plany trenerskie dają więcej miejsca, gdy lista zawodników rośnie, i zawierają wszystko z Pro. Każde narzędzie trenerskie działa w każdym planie.",
   "cpl.sheetLead":
     "Pro obejmuje do {pro} podopiecznych. Plany trenerskie dają więcej miejsca, gdy lista podopiecznych rośnie, i zawierają wszystko z Pro. Każde narzędzie trenerskie działa w każdym planie.",
   "cpl.clients.coach.ath": "Do {limit} zawodników",
@@ -576,7 +602,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpl.otherBill.store":
     "Twoje Pro jest rozliczane przez sklep z aplikacjami w telefonie. Gdy plan trenerski się zacznie, anuluj tam Pro, bo plany trenerskie zawierają Pro.",
   "cpl.unavailable": "Nie można teraz pokazać planów trenerskich. Sprawdź połączenie i spróbuj ponownie.",
-  "cpl.notYet.ath": "Plany trenerskie nie są tu jeszcze w sprzedaży. Twoi zawodnicy pozostają połączeni, a plany pojawią się tutaj, gdy tylko będą dostępne.",
+  "cpl.notYet.ath":
+    "Plany trenerskie nie są tu jeszcze w sprzedaży. Twoi zawodnicy pozostają połączeni, a plany pojawią się tutaj, gdy tylko będą dostępne.",
   "cpl.notYet":
     "Plany trenerskie nie są tu jeszcze w sprzedaży. Twoi podopieczni pozostają połączeni, a plany pojawią się tutaj, gdy tylko będą dostępne.",
   "cpl.retry": "Spróbuj ponownie",
