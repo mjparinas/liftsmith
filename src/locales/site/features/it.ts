@@ -439,6 +439,10 @@ export const it: FeaturesText = {
       name: "Gratis per le squadre delle superiori",
       body: "Gli allenatori delle superiori che confermano un’email scolastica hanno Pro gratis, come gli atleti dai 13 ai 18 anni delle loro squadre, con una classifica settimanale della squadra. Massa grassa e profili pubblici restano disattivati per i minori di 18 anni.",
     },
+    "my-team": {
+      name: "La mia squadra per atleti scolastici",
+      body: "Un atleta di una squadra scolastica apre Coaching sulla casa della sua squadra: la squadra e il coach, i programmi assegnati con Segui, una chat di squadra con il coach, una chat con il coach e la settimana della squadra. Un coach può aggiungere a una squadra gli atleti arrivati con il suo invito; ognuno indica l’età e accetta prima.",
+    },
     "team-session": {
       name: "Sessioni di squadra su un tablet",
       body: "Un allenatore scolastico guida un allenamento per tutta la squadra da un tablet: ogni atleta tocca il proprio nome e registra le sue serie, con il peso da dove aveva lasciato, e il tabellone mostra chi non ha iniziato. Alla fine, le serie di ognuno vengono salvate nel suo account. Funziona senza campo.",
@@ -480,7 +484,7 @@ export const it: FeaturesText = {
     },
     "coach-programs": {
       name: "Programmi dei coach",
-      body: "Coach e personal trainer trasformano le loro routine in un programma, con livello, obiettivo e numero di settimane, gratuito o a pagamento, e ne condividono il link. Salvi i suoi giorni nelle tue routine con un tocco e la tua progressione sceglie i carichi. I programmi a pagamento pagano il coach tramite il suo account Stripe.",
+      body: "Coach e personal trainer trasformano le loro routine in un programma, con livello, obiettivo e numero di settimane, gratuito o a pagamento, e ne condividono il link. Salvi i suoi giorni nelle tue routine con un tocco e la tua progressione sceglie i carichi. I programmi a pagamento pagano il coach tramite il suo account Stripe. Una vista settimana mette ogni routine nei suoi giorni con i riposi, una vista mese mostra come procede e Organizza da solo distribuisce le routine per te.",
       note: "I programmi a pagamento si acquistano sul sito; le app per Android e iPhone mostrano quelli gratuiti e quelli che hai.",
       proPart: "Ottenere programmi è gratis; crearli fa parte del coaching, che è Pro.",
     },

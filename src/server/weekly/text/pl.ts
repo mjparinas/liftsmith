@@ -822,7 +822,7 @@ export const emails: Record<string, Words> = {
     title: "Udostępniaj i sprzedawaj swoje programy",
     intro: "Zamień programy, które dajesz raz po raz, w coś, co każdy może realizować, za darmo lub za opłatą.",
     points: [
-      "W Trenowanie › Programy wybierz do siedmiu swoich planów jako dni, potem dodaj nazwę, poziom, cel i liczbę tygodni.",
+      "W Coaching › Programy rozłóż swoje rutyny na dni tygodnia z odpoczynkiem pomiędzy (Ułóż automatycznie zrobi to za ciebie), sprawdź miesiąc, a potem dodaj nazwę, poziom, cel i liczbę tygodni.",
       "Zostaw cenę pustą dla darmowego programu albo ustaw ją, gdy płatności przez Stripe są włączone.",
       "Płatne programy kupuje się na stronie, a pieniądze trafiają na Twoje konto Stripe.",
       "Udostępnij link gdziekolwiek. Kto ma program, zachowuje go, nawet gdy zdejmiesz go z listy.",
@@ -1080,5 +1080,17 @@ export const emails: Record<string, Words> = {
       "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj.",
     ],
     dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta.",
+  },
+  "my-team": {
+    title: "Twoi zawodnicy dostają panel Moja drużyna",
+    intro:
+      "Zawodnicy Twojej drużyny szkolnej otwierają teraz Moją drużynę: drużynę, Ciebie jako trenera, przypisane programy, czat drużyny i czat z Tobą, wszystko na jednym ekranie.",
+    points: [
+      "Dodawaj zawodników, których już trenujesz, prosto z karty drużyny. Dostają zaproszenie i dołączają jednym dotknięciem.",
+      "Zawodnicy nie widzą już Programów, Zawodników ani Konfiguracji. Moja drużyna pokazuje tylko to, czego potrzebują.",
+      "Czat drużyny jest dla całej drużyny i dla Ciebie. Możesz usunąć każdą wiadomość, a zawodnicy są widoczni po imieniu.",
+      "Przypisane programy są w Mojej drużynie z przyciskiem Obserwuj, a tablica tygodnia pokazuje, kto trenował.",
+    ],
+    dyk: "Linki do drużyny działają teraz także wtedy, gdy zawodnik zaloguje się po ich otwarciu, więc nikt nie wypada ze składu.",
   },
 };

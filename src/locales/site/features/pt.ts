@@ -507,6 +507,10 @@ export const pt: FeaturesText = {
       name: "Grátis para equipes escolares",
       body: "Treinadores de escolas de ensino médio que confirmam um e-mail da escola ganham o Pro grátis, assim como os atletas de 13 a 18 anos das suas equipes, com um ranking semanal da equipe. Gordura corporal e perfis públicos ficam desligados para menores de 18.",
     },
+    "my-team": {
+      name: "Meu time para atletas escolares",
+      body: "Um atleta de time escolar abre o Coaching na casa do seu time: o time e o técnico, os programas atribuídos com Seguir, um chat do time com o técnico, um chat com o técnico e a semana do time. O técnico pode adicionar ao time atletas que entraram com o convite dele; cada um informa a idade e aceita antes.",
+    },
     "team-session": {
       name: "Sessões do time em um tablet",
       body: "Um técnico do ensino médio conduz um treino para o time todo em um tablet: cada atleta toca no próprio nome e registra suas séries, com o peso de onde parou, e o painel mostra quem não começou. No fim, as séries de cada atleta ficam salvas na própria conta. Funciona sem sinal.",
@@ -557,7 +561,7 @@ export const pt: FeaturesText = {
     },
     "coach-programs": {
       name: "Programas de treinadores",
-      body: "Treinadores e personal trainers transformam suas rotinas em um programa, com nível, objetivo e quantas semanas seguir, grátis ou com preço, e compartilham o link. Você salva os dias nas suas rotinas com um toque, e a sua própria progressão escolhe as cargas. Programas pagos são pagos ao treinador pela própria conta Stripe dele.",
+      body: "Treinadores e personal trainers transformam suas rotinas em um programa, com nível, objetivo e quantas semanas seguir, grátis ou com preço, e compartilham o link. Você salva os dias nas suas rotinas com um toque, e a sua própria progressão escolhe as cargas. Programas pagos são pagos ao treinador pela própria conta Stripe dele. Uma visão de semana coloca cada rotina nos seus dias com descansos, uma visão de mês mostra como ela corre e Organizar sozinho distribui as rotinas por você.",
       note: "Programas pagos são comprados no site; os apps de Android e iPhone mostram os programas grátis e os que você já tem.",
       proPart: "Pegar programas é grátis; criá-los faz parte do coaching, que é Pro.",
     },

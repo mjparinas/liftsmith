@@ -109,16 +109,103 @@ export const PPL: ProgramTemplate = {
 
 export const PROGRAM_TEMPLATES: readonly ProgramTemplate[] = [UPPER_LOWER, PPL];
 
-/** Builds local routines + draft fields from a template (new ids each call). */
+/**
+ * What makes two routines the same program day: the share code a day travels as (name, exercises, sets, parts), plus
+ * the coach assignment a routine belongs to, if any, so a client's assigned day is never mixed up with a plain copy.
+ */
+export function routineKey(r: Routine): string {
+  const tie = r.assignedProgram
+    ? `|p:${r.assignedProgram.assignId}:${r.assignedProgram.dayIndex}`
+    : r.assignedPlan
+      ? `|c:${r.assignedPlan.id}`
+      : "";
+  return encodeRoutine(r) + tie;
+}
+
+export interface DayChoice {
+  routine: Routine;
+  /** Its place in the program (0 is Day 1), or -1 when it isn't picked. */
+  at: number;
+  /** How many exercises it has, shown when another routine has the same name, so the two can be told apart. */
+  exercises?: number;
+}
+
+/**
+ * The program editor's day chips (coach-programs.md "Picking the days", 2026-11-25): the picked days first, in the order
+ * they run, then the rest A to Z. Identical copies (same routineKey) show once, and routines that share a name but
+ * differ say how many exercises each has.
+ */
+export function dayChoices(routines: readonly Routine[], picked: readonly string[]): DayChoice[] {
+  const byId = new Map(routines.map((r) => [r.id, r]));
+  const seen = new Set<string>();
+  const first: Routine[] = [];
+  for (const id of picked) {
+    const r = byId.get(id);
+    if (!r) continue;
+    first.push(r);
+    seen.add(routineKey(r));
+  }
+  const rest: Routine[] = [];
+  for (const r of routines) {
+    if (picked.includes(r.id)) continue;
+    const k = routineKey(r);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    rest.push(r);
+  }
+  rest.sort((a, b) => a.name.localeCompare(b.name) || b.updatedAt - a.updatedAt);
+  const all = [...first, ...rest];
+  const names = new Map<string, number>();
+  for (const r of all) names.set(r.name.trim().toLowerCase(), (names.get(r.name.trim().toLowerCase()) ?? 0) + 1);
+  return all.map((r) => ({
+    routine: r,
+    at: picked.indexOf(r.id),
+    exercises: (names.get(r.name.trim().toLowerCase()) ?? 0) > 1 ? r.items.length : undefined,
+  }));
+}
+
+/**
+ * Routines that are identical copies of another one (same routineKey), to tidy up. In each group it keeps a picked or
+ * protected routine (today's routine, say) if there is one, otherwise the newest; the list is kept newest first.
+ */
+export function extraCopies(routines: readonly Routine[], keep: readonly string[]): string[] {
+  const groups = new Map<string, Routine[]>();
+  for (const r of routines) {
+    const k = routineKey(r);
+    groups.set(k, [...(groups.get(k) ?? []), r]);
+  }
+  const out: string[] = [];
+  for (const g of groups.values()) {
+    if (g.length < 2) continue;
+    const kept = g.filter((r) => keep.includes(r.id));
+    const stay = kept.length ? kept : [g.reduce((a, b) => (b.updatedAt > a.updatedAt ? b : a))];
+    for (const r of g) if (!stay.includes(r)) out.push(r.id);
+  }
+  return out;
+}
+
+/**
+ * Builds local routines + draft fields from a template. A template day the coach already has as a routine, unchanged,
+ * reuses it rather than making another copy (2026-11-25: every tap on a template used to add four or six more).
+ */
 export function routinesFromTemplate(
   template: ProgramTemplate,
   now: number,
   newId: () => string,
+  existing: readonly Routine[] = [],
 ): { routines: Routine[]; routineIds: string[]; weekdays: number[][] } {
   const routines: Routine[] = [];
   const routineIds: string[] = [];
   const weekdays: number[][] = [];
+  const have = new Map<string, string>();
+  for (const r of existing) if (!have.has(routineKey(r))) have.set(routineKey(r), r.id);
   for (const d of template.days) {
+    weekdays.push([...d.weekdays]);
+    const same = have.get(routineKey({ id: "", name: d.name, items: d.items, createdAt: now, updatedAt: now }));
+    if (same) {
+      routineIds.push(same);
+      continue;
+    }
     const id = newId();
     routines.push({
       id,
@@ -128,7 +215,6 @@ export function routinesFromTemplate(
       updatedAt: now,
     });
     routineIds.push(id);
-    weekdays.push([...d.weekdays]);
   }
   return { routines, routineIds, weekdays };
 }

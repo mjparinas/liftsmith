@@ -445,6 +445,10 @@ export const de: FeaturesText = {
       name: "Kostenlos für Schulteams",
       body: "Trainer an weiterführenden Schulen, die eine Schul-E-Mail-Adresse bestätigen, bekommen Pro kostenlos, ebenso die 13- bis 18-jährigen Sportler ihrer Teams, mit einer wöchentlichen Teamtabelle. Körperfett und öffentliche Profile bleiben für unter 18-Jährige aus.",
     },
+    "my-team": {
+      name: "Mein Team für Schulsportler",
+      body: "Wer in einem Schulteam ist, öffnet Coaching im Zuhause seines Teams: das Team und sein Coach, die zugewiesenen Programme mit Folgen, ein Team-Chat mit dem Coach, ein Chat mit dem Coach und die Woche des Teams. Ein Coach kann Athleten, die über seine Einladung kamen, einem Team hinzufügen; jede Person gibt zuerst ihr Alter an und stimmt zu.",
+    },
     "team-session": {
       name: "Teamtraining auf einem Tablet",
       body: "Ein Schultrainer leitet ein Training für das ganze Team von einem Tablet aus: Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht startet beim letzten Stand, und die Tafel zeigt, wer noch nicht angefangen hat. Am Ende landen die Sätze im eigenen Konto. Funktioniert ohne Empfang.",
@@ -486,7 +490,7 @@ export const de: FeaturesText = {
     },
     "coach-programs": {
       name: "Programme von Coaches",
-      body: "Coaches und Personal Trainer machen aus ihren Routinen ein Programm, mit Level, Ziel und Anzahl Wochen, kostenlos oder mit Preis, und teilen den Link. Du speicherst seine Tage mit einem Tippen in deinen Routinen, und deine eigene Progression wählt die Gewichte. Kostenpflichtige Programme bezahlst du dem Coach über sein eigenes Stripe-Konto.",
+      body: "Coaches und Personal Trainer machen aus ihren Routinen ein Programm, mit Level, Ziel und Anzahl Wochen, kostenlos oder mit Preis, und teilen den Link. Du speicherst seine Tage mit einem Tippen in deinen Routinen, und deine eigene Progression wählt die Gewichte. Kostenpflichtige Programme bezahlst du dem Coach über sein eigenes Stripe-Konto. Eine Wochenansicht legt jede Routine auf ihre Wochentage mit Ruhetagen, eine Monatsansicht zeigt den Ablauf, und Automatisch planen verteilt die Routinen für dich.",
       note: "Kostenpflichtige Programme werden auf der Website gekauft; die Android- und iPhone-Apps zeigen kostenlose Programme und die, die du hast.",
       proPart: "Programme zu bekommen ist kostenlos; sie zu erstellen gehört zum Coaching, das Pro ist.",
     },

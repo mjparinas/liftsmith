@@ -815,6 +815,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "my-team",
+        name: "My team for school athletes",
+        body: "An athlete on a school team opens Coaching to their team's home: the team and its coach, the programs the coach assigned with Follow, a team chat with the coach in it, a chat with the coach, and the team's week. A coach can add athletes who joined with their invite to a team; each says their age and agrees first.",
+        tier: "free",
+        added: "2026-11-25",
+      },
+      {
         id: "team-session",
         name: "Team sessions on one tablet",
         body: "A high school coach runs one workout for the whole team from one tablet: each athlete taps their first name and logs their own sets, the weight starting where they left off, and the board shows who hasn't started. When it ends, each athlete's sets are saved to their own account. Works with no reception.",
@@ -900,7 +907,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-programs",
         name: "Programs from coaches",
-        body: "Coaches and personal trainers turn their routines into a program, with a level, a goal and how many weeks to run it, free or with a price, and share its link. Lifters save its days to their routines in one tap, and their own progression picks the weights. Paid programs pay the coach through their own Stripe account.",
+        body: "Coaches and personal trainers turn their routines into a program, with a level, a goal and how many weeks to run it, free or with a price, and share its link. Lifters save its days to their routines in one tap, and their own progression picks the weights. Paid programs pay the coach through their own Stripe account. A week view puts each routine on its weekdays with rest days, a month view shows how it runs, and Auto-arrange spreads the routines out for you.",
         tier: "both",
         note: "Paid programs are bought on the website; the Android and iPhone apps show free programs and the ones you have.",
         proPart: "Getting programs is free; making them is part of coaching, which is Pro.",

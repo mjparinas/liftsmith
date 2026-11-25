@@ -824,7 +824,7 @@ export const emails: Record<string, Words> = {
     title: "Condividi e vendi i tuoi programmi",
     intro: "Trasforma i programmi che dai sempre ai tuoi clienti in qualcosa che chiunque può seguire, gratis o a pagamento.",
     points: [
-      "In Coaching › Programmi, scegli fino a sette tue routine come giorni, poi aggiungi nome, livello, obiettivo e numero di settimane.",
+      "In Coaching › Programmi, metti le tue routine sui giorni di una settimana con riposi in mezzo (Organizza da solo lo fa per te), controlla il mese, poi aggiungi un nome, un livello, un obiettivo e quante settimane.",
       "Lascia vuoto il prezzo per un programma gratuito, oppure fissane uno quando i pagamenti con Stripe sono attivi.",
       "I programmi a pagamento si acquistano sul sito e i soldi vanno sul tuo account Stripe.",
       "Condividi il link ovunque. Chi lo ha lo conserva, anche dopo che lo togli dalla lista.",
@@ -1083,5 +1083,17 @@ export const emails: Record<string, Words> = {
       "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi.",
     ],
     dyk: "Puoi assegnare allo stesso modo dalla scheda squadra o dal report di un cliente.",
+  },
+  "my-team": {
+    title: "I tuoi atleti hanno la dashboard La mia squadra",
+    intro:
+      "Gli atleti della tua squadra scolastica ora aprono La mia squadra: la squadra, tu come allenatore, i programmi assegnati, la chat di squadra e una chat con te, in un'unica schermata.",
+    points: [
+      "Aggiungi dalla scheda della squadra gli atleti che alleni già. Ricevono un invito e si uniscono con un tocco.",
+      "Gli atleti non vedono più Programmi, Atleti o Configurazione. La mia squadra mostra solo ciò che serve.",
+      "La chat di squadra è per tutta la squadra e per te. Puoi eliminare qualsiasi messaggio, e gli atleti compaiono con il nome.",
+      "I programmi assegnati sono in La mia squadra con Segui, e la bacheca della settimana mostra chi si è allenato.",
+    ],
+    dyk: "I link della squadra ora funzionano anche se l'atleta accede dopo averli aperti, quindi nessuno resta fuori dalla rosa.",
   },
 };
