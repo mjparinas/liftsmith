@@ -350,7 +350,7 @@ export const pt: SiteText = {
       noLimit: "Sem limite fixo de alunos",
       inPro: "Incluído no Pro",
       orMonthly: "ou {monthly} por mês",
-      free: "Seus alunos sempre treinam grátis, coaches de ensino médio que confirmam um e-mail escolar ganham o Pro de graça, e no Coach e no Coach Plus o {name} não fica com nada do que os alunos pagam a você (2% no Pro).",
+      free: "Seus alunos sempre treinam grátis. Coaches de ensino médio que confirmam um e-mail escolar ganham o Pro de graça. No Coach e no Coach Plus o {name} não fica com nada do que os alunos de personal training pagam a você (2% no Pro).",
       cta: "Liftsmith para coaches",
     },
   },

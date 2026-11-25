@@ -20,7 +20,7 @@ import {
   type ProgramDraft,
 } from "@/lib/coachPrograms";
 import { PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
-import { t } from "@/lib/i18n";
+import { t, tFor } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { SITE_URL } from "@/lib/site";
@@ -102,7 +102,7 @@ export function CoachPrograms({ sports = false }: { sports?: boolean }) {
   const mine = data.mine ?? [];
   const full = mine.length >= PROGRAM_LIMITS.perCoach;
   return (
-    <Section title={t("cpg.mine")} icon="layers" info="coachPrograms">
+    <Section title={t("cpg.mine")} icon="layers" info={sports ? undefined : "coachPrograms"}>
       <p className="px-1 text-sm text-muted">
         {sports ? t("cpg.mineHintSports") : data.pay?.ready ? t("cpg.mineHint") : t("cpg.mineHintFree")}
       </p>
@@ -122,14 +122,16 @@ export function CoachPrograms({ sports = false }: { sports?: boolean }) {
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="min-w-0 font-semibold break-words">{p.title}</span>
-                  <span className="num shrink-0 rounded-full bg-raised px-2 py-0.5 text-xs font-semibold text-muted">
-                    {p.price ? money(p.price, p.currency) : t("cpg.free")}
-                  </span>
+                  {!sports && (
+                    <span className="num shrink-0 rounded-full bg-raised px-2 py-0.5 text-xs font-semibold text-muted">
+                      {p.price ? money(p.price, p.currency) : t("cpg.free")}
+                    </span>
+                  )}
                 </div>
                 <p className="mt-0.5 text-xs text-faint">{factsLine(p)}</p>
                 <p className="mt-1 text-sm text-muted">
                   {p.listed ? t("cpg.listed") : t("cpg.unlisted")}
-                  {p.price ? ` · ${t("cpg.sales", { count: p.sales ?? 0 })}` : ""}
+                  {!sports && p.price ? ` · ${t("cpg.sales", { count: p.sales ?? 0 })}` : ""}
                 </p>
               </button>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -170,7 +172,8 @@ export function CoachPrograms({ sports = false }: { sports?: boolean }) {
           <Editor
             start={editing.draft}
             program={editing.program}
-            payReady={data.pay.ready}
+            payReady={data.pay.ready && !sports}
+            hidePrice={sports}
             currency={data.pay.currency}
             onDone={() => {
               setEditing(null);
@@ -187,6 +190,7 @@ export function CoachPrograms({ sports = false }: { sports?: boolean }) {
         {assigning && (
           <AssignSheet
             program={assigning}
+            athlete={sports}
             onDone={() => {
               setAssigning(null);
             }}
@@ -194,7 +198,7 @@ export function CoachPrograms({ sports = false }: { sports?: boolean }) {
         )}
       </Sheet>
       <Sheet open={!!calendar} onClose={() => setCalendar(null)} title={t("cpg.cal.title")} wide>
-        {calendar && <ProgramCalendar programId={calendar.id} />}
+        {calendar && <ProgramCalendar programId={calendar.id} athlete={sports} />}
       </Sheet>
     </Section>
   );
@@ -218,12 +222,15 @@ function Editor({
   start,
   program,
   payReady,
+  hidePrice = false,
   currency,
   onDone,
 }: {
   start: ProgramDraft;
   program?: CoachProgram;
   payReady: boolean;
+  /** Sports and school coaches do not charge for a program, so the price field and the Stripe line both stay off. */
+  hidePrice?: boolean;
   currency: string | null;
   onDone: () => void;
 }) {
@@ -399,23 +406,24 @@ function Editor({
         </div>
       </div>
       <BumpField label={t("cpg.weeksLabel")} value={weeks} onChange={setWeeks} step={1} start={8} min={1} max={16} />
-      {payReady ? (
-        <div>
-          <BumpField
-            label={t("cpg.priceLabel", { currency: (currency ?? "usd").toUpperCase() })}
-            value={price}
-            onChange={setPrice}
-            step={1}
-            start={20}
-            min={0}
-            max={PROGRAM_LIMITS.price[1]}
-            placeholder={t("cpg.free")}
-          />
-          <p className="mt-1 text-xs text-faint">{t("cpg.priceHint")}</p>
-        </div>
-      ) : (
-        <p className="text-sm text-muted">{t("cpg.priceNeedsPay")}</p>
-      )}
+      {!hidePrice &&
+        (payReady ? (
+          <div>
+            <BumpField
+              label={t("cpg.priceLabel", { currency: (currency ?? "usd").toUpperCase() })}
+              value={price}
+              onChange={setPrice}
+              step={1}
+              start={20}
+              min={0}
+              max={PROGRAM_LIMITS.price[1]}
+              placeholder={t("cpg.free")}
+            />
+            <p className="mt-1 text-xs text-faint">{t("cpg.priceHint")}</p>
+          </div>
+        ) : (
+          <p className="text-sm text-muted">{t("cpg.priceNeedsPay")}</p>
+        ))}
       <InlineSwitch label={t("cpg.listedLabel")} hint={t("cpg.listedHint")} on={d.listed} onChange={(v) => setD({ ...d, listed: v })} />
       {note && (
         <p className="text-sm text-warn" role="status">
@@ -447,7 +455,7 @@ function Editor({
   );
 }
 
-function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () => void }) {
+function AssignSheet({ program, onDone, athlete }: { program: CoachProgram; onDone: () => void; athlete: boolean }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
   const [scope, setScope] = useState<AssignScope | null>(null);
@@ -476,7 +484,7 @@ function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () =>
       const r = await assignProgram(program.id, scope, weekdays);
       haptic("success");
       track("feature", { name: "trainer", detail: "assignProgram" });
-      setNote(t("cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+      setNote(tFor(athlete, "cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
       if (r.assigned.length) setTimeout(onDone, 1200);
     } catch (e) {
       oops();
@@ -501,7 +509,7 @@ function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () =>
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted">{t("cpg.assignHint")}</p>
+      <p className="text-sm text-muted">{tFor(athlete, "cpg.assignHint")}</p>
       {program.days.map((d, i) => (
         <div key={i}>
           <p className="text-sm font-medium">{d.name}</p>
@@ -530,10 +538,10 @@ function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () =>
       ))}
       <div className="flex flex-wrap gap-2">
         <Chip active={scope?.type === "allClients"} onClick={() => setScope({ type: "allClients" })} disabled={!clients.length}>
-          {t("cpg.assignAll", { count: clients.length })}
+          {tFor(athlete, "cpg.assignAll", { count: clients.length })}
         </Chip>
         <Chip active={scope?.type === "clients"} onClick={() => setScope({ type: "clients", ids: picked })} disabled={!clients.length}>
-          {t("cpg.assignPick")}
+          {tFor(athlete, "cpg.assignPick")}
         </Chip>
         {teams.map((team) => (
           <Chip

@@ -327,7 +327,7 @@ export const es: SiteText = {
       noLimit: "Sin límite fijo de clientes",
       inPro: "Incluido en Pro",
       orMonthly: "o {monthly} al mes",
-      free: "Tus clientes siempre entrenan gratis, los entrenadores de secundaria que confirman un correo del centro tienen Pro gratis, y con Coach y Coach Plus {name} no se queda nada de lo que te pagan tus clientes (un 2 % con Pro).",
+      free: "Tus clientes siempre entrenan gratis. Los entrenadores de secundaria que confirman un correo del centro tienen Pro gratis. Con Coach y Coach Plus {name} no se queda nada de lo que te pagan tus clientes de entrenamiento personal (un 2 % con Pro).",
       cta: "Liftsmith para entrenadores",
     },
   },

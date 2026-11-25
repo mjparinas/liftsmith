@@ -20,8 +20,8 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 
 ## Coach side: Coaching › Programs
 
-- A new tab on the coach's pages (`#/trainer/programs`, `CoachPrograms.tsx`), for every coach: free programs need no payments. **New program** opens the editor: name, about, the days (chips of the coach's routines, numbered in the order picked; with no routines, **Make a routine** opens the routines sheet), level, goal, weeks, price (only once their Stripe account takes payments; otherwise a line saying to set up payments) and **On the list**.
-- Each program shows Listed or Off the list, its price and how many it sold. Editing keeps its days unless the coach picks new ones. **Share link** (the phone's share sheet, or copy) shares `https://www.getliftsmith.com/app/#/program/<id>`; **See it as a lifter** opens the program page.
+- A new tab on the coach's pages (`#/trainer/programs`, `CoachPrograms.tsx`), for every coach: free programs need no payments. **New program** opens the editor: name, about, the days (chips of the coach's routines, numbered in the order picked; with no routines, **Make a routine** opens the routines sheet), level, goal, weeks, price (only once their Stripe account takes payments; otherwise a line saying to set up payments) and **On the list**. A sports coach, including a school coach, does not see a price, a sale count, or that Stripe line (`sports` on `CoachPrograms`). Saving a program there stores it as free.
+- Each program shows Listed or Off the list. A personal trainer or physio also sees its price and how many it sold. A sports coach, including a school coach, does not. Editing keeps its days unless the coach picks new ones. **Share link** (the phone's share sheet, or copy) shares `https://www.getliftsmith.com/app/#/program/<id>`; **See it as a lifter** opens the program page.
 - **Delete** removes a program nobody has; a program somebody bought is only taken off the list instead ("Take it off the list"), so nobody loses what they paid for. Off the list, only the coach and people who have it can open it.
 - The coach gets a push for each sale (`coachProgramSold`, once per payment).
 

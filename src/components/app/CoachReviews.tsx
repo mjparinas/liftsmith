@@ -30,7 +30,7 @@ import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
 import { useApp } from "@/lib/store";
-import type { Person } from "@/lib/trainer";
+import { useCoachNotes, type Person } from "@/lib/trainer";
 
 import { Icon } from "./icons";
 import { Button, Chip, EmptyState, Section, Sheet } from "./ui";
@@ -382,6 +382,7 @@ export function ReplyBox({
   /** Where the reply goes: a review of the coach (the default) or of one of their programs. */
   save?: (id: string, text: string) => Promise<unknown>;
 }) {
+  const athlete = useCoachNotes((s) => s.who.role) === "coach";
   const [open, setOpen] = useState(false);
   const [text, setText] = useState(review.reply);
   const [busy, setBusy] = useState(false);
@@ -397,7 +398,7 @@ export function ReplyBox({
       onSaved();
     } catch (e) {
       oops();
-      setNote(reviewError(e));
+      setNote(reviewError(e, athlete));
     } finally {
       setBusy(false);
     }

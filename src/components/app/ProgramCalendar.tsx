@@ -15,7 +15,7 @@ import {
   type CalendarMonth,
 } from "@/lib/coachProgramAssign";
 import { dayKey, monthGrid, weekdayNames } from "@/lib/dashboard";
-import { date, t } from "@/lib/i18n";
+import { date, t, tFor } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { trainerError } from "@/lib/trainer";
@@ -49,11 +49,14 @@ export function ProgramCalendar({
   teamId,
   /** When set, the roster shows only this athlete (client report month strip). */
   clientId,
+  athlete = false,
   onClose,
 }: {
   programId?: string;
   teamId?: string;
   clientId?: string;
+  /** Sports coach: the empty calendar says athletes. */
+  athlete?: boolean;
   onClose?: () => void;
 }) {
   const now = useNow(60_000);
@@ -260,7 +263,9 @@ export function ProgramCalendar({
         ) : data ? (
           <p className="text-sm text-muted">{t("cpg.cal.empty")}</p>
         ) : null}
-        {error?.includes("gone") || (data === null && error) ? <p className="mt-2 text-sm text-muted">{t("cpg.cal.noAssign")}</p> : null}
+        {error?.includes("gone") || (data === null && error) ? (
+          <p className="mt-2 text-sm text-muted">{tFor(athlete, "cpg.cal.noAssign")}</p>
+        ) : null}
         {error && (
           <Button kind="ghost" className="mt-2" onClick={() => (oops(), load())}>
             {t("friends.retry")}
