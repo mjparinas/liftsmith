@@ -115,6 +115,9 @@ export const en = {
     "Pro unlocks Amy, a clear English voice built into the app. Pick Amy or your phone's text-to-speech in Settings › Workout; Amy falls back to the phone voice if she can't load.",
   "wn.c.checkUpdates.title": "Check for updates in Settings",
   "wn.c.checkUpdates.body": "On Android and iPhone, Settings › Version lets you check for a newer app and install it when one is ready.",
+  "wn.c.assignProgram.title": "Assign a season program",
+  "wn.c.assignProgram.body":
+    "Coaches put Upper/Lower, Push/Pull/Legs or their own multi-day program on clients or a school team for N weeks. Athletes follow once; Today shows that weekday’s workout. A program calendar shows Done and Not yet — first names only for school teams, never weights.",
 } as const;
 
 type Key = keyof typeof en;
@@ -240,6 +243,9 @@ export const es: Partial<Record<Key, Message>> = {
     "Pro desbloquea Amy, una voz inglesa clara incluida en la app. Elige Amy o el texto a voz del teléfono en Ajustes › Entrenamiento; Amy vuelve a la voz del teléfono si no puede cargar.",
   "wn.c.checkUpdates.title": "Buscar actualizaciones en Ajustes",
   "wn.c.checkUpdates.body": "En Android e iPhone, Ajustes › Versión te deja buscar una app más nueva e instalarla cuando esté lista.",
+  "wn.c.assignProgram.title": "Asigna un programa de temporada",
+  "wn.c.assignProgram.body":
+    "Los entrenadores ponen Upper/Lower, Push/Pull/Legs o su programa de varios días a clientes o un equipo escolar durante N semanas. Siguen una vez; Hoy muestra el entrenamiento de ese día. Un calendario muestra Hecho y Aún no — solo nombres de pila en equipos escolares, nunca pesos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -366,6 +372,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.checkUpdates.title": "Chercher les mises à jour dans Réglages",
   "wn.c.checkUpdates.body":
     "Sur Android et iPhone, Réglages › Version permet de chercher une app plus récente et de l'installer quand elle est prête.",
+  "wn.c.assignProgram.title": "Assigner un programme de saison",
+  "wn.c.assignProgram.body":
+    "Les coachs mettent Upper/Lower, Push/Pull/Legs ou leur programme de plusieurs jours sur des clients ou une équipe scolaire pour N semaines. Suivre une fois ; Aujourd’hui montre l’entraînement du jour. Un calendrier montre Fait et Pas encore — prénoms seulement pour les équipes scolaires, jamais de poids.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -489,6 +498,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.checkUpdates.title": "In den Einstellungen nach Updates suchen",
   "wn.c.checkUpdates.body":
     "Auf Android und iPhone kannst du unter Einstellungen › Version nach einer neueren App suchen und sie installieren, wenn eine bereit ist.",
+  "wn.c.assignProgram.title": "Saisonprogramm zuweisen",
+  "wn.c.assignProgram.body":
+    "Coaches setzen Upper/Lower, Push/Pull/Legs oder ihr mehrtägiges Programm für N Wochen auf Klienten oder ein Schulteam. Einmal folgen; Heute zeigt das Training des Wochentags. Ein Kalender zeigt Erledigt und Noch nicht — nur Vornamen bei Schulteams, nie Gewichte.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -612,6 +624,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.checkUpdates.title": "Cerca aggiornamenti in Impostazioni",
   "wn.c.checkUpdates.body":
     "Su Android e iPhone, Impostazioni › Versione ti permette di cercare un'app più recente e installarla quando è pronta.",
+  "wn.c.assignProgram.title": "Assegna un programma di stagione",
+  "wn.c.assignProgram.body":
+    "I coach mettono Upper/Lower, Push/Pull/Legs o il loro programma di più giorni su clienti o una squadra scolastica per N settimane. Seguono una volta; Oggi mostra l’allenamento del giorno. Un calendario mostra Fatto e Non ancora — solo nomi per le squadre scolastiche, mai i pesi.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -725,6 +740,9 @@ export const ja: Partial<Record<Key, Message>> = {
     "ProでAmyが使えます。アプリ内蔵の明瞭な英語ボイスです。設定 › ワークアウトでAmyか端末の音声を選べ、Amyが使えないときは端末の声に戻ります。",
   "wn.c.checkUpdates.title": "設定でアップデートを確認",
   "wn.c.checkUpdates.body": "AndroidとiPhoneでは、設定 › バージョンから新しいアプリを確認し、準備ができたらインストールできます。",
+  "wn.c.assignProgram.title": "シーズンプログラムを割り当て",
+  "wn.c.assignProgram.body":
+    "コーチが Upper/Lower、Push/Pull/Legs、または自作の複数日プログラムをクライアントや学校チームに N 週間割り当てます。一度フォローすれば、今日にその曜日のワークアウトが出ます。カレンダーで完了／まだが分かり、学校チームは下の名前のみ、重量は出しません。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -844,6 +862,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.checkUpdates.title": "Verificar atualizações em Ajustes",
   "wn.c.checkUpdates.body":
     "No Android e no iPhone, Ajustes › Versão deixa você procurar um app mais novo e instalá-lo quando estiver pronto.",
+  "wn.c.assignProgram.title": "Atribuir um programa de temporada",
+  "wn.c.assignProgram.body":
+    "Os treinadores põem Upper/Lower, Push/Pull/Legs ou o seu programa de vários dias em clientes ou numa equipa escolar por N semanas. Seguem uma vez; Hoje mostra o treino desse dia. Um calendário mostra Feito e Ainda não — só primeiros nomes em equipas escolares, nunca pesos.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -953,6 +974,9 @@ export const ko: Partial<Record<Key, Message>> = {
     "Pro로 Amy를 쓸 수 있어요. 앱에 들어 있는 또렷한 영어 음성이에요. 설정 › 운동에서 Amy 또는 휴대폰 음성을 고르고, Amy를 쓸 수 없으면 휴대폰 음성으로 돌아가요.",
   "wn.c.checkUpdates.title": "설정에서 업데이트 확인",
   "wn.c.checkUpdates.body": "Android와 iPhone에서는 설정 › 버전에서 새 앱이 있는지 확인하고, 준비되면 설치할 수 있어요.",
+  "wn.c.assignProgram.title": "시즌 프로그램 배정",
+  "wn.c.assignProgram.body":
+    "코치가 어퍼/로워, 푸시/풀/레그 또는 여러 날 프로그램을 클라이언트나 학교 팀에 N주 배정합니다. 한 번 따르면 오늘에 그날 운동이 나옵니다. 달력에서 완료/아직을 보고, 학교 팀은 이름만, 무게는 절대 안 보입니다.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1072,6 +1096,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.checkUpdates.title": "Sprawdzanie aktualizacji w Ustawieniach",
   "wn.c.checkUpdates.body":
     "Na Androidzie i iPhonie w Ustawienia › Wersja możesz sprawdzić nowszą aplikację i zainstalować ją, gdy będzie gotowa.",
+  "wn.c.assignProgram.title": "Przypisz program sezonowy",
+  "wn.c.assignProgram.body":
+    "Trenerzy ustawiają Upper/Lower, Push/Pull/Legs lub własny wielodniowy program klientom albo drużynie szkolnej na N tygodni. Śledzą raz; Dziś pokazuje trening tego dnia. Kalendarz pokazuje Zrobione i Jeszcze nie — tylko imiona w drużynach szkolnych, nigdy ciężary.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1192,4 +1219,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.checkUpdates.title": "Ayarlar'da güncelleme denetle",
   "wn.c.checkUpdates.body":
     "Android ve iPhone'da Ayarlar › Sürüm, daha yeni bir uygulama olup olmadığını denetlemeni ve hazır olduğunda yüklemeni sağlar.",
+  "wn.c.assignProgram.title": "Sezon programı ata",
+  "wn.c.assignProgram.body":
+    "Koçlar Upper/Lower, Push/Pull/Legs veya kendi çok günlük programlarını danışanlara ya da okul takımına N hafta atar. Bir kez takip; Bugün o günün antrenmanını gösterir. Takvim Yapıldı ve Henüz değil’i gösterir — okul takımlarında yalnızca adlar, asla ağırlık yok.",
 };

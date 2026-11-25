@@ -48,6 +48,7 @@ import { NowPlayingBar } from "./NowPlaying";
 import { programName } from "./Programs";
 import { RecoveryMap } from "./RecoveryMap";
 import { NextDayPain, RehabPhaseToday } from "./RehabPhase";
+import { CoachProgramChip, CoachProgramEndedToday, ProgramAssignToday } from "./ProgramAssignToday";
 import { PlanEnded, PlanToday, RehabToday } from "./RehabToday";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
@@ -512,6 +513,8 @@ export function Today() {
             </section>
           )}
 
+          {!active && <ProgramAssignToday />}
+          {!active && <CoachProgramEndedToday />}
           {!active && <PlanToday />}
           {!active && <PlanEnded />}
           {!active && <NextDayPain />}
@@ -569,6 +572,7 @@ export function Today() {
           {resting ? null : preview && preview.items.length > 0 ? (
             <>
               {!active && <TodayParts />}
+              {!active && <CoachProgramChip />}
               {/* Lifting off for today (cardio and stretches only): the exercise list isn't run, so it isn't shown. */}
               {!(split?.noLift && !active) && (
                 <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
@@ -739,6 +743,7 @@ export function Today() {
             </>
           ) : (
             <div className="card mt-6">
+              {!active && <CoachProgramChip />}
               <EmptyState
                 icon="moon"
                 mascot="sleepy"

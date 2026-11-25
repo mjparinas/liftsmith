@@ -46,6 +46,12 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.16.0",
+    day: "2026-11-24",
+    headline: "Assign a season program to clients or a school team, with a calendar of who has lifted",
+    changes: [{ id: "assignProgram", kind: "new", icon: "layers" }],
+  },
+  {
     version: "0.15.0",
     day: "2026-11-23",
     headline: "Amy voice for the voice coach, and check for updates from Settings on the phones",

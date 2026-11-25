@@ -17,14 +17,19 @@ import {
   type MinePrograms,
   type ProgramDraft,
 } from "@/lib/coachPrograms";
+import { assignProgram, endProgramAssigns, type AssignScope } from "@/lib/coachProgramAssign";
+import { PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
+import { WEEKDAYS } from "@/lib/calendar";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
-import { trainerError } from "@/lib/trainer";
+import { loadOverview, trainerError, type Overview, type Person } from "@/lib/trainer";
+import { loadTeams, type Team } from "@/lib/teams";
 
 import { factsLine } from "./CoachProgram";
+import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { RoutinesSheet } from "./Routines";
 import { BumpField, Button, Chip, EmptyState, InlineSwitch, Section, Sheet, Skeleton } from "./ui";
@@ -50,6 +55,8 @@ export function CoachPrograms() {
   const [data, setData] = useState<MinePrograms | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ draft: ProgramDraft; program?: CoachProgram } | null>(null);
+  const [assigning, setAssigning] = useState<CoachProgram | null>(null);
+  const [calendar, setCalendar] = useState<CoachProgram | null>(null);
   const reload = useCallback(() => {
     loadMine()
       .then(setData)
@@ -75,10 +82,10 @@ export function CoachPrograms() {
       ) : (
         <ul className="mt-3 space-y-3">
           {data.mine.map((p) => (
-            <li key={p.id}>
+            <li key={p.id} className="card p-4">
               <button
                 type="button"
-                className="press card w-full p-4 text-left"
+                className="press w-full text-left"
                 onClick={() => {
                   haptic("tick");
                   setEditing({ program: p, draft: toDraft(p) });
@@ -96,6 +103,26 @@ export function CoachPrograms() {
                   {p.price ? ` · ${t("cpg.sales", { count: p.sales ?? 0 })}` : ""}
                 </p>
               </button>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  kind="ghost"
+                  onClick={() => {
+                    haptic("tick");
+                    setAssigning(p);
+                  }}
+                >
+                  {t("cpg.assign")}
+                </Button>
+                <Button
+                  kind="ghost"
+                  onClick={() => {
+                    haptic("tick");
+                    setCalendar(p);
+                  }}
+                >
+                  {t("cpg.assignCalendar")}
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -122,6 +149,19 @@ export function CoachPrograms() {
             }}
           />
         )}
+      </Sheet>
+      <Sheet open={!!assigning} onClose={() => setAssigning(null)} title={assigning ? t("cpg.assignTitle", { title: assigning.title }) : ""}>
+        {assigning && (
+          <AssignSheet
+            program={assigning}
+            onDone={() => {
+              setAssigning(null);
+            }}
+          />
+        )}
+      </Sheet>
+      <Sheet open={!!calendar} onClose={() => setCalendar(null)} title={t("cpg.cal.title")} wide>
+        {calendar && <ProgramCalendar programId={calendar.id} />}
       </Sheet>
     </Section>
   );
@@ -228,8 +268,41 @@ function Editor({
     if (!(await shareUrl(link, program.title))) setNote((await copyText(link)) ? t("cpg.copied") : link);
   };
 
+  const applyTemplate = (tpl: ProgramTemplate) => {
+    const now = Date.now();
+    const { routines: made, routineIds, weekdays } = routinesFromTemplate(tpl, now, () =>
+      typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+    );
+    for (const r of made) useApp.getState().saveRoutine(r);
+    setD({
+      ...d,
+      title: d.title.trim() || tpl.title,
+      about: d.about.trim() || tpl.about,
+      goal: tpl.goal,
+      weeks: tpl.weeks,
+      routineIds,
+      weekdays,
+    });
+    setWeeks(String(tpl.weeks));
+    haptic("success");
+    track("feature", { name: "coach_program", detail: `template_${tpl.id}` });
+  };
+
   return (
     <div className="space-y-4">
+      {!program && (
+        <div>
+          <p className="text-sm font-medium">{t("cpg.template")}</p>
+          <p className="text-xs text-faint">{t("cpg.templateHint")}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {PROGRAM_TEMPLATES.map((tpl) => (
+              <Chip key={tpl.id} onClick={() => applyTemplate(tpl)}>
+                {t(`cpg.template.${tpl.id}`)}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      )}
       <div>
         <label htmlFor="cpg-title" className="text-sm font-medium">
           {t("cpg.name")}
@@ -350,4 +423,162 @@ function Editor({
       <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
     </div>
   );
+}
+
+function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () => void }) {
+  const [overview, setOverview] = useState<Overview | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [scope, setScope] = useState<AssignScope | null>(null);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const [weekdays, setWeekdays] = useState<number[][]>(() =>
+    program.days.map((d, i) => d.weekdays ?? defaultWeekdays(program.days.length, i)),
+  );
+
+  useEffect(() => {
+    void loadOverview()
+      .then(setOverview)
+      .catch(() => setOverview(null));
+    void loadTeams()
+      .then((o) => setTeams(o.teams ?? []))
+      .catch(() => setTeams([]));
+  }, []);
+
+  const clients = overview?.clients ?? [];
+  const goAssign = async () => {
+    if (!scope) return;
+    setBusy(true);
+    setNote(null);
+    try {
+      const r = await assignProgram(program.id, scope, weekdays);
+      haptic("success");
+      track("feature", { name: "trainer", detail: "assignProgram" });
+      setNote(t("cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+      if (r.assigned.length) setTimeout(onDone, 1200);
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+    setBusy(false);
+  };
+
+  const takeBack = async () => {
+    setBusy(true);
+    try {
+      await endProgramAssigns({ programId: program.id });
+      haptic("toggle");
+      setNote(t("cpg.assignTaken"));
+      track("feature", { name: "trainer", detail: "endProgram" });
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+    setBusy(false);
+  };
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted">{t("cpg.assignHint")}</p>
+      {program.days.map((d, i) => (
+        <div key={i}>
+          <p className="text-sm font-medium">{d.name}</p>
+          <div className="mt-1 flex flex-wrap gap-1" role="group" aria-label={t("cpg.weekdays")}>
+            {WEEKDAYS.map((label, w) => {
+              const on = weekdays[i]?.includes(w) ?? false;
+              return (
+                <Chip
+                  key={w}
+                  active={on}
+                  onClick={() =>
+                    setWeekdays((all) =>
+                      all.map((row, ri) => {
+                        if (ri !== i) return row;
+                        return on ? row.filter((x) => x !== w) : [...row, w].sort((a, b) => a - b);
+                      }),
+                    )
+                  }
+                >
+                  {label}
+                </Chip>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      <div className="flex flex-wrap gap-2">
+        <Chip
+          active={scope?.type === "allClients"}
+          onClick={() => setScope({ type: "allClients" })}
+          disabled={!clients.length}
+        >
+          {t("cpg.assignAll", { count: clients.length })}
+        </Chip>
+        <Chip
+          active={scope?.type === "clients"}
+          onClick={() => setScope({ type: "clients", ids: picked })}
+          disabled={!clients.length}
+        >
+          {t("cpg.assignPick")}
+        </Chip>
+        {teams.map((team) => (
+          <Chip
+            key={team.id}
+            active={scope?.type === "team" && scope.teamId === team.id}
+            onClick={() => setScope({ type: "team", teamId: team.id })}
+          >
+            {t("cpg.assignTeam", { name: team.name, count: team.members })}
+          </Chip>
+        ))}
+      </div>
+      {scope?.type === "clients" && (
+        <div className="flex flex-wrap gap-2">
+          {clients.map((c: Person) => {
+            const on = picked.includes(c.id);
+            return (
+              <Chip
+                key={c.id}
+                active={on}
+                onClick={() => {
+                  const next = on ? picked.filter((x) => x !== c.id) : [...picked, c.id];
+                  setPicked(next);
+                  setScope({ type: "clients", ids: next });
+                }}
+              >
+                {c.name}
+              </Chip>
+            );
+          })}
+        </div>
+      )}
+      {note && (
+        <p className="text-sm text-muted" role="status">
+          {note}
+        </p>
+      )}
+      <Button
+        className="w-full"
+        disabled={
+          busy ||
+          !scope ||
+          (scope.type === "clients" && !scope.ids.length) ||
+          weekdays.some((w) => !w.length)
+        }
+        onClick={() => void goAssign()}
+      >
+        {t("cpg.assignGo")}
+      </Button>
+      <Button kind="danger" className="w-full" disabled={busy} onClick={() => void takeBack()}>
+        {t("cpg.assignTakeBack")}
+      </Button>
+    </div>
+  );
+}
+
+function defaultWeekdays(days: number, i: number): number[] {
+  if (days === 4) return [[1], [2], [4], [5]][i] ?? [1 + i];
+  if (days === 6) return [[1], [2], [3], [4], [5], [6]][i] ?? [1 + i];
+  if (days === 3) return [[1, 4], [2, 5], [3, 6]][i] ?? [1];
+  if (days === 2) return [[1, 4], [2, 5]][i] ?? [1];
+  return [((i % 5) + 1) as number];
 }

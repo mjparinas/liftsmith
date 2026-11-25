@@ -17,6 +17,7 @@ import { bodyMode } from "../pregnancy";
 import { freeProgramFor, pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
+import { coachProgramDayIndex } from "../coachProgramAssign";
 import { planFromRoutine } from "../routines";
 import { splitSession, STRETCH_PART_MIN, type SessionSplit } from "../sessionSplit";
 import type { State } from "../store";
@@ -210,7 +211,15 @@ export function planSlice(c: Ctx): PlanSlice {
       const trying = get().tryAdaptive && !can("adaptive") && freeAdaptiveLeft(events, now);
       const src = trying ? undefined : profile.planSource;
       // A saved routine replaces today's plan (adaptive or program), where this gym can do it.
-      const routine = profile.routines?.find((x) => x.id === get().routineId);
+      // A season coach program (coachProgramAssign.ts) picks today's weekday-bound day when no one-day override is on.
+      const coachDay =
+        !get().routineId && src?.kind === "coachProgram"
+          ? (() => {
+              const i = coachProgramDayIndex(src, now);
+              return i === null ? null : (profile.routines?.find((x) => x.id === src.dayIds[i]) ?? null);
+            })()
+          : null;
+      const routine = profile.routines?.find((x) => x.id === get().routineId) ?? coachDay;
       // The slider is the whole workout (Melvin, 2026-11-14): the parts that are on take their minutes out of the
       // lifting, so the adaptive plan (and a split program's day) is sized to what's left. A routine runs as written.
       const split = routine ? null : partSplit(profile, g, events, now);
@@ -219,7 +228,11 @@ export function planSlice(c: Ctx): PlanSlice {
       const programDay =
         src?.kind === "program" ? programPlan({ src, gym: g, profile: sized, events, now, call, challenge: r.challenge }) : null;
       const fromProgram = programDay?.program?.fixed ? injuryPass(programDay, events, profile, g, now) : programDay;
-      let plan = fromProgram ?? generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: r.challenge });
+      // Off day on a coach season program: no forced lift (rest messaging on Today).
+      const coachOff = src?.kind === "coachProgram" && !routine && !trying;
+      let plan = coachOff
+        ? { ...generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: false }), items: [], estMinutes: 0 }
+        : (fromProgram ?? generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: r.challenge }));
       // It isn't a program day, so the program's next day stays next.
       const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
       // A rehab routine from the lifter's physio stays as written: it's meant for the injured area (trainer-mode.md).
@@ -248,7 +261,7 @@ export function planSlice(c: Ctx): PlanSlice {
       if (!can("adaptive")) {
         // Adaptive plans and splits are Pro: keep what they had, and plan the free classic 5x5 meanwhile.
         // The free program fits the gym (freeProgramFor): the 5×5 with a barbell, dumbbell full body, or bodyweight skills.
-        if (!free && src.kind !== "routine")
+        if (!free && src.kind !== "routine" && src.kind !== "coachProgram")
           get().setProfile({ proPlan: src, planSource: pickProgram(freeProgramFor(g), { profile, gym: g, events, now: Date.now() }) });
       } else if (profile.proPlan) {
         // Pro again (a purchase, a restore, a renewal the phone just heard about): back to their own plan.

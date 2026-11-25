@@ -28,6 +28,8 @@ export interface ProgramDay {
   code?: string;
   exercises: number;
   sets: number;
+  /** JS getDay() weekdays (0=Sun … 6=Sat) this day runs, when set for season assigns. */
+  weekdays?: number[];
 }
 
 export interface CoachProgram {
@@ -65,6 +67,8 @@ export interface ProgramDraft {
   weeks: number;
   /** Routine ids from the coach's own routines, in order. */
   routineIds: string[];
+  /** Optional weekdays per routine id index (season programs). */
+  weekdays?: number[][];
   price: number;
   listed: boolean;
 }
@@ -122,11 +126,22 @@ export async function browse(coach?: string): Promise<CoachProgram[]> {
 export const loadMine = () => api<MinePrograms>("/api/programs/?mine=1", { token: mustToken() });
 
 /** The days as routine codes, from the coach's own saved routines (exercises, sets, supersets and parts; no weights). */
-export function draftDays(draft: Pick<ProgramDraft, "routineIds">, routines: readonly Routine[]): { name: string; code: string }[] {
-  return draft.routineIds
-    .map((id) => routines.find((r) => r.id === id))
-    .filter((r): r is Routine => !!r && r.items.length > 0)
-    .map((r) => ({ name: r.name.trim().slice(0, 40) || "Day", code: encodeRoutine(r) }));
+export function draftDays(
+  draft: Pick<ProgramDraft, "routineIds" | "weekdays">,
+  routines: readonly Routine[],
+): { name: string; code: string; weekdays?: number[] }[] {
+  return draft.routineIds.flatMap((id, i) => {
+    const r = routines.find((x) => x.id === id);
+    if (!r || !r.items.length) return [];
+    const weekdays = draft.weekdays?.[i];
+    return [
+      {
+        name: r.name.trim().slice(0, 40) || "Day",
+        code: encodeRoutine(r),
+        ...(weekdays?.length ? { weekdays } : {}),
+      },
+    ];
+  });
 }
 
 /** What the server keeps from a draft (the routine ids become days). */
@@ -147,7 +162,7 @@ export async function saveProgram(draft: ProgramDraft, routines: readonly Routin
 }
 /** Saves a program's details with the days it already has (the coach didn't pick new ones). */
 export async function saveProgramKeepingDays(draft: ProgramDraft, program: CoachProgram): Promise<CoachProgram> {
-  const days = program.days.flatMap((d) => (d.code ? [{ name: d.name, code: d.code }] : []));
+  const days = program.days.flatMap((d) => (d.code ? [{ name: d.name, code: d.code, ...(d.weekdays ? { weekdays: d.weekdays } : {}) }] : []));
   return (await post<{ program: CoachProgram }>({ action: "save", program: { ...details(draft), days } })).program;
 }
 export const deleteProgram = async (id: string) => (await post<{ result: "deleted" | "unlisted" }>({ action: "delete", id })).result;

@@ -1071,4 +1071,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Il coach gratuito e gli avvisi di riposo a schermo bloccato usano ancora la sintesi di sistema quando serve.",
   },
+  "coach-assign-program": {
+    title: "Assegna un programma di stagione a tutto il gruppo",
+    intro: "Metti Upper/Lower o Push/Pull/Legs su clienti o squadra scolastica per N settimane: seguono una volta, Oggi fa il giorno giusto e un calendario mostra chi ha alzato.",
+    points: [
+      "In Coaching › Programmi, parti da Upper/Lower o Push/Pull/Legs, imposta i giorni, poi Assegna a… clienti o squadra.",
+      "Gli atleti ricevono un push e Seguono una volta su Oggi. La loro progressione sceglie i pesi.",
+      "Nei giorni previsti, Oggi mostra quell’allenamento. I giorni liberi restano di riposo.",
+      "Il calendario del programma mostra Fatto e Non ancora. Squadre scolastiche: solo nomi, mai i pesi.",
+    ],
+    dyk: "Puoi assegnare allo stesso modo dalla scheda squadra o dal report di un cliente.",
+  },
+
 };

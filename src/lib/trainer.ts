@@ -14,6 +14,7 @@ import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } 
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import type { ClientPay, OverviewPay } from "./coachPay";
 import type { ClientLimits, CoachTier } from "./coachPlans";
+import type { ProgramAssign } from "./coachProgramAssign";
 import type { Shown, Status } from "./coachStatus";
 import { cycleState } from "./cycle";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
@@ -86,6 +87,8 @@ export interface Overview {
   coaches: Person[];
   /** Routines this lifter's coaches gave them. */
   plans: Plan[];
+  /** Season programs this lifter's coaches assigned (pending or active). */
+  programAssigns?: ProgramAssign[];
   /** Notes this lifter's coaches left them, newest first. */
   notes?: Note[];
   /** What this coach's new clients start setup with. */
@@ -203,6 +206,8 @@ export interface ClientView {
   events: unknown[];
   /** Routines this coach gave the client. */
   plans: Plan[];
+  /** Season programs this coach assigned to the client. */
+  programAssigns?: ProgramAssign[];
   /** This coach's note to the client. */
   note?: Note | null;
   /** The client's body data, when they share it. */
@@ -981,6 +986,8 @@ const PLANS = "liftsmith.coachPlans";
 const PLANS_SEEN = "liftsmith.coachPlans.seen";
 const PLANS_READY = "liftsmith.coachPlans.ready";
 const PLANS_ENDED = "liftsmith.coachPlans.ended";
+const PROGRAM_ASSIGNS = "liftsmith.coachProgramAssigns";
+const PROGRAM_ASSIGNS_SEEN = "liftsmith.coachProgramAssigns.seen";
 const NOBODY: Who = { coaches: [], clients: 0 };
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
@@ -1019,12 +1026,21 @@ interface NotesState {
   who: Who;
   /** Programs this lifter's coaches sent, with the coach's name and role, for Today's "save it" card (2026-11-15). */
   plans: ShownPlan[];
+  /** Season programs assigned to this lifter, with the coach's name. */
+  programAssigns: ShownProgramAssign[];
+  /** Season assigns "Not now" hid on Today, by id. */
+  programAssignsSeen: string[];
   /** Plans "Not now" hid on Today, by id. */
   plansSeen: string[];
   /** An overview has loaded, so a missing plan id is really gone and not just "not fetched yet". */
   plansReady: boolean;
   /** Plan ids the lifter already answered on the "taken back" card (stop or keep). */
   plansEnded: string[];
+}
+/** A season program assign with who sent it. */
+export interface ShownProgramAssign extends ProgramAssign {
+  coach: string;
+  role?: Role;
 }
 /** A program from a coach, with who sent it. */
 export interface ShownPlan extends Plan {
@@ -1069,6 +1085,8 @@ export const useCoachNotes = create<NotesState>(() => ({
   coaching: typeof window === "undefined" ? false : readJson<boolean>(COACHING, false),
   who: typeof window === "undefined" ? NOBODY : readJson<Who>(WHO, NOBODY),
   plans: typeof window === "undefined" ? [] : readJson<ShownPlan[]>(PLANS, []),
+  programAssigns: typeof window === "undefined" ? [] : readJson<ShownProgramAssign[]>(PROGRAM_ASSIGNS, []),
+  programAssignsSeen: typeof window === "undefined" ? [] : readJson<string[]>(PROGRAM_ASSIGNS_SEEN, []),
   plansSeen: typeof window === "undefined" ? [] : readJson<string[]>(PLANS_SEEN, []),
   plansReady: typeof window === "undefined" ? false : readJson<boolean>(PLANS_READY, false),
   plansEnded: typeof window === "undefined" ? [] : readJson<string[]>(PLANS_ENDED, []),
@@ -1092,7 +1110,12 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
   o: Pick<Overview, "notes" | "coaches"> &
-    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans" | "videos">>,
+    Partial<
+      Pick<
+        Overview,
+        "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans" | "programAssigns" | "videos"
+      >
+    >,
 ): void {
   const notes = shownNotes(o);
   const coaching = usesCoaching(o);
@@ -1117,9 +1140,33 @@ export function keepNotes(
     const c = o.coaches.find((x) => x.id === p.coachId);
     return { ...p, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
   });
+  const programAssigns: ShownProgramAssign[] = (o.programAssigns ?? []).map((p) => {
+    const c = o.coaches.find((x) => x.id === p.coachId);
+    return { ...p, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
+  });
   writeJson(PLANS, plans);
+  writeJson(PROGRAM_ASSIGNS, programAssigns);
   writeJson(PLANS_READY, true);
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who, plans, videos: o.videos ?? 0, plansReady: true });
+  useCoachNotes.setState({
+    notes,
+    unread,
+    targets,
+    checkins,
+    sessions,
+    coaching,
+    who,
+    plans,
+    programAssigns,
+    videos: o.videos ?? 0,
+    plansReady: true,
+  });
+}
+
+/** "Not now" on Today's season program card. */
+export function dismissProgramAssign(id: string): void {
+  const programAssignsSeen = [...useCoachNotes.getState().programAssignsSeen.filter((x) => x !== id), id].slice(-50);
+  writeJson(PROGRAM_ASSIGNS_SEEN, programAssignsSeen);
+  useCoachNotes.setState({ programAssignsSeen });
 }
 
 /**

@@ -72,6 +72,14 @@ import {
   stopMonthly,
 } from "@/server/coachPay";
 import { coachPlanOf } from "@/server/coachPlan";
+import {
+  acceptProgramAssign,
+  assignProgram,
+  endProgramAssign,
+  endProgramAssigns,
+  programCalendar,
+  type AssignScope,
+} from "@/server/coachProgramAssign";
 import { setStatus, setTyping, touchSeen } from "@/server/coachPresence";
 import { rateLimit } from "@/server/db";
 import { dropPairVideos, videosWaiting } from "@/server/formVideos";
@@ -94,6 +102,18 @@ export async function GET(req: Request) {
   if (checkin !== null) {
     const c = await checkinFor(s.accountId, checkin);
     return c ? reply(req, 200, { checkin: c }) : reply(req, 404, { error: "gone" });
+  }
+  const calProgram = q.get("programCalendar");
+  const calTeam = q.get("teamCalendar");
+  if (calProgram !== null || calTeam !== null) {
+    const year = Number(q.get("year"));
+    const month = Number(q.get("month"));
+    const r = await programCalendar(s.accountId, {
+      ...(calTeam !== null ? { teamId: calTeam } : { programId: calProgram ?? undefined }),
+      year,
+      month,
+    });
+    return "error" in r ? reply(req, r.error === "gone" ? 404 : 400, r) : reply(req, 200, r);
   }
   const client = q.get("client");
   if (client === null) {
@@ -158,6 +178,10 @@ export async function POST(req: Request) {
         status?: unknown;
         until?: unknown;
         sticker?: unknown;
+        programId?: unknown;
+        scope?: unknown;
+        weekdays?: unknown;
+        teamId?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -300,6 +324,28 @@ export async function POST(req: Request) {
     case "unassign":
       await removePlan(s.accountId, body.id);
       return reply(req, 200, { ok: true });
+    case "assignProgram": {
+      const scope = body.scope as AssignScope | undefined;
+      if (!scope || typeof scope !== "object" || !("type" in scope)) return reply(req, 400, { error: "bad" });
+      const r = await assignProgram(s.accountId, body.programId, scope, body.weekdays);
+      if ("error" in r) return reply(req, r.error === "gone" || r.error === "noTargets" ? 404 : 400, r);
+      return reply(req, 200, r);
+    }
+    case "acceptProgram": {
+      const r = await acceptProgramAssign(s.accountId, body.id);
+      return "error" in r ? reply(req, r.error === "gone" ? 404 : 400, r) : reply(req, 200, { assign: r });
+    }
+    case "endProgram": {
+      const r = await endProgramAssign(s.accountId, body.id);
+      return "error" in r ? reply(req, r.error === "gone" ? 404 : 400, r) : reply(req, 200, { assign: r });
+    }
+    case "endPrograms": {
+      const n = await endProgramAssigns(s.accountId, {
+        programId: typeof body.programId === "string" ? body.programId : undefined,
+        teamId: typeof body.teamId === "string" ? body.teamId : undefined,
+      });
+      return reply(req, 200, { ended: n });
+    }
     case "unlink":
       if (!isAccountId(body.id)) return reply(req, 400, { error: "Bad request." });
       // A monthly plan between them ends first, so nobody keeps paying (coachPay.ts).
