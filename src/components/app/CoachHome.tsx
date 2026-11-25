@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
-import { useAccount } from "@/lib/auth";
+import { AuthError, useAccount } from "@/lib/auth";
 import { useLive, useLivePoll } from "@/lib/chatLive";
 import { savePendingCoach } from "@/lib/coachInvite";
 import { coachingMode, coachingView, readPicked, savePicked, type CoachTab, type Picked } from "@/lib/coachMode";
@@ -25,12 +25,11 @@ import { foodDays, weekIntake, weekProtein } from "@/lib/nutrition";
 import { startPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
-import type { TeamsOverview } from "@/lib/teams";
+import { previewTeam, teamCodeFrom, teamError, type Team, type TeamsOverview } from "@/lib/teams";
 import { bodyCompOn } from "@/lib/teen";
 import {
   cancelInvite,
   coachBadge,
-  codeFrom,
   inviteUrl,
   JOIN_SHARES,
   joinCode,
@@ -74,7 +73,7 @@ import { TargetsCard } from "./CoachTargets";
 import { ClientVideos } from "./FormVideos";
 import { Icon, type IconName } from "./icons";
 import { go, replaceRoute } from "./router";
-import { AthleteTeams, CoachTeams, useTeams } from "./SchoolTeams";
+import { AthleteTeams, CoachTeams, JoinTeam, useTeams } from "./SchoolTeams";
 import { Button, Chip, ProTag, ScreenHeader, Section, Skeleton, SwitchRow } from "./ui";
 
 const CLIENT = "c.";
@@ -109,7 +108,7 @@ export function CoachHome({
   const [note, setNote] = useState<string | null>(paid ? t("pay.thanks") : null);
   const [picked, setPicked] = useState<Picked>(() => readPicked());
   // Just joined a coach: said once at the top, since joining swaps the first page for the client's.
-  const [joined, setJoined] = useState(false);
+  const [joined, setJoined] = useState<"coach" | "team" | null>(null);
   const teams = useTeams();
   const reload = useCallback(() => {
     // The last copy shows at once; the server's answer replaces it (liveRead.ts).
@@ -147,11 +146,11 @@ export function CoachHome({
   const view = joining ? { kind: "client" as const } : coachingView(mode, !!data.pay, tab);
   const status = (note || joined) && (
     <p className={`mt-3 text-sm ${note ? "text-warn" : "text-good"}`} role="status">
-      {note ?? t("trn.joined")}
+      {note ?? t(joined === "team" ? "team.joined" : "trn.joined")}
     </p>
   );
-  const onJoined = () => {
-    setJoined(true);
+  const onJoined = (team = false) => {
+    setJoined(team ? "team" : "coach");
     reloadAll();
   };
 
@@ -162,7 +161,6 @@ export function CoachHome({
         {status}
         <StartPage
           data={data}
-          teams={teams.data}
           onChange={onJoined}
           onPick={(p) => {
             savePicked(p);
@@ -310,16 +308,13 @@ function Badge({ who }: { who: Overview }) {
 
 function StartPage({
   data,
-  teams,
   onChange,
   onPick,
 }: {
   data: Overview;
-  teams: TeamsOverview;
-  onChange: () => void;
+  onChange: (team?: boolean) => void;
   onPick: (p: Exclude<Picked, null>) => void;
 }) {
-  const [team, setTeam] = useState(false);
   const pro = can("coaching");
   return (
     <div>
@@ -333,15 +328,6 @@ function StartPage({
         <div className="mt-3">
           <JoinCoach code="" coaches={data.coaches} onChange={onChange} />
         </div>
-        {team ? (
-          <div className="mt-3">
-            <AthleteTeams data={teams} onChange={onChange} />
-          </div>
-        ) : (
-          <Button kind="quiet" className="mt-2 w-full" onClick={() => setTeam(true)}>
-            {t("trn.start.team")}
-          </Button>
-        )}
       </section>
       <button
         type="button"
@@ -396,7 +382,7 @@ function ClientPage({
   /** Also a coach: the coach's pages are a tab away, so no "Coach others too". */
   coachSide: boolean;
   onChange: () => void;
-  onJoined: () => void;
+  onJoined: (team?: boolean) => void;
 }) {
   const coaches = data.coaches;
   const [adding, setAdding] = useState(!!code || !!team || (coaches.length === 0 && teams.joined.length === 0));
@@ -414,7 +400,7 @@ function ClientPage({
       {data.pay && <YourPayments pay={data.pay} coaches={coaches} onChange={onChange} />}
       {teams.joined.length > 0 && (
         <Section title={t("team.title")} icon="trophy">
-          <AthleteTeams data={teams} code={team} onChange={onChange} />
+          <AthleteTeams data={teams} onChange={onChange} />
         </Section>
       )}
       {coaches.map((c) => (
@@ -426,9 +412,7 @@ function ClientPage({
       <Section title={coaches.length || teams.joined.length ? t("trn.addAnother") : t("trn.joinTitle")} icon="plus">
         {adding ? (
           <div className="space-y-3">
-            <JoinCoach code={code} coaches={coaches} onChange={onJoined} />
-            {/* On a team already, joining another is under the team above. */}
-            {teams.joined.length === 0 && <AthleteTeams data={teams} code={team} onChange={onChange} />}
+            <JoinCoach key={code || team} code={team ? `team.${team}` : code} coaches={coaches} onChange={onJoined} />
           </div>
         ) : (
           <Button kind="ghost" icon="plus" className="w-full" onClick={() => setAdding(true)}>
@@ -574,44 +558,71 @@ function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onCh
   );
 }
 
-/** A coach's code: look it up, see what they'll see, agree. Looking links nothing. */
-function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[]; onChange: () => void }) {
-  const [text, setText] = useState(code ? showCode(code) : "");
+/** One coach or school team invite field. Preview first; joining always requires consent. */
+function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[]; onChange: (team?: boolean) => void }) {
+  const [text, setText] = useState(code ? showCode(teamCodeFrom(code)) : "");
   const [found, setFound] = useState<Person | null>(null);
+  const [teamFound, setTeamFound] = useState<Team | null>(null);
+  const [checkedCode, setCheckedCode] = useState("");
   const [picked, setPicked] = useState<ShareKind[]>([...JOIN_SHARES]);
   const kinds = shareKinds(bodyCompOn(useApp((s) => s.profile)));
   const [note, setNote] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const check = useCallback(async (raw: string) => {
-    const c = codeFrom(raw);
-    if (!c) return setNote(t("trn.err.unknown"));
-    setBusy(true);
+  const [busy, setBusy] = useState(!!code);
+  const resolve = useCallback(async (raw: string) => {
+    const c = teamCodeFrom(raw);
+    if (!c) throw new AuthError("unknown", 400);
+    if (/team\./i.test(raw)) return { code: c, team: await previewTeam(c) };
     try {
-      setFound(await previewCode(c));
-      setNote(null);
+      return { code: c, coach: await previewCode(c) };
     } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    } finally {
-      setBusy(false);
+      // Only a missing invite should try the other kind; preserve network and rate-limit errors.
+      if (!(e instanceof AuthError) || e.message !== "unknown") throw e;
+      return { code: c, team: await previewTeam(c) };
     }
   }, []);
-  // Opened from an invite link: look the code up straight away (looking links nothing).
+  const check = useCallback(
+    async (raw: string, live: () => boolean = () => true) => {
+      setBusy(true);
+      setNote(null);
+      try {
+        const result = await resolve(raw);
+        if (!live()) return;
+        setCheckedCode(result.code);
+        setFound(result.coach ?? null);
+        setTeamFound(result.team ?? null);
+      } catch (e) {
+        if (!live()) return;
+        oops();
+        if (e instanceof AuthError && e.message === "unknown") savePendingCoach("");
+        setNote(e instanceof AuthError && e.message === "lapsed" ? teamError(e) : trainerError(e));
+      } finally {
+        if (live()) setBusy(false);
+      }
+    },
+    [resolve],
+  );
   useEffect(() => {
     if (!code) return;
     let live = true;
-    previewCode(code)
-      .then((p) => live && setFound(p))
+    resolve(code)
+      .then((result) => {
+        if (!live) return;
+        setCheckedCode(result.code);
+        setFound(result.coach ?? null);
+        setTeamFound(result.team ?? null);
+      })
       .catch((e: unknown) => {
         if (!live) return;
-        // A code that no longer works stops waiting on the device.
-        savePendingCoach("");
-        setNote(trainerError(e));
+        if (e instanceof AuthError && e.message === "unknown") savePendingCoach("");
+        setNote(e instanceof AuthError && e.message === "lapsed" ? teamError(e) : trainerError(e));
+      })
+      .finally(() => {
+        if (live) setBusy(false);
       });
     return () => {
       live = false;
     };
-  }, [code]);
+  }, [code, resolve]);
   const submit = (e: FormEvent) => {
     e.preventDefault();
     void check(text);
@@ -620,7 +631,7 @@ function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[
     setBusy(true);
     try {
       await joinCode(
-        codeFrom(text),
+        checkedCode,
         picked.filter((k) => kinds.includes(k)),
       );
       savePendingCoach("");
@@ -639,7 +650,19 @@ function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[
   };
   return (
     <div>
-      {found ? (
+      {teamFound ? (
+        <JoinTeam
+          code={checkedCode}
+          found={teamFound}
+          onCancel={() => setTeamFound(null)}
+          onChange={() => {
+            savePendingCoach("");
+            setTeamFound(null);
+            setText("");
+            onChange(true);
+          }}
+        />
+      ) : found ? (
         <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-accent)" }} aria-live="polite">
           {found.role && <p className="text-xs font-semibold tracking-wider text-muted uppercase">{t(`trn.role.${found.role}`)}</p>}
           <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
@@ -672,7 +695,11 @@ function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[
             <input
               id="trn-code"
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value);
+                setNote(null);
+              }}
+              disabled={busy}
               className="num min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2 uppercase tracking-widest"
               placeholder="ABCD-EFGH"
               autoComplete="off"

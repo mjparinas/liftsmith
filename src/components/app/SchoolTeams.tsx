@@ -25,11 +25,9 @@ import {
   loadTeams,
   makeTeam,
   newTeamCode,
-  previewTeam,
   removeAthlete,
   sendSchoolCode,
   TEAM_AGES,
-  teamCodeFrom,
   teamError,
   teamUrl,
   type BoardRow,
@@ -73,8 +71,8 @@ export function useTeams(): { data: TeamsOverview | null; error: string | null; 
   return { data, error, reload };
 }
 
-/** An athlete's side: the teams they're on (with the weekly board), and joining one with a team code. */
-export function AthleteTeams({ data, code = "", onChange }: { data: TeamsOverview | null; code?: string; onChange: () => void }) {
+/** An athlete's existing teams and their weekly boards. Joining lives in the shared invite field. */
+export function AthleteTeams({ data, onChange }: { data: TeamsOverview | null; onChange: () => void }) {
   const [note, setNote] = useState<string | null>(null);
   const [board, setBoard] = useState<string | null>(null);
   return (
@@ -82,7 +80,6 @@ export function AthleteTeams({ data, code = "", onChange }: { data: TeamsOvervie
       {data?.joined.map((tm) => (
         <JoinedTeam key={tm.id} team={tm} onBoard={() => setBoard(tm.id)} onChange={onChange} onNote={setNote} />
       ))}
-      <JoinTeam code={code} joined={data?.joined.length ?? 0} onChange={onChange} />
       {note && (
         <p className="text-sm text-muted" role="status">
           {note}
@@ -148,54 +145,20 @@ function JoinedTeam({
   );
 }
 
-function JoinTeam({ code, joined, onChange }: { code: string; joined: number; onChange: () => void }) {
+export function JoinTeam({ code, found, onChange, onCancel }: { code: string; found: Team; onChange: () => void; onCancel: () => void }) {
   const profile = useApp((s) => s.profile);
   const known = profile.birthYear ? ageOf(profile.birthYear) : 0;
-  const [text, setText] = useState(code ? showCode(code) : "");
-  const [found, setFound] = useState<Team | null>(null);
   const [age, setAge] = useState<number | null>(known >= 13 && known <= 18 ? known : null);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const check = useCallback(async (raw: string) => {
-    const c = teamCodeFrom(raw);
-    if (!c) return setNote(t("team.err.unknown"));
-    setBusy(true);
-    try {
-      setFound(await previewTeam(c));
-      setNote(null);
-    } catch (e) {
-      oops();
-      setNote(teamError(e));
-    } finally {
-      setBusy(false);
-    }
-  }, []);
-  // Opened from a team link: look it up straight away (looking joins nothing).
-  useEffect(() => {
-    if (!code) return;
-    let live = true;
-    previewTeam(code)
-      .then((tm) => live && setFound(tm))
-      .catch((e: unknown) => live && setNote(teamError(e)));
-    return () => {
-      live = false;
-    };
-  }, [code]);
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    void check(text);
-  };
   const join = async () => {
-    if (!found || age === null) return;
+    if (age === null) return;
     setBusy(true);
     try {
-      await joinTeam(teamCodeFrom(text), age);
+      await joinTeam(code, age);
       haptic("success");
       sound.done();
       track("feature", { name: "team", detail: "join" });
-      setFound(null);
-      setText("");
-      setNote(t("team.joined"));
       onChange();
     } catch (e) {
       oops();
@@ -206,56 +169,33 @@ function JoinTeam({ code, joined, onChange }: { code: string; joined: number; on
   };
   return (
     <div>
-      {found ? (
-        <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-ember)" }} aria-live="polite">
-          <p className="font-semibold">{t("team.consentTitle", { team: found.name })}</p>
-          <p className="text-sm text-muted">{t("team.byCoach", { school: found.school, coach: found.coachName || t("trn.noName") })}</p>
-          <p className="mt-3 text-sm font-semibold" id="team-age">
-            {t("team.ageAsk")}
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="team-age">
-            {TEAM_AGES.map((a) => (
-              <Chip key={a} active={age === a} onClick={() => setAge(a)}>
-                {String(a)}
-              </Chip>
-            ))}
-          </div>
-          <p className="mt-2 text-xs text-muted">{t("team.ageWhy")}</p>
-          <p className="mt-3 text-sm">{t("team.consentSees", { coach: found.coachName || t("trn.noName") })}</p>
-          <p className="mt-2 text-sm text-muted">{t("team.consentNot")}</p>
-          <p className="mt-2 text-sm text-muted">{t("team.consentBoard")}</p>
-          <p className="mt-2 text-sm">{t("team.proFree")}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button className="flex-1" disabled={busy || age === null} onClick={() => void join()}>
-              {t("team.agree")}
-            </Button>
-            <Button kind="ghost" onClick={() => setFound(null)}>
-              {t("trn.notNow")}
-            </Button>
-          </div>
-        </section>
-      ) : (
-        <form onSubmit={submit} className="card p-4">
-          <label htmlFor="team-code" className="block text-sm text-muted">
-            {joined ? t("team.codeAnother") : t("team.codeAsk")}
-          </label>
-          <div className="mt-2 flex gap-2">
-            <input
-              id="team-code"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className={`num ${INPUT} uppercase tracking-widest`}
-              placeholder="ABCD-EFGH"
-              autoComplete="off"
-              autoCapitalize="characters"
-              spellCheck={false}
-            />
-            <Button submit disabled={busy || !text.trim()}>
-              {t("team.check")}
-            </Button>
-          </div>
-        </form>
-      )}
+      <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-ember)" }} aria-live="polite">
+        <p className="font-semibold">{t("team.consentTitle", { team: found.name })}</p>
+        <p className="text-sm text-muted">{t("team.byCoach", { school: found.school, coach: found.coachName || t("trn.noName") })}</p>
+        <p className="mt-3 text-sm font-semibold" id="team-age">
+          {t("team.ageAsk")}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="team-age">
+          {TEAM_AGES.map((a) => (
+            <Chip key={a} active={age === a} onClick={() => setAge(a)}>
+              {String(a)}
+            </Chip>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-muted">{t("team.ageWhy")}</p>
+        <p className="mt-3 text-sm">{t("team.consentSees", { coach: found.coachName || t("trn.noName") })}</p>
+        <p className="mt-2 text-sm text-muted">{t("team.consentNot")}</p>
+        <p className="mt-2 text-sm text-muted">{t("team.consentBoard")}</p>
+        <p className="mt-2 text-sm">{t("team.proFree")}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button className="flex-1" disabled={busy || age === null} onClick={() => void join()}>
+            {t("team.agree")}
+          </Button>
+          <Button kind="ghost" onClick={onCancel}>
+            {t("trn.notNow")}
+          </Button>
+        </div>
+      </section>
       {note && (
         <p className="mt-2 text-sm text-muted" role="status">
           {note}
