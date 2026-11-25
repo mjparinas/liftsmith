@@ -44,6 +44,7 @@ import {
   setRole,
   setShare,
   setTargets,
+  stopCoach,
   unlink,
 } from "@/server/coach";
 import { addSlots, book, cancelSlot, clientSlots, coachSlots, slotsWith } from "@/server/coachBooking";
@@ -376,6 +377,9 @@ export async function POST(req: Request) {
     }
     case "role":
       return reply(req, 200, { role: await setRole(s.accountId, body.role) });
+    case "stopCoach":
+      await stopCoach(s.accountId);
+      return reply(req, 200, { stopped: true });
     case "alerts":
       return reply(req, 200, { on: await setAlerts(s.accountId, body.on) });
     case "pushToken": {

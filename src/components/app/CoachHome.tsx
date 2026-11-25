@@ -43,6 +43,7 @@ import {
   sharedWith,
   shareKinds,
   showCode,
+  stopCoaching,
   trainerError,
   trainersOnly,
   unlinkPerson,
@@ -1032,6 +1033,19 @@ function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => voi
       setRole(saved);
     }
   };
+  const stop = async () => {
+    if (!window.confirm(t("trn.stopCoachAsk"))) return;
+    try {
+      await stopCoaching();
+      setRole(null);
+      haptic("toggle");
+      track("feature", { name: "trainer", detail: "stopCoach" });
+      onChange();
+    } catch {
+      oops();
+      setRole(saved);
+    }
+  };
   return (
     <section className="card mt-4 p-4">
       <p id="trn-role" className="font-semibold">
@@ -1045,6 +1059,11 @@ function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => voi
         ))}
       </div>
       <p className="mt-2 text-sm text-muted">{role ? t(`trn.role.${role}Hint`) : t("trn.role.pick")}</p>
+      {role && (
+        <Button kind="ghost" className="mt-3 w-full" onClick={() => void stop()}>
+          {t("trn.stopCoach")}
+        </Button>
+      )}
     </section>
   );
 }

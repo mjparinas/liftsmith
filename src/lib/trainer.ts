@@ -340,6 +340,8 @@ export function sharedWith(o: Pick<Overview, "shared" | "bodyShared" | "painShar
 }
 export const saveRole = async (role: Role) =>
   (await api<{ role: Role | null }>("/api/coach/", { token: token(), body: { action: "role", role } })).role;
+export const stopCoaching = async () =>
+  void (await api<{ stopped: boolean }>("/api/coach/", { token: token(), body: { action: "stopCoach" } }));
 /** "Your trainer" when every coach a lifter has is a personal trainer, else "Your coach". */
 export const trainersOnly = (people: readonly Pick<Person, "role">[]) => people.length > 0 && people.every((p) => p.role === "trainer");
 export const setCoachAlerts = async (on: boolean) =>
