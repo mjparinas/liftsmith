@@ -652,6 +652,9 @@ if (runs("app"))
       r.fulfill({ json: r.request().method() === "GET" ? reviewsApi(r.request().url()) : { ok: true } }),
     );
     await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
+    await page.route("**/api/programs/**", (r) =>
+      r.fulfill({ json: r.request().method() === "GET" ? { mine: [], listed: [] } : { ok: true } }),
+    );
     await page.goto(`${server.url}/app/#/trainer/clients`);
     await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
     await scan("coaching clients");
