@@ -50,9 +50,21 @@ describe("Reports danger actions", () => {
     const remove = screen.getByRole("button", { name: "Remove" });
     await user.click(remove);
     expect(screen.getByRole("button", { name: "Confirm remove?" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(/Esc cancels/);
     const fetchMock = vi.mocked(fetch);
     expect(fetchMock.mock.calls.some((c) => (c[1] as RequestInit | undefined)?.method === "POST")).toBe(false);
     await user.click(screen.getByRole("button", { name: "Confirm remove?" }));
     await waitFor(() => expect(fetchMock.mock.calls.some((c) => (c[1] as RequestInit | undefined)?.method === "POST")).toBe(true));
+  });
+
+  it("clears an armed danger action on Escape", async () => {
+    const user = userEvent.setup();
+    render(<Reports admin onCount={() => {}} />);
+    await screen.findByText("Spammy post");
+    await user.click(screen.getByRole("button", { name: "Remove" }));
+    expect(screen.getByRole("button", { name: "Confirm remove?" })).toBeInTheDocument();
+    await user.keyboard("{Escape}");
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Confirm remove?" })).not.toBeInTheDocument();
   });
 });

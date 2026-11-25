@@ -13,14 +13,15 @@ import { Card } from "./charts";
 import { REASON_NAME } from "./Moderation";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
+import { useDangerArm } from "./useDangerArm";
 
 type Suggestion = { action: Exclude<ReportAction, "unsuspend">; reason: string };
 const key = (g: ReportGroup) => `${g.kind}:${g.targetId}`;
 
-const ACTIONS: { action: ReportAction; label: string; danger?: boolean }[] = [
-  { action: "remove", label: "Remove", danger: true },
-  { action: "dismiss", label: "Dismiss" },
-  { action: "suspend", label: "Ban author", danger: true },
+const ACTIONS: { action: ReportAction; label: string; danger?: boolean; effect?: string }[] = [
+  { action: "remove", label: "Remove", danger: true, effect: "Deletes the content (or resets a profile name)." },
+  { action: "dismiss", label: "Dismiss", effect: "Shows the content again." },
+  { action: "suspend", label: "Ban author", danger: true, effect: "Hides everything they wrote on Friends and tells them." },
 ];
 
 /** Danger actions need a second tap naming the effect; Dismiss stays one tap. */
@@ -33,8 +34,7 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
   const [rows, setRows] = useState<ReportGroup[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
-  /** Armed danger action: same row + action a second time runs it. */
-  const [armed, setArmed] = useState<{ id: string; action: ReportAction } | null>(null);
+  const { armed, isArmed, request } = useDangerArm();
   useEffect(() => {
     let live = true;
     fetch("/api/admin/reports/")
@@ -53,7 +53,6 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
   const load = () => setVersion((v) => v + 1);
   const ai = useAiStatus();
   const [tips, setTips] = useState<Record<string, Suggestion | "…" | { error: string }>>({});
-  // Claude reads one report and suggests remove, dismiss or ban, with a reason; staff press the button (or ignore it).
   const suggest = async (g: ReportGroup) => {
     setTips((t) => ({ ...t, [key(g)]: "…" }));
     const r = await aiPost<{ suggestion: Suggestion }>({
@@ -80,29 +79,36 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
       body: JSON.stringify({ kind: g.kind, id: g.targetId, action }),
     });
     if (!r.ok) setError(((await r.json().catch(() => ({}))) as { error?: string }).error ?? "That didn't work.");
-    setArmed(null);
     load();
   };
   /** Remove and Ban need two taps; Dismiss and Unban run at once. Returns true when the request was sent. */
   const requestAct = (g: ReportGroup, action: ReportAction): boolean => {
     const needsConfirm = action === "remove" || action === "suspend";
-    const id = key(g);
-    if (needsConfirm && !(armed?.id === id && armed.action === action)) {
-      setArmed({ id, action });
-      return false;
-    }
-    void act(g, action);
-    return true;
+    return request(key(g), action, needsConfirm, () => void act(g, action));
   };
+  const armedMeta = armed && ACTIONS.find((x) => x.action === armed.action);
+  const armedLabel = armedMeta ? `${CONFIRM_LABEL[armedMeta.action] ?? armedMeta.label} — ${armedMeta.effect ?? ""} Esc cancels.` : null;
   return (
     <Card title="Reports on Friends, coach reviews and the community">
-      <p className="text-sm text-muted">
-        Posts, comments, profiles, coach reviews, coaches&apos; replies and community ideas, bugs and comments that people reported. Three
-        reports hide a post, comment, review or reply until it&apos;s decided here. Remove deletes it (for a profile, resets the name to the
-        handle and clears the tagline; for a reply, clears the reply and keeps the review), Dismiss shows it again, Ban author hides
-        everything the author wrote on Friends and tells them (for an idea, bug or comment in the community, Ban author blocks them from
-        posting there). For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
-      </p>
+      <ul className="space-y-1.5 text-sm">
+        {ACTIONS.map((a) => (
+          <li key={a.action}>
+            <span className={`font-semibold ${a.danger ? "text-bad" : "text-ink"}`}>{a.label}</span>
+            <span className="text-muted"> — {a.effect}</span>
+          </li>
+        ))}
+      </ul>
+      <details className="mt-3 text-sm text-muted">
+        <summary className="press min-h-11 cursor-pointer list-none py-2 text-accent underline marker:content-none [&::-webkit-details-marker]:hidden">
+          Full policy
+        </summary>
+        <p className="mt-1 max-w-prose">
+          Posts, comments, profiles, coach reviews, coaches&apos; replies and community ideas, bugs and comments that people reported. Three
+          reports hide a post, comment, review or reply until it&apos;s decided here. For a profile, Remove resets the name to the handle
+          and clears the tagline; for a reply, it clears the reply and keeps the review. Ban author on a community idea, bug or comment
+          blocks them from posting there. For warnings, suspensions, shadow bans and who reported whom, open the author on the Users tab.
+        </p>
+      </details>
       {admin && ai?.configured && rows && rows.length > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
           <button type="button" disabled={!ai.ready} onClick={() => void suggestAll()} className={aiBtn}>
@@ -111,7 +117,29 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
           <AiNote s={ai} />
         </div>
       )}
-      {error && <p className="mt-2 text-sm text-bad">{error}</p>}
+      {error && (
+        <div className="mt-2 space-y-2">
+          <p className="text-sm text-bad" role="alert">
+            {error}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setRows(null);
+              load();
+            }}
+            className="press min-h-11 rounded-lg btn-primary px-3 py-2 text-sm font-semibold"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+      {armedLabel && (
+        <p className="mt-2 text-sm text-bad" role="status" aria-live="polite">
+          {armedLabel}
+        </p>
+      )}
       {rows === null ? (
         !error && (
           <Loading label="Loading reports" className="mt-3">
@@ -154,13 +182,15 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                       !(a.action === "remove" && !g.content) &&
                       !(a.action === "suspend" && (g.kind === "review" || g.kind === "routine") && !g.author?.handle),
                   ).map((a) => {
-                    const ready = armed?.id === key(g) && armed.action === a.action;
+                    const ready = isArmed(key(g), a.action);
                     return (
                       <button
                         key={a.action}
                         type="button"
+                        aria-pressed={a.danger ? ready : undefined}
+                        title={ready ? "Esc cancels" : a.effect}
                         onClick={() => requestAct(g, a.action)}
-                        className={`press rounded-lg px-3 py-1.5 ${
+                        className={`press min-h-11 rounded-lg px-3 py-1.5 ${
                           a.danger
                             ? ready
                               ? "border border-bad bg-bad/15 font-semibold text-bad"
@@ -181,7 +211,7 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
                     <button
                       type="button"
                       onClick={() => void act(g, "unsuspend")}
-                      className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+                      className="press min-h-11 rounded-lg border border-line px-3 py-1.5 text-muted"
                     >
                       Unban
                     </button>
