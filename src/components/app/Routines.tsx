@@ -272,7 +272,7 @@ function ShareRoutine({ routine }: { routine: Routine }) {
   );
 }
 
-function RoutineEditor({
+export function RoutineEditor({
   initial,
   onSave,
   onDelete,

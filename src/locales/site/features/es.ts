@@ -486,7 +486,7 @@ export const es: FeaturesText = {
     },
     "coach-programs": {
       name: "Programas de entrenadores",
-      body: "Los entrenadores y entrenadores personales convierten sus rutinas en un programa, con nivel, objetivo y cuántas semanas seguirlo, gratis o con precio, y comparten su enlace. Guardas sus días en tus rutinas con un toque y tu propia progresión elige los pesos. Los programas de pago se pagan al entrenador a través de su propia cuenta de Stripe.",
+      body: "Los entrenadores y entrenadores personales convierten sus rutinas en un programa, con nivel, objetivo y cuántas semanas seguirlo, gratis o con precio, y comparten su enlace. Guardas sus días en tus rutinas con un toque y tu propia progresión elige los pesos. Los programas de pago se pagan al entrenador a través de su propia cuenta de Stripe. Una vista de semana pone cada rutina en sus días con descansos, una vista de mes muestra cómo transcurre y Organizar solo reparte las rutinas por ti.",
       note: "Los programas de pago se compran en la web; las apps de Android e iPhone muestran los programas gratis y los que ya tienes.",
       proPart: "Conseguir programas es gratis; crearlos forma parte del coaching, que es Pro.",
     },

@@ -822,7 +822,7 @@ export const emails: Record<string, Words> = {
     title: "Udostępniaj i sprzedawaj swoje programy",
     intro: "Zamień programy, które dajesz raz po raz, w coś, co każdy może realizować, za darmo lub za opłatą.",
     points: [
-      "W Trenowanie › Programy wybierz do siedmiu swoich planów jako dni, potem dodaj nazwę, poziom, cel i liczbę tygodni.",
+      "W Coaching › Programy rozłóż swoje rutyny na dni tygodnia z odpoczynkiem pomiędzy (Ułóż automatycznie zrobi to za ciebie), sprawdź miesiąc, a potem dodaj nazwę, poziom, cel i liczbę tygodni.",
       "Zostaw cenę pustą dla darmowego programu albo ustaw ją, gdy płatności przez Stripe są włączone.",
       "Płatne programy kupuje się na stronie, a pieniądze trafiają na Twoje konto Stripe.",
       "Udostępnij link gdziekolwiek. Kto ma program, zachowuje go, nawet gdy zdejmiesz go z listy.",

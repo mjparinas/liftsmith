@@ -34,6 +34,17 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 - **Remove N identical copies** (under the chips, only when there are some) deletes the extra copies from the coach's routines, keeping the picked one, today's routine, or else the newest (`extraCopies`). Programs already saved are untouched: their days travel as codes on the server.
 - Pure web code, so Android, iOS and the web get it together.
 
+## The program builder (Melvin, 2026-11-25: "a better dashboard for the coach to … create and design their own programs")
+
+Melvin picked **phases of repeated weeks** on a decision card (over one repeated week and every week by hand), from the proposal at https://claude.ai/artifact/H4sRRQktJcjVGdRsTRfAi2. Built in stages; stage 1 is built.
+
+- **Stage 1 (built): the week.** The program editor's Days are a week: each weekday holds one of the coach's routines or rest (`Week` in `src/lib/programWeek.ts`, `ProgramWeekEditor.tsx`). Tap a day to pick its workout, make a new routine for it, edit it, or make it rest. The same routine can run on several days. It saves as before: each routine once, in calendar order, with the weekdays it runs on (`draftFromWeek`), so Assign already starts from those weekdays. A saved program whose days are no longer the coach's own routines unchanged keeps its days until the coach presses **Lay out a new week** (`weekFromProgram`).
+- **Month view.** A Week / Month switch shows the program on a calendar from this week, faded after its last week (`monthCells`).
+- **Auto-arrange.** Pick routines in order and workouts a week (1 to 7); it uses the usual spread for that many days (`PATTERN`: 3 is Mon, Wed, Fri; 4 is Mon, Tue, Thu, Fri) and puts on each day the next routine that shares the fewest big muscles with yesterday's, so two leg days don't run back to back when something else can go between. Each rest day between workouts says why ("Rest so the same muscles get time between Lower A and Lower B", or "Rest after Upper A").
+- **Your routines** sit under the week (two columns on desktop) with their exercise count and the days they're on; tapping one edits it in place (the same `RoutineEditor`), and **New routine** makes one. Identical copies show once and can be removed, as before.
+- **Next stages** (not built): phases (a Build, Deload or Peak phase each with its own week and simple effort and set rules, a one-tap deload), the athlete's views (Today's "From your coach" card with phase and week, Up next and the month on My team), and an **In order** switch (the next day whenever the lifter trains). The assign code waits for the My team dashboard work to merge.
+- Pure web code, so Android, iOS and the web get it together.
+
 ## Lifter side
 
 - **Settings › Program** gets **From coaches**: the programs the lifter has, and **Browse coaches' programs** (`#/program`), the list, newest first.

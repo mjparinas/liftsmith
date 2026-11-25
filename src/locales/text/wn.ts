@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.programBuilder.title": "Program builder for coaches",
+  "wn.c.programBuilder.body": "Put routines on the days of a week with rest days, see the month, and let Auto-arrange spread them out.",
   "wn.c.myTeam.title": "My team",
   "wn.c.myTeam.body":
     "On a school team? Coaching is now your team's home: the team, your coach, the programs they assigned, a team chat and a chat with your coach.",
@@ -140,6 +142,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Creador de programas para entrenadores",
+  "wn.c.programBuilder.body": "Pon rutinas en los días de la semana con descansos, mira el mes y deja que Organizar solo las reparta.",
   "wn.c.myTeam.title": "Mi equipo",
   "wn.c.myTeam.body":
     "¿Estás en un equipo escolar? Coaching es ahora la casa de tu equipo: el equipo, tu entrenador, los programas que te asignó, un chat del equipo y un chat con tu entrenador.",
@@ -284,6 +288,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Créateur de programmes pour les coachs",
+  "wn.c.programBuilder.body":
+    "Placez les routines sur les jours de la semaine avec des repos, voyez le mois et laissez Organiser automatiquement les répartir.",
   "wn.c.myTeam.title": "Mon équipe",
   "wn.c.myTeam.body":
     "Dans une équipe scolaire ? Coaching devient la maison de votre équipe : l’équipe, votre coach, les programmes attribués, une discussion d’équipe et une discussion avec votre coach.",
@@ -431,6 +438,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Programm-Baukasten für Coaches",
+  "wn.c.programBuilder.body": "Lege Routinen mit Ruhetagen auf die Wochentage, sieh den Monat und lass Automatisch planen sie verteilen.",
   "wn.c.myTeam.title": "Mein Team",
   "wn.c.myTeam.body":
     "In einem Schulteam? Coaching ist jetzt das Zuhause deines Teams: das Team, dein Coach, die zugewiesenen Programme, ein Team-Chat und ein Chat mit deinem Coach.",
@@ -575,6 +584,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Costruttore di programmi per coach",
+  "wn.c.programBuilder.body":
+    "Metti le routine nei giorni della settimana con i riposi, guarda il mese e lascia che Organizza da solo le distribuisca.",
   "wn.c.myTeam.title": "La mia squadra",
   "wn.c.myTeam.body":
     "Sei in una squadra scolastica? Coaching ora è la casa della tua squadra: la squadra, il coach, i programmi assegnati, una chat di squadra e una chat con il coach.",
@@ -719,6 +731,8 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "コーチ向けプログラム作成",
+  "wn.c.programBuilder.body": "ルーティンを曜日に置いて休みを入れ、月で確認し、自動で配置に振り分けを任せられます。",
   "wn.c.myTeam.title": "マイチーム",
   "wn.c.myTeam.body":
     "学校のチームに入っていますか？コーチングがチームの拠点になりました。チーム、コーチ、割り当てられたプログラム、チームチャット、コーチとのチャットがまとまっています。",
@@ -853,6 +867,8 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Criador de programas para treinadores",
+  "wn.c.programBuilder.body": "Coloque rotinas nos dias da semana com descansos, veja o mês e deixe Organizar sozinho distribuí-las.",
   "wn.c.myTeam.title": "Meu time",
   "wn.c.myTeam.body":
     "Está num time escolar? Coaching agora é a casa do seu time: o time, seu técnico, os programas atribuídos, um chat do time e um chat com o técnico.",
@@ -993,6 +1009,8 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "코치용 프로그램 빌더",
+  "wn.c.programBuilder.body": "루틴을 요일에 놓고 휴식일을 넣고, 월로 확인하고, 자동 배치로 나눠 보세요.",
   "wn.c.myTeam.title": "내 팀",
   "wn.c.myTeam.body":
     "학교 팀에 있나요? 이제 코칭이 팀의 홈이에요. 팀, 코치, 배정된 프로그램, 팀 채팅, 코치와의 채팅을 한곳에서 볼 수 있어요.",
@@ -1121,6 +1139,8 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Kreator programów dla trenerów",
+  "wn.c.programBuilder.body": "Rozłóż rutyny na dni tygodnia z odpoczynkiem, zobacz miesiąc i pozwól, by Ułóż automatycznie je rozłożyło.",
   "wn.c.myTeam.title": "Moja drużyna",
   "wn.c.myTeam.body":
     "Jesteś w drużynie szkolnej? Coaching to teraz dom twojej drużyny: drużyna, trener, przydzielone programy, czat drużyny i czat z trenerem.",
@@ -1260,6 +1280,8 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Koçlar için program oluşturucu",
+  "wn.c.programBuilder.body": "Rutinleri dinlenme günleriyle haftanın günlerine koy, ayı gör ve Otomatik yerleştir onları dağıtsın.",
   "wn.c.myTeam.title": "Takımım",
   "wn.c.myTeam.body":
     "Bir okul takımında mısın? Koçluk artık takımının evi: takım, koçun, atanan programlar, takım sohbeti ve koçunla sohbet bir arada.",

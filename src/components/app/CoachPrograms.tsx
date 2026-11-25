@@ -19,9 +19,11 @@ import {
   type MinePrograms,
   type ProgramDraft,
 } from "@/lib/coachPrograms";
-import { dayChoices, extraCopies, PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
+import { PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
+import { weekStartDay } from "@/lib/derive";
 import { t, tFor } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { draftFromWeek, emptyWeek, weekFromDraft, weekFromProgram, type Week } from "@/lib/programWeek";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
@@ -31,8 +33,8 @@ import type { Routine } from "@/lib/types";
 
 import { factsLine } from "./CoachProgram";
 import { ProgramCalendar } from "./ProgramCalendar";
+import { ProgramWeekEditor } from "./ProgramWeekEditor";
 import { go } from "./router";
-import { RoutinesSheet } from "./Routines";
 import { BumpField, Button, Chip, EmptyState, InlineSwitch, Section, Sheet, Skeleton } from "./ui";
 
 // Coaching › Programs (docs/decisions/coach-programs.md): a coach turns a few of their routines into a program with a
@@ -242,31 +244,30 @@ function Editor({
   const [price, setPrice] = useState(start.price ? String(start.price) : "");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const [routinesOpen, setRoutinesOpen] = useState(false);
-  // An existing program keeps its days unless the coach picks new ones.
-  const keepDays = !!program && d.routineIds.length === 0;
+  // The program's week (programWeek.ts). A saved program whose days are no longer the coach's own routines, unchanged,
+  // keeps its saved days (null) until the coach lays out a new week.
+  const [week, setWeek] = useState<Week | null>(() =>
+    program ? weekFromProgram(program.days, routines) : weekFromDraft(start.routineIds, start.weekdays),
+  );
+  const firstDay = weekStartDay();
+  const laid = week ? draftFromWeek(week, firstDay) : null;
+  const keepDays = !!program && !laid;
   const priceNum = Number(price) || 0;
   const ok =
     d.title.trim().length > 0 &&
-    (keepDays || d.routineIds.length > 0) &&
+    (keepDays || (laid?.routineIds.length ?? 0) > 0) &&
     (!priceNum || (payReady && priceNum >= PROGRAM_LIMITS.price[0] && priceNum <= PROGRAM_LIMITS.price[1]));
-
-  const toggleDay = (id: string) => {
-    haptic("select");
-    setD((x) =>
-      x.routineIds.includes(id)
-        ? { ...x, routineIds: x.routineIds.filter((r) => r !== id) }
-        : x.routineIds.length >= PROGRAM_LIMITS.days
-          ? x
-          : { ...x, routineIds: [...x.routineIds, id] },
-    );
-  };
 
   const save = async () => {
     setBusy(true);
     setNote(null);
     try {
-      const draft = { ...d, weeks: Math.min(16, Math.max(1, Math.round(Number(weeks) || 8))), price: payReady ? priceNum : 0 };
+      const draft = {
+        ...d,
+        ...(laid ?? {}),
+        weeks: Math.min(16, Math.max(1, Math.round(Number(weeks) || 8))),
+        price: payReady ? priceNum : 0,
+      };
       if (keepDays && program) {
         // Same days as before: the server keeps them when the coach sends them back as they were.
         await saveProgramKeepingDays(draft, program);
@@ -309,21 +310,11 @@ function Editor({
     if (!(await shareUrl(link, program.title))) setNote((await copyText(link)) ? t("cpg.copied") : link);
   };
 
-  const choices = dayChoices(routines, d.routineIds);
-  // Identical copies (mostly from tapping a template more than once) can go; picked days and today's routine stay.
-  const today = useApp((s) => s.routineId);
-  const copies = extraCopies(routines, today ? [...d.routineIds, today] : d.routineIds);
-  const tidy = () => {
-    const { deleteRoutine } = useApp.getState();
-    for (const id of copies) deleteRoutine(id);
-    haptic("toggle");
-    track("feature", { name: "coach_program", detail: "tidy_copies" });
-  };
-
   const applyTemplate = (tpl: ProgramTemplate) => {
     const { made, draft, weeks } = draftFromTemplate(tpl, d, routines);
     for (const r of made) useApp.getState().saveRoutine(r);
     setD(draft);
+    setWeek(weekFromDraft(draft.routineIds, draft.weekdays));
     setWeeks(weeks);
     haptic("success");
     track("feature", { name: "coach_program", detail: `template_${tpl.id}` });
@@ -374,34 +365,18 @@ function Editor({
       <div>
         <p className="text-sm font-medium">{t("cpg.days.label")}</p>
         <p className="text-xs text-faint">{t("cpg.days.what")}</p>
-        <p className="text-xs text-faint">
-          {keepDays ? t("cpg.days.keep", { count: program?.days.length ?? 0 }) : t("cpg.days.hint", { count: PROGRAM_LIMITS.days })}
-        </p>
-        {routines.length === 0 ? (
-          <div className="mt-2">
-            <p className="text-sm text-muted">{t("cpg.days.none")}</p>
-            <Button kind="ghost" icon="plus" className="mt-2" onClick={() => setRoutinesOpen(true)}>
-              {t("cpg.days.make")}
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("cpg.days.label")}>
-              {choices.map(({ routine: r, at, exercises }) => (
-                <Chip key={r.id} active={at >= 0} onClick={() => toggleDay(r.id)}>
-                  {at >= 0 ? `${at + 1}. ` : ""}
-                  {r.name}
-                  {exercises !== undefined ? ` · ${t("cpg.days.ex", { count: exercises })}` : ""}
-                </Chip>
-              ))}
-            </div>
-            {copies.length > 0 && (
-              <Button kind="quiet" icon="trash" className="mt-2" onClick={tidy}>
-                {t("cpg.days.tidy", { count: copies.length })}
+        <div className="mt-2">
+          {week ? (
+            <ProgramWeekEditor week={week} onChange={setWeek} weeks={Math.min(16, Math.max(1, Math.round(Number(weeks) || 8)))} />
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm text-muted">{t("cpg.days.keep", { count: program?.days.length ?? 0 })}</p>
+              <Button kind="ghost" icon="calendar" onClick={() => setWeek(emptyWeek())}>
+                {t("cpg.days.newWeek")}
               </Button>
-            )}
-          </>
-        )}
+            </div>
+          )}
+        </div>
       </div>
       <div>
         <p className="text-sm font-medium">{t("cpg.levelLabel")}</p>
@@ -468,7 +443,6 @@ function Editor({
           </Button>
         )}
       </div>
-      <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
     </div>
   );
 }

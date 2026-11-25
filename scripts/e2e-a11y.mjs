@@ -653,7 +653,9 @@ if (runs("app"))
     );
     await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
     await page.route("**/api/programs/**", (r) =>
-      r.fulfill({ json: r.request().method() === "GET" ? { mine: [], listed: [] } : { ok: true } }),
+      r.fulfill({
+        json: r.request().method() === "GET" ? { mine: [], listed: [], owned: [], pay: { ready: false, currency: null } } : { ok: true },
+      }),
     );
     await page.goto(`${server.url}/app/#/trainer/clients`);
     await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
@@ -667,6 +669,19 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/trainer/programs`);
     await page.getByRole("heading", { name: "Your programs" }).waitFor();
     await scan("coach programs");
+    // The program builder (2026-11-25, coach-programs.md "The program builder"): the week from a template, then the month.
+    await page.getByRole("button", { name: "New program" }).click();
+    await page.getByRole("button", { name: "Upper / Lower" }).click();
+    await page.getByRole("list", { name: "Week" }).getByText("Upper A").waitFor();
+    await page.getByRole("button", { name: "Month", exact: true }).scrollIntoViewIfNeeded();
+    if (process.env.PROGRAM_SHOTS) await page.screenshot({ path: `${process.env.PROGRAM_SHOTS}/week-${page.viewportSize().width}.png` });
+    await scan("coach program builder");
+    await page.getByRole("button", { name: "Month", exact: true }).click();
+    await page.getByRole("list", { name: "Month" }).waitFor();
+    await page.getByRole("button", { name: "Month", exact: true }).scrollIntoViewIfNeeded();
+    if (process.env.PROGRAM_SHOTS) await page.screenshot({ path: `${process.env.PROGRAM_SHOTS}/month-${page.viewportSize().width}.png` });
+    await scan("coach program month");
+    await page.keyboard.press("Escape");
     await page.goto(`${server.url}/app/#/trainer/setup`);
     await page.getByText("Fixed my squat in a month.").waitFor();
     await scan("coaching reviews");

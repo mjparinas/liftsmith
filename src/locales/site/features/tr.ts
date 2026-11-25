@@ -561,7 +561,7 @@ export const tr: FeaturesText = {
     },
     "coach-programs": {
       name: "Koç programları",
-      body: "Koçlar ve kişisel antrenörler rutinlerini seviye, hedef ve kaç hafta uygulanacağıyla birlikte ücretsiz ya da ücretli bir programa dönüştürür ve bağlantısını paylaşır. Günlerini tek dokunuşla rutinlerine kaydedersin, ağırlıkları kendi ilerlemen belirler. Ücretli programların ödemesi koçun kendi Stripe hesabına gider.",
+      body: "Koçlar ve kişisel antrenörler rutinlerini seviye, hedef ve kaç hafta uygulanacağıyla birlikte ücretsiz ya da ücretli bir programa dönüştürür ve bağlantısını paylaşır. Günlerini tek dokunuşla rutinlerine kaydedersin, ağırlıkları kendi ilerlemen belirler. Ücretli programların ödemesi koçun kendi Stripe hesabına gider. Hafta görünümü her rutini dinlenme günleriyle birlikte kendi günlerine koyar, ay görünümü akışı gösterir ve Otomatik yerleştir rutinleri senin için dağıtır.",
       note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
       proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
     },
