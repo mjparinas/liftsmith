@@ -1,14 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  coachProgramDayIndex,
-  coachProgramEndAt,
-  coachProgramWeek,
-  followAssign,
-  type ProgramAssign,
-} from "./coachProgramAssign";
+import { exerciseIdsFromCode, parseAssignDays } from "../server/coachProgramAssign";
+import { coachProgramDayIndex, coachProgramEndAt, coachProgramWeek, followAssign, type ProgramAssign } from "./coachProgramAssign";
 import { PROGRAM_TEMPLATES, templateOk } from "./coachProgramTemplates";
-import { parseAssignDays, exerciseIdsFromCode } from "../server/coachProgramAssign";
 
 const assign = (over: Partial<ProgramAssign> = {}): ProgramAssign => ({
   id: "a1",

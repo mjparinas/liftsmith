@@ -18,6 +18,7 @@ import { haptic, oops, sound } from "@/lib/juice";
 import { MAX_ROUTINES, upsertRoutine } from "@/lib/routines";
 import { useApp } from "@/lib/store";
 import { dismissProgramAssign, useCoachNotes, type ShownProgramAssign } from "@/lib/trainer";
+import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
 import { AthleteProgramCalendar } from "./ProgramCalendar";
@@ -97,9 +98,9 @@ export function ProgramAssignToday() {
 export function CoachProgramChip() {
   const { profile } = useApp();
   const [cal, setCal] = useState(false);
+  const now = useNow(60_000);
   const src = profile.planSource;
   if (src?.kind !== "coachProgram") return null;
-  const now = Date.now();
   if (now >= coachProgramEndAt(src)) {
     return (
       <p className="mt-2 text-sm text-muted" data-testid="coach-program-ended">
@@ -136,9 +137,10 @@ export function CoachProgramChip() {
 /** After the weeks end: stop following or keep days as ordinary routines. */
 export function CoachProgramEndedToday() {
   const { profile, setProfile, replan } = useApp();
+  const now = useNow(60_000);
   const src = profile.planSource;
   if (src?.kind !== "coachProgram") return null;
-  if (Date.now() < coachProgramEndAt(src)) return null;
+  if (now < coachProgramEndAt(src)) return null;
 
   const stop = async () => {
     try {
@@ -148,7 +150,8 @@ export function CoachProgramEndedToday() {
     }
     const routines = (profile.routines ?? []).map((r) => {
       if (r.assignedProgram?.assignId !== src.assignId) return r;
-      const { assignedProgram: _a, ...rest } = r;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- drop assignedProgram
+      const { assignedProgram, ...rest } = r;
       return rest;
     });
     setProfile({ routines, planSource: { kind: "adaptive" } });
@@ -159,7 +162,8 @@ export function CoachProgramEndedToday() {
   const keep = () => {
     const routines = (profile.routines ?? []).map((r) => {
       if (r.assignedProgram?.assignId !== src.assignId) return r;
-      const { assignedProgram: _a, ...rest } = r;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- drop assignedProgram
+      const { assignedProgram, ...rest } = r;
       return rest;
     });
     setProfile({ routines, planSource: { kind: "adaptive" } });

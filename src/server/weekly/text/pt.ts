@@ -1074,7 +1074,8 @@ export const emails: Record<string, Words> = {
   },
   "coach-assign-program": {
     title: "Atribua um programa de temporada a todo o grupo",
-    intro: "Ponha Upper/Lower ou Push/Pull/Legs nos clientes ou na equipa escolar por N semanas — seguem uma vez, Hoje corre o dia certo e um calendário mostra quem levantou.",
+    intro:
+      "Ponha Upper/Lower ou Push/Pull/Legs nos clientes ou na equipa escolar por N semanas — seguem uma vez, Hoje corre o dia certo e um calendário mostra quem levantou.",
     points: [
       "Em Coaching › Programas, comece por Upper/Lower ou Push/Pull/Legs, defina os dias e Atribuir a… clientes ou equipa.",
       "Os atletas recebem um push e Seguem uma vez em Hoje. A progressão deles escolhe os pesos.",
@@ -1083,5 +1084,4 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente.",
   },
-
 };

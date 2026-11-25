@@ -1073,7 +1073,8 @@ export const emails: Record<string, Words> = {
   },
   "coach-assign-program": {
     title: "Saisonprogramm für die ganze Gruppe zuweisen",
-    intro: "Upper/Lower oder Push/Pull/Legs für N Wochen an Klienten oder Schulteam — einmal folgen, Heute zeigt den richtigen Tag, der Kalender wer schon gehoben hat.",
+    intro:
+      "Upper/Lower oder Push/Pull/Legs für N Wochen an Klienten oder Schulteam — einmal folgen, Heute zeigt den richtigen Tag, der Kalender wer schon gehoben hat.",
     points: [
       "Unter Coaching › Programme mit Upper/Lower oder Push/Pull/Legs starten, Wochentage setzen, dann Zuweisen an… Klienten oder Team.",
       "Athletinnen bekommen eine Push und folgen einmal auf Heute. Die eigene Progression wählt die Gewichte.",
@@ -1082,5 +1083,4 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten.",
   },
-
 };

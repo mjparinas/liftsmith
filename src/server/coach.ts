@@ -15,8 +15,8 @@ import { liveStatus, muted, shownState, type Presence, type Shown } from "@/lib/
 import { isSticker, stickerEmoji, type StickerId } from "@/lib/stickers";
 
 import { hasRoom } from "./coachPlan";
-import { assignsForClient, assignsForPair, type ProgramAssign } from "./coachProgramAssign";
 import { presenceCleanup, presenceOf, presences, stopTyping, touchSeen, typingTo } from "./coachPresence";
+import { assignsForClient, assignsForPair, type ProgramAssign } from "./coachProgramAssign";
 import { batch, query, rateLimit, run } from "./db";
 import { notifyCoach } from "./push";
 

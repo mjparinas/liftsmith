@@ -1068,7 +1068,8 @@ export const emails: Record<string, Words> = {
   },
   "coach-assign-program": {
     title: "シーズンプログラムを全員に割り当て",
-    intro: "Upper/Lower や Push/Pull/Legs をクライアントや学校チームに N 週間。一度フォローすれば今日が正しい日を出し、カレンダーで誰が挙げたか分かります。",
+    intro:
+      "Upper/Lower や Push/Pull/Legs をクライアントや学校チームに N 週間。一度フォローすれば今日が正しい日を出し、カレンダーで誰が挙げたか分かります。",
     points: [
       "コーチング › プログラムで Upper/Lower か Push/Pull/Legs から始め、曜日を決めてクライアントやチームに割り当て。",
       "選手はプッシュを受け、今日で一度フォロー。重量は各自の進行が決めます。",
@@ -1077,5 +1078,4 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "学校チームのカードやクライアントのレポートからでも同じように割り当てられます。",
   },
-
 };

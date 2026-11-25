@@ -245,7 +245,8 @@ export const es: SiteText = {
       title: "Buscamos a nuestros primeros usuarios.",
       sample: "Cita de ejemplo, no de un usuario real",
       looking: "Buscamos a nuestros primeros usuarios.",
-      lookingRest: "Prueba {name} gratis en el navegador, cuéntanos qué te parece desde la propia app y tus palabras podrían aparecer aquí.",
+      lookingRest:
+        "Prueba {name} gratis en el navegador, cuéntanos qué te parece desde la propia app y tus palabras podrían aparecer aquí.",
       cta: "Empieza gratis en el navegador",
     },
     pricing: {

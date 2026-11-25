@@ -240,7 +240,8 @@ export const de: SiteText = {
       title: "Wir suchen unsere ersten Nutzerinnen und Nutzer.",
       sample: "Beispielzitat, keine echte Person",
       looking: "Wir suchen unsere ersten Nutzerinnen und Nutzer.",
-      lookingRest: "Probier {name} kostenlos im Browser aus, sag uns direkt in der App, was du denkst, und deine Worte könnten hier stehen.",
+      lookingRest:
+        "Probier {name} kostenlos im Browser aus, sag uns direkt in der App, was du denkst, und deine Worte könnten hier stehen.",
       cta: "Kostenlos im Browser starten",
     },
     pricing: {

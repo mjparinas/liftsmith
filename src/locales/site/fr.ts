@@ -246,7 +246,8 @@ export const fr: SiteText = {
       title: "Nous cherchons nos premiers utilisateurs.",
       sample: "Citation d’exemple, pas d’un vrai utilisateur",
       looking: "Nous cherchons nos premiers utilisateurs.",
-      lookingRest: "Essayez {name} gratuitement dans le navigateur, dites-nous ce que vous en pensez depuis l’app, et vos mots pourraient figurer ici.",
+      lookingRest:
+        "Essayez {name} gratuitement dans le navigateur, dites-nous ce que vous en pensez depuis l’app, et vos mots pourraient figurer ici.",
       cta: "Commencer gratuitement dans le navigateur",
     },
     pricing: {
