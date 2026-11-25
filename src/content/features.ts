@@ -849,7 +849,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-roles",
         name: "For personal trainers and coaches",
-        body: "Say whether you're a personal trainer working one-on-one or a coach running groups and teams. Clients see the right word for you, and the tools you use most come first.",
+        body: "Say whether you're a personal trainer, a sports coach or a physio. Clients see the right word for you, and only the tools for that role show — messaging stays for everyone.",
         tier: "pro",
         pro: "coaching",
         added: "2026-11-13",

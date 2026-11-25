@@ -465,7 +465,7 @@ export const fr: FeaturesText = {
     },
     "coach-roles": {
       name: "Pour les coachs personnels et les entraîneurs",
-      body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",
+      body: "Indiquez si vous êtes coach personnel, entraîneur sportif ou kiné. Vos clients voient le bon mot, et seuls les outils de ce rôle s'affichent — la messagerie reste pour tout le monde.",
     },
     "coach-booking": {
       name: "Réservation et planning des séances",

@@ -526,7 +526,7 @@ export const pl: FeaturesText = {
     },
     "coach-roles": {
       name: "Dla trenerów personalnych i trenerów",
-      body: "Powiedz, czy jesteś trenerem personalnym pracującym jeden na jeden, czy trenerem prowadzącym grupy i drużyny. Podopieczni widzą właściwe określenie, a narzędzia, których używasz najczęściej, są na początku.",
+      body: "Powiedz, czy jesteś trenerem personalnym, trenerem sportowym czy fizjo. Podopieczni widzą właściwe określenie, a tylko narzędzia tej roli są widoczne — wiadomości zostają dla wszystkich.",
     },
     "coach-booking": {
       name: "Rezerwacja i planowanie sesji",

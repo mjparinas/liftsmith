@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { savePendingCoach } from "@/lib/coachInvite";
-import { COACH_TABS } from "@/lib/coachMode";
+import { COACH_TABS, coachTools } from "@/lib/coachMode";
 import { assignProgram, endProgramAssign, type ProgramAssign } from "@/lib/coachProgramAssign";
 import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
 import { can } from "@/lib/entitlements";
@@ -345,11 +345,14 @@ function ClientPlans({
   clientId,
   plans,
   physio,
+  rehab,
   onChange,
 }: {
   clientId: string;
   plans: PlanProgress[];
   physio: boolean;
+  /** Show rehab programs in the assign sheet (physio first; personal trainer after own routines; sports coach never). */
+  rehab: boolean;
   onChange: () => void;
 }) {
   const saved = useApp((s) => s.profile.routines);
@@ -455,8 +458,8 @@ function ClientPlans({
       )}
       <Sheet open={picking} onClose={() => setPicking(false)} title={t("trn.assignTitle")}>
         <PerWeekPicker value={perWeek} onChange={setPerWeek} />
-        {/* A physio sees the rehab programs first; a trainer sees their own routines first. */}
-        {physio && <RehabPrograms onPick={pickProtocol} />}
+        {/* A physio sees the rehab programs first; a trainer sees their own routines first; sports coaches never. */}
+        {rehab && physio && <RehabPrograms onPick={pickProtocol} />}
         {(physio || routines.length > 0) && <p className="mb-2 text-sm font-semibold">{t("trn.assignOwn")}</p>}
         {routines.length ? (
           <ul className="space-y-2">
@@ -486,7 +489,7 @@ function ClientPlans({
         ) : (
           <p className="text-sm text-muted">{t("trn.assignNone")}</p>
         )}
-        {!physio && (
+        {rehab && !physio && (
           <div className="mt-4">
             <RehabPrograms onPick={pickProtocol} />
           </div>
@@ -548,6 +551,7 @@ function ClientScreen({ id }: { id: string }) {
   const [saved, setSaved] = useState<Note | null>(null);
   const [body, setBody] = useState<BodyShare | null>(null);
   const [physio, setPhysio] = useState(false);
+  const [tools, setTools] = useState(() => coachTools(null));
   const [targets, setTargets] = useState<Targets | null>(null);
   const [teen, setTeen] = useState(false);
   const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots" | "pay" | "role">>({});
@@ -566,8 +570,9 @@ function ClientScreen({ id }: { id: string }) {
         setReport(clientReport(v, Date.now()));
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
-        // A coach who works as a physio sees pain first, and rehab programs lead the assign sheet.
+        // Role gates tools on the report (2026-11-24); physio still leads with pain and rehab.
         setPhysio(v.role === "physio");
+        setTools(coachTools(v.role ?? null));
         setTargets(v.targets ?? null);
         setTeen(v.teen === true);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
@@ -633,9 +638,11 @@ function ClientScreen({ id }: { id: string }) {
           })}
         </ul>
       </Section>
-      {physio && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
-      <ClientSessions client={{ id, name: report.name, since: 0 }} slots={checkins.slots ?? []} onChange={() => setVersion((n) => n + 1)} />
-      {checkins.pay && (
+      {physio && tools.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
+      {tools.sessions && (
+        <ClientSessions client={{ id, name: report.name, since: 0 }} slots={checkins.slots ?? []} onChange={() => setVersion((n) => n + 1)} />
+      )}
+      {tools.pay && checkins.pay && (
         <ClientPayments
           key={checkins.pay.price?.at ?? 0}
           clientId={id}
@@ -696,28 +703,40 @@ function ClientScreen({ id }: { id: string }) {
           <p className="px-1 text-sm text-muted">{t("trn.noWorkouts")}</p>
         )}
       </Section>
-      <ClientPlans key={String(physio)} clientId={id} plans={report.plans} physio={physio} onChange={() => setVersion((n) => n + 1)} />
+      <ClientPlans
+        key={`${physio}-${tools.rehab}`}
+        clientId={id}
+        plans={report.plans}
+        physio={physio}
+        rehab={tools.rehab || checkins.role === "trainer"}
+        onChange={() => setVersion((n) => n + 1)}
+      />
       <ClientProgramAssign clientId={id} assigns={programAssigns} onChange={() => setVersion((n) => n + 1)} />
-      {!physio && report.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
-      <ClientCheckins
-        clientId={id}
-        forms={checkins.forms ?? []}
-        checkins={checkins.checkins ?? []}
-        repeat={checkins.repeat ?? null}
-        teen={teen}
-        onChange={() => setVersion((n) => n + 1)}
-      />
-      <CoachVideos clientId={id} name={report.name} teen={teen} />
-      <ClientTargets
-        key={targets?.at ?? 0}
-        clientId={id}
-        saved={targets}
-        body={body}
-        teen={teen}
-        name={report.name}
-        now={report.now}
-        onChange={() => setVersion((n) => n + 1)}
-      />
+      {/* Pain shared with a personal trainer: secondary, below plans (not for sports coaches). */}
+      {!physio && checkins.role === "trainer" && report.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
+      {tools.checkins && (
+        <ClientCheckins
+          clientId={id}
+          forms={checkins.forms ?? []}
+          checkins={checkins.checkins ?? []}
+          repeat={checkins.repeat ?? null}
+          teen={teen}
+          onChange={() => setVersion((n) => n + 1)}
+        />
+      )}
+      {tools.videos && <CoachVideos clientId={id} name={report.name} teen={teen} />}
+      {tools.nutrition && (
+        <ClientTargets
+          key={targets?.at ?? 0}
+          clientId={id}
+          saved={targets}
+          body={body}
+          teen={teen}
+          name={report.name}
+          now={report.now}
+          onChange={() => setVersion((n) => n + 1)}
+        />
+      )}
       {report.readiness && <ClientReadiness name={report.name} r={report.readiness} shares={report.shares} />}
       {body && <ClientBody name={report.name} body={body} />}
       {report.prs.length > 0 && (

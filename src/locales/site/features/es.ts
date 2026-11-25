@@ -460,7 +460,7 @@ export const es: FeaturesText = {
     },
     "coach-roles": {
       name: "Para entrenadores personales y coaches",
-      body: "Indica si eres entrenador personal uno a uno o coach de grupos y equipos. Tus clientes ven la palabra correcta y lo que más usas va primero.",
+      body: "Indica si eres entrenador personal, coach deportivo o fisioterapeuta. Tus clientes ven la palabra correcta y solo se muestran las herramientas de ese rol; los mensajes siguen para todos.",
     },
     "coach-booking": {
       name: "Reserva y agenda de sesiones",
