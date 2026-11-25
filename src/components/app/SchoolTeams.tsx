@@ -734,7 +734,9 @@ function Board({ team, onClose }: { team: string | null; onClose: () => void }) 
         <p className="mt-3 text-sm font-semibold">
           {rows.every((r) => r.workouts === 0)
             ? t("team.boardNudgeNone")
-            : t("team.boardNudge", { count: rows.filter((r) => r.workouts === 0).length, name: top?.name || t("trn.noName") })}
+            : rows.every((r) => r.workouts > 0)
+              ? t("team.boardNudgeAll", { name: top?.name || t("trn.noName") })
+              : t("team.boardNudge", { count: rows.filter((r) => r.workouts === 0).length, name: top?.name || t("trn.noName") })}
         </p>
       )}
       {rows && rows.length > 0 && (

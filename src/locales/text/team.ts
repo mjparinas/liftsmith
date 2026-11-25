@@ -56,6 +56,7 @@ export const en = {
   "team.loading": "Loading…",
   "team.boardEmpty": "Nobody has joined yet. Send the team code to your athletes.",
   "team.boardNudgeNone": "Nobody has trained yet this week. One workout puts you at the top.",
+  "team.boardNudgeAll": "Everyone has trained this week. {name} leads.",
   "team.boardNudge": {
     one: "{count} teammate hasn't trained yet this week. {name} leads.",
     other: "{count} teammates haven't trained yet this week. {name} leads.",
@@ -213,6 +214,7 @@ export const es: Partial<Record<Key, Message>> = {
   "team.loading": "Cargando…",
   "team.boardEmpty": "Nadie se ha unido todavía. Envía el código del equipo a tus atletas.",
   "team.boardNudgeNone": "Nadie ha entrenado esta semana. Un entrenamiento te pone en primer lugar.",
+  "team.boardNudgeAll": "Todos han entrenado esta semana. {name} va primero.",
   "team.boardNudge": {
     one: "{count} compañero aún no ha entrenado esta semana. {name} va primero.",
     other: "{count} compañeros aún no han entrenado esta semana. {name} va primero.",
@@ -371,6 +373,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "team.loading": "Chargement…",
   "team.boardEmpty": "Personne n’a encore rejoint l’équipe. Envoyez le code à vos athlètes.",
   "team.boardNudgeNone": "Personne ne s’est encore entraîné cette semaine. Une séance vous place en tête.",
+  "team.boardNudgeAll": "Tout le monde s’est entraîné cette semaine. {name} est en tête.",
   "team.boardNudge": {
     one: "{count} coéquipier ne s’est pas encore entraîné cette semaine. {name} mène.",
     other: "{count} coéquipiers ne se sont pas encore entraînés cette semaine. {name} mène.",
@@ -533,6 +536,7 @@ export const de: Partial<Record<Key, Message>> = {
   "team.loading": "Wird geladen…",
   "team.boardEmpty": "Noch ist niemand beigetreten. Schick deinen Sportlern den Teamcode.",
   "team.boardNudgeNone": "Diese Woche hat noch niemand trainiert. Ein Training bringt dich an die Spitze.",
+  "team.boardNudgeAll": "Alle haben diese Woche trainiert. {name} liegt vorn.",
   "team.boardNudge": {
     one: "{count} Teamkollege hat diese Woche noch nicht trainiert. {name} führt.",
     other: "{count} Teamkollegen haben diese Woche noch nicht trainiert. {name} führt.",
@@ -693,6 +697,7 @@ export const it: Partial<Record<Key, Message>> = {
   "team.loading": "Caricamento…",
   "team.boardEmpty": "Non è ancora entrato nessuno. Invia il codice squadra ai tuoi atleti.",
   "team.boardNudgeNone": "Nessuno si è ancora allenato questa settimana. Un allenamento ti porta in testa.",
+  "team.boardNudgeAll": "Si sono allenati tutti questa settimana. {name} è in testa.",
   "team.boardNudge": {
     one: "{count} compagno non si è ancora allenato questa settimana. {name} è in testa.",
     other: "{count} compagni non si sono ancora allenati questa settimana. {name} è in testa.",
@@ -849,6 +854,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "team.loading": "読み込み中…",
   "team.boardEmpty": "まだ誰も参加していません。選手にチームコードを送りましょう。",
   "team.boardNudgeNone": "今週はまだ誰もトレーニングしていません。1回のワークアウトでトップに立てます。",
+  "team.boardNudgeAll": "今週は全員がトレーニングしました。トップは{name}です。",
   "team.boardNudge": { other: "今週まだトレーニングしていないチームメイトが {count} 人います。トップは {name} です。" },
   "team.colWorkouts": "ワークアウト",
   "team.colSets": "セット",
@@ -999,6 +1005,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "team.loading": "Carregando…",
   "team.boardEmpty": "Ninguém entrou ainda. Envie o código do time aos seus atletas.",
   "team.boardNudgeNone": "Ninguém treinou ainda esta semana. Um treino te coloca no topo.",
+  "team.boardNudgeAll": "Todos treinaram esta semana. {name} está na frente.",
   "team.boardNudge": {
     one: "{count} colega de time ainda não treinou esta semana. {name} lidera.",
     other: "{count} colegas de time ainda não treinaram esta semana. {name} lidera.",
@@ -1150,6 +1157,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "team.loading": "불러오는 중…",
   "team.boardEmpty": "아직 아무도 들어오지 않았어요. 선수들에게 팀 코드를 보내세요.",
   "team.boardNudgeNone": "이번 주에는 아직 아무도 운동하지 않았어요. 한 번만 운동해도 1위예요.",
+  "team.boardNudgeAll": "이번 주에는 모두 운동했어요. {name} 님이 1위예요.",
   "team.boardNudge": {
     other: "이번 주에 아직 운동하지 않은 팀원이 {count}명이에요. 1위는 {name}님이에요.",
   },
@@ -1300,6 +1308,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "team.loading": "Yükleniyor…",
   "team.boardEmpty": "Henüz kimse katılmadı. Takım kodunu sporcularına gönder.",
   "team.boardNudgeNone": "Bu hafta henüz kimse antrenman yapmadı. Tek bir antrenman seni zirveye taşır.",
+  "team.boardNudgeAll": "Bu hafta herkes antrenman yaptı. Önde {name} var.",
   "team.boardNudge": {
     one: "{count} takım arkadaşı bu hafta henüz antrenman yapmadı. Önde: {name}.",
     other: "{count} takım arkadaşı bu hafta henüz antrenman yapmadı. Önde: {name}.",
@@ -1460,6 +1469,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "team.loading": "Ładowanie…",
   "team.boardEmpty": "Nikt jeszcze nie dołączył. Wyślij kod drużyny swoim zawodnikom.",
   "team.boardNudgeNone": "W tym tygodniu nikt jeszcze nie trenował. Jeden trening i jesteś na szczycie.",
+  "team.boardNudgeAll": "W tym tygodniu wszyscy trenowali. Prowadzi {name}.",
   "team.boardNudge": {
     one: "{count} osoba z drużyny jeszcze nie trenowała w tym tygodniu. Prowadzi: {name}.",
     few: "{count} osoby z drużyny jeszcze nie trenowały w tym tygodniu. Prowadzi: {name}.",

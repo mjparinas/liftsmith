@@ -60,29 +60,46 @@ export function MyTeam({
   const ids = new Set(teams.joined.map((tm) => tm.coachId));
   const assigns = (data.programAssigns ?? []).filter((a) => ids.has(a.coachId) && a.status !== "ended");
   return (
-    <div className="mt-4 space-y-4 desk:grid desk:grid-cols-[minmax(0,1fr)_24rem] desk:items-start desk:gap-6 desk:space-y-0">
-      <div className="min-w-0 space-y-4">
+    // On a phone one column, in the order that matters (team, coach, programs, week, then the rest); on the desktop layout
+    // two columns, the team, its week and the rest on the left and the coach and programs on the right, so neither column
+    // runs long beside an empty one. The columns are `contents` on phones, so `order` places every card.
+    <div className="mt-4 flex flex-col gap-4 desk:grid desk:grid-cols-[minmax(0,1fr)_24rem] desk:items-start desk:gap-6">
+      <div className="contents min-w-0 desk:flex desk:flex-col desk:gap-4">
         {teams.invites.map((tm) => (
-          <Invite key={tm.id} team={tm} onJoined={onJoined} onChange={onChange} />
+          <div key={tm.id} className="order-1">
+            <Invite team={tm} onJoined={onJoined} onChange={onChange} />
+          </div>
         ))}
         {teams.joined.map((tm) => (
-          <TeamCard key={tm.id} team={tm} unread={teams.chatUnread[tm.id] ?? 0} />
+          <div key={tm.id} className="order-2">
+            <TeamCard team={tm} unread={teams.chatUnread[tm.id] ?? 0} />
+          </div>
         ))}
         {teams.joined.map((tm) => (
-          <Week key={tm.id} team={tm} />
+          <div key={tm.id} className="order-5">
+            <Week team={tm} />
+          </div>
         ))}
+        {more && <div className="order-6 min-w-0 space-y-4">{more}</div>}
       </div>
-      <div className="min-w-0 space-y-4">
+      <div className="contents min-w-0 desk:flex desk:flex-col desk:gap-4">
         {coaches.map((c) => (
-          <CoachCard key={c.id} coach={c} unread={data.unread?.[c.id] ?? 0} />
+          <div key={c.id} className="order-3">
+            <CoachCard coach={c} unread={data.unread?.[c.id] ?? 0} />
+          </div>
         ))}
-        {teams.joined.length > 0 && <Programs assigns={assigns} coach={coaches[0]?.name ?? ""} />}
-        {more}
+        {teams.joined.length > 0 && (
+          <div className="order-4">
+            <Programs assigns={assigns} coach={coaches[0]?.name ?? ""} />
+          </div>
+        )}
         {teams.joined.map((tm) => (
-          <Leave key={tm.id} team={tm} onChange={onChange} onNote={setNote} />
+          <div key={tm.id} className="order-7">
+            <Leave team={tm} onChange={onChange} onNote={setNote} />
+          </div>
         ))}
         {note && (
-          <p className="text-sm text-muted" role="status">
+          <p className="order-8 text-sm text-muted" role="status">
             {note}
           </p>
         )}
@@ -268,7 +285,9 @@ function Week({ team }: { team: Team }) {
             <p className="font-semibold">
               {rows.every((r) => r.workouts === 0)
                 ? t("team.boardNudgeNone")
-                : t("team.boardNudge", { count: rows.filter((r) => r.workouts === 0).length, name: top?.name || t("trn.noName") })}
+                : rows.every((r) => r.workouts > 0)
+                  ? t("team.boardNudgeAll", { name: top?.name || t("trn.noName") })
+                  : t("team.boardNudge", { count: rows.filter((r) => r.workouts === 0).length, name: top?.name || t("trn.noName") })}
             </p>
             <p className="mt-1 text-xs text-muted">{t("team.boardLead")}</p>
             <p className="mt-3 flex gap-3 text-xs text-muted" aria-hidden>
