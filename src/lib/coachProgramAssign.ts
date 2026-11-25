@@ -1,7 +1,7 @@
 // Client side of season program assigns (server: src/server/coachProgramAssign.ts).
 import { api, AuthError, readAccount } from "./auth";
-import type { PlanSource, Routine } from "./types";
 import { decodeRoutine } from "./routineShare";
+import type { PlanSource, Routine } from "./types";
 
 export type AssignStatus = "pending" | "active" | "ended";
 export type AttendanceState = "done" | "notYet" | "scheduled" | "off";
@@ -41,10 +41,7 @@ export interface CalendarDay {
   people: CalendarPerson[];
 }
 
-export type AssignScope =
-  | { type: "clients"; ids: string[] }
-  | { type: "allClients" }
-  | { type: "team"; teamId: string };
+export type AssignScope = { type: "clients"; ids: string[] } | { type: "allClients" } | { type: "team"; teamId: string };
 
 export interface AssignResult {
   assigned: ProgramAssign[];
@@ -76,14 +73,25 @@ export const endProgramAssign = (id: string) => post<{ assign: ProgramAssign }>(
 export const endProgramAssigns = (opts: { programId?: string; teamId?: string }) =>
   post<{ ended: number }>({ action: "endPrograms", ...opts });
 
-export async function loadProgramCalendar(opts: { programId?: string; teamId?: string; year: number; month: number }): Promise<CalendarMonth> {
+export async function loadProgramCalendar(opts: {
+  programId?: string;
+  teamId?: string;
+  year: number;
+  month: number;
+}): Promise<CalendarMonth> {
   const q = new URLSearchParams({ year: String(opts.year), month: String(opts.month) });
   if (opts.teamId) q.set("teamCalendar", opts.teamId);
   else if (opts.programId) q.set("programCalendar", opts.programId);
   return api<CalendarMonth>(`/api/coach/?${q}`, { token: mustToken() });
 }
 
-const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+const newId = (): string => {
+  const c = globalThis.crypto;
+  if (typeof c?.randomUUID === "function") return c.randomUUID();
+  const b = new Uint8Array(16);
+  c.getRandomValues(b);
+  return Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+};
 
 /** Saves each assign day as a local routine and builds the standing planSource. */
 export function followAssign(
