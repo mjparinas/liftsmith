@@ -1084,4 +1084,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten.",
   },
+  "my-team": {
+    title: "Deine Athleten bekommen das Dashboard Mein Team",
+    intro:
+      "Athleten deines Schulteams öffnen jetzt Mein Team: ihr Team, dich als Coach, die zugewiesenen Programme, den Team-Chat und einen Chat mit dir, alles auf einem Bildschirm.",
+    points: [
+      "Füge Athleten, die du schon coachst, direkt über die Teamkarte hinzu. Sie bekommen eine Einladung und treten mit einem Tippen bei.",
+      "Athleten sehen Programme, Athleten und Einrichtung nicht mehr. Mein Team zeigt nur, was sie brauchen.",
+      "Der Team-Chat ist für das ganze Team und dich. Du kannst jede Nachricht löschen, Athleten erscheinen mit Vornamen.",
+      "Zugewiesene Programme stehen mit Folgen auf Mein Team, und die Wochentafel zeigt, wer trainiert hat.",
+    ],
+    dyk: "Team-Links funktionieren jetzt auch, wenn sich ein Athlet erst nach dem Öffnen anmeldet, also fehlt niemand im Kader.",
+  },
 };

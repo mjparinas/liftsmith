@@ -443,6 +443,36 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     noScan: ["library_saves"],
   },
   {
+    name: "my team: a team's chat page (teamChat.ts teamChat)",
+    sql: "SELECT id, account_id, created_at, body FROM team_messages WHERE team_id = ? AND created_at < ? ORDER BY created_at DESC LIMIT 50",
+    uses: ["team_messages_team"],
+    noScan: ["team_messages"],
+  },
+  {
+    name: "my team: unread team chat (teamChat.ts teamChatUnread)",
+    sql: "SELECT COUNT(*) AS n FROM (SELECT account_id FROM team_messages WHERE team_id = ? AND created_at > ? LIMIT 100) WHERE account_id != ?",
+    uses: ["team_messages_team"],
+    noScan: ["team_messages"],
+  },
+  {
+    name: "my team: a lifter's chat reads (teamChat.ts teamChatUnread)",
+    sql: "SELECT team_id, read_at FROM team_chat_reads WHERE account_id = ?",
+    uses: ["team_chat_reads_account"],
+    noScan: ["team_chat_reads"],
+  },
+  {
+    name: "my team: teams a coach asked a lifter to join (teams.ts teamsOverview)",
+    sql: "SELECT t.* FROM team_invites ti JOIN teams t ON t.id = ti.team_id WHERE ti.account_id = ? ORDER BY ti.created_at",
+    uses: ["team_invites_account"],
+    noScan: ["team_invites"],
+  },
+  {
+    name: "my team: who a team is waiting on (teams.ts teamsOverview)",
+    sql: "SELECT account_id, created_at FROM team_invites WHERE team_id = ? ORDER BY created_at",
+    uses: ["sqlite_autoindex_team_invites_1"],
+    noScan: ["team_invites"],
+  },
+  {
     name: "team sessions: a session's sets (teamSessions.ts pushSession, liveBoard)",
     sql: "SELECT athlete_id, exercise_id, COUNT(*) AS c FROM team_session_sets WHERE session_id = ? AND reps > 0 GROUP BY athlete_id, exercise_id",
     uses: ["sqlite_autoindex_team_session_sets_1"],

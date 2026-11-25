@@ -10,7 +10,7 @@ import { readAccount } from "@/lib/auth";
 import { useBack } from "@/lib/back";
 import { billingLive, useBilling, webBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
-import { coachSignup, isCoachSignupHash, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
+import { coachSignup, isCoachSignupHash, isTeamCode, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
 import { savePicked } from "@/lib/coachMode";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { estimate } from "@/lib/e1rm";
@@ -372,7 +372,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         }}
         onStart={(signedIn) => {
           setFreshAccount(!!signedIn);
-          setCoachPath(!!coachNow.current && !!readAccount());
+          // A school team's code joins after setup (App.tsx opens the team with it), not through the coach path.
+          setCoachPath(!!coachNow.current && !isTeamCode(coachNow.current) && !!readAccount());
           setCoachingPath(!coachNow.current && coachingNow.current && !!readAccount());
           setStep(0);
           setWelcome(false);

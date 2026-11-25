@@ -111,4 +111,22 @@ describe("the badge by the lifter's name", () => {
     expect(coachBadge({ coaches: [], clients: 4, role: "physio" })).toBe("Coach · 4 clients");
     expect(coachBadge({ coaches: [], clients: 0 })).toBeNull();
   });
+
+  it("an athlete on a school team gets My team, never the coach's tabs, even with a stray role or pick (2026-11-25)", () => {
+    const team = { id: "T1", name: "Volleyball", code: "", school: "Deen", coachId: "c1", coachName: "Pat", members: 3 };
+    const teams = { ...NO_TEAMS, joined: [team] };
+    for (const mode of [
+      coachingMode({ ...NONE, coaches: [SAM] }, teams),
+      coachingMode({ ...NONE, coaches: [SAM], role: "coach" }, teams),
+      coachingMode({ ...NONE, coaches: [SAM] }, teams, "school"),
+      coachingMode({ ...NONE, coaches: [SAM] }, teams, "coach"),
+    ]) {
+      expect(mode).toMatchObject({ coach: false, school: false, athlete: true });
+      expect(coachingView(mode, false, "programs")).toEqual({ kind: "client" });
+    }
+    // Asked to join one (no code needed) counts too.
+    expect(coachingMode({ ...NONE, coaches: [SAM] }, { ...NO_TEAMS, invites: [team] }).athlete).toBe(true);
+    // Someone who really coaches keeps their tabs.
+    expect(coachingMode({ ...NONE, coaches: [SAM], clients: [SAM] }, teams).coach).toBe(true);
+  });
 });

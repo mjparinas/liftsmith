@@ -73,6 +73,7 @@ import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
 import { ClientVideos } from "./FormVideos";
 import { Icon, type IconName } from "./icons";
+import { MyTeam } from "./MyTeam";
 import { go, replaceRoute } from "./router";
 import { AthleteTeams, CoachTeams, JoinTeam, useTeams } from "./SchoolTeams";
 import { Button, Chip, ProTag, ScreenHeader, Section, Skeleton, SwitchRow } from "./ui";
@@ -193,23 +194,35 @@ export function CoachHome({
           back={back}
           kicker={<Badge who={data} />}
           title={
-            trainersOnly(data.coaches)
-              ? t("trn.yourTrainer")
-              : !data.coaches.length && teams.data.joined.length
-                ? t("team.title")
-                : t("trn.yourCoach")
+            mode.athlete && !joining
+              ? t("mt.title")
+              : trainersOnly(data.coaches)
+                ? t("trn.yourTrainer")
+                : !data.coaches.length && teams.data.joined.length
+                  ? t("team.title")
+                  : t("trn.yourCoach")
           }
         />
         {status}
-        <ClientPage
-          data={data}
-          teams={teams.data}
-          code={code}
-          team={team}
-          coachSide={mode.coach || mode.school}
-          onChange={reloadAll}
-          onJoined={onJoined}
-        />
+        {mode.athlete && !joining ? (
+          <MyTeam
+            data={data}
+            teams={teams.data}
+            onChange={reloadAll}
+            onJoined={() => onJoined(true)}
+            more={<AthleteMore data={data} teams={teams.data} onChange={reloadAll} onJoined={onJoined} />}
+          />
+        ) : (
+          <ClientPage
+            data={data}
+            teams={teams.data}
+            code={code}
+            team={team}
+            coachSide={mode.coach || mode.school}
+            onChange={reloadAll}
+            onJoined={onJoined}
+          />
+        )}
       </div>
     );
 
@@ -243,7 +256,7 @@ export function CoachHome({
         {view.tab === "teams" && (
           <div className="desk-col">
             <Section title={t("team.title")} icon="trophy" info="schoolTeams">
-              <CoachTeams data={teams.data} onChange={teams.reload} />
+              <CoachTeams data={teams.data} athletes={data.clients} onChange={reloadAll} />
             </Section>
           </div>
         )}
@@ -442,6 +455,51 @@ function ClientPage({
           {t("trn.alsoCoach")}
         </Button>
       )}
+    </div>
+  );
+}
+
+/**
+ * The rest of an athlete's My team (MyTeam.tsx): other coaches they have, check-ins waiting, notes and routines from
+ * their coach, what they share with each coach, and a code for another team or coach.
+ */
+function AthleteMore({
+  data,
+  teams,
+  onChange,
+  onJoined,
+}: {
+  data: Overview;
+  teams: TeamsOverview;
+  onChange: () => void;
+  onJoined: (team?: boolean) => void;
+}) {
+  const coaches = data.coaches;
+  const teamCoaches = new Set(teams.joined.map((tm) => tm.coachId));
+  const [adding, setAdding] = useState(false);
+  return (
+    <div className="space-y-4">
+      {coaches
+        .filter((c) => !teamCoaches.has(c.id))
+        .map((c) => (
+          <CoachCard key={c.id} coach={c} unread={data.unread?.[c.id] ?? 0} />
+        ))}
+      <PendingCheckins
+        checkins={(data.checkins ?? []).map((c) => ({ ...c, coach: coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
+      />
+      <FromCoach coaches={coaches} plans={data.plans} notes={data.notes ?? []} targets={data.targets ?? []} />
+      {coaches.map((c) => (
+        <Sharing key={c.id} coach={c} on={sharedWith(data, c.id)} onChange={onChange} />
+      ))}
+      <Section title={t("trn.addAnother")} icon="plus">
+        {adding ? (
+          <JoinCoach code="" coaches={coaches} onChange={onJoined} />
+        ) : (
+          <Button kind="ghost" icon="plus" className="w-full" onClick={() => setAdding(true)}>
+            {t("trn.addAnotherButton")}
+          </Button>
+        )}
+      </Section>
     </div>
   );
 }

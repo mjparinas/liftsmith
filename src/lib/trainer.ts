@@ -115,6 +115,8 @@ export interface Overview {
   targets?: Targets[];
   /** Form videos and notes on them waiting for this account (formVideos.ts), counted with unread messages. */
   videos?: number;
+  /** Unread team chat messages on the school teams this account coaches or is on (teamChat.ts), counted with messages. */
+  teamChat?: number;
   /** This coach's check-in forms, and the check-ins waiting for this lifter to answer. */
   forms?: Form[];
   checkins?: Checkin[];
@@ -356,7 +358,11 @@ export const showCode = (code: string) => (code.length === 8 ? `${code.slice(0, 
 /** The link a coach sends: it opens Coaching in the app with the code filled in. */
 export const inviteUrl = (code: string, base = SITE_URL) => `${base.replace(/\/$/, "")}${APP_PATH}#/trainer/${code}`;
 /** The code in a pasted invite link, or the typed code itself, tidied. Empty when it can't be one. */
-export const codeFrom = (text: string) => coachCode(text);
+/** A coach's code (a team's link is not one: Trainer.tsx reads those itself). */
+export const codeFrom = (text: string) => {
+  const c = coachCode(text);
+  return c.startsWith("team.") ? "" : c;
+};
 
 /** `athlete` is a sports coach's wording (client for a personal trainer or physio). */
 export function trainerError(e: unknown, athlete = false): string {
@@ -1035,6 +1041,8 @@ interface NotesState {
   checkins: (Checkin & { coach: string })[];
   /** Form videos and notes on them waiting for this account (formVideo.ts): counted with unread messages. */
   videos: number;
+  /** Unread team chat messages (teamChat.ts): counted with unread messages. */
+  teamChat: number;
   /** Sessions this lifter booked with a coach, for Today. */
   sessions: (Slot & { coach: string })[];
   /** The newest daily nutrition targets from a coach, with the coach's name, for coach's notes and Health. */
@@ -1108,6 +1116,7 @@ export const useCoachNotes = create<NotesState>(() => ({
   unread: [],
   checkins: [],
   videos: 0,
+  teamChat: 0,
   sessions: [],
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
@@ -1153,6 +1162,7 @@ export function keepNotes(
         | "plans"
         | "programAssigns"
         | "videos"
+        | "teamChat"
         | "schedule"
       >
     >,
@@ -1200,6 +1210,7 @@ export function keepNotes(
     plans,
     programAssigns,
     videos: o.videos ?? 0,
+    teamChat: o.teamChat ?? 0,
     plansReady: true,
   });
 }
@@ -1245,7 +1256,8 @@ export function dismissPlan(id: string): void {
 }
 
 /** Everything waiting in coaching: unread messages, plus form videos and their notes. */
-export const coachWaiting = (s: Pick<NotesState, "unread" | "videos">) => s.unread.reduce((n, u) => n + u.count, 0) + (s.videos || 0);
+export const coachWaiting = (s: Pick<NotesState, "unread" | "videos" | "teamChat">) =>
+  s.unread.reduce((n, u) => n + u.count, 0) + (s.videos || 0) + (s.teamChat || 0);
 
 /** A form video or its notes were opened here: that many fewer wait, until the next load says otherwise. */
 export function videosSeen(n: number): void {

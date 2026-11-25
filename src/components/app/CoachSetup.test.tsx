@@ -161,6 +161,10 @@ describe("coach codes", () => {
     expect(coachCode(" abcd-2345 ")).toBe("ABCD2345");
     expect(coachCode("https://www.getliftsmith.com/app/#/trainer/ABCD2345")).toBe("ABCD2345");
     expect(coachCode("ABCD-0000")).toBe("");
+    // A school team's link keeps its mark, so signing in or setup still opens the team (2026-11-25).
+    expect(coachCode("https://www.getliftsmith.com/app/#/trainer/team.APRJ2345")).toBe("team.APRJ2345");
+    expect(coachCode("team.aprj-2345")).toBe("team.APRJ2345");
+    expect(coachFromReferrer("utm_source=coach&utm_campaign=team.APRJ2345")).toBe("team.APRJ2345");
     expect(coachFromReferrer("utm_source=coach&utm_campaign=ABCD2345")).toBe("ABCD2345");
     expect(coachFromReferrer("utm_source=invite&utm_campaign=ABCD2345")).toBe("");
     expect(decodeURIComponent(playCoachUrl("ABCD2345"))).toContain("referrer=utm_source=coach&utm_campaign=ABCD2345");

@@ -445,6 +445,10 @@ export const de: FeaturesText = {
       name: "Kostenlos für Schulteams",
       body: "Trainer an weiterführenden Schulen, die eine Schul-E-Mail-Adresse bestätigen, bekommen Pro kostenlos, ebenso die 13- bis 18-jährigen Sportler ihrer Teams, mit einer wöchentlichen Teamtabelle. Körperfett und öffentliche Profile bleiben für unter 18-Jährige aus.",
     },
+    "my-team": {
+      name: "Mein Team für Schulsportler",
+      body: "Wer in einem Schulteam ist, öffnet Coaching im Zuhause seines Teams: das Team und sein Coach, die zugewiesenen Programme mit Folgen, ein Team-Chat mit dem Coach, ein Chat mit dem Coach und die Woche des Teams. Ein Coach kann Athleten, die über seine Einladung kamen, einem Team hinzufügen; jede Person gibt zuerst ihr Alter an und stimmt zu.",
+    },
     "team-session": {
       name: "Teamtraining auf einem Tablet",
       body: "Ein Schultrainer leitet ein Training für das ganze Team von einem Tablet aus: Alle tippen auf ihren Vornamen und tragen ihre Sätze selbst ein, das Gewicht startet beim letzten Stand, und die Tafel zeigt, wer noch nicht angefangen hat. Am Ende landen die Sätze im eigenen Konto. Funktioniert ohne Empfang.",

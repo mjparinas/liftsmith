@@ -59,6 +59,9 @@ const SLOT = { id: "s1", coachId: "k1", start: NOW + 2 * 86_400_000, minutes: 60
 /** An upcoming session for the coach's schedule (its calendar starts at this month). */
 const SOON = Date.now() + 2 * 86_400_000;
 let mySessions: { booked: unknown[]; open: unknown[] } = { booked: [], open: [] };
+/** What GET /api/teams/ answers (null: the server's plain "ok", as in most tests). */
+let teamsData: unknown = null;
+let assigns: unknown[] = [];
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
@@ -75,6 +78,8 @@ beforeEach(() => {
   trainer = false;
   payOn = false;
   mySessions = { booked: [], open: [] };
+  teamsData = null;
+  assigns = [];
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -103,6 +108,22 @@ beforeEach(() => {
           : null,
       });
     if (url.startsWith("/api/programs/")) return Response.json({ mine: [], pay: { ready: false } });
+    if (url === "/api/teams/" && !body && teamsData) return Response.json(teamsData);
+    if (url.startsWith("/api/teams/?board="))
+      return Response.json({ team: TEAM, board: [{ id: "me", name: "Maya", workouts: 2, sets: 30 }] });
+    if (url === "/api/teams/" && body?.action === "chat")
+      return Response.json({
+        team: { id: "t1", name: "School squad" },
+        coach: false,
+        more: false,
+        messages: body.after
+          ? []
+          : [{ id: "tm1", name: "Sam", coach: true, at: NOW, body: "Lift at 4 tomorrow", mine: false, canDelete: false }],
+      });
+    if (url === "/api/teams/" && body?.action === "say")
+      return Response.json({
+        message: { id: "tm2", name: "Maya", coach: false, at: NOW + 1, body: body.text, mine: true, canDelete: true },
+      });
     if (url === "/api/coach/?checkin=ci1") return Response.json({ checkin: CHECKIN });
     if (url === "/api/coach/?chat=k1")
       return Response.json({
@@ -127,6 +148,7 @@ beforeEach(() => {
         checkins: linked ? [CHECKIN] : [],
         slots: coaching ? [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1", start: SOON }] : [],
         sessions: mySessions,
+        programAssigns: assigns,
         pay: payOn
           ? {
               account: { ready: true, currency: "cad" },
@@ -850,5 +872,81 @@ describe("client payments", () => {
     await u.click(await screen.findByRole("button", { name: /Pay for a session/ }));
     expect(calls.find((c) => (c.body as { action?: string })?.action === "payCheckout")).toMatchObject({ body: { id: "k1" } });
     expect(open).toHaveBeenCalledWith("https://checkout.stripe.com/c/x", "_blank", "noopener");
+  });
+});
+
+describe("My team (school team athletes)", () => {
+  const ATHLETE_TEAMS = {
+    school: null,
+    codeSent: false,
+    teams: [],
+    joined: [{ ...TEAM, coachName: "Sam" }],
+    members: {},
+    live: {},
+    invites: [],
+    invited: {},
+    chatUnread: { t1: 3 },
+  };
+  const ASSIGN = {
+    id: "a1",
+    coachId: "k1",
+    clientId: "me",
+    programId: "p1",
+    teamId: "t1",
+    title: "Preseason strength",
+    weeks: 6,
+    days: [{ name: "Day A", code: CODE, weekdays: [1] }],
+    status: "pending",
+    createdAt: NOW,
+    acceptedAt: null,
+    startedAt: null,
+    endedAt: null,
+  };
+
+  it("an athlete sees their team, coach, programs and chats, and never the coach's tabs", async () => {
+    asClient();
+    // A role left on the account (a stray tap on the first page) doesn't turn an athlete into a coach.
+    coachRole = "coach";
+    teamsData = ATHLETE_TEAMS;
+    assigns = [ASSIGN];
+    render(<Trainer arg="programs" />);
+    expect(await screen.findByRole("heading", { level: 1, name: "My team" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "School squad" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Team chat" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Message Sam" })).toBeInTheDocument();
+    expect(screen.getByText("Preseason strength")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Follow this program" })).toBeInTheDocument();
+    expect(await screen.findByText("Maya")).toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: /pages/i })).toBeNull();
+    for (const tab of ["Programs", "Athletes", "Setup", "Clients"]) expect(screen.queryByRole("button", { name: tab })).toBeNull();
+  });
+
+  it("an athlete a coach added joins with their age, no code needed", async () => {
+    asClient();
+    teamsData = { ...ATHLETE_TEAMS, joined: [], invites: [{ ...TEAM, coachName: "Sam" }], chatUnread: {} };
+    const u = userEvent.setup();
+    render(<Trainer />);
+    expect(await screen.findByText("Sam added you to School squad")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "15" }));
+    await u.click(screen.getByRole("button", { name: "Join the team" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "accept")).toMatchObject({ body: { team: "t1", age: 15 } });
+  });
+
+  it("the team chat shows the coach marked and sends a message", async () => {
+    asClient();
+    const u = userEvent.setup();
+    render(<Trainer arg="tc.t1" />);
+    expect(await screen.findByText("Lift at 4 tomorrow")).toBeInTheDocument();
+    expect(screen.getByText("Coach")).toBeInTheDocument();
+    await u.type(screen.getByLabelText("Message the team"), "On my way");
+    await u.click(screen.getByRole("button", { name: "Send" }));
+    expect(await screen.findByText("On my way")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "say")).toMatchObject({ body: { team: "t1", text: "On my way" } });
+  });
+
+  it("a team link opened signed out keeps the team code for after signing in", () => {
+    useAccount.setState({ account: null });
+    render(<Trainer arg="team.APRJKHTD" />);
+    expect(localStorage.getItem("liftsmith.coachInvite")).toBe("team.APRJKHTD");
   });
 });
