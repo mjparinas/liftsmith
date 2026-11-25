@@ -266,7 +266,8 @@ export const pl: SiteText = {
       title: "Szukamy naszych pierwszych użytkowników.",
       sample: "Przykładowa opinia, nie od prawdziwego użytkownika",
       looking: "Szukamy naszych pierwszych użytkowników.",
-      lookingRest: "Wypróbuj {name} za darmo w przeglądarce, powiedz nam z poziomu aplikacji, co o niej myślisz, a twoje słowa mogą się tu znaleźć.",
+      lookingRest:
+        "Wypróbuj {name} za darmo w przeglądarce, powiedz nam z poziomu aplikacji, co o niej myślisz, a twoje słowa mogą się tu znaleźć.",
       cta: "Zacznij za darmo w przeglądarce",
     },
     pricing: {

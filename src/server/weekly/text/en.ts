@@ -1089,7 +1089,8 @@ export const emails: Record<string, Words> = {
   },
   "coach-assign-program": {
     title: "Assign a season program to the whole roster",
-    intro: "Put Upper/Lower or Push/Pull/Legs on your clients or school team for N weeks — athletes follow once, Today runs the right day, and a calendar shows who has lifted.",
+    intro:
+      "Put Upper/Lower or Push/Pull/Legs on your clients or school team for N weeks — athletes follow once, Today runs the right day, and a calendar shows who has lifted.",
     points: [
       "In Coaching › Programs, start from Upper/Lower or Push/Pull/Legs, set the weekdays, then Assign to… clients or a team.",
       "Athletes get a push and Follow this program once on Today. Their own progression picks the weights.",
@@ -1098,5 +1099,4 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "You can assign the same way from a school team card or a single client's report.",
   },
-
 };

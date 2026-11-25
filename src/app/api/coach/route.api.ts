@@ -72,6 +72,7 @@ import {
   stopMonthly,
 } from "@/server/coachPay";
 import { coachPlanOf } from "@/server/coachPlan";
+import { setStatus, setTyping, touchSeen } from "@/server/coachPresence";
 import {
   acceptProgramAssign,
   assignProgram,
@@ -80,7 +81,6 @@ import {
   programCalendar,
   type AssignScope,
 } from "@/server/coachProgramAssign";
-import { setStatus, setTyping, touchSeen } from "@/server/coachPresence";
 import { rateLimit } from "@/server/db";
 import { dropPairVideos, videosWaiting } from "@/server/formVideos";
 import { saveToken } from "@/server/push";

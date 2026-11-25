@@ -44,7 +44,13 @@ export const UPPER_LOWER: ProgramTemplate = {
     {
       name: "Upper B",
       weekdays: [4],
-      items: [sets("incline-bench-press", 4), sets("db-row", 4), sets("lateral-raise", 3), sets("lat-pulldown", 3), sets("barbell-curl", 3)],
+      items: [
+        sets("incline-bench-press", 4),
+        sets("db-row", 4),
+        sets("lateral-raise", 3),
+        sets("lat-pulldown", 3),
+        sets("barbell-curl", 3),
+      ],
     },
     {
       name: "Lower B",
@@ -65,7 +71,13 @@ export const PPL: ProgramTemplate = {
     {
       name: "Push A",
       weekdays: [1],
-      items: [sets("bench-press", 4), sets("overhead-press", 3), sets("incline-bench-press", 3), sets("lateral-raise", 3), sets("skull-crusher", 3)],
+      items: [
+        sets("bench-press", 4),
+        sets("overhead-press", 3),
+        sets("incline-bench-press", 3),
+        sets("lateral-raise", 3),
+        sets("skull-crusher", 3),
+      ],
     },
     {
       name: "Pull A",

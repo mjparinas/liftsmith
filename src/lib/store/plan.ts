@@ -1,5 +1,6 @@
 import { track } from "../analytics";
 import { weekStart } from "../block";
+import { coachProgramDayIndex } from "../coachProgramAssign";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
 import { can } from "../entitlements";
@@ -17,7 +18,6 @@ import { bodyMode } from "../pregnancy";
 import { freeProgramFor, pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
-import { coachProgramDayIndex } from "../coachProgramAssign";
 import { planFromRoutine } from "../routines";
 import { splitSession, STRETCH_PART_MIN, type SessionSplit } from "../sessionSplit";
 import type { State } from "../store";
