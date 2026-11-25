@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { track } from "@/lib/analytics";
 import { assignProgram, endProgramAssigns } from "@/lib/coachProgramAssign";
 import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
-import { date, t } from "@/lib/i18n";
+import { date, t, tFor } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
 import { copyText, shareUrl } from "@/lib/shareLinks";
@@ -405,7 +405,7 @@ function CoachTeam({
       const r = await assignProgram(p.id, { type: "team", teamId: team.id }, weekdays);
       haptic("success");
       track("feature", { name: "trainer", detail: "assignProgram" });
-      setNote(t("cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+      setNote(tFor(true, "cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
       setAssignOpen(false);
     } catch (e) {
       oops();
@@ -459,7 +459,7 @@ function CoachTeam({
       )}
       {watch && live && <LiveBoardSheet id={live} onClose={() => setWatch(false)} />}
       <Sheet open={assignOpen} onClose={() => setAssignOpen(false)} title={t("cpg.clientAssign")}>
-        <p className="text-sm text-muted">{t("cpg.assignHint")}</p>
+        <p className="text-sm text-muted">{tFor(true, "cpg.assignHint")}</p>
         {!programs ? (
           <p className="mt-3 text-sm text-muted">…</p>
         ) : programs.length === 0 ? (
@@ -492,7 +492,7 @@ function CoachTeam({
         </Button>
       </Sheet>
       <Sheet open={calOpen} onClose={() => setCalOpen(false)} title={t("cpg.cal.title")} wide>
-        <ProgramCalendar teamId={team.id} />
+        <ProgramCalendar teamId={team.id} athlete />
       </Sheet>
       {members.length > 0 && (
         <details className="mt-3">

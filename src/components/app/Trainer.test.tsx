@@ -380,6 +380,7 @@ describe("pages for each side", () => {
     for (const name of ["Clients", "Messages", "Schedule", "Check-ins", "Setup"])
       expect(within(nav).getByRole("button", { name })).toBeInTheDocument();
     expect(within(nav).getByRole("button", { name: "Clients" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("heading", { name: "Your clients" })).toBeInTheDocument();
     // Sessions, setup and the forms are on their own pages, not under the client list.
     expect(screen.queryByText("New clients start with")).toBeNull();
     expect(screen.queryByRole("button", { name: "Add times" })).toBeNull();
@@ -397,6 +398,24 @@ describe("pages for each side", () => {
     expect(within(nav).queryByRole("button", { name: "Schedule" })).toBeNull();
     expect(within(nav).queryByRole("button", { name: "Check-ins" })).toBeNull();
     expect(within(nav).queryByRole("button", { name: "Payments" })).toBeNull();
+  });
+
+  it("a sports coach's list says athletes", async () => {
+    coachRole = "coach";
+    render(<Trainer arg="clients" />);
+    expect(await screen.findByRole("heading", { name: "Your athletes" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Invite athletes" })).toBeInTheDocument();
+    expect(screen.queryByText("Your clients")).toBeNull();
+    expect(screen.queryByText("Invite clients")).toBeNull();
+  });
+
+  it("a sports coach's report says athlete", async () => {
+    coachRole = "coach";
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Athlete")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Routines for this athlete" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remove athlete" })).toBeInTheDocument();
+    expect(screen.queryByText("Remove client")).toBeNull();
   });
 
   it("someone new to coaching picks a side first", async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { coachingMode, coachingView, coachTabs, coachTools, isSportsCoach } from "./coachMode";
+import { coachingMode, coachingNav, coachingView, coachTabs, coachTools, isSportsCoach } from "./coachMode";
 import { coachBadge } from "./trainer";
 
 const NONE = { invite: null, clients: [], coaches: [], role: null, coach: false };
@@ -86,6 +86,16 @@ describe("which coaching pages a lifter sees", () => {
   });
 });
 
+describe("the navigation item", () => {
+  it("names a trainer, a coach and a physio, and hides it for everyone else", () => {
+    expect(coachingNav("trainer")).toEqual({ role: "trainer", icon: "dumbbell" });
+    expect(coachingNav("coach")).toEqual({ role: "coach", icon: "flag" });
+    expect(coachingNav("physio")).toEqual({ role: "physio", icon: "bandage" });
+    expect(coachingNav(null)).toBeNull();
+    expect(coachingNav(undefined)).toBeNull();
+  });
+});
+
 describe("the badge by the lifter's name", () => {
   it("names the coach, in the coach's own word", () => {
     expect(coachBadge({ coaches: [SAM], clients: 0 })).toBe("Coached by Sam");
@@ -96,6 +106,9 @@ describe("the badge by the lifter's name", () => {
 
   it("says Coach with a count for someone who coaches, and nothing for everyone else", () => {
     expect(coachBadge({ coaches: [], clients: 4 })).toBe("Coach · 4 clients");
+    expect(coachBadge({ coaches: [], clients: 4, role: "coach" })).toBe("Coach · 4 athletes");
+    expect(coachBadge({ coaches: [], clients: 4, role: "trainer" })).toBe("Coach · 4 clients");
+    expect(coachBadge({ coaches: [], clients: 4, role: "physio" })).toBe("Coach · 4 clients");
     expect(coachBadge({ coaches: [], clients: 0 })).toBeNull();
   });
 });

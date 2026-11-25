@@ -15,7 +15,7 @@ import { COACH_TABS, coachTools } from "@/lib/coachMode";
 import { assignProgram, endProgramAssign, type ProgramAssign } from "@/lib/coachProgramAssign";
 import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
 import { can } from "@/lib/entitlements";
-import { date, list, t } from "@/lib/i18n";
+import { date, list, t, tFor } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
 import { phaseRoutineName, rehabProgram, type RehabProgram } from "@/lib/rehab";
@@ -242,7 +242,17 @@ function NoteToClient({ clientId, saved, onChange }: { clientId: string; saved: 
 }
 
 /** Season program assign + this client's month calendar (docs/decisions/coach-programs.md). */
-function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string; assigns: ProgramAssign[]; onChange: () => void }) {
+function ClientProgramAssign({
+  clientId,
+  assigns,
+  onChange,
+  athlete,
+}: {
+  clientId: string;
+  assigns: ProgramAssign[];
+  onChange: () => void;
+  athlete: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [cal, setCal] = useState(false);
   const [programs, setPrograms] = useState<CoachProgram[] | null>(null);
@@ -262,7 +272,7 @@ function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string
       const r = await assignProgram(p.id, { type: "clients", ids: [clientId] }, weekdays);
       haptic("success");
       track("feature", { name: "trainer", detail: "assignProgram" });
-      setNote(t("cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+      setNote(tFor(athlete, "cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
       setOpen(false);
       onChange();
     } catch (e) {
@@ -317,7 +327,7 @@ function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string
         )}
       </div>
       <Sheet open={open} onClose={() => setOpen(false)} title={t("cpg.clientAssign")}>
-        <p className="text-sm text-muted">{t("cpg.assignHint")}</p>
+        <p className="text-sm text-muted">{tFor(athlete, "cpg.assignHint")}</p>
         {!programs ? (
           <p className="mt-3 text-sm text-muted">…</p>
         ) : programs.length === 0 ? (
@@ -336,7 +346,7 @@ function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string
       </Sheet>
       {active && (
         <Sheet open={cal} onClose={() => setCal(false)} title={t("cpg.cal.title")} wide>
-          <ProgramCalendar programId={active.programId} clientId={clientId} />
+          <ProgramCalendar programId={active.programId} clientId={clientId} athlete={athlete} />
         </Sheet>
       )}
     </Section>
@@ -349,6 +359,7 @@ function ClientPlans({
   plans,
   physio,
   rehab,
+  athlete,
   onChange,
 }: {
   clientId: string;
@@ -356,6 +367,7 @@ function ClientPlans({
   physio: boolean;
   /** Show rehab programs in the assign sheet (physio first; personal trainer after own routines; sports coach never). */
   rehab: boolean;
+  athlete: boolean;
   onChange: () => void;
 }) {
   const saved = useApp((s) => s.profile.routines);
@@ -375,7 +387,7 @@ function ClientPlans({
       onChange();
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   // Rehab protocols (2026-11-17): moving a phase sends the client that phase and takes the old one back.
@@ -397,7 +409,7 @@ function ClientPlans({
       onChange();
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   const pickProtocol = (p: RehabProgram, phase: number, self: boolean) => void give(protocolRoutine(p, phase, self));
@@ -409,11 +421,11 @@ function ClientPlans({
       onChange();
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   return (
-    <Section title={t("trn.plans")} icon="layers">
+    <Section title={tFor(athlete, "trn.plans")} icon="layers">
       {plans.length > 0 && (
         <ul className="card mb-3 divide-y divide-line">
           {plans.map((p) => (
@@ -570,7 +582,9 @@ function ClientScreen({ id }: { id: string }) {
       () => loadClient(id),
       (v) => {
         if (!live) return;
-        setReport(clientReport(v, Date.now()));
+        const report = clientReport(v, Date.now());
+        // Sports coaches do not take payments, so a failed charge never leads their report.
+        setReport(v.role === "coach" ? { ...report, flags: report.flags.filter((f) => f.kind !== "payFailed") } : report);
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
         // Role gates tools on the report (2026-11-24); physio still leads with pain and rehab.
@@ -581,7 +595,7 @@ function ClientScreen({ id }: { id: string }) {
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
         setProgramAssigns(v.programAssigns ?? []);
       },
-    ).catch((e: unknown) => live && setError(trainerError(e)));
+    ).catch((e: unknown) => live && setError(trainerError(e, useCoachNotes.getState().who.role === "coach")));
     return () => {
       live = false;
     };
@@ -607,6 +621,7 @@ function ClientScreen({ id }: { id: string }) {
       </div>
     );
   if (!report) return <ScreenHeader back={back} title={t("trn.loading")} />;
+  const athlete = checkins.role === "coach";
   const remove = async () => {
     try {
       await unlinkPerson(id);
@@ -615,14 +630,14 @@ function ClientScreen({ id }: { id: string }) {
       go("trainer");
     } catch (e) {
       oops();
-      setError(trainerError(e));
+      setError(trainerError(e, athlete));
     }
   };
   const names = report.names;
   return (
     // Desktop layout: the report flows into two columns (.desk-cols), what to do first.
     <div className="desk-cols pb-2">
-      <ScreenHeader className="desk-span" back={back} kicker={t("trn.client")} title={report.name || t("trn.noName")} />
+      <ScreenHeader className="desk-span" back={back} kicker={tFor(athlete, "trn.client")} title={report.name || t("trn.noName")} />
       <div className="desk-span mt-3">
         <Button className="w-full" icon="chat" onClick={() => go("trainer", `${CHAT}${id}`)}>
           {t("trn.messageNamed", { name: report.name || t("trn.noName") })}
@@ -721,9 +736,10 @@ function ClientScreen({ id }: { id: string }) {
         plans={report.plans}
         physio={physio}
         rehab={tools.rehab || checkins.role === "trainer"}
+        athlete={athlete}
         onChange={() => setVersion((n) => n + 1)}
       />
-      <ClientProgramAssign clientId={id} assigns={programAssigns} onChange={() => setVersion((n) => n + 1)} />
+      <ClientProgramAssign clientId={id} assigns={programAssigns} athlete={athlete} onChange={() => setVersion((n) => n + 1)} />
       {/* Pain shared with a personal trainer: secondary, below plans (not for sports coaches). */}
       {!physio && checkins.role === "trainer" && report.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
       {tools.checkins && (
@@ -770,9 +786,9 @@ function ClientScreen({ id }: { id: string }) {
           ? t("trn.sharedList", { name: report.name || t("trn.noName"), list: list(report.shares.map((k) => t(KIND_WORD[k]))) })
           : t("trn.sharedNone", { name: report.name || t("trn.noName") })}
       </p>
-      <p className="mt-2 px-1 text-xs text-muted">{t("trn.whatYouSee")}</p>
+      <p className="mt-2 px-1 text-xs text-muted">{tFor(athlete, "trn.whatYouSee")}</p>
       <Button kind="danger" className="mt-4 w-full" onClick={() => void remove()}>
-        {t("trn.remove")}
+        {tFor(athlete, "trn.remove")}
       </Button>
     </div>
   );

@@ -13,13 +13,14 @@ import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { COMMIT, versionLabel } from "@/lib/build";
+import { coachingNav } from "@/lib/coachMode";
 import { communityOn } from "@/lib/community";
 import { weekOf } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import { visitsOn } from "@/lib/gymVisits";
-import { english, t } from "@/lib/i18n";
+import { english, t, tFor } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
@@ -167,13 +168,14 @@ function ProCard() {
 /** Coaching: what it holds for this lifter, their coach's name or how many clients they coach. */
 function CoachingRow() {
   const who = useCoachNotes((s) => s.who);
+  const nav = coachingNav(who.role);
   const first = who.coaches[0];
   const sub = first
     ? t("trn.rowClient", { name: first.name || t("trn.noName") })
     : who.clients
-      ? t("trn.rowCoach", { count: who.clients })
+      ? tFor(who.role === "coach", "trn.rowCoach", { count: who.clients })
       : t("trn.rowNote");
-  return <NavRow title={t("trn.row")} sub={sub} icon="people" onClick={() => go("trainer")} />;
+  return <NavRow title={nav ? t(`trn.role.${nav.role}`) : t("trn.row")} sub={sub} icon={nav?.icon ?? "people"} onClick={() => go("trainer")} />;
 }
 
 /** Settings' second row: sign in to back up and sync, or who's signed in. */
@@ -333,7 +335,7 @@ export function Settings() {
 function SettingsMain() {
   const { profile } = useApp();
   const desktop = useDesktop();
-  const coaching = useCoachNotes((s) => s.coaching);
+  const inNav = useCoachNotes((s) => !!coachingNav(s.who.role));
   const more = useUnlocked("more");
   const goal = t(`goal.${profile.goal}`);
   const program = programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive");
@@ -355,8 +357,8 @@ function SettingsMain() {
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
-      {/* The sidebar owns Coaching on desktop; on phones it appears only for active coaching accounts. */}
-      {coaching && !desktop && (
+      {/* On desktop, a trainer, coach or physio has their item in the sidebar (App.tsx), so the row goes. */}
+      {!(desktop && inNav) && (
         <div className="mt-2">
           <CoachingRow />
         </div>

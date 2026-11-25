@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // src/lib/coachPrograms.ts, docs/decisions/coach-programs.md). English is the source.
 
 export const en = {
+  "cpg.assignAll.ath": "All athletes ({count})",
+  "cpg.assignPick.ath": "Pick athletes",
+  "cpg.cal.noAssign.ath": "Assign this program to a team or athletes to see the calendar.",
   "cpg.title": "Coaches' programs",
   "cpg.intro":
     "Programs made by coaches and personal trainers. Each one's days save to your routines, and your own progression picks the weights.",
@@ -101,14 +104,19 @@ export const en = {
   "cpg.rev.verified": "Verified purchase",
   "cpg.assign": "Assign to…",
   "cpg.assignTitle": "Assign {title}",
-  "cpg.assignHint": "Athletes follow once. Today shows each day's workout on the weekdays you set.",
+  "cpg.assignHint.ath": "Athletes follow once. Today shows each day's workout on the weekdays you set.",
+  "cpg.assignHint": "Clients follow once. Today shows each day's workout on the weekdays you set.",
   "cpg.assignAll": "All clients ({count})",
   "cpg.assignPick": "Pick clients",
   "cpg.assignTeam": "Team: {name} ({count})",
   "cpg.assignGo": "Assign program",
-  "cpg.assignDone": {
+  "cpg.assignDone.ath": {
     one: "Assigned to {count} athlete. Skipped {skip}.",
     other: "Assigned to {count} athletes. Skipped {skip}.",
+  },
+  "cpg.assignDone": {
+    one: "Assigned to {count} client. Skipped {skip}.",
+    other: "Assigned to {count} clients. Skipped {skip}.",
   },
   "cpg.assignCalendar": "See calendar",
   "cpg.assignTakeBack": "Take back",
@@ -150,6 +158,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Todos los atletas ({count})",
+  "cpg.assignPick.ath": "Elegir atletas",
+  "cpg.cal.noAssign.ath": "Asigna este programa a un equipo o a atletas para ver el calendario.",
   "cpg.title": "Programas de entrenadores",
   "cpg.intro":
     "Programas hechos por entrenadores y entrenadores personales. Sus días se guardan en tus rutinas y tu propia progresión elige los pesos.",
@@ -249,12 +260,14 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Compra verificada",
   "cpg.assign": "Asignar a…",
   "cpg.assignTitle": "Asignar {title}",
-  "cpg.assignHint": "Los atletas lo siguen una vez. Hoy muestra el entrenamiento de cada día en los días de la semana que elijas.",
+  "cpg.assignHint.ath": "Los atletas lo siguen una vez. Hoy muestra el entrenamiento de cada día en los días de la semana que elijas.",
+  "cpg.assignHint": "Los clientes lo siguen una vez. Hoy muestra el entrenamiento de cada día en los días de la semana que elijas.",
   "cpg.assignAll": "Todos los clientes ({count})",
   "cpg.assignPick": "Elegir clientes",
   "cpg.assignTeam": "Equipo: {name} ({count})",
   "cpg.assignGo": "Asignar programa",
-  "cpg.assignDone": { one: "Asignado a {count} atleta. Omitidos {skip}.", other: "Asignado a {count} atletas. Omitidos {skip}." },
+  "cpg.assignDone.ath": { one: "Asignado a {count} atleta. Omitidos {skip}.", other: "Asignado a {count} atletas. Omitidos {skip}." },
+  "cpg.assignDone": { one: "Asignado a {count} cliente. Omitidos {skip}.", other: "Asignado a {count} clientes. Omitidos {skip}." },
   "cpg.assignCalendar": "Ver calendario",
   "cpg.assignTakeBack": "Retirar",
   "cpg.assignTaken": "Programa retirado.",
@@ -293,6 +306,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Tous les athlètes ({count})",
+  "cpg.assignPick.ath": "Choisir des athlètes",
+  "cpg.cal.noAssign.ath": "Assignez ce programme à une équipe ou à des athlètes pour voir le calendrier.",
   "cpg.title": "Programmes de coachs",
   "cpg.intro":
     "Des programmes créés par des coachs et des entraîneurs personnels. Leurs jours s'enregistrent dans vos routines, et votre propre progression choisit les charges.",
@@ -397,12 +413,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Achat vérifié",
   "cpg.assign": "Assigner à…",
   "cpg.assignTitle": "Assigner {title}",
-  "cpg.assignHint": "Les athlètes le suivent une fois. Aujourd’hui affiche l’entraînement de chaque jour aux jours de la semaine choisis.",
+  "cpg.assignHint.ath": "Les athlètes le suivent une fois. Aujourd’hui affiche l’entraînement de chaque jour aux jours de la semaine choisis.",
+  "cpg.assignHint": "Les clients le suivent une fois. Aujourd’hui affiche l’entraînement de chaque jour aux jours de la semaine choisis.",
   "cpg.assignAll": "Tous les clients ({count})",
   "cpg.assignPick": "Choisir des clients",
   "cpg.assignTeam": "Équipe : {name} ({count})",
   "cpg.assignGo": "Assigner le programme",
-  "cpg.assignDone": { one: "Assigné à {count} athlète. Ignorés : {skip}.", other: "Assigné à {count} athlètes. Ignorés : {skip}." },
+  "cpg.assignDone.ath": { one: "Assigné à {count} athlète. Ignorés : {skip}.", other: "Assigné à {count} athlètes. Ignorés : {skip}." },
+  "cpg.assignDone": { one: "Assigné à {count} client. Ignorés : {skip}.", other: "Assigné à {count} clients. Ignorés : {skip}." },
   "cpg.assignCalendar": "Voir le calendrier",
   "cpg.assignTakeBack": "Retirer",
   "cpg.assignTaken": "Programme retiré.",
@@ -441,6 +459,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Alle Athleten ({count})",
+  "cpg.assignPick.ath": "Athleten wählen",
+  "cpg.cal.noAssign.ath": "Weise dieses Programm einem Team oder Athleten zu, um den Kalender zu sehen.",
   "cpg.title": "Programme von Coaches",
   "cpg.intro":
     "Programme von Coaches und Personal Trainern. Ihre Tage landen in deinen Routinen, und deine eigene Progression wählt die Gewichte.",
@@ -542,14 +563,19 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Verifizierter Kauf",
   "cpg.assign": "Zuweisen an…",
   "cpg.assignTitle": "{title} zuweisen",
-  "cpg.assignHint": "Athleten folgen einmal. Heute zeigt das Training jedes Tages an den gewählten Wochentagen.",
+  "cpg.assignHint.ath": "Athleten folgen einmal. Heute zeigt das Training jedes Tages an den gewählten Wochentagen.",
+  "cpg.assignHint": "Kunden folgen einmal. Heute zeigt das Training jedes Tages an den gewählten Wochentagen.",
   "cpg.assignAll": "Alle Klienten ({count})",
   "cpg.assignPick": "Klienten wählen",
   "cpg.assignTeam": "Team: {name} ({count})",
   "cpg.assignGo": "Programm zuweisen",
-  "cpg.assignDone": {
+  "cpg.assignDone.ath": {
     one: "An {count} Athleten zugewiesen. Übersprungen: {skip}.",
     other: "An {count} Athleten zugewiesen. Übersprungen: {skip}.",
+  },
+  "cpg.assignDone": {
+    one: "An {count} Kunden zugewiesen. Übersprungen: {skip}.",
+    other: "An {count} Kunden zugewiesen. Übersprungen: {skip}.",
   },
   "cpg.assignCalendar": "Kalender ansehen",
   "cpg.assignTakeBack": "Zurücknehmen",
@@ -589,6 +615,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Tutti gli atleti ({count})",
+  "cpg.assignPick.ath": "Scegli atleti",
+  "cpg.cal.noAssign.ath": "Assegna questo programma a una squadra o a degli atleti per vedere il calendario.",
   "cpg.title": "Programmi dei coach",
   "cpg.intro":
     "Programmi creati da coach e personal trainer. I loro giorni si salvano nelle tue routine e la tua progressione sceglie i carichi.",
@@ -689,12 +718,14 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Acquisto verificato",
   "cpg.assign": "Assegna a…",
   "cpg.assignTitle": "Assegna {title}",
-  "cpg.assignHint": "Gli atleti lo seguono una volta. Oggi mostra l’allenamento di ogni giorno nei giorni della settimana scelti.",
+  "cpg.assignHint.ath": "Gli atleti lo seguono una volta. Oggi mostra l’allenamento di ogni giorno nei giorni della settimana scelti.",
+  "cpg.assignHint": "I clienti lo seguono una volta. Oggi mostra l’allenamento di ogni giorno nei giorni della settimana scelti.",
   "cpg.assignAll": "Tutti i clienti ({count})",
   "cpg.assignPick": "Scegli clienti",
   "cpg.assignTeam": "Squadra: {name} ({count})",
   "cpg.assignGo": "Assegna programma",
-  "cpg.assignDone": { one: "Assegnato a {count} atleta. Saltati: {skip}.", other: "Assegnato a {count} atleti. Saltati: {skip}." },
+  "cpg.assignDone.ath": { one: "Assegnato a {count} atleta. Saltati: {skip}.", other: "Assegnato a {count} atleti. Saltati: {skip}." },
+  "cpg.assignDone": { one: "Assegnato a {count} cliente. Saltati: {skip}.", other: "Assegnato a {count} clienti. Saltati: {skip}." },
   "cpg.assignCalendar": "Vedi calendario",
   "cpg.assignTakeBack": "Ritira",
   "cpg.assignTaken": "Programma ritirato.",
@@ -733,6 +764,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "すべての選手（{count}）",
+  "cpg.assignPick.ath": "選手を選ぶ",
+  "cpg.cal.noAssign.ath": "カレンダーを見るには、このプログラムをチームか選手に割り当ててください。",
   "cpg.title": "コーチのプログラム",
   "cpg.intro":
     "コーチやパーソナルトレーナーが作ったプログラムです。各日はあなたのルーティンに保存され、重量はあなた自身の進み具合で決まります。",
@@ -825,12 +859,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "購入済み",
   "cpg.assign": "割り当て…",
   "cpg.assignTitle": "{title}を割り当て",
-  "cpg.assignHint": "選手は一度フォローします。今日は選んだ曜日にその日のワークアウトを表示します。",
+  "cpg.assignHint.ath": "選手は一度フォローします。今日は選んだ曜日にその日のワークアウトを表示します。",
+  "cpg.assignHint": "クライアントは一度フォローします。今日は選んだ曜日にその日のワークアウトを表示します。",
   "cpg.assignAll": "すべてのクライアント（{count}）",
   "cpg.assignPick": "クライアントを選ぶ",
   "cpg.assignTeam": "チーム：{name}（{count}）",
   "cpg.assignGo": "プログラムを割り当て",
-  "cpg.assignDone": { other: "{count}人に割り当てました。スキップ {skip}。" },
+  "cpg.assignDone.ath": { other: "{count}人の選手に割り当てました。スキップ {skip}。" },
+  "cpg.assignDone": { other: "{count}人のクライアントに割り当てました。スキップ {skip}。" },
   "cpg.assignCalendar": "カレンダーを見る",
   "cpg.assignTakeBack": "取り下げる",
   "cpg.assignTaken": "プログラムを取り下げました。",
@@ -866,6 +902,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Todos os atletas ({count})",
+  "cpg.assignPick.ath": "Escolher atletas",
+  "cpg.cal.noAssign.ath": "Atribua este programa a uma equipe ou a atletas para ver o calendário.",
   "cpg.title": "Programas de treinadores",
   "cpg.intro":
     "Programas feitos por treinadores e personal trainers. Os dias de cada um vão para as suas rotinas, e a sua própria progressão escolhe as cargas.",
@@ -966,12 +1005,14 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Compra verificada",
   "cpg.assign": "Atribuir a…",
   "cpg.assignTitle": "Atribuir {title}",
-  "cpg.assignHint": "Os atletas seguem uma vez. Hoje mostra o treino de cada dia nos dias da semana que você escolher.",
+  "cpg.assignHint.ath": "Os atletas seguem uma vez. Hoje mostra o treino de cada dia nos dias da semana que você escolher.",
+  "cpg.assignHint": "Os alunos seguem uma vez. Hoje mostra o treino de cada dia nos dias da semana que você escolher.",
   "cpg.assignAll": "Todos os clientes ({count})",
   "cpg.assignPick": "Escolher clientes",
   "cpg.assignTeam": "Equipe: {name} ({count})",
   "cpg.assignGo": "Atribuir programa",
-  "cpg.assignDone": { one: "Atribuído a {count} atleta. Ignorados: {skip}.", other: "Atribuído a {count} atletas. Ignorados: {skip}." },
+  "cpg.assignDone.ath": { one: "Atribuído a {count} atleta. Ignorados: {skip}.", other: "Atribuído a {count} atletas. Ignorados: {skip}." },
+  "cpg.assignDone": { one: "Atribuído a {count} aluno. Ignorados: {skip}.", other: "Atribuído a {count} alunos. Ignorados: {skip}." },
   "cpg.assignCalendar": "Ver calendário",
   "cpg.assignTakeBack": "Retirar",
   "cpg.assignTaken": "Programa retirado.",
@@ -1010,6 +1051,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "모든 선수 ({count})",
+  "cpg.assignPick.ath": "선수 선택",
+  "cpg.cal.noAssign.ath": "캘린더를 보려면 이 프로그램을 팀이나 선수에게 배정하세요.",
   "cpg.title": "코치 프로그램",
   "cpg.intro":
     "코치와 퍼스널 트레이너가 만든 프로그램이에요. 각 프로그램의 운동일은 내 루틴에 저장되고, 무게는 내 진행 상황에 맞춰 정해져요.",
@@ -1102,12 +1146,14 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "구매 확인됨",
   "cpg.assign": "배정…",
   "cpg.assignTitle": "{title} 배정",
-  "cpg.assignHint": "선수는 한 번 따라가요. 오늘은 선택한 요일에 그날 운동을 보여 줘요.",
+  "cpg.assignHint.ath": "선수는 한 번 따라가요. 오늘은 선택한 요일에 그날 운동을 보여 줘요.",
+  "cpg.assignHint": "회원은 한 번 따라가요. 오늘은 선택한 요일에 그날 운동을 보여 줘요.",
   "cpg.assignAll": "모든 클라이언트 ({count})",
   "cpg.assignPick": "클라이언트 고르기",
   "cpg.assignTeam": "팀: {name} ({count})",
   "cpg.assignGo": "프로그램 배정",
-  "cpg.assignDone": { other: "{count}명에게 배정했어요. 건너뜀 {skip}." },
+  "cpg.assignDone.ath": { other: "선수 {count}명에게 배정했어요. 건너뜀 {skip}." },
+  "cpg.assignDone": { other: "회원 {count}명에게 배정했어요. 건너뜀 {skip}." },
   "cpg.assignCalendar": "달력 보기",
   "cpg.assignTakeBack": "거두기",
   "cpg.assignTaken": "프로그램을 거뒀어요.",
@@ -1143,6 +1189,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Tüm sporcular ({count})",
+  "cpg.assignPick.ath": "Sporcu seç",
+  "cpg.cal.noAssign.ath": "Takvimi görmek için bu programı bir takıma veya sporculara ata.",
   "cpg.title": "Koç programları",
   "cpg.intro":
     "Koçların ve kişisel antrenörlerin hazırladığı programlar. Her programın günleri rutinlerine kaydedilir, ağırlıkları kendi ilerlemen belirler.",
@@ -1239,12 +1288,14 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Doğrulanmış satın alma",
   "cpg.assign": "Ata…",
   "cpg.assignTitle": "{title} ata",
-  "cpg.assignHint": "Sporcular bir kez takip eder. Bugün, seçtiğiniz haftanın günlerinde o günün antrenmanını gösterir.",
+  "cpg.assignHint.ath": "Sporcular bir kez takip eder. Bugün, seçtiğiniz haftanın günlerinde o günün antrenmanını gösterir.",
+  "cpg.assignHint": "Danışanlar bir kez takip eder. Bugün, seçtiğiniz haftanın günlerinde o günün antrenmanını gösterir.",
   "cpg.assignAll": "Tüm danışanlar ({count})",
   "cpg.assignPick": "Danışan seç",
   "cpg.assignTeam": "Takım: {name} ({count})",
   "cpg.assignGo": "Programı ata",
-  "cpg.assignDone": { one: "{count} sporcuya atandı. Atlanan: {skip}.", other: "{count} sporcuya atandı. Atlanan: {skip}." },
+  "cpg.assignDone.ath": { one: "{count} sporcuya atandı. Atlanan: {skip}.", other: "{count} sporcuya atandı. Atlanan: {skip}." },
+  "cpg.assignDone": { one: "{count} danışana atandı. Atlanan: {skip}.", other: "{count} danışana atandı. Atlanan: {skip}." },
   "cpg.assignCalendar": "Takvimi gör",
   "cpg.assignTakeBack": "Geri al",
   "cpg.assignTaken": "Program geri alındı.",
@@ -1283,6 +1334,9 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "cpg.assignAll.ath": "Wszyscy zawodnicy ({count})",
+  "cpg.assignPick.ath": "Wybierz zawodników",
+  "cpg.cal.noAssign.ath": "Przypisz ten program do drużyny albo zawodników, żeby zobaczyć kalendarz.",
   "cpg.title": "Programy trenerów",
   "cpg.intro":
     "Programy przygotowane przez trenerów i trenerów personalnych. Dni każdego z nich trafiają do twoich rutyn, a ciężary dobiera twój własny postęp.",
@@ -1406,16 +1460,23 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.rev.verified": "Zweryfikowany zakup",
   "cpg.assign": "Przypisz do…",
   "cpg.assignTitle": "Przypisz {title}",
-  "cpg.assignHint": "Zawodnicy śledzą raz. Dziś pokazuje trening każdego dnia w wybrane dni tygodnia.",
+  "cpg.assignHint.ath": "Zawodnicy śledzą raz. Dziś pokazuje trening każdego dnia w wybrane dni tygodnia.",
+  "cpg.assignHint": "Klienci śledzą raz. Dziś pokazuje trening każdego dnia w wybrane dni tygodnia.",
   "cpg.assignAll": "Wszyscy klienci ({count})",
   "cpg.assignPick": "Wybierz klientów",
   "cpg.assignTeam": "Drużyna: {name} ({count})",
   "cpg.assignGo": "Przypisz program",
-  "cpg.assignDone": {
+  "cpg.assignDone.ath": {
     one: "Przypisano do {count} zawodnika. Pominięto: {skip}.",
     few: "Przypisano do {count} zawodników. Pominięto: {skip}.",
     many: "Przypisano do {count} zawodników. Pominięto: {skip}.",
     other: "Przypisano do {count} zawodników. Pominięto: {skip}.",
+  },
+  "cpg.assignDone": {
+    one: "Przypisano do {count} klienta. Pominięto: {skip}.",
+    few: "Przypisano do {count} klientów. Pominięto: {skip}.",
+    many: "Przypisano do {count} klientów. Pominięto: {skip}.",
+    other: "Przypisano do {count} klientów. Pominięto: {skip}.",
   },
   "cpg.assignCalendar": "Zobacz kalendarz",
   "cpg.assignTakeBack": "Cofnij",

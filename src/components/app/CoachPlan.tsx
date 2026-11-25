@@ -12,7 +12,7 @@ import { useAccount } from "@/lib/auth";
 import { manageUrl, openWebPortal, useBilling, webBilling } from "@/lib/billing";
 import { buyCoach, loadCoachOffers, useCoachBilling, type CoachBuyResult, type CoachOffer } from "@/lib/coachBilling";
 import { clientLimit, higherTier, tierRank, UNLIMITED_CLIENTS, type CoachTier, type PaidCoachTier } from "@/lib/coachPlans";
-import { date, t } from "@/lib/i18n";
+import { date, t, tFor } from "@/lib/i18n";
 import { haptic, isNative, oops } from "@/lib/juice";
 import { SITE_URL } from "@/lib/site";
 import type { CoachPlanInfo } from "@/lib/trainer";
@@ -29,7 +29,18 @@ export function effectivePlan(plan: CoachPlanInfo, storeTier: CoachTier | undefi
   return { tier, limit: Math.max(plan.limit, clientLimit(tier, plan.limits)) };
 }
 
-export function CoachPlanCard({ plan, onChange, paid = false }: { plan: CoachPlanInfo; onChange: () => void; paid?: boolean }) {
+export function CoachPlanCard({
+  plan,
+  onChange,
+  paid = false,
+  /** Sports coach: the plan's count and the way up say athlete. Personal trainer and physio keep client. */
+  athlete = false,
+}: {
+  plan: CoachPlanInfo;
+  onChange: () => void;
+  paid?: boolean;
+  athlete?: boolean;
+}) {
   const storeTier = useBilling((s) => s.coachTier);
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState<string | null>(paid ? t("cpl.paid") : null);
@@ -74,7 +85,9 @@ export function CoachPlanCard({ plan, onChange, paid = false }: { plan: CoachPla
         <span className="text-sm font-semibold text-accent">{school ? t("cpl.tier.school") : tierName(tier)}</span>
       </div>
       <p className="num mt-1 text-sm">
-        {unlimited ? t("cpl.countNoLimit", { count: plan.clients }) : t("cpl.count", { count: plan.clients, limit })}
+        {unlimited
+          ? tFor(athlete, "cpl.countNoLimit", { count: plan.clients })
+          : tFor(athlete, "cpl.count", { count: plan.clients, limit })}
       </p>
       {!unlimited && (
         <div
@@ -83,7 +96,7 @@ export function CoachPlanCard({ plan, onChange, paid = false }: { plan: CoachPla
           aria-valuemin={0}
           aria-valuemax={limit}
           aria-valuenow={Math.min(plan.clients, limit)}
-          aria-label={t("cpl.count", { count: plan.clients, limit })}
+          aria-label={tFor(athlete, "cpl.count", { count: plan.clients, limit })}
         >
           <div
             className="h-full rounded-full"
@@ -94,15 +107,15 @@ export function CoachPlanCard({ plan, onChange, paid = false }: { plan: CoachPla
       {/* What to do, not just the number (AGENTS.md "Action over stats"). */}
       <p className="mt-2 text-sm text-muted">
         {school
-          ? t("cpl.school", { limit })
+          ? tFor(athlete, "cpl.school", { limit })
           : grace
             ? t("cpl.grace", { limit, date: date(grace, { day: "numeric", month: "long", year: "numeric" }) })
             : over
-              ? t("cpl.over")
+              ? tFor(athlete, "cpl.over")
               : full
-                ? t("cpl.full")
+                ? tFor(athlete, "cpl.full")
                 : unlimited
-                  ? t("cpl.free")
+                  ? tFor(athlete, "cpl.free")
                   : t("cpl.left", { left: limit - plan.clients })}
       </p>
       {!school && tier !== "coachPlus" && (
@@ -116,7 +129,7 @@ export function CoachPlanCard({ plan, onChange, paid = false }: { plan: CoachPla
           {note}
         </p>
       )}
-      <PlansSheet open={open} onClose={() => setOpen(false)} plan={plan} tier={tier} onDone={done} />
+      <PlansSheet open={open} onClose={() => setOpen(false)} plan={plan} tier={tier} athlete={athlete} onDone={done} />
     </section>
   );
 }
@@ -141,12 +154,14 @@ function PlansSheet({
   onClose,
   plan,
   tier,
+  athlete,
   onDone,
 }: {
   open: boolean;
   onClose: () => void;
   plan: CoachPlanInfo;
   tier: CoachTier;
+  athlete: boolean;
   onDone: (r: CoachBuyResult, tier: PaidCoachTier) => void;
 }) {
   const { offers, busy, error, notForSale } = useCoachBilling();
@@ -169,7 +184,7 @@ function PlansSheet({
   };
   return (
     <Sheet open={open} onClose={onClose} title={t("cpl.sheetTitle")}>
-      <p className="text-sm text-muted">{t("cpl.sheetLead", { pro: plan.limits.pro })}</p>
+      <p className="text-sm text-muted">{tFor(athlete, "cpl.sheetLead", { pro: plan.limits.pro })}</p>
       {(["coach", "coachPlus"] as PaidCoachTier[]).map((tr) => {
         const mine = tier === tr;
         const below = tierRank(tr) < tierRank(tier);
@@ -182,9 +197,11 @@ function PlansSheet({
               {mine && <span className="text-xs font-semibold text-accent">{t("cpl.current")}</span>}
             </div>
             <p className="mt-1 text-sm font-semibold">
-              {tr === "coachPlus" ? t("cpl.clients.coachPlus") : t("cpl.clients.coach", { limit })}
+              {tr === "coachPlus" ? tFor(athlete, "cpl.clients.coachPlus") : tFor(athlete, "cpl.clients.coach", { limit })}
             </p>
-            <p className="mt-1 text-sm text-muted">{t(tr === "coachPlus" ? "cpl.what.coachPlus" : "cpl.what.coach")}</p>
+            <p className="mt-1 text-sm text-muted">
+              {tFor(athlete, tr === "coachPlus" ? "cpl.what.coachPlus" : "cpl.what.coach")}
+            </p>
             {!mine && !below && (
               <div className="mt-3 space-y-2">
                 {choices.map((o) => (
@@ -210,7 +227,7 @@ function PlansSheet({
           </section>
         );
       })}
-      {notForSale && !offers?.length && <p className="mt-4 text-sm text-muted">{t("cpl.notYet")}</p>}
+      {notForSale && !offers?.length && <p className="mt-4 text-sm text-muted">{tFor(athlete, "cpl.notYet")}</p>}
       {!notForSale && !offers?.length && (
         <div className="mt-4">
           <p className="text-sm text-muted">{t("cpl.unavailable")}</p>
@@ -220,7 +237,7 @@ function PlansSheet({
           </Button>
         </div>
       )}
-      <p className="mt-4 text-sm">{t("cpl.free")}</p>
+      <p className="mt-4 text-sm">{tFor(athlete, "cpl.free")}</p>
       {tier === "pro" && <p className="mt-2 text-xs text-muted">{otherBill ?? t("cpl.replace")}</p>}
       <p className="mt-2 text-xs text-faint">
         {t(store === "web" ? "pro.legal.web" : store === "appstore" ? "pro.legal.appstore" : "pro.legal.play")}

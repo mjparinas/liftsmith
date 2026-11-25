@@ -126,19 +126,32 @@ describe("desktop layout", () => {
     expect(within(nav).getByRole("button", { name: "Settings" })).toHaveAttribute("aria-current", "page");
   });
 
-  it("shows Coaching only to accounts that coach or are coached, and then Settings drops its row", async () => {
+  it("shows the coaching item only for a trainer, coach or physio, named and icon'd for that role", async () => {
     const user = userEvent.setup();
     await onboard(user);
     const nav = screen.getByRole("navigation", { name: "Main" });
-    expect(within(nav).queryByRole("button", { name: "Coaching" })).toBeNull();
+    expect(within(nav).queryByRole("button", { name: "Personal trainer" })).toBeNull();
+    expect(within(nav).queryByRole("button", { name: "Coach" })).toBeNull();
+    expect(within(nav).queryByRole("button", { name: "Physio" })).toBeNull();
     await user.click(within(nav).getByRole("button", { name: "Settings" }));
-    expect(screen.queryByRole("button", { name: /^Coaching/ })).toBeNull();
+    // A client, or a coach who has not picked how they work, still reaches it from Settings.
+    expect(screen.getByRole("button", { name: /^Coaching/ })).toBeInTheDocument();
 
-    act(() => useCoachNotes.setState({ coaching: true, unread: [{ id: "c1", count: 2, name: "Ana" }] }));
-    expect(within(nav).getByRole("button", { name: "Coaching, 2 new messages" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Coaching/ })).toHaveLength(1);
-    await user.click(within(nav).getByRole("button", { name: /Coaching/ }));
-    expect(within(nav).getByRole("button", { name: /Coaching/ })).toHaveAttribute("aria-current", "page");
+    const who = { coaches: [], clients: 2, role: "trainer" as const };
+    act(() => useCoachNotes.setState({ coaching: true, who, unread: [{ id: "c1", count: 2, name: "Ana" }] }));
+    const trainer = within(nav).getByRole("button", { name: "Personal trainer, 2 new messages" });
+    expect(trainer.querySelector("svg path")?.getAttribute("d")).toContain("M6.5 6.5v11");
+    expect(screen.getAllByRole("button", { name: /Personal trainer|Coaching/ })).toHaveLength(1);
+    await user.click(trainer);
+    expect(within(nav).getByRole("button", { name: /Personal trainer/ })).toHaveAttribute("aria-current", "page");
+
+    act(() => useCoachNotes.setState({ who: { ...who, role: "coach" }, unread: [] }));
+    const coach = within(nav).getByRole("button", { name: "Coach" });
+    expect(coach.querySelector("svg path")?.getAttribute("d")).toContain("M5 21V4");
+
+    act(() => useCoachNotes.setState({ who: { ...who, role: "physio" } }));
+    const physio = within(nav).getByRole("button", { name: "Physio" });
+    expect(physio.querySelector("svg path")?.getAttribute("d")).toContain("M18.4 11.3");
   });
 
   it("has Programs and Tools as screens of their own, with their other links gone on desktop", async () => {

@@ -22,7 +22,7 @@ import { dayKey as calendarDay } from "./dashboard";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { targetFor, trainedDays } from "./foodTargets";
-import { t } from "./i18n";
+import { t, tFor } from "./i18n";
 import { injuries, PART_LABEL } from "./injury";
 import { stalls, type Stall } from "./insights";
 import { track } from "./net";
@@ -358,17 +358,19 @@ export const inviteUrl = (code: string, base = SITE_URL) => `${base.replace(/\/$
 /** The code in a pasted invite link, or the typed code itself, tidied. Empty when it can't be one. */
 export const codeFrom = (text: string) => coachCode(text);
 
-export function trainerError(e: unknown): string {
+/** `athlete` is a sports coach's wording (client for a personal trainer or physio). */
+export function trainerError(e: unknown, athlete = false): string {
   if (e instanceof AuthError) {
     if (e.message === "offline") return t("trn.err.offline");
     if (e.message === "slow") return t("trn.err.slow");
     if (e.message === "unknown") return t("trn.err.unknown");
-    if (e.message === "self") return t("trn.err.self");
+    if (e.message === "self") return tFor(athlete, "trn.err.self");
     if (e.message === "full") return t("trn.err.full");
     if (e.message === "coachFull") return t("trn.err.coachFull");
+    if (e.message === "plansFull") return tFor(athlete, "trn.err.plansFull");
     if (e.message === "taken") return t("trn.err.taken");
     if (e.message === "slotsFull") return t("trn.err.slotsFull");
-    if (e.message === "gone") return t("trn.err.gone");
+    if (e.message === "gone") return tFor(athlete, "trn.err.gone");
   }
   return t("trn.err.failed");
 }
@@ -1040,8 +1042,8 @@ interface NotesState {
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
   seen: string[];
   /**
-   * This account coaches (picked a role, has an invite out or a client) or is coached: the desktop sidebar shows
-   * Coaching only then (docs/decisions/desktop-layout.md). Kept on the device so it shows before the first load.
+   * This account coaches (picked a role, has an invite out or a client) or is coached. The sidebar uses `who.role`
+   * instead (docs/decisions/desktop-layout.md). Kept on the device so it shows before the first load.
    */
   coaching: boolean;
   /** Who this lifter trains with and how many clients they coach, for the badge by their name (coachBadge). */
@@ -1078,6 +1080,11 @@ export interface Who {
    * `clients` still says so once someone has joined.
    */
   self?: boolean;
+  /**
+   * How you work, for the sidebar and the Settings row (2026-11-24). Missing on a cache from before that, until the
+   * next overview.
+   */
+  role?: Role | null;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -1168,6 +1175,7 @@ export function keepNotes(
     coaches: o.coaches.map((c) => ({ id: c.id, name: c.name, ...(c.role ? { role: c.role } : {}) })),
     clients: o.clients?.length ?? 0,
     self: !!(o.coach || o.invite || (o.clients?.length ?? 0) > 0 || o.role),
+    role: o.role ?? null,
   };
   writeJson(WHO, who);
   const plans: ShownPlan[] = (o.plans ?? []).map((p) => {
@@ -1270,7 +1278,7 @@ export function coachBadge(who: Who): string | null {
         ? t("trn.badge.physio", { name })
         : t("trn.badge.coach", { name });
   }
-  return who.clients > 0 ? t("trn.badge.coaching", { count: who.clients }) : null;
+  return who.clients > 0 ? tFor(who.role === "coach", "trn.badge.coaching", { count: who.clients }) : null;
 }
 
 let lastLook = 0;

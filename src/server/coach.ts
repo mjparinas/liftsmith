@@ -371,7 +371,8 @@ export async function joinCoach(
   if (!(await hasRoom(coachId, now))) {
     // Tell the coach once a day, so they can make room or move to a coach plan (docs/decisions/money.md "Coach plans").
     if (await rateLimit(`coachFull:${coachId}`, 1, 86_400_000).catch(() => false)) {
-      await notifyCoach(coachId, "coachFull", { name: await nameOf(clientId) }, "#/trainer");
+      const role = await roleOf(coachId);
+      await notifyCoach(coachId, role === "coach" ? "coachFullAthlete" : "coachFull", { name: await nameOf(clientId) }, "#/trainer");
     }
     return { error: "coachFull" };
   }

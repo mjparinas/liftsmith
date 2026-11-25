@@ -7,6 +7,8 @@
 // - a personal trainer or physio gets their tools as tabs; a sports coach (role coach, or school-only) gets Programs first;
 // - roles hide irrelevant tools (2026-11-24), not only labels; Messages stay for every persona;
 // - someone who is none of these picks how they'll use coaching first.
+import type { IconName } from "@/components/app/icons";
+
 import type { TeamsOverview } from "./teams";
 import type { Overview, Role } from "./trainer";
 
@@ -55,6 +57,22 @@ export function coachingMode(o: O | null, teams: T | null, picked: Picked = null
     client: (o?.coaches.length ?? 0) > 0,
     athlete: (teams?.joined.length ?? 0) > 0,
   };
+}
+
+/** Sidebar and Settings row: the icon for each way of working. */
+const NAV_ICON: Record<Role, IconName> = {
+  trainer: "dumbbell",
+  coach: "flag",
+  physio: "bandage",
+};
+
+/**
+ * The main navigation's coaching item. Only an account that is a personal trainer, a sports coach or a physio
+ * (How you work). A client, and a coach who has not picked yet, get no item here.
+ */
+export function coachingNav(role: Role | null | undefined): { role: Role; icon: IconName } | null {
+  if (role !== "trainer" && role !== "coach" && role !== "physio") return null;
+  return { role, icon: NAV_ICON[role] };
 }
 
 /** Sports / team coach (not personal trainer or physio). School-only path counts as sports until they pick another role. */

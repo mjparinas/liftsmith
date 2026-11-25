@@ -17,7 +17,7 @@ import { useLive, useLivePoll } from "@/lib/chatLive";
 import { savePendingCoach } from "@/lib/coachInvite";
 import { coachingMode, coachingView, isSportsCoach, readPicked, savePicked, type CoachTab, type Picked } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
-import { date, t } from "@/lib/i18n";
+import { date, t, tFor } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
 import { liveRead } from "@/lib/liveRead";
@@ -61,7 +61,6 @@ import type { Experience, Goal } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { MyStatusButton, presenceText, StatusDot } from "./ChatStatus";
-import { CoachCalendar } from "./CoachCalendar";
 import { ChatThread } from "./CoachChat";
 import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { CoachGyms } from "./CoachGyms";
@@ -113,10 +112,8 @@ export function CoachHome({
   const [joined, setJoined] = useState<"coach" | "team" | null>(null);
   const teams = useTeams();
   const reload = useCallback(() => {
-    const accountId = useAccount.getState().account?.id;
     // The last copy shows at once; the server's answer replaces it (liveRead.ts).
     liveRead("coach.overview", loadOverview, (o, fresh) => {
-      if (useAccount.getState().account?.id !== accountId) return;
       setData(o);
       if (!fresh) return;
       // Today shows the newest note from a coach; keep it in step with what this screen loaded.
@@ -219,14 +216,11 @@ export function CoachHome({
   return (
     <div className="pb-2">
       <ScreenHeader back={back} kicker={role ? t(`trn.role.${role}`) : undefined} title={screenTitle} />
-      <Button kind="ghost" onClick={() => go("trainer", "calendar-access")}>
-        {t("trn.calendar.access")}
-      </Button>
       <Tabs tabs={view.tabs} tab={view.tab} data={data} sports={sports || role === "coach"} />
       {status}
       <div key={view.tab} className="animate-fade">
-        {view.tab === "clients" && <ClientsPage data={data} onChange={reload} planPaid={planPaid} />}
-        {view.tab === "messages" && <MessagesPage data={data} />}
+        {view.tab === "clients" && <ClientsPage data={data} onChange={reload} planPaid={planPaid} athlete={sports} />}
+        {view.tab === "messages" && <MessagesPage data={data} athlete={sports} />}
         {view.tab === "schedule" && (
           <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={reload} />
         )}
@@ -238,7 +232,6 @@ export function CoachHome({
         )}
         {view.tab === "programs" && (
           <div className="desk-col">
-            <CoachCalendar clients={data.clients} teams={teams.data?.teams ?? []} />
             <CoachPrograms sports={sports || role === "coach"} />
           </div>
         )}
@@ -254,7 +247,7 @@ export function CoachHome({
             </Section>
           </div>
         )}
-        {view.tab === "setup" && <SetupPage data={data} onChange={reload} />}
+        {view.tab === "setup" && <SetupPage data={data} onChange={reload} athlete={sports} />}
         {view.tab === "mine" && (
           <ClientPage data={data} teams={teams.data} code="" team="" coachSide onChange={reloadAll} onJoined={onJoined} />
         )}
@@ -350,9 +343,6 @@ function StartPage({
         <p className="mt-1 text-sm text-muted">{t("trn.start.clientHint")}</p>
         <div className="mt-3">
           <JoinCoach code="" coaches={data.coaches} onChange={onChange} />
-          <Button kind="ghost" onClick={() => go("trainer", "calendar-access")}>
-            {t("trn.calendar.access")}
-          </Button>
         </div>
       </section>
       <button
@@ -446,11 +436,6 @@ function ClientPage({
           </Button>
         )}
       </Section>
-      {!coachSide && (
-        <Button kind="ghost" onClick={() => go("trainer", "calendar-access")}>
-          {t("trn.calendar.access")}
-        </Button>
-      )}
       {/* A client never sees the coach's tools; one quiet way in for someone who starts coaching later. */}
       {!coachSide && (
         <Button kind="quiet" className="mt-6 w-full" onClick={() => go("trainer", "start")}>
@@ -777,7 +762,18 @@ function ProRow() {
 }
 
 /** Clients: the invite, the plan's limit, and every client with their unread messages. */
-function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: () => void; planPaid: boolean }) {
+function ClientsPage({
+  data,
+  onChange,
+  planPaid,
+  athlete,
+}: {
+  data: Overview;
+  onChange: () => void;
+  planPaid: boolean;
+  /** Sports coach, including a school coach who has not picked a role yet. */
+  athlete: boolean;
+}) {
   const [note, setNote] = useState<string | null>(null);
   if (!can("coaching")) return <ProRow />;
   const invite = data.invite;
@@ -790,7 +786,7 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
       onChange();
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   const stop = async () => {
@@ -800,7 +796,7 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
       onChange();
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   const send = async () => {
@@ -812,12 +808,7 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
   };
   return (
     <div className="desk:grid desk:grid-cols-[minmax(0,1fr)_22rem] desk:items-start desk:gap-6">
-      <Section title={t("trn.yourClients")} icon="people">
-        {!!data.clients.length && (
-          <Button kind="ghost" onClick={() => go("trainer", "training-activity")}>
-            {t("trn.calendar.activity")}
-          </Button>
-        )}
+      <Section title={tFor(athlete, "trn.yourClients")} icon="people">
         {data.clients.length ? (
           // Desktop layout: the client list is a grid of cards, so a coach sees more clients at once.
           <ul className="space-y-2 desk:grid desk:grid-cols-2 desk:gap-3 desk:space-y-0">
@@ -851,15 +842,15 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
             })}
           </ul>
         ) : (
-          <p className="card px-4 py-3 text-sm text-muted">{t("trn.noClients")}</p>
+          <p className="card px-4 py-3 text-sm text-muted">{tFor(athlete, "trn.noClients")}</p>
         )}
       </Section>
       <div>
-        <Section title={t("trn.invite")} icon="share">
+        <Section title={tFor(athlete, "trn.invite")} icon="share">
           <div className="card p-4">
             {invite ? (
               <>
-                <p className="text-sm text-muted">{t("trn.inviteHint")}</p>
+                <p className="text-sm text-muted">{tFor(athlete, "trn.inviteHint")}</p>
                 <p
                   className="display num mt-2 text-3xl tracking-widest"
                   aria-label={t("trn.codeIs", { code: invite.code.split("").join(" ") })}
@@ -883,13 +874,13 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
               </>
             ) : (
               <>
-                <p className="text-sm text-muted">{t("trn.inviteNone")}</p>
+                <p className="text-sm text-muted">{tFor(athlete, "trn.inviteNone")}</p>
                 <Button className="mt-3 w-full" icon="plus" onClick={() => void make()}>
                   {t("trn.makeInvite")}
                 </Button>
               </>
             )}
-            <p className="mt-3 text-xs text-muted">{t("trn.proFree")}</p>
+            <p className="mt-3 text-xs text-muted">{tFor(athlete, "trn.proFree")}</p>
             {note && (
               <p className="mt-2 text-sm text-muted" role="status">
                 {note}
@@ -898,7 +889,7 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
           </div>
         </Section>
         {/* How many clients the coach's plan allows, and the way up when it's full (coach plans). */}
-        {data.plan && <CoachPlanCard plan={data.plan} onChange={onChange} paid={planPaid} />}
+        {data.plan && <CoachPlanCard plan={data.plan} onChange={onChange} paid={planPaid} athlete={athlete} />}
       </div>
     </div>
   );
@@ -908,7 +899,7 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
  * Messages: everyone the lifter can message, unread first. On a phone a tap opens the thread; on a desktop the thread
  * opens beside the list.
  */
-function MessagesPage({ data }: { data: Overview }) {
+function MessagesPage({ data, athlete }: { data: Overview; athlete: boolean }) {
   const desktop = useDesktop();
   // Statuses and live unread counts (chatLive.ts), every 20 seconds while this page is open; the overview's until then.
   const me = useAccount((s) => s.account?.id ?? null);
@@ -927,7 +918,7 @@ function MessagesPage({ data }: { data: Overview }) {
     return (
       <div className="card mt-4 px-4 py-6 text-center">
         <p className="font-semibold">{t("trn.msg.noneTitle")}</p>
-        <p className="mt-1 text-sm text-muted">{t("trn.msg.noneBody")}</p>
+        <p className="mt-1 text-sm text-muted">{tFor(athlete, "trn.msg.noneBody")}</p>
       </div>
     );
   return (
@@ -962,7 +953,7 @@ function MessagesPage({ data }: { data: Overview }) {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{name}</span>
                     <span className="block truncate text-xs text-muted">
-                      {p.side === "coach" ? t("trn.msg.yourCoach") : t("trn.client")}
+                      {p.side === "coach" ? t("trn.msg.yourCoach") : tFor(athlete, "trn.client")}
                       {lp && ` · ${lp.typing ? t("trn.typingShort") : presenceText(lp.presence, now)}`}
                     </span>
                   </span>
@@ -984,7 +975,7 @@ function MessagesPage({ data }: { data: Overview }) {
 }
 
 /** Setup: how the coach works, what new clients start with, and alerts. */
-function SetupPage({ data, onChange }: { data: Overview; onChange: () => void }) {
+function SetupPage({ data, onChange, athlete }: { data: Overview; onChange: () => void; athlete: boolean }) {
   const [note, setNote] = useState<string | null>(null);
   if (!can("coaching")) return <ProRow />;
   const alerts = async (on: boolean) => {
@@ -996,18 +987,23 @@ function SetupPage({ data, onChange }: { data: Overview; onChange: () => void })
       onChange();
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   return (
     <div className="desk-cols">
       <RolePick key={data.role ?? ""} saved={data.role ?? null} onChange={onChange} />
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
-      <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
+      <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} athlete={athlete} />
       <CoachGyms />
       <MyReviews />
       <div className="mt-3">
-        <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
+        <SwitchRow
+          label={tFor(athlete, "trn.alerts")}
+          hint={tFor(athlete, "trn.alertsHint")}
+          on={data.alerts ?? true}
+          onChange={(v) => void alerts(v)}
+        />
       </div>
       {note && (
         <p className="mt-2 text-sm text-muted" role="status">
@@ -1081,7 +1077,7 @@ const LEVEL_CHOICES: { id: Experience; key: "setup.exp.new" | "setup.exp.interme
  * questions in setup (Onboarding's coach path) and can change them later in Settings. Tapping the picked chip again
  * leaves that question to the client. Saved on each tap.
  */
-function StartSetup({ setup: saved }: { setup: Setup }) {
+function StartSetup({ setup: saved, athlete }: { setup: Setup; athlete: boolean }) {
   const [setup, setSetup] = useState<Setup>(saved);
   const [note, setNote] = useState<string | null>(null);
   const pick = async (next: Setup) => {
@@ -1089,11 +1085,11 @@ function StartSetup({ setup: saved }: { setup: Setup }) {
     setSetup(next);
     try {
       setSetup(await saveSetup(next));
-      setNote(t("trn.setupSaved"));
+      setNote(tFor(athlete, "trn.setupSaved"));
     } catch (e) {
       oops();
       setSetup(before);
-      setNote(trainerError(e));
+      setNote(trainerError(e, athlete));
     }
   };
   const toggle = <K extends keyof Setup>(key: K, value: Setup[K]) => {
@@ -1105,9 +1101,9 @@ function StartSetup({ setup: saved }: { setup: Setup }) {
   return (
     <section className="card mt-3 p-4" aria-labelledby="trn-setup">
       <p id="trn-setup" className="font-semibold">
-        {t("trn.setupTitle")}
+        {tFor(athlete, "trn.setupTitle")}
       </p>
-      <p className="mt-1 text-sm text-muted">{t("trn.setupHint")}</p>
+      <p className="mt-1 text-sm text-muted">{tFor(athlete, "trn.setupHint")}</p>
       <p className="mt-3 text-sm font-medium" id="trn-setup-goal">
         {t("trn.setupGoal")}
       </p>

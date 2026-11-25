@@ -873,7 +873,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "coach-pages",
         name: "A page for each side",
-        body: "Clients see only their coach: message them in one tap, answer check-ins, book sessions and choose what to share. Coaches get a page for each job, with clients, messages, schedule, check-ins and payments as tabs on the web and on phones.",
+        body: "Clients see only their coach: message them in one tap, answer check-ins, book sessions and choose what to share. A personal trainer or physio gets a page for each job, with clients, messages, schedule, check-ins and payments. A sports coach gets programs, messages and athletes.",
         tier: "both",
         proPart: "Being a client is free; coaching clients is Pro.",
         pro: "coaching",
@@ -917,7 +917,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       },
       {
         id: "coach-assign-program",
-        name: "Assign a season program to clients or a team",
+        name: "Assign a season program to athletes or a team",
         body: "Coaches assign a multi-day program (Upper/Lower, Push/Pull/Legs, or their own) as a weekday standing plan for N weeks. Athletes follow once; Today shows that day's workout. A program calendar shows who has done each day and who hasn't yet — first names only for school teams, never weights.",
         tier: "both",
         proPart: "Following a program is free; assigning one is part of coaching, which is Pro.",

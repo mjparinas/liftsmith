@@ -13,7 +13,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type Keyboard
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { chimeFor, clearUnread } from "@/lib/chatLive";
-import { date, t } from "@/lib/i18n";
+import { date, t, tFor } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { useKeyboardViewport } from "@/lib/keyboard";
 import { useDesktop } from "@/lib/layout";
@@ -27,6 +27,7 @@ import {
   sendMessage,
   sendTyping,
   trainerError,
+  useCoachNotes,
   type Message,
   type ShownPresence,
   type Thread,
@@ -65,6 +66,11 @@ export function mergeMessages(old: readonly Message[], add: readonly Message[]):
   return fresh.length === 0 ? [...old] : [...old, ...fresh].sort((a, b) => a.at - b.at);
 }
 
+/** Either wording means the other person ended the link. */
+function stoppedSharing(msg: string): boolean {
+  return msg === t("trn.err.gone") || msg === t("trn.err.gone.ath");
+}
+
 /**
  * One chat thread. On its own screen on a phone or tablet it fills the visible screen: the header at the top, the send
  * box fixed at the bottom above the tab bar (or on the keyboard while typing), and only the messages scroll between
@@ -73,6 +79,7 @@ export function mergeMessages(old: readonly Message[], add: readonly Message[]):
  * and `dock` fills a chat dock window, whose header the dock draws.
  */
 export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMode }) {
+  const athlete = useCoachNotes((s) => s.who.role) === "coach";
   const me = useAccount((s) => s.account?.id ?? "");
   const [list, setList] = useState<Message[] | null>(null);
   const [name, setName] = useState("");
@@ -154,8 +161,8 @@ export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMod
       ).then(
         () => undefined,
         (e: unknown) => {
-          const msg = trainerError(e);
-          if (msg === t("trn.err.gone")) setGone(true);
+          const msg = trainerError(e, useCoachNotes.getState().who.role === "coach");
+          if (stoppedSharing(msg)) setGone(true);
           setError(msg);
           setList((old) => old ?? []);
         },
@@ -179,8 +186,8 @@ export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMod
       }
       setError(null);
     } catch (e) {
-      const msg = trainerError(e);
-      if (msg === t("trn.err.gone")) setGone(true);
+      const msg = trainerError(e, useCoachNotes.getState().who.role === "coach");
+      if (stoppedSharing(msg)) setGone(true);
     }
   }, [id, load, me, meta]);
 
@@ -317,7 +324,11 @@ export function ChatThread({ id, mode = "screen" }: { id: string; mode?: ChatMod
     return (
       <div className="pb-2">
         {mode === "screen" && <ScreenHeader back={back} title={t("trn.chat")} />}
-        <EmptyState icon="info" title={t("trn.err.gone")} action={<Button onClick={() => go("trainer")}>{t("trn.back")}</Button>} />
+        <EmptyState
+          icon="info"
+          title={tFor(athlete, "trn.err.gone")}
+          action={<Button onClick={() => go("trainer")}>{t("trn.back")}</Button>}
+        />
       </div>
     );
   // The newest message this lifter sent, which carries "Seen" or "Sent" under it.

@@ -315,7 +315,7 @@ export const ja: SiteText = {
       noLimit: "クライアント数の上限なし",
       inPro: "Pro に含まれます",
       orMonthly: "または月{monthly}",
-      free: "クライアントはいつでも無料でトレーニングでき、学校のメールを確認した高校のコーチは Pro が無料です。Coach と Coach Plus では、クライアントからの支払いから{name}が受け取る分はありません（Pro では 2%）。",
+      free: "クライアントはいつでも無料でトレーニングできます。学校のメールを確認した高校のコーチは Pro が無料です。Coach と Coach Plus では、パーソナルトレーニングのクライアントからの支払いから{name}が受け取る分はありません（Pro では 2%）。",
       cta: "コーチ向け Liftsmith",
     },
   },
