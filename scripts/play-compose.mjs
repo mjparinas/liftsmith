@@ -7,6 +7,8 @@
 //   chromebook/NN-name.jpg 1920×1080 (16:9 landscape, Chromebook screenshots)
 //   feature-graphic.png   1024×500
 //   phone-<lang>/NN-name.jpg the phone shots for a translated listing, from store/play/raw/<lang>/
+// And App Store Connect iPhone 6.1"/6.3" shots (1179×2556) in store/appstore/iphone-6.1/ — same captions,
+// taller canvas so nothing is padded or cover-cropped from the Play set.
 // Captions live in SHOTS below and in docs/PLAY_LISTING.md; keep them the same. The translated captions live
 // in play-captions.json and docs/PLAY_LISTING_TRANSLATIONS.md (playListing.test.ts checks they match).
 //   node scripts/play-compose.mjs                   # English, plus every language whose raw shots exist
@@ -60,20 +62,29 @@ const TOKENS = `
   .grad { background:linear-gradient(100deg,#5b9cff,#9b86ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
 `;
 
-function frameHtml(img, title, sub, { tablet = false, pos = "top", lang = "en" } = {}) {
-  const w = tablet ? 860 : 800;
+function frameHtml(img, title, sub, { tablet = false, pos = "top", lang = "en", tall = false } = {}) {
+  // tall = App Store iPhone 6.1"/6.3" (1179×2556): same look as Play, extra height under the phone bleed.
+  const w = tall ? 900 : tablet ? 860 : 800;
+  const capPad = tall ? 56 : 72;
+  const capTop = tall ? 100 : 110;
+  const h1 = tall ? 60 : 68;
+  const subSize = tall ? 30 : 36;
+  const devTop = tall ? 460 : tablet ? 470 : 500;
+  const winH = tall ? 2000 : tablet ? 1500 : 1470;
+  const radius = tall ? 58 : tablet ? 44 : 64;
+  const winRadius = tall ? 46 : tablet ? 28 : 50;
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><style>${TOKENS}
     :lang(ja) body { font-family:"Inter","Roboto","Hiragino Sans","Noto Sans CJK JP","Noto Sans JP","Yu Gothic",system-ui,sans-serif; }
     :lang(ja) h1, :lang(ja) p { line-break:strict; word-break:auto-phrase; }
     :lang(ko) body { font-family:"Inter","Roboto","Apple SD Gothic Neo","Noto Sans CJK KR","Noto Sans KR",system-ui,sans-serif; }
     :lang(ko) h1, :lang(ko) p { word-break:keep-all; }
-    .cap { position:absolute; left:72px; right:72px; top:110px; text-align:center; }
-    h1 { font-size:68px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; }
-    p { margin-top:26px; font-size:36px; line-height:1.3; color:var(--muted); }
-    .dev { position:absolute; left:50%; top:${tablet ? 470 : 500}px; width:${w}px; transform:translateX(-50%);
-      border-radius:${tablet ? 44 : 64}px; padding:${tablet ? 18 : 16}px; background:linear-gradient(160deg,#2a3443,#121821);
+    .cap { position:absolute; left:${capPad}px; right:${capPad}px; top:${capTop}px; text-align:center; }
+    h1 { font-size:${h1}px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; }
+    p { margin-top:26px; font-size:${subSize}px; line-height:1.3; color:var(--muted); }
+    .dev { position:absolute; left:50%; top:${devTop}px; width:${w}px; transform:translateX(-50%);
+      border-radius:${radius}px; padding:${tablet && !tall ? 18 : 16}px; background:linear-gradient(160deg,#2a3443,#121821);
       box-shadow:0 0 0 2px #3a4656, 0 40px 120px rgba(0,0,0,.6), 0 0 160px rgba(76,141,255,.18); }
-    .win { height:${tablet ? 1500 : 1470}px; overflow:hidden; border-radius:${tablet ? 28 : 50}px; }
+    .win { height:${winH}px; overflow:hidden; border-radius:${winRadius}px; }
     .dev img { display:block; width:100%; height:100%; object-fit:cover; object-position:${pos}; }
   </style></head><body><div class="aurora"></div>
     <div class="cap"><h1>${title}</h1><p>${sub}</p></div>
@@ -165,21 +176,41 @@ for (const [i, [name, title, sub, pos]] of PHONE_SHOTS.entries()) {
     height: 1920,
   });
 }
+// App Store Connect: iPhone 6.1" / 6.3" (1179×2556). Same raw screens, native tall frame — never resize Play JPGs.
+const ASC = "store/appstore/iphone-6.1";
+for (const [i, [name, title, sub, pos]] of PHONE_SHOTS.entries()) {
+  await render(frameHtml(url(`${RAW}/${name}.png`), title, sub, { pos, tall: true }), `${ASC}/${n(i)}-${name}.jpg`, {
+    width: 1179,
+    height: 2556,
+  });
+}
 for (const [i, [name, title, sub]] of TABLET_SHOTS.entries()) {
-  const html = frameHtml(url(`${RAW}/${name}.png`), title, sub, { tablet: true });
+  const raw = `${RAW}/${name}.png`;
+  if (!fs.existsSync(raw)) {
+    console.log(`  skip tablet ${name} (no raw — finish play-capture.mjs)`);
+    continue;
+  }
+  const html = frameHtml(url(raw), title, sub, { tablet: true });
   const base = name.replace(/-tablet$/, "");
   await render(html, `${ROOT}/tablet-7/${n(i)}-${base}.jpg`, { width: 1080, height: 1920 });
   await render(html, `${ROOT}/tablet-10/${n(i)}-${base}.jpg`, { width: 1080, height: 1920, scale: 4 / 3 });
 }
 for (const [i, [name, title, sub]] of CHROMEBOOK_SHOTS.entries()) {
-  await render(desktopHtml(url(`${RAW}/${name}.png`), title, sub), `${ROOT}/chromebook/${n(i)}-${name.replace(/-desktop$/, "")}.jpg`, {
+  const raw = `${RAW}/${name}.png`;
+  if (!fs.existsSync(raw)) {
+    console.log(`  skip chromebook ${name.replace(/-desktop$/, "")} (no raw — finish play-capture.mjs)`);
+    continue;
+  }
+  await render(desktopHtml(url(raw), title, sub), `${ROOT}/chromebook/${n(i)}-${name.replace(/-desktop$/, "")}.jpg`, {
     width: 1920,
     height: 1080,
   });
 }
-const icon = fs.existsSync(`${ROOT}/icon-512.png`) ? `${ROOT}/icon-512.png` : "public/icon.svg";
-await render(featureHtml(url(icon), [url(`${RAW}/today.png`), url(`${RAW}/workout.png`)]), `${ROOT}/feature-graphic.png`, {
-  width: 1024,
-  height: 500,
-});
+if (fs.existsSync(`${RAW}/today.png`) && fs.existsSync(`${RAW}/workout.png`)) {
+  const icon = fs.existsSync(`${ROOT}/icon-512.png`) ? `${ROOT}/icon-512.png` : "public/icon.svg";
+  await render(featureHtml(url(icon), [url(`${RAW}/today.png`), url(`${RAW}/workout.png`)]), `${ROOT}/feature-graphic.png`, {
+    width: 1024,
+    height: 500,
+  });
+}
 await browser.close();
