@@ -23,6 +23,7 @@ import { filledFaqs, siteVars } from "@/locales/site/vars";
 // The words live in src/locales/site; every name comes from BRAND (src/lib/brand.ts), so a rename is one line.
 // Screenshots are real: scripts/site-screenshots.mjs drives the app and writes public/screens/ (English for now).
 // Calls to action carry data-cta, which the site beacon counts.
+// Kept short on purpose: hero proof, three differentiators, then pricing — the rest lives on /features/.
 
 const name = BRAND.name;
 
@@ -34,12 +35,6 @@ export const HOME_GUIDES = [
   "overhead-press",
   "pull-up",
   "db-row",
-  "romanian-deadlift",
-  "hip-thrust",
-  "lat-pulldown",
-  "bulgarian-split-squat",
-  "lateral-raise",
-  "ab-wheel",
 ] as const;
 
 export function homeMetadata(lang: SiteLang): Metadata {
@@ -55,14 +50,15 @@ export function homeMetadata(lang: SiteLang): Metadata {
   });
 }
 
-/** Each feature's id and screenshot, in the order of the text's feature list. */
+/** Homepage differentiators only (plans, plates, lock-screen rest). Recovery and progress stay in the locale for /features/. */
 const FEATURE_SHOTS = [
-  { id: "plans", shot: "/screens/today.webp" },
-  { id: "workout", shot: "/screens/workout.webp" },
-  { id: "lockscreen", shot: "/screens/rest.webp" },
-  { id: "recovery", shot: "/screens/recovery.webp" },
-  { id: "progress", shot: "/screens/progress.webp" },
-];
+  { id: "plans", shot: "/screens/today.webp", index: 0 },
+  { id: "workout", shot: "/screens/workout.webp", index: 1 },
+  { id: "lockscreen", shot: "/screens/rest.webp", index: 2 },
+] as const;
+
+/** Soft depth without a coloured halo (craft floor: zero-offset coloured glow is decoration). */
+const CTA_SHADOW = "shadow-[0_8px_24px_-12px_rgb(0_0_0/0.55)]";
 
 function Cta({ children, cta, className = "" }: { children: React.ReactNode; cta: string; className?: string }) {
   return (
@@ -70,7 +66,7 @@ function Cta({ children, cta, className = "" }: { children: React.ReactNode; cta
       href={APP_PATH}
       prefetch={false}
       data-cta={cta}
-      className={`press inline-flex min-h-14 items-center justify-center rounded-2xl bg-accent px-7 text-lg font-semibold text-accent-ink shadow-[0_10px_40px_-10px_rgb(76_141_255/0.7)] ${className}`}
+      className={`press inline-flex min-h-14 items-center justify-center rounded-2xl bg-accent px-7 text-lg font-semibold text-accent-ink ${CTA_SHADOW} ${className}`}
     >
       {children}
     </Link>
@@ -91,16 +87,10 @@ function Ghost({ href, children, cta }: { href: string; children: React.ReactNod
 
 function Phone({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
   return (
-    <div
-      className={`relative rounded-[2.4rem] border border-[#2a3442] bg-[#0b0f15] p-2 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8),0_0_0_1px_rgb(255_255_255/0.03)] ${className}`}
-    >
+    <div className={`relative rounded-[2.4rem] border border-line bg-bg p-2 shadow-[0_20px_50px_-24px_rgb(0_0_0/0.75)] ${className}`}>
       <Screenshot src={src} alt={alt} sizes="(min-width: 1024px) 300px, 70vw" className="h-auto w-full rounded-[2rem]" />
     </div>
   );
-}
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-xs font-semibold tracking-[0.18em] text-accent uppercase">{children}</p>;
 }
 
 function Check() {
@@ -108,6 +98,37 @@ function Check() {
     <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden className="mt-0.5 shrink-0 text-good">
       <path fill="currentColor" d="M8.2 14.6 3.9 10.3l1.4-1.4 2.9 2.9 6.5-6.5 1.4 1.4z" />
     </svg>
+  );
+}
+
+function HeroActions({
+  cta,
+  checks,
+  demos,
+  vars,
+}: {
+  cta: string;
+  checks: readonly string[];
+  demos: string;
+  vars: ReturnType<typeof siteVars>;
+}) {
+  return (
+    <>
+      <Cta cta="hero">{cta}</Cta>
+      <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
+        {checks.map((c) => (
+          <li key={c} className="flex gap-1.5">
+            <Check />
+            {fill(c, vars)}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-sm text-muted">
+        <a href="#demos" data-cta="hero-demos" className="font-semibold text-ink underline underline-offset-4">
+          {demos}
+        </a>
+      </p>
+    </>
   );
 }
 
@@ -119,10 +140,11 @@ export function HomeView({ lang }: { lang: SiteLang }) {
   const vars = siteVars(lang);
   const guideNames = exerciseNames(lang, HOME_GUIDES);
   const labels = muscleLabels(lang);
-  const features = h.features.items.map((f, i) => ({ ...f, ...FEATURE_SHOTS[i]! }));
-  const faqs = filledFaqs(t.faqs, vars);
-  const quotes = visibleQuotes();
+  const features = FEATURE_SHOTS.map((shot) => ({ ...h.features.items[shot.index]!, ...shot }));
+  // Real quotes only on the homepage — samples stay out of the social-proof frame (critique P2).
+  const quotes = visibleQuotes().filter((q) => !q.sample);
   const url = `${SITE_URL}${localPath(lang, "/")}`;
+  const faqs = filledFaqs(t.faqs, vars);
   const jsonLd = [
     appJsonLd({ url, description: fill(h.description, vars), lang, offers: appOffers(`${SITE_URL}${localPath(lang, "/pricing/")}`) }),
     {
@@ -142,22 +164,24 @@ export function HomeView({ lang }: { lang: SiteLang }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SiteHeader lang={lang} />
       <main className="overflow-x-clip">
-        {/* Hero */}
+        {/* Hero: brand voice + product proof + one convert path */}
         <section className="relative">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 -top-40 h-[640px] bg-[radial-gradient(ellipse_at_70%_30%,rgb(76_141_255/0.18),transparent_60%)]"
+            className="pointer-events-none absolute inset-x-0 -top-40 h-[640px] bg-[radial-gradient(ellipse_at_70%_30%,rgb(76_141_255/0.1),transparent_60%)]"
           />
-          {/* Phones: headline, then the lifter, then the buttons. Wide screens: text left, lifter right. */}
           <div className="relative mx-auto grid max-w-6xl gap-x-12 gap-y-8 px-4 pt-10 pb-14 lg:grid-cols-[1fr_1.05fr] lg:grid-rows-[auto_1fr] lg:pt-16">
-            <div className="lg:self-end">
-              <Eyebrow>{h.eyebrow}</Eyebrow>
-              <h1 className="mt-4 text-[2.6rem] leading-[1.05] font-bold tracking-tight text-balance sm:text-6xl">
-                {h.h1a} <span className="bg-gradient-to-r from-accent to-holo bg-clip-text text-transparent">{h.h1b}</span>
+            <div className="order-1 lg:col-start-1 lg:row-start-1 lg:self-end">
+              <h1 className="text-[2.6rem] leading-[1.05] font-bold tracking-tight text-balance sm:text-6xl">
+                {h.h1a} <span className="text-accent">{h.h1b}</span>
               </h1>
               <p className="mt-5 max-w-xl text-lg text-muted sm:text-xl">{fill(h.lede, vars)}</p>
             </div>
-            <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+            {/* Phones: CTA before the figure (order-2) so convert stays in the first viewport. */}
+            <div className="order-2 lg:order-none lg:col-start-1 lg:row-start-2">
+              <HeroActions cta={h.cta} checks={h.checks} demos={h.demosButton} vars={vars} />
+            </div>
+            <div className="order-3 lg:order-none lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
               <HeroLift
                 labels={labels}
                 plates={HERO_PROGRAM.map((s) => perSide(s.kg))}
@@ -169,34 +193,17 @@ export function HomeView({ lang }: { lang: SiteLang }) {
                 locale={lang === "en" ? "en-US" : lang}
               />
             </div>
-            <div>
-              <div className="flex flex-wrap gap-3">
-                <Cta cta="hero">{h.cta}</Cta>
-                <Ghost href="#demos" cta="hero-demos">
-                  {h.demosButton}
-                </Ghost>
-              </div>
-              <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
-                {h.checks.map((c) => (
-                  <li key={c} className="flex gap-1.5">
-                    <Check />
-                    {fill(c, vars)}
-                  </li>
-                ))}
-              </ul>
-              <StoreBadges className="mt-7" place="hero" lang={lang} />
-            </div>
           </div>
         </section>
 
-        {/* Facts strip: things that are true of the app, not user counts we don't have yet */}
-        <section aria-label={h.glance} className="border-y border-line bg-surface/50">
-          <dl className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-8 text-center sm:grid-cols-4">
-            {h.facts.map((f) => (
-              <div key={f.label}>
+        {/* Proof line: minutes, one tap, no ads — skip the exercise count vanity metric */}
+        <section aria-label={h.glance} className="border-y border-line">
+          <dl className="mx-auto flex max-w-6xl flex-wrap items-baseline justify-center gap-x-10 gap-y-3 px-4 py-6 text-center sm:justify-between">
+            {h.facts.slice(1).map((f) => (
+              <div key={f.label} className="min-w-[7rem]">
                 <dt className="sr-only">{f.label}</dt>
-                <dd className="num text-3xl font-bold sm:text-4xl">{fill(f.value, vars)}</dd>
-                <dd className="mt-1 text-sm text-muted">{f.label}</dd>
+                <dd className="num text-2xl font-bold sm:text-3xl">{fill(f.value, vars)}</dd>
+                <dd className="mt-0.5 text-sm text-muted">{f.label}</dd>
               </div>
             ))}
           </dl>
@@ -204,39 +211,35 @@ export function HomeView({ lang }: { lang: SiteLang }) {
 
         {/* How it works */}
         <section aria-labelledby="how" className="mx-auto max-w-6xl px-4 py-20">
-          <Eyebrow>{h.how.eyebrow}</Eyebrow>
-          <h2 id="how" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 id="how" className="text-3xl font-bold tracking-tight sm:text-4xl">
             {h.how.title}
           </h2>
-          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+          <ol className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
             {h.how.steps.map((s, i) => (
-              <li key={s.title} className="card relative overflow-hidden p-6">
-                <span aria-hidden className="num absolute -top-4 right-3 text-8xl font-black text-white/[0.04]">
-                  {i + 1}
-                </span>
-                <span className="grid size-10 place-items-center rounded-full bg-accent/15 font-bold text-accent" aria-hidden>
-                  {i + 1}
-                </span>
-                <h3 className="mt-4 text-xl font-semibold">{s.title}</h3>
+              <li key={s.title}>
+                <h3 className="text-lg font-semibold tracking-tight">
+                  <span className="text-accent">{i + 1}.</span> {s.title}
+                </h3>
                 <p className="mt-2 text-muted">{s.body}</p>
                 {i === 0 && (
-                  <a href="/gyms/" className="mt-3 inline-block font-semibold text-accent hover:underline">
+                  <a href="/gyms/" className="mt-3 inline-block font-semibold text-accent underline-offset-4 hover:underline">
                     {h.how.findGym} ›
                   </a>
                 )}
               </li>
             ))}
           </ol>
-          <div className="mt-8 flex justify-center">
-            <Cta cta="how">{h.how.cta}</Cta>
+          <div className="mt-10">
+            <Cta cta="how" className="w-full sm:w-auto">
+              {h.how.cta}
+            </Cta>
           </div>
         </section>
 
-        {/* Features, each with a real screenshot */}
+        {/* Three differentiators with real screenshots */}
         <section id="features" aria-labelledby="features-h" className="scroll-mt-20 border-t border-line">
           <div className="mx-auto max-w-6xl px-4 pt-20">
-            <Eyebrow>{h.features.eyebrow}</Eyebrow>
-            <h2 id="features-h" className="mt-3 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 id="features-h" className="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
               {h.features.title}
             </h2>
           </div>
@@ -248,16 +251,15 @@ export function HomeView({ lang }: { lang: SiteLang }) {
               className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-2 md:gap-16"
             >
               <div className={i % 2 ? "md:order-2" : ""}>
-                <Eyebrow>{f.eyebrow}</Eyebrow>
-                <h3 id={`${f.id}-h`} className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+                <h3 id={`${f.id}-h`} className="text-2xl font-bold tracking-tight sm:text-3xl">
                   {f.title}
                 </h3>
                 <p className="mt-4 text-lg text-muted">{fill(f.body, vars)}</p>
                 <ul className="mt-5 space-y-2.5">
-                  {f.points.map((p) => (
-                    <li key={p} className="flex gap-2.5">
+                  {f.points.map((point) => (
+                    <li key={point} className="flex items-start gap-2.5">
                       <Check />
-                      {p}
+                      <span>{point}</span>
                     </li>
                   ))}
                 </ul>
@@ -271,83 +273,75 @@ export function HomeView({ lang }: { lang: SiteLang }) {
                 </Link>
               </div>
               <div className="relative mx-auto w-full max-w-[300px]">
-                <div aria-hidden className="absolute inset-0 -z-10 scale-110 rounded-full bg-accent/10 blur-3xl" />
                 <Phone src={f.shot} alt={f.alt} />
               </div>
             </article>
           ))}
+          <div className="mx-auto max-w-6xl px-4 pt-2 pb-16">
+            <Link
+              href="/features/"
+              data-cta="home-all-features"
+              className="inline-flex min-h-11 items-center gap-1 font-semibold text-accent underline-offset-4 hover:underline"
+            >
+              {h.more.all} <span aria-hidden>→</span>
+            </Link>
+          </div>
         </section>
 
         {/* Mid-page call to action */}
-        <section aria-labelledby="mid" className="mx-auto max-w-6xl px-4 py-10">
-          <div className="relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-br from-[#10213f] to-surface p-8 sm:p-12">
+        <section aria-labelledby="mid" className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
+          <div className="rounded-3xl border border-line bg-surface p-8 sm:p-12">
             <div className="grid items-center gap-6 md:grid-cols-[1.4fr_1fr]">
               <div>
-                <h2 id="mid" className="text-2xl font-bold sm:text-3xl">
+                <h2 id="mid" className="text-2xl font-bold tracking-tight sm:text-3xl">
                   {h.mid.title}
                 </h2>
-                <p className="mt-2 text-muted">{h.mid.body}</p>
+                <p className="mt-3 text-muted">{h.mid.body}</p>
               </div>
               <div className="flex md:justify-end">
-                <Cta cta="mid">{h.mid.cta}</Cta>
+                <Cta cta="mid" className="w-full md:w-auto">
+                  {h.mid.cta}
+                </Cta>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 3D demos */}
-        <section id="demos" aria-labelledby="demos-h" className="scroll-mt-20 border-t border-line bg-[#05080c]">
+        {/* 3D demo tease — one lift, drag to look around; full controls live in the app */}
+        <section id="demos" aria-labelledby="demos-h" className="scroll-mt-20 border-t border-line">
           <div className="mx-auto max-w-6xl px-4 py-20">
-            <Eyebrow>{h.demos.eyebrow}</Eyebrow>
-            <h2 id="demos-h" className="mt-3 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 id="demos-h" className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">
               {h.demos.title}
             </h2>
             <p className="mt-4 max-w-2xl text-lg text-muted">{h.demos.body}</p>
             <div className="mt-10">
               <DemoPicker
+                teaser
                 labels={labels}
                 names={lang === "en" ? undefined : exerciseNames(lang, DEMO_LIFTS)}
                 words={lang === "en" ? undefined : demoWords(lang)}
                 picker={h.demos.picker}
               />
             </div>
-            <div className="mt-10 flex justify-center">
+            <div className="mt-10">
               <Cta cta="demos">{h.demos.cta}</Cta>
             </div>
           </div>
         </section>
 
-        {/* More features */}
-        <section aria-labelledby="more" className="mx-auto max-w-6xl px-4 py-20">
-          <Eyebrow>{h.more.eyebrow}</Eyebrow>
-          <h2 id="more" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            {h.more.title}
-          </h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {h.more.items.map((m) => (
-              <div key={m.title} className="card p-6">
-                <h3 className="text-lg font-semibold">{m.title}</h3>
-                <p className="mt-2 text-muted">{fill(m.body, vars)}</p>
-              </div>
-            ))}
-          </div>
-          <Link
-            href="/features/"
-            data-cta="home-all-features"
-            className="mt-6 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
-          >
-            {h.more.all} <span aria-hidden>→</span>
-          </Link>
-          <div className="mt-10 grid items-center gap-8 rounded-3xl border border-line bg-surface p-6 sm:p-10 md:grid-cols-[1fr_260px]">
+        {/* Juice, one card — not a six-up feature wall */}
+        <section aria-labelledby="juice" className="border-t border-line">
+          <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-20 md:grid-cols-[1fr_260px]">
             <div>
-              <Eyebrow>{h.juice.eyebrow}</Eyebrow>
-              <h3 className="mt-3 text-2xl font-bold sm:text-3xl">{h.juice.title}</h3>
-              <p className="mt-3 text-muted">{h.juice.body}</p>
+              <h2 id="juice" className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {h.juice.title}
+              </h2>
+              <p className="mt-3 max-w-xl text-muted">{h.juice.body}</p>
               <Link
                 href={APP_PATH}
                 prefetch={false}
                 data-cta="juice"
-                className="mt-5 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
+                className="mt-5 inline-flex min-h-11 items-center gap-1 font-semibold text-accent underline-offset-4 hover:underline"
               >
                 {h.juice.cta} <span aria-hidden>→</span>
               </Link>
@@ -356,88 +350,78 @@ export function HomeView({ lang }: { lang: SiteLang }) {
           </div>
         </section>
 
-        {/* Free guides: links into the exercise guides and calculators, so the pages people search are a click from home */}
-        <section aria-labelledby="learn" className="mx-auto max-w-6xl px-4 pb-20">
-          <Eyebrow>{h.learn.eyebrow}</Eyebrow>
-          <h2 id="learn" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            {h.learn.title}
-          </h2>
-          <p className="mt-3 max-w-2xl text-muted">{h.learn.body}</p>
-          <div className="mt-8 grid gap-6 md:grid-cols-[2fr_1fr]">
-            <nav aria-label={h.learn.exercises} className="card p-6">
-              <h3 className="text-lg font-semibold">{h.learn.exercises}</h3>
-              <ul className="mt-3 grid gap-x-6 gap-y-1 sm:grid-cols-2">
-                {HOME_GUIDES.map((id) => (
-                  <li key={id}>
-                    <Link
-                      href={localPath(lang, `/exercises/${id}/`)}
-                      className="inline-flex min-h-11 items-center text-accent hover:underline"
-                    >
-                      {guideNames[id] ?? id}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/exercises/"
-                data-cta="home-exercises"
-                className="mt-3 inline-flex min-h-11 items-center gap-1 font-semibold hover:underline"
-              >
-                {t.chrome.links.exercises} <span aria-hidden>→</span>
-              </Link>
-            </nav>
-            <nav aria-label={h.learn.tools} className="card p-6">
-              <h3 className="text-lg font-semibold">{h.learn.tools}</h3>
-              <ul className="mt-3 space-y-1">
-                {[
-                  { href: localPath(lang, "/tools/plate-calculator/"), label: t.chrome.links.plates },
-                  { href: localPath(lang, "/tools/one-rep-max-calculator/"), label: t.chrome.links.oneRm },
-                  { href: localPath(lang, "/programs/"), label: t.chrome.links.programs },
-                  { href: localPath(lang, "/muscles/"), label: t.chrome.links.muscles },
-                ].map((l) => (
-                  <li key={l.href}>
-                    <Link href={l.href} className="inline-flex min-h-11 items-center text-accent hover:underline">
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+        {/* Free guides: compact SEO bridges into exercise and tool pages */}
+        <section aria-labelledby="learn" className="border-t border-line">
+          <div className="mx-auto max-w-6xl px-4 py-20">
+            <h2 id="learn" className="text-3xl font-bold tracking-tight sm:text-4xl">
+              {h.learn.title}
+            </h2>
+            <p className="mt-3 max-w-2xl text-muted">{h.learn.body}</p>
+            <div className="mt-8 grid gap-8 md:grid-cols-[2fr_1fr]">
+              <nav aria-label={h.learn.exercises}>
+                <h3 className="text-lg font-semibold">{h.learn.exercises}</h3>
+                <ul className="mt-3 grid gap-x-6 gap-y-1 sm:grid-cols-2">
+                  {HOME_GUIDES.map((id) => (
+                    <li key={id}>
+                      <Link
+                        href={localPath(lang, `/exercises/${id}/`)}
+                        className="inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline"
+                      >
+                        {guideNames[id] ?? id}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/exercises/"
+                  data-cta="home-exercises"
+                  className="mt-3 inline-flex min-h-11 items-center gap-1 font-semibold underline-offset-4 hover:underline"
+                >
+                  {t.chrome.links.exercises} <span aria-hidden>→</span>
+                </Link>
+              </nav>
+              <nav aria-label={h.learn.tools}>
+                <h3 className="text-lg font-semibold">{h.learn.tools}</h3>
+                <ul className="mt-3 space-y-1">
+                  {[
+                    { href: localPath(lang, "/tools/plate-calculator/"), label: t.chrome.links.plates },
+                    { href: localPath(lang, "/tools/one-rep-max-calculator/"), label: t.chrome.links.oneRm },
+                    { href: localPath(lang, "/programs/"), label: t.chrome.links.programs },
+                    { href: localPath(lang, "/muscles/"), label: t.chrome.links.muscles },
+                  ].map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
           </div>
         </section>
 
-        {/* Testimonials */}
+        {/* Until real quotes exist: a beta ask, not a fake review wall */}
         <section aria-labelledby="quotes" className="border-t border-line bg-surface/40">
           <div className="mx-auto max-w-6xl px-4 py-20">
-            <Eyebrow>{h.quotes.eyebrow}</Eyebrow>
-            <h2 id="quotes" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 id="quotes" className="text-3xl font-bold tracking-tight sm:text-4xl">
               {h.quotes.title}
             </h2>
+            <p className="mt-3 max-w-2xl text-muted">{fill(h.quotes.lookingRest, vars)}</p>
             {quotes.length > 0 ? (
               <ul className="mt-10 grid gap-4 md:grid-cols-3">
                 {quotes.map((q, i) => (
-                  <li key={i} className="card flex flex-col gap-4 p-6">
-                    {q.sample && (
-                      <span className="self-start rounded-full bg-warn/15 px-3 py-1 text-xs font-bold text-warn">{h.quotes.sample}</span>
-                    )}
-                    <p aria-hidden className="text-gold">
-                      ★★★★★
-                    </p>
+                  <li key={i} className="rounded-2xl border border-line bg-surface p-6">
                     <blockquote className="text-lg">&ldquo;{q.quote}&rdquo;</blockquote>
-                    <p className="mt-auto text-sm">
+                    <p className="mt-4 text-sm">
                       <b>{q.name}</b> <span className="text-muted">· {q.about}</span>
                     </p>
                   </li>
                 ))}
               </ul>
             ) : null}
-            <div className="mt-8 flex flex-col items-start gap-4 rounded-3xl border border-dashed border-line p-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-muted">
-                <b className="text-ink">{h.quotes.looking}</b> {fill(h.quotes.lookingRest, vars)}
-              </p>
-              <Cta cta="beta" className="shrink-0">
-                {h.quotes.cta}
-              </Cta>
+            <div className="mt-8">
+              <Cta cta="beta">{h.quotes.cta}</Cta>
             </div>
           </div>
         </section>
@@ -445,14 +429,13 @@ export function HomeView({ lang }: { lang: SiteLang }) {
         {/* Pricing */}
         <section id="pricing" aria-labelledby="pricing-h" className="scroll-mt-20 mx-auto max-w-6xl px-4 py-20">
           <div className="text-center">
-            <Eyebrow>{p.eyebrow}</Eyebrow>
-            <h2 id="pricing-h" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 id="pricing-h" className="text-3xl font-bold tracking-tight sm:text-4xl">
               {p.title}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-muted">{fill(p.body, vars)}</p>
           </div>
           <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-2">
-            <div className="card flex flex-col p-7">
+            <div className="flex flex-col rounded-[20px] border border-line bg-surface p-7">
               <h3 className="text-xl font-semibold">{p.free}</h3>
               <p className="mt-3">
                 <span className="num text-4xl font-bold min-[360px]:text-5xl">{usd(lang, 0)}</span>{" "}
@@ -460,9 +443,9 @@ export function HomeView({ lang }: { lang: SiteLang }) {
               </p>
               <ul className="mt-6 flex-1 space-y-3">
                 {t.plans.free.map((x) => (
-                  <li key={x} className="flex gap-2.5">
+                  <li key={x} className="flex items-start gap-2.5">
                     <Check />
-                    {x}
+                    <span>{x}</span>
                   </li>
                 ))}
               </ul>
@@ -475,7 +458,7 @@ export function HomeView({ lang }: { lang: SiteLang }) {
                 {p.startFree}
               </Link>
             </div>
-            <div className="relative flex flex-col rounded-[20px] border-2 border-accent bg-gradient-to-b from-[#112244] to-surface p-7 shadow-[0_20px_60px_-20px_rgb(76_141_255/0.5)]">
+            <div className="relative flex flex-col rounded-[20px] border-2 border-accent bg-surface p-7">
               <span className="absolute -top-3.5 left-7 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-ink uppercase">
                 {fill(p.daysFree, vars)}
               </span>
@@ -487,9 +470,9 @@ export function HomeView({ lang }: { lang: SiteLang }) {
               <p className="mt-1 text-sm text-muted">{fill(p.priceNote, vars)}</p>
               <ul className="mt-6 flex-1 space-y-3">
                 {t.plans.pro.map((x) => (
-                  <li key={x} className="flex gap-2.5">
+                  <li key={x} className="flex items-start gap-2.5">
                     <Check />
-                    {x}
+                    <span>{x}</span>
                   </li>
                 ))}
               </ul>
@@ -511,13 +494,12 @@ export function HomeView({ lang }: { lang: SiteLang }) {
 
         {/* FAQ */}
         <section id="faq" aria-labelledby="faq-h" className="scroll-mt-20 mx-auto max-w-3xl px-4 py-20">
-          <Eyebrow>{h.faq.eyebrow}</Eyebrow>
-          <h2 id="faq-h" className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 id="faq-h" className="text-3xl font-bold tracking-tight sm:text-4xl">
             {h.faq.title}
           </h2>
           <div className="mt-8 space-y-3">
             {faqs.map((f) => (
-              <details key={f.q} className="group card p-5 open:border-accent/40">
+              <details key={f.q} className="group rounded-2xl border border-line bg-surface p-5 open:border-accent/40">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold">
                   {f.q}
                   <span aria-hidden className="text-2xl text-muted transition-transform group-open:rotate-45">
@@ -534,7 +516,7 @@ export function HomeView({ lang }: { lang: SiteLang }) {
         <section aria-labelledby="final" className="relative overflow-hidden border-t border-line">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgb(76_141_255/0.22),transparent_60%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgb(76_141_255/0.12),transparent_60%)]"
           />
           <div className="relative mx-auto max-w-3xl px-4 py-24 text-center">
             <h2 id="final" className="text-4xl font-bold tracking-tight text-balance sm:text-5xl">
