@@ -1,6 +1,6 @@
 import { barDiscs, poleDiscs, trapDiscs } from "@/lib/demo/barPlates";
 import { partIndices, placeVec } from "@/lib/demo/mesh";
-import { anchorAt, poleSegments, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
+import { anchorAt, feetLoad, poleSegments, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
 
 import { DEMO_COLOURS } from "./colours";
 import type { Scene } from "./engine";
@@ -156,7 +156,24 @@ export function createScene2D(canvas: HTMLCanvasElement): Scene {
       }
       const hands = [J.handL, J.handR];
       const mid: Vec = [(J.handL[0] + J.handR[0]) / 2, (J.handL[1] + J.handR[1]) / 2, (J.handL[2] + J.handR[2]) / 2];
-      if (load === "dumbbell" || load === "kettlebell") {
+      if (load === "dumbbell" && hold === "feet") {
+        // one dumbbell squeezed between the feet, its handle along the shins
+        const { at: c, dir: u } = feetLoad(J);
+        const along = (k: number): Vec => [c[0] + u[0] * k, c[1] + u[1] * k, c[2] + u[2] * k];
+        line(along(-0.15), along(0.15));
+        // each head is a ring square to the handle: across it in z, and along x-y at right angles to it
+        const n = Math.hypot(u[0], u[1]) || 1;
+        const v: Vec = [-u[1] / n, u[0] / n, 0];
+        for (const k of [-0.1, 0.1]) {
+          const h = along(k);
+          for (let i = 0; i <= 16; i++) {
+            const a = (i / 16) * Math.PI * 2;
+            const q = proj(world([h[0] + v[0] * Math.cos(a) * 0.07, h[1] + v[1] * Math.cos(a) * 0.07, h[2] + Math.sin(a) * 0.07]));
+            if (i) ctx.lineTo(q[0], q[1]);
+            else ctx.moveTo(q[0], q[1]);
+          }
+        }
+      } else if (load === "dumbbell" || load === "kettlebell") {
         const at = hold === "centre" ? [mid] : hold === "R" ? [J.handR] : hands;
         for (const h of at) {
           if (load === "dumbbell") {

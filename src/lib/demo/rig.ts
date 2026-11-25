@@ -306,14 +306,17 @@ export type PerSide<T> = T | { L: T; R: T };
 
 /** What the lifter holds: a barbell at `bar`, a weight in each hand (or one, or one held in both), a cable handle, an ab wheel. */
 export type Load = "barbell" | "trapbar" | "dumbbell" | "kettlebell" | "ball" | "handle" | "wheel" | "none";
-export type Hold = "each" | "centre" | "R";
+/** Which hands hold the load, or "feet": one dumbbell squeezed between the feet (dumbbell leg curls). */
+export type Hold = "each" | "centre" | "R" | "feet";
 
 /** A joint name, the midpoint of the hands ("hands"), a point just off the upper back ("upperBack", where a band wraps), or a fixed point. */
 export type Anchor = Vec | "hands" | "ankles" | "handL" | "handR" | "ankleL" | "ankleR" | "kneeL" | "kneeR" | "hipC" | "neck" | "upperBack";
 
 /** Scenery drawn around the figure, in the figure's own frame. */
 export type Prop =
-  | { kind: "box"; at: Vec; size: Vec; tilt?: number; follow?: Anchor } // centre (offset from `follow` when set), full size, tilt about z (degrees)
+  // centre (offset from `follow` when set), full size, tilt about z (degrees); `steel` draws it as bright as the
+  // bars and plates (a weight stack's plates) instead of as dim furniture
+  | { kind: "box"; at: Vec; size: Vec; tilt?: number; follow?: Anchor; steel?: boolean }
   | { kind: "rail"; at: Vec; length: number; axis?: "x" | "y" | "z" } // pull-up bar, dip bars, smith rails
   | { kind: "cable"; from: Anchor; to: Anchor } // pulley cable or band, follows the joints
   | PoleProp
@@ -603,6 +606,18 @@ export function sample(phases: PhaseRow[], t: number): { d: number; label: strin
 }
 
 /** Where an anchor is for the current joints. */
+/**
+ * Where a dumbbell squeezed between the feet sits (hold "feet"): between the arches, a little past the ankles
+ * toward the toes, its handle running along the shins.
+ */
+export function feetLoad(J: Joints): { at: Vec; dir: Vec } {
+  const ankle = lerpV(J.ankleL, J.ankleR, 0.5);
+  const knee = lerpV(J.kneeL, J.kneeR, 0.5);
+  const toe = lerpV(J.toeL, J.toeR, 0.5);
+  const dir = norm(sub(ankle, knee));
+  return { at: add(lerpV(ankle, toe, 0.35), mul(dir, 0.04)), dir };
+}
+
 export function anchorAt(J: Joints, a: Anchor): Vec {
   if (typeof a !== "string") return a;
   if (a === "hands") return lerpV(J.handL, J.handR, 0.5);
