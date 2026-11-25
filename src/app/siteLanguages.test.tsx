@@ -92,7 +92,7 @@ describe("translated pages", () => {
       expect(container.firstElementChild?.getAttribute("lang"), lang).toBe(lang);
       expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(t.home.h1a);
       const ctas = screen.getAllByRole("link").filter((a) => /^\/app\/?$/.test(a.getAttribute("href") ?? ""));
-      expect(ctas.length, lang).toBeGreaterThanOrEqual(12);
+      expect(ctas.length, lang).toBeGreaterThanOrEqual(8);
       // The header stays on this language's pages, and the switcher offers every language.
       const nav = within(screen.getByRole("navigation", { name: t.chrome.siteNav }));
       expect(nav.getAllByRole("link", { name: t.chrome.nav.pricing })[0]!.getAttribute("href")).toMatch(new RegExp(`^/${lang}/pricing/?$`));

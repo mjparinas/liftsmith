@@ -3,7 +3,7 @@
 // The top of Overview: what needs a person right now, before any number (action over stats, AGENTS.md). The same
 // list as the To Do tab (mail waiting, reports waiting, creators owed, payment failures, a late job, setup still to
 // do) plus open tasks, each one click from where it's dealt with. Says so when nothing needs doing.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { TodoItem, TodoList } from "@/server/adminTodo";
 
@@ -16,6 +16,12 @@ const SHOWN = 5;
 export function NeedsYou({ go, onList }: { go: (tab: string) => void; onList?: (list: TodoList) => void }) {
   const [list, setList] = useState<TodoList | null>(null);
   const [error, setError] = useState(false);
+  const [version, setVersion] = useState(0);
+  const load = useCallback(() => {
+    setError(false);
+    setList(null);
+    setVersion((v) => v + 1);
+  }, []);
   useEffect(() => {
     let live = true;
     fetch("/api/admin/todo/")
@@ -30,8 +36,18 @@ export function NeedsYou({ go, onList }: { go: (tab: string) => void; onList?: (
     return () => {
       live = false;
     };
-  }, [onList]);
-  if (error) return null;
+  }, [onList, version]);
+  if (error)
+    return (
+      <Card title="Needs you" subtitle="Couldn't load what needs you.">
+        <p className="text-sm text-bad" role="alert">
+          The To Do list didn&apos;t load. Mail and reports may still be waiting.
+        </p>
+        <button type="button" onClick={load} className="press mt-3 min-h-11 rounded-lg btn-primary px-3 py-2 text-sm font-semibold">
+          Retry
+        </button>
+      </Card>
+    );
   if (!list)
     return (
       <Loading label="Loading what needs you">
@@ -62,7 +78,7 @@ export function NeedsYou({ go, onList }: { go: (tab: string) => void; onList?: (
         )}
       </ul>
       {rest > 0 && items.length >= SHOWN && (
-        <button type="button" className="mt-2 text-sm text-accent underline" onClick={() => go("To Do")}>
+        <button type="button" className="mt-2 min-h-11 text-sm text-accent underline" onClick={() => go("To Do")}>
           {rest} more on To Do
         </button>
       )}
@@ -84,7 +100,7 @@ function Row({ item, go }: { item: TodoItem; go: (tab: string) => void }) {
           href={item.action.href}
           target="_blank"
           rel="noreferrer"
-          className="press rounded-lg btn-primary px-3 py-1.5 text-sm font-semibold"
+          className="press min-h-11 rounded-lg border border-line px-3 py-1.5 text-sm font-semibold text-ink"
         >
           {item.action.label}
         </a>
@@ -95,7 +111,11 @@ function Row({ item, go }: { item: TodoItem; go: (tab: string) => void }) {
 
 function OpenButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="press rounded-lg btn-primary px-3 py-1.5 text-sm font-semibold">
+    <button
+      type="button"
+      onClick={onClick}
+      className="press min-h-11 rounded-lg border border-line px-3 py-1.5 text-sm font-semibold text-ink"
+    >
       {label}
     </button>
   );

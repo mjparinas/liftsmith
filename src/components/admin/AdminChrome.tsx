@@ -2,9 +2,10 @@
 
 // The admin panel's frame, in the app's own look (Melvin, 2026-11-17: "make the liftsmith admin skinned
 // similarly to the main app"): the app icon and wordmark, the soft top light (.aurora), the app's stroke icons
-// and section labels, and on a wide window a sidebar like the web app's desktop layout. One nav in the page:
-// a sidebar from lg up, rows of chips that wrap above it (every section stays in view, Melvin 2026-11-12).
-import type { ReactNode } from "react";
+// and section labels, and on a wide window a sidebar like the web app's desktop layout. Progressive groups
+// (Melvin via critique 2026-11-24): Work and People stay open; Numbers and Running collapse until opened or
+// the current tab lives there — deep links and badges still reach every section.
+import { useEffect, useState, type ReactNode } from "react";
 
 import { Icon, type IconName } from "@/components/app/icons";
 import { BuildStamp } from "@/components/BuildStamp";
@@ -36,11 +37,15 @@ export const TAB_ICONS: Record<string, IconName> = {
 };
 
 /** The sections in groups, in the tab order: a label over each group in the sidebar. */
-export const TAB_GROUPS: readonly { label: string; tabs: readonly string[] }[] = [
+export const TAB_GROUPS: readonly { label: string; tabs: readonly string[]; collapse?: boolean }[] = [
   { label: "Work", tabs: ["Overview", "To Do", "Inbox", "Reports", "Community", "Gyms"] },
-  { label: "Numbers", tabs: ["Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Codes"] },
+  {
+    label: "Numbers",
+    tabs: ["Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Codes"],
+    collapse: true,
+  },
   { label: "People", tabs: ["Users", "Installs"] },
-  { label: "Running", tabs: ["Flags", "Seasons", "Automations", "System", "Log"] },
+  { label: "Running", tabs: ["Flags", "Seasons", "Automations", "System", "Log"], collapse: true },
 ];
 
 /** The app icon (public/icon.svg), the same file as the favicon and the site header's mark. */
@@ -71,8 +76,9 @@ function NavItem({ tab, on, badge, onClick }: { tab: string; on: boolean; badge?
       <button
         type="button"
         aria-current={on ? "page" : undefined}
+        aria-label={badge ? `${tab}, ${badge} waiting` : undefined}
         onClick={onClick}
-        className={`press flex min-h-9 items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-semibold transition-colors duration-200 lg:min-h-0 lg:w-full lg:py-[0.4rem] lg:gap-3 lg:text-left ${
+        className={`press flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition-colors duration-200 lg:w-full lg:py-2 lg:gap-3 lg:text-left ${
           on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"
         }`}
       >
@@ -81,7 +87,7 @@ function NavItem({ tab, on, badge, onClick }: { tab: string; on: boolean; badge?
         </span>
         <span className="lg:flex-1">{tab}</span>
         {badge ? (
-          <span className="btn-primary rounded-full px-1.5 text-xs font-bold tabular-nums" aria-label={`${badge} waiting`}>
+          <span className="rounded-full bg-accent/20 px-1.5 text-xs font-bold tabular-nums text-accent" aria-hidden>
             {badge}
           </span>
         ) : null}
@@ -113,6 +119,22 @@ export function AdminShell({
   tools?: ReactNode;
   children: ReactNode;
 }) {
+  // Collapsible groups start closed unless the open tab lives there (deep links still land).
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
+    const init: Record<string, boolean> = {};
+    for (const g of TAB_GROUPS) {
+      if (g.collapse && g.tabs.includes(tab)) init[g.label] = true;
+    }
+    return init;
+  });
+  useEffect(() => {
+    for (const g of TAB_GROUPS) {
+      if (g.collapse && g.tabs.includes(tab)) {
+        setExpanded((e) => (e[g.label] ? e : { ...e, [g.label]: true }));
+      }
+    }
+  }, [tab]);
+
   return (
     <div className="admin aurora min-h-dvh">
       <aside className="flex flex-wrap items-center gap-x-3 gap-y-3 px-4 pt-4 lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:w-60 lg:flex-col lg:flex-nowrap lg:items-stretch lg:gap-4 lg:overflow-y-auto lg:border-r lg:border-line/70 lg:bg-bg/92 lg:px-3 lg:py-5 lg:backdrop-blur-xl">
@@ -122,27 +144,78 @@ export function AdminShell({
         <div className="order-2 ml-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted lg:order-3 lg:ml-0 lg:mt-auto lg:flex-col lg:items-stretch lg:gap-2 lg:border-t lg:border-line/70 lg:px-2 lg:pt-4">
           {staff && (
             <span className="min-w-0 break-all">
-              {staff.email} <span className="rounded-full bg-raised px-1.5 py-0.5 text-[0.7rem] font-semibold">{staff.role}</span>
+              {staff.email} <span className="rounded-full bg-raised px-1.5 py-0.5 text-xs font-semibold">{staff.role}</span>
             </span>
           )}
           {onSignOut && (
-            <button type="button" className="text-left text-muted underline hover:text-ink" onClick={onSignOut}>
+            <button type="button" className="min-h-11 text-left text-muted underline hover:text-ink" onClick={onSignOut}>
               Sign out
             </button>
           )}
           <BuildStamp className="hidden lg:block" />
         </div>
         <nav className="order-3 flex w-full flex-col gap-3 lg:order-2 lg:block lg:gap-0" aria-label="Sections">
-          {TAB_GROUPS.map((g) => (
-            <div key={g.label} className="min-w-0 lg:mb-3">
-              <div className={`${SECTION_LABEL} px-1 pb-1 lg:px-3 lg:pb-1.5`}>{g.label}</div>
-              <ul className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
-                {g.tabs.map((t) => (
-                  <NavItem key={t} tab={t} on={tab === t} badge={badges[t]} onClick={() => onTab?.(t)} />
-                ))}
-              </ul>
-            </div>
-          ))}
+          {TAB_GROUPS.map((g) => {
+            const waiting = g.tabs.reduce((n, t) => n + (badges[t] ?? 0), 0);
+            const pinned = g.tabs.includes(tab);
+            const open = !g.collapse || pinned || !!expanded[g.label];
+            if (g.collapse) {
+              return (
+                <div key={g.label} className="min-w-0 lg:mb-3">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-label={
+                      pinned
+                        ? waiting > 0
+                          ? `${g.label}, ${waiting} waiting`
+                          : g.label
+                        : waiting > 0
+                          ? `${g.label}, ${waiting} waiting, ${open ? "collapse" : "expand"}`
+                          : `${g.label}, ${open ? "collapse" : "expand"}`
+                    }
+                    onClick={() => {
+                      if (pinned) return;
+                      setExpanded((e) => ({ ...e, [g.label]: !open }));
+                    }}
+                    className={`press flex min-h-11 w-full items-center gap-2 rounded-xl px-1 py-1.5 text-left hover:bg-raised lg:px-3 ${SECTION_LABEL}`}
+                  >
+                    <span className="flex-1" aria-hidden>
+                      {g.label}
+                    </span>
+                    {waiting > 0 && (
+                      <span
+                        className="rounded-full bg-accent/20 px-1.5 text-xs font-bold tabular-nums normal-case tracking-normal text-accent"
+                        aria-hidden
+                      >
+                        {waiting}
+                      </span>
+                    )}
+                    <span className="text-faint" aria-hidden>
+                      <Icon name={open ? "chevronDown" : "chevronRight"} size={16} />
+                    </span>
+                  </button>
+                  {open && (
+                    <ul className="mt-1 flex flex-wrap gap-1 lg:mt-0 lg:flex-col lg:gap-0.5">
+                      {g.tabs.map((t) => (
+                        <NavItem key={t} tab={t} on={tab === t} badge={badges[t]} onClick={() => onTab?.(t)} />
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            }
+            return (
+              <div key={g.label} className="min-w-0 lg:mb-3">
+                <div className={`${SECTION_LABEL} px-1 pb-1 lg:px-3 lg:pb-1.5`}>{g.label}</div>
+                <ul className="flex flex-wrap gap-1 lg:flex-col lg:gap-0.5">
+                  {g.tabs.map((t) => (
+                    <NavItem key={t} tab={t} on={tab === t} badge={badges[t]} onClick={() => onTab?.(t)} />
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </nav>
       </aside>
       <div className="lg:pl-60">

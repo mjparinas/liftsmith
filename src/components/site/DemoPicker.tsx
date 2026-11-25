@@ -20,6 +20,8 @@ export function DemoPicker({
   names,
   words,
   picker = "Exercise",
+  /** Marketing tease: one lift, drag only — full body/view/overlay controls stay in the app. */
+  teaser = false,
 }: {
   labels: Partial<Record<Muscle, string>>;
   /** The lifts' names in the page's language; English from the library otherwise. */
@@ -27,31 +29,36 @@ export function DemoPicker({
   /** The demo's own words (DEMO_WORDS) in the page's language. */
   words?: DemoWords;
   picker?: string;
+  teaser?: boolean;
 }) {
   const [id, setId] = useState(DEMO_LIFTS[0]);
   const hr = useDemoHeartRate();
+  const lifts = teaser ? DEMO_LIFTS.slice(0, 1) : DEMO_LIFTS;
+  const shown = teaser ? DEMO_LIFTS[0]! : id;
   return (
     <div className="mx-auto grid max-w-[720px] gap-4">
-      <div className="flex flex-wrap gap-2" role="group" aria-label={picker}>
-        {DEMO_LIFTS.map((x) => (
-          <button
-            key={x}
-            type="button"
-            aria-pressed={x === id}
-            onClick={() => setId(x)}
-            className={`press min-h-11 rounded-full border px-4 text-sm font-medium ${x === id ? "border-accent bg-accent/15 text-accent" : "border-line bg-surface text-ink"}`}
-          >
-            {names?.[x] ?? EXERCISE_BY_ID.get(x)!.name}
-          </button>
-        ))}
-      </div>
+      {!teaser && (
+        <div className="flex flex-wrap gap-2" role="group" aria-label={picker}>
+          {lifts.map((x) => (
+            <button
+              key={x}
+              type="button"
+              aria-pressed={x === id}
+              onClick={() => setId(x)}
+              className={`press min-h-11 rounded-full border px-4 text-sm font-medium ${x === id ? "border-accent bg-accent/15 text-accent" : "border-line bg-surface text-ink"}`}
+            >
+              {names?.[x] ?? EXERCISE_BY_ID.get(x)!.name}
+            </button>
+          ))}
+        </div>
+      )}
       <LiftDemoCore
-        exerciseId={id}
-        controls
-        bodyToggle
+        exerciseId={shown}
+        controls={!teaser}
+        bodyToggle={!teaser}
         labels={labels}
         words={words}
-        name={names?.[id]}
+        name={names?.[shown]}
         fps={30}
         maxDpr={1.5}
         autoPlay2d={false}
