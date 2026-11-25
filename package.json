@@ -1,6 +1,6 @@
 {
   "name": "liftsmith",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "private": true,
   "scripts": {
     "predev": "node scripts/mediapipe.mjs && node scripts/leaflet.mjs && node scripts/piper.mjs",
