@@ -266,7 +266,8 @@ export const tr: SiteText = {
       title: "İlk sporcularımızı arıyoruz.",
       sample: "Örnek alıntı, gerçek bir kullanıcı değil",
       looking: "İlk sporcularımızı arıyoruz.",
-      lookingRest: "{name} uygulamasını tarayıcıda ücretsiz dene, ne düşündüğünü uygulamanın içinden bize söyle; senin sözlerin burada olabilir.",
+      lookingRest:
+        "{name} uygulamasını tarayıcıda ücretsiz dene, ne düşündüğünü uygulamanın içinden bize söyle; senin sözlerin burada olabilir.",
       cta: "Tarayıcıda ücretsiz başla",
     },
     pricing: {

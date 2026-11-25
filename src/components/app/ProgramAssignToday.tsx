@@ -150,7 +150,8 @@ export function CoachProgramEndedToday() {
     }
     const routines = (profile.routines ?? []).map((r) => {
       if (r.assignedProgram?.assignId !== src.assignId) return r;
-      const { assignedProgram: _a, ...rest } = r;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- drop assignedProgram
+      const { assignedProgram, ...rest } = r;
       return rest;
     });
     setProfile({ routines, planSource: { kind: "adaptive" } });
@@ -161,7 +162,8 @@ export function CoachProgramEndedToday() {
   const keep = () => {
     const routines = (profile.routines ?? []).map((r) => {
       if (r.assignedProgram?.assignId !== src.assignId) return r;
-      const { assignedProgram: _a, ...rest } = r;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- drop assignedProgram
+      const { assignedProgram, ...rest } = r;
       return rest;
     });
     setProfile({ routines, planSource: { kind: "adaptive" } });

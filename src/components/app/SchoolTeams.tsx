@@ -9,8 +9,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
-import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
 import { assignProgram, endProgramAssigns } from "@/lib/coachProgramAssign";
+import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { liveRead } from "@/lib/liveRead";
@@ -461,7 +461,7 @@ function CoachTeam({
   };
   const assignToTeam = async (p: CoachProgram) => {
     try {
-      const weekdays = p.days.map((d, i) => d.weekdays ?? ([[1], [2], [4], [5], [3], [6]][i] ?? [1 + (i % 5)]));
+      const weekdays = p.days.map((d, i) => d.weekdays ?? [[1], [2], [4], [5], [3], [6]][i] ?? [1 + (i % 5)]);
       const r = await assignProgram(p.id, { type: "team", teamId: team.id }, weekdays);
       haptic("success");
       track("feature", { name: "trainer", detail: "assignProgram" });

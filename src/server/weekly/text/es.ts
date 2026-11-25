@@ -1072,7 +1072,8 @@ export const emails: Record<string, Words> = {
   },
   "coach-assign-program": {
     title: "Asigna un programa de temporada a toda la plantilla",
-    intro: "Pon Upper/Lower o Push/Pull/Legs a tus clientes o equipo escolar durante N semanas: siguen una vez, Hoy ejecuta el día correcto y un calendario muestra quién ha entrenado.",
+    intro:
+      "Pon Upper/Lower o Push/Pull/Legs a tus clientes o equipo escolar durante N semanas: siguen una vez, Hoy ejecuta el día correcto y un calendario muestra quién ha entrenado.",
     points: [
       "En Coaching › Programas, parte de Upper/Lower o Push/Pull/Legs, elige los días y Asignar a… clientes o un equipo.",
       "Los atletas reciben un aviso y siguen el programa una vez en Hoy. Su propia progresión elige los pesos.",
@@ -1081,5 +1082,4 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Puedes asignar igual desde la ficha del equipo escolar o el informe de un cliente.",
   },
-
 };

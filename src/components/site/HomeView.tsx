@@ -28,14 +28,7 @@ import { filledFaqs, siteVars } from "@/locales/site/vars";
 const name = BRAND.name;
 
 /** The exercise guides the home page links to: the most searched lifts, each with a guide in every site language. */
-export const HOME_GUIDES = [
-  "bench-press",
-  "back-squat",
-  "deadlift",
-  "overhead-press",
-  "pull-up",
-  "db-row",
-] as const;
+export const HOME_GUIDES = ["bench-press", "back-squat", "deadlift", "overhead-press", "pull-up", "db-row"] as const;
 
 export function homeMetadata(lang: SiteLang): Metadata {
   const h = siteText(lang).home;

@@ -162,7 +162,9 @@ export async function saveProgram(draft: ProgramDraft, routines: readonly Routin
 }
 /** Saves a program's details with the days it already has (the coach didn't pick new ones). */
 export async function saveProgramKeepingDays(draft: ProgramDraft, program: CoachProgram): Promise<CoachProgram> {
-  const days = program.days.flatMap((d) => (d.code ? [{ name: d.name, code: d.code, ...(d.weekdays ? { weekdays: d.weekdays } : {}) }] : []));
+  const days = program.days.flatMap((d) =>
+    d.code ? [{ name: d.name, code: d.code, ...(d.weekdays ? { weekdays: d.weekdays } : {}) }] : [],
+  );
   return (await post<{ program: CoachProgram }>({ action: "save", program: { ...details(draft), days } })).program;
 }
 export const deleteProgram = async (id: string) => (await post<{ result: "deleted" | "unlisted" }>({ action: "delete", id })).result;
