@@ -1100,4 +1100,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "You can assign the same way from a school team card or a single client's report.",
   },
+  "my-team": {
+    title: "Your athletes get a My team dashboard",
+    intro:
+      "Athletes on your school team now open My team: their team, you as their coach, the programs you assigned, team chat and a chat with you, all on one screen.",
+    points: [
+      "Add athletes who already coach with you straight from your team card. They get an invite and join with one tap.",
+      "Athletes no longer see Programs, Athletes or Setup. My team shows them only what they need.",
+      "Team chat is for the whole team and you. You can delete any message, and athletes show by first name.",
+      "Assigned programs sit on My team with Follow, and the week board shows who has trained.",
+    ],
+    dyk: "Team links now work when an athlete signs in after opening them, so nobody is left off the roster.",
+  },
 };

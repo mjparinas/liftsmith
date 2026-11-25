@@ -80,6 +80,7 @@ import * as mom from "./text/mom";
 import * as month from "./text/month";
 import * as msg from "./text/msg";
 import * as msgKind from "./text/msgKind";
+import * as mt from "./text/mt";
 import * as muscle from "./text/muscle";
 import * as nav from "./text/nav";
 import * as note from "./text/note";
@@ -169,6 +170,7 @@ export const en = {
   ...buddy.en,
   ...crew.en,
   ...fv.en,
+  ...mt.en,
   ...buy.en,
   ...cal.en,
   ...calc.en,

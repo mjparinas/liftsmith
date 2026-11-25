@@ -677,13 +677,30 @@ export async function sharesPain(coachId: string, clientId: string): Promise<boo
   return Number(r?.pain ?? 0) === 1;
 }
 
+/** Whether this client is on one of this coach's school teams (team_members by the athlete, teams.ts). */
+async function onCoachTeam(coachId: string, clientId: string): Promise<boolean> {
+  const [r] = await query<{ n: number }>(
+    "SELECT COUNT(*) AS n FROM team_members tm JOIN teams t ON t.id = tm.team_id WHERE tm.account_id = ? AND t.coach_id = ?",
+    [clientId, coachId],
+  );
+  return Number(r?.n ?? 0) > 0;
+}
+
+/**
+ * What a school team's coach never gets, whatever the switch once said (Melvin, 2026-11-25: sharing a teenager's
+ * cycle with their team's coach "seems pretty intrusive"; docs/decisions/school-teams.md "My team").
+ */
+export const TEAM_NEVER: readonly ShareKind[] = ["cycle"];
+
 /** Everything one client shares with one coach. */
 export async function sharesOf(coachId: string, clientId: string): Promise<Shares> {
   const [r] = await query<Record<ShareKind, number>>(
     `SELECT ${SHARE_KINDS.join(", ")} FROM coach_shares WHERE coach_id = ? AND client_id = ?`,
     [coachId, clientId],
   );
-  return Object.fromEntries(SHARE_KINDS.map((k) => [k, Number(r?.[k] ?? 0) === 1]));
+  const out: Shares = Object.fromEntries(SHARE_KINDS.map((k) => [k, Number(r?.[k] ?? 0) === 1]));
+  if (TEAM_NEVER.some((k) => out[k]) && (await onCoachTeam(coachId, clientId))) for (const k of TEAM_NEVER) out[k] = false;
+  return out;
 }
 
 /** What's shared on each link this account is on, by the other side's id: as a client (`client_id`) or as a coach. */
@@ -712,6 +729,7 @@ export async function setShare(
   if (!isAccountId(coachId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
   // One fixed column name per kind of share, never taken from the request.
   const col: ShareKind = isKind(what) ? what : "body";
+  if (on === true && TEAM_NEVER.includes(col) && (await onCoachTeam(coachId, clientId))) return false;
   await run(
     `INSERT INTO coach_shares (coach_id, client_id, ${col}, updated_at) VALUES (?, ?, ?, ?)
      ON CONFLICT (coach_id, client_id) DO UPDATE SET ${col} = excluded.${col}, updated_at = excluded.updated_at`,

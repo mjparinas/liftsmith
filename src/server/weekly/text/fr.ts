@@ -1088,4 +1088,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client.",
   },
+  "my-team": {
+    title: "Vos athlètes ont un tableau de bord Mon équipe",
+    intro:
+      "Les athlètes de votre équipe scolaire ouvrent maintenant Mon équipe : leur équipe, vous comme entraîneur, les programmes assignés, le chat d'équipe et une discussion avec vous, sur un seul écran.",
+    points: [
+      "Ajoutez depuis la carte de l'équipe les athlètes que vous entraînez déjà. Ils reçoivent une invitation et rejoignent d'un toucher.",
+      "Les athlètes ne voient plus Programmes, Athlètes ni Configuration. Mon équipe ne montre que l'essentiel.",
+      "Le chat d'équipe réunit toute l'équipe et vous. Vous pouvez supprimer n'importe quel message, et les athlètes apparaissent par leur prénom.",
+      "Les programmes assignés sont sur Mon équipe avec Suivre, et le tableau de la semaine montre qui s'est entraîné.",
+    ],
+    dyk: "Les liens d'équipe fonctionnent maintenant même si l'athlète se connecte après les avoir ouverts, donc personne ne manque à la liste.",
+  },
 };

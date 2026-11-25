@@ -446,6 +446,10 @@ export const fr: FeaturesText = {
       name: "Gratuit pour les équipes d’école secondaire",
       body: "Les entraîneurs d’école secondaire qui confirment un courriel scolaire ont Pro gratuitement, tout comme les athlètes de 13 à 18 ans de leurs équipes, avec un tableau d’équipe chaque semaine. La masse grasse et les profils publics restent désactivés pour les moins de 18 ans.",
     },
+    "my-team": {
+      name: "Mon équipe pour les athlètes scolaires",
+      body: "Un athlète d’une équipe scolaire ouvre Coaching sur la maison de son équipe : l’équipe et son coach, les programmes attribués avec Suivre, une discussion d’équipe avec le coach, une discussion avec le coach et la semaine de l’équipe. Un coach peut ajouter à une équipe les athlètes venus par son invitation ; chacun indique son âge et accepte d’abord.",
+    },
     "team-session": {
       name: "Séances d'équipe sur une tablette",
       body: "Un coach de lycée mène une séance pour toute l'équipe depuis une tablette : chaque athlète touche son prénom et note ses séries, la charge reprenant là où il en était, et le tableau montre qui n'a pas commencé. À la fin, les séries de chacun sont enregistrées dans son propre compte. Fonctionne sans réseau.",

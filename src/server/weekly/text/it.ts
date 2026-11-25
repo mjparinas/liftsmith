@@ -1084,4 +1084,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Puoi assegnare allo stesso modo dalla scheda squadra o dal report di un cliente.",
   },
+  "my-team": {
+    title: "I tuoi atleti hanno la dashboard La mia squadra",
+    intro:
+      "Gli atleti della tua squadra scolastica ora aprono La mia squadra: la squadra, tu come allenatore, i programmi assegnati, la chat di squadra e una chat con te, in un'unica schermata.",
+    points: [
+      "Aggiungi dalla scheda della squadra gli atleti che alleni già. Ricevono un invito e si uniscono con un tocco.",
+      "Gli atleti non vedono più Programmi, Atleti o Configurazione. La mia squadra mostra solo ciò che serve.",
+      "La chat di squadra è per tutta la squadra e per te. Puoi eliminare qualsiasi messaggio, e gli atleti compaiono con il nome.",
+      "I programmi assegnati sono in La mia squadra con Segui, e la bacheca della settimana mostra chi si è allenato.",
+    ],
+    dyk: "I link della squadra ora funzionano anche se l'atleta accede dopo averli aperti, quindi nessuno resta fuori dalla rosa.",
+  },
 };

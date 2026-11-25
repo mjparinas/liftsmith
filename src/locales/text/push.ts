@@ -57,6 +57,7 @@ export const en = {
   "push.coachPlanEnd": "{name} took back {text}. You can stop it or keep doing it on your own.",
   "push.coachProgramAssign": "{name} assigned you a program: {text}. Tap to follow it.",
   "push.coachProgramAssignEnd": "{name} ended {text}. You can stop it or keep the days as your own routines.",
+  "push.teamInvite": "{name} added you to {text}. Open it to join.",
 } as const;
 
 type Key = keyof typeof en;
@@ -115,6 +116,7 @@ export const es: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} retiró {text}. Puedes dejarlo o seguir haciéndolo por tu cuenta.",
   "push.coachProgramAssign": "{name} te asignó un programa: {text}. Toca para seguirlo.",
   "push.coachProgramAssignEnd": "{name} terminó {text}. Puedes dejarlo o guardar los días como rutinas tuyas.",
+  "push.teamInvite": "{name} te añadió a {text}. Ábrelo para unirte.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -172,6 +174,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} a repris {text}. Vous pouvez l’arrêter ou le continuer seul.",
   "push.coachProgramAssign": "{name} vous a assigné un programme : {text}. Touchez pour le suivre.",
   "push.coachProgramAssignEnd": "{name} a terminé {text}. Vous pouvez l’arrêter ou garder les jours comme vos routines.",
+  "push.teamInvite": "{name} vous a ajouté à {text}. Ouvrez pour rejoindre.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -228,6 +231,7 @@ export const de: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} hat {text} zurückgenommen. Du kannst es beenden oder allein weitermachen.",
   "push.coachProgramAssign": "{name} hat dir ein Programm zugewiesen: {text}. Tippe, um es zu folgen.",
   "push.coachProgramAssignEnd": "{name} hat {text} beendet. Du kannst aufhören oder die Tage als eigene Routinen behalten.",
+  "push.teamInvite": "{name} hat dich zu {text} hinzugefügt. Öffne es, um beizutreten.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -285,6 +289,7 @@ export const it: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} ha ritirato {text}. Puoi interromperlo o continuare da solo.",
   "push.coachProgramAssign": "{name} ti ha assegnato un programma: {text}. Tocca per seguirlo.",
   "push.coachProgramAssignEnd": "{name} ha concluso {text}. Puoi fermarlo o tenere i giorni come tue routine.",
+  "push.teamInvite": "{name} ti ha aggiunto a {text}. Apri per entrare.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -342,6 +347,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name}さんが{text}を取り下げました。やめるか、自分で続けるかを選べます。",
   "push.coachProgramAssign": "{name}さんがプログラムを割り当てました：{text}。タップして始めましょう。",
   "push.coachProgramAssignEnd": "{name}さんが{text}を終了しました。やめるか、日ごとのルーティンとして残せます。",
+  "push.teamInvite": "{name}さんが{text}にあなたを追加しました。開いて参加しましょう。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -395,6 +401,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} retirou {text}. Você pode parar ou continuar por conta própria.",
   "push.coachProgramAssign": "{name} atribuiu um programa a você: {text}. Toque para seguir.",
   "push.coachProgramAssignEnd": "{name} encerrou {text}. Você pode parar ou guardar os dias como rotinas suas.",
+  "push.teamInvite": "{name} adicionou você a {text}. Abra para entrar.",
   "push.coachReview": "{name} deixou uma avaliação para você: {text}",
   "push.coachProgramSold": "{name} comprou o seu programa “{text}”.",
   "push.coachProgramReview": "{name} avaliou seu programa: {text}",
@@ -450,6 +457,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name}님이 {text}을(를) 거뒀어요. 멈추거나 혼자 이어갈 수 있어요.",
   "push.coachProgramAssign": "{name}님이 프로그램을 배정했어요: {text}. 눌러서 따라가세요.",
   "push.coachProgramAssignEnd": "{name}님이 {text}을(를) 끝냈어요. 멈추거나 날들을 내 루틴으로 남길 수 있어요.",
+  "push.teamInvite": "{name}님이 {text}에 나를 추가했어요. 열어서 참여하세요.",
   "push.coachReview": "{name}님이 리뷰를 남겼어요: {text}",
   "push.coachProgramSold": "{name}님이 내 프로그램 “{text}”을(를) 구매했어요.",
   "push.coachProgramReview": "{name}님이 내 프로그램을 평가했어요: {text}",
@@ -505,6 +513,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} {text} programını geri aldı. Durdurabilir veya kendi başına sürdürebilirsin.",
   "push.coachProgramAssign": "{name} sana bir program atadı: {text}. Takip etmek için dokun.",
   "push.coachProgramAssignEnd": "{name} {text} programını bitirdi. Durdurabilir veya günleri kendi rutinlerin olarak tutabilirsin.",
+  "push.teamInvite": "{name} seni {text} takımına ekledi. Katılmak için aç.",
   "push.coachReview": "{name} sana bir değerlendirme bıraktı: {text}",
   "push.coachProgramSold": "{name} “{text}” programını satın aldı.",
   "push.coachProgramReview": "{name} programını puanladı: {text}",
@@ -562,6 +571,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "push.coachPlanEnd": "{name} wycofuje {text}. Możesz go zatrzymać albo robić dalej samodzielnie.",
   "push.coachProgramAssign": "{name} przypisuje ci program: {text}. Stuknij, żeby go śledzić.",
   "push.coachProgramAssignEnd": "{name} kończy {text}. Możesz zatrzymać albo zachować dni jako własne rutyny.",
+  "push.teamInvite": "{name} dodaje cię do drużyny {text}. Otwórz, aby dołączyć.",
   "push.coachReview": "{name} wystawia ci opinię: {text}",
   "push.coachProgramSold": "{name} kupuje twój program „{text}”.",
   "push.coachProgramReview": "{name} ocenia Twój program: {text}",

@@ -66,6 +66,7 @@ import { Icon } from "./icons";
 import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { partLabel } from "./Stretch";
+import { TeamChat } from "./TeamChat";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
 const CLIENT = "c.";
@@ -74,13 +75,17 @@ const TEAM = "team.";
 const CHECKIN = "f.";
 // A form video (FormVideos.tsx), for the coach or the client.
 const VIDEO = "v.";
+// A school team's chat (TeamChat.tsx), for its athletes and coach.
+const TEAM_CHAT = "tc.";
 
 export function Trainer({ arg }: { arg?: string }) {
   const account = useAccount((s) => s.account);
   const code = arg && !arg.includes(".") && !(COACH_TABS as readonly string[]).includes(arg) ? codeFrom(arg) : "";
-  if (!account) return <SignedOut code={code} />;
+  // Signed out with a team's link: the code waits with its "team." mark, so signing in opens the team (coachInvite.ts).
+  if (!account) return <SignedOut code={arg?.startsWith(TEAM) ? `${TEAM}${teamCodeFrom(arg.slice(TEAM.length))}` : code} />;
   if (arg?.startsWith(CLIENT)) return <ClientScreen id={arg.slice(CLIENT.length)} />;
   if (arg?.startsWith(CHAT)) return <ChatScreen id={arg.slice(CHAT.length)} />;
+  if (arg?.startsWith(TEAM_CHAT)) return <TeamChat id={arg.slice(TEAM_CHAT.length)} />;
   // A school team's link (#/trainer/team.<code>, SchoolTeams.tsx) fills in the team code instead.
   if (arg?.startsWith(TEAM)) return <CoachHome team={teamCodeFrom(arg.slice(TEAM.length))} />;
   if (arg?.startsWith(CHECKIN)) return <CheckinScreen id={arg.slice(CHECKIN.length)} />;
@@ -112,7 +117,7 @@ function SignedOut({ code }: { code: string }) {
       <EmptyState
         icon="lock"
         title={code ? t("trn.signInCode") : t("trn.signIn")}
-        body={code ? t("trn.signInCodeBody", { code: showCode(code) }) : t("trn.signInBody")}
+        body={code ? t("trn.signInCodeBody", { code: showCode(code.replace(TEAM, "")) }) : t("trn.signInBody")}
         action={<Button onClick={() => go("account")}>{t("account.signIn")}</Button>}
       />
     </div>
