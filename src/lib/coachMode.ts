@@ -4,11 +4,11 @@
 // what Coaching opens on:
 // - a client (linked to a coach, or on a school team) sees only their coach: messages, check-ins, sessions, payments and
 //   what they share;
-// - a coach (has coached, or picked "I coach clients", which signing up from the coaches page does too) gets the coach's pages, one per job, as tabs;
-// - a school coach (has a school address or a team, or picked "I coach a high school team") gets the Teams page;
+// - a personal trainer or physio gets their tools as tabs; a sports coach (role coach, or school-only) gets Programs first;
+// - roles hide irrelevant tools (2026-11-24), not only labels; Messages stay for every persona;
 // - someone who is none of these picks how they'll use coaching first.
 import type { TeamsOverview } from "./teams";
-import type { Overview } from "./trainer";
+import type { Overview, Role } from "./trainer";
 
 export type CoachTab = "clients" | "messages" | "schedule" | "checkins" | "programs" | "pay" | "teams" | "setup" | "mine";
 export const COACH_TABS: readonly CoachTab[] = ["clients", "messages", "schedule", "checkins", "programs", "pay", "teams", "setup", "mine"];
@@ -57,23 +57,71 @@ export function coachingMode(o: O | null, teams: T | null, picked: Picked = null
   };
 }
 
-/** The coach's pages, in order. Programs (coachPrograms.ts) for every coach: free ones need no payments. Payments only once the server takes them; My coach when they train with one too. */
-export function coachTabs(mode: Mode, payments: boolean): CoachTab[] {
+/** Sports / team coach (not personal trainer or physio). School-only path counts as sports until they pick another role. */
+export function isSportsCoach(mode: Mode, role: Role | null): boolean {
+  if (role === "trainer" || role === "physio") return false;
+  if (role === "coach") return true;
+  return mode.school && !mode.coach;
+}
+
+/** Which tools a coach's client report and tabs expose for their role. Messages are always on. */
+export function coachTools(role: Role | null): {
+  schedule: boolean;
+  checkins: boolean;
+  pay: boolean;
+  rehab: boolean;
+  nutrition: boolean;
+  videos: boolean;
+  sessions: boolean;
+} {
+  if (role === "coach") {
+    return { schedule: false, checkins: false, pay: false, rehab: false, nutrition: false, videos: false, sessions: false };
+  }
+  if (role === "physio") {
+    return { schedule: true, checkins: true, pay: true, rehab: true, nutrition: false, videos: true, sessions: true };
+  }
+  if (role === "trainer") {
+    return { schedule: true, checkins: true, pay: true, rehab: false, nutrition: true, videos: true, sessions: true };
+  }
+  // Role not picked yet: keep the report lean until Setup › How you work.
+  return { schedule: false, checkins: false, pay: false, rehab: false, nutrition: false, videos: false, sessions: false };
+}
+
+/**
+ * The coach's pages, in order. Role gates the set (2026-11-24): personal trainer and physio get booking and check-ins;
+ * sports coaches lead with Programs (and Teams when school); pending role pick gets Clients, Messages and Setup only.
+ */
+export function coachTabs(mode: Mode, payments: boolean, role: Role | null = null): CoachTab[] {
+  if (!mode.coach && !mode.school) return [];
   const tabs: CoachTab[] = [];
-  if (mode.coach) tabs.push("clients", "messages", "schedule", "checkins", "programs");
-  if (mode.coach && payments) tabs.push("pay");
-  if (mode.school) tabs.push("teams");
-  if (mode.coach) tabs.push("setup");
-  if (tabs.length && (mode.client || mode.athlete)) tabs.push("mine");
+  const mine = mode.client || mode.athlete;
+
+  if (role === "trainer" || role === "physio") {
+    tabs.push("clients", "messages", "schedule", "checkins", "programs");
+    if (payments) tabs.push("pay");
+    if (mode.school) tabs.push("teams");
+    tabs.push("setup");
+  } else if (role === "coach") {
+    tabs.push("programs");
+    if (mode.school) tabs.push("teams");
+    tabs.push("messages", "clients", "setup");
+  } else if (mode.coach) {
+    // Picked personal training / coaching clients but not How you work yet.
+    tabs.push("clients", "messages", "setup");
+  } else {
+    // School-only: sports coach path.
+    tabs.push("programs", "teams", "messages", "clients", "setup");
+  }
+  if (tabs.length && mine) tabs.push("mine");
   return tabs;
 }
 
 /** What Coaching shows: the coach's pages (on a tab), the client's page, or the first page that asks. */
 export type View = { kind: "coach"; tab: CoachTab; tabs: CoachTab[] } | { kind: "client" } | { kind: "start" };
 
-export function coachingView(mode: Mode, payments: boolean, asked?: string): View {
+export function coachingView(mode: Mode, payments: boolean, asked?: string, role: Role | null = null): View {
   if (asked === "start") return { kind: "start" };
-  const tabs = coachTabs(mode, payments);
+  const tabs = coachTabs(mode, payments, role);
   if (tabs.length) {
     const tab = (tabs as string[]).includes(asked ?? "") ? (asked as CoachTab) : tabs[0]!;
     return { kind: "coach", tab, tabs };

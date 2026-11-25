@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { coachingMode, coachingView, coachTabs } from "./coachMode";
+import { coachingMode, coachingView, coachTabs, coachTools, isSportsCoach } from "./coachMode";
 import { coachBadge } from "./trainer";
 
 const NONE = { invite: null, clients: [], coaches: [], role: null, coach: false };
@@ -17,13 +17,34 @@ describe("which coaching pages a lifter sees", () => {
     expect(coachingView(mode, true, "clients")).toEqual({ kind: "client" });
   });
 
-  it("a coach gets a page per job, payments only once the server takes them", () => {
+  it("a personal trainer gets booking tools; payments only once the server takes them", () => {
+    const mode = coachingMode({ ...NONE, coach: true, role: "trainer" }, NO_TEAMS);
+    expect(coachTabs(mode, false, "trainer")).toEqual(["clients", "messages", "schedule", "checkins", "programs", "setup"]);
+    expect(coachTabs(mode, true, "trainer")).toEqual(["clients", "messages", "schedule", "checkins", "programs", "pay", "setup"]);
+    expect(coachingView(mode, false, "schedule", "trainer")).toMatchObject({ kind: "coach", tab: "schedule" });
+    expect(coachingView(mode, false, "teams", "trainer")).toMatchObject({ kind: "coach", tab: "clients" });
+  });
+
+  it("before How you work, a new coach only sees Clients, Messages and Setup", () => {
     const mode = coachingMode({ ...NONE, coach: true }, NO_TEAMS);
-    expect(coachTabs(mode, false)).toEqual(["clients", "messages", "schedule", "checkins", "programs", "setup"]);
-    expect(coachTabs(mode, true)).toEqual(["clients", "messages", "schedule", "checkins", "programs", "pay", "setup"]);
-    expect(coachingView(mode, false, "schedule")).toMatchObject({ kind: "coach", tab: "schedule" });
-    // A page that isn't theirs falls back to the first one.
-    expect(coachingView(mode, false, "teams")).toMatchObject({ kind: "coach", tab: "clients" });
+    expect(coachTabs(mode, true, null)).toEqual(["clients", "messages", "setup"]);
+    expect(coachingView(mode, true, "schedule", null)).toMatchObject({ kind: "coach", tab: "clients" });
+  });
+
+  it("a sports coach leads with Programs; Teams when school; no Schedule or Payments", () => {
+    const mode = coachingMode({ ...NONE, coach: true, role: "coach" }, NO_TEAMS);
+    expect(coachTabs(mode, true, "coach")).toEqual(["programs", "messages", "clients", "setup"]);
+    expect(isSportsCoach(mode, "coach")).toBe(true);
+    const school = coachingMode({ ...NONE, coach: true, role: "coach" }, { ...NO_TEAMS, school: { school: "Hill High", active: true } as never });
+    expect(coachTabs(school, true, "coach")).toEqual(["programs", "teams", "messages", "clients", "setup"]);
+    expect(coachingView(school, true, undefined, "coach")).toMatchObject({ kind: "coach", tab: "programs" });
+  });
+
+  it("a physio gets the same tabs as a personal trainer", () => {
+    const mode = coachingMode({ ...NONE, role: "physio" }, NO_TEAMS);
+    expect(coachTabs(mode, false, "physio")).toEqual(["clients", "messages", "schedule", "checkins", "programs", "setup"]);
+    expect(coachTools("physio").rehab).toBe(true);
+    expect(coachTools("physio").nutrition).toBe(false);
   });
 
   it("an invite, a client or a picked role makes a coach; so does picking it", () => {
@@ -34,16 +55,31 @@ describe("which coaching pages a lifter sees", () => {
     expect(coachingMode(NONE, null).coach).toBe(false);
   });
 
-  it("a school coach gets the Teams page; a coach who trains with a coach too gets My coach", () => {
+  it("a school-only coach gets the sports tabs with Teams; My coach when they train with one too", () => {
     const school = coachingMode(NONE, { ...NO_TEAMS, school: { school: "Hill High", active: true } as never });
-    expect(coachTabs(school, false)).toEqual(["teams"]);
-    const both = coachingMode({ ...NONE, coach: true, coaches: [SAM] }, NO_TEAMS);
-    expect(coachTabs(both, false).at(-1)).toBe("mine");
+    expect(isSportsCoach(school, null)).toBe(true);
+    expect(coachTabs(school, false, null)).toEqual(["programs", "teams", "messages", "clients", "setup"]);
+    const both = coachingMode({ ...NONE, coach: true, role: "trainer", coaches: [SAM] }, NO_TEAMS);
+    expect(coachTabs(both, false, "trainer").at(-1)).toBe("mine");
   });
 
   it("someone who is none of these picks a side first", () => {
     expect(coachingView(coachingMode(NONE, NO_TEAMS), false)).toEqual({ kind: "start" });
     expect(coachingView(coachingMode({ ...NONE, coach: true }, NO_TEAMS), false, "start")).toEqual({ kind: "start" });
+  });
+
+  it("sports coaches hide booking, check-ins, pay, rehab, nutrition and form videos", () => {
+    expect(coachTools("coach")).toEqual({
+      schedule: false,
+      checkins: false,
+      pay: false,
+      rehab: false,
+      nutrition: false,
+      videos: false,
+      sessions: false,
+    });
+    expect(coachTools("trainer").sessions).toBe(true);
+    expect(coachTools("trainer").nutrition).toBe(true);
   });
 });
 

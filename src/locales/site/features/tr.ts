@@ -526,7 +526,7 @@ export const tr: FeaturesText = {
     },
     "coach-roles": {
       name: "Kişisel antrenörler ve koçlar için",
-      body: "Birebir çalışan bir kişisel antrenör mü, grupları ve takımları yöneten bir koç mu olduğunu söyle. Danışanlar sana uygun unvanı görür, en çok kullandığın araçlar da öne gelir.",
+      body: "Kişisel antrenör, spor koçu veya fizyo olduğunuzu söyleyin. Danışanlar doğru unvanı görür ve yalnızca o rolün araçları çıkar — mesajlaşma herkes için kalır.",
     },
     "coach-booking": {
       name: "Seans rezervasyonu ve planlama",

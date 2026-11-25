@@ -22,6 +22,8 @@ let inviteKind: "coach" | "team" | "invalid" | "offline" = "coach";
 const TEAM = { id: "t1", name: "School squad", code: "", school: "Central", coachId: "k1", coachName: "Sam", members: 2 };
 // Whether this account coaches (an invite out and a client). Client-side tests turn it off: a client sees only their coach.
 let coaching = true;
+/** The coach's How you work role; defaults to personal trainer so PT tools show in coach-side tests. */
+let coachRole: "trainer" | "coach" | "physio" | null = "trainer";
 const asClient = () => {
   linked = true;
   coaching = false;
@@ -65,6 +67,7 @@ beforeEach(() => {
   linked = false;
   inviteKind = "coach";
   coaching = true;
+  coachRole = "trainer";
   assigned = [];
   note = null;
   shared = null;
@@ -89,6 +92,7 @@ beforeEach(() => {
         forms: [FORM],
         checkins: answered,
         repeat: null,
+        role: coachRole,
         pay: payOn
           ? {
               account: { ready: true, currency: "cad" },
@@ -98,6 +102,7 @@ beforeEach(() => {
             }
           : null,
       });
+    if (url.startsWith("/api/programs/")) return Response.json({ mine: [], pay: { ready: false } });
     if (url === "/api/coach/?checkin=ci1") return Response.json({ checkin: CHECKIN });
     if (url === "/api/coach/?chat=k1")
       return Response.json({
@@ -115,6 +120,8 @@ beforeEach(() => {
         plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
         notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
         setup: { days: 3 },
+        role: coaching ? coachRole : null,
+        coach: coaching,
         targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
         forms: [FORM],
         checkins: linked ? [CHECKIN] : [],
@@ -361,7 +368,7 @@ describe("pages for each side", () => {
     expect(screen.getByRole("heading", { name: "What Sam sees" })).toBeInTheDocument();
   });
 
-  it("a coach gets a page per job as tabs, and a tab replaces the page", async () => {
+  it("a personal trainer gets a page per job as tabs, and a tab replaces the page", async () => {
     const u = userEvent.setup();
     render(<Trainer />);
     const nav = await screen.findByRole("navigation", { name: "Coaching pages" });
@@ -375,13 +382,26 @@ describe("pages for each side", () => {
     expect(location.hash).toBe("#/coaching/messages");
   });
 
+  it("a sports coach leads with Programs and Athletes, without Schedule or Check-ins", async () => {
+    coachRole = "coach";
+    render(<Trainer />);
+    const nav = await screen.findByRole("navigation", { name: "Coaching pages" });
+    expect(within(nav).getByRole("button", { name: "Programs" })).toHaveAttribute("aria-current", "page");
+    expect(within(nav).getByRole("button", { name: "Athletes" })).toBeInTheDocument();
+    expect(within(nav).getByRole("button", { name: "Messages" })).toBeInTheDocument();
+    expect(within(nav).queryByRole("button", { name: "Schedule" })).toBeNull();
+    expect(within(nav).queryByRole("button", { name: "Check-ins" })).toBeNull();
+    expect(within(nav).queryByRole("button", { name: "Payments" })).toBeNull();
+  });
+
   it("someone new to coaching picks a side first", async () => {
     coaching = false;
+    coachRole = null;
     render(<Trainer />);
     expect(await screen.findByText("How will you use coaching?")).toBeInTheDocument();
     expect(screen.getByText("I train with a coach")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /I coach clients/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /I coach a high school team/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /I'm a personal trainer/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /I'm a coach/ })).toBeInTheDocument();
   });
 
   it("signed out, a coach's code waits through signing in or making an account", () => {
