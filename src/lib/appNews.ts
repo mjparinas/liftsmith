@@ -52,6 +52,7 @@ export const RELEASES: readonly AppRelease[] = [
     changes: [
       { id: "myTeam", kind: "new", icon: "trophy" },
       { id: "teamAdd", kind: "fixed", icon: "people" },
+      { id: "programDays", kind: "fixed", icon: "layers" },
     ],
   },
   {

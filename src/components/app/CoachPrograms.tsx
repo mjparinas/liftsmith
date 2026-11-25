@@ -19,7 +19,7 @@ import {
   type MinePrograms,
   type ProgramDraft,
 } from "@/lib/coachPrograms";
-import { PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
+import { dayChoices, extraCopies, PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
 import { t, tFor } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { copyText, shareUrl } from "@/lib/shareLinks";
@@ -27,6 +27,7 @@ import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { loadTeams, type Team } from "@/lib/teams";
 import { loadOverview, trainerError, type Overview, type Person } from "@/lib/trainer";
+import type { Routine } from "@/lib/types";
 
 import { factsLine } from "./CoachProgram";
 import { ProgramCalendar } from "./ProgramCalendar";
@@ -49,8 +50,8 @@ const templateId = (): string => {
 };
 
 /** Builds draft fields and local routines from a template (kept outside render for purity). */
-function draftFromTemplate(tpl: ProgramTemplate, d: ProgramDraft, now = Date.now()) {
-  const { routines: made, routineIds, weekdays } = routinesFromTemplate(tpl, now, templateId);
+function draftFromTemplate(tpl: ProgramTemplate, d: ProgramDraft, existing: readonly Routine[], now = Date.now()) {
+  const { routines: made, routineIds, weekdays } = routinesFromTemplate(tpl, now, templateId, existing);
   return {
     made,
     draft: {
@@ -308,8 +309,19 @@ function Editor({
     if (!(await shareUrl(link, program.title))) setNote((await copyText(link)) ? t("cpg.copied") : link);
   };
 
+  const choices = dayChoices(routines, d.routineIds);
+  // Identical copies (mostly from tapping a template more than once) can go; picked days and today's routine stay.
+  const today = useApp((s) => s.routineId);
+  const copies = extraCopies(routines, today ? [...d.routineIds, today] : d.routineIds);
+  const tidy = () => {
+    const { deleteRoutine } = useApp.getState();
+    for (const id of copies) deleteRoutine(id);
+    haptic("toggle");
+    track("feature", { name: "coach_program", detail: "tidy_copies" });
+  };
+
   const applyTemplate = (tpl: ProgramTemplate) => {
-    const { made, draft, weeks } = draftFromTemplate(tpl, d);
+    const { made, draft, weeks } = draftFromTemplate(tpl, d, routines);
     for (const r of made) useApp.getState().saveRoutine(r);
     setD(draft);
     setWeeks(weeks);
@@ -361,6 +373,7 @@ function Editor({
       </div>
       <div>
         <p className="text-sm font-medium">{t("cpg.days.label")}</p>
+        <p className="text-xs text-faint">{t("cpg.days.what")}</p>
         <p className="text-xs text-faint">
           {keepDays ? t("cpg.days.keep", { count: program?.days.length ?? 0 }) : t("cpg.days.hint", { count: PROGRAM_LIMITS.days })}
         </p>
@@ -372,17 +385,22 @@ function Editor({
             </Button>
           </div>
         ) : (
-          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("cpg.days.label")}>
-            {routines.map((r) => {
-              const at = d.routineIds.indexOf(r.id);
-              return (
+          <>
+            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("cpg.days.label")}>
+              {choices.map(({ routine: r, at, exercises }) => (
                 <Chip key={r.id} active={at >= 0} onClick={() => toggleDay(r.id)}>
                   {at >= 0 ? `${at + 1}. ` : ""}
                   {r.name}
+                  {exercises !== undefined ? ` · ${t("cpg.days.ex", { count: exercises })}` : ""}
                 </Chip>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+            {copies.length > 0 && (
+              <Button kind="quiet" icon="trash" className="mt-2" onClick={tidy}>
+                {t("cpg.days.tidy", { count: copies.length })}
+              </Button>
+            )}
+          </>
         )}
       </div>
       <div>

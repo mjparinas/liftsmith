@@ -25,6 +25,15 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 - **Delete** removes a program nobody has; a program somebody bought is only taken off the list instead ("Take it off the list"), so nobody loses what they paid for. Off the list, only the coach and people who have it can open it.
 - The coach gets a push for each sale (`coachProgramSold`, once per payment).
 
+## Picking the days (Melvin, 2026-11-25: "i dont understand how these programs work for coaches")
+
+- The editor says what a day is, right under **Days**: one workout, done in order (Day 1, then Day 2), with weights from each lifter's own history.
+- **The picked days come first, in the order they run** (1, 2, 3, 4), then the coach's other routines A to Z (`dayChoices` in `coachProgramTemplates.ts`). It used to list routines newest first, so four picked days read 4, 3, 2, 1.
+- **Identical copies show once.** Two routines are the same day when their share code matches (name, exercises, sets and parts) and neither belongs to a coach assignment (`routineKey`). Routines that share a name but differ say how many exercises each has.
+- **A template reuses what it already made.** Tapping Upper / Lower or Push / Pull / Legs used to make four or six new routines every time, so a coach who tried them a few times had dozens of "Upper A"s. Now an unchanged day routine is reused, and only a day the coach changed gets a new one.
+- **Remove N identical copies** (under the chips, only when there are some) deletes the extra copies from the coach's routines, keeping the picked one, today's routine, or else the newest (`extraCopies`). Programs already saved are untouched: their days travel as codes on the server.
+- Pure web code, so Android, iOS and the web get it together.
+
 ## Lifter side
 
 - **Settings › Program** gets **From coaches**: the programs the lifter has, and **Browse coaches' programs** (`#/program`), the list, newest first.
