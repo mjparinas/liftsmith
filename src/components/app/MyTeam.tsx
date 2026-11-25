@@ -85,7 +85,7 @@ export function MyTeam({
       <div className="contents min-w-0 desk:flex desk:flex-col desk:gap-4">
         {coaches.map((c) => (
           <div key={c.id} className="order-3">
-            <CoachCard coach={c} unread={data.unread?.[c.id] ?? 0} />
+            <CoachCard coach={c} unread={data.unread?.[c.id] ?? 0} assistants={assistantsOf(teams.joined, c.id)} />
           </div>
         ))}
         {teams.joined.length > 0 && (
@@ -169,8 +169,17 @@ function TeamCard({ team, unread }: { team: Team; unread: number }) {
   );
 }
 
-/** The athlete's coach, with Message first (the same chat Coaching always had). */
-function CoachCard({ coach, unread }: { coach: Person; unread: number }) {
+/** The assistant coaches on any of this coach's teams the athlete is on, each once. */
+export function assistantsOf(teams: Team[], coachId: string): { id: string; name: string }[] {
+  const all = teams.filter((tm) => tm.coachId === coachId).flatMap((tm) => tm.assistants ?? []);
+  return [...new Map(all.map((a) => [a.id, a])).values()];
+}
+
+/**
+ * The athlete's coach, with Message first (the same chat Coaching always had), and the assistant coaches who help with
+ * the team (Melvin, 2026-11-25: "It should also show assistant/junior coaches here").
+ */
+function CoachCard({ coach, unread, assistants }: { coach: Person; unread: number; assistants: { id: string; name: string }[] }) {
   const name = coach.name || t("trn.noName");
   return (
     <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-violet)" }}>
@@ -184,6 +193,27 @@ function CoachCard({ coach, unread }: { coach: Person; unread: number }) {
           <span className="block text-sm text-muted">{t("mt.coachHint")}</span>
         </span>
       </div>
+      {assistants.length > 0 && (
+        <div className="mt-3 border-t border-line pt-3">
+          <p className="text-xs font-semibold tracking-wider text-muted uppercase">{t("mt.assistants", { count: assistants.length })}</p>
+          <ul className="mt-2 space-y-2">
+            {assistants.map((a) => {
+              const n = a.name || t("trn.noName");
+              return (
+                <li key={a.id} className="flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-raised text-sm font-bold text-violet"
+                  >
+                    {n.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{n}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
       <Button kind="ghost" className="mt-3 w-full" icon="chat" onClick={() => go("trainer", `m.${coach.id}`)}>
         <span className="inline-flex items-center gap-2">
           {t("trn.messageNamed", { name })}

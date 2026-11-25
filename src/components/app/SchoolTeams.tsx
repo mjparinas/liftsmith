@@ -251,6 +251,7 @@ function CoachSide({
             team={tm}
             members={data.members[tm.id] ?? []}
             invited={data.invited[tm.id] ?? []}
+            left={data.left[tm.id] ?? []}
             athletes={athletes}
             unread={data.chatUnread[tm.id] ?? 0}
             live={data.live[tm.id]}
@@ -390,6 +391,7 @@ function CoachTeam({
   team,
   members,
   invited,
+  left,
   athletes,
   unread,
   live,
@@ -400,6 +402,8 @@ function CoachTeam({
   members: { id: string; name: string; since: number }[];
   /** Athletes added from the coach's list, waiting to say yes on My team. */
   invited: { id: string; name: string; since: number }[];
+  /** Athletes who left this team, so one who left by mistake can be added back. */
+  left: { id: string; name: string }[];
   athletes: { id: string; name: string }[];
   /** Unread team chat messages. */
   unread: number;
@@ -564,7 +568,7 @@ function CoachTeam({
           </ul>
         </details>
       )}
-      <AddAthletes team={team} members={members} invited={invited} athletes={athletes} onChange={onChange} onNote={setNote} />
+      <AddAthletes team={team} members={members} invited={invited} left={left} athletes={athletes} onChange={onChange} onNote={setNote} />
       <div className="mt-2 flex flex-wrap gap-2">
         <Button kind="quiet" onClick={() => void act(() => newTeamCode(team.id), "newCode")}>
           {t("trn.newCode")}
@@ -585,12 +589,14 @@ function CoachTeam({
 /**
  * The coach's athletes who aren't on this team (they joined with the coach's own invite, so a team never counted them;
  * Melvin, 2026-11-25), each with Add, and the ones added who haven't said yes yet, with Take back. Adding asks them on
- * My team for their age and agreement, as a team code would.
+ * My team for their age and agreement, as a team code would. Athletes who left the team are listed too, marked "Left
+ * the team", so one who left by mistake can be added back even without a coach link (Melvin, 2026-11-25).
  */
 function AddAthletes({
   team,
   members,
   invited,
+  left,
   athletes,
   onChange,
   onNote,
@@ -598,13 +604,15 @@ function AddAthletes({
   team: Team;
   members: { id: string }[];
   invited: { id: string; name: string }[];
+  left: { id: string; name: string }[];
   athletes: { id: string; name: string }[];
   onChange: () => void;
   onNote: (n: string) => void;
 }) {
   const on = new Set([...members, ...invited].map((m) => m.id));
-  const left = athletes.filter((a) => !on.has(a.id));
-  if (!left.length && !invited.length) return null;
+  const gone = new Set(left.map((m) => m.id));
+  const rest = [...left.filter((m) => !on.has(m.id)), ...athletes.filter((a) => !on.has(a.id) && !gone.has(a.id))];
+  if (!rest.length && !invited.length) return null;
   const run = async (f: () => Promise<void>, note: string, detail: string) => {
     try {
       await f();
@@ -640,9 +648,12 @@ function AddAthletes({
             </Button>
           </li>
         ))}
-        {left.map((a) => (
+        {rest.map((a) => (
           <li key={a.id} className="flex items-center gap-2 py-2">
-            <span className="min-w-0 flex-1 truncate">{a.name || t("trn.noName")}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate">{a.name || t("trn.noName")}</span>
+              {gone.has(a.id) && <span className="block text-xs text-muted">{t("mt.leftTeam")}</span>}
+            </span>
             <Button
               kind="ghost"
               icon="plus"

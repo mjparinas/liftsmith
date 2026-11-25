@@ -24,6 +24,8 @@ export interface Team {
   coachId: string;
   coachName: string;
   members: number;
+  /** Assistant coaches who help with this team (their calendar access is scoped to it): shown to athletes on My team. */
+  assistants?: { id: string; name: string }[];
 }
 export interface Member {
   id: string;
@@ -42,6 +44,8 @@ export interface TeamsOverview {
   invites: Team[];
   /** Athletes each of the coach's teams is waiting on, by team id. */
   invited: Record<string, Member[]>;
+  /** Athletes who left each of the coach's teams, newest first, so a coach can add back one who left by mistake. */
+  left: Record<string, Member[]>;
   /** Unread team chat messages, by team id. */
   chatUnread: Record<string, number>;
 }
@@ -55,6 +59,8 @@ export interface TeamMessage {
   body: string;
   mine: boolean;
   canDelete: boolean;
+  /** Their Friends avatar, or "" for a letter. */
+  avatar?: string;
 }
 export interface TeamChatPage {
   messages: TeamMessage[];
@@ -73,6 +79,7 @@ export const fullOverview = (o: Partial<TeamsOverview>): TeamsOverview => ({
   live: o.live ?? {},
   invites: o.invites ?? [],
   invited: o.invited ?? {},
+  left: o.left ?? {},
   chatUnread: o.chatUnread ?? {},
 });
 export interface BoardRow {

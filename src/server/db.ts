@@ -1195,6 +1195,14 @@ const SCHEMA = [
     PRIMARY KEY (team_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS team_invites_account ON team_invites (account_id)`,
+  // Athletes who left a team or were taken off it, so its coach can add them back (2026-11-25). Gone when they rejoin.
+  `CREATE TABLE IF NOT EXISTS team_left (
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    left_at INTEGER NOT NULL,
+    PRIMARY KEY (team_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_left_account ON team_left (account_id)`,
   `CREATE TABLE IF NOT EXISTS team_messages (
     id TEXT PRIMARY KEY,
     team_id TEXT NOT NULL,

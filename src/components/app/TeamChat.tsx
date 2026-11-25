@@ -17,6 +17,7 @@ import { loadTeamChat, sayToTeam, teamError, unsayToTeam, type TeamMessage } fro
 import { refreshCoachNotes } from "@/lib/trainer";
 import { isVisible, onVisibility } from "@/lib/visibility";
 
+import { Avatar } from "./AvatarFace";
 import { backToCoaching } from "./CoachChat";
 import { Icon } from "./icons";
 import { Button, EmptyState, ScreenHeader, Sheet } from "./ui";
@@ -215,7 +216,8 @@ export function TeamChat({ id }: { id: string }) {
         ) : (
           <ol className="space-y-2 pt-3" aria-live="polite" aria-label={pane ? undefined : t("mt.chat")}>
             {list.map((m) => (
-              <li key={m.id} className={`flex items-end gap-1 ${m.mine ? "flex-row-reverse" : ""}`}>
+              <li key={m.id} className={`flex items-end gap-2 ${m.mine ? "flex-row-reverse" : ""}`}>
+                {!m.mine && <Avatar name={who(m)} avatar={m.avatar} size={32} />}
                 <div
                   className={`min-w-0 max-w-[85%] rounded-2xl px-4 py-2 ${m.mine ? "bg-accent/15" : m.coach ? "card card-tint" : "card"}`}
                   style={m.coach && !m.mine ? { ["--tint" as string]: "var(--color-violet)" } : undefined}

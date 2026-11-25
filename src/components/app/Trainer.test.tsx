@@ -919,6 +919,9 @@ describe("My team (school team athletes)", () => {
     expect(await screen.findByText("Maya")).toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: /pages/i })).toBeNull();
     for (const tab of ["Programs", "Athletes", "Setup", "Clients"]) expect(screen.queryByRole("button", { name: tab })).toBeNull();
+    // Only a coach adds another coach or team, and a team coach is never offered the cycle (Melvin, 2026-11-25).
+    expect(screen.queryByRole("button", { name: "Add a coach or team" })).toBeNull();
+    expect(screen.queryByText("Share your cycle with Sam")).toBeNull();
   });
 
   it("an athlete a coach added joins with their age, no code needed", async () => {

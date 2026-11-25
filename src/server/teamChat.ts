@@ -9,6 +9,8 @@
 //   chat since, at most once an hour per team.
 import { randomBytes } from "node:crypto";
 
+import { AVATAR_IDS } from "@/lib/socialTypes";
+
 import { nameOf } from "./coach";
 import { batch, query, rateLimit, run } from "./db";
 import { checkText } from "./moderation";
@@ -43,6 +45,8 @@ export interface TeamMessage {
   body: string;
   mine: boolean;
   canDelete: boolean;
+  /** Their Friends avatar (one of the app's own faces), or "" for a letter. */
+  avatar: string;
 }
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0]?.slice(0, 30) ?? "";
@@ -84,7 +88,25 @@ async function shownName(id: string, coachId: string): Promise<string> {
   return id === coachId ? name : firstName(name);
 }
 
-async function toMessage(viewer: string, a: Access, r: { id: string; account_id: string; created_at: number; body: string }) {
+const AVATAR_SET = new Set<string>(AVATAR_IDS);
+
+/** Each writer's chosen avatar, one primary-key read for the page (social_profiles.account_id). */
+async function avatarsOf(ids: string[]): Promise<Map<string, string>> {
+  const unique = [...new Set(ids)];
+  if (!unique.length) return new Map();
+  const rows = await query<{ account_id: string; avatar: string }>(
+    `SELECT account_id, avatar FROM social_profiles WHERE account_id IN (${unique.map(() => "?").join(", ")})`,
+    unique,
+  );
+  return new Map(rows.map((r) => [s(r.account_id), AVATAR_SET.has(s(r.avatar)) ? s(r.avatar) : ""]));
+}
+
+async function toMessage(
+  viewer: string,
+  a: Access,
+  r: { id: string; account_id: string; created_at: number; body: string },
+  avatars: Map<string, string>,
+) {
   const from = s(r.account_id);
   const coachId = s(a.team.coach_id);
   const mine = from === viewer;
@@ -96,6 +118,7 @@ async function toMessage(viewer: string, a: Access, r: { id: string; account_id:
     body: s(r.body),
     mine,
     canDelete: mine || a.coach,
+    avatar: avatars.get(from) ?? "",
   };
   return m;
 }
@@ -117,7 +140,8 @@ export async function teamChat(accountId: string, b: Record<string, unknown>, no
      ORDER BY created_at ${newer ? "ASC" : "DESC"} LIMIT ${TEAM_CHAT.page}`,
     [s(a.team.id), older ? before : newer ? after : now + 1],
   );
-  const messages = await Promise.all(rows.map((r) => toMessage(accountId, a, r)));
+  const avatars = await avatarsOf(rows.map((r) => s(r.account_id)));
+  const messages = await Promise.all(rows.map((r) => toMessage(accountId, a, r, avatars)));
   if (!newer) messages.reverse();
   if (!older) await markRead(s(a.team.id), accountId, now);
   return ok({ messages, more: !newer && rows.length === TEAM_CHAT.page, team: { id: s(a.team.id), name: s(a.team.name) }, coach: a.coach });
@@ -143,7 +167,12 @@ export async function teamSay(accountId: string, b: Record<string, unknown>, now
       args: [teamId, accountId, now],
     },
   ]);
-  const message = await toMessage(accountId, a, { id, account_id: accountId, created_at: now, body: text.text });
+  const message = await toMessage(
+    accountId,
+    a,
+    { id, account_id: accountId, created_at: now, body: text.text },
+    await avatarsOf([accountId]),
+  );
   await pushChat(a, accountId, message.name, text.text, now);
   return ok({ message });
 }

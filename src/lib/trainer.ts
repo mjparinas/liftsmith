@@ -252,7 +252,11 @@ function token(): string {
   return a.token;
 }
 
-export const loadOverview = async () => api<Overview>("/api/coach/", { token: token() });
+/** The required lists are always there, even from an older server or a cached copy that lacks one, so no screen reads `.length` of nothing. */
+export const loadOverview = async () => {
+  const o = await api<Overview>("/api/coach/", { token: token() });
+  return { ...o, clients: o.clients ?? [], coaches: o.coaches ?? [], plans: o.plans ?? [] };
+};
 export const loadClient = async (id: string) => api<ClientView>(`/api/coach/?client=${encodeURIComponent(id)}`, { token: token() });
 /** A fresh invite. The first one from a coach who came in through the coaches page says so, for the admin panel's counts. */
 export async function newInvite(): Promise<Invite> {

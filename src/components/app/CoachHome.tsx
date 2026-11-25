@@ -210,7 +210,7 @@ export function CoachHome({
             teams={teams.data}
             onChange={reloadAll}
             onJoined={() => onJoined(true)}
-            more={<AthleteMore data={data} teams={teams.data} onChange={reloadAll} onJoined={onJoined} />}
+            more={<AthleteMore data={data} teams={teams.data} onChange={reloadAll} />}
           />
         ) : (
           <ClientPage
@@ -461,22 +461,12 @@ function ClientPage({
 
 /**
  * The rest of an athlete's My team (MyTeam.tsx): other coaches they have, check-ins waiting, notes and routines from
- * their coach, what they share with each coach, and a code for another team or coach.
+ * their coach and what they share with each coach. Only a coach adds another coach or team (Melvin, 2026-11-25): an
+ * athlete joins one from the coach's link or an invite on My team, never from a code box here.
  */
-function AthleteMore({
-  data,
-  teams,
-  onChange,
-  onJoined,
-}: {
-  data: Overview;
-  teams: TeamsOverview;
-  onChange: () => void;
-  onJoined: (team?: boolean) => void;
-}) {
+function AthleteMore({ data, teams, onChange }: { data: Overview; teams: TeamsOverview; onChange: () => void }) {
   const coaches = data.coaches;
   const teamCoaches = new Set(teams.joined.map((tm) => tm.coachId));
-  const [adding, setAdding] = useState(false);
   return (
     <div className="space-y-4">
       {coaches
@@ -489,17 +479,8 @@ function AthleteMore({
       />
       <FromCoach coaches={coaches} plans={data.plans} notes={data.notes ?? []} targets={data.targets ?? []} />
       {coaches.map((c) => (
-        <Sharing key={c.id} coach={c} on={sharedWith(data, c.id)} onChange={onChange} />
+        <Sharing key={c.id} coach={c} on={sharedWith(data, c.id)} onChange={onChange} team={teamCoaches.has(c.id)} />
       ))}
-      <Section title={t("trn.addAnother")} icon="plus">
-        {adding ? (
-          <JoinCoach code="" coaches={coaches} onChange={onJoined} />
-        ) : (
-          <Button kind="ghost" icon="plus" className="w-full" onClick={() => setAdding(true)}>
-            {t("trn.addAnotherButton")}
-          </Button>
-        )}
-      </Section>
     </div>
   );
 }
@@ -600,7 +581,10 @@ function FromCoach({ coaches, plans, notes, targets }: { coaches: Person[]; plan
 }
 
 /** What the lifter shares with one coach, item by item, which they choose, and Stop sharing. */
-function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onChange: () => void }) {
+/** What a school team's coach is never offered (Melvin, 2026-11-25: cycle sharing there "seems pretty intrusive"). */
+const TEAM_HIDDEN: readonly ShareKind[] = ["cycle"];
+
+function Sharing({ coach, on, onChange, team = false }: { coach: Person; on: ShareKind[]; onChange: () => void; team?: boolean }) {
   const [note, setNote] = useState<string | null>(null);
   const name = coach.name || t("trn.noName");
   const leave = async () => {
@@ -618,7 +602,7 @@ function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onCh
   return (
     <Section title={t("trn.shareTitle", { name })} icon="lock">
       <p className="mb-2 px-1 text-sm text-muted">{t("trn.shareLead", { name })}</p>
-      <ShareSwitches coachId={coach.id} name={name} on={on} onChange={onChange} />
+      <ShareSwitches coachId={coach.id} name={name} on={on} onChange={onChange} hide={team ? TEAM_HIDDEN : []} />
       <p className="mt-2 px-1 text-xs text-muted">{t("trn.shareNever")}</p>
       <Button kind="ghost" className="mt-3 w-full" onClick={() => void leave()}>
         {t("trn.stopSharingNamed", { name })}
