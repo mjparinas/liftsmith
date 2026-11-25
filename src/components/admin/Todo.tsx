@@ -18,6 +18,7 @@ const KIND_LABEL: Record<TodoKind, string> = {
   billing: "Billing",
   job: "System",
   gyms: "Gyms",
+  schools: "School coaches",
   setup: "Setup",
 };
 const post = async (body: Record<string, unknown>) => {
@@ -171,7 +172,7 @@ export function Todo({ admin, go, onList }: { admin: boolean; go: (tab: string) 
     <div className="space-y-4">
       <Card
         title="Needs a person"
-        subtitle="Worked out from mail, creators, billing, the reminder job and settings, every time you open this tab."
+        subtitle="School approvals, reports, mail, gym requests, payouts and system tasks, checked every time you open this tab."
         right={
           data.hidden > 0 && admin ? (
             <button
