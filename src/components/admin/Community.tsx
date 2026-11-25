@@ -13,6 +13,7 @@ import type { AdminPost } from "@/server/community";
 import { Card } from "./charts";
 import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
+import { useDangerArm } from "./useDangerArm";
 
 const STATUS_NAME: Record<Status, string> = {
   review: "Under review",
@@ -23,8 +24,9 @@ const STATUS_NAME: Record<Status, string> = {
   merged: "Merged",
 };
 const box = "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm";
-const btn = "press rounded-lg border border-line px-3 py-1.5 text-sm text-muted";
-const danger = "press rounded-lg border border-bad/40 px-3 py-1.5 text-sm text-bad";
+const btn = "press min-h-11 rounded-lg border border-line px-3 py-1.5 text-sm text-muted";
+const danger = "press min-h-11 rounded-lg border border-bad/40 px-3 py-1.5 text-sm text-bad";
+const dangerArmed = "press min-h-11 rounded-lg border border-bad bg-bad/15 px-3 py-1.5 text-sm font-semibold text-bad";
 
 type Comment = {
   id: string;
@@ -161,6 +163,7 @@ function PostDetail({ post, posts, admin, onChange }: { post: AdminPost; posts: 
   const [into, setInto] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [v, setV] = useState(0);
+  const { armed, isArmed, request } = useDangerArm();
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/community/?id=${encodeURIComponent(post.id)}`)
@@ -178,6 +181,9 @@ function PostDetail({ post, posts, admin, onChange }: { post: AdminPost; posts: 
       setV((x) => x + 1);
       onChange();
     }
+  };
+  const dangerAct = (id: string, action: string, body: object, done: string) => {
+    request(id, action, true, () => void act(body, done));
   };
   const targets = posts.filter((p) => p.id !== post.id && p.status !== "merged");
   const needle = into.trim().toLowerCase();
@@ -203,6 +209,11 @@ function PostDetail({ post, posts, admin, onChange }: { post: AdminPost; posts: 
       {msg && (
         <p role="status" className="text-sm text-muted">
           {msg}
+        </p>
+      )}
+      {armed && (
+        <p className="text-sm text-bad" role="status" aria-live="polite">
+          Confirm the danger action, or press Esc to cancel.
         </p>
       )}
       {admin && post.status !== "merged" && (
@@ -319,16 +330,22 @@ function PostDetail({ post, posts, admin, onChange }: { post: AdminPost; posts: 
                     >
                       {c.hidden ? "Show" : "Hide"}
                     </button>
-                    <button type="button" className={danger} onClick={() => void act({ op: "remove", comment: c.id }, "Comment removed.")}>
-                      Remove
+                    <button
+                      type="button"
+                      aria-pressed={isArmed(c.id, "remove")}
+                      className={isArmed(c.id, "remove") ? dangerArmed : danger}
+                      onClick={() => dangerAct(c.id, "remove", { op: "remove", comment: c.id }, "Comment removed.")}
+                    >
+                      {isArmed(c.id, "remove") ? "Confirm remove?" : "Remove"}
                     </button>
                     {!c.staff && (
                       <button
                         type="button"
-                        className={danger}
-                        onClick={() => void act({ op: "block", account: c.accountId }, "Blocked from the community.")}
+                        aria-pressed={isArmed(c.id, "block")}
+                        className={isArmed(c.id, "block") ? dangerArmed : danger}
+                        onClick={() => dangerAct(c.id, "block", { op: "block", account: c.accountId }, "Blocked from the community.")}
                       >
-                        Block
+                        {isArmed(c.id, "block") ? "Confirm block?" : "Block"}
                       </button>
                     )}
                   </div>
@@ -368,17 +385,25 @@ function PostDetail({ post, posts, admin, onChange }: { post: AdminPost; posts: 
           >
             {post.hiddenBy ? "Show the post" : "Hide the post"}
           </button>
-          <button type="button" className={danger} onClick={() => void act({ op: "remove", post: post.id }, "Post removed.")}>
-            Remove the post
+          <button
+            type="button"
+            aria-pressed={isArmed(post.id, "remove")}
+            className={isArmed(post.id, "remove") ? dangerArmed : danger}
+            onClick={() => dangerAct(post.id, "remove", { op: "remove", post: post.id }, "Post removed.")}
+          >
+            {isArmed(post.id, "remove") ? "Confirm remove?" : "Remove the post"}
           </button>
           {post.accountId && (
             <>
               <button
                 type="button"
-                className={danger}
-                onClick={() => void act({ op: "block", account: post.accountId }, "The author is blocked from the community.")}
+                aria-pressed={isArmed(post.id, "block")}
+                className={isArmed(post.id, "block") ? dangerArmed : danger}
+                onClick={() =>
+                  dangerAct(post.id, "block", { op: "block", account: post.accountId }, "The author is blocked from the community.")
+                }
               >
-                Block the author
+                {isArmed(post.id, "block") ? "Confirm block?" : "Block the author"}
               </button>
               <button
                 type="button"
