@@ -1081,6 +1081,7 @@ export const emails: Record<string, Words> = {
       "Os atletas recebem um push e Seguem uma vez em Hoje. A progressão deles escolhe os pesos.",
       "Num dia agendado, Hoje mostra esse treino. Dias livres ficam de descanso.",
       "O calendário do programa mostra Feito e Ainda não. Equipas escolares: só primeiros nomes, nunca pesos.",
+      "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje.",
     ],
     dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente.",
   },

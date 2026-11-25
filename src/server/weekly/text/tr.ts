@@ -1076,6 +1076,7 @@ export const emails: Record<string, Words> = {
       "Sporcular bir push alır ve Bugün’de bir kez takip eder. Ağırlıkları kendi ilerlemeleri seçer.",
       "Planlı bir günde Bugün o antrenmanı gösterir. Boş günler dinlenme kalır.",
       "Program takvimi Yapıldı ve Henüz değil’i gösterir. Okul takımları: yalnızca adlar, asla ağırlık yok.",
+      "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür.",
     ],
     dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz.",
   },

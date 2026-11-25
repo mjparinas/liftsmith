@@ -53,6 +53,7 @@ import { fmtNum, fmtWeight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { ClientBody } from "./CoachBody";
+import { CalendarAccessScreen, TrainingActivityScreen } from "./CoachCalendar";
 import { backToCoaching, ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen } from "./CoachCheckins";
 import { CoachHome, NoteCard } from "./CoachHome";
@@ -84,6 +85,8 @@ export function Trainer({ arg }: { arg?: string }) {
   if (arg?.startsWith(TEAM)) return <CoachHome team={teamCodeFrom(arg.slice(TEAM.length))} />;
   if (arg?.startsWith(CHECKIN)) return <CheckinScreen id={arg.slice(CHECKIN.length)} />;
   if (arg?.startsWith(VIDEO)) return <VideoScreen id={arg.slice(VIDEO.length)} />;
+  if (arg === "training-activity") return <TrainingActivityScreen />;
+  if (arg === "calendar-access") return <CalendarAccessScreen />;
   if (arg === "forms") return <FormsScreen />;
   // Back from paying a coach on Stripe's page.
   if (arg === "paid") return <CoachHome tab="mine" paid />;
@@ -640,7 +643,11 @@ function ClientScreen({ id }: { id: string }) {
       </Section>
       {physio && tools.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
       {tools.sessions && (
-        <ClientSessions client={{ id, name: report.name, since: 0 }} slots={checkins.slots ?? []} onChange={() => setVersion((n) => n + 1)} />
+        <ClientSessions
+          client={{ id, name: report.name, since: 0 }}
+          slots={checkins.slots ?? []}
+          onChange={() => setVersion((n) => n + 1)}
+        />
       )}
       {tools.pay && checkins.pay && (
         <ClientPayments
@@ -667,6 +674,11 @@ function ClientScreen({ id }: { id: string }) {
           ))}
         </div>
       </Section>
+      {report.schedule && (
+        <Section title={t("trn.calendar.adherence")} icon="calendar">
+          <p className="card p-4 text-sm">{t("trn.calendar.adherenceLine", report.schedule)}</p>
+        </Section>
+      )}
       <Section title={t("trn.recent")} icon="clock">
         {report.sessions.length ? (
           <ul className="card divide-y divide-line">

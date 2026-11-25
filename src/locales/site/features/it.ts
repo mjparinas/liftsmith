@@ -489,6 +489,10 @@ export const it: FeaturesText = {
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",
       proPart: "Essere cliente è gratis; allenare clienti è Pro.",
     },
+    "coach-calendar": {
+      name: "Calendario degli allenamenti",
+      body: "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi. Invita gli assistenti a modificare un calendario e controlla l’attività degli atleti.",
+    },
     "coach-assign-program": {
       name: "Assegna un programma di stagione a clienti o a una squadra",
       body: "I coach assegnano un programma di più giorni (Upper/Lower, Push/Pull/Legs o il proprio) come piano fisso per giorni della settimana per N settimane. Gli atleti lo seguono una volta; Oggi mostra l’allenamento del giorno. Un calendario mostra chi ha fatto ogni giorno e chi non ancora — solo nomi di battesimo per le squadre scolastiche, mai i pesi.",

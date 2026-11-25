@@ -252,3 +252,13 @@ Clients rate their coach, personal trainer or physio after four weeks or two ses
 ## One invite field (2026-11-24)
 
 Melvin asked to remove the two competing code fields. Coaching now has one field for a coach or school team code or invite link, including when adding another coach or team. Plain codes check coach invites first, then school teams only when no coach invite matches; explicit team links go straight to the team. Previewing joins nothing: coach sharing consent and school team age (13–18) and consent remain separate. Network errors and rate limits are preserved. Shared web code fixes Android, iOS and web together.
+
+## Assign workouts by date (2026-11-25)
+
+Coaching › Programs starts with a workout calendar. A coach picks a month, an audience and a date, then saves a routine or a rest day. The calendar accepts assignments roughly nine months ahead. An athlete's own assignment takes priority over a team assignment, which takes priority over a coach's assignment to all athletes. A date with no assignment leaves the athlete's usual plan available. Today puts the scheduled workout or rest day before the usual plan. Assigned routines use the same preview, progression and workout logging as other routines. Android, iOS and the web app share the same calendar.
+
+The athlete's report shows four weeks of calendar adherence alongside the existing exercise, lift and consistency history. A workout counts as completed when the athlete logs a completed session from its scheduled routine. Rest-day training uses the coach's local date when grouping sessions for the report.
+
+A lead coach can invite an assistant for the selected calendar audience. The invitation code is single-use and expires after seven days. Assistants join from Calendar access and can schedule routines or rest days on that calendar. The lead can remove access at any time. Calendar access grants no access to athlete reports, messages, or payments.
+
+Athletes › Training activity lists the whole linked roster by recent activity, with four-week workout counts and a link to each athlete's exercise and lift report.

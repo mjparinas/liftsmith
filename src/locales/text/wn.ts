@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.coachCalendar.title": "Workout calendar",
+  "wn.c.coachCalendar.body":
+    "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",
   "wn.c.deleteWorkout.title": "Undo after deleting a workout",
   "wn.c.deleteWorkout.body":
     "Deleted a workout by mistake? Tap Undo for a few seconds after. A deleted workout now also leaves your Friends feed and Health Connect or Apple Health, and every stat is worked out again from what's left.",
@@ -126,6 +129,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Calendario de entrenamientos",
+  "wn.c.coachCalendar.body":
+    "Asigna entrenamientos o días de descanso en un calendario mensual. Los atletas ven lo programado en Hoy. Invita a entrenadores asistentes a editar un calendario y revisa la actividad del equipo.",
   "wn.c.deleteWorkout.title": "Deshacer al eliminar un entrenamiento",
   "wn.c.deleteWorkout.body":
     "¿Eliminaste un entrenamiento por error? Toca Deshacer durante unos segundos. Ahora un entrenamiento eliminado también sale de Amigos y de Health Connect o Salud, y todas las estadísticas se recalculan con lo que queda.",
@@ -255,6 +261,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Calendrier des entraînements",
+  "wn.c.coachCalendar.body":
+    "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui. Invitez des coachs adjoints à modifier un calendrier et consultez l’activité de vos athlètes.",
   "wn.c.deleteWorkout.title": "Annuler après avoir supprimé une séance",
   "wn.c.deleteWorkout.body":
     "Une séance supprimée par erreur ? Touchez Annuler pendant quelques secondes. Une séance supprimée quitte aussi Amis et Health Connect ou Santé, et toutes les stats sont recalculées avec ce qui reste.",
@@ -387,6 +396,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Trainingskalender",
+  "wn.c.coachCalendar.body":
+    "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute. Lade Assistenzcoaches zum Bearbeiten eines Kalenders ein und prüfe die Trainingsaktivität deiner Athleten.",
   "wn.c.deleteWorkout.title": "Rückgängig nach dem Löschen eines Trainings",
   "wn.c.deleteWorkout.body":
     "Ein Training aus Versehen gelöscht? Tippe ein paar Sekunden lang auf Rückgängig. Ein gelöschtes Training verschwindet jetzt auch aus Freunde und aus Health Connect oder Apple Health, und alle Werte werden aus dem Rest neu berechnet.",
@@ -516,6 +528,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Calendario degli allenamenti",
+  "wn.c.coachCalendar.body":
+    "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi. Invita gli assistenti a modificare un calendario e controlla l’attività degli atleti.",
   "wn.c.deleteWorkout.title": "Annulla dopo aver eliminato un allenamento",
   "wn.c.deleteWorkout.body":
     "Hai eliminato un allenamento per sbaglio? Tocca Annulla per qualche secondo. Ora un allenamento eliminato sparisce anche da Amici e da Health Connect o Apple Salute, e tutte le statistiche vengono ricalcolate da ciò che resta.",
@@ -645,6 +660,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "トレーニングカレンダー",
+  "wn.c.coachCalendar.body":
+    "月間カレンダーでトレーニングや休養日を設定できます。選手は「今日」でその日の予定を確認できます。アシスタントコーチをカレンダー編集に招待し、選手のトレーニング記録を確認できます。",
   "wn.c.deleteWorkout.title": "ワークアウト削除の取り消し",
   "wn.c.deleteWorkout.body":
     "間違えて削除しても、数秒間は「元に戻す」をタップできます。削除したワークアウトは友達のフィードやヘルスコネクト、Apple ヘルスケアからも消え、統計はすべて残りのデータから計算し直されます。",
@@ -764,6 +782,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Calendário de treinos",
+  "wn.c.coachCalendar.body":
+    "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",
   "wn.c.deleteWorkout.title": "Desfazer ao excluir um treino",
   "wn.c.deleteWorkout.body":
     "Excluiu um treino sem querer? Toque em Desfazer por alguns segundos. Agora um treino excluído também sai de Amigos e do Health Connect ou Apple Saúde, e todas as estatísticas são recalculadas com o que sobrou.",
@@ -889,6 +910,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "운동 캘린더",
+  "wn.c.coachCalendar.body":
+    "월간 캘린더에서 운동이나 휴식일을 배정하세요. 선수는 오늘 화면에서 일정을 확인할 수 있습니다. 보조 코치를 초대해 캘린더를 편집하게 하고 선수들의 운동 활동을 확인하세요.",
   "wn.c.deleteWorkout.title": "운동 삭제 실행 취소",
   "wn.c.deleteWorkout.body":
     "실수로 운동을 삭제했나요? 몇 초 동안 실행 취소를 누를 수 있어요. 이제 삭제한 운동은 친구 피드와 헬스 커넥트나 Apple 건강에서도 사라지고, 모든 통계는 남은 기록으로 다시 계산돼요.",
@@ -1004,6 +1028,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Kalendarz treningów",
+  "wn.c.coachCalendar.body":
+    "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",
   "wn.c.deleteWorkout.title": "Cofnij po usunięciu treningu",
   "wn.c.deleteWorkout.body":
     "Usunięto trening przez pomyłkę? Przez kilka sekund możesz dotknąć Cofnij. Usunięty trening znika teraz także ze Znajomych i z Health Connect lub Apple Zdrowie, a wszystkie statystyki są przeliczane z tego, co zostało.",
@@ -1129,6 +1156,9 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.coachCalendar.title": "Antrenman takvimi",
+  "wn.c.coachCalendar.body":
+    "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",
   "wn.c.deleteWorkout.title": "Antrenman silmeyi geri al",
   "wn.c.deleteWorkout.body":
     "Bir antrenmanı yanlışlıkla mı sildin? Birkaç saniye boyunca Geri al'a dokunabilirsin. Silinen antrenman artık Arkadaşlar'dan ve Health Connect ya da Apple Sağlık'tan da kalkar; tüm istatistikler kalanlardan yeniden hesaplanır.",

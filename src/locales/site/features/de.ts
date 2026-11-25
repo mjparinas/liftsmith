@@ -495,6 +495,10 @@ export const de: FeaturesText = {
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",
       proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
     },
+    "coach-calendar": {
+      name: "Trainingskalender",
+      body: "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute. Lade Assistenzcoaches zum Bearbeiten eines Kalenders ein und prüfe die Trainingsaktivität deiner Athleten.",
+    },
     "coach-assign-program": {
       name: "Saisonprogramm an Klienten oder ein Team zuweisen",
       body: "Coaches weisen ein mehrtägiges Programm (Upper/Lower, Push/Pull/Legs oder eigenes) als wochentagsgebundenen Plan für N Wochen zu. Athletinnen folgen einmal; Heute zeigt das Training des Tages. Ein Programmkalender zeigt, wer jeden Tag gemacht hat und wer noch nicht — nur Vornamen bei Schulteams, nie Gewichte.",
