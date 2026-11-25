@@ -112,8 +112,10 @@ export function CoachHome({
   const [joined, setJoined] = useState<"coach" | "team" | null>(null);
   const teams = useTeams();
   const reload = useCallback(() => {
+    const accountId = useAccount.getState().account?.id;
     // The last copy shows at once; the server's answer replaces it (liveRead.ts).
     liveRead("coach.overview", loadOverview, (o, fresh) => {
+      if (useAccount.getState().account?.id !== accountId) return;
       setData(o);
       if (!fresh) return;
       // Today shows the newest note from a coach; keep it in step with what this screen loaded.

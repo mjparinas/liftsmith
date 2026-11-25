@@ -763,7 +763,7 @@ export function clientReport(view: ClientView, now: number): Report {
   const recent = sessions.slice(0, 10);
   const cells = view.schedule ?? [];
   const dates = [...new Set(cells.map((d) => d.date))].filter((day) => day < calendarDay(now));
-  const finished = new Set(sessions.map((s) => s.sessionId));
+  const finished = new Set(events.flatMap((e) => (e.type === "sessionEnd" ? [e.sessionId] : [])));
   const done = new Set(events.flatMap((e) => (e.type === "sessionStart" && e.routine && finished.has(e.sessionId) ? [e.routine] : [])));
   const trainedDays = new Set(sessions.map((s) => calendarDay(s.start)));
   const schedule = { completed: 0, unlogged: 0, trainedOnRest: 0 };
