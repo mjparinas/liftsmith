@@ -19,24 +19,15 @@ import Home from "./page";
 
 describe("home page", () => {
   afterEach(cleanup);
-  it("leads with a free start into the app, plus the store badges", () => {
+  it("leads with one honest browser CTA, and a quiet link to the 3D demo", () => {
     render(<Home />);
     const hero = screen.getByRole("heading", { level: 1 }).closest("section")!;
     const first = within(hero).getAllByRole("link")[0];
-    expect(first).toHaveTextContent("Build my first workout");
+    expect(first).toHaveTextContent("Start free in the browser");
     expect(first.getAttribute("href")).toMatch(/^\/app\/?$/);
-    // Google Play is live; the App Store badge stays "coming soon" until iOS ships.
-    expect(
-      within(hero)
-        .getByRole("link", { name: /Google Play/ })
-        .getAttribute("href"),
-    ).toBe("https://play.google.com/store/apps/details?id=com.getliftsmith.app");
-    expect(within(hero).getByRole("img", { name: "App Store: coming soon" })).toBeInTheDocument();
-    expect(
-      within(hero)
-        .getByRole("link", { name: /Use it in your browser today/ })
-        .getAttribute("href"),
-    ).toMatch(/^\/app\/?$/);
+    expect(within(hero).getByRole("link", { name: "Try a 3D demo" }).getAttribute("href")).toBe("#demos");
+    // Store badges live on the final CTA — one install path in the first viewport.
+    expect(within(hero).queryByRole("link", { name: /Google Play/ })).toBeNull();
   });
 
   it("links to the popular exercise guides and the calculators, by name", () => {
@@ -55,26 +46,26 @@ describe("home page", () => {
     expect(within(tools).getByRole("link", { name: "Plate calculator" }).getAttribute("href")).toMatch(/^\/tools\/plate-calculator\/?$/);
   });
 
-  it("has plenty of calls to action, each one counted", () => {
+  it("has counted calls to action into the app, each with its own name", () => {
     render(<Home />);
     const ctas = screen.getAllByRole("link").filter((a) => /^\/app\/?$/.test(a.getAttribute("href") ?? ""));
-    expect(ctas.length).toBeGreaterThanOrEqual(12);
+    expect(ctas.length).toBeGreaterThanOrEqual(8);
     const counted = ctas.filter((a) => a.hasAttribute("data-cta")).map((a) => a.getAttribute("data-cta"));
     expect(new Set(counted).size).toBe(counted.length); // every placement has its own name
   });
 
-  it("outlines every major feature with a real screenshot", () => {
+  it("outlines the three homepage differentiators with real screenshots", () => {
     render(<Home />);
     for (const name of [
       "A plan for today, built from your last workouts",
       "Big numbers, one tap, plates already worked out",
       "Your rest timer lives on the lock screen",
-      "See which muscles are ready before you train them",
-      "Numbers that show you're getting stronger",
     ]) {
       const article = screen.getByRole("heading", { name }).closest("article")!;
       expect(decodeURIComponent(within(article).getByRole("img").getAttribute("src")!)).toMatch(/screens\/\w+\.webp/);
     }
+    expect(screen.queryByRole("heading", { name: "See which muscles are ready before you train them" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Numbers that show you're getting stronger" })).toBeNull();
   });
 
   it("shows the confirmed prices, the trial length from the flag, and no ads", () => {
@@ -87,13 +78,12 @@ describe("home page", () => {
     expect(pricing.textContent).not.toMatch(/lifetime/i);
   });
 
-  it("labels every sample testimonial as not a real user", () => {
+  it("asks for first lifters instead of showing sample reviews", () => {
     render(<Home />);
-    const quotes = screen.getByRole("heading", { name: "What lifters say" }).closest("section")!;
-    const shown = within(quotes).queryAllByRole("listitem");
-    const samples = visibleQuotes().filter((q) => q.sample).length;
-    expect(within(quotes).queryAllByText("Sample quote, not a real user")).toHaveLength(samples);
-    expect(shown).toHaveLength(visibleQuotes().length);
+    const quotes = screen.getByRole("heading", { name: "We're looking for our first lifters." }).closest("section")!;
+    expect(within(quotes).queryAllByText("Sample quote, not a real user")).toHaveLength(0);
+    expect(within(quotes).queryAllByRole("listitem")).toHaveLength(0);
+    expect(within(quotes).getByRole("link", { name: "Start free in the browser" }).getAttribute("href")).toMatch(/^\/app\/?$/);
   });
 
   it("answers the FAQ, also as structured data", () => {
