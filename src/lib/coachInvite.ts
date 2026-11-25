@@ -12,13 +12,26 @@ import { isNative } from "./juice";
 const PENDING = "liftsmith.coachInvite";
 const CODE_RE = /^[2-9A-HJ-NP-Z]{8}$/;
 
-/** A typed code or a pasted invite link, tidied to the code. Empty when it can't be one. */
+/**
+ * A typed code or a pasted invite link, tidied to the code. Empty when it can't be one. A school team's link
+ * (#/trainer/team.<code>) keeps its "team." mark, so the code still opens the team's page after signing in or setup
+ * (2026-11-25: the mark used to be dropped there, and an athlete who opened the link signed out never joined).
+ */
 export function coachCode(text: string | null | undefined): string {
   if (!text) return "";
-  const m = /#\/(?:trainer|coaching)\/([\w-]+)/.exec(text);
-  const c = (m ? m[1]! : text).toUpperCase().replace(/[\s-]/g, "");
-  return CODE_RE.test(c) ? c : "";
+  const m = /#\/(?:trainer|coaching)\/([\w.-]+)/.exec(text);
+  const raw = (m ? m[1]! : text).trim();
+  const team = /^team\./i.test(raw);
+  const c = raw
+    .replace(/^team\./i, "")
+    .toUpperCase()
+    .replace(/[\s-]/g, "");
+  return CODE_RE.test(c) ? `${team ? TEAM : ""}${c}` : "";
 }
+
+const TEAM = "team.";
+/** A waiting code that is a school team's, not a coach's. */
+export const isTeamCode = (code: string) => code.startsWith(TEAM);
 
 /** The waiting code: the one this page was opened with (#/trainer/<code>), else one saved earlier. */
 export function pendingCoach(): string {

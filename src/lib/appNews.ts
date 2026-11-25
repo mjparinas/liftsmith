@@ -48,9 +48,11 @@ export const RELEASES: readonly AppRelease[] = [
   {
     version: "0.19.0",
     day: "2026-11-26",
-    headline: "Coaches lay out programs on a week and a month, with Auto-arrange for rest days",
+    headline: "My team for school athletes, and coaches lay out programs on a week and a month with Auto-arrange",
     changes: [
+      { id: "myTeam", kind: "new", icon: "trophy" },
       { id: "programBuilder", kind: "new", icon: "calendar" },
+      { id: "teamAdd", kind: "fixed", icon: "people" },
       { id: "programDays", kind: "fixed", icon: "layers" },
     ],
   },

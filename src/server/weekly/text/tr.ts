@@ -1080,4 +1080,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz.",
   },
+  "my-team": {
+    title: "Sporcularınıza Takımım paneli geldi",
+    intro:
+      "Okul takımınızdaki sporcular artık Takımım ekranını açıyor: takımları, koçları olarak siz, atadığınız programlar, takım sohbeti ve sizinle sohbet, hepsi tek ekranda.",
+    points: [
+      "Zaten çalıştırdığınız sporcuları takım kartından doğrudan ekleyin. Davet alır ve tek dokunuşla katılırlar.",
+      "Sporcular artık Programlar, Sporcular ve Kurulum'u görmüyor. Takımım yalnızca ihtiyaç duyduklarını gösteriyor.",
+      "Takım sohbeti tüm takım ve sizin için. Her mesajı silebilirsiniz, sporcular adlarıyla görünür.",
+      "Atanan programlar Takip et düğmesiyle Takımım'da durur ve haftalık tablo kimin antrenman yaptığını gösterir.",
+    ],
+    dyk: "Takım bağlantıları artık sporcu bağlantıyı açtıktan sonra giriş yapsa da çalışıyor, böylece kimse kadrodan dışarıda kalmıyor.",
+  },
 };

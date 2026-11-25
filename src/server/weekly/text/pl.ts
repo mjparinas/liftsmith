@@ -1081,4 +1081,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta.",
   },
+  "my-team": {
+    title: "Twoi zawodnicy dostają panel Moja drużyna",
+    intro:
+      "Zawodnicy Twojej drużyny szkolnej otwierają teraz Moją drużynę: drużynę, Ciebie jako trenera, przypisane programy, czat drużyny i czat z Tobą, wszystko na jednym ekranie.",
+    points: [
+      "Dodawaj zawodników, których już trenujesz, prosto z karty drużyny. Dostają zaproszenie i dołączają jednym dotknięciem.",
+      "Zawodnicy nie widzą już Programów, Zawodników ani Konfiguracji. Moja drużyna pokazuje tylko to, czego potrzebują.",
+      "Czat drużyny jest dla całej drużyny i dla Ciebie. Możesz usunąć każdą wiadomość, a zawodnicy są widoczni po imieniu.",
+      "Przypisane programy są w Mojej drużynie z przyciskiem Obserwuj, a tablica tygodnia pokazuje, kto trenował.",
+    ],
+    dyk: "Linki do drużyny działają teraz także wtedy, gdy zawodnik zaloguje się po ich otwarciu, więc nikt nie wypada ze składu.",
+  },
 };

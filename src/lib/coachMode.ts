@@ -2,8 +2,9 @@
 // teams, or coach a high school team ... keep clients / coaches / high school coaches functionality separate"; decision
 // record docs/decisions/trainer-mode.md "Pages for each side"). One account still does everything; what it has done decides
 // what Coaching opens on:
-// - a client (linked to a coach, or on a school team) sees only their coach: messages, check-ins, sessions, payments and
-//   what they share;
+// - a client (linked to a coach) sees only their coach: messages, check-ins, sessions, payments and what they share;
+// - an athlete on a school team (or asked to join one) sees My team (2026-11-25, MyTeam.tsx): their team, coach,
+//   programs, team chat and coach chat, never the coach's Programs, Athletes or Setup;
 // - a personal trainer or physio gets their tools as tabs; a sports coach (role coach, or school-only) gets Programs first;
 // - roles hide irrelevant tools (2026-11-24), not only labels; Messages stay for every persona;
 // - someone who is none of these picks how they'll use coaching first.
@@ -48,14 +49,20 @@ export function savePicked(v: Picked): void {
 }
 
 type O = Pick<Overview, "invite" | "clients" | "coaches" | "role" | "coach">;
-type T = Pick<TeamsOverview, "school" | "teams" | "joined">;
+type T = Pick<TeamsOverview, "school" | "teams" | "joined"> & Partial<Pick<TeamsOverview, "invites">>;
 
 export function coachingMode(o: O | null, teams: T | null, picked: Picked = null): Mode {
+  const athlete = (teams?.joined.length ?? 0) > 0 || (teams?.invites?.length ?? 0) > 0;
+  // Really coaching: someone to coach, an invite out, or a school proven. A role or a pick alone (a stray tap on the
+  // first page, or a pick left on a shared device) doesn't make an athlete on a school team a coach (Melvin,
+  // 2026-11-25: "an athlete should not see the athletes tab, or even set up, or programs"; they get My team).
+  const coaching = !!o && (!!o.coach || !!o.invite || o.clients.length > 0);
+  const schooling = !!teams && (!!teams.school || teams.teams.length > 0);
   return {
-    coach: (!!o && (!!o.coach || !!o.invite || o.clients.length > 0 || !!o.role)) || picked === "coach",
-    school: (!!teams && (!!teams.school || teams.teams.length > 0)) || picked === "school",
+    coach: coaching || (!athlete && (!!o?.role || picked === "coach")),
+    school: schooling || (!athlete && picked === "school"),
     client: (o?.coaches.length ?? 0) > 0,
-    athlete: (teams?.joined.length ?? 0) > 0,
+    athlete,
   };
 }
 

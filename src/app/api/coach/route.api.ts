@@ -99,6 +99,7 @@ import {
 import { rateLimit } from "@/server/db";
 import { dropPairVideos, videosWaiting } from "@/server/formVideos";
 import { saveToken } from "@/server/push";
+import { teamChatWaiting } from "@/server/teamChat";
 
 export const OPTIONS = preflight;
 
@@ -142,7 +143,7 @@ export async function GET(req: Request) {
   const client = q.get("client");
   if (client === null) {
     await touchSeen(s.accountId);
-    const [o, mine, pending, slots, sessions, plan, videos, schedule] = await Promise.all([
+    const [o, mine, pending, slots, sessions, plan, videos, schedule, teamChat] = await Promise.all([
       overview(s.accountId),
       forms(s.accountId),
       pendingCheckins(s.accountId),
@@ -151,12 +152,13 @@ export async function GET(req: Request) {
       coachPlanOf(s.accountId),
       videosWaiting(s.accountId),
       upcomingSchedule(s.accountId),
+      teamChatWaiting(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
     const pay = payConfig()
       ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId), fee: await feeFor(s.accountId) }
       : null;
-    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan, videos, schedule });
+    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan, videos, schedule, teamChat });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
   const view = await clientView(s.accountId, client);

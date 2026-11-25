@@ -441,6 +441,10 @@ export const es: FeaturesText = {
       name: "Gratis para equipos de secundaria",
       body: "Los entrenadores de secundaria que confirman un correo escolar tienen Pro gratis, igual que los atletas de 13 a 18 años de sus equipos, con una tabla semanal del equipo. La grasa corporal y los perfiles públicos siguen desactivados para menores de 18.",
     },
+    "my-team": {
+      name: "Mi equipo para atletas escolares",
+      body: "Un atleta de un equipo escolar abre Coaching en la casa de su equipo: el equipo y su entrenador, los programas asignados con Seguir, un chat del equipo con el entrenador dentro, un chat con el entrenador y la semana del equipo. El entrenador puede añadir a un equipo a los atletas que se unieron con su invitación; cada uno indica su edad y acepta antes.",
+    },
     "team-session": {
       name: "Sesiones de equipo en una tableta",
       body: "Un entrenador de secundaria dirige un entrenamiento para todo el equipo desde una tableta: cada atleta toca su nombre y anota sus series, con el peso donde lo dejó, y el tablero muestra quién no ha empezado. Al terminar, las series de cada atleta se guardan en su propia cuenta. Funciona sin cobertura.",

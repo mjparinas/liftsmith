@@ -6,12 +6,18 @@ import { badgeCount } from "@/lib/badgeCount";
 import { unreadFrom } from "./coach";
 import { videosWaiting } from "./formVideos";
 import { friendsWaiting } from "./social";
+import { teamChatWaiting } from "./teamChat";
 
 /** What's waiting for this account, capped as phones cap it. Never throws: a failed count sends no number. */
 export async function badgeFor(accountId: string): Promise<number | undefined> {
   try {
-    const [friends, coach, videos] = await Promise.all([friendsWaiting(accountId), unreadFrom(accountId), videosWaiting(accountId)]);
-    return badgeCount({ friends, coach: Object.values(coach).reduce((a, b) => a + b, 0) + videos });
+    const [friends, coach, videos, team] = await Promise.all([
+      friendsWaiting(accountId),
+      unreadFrom(accountId),
+      videosWaiting(accountId),
+      teamChatWaiting(accountId),
+    ]);
+    return badgeCount({ friends, coach: Object.values(coach).reduce((a, b) => a + b, 0) + videos + team });
   } catch {
     return undefined;
   }

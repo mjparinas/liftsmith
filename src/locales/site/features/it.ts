@@ -439,6 +439,10 @@ export const it: FeaturesText = {
       name: "Gratis per le squadre delle superiori",
       body: "Gli allenatori delle superiori che confermano un’email scolastica hanno Pro gratis, come gli atleti dai 13 ai 18 anni delle loro squadre, con una classifica settimanale della squadra. Massa grassa e profili pubblici restano disattivati per i minori di 18 anni.",
     },
+    "my-team": {
+      name: "La mia squadra per atleti scolastici",
+      body: "Un atleta di una squadra scolastica apre Coaching sulla casa della sua squadra: la squadra e il coach, i programmi assegnati con Segui, una chat di squadra con il coach, una chat con il coach e la settimana della squadra. Un coach può aggiungere a una squadra gli atleti arrivati con il suo invito; ognuno indica l’età e accetta prima.",
+    },
     "team-session": {
       name: "Sessioni di squadra su un tablet",
       body: "Un allenatore scolastico guida un allenamento per tutta la squadra da un tablet: ogni atleta tocca il proprio nome e registra le sue serie, con il peso da dove aveva lasciato, e il tabellone mostra chi non ha iniziato. Alla fine, le serie di ognuno vengono salvate nel suo account. Funziona senza campo.",

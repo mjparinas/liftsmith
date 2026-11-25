@@ -1083,4 +1083,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Puedes asignar igual desde la ficha del equipo escolar o el informe de un cliente.",
   },
+  "my-team": {
+    title: "Tus atletas tienen el panel Mi equipo",
+    intro:
+      "Los atletas de tu equipo escolar ahora abren Mi equipo: su equipo, tú como entrenador, los programas que asignaste, el chat del equipo y un chat contigo, todo en una pantalla.",
+    points: [
+      "Añade desde la tarjeta del equipo a los atletas que ya entrenan contigo. Reciben una invitación y se unen con un toque.",
+      "Los atletas ya no ven Programas, Atletas ni Configuración. Mi equipo les muestra solo lo que necesitan.",
+      "El chat del equipo es para todo el equipo y para ti. Puedes borrar cualquier mensaje, y los atletas aparecen por su nombre.",
+      "Los programas asignados están en Mi equipo con Seguir, y el tablero semanal muestra quién ha entrenado.",
+    ],
+    dyk: "Los enlaces del equipo ahora funcionan aunque el atleta inicie sesión después de abrirlos, así nadie se queda fuera de la lista.",
+  },
 };

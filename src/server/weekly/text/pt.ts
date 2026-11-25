@@ -1085,4 +1085,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente.",
   },
+  "my-team": {
+    title: "Seus atletas ganham o painel Meu time",
+    intro:
+      "Os atletas do seu time escolar agora abrem Meu time: o time, você como treinador, os programas atribuídos, o chat do time e um chat com você, tudo em uma tela.",
+    points: [
+      "Adicione pelo cartão do time os atletas que você já treina. Eles recebem um convite e entram com um toque.",
+      "Os atletas não veem mais Programas, Atletas nem Configuração. Meu time mostra só o que eles precisam.",
+      "O chat do time é para o time todo e para você. Você pode apagar qualquer mensagem, e os atletas aparecem pelo primeiro nome.",
+      "Os programas atribuídos ficam em Meu time com Seguir, e o quadro da semana mostra quem treinou.",
+    ],
+    dyk: "Os links do time agora funcionam mesmo se o atleta entrar depois de abri-los, então ninguém fica de fora da lista.",
+  },
 };

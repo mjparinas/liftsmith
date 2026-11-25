@@ -44,13 +44,16 @@ export function ShareSwitches({
   name,
   on,
   onChange,
+  hide = [],
 }: {
   coachId: string;
   name: string;
   on: readonly ShareKind[];
   onChange: () => void;
+  /** Kinds this coach never gets: a school team's coach never sees an athlete's cycle (school-teams.md "My team"). */
+  hide?: readonly ShareKind[];
 }) {
-  const kinds = useKinds();
+  const kinds = useKinds().filter((k) => !hide.includes(k));
   const [note, setNote] = useState<string | null>(null);
   const flip = async (k: ShareKind, v: boolean) => {
     try {

@@ -17,8 +17,11 @@ import { liveRead } from "@/lib/liveRead";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import {
+  cancelTeamInvite,
   confirmSchoolCode,
   deleteTeam,
+  fullOverview,
+  inviteToTeam,
   joinTeam,
   leaveTeam,
   loadBoard,
@@ -42,7 +45,7 @@ import { useVisible } from "@/lib/visibility";
 import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { BoardList } from "./TeamBoardList";
-import { Button, Chip, Sheet } from "./ui";
+import { Button, Chip, CountDot, Sheet } from "./ui";
 
 const INPUT = "min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2";
 
@@ -54,16 +57,9 @@ export function useTeams(): { data: TeamsOverview | null; error: string | null; 
     // The last copy shows at once; the server's answer replaces it (liveRead.ts).
     liveRead("teams", loadTeams, (o) =>
       // Whatever came back, every list is there (an older server, or a reply that isn't ours).
-      setData({
-        school: o.school ?? null,
-        codeSent: !!o.codeSent,
-        teams: o.teams ?? [],
-        joined: o.joined ?? [],
-        members: o.members ?? {},
-        live: o.live ?? {},
-      }),
+      setData(fullOverview(o)),
     ).catch((e: unknown) => {
-      setData({ school: null, codeSent: false, teams: [], joined: [], members: {}, live: {} });
+      setData(fullOverview({}));
       setError(teamError(e));
     });
   }, []);
@@ -92,12 +88,21 @@ export function AthleteTeams({ data, onChange }: { data: TeamsOverview | null; o
 }
 
 /** A school coach's side: prove the school address, then their teams, links, athletes and boards. */
-export function CoachTeams({ data, onChange }: { data: TeamsOverview | null; onChange: () => void }) {
+export function CoachTeams({
+  data,
+  athletes = [],
+  onChange,
+}: {
+  data: TeamsOverview | null;
+  /** Everyone linked to this coach (Athletes): the ones not on a team yet can be added to one. */
+  athletes?: { id: string; name: string }[];
+  onChange: () => void;
+}) {
   const [board, setBoard] = useState<string | null>(null);
   return (
     <div className="space-y-3">
       <p className="px-1 text-sm text-muted">{t("team.lead")}</p>
-      {data && <CoachSide data={data} onBoard={setBoard} onChange={onChange} />}
+      {data && <CoachSide data={data} athletes={athletes} onBoard={setBoard} onChange={onChange} />}
       {board && <Board key={board} team={board} onClose={() => setBoard(null)} />}
     </div>
   );
@@ -145,7 +150,22 @@ function JoinedTeam({
   );
 }
 
-export function JoinTeam({ code, found, onChange, onCancel }: { code: string; found: Team; onChange: () => void; onCancel: () => void }) {
+export function JoinTeam({
+  code,
+  found,
+  onChange,
+  onCancel,
+  join: joinWith,
+  cancelLabel,
+}: {
+  code: string;
+  found: Team;
+  onChange: () => void;
+  onCancel: () => void;
+  /** How to join: with the team's code (the default), or a coach's invite on My team (MyTeam.tsx). */
+  join?: (age: number) => Promise<unknown>;
+  cancelLabel?: string;
+}) {
   const profile = useApp((s) => s.profile);
   const known = profile.birthYear ? ageOf(profile.birthYear) : 0;
   const [age, setAge] = useState<number | null>(known >= 13 && known <= 18 ? known : null);
@@ -155,7 +175,7 @@ export function JoinTeam({ code, found, onChange, onCancel }: { code: string; fo
     if (age === null) return;
     setBusy(true);
     try {
-      await joinTeam(code, age);
+      await (joinWith ? joinWith(age) : joinTeam(code, age));
       haptic("success");
       sound.done();
       track("feature", { name: "team", detail: "join" });
@@ -192,7 +212,7 @@ export function JoinTeam({ code, found, onChange, onCancel }: { code: string; fo
             {t("team.agree")}
           </Button>
           <Button kind="ghost" onClick={onCancel}>
-            {t("trn.notNow")}
+            {cancelLabel ?? t("trn.notNow")}
           </Button>
         </div>
       </section>
@@ -207,7 +227,17 @@ export function JoinTeam({ code, found, onChange, onCancel }: { code: string; fo
 
 // --- Coaches ---
 
-function CoachSide({ data, onBoard, onChange }: { data: TeamsOverview; onBoard: (id: string) => void; onChange: () => void }) {
+function CoachSide({
+  data,
+  athletes,
+  onBoard,
+  onChange,
+}: {
+  data: TeamsOverview;
+  athletes: { id: string; name: string }[];
+  onBoard: (id: string) => void;
+  onChange: () => void;
+}) {
   const s = data.school;
   if (s?.active)
     return (
@@ -220,6 +250,10 @@ function CoachSide({ data, onBoard, onChange }: { data: TeamsOverview; onBoard: 
             key={tm.id}
             team={tm}
             members={data.members[tm.id] ?? []}
+            invited={data.invited[tm.id] ?? []}
+            left={data.left[tm.id] ?? []}
+            athletes={athletes}
+            unread={data.chatUnread[tm.id] ?? 0}
             live={data.live[tm.id]}
             onBoard={() => onBoard(tm.id)}
             onChange={onChange}
@@ -356,12 +390,23 @@ function Verify({ data, onChange }: { data: TeamsOverview; onChange: () => void 
 function CoachTeam({
   team,
   members,
+  invited,
+  left,
+  athletes,
+  unread,
   live,
   onBoard,
   onChange,
 }: {
   team: Team;
   members: { id: string; name: string; since: number }[];
+  /** Athletes added from the coach's list, waiting to say yes on My team. */
+  invited: { id: string; name: string; since: number }[];
+  /** Athletes who left this team, so one who left by mistake can be added back. */
+  left: { id: string; name: string }[];
+  athletes: { id: string; name: string }[];
+  /** Unread team chat messages. */
+  unread: number;
   /** A team session for this team running on another device. */
   live?: string;
   onBoard: () => void;
@@ -428,6 +473,15 @@ function CoachTeam({
           {t("team.board")}
         </Button>
       </div>
+      {/* The team's chat (TeamChat.tsx): the coach and every athlete on the team. */}
+      {members.length > 0 && (
+        <Button kind="ghost" icon="chat" className="mt-2 w-full" onClick={() => go("trainer", `tc.${team.id}`)}>
+          <span className="inline-flex items-center gap-2">
+            {t("mt.chat")}
+            <CountDot n={unread} />
+          </span>
+        </Button>
+      )}
       {/* Team session (TeamSession.tsx): one workout for the whole team on one tablet. */}
       {members.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
@@ -514,6 +568,7 @@ function CoachTeam({
           </ul>
         </details>
       )}
+      <AddAthletes team={team} members={members} invited={invited} left={left} athletes={athletes} onChange={onChange} onNote={setNote} />
       <div className="mt-2 flex flex-wrap gap-2">
         <Button kind="quiet" onClick={() => void act(() => newTeamCode(team.id), "newCode")}>
           {t("trn.newCode")}
@@ -528,6 +583,90 @@ function CoachTeam({
         </p>
       )}
     </section>
+  );
+}
+
+/**
+ * The coach's athletes who aren't on this team (they joined with the coach's own invite, so a team never counted them;
+ * Melvin, 2026-11-25), each with Add, and the ones added who haven't said yes yet, with Take back. Adding asks them on
+ * My team for their age and agreement, as a team code would. Athletes who left the team are listed too, marked "Left
+ * the team", so one who left by mistake can be added back even without a coach link (Melvin, 2026-11-25).
+ */
+function AddAthletes({
+  team,
+  members,
+  invited,
+  left,
+  athletes,
+  onChange,
+  onNote,
+}: {
+  team: Team;
+  members: { id: string }[];
+  invited: { id: string; name: string }[];
+  left: { id: string; name: string }[];
+  athletes: { id: string; name: string }[];
+  onChange: () => void;
+  onNote: (n: string) => void;
+}) {
+  const on = new Set([...members, ...invited].map((m) => m.id));
+  const gone = new Set(left.map((m) => m.id));
+  const rest = [...left.filter((m) => !on.has(m.id)), ...athletes.filter((a) => !on.has(a.id) && !gone.has(a.id))];
+  if (!rest.length && !invited.length) return null;
+  const run = async (f: () => Promise<void>, note: string, detail: string) => {
+    try {
+      await f();
+      haptic("success");
+      track("feature", { name: "team", detail });
+      onNote(note);
+      onChange();
+    } catch (e) {
+      oops();
+      onNote(teamError(e));
+    }
+  };
+  return (
+    <div className="mt-3 border-t border-line pt-3">
+      <p className="text-sm font-semibold">{t("mt.addTitle")}</p>
+      <p className="text-xs text-muted">{t("mt.addHint")}</p>
+      <ul className="mt-1 divide-y divide-line">
+        {invited.map((m) => (
+          <li key={m.id} className="flex items-center gap-2 py-2">
+            <span className="min-w-0 flex-1">
+              <span className="block truncate">{m.name || t("trn.noName")}</span>
+              <span className="block text-xs text-muted">{t("mt.waiting")}</span>
+            </span>
+            <Button
+              kind="quiet"
+              className="shrink-0 !px-3 !py-2 text-sm"
+              label={t("mt.takeBackNamed", { name: m.name || t("trn.noName") })}
+              onClick={() =>
+                void run(() => cancelTeamInvite(team.id, m.id), t("mt.takenBack", { name: m.name || t("trn.noName") }), "uninvite")
+              }
+            >
+              {t("mt.takeBack")}
+            </Button>
+          </li>
+        ))}
+        {rest.map((a) => (
+          <li key={a.id} className="flex items-center gap-2 py-2">
+            <span className="min-w-0 flex-1">
+              <span className="block truncate">{a.name || t("trn.noName")}</span>
+              {gone.has(a.id) && <span className="block text-xs text-muted">{t("mt.leftTeam")}</span>}
+            </span>
+            <Button
+              kind="ghost"
+              icon="plus"
+              className="shrink-0 !px-3 !py-2 text-sm"
+              label={t("mt.addNamed", { name: a.name || t("trn.noName") })}
+              onClick={() => void run(() => inviteToTeam(team.id, a.id), t("mt.added", { name: a.name || t("trn.noName") }), "addAthlete")}
+            >
+              {t("mt.add")}
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -606,7 +745,9 @@ function Board({ team, onClose }: { team: string | null; onClose: () => void }) 
         <p className="mt-3 text-sm font-semibold">
           {rows.every((r) => r.workouts === 0)
             ? t("team.boardNudgeNone")
-            : t("team.boardNudge", { count: rows.filter((r) => r.workouts === 0).length, name: top?.name || t("trn.noName") })}
+            : rows.every((r) => r.workouts > 0)
+              ? t("team.boardNudgeAll", { name: top?.name || t("trn.noName") })
+              : t("team.boardNudge", { count: rows.filter((r) => r.workouts === 0).length, name: top?.name || t("trn.noName") })}
         </p>
       )}
       {rows && rows.length > 0 && (
