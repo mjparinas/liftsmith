@@ -323,6 +323,7 @@ export function Users({
   open,
   setOpen,
   initialQuery = "",
+  onSchoolsChanged,
 }: {
   admin: boolean;
   me: string;
@@ -330,6 +331,7 @@ export function Users({
   setOpen: (id: string | null) => void;
   /** A search to start with, from the header's search box. */
   initialQuery?: string;
+  onSchoolsChanged?: () => void;
 }) {
   const [q, setQ] = useState(initialQuery);
   const [search, setSearch] = useState(initialQuery);
@@ -352,7 +354,7 @@ export function Users({
           <Account id={open} admin={admin} me={me} close={() => setOpen(null)} openAccount={setOpen} />
         </Reveal>
       )}
-      {!open && <SchoolCoaches admin={admin} />}
+      {!open && <SchoolCoaches admin={admin} onChanged={onSchoolsChanged} />}
       {data && (
         <div className="grid grid-cols-3 gap-3">
           <Tile label="Accounts" value={fmtInt(data.totals.total)} />

@@ -13,6 +13,7 @@ Melvin, 2026-11-13: "can we make the app free for anybody in high school or belo
 - Coaching › **School teams** › Confirm my school: the school's name and the coach's school address. We email a six-digit code (30 minutes, 5 tries counted before comparing, 5 codes a day per account).
 - **Free mail never counts** (`FREE_MAIL`: Gmail, Outlook, iCloud, Yahoo, Proton, Canadian ISPs and others).
 - **Known school domains are approved at once:** patterns only schools get (`k12.<state>.us`, `.sch.uk`, `.ed.jp`) and every domain staff have trusted (`school_domains`). Anything else waits for staff on the **admin Users tab › School coaches** card (`SchoolCoaches.tsx`, `/api/admin/schools/`, audited): **Approve** trusts the domain (that coach and everyone waiting there, and the next coach is approved at once), **Reject** turns down this coach, **Block domain** stops the domain for good (a company, a university, a domain anyone can get an address at). Canadian school boards (`sd35.bc.ca`, `tdsb.on.ca` …) have no common pattern, so the first coach at each board goes through staff.
+- **Admin visibility** (Melvin, 2026-11-24): pending proven addresses also appear on Overview’s Needs you and To Do, one task and one count per coach, with a button to review them on Users. The count refreshes after a decision.
 - **The proof lasts a school year** (`verifiedMs`, 400 days), then the coach confirms the address again. A coach who leaves the school loses the address, so free Pro ends for them and their athletes.
 
 ## Teams
@@ -56,3 +57,7 @@ Pure web code on the server and in the app, so Android, iOS and the web app get 
 - Deleting an account deletes its school proof, its teams (their athletes become teamless) and its places on teams (`teamDeletes`).
 - **Season programs for the team** (2026-11-24): a verified coach assigns a Coach Program (Upper/Lower, PPL, or their own) to the whole team from the team card or Coaching › Programs. Athletes Follow once; Today runs the weekday-bound days; the team **program calendar** shows who has done each day (first names only). Details in [Coaches' programs](coach-programs.md) "Assign to clients and teams".
 - Not built: a club (non-school) team plan, parent accounts, and school districts buying for many coaches. Physiotherapists are a separate thread that also builds on trainer mode.
+
+## One invite field (2026-11-24)
+
+Melvin asked to remove the two competing code fields. Coaching now has one field for a coach or school team code or invite link, including when adding another coach or team. Plain codes check coach invites first, then school teams only when no coach invite matches; explicit team links go straight to the team. Previewing joins nothing: coach sharing consent and school team age (13–18) and consent remain separate. Network errors and rate limits are preserved. Shared web code fixes Android, iOS and web together.
