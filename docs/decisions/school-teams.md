@@ -57,3 +57,7 @@ Pure web code on the server and in the app, so Android, iOS and the web app get 
 - Deleting an account deletes its school proof, its teams (their athletes become teamless) and its places on teams (`teamDeletes`).
 - **Season programs for the team** (2026-11-24): a verified coach assigns a Coach Program (Upper/Lower, PPL, or their own) to the whole team from the team card or Coaching › Programs. Athletes Follow once; Today runs the weekday-bound days; the team **program calendar** shows who has done each day (first names only). Details in [Coaches' programs](coach-programs.md) "Assign to clients and teams".
 - Not built: a club (non-school) team plan, parent accounts, and school districts buying for many coaches. Physiotherapists are a separate thread that also builds on trainer mode.
+
+## One invite field (2026-11-24)
+
+Melvin asked to remove the two competing code fields. Coaching now has one field for a coach or school team code or invite link, including when adding another coach or team. Plain codes check coach invites first, then school teams only when no coach invite matches; explicit team links go straight to the team. Previewing joins nothing: coach sharing consent and school team age (13–18) and consent remain separate. Network errors and rate limits are preserved. Shared web code fixes Android, iOS and web together.

@@ -18,6 +18,8 @@ import { CoachNoteToday, Trainer } from "./Trainer";
 
 const calls: { url: string; body: unknown; auth?: string }[] = [];
 let linked = false;
+let inviteKind: "coach" | "team" | "invalid" | "offline" = "coach";
+const TEAM = { id: "t1", name: "School squad", code: "", school: "Central", coachId: "k1", coachName: "Sam", members: 2 };
 // Whether this account coaches (an invite out and a client). Client-side tests turn it off: a client sees only their coach.
 let coaching = true;
 const asClient = () => {
@@ -61,6 +63,7 @@ beforeEach(() => {
   localStorage.clear();
   calls.length = 0;
   linked = false;
+  inviteKind = "coach";
   coaching = true;
   assigned = [];
   note = null;
@@ -137,6 +140,11 @@ beforeEach(() => {
     if (body?.action === "role") return Response.json({ role: body.role });
     if (body?.action === "form") return Response.json({ form: { ...body.form, id: "f2", at: NOW } });
     if (body?.action === "answer") return Response.json({ checkin: { ...CHECKIN, answers: body.answers, answeredAt: NOW } });
+    if (body?.action === "preview" && inviteKind === "offline") throw new TypeError("Failed to fetch");
+    if (url === "/api/teams/" && body?.action === "preview")
+      return inviteKind === "team" ? Response.json({ team: TEAM }) : Response.json({ error: "unknown" }, { status: 400 });
+    if (url === "/api/teams/" && body?.action === "join") return Response.json({ team: TEAM });
+    if (body?.action === "preview" && inviteKind !== "coach") return Response.json({ error: "unknown" }, { status: 400 });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
       asClient();
@@ -177,7 +185,7 @@ describe("trainer mode", () => {
     coaching = false;
     const u = userEvent.setup();
     render(<Trainer />);
-    await u.type(await screen.findByLabelText(/Got a code from your coach/), "abcd-2345");
+    await u.type(await screen.findByLabelText(/Enter a coach or school team code/), "abcd-2345");
     await u.click(screen.getByRole("button", { name: "Check code" }));
     expect(await screen.findByText("Share your workouts with Sam?")).toBeInTheDocument();
     expect(screen.getByText(/Everything else stays private/)).toBeInTheDocument();
@@ -197,6 +205,49 @@ describe("trainer mode", () => {
     // The sharing lead names the coach (it showed a raw "{name}" before, 2026-11-13).
     expect(screen.getByText(/anything else you want Sam to see/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Message Sam" })).toBeInTheDocument();
+  });
+
+  it.each(["aprj-khtd", "https://www.getliftsmith.com/app/#/trainer/team.APRJKHTD"])(
+    "one input accepts a school invite %s and keeps age and consent before joining",
+    async (input) => {
+      coaching = false;
+      inviteKind = "team";
+      const u = userEvent.setup();
+      render(<Trainer />);
+      const field = await screen.findByLabelText(/Enter a coach or school team code/);
+      expect(screen.getAllByRole("textbox")).toHaveLength(1);
+      await u.type(field, input);
+      await u.click(screen.getByRole("button", { name: "Check code" }));
+      expect(await screen.findByText(/School squad/)).toBeInTheDocument();
+      expect(calls.some((c) => (c.body as { action?: string })?.action === "join")).toBe(false);
+      await u.click(screen.getByRole("button", { name: "16" }));
+      await u.click(screen.getByRole("button", { name: "Join the team" }));
+      expect(calls.find((c) => c.url === "/api/teams/" && (c.body as { action?: string })?.action === "join")).toMatchObject({
+        body: { code: "APRJKHTD", age: 16 },
+      });
+    },
+  );
+
+  it("shows one error only after neither invite type matches", async () => {
+    coaching = false;
+    inviteKind = "invalid";
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.type(await screen.findByLabelText(/Enter a coach or school team code/), "APRJ-KHTD");
+    await u.click(screen.getByRole("button", { name: "Check code" }));
+    expect(await screen.findByText(/That code isn't right or has expired/)).toBeInTheDocument();
+    expect(calls.filter((c) => (c.body as { action?: string })?.action === "preview")).toHaveLength(2);
+  });
+
+  it("does not try a team lookup when the coach lookup loses its connection", async () => {
+    coaching = false;
+    inviteKind = "offline";
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.type(await screen.findByLabelText(/Enter a coach or school team code/), "APRJ-KHTD");
+    await u.click(screen.getByRole("button", { name: "Check code" }));
+    await screen.findByRole("status");
+    expect(calls.filter((c) => (c.body as { action?: string })?.action === "preview")).toHaveLength(1);
   });
 
   it("an invite link fills in the code and shows whose it is", async () => {

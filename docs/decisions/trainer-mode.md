@@ -246,3 +246,7 @@ Melvin asked for "taking client payments, through Stripe Connect" in the same ro
 ## Ratings and reviews (2026-11-15)
 
 Clients rate their coach, personal trainer or physio after four weeks or two sessions together; the rating shows on the invite and the trainer directory once there are three reviews, with how many clients trained in the last two weeks. Coaches reply on Coaching › Setup. See [Coach ratings and reviews](coach-reviews.md).
+
+## One invite field (2026-11-24)
+
+Melvin asked to remove the two competing code fields. Coaching now has one field for a coach or school team code or invite link, including when adding another coach or team. Plain codes check coach invites first, then school teams only when no coach invite matches; explicit team links go straight to the team. Previewing joins nothing: coach sharing consent and school team age (13–18) and consent remain separate. Network errors and rate limits are preserved. Shared web code fixes Android, iOS and web together.
