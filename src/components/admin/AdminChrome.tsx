@@ -5,7 +5,7 @@
 // and section labels, and on a wide window a sidebar like the web app's desktop layout. Progressive groups
 // (Melvin via critique 2026-11-24): Work and People stay open; Numbers and Running collapse until opened or
 // the current tab lives there — deep links and badges still reach every section.
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Icon, type IconName } from "@/components/app/icons";
 import { BuildStamp } from "@/components/BuildStamp";
@@ -120,6 +120,7 @@ export function AdminShell({
   children: ReactNode;
 }) {
   // Collapsible groups start closed unless the open tab lives there (deep links still land).
+  // Visiting a group keeps it open after you leave (adjust during render — no sync setState in an effect).
   const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     for (const g of TAB_GROUPS) {
@@ -127,13 +128,18 @@ export function AdminShell({
     }
     return init;
   });
-  useEffect(() => {
+  const [seenTab, setSeenTab] = useState(tab);
+  if (tab !== seenTab) {
+    setSeenTab(tab);
+    let next: Record<string, boolean> | null = null;
     for (const g of TAB_GROUPS) {
-      if (g.collapse && g.tabs.includes(tab)) {
-        setExpanded((e) => (e[g.label] ? e : { ...e, [g.label]: true }));
+      if (g.collapse && g.tabs.includes(tab) && !(next ?? expanded)[g.label]) {
+        next ??= { ...expanded };
+        next[g.label] = true;
       }
     }
-  }, [tab]);
+    if (next) setExpanded(next);
+  }
 
   return (
     <div className="admin aurora min-h-dvh">

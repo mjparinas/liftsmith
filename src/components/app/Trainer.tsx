@@ -50,6 +50,7 @@ import {
 } from "@/lib/trainer";
 import type { Routine } from "@/lib/types";
 import { fmtNum, fmtWeight } from "@/lib/units";
+import { useNow } from "@/lib/useNow";
 
 import { ClientBody } from "./CoachBody";
 import { backToCoaching, ChatScreen } from "./CoachChat";
@@ -243,6 +244,7 @@ function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string
   const [cal, setCal] = useState(false);
   const [programs, setPrograms] = useState<CoachProgram[] | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const now = useNow(60_000);
   const openOnes = assigns.filter((a) => a.status === "pending" || a.status === "active");
   const active = openOnes.find((a) => a.status === "active") ?? openOnes[0];
   const openAssign = () => {
@@ -273,7 +275,7 @@ function ClientProgramAssign({ clientId, assigns, onChange }: { clientId: string
           <p className="mt-1 text-sm text-muted">
             {active.status === "active" && active.startedAt
               ? t("cpg.clientFollowing", {
-                  week: Math.min(active.weeks, Math.floor((Date.now() - active.startedAt) / (7 * 86_400_000)) + 1),
+                  week: Math.min(active.weeks, Math.floor((now - active.startedAt) / (7 * 86_400_000)) + 1),
                   weeks: active.weeks,
                 })
               : t("cpg.clientPending")}

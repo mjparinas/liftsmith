@@ -64,9 +64,9 @@ export function ProgramCalendar({
   const [filter, setFilter] = useState<Filter>("notYet");
 
   const load = useCallback(() => {
-    setError(null);
     loadProgramCalendar({ programId, teamId, year: ym.y, month: ym.m })
       .then((r) => {
+        setError(null);
         setData(r);
         track("feature", { name: "trainer", detail: "programCalendar" });
       })

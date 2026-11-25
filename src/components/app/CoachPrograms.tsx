@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { WEEKDAYS } from "@/lib/calendar";
 import { money } from "@/lib/coachPay";
+import { assignProgram, endProgramAssigns, type AssignScope } from "@/lib/coachProgramAssign";
 import {
   deleteProgram,
   GOALS,
@@ -17,16 +19,14 @@ import {
   type MinePrograms,
   type ProgramDraft,
 } from "@/lib/coachPrograms";
-import { assignProgram, endProgramAssigns, type AssignScope } from "@/lib/coachProgramAssign";
 import { PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@/lib/coachProgramTemplates";
-import { WEEKDAYS } from "@/lib/calendar";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
-import { loadOverview, trainerError, type Overview, type Person } from "@/lib/trainer";
 import { loadTeams, type Team } from "@/lib/teams";
+import { loadOverview, trainerError, type Overview, type Person } from "@/lib/trainer";
 
 import { factsLine } from "./CoachProgram";
 import { ProgramCalendar } from "./ProgramCalendar";
@@ -39,6 +39,32 @@ import { BumpField, Button, Chip, EmptyState, InlineSwitch, Section, Sheet, Skel
 // then shares its link. Paid programs sell on the website; the apps only ever show free ones and ones a lifter has.
 
 const FIELD = "mt-1 w-full rounded-xl border border-line bg-raised px-3 py-2";
+
+const templateId = (): string => {
+  const c = globalThis.crypto;
+  if (typeof c?.randomUUID === "function") return c.randomUUID();
+  const b = new Uint8Array(16);
+  c.getRandomValues(b);
+  return Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+};
+
+/** Builds draft fields and local routines from a template (kept outside render for purity). */
+function draftFromTemplate(tpl: ProgramTemplate, d: ProgramDraft, now = Date.now()) {
+  const { routines: made, routineIds, weekdays } = routinesFromTemplate(tpl, now, templateId);
+  return {
+    made,
+    draft: {
+      ...d,
+      title: d.title.trim() || tpl.title,
+      about: d.about.trim() || tpl.about,
+      goal: tpl.goal,
+      weeks: tpl.weeks,
+      routineIds,
+      weekdays,
+    } satisfies ProgramDraft,
+    weeks: String(tpl.weeks),
+  };
+}
 
 const blank = (): ProgramDraft => ({
   title: "",
@@ -150,7 +176,11 @@ export function CoachPrograms() {
           />
         )}
       </Sheet>
-      <Sheet open={!!assigning} onClose={() => setAssigning(null)} title={assigning ? t("cpg.assignTitle", { title: assigning.title }) : ""}>
+      <Sheet
+        open={!!assigning}
+        onClose={() => setAssigning(null)}
+        title={assigning ? t("cpg.assignTitle", { title: assigning.title }) : ""}
+      >
         {assigning && (
           <AssignSheet
             program={assigning}
@@ -269,21 +299,10 @@ function Editor({
   };
 
   const applyTemplate = (tpl: ProgramTemplate) => {
-    const now = Date.now();
-    const { routines: made, routineIds, weekdays } = routinesFromTemplate(tpl, now, () =>
-      typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2),
-    );
+    const { made, draft, weeks } = draftFromTemplate(tpl, d);
     for (const r of made) useApp.getState().saveRoutine(r);
-    setD({
-      ...d,
-      title: d.title.trim() || tpl.title,
-      about: d.about.trim() || tpl.about,
-      goal: tpl.goal,
-      weeks: tpl.weeks,
-      routineIds,
-      weekdays,
-    });
-    setWeeks(String(tpl.weeks));
+    setD(draft);
+    setWeeks(weeks);
     haptic("success");
     track("feature", { name: "coach_program", detail: `template_${tpl.id}` });
   };
@@ -507,18 +526,10 @@ function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () =>
         </div>
       ))}
       <div className="flex flex-wrap gap-2">
-        <Chip
-          active={scope?.type === "allClients"}
-          onClick={() => setScope({ type: "allClients" })}
-          disabled={!clients.length}
-        >
+        <Chip active={scope?.type === "allClients"} onClick={() => setScope({ type: "allClients" })} disabled={!clients.length}>
           {t("cpg.assignAll", { count: clients.length })}
         </Chip>
-        <Chip
-          active={scope?.type === "clients"}
-          onClick={() => setScope({ type: "clients", ids: picked })}
-          disabled={!clients.length}
-        >
+        <Chip active={scope?.type === "clients"} onClick={() => setScope({ type: "clients", ids: picked })} disabled={!clients.length}>
           {t("cpg.assignPick")}
         </Chip>
         {teams.map((team) => (
@@ -558,12 +569,7 @@ function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () =>
       )}
       <Button
         className="w-full"
-        disabled={
-          busy ||
-          !scope ||
-          (scope.type === "clients" && !scope.ids.length) ||
-          weekdays.some((w) => !w.length)
-        }
+        disabled={busy || !scope || (scope.type === "clients" && !scope.ids.length) || weekdays.some((w) => !w.length)}
         onClick={() => void goAssign()}
       >
         {t("cpg.assignGo")}
@@ -578,7 +584,20 @@ function AssignSheet({ program, onDone }: { program: CoachProgram; onDone: () =>
 function defaultWeekdays(days: number, i: number): number[] {
   if (days === 4) return [[1], [2], [4], [5]][i] ?? [1 + i];
   if (days === 6) return [[1], [2], [3], [4], [5], [6]][i] ?? [1 + i];
-  if (days === 3) return [[1, 4], [2, 5], [3, 6]][i] ?? [1];
-  if (days === 2) return [[1, 4], [2, 5]][i] ?? [1];
+  if (days === 3)
+    return (
+      [
+        [1, 4],
+        [2, 5],
+        [3, 6],
+      ][i] ?? [1]
+    );
+  if (days === 2)
+    return (
+      [
+        [1, 4],
+        [2, 5],
+      ][i] ?? [1]
+    );
   return [((i % 5) + 1) as number];
 }
