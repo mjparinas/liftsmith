@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { summarizeTodo, todoBadge } from "@/components/admin/todoCount";
+
 import { addTask, checkTask, deleteTask, hideItem, listTasks, setTaskDone, setupItems, todoList, unhideAll } from "./adminTodo";
 import { resetDb, run } from "./db";
 import { recentJobRuns, trackJob } from "./monitor";
@@ -91,6 +93,44 @@ describe("admin to-do list", () => {
     expect((await todoList(NOW)).items.some((i) => i.kind === "reports")).toBe(false);
     await run("INSERT INTO reports (reporter_id, kind, target_id, reason, created_at) VALUES ('r3', 'comment', 'c1', 'abuse', ?)", [NOW]);
     expect((await todoList(NOW)).items.find((i) => i.kind === "reports")?.title).toBe("3 reports waiting for a decision");
+  });
+
+  it("counts each proven pending school coach and removes decided requests", async () => {
+    const baseline = (await todoList(NOW)).items.length;
+    for (const [id, status, verified] of [
+      ["pending1", "pending", NOW - DAY],
+      ["pending2", "pending", NOW],
+      ["approved", "approved", NOW],
+      ["rejected", "rejected", NOW],
+      ["code", "code", null],
+      ["unproven", "pending", null],
+    ] as const) {
+      await run(
+        "INSERT INTO school_coaches (account_id, email, school, domain, status, verified_at, created_at) VALUES (?, ?, ?, 'school.example', ?, ?, ?)",
+        [id, `${id}@school.example`, `School ${id}`, status, verified, NOW],
+      );
+    }
+    const list = await todoList(NOW);
+    expect(list.problems).toEqual([]);
+    const schools = list.items.filter((i) => i.kind === "schools");
+    expect(schools.map((i) => i.title)).toEqual([
+      "School coach waiting for approval: School pending1",
+      "School coach waiting for approval: School pending2",
+    ]);
+    expect(list.items.slice(0, 2)).toEqual(schools);
+    expect(schools[0].action).toEqual({ label: "Review school coaches", tab: "Users" });
+    expect(schools[0].detail).toContain("school.example");
+    expect(todoBadge(summarizeTodo(list)!, [])).toBe(baseline + 2);
+    await hideItem(schools[0].key, null, NOW);
+    expect((await todoList(NOW)).items.filter((i) => i.kind === "schools")).toHaveLength(1);
+    // A fresh proof isn't hidden by a dismissal of the previous request.
+    await run("UPDATE school_coaches SET verified_at = ? WHERE account_id = 'pending1'", [NOW + 1]);
+    expect((await todoList(NOW)).items.filter((i) => i.kind === "schools")).toHaveLength(2);
+    await run("UPDATE school_coaches SET status = 'approved' WHERE account_id = 'pending1'");
+    await run("UPDATE school_coaches SET status = 'rejected' WHERE account_id = 'pending2'");
+    const resolved = await todoList(NOW);
+    expect(resolved.items.some((i) => i.kind === "schools")).toBe(false);
+    expect(todoBadge(summarizeTodo(resolved)!, [])).toBe(baseline);
   });
 
   it("keeps the admins' own tasks", async () => {

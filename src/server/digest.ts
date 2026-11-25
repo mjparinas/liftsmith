@@ -128,6 +128,7 @@ const TODO_GROUP: Record<TodoKind, string> = {
   billing: "Billing problems",
   job: "Scheduled jobs",
   gyms: "Gym claims and posters",
+  schools: "School coaches waiting for approval",
   setup: "Setup steps",
 };
 

@@ -11,7 +11,7 @@ import type { SchoolReview } from "@/server/teams";
 import { Card } from "./charts";
 import { ago } from "./time";
 
-export function SchoolCoaches({ admin }: { admin: boolean }) {
+export function SchoolCoaches({ admin, onChanged }: { admin: boolean; onChanged?: () => void }) {
   const [rows, setRows] = useState<SchoolReview[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
@@ -35,6 +35,7 @@ export function SchoolCoaches({ admin }: { admin: boolean }) {
       body: JSON.stringify({ id: c.accountId, action }),
     });
     if (!r.ok) setError(((await r.json().catch(() => ({}))) as { error?: string }).error ?? "That didn't work.");
+    if (r.ok) onChanged?.();
     setVersion((v) => v + 1);
   };
   const waiting = rows?.filter((c) => c.status === "pending") ?? [];

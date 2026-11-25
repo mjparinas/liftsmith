@@ -19,7 +19,7 @@ const DAY = 86_400_000;
 /** "Dismiss" hides an item for good, stored as a far-off date so one column covers both. */
 const FOREVER = 8_640_000_000_000_000;
 
-export type TodoKind = "inbox" | "reports" | "creator" | "billing" | "job" | "gyms" | "setup";
+export type TodoKind = "inbox" | "reports" | "creator" | "billing" | "job" | "gyms" | "schools" | "setup";
 
 export interface TodoItem {
   key: string;
@@ -221,6 +221,21 @@ async function gymItems(): Promise<TodoItem[]> {
   return items;
 }
 
+/** One task per proven school address waiting for staff, oldest first. */
+async function schoolItems(): Promise<TodoItem[]> {
+  const rows = await query<{ account_id: string; school: string; domain: string; verified_at: number }>(
+    "SELECT account_id, school, domain, verified_at FROM school_coaches WHERE status = 'pending' AND verified_at IS NOT NULL ORDER BY verified_at, account_id",
+  );
+  return rows.map((r) => ({
+    key: `schools:${r.account_id}:${r.verified_at}`,
+    kind: "schools",
+    title: `School coach waiting for approval: ${r.school}`,
+    detail: `Check ${r.domain} on the school's own website, then approve or reject the request.`,
+    at: Number(r.verified_at),
+    action: { label: "Review school coaches", tab: "Users" },
+  }));
+}
+
 /** Runs a source, leaving it out (with a note) when it fails, so one broken service doesn't empty the list. */
 async function from(name: string, fn: () => Promise<TodoItem[]>, problems: string[]): Promise<TodoItem[]> {
   try {
@@ -242,6 +257,7 @@ export interface TodoList {
 export async function todoList(now = Date.now()): Promise<TodoList> {
   const problems: string[] = [];
   const groups = await Promise.all([
+    from("School coaches", schoolItems, problems),
     from("Inbox", () => inboxItems(now), problems),
     from("Reports", () => reportItems(), problems),
     from("Creators", () => creatorItems(now), problems),

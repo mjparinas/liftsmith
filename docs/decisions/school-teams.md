@@ -13,6 +13,7 @@ Melvin, 2026-11-13: "can we make the app free for anybody in high school or belo
 - Coaching › **School teams** › Confirm my school: the school's name and the coach's school address. We email a six-digit code (30 minutes, 5 tries counted before comparing, 5 codes a day per account).
 - **Free mail never counts** (`FREE_MAIL`: Gmail, Outlook, iCloud, Yahoo, Proton, Canadian ISPs and others).
 - **Known school domains are approved at once:** patterns only schools get (`k12.<state>.us`, `.sch.uk`, `.ed.jp`) and every domain staff have trusted (`school_domains`). Anything else waits for staff on the **admin Users tab › School coaches** card (`SchoolCoaches.tsx`, `/api/admin/schools/`, audited): **Approve** trusts the domain (that coach and everyone waiting there, and the next coach is approved at once), **Reject** turns down this coach, **Block domain** stops the domain for good (a company, a university, a domain anyone can get an address at). Canadian school boards (`sd35.bc.ca`, `tdsb.on.ca` …) have no common pattern, so the first coach at each board goes through staff.
+- **Admin visibility** (Melvin, 2026-11-24): pending proven addresses also appear on Overview’s Needs you and To Do, one task and one count per coach, with a button to review them on Users. The count refreshes after a decision.
 - **The proof lasts a school year** (`verifiedMs`, 400 days), then the coach confirms the address again. A coach who leaves the school loses the address, so free Pro ends for them and their athletes.
 
 ## Teams

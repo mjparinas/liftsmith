@@ -593,6 +593,12 @@ export function AdminApp() {
     const s = summarizeTodo(j);
     if (s) setTodo(s);
   }, []);
+  const refreshTodo = useCallback(() => {
+    void fetch("/api/admin/todo/")
+      .then((r) => (r.ok ? r.json() : null))
+      .then(todoList)
+      .catch(() => {});
+  }, [todoList]);
   const badges: Partial<Record<Tab, number>> = todo ? { ...counts, "To Do": todoBadge(todo, mail) } : counts;
   const inboxCount = useCallback((n: number) => setCount("Inbox", n), [setCount]);
   const reportsCount = useCallback((n: number) => setCount("Reports", n), [setCount]);
@@ -688,7 +694,15 @@ export function AdminApp() {
   const workPanels = (isAdmin: boolean, me: string) => (
     <>
       {tab === "Users" && (
-        <Users key={view.q ?? ""} admin={isAdmin} me={me} open={view.open} setOpen={openIn("Users")} initialQuery={view.q} />
+        <Users
+          key={view.q ?? ""}
+          admin={isAdmin}
+          me={me}
+          open={view.open}
+          setOpen={openIn("Users")}
+          initialQuery={view.q}
+          onSchoolsChanged={refreshTodo}
+        />
       )}
       {tab === "Installs" && <Installs admin={isAdmin} open={view.open} setOpen={openIn("Installs")} />}
       {tab === "To Do" && <Todo admin={isAdmin} go={go} onList={todoList} />}
