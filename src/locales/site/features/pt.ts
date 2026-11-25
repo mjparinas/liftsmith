@@ -526,7 +526,7 @@ export const pt: FeaturesText = {
     },
     "coach-roles": {
       name: "Para personal trainers e coaches",
-      body: "Diga se você é personal trainer com atendimento individual ou coach de grupos e equipes. Os alunos veem o termo certo para você, e as ferramentas que você mais usa vêm primeiro.",
+      body: "Diga se você é personal trainer, coach esportivo ou fisio. Os alunos veem o termo certo, e só as ferramentas desse papel aparecem — as mensagens ficam para todos.",
     },
     "coach-booking": {
       name: "Agendamento de sessões",

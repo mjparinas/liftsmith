@@ -464,7 +464,7 @@ export const de: FeaturesText = {
     },
     "coach-roles": {
       name: "Für Personal Trainer und Coaches",
-      body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",
+      body: "Sag, ob du Personal Trainer, Sportcoach oder Physio bist. Kunden sehen das richtige Wort, und nur die Tools dieser Rolle erscheinen — Nachrichten bleiben für alle.",
     },
     "coach-booking": {
       name: "Termine buchen und planen",

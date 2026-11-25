@@ -77,7 +77,7 @@ const blank = (): ProgramDraft => ({
   listed: true,
 });
 
-export function CoachPrograms() {
+export function CoachPrograms({ sports = false }: { sports?: boolean }) {
   const [data, setData] = useState<MinePrograms | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ draft: ProgramDraft; program?: CoachProgram } | null>(null);
@@ -99,15 +99,18 @@ export function CoachPrograms() {
       <Skeleton className="mt-4 h-28" />
     );
 
-  const full = data.mine.length >= PROGRAM_LIMITS.perCoach;
+  const mine = data.mine ?? [];
+  const full = mine.length >= PROGRAM_LIMITS.perCoach;
   return (
     <Section title={t("cpg.mine")} icon="layers" info="coachPrograms">
-      <p className="px-1 text-sm text-muted">{data.pay.ready ? t("cpg.mineHint") : t("cpg.mineHintFree")}</p>
-      {data.mine.length === 0 ? (
-        <EmptyState icon="layers" title={t("cpg.noneMine")} body={t("cpg.noneMineBody")} />
+      <p className="px-1 text-sm text-muted">
+        {sports ? t("cpg.mineHintSports") : data.pay?.ready ? t("cpg.mineHint") : t("cpg.mineHintFree")}
+      </p>
+      {mine.length === 0 ? (
+        <EmptyState icon="layers" title={t("cpg.noneMine")} body={sports ? t("cpg.noneMineBodySports") : t("cpg.noneMineBody")} />
       ) : (
         <ul className="mt-3 space-y-3">
-          {data.mine.map((p) => (
+          {mine.map((p) => (
             <li key={p.id} className="card p-4">
               <button
                 type="button"

@@ -209,13 +209,15 @@ Melvin picked gap item 3 from the 2026-11-17 gap analysis (2026-11-19: "form vid
 - **Plans:** watching and pinning notes is a coaching tool, on every coach plan; sending is free for clients. Indexes: `coach_videos_pair`, `coach_videos_client`, `coach_video_notes_video` (in `dbIndexes.test.ts`).
 - **No native code:** the camera is getUserMedia (the permission camera rep counting already uses on Android and iOS), the clip is a file input and playback is a `<video>`, so Android, iOS and the web get it together. Not built: drawing on the video, side-by-side compare of two videos, and filming from the workout screen; ideas for later.
 
-## Personal trainers and coaches (2026-11-13)
+## Personal trainers and coaches (2026-11-13; tools gated 2026-11-24)
 
-Melvin: "can we differentiate between personal trainers and coaches please", and chose "Role sets labels and defaults" over a strict split of tools or two separate Pro features.
+Melvin: "can we differentiate between personal trainers and coaches please" (2026-11-13), then (2026-11-24) asked to stop mixing personal-training tools with sports coaching, and to hide tools that aren't relevant for each persona while keeping messaging for everyone. Naming: **Personal trainer**, **Coach** (sports / teams / school), **Physio**.
 
-- **A coaching account says how it works** under Your clients (`RolePick`, saved as `coach_prefs.role`, the `role` action): **Personal trainer** (one-on-one clients, mostly in person: sessions, booking and a price per session first), **Coach** (teams and groups, often remotely: check-ins, programs and a monthly fee first) or **Physio** (pain and rehab programs first; see Physio support above). Unset until they pick.
-- **It changes words and order, never tools.** Every coaching tool stays available to both, because many trainers also run small groups and coaches book one-on-ones. Clients see the role beside their coach's name and on the invite, and a lifter whose coaches are all personal trainers reads "Your trainer" and "From your trainer" instead of "coach" (`trainersOnly`). The booking and payment tools that follow use it for their defaults (a price per session for trainers, a monthly fee for coaches).
+- **A coaching account says how it works** under Setup (`RolePick`, saved as `coach_prefs.role`, the `role` action): **Personal trainer** (one-on-one clients: sessions, booking, check-ins, payments), **Coach** (sports and teams: programs assigned by weekday, Teams when school-verified, messages), or **Physio** (pain and rehab programs first; see Physio support above). Unset until they pick; until then they only see Clients, Messages and Setup.
+- **Roles hide irrelevant tools** (`coachTabs` / `coachTools` in `coachMode.ts`). Personal trainer and physio: Clients, Messages, Schedule, Check-ins, Programs, Payments (when live), Setup. Sports coach: Programs first, then Teams (school), Messages, Athletes, Setup — no Schedule, Check-ins or Payments. Physio keeps rehab-first reports and form videos; sports coaches hide rehab protocols, nutrition targets and form videos on the client report. **Messages stay for every persona.** Clients still see whatever their linked coach sent. Booking defaults remain a price per session for trainers/physios (monthly was the old coach default; sports coaches no longer show payments). Clients see the role beside their coach's name and on the invite; a lifter whose coaches are all personal trainers reads "Your trainer" (`trainersOnly`).
+- Screen titles follow the role (`Personal training` / `Coaching` / `Physio`); the Settings row falls back to Coaching before a role is picked.
 - Still one Pro feature (`coaching`), one paywall entry, and a features page line (`coach-roles`).
+- Daily team programming for sports coaches is Coach Programs assigned to a team ([Coaches' programs](coach-programs.md) "Assign to clients and teams"), not a separate product.
 
 ## Booking and scheduling sessions (built 2026-11-13)
 

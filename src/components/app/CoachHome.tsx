@@ -5,17 +5,25 @@
 // pages"). Which side a lifter is on comes from coachMode.ts:
 // - A client sees only their coach: a card per coach with Message first, what the coach sent them (notes, targets,
 //   routines), check-ins waiting, sessions, payments and, per coach, what they share and Stop sharing.
-// - A coach gets one page per job, as tabs at the top (on a phone they wrap onto a second row): Clients, Messages, Schedule,
-//   Check-ins, Payments (once the server takes them), Teams (a school coach), Setup, and My coach when they train with
-//   one too. Each tab is its own route (#/trainer/<tab>) that replaces the page rather than adding a step for back.
-// - Someone who is none of these picks first: train with a coach, coach clients, or coach a high school team.
+// - A personal trainer or physio gets one page per job as tabs; a sports coach leads with Programs (then Teams when
+//   school), Messages, Athletes and Setup — Schedule, Check-ins and Payments stay hidden (coachMode.ts, 2026-11-24).
+//   Each tab is its own route (#/trainer/<tab>) that replaces the page rather than adding a step for back.
+// - Someone who is none of these picks first: train with a coach, personal trainer, or sports / school coach.
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
 import { AuthError, useAccount } from "@/lib/auth";
 import { useLive, useLivePoll } from "@/lib/chatLive";
 import { savePendingCoach } from "@/lib/coachInvite";
-import { coachingMode, coachingView, readPicked, savePicked, type CoachTab, type Picked } from "@/lib/coachMode";
+import {
+  coachingMode,
+  coachingView,
+  isSportsCoach,
+  readPicked,
+  savePicked,
+  type CoachTab,
+  type Picked,
+} from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
@@ -141,9 +149,13 @@ export function CoachHome({
     );
 
   const mode = coachingMode(data, teams.data, picked);
+  const role = data.role ?? null;
+  const sports = isSportsCoach(mode, role);
   // A coach's or a team's code to look at goes to the client's side, whatever else the lifter does.
   const joining = !!code || !!team;
-  const view = joining ? { kind: "client" as const } : coachingView(mode, !!data.pay, tab);
+  const view = joining ? { kind: "client" as const } : coachingView(mode, !!data.pay, tab, role);
+  const screenTitle =
+    role === "trainer" ? t("trn.title.trainer") : role === "physio" ? t("trn.title.physio") : role === "coach" ? t("trn.title.coach") : t("trn.title");
   const status = (note || joined) && (
     <p className={`mt-3 text-sm ${note ? "text-warn" : "text-good"}`} role="status">
       {note ?? t(joined === "team" ? "team.joined" : "trn.joined")}
@@ -157,7 +169,7 @@ export function CoachHome({
   if (view.kind === "start")
     return (
       <div className="pb-2">
-        <ScreenHeader back={back} title={t("trn.title")} />
+        <ScreenHeader back={back} title={screenTitle} />
         {status}
         <StartPage
           data={data}
@@ -165,7 +177,11 @@ export function CoachHome({
           onPick={(p) => {
             savePicked(p);
             setPicked(p);
-            replaceRoute("trainer", p === "school" ? "teams" : "clients");
+            // Personal trainer path → trainer role; school / sports → coach role (tabs follow).
+            void saveRole(p === "school" ? "coach" : "trainer")
+              .then(() => reload())
+              .catch(() => undefined);
+            replaceRoute("trainer", p === "school" ? "programs" : "clients");
           }}
         />
       </div>
@@ -200,8 +216,8 @@ export function CoachHome({
 
   return (
     <div className="pb-2">
-      <ScreenHeader back={back} kicker={data.role ? t(`trn.role.${data.role}`) : undefined} title={t("trn.title")} />
-      <Tabs tabs={view.tabs} tab={view.tab} data={data} />
+      <ScreenHeader back={back} kicker={role ? t(`trn.role.${role}`) : undefined} title={screenTitle} />
+      <Tabs tabs={view.tabs} tab={view.tab} data={data} sports={sports || role === "coach"} />
       {status}
       <div key={view.tab} className="animate-fade">
         {view.tab === "clients" && <ClientsPage data={data} onChange={reload} planPaid={planPaid} />}
@@ -217,7 +233,7 @@ export function CoachHome({
         )}
         {view.tab === "programs" && (
           <div className="desk-col">
-            <CoachPrograms />
+            <CoachPrograms sports={sports || role === "coach"} />
           </div>
         )}
         {view.tab === "pay" && data.pay && (
@@ -242,7 +258,7 @@ export function CoachHome({
 }
 
 /** The coach's pages as tabs: a row at the top that scrolls sideways on a phone. Each one replaces the page. */
-function Tabs({ tabs, tab, data }: { tabs: CoachTab[]; tab: CoachTab; data: Overview }) {
+function Tabs({ tabs, tab, data, sports }: { tabs: CoachTab[]; tab: CoachTab; data: Overview; sports: boolean }) {
   const unread = Object.entries(data.unread ?? {}).reduce((n, [, c]) => n + c, 0);
   return (
     // Every page in view at once: on a phone the tabs wrap onto a second row rather than hide off the edge.
@@ -251,6 +267,7 @@ function Tabs({ tabs, tab, data }: { tabs: CoachTab[]; tab: CoachTab; data: Over
         {tabs.map((x) => {
           const on = x === tab;
           const count = x === "messages" ? unread : 0;
+          const label = x === "clients" && sports ? t("trn.tab.athletes") : t(`trn.tab.${x}`);
           return (
             <li key={x}>
               <button
@@ -267,7 +284,7 @@ function Tabs({ tabs, tab, data }: { tabs: CoachTab[]; tab: CoachTab; data: Over
                 }`}
               >
                 <Icon name={TAB_ICON[x]} size={16} className={on ? "text-accent" : ""} />
-                {t(`trn.tab.${x}`)}
+                {label}
                 {count > 0 && (
                   <span className="num rounded-full bg-accent px-1.5 text-xs font-bold text-accent-ink">
                     <span aria-hidden>{count}</span>
@@ -982,7 +999,7 @@ function SetupPage({ data, onChange }: { data: Overview; onChange: () => void })
   );
 }
 
-/** Personal trainer, coach or physio: changes the words clients see and what comes first, never which tools there are. */
+/** Personal trainer, sports coach or physio: sets the words clients see and which tools show (coachMode.ts). */
 function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => void }) {
   const [role, setRole] = useState<Role | null>(saved);
   const pick = async (r: Role) => {
