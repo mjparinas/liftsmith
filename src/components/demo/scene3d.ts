@@ -31,6 +31,7 @@ import { barDiscs, loadingKey, poleDiscs, trapDiscs, type DemoDisc } from "@/lib
 import { partIndices, REGIONS } from "@/lib/demo/mesh";
 import {
   anchorAt,
+  feetLoad,
   POLE_SEGMENTS,
   poleSegments,
   ropePoints,
@@ -350,7 +351,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     poles = [];
     for (const p of props) {
       if (p.kind === "box") {
-        const e = new LineSegments(new EdgesGeometry(new BoxGeometry(p.size[0], p.size[1], p.size[2]), 1), propMat);
+        const e = new LineSegments(new EdgesGeometry(new BoxGeometry(p.size[0], p.size[1], p.size[2]), 1), p.steel ? steelMat : propMat);
         e.position.set(...p.at);
         e.rotation.z = ((p.tilt ?? 0) * Math.PI) / 180;
         propGroup.add(e);
@@ -563,6 +564,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   let paintCols: (Color | null)[] = [];
 
   const place = (o: { position: Vector3 }, p: Vec) => o.position.set(p[0], p[1], p[2]);
+  const Z_AXIS = new Vector3(0, 0, 1);
 
   return {
     resize(w, h, dpr) {
@@ -655,11 +657,14 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
       }
       const hands = [J.handL, J.handR];
       const mid: Vec = [(J.handL[0] + J.handR[0]) / 2, (J.handL[1] + J.handR[1]) / 2, (J.handL[2] + J.handR[2]) / 2];
+      const feet = hold === "feet" ? feetLoad(J) : null;
       const set = (objs: Group[], on: boolean) =>
         objs.forEach((o, i) => {
-          o.visible = on && (hold === "each" || (hold === "R" && i === 1) || (hold === "centre" && i === 0));
-          place(o, hold === "centre" ? mid : hands[i]);
-          if (o === bells[i]) o.rotation.x = hold === "centre" ? Math.PI / 2 : 0;
+          o.visible = on && (hold === "each" || (hold === "R" && i === 1) || ((hold === "centre" || hold === "feet") && i === 0));
+          place(o, feet ? feet.at : hold === "centre" ? mid : hands[i]);
+          if (o !== bells[i]) return;
+          if (feet) o.quaternion.setFromUnitVectors(Z_AXIS, new Vector3(...feet.dir));
+          else o.rotation.set(hold === "centre" ? Math.PI / 2 : 0, 0, 0);
         });
       set(bells, load === "dumbbell");
       set(kbs, load === "kettlebell");

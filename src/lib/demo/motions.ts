@@ -1560,7 +1560,45 @@ function cossack(): Motion {
   };
 }
 
-function kneeMachine(o: { extend: boolean }): Motion {
+/**
+ * A selectorized machine's weight stack: two guide rods and a column of plates, standing on the floor at
+ * `x`, `z`. Leg curls and extensions had no stack, so they looked like sitting on a box with nothing to
+ * lift (Melvin, 2026-11-25: "the 3D models on the leg curls currently doesn't show weights").
+ */
+function weightStack(x: number, z: number, plates = 9): Prop[] {
+  const t = 0.045,
+    gap = 0.012,
+    base = 0.08;
+  const top = base + plates * (t + gap);
+  return [
+    rail(V(x, (top + 0.35) / 2, z - 0.09), top + 0.35, "y"),
+    rail(V(x, (top + 0.35) / 2, z + 0.09), top + 0.35, "y"),
+    rail(V(x, top + 0.35, z), 0.3, "z"),
+    ...Array.from({ length: plates }, (_, i): Prop => ({
+      kind: "box",
+      at: V(x, base + t / 2 + i * (t + gap), z),
+      size: V(0.16, t, 0.28),
+      steel: true,
+    })),
+  ];
+}
+
+/** The machine side of a leg curl or extension: a lever from the knee's pivot to a roller pad at the ankles, and the stack. */
+function legLever(pivot: Vec, oneLeg: boolean, roller: Vec, stackAt: [number, number]): Prop[] {
+  return [
+    { kind: "pole", from: V(pivot[0], pivot[1], 0.3), to: oneLeg ? "ankleR" : "ankles", past: 0.12, plate: 0 },
+    { kind: "box", at: roller, size: V(0.09, 0.09, oneLeg ? 0.22 : 0.44), follow: oneLeg ? "ankleR" : "ankles" },
+    ...weightStack(stackAt[0], stackAt[1]),
+  ];
+}
+
+/**
+ * Seated leg extension or leg curl on a machine: the lever's roller on the front of the shins (extension) or
+ * behind the heels (curl), a thigh pad holding the legs down for the curl, and the weight stack beside the seat.
+ * `oneLeg` works the right leg; the left rests.
+ */
+function kneeMachine(o: { extend: boolean; oneLeg?: boolean }): Motion {
+  const angle = (d: number) => (o.extend ? lerp(5, 82, d) : lerp(80, -12, d));
   return {
     phases: o.extend
       ? TEMPO.liftFirst("Extend · 1s", "Lower · 2s", "Bent", "Squeeze")
@@ -1571,20 +1609,76 @@ function kneeMachine(o: { extend: boolean }): Motion {
       const hip = V(0, 0.55);
       const sh = torsoAt(B, hip, -12);
       const knee = V(B.thigh * 0.99, 0.55);
-      const a = o.extend ? lerp(5, 82, d) : lerp(80, -12, d);
-      const ankle = swing(knee, B.shin * 0.98, a);
+      const a = angle(d);
+      const leg = (deg: number): Vec => {
+        const p = swing(knee, B.shin * 0.98, deg);
+        return V(p[0], p[1], 0.13);
+      };
+      // the resting leg hangs down beside the pad
+      const rest = o.extend ? 5 : 20;
       return {
         hip,
         sh,
-        ankle: V(ankle[0], ankle[1], 0.13),
-        foot: -a * 0.3,
+        ankle: o.oneLeg ? per(leg(rest), leg(a)) : leg(a),
+        foot: o.oneLeg ? { L: -rest * 0.3, R: -a * 0.3 } : -a * 0.3,
         kneePole: V(0, 1, 0.1),
         hand: V(0.05, 0.52, B.hipW + 0.2),
         elbowPole: V(-1, 0, 0.5),
         headBlend: 0.8,
       };
     },
-    props: (B) => [...seatProps(-12)(B), { kind: "box", at: V(B.thigh * 0.99, 0.25), size: V(0.08, 0.5, 0.4) }],
+    props: (B) => {
+      const knee = V(B.thigh * 0.99, 0.55);
+      // the roller sits on the front of the shins for an extension, behind the heels for a curl
+      const roller = o.extend ? V(0.07, 0.02) : V(-0.02, -0.07);
+      const p: Prop[] = [...seatProps(-12)(B), ...legLever(knee, !!o.oneLeg, roller, [-0.05, 0.62])];
+      // the curl's thigh pad, across the top of the thighs just behind the knees
+      if (!o.extend) p.push({ kind: "box", at: V(B.thigh * 0.75, 0.55 + 0.13), size: V(0.12, 0.08, 0.46) });
+      return p;
+    },
+  };
+}
+
+/**
+ * A leg curl lying face down: on a leg curl machine (pad under the hips and chest, a roller behind the ankles on
+ * a lever, the weight stack at the head end), on a flat bench with a dumbbell between the feet, or on the floor
+ * with a band from a low anchor behind the feet. `oneLeg` curls the right leg; the left stays long.
+ */
+function proneCurl(o: { gear: "machine" | "dumbbell" | "band"; oneLeg?: boolean }): Motion {
+  const top = o.gear === "machine" ? 0.72 : o.gear === "dumbbell" ? 0.45 : 0;
+  const hipY = top + (o.gear === "band" ? 0.13 : 0.1);
+  return {
+    phases: TEMPO.liftFirst("Curl · 1s", "Lower · 2s", "Long", "Squeeze"),
+    load: o.gear === "dumbbell" ? "dumbbell" : "none",
+    hold: o.gear === "dumbbell" ? "feet" : undefined,
+    stance: o.gear === "dumbbell" ? 0.07 : 0.11,
+    pose(B, d) {
+      const hip = V(0, hipY);
+      const sh = o.gear === "band" ? add(hip, V(Math.cos(rad(18)) * B.torso, Math.sin(rad(18)) * B.torso)) : torsoAt(B, hip, 90);
+      const knee = V(-B.thigh * 0.99, hipY - 0.01);
+      const z = o.gear === "dumbbell" ? 0.07 : 0.11;
+      const leg = (deg: number): Vec => V(knee[0] - Math.cos(rad(deg)) * B.shin * 0.98, knee[1] + Math.sin(rad(deg)) * B.shin * 0.98, z);
+      const a = lerp(4, o.gear === "band" ? 100 : 105, d);
+      // propped on the forearms on the floor; holding the machine's handles or the bench's legs
+      const hand = o.gear === "band" ? V(sh[0] + 0.26, 0.07, 0.16) : V(sh[0] + 0.18, top - 0.06, 0.24);
+      return {
+        hip,
+        sh,
+        ankle: o.oneLeg ? per(leg(4), leg(a)) : leg(a),
+        foot: o.oneLeg ? { L: 84, R: 80 + a } : 80 + a,
+        kneePole: V(0, -1, 0.1),
+        hand,
+        elbowPole: o.gear === "band" ? V(0, -1, 0.6) : V(0, -1, 0.5),
+        headBlend: 0.2,
+      };
+    },
+    props: (B) => {
+      const kneeX = -B.thigh * 0.99;
+      const shX = B.torso;
+      if (o.gear === "band") return [cable(V(kneeX - B.shin - 0.75, 0.1, 0), o.oneLeg ? "ankleR" : "ankles")];
+      if (o.gear === "dumbbell") return [bench(kneeX + 0.08, shX + 0.25, top, 0.34)];
+      return [bench(kneeX + 0.08, shX + 0.3, top, 0.34), ...legLever(V(kneeX, hipY - 0.01), !!o.oneLeg, V(-0.04, 0.05), [shX + 0.55, 0])];
+    },
   };
 }
 
@@ -6748,7 +6842,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-rdl": () => rdl({ load: "dumbbell" }),
   "kb-swing": kbSwing,
   "single-leg-rdl": () => rdl({ load: "none", single: true }),
-  "lying-leg-curl": () => kneeMachine({ extend: false }),
+  "lying-leg-curl": () => proneCurl({ gear: "machine" }),
   "nordic-curl": nordic,
   "glute-bridge": () => bridge({}),
   "hip-thrust": () => bridge({ bench: true, bar: true }),
@@ -7091,7 +7185,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "skater-squat": () => skaterSquat({}),
   "narrow-leg-press": legPress,
   "wide-leg-press": legPress,
-  "single-leg-extension": () => kneeMachine({ extend: true }),
+  "single-leg-extension": () => kneeMachine({ extend: true, oneLeg: true }),
   "smith-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
   "bw-box-squat": () => squat({ hold: "arms", box: true, depth: 0.9 }),
   "kb-single-leg-rdl": () => rdl({ load: "kettlebell", single: true }),
@@ -7102,9 +7196,9 @@ const MOTIONS: Record<string, () => Motion> = {
   "seated-good-morning": seatedGoodMorning,
   "slider-leg-curl": () => bridgeWalkout({ slide: true }),
   "cable-standing-leg-curl": () => cableLeg({ move: "curl" }),
-  "band-leg-curl": () => kneeMachine({ extend: false }),
-  "db-lying-leg-curl": () => kneeMachine({ extend: false }),
-  "single-leg-curl": () => kneeMachine({ extend: false }),
+  "band-leg-curl": () => proneCurl({ gear: "band" }),
+  "db-lying-leg-curl": () => proneCurl({ gear: "dumbbell" }),
+  "single-leg-curl": () => proneCurl({ gear: "machine", oneLeg: true }),
   "frog-pump": () => bridge({}),
   "staggered-hip-thrust": () => bridge({ bench: true, bar: true }),
   "band-hip-thrust": () => bridge({ bench: true }),
@@ -7545,7 +7639,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "low-foot-leg-press": legPress,
   "paused-hack-squat": hackSquat,
   "paused-leg-press": legPress,
-  "single-leg-seated-leg-curl": () => kneeMachine({ extend: false }),
+  "single-leg-seated-leg-curl": () => kneeMachine({ extend: false, oneLeg: true }),
   "squat-pulse": () => squat({ hold: "arms", depth: 0.4 }),
   "lunge-pulse": () => lunge({ hands: "hips" }),
   "lateral-squat-walk": lateralSquatWalk,
