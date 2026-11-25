@@ -81,7 +81,8 @@ export const es: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} terminó un entrenamiento.",
   "push.coachQuiet": "{name} lleva una semana sin entrenar. Un mensaje rápido puede ayudar.",
   "push.coachFull": "{name} intentó unirse como cliente, pero tu plan está completo. Abre Entrenador para hacer sitio o mejorar tu plan.",
-  "push.coachFullAthlete": "{name} intentó unirse como atleta, pero tu plan está completo. Abre Entrenador para hacer sitio o mejorar tu plan.",
+  "push.coachFullAthlete":
+    "{name} intentó unirse como atleta, pero tu plan está completo. Abre Entrenador para hacer sitio o mejorar tu plan.",
   "push.coachPain": "{name} valoró su dolor en {text}/10. Conviene preguntarle cómo está.",
   "push.coachReview": "{name} te dejó una reseña: {text}",
   "push.coachProgramReview": "{name} valoró tu programa: {text}",
@@ -137,7 +138,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.coachQuiet": "{name} n'a pas fait de séance depuis une semaine. Un petit message peut aider.",
   "push.coachFull":
     "{name} a voulu devenir votre client, mais votre forfait est complet. Ouvrez Coaching pour faire de la place ou changer de forfait.",
-  "push.coachFullAthlete": "{name} a voulu devenir votre athlète, mais votre forfait est complet. Ouvrez Coaching pour faire de la place ou changer de forfait.",
+  "push.coachFullAthlete":
+    "{name} a voulu devenir votre athlète, mais votre forfait est complet. Ouvrez Coaching pour faire de la place ou changer de forfait.",
   "push.coachPain": "{name} a noté sa douleur à {text}/10. Prenez de ses nouvelles.",
   "push.coachReview": "{name} vous a laissé un avis : {text}",
   "push.coachProgramReview": "{name} a noté votre programme : {text}",
@@ -192,7 +194,8 @@ export const de: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} hat ein Workout beendet.",
   "push.coachQuiet": "{name} hat seit einer Woche nicht trainiert. Eine kurze Nachricht kann helfen.",
   "push.coachFull": "{name} wollte dein Kunde werden, aber dein Plan ist voll. Öffne Coaching, um Platz zu schaffen oder upzugraden.",
-  "push.coachFullAthlete": "{name} wollte dein Athlet werden, aber dein Plan ist voll. Öffne Coaching, um Platz zu schaffen oder upzugraden.",
+  "push.coachFullAthlete":
+    "{name} wollte dein Athlet werden, aber dein Plan ist voll. Öffne Coaching, um Platz zu schaffen oder upzugraden.",
   "push.coachPain": "{name} hat den Schmerz mit {text}/10 bewertet. Frag am besten kurz nach.",
   "push.coachReview": "{name} hat dir eine Bewertung hinterlassen: {text}",
   "push.coachProgramReview": "{name} hat dein Programm bewertet: {text}",
@@ -248,7 +251,8 @@ export const it: Partial<Record<Key, Message>> = {
   "push.coachQuiet": "{name} non si allena da una settimana. Un breve messaggio può aiutare.",
   "push.coachFull":
     "{name} ha provato a diventare tuo cliente, ma il tuo piano è pieno. Apri Coaching per fare spazio o passare a un piano superiore.",
-  "push.coachFullAthlete": "{name} ha provato a diventare tuo atleta, ma il tuo piano è pieno. Apri Coaching per fare spazio o passare a un piano superiore.",
+  "push.coachFullAthlete":
+    "{name} ha provato a diventare tuo atleta, ma il tuo piano è pieno. Apri Coaching per fare spazio o passare a un piano superiore.",
   "push.coachPain": "{name} ha valutato il dolore {text}/10. Meglio sentire come sta.",
   "push.coachReview": "{name} ti ha lasciato una recensione: {text}",
   "push.coachProgramReview": "{name} ha valutato il tuo programma: {text}",
@@ -304,7 +308,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.coachQuiet": "{name}さんは1週間トレーニングしていません。短いメッセージが助けになるかもしれません。",
   "push.coachFull":
     "{name}さんがクライアントとして参加しようとしましたが、プランの上限に達しています。コーチングを開いて枠を空けるか、プランをアップグレードしてください。",
-  "push.coachFullAthlete": "{name}さんが選手として参加しようとしましたが、プランの上限です。コーチングを開いて枠を空けるか、アップグレードしてください。",
+  "push.coachFullAthlete":
+    "{name}さんが選手として参加しようとしましたが、プランの上限です。コーチングを開いて枠を空けるか、アップグレードしてください。",
   "push.coachPain": "{name}さんが痛みを{text}/10と記録しました。様子を確認しましょう。",
   "push.coachReview": "{name}さんがレビューを書きました：{text}",
   "push.coachProgramReview": "{name}さんがあなたのプログラムを評価しました：{text}",
@@ -359,7 +364,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} terminou um treino.",
   "push.coachQuiet": "{name} não treina há uma semana. Uma mensagem rápida pode ajudar.",
   "push.coachFull": "{name} tentou entrar como seu aluno, mas seu plano está cheio. Abra Coaching para liberar espaço ou fazer upgrade.",
-  "push.coachFullAthlete": "{name} tentou entrar como seu atleta, mas seu plano está cheio. Abra Coaching para liberar espaço ou fazer upgrade.",
+  "push.coachFullAthlete":
+    "{name} tentou entrar como seu atleta, mas seu plano está cheio. Abra Coaching para liberar espaço ou fazer upgrade.",
   "push.coachPain": "{name} deu nota {text}/10 para a dor. Vale a pena conversar.",
   "push.gymNews": "{name}: {text}",
   "push.clubMsg": "{name}: {text}",
@@ -525,7 +531,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "push.coachQuiet": "{name} nie trenuje od tygodnia. Krótka wiadomość może pomóc.",
   "push.coachFull":
     "{name} chce dołączyć jako twój podopieczny, ale twój plan jest pełny. Otwórz Prowadzenie, żeby zrobić miejsce lub zmienić plan.",
-  "push.coachFullAthlete": "{name} próbował dołączyć jako zawodnik, ale plan jest pełny. Otwórz Trenowanie, żeby zwolnić miejsce albo przejść na większy plan.",
+  "push.coachFullAthlete":
+    "{name} próbował dołączyć jako zawodnik, ale plan jest pełny. Otwórz Trenowanie, żeby zwolnić miejsce albo przejść na większy plan.",
   "push.coachPain": "{name} ocenia ból na {text}/10. Warto się odezwać.",
   "push.gymNews": "{name}: {text}",
   "push.clubMsg": "{name}: {text}",

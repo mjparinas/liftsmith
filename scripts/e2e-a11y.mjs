@@ -617,11 +617,16 @@ if (runs("app"))
       sessions: { booked: [], open: [] },
       pay: null,
       coach: !client,
+      role: client ? null : "trainer",
     });
     let coachClient = false;
-    await page.route("**/api/coach/**", (r) =>
-      r.fulfill({ json: r.request().method() === "GET" && !r.request().url().includes("?") ? coachApi(coachClient) : { ok: true } }),
-    );
+    await page.route("**/api/coach/**", (r) => {
+      const query = new URL(r.request().url()).searchParams;
+      if (r.request().method() === "GET" && query.has("schedule")) {
+        return r.fulfill({ json: { scope: query.get("schedule"), days: [] } });
+      }
+      return r.fulfill({ json: r.request().method() === "GET" && !query.size ? coachApi(coachClient) : { ok: true } });
+    });
     // Ratings and reviews (2026-11-15, coach-reviews.md): the coach's own on Setup, and the client's own review of Sam.
     const review = (id, stars, name, text, reply = "") => ({
       id,
@@ -647,6 +652,9 @@ if (runs("app"))
       r.fulfill({ json: r.request().method() === "GET" ? reviewsApi(r.request().url()) : { ok: true } }),
     );
     await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
+    await page.route("**/api/programs/**", (r) =>
+      r.fulfill({ json: r.request().method() === "GET" ? { mine: [], listed: [] } : { ok: true } }),
+    );
     await page.goto(`${server.url}/app/#/trainer/clients`);
     await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
     await scan("coaching clients");
@@ -656,6 +664,9 @@ if (runs("app"))
     await page.goto(`${server.url}/app/#/trainer/schedule`);
     await page.getByTestId("schedule-calendar").waitFor();
     await scan("coaching schedule");
+    await page.goto(`${server.url}/app/#/trainer/programs`);
+    await page.getByRole("heading", { name: "Your programs" }).waitFor();
+    await scan("coach programs");
     await page.goto(`${server.url}/app/#/trainer/setup`);
     await page.getByText("Fixed my squat in a month.").waitFor();
     await scan("coaching reviews");

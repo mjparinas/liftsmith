@@ -145,6 +145,11 @@ beforeEach(() => {
     if (body?.action === "sendForm") return Response.json({ checkin: { ...CHECKIN, clientId: body.client, coachId: "me" } });
     if (body?.action === "repeatForm") return Response.json({ repeat: body.id ? { formId: body.id, nextAt: NOW + 7 * 86_400_000 } : null });
     if (body?.action === "role") return Response.json({ role: body.role });
+    if (body?.action === "stopCoach") {
+      coaching = false;
+      coachRole = null;
+      return Response.json({ stopped: true });
+    }
     if (body?.action === "form") return Response.json({ form: { ...body.form, id: "f2", at: NOW } });
     if (body?.action === "answer") return Response.json({ checkin: { ...CHECKIN, answers: body.answers, answeredAt: NOW } });
     if (body?.action === "preview" && inviteKind === "offline") throw new TypeError("Failed to fetch");
@@ -731,6 +736,14 @@ describe("personal trainer or coach", () => {
     expect(calls.filter((c) => (c.body as { action?: string })?.action === "role").at(-1)).toMatchObject({ body: { role: "physio" } });
     expect(screen.getByText(/For physios and rehab clinicians/)).toBeInTheDocument();
     expect(screen.queryByText("I coach as")).not.toBeInTheDocument();
+  });
+
+  it("a coach, trainer or physio can stop coaching", async () => {
+    const u = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<Trainer arg="setup" />);
+    await u.click(await screen.findByRole("button", { name: "Stop coaching" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "stopCoach")).toBeDefined();
   });
 
   it("a client with a personal trainer sees the word trainer", async () => {

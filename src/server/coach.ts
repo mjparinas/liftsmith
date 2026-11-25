@@ -404,6 +404,14 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
       args: pair,
     },
     { sql: "DELETE FROM coach_program_assigns WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    {
+      sql: "DELETE FROM coach_calendar_access WHERE (owner_id = ? AND scope = ?) OR (owner_id = ? AND scope = ?)",
+      args: [accountId, `client:${otherId}`, otherId, `client:${accountId}`],
+    },
+    {
+      sql: "DELETE FROM coach_schedule_days WHERE (coach_id = ? AND scope = ?) OR (coach_id = ? AND scope = ?)",
+      args: [accountId, `client:${otherId}`, otherId, `client:${accountId}`],
+    },
   ]);
 }
 
@@ -1137,6 +1145,34 @@ export async function setRole(coachId: string, role: unknown, now = Date.now()):
   return r;
 }
 
+/** Stop an account coaching other people. Incoming coach/client relationships stay intact. */
+export async function stopCoach(coachId: string): Promise<void> {
+  await batch([
+    {
+      sql: `INSERT INTO coach_prefs (account_id, alerts, role, kind, updated_at) VALUES (?, 1, NULL, 'trainer', ?)
+            ON CONFLICT (account_id) DO UPDATE SET role = NULL, kind = 'trainer', updated_at = excluded.updated_at`,
+      args: [coachId, Date.now()],
+    },
+    { sql: "DELETE FROM coach_invites WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_accounts WHERE account_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_links WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_plans WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_defaults WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_notes WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_messages WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_reads WHERE other_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_shares WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_alerts WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_targets WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_forms WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_slots WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_checkins WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_program_assigns WHERE coach_id = ?", args: [coachId] },
+    { sql: "DELETE FROM coach_programs WHERE coach_id = ?", args: [coachId] },
+  ]);
+}
+
 /**
  * A client's phone synced a finished workout: tell each of their coaches who has alerts on. Called from sync with the
  * events it just stored; a workout logged long ago (an import, a backup) says nothing.
@@ -1256,4 +1292,10 @@ export const coachCleanup = (accountId: string) => [
   // Reviews it wrote and reviews of it (coachReviews.ts).
   { sql: "DELETE FROM coach_reviews WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_program_assigns WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  {
+    sql: "DELETE FROM coach_calendar_access WHERE owner_id = ? OR assistant_id = ? OR scope = ?",
+    args: [accountId, accountId, `client:${accountId}`],
+  },
+  { sql: "DELETE FROM coach_schedule_days WHERE coach_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_schedule_days WHERE scope = ?", args: [`client:${accountId}`] },
 ];

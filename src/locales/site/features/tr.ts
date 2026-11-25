@@ -561,6 +561,10 @@ export const tr: FeaturesText = {
       note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
       proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
     },
+    "coach-calendar": {
+      name: "Antrenman takvimi",
+      body: "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",
+    },
     "coach-assign-program": {
       name: "Sezon programını danışanlara veya bir takıma ata",
       body: "Koçlar çok günlük bir programı (Upper/Lower, Push/Pull/Legs veya kendi) N hafta boyunca haftanın günlerine bağlı bir plan olarak atar. Sporcular bir kez takip eder; Bugün o günün antrenmanını gösterir. Program takvimi her günü kim yaptı, kim henüz yapmadı gösterir — okul takımlarında yalnızca adlar, asla ağırlık yok.",

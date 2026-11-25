@@ -35,7 +35,10 @@ describe("which coaching pages a lifter sees", () => {
     const mode = coachingMode({ ...NONE, coach: true, role: "coach" }, NO_TEAMS);
     expect(coachTabs(mode, true, "coach")).toEqual(["programs", "messages", "clients", "setup"]);
     expect(isSportsCoach(mode, "coach")).toBe(true);
-    const school = coachingMode({ ...NONE, coach: true, role: "coach" }, { ...NO_TEAMS, school: { school: "Hill High", active: true } as never });
+    const school = coachingMode(
+      { ...NONE, coach: true, role: "coach" },
+      { ...NO_TEAMS, school: { school: "Hill High", active: true } as never },
+    );
     expect(coachTabs(school, true, "coach")).toEqual(["programs", "teams", "messages", "clients", "setup"]);
     expect(coachingView(school, true, undefined, "coach")).toMatchObject({ kind: "coach", tab: "programs" });
   });

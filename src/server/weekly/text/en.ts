@@ -1096,6 +1096,7 @@ export const emails: Record<string, Words> = {
       "Athletes get a push and Follow this program once on Today. Their own progression picks the weights.",
       "On a scheduled weekday, Today shows that day's workout. Off days stay rest — no lift scheduled.",
       "Open the program calendar to see Done and Not yet for each day. School teams show first names only, never weights.",
+      "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today.",
     ],
     dyk: "You can assign the same way from a school team card or a single client's report.",
   },

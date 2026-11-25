@@ -15,15 +15,7 @@ import { track } from "@/lib/analytics";
 import { AuthError, useAccount } from "@/lib/auth";
 import { useLive, useLivePoll } from "@/lib/chatLive";
 import { savePendingCoach } from "@/lib/coachInvite";
-import {
-  coachingMode,
-  coachingView,
-  isSportsCoach,
-  readPicked,
-  savePicked,
-  type CoachTab,
-  type Picked,
-} from "@/lib/coachMode";
+import { coachingMode, coachingView, isSportsCoach, readPicked, savePicked, type CoachTab, type Picked } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
 import { date, t, tFor } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
@@ -51,6 +43,7 @@ import {
   sharedWith,
   shareKinds,
   showCode,
+  stopCoaching,
   trainerError,
   trainersOnly,
   unlinkPerson,
@@ -155,7 +148,13 @@ export function CoachHome({
   const joining = !!code || !!team;
   const view = joining ? { kind: "client" as const } : coachingView(mode, !!data.pay, tab, role);
   const screenTitle =
-    role === "trainer" ? t("trn.title.trainer") : role === "physio" ? t("trn.title.physio") : role === "coach" ? t("trn.title.coach") : t("trn.title");
+    role === "trainer"
+      ? t("trn.title.trainer")
+      : role === "physio"
+        ? t("trn.title.physio")
+        : role === "coach"
+          ? t("trn.title.coach")
+          : t("trn.title");
   const status = (note || joined) && (
     <p className={`mt-3 text-sm ${note ? "text-warn" : "text-good"}`} role="status">
       {note ?? t(joined === "team" ? "team.joined" : "trn.joined")}
@@ -1030,6 +1029,19 @@ function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => voi
       setRole(saved);
     }
   };
+  const stop = async () => {
+    if (!window.confirm(t("trn.stopCoachAsk"))) return;
+    try {
+      await stopCoaching();
+      setRole(null);
+      haptic("toggle");
+      track("feature", { name: "trainer", detail: "stopCoach" });
+      onChange();
+    } catch {
+      oops();
+      setRole(saved);
+    }
+  };
   return (
     <section className="card mt-4 p-4">
       <p id="trn-role" className="font-semibold">
@@ -1043,6 +1055,11 @@ function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => voi
         ))}
       </div>
       <p className="mt-2 text-sm text-muted">{role ? t(`trn.role.${role}Hint`) : t("trn.role.pick")}</p>
+      {role && (
+        <Button kind="ghost" className="mt-3 w-full" onClick={() => void stop()}>
+          {t("trn.stopCoach")}
+        </Button>
+      )}
     </section>
   );
 }

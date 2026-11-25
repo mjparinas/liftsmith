@@ -46,6 +46,15 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.18.1",
+    day: "2026-11-25",
+    headline: "Stop coaching and turn off its tools from Coaching setup",
+    changes: [
+      { id: "coachCalendar", kind: "new", icon: "calendar" },
+      { id: "stopCoach", kind: "fixed", icon: "people" },
+    ],
+  },
+  {
     version: "0.17.0",
     day: "2026-11-24",
     headline: "Personal trainers, sports coaches and physios each see the tools that fit their role",

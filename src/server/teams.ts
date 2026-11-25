@@ -291,6 +291,8 @@ export async function deleteTeam(coachId: string, teamId: unknown): Promise<bool
     // Its team sessions go too (teamSessions.ts); workouts already written into athletes' accounts stay theirs.
     { sql: "DELETE FROM team_session_sets WHERE session_id IN (SELECT id FROM team_sessions WHERE team_id = ?)", args: [r.id] },
     { sql: "DELETE FROM team_sessions WHERE team_id = ?", args: [r.id] },
+    { sql: "DELETE FROM coach_calendar_access WHERE scope = ?", args: [`team:${r.id}`] },
+    { sql: "DELETE FROM coach_schedule_days WHERE scope = ?", args: [`team:${r.id}`] },
     { sql: "DELETE FROM teams WHERE id = ?", args: [r.id] },
   ]);
   for (const m of members) await unlinkUnlessOtherTeam(coachId, s(m.account_id));

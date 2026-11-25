@@ -1,6 +1,7 @@
 import { track } from "../analytics";
 import { weekStart } from "../block";
 import { coachProgramDayIndex } from "../coachProgramAssign";
+import { scheduledRoutine } from "../coachSchedule";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
 import { can } from "../entitlements";
@@ -219,7 +220,7 @@ export function planSlice(c: Ctx): PlanSlice {
               return i === null ? null : (profile.routines?.find((x) => x.id === src.dayIds[i]) ?? null);
             })()
           : null;
-      const routine = profile.routines?.find((x) => x.id === get().routineId) ?? coachDay;
+      const routine = profile.routines?.find((x) => x.id === get().routineId) ?? scheduledRoutine(get().routineId, now) ?? coachDay;
       // The slider is the whole workout (Melvin, 2026-11-14): the parts that are on take their minutes out of the
       // lifting, so the adaptive plan (and a split program's day) is sized to what's left. A routine runs as written.
       const split = routine ? null : partSplit(profile, g, events, now);

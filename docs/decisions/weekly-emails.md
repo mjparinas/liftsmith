@@ -888,3 +888,5 @@ Put Upper/Lower or Push/Pull/Legs on your clients or school team for N weeks —
 - Open the program calendar to see Done and Not yet for each day. School teams show first names only, never weights.
 Did you know? You can assign the same way from a school team card or a single client's report. ([Coaches' programs](coach-programs.md))
 
+
+**New, 2026-11-25.** The coach assignment tip includes the month calendar for scheduling workouts and rest days.

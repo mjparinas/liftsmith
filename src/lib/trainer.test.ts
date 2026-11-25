@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { DAY, makeWorkout, NOW } from "@/test/factories";
 
+import { dayKey } from "./dashboard";
 import { phaseItems, rehabProgram } from "./rehab";
 import { encodeRoutine } from "./routineShare";
+import { scheduleRoutineId, type ScheduleCell } from "./scheduleDays";
 import {
   cleanEvents,
   clientReport,
@@ -44,6 +46,36 @@ describe("a coach's report on a client", () => {
 
   it("says when there are no workouts yet", () => {
     expect(clientReport(view([]), NOW).flags).toEqual([{ kind: "new" }]);
+  });
+
+  it("counts completed calendar workouts and workouts logged on rest days", () => {
+    const workout: ScheduleCell = {
+      date: dayKey(NOW - 3 * DAY),
+      kind: "workout",
+      name: "Push",
+      code: "r1~Push~bench-press.4",
+      coachId: "coach",
+      scope: "all",
+      updatedAt: NOW - 7 * DAY,
+    };
+    const schedule = [
+      workout,
+      { ...workout, date: dayKey(NOW - 2 * DAY) },
+      { ...workout, date: dayKey(NOW - DAY), kind: "rest" as const },
+      { ...workout, date: dayKey(NOW) },
+    ];
+    const finished = makeWorkout("assigned", NOW - 3 * DAY, [{}, {}]).map((e) =>
+      e.type === "sessionStart" ? { ...e, routine: scheduleRoutineId(workout) } : e,
+    );
+    const unfinished = makeWorkout("unfinished", NOW - 2 * DAY, [{}, {}])
+      .filter((e) => e.type !== "sessionEnd")
+      .map((e) => (e.type === "sessionStart" ? { ...e, routine: scheduleRoutineId(schedule[1]!) } : e));
+    const restDay = makeWorkout("extra", NOW - DAY, [{}, {}]);
+    expect(clientReport({ ...view([...finished, ...unfinished, ...restDay]), schedule }, NOW).schedule).toEqual({
+      completed: 1,
+      unlogged: 1,
+      trainedOnRest: 1,
+    });
   });
 
   it("flags a client who has gone quiet", () => {

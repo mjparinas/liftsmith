@@ -175,7 +175,9 @@ function CoachingRow() {
     : who.clients
       ? tFor(who.role === "coach", "trn.rowCoach", { count: who.clients })
       : t("trn.rowNote");
-  return <NavRow title={nav ? t(`trn.role.${nav.role}`) : t("trn.row")} sub={sub} icon={nav?.icon ?? "people"} onClick={() => go("trainer")} />;
+  return (
+    <NavRow title={nav ? t(`trn.role.${nav.role}`) : t("trn.row")} sub={sub} icon={nav?.icon ?? "people"} onClick={() => go("trainer")} />
+  );
 }
 
 /** Settings' second row: sign in to back up and sync, or who's signed in. */

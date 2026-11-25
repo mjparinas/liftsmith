@@ -2,7 +2,7 @@
 // names or internals, and only things a lifter would notice in the app or on the site. Newest day first; one
 // entry per day that had such changes. Since 2026-11-19 a new day is a release in src/lib/appNews.ts, which the
 // app's own What's new sheet shows in every language; its English words come in here, so one list feeds both
-// (docs/decisions/whats-new.md). The days below `FROM_APP` are the older, website-only entries.
+// (docs/decisions/whats-new.md). The days below the app releases are the older, website-only entries.
 import { RELEASES } from "@/lib/appNews";
 import type { MessageKey } from "@/locales/en";
 
@@ -35,16 +35,21 @@ const words = (key: string): string => {
   return typeof m === "string" ? m : "";
 };
 
-/** The app's releases, in English. */
-const FROM_APP: NewsDay[] = RELEASES.map((r) => ({
-  day: r.day,
-  version: r.version,
-  headline: r.headline,
-  items: r.changes.map((c) => ({ kind: c.kind, title: words(`wn.c.${c.id}.title`), body: words(`wn.c.${c.id}.body`) })),
-}));
+/** The public page groups releases from the same day under the latest version. */
+const fromApp = new Map<string, NewsDay>();
+for (const release of RELEASES) {
+  const items = release.changes.map((c) => ({
+    kind: c.kind,
+    title: words(`wn.c.${c.id}.title`),
+    body: words(`wn.c.${c.id}.body`),
+  }));
+  const day = fromApp.get(release.day);
+  if (day) day.items.push(...items);
+  else fromApp.set(release.day, { day: release.day, version: release.version, headline: release.headline, items });
+}
 
 export const WHATS_NEW: NewsDay[] = [
-  ...FROM_APP,
+  ...fromApp.values(),
   {
     day: "2026-11-09",
     headline: "Accounts and sync, camera rep counting, a 3D recovery map, and Spanish and French",

@@ -908,6 +908,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "coach-calendar",
+        name: "Workout calendar",
+        body: "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",
+        tier: "both",
+        pro: "coaching",
+        added: "2026-11-25",
+      },
+      {
         id: "coach-assign-program",
         name: "Assign a season program to athletes or a team",
         body: "Coaches assign a multi-day program (Upper/Lower, Push/Pull/Legs, or their own) as a weekday standing plan for N weeks. Athletes follow once; Today shows that day's workout. A program calendar shows who has done each day and who hasn't yet — first names only for school teams, never weights.",

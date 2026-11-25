@@ -27,6 +27,7 @@ import {
   setRole,
   setShare,
   setTargets,
+  stopCoach,
   unlink,
   unreadFrom,
 } from "./coach";
@@ -696,6 +697,15 @@ describe("physio support", () => {
     expect(await roleOf("coach")).toBe("physio");
     await run("UPDATE coach_prefs SET kind = 'trainer', role = NULL WHERE account_id = ?", ["coach"]);
     expect(await roleOf("coach")).toBeNull();
+  });
+
+  it("stops coaching and removes the coach role, marker and invite", async () => {
+    await setRole("coach", "physio", NOW);
+    await makeInvite("coach", NOW);
+    await stopCoach("coach");
+    expect(await roleOf("coach")).toBeNull();
+    expect((await overview("coach", NOW)).coach).toBe(false);
+    expect((await overview("coach", NOW)).invite).toBeNull();
   });
 
   it("a routine can say how many times a week, and only 1 to 7", async () => {

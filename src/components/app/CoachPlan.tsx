@@ -199,9 +199,7 @@ function PlansSheet({
             <p className="mt-1 text-sm font-semibold">
               {tr === "coachPlus" ? tFor(athlete, "cpl.clients.coachPlus") : tFor(athlete, "cpl.clients.coach", { limit })}
             </p>
-            <p className="mt-1 text-sm text-muted">
-              {tFor(athlete, tr === "coachPlus" ? "cpl.what.coachPlus" : "cpl.what.coach")}
-            </p>
+            <p className="mt-1 text-sm text-muted">{tFor(athlete, tr === "coachPlus" ? "cpl.what.coachPlus" : "cpl.what.coach")}</p>
             {!mine && !below && (
               <div className="mt-3 space-y-2">
                 {choices.map((o) => (
