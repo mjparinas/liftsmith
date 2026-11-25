@@ -194,10 +194,12 @@ export const es: Partial<Record<Key, Message>> = {
     "Convierte tus rutinas en un programa, gratis o de pago. Los de pago se venden en la web de Liftsmith y el dinero va a tu cuenta de Stripe.",
   "cpg.mineHintFree":
     "Convierte tus rutinas en un programa y comparte su enlace. Para cobrar por uno, configura primero los pagos con Stripe.",
-  "cpg.mineHintSports": "Crea una temporada con Upper/Lower o Push/Pull, asígnala a tu equipo y los atletas siguen el trabajo de cada día sin que publiques a diario.",
+  "cpg.mineHintSports":
+    "Crea una temporada con Upper/Lower o Push/Pull, asígnala a tu equipo y los atletas siguen el trabajo de cada día sin que publiques a diario.",
   "cpg.noneMine": "Aún no hay programas",
   "cpg.noneMineBody": "Elige algunas de tus rutinas como sus días, ponle un nombre y comparte el enlace.",
-  "cpg.noneMineBodySports": "Empieza con Nuevo programa, elige Upper/Lower o Push/Pull y asígnalo a tu equipo para que vean el trabajo de cada día.",
+  "cpg.noneMineBodySports":
+    "Empieza con Nuevo programa, elige Upper/Lower o Push/Pull y asígnalo a tu equipo para que vean el trabajo de cada día.",
   "cpg.fullMine": {
     one: "Tienes el máximo de programas por entrenador ({count}).",
     other: "Tienes el máximo de programas por entrenador ({count}).",
@@ -337,7 +339,8 @@ export const fr: Partial<Record<Key, Message>> = {
     "Faites de vos routines un programme, gratuit ou payant. Les programmes payants se vendent sur le site Liftsmith, et l'argent va sur votre compte Stripe.",
   "cpg.mineHintFree":
     "Faites de vos routines un programme et partagez son lien. Pour en faire payer un, configurez d'abord les paiements avec Stripe.",
-  "cpg.mineHintSports": "Construisez une saison en Upper/Lower ou Push/Pull, assignez-la à votre équipe : les athlètes suivent le travail du jour sans publication quotidienne.",
+  "cpg.mineHintSports":
+    "Construisez une saison en Upper/Lower ou Push/Pull, assignez-la à votre équipe : les athlètes suivent le travail du jour sans publication quotidienne.",
   "cpg.noneMine": "Pas encore de programmes",
   "cpg.noneMineBody": "Choisissez quelques-unes de vos routines comme jours, donnez-lui un nom et partagez le lien.",
   "cpg.noneMineBodySports": "Créez un nouveau programme, choisissez Upper/Lower ou Push/Pull, puis assignez-le à votre équipe.",
@@ -482,7 +485,8 @@ export const de: Partial<Record<Key, Message>> = {
     "Mach aus deinen Routinen ein Programm, kostenlos oder kostenpflichtig. Kostenpflichtige Programme werden auf der Liftsmith-Website verkauft, und das Geld geht auf dein Stripe-Konto.",
   "cpg.mineHintFree":
     "Mach aus deinen Routinen ein Programm und teile den Link. Um Geld dafür zu nehmen, richte zuerst Zahlungen mit Stripe ein.",
-  "cpg.mineHintSports": "Baue eine Saison aus Upper/Lower oder Push/Pull, weise sie dem Team zu – Athleten folgen dem Tagesplan, ohne tägliches Posten.",
+  "cpg.mineHintSports":
+    "Baue eine Saison aus Upper/Lower oder Push/Pull, weise sie dem Team zu – Athleten folgen dem Tagesplan, ohne tägliches Posten.",
   "cpg.noneMine": "Noch keine Programme",
   "cpg.noneMineBody": "Wähle ein paar deiner Routinen als Tage, gib ihm einen Namen und teile den Link.",
   "cpg.noneMineBodySports": "Starte mit Neuem Programm, wähle Upper/Lower oder Push/Pull und weise es dem Team zu.",
@@ -628,7 +632,8 @@ export const it: Partial<Record<Key, Message>> = {
     "Trasforma le tue routine in un programma, gratuito o a pagamento. Quelli a pagamento si vendono sul sito di Liftsmith e i soldi vanno sul tuo account Stripe.",
   "cpg.mineHintFree":
     "Trasforma le tue routine in un programma e condividi il link. Per farlo pagare, configura prima i pagamenti con Stripe.",
-  "cpg.mineHintSports": "Crea una stagione con Upper/Lower o Push/Pull, assegnala alla squadra: gli atleti seguono il lavoro del giorno senza post quotidiani.",
+  "cpg.mineHintSports":
+    "Crea una stagione con Upper/Lower o Push/Pull, assegnala alla squadra: gli atleti seguono il lavoro del giorno senza post quotidiani.",
   "cpg.noneMine": "Ancora nessun programma",
   "cpg.noneMineBody": "Scegli alcune tue routine come giorni, dagli un nome e condividi il link.",
   "cpg.noneMineBodySports": "Inizia con Nuovo programma, scegli Upper/Lower o Push/Pull e assegnalo alla squadra.",
@@ -770,7 +775,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.mineHint":
     "ルーティンを無料または有料のプログラムにできます。有料プログラムはLiftsmithのウェブサイトで販売され、代金はあなたのStripeアカウントに入ります。",
   "cpg.mineHintFree": "ルーティンをプログラムにして、リンクを共有できます。有料にするには、先にStripeで支払いを設定してください。",
-  "cpg.mineHintSports": "アッパー／ローワーやプッシュ／プルでシーズンを作り、チームに割り当てると、選手は毎日の投稿なしでその日のメニューに従えます。",
+  "cpg.mineHintSports":
+    "アッパー／ローワーやプッシュ／プルでシーズンを作り、チームに割り当てると、選手は毎日の投稿なしでその日のメニューに従えます。",
   "cpg.noneMine": "まだプログラムがありません",
   "cpg.noneMineBody": "ルーティンをいくつか日として選び、名前を付けてリンクを共有しましょう。",
   "cpg.noneMineBodySports": "新規プログラムから始め、アッパー／ローワーやプッシュ／プルを選んでチームに割り当てましょう。",
@@ -903,7 +909,8 @@ export const pt: Partial<Record<Key, Message>> = {
     "Transforme suas rotinas em um programa, grátis ou pago. Programas pagos são vendidos no site do Liftsmith, e o dinheiro vai para a sua conta Stripe.",
   "cpg.mineHintFree":
     "Transforme suas rotinas em um programa e compartilhe o link. Para cobrar, configure antes os pagamentos com a Stripe.",
-  "cpg.mineHintSports": "Monte uma temporada com Upper/Lower ou Push/Pull, atribua à equipe e os atletas seguem o trabalho do dia sem você postar todo dia.",
+  "cpg.mineHintSports":
+    "Monte uma temporada com Upper/Lower ou Push/Pull, atribua à equipe e os atletas seguem o trabalho do dia sem você postar todo dia.",
   "cpg.noneMine": "Nenhum programa ainda",
   "cpg.noneMineBody": "Escolha algumas das suas rotinas como dias, dê um nome e compartilhe o link.",
   "cpg.noneMineBodySports": "Comece com Novo programa, escolha Upper/Lower ou Push/Pull e atribua à equipe.",
@@ -1178,7 +1185,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.mineHint":
     "Rutinlerini ücretsiz ya da ücretli bir programa dönüştür. Ücretli programlar Liftsmith web sitesinde satılır, para Stripe hesabına gider.",
   "cpg.mineHintFree": "Rutinlerini bir programa dönüştür ve bağlantısını paylaş. Ücret almak için önce Stripe ile ödemeleri kur.",
-  "cpg.mineHintSports": "Upper/Lower veya Push/Pull ile sezon kurun, takıma atayın; sporcular günlük paylaşım olmadan günün işini takip eder.",
+  "cpg.mineHintSports":
+    "Upper/Lower veya Push/Pull ile sezon kurun, takıma atayın; sporcular günlük paylaşım olmadan günün işini takip eder.",
   "cpg.noneMine": "Henüz program yok",
   "cpg.noneMineBody": "Rutinlerinden birkaçını gün olarak seç, bir ad ver ve bağlantıyı paylaş.",
   "cpg.noneMineBodySports": "Yeni program ile başlayın, Upper/Lower veya Push/Pull seçin ve takıma atayın.",

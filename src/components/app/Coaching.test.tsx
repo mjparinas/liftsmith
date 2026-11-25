@@ -2,13 +2,15 @@
 // Integration tests for the coaching features (Melvin, 2026-11-09): "why this weight", changing the
 // plan mid-workout, machine settings, shared workout links, lift goals and what to buy next, through
 // the real store and IndexedDB.
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { dayKey } from "@/lib/dashboard";
 import { encodeRemix } from "@/lib/remix";
 import { remainingSeconds } from "@/lib/replan";
 import { useApp } from "@/lib/store";
+import { forgetNotes, keepNotes } from "@/lib/trainer";
 
 import { App } from "./App";
 
@@ -99,6 +101,39 @@ describe("coaching in the workout", () => {
     const gym = useApp.getState().gyms[0];
     expect(gym.settings?.["leg-press"]).toEqual([{ label: "Back angle", value: "3" }]);
   });
+});
+
+it("previews and starts today's scheduled coach routine without adding it to saved routines", async () => {
+  const user = userEvent.setup();
+  await onboard(user);
+  try {
+    const now = Date.now();
+    act(() =>
+      keepNotes({
+        coaches: [],
+        schedule: [
+          {
+            date: dayKey(now),
+            kind: "workout",
+            name: "Coach bench session",
+            code: "r1~Push~bench-press.4",
+            coachId: "coach",
+            scope: "all",
+            updatedAt: now,
+          },
+        ],
+      }),
+    );
+    const card = (await screen.findByRole("heading", { name: "Coach bench session" })).closest("section")!;
+    await user.click(within(card).getByRole("button", { name: "Preview workout" }));
+    expect(useApp.getState().preview?.items[0]?.exerciseId).toBe("bench-press");
+    await user.click(within(card).getByRole("button", { name: "Start workout" }));
+    expect(useApp.getState().active?.plan.items[0]?.exerciseId).toBe("bench-press");
+    expect(location.hash).toMatch(/^#\/(workout|stretch)/);
+    expect(useApp.getState().profile.routines?.some((r) => r.name === "Coach bench session")).not.toBe(true);
+  } finally {
+    act(() => forgetNotes());
+  }
 });
 
 describe("shared workouts", () => {

@@ -15,15 +15,7 @@ import { track } from "@/lib/analytics";
 import { AuthError, useAccount } from "@/lib/auth";
 import { useLive, useLivePoll } from "@/lib/chatLive";
 import { savePendingCoach } from "@/lib/coachInvite";
-import {
-  coachingMode,
-  coachingView,
-  isSportsCoach,
-  readPicked,
-  savePicked,
-  type CoachTab,
-  type Picked,
-} from "@/lib/coachMode";
+import { coachingMode, coachingView, isSportsCoach, readPicked, savePicked, type CoachTab, type Picked } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
@@ -68,6 +60,7 @@ import type { Experience, Goal } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { MyStatusButton, presenceText, StatusDot } from "./ChatStatus";
+import { CoachCalendar } from "./CoachCalendar";
 import { ChatThread } from "./CoachChat";
 import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { CoachGyms } from "./CoachGyms";
@@ -119,8 +112,10 @@ export function CoachHome({
   const [joined, setJoined] = useState<"coach" | "team" | null>(null);
   const teams = useTeams();
   const reload = useCallback(() => {
+    const accountId = useAccount.getState().account?.id;
     // The last copy shows at once; the server's answer replaces it (liveRead.ts).
     liveRead("coach.overview", loadOverview, (o, fresh) => {
+      if (useAccount.getState().account?.id !== accountId) return;
       setData(o);
       if (!fresh) return;
       // Today shows the newest note from a coach; keep it in step with what this screen loaded.
@@ -155,7 +150,13 @@ export function CoachHome({
   const joining = !!code || !!team;
   const view = joining ? { kind: "client" as const } : coachingView(mode, !!data.pay, tab, role);
   const screenTitle =
-    role === "trainer" ? t("trn.title.trainer") : role === "physio" ? t("trn.title.physio") : role === "coach" ? t("trn.title.coach") : t("trn.title");
+    role === "trainer"
+      ? t("trn.title.trainer")
+      : role === "physio"
+        ? t("trn.title.physio")
+        : role === "coach"
+          ? t("trn.title.coach")
+          : t("trn.title");
   const status = (note || joined) && (
     <p className={`mt-3 text-sm ${note ? "text-warn" : "text-good"}`} role="status">
       {note ?? t(joined === "team" ? "team.joined" : "trn.joined")}
@@ -217,6 +218,9 @@ export function CoachHome({
   return (
     <div className="pb-2">
       <ScreenHeader back={back} kicker={role ? t(`trn.role.${role}`) : undefined} title={screenTitle} />
+      <Button kind="ghost" onClick={() => go("trainer", "calendar-access")}>
+        {t("trn.calendar.access")}
+      </Button>
       <Tabs tabs={view.tabs} tab={view.tab} data={data} sports={sports || role === "coach"} />
       {status}
       <div key={view.tab} className="animate-fade">
@@ -233,6 +237,7 @@ export function CoachHome({
         )}
         {view.tab === "programs" && (
           <div className="desk-col">
+            <CoachCalendar clients={data.clients} teams={teams.data?.teams ?? []} />
             <CoachPrograms sports={sports || role === "coach"} />
           </div>
         )}
@@ -344,6 +349,9 @@ function StartPage({
         <p className="mt-1 text-sm text-muted">{t("trn.start.clientHint")}</p>
         <div className="mt-3">
           <JoinCoach code="" coaches={data.coaches} onChange={onChange} />
+          <Button kind="ghost" onClick={() => go("trainer", "calendar-access")}>
+            {t("trn.calendar.access")}
+          </Button>
         </div>
       </section>
       <button
@@ -437,6 +445,11 @@ function ClientPage({
           </Button>
         )}
       </Section>
+      {!coachSide && (
+        <Button kind="ghost" onClick={() => go("trainer", "calendar-access")}>
+          {t("trn.calendar.access")}
+        </Button>
+      )}
       {/* A client never sees the coach's tools; one quiet way in for someone who starts coaching later. */}
       {!coachSide && (
         <Button kind="quiet" className="mt-6 w-full" onClick={() => go("trainer", "start")}>
@@ -799,6 +812,11 @@ function ClientsPage({ data, onChange, planPaid }: { data: Overview; onChange: (
   return (
     <div className="desk:grid desk:grid-cols-[minmax(0,1fr)_22rem] desk:items-start desk:gap-6">
       <Section title={t("trn.yourClients")} icon="people">
+        {!!data.clients.length && (
+          <Button kind="ghost" onClick={() => go("trainer", "training-activity")}>
+            {t("trn.calendar.activity")}
+          </Button>
+        )}
         {data.clients.length ? (
           // Desktop layout: the client list is a grid of cards, so a coach sees more clients at once.
           <ul className="space-y-2 desk:grid desk:grid-cols-2 desk:gap-3 desk:space-y-0">

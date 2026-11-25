@@ -403,6 +403,14 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
       args: pair,
     },
     { sql: "DELETE FROM coach_program_assigns WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    {
+      sql: "DELETE FROM coach_calendar_access WHERE (owner_id = ? AND scope = ?) OR (owner_id = ? AND scope = ?)",
+      args: [accountId, `client:${otherId}`, otherId, `client:${accountId}`],
+    },
+    {
+      sql: "DELETE FROM coach_schedule_days WHERE (coach_id = ? AND scope = ?) OR (coach_id = ? AND scope = ?)",
+      args: [accountId, `client:${otherId}`, otherId, `client:${accountId}`],
+    },
   ]);
 }
 
@@ -1255,4 +1263,10 @@ export const coachCleanup = (accountId: string) => [
   // Reviews it wrote and reviews of it (coachReviews.ts).
   { sql: "DELETE FROM coach_reviews WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_program_assigns WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  {
+    sql: "DELETE FROM coach_calendar_access WHERE owner_id = ? OR assistant_id = ? OR scope = ?",
+    args: [accountId, accountId, `client:${accountId}`],
+  },
+  { sql: "DELETE FROM coach_schedule_days WHERE coach_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_schedule_days WHERE scope = ?", args: [`client:${accountId}`] },
 ];

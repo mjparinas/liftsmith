@@ -15,8 +15,10 @@ import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import type { ClientPay, OverviewPay } from "./coachPay";
 import type { ClientLimits, CoachTier } from "./coachPlans";
 import type { ProgramAssign } from "./coachProgramAssign";
+import { clearScheduleCache, setScheduleCache, type ScheduleCell } from "./coachSchedule";
 import type { Shown, Status } from "./coachStatus";
 import { cycleState } from "./cycle";
+import { dayKey as calendarDay } from "./dashboard";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { targetFor, trainedDays } from "./foodTargets";
@@ -30,6 +32,7 @@ import { gradedSet } from "./progression";
 import { phaseTitle } from "./rehab";
 import { areaInjuries, phaseCheck, phaseTo, sessionPhase, type PhaseCheck } from "./rehabPhases";
 import { decodeRoutine } from "./routineShare";
+import { pickCell, scheduleRoutineId } from "./scheduleDays";
 import { APP_PATH, SITE_URL } from "./site";
 import type { StickerId } from "./stickers";
 import {
@@ -82,6 +85,7 @@ export interface Note {
   at: number;
 }
 export interface Overview {
+  schedule?: ScheduleCell[];
   invite: Invite | null;
   clients: Person[];
   coaches: Person[];
@@ -201,6 +205,7 @@ export interface Targets {
   at: number;
 }
 export interface ClientView {
+  schedule?: ScheduleCell[];
   name: string;
   daysPerWeek: number | null;
   events: unknown[];
@@ -671,6 +676,7 @@ export interface Report {
   lastAt: number | null;
   /** The last 10 workouts, newest first. */
   sessions: SessionSummary[];
+  schedule?: { completed: number; unlogged: number; trainedOnRest: number };
   /** New bests in the last 30 days, newest first. */
   prs: Pr[];
   stalls: Stall[];
@@ -755,6 +761,19 @@ export function clientReport(view: ClientView, now: number): Report {
     if (!flags.some((f) => f.kind !== "prs") && goal) flags.push({ kind: "onTrack", done: weeks[3]!.count, goal });
   }
   const recent = sessions.slice(0, 10);
+  const cells = view.schedule ?? [];
+  const dates = [...new Set(cells.map((d) => d.date))].filter((day) => day < calendarDay(now));
+  const finished = new Set(events.flatMap((e) => (e.type === "sessionEnd" ? [e.sessionId] : [])));
+  const done = new Set(events.flatMap((e) => (e.type === "sessionStart" && e.routine && finished.has(e.sessionId) ? [e.routine] : [])));
+  const trainedDays = new Set(sessions.map((s) => calendarDay(s.start)));
+  const schedule = { completed: 0, unlogged: 0, trainedOnRest: 0 };
+  for (const day of dates) {
+    const cell = pickCell(cells, day);
+    if (cell?.kind === "workout") {
+      if (done.has(scheduleRoutineId(cell))) schedule.completed++;
+      else schedule.unlogged++;
+    } else if (cell?.kind === "rest" && trainedDays.has(day)) schedule.trainedOnRest++;
+  }
   return {
     name: view.name,
     now,
@@ -762,6 +781,7 @@ export function clientReport(view: ClientView, now: number): Report {
     weeks,
     lastAt,
     sessions: recent,
+    ...(dates.length ? { schedule } : {}),
     prs,
     stalls: stalled,
     flags,
@@ -1113,10 +1133,22 @@ export function keepNotes(
     Partial<
       Pick<
         Overview,
-        "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach" | "plans" | "programAssigns" | "videos"
+        | "clients"
+        | "unread"
+        | "targets"
+        | "checkins"
+        | "sessions"
+        | "invite"
+        | "role"
+        | "coach"
+        | "plans"
+        | "programAssigns"
+        | "videos"
+        | "schedule"
       >
     >,
 ): void {
+  if (o.schedule) setScheduleCache(o.schedule);
   const notes = shownNotes(o);
   const coaching = usesCoaching(o);
   writeJson(COACHING, coaching);
@@ -1242,10 +1274,12 @@ export function coachBadge(who: Who): string | null {
 let lastLook = 0;
 /** Signed in: looks for new notes from the lifter's coaches, at most every 15 minutes. Quiet on any failure. */
 export async function refreshCoachNotes(now = Date.now(), force = false): Promise<void> {
-  if (!readAccount() || (!force && now - lastLook < EVERY)) return;
+  const account = readAccount();
+  if (!account || (!force && now - lastLook < EVERY)) return;
   lastLook = now;
   try {
-    keepNotes(await track(loadOverview()));
+    const overview = await track(loadOverview());
+    if (readAccount()?.token === account.token) keepNotes(overview);
   } catch {
     // offline or signed out: keep what was there
   }
@@ -1260,6 +1294,8 @@ export function dismissNote(n: Note): void {
 
 /** Signed out, or the lifter erased their data: nothing from a coach stays on the device. */
 export function forgetNotes(): void {
+  lastLook = 0;
+  clearScheduleCache();
   writeJson(CACHE, []);
   writeJson(TARGETS, null);
   writeJson(COACHING, false);

@@ -1080,6 +1080,7 @@ export const emails: Record<string, Words> = {
       "Gli atleti ricevono un push e Seguono una volta su Oggi. La loro progressione sceglie i pesi.",
       "Nei giorni previsti, Oggi mostra quell’allenamento. I giorni liberi restano di riposo.",
       "Il calendario del programma mostra Fatto e Non ancora. Squadre scolastiche: solo nomi, mai i pesi.",
+      "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi.",
     ],
     dyk: "Puoi assegnare allo stesso modo dalla scheda squadra o dal report di un cliente.",
   },

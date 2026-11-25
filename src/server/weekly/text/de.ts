@@ -1080,6 +1080,7 @@ export const emails: Record<string, Words> = {
       "Athletinnen bekommen eine Push und folgen einmal auf Heute. Die eigene Progression wählt die Gewichte.",
       "Am geplanten Wochentag zeigt Heute dieses Training. Freie Tage bleiben Ruhe.",
       "Der Programmkalender zeigt Erledigt und Noch nicht. Schulteams: nur Vornamen, nie Gewichte.",
+      "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute.",
     ],
     dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten.",
   },

@@ -1084,6 +1084,7 @@ export const emails: Record<string, Words> = {
       "Les athlètes reçoivent une notif et Suivre ce programme une fois. Leur progression choisit les charges.",
       "Un jour prévu, Aujourd’hui montre cet entraînement. Les jours sans séance restent au repos.",
       "Le calendrier du programme montre Fait et Pas encore. Les équipes scolaires : prénoms seulement, jamais de poids.",
+      "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui.",
     ],
     dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client.",
   },

@@ -561,6 +561,10 @@ export const pt: FeaturesText = {
       note: "Programas pagos são comprados no site; os apps de Android e iPhone mostram os programas grátis e os que você já tem.",
       proPart: "Pegar programas é grátis; criá-los faz parte do coaching, que é Pro.",
     },
+    "coach-calendar": {
+      name: "Calendário de treinos",
+      body: "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",
+    },
     "coach-assign-program": {
       name: "Atribuir um programa de temporada a clientes ou a uma equipa",
       body: "Os treinadores atribuem um programa de vários dias (Upper/Lower, Push/Pull/Legs ou o seu) como plano fixo por dias da semana durante N semanas. Os atletas seguem uma vez; Hoje mostra o treino desse dia. Um calendário do programa mostra quem fez cada dia e quem ainda não — só primeiros nomes em equipas escolares, nunca pesos.",
