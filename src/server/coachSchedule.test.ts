@@ -53,6 +53,17 @@ it("supports future months and rejects invalid dates and unauthorized edits", as
   expect(await scheduleMonth("coach", "all", 2027, 5)).toMatchObject({ days: [{ date: "2027-06-12", kind: "rest" }] });
 });
 
+it("keeps the workout identity when a coach retries an unchanged save", async () => {
+  const original = await setScheduleDay("coach", "all", day, "workout", "Push", code, now);
+  const retry = await setScheduleDay("coach", "all", day, "workout", "Push", code, now + 1000);
+  expect(original).toMatchObject({ updatedAt: now });
+  expect(retry).toEqual(original);
+  const updated = await setScheduleDay("coach", "all", day, "workout", "Push", "r1~Push~bench-press.5", now + 2000);
+  expect(updated).toMatchObject({ updatedAt: now + 2000 });
+  expect(await setScheduleDay("coach", "all", day, "workout", "Invalid", "r1~Invalid~unknown.3", now)).toEqual({ error: "bad" });
+  expect(await scheduleMonth("coach", "all", 2026, 11)).toMatchObject({ days: [updated] });
+});
+
 it("stops sharing a client assignment when the athlete unlinks", async () => {
   await setScheduleDay("coach", "client:athlete", day, "rest", null, null, now);
   await unlink("athlete", "coach");

@@ -3,6 +3,7 @@ import { createHash, randomBytes } from "node:crypto";
 // The coach's calendar (docs/decisions/trainer-mode.md "Assign workouts by date"). One cell per coach, scope and civil date:
 // a routine share code, or rest. `all` reaches every client. `team:<id>` reaches that team. `client:<id>` reaches
 // one client. Today asks for the next couple of weeks and picks the most specific cell.
+import { decodeRoutine } from "@/lib/routineShare";
 import { dateAllowed, shiftDay, utcDay, type ScheduleCell, type ScheduleKind } from "@/lib/scheduleDays";
 
 import { isAccountId, isClient, isRoutineCode, nameOf, roleOf } from "./coach";
@@ -100,13 +101,18 @@ export async function setScheduleDay(
   if (kind !== "workout" && kind !== "rest") return { error: "bad" };
   const rest = kind === "rest";
   const title = cleanName(name);
-  if (!rest && (!title || !isRoutineCode(code))) return { error: "bad" };
-  await run(
+  if (!rest && (!title || !isRoutineCode(code) || !decodeRoutine(code))) return { error: "bad" };
+  const [saved] = await query<Row>(
     `INSERT INTO coach_schedule_days (coach_id, scope, date, kind, name, code, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT (coach_id, scope, date) DO UPDATE SET kind = excluded.kind, name = excluded.name, code = excluded.code, updated_at = excluded.updated_at`,
+     ON CONFLICT (coach_id, scope, date) DO UPDATE SET
+       updated_at = CASE WHEN kind = excluded.kind AND name = excluded.name AND code = excluded.code
+                         THEN updated_at ELSE excluded.updated_at END,
+       kind = excluded.kind, name = excluded.name, code = excluded.code
+     RETURNING *`,
     [coachId, scope, date, rest ? "rest" : "workout", rest ? "" : title, rest ? "" : String(code), now],
   );
-  return { date, kind: rest ? "rest" : "workout", name: rest ? "" : title, code: rest ? "" : String(code), coachId, scope, updatedAt: now };
+  if (!saved) throw new Error("Schedule assignment was not saved");
+  return cell(saved);
 }
 
 export async function clearScheduleDay(

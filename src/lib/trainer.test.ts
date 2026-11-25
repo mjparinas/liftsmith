@@ -67,8 +67,11 @@ describe("a coach's report on a client", () => {
     const finished = makeWorkout("assigned", NOW - 3 * DAY, [{}, {}]).map((e) =>
       e.type === "sessionStart" ? { ...e, routine: scheduleRoutineId(workout) } : e,
     );
+    const unfinished = makeWorkout("unfinished", NOW - 2 * DAY, [{}, {}])
+      .filter((e) => e.type !== "sessionEnd")
+      .map((e) => (e.type === "sessionStart" ? { ...e, routine: scheduleRoutineId(schedule[1]!) } : e));
     const restDay = makeWorkout("extra", NOW - DAY, [{}, {}]);
-    expect(clientReport({ ...view([...finished, ...restDay]), schedule }, NOW).schedule).toEqual({
+    expect(clientReport({ ...view([...finished, ...unfinished, ...restDay]), schedule }, NOW).schedule).toEqual({
       completed: 1,
       unlogged: 1,
       trainedOnRest: 1,
