@@ -134,6 +134,17 @@ export const FLAGS = {
    * clients and no plan is shown. Turn on once the store products and Stripe prices exist; the grace for coaches who
    * already have more than Pro's limit starts then.
    */
+  /**
+   * The Wear OS app is live on Google Play (Melvin, 2026-11-26): Getting started's watch email (src/server/tour.ts) and
+   * the weekly "Your workout on your wrist" tip wait for it. Turn on once Google approves the Wear OS release.
+   */
+  wearOnPlay: {
+    default: false,
+    options: [false, true] as const,
+    label: "Wear OS app on Google Play",
+    description:
+      "Turns on the Wear OS email in Getting started and the weekly watch tip. Turn on once Google Play approves the Wear OS app.",
+  },
   coachPlans: {
     default: false,
     options: [false, true] as const,

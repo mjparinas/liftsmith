@@ -33,7 +33,7 @@ import {
 import { isMsgLang, say } from "@/lib/messageText";
 
 import { confirmMail, messageMail, welcomeMail, type Footer, type Mail } from "./reminderEmails";
-import { nextTour, tourMail } from "./tour";
+import { nextTour, NO_TOUR_FLAGS, tourMail, type TourFlags } from "./tour";
 import { nextWeekly, NO_FACTS, weeklyMail, weeklyStart, type WeeklyFacts } from "./weekly/send";
 
 export type Status = "pending" | "confirmed" | "unsubscribed";
@@ -88,6 +88,8 @@ export interface Store {
   /** The account's roles (coach, physio, school coach, gym staff) and the flags the weekly tips wait for (weekly/send.ts).
    *  Missing where there's no such data: then only the emails for every lifter go out. */
   weeklyFacts?(accountId: string): Promise<WeeklyFacts>;
+  /** The flags Getting started's later steps wait for (tour.ts `late`). Missing: none of them go out. */
+  tourFlags?(): Promise<TourFlags>;
 }
 
 export interface Outgoing extends Mail {
@@ -554,8 +556,9 @@ export async function schedule(sub: Sub, store: Store, mail: Mailer, env: Env, n
     }
   }
   // The feature tour: the next email in the series, on a day with nothing else (tour.ts).
+  const tourFlags = store.tourFlags ? await store.tourFlags().catch(() => NO_TOUR_FLAGS) : NO_TOUR_FLAGS;
   if ((sub.kinds.tour ?? DEFAULT_ON.tour) && !sub.plan.teen) {
-    const t = nextTour(await store.sends(sub.id, 0), tz, now, now + WINDOW);
+    const t = nextTour(await store.sends(sub.id, 0), tz, now, now + WINDOW, tourFlags);
     if (t) {
       const r = await mail.send({
         ...tourMail(t, footer(env, sub.id), sub.plan.lang),
@@ -574,7 +577,7 @@ export async function schedule(sub: Sub, store: Store, mail: Mailer, env: Env, n
   // The weekly tips: after Getting started, one a week on a day with nothing else (weekly/send.ts). Never to under-18s.
   if ((sub.kinds.weekly ?? DEFAULT_ON.weekly) && !sub.plan.teen) {
     const all = await store.sends(sub.id, 0);
-    const start = weeklyStart(all, sub.kinds.tour ?? DEFAULT_ON.tour, sub.confirmedAt ?? sub.createdAt);
+    const start = weeklyStart(all, sub.kinds.tour ?? DEFAULT_ON.tour, sub.confirmedAt ?? sub.createdAt, tourFlags);
     if (start !== null && start < now + WINDOW) {
       const facts = sub.accountId && store.weeklyFacts ? await store.weeklyFacts(sub.accountId).catch(() => NO_FACTS) : NO_FACTS;
       const w = nextWeekly(all, tz, now, now + WINDOW, start, facts);
@@ -604,15 +607,21 @@ export function memoryStore(): Store & {
   all: Send[];
   friends: Map<string, FriendActivity[]>;
   facts: Map<string, WeeklyFacts>;
+  tour: TourFlags;
 } {
   const subs = new Map<string, Sub>();
   const friends = new Map<string, FriendActivity[]>();
   const facts = new Map<string, WeeklyFacts>();
+  const tour: TourFlags = { ...NO_TOUR_FLAGS };
   let all: Send[] = [];
   return {
     subs,
     friends,
     facts,
+    tour,
+    async tourFlags() {
+      return tour;
+    },
     async friendActivity(accountId) {
       return friends.get(accountId) ?? [];
     },

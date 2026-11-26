@@ -4,6 +4,7 @@
 import { query, run, type Row } from "./db";
 import { flagStates } from "./flags";
 import type { Send, Store, Sub } from "./reminders";
+import type { TourFlags } from "./tour";
 import type { Role } from "./weekly/list";
 
 const SCHEMA = [
@@ -79,7 +80,13 @@ const toSend = (r: Row): Send => ({
 });
 
 export function dbStore(): Store {
+  // Read once per run: every subscriber's Getting started checks the same flags.
+  let tourFlags: Promise<TourFlags> | null = null;
   return {
+    tourFlags() {
+      tourFlags ??= flagStates().then((states) => ({ wearOnPlay: states.get("wearOnPlay")?.value === true }));
+      return tourFlags;
+    },
     async get(id) {
       await init();
       const rows = await query("SELECT * FROM reminder_subs WHERE id = ?", [id]);
@@ -172,7 +179,11 @@ export function dbStore(): Store {
       if (physio) roles.push("physio");
       if (school) roles.push("school");
       if (gym) roles.push("gym");
-      return { roles, flags: { coachPlans: states.get("coachPlans")?.value === true }, male };
+      return {
+        roles,
+        flags: { coachPlans: states.get("coachPlans")?.value === true, wearOnPlay: states.get("wearOnPlay")?.value === true },
+        male,
+      };
     },
   };
 }
