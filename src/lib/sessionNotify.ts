@@ -50,6 +50,43 @@ export interface SessionState {
   timer?: TimerSegment[];
   /** What the lock screen and watches say when the last phase runs out ("Time's up"). */
   timerOver?: string;
+  /** What the watches can change on this set before Log set: a ladder of weights and the reps (workout/watchAdjust.ts). */
+  adj?: WatchAdj;
+  /** After an exercise's last set: how did it feel, answered on the watch (workout/watchAdjust.ts watchAsk). */
+  ask?: WatchAsk;
+}
+
+/**
+ * The set's weight and reps as the watches change them with the crown, bezel, − / + or keys. `kg` is a ladder of
+ * weights around the set's own, lightest first, with `w` the words for each ("102.5 lb", "20 kg each") and `i` where
+ * the set's own weight is; both are empty for a bodyweight move (reps only). `key` names the set, and a weight and reps
+ * sent back for another set are ignored.
+ */
+export interface WatchAdj {
+  key: string;
+  kg: number[];
+  w: string[];
+  i: number;
+  reps: number;
+  /** The word after the reps: "reps" or "reps each side", in the app's language. */
+  rs: string;
+}
+
+/** "How did Bench press feel?" with three answers (`o`) and the rating each one sends (`v`: 1 too easy, 0, -1 too hard). */
+export interface WatchAsk {
+  ex: string;
+  q: string;
+  o: string[];
+  v: number[];
+}
+
+/** What came with a watch's tap: the weight and reps it settled on (log, adjust), or its answer to `ask` (rate). */
+export interface SessionPayload {
+  key?: string;
+  kg?: number;
+  reps?: number;
+  ex?: string;
+  v?: number;
 }
 
 /** One phase of the set timer: a countdown to `to` labelled "Time left", "Switch sides"…, or a count-up from `from`. */
@@ -79,6 +116,8 @@ export interface AheadStep {
   total: number;
   /** Every planned set is logged: the notification says so and further taps do nothing. */
   end?: boolean;
+  /** What the watches can change on that set, so a watch can adjust it with the app closed too. */
+  adj?: WatchAdj;
 }
 
 /** The status bar chip while lifting: "2/4" for set 2 of 4, "W1/2" for a warm-up. Numbers only, so it fits the
@@ -87,14 +126,17 @@ export function chipText(warming: boolean, n: number, total: number): string {
   return `${warming ? "W" : ""}${n}/${total}`;
 }
 
-/** Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). */
-export type SessionAction = "log" | "add30" | "start";
+/**
+ * Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). The watches also
+ * send adjust (a new weight or reps, a moment after the last turn of the crown) and rate (how the exercise felt).
+ */
+export type SessionAction = "log" | "add30" | "start" | "adjust" | "rate";
 type Handle = ListenerHandle;
 type Plugin = {
   update(s: SessionState): Promise<void>;
   stop(): Promise<void>;
   requestPermission(): Promise<{ granted: boolean }>;
-  addListener(event: "action", cb: (e: { action: SessionAction; at?: number }) => void): Handle | Promise<Handle>;
+  addListener(event: "action", cb: (e: { action: SessionAction; at?: number; data?: unknown }) => void): Handle | Promise<Handle>;
   addListener(event: "heartRate", cb: (e: { bpm: number }) => void): Handle | Promise<Handle>;
   addListener(event: "watchMotion", cb: (e: unknown) => void): Handle | Promise<Handle>;
 };
@@ -158,10 +200,32 @@ export async function restOverAlert(next: string, alert: { sound: boolean; vibra
  * made with the app closed (or asleep in the background) reaches the app when it next runs, and is logged at its own
  * time, not then. Returns an unsubscribe function.
  */
-export function onSessionAction(cb: (a: SessionAction, at?: number) => void): () => void {
+export function onSessionAction(cb: (a: SessionAction, at?: number, data?: SessionPayload) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};
-  return unlisten(p.addListener("action", (e) => cb(e.action, tapTime(e.at))));
+  return unlisten(p.addListener("action", (e) => cb(e.action, tapTime(e.at), tapData(e.data))));
+}
+
+/**
+ * What came with a watch's tap, read field by field: a JSON string (Android keeps it as text) or an object (iOS).
+ * Only numbers and short strings pass; the shortcut code then checks them against the set (watchAdjust.ts).
+ */
+export function tapData(d: unknown): SessionPayload | undefined {
+  let o: unknown = d;
+  if (typeof d === "string") {
+    if (d.length > 500) return undefined;
+    try {
+      o = JSON.parse(d);
+    } catch {
+      return undefined;
+    }
+  }
+  if (!o || typeof o !== "object") return undefined;
+  const r = o as Record<string, unknown>;
+  const num = (x: unknown) => (typeof x === "number" && Number.isFinite(x) ? x : undefined);
+  const str = (x: unknown) => (typeof x === "string" && x.length <= 120 ? x : undefined);
+  const out: SessionPayload = { key: str(r.key), kg: num(r.kg), reps: num(r.reps), ex: str(r.ex), v: num(r.v) };
+  return Object.values(out).some((x) => x !== undefined) ? out : undefined;
 }
 
 /** A tap's time from the native side: a real past moment (not in the future, not over a day old), else undefined (now). */

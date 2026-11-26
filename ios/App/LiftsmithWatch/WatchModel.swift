@@ -55,6 +55,15 @@ final class WatchModel: NSObject, ObservableObject {
         deliver(["action": action])
     }
 
+    /// A tap with what goes with it: Log set or adjust with the weight and reps chosen here, or rate with how the
+    /// exercise felt (docs/decisions/watch-apps.md "Adjust and rate a set"). The phone checks every field.
+    func send(_ action: String, fields: [String: Any], click: Bool = true) {
+        if click { WKInterfaceDevice.current().play(.click) }
+        var m = fields
+        m["action"] = action
+        deliver(m)
+    }
+
     private func deliver(_ message: [String: Any]) {
         let s = WCSession.default
         guard s.activationState == .activated else { return }

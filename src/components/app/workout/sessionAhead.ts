@@ -5,6 +5,7 @@ import { afterLog, warmingUp, type Active } from "@/lib/store/workout";
 import type { AppEvent, Gym, Unit } from "@/lib/types";
 
 import { plateText, setText } from "../format";
+import { watchAdj } from "./watchAdjust";
 
 // What the live workout notification says about the set on screen, and the sets after it. The notification's Log set
 // works with the app closed (WorkoutService.java, WorkoutSessionPlugin.swift): the phone can't run the training engine
@@ -13,6 +14,9 @@ import { plateText, setText } from "../format";
 
 /** How many sets ahead the notification knows: more than any planned workout has, warm-ups included. */
 export const AHEAD_MAX = 60;
+/** How many of those steps carry the watches' weight ladder (watchAdjust.ts): a gym session's worth with the app
+ *  closed, without working out dozens of ladders on every Log set. */
+export const ADJ_AHEAD = 12;
 
 type Fields = Pick<SessionState, "setLabel" | "next" | "plates" | "chip"> & { name: string; done: number; total: number };
 
@@ -78,7 +82,12 @@ export function aheadSteps(a: Active, events: readonly AppEvent[], unit: Unit, g
     }
     const rest = cur.restUntil ? cur.restTotal : 0;
     const { name, ...fields } = f;
-    steps.push({ ...fields, title: rest > 0 ? t("workout.restTitle", { name }) : name, rest });
+    steps.push({
+      ...fields,
+      title: rest > 0 ? t("workout.restTitle", { name }) : name,
+      rest,
+      adj: k < ADJ_AHEAD ? watchAdj(cur, evs, unit, gym) : undefined,
+    });
   }
   return steps;
 }

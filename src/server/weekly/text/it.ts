@@ -368,6 +368,7 @@ export const emails: Record<string, Words> = {
       "Le app per Wear OS e Apple Watch mostrano la serie o il conto alla rovescia del riposo.",
       "La frequenza cardiaca arriva dal sensore dell'orologio.",
       "Registra serie e +30 s dal polso, con una vibrazione a fine riposo.",
+      "Cambia peso e ripetizioni con la corona o − e +, e di' com'è andato un esercizio.",
       "Un'app per gli orologi Garmin arriverà presto.",
     ],
     dyk: "Anche la schermata di blocco mostra il conto alla rovescia, la serie successiva e i suoi dischi.",

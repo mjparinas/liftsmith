@@ -9,8 +9,9 @@ import WatchConnectivity
 final class WatchLink: NSObject, WCSessionDelegate {
     static let shared = WatchLink()
 
-    /// Log set or +30 s from the watch, handled exactly like the Live Activity's buttons.
-    var onAction: ((String) -> Void)?
+    /// Log set or +30 s from the watch, handled exactly like the Live Activity's buttons, plus adjust and rate with
+    /// what came with them (the weight and reps chosen on the watch, or how the exercise felt; WatchMessages.data).
+    var onAction: ((String, [String: Any]?) -> Void)?
     /// A reading from the watch's own heart rate sensor.
     var onHeartRate: ((Int) -> Void)?
     /// A batch of wrist motion (Labs, watch rep counting), counted by the web app.
@@ -62,7 +63,9 @@ final class WatchLink: NSObject, WCSessionDelegate {
 
     private func receive(_ message: [String: Any]) {
         DispatchQueue.main.async {
-            if let action = WatchMessages.action(message["action"]) { self.onAction?(action) }
+            if let action = WatchMessages.tapAction(message["action"]), let data = WatchMessages.data(action, message) {
+                self.onAction?(action, data.isEmpty ? nil : data)
+            }
             if let bpm = WatchMessages.bpm(message["hr"]) { self.onHeartRate?(bpm) }
             if let m = WatchMessages.motion(message["motion"]) { self.onMotion?(m) }
         }
@@ -83,6 +86,26 @@ enum WatchMessages {
     static func action(_ value: Any?) -> String? {
         guard let a = value as? String, a == "log" || a == "add30" else { return nil }
         return a
+    }
+
+    /// Log set and +30 s, plus adjust and rate from the watches (docs/decisions/watch-apps.md "Adjust and rate a set").
+    static func tapAction(_ value: Any?) -> String? {
+        guard let a = value as? String, a == "log" || a == "add30" || a == "adjust" || a == "rate" else { return nil }
+        return a
+    }
+
+    /// What came with a tap, field by field (the web app checks it against the set again, watchAdjust.ts), or nil
+    /// when a tap that needs fields lacks them. Same rules as Android's WatchMessages.tap.
+    static func data(_ action: String, _ m: [String: Any]) -> [String: Any]? {
+        var d: [String: Any] = [:]
+        if let key = m["key"] as? String, key.count <= 120 { d["key"] = key }
+        if let kg = (m["kg"] as? NSNumber)?.doubleValue, kg.isFinite { d["kg"] = kg }
+        if let reps = (m["reps"] as? NSNumber)?.intValue { d["reps"] = reps }
+        if let ex = m["ex"] as? String, ex.count <= 120 { d["ex"] = ex }
+        if let v = (m["v"] as? NSNumber)?.intValue, abs(v) <= 1 { d["v"] = v }
+        if action == "rate", d["ex"] == nil || d["v"] == nil { return nil }
+        if action == "adjust", d["key"] == nil || d["reps"] == nil { return nil }
+        return d
     }
 
     /// The most readings one motion batch may carry (src/lib/reps/watchMotion.ts MAX_BATCH).

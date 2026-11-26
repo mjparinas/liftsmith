@@ -626,6 +626,11 @@ export const tr: FeaturesText = {
       name: "Saat uygulamaları",
       body: "Wear OS ve Apple Watch'ta antrenman: set ya da dinlenme geri sayımı, saatten nabız, Seti kaydet ve +30 s, dinlenme bitince de bir titreşim.",
     },
+    "watch-adjust": {
+      name: "Saatte seti değiştir ve değerlendir",
+      body: "Kurmayı veya çerçeveyi çevir ya da − ve + düğmelerine bas; ağırlığı ve tekrarları bileğinden telefonla aynı adımlarla değiştir: plakaların, dambılların ya da makinenin ağırlık yığını. Bir hareketin son setinden sonra saat nasıl geçtiğini sorar ve cevabın bir sonraki ağırlığı belirler.",
+      note: "Wear OS, Apple Watch ve Garmin (UP ve DOWN düğmeleri).",
+    },
     widgets: {
       name: "Ana ekran widget'ları",
       body: "Üç widget: Bugün (günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet), Bu hafta (antrenman yaptığın günler, serin ve onu neyin sürdürdüğü) ve Toparlanma (hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı).",
