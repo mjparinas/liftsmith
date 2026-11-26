@@ -46,14 +46,26 @@ for (const { name } of pick()) {
     const desktop = await page.evaluate(() => document.documentElement.dataset.layout === "desktop");
     check(desktop === name.startsWith("Desktop"), `${name}: ${desktop ? "has" : "lacks"} the desktop layout`, fail);
     if (desktop) {
-      // Today's right column stacks with no gap: the quote and quests start right under the call, however tall
-      // the plan beside them is (Melvin, 2026-11-14: a big empty gap opened under the call).
-      const gap = await page.evaluate(() => {
-        const call = document.getElementById("call-title")?.closest(".desk\\:order-2");
-        const rest = call?.parentElement?.querySelector(":scope > .desk\\:order-3");
-        return call && rest ? rest.getBoundingClientRect().top - call.getBoundingClientRect().bottom : null;
+      // Today's two columns (Melvin, 2026-11-26): the call sits in the left column with the plan, and the side
+      // column's first card is level with the left column's first card (the coach's note, or else the call).
+      const today = await page.evaluate(() => {
+        const main = document.querySelector('[data-testid="today-main"]');
+        const side = document.querySelector('[data-testid="today-side"]');
+        const call = document.getElementById("call-title");
+        const first = (col) => [...col.querySelectorAll(".card, .card-tint")].find((c) => c.getBoundingClientRect().height > 0);
+        const a = main && first(main);
+        const b = side && first(side);
+        return {
+          callLeft: !call || !!main?.contains(call),
+          offset: a && b ? Math.round(b.getBoundingClientRect().top - a.getBoundingClientRect().top) : null,
+        };
       });
-      check(gap === null || Math.abs(gap) <= 24, `${name}: Today's right column has a ${gap} px gap under the call`, fail);
+      check(today.callLeft, `${name}: Today's call is not in the left column`, fail);
+      check(
+        today.offset === null || Math.abs(today.offset) <= 2,
+        `${name}: Today's side column starts ${today.offset} px off the left column`,
+        fail,
+      );
     }
     await page.screenshot({ path: `${OUT}/${tag}-today.png` });
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
