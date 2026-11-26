@@ -2,7 +2,7 @@
 // the watch app's own screens, framed with a caption like the Play listing shots (play-compose.mjs). The screens in
 // store/wear/<lang>/ (set, rest, start) are the Wear OS app's real layout, strings and drawables drawn by Android's
 // own renderer (scripts/wear-shots/, Paparazzi), with the phone's words for each language.
-//   (cd scripts/wear-shots && gradle :shots:recordPaparazziDebug) && node scripts/email-watch.mjs
+//   (cd scripts/wear-shots && gradle :watch:recordPaparazziDebug) && node scripts/email-watch.mjs
 // Writes public/email/<lang>/09.jpg and public/email/<lang>/w/watches.jpg, 600 px wide like the other email pictures.
 // The caption's title is the email's own (rmd.tour.watch.title); keep them the same.
 import fs from "node:fs";
@@ -23,7 +23,7 @@ const CAPTIONS = {
   tr: ["Antrenmanın Wear OS saatinde", "Setler ve dinlenme bileğinde"],
 };
 
-const RAW = "scripts/wear-shots/shots/src/test/snapshots/images";
+const RAW = "scripts/wear-shots/watch/src/test/snapshots/images";
 // Copy fresh renders from the Paparazzi rig, when there are any, into store/wear/<lang>/.
 if (fs.existsSync(RAW))
   for (const f of fs.readdirSync(RAW)) {

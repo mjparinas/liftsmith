@@ -1,4 +1,4 @@
 .gradle/
 build/
 local.properties
-shots/src/test/snapshots/
+watch/src/test/snapshots/
