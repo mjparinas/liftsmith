@@ -1089,6 +1089,7 @@ export const emails: Record<string, Words> = {
       "Sporcular artık Programlar, Sporcular ve Kurulum'u görmüyor. Takımım yalnızca ihtiyaç duyduklarını gösteriyor.",
       "Takım sohbeti tüm takım ve sizin için. Her mesajı silebilirsiniz, sporcular adlarıyla görünür.",
       "Atanan programlar Takip et düğmesiyle Takımım'da durur ve haftalık tablo kimin antrenman yaptığını gösterir.",
+      "Program takip eden sporcular onu Bugün ekranında sıradakiyle birlikte görür; ayları Takımım'dadır.",
     ],
     dyk: "Takım bağlantıları artık sporcu bağlantıyı açtıktan sonra giriş yapsa da çalışıyor, böylece kimse kadrodan dışarıda kalmıyor.",
   },

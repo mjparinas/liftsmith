@@ -1090,6 +1090,7 @@ export const emails: Record<string, Words> = {
       "Zawodnicy nie widzą już Programów, Zawodników ani Konfiguracji. Moja drużyna pokazuje tylko to, czego potrzebują.",
       "Czat drużyny jest dla całej drużyny i dla Ciebie. Możesz usunąć każdą wiadomość, a zawodnicy są widoczni po imieniu.",
       "Przypisane programy są w Mojej drużynie z przyciskiem Obserwuj, a tablica tygodnia pokazuje, kto trenował.",
+      "Zawodnicy realizujący program widzą go na ekranie Dziś z tym, co następne, a ich miesiąc jest w Mojej drużynie.",
     ],
     dyk: "Linki do drużyny działają teraz także wtedy, gdy zawodnik zaloguje się po ich otwarciu, więc nikt nie wypada ze składu.",
   },

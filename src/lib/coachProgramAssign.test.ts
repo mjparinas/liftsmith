@@ -5,6 +5,7 @@ import {
   catchUpAssign,
   coachProgramDayIndex,
   coachProgramEndAt,
+  coachProgramNext,
   coachProgramWeek,
   followAssign,
   type ProgramAssign,
@@ -117,5 +118,28 @@ describe("catchUpAssign", () => {
     expect(catchUpAssign(next.routines, next.planSource, changed, 400)).toBeNull();
     expect(catchUpAssign(routines, first.planSource, { ...changed, id: "other" }, 400)).toBeNull();
     expect(catchUpAssign(routines, first.planSource, { ...changed, status: "ended" }, 400)).toBeNull();
+  });
+});
+
+describe("coachProgramNext", () => {
+  // Local dates, so the weekdays hold in any time zone: Monday 2024-01-01 at 9:00.
+  const monday = new Date(2024, 0, 1, 9).getTime();
+  const src = () => ({ ...followAssign(assign(), monday).planSource, startedAt: monday - 3_600_000 });
+
+  it("finds the next day after today, not today", () => {
+    // Today is Monday's Upper A; next is Tuesday's Lower A.
+    const next = coachProgramNext(src(), monday);
+    expect(next?.dayIndex).toBe(1);
+    expect(new Date(next!.at).getDay()).toBe(2);
+    // From Tuesday it skips the rest of the week to next Monday.
+    const tue = new Date(2024, 0, 2, 9).getTime();
+    const after = coachProgramNext(src(), tue);
+    expect(after?.dayIndex).toBe(0);
+    expect(new Date(after!.at).getDate()).toBe(8);
+  });
+
+  it("is null once no day is left before the end", () => {
+    const lastTue = new Date(2024, 0, 23, 9).getTime();
+    expect(coachProgramNext(src(), lastTue)).toBeNull();
   });
 });

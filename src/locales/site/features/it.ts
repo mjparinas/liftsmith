@@ -498,6 +498,10 @@ export const it: FeaturesText = {
       body: "Cambia un giorno del programma di un coach solo per un cliente, per esempio un esercizio sostituito per un infortunio. Il giorno risulta cambiato per quella persona e un tocco riporta il giorno del programma. Le modifiche al programma arrivano comunque a tutti e a ogni giorno non cambiato, e l'app di ciascuno le riceve da sola.",
       proPart: "Essere clienti è gratis; seguire clienti è Pro.",
     },
+    "coach-program-today": {
+      name: "Dal tuo coach, su Oggi",
+      body: "Chi segue il programma di un coach lo vede su Oggi: da chi arriva, il giorno di oggi, la settimana e la fase, e il prossimo con il suo giorno. Un atleta di una squadra scolastica vede anche il mese in La mia squadra, con i giorni fatti, saltati e in arrivo.",
+    },
     "coach-pages": {
       name: "Una pagina per ogni lato",
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",

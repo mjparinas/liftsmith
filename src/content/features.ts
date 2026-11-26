@@ -933,6 +933,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-26",
       },
       {
+        id: "coach-program-today",
+        name: "From your coach on Today",
+        body: "A lifter following a coach's program sees it on Today: who it's from, today's day, the week and phase, and what's up next with its day. An athlete on a school team also gets the month on My team, with days done, missed and coming.",
+        tier: "free",
+        added: "2026-11-26",
+      },
+      {
         id: "coach-calendar",
         name: "Workout calendar",
         body: "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",

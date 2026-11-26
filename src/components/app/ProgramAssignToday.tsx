@@ -10,12 +10,13 @@ import {
   catchUpAssign,
   coachProgramDayIndex,
   coachProgramEndAt,
+  coachProgramNext,
   coachProgramPhase,
   coachProgramWeek,
   endProgramAssign,
   followAssign,
 } from "@/lib/coachProgramAssign";
-import { t } from "@/lib/i18n";
+import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { MAX_ROUTINES, upsertRoutine } from "@/lib/routines";
 import { useApp } from "@/lib/store";
@@ -120,25 +121,44 @@ export function CoachProgramChip() {
     );
   }
   const dayI = coachProgramDayIndex(src, now);
-  const dayName = dayI === null ? null : (profile.routines?.find((r) => r.id === src.dayIds[dayI])?.name ?? src.title);
+  const nameOf = (i: number) => profile.routines?.find((r) => r.id === src.dayIds[i])?.name ?? src.title;
   const week = coachProgramWeek(src, now);
   const line =
     dayI === null
       ? t("cpg.assignToday.off", { plan: src.title, week, weeks: src.weeks })
       : t("cpg.assignToday.day", {
           plan: src.title,
-          day: dayName ?? "",
+          day: nameOf(dayI),
           week,
           weeks: src.weeks,
           weekday: WEEKDAYS[new Date(now).getDay()] ?? "",
         });
   const phase = src.phases && src.phases.length > 1 ? coachProgramPhase(src, now) : null;
+  const next = coachProgramNext(src, now);
+  const coach = followed?.coach || t("trn.noName");
+  // "From your coach" (stage 4, 2026-11-26): whose plan this is, where in it today sits, and what's next.
   return (
-    <div className="mt-2" data-testid={dayI === null ? "coach-program-off" : "coach-program-day"}>
-      <p className="text-sm text-muted">{line}</p>
+    <section
+      className="card card-tint mt-3 p-4"
+      style={{ ["--tint" as string]: "var(--color-violet)" }}
+      data-testid={dayI === null ? "coach-program-off" : "coach-program-day"}
+    >
+      <p className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-muted uppercase">
+        <Icon name="layers" size={14} />
+        {t("cpg.from.kicker", { name: coach })}
+      </p>
+      <p className="mt-1 text-sm">{line}</p>
       {phase && (
         <p className="text-sm font-medium" data-testid="coach-program-phase">
           {t("cpg.phase.now", { name: t(`cpg.phase.${phase.kind}`), week: phase.week, count: phase.weeks })}
+        </p>
+      )}
+      {next && (
+        <p className="mt-1 text-sm text-muted" data-testid="coach-program-next">
+          {t("cpg.from.next", {
+            day: nameOf(next.dayIndex),
+            when: date(new Date(next.at), { weekday: "long", day: "numeric", month: "short" }),
+          })}
         </p>
       )}
       <Button kind="ghost" className="mt-1 !px-0" onClick={() => setCal(true)}>
@@ -147,7 +167,7 @@ export function CoachProgramChip() {
       <Sheet open={cal} onClose={() => setCal(false)} title={t("cpg.cal.title")} wide>
         <AthleteProgramCalendar src={src} />
       </Sheet>
-    </div>
+    </section>
   );
 }
 

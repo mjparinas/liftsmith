@@ -43,6 +43,7 @@ export const en = {
   "mt.takeBack": "Take back",
   "mt.takeBackNamed": "Take back {name}",
   "mt.takenBack": "Took back {name}'s invite.",
+  "mt.month": "Your month",
 };
 
 type Key = keyof typeof en;
@@ -86,6 +87,7 @@ export const es: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Retirar",
   "mt.takeBackNamed": "Retirar a {name}",
   "mt.takenBack": "Invitación de {name} retirada.",
+  "mt.month": "Tu mes",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -128,6 +130,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Retirer",
   "mt.takeBackNamed": "Retirer {name}",
   "mt.takenBack": "Invitation de {name} retirée.",
+  "mt.month": "Ton mois",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -170,6 +173,7 @@ export const de: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Zurückziehen",
   "mt.takeBackNamed": "Einladung an {name} zurückziehen",
   "mt.takenBack": "Einladung an {name} zurückgezogen.",
+  "mt.month": "Dein Monat",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -211,6 +215,7 @@ export const it: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Ritira",
   "mt.takeBackNamed": "Ritira l’invito a {name}",
   "mt.takenBack": "Invito a {name} ritirato.",
+  "mt.month": "Il tuo mese",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -252,6 +257,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "mt.takeBack": "取り消す",
   "mt.takeBackNamed": "取り消す: {name}",
   "mt.takenBack": "{name}さんへの招待を取り消しました。",
+  "mt.month": "今月の予定",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -293,6 +299,7 @@ export const pt: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Cancelar",
   "mt.takeBackNamed": "Cancelar convite de {name}",
   "mt.takenBack": "Convite de {name} cancelado.",
+  "mt.month": "Seu mês",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -334,6 +341,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "mt.takeBack": "취소",
   "mt.takeBackNamed": "취소: {name}",
   "mt.takenBack": "{name}님 초대를 취소했어요.",
+  "mt.month": "이번 달",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -375,6 +383,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Geri al",
   "mt.takeBackNamed": "Geri al: {name}",
   "mt.takenBack": "{name} için davet geri alındı.",
+  "mt.month": "Bu ay",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -421,4 +430,5 @@ export const pl: Partial<Record<Key, Message>> = {
   "mt.takeBack": "Cofnij",
   "mt.takeBackNamed": "Cofnij: {name}",
   "mt.takenBack": "Cofnięto zaproszenie dla: {name}.",
+  "mt.month": "Twój miesiąc",
 };

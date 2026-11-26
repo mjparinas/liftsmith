@@ -505,6 +505,10 @@ export const fr: FeaturesText = {
       body: "Modifiez un jour du programme d'un coach pour un seul client, par exemple un exercice remplacé à cause d'une blessure. Le jour est marqué comme modifié pour cette personne et un toucher remet le jour du programme. Les modifications du programme atteignent toujours tout le monde et chaque jour non modifié, et l'app de chacun les récupère seule.",
       proPart: "Être client est gratuit ; coacher des clients est Pro.",
     },
+    "coach-program-today": {
+      name: "De ton coach, sur Aujourd'hui",
+      body: "Qui suit le programme d'un coach le voit sur Aujourd'hui : de qui il vient, le jour d'aujourd'hui, la semaine et la phase, et la suite avec son jour. Un athlète d'une équipe scolaire voit aussi le mois dans Mon équipe, avec les jours faits, manqués et à venir.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",

@@ -575,6 +575,10 @@ export const tr: FeaturesText = {
       body: "Bir koçun programındaki bir günü yalnızca bir danışan için değiştir, örneğin sakatlık nedeniyle değiştirilen bir hareket. O gün o kişi için değişti olarak işaretlenir ve tek dokunuş programdaki günü geri getirir. Programda yaptığın değişiklikler herkese ve değiştirmediğin her güne yine ulaşır; herkesin uygulaması bunu kendiliğinden alır.",
       proPart: "Danışan olmak ücretsizdir; danışan çalıştırmak Pro'dur.",
     },
+    "coach-program-today": {
+      name: "Bugün ekranında koçundan",
+      body: "Bir koçun programını takip eden kişi bunu Bugün ekranında görür: kimden geldiğini, bugünün gününü, haftayı ve aşamayı, sıradaki günü ve tarihini. Okul takımındaki bir sporcu Takımım'da yapılan, kaçırılan ve gelecek günleriyle ayı da görür.",
+    },
     "coach-calendar": {
       name: "Antrenman takvimi",
       body: "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

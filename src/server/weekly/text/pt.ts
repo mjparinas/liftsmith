@@ -1094,6 +1094,7 @@ export const emails: Record<string, Words> = {
       "Os atletas não veem mais Programas, Atletas nem Configuração. Meu time mostra só o que eles precisam.",
       "O chat do time é para o time todo e para você. Você pode apagar qualquer mensagem, e os atletas aparecem pelo primeiro nome.",
       "Os programas atribuídos ficam em Meu time com Seguir, e o quadro da semana mostra quem treinou.",
+      "Atletas que seguem um programa o veem em Hoje com o próximo dia, e o mês deles fica em Meu time.",
     ],
     dyk: "Os links do time agora funcionam mesmo se o atleta entrar depois de abri-los, então ninguém fica de fora da lista.",
   },

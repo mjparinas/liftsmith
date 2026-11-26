@@ -500,6 +500,10 @@ export const es: FeaturesText = {
       body: "Cambia un día del programa de un entrenador solo para un cliente, por ejemplo un ejercicio cambiado por una lesión. El día queda marcado como cambiado para esa persona y un toque recupera el día del programa. Lo que cambies en el programa sigue llegando a todos y a cada día que no cambiaste, y la app de cada persona lo recoge sola.",
       proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
     },
+    "coach-program-today": {
+      name: "De tu entrenador, en Hoy",
+      body: "Quien sigue el programa de un entrenador lo ve en Hoy: de quién es, el día de hoy, la semana y la fase, y lo siguiente con su día. Un deportista de un equipo escolar también ve el mes en Mi equipo, con los días hechos, perdidos y por venir.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",
