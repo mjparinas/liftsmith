@@ -367,6 +367,7 @@ export const emails: Record<string, Words> = {
       "Wear OS ve Apple Watch uygulamaları seti ya da dinlenme geri sayımını gösterir.",
       "Nabız saatin kendi sensöründen gelir.",
       "Bileğinden Seti kaydet ve +30 sn; dinlenme bittiğinde titreşim.",
+      "Ağırlığı ve tekrarları kurma ya da − ve + ile değiştir, bir hareketin nasıl geçtiğini söyle.",
       "Garmin saat uygulaması çok yakında.",
     ],
     dyk: "Kilit ekranı da dinlenme geri sayımını, sıradaki seti ve plakalarını gösterir.",

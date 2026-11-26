@@ -104,6 +104,7 @@ import { UpdateToast } from "./UpdateToast";
 import { useUnlocked } from "./useUnlocked";
 import { WhatsNewNote } from "./WhatsNew";
 import { Workout } from "./Workout";
+import { runWatchTap } from "./workout/watchAdjust";
 
 const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
   { route: "today", label: "tab.today", icon: "today" },
@@ -332,7 +333,14 @@ export function App() {
       sessionStorage.setItem("ls.resumed", "1");
       run(fromLink);
     }
-    return onSessionAction(run);
+    return onSessionAction((a, at, data) => {
+      // The watches' weight, reps and "How did it feel?" (workout/watchAdjust.ts); everything else is a shortcut.
+      if (runWatchTap(a, at, data)) {
+        if (a === "log" && !isRoute(location.hash, "workout")) go("workout");
+        return;
+      }
+      if (a !== "adjust" && a !== "rate") run(a, at);
+    });
   }, [ready]);
   // Android App Links (appLinks.ts): a tapped link to the app on our domain opens its screen here. Waits
   // for the store, like shortcuts, so a cold start's link lands after loading.

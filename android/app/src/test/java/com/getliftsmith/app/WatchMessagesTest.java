@@ -71,4 +71,36 @@ public class WatchMessagesTest {
         assertNull(WatchMessages.today("junk"));
         assertNull(WatchMessages.today(null));
     }
+
+    @Test
+    public void plainTapsCarryNothing() {
+        WatchMessages.Tap t = WatchMessages.tap("log");
+        assertNotNull(t);
+        assertEquals("log", t.action);
+        assertNull(t.data);
+        assertNull(WatchMessages.tap("start"));
+    }
+
+    @Test
+    public void logCarriesTheWatchsWeightAndReps() throws Exception {
+        WatchMessages.Tap t = WatchMessages.tap("{\"a\":\"log\",\"key\":\"s:1:0:0:\",\"kg\":102.5,\"reps\":6,\"junk\":\"x\"}");
+        assertNotNull(t);
+        assertEquals("log", t.action);
+        org.json.JSONObject d = new org.json.JSONObject(t.data);
+        assertEquals(102.5, d.getDouble("kg"), 1e-9);
+        assertEquals(6, d.getInt("reps"));
+        assertEquals("s:1:0:0:", d.getString("key"));
+        assertEquals(false, d.has("junk"));
+    }
+
+    @Test
+    public void adjustAndRateNeedTheirFields() {
+        assertNull(WatchMessages.tap("{\"a\":\"adjust\",\"kg\":100}"));
+        assertNotNull(WatchMessages.tap("{\"a\":\"adjust\",\"key\":\"k\",\"reps\":8}"));
+        assertNull(WatchMessages.tap("{\"a\":\"rate\",\"v\":1}"));
+        assertNull(WatchMessages.tap("{\"a\":\"rate\",\"ex\":\"row\",\"v\":3}"));
+        assertNotNull(WatchMessages.tap("{\"a\":\"rate\",\"ex\":\"row\",\"v\":-1}"));
+        assertNull(WatchMessages.tap("{\"a\":\"start\"}"));
+        assertNull(WatchMessages.tap("{nope"));
+    }
 }

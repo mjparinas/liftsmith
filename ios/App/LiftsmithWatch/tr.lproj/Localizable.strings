@@ -5,3 +5,8 @@
 "Heart rate %lld beats per minute" = "Nabız dakikada %lld atım";
 "Log set" = "Seti kaydet";
 "+30 s" = "+30 s";
+"Lighter" = "Daha hafif";
+"Heavier" = "Daha ağır";
+"Fewer reps" = "Daha az tekrar";
+"More reps" = "Daha fazla tekrar";
+"Turn the crown to change" = "Değiştirmek için kuronu çevirin";

@@ -631,6 +631,11 @@ export const pl: FeaturesText = {
       body: "Kafelek i komplikacja tarczy na Wear OS, komplikacja na Apple Watch i podgląd na Garminie pokazują dzisiejszą propozycję, jej czas i twoją gotowość, np. „Mocniej · 45 min · Gotowość 82”. Na Wear OS Zacznij na telefonie otwiera ją na telefonie.",
       note: "Apple Watch nie może otworzyć aplikacji na iPhonie, więc jego komplikacja otwiera aplikację na zegarku.",
     },
+    "watch-adjust": {
+      name: "Zmień i oceń serię na zegarku",
+      body: "Obróć koronkę lub pierścień albo naciśnij − i +, aby zmienić ciężar i powtórzenia z nadgarstka, tymi samymi krokami co w telefonie: twoje talerze, hantle albo stos ciężarów maszyny. Po ostatniej serii ćwiczenia zegarek pyta, jak poszło, a twoja odpowiedź ustala kolejny ciężar.",
+      note: "Wear OS, Apple Watch i Garmin (przyciski UP i DOWN).",
+    },
     widgets: {
       name: "Widżety na ekranie głównym",
       body: "Trzy widżety: Dziś (decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię), Ten tydzień (dni z treningiem, twoja passa i co ją podtrzyma) oraz Regeneracja (które mięśnie są gotowe do treningu i kiedy będą pozostałe).",

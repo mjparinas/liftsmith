@@ -13,7 +13,8 @@ import org.json.JSONObject;
  * The phone sends short keys because Connect IQ messages are small and slow: "t" title, "s" set label, "n" the set,
  * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree), "h" heart rate from a
  * Bluetooth monitor, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its
- * end or -1 for a count-up, label] and "ki" which timer that is. The watch sends {"a": "log" | "add30"} or {"hr": bpm}.
+ * end or -1 for a count-up, label] and "ki" which timer that is, plus the set's weight ladder and "How did it feel?" (below).
+ * The watch sends {"a": "log" | "add30"}, {"a": "log" | "adjust", "key", "kg", "reps"}, {"a": "rate", "ex", "v"} or {"hr": bpm}.
  * iOS counterpart: GarminLink.swift (GarminMessages).
  */
 final class GarminMessages {
@@ -54,6 +55,24 @@ final class GarminMessages {
         }
         m.put("k", k);
         m.put("ki", first > 0 ? String.valueOf(first) : "");
+        // Adjust and rate a set (watchAdjust.ts): "ay" the set's key, "ak" the weight ladder in kg, "aw" its words,
+        // "ai" where the set's own weight is, "ar" the reps and "ars" the word after them; "qe" the exercise asked
+        // about, "q" the question and "qo" its three answers (too easy, about right, too hard).
+        JSONObject adj = s.optJSONObject("adj");
+        if (adj != null && restUntil <= now) {
+            m.put("ay", adj.optString("key", ""));
+            m.put("ak", numbers(adj.optJSONArray("kg")));
+            m.put("aw", strings(adj.optJSONArray("w")));
+            m.put("ai", adj.optInt("i", 0));
+            m.put("ar", adj.optInt("reps", 0));
+            m.put("ars", adj.optString("rs", ""));
+        }
+        JSONObject ask = s.optJSONObject("ask");
+        if (ask != null) {
+            m.put("qe", ask.optString("ex", ""));
+            m.put("q", ask.optString("q", ""));
+            m.put("qo", strings(ask.optJSONArray("o")));
+        }
         return m;
     }
 
@@ -70,6 +89,18 @@ final class GarminMessages {
         return m;
     }
 
+    private static List<Object> numbers(JSONArray a) {
+        List<Object> out = new ArrayList<>();
+        for (int i = 0; a != null && i < a.length() && i < 24; i++) out.add((float) a.optDouble(i, 0));
+        return out;
+    }
+
+    private static List<Object> strings(JSONArray a) {
+        List<Object> out = new ArrayList<>();
+        for (int i = 0; a != null && i < a.length() && i < 24; i++) out.add(a.optString(i, ""));
+        return out;
+    }
+
     /** The workout ended: the watch goes back to "No workout running". */
     static Map<String, Object> end() {
         Map<String, Object> m = new HashMap<>();
@@ -83,7 +114,7 @@ final class GarminMessages {
      */
     static boolean worthSending(Map<String, Object> last, Map<String, Object> next, long sinceLastMs) {
         if (last == null) return true;
-        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki" }) {
+        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki", "ay", "ai", "ar", "qe" }) {
             Object a = last.get(k);
             if (a == null ? next.get(k) != null : !a.equals(next.get(k))) return true;
         }
@@ -99,6 +130,12 @@ final class GarminMessages {
     static String action(List<Object> message) {
         Object a = field(message, "a");
         return a instanceof String ? WatchMessages.action((String) a) : null;
+    }
+
+    /** A tap with what came with it ({"a": "log", "key": …, "kg": …, "reps": …} or {"a": "rate", …}), or null. */
+    static WatchMessages.Tap tap(List<Object> message) {
+        if (field(message, "a") == null) return null;
+        return WatchMessages.tap((String key) -> field(message, key));
     }
 
     /** A believable heart rate from the watch's sensor (30 to 240), or 0. */

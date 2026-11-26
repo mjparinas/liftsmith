@@ -368,6 +368,7 @@ export const emails: Record<string, Words> = {
       "Die Apps für Wear OS und Apple Watch zeigen den Satz oder den Pausen-Countdown.",
       "Die Herzfrequenz kommt vom Sensor der Uhr.",
       "„Satz eintragen“ und +30 s vom Handgelenk, mit Vibration am Pausenende.",
+      "Ändere Gewicht und Wiederholungen mit der Krone oder − und +, und sag, wie sich eine Übung angefühlt hat.",
       "Eine App für Garmin-Uhren kommt bald.",
     ],
     dyk: "Der Sperrbildschirm zeigt auch den Pausen-Countdown, den nächsten Satz und seine Scheiben.",

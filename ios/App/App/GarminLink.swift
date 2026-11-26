@@ -15,7 +15,7 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
     static let scheme = "liftsmith-ciq"
     private static let devicesKey = "garmin.devices"
 
-    var onAction: ((String) -> Void)?
+    var onAction: ((String, [String: Any]?) -> Void)?
     var onHeartRate: ((Int) -> Void)?
     /// The picked watches changed (Connected apps refreshes).
     var onChange: (() -> Void)?
@@ -162,7 +162,7 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
     func receivedMessage(_ message: Any!, from app: IQApp!) {
         let dict = message as? [String: Any] ?? [:]
         DispatchQueue.main.async {
-            if let a = GarminMessages.action(dict["a"]) { self.onAction?(a) }
+            if let a = WatchMessages.tapAction(dict["a"]), let data = WatchMessages.data(a, dict) { self.onAction?(a, data.isEmpty ? nil : data) }
             if let b = GarminMessages.bpm(dict["hr"]) { self.onHeartRate?(b) }
         }
     }
@@ -207,7 +207,7 @@ enum GarminMessages {
                 k.append([start, end, p["label"] as? String ?? ""])
             }
         }
-        return [
+        let base: [String: Any] = [
             "k": k,
             "ki": first > 0 ? String(Int64(first)) : "",
             "t": s["title"] as? String ?? "",
@@ -219,11 +219,34 @@ enum GarminMessages {
             "v": s["vibrate"] as? Bool ?? true,
             "w": s["warn"] as? Bool ?? false,
         ]
+        return base.merging(adjust(s, resting: left > 0)) { a, _ in a }
+    }
+
+    /// Adjust and rate a set (watchAdjust.ts), in the same short keys as Android's GarminMessages: "ay" the set's key,
+    /// "ak" the weight ladder in kg, "aw" its words, "ai" where the set's own weight is, "ar" the reps, "ars" the word
+    /// after them; "qe" the exercise asked about, "q" the question, "qo" its three answers.
+    static func adjust(_ s: [String: Any], resting: Bool) -> [String: Any] {
+        var m: [String: Any] = [:]
+        if let adj = s["adj"] as? [String: Any], !resting {
+            m["ay"] = adj["key"] as? String ?? ""
+            m["ak"] = ((adj["kg"] as? [Any]) ?? []).prefix(24).map { ($0 as? NSNumber)?.doubleValue ?? 0 }
+            m["aw"] = ((adj["w"] as? [Any]) ?? []).prefix(24).map { $0 as? String ?? "" }
+            m["ai"] = (adj["i"] as? NSNumber)?.intValue ?? 0
+            m["ar"] = (adj["reps"] as? NSNumber)?.intValue ?? 0
+            m["ars"] = adj["rs"] as? String ?? ""
+        }
+        if let ask = s["ask"] as? [String: Any] {
+            m["qe"] = ask["ex"] as? String ?? ""
+            m["q"] = ask["q"] as? String ?? ""
+            m["qo"] = ((ask["o"] as? [Any]) ?? []).prefix(3).map { $0 as? String ?? "" }
+        }
+        return m
     }
 
     static func worthSending(_ last: [String: Any]?, _ next: [String: Any], since: TimeInterval) -> Bool {
         guard let last else { return true }
-        for k in ["t", "s", "n", "p", "ki"] where last[k] as? String != next[k] as? String { return true }
+        for k in ["t", "s", "n", "p", "ki", "ay", "qe"] where last[k] as? String != next[k] as? String { return true }
+        if last["ai"] as? Int != next["ai"] as? Int || last["ar"] as? Int != next["ar"] as? Int { return true }
         if last["v"] as? Bool != next["v"] as? Bool || last["w"] as? Bool != next["w"] as? Bool { return true }
         let a = last["r"] as? Int ?? 0, b = next["r"] as? Int ?? 0
         if (a > 0) != (b > 0) || (b > 0 && abs(Double(b) + since - Double(a)) > 1.5) { return true }

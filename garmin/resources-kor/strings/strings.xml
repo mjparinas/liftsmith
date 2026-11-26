@@ -7,4 +7,5 @@
     <string id="HintLog">START: 세트 기록</string>
     <string id="HintAdd">DOWN: +30초</string>
     <string id="TodayNone" scope="glance">휴대폰에서 Liftsmith를 열면 오늘의 계획이 표시됩니다.</string>
+    <string id="HintRate">MENU: 평가하기</string>
 </strings>

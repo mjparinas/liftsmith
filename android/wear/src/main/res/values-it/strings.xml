@@ -21,4 +21,10 @@
     <string name="tile_label">Allenamento di oggi</string>
     <string name="open_app">Apri</string>
     <string name="no_today">Apri Liftsmith sul telefono per vedere qui il piano di oggi.</string>
+    <string name="lighter">Più leggero</string>
+    <string name="heavier">Più pesante</string>
+    <string name="fewer_reps">Meno ripetizioni</string>
+    <string name="more_reps">Più ripetizioni</string>
+    <string name="weight_value">Peso %1$s, ruota la corona per cambiarlo</string>
+    <string name="reps_value">%1$s, ruota la corona per cambiare</string>
 </resources>

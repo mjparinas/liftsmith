@@ -21,4 +21,10 @@
     <string name="tile_label">今日のワークアウト</string>
     <string name="open_app">開く</string>
     <string name="no_today">スマートフォンでLiftsmithを開くと、今日のプランがここに表示されます。</string>
+    <string name="lighter">軽くする</string>
+    <string name="heavier">重くする</string>
+    <string name="fewer_reps">回数を減らす</string>
+    <string name="more_reps">回数を増やす</string>
+    <string name="weight_value">重量 %1$s、リューズを回して変更</string>
+    <string name="reps_value">%1$s、リューズを回して変更</string>
 </resources>

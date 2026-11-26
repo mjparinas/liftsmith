@@ -570,6 +570,11 @@ export const fr: FeaturesText = {
       body: "Une tuile et une complication de cadran sur Wear OS, une complication sur Apple Watch et un aperçu sur Garmin affichent le choix du jour, sa durée et ta forme, comme « Pousser · 45 min · Forme 82 ». Sur Wear OS, Démarrer sur le téléphone l'ouvre sur ton téléphone.",
       note: "L'Apple Watch ne peut pas ouvrir l'app de l'iPhone, donc sa complication ouvre l'app de la montre.",
     },
+    "watch-adjust": {
+      name: "Modifier et noter une série sur la montre",
+      body: "Tournez la couronne ou la lunette, ou appuyez sur − et +, pour changer la charge et les répétitions depuis le poignet, par les mêmes paliers que sur le téléphone : vos disques, vos haltères ou la pile de la machine. Après la dernière série d’un exercice, la montre demande comment c’était, et votre réponse fixe la charge suivante.",
+      note: "Wear OS, Apple Watch et Garmin (boutons UP et DOWN).",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",

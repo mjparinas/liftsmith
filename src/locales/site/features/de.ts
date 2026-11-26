@@ -569,6 +569,11 @@ export const de: FeaturesText = {
       body: "Eine Kachel und eine Zifferblatt-Komplikation auf Wear OS, eine Komplikation auf der Apple Watch und ein Glance auf Garmin zeigen die heutige Empfehlung, wie lange sie dauert und wie bereit du bist, etwa „Pushen · 45 Min. · Bereitschaft 82“. Auf Wear OS öffnet „Am Handy starten“ es auf deinem Handy.",
       note: "Die Apple Watch kann die iPhone-App nicht öffnen, deshalb öffnet ihre Komplikation die Uhr-App.",
     },
+    "watch-adjust": {
+      name: "Satz auf der Uhr ändern und bewerten",
+      body: "Dreh die Krone oder die Lünette oder tippe auf − und +, um Gewicht und Wiederholungen am Handgelenk zu ändern, in denselben Schritten wie am Handy: deine Scheiben, Kurzhanteln oder der Steckgewichtsblock. Nach dem letzten Satz einer Übung fragt die Uhr, wie es sich angefühlt hat, und deine Antwort bestimmt das nächste Gewicht.",
+      note: "Wear OS, Apple Watch und Garmin (Tasten UP und DOWN).",
+    },
     widgets: {
       name: "Widgets für den Startbildschirm",
       body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",

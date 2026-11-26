@@ -563,6 +563,11 @@ export const it: FeaturesText = {
       body: "Un riquadro e una complicazione del quadrante su Wear OS, una complicazione su Apple Watch e un glance su Garmin mostrano la scelta di oggi, quanto dura e quanto sei in forma, come «Spingi · 45 min · Prontezza 82». Su Wear OS, Avvia sul telefono lo apre sul telefono.",
       note: "Apple Watch non può aprire l'app dell'iPhone, quindi la sua complicazione apre l'app dell'orologio.",
     },
+    "watch-adjust": {
+      name: "Modifica e valuta una serie sull’orologio",
+      body: "Ruota la corona o la ghiera, o premi − e +, per cambiare peso e ripetizioni dal polso, con gli stessi passi del telefono: i tuoi dischi, i manubri o il pacco pesi della macchina. Dopo l’ultima serie di un esercizio l’orologio chiede com’è andata e la tua risposta decide il peso successivo.",
+      note: "Wear OS, Apple Watch e Garmin (tasti UP e DOWN).",
+    },
     widgets: {
       name: "Widget della schermata Home",
       body: "Tre widget: Oggi (la scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie), Questa settimana (giorni di allenamento, la tua serie e cosa la mantiene) e Recupero (quali muscoli sono pronti e quando lo saranno gli altri).",

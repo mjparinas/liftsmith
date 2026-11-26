@@ -388,6 +388,7 @@ export const emails: Record<string, Words> = {
       "Wear OS and Apple Watch apps show the set or the rest countdown.",
       "Heart rate comes from the watch's own sensor.",
       "Log set and +30 s from your wrist, with a buzz when rest ends.",
+      "Change the weight and reps with the crown or − and +, and say how an exercise felt.",
       "A Garmin watch app is coming soon.",
     ],
     dyk: "The lock screen shows the rest countdown, the next set and its plates too.",

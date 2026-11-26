@@ -129,6 +129,20 @@ final class WatchHub {
         send(context.getApplicationContext(), PATH_ACTION, action);
     }
 
+    /**
+     * A tap with what goes with it: Log set or adjust with the weight and reps chosen on the watch, or rate with how
+     * the exercise felt. The phone checks the fields (WatchMessages.tap) and the web app the set (watchAdjust.ts).
+     */
+    static void action(Context context, String action, org.json.JSONObject fields) {
+        try {
+            fields.put("a", action);
+        } catch (org.json.JSONException e) {
+            action(context, action);
+            return;
+        }
+        send(context.getApplicationContext(), PATH_ACTION, fields.toString());
+    }
+
     /** A batch of wrist motion (MotionStream), counted into reps on the phone. */
     static void motion(Context context, String body) {
         send(context.getApplicationContext(), PATH_MOTION, body);

@@ -366,6 +366,7 @@ export const emails: Record<string, Words> = {
       "Aplikacje na Wear OS i Apple Watch pokazują serię lub odliczanie przerwy.",
       "Tętno pochodzi z czujnika samego zegarka.",
       "Zapisz serię i +30 s prosto z nadgarstka, z wibracją na koniec przerwy.",
+      "Zmieniaj ciężar i powtórzenia koronką albo − i +, i powiedz, jak poszło ćwiczenie.",
       "Aplikacja na zegarki Garmin już wkrótce.",
     ],
     dyk: "Ekran blokady też pokazuje odliczanie przerwy, następną serię i jej talerze.",

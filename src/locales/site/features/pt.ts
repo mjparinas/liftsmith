@@ -631,6 +631,11 @@ export const pt: FeaturesText = {
       body: "Um bloco e uma complicação de mostrador no Wear OS, uma complicação no Apple Watch e um glance no Garmin mostram a indicação de hoje, quanto dura e como está sua prontidão, como “Forçar · 45 min · Prontidão 82”. No Wear OS, Começar no celular abre o treino no seu celular.",
       note: "O Apple Watch não consegue abrir o app do iPhone, então a complicação abre o app do relógio.",
     },
+    "watch-adjust": {
+      name: "Mude e avalie uma série no relógio",
+      body: "Gire a coroa ou o aro, ou toque em − e +, para mudar o peso e as repetições pelo pulso, nos mesmos passos do celular: suas anilhas, halteres ou a pilha de pesos da máquina. Depois da última série de um exercício, o relógio pergunta como foi, e sua resposta define o próximo peso.",
+      note: "Wear OS, Apple Watch e Garmin (botões UP e DOWN).",
+    },
     widgets: {
       name: "Widgets na tela inicial",
       body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",
