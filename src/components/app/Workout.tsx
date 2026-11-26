@@ -386,7 +386,7 @@ export function Workout() {
   // The sets after this one, for Log set on the notification with the app closed (sessionAhead.ts). Worked out
   // again only when the workout moves, not on every heart rate reading.
   const ahead = useRef({ key: "", steps: [] as AheadStep[] });
-  // "Machine taken" on the watches (takenSwap.ts): what one tap would swap to, worked out again only when the exercise changes.
+  // "Machine taken" on the watches (takenSwap.ts): what one tap would swap to, worked out again only when the workout moves on.
   const takenOffer = useRef({ key: "", text: undefined as string | undefined, step: undefined as TakenAheadStep | undefined });
   useEffect(() => {
     if (!active || !ex || !gym) return;
@@ -398,8 +398,10 @@ export function Workout() {
     if (!f) return;
     if (ahead.current.key !== key)
       ahead.current = { key, steps: aheadSteps(active, events, profile.unit, gym, profile.training?.autoRest !== false) };
-    if (takenOffer.current.key !== key)
-      takenOffer.current = { key, text: undefined, step: undefined, ...watchTaken(active, events, profile, gym) };
+    // Not on every weight or reps bump: the swap and the sets after it only change when the workout moves on.
+    const takenKey = `${active.index}:${ex.id}:${active.restUntil}:${doneSets}:${warmDone}:${active.plan.items.length}`;
+    if (takenOffer.current.key !== takenKey)
+      takenOffer.current = { key: takenKey, text: undefined, step: undefined, ...watchTaken(active, events, profile, gym) };
     void updateSession({
       title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
       setLabel: f.setLabel,
