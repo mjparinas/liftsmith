@@ -19,4 +19,7 @@
     <string name="check_phone">Check your phone</string>
     <string name="open_failed">Open Liftsmith on your phone.</string>
     <string name="install_failed">Get Liftsmith from Google Play on your phone.</string>
+    <string name="tile_label">Today\'s workout</string>
+    <string name="open_app">Open</string>
+    <string name="no_today">Open Liftsmith on your phone to see today\'s plan here.</string>
 </resources>

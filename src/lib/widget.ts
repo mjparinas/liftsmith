@@ -42,6 +42,17 @@ export interface WidgetSnapshot {
   week?: WeekPart;
   /** The Recovery widget (2026-11-15). */
   rec?: RecoveryPart;
+  /** Today's call on the watches (2026-11-26): the Wear OS tile and complication, the Apple Watch complication and the
+   *  Garmin glance. The phones pass it on with `day`, `kind`, `title`, `why` and `stale` (WatchLink, GarminLink). */
+  watch?: WatchPart;
+}
+
+/** The short pieces a watch face has room for: "Push", "45 min" and "Readiness 82". Empty strings are left out. */
+export interface WatchPart {
+  call: string;
+  mins: string;
+  /** Empty before readiness means anything (no signals yet), on rest days, programs and during a workout. */
+  ready: string;
 }
 
 // ---------- This week and Recovery widgets (Melvin chose both, 2026-11-15)
@@ -208,14 +219,25 @@ export function widgetSnapshot({ plan, readiness, active, streak, goal, notes, n
     log: active ? t("wdg.log") : "",
     stale: t("wdg.stale"),
   };
-  if (active) return { ...base, kind: "active", title: t("td.inProgress"), why: t("wdg.activeWhy") };
-  if (!plan || !plan.items.length) return { ...base, kind: "rest", title: t("td.restDay"), why: t("td.restBody") };
+  if (active) {
+    const title = t("td.inProgress");
+    return { ...base, kind: "active", title, why: t("wdg.activeWhy"), watch: { call: title, mins: "", ready: "" } };
+  }
+  if (!plan || !plan.items.length) {
+    const title = t("td.restDay");
+    return { ...base, kind: "rest", title, why: t("td.restBody"), watch: { call: title, mins: "", ready: "" } };
+  }
   const minutes = plan.estMinutes || plan.minutes;
+  const mins = t("wdg.mins", { minutes });
   if (plan.program?.fixed) {
-    return { ...base, kind: "program", title: t("wdg.title", { call: plan.program.dayName, minutes }), why: plan.program.note };
+    const call = plan.program.dayName;
+    return { ...base, kind: "program", title: t("wdg.title", { call, minutes }), why: plan.program.note, watch: { call, mins, ready: "" } };
   }
   const why = plan.challenge ? t("td.challenge") : readiness ? callWhy(readiness, plan.call, plan.week.deload) : "";
-  return { ...base, kind: plan.call, title: t("wdg.title", { call: CALL_TEXT[plan.call].label, minutes }), why };
+  const call = CALL_TEXT[plan.call].label;
+  // A score with no signal behind it is a placeholder (Today says so), so the watch leaves it out.
+  const ready = readiness && readiness.signals.some((g) => g.points !== 0) ? t("td.readinessN", { n: readiness.score }) : "";
+  return { ...base, kind: plan.call, title: t("wdg.title", { call, minutes }), why, watch: { call, mins, ready } };
 }
 
 type Plugin = { setWidget(o: { json: string }): Promise<void> };

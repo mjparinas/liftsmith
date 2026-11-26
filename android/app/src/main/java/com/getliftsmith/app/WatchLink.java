@@ -24,6 +24,8 @@ import org.json.JSONObject;
 final class WatchLink {
 
     static final String PATH_WORKOUT = "/liftsmith/workout";
+    /** Today's call for the watch tile and complication (WatchMessages.today), kept apart from the live workout. */
+    static final String PATH_TODAY = "/liftsmith/today";
     /** Declared by the watch app (wear/src/main/res/values/wear.xml), so only watches with it are opened. */
     static final String CAPABILITY = "liftsmith_watch";
 
@@ -57,6 +59,27 @@ final class WatchLink {
             Wearable.getDataClient(context).deleteDataItems(uri);
         } catch (Exception ignored) {
             // No Play services.
+        }
+    }
+
+    /**
+     * Today's call for the watch's tile and complication, from the home-screen widget's snapshot, which the app sends
+     * only when a line changes (src/lib/widget.ts). The Data Layer skips an item whose bytes didn't change, so nothing
+     * wakes the watch for nothing. An empty snapshot (signed out) takes it off the watch.
+     */
+    static void today(Context context, String snapshot) {
+        JSONObject today = WatchMessages.today(snapshot);
+        try {
+            if (today == null) {
+                Uri uri = new Uri.Builder().scheme("wear").path(PATH_TODAY).build();
+                Wearable.getDataClient(context).deleteDataItems(uri);
+                return;
+            }
+            PutDataMapRequest req = PutDataMapRequest.create(PATH_TODAY);
+            req.getDataMap().putString("json", today.toString());
+            Wearable.getDataClient(context).putDataItem(req.asPutDataRequest());
+        } catch (Exception ignored) {
+            // No Play services: no watch to tell.
         }
     }
 

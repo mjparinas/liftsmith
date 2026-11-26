@@ -27,6 +27,14 @@ class WorkoutView extends WatchUi.View {
         dc.clear();
 
         if (!_w.active()) {
+            // Today's call from the phone (the glance's), so the lifter knows what's waiting.
+            var t = TodayStore.load();
+            if (TodayStore.current(t)) {
+                line(dc, cx, h * 0.32, TodayStore.text(t as Dictionary, "t"), Graphics.FONT_SMALL, INK, w * 0.8, 2);
+                line(dc, cx, h * 0.5, TodayStore.detail(t as Dictionary), Graphics.FONT_XTINY, BLUE, w * 0.8, 1);
+                line(dc, cx, h * 0.68, WatchUi.loadResource(Rez.Strings.NoneBody) as String, Graphics.FONT_XTINY, MUTED, w * 0.75, 2);
+                return;
+            }
             line(dc, cx, h * 0.38, WatchUi.loadResource(Rez.Strings.NoneTitle) as String, Graphics.FONT_SMALL, INK, w * 0.8, 2);
             line(dc, cx, h * 0.62, WatchUi.loadResource(Rez.Strings.NoneBody) as String, Graphics.FONT_XTINY, MUTED, w * 0.75, 3);
             return;

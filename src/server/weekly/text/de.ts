@@ -1098,4 +1098,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Team-Links funktionieren jetzt auch, wenn sich ein Athlet erst nach dem Öffnen anmeldet, also fehlt niemand im Kader.",
   },
+  "watch-today": {
+    title: "Das heutige Training auf dem Zifferblatt",
+    intro:
+      "Deine Uhr zeigt jetzt, was heute ansteht, ohne dass du etwas öffnest: das Training, wie lange es dauert und wie bereit du bist.",
+    points: [
+      "Auf Wear OS fügst du die Kachel „Heutiges Training“ oder eine Komplikation hinzu. „Am Handy starten“ öffnet das Training auf deinem Handy.",
+      "Auf der Apple Watch fügst du die Liftsmith-Komplikation hinzu. Ein Tipp öffnet die Uhr-App mit der heutigen Empfehlung.",
+      "Auf Garmin zeigt der Liftsmith-Glance dieselbe Zeile, sobald du die App einmal auf der Uhr geöffnet hast.",
+      "Es ist dieselbe Empfehlung mit demselben Grund wie unter Heute auf dem Handy, und sie ändert sich mit deinem Plan.",
+    ],
+    dyk: "Ein Plan von gestern erscheint nie als heutiger: Nach Mitternacht wartet die Uhr auf den neuen Plan von deinem Handy.",
+  },
 };

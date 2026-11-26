@@ -1114,4 +1114,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Team links now work when an athlete signs in after opening them, so nobody is left off the roster.",
   },
+  "watch-today": {
+    title: "Today's workout on your watch face",
+    intro: "Your watch now shows what's waiting today without opening anything: the workout, how long it takes and how ready you are.",
+    points: [
+      "On Wear OS, add the Today's workout tile or a complication. Start on phone opens the workout on your phone.",
+      "On Apple Watch, add the Liftsmith complication. A tap opens the watch app with today's call.",
+      "On Garmin, the Liftsmith glance shows the same line once you've opened the app on the watch.",
+      "It's the same call and reason as Today on your phone, and it updates when your plan changes.",
+    ],
+    dyk: "A plan from yesterday never shows as today's: after midnight the watch waits for your phone's new plan.",
+  },
 };

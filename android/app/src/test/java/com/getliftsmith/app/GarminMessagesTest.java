@@ -103,4 +103,18 @@ public class GarminMessagesTest {
         assertFalse(GarminMessages.worthSending(m, GarminMessages.state(plank, NOW + 1000), 1000));
         assertEquals(java.util.Collections.emptyList(), GarminMessages.state(lifting(), NOW).get("k"));
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void todayGoesUnderItsOwnKeySoItIsNeverTakenForAWorkout() throws Exception {
+        org.json.JSONObject t = new org.json.JSONObject().put("day", "2026-11-26").put("call", "Push").put("mins", "45 min").put("ready", "Readiness 82");
+        java.util.Map<String, Object> m = GarminMessages.today(t);
+        assertEquals(1, m.size());
+        java.util.Map<String, Object> g = (java.util.Map<String, Object>) m.get("g");
+        assertEquals("Push", g.get("c"));
+        assertEquals("45 min", g.get("m"));
+        assertEquals("Readiness 82", g.get("r"));
+        assertEquals("", g.get("y"));
+        assertEquals("", ((java.util.Map<String, Object>) GarminMessages.today(null).get("g")).get("c"));
+    }
 }

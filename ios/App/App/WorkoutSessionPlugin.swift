@@ -256,6 +256,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         UserDefaults(suiteName: "group.com.getliftsmith.app")?.set(json, forKey: "widget")
         // Today, This week and Recovery all read this one snapshot.
         WidgetCenter.shared.reloadAllTimelines()
+        // The same call on the watches: the Apple Watch complication and the Garmin glance.
+        WatchLink.shared.today(json)
+        GarminLink.shared.today(json)
         call.resolve()
     }
 

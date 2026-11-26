@@ -186,7 +186,12 @@ public class WorkoutSessionPlugin extends Plugin {
     @PluginMethod
     public void setWidget(PluginCall call) {
         String json = call.getString("json");
-        if (json != null) WorkoutWidget.save(getContext(), json);
+        if (json != null) {
+            WorkoutWidget.save(getContext(), json);
+            // The same call on the watches: the Wear OS tile and complication, and the Garmin glance.
+            WatchLink.today(getContext(), json);
+            GarminLink.today(getContext(), json);
+        }
         call.resolve();
     }
 

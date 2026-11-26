@@ -1094,4 +1094,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Takım bağlantıları artık sporcu bağlantıyı açtıktan sonra giriş yapsa da çalışıyor, böylece kimse kadrodan dışarıda kalmıyor.",
   },
+  "watch-today": {
+    title: "Bugünkü antrenman saat kadranında",
+    intro: "Saatin artık hiçbir şey açmadan bugün seni neyin beklediğini gösteriyor: antrenman, süresi ve hazırlığın.",
+    points: [
+      "Wear OS'ta Bugünkü antrenman kutucuğunu veya bir komplikasyon ekle. Telefonda başlat, antrenmanı telefonunda açar.",
+      "Apple Watch'ta Liftsmith komplikasyonunu ekle. Dokununca saat uygulaması bugünkü öneriyle açılır.",
+      "Garmin'de uygulamayı saatte bir kez açtıktan sonra Liftsmith özeti aynı satırı gösterir.",
+      "Telefondaki Bugün ile aynı öneri ve aynı neden; planın değişince o da değişir.",
+    ],
+    dyk: "Dünkü plan hiçbir zaman bugünkü gibi görünmez: gece yarısından sonra saat, telefonundan yeni planı bekler.",
+  },
 };

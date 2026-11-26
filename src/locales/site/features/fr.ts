@@ -565,6 +565,11 @@ export const fr: FeaturesText = {
       name: "Applis pour montres",
       body: "La séance sur Wear OS et Apple Watch : la série ou le décompte du repos, le pouls de la montre, Valider la série et +30 s, et une vibration à la fin du repos.",
     },
+    "watch-today": {
+      name: "La séance du jour sur ta montre",
+      body: "Une tuile et une complication de cadran sur Wear OS, une complication sur Apple Watch et un aperçu sur Garmin affichent le choix du jour, sa durée et ta forme, comme « Pousser · 45 min · Forme 82 ». Sur Wear OS, Démarrer sur le téléphone l'ouvre sur ton téléphone.",
+      note: "L'Apple Watch ne peut pas ouvrir l'app de l'iPhone, donc sa complication ouvre l'app de la montre.",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",

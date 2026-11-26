@@ -79,9 +79,19 @@ Melvin, 2026-11-26: "Can liftsmith automatically track workouts on the wear os a
 - **Play review**: built on 2026-11-26 while the Wear OS app was in production review. The change only reaches Play's internal track through the usual release; nothing was sent to production.
 - **Untested on a wrist.** The 15 seconds and 3 reps are guesses, like the hands-free waits; tune them on real sets before it leaves Labs.
 
+## Today on the watch face (2026-11-26)
+
+Melvin picked it from the watch ideas (2026-11-26, idea 3: "a tile/complication showing today's call ... with Start on phone").
+
+- **What it shows**: today's call (the readiness call's label, or the program day's name, or Rest day), the minutes and "Readiness N" when the readiness signals moved anything, plus the short reason where there's room. A workout in progress takes over as before.
+- **One source**: the home-screen widget's snapshot (`widgetSnapshot` in `src/lib/widget.ts`, which now carries a `watch` part: `call`, `mins`, `ready`). The app sends it only when a line changes, and `WorkoutSession.setWidget` on each phone hands it to the watches too (`WatchMessages.today` on both phones keeps day, kind, title, why, stale, call, mins and ready; an empty snapshot clears it). Nothing new runs on a timer.
+- **Wear OS**: a Data Layer item of its own, `/liftsmith/today`, apart from the live workout, kept on the watch (`TodayStore`). A **tile** (`TodayTileService`, Tiles 1.5 with Material layouts) shows the label, the call, the minutes and readiness, the reason and **Start on phone**, which opens the watch app with `startOnPhone` and that opens the phone's `liftsmith://start` (the same path as the idle screen's button). A **complication** (`TodayComplicationService`, short and long text) shows the call; a tap opens the watch app, never a start, because a watch face tap is easy to make by accident. The watch app's idle screen shows the same call.
+- **Apple Watch**: the application context now holds the live workout (`json`) and today's call (`today`) together, merged, because each update replaces the whole context. A complication on the face gets `transferCurrentComplicationUserInfo` (budgeted by watchOS). A WidgetKit extension, `LiftsmithWatchWidgets`, draws circular, corner, inline and rectangular complications from what the watch app saved (`WatchToday.swift`, in both targets), with a timeline entry at midnight. **No Start on phone**: watchOS can't open the iPhone app, so a tap opens the watch app with today's call. The watch app and the extension share it through the App Group `group.com.getliftsmith.app`, which isn't on either target yet (open items, iOS deferred); until it is, the complication shows "Liftsmith" and the watch app's own idle screen still shows the call.
+- **Garmin**: a **glance** (`TodayGlance.mc`) and the idle screen show the call. It comes in a message under `g` (`GarminMessages.today` and `WatchMessages.garminToday`) so an older watch app never takes it for a workout; a background service (`TodayService.mc`, Background permission) stores it when the app isn't open, so the app has to be opened once on the watch. Not built in CI (see below), so untried.
+- **Never yesterday's**: every copy carries its day (`y-m-d` like `dayKey`), and a watch that reaches midnight shows nothing until the phone sends the new day's plan.
+
 ## Later
 
-- A watch face complication or tile with today's call.
 - Build the Garmin watch app in CI once there's a Garmin login for the SDK Manager to use (`GARMIN_*` secrets).
 
 ## Emails and screenshots (2026-11-26)

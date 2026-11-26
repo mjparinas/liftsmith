@@ -1047,6 +1047,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "watch-today",
+        name: "Today's workout on your watch",
+        body: 'A Wear OS tile and watch face complication, an Apple Watch complication and a Garmin glance show today\'s call, how long it takes and how ready you are, like "Push · 45 min · Readiness 82". On Wear OS, Start on phone opens it on your phone.',
+        tier: "free",
+        where: "phones",
+        note: "Apple Watch can't open the iPhone app, so its complication opens the watch app instead.",
+        added: "2026-11-26",
+      },
+      {
         id: "widgets",
         name: "Home-screen widgets",
         body: "Three widgets: Today (the day's call, your weekly goal, a coach's note and Start or Log set), This week (days trained, your streak and what keeps it going) and Recovery (which muscles are ready to train and when the rest will be).",

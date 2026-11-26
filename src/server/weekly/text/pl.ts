@@ -1095,4 +1095,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Linki do drużyny działają teraz także wtedy, gdy zawodnik zaloguje się po ich otwarciu, więc nikt nie wypada ze składu.",
   },
+  "watch-today": {
+    title: "Dzisiejszy trening na tarczy zegarka",
+    intro: "Zegarek pokazuje teraz, co czeka cię dziś, bez otwierania czegokolwiek: trening, ile trwa i jaka jest twoja gotowość.",
+    points: [
+      "Na Wear OS dodaj kafelek Dzisiejszy trening lub komplikację. Zacznij na telefonie otwiera trening na telefonie.",
+      "Na Apple Watch dodaj komplikację Liftsmith. Dotknięcie otwiera aplikację na zegarku z dzisiejszą propozycją.",
+      "Na Garminie podgląd Liftsmith pokazuje tę samą linię, gdy raz otworzysz aplikację na zegarku.",
+      "To ta sama propozycja i ten sam powód co w Dziś na telefonie, a zmienia się razem z planem.",
+    ],
+    dyk: "Wczorajszy plan nigdy nie pokaże się jako dzisiejszy: po północy zegarek czeka na nowy plan z telefonu.",
+  },
 };

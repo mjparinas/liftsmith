@@ -53,6 +53,10 @@
 		C1A0B0040000000000000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0040000000000000002 /* Localizable.strings */; };
 		E7A1C0DE00000000000000F1 /* GarminLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE00000000000000F2 /* GarminLink.swift */; };
 		E7A1C0DE00000000000000F5 /* ConnectIQ in Frameworks */ = {isa = PBXBuildFile; productRef = E7A1C0DE00000000000000F4 /* ConnectIQ */; };
+		E7A1C0DE0000000000000101 /* WatchToday.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000100 /* WatchToday.swift */; };
+		E7A1C0DE0000000000000102 /* WatchToday.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000100 /* WatchToday.swift */; };
+		E7A1C0DE0000000000000104 /* LiftsmithWatchWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000103 /* LiftsmithWatchWidgets.swift */; };
+		E7A1C0DE0000000000000107 /* LiftsmithWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000106 /* LiftsmithWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +73,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E7A1C0DE0000000000000010;
 			remoteInfo = LiftsmithWatch;
+		};
+		E7A1C0DE0000000000000110 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E7A1C0DE0000000000000109;
+			remoteInfo = LiftsmithWatchWidgets;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -93,6 +104,17 @@
 				E7A1C0DE000000000000000D /* LiftsmithWatch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E7A1C0DE0000000000000112 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E7A1C0DE0000000000000107 /* LiftsmithWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -188,6 +210,10 @@
 		C1A0B004000000000000000A /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C1A0B004000000000000000B /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E7A1C0DE00000000000000F2 /* GarminLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarminLink.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000100 /* WatchToday.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchToday.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000103 /* LiftsmithWatchWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftsmithWatchWidgets.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000105 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000106 /* LiftsmithWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiftsmithWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +243,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E7A1C0DE000000000000010B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -230,6 +263,7 @@
 				F6C7983D12D78D132ECAD923 /* Frameworks */,
 				ABD8D1072A0CEFB112237523 /* LiftsmithWidgets */,
 				E7A1C0DE0000000000000018 /* LiftsmithWatch */,
+				E7A1C0DE0000000000000108 /* LiftsmithWatchWidgets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -239,6 +273,7 @@
 				504EC3041FED79650016851F /* App.app */,
 				BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */,
 				E7A1C0DE000000000000000E /* LiftsmithWatch.app */,
+				E7A1C0DE0000000000000106 /* LiftsmithWatchWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -333,6 +368,16 @@
 			path = LiftsmithWatch;
 			sourceTree = "<group>";
 		};
+		E7A1C0DE0000000000000108 /* LiftsmithWatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				E7A1C0DE0000000000000103 /* LiftsmithWatchWidgets.swift */,
+				E7A1C0DE0000000000000100 /* WatchToday.swift */,
+				E7A1C0DE0000000000000105 /* Info.plist */,
+			);
+			path = LiftsmithWatchWidgets;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -385,15 +430,34 @@
 				E7A1C0DE000000000000001B /* Sources */,
 				E7A1C0DE0000000000000017 /* Frameworks */,
 				E7A1C0DE000000000000001C /* Resources */,
+				E7A1C0DE0000000000000112 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E7A1C0DE0000000000000111 /* PBXTargetDependency */,
 			);
 			name = LiftsmithWatch;
 			productName = LiftsmithWatch;
 			productReference = E7A1C0DE000000000000000E /* LiftsmithWatch.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E7A1C0DE0000000000000109 /* LiftsmithWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7A1C0DE000000000000010D /* Build configuration list for PBXNativeTarget "LiftsmithWatchWidgets" */;
+			buildPhases = (
+				E7A1C0DE000000000000010A /* Sources */,
+				E7A1C0DE000000000000010B /* Frameworks */,
+				E7A1C0DE000000000000010C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LiftsmithWatchWidgets;
+			productName = LiftsmithWatchWidgets;
+			productReference = E7A1C0DE0000000000000106 /* LiftsmithWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -440,6 +504,7 @@
 				504EC3031FED79650016851F /* App */,
 				F7B0C469AAFC410AA368939D /* LiftsmithWidgets */,
 				E7A1C0DE0000000000000010 /* LiftsmithWatch */,
+				E7A1C0DE0000000000000109 /* LiftsmithWatchWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -476,6 +541,13 @@
 			files = (
 				E7A1C0DE0000000000000009 /* Assets.xcassets in Resources */,
 				E7A1C0DE000000000000000B /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E7A1C0DE000000000000010C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -526,6 +598,16 @@
 				E7A1C0DE0000000000000003 /* LiftsmithWatchApp.swift in Sources */,
 				E7A1C0DE0000000000000005 /* WatchModel.swift in Sources */,
 				E7A1C0DE0000000000000007 /* WatchState.swift in Sources */,
+				E7A1C0DE0000000000000101 /* WatchToday.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E7A1C0DE000000000000010A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7A1C0DE0000000000000104 /* LiftsmithWatchWidgets.swift in Sources */,
+				E7A1C0DE0000000000000102 /* WatchToday.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,6 +625,12 @@
 			name = LiftsmithWatch;
 			target = E7A1C0DE0000000000000010 /* LiftsmithWatch */;
 			targetProxy = E7A1C0DE000000000000000F /* PBXContainerItemProxy */;
+		};
+		E7A1C0DE0000000000000111 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LiftsmithWatchWidgets;
+			target = E7A1C0DE0000000000000109 /* LiftsmithWatchWidgets */;
+			targetProxy = E7A1C0DE0000000000000110 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -661,7 +749,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.1;
+				MARKETING_VERSION = 0.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -795,8 +883,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.26.1;
-				MARKETING_VERSION = 0.26.1;
+				MARKETING_VERSION = 0.27.0;
+				MARKETING_VERSION = 0.27.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -820,8 +908,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.26.1;
-				MARKETING_VERSION = 0.26.1;
+				MARKETING_VERSION = 0.27.0;
+				MARKETING_VERSION = 0.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -844,8 +932,8 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.26.1;
-				MARKETING_VERSION = 0.26.1;
+				MARKETING_VERSION = 0.27.0;
+				MARKETING_VERSION = 0.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -868,8 +956,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.26.1;
-				MARKETING_VERSION = 0.26.1;
+				MARKETING_VERSION = 0.27.0;
+				MARKETING_VERSION = 0.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -893,9 +981,55 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.26.1;
-				MARKETING_VERSION = 0.26.1;
+				MARKETING_VERSION = 0.27.0;
+				MARKETING_VERSION = 0.27.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E7A1C0DE000000000000010E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LiftsmithWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.27.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			};
+			name = Debug;
+		};
+		E7A1C0DE000000000000010F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LiftsmithWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.27.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -941,6 +1075,15 @@
 			buildConfigurations = (
 				E7A1C0DE000000000000001D /* Debug */,
 				E7A1C0DE000000000000001E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E7A1C0DE000000000000010D /* Build configuration list for PBXNativeTarget "LiftsmithWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E7A1C0DE000000000000010E /* Debug */,
+				E7A1C0DE000000000000010F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

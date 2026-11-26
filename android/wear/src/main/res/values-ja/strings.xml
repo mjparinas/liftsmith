@@ -18,4 +18,7 @@
     <string name="check_phone">スマホを確認してください</string>
     <string name="open_failed">スマホでLiftsmithを開いてください。</string>
     <string name="install_failed">スマホのGoogle PlayからLiftsmithを入れてください。</string>
+    <string name="tile_label">今日のワークアウト</string>
+    <string name="open_app">開く</string>
+    <string name="no_today">スマートフォンでLiftsmithを開くと、今日のプランがここに表示されます。</string>
 </resources>

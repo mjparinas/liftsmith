@@ -1099,4 +1099,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Os links do time agora funcionam mesmo se o atleta entrar depois de abri-los, então ninguém fica de fora da lista.",
   },
+  "watch-today": {
+    title: "O treino de hoje no mostrador",
+    intro: "Seu relógio agora mostra o que espera por você hoje sem abrir nada: o treino, quanto dura e como está sua prontidão.",
+    points: [
+      "No Wear OS, adicione o bloco Treino de hoje ou uma complicação. Começar no celular abre o treino no seu celular.",
+      "No Apple Watch, adicione a complicação do Liftsmith. Um toque abre o app do relógio com a indicação de hoje.",
+      "No Garmin, o resumo do Liftsmith mostra a mesma linha depois que você abrir o app no relógio.",
+      "É a mesma indicação e o mesmo motivo de Hoje no celular, e muda quando seu plano muda.",
+    ],
+    dyk: "Um plano de ontem nunca aparece como o de hoje: depois da meia-noite, o relógio espera o novo plano do celular.",
+  },
 };

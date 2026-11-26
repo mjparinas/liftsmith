@@ -57,6 +57,19 @@ final class GarminMessages {
         return m;
     }
 
+    /**
+     * Today's call for the glance (WatchMessages.today), under "g" so the watch never takes it for a workout:
+     * {"g": {"d" day, "k" kind, "t" title, "y" why, "c" call, "m" minutes, "r" readiness, "x" stale}}.
+     */
+    static Map<String, Object> today(JSONObject t) {
+        Map<String, Object> g = new HashMap<>();
+        String[][] keys = { { "d", "day" }, { "k", "kind" }, { "t", "title" }, { "y", "why" }, { "c", "call" }, { "m", "mins" }, { "r", "ready" }, { "x", "stale" } };
+        for (String[] k : keys) g.put(k[0], t == null ? "" : t.optString(k[1], ""));
+        Map<String, Object> m = new HashMap<>();
+        m.put("g", g);
+        return m;
+    }
+
     /** The workout ended: the watch goes back to "No workout running". */
     static Map<String, Object> end() {
         Map<String, Object> m = new HashMap<>();

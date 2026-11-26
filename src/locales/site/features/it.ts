@@ -558,6 +558,11 @@ export const it: FeaturesText = {
       name: "App per orologi",
       body: "L’allenamento su Wear OS e Apple Watch: la serie o il conto alla rovescia del riposo, il battito dall’orologio, Registra serie e +30 s, e una vibrazione a fine riposo.",
     },
+    "watch-today": {
+      name: "L'allenamento di oggi sull'orologio",
+      body: "Un riquadro e una complicazione del quadrante su Wear OS, una complicazione su Apple Watch e un glance su Garmin mostrano la scelta di oggi, quanto dura e quanto sei in forma, come «Spingi · 45 min · Prontezza 82». Su Wear OS, Avvia sul telefono lo apre sul telefono.",
+      note: "Apple Watch non può aprire l'app dell'iPhone, quindi la sua complicazione apre l'app dell'orologio.",
+    },
     widgets: {
       name: "Widget della schermata Home",
       body: "Tre widget: Oggi (la scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie), Questa settimana (giorni di allenamento, la tua serie e cosa la mantiene) e Recupero (quali muscoli sono pronti e quando lo saranno gli altri).",

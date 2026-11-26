@@ -6,6 +6,7 @@ import Toybox.Time;
 //! {"end" => true} when it ended. "k" is the set timer for holds, carries and cardio: its phases as [seconds from now
 //! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
 //! phone's never have to agree.
+(:glance, :background)
 class WorkoutState {
     //! A workout the phone stopped updating this long ago was forgotten (the phone ends those after 3 hours).
     const STALE_SEC = 10800;

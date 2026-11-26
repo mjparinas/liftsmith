@@ -18,4 +18,7 @@
     <string name="check_phone">Sprawdź telefon</string>
     <string name="open_failed">Otwórz Liftsmith na telefonie.</string>
     <string name="install_failed">Pobierz Liftsmith z Google Play na telefonie.</string>
+    <string name="tile_label">Dzisiejszy trening</string>
+    <string name="open_app">Otwórz</string>
+    <string name="no_today">Otwórz Liftsmith na telefonie, aby zobaczyć tu dzisiejszy plan.</string>
 </resources>

@@ -1102,4 +1102,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Les liens d'équipe fonctionnent maintenant même si l'athlète se connecte après les avoir ouverts, donc personne ne manque à la liste.",
   },
+  "watch-today": {
+    title: "La séance du jour sur votre cadran",
+    intro: "Votre montre affiche maintenant ce qui vous attend aujourd’hui sans rien ouvrir : la séance, sa durée et votre forme.",
+    points: [
+      "Sur Wear OS, ajoutez la tuile Séance du jour ou une complication. Démarrer sur le téléphone ouvre la séance sur votre téléphone.",
+      "Sur l’Apple Watch, ajoutez la complication Liftsmith. Un appui ouvre l’app de la montre avec le choix du jour.",
+      "Sur Garmin, l’aperçu Liftsmith affiche la même ligne une fois l’app ouverte sur la montre.",
+      "C’est le même choix et la même raison qu’Aujourd’hui sur votre téléphone, mis à jour quand votre programme change.",
+    ],
+    dyk: "Un programme d’hier ne s’affiche jamais comme celui du jour : après minuit, la montre attend le nouveau programme de votre téléphone.",
+  },
 };

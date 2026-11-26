@@ -626,6 +626,11 @@ export const pl: FeaturesText = {
       name: "Aplikacje na zegarki",
       body: "Trening na Wear OS i Apple Watch: seria albo odliczanie przerwy, tętno z zegarka, Zapisz serię i +30 s oraz wibracja na koniec przerwy.",
     },
+    "watch-today": {
+      name: "Dzisiejszy trening na zegarku",
+      body: "Kafelek i komplikacja tarczy na Wear OS, komplikacja na Apple Watch i podgląd na Garminie pokazują dzisiejszą propozycję, jej czas i twoją gotowość, np. „Mocniej · 45 min · Gotowość 82”. Na Wear OS Zacznij na telefonie otwiera ją na telefonie.",
+      note: "Apple Watch nie może otworzyć aplikacji na iPhonie, więc jego komplikacja otwiera aplikację na zegarku.",
+    },
     widgets: {
       name: "Widżety na ekranie głównym",
       body: "Trzy widżety: Dziś (decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię), Ten tydzień (dni z treningiem, twoja passa i co ją podtrzyma) oraz Regeneracja (które mięśnie są gotowe do treningu i kiedy będą pozostałe).",

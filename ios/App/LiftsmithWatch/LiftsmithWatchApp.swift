@@ -37,6 +37,22 @@ struct WorkoutView: View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             if let s = model.current {
                 running(s, now: context.date)
+            } else if let t = model.today, t.current(at: context.date), !t.active {
+                // Today's call from the phone (the complication's), so the lifter knows what's waiting.
+                ScrollView {
+                    VStack(spacing: 4) {
+                        Text(t.title).font(.headline).multilineTextAlignment(.center)
+                        if !t.ready.isEmpty {
+                            Text(t.ready).font(.footnote.bold()).foregroundStyle(Color.brand)
+                        }
+                        if !t.why.isEmpty {
+                            Text(t.why).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        }
+                        Text("Start one on your phone and it shows here.")
+                            .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 4)
+                    }
+                    .padding(.horizontal)
+                }
             } else {
                 VStack(spacing: 6) {
                     Text("No workout running").font(.headline).multilineTextAlignment(.center)

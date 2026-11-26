@@ -6,4 +6,5 @@
     <string id="Bpm">$1$ bpm</string>
     <string id="HintLog">START：セットを記録</string>
     <string id="HintAdd">DOWN：+30 秒</string>
+    <string id="TodayNone" scope="glance">スマートフォンでLiftsmithを開くと今日のプランが届きます。</string>
 </strings>

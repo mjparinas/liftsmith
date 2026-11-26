@@ -626,6 +626,11 @@ export const pt: FeaturesText = {
       name: "Apps para relógio",
       body: "O treino no Wear OS e no Apple Watch: a série ou a contagem do descanso, a frequência cardíaca do relógio, Registrar série e +30 s, e uma vibração quando o descanso acaba.",
     },
+    "watch-today": {
+      name: "O treino de hoje no seu relógio",
+      body: "Um bloco e uma complicação de mostrador no Wear OS, uma complicação no Apple Watch e um glance no Garmin mostram a indicação de hoje, quanto dura e como está sua prontidão, como “Forçar · 45 min · Prontidão 82”. No Wear OS, Começar no celular abre o treino no seu celular.",
+      note: "O Apple Watch não consegue abrir o app do iPhone, então a complicação abre o app do relógio.",
+    },
     widgets: {
       name: "Widgets na tela inicial",
       body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",
