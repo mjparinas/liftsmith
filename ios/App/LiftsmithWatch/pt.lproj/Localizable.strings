@@ -5,4 +5,9 @@
 "Heart rate %lld beats per minute" = "Frequência cardíaca de %lld batimentos por minuto";
 "Log set" = "Registrar série";
 "+30 s" = "+30 s";
+"Lighter" = "Mais leve";
+"Heavier" = "Mais pesado";
+"Fewer reps" = "Menos repetições";
+"More reps" = "Mais repetições";
+"Turn the crown to change" = "Gire a coroa para mudar";
 "Machine taken" = "Aparelho ocupado";

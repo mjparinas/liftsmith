@@ -116,4 +116,31 @@ public class GarminMessagesTest {
         assertFalse(GarminMessages.worthSending(m, GarminMessages.state(plank, NOW + 1000), 1000));
         assertEquals(java.util.Collections.emptyList(), GarminMessages.state(lifting(), NOW).get("k"));
     }
+
+    @Test
+    public void theLadderAndTheQuestionGoToTheWatch() throws Exception {
+        JSONObject s = lifting()
+            .put("adj", new JSONObject().put("key", "s1:2:0:2:").put("kg", new org.json.JSONArray("[97.5,100,102.5]")).put("w", new org.json.JSONArray("[\"97.5 kg\",\"100 kg\",\"102.5 kg\"]")).put("i", 1).put("reps", 5).put("rs", "reps"))
+            .put("ask", new JSONObject().put("ex", "back-squat").put("q", "How did Back squat feel?").put("o", new org.json.JSONArray("[\"Too easy\",\"About right\",\"Too hard\"]")));
+        Map<String, Object> m = GarminMessages.state(s, NOW);
+        assertEquals("s1:2:0:2:", m.get("ay"));
+        assertEquals(3, ((List<?>) m.get("ak")).size());
+        assertEquals("100 kg", ((List<?>) m.get("aw")).get(1));
+        assertEquals(5, m.get("ar"));
+        assertEquals("back-squat", m.get("qe"));
+        assertEquals(3, ((List<?>) m.get("qo")).size());
+    }
+
+    @Test
+    public void tapsCarryTheirFields() throws Exception {
+        Map<String, Object> d = new HashMap<>();
+        d.put("a", "log");
+        d.put("key", "k");
+        d.put("kg", 60.0f);
+        d.put("reps", 8);
+        WatchMessages.Tap t = GarminMessages.tap(Collections.<Object>singletonList(d));
+        assertEquals("log", t.action);
+        assertEquals(8, new JSONObject(t.data).getInt("reps"));
+        assertNull(GarminMessages.tap(Collections.<Object>singletonList(Collections.singletonMap("hr", 120))));
+    }
 }

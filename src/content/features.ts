@@ -1047,6 +1047,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "watch-adjust",
+        name: "Change and rate a set on the watch",
+        body: "Turn the crown or bezel, or press − and +, to change the weight and reps from your wrist, in the same steps as the phone: your plates, dumbbells or the machine's stack. After an exercise's last set the watch asks how it felt, and your answer sets the next weight.",
+        tier: "free",
+        where: "phones",
+        note: "Wear OS, Apple Watch and Garmin (UP and DOWN buttons).",
+        added: "2026-11-26",
+      },
+      {
         id: "machine-taken",
         name: "Machine taken",
         body: "Someone on the machine? One tap on your watch or in Change the plan swaps in the best lift for your gym that doesn't need it, with its weight and why.",

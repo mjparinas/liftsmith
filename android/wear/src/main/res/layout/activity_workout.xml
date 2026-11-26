@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- One column, centred, with room for a round screen's edge. Buttons are at least 52 dp tall (Wear's minimum is 48) and grow with the watch's font size. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -60,6 +63,110 @@
             android:textColor="@color/ink"
             android:textSize="28sp"
             android:textStyle="bold" />
+
+        <!-- Adjust the set (watch-apps.md "Adjust and rate a set"): − / + and the crown or bezel move the weight along
+             the phone's ladder and the reps; tap a number to pick which one the crown moves. -->
+        <LinearLayout
+            android:id="@+id/adjust"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/weightRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/weightDown"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:background="@drawable/button"
+                android:contentDescription="@string/lighter"
+                android:text="@string/minus"
+                android:textColor="@color/ink"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/weight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFeatureSettings="tnum"
+                android:gravity="center"
+                android:maxLines="2"
+                android:minHeight="48dp"
+                android:textColor="@color/ink"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/weightUp"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:background="@drawable/button"
+                android:contentDescription="@string/heavier"
+                android:text="@string/plus"
+                android:textColor="@color/ink"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/repsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/repsDown"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:background="@drawable/button"
+                android:contentDescription="@string/fewer_reps"
+                android:text="@string/minus"
+                android:textColor="@color/ink"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/reps"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:fontFeatureSettings="tnum"
+                android:gravity="center"
+                android:maxLines="2"
+                android:minHeight="48dp"
+                android:textColor="@color/ink"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/repsUp"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:background="@drawable/button"
+                android:contentDescription="@string/more_reps"
+                android:text="@string/plus"
+                android:textColor="@color/ink"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/sub"
@@ -128,6 +235,56 @@
             android:textColor="@color/dim"
             android:textSize="12sp"
             android:visibility="gone" />
+        <!-- After an exercise's last set: how did it feel, with the phone's three answers. -->
+        <LinearLayout
+            android:id="@+id/askBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/askQ"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/dim"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/ask0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/button"
+                android:textAllCaps="false"
+                android:textColor="@color/ink"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/ask1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/button"
+                android:textAllCaps="false"
+                android:textColor="@color/ink"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/ask2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/button"
+                android:textAllCaps="false"
+                android:textColor="@color/ink"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <!-- Start on phone, or Install on phone when the phone hasn't got Liftsmith (PhoneLink). -->
         <Button

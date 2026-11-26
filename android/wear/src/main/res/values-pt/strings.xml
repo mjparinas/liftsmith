@@ -19,4 +19,10 @@
     <string name="check_phone">Olhe o celular</string>
     <string name="open_failed">Abra o Liftsmith no celular.</string>
     <string name="install_failed">Baixe o Liftsmith no Google Play do celular.</string>
+    <string name="lighter">Mais leve</string>
+    <string name="heavier">Mais pesado</string>
+    <string name="fewer_reps">Menos repetições</string>
+    <string name="more_reps">Mais repetições</string>
+    <string name="weight_value">Peso %1$s, gire a coroa para mudar</string>
+    <string name="reps_value">%1$s, gire a coroa para mudar</string>
 </resources>

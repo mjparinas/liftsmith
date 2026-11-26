@@ -626,6 +626,11 @@ export const pl: FeaturesText = {
       name: "Aplikacje na zegarki",
       body: "Trening na Wear OS i Apple Watch: seria albo odliczanie przerwy, tętno z zegarka, Zapisz serię i +30 s oraz wibracja na koniec przerwy.",
     },
+    "watch-adjust": {
+      name: "Zmień i oceń serię na zegarku",
+      body: "Obróć koronkę lub pierścień albo naciśnij − i +, aby zmienić ciężar i powtórzenia z nadgarstka, tymi samymi krokami co w telefonie: twoje talerze, hantle albo stos ciężarów maszyny. Po ostatniej serii ćwiczenia zegarek pyta, jak poszło, a twoja odpowiedź ustala kolejny ciężar.",
+      note: "Wear OS, Apple Watch i Garmin (przyciski UP i DOWN).",
+    },
     "machine-taken": {
       name: "Maszyna zajęta",
       body: "Ktoś na maszynie? Jedno dotknięcie na zegarku lub w Zmień plan wstawia najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",

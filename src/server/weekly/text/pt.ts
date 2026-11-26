@@ -367,9 +367,9 @@ export const emails: Record<string, Words> = {
     points: [
       "Os apps para Wear OS e Apple Watch mostram a série ou a contagem do descanso.",
       "A frequência cardíaca vem do sensor do próprio relógio.",
-      "Registrar série e +30 s pelo pulso, com uma vibração quando o descanso acaba.",
+      "Registrar série e +30 s pelo pulso, com uma vibração quando o descanso acaba. Aparelho ocupado? Um toque coloca o melhor exercício para a sua academia, com a carga.",
+      "Mude o peso e as repetições com a coroa ou − e +, e diga como foi um exercício.",
       "Um app para relógios Garmin está chegando.",
-      "Aparelho ocupado? Um toque coloca o melhor exercício para a sua academia, com a carga.",
     ],
     dyk: "A tela de bloqueio também mostra a contagem do descanso, a próxima série e as anilhas dela.",
   },

@@ -564,6 +564,11 @@ export const de: FeaturesText = {
       name: "Uhren-Apps",
       body: "Das Training auf Wear OS und der Apple Watch: der Satz oder der Pausen-Countdown, der Puls der Uhr, Satz eintragen und +30 s, und ein Vibrieren, wenn die Pause endet.",
     },
+    "watch-adjust": {
+      name: "Satz auf der Uhr ändern und bewerten",
+      body: "Dreh die Krone oder die Lünette oder tippe auf − und +, um Gewicht und Wiederholungen am Handgelenk zu ändern, in denselben Schritten wie am Handy: deine Scheiben, Kurzhanteln oder der Steckgewichtsblock. Nach dem letzten Satz einer Übung fragt die Uhr, wie es sich angefühlt hat, und deine Antwort bestimmt das nächste Gewicht.",
+      note: "Wear OS, Apple Watch und Garmin (Tasten UP und DOWN).",
+    },
     "machine-taken": {
       name: "Gerät belegt",
       body: "Jemand am Gerät? Ein Tipp auf deiner Uhr oder in „Plan ändern“ setzt die beste Übung deines Studios ein, die es nicht braucht, mit Gewicht und Grund.",

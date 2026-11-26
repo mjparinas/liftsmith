@@ -7,6 +7,7 @@
     <string id="Bpm">$1$ bpm</string>
     <string id="HintLog">START: Log set</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="HintRate">MENU: Rate it</string>
     <string id="HintLogTaken">START: Log · UP: Taken</string>
     <string id="HintAddTaken">DOWN: +30 s · UP: Taken</string>
 </strings>

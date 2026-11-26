@@ -19,4 +19,10 @@
     <string name="check_phone">휴대폰을 확인하세요</string>
     <string name="open_failed">휴대폰에서 Liftsmith를 여세요.</string>
     <string name="install_failed">휴대폰의 Google Play에서 Liftsmith를 설치하세요.</string>
+    <string name="lighter">더 가볍게</string>
+    <string name="heavier">더 무겁게</string>
+    <string name="fewer_reps">횟수 줄이기</string>
+    <string name="more_reps">횟수 늘리기</string>
+    <string name="weight_value">무게 %1$s, 크라운을 돌려 변경</string>
+    <string name="reps_value">%1$s, 크라운을 돌려 변경</string>
 </resources>

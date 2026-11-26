@@ -109,8 +109,10 @@ describe("Log set on the notification with the app closed", () => {
   it("Android keeps the tap with its time and moves the notification on when no web app can hear it", () => {
     const service = java("WorkoutService.java");
     const tapped = service.slice(service.indexOf("private void tapped("));
-    expect(tapped).toMatch(/if \(WorkoutSessionPlugin\.isLive\(\)\) \{\s+sendBroadcast\([^;]*putExtra\("at", at\)\);\s+return;/);
-    expect(tapped).toContain("WorkoutTaps.add(this, action, at);");
+    expect(tapped).toMatch(
+      /if \(WorkoutSessionPlugin\.isLive\(\)\) \{\s+sendBroadcast\([^;]*putExtra\(EXTRA_DATA, data\)\.putExtra\("at", at\)\s*\);\s+return;/,
+    );
+    expect(tapped).toContain("WorkoutTaps.add(this, action, data, at);");
     expect(tapped).toContain("ahead.optJSONObject(aheadAt)");
     expect(tapped).toContain('putExtra("restUntil", rest > 0 ? at + rest * 1000L : 0L)');
     // A fresh update from the app starts the look-ahead again.
@@ -122,8 +124,8 @@ describe("Log set on the notification with the app closed", () => {
     expect(plugin).toMatch(/WorkoutTaps\.drain\(getContext\(\)\)[\s\S]*?notifyListeners\("action", data, true\);[\s\S]*?current = this;/);
     expect(plugin).toContain("if (current == this) current = null;");
     expect(plugin).toContain('i.putExtra("ahead"');
-    expect(java("WatchListenerService.java")).toContain("WorkoutService.tap(this, action);");
-    expect(java("GarminLink.java")).toContain("WorkoutService.tap(context, action);");
+    expect(java("WatchListenerService.java")).toContain("WorkoutService.tap(this, tap.action, tap.data);");
+    expect(java("GarminLink.java")).toContain("WorkoutService.tap(context, tap.action, tap.data);");
   });
 
   it("iOS catches the rest-over alert's buttons from launch and hands them over when the app comes back", () => {

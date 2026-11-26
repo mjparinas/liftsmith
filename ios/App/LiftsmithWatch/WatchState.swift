@@ -29,6 +29,60 @@ struct WatchState: Decodable, Equatable {
     var why = ""
     /// The set timer for holds, carries and cardio, phase by phase (src/lib/sessionNotify.ts TimerSegment).
     var timer: [Phase] = []
+    /// What the crown and − / + can change on this set (watchAdjust.ts watchAdj).
+    var adj: Adj?
+    /// "How did it feel?" after an exercise's last set (watchAdjust.ts watchAsk).
+    var ask: Ask?
+
+    /// The set's weight ladder (kg, lightest first, empty for a bodyweight move) with the words for each, where the
+    /// set's own weight is, and the reps. `key` names the set; the phone ignores values sent for another one.
+    struct Adj: Decodable, Equatable {
+        static let repsMax = 100
+        var key: String
+        var kg: [Double]
+        var w: [String]
+        var i: Int
+        var reps: Int
+        var rs: String
+
+        var hasWeight: Bool { !kg.isEmpty }
+
+        /// The ladder's step closest to `want` kg, so a choice survives the phone sending the ladder again around it.
+        func nearest(_ want: Double) -> Int {
+            var best = i
+            for k in kg.indices where abs(kg[k] - want) < abs(kg[best] - want) { best = k }
+            return best
+        }
+
+        static func clampReps(_ r: Int) -> Int { min(repsMax, max(1, r)) }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            key = try c.decode(String.self, forKey: .key)
+            let kg = (try? c.decode([Double].self, forKey: .kg)) ?? []
+            let w = (try? c.decode([String].self, forKey: .w)) ?? []
+            let n = kg.count == w.count ? min(kg.count, 40) : 0
+            self.kg = Array(kg.prefix(n))
+            self.w = Array(w.prefix(n))
+            i = (try? c.decode(Int.self, forKey: .i)) ?? 0
+            reps = Adj.clampReps((try? c.decode(Int.self, forKey: .reps)) ?? 0)
+            rs = (try? c.decode(String.self, forKey: .rs)) ?? ""
+            if key.isEmpty || (n > 0 && !(0..<n).contains(i)) {
+                throw DecodingError.dataCorruptedError(forKey: .i, in: c, debugDescription: "Not a ladder")
+            }
+            if n == 0 { i = 0 }
+        }
+
+        private enum CodingKeys: String, CodingKey { case key, kg, w, i, reps, rs }
+    }
+
+    /// The question, its three answers (`o`) and the rating each sends (`v`: 1 too easy, 0 about right, -1 too hard).
+    struct Ask: Decodable, Equatable {
+        var ex: String
+        var q: String
+        var o: [String]
+        var v: [Int]
+    }
 
     /// One phase of the set timer: counts down to `to` ("Time left", "Switch sides"…), or up from `from` with no end.
     struct Phase: Decodable, Equatable {
@@ -70,10 +124,13 @@ struct WatchState: Decodable, Equatable {
         why = (try? c.decode(String.self, forKey: .why)) ?? ""
         let phases = (try? c.decode([Phase].self, forKey: .timer)) ?? []
         timer = Array(phases.filter { p in p.from > 0 && (p.to.map { to in to > p.from } ?? true) }.prefix(8))
+        adj = try? c.decode(Adj.self, forKey: .adj)
+        let ask = try? c.decode(Ask.self, forKey: .ask)
+        self.ask = ask.flatMap { $0.o.count == 3 && $0.v.count == 3 && !$0.ex.isEmpty ? $0 : nil }
     }
 
     private enum CodingKeys: String, CodingKey {
-        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, taken, why, timer
+        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, taken, why, timer, adj, ask
     }
 
     /// The set timer's phase at `now` (started, not ended); never while resting. Same rule as the phone's.

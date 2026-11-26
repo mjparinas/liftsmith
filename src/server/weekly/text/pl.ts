@@ -365,9 +365,9 @@ export const emails: Record<string, Words> = {
     points: [
       "Aplikacje na Wear OS i Apple Watch pokazują serię lub odliczanie przerwy.",
       "Tętno pochodzi z czujnika samego zegarka.",
-      "Zapisz serię i +30 s prosto z nadgarstka, z wibracją na koniec przerwy.",
+      "Zapisz serię i +30 s prosto z nadgarstka, z wibracją na koniec przerwy. Maszyna zajęta? Jedno dotknięcie wstawia najlepsze ćwiczenie dla twojej siłowni, z ciężarem.",
+      "Zmieniaj ciężar i powtórzenia koronką albo − i +, i powiedz, jak poszło ćwiczenie.",
       "Aplikacja na zegarki Garmin już wkrótce.",
-      "Maszyna zajęta? Jedno dotknięcie wstawia najlepsze ćwiczenie dla twojej siłowni, z ciężarem.",
     ],
     dyk: "Ekran blokady też pokazuje odliczanie przerwy, następną serię i jej talerze.",
   },

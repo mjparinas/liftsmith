@@ -560,6 +560,11 @@ export const es: FeaturesText = {
       name: "Apps para reloj",
       body: "El entrenamiento en Wear OS y Apple Watch: la serie o la cuenta atrás del descanso, el pulso del reloj, Registrar serie y +30 s, y una vibración al terminar el descanso.",
     },
+    "watch-adjust": {
+      name: "Cambia y valora una serie en el reloj",
+      body: "Gira la corona o el bisel, o pulsa − y +, para cambiar el peso y las repeticiones desde la muñeca, con los mismos saltos que en el teléfono: tus discos, mancuernas o la pila de la máquina. Tras la última serie de un ejercicio, el reloj pregunta qué tal fue y tu respuesta fija el siguiente peso.",
+      note: "Wear OS, Apple Watch y Garmin (botones UP y DOWN).",
+    },
     "machine-taken": {
       name: "Máquina ocupada",
       body: "¿Alguien en la máquina? Un toque en tu reloj o en Cambiar el plan pone el mejor ejercicio de tu gimnasio que no la necesita, con su peso y por qué.",

@@ -30,7 +30,7 @@ export const BLOG_MACHINE_TAKEN: Article[] = [
       { cta: "watch" },
       { h2: "On every watch, and on the phone" },
       {
-        p: "Machine taken is on Wear OS and Apple Watch as a button under Log set, and on Garmin watches as the UP button (the hint at the bottom says so). On the phone and the web, **Change the plan** during a workout leads with the same pick as a single **Swap to** button, with its weight and why, and the other options under it.",
+        p: "Machine taken is on Wear OS and Apple Watch as a button under Log set, and on Garmin watches as the UP button during rest (the hint at the bottom says so). On the phone and the web, **Change the plan** during a workout leads with the same pick as a single **Swap to** button, with its weight and why, and the other options under it.",
       },
       {
         tip: "Phone in your bag with the app asleep? The tap still works: the phone worked the swap out ahead of time, so the watch and lock screen move to the new lift at once, and the app makes the same swap the next time it opens.",

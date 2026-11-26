@@ -43,6 +43,100 @@ final class WorkoutState {
     final String why;
     /** The set timer for holds, carries and cardio, phase by phase in wall-clock time (sessionNotify.ts TimerSegment). */
     final List<Phase> timer;
+    /** What the crown and − / + can change on this set, or null (watchAdjust.ts watchAdj). */
+    final Adj adj;
+    /** "How did it feel?" after an exercise's last set, or null (watchAdjust.ts watchAsk). */
+    final Ask ask;
+
+    /**
+     * The set's weight and reps as the phone offers them: a ladder of weights around the set's own (lightest first,
+     * empty for a bodyweight move) with the words for each, where the set's own weight is, and the reps.
+     */
+    static final class Adj {
+
+        /** The most reps the watch sends, like the phone's REPS_MAX. */
+        static final int REPS_MAX = 100;
+        final String key;
+        final double[] kg;
+        final String[] words;
+        final int i;
+        final int reps;
+        final String repsWord;
+
+        Adj(String key, double[] kg, String[] words, int i, int reps, String repsWord) {
+            this.key = key;
+            this.kg = kg;
+            this.words = words;
+            this.i = i;
+            this.reps = reps;
+            this.repsWord = repsWord;
+        }
+
+        /** The ladder's step closest to `want` kg, so a choice survives the phone sending the ladder again around it. */
+        int nearest(double want) {
+            int best = i;
+            for (int k = 0; k < kg.length; k++) if (Math.abs(kg[k] - want) < Math.abs(kg[best] - want)) best = k;
+            return best;
+        }
+
+        boolean hasWeight() {
+            return kg.length > 0;
+        }
+
+        static int clampReps(int r) {
+            return Math.max(1, Math.min(REPS_MAX, r));
+        }
+
+        static Adj parse(JSONObject o) {
+            if (o == null) return null;
+            JSONArray kg = o.optJSONArray("kg");
+            JSONArray w = o.optJSONArray("w");
+            int n = kg == null || w == null || kg.length() != w.length() ? 0 : Math.min(kg.length(), 40);
+            double[] k = new double[n];
+            String[] words = new String[n];
+            for (int x = 0; x < n; x++) {
+                k[x] = kg.optDouble(x, 0);
+                words[x] = w.optString(x, "");
+            }
+            int i = o.optInt("i", 0);
+            if (n > 0 && (i < 0 || i >= n)) return null;
+            String key = o.optString("key", "");
+            int reps = o.optInt("reps", 0);
+            if (key.isEmpty() || reps < 1) return null;
+            return new Adj(key, k, words, n == 0 ? 0 : i, clampReps(reps), o.optString("rs", ""));
+        }
+    }
+
+    /** The question, its three answers and the rating each sends (1 too easy, 0 about right, -1 too hard). */
+    static final class Ask {
+
+        final String ex;
+        final String question;
+        final String[] answers;
+        final int[] values;
+
+        Ask(String ex, String question, String[] answers, int[] values) {
+            this.ex = ex;
+            this.question = question;
+            this.answers = answers;
+            this.values = values;
+        }
+
+        static Ask parse(JSONObject o) {
+            if (o == null) return null;
+            JSONArray a = o.optJSONArray("o");
+            JSONArray v = o.optJSONArray("v");
+            if (a == null || v == null || a.length() != 3 || v.length() != 3) return null;
+            String ex = o.optString("ex", "");
+            if (ex.isEmpty()) return null;
+            return new Ask(
+                ex,
+                o.optString("q", ""),
+                new String[] { a.optString(0, ""), a.optString(1, ""), a.optString(2, "") },
+                new int[] { v.optInt(0, 0), v.optInt(1, 0), v.optInt(2, 0) }
+            );
+        }
+    }
 
     /** One phase of the set timer: counts down to `to`, or up from `from` when `to` is 0. */
     static final class Phase {
@@ -81,6 +175,8 @@ final class WorkoutState {
         taken = o.optString("taken", "");
         why = o.optString("why", "");
         timer = phases(o.optJSONArray("timer"));
+        adj = Adj.parse(o.optJSONObject("adj"));
+        ask = Ask.parse(o.optJSONObject("ask"));
     }
 
     private static List<Phase> phases(JSONArray a) {

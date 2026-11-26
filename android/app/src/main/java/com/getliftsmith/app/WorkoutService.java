@@ -36,6 +36,8 @@ public class WorkoutService extends Service {
     static final String ACTION_UPDATE = "com.getliftsmith.app.UPDATE";
     static final String BROADCAST_ACTION = "com.getliftsmith.app.WORKOUT_ACTION";
     static final String EXTRA_ACTION = "action";
+    /** What a watch sent with its tap, as JSON (WatchMessages.Tap), or none. */
+    static final String EXTRA_DATA = "data";
     // "-v2": the first channel was IMPORTANCE_LOW, which Android files under "Silent" and hides on the lock screen
     // unless the user shows silent notifications there. An app can't raise a channel's importance once it exists,
     // so the live notification moved to a new channel and the old one is deleted.
@@ -53,10 +55,20 @@ public class WorkoutService extends Service {
      * the app closed too. Without a workout running there's nothing to log, and the web app ignores it anyway.
      */
     static void tap(Context context, String action) {
+        tap(context, action, null);
+    }
+
+    /**
+     * The same with what the watch sent along (WatchMessages.Tap): the weight and reps it settled on, or how the
+     * exercise felt. `data` rides with the tap to the web app, and is kept with it while the app is closed.
+     */
+    static void tap(Context context, String action, String data) {
         if (running) {
-            context.startService(new Intent(context, WorkoutService.class).putExtra(EXTRA_ACTION, action));
+            context.startService(new Intent(context, WorkoutService.class).putExtra(EXTRA_ACTION, action).putExtra(EXTRA_DATA, data));
         } else {
-            context.sendBroadcast(new Intent(BROADCAST_ACTION).setPackage(context.getPackageName()).putExtra(EXTRA_ACTION, action));
+            context.sendBroadcast(
+                new Intent(BROADCAST_ACTION).setPackage(context.getPackageName()).putExtra(EXTRA_ACTION, action).putExtra(EXTRA_DATA, data)
+            );
         }
     }
 
@@ -69,6 +81,8 @@ public class WorkoutService extends Service {
     /** The notification after each of the next Log sets, from the app (sessionAhead.ts), and how many are used. */
     private JSONArray ahead = new JSONArray();
     private int aheadAt = 0;
+    /** The weight ladder the watches last got from a step ahead, kept through +30 s. */
+    private JSONObject lastAdj = null;
     /** The last planned set has been logged from the notification with the app closed. */
     private boolean ended = false;
     /** The set timer for holds, carries and cardio (TimerPhases), counted here so it runs with the app asleep. */
@@ -98,12 +112,13 @@ public class WorkoutService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || !ACTION_UPDATE.equals(intent.getAction())) {
             String action = intent == null ? null : intent.getStringExtra(EXTRA_ACTION);
-            if (action != null) tapped(action, System.currentTimeMillis());
+            if (action != null) tapped(action, intent.getStringExtra(EXTRA_DATA), System.currentTimeMillis());
             return START_NOT_STICKY;
         }
         // A fresh update from the app: the sets ahead start again from the set it's on.
         ahead = WorkoutTaps.parse(intent.getStringExtra("ahead"));
         aheadAt = 0;
+        lastAdj = parseObject(intent.getStringExtra("adj"));
         ended = false;
         show(intent);
         return START_NOT_STICKY;
@@ -115,23 +130,27 @@ public class WorkoutService extends Service {
      * for the app to log when it opens, and the notification moves on by itself: to the next set the app worked out
      * ahead of time (sessionAhead.ts), with its rest counting down and the rest-over alert at the end.
      */
-    private void tapped(String action, long at) {
+    private void tapped(String action, String data, long at) {
         if (WorkoutSessionPlugin.isLive()) {
-            sendBroadcast(new Intent(BROADCAST_ACTION).setPackage(getPackageName()).putExtra(EXTRA_ACTION, action).putExtra("at", at));
+            sendBroadcast(
+                new Intent(BROADCAST_ACTION).setPackage(getPackageName()).putExtra(EXTRA_ACTION, action).putExtra(EXTRA_DATA, data).putExtra("at", at)
+            );
             return;
         }
         if ("taken".equals(action)) {
             takenTapped(at);
             return;
         }
-        if (last == null) {
-            WorkoutTaps.add(this, action, at);
+        // A watch's weight and reps on their own only matter while the app is open: Log set carries them anyway.
+        if ("adjust".equals(action)) return;
+        if (last == null || "rate".equals(action)) {
+            WorkoutTaps.add(this, action, data, at);
             return;
         }
         if ("log".equals(action)) {
             // Every planned set is logged: further taps would log nothing, so they aren't kept either.
             if (ended) return;
-            WorkoutTaps.add(this, action, at);
+            WorkoutTaps.add(this, action, data, at);
             JSONObject step = ahead.optJSONObject(aheadAt);
             if (step == null) return;
             aheadAt++;
@@ -158,7 +177,8 @@ public class WorkoutService extends Service {
                 // The steps ahead don't know which of them a Machine taken swap stands in for.
                 .putExtra("why", "");
             show(n);
-            watches(n);
+            // The step's weight ladder, so the watch can change that set too (watchAdjust.ts).
+            watches(n, step.optJSONObject("adj"));
         } else if ("add30".equals(action)) {
             long restUntil = last.getLongExtra("restUntil", 0L);
             // Like the app's +30 s: only while resting.
@@ -167,7 +187,7 @@ public class WorkoutService extends Service {
             long total = restFrom > 0 ? (restUntil - restFrom + 999) / 1000 : 0;
             Intent n = new Intent(last).putExtra("restUntil", restUntil + 30_000L).putExtra("restTotal", total + 30);
             show(n);
-            watches(n);
+            watches(n, lastAdj);
         }
     }
 
@@ -197,13 +217,24 @@ public class WorkoutService extends Service {
             .putExtra("timer", "[]")
             .putExtra("timerDone", false);
         show(n);
-        watches(n);
+        watches(n, step.optJSONObject("adj"));
     }
 
     /** The watch apps follow the notification while the app is closed (the app sends them its own updates otherwise). */
-    private void watches(Intent n) {
+    private static JSONObject parseObject(String json) {
+        if (json == null || json.isEmpty()) return null;
+        try {
+            return new JSONObject(json);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    private void watches(Intent n, JSONObject adj) {
+        lastAdj = adj;
         JSONObject w = new JSONObject();
         try {
+            if (adj != null) w.put("adj", adj);
             w.put("title", n.getStringExtra("title"));
             w.put("setLabel", n.getStringExtra("setLabel"));
             w.put("next", n.getStringExtra("next"));

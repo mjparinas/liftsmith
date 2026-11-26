@@ -565,6 +565,11 @@ export const fr: FeaturesText = {
       name: "Applis pour montres",
       body: "La séance sur Wear OS et Apple Watch : la série ou le décompte du repos, le pouls de la montre, Valider la série et +30 s, et une vibration à la fin du repos.",
     },
+    "watch-adjust": {
+      name: "Modifier et noter une série sur la montre",
+      body: "Tournez la couronne ou la lunette, ou appuyez sur − et +, pour changer la charge et les répétitions depuis le poignet, par les mêmes paliers que sur le téléphone : vos disques, vos haltères ou la pile de la machine. Après la dernière série d’un exercice, la montre demande comment c’était, et votre réponse fixe la charge suivante.",
+      note: "Wear OS, Apple Watch et Garmin (boutons UP et DOWN).",
+    },
     "machine-taken": {
       name: "Machine occupée",
       body: "Quelqu'un sur la machine ? Une touche sur ta montre ou dans Modifier le plan met le meilleur exercice de ta salle qui n'en a pas besoin, avec sa charge et pourquoi.",
