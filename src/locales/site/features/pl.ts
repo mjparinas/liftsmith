@@ -788,6 +788,11 @@ export const pl: FeaturesText = {
       body: "Zacznij kolejną serię, a zegarek sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
       note: "Wear OS i Apple Watch, z włączonym liczeniem powtórzeń zegarkiem.",
     },
+    "lab-watch-speed": {
+      name: "Prędkość sztangi z nadgarstka",
+      body: "Zegarek mierzy, jak szybko podnosisz każde powtórzenie, i wibruje, gdy seria zwolniła na tyle, że można ją zakończyć. Prędkości z rozgrzewki dopasowują pierwszy ciężar roboczy, bez kamery.",
+      note: "Wear OS i Apple Watch, przy włączonym liczeniu powtórzeń zegarkiem.",
+    },
     "lab-voice": {
       name: "Głosowy zapis serii",
       body: "Powiedz „100 na 8” albo „za lekko”, żeby zapisać serię. Rozpoznawane na urządzeniu; żaden dźwięk go nie opuszcza.",

@@ -528,6 +528,7 @@ export const emails: Record<string, Words> = {
       "Contrôle technique : squats au-dessus de la parallèle, répétitions écourtées et inclinaison d'un côté.",
       "Relecture de la trajectoire : une répétition avec le trajet de la barre dessiné et une consigne.",
       "Le maximum du jour à partir de l'échauffement : un ajustement de votre première charge de travail.",
+      "Vitesse au poignet : pas de caméra ? Ta montre mesure la vitesse de chaque répétition, vibre quand il est temps d'arrêter et nourrit le max du jour.",
     ],
     dyk: "Une expérience qui en demande une autre n'apparaît que lorsque celle-ci est activée.",
   },

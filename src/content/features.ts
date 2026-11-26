@@ -1363,6 +1363,16 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-26",
       },
       {
+        id: "lab-watch-speed",
+        name: "Wrist bar speed",
+        body: "Your watch measures how fast you lift each rep and buzzes when the set has slowed enough to end. Warm-up speeds tune your first working weight, no camera needed.",
+        tier: "lab",
+        where: "phones",
+        lab: "labWatchSpeed",
+        note: "Wear OS and Apple Watch, with watch rep counting on.",
+        added: "2026-11-26",
+      },
+      {
         id: "lab-voice",
         name: "Voice set logging",
         body: 'Say "100 for 8" or "too easy" to log a set. Recognized on your device; no audio leaves it.',

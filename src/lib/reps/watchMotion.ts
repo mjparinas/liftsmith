@@ -1,6 +1,6 @@
 import type { Pattern } from "../types";
 import { imuProfile, ImuRepCounter } from "./imu";
-import type { MotionProfile } from "./types";
+import type { MotionProfile, SetSummary } from "./types";
 
 // Watch rep counting (Labs, `labWatchReps`; docs/decisions/watch-apps.md). While a set is on, the phone asks the
 // watch app for its motion (`motion` in the workout state); the watch streams its fused vertical acceleration and
@@ -45,6 +45,7 @@ export class WatchRepCount {
   private counter: ImuRepCounter;
   private base = 0;
   private lastT = -Infinity;
+  private done: SetSummary | undefined;
 
   constructor(private readonly profile: MotionProfile) {
     this.counter = new ImuRepCounter(profile);
@@ -59,7 +60,9 @@ export class WatchRepCount {
       this.counter.pushFused(x.t, x.up, x.rot);
       // A long pause ends the counter's set by itself: keep its reps and carry on, like phone motion does.
       if (this.counter.tracker.over) {
-        this.base += this.counter.summary().full;
+        const sum = this.counter.summary();
+        this.base += sum.full;
+        if (sum.full > 0) this.done = sum;
         this.counter = new ImuRepCounter(this.profile);
       }
     }
@@ -68,5 +71,15 @@ export class WatchRepCount {
 
   get reps(): number {
     return this.base + this.counter.summary().full;
+  }
+
+  /**
+   * The reps being counted now, with each one's lifting speed in m/s (the motion counter measures height, so the
+   * tracker's speeds are metres a second), or the last stretch that had full reps once a pause ended it. Wrist bar
+   * speed (Labs, `labWatchSpeed`) reads it like the camera's summary. Undefined until a full rep is in.
+   */
+  summary(): SetSummary | undefined {
+    const now = this.counter.summary();
+    return now.full > 0 ? now : this.done;
   }
 }
