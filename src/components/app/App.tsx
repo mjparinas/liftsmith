@@ -102,6 +102,7 @@ import { TrainingSettings } from "./TrainingSettings";
 import { CountDot, TodaySkeleton } from "./ui";
 import { UpdateToast } from "./UpdateToast";
 import { useUnlocked } from "./useUnlocked";
+import { useWatchCarry, useWatchWorkouts } from "./WatchCarry";
 import { WhatsNewNote } from "./WhatsNew";
 import { Workout } from "./Workout";
 import { runWatchTap } from "./workout/watchAdjust";
@@ -160,6 +161,9 @@ export function App() {
   useLang();
   // The home-screen widget (widget.ts): today's call and why, the weekly goal and the top coach's note.
   useHomeWidget();
+  // Phone-free watch workouts (WatchCarry.ts): today's plan on the watches, and the workouts they ran on their own.
+  useWatchCarry();
+  useWatchWorkouts();
   const language = profile.language;
   useEffect(() => {
     setLanguage(language);

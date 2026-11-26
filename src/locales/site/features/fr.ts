@@ -580,6 +580,11 @@ export const fr: FeaturesText = {
       body: "Quelqu'un sur la machine ? Une touche sur ta montre ou dans Modifier le plan met le meilleur exercice de ta salle qui n'en a pas besoin, avec sa charge et pourquoi.",
       note: "Wear OS, Apple Watch et Garmin (le bouton UP), et Modifier le plan sur le téléphone et le web.",
     },
+    "watch-alone": {
+      name: "Séances sur la montre, sans téléphone",
+      body: "Le plan du jour t'accompagne sur ta montre. Touche Démarrer sur la montre, note chaque série avec sa charge et ses répétitions au poignet, et la séance est enregistrée, records compris, quand ton téléphone est de nouveau près.",
+      note: "Wear OS, Apple Watch et Garmin.",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",
@@ -725,6 +730,11 @@ export const fr: FeaturesText = {
     "lab-watch-auto": {
       name: "Séries mains libres avec la montre",
       body: "Lance ta série suivante et ta montre arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
+      note: "Wear OS et Apple Watch, avec le comptage des répétitions par la montre activé.",
+    },
+    "lab-watch-speed": {
+      name: "Vitesse au poignet",
+      body: "Ta montre mesure la vitesse de chaque répétition et vibre quand la série a assez ralenti pour l'arrêter. Les vitesses de l'échauffement ajustent ta première charge de travail, sans caméra.",
       note: "Wear OS et Apple Watch, avec le comptage des répétitions par la montre activé.",
     },
     "lab-voice": {

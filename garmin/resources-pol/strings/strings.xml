@@ -10,4 +10,9 @@
     <string id="HintRate">MENU: Oceń</string>
     <string id="HintLogTaken">START: Zapisz · UP: Zajęta</string>
     <string id="HintAddTaken">DOWN: +30 s · UP: Zajęta</string>
+    <string id="HintStartWatch">START: zacznij na zegarku</string>
+    <string id="HintFinish">START: zakończ</string>
+    <string id="OnWatch">Bez telefonu · BACK: zakończ</string>
+    <string id="FinishAsk">Zakończyć i zapisać dla telefonu?</string>
+    <string id="SavedForPhone">Zapisano na zegarku. Trafi do telefonu, gdy znów będą razem.</string>
 </strings>

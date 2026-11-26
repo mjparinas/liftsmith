@@ -641,6 +641,11 @@ export const pl: FeaturesText = {
       body: "Ktoś na maszynie? Jedno dotknięcie na zegarku lub w Zmień plan wstawia najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
       note: "Wear OS, Apple Watch i Garmin (przycisk UP), a na telefonie i w sieci Zmień plan.",
     },
+    "watch-alone": {
+      name: "Trening na zegarku, bez telefonu",
+      body: "Dzisiejszy plan jest też na zegarku. Dotknij Zacznij na zegarku, zapisuj każdą serię z ciężarem i powtórzeniami na nadgarstku, a trening zapisze się razem z rekordami, gdy telefon znów będzie blisko.",
+      note: "Wear OS, Apple Watch i Garmin.",
+    },
     widgets: {
       name: "Widżety na ekranie głównym",
       body: "Trzy widżety: Dziś (decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię), Ten tydzień (dni z treningiem, twoja passa i co ją podtrzyma) oraz Regeneracja (które mięśnie są gotowe do treningu i kiedy będą pozostałe).",
@@ -787,6 +792,11 @@ export const pl: FeaturesText = {
       name: "Serie bez rąk z zegarkiem",
       body: "Zacznij kolejną serię, a zegarek sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
       note: "Wear OS i Apple Watch, z włączonym liczeniem powtórzeń zegarkiem.",
+    },
+    "lab-watch-speed": {
+      name: "Prędkość sztangi z nadgarstka",
+      body: "Zegarek mierzy, jak szybko podnosisz każde powtórzenie, i wibruje, gdy seria zwolniła na tyle, że można ją zakończyć. Prędkości z rozgrzewki dopasowują pierwszy ciężar roboczy, bez kamery.",
+      note: "Wear OS i Apple Watch, przy włączonym liczeniu powtórzeń zegarkiem.",
     },
     "lab-voice": {
       name: "Głosowy zapis serii",

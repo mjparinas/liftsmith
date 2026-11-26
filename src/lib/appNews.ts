@@ -46,8 +46,18 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.29.0",
+    version: "0.31.0",
     day: "2026-11-27",
+    headline:
+      "Workouts on your watch with your phone away, and bar speed from your wrist: your watch measures each rep, buzzes when it's time to end the set and tunes your first weight",
+    changes: [
+      { id: "watchAlone", kind: "new", icon: "watch", gate: "native" },
+      { id: "watchSpeed", kind: "new", icon: "watch", unlock: "more", gate: "native" },
+    ],
+  },
+  {
+    version: "0.29.0",
+    day: "2026-11-26",
     headline:
       "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, a program can run in order, 13 new stretches, changing, rating and hands-free sets on the watch, today's workout on your watch face, and Machine taken in one tap",
     changes: [

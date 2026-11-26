@@ -527,6 +527,7 @@ export const emails: Record<string, Words> = {
       "Controllo della tecnica: squat sopra il parallelo, ripetizioni accorciate e inclinazione da un lato.",
       "Replay della traiettoria: una ripetizione con il percorso del bilanciere disegnato e un'indicazione.",
       "Il massimale di oggi dal riscaldamento: una spinta al tuo primo peso di lavoro.",
+      "Velocità dal polso: niente fotocamera? L'orologio misura la velocità di ogni ripetizione, vibra quando è ora di fermarsi e alimenta il massimale di oggi.",
     ],
     dyk: "Un esperimento che ne richiede un altro compare solo quando quello è attivo.",
   },
@@ -1109,5 +1110,16 @@ export const emails: Record<string, Words> = {
       "È la stessa scelta con lo stesso motivo di Oggi sul telefono, e si aggiorna quando cambia il piano.",
     ],
     dyk: "Un piano di ieri non appare mai come quello di oggi: dopo mezzanotte l'orologio aspetta il nuovo piano dal telefono.",
+  },
+  "watch-alone": {
+    title: "Lascia il telefono nell'armadietto",
+    intro: "Il piano di oggi ora viaggia anche sul tuo orologio: allenati con il solo polso e salva tutto dopo.",
+    points: [
+      "Quando sul telefono non c'è un allenamento in corso, l'orologio mostra quello di oggi con Inizia sull'orologio (START su Garmin).",
+      "Registra serie, +30 s, la vibrazione a fine recupero e il cambio di peso e ripetizioni funzionano al polso, con il battito dell'orologio.",
+      "Tocca Fine quando hai finito. L'orologio tiene l'allenamento finché il telefono non è di nuovo vicino, con l'app aperta o no.",
+      "Il telefono lo salva come se l'avessi registrato lì: ogni serie, i tuoi record, i prossimi pesi e Salute.",
+    ],
+    dyk: "La pianificazione resta sul telefono, quindi Macchina occupata e Cambia il piano aspettano che torni.",
   },
 };

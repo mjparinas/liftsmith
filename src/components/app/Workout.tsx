@@ -17,7 +17,7 @@ import { alternatives } from "@/lib/generator";
 import { msLeft, nextCount, type Counted } from "@/lib/handsFree";
 import { hrSupported } from "@/lib/heartRate";
 import { hrLink } from "@/lib/hrLink";
-import { currentTag, t } from "@/lib/i18n";
+import { currentTag, num, t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
@@ -28,7 +28,9 @@ import { pickWeights } from "@/lib/pickWeights";
 import { loadBar } from "@/lib/plates";
 import { bodyMode } from "@/lib/pregnancy";
 import { target, TIMED } from "@/lib/progression";
+import { barSpeed, type BarSpeedReadout } from "@/lib/reps/barSpeed";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
+import type { SetSummary } from "@/lib/reps/types";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import {
@@ -327,10 +329,31 @@ export function Workout() {
     !whyOpen &&
     !planOpen;
   const autoLeft = handsFree ? msLeft(counted, countKey, planReps, now) : null;
-  // The watch buzzes once each time this changes: the set started by itself, or logged itself.
+  // The watch buzzes once each time this changes: the set started by itself, logged itself, or slowed enough to end.
   const [cue, setCue] = useState<string | undefined>(undefined);
   const carry = useRef<Carry | null>(null);
   const cues = useRef(0);
+  // Today's max from warm-ups (its lab, or wrist bar speed's): each warm-up's fastest rep while the camera or the
+  // watch counts it, kept by its place in the ramp, and each working set's last full rep, which teaches the lifter's
+  // own threshold. One handler for both counters, so the camera and the wrist feed the same numbers.
+  const watchSpeedOn = labOn("labWatchSpeed");
+  const speedMaxOn = labOn("labSpeedMax") || watchSpeedOn;
+  const warmSpeed = useRef<{ key: string; index: number; kg: number; speed: number } | null>(null);
+  const noteSpeeds = (sum: SetSummary) => {
+    const a = useApp.getState().active;
+    if (!a || !ex) return;
+    if (!warmingUp(a)) {
+      const last = lastFullMetres(sum);
+      if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter, meanFullSpeed(sum.reps));
+      return;
+    }
+    const v = fastestMetres(sum);
+    if (v === undefined) return;
+    warmSpeed.current = { key: `${a.sessionId}:${ex.id}`, index: a.warm ?? 0, kg: a.weight, speed: v };
+  };
+  // Wrist bar speed (Labs, `labWatchSpeed`): the watch's last rep speed for this set, and one buzz once it says stop.
+  const [wristSpeed, setWristSpeed] = useState<{ key: string; read: BarSpeedReadout } | null>(null);
+  const slowBuzzed = useRef("");
   const watchReps = useWatchReps({
     on: watchCountOn,
     exerciseId: ex?.id,
@@ -343,7 +366,20 @@ export function Workout() {
       if (a && ex) s.adjust(a.weight, countedReps(ex.id, n));
       noteCount(n);
     },
+    onSummary: watchSpeedOn
+      ? (sum) => {
+          noteSpeeds(sum);
+          const read = barSpeed(sum);
+          if (!read?.metres) return;
+          setWristSpeed({ key: countKey, read });
+          if (read.advice === "stop" && slowBuzzed.current !== countKey) {
+            slowBuzzed.current = countKey;
+            setCue(cueId("slow", ++cues.current));
+          }
+        }
+      : undefined,
   });
+  const wrist = watchSpeedOn && wristSpeed?.key === countKey ? wristSpeed.read : undefined;
   // During rest, after it has settled: three reps on the wrist mean the next set has started, so rest ends now and
   // those reps carry into the set.
   const restWatch = watchAuto && !!active && resting && !finished && !warming && !active.tag && watchingRest(active.restStart, now);
@@ -450,10 +486,8 @@ export function Workout() {
     active?.askFeedback,
   ]);
 
-  // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
-  // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).
-  const speedMaxOn = labOn("labSpeedMax");
-  const warmSpeed = useRef<{ key: string; index: number; kg: number; speed: number } | null>(null);
+  // Today's max from warm-ups: the speeds noted above are recorded when the warm-up is logged, whichever way
+  // (here, the dock or the notification).
   const exId = item?.exerciseId;
   useEffect(() => {
     if (!sessionId || !exId) return;
@@ -801,24 +835,7 @@ export function Workout() {
                     if (a && ex) s.adjust(a.weight, countedReps(ex.id, n));
                     noteCount(n);
                   }}
-                  onSummary={
-                    speedMaxOn
-                      ? (sum) => {
-                          const a = useApp.getState().active;
-                          if (!a) return;
-                          if (!warmingUp(a)) {
-                            // A working set: its last full rep's speed, and whether a rep failed after it, are
-                            // saved with the set, so sets taken to failure teach the lifter's own threshold.
-                            const last = lastFullMetres(sum);
-                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter, meanFullSpeed(sum.reps));
-                            return;
-                          }
-                          const v = fastestMetres(sum);
-                          if (v === undefined) return;
-                          warmSpeed.current = { key: `${a.sessionId}:${ex.id}`, index: a.warm ?? 0, kg: a.weight, speed: v };
-                        }
-                      : undefined
-                  }
+                  onSummary={labOn("labSpeedMax") ? noteSpeeds : undefined}
                   onClose={() => changeCount({ ...countPrefs, on: false })}
                   paused={infoOpen || swapOpen || endOpen}
                 />
@@ -845,13 +862,31 @@ export function Workout() {
                 </span>
               </button>
               {watchReps !== null && (
-                <span
-                  className="absolute left-2 top-2 inline-flex min-h-8 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm font-semibold tabular-nums"
-                  data-testid="watch-reps"
-                >
-                  <Icon name="watch" size={16} className="text-accent" />
-                  {t("count.watch", { count: watchReps })}
-                </span>
+                <div className="absolute left-2 right-2 top-2 flex flex-col items-start gap-1">
+                  <span
+                    className={`inline-flex min-h-8 items-center gap-1 rounded-full border bg-bg/80 px-3 text-sm font-semibold tabular-nums ${wrist?.advice === "stop" ? "border-warn text-warn" : "border-line"}`}
+                    data-testid="watch-reps"
+                  >
+                    <Icon name="watch" size={16} className="text-accent" />
+                    {t("count.watch", { count: watchReps })}
+                    {wrist && (
+                      <span data-testid="wrist-speed">
+                        {" · "}
+                        {t("count.speed.ms", { speed: num(wrist.speed, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
+                      </span>
+                    )}
+                  </span>
+                  {wrist?.advice && (
+                    <span
+                      className="max-w-full rounded-xl border border-line bg-bg/80 px-3 py-1 text-xs text-muted"
+                      data-testid="wrist-advice"
+                    >
+                      {wrist.advice === "stop"
+                        ? t("count.speed.stop", { loss: Math.round(wrist.loss * 100) })
+                        : t("count.speed.left", { count: wrist.rir ?? 0, loss: Math.round(wrist.loss * 100) })}
+                    </span>
+                  )}
+                </div>
               )}
               {canCount && (
                 <AutoCountButton

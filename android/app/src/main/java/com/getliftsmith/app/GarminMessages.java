@@ -105,6 +105,129 @@ final class GarminMessages {
         return out;
     }
 
+    /**
+     * Today's carried plan (src/lib/watchWorkout.ts Carry) for a workout on the watch with the phone away, under "wc"
+     * so an older watch app never takes it for a workout, with lists instead of named fields to stay small:
+     * {"wc": {"id", "d" day, "t" title, "y" why, "v" vibrate, "w" heads-up, "o" answers, "dn" all logged, "fn" finish
+     * line, "ex": [[name, rest title, question, [kg], [words], reps word]], "st": [[exercise, label, set, ladder place,
+     * reps, rest, ask, adjustable, keeps the last set's weight and reps]]}}. An empty map under "wc" takes it off the watch.
+     */
+    static Map<String, Object> carry(JSONObject c) {
+        Map<String, Object> w = new HashMap<>();
+        if (c != null) {
+            w.put("id", c.optString("id", ""));
+            w.put("d", c.optString("day", ""));
+            w.put("t", c.optString("title", ""));
+            w.put("y", c.optString("why", ""));
+            w.put("v", c.optBoolean("vib", true));
+            w.put("w", c.optBoolean("warn", false));
+            w.put("o", strings(c.optJSONArray("o")));
+            w.put("dn", c.optString("done", ""));
+            w.put("fn", c.optString("fin", ""));
+            List<Object> ex = new ArrayList<>();
+            JSONArray items = c.optJSONArray("ex");
+            for (int i = 0; items != null && i < items.length() && i < 24; i++) {
+                JSONObject x = items.optJSONObject(i);
+                if (x == null) continue;
+                ex.add(Arrays.asList(
+                    x.optString("n", ""),
+                    x.optString("rt", ""),
+                    x.optString("q", ""),
+                    numbers(x.optJSONArray("kg")),
+                    strings(x.optJSONArray("w")),
+                    x.optString("rs", "")
+                ));
+            }
+            w.put("ex", ex);
+            List<Object> st = new ArrayList<>();
+            JSONArray steps = c.optJSONArray("st");
+            for (int i = 0; steps != null && i < steps.length() && i < 80; i++) {
+                JSONObject x = steps.optJSONObject(i);
+                if (x == null) continue;
+                st.add(Arrays.asList(
+                    x.optInt("e", 0),
+                    x.optString("l", ""),
+                    x.optString("t", ""),
+                    x.optInt("i", 0),
+                    x.optInt("r", 1),
+                    x.optInt("s", 0),
+                    x.optInt("f", 0) == 1,
+                    x.optInt("a", 0) == 1,
+                    x.optInt("c", 0) == 1
+                ));
+            }
+            w.put("st", st);
+        }
+        Map<String, Object> m = new HashMap<>();
+        m.put("wc", w);
+        return m;
+    }
+
+    /**
+     * A workout the Garmin watch ran with the phone away, as the web app reads it (src/lib/watchWorkout.ts
+     * WatchResult), or null. The watch sends {"wd": {"id", "c", "s" start, "e" end, "sets": [[step, at, kg, reps,
+     * from]], "rates": [[step, rating]], "hr": [avg, max, min]}} with times in seconds, because Connect IQ numbers are
+     * 32-bit; they become milliseconds here.
+     */
+    static JSONObject result(List<Object> message) {
+        Object wd = field(message, "wd");
+        if (!(wd instanceof Map)) return null;
+        Map<?, ?> r = (Map<?, ?>) wd;
+        try {
+            JSONObject out = new JSONObject();
+            Object id = r.get("id");
+            Object c = r.get("c");
+            if (!(id instanceof String) || !(c instanceof String)) return null;
+            out.put("id", id);
+            out.put("c", c);
+            out.put("start", seconds(r.get("s")));
+            out.put("end", seconds(r.get("e")));
+            JSONArray sets = new JSONArray();
+            for (Object x : list(r.get("sets"))) {
+                List<?> a = list(x);
+                if (a.size() < 5) return null;
+                sets.put(new JSONArray(Arrays.asList(number(a.get(0)), seconds(a.get(1)), number(a.get(2)), number(a.get(3)), seconds(a.get(4)))));
+            }
+            out.put("sets", sets);
+            JSONArray rates = new JSONArray();
+            for (Object x : list(r.get("rates"))) {
+                List<?> a = list(x);
+                if (a.size() >= 2) rates.put(new JSONArray(Arrays.asList(number(a.get(0)), number(a.get(1)))));
+            }
+            out.put("rates", rates);
+            JSONArray hr = new JSONArray();
+            for (Object x : list(r.get("hr"))) hr.put(number(x));
+            out.put("hr", hr);
+            return WatchWorkouts.parse(out.toString());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** The watch app opened and wants today's plan again: {"wq": 1}. */
+    static boolean wantsCarry(List<Object> message) {
+        return field(message, "wq") != null;
+    }
+
+    /** What the phone sends back once a workout is kept, so the watch can let it go: {"wk": id}. */
+    static Map<String, Object> received(String id) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("wk", id);
+        return m;
+    }
+
+    private static List<?> list(Object o) {
+        return o instanceof List ? (List<?>) o : new ArrayList<>();
+    }
+
+    private static double number(Object o) {
+        return o instanceof Number ? ((Number) o).doubleValue() : -1;
+    }
+
+    private static long seconds(Object o) {
+        return o instanceof Number ? Math.round(((Number) o).doubleValue() * 1000) : 0L;
+    }
+
     /** The workout ended: the watch goes back to "No workout running". */
     static Map<String, Object> end() {
         Map<String, Object> m = new HashMap<>();

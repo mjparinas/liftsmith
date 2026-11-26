@@ -575,6 +575,11 @@ export const es: FeaturesText = {
       body: "¿Alguien en la máquina? Un toque en tu reloj o en Cambiar el plan pone el mejor ejercicio de tu gimnasio que no la necesita, con su peso y por qué.",
       note: "Wear OS, Apple Watch y Garmin (el botón UP), y Cambiar el plan en el teléfono y la web.",
     },
+    "watch-alone": {
+      name: "Entrenos en el reloj, sin el móvil",
+      body: "El plan de hoy viaja en tu reloj. Toca Empezar en el reloj, registra cada serie con su peso y repeticiones en la muñeca, y el entreno se guarda, récords incluidos, cuando el móvil vuelve a estar cerca.",
+      note: "Wear OS, Apple Watch y Garmin.",
+    },
     widgets: {
       name: "Widgets en la pantalla de inicio",
       body: "Tres widgets: Hoy (la decisión del día, tu meta semanal, una nota del entrenador y Empezar o Registrar serie), Esta semana (días entrenados, tu racha y qué la mantiene) y Recuperación (qué músculos están listos para entrenar y cuándo lo estará el resto).",
@@ -720,6 +725,11 @@ export const es: FeaturesText = {
     "lab-watch-auto": {
       name: "Series sin manos con el reloj",
       body: "Empieza tu siguiente serie y tu reloj termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
+      note: "Wear OS y Apple Watch, con el conteo de repeticiones con el reloj activado.",
+    },
+    "lab-watch-speed": {
+      name: "Velocidad desde la muñeca",
+      body: "Tu reloj mide lo rápido que levantas cada repetición y vibra cuando la serie se ha frenado lo suficiente para terminarla. Las velocidades del calentamiento ajustan tu primer peso de trabajo, sin cámara.",
       note: "Wear OS y Apple Watch, con el conteo de repeticiones con el reloj activado.",
     },
     "lab-voice": {

@@ -28,4 +28,9 @@
     <string name="more_reps">回数を増やす</string>
     <string name="weight_value">重量 %1$s、リューズを回して変更</string>
     <string name="reps_value">%1$s、リューズを回して変更</string>
+    <string name="start_on_watch">ウォッチで開始</string>
+    <string name="finish">終了</string>
+    <string name="finish_again">もう一度タップで終了</string>
+    <string name="on_watch">スマホなし：ウォッチに保存</string>
+    <string name="saved_for_phone">ウォッチに保存しました。スマホが近くに戻ると送られます。</string>
 </resources>

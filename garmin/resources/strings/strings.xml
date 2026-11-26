@@ -11,4 +11,9 @@
     <string id="HintRate">MENU: Rate it</string>
     <string id="HintLogTaken">START: Log · UP: Taken</string>
     <string id="HintAddTaken">DOWN: +30 s · UP: Taken</string>
+    <string id="HintStartWatch">START: Start on watch</string>
+    <string id="HintFinish">START: Finish</string>
+    <string id="OnWatch">No phone · BACK: Finish</string>
+    <string id="FinishAsk">Finish and save it for your phone?</string>
+    <string id="SavedForPhone">Saved on the watch. It goes to your phone when they’re together again.</string>
 </strings>

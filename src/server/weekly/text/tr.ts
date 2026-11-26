@@ -526,6 +526,7 @@ export const emails: Record<string, Words> = {
       "Form kontrolü: paralelin üstünde kalan squat'lar, yarım kalan tekrarlar ve bir yana yatma.",
       "Bar yolu tekrarı: barın yolu çizilmiş bir tekrar ve tek bir ipucu.",
       "Isınmalardan bugünün maksimumu: ilk çalışma ağırlığına küçük bir düzeltme.",
+      "Bilekten bar hızı: kamera yok mu? Saatin her tekrarın hızını ölçer, durma zamanı gelince titrer ve bugünün maksimumunu besler.",
     ],
     dyk: "Başka bir deneye ihtiyaç duyan bir deney, ancak o açıldığında görünür.",
   },
@@ -1105,5 +1106,16 @@ export const emails: Record<string, Words> = {
       "Telefondaki Bugün ile aynı öneri ve aynı neden; planın değişince o da değişir.",
     ],
     dyk: "Dünkü plan hiçbir zaman bugünkü gibi görünmez: gece yarısından sonra saat, telefonundan yeni planı bekler.",
+  },
+  "watch-alone": {
+    title: "Telefonunu dolapta bırak",
+    intro: "Bugünün planı artık saatinde de: sadece bileğinle antrenman yap, hepsini sonra kaydet.",
+    points: [
+      "Telefonunda antrenman çalışmıyorken saat bugünkünü Saatte başlat ile gösterir (Garmin'de START).",
+      "Set kaydetme, +30 sn, dinlenme sonu titreşimi, ağırlık ve tekrar değiştirme bilekte çalışır; nabız saatin sensöründen gelir.",
+      "Bitince Bitir'e dokun. Uygulama açık olsun olmasın, telefonun yeniden yakına gelene kadar saat antrenmanı saklar.",
+      "Telefonun onu orada kaydetmişsin gibi saklar: her set, rekorların, sonraki ağırlıklar ve Sağlık.",
+    ],
+    dyk: "Planlama telefonda kalır; Makine dolu ve Planı değiştir telefon dönene kadar bekler.",
   },
 };

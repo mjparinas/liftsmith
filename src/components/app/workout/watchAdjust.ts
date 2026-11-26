@@ -33,19 +33,19 @@ export function setKey(a: Active, events: readonly AppEvent[]): string {
   return `${a.sessionId}:${sets}:${a.index}:${a.warm ?? 0}:${a.tag ?? ""}`;
 }
 
-/** Weights from LADDER_STEPS lighter to LADDER_STEPS heavier than `kg`, each once, lightest first, and where `kg` is. */
-export function ladder(kg: number, step: (kg: number, dir: 1 | -1) => number): { kg: number[]; i: number } {
+/** Weights from `steps` (LADDER_STEPS) lighter to `steps` heavier than `kg`, each once, lightest first, and where `kg` is. */
+export function ladder(kg: number, step: (kg: number, dir: 1 | -1) => number, steps = LADDER_STEPS): { kg: number[]; i: number } {
   const down: number[] = [];
   const up: number[] = [];
   let cur = kg;
-  for (let k = 0; k < LADDER_STEPS; k++) {
+  for (let k = 0; k < steps; k++) {
     const n = step(cur, -1);
     if (!(n < cur - 1e-6) || n < 0) break;
     down.unshift(n);
     cur = n;
   }
   cur = kg;
-  for (let k = 0; k < LADDER_STEPS; k++) {
+  for (let k = 0; k < steps; k++) {
     const n = step(cur, 1);
     if (!(n > cur + 1e-6)) break;
     up.push(n);

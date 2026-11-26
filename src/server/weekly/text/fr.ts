@@ -528,6 +528,7 @@ export const emails: Record<string, Words> = {
       "Contrôle technique : squats au-dessus de la parallèle, répétitions écourtées et inclinaison d'un côté.",
       "Relecture de la trajectoire : une répétition avec le trajet de la barre dessiné et une consigne.",
       "Le maximum du jour à partir de l'échauffement : un ajustement de votre première charge de travail.",
+      "Vitesse au poignet : pas de caméra ? Ta montre mesure la vitesse de chaque répétition, vibre quand il est temps d'arrêter et nourrit le max du jour.",
     ],
     dyk: "Une expérience qui en demande une autre n'apparaît que lorsque celle-ci est activée.",
   },
@@ -1113,5 +1114,17 @@ export const emails: Record<string, Words> = {
       "C’est le même choix et la même raison qu’Aujourd’hui sur votre téléphone, mis à jour quand votre programme change.",
     ],
     dyk: "Un programme d’hier ne s’affiche jamais comme celui du jour : après minuit, la montre attend le nouveau programme de votre téléphone.",
+  },
+  "watch-alone": {
+    title: "Laissez votre téléphone au casier",
+    intro:
+      "Le plan du jour vous accompagne maintenant sur votre montre : entraînez-vous avec le poignet seul et tout est enregistré plus tard.",
+    points: [
+      "Quand aucune séance ne tourne sur votre téléphone, la montre affiche celle du jour avec Démarrer sur la montre (START sur Garmin).",
+      "Noter la série, +30 s, la vibration de fin de repos et le choix de la charge et des répétitions fonctionnent au poignet, avec la fréquence cardiaque de la montre.",
+      "Terminez quand vous avez fini. La montre garde la séance jusqu’à ce que votre téléphone soit de nouveau près, app ouverte ou non.",
+      "Votre téléphone l’enregistre alors comme si vous l’aviez notée dessus : chaque série, vos records, les prochaines charges et Santé.",
+    ],
+    dyk: "La planification reste sur le téléphone : Machine occupée et Modifier le plan attendent son retour.",
   },
 };

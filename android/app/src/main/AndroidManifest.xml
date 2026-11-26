@@ -364,13 +364,19 @@
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Rest timer and set logging for a workout the user started; shows a live countdown on the lock screen." />
         </service>
 
-        <!-- Messages from the Wear OS app (android/wear): Log set, +30 s and heart rate (WatchListenerService.java). -->
+        <!-- Messages from the Wear OS app (android/wear): Log set, +30 s and heart rate, and its phone-free workouts (WatchListenerService.java). -->
         <service
             android:name=".WatchListenerService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
                 <data android:scheme="wear" android:host="*" android:pathPrefix="/liftsmith/" />
+            </intent-filter>
+            <!-- Workouts the watch ran on its own, phone away (WatchWorkouts.java): one Data Layer item each, kept by
+                 the system until the phone is near, then saved here and deleted, which tells the watch it arrived. -->
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/liftsmith/done/" />
             </intent-filter>
         </service>
 

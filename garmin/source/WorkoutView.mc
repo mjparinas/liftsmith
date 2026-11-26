@@ -14,10 +14,12 @@ class WorkoutView extends WatchUi.View {
     const RED = 0xff5a5a;
 
     private var _w as WorkoutState;
+    private var _app as LiftsmithApp;
 
-    function initialize(w as WorkoutState) {
+    function initialize(w as WorkoutState, app as LiftsmithApp) {
         View.initialize();
         _w = w;
+        _app = app;
     }
 
     function onUpdate(dc as Graphics.Dc) as Void {
@@ -28,6 +30,21 @@ class WorkoutView extends WatchUi.View {
         dc.clear();
 
         if (!_w.active()) {
+            var saved = CarryStore.waiting().size() > 0;
+            // Today's plan is on the watch too, so START runs it here with the phone away (watch-apps.md "Phone-free workouts").
+            var c = _app.carried();
+            if (c != null) {
+                line(dc, cx, h * 0.3, c.get("t") instanceof String ? c.get("t") as String : "", Graphics.FONT_SMALL, INK, w * 0.8, 2);
+                line(dc, cx, h * 0.5, c.get("y") instanceof String ? c.get("y") as String : "", Graphics.FONT_XTINY, MUTED, w * 0.8, 2);
+                line(dc, cx, h * 0.68, WatchUi.loadResource(saved ? Rez.Strings.SavedForPhone : Rez.Strings.NoneBody) as String, Graphics.FONT_XTINY, MUTED, w * 0.75, 2);
+                line(dc, cx, h * 0.86, WatchUi.loadResource(Rez.Strings.HintStartWatch) as String, Graphics.FONT_XTINY, BLUE, w * 0.6, 1);
+                return;
+            }
+            if (saved) {
+                line(dc, cx, h * 0.38, WatchUi.loadResource(Rez.Strings.NoneTitle) as String, Graphics.FONT_SMALL, INK, w * 0.8, 2);
+                line(dc, cx, h * 0.62, WatchUi.loadResource(Rez.Strings.SavedForPhone) as String, Graphics.FONT_XTINY, MUTED, w * 0.75, 3);
+                return;
+            }
             // Today's call from the phone (the glance's), so the lifter knows what's waiting.
             var t = TodayStore.load();
             if (TodayStore.current(t)) {
@@ -80,6 +97,14 @@ class WorkoutView extends WatchUi.View {
         var hint = resting
             ? (_w.asking() ? Rez.Strings.HintRate : (taken ? Rez.Strings.HintAddTaken : Rez.Strings.HintAdd))
             : (taken ? Rez.Strings.HintLogTaken : Rez.Strings.HintLog);
+        var run = _app.run as GarminRun?;
+        if (run != null) {
+            // Phone-free: BACK finishes, and START does once every set is logged.
+            line(dc, cx, h * 0.07, WatchUi.loadResource(Rez.Strings.OnWatch) as String, Graphics.FONT_XTINY, MUTED, w * 0.5, 1);
+            if (run.finishedAll()) {
+                hint = Rez.Strings.HintFinish;
+            }
+        }
         line(dc, cx, h * 0.87, WatchUi.loadResource(hint) as String, Graphics.FONT_XTINY, MUTED, w * 0.6, 1);
     }
 

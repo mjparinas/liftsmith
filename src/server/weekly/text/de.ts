@@ -527,6 +527,7 @@ export const emails: Record<string, Words> = {
       "Technik-Check: Kniebeugen über der Parallele, verkürzte Wiederholungen und seitliches Kippen.",
       "Hantelweg-Wiederholung: eine Wiederholung mit eingezeichnetem Weg der Stange und einem Hinweis.",
       "Heutiges Maximum aus dem Aufwärmen: ein Anstoß für dein erstes Arbeitsgewicht.",
+      "Hantelgeschwindigkeit am Handgelenk: keine Kamera? Deine Uhr misst das Tempo jeder Wiederholung, vibriert, wenn es Zeit zum Aufhören ist, und speist das heutige Maximum.",
     ],
     dyk: "Ein Experiment, das ein anderes braucht, erscheint erst, wenn dieses an ist.",
   },
@@ -1110,5 +1111,16 @@ export const emails: Record<string, Words> = {
       "Es ist dieselbe Empfehlung mit demselben Grund wie unter Heute auf dem Handy, und sie ändert sich mit deinem Plan.",
     ],
     dyk: "Ein Plan von gestern erscheint nie als heutiger: Nach Mitternacht wartet die Uhr auf den neuen Plan von deinem Handy.",
+  },
+  "watch-alone": {
+    title: "Lass dein Handy im Spind",
+    intro: "Der heutige Plan ist jetzt auch auf deiner Uhr, also trainierst du nur mit dem Handgelenk und speicherst alles später.",
+    points: [
+      "Läuft auf dem Handy kein Training, zeigt die Uhr das heutige mit „Auf der Uhr starten“ (START bei Garmin).",
+      "Satz eintragen, +30 s, die Vibration am Pausenende und Gewicht und Wiederholungen ändern gehen am Handgelenk, mit der Herzfrequenz der Uhr.",
+      "Tippe auf „Beenden“, wenn du fertig bist. Die Uhr behält das Training, bis dein Handy wieder in der Nähe ist, ob die App offen ist oder nicht.",
+      "Dein Handy speichert es dann, als hättest du dort eingetragen: jeden Satz, deine Bestwerte, die nächsten Gewichte und Health.",
+    ],
+    dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
   },
 };

@@ -21,7 +21,9 @@ import com.google.android.gms.wearable.Wearable;
 
 /**
  * The watch screen: the set, the weight and reps (or the rest countdown), plates, heart rate, and Log set and
- * +30 s. Everything comes from the phone; a tap goes back to the phone, which logs it and sends the next state.
+ * +30 s. Everything comes from the phone; a tap goes back to the phone, which logs it and sends the next state. With
+ * Start on watch the same screen runs today's plan the phone carried here (WatchRun), with no phone needed, and
+ * Finish keeps it for the phone.
  */
 public class WorkoutActivity extends Activity implements WatchHub.Listener {
 
@@ -44,7 +46,10 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
     };
     private boolean asked = false;
     private TextView set, title, why, big, sub, hr, note, takenTo, weight, reps, askQ;
-    private Button log, add, taken, phone;
+    private Button log, add, taken, phone, finish, watchStart;
+    /** Finish before every set is logged asks for a second tap within FINISH_CONFIRM_MS, so a stray tap ends nothing. */
+    private long finishArmed = 0;
+    private static final long FINISH_CONFIRM_MS = 3000;
     private View scroll, adjust, weightRow, askBox;
     private final Button[] askButtons = new Button[3];
     /**
@@ -97,6 +102,8 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         log = findViewById(R.id.log);
         add = findViewById(R.id.add);
         phone = findViewById(R.id.phone);
+        finish = findViewById(R.id.finish);
+        watchStart = findViewById(R.id.watchStart);
         note = findViewById(R.id.note);
         scroll = findViewById(R.id.scroll);
         adjust = findViewById(R.id.adjust);
@@ -124,6 +131,11 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         add.setOnClickListener((v) -> tap(v, "add30"));
         taken.setOnClickListener((v) -> tap(v, "taken"));
         phone.setOnClickListener(this::openOnPhone);
+        watchStart.setOnClickListener((v) -> {
+            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            WatchHub.startLocal(this);
+        });
+        finish.setOnClickListener(this::finishRun);
         startWanted = getIntent().getBooleanExtra(EXTRA_START, false);
     }
 
@@ -155,6 +167,20 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             tapNote = ok ? R.string.check_phone : install ? R.string.install_failed : R.string.open_failed;
             render();
         });
+    }
+
+    /** Finish the watch's own run: at once when every set is logged, else on a second tap. */
+    private void finishRun(View v) {
+        long now = System.currentTimeMillis();
+        if (!WatchHub.localDone() && now - finishArmed > FINISH_CONFIRM_MS) {
+            finishArmed = now;
+            v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
+            render();
+            return;
+        }
+        finishArmed = 0;
+        v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+        WatchHub.finishLocal(this);
     }
 
     private void tap(View v, String action) {
@@ -354,6 +380,10 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             takenTo.setVisibility(View.GONE);
             adjust.setVisibility(View.GONE);
             askBox.setVisibility(View.GONE);
+            finish.setVisibility(View.GONE);
+            // Today's plan carried from the phone: Start on watch runs it here, phone or no phone.
+            org.json.JSONObject carried = WatchHub.carried(this);
+            watchStart.setVisibility(carried != null ? View.VISIBLE : View.GONE);
             // Not standalone: say what the phone needs, and offer the one step that gets there.
             switch (link) {
                 case NO_APP:
@@ -363,8 +393,14 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
                     phone.setVisibility(View.VISIBLE);
                     break;
                 case OFFLINE:
-                    title.setText(R.string.offline_title);
-                    sub.setText(R.string.offline_body);
+                    if (carried != null) {
+                        // No phone, but today's plan is here: say what Start on watch runs.
+                        title.setText(carried.optString("title", ""));
+                        sub.setText(carried.optString("why", "").isEmpty() ? getString(R.string.offline_title) : carried.optString("why", ""));
+                    } else {
+                        title.setText(R.string.offline_title);
+                        sub.setText(R.string.offline_body);
+                    }
                     phone.setVisibility(View.GONE);
                     break;
                 case READY: {
@@ -374,6 +410,9 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
                         title.setText(today.title);
                         String detail = today.mins.isEmpty() ? "" : today.ready;
                         sub.setText(detail.isEmpty() ? today.why : today.why.isEmpty() ? detail : detail + "\n" + today.why);
+                    } else if (carried != null) {
+                        title.setText(carried.optString("title", ""));
+                        sub.setText(carried.optString("why", ""));
                     } else {
                         title.setText(R.string.none_title);
                         sub.setText(R.string.none_body);
@@ -389,15 +428,25 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
                     phone.setVisibility(View.GONE);
                     break;
             }
-            sub.setVisibility(View.VISIBLE);
-            note.setVisibility(tapNote == 0 ? View.GONE : View.VISIBLE);
+            sub.setVisibility(sub.getText().length() == 0 ? View.GONE : View.VISIBLE);
+            // A finished watch run still on its way to the phone says so, until the phone has it.
+            int waiting = WatchHub.waiting(this);
+            note.setVisibility(tapNote != 0 || waiting > 0 ? View.VISIBLE : View.GONE);
             if (tapNote != 0) note.setText(tapNote);
+            else if (waiting > 0) note.setText(R.string.saved_for_phone);
             return;
         }
         phone.setVisibility(View.GONE);
-        // Mid-workout with the phone out of reach: taps can't arrive, so say so instead of failing quietly.
-        note.setVisibility(link == PhoneLink.Status.OFFLINE ? View.VISIBLE : View.GONE);
-        if (link == PhoneLink.Status.OFFLINE) note.setText(R.string.offline_title);
+        watchStart.setVisibility(View.GONE);
+        boolean local = WatchHub.local();
+        boolean allDone = WatchHub.localDone();
+        finish.setVisibility(local ? View.VISIBLE : View.GONE);
+        finish.setText(local && !allDone && now - finishArmed <= FINISH_CONFIRM_MS ? R.string.finish_again : R.string.finish);
+        // Mid-workout with the phone out of reach: taps can't arrive, so say so instead of failing quietly. The
+        // watch's own run needs no phone: it says it's kept here instead.
+        note.setVisibility(local || link == PhoneLink.Status.OFFLINE ? View.VISIBLE : View.GONE);
+        if (local) note.setText(R.string.on_watch);
+        else if (link == PhoneLink.Status.OFFLINE) note.setText(R.string.offline_title);
         boolean resting = s.resting(now);
         // The set timer (holds, carries, cardio): its clock in the big line and what it's counting under it.
         WorkoutState.Phase phase = s.phase(now);
@@ -419,7 +468,7 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         int bpm = WatchHub.bpm() > 0 ? WatchHub.bpm() : s.hr;
         hr.setVisibility(bpm > 0 ? View.VISIBLE : View.GONE);
         hr.setText(getString(R.string.bpm, bpm));
-        log.setVisibility(View.VISIBLE);
+        log.setVisibility(allDone ? View.GONE : View.VISIBLE);
         add.setVisibility(resting ? View.VISIBLE : View.GONE);
         why.setVisibility(s.why.isEmpty() ? View.GONE : View.VISIBLE);
         why.setText(s.why);

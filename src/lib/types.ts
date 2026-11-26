@@ -738,8 +738,9 @@ export interface SessionStartEvent extends EventBase {
   /** The lifter changed the call before starting. */
   callOverridden?: boolean;
   challenge?: boolean;
-  /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
-  source?: "manual";
+  /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate); or run on a watch
+   *  with the phone away and saved when the watch reached the phone (watchWorkout.ts, "watch"). */
+  source?: "manual" | "watch";
   /** Logged on a school coach's team session tablet (teamSessions.ts on the server): the team's name. */
   team?: string;
   /** The program and day the plan came from (programs.ts). */

@@ -10,4 +10,9 @@
     <string id="HintRate">MENU: Bewerten</string>
     <string id="HintLogTaken">START: Eintragen · UP: Belegt</string>
     <string id="HintAddTaken">DOWN: +30 s · UP: Belegt</string>
+    <string id="HintStartWatch">START: Auf der Uhr starten</string>
+    <string id="HintFinish">START: Beenden</string>
+    <string id="OnWatch">Ohne Handy · BACK: Beenden</string>
+    <string id="FinishAsk">Beenden und fürs Handy speichern?</string>
+    <string id="SavedForPhone">Auf der Uhr gespeichert. Es geht aufs Handy, sobald beide wieder beisammen sind.</string>
 </strings>

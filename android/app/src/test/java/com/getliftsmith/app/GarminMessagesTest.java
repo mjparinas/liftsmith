@@ -157,4 +157,50 @@ public class GarminMessagesTest {
         assertEquals(8, new JSONObject(t.data).getInt("reps"));
         assertNull(GarminMessages.tap(Collections.<Object>singletonList(Collections.singletonMap("hr", 120))));
     }
+
+    private static final String CARRY =
+        "{\"v\":1,\"id\":\"c1\",\"day\":\"2027-1-15\",\"title\":\"Push\",\"why\":\"\",\"vib\":true,\"warn\":false,\"o\":[\"a\",\"b\",\"c\"]," +
+        "\"done\":\"Done\",\"fin\":\"Finish\",\"ex\":[{\"n\":\"Bench press\",\"rt\":\"Rest\",\"q\":\"How?\",\"kg\":[60,62.5],\"w\":[\"60 kg\",\"62.5 kg\"],\"rs\":\"reps\"}]," +
+        "\"st\":[{\"e\":0,\"l\":\"Set 1 of 2\",\"t\":\"60 kg × 8\",\"i\":0,\"r\":8,\"s\":90,\"a\":1},{\"e\":0,\"l\":\"Set 2 of 2\",\"t\":\"60 kg × 8\",\"i\":0,\"r\":8,\"s\":0,\"f\":1,\"a\":1,\"c\":1}]}";
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void todaysPlanGoesToTheWatchInShortKeys() throws Exception {
+        Map<String, Object> wc = (Map<String, Object>) GarminMessages.carry(new JSONObject(WatchMessages.carry(CARRY))).get("wc");
+        assertEquals("c1", wc.get("id"));
+        assertEquals("2027-1-15", wc.get("d"));
+        List<?> st = (List<?>) wc.get("st");
+        assertEquals(2, st.size());
+        List<?> second = (List<?>) st.get(1);
+        assertEquals(9, second.size());
+        assertEquals(true, second.get(6));
+        assertEquals(true, second.get(8));
+        assertEquals(false, ((List<?>) st.get(0)).get(8));
+        List<?> ex = (List<?>) ((List<?>) wc.get("ex")).get(0);
+        assertEquals("Bench press", ex.get(0));
+        assertTrue(((Map<?, ?>) GarminMessages.carry(null).get("wc")).isEmpty());
+        assertNull(WatchMessages.carry("{\"v\":2}"));
+    }
+
+    @Test
+    public void aWatchWorkoutComesBackInMilliseconds() throws Exception {
+        Map<String, Object> wd = new HashMap<>();
+        wd.put("id", "g18000000001234");
+        wd.put("c", "c1");
+        wd.put("s", 1_800_000_000);
+        wd.put("e", 1_800_000_300);
+        wd.put("sets", Arrays.asList(Arrays.asList(0, 1_800_000_100, 62.5f, 6, 1_800_000_000), Arrays.asList(1, 1_800_000_250, -1, 8, 1_800_000_190)));
+        wd.put("rates", Collections.singletonList(Arrays.asList(1, -1)));
+        wd.put("hr", Arrays.asList(130, 150, 100));
+        JSONObject r = GarminMessages.result(Collections.<Object>singletonList(Collections.singletonMap("wd", wd)));
+        assertEquals("g18000000001234", r.getString("id"));
+        assertEquals(1_800_000_000_000L, r.getLong("start"));
+        assertEquals(1_800_000_100_000L, r.getJSONArray("sets").getJSONArray(0).getLong(1));
+        assertEquals(62.5, r.getJSONArray("sets").getJSONArray(0).getDouble(2), 1e-6);
+        assertEquals(-1.0, r.getJSONArray("sets").getJSONArray(1).getDouble(2), 1e-9);
+        assertEquals("g18000000001234", GarminMessages.received("g18000000001234").get("wk"));
+        assertNull(GarminMessages.result(Collections.<Object>singletonList(Collections.singletonMap("hr", 120))));
+        assertTrue(GarminMessages.wantsCarry(Collections.<Object>singletonList(Collections.singletonMap("wq", 1))));
+        assertFalse(GarminMessages.wantsCarry(Collections.<Object>singletonList(Collections.singletonMap("hr", 120))));
+    }
 }

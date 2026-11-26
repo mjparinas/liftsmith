@@ -89,10 +89,12 @@ describe("Play store policy config", () => {
       // The home-screen widget's snapshot (today's plan, coach's note) is personal too.
       expect(body).toContain('<exclude domain="sharedpref" path="liftsmith_widget.xml" />');
       expect(body).toContain('<exclude domain="sharedpref" path="liftsmith_taps.xml" />');
+      expect(body).toContain('<exclude domain="sharedpref" path="liftsmith_watch_workouts.xml" />');
     }
     expect(res("full_backup_content")).toContain('<exclude domain="root" path="app_webview/" />');
     expect(res("full_backup_content")).toContain('<exclude domain="sharedpref" path="liftsmith_widget.xml" />');
     expect(res("full_backup_content")).toContain('<exclude domain="sharedpref" path="liftsmith_taps.xml" />');
+    expect(res("full_backup_content")).toContain('<exclude domain="sharedpref" path="liftsmith_watch_workouts.xml" />');
   });
 
   it("keeps the web view's storage out of iCloud backup", () => {

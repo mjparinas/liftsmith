@@ -527,6 +527,7 @@ export const emails: Record<string, Words> = {
       "Checagem de técnica: agachamentos acima da paralela, reps encurtadas e inclinação para um lado.",
       "Replay do trajeto da barra: uma rep com o trajeto da barra desenhado e uma dica.",
       "Máximo do dia pelo aquecimento: um ajuste no seu primeiro peso de trabalho.",
+      "Velocidade pelo pulso: sem câmera? Seu relógio mede a velocidade de cada repetição, vibra na hora de parar e alimenta o máximo de hoje.",
     ],
     dyk: "Um lab que depende de outro só aparece depois que esse outro está ativado.",
   },
@@ -1110,5 +1111,16 @@ export const emails: Record<string, Words> = {
       "É a mesma indicação e o mesmo motivo de Hoje no celular, e muda quando seu plano muda.",
     ],
     dyk: "Um plano de ontem nunca aparece como o de hoje: depois da meia-noite, o relógio espera o novo plano do celular.",
+  },
+  "watch-alone": {
+    title: "Deixe o celular no armário",
+    intro: "O plano de hoje agora vai junto no seu relógio: treine só com o pulso e salve tudo depois.",
+    points: [
+      "Quando nenhum treino está rodando no celular, o relógio mostra o de hoje com Começar no relógio (START no Garmin).",
+      "Registrar série, +30 s, a vibração no fim do descanso e mudar peso e repetições funcionam no pulso, com a frequência cardíaca do relógio.",
+      "Toque em Concluir quando terminar. O relógio guarda o treino até o celular estar por perto de novo, com o app aberto ou não.",
+      "O celular salva tudo como se você tivesse registrado nele: cada série, seus recordes, os próximos pesos e o Saúde.",
+    ],
+    dyk: "O planejamento continua no celular, então Aparelho ocupado e Mudar o plano esperam ele voltar.",
   },
 };

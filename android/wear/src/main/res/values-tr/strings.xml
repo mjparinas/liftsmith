@@ -28,4 +28,9 @@
     <string name="more_reps">Daha fazla tekrar</string>
     <string name="weight_value">Ağırlık %1$s, değiştirmek için kuronu çevirin</string>
     <string name="reps_value">%1$s, değiştirmek için kuronu çevirin</string>
+    <string name="start_on_watch">Saatte başlat</string>
+    <string name="finish">Bitir</string>
+    <string name="finish_again">Bitirmek için tekrar dokun</string>
+    <string name="on_watch">Telefonsuz: saatte saklanıyor</string>
+    <string name="saved_for_phone">Saatte kaydedildi. Telefon yeniden yakına gelince ona gider.</string>
 </resources>

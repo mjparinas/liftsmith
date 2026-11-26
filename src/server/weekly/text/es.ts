@@ -526,6 +526,7 @@ export const emails: Record<string, Words> = {
       "Control de la técnica: sentadillas por encima del paralelo, repeticiones cortas e inclinarse hacia un lado.",
       "Repetición de la trayectoria: una repetición con el camino de la barra dibujado y una indicación.",
       "El máximo de hoy desde el calentamiento: un ajuste a tu primer peso de trabajo.",
+      "Velocidad desde la muñeca: ¿sin cámara? Tu reloj mide la velocidad de cada repetición, vibra cuando toca parar y alimenta el máximo de hoy.",
     ],
     dyk: "Un experimento que necesita otro solo aparece cuando ese está activado.",
   },
@@ -1108,5 +1109,16 @@ export const emails: Record<string, Words> = {
       "Es la misma propuesta y el mismo motivo que Hoy en tu móvil, y se actualiza cuando cambia tu plan.",
     ],
     dyk: "Un plan de ayer nunca aparece como el de hoy: pasada la medianoche, el reloj espera el nuevo plan de tu móvil.",
+  },
+  "watch-alone": {
+    title: "Deja el móvil en la taquilla",
+    intro: "El plan de hoy ahora va contigo en el reloj: entrena solo con la muñeca y guárdalo todo después.",
+    points: [
+      "Cuando no hay un entreno en marcha en el móvil, el reloj muestra el de hoy con Empezar en el reloj (START en Garmin).",
+      "Registrar serie, +30 s, la vibración al final del descanso y cambiar el peso y las repeticiones funcionan en la muñeca, con el pulso del reloj.",
+      "Toca Terminar al acabar. El reloj guarda el entreno hasta que el móvil vuelve a estar cerca, con la app abierta o no.",
+      "El móvil lo guarda como si lo hubieras registrado allí: cada serie, tus récords, los próximos pesos y Salud.",
+    ],
+    dyk: "La planificación sigue en el móvil, así que Máquina ocupada y Cambiar el plan esperan a que vuelva.",
   },
 };

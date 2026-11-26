@@ -579,6 +579,11 @@ export const de: FeaturesText = {
       body: "Jemand am Gerät? Ein Tipp auf deiner Uhr oder in „Plan ändern“ setzt die beste Übung deines Studios ein, die es nicht braucht, mit Gewicht und Grund.",
       note: "Wear OS, Apple Watch und Garmin (die UP-Taste), und „Plan ändern“ auf dem Handy und im Web.",
     },
+    "watch-alone": {
+      name: "Training auf der Uhr, ohne Handy",
+      body: "Der heutige Plan reist auf deiner Uhr mit. Tippe auf „Auf der Uhr starten“, trag jeden Satz mit Gewicht und Wiederholungen am Handgelenk ein, und das Training wird samt Bestwerten gespeichert, sobald dein Handy wieder in der Nähe ist.",
+      note: "Wear OS, Apple Watch und Garmin.",
+    },
     widgets: {
       name: "Widgets für den Startbildschirm",
       body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",
@@ -725,6 +730,11 @@ export const de: FeaturesText = {
       name: "Freihändige Sätze mit der Uhr",
       body: "Starte deinen nächsten Satz, und deine Uhr beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
       note: "Wear OS und Apple Watch, mit eingeschaltetem Zählen der Wiederholungen mit der Uhr.",
+    },
+    "lab-watch-speed": {
+      name: "Hantelgeschwindigkeit am Handgelenk",
+      body: "Deine Uhr misst, wie schnell du jede Wiederholung hebst, und vibriert, wenn der Satz langsam genug zum Beenden ist. Die Aufwärmgeschwindigkeiten passen dein erstes Arbeitsgewicht an, ohne Kamera.",
+      note: "Wear OS und Apple Watch, mit eingeschaltetem Wiederholungszählen der Uhr.",
     },
     "lab-voice": {
       name: "Sätze per Sprache eintragen",

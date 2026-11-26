@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Form check: squats above parallel, cut-short reps and leaning to one side.",
       "Bar path replay: a rep with the bar's path drawn and one cue.",
       "Today's max from warm-ups: a nudge to your first working weight.",
+      "Wrist bar speed: no camera? Your watch measures each rep's speed, buzzes when it's time to stop and feeds today's max.",
     ],
     dyk: "A lab that needs another one only shows once that one is on.",
   },
@@ -1125,5 +1126,16 @@ export const emails: Record<string, Words> = {
       "It's the same call and reason as Today on your phone, and it updates when your plan changes.",
     ],
     dyk: "A plan from yesterday never shows as today's: after midnight the watch waits for your phone's new plan.",
+  },
+  "watch-alone": {
+    title: "Leave your phone in the locker",
+    intro: "Today's plan now rides along on your watch, so you can lift with just your wrist and save it all later.",
+    points: [
+      "When no workout runs on your phone, your watch shows today's workout with Start on watch (START on Garmin).",
+      "Log set, +30 s, the rest buzz and changing the weight and reps all work on the wrist, with heart rate from the watch.",
+      "Finish when you're done. The watch keeps the workout until your phone is near again, app open or not.",
+      "Your phone then saves it as if you'd logged it there: every set, your bests, the next weights and Health.",
+    ],
+    dyk: "Planning stays on the phone, so Machine taken and Change the plan wait until your phone is back.",
   },
 };

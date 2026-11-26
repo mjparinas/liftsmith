@@ -28,4 +28,9 @@
     <string name="more_reps">Więcej powtórzeń</string>
     <string name="weight_value">Ciężar %1$s, obróć koronkę, aby zmienić</string>
     <string name="reps_value">%1$s, obróć koronkę, aby zmienić</string>
+    <string name="start_on_watch">Zacznij na zegarku</string>
+    <string name="finish">Zakończ</string>
+    <string name="finish_again">Dotknij jeszcze raz, aby zakończyć</string>
+    <string name="on_watch">Bez telefonu: zapisane na zegarku</string>
+    <string name="saved_for_phone">Zapisano na zegarku. Trafi do telefonu, gdy znów będą razem.</string>
 </resources>
