@@ -1098,7 +1098,7 @@ export const emails: Record<string, Words> = {
       "Open the program calendar to see Done and Not yet for each day. School teams show first names only, never weights.",
       "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today.",
     ],
-    dyk: "You can assign the same way from a school team card or a single client's report.",
+    dyk: "You can assign the same way from a school team card or a single client's report. You can also change a day for one client from their report, and program edits still reach every other day.",
   },
   "my-team": {
     title: "Your athletes get a My team dashboard",

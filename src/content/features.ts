@@ -924,6 +924,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-26",
       },
       {
+        id: "client-program-copy",
+        name: "Tweak a program for one client",
+        body: "Change a day of a coach's program for one client only, say an exercise swapped around an injury. The day is marked as changed for them and one tap puts the program's day back. Edits to the program still reach everyone on it and every day you didn't change, and the lifter's app picks them up on its own.",
+        tier: "both",
+        proPart: "Being a client is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-26",
+      },
+      {
         id: "coach-calendar",
         name: "Workout calendar",
         body: "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",

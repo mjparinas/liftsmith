@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import { exerciseIdsFromCode, parseAssignDays } from "../server/coachProgramAssign";
-import { coachProgramDayIndex, coachProgramEndAt, coachProgramWeek, followAssign, type ProgramAssign } from "./coachProgramAssign";
+import {
+  catchUpAssign,
+  coachProgramDayIndex,
+  coachProgramEndAt,
+  coachProgramWeek,
+  followAssign,
+  type ProgramAssign,
+} from "./coachProgramAssign";
 import { PROGRAM_TEMPLATES, templateOk } from "./coachProgramTemplates";
 
 const assign = (over: Partial<ProgramAssign> = {}): ProgramAssign => ({
@@ -82,5 +89,33 @@ describe("followAssign and day index", () => {
     if (new Date(monday).getDay() === 2) expect(i).toBe(1);
     expect(coachProgramWeek(src, monday + 8 * 86_400_000)).toBe(2);
     expect(coachProgramEndAt(src)).toBe(src.startedAt + 4 * 7 * 86_400_000);
+  });
+});
+
+describe("catchUpAssign", () => {
+  it("rebuilds the followed days in place once the coach changes the program, keeping ids and the start day", () => {
+    const first = followAssign(assign({ status: "active", updatedAt: 5 }), 100);
+    const other = { id: "mine", name: "My own", items: [], createdAt: 1, updatedAt: 1 };
+    const routines = [...first.routines, other];
+    expect(catchUpAssign(routines, first.planSource, assign({ status: "active", updatedAt: 5 }), 200)).toBeNull();
+    const changed = assign({
+      status: "active",
+      updatedAt: 9,
+      weeks: 6,
+      tweaked: [1],
+      days: [
+        { name: "Upper A", code: "r1~VXBwZXI~bench-press.5~barbell-row.3", weekdays: [1] },
+        { name: "Lower A", code: "r1~TG93ZXI~leg-press.4~romanian-deadlift.3", weekdays: [3] },
+      ],
+    });
+    const next = catchUpAssign(routines, first.planSource, changed, 300)!;
+    expect(next.planSource).toMatchObject({ startedAt: 100, weeks: 6, syncedAt: 9, dayIds: first.planSource.dayIds, weekdays: [[1], [3]] });
+    expect(next.routines.map((r) => r.id)).toEqual([...first.planSource.dayIds, "mine"]);
+    expect(next.routines[1]!.items.map((i) => i.exerciseId)).toEqual(["leg-press", "romanian-deadlift"]);
+    expect(next.routines[0]!.createdAt).toBe(100);
+    // Once caught up, nothing more to do; another program or an ended one is left alone.
+    expect(catchUpAssign(next.routines, next.planSource, changed, 400)).toBeNull();
+    expect(catchUpAssign(routines, first.planSource, { ...changed, id: "other" }, 400)).toBeNull();
+    expect(catchUpAssign(routines, first.planSource, { ...changed, status: "ended" }, 400)).toBeNull();
   });
 });

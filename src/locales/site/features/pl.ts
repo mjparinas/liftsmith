@@ -570,6 +570,11 @@ export const pl: FeaturesText = {
       body: "Program trenera może iść fazami, a każda powtarza własny tydzień: Budowa, tydzień Odciążenia z mniejszą liczbą serii i lżejszymi ciężarami oraz Szczyt z mniejszą liczbą serii, żeby być wypoczętym. Dodaj odciążenie jednym dotknięciem, zobacz każdą fazę w miesiącu i ustal powtórzenia dla ćwiczenia (np. 8–12) albo zostaw Auto, żeby wybrała je historia każdej osoby. Osoby, które go realizują, widzą pod planem na Dziś, w której fazie i tygodniu są.",
       proPart: "Realizowanie programu jest bezpłatne; tworzenie go jest częścią coachingu, który jest w Pro.",
     },
+    "client-program-copy": {
+      name: "Dopasuj program do jednego klienta",
+      body: "Zmień dzień w programie trenera tylko dla jednego klienta, np. ćwiczenie wymienione z powodu kontuzji. Dzień jest oznaczony jako zmieniony dla tej osoby, a jedno dotknięcie przywraca dzień z programu. Zmiany w programie nadal trafiają do wszystkich i do każdego dnia, którego nie zmieniłeś, a aplikacja każdej osoby pobiera je sama.",
+      proPart: "Bycie klientem jest bezpłatne; prowadzenie klientów jest w Pro.",
+    },
     "coach-calendar": {
       name: "Kalendarz treningów",
       body: "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",

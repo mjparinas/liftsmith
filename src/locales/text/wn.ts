@@ -143,6 +143,9 @@ export const en = {
   "wn.c.programPhases.title": "Phases and reps in coach programs",
   "wn.c.programPhases.body":
     "Coaches run a program in phases with a one-tap deload week, and can set reps for an exercise or leave them on Auto. You see your phase and week under Today's plan.",
+  "wn.c.programTweaks.title": "One client's own copy of a program",
+  "wn.c.programTweaks.body":
+    "Coaches can change a day for one client, marked and easy to undo, while program edits still reach everyone. Your app picks up your coach's changes on its own.",
 } as const;
 
 type Key = keyof typeof en;
@@ -297,6 +300,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Fases y repeticiones en los programas de entrenadores",
   "wn.c.programPhases.body":
     "Los entrenadores organizan un programa por fases con una semana de descarga en un toque, y pueden fijar las repeticiones de un ejercicio o dejarlas en Auto. Ves tu fase y semana bajo el plan de Hoy.",
+  "wn.c.programTweaks.title": "La copia propia de un cliente",
+  "wn.c.programTweaks.body":
+    "Los entrenadores pueden cambiar un día para un cliente, marcado y fácil de deshacer, mientras lo que cambian en el programa sigue llegando a todos. Tu app recoge sola los cambios de tu entrenador.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -453,6 +459,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Phases et répétitions dans les programmes de coach",
   "wn.c.programPhases.body":
     "Les coachs organisent un programme en phases avec une semaine de décharge en un toucher, et peuvent fixer les répétitions d'un exercice ou les laisser sur Auto. Vous voyez votre phase et votre semaine sous le plan d'Aujourd'hui.",
+  "wn.c.programTweaks.title": "La copie d'un programme pour un client",
+  "wn.c.programTweaks.body":
+    "Les coachs peuvent modifier un jour pour un client, marqué et facile à annuler, tandis que les modifications du programme atteignent toujours tout le monde. Votre app récupère seule les changements de votre coach.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -605,6 +614,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Phasen und Wiederholungen in Coach-Programmen",
   "wn.c.programPhases.body":
     "Coaches teilen ein Programm in Phasen mit einer Deload-Woche per Tippen und können Wiederholungen für eine Übung festlegen oder auf Auto lassen. Deine Phase und Woche siehst du unter dem Plan auf Heute.",
+  "wn.c.programTweaks.title": "Eine eigene Programmkopie pro Person",
+  "wn.c.programTweaks.body":
+    "Coaches können einen Tag für eine Person ändern, markiert und leicht rückgängig zu machen, während Änderungen am Programm weiter alle erreichen. Deine App übernimmt die Änderungen deines Coaches von selbst.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -758,6 +770,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Fasi e ripetizioni nei programmi dei coach",
   "wn.c.programPhases.body":
     "I coach dividono un programma in fasi con una settimana di scarico in un tocco, e possono impostare le ripetizioni di un esercizio o lasciarle su Auto. Vedi fase e settimana sotto il piano di Oggi.",
+  "wn.c.programTweaks.title": "La copia del programma per un cliente",
+  "wn.c.programTweaks.body":
+    "I coach possono cambiare un giorno per un cliente, segnato e facile da annullare, mentre le modifiche al programma arrivano comunque a tutti. La tua app riceve da sola i cambiamenti del tuo coach.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -900,6 +915,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "コーチのプログラムにフェーズと回数設定",
   "wn.c.programPhases.body":
     "コーチはワンタップのディロード週を含むフェーズでプログラムを組み、種目の回数を決めるかオートのままにできます。今のフェーズと週は今日のプランの下に表示されます。",
+  "wn.c.programTweaks.title": "クライアントごとのプログラム",
+  "wn.c.programTweaks.body":
+    "コーチは1人のクライアントだけ日を変更でき、変更は表示されて簡単に元に戻せます。プログラムへの編集は全員に届き、アプリがコーチの変更を自動で受け取ります。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1048,6 +1066,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Fases e repetições nos programas de treinadores",
   "wn.c.programPhases.body":
     "Treinadores dividem um programa em fases com uma semana de deload em um toque, e podem definir as repetições de um exercício ou deixar no Auto. Você vê sua fase e semana abaixo do plano de Hoje.",
+  "wn.c.programTweaks.title": "A cópia do programa de cada cliente",
+  "wn.c.programTweaks.body":
+    "Treinadores podem mudar um dia para um cliente, marcado e fácil de desfazer, enquanto as mudanças no programa continuam chegando a todos. Seu app recebe sozinho as mudanças do seu treinador.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1184,6 +1205,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "코치 프로그램의 단계와 반복 횟수",
   "wn.c.programPhases.body":
     "코치는 한 번 탭으로 넣는 디로드 주와 함께 프로그램을 단계로 나누고, 운동별 반복 횟수를 정하거나 자동으로 둘 수 있습니다. 지금 단계와 주차는 오늘의 계획 아래에 보입니다.",
+  "wn.c.programTweaks.title": "고객별 프로그램 사본",
+  "wn.c.programTweaks.body":
+    "코치는 고객 한 명을 위해 하루를 바꿀 수 있고, 변경은 표시되며 쉽게 되돌릴 수 있어요. 프로그램 수정은 모두에게 반영되고, 앱이 코치의 변경을 알아서 받아요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1331,6 +1355,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Fazy i powtórzenia w programach trenerów",
   "wn.c.programPhases.body":
     "Trenerzy dzielą program na fazy z tygodniem odciążenia dodawanym jednym dotknięciem i mogą ustalić powtórzenia ćwiczenia albo zostawić Auto. Swoją fazę i tydzień widzisz pod planem na Dziś.",
+  "wn.c.programTweaks.title": "Własna kopia programu dla klienta",
+  "wn.c.programTweaks.body":
+    "Trenerzy mogą zmienić dzień dla jednego klienta, oznaczony i łatwy do cofnięcia, a zmiany w programie nadal trafiają do wszystkich. Twoja aplikacja sama pobiera zmiany od trenera.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1480,4 +1507,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.programPhases.title": "Koç programlarında evreler ve tekrarlar",
   "wn.c.programPhases.body":
     "Koçlar programı tek dokunuşla eklenen bir deload haftasıyla evrelere ayırır ve bir hareketin tekrarlarını belirleyebilir ya da Otomatik bırakabilir. Evreni ve haftanı Bugün planının altında görürsün.",
+  "wn.c.programTweaks.title": "Danışana özel program kopyası",
+  "wn.c.programTweaks.body":
+    "Koçlar bir danışan için bir günü değiştirebilir; değişiklik işaretlenir ve kolayca geri alınır, programdaki düzenlemeler ise herkese ulaşır. Uygulaman koçunun değişikliklerini kendiliğinden alır.",
 };

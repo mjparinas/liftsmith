@@ -1079,7 +1079,7 @@ export const emails: Record<string, Words> = {
       "Kalendarz programu pokazuje Zrobione i Jeszcze nie. Drużyny szkolne: tylko imiona, nigdy ciężary.",
       "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj.",
     ],
-    dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta.",
+    dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta. Możesz też zmienić dzień dla jednego klienta w jego raporcie, a zmiany w programie nadal trafiają do pozostałych dni.",
   },
   "my-team": {
     title: "Twoi zawodnicy dostają panel Moja drużyna",

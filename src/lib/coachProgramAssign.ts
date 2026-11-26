@@ -24,6 +24,10 @@ export interface ProgramAssign {
   title: string;
   weeks: number;
   days: AssignDay[];
+  /** Days the coach changed for this client only (indexes into days). */
+  tweaked?: number[];
+  /** Last change from the coach; older servers leave it out. */
+  updatedAt?: number;
   status: AssignStatus;
   createdAt: number;
   acceptedAt: number | null;
@@ -71,6 +75,12 @@ export const assignProgram = (programId: string, scope: AssignScope, weekdays?: 
 
 export const acceptProgramAssign = (id: string) => post<{ assign: ProgramAssign }>({ action: "acceptProgram", id }).then((r) => r.assign);
 
+/** The coach changes one day for this client only, or with null puts the program's day back. */
+export const tweakProgramDay = (id: string, day: number, routine: { name: string; code: string } | null) =>
+  post<{ assign: ProgramAssign }>({ action: "tweakProgramDay", id, day, code: routine?.code ?? null, name: routine?.name }).then(
+    (r) => r.assign,
+  );
+
 export const endProgramAssign = (id: string) => post<{ assign: ProgramAssign }>({ action: "endProgram", id }).then((r) => r.assign);
 
 export const endProgramAssigns = (opts: { programId?: string; teamId?: string }) =>
@@ -96,10 +106,15 @@ const newId = (): string => {
   return Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 };
 
-/** Saves each assign day as a local routine and builds the standing planSource. */
+/**
+ * Saves each assign day as a local routine and builds the standing planSource. `reuse` maps a day index to the id of
+ * the routine that already holds it, so catching up with a coach's change keeps the same routines (and their history).
+ */
 export function followAssign(
   assign: ProgramAssign,
   now = Date.now(),
+  reuse?: ReadonlyMap<number, string>,
+  startedAt = now,
 ): { routines: Routine[]; planSource: Extract<PlanSource, { kind: "coachProgram" }> } {
   const dayIds: string[] = [];
   const weekdays: number[][] = [];
@@ -107,7 +122,7 @@ export function followAssign(
   const routines: Routine[] = assign.days.flatMap((d, dayIndex) => {
     const decoded = decodeRoutine(d.code);
     if (!decoded) return [];
-    const id = newId();
+    const id = reuse?.get(dayIndex) ?? newId();
     dayIds.push(id);
     kept.push(dayIndex);
     weekdays.push([...d.weekdays]);
@@ -131,7 +146,7 @@ export function followAssign(
       coachId: assign.coachId,
       programId: assign.programId,
       title: assign.title,
-      startedAt: now,
+      startedAt,
       weeks: assign.weeks,
       dayIds,
       weekdays,
@@ -139,8 +154,36 @@ export function followAssign(
       ...(assign.phases?.length
         ? { phases: assign.phases.map((p) => ({ ...p, weekdays: kept.map((i) => [...(p.weekdays[i] ?? [])]) })) }
         : {}),
+      ...(assign.updatedAt ? { syncedAt: assign.updatedAt } : {}),
     },
   };
+}
+
+/**
+ * Catches a followed program up with the coach (stage 3, 2026-11-26): when the assign changed since these days were
+ * saved, its routines are rebuilt from it in place (same ids, so history stays) and the plan keeps its start day.
+ * Null when there's nothing to do.
+ */
+export function catchUpAssign(
+  routines: readonly Routine[],
+  src: PlanSource | undefined,
+  assign: ProgramAssign | undefined,
+  now = Date.now(),
+): { routines: Routine[]; planSource: Extract<PlanSource, { kind: "coachProgram" }> } | null {
+  if (src?.kind !== "coachProgram" || !assign || assign.id !== src.assignId || assign.status !== "active") return null;
+  if (!assign.updatedAt || assign.updatedAt <= (src.syncedAt ?? 0)) return null;
+  const reuse = new Map<number, string>();
+  const created = new Map<string, number>();
+  for (const r of routines)
+    if (r.assignedProgram?.assignId === assign.id) {
+      reuse.set(r.assignedProgram.dayIndex, r.id);
+      created.set(r.id, r.createdAt);
+    }
+  const next = followAssign(assign, now, reuse, src.startedAt);
+  const fresh = next.routines.map((r) => ({ ...r, createdAt: created.get(r.id) ?? now }));
+  const ids = new Set(fresh.map((r) => r.id));
+  const others = routines.filter((r) => r.assignedProgram?.assignId !== assign.id && !ids.has(r.id));
+  return { routines: [...fresh, ...others], planSource: next.planSource };
 }
 
 type CoachSource = Extract<PlanSource, { kind: "coachProgram" }>;

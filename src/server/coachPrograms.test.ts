@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { onboardUrl, refreshAccount, type ConnectEvent, type PayConfig } from "./coachPay";
-import { assignProgram } from "./coachProgramAssign";
+import { acceptProgramAssign, assignProgram, assignsForClient, tweakAssignDay } from "./coachProgramAssign";
 import {
   browsePrograms,
   countCode,
@@ -145,6 +145,99 @@ describe("making a program", () => {
     await ready();
     expect(await saveProgram("coach", program({ price: 1000 }), NOW)).toEqual({ error: "bad" });
     expect(await made({ price: 29.99 })).toMatchObject({ price: 29.99, currency: "cad" });
+  });
+});
+
+describe("one client's own copy", () => {
+  const DAY_C = `r1~Legs~leg-press.4~romanian-deadlift.3`;
+  const start = async () => {
+    const p = await made({
+      days: [
+        { name: "Push", code: DAY_A, weekdays: [1] },
+        { name: "Legs", code: DAY_B, weekdays: [3] },
+      ],
+    });
+    await run("INSERT INTO coach_links (coach_id, client_id, created_at) VALUES ('coach', 'buyer', ?)", [NOW]);
+    await run("INSERT INTO coach_links (coach_id, client_id, created_at) VALUES ('coach', 'teen', ?)", [NOW]);
+    const r = await assignProgram("coach", p.id, { type: "clients", ids: ["buyer", "teen"] }, undefined, NOW);
+    if ("error" in r) throw new Error(r.error);
+    return { p, ana: r.assigned[0]!, kid: r.assigned[1]! };
+  };
+
+  it("changes a day for one client, keeps it through program edits, and puts it back", async () => {
+    const { p, ana } = await start();
+    await acceptProgramAssign("buyer", ana.id, NOW);
+    const t = await tweakAssignDay("coach", ana.id, 1, DAY_C, "Legs (knee)", NOW + 10);
+    if ("error" in t) throw new Error(t.error);
+    expect(t).toMatchObject({ tweaked: [1], updatedAt: NOW + 10, days: [{ code: DAY_A }, { name: "Legs (knee)", code: DAY_C }] });
+    // Only the coach who assigned it, a real day and a real routine.
+    expect(await tweakAssignDay("buyer", ana.id, 1, DAY_C, "x", NOW)).toEqual({ error: "gone" });
+    expect(await tweakAssignDay("coach", ana.id, 5, DAY_C, "x", NOW)).toEqual({ error: "bad" });
+    expect(await tweakAssignDay("coach", ana.id, 0, `r1~${PUSH}`, "x", NOW)).toEqual({ error: "bad" });
+
+    // The coach edits the program: the change reaches both clients, Ana's own day stays hers.
+    const DAY_A2 = `r1~Push~bench-press.5~overhead-press.3`;
+    await saveProgram(
+      "coach",
+      program({
+        id: p.id,
+        title: "Bench block",
+        days: [
+          { name: "Push", code: DAY_A2, weekdays: [1] },
+          { name: "Legs", code: DAY_B, weekdays: [4] },
+        ],
+      }),
+      NOW + 20,
+    );
+    const [mine] = await assignsForClient("buyer");
+    expect(mine).toMatchObject({
+      title: "Bench block",
+      tweaked: [1],
+      updatedAt: NOW + 20,
+      days: [
+        { code: DAY_A2, weekdays: [1] },
+        { code: DAY_C, weekdays: [4] },
+      ],
+    });
+    const [theirs] = await assignsForClient("teen");
+    expect(theirs?.days.map((d) => d.code)).toEqual([DAY_A2, DAY_B]);
+    expect(theirs?.tweaked).toBeUndefined();
+
+    const back = await tweakAssignDay("coach", ana.id, 1, null, undefined, NOW + 30);
+    if ("error" in back) throw new Error(back.error);
+    expect(back.tweaked).toBeUndefined();
+    expect(back.days[1]?.code).toBe(DAY_B);
+  });
+
+  it("keeps weekdays picked for the assign, and drops a change on a day that's gone", async () => {
+    const p = await made({
+      days: [
+        { name: "Push", code: DAY_A, weekdays: [1] },
+        { name: "Legs", code: DAY_B, weekdays: [3] },
+      ],
+    });
+    await run("INSERT INTO coach_links (coach_id, client_id, created_at) VALUES ('coach', 'buyer', ?)", [NOW]);
+    const r = await assignProgram("coach", p.id, { type: "clients", ids: ["buyer"] }, [[2], [5]], NOW);
+    if ("error" in r) throw new Error(r.error);
+    const a = r.assigned[0]!;
+    await tweakAssignDay("coach", a.id, 1, DAY_C, "Legs", NOW + 1);
+    await saveProgram(
+      "coach",
+      program({
+        id: p.id,
+        title: "Renamed",
+        days: [
+          { name: "Push", code: DAY_A, weekdays: [1] },
+          { name: "Legs", code: DAY_B, weekdays: [3] },
+        ],
+      }),
+      NOW + 2,
+    );
+    expect((await assignsForClient("buyer"))[0]?.days.map((d) => d.weekdays)).toEqual([[2], [5]]);
+    await saveProgram("coach", program({ id: p.id, days: [{ name: "Push", code: DAY_A, weekdays: [1] }] }), NOW + 3);
+    const [one] = await assignsForClient("buyer");
+    expect(one?.days).toEqual([{ name: "Push", code: DAY_A, weekdays: [1] }]);
+    expect(one?.tweaked).toBeUndefined();
   });
 });
 

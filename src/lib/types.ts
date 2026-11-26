@@ -496,6 +496,8 @@ export type PlanSource =
       weekdays: number[][];
       /** The program's phases in order, when it has more than its one week (weekdays inside are parallel to dayIds). */
       phases?: ProgramPhase[];
+      /** The assign's `updatedAt` these days came from, so a later change from the coach is picked up once. */
+      syncedAt?: number;
     };
 /**
  * A phase of a coach's program (program builder stage 2, 2026-11-26): its own week repeated for a few weeks. Build runs

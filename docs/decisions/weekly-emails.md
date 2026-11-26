@@ -901,3 +901,5 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-25.** The coach assignment tip includes the month calendar for scheduling workouts and rest days.
 
 **New, 2026-11-26.** The "Share and sell your programs" email gets a point on phases (Build, a one-tap Deload week, Peak) and coach-set reps with Auto as the default.
+
+**New, 2026-11-26.** The "Assign a season program" email's Did you know line adds changing a day for one client from their report.

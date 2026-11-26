@@ -207,6 +207,18 @@ export const en = {
   "cpg.phase.range": "Weeks {from} to {to}: {name}",
   "cpg.phase.one": "Week {from}: {name}",
   "cpg.phase.now": "{name}, week {week} of {count}",
+  "cpg.tweak.hint": "Change a day for this client only. Your later edits to the program still reach every other day.",
+  "cpg.tweak.hint.ath": "Change a day for this athlete only. Your later edits to the program still reach every other day.",
+  "cpg.tweak.badge": "Changed for this client",
+  "cpg.tweak.badge.ath": "Changed for this athlete",
+  "cpg.tweak.edit": "Change for this client",
+  "cpg.tweak.edit.ath": "Change for this athlete",
+  "cpg.tweak.undo": "Use the program's day",
+  "cpg.tweak.title": "Change this day for this client",
+  "cpg.tweak.title.ath": "Change this day for this athlete",
+  "cpg.tweak.saved": "Saved for this client. Their app picks it up next time it opens.",
+  "cpg.tweak.saved.ath": "Saved for this athlete. Their app picks it up next time it opens.",
+  "cpg.tweak.reset": "Back to the program's day.",
 } as const;
 
 type Key = keyof typeof en;
@@ -411,6 +423,18 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "Semanas {from} a {to}: {name}",
   "cpg.phase.one": "Semana {from}: {name}",
   "cpg.phase.now": "{name}, semana {week} de {count}",
+  "cpg.tweak.hint": "Cambia un día solo para este cliente. Lo que cambies después en el programa sigue llegando a los demás días.",
+  "cpg.tweak.hint.ath": "Cambia un día solo para este atleta. Lo que cambies después en el programa sigue llegando a los demás días.",
+  "cpg.tweak.badge": "Cambiado para este cliente",
+  "cpg.tweak.badge.ath": "Cambiado para este atleta",
+  "cpg.tweak.edit": "Cambiar para este cliente",
+  "cpg.tweak.edit.ath": "Cambiar para este atleta",
+  "cpg.tweak.undo": "Usar el día del programa",
+  "cpg.tweak.title": "Cambiar este día para este cliente",
+  "cpg.tweak.title.ath": "Cambiar este día para este atleta",
+  "cpg.tweak.saved": "Guardado para este cliente. Su app lo recibe la próxima vez que se abra.",
+  "cpg.tweak.saved.ath": "Guardado para este atleta. Su app lo recibe la próxima vez que se abra.",
+  "cpg.tweak.reset": "Vuelve el día del programa.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -619,6 +643,20 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "Semaines {from} à {to} : {name}",
   "cpg.phase.one": "Semaine {from} : {name}",
   "cpg.phase.now": "{name}, semaine {week} sur {count}",
+  "cpg.tweak.hint":
+    "Modifiez un jour pour ce client seulement. Vos prochaines modifications du programme atteignent toujours les autres jours.",
+  "cpg.tweak.hint.ath":
+    "Modifiez un jour pour cet athlète seulement. Vos prochaines modifications du programme atteignent toujours les autres jours.",
+  "cpg.tweak.badge": "Modifié pour ce client",
+  "cpg.tweak.badge.ath": "Modifié pour cet athlète",
+  "cpg.tweak.edit": "Modifier pour ce client",
+  "cpg.tweak.edit.ath": "Modifier pour cet athlète",
+  "cpg.tweak.undo": "Reprendre le jour du programme",
+  "cpg.tweak.title": "Modifier ce jour pour ce client",
+  "cpg.tweak.title.ath": "Modifier ce jour pour cet athlète",
+  "cpg.tweak.saved": "Enregistré pour ce client. Son app le reçoit à sa prochaine ouverture.",
+  "cpg.tweak.saved.ath": "Enregistré pour cet athlète. Son app le reçoit à sa prochaine ouverture.",
+  "cpg.tweak.reset": "Le jour du programme est de retour.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -829,6 +867,18 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "Wochen {from} bis {to}: {name}",
   "cpg.phase.one": "Woche {from}: {name}",
   "cpg.phase.now": "{name}, Woche {week} von {count}",
+  "cpg.tweak.hint": "Ändere einen Tag nur für diesen Kunden. Spätere Änderungen am Programm erreichen weiter alle anderen Tage.",
+  "cpg.tweak.hint.ath": "Ändere einen Tag nur für diese Person im Team. Spätere Änderungen am Programm erreichen weiter alle anderen Tage.",
+  "cpg.tweak.badge": "Für diesen Kunden geändert",
+  "cpg.tweak.badge.ath": "Für diese Person geändert",
+  "cpg.tweak.edit": "Für diesen Kunden ändern",
+  "cpg.tweak.edit.ath": "Für diese Person ändern",
+  "cpg.tweak.undo": "Tag aus dem Programm nehmen",
+  "cpg.tweak.title": "Diesen Tag für diesen Kunden ändern",
+  "cpg.tweak.title.ath": "Diesen Tag für diese Person ändern",
+  "cpg.tweak.saved": "Für diesen Kunden gespeichert. Die App übernimmt es beim nächsten Öffnen.",
+  "cpg.tweak.saved.ath": "Für diese Person gespeichert. Die App übernimmt es beim nächsten Öffnen.",
+  "cpg.tweak.reset": "Wieder der Tag aus dem Programm.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1032,6 +1082,19 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "Settimane da {from} a {to}: {name}",
   "cpg.phase.one": "Settimana {from}: {name}",
   "cpg.phase.now": "{name}, settimana {week} di {count}",
+  "cpg.tweak.hint": "Cambia un giorno solo per questo cliente. Le modifiche successive al programma arrivano comunque agli altri giorni.",
+  "cpg.tweak.hint.ath":
+    "Cambia un giorno solo per questo atleta. Le modifiche successive al programma arrivano comunque agli altri giorni.",
+  "cpg.tweak.badge": "Cambiato per questo cliente",
+  "cpg.tweak.badge.ath": "Cambiato per questo atleta",
+  "cpg.tweak.edit": "Cambia per questo cliente",
+  "cpg.tweak.edit.ath": "Cambia per questo atleta",
+  "cpg.tweak.undo": "Usa il giorno del programma",
+  "cpg.tweak.title": "Cambia questo giorno per questo cliente",
+  "cpg.tweak.title.ath": "Cambia questo giorno per questo atleta",
+  "cpg.tweak.saved": "Salvato per questo cliente. La sua app lo riceve alla prossima apertura.",
+  "cpg.tweak.saved.ath": "Salvato per questo atleta. La sua app lo riceve alla prossima apertura.",
+  "cpg.tweak.reset": "Torna il giorno del programma.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1216,6 +1279,18 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "{from}〜{to}週目：{name}",
   "cpg.phase.one": "{from}週目：{name}",
   "cpg.phase.now": "{name}・{count}週中{week}週目",
+  "cpg.tweak.hint": "このクライアントだけ日を変更できます。このあとプログラムを編集しても、ほかの日にはそのまま反映されます。",
+  "cpg.tweak.hint.ath": "この選手だけ日を変更できます。このあとプログラムを編集しても、ほかの日にはそのまま反映されます。",
+  "cpg.tweak.badge": "このクライアント用に変更",
+  "cpg.tweak.badge.ath": "この選手用に変更",
+  "cpg.tweak.edit": "このクライアント用に変更",
+  "cpg.tweak.edit.ath": "この選手用に変更",
+  "cpg.tweak.undo": "プログラムの日に戻す",
+  "cpg.tweak.title": "このクライアント用にこの日を変更",
+  "cpg.tweak.title.ath": "この選手用にこの日を変更",
+  "cpg.tweak.saved": "このクライアント用に保存しました。次にアプリを開いたときに反映されます。",
+  "cpg.tweak.saved.ath": "この選手用に保存しました。次にアプリを開いたときに反映されます。",
+  "cpg.tweak.reset": "プログラムの日に戻しました。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1419,6 +1494,18 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "Semanas {from} a {to}: {name}",
   "cpg.phase.one": "Semana {from}: {name}",
   "cpg.phase.now": "{name}, semana {week} de {count}",
+  "cpg.tweak.hint": "Mude um dia só para este cliente. O que você mudar depois no programa continua chegando aos outros dias.",
+  "cpg.tweak.hint.ath": "Mude um dia só para este atleta. O que você mudar depois no programa continua chegando aos outros dias.",
+  "cpg.tweak.badge": "Mudado para este cliente",
+  "cpg.tweak.badge.ath": "Mudado para este atleta",
+  "cpg.tweak.edit": "Mudar para este cliente",
+  "cpg.tweak.edit.ath": "Mudar para este atleta",
+  "cpg.tweak.undo": "Usar o dia do programa",
+  "cpg.tweak.title": "Mudar este dia para este cliente",
+  "cpg.tweak.title.ath": "Mudar este dia para este atleta",
+  "cpg.tweak.saved": "Salvo para este cliente. O app dele recebe na próxima vez que abrir.",
+  "cpg.tweak.saved.ath": "Salvo para este atleta. O app dele recebe na próxima vez que abrir.",
+  "cpg.tweak.reset": "O dia do programa voltou.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1603,6 +1690,18 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "{from}~{to}주차: {name}",
   "cpg.phase.one": "{from}주차: {name}",
   "cpg.phase.now": "{name}, {count}주 중 {week}주차",
+  "cpg.tweak.hint": "이 고객만을 위해 하루를 바꿀 수 있어요. 나중에 프로그램을 수정해도 다른 날에는 그대로 반영됩니다.",
+  "cpg.tweak.hint.ath": "이 선수만을 위해 하루를 바꿀 수 있어요. 나중에 프로그램을 수정해도 다른 날에는 그대로 반영됩니다.",
+  "cpg.tweak.badge": "이 고객용으로 변경됨",
+  "cpg.tweak.badge.ath": "이 선수용으로 변경됨",
+  "cpg.tweak.edit": "이 고객용으로 변경",
+  "cpg.tweak.edit.ath": "이 선수용으로 변경",
+  "cpg.tweak.undo": "프로그램의 날로 되돌리기",
+  "cpg.tweak.title": "이 고객용으로 이날 변경",
+  "cpg.tweak.title.ath": "이 선수용으로 이날 변경",
+  "cpg.tweak.saved": "이 고객용으로 저장했어요. 다음에 앱을 열 때 반영됩니다.",
+  "cpg.tweak.saved.ath": "이 선수용으로 저장했어요. 다음에 앱을 열 때 반영됩니다.",
+  "cpg.tweak.reset": "프로그램의 날로 돌아갔어요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1801,6 +1900,18 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "{from}–{to}. haftalar: {name}",
   "cpg.phase.one": "{from}. hafta: {name}",
   "cpg.phase.now": "{name}, {count} haftanın {week}. haftası",
+  "cpg.tweak.hint": "Bir günü yalnızca bu danışan için değiştir. Programda sonradan yaptığın değişiklikler diğer günlere yine ulaşır.",
+  "cpg.tweak.hint.ath": "Bir günü yalnızca bu sporcu için değiştir. Programda sonradan yaptığın değişiklikler diğer günlere yine ulaşır.",
+  "cpg.tweak.badge": "Bu danışan için değişti",
+  "cpg.tweak.badge.ath": "Bu sporcu için değişti",
+  "cpg.tweak.edit": "Bu danışan için değiştir",
+  "cpg.tweak.edit.ath": "Bu sporcu için değiştir",
+  "cpg.tweak.undo": "Programdaki günü kullan",
+  "cpg.tweak.title": "Bu günü bu danışan için değiştir",
+  "cpg.tweak.title.ath": "Bu günü bu sporcu için değiştir",
+  "cpg.tweak.saved": "Bu danışan için kaydedildi. Uygulaması bir sonraki açılışta alır.",
+  "cpg.tweak.saved.ath": "Bu sporcu için kaydedildi. Uygulaması bir sonraki açılışta alır.",
+  "cpg.tweak.reset": "Programdaki gün geri geldi.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -2058,4 +2169,16 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.phase.range": "Tygodnie {from}–{to}: {name}",
   "cpg.phase.one": "Tydzień {from}: {name}",
   "cpg.phase.now": "{name}, tydzień {week} z {count}",
+  "cpg.tweak.hint": "Zmień dzień tylko dla tego klienta. Późniejsze zmiany w programie nadal trafiają do pozostałych dni.",
+  "cpg.tweak.hint.ath": "Zmień dzień tylko dla tego zawodnika. Późniejsze zmiany w programie nadal trafiają do pozostałych dni.",
+  "cpg.tweak.badge": "Zmienione dla tego klienta",
+  "cpg.tweak.badge.ath": "Zmienione dla tego zawodnika",
+  "cpg.tweak.edit": "Zmień dla tego klienta",
+  "cpg.tweak.edit.ath": "Zmień dla tego zawodnika",
+  "cpg.tweak.undo": "Użyj dnia z programu",
+  "cpg.tweak.title": "Zmień ten dzień dla tego klienta",
+  "cpg.tweak.title.ath": "Zmień ten dzień dla tego zawodnika",
+  "cpg.tweak.saved": "Zapisano dla tego klienta. Jego aplikacja pobierze to przy następnym otwarciu.",
+  "cpg.tweak.saved.ath": "Zapisano dla tego zawodnika. Jego aplikacja pobierze to przy następnym otwarciu.",
+  "cpg.tweak.reset": "Wrócił dzień z programu.",
 };
