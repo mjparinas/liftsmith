@@ -5,6 +5,7 @@
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
 import { accessFor, type Access } from "./access";
+import { roleOf } from "./adminAuth";
 import { coachCleanup } from "./coach";
 import { forgetCoachPay } from "./coachPay";
 import { programCleanup } from "./coachPrograms";
@@ -50,6 +51,9 @@ export interface AccountInfo {
   pro: boolean;
   proVia: Access["via"];
   sub: Access["sub"];
+  /** The account's verified address is on ADMIN_EMAILS or SUPPORT_EMAILS (adminAuth.ts), so the app shows Settings ›
+   *  Admin panel. It opens the panel and nothing else: the panel still asks for its own sign-in and two-step. */
+  staff: boolean;
 }
 
 export type Platform = "web" | "android" | "ios";
@@ -71,13 +75,13 @@ export async function accountInfo(id: string): Promise<AccountInfo | null> {
   };
 }
 
-async function access(id: string, email: string | null): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub">> {
+async function access(id: string, email: string | null): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub" | "staff">> {
   const a = await accessFor(id, email);
-  return { pro: a.pro, proVia: a.via, sub: a.sub };
+  return { pro: a.pro, proVia: a.via, sub: a.sub, staff: !!email && roleOf(email.trim().toLowerCase()) !== null };
 }
 
 /** The account's Pro and where it comes from (access.ts). Sync sends it on every round. */
-export async function accountAccess(id: string): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub">> {
+export async function accountAccess(id: string): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub" | "staff">> {
   const rows = await query<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [id]);
   return access(id, rows[0]?.email ? String(rows[0].email) : null);
 }

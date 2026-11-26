@@ -8,6 +8,7 @@ import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
+import { openAdmin } from "@/lib/adminLink";
 import { analyticsOn, askFirstHere, installId, setAnalytics, track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
@@ -339,6 +340,7 @@ function SettingsMain() {
   const desktop = useDesktop();
   const inNav = useCoachNotes((s) => !!coachingNav(s.who.role));
   const more = useUnlocked("more");
+  const staff = useAccount((s) => !!s.account?.staff);
   const goal = t(`goal.${profile.goal}`);
   const program = programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive");
   const sums: Record<Group, string> = {
@@ -388,6 +390,8 @@ function SettingsMain() {
         <div className="space-y-3">
           {communityOn() && <NavRow title={t("cmty.title")} sub={t("cmty.rowSub")} icon="lightbulb" onClick={() => go("community")} />}
           <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
+          {/* Staff only (adminLink.ts): the admin panel in an in-app browser tab, which asks for its own sign-in. */}
+          {staff && <NavRow title={t("settings.admin")} sub={t("settings.adminSub")} icon="server" onClick={() => void openAdmin()} />}
           {/* The version and What's new (WhatsNew.tsx, docs/decisions/whats-new.md). */}
           <VersionRow />
         </div>

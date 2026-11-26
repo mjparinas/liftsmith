@@ -32,6 +32,8 @@ export interface Account {
   proVia?: ProVia | null;
   /** The paid subscription behind it, when there is one. */
   sub?: AccountSub | null;
+  /** A staff address (the server's ADMIN_EMAILS or SUPPORT_EMAILS): Settings shows Admin panel (adminLink.ts). */
+  staff?: boolean;
 }
 
 export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach" | "club" | "school" | "team";
@@ -51,6 +53,8 @@ export interface AccountAccess {
   pro?: boolean;
   proVia?: ProVia | null;
   sub?: AccountSub | null;
+  /** On the staff lists (Settings › Admin panel). */
+  staff?: boolean;
 }
 
 export type Method = "google" | "apple" | "email";
@@ -179,6 +183,7 @@ async function signedInAs(r: SessionReply, via: Method): Promise<Account> {
     providers: r.account.providers,
     via,
     ...(r.account.pro ? { pro: true, proVia: r.account.proVia ?? null, sub: r.account.sub ?? null } : {}),
+    ...(r.account.staff ? { staff: true } : {}),
   };
   try {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a));
@@ -314,6 +319,11 @@ export function setAccountPro(pro: boolean, more: Omit<AccountAccess, "pro"> = {
   const a = readAccount();
   if (!a) return;
   const next: Account = { ...a, pro, proVia: pro ? (more.proVia ?? a.proVia ?? null) : null, sub: pro ? (more.sub ?? null) : null };
+  // A sync or account reply says whether the address is staff; other callers leave it as it was.
+  if (more.staff !== undefined || "pro" in more) {
+    if (more.staff) next.staff = true;
+    else delete next.staff;
+  }
   if (!next.proVia) delete next.proVia;
   if (!next.sub) delete next.sub;
   if (JSON.stringify(next) === JSON.stringify(a)) return;

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
+import { isAdminLink } from "./adminLink";
 import { APP_LINK_PATHS, hashFromLink } from "./appLinks";
 import { routineUrl } from "./routineShare";
 
@@ -59,6 +60,18 @@ describe("app links", () => {
     expect(hashFromLink("not a url")).toBeNull();
   });
 
+  it("opens admin links in the app's browser tab, never as a screen (Melvin, 2026-11-26)", () => {
+    for (const path of ["/admin", "/admin/", "/admin/?tab=System", "/api/admin/login/?token=abc"]) {
+      const url = `https://www.getliftsmith.com${path}`;
+      expect(isAdminLink(url), path).toBe(true);
+      expect(hashFromLink(url), path).toBeNull();
+    }
+    expect(isAdminLink("https://www.getliftsmith.com/administration/")).toBe(false);
+    expect(isAdminLink("https://www.getliftsmith.com/api/admin/flags/")).toBe(false);
+    expect(isAdminLink("https://evil.example/admin/")).toBe(false);
+    expect(isAdminLink("http://www.getliftsmith.com/admin/")).toBe(false);
+  });
+
   it("claims exactly APP_LINK_PATHS on www in the manifest, verified, and each one opens a screen", () => {
     const manifest = readFileSync("android/app/src/main/AndroidManifest.xml", "utf8");
     const filter = /<intent-filter android:autoVerify="true">([\s\S]*?)<\/intent-filter>/.exec(manifest)?.[1] ?? "";
@@ -69,8 +82,10 @@ describe("app links", () => {
     expect(claimed).toEqual(APP_LINK_PATHS);
     expect(claimed.map((c) => c.prefix ?? "")).not.toContain("/coach-programs/");
     expect(new Set([...filter.matchAll(/android:host="([^"]+)"/g)].map((m) => m[1]))).toEqual(new Set(["www.getliftsmith.com"]));
-    for (const c of APP_LINK_PATHS)
-      expect(hashFromLink(`https://www.getliftsmith.com${c.path ?? `${c.prefix}x/`}`), JSON.stringify(c)).not.toBeNull();
+    for (const c of APP_LINK_PATHS) {
+      const url = `https://www.getliftsmith.com${c.path ?? `${c.prefix}x/`}`;
+      expect(hashFromLink(url) !== null || isAdminLink(url), JSON.stringify(c)).toBe(true);
+    }
   });
 
   it("sends website links tapped inside the Android app to the browser, not back to the app", () => {
