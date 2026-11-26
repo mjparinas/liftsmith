@@ -398,9 +398,10 @@ export function Today() {
 
       {/* The coach's note, a new message, a session or a check-in from the coach come first, above the call and the
           plan, on phones and the desktop alike (Melvin, 2026-11-25: on the desktop it sat down the side column, while
-          the coach is told "it's at the top of their Today"). One column wide on the desktop, so it doesn't stretch. */}
+          the coach is told "it's at the top of their Today"). On the desktop it is exactly as wide as the plan's column
+          below it (3 of the grid's 5 columns, which has 4 gaps of 1.5rem), so their edges line up. */}
       {!active && (
-        <div className="desk-col">
+        <div className="desk:w-[calc((100%-6rem)*0.6+3rem)]">
           <CoachNoteToday />
         </div>
       )}

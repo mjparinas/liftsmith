@@ -28,9 +28,9 @@ import {
 } from "@/server/gymExtras";
 import { countVisit, gymInsights } from "@/server/gymInsights";
 import { areaMapPath } from "@/server/gymMedia";
-import { mergedTarget, reportPlace } from "@/server/gymPlaceReports";
-import { closestPlaces, isPlaceId, joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
-import { latestOrder, requestPosters } from "@/server/gymPosters";
+import { mergedPath, mergedTarget, reportPlace } from "@/server/gymPlaceReports";
+import { closestPlaces, isPlaceId, joinPlace, movedGym, nearbyPlaces, placeById, placeBySlug, suggestPlace } from "@/server/gymPlaces";
+import { countScan, latestOrder, requestPosters } from "@/server/gymPosters";
 import { closestReply, ipSpot, visitorClock } from "@/server/gymsNear";
 import { cancelInvite, invitePreview, inviteStaff, joinStaff, removeStaff, staffOf } from "@/server/gymStaff";
 import { gymClubStart } from "@/server/social";
@@ -50,6 +50,23 @@ export async function GET(req: Request) {
     // A gym staff merged into another (gymPlaceReports.ts) opens the gym it was merged into.
     const merged = found || !isPlaceId(u.get("place")) ? null : await mergedTarget(u.get("place")!);
     const place = found ?? (merged ? await placeById(merged) : null);
+    return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
+  }
+  // ?city=<slug>&gym=<slug>[&qr=1]: one real gym by its website address, for a /gyms/<city>/<gym>/ link that opened
+  // the app (Android App Links, src/lib/appLinks.ts). A page that moved city or was merged opens the gym it went to,
+  // and a link from the gym's poster QR code (?from=qr on the page) is counted as a scan, as the page would have.
+  if (u.has("city") && u.has("gym")) {
+    const [ok, found] = await Promise.all([allowed, placeBySlug(u.get("city"), u.get("gym"))]);
+    if (!ok) return reply(req, 429, { error: "slow" });
+    let place = found;
+    if (!place) {
+      const city = u.get("city")!;
+      const gym = u.get("gym")!;
+      const to = (await movedGym(city, gym)) ?? (await mergedPath(city, gym));
+      const m = to ? /^\/gyms\/([^/]+)\/([^/]+)\/$/.exec(to) : null;
+      place = m ? await placeBySlug(m[1], m[2]) : null;
+    }
+    if (place && u.get("qr") === "1") await countScan(place.id, addressKey(ipOf(req))).catch(() => {});
     return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
   }
   // ?chain=<slug>: a gym chain and every branch, for its page in the app (GymChain.tsx; gymChains.ts).

@@ -160,6 +160,9 @@ export const en = {
   "wn.c.chatInPlace.title": "Chats open where you are",
   "wn.c.chatInPlace.body":
     "Message your coach or open Team chat and the chat opens right there: in the Messages box on a computer, or over the page on your phone.",
+  "wn.c.siteLinks.title": "Website links open the app",
+  "wn.c.siteLinks.body":
+    "On Android, a link to a gym, routine, profile, exercise or tool on getliftsmith.com now opens that screen here instead of the browser.",
   "wn.c.coachNoteTop.title": "Your coach's note is at the top of Today",
   "wn.c.coachNoteTop.body":
     "A note from your coach now sits at the very top of Today, above your workout, on your phone and on a computer.",
@@ -337,6 +340,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Los chats se abren donde estás",
   "wn.c.chatInPlace.body":
     "Escribe a tu entrenador o abre el chat del equipo y se abre ahí mismo: en el cuadro de Mensajes en el ordenador o sobre la página en el teléfono.",
+  "wn.c.siteLinks.title": "Los enlaces de la web abren la app",
+  "wn.c.siteLinks.body":
+    "En Android, un enlace a un gimnasio, rutina, perfil, ejercicio o herramienta de getliftsmith.com ahora abre esa pantalla aquí y no en el navegador.",
   "wn.c.coachNoteTop.title": "La nota de tu entrenador, arriba en Hoy",
   "wn.c.coachNoteTop.body":
     "La nota de tu entrenador ahora aparece arriba del todo en Hoy, encima de tu entrenamiento, en el teléfono y en el ordenador.",
@@ -516,6 +522,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Les discussions s'ouvrent là où vous êtes",
   "wn.c.chatInPlace.body":
     "Écrivez à votre coach ou ouvrez la discussion d'équipe : elle s'ouvre sur place, dans la boîte Messages sur ordinateur ou par-dessus la page sur téléphone.",
+  "wn.c.siteLinks.title": "Les liens du site ouvrent l'appli",
+  "wn.c.siteLinks.body":
+    "Sur Android, un lien vers une salle, une routine, un profil, un exercice ou un outil de getliftsmith.com ouvre maintenant cet écran ici plutôt que dans le navigateur.",
   "wn.c.coachNoteTop.title": "La note de votre coach en haut d'Aujourd'hui",
   "wn.c.coachNoteTop.body":
     "La note de votre coach s'affiche maintenant tout en haut d'Aujourd'hui, au-dessus de votre séance, sur téléphone comme sur ordinateur.",
@@ -691,6 +700,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Chats öffnen sich dort, wo du bist",
   "wn.c.chatInPlace.body":
     "Schreib deinem Coach oder öffne den Teamchat, und der Chat öffnet sich direkt dort: am Computer im Nachrichtenfenster, am Handy über der Seite.",
+  "wn.c.siteLinks.title": "Links zur Website öffnen die App",
+  "wn.c.siteLinks.body":
+    "Auf Android öffnet ein Link zu einem Studio, einer Routine, einem Profil, einer Übung oder einem Tool auf getliftsmith.com jetzt diesen Bildschirm hier statt im Browser.",
   "wn.c.coachNoteTop.title": "Die Notiz deines Coaches oben auf Heute",
   "wn.c.coachNoteTop.body": "Eine Notiz deines Coaches steht jetzt ganz oben auf Heute, über deinem Training, am Handy und am Computer.",
   "wn.c.moreStretches.title": "13 neue Dehnübungen",
@@ -866,6 +878,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Le chat si aprono dove sei",
   "wn.c.chatInPlace.body":
     "Scrivi al tuo coach o apri la chat della squadra e si apre lì: nel riquadro Messaggi sul computer o sopra la pagina sul telefono.",
+  "wn.c.siteLinks.title": "I link del sito aprono l'app",
+  "wn.c.siteLinks.body":
+    "Su Android, un link a una palestra, una routine, un profilo, un esercizio o uno strumento su getliftsmith.com ora apre quella schermata qui invece che nel browser.",
   "wn.c.coachNoteTop.title": "La nota del coach in cima a Oggi",
   "wn.c.coachNoteTop.body": "La nota del tuo coach ora è in cima a Oggi, sopra l'allenamento, sul telefono e sul computer.",
   "wn.c.moreStretches.title": "13 nuovi allungamenti",
@@ -1030,6 +1045,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "チャットがその場で開きます",
   "wn.c.chatInPlace.body":
     "コーチへのメッセージやチームチャットは、その場で開きます。パソコンではメッセージ欄に、スマートフォンでは画面の上に表示されます。",
+  "wn.c.siteLinks.title": "サイトのリンクがアプリで開きます",
+  "wn.c.siteLinks.body":
+    "Android では、getliftsmith.com のジム、ルーティン、プロフィール、種目、ツールへのリンクが、ブラウザではなくアプリのその画面で開くようになりました。",
   "wn.c.coachNoteTop.title": "コーチのメモが今日のいちばん上に",
   "wn.c.coachNoteTop.body": "コーチからのメモが、スマートフォンでもパソコンでも、今日の画面のいちばん上、ワークアウトの上に表示されます。",
   "wn.c.moreStretches.title": "新しいストレッチ13種",
@@ -1200,6 +1218,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "As conversas abrem onde você está",
   "wn.c.chatInPlace.body":
     "Mande mensagem ao seu treinador ou abra o chat da equipe e ele abre ali mesmo: na caixa de Mensagens no computador ou sobre a página no celular.",
+  "wn.c.siteLinks.title": "Links do site abrem o app",
+  "wn.c.siteLinks.body":
+    "No Android, um link para uma academia, rotina, perfil, exercício ou ferramenta do getliftsmith.com agora abre essa tela aqui, e não no navegador.",
   "wn.c.coachNoteTop.title": "O recado do treinador no topo de Hoje",
   "wn.c.coachNoteTop.body": "O recado do seu treinador agora fica no topo de Hoje, acima do seu treino, no celular e no computador.",
   "wn.c.moreStretches.title": "13 alongamentos novos",
@@ -1358,6 +1379,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "채팅이 바로 그 자리에서 열려요",
   "wn.c.chatInPlace.body":
     "코치에게 메시지를 보내거나 팀 채팅을 열면 그 자리에서 열려요. 컴퓨터에서는 메시지 창에, 휴대폰에서는 화면 위에 열려요.",
+  "wn.c.siteLinks.title": "웹사이트 링크가 앱에서 열려요",
+  "wn.c.siteLinks.body":
+    "Android에서 getliftsmith.com의 헬스장, 루틴, 프로필, 운동, 도구 링크를 누르면 이제 브라우저 대신 앱의 해당 화면이 열려요.",
   "wn.c.coachNoteTop.title": "코치 메모가 오늘 맨 위에",
   "wn.c.coachNoteTop.body": "코치가 남긴 메모가 이제 휴대폰과 컴퓨터 모두에서 오늘 화면 맨 위, 운동 위에 보여요.",
   "wn.c.moreStretches.title": "새 스트레칭 13가지",
@@ -1527,6 +1551,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Czaty otwierają się tam, gdzie jesteś",
   "wn.c.chatInPlace.body":
     "Napisz do trenera albo otwórz czat drużyny, a otworzy się od razu: w okienku Wiadomości na komputerze lub nad stroną na telefonie.",
+  "wn.c.siteLinks.title": "Linki do strony otwierają aplikację",
+  "wn.c.siteLinks.body":
+    "Na Androidzie link do siłowni, rutyny, profilu, ćwiczenia lub narzędzia na getliftsmith.com otwiera teraz ten ekran tutaj zamiast w przeglądarce.",
   "wn.c.coachNoteTop.title": "Notatka trenera na górze Dzisiaj",
   "wn.c.coachNoteTop.body": "Notatka od trenera jest teraz na samej górze ekranu Dzisiaj, nad treningiem, na telefonie i na komputerze.",
   "wn.c.moreStretches.title": "13 nowych ćwiczeń rozciągających",
@@ -1698,6 +1725,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Sohbetler olduğun yerde açılır",
   "wn.c.chatInPlace.body":
     "Koçuna yaz ya da takım sohbetini aç, sohbet hemen orada açılır: bilgisayarda Mesajlar kutusunda, telefonda sayfanın üstünde.",
+  "wn.c.siteLinks.title": "Site bağlantıları uygulamayı açar",
+  "wn.c.siteLinks.body":
+    "Android'de getliftsmith.com'daki bir spor salonu, rutin, profil, egzersiz veya araç bağlantısı artık tarayıcı yerine burada o ekranı açar.",
   "wn.c.coachNoteTop.title": "Koçunun notu Bugün'ün en üstünde",
   "wn.c.coachNoteTop.body": "Koçundan gelen not artık telefonda ve bilgisayarda Bugün ekranının en üstünde, antrenmanının üzerinde.",
   "wn.c.moreStretches.title": "13 yeni esneme",

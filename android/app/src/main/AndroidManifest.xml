@@ -31,16 +31,82 @@
                 <data android:scheme="liftsmith" />
             </intent-filter>
 
-            <!-- Android App Links: links into the web app on our domain (shared routines, remix links) open here
-                 (src/lib/appLinks.ts; verified by public/.well-known/assetlinks.json). www only: the bare domain
-                 redirects, and verification doesn't follow redirects. -->
+            <!-- Android App Links: links to our domain open here (src/lib/appLinks.ts, verified by
+                 public/.well-known/assetlinks.json): the web app (/app), invite links, and every website page that has
+                 a screen in the app (gyms, routines, profiles, exercises, tools, pricing, the home page; 2026-11-26).
+                 The list must equal APP_LINK_PATHS (appLinks.test.ts). www only: the bare domain redirects, and
+                 verification doesn't follow redirects. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/app" />
-                <!-- Invite links, www.getliftsmith.com/invite/<code> (src/lib/appLinks.ts, 2026-11-15). -->
-                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/invite" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/app" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/app/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/invite/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/u/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/gyms/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/gym-chains/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/routines/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/community/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/es" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/es/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/es/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/es/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/es/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/es/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/fr" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/fr/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/fr/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/fr/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/fr/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/fr/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/de" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/de/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/de/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/de/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/de/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/de/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/it" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/it/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/it/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/it/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/it/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/it/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/ja" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/ja/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ja/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ja/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ja/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ja/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/pt" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/pt/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pt/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pt/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pt/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pt/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/ko" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/ko/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ko/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ko/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ko/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/ko/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/pl" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/pl/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pl/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pl/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pl/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/pl/pricing/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/tr" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:path="/tr/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/tr/exercises/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/tr/programs/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/tr/tools/" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/tr/pricing/" />
             </intent-filter>
 
         </activity>
