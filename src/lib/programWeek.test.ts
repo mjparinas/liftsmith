@@ -1,7 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import { UPPER_LOWER } from "./coachProgramTemplates";
-import { autoArrange, draftFromWeek, emptyWeek, monthCells, weekFromDraft, weekFromProgram, workoutsIn } from "./programWeek";
+import {
+  autoArrange,
+  draftFromPhases,
+  draftFromWeek,
+  emptyWeek,
+  monthCells,
+  phasesFromDraft,
+  weekFromDraft,
+  weekFromProgram,
+  workoutsIn,
+} from "./programWeek";
 import { encodeRoutine } from "./routineShare";
 import type { Routine } from "./types";
 
@@ -104,5 +114,50 @@ describe("monthCells", () => {
     expect(cells[7]!.routineId).toBe("u");
     expect(cells[14]!.inside).toBe(false);
     expect(cells[14]!.routineId).toBeNull();
+  });
+});
+
+describe("phases in the builder", () => {
+  const build = weekFromDraft(["a", "b"], [[1, 4], [2]]);
+  const deload = emptyWeek();
+  deload[3] = "c";
+  deload[1] = "a";
+
+  it("saves each routine once, the first phase's weekdays, and every phase's weekdays", () => {
+    const out = draftFromPhases(
+      [
+        { kind: "build", weeks: 3, week: build },
+        { kind: "deload", weeks: 1, week: deload },
+      ],
+      1,
+    );
+    expect(out.routineIds).toEqual(["a", "b", "c"]);
+    expect(out.weekdays).toEqual([[1, 4], [2], []]);
+    expect(out.phases).toEqual([
+      { kind: "build", weeks: 3, weekdays: [[1, 4], [2], []] },
+      { kind: "deload", weeks: 1, weekdays: [[1], [], [3]] },
+    ]);
+    expect(phasesFromDraft(out.routineIds, out.weekdays, 4, out.phases)).toEqual([
+      { kind: "build", weeks: 3, week: build },
+      { kind: "deload", weeks: 1, week: deload },
+    ]);
+  });
+
+  it("is a plain week with one phase", () => {
+    const out = draftFromPhases([{ kind: "build", weeks: 6, week: build }], 1);
+    expect(out).toEqual({ routineIds: ["a", "b"], weekdays: [[1, 4], [2]] });
+    expect(phasesFromDraft(["a", "b"], [[1, 4], [2]], 6)).toEqual([{ kind: "build", weeks: 6, week: build }]);
+  });
+
+  it("shows each phase's week on the month", () => {
+    const cells = monthCells(build, new Date(2026, 11, 2, 15).getTime(), 99, 1, 42, [
+      { weeks: 1, week: build },
+      { weeks: 1, week: deload },
+    ]);
+    expect(cells[0]!.routineId).toBe("a");
+    expect(cells[7]!.routineId).toBe("a");
+    expect(cells[9]!.routineId).toBe("c");
+    expect(cells[9]!.phase).toBe(1);
+    expect(cells[14]!.inside).toBe(false);
   });
 });

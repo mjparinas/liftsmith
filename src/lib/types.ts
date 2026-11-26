@@ -494,7 +494,24 @@ export type PlanSource =
       dayIds: string[];
       /** Parallel to dayIds: JS getDay() weekdays (0=Sun … 6=Sat) each day runs. */
       weekdays: number[][];
+      /** The program's phases in order, when it has more than its one week (weekdays inside are parallel to dayIds). */
+      phases?: ProgramPhase[];
     };
+/**
+ * A phase of a coach's program (program builder stage 2, 2026-11-26): its own week repeated for a few weeks. Build runs
+ * the routines as written; Deload halves the sets and goes 10% lighter; Peak cuts the sets by a third.
+ */
+export type PhaseKind = "build" | "deload" | "peak";
+export const PHASE_KINDS: readonly PhaseKind[] = ["build", "deload", "peak"];
+
+export interface ProgramPhase {
+  kind: PhaseKind;
+  /** 1 to 16. */
+  weeks: number;
+  /** Parallel to the program's days: the weekdays (JS getDay()) each day runs in this phase; empty is not in it. */
+  weekdays: number[][];
+}
+
 /** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
 export interface RoutineItem {
   exerciseId: string;
@@ -506,6 +523,11 @@ export interface RoutineItem {
    * Only used when the routine is a rehab program (2026-11-22).
    */
   reps?: number;
+  /**
+   * A coach's rep range for this exercise ends here (`reps` to `repsTo`, e.g. 8 to 10), from the program builder
+   * (2026-11-26). Each lifter's own progression still picks the weight inside it. Missing: the usual range.
+   */
+  repsTo?: number;
   /** A short cue from the physio (about 80 characters). Missing: the usual target note. */
   cue?: string;
 }

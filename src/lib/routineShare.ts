@@ -1,7 +1,7 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { PHASES, REHAB_PROGRAMS } from "./rehab";
-import { clampSets, cleanCue, cleanParts, cleanReps, MAX_ITEMS, NAME_MAX } from "./routines";
+import { clampSets, cleanCue, cleanParts, cleanRange, cleanReps, MAX_ITEMS, NAME_MAX } from "./routines";
 import { APP_PATH, SITE_URL } from "./site";
 import { linksOf, withLinks } from "./superset";
 import { BODY_PARTS, type BodyPart, type RehabPlan, type RehabProtocolId, type Routine, type RoutineItem, type RoutinePart } from "./types";
@@ -113,9 +113,13 @@ const safeDecode = (s: string) => {
 };
 
 // The name goes in as base64url of its UTF-8, so no app that encodes the link again can change it.
-/** An exercise segment: `id.sets`, `.s` when linked to the next, `.rN` for prescribed reps or seconds, `.c` plus a cue. */
+/**
+ * An exercise segment: `id.sets`, `.s` when linked to the next, `.rN` for prescribed reps or seconds or `.rN-M` for a
+ * coach's rep range (2026-11-26; older apps don't read it and keep their own range), `.c` plus a cue.
+ */
 function itemOut(i: RoutineItem, link: boolean): string {
-  const reps = cleanReps(i.reps);
+  const range = i.repsTo !== undefined ? cleanRange(i.reps, i.repsTo) : undefined;
+  const reps = range ? `${range[0]}-${range[1]}` : cleanReps(i.reps);
   const cue = cleanCue(i.cue);
   // `.s` stays the third piece when there is no prescription, so an older app still sees the superset.
   // With a prescription it follows `.s` (`id.sets.s.rN`) or stands in the third place (`id.sets.rN`).
@@ -174,24 +178,33 @@ export function decodeRoutine(code: string): {
   const raw = code.includes("~") ? code : safeDecode(code);
   const [v, rawName = "", ...parts] = raw.split("~");
   if (v !== SHARE_VERSION) return null;
-  const kept: { exerciseId: string; sets: number; reps?: number; cue?: string; at: number; link: boolean }[] = [];
+  const kept: { exerciseId: string; sets: number; reps?: number; repsTo?: number; cue?: string; at: number; link: boolean }[] = [];
   parts.slice(0, MAX_ITEMS).forEach((p, at) => {
     const [exerciseId = "", s, ...rest] = p.split(".");
     const sets = Number(s);
     if (!EXERCISE_BY_ID.has(exerciseId) || !Number.isInteger(sets) || sets < 1 || sets > 10) return;
     let link = false;
     let reps: number | undefined;
+    let repsTo: number | undefined;
     let cue: string | undefined;
     for (const bit of rest) {
+      const range = /^r(\d+)-(\d+)$/.exec(bit);
       if (bit === "s") link = true;
       else if (/^r\d+$/.test(bit)) reps = cleanReps(Number(bit.slice(1)));
+      else if (range) [reps, repsTo] = cleanRange(Number(range[1]), Number(range[2])) ?? [undefined, undefined];
       else if (bit.startsWith("c") && bit.length > 1) cue = cleanCue(nameIn(bit.slice(1)));
     }
-    kept.push({ exerciseId, sets, at, link, ...(reps ? { reps } : {}), ...(cue ? { cue } : {}) });
+    kept.push({ exerciseId, sets, at, link, ...(reps ? { reps } : {}), ...(repsTo ? { repsTo } : {}), ...(cue ? { cue } : {}) });
   });
   if (!kept.length) return null;
   const items = withLinks(
-    kept.map(({ exerciseId, sets, reps, cue }) => ({ exerciseId, sets, ...(reps ? { reps } : {}), ...(cue ? { cue } : {}) })),
+    kept.map(({ exerciseId, sets, reps, repsTo, cue }) => ({
+      exerciseId,
+      sets,
+      ...(reps ? { reps } : {}),
+      ...(repsTo ? { repsTo } : {}),
+      ...(cue ? { cue } : {}),
+    })),
     kept.slice(0, -1).map((k, i) => k.link && kept[i + 1]!.at === k.at + 1),
   );
   // Control characters never belong in a name; the rest is shown as plain text.
@@ -228,7 +241,12 @@ export function sameItems(a: readonly RoutineItem[], b: readonly RoutineItem[]):
   const lb = linksOf(b);
   return (
     a.every(
-      (x, i) => x.exerciseId === b[i]!.exerciseId && x.sets === b[i]!.sets && x.reps === b[i]!.reps && (x.cue ?? "") === (b[i]!.cue ?? ""),
+      (x, i) =>
+        x.exerciseId === b[i]!.exerciseId &&
+        x.sets === b[i]!.sets &&
+        x.reps === b[i]!.reps &&
+        x.repsTo === b[i]!.repsTo &&
+        (x.cue ?? "") === (b[i]!.cue ?? ""),
     ) && la.every((on, i) => on === lb[i])
   );
 }

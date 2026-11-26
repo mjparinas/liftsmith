@@ -565,6 +565,11 @@ export const tr: FeaturesText = {
       note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
       proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
     },
+    "program-phases": {
+      name: "Program evreleri ve koçun tekrarları",
+      body: "Bir koçun programı evreler halinde ilerleyebilir; her evre kendi haftasını tekrarlar: Gelişim, daha az set ve daha hafif ağırlıklarla bir Deload haftası ve dinç kalmak için daha az setli bir Zirve. Tek dokunuşla deload ekle, her evreyi ayda gör ve bir hareket için tekrarları belirle (örneğin 8-12) ya da Otomatik bırak, her kişinin kendi geçmişi seçsin. Programı izleyenler Bugün planının altında hangi evrede ve haftada olduklarını görür.",
+      proPart: "Bir programı izlemek ücretsizdir; program oluşturmak Pro olan koçluğun parçasıdır.",
+    },
     "coach-calendar": {
       name: "Antrenman takvimi",
       body: "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

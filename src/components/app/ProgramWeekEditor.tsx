@@ -7,7 +7,7 @@ import { dayChoices, extraCopies } from "@/lib/coachProgramTemplates";
 import { weekStartDay } from "@/lib/derive";
 import { date, t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
-import { autoArrange, monthCells, weekOrder, workoutsIn, type RestWhy, type Week } from "@/lib/programWeek";
+import { autoArrange, monthCells, weekOrder, workoutsIn, type PhaseDraft, type RestWhy, type Week } from "@/lib/programWeek";
 import { useApp } from "@/lib/store";
 import type { Routine } from "@/lib/types";
 
@@ -35,11 +35,14 @@ export function ProgramWeekEditor({
   week,
   onChange,
   weeks,
+  phases,
 }: {
   week: Week;
   onChange: (w: Week) => void;
   /** How many weeks the program runs, for the Month view. */
   weeks: number;
+  /** The program's phases, when it has more than one, so the Month view shows each phase's week. */
+  phases?: readonly PhaseDraft[];
 }) {
   const { profile, saveRoutine, deleteRoutine, routineId: today } = useApp();
   const routines = profile.routines ?? [];
@@ -123,7 +126,7 @@ export function ProgramWeekEditor({
           })}
         </ol>
       ) : (
-        <MonthView week={week} weeks={weeks} byId={byId} firstDay={firstDay} />
+        <MonthView week={week} weeks={weeks} byId={byId} firstDay={firstDay} phases={phases} />
       )}
       <p className="text-xs text-faint">{t("cpg.weekSummary", { count: workoutsIn(week) })}</p>
 
@@ -251,6 +254,7 @@ export function ProgramWeekEditor({
       >
         {editing && (
           <RoutineEditor
+            coachReps
             initial={editing.routine}
             onSave={(r) => {
               haptic("success");
@@ -358,9 +362,34 @@ function AutoArrange({
   );
 }
 
-function MonthView({ week, weeks, byId, firstDay }: { week: Week; weeks: number; byId: Map<string, Routine>; firstDay: 0 | 1 }) {
+/** "Weeks 1 to 5: Build", one line per phase, for under the month. */
+export function phaseRanges(phases: readonly Pick<PhaseDraft, "kind" | "weeks">[]): string[] {
+  let from = 1;
+  return phases.map((p) => {
+    const to = from + p.weeks - 1;
+    const name = t(`cpg.phase.${p.kind}`);
+    const line = to === from ? t("cpg.phase.one", { from, name }) : t("cpg.phase.range", { from, to, name });
+    from = to + 1;
+    return line;
+  });
+}
+
+function MonthView({
+  week,
+  weeks,
+  byId,
+  firstDay,
+  phases,
+}: {
+  week: Week;
+  weeks: number;
+  byId: Map<string, Routine>;
+  firstDay: 0 | 1;
+  phases?: readonly PhaseDraft[];
+}) {
   const [now] = useState(() => Date.now());
-  const cells = monthCells(week, now, weeks, firstDay);
+  const phased = phases && phases.length > 1 ? phases : undefined;
+  const cells = monthCells(week, now, weeks, firstDay, 42, phased);
   const today = new Date(now).toDateString();
   return (
     <div>
@@ -375,7 +404,10 @@ function MonthView({ week, weeks, byId, firstDay }: { week: Week; weeks: number;
         {cells.map((c) => {
           const r = c.routineId ? byId.get(c.routineId) : undefined;
           const day = new Date(c.at);
-          const label = `${date(c.at, { weekday: "long", month: "long", day: "numeric" })}: ${r ? r.name : c.inside ? t("cpg.rest") : t("cpg.month.after")}`;
+          const what = r ? r.name : c.inside ? t("cpg.rest") : t("cpg.month.after");
+          const phase = phased && c.inside ? t(`cpg.phase.${phased[c.phase]!.kind}`) : null;
+          const label = `${date(c.at, { weekday: "long", month: "long", day: "numeric" })}: ${phase ? `${what} (${phase})` : what}`;
+          const easy = phased && c.inside && phased[c.phase]!.kind !== "build";
           return (
             <li
               key={c.at}
@@ -384,13 +416,29 @@ function MonthView({ week, weeks, byId, firstDay }: { week: Week; weeks: number;
                 r ? "border-line bg-raised" : "border-dashed border-line text-faint"
               } ${c.inside ? "" : "opacity-40"} ${day.toDateString() === today ? "outline-2 outline-accent" : ""}`}
             >
-              <span className="num block text-faint">{day.getDate()}</span>
+              <span className="num flex items-center justify-between text-faint">
+                {day.getDate()}
+                {/* A Deload or Peak week is marked with its first letter; the line under the month names it. */}
+                {easy && c.routineId && (
+                  <span className="text-[0.625rem] font-bold text-muted" aria-hidden="true">
+                    {t(`cpg.phase.${phased[c.phase]!.kind}`).slice(0, 1)}
+                  </span>
+                )}
+              </span>
               {r && <span className="block font-semibold leading-tight break-words text-[0.6875rem]">{r.name}</span>}
             </li>
           );
         })}
       </ol>
-      <p className="mt-2 text-xs text-faint">{t("cpg.month.hint", { count: weeks })}</p>
+      {phased ? (
+        <ul className="mt-2 space-y-0.5 text-xs text-faint">
+          {phaseRanges(phased).map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-xs text-faint">{t("cpg.month.hint", { count: weeks })}</p>
+      )}
     </div>
   );
 }

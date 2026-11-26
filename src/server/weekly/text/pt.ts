@@ -826,10 +826,10 @@ export const emails: Record<string, Words> = {
     intro: "Transforme os programas que você passa repetidamente em algo que qualquer pessoa pode seguir, de graça ou pago.",
     points: [
       "Em Coaching › Programas, coloque suas rotinas nos dias de uma semana com descansos entre elas (Organizar sozinho faz isso por você), confira o mês e depois adicione um nome, um nível, um objetivo e quantas semanas.",
-      "Deixe o preço vazio para um programa gratuito, ou defina um quando os pagamentos com Stripe estiverem ativos.",
-      "Programas pagos são comprados no site, e o dinheiro vai para a sua conta Stripe.",
+      "Deixe o preço vazio para um programa gratuito, ou defina um quando os pagamentos com Stripe estiverem ativos. Programas pagos são comprados no site, e o dinheiro vai para a sua conta Stripe.",
       "Compartilhe o link em qualquer lugar. Quem tem o programa continua com ele, mesmo depois que você o tira da lista.",
       "Cada programa publicado ganha sua própria página no site, e quem o tem há duas semanas pode avaliá-lo.",
+      "Divida em fases: semanas de Construção, uma semana de Deload com séries menos numerosas e mais leves (adicionada com um toque) e um Pico, e defina as repetições de um exercício (por exemplo, de 8 a 12) ou deixe no Auto.",
     ],
     dyk: "Um programa não tem pesos: a progressão de cada pessoa escolhe os pesos, então o mesmo programa serve para iniciantes e veteranos.",
   },

@@ -24,6 +24,16 @@ describe("routine links", () => {
     expect(code).toBe("r1~QQ~bench-press.3");
   });
 
+  it("carries a coach's rep range, and an older reader keeps the exercise", () => {
+    const ranged = [{ exerciseId: "bench-press", sets: 3, reps: 8, repsTo: 10 }, ...items.slice(1)];
+    const code = encodeRoutine({ name: "A", items: ranged });
+    expect(code.split("~")[2]).toBe("bench-press.3.r8-10");
+    expect(decodeRoutine(code)!.items).toEqual(ranged);
+    // A broken range is left out rather than guessed.
+    expect(decodeRoutine("r1~QQ~bench-press.3.r10-8")!.items).toEqual([{ exerciseId: "bench-press", sets: 3 }]);
+    expect(sameItems(ranged, items)).toBe(false);
+  });
+
   it("drops unknown exercises and breaks a superset that loses a partner", () => {
     const code = "r1~TWl4~bench-press.3.s~not-a-lift.3.s~lateral-raise.3.s~cable-pushdown.2";
     expect(decodeRoutine(code)).toEqual({

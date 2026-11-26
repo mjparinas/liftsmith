@@ -823,10 +823,10 @@ export const emails: Record<string, Words> = {
     intro: "Tekrar tekrar verdiğin programları herkesin izleyebileceği bir şeye dönüştür, ücretsiz ya da ücretli.",
     points: [
       "Koçluk › Programlar'da rutinlerini haftanın günlerine, aralarına dinlenme koyarak yerleştir (Otomatik yerleştir bunu senin için yapar), ayı kontrol et, sonra ad, seviye, hedef ve hafta sayısı ekle.",
-      "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle.",
-      "Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
+      "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle. Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
       "Bağlantısını her yerde paylaş. Programa sahip olanlar, sen listeden kaldırsan bile onu tutar.",
       "Yayınlanan her programın web sitesinde kendi sayfası olur ve iki haftadır sahip olanlar onu puanlayabilir.",
+      "Evreler halinde ilerlet: Gelişim haftaları, daha az ve hafif setli bir Deload haftası (tek dokunuşla eklenir) ve bir Zirve; bir hareket için tekrarları belirle (örneğin 8-12) ya da Otomatik bırak.",
     ],
     dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar.",
   },

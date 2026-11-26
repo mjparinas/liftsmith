@@ -1,7 +1,8 @@
 // Client side of season program assigns (server: src/server/coachProgramAssign.ts).
 import { api, AuthError, readAccount } from "./auth";
+import { phaseAt } from "./programPhases";
 import { decodeRoutine } from "./routineShare";
-import type { PlanSource, Routine } from "./types";
+import type { PlanSource, ProgramPhase, Routine } from "./types";
 
 export type AssignStatus = "pending" | "active" | "ended";
 export type AttendanceState = "done" | "notYet" | "scheduled" | "off";
@@ -14,6 +15,8 @@ export interface AssignDay {
 
 export interface ProgramAssign {
   id: string;
+  /** The program's phases, when it has more than one week laid out (weekdays parallel to days). */
+  phases?: ProgramPhase[];
   coachId: string;
   clientId: string;
   programId: string;
@@ -100,11 +103,13 @@ export function followAssign(
 ): { routines: Routine[]; planSource: Extract<PlanSource, { kind: "coachProgram" }> } {
   const dayIds: string[] = [];
   const weekdays: number[][] = [];
+  const kept: number[] = [];
   const routines: Routine[] = assign.days.flatMap((d, dayIndex) => {
     const decoded = decodeRoutine(d.code);
     if (!decoded) return [];
     const id = newId();
     dayIds.push(id);
+    kept.push(dayIndex);
     weekdays.push([...d.weekdays]);
     return [
       {
@@ -130,9 +135,19 @@ export function followAssign(
       weeks: assign.weeks,
       dayIds,
       weekdays,
+      // Phase weekdays stay parallel to dayIds, skipping any day this app couldn't read.
+      ...(assign.phases?.length
+        ? { phases: assign.phases.map((p) => ({ ...p, weekdays: kept.map((i) => [...(p.weekdays[i] ?? [])]) })) }
+        : {}),
     },
   };
 }
+
+type CoachSource = Extract<PlanSource, { kind: "coachProgram" }>;
+
+/** Where a standing coach program is this week: its phase (or the one week), the week inside it, and the weekdays. */
+export const coachProgramPhase = (src: Pick<CoachSource, "startedAt" | "weeks" | "weekdays" | "phases">, now = Date.now()) =>
+  phaseAt(src, now);
 
 /** End instant of a coach program standing plan (startedAt + weeks × 7 days). */
 export const coachProgramEndAt = (src: Extract<PlanSource, { kind: "coachProgram" }>) => src.startedAt + src.weeks * 7 * 86_400_000;
@@ -141,8 +156,9 @@ export const coachProgramEndAt = (src: Extract<PlanSource, { kind: "coachProgram
 export function coachProgramDayIndex(src: Extract<PlanSource, { kind: "coachProgram" }>, now = Date.now()): number | null {
   if (now < src.startedAt || now >= coachProgramEndAt(src)) return null;
   const wd = new Date(now).getDay();
-  for (let i = 0; i < src.weekdays.length; i++) {
-    if (src.weekdays[i]?.includes(wd)) return i;
+  const { weekdays } = coachProgramPhase(src, now);
+  for (let i = 0; i < weekdays.length; i++) {
+    if (weekdays[i]?.includes(wd)) return i;
   }
   return null;
 }

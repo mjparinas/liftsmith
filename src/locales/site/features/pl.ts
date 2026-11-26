@@ -565,6 +565,11 @@ export const pl: FeaturesText = {
       note: "Płatne programy kupuje się na stronie; aplikacje na Androida i iPhone'a pokazują programy darmowe i te, które już masz.",
       proPart: "Pobieranie programów jest darmowe; tworzenie ich to część coachingu, który jest w Pro.",
     },
+    "program-phases": {
+      name: "Fazy programu i powtórzenia od trenera",
+      body: "Program trenera może iść fazami, a każda powtarza własny tydzień: Budowa, tydzień Odciążenia z mniejszą liczbą serii i lżejszymi ciężarami oraz Szczyt z mniejszą liczbą serii, żeby być wypoczętym. Dodaj odciążenie jednym dotknięciem, zobacz każdą fazę w miesiącu i ustal powtórzenia dla ćwiczenia (np. 8–12) albo zostaw Auto, żeby wybrała je historia każdej osoby. Osoby, które go realizują, widzą pod planem na Dziś, w której fazie i tygodniu są.",
+      proPart: "Realizowanie programu jest bezpłatne; tworzenie go jest częścią coachingu, który jest w Pro.",
+    },
     "coach-calendar": {
       name: "Kalendarz treningów",
       body: "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",

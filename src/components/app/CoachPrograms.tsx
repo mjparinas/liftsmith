@@ -23,7 +23,7 @@ import { PROGRAM_TEMPLATES, routinesFromTemplate, type ProgramTemplate } from "@
 import { weekStartDay } from "@/lib/derive";
 import { t, tFor } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
-import { draftFromWeek, emptyWeek, weekFromDraft, weekFromProgram, type Week } from "@/lib/programWeek";
+import { draftFromPhases, emptyWeek, phasesFromDraft, phasesFromProgram, type PhaseDraft, type Week } from "@/lib/programWeek";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
@@ -33,6 +33,7 @@ import type { Routine } from "@/lib/types";
 
 import { factsLine } from "./CoachProgram";
 import { ProgramCalendar } from "./ProgramCalendar";
+import { ProgramPhases } from "./ProgramPhases";
 import { ProgramWeekEditor } from "./ProgramWeekEditor";
 import { go } from "./router";
 import { BumpField, Button, Chip, EmptyState, InlineSwitch, Section, Sheet, Skeleton } from "./ui";
@@ -244,18 +245,29 @@ function Editor({
   const [price, setPrice] = useState(start.price ? String(start.price) : "");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  // The program's week (programWeek.ts). A saved program whose days are no longer the coach's own routines, unchanged,
-  // keeps its saved days (null) until the coach lays out a new week.
-  const [week, setWeek] = useState<Week | null>(() =>
-    program ? weekFromProgram(program.days, routines) : weekFromDraft(start.routineIds, start.weekdays),
+  // The program's phases, each with its week (programWeek.ts); one phase is the program's week repeated. A saved program
+  // whose days are no longer the coach's own routines, unchanged, keeps its saved days (null) until the coach lays out
+  // a new week.
+  const [phases, setPhases] = useState<PhaseDraft[] | null>(() =>
+    program
+      ? phasesFromProgram(program.days, program.phases, program.weeks, routines)
+      : phasesFromDraft(start.routineIds, start.weekdays, start.weeks, start.phases),
   );
+  const [sel, setSel] = useState(0);
+  const phase = phases ? (phases[sel] ?? phases[0]!) : null;
+  const setWeek = (w: Week) => phases && setPhases(phases.map((p) => (p === phase ? { ...p, week: w } : p)));
   const firstDay = weekStartDay();
-  const laid = week ? draftFromWeek(week, firstDay) : null;
+  const laid = phases ? draftFromPhases(phases, firstDay) : null;
+  const multi = !!phases && phases.length > 1;
+  const singleWeeks = Math.min(16, Math.max(1, Math.round(Number(weeks) || 8)));
+  const totalWeeks = multi ? phases.reduce((n, p) => n + p.weeks, 0) : singleWeeks;
   const keepDays = !!program && !laid;
   const priceNum = Number(price) || 0;
   const ok =
     d.title.trim().length > 0 &&
     (keepDays || (laid?.routineIds.length ?? 0) > 0) &&
+    // Every phase needs a workout in its week.
+    (!multi || phases.every((p) => p.week.some(Boolean))) &&
     (!priceNum || (payReady && priceNum >= PROGRAM_LIMITS.price[0] && priceNum <= PROGRAM_LIMITS.price[1]));
 
   const save = async () => {
@@ -265,7 +277,7 @@ function Editor({
       const draft = {
         ...d,
         ...(laid ?? {}),
-        weeks: Math.min(16, Math.max(1, Math.round(Number(weeks) || 8))),
+        weeks: totalWeeks,
         price: payReady ? priceNum : 0,
       };
       if (keepDays && program) {
@@ -314,7 +326,8 @@ function Editor({
     const { made, draft, weeks } = draftFromTemplate(tpl, d, routines);
     for (const r of made) useApp.getState().saveRoutine(r);
     setD(draft);
-    setWeek(weekFromDraft(draft.routineIds, draft.weekdays));
+    setPhases(phasesFromDraft(draft.routineIds, draft.weekdays, Number(weeks) || 8));
+    setSel(0);
     setWeeks(weeks);
     haptic("success");
     track("feature", { name: "coach_program", detail: `template_${tpl.id}` });
@@ -366,12 +379,26 @@ function Editor({
         <p className="text-sm font-medium">{t("cpg.days.label")}</p>
         <p className="text-xs text-faint">{t("cpg.days.what")}</p>
         <div className="mt-2">
-          {week ? (
-            <ProgramWeekEditor week={week} onChange={setWeek} weeks={Math.min(16, Math.max(1, Math.round(Number(weeks) || 8)))} />
+          {phases && phase ? (
+            <div className="space-y-3">
+              <ProgramPhases
+                phases={phases}
+                sel={sel}
+                onSelect={setSel}
+                singleWeeks={singleWeeks}
+                onChange={(next, at) => {
+                  // Back to one phase: its weeks become the program's weeks again.
+                  if (next.length === 1) setWeeks(String(next[0]!.weeks));
+                  setPhases(next);
+                  setSel(at);
+                }}
+              />
+              <ProgramWeekEditor key={sel} week={phase.week} onChange={setWeek} weeks={totalWeeks} phases={multi ? phases : undefined} />
+            </div>
           ) : (
             <div className="space-y-2">
               <p className="text-sm text-muted">{t("cpg.days.keep", { count: program?.days.length ?? 0 })}</p>
-              <Button kind="ghost" icon="calendar" onClick={() => setWeek(emptyWeek())}>
+              <Button kind="ghost" icon="calendar" onClick={() => setPhases([{ kind: "build", weeks: singleWeeks, week: emptyWeek() }])}>
                 {t("cpg.days.newWeek")}
               </Button>
             </div>
@@ -398,7 +425,8 @@ function Editor({
           ))}
         </div>
       </div>
-      <BumpField label={t("cpg.weeksLabel")} value={weeks} onChange={setWeeks} step={1} start={8} min={1} max={16} />
+      {/* With phases, the program's weeks are the phases' weeks added up (shown on the phase bar). */}
+      {!multi && <BumpField label={t("cpg.weeksLabel")} value={weeks} onChange={setWeeks} step={1} start={8} min={1} max={16} />}
       {!hidePrice &&
         (payReady ? (
           <div>

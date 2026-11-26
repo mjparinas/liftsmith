@@ -494,6 +494,11 @@ export const de: FeaturesText = {
       note: "Kostenpflichtige Programme werden auf der Website gekauft; die Android- und iPhone-Apps zeigen kostenlose Programme und die, die du hast.",
       proPart: "Programme zu bekommen ist kostenlos; sie zu erstellen gehört zum Coaching, das Pro ist.",
     },
+    "program-phases": {
+      name: "Programmphasen und Wiederholungen vom Coach",
+      body: "Das Programm eines Coaches kann in Phasen laufen, jede mit ihrer eigenen Woche: Aufbau, eine Deload-Woche mit weniger Sätzen und leichteren Gewichten und eine Peak-Phase mit weniger Sätzen, damit man frisch ist. Füge mit einem Tippen eine Deload-Woche hinzu, sieh jede Phase im Monat und lege Wiederholungen für eine Übung fest (etwa 8 bis 12) oder lass sie auf Auto, damit der eigene Verlauf jeder Person sie wählt. Wer trainiert, sieht unter dem Plan auf Heute, in welcher Phase und Woche er gerade ist.",
+      proPart: "Einem Programm zu folgen ist kostenlos; eines zu erstellen gehört zum Coaching, und das ist Pro.",
+    },
     "coach-pages": {
       name: "Eine Seite für jede Seite",
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",

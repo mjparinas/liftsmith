@@ -915,6 +915,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-15",
       },
       {
+        id: "program-phases",
+        name: "Program phases and coach reps",
+        body: "A coach's program can run in phases, each repeating its own week: Build, a Deload week with fewer sets and lighter weights, and a Peak with fewer sets so lifters arrive fresh. Add a deload in one tap, see each phase on the month, and set reps for an exercise (say 8 to 12) or leave them on Auto so each lifter's own history picks them. Lifters see which phase and week they're on under Today's plan.",
+        tier: "both",
+        proPart: "Following a program is free; making one is part of coaching, which is Pro.",
+        pro: "coaching",
+        added: "2026-11-26",
+      },
+      {
         id: "coach-calendar",
         name: "Workout calendar",
         body: "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",

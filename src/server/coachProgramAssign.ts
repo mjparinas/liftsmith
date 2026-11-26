@@ -3,6 +3,9 @@
 // day's routine, and the coach sees a calendar of who has done each day.
 import { randomBytes } from "node:crypto";
 
+import { cleanPhases, phaseAt, phaseWeeks } from "@/lib/programPhases";
+import type { ProgramPhase } from "@/lib/types";
+
 import { isAccountId, isClient, isRoutineCode, nameOf } from "./coach";
 import { query, run } from "./db";
 import { notifyCoach } from "./push";
@@ -27,6 +30,8 @@ export interface ProgramAssign {
   title: string;
   weeks: number;
   days: AssignDay[];
+  /** The program's phases at assign time, when it has them (weekdays parallel to days). */
+  phases?: ProgramPhase[];
   status: AssignStatus;
   createdAt: number;
   acceptedAt: number | null;
@@ -67,6 +72,7 @@ interface Row {
   title: string;
   weeks: number;
   days: string;
+  phases?: string | null;
   status: string;
   created_at: number;
   accepted_at: number | null;
@@ -80,7 +86,18 @@ interface ProgramRow {
   title: string;
   weeks: number;
   days: string;
+  phases?: string | null;
   price: number;
+}
+
+/** Stored phases JSON for `dayCount` days, checked again on the way out. */
+function phasesOf(raw: unknown, dayCount: number): ProgramPhase[] | null {
+  if (!raw) return null;
+  try {
+    return cleanPhases(JSON.parse(String(raw)), dayCount);
+  } catch {
+    return null;
+  }
 }
 
 const s = (x: unknown) => String(x ?? "");
@@ -96,7 +113,7 @@ function cleanWeekdays(x: unknown): number[] {
 }
 
 /** Days from a program's stored JSON, with optional weekday overrides from the assign call. */
-export function parseAssignDays(raw: unknown, weekdaysByIndex?: unknown): AssignDay[] | null {
+export function parseAssignDays(raw: unknown, weekdaysByIndex?: unknown, phased = false): AssignDay[] | null {
   if (!Array.isArray(raw) || !raw.length || raw.length > 7) return null;
   const overrides = Array.isArray(weekdaysByIndex) ? weekdaysByIndex : null;
   const out: AssignDay[] = [];
@@ -113,8 +130,9 @@ export function parseAssignDays(raw: unknown, weekdaysByIndex?: unknown): Assign
         : "";
     const code = row.code;
     if (!name || !isRoutineCode(code)) return null;
+    // In a program with phases a day may sit out the first phase, so it has no weekdays of its own.
     const weekdays = cleanWeekdays(overrides?.[i] ?? row.weekdays);
-    if (!weekdays.length) return null;
+    if (!weekdays.length && !phased) return null;
     out.push({ name, code, weekdays });
   }
   // No two days may share a weekday (Today picks the first match).
@@ -131,10 +149,11 @@ export function parseAssignDays(raw: unknown, weekdaysByIndex?: unknown): Assign
 function shape(r: Row): ProgramAssign {
   let days: AssignDay[] = [];
   try {
-    days = parseAssignDays(JSON.parse(String(r.days))) ?? [];
+    days = parseAssignDays(JSON.parse(String(r.days)), undefined, !!r.phases) ?? [];
   } catch {
     days = [];
   }
+  const phases = phasesOf(r.phases, days.length);
   const status = (ASSIGN_STATUSES as readonly string[]).includes(String(r.status)) ? (String(r.status) as AssignStatus) : "ended";
   return {
     id: s(r.id),
@@ -145,6 +164,7 @@ function shape(r: Row): ProgramAssign {
     title: s(r.title),
     weeks: n(r.weeks),
     days,
+    ...(phases ? { phases } : {}),
     status,
     createdAt: n(r.created_at),
     acceptedAt: r.accepted_at == null ? null : n(r.accepted_at),
@@ -206,7 +226,9 @@ export async function assignProgram(
   now = Date.now(),
 ): Promise<AssignResult | { error: AssignError }> {
   if (typeof programId !== "string" || !programId) return { error: "bad" };
-  const [prog] = await query<ProgramRow>("SELECT id, coach_id, title, weeks, days, price FROM coach_programs WHERE id = ?", [programId]);
+  const [prog] = await query<ProgramRow>("SELECT id, coach_id, title, weeks, days, phases, price FROM coach_programs WHERE id = ?", [
+    programId,
+  ]);
   if (!prog || s(prog.coach_id) !== coachId) return { error: "gone" };
   let rawDays: unknown;
   try {
@@ -214,14 +236,18 @@ export async function assignProgram(
   } catch {
     return { error: "emptyDays" };
   }
-  const days = parseAssignDays(rawDays, weekdaysByIndex);
+  // A program with phases keeps its own weekdays in each phase, so an assign can't move them.
+  const rawCount = Array.isArray(rawDays) ? rawDays.length : 0;
+  const phases = phasesOf(prog.phases, rawCount);
+  const days = parseAssignDays(rawDays, phases ? undefined : weekdaysByIndex, !!phases);
   if (!days?.length) return { error: "emptyDays" };
+  const phasesJson = phases ? JSON.stringify(phases) : "";
   const clients = await resolveClients(coachId, scope);
   if (!clients.length) return { error: "noTargets" };
   const teamId = scope.type === "team" ? scope.teamId : null;
   const daysJson = JSON.stringify(days);
   const title = s(prog.title).slice(0, 60);
-  const weeks = Math.min(16, Math.max(1, n(prog.weeks)));
+  const weeks = Math.min(16, Math.max(1, phases ? phaseWeeks(phases) : n(prog.weeks)));
   const assigned: ProgramAssign[] = [];
   const skipped: AssignResult["skipped"] = [];
   const coachName = await nameOf(coachId);
@@ -235,9 +261,9 @@ export async function assignProgram(
     const id = randomBytes(9).toString("base64url");
     await run(
       `INSERT INTO coach_program_assigns
-       (id, coach_id, client_id, program_id, team_id, title, weeks, days, status, created_at, accepted_at, started_at, ended_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NULL, NULL, NULL)`,
-      [id, coachId, clientId, s(prog.id), teamId, title, weeks, daysJson, now],
+       (id, coach_id, client_id, program_id, team_id, title, weeks, days, phases, status, created_at, accepted_at, started_at, ended_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NULL, NULL, NULL)`,
+      [id, coachId, clientId, s(prog.id), teamId, title, weeks, daysJson, phasesJson, now],
     );
     // Free listed programs may grant ownership so "From coaches" stays consistent; paid never does (teens can't buy).
     if (n(prog.price) === 0) {
@@ -258,6 +284,7 @@ export async function assignProgram(
         title,
         weeks,
         days: daysJson,
+        phases: phasesJson,
         status: "pending",
         created_at: now,
         accepted_at: null,
@@ -447,18 +474,23 @@ export async function programCalendar(
     sessions.set(clientId, await sessionsByDay(clientId, from, to));
   }
 
-  const weekdayToDay = new Map<number, { index: number; name: string; ids: string[] }>();
-  template.days.forEach((d, index) => {
-    const ids = exerciseIdsFromCode(d.code);
-    for (const w of d.weekdays) weekdayToDay.set(w, { index, name: d.name, ids });
-  });
+  const ids = template.days.map((d) => exerciseIdsFromCode(d.code));
+  // With phases, which day runs on a weekday depends on the week of the program (from the template's start).
+  const templateStart = template.startedAt ?? template.createdAt;
+  const dayOn = (d: Date): { index: number; name: string; ids: string[] } | undefined => {
+    const { weekdays } = phaseAt(
+      { startedAt: templateStart, weeks: template.weeks, weekdays: template.days.map((x) => x.weekdays), phases: template.phases },
+      d.getTime(),
+    );
+    const index = weekdays.findIndex((w) => w.includes(d.getDay()));
+    return index < 0 ? undefined : { index, name: template.days[index]!.name, ids: ids[index]! };
+  };
 
   const out: CalendarDay[] = [];
   for (let day = 1; day <= 31; day++) {
     const d = new Date(year, month, day);
     if (d.getMonth() !== month) break;
-    const wd = d.getDay();
-    const mapped = weekdayToDay.get(wd);
+    const mapped = dayOn(d);
     if (!mapped) continue;
     const key = dayKey(d.getTime());
     const people: CalendarPerson[] = [];

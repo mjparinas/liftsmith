@@ -1761,6 +1761,10 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Where the picture's file lives in Vercel Blob (gymBlob.ts, 2026-11-19); '' while its bytes are still in `image`.
   // Once it's set, `image` is left empty.
   ["gym_photos", "url", "TEXT NOT NULL DEFAULT ''"],
+  // A coach program's phases (Build, Deload, Peak, each its own week for a few weeks; programPhases.ts, 2026-11-26), as
+  // JSON, and the snapshot an assign takes of them. '' when the program is one week repeated.
+  ["coach_programs", "phases", "TEXT NOT NULL DEFAULT ''"],
+  ["coach_program_assigns", "phases", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 /**
