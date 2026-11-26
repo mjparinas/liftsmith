@@ -193,7 +193,7 @@ export const it: FeaturesText = {
     },
     stretching: {
       name: "Stretching",
-      body: "48 allungamenti con dimostrazioni in 3D: un riscaldamento facoltativo prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno. Qualche secondo per metterti in posizione prima di ogni allungamento e di ogni lato, e lo schermo resta acceso.",
+      body: "61 allungamenti con dimostrazioni in 3D: un riscaldamento facoltativo prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno. Qualche secondo per metterti in posizione prima di ogni allungamento e di ogni lato, e lo schermo resta acceso.",
     },
     "workout-parts": {
       name: "Allenamenti in parti",

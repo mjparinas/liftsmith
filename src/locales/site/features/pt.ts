@@ -244,7 +244,7 @@ export const pt: FeaturesText = {
     },
     stretching: {
       name: "Alongamento",
-      body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",
+      body: "61 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",
     },
     "workout-parts": {
       name: "Treinos em partes",

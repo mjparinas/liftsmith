@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "Scaldarsi bene significa serie allenanti più pesanti e più sicure. L'app lo pianifica per te.",
     points: [
       "Le serie di avvicinamento sono calcolate per ogni esercizio pesante.",
-      "48 allungamenti con demo in 3D: un riscaldamento prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno.",
+      "61 allungamenti con demo in 3D: un riscaldamento prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno.",
       "Un allenamento può fare riscaldamento, pesi e defaticamento in fila, con Salta tra una parte e l'altra.",
       "I giorni di stretching da 10 minuti in su mantengono la tua serie.",
     ],

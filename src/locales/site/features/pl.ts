@@ -244,7 +244,7 @@ export const pl: FeaturesText = {
     },
     stretching: {
       name: "Rozciąganie",
-      body: "48 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień. Kilka sekund na przyjęcie pozycji przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie.",
+      body: "61 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień. Kilka sekund na przyjęcie pozycji przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie.",
     },
     "workout-parts": {
       name: "Treningi z częściami",

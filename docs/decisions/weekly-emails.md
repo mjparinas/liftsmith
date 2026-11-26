@@ -109,7 +109,7 @@ Did you know? If your gym lacks something a program needs, the app puts in a sta
 Free · Lifters · Screen: the workout with warm-up sets shown, or the stretch part
 Warming up well means heavier, safer working sets. The app plans it for you.
 - Ramp-up sets worked out for each heavy lift.
-- 48 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.
+- 61 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.
 - A workout can run warm-up, lifting and cool-down in order, with Skip between them.
 - Stretch days of 10 minutes or more keep your streak.
 Did you know? Tools › Warm-up gives the warm-up sets for any weight, for lifts outside the app's plan.

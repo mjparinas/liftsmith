@@ -155,7 +155,7 @@ export const emails: Record<string, Words> = {
     intro: "Um bom aquecimento significa séries de trabalho mais pesadas e mais seguras. O app planeja isso para você.",
     points: [
       "As séries de aproximação são calculadas para cada exercício pesado.",
-      "48 alongamentos com demonstrações em 3D: um aquecimento antes, um desaquecimento depois ou uma rotina de alongamento em qualquer dia.",
+      "61 alongamentos com demonstrações em 3D: um aquecimento antes, um desaquecimento depois ou uma rotina de alongamento em qualquer dia.",
       "Um treino pode ter aquecimento, musculação e desaquecimento em sequência, com Pular entre eles.",
       "Dias de alongamento de 10 minutos ou mais mantêm sua sequência.",
     ],

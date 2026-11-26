@@ -192,7 +192,7 @@ export const es: FeaturesText = {
     },
     stretching: {
       name: "Estiramientos",
-      body: "48 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día. Unos segundos para colocarte antes de cada estiramiento y cada lado, y la pantalla sigue encendida.",
+      body: "61 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día. Unos segundos para colocarte antes de cada estiramiento y cada lado, y la pantalla sigue encendida.",
     },
     "workout-parts": {
       name: "Entrenamientos por partes",

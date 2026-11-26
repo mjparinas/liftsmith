@@ -199,7 +199,7 @@ export const de: FeaturesText = {
     },
     stretching: {
       name: "Dehnen",
-      body: "48 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag. Ein paar Sekunden, um vor jeder Dehnung und jeder Seite in Position zu kommen, und der Bildschirm bleibt an.",
+      body: "61 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag. Ein paar Sekunden, um vor jeder Dehnung und jeder Seite in Position zu kommen, und der Bildschirm bleibt an.",
     },
     "workout-parts": {
       name: "Training in Teilen",

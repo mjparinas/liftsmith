@@ -244,7 +244,7 @@ export const tr: FeaturesText = {
     },
     stretching: {
       name: "Esneme",
-      body: "3D gösterimli 48 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini. Her esneme ve her taraf öncesinde pozisyon almak için birkaç saniye var ve ekran açık kalır.",
+      body: "3D gösterimli 61 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini. Her esneme ve her taraf öncesinde pozisyon almak için birkaç saniye var ve ekran açık kalır.",
     },
     "workout-parts": {
       name: "Bölümlü antrenmanlar",
