@@ -241,6 +241,29 @@ export function Today() {
   // and keeps the check-in, without the ring, signals or the call picker (UX audit, 2026-11-13).
   const fresh = !!readiness && stats.sessions.length === 0 && readiness.signals.every((g) => g.points === 0);
 
+  // Beside the plan on the desktop, between the call and the plan on a phone (see the columns below).
+  const sideCards = (
+    <>
+      {!active && !assignment && <ProgramAssignToday />}
+      {!active && <CoachProgramEndedToday />}
+      {!active && <PlanToday />}
+      {!active && <PlanEnded />}
+      {!active && <NextDayPain />}
+      {!active && <RehabPhaseToday />}
+      {/* The physio's rehab on a day without lifting; beside the lifting it's the Rehab row in the parts. */}
+      {!active && (resting || !(preview && preview.items.length > 0)) && <RehabToday />}
+      {!active && <CoachNotes limit={2} />}
+    </>
+  );
+  const extras = (
+    <>
+      {!active && <StretchLibraryCard />}
+      {profile.quotes !== false && <DailyQuote now={now} />}
+      {!active && <SaveNudge />}
+      {!active && <TodayGame />}
+    </>
+  );
+
   return (
     <div className="pb-28">
       <header className="pt-3">
@@ -396,37 +419,22 @@ export function Today() {
         )}
       </div>
 
-      {/* The coach's note, a new message, a session or a check-in from the coach come first, above the call and the
-          plan, on phones and the desktop alike (Melvin, 2026-11-25: on the desktop it sat down the side column, while
-          the coach is told "it's at the top of their Today"). On the desktop it is exactly as wide as the plan's column
-          below it (3 of the grid's 5 columns, which has 4 gaps of 1.5rem), so their edges line up. */}
-      {!active && (
-        <div className="desk:w-[calc((100%-6rem)*0.6+3rem)]">
-          <CoachNoteToday />
-        </div>
-      )}
-
-      <NowPlayingBar className="mt-3" />
-
-      {!active && assignment && <ScheduleToday cell={assignment} />}
-
-      <TodayMoments />
-
-      {/* Phone order (UX audit, 2026-11-13; a note from the coach sits above all of it since 2026-11-25): the call
-          and any coach's notes, then the plan, then the quote, saving and the week's quests, so the workout is near the top instead of below the extras. Desktop layout
-          (layout.ts): the plan in the wider left column spanning two rows; the call and notes beside it on top, the
-          quote and quests under them. The first row is only as tall as the call and notes, and the second row takes
-          the rest of the plan's height, so the quote sits right under the call instead of halfway down the page
-          (Melvin, 2026-11-14). */}
-      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:grid-rows-[auto_1fr] desk:items-start desk:gap-x-6">
-        {/* Once the day's workout is done it takes the wide column, where the plan was, so the page isn't empty
-            beside the notes (Melvin, 2026-11-13). First in the page, so a phone shows it first as before. */}
-        {doneToday && resting && (
-          <div className="desk:order-1 desk:col-span-3 desk:row-span-2">
-            <DoneToday session={doneToday} onAgain={trainAgain} />
-          </div>
-        )}
-        <div className="desk:order-2 desk:col-span-2">
+      {/* Today in two columns on the desktop (layout.ts), one on phones (Melvin, 2026-11-26). The left column is the
+          day itself: a note from the coach (Melvin, 2026-11-25: "it's at the top of their Today"), then the call, then
+          the plan (or the finished workout). The right column, the coach's and program cards and then the quote,
+          saving and the week's quests, starts level with the first card on the left. A phone shows one list in the
+          order of the UX audit (2026-11-13): the coach's note, the call, the coach's and program cards, the plan,
+          then the extras. The side cards move between the two places rather than being reordered with CSS, so
+          keyboard and screen reader order always matches what's on screen. */}
+      <div className="desk:flex desk:items-start desk:gap-x-6">
+        <div data-testid="today-main" className="desk:w-[calc(60%-0.6rem)] desk:min-w-0">
+          {!active && <CoachNoteToday />}
+          <NowPlayingBar className="mt-3" />
+          {!active && assignment && <ScheduleToday cell={assignment} />}
+          <TodayMoments />
+          {/* Once the day's workout is done it takes the plan's place, so the page isn't empty beside the notes
+              (Melvin, 2026-11-13). */}
+          {doneToday && resting && <DoneToday session={doneToday} onAgain={trainAgain} />}
           {showCall && readiness && preview && call && (
             <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
               <div className="flex items-center gap-4">
@@ -527,260 +535,252 @@ export function Today() {
               )}
             </section>
           )}
-
-          {!active && !assignment && <ProgramAssignToday />}
-          {!active && <CoachProgramEndedToday />}
-          {!active && <PlanToday />}
-          {!active && <PlanEnded />}
-          {!active && <NextDayPain />}
-          {!active && <RehabPhaseToday />}
-          {/* The physio's rehab on a day without lifting; beside the lifting it's the Rehab row in the parts. */}
-          {!active && (resting || !(preview && preview.items.length > 0)) && <RehabToday />}
-          {!active && <CoachNotes limit={2} />}
-        </div>
-        <div className={`desk:order-1 desk:col-span-3 desk:row-span-2 ${resting ? "hidden" : ""}`}>
-          {!fixed && !resting && (
-            <div className="card mt-4 p-4">
-              <div className="flex items-baseline justify-between">
-                <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted">
-                  <Icon name="clock" size={16} className="text-cyan" />
-                  {t("td.length")}
-                </label>
-                <span className="display text-[1.875rem]">
-                  <span key={lenKey} className={`inline-block ${lenKey ? "animate-nudge" : ""}`}>
-                    {profile.minutes}
+          {!desktop && sideCards}
+          <div className={resting ? "hidden" : undefined}>
+            {!fixed && !resting && (
+              <div className="card mt-4 p-4">
+                <div className="flex items-baseline justify-between">
+                  <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted">
+                    <Icon name="clock" size={16} className="text-cyan" />
+                    {t("td.length")}
+                  </label>
+                  <span className="display text-[1.875rem]">
+                    <span key={lenKey} className={`inline-block ${lenKey ? "animate-nudge" : ""}`}>
+                      {profile.minutes}
+                    </span>
+                    <span className="ml-1 text-base font-semibold tracking-normal text-muted">{t("td.min")}</span>
                   </span>
-                  <span className="ml-1 text-base font-semibold tracking-normal text-muted">{t("td.min")}</span>
-                </span>
+                </div>
+                <input
+                  id="len"
+                  type="range"
+                  min={15}
+                  max={90}
+                  step={5}
+                  value={profile.minutes}
+                  onChange={(e) => {
+                    haptic("select");
+                    sound.tick();
+                    setLenKey((k) => k + 1);
+                    setProfile({ minutes: Number(e.target.value), minutesDay: dayKey(Date.now()) });
+                  }}
+                  className="slider mt-4 w-full"
+                  style={{ "--fill": fill } as CSSProperties}
+                />
+                <div className="num relative mt-1.5 flex justify-between text-xs text-faint" data-testid="len-ticks">
+                  <span>15</span>
+                  <span className="absolute -translate-x-1/2" style={{ left: onTrack(45) }}>
+                    45
+                  </span>
+                  <span>90</span>
+                </div>
+                {/* The slider is the whole workout: with other parts on, where its minutes go (sessionSplit.ts). */}
+                {hasOtherParts(split) && <SplitBar split={split} />}
+                <FitAroundCalendar />
               </div>
-              <input
-                id="len"
-                type="range"
-                min={15}
-                max={90}
-                step={5}
-                value={profile.minutes}
-                onChange={(e) => {
-                  haptic("select");
-                  sound.tick();
-                  setLenKey((k) => k + 1);
-                  setProfile({ minutes: Number(e.target.value), minutesDay: dayKey(Date.now()) });
-                }}
-                className="slider mt-4 w-full"
-                style={{ "--fill": fill } as CSSProperties}
-              />
-              <div className="num relative mt-1.5 flex justify-between text-xs text-faint" data-testid="len-ticks">
-                <span>15</span>
-                <span className="absolute -translate-x-1/2" style={{ left: onTrack(45) }}>
-                  45
-                </span>
-                <span>90</span>
-              </div>
-              {/* The slider is the whole workout: with other parts on, where its minutes go (sessionSplit.ts). */}
-              {hasOtherParts(split) && <SplitBar split={split} />}
-              <FitAroundCalendar />
-            </div>
-          )}
-          {!fixed && !resting && <PlanExtras />}
+            )}
+            {!fixed && !resting && <PlanExtras />}
 
-          {resting ? null : preview && preview.items.length > 0 ? (
-            <>
-              {!active && <TodayParts />}
-              {!active && <CoachProgramChip />}
-              {/* Lifting off for today (cardio and stretches only): the exercise list isn't run, so it isn't shown. */}
-              {!(split?.noLift && !active) && (
-                <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
-                  {shared && (
-                    <p className="mb-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="plan-shared-why">
-                      <Icon name="target" size={14} className="mt-[3px] shrink-0 text-accent" />
-                      <span>{shared.charAt(0).toUpperCase() + shared.slice(1)}</span>
-                    </p>
-                  )}
-                  <ol className="stagger card overflow-hidden" data-testid="plan-list">
-                    {items.map((it, i) => {
-                      const ex = exercise(it.exerciseId);
-                      const hue = muscleHue(it.focus);
-                      const ss = supersetLabel(items, i);
-                      const joinsPrev = i > 0 && linkedToNext(items, i - 1);
-                      const joinsNext = linkedToNext(items, i);
-                      const look = live ? { className: "", css: {} } : reorder.style(i);
-                      const picked = !live && reorder.picked === i;
-                      // Supersets read as one block: a shared tint, one accent bracket down the left that runs
-                      // across the rows, and a dashed join where the link button sits on the line between them.
-                      return (
-                        <li
-                          key={it.exerciseId}
-                          {...(live ? {} : reorder.row(i))}
-                          data-superset={it.group ?? undefined}
-                          className={`animate-rise relative flex select-none items-center gap-3 px-4 py-3.5 transition-shadow ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""} ${look.className}`}
-                          style={{ animationDelay: `${i * 40}ms`, ...look.css }}
-                        >
-                          <span
-                            className={`absolute left-0 ${ss ? "w-1 bg-accent" : "w-[3px] rounded-r-full"} ${joinsPrev ? "top-0" : "top-3"} ${joinsNext ? "bottom-0" : "bottom-3"} ${ss && !joinsPrev ? "rounded-tr-full" : ""} ${ss && !joinsNext ? "rounded-br-full" : ""}`}
-                            style={ss ? undefined : { background: hue }}
-                            aria-hidden
-                          />
-                          {/* The number is the button for moving this exercise without dragging (and by keyboard). */}
-                          {live ? (
-                            <span
-                              className="num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold"
-                              style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
-                            >
-                              {i + 1}
-                            </span>
-                          ) : (
-                            <button
-                              type="button"
-                              data-no-drag
-                              onClick={() => reorder.setPicked(picked ? null : i)}
-                              aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
-                              aria-pressed={picked}
-                              className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
-                              style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
-                            >
-                              {i + 1}
-                            </button>
-                          )}
-                          <div className={`min-w-0 flex-1 ${items.length > 1 && !live ? "max-[389px]:pr-9" : ""}`}>
-                            {ss && (
-                              <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">
-                                <Icon name="link" size={12} />
-                                {ss}
-                              </div>
-                            )}
-                            <div className="truncate font-semibold">{ex.name}</div>
-                            <div className="text-sm text-muted num">
-                              {it.label ? `${it.label} · ` : ""}
-                              {it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} ·{" "}
-                              {(it.setTargets ?? []).some((st) => st.weight > it.target.weight) ? t("td.upTo") : ""}
-                              {loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((st) => st.weight)), profile.unit)}
-                              {" · "}
-                              {it.warmup ? t("td.warmups", { count: it.warmup.length }) : ""}
-                              {t("td.mins", { n: Math.max(1, Math.round(itemSeconds(it) / 60)) })}
-                            </div>
-                            {(() => {
-                              const w = whys?.[i];
-                              const line = w ? (shared ? itemWhyWithoutLoad(w) : w.short) : "";
-                              return line ? (
-                                <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">
-                                  {line}
-                                </p>
-                              ) : null;
-                            })()}
-                          </div>
-                          {picked ? (
-                            <MoveButtons
-                              name={ex.name}
-                              canUp={i > 0}
-                              canDown={i < items.length - 1}
-                              onUp={() => reorder.step(i, -1)}
-                              onDown={() => reorder.step(i, 1)}
-                              onDone={() => reorder.setPicked(null)}
-                            />
-                          ) : it.injuryPct ? (
-                            <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">
-                              {t(it.mode ? `preg.td.${it.mode}` : "td.injury", { n: it.injuryPct })}
-                            </span>
-                          ) : (
-                            <span
-                              className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${items.length > 1 && !live ? "hidden min-[390px]:inline" : ""}`}
-                              style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}
-                            >
-                              {MUSCLE_LABEL[it.focus]}
-                            </span>
-                          )}
-                          {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
-                          {i > 0 && !live && (
-                            <LinkToggle
-                              className="absolute -top-[22px] right-3 z-10"
-                              on={joinsPrev}
-                              first={exercise(items[i - 1]!.exerciseId).name}
-                              second={ex.name}
-                              onToggle={() => toggleSuperset(i - 1)}
-                            />
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ol>
-                  {items.length > 1 &&
-                    (() => {
-                      const grouped = items.some((x) => x.group);
-                      const saved = grouped
-                        ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                          Math.round((planSeconds(items.map(({ group: _g, ...x }) => x)) - planSeconds(items)) / 60)
-                        : 0;
-                      return (
-                        <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
-                          <Icon name="link" size={14} className="mt-[3px] shrink-0" />
-                          <span>
-                            {live
-                              ? t("td.ssLive", { section: t("workout.comingUp") })
-                              : grouped
-                                ? saved > 0
-                                  ? t("td.ssLinkedSaves", { n: saved })
-                                  : t("td.ssLinked")
-                                : t("td.ssHint")}
-                            <Info term="superset" />
-                          </span>
-                        </p>
-                      );
-                    })()}
-                </Section>
-              )}
-              {!(split?.noLift && !active) && (
-                <Section title={t("td.whyMuscles")} icon="recovery">
-                  <div className="card p-4">
-                    <RecoveryMap rec={rec} focus={focus} compact chips={false} />
-                    {preview.program && !preview.routineId ? (
-                      <p className="mt-3 text-sm text-muted">
-                        {t(fixed ? "td.programDay" : "td.programDayAdaptive", {
-                          day: preview.program.dayName ?? "",
-                          program: programName(preview.program.id) ?? "",
-                          sets: preview.week.setsPerMuscle,
-                          note: preview.program.note ?? "",
-                        })}
-                      </p>
-                    ) : (
-                      <p className="mt-3 text-sm text-muted">
-                        {preview.routineId
-                          ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))) })
-                          : t("td.targets", {
-                              muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))),
-                              sets: preview.week.setsPerMuscle,
-                            })}
+            {resting ? null : preview && preview.items.length > 0 ? (
+              <>
+                {!active && <TodayParts />}
+                {!active && <CoachProgramChip />}
+                {/* Lifting off for today (cardio and stretches only): the exercise list isn't run, so it isn't shown. */}
+                {!(split?.noLift && !active) && (
+                  <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
+                    {shared && (
+                      <p className="mb-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="plan-shared-why">
+                        <Icon name="target" size={14} className="mt-[3px] shrink-0 text-accent" />
+                        <span>{shared.charAt(0).toUpperCase() + shared.slice(1)}</span>
                       </p>
                     )}
-                  </div>
-                </Section>
-              )}
-            </>
-          ) : (
-            <>
-              {!active && <CoachProgramChip />}
-              <div className="card mt-6">
-                <EmptyState
-                  icon="moon"
-                  mascot="sleepy"
-                  tint="var(--color-cyan)"
-                  title={t("td.restDay")}
-                  body={t("td.restBody")}
-                  action={
-                    <Button kind="ghost" icon="stretch" onClick={() => go("stretch", "rest")}>
-                      {t("str.restCard")}
-                    </Button>
-                  }
-                />
-              </div>
-            </>
-          )}
+                    <ol className="stagger card overflow-hidden" data-testid="plan-list">
+                      {items.map((it, i) => {
+                        const ex = exercise(it.exerciseId);
+                        const hue = muscleHue(it.focus);
+                        const ss = supersetLabel(items, i);
+                        const joinsPrev = i > 0 && linkedToNext(items, i - 1);
+                        const joinsNext = linkedToNext(items, i);
+                        const look = live ? { className: "", css: {} } : reorder.style(i);
+                        const picked = !live && reorder.picked === i;
+                        // Supersets read as one block: a shared tint, one accent bracket down the left that runs
+                        // across the rows, and a dashed join where the link button sits on the line between them.
+                        return (
+                          <li
+                            key={it.exerciseId}
+                            {...(live ? {} : reorder.row(i))}
+                            data-superset={it.group ?? undefined}
+                            className={`animate-rise relative flex select-none items-center gap-3 px-4 py-3.5 transition-shadow ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""} ${look.className}`}
+                            style={{ animationDelay: `${i * 40}ms`, ...look.css }}
+                          >
+                            <span
+                              className={`absolute left-0 ${ss ? "w-1 bg-accent" : "w-[3px] rounded-r-full"} ${joinsPrev ? "top-0" : "top-3"} ${joinsNext ? "bottom-0" : "bottom-3"} ${ss && !joinsPrev ? "rounded-tr-full" : ""} ${ss && !joinsNext ? "rounded-br-full" : ""}`}
+                              style={ss ? undefined : { background: hue }}
+                              aria-hidden
+                            />
+                            {/* The number is the button for moving this exercise without dragging (and by keyboard). */}
+                            {live ? (
+                              <span
+                                className="num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold"
+                                style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
+                              >
+                                {i + 1}
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                data-no-drag
+                                onClick={() => reorder.setPicked(picked ? null : i)}
+                                aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
+                                aria-pressed={picked}
+                                className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
+                                style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
+                              >
+                                {i + 1}
+                              </button>
+                            )}
+                            <div className={`min-w-0 flex-1 ${items.length > 1 && !live ? "max-[389px]:pr-9" : ""}`}>
+                              {ss && (
+                                <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">
+                                  <Icon name="link" size={12} />
+                                  {ss}
+                                </div>
+                              )}
+                              <div className="truncate font-semibold">{ex.name}</div>
+                              <div className="text-sm text-muted num">
+                                {it.label ? `${it.label} · ` : ""}
+                                {it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} ·{" "}
+                                {(it.setTargets ?? []).some((st) => st.weight > it.target.weight) ? t("td.upTo") : ""}
+                                {loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((st) => st.weight)), profile.unit)}
+                                {" · "}
+                                {it.warmup ? t("td.warmups", { count: it.warmup.length }) : ""}
+                                {t("td.mins", { n: Math.max(1, Math.round(itemSeconds(it) / 60)) })}
+                              </div>
+                              {(() => {
+                                const w = whys?.[i];
+                                const line = w ? (shared ? itemWhyWithoutLoad(w) : w.short) : "";
+                                return line ? (
+                                  <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">
+                                    {line}
+                                  </p>
+                                ) : null;
+                              })()}
+                            </div>
+                            {picked ? (
+                              <MoveButtons
+                                name={ex.name}
+                                canUp={i > 0}
+                                canDown={i < items.length - 1}
+                                onUp={() => reorder.step(i, -1)}
+                                onDown={() => reorder.step(i, 1)}
+                                onDone={() => reorder.setPicked(null)}
+                              />
+                            ) : it.injuryPct ? (
+                              <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">
+                                {t(it.mode ? `preg.td.${it.mode}` : "td.injury", { n: it.injuryPct })}
+                              </span>
+                            ) : (
+                              <span
+                                className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${items.length > 1 && !live ? "hidden min-[390px]:inline" : ""}`}
+                                style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}
+                              >
+                                {MUSCLE_LABEL[it.focus]}
+                              </span>
+                            )}
+                            {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
+                            {i > 0 && !live && (
+                              <LinkToggle
+                                className="absolute -top-[22px] right-3 z-10"
+                                on={joinsPrev}
+                                first={exercise(items[i - 1]!.exerciseId).name}
+                                second={ex.name}
+                                onToggle={() => toggleSuperset(i - 1)}
+                              />
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                    {items.length > 1 &&
+                      (() => {
+                        const grouped = items.some((x) => x.group);
+                        const saved = grouped
+                          ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                            Math.round((planSeconds(items.map(({ group: _g, ...x }) => x)) - planSeconds(items)) / 60)
+                          : 0;
+                        return (
+                          <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
+                            <Icon name="link" size={14} className="mt-[3px] shrink-0" />
+                            <span>
+                              {live
+                                ? t("td.ssLive", { section: t("workout.comingUp") })
+                                : grouped
+                                  ? saved > 0
+                                    ? t("td.ssLinkedSaves", { n: saved })
+                                    : t("td.ssLinked")
+                                  : t("td.ssHint")}
+                              <Info term="superset" />
+                            </span>
+                          </p>
+                        );
+                      })()}
+                  </Section>
+                )}
+                {!(split?.noLift && !active) && (
+                  <Section title={t("td.whyMuscles")} icon="recovery">
+                    <div className="card p-4">
+                      <RecoveryMap rec={rec} focus={focus} compact chips={false} />
+                      {preview.program && !preview.routineId ? (
+                        <p className="mt-3 text-sm text-muted">
+                          {t(fixed ? "td.programDay" : "td.programDayAdaptive", {
+                            day: preview.program.dayName ?? "",
+                            program: programName(preview.program.id) ?? "",
+                            sets: preview.week.setsPerMuscle,
+                            note: preview.program.note ?? "",
+                          })}
+                        </p>
+                      ) : (
+                        <p className="mt-3 text-sm text-muted">
+                          {preview.routineId
+                            ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))) })
+                            : t("td.targets", {
+                                muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))),
+                                sets: preview.week.setsPerMuscle,
+                              })}
+                        </p>
+                      )}
+                    </div>
+                  </Section>
+                )}
+              </>
+            ) : (
+              <>
+                {!active && <CoachProgramChip />}
+                <div className="card mt-6">
+                  <EmptyState
+                    icon="moon"
+                    mascot="sleepy"
+                    tint="var(--color-cyan)"
+                    title={t("td.restDay")}
+                    body={t("td.restBody")}
+                    action={
+                      <Button kind="ghost" icon="stretch" onClick={() => go("stretch", "rest")}>
+                        {t("str.restCard")}
+                      </Button>
+                    }
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          {!desktop && extras}
         </div>
-        <div className="desk:order-3 desk:col-span-2">
-          {!active && <StretchLibraryCard />}
-          {profile.quotes !== false && <DailyQuote now={now} />}
-          {!active && <SaveNudge />}
-          {!active && <TodayGame />}
-        </div>
+        {desktop && (
+          <div data-testid="today-side" className="min-w-0 flex-1">
+            {sideCards}
+            {extras}
+          </div>
+        )}
       </div>
 
       {!active && !resting && preview && preview.items.length > 0 && (

@@ -46,7 +46,7 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.29.0",
+    version: "0.29.1",
     day: "2026-11-27",
     headline:
       "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, a program can run in order, 13 new stretches, changing, rating and hands-free sets on the watch, today's workout on your watch face, and Machine taken in one tap",
