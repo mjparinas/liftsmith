@@ -8,7 +8,7 @@ export const BLOG_WATCH_TODAY: Article[] = [
     kind: "blog",
     title: "Today's workout on your watch face",
     description:
-      "A Liftsmith tile and complication on Wear OS, a complication on Apple Watch and a glance on Garmin show today's workout, how long it takes and how ready you are.",
+      "A Wear OS tile and complication, an Apple Watch complication and a Garmin glance show today's workout, how long it takes and how ready you are.",
     date: "2026-11-26",
     tag: "Tracking",
     cta: "watch",
