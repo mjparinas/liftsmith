@@ -184,7 +184,7 @@ try {
     const out = `public/email/${lang}/w`;
     fs.mkdirSync(out, { recursive: true });
     for (const e of WEEKLY) {
-      if ((ONLY && !ONLY.has(e.id)) || e.shot === false) continue;
+      if ((ONLY && !ONLY.has(e.id)) || e.shot === false || e.art) continue; // `art`: drawn by its own script (email-watch.mjs)
       const wide = WIDE.has(e.id);
       if (wide) {
         await page.setViewportSize({ width: 1280, height: 800 });

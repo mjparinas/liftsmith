@@ -908,3 +908,5 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-26.** The My team email gets a point on "From your coach" on Today, Up next and the month on My team.
 
 **New, 2026-11-26.** The "Share and sell your programs" email's Did you know line adds Run the days in order.
+
+**New, 2026-11-26.** "Your workout on your wrist" (`watches`) now waits for the `wearOnPlay` admin flag and goes out next (`fresh`) once it's on, with a new picture: the Wear OS app's own screens (`scripts/email-watch.mjs`, drawn from the watch's layout by `scripts/wear-shots/`) instead of Connected apps. Anyone who got Getting started's new watch step skips it (`coveredBy: "tour:watch"`). Melvin, 2026-11-26: "for the emails we send out for new users, can you add the fact that we now have support for wear os (android) smart watches, dont forget to add screen shots to those emails".

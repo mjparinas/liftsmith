@@ -101,6 +101,11 @@ export const en = {
   "rmd.tour.rest.body":
     "Log a set and the rest timer starts on its own. On Android and iPhone it keeps counting on the lock screen, with the next set and its plates.",
   "rmd.tour.rest.tip": "Ready early? Tap Skip. Need longer? Tap +30 s, right from the lock screen.",
+  "rmd.tour.watch.title": "Your workout on your Wear OS watch",
+  "rmd.tour.watch.body":
+    "Liftsmith has a Wear OS app. Start a workout on your phone and your watch shows the set, the weight and reps, the rest countdown and your heart rate from the watch's own sensor.",
+  "rmd.tour.watch.tip":
+    "Tap Log set or +30 s on your wrist, feel the buzz when rest ends, and leave the phone in your bag. Find Liftsmith in Google Play on your watch.",
   "rmd.tour.recovery.title": "See what's recovered",
   "rmd.tour.recovery.body":
     "Body shows every muscle coloured by how recovered it is, worked out from your own sets. It's how the plan knows to rest your legs after a big squat day.",
@@ -232,6 +237,11 @@ export const es: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Registra una serie y el temporizador de descanso arranca solo. En Android y iPhone sigue contando en la pantalla de bloqueo, con la siguiente serie y sus discos.",
   "rmd.tour.rest.tip": "¿Listo antes? Toca Saltar. ¿Necesitas más? Toca +30 s, desde la pantalla de bloqueo.",
+  "rmd.tour.watch.title": "Tu entrenamiento en tu reloj Wear OS",
+  "rmd.tour.watch.body":
+    "Liftsmith tiene una app para Wear OS. Empieza un entrenamiento en el móvil y el reloj muestra la serie, el peso y las repeticiones, la cuenta atrás del descanso y tu frecuencia cardiaca medida por el propio reloj.",
+  "rmd.tour.watch.tip":
+    "Toca Registrar serie o +30 s en la muñeca, nota la vibración al acabar el descanso y deja el móvil en la bolsa. Busca Liftsmith en Google Play desde tu reloj.",
   "rmd.tour.recovery.title": "Mira qué está recuperado",
   "rmd.tour.recovery.body":
     "Cuerpo muestra cada músculo con un color según lo recuperado que está, calculado a partir de tus propias series. Así sabe el plan que debe dar descanso a tus piernas tras un gran día de sentadillas.",
@@ -364,6 +374,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Enregistrez une série et le minuteur de repos démarre seul. Sur Android et iPhone, il continue sur l'écran verrouillé, avec la série suivante et ses disques.",
   "rmd.tour.rest.tip": "Prêt plus tôt ? Touchez Passer. Besoin de plus ? Touchez +30 s, depuis l'écran verrouillé.",
+  "rmd.tour.watch.title": "Votre séance sur votre montre Wear OS",
+  "rmd.tour.watch.body":
+    "Liftsmith a une app Wear OS. Lancez une séance sur votre téléphone et la montre affiche la série, la charge et les répétitions, le compte à rebours du repos et votre fréquence cardiaque mesurée par la montre.",
+  "rmd.tour.watch.tip":
+    "Touchez Noter la série ou +30 s au poignet, sentez la vibration à la fin du repos et laissez le téléphone dans le sac. Cherchez Liftsmith dans Google Play sur votre montre.",
   "rmd.tour.recovery.title": "Voyez ce qui a récupéré",
   "rmd.tour.recovery.body":
     "Corps montre chaque muscle coloré selon sa récupération, calculée d'après vos propres séries. C'est ainsi que le plan sait laisser vos jambes se reposer après une grosse séance de squats.",
@@ -495,6 +510,11 @@ export const de: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Trag einen Satz ein, und der Pausentimer startet von selbst. Auf Android und iPhone läuft er auf dem Sperrbildschirm weiter, mit dem nächsten Satz und seinen Scheiben.",
   "rmd.tour.rest.tip": "Früher bereit? Tippe auf Überspringen. Mehr Zeit nötig? Tippe auf +30 s, direkt auf dem Sperrbildschirm.",
+  "rmd.tour.watch.title": "Dein Training auf deiner Wear-OS-Uhr",
+  "rmd.tour.watch.body":
+    "Liftsmith hat eine Wear-OS-App. Starte ein Training auf dem Handy, und die Uhr zeigt den Satz, Gewicht und Wiederholungen, den Pausen-Countdown und deinen Puls vom Sensor der Uhr.",
+  "rmd.tour.watch.tip":
+    "Tippe am Handgelenk auf Satz eintragen oder +30 s, spür die Vibration, wenn die Pause endet, und lass das Handy in der Tasche. Such Liftsmith bei Google Play auf deiner Uhr.",
   "rmd.tour.recovery.title": "Sieh, was erholt ist",
   "rmd.tour.recovery.body":
     "Körper zeigt jeden Muskel farbig nach seiner Erholung, berechnet aus deinen eigenen Sätzen. So weiß der Plan, dass deine Beine nach einem harten Kniebeugen-Tag Pause brauchen.",
@@ -624,6 +644,11 @@ export const it: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Registra una serie e il timer del riposo parte da solo. Su Android e iPhone continua sulla schermata di blocco, con la serie successiva e i suoi dischi.",
   "rmd.tour.rest.tip": "Pronto prima? Tocca Salta. Ti serve più tempo? Tocca +30 s, dalla schermata di blocco.",
+  "rmd.tour.watch.title": "Il tuo allenamento sul tuo orologio Wear OS",
+  "rmd.tour.watch.body":
+    "Liftsmith ha un'app per Wear OS. Avvia un allenamento sul telefono e l'orologio mostra la serie, il peso e le ripetizioni, il conto alla rovescia del riposo e la frequenza cardiaca rilevata dall'orologio.",
+  "rmd.tour.watch.tip":
+    "Tocca Registra serie o +30 s al polso, senti la vibrazione quando il riposo finisce e lascia il telefono nella borsa. Cerca Liftsmith su Google Play dal tuo orologio.",
   "rmd.tour.recovery.title": "Guarda cosa è recuperato",
   "rmd.tour.recovery.body":
     "Corpo mostra ogni muscolo colorato in base al recupero, calcolato dalle tue serie. Così il piano sa di far riposare le gambe dopo una giornata pesante di squat.",
@@ -743,6 +768,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "セットを記録すると、休憩タイマーが自動で始まります。Android と iPhone ではロック画面でもカウントが続き、次のセットとプレートも表示されます。",
   "rmd.tour.rest.tip": "早く準備できたら「スキップ」、もっと休みたいときは「+30 秒」を。ロック画面からでも操作できます。",
+  "rmd.tour.watch.title": "Wear OS のスマートウォッチでトレーニング",
+  "rmd.tour.watch.body":
+    "Liftsmith に Wear OS アプリが登場しました。スマホでトレーニングを始めると、ウォッチにセット、重量と回数、休憩のカウントダウン、ウォッチのセンサーで測った心拍数が表示されます。",
+  "rmd.tour.watch.tip":
+    "手首で「セットを記録」や「+30 秒」をタップ。休憩が終わると振動で知らせるので、スマホはバッグに入れたままで大丈夫です。ウォッチの Google Play で Liftsmith を検索してください。",
   "rmd.tour.recovery.title": "回復した部位がひと目でわかります",
   "rmd.tour.recovery.body":
     "「からだ」では、自分のセットから計算した回復具合で筋肉ごとに色分けされます。だからスクワットをたくさんした翌日は、脚を休ませるメニューになります。",
@@ -888,6 +918,11 @@ export const pt: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Registre uma série e o timer de descanso começa sozinho. No Android e no iPhone ele continua contando na tela de bloqueio, com a próxima série e as anilhas dela.",
   "rmd.tour.rest.tip": "Pronto antes? Toque em Pular. Precisa de mais? Toque em +30 s, direto da tela de bloqueio.",
+  "rmd.tour.watch.title": "Seu treino no seu relógio Wear OS",
+  "rmd.tour.watch.body":
+    "O Liftsmith tem um app para Wear OS. Comece um treino no celular e o relógio mostra a série, o peso e as repetições, a contagem regressiva do descanso e sua frequência cardíaca medida pelo próprio relógio.",
+  "rmd.tour.watch.tip":
+    "Toque em Registrar série ou +30 s no pulso, sinta a vibração quando o descanso acabar e deixe o celular na bolsa. Procure o Liftsmith no Google Play do seu relógio.",
   "rmd.tour.recovery.title": "Veja o que já se recuperou",
   "rmd.tour.recovery.body":
     "Corpo mostra cada músculo colorido pelo quanto se recuperou, calculado a partir das suas próprias séries. É assim que o plano sabe que deve poupar suas pernas depois de um dia pesado de agachamento.",
@@ -1021,6 +1056,11 @@ export const ko: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "세트를 기록하면 휴식 타이머가 알아서 시작돼요. Android와 iPhone에서는 잠금 화면에서도 다음 세트와 원판을 보여 주며 계속 카운트해요.",
   "rmd.tour.rest.tip": "일찍 준비됐나요? 건너뛰기를 누르세요. 더 쉬어야 하나요? 잠금 화면에서 바로 +30초를 누르세요.",
+  "rmd.tour.watch.title": "Wear OS 워치에서 운동하세요",
+  "rmd.tour.watch.body":
+    "Liftsmith에 Wear OS 앱이 생겼어요. 휴대폰에서 운동을 시작하면 워치에 세트, 무게와 횟수, 휴식 카운트다운, 워치 센서로 잰 심박수가 표시돼요.",
+  "rmd.tour.watch.tip":
+    "손목에서 세트 기록이나 +30초를 누르고, 휴식이 끝나면 진동으로 알려 주니 휴대폰은 가방에 두세요. 워치의 Google Play에서 Liftsmith를 찾아보세요.",
   "rmd.tour.recovery.title": "회복된 근육 확인하기",
   "rmd.tour.recovery.body":
     "몸 화면은 내 세트를 바탕으로 계산한 회복 정도에 따라 모든 근육을 색으로 보여 줘요. 그래서 스쿼트를 많이 한 다음 날에는 계획이 다리를 쉬게 해요.",
@@ -1169,6 +1209,11 @@ export const tr: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Bir set kaydet, dinlenme sayacı kendiliğinden başlar. Android ve iPhone'da sonraki set ve plakalarıyla birlikte kilit ekranında saymaya devam eder.",
   "rmd.tour.rest.tip": "Erken mi hazırsın? Atla'ya dokun. Daha fazla mı lazım? Doğrudan kilit ekranından +30 sn'ye dokun.",
+  "rmd.tour.watch.title": "Antrenmanın Wear OS saatinde",
+  "rmd.tour.watch.body":
+    "Liftsmith'in artık bir Wear OS uygulaması var. Telefonda antrenmanı başlat, saat seti, ağırlığı ve tekrarları, dinlenme geri sayımını ve saatin kendi sensöründen nabzını göstersin.",
+  "rmd.tour.watch.tip":
+    "Bileğinden Seti kaydet'e ya da +30 s'ye dokun, dinlenme bitince titreşimi hisset ve telefonu çantada bırak. Liftsmith'i saatindeki Google Play'de bul.",
   "rmd.tour.recovery.title": "Neyin toparlandığını gör",
   "rmd.tour.recovery.body":
     "Vücut ekranı, kendi setlerinden hesaplanan toparlanma durumuna göre her kası renklendirir. Plan, büyük bir squat gününden sonra bacaklarını dinlendirmesi gerektiğini böyle bilir.",
@@ -1326,6 +1371,11 @@ export const pl: Partial<Record<Key, Message>> = {
   "rmd.tour.rest.body":
     "Zapisz serię, a minutnik przerwy włączy się sam. Na Androidzie i iPhonie odlicza dalej na ekranie blokady, z następną serią i jej talerzami.",
   "rmd.tour.rest.tip": "Gotowy wcześniej? Stuknij Pomiń. Potrzebujesz więcej? Stuknij +30 s, prosto z ekranu blokady.",
+  "rmd.tour.watch.title": "Trening na zegarku z Wear OS",
+  "rmd.tour.watch.body":
+    "Liftsmith ma aplikację na Wear OS. Zacznij trening na telefonie, a zegarek pokaże serię, ciężar i powtórzenia, odliczanie przerwy i tętno z czujnika zegarka.",
+  "rmd.tour.watch.tip":
+    "Stuknij Zapisz serię albo +30 s na nadgarstku, poczuj wibrację na koniec przerwy i zostaw telefon w torbie. Znajdź Liftsmith w Google Play na zegarku.",
   "rmd.tour.recovery.title": "Zobacz, co się zregenerowało",
   "rmd.tour.recovery.body":
     "Ciało pokazuje każdy mięsień w kolorze zależnym od regeneracji, wyliczonej z twoich własnych serii. Dzięki temu plan wie, że po ciężkim dniu przysiadów nogi mają odpocząć.",

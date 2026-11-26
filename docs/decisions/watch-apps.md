@@ -72,3 +72,8 @@ Melvin picked it from the Labs ideas (2026-11-11: "Labs ideas 1 to 5").
 
 - A watch face complication or tile with today's call.
 - Build the Garmin watch app in CI once there's a Garmin login for the SDK Manager to use (`GARMIN_*` secrets).
+
+## Emails and screenshots (2026-11-26)
+
+Melvin asked for the Wear OS app in the new-user emails, with screenshots. Getting started has a watch step and the weekly "Your workout on your wrist" tip has a watch picture, both waiting for the `wearOnPlay` flag until Google Play approves the Wear OS release ([Reminders and lifecycle messages](reminders-and-lifecycle-messages.md)). The screens are real: `scripts/wear-shots/` is a small Gradle project, outside the app build and CI, that draws `activity_workout.xml` with the watch's own strings, colours and buttons through Paparazzi (Android's layout renderer) on a 454 px round watch, filled in like `WorkoutActivity.render()` (a set, rest, and Start on phone) with the phone's words in each language. The renders live in `store/wear/<lang>/` (also usable as Play's Wear OS screenshots), and `scripts/email-watch.mjs` frames them for email.
+

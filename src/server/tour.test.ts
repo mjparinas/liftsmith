@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { addDays, atTime, zoned } from "@/lib/messages";
 
 import type { Send } from "./reminders";
-import { nextTour, TOUR, tourMail } from "./tour";
+import { nextTour, TOUR, tourMail, tourSteps } from "./tour";
+import { NO_FACTS, queue, weeklyStart } from "./weekly/send";
 
 const TZ = "America/Vancouver";
 const MON = zoned(2026, 11, 9, 0, 0, TZ);
@@ -50,5 +51,52 @@ describe("the getting-started emails", () => {
     expect(m.text).toContain("Erste Schritte · 3 von 8");
     expect(m.text).toContain("https://example.com/u");
     expect(m.html).toContain("#/today");
+  });
+
+  // The Wear OS step (Melvin, 2026-11-26): waits for the wearOnPlay flag, and never reaches anyone already done.
+  describe("the Wear OS step", () => {
+    const ON = { wearOnPlay: true };
+    const sentUpTo = (id: string) => {
+      const ids = TOUR.filter((t) => !t.late).map((t) => t.id);
+      return ids.slice(0, ids.indexOf(id) + 1).map((x, i) => send(`tour:${x}`, "tour", atTime(addDays(MON, i, TZ), "10:00", TZ)));
+    };
+    const after = (sends: Send[]) => addDays(MON, sends.length + 1, TZ);
+
+    it("is skipped while Google Play hasn't approved the watch app", () => {
+      const sends = sentUpTo("rest");
+      expect(nextTour(sends, TZ, after(sends), after(sends) + DAY)).toMatchObject({ key: "tour:recovery", n: 5, total: 8 });
+    });
+
+    it("comes right after the rest timer once the flag is on, as tip 6 of 9, with the watch's screens", () => {
+      const sends = sentUpTo("rest");
+      const t = nextTour(sends, TZ, after(sends), after(sends) + DAY, ON)!;
+      expect(t).toMatchObject({ key: "tour:watch", n: 5, total: 9 });
+      const m = tourMail(t, footer, "en");
+      expect(m.subject).toBe("Your workout on your Wear OS watch");
+      expect(m.html).toContain('src="https://www.getliftsmith.com/email/en/09.jpg"');
+      expect(m.text).toContain("Getting started · 6 of 9");
+      expect(m.html).toContain("#/connections");
+    });
+
+    it("never reaches someone who finished Getting started before it, and doesn't hold up their weekly tips", () => {
+      const done = sentUpTo("awards");
+      expect(tourSteps(done, ON).map((t) => t.id)).not.toContain("watch");
+      expect(nextTour(done, TZ, after(done), after(done) + 7 * DAY, ON)).toBeNull();
+      expect(weeklyStart(done, true, MON, ON)).not.toBeNull();
+      // They hear about it in the weekly tips instead, once the flag is on.
+      const flags = { ...NO_FACTS.flags, wearOnPlay: true };
+      const q = queue(new Set(), { roles: [], flags });
+      expect(q.findIndex((e) => e.id === "watches")).toBeLessThan(q.findIndex((e) => !e.fresh));
+      expect(queue(new Set(), NO_FACTS).some((e) => e.id === "watches")).toBe(false);
+    });
+
+    it("someone who got it isn't sent the weekly watch tip too, and their weekly tips wait for it", () => {
+      const sends = [...sentUpTo("rest"), send("tour:watch", "tour", atTime(addDays(MON, 5, TZ), "10:00", TZ))];
+      expect(weeklyStart(sends, true, MON, ON)).toBeNull();
+      const flags = { coachPlans: false, wearOnPlay: true };
+      expect(queue(new Set(["tour:watch"]), { roles: [], flags }).some((e) => e.id === "watches")).toBe(false);
+      // Already sent: it stays in their series even if the flag goes off again.
+      expect(tourSteps(sends, { wearOnPlay: false }).map((t) => t.id)).toContain("watch");
+    });
   });
 });
