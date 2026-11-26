@@ -509,6 +509,11 @@ export const fr: FeaturesText = {
       name: "De ton coach, sur Aujourd'hui",
       body: "Qui suit le programme d'un coach le voit sur Aujourd'hui : de qui il vient, le jour d'aujourd'hui, la semaine et la phase, et la suite avec son jour. Un athlète d'une équipe scolaire voit aussi le mois dans Mon équipe, avec les jours faits, manqués et à venir.",
     },
+    "program-in-order": {
+      name: "Des programmes qui se suivent dans l'ordre",
+      body: "Un coach peut faire suivre les jours d'un programme dans l'ordre : chaque personne fait le jour suivant dès qu'elle s'entraîne, au lieu de jours fixes, et la semaine reste un rythme suggéré. Aujourd'hui indique la suite.",
+      proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",

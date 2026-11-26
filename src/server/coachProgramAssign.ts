@@ -32,6 +32,8 @@ export interface ProgramAssign {
   days: AssignDay[];
   /** The program's phases at assign time, when it has them (weekdays parallel to days). */
   phases?: ProgramPhase[];
+  /** The days run one after another whenever the lifter trains, not on their weekdays (the weekdays are a rhythm). */
+  inOrder?: true;
   /** Days the coach changed for this client only (indexes into days); the rest follow the program. */
   tweaked?: number[];
   /** Last change from the coach (a program edit reaching it, or a tweak), so a following app can catch up. */
@@ -84,6 +86,7 @@ interface Row {
   days: string;
   phases?: string | null;
   tweaks?: string | null;
+  in_order?: number | null;
   own_weekdays?: number | null;
   updated_at?: number | null;
   status: string;
@@ -100,6 +103,7 @@ interface ProgramRow {
   weeks: number;
   days: string;
   phases?: string | null;
+  in_order?: number | null;
   price: number;
 }
 
@@ -207,6 +211,7 @@ function shape(r: Row): ProgramAssign {
     weeks: n(r.weeks),
     days,
     ...(phases ? { phases } : {}),
+    ...(n(r.in_order) === 1 ? { inOrder: true as const } : {}),
     ...(tweaks.size ? { tweaked: [...tweaks.keys()].sort((a, b) => a - b) } : {}),
     updatedAt: n(r.updated_at) || n(r.created_at),
     status,
@@ -270,9 +275,10 @@ export async function assignProgram(
   now = Date.now(),
 ): Promise<AssignResult | { error: AssignError }> {
   if (typeof programId !== "string" || !programId) return { error: "bad" };
-  const [prog] = await query<ProgramRow>("SELECT id, coach_id, title, weeks, days, phases, price FROM coach_programs WHERE id = ?", [
-    programId,
-  ]);
+  const [prog] = await query<ProgramRow>(
+    "SELECT id, coach_id, title, weeks, days, phases, in_order, price FROM coach_programs WHERE id = ?",
+    [programId],
+  );
   if (!prog || s(prog.coach_id) !== coachId) return { error: "gone" };
   let rawDays: unknown;
   try {
@@ -289,6 +295,7 @@ export async function assignProgram(
   const base = parseAssignDays(rawDays, undefined, !!phases);
   const ownWeekdays = !phases && !!base && days.some((d, i) => d.weekdays.join() !== (base[i]?.weekdays ?? []).join()) ? 1 : 0;
   const phasesJson = phases ? JSON.stringify(phases) : "";
+  const inOrder = n(prog.in_order) === 1 ? 1 : 0;
   const clients = await resolveClients(coachId, scope);
   if (!clients.length) return { error: "noTargets" };
   const teamId = scope.type === "team" ? scope.teamId : null;
@@ -308,10 +315,10 @@ export async function assignProgram(
     const id = randomBytes(9).toString("base64url");
     await run(
       `INSERT INTO coach_program_assigns
-       (id, coach_id, client_id, program_id, team_id, title, weeks, days, phases, tweaks, own_weekdays, updated_at, status, created_at,
-        accepted_at, started_at, ended_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, 'pending', ?, NULL, NULL, NULL)`,
-      [id, coachId, clientId, s(prog.id), teamId, title, weeks, daysJson, phasesJson, ownWeekdays, now, now],
+       (id, coach_id, client_id, program_id, team_id, title, weeks, days, phases, tweaks, in_order, own_weekdays, updated_at, status,
+        created_at, accepted_at, started_at, ended_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, ?, 'pending', ?, NULL, NULL, NULL)`,
+      [id, coachId, clientId, s(prog.id), teamId, title, weeks, daysJson, phasesJson, inOrder, ownWeekdays, now, now],
     );
     // Free listed programs may grant ownership so "From coaches" stays consistent; paid never does (teens can't buy).
     if (n(prog.price) === 0) {
@@ -333,6 +340,7 @@ export async function assignProgram(
         weeks,
         days: daysJson,
         phases: phasesJson,
+        in_order: inOrder,
         updated_at: now,
         status: "pending",
         created_at: now,
@@ -351,9 +359,10 @@ export async function assignProgram(
  * for that client (a day that no longer exists drops its change). Returns how many assigns changed.
  */
 export async function syncProgramAssigns(coachId: string, programId: string, now = Date.now()): Promise<number> {
-  const [prog] = await query<ProgramRow>("SELECT id, coach_id, title, weeks, days, phases, price FROM coach_programs WHERE id = ?", [
-    programId,
-  ]);
+  const [prog] = await query<ProgramRow>(
+    "SELECT id, coach_id, title, weeks, days, phases, in_order, price FROM coach_programs WHERE id = ?",
+    [programId],
+  );
   if (!prog || s(prog.coach_id) !== coachId) return 0;
   let rawDays: unknown;
   try {
@@ -367,6 +376,7 @@ export async function syncProgramAssigns(coachId: string, programId: string, now
   if (!base?.length) return 0;
   const weeks = Math.min(16, Math.max(1, phases ? phaseWeeks(phases) : n(prog.weeks)));
   const title = s(prog.title).slice(0, 60);
+  const inOrder = n(prog.in_order) === 1 ? 1 : 0;
   const rows = await query<Row>(
     "SELECT * FROM coach_program_assigns WHERE coach_id = ? AND program_id = ? AND status IN ('pending', 'active')",
     [coachId, programId],
@@ -391,17 +401,18 @@ export async function syncProgramAssigns(coachId: string, programId: string, now
     const daysJson = JSON.stringify(days);
     const phasesJson = phases ? JSON.stringify(phases) : "";
     const tJson = tweaksJson(tweaks);
-    if (daysJson === s(r.days) && phasesJson === s(r.phases) && tJson === s(r.tweaks) && weeks === n(r.weeks) && title === s(r.title))
-      continue;
-    await run("UPDATE coach_program_assigns SET days = ?, phases = ?, tweaks = ?, weeks = ?, title = ?, updated_at = ? WHERE id = ?", [
-      daysJson,
-      phasesJson,
-      tJson,
-      weeks,
-      title,
-      now,
-      s(r.id),
-    ]);
+    const same =
+      daysJson === s(r.days) &&
+      phasesJson === s(r.phases) &&
+      tJson === s(r.tweaks) &&
+      weeks === n(r.weeks) &&
+      title === s(r.title) &&
+      inOrder === n(r.in_order);
+    if (same) continue;
+    await run(
+      "UPDATE coach_program_assigns SET days = ?, phases = ?, tweaks = ?, weeks = ?, title = ?, in_order = ?, updated_at = ? WHERE id = ?",
+      [daysJson, phasesJson, tJson, weeks, title, inOrder, now, s(r.id)],
+    );
     changed++;
   }
   return changed;

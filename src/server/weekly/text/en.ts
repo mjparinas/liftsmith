@@ -849,7 +849,7 @@ export const emails: Record<string, Words> = {
       "Each listed program gets its own page on the website, and lifters who've had it two weeks can rate it.",
       "Run it in phases: Build weeks, a Deload week with fewer, lighter sets (one tap to add), and a Peak, and set reps for an exercise (say 8 to 12) or leave them on Auto.",
     ],
-    dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.",
+    dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike. Turn on Run the days in order and each lifter gets the next day whenever they train.",
   },
   "screenshot-share": {
     title: "Take a screenshot, get a card worth sharing",

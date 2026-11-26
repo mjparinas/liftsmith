@@ -504,6 +504,11 @@ export const es: FeaturesText = {
       name: "De tu entrenador, en Hoy",
       body: "Quien sigue el programa de un entrenador lo ve en Hoy: de quién es, el día de hoy, la semana y la fase, y lo siguiente con su día. Un deportista de un equipo escolar también ve el mes en Mi equipo, con los días hechos, perdidos y por venir.",
     },
+    "program-in-order": {
+      name: "Programas que van en orden",
+      body: "Un entrenador puede hacer que un programa vaya en orden: cada persona hace el día siguiente cuando entrena, en lugar de en días fijos de la semana, y la semana queda como ritmo sugerido. Hoy dice lo que viene.",
+      proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",

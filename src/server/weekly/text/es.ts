@@ -829,7 +829,7 @@ export const emails: Record<string, Words> = {
       "Cada programa publicado tiene su propia página en la web, y quienes lo tienen desde hace dos semanas pueden valorarlo.",
       "Hazlo por fases: semanas de Construcción, una semana de Descarga con series menos y más ligeras (se añade con un toque) y un Pico, y fija las repeticiones de un ejercicio (por ejemplo, de 8 a 12) o déjalas en Auto.",
     ],
-    dyk: "Un programa no lleva pesos: la progresión de cada deportista los elige, así que un mismo programa sirve a principiantes y veteranos.",
+    dyk: "Un programa no lleva pesos: la progresión de cada deportista los elige, así que un mismo programa sirve a principiantes y veteranos. Activa Hacer los días en orden y cada persona hará el día siguiente cuando entrene.",
   },
   "screenshot-share": {
     title: "Haz una captura y llévate una tarjeta para compartir",

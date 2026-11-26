@@ -164,6 +164,31 @@ describe("one client's own copy", () => {
     return { p, ana: r.assigned[0]!, kid: r.assigned[1]! };
   };
 
+  it("In order travels from the program to every assign, and an edit that turns it on reaches them", async () => {
+    const { p, ana } = await start();
+    expect(ana.inOrder).toBeUndefined();
+    const saved = await saveProgram(
+      "coach",
+      program({
+        id: p.id,
+        inOrder: true,
+        days: [
+          { name: "Push", code: DAY_A, weekdays: [1] },
+          { name: "Legs", code: DAY_B, weekdays: [3] },
+        ],
+      }),
+      NOW + 5,
+    );
+    if ("error" in saved) throw new Error(saved.error);
+    expect(saved.inOrder).toBe(true);
+    const [mine] = await assignsForClient("buyer");
+    expect(mine).toMatchObject({ inOrder: true, updatedAt: NOW + 5 });
+    await run("INSERT INTO coach_links (coach_id, client_id, created_at) VALUES ('coach', 'third', ?)", [NOW]);
+    const r = await assignProgram("coach", p.id, { type: "clients", ids: ["third"] }, undefined, NOW + 6);
+    if ("error" in r) throw new Error(r.error);
+    expect(r.assigned[0]?.inOrder).toBe(true);
+  });
+
   it("changes a day for one client, keeps it through program edits, and puts it back", async () => {
     const { p, ana } = await start();
     await acceptProgramAssign("buyer", ana.id, NOW);

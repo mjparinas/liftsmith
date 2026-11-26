@@ -830,7 +830,7 @@ export const emails: Record<string, Words> = {
       "Ogni programma pubblicato ha una sua pagina sul sito, e chi lo ha da due settimane può valutarlo.",
       "Dividilo in fasi: settimane di Costruzione, una settimana di Scarico con serie meno numerose e più leggere (si aggiunge con un tocco) e un Picco, e imposta le ripetizioni di un esercizio (per esempio da 8 a 12) o lasciale su Auto.",
     ],
-    dyk: "Un programma non contiene carichi: li sceglie la progressione di ogni atleta, quindi lo stesso programma va bene per principianti ed esperti.",
+    dyk: "Un programma non contiene carichi: li sceglie la progressione di ogni atleta, quindi lo stesso programma va bene per principianti ed esperti. Attiva Fai i giorni in ordine e ognuno farà il giorno successivo quando si allena.",
   },
   "screenshot-share": {
     title: "Fai uno screenshot, ottieni una card da condividere",

@@ -36,7 +36,7 @@ Melvin asked for item 4 of a gap list on 2026-11-15: "a program marketplace wher
 
 ## The program builder (Melvin, 2026-11-25: "a better dashboard for the coach to … create and design their own programs")
 
-Melvin picked **phases of repeated weeks** on a decision card (over one repeated week and every week by hand), from the proposal at https://claude.ai/artifact/H4sRRQktJcjVGdRsTRfAi2. Built in stages; stages 1 to 4 are built.
+Melvin picked **phases of repeated weeks** on a decision card (over one repeated week and every week by hand), from the proposal at https://claude.ai/artifact/H4sRRQktJcjVGdRsTRfAi2. Built in stages; stages 1 to 5 are built.
 
 - **Stage 1 (built): the week.** The program editor's Days are a week: each weekday holds one of the coach's routines or rest (`Week` in `src/lib/programWeek.ts`, `ProgramWeekEditor.tsx`). Tap a day to pick its workout, make a new routine for it, edit it, or make it rest. The same routine can run on several days. It saves as before: each routine once, in calendar order, with the weekdays it runs on (`draftFromWeek`), so Assign already starts from those weekdays. A saved program whose days are no longer the coach's own routines unchanged keeps its days until the coach presses **Lay out a new week** (`weekFromProgram`).
 - **Month view.** A Week / Month switch shows the program on a calendar from this week, faded after its last week (`monthCells`).
@@ -55,7 +55,7 @@ Melvin picked **phases of repeated weeks** on a decision card (over one repeated
   - **From your coach on Today** (`CoachProgramChip` in `ProgramAssignToday.tsx`): while a lifter follows a coach's program, Today shows a tinted card above the plan (and above the rest-day card on an off day) that says **From your coach · <name>**, today's day or rest with the week, the phase and its week when the program has phases, **Up next: <day>, <weekday and date>** and See calendar. Up next is `coachProgramNext` (`coachProgramAssign.ts`): the first program day after today, looking two weeks ahead, never past the program's end.
   - **The month on My team** (`MyTeam.tsx`): the program being followed says Up next under Following, and **Your month** under the list shows the same athlete calendar (days done, missed and coming, from the lifter's own workouts on the phone).
   - Nothing new on the server: both read the plan saved on the phone, so they work offline.
-- **Next stage** (not built): an **In order** switch (the next day whenever the lifter trains, instead of fixed weekdays).
+- **Stage 5 (built, 2026-11-26): In order.** **Run the days in order**, a switch under the program's week in the builder (`inOrder`, `coach_programs.in_order`, copied to each assign and kept in step by `syncProgramAssigns`): each lifter gets the next day whenever they train, instead of on set weekdays. Today's day is `coachProgramToday` (`coachProgramAssign.ts`): the day after the last program day finished (a workout started from one of the program's routines since it began, `sessionStart.routine`), that same day again while it's still today, and Day 1 at the start; it wraps after the last day and never runs past the program's end. Up next then says "the next time you train" instead of a date. The week the coach laid out stays as the suggested rhythm: the calendars still show it, and phases still go by calendar week, so a Deload week is still that week. A workout that isn't one of the program's days doesn't move it.
 - Pure web code, so Android, iOS and the web get it together.
 
 ## Lifter side

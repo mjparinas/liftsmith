@@ -149,6 +149,9 @@ export const en = {
   "wn.c.programAthlete.title": "From your coach on Today",
   "wn.c.programAthlete.body":
     "Following a coach's program? Today says who it's from, the week and phase, and what's up next. School athletes also get their month on My team.",
+  "wn.c.programInOrder.title": "Programs that run in order",
+  "wn.c.programInOrder.body":
+    "A coach can now run a program's days in order: you get the next day whenever you train, not on set weekdays.",
 } as const;
 
 type Key = keyof typeof en;
@@ -309,6 +312,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "De tu entrenador, en Hoy",
   "wn.c.programAthlete.body":
     "¿Sigues el programa de un entrenador? Hoy dice de quién es, la semana y la fase, y lo siguiente. Los deportistas escolares también ven su mes en Mi equipo.",
+  "wn.c.programInOrder.title": "Programas que van en orden",
+  "wn.c.programInOrder.body":
+    "Ahora un entrenador puede hacer que los días vayan en orden: haces el día siguiente cuando entrenas, no en días fijos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -471,6 +477,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "De ton coach, sur Aujourd'hui",
   "wn.c.programAthlete.body":
     "Tu suis le programme d'un coach ? Aujourd'hui dit de qui il vient, la semaine et la phase, et la suite. Les athlètes scolaires voient aussi leur mois dans Mon équipe.",
+  "wn.c.programInOrder.title": "Des programmes qui se suivent dans l'ordre",
+  "wn.c.programInOrder.body":
+    "Un coach peut maintenant faire suivre les jours dans l'ordre : tu fais le jour suivant dès que tu t'entraînes, pas à jours fixes.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -629,6 +638,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "Von deinem Coach auf Heute",
   "wn.c.programAthlete.body":
     "Du folgst dem Programm eines Coaches? Heute zeigt, von wem es ist, Woche und Phase und was als Nächstes kommt. Schulsportler sehen ihren Monat auch in Mein Team.",
+  "wn.c.programInOrder.title": "Programme, die der Reihe nach laufen",
+  "wn.c.programInOrder.body":
+    "Ein Coach kann die Tage jetzt der Reihe nach laufen lassen: Du machst den nächsten Tag, wann immer du trainierst, nicht an festen Wochentagen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -788,6 +800,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "Dal tuo coach, su Oggi",
   "wn.c.programAthlete.body":
     "Segui il programma di un coach? Oggi dice da chi arriva, la settimana e la fase, e il prossimo giorno. Gli atleti scolastici vedono anche il loro mese in La mia squadra.",
+  "wn.c.programInOrder.title": "Programmi che vanno in ordine",
+  "wn.c.programInOrder.body":
+    "Ora un coach può far andare i giorni in ordine: fai il giorno successivo quando ti alleni, non in giorni fissi.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -936,6 +951,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "今日の画面に「コーチから」",
   "wn.c.programAthlete.body":
     "コーチのプログラムに取り組んでいますか？今日の画面に、誰からか、週とフェーズ、次のメニューが表示されます。学校の選手は「マイチーム」で1か月の予定も見られます。",
+  "wn.c.programInOrder.title": "順番に進むプログラム",
+  "wn.c.programInOrder.body":
+    "コーチがプログラムを順番に進めるよう設定できるようになりました。決まった曜日ではなく、トレーニングするたびに次の日に進みます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1090,6 +1108,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "Do seu treinador, em Hoje",
   "wn.c.programAthlete.body":
     "Segue o programa de um treinador? Hoje mostra de quem é, a semana e a fase, e o próximo dia. Atletas escolares também veem o mês em Meu time.",
+  "wn.c.programInOrder.title": "Programas que seguem em ordem",
+  "wn.c.programInOrder.body":
+    "Agora um treinador pode fazer os dias seguirem em ordem: você faz o próximo dia sempre que treina, não em dias fixos.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1232,6 +1253,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "오늘 화면에 코치가 보낸 프로그램",
   "wn.c.programAthlete.body":
     "코치의 프로그램을 따르고 있나요? 오늘 화면에 누가 보냈는지, 주차와 단계, 다음 운동이 보여요. 학교 선수는 마이 팀에서 한 달도 볼 수 있어요.",
+  "wn.c.programInOrder.title": "순서대로 진행되는 프로그램",
+  "wn.c.programInOrder.body":
+    "이제 코치가 프로그램을 순서대로 진행하게 할 수 있어요. 정해진 요일이 아니라 운동할 때마다 다음 날로 넘어가요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1385,6 +1409,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "Od trenera na ekranie Dziś",
   "wn.c.programAthlete.body":
     "Realizujesz program trenera? Dziś pokazuje, od kogo jest, tydzień i fazę oraz to, co następne. Zawodnicy szkolni widzą też swój miesiąc w Mojej drużynie.",
+  "wn.c.programInOrder.title": "Programy realizowane po kolei",
+  "wn.c.programInOrder.body":
+    "Trener może teraz ustawić dni po kolei: robisz następny dzień, kiedy tylko trenujesz, a nie w stałe dni tygodnia.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1540,4 +1567,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.programAthlete.title": "Bugün ekranında koçundan",
   "wn.c.programAthlete.body":
     "Bir koçun programını mı takip ediyorsun? Bugün ekranı kimden geldiğini, haftayı ve aşamayı, sıradakini gösterir. Okul sporcuları ayı Takımım'da da görür.",
+  "wn.c.programInOrder.title": "Sırayla ilerleyen programlar",
+  "wn.c.programInOrder.body":
+    "Koç artık bir programın günlerini sırayla ilerletebilir: sabit günlerde değil, ne zaman antrenman yaparsan sıradaki günü yaparsın.",
 };

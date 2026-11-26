@@ -940,6 +940,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-26",
       },
       {
+        id: "program-in-order",
+        name: "Programs that run in order",
+        body: "A coach can switch a program to run its days in order: each lifter gets the next day whenever they train, instead of on set weekdays, and the week stays as a suggested rhythm. Today says what's up next.",
+        tier: "both",
+        proPart: "Being a client is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-26",
+      },
+      {
         id: "coach-calendar",
         name: "Workout calendar",
         body: "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",

@@ -45,6 +45,8 @@ export interface CoachProgram {
   days: ProgramDay[];
   /** Build, Deload and Peak phases, each its own week, when the program has them (weekdays parallel to days). */
   phases?: ProgramPhase[];
+  /** The days run one after another whenever the lifter trains; the weekdays are then a suggested rhythm. */
+  inOrder?: true;
   price: number;
   currency: string;
   listed: boolean;
@@ -73,6 +75,8 @@ export interface ProgramDraft {
   weekdays?: number[][];
   /** Phases, with weekdays parallel to routineIds; the weeks are then theirs added up. */
   phases?: ProgramPhase[];
+  /** In order: each lifter gets the next day whenever they train, not on set weekdays. */
+  inOrder?: boolean;
   price: number;
   listed: boolean;
 }
@@ -158,6 +162,7 @@ const details = (d: ProgramDraft) => ({
   weeks: d.weeks,
   price: d.price,
   listed: d.listed,
+  inOrder: d.inOrder === true,
 });
 
 export async function saveProgram(draft: ProgramDraft, routines: readonly Routine[]): Promise<CoachProgram> {

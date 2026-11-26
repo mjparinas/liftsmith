@@ -579,6 +579,11 @@ export const pl: FeaturesText = {
       name: "Od trenera na ekranie Dziś",
       body: "Kto realizuje program trenera, widzi go na ekranie Dziś: od kogo jest, dzisiejszy dzień, tydzień i fazę oraz to, co następne, z dniem. Zawodnik drużyny szkolnej widzi też miesiąc w Mojej drużynie, z dniami zrobionymi, pominiętymi i nadchodzącymi.",
     },
+    "program-in-order": {
+      name: "Programy realizowane po kolei",
+      body: "Trener może ustawić program, by dni szły po kolei: każdy robi następny dzień, kiedy tylko trenuje, zamiast w stałe dni tygodnia, a tydzień zostaje jako sugerowany rytm. Ekran Dziś pokazuje, co następne.",
+      proPart: "Bycie klientem jest bezpłatne; prowadzenie klientów jest w Pro.",
+    },
     "coach-calendar": {
       name: "Kalendarz treningów",
       body: "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",

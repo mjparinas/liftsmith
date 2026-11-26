@@ -579,6 +579,11 @@ export const pt: FeaturesText = {
       name: "Do seu treinador, em Hoje",
       body: "Quem segue o programa de um treinador o vê em Hoje: de quem é, o dia de hoje, a semana e a fase, e o próximo com o seu dia. Um atleta de um time escolar também vê o mês em Meu time, com os dias feitos, perdidos e que vêm aí.",
     },
+    "program-in-order": {
+      name: "Programas que seguem em ordem",
+      body: "Um treinador pode fazer um programa seguir em ordem: cada pessoa faz o próximo dia sempre que treina, em vez de em dias fixos da semana, e a semana fica como ritmo sugerido. Hoje mostra o que vem a seguir.",
+      proPart: "Ser cliente é grátis; treinar clientes é Pro.",
+    },
     "coach-calendar": {
       name: "Calendário de treinos",
       body: "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",

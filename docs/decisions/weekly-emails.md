@@ -906,3 +906,5 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-26.** The "Assign a season program" email's Did you know line adds changing a day for one client from their report.
 
 **New, 2026-11-26.** The My team email gets a point on "From your coach" on Today, Up next and the month on My team.
+
+**New, 2026-11-26.** The "Share and sell your programs" email's Did you know line adds Run the days in order.
