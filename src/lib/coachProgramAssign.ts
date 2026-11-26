@@ -1,5 +1,6 @@
 // Client side of season program assigns (server: src/server/coachProgramAssign.ts).
 import { api, AuthError, readAccount } from "./auth";
+import { t } from "./i18n";
 import { phaseAt } from "./programPhases";
 import { decodeRoutine } from "./routineShare";
 import type { AppEvent, PlanSource, ProgramPhase, Routine } from "./types";
@@ -271,3 +272,11 @@ export function coachProgramNext(
   }
   return null;
 }
+
+/**
+ * What a coach reads when a team they picked has no athletes to give a program to (Melvin, 2026-11-26: "let the user
+ * know that it's because there are no athletes, tell them to add one").
+ */
+export const noAthletes = (team: { name: string }) => t("cpg.noAthletes", { team: team.name });
+/** The server found no one to give the program to (`noTargets`, coachProgramAssign.ts on the server). */
+export const isNoTargets = (e: unknown) => e instanceof AuthError && e.message === "noTargets";

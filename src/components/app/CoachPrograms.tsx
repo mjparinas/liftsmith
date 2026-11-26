@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { track } from "@/lib/analytics";
 import { WEEKDAYS } from "@/lib/calendar";
 import { money } from "@/lib/coachPay";
-import { assignProgram, endProgramAssigns, type AssignScope } from "@/lib/coachProgramAssign";
+import { assignProgram, endProgramAssigns, isNoTargets, noAthletes, type AssignScope } from "@/lib/coachProgramAssign";
 import {
   deleteProgram,
   GOALS,
@@ -505,19 +505,27 @@ function AssignSheet({ program, onDone, athlete }: { program: CoachProgram; onDo
   }, []);
 
   const clients = overview?.clients ?? [];
+  // A team with no athletes can't take a program (Melvin, 2026-11-26): say why and what to do, never a bare error.
+  const team = scope?.type === "team" ? teams.find((x) => x.id === scope.teamId) : undefined;
+  const emptyTeam = !!team && team.members === 0;
   const goAssign = async () => {
     if (!scope) return;
     setBusy(true);
     setNote(null);
     try {
       const r = await assignProgram(program.id, scope, weekdays);
-      haptic("success");
-      track("feature", { name: "trainer", detail: "assignProgram" });
-      setNote(tFor(athlete, "cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
-      if (r.assigned.length) setTimeout(onDone, 1200);
+      if (!r.assigned.length && team) {
+        oops();
+        setNote(noAthletes(team));
+      } else {
+        haptic("success");
+        track("feature", { name: "trainer", detail: "assignProgram" });
+        setNote(tFor(athlete, "cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
+        if (r.assigned.length) setTimeout(onDone, 1200);
+      }
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setNote(team && isNoTargets(e) ? noAthletes(team) : trainerError(e));
     }
     setBusy(false);
   };
@@ -576,7 +584,10 @@ function AssignSheet({ program, onDone, athlete }: { program: CoachProgram; onDo
           <Chip
             key={team.id}
             active={scope?.type === "team" && scope.teamId === team.id}
-            onClick={() => setScope({ type: "team", teamId: team.id })}
+            onClick={() => {
+              setScope({ type: "team", teamId: team.id });
+              setNote(team.members === 0 ? noAthletes(team) : null);
+            }}
           >
             {t("cpg.assignTeam", { name: team.name, count: team.members })}
           </Chip>
@@ -609,7 +620,7 @@ function AssignSheet({ program, onDone, athlete }: { program: CoachProgram; onDo
       )}
       <Button
         className="w-full"
-        disabled={busy || !scope || (scope.type === "clients" && !scope.ids.length) || weekdays.some((w) => !w.length)}
+        disabled={busy || !scope || emptyTeam || (scope.type === "clients" && !scope.ids.length) || weekdays.some((w) => !w.length)}
         onClick={() => void goAssign()}
       >
         {t("cpg.assignGo")}

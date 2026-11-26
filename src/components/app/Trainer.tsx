@@ -64,6 +64,7 @@ import { ClientSessions, SessionToday } from "./CoachSessions";
 import { ClientTargets } from "./CoachTargets";
 import { CoachVideos, VideoScreen } from "./FormVideos";
 import { Icon } from "./icons";
+import { MessageButton } from "./MessageButton";
 import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { partLabel } from "./Stretch";
@@ -646,9 +647,9 @@ function ClientScreen({ id }: { id: string }) {
     <div className="desk-cols pb-2">
       <ScreenHeader className="desk-span" back={back} kicker={tFor(athlete, "trn.client")} title={report.name || t("trn.noName")} />
       <div className="desk-span mt-3">
-        <Button className="w-full" icon="chat" onClick={() => go("trainer", `${CHAT}${id}`)}>
+        <MessageButton id={id} name={report.name || t("trn.noName")} className="w-full">
           {t("trn.messageNamed", { name: report.name || t("trn.noName") })}
-        </Button>
+        </MessageButton>
       </div>
       <Section title={t("trn.todo")} icon="flag">
         <ul className="space-y-2">

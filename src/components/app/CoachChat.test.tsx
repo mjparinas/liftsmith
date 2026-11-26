@@ -12,7 +12,7 @@ import { resetChime, useLive } from "@/lib/chatLive";
 import { DESKTOP_QUERY } from "@/lib/layout";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 
-import { ChatDock, openWin } from "./ChatDock";
+import { ChatDock, openInDock, openWin, teamWin } from "./ChatDock";
 import { ChatThread, mergeMessages } from "./CoachChat";
 
 const NOW = Date.now();
@@ -76,6 +76,13 @@ beforeEach(() => {
     if (body?.action === "send")
       return Response.json({ message: { id: "new", from: "me", text: body.sticker ? "" : body.text, at: NOW, sticker: body.sticker } });
     if (body?.action === "status") return Response.json({ status: body.status, until: body.until });
+    if (url === "/api/teams/" && body?.action === "chat")
+      return Response.json({
+        team: { id: body.team, name: "School squad" },
+        coach: true,
+        more: false,
+        messages: body.after ? [] : [{ id: "tm1", name: "Maya", mine: false, coach: false, body: "Gym at 4?", at: NOW - 20_000 }],
+      });
     return Response.json({ ok: true });
   });
 });
@@ -182,6 +189,31 @@ describe("the chat dock", () => {
     await u.click(screen.getByRole("radio", { name: /On vacation/ }));
     await u.click(screen.getByRole("button", { name: "Set status" }));
     expect(calls.find((c) => c.body?.action === "status")?.body).toMatchObject({ status: "vacation", until: 0 });
+  });
+
+  it("Message and Team chat elsewhere on the page open their chat here, unfolded, with the list expanded", async () => {
+    wide = true;
+    fakeMatchMedia();
+    render(<ChatDock hidden={false} />);
+    const dock = await screen.findByTestId("chat-dock");
+    act(() => openInDock("k1"));
+    expect(await within(dock).findByText("Heavy but good")).toBeInTheDocument();
+    expect(within(dock).getByRole("button", { name: /^Messages/ })).toHaveAttribute("aria-expanded", "true");
+    act(() => openInDock(teamWin("t1"), "School squad"));
+    expect(await within(dock).findByText("Gym at 4?")).toBeInTheDocument();
+    expect(within(dock).getAllByTestId("chat-window")).toHaveLength(2);
+    expect(within(dock).getByRole("button", { name: "Close the chat with School squad" })).toBeInTheDocument();
+  });
+
+  it("opens a team's chat even for a coach with no one in the list", async () => {
+    wide = true;
+    fakeMatchMedia();
+    live = { ...live, people: [] };
+    render(<ChatDock hidden={false} />);
+    await act(async () => {});
+    expect(screen.queryByTestId("chat-dock")).toBeNull();
+    act(() => openInDock(teamWin("t1"), "School squad"));
+    expect(await screen.findByText("Gym at 4?")).toBeInTheDocument();
   });
 
   it("keeps two windows at most, the newest beside the list", () => {
