@@ -507,6 +507,10 @@ export const tr: FeaturesText = {
       name: "Lise takımlarına ücretsiz",
       body: "Okul e-posta adresini doğrulayan lise koçları Pro'yu ücretsiz alır; takımlarındaki 13–18 yaş arası sporcular da öyle, haftalık takım sıralamasıyla. Vücut yağı ve herkese açık profiller 18 yaş altı için kapalı kalır.",
     },
+    "my-team": {
+      name: "Okul sporcuları için Takımım",
+      body: "Okul takımındaki bir sporcu Koçluk'u açınca takımının evini görür: takım ve koçu, Takip et ile atanan programlar, koçun da olduğu takım sohbeti, koçla sohbet ve takımın haftası. Koç, daveti ile katılan sporcuları bir takıma ekleyebilir; her biri önce yaşını girer ve onay verir.",
+    },
     "team-session": {
       name: "Tek tablette takım seansları",
       body: "Lise koçu tüm takımın antrenmanını tek tabletten yönetir: her sporcu adına dokunup kendi setlerini kaydeder, ağırlık kaldığı yerden başlar ve pano kimin başlamadığını gösterir. Bitince her sporcunun setleri kendi hesabına kaydedilir. Çekim olmadan da çalışır.",
@@ -557,7 +561,7 @@ export const tr: FeaturesText = {
     },
     "coach-programs": {
       name: "Koç programları",
-      body: "Koçlar ve kişisel antrenörler rutinlerini seviye, hedef ve kaç hafta uygulanacağıyla birlikte ücretsiz ya da ücretli bir programa dönüştürür ve bağlantısını paylaşır. Günlerini tek dokunuşla rutinlerine kaydedersin, ağırlıkları kendi ilerlemen belirler. Ücretli programların ödemesi koçun kendi Stripe hesabına gider.",
+      body: "Koçlar ve kişisel antrenörler rutinlerini seviye, hedef ve kaç hafta uygulanacağıyla birlikte ücretsiz ya da ücretli bir programa dönüştürür ve bağlantısını paylaşır. Günlerini tek dokunuşla rutinlerine kaydedersin, ağırlıkları kendi ilerlemen belirler. Ücretli programların ödemesi koçun kendi Stripe hesabına gider. Hafta görünümü her rutini dinlenme günleriyle birlikte kendi günlerine koyar, ay görünümü akışı gösterir ve Otomatik yerleştir rutinleri senin için dağıtır.",
       note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
       proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
     },

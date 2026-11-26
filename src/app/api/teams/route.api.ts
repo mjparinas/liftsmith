@@ -3,11 +3,19 @@
 // POST { action }: "school" (send a code to a school address: `email`, `school`), "confirm" (the emailed `code`),
 // "make" (a team: `name`), "newCode" and "delete" (a coach's team: `team`), "remove" (an athlete off a team: `team`,
 // `id`), "preview" and "join" (an athlete entering a team code: `code`, and `age` to join) and "leave" (`team`).
+// My team (2026-11-25): "invite" and "uninvite" (a coach adds one of their athletes to a team: `team`, `id`), "accept"
+// (`team`, `age`) and "decline" (`team`) for the athlete; "chat" (`team`, `before` or `after`), "say" (`team`, `text`)
+// and "unsay" (a message `id`) for the team's chat (teamChat.ts).
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { resendMail } from "@/server/accounts";
+import { teamChat, teamSay, teamUnsay } from "@/server/teamChat";
 import {
+  acceptTeamInvite,
+  cancelTeamInvite,
   confirmSchool,
+  declineTeamInvite,
   deleteTeam,
+  inviteToTeam,
   joinTeam,
   leaveTeam,
   makeTeam,
@@ -65,6 +73,29 @@ export async function POST(req: Request) {
     case "join": {
       const r = b.action === "join" ? await joinTeam(s.accountId, b.code, b.age) : await previewTeam(s.accountId, b.code);
       return "error" in r ? fail(r.error) : reply(req, 200, r);
+    }
+    case "invite": {
+      const r = await inviteToTeam(s.accountId, b.team, b.id);
+      return "error" in r ? fail(r.error) : reply(req, 200, r);
+    }
+    case "uninvite":
+      return (await cancelTeamInvite(s.accountId, b.team, b.id)) ? reply(req, 200, { ok: true }) : fail("unknown");
+    case "accept": {
+      const r = await acceptTeamInvite(s.accountId, b.team, b.age);
+      return "error" in r ? fail(r.error) : reply(req, 200, r);
+    }
+    case "decline":
+      return (await declineTeamInvite(s.accountId, b.team)) ? reply(req, 200, { ok: true }) : fail("unknown");
+    case "chat":
+    case "say":
+    case "unsay": {
+      const r =
+        b.action === "chat"
+          ? await teamChat(s.accountId, b)
+          : b.action === "say"
+            ? await teamSay(s.accountId, b)
+            : await teamUnsay(s.accountId, b);
+      return reply(req, r.code, r.body);
     }
     case "leave":
       return (await leaveTeam(s.accountId, b.team)) ? reply(req, 200, { ok: true }) : fail("unknown");

@@ -1186,6 +1186,40 @@ const SCHEMA = [
     PRIMARY KEY (team_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS team_members_account ON team_members (account_id)`,
+  // My team (2026-11-25, teams.ts and teamChat.ts): a coach adds an athlete already linked to them to a team (they say
+  // their age and agree before they're on it), and each team has a chat for its athletes and coach.
+  `CREATE TABLE IF NOT EXISTS team_invites (
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (team_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_invites_account ON team_invites (account_id)`,
+  // Athletes who left a team or were taken off it, so its coach can add them back (2026-11-25). Gone when they rejoin.
+  `CREATE TABLE IF NOT EXISTS team_left (
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    left_at INTEGER NOT NULL,
+    PRIMARY KEY (team_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_left_account ON team_left (account_id)`,
+  `CREATE TABLE IF NOT EXISTS team_messages (
+    id TEXT PRIMARY KEY,
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    body TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_messages_team ON team_messages (team_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS team_messages_account ON team_messages (account_id)`,
+  `CREATE TABLE IF NOT EXISTS team_chat_reads (
+    team_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    read_at INTEGER NOT NULL DEFAULT 0,
+    pushed_at INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (team_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS team_chat_reads_account ON team_chat_reads (account_id)`,
   // Team sessions (2026-11-19, teamSessions.ts): one workout a coach runs for a whole team from one tablet, and the
   // sets each athlete logs there. Written into the athletes' own accounts when it ends (`written`).
   `CREATE TABLE IF NOT EXISTS team_sessions (

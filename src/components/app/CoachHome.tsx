@@ -73,6 +73,7 @@ import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
 import { ClientVideos } from "./FormVideos";
 import { Icon, type IconName } from "./icons";
+import { MyTeam } from "./MyTeam";
 import { go, replaceRoute } from "./router";
 import { AthleteTeams, CoachTeams, JoinTeam, useTeams } from "./SchoolTeams";
 import { Button, Chip, ProTag, ScreenHeader, Section, Skeleton, SwitchRow } from "./ui";
@@ -193,23 +194,35 @@ export function CoachHome({
           back={back}
           kicker={<Badge who={data} />}
           title={
-            trainersOnly(data.coaches)
-              ? t("trn.yourTrainer")
-              : !data.coaches.length && teams.data.joined.length
-                ? t("team.title")
-                : t("trn.yourCoach")
+            mode.athlete && !joining
+              ? t("mt.title")
+              : trainersOnly(data.coaches)
+                ? t("trn.yourTrainer")
+                : !data.coaches.length && teams.data.joined.length
+                  ? t("team.title")
+                  : t("trn.yourCoach")
           }
         />
         {status}
-        <ClientPage
-          data={data}
-          teams={teams.data}
-          code={code}
-          team={team}
-          coachSide={mode.coach || mode.school}
-          onChange={reloadAll}
-          onJoined={onJoined}
-        />
+        {mode.athlete && !joining ? (
+          <MyTeam
+            data={data}
+            teams={teams.data}
+            onChange={reloadAll}
+            onJoined={() => onJoined(true)}
+            more={<AthleteMore data={data} teams={teams.data} onChange={reloadAll} />}
+          />
+        ) : (
+          <ClientPage
+            data={data}
+            teams={teams.data}
+            code={code}
+            team={team}
+            coachSide={mode.coach || mode.school}
+            onChange={reloadAll}
+            onJoined={onJoined}
+          />
+        )}
       </div>
     );
 
@@ -243,7 +256,7 @@ export function CoachHome({
         {view.tab === "teams" && (
           <div className="desk-col">
             <Section title={t("team.title")} icon="trophy" info="schoolTeams">
-              <CoachTeams data={teams.data} onChange={teams.reload} />
+              <CoachTeams data={teams.data} athletes={data.clients} onChange={reloadAll} />
             </Section>
           </div>
         )}
@@ -446,6 +459,32 @@ function ClientPage({
   );
 }
 
+/**
+ * The rest of an athlete's My team (MyTeam.tsx): other coaches they have, check-ins waiting, notes and routines from
+ * their coach and what they share with each coach. Only a coach adds another coach or team (Melvin, 2026-11-25): an
+ * athlete joins one from the coach's link or an invite on My team, never from a code box here.
+ */
+function AthleteMore({ data, teams, onChange }: { data: Overview; teams: TeamsOverview; onChange: () => void }) {
+  const coaches = data.coaches;
+  const teamCoaches = new Set(teams.joined.map((tm) => tm.coachId));
+  return (
+    <div className="space-y-4">
+      {coaches
+        .filter((c) => !teamCoaches.has(c.id))
+        .map((c) => (
+          <CoachCard key={c.id} coach={c} unread={data.unread?.[c.id] ?? 0} />
+        ))}
+      <PendingCheckins
+        checkins={(data.checkins ?? []).map((c) => ({ ...c, coach: coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
+      />
+      <FromCoach coaches={coaches} plans={data.plans} notes={data.notes ?? []} targets={data.targets ?? []} />
+      {coaches.map((c) => (
+        <Sharing key={c.id} coach={c} on={sharedWith(data, c.id)} onChange={onChange} team={teamCoaches.has(c.id)} />
+      ))}
+    </div>
+  );
+}
+
 /** One coach, with Message first: the way to reach them (Melvin, 2026-11-13: "as a client, how do i interact with my coach"). */
 function CoachCard({ coach, unread }: { coach: Person; unread: number }) {
   const name = coach.name || t("trn.noName");
@@ -542,7 +581,10 @@ function FromCoach({ coaches, plans, notes, targets }: { coaches: Person[]; plan
 }
 
 /** What the lifter shares with one coach, item by item, which they choose, and Stop sharing. */
-function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onChange: () => void }) {
+/** What a school team's coach is never offered (Melvin, 2026-11-25: cycle sharing there "seems pretty intrusive"). */
+const TEAM_HIDDEN: readonly ShareKind[] = ["cycle"];
+
+function Sharing({ coach, on, onChange, team = false }: { coach: Person; on: ShareKind[]; onChange: () => void; team?: boolean }) {
   const [note, setNote] = useState<string | null>(null);
   const name = coach.name || t("trn.noName");
   const leave = async () => {
@@ -560,7 +602,7 @@ function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onCh
   return (
     <Section title={t("trn.shareTitle", { name })} icon="lock">
       <p className="mb-2 px-1 text-sm text-muted">{t("trn.shareLead", { name })}</p>
-      <ShareSwitches coachId={coach.id} name={name} on={on} onChange={onChange} />
+      <ShareSwitches coachId={coach.id} name={name} on={on} onChange={onChange} hide={team ? TEAM_HIDDEN : []} />
       <p className="mt-2 px-1 text-xs text-muted">{t("trn.shareNever")}</p>
       <Button kind="ghost" className="mt-3 w-full" onClick={() => void leave()}>
         {t("trn.stopSharingNamed", { name })}

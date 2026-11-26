@@ -19,6 +19,8 @@ import { cleanEmail, type SendMail } from "./accounts";
 import { cleanCode, COACH_LIMITS, nameOf, newCode, unlink } from "./coach";
 import { batch, query, rateLimit, run } from "./db";
 import { dropPairVideos } from "./formVideos";
+import { notifyPlain } from "./push";
+import { teamChatDeletes, teamChatUnread } from "./teamChat";
 
 const DAY = 86_400_000;
 
@@ -225,6 +227,8 @@ export interface Team {
   coachId: string;
   coachName: string;
   members: number;
+  /** Assistant coaches who took the coach's calendar invite for this team. */
+  assistants: { id: string; name: string }[];
 }
 export interface Member {
   id: string;
@@ -245,7 +249,18 @@ async function teamOut(r: TeamRow): Promise<Team> {
     coachId: s(r.coach_id),
     coachName: await nameOf(s(r.coach_id)),
     members: n(c?.n),
+    assistants: await assistantsOf(s(r.coach_id), s(r.id)),
   };
+}
+
+/** The team's assistant coaches: those who took the coach's calendar invite for it (coachSchedule.ts). */
+async function assistantsOf(coachId: string, teamId: string): Promise<{ id: string; name: string }[]> {
+  const rows = await query<{ assistant_id: string }>(
+    "SELECT assistant_id FROM coach_calendar_access WHERE owner_id = ? AND scope = ? AND assistant_id IS NOT NULL",
+    [coachId, `team:${teamId}`],
+  );
+  const ids = [...new Set(rows.map((r) => s(r.assistant_id)).filter((id) => id && id !== coachId))];
+  return Promise.all(ids.map(async (id) => ({ id, name: await nameOf(id) })));
 }
 
 export type TeamError = "notCoach" | "name" | "full";
@@ -288,6 +303,9 @@ export async function deleteTeam(coachId: string, teamId: unknown): Promise<bool
   const members = await query<{ account_id: string }>("SELECT account_id FROM team_members WHERE team_id = ?", [r.id]);
   await batch([
     { sql: "DELETE FROM team_members WHERE team_id = ?", args: [r.id] },
+    { sql: "DELETE FROM team_invites WHERE team_id = ?", args: [r.id] },
+    { sql: "DELETE FROM team_left WHERE team_id = ?", args: [r.id] },
+    ...teamChatDeletes(r.id),
     // Its team sessions go too (teamSessions.ts); workouts already written into athletes' accounts stay theirs.
     { sql: "DELETE FROM team_session_sets WHERE session_id IN (SELECT id FROM team_sessions WHERE team_id = ?)", args: [r.id] },
     { sql: "DELETE FROM team_sessions WHERE team_id = ?", args: [r.id] },
@@ -315,8 +333,19 @@ export async function removeMember(coachId: string, teamId: unknown, athleteId: 
   const r = await ownTeam(coachId, teamId);
   if (!r || typeof athleteId !== "string") return false;
   const gone = await run("DELETE FROM team_members WHERE team_id = ? AND account_id = ?", [r.id, athleteId]);
+  await run("DELETE FROM team_chat_reads WHERE team_id = ? AND account_id = ?", [r.id, athleteId]);
+  if (gone) await noteLeft(r.id, athleteId);
   if (gone) await unlinkUnlessOtherTeam(coachId, athleteId);
   return gone > 0;
+}
+
+/** Remembers who left (or was taken off), so the coach can add them back from the team card. */
+async function noteLeft(teamId: string, accountId: string, now = Date.now()): Promise<void> {
+  await run(
+    `INSERT INTO team_left (team_id, account_id, left_at) VALUES (?, ?, ?)
+     ON CONFLICT (team_id, account_id) DO UPDATE SET left_at = excluded.left_at`,
+    [teamId, accountId, now],
+  );
 }
 
 /** An athlete leaves a team. */
@@ -325,6 +354,8 @@ export async function leaveTeam(accountId: string, teamId: unknown): Promise<boo
   const [t] = await query<TeamRow>("SELECT * FROM teams WHERE id = ?", [teamId]);
   if (!t) return false;
   const gone = await run("DELETE FROM team_members WHERE team_id = ? AND account_id = ?", [teamId, accountId]);
+  await run("DELETE FROM team_chat_reads WHERE team_id = ? AND account_id = ?", [teamId, accountId]);
+  if (gone) await noteLeft(teamId, accountId);
   if (gone) await unlinkUnlessOtherTeam(s(t.coach_id), accountId);
   return gone > 0;
 }
@@ -376,6 +407,12 @@ export async function joinTeam(
     const [theirs] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ?", [team.coachId]);
     if (n(theirs?.n) >= TEAM_LIMITS.clients) return { error: "coachFull" };
   }
+  await addMember(team, accountId, age, now);
+  return { team: { ...team, members: team.members + 1 } };
+}
+
+/** Puts an athlete on a team (age already checked) and links them to its coach; any invite to it is used up. */
+async function addMember(team: Team, accountId: string, age: number, now: number): Promise<void> {
   // Born this many years ago, at the latest: kept so free Pro ends when they pass high school age.
   const birthYear = new Date(now).getUTCFullYear() - age;
   await batch([
@@ -384,8 +421,86 @@ export async function joinTeam(
       args: [team.id, accountId, birthYear, now],
     },
     { sql: "INSERT OR IGNORE INTO coach_links (coach_id, client_id, created_at) VALUES (?, ?, ?)", args: [team.coachId, accountId, now] },
+    { sql: "DELETE FROM team_invites WHERE team_id = ? AND account_id = ?", args: [team.id, accountId] },
+    { sql: "DELETE FROM team_left WHERE team_id = ? AND account_id = ?", args: [team.id, accountId] },
+    // A team's coach never sees the athlete's cycle (coach.ts TEAM_NEVER), so a switch turned on before is turned off.
+    { sql: "UPDATE coach_shares SET cycle = 0 WHERE coach_id = ? AND client_id = ?", args: [team.coachId, accountId] },
   ]);
-  return { team: { ...team, members: team.members + 1 } };
+}
+
+// --- Adding an athlete the coach already has (2026-11-25) ---
+//
+// Melvin added an athlete and the team still said 0: the athlete had joined him through his Athletes invite (a coach
+// link), which never put them on a team. Now the team card lists the coach's athletes who aren't on it, Add puts an
+// invite in front of them on My team, and they join it there with their age and agreement, like a team code.
+
+export type InviteError = "unknown" | "notClient" | "member" | "full";
+
+/** The coach asks one of their own athletes (already linked to them) to join a team. */
+export async function inviteToTeam(
+  coachId: string,
+  teamId: unknown,
+  athleteId: unknown,
+  now = Date.now(),
+): Promise<{ ok: true } | { error: InviteError }> {
+  const r = await ownTeam(coachId, teamId);
+  if (!r || typeof athleteId !== "string") return { error: "unknown" };
+  const [linked] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ? AND client_id = ?", [
+    coachId,
+    athleteId,
+  ]);
+  if (!n(linked?.n)) {
+    // Someone who left this team (by mistake, often) can be asked back: their coach link went when they left.
+    const [left] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM team_left WHERE team_id = ? AND account_id = ?", [
+      r.id,
+      athleteId,
+    ]);
+    if (!n(left?.n)) return { error: "notClient" };
+  }
+  const [had] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM team_members WHERE team_id = ? AND account_id = ?", [
+    r.id,
+    athleteId,
+  ]);
+  if (n(had?.n)) return { error: "member" };
+  const [c] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM team_members WHERE team_id = ?", [r.id]);
+  if (n(c?.n) >= TEAM_LIMITS.members) return { error: "full" };
+  const added = await run("INSERT OR IGNORE INTO team_invites (team_id, account_id, created_at) VALUES (?, ?, ?)", [r.id, athleteId, now]);
+  if (added) await notifyPlain(athleteId, "teamInvite", { name: await nameOf(coachId), text: s(r.name) }, "#/trainer");
+  return { ok: true };
+}
+
+/** The coach takes an invite back. */
+export async function cancelTeamInvite(coachId: string, teamId: unknown, athleteId: unknown): Promise<boolean> {
+  const r = await ownTeam(coachId, teamId);
+  if (!r || typeof athleteId !== "string") return false;
+  return (await run("DELETE FROM team_invites WHERE team_id = ? AND account_id = ?", [r.id, athleteId])) > 0;
+}
+
+/** The athlete says yes, with their age (13 to 18, checked here too). */
+export async function acceptTeamInvite(
+  accountId: string,
+  teamId: unknown,
+  age: unknown,
+  now = Date.now(),
+): Promise<{ team: Team } | { error: JoinError }> {
+  if (typeof age !== "number" || !Number.isInteger(age) || age < TEAM_LIMITS.minAge || age > TEAM_LIMITS.maxAge) return { error: "age" };
+  if (typeof teamId !== "string") return { error: "unknown" };
+  const [r] = await query<TeamRow>(
+    "SELECT t.* FROM team_invites ti JOIN teams t ON t.id = ti.team_id WHERE ti.team_id = ? AND ti.account_id = ?",
+    [teamId, accountId],
+  );
+  if (!r) return { error: "unknown" };
+  if (!(await isSchoolCoach(s(r.coach_id), now))) return { error: "lapsed" };
+  const team = await teamOut(r);
+  if (team.members >= TEAM_LIMITS.members) return { error: "full" };
+  await addMember(team, accountId, age, now);
+  return { team: { ...team, code: "", members: team.members + 1 } };
+}
+
+/** The athlete says no thanks. */
+export async function declineTeamInvite(accountId: string, teamId: unknown): Promise<boolean> {
+  if (typeof teamId !== "string") return false;
+  return (await run("DELETE FROM team_invites WHERE team_id = ? AND account_id = ?", [teamId, accountId])) > 0;
 }
 
 /** Free Pro through school teams: "school" for a verified coach, "team" for an athlete of high school age. */
@@ -461,15 +576,51 @@ export async function teamBoard(accountId: string, teamId: unknown, now = Date.n
 export async function teamsOverview(
   accountId: string,
   now = Date.now(),
-): Promise<{ school: SchoolCoach | null; codeSent: boolean; teams: Team[]; joined: Team[]; members: Record<string, Member[]> }> {
+): Promise<{
+  school: SchoolCoach | null;
+  codeSent: boolean;
+  teams: Team[];
+  joined: Team[];
+  members: Record<string, Member[]>;
+  /** Teams a coach asked this lifter to join (no code: they join from My team). */
+  invites: Team[];
+  /** Athletes each of the coach's teams is waiting on, by team. */
+  invited: Record<string, Member[]>;
+  /** Athletes who left each of the coach's teams, newest first, so the coach can add them back. */
+  left: Record<string, Member[]>;
+  /** Unread team chat messages, by team (the coach's teams and the lifter's). */
+  chatUnread: Record<string, number>;
+}> {
   const row = await coachRow(accountId);
   const own = await query<TeamRow>("SELECT * FROM teams WHERE coach_id = ? ORDER BY created_at", [accountId]);
   const joined = await query<TeamRow>(
     "SELECT t.* FROM team_members tm JOIN teams t ON t.id = tm.team_id WHERE tm.account_id = ? ORDER BY tm.joined_at",
     [accountId],
   );
+  const invites = await query<TeamRow>(
+    "SELECT t.* FROM team_invites ti JOIN teams t ON t.id = ti.team_id WHERE ti.account_id = ? ORDER BY ti.created_at",
+    [accountId],
+  );
   const members: Record<string, Member[]> = {};
+  const invited: Record<string, Member[]> = {};
+  const left: Record<string, Member[]> = {};
   for (const t of own) {
+    const gone = await query<{ account_id: string; left_at: number }>(
+      "SELECT account_id, left_at FROM team_left WHERE team_id = ? ORDER BY left_at DESC LIMIT 50",
+      [t.id],
+    );
+    if (gone.length)
+      left[s(t.id)] = await Promise.all(
+        gone.map(async (r) => ({ id: s(r.account_id), since: n(r.left_at), name: await nameOf(s(r.account_id)) })),
+      );
+    const asked = await query<{ account_id: string; created_at: number }>(
+      "SELECT account_id, created_at FROM team_invites WHERE team_id = ? ORDER BY created_at",
+      [t.id],
+    );
+    if (asked.length)
+      invited[s(t.id)] = await Promise.all(
+        asked.map(async (r) => ({ id: s(r.account_id), since: n(r.created_at), name: await nameOf(s(r.account_id)) })),
+      );
     const rows = await query<{ account_id: string; joined_at: number }>(
       "SELECT account_id, joined_at FROM team_members WHERE team_id = ? ORDER BY joined_at",
       [t.id],
@@ -486,6 +637,13 @@ export async function teamsOverview(
     // Joined teams never carry their code: only the coach shares it.
     joined: (await Promise.all(joined.map(teamOut))).map((t) => ({ ...t, code: "" })),
     members,
+    invites: (await Promise.all(invites.map(teamOut))).map((t) => ({ ...t, code: "" })),
+    invited,
+    left,
+    chatUnread: await teamChatUnread(
+      accountId,
+      [...own, ...joined].map((t) => s(t.id)),
+    ),
   };
 }
 
@@ -558,7 +716,15 @@ export async function decideSchool(accountId: unknown, action: unknown, now = Da
 /** Deleting an account deletes its school proof, its teams (athletes stay, teamless) and its places on teams. */
 export const teamDeletes = (accountId: string) => [
   { sql: "DELETE FROM school_coaches WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM team_invites WHERE team_id IN (SELECT id FROM teams WHERE coach_id = ?)", args: [accountId] },
+  { sql: "DELETE FROM team_left WHERE team_id IN (SELECT id FROM teams WHERE coach_id = ?)", args: [accountId] },
+  { sql: "DELETE FROM team_messages WHERE team_id IN (SELECT id FROM teams WHERE coach_id = ?)", args: [accountId] },
+  { sql: "DELETE FROM team_chat_reads WHERE team_id IN (SELECT id FROM teams WHERE coach_id = ?)", args: [accountId] },
   { sql: "DELETE FROM team_members WHERE team_id IN (SELECT id FROM teams WHERE coach_id = ?)", args: [accountId] },
   { sql: "DELETE FROM teams WHERE coach_id = ?", args: [accountId] },
   { sql: "DELETE FROM team_members WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM team_invites WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM team_left WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM team_messages WHERE account_id = ?", args: [accountId] },
+  { sql: "DELETE FROM team_chat_reads WHERE account_id = ?", args: [accountId] },
 ];

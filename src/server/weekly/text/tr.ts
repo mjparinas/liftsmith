@@ -822,7 +822,7 @@ export const emails: Record<string, Words> = {
     title: "Programlarını paylaş ve sat",
     intro: "Tekrar tekrar verdiğin programları herkesin izleyebileceği bir şeye dönüştür, ücretsiz ya da ücretli.",
     points: [
-      "Koçluk › Programlar'da rutinlerinden en fazla yedisini gün olarak seç, sonra bir ad, seviye, hedef ve kaç hafta olduğunu ekle.",
+      "Koçluk › Programlar'da rutinlerini haftanın günlerine, aralarına dinlenme koyarak yerleştir (Otomatik yerleştir bunu senin için yapar), ayı kontrol et, sonra ad, seviye, hedef ve hafta sayısı ekle.",
       "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle.",
       "Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
       "Bağlantısını her yerde paylaş. Programa sahip olanlar, sen listeden kaldırsan bile onu tutar.",
@@ -1079,5 +1079,17 @@ export const emails: Record<string, Words> = {
       "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür.",
     ],
     dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz.",
+  },
+  "my-team": {
+    title: "Sporcularınıza Takımım paneli geldi",
+    intro:
+      "Okul takımınızdaki sporcular artık Takımım ekranını açıyor: takımları, koçları olarak siz, atadığınız programlar, takım sohbeti ve sizinle sohbet, hepsi tek ekranda.",
+    points: [
+      "Zaten çalıştırdığınız sporcuları takım kartından doğrudan ekleyin. Davet alır ve tek dokunuşla katılırlar.",
+      "Sporcular artık Programlar, Sporcular ve Kurulum'u görmüyor. Takımım yalnızca ihtiyaç duyduklarını gösteriyor.",
+      "Takım sohbeti tüm takım ve sizin için. Her mesajı silebilirsiniz, sporcular adlarıyla görünür.",
+      "Atanan programlar Takip et düğmesiyle Takımım'da durur ve haftalık tablo kimin antrenman yaptığını gösterir.",
+    ],
+    dyk: "Takım bağlantıları artık sporcu bağlantıyı açtıktan sonra giriş yapsa da çalışıyor, böylece kimse kadrodan dışarıda kalmıyor.",
   },
 };

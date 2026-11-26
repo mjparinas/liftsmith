@@ -803,4 +803,30 @@ describe("kneeling, seated and chest-down moves, and machines", () => {
     }
     expect(props("single-arm-shoulder-press-machine").filter((p) => p.kind === "pole")).toHaveLength(1);
   });
+  it("shows the weight on every leg curl and extension, lying face down where the curl is done lying", () => {
+    // Melvin, 2026-11-25: "the 3D models on the leg curls currently doesn't show weights"
+    const stack = (id: string) => props(id).filter((p) => p.kind === "box" && p.size[1] < 0.06).length;
+    for (const id of [
+      "lying-leg-curl",
+      "single-leg-curl",
+      "seated-leg-curl",
+      "single-leg-seated-leg-curl",
+      "leg-extension",
+      "single-leg-extension",
+    ]) {
+      expect(stack(id), id).toBeGreaterThanOrEqual(6); // the plates of the stack
+      const lever = props(id).find((p) => p.kind === "pole");
+      expect(lever && lever.kind === "pole" && lever.to, id).toMatch(/^ankle/);
+    }
+    for (const id of ["lying-leg-curl", "single-leg-curl", "db-lying-leg-curl", "band-leg-curl"]) {
+      const j = at(id);
+      expect(Math.abs(j.shC[1] - j.hipC[1]), id).toBeLessThan(0.2); // lying, not seated
+      expect(at(id, 1).ankleR[1], id).toBeGreaterThan(j.ankleR[1] + 0.3); // the heel comes up
+    }
+    expect(motionFor("db-lying-leg-curl")).toMatchObject({ load: "dumbbell", hold: "feet" });
+    expect(cables("band-leg-curl").map((c) => c.kind === "cable" && c.to)).toEqual(["ankles"]);
+    // one leg works, the other stays put
+    for (const id of ["single-leg-curl", "single-leg-seated-leg-curl", "single-leg-extension"])
+      expect(Math.abs(at(id, 1).ankleL[1] - at(id, 0).ankleL[1]), id).toBeLessThan(0.01);
+  });
 });

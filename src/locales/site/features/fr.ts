@@ -446,6 +446,10 @@ export const fr: FeaturesText = {
       name: "Gratuit pour les équipes d’école secondaire",
       body: "Les entraîneurs d’école secondaire qui confirment un courriel scolaire ont Pro gratuitement, tout comme les athlètes de 13 à 18 ans de leurs équipes, avec un tableau d’équipe chaque semaine. La masse grasse et les profils publics restent désactivés pour les moins de 18 ans.",
     },
+    "my-team": {
+      name: "Mon équipe pour les athlètes scolaires",
+      body: "Un athlète d’une équipe scolaire ouvre Coaching sur la maison de son équipe : l’équipe et son coach, les programmes attribués avec Suivre, une discussion d’équipe avec le coach, une discussion avec le coach et la semaine de l’équipe. Un coach peut ajouter à une équipe les athlètes venus par son invitation ; chacun indique son âge et accepte d’abord.",
+    },
     "team-session": {
       name: "Séances d'équipe sur une tablette",
       body: "Un coach de lycée mène une séance pour toute l'équipe depuis une tablette : chaque athlète touche son prénom et note ses séries, la charge reprenant là où il en était, et le tableau montre qui n'a pas commencé. À la fin, les séries de chacun sont enregistrées dans son propre compte. Fonctionne sans réseau.",
@@ -487,7 +491,7 @@ export const fr: FeaturesText = {
     },
     "coach-programs": {
       name: "Programmes de coachs",
-      body: "Les coachs et entraîneurs personnels font de leurs routines un programme, avec un niveau, un objectif et un nombre de semaines, gratuit ou payant, et partagent son lien. Vous enregistrez ses jours dans vos routines d'un toucher, et votre propre progression choisit les charges. Les programmes payants paient le coach par son propre compte Stripe.",
+      body: "Les coachs et entraîneurs personnels font de leurs routines un programme, avec un niveau, un objectif et un nombre de semaines, gratuit ou payant, et partagent son lien. Vous enregistrez ses jours dans vos routines d'un toucher, et votre propre progression choisit les charges. Les programmes payants paient le coach par son propre compte Stripe. Une vue semaine place chaque routine sur ses jours avec des repos, une vue mois montre son déroulement et Organiser automatiquement répartit les routines pour vous.",
       note: "Les programmes payants s'achètent sur le site ; les apps Android et iPhone montrent les programmes gratuits et ceux que vous avez.",
       proPart: "Obtenir des programmes est gratuit ; en créer fait partie du coaching, qui est Pro.",
     },

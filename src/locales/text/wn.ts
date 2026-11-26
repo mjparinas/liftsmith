@@ -4,9 +4,22 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.programBuilder.title": "Program builder for coaches",
+  "wn.c.programBuilder.body": "Put routines on the days of a week with rest days, see the month, and let Auto-arrange spread them out.",
+  "wn.c.myTeam.title": "My team",
+  "wn.c.myTeam.body":
+    "On a school team? Coaching is now your team's home: the team, your coach, the programs they assigned, a team chat and a chat with your coach.",
+  "wn.c.teamAdd.title": "Athletes show up on their team",
+  "wn.c.teamAdd.body":
+    "A coach can add athletes who joined with their invite to a team, and a team link opened before signing in still joins the team after.",
+  "wn.c.programDays.title": "Clearer program days",
+  "wn.c.programDays.body": "Picked days show in order, identical routine copies show once, and templates stop making new copies.",
   "wn.c.stopCoach.title": "Stop coaching",
   "wn.c.stopCoach.body":
     "Coach, trainer and physio accounts can now choose Stop coaching in Coaching setup. It removes the coach role, live invite and coach-side links.",
+  "wn.c.legCurlWeights.title": "Leg curls show the weight",
+  "wn.c.legCurlWeights.body":
+    "The how-to figures for leg curls and leg extensions now show the machine's weight stack and lever, and the lying, dumbbell and band curls lie face down.",
   "wn.c.coachCalendar.title": "Workout calendar",
   "wn.c.coachCalendar.body":
     "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today. Invite assistant coaches to edit a calendar and check the roster’s training activity.",
@@ -132,9 +145,23 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Creador de programas para entrenadores",
+  "wn.c.programBuilder.body": "Pon rutinas en los días de la semana con descansos, mira el mes y deja que Organizar solo las reparta.",
+  "wn.c.myTeam.title": "Mi equipo",
+  "wn.c.myTeam.body":
+    "¿Estás en un equipo escolar? Coaching es ahora la casa de tu equipo: el equipo, tu entrenador, los programas que te asignó, un chat del equipo y un chat con tu entrenador.",
+  "wn.c.teamAdd.title": "Los atletas aparecen en su equipo",
+  "wn.c.teamAdd.body":
+    "Un entrenador puede añadir a un equipo a los atletas que se unieron con su invitación, y un enlace de equipo abierto antes de iniciar sesión sigue uniéndote después.",
+  "wn.c.programDays.title": "Días del programa más claros",
+  "wn.c.programDays.body":
+    "Los días elegidos salen en orden, las copias idénticas de una rutina salen una vez y las plantillas ya no crean copias nuevas.",
   "wn.c.stopCoach.title": "Dejar de entrenar",
   "wn.c.stopCoach.body":
     "Las cuentas de coach, entrenador y fisioterapeuta pueden elegir Dejar de entrenar en la configuración de Coaching. Se elimina el papel de coach, la invitación activa y los enlaces como coach.",
+  "wn.c.legCurlWeights.title": "Los curls de piernas muestran el peso",
+  "wn.c.legCurlWeights.body":
+    "Las figuras de cómo hacerlo de los curls y extensiones de piernas ahora muestran la pila de pesas y la palanca de la máquina, y los curls tumbado, con mancuerna y con banda se hacen boca abajo.",
   "wn.c.coachCalendar.title": "Calendario de entrenamientos",
   "wn.c.coachCalendar.body":
     "Asigna entrenamientos o días de descanso en un calendario mensual. Los atletas ven lo programado en Hoy. Invita a entrenadores asistentes a editar un calendario y revisa la actividad del equipo.",
@@ -267,9 +294,24 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Créateur de programmes pour les coachs",
+  "wn.c.programBuilder.body":
+    "Placez les routines sur les jours de la semaine avec des repos, voyez le mois et laissez Organiser automatiquement les répartir.",
+  "wn.c.myTeam.title": "Mon équipe",
+  "wn.c.myTeam.body":
+    "Dans une équipe scolaire ? Coaching devient la maison de votre équipe : l’équipe, votre coach, les programmes attribués, une discussion d’équipe et une discussion avec votre coach.",
+  "wn.c.teamAdd.title": "Les athlètes apparaissent dans leur équipe",
+  "wn.c.teamAdd.body":
+    "Un coach peut ajouter à une équipe les athlètes venus par son invitation, et un lien d’équipe ouvert avant la connexion fait toujours rejoindre l’équipe ensuite.",
+  "wn.c.programDays.title": "Des jours de programme plus clairs",
+  "wn.c.programDays.body":
+    "Les jours choisis s'affichent dans l'ordre, les copies identiques d'une routine n'apparaissent qu'une fois et les modèles ne créent plus de nouvelles copies.",
   "wn.c.stopCoach.title": "Arrêter le coaching",
   "wn.c.stopCoach.body":
     "Les comptes coach, coach personnel et kinésithérapeute peuvent choisir Arrêter le coaching dans la configuration. Le rôle, l'invitation active et les liens comme coach sont supprimés.",
+  "wn.c.legCurlWeights.title": "Les leg curls montrent la charge",
+  "wn.c.legCurlWeights.body":
+    "Les figures des leg curls et des extensions de jambes montrent maintenant la pile de poids et le levier de la machine, et les curls allongé, avec haltère et avec élastique se font à plat ventre.",
   "wn.c.coachCalendar.title": "Calendrier des entraînements",
   "wn.c.coachCalendar.body":
     "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui. Invitez des coachs adjoints à modifier un calendrier et consultez l’activité de vos athlètes.",
@@ -405,9 +447,23 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Programm-Baukasten für Coaches",
+  "wn.c.programBuilder.body": "Lege Routinen mit Ruhetagen auf die Wochentage, sieh den Monat und lass Automatisch planen sie verteilen.",
+  "wn.c.myTeam.title": "Mein Team",
+  "wn.c.myTeam.body":
+    "In einem Schulteam? Coaching ist jetzt das Zuhause deines Teams: das Team, dein Coach, die zugewiesenen Programme, ein Team-Chat und ein Chat mit deinem Coach.",
+  "wn.c.teamAdd.title": "Athleten erscheinen in ihrem Team",
+  "wn.c.teamAdd.body":
+    "Ein Coach kann Athleten, die über seine Einladung kamen, einem Team hinzufügen, und ein Team-Link, der vor der Anmeldung geöffnet wurde, führt danach trotzdem ins Team.",
+  "wn.c.programDays.title": "Klarere Programmtage",
+  "wn.c.programDays.body":
+    "Gewählte Tage stehen in Reihenfolge, identische Routinekopien erscheinen nur einmal und Vorlagen legen keine neuen Kopien mehr an.",
   "wn.c.stopCoach.title": "Coaching beenden",
   "wn.c.stopCoach.body":
     "Coach-, Trainer- und Physiotherapie-Konten können jetzt Coaching beenden wählen. Rolle, aktive Einladung und Coach-Verknüpfungen werden entfernt.",
+  "wn.c.legCurlWeights.title": "Beinbeuger zeigen das Gewicht",
+  "wn.c.legCurlWeights.body":
+    "Die Anleitungsfiguren für Beinbeuger und Beinstrecker zeigen jetzt den Gewichtsblock und den Hebel der Maschine, und liegende, Kurzhantel- und Band-Beinbeuger werden in Bauchlage gezeigt.",
   "wn.c.coachCalendar.title": "Trainingskalender",
   "wn.c.coachCalendar.body":
     "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute. Lade Assistenzcoaches zum Bearbeiten eines Kalenders ein und prüfe die Trainingsaktivität deiner Athleten.",
@@ -540,9 +596,24 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Costruttore di programmi per coach",
+  "wn.c.programBuilder.body":
+    "Metti le routine nei giorni della settimana con i riposi, guarda il mese e lascia che Organizza da solo le distribuisca.",
+  "wn.c.myTeam.title": "La mia squadra",
+  "wn.c.myTeam.body":
+    "Sei in una squadra scolastica? Coaching ora è la casa della tua squadra: la squadra, il coach, i programmi assegnati, una chat di squadra e una chat con il coach.",
+  "wn.c.teamAdd.title": "Gli atleti compaiono nella loro squadra",
+  "wn.c.teamAdd.body":
+    "Un coach può aggiungere a una squadra gli atleti arrivati con il suo invito, e un link di squadra aperto prima dell’accesso fa comunque entrare nella squadra dopo.",
+  "wn.c.programDays.title": "Giorni del programma più chiari",
+  "wn.c.programDays.body":
+    "I giorni scelti appaiono in ordine, le copie identiche di una routine compaiono una volta sola e i modelli non creano più nuove copie.",
   "wn.c.stopCoach.title": "Smetti di fare coaching",
   "wn.c.stopCoach.body":
     "Gli account coach, personal trainer e fisioterapista possono scegliere Smetti di fare coaching in Configurazione. Ruolo, invito attivo e collegamenti come coach vengono rimossi.",
+  "wn.c.legCurlWeights.title": "I leg curl mostrano il peso",
+  "wn.c.legCurlWeights.body":
+    "Le figure guida di leg curl e leg extension ora mostrano il pacco pesi e la leva della macchina, e i curl da sdraiato, con manubrio e con elastico si fanno a pancia in giù.",
   "wn.c.coachCalendar.title": "Calendario degli allenamenti",
   "wn.c.coachCalendar.body":
     "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi. Invita gli assistenti a modificare un calendario e controlla l’attività degli atleti.",
@@ -675,9 +746,23 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "コーチ向けプログラム作成",
+  "wn.c.programBuilder.body": "ルーティンを曜日に置いて休みを入れ、月で確認し、自動で配置に振り分けを任せられます。",
+  "wn.c.myTeam.title": "マイチーム",
+  "wn.c.myTeam.body":
+    "学校のチームに入っていますか？コーチングがチームの拠点になりました。チーム、コーチ、割り当てられたプログラム、チームチャット、コーチとのチャットがまとまっています。",
+  "wn.c.teamAdd.title": "選手がチームに表示されるように",
+  "wn.c.teamAdd.body":
+    "コーチは招待でつながった選手をチームに追加できます。サインイン前に開いたチームのリンクも、サインイン後にチームに参加できます。",
+  "wn.c.programDays.title": "プログラムの日がわかりやすく",
+  "wn.c.programDays.body":
+    "選んだ日が順番どおりに並び、同じルーティンのコピーは1つだけ表示され、テンプレートが新しいコピーを作らなくなりました。",
   "wn.c.stopCoach.title": "コーチングをやめる",
   "wn.c.stopCoach.body":
     "コーチ、パーソナルトレーナー、理学療法士のアカウントは設定からコーチングを終了できます。役割、有効な招待、コーチとしてのリンクが削除されます。",
+  "wn.c.legCurlWeights.title": "レッグカールに重りを表示",
+  "wn.c.legCurlWeights.body":
+    "レッグカールとレッグエクステンションの見本の人形に、マシンのウェイトスタックとレバーが表示されるようになりました。ライイング、ダンベル、バンドのレッグカールはうつ伏せで表示されます。",
   "wn.c.coachCalendar.title": "トレーニングカレンダー",
   "wn.c.coachCalendar.body":
     "月間カレンダーでトレーニングや休養日を設定できます。選手は「今日」でその日の予定を確認できます。アシスタントコーチをカレンダー編集に招待し、選手のトレーニング記録を確認できます。",
@@ -800,9 +885,23 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Criador de programas para treinadores",
+  "wn.c.programBuilder.body": "Coloque rotinas nos dias da semana com descansos, veja o mês e deixe Organizar sozinho distribuí-las.",
+  "wn.c.myTeam.title": "Meu time",
+  "wn.c.myTeam.body":
+    "Está num time escolar? Coaching agora é a casa do seu time: o time, seu técnico, os programas atribuídos, um chat do time e um chat com o técnico.",
+  "wn.c.teamAdd.title": "Atletas aparecem no time",
+  "wn.c.teamAdd.body":
+    "O técnico pode adicionar ao time atletas que entraram com o convite dele, e um link de time aberto antes de entrar ainda leva ao time depois.",
+  "wn.c.programDays.title": "Dias do programa mais claros",
+  "wn.c.programDays.body":
+    "Os dias escolhidos aparecem em ordem, cópias idênticas de uma rotina aparecem uma vez só e os modelos não criam mais cópias novas.",
   "wn.c.stopCoach.title": "Parar de fazer coaching",
   "wn.c.stopCoach.body":
     "Contas de coach, personal trainer e fisioterapeuta podem escolher Parar de fazer coaching nas configurações. O papel, o convite ativo e os links como coach serão removidos.",
+  "wn.c.legCurlWeights.title": "Os flexores mostram o peso",
+  "wn.c.legCurlWeights.body":
+    "As figuras de como fazer da mesa flexora e da cadeira extensora agora mostram a pilha de pesos e a alavanca da máquina, e as flexões deitado, com halter e com elástico são feitas de bruços.",
   "wn.c.coachCalendar.title": "Calendário de treinos",
   "wn.c.coachCalendar.body":
     "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",
@@ -931,9 +1030,21 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "코치용 프로그램 빌더",
+  "wn.c.programBuilder.body": "루틴을 요일에 놓고 휴식일을 넣고, 월로 확인하고, 자동 배치로 나눠 보세요.",
+  "wn.c.myTeam.title": "내 팀",
+  "wn.c.myTeam.body":
+    "학교 팀에 있나요? 이제 코칭이 팀의 홈이에요. 팀, 코치, 배정된 프로그램, 팀 채팅, 코치와의 채팅을 한곳에서 볼 수 있어요.",
+  "wn.c.teamAdd.title": "선수가 팀에 표시돼요",
+  "wn.c.teamAdd.body": "코치는 초대로 연결된 선수를 팀에 추가할 수 있고, 로그인 전에 연 팀 링크도 로그인 후 팀에 참여할 수 있어요.",
+  "wn.c.programDays.title": "프로그램 일정이 더 명확해졌어요",
+  "wn.c.programDays.body": "고른 날이 순서대로 보이고, 같은 루틴 사본은 한 번만 보이며, 템플릿이 더 이상 새 사본을 만들지 않아요.",
   "wn.c.stopCoach.title": "코칭 종료",
   "wn.c.stopCoach.body":
     "코치, 퍼스널 트레이너, 물리치료사 계정은 설정에서 코칭 종료를 선택할 수 있습니다. 역할, 활성 초대와 코치 링크가 제거됩니다.",
+  "wn.c.legCurlWeights.title": "레그 컬에 무게 표시",
+  "wn.c.legCurlWeights.body":
+    "레그 컬과 레그 익스텐션의 동작 안내 인형에 이제 머신의 웨이트 스택과 레버가 보입니다. 라잉, 덤벨, 밴드 레그 컬은 엎드린 자세로 보입니다.",
   "wn.c.coachCalendar.title": "운동 캘린더",
   "wn.c.coachCalendar.body":
     "월간 캘린더에서 운동이나 휴식일을 배정하세요. 선수는 오늘 화면에서 일정을 확인할 수 있습니다. 보조 코치를 초대해 캘린더를 편집하게 하고 선수들의 운동 활동을 확인하세요.",
@@ -1052,9 +1163,22 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Kreator programów dla trenerów",
+  "wn.c.programBuilder.body": "Rozłóż rutyny na dni tygodnia z odpoczynkiem, zobacz miesiąc i pozwól, by Ułóż automatycznie je rozłożyło.",
+  "wn.c.myTeam.title": "Moja drużyna",
+  "wn.c.myTeam.body":
+    "Jesteś w drużynie szkolnej? Coaching to teraz dom twojej drużyny: drużyna, trener, przydzielone programy, czat drużyny i czat z trenerem.",
+  "wn.c.teamAdd.title": "Zawodnicy pojawiają się w drużynie",
+  "wn.c.teamAdd.body":
+    "Trener może dodać do drużyny zawodników, którzy dołączyli przez jego zaproszenie, a link do drużyny otwarty przed zalogowaniem nadal działa po zalogowaniu.",
+  "wn.c.programDays.title": "Czytelniejsze dni programu",
+  "wn.c.programDays.body": "Wybrane dni są po kolei, identyczne kopie rutyny pojawiają się raz, a szablony nie tworzą już nowych kopii.",
   "wn.c.stopCoach.title": "Zakończ coaching",
   "wn.c.stopCoach.body":
     "Konta trenera, trenera personalnego i fizjoterapeuty mogą wybrać Zakończ coaching w ustawieniach. Zostaną usunięte role, aktywne zaproszenie i powiązania trenerskie.",
+  "wn.c.legCurlWeights.title": "Uginanie nóg pokazuje ciężar",
+  "wn.c.legCurlWeights.body":
+    "Postacie z instrukcją uginania i prostowania nóg pokazują teraz stos obciążenia i dźwignię maszyny, a uginanie leżąc, z hantlą i z gumą odbywa się na brzuchu.",
   "wn.c.coachCalendar.title": "Kalendarz treningów",
   "wn.c.coachCalendar.body":
     "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",
@@ -1183,9 +1307,23 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.programBuilder.title": "Koçlar için program oluşturucu",
+  "wn.c.programBuilder.body": "Rutinleri dinlenme günleriyle haftanın günlerine koy, ayı gör ve Otomatik yerleştir onları dağıtsın.",
+  "wn.c.myTeam.title": "Takımım",
+  "wn.c.myTeam.body":
+    "Bir okul takımında mısın? Koçluk artık takımının evi: takım, koçun, atanan programlar, takım sohbeti ve koçunla sohbet bir arada.",
+  "wn.c.teamAdd.title": "Sporcular takımlarında görünüyor",
+  "wn.c.teamAdd.body":
+    "Koç, daveti ile katılan sporcuları bir takıma ekleyebilir; giriş yapmadan açılan takım bağlantısı da girişten sonra takıma katılır.",
+  "wn.c.programDays.title": "Daha anlaşılır program günleri",
+  "wn.c.programDays.body":
+    "Seçilen günler sırayla görünür, aynı rutinin kopyaları bir kez görünür ve şablonlar artık yeni kopya oluşturmaz.",
   "wn.c.stopCoach.title": "Koçluğu bırak",
   "wn.c.stopCoach.body":
     "Koç, kişisel antrenör ve fizyoterapist hesapları ayarlarda Koçluğu bırak seçebilir. Rol, aktif davet ve koç bağlantıları kaldırılır.",
+  "wn.c.legCurlWeights.title": "Leg curl hareketleri ağırlığı gösteriyor",
+  "wn.c.legCurlWeights.body":
+    "Leg curl ve leg extension nasıl yapılır figürleri artık makinenin ağırlık yığınını ve kolunu gösteriyor; yüzüstü, dambıllı ve bantlı leg curl yüzüstü yatarak yapılıyor.",
   "wn.c.coachCalendar.title": "Antrenman takvimi",
   "wn.c.coachCalendar.body":
     "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

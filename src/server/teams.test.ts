@@ -2,16 +2,21 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { accessFor } from "./access";
 import { deleteAccount } from "./accounts";
-import { isClient } from "./coach";
+import { isClient, setShare, sharesOf } from "./coach";
 import { query, resetDb } from "./db";
 import { join as joinFriends, me as myFriends, update as updateFriends } from "./social";
 import { sync } from "./sync";
+import { teamChat, teamChatWaiting, teamSay, teamUnsay } from "./teamChat";
 import {
+  acceptTeamInvite,
+  cancelTeamInvite,
   confirmSchool,
   decideSchool,
+  declineTeamInvite,
   deleteTeam,
   domainOf,
   firstName,
+  inviteToTeam,
   isFreeMail,
   isMinor,
   joinTeam,
@@ -217,6 +222,175 @@ describe("teams", () => {
     expect(await query("SELECT * FROM teams")).toHaveLength(0);
     expect(await query("SELECT * FROM team_members")).toHaveLength(0);
     expect(await schoolPro("kid", NOW)).toBeNull();
+  });
+});
+
+describe("My team", () => {
+  /** An athlete who joined the coach with the coach's own invite (Athletes), so no team counted them. */
+  const link = (coach: string, client: string) =>
+    query("INSERT INTO coach_links (coach_id, client_id, created_at) VALUES (?, ?, ?)", [coach, client, NOW]);
+
+  it("a coach adds an athlete they already have; the team counts them once they say their age and yes", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Senior Girls Volleyball", NOW, "APRJ2345");
+    if ("error" in team) throw new Error();
+    await link("coach", "kid");
+    // Melvin's case: linked to the coach, the team still says 0.
+    expect((await teamsOverview("coach", NOW)).teams[0]!.members).toBe(0);
+    expect(await inviteToTeam("coach", team.id, "stranger", NOW)).toEqual({ error: "notClient" });
+    expect(await inviteToTeam("other", team.id, "kid", NOW)).toEqual({ error: "unknown" });
+    expect(await inviteToTeam("coach", team.id, "kid", NOW)).toEqual({ ok: true });
+    expect((await teamsOverview("coach", NOW)).invited[team.id]?.map((m) => m.id)).toEqual(["kid"]);
+    const mine = await teamsOverview("kid", NOW);
+    expect(mine.invites.map((t) => t.name)).toEqual(["Senior Girls Volleyball"]);
+    expect(mine.invites[0]!.code).toBe("");
+    expect(await acceptTeamInvite("kid", team.id, 12, NOW)).toEqual({ error: "age" });
+    expect(await acceptTeamInvite("stranger", team.id, 15, NOW)).toEqual({ error: "unknown" });
+    const r = await acceptTeamInvite("kid", team.id, 16, NOW);
+    expect("team" in r && r.team.members).toBe(1);
+    const after = await teamsOverview("coach", NOW);
+    expect(after.teams[0]!.members).toBe(1);
+    expect(after.invited[team.id]).toBeUndefined();
+    expect((await teamsOverview("kid", NOW)).invites).toEqual([]);
+    expect(await schoolPro("kid", NOW)).toBe("team");
+    expect(await inviteToTeam("coach", team.id, "kid", NOW)).toEqual({ error: "member" });
+  });
+
+  it("an invite can be taken back or turned down", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Track", NOW, "TRAK2345");
+    if ("error" in team) throw new Error();
+    await link("coach", "kid");
+    await inviteToTeam("coach", team.id, "kid", NOW);
+    expect(await cancelTeamInvite("coach", team.id, "kid")).toBe(true);
+    expect((await teamsOverview("kid", NOW)).invites).toEqual([]);
+    await inviteToTeam("coach", team.id, "kid", NOW);
+    expect(await declineTeamInvite("kid", team.id)).toBe(true);
+    expect(await acceptTeamInvite("kid", team.id, 15, NOW)).toEqual({ error: "unknown" });
+  });
+
+  it("the team chat is the coach's and its athletes' only; the coach can delete anything", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Rugby", NOW, "RUGB2345");
+    if ("error" in team) throw new Error();
+    await joinTeam("kid", "RUGB2345", 16, NOW);
+    await joinTeam("kid2", "RUGB2345", 17, NOW);
+    await push("kid", [], { name: "Sam Lee" });
+    await push("coach", [], { name: "Pat Morgan" });
+    expect((await teamSay("stranger", { team: team.id, text: "hi" }, NOW)).code).toBe(404);
+    expect((await teamSay("kid", { team: team.id, text: "see www.example.com" }, NOW)).body).toEqual({ error: "message.link" });
+    const said = await teamSay("kid", { team: team.id, text: "Practice was great" }, NOW);
+    expect(said.code).toBe(200);
+    await teamSay("coach", { team: team.id, text: "Lift at 4 tomorrow" }, NOW + 1000);
+    // kid2 hasn't opened it: two unread, which count toward the coaching count and the icon.
+    expect((await teamsOverview("kid2", NOW + 2000)).chatUnread[team.id]).toBe(2);
+    expect(await teamChatWaiting("kid2")).toBe(2);
+    const page = await teamChat("kid2", { team: team.id }, NOW + 2000);
+    const messages = page.body.messages as { name: string; coach: boolean; body: string; canDelete: boolean; id: string }[];
+    expect(messages.map((m) => [m.name, m.coach, m.body])).toEqual([
+      ["Sam", false, "Practice was great"],
+      ["Pat Morgan", true, "Lift at 4 tomorrow"],
+    ]);
+    expect(messages.every((m) => !m.canDelete)).toBe(true);
+    expect(await teamChatWaiting("kid2")).toBe(0);
+    // Only new ones after a time.
+    const newer = await teamChat("kid2", { team: team.id, after: NOW + 500 }, NOW + 3000);
+    expect((newer.body.messages as unknown[]).length).toBe(1);
+    // kid2 can't delete kid's message; the coach can.
+    await teamUnsay("kid2", { id: messages[0]!.id });
+    expect(((await teamChat("coach", { team: team.id }, NOW + 4000)).body.messages as unknown[]).length).toBe(2);
+    await teamUnsay("coach", { id: messages[0]!.id });
+    expect(((await teamChat("coach", { team: team.id }, NOW + 4000)).body.messages as unknown[]).length).toBe(1);
+    // Leaving closes it; deleting the team deletes it.
+    await leaveTeam("kid2", team.id);
+    expect((await teamChat("kid2", { team: team.id }, NOW)).code).toBe(404);
+    await deleteTeam("coach", team.id);
+    expect(await query("SELECT * FROM team_messages")).toHaveLength(0);
+  });
+});
+
+describe("My team, round 2", () => {
+  it("an athlete who left can be added back by the coach, without a code or a coach link", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Soccer", NOW, "SCCR2345");
+    if ("error" in team) throw new Error();
+    await joinTeam("kid", "SCCR2345", 15, NOW);
+    expect(await leaveTeam("kid", team.id)).toBe(true);
+    // Leaving the only team ends the coach link, but the coach still sees them under the team.
+    expect(await isClient("coach", "kid")).toBe(false);
+    expect((await teamsOverview("coach", NOW)).left[team.id]?.map((m) => m.id)).toEqual(["kid"]);
+    expect((await teamsOverview("kid", NOW)).left).toEqual({});
+    expect(await inviteToTeam("coach", team.id, "kid", NOW)).toEqual({ ok: true });
+    expect(await inviteToTeam("other", team.id, "kid", NOW)).toEqual({ error: "unknown" });
+    const r = await acceptTeamInvite("kid", team.id, 15, NOW);
+    expect("team" in r && r.team.members).toBe(1);
+    expect((await teamsOverview("coach", NOW)).left[team.id]).toBeUndefined();
+    // Removed by the coach counts as left too.
+    expect(await removeMember("coach", team.id, "kid")).toBe(true);
+    expect((await teamsOverview("coach", NOW)).left[team.id]?.map((m) => m.id)).toEqual(["kid"]);
+    // Someone who was never on the team still can't be added.
+    expect(await inviteToTeam("coach", team.id, "stranger", NOW)).toEqual({ error: "notClient" });
+    await deleteTeam("coach", team.id);
+    expect(await query("SELECT * FROM team_left")).toHaveLength(0);
+  });
+
+  it("athletes see the team's assistant coaches", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Swim", NOW, "SWMM2345");
+    if ("error" in team) throw new Error();
+    await joinTeam("kid", "SWMM2345", 16, NOW);
+    await push("helper", [], { name: "Jo Okafor" });
+    await query("INSERT INTO coach_calendar_access (id, owner_id, scope, assistant_id, expires_at) VALUES (?, ?, ?, ?, ?)", [
+      "a1",
+      "coach",
+      `team:${team.id}`,
+      "helper",
+      NOW + 30 * DAY,
+    ]);
+    // Access to the coach's whole calendar isn't a team assistant.
+    await query("INSERT INTO coach_calendar_access (id, owner_id, scope, assistant_id, expires_at) VALUES (?, ?, ?, ?, ?)", [
+      "a2",
+      "coach",
+      "all",
+      "other",
+      NOW + 30 * DAY,
+    ]);
+    const mine = await teamsOverview("kid", NOW);
+    expect(mine.joined[0]!.assistants.map((a) => a.id)).toEqual(["helper"]);
+  });
+
+  it("a team coach never sees an athlete's cycle", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Hockey", NOW, "HCKY2345");
+    if ("error" in team) throw new Error();
+    await joinTeam("kid", "HCKY2345", 16, NOW);
+    expect(await setShare("kid", "coach", true, NOW, "cycle")).toBe(false);
+    expect((await sharesOf("coach", "kid")).cycle).toBe(false);
+    // Even one turned on before the team: joining turns it off, and it's never read.
+    await query("UPDATE coach_shares SET cycle = 1 WHERE coach_id = ? AND client_id = ?", ["coach", "kid"]);
+    expect((await sharesOf("coach", "kid")).cycle).toBe(false);
+    // Other kinds still work.
+    expect(await setShare("kid", "coach", true, NOW, "notes")).toBe(true);
+  });
+
+  it("team chat messages carry the writer's avatar", async () => {
+    await verifiedCoach();
+    const team = await makeTeam("coach", "Tennis", NOW, "TENN2345");
+    if ("error" in team) throw new Error();
+    await joinTeam("kid", "TENN2345", 16, NOW);
+    await joinTeam("kid2", "TENN2345", 16, NOW);
+    await query("INSERT INTO social_profiles (account_id, handle, name, agreed_at, created_at, avatar) VALUES (?, ?, ?, ?, ?, ?)", [
+      "kid",
+      "kid",
+      "Sam",
+      NOW,
+      NOW,
+      "av-bolt",
+    ]);
+    await teamSay("kid", { team: team.id, text: "Nice serve" }, NOW);
+    await teamSay("kid2", { team: team.id, text: "Thanks" }, NOW + 1);
+    const page = await teamChat("coach", { team: team.id }, NOW + 2);
+    expect((page.body.messages as { avatar: string }[]).map((m) => m.avatar)).toEqual(["av-bolt", ""]);
   });
 });
 
