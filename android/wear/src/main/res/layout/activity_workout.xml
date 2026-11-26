@@ -286,6 +286,20 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
+        <!-- Phone-free workouts (WatchRun): Finish saves the watch's own run for the phone. -->
+        <Button
+            android:id="@+id/finish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/button"
+            android:text="@string/finish"
+            android:textAllCaps="false"
+            android:textColor="@color/ink"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
         <!-- Start on phone, or Install on phone when the phone hasn't got Liftsmith (PhoneLink). -->
         <Button
             android:id="@+id/phone"
@@ -296,6 +310,21 @@
             android:background="@drawable/button_primary"
             android:textAllCaps="false"
             android:textColor="@color/accent_ink"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- Start on watch: today's plan, carried from the phone, run here with the phone away. -->
+        <Button
+            android:id="@+id/watchStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="52dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/button"
+            android:text="@string/start_on_watch"
+            android:textAllCaps="false"
+            android:textColor="@color/ink"
             android:textSize="15sp"
             android:textStyle="bold"
             android:visibility="gone" />

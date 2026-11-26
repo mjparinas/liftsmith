@@ -16,6 +16,8 @@ final class WatchLink: NSObject, WCSessionDelegate {
     var onHeartRate: ((Int) -> Void)?
     /// A batch of wrist motion (Labs, watch rep counting), counted by the web app.
     var onMotion: (([String: Any]) -> Void)?
+    /// A workout the watch ran with the phone away reached the phone (WatchWorkouts): the web app saves it.
+    var onWorkout: (() -> Void)?
 
     private var launchedFor: String?
     /// The application context holds the live workout ("json") and today's call ("today") together, because each
@@ -72,6 +74,15 @@ final class WatchLink: NSObject, WCSessionDelegate {
         }
     }
 
+    /// Today's plan worked out set by set (src/lib/watchWorkout.ts Carry), for a workout on the watch with the phone
+    /// away. It rides in the application context with the rest, so the watch has the newest one whenever it wakes.
+    func carry(_ json: String) {
+        guard let s = session else { return }
+        let c = WatchMessages.carry(json) ?? ""
+        guard context["carry"] as? String != c else { return }
+        send(["carry": c], on: s)
+    }
+
     private func send(_ part: [String: Any], on s: WCSession) {
         // After a relaunch, start from what the watch already has, so today's call never wipes a running workout.
         if context.isEmpty { context = s.applicationContext }
@@ -87,6 +98,9 @@ final class WatchLink: NSObject, WCSessionDelegate {
             }
             if let bpm = WatchMessages.bpm(message["hr"]) { self.onHeartRate?(bpm) }
             if let m = WatchMessages.motion(message["motion"]) { self.onMotion?(m) }
+            // A workout the watch ran on its own, sent as queued user info, which reaches the phone even when the app
+            // isn't running: kept until the web app saves it.
+            if let done = message["done"] as? String, WatchWorkouts.add(done) { self.onWorkout?() }
         }
     }
 
@@ -100,8 +114,61 @@ final class WatchLink: NSObject, WCSessionDelegate {
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) { receive(userInfo) }
 }
 
+/// Workouts a watch ran on its own, with the phone away (docs/decisions/watch-apps.md "Phone-free workouts"), kept
+/// until the web app has saved them (src/lib/watchWorkout.ts). Apple Watch sends them as queued user info and Garmin
+/// as a message; both land here. Android counterpart: WatchWorkouts.java.
+enum WatchWorkouts {
+    static let key = "liftsmith.watchWorkouts"
+    static let max = 30
+    static let maxChars = 64_000
+
+    /// The result's id when it looks like one (letters, digits, - and _, 4 to 64), or nil.
+    static func id(_ o: [String: Any]?) -> String? {
+        guard let id = o?["id"] as? String, (4...64).contains(id.count),
+              id.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else { return nil }
+        return id
+    }
+
+    /// A watch's result, checked for shape only (the web app checks every set again), or nil.
+    static func parse(_ json: String) -> [String: Any]? {
+        guard json.count <= maxChars, let data = json.data(using: .utf8),
+              let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              id(o) != nil, !((o["c"] as? String) ?? "").isEmpty, o["sets"] is [Any] else { return nil }
+        return o
+    }
+
+    static func all() -> [String] { UserDefaults.standard.stringArray(forKey: key) ?? [] }
+
+    /// Keeps one; the same id twice is kept once. False when it isn't one, or there's no room.
+    static func add(_ json: String) -> Bool {
+        guard let o = parse(json), let rid = id(o) else { return false }
+        var list = all()
+        if list.contains(where: { parse($0).flatMap(self.id) == rid }) { return true }
+        guard list.count < max else { return false }
+        list.append(json)
+        UserDefaults.standard.set(list, forKey: key)
+        return true
+    }
+
+    static func remove(_ id: String) {
+        UserDefaults.standard.set(all().filter { parse($0).flatMap(self.id) != id }, forKey: key)
+    }
+}
+
 /// What the watch may send. Anything else is dropped, so a bad message can't reach the web app.
 enum WatchMessages {
+    /// The most a carried plan may weigh: 80 steps of words with plenty to spare (Android: WatchMessages.MAX_CARRY).
+    static let maxCarry = 48_000
+
+    /// Today's carried plan as the watch keeps it, or nil to take it off (empty, "{}", too big or not a plan).
+    static func carry(_ json: String) -> String? {
+        guard json.count <= maxCarry, let data = json.data(using: .utf8),
+              let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              (o["v"] as? NSNumber)?.intValue == 1, !((o["id"] as? String) ?? "").isEmpty,
+              o["st"] is [Any], o["ex"] is [Any] else { return nil }
+        return json
+    }
+
     /// Today's call for the watch, from the widget's snapshot: {day, kind, title, why, stale, call, mins, ready}, all
     /// strings, as JSON; nil for an empty snapshot. Same as Android's WatchMessages.today.
     static func today(_ snapshot: String) -> String? {

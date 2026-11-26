@@ -9,11 +9,13 @@
         <exclude domain="sharedpref" path="WebViewChromiumPrefs.xml" />
         <exclude domain="sharedpref" path="liftsmith_widget.xml" />
         <exclude domain="sharedpref" path="liftsmith_taps.xml" />
+        <exclude domain="sharedpref" path="liftsmith_watch_workouts.xml" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="root" path="app_webview/" />
         <exclude domain="sharedpref" path="WebViewChromiumPrefs.xml" />
         <exclude domain="sharedpref" path="liftsmith_widget.xml" />
         <exclude domain="sharedpref" path="liftsmith_taps.xml" />
+        <exclude domain="sharedpref" path="liftsmith_watch_workouts.xml" />
     </device-transfer>
 </data-extraction-rules>

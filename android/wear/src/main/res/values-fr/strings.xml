@@ -28,4 +28,9 @@
     <string name="more_reps">Plus de répétitions</string>
     <string name="weight_value">Poids %1$s, tournez la couronne pour le changer</string>
     <string name="reps_value">%1$s, tournez la couronne pour changer</string>
+    <string name="start_on_watch">Démarrer sur la montre</string>
+    <string name="finish">Terminer</string>
+    <string name="finish_again">Touchez encore pour terminer</string>
+    <string name="on_watch">Sans téléphone : gardé sur la montre</string>
+    <string name="saved_for_phone">Enregistré sur la montre. Il ira sur le téléphone quand ils seront de nouveau ensemble.</string>
 </resources>

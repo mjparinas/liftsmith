@@ -10,4 +10,9 @@
     <string id="HintRate">MENU : Noter</string>
     <string id="HintLogTaken">START : noter · UP : occupée</string>
     <string id="HintAddTaken">DOWN : +30 s · UP : occupée</string>
+    <string id="HintStartWatch">START : démarrer sur la montre</string>
+    <string id="HintFinish">START : terminer</string>
+    <string id="OnWatch">Sans téléphone · BACK : terminer</string>
+    <string id="FinishAsk">Terminer et l’enregistrer pour le téléphone ?</string>
+    <string id="SavedForPhone">Enregistré sur la montre. Il ira sur le téléphone quand ils seront de nouveau ensemble.</string>
 </strings>

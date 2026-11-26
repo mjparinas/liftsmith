@@ -1108,4 +1108,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Wczorajszy plan nigdy nie pokaże się jako dzisiejszy: po północy zegarek czeka na nowy plan z telefonu.",
   },
+  "watch-alone": {
+    title: "Zostaw telefon w szafce",
+    intro: "Dzisiejszy plan jest teraz także na zegarku: trenuj z samym nadgarstkiem i zapisz wszystko później.",
+    points: [
+      "Gdy na telefonie nie trwa trening, zegarek pokazuje dzisiejszy z przyciskiem Zacznij na zegarku (START na Garminie).",
+      "Zapis serii, +30 s, wibracja na koniec przerwy i zmiana ciężaru i powtórzeń działają na nadgarstku, z tętnem z zegarka.",
+      "Dotknij Zakończ, gdy skończysz. Zegarek trzyma trening, aż telefon znów będzie blisko, z otwartą aplikacją lub nie.",
+      "Telefon zapisuje go tak, jakbyś zapisywał na nim: każdą serię, rekordy, kolejne ciężary i Zdrowie.",
+    ],
+    dyk: "Planowanie zostaje na telefonie, więc Maszyna zajęta i Zmień plan czekają, aż wróci.",
+  },
 };

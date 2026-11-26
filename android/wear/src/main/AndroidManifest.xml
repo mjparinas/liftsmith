@@ -52,6 +52,8 @@
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <data android:scheme="wear" android:host="*" android:path="/liftsmith/workout" />
                 <data android:scheme="wear" android:host="*" android:path="/liftsmith/today" />
+                <data android:scheme="wear" android:host="*" android:path="/liftsmith/carry" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/liftsmith/done/" />
             </intent-filter>
         </service>
 

@@ -48,7 +48,7 @@ export const BLOG_WATCH_TODAY: Article[] = [
       ],
       [
         "Can I start the workout from my watch?",
-        "On Wear OS, yes: Start on phone opens it on your phone. On Apple Watch and Garmin, tap Start on your phone and the watch follows.",
+        "On Wear OS, Start on phone opens it on your phone. And on Wear OS, Apple Watch and Garmin, Start on watch runs today's plan right on the wrist with your phone away; it's saved when your phone is near again.",
       ],
     ],
   },

@@ -146,6 +146,9 @@ export const en = {
   "wn.c.watchToday.title": "Today's workout on your watch face",
   "wn.c.watchToday.body":
     "Add the Liftsmith tile or complication to see today's call, how long and how ready you are. On Wear OS, Start on phone opens it.",
+  "wn.c.watchAlone.title": "Leave your phone in the locker",
+  "wn.c.watchAlone.body":
+    "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
   "wn.c.watchAuto.title": "Hands-free sets on your watch",
   "wn.c.watchAuto.body":
     "In Labs: start your next set and your Wear OS watch or Apple Watch ends rest, counts the reps and logs the set by itself, with a buzz at each step.",
@@ -336,6 +339,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "El entrenamiento de hoy en tu esfera",
   "wn.c.watchToday.body":
     "Añade el mosaico o la complicación de Liftsmith para ver la propuesta de hoy, cuánto dura y cómo estás de preparado. En Wear OS, Empezar en el móvil lo abre.",
+  "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
+  "wn.c.watchAlone.body":
+    "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
   "wn.c.watchAuto.title": "Series sin manos en tu reloj",
   "wn.c.watchAuto.body":
     "En Labs: empieza tu siguiente serie y tu reloj Wear OS o Apple Watch termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
@@ -528,6 +534,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "La séance du jour sur ton cadran",
   "wn.c.watchToday.body":
     "Ajoute la tuile ou la complication Liftsmith pour voir le choix du jour, sa durée et ta forme. Sur Wear OS, Démarrer sur le téléphone l'ouvre.",
+  "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
+  "wn.c.watchAlone.body":
+    "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
   "wn.c.watchAuto.title": "Séries mains libres sur ta montre",
   "wn.c.watchAuto.body":
     "Dans Labs : lance ta série suivante et ta montre Wear OS ou ton Apple Watch arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
@@ -716,6 +725,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Das heutige Training auf dem Zifferblatt",
   "wn.c.watchToday.body":
     "Füge die Liftsmith-Kachel oder -Komplikation hinzu und sieh die heutige Empfehlung, die Dauer und deine Bereitschaft. Auf Wear OS öffnet „Am Handy starten“ es.",
+  "wn.c.watchAlone.title": "Lass dein Handy im Spind",
+  "wn.c.watchAlone.body":
+    "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
   "wn.c.watchAuto.title": "Freihändige Sätze auf deiner Uhr",
   "wn.c.watchAuto.body":
     "In Labs: Starte deinen nächsten Satz, und deine Wear-OS-Uhr oder Apple Watch beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
@@ -904,6 +916,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "L'allenamento di oggi sul quadrante",
   "wn.c.watchToday.body":
     "Aggiungi il riquadro o la complicazione di Liftsmith per vedere la scelta di oggi, quanto dura e quanto sei in forma. Su Wear OS, Avvia sul telefono lo apre.",
+  "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
+  "wn.c.watchAlone.body":
+    "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
   "wn.c.watchAuto.title": "Serie a mani libere sull'orologio",
   "wn.c.watchAuto.body":
     "In Labs: inizia la serie successiva e il tuo orologio Wear OS o Apple Watch chiude il recupero, conta le ripetizioni e registra la serie da solo, con una vibrazione a ogni passo.",
@@ -1081,6 +1096,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "今日のワークアウトをウォッチフェイスに",
   "wn.c.watchToday.body":
     "Liftsmithのタイルやコンプリケーションを追加すると、今日のおすすめ、時間、コンディションが見られます。Wear OSでは「スマホで開始」で開けます。",
+  "wn.c.watchAlone.title": "スマホはロッカーに",
+  "wn.c.watchAlone.body":
+    "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
   "wn.c.watchAuto.title": "ウォッチでハンズフリーセット",
   "wn.c.watchAuto.body":
     "Labsに追加：次のセットを始めるだけで、Wear OSウォッチやApple Watchが休憩を終え、レップを数え、セットを自動で記録します。各ステップで振動します。",
@@ -1264,6 +1282,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "O treino de hoje no mostrador",
   "wn.c.watchToday.body":
     "Adicione o bloco ou a complicação do Liftsmith para ver a indicação de hoje, quanto dura e como está sua prontidão. No Wear OS, Começar no celular abre o treino.",
+  "wn.c.watchAlone.title": "Deixe o celular no armário",
+  "wn.c.watchAlone.body":
+    "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
   "wn.c.watchAuto.title": "Séries sem as mãos no seu relógio",
   "wn.c.watchAuto.body":
     "No Labs: comece a próxima série e seu relógio Wear OS ou Apple Watch encerra o descanso, conta as repetições e registra a série sozinho, com uma vibração a cada etapa.",
@@ -1435,6 +1456,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "오늘의 운동을 워치 페이스에",
   "wn.c.watchToday.body":
     "Liftsmith 타일이나 컴플리케이션을 추가하면 오늘의 추천, 운동 시간, 컨디션을 볼 수 있어요. Wear OS에서는 휴대폰에서 시작으로 열 수 있어요.",
+  "wn.c.watchAlone.title": "휴대폰은 사물함에",
+  "wn.c.watchAlone.body":
+    "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
   "wn.c.watchAuto.title": "워치로 손 안 대는 세트",
   "wn.c.watchAuto.body":
     "Labs에서: 다음 세트를 시작하면 Wear OS 워치나 Apple Watch가 휴식을 끝내고, 반복 횟수를 세고, 세트를 저절로 기록해요. 단계마다 진동해요.",
@@ -1617,6 +1641,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Dzisiejszy trening na tarczy zegarka",
   "wn.c.watchToday.body":
     "Dodaj kafelek lub komplikację Liftsmith, aby widzieć dzisiejszą propozycję, czas i gotowość. Na Wear OS Zacznij na telefonie otwiera trening.",
+  "wn.c.watchAlone.title": "Zostaw telefon w szafce",
+  "wn.c.watchAlone.body":
+    "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
   "wn.c.watchAuto.title": "Serie bez rąk na zegarku",
   "wn.c.watchAuto.body":
     "W Labs: zacznij kolejną serię, a zegarek z Wear OS lub Apple Watch sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
@@ -1801,6 +1828,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Bugünkü antrenman saat kadranında",
   "wn.c.watchToday.body":
     "Liftsmith kutucuğunu veya komplikasyonunu ekle; bugünkü öneriyi, süresini ve hazırlığını gör. Wear OS'ta Telefonda başlat onu açar.",
+  "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
+  "wn.c.watchAlone.body":
+    "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",
   "wn.c.watchAuto.title": "Saatinde eller serbest setler",
   "wn.c.watchAuto.body":
     "Labs'ta: bir sonraki setine başla; Wear OS saatin ya da Apple Watch dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",

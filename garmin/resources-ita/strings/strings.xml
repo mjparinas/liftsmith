@@ -10,4 +10,9 @@
     <string id="HintRate">MENU: Valuta</string>
     <string id="HintLogTaken">START: Registra · UP: Occupata</string>
     <string id="HintAddTaken">DOWN: +30 s · UP: Occupata</string>
+    <string id="HintStartWatch">START: inizia sull’orologio</string>
+    <string id="HintFinish">START: fine</string>
+    <string id="OnWatch">Senza telefono · BACK: fine</string>
+    <string id="FinishAsk">Finire e salvarlo per il telefono?</string>
+    <string id="SavedForPhone">Salvato sull’orologio. Passerà al telefono quando saranno di nuovo vicini.</string>
 </strings>

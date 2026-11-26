@@ -145,6 +145,7 @@ import * as variety from "./text/variety";
 import * as vc from "./text/vc";
 import * as vl from "./text/vl";
 import * as warm from "./text/warm";
+import * as wcarry from "./text/wcarry";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
 import * as wk from "./text/wk";
@@ -294,6 +295,7 @@ export const tr: Partial<Record<MessageKey, Message>> = {
   ...variety.tr,
   ...vc.tr,
   ...vl.tr,
+  ...wcarry.tr,
   ...warm.tr,
   ...wdg.tr,
   ...why.tr,

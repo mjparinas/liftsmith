@@ -9,6 +9,7 @@ import android.os.Vibrator;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.Wearable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -57,11 +58,133 @@ final class WatchHub {
     private static PhoneLink.Status phoneStatus = PhoneLink.Status.CHECKING;
     private static String phoneNode;
 
+    /** A workout running on the watch with the phone away (WatchRun), or null. It wins over the phone's on screen. */
+    private static WatchRun run;
+    private static boolean runLoaded;
+
     private WatchHub() {}
 
     static WorkoutState state() {
+        WatchRun r = run;
+        long now = System.currentTimeMillis();
+        if (r != null) return WorkoutState.parse(r.state(now));
         WorkoutState s = state;
-        return s == null || s.stale(System.currentTimeMillis()) ? null : s;
+        return s == null || s.stale(now) ? null : s;
+    }
+
+    /** Whether the workout on screen is the watch's own (no phone needed). */
+    static boolean local() {
+        return run != null;
+    }
+
+    /** Whether the run has logged every set it carried: only Finish is left. */
+    static boolean localDone() {
+        WatchRun r = run;
+        return r != null && r.finishedAll();
+    }
+
+    /** Today's carried plan, if there's one for today the watch can run on its own. */
+    static org.json.JSONObject carried(Context context) {
+        return WatchRun.plan(CarryStore.rawCarry(context), CarryStore.today(System.currentTimeMillis()));
+    }
+
+    /** How many finished runs haven't reached the phone yet. */
+    static int waiting(Context context) {
+        return CarryStore.waiting(context).size();
+    }
+
+    /** Brings back a run the app was closed in the middle of; one forgotten for hours is finished as it stands. */
+    private static void loadRun(Context app) {
+        if (runLoaded) return;
+        runLoaded = true;
+        run = CarryStore.loadRun(app);
+        if (run != null && run.forgotten(System.currentTimeMillis())) finishLocal(app);
+    }
+
+    /** Start on watch: today's carried plan, run here. */
+    static void startLocal(Context context) {
+        Context app = context.getApplicationContext();
+        org.json.JSONObject c = carried(app);
+        if (c == null || run != null) return;
+        long now = System.currentTimeMillis();
+        run = WatchRun.start(c, now, System.nanoTime());
+        CarryStore.saveRun(app, run);
+        localChanged(app);
+    }
+
+    /**
+     * Finish: the run goes to the phone as a Data Layer item of its own, which waits on the watch until the phone is
+     * near (phone at home, in a locker, off), and the screen goes back to idle. Nothing goes when no set was logged.
+     */
+    static void finishLocal(Context context) {
+        Context app = context.getApplicationContext();
+        WatchRun r = run;
+        if (r == null) return;
+        String result = r.result(System.currentTimeMillis());
+        if (result != null) {
+            try {
+                PutDataMapRequest req = PutDataMapRequest.create(CarryStore.PATH_DONE + r.id);
+                req.getDataMap().putString("json", result);
+                Wearable.getDataClient(app).putDataItem(req.asPutDataRequest().setUrgent());
+                CarryStore.addWaiting(app, r.id);
+            } catch (Exception ignored) {
+                // No Play services: nothing can reach the phone from this watch.
+            }
+        }
+        run = null;
+        CarryStore.saveRun(app, null);
+        localChanged(app);
+    }
+
+    private static void localChanged(Context app) {
+        appContext = app;
+        main.post(() -> {
+            scheduleBuzz(app, state());
+            for (Listener l : listeners) l.changed();
+        });
+    }
+
+    /** A tap on the watch's own run: logged here, kept, and the screen and buzzes follow. */
+    private static void localAction(Context app, String action, org.json.JSONObject fields) {
+        WatchRun r = run;
+        if (r == null) return;
+        long now = System.currentTimeMillis();
+        Double kg = fields != null && fields.has("kg") ? fields.optDouble("kg") : null;
+        Integer reps = fields != null && fields.has("reps") ? fields.optInt("reps") : null;
+        switch (action) {
+            case "log":
+                r.log(now, kg, reps);
+                break;
+            case "adjust":
+                r.adjust(kg, reps);
+                break;
+            case "add30":
+                r.add30(now);
+                break;
+            case "rate":
+                if (fields != null) r.rate(fields.optInt("v", 9));
+                break;
+            default:
+                return;
+        }
+        CarryStore.saveRun(app, r);
+        localChanged(app);
+    }
+
+    /** Today's carried plan from the phone (or null: taken off). */
+    static void carry(Context context, String json) {
+        CarryStore.saveCarry(context, json);
+        main.post(() -> {
+            for (Listener l : listeners) l.changed();
+        });
+    }
+
+    /** The phone kept a finished run and deleted its item: it arrived. */
+    static void arrived(Context context, String id) {
+        CarryStore.arrived(context, id);
+        main.post(() -> {
+            for (Listener l : listeners) l.changed();
+        });
     }
 
     /** The watch's own reading, or 0. */
@@ -80,6 +203,15 @@ final class WatchHub {
     /** Reads the phone's current workout (the app just opened, or came back). */
     static void refresh(Context context) {
         Context app = context.getApplicationContext();
+        loadRun(app);
+        // Today's carried plan, in case it came while the listener couldn't run.
+        Uri carry = new Uri.Builder().scheme("wear").path(CarryStore.PATH_CARRY).build();
+        Wearable.getDataClient(app).getDataItems(carry).addOnSuccessListener((DataItemBuffer items) -> {
+            String json = null;
+            for (DataItem item : items) json = DataMapItem.fromDataItem(item).getDataMap().getString("json");
+            items.release();
+            if (json != null && !json.equals(CarryStore.rawCarry(app))) carry(app, json);
+        });
         Uri uri = new Uri.Builder().scheme("wear").path(PATH_WORKOUT).build();
         Wearable.getDataClient(app).getDataItems(uri).addOnSuccessListener((DataItemBuffer items) -> {
             WorkoutState found = null;
@@ -104,8 +236,13 @@ final class WatchHub {
         main.post(() -> {
             WorkoutState prev = state;
             state = next;
-            if (next == null) bpm = 0;
             appContext = app;
+            // The watch's own run stays on screen; the phone's workout shows once it's finished.
+            if (run != null) {
+                for (Listener l : listeners) l.changed();
+                return;
+            }
+            if (next == null) bpm = 0;
             if (next != null && next.vibrate && next.newCue(prev)) cueBuzz(app);
             scheduleBuzz(app, next);
             for (Listener l : listeners) l.changed();
@@ -118,6 +255,12 @@ final class WatchHub {
             bpm = reading;
             for (Listener l : listeners) l.changed();
         });
+        WatchRun r = run;
+        if (r != null) {
+            // The watch's own run keeps its heart rate for the phone to save later; there's no phone to send it to.
+            r.heartRate(reading);
+            return;
+        }
         long now = System.currentTimeMillis();
         if (now - lastHrSent < HR_SEND_MS) return;
         lastHrSent = now;
@@ -126,6 +269,10 @@ final class WatchHub {
 
     /** Log set or +30 s, done on the phone exactly like the notification's buttons. */
     static void action(Context context, String action) {
+        if (run != null) {
+            localAction(context.getApplicationContext(), action, null);
+            return;
+        }
         send(context.getApplicationContext(), PATH_ACTION, action);
     }
 
@@ -134,6 +281,10 @@ final class WatchHub {
      * the exercise felt. The phone checks the fields (WatchMessages.tap) and the web app the set (watchAdjust.ts).
      */
     static void action(Context context, String action, org.json.JSONObject fields) {
+        if (run != null) {
+            localAction(context.getApplicationContext(), action, fields);
+            return;
+        }
         try {
             fields.put("a", action);
         } catch (org.json.JSONException e) {
@@ -145,6 +296,7 @@ final class WatchHub {
 
     /** A batch of wrist motion (MotionStream), counted into reps on the phone. */
     static void motion(Context context, String body) {
+        if (run != null) return;
         send(context.getApplicationContext(), PATH_MOTION, body);
     }
 

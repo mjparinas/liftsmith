@@ -15,6 +15,18 @@ final class WatchModel: NSObject, ObservableObject {
     @Published private(set) var bpm: Int?
     /// Today's call from the phone (the complication's), shown while no workout runs.
     @Published private(set) var today: WatchToday? = WatchToday.load()
+    /// A workout run here with the phone away (docs/decisions/watch-apps.md "Phone-free workouts"), kept on the watch
+    /// so closing the app loses nothing.
+    @Published private(set) var run: WatchRun? = WatchModel.loadRun()
+    /// Today's plan worked out set by set, as the phone last sent it (WatchLink.swift carry).
+    @Published private(set) var carryJson: String? = UserDefaults.standard.string(forKey: WatchModel.carryKey)
+    /// Phone-free workouts finished here that haven't reached the phone yet.
+    @Published private(set) var waiting = 0
+
+    private static let runKey = "liftsmith.watchRun"
+    private static let carryKey = "liftsmith.watchCarry"
+    /// Finished results not yet handed to WatchConnectivity (it wasn't active yet).
+    private static let pendingKey = "liftsmith.watchDone"
 
     private let health = HKHealthStore()
     private var session: HKWorkoutSession?
@@ -31,12 +43,100 @@ final class WatchModel: NSObject, ObservableObject {
         guard WCSession.isSupported() else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
+        if run != nil { beginWorkout() }
     }
 
-    /// The workout to show, unless the phone forgot it long ago.
+    /// The workout to show: the one running here with the phone away first, then the phone's, unless the phone forgot
+    /// it long ago.
     var current: WatchState? {
+        if let r = run { return WatchState.parse(r.state(now: Self.ms())) }
         guard let s = state, !s.stale(at: Date()) else { return nil }
         return s
+    }
+
+    /// Today's carried plan, when nothing runs and the watch could start it on its own.
+    var carried: Carry? { run == nil ? Carry.parse(carryJson, day: Carry.today()) : nil }
+
+    private static func ms(_ d: Date = Date()) -> Double { (d.timeIntervalSince1970 * 1000).rounded() }
+
+    private static func loadRun() -> WatchRun? {
+        guard let data = UserDefaults.standard.data(forKey: runKey) else { return nil }
+        return try? JSONDecoder().decode(WatchRun.self, from: data)
+    }
+
+    private func saveRun() {
+        if let r = run, let data = try? JSONEncoder().encode(r) {
+            UserDefaults.standard.set(data, forKey: Self.runKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: Self.runKey)
+        }
+    }
+
+    fileprivate func applyCarry(_ json: String) {
+        guard json != carryJson else { return }
+        carryJson = json.isEmpty ? nil : json
+        UserDefaults.standard.set(carryJson, forKey: Self.carryKey)
+    }
+
+    fileprivate func countWaiting() {
+        let kept = UserDefaults.standard.stringArray(forKey: Self.pendingKey)?.count ?? 0
+        waiting = kept + WCSession.default.outstandingUserInfoTransfers.filter { $0.userInfo["done"] != nil }.count
+    }
+
+    // MARK: Phone-free workouts
+
+    /// Starts today's carried plan here, with the phone away.
+    func startLocal() {
+        guard run == nil, let c = carried else { return }
+        WKInterfaceDevice.current().play(.start)
+        run = WatchRun(carry: c, now: Self.ms())
+        saveRun()
+        scheduleRestTap()
+        beginWorkout()
+    }
+
+    /// Ends the run here and queues what was logged for the phone, which saves it whenever it's near again.
+    func finishLocal() {
+        guard let r = run else { return }
+        if let json = r.result(now: Self.ms()) {
+            var list = UserDefaults.standard.stringArray(forKey: Self.pendingKey) ?? []
+            list.append(json)
+            UserDefaults.standard.set(Array(list.suffix(30)), forKey: Self.pendingKey)
+        }
+        flushPending()
+        WKInterfaceDevice.current().play(.success)
+        run = nil
+        saveRun()
+        scheduleRestTap()
+        countWaiting()
+        if current == nil { endWorkout() }
+    }
+
+    /// Queues finished results with WatchConnectivity, which delivers them whenever the phone is near, app open or not.
+    fileprivate func flushPending() {
+        let s = WCSession.default
+        guard s.activationState == .activated, let list = UserDefaults.standard.stringArray(forKey: Self.pendingKey), !list.isEmpty else { return }
+        for json in list { s.transferUserInfo(["done": json]) }
+        UserDefaults.standard.removeObject(forKey: Self.pendingKey)
+        countWaiting()
+    }
+
+    /// A tap on the run here instead of the phone.
+    private func local(_ action: String, _ f: [String: Any]) {
+        guard var r = run else { return }
+        let now = Self.ms()
+        let kg = (f["kg"] as? NSNumber)?.doubleValue
+        let reps = (f["reps"] as? NSNumber)?.intValue
+        switch action {
+        case "log": r.log(now: now, kg: kg, reps: reps)
+        case "adjust": r.adjust(kg: kg, reps: reps)
+        case "add30": r.add30(now: now)
+        case "rate": r.rate((f["v"] as? NSNumber)?.intValue ?? 9)
+        default: return
+        }
+        run = r
+        saveRun()
+        scheduleRestTap()
     }
 
     /// Today's call for the complication and the idle screen; "" when the phone took it away (signed out).
@@ -50,6 +150,11 @@ final class WatchModel: NSObject, ObservableObject {
     fileprivate func apply(_ json: String?) {
         let next = WatchState.parse(json)
         guard next != state else { return }
+        // A run here owns the screen and the workout session; the phone's own workout waits until it's finished.
+        if run != nil {
+            state = next
+            return
+        }
         // Hands-free watch sets (Labs): one tap when the set started or logged itself, so the lifter knows without looking.
         if let n = next, n.vibrate, n.newCue(after: state) { WKInterfaceDevice.current().play(.click) }
         state = next
@@ -62,6 +167,7 @@ final class WatchModel: NSObject, ObservableObject {
 
     func send(_ action: String) {
         WKInterfaceDevice.current().play(.click)
+        if run != nil { return local(action, [:]) }
         deliver(["action": action])
     }
 
@@ -69,6 +175,7 @@ final class WatchModel: NSObject, ObservableObject {
     /// exercise felt (docs/decisions/watch-apps.md "Adjust and rate a set"). The phone checks every field.
     func send(_ action: String, fields: [String: Any], click: Bool = true) {
         if click { WKInterfaceDevice.current().play(.click) }
+        if run != nil { return local(action, fields) }
         var m = fields
         m["action"] = action
         deliver(m)
@@ -164,6 +271,12 @@ final class WatchModel: NSObject, ObservableObject {
         bpm = reading
         guard Date().timeIntervalSince(lastHrSent) >= 2 else { return }
         lastHrSent = Date()
+        if run != nil {
+            // With the phone away, the watch keeps the readings itself and hands back the average, high and low.
+            run?.heartRate(reading)
+            saveRun()
+            return
+        }
         // Only while the phone is reachable: an old reading is no use to it later.
         if WCSession.default.isReachable { WCSession.default.sendMessage(["hr": reading], replyHandler: nil, errorHandler: nil) }
     }
@@ -173,18 +286,26 @@ extension WatchModel: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         let json = session.receivedApplicationContext["json"] as? String
         let today = session.receivedApplicationContext["today"] as? String
+        let carry = session.receivedApplicationContext["carry"] as? String
         Task { @MainActor in
             self.apply(json)
             if let today { self.applyToday(today) }
+            if let carry { self.applyCarry(carry) }
+            // A run left on the wrist for hours is finished with what was logged.
+            if let r = self.run, r.forgotten(now: Self.ms()) { self.finishLocal() }
+            self.flushPending()
+            self.countWaiting()
         }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
         let json = context["json"] as? String
         let today = context["today"] as? String
+        let carry = context["carry"] as? String
         Task { @MainActor in
             self.apply(json)
             if let today { self.applyToday(today) }
+            if let carry { self.applyCarry(carry) }
         }
     }
 
@@ -193,8 +314,16 @@ extension WatchModel: WCSessionDelegate {
         if let today = message["today"] as? String {
             Task { @MainActor in self.applyToday(today) }
         }
+        if let carry = message["carry"] as? String {
+            Task { @MainActor in self.applyCarry(carry) }
+        }
         guard let json = message["json"] as? String else { return }
         Task { @MainActor in self.apply(json) }
+    }
+
+    /// A phone-free workout reached the phone.
+    nonisolated func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
+        Task { @MainActor in self.countWaiting() }
     }
 
     /// Today's call sent for the complication (transferCurrentComplicationUserInfo), which wakes the watch app for it.

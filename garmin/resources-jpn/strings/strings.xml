@@ -10,4 +10,9 @@
     <string id="HintRate">MENU：評価する</string>
     <string id="HintLogTaken">START：記録・UP：使用中</string>
     <string id="HintAddTaken">DOWN：+30 秒・UP：使用中</string>
+    <string id="HintStartWatch">START：ウォッチで開始</string>
+    <string id="HintFinish">START：終了</string>
+    <string id="OnWatch">スマホなし · BACK：終了</string>
+    <string id="FinishAsk">終了してスマホ用に保存しますか？</string>
+    <string id="SavedForPhone">ウォッチに保存しました。スマホが近くに戻ると送られます。</string>
 </strings>

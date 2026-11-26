@@ -16,6 +16,8 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
     private static let devicesKey = "garmin.devices"
 
     var onAction: ((String, [String: Any]?) -> Void)?
+    /// A workout the watch ran with the phone away was kept (WatchWorkouts).
+    var onWorkout: (() -> Void)?
     var onHeartRate: ((Int) -> Void)?
     /// The picked watches changed (Connected apps refreshes).
     var onChange: (() -> Void)?
@@ -139,6 +141,18 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
         send(WatchMessages.garminToday(json))
     }
 
+    /// Today's carried plan last sent, so an unchanged plan doesn't cross Bluetooth again.
+    private var lastCarry: String?
+
+    /// Today's plan worked out set by set, for a workout on the watch with the phone away (GarminMessages.carry).
+    func carry(_ json: String) {
+        guard started, !devices.isEmpty else { return }
+        let c = WatchMessages.carry(json) ?? ""
+        guard c != lastCarry else { return }
+        lastCarry = c
+        send(GarminMessages.carry(c))
+    }
+
     /// The workout ended: the watch goes back to "No workout running".
     func stop() {
         launchedFor = nil
@@ -164,6 +178,13 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
         DispatchQueue.main.async {
             if let a = WatchMessages.tapAction(dict["a"]), let data = WatchMessages.data(a, dict) { self.onAction?(a, data.isEmpty ? nil : data) }
             if let b = GarminMessages.bpm(dict["hr"]) { self.onHeartRate?(b) }
+            // The watch app opened and asks for today's plan again, in case it was closed when the plan last changed.
+            if dict["wq"] != nil, let c = self.lastCarry, !c.isEmpty { self.send(GarminMessages.carry(c)) }
+            // A workout the watch ran with the phone away: kept for the web app, then the watch is told it arrived.
+            if let done = GarminMessages.result(dict["wd"]), WatchWorkouts.add(done), let id = WatchWorkouts.parse(done).flatMap(WatchWorkouts.id) {
+                self.onWorkout?()
+                self.send(["wk": id])
+            }
         }
     }
 
@@ -257,6 +278,49 @@ enum GarminMessages {
     }
 
     static func action(_ value: Any?) -> String? { WatchMessages.action(value) }
+
+    /// Today's carried plan under "wc", with lists instead of named fields to stay small (Android: GarminMessages.carry).
+    /// An empty dictionary under "wc" takes it off the watch.
+    static func carry(_ json: String) -> [String: Any] {
+        guard let data = json.data(using: .utf8), let c = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return ["wc": [String: Any]()]
+        }
+        let str = { (k: String) in c[k] as? String ?? "" }
+        let ex: [[Any]] = ((c["ex"] as? [[String: Any]]) ?? []).prefix(24).map { x in
+            [x["n"] as? String ?? "", x["rt"] as? String ?? "", x["q"] as? String ?? "",
+             ((x["kg"] as? [NSNumber]) ?? []).prefix(24).map { Float(truncating: $0) },
+             ((x["w"] as? [String]) ?? []).prefix(24).map { $0 }, x["rs"] as? String ?? ""]
+        }
+        let st: [[Any]] = ((c["st"] as? [[String: Any]]) ?? []).prefix(80).map { x in
+            let n = { (k: String, d: Int) in (x[k] as? NSNumber)?.intValue ?? d }
+            return [n("e", 0), x["l"] as? String ?? "", x["t"] as? String ?? "", n("i", 0), n("r", 1), n("s", 0), n("f", 0) == 1, n("a", 0) == 1, n("c", 0) == 1]
+        }
+        let w: [String: Any] = [
+            "id": str("id"), "d": str("day"), "t": str("title"), "y": str("why"),
+            "v": (c["vib"] as? Bool) ?? true, "w": (c["warn"] as? Bool) ?? false,
+            "o": (c["o"] as? [String]) ?? [], "dn": str("done"), "fn": str("fin"), "ex": ex, "st": st,
+        ]
+        return ["wc": w]
+    }
+
+    /// A workout the watch ran with the phone away, as JSON the web app reads (src/lib/watchWorkout.ts WatchResult),
+    /// or nil. The watch's times are seconds (Connect IQ numbers are 32-bit); they become milliseconds here.
+    static func result(_ value: Any?) -> String? {
+        guard let r = value as? [String: Any], let id = r["id"] as? String, let c = r["c"] as? String else { return nil }
+        let num = { (o: Any?) -> Double in (o as? NSNumber)?.doubleValue ?? -1 }
+        let ms = { (o: Any?) -> Double in ((o as? NSNumber)?.doubleValue ?? 0) * 1000 }
+        var sets: [[Double]] = []
+        for x in (r["sets"] as? [[Any]]) ?? [] {
+            guard x.count >= 5 else { return nil }
+            sets.append([num(x[0]), ms(x[1]), num(x[2]), num(x[3]), ms(x[4])])
+        }
+        let rates: [[Double]] = ((r["rates"] as? [[Any]]) ?? []).compactMap { $0.count >= 2 ? [num($0[0]), num($0[1])] : nil }
+        let hr: [Double] = ((r["hr"] as? [Any]) ?? []).map(num)
+        let out: [String: Any] = ["id": id, "c": c, "start": ms(r["s"]), "end": ms(r["e"]), "sets": sets, "rates": rates, "hr": hr]
+        guard let data = try? JSONSerialization.data(withJSONObject: out), let json = String(data: data, encoding: .utf8),
+              WatchWorkouts.parse(json) != nil else { return nil }
+        return json
+    }
 
     static func bpm(_ value: Any?) -> Int? {
         if let n = value as? NSNumber { return WatchMessages.bpm(n.intValue) }

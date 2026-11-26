@@ -86,6 +86,55 @@ final class WatchLink {
         }
     }
 
+    /** Today's plan worked out set by set, for a workout on the watch with the phone away (src/lib/watchWorkout.ts). */
+    static final String PATH_CARRY = "/liftsmith/carry";
+
+    /**
+     * Today's carried plan (WatchMessages.carry checks it). Like today's call, the Data Layer skips bytes that didn't
+     * change, so a watch only wakes for a new plan; an empty one takes it off the watch.
+     */
+    static void carry(Context context, String json) {
+        String carry = WatchMessages.carry(json);
+        try {
+            if (carry == null) {
+                Uri uri = new Uri.Builder().scheme("wear").path(PATH_CARRY).build();
+                Wearable.getDataClient(context).deleteDataItems(uri);
+                return;
+            }
+            PutDataMapRequest req = PutDataMapRequest.create(PATH_CARRY);
+            req.getDataMap().putString("json", carry);
+            Wearable.getDataClient(context).putDataItem(req.asPutDataRequest());
+        } catch (Exception ignored) {
+            // No Play services: no watch to tell.
+        }
+    }
+
+    /**
+     * Watch workouts whose item is still on the Data Layer (they arrived while the listener couldn't run): kept now,
+     * then `then` runs. Called when the app opens.
+     */
+    static void collect(Context context, Runnable then) {
+        try {
+            Uri uri = new Uri.Builder().scheme("wear").path(WatchListenerService.PATH_DONE).build();
+            Wearable.getDataClient(context)
+                .getDataItems(uri, com.google.android.gms.wearable.DataClient.FILTER_PREFIX)
+                .addOnSuccessListener((com.google.android.gms.wearable.DataItemBuffer items) -> {
+                    for (com.google.android.gms.wearable.DataItem item : items) {
+                        WatchListenerService.take(
+                            context,
+                            item.getUri(),
+                            com.google.android.gms.wearable.DataMapItem.fromDataItem(item).getDataMap().getString("json")
+                        );
+                    }
+                    items.release();
+                    then.run();
+                })
+                .addOnFailureListener((Exception e) -> then.run());
+        } catch (Exception e) {
+            then.run();
+        }
+    }
+
     /** A workout started on the phone: open the watch app, so heart rate and the rest buzz start with it. */
     private static void openOnWatch(Context context) {
         try {

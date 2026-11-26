@@ -28,4 +28,9 @@
     <string name="more_reps">Mehr Wiederholungen</string>
     <string name="weight_value">Gewicht %1$s, Krone drehen zum Ändern</string>
     <string name="reps_value">%1$s, Krone drehen zum Ändern</string>
+    <string name="start_on_watch">Auf der Uhr starten</string>
+    <string name="finish">Beenden</string>
+    <string name="finish_again">Zum Beenden noch mal tippen</string>
+    <string name="on_watch">Ohne Handy: auf der Uhr gespeichert</string>
+    <string name="saved_for_phone">Auf der Uhr gespeichert. Es geht aufs Handy, sobald beide wieder beisammen sind.</string>
 </resources>

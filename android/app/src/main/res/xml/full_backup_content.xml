@@ -5,4 +5,5 @@
     <exclude domain="sharedpref" path="WebViewChromiumPrefs.xml" />
     <exclude domain="sharedpref" path="liftsmith_widget.xml" />
     <exclude domain="sharedpref" path="liftsmith_taps.xml" />
+    <exclude domain="sharedpref" path="liftsmith_watch_workouts.xml" />
 </full-backup-content>

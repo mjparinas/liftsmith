@@ -641,6 +641,11 @@ export const pt: FeaturesText = {
       body: "Alguém no aparelho? Um toque no relógio ou em Mudar o plano coloca o melhor exercício da sua academia que não precisa dele, com a carga e o porquê.",
       note: "Wear OS, Apple Watch e Garmin (o botão UP), e Mudar o plano no celular e na web.",
     },
+    "watch-alone": {
+      name: "Treinos no relógio, sem o celular",
+      body: "O plano de hoje vai junto no seu relógio. Toque em Começar no relógio, registre cada série com peso e repetições no pulso, e o treino é salvo, recordes incluídos, quando o celular estiver por perto de novo.",
+      note: "Wear OS, Apple Watch e Garmin.",
+    },
     widgets: {
       name: "Widgets na tela inicial",
       body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",

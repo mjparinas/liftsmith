@@ -53,6 +53,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         CAPPluginMethod(name: "update", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setWidget", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setCarry", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "watchWorkouts", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "doneWatchWorkout", returnType: CAPPluginReturnPromise),
     ]
 
     private let restId = WorkoutTaps.restId
@@ -83,10 +86,13 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         WatchLink.shared.onAction = { [weak self] a, data in self?.tap(a, data: data) }
         WatchLink.shared.onHeartRate = { [weak self] bpm in self?.notifyListeners("heartRate", data: ["bpm": bpm]) }
         WatchLink.shared.onMotion = { [weak self] m in self?.notifyListeners("watchMotion", data: m) }
+        // Workouts the watches ran with the phone away (WatchWorkouts), saved by the web app.
+        WatchLink.shared.onWorkout = { [weak self] in self?.notifyListeners("watchWorkout", data: [:], retainUntilConsumed: true) }
         WatchLink.shared.start()
         // The Garmin watch app (GarminLink.swift, garmin/): the same taps and heart rate.
         GarminLink.shared.onAction = WatchLink.shared.onAction
         GarminLink.shared.onHeartRate = WatchLink.shared.onHeartRate
+        GarminLink.shared.onWorkout = WatchLink.shared.onWorkout
         GarminLink.shared.restore()
     }
 
@@ -266,6 +272,25 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         // The same call on the watches: the Apple Watch complication and the Garmin glance.
         WatchLink.shared.today(json)
         GarminLink.shared.today(json)
+        call.resolve()
+    }
+
+    /// Today's plan worked out set by set (src/lib/watchWorkout.ts Carry), for workouts on the watch with the phone away.
+    @objc func setCarry(_ call: CAPPluginCall) {
+        let json = call.getString("json") ?? ""
+        WatchLink.shared.carry(json)
+        GarminLink.shared.carry(json)
+        call.resolve()
+    }
+
+    /// The watch workouts waiting to be saved, as each watch sent them.
+    @objc func watchWorkouts(_ call: CAPPluginCall) {
+        call.resolve(["list": WatchWorkouts.all().compactMap { WatchWorkouts.parse($0) }])
+    }
+
+    /// Saved by the web app (or one it can't save): forgotten here.
+    @objc func doneWatchWorkout(_ call: CAPPluginCall) {
+        if let id = call.getString("id"), !id.isEmpty { WatchWorkouts.remove(id) }
         call.resolve()
     }
 

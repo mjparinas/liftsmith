@@ -1127,4 +1127,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A plan from yesterday never shows as today's: after midnight the watch waits for your phone's new plan.",
   },
+  "watch-alone": {
+    title: "Leave your phone in the locker",
+    intro: "Today's plan now rides along on your watch, so you can lift with just your wrist and save it all later.",
+    points: [
+      "When no workout runs on your phone, your watch shows today's workout with Start on watch (START on Garmin).",
+      "Log set, +30 s, the rest buzz and changing the weight and reps all work on the wrist, with heart rate from the watch.",
+      "Finish when you're done. The watch keeps the workout until your phone is near again, app open or not.",
+      "Your phone then saves it as if you'd logged it there: every set, your bests, the next weights and Health.",
+    ],
+    dyk: "Planning stays on the phone, so Machine taken and Change the plan wait until your phone is back.",
+  },
 };
