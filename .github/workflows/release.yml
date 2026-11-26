@@ -103,9 +103,13 @@ jobs:
         working-directory: android
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          VERSION_CODE: ${{ github.run_number }}
+          RUN_NUMBER: ${{ github.run_number }}
           VERSION_NAME: ${{ needs.web.outputs.version }}
+        # Phone version code = run number × 2, Wear OS = that + 1 (android/wear/build.gradle), so every bundle of the
+        # one Play app has its own code and the two stay close (Play refuses a code far above the last one;
+        # docs/decisions/app-versions.md).
         run: |
+          export VERSION_CODE=$((RUN_NUMBER * 2))
           echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > "$RUNNER_TEMP/upload.jks"
           ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
       - uses: actions/upload-artifact@v7
@@ -117,6 +121,7 @@ jobs:
             android/wear/build/outputs/bundle/release/wear-release.aab
           retention-days: 30
       - name: Upload to Play (internal)
+        id: play_phone
         if: env.HAS_KEY == 'true' && env.HAS_PLAY == 'true'
         uses: r0adkll/upload-google-play@v1
         with:
@@ -125,9 +130,18 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
-      # Wear OS Play upload paused (2026-11-23): form factor removed after a Wear quality rejection. The Wear AAB
-      # still builds into liftsmith-release-aab. Restore a wear:internal upload when Wear is ready again
-      # (docs/decisions/watch-apps.md, open-items.md).
+      # The Wear OS app goes to Play's Wear OS internal track (Wear OS opted in again 2026-11-26). If Play refuses
+      # it, the phone release still stands (docs/decisions/watch-apps.md).
+      - name: Upload the Wear OS app to Play (Wear OS internal)
+        if: env.HAS_KEY == 'true' && env.HAS_PLAY == 'true' && steps.play_phone.outcome == 'success'
+        continue-on-error: true
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.getliftsmith.app
+          releaseFiles: android/wear/build/outputs/bundle/release/wear-release.aab
+          track: wear:internal
+          status: completed
 
   ios:
     name: iOS · TestFlight

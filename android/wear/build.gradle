@@ -10,9 +10,10 @@ android {
         // Wear OS 3 and up (API 30), the Data Layer and foreground health services the app relies on.
         minSdkVersion 30
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Play needs every bundle of one app to have its own version code, so the watch's sits well above the
-        // phone's (both come from the release run number; see .github/workflows/release.yml).
-        versionCode(((System.getenv("VERSION_CODE") ?: "1") as int) + 100000000)
+        // Play needs every bundle of one app to have its own version code: Release gives the phone the run number
+        // × 2 and the watch the next one up, so they never meet and stay close (Play refuses a code far above the
+        // last one, 2026-11-26; see .github/workflows/release.yml).
+        versionCode(((System.getenv("VERSION_CODE") ?: "1") as int) + 1)
         versionName(System.getenv("VERSION_NAME") ?: new groovy.json.JsonSlurper().parse(rootProject.file("../package.json")).version)
     }
     signingConfigs {
