@@ -527,6 +527,7 @@ export const emails: Record<string, Words> = {
       "Controllo della tecnica: squat sopra il parallelo, ripetizioni accorciate e inclinazione da un lato.",
       "Replay della traiettoria: una ripetizione con il percorso del bilanciere disegnato e un'indicazione.",
       "Il massimale di oggi dal riscaldamento: una spinta al tuo primo peso di lavoro.",
+      "Velocità dal polso: niente fotocamera? L'orologio misura la velocità di ogni ripetizione, vibra quando è ora di fermarsi e alimenta il massimale di oggi.",
     ],
     dyk: "Un esperimento che ne richiede un altro compare solo quando quello è attivo.",
   },

@@ -788,6 +788,11 @@ export const tr: FeaturesText = {
       body: "Bir sonraki setine başla; saatin dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",
       note: "Wear OS ve Apple Watch, saatle tekrar sayma açıkken.",
     },
+    "lab-watch-speed": {
+      name: "Bilekten bar hızı",
+      body: "Saatin her tekrarı ne kadar hızlı kaldırdığını ölçer ve set bitirecek kadar yavaşladığında titrer. Isınma hızları ilk çalışma ağırlığını kamera olmadan ayarlar.",
+      note: "Wear OS ve Apple Watch, saatle tekrar sayma açıkken.",
+    },
     "lab-voice": {
       name: "Sesle set kaydı",
       body: "Bir seti kaydetmek için “8 tekrar 100” ya da “çok kolay” de. Cihazında tanınır; hiçbir ses dışarı çıkmaz.",

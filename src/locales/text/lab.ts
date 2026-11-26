@@ -73,6 +73,9 @@ export const en = {
   "lab.watchAuto.title": "Hands-free watch sets",
   "lab.watchAuto.body":
     "With watch rep counting on, your watch runs the whole set for you. After the first 15 seconds of rest, start your next set and rest ends by itself once the watch has counted 3 reps. A few seconds after your last rep the set logs itself and rest starts. Your watch buzzes each time. Undo puts a set back.",
+  "lab.watchSpeed.title": "Wrist bar speed",
+  "lab.watchSpeed.body":
+    "With watch rep counting on, your watch measures how fast you lift each rep, with no camera to set up. The phone shows the last rep's speed, and your watch buzzes once when the set has slowed enough to end. Warm-up speeds also feed today's max, so your first working weight can move with how you feel today. A wrist moves a little differently from the bar, so treat the numbers as a guide.",
   "lab.tempo.title": "Tempo coach",
   "lab.tempo.body":
     "On tempo and paused lifts, like a tempo squat or a paused bench, adds Count tempo above Log set. Tap it as you take the weight: after 3, 2, 1 it counts every second of each rep in sound and buzzes, a falling note to lower, a steady one to hold and a rising one to lift, then stops after your reps. Log set is still one tap.",
@@ -158,6 +161,9 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Series sin manos con el reloj",
   "lab.watchAuto.body":
     "Con el conteo de repeticiones con el reloj activado, tu reloj se encarga de toda la serie. Pasados los primeros 15 segundos de descanso, empieza tu siguiente serie y el descanso termina solo cuando el reloj cuenta 3 repeticiones. Unos segundos después de tu última repetición, la serie se registra sola y empieza el descanso. Tu reloj vibra cada vez. Deshacer recupera una serie.",
+  "lab.watchSpeed.title": "Velocidad desde la muñeca",
+  "lab.watchSpeed.body":
+    "Con el conteo de repeticiones del reloj activado, tu reloj mide lo rápido que levantas cada repetición, sin cámara que preparar. El teléfono muestra la velocidad de la última repetición y el reloj vibra una vez cuando la serie se ha frenado lo suficiente para terminarla. Las velocidades del calentamiento también alimentan el máximo de hoy, así que tu primer peso de trabajo puede ajustarse a cómo te sientes hoy. La muñeca no se mueve exactamente como la barra, así que toma los números como guía.",
   "lab.tempo.title": "Entrenador de tempo",
   "lab.tempo.body":
     "En los ejercicios con tempo o con pausa, como la sentadilla con tempo o el press de banca con pausa, añade Marcar el tempo encima de Registrar serie. Tócalo al coger el peso: tras 3, 2, 1 cuenta cada segundo de cada repetición con sonidos y vibraciones, una nota que baja para bajar, una fija para aguantar y una que sube para subir, y se detiene al terminar tus repeticiones. Registrar la serie sigue siendo un solo toque.",
@@ -241,6 +247,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Séries mains libres avec la montre",
   "lab.watchAuto.body":
     "Avec le comptage des répétitions par la montre activé, ta montre gère toute la série. Après les 15 premières secondes de repos, lance ta série suivante : le repos s'arrête tout seul dès que la montre a compté 3 répétitions. Quelques secondes après ta dernière répétition, la série s'enregistre seule et le repos commence. Ta montre vibre à chaque fois. Annuler remet une série.",
+  "lab.watchSpeed.title": "Vitesse au poignet",
+  "lab.watchSpeed.body":
+    "Avec le comptage des répétitions par la montre activé, ta montre mesure la vitesse de chaque répétition, sans caméra à installer. Le téléphone affiche la vitesse de la dernière répétition, et ta montre vibre une fois quand la série a assez ralenti pour l'arrêter. Les vitesses de l'échauffement nourrissent aussi le max du jour, pour que ta première charge de travail suive ta forme du jour. Le poignet ne bouge pas tout à fait comme la barre : prends les chiffres comme un repère.",
   "lab.tempo.title": "Coach de tempo",
   "lab.tempo.body":
     "Sur les exercices avec tempo ou avec pause, comme le squat tempo ou le développé couché avec pause, ajoute Compter le tempo au-dessus de Valider la série. Touche-le en prenant la charge : après 3, 2, 1, il compte chaque seconde de chaque répétition par des sons et des vibrations, une note qui descend pour descendre, une note fixe pour tenir et une note qui monte pour monter, puis s'arrête après tes répétitions. Valider la série reste une seule touche.",
@@ -326,6 +335,9 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Freihändige Sätze mit der Uhr",
   "lab.watchAuto.body":
     "Wenn das Zählen der Wiederholungen mit der Uhr an ist, übernimmt deine Uhr den ganzen Satz. Nach den ersten 15 Sekunden Pause startest du einfach deinen nächsten Satz, und die Pause endet von selbst, sobald die Uhr 3 Wiederholungen gezählt hat. Ein paar Sekunden nach deiner letzten Wiederholung trägt sich der Satz selbst ein und die Pause beginnt. Deine Uhr vibriert jedes Mal. Rückgängig holt einen Satz zurück.",
+  "lab.watchSpeed.title": "Hantelgeschwindigkeit am Handgelenk",
+  "lab.watchSpeed.body":
+    "Mit dem Wiederholungszählen der Uhr misst deine Uhr, wie schnell du jede Wiederholung hebst, ganz ohne Kamera. Das Handy zeigt die Geschwindigkeit der letzten Wiederholung, und deine Uhr vibriert einmal, wenn der Satz so langsam geworden ist, dass du ihn beenden kannst. Die Geschwindigkeiten beim Aufwärmen fließen auch ins heutige Maximum ein, damit dein erstes Arbeitsgewicht zu deiner Tagesform passt. Das Handgelenk bewegt sich etwas anders als die Hantel, nimm die Zahlen also als Richtwert.",
   "lab.tempo.title": "Tempo-Coach",
   "lab.tempo.body":
     "Bei Tempo- und Pausenübungen wie Tempo-Kniebeugen oder Bankdrücken mit Pause erscheint über „Satz eintragen“ die Schaltfläche Tempo zählen. Tippe sie an, wenn du das Gewicht aufnimmst: Nach 3, 2, 1 zählt sie jede Sekunde jeder Wiederholung mit Tönen und Vibration, ein fallender Ton zum Ablassen, ein gleichbleibender zum Halten und ein steigender zum Hochdrücken, und hört nach deinen Wiederholungen auf. Satz eintragen bleibt ein Tippen.",
@@ -408,6 +420,9 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Serie a mani libere con l'orologio",
   "lab.watchAuto.body":
     "Con il conteggio delle ripetizioni con l'orologio attivo, il tuo orologio gestisce l'intera serie. Dopo i primi 15 secondi di recupero, inizia la serie successiva e il recupero finisce da solo appena l'orologio conta 3 ripetizioni. Pochi secondi dopo l'ultima ripetizione la serie si registra da sola e parte il recupero. L'orologio vibra ogni volta. Annulla riporta indietro una serie.",
+  "lab.watchSpeed.title": "Velocità dal polso",
+  "lab.watchSpeed.body":
+    "Con il conteggio delle ripetizioni dell'orologio attivo, l'orologio misura quanto velocemente sollevi ogni ripetizione, senza fotocamera da preparare. Il telefono mostra la velocità dell'ultima ripetizione e l'orologio vibra una volta quando la serie è rallentata abbastanza da chiuderla. Le velocità del riscaldamento alimentano anche il massimale di oggi, così il primo carico di lavoro segue come ti senti oggi. Il polso non si muove proprio come il bilanciere, quindi prendi i numeri come una guida.",
   "lab.tempo.title": "Coach del tempo",
   "lab.tempo.body":
     "Negli esercizi a tempo o con fermo, come lo squat a tempo o la panca con fermo, aggiunge Conta il tempo sopra Registra serie. Toccalo mentre prendi il peso: dopo 3, 2, 1 conta ogni secondo di ogni ripetizione con suoni e vibrazioni, una nota che scende per scendere, una ferma per tenere e una che sale per salire, poi si ferma dopo le tue ripetizioni. Registrare la serie resta un solo tocco.",
@@ -490,6 +505,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "ウォッチでハンズフリーセット",
   "lab.watchAuto.body":
     "ウォッチでのレップカウントがオンのとき、セット全体をウォッチが進めます。休憩の最初の15秒が過ぎたら次のセットを始めてください。ウォッチが3レップ数えると休憩が自動で終わります。最後のレップの数秒後にセットが自動で記録され、休憩が始まります。そのたびにウォッチが振動します。元に戻すでセットを戻せます。",
+  "lab.watchSpeed.title": "手首でバースピード",
+  "lab.watchSpeed.body":
+    "ウォッチのレップカウントがオンのとき、カメラを準備しなくても、ウォッチが各レップを挙げる速さを測ります。スマートフォンに最後のレップの速さが表示され、セットを終えてよいほど遅くなるとウォッチが1回振動します。ウォームアップの速さは今日の最大重量にも使われるので、最初のメイン重量を今日の調子に合わせられます。手首の動きはバーと少し違うため、数値は目安として使ってください。",
   "lab.tempo.title": "テンポコーチ",
   "lab.tempo.body":
     "テンポスクワットや一時停止ベンチプレスなど、テンポや停止のある種目で「セットを記録」の上に「テンポを数える」が出ます。重さを持つときにタップすると、3、2、1のあとに各レップの1秒ごとを音と振動で数えます。下ろすときは下がる音、止めるときは同じ音、上げるときは上がる音で、決めたレップ数が終わると止まります。セットの記録はこれまでどおりワンタップです。",
@@ -573,6 +591,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Séries sem as mãos com o relógio",
   "lab.watchAuto.body":
     "Com a contagem de repetições pelo relógio ligada, seu relógio cuida da série inteira. Depois dos primeiros 15 segundos de descanso, comece a próxima série e o descanso termina sozinho quando o relógio contar 3 repetições. Alguns segundos depois da sua última repetição, a série é registrada sozinha e o descanso começa. Seu relógio vibra a cada vez. Desfazer traz uma série de volta.",
+  "lab.watchSpeed.title": "Velocidade pelo pulso",
+  "lab.watchSpeed.body":
+    "Com a contagem de repetições do relógio ligada, seu relógio mede a velocidade de cada repetição, sem câmera para montar. O celular mostra a velocidade da última repetição, e o relógio vibra uma vez quando a série desacelerou o bastante para terminar. As velocidades do aquecimento também alimentam o máximo de hoje, para que sua primeira carga de trabalho acompanhe como você está hoje. O pulso não se move exatamente como a barra, então use os números como referência.",
   "lab.tempo.title": "Coach de cadência",
   "lab.tempo.body":
     "Em exercícios com cadência ou pausa, como um agachamento com cadência ou um supino com pausa, adiciona Contar cadência acima de Registrar série. Toque quando pegar o peso: depois de 3, 2, 1, ele conta cada segundo de cada rep com sons e vibrações, uma nota descendo para baixar, uma constante para segurar e uma subindo para subir, e para depois das suas reps. Registrar série continua sendo um toque.",
@@ -654,6 +675,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "워치로 손 안 대는 세트",
   "lab.watchAuto.body":
     "워치 반복 횟수 세기가 켜져 있으면 워치가 세트 전체를 맡아요. 휴식의 처음 15초가 지나면 다음 세트를 시작하세요. 워치가 3회를 세면 휴식이 저절로 끝나요. 마지막 반복 몇 초 뒤에 세트가 저절로 기록되고 휴식이 시작돼요. 그때마다 워치가 진동해요. 실행 취소로 세트를 되돌릴 수 있어요.",
+  "lab.watchSpeed.title": "손목 바 속도",
+  "lab.watchSpeed.body":
+    "워치 반복 횟수 세기가 켜져 있으면 카메라를 설치하지 않아도 워치가 각 반복을 들어 올리는 속도를 잽니다. 휴대폰에 마지막 반복의 속도가 표시되고, 세트를 끝내도 될 만큼 느려지면 워치가 한 번 진동합니다. 워밍업 속도는 오늘의 최대 중량에도 쓰여서 첫 본 세트 무게가 오늘 컨디션에 맞춰질 수 있습니다. 손목은 바와 조금 다르게 움직이니 숫자는 참고로만 보세요.",
   "lab.tempo.title": "템포 코치",
   "lab.tempo.body":
     "템포 스쿼트나 포즈 벤치 프레스 같은 템포 및 정지 리프트에서 세트 기록 위에 템포 세기를 추가해요. 무게를 들 때 탭하세요. 3, 2, 1 뒤에 반복마다 매초를 소리와 진동으로 세어 줘요. 내릴 때는 내려가는 음, 버틸 때는 일정한 음, 올릴 때는 올라가는 음이고, 반복을 마치면 멈춰요. 세트 기록은 여전히 한 번 탭이에요.",
@@ -735,6 +759,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Saatle eller serbest setler",
   "lab.watchAuto.body":
     "Saatle tekrar sayma açıkken setin tamamını saatin yönetir. Dinlenmenin ilk 15 saniyesinden sonra bir sonraki setine başla; saat 3 tekrar saydığında dinlenme kendiliğinden biter. Son tekrarından birkaç saniye sonra set kendiliğinden kaydedilir ve dinlenme başlar. Saatin her seferinde titrer. Geri al bir seti geri getirir.",
+  "lab.watchSpeed.title": "Bilekten bar hızı",
+  "lab.watchSpeed.body":
+    "Saatle tekrar sayma açıkken saatin, kamera kurmana gerek kalmadan her tekrarı ne kadar hızlı kaldırdığını ölçer. Telefon son tekrarın hızını gösterir ve set bitirecek kadar yavaşladığında saatin bir kez titrer. Isınma hızları bugünün maksimumunu da besler, böylece ilk çalışma ağırlığın bugünkü formuna göre ayarlanabilir. Bilek bardan biraz farklı hareket eder, bu yüzden sayıları bir rehber olarak gör.",
   "lab.tempo.title": "Tempo koçu",
   "lab.tempo.body":
     "Tempo squat ya da duraklamalı bench press gibi tempolu ve duraklamalı hareketlerde Seti kaydet'in üstüne Tempoyu say ekler. Ağırlığı alırken dokun: 3, 2, 1'den sonra her tekrarın her saniyesini ses ve titreşimle sayar; indirmek için düşen bir nota, tutmak için sabit bir nota, kaldırmak için yükselen bir nota, tekrarların bitince de durur. Seti kaydet hâlâ tek dokunuş.",
@@ -817,6 +844,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "lab.watchAuto.title": "Serie bez rąk z zegarkiem",
   "lab.watchAuto.body":
     "Gdy liczenie powtórzeń zegarkiem jest włączone, zegarek prowadzi całą serię. Po pierwszych 15 sekundach przerwy zacznij kolejną serię, a przerwa skończy się sama, gdy zegarek policzy 3 powtórzenia. Kilka sekund po ostatnim powtórzeniu seria zapisze się sama i zacznie się przerwa. Zegarek za każdym razem zawibruje. Cofnij przywraca serię.",
+  "lab.watchSpeed.title": "Prędkość sztangi z nadgarstka",
+  "lab.watchSpeed.body":
+    "Przy włączonym liczeniu powtórzeń zegarkiem zegarek mierzy, jak szybko podnosisz każde powtórzenie, bez ustawiania kamery. Telefon pokazuje prędkość ostatniego powtórzenia, a zegarek wibruje raz, gdy seria zwolniła na tyle, że można ją zakończyć. Prędkości z rozgrzewki zasilają też dzisiejsze maksimum, więc pierwszy ciężar roboczy może dopasować się do dzisiejszej formy. Nadgarstek porusza się trochę inaczej niż sztanga, więc traktuj liczby jako wskazówkę.",
   "lab.tempo.title": "Trener tempa",
   "lab.tempo.body":
     "W ćwiczeniach z tempem i pauzą, jak przysiad z tempem czy wyciskanie z pauzą, dodaje Licz tempo nad Zapisz serię. Stuknij, gdy bierzesz ciężar: po 3, 2, 1 odlicza każdą sekundę każdego powtórzenia dźwiękiem i wibracją, opadający ton przy opuszczaniu, równy przy zatrzymaniu i rosnący przy podnoszeniu, a po twoich powtórzeniach milknie. Zapisz serię to nadal jedno stuknięcie.",

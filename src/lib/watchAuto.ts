@@ -30,8 +30,11 @@ export function withCarry(carry: Carry | null, key: string, n: number): number {
   return carry && carry.key === key ? carry.n + n : n;
 }
 
-/** What the watch buzzes for: the set started by itself, or the set logged itself. Each cue's id is new. */
-export type CueKind = "go" | "logged";
+/**
+ * What the watch buzzes for: the set started by itself, the set logged itself, or the bar has slowed enough to end
+ * the set (wrist bar speed, Labs). Each cue's id is new.
+ */
+export type CueKind = "go" | "logged" | "slow";
 
 /** A cue id the watches buzz on once when it changes (sessionNotify.ts `cue`): its kind and a count that only rises. */
 export function cueId(kind: CueKind, n: number): string {
