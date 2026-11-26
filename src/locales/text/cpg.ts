@@ -219,6 +219,8 @@ export const en = {
   "cpg.tweak.saved": "Saved for this client. Their app picks it up next time it opens.",
   "cpg.tweak.saved.ath": "Saved for this athlete. Their app picks it up next time it opens.",
   "cpg.tweak.reset": "Back to the program's day.",
+  "cpg.from.kicker": "From your coach · {name}",
+  "cpg.from.next": "Up next: {day}, {when}",
 } as const;
 
 type Key = keyof typeof en;
@@ -435,6 +437,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Guardado para este cliente. Su app lo recibe la próxima vez que se abra.",
   "cpg.tweak.saved.ath": "Guardado para este atleta. Su app lo recibe la próxima vez que se abra.",
   "cpg.tweak.reset": "Vuelve el día del programa.",
+  "cpg.from.kicker": "De tu entrenador · {name}",
+  "cpg.from.next": "Lo siguiente: {day}, {when}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -657,6 +661,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Enregistré pour ce client. Son app le reçoit à sa prochaine ouverture.",
   "cpg.tweak.saved.ath": "Enregistré pour cet athlète. Son app le reçoit à sa prochaine ouverture.",
   "cpg.tweak.reset": "Le jour du programme est de retour.",
+  "cpg.from.kicker": "De ton coach · {name}",
+  "cpg.from.next": "Ensuite : {day}, {when}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -879,6 +885,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Für diesen Kunden gespeichert. Die App übernimmt es beim nächsten Öffnen.",
   "cpg.tweak.saved.ath": "Für diese Person gespeichert. Die App übernimmt es beim nächsten Öffnen.",
   "cpg.tweak.reset": "Wieder der Tag aus dem Programm.",
+  "cpg.from.kicker": "Von deinem Coach · {name}",
+  "cpg.from.next": "Als Nächstes: {day}, {when}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1095,6 +1103,8 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Salvato per questo cliente. La sua app lo riceve alla prossima apertura.",
   "cpg.tweak.saved.ath": "Salvato per questo atleta. La sua app lo riceve alla prossima apertura.",
   "cpg.tweak.reset": "Torna il giorno del programma.",
+  "cpg.from.kicker": "Dal tuo coach · {name}",
+  "cpg.from.next": "Prossimo: {day}, {when}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1291,6 +1301,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "このクライアント用に保存しました。次にアプリを開いたときに反映されます。",
   "cpg.tweak.saved.ath": "この選手用に保存しました。次にアプリを開いたときに反映されます。",
   "cpg.tweak.reset": "プログラムの日に戻しました。",
+  "cpg.from.kicker": "コーチから · {name}",
+  "cpg.from.next": "次は：{day}（{when}）",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1506,6 +1518,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Salvo para este cliente. O app dele recebe na próxima vez que abrir.",
   "cpg.tweak.saved.ath": "Salvo para este atleta. O app dele recebe na próxima vez que abrir.",
   "cpg.tweak.reset": "O dia do programa voltou.",
+  "cpg.from.kicker": "Do seu treinador · {name}",
+  "cpg.from.next": "A seguir: {day}, {when}",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1702,6 +1716,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "이 고객용으로 저장했어요. 다음에 앱을 열 때 반영됩니다.",
   "cpg.tweak.saved.ath": "이 선수용으로 저장했어요. 다음에 앱을 열 때 반영됩니다.",
   "cpg.tweak.reset": "프로그램의 날로 돌아갔어요.",
+  "cpg.from.kicker": "코치가 보냄 · {name}",
+  "cpg.from.next": "다음: {day}, {when}",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1912,6 +1928,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Bu danışan için kaydedildi. Uygulaması bir sonraki açılışta alır.",
   "cpg.tweak.saved.ath": "Bu sporcu için kaydedildi. Uygulaması bir sonraki açılışta alır.",
   "cpg.tweak.reset": "Programdaki gün geri geldi.",
+  "cpg.from.kicker": "Koçundan · {name}",
+  "cpg.from.next": "Sıradaki: {day}, {when}",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -2181,4 +2199,6 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.tweak.saved": "Zapisano dla tego klienta. Jego aplikacja pobierze to przy następnym otwarciu.",
   "cpg.tweak.saved.ath": "Zapisano dla tego zawodnika. Jego aplikacja pobierze to przy następnym otwarciu.",
   "cpg.tweak.reset": "Wrócił dzień z programu.",
+  "cpg.from.kicker": "Od twojego trenera · {name}",
+  "cpg.from.next": "Następnie: {day}, {when}",
 };

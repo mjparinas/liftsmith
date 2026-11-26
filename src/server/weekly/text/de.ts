@@ -1093,6 +1093,7 @@ export const emails: Record<string, Words> = {
       "Athleten sehen Programme, Athleten und Einrichtung nicht mehr. Mein Team zeigt nur, was sie brauchen.",
       "Der Team-Chat ist für das ganze Team und dich. Du kannst jede Nachricht löschen, Athleten erscheinen mit Vornamen.",
       "Zugewiesene Programme stehen mit Folgen auf Mein Team, und die Wochentafel zeigt, wer trainiert hat.",
+      "Wer einem Programm folgt, sieht es auf Heute mit dem, was als Nächstes kommt, und den Monat in Mein Team.",
     ],
     dyk: "Team-Links funktionieren jetzt auch, wenn sich ein Athlet erst nach dem Öffnen anmeldet, also fehlt niemand im Kader.",
   },

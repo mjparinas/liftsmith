@@ -575,6 +575,10 @@ export const pl: FeaturesText = {
       body: "Zmień dzień w programie trenera tylko dla jednego klienta, np. ćwiczenie wymienione z powodu kontuzji. Dzień jest oznaczony jako zmieniony dla tej osoby, a jedno dotknięcie przywraca dzień z programu. Zmiany w programie nadal trafiają do wszystkich i do każdego dnia, którego nie zmieniłeś, a aplikacja każdej osoby pobiera je sama.",
       proPart: "Bycie klientem jest bezpłatne; prowadzenie klientów jest w Pro.",
     },
+    "coach-program-today": {
+      name: "Od trenera na ekranie Dziś",
+      body: "Kto realizuje program trenera, widzi go na ekranie Dziś: od kogo jest, dzisiejszy dzień, tydzień i fazę oraz to, co następne, z dniem. Zawodnik drużyny szkolnej widzi też miesiąc w Mojej drużynie, z dniami zrobionymi, pominiętymi i nadchodzącymi.",
+    },
     "coach-calendar": {
       name: "Kalendarz treningów",
       body: "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",

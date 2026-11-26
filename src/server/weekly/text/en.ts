@@ -1109,6 +1109,7 @@ export const emails: Record<string, Words> = {
       "Athletes no longer see Programs, Athletes or Setup. My team shows them only what they need.",
       "Team chat is for the whole team and you. You can delete any message, and athletes show by first name.",
       "Assigned programs sit on My team with Follow, and the week board shows who has trained.",
+      "Athletes following a program see it on Today with what's up next, and their month sits on My team.",
     ],
     dyk: "Team links now work when an athlete signs in after opening them, so nobody is left off the roster.",
   },

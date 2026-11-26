@@ -1092,6 +1092,7 @@ export const emails: Record<string, Words> = {
       "Los atletas ya no ven Programas, Atletas ni Configuración. Mi equipo les muestra solo lo que necesitan.",
       "El chat del equipo es para todo el equipo y para ti. Puedes borrar cualquier mensaje, y los atletas aparecen por su nombre.",
       "Los programas asignados están en Mi equipo con Seguir, y el tablero semanal muestra quién ha entrenado.",
+      "Los deportistas que siguen un programa lo ven en Hoy con lo siguiente, y su mes está en Mi equipo.",
     ],
     dyk: "Los enlaces del equipo ahora funcionan aunque el atleta inicie sesión después de abrirlos, así nadie se queda fuera de la lista.",
   },

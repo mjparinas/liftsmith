@@ -1093,6 +1093,7 @@ export const emails: Record<string, Words> = {
       "Gli atleti non vedono più Programmi, Atleti o Configurazione. La mia squadra mostra solo ciò che serve.",
       "La chat di squadra è per tutta la squadra e per te. Puoi eliminare qualsiasi messaggio, e gli atleti compaiono con il nome.",
       "I programmi assegnati sono in La mia squadra con Segui, e la bacheca della settimana mostra chi si è allenato.",
+      "Gli atleti che seguono un programma lo vedono su Oggi con il prossimo giorno, e il loro mese è in La mia squadra.",
     ],
     dyk: "I link della squadra ora funzionano anche se l'atleta accede dopo averli aperti, quindi nessuno resta fuori dalla rosa.",
   },

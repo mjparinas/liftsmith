@@ -747,21 +747,23 @@ export function Today() {
               )}
             </>
           ) : (
-            <div className="card mt-6">
+            <>
               {!active && <CoachProgramChip />}
-              <EmptyState
-                icon="moon"
-                mascot="sleepy"
-                tint="var(--color-cyan)"
-                title={t("td.restDay")}
-                body={t("td.restBody")}
-                action={
-                  <Button kind="ghost" icon="stretch" onClick={() => go("stretch", "rest")}>
-                    {t("str.restCard")}
-                  </Button>
-                }
-              />
-            </div>
+              <div className="card mt-6">
+                <EmptyState
+                  icon="moon"
+                  mascot="sleepy"
+                  tint="var(--color-cyan)"
+                  title={t("td.restDay")}
+                  body={t("td.restBody")}
+                  action={
+                    <Button kind="ghost" icon="stretch" onClick={() => go("stretch", "rest")}>
+                      {t("str.restCard")}
+                    </Button>
+                  }
+                />
+              </div>
+            </>
           )}
         </div>
         <div className="desk:order-3 desk:col-span-2">

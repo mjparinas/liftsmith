@@ -1097,6 +1097,7 @@ export const emails: Record<string, Words> = {
       "Les athlètes ne voient plus Programmes, Athlètes ni Configuration. Mon équipe ne montre que l'essentiel.",
       "Le chat d'équipe réunit toute l'équipe et vous. Vous pouvez supprimer n'importe quel message, et les athlètes apparaissent par leur prénom.",
       "Les programmes assignés sont sur Mon équipe avec Suivre, et le tableau de la semaine montre qui s'est entraîné.",
+      "Les athlètes qui suivent un programme le voient sur Aujourd'hui avec la suite, et leur mois est dans Mon équipe.",
     ],
     dyk: "Les liens d'équipe fonctionnent maintenant même si l'athlète se connecte après les avoir ouverts, donc personne ne manque à la liste.",
   },

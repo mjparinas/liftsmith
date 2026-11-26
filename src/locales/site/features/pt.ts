@@ -575,6 +575,10 @@ export const pt: FeaturesText = {
       body: "Mude um dia do programa de um treinador só para um cliente, por exemplo um exercício trocado por causa de uma lesão. O dia fica marcado como mudado para essa pessoa e um toque traz de volta o dia do programa. As mudanças no programa continuam chegando a todos e a cada dia que você não mudou, e o app de cada pessoa recebe sozinho.",
       proPart: "Ser cliente é grátis; treinar clientes é Pro.",
     },
+    "coach-program-today": {
+      name: "Do seu treinador, em Hoje",
+      body: "Quem segue o programa de um treinador o vê em Hoje: de quem é, o dia de hoje, a semana e a fase, e o próximo com o seu dia. Um atleta de um time escolar também vê o mês em Meu time, com os dias feitos, perdidos e que vêm aí.",
+    },
     "coach-calendar": {
       name: "Calendário de treinos",
       body: "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",

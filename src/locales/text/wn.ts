@@ -146,6 +146,9 @@ export const en = {
   "wn.c.programTweaks.title": "One client's own copy of a program",
   "wn.c.programTweaks.body":
     "Coaches can change a day for one client, marked and easy to undo, while program edits still reach everyone. Your app picks up your coach's changes on its own.",
+  "wn.c.programAthlete.title": "From your coach on Today",
+  "wn.c.programAthlete.body":
+    "Following a coach's program? Today says who it's from, the week and phase, and what's up next. School athletes also get their month on My team.",
 } as const;
 
 type Key = keyof typeof en;
@@ -303,6 +306,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "La copia propia de un cliente",
   "wn.c.programTweaks.body":
     "Los entrenadores pueden cambiar un día para un cliente, marcado y fácil de deshacer, mientras lo que cambian en el programa sigue llegando a todos. Tu app recoge sola los cambios de tu entrenador.",
+  "wn.c.programAthlete.title": "De tu entrenador, en Hoy",
+  "wn.c.programAthlete.body":
+    "¿Sigues el programa de un entrenador? Hoy dice de quién es, la semana y la fase, y lo siguiente. Los deportistas escolares también ven su mes en Mi equipo.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -462,6 +468,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "La copie d'un programme pour un client",
   "wn.c.programTweaks.body":
     "Les coachs peuvent modifier un jour pour un client, marqué et facile à annuler, tandis que les modifications du programme atteignent toujours tout le monde. Votre app récupère seule les changements de votre coach.",
+  "wn.c.programAthlete.title": "De ton coach, sur Aujourd'hui",
+  "wn.c.programAthlete.body":
+    "Tu suis le programme d'un coach ? Aujourd'hui dit de qui il vient, la semaine et la phase, et la suite. Les athlètes scolaires voient aussi leur mois dans Mon équipe.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -617,6 +626,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "Eine eigene Programmkopie pro Person",
   "wn.c.programTweaks.body":
     "Coaches können einen Tag für eine Person ändern, markiert und leicht rückgängig zu machen, während Änderungen am Programm weiter alle erreichen. Deine App übernimmt die Änderungen deines Coaches von selbst.",
+  "wn.c.programAthlete.title": "Von deinem Coach auf Heute",
+  "wn.c.programAthlete.body":
+    "Du folgst dem Programm eines Coaches? Heute zeigt, von wem es ist, Woche und Phase und was als Nächstes kommt. Schulsportler sehen ihren Monat auch in Mein Team.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -773,6 +785,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "La copia del programma per un cliente",
   "wn.c.programTweaks.body":
     "I coach possono cambiare un giorno per un cliente, segnato e facile da annullare, mentre le modifiche al programma arrivano comunque a tutti. La tua app riceve da sola i cambiamenti del tuo coach.",
+  "wn.c.programAthlete.title": "Dal tuo coach, su Oggi",
+  "wn.c.programAthlete.body":
+    "Segui il programma di un coach? Oggi dice da chi arriva, la settimana e la fase, e il prossimo giorno. Gli atleti scolastici vedono anche il loro mese in La mia squadra.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -918,6 +933,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "クライアントごとのプログラム",
   "wn.c.programTweaks.body":
     "コーチは1人のクライアントだけ日を変更でき、変更は表示されて簡単に元に戻せます。プログラムへの編集は全員に届き、アプリがコーチの変更を自動で受け取ります。",
+  "wn.c.programAthlete.title": "今日の画面に「コーチから」",
+  "wn.c.programAthlete.body":
+    "コーチのプログラムに取り組んでいますか？今日の画面に、誰からか、週とフェーズ、次のメニューが表示されます。学校の選手は「マイチーム」で1か月の予定も見られます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1069,6 +1087,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "A cópia do programa de cada cliente",
   "wn.c.programTweaks.body":
     "Treinadores podem mudar um dia para um cliente, marcado e fácil de desfazer, enquanto as mudanças no programa continuam chegando a todos. Seu app recebe sozinho as mudanças do seu treinador.",
+  "wn.c.programAthlete.title": "Do seu treinador, em Hoje",
+  "wn.c.programAthlete.body":
+    "Segue o programa de um treinador? Hoje mostra de quem é, a semana e a fase, e o próximo dia. Atletas escolares também veem o mês em Meu time.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1208,6 +1229,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "고객별 프로그램 사본",
   "wn.c.programTweaks.body":
     "코치는 고객 한 명을 위해 하루를 바꿀 수 있고, 변경은 표시되며 쉽게 되돌릴 수 있어요. 프로그램 수정은 모두에게 반영되고, 앱이 코치의 변경을 알아서 받아요.",
+  "wn.c.programAthlete.title": "오늘 화면에 코치가 보낸 프로그램",
+  "wn.c.programAthlete.body":
+    "코치의 프로그램을 따르고 있나요? 오늘 화면에 누가 보냈는지, 주차와 단계, 다음 운동이 보여요. 학교 선수는 마이 팀에서 한 달도 볼 수 있어요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1358,6 +1382,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "Własna kopia programu dla klienta",
   "wn.c.programTweaks.body":
     "Trenerzy mogą zmienić dzień dla jednego klienta, oznaczony i łatwy do cofnięcia, a zmiany w programie nadal trafiają do wszystkich. Twoja aplikacja sama pobiera zmiany od trenera.",
+  "wn.c.programAthlete.title": "Od trenera na ekranie Dziś",
+  "wn.c.programAthlete.body":
+    "Realizujesz program trenera? Dziś pokazuje, od kogo jest, tydzień i fazę oraz to, co następne. Zawodnicy szkolni widzą też swój miesiąc w Mojej drużynie.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1510,4 +1537,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.programTweaks.title": "Danışana özel program kopyası",
   "wn.c.programTweaks.body":
     "Koçlar bir danışan için bir günü değiştirebilir; değişiklik işaretlenir ve kolayca geri alınır, programdaki düzenlemeler ise herkese ulaşır. Uygulaman koçunun değişikliklerini kendiliğinden alır.",
+  "wn.c.programAthlete.title": "Bugün ekranında koçundan",
+  "wn.c.programAthlete.body":
+    "Bir koçun programını mı takip ediyorsun? Bugün ekranı kimden geldiğini, haftayı ve aşamayı, sıradakini gösterir. Okul sporcuları ayı Takımım'da da görür.",
 };

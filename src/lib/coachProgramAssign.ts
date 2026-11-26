@@ -211,3 +211,18 @@ export function coachProgramWeek(src: Extract<PlanSource, { kind: "coachProgram"
   const ms = Math.max(0, now - src.startedAt);
   return Math.min(src.weeks, Math.floor(ms / (7 * 86_400_000)) + 1);
 }
+
+/**
+ * The next day of a standing coach program after today (athlete views, stage 4): its day index and local noon of that
+ * day, looking up to two weeks ahead. Null when the program has no more days before it ends.
+ */
+export function coachProgramNext(src: CoachSource, now = Date.now()): { dayIndex: number; at: number } | null {
+  const today = new Date(now);
+  for (let ahead = 1; ahead <= 14; ahead++) {
+    const at = new Date(today.getFullYear(), today.getMonth(), today.getDate() + ahead, 12).getTime();
+    if (at >= coachProgramEndAt(src)) return null;
+    const dayIndex = coachProgramDayIndex(src, at);
+    if (dayIndex !== null) return { dayIndex, at };
+  }
+  return null;
+}
