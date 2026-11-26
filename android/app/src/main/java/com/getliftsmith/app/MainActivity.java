@@ -14,6 +14,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(WorkoutSessionPlugin.class);
         registerPlugin(CalendarPlugin.class);
         registerPlugin(InstallInfoPlugin.class);
+        registerPlugin(SiteLinksPlugin.class);
         registerPlugin(VoiceCoachPlugin.class);
         registerPlugin(AppIconPlugin.class);
         registerPlugin(AccountSignInPlugin.class);

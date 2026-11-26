@@ -191,7 +191,12 @@ export async function findNearby(
 /** One real gym by id (its page in the app, and the QR code's target). */
 export async function fetchPlace(id: string): Promise<Place | "gone" | "offline"> {
   try {
-    return (await api<{ place: Place }>(`/api/gyms/?place=${encodeURIComponent(id)}`)).place;
+    // "<city>~<gym>[~qr]" is a website address that opened the app (src/lib/appLinks.ts); anything else is the gym's id.
+    const [city, gym, qr] = id.split("~");
+    const q = gym
+      ? `city=${encodeURIComponent(city!)}&gym=${encodeURIComponent(gym)}${qr === "qr" ? "&qr=1" : ""}`
+      : `place=${encodeURIComponent(id)}`;
+    return (await api<{ place: Place }>(`/api/gyms/?${q}`)).place;
   } catch (e) {
     return e instanceof AuthError && e.status === 404 ? "gone" : "offline";
   }
