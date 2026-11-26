@@ -175,11 +175,7 @@ final class WatchRun {
     /** "How did it feel?": 1 too easy, 0 about right, -1 too hard, for the exercise just finished. */
     void rate(int v) {
         if (ask < 0 || v < -1 || v > 1) return;
-        try {
-            rates.put(new JSONArray().put(ask).put(v));
-        } catch (JSONException ignored) {
-            // Plain values.
-        }
+        rates.put(new JSONArray().put(ask).put(v));
         ask = -1;
     }
 
