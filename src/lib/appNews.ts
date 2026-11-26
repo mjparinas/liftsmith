@@ -46,10 +46,13 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.21.0",
+    version: "0.22.0",
     day: "2026-11-27",
-    headline: "Coach programs run in phases with a one-tap deload, and coaches can set reps",
-    changes: [{ id: "programPhases", kind: "new", icon: "layers" }],
+    headline: "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client",
+    changes: [
+      { id: "programPhases", kind: "new", icon: "layers" },
+      { id: "programTweaks", kind: "new", icon: "people" },
+    ],
   },
   {
     version: "0.20.1",

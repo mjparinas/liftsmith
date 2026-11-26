@@ -81,6 +81,7 @@ import {
   endProgramAssign,
   endProgramAssigns,
   programCalendar,
+  tweakAssignDay,
   type AssignScope,
 } from "@/server/coachProgramAssign";
 import {
@@ -227,6 +228,7 @@ export async function POST(req: Request) {
         date?: unknown;
         access?: unknown;
         weekdays?: unknown;
+        day?: unknown;
         teamId?: unknown;
       }
     | undefined;
@@ -402,6 +404,10 @@ export async function POST(req: Request) {
     }
     case "acceptProgram": {
       const r = await acceptProgramAssign(s.accountId, body.id);
+      return "error" in r ? reply(req, r.error === "gone" ? 404 : 400, r) : reply(req, 200, { assign: r });
+    }
+    case "tweakProgramDay": {
+      const r = await tweakAssignDay(s.accountId, body.id, body.day, body.code ?? null, body.name);
       return "error" in r ? reply(req, r.error === "gone" ? 404 : 400, r) : reply(req, 200, { assign: r });
     }
     case "endProgram": {

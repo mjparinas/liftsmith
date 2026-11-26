@@ -1078,7 +1078,7 @@ export const emails: Record<string, Words> = {
       "Program takvimi Yapıldı ve Henüz değil’i gösterir. Okul takımları: yalnızca adlar, asla ağırlık yok.",
       "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür.",
     ],
-    dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz.",
+    dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz. Bir danışanın raporundan yalnızca onun için bir günü de değiştirebilirsin; programdaki değişiklikler diğer günlere yine ulaşır.",
   },
   "my-team": {
     title: "Sporcularınıza Takımım paneli geldi",

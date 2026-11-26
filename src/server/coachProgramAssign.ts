@@ -32,6 +32,10 @@ export interface ProgramAssign {
   days: AssignDay[];
   /** The program's phases at assign time, when it has them (weekdays parallel to days). */
   phases?: ProgramPhase[];
+  /** Days the coach changed for this client only (indexes into days); the rest follow the program. */
+  tweaked?: number[];
+  /** Last change from the coach (a program edit reaching it, or a tweak), so a following app can catch up. */
+  updatedAt: number;
   status: AssignStatus;
   createdAt: number;
   acceptedAt: number | null;
@@ -40,6 +44,12 @@ export interface ProgramAssign {
 }
 
 export type AssignError = "notClient" | "bad" | "gone" | "emptyDays" | "noTargets";
+
+/** A day changed for one client: its routine code (and name) instead of the program's. */
+export interface DayTweak {
+  name: string;
+  code: string;
+}
 
 export type AssignScope = { type: "clients"; ids: string[] } | { type: "allClients" } | { type: "team"; teamId: string };
 
@@ -73,6 +83,9 @@ interface Row {
   weeks: number;
   days: string;
   phases?: string | null;
+  tweaks?: string | null;
+  own_weekdays?: number | null;
+  updated_at?: number | null;
   status: string;
   created_at: number;
   accepted_at: number | null;
@@ -99,6 +112,30 @@ function phasesOf(raw: unknown, dayCount: number): ProgramPhase[] | null {
     return null;
   }
 }
+
+/** Stored per-client tweaks, by day index, for `dayCount` days; anything out of range or unreadable is dropped. */
+export function tweaksOf(raw: unknown, dayCount: number): Map<number, DayTweak> {
+  const out = new Map<number, DayTweak>();
+  if (!raw) return out;
+  let obj: unknown;
+  try {
+    obj = JSON.parse(String(raw));
+  } catch {
+    return out;
+  }
+  if (!obj || typeof obj !== "object") return out;
+  for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+    const i = Number(k);
+    if (!Number.isInteger(i) || i < 0 || i >= dayCount || !v || typeof v !== "object") continue;
+    const t = v as { name?: unknown; code?: unknown };
+    if (!isRoutineCode(t.code) || exerciseIdsFromCode(t.code).length === 0) continue;
+    const name = typeof t.name === "string" ? t.name.slice(0, 40) : "";
+    out.set(i, { name, code: t.code });
+  }
+  return out;
+}
+
+const tweaksJson = (m: Map<number, DayTweak>) => (m.size ? JSON.stringify(Object.fromEntries([...m].sort((a, b) => a[0] - b[0]))) : "");
 
 const s = (x: unknown) => String(x ?? "");
 const n = (x: unknown) => Number(x ?? 0);
@@ -154,6 +191,11 @@ function shape(r: Row): ProgramAssign {
     days = [];
   }
   const phases = phasesOf(r.phases, days.length);
+  const tweaks = tweaksOf(r.tweaks, days.length);
+  days = days.map((d, i) => {
+    const t = tweaks.get(i);
+    return t ? { ...d, code: t.code, name: t.name || d.name } : d;
+  });
   const status = (ASSIGN_STATUSES as readonly string[]).includes(String(r.status)) ? (String(r.status) as AssignStatus) : "ended";
   return {
     id: s(r.id),
@@ -165,6 +207,8 @@ function shape(r: Row): ProgramAssign {
     weeks: n(r.weeks),
     days,
     ...(phases ? { phases } : {}),
+    ...(tweaks.size ? { tweaked: [...tweaks.keys()].sort((a, b) => a - b) } : {}),
+    updatedAt: n(r.updated_at) || n(r.created_at),
     status,
     createdAt: n(r.created_at),
     acceptedAt: r.accepted_at == null ? null : n(r.accepted_at),
@@ -241,6 +285,9 @@ export async function assignProgram(
   const phases = phasesOf(prog.phases, rawCount);
   const days = parseAssignDays(rawDays, phases ? undefined : weekdaysByIndex, !!phases);
   if (!days?.length) return { error: "emptyDays" };
+  // Weekdays picked for this assign rather than the program's: kept when the program changes later.
+  const base = parseAssignDays(rawDays, undefined, !!phases);
+  const ownWeekdays = !phases && !!base && days.some((d, i) => d.weekdays.join() !== (base[i]?.weekdays ?? []).join()) ? 1 : 0;
   const phasesJson = phases ? JSON.stringify(phases) : "";
   const clients = await resolveClients(coachId, scope);
   if (!clients.length) return { error: "noTargets" };
@@ -261,9 +308,10 @@ export async function assignProgram(
     const id = randomBytes(9).toString("base64url");
     await run(
       `INSERT INTO coach_program_assigns
-       (id, coach_id, client_id, program_id, team_id, title, weeks, days, phases, status, created_at, accepted_at, started_at, ended_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NULL, NULL, NULL)`,
-      [id, coachId, clientId, s(prog.id), teamId, title, weeks, daysJson, phasesJson, now],
+       (id, coach_id, client_id, program_id, team_id, title, weeks, days, phases, tweaks, own_weekdays, updated_at, status, created_at,
+        accepted_at, started_at, ended_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, ?, 'pending', ?, NULL, NULL, NULL)`,
+      [id, coachId, clientId, s(prog.id), teamId, title, weeks, daysJson, phasesJson, ownWeekdays, now, now],
     );
     // Free listed programs may grant ownership so "From coaches" stays consistent; paid never does (teens can't buy).
     if (n(prog.price) === 0) {
@@ -285,6 +333,7 @@ export async function assignProgram(
         weeks,
         days: daysJson,
         phases: phasesJson,
+        updated_at: now,
         status: "pending",
         created_at: now,
         accepted_at: null,
@@ -294,6 +343,109 @@ export async function assignProgram(
     );
   }
   return { assigned, skipped };
+}
+
+/**
+ * A program edit reaches everyone on it (Melvin, 2026-11-26): each open assign takes the program's new days, phases,
+ * weeks and title, keeps the weekdays picked for it when the days still line up, and keeps the days the coach changed
+ * for that client (a day that no longer exists drops its change). Returns how many assigns changed.
+ */
+export async function syncProgramAssigns(coachId: string, programId: string, now = Date.now()): Promise<number> {
+  const [prog] = await query<ProgramRow>("SELECT id, coach_id, title, weeks, days, phases, price FROM coach_programs WHERE id = ?", [
+    programId,
+  ]);
+  if (!prog || s(prog.coach_id) !== coachId) return 0;
+  let rawDays: unknown;
+  try {
+    rawDays = JSON.parse(String(prog.days));
+  } catch {
+    return 0;
+  }
+  const rawCount = Array.isArray(rawDays) ? rawDays.length : 0;
+  const phases = phasesOf(prog.phases, rawCount);
+  const base = parseAssignDays(rawDays, undefined, !!phases);
+  if (!base?.length) return 0;
+  const weeks = Math.min(16, Math.max(1, phases ? phaseWeeks(phases) : n(prog.weeks)));
+  const title = s(prog.title).slice(0, 60);
+  const rows = await query<Row>(
+    "SELECT * FROM coach_program_assigns WHERE coach_id = ? AND program_id = ? AND status IN ('pending', 'active')",
+    [coachId, programId],
+  );
+  let changed = 0;
+  for (const r of rows) {
+    let old: AssignDay[] = [];
+    try {
+      old = parseAssignDays(JSON.parse(String(r.days)), undefined, !!r.phases) ?? [];
+    } catch {
+      old = [];
+    }
+    const keep = !phases && n(r.own_weekdays) === 1 && old.length === base.length;
+    const days = keep
+      ? (parseAssignDays(
+          rawDays,
+          old.map((d) => d.weekdays),
+          false,
+        ) ?? base)
+      : base;
+    const tweaks = tweaksOf(r.tweaks, days.length);
+    const daysJson = JSON.stringify(days);
+    const phasesJson = phases ? JSON.stringify(phases) : "";
+    const tJson = tweaksJson(tweaks);
+    if (daysJson === s(r.days) && phasesJson === s(r.phases) && tJson === s(r.tweaks) && weeks === n(r.weeks) && title === s(r.title))
+      continue;
+    await run("UPDATE coach_program_assigns SET days = ?, phases = ?, tweaks = ?, weeks = ?, title = ?, updated_at = ? WHERE id = ?", [
+      daysJson,
+      phasesJson,
+      tJson,
+      weeks,
+      title,
+      now,
+      s(r.id),
+    ]);
+    changed++;
+  }
+  return changed;
+}
+
+/**
+ * The coach changes one day for this client only (an exercise swapped for an injury, say), or with a null code puts
+ * the program's day back. The change stays through later program edits until it's reset.
+ */
+export async function tweakAssignDay(
+  coachId: string,
+  assignId: unknown,
+  dayIndex: unknown,
+  code: unknown,
+  name: unknown,
+  now = Date.now(),
+): Promise<ProgramAssign | { error: AssignError }> {
+  if (typeof assignId !== "string" || typeof dayIndex !== "number" || !Number.isInteger(dayIndex)) return { error: "bad" };
+  const [row] = await query<Row>("SELECT * FROM coach_program_assigns WHERE id = ? AND coach_id = ?", [assignId, coachId]);
+  if (!row || s(row.status) === "ended") return { error: "gone" };
+  let count = 0;
+  try {
+    const raw: unknown = JSON.parse(String(row.days));
+    count = Array.isArray(raw) ? raw.length : 0;
+  } catch {
+    count = 0;
+  }
+  if (dayIndex < 0 || dayIndex >= count) return { error: "bad" };
+  const tweaks = tweaksOf(row.tweaks, count);
+  if (code === null) tweaks.delete(dayIndex);
+  else {
+    if (!isRoutineCode(code) || exerciseIdsFromCode(code).length === 0) return { error: "bad" };
+    const label =
+      typeof name === "string"
+        ? name
+            .replace(/[\u0000-\u001f\u007f]/g, " ")
+            .trim()
+            .slice(0, 40)
+        : "";
+    tweaks.set(dayIndex, { name: label, code });
+  }
+  const tJson = tweaksJson(tweaks);
+  await run("UPDATE coach_program_assigns SET tweaks = ?, updated_at = ? WHERE id = ?", [tJson, now, s(row.id)]);
+  return shape({ ...row, tweaks: tJson, updated_at: now });
 }
 
 /** The client accepts: standing plan starts. */

@@ -570,6 +570,11 @@ export const pt: FeaturesText = {
       body: "O programa de um treinador pode seguir em fases, cada uma repetindo a própria semana: Construção, uma semana de Deload com menos séries e cargas mais leves, e um Pico com menos séries para chegar descansado. Adicione um deload com um toque, veja cada fase no mês e defina as repetições de um exercício (por exemplo, de 8 a 12) ou deixe no Auto para que o histórico de cada pessoa escolha. Quem segue vê em que fase e semana está abaixo do plano de Hoje.",
       proPart: "Seguir um programa é grátis; criar um faz parte do coaching, que é Pro.",
     },
+    "client-program-copy": {
+      name: "Ajuste um programa para um cliente",
+      body: "Mude um dia do programa de um treinador só para um cliente, por exemplo um exercício trocado por causa de uma lesão. O dia fica marcado como mudado para essa pessoa e um toque traz de volta o dia do programa. As mudanças no programa continuam chegando a todos e a cada dia que você não mudou, e o app de cada pessoa recebe sozinho.",
+      proPart: "Ser cliente é grátis; treinar clientes é Pro.",
+    },
     "coach-calendar": {
       name: "Calendário de treinos",
       body: "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",

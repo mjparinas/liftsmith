@@ -1086,7 +1086,7 @@ export const emails: Record<string, Words> = {
       "Le calendrier du programme montre Fait et Pas encore. Les équipes scolaires : prénoms seulement, jamais de poids.",
       "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui.",
     ],
-    dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client.",
+    dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client. Vous pouvez aussi modifier un jour pour un client depuis son rapport, et les modifications du programme atteignent toujours les autres jours.",
   },
   "my-team": {
     title: "Vos athlètes ont un tableau de bord Mon équipe",

@@ -570,6 +570,11 @@ export const tr: FeaturesText = {
       body: "Bir koçun programı evreler halinde ilerleyebilir; her evre kendi haftasını tekrarlar: Gelişim, daha az set ve daha hafif ağırlıklarla bir Deload haftası ve dinç kalmak için daha az setli bir Zirve. Tek dokunuşla deload ekle, her evreyi ayda gör ve bir hareket için tekrarları belirle (örneğin 8-12) ya da Otomatik bırak, her kişinin kendi geçmişi seçsin. Programı izleyenler Bugün planının altında hangi evrede ve haftada olduklarını görür.",
       proPart: "Bir programı izlemek ücretsizdir; program oluşturmak Pro olan koçluğun parçasıdır.",
     },
+    "client-program-copy": {
+      name: "Programı tek bir danışana göre ayarla",
+      body: "Bir koçun programındaki bir günü yalnızca bir danışan için değiştir, örneğin sakatlık nedeniyle değiştirilen bir hareket. O gün o kişi için değişti olarak işaretlenir ve tek dokunuş programdaki günü geri getirir. Programda yaptığın değişiklikler herkese ve değiştirmediğin her güne yine ulaşır; herkesin uygulaması bunu kendiliğinden alır.",
+      proPart: "Danışan olmak ücretsizdir; danışan çalıştırmak Pro'dur.",
+    },
     "coach-calendar": {
       name: "Antrenman takvimi",
       body: "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

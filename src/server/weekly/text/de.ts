@@ -1082,7 +1082,7 @@ export const emails: Record<string, Words> = {
       "Der Programmkalender zeigt Erledigt und Noch nicht. Schulteams: nur Vornamen, nie Gewichte.",
       "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute.",
     ],
-    dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten.",
+    dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten. Du kannst auch einen Tag für eine Person in ihrem Bericht ändern, und Änderungen am Programm erreichen weiter alle anderen Tage.",
   },
   "my-team": {
     title: "Deine Athleten bekommen das Dashboard Mein Team",

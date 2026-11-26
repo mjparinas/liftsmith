@@ -1083,7 +1083,7 @@ export const emails: Record<string, Words> = {
       "O calendário do programa mostra Feito e Ainda não. Equipas escolares: só primeiros nomes, nunca pesos.",
       "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje.",
     ],
-    dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente.",
+    dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente. Você também pode mudar um dia para um cliente no relatório dele, e as mudanças no programa continuam chegando aos outros dias.",
   },
   "my-team": {
     title: "Seus atletas ganham o painel Meu time",

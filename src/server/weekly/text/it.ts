@@ -1082,7 +1082,7 @@ export const emails: Record<string, Words> = {
       "Il calendario del programma mostra Fatto e Non ancora. Squadre scolastiche: solo nomi, mai i pesi.",
       "Assegna allenamenti o giorni di riposo sul calendario mensile. Gli atleti vedono il programma del giorno in Oggi.",
     ],
-    dyk: "Puoi assegnare allo stesso modo dalla scheda squadra o dal report di un cliente.",
+    dyk: "Puoi assegnare allo stesso modo dalla scheda squadra o dal report di un cliente. Puoi anche cambiare un giorno per un cliente dal suo report, e le modifiche al programma arrivano comunque agli altri giorni.",
   },
   "my-team": {
     title: "I tuoi atleti hanno la dashboard La mia squadra",

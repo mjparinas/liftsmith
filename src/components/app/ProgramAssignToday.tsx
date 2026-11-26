@@ -1,12 +1,13 @@
 "use client";
 
 // Today cards for a season program a coach assigned (coachProgramAssign.ts): Follow once, or finished / taken back.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { WEEKDAYS } from "@/lib/calendar";
 import {
   acceptProgramAssign,
+  catchUpAssign,
   coachProgramDayIndex,
   coachProgramEndAt,
   coachProgramPhase,
@@ -97,10 +98,19 @@ export function ProgramAssignToday() {
 
 /** Chip / line under Today's plan while following a season program. */
 export function CoachProgramChip() {
-  const { profile } = useApp();
+  const { profile, setProfile, replan } = useApp();
   const [cal, setCal] = useState(false);
   const now = useNow(60_000);
   const src = profile.planSource;
+  const assigns = useCoachNotes((s) => s.programAssigns);
+  // The coach changed the program, or a day just for this lifter: bring the saved days up to date once.
+  const followed = src?.kind === "coachProgram" ? assigns.find((a) => a.id === src.assignId) : undefined;
+  useEffect(() => {
+    const next = catchUpAssign(profile.routines ?? [], profile.planSource, followed);
+    if (!next) return;
+    setProfile({ routines: next.routines.slice(0, MAX_ROUTINES), planSource: next.planSource });
+    replan();
+  }, [followed, profile.routines, profile.planSource, setProfile, replan]);
   if (src?.kind !== "coachProgram") return null;
   if (now >= coachProgramEndAt(src)) {
     return (

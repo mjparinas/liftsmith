@@ -19,6 +19,7 @@ import type { ProgramPhase } from "@/lib/types";
 
 import { isAccountId, isRoutineCode, nameOf, roleOf, teenProfile, type Role } from "./coach";
 import { accountRow, call, coachOfStripe, feeFor, minorUnits, payAccount, type ConnectEvent, type PayConfig } from "./coachPay";
+import { syncProgramAssigns } from "./coachProgramAssign";
 import { batch, query, run } from "./db";
 import { checkText, tidy } from "./moderation";
 import { notifyCoach } from "./push";
@@ -270,6 +271,8 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
       now,
     ],
   );
+  // Everyone on this program gets the change, apart from the days changed for them alone (stage 3, 2026-11-26).
+  await syncProgramAssigns(coachId, id, now);
   return (await programFor(id, coachId))!;
 }
 

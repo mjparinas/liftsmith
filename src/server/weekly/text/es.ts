@@ -1081,7 +1081,7 @@ export const emails: Record<string, Words> = {
       "Abre el calendario del programa para ver Hecho y Aún no cada día. En equipos escolares solo nombres de pila, nunca pesos.",
       "Asigna entrenamientos o días de descanso en un calendario mensual. Los atletas ven lo programado en Hoy.",
     ],
-    dyk: "Puedes asignar igual desde la ficha del equipo escolar o el informe de un cliente.",
+    dyk: "Puedes asignar igual desde la ficha del equipo escolar o el informe de un cliente. También puedes cambiar un día para un cliente desde su informe, y lo que cambies en el programa sigue llegando a los demás días.",
   },
   "my-team": {
     title: "Tus atletas tienen el panel Mi equipo",
