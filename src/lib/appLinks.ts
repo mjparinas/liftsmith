@@ -1,5 +1,6 @@
 "use client";
 
+import { isAdminLink, openAdmin } from "./adminLink";
 import { inviteAppPath, inviteOfUrl, keepInviteFrom } from "./invite";
 import { APP_PATH } from "./site";
 import { SITE_LANGS } from "./siteLang";
@@ -38,6 +39,10 @@ export const APP_LINK_PATHS: { path?: string; prefix?: string }[] = [
   { prefix: "/gym-chains/" },
   { prefix: "/routines/" },
   { prefix: "/community/" },
+  // The admin panel and its emailed sign-in link open in the app's browser tab, not a screen (adminLink.ts).
+  { path: "/admin" },
+  { prefix: "/admin/" },
+  { prefix: "/api/admin/login/" },
   ...TRANSLATED.map((x) => ({ prefix: `/${x}/` })),
   ...SITE_LANGS.filter((l) => l !== "en").flatMap((l) => [
     { path: `/${l}` },
@@ -141,6 +146,7 @@ export async function startAppLinks(open: (hash: string) => void): Promise<() =>
   if (!cap?.isNativePlatform?.() || cap.getPlatform?.() !== "android") return () => {};
   const { App } = await import("@capacitor/app");
   const go = (url: string | undefined) => {
+    if (url && isAdminLink(url)) return void openAdmin(url);
     const hash = url ? hashFromLink(url) : null;
     if (!hash || !url) return;
     keepInviteFrom(url);

@@ -133,6 +133,22 @@ describe("accounts", () => {
     expect(r.code).toBe(401);
   });
 
+  it("marks staff accounts, so the app can show Settings › Admin panel (Melvin, 2026-11-26)", async () => {
+    const before = process.env.ADMIN_EMAILS;
+    process.env.ADMIN_EMAILS = "owner@example.com";
+    try {
+      const sign = async (email: string) => {
+        const sent = await startEmail(email, null, NOW);
+        return (await verifyEmail(email, String(sent.body.devCode), "android", NOW)).body.account as { staff: boolean };
+      };
+      expect((await sign("Owner@Example.com")).staff).toBe(true);
+      expect((await sign("lifter@example.com")).staff).toBe(false);
+    } finally {
+      if (before === undefined) delete process.env.ADMIN_EMAILS;
+      else process.env.ADMIN_EMAILS = before;
+    }
+  });
+
   it("email codes work once, expire, and lock after five wrong tries", async () => {
     const code = String((await startEmail("a@b.co", null, NOW)).body.devCode);
     expect((await verifyEmail("a@b.co", code, "web", NOW + 11 * 60_000)).code).toBe(401);

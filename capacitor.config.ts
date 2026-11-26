@@ -4,6 +4,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 export const ANDROID_PLUGINS = [
   "@capacitor-community/bluetooth-le",
   "@capacitor/app",
+  "@capacitor/browser",
   "@capacitor/device",
   "@capacitor/filesystem",
   "@capacitor/geolocation",
