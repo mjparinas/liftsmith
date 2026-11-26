@@ -147,6 +147,9 @@ public class WorkoutStateTest {
         assertEquals(-1, s.ask.values[2]);
         assertEquals("About right", s.ask.answers[1]);
         assertNull(WorkoutState.parse("{\"ask\":{\"ex\":\"x\",\"o\":[\"a\"],\"v\":[1]}}").ask);
+    }
+
+    @Test
     public void machineTakenComesWithItsPickAndWhy() {
         WorkoutState none = WorkoutState.parse("{\"title\":\"Lat pulldown\"}");
         assertEquals("", none.taken);
