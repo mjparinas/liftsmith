@@ -78,6 +78,7 @@ import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
 import { VoiceLog } from "./workout/VoiceLog";
 import { VolumeLog } from "./workout/VolumeLog";
+import { watchAdj, watchAsk } from "./workout/watchAdjust";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
@@ -376,7 +377,7 @@ export function Workout() {
   const ahead = useRef({ key: "", steps: [] as AheadStep[] });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}:${cue ?? ""}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}:${cue ?? ""}:${active.askFeedback ?? ""}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -410,8 +411,24 @@ export function Workout() {
       // The set timer (holds, carries, cardio): the lock screen and the watches count it down on their own clocks.
       timer: timerRun && !resting ? sessionTimer(timerRun) : undefined,
       timerOver: timerRun && !resting ? t("timer.over") : undefined,
+      // The watches change the weight and reps on the wrist, and answer "How did it feel?" (watchAdjust.ts).
+      adj: watchAdj(active, events, profile.unit, gym),
+      ask: watchAsk(active),
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion, timerRun?.startAt, cue]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    active?.index,
+    active?.restUntil,
+    active?.weight,
+    active?.reps,
+    doneSets,
+    warmDone,
+    bpm,
+    watchMotion,
+    timerRun?.startAt,
+    cue,
+    active?.askFeedback,
+  ]);
 
   // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
   // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).

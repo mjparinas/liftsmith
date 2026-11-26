@@ -48,6 +48,9 @@ public class WorkoutSessionPlugin extends Plugin {
             public void onReceive(Context context, Intent intent) {
                 JSObject data = new JSObject();
                 data.put("action", intent.getStringExtra(WorkoutService.EXTRA_ACTION));
+                // What a watch sent with it (its weight and reps, or a rating), as JSON the web app reads (tapData).
+                String extra = intent.getStringExtra(WorkoutService.EXTRA_DATA);
+                if (extra != null) data.put("data", extra);
                 // When it was tapped, so a set is logged at its own time even if the web app is slow to hear it.
                 long at = intent.getLongExtra("at", 0L);
                 if (at > 0) data.put("at", at);
@@ -90,6 +93,8 @@ public class WorkoutSessionPlugin extends Plugin {
             JSObject data = new JSObject();
             data.put("action", tap.optString("action"));
             data.put("at", tap.optLong("at", 0L));
+            String extra = tap.optString("data", "");
+            if (!extra.isEmpty()) data.put("data", extra);
             notifyListeners("action", data, true);
         }
         current = this;
@@ -174,6 +179,9 @@ public class WorkoutSessionPlugin extends Plugin {
         JSArray timer = call.getArray("timer");
         i.putExtra("timer", timer == null ? "[]" : timer.toString());
         i.putExtra("timerOver", call.getString("timerOver", ""));
+        // The watches' weight ladder for this set (watchAdjust.ts), kept by the service for the watches with the app closed.
+        JSObject adj = call.getObject("adj");
+        i.putExtra("adj", adj == null ? "" : adj.toString());
         // The same workout on a Wear OS watch (WatchLink, android/wear) and a Garmin watch (GarminLink, garmin/), sent
         // before the service starts, so a watch never misses a change because the phone's service couldn't start.
         WatchLink.update(getContext(), call.getData());

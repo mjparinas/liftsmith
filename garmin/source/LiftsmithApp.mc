@@ -1,5 +1,6 @@
 // Liftsmith for Garmin watches (docs/decisions/watch-apps.md). The phone's workout on the wrist: the set, the
-// weight and reps or the rest countdown, plates and heart rate, with Log set (START) and +30 s (DOWN). The phone
+// weight and reps or the rest countdown, plates and heart rate, with Log set (START) and +30 s (DOWN); UP and DOWN
+// change the weight or reps during a set, and MENU answers "How did it feel?" after an exercise's last set. The phone
 // sends the state (GarminLink.java on Android, GarminLink.swift on iOS) and does all the logging; the watch only
 // shows it, sends taps back and adds its own heart rate. Same job as the Wear OS and Apple Watch apps.
 
@@ -21,6 +22,10 @@ class LiftsmithApp extends Application.AppBase {
     //! The set timer phase last seen (its label), to buzz when it moves on; null with no timer.
     private var _timerPhase as String? = null;
     private var _hrSentAt as Number = 0;
+    //! Waits a moment after the last UP or DOWN before the new weight and reps go to the phone, so a run of presses
+    //! sends one adjust, not one each.
+    private var _adjTimer as Timer.Timer?;
+    const ADJUST_WAIT_MS = 1000;
 
     function initialize() {
         AppBase.initialize();
@@ -37,6 +42,7 @@ class LiftsmithApp extends Application.AppBase {
     }
 
     function onStop(state as Dictionary?) as Void {
+        flushAdjust();
         Sensor.enableSensorEvents(null);
         Sensor.setEnabledSensors([]);
         var timer = _timer;
@@ -98,7 +104,46 @@ class LiftsmithApp extends Application.AppBase {
         WatchUi.requestUpdate();
     }
 
-    //! Log set ({"a" => "log"}), +30 s ({"a" => "add30"}) or a heart rate reading ({"hr" => bpm}).
+    //! Send the weight and reps picked on the watch a moment after the last press (the phone changes the set
+    //! without logging it).
+    function scheduleAdjust() as Void {
+        cancelAdjust();
+        var t = new Timer.Timer();
+        t.start(method(:flushAdjust), ADJUST_WAIT_MS, false);
+        _adjTimer = t;
+    }
+
+    function cancelAdjust() as Void {
+        var t = _adjTimer;
+        if (t != null) {
+            t.stop();
+        }
+        _adjTimer = null;
+    }
+
+    function flushAdjust() as Void {
+        if (_adjTimer == null) {
+            return;
+        }
+        _adjTimer = null;
+        if (workout.adjustable() && workout.edited()) {
+            var msg = workout.values();
+            msg.put("a", "adjust");
+            send(msg);
+        }
+    }
+
+    //! "How did it feel?" with the phone's question and three answers.
+    function ask() as Void {
+        var menu = new WatchUi.Menu2({ :title => workout.askQ });
+        var values = [1, 0, -1];
+        for (var i = 0; i < 3 && i < workout.askO.size(); i++) {
+            menu.addItem(new WatchUi.MenuItem(workout.askO[i] as String, null, values[i], {}));
+        }
+        WatchUi.pushView(menu, new RateDelegate(self, workout.askEx), WatchUi.SLIDE_LEFT);
+    }
+
+    //! Log set ({"a" => "log"}, with "key", "kg" and "reps" when changed on the watch), adjust, rate, +30 s ({"a" => "add30"}) or a heart rate reading ({"hr" => bpm}).
     function send(msg as Dictionary) as Void {
         Communications.transmit(msg, null, new SendListener());
     }

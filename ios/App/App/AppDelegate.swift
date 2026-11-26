@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = EarlyNotifications.shared
         // The same for Log set and +30 s from the Apple Watch, which can wake the app before there's a web view.
         // The plugin takes these over when it loads (WorkoutSessionPlugin.load).
-        WatchLink.shared.onAction = { a in DispatchQueue.main.async { WorkoutTaps.tapped(a) } }
+        WatchLink.shared.onAction = { a, data in DispatchQueue.main.async { WorkoutTaps.tapped(a, data: data) } }
         WatchLink.shared.start()
         return true
     }

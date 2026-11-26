@@ -1,7 +1,9 @@
 # Liftsmith for Garmin watches
 
 A Connect IQ watch app: the phone's workout on the wrist (set, weight and reps or the rest countdown, plates, heart
-rate), with **Log set** on START (or a tap) and **+30 s** on DOWN (or a swipe up) during rest. The phone does all the
+rate), with **Log set** on START (or a tap) and **+30 s** on DOWN (or a swipe up) during rest. During a set UP and
+DOWN change the weight or the reps along the phone's own steps and MENU switches which; after an exercise's last set
+MENU answers "How did it feel?". The phone does all the
 logging; the watch only shows the state, sends taps back and adds its own heart rate. Decisions in
 [Watch apps](../docs/decisions/watch-apps.md).
 
