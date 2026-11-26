@@ -33,9 +33,9 @@ final class WatchMessages {
         }
     }
 
-    /** "log" or "add30", or null. */
+    /** "log", "add30" or "taken" (Machine taken, src/lib/takenSwap.ts), or null. */
     static String action(String body) {
-        return "log".equals(body) || "add30".equals(body) ? body : null;
+        return "log".equals(body) || "add30".equals(body) || "taken".equals(body) ? body : null;
     }
 
     /**

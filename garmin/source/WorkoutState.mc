@@ -2,7 +2,7 @@ import Toybox.Lang;
 import Toybox.Time;
 
 //! The workout the phone is running, as GarminLink sends it: {"t" title, "s" set label, "n" the set (weight and
-//! reps), "p" plates, "r" seconds of rest left, "h" heart rate the phone has, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends}, or
+//! reps), "p" plates, "r" seconds of rest left, "h" heart rate the phone has, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "x" what Machine taken swaps to, "y" why the exercise is there after one}, or
 //! {"end" => true} when it ended. "k" is the set timer for holds, carries and cardio: its phases as [seconds from now
 //! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
 //! phone's never have to agree. "ay", "ak", "aw", "ai", "ar" and "ars" are the set to adjust and "qe", "q" and "qo" the
@@ -20,6 +20,10 @@ class WorkoutState {
     var watchHr as Number = 0;
     var vibrate as Boolean = true;
     var warn as Boolean = false;
+    //! Machine taken (src/lib/takenSwap.ts): what UP swaps to, or "" when there's nothing to swap to.
+    var taken as String = "";
+    //! Why the exercise is there after a Machine taken swap, or "".
+    var why as String = "";
     //! When rest ends on the watch's clock (seconds), or 0 while lifting.
     var restEnds as Number = 0;
     //! When the last update arrived (seconds), or 0 when no workout is running.
@@ -72,6 +76,8 @@ class WorkoutState {
         hr = whole(data.get("h"));
         vibrate = data.get("v") != false;
         warn = data.get("w") == true;
+        taken = text(data.get("x"));
+        why = text(data.get("y"));
         var rest = whole(data.get("r"));
         restEnds = rest > 0 ? now + rest : 0;
         timer = [];
@@ -132,6 +138,11 @@ class WorkoutState {
     }
 
     //! The set can be changed now: a set is on (not rest, not a set timer) and the phone sent what to change.
+    //! Whether Machine taken can swap now: the phone sent a pick and no set timer is running.
+    function canTake() as Boolean {
+        return active() && taken.length() > 0 && phase() == null;
+    }
+
     function adjustable() as Boolean {
         return active() && adjKey.length() > 0 && !resting() && phase() == null;
     }

@@ -575,6 +575,11 @@ export const fr: FeaturesText = {
       body: "Tournez la couronne ou la lunette, ou appuyez sur − et +, pour changer la charge et les répétitions depuis le poignet, par les mêmes paliers que sur le téléphone : vos disques, vos haltères ou la pile de la machine. Après la dernière série d’un exercice, la montre demande comment c’était, et votre réponse fixe la charge suivante.",
       note: "Wear OS, Apple Watch et Garmin (boutons UP et DOWN).",
     },
+    "machine-taken": {
+      name: "Machine occupée",
+      body: "Quelqu'un sur la machine ? Une touche sur ta montre ou dans Modifier le plan met le meilleur exercice de ta salle qui n'en a pas besoin, avec sa charge et pourquoi.",
+      note: "Wear OS, Apple Watch et Garmin (le bouton UP), et Modifier le plan sur le téléphone et le web.",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",

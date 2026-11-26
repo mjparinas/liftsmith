@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.machineTaken.title": "Machine taken? One tap",
+  "wn.c.machineTaken.body":
+    "Tap Machine taken on your Wear OS, Apple Watch or Garmin watch, or in Change the plan, and the best lift for your gym that doesn't need it takes its place, with its weight and why.",
   "wn.c.programBuilder.title": "Program builder for coaches",
   "wn.c.programBuilder.body": "Put routines on the days of a week with rest days, see the month, and let Auto-arrange spread them out.",
   "wn.c.myTeam.title": "My team",
@@ -178,6 +181,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "¿Máquina ocupada? Un toque",
+  "wn.c.machineTaken.body":
+    "Toca Máquina ocupada en tu reloj Wear OS, Apple Watch o Garmin, o en Cambiar el plan, y el mejor ejercicio de tu gimnasio que no la necesita ocupa su lugar, con su peso y por qué.",
   "wn.c.programBuilder.title": "Creador de programas para entrenadores",
   "wn.c.programBuilder.body": "Pon rutinas en los días de la semana con descansos, mira el mes y deja que Organizar solo las reparta.",
   "wn.c.myTeam.title": "Mi equipo",
@@ -360,6 +366,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Machine occupée ? Une touche",
+  "wn.c.machineTaken.body":
+    "Touche Machine occupée sur ta montre Wear OS, Apple Watch ou Garmin, ou dans Modifier le plan, et le meilleur exercice de ta salle qui n'en a pas besoin prend sa place, avec sa charge et pourquoi.",
   "wn.c.programBuilder.title": "Créateur de programmes pour les coachs",
   "wn.c.programBuilder.body":
     "Placez les routines sur les jours de la semaine avec des repos, voyez le mois et laissez Organiser automatiquement les répartir.",
@@ -546,6 +555,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Gerät belegt? Ein Tipp",
+  "wn.c.machineTaken.body":
+    "Tippe auf deiner Wear-OS-, Apple- oder Garmin-Uhr oder in „Plan ändern“ auf „Gerät belegt“, und die beste Übung deines Studios, die es nicht braucht, kommt an seine Stelle, mit Gewicht und Grund.",
   "wn.c.programBuilder.title": "Programm-Baukasten für Coaches",
   "wn.c.programBuilder.body": "Lege Routinen mit Ruhetagen auf die Wochentage, sieh den Monat und lass Automatisch planen sie verteilen.",
   "wn.c.myTeam.title": "Mein Team",
@@ -727,6 +739,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Macchina occupata? Un tocco",
+  "wn.c.machineTaken.body":
+    "Tocca Macchina occupata sull'orologio Wear OS, Apple Watch o Garmin, o in Cambia il piano, e l'esercizio migliore della tua palestra che non la usa prende il suo posto, con il peso e il perché.",
   "wn.c.programBuilder.title": "Costruttore di programmi per coach",
   "wn.c.programBuilder.body":
     "Metti le routine nei giorni della settimana con i riposi, guarda il mese e lascia che Organizza da solo le distribuisca.",
@@ -909,6 +924,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "マシン使用中？ワンタップで",
+  "wn.c.machineTaken.body":
+    "Wear OS、Apple Watch、Garminのウォッチか「プランを変更」で「マシン使用中」をタップすると、そのマシンを使わない、ジムで一番合う種目に重量と理由つきで入れ替わります。",
   "wn.c.programBuilder.title": "コーチ向けプログラム作成",
   "wn.c.programBuilder.body": "ルーティンを曜日に置いて休みを入れ、月で確認し、自動で配置に振り分けを任せられます。",
   "wn.c.myTeam.title": "マイチーム",
@@ -1080,6 +1098,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Aparelho ocupado? Um toque",
+  "wn.c.machineTaken.body":
+    "Toque em Aparelho ocupado no seu relógio Wear OS, Apple Watch ou Garmin, ou em Mudar o plano, e o melhor exercício da sua academia que não precisa dele entra no lugar, com a carga e o porquê.",
   "wn.c.programBuilder.title": "Criador de programas para treinadores",
   "wn.c.programBuilder.body": "Coloque rotinas nos dias da semana com descansos, veja o mês e deixe Organizar sozinho distribuí-las.",
   "wn.c.myTeam.title": "Meu time",
@@ -1257,6 +1278,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "기구 사용 중? 한 번 탭",
+  "wn.c.machineTaken.body":
+    "Wear OS, Apple Watch, Garmin 워치나 '계획 변경'에서 '기구 사용 중'을 누르면 그 기구가 필요 없는 헬스장 최고의 운동이 무게와 이유와 함께 그 자리를 채웁니다.",
   "wn.c.programBuilder.title": "코치용 프로그램 빌더",
   "wn.c.programBuilder.body": "루틴을 요일에 놓고 휴식일을 넣고, 월로 확인하고, 자동 배치로 나눠 보세요.",
   "wn.c.myTeam.title": "내 팀",
@@ -1422,6 +1446,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Maszyna zajęta? Jedno dotknięcie",
+  "wn.c.machineTaken.body":
+    "Dotknij Maszyna zajęta na zegarku Wear OS, Apple Watch lub Garmin albo w Zmień plan, a jej miejsce zajmie najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
   "wn.c.programBuilder.title": "Kreator programów dla trenerów",
   "wn.c.programBuilder.body": "Rozłóż rutyny na dni tygodnia z odpoczynkiem, zobacz miesiąc i pozwól, by Ułóż automatycznie je rozłożyło.",
   "wn.c.myTeam.title": "Moja drużyna",
@@ -1598,6 +1625,9 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Makine dolu mu? Tek dokunuş",
+  "wn.c.machineTaken.body":
+    "Wear OS, Apple Watch ya da Garmin saatinde veya Planı değiştir'de Makine dolu'ya dokun; salonunda ona ihtiyaç duymayan en iyi hareket, ağırlığı ve nedeniyle yerine geçer.",
   "wn.c.programBuilder.title": "Koçlar için program oluşturucu",
   "wn.c.programBuilder.body": "Rutinleri dinlenme günleriyle haftanın günlerine koy, ayı gör ve Otomatik yerleştir onları dağıtsın.",
   "wn.c.myTeam.title": "Takımım",

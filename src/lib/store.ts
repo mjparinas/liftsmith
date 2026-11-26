@@ -26,7 +26,7 @@ import type { AppEvent, Gym, Profile, StretchEvent } from "./types";
 import { clearWidget } from "./widget";
 import { clearPersonalKeys } from "./wipe";
 
-export { AUTO_END_MS, hrWindow, partNow, REST_PAUSE_SEC, stretching, warmingUp, type Active } from "./store/workout";
+export { AUTO_END_MS, hrWindow, partNow, REST_PAUSE_SEC, stretching, swappedActive, warmingUp, type Active } from "./store/workout";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 // Each area's state and actions live in its own slice under src/lib/store/ (workout, plan, injuries,

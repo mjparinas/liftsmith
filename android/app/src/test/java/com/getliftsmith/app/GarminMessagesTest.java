@@ -63,6 +63,18 @@ public class GarminMessagesTest {
     }
 
     @Test
+    public void machineTakenGoesWithItsPickAndWhy() throws Exception {
+        Map<String, Object> a = GarminMessages.state(lifting(), NOW);
+        assertEquals("", a.get("x"));
+        Map<String, Object> b = GarminMessages.state(lifting().put("taken", "Swaps to Dumbbell row, 30 kg × 10"), NOW);
+        assertEquals("Swaps to Dumbbell row, 30 kg × 10", b.get("x"));
+        assertTrue(GarminMessages.worthSending(a, b, 500));
+        Map<String, Object> c = GarminMessages.state(lifting().put("why", "In for Lat pulldown, which was taken"), NOW);
+        assertEquals("In for Lat pulldown, which was taken", c.get("y"));
+        assertTrue(GarminMessages.worthSending(a, c, 500));
+    }
+
+    @Test
     public void endClearsTheWatch() {
         assertEquals(true, GarminMessages.end().get("end"));
     }
@@ -77,6 +89,7 @@ public class GarminMessagesTest {
     public void onlyLogAdd30AndBelievableHeartRatesComeIn() {
         assertEquals("log", GarminMessages.action(msg("a", "log")));
         assertEquals("add30", GarminMessages.action(msg("a", "add30")));
+        assertEquals("taken", GarminMessages.action(msg("a", "taken")));
         assertNull(GarminMessages.action(msg("a", "discard")));
         assertNull(GarminMessages.action(msg("a", 3)));
         assertNull(GarminMessages.action(null));

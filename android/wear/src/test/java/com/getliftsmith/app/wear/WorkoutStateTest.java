@@ -148,4 +148,14 @@ public class WorkoutStateTest {
         assertEquals("About right", s.ask.answers[1]);
         assertNull(WorkoutState.parse("{\"ask\":{\"ex\":\"x\",\"o\":[\"a\"],\"v\":[1]}}").ask);
     }
+
+    @Test
+    public void machineTakenComesWithItsPickAndWhy() {
+        WorkoutState none = WorkoutState.parse("{\"title\":\"Lat pulldown\"}");
+        assertEquals("", none.taken);
+        assertEquals("", none.why);
+        WorkoutState s = WorkoutState.parse("{\"taken\":\"Swaps to Dumbbell row, 30 kg × 10\",\"why\":\"In for Lat pulldown, which was taken\"}");
+        assertEquals("Swaps to Dumbbell row, 30 kg × 10", s.taken);
+        assertEquals("In for Lat pulldown, which was taken", s.why);
+    }
 }

@@ -125,7 +125,7 @@ enum WatchMessages {
     }
 
     static func action(_ value: Any?) -> String? {
-        guard let a = value as? String, a == "log" || a == "add30" else { return nil }
+        guard let a = value as? String, a == "log" || a == "add30" || a == "taken" else { return nil }
         return a
     }
 

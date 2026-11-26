@@ -9,4 +9,6 @@
     <string id="HintAdd">DOWN: +30 s</string>
     <string id="TodayNone" scope="glance">Open Liftsmith on your phone for today's plan.</string>
     <string id="HintRate">MENU: Rate it</string>
+    <string id="HintLogTaken">START: Log · UP: Taken</string>
+    <string id="HintAddTaken">DOWN: +30 s · UP: Taken</string>
 </strings>

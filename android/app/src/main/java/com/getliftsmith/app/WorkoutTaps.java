@@ -63,4 +63,14 @@ final class WorkoutTaps {
             return new JSONArray();
         }
     }
+
+    /** A JSON object from an intent extra, or null when there isn't one. */
+    static JSONObject object(String json) {
+        if (json == null || json.isEmpty()) return null;
+        try {
+            return new JSONObject(json);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
 }

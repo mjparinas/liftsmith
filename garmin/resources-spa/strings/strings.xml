@@ -8,4 +8,6 @@
     <string id="HintAdd">DOWN: +30 s</string>
     <string id="TodayNone" scope="glance">Abre Liftsmith en tu móvil para ver el plan de hoy.</string>
     <string id="HintRate">MENU: Valorar</string>
+    <string id="HintLogTaken">START: Registrar · UP: Ocupada</string>
+    <string id="HintAddTaken">DOWN: +30 s · UP: Ocupada</string>
 </strings>

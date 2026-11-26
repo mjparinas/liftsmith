@@ -9,9 +9,10 @@ import org.junit.Test;
 public class WatchMessagesTest {
 
     @Test
-    public void onlyLogAndAdd30AreActions() {
+    public void onlyLogAdd30AndTakenAreActions() {
         assertEquals("log", WatchMessages.action("log"));
         assertEquals("add30", WatchMessages.action("add30"));
+        assertEquals("taken", WatchMessages.action("taken"));
         assertNull(WatchMessages.action("start"));
         assertNull(WatchMessages.action(""));
         assertNull(WatchMessages.action("log; drop"));

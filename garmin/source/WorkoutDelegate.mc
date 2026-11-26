@@ -3,7 +3,8 @@ import Toybox.WatchUi;
 
 //! START (or a tap on touch watches) logs the set, with the weight and reps picked on the watch; during a set UP and
 //! DOWN (or swipes) step the weight or the reps along the phone's own steps and MENU (or a long press) switches
-//! which; during rest DOWN adds 30 s and MENU answers "How did it feel?" when the phone asks. Everything goes to the
+//! which; during rest DOWN adds 30 s, UP is Machine taken when the phone has a pick (also on a set that can't be changed) and
+//! MENU answers "How did it feel?" when the phone asks. Everything goes to the
 //! phone like the notification's buttons, and the phone sends back the next state. BACK leaves.
 class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     private var _app as LiftsmithApp;
@@ -33,6 +34,10 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onPreviousPage() as Boolean {
+        var w = _app.workout;
+        if (w.resting() || !w.adjustable()) {
+            return taken();
+        }
         return change(1);
     }
 
@@ -78,6 +83,16 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
             _app.scheduleAdjust();
         }
         WatchUi.requestUpdate();
+        return true;
+    }
+
+    //! Machine taken: the phone swaps the exercise for its pick (takenSwap.ts) and sends the new state.
+    private function taken() as Boolean {
+        if (!_app.workout.active() || !_app.workout.canTake()) {
+            return false;
+        }
+        _app.send({ "a" => "taken" });
+        _app.buzz(60);
         return true;
     }
 }

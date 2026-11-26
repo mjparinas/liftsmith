@@ -6,17 +6,23 @@ import { SECTION_LABEL } from "@/components/titles";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { explain } from "@/lib/explain";
-import { alternatives, type PlanItem } from "@/lib/generator";
+import type { PlanItem } from "@/lib/generator";
 import { gymName } from "@/lib/gymNames";
 import { list, t } from "@/lib/i18n";
+import { activeInjuries } from "@/lib/injury";
 import { haptic } from "@/lib/juice";
 import { presetLabels, settingsFor, settingsLine, type Setting } from "@/lib/machineSettings";
-import { busyEquipment, minutesLeft } from "@/lib/replan";
+import { pickWeights } from "@/lib/pickWeights";
+import { bodyMode } from "@/lib/pregnancy";
+import { target } from "@/lib/progression";
+import { minutesLeft } from "@/lib/replan";
 import { useApp } from "@/lib/store";
+import { takenEquipment, takenSwaps, takenTarget } from "@/lib/takenSwap";
 import { EQUIPMENT_LABEL, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { itemWhy, whyContext } from "@/lib/why";
 
+import { setText } from "./format";
 import { go } from "./router";
 import { Button, ProTag, Sheet } from "./ui";
 
@@ -73,20 +79,31 @@ export function ReplanSheet({
 }) {
   const s = useApp();
   const [changes, setChanges] = useState<string[] | null>(null);
+  const now = useNow(60_000);
   const a = s.active;
   if (!open || !a) return null;
+  const hurt = activeInjuries(s.events);
+  const mode = bodyMode(s.profile, now);
+  const weights = pickWeights(s.events, s.profile, now);
   const item = a.plan.items[a.index];
   const left = minutesLeft(a.plan.items, a.index, doneOnCurrent);
   const options = [10, 15, 20, 30, 45].filter((m) => m < left);
-  const busy = item ? busyEquipment(item.exerciseId) : [];
+  // "Machine taken" (takenSwap.ts): the same pick the watch's one tap makes goes first, with its weight and why.
+  const busy = item && !item.part ? takenEquipment(item.exerciseId) : [];
   const free =
     item && busy.length
-      ? alternatives(
+      ? takenSwaps(
           item.exerciseId,
-          { ...gym, equipment: gym.equipment.filter((e) => !busy.includes(e)) },
+          gym,
           a.plan.items.map((i) => i.exerciseId),
-        ).slice(0, 4)
+          hurt,
+          mode,
+          weights,
+        ).slice(0, 5)
       : [];
+  const best = free[0];
+  const bestEx = best ? exercise(best) : undefined;
+  const bestTarget = bestEx ? takenTarget(bestEx.id, target(bestEx, s.events, s.profile, gym, now), hurt, gym, mode) : undefined;
   const close = () => {
     setChanges(null);
     onClose();
@@ -176,20 +193,38 @@ export function ReplanSheet({
                   {t("coach.later", { name: exercise(item.exerciseId).name })}
                 </Button>
               )}
-              {free.length > 0 && <p className="mt-3 text-sm text-faint">{t("coach.swapOther")}</p>}
+              {bestEx && bestTarget && (
+                <Button
+                  className="mt-2 w-full"
+                  icon="swap"
+                  onClick={() => {
+                    haptic("tap");
+                    s.swap(bestEx.id, false, true);
+                    close();
+                  }}
+                >
+                  {t("coach.takenSwap", { name: bestEx.name })}
+                </Button>
+              )}
+              {bestEx && bestTarget && (
+                <p className="mt-1.5 text-sm text-muted">
+                  {setText(bestEx, bestTarget.weight, bestTarget.reps, s.profile.unit)} · {t("coach.takenWhy")}
+                </p>
+              )}
+              {free.length > 1 && <p className="mt-3 text-sm text-faint">{t("coach.swapOther")}</p>}
               <ul className="mt-1 divide-y divide-line">
-                {free.map((e) => (
-                  <li key={e.id}>
+                {free.slice(1).map((id) => (
+                  <li key={id}>
                     <button
                       type="button"
                       className="press flex min-h-11 w-full items-center justify-between py-2.5 text-left"
                       onClick={() => {
                         haptic("tap");
-                        s.swap(e.id, false);
+                        s.swap(id, false, true);
                         close();
                       }}
                     >
-                      <span className="font-medium">{e.name}</span>
+                      <span className="font-medium">{exercise(id).name}</span>
                       <span className="text-accent">{t("coach.swap")}</span>
                     </button>
                   </li>

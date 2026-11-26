@@ -84,6 +84,10 @@ struct WorkoutView: View {
                     Text(s.setLabel.uppercased()).font(.caption2.bold()).foregroundStyle(Color.brand)
                 }
                 Text(s.title).font(.headline).lineLimit(2).multilineTextAlignment(.center)
+                if !s.why.isEmpty {
+                    // Why the exercise is there after a Machine taken swap (src/lib/takenSwap.ts).
+                    Text(s.why).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                }
                 if let p = s.phase(at: now) {
                     // The set timer (holds, carries, cardio), counted on the watch's own clock.
                     Text(p.label).font(.footnote).foregroundStyle(.secondary)
@@ -120,6 +124,12 @@ struct WorkoutView: View {
                     .padding(.top, 4)
                 if resting {
                     Button("+30 s") { model.send("add30") }
+                }
+                if !s.taken.isEmpty, s.phase(at: now) == nil {
+                    // Machine taken: the phone swaps to the best pick at this gym, named under the button.
+                    Button("Machine taken") { model.send("taken") }
+                        .accessibilityHint(Text(s.taken))
+                    Text(s.taken).font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 }
                 if let ask = s.ask, ask.ex != answered {
                     // How did it feel, after an exercise's last set, with the phone's own three answers.

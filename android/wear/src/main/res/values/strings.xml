@@ -6,6 +6,7 @@
     <string name="none_title">No workout running</string>
     <string name="none_body">Start one on your phone and it shows here.</string>
     <string name="log_set">Log set</string>
+    <string name="machine_taken">Machine taken</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Next: %1$s</string>
     <string name="rest_left">Rest, %1$s left</string>

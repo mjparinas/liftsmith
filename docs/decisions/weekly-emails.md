@@ -914,5 +914,6 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-26.** "Labs: log sets without touching the screen" (`labs-hands-off`) gets a point for hands-free watch sets (`labWatchAuto`, [Watch apps](watch-apps.md) "Hands-free watch sets"), in every language. It extends that email rather than adding one, so the screenshot stays as it is.
 
 **New, 2026-11-26.** "Your workout on your wrist" (`watches`) gets a point for changing the weight and reps on the watch and answering how an exercise felt ([Watch apps](watch-apps.md) "Adjust and rate a set"), in every language. It extends that email rather than adding one, so its picture stays as it is.
+**New, 2026-11-26.** "Your workout on your wrist" (`watches`) adds Machine taken to its Log set point (the email already has five points) ([Watch apps](watch-apps.md) "Machine taken"), in every language. It extends that email rather than adding one, so the screenshot stays as it is.
 
 **New, 2026-11-26.** "Today's workout on your watch face" (`watch-today`): the Wear OS tile and complication, the Apple Watch complication and the Garmin glance with today's call ([Watch apps](watch-apps.md) "Today on the watch face"), with a screenshot of Today, in every language.

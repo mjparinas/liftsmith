@@ -37,6 +37,10 @@ final class WorkoutState {
     final boolean motionRest;
     /** Labs, hands-free watch sets: a new id means the set started or logged itself, and the watch buzzes once. */
     final String cue;
+    /** Machine taken (src/lib/takenSwap.ts): what one tap swaps to ("Swaps to Dumbbell row, 30 kg × 10"); empty hides the button. */
+    final String taken;
+    /** Why the exercise is there after a Machine taken swap ("In for Lat pulldown, which was taken"), or empty. */
+    final String why;
     /** The set timer for holds, carries and cardio, phase by phase in wall-clock time (sessionNotify.ts TimerSegment). */
     final List<Phase> timer;
     /** What the crown and − / + can change on this set, or null (watchAdjust.ts watchAdj). */
@@ -168,6 +172,8 @@ final class WorkoutState {
         motion = o.optBoolean("motion", false);
         motionRest = o.optBoolean("motionRest", false);
         cue = o.optString("cue", "");
+        taken = o.optString("taken", "");
+        why = o.optString("why", "");
         timer = phases(o.optJSONArray("timer"));
         adj = Adj.parse(o.optJSONObject("adj"));
         ask = Ask.parse(o.optJSONObject("ask"));

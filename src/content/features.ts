@@ -1065,6 +1065,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-26",
       },
       {
+        id: "machine-taken",
+        name: "Machine taken",
+        body: "Someone on the machine? One tap on your watch or in Change the plan swaps in the best lift for your gym that doesn't need it, with its weight and why.",
+        tier: "pro",
+        pro: "replan",
+        note: "Wear OS, Apple Watch and Garmin (the UP button), and Change the plan on the phone and the web.",
+        added: "2026-11-26",
+      },
+      {
         id: "widgets",
         name: "Home-screen widgets",
         body: "Three widgets: Today (the day's call, your weekly goal, a coach's note and Start or Log set), This week (days trained, your streak and what keeps it going) and Recovery (which muscles are ready to train and when the rest will be).",

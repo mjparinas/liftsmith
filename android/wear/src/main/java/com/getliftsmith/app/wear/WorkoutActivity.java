@@ -43,8 +43,8 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         }
     };
     private boolean asked = false;
-    private TextView set, title, big, sub, hr, note, weight, reps, askQ;
-    private Button log, add, phone;
+    private TextView set, title, why, big, sub, hr, note, takenTo, weight, reps, askQ;
+    private Button log, add, taken, phone;
     private View scroll, adjust, weightRow, askBox;
     private final Button[] askButtons = new Button[3];
     /**
@@ -88,6 +88,9 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         setContentView(R.layout.activity_workout);
         set = findViewById(R.id.set);
         title = findViewById(R.id.title);
+        why = findViewById(R.id.why);
+        taken = findViewById(R.id.taken);
+        takenTo = findViewById(R.id.taken_to);
         big = findViewById(R.id.big);
         sub = findViewById(R.id.sub);
         hr = findViewById(R.id.hr);
@@ -119,6 +122,7 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         scroll.setOnGenericMotionListener((v, e) -> crown(e));
         log.setOnClickListener((v) -> logSet(v));
         add.setOnClickListener((v) -> tap(v, "add30"));
+        taken.setOnClickListener((v) -> tap(v, "taken"));
         phone.setOnClickListener(this::openOnPhone);
         startWanted = getIntent().getBooleanExtra(EXTRA_START, false);
     }
@@ -345,6 +349,9 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             hr.setVisibility(View.GONE);
             log.setVisibility(View.GONE);
             add.setVisibility(View.GONE);
+            why.setVisibility(View.GONE);
+            taken.setVisibility(View.GONE);
+            takenTo.setVisibility(View.GONE);
             adjust.setVisibility(View.GONE);
             askBox.setVisibility(View.GONE);
             // Not standalone: say what the phone needs, and offer the one step that gets there.
@@ -414,6 +421,14 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         hr.setText(getString(R.string.bpm, bpm));
         log.setVisibility(View.VISIBLE);
         add.setVisibility(resting ? View.VISIBLE : View.GONE);
+        why.setVisibility(s.why.isEmpty() ? View.GONE : View.VISIBLE);
+        why.setText(s.why);
+        // Machine taken: only when the phone has a pick (and Pro); the line under it says what it swaps to.
+        boolean canSwap = !s.taken.isEmpty() && phase == null;
+        taken.setVisibility(canSwap ? View.VISIBLE : View.GONE);
+        takenTo.setVisibility(canSwap ? View.VISIBLE : View.GONE);
+        takenTo.setText(s.taken);
+        taken.setContentDescription(getString(R.string.machine_taken) + ". " + s.taken);
         // The set's weight and reps, changed with − / + or the crown (watchAdjust.ts on the phone).
         WorkoutState.Adj a = adjustable(s);
         adjust.setVisibility(a == null ? View.GONE : View.VISIBLE);

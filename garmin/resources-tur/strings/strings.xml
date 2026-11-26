@@ -8,4 +8,6 @@
     <string id="HintAdd">DOWN: +30 s</string>
     <string id="TodayNone" scope="glance">Bugünkü plan için telefonunda Liftsmith'i aç.</string>
     <string id="HintRate">MENU: Değerlendir</string>
+    <string id="HintLogTaken">START: Kaydet · UP: Dolu</string>
+    <string id="HintAddTaken">DOWN: +30 sn · UP: Dolu</string>
 </strings>

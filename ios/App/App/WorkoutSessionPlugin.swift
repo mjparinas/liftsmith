@@ -159,7 +159,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         }
         // The watch's view of it, so the Apple Watch moves on with the Live Activity while the app sleeps.
         state["watch"] = watchState(call)
-        WorkoutTaps.remember(state: state, ahead: call.getArray("ahead") ?? [])
+        WorkoutTaps.remember(state: state, ahead: call.getArray("ahead") ?? [], takenStep: call.getObject("takenStep"))
         WatchLink.shared.update(watchState(call))
         GarminLink.shared.update(watchState(call))
         let center = UNUserNotificationCenter.current()
@@ -287,6 +287,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         if call.getBool("motion") == true { s["motion"] = true }
         if call.getBool("motionRest") == true { s["motionRest"] = true }
         if let cue = call.getString("cue"), !cue.isEmpty { s["cue"] = cue }
+        // Machine taken (src/lib/takenSwap.ts): what the watch's button swaps to, and why the exercise is there after one.
+        if let taken = call.getString("taken"), !taken.isEmpty { s["taken"] = taken }
+        if let why = call.getString("why"), !why.isEmpty { s["why"] = why }
         // The set timer (holds, carries, cardio): the watch counts its phases on its own clock (WatchState.timer).
         if let timer = call.getArray("timer"), !timer.isEmpty { s["timer"] = timer }
         // Adjust and rate a set on the watch (watchAdjust.ts): the weight ladder and reps, and "How did it feel?".
@@ -360,10 +363,12 @@ enum WorkoutTaps {
     }
 
     /// The app's latest update: what the Live Activity shows now and the sets after it.
-    static func remember(state: [String: Any], ahead: [Any]) {
+    static func remember(state: [String: Any], ahead: [Any], takenStep: [String: Any]? = nil) {
         var d = load()
         d["state"] = state
         d["ahead"] = ahead
+        // Machine taken from a watch with the app asleep: the swap the app worked out ahead (sessionAhead.ts takenStep).
+        d["takenStep"] = takenStep
         d["aheadAt"] = 0
         d["ended"] = false
         save(d)
@@ -392,6 +397,8 @@ enum WorkoutTaps {
         // A watch's weight and reps on their own only matter while the app is open: Log set carries them anyway.
         if action == "adjust" { return done() }
         var d = load()
+        // Machine taken needs the swap the app worked out ahead; without a workout we know of there's none to make.
+        if action == "taken", d["state"] == nil { return done() }
         guard var state = d["state"] as? [String: Any], action != "rate" else {
             // No workout we know of (the app was closed before it sent one), or a watch's "How did it feel?": keep
             // the tap; the app decides.
@@ -424,6 +431,8 @@ enum WorkoutTaps {
                 w["adj"] = step["adj"]
                 w["ask"] = nil
                 w["hr"] = nil
+                // The steps ahead don't know which of them a Machine taken swap stands in for.
+                w["why"] = nil
                 w["timer"] = nil
                 state["watch"] = w
                 WatchLink.shared.update(w)
@@ -438,6 +447,25 @@ enum WorkoutTaps {
                 w["restUntil"] = restUntil + 30_000
                 state["watch"] = w
                 WatchLink.shared.update(w)
+            }
+        } else if action == "taken" {
+            // Machine taken: only before any other tap since the app's last update, because the swap was worked out
+            // from that moment. The app makes the same swap when it wakes and replays the tap.
+            guard (d["aheadAt"] as? Int ?? 0) == 0, d["ended"] as? Bool != true, let step = d["takenStep"] as? [String: Any] else { return done() }
+            keep(action, data: data, at: at, in: &d)
+            for key in ["title", "setLabel", "next", "plates", "chip", "done", "total"] { state[key] = step[key] }
+            d["ahead"] = step["ahead"] as? [Any] ?? []
+            d["aheadAt"] = 0
+            d["takenStep"] = nil
+            // The watches show the new lift (and why it's there) with no second Machine taken to offer.
+            if var w = state["watch"] as? [String: Any] {
+                for key in ["title", "setLabel", "next", "plates", "done", "total", "why"] { w[key] = step[key] }
+                w["adj"] = step["adj"]
+                w["ask"] = nil
+                w["taken"] = nil
+                state["watch"] = w
+                WatchLink.shared.update(w)
+                GarminLink.shared.update(w)
             }
         } else {
             return done()

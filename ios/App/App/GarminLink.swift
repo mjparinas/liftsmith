@@ -218,6 +218,9 @@ enum GarminMessages {
             "h": s["hr"] as? Int ?? 0,
             "v": s["vibrate"] as? Bool ?? true,
             "w": s["warn"] as? Bool ?? false,
+            // Machine taken (src/lib/takenSwap.ts): what UP swaps to, and why the exercise is there after a swap.
+            "x": s["taken"] as? String ?? "",
+            "y": s["why"] as? String ?? "",
         ]
         return base.merging(adjust(s, resting: left > 0)) { a, _ in a }
     }
@@ -245,7 +248,7 @@ enum GarminMessages {
 
     static func worthSending(_ last: [String: Any]?, _ next: [String: Any], since: TimeInterval) -> Bool {
         guard let last else { return true }
-        for k in ["t", "s", "n", "p", "ki", "ay", "qe"] where last[k] as? String != next[k] as? String { return true }
+        for k in ["t", "s", "n", "p", "ki", "x", "y", "ay", "qe"] where last[k] as? String != next[k] as? String { return true }
         if last["ai"] as? Int != next["ai"] as? Int || last["ar"] as? Int != next["ar"] as? Int { return true }
         if last["v"] as? Bool != next["v"] as? Bool || last["w"] as? Bool != next["w"] as? Bool { return true }
         let a = last["r"] as? Int ?? 0, b = next["r"] as? Int ?? 0

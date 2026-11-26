@@ -5,6 +5,7 @@
     <string name="none_title">Kein Training aktiv</string>
     <string name="none_body">Starte eins auf deinem Handy, dann erscheint es hier.</string>
     <string name="log_set">Satz eintragen</string>
+    <string name="machine_taken">Gerät belegt</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Als Nächstes: %1$s</string>
     <string name="rest_left">Pause, noch %1$s</string>

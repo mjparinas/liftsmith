@@ -636,6 +636,11 @@ export const tr: FeaturesText = {
       body: "Kurmayı veya çerçeveyi çevir ya da − ve + düğmelerine bas; ağırlığı ve tekrarları bileğinden telefonla aynı adımlarla değiştir: plakaların, dambılların ya da makinenin ağırlık yığını. Bir hareketin son setinden sonra saat nasıl geçtiğini sorar ve cevabın bir sonraki ağırlığı belirler.",
       note: "Wear OS, Apple Watch ve Garmin (UP ve DOWN düğmeleri).",
     },
+    "machine-taken": {
+      name: "Makine dolu",
+      body: "Makinede biri mi var? Saatinde ya da Planı değiştir'de tek dokunuş, salonunda ona ihtiyaç duymayan en iyi hareketi ağırlığı ve nedeniyle getirir.",
+      note: "Wear OS, Apple Watch ve Garmin (UP düğmesi), telefonda ve web'de Planı değiştir.",
+    },
     widgets: {
       name: "Ana ekran widget'ları",
       body: "Üç widget: Bugün (günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet), Bu hafta (antrenman yaptığın günler, serin ve onu neyin sürdürdüğü) ve Toparlanma (hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı).",

@@ -367,7 +367,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Les apps Wear OS et Apple Watch affichent la série ou le compte à rebours du repos.",
       "La fréquence cardiaque vient du capteur de la montre.",
-      "Enregistrer la série et +30 s depuis le poignet, avec une vibration à la fin du repos.",
+      "Enregistrer la série et +30 s depuis le poignet, avec une vibration à la fin du repos. Machine occupée ? Une touche met le meilleur exercice pour ta salle, avec sa charge.",
       "Change la charge et les répétitions avec la couronne ou − et +, et dis comment s'est passé un exercice.",
       "Une app pour montres Garmin arrive bientôt.",
     ],

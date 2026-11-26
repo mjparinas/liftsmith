@@ -41,6 +41,15 @@ export interface SessionState {
   motionRest?: boolean;
   /** Labs, hands-free watch sets: the watch buzzes once each time this id changes (the set started or logged itself). */
   cue?: string;
+  /**
+   * "Machine taken" (takenSwap.ts): what the watches' Machine taken button swaps to ("Swaps to Dumbbell row, 30 kg × 10").
+   * Absent when there's nothing to swap to, or without Pro; the watches show the button only with it.
+   */
+  taken?: string;
+  /** The state after a Machine taken tap and the sets after it, for a tap with the app asleep (sessionAhead.ts takenStep). */
+  takenStep?: TakenAheadStep;
+  /** Why the exercise on screen is there, after a Machine taken swap ("In for Lat pulldown, which was taken"). */
+  why?: string;
   /** The notification after each of the next Log sets (sessionAhead.ts), so Log set works with the app closed. */
   ahead?: AheadStep[];
   /**
@@ -120,6 +129,12 @@ export interface AheadStep {
   adj?: WatchAdj;
 }
 
+/** What the notification and watches show after a Machine taken tap made with the app asleep: rest carries on. */
+export interface TakenAheadStep extends Omit<AheadStep, "rest" | "end"> {
+  why: string;
+  ahead: AheadStep[];
+}
+
 /** The status bar chip while lifting: "2/4" for set 2 of 4, "W1/2" for a warm-up. Numbers only, so it fits the
  *  chip's 96 dp (Android shows the text only when it fits) in every language. */
 export function chipText(warming: boolean, n: number, total: number): string {
@@ -128,9 +143,10 @@ export function chipText(warming: boolean, n: number, total: number): string {
 
 /**
  * Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). The watches also
- * send adjust (a new weight or reps, a moment after the last turn of the crown) and rate (how the exercise felt).
+ * send adjust (a new weight or reps, a moment after the last turn of the crown), rate (how the exercise felt) and taken,
+ * their Machine taken button (takenSwap.ts).
  */
-export type SessionAction = "log" | "add30" | "start" | "adjust" | "rate";
+export type SessionAction = "log" | "add30" | "start" | "adjust" | "rate" | "taken";
 type Handle = ListenerHandle;
 type Plugin = {
   update(s: SessionState): Promise<void>;
