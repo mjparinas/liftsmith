@@ -6,4 +6,6 @@
     <string id="Bpm">$1$ lpm</string>
     <string id="HintLog">START: registrar serie</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="HintLogTaken">START: Registrar · UP: Ocupada</string>
+    <string id="HintAddTaken">DOWN: +30 s · UP: Ocupada</string>
 </strings>

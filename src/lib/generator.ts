@@ -49,6 +49,8 @@ export interface PlanItem {
   group?: string;
   /** An automatic superset shortened this exercise's rest; this is its rest on its own, used again if the pair is split (autoSuperset.ts). */
   soloRest?: number;
+  /** Swapped in because this exercise's equipment was taken ("Machine taken", takenSwap.ts): the one it stands in for. */
+  takenFrom?: string;
 }
 
 export interface SetTarget {

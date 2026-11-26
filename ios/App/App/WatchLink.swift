@@ -81,7 +81,7 @@ final class WatchLink: NSObject, WCSessionDelegate {
 /// What the watch may send. Anything else is dropped, so a bad message can't reach the web app.
 enum WatchMessages {
     static func action(_ value: Any?) -> String? {
-        guard let a = value as? String, a == "log" || a == "add30" else { return nil }
+        guard let a = value as? String, a == "log" || a == "add30" || a == "taken" else { return nil }
         return a
     }
 

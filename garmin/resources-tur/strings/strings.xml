@@ -6,4 +6,6 @@
     <string id="Bpm">$1$ bpm</string>
     <string id="HintLog">START: Seti kaydet</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="HintLogTaken">START: Kaydet · UP: Dolu</string>
+    <string id="HintAddTaken">DOWN: +30 sn · UP: Dolu</string>
 </strings>

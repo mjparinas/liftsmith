@@ -626,6 +626,11 @@ export const pt: FeaturesText = {
       name: "Apps para relógio",
       body: "O treino no Wear OS e no Apple Watch: a série ou a contagem do descanso, a frequência cardíaca do relógio, Registrar série e +30 s, e uma vibração quando o descanso acaba.",
     },
+    "machine-taken": {
+      name: "Aparelho ocupado",
+      body: "Alguém no aparelho? Um toque no relógio ou em Mudar o plano coloca o melhor exercício da sua academia que não precisa dele, com a carga e o porquê.",
+      note: "Wear OS, Apple Watch e Garmin (o botão UP), e Mudar o plano no celular e na web.",
+    },
     widgets: {
       name: "Widgets na tela inicial",
       body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",

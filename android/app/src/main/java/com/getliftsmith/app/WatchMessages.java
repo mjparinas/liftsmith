@@ -9,9 +9,9 @@ final class WatchMessages {
 
     private WatchMessages() {}
 
-    /** "log" or "add30", or null. */
+    /** "log", "add30" or "taken" (Machine taken, src/lib/takenSwap.ts), or null. */
     static String action(String body) {
-        return "log".equals(body) || "add30".equals(body) ? body : null;
+        return "log".equals(body) || "add30".equals(body) || "taken".equals(body) ? body : null;
     }
 
     /** A heart rate in beats per minute, or 0 when it isn't a believable one (30 to 240). */

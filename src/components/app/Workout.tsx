@@ -9,6 +9,7 @@ import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { estimate } from "@/lib/e1rm";
+import { can } from "@/lib/entitlements";
 import { endWorkout } from "@/lib/endWorkout";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
@@ -23,21 +24,23 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
 import { meanFullSpeed } from "@/lib/partMetrics";
+import { pickWeights } from "@/lib/pickWeights";
 import { loadBar } from "@/lib/plates";
 import { bodyMode } from "@/lib/pregnancy";
-import { TIMED } from "@/lib/progression";
+import { target, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
-import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep } from "@/lib/sessionNotify";
+import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep, type TakenAheadStep } from "@/lib/sessionNotify";
 import { timerLength, type TimerSpec } from "@/lib/setTimer";
 import { countedReps, implementsFor, perSide } from "@/lib/sides";
 import { followWorkout, sonosOn } from "@/lib/sonos";
-import { partNow, useApp, warmingUp } from "@/lib/store";
+import { partNow, useApp, warmingUp, type Active } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
+import { takenPick, takenTarget } from "@/lib/takenSwap";
 import { tempoOf } from "@/lib/tempo";
 import { REST_WARN_S, restAlertOf, restWarnOn } from "@/lib/training";
-import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Gym, type LoadKind, type Muscle, type Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { isVisible, useVisible } from "@/lib/visibility";
@@ -70,7 +73,7 @@ import { KeyboardLog } from "./workout/KeyboardLog";
 import { MachineCard } from "./workout/MachineCard";
 import { countdownTick, UndoChip, warnTick } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
-import { aheadSteps, sessionFields } from "./workout/sessionAhead";
+import { aheadSteps, sessionFields, takenStep } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
 import { sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
@@ -374,6 +377,8 @@ export function Workout() {
   // The sets after this one, for Log set on the notification with the app closed (sessionAhead.ts). Worked out
   // again only when the workout moves, not on every heart rate reading.
   const ahead = useRef({ key: "", steps: [] as AheadStep[] });
+  // "Machine taken" on the watches (takenSwap.ts): what one tap would swap to, worked out again only when the exercise changes.
+  const takenOffer = useRef({ key: "", text: undefined as string | undefined, step: undefined as TakenAheadStep | undefined });
   useEffect(() => {
     if (!active || !ex || !gym) return;
     const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}:${cue ?? ""}`;
@@ -384,6 +389,7 @@ export function Workout() {
     if (!f) return;
     if (ahead.current.key !== key)
       ahead.current = { key, steps: aheadSteps(active, events, profile.unit, gym, profile.training?.autoRest !== false) };
+    if (takenOffer.current.key !== key) takenOffer.current = { key, text: undefined, step: undefined, ...watchTaken(active, events, profile, gym) };
     void updateSession({
       title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
       setLabel: f.setLabel,
@@ -406,6 +412,9 @@ export function Workout() {
       motion: watchMotion || undefined,
       motionRest: (restWatch && watchMotion) || undefined,
       cue,
+      taken: takenOffer.current.text,
+      takenStep: takenOffer.current.step,
+      why: item?.takenFrom ? t("why.taken", { name: exercise(item.takenFrom).name }) : undefined,
       ahead: ahead.current.steps,
       // The set timer (holds, carries, cardio): the lock screen and the watches count it down on their own clocks.
       timer: timerRun && !resting ? sessionTimer(timerRun) : undefined,
@@ -1289,4 +1298,23 @@ function CustomExercise({
       </button>
     </form>
   );
+}
+
+/**
+ * The watches' "Machine taken" (takenSwap.ts): the line saying what one tap swaps to, with its weight and reps, and the
+ * state after it for a tap with the phone app asleep. None without Pro or a pick.
+ */
+function watchTaken(a: Active, events: AppEvent[], profile: Profile, gym: Gym): { text?: string; step?: TakenAheadStep } {
+  if (!can("replan")) return {};
+  const now = Date.now();
+  const hurt = activeInjuries(events);
+  const mode = bodyMode(profile, now);
+  const to = takenPick(a.plan.items[a.index], a.plan.items.map((i) => i.exerciseId), gym, hurt, mode, pickWeights(events, profile, now));
+  if (!to) return {};
+  const ex = exercise(to);
+  const tg = takenTarget(to, target(ex, events, profile, gym, now), hurt, gym, mode);
+  return {
+    text: t("coach.takenTo", { name: ex.name, set: setText(ex, tg.weight, tg.reps, profile.unit) }),
+    step: takenStep(a, events, profile, gym, to, profile.training?.autoRest !== false) ?? undefined,
+  };
 }

@@ -74,8 +74,13 @@ describe("rest time left on the Android Live Update", () => {
     expect(live).toContain("state.phase(at: now)");
     const watch = readFileSync(join(__dirname, "../../ios/App/LiftsmithWatch/WatchState.swift"), "utf8");
     expect(watch).toContain(
-      "case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, timer",
+      "case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, taken, why, timer",
     );
+    // Machine taken (takenSwap.ts): every watch shows the phone's pick and sends "taken"; both phones let it through.
+    expect(watch).toContain('taken = (try? c.decode(String.self, forKey: .taken)) ?? ""');
+    expect(readFileSync(join(__dirname, "../../ios/App/App/WatchLink.swift"), "utf8")).toContain('a == "taken"');
+    expect(readFileSync(join(__dirname, "../../android/app/src/main/java/com/getliftsmith/app/WatchMessages.java"), "utf8")).toContain('"taken".equals(body)');
+    expect(readFileSync(join(__dirname, "../../garmin/source/WorkoutDelegate.mc"), "utf8")).toContain('_app.send({ "a" => "taken" });');
     const garmin = readFileSync(join(__dirname, "../../garmin/source/WorkoutState.mc"), "utf8");
     expect(garmin).toContain('var k = data.get("k");');
   });

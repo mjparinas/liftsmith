@@ -13,7 +13,8 @@ import org.json.JSONObject;
  * The phone sends short keys because Connect IQ messages are small and slow: "t" title, "s" set label, "n" the set,
  * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree), "h" heart rate from a
  * Bluetooth monitor, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its
- * end or -1 for a count-up, label] and "ki" which timer that is. The watch sends {"a": "log" | "add30"} or {"hr": bpm}.
+ * end or -1 for a count-up, label] and "ki" which timer that is, "x" what Machine taken swaps to (none: no UP button) and
+ * "y" why the exercise is there after one. The watch sends {"a": "log" | "add30" | "taken"} or {"hr": bpm}.
  * iOS counterpart: GarminLink.swift (GarminMessages).
  */
 final class GarminMessages {
@@ -35,6 +36,9 @@ final class GarminMessages {
         m.put("h", s.optInt("hr", 0));
         m.put("v", s.optBoolean("vibrate", true));
         m.put("w", s.optBoolean("warn", false));
+        // Machine taken (src/lib/takenSwap.ts): what UP swaps to, and why the exercise is there after a swap.
+        m.put("x", s.optString("taken", ""));
+        m.put("y", s.optString("why", ""));
         // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
         List<Object> k = new ArrayList<>();
         JSONArray timer = restUntil > now ? null : s.optJSONArray("timer");
@@ -70,7 +74,7 @@ final class GarminMessages {
      */
     static boolean worthSending(Map<String, Object> last, Map<String, Object> next, long sinceLastMs) {
         if (last == null) return true;
-        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki" }) {
+        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki", "x", "y" }) {
             Object a = last.get(k);
             if (a == null ? next.get(k) != null : !a.equals(next.get(k))) return true;
         }
@@ -82,7 +86,7 @@ final class GarminMessages {
         return !last.get("h").equals(next.get("h")) && sinceLastMs >= HR_ONLY_MS;
     }
 
-    /** "log" or "add30" from the watch, or null. */
+    /** "log", "add30" or "taken" from the watch, or null. */
     static String action(List<Object> message) {
         Object a = field(message, "a");
         return a instanceof String ? WatchMessages.action((String) a) : null;

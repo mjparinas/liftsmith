@@ -5,6 +5,7 @@
     <string name="none_title">Brak trwającego treningu</string>
     <string name="none_body">Zacznij trening na telefonie, a pojawi się tutaj.</string>
     <string name="log_set">Zapisz serię</string>
+    <string name="machine_taken">Maszyna zajęta</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Dalej: %1$s</string>
     <string name="rest_left">Przerwa, zostało %1$s</string>

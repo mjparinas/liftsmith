@@ -564,6 +564,11 @@ export const de: FeaturesText = {
       name: "Uhren-Apps",
       body: "Das Training auf Wear OS und der Apple Watch: der Satz oder der Pausen-Countdown, der Puls der Uhr, Satz eintragen und +30 s, und ein Vibrieren, wenn die Pause endet.",
     },
+    "machine-taken": {
+      name: "Gerät belegt",
+      body: "Jemand am Gerät? Ein Tipp auf deiner Uhr oder in „Plan ändern“ setzt die beste Übung deines Studios ein, die es nicht braucht, mit Gewicht und Grund.",
+      note: "Wear OS, Apple Watch und Garmin (die UP-Taste), und „Plan ändern“ auf dem Handy und im Web.",
+    },
     widgets: {
       name: "Widgets für den Startbildschirm",
       body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",

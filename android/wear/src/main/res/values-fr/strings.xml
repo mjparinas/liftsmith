@@ -5,6 +5,7 @@
     <string name="none_title">Aucune séance en cours</string>
     <string name="none_body">Lancez-en une sur votre téléphone et elle s’affichera ici.</string>
     <string name="log_set">Noter la série</string>
+    <string name="machine_taken">Machine occupée</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Ensuite : %1$s</string>
     <string name="rest_left">Repos, encore %1$s</string>

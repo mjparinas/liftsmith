@@ -389,6 +389,7 @@ export const emails: Record<string, Words> = {
       "Heart rate comes from the watch's own sensor.",
       "Log set and +30 s from your wrist, with a buzz when rest ends.",
       "A Garmin watch app is coming soon.",
+      "Machine taken? One tap swaps in the best lift for your gym, with its weight.",
     ],
     dyk: "The lock screen shows the rest countdown, the next set and its plates too.",
   },

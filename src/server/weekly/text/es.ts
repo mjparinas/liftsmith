@@ -368,6 +368,7 @@ export const emails: Record<string, Words> = {
       "La frecuencia cardiaca viene del sensor del propio reloj.",
       "Registrar serie y +30 s desde la muñeca, con una vibración cuando acaba el descanso.",
       "Pronto llegará una app para relojes Garmin.",
+      "¿Máquina ocupada? Un toque pone el mejor ejercicio para tu gimnasio, con su peso.",
     ],
     dyk: "La pantalla de bloqueo también muestra la cuenta atrás, la siguiente serie y sus discos.",
   },

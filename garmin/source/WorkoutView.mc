@@ -47,13 +47,15 @@ class WorkoutView extends WatchUi.View {
             line(dc, cx, h * 0.64, Lang.format(WatchUi.loadResource(Rez.Strings.Next) as String, [_w.next]), Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
         } else {
             line(dc, cx, h * 0.47, _w.next, Graphics.FONT_MEDIUM, INK, w * 0.9, 1);
-            line(dc, cx, h * 0.64, _w.plates, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
+            // After a Machine taken swap the new lift's plates matter most; with none, why it's there.
+            line(dc, cx, h * 0.64, _w.plates.length() > 0 ? _w.plates : _w.why, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
         }
         var bpm = _w.bpm();
         if (bpm > 0) {
             line(dc, cx, h * 0.75, Lang.format(WatchUi.loadResource(Rez.Strings.Bpm) as String, [bpm]), Graphics.FONT_XTINY, RED, w * 0.6, 1);
         }
-        var hint = resting ? Rez.Strings.HintAdd : Rez.Strings.HintLog;
+        var taken = _w.taken.length() > 0 && phase == null;
+        var hint = resting ? (taken ? Rez.Strings.HintAddTaken : Rez.Strings.HintAdd) : (taken ? Rez.Strings.HintLogTaken : Rez.Strings.HintLog);
         line(dc, cx, h * 0.87, WatchUi.loadResource(hint) as String, Graphics.FONT_XTINY, MUTED, w * 0.6, 1);
     }
 

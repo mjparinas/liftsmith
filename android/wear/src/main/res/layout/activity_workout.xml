@@ -38,6 +38,17 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <!-- Why the exercise is there after a Machine taken swap (src/lib/takenSwap.ts). -->
+        <TextView
+            android:id="@+id/why"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxLines="2"
+            android:textColor="@color/dim"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/big"
             android:layout_width="wrap_content"
@@ -92,6 +103,31 @@
             android:textAllCaps="false"
             android:textColor="@color/ink"
             android:textSize="15sp" />
+
+        <!-- Machine taken: the phone swaps to the best pick at this gym, named under the button. -->
+        <Button
+            android:id="@+id/taken"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/button"
+            android:text="@string/machine_taken"
+            android:textAllCaps="false"
+            android:textColor="@color/ink"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/taken_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:maxLines="2"
+            android:textColor="@color/dim"
+            android:textSize="12sp"
+            android:visibility="gone" />
 
         <!-- Start on phone, or Install on phone when the phone hasn't got Liftsmith (PhoneLink). -->
         <Button

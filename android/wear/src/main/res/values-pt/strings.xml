@@ -5,6 +5,7 @@
     <string name="none_title">Nenhum treino em andamento</string>
     <string name="none_body">Comece um no celular e ele aparece aqui.</string>
     <string name="log_set">Registrar série</string>
+    <string name="machine_taken">Aparelho ocupado</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Próxima: %1$s</string>
     <string name="rest_left">Descanso, faltam %1$s</string>

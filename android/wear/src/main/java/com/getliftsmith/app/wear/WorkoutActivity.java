@@ -35,8 +35,8 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         }
     };
     private boolean asked = false;
-    private TextView set, title, big, sub, hr, note;
-    private Button log, add, phone;
+    private TextView set, title, why, big, sub, hr, note, takenTo;
+    private Button log, add, taken, phone;
     /** What the last Start on phone or Install on phone tap said ("Check your phone"), until the state changes. */
     private int tapNote = 0;
     private PhoneLink.Status tapFor = null;
@@ -59,6 +59,9 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         setContentView(R.layout.activity_workout);
         set = findViewById(R.id.set);
         title = findViewById(R.id.title);
+        why = findViewById(R.id.why);
+        taken = findViewById(R.id.taken);
+        takenTo = findViewById(R.id.taken_to);
         big = findViewById(R.id.big);
         sub = findViewById(R.id.sub);
         hr = findViewById(R.id.hr);
@@ -68,6 +71,7 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         note = findViewById(R.id.note);
         log.setOnClickListener((v) -> tap(v, "log"));
         add.setOnClickListener((v) -> tap(v, "add30"));
+        taken.setOnClickListener((v) -> tap(v, "taken"));
         phone.setOnClickListener(this::openOnPhone);
     }
 
@@ -149,6 +153,9 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             hr.setVisibility(View.GONE);
             log.setVisibility(View.GONE);
             add.setVisibility(View.GONE);
+            why.setVisibility(View.GONE);
+            taken.setVisibility(View.GONE);
+            takenTo.setVisibility(View.GONE);
             // Not standalone: say what the phone needs, and offer the one step that gets there.
             switch (link) {
                 case NO_APP:
@@ -207,5 +214,13 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         hr.setText(getString(R.string.bpm, bpm));
         log.setVisibility(View.VISIBLE);
         add.setVisibility(resting ? View.VISIBLE : View.GONE);
+        why.setVisibility(s.why.isEmpty() ? View.GONE : View.VISIBLE);
+        why.setText(s.why);
+        // Machine taken: only when the phone has a pick (and Pro); the line under it says what it swaps to.
+        boolean canSwap = !s.taken.isEmpty() && phase == null;
+        taken.setVisibility(canSwap ? View.VISIBLE : View.GONE);
+        takenTo.setVisibility(canSwap ? View.VISIBLE : View.GONE);
+        takenTo.setText(s.taken);
+        taken.setContentDescription(getString(R.string.machine_taken) + ". " + s.taken);
     }
 }

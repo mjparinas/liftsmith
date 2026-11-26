@@ -565,6 +565,11 @@ export const fr: FeaturesText = {
       name: "Applis pour montres",
       body: "La séance sur Wear OS et Apple Watch : la série ou le décompte du repos, le pouls de la montre, Valider la série et +30 s, et une vibration à la fin du repos.",
     },
+    "machine-taken": {
+      name: "Machine occupée",
+      body: "Quelqu'un sur la machine ? Une touche sur ta montre ou dans Modifier le plan met le meilleur exercice de ta salle qui n'en a pas besoin, avec sa charge et pourquoi.",
+      note: "Wear OS, Apple Watch et Garmin (le bouton UP), et Modifier le plan sur le téléphone et le web.",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",

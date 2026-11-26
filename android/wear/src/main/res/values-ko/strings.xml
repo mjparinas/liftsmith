@@ -5,6 +5,7 @@
     <string name="none_title">진행 중인 운동 없음</string>
     <string name="none_body">휴대폰에서 운동을 시작하면 여기에 표시돼요.</string>
     <string name="log_set">세트 기록</string>
+    <string name="machine_taken">기구 사용 중</string>
     <string name="add_30">+30초</string>
     <string name="up_next">다음: %1$s</string>
     <string name="rest_left">휴식, %1$s 남음</string>

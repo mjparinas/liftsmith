@@ -12,7 +12,9 @@ import { useApp } from "./store";
 // The native side hands the action to the WorkoutSession plugin's "action" event, the same event the
 // lock-screen notification buttons use.
 
-export type ShortcutAction = "start" | "log" | "add30" | "muscles";
+/** "taken" is the watch's Machine taken (takenSwap.ts): it reaches the app through the same action event, but no link or
+ *  system shortcut sends it, so it isn't in SHORTCUT_ACTIONS. */
+export type ShortcutAction = "start" | "log" | "add30" | "muscles" | "taken";
 /** "muscles" opens Body's muscle view: the Recovery widget's tap (2026-11-15). */
 export const SHORTCUT_ACTIONS: readonly ShortcutAction[] = ["start", "log", "add30", "muscles"];
 
@@ -34,6 +36,7 @@ export function runShortcut(action: ShortcutAction, at?: number): "workout" | "t
   }
   if (!s.active) return "today";
   if (action === "log") s.logSet(at);
+  else if (action === "taken") s.takenSwap();
   else s.addRest(30);
   return "workout";
 }

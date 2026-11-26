@@ -2,6 +2,7 @@ import { track } from "../analytics";
 import { startDistance } from "../cardio";
 import { scheduledRoutine } from "../coachSchedule";
 import { derive } from "../derive";
+import { can } from "../entitlements";
 import { workoutEventIds } from "../editHistory";
 import { markJoke, plateJoke, seenJokes } from "../eggs";
 import { exercise } from "../exercises";
@@ -16,10 +17,12 @@ import { bodyMode } from "../pregnancy";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
+import { pickWeights } from "../pickWeights";
 import { partDefaults } from "../routines";
 import { doneParts, enterPart, movePart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
+import { takenPick } from "../takenSwap";
 import { toast } from "../toast";
 import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine, SetTag } from "../types";
 import { WARMUP_REST, warmupFor, warmupsOn } from "../warmup";
@@ -160,6 +163,42 @@ export const UNDO_MS = 10_000;
 export interface Logged {
   evs: AppEvent[];
   next: Active;
+}
+
+/**
+ * The workout after swapping the exercise on screen for `toId`, without saving anything: Swap, "Machine taken" and the
+ * sets the watches step through with the phone app asleep (sessionAhead.ts takenStep) all use it, so they agree.
+ */
+export function swappedActive(a: Active, events: AppEvent[], profile: Profile, g: Gym, toId: string, taken = false, now = Date.now()): Active {
+  const item = a.plan.items[a.index];
+  const to = exercise(toId);
+  const t = injuredTarget(to, target(to, events, profile, g, now), activeInjuries(events), g, bodyMode(profile, now));
+  const done = setsDone(events, a.sessionId, item.exerciseId);
+  const newItem: PlanItem = {
+    ...item,
+    exerciseId: toId,
+    target: t.target,
+    injuryPct: t.injuryPct,
+    mode: t.mode,
+    sets: Math.max(1, item.sets - done),
+    // Swapped again while the first was taken: it still stands in for the exercise that was planned.
+    takenFrom: taken ? (item.takenFrom ?? item.exerciseId) : undefined,
+  };
+  // A program keeps its sets and reps (and the lift the sets count for); only the weight changes,
+  // to what the new exercise usually takes. A ladder step keeps bodyweight.
+  if (item.setTargets) {
+    const rest = item.setTargets.slice(Math.min(done, item.setTargets.length - 1));
+    newItem.setTargets = rest.map((x) => ({ ...x, weight: t.target.weight }));
+    newItem.target = { ...t.target, reps: rest[0].reps, note: item.target.note };
+    newItem.sets = rest.length;
+  }
+  // The new exercise gets its own warm-ups, unless working sets were already done.
+  const warmed = new Set(a.plan.items.slice(0, a.index).flatMap((i) => exercise(i.exerciseId).primary));
+  const wu = done || !warmupsOn(profile) ? [] : warmupFor(exercise(toId), t.target.weight, g, warmed);
+  newItem.warmup = wu.length ? wu : undefined;
+  const items = [...a.plan.items];
+  items[a.index] = newItem;
+  return loadItem(events, { ...a, plan: { ...a.plan, items } }, a.index, now);
 }
 
 /**
@@ -389,7 +428,11 @@ export interface WorkoutSlice {
   /** Skip the rest of the warm-ups and go to the working weight. */
   skipWarmup(): void;
   feedback(r: Rating): void;
-  swap(toId: string, avoid: boolean): void;
+  /** `taken`: the equipment was busy ("Machine taken"), so the new exercise says why it's there (why.ts workoutWhy). */
+  swap(toId: string, avoid: boolean, taken?: boolean): void;
+  /** "Machine taken" from the watch or the phone (takenSwap.ts): swaps to the best pick. Pro, like working around
+   *  taken equipment. Returns the new exercise's id, or null when there's nothing to swap to. */
+  takenSwap(): string | null;
   /** Adds an exercise at the end of the workout in progress (the exercise browser's "Add an exercise"). */
   addExercise(exerciseId: string): void;
   goTo(index: number): void;
@@ -872,47 +915,34 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       persistActive(next);
     },
 
-    swap(toId, avoid) {
+    swap(toId, avoid, taken = false) {
       const a = get().active;
       const g = gym();
       if (!a || !g) return;
       const item = a.plan.items[a.index];
-      const to = exercise(toId);
-      const t = injuredTarget(
-        to,
-        target(to, get().events, get().profile, g, Date.now()),
-        activeInjuries(get().events),
-        g,
-        bodyMode(get().profile, Date.now()),
-      );
-      const done = setsDone(get().events, a.sessionId, item.exerciseId);
-      const newItem: PlanItem = {
-        ...item,
-        exerciseId: toId,
-        target: t.target,
-        injuryPct: t.injuryPct,
-        mode: t.mode,
-        sets: Math.max(1, item.sets - done),
-      };
-      // A program keeps its sets and reps (and the lift the sets count for); only the weight changes,
-      // to what the new exercise usually takes. A ladder step keeps bodyweight.
-      if (item.setTargets) {
-        const rest = item.setTargets.slice(Math.min(done, item.setTargets.length - 1));
-        newItem.setTargets = rest.map((x) => ({ ...x, weight: t.target.weight }));
-        newItem.target = { ...t.target, reps: rest[0].reps, note: item.target.note };
-        newItem.sets = rest.length;
-      }
-      // The new exercise gets its own warm-ups, unless working sets were already done.
-      const warmed = new Set(a.plan.items.slice(0, a.index).flatMap((i) => exercise(i.exerciseId).primary));
-      const wu = done || !warmupsOn(get().profile) ? [] : warmupFor(exercise(toId), t.target.weight, g, warmed);
-      newItem.warmup = wu.length ? wu : undefined;
-      const items = [...a.plan.items];
-      items[a.index] = newItem;
+      const next = swappedActive(a, get().events, get().profile, g, toId, taken);
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);
-      track("feature", { name: "swap", detail: avoid ? "not available here" : "swap" });
-      const next = loadItem(get().events, { ...a, plan: { ...a.plan, items } }, a.index);
+      track("feature", { name: "swap", detail: avoid ? "not available here" : taken ? "taken" : "swap" });
       set({ active: next });
       persistActive(next);
+    },
+
+    takenSwap() {
+      const a = get().active;
+      const g = gym();
+      if (!a || !g || !can("replan")) return null;
+      const { events, profile } = get();
+      const now = Date.now();
+      const to = takenPick(
+        a.plan.items[a.index],
+        a.plan.items.map((i) => i.exerciseId),
+        g,
+        activeInjuries(events),
+        bodyMode(profile, now),
+        pickWeights(events, profile, now),
+      );
+      if (to) get().swap(to, false, true);
+      return to;
     },
 
     addExercise(exerciseId) {

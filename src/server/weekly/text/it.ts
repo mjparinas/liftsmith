@@ -369,6 +369,7 @@ export const emails: Record<string, Words> = {
       "La frequenza cardiaca arriva dal sensore dell'orologio.",
       "Registra serie e +30 s dal polso, con una vibrazione a fine riposo.",
       "Un'app per gli orologi Garmin arriverà presto.",
+      "Macchina occupata? Un tocco mette l'esercizio migliore per la tua palestra, con il peso.",
     ],
     dyk: "Anche la schermata di blocco mostra il conto alla rovescia, la serie successiva e i suoi dischi.",
   },

@@ -6,4 +6,6 @@
     <string id="Bpm">$1$ S/min</string>
     <string id="HintLog">START: Satz eintragen</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="HintLogTaken">START: Eintragen · UP: Belegt</string>
+    <string id="HintAddTaken">DOWN: +30 s · UP: Belegt</string>
 </strings>

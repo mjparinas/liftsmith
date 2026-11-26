@@ -152,7 +152,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             state["restUntil"] = r
             if let total = call.getDouble("restTotal"), total > 0 { state["restFrom"] = r - total * 1000 }
         }
-        WorkoutTaps.remember(state: state, ahead: call.getArray("ahead") ?? [])
+        WorkoutTaps.remember(state: state, ahead: call.getArray("ahead") ?? [], takenStep: call.getObject("takenStep"))
         WatchLink.shared.update(watchState(call))
         GarminLink.shared.update(watchState(call))
         let center = UNUserNotificationCenter.current()
@@ -277,6 +277,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         if call.getBool("motion") == true { s["motion"] = true }
         if call.getBool("motionRest") == true { s["motionRest"] = true }
         if let cue = call.getString("cue"), !cue.isEmpty { s["cue"] = cue }
+        // Machine taken (src/lib/takenSwap.ts): what the watch's button swaps to, and why the exercise is there after one.
+        if let taken = call.getString("taken"), !taken.isEmpty { s["taken"] = taken }
+        if let why = call.getString("why"), !why.isEmpty { s["why"] = why }
         // The set timer (holds, carries, cardio): the watch counts its phases on its own clock (WatchState.timer).
         if let timer = call.getArray("timer"), !timer.isEmpty { s["timer"] = timer }
         return s
@@ -347,10 +350,12 @@ enum WorkoutTaps {
     }
 
     /// The app's latest update: what the Live Activity shows now and the sets after it.
-    static func remember(state: [String: Any], ahead: [Any]) {
+    static func remember(state: [String: Any], ahead: [Any], takenStep: [String: Any]? = nil) {
         var d = load()
         d["state"] = state
         d["ahead"] = ahead
+        // Machine taken from a watch with the app asleep: the swap the app worked out ahead (sessionAhead.ts takenStep).
+        d["takenStep"] = takenStep
         d["aheadAt"] = 0
         d["ended"] = false
         save(d)
@@ -377,6 +382,8 @@ enum WorkoutTaps {
     /// A tap with the app not open. Calls `done` once the Live Activity and the next alert are updated.
     static func tapped(_ action: String, at: Date = Date(), done: @escaping () -> Void = {}) {
         var d = load()
+        // Machine taken needs the swap the app worked out ahead; without a workout we know of there's none to make.
+        if action == "taken", d["state"] == nil { return done() }
         guard var state = d["state"] as? [String: Any] else {
             // No workout we know of (the app was closed before it sent one): keep the tap; the app decides.
             keep(action, at: at, in: &d)
@@ -407,13 +414,33 @@ enum WorkoutTaps {
             guard restUntil > now else { return done() }
             keep(action, at: at, in: &d)
             state["restUntil"] = restUntil + 30_000
+        } else if action == "taken" {
+            // Machine taken: only before any other tap since the app's last update, because the swap was worked out
+            // from that moment. The app makes the same swap when it wakes and replays the tap.
+            guard (d["aheadAt"] as? Int ?? 0) == 0, d["ended"] as? Bool != true, let step = d["takenStep"] as? [String: Any] else { return done() }
+            keep(action, at: at, in: &d)
+            for key in ["title", "setLabel", "next", "plates", "chip", "done", "total", "why"] { state[key] = step[key] }
+            d["ahead"] = step["ahead"] as? [Any] ?? []
+            d["aheadAt"] = 0
+            d["takenStep"] = nil
         } else {
             return done()
         }
+        // The steps ahead don't know which of them a Machine taken swap stands in for.
+        if action == "log" { state["why"] = nil }
         d["state"] = state
         save(d)
         scheduleAlert(state)
+        watches(state)
         show(state, done: done)
+    }
+
+    /// The watch apps follow the Live Activity while the app is asleep (the app sends them its own updates otherwise).
+    private static func watches(_ state: [String: Any]) {
+        var w: [String: Any] = [:]
+        for key in ["title", "setLabel", "next", "plates", "done", "total", "restUntil", "why"] { w[key] = state[key] }
+        WatchLink.shared.update(w)
+        GarminLink.shared.update(w)
     }
 
     private static func keep(_ action: String, at: Date, in d: inout [String: Any]) {

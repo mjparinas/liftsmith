@@ -23,6 +23,10 @@ struct WatchState: Decodable, Equatable {
     var motionRest = false
     /// Labs, hands-free watch sets: a new id means the set started or logged itself, and the watch taps once.
     var cue = ""
+    /// Machine taken (src/lib/takenSwap.ts): what one tap swaps to; empty hides the button.
+    var taken = ""
+    /// Why the exercise is there after a Machine taken swap, or empty.
+    var why = ""
     /// The set timer for holds, carries and cardio, phase by phase (src/lib/sessionNotify.ts TimerSegment).
     var timer: [Phase] = []
 
@@ -62,12 +66,14 @@ struct WatchState: Decodable, Equatable {
         motion = (try? c.decode(Bool.self, forKey: .motion)) ?? false
         motionRest = (try? c.decode(Bool.self, forKey: .motionRest)) ?? false
         cue = (try? c.decode(String.self, forKey: .cue)) ?? ""
+        taken = (try? c.decode(String.self, forKey: .taken)) ?? ""
+        why = (try? c.decode(String.self, forKey: .why)) ?? ""
         let phases = (try? c.decode([Phase].self, forKey: .timer)) ?? []
         timer = Array(phases.filter { p in p.from > 0 && (p.to.map { to in to > p.from } ?? true) }.prefix(8))
     }
 
     private enum CodingKeys: String, CodingKey {
-        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, timer
+        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, taken, why, timer
     }
 
     /// The set timer's phase at `now` (started, not ended); never while resting. Same rule as the phone's.

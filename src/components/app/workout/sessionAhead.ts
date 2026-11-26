@@ -1,8 +1,8 @@
 import { exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
-import { chipText, type AheadStep, type SessionState } from "@/lib/sessionNotify";
-import { afterLog, warmingUp, type Active } from "@/lib/store/workout";
-import type { AppEvent, Gym, Unit } from "@/lib/types";
+import { chipText, type AheadStep, type SessionState, type TakenAheadStep } from "@/lib/sessionNotify";
+import { afterLog, swappedActive, warmingUp, type Active } from "@/lib/store/workout";
+import type { AppEvent, Gym, Profile, Unit } from "@/lib/types";
 
 import { plateText, setText } from "../format";
 
@@ -81,4 +81,25 @@ export function aheadSteps(a: Active, events: readonly AppEvent[], unit: Unit, g
     steps.push({ ...fields, title: rest > 0 ? t("workout.restTitle", { name }) : name, rest });
   }
   return steps;
+}
+
+/**
+ * The workout after swapping to `toId` for taken equipment, worked out ahead like `aheadSteps`: with the phone app asleep
+ * (iOS in the background, Android closed) the watches' Machine taken tap steps to it, and the app makes the same swap
+ * when it wakes and replays the tap. Rest carries on as it was.
+ */
+export function takenStep(a: Active, events: AppEvent[], profile: Profile, gym: Gym, toId: string, autoRest: boolean): TakenAheadStep | null {
+  const item = a.plan.items[a.index];
+  if (!item) return null;
+  const now = Date.now();
+  const next = swappedActive(a, events, profile, gym, toId, true, now);
+  const f = sessionFields(next, events, profile.unit, gym);
+  if (!f) return null;
+  const { name, ...fields } = f;
+  return {
+    ...fields,
+    title: a.restUntil && a.restUntil > now ? t("workout.restTitle", { name }) : name,
+    why: t("why.taken", { name: exercise(item.exerciseId).name }),
+    ahead: aheadSteps(next, events, profile.unit, gym, autoRest),
+  };
 }

@@ -369,6 +369,7 @@ export const emails: Record<string, Words> = {
       "Die Herzfrequenz kommt vom Sensor der Uhr.",
       "„Satz eintragen“ und +30 s vom Handgelenk, mit Vibration am Pausenende.",
       "Eine App für Garmin-Uhren kommt bald.",
+      "Gerät belegt? Ein Tipp setzt die beste Übung für dein Studio ein, mit Gewicht.",
     ],
     dyk: "Der Sperrbildschirm zeigt auch den Pausen-Countdown, den nächsten Satz und seine Scheiben.",
   },

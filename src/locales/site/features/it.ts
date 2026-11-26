@@ -558,6 +558,11 @@ export const it: FeaturesText = {
       name: "App per orologi",
       body: "L’allenamento su Wear OS e Apple Watch: la serie o il conto alla rovescia del riposo, il battito dall’orologio, Registra serie e +30 s, e una vibrazione a fine riposo.",
     },
+    "machine-taken": {
+      name: "Macchina occupata",
+      body: "Qualcuno sulla macchina? Un tocco sull'orologio o in Cambia il piano mette l'esercizio migliore della tua palestra che non la usa, con il peso e il perché.",
+      note: "Wear OS, Apple Watch e Garmin (il tasto UP), e Cambia il piano sul telefono e sul web.",
+    },
     widgets: {
       name: "Widget della schermata Home",
       body: "Tre widget: Oggi (la scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie), Questa settimana (giorni di allenamento, la tua serie e cosa la mantiene) e Recupero (quali muscoli sono pronti e quando lo saranno gli altri).",

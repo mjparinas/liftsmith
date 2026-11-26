@@ -206,12 +206,15 @@ enum GarminMessages {
             "h": s["hr"] as? Int ?? 0,
             "v": s["vibrate"] as? Bool ?? true,
             "w": s["warn"] as? Bool ?? false,
+            // Machine taken (src/lib/takenSwap.ts): what UP swaps to, and why the exercise is there after a swap.
+            "x": s["taken"] as? String ?? "",
+            "y": s["why"] as? String ?? "",
         ]
     }
 
     static func worthSending(_ last: [String: Any]?, _ next: [String: Any], since: TimeInterval) -> Bool {
         guard let last else { return true }
-        for k in ["t", "s", "n", "p", "ki"] where last[k] as? String != next[k] as? String { return true }
+        for k in ["t", "s", "n", "p", "ki", "x", "y"] where last[k] as? String != next[k] as? String { return true }
         if last["v"] as? Bool != next["v"] as? Bool || last["w"] as? Bool != next["w"] as? Bool { return true }
         let a = last["r"] as? Int ?? 0, b = next["r"] as? Int ?? 0
         if (a > 0) != (b > 0) || (b > 0 && abs(Double(b) + since - Double(a)) > 1.5) { return true }

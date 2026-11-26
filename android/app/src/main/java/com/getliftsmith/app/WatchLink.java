@@ -35,8 +35,11 @@ final class WatchLink {
     static void update(Context context, JSONObject state) {
         try {
             state.put("at", System.currentTimeMillis());
+            // The steps after a Machine taken tap are for the phone's own service (WorkoutService), not the watch.
+            JSONObject forWatch = new JSONObject(state.toString());
+            forWatch.remove("takenStep");
             PutDataMapRequest req = PutDataMapRequest.create(PATH_WORKOUT);
-            req.getDataMap().putString("json", state.toString());
+            req.getDataMap().putString("json", forWatch.toString());
             PutDataRequest put = req.asPutDataRequest().setUrgent();
             Wearable.getDataClient(context).putDataItem(put);
         } catch (Exception ignored) {

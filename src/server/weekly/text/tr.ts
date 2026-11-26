@@ -368,6 +368,7 @@ export const emails: Record<string, Words> = {
       "Nabız saatin kendi sensöründen gelir.",
       "Bileğinden Seti kaydet ve +30 sn; dinlenme bittiğinde titreşim.",
       "Garmin saat uygulaması çok yakında.",
+      "Makine dolu mu? Tek dokunuş, salonun için en iyi hareketi ağırlığıyla getirir.",
     ],
     dyk: "Kilit ekranı da dinlenme geri sayımını, sıradaki seti ve plakalarını gösterir.",
   },

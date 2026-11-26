@@ -1,8 +1,9 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-//! START (or a tap on touch watches) logs the set as planned; DOWN (or a swipe up) adds 30 s of rest. Both go to
-//! the phone exactly like the notification's buttons, and the phone sends back the next state. BACK leaves.
+//! START (or a tap on touch watches) logs the set as planned; DOWN (or a swipe up) adds 30 s of rest; UP (or a swipe
+//! down) is Machine taken, when the phone has a pick. All go to the phone exactly like the notification's buttons, and
+//! the phone sends back the next state. BACK leaves.
 class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     private var _app as LiftsmithApp;
 
@@ -25,6 +26,15 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
             return false;
         }
         _app.send({ "a" => "add30" });
+        _app.buzz(60);
+        return true;
+    }
+
+    function onPreviousPage() as Boolean {
+        if (!_app.workout.active() || _app.workout.taken.length() == 0 || _app.workout.phase() != null) {
+            return false;
+        }
+        _app.send({ "a" => "taken" });
         _app.buzz(60);
         return true;
     }

@@ -367,6 +367,7 @@ export const emails: Record<string, Words> = {
       "Tętno pochodzi z czujnika samego zegarka.",
       "Zapisz serię i +30 s prosto z nadgarstka, z wibracją na koniec przerwy.",
       "Aplikacja na zegarki Garmin już wkrótce.",
+      "Maszyna zajęta? Jedno dotknięcie wstawia najlepsze ćwiczenie dla twojej siłowni, z ciężarem.",
     ],
     dyk: "Ekran blokady też pokazuje odliczanie przerwy, następną serię i jej talerze.",
   },

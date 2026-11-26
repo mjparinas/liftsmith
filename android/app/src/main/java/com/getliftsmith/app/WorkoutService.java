@@ -120,6 +120,10 @@ public class WorkoutService extends Service {
             sendBroadcast(new Intent(BROADCAST_ACTION).setPackage(getPackageName()).putExtra(EXTRA_ACTION, action).putExtra("at", at));
             return;
         }
+        if ("taken".equals(action)) {
+            takenTapped(at);
+            return;
+        }
         if (last == null) {
             WorkoutTaps.add(this, action, at);
             return;
@@ -150,7 +154,9 @@ public class WorkoutService extends Service {
                 // A new set: the last rest's "Rest over" is done with, and so is the set timer.
                 .putExtra("restDone", false)
                 .putExtra("timer", "[]")
-                .putExtra("timerDone", false);
+                .putExtra("timerDone", false)
+                // The steps ahead don't know which of them a Machine taken swap stands in for.
+                .putExtra("why", "");
             show(n);
             watches(n);
         } else if ("add30".equals(action)) {
@@ -165,6 +171,35 @@ public class WorkoutService extends Service {
         }
     }
 
+    /**
+     * Machine taken from a watch with the app closed: the app worked out the swap ahead of time (sessionAhead.ts takenStep),
+     * so the notification and watches move to it now and the app makes the same swap when it opens. Only before any
+     * other tap since the app's last update, because the swap was worked out from that moment; otherwise it's dropped.
+     */
+    private void takenTapped(long at) {
+        if (last == null || aheadAt != 0 || ended) return;
+        JSONObject step = WorkoutTaps.object(last.getStringExtra("takenStep"));
+        if (step == null) return;
+        WorkoutTaps.add(this, "taken", at);
+        ahead = step.optJSONArray("ahead") == null ? new JSONArray() : step.optJSONArray("ahead");
+        aheadAt = 0;
+        Intent n = new Intent(last)
+            .putExtra("title", step.optString("title", ""))
+            .putExtra("setLabel", step.optString("setLabel", ""))
+            .putExtra("next", step.optString("next", ""))
+            .putExtra("plates", step.optString("plates", ""))
+            .putExtra("chip", step.optString("chip", ""))
+            .putExtra("done", step.optInt("done", 0))
+            .putExtra("total", step.optInt("total", 0))
+            .putExtra("why", step.optString("why", ""))
+            // One swap: the next tap would need the app to work out another.
+            .putExtra("takenStep", "")
+            .putExtra("timer", "[]")
+            .putExtra("timerDone", false);
+        show(n);
+        watches(n);
+    }
+
     /** The watch apps follow the notification while the app is closed (the app sends them its own updates otherwise). */
     private void watches(Intent n) {
         JSONObject w = new JSONObject();
@@ -177,6 +212,8 @@ public class WorkoutService extends Service {
             w.put("warn", n.getBooleanExtra("warn", false));
             w.put("done", n.getIntExtra("done", 0));
             w.put("total", n.getIntExtra("total", 0));
+            String why = n.getStringExtra("why");
+            if (why != null && !why.isEmpty()) w.put("why", why);
             long restUntil = n.getLongExtra("restUntil", 0L);
             if (restUntil > 0) w.put("restUntil", restUntil);
         } catch (JSONException ignored) {
