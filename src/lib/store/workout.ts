@@ -2,9 +2,9 @@ import { track } from "../analytics";
 import { startDistance } from "../cardio";
 import { scheduledRoutine } from "../coachSchedule";
 import { derive } from "../derive";
-import { can } from "../entitlements";
 import { workoutEventIds } from "../editHistory";
 import { markJoke, plateJoke, seenJokes } from "../eggs";
+import { can } from "../entitlements";
 import { exercise } from "../exercises";
 import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
 import { noteVisit, visitFor } from "../gymVisits";
@@ -13,11 +13,11 @@ import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
 import { cardioItem, extraOffer, rehabItems, type ExtraOffer } from "../partExtras";
+import { pickWeights } from "../pickWeights";
 import { bodyMode } from "../pregnancy";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
-import { pickWeights } from "../pickWeights";
 import { partDefaults } from "../routines";
 import { doneParts, enterPart, movePart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
@@ -169,7 +169,15 @@ export interface Logged {
  * The workout after swapping the exercise on screen for `toId`, without saving anything: Swap, "Machine taken" and the
  * sets the watches step through with the phone app asleep (sessionAhead.ts takenStep) all use it, so they agree.
  */
-export function swappedActive(a: Active, events: AppEvent[], profile: Profile, g: Gym, toId: string, taken = false, now = Date.now()): Active {
+export function swappedActive(
+  a: Active,
+  events: AppEvent[],
+  profile: Profile,
+  g: Gym,
+  toId: string,
+  taken = false,
+  now = Date.now(),
+): Active {
   const item = a.plan.items[a.index];
   const to = exercise(toId);
   const t = injuredTarget(to, target(to, events, profile, g, now), activeInjuries(events), g, bodyMode(profile, now));

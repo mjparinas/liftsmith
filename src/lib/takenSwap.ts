@@ -3,8 +3,8 @@ import { alternatives, injuredTarget, type PlanItem } from "./generator";
 import type { Injury } from "./injury";
 import type { PickWeights } from "./pickWeights";
 import type { BodyMode } from "./pregnancy";
-import { busyEquipment } from "./replan";
 import type { Target } from "./progression";
+import { busyEquipment } from "./replan";
 import type { Equipment, Gym } from "./types";
 
 // "Machine taken" (Melvin picked it, 2026-11-26, watch ideas 2): one tap, on the watch or the phone, swaps the

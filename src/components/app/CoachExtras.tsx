@@ -9,9 +9,9 @@ import { explain } from "@/lib/explain";
 import type { PlanItem } from "@/lib/generator";
 import { gymName } from "@/lib/gymNames";
 import { list, t } from "@/lib/i18n";
+import { activeInjuries } from "@/lib/injury";
 import { haptic } from "@/lib/juice";
 import { presetLabels, settingsFor, settingsLine, type Setting } from "@/lib/machineSettings";
-import { activeInjuries } from "@/lib/injury";
 import { pickWeights } from "@/lib/pickWeights";
 import { bodyMode } from "@/lib/pregnancy";
 import { target } from "@/lib/progression";
@@ -90,7 +90,17 @@ export function ReplanSheet({
   const options = [10, 15, 20, 30, 45].filter((m) => m < left);
   // "Machine taken" (takenSwap.ts): the same pick the watch's one tap makes goes first, with its weight and why.
   const busy = item && !item.part ? takenEquipment(item.exerciseId) : [];
-  const free = item && busy.length ? takenSwaps(item.exerciseId, gym, a.plan.items.map((i) => i.exerciseId), hurt, mode, weights).slice(0, 5) : [];
+  const free =
+    item && busy.length
+      ? takenSwaps(
+          item.exerciseId,
+          gym,
+          a.plan.items.map((i) => i.exerciseId),
+          hurt,
+          mode,
+          weights,
+        ).slice(0, 5)
+      : [];
   const best = free[0];
   const bestEx = best ? exercise(best) : undefined;
   const bestTarget = bestEx ? takenTarget(bestEx.id, target(bestEx, s.events, s.profile, gym, now), hurt, gym, mode) : undefined;

@@ -9,8 +9,8 @@ import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { estimate } from "@/lib/e1rm";
-import { can } from "@/lib/entitlements";
 import { endWorkout } from "@/lib/endWorkout";
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
@@ -31,7 +31,15 @@ import { target, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
-import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep, type TakenAheadStep } from "@/lib/sessionNotify";
+import {
+  notifyPermission,
+  onWatchHeartRate,
+  restOverAlert,
+  stopSession,
+  updateSession,
+  type AheadStep,
+  type TakenAheadStep,
+} from "@/lib/sessionNotify";
 import { timerLength, type TimerSpec } from "@/lib/setTimer";
 import { countedReps, implementsFor, perSide } from "@/lib/sides";
 import { followWorkout, sonosOn } from "@/lib/sonos";
@@ -389,7 +397,8 @@ export function Workout() {
     if (!f) return;
     if (ahead.current.key !== key)
       ahead.current = { key, steps: aheadSteps(active, events, profile.unit, gym, profile.training?.autoRest !== false) };
-    if (takenOffer.current.key !== key) takenOffer.current = { key, text: undefined, step: undefined, ...watchTaken(active, events, profile, gym) };
+    if (takenOffer.current.key !== key)
+      takenOffer.current = { key, text: undefined, step: undefined, ...watchTaken(active, events, profile, gym) };
     void updateSession({
       title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
       setLabel: f.setLabel,
@@ -1309,7 +1318,14 @@ function watchTaken(a: Active, events: AppEvent[], profile: Profile, gym: Gym): 
   const now = Date.now();
   const hurt = activeInjuries(events);
   const mode = bodyMode(profile, now);
-  const to = takenPick(a.plan.items[a.index], a.plan.items.map((i) => i.exerciseId), gym, hurt, mode, pickWeights(events, profile, now));
+  const to = takenPick(
+    a.plan.items[a.index],
+    a.plan.items.map((i) => i.exerciseId),
+    gym,
+    hurt,
+    mode,
+    pickWeights(events, profile, now),
+  );
   if (!to) return {};
   const ex = exercise(to);
   const tg = takenTarget(to, target(ex, events, profile, gym, now), hurt, gym, mode);

@@ -2,6 +2,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { sessionFields, takenStep } from "@/components/app/workout/sessionAhead";
+import { makeTestGym } from "@/test/factories";
 
 import { defaultProfile } from "./defaults";
 import { exercise } from "./exercises";
@@ -10,7 +11,6 @@ import { buildWeights } from "./pickWeights";
 import { runShortcut } from "./shortcuts";
 import { useApp } from "./store";
 import { takenEquipment, takenPick, takenSwaps } from "./takenSwap";
-import { makeTestGym } from "@/test/factories";
 import { workoutWhy } from "./why";
 
 const pro = vi.hoisted(() => ({ on: true }));
@@ -57,7 +57,11 @@ describe("the Machine taken pick", () => {
   });
 
   it("says what it stands in for, under the target", () => {
-    const why = workoutWhy(item("cable-pullover", { takenFrom: "lat-pulldown" }), { week: { deload: false } as never, call: "normal", items: [] });
+    const why = workoutWhy(item("cable-pullover", { takenFrom: "lat-pulldown" }), {
+      week: { deload: false } as never,
+      call: "normal",
+      items: [],
+    });
     expect(why).toContain("Lat pulldown");
   });
 });
@@ -97,7 +101,14 @@ describe("Machine taken in a workout", () => {
   it("works out the watches' state after the tap exactly as the swap lands", () => {
     const s = useApp.getState();
     const a = s.active!;
-    const to = takenPick(a.plan.items[a.index], a.plan.items.map((i) => i.exerciseId), s.gyms[0]!, [], null, buildWeights([], s.profile.training, Date.now()));
+    const to = takenPick(
+      a.plan.items[a.index],
+      a.plan.items.map((i) => i.exerciseId),
+      s.gyms[0]!,
+      [],
+      null,
+      buildWeights([], s.profile.training, Date.now()),
+    );
     expect(to).toBeTruthy();
     const step = takenStep(a, s.events, s.profile, s.gyms[0]!, to!, true)!;
     useApp.getState().swap(to!, false, true);

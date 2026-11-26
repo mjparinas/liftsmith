@@ -45,7 +45,10 @@ export const BLOG_MACHINE_TAKEN: Article[] = [
         "Is it free?",
         "Working around taken equipment is part of Pro, on the watch and the phone alike. Free lifters can still swap any exercise by hand from the workout screen.",
       ],
-      ["Do the sets I already did count?", "Yes. Sets you logged stay with the first lift, and the swap takes only the sets that are left."],
+      [
+        "Do the sets I already did count?",
+        "Yes. Sets you logged stay with the first lift, and the swap takes only the sets that are left.",
+      ],
     ],
   },
 ];

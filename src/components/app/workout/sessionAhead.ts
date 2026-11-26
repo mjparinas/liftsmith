@@ -88,7 +88,14 @@ export function aheadSteps(a: Active, events: readonly AppEvent[], unit: Unit, g
  * (iOS in the background, Android closed) the watches' Machine taken tap steps to it, and the app makes the same swap
  * when it wakes and replays the tap. Rest carries on as it was.
  */
-export function takenStep(a: Active, events: AppEvent[], profile: Profile, gym: Gym, toId: string, autoRest: boolean): TakenAheadStep | null {
+export function takenStep(
+  a: Active,
+  events: AppEvent[],
+  profile: Profile,
+  gym: Gym,
+  toId: string,
+  autoRest: boolean,
+): TakenAheadStep | null {
   const item = a.plan.items[a.index];
   if (!item) return null;
   const now = Date.now();
