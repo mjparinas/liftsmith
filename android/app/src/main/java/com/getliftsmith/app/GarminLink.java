@@ -99,6 +99,9 @@ final class GarminLink {
         for (Runnable r : run) r.run();
     }
 
+    /** Today's carried plan last sent, so an unchanged plan doesn't cross Bluetooth again. */
+    private static String lastCarry;
+
     /** Log set, +30 s and heart rate from the watch, handled exactly like the Wear OS app's. */
     private static final ConnectIQ.IQApplicationEventListener incoming = (device, app, message, status) -> {
         if (status != ConnectIQ.IQMessageStatus.SUCCESS || context == null) return;
@@ -208,9 +211,6 @@ final class GarminLink {
             send(GarminMessages.today(t));
         });
     }
-
-    /** Today's carried plan last sent, so an unchanged plan doesn't cross Bluetooth again. */
-    private static String lastCarry;
 
     /** Today's plan worked out set by set, for a workout on the watch with the phone away. Nothing without Garmin Connect. */
     static void carry(Context ctx, String json) {
