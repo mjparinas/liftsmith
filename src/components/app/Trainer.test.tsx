@@ -353,8 +353,13 @@ describe("trainer mode", () => {
     expect(await screen.findByText(/Deload this week/)).toBeInTheDocument();
     unmount();
     render(<CoachNoteToday />);
-    expect(screen.getByText(/Deload this week/)).toBeInTheDocument();
-    expect(screen.getByText(/From Sam/)).toBeInTheDocument();
+    // One card: who it's from, the note and both buttons together (Melvin, 2026-11-26).
+    const card = screen.getByTestId("coach-note-today");
+    expect(card).toHaveTextContent(/Deload this week/);
+    expect(card).toHaveTextContent("From your coach");
+    expect(card).toHaveTextContent("Sam");
+    expect(within(card).getByRole("button", { name: "Open coaching" })).toBeInTheDocument();
+    expect(within(card).getByRole("button", { name: "Got it" })).toBeInTheDocument();
     await u.click(screen.getByRole("button", { name: "Got it" }));
     expect(screen.queryByText(/Deload this week/)).toBeNull();
   });
