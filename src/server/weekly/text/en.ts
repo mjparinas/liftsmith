@@ -635,6 +635,7 @@ export const emails: Record<string, Words> = {
       'Voice: say "100 for 8" or "too easy", recognized on your phone.',
       "The volume button on your phone or earbuds logs the set.",
       "Your watch, or the phone's own motion sensors, can count the reps.",
+      "Hands-free watch sets: start your next set and the watch ends rest, counts and logs it by itself.",
       "The tempo coach counts each rep's lowering, hold and lift.",
     ],
     dyk: "No audio ever leaves your phone for voice logging.",

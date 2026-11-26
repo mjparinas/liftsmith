@@ -275,6 +275,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         if let d = call.getInt("done") { s["done"] = d }
         if let t = call.getInt("total") { s["total"] = t }
         if call.getBool("motion") == true { s["motion"] = true }
+        if call.getBool("motionRest") == true { s["motionRest"] = true }
+        if let cue = call.getString("cue"), !cue.isEmpty { s["cue"] = cue }
         // The set timer (holds, carries, cardio): the watch counts its phases on its own clock (WatchState.timer).
         if let timer = call.getArray("timer"), !timer.isEmpty { s["timer"] = timer }
         return s

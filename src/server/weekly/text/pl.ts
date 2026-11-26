@@ -613,6 +613,7 @@ export const emails: Record<string, Words> = {
       "Głos: powiedz „100 na 8” albo „za lekko”, rozpoznawane na twoim telefonie.",
       "Przycisk głośności w telefonie lub słuchawkach zapisuje serię.",
       "Zegarek albo czujniki ruchu w telefonie mogą liczyć powtórzenia.",
+      "Serie bez rąk z zegarkiem: zacznij kolejną serię, a zegarek sam zakończy przerwę, policzy ją i zapisze.",
       "Trener tempa odlicza opuszczanie, zatrzymanie i podnoszenie w każdym powtórzeniu.",
     ],
     dyk: "Przy zapisywaniu głosem żaden dźwięk nigdy nie opuszcza twojego telefonu.",

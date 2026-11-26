@@ -46,11 +46,12 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.25.0",
+    version: "0.26.0",
     day: "2026-11-27",
     headline:
-      "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, a program can run in order, and 13 new stretches",
+      "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, a program can run in order, 13 new stretches, and hands-free sets on the watch",
     changes: [
+      { id: "watchAuto", kind: "new", icon: "watch", unlock: "more", gate: "native" },
       { id: "programPhases", kind: "new", icon: "layers" },
       { id: "programTweaks", kind: "new", icon: "people" },
       { id: "programAthlete", kind: "new", icon: "calendar" },

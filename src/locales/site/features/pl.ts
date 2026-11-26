@@ -768,6 +768,11 @@ export const pl: FeaturesText = {
       name: "Serie bez użycia rąk",
       body: "Gdy licznik powtórzeń liczy, seria zapisuje się sama kilka sekund po ostatnim powtórzeniu.",
     },
+    "lab-watch-auto": {
+      name: "Serie bez rąk z zegarkiem",
+      body: "Zacznij kolejną serię, a zegarek sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
+      note: "Wear OS i Apple Watch, z włączonym liczeniem powtórzeń zegarkiem.",
+    },
     "lab-voice": {
       name: "Głosowy zapis serii",
       body: "Powiedz „100 na 8” albo „za lekko”, żeby zapisać serię. Rozpoznawane na urządzeniu; żaden dźwięk go nie opuszcza.",

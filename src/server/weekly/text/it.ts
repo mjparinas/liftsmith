@@ -615,6 +615,7 @@ export const emails: Record<string, Words> = {
       'Voce: di\' "100 per 8" o "troppo facile", riconosciuto sul telefono.',
       "Il tasto del volume del telefono o degli auricolari registra la serie.",
       "Il tuo orologio, o i sensori di movimento del telefono, possono contare le ripetizioni.",
+      "Serie a mani libere con l'orologio: inizia la serie successiva e l'orologio chiude il recupero, la conta e la registra da solo.",
       "Il coach del tempo conta discesa, pausa e salita di ogni ripetizione.",
     ],
     dyk: "Per la registrazione vocale nessun audio lascia mai il telefono.",

@@ -63,6 +63,14 @@ export const FLAGS = {
     label: "Labs: hands-free sets",
     description: "While a rep counter is counting, the set logs itself a few seconds after the last rep and rest starts.",
   },
+  /** Labs: the watch also sees the next set start during rest, and every watch-counted set logs itself (watchAuto.ts). */
+  labWatchAuto: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: hands-free watch sets",
+    description:
+      "With watch rep counting on: rest ends when the watch sees the next set start, the set logs itself after the last rep, and the watch buzzes at each step.",
+  },
   /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
   labHrRest: {
     default: false,

@@ -140,6 +140,9 @@ export const en = {
   "wn.c.assignProgram.title": "Assign a season program",
   "wn.c.assignProgram.body":
     "Coaches put Upper/Lower, Push/Pull/Legs or their own multi-day program on athletes or a school team for N weeks. Athletes follow once; Today shows that weekday’s workout. A program calendar shows Done and Not yet — first names only for school teams, never weights.",
+  "wn.c.watchAuto.title": "Hands-free sets on your watch",
+  "wn.c.watchAuto.body":
+    "In Labs: start your next set and your Wear OS watch or Apple Watch ends rest, counts the reps and logs the set by itself, with a buzz at each step.",
   "wn.c.programPhases.title": "Phases and reps in coach programs",
   "wn.c.programPhases.body":
     "Coaches run a program in phases with a one-tap deload week, and can set reps for an exercise or leave them on Auto. You see your phase and week under Today's plan.",
@@ -312,6 +315,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Asigna un programa de temporada",
   "wn.c.assignProgram.body":
     "Los entrenadores ponen Upper/Lower, Push/Pull/Legs o su programa de varios días a clientes o un equipo escolar durante N semanas. Siguen una vez; Hoy muestra el entrenamiento de ese día. Un calendario muestra Hecho y Aún no — solo nombres de pila en equipos escolares, nunca pesos.",
+  "wn.c.watchAuto.title": "Series sin manos en tu reloj",
+  "wn.c.watchAuto.body":
+    "En Labs: empieza tu siguiente serie y tu reloj Wear OS o Apple Watch termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
   "wn.c.programPhases.title": "Fases y repeticiones en los programas de entrenadores",
   "wn.c.programPhases.body":
     "Los entrenadores organizan un programa por fases con una semana de descarga en un toque, y pueden fijar las repeticiones de un ejercicio o dejarlas en Auto. Ves tu fase y semana bajo el plan de Hoy.",
@@ -486,6 +492,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Assigner un programme de saison",
   "wn.c.assignProgram.body":
     "Les coachs mettent Upper/Lower, Push/Pull/Legs ou leur programme de plusieurs jours sur des clients ou une équipe scolaire pour N semaines. Suivre une fois ; Aujourd’hui montre l’entraînement du jour. Un calendrier montre Fait et Pas encore — prénoms seulement pour les équipes scolaires, jamais de poids.",
+  "wn.c.watchAuto.title": "Séries mains libres sur ta montre",
+  "wn.c.watchAuto.body":
+    "Dans Labs : lance ta série suivante et ta montre Wear OS ou ton Apple Watch arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
   "wn.c.programPhases.title": "Phases et répétitions dans les programmes de coach",
   "wn.c.programPhases.body":
     "Les coachs organisent un programme en phases avec une semaine de décharge en un toucher, et peuvent fixer les répétitions d'un exercice ou les laisser sur Auto. Vous voyez votre phase et votre semaine sous le plan d'Aujourd'hui.",
@@ -656,6 +665,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Saisonprogramm zuweisen",
   "wn.c.assignProgram.body":
     "Coaches setzen Upper/Lower, Push/Pull/Legs oder ihr mehrtägiges Programm für N Wochen auf Klienten oder ein Schulteam. Einmal folgen; Heute zeigt das Training des Wochentags. Ein Kalender zeigt Erledigt und Noch nicht — nur Vornamen bei Schulteams, nie Gewichte.",
+  "wn.c.watchAuto.title": "Freihändige Sätze auf deiner Uhr",
+  "wn.c.watchAuto.body":
+    "In Labs: Starte deinen nächsten Satz, und deine Wear-OS-Uhr oder Apple Watch beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
   "wn.c.programPhases.title": "Phasen und Wiederholungen in Coach-Programmen",
   "wn.c.programPhases.body":
     "Coaches teilen ein Programm in Phasen mit einer Deload-Woche per Tippen und können Wiederholungen für eine Übung festlegen oder auf Auto lassen. Deine Phase und Woche siehst du unter dem Plan auf Heute.",
@@ -826,6 +838,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Assegna un programma di stagione",
   "wn.c.assignProgram.body":
     "I coach mettono Upper/Lower, Push/Pull/Legs o il loro programma di più giorni su clienti o una squadra scolastica per N settimane. Seguono una volta; Oggi mostra l’allenamento del giorno. Un calendario mostra Fatto e Non ancora — solo nomi per le squadre scolastiche, mai i pesi.",
+  "wn.c.watchAuto.title": "Serie a mani libere sull'orologio",
+  "wn.c.watchAuto.body":
+    "In Labs: inizia la serie successiva e il tuo orologio Wear OS o Apple Watch chiude il recupero, conta le ripetizioni e registra la serie da solo, con una vibrazione a ogni passo.",
   "wn.c.programPhases.title": "Fasi e ripetizioni nei programmi dei coach",
   "wn.c.programPhases.body":
     "I coach dividono un programma in fasi con una settimana di scarico in un tocco, e possono impostare le ripetizioni di un esercizio o lasciarle su Auto. Vedi fase e settimana sotto il piano di Oggi.",
@@ -985,6 +1000,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "シーズンプログラムを割り当て",
   "wn.c.assignProgram.body":
     "コーチが Upper/Lower、Push/Pull/Legs、または自作の複数日プログラムをクライアントや学校チームに N 週間割り当てます。一度フォローすれば、今日にその曜日のワークアウトが出ます。カレンダーで完了／まだが分かり、学校チームは下の名前のみ、重量は出しません。",
+  "wn.c.watchAuto.title": "ウォッチでハンズフリーセット",
+  "wn.c.watchAuto.body":
+    "Labsに追加：次のセットを始めるだけで、Wear OSウォッチやApple Watchが休憩を終え、レップを数え、セットを自動で記録します。各ステップで振動します。",
   "wn.c.programPhases.title": "コーチのプログラムにフェーズと回数設定",
   "wn.c.programPhases.body":
     "コーチはワンタップのディロード週を含むフェーズでプログラムを組み、種目の回数を決めるかオートのままにできます。今のフェーズと週は今日のプランの下に表示されます。",
@@ -1150,6 +1168,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Atribuir um programa de temporada",
   "wn.c.assignProgram.body":
     "Os treinadores põem Upper/Lower, Push/Pull/Legs ou o seu programa de vários dias em clientes ou numa equipa escolar por N semanas. Seguem uma vez; Hoje mostra o treino desse dia. Um calendário mostra Feito e Ainda não — só primeiros nomes em equipas escolares, nunca pesos.",
+  "wn.c.watchAuto.title": "Séries sem as mãos no seu relógio",
+  "wn.c.watchAuto.body":
+    "No Labs: comece a próxima série e seu relógio Wear OS ou Apple Watch encerra o descanso, conta as repetições e registra a série sozinho, com uma vibração a cada etapa.",
   "wn.c.programPhases.title": "Fases e repetições nos programas de treinadores",
   "wn.c.programPhases.body":
     "Treinadores dividem um programa em fases com uma semana de deload em um toque, e podem definir as repetições de um exercício ou deixar no Auto. Você vê sua fase e semana abaixo do plano de Hoje.",
@@ -1303,6 +1324,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "시즌 프로그램 배정",
   "wn.c.assignProgram.body":
     "코치가 어퍼/로워, 푸시/풀/레그 또는 여러 날 프로그램을 클라이언트나 학교 팀에 N주 배정합니다. 한 번 따르면 오늘에 그날 운동이 나옵니다. 달력에서 완료/아직을 보고, 학교 팀은 이름만, 무게는 절대 안 보입니다.",
+  "wn.c.watchAuto.title": "워치로 손 안 대는 세트",
+  "wn.c.watchAuto.body":
+    "Labs에서: 다음 세트를 시작하면 Wear OS 워치나 Apple Watch가 휴식을 끝내고, 반복 횟수를 세고, 세트를 저절로 기록해요. 단계마다 진동해요.",
   "wn.c.programPhases.title": "코치 프로그램의 단계와 반복 횟수",
   "wn.c.programPhases.body":
     "코치는 한 번 탭으로 넣는 디로드 주와 함께 프로그램을 단계로 나누고, 운동별 반복 횟수를 정하거나 자동으로 둘 수 있습니다. 지금 단계와 주차는 오늘의 계획 아래에 보입니다.",
@@ -1467,6 +1491,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Przypisz program sezonowy",
   "wn.c.assignProgram.body":
     "Trenerzy ustawiają Upper/Lower, Push/Pull/Legs lub własny wielodniowy program klientom albo drużynie szkolnej na N tygodni. Śledzą raz; Dziś pokazuje trening tego dnia. Kalendarz pokazuje Zrobione i Jeszcze nie — tylko imiona w drużynach szkolnych, nigdy ciężary.",
+  "wn.c.watchAuto.title": "Serie bez rąk na zegarku",
+  "wn.c.watchAuto.body":
+    "W Labs: zacznij kolejną serię, a zegarek z Wear OS lub Apple Watch sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
   "wn.c.programPhases.title": "Fazy i powtórzenia w programach trenerów",
   "wn.c.programPhases.body":
     "Trenerzy dzielą program na fazy z tygodniem odciążenia dodawanym jednym dotknięciem i mogą ustalić powtórzenia ćwiczenia albo zostawić Auto. Swoją fazę i tydzień widzisz pod planem na Dziś.",
@@ -1633,6 +1660,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Sezon programı ata",
   "wn.c.assignProgram.body":
     "Koçlar Upper/Lower, Push/Pull/Legs veya kendi çok günlük programlarını danışanlara ya da okul takımına N hafta atar. Bir kez takip; Bugün o günün antrenmanını gösterir. Takvim Yapıldı ve Henüz değil’i gösterir — okul takımlarında yalnızca adlar, asla ağırlık yok.",
+  "wn.c.watchAuto.title": "Saatinde eller serbest setler",
+  "wn.c.watchAuto.body":
+    "Labs'ta: bir sonraki setine başla; Wear OS saatin ya da Apple Watch dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",
   "wn.c.programPhases.title": "Koç programlarında evreler ve tekrarlar",
   "wn.c.programPhases.body":
     "Koçlar programı tek dokunuşla eklenen bir deload haftasıyla evrelere ayırır ve bir hareketin tekrarlarını belirleyebilir ya da Otomatik bırakabilir. Evreni ve haftanı Bugün planının altında görürsün.",

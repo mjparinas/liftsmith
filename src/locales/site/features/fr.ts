@@ -707,6 +707,11 @@ export const fr: FeaturesText = {
       name: "Séries mains libres",
       body: "Pendant qu’un compteur de répétitions compte, la série se valide seule quelques secondes après votre dernière répétition.",
     },
+    "lab-watch-auto": {
+      name: "Séries mains libres avec la montre",
+      body: "Lance ta série suivante et ta montre arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
+      note: "Wear OS et Apple Watch, avec le comptage des répétitions par la montre activé.",
+    },
     "lab-voice": {
       name: "Valider une série à la voix",
       body: "Dites « 100 pour 8 » ou « trop facile » pour valider une série. Reconnu sur votre appareil ; aucun son n’en sort.",

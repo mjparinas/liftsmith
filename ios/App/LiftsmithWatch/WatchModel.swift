@@ -40,6 +40,8 @@ final class WatchModel: NSObject, ObservableObject {
     fileprivate func apply(_ json: String?) {
         let next = WatchState.parse(json)
         guard next != state else { return }
+        // Hands-free watch sets (Labs): one tap when the set started or logged itself, so the lifter knows without looking.
+        if let n = next, n.vibrate, n.newCue(after: state) { WKInterfaceDevice.current().play(.click) }
         state = next
         scheduleRestTap()
         if next == nil { endWorkout() } else { beginWorkout() }

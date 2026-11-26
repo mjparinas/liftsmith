@@ -768,6 +768,11 @@ export const tr: FeaturesText = {
       name: "Eller serbest setler",
       body: "Bir tekrar sayacı sayarken set, son tekrarından birkaç saniye sonra kendiliğinden kaydedilir.",
     },
+    "lab-watch-auto": {
+      name: "Saatle eller serbest setler",
+      body: "Bir sonraki setine başla; saatin dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",
+      note: "Wear OS ve Apple Watch, saatle tekrar sayma açıkken.",
+    },
     "lab-voice": {
       name: "Sesle set kaydı",
       body: "Bir seti kaydetmek için “8 tekrar 100” ya da “çok kolay” de. Cihazında tanınır; hiçbir ses dışarı çıkmaz.",
