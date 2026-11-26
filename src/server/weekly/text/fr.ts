@@ -616,6 +616,7 @@ export const emails: Record<string, Words> = {
       "Voix : dites « 100 pour 8 » ou « trop facile », reconnu sur votre téléphone.",
       "Le bouton de volume du téléphone ou des écouteurs enregistre la série.",
       "Votre montre, ou les capteurs de mouvement du téléphone, peuvent compter les répétitions.",
+      "Séries mains libres avec la montre : lance ta série suivante et la montre arrête le repos, la compte et l'enregistre seule.",
       "Le coach de tempo compte la descente, la pause et la montée de chaque répétition.",
     ],
     dyk: "Pour l'enregistrement vocal, aucun son ne quitte jamais votre téléphone.",

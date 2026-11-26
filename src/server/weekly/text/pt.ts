@@ -615,6 +615,7 @@ export const emails: Record<string, Words> = {
       "Voz: diga “100 por 8” ou “fácil demais”, reconhecido no seu celular.",
       "O botão de volume do celular ou dos fones registra a série.",
       "Seu relógio, ou os próprios sensores de movimento do celular, podem contar as reps.",
+      "Séries sem as mãos com o relógio: comece a próxima série e o relógio encerra o descanso, conta e registra sozinho.",
       "O coach de cadência conta a descida, a pausa e a subida de cada rep.",
     ],
     dyk: "Nenhum áudio sai do seu celular no registro por voz.",

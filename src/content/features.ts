@@ -1326,6 +1326,16 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-11",
       },
       {
+        id: "lab-watch-auto",
+        name: "Hands-free watch sets",
+        body: "Start your next set and your watch ends rest, counts the reps and logs the set by itself, with a buzz at each step.",
+        tier: "lab",
+        where: "phones",
+        lab: "labWatchAuto",
+        note: "Wear OS and Apple Watch, with watch rep counting on.",
+        added: "2026-11-26",
+      },
+      {
         id: "lab-voice",
         name: "Voice set logging",
         body: 'Say "100 for 8" or "too easy" to log a set. Recognized on your device; no audio leaves it.',

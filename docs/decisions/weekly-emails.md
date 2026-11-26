@@ -910,3 +910,5 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-26.** The "Share and sell your programs" email's Did you know line adds Run the days in order.
 
 **New, 2026-11-26.** "Your workout on your wrist" (`watches`) now waits for the `wearOnPlay` admin flag and goes out next (`fresh`) once it's on, with a new picture: the Wear OS app's own screens (`scripts/email-watch.mjs`, drawn from the watch's layout by `scripts/wear-shots/`) instead of Connected apps. Anyone who got Getting started's new watch step skips it (`coveredBy: "tour:watch"`). Melvin, 2026-11-26: "for the emails we send out for new users, can you add the fact that we now have support for wear os (android) smart watches, dont forget to add screen shots to those emails".
+
+**New, 2026-11-26.** "Labs: log sets without touching the screen" (`labs-hands-off`) gets a point for hands-free watch sets (`labWatchAuto`, [Watch apps](watch-apps.md) "Hands-free watch sets"), in every language. It extends that email rather than adding one, so the screenshot stays as it is.

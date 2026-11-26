@@ -702,6 +702,11 @@ export const es: FeaturesText = {
       name: "Series manos libres",
       body: "Mientras un contador de repeticiones cuenta, la serie se registra sola unos segundos después de tu última repetición.",
     },
+    "lab-watch-auto": {
+      name: "Series sin manos con el reloj",
+      body: "Empieza tu siguiente serie y tu reloj termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
+      note: "Wear OS y Apple Watch, con el conteo de repeticiones con el reloj activado.",
+    },
     "lab-voice": {
       name: "Registrar series por voz",
       body: "Di «100 por 8» o «demasiado fácil» para registrar una serie. Se reconoce en tu dispositivo; ningún audio sale de él.",

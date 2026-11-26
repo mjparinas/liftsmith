@@ -72,6 +72,9 @@ public class WorkoutStateTest {
         assertFalse(WorkoutState.parse("{\"title\":\"Squat\"}").streamMotion(NOW));
         assertTrue(WorkoutState.parse("{\"motion\":true}").streamMotion(NOW));
         assertFalse(WorkoutState.parse("{\"motion\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
+        // Hands-free watch sets: the phone wants rest too, to see the next set start.
+        assertTrue(WorkoutState.parse("{\"motion\":true,\"motionRest\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
+        assertFalse(WorkoutState.parse("{\"motionRest\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
     }
 
     @Test
@@ -96,5 +99,17 @@ public class WorkoutStateTest {
             "{\"restUntil\":" + (NOW + 60_000) + ",\"timer\":[{\"from\":" + NOW + ",\"label\":\"x\"}]}"
         );
         assertNull(rest.phase(NOW + 1000));
+    }
+
+    @Test
+    public void buzzesOnANewCueOnly() {
+        WorkoutState a = WorkoutState.parse("{\"sessionId\":\"s1\",\"cue\":\"go:1\"}");
+        WorkoutState b = WorkoutState.parse("{\"sessionId\":\"s1\",\"cue\":\"logged:2\"}");
+        WorkoutState other = WorkoutState.parse("{\"sessionId\":\"s2\",\"cue\":\"logged:3\"}");
+        assertFalse(a.newCue(null));
+        assertFalse(a.newCue(a));
+        assertTrue(b.newCue(a));
+        assertFalse(other.newCue(b));
+        assertFalse(WorkoutState.parse("{\"sessionId\":\"s1\"}").newCue(a));
     }
 }

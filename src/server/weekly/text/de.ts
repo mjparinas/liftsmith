@@ -615,6 +615,7 @@ export const emails: Record<string, Words> = {
       "Sprache: Sag „100 für 8“ oder „zu leicht“, erkannt auf deinem Handy.",
       "Die Lautstärketaste am Handy oder an den Kopfhörern trägt den Satz ein.",
       "Deine Uhr oder die Bewegungssensoren des Handys können die Wiederholungen zählen.",
+      "Freihändige Sätze mit der Uhr: Starte deinen nächsten Satz, und die Uhr beendet die Pause, zählt ihn und trägt ihn selbst ein.",
       "Der Tempo-Coach zählt bei jeder Wiederholung das Absenken, Halten und Heben.",
     ],
     dyk: "Beim Eintragen per Sprache verlässt nie ein Ton dein Handy.",

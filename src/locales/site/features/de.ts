@@ -706,6 +706,11 @@ export const de: FeaturesText = {
       name: "Freihändige Sätze",
       body: "Während ein Wiederholungszähler zählt, trägt sich der Satz ein paar Sekunden nach deiner letzten Wiederholung selbst ein.",
     },
+    "lab-watch-auto": {
+      name: "Freihändige Sätze mit der Uhr",
+      body: "Starte deinen nächsten Satz, und deine Uhr beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
+      note: "Wear OS und Apple Watch, mit eingeschaltetem Zählen der Wiederholungen mit der Uhr.",
+    },
     "lab-voice": {
       name: "Sätze per Sprache eintragen",
       body: "Sag „100 für 8“ oder „zu leicht“, um einen Satz einzutragen. Erkannt auf deinem Gerät; kein Ton verlässt es.",

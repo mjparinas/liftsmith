@@ -614,6 +614,7 @@ export const emails: Record<string, Words> = {
       'Voz: di "100 por 8" o "demasiado fácil", reconocido en tu teléfono.',
       "El botón de volumen del teléfono o de los auriculares registra la serie.",
       "Tu reloj, o los sensores de movimiento del propio teléfono, pueden contar las repeticiones.",
+      "Series sin manos con el reloj: empieza tu siguiente serie y el reloj termina el descanso, la cuenta y la registra solo.",
       "El coach de tempo cuenta la bajada, la pausa y la subida de cada repetición.",
     ],
     dyk: "Para el registro por voz, ningún audio sale nunca de tu teléfono.",

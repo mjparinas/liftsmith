@@ -37,6 +37,10 @@ export interface SessionState {
   sessionId?: string;
   /** Labs, watch rep counting: the Wear OS or Apple Watch app streams its motion for this set (watchMotion.ts). */
   motion?: boolean;
+  /** Labs, hands-free watch sets: keep streaming motion through rest too, so the phone sees the next set start (watchAuto.ts). */
+  motionRest?: boolean;
+  /** Labs, hands-free watch sets: the watch buzzes once each time this id changes (the set started or logged itself). */
+  cue?: string;
   /** The notification after each of the next Log sets (sessionAhead.ts), so Log set works with the app closed. */
   ahead?: AheadStep[];
   /**

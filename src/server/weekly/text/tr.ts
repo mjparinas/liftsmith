@@ -614,6 +614,7 @@ export const emails: Record<string, Words> = {
       "Ses: “8 tekrar 100” ya da “çok kolay” de; telefonunda tanınır.",
       "Telefonundaki ya da kulaklığındaki ses düğmesi seti kaydeder.",
       "Saatin ya da telefonun kendi hareket sensörleri tekrarları sayabilir.",
+      "Saatle eller serbest setler: bir sonraki setine başla, saat dinlenmeyi bitirir, seti sayar ve kendiliğinden kaydeder.",
       "Tempo koçu her tekrarın indirme, bekleme ve kaldırma aşamalarını sayar.",
     ],
     dyk: "Sesle kayıt için hiçbir ses kaydı telefonundan çıkmaz.",

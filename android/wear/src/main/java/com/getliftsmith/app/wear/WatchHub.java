@@ -94,9 +94,11 @@ final class WatchHub {
     static void set(Context context, WorkoutState next) {
         Context app = context.getApplicationContext();
         main.post(() -> {
+            WorkoutState prev = state;
             state = next;
             if (next == null) bpm = 0;
             appContext = app;
+            if (next != null && next.vibrate && next.newCue(prev)) cueBuzz(app);
             scheduleBuzz(app, next);
             for (Listener l : listeners) l.changed();
         });
@@ -163,6 +165,12 @@ final class WatchHub {
             });
             then.run();
         });
+    }
+
+    /** Hands-free watch sets (Labs): one short tap when the set started or logged itself, so the lifter knows without looking. */
+    private static void cueBuzz(Context app) {
+        Vibrator v = app.getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createOneShot(120, VibrationEffect.DEFAULT_AMPLITUDE));
     }
 
     /** A buzz on the wrist when rest ends, if the lifter's rest-over alert vibrates (Workout preferences). */

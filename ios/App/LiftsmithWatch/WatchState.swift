@@ -19,6 +19,10 @@ struct WatchState: Decodable, Equatable {
     var sessionId = ""
     /// Labs, watch rep counting: the phone wants the wrist's motion for this set.
     var motion = false
+    /// Labs, hands-free watch sets: keep streaming through rest, so the phone sees the next set start.
+    var motionRest = false
+    /// Labs, hands-free watch sets: a new id means the set started or logged itself, and the watch taps once.
+    var cue = ""
     /// The set timer for holds, carries and cardio, phase by phase (src/lib/sessionNotify.ts TimerSegment).
     var timer: [Phase] = []
 
@@ -56,12 +60,14 @@ struct WatchState: Decodable, Equatable {
         at = (try? c.decode(Double.self, forKey: .at)) ?? 0
         sessionId = (try? c.decode(String.self, forKey: .sessionId)) ?? ""
         motion = (try? c.decode(Bool.self, forKey: .motion)) ?? false
+        motionRest = (try? c.decode(Bool.self, forKey: .motionRest)) ?? false
+        cue = (try? c.decode(String.self, forKey: .cue)) ?? ""
         let phases = (try? c.decode([Phase].self, forKey: .timer)) ?? []
         timer = Array(phases.filter { p in p.from > 0 && (p.to.map { to in to > p.from } ?? true) }.prefix(8))
     }
 
     private enum CodingKeys: String, CodingKey {
-        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, timer
+        case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, timer
     }
 
     /// The set timer's phase at `now` (started, not ended); never while resting. Same rule as the phone's.
@@ -74,8 +80,15 @@ struct WatchState: Decodable, Equatable {
 
     func resting(at now: Date) -> Bool { (restEnd ?? .distantPast) > now }
 
-    /// Whether to stream motion now: the phone asked for it, and rest hasn't started on this watch's clock.
-    func streamMotion(at now: Date) -> Bool { motion && !resting(at: now) }
+    /// Whether to stream motion now: the phone asked for it, and rest hasn't started on this watch's clock (or the
+    /// phone wants rest too, to see the next set start).
+    func streamMotion(at now: Date) -> Bool { motion && (motionRest || !resting(at: now)) }
+
+    /// Whether going from `prev` to this state should tap: a new cue during the same workout.
+    func newCue(after prev: WatchState?) -> Bool {
+        guard !cue.isEmpty, let prev, prev.sessionId == sessionId else { return false }
+        return cue != prev.cue
+    }
 
     func stale(at now: Date) -> Bool { at > 0 && now.timeIntervalSince1970 - at / 1000 > Self.staleAfter }
 }

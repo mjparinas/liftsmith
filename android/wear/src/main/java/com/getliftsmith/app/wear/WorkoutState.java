@@ -33,6 +33,10 @@ final class WorkoutState {
     final String sessionId;
     /** Labs, watch rep counting: the phone wants the wrist's motion for this set. */
     final boolean motion;
+    /** Labs, hands-free watch sets: keep streaming through rest, so the phone sees the next set start. */
+    final boolean motionRest;
+    /** Labs, hands-free watch sets: a new id means the set started or logged itself, and the watch buzzes once. */
+    final String cue;
     /** The set timer for holds, carries and cardio, phase by phase in wall-clock time (sessionNotify.ts TimerSegment). */
     final List<Phase> timer;
 
@@ -68,6 +72,8 @@ final class WorkoutState {
         at = o.optLong("at", 0L);
         sessionId = o.optString("sessionId", "");
         motion = o.optBoolean("motion", false);
+        motionRest = o.optBoolean("motionRest", false);
+        cue = o.optString("cue", "");
         timer = phases(o.optJSONArray("timer"));
     }
 
@@ -106,9 +112,15 @@ final class WorkoutState {
         return at > 0 && now - at > STALE_MS;
     }
 
-    /** Whether to stream motion now: the phone asked for it, and rest hasn't started on this watch's clock. */
+    /** Whether to stream motion now: the phone asked for it, and rest hasn't started on this watch's clock (or the
+     * phone wants rest too, to see the next set start). */
     boolean streamMotion(long now) {
-        return motion && !resting(now);
+        return motion && (motionRest || !resting(now));
+    }
+
+    /** Whether going from `prev` to this state should buzz: a new cue during the same workout. */
+    boolean newCue(WorkoutState prev) {
+        return !cue.isEmpty() && prev != null && prev.sessionId.equals(sessionId) && !cue.equals(prev.cue);
     }
 
     boolean resting(long now) {

@@ -68,6 +68,17 @@ Melvin picked it from the Labs ideas (2026-11-11: "Labs ideas 1 to 5").
 - **Battery**: the sensors run only during a set with the lab on; between sets and without the lab nothing is read, and nothing is sent when no watch has the app.
 - **Gaps**: Wear OS streams from its workout service, which needs the heart rate permission. Garmin isn't included (Connect IQ messages are too small and slow). The web app has no watch, so the lab only shows in the phone apps. The Apple Watch half hasn't been tried on a watch yet (open items, iOS deferred).
 
+## Hands-free watch sets (Labs, 2026-11-26)
+
+Melvin, 2026-11-26: "Can liftsmith automatically track workouts on the wear os app? Not using the button presses??" He picked "Fully hands-free sets" over Health Services heart rate and over recognizing the lift from the wrist (research-grade, needs a trained model).
+
+- **What it does**: **Settings › Labs › Hands-free watch sets** (`labWatchAuto`, Pro like every lab, `native`, needs watch rep counting) runs the whole set from the wrist. After the first 15 seconds of rest (`SETTLE_MS`: racking, walking away, shaking out), the watch keeps streaming its motion; once the phone has counted 3 reps (`START_REPS`, so a sip of water isn't a set), rest ends at once (`skipRest`) and those reps carry into the set (`withCarry`). The set then logs itself a few seconds after the last rep with the hands-free sets rule (`handsFree.ts`), whether or not that lab is on, and rest starts. The watch taps once when the set starts by itself and once when it logs itself. Undo puts a set back as usual. Rules in `src/lib/watchAuto.ts`, wired in `Workout.tsx`.
+- **The phone still counts.** Same split as watch rep counting: the phone asks with `motion` plus `motionRest` (keep streaming through rest), and the watch says nothing back but motion. The buzz is a `cue` id in the workout state that changes each time the set starts or logs itself; the watch taps when it sees a new one in the same workout (`WorkoutState.newCue` on Wear OS, `WatchState.newCue` on Apple Watch), only when vibrate is on. A watch app from before this change ignores both fields and stops streaming during rest, so nothing breaks: rest just ends on its timer.
+- **Not for**: lifts the wrist doesn't move in (pull-ups, dips, planks, carries), cardio, warm-ups and superset rounds during rest (those still end rest on the timer), and while the camera or phone motion is counting.
+- **Platforms**: Wear OS and Apple Watch get it together. Garmin doesn't stream motion, so it has neither watch rep counting nor this (Platform deltas). The phone app has to be running for the count, as with watch rep counting.
+- **Play review**: built on 2026-11-26 while the Wear OS app was in production review. The change only reaches Play's internal track through the usual release; nothing was sent to production.
+- **Untested on a wrist.** The 15 seconds and 3 reps are guesses, like the hands-free waits; tune them on real sets before it leaves Labs.
+
 ## Later
 
 - A watch face complication or tile with today's call.
