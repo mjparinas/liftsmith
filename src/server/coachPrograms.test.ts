@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { onboardUrl, refreshAccount, type ConnectEvent, type PayConfig } from "./coachPay";
+import { assignProgram } from "./coachProgramAssign";
 import {
   browsePrograms,
   countCode,
@@ -101,6 +102,33 @@ describe("making a program", () => {
     const again = await saveProgram("coach", program({ id: p.id, title: "Bench block" }), NOW + 1);
     expect(again).toMatchObject({ id: p.id, title: "Bench block" });
     expect(await saveProgram("buyer", program({ id: p.id }), NOW)).toEqual({ error: "notYours" });
+  });
+
+  it("keeps phases, makes the weeks theirs, and an assign takes a copy", async () => {
+    const phases = [
+      { kind: "build", weeks: 5, weekdays: [[1, 4], [2]] },
+      { kind: "deload", weeks: 1, weekdays: [[1], [3]] },
+    ];
+    const p = await made({
+      weeks: 2,
+      phases,
+      days: [
+        { name: "Push", code: DAY_A, weekdays: [1, 4] },
+        { name: "Legs", code: DAY_B, weekdays: [2] },
+      ],
+    });
+    expect(p.weeks).toBe(6);
+    expect(p.phases).toEqual(phases);
+    expect((await programFor(p.id, "buyer"))!.phases).toEqual(phases);
+    // Phases that don't fit the days are refused rather than dropped.
+    expect(await saveProgram("coach", program({ phases: [phases[0], { kind: "taper", weeks: 1, weekdays: [[1], []] }] }), NOW)).toEqual({
+      error: "bad",
+    });
+    await run("INSERT INTO coach_links (coach_id, client_id, created_at) VALUES ('coach', 'buyer', ?)", [NOW]);
+    const r = await assignProgram("coach", p.id, { type: "clients", ids: ["buyer"] }, [[0], [6]], NOW);
+    if ("error" in r) throw new Error(r.error);
+    // The program's own weekdays win over the assign's: each phase has its own.
+    expect(r.assigned[0]).toMatchObject({ weeks: 6, phases, days: [{ weekdays: [1, 4] }, { weekdays: [2] }] });
   });
 
   it("refuses bad input, links, and coaches under 18", async () => {

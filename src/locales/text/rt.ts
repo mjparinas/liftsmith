@@ -77,6 +77,9 @@ export const en = {
   "rt.secsMore": "More seconds of {name}",
   "rt.cue": "Cue for {name}",
   "rt.cuePlaceholder": "Short cue, optional",
+  "rt.range.button": "Reps: {range}",
+  "rt.range.auto": "Auto",
+  "rt.range.label": "Reps for {name}",
 } as const;
 
 type Key = keyof typeof en;
@@ -157,6 +160,9 @@ export const es: Partial<Record<Key, Message>> = {
   "rt.secsMore": "Más segundos de {name}",
   "rt.cue": "Indicación para {name}",
   "rt.cuePlaceholder": "Indicación breve, opcional",
+  "rt.range.button": "Repeticiones: {range}",
+  "rt.range.auto": "Automático",
+  "rt.range.label": "Repeticiones de {name}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -235,6 +241,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "rt.secsMore": "Plus de secondes de {name}",
   "rt.cue": "Consigne pour {name}",
   "rt.cuePlaceholder": "Courte consigne, facultative",
+  "rt.range.button": "Répétitions : {range}",
+  "rt.range.auto": "Auto",
+  "rt.range.label": "Répétitions pour {name}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -316,6 +325,9 @@ export const de: Partial<Record<Key, Message>> = {
   "rt.secsMore": "Mehr Sekunden von {name}",
   "rt.cue": "Hinweis für {name}",
   "rt.cuePlaceholder": "Kurzer Hinweis, optional",
+  "rt.range.button": "Wiederholungen: {range}",
+  "rt.range.auto": "Automatisch",
+  "rt.range.label": "Wiederholungen für {name}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -397,6 +409,9 @@ export const it: Partial<Record<Key, Message>> = {
   "rt.secsMore": "Più secondi di {name}",
   "rt.cue": "Indicazione per {name}",
   "rt.cuePlaceholder": "Indicazione breve, facoltativa",
+  "rt.range.button": "Ripetizioni: {range}",
+  "rt.range.auto": "Automatiche",
+  "rt.range.label": "Ripetizioni per {name}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -473,6 +488,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "rt.secsMore": "{name}の秒数を増やす",
   "rt.cue": "{name}の合図",
   "rt.cuePlaceholder": "短い合図（任意）",
+  "rt.range.button": "回数：{range}",
+  "rt.range.auto": "自動",
+  "rt.range.label": "{name}の回数",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -558,6 +576,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "rt.secsMore": "Mais segundos de {name}",
   "rt.cue": "Dica para {name}",
   "rt.cuePlaceholder": "Dica curta, opcional",
+  "rt.range.button": "Repetições: {range}",
+  "rt.range.auto": "Automático",
+  "rt.range.label": "Repetições de {name}",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -640,6 +661,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "rt.secsMore": "{name} 초 늘리기",
   "rt.cue": "{name} 신호",
   "rt.cuePlaceholder": "짧은 신호, 선택",
+  "rt.range.button": "횟수: {range}",
+  "rt.range.auto": "자동",
+  "rt.range.label": "{name} 횟수",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -725,6 +749,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "rt.secsMore": "{name} saniyesini artır",
   "rt.cue": "{name} için ipucu",
   "rt.cuePlaceholder": "Kısa ipucu, isteğe bağlı",
+  "rt.range.button": "Tekrar: {range}",
+  "rt.range.auto": "Otomatik",
+  "rt.range.label": "{name} için tekrar",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -816,4 +843,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "rt.secsMore": "Więcej sekund: {name}",
   "rt.cue": "Wskazówka do {name}",
   "rt.cuePlaceholder": "Krótka wskazówka, opcjonalnie",
+  "rt.range.button": "Powtórzenia: {range}",
+  "rt.range.auto": "Automatycznie",
+  "rt.range.label": "Powtórzenia: {name}",
 };

@@ -844,10 +844,10 @@ export const emails: Record<string, Words> = {
     intro: "Turn the programs you hand out again and again into something anyone can follow, free or for a price.",
     points: [
       "Under Coaching › Programs, put your routines on the days of a week with rest days in between (Auto-arrange can do it for you), check it on the month, then add a name, a level, a goal and how many weeks.",
-      "Leave the price empty for a free program, or set one once payments with Stripe are on.",
-      "Paid programs are bought on the website, and the money goes to your Stripe account.",
+      "Leave the price empty for a free program, or set one once payments with Stripe are on. Paid programs are bought on the website, and the money goes to your Stripe account.",
       "Share its link anywhere. People who have it keep it, even after you take it off the list.",
       "Each listed program gets its own page on the website, and lifters who've had it two weeks can rate it.",
+      "Run it in phases: Build weeks, a Deload week with fewer, lighter sets (one tap to add), and a Peak, and set reps for an exercise (say 8 to 12) or leave them on Auto.",
     ],
     dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.",
   },

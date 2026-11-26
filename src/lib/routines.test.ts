@@ -2,7 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import { defaultProfile, makeGym } from "./defaults";
 import { generate } from "./generator";
-import { cleanParts, cleanRoutine, doneItems, moveItem, partDefaults, planFromRoutine, routineFrom, upsertRoutine } from "./routines";
+import {
+  cleanParts,
+  cleanRange,
+  cleanRoutine,
+  doneItems,
+  moveItem,
+  partDefaults,
+  phaseSets,
+  planFromRoutine,
+  routineFrom,
+  upsertRoutine,
+} from "./routines";
 import type { AppEvent, Routine } from "./types";
 
 const NOW = Date.UTC(2026, 10, 9, 18);
@@ -80,6 +91,41 @@ describe("routines", () => {
     const plain = planFromRoutine(base, { ...r, rehab: undefined }, [], profile, gym, NOW)!;
     expect(plain.plan.items[0]!.target.reps).not.toBe(4);
     expect(plain.plan.items[0]!.target.note).not.toBe("Soft knees");
+  });
+
+  it("keeps a coach's rep range on a plain routine, and uses it for the target", () => {
+    expect(cleanRange(8, 10)).toEqual([8, 10]);
+    expect(cleanRange(10, 8)).toBeUndefined();
+    expect(cleanRange(0, 5)).toBeUndefined();
+    expect(cleanRange(5, 60)).toBeUndefined();
+    const kept = cleanRoutine(routine([{ exerciseId: "bench-press", sets: 3, reps: 12, repsTo: 15, cue: "x" }]));
+    expect(kept.items[0]).toEqual({ exerciseId: "bench-press", sets: 3, reps: 12, repsTo: 15 });
+    // A single number without a range stays a physio's thing: dropped off a plain routine.
+    expect(cleanRoutine(routine([{ exerciseId: "bench-press", sets: 3, reps: 12 }])).items[0]).not.toHaveProperty("reps");
+    const gym = makeGym("commercial", "kg", "g");
+    const profile = { ...defaultProfile(NOW), activeGymId: "g", onboarded: true };
+    const base = generate({ gym, profile, events: [], minutes: 45, now: NOW });
+    const out = planFromRoutine(base, kept, [], profile, gym, NOW)!;
+    expect(out.plan.items[0]!.target.reps).toBeGreaterThanOrEqual(12);
+    expect(out.plan.items[0]!.target.reps).toBeLessThanOrEqual(15);
+  });
+
+  it("halves the sets and goes lighter on a deload phase, and trims them at a peak", () => {
+    expect([phaseSets(4, "deload"), phaseSets(3, "deload"), phaseSets(1, "deload")]).toEqual([2, 2, 1]);
+    expect([phaseSets(3, "peak"), phaseSets(4, "peak"), phaseSets(1, "peak")]).toEqual([2, 3, 1]);
+    expect(phaseSets(4, "build")).toBe(4);
+    const gym = makeGym("commercial", "kg", "g");
+    const profile = { ...defaultProfile(NOW), activeGymId: "g", onboarded: true };
+    const base = generate({ gym, profile, events: [], minutes: 45, now: NOW });
+    const r = routine([{ exerciseId: "bench-press", sets: 4 }]);
+    const build = planFromRoutine(base, r, [], profile, gym, NOW)!.plan.items[0]!;
+    const deload = planFromRoutine(base, r, [], profile, gym, NOW, "deload")!.plan.items[0]!;
+    const peak = planFromRoutine(base, r, [], profile, gym, NOW, "peak")!.plan.items[0]!;
+    expect(deload.sets).toBe(2);
+    expect(deload.target.weight).toBeLessThan(build.target.weight);
+    expect(deload.target.note).toBe("Deload week: 10% lighter so you recover");
+    expect(peak.sets).toBe(3);
+    expect(peak.target.note).toBe("Peak week: fewer sets so you're fresh");
   });
 
   it("leaves out what the gym can't do, and a superset that loses a partner", () => {

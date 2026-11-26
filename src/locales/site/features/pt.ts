@@ -565,6 +565,11 @@ export const pt: FeaturesText = {
       note: "Programas pagos são comprados no site; os apps de Android e iPhone mostram os programas grátis e os que você já tem.",
       proPart: "Pegar programas é grátis; criá-los faz parte do coaching, que é Pro.",
     },
+    "program-phases": {
+      name: "Fases do programa e repetições do treinador",
+      body: "O programa de um treinador pode seguir em fases, cada uma repetindo a própria semana: Construção, uma semana de Deload com menos séries e cargas mais leves, e um Pico com menos séries para chegar descansado. Adicione um deload com um toque, veja cada fase no mês e defina as repetições de um exercício (por exemplo, de 8 a 12) ou deixe no Auto para que o histórico de cada pessoa escolha. Quem segue vê em que fase e semana está abaixo do plano de Hoje.",
+      proPart: "Seguir um programa é grátis; criar um faz parte do coaching, que é Pro.",
+    },
     "coach-calendar": {
       name: "Calendário de treinos",
       body: "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",

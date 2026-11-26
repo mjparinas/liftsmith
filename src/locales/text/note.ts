@@ -45,6 +45,7 @@ export const en = {
     one: "Cardio after the lifting: {count} minute at a steady pace",
     other: "Cardio after the lifting: {count} minutes at a steady pace",
   },
+  "note.coachPeak": "Peak week: fewer sets so you're fresh",
 } as const;
 
 type Key = keyof typeof en;
@@ -91,6 +92,7 @@ export const es: Partial<Record<Key, Message>> = {
     one: "Cardio después de las pesas: {count} minuto a ritmo constante",
     other: "Cardio después de las pesas: {count} minutos a ritmo constante",
   },
+  "note.coachPeak": "Semana de pico: menos series para llegar fresco",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -135,6 +137,7 @@ export const fr: Partial<Record<Key, Message>> = {
     one: "Cardio après la muscu : {count} minute à allure régulière",
     other: "Cardio après la muscu : {count} minutes à allure régulière",
   },
+  "note.coachPeak": "Semaine de pic : moins de séries pour rester frais",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -179,6 +182,7 @@ export const de: Partial<Record<Key, Message>> = {
     one: "Cardio nach dem Krafttraining: {count} Minute in ruhigem Tempo",
     other: "Cardio nach dem Krafttraining: {count} Minuten in ruhigem Tempo",
   },
+  "note.coachPeak": "Peak-Woche: weniger Sätze, damit du frisch bist",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -223,6 +227,7 @@ export const it: Partial<Record<Key, Message>> = {
     one: "Cardio dopo i pesi: {count} minuto a ritmo costante",
     other: "Cardio dopo i pesi: {count} minuti a ritmo costante",
   },
+  "note.coachPeak": "Settimana di picco: meno serie per arrivare fresco",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -261,6 +266,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "note.rehabFirst": "理学療法士のリハビリ：指示どおりに。痛むなら中止",
   "note.rehabAgain": "リハビリ：前回と同じ、理学療法士の指示どおり",
   "note.cardioPart": { other: "ウエイトのあとの有酸素：一定のペースで{count}分" },
+  "note.coachPeak": "ピーク週：疲れを残さないようセット数を減らします",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -305,6 +311,7 @@ export const pt: Partial<Record<Key, Message>> = {
     one: "Cardio depois da musculação: {count} minuto em ritmo constante",
     other: "Cardio depois da musculação: {count} minutos em ritmo constante",
   },
+  "note.coachPeak": "Semana de pico: menos séries para chegar descansado",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -347,6 +354,7 @@ export const ko: Partial<Record<Key, Message>> = {
   "note.cardioPart": {
     other: "웨이트 후 유산소: 일정한 속도로 {count}분",
   },
+  "note.coachPeak": "피크 주간: 컨디션을 위해 세트 수를 줄여요",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -391,6 +399,7 @@ export const tr: Partial<Record<Key, Message>> = {
     one: "Ağırlıktan sonra kardiyo: sabit tempoda {count} dakika",
     other: "Ağırlıktan sonra kardiyo: sabit tempoda {count} dakika",
   },
+  "note.coachPeak": "Zirve haftası: dinç kalman için daha az set",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -439,4 +448,5 @@ export const pl: Partial<Record<Key, Message>> = {
     many: "Cardio po ciężarach: {count} minut w równym tempie",
     other: "Cardio po ciężarach: {count} minuty w równym tempie",
   },
+  "note.coachPeak": "Tydzień szczytu: mniej serii, żebyś był wypoczęty",
 };

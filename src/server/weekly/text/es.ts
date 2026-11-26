@@ -824,10 +824,10 @@ export const emails: Record<string, Words> = {
     intro: "Convierte los programas que repites una y otra vez en algo que cualquiera pueda seguir, gratis o con precio.",
     points: [
       "En Coaching › Programas, pon tus rutinas en los días de una semana con descansos entre ellas (Organizar solo lo hace por ti), revísalo en el mes y luego añade un nombre, un nivel, un objetivo y cuántas semanas.",
-      "Deja el precio vacío para un programa gratis, o pon uno cuando tengas los pagos con Stripe activados.",
-      "Los programas de pago se compran en la web y el dinero va a tu cuenta de Stripe.",
+      "Deja el precio vacío para un programa gratis, o pon uno cuando tengas los pagos con Stripe activados. Los programas de pago se compran en la web y el dinero va a tu cuenta de Stripe.",
       "Comparte su enlace donde quieras. Quien ya lo tiene lo conserva, aunque lo quites de la lista.",
       "Cada programa publicado tiene su propia página en la web, y quienes lo tienen desde hace dos semanas pueden valorarlo.",
+      "Hazlo por fases: semanas de Construcción, una semana de Descarga con series menos y más ligeras (se añade con un toque) y un Pico, y fija las repeticiones de un ejercicio (por ejemplo, de 8 a 12) o déjalas en Auto.",
     ],
     dyk: "Un programa no lleva pesos: la progresión de cada deportista los elige, así que un mismo programa sirve a principiantes y veteranos.",
   },

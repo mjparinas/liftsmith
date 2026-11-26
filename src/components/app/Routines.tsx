@@ -33,6 +33,16 @@ import { useShareInvite } from "./useShareInvite";
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
 // one from the exercise library. All of it is optional and happens before or after a workout.
 
+/** The rep ranges a coach picks from in the program builder (2026-11-26); Auto keeps each lifter's own. */
+const REP_RANGES: readonly [number, number][] = [
+  [3, 5],
+  [5, 8],
+  [6, 10],
+  [8, 12],
+  [10, 15],
+  [12, 20],
+];
+
 const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
 function summary(r: Routine): string {
@@ -278,12 +288,15 @@ export function RoutineEditor({
   onDelete,
   onCancel,
   shareable,
+  coachReps,
 }: {
   initial: Routine;
   onSave: (r: Routine) => void;
   onDelete?: () => void;
   onCancel: () => void;
   shareable?: boolean;
+  /** The coach program builder (2026-11-26): each exercise may get a rep range, or stay Auto. */
+  coachReps?: boolean;
 }) {
   const { gyms, profile } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
@@ -299,6 +312,8 @@ export function RoutineEditor({
   const [perWeek, setPerWeek] = useState<number | undefined>(initial.perWeek);
   const showRehab = isCoach || !!initial.rehab;
   const [adding, setAdding] = useState(initial.items.length === 0);
+  // Which exercise's rep range choices are open (the program builder only).
+  const [rangeOpen, setRangeOpen] = useState<number | null>(null);
   // Desktop layout (layout.ts): the exercise browser stays open beside the routine, and rows drag to a new place
   // (the up and down buttons still work, for the keyboard).
   const desktop = useDesktop();
@@ -481,6 +496,42 @@ export function RoutineEditor({
                       </button>
                     </div>
                   </div>
+                  {coachReps && !rehab && !ex.cardio && !TIMED.has(it.exerciseId) && (
+                    <div className="mt-1 pl-[52px]">
+                      <button
+                        type="button"
+                        aria-expanded={rangeOpen === i}
+                        onClick={() => {
+                          tick();
+                          setRangeOpen(rangeOpen === i ? null : i);
+                        }}
+                        className="press min-h-11 rounded-full px-1 text-sm text-muted"
+                      >
+                        {t("rt.range.button", {
+                          range: it.repsTo && it.reps ? `${it.reps}–${it.repsTo}` : t("rt.range.auto"),
+                        })}
+                      </button>
+                      {rangeOpen === i && (
+                        <div className="mt-1 flex flex-wrap gap-2" role="group" aria-label={t("rt.range.label", { name: ex.name })}>
+                          <Chip
+                            active={!it.repsTo}
+                            onClick={() => setItems(items.map((x, k) => (k === i ? { ...x, reps: undefined, repsTo: undefined } : x)))}
+                          >
+                            {t("rt.range.auto")}
+                          </Chip>
+                          {REP_RANGES.map(([lo, hi]) => (
+                            <Chip
+                              key={lo * 100 + hi}
+                              active={it.reps === lo && it.repsTo === hi}
+                              onClick={() => setItems(items.map((x, k) => (k === i ? { ...x, reps: lo, repsTo: hi } : x)))}
+                            >
+                              {`${lo}–${hi}`}
+                            </Chip>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {rehab && (
                     <div className="mt-1 space-y-2 pl-[52px]">
                       <div className="flex items-center gap-1">
@@ -533,9 +584,10 @@ export function RoutineEditor({
             className="w-full"
             disabled={!items.length || (rehab && !rehabPart)}
             onClick={() => {
+              // A plain routine keeps only a coach's rep range (both ends); a physio's single number and cue go.
               const plain = items.map((item) => {
                 const next = { ...item };
-                delete next.reps;
+                if (!next.repsTo) delete next.reps;
                 delete next.cue;
                 return next;
               });

@@ -9,6 +9,7 @@ import {
   acceptProgramAssign,
   coachProgramDayIndex,
   coachProgramEndAt,
+  coachProgramPhase,
   coachProgramWeek,
   endProgramAssign,
   followAssign,
@@ -121,9 +122,15 @@ export function CoachProgramChip() {
           weeks: src.weeks,
           weekday: WEEKDAYS[new Date(now).getDay()] ?? "",
         });
+  const phase = src.phases && src.phases.length > 1 ? coachProgramPhase(src, now) : null;
   return (
     <div className="mt-2" data-testid={dayI === null ? "coach-program-off" : "coach-program-day"}>
       <p className="text-sm text-muted">{line}</p>
+      {phase && (
+        <p className="text-sm font-medium" data-testid="coach-program-phase">
+          {t("cpg.phase.now", { name: t(`cpg.phase.${phase.kind}`), week: phase.week, count: phase.weeks })}
+        </p>
+      )}
       <Button kind="ghost" className="mt-1 !px-0" onClick={() => setCal(true)}>
         {t("cpg.assignCalendar")}
       </Button>

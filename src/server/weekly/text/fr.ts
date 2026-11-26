@@ -827,10 +827,10 @@ export const emails: Record<string, Words> = {
     intro: "Faites des programmes que vous donnez encore et encore quelque chose que tout le monde peut suivre, gratuit ou payant.",
     points: [
       "Dans Coaching › Programmes, placez vos routines sur les jours d'une semaine avec des repos entre elles (Organiser automatiquement le fait pour vous), vérifiez le mois, puis ajoutez un nom, un niveau, un objectif et le nombre de semaines.",
-      "Laissez le prix vide pour un programme gratuit, ou fixez-en un une fois les paiements Stripe activés.",
-      "Les programmes payants s'achètent sur le site, et l'argent va sur votre compte Stripe.",
+      "Laissez le prix vide pour un programme gratuit, ou fixez-en un une fois les paiements Stripe activés. Les programmes payants s'achètent sur le site, et l'argent va sur votre compte Stripe.",
       "Partagez son lien partout. Ceux qui l'ont le gardent, même après l'avoir retiré de la liste.",
       "Chaque programme publié a sa propre page sur le site, et les personnes qui l'ont depuis deux semaines peuvent le noter.",
+      "Faites-le en phases : des semaines de Construction, une semaine de Décharge avec moins de séries, plus légères (ajoutée en un toucher), et un Pic, et fixez les répétitions d'un exercice (par exemple 8 à 12) ou laissez-les sur Auto.",
     ],
     dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés.",
   },

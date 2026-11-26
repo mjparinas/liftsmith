@@ -495,6 +495,11 @@ export const fr: FeaturesText = {
       note: "Les programmes payants s'achètent sur le site ; les apps Android et iPhone montrent les programmes gratuits et ceux que vous avez.",
       proPart: "Obtenir des programmes est gratuit ; en créer fait partie du coaching, qui est Pro.",
     },
+    "program-phases": {
+      name: "Phases de programme et répétitions du coach",
+      body: "Le programme d'un coach peut se dérouler en phases, chacune répétant sa propre semaine : Construction, une semaine de Décharge avec moins de séries et des charges plus légères, et un Pic avec moins de séries pour arriver frais. Ajoutez une décharge en un toucher, voyez chaque phase sur le mois, et fixez les répétitions d'un exercice (par exemple 8 à 12) ou laissez-les sur Auto pour que l'historique de chacun les choisisse. Les pratiquants voient leur phase et leur semaine sous le plan d'Aujourd'hui.",
+      proPart: "Suivre un programme est gratuit ; en créer un fait partie du coaching, qui est Pro.",
+    },
     "coach-pages": {
       name: "Une page pour chaque côté",
       body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",

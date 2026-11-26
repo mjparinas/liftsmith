@@ -490,6 +490,11 @@ export const es: FeaturesText = {
       note: "Los programas de pago se compran en la web; las apps de Android e iPhone muestran los programas gratis y los que ya tienes.",
       proPart: "Conseguir programas es gratis; crearlos forma parte del coaching, que es Pro.",
     },
+    "program-phases": {
+      name: "Fases de programa y repeticiones del entrenador",
+      body: "El programa de un entrenador puede ir por fases, cada una repitiendo su propia semana: Construcción, una semana de Descarga con menos series y pesos más ligeros, y un Pico con menos series para llegar fresco. Añade una descarga con un toque, ve cada fase en el mes y fija las repeticiones de un ejercicio (por ejemplo, de 8 a 12) o déjalas en Auto para que el historial de cada persona las elija. Quien lo sigue ve en qué fase y semana está bajo el plan de Hoy.",
+      proPart: "Seguir un programa es gratis; crearlo forma parte del coaching, que es Pro.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",

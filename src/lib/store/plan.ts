@@ -1,6 +1,6 @@
 import { track } from "../analytics";
 import { weekStart } from "../block";
-import { coachProgramDayIndex } from "../coachProgramAssign";
+import { coachProgramDayIndex, coachProgramPhase } from "../coachProgramAssign";
 import { scheduledRoutine } from "../coachSchedule";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
@@ -235,7 +235,9 @@ export function planSlice(c: Ctx): PlanSlice {
         ? { ...generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: false }), items: [], estMinutes: 0 }
         : (fromProgram ?? generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: r.challenge }));
       // It isn't a program day, so the program's next day stays next.
-      const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
+      // A coach program's Deload or Peak phase changes that day's sets and weights (routines.ts phaseSets).
+      const phase = coachDay && routine === coachDay && src?.kind === "coachProgram" ? coachProgramPhase(src, now).kind : undefined;
+      const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now, phase)?.plan : undefined;
       // A rehab routine from the lifter's physio stays as written: it's meant for the injured area (trainer-mode.md).
       if (fromRoutine)
         plan = routine?.rehab

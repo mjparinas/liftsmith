@@ -5,7 +5,7 @@ import type { Rating, Review } from "./coachReviews";
 import { openOutside } from "./connections";
 import { isNative } from "./juice";
 import { decodeRoutine, encodeRoutine } from "./routineShare";
-import type { Routine } from "./types";
+import type { ProgramPhase, Routine } from "./types";
 
 export const LEVELS = ["beginner", "intermediate", "advanced", "any"] as const;
 export const GOALS = ["strength", "muscle", "fitness", "fatLoss", "sport"] as const;
@@ -43,6 +43,8 @@ export interface CoachProgram {
   goal: Goal;
   weeks: number;
   days: ProgramDay[];
+  /** Build, Deload and Peak phases, each its own week, when the program has them (weekdays parallel to days). */
+  phases?: ProgramPhase[];
   price: number;
   currency: string;
   listed: boolean;
@@ -69,6 +71,8 @@ export interface ProgramDraft {
   routineIds: string[];
   /** Optional weekdays per routine id index (season programs). */
   weekdays?: number[][];
+  /** Phases, with weekdays parallel to routineIds; the weeks are then theirs added up. */
+  phases?: ProgramPhase[];
   price: number;
   listed: boolean;
 }
@@ -157,15 +161,23 @@ const details = (d: ProgramDraft) => ({
 });
 
 export async function saveProgram(draft: ProgramDraft, routines: readonly Routine[]): Promise<CoachProgram> {
-  return (await post<{ program: CoachProgram }>({ action: "save", program: { ...details(draft), days: draftDays(draft, routines) } }))
-    .program;
+  // Days whose routine is gone are left out, and each phase's weekdays with them, so they stay side by side.
+  const kept = draft.routineIds.flatMap((id, i) => (routines.find((x) => x.id === id)?.items.length ? [i] : []));
+  const phases = draft.phases?.map((p) => ({ ...p, weekdays: kept.map((i) => p.weekdays[i] ?? []) }));
+  return (
+    await post<{ program: CoachProgram }>({
+      action: "save",
+      program: { ...details(draft), days: draftDays(draft, routines), ...(phases && phases.length > 1 ? { phases } : {}) },
+    })
+  ).program;
 }
 /** Saves a program's details with the days it already has (the coach didn't pick new ones). */
 export async function saveProgramKeepingDays(draft: ProgramDraft, program: CoachProgram): Promise<CoachProgram> {
   const days = program.days.flatMap((d) =>
     d.code ? [{ name: d.name, code: d.code, ...(d.weekdays ? { weekdays: d.weekdays } : {}) }] : [],
   );
-  return (await post<{ program: CoachProgram }>({ action: "save", program: { ...details(draft), days } })).program;
+  const phases = program.phases && days.length === program.days.length ? { phases: program.phases } : {};
+  return (await post<{ program: CoachProgram }>({ action: "save", program: { ...details(draft), days, ...phases } })).program;
 }
 export const deleteProgram = async (id: string) => (await post<{ result: "deleted" | "unlisted" }>({ action: "delete", id })).result;
 export const getFree = async (id: string) => (await post<{ program: CoachProgram }>({ action: "get", id })).program;
