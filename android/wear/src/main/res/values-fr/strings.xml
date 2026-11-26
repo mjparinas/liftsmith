@@ -5,6 +5,7 @@
     <string name="none_title">Aucune séance en cours</string>
     <string name="none_body">Lancez-en une sur votre téléphone et elle s’affichera ici.</string>
     <string name="log_set">Noter la série</string>
+    <string name="machine_taken">Machine occupée</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Ensuite : %1$s</string>
     <string name="rest_left">Repos, encore %1$s</string>
@@ -18,4 +19,13 @@
     <string name="check_phone">Regardez votre téléphone</string>
     <string name="open_failed">Ouvrez Liftsmith sur votre téléphone.</string>
     <string name="install_failed">Installez Liftsmith depuis Google Play sur votre téléphone.</string>
+    <string name="tile_label">Séance du jour</string>
+    <string name="open_app">Ouvrir</string>
+    <string name="no_today">Ouvrez Liftsmith sur votre téléphone pour voir ici le programme du jour.</string>
+    <string name="lighter">Plus léger</string>
+    <string name="heavier">Plus lourd</string>
+    <string name="fewer_reps">Moins de répétitions</string>
+    <string name="more_reps">Plus de répétitions</string>
+    <string name="weight_value">Poids %1$s, tournez la couronne pour le changer</string>
+    <string name="reps_value">%1$s, tournez la couronne pour changer</string>
 </resources>

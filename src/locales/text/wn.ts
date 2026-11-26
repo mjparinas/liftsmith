@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.machineTaken.title": "Machine taken? One tap",
+  "wn.c.machineTaken.body":
+    "Tap Machine taken on your Wear OS, Apple Watch or Garmin watch, or in Change the plan, and the best lift for your gym that doesn't need it takes its place, with its weight and why.",
   "wn.c.programBuilder.title": "Program builder for coaches",
   "wn.c.programBuilder.body": "Put routines on the days of a week with rest days, see the month, and let Auto-arrange spread them out.",
   "wn.c.myTeam.title": "My team",
@@ -140,6 +143,15 @@ export const en = {
   "wn.c.assignProgram.title": "Assign a season program",
   "wn.c.assignProgram.body":
     "Coaches put Upper/Lower, Push/Pull/Legs or their own multi-day program on athletes or a school team for N weeks. Athletes follow once; Today shows that weekday’s workout. A program calendar shows Done and Not yet — first names only for school teams, never weights.",
+  "wn.c.watchToday.title": "Today's workout on your watch face",
+  "wn.c.watchToday.body":
+    "Add the Liftsmith tile or complication to see today's call, how long and how ready you are. On Wear OS, Start on phone opens it.",
+  "wn.c.watchAuto.title": "Hands-free sets on your watch",
+  "wn.c.watchAuto.body":
+    "In Labs: start your next set and your Wear OS watch or Apple Watch ends rest, counts the reps and logs the set by itself, with a buzz at each step.",
+  "wn.c.watchAdjust.title": "Change and rate a set on your watch",
+  "wn.c.watchAdjust.body":
+    "Turn the crown or press − and + to change the weight and reps on Wear OS, Apple Watch or Garmin, and after an exercise's last set, say how it felt right on your wrist.",
   "wn.c.programPhases.title": "Phases and reps in coach programs",
   "wn.c.programPhases.body":
     "Coaches run a program in phases with a one-tap deload week, and can set reps for an exercise or leave them on Auto. You see your phase and week under Today's plan.",
@@ -155,11 +167,23 @@ export const en = {
   "wn.c.chatInPlace.title": "Chats open where you are",
   "wn.c.chatInPlace.body":
     "Message your coach or open Team chat and the chat opens right there: in the Messages box on a computer, or over the page on your phone.",
+  "wn.c.siteLinks.title": "Website links open the app",
+  "wn.c.siteLinks.body":
+    "On Android, a link to a gym, routine, profile, exercise or tool on getliftsmith.com now opens that screen here instead of the browser.",
+  "wn.c.coachNoteTop.title": "Your coach's note is at the top of Today",
+  "wn.c.coachNoteTop.body":
+    "A note from your coach now sits at the very top of Today, above your workout, on your phone and on a computer.",
+  "wn.c.moreStretches.title": "13 new stretches",
+  "wn.c.moreStretches.body":
+    "Couch stretch, frog, 90/90 hip switches, band pass-throughs, sleeper stretch, chin tucks and more, each with its 3D demo, for hips, shoulders, neck, wrists and calves.",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "¿Máquina ocupada? Un toque",
+  "wn.c.machineTaken.body":
+    "Toca Máquina ocupada en tu reloj Wear OS, Apple Watch o Garmin, o en Cambiar el plan, y el mejor ejercicio de tu gimnasio que no la necesita ocupa su lugar, con su peso y por qué.",
   "wn.c.programBuilder.title": "Creador de programas para entrenadores",
   "wn.c.programBuilder.body": "Pon rutinas en los días de la semana con descansos, mira el mes y deja que Organizar solo las reparta.",
   "wn.c.myTeam.title": "Mi equipo",
@@ -306,6 +330,15 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Asigna un programa de temporada",
   "wn.c.assignProgram.body":
     "Los entrenadores ponen Upper/Lower, Push/Pull/Legs o su programa de varios días a clientes o un equipo escolar durante N semanas. Siguen una vez; Hoy muestra el entrenamiento de ese día. Un calendario muestra Hecho y Aún no — solo nombres de pila en equipos escolares, nunca pesos.",
+  "wn.c.watchToday.title": "El entrenamiento de hoy en tu esfera",
+  "wn.c.watchToday.body":
+    "Añade el mosaico o la complicación de Liftsmith para ver la propuesta de hoy, cuánto dura y cómo estás de preparado. En Wear OS, Empezar en el móvil lo abre.",
+  "wn.c.watchAuto.title": "Series sin manos en tu reloj",
+  "wn.c.watchAuto.body":
+    "En Labs: empieza tu siguiente serie y tu reloj Wear OS o Apple Watch termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
+  "wn.c.watchAdjust.title": "Cambia y valora una serie en tu reloj",
+  "wn.c.watchAdjust.body":
+    "Gira la corona o pulsa − y + para cambiar el peso y las repeticiones en Wear OS, Apple Watch o Garmin, y tras la última serie de un ejercicio, di qué tal fue desde la muñeca.",
   "wn.c.programPhases.title": "Fases y repeticiones en los programas de entrenadores",
   "wn.c.programPhases.body":
     "Los entrenadores organizan un programa por fases con una semana de descarga en un toque, y pueden fijar las repeticiones de un ejercicio o dejarlas en Auto. Ves tu fase y semana bajo el plan de Hoy.",
@@ -321,9 +354,21 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Los chats se abren donde estás",
   "wn.c.chatInPlace.body":
     "Escribe a tu entrenador o abre el chat del equipo y se abre ahí mismo: en el cuadro de Mensajes en el ordenador o sobre la página en el teléfono.",
+  "wn.c.siteLinks.title": "Los enlaces de la web abren la app",
+  "wn.c.siteLinks.body":
+    "En Android, un enlace a un gimnasio, rutina, perfil, ejercicio o herramienta de getliftsmith.com ahora abre esa pantalla aquí y no en el navegador.",
+  "wn.c.coachNoteTop.title": "La nota de tu entrenador, arriba en Hoy",
+  "wn.c.coachNoteTop.body":
+    "La nota de tu entrenador ahora aparece arriba del todo en Hoy, encima de tu entrenamiento, en el teléfono y en el ordenador.",
+  "wn.c.moreStretches.title": "13 estiramientos nuevos",
+  "wn.c.moreStretches.body":
+    "Estiramiento del sofá, rana, cambios de cadera 90/90, pasos de banda, estiramiento del durmiente, retracciones de barbilla y más, cada uno con su demo en 3D, para cadera, hombros, cuello, muñecas y gemelos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Machine occupée ? Une touche",
+  "wn.c.machineTaken.body":
+    "Touche Machine occupée sur ta montre Wear OS, Apple Watch ou Garmin, ou dans Modifier le plan, et le meilleur exercice de ta salle qui n'en a pas besoin prend sa place, avec sa charge et pourquoi.",
   "wn.c.programBuilder.title": "Créateur de programmes pour les coachs",
   "wn.c.programBuilder.body":
     "Placez les routines sur les jours de la semaine avec des repos, voyez le mois et laissez Organiser automatiquement les répartir.",
@@ -474,6 +519,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Assigner un programme de saison",
   "wn.c.assignProgram.body":
     "Les coachs mettent Upper/Lower, Push/Pull/Legs ou leur programme de plusieurs jours sur des clients ou une équipe scolaire pour N semaines. Suivre une fois ; Aujourd’hui montre l’entraînement du jour. Un calendrier montre Fait et Pas encore — prénoms seulement pour les équipes scolaires, jamais de poids.",
+  "wn.c.watchToday.title": "La séance du jour sur ton cadran",
+  "wn.c.watchToday.body":
+    "Ajoute la tuile ou la complication Liftsmith pour voir le choix du jour, sa durée et ta forme. Sur Wear OS, Démarrer sur le téléphone l'ouvre.",
+  "wn.c.watchAuto.title": "Séries mains libres sur ta montre",
+  "wn.c.watchAuto.body":
+    "Dans Labs : lance ta série suivante et ta montre Wear OS ou ton Apple Watch arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
+  "wn.c.watchAdjust.title": "Modifie et note une série sur ta montre",
+  "wn.c.watchAdjust.body":
+    "Tourne la couronne ou appuie sur − et + pour changer la charge et les répétitions sur Wear OS, Apple Watch ou Garmin, et après la dernière série d'un exercice, dis comment c'était depuis ton poignet.",
   "wn.c.programPhases.title": "Phases et répétitions dans les programmes de coach",
   "wn.c.programPhases.body":
     "Les coachs organisent un programme en phases avec une semaine de décharge en un toucher, et peuvent fixer les répétitions d'un exercice ou les laisser sur Auto. Vous voyez votre phase et votre semaine sous le plan d'Aujourd'hui.",
@@ -489,9 +543,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Les discussions s'ouvrent là où vous êtes",
   "wn.c.chatInPlace.body":
     "Écrivez à votre coach ou ouvrez la discussion d'équipe : elle s'ouvre sur place, dans la boîte Messages sur ordinateur ou par-dessus la page sur téléphone.",
+  "wn.c.siteLinks.title": "Les liens du site ouvrent l'appli",
+  "wn.c.siteLinks.body":
+    "Sur Android, un lien vers une salle, une routine, un profil, un exercice ou un outil de getliftsmith.com ouvre maintenant cet écran ici plutôt que dans le navigateur.",
+  "wn.c.coachNoteTop.title": "La note de votre coach en haut d'Aujourd'hui",
+  "wn.c.coachNoteTop.body":
+    "La note de votre coach s'affiche maintenant tout en haut d'Aujourd'hui, au-dessus de votre séance, sur téléphone comme sur ordinateur.",
+  "wn.c.moreStretches.title": "13 nouveaux étirements",
+  "wn.c.moreStretches.body":
+    "Étirement du canapé, grenouille, bascules de hanches 90/90, passages d'élastique, étirement du dormeur, rentrés de menton et plus encore, chacun avec sa démo en 3D, pour les hanches, les épaules, le cou, les poignets et les mollets.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Gerät belegt? Ein Tipp",
+  "wn.c.machineTaken.body":
+    "Tippe auf deiner Wear-OS-, Apple- oder Garmin-Uhr oder in „Plan ändern“ auf „Gerät belegt“, und die beste Übung deines Studios, die es nicht braucht, kommt an seine Stelle, mit Gewicht und Grund.",
   "wn.c.programBuilder.title": "Programm-Baukasten für Coaches",
   "wn.c.programBuilder.body": "Lege Routinen mit Ruhetagen auf die Wochentage, sieh den Monat und lass Automatisch planen sie verteilen.",
   "wn.c.myTeam.title": "Mein Team",
@@ -638,6 +704,15 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Saisonprogramm zuweisen",
   "wn.c.assignProgram.body":
     "Coaches setzen Upper/Lower, Push/Pull/Legs oder ihr mehrtägiges Programm für N Wochen auf Klienten oder ein Schulteam. Einmal folgen; Heute zeigt das Training des Wochentags. Ein Kalender zeigt Erledigt und Noch nicht — nur Vornamen bei Schulteams, nie Gewichte.",
+  "wn.c.watchToday.title": "Das heutige Training auf dem Zifferblatt",
+  "wn.c.watchToday.body":
+    "Füge die Liftsmith-Kachel oder -Komplikation hinzu und sieh die heutige Empfehlung, die Dauer und deine Bereitschaft. Auf Wear OS öffnet „Am Handy starten“ es.",
+  "wn.c.watchAuto.title": "Freihändige Sätze auf deiner Uhr",
+  "wn.c.watchAuto.body":
+    "In Labs: Starte deinen nächsten Satz, und deine Wear-OS-Uhr oder Apple Watch beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
+  "wn.c.watchAdjust.title": "Satz auf deiner Uhr ändern und bewerten",
+  "wn.c.watchAdjust.body":
+    "Dreh die Krone oder tippe auf − und +, um Gewicht und Wiederholungen auf Wear OS, Apple Watch oder Garmin zu ändern, und sag nach dem letzten Satz einer Übung direkt am Handgelenk, wie es sich angefühlt hat.",
   "wn.c.programPhases.title": "Phasen und Wiederholungen in Coach-Programmen",
   "wn.c.programPhases.body":
     "Coaches teilen ein Programm in Phasen mit einer Deload-Woche per Tippen und können Wiederholungen für eine Übung festlegen oder auf Auto lassen. Deine Phase und Woche siehst du unter dem Plan auf Heute.",
@@ -653,9 +728,20 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Chats öffnen sich dort, wo du bist",
   "wn.c.chatInPlace.body":
     "Schreib deinem Coach oder öffne den Teamchat, und der Chat öffnet sich direkt dort: am Computer im Nachrichtenfenster, am Handy über der Seite.",
+  "wn.c.siteLinks.title": "Links zur Website öffnen die App",
+  "wn.c.siteLinks.body":
+    "Auf Android öffnet ein Link zu einem Studio, einer Routine, einem Profil, einer Übung oder einem Tool auf getliftsmith.com jetzt diesen Bildschirm hier statt im Browser.",
+  "wn.c.coachNoteTop.title": "Die Notiz deines Coaches oben auf Heute",
+  "wn.c.coachNoteTop.body": "Eine Notiz deines Coaches steht jetzt ganz oben auf Heute, über deinem Training, am Handy und am Computer.",
+  "wn.c.moreStretches.title": "13 neue Dehnübungen",
+  "wn.c.moreStretches.body":
+    "Couch-Stretch, Frosch, 90/90-Hüftwechsel, Band-Durchzüge, Sleeper-Stretch, Kinn zurückziehen und mehr, jede mit 3D-Demo, für Hüfte, Schultern, Nacken, Handgelenke und Waden.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Macchina occupata? Un tocco",
+  "wn.c.machineTaken.body":
+    "Tocca Macchina occupata sull'orologio Wear OS, Apple Watch o Garmin, o in Cambia il piano, e l'esercizio migliore della tua palestra che non la usa prende il suo posto, con il peso e il perché.",
   "wn.c.programBuilder.title": "Costruttore di programmi per coach",
   "wn.c.programBuilder.body":
     "Metti le routine nei giorni della settimana con i riposi, guarda il mese e lascia che Organizza da solo le distribuisca.",
@@ -803,6 +889,15 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Assegna un programma di stagione",
   "wn.c.assignProgram.body":
     "I coach mettono Upper/Lower, Push/Pull/Legs o il loro programma di più giorni su clienti o una squadra scolastica per N settimane. Seguono una volta; Oggi mostra l’allenamento del giorno. Un calendario mostra Fatto e Non ancora — solo nomi per le squadre scolastiche, mai i pesi.",
+  "wn.c.watchToday.title": "L'allenamento di oggi sul quadrante",
+  "wn.c.watchToday.body":
+    "Aggiungi il riquadro o la complicazione di Liftsmith per vedere la scelta di oggi, quanto dura e quanto sei in forma. Su Wear OS, Avvia sul telefono lo apre.",
+  "wn.c.watchAuto.title": "Serie a mani libere sull'orologio",
+  "wn.c.watchAuto.body":
+    "In Labs: inizia la serie successiva e il tuo orologio Wear OS o Apple Watch chiude il recupero, conta le ripetizioni e registra la serie da solo, con una vibrazione a ogni passo.",
+  "wn.c.watchAdjust.title": "Modifica e valuta una serie sull'orologio",
+  "wn.c.watchAdjust.body":
+    "Ruota la corona o premi − e + per cambiare peso e ripetizioni su Wear OS, Apple Watch o Garmin, e dopo l'ultima serie di un esercizio di' com'è andata direttamente dal polso.",
   "wn.c.programPhases.title": "Fasi e ripetizioni nei programmi dei coach",
   "wn.c.programPhases.body":
     "I coach dividono un programma in fasi con una settimana di scarico in un tocco, e possono impostare le ripetizioni di un esercizio o lasciarle su Auto. Vedi fase e settimana sotto il piano di Oggi.",
@@ -818,9 +913,20 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Le chat si aprono dove sei",
   "wn.c.chatInPlace.body":
     "Scrivi al tuo coach o apri la chat della squadra e si apre lì: nel riquadro Messaggi sul computer o sopra la pagina sul telefono.",
+  "wn.c.siteLinks.title": "I link del sito aprono l'app",
+  "wn.c.siteLinks.body":
+    "Su Android, un link a una palestra, una routine, un profilo, un esercizio o uno strumento su getliftsmith.com ora apre quella schermata qui invece che nel browser.",
+  "wn.c.coachNoteTop.title": "La nota del coach in cima a Oggi",
+  "wn.c.coachNoteTop.body": "La nota del tuo coach ora è in cima a Oggi, sopra l'allenamento, sul telefono e sul computer.",
+  "wn.c.moreStretches.title": "13 nuovi allungamenti",
+  "wn.c.moreStretches.body":
+    "Allungamento del divano, rana, cambi d'anca 90/90, passaggi con elastico, allungamento del dormiente, retrazioni del mento e altro, ognuno con la sua demo in 3D, per anche, spalle, collo, polsi e polpacci.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "マシン使用中？ワンタップで",
+  "wn.c.machineTaken.body":
+    "Wear OS、Apple Watch、Garminのウォッチか「プランを変更」で「マシン使用中」をタップすると、そのマシンを使わない、ジムで一番合う種目に重量と理由つきで入れ替わります。",
   "wn.c.programBuilder.title": "コーチ向けプログラム作成",
   "wn.c.programBuilder.body": "ルーティンを曜日に置いて休みを入れ、月で確認し、自動で配置に振り分けを任せられます。",
   "wn.c.myTeam.title": "マイチーム",
@@ -957,6 +1063,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "シーズンプログラムを割り当て",
   "wn.c.assignProgram.body":
     "コーチが Upper/Lower、Push/Pull/Legs、または自作の複数日プログラムをクライアントや学校チームに N 週間割り当てます。一度フォローすれば、今日にその曜日のワークアウトが出ます。カレンダーで完了／まだが分かり、学校チームは下の名前のみ、重量は出しません。",
+  "wn.c.watchToday.title": "今日のワークアウトをウォッチフェイスに",
+  "wn.c.watchToday.body":
+    "Liftsmithのタイルやコンプリケーションを追加すると、今日のおすすめ、時間、コンディションが見られます。Wear OSでは「スマホで開始」で開けます。",
+  "wn.c.watchAuto.title": "ウォッチでハンズフリーセット",
+  "wn.c.watchAuto.body":
+    "Labsに追加：次のセットを始めるだけで、Wear OSウォッチやApple Watchが休憩を終え、レップを数え、セットを自動で記録します。各ステップで振動します。",
+  "wn.c.watchAdjust.title": "ウォッチでセットを変更・評価",
+  "wn.c.watchAdjust.body":
+    "Wear OS、Apple Watch、Garmin でリューズを回すか − と + を押して重量と回数を変更でき、種目の最後のセットのあとは手首からどうだったかを答えられます。",
   "wn.c.programPhases.title": "コーチのプログラムにフェーズと回数設定",
   "wn.c.programPhases.body":
     "コーチはワンタップのディロード週を含むフェーズでプログラムを組み、種目の回数を決めるかオートのままにできます。今のフェーズと週は今日のプランの下に表示されます。",
@@ -972,9 +1087,20 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "チャットがその場で開きます",
   "wn.c.chatInPlace.body":
     "コーチへのメッセージやチームチャットは、その場で開きます。パソコンではメッセージ欄に、スマートフォンでは画面の上に表示されます。",
+  "wn.c.siteLinks.title": "サイトのリンクがアプリで開きます",
+  "wn.c.siteLinks.body":
+    "Android では、getliftsmith.com のジム、ルーティン、プロフィール、種目、ツールへのリンクが、ブラウザではなくアプリのその画面で開くようになりました。",
+  "wn.c.coachNoteTop.title": "コーチのメモが今日のいちばん上に",
+  "wn.c.coachNoteTop.body": "コーチからのメモが、スマートフォンでもパソコンでも、今日の画面のいちばん上、ワークアウトの上に表示されます。",
+  "wn.c.moreStretches.title": "新しいストレッチ13種",
+  "wn.c.moreStretches.body":
+    "カウチストレッチ、カエル、90/90ヒップスイッチ、バンドパススルー、スリーパーストレッチ、チンタックなど。どれも3Dデモ付きで、股関節・肩・首・手首・ふくらはぎに。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Aparelho ocupado? Um toque",
+  "wn.c.machineTaken.body":
+    "Toque em Aparelho ocupado no seu relógio Wear OS, Apple Watch ou Garmin, ou em Mudar o plano, e o melhor exercício da sua academia que não precisa dele entra no lugar, com a carga e o porquê.",
   "wn.c.programBuilder.title": "Criador de programas para treinadores",
   "wn.c.programBuilder.body": "Coloque rotinas nos dias da semana com descansos, veja o mês e deixe Organizar sozinho distribuí-las.",
   "wn.c.myTeam.title": "Meu time",
@@ -1117,6 +1243,15 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Atribuir um programa de temporada",
   "wn.c.assignProgram.body":
     "Os treinadores põem Upper/Lower, Push/Pull/Legs ou o seu programa de vários dias em clientes ou numa equipa escolar por N semanas. Seguem uma vez; Hoje mostra o treino desse dia. Um calendário mostra Feito e Ainda não — só primeiros nomes em equipas escolares, nunca pesos.",
+  "wn.c.watchToday.title": "O treino de hoje no mostrador",
+  "wn.c.watchToday.body":
+    "Adicione o bloco ou a complicação do Liftsmith para ver a indicação de hoje, quanto dura e como está sua prontidão. No Wear OS, Começar no celular abre o treino.",
+  "wn.c.watchAuto.title": "Séries sem as mãos no seu relógio",
+  "wn.c.watchAuto.body":
+    "No Labs: comece a próxima série e seu relógio Wear OS ou Apple Watch encerra o descanso, conta as repetições e registra a série sozinho, com uma vibração a cada etapa.",
+  "wn.c.watchAdjust.title": "Mude e avalie uma série no relógio",
+  "wn.c.watchAdjust.body":
+    "Gire a coroa ou toque em − e + para mudar o peso e as repetições no Wear OS, Apple Watch ou Garmin e, depois da última série de um exercício, diga como foi direto do pulso.",
   "wn.c.programPhases.title": "Fases e repetições nos programas de treinadores",
   "wn.c.programPhases.body":
     "Treinadores dividem um programa em fases com uma semana de deload em um toque, e podem definir as repetições de um exercício ou deixar no Auto. Você vê sua fase e semana abaixo do plano de Hoje.",
@@ -1132,9 +1267,20 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "As conversas abrem onde você está",
   "wn.c.chatInPlace.body":
     "Mande mensagem ao seu treinador ou abra o chat da equipe e ele abre ali mesmo: na caixa de Mensagens no computador ou sobre a página no celular.",
+  "wn.c.siteLinks.title": "Links do site abrem o app",
+  "wn.c.siteLinks.body":
+    "No Android, um link para uma academia, rotina, perfil, exercício ou ferramenta do getliftsmith.com agora abre essa tela aqui, e não no navegador.",
+  "wn.c.coachNoteTop.title": "O recado do treinador no topo de Hoje",
+  "wn.c.coachNoteTop.body": "O recado do seu treinador agora fica no topo de Hoje, acima do seu treino, no celular e no computador.",
+  "wn.c.moreStretches.title": "13 alongamentos novos",
+  "wn.c.moreStretches.body":
+    "Alongamento do sofá, sapo, troca de quadril 90/90, passagem com elástico, alongamento do dorminhoco, retração do queixo e mais, cada um com sua demo em 3D, para quadril, ombros, pescoço, punhos e panturrilhas.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "기구 사용 중? 한 번 탭",
+  "wn.c.machineTaken.body":
+    "Wear OS, Apple Watch, Garmin 워치나 '계획 변경'에서 '기구 사용 중'을 누르면 그 기구가 필요 없는 헬스장 최고의 운동이 무게와 이유와 함께 그 자리를 채웁니다.",
   "wn.c.programBuilder.title": "코치용 프로그램 빌더",
   "wn.c.programBuilder.body": "루틴을 요일에 놓고 휴식일을 넣고, 월로 확인하고, 자동 배치로 나눠 보세요.",
   "wn.c.myTeam.title": "내 팀",
@@ -1265,6 +1411,15 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "시즌 프로그램 배정",
   "wn.c.assignProgram.body":
     "코치가 어퍼/로워, 푸시/풀/레그 또는 여러 날 프로그램을 클라이언트나 학교 팀에 N주 배정합니다. 한 번 따르면 오늘에 그날 운동이 나옵니다. 달력에서 완료/아직을 보고, 학교 팀은 이름만, 무게는 절대 안 보입니다.",
+  "wn.c.watchToday.title": "오늘의 운동을 워치 페이스에",
+  "wn.c.watchToday.body":
+    "Liftsmith 타일이나 컴플리케이션을 추가하면 오늘의 추천, 운동 시간, 컨디션을 볼 수 있어요. Wear OS에서는 휴대폰에서 시작으로 열 수 있어요.",
+  "wn.c.watchAuto.title": "워치로 손 안 대는 세트",
+  "wn.c.watchAuto.body":
+    "Labs에서: 다음 세트를 시작하면 Wear OS 워치나 Apple Watch가 휴식을 끝내고, 반복 횟수를 세고, 세트를 저절로 기록해요. 단계마다 진동해요.",
+  "wn.c.watchAdjust.title": "워치에서 세트 변경과 평가",
+  "wn.c.watchAdjust.body":
+    "Wear OS, Apple Watch, Garmin에서 크라운을 돌리거나 − 와 + 를 눌러 무게와 횟수를 바꾸고, 운동의 마지막 세트 뒤에는 손목에서 바로 어땠는지 답하세요.",
   "wn.c.programPhases.title": "코치 프로그램의 단계와 반복 횟수",
   "wn.c.programPhases.body":
     "코치는 한 번 탭으로 넣는 디로드 주와 함께 프로그램을 단계로 나누고, 운동별 반복 횟수를 정하거나 자동으로 둘 수 있습니다. 지금 단계와 주차는 오늘의 계획 아래에 보입니다.",
@@ -1280,9 +1435,20 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "채팅이 바로 그 자리에서 열려요",
   "wn.c.chatInPlace.body":
     "코치에게 메시지를 보내거나 팀 채팅을 열면 그 자리에서 열려요. 컴퓨터에서는 메시지 창에, 휴대폰에서는 화면 위에 열려요.",
+  "wn.c.siteLinks.title": "웹사이트 링크가 앱에서 열려요",
+  "wn.c.siteLinks.body":
+    "Android에서 getliftsmith.com의 헬스장, 루틴, 프로필, 운동, 도구 링크를 누르면 이제 브라우저 대신 앱의 해당 화면이 열려요.",
+  "wn.c.coachNoteTop.title": "코치 메모가 오늘 맨 위에",
+  "wn.c.coachNoteTop.body": "코치가 남긴 메모가 이제 휴대폰과 컴퓨터 모두에서 오늘 화면 맨 위, 운동 위에 보여요.",
+  "wn.c.moreStretches.title": "새 스트레칭 13가지",
+  "wn.c.moreStretches.body":
+    "카우치 스트레칭, 개구리, 90/90 고관절 전환, 밴드 패스스루, 슬리퍼 스트레칭, 턱 당기기 등. 모두 3D 시연이 있고 고관절, 어깨, 목, 손목, 종아리를 위한 거예요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Maszyna zajęta? Jedno dotknięcie",
+  "wn.c.machineTaken.body":
+    "Dotknij Maszyna zajęta na zegarku Wear OS, Apple Watch lub Garmin albo w Zmień plan, a jej miejsce zajmie najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
   "wn.c.programBuilder.title": "Kreator programów dla trenerów",
   "wn.c.programBuilder.body": "Rozłóż rutyny na dni tygodnia z odpoczynkiem, zobacz miesiąc i pozwól, by Ułóż automatycznie je rozłożyło.",
   "wn.c.myTeam.title": "Moja drużyna",
@@ -1424,6 +1590,15 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Przypisz program sezonowy",
   "wn.c.assignProgram.body":
     "Trenerzy ustawiają Upper/Lower, Push/Pull/Legs lub własny wielodniowy program klientom albo drużynie szkolnej na N tygodni. Śledzą raz; Dziś pokazuje trening tego dnia. Kalendarz pokazuje Zrobione i Jeszcze nie — tylko imiona w drużynach szkolnych, nigdy ciężary.",
+  "wn.c.watchToday.title": "Dzisiejszy trening na tarczy zegarka",
+  "wn.c.watchToday.body":
+    "Dodaj kafelek lub komplikację Liftsmith, aby widzieć dzisiejszą propozycję, czas i gotowość. Na Wear OS Zacznij na telefonie otwiera trening.",
+  "wn.c.watchAuto.title": "Serie bez rąk na zegarku",
+  "wn.c.watchAuto.body":
+    "W Labs: zacznij kolejną serię, a zegarek z Wear OS lub Apple Watch sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
+  "wn.c.watchAdjust.title": "Zmień i oceń serię na zegarku",
+  "wn.c.watchAdjust.body":
+    "Obróć koronkę lub naciśnij − i +, aby zmienić ciężar i powtórzenia na Wear OS, Apple Watch lub Garminie, a po ostatniej serii ćwiczenia powiedz z nadgarstka, jak poszło.",
   "wn.c.programPhases.title": "Fazy i powtórzenia w programach trenerów",
   "wn.c.programPhases.body":
     "Trenerzy dzielą program na fazy z tygodniem odciążenia dodawanym jednym dotknięciem i mogą ustalić powtórzenia ćwiczenia albo zostawić Auto. Swoją fazę i tydzień widzisz pod planem na Dziś.",
@@ -1439,9 +1614,20 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Czaty otwierają się tam, gdzie jesteś",
   "wn.c.chatInPlace.body":
     "Napisz do trenera albo otwórz czat drużyny, a otworzy się od razu: w okienku Wiadomości na komputerze lub nad stroną na telefonie.",
+  "wn.c.siteLinks.title": "Linki do strony otwierają aplikację",
+  "wn.c.siteLinks.body":
+    "Na Androidzie link do siłowni, rutyny, profilu, ćwiczenia lub narzędzia na getliftsmith.com otwiera teraz ten ekran tutaj zamiast w przeglądarce.",
+  "wn.c.coachNoteTop.title": "Notatka trenera na górze Dzisiaj",
+  "wn.c.coachNoteTop.body": "Notatka od trenera jest teraz na samej górze ekranu Dzisiaj, nad treningiem, na telefonie i na komputerze.",
+  "wn.c.moreStretches.title": "13 nowych ćwiczeń rozciągających",
+  "wn.c.moreStretches.body":
+    "Rozciąganie przy kanapie, żabka, przełożenia bioder 90/90, przekładanie gumy, rozciąganie śpiącego, cofanie brody i więcej, każde z demonstracją 3D, na biodra, barki, szyję, nadgarstki i łydki.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.machineTaken.title": "Makine dolu mu? Tek dokunuş",
+  "wn.c.machineTaken.body":
+    "Wear OS, Apple Watch ya da Garmin saatinde veya Planı değiştir'de Makine dolu'ya dokun; salonunda ona ihtiyaç duymayan en iyi hareket, ağırlığı ve nedeniyle yerine geçer.",
   "wn.c.programBuilder.title": "Koçlar için program oluşturucu",
   "wn.c.programBuilder.body": "Rutinleri dinlenme günleriyle haftanın günlerine koy, ayı gör ve Otomatik yerleştir onları dağıtsın.",
   "wn.c.myTeam.title": "Takımım",
@@ -1585,6 +1771,15 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.assignProgram.title": "Sezon programı ata",
   "wn.c.assignProgram.body":
     "Koçlar Upper/Lower, Push/Pull/Legs veya kendi çok günlük programlarını danışanlara ya da okul takımına N hafta atar. Bir kez takip; Bugün o günün antrenmanını gösterir. Takvim Yapıldı ve Henüz değil’i gösterir — okul takımlarında yalnızca adlar, asla ağırlık yok.",
+  "wn.c.watchToday.title": "Bugünkü antrenman saat kadranında",
+  "wn.c.watchToday.body":
+    "Liftsmith kutucuğunu veya komplikasyonunu ekle; bugünkü öneriyi, süresini ve hazırlığını gör. Wear OS'ta Telefonda başlat onu açar.",
+  "wn.c.watchAuto.title": "Saatinde eller serbest setler",
+  "wn.c.watchAuto.body":
+    "Labs'ta: bir sonraki setine başla; Wear OS saatin ya da Apple Watch dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",
+  "wn.c.watchAdjust.title": "Saatinde seti değiştir ve değerlendir",
+  "wn.c.watchAdjust.body":
+    "Wear OS, Apple Watch veya Garmin'de kurmayı çevir ya da − ve + düğmelerine basarak ağırlığı ve tekrarları değiştir; bir hareketin son setinden sonra nasıl geçtiğini bileğinden söyle.",
   "wn.c.programPhases.title": "Koç programlarında evreler ve tekrarlar",
   "wn.c.programPhases.body":
     "Koçlar programı tek dokunuşla eklenen bir deload haftasıyla evrelere ayırır ve bir hareketin tekrarlarını belirleyebilir ya da Otomatik bırakabilir. Evreni ve haftanı Bugün planının altında görürsün.",
@@ -1600,4 +1795,12 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.chatInPlace.title": "Sohbetler olduğun yerde açılır",
   "wn.c.chatInPlace.body":
     "Koçuna yaz ya da takım sohbetini aç, sohbet hemen orada açılır: bilgisayarda Mesajlar kutusunda, telefonda sayfanın üstünde.",
+  "wn.c.siteLinks.title": "Site bağlantıları uygulamayı açar",
+  "wn.c.siteLinks.body":
+    "Android'de getliftsmith.com'daki bir spor salonu, rutin, profil, egzersiz veya araç bağlantısı artık tarayıcı yerine burada o ekranı açar.",
+  "wn.c.coachNoteTop.title": "Koçunun notu Bugün'ün en üstünde",
+  "wn.c.coachNoteTop.body": "Koçundan gelen not artık telefonda ve bilgisayarda Bugün ekranının en üstünde, antrenmanının üzerinde.",
+  "wn.c.moreStretches.title": "13 yeni esneme",
+  "wn.c.moreStretches.body":
+    "Kanepe esnetmesi, kurbağa, 90/90 kalça geçişleri, bantla omuz geçişi, uyuyan esnetmesi, çene geri çekme ve daha fazlası; her biri 3D gösterimli, kalça, omuz, boyun, bilek ve baldırlar için.",
 };

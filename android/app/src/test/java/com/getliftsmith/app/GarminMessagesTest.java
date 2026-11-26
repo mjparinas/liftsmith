@@ -63,6 +63,18 @@ public class GarminMessagesTest {
     }
 
     @Test
+    public void machineTakenGoesWithItsPickAndWhy() throws Exception {
+        Map<String, Object> a = GarminMessages.state(lifting(), NOW);
+        assertEquals("", a.get("x"));
+        Map<String, Object> b = GarminMessages.state(lifting().put("taken", "Swaps to Dumbbell row, 30 kg × 10"), NOW);
+        assertEquals("Swaps to Dumbbell row, 30 kg × 10", b.get("x"));
+        assertTrue(GarminMessages.worthSending(a, b, 500));
+        Map<String, Object> c = GarminMessages.state(lifting().put("why", "In for Lat pulldown, which was taken"), NOW);
+        assertEquals("In for Lat pulldown, which was taken", c.get("y"));
+        assertTrue(GarminMessages.worthSending(a, c, 500));
+    }
+
+    @Test
     public void endClearsTheWatch() {
         assertEquals(true, GarminMessages.end().get("end"));
     }
@@ -77,6 +89,7 @@ public class GarminMessagesTest {
     public void onlyLogAdd30AndBelievableHeartRatesComeIn() {
         assertEquals("log", GarminMessages.action(msg("a", "log")));
         assertEquals("add30", GarminMessages.action(msg("a", "add30")));
+        assertEquals("taken", GarminMessages.action(msg("a", "taken")));
         assertNull(GarminMessages.action(msg("a", "discard")));
         assertNull(GarminMessages.action(msg("a", 3)));
         assertNull(GarminMessages.action(null));
@@ -102,5 +115,46 @@ public class GarminMessagesTest {
         assertTrue(GarminMessages.worthSending(GarminMessages.state(lifting(), NOW), m, 500));
         assertFalse(GarminMessages.worthSending(m, GarminMessages.state(plank, NOW + 1000), 1000));
         assertEquals(java.util.Collections.emptyList(), GarminMessages.state(lifting(), NOW).get("k"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void todayGoesUnderItsOwnKeySoItIsNeverTakenForAWorkout() throws Exception {
+        org.json.JSONObject t = new org.json.JSONObject().put("day", "2026-11-26").put("call", "Push").put("mins", "45 min").put("ready", "Readiness 82");
+        java.util.Map<String, Object> m = GarminMessages.today(t);
+        assertEquals(1, m.size());
+        java.util.Map<String, Object> g = (java.util.Map<String, Object>) m.get("g");
+        assertEquals("Push", g.get("c"));
+        assertEquals("45 min", g.get("m"));
+        assertEquals("Readiness 82", g.get("r"));
+        assertEquals("", g.get("y"));
+        assertEquals("", ((java.util.Map<String, Object>) GarminMessages.today(null).get("g")).get("c"));
+    }
+
+    @Test
+    public void theLadderAndTheQuestionGoToTheWatch() throws Exception {
+        JSONObject s = lifting()
+            .put("adj", new JSONObject().put("key", "s1:2:0:2:").put("kg", new org.json.JSONArray("[97.5,100,102.5]")).put("w", new org.json.JSONArray("[\"97.5 kg\",\"100 kg\",\"102.5 kg\"]")).put("i", 1).put("reps", 5).put("rs", "reps"))
+            .put("ask", new JSONObject().put("ex", "back-squat").put("q", "How did Back squat feel?").put("o", new org.json.JSONArray("[\"Too easy\",\"About right\",\"Too hard\"]")));
+        Map<String, Object> m = GarminMessages.state(s, NOW);
+        assertEquals("s1:2:0:2:", m.get("ay"));
+        assertEquals(3, ((List<?>) m.get("ak")).size());
+        assertEquals("100 kg", ((List<?>) m.get("aw")).get(1));
+        assertEquals(5, m.get("ar"));
+        assertEquals("back-squat", m.get("qe"));
+        assertEquals(3, ((List<?>) m.get("qo")).size());
+    }
+
+    @Test
+    public void tapsCarryTheirFields() throws Exception {
+        Map<String, Object> d = new HashMap<>();
+        d.put("a", "log");
+        d.put("key", "k");
+        d.put("kg", 60.0f);
+        d.put("reps", 8);
+        WatchMessages.Tap t = GarminMessages.tap(Collections.<Object>singletonList(d));
+        assertEquals("log", t.action);
+        assertEquals(8, new JSONObject(t.data).getInt("reps"));
+        assertNull(GarminMessages.tap(Collections.<Object>singletonList(Collections.singletonMap("hr", 120))));
     }
 }

@@ -20,6 +20,7 @@ export type LabFlag =
   | "labGymMachines"
   | "labScale"
   | "labHandsFree"
+  | "labWatchAuto"
   | "labBarPath"
   | "labTempo"
   | "labVolumeLog"
@@ -40,6 +41,7 @@ export interface Lab {
     | "machines"
     | "scale"
     | "handsFree"
+    | "watchAuto"
     | "barPath"
     | "tempo"
     | "volumeLog"
@@ -64,6 +66,7 @@ export const LABS: readonly Lab[] = [
   { flag: "labGymMachines", key: "machines" },
   { flag: "labScale", key: "scale" },
   { flag: "labHandsFree", key: "handsFree" },
+  { flag: "labWatchAuto", key: "watchAuto", needs: "labWatchReps", native: true },
   { flag: "labBarPath", key: "barPath", needs: "labRepCount" },
   { flag: "labTempo", key: "tempo" },
   { flag: "labVolumeLog", key: "volumeLog", native: true },

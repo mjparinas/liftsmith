@@ -244,7 +244,7 @@ export const pl: FeaturesText = {
     },
     stretching: {
       name: "Rozciąganie",
-      body: "48 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień. Kilka sekund na przyjęcie pozycji przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie.",
+      body: "61 ćwiczeń rozciągających z demonstracjami 3D: opcjonalna rozgrzewka przed, wyciszenie po albo sesja rozciągania w dowolny dzień. Kilka sekund na przyjęcie pozycji przed każdym rozciąganiem i każdą stroną, a ekran nie gaśnie.",
     },
     "workout-parts": {
       name: "Treningi z częściami",
@@ -626,6 +626,21 @@ export const pl: FeaturesText = {
       name: "Aplikacje na zegarki",
       body: "Trening na Wear OS i Apple Watch: seria albo odliczanie przerwy, tętno z zegarka, Zapisz serię i +30 s oraz wibracja na koniec przerwy.",
     },
+    "watch-today": {
+      name: "Dzisiejszy trening na zegarku",
+      body: "Kafelek i komplikacja tarczy na Wear OS, komplikacja na Apple Watch i podgląd na Garminie pokazują dzisiejszą propozycję, jej czas i twoją gotowość, np. „Mocniej · 45 min · Gotowość 82”. Na Wear OS Zacznij na telefonie otwiera ją na telefonie.",
+      note: "Apple Watch nie może otworzyć aplikacji na iPhonie, więc jego komplikacja otwiera aplikację na zegarku.",
+    },
+    "watch-adjust": {
+      name: "Zmień i oceń serię na zegarku",
+      body: "Obróć koronkę lub pierścień albo naciśnij − i +, aby zmienić ciężar i powtórzenia z nadgarstka, tymi samymi krokami co w telefonie: twoje talerze, hantle albo stos ciężarów maszyny. Po ostatniej serii ćwiczenia zegarek pyta, jak poszło, a twoja odpowiedź ustala kolejny ciężar.",
+      note: "Wear OS, Apple Watch i Garmin (przyciski UP i DOWN).",
+    },
+    "machine-taken": {
+      name: "Maszyna zajęta",
+      body: "Ktoś na maszynie? Jedno dotknięcie na zegarku lub w Zmień plan wstawia najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
+      note: "Wear OS, Apple Watch i Garmin (przycisk UP), a na telefonie i w sieci Zmień plan.",
+    },
     widgets: {
       name: "Widżety na ekranie głównym",
       body: "Trzy widżety: Dziś (decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię), Ten tydzień (dni z treningiem, twoja passa i co ją podtrzyma) oraz Regeneracja (które mięśnie są gotowe do treningu i kiedy będą pozostałe).",
@@ -767,6 +782,11 @@ export const pl: FeaturesText = {
     "lab-hands-free": {
       name: "Serie bez użycia rąk",
       body: "Gdy licznik powtórzeń liczy, seria zapisuje się sama kilka sekund po ostatnim powtórzeniu.",
+    },
+    "lab-watch-auto": {
+      name: "Serie bez rąk z zegarkiem",
+      body: "Zacznij kolejną serię, a zegarek sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
+      note: "Wear OS i Apple Watch, z włączonym liczeniem powtórzeń zegarkiem.",
     },
     "lab-voice": {
       name: "Głosowy zapis serii",

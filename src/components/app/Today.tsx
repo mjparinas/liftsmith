@@ -396,14 +396,24 @@ export function Today() {
         )}
       </div>
 
+      {/* The coach's note, a new message, a session or a check-in from the coach come first, above the call and the
+          plan, on phones and the desktop alike (Melvin, 2026-11-25: on the desktop it sat down the side column, while
+          the coach is told "it's at the top of their Today"). On the desktop it is exactly as wide as the plan's column
+          below it (3 of the grid's 5 columns, which has 4 gaps of 1.5rem), so their edges line up. */}
+      {!active && (
+        <div className="desk:w-[calc((100%-6rem)*0.6+3rem)]">
+          <CoachNoteToday />
+        </div>
+      )}
+
       <NowPlayingBar className="mt-3" />
 
       {!active && assignment && <ScheduleToday cell={assignment} />}
 
       <TodayMoments />
 
-      {/* Phone order (UX audit, 2026-11-13): the call and any coach's notes, then the plan, then the quote, saving
-          and the week's quests, so the workout is near the top instead of below the extras. Desktop layout
+      {/* Phone order (UX audit, 2026-11-13; a note from the coach sits above all of it since 2026-11-25): the call
+          and any coach's notes, then the plan, then the quote, saving and the week's quests, so the workout is near the top instead of below the extras. Desktop layout
           (layout.ts): the plan in the wider left column spanning two rows; the call and notes beside it on top, the
           quote and quests under them. The first row is only as tall as the call and notes, and the second row takes
           the rest of the plan's height, so the quote sits right under the call instead of halfway down the page
@@ -526,7 +536,6 @@ export function Today() {
           {!active && <RehabPhaseToday />}
           {/* The physio's rehab on a day without lifting; beside the lifting it's the Rehab row in the parts. */}
           {!active && (resting || !(preview && preview.items.length > 0)) && <RehabToday />}
-          {!active && <CoachNoteToday />}
           {!active && <CoachNotes limit={2} />}
         </div>
         <div className={`desk:order-1 desk:col-span-3 desk:row-span-2 ${resting ? "hidden" : ""}`}>

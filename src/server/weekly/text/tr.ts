@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "İyi ısınmak daha ağır ve daha güvenli çalışma setleri demek. Uygulama bunu senin için planlar.",
     points: [
       "Her ağır hareket için kademeli ısınma setleri hesaplanır.",
-      "3B gösterimli 48 esneme: önce ısınma, sonra soğuma ya da herhangi bir gün bir esneme rutini.",
+      "3B gösterimli 61 esneme: önce ısınma, sonra soğuma ya da herhangi bir gün bir esneme rutini.",
       "Bir antrenman ısınma, ağırlık çalışması ve soğumayı sırayla yürütebilir; aralarında Atla düğmesi var.",
       "10 dakika ya da daha uzun esneme günleri serini korur.",
     ],
@@ -366,7 +366,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Wear OS ve Apple Watch uygulamaları seti ya da dinlenme geri sayımını gösterir.",
       "Nabız saatin kendi sensöründen gelir.",
-      "Bileğinden Seti kaydet ve +30 sn; dinlenme bittiğinde titreşim.",
+      "Bileğinden Seti kaydet ve +30 sn; dinlenme bittiğinde titreşim. Makine dolu mu? Tek dokunuş, salonun için en iyi hareketi ağırlığıyla getirir.",
+      "Ağırlığı ve tekrarları kurma ya da − ve + ile değiştir, bir hareketin nasıl geçtiğini söyle.",
       "Garmin saat uygulaması çok yakında.",
     ],
     dyk: "Kilit ekranı da dinlenme geri sayımını, sıradaki seti ve plakalarını gösterir.",
@@ -614,6 +615,7 @@ export const emails: Record<string, Words> = {
       "Ses: “8 tekrar 100” ya da “çok kolay” de; telefonunda tanınır.",
       "Telefonundaki ya da kulaklığındaki ses düğmesi seti kaydeder.",
       "Saatin ya da telefonun kendi hareket sensörleri tekrarları sayabilir.",
+      "Saatle eller serbest setler: bir sonraki setine başla, saat dinlenmeyi bitirir, seti sayar ve kendiliğinden kaydeder.",
       "Tempo koçu her tekrarın indirme, bekleme ve kaldırma aşamalarını sayar.",
     ],
     dyk: "Sesle kayıt için hiçbir ses kaydı telefonundan çıkmaz.",
@@ -1092,5 +1094,16 @@ export const emails: Record<string, Words> = {
       "Program takip eden sporcular onu Bugün ekranında sıradakiyle birlikte görür; ayları Takımım'dadır.",
     ],
     dyk: "Takım bağlantıları artık sporcu bağlantıyı açtıktan sonra giriş yapsa da çalışıyor, böylece kimse kadrodan dışarıda kalmıyor.",
+  },
+  "watch-today": {
+    title: "Bugünkü antrenman saat kadranında",
+    intro: "Saatin artık hiçbir şey açmadan bugün seni neyin beklediğini gösteriyor: antrenman, süresi ve hazırlığın.",
+    points: [
+      "Wear OS'ta Bugünkü antrenman kutucuğunu veya bir komplikasyon ekle. Telefonda başlat, antrenmanı telefonunda açar.",
+      "Apple Watch'ta Liftsmith komplikasyonunu ekle. Dokununca saat uygulaması bugünkü öneriyle açılır.",
+      "Garmin'de uygulamayı saatte bir kez açtıktan sonra Liftsmith özeti aynı satırı gösterir.",
+      "Telefondaki Bugün ile aynı öneri ve aynı neden; planın değişince o da değişir.",
+    ],
+    dyk: "Dünkü plan hiçbir zaman bugünkü gibi görünmez: gece yarısından sonra saat, telefonundan yeni planı bekler.",
   },
 };

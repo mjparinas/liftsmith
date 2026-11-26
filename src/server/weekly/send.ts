@@ -10,7 +10,7 @@ import { APP_PATH, SITE_URL } from "@/lib/site";
 
 import { brandedMail, type Footer, type Mail } from "../reminderEmails";
 import type { Send } from "../reminders";
-import { TOUR } from "../tour";
+import { NO_TOUR_FLAGS, tourSteps, type TourFlags } from "../tour";
 import { PRO_PRICE, WEEKLY, type Role, type WeeklyEmail } from "./list";
 import * as de from "./text/de";
 import * as en from "./text/en";
@@ -39,12 +39,12 @@ const DAYS = new Set([2, 3, 4, 5, 6]);
 /** What the server knows about the account, for the emails meant for some people only. */
 export interface WeeklyFacts {
   roles: Role[];
-  flags: { coachPlans: boolean };
+  flags: { coachPlans: boolean; wearOnPlay: boolean };
   /** The synced profile says male (Your stats), for emails marked `notMale`. Missing means not known. */
   male?: boolean;
 }
 
-export const NO_FACTS: WeeklyFacts = { roles: [], flags: { coachPlans: false } };
+export const NO_FACTS: WeeklyFacts = { roles: [], flags: { coachPlans: false, wearOnPlay: false } };
 
 export interface WeeklySend {
   key: string;
@@ -65,20 +65,23 @@ export function forAccount(e: WeeklyEmail, f: WeeklyFacts): boolean {
   return true;
 }
 
-/** The emails still to send, in order: brand-new features first (oldest first), then the list. */
+/**
+ * The emails still to send, in order: brand-new features first (oldest first), then the list. `sent` holds the
+ * weekly and Getting started keys already out, so an email a Getting started step covered (`coveredBy`) is skipped.
+ */
 export function queue(sent: ReadonlySet<string>, f: WeeklyFacts): WeeklyEmail[] {
-  const left = WEEKLY.filter((e) => !sent.has(weeklyKey(e)) && forAccount(e, f));
+  const left = WEEKLY.filter((e) => !sent.has(weeklyKey(e)) && !(e.coveredBy && sent.has(e.coveredBy)) && forAccount(e, f));
   const fresh = left.filter((e) => e.fresh).sort((a, b) => a.fresh!.localeCompare(b.fresh!));
   return [...fresh, ...left.filter((e) => !e.fresh)];
 }
 
 /**
- * When the weekly tips may start: a week after Getting started's last email once all eight are out, or fifteen days
+ * When the weekly tips may start: a week after Getting started's last email once every step is out, or fifteen days
  * after the subscription began when Getting started is switched off. Null while Getting started is still running.
  */
-export function weeklyStart(sends: readonly Send[], tourOn: boolean, since: number): number | null {
+export function weeklyStart(sends: readonly Send[], tourOn: boolean, since: number, flags: TourFlags = NO_TOUR_FLAGS): number | null {
   const tour = sends.filter((s) => s.kind === "tour" && s.status !== "cancelled");
-  const done = TOUR.every((t) => tour.some((s) => s.key === `tour:${t.id}`));
+  const done = tourSteps(tour, flags).every((t) => tour.some((s) => s.key === `tour:${t.id}`));
   if (done) return Math.max(...tour.map((s) => s.sendAt)) + AFTER_TOUR;
   return tourOn ? null : since + WITHOUT_TOUR;
 }
@@ -102,7 +105,7 @@ export function nextWeekly(
 ): WeeklySend | null {
   const live = sends.filter((s) => s.status !== "cancelled");
   const weekly = live.filter((s) => s.kind === "weekly");
-  const email = queue(new Set(weekly.map((s) => s.key)), facts)[0];
+  const email = queue(new Set(live.filter((s) => s.kind === "weekly" || s.kind === "tour").map((s) => s.key)), facts)[0];
   if (!email) return null;
   // One a calendar week, and none in a week with a trial-ending email: that one matters more.
   const weeks = new Set(live.filter((s) => s.kind === "weekly" || s.kind === "trial").map((s) => weekOf(s.sendAt, tz)));

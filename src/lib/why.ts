@@ -144,5 +144,7 @@ export function workoutWhy(item: PlanItem, plan: Pick<Plan, "week" | "call" | "i
   const sets = plan.week.deload ? t("why.deloadSets") : plan.call === "recover" ? t("why.easySets") : undefined;
   // An automatic superset says why its rest is shorter.
   const pair = item.group && item.soloRest !== undefined ? t("why.pairRest", { rest: restLabel(item.restSec) }) : undefined;
-  return [item.target.note, sets, pair].filter(Boolean).join(" · ");
+  // "Machine taken": the stand-in says what it replaced and why it was picked.
+  const taken = item.takenFrom ? t("why.taken", { name: EXERCISE_BY_ID.get(item.takenFrom)?.name ?? "" }) : undefined;
+  return [taken, item.target.note, sets, pair].filter(Boolean).join(" · ");
 }

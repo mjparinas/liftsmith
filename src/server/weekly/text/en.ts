@@ -175,7 +175,7 @@ export const emails: Record<string, Words> = {
     intro: "Warming up well means heavier, safer working sets. The app plans it for you.",
     points: [
       "Ramp-up sets are worked out for each heavy lift.",
-      "48 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.",
+      "61 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.",
       "A workout can run warm-up, lifting and cool-down in order, with Skip between them.",
       "Stretch days of 10 minutes or more keep your streak.",
     ],
@@ -387,7 +387,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Wear OS and Apple Watch apps show the set or the rest countdown.",
       "Heart rate comes from the watch's own sensor.",
-      "Log set and +30 s from your wrist, with a buzz when rest ends.",
+      "Log set and +30 s from your wrist, with a buzz when rest ends. Machine taken? One tap swaps in the best lift for your gym, with its weight.",
+      "Change the weight and reps with the crown or − and +, and say how an exercise felt.",
       "A Garmin watch app is coming soon.",
     ],
     dyk: "The lock screen shows the rest countdown, the next set and its plates too.",
@@ -635,6 +636,7 @@ export const emails: Record<string, Words> = {
       'Voice: say "100 for 8" or "too easy", recognized on your phone.',
       "The volume button on your phone or earbuds logs the set.",
       "Your watch, or the phone's own motion sensors, can count the reps.",
+      "Hands-free watch sets: start your next set and the watch ends rest, counts and logs it by itself.",
       "The tempo coach counts each rep's lowering, hold and lift.",
     ],
     dyk: "No audio ever leaves your phone for voice logging.",
@@ -1112,5 +1114,16 @@ export const emails: Record<string, Words> = {
       "Athletes following a program see it on Today with what's up next, and their month sits on My team.",
     ],
     dyk: "Team links now work when an athlete signs in after opening them, so nobody is left off the roster.",
+  },
+  "watch-today": {
+    title: "Today's workout on your watch face",
+    intro: "Your watch now shows what's waiting today without opening anything: the workout, how long it takes and how ready you are.",
+    points: [
+      "On Wear OS, add the Today's workout tile or a complication. Start on phone opens the workout on your phone.",
+      "On Apple Watch, add the Liftsmith complication. A tap opens the watch app with today's call.",
+      "On Garmin, the Liftsmith glance shows the same line once you've opened the app on the watch.",
+      "It's the same call and reason as Today on your phone, and it updates when your plan changes.",
+    ],
+    dyk: "A plan from yesterday never shows as today's: after midnight the watch waits for your phone's new plan.",
   },
 };

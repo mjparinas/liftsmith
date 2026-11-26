@@ -5,6 +5,7 @@
     <string name="none_title">Süren antrenman yok</string>
     <string name="none_body">Telefonunda bir antrenman başlat, burada görünsün.</string>
     <string name="log_set">Seti kaydet</string>
+    <string name="machine_taken">Makine dolu</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Sıradaki: %1$s</string>
     <string name="rest_left">Dinlenme, %1$s kaldı</string>
@@ -18,4 +19,13 @@
     <string name="check_phone">Telefonuna bak</string>
     <string name="open_failed">Liftsmith\'i telefonunda aç.</string>
     <string name="install_failed">Liftsmith\'i telefonundaki Google Play\'den indir.</string>
+    <string name="tile_label">Bugünkü antrenman</string>
+    <string name="open_app">Aç</string>
+    <string name="no_today">Bugünkü planı burada görmek için telefonunda Liftsmith\'i aç.</string>
+    <string name="lighter">Daha hafif</string>
+    <string name="heavier">Daha ağır</string>
+    <string name="fewer_reps">Daha az tekrar</string>
+    <string name="more_reps">Daha fazla tekrar</string>
+    <string name="weight_value">Ağırlık %1$s, değiştirmek için kuronu çevirin</string>
+    <string name="reps_value">%1$s, değiştirmek için kuronu çevirin</string>
 </resources>

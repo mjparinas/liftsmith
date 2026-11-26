@@ -4,6 +4,7 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "why.taken": "In for {name}, which was taken",
   "why.pick": "{muscle} {pct}% recovered, {done} of {goal} sets this week",
   "why.pickPriority": "{muscle} {pct}% recovered, {done} of {goal} sets this week (a priority)",
   "why.favourite": "{pick}, and a favourite",
@@ -35,6 +36,7 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "why.taken": "En lugar de {name}, que estaba ocupado",
   "why.pick": "{muscle}: recuperación del {pct}%, {done} de {goal} series esta semana",
   "why.pickPriority": "{muscle}: recuperación del {pct}%, {done} de {goal} series esta semana (una prioridad)",
   "why.favourite": "{pick}, y es un favorito",
@@ -65,6 +67,7 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "why.taken": "À la place de {name}, qui était occupé",
   "why.pick": "{muscle} : récupération à {pct} %, {done} séries sur {goal} cette semaine",
   "why.pickPriority": "{muscle} : récupération à {pct} %, {done} séries sur {goal} cette semaine (une priorité)",
   "why.favourite": "{pick}, et un favori",
@@ -95,6 +98,7 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "why.taken": "Statt {name}, das belegt war",
   "why.pick": "{muscle} {pct} % erholt, {done} von {goal} Sätzen diese Woche",
   "why.pickPriority": "{muscle} {pct} % erholt, {done} von {goal} Sätzen diese Woche (Priorität)",
   "why.favourite": "{pick}, und ein Favorit",
@@ -124,6 +128,7 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "why.taken": "Al posto di {name}, che era occupato",
   "why.pick": "{muscle} recuperati al {pct}%, {done} di {goal} serie questa settimana",
   "why.pickPriority": "{muscle} recuperati al {pct}%, {done} di {goal} serie questa settimana (una priorità)",
   "why.favourite": "{pick}, ed è un preferito",
@@ -154,6 +159,7 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "why.taken": "{name}が使用中のための代わり",
   "why.pick": "{muscle}は回復{pct}%、今週{goal}セット中{done}セット",
   "why.pickPriority": "{muscle}は回復{pct}%、今週{goal}セット中{done}セット（優先）",
   "why.favourite": "{pick}、お気に入り",
@@ -182,6 +188,7 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "why.taken": "No lugar de {name}, que estava ocupado",
   "why.pick": "{muscle} {pct}% recuperado, {done} de {goal} séries esta semana",
   "why.pickPriority": "{muscle} {pct}% recuperado, {done} de {goal} séries esta semana (uma prioridade)",
   "why.favourite": "{pick}, e é um favorito",
@@ -215,6 +222,7 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "why.taken": "{name}이(가) 사용 중이라 대신 하는 운동",
   "why.pick": "{muscle} {pct}% 회복, 이번 주 {goal}세트 중 {done}세트",
   "why.pickPriority": "{muscle} {pct}% 회복, 이번 주 {goal}세트 중 {done}세트(우선 근육)",
   "why.favourite": "{pick}, 즐겨찾기",
@@ -245,6 +253,7 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "why.taken": "Dolu olan {name} yerine",
   "why.pick": "{muscle} %{pct} toparlandı, bu hafta {goal} setin {done} tanesi yapıldı",
   "why.pickPriority": "{muscle} %{pct} toparlandı, bu hafta {goal} setin {done} tanesi yapıldı (öncelikli)",
   "why.favourite": "{pick}, ayrıca favori",
@@ -277,6 +286,7 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "why.taken": "Zamiast {name}, które było zajęte",
   "why.pick": "{muscle}: regeneracja {pct}%, {done} z {goal} serii w tym tygodniu",
   "why.pickPriority": "{muscle}: regeneracja {pct}%, {done} z {goal} serii w tym tygodniu (priorytet)",
   "why.favourite": "{pick}, do tego ulubione",

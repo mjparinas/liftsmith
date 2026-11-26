@@ -6,4 +6,8 @@
     <string id="Bpm">$1$ S/min</string>
     <string id="HintLog">START: Satz eintragen</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="TodayNone" scope="glance">Öffne Liftsmith auf deinem Handy für den heutigen Plan.</string>
+    <string id="HintRate">MENU: Bewerten</string>
+    <string id="HintLogTaken">START: Eintragen · UP: Belegt</string>
+    <string id="HintAddTaken">DOWN: +30 s · UP: Belegt</string>
 </strings>

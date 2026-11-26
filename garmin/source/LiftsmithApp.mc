@@ -1,17 +1,23 @@
 // Liftsmith for Garmin watches (docs/decisions/watch-apps.md). The phone's workout on the wrist: the set, the
-// weight and reps or the rest countdown, plates and heart rate, with Log set (START) and +30 s (DOWN). The phone
+// weight and reps or the rest countdown, plates and heart rate, with Log set (START) and +30 s (DOWN); UP and DOWN
+// change the weight or reps during a set, and MENU answers "How did it feel?" after an exercise's last set. The phone
 // sends the state (GarminLink.java on Android, GarminLink.swift on iOS) and does all the logging; the watch only
 // shows it, sends taps back and adds its own heart rate. Same job as the Wear OS and Apple Watch apps.
 
 import Toybox.Application;
 import Toybox.Attention;
+import Toybox.Background;
 import Toybox.Communications;
 import Toybox.Lang;
 import Toybox.Sensor;
+import Toybox.System;
 import Toybox.Time;
 import Toybox.Timer;
 import Toybox.WatchUi;
 
+//! The glance and the background service (today's call, TodayGlance.mc) load this class too, so it does nothing
+//! of its own until getInitialView: the sensor, the timer and phone messages start only in the full app.
+(:glance, :background)
 class LiftsmithApp extends Application.AppBase {
     var workout as WorkoutState;
     private var _timer as Timer.Timer?;
@@ -21,14 +27,27 @@ class LiftsmithApp extends Application.AppBase {
     //! The set timer phase last seen (its label), to buzz when it moves on; null with no timer.
     private var _timerPhase as String? = null;
     private var _hrSentAt as Number = 0;
+    private var _running as Boolean = false;
+    //! Waits a moment after the last UP or DOWN before the new weight and reps go to the phone, so a run of presses
+    //! sends one adjust, not one each.
+    private var _adjTimer as Timer.Timer?;
+    const ADJUST_WAIT_MS = 1000;
 
     function initialize() {
         AppBase.initialize();
         workout = new WorkoutState();
     }
 
-    function onStart(state as Dictionary?) as Void {
+    function onStart(state as Dictionary?) as Void {}
+
+    //! The full app only (never the glance or the background service).
+    function begin() as Void {
+        _running = true;
         Communications.registerForPhoneAppMessages(method(:onPhone));
+        // Today's call for the glance, also while the app is closed (TodayService).
+        if (Background has :registerForPhoneAppMessageEvent) {
+            Background.registerForPhoneAppMessageEvent();
+        }
         Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
         Sensor.enableSensorEvents(method(:onSensor));
         var timer = new Timer.Timer();
@@ -37,6 +56,10 @@ class LiftsmithApp extends Application.AppBase {
     }
 
     function onStop(state as Dictionary?) as Void {
+        if (!_running) {
+            return;
+        }
+        flushAdjust();
         Sensor.enableSensorEvents(null);
         Sensor.setEnabledSensors([]);
         var timer = _timer;
@@ -46,11 +69,36 @@ class LiftsmithApp extends Application.AppBase {
     }
 
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
+        begin();
         return [new WorkoutView(workout), new WorkoutDelegate(self)];
     }
 
-    //! A new state from the phone (or the end of the workout).
+    (:glance)
+    function getGlanceView() as [WatchUi.GlanceView] or [WatchUi.GlanceView, WatchUi.GlanceViewDelegate] or Null {
+        return [new TodayGlance()];
+    }
+
+    (:background)
+    function getServiceDelegate() as [System.ServiceDelegate] {
+        return [new TodayService()];
+    }
+
+    //! Today's call the background service picked up while the app was closed.
+    function onBackgroundData(data as Application.PersistableType) as Void {
+        if (data instanceof Dictionary) {
+            Application.Storage.setValue(TodayStore.KEY, data);
+            WatchUi.requestUpdate();
+        }
+    }
+
+    //! A new state from the phone (or the end of the workout), or today's call for the glance under "g".
     function onPhone(msg as Communications.PhoneAppMessage) as Void {
+        var data = msg.data;
+        if (data instanceof Dictionary && data.get("g") instanceof Dictionary) {
+            Application.Storage.setValue(TodayStore.KEY, data.get("g") as Dictionary);
+            WatchUi.requestUpdate();
+            return;
+        }
         workout.apply(msg.data);
         _wasResting = workout.resting();
         var phase = workout.phase();
@@ -98,7 +146,46 @@ class LiftsmithApp extends Application.AppBase {
         WatchUi.requestUpdate();
     }
 
-    //! Log set ({"a" => "log"}), +30 s ({"a" => "add30"}) or a heart rate reading ({"hr" => bpm}).
+    //! Send the weight and reps picked on the watch a moment after the last press (the phone changes the set
+    //! without logging it).
+    function scheduleAdjust() as Void {
+        cancelAdjust();
+        var t = new Timer.Timer();
+        t.start(method(:flushAdjust), ADJUST_WAIT_MS, false);
+        _adjTimer = t;
+    }
+
+    function cancelAdjust() as Void {
+        var t = _adjTimer;
+        if (t != null) {
+            t.stop();
+        }
+        _adjTimer = null;
+    }
+
+    function flushAdjust() as Void {
+        if (_adjTimer == null) {
+            return;
+        }
+        _adjTimer = null;
+        if (workout.adjustable() && workout.edited()) {
+            var msg = workout.values();
+            msg.put("a", "adjust");
+            send(msg);
+        }
+    }
+
+    //! "How did it feel?" with the phone's question and three answers.
+    function ask() as Void {
+        var menu = new WatchUi.Menu2({ :title => workout.askQ });
+        var values = [1, 0, -1];
+        for (var i = 0; i < 3 && i < workout.askO.size(); i++) {
+            menu.addItem(new WatchUi.MenuItem(workout.askO[i] as String, null, values[i], {}));
+        }
+        WatchUi.pushView(menu, new RateDelegate(self, workout.askEx), WatchUi.SLIDE_LEFT);
+    }
+
+    //! Log set ({"a" => "log"}, with "key", "kg" and "reps" when changed on the watch), adjust, rate, +30 s ({"a" => "add30"}) or a heart rate reading ({"hr" => bpm}).
     function send(msg as Dictionary) as Void {
         Communications.transmit(msg, null, new SendListener());
     }

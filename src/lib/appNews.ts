@@ -46,16 +46,23 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.24.1",
+    version: "0.29.0",
     day: "2026-11-27",
     headline:
-      "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, and a program can run in order",
+      "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, a program can run in order, 13 new stretches, changing, rating and hands-free sets on the watch, today's workout on your watch face, and Machine taken in one tap",
     changes: [
+      { id: "watchToday", kind: "new", icon: "watch", gate: "native" },
+      { id: "machineTaken", kind: "new", icon: "swap" },
+      { id: "watchAdjust", kind: "new", icon: "watch", gate: "native" },
+      { id: "watchAuto", kind: "new", icon: "watch", unlock: "more", gate: "native" },
       { id: "programPhases", kind: "new", icon: "layers" },
       { id: "programTweaks", kind: "new", icon: "people" },
       { id: "programAthlete", kind: "new", icon: "calendar" },
       { id: "programInOrder", kind: "new", icon: "layers" },
+      { id: "moreStretches", kind: "new", icon: "stretch" },
       { id: "chatInPlace", kind: "better", icon: "chat" },
+      { id: "coachNoteTop", kind: "fixed", icon: "chat" },
+      { id: "siteLinks", kind: "fixed", icon: "link", gate: "native" },
     ],
   },
   {

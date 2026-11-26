@@ -13,6 +13,8 @@ final class WatchModel: NSObject, ObservableObject {
 
     @Published private(set) var state: WatchState?
     @Published private(set) var bpm: Int?
+    /// Today's call from the phone (the complication's), shown while no workout runs.
+    @Published private(set) var today: WatchToday? = WatchToday.load()
 
     private let health = HKHealthStore()
     private var session: HKWorkoutSession?
@@ -37,9 +39,19 @@ final class WatchModel: NSObject, ObservableObject {
         return s
     }
 
+    /// Today's call for the complication and the idle screen; "" when the phone took it away (signed out).
+    fileprivate func applyToday(_ json: String) {
+        let next = WatchToday.parse(json)
+        guard next != today else { return }
+        today = next
+        WatchToday.save(next == nil ? nil : json)
+    }
+
     fileprivate func apply(_ json: String?) {
         let next = WatchState.parse(json)
         guard next != state else { return }
+        // Hands-free watch sets (Labs): one tap when the set started or logged itself, so the lifter knows without looking.
+        if let n = next, n.vibrate, n.newCue(after: state) { WKInterfaceDevice.current().play(.click) }
         state = next
         scheduleRestTap()
         if next == nil { endWorkout() } else { beginWorkout() }
@@ -51,6 +63,15 @@ final class WatchModel: NSObject, ObservableObject {
     func send(_ action: String) {
         WKInterfaceDevice.current().play(.click)
         deliver(["action": action])
+    }
+
+    /// A tap with what goes with it: Log set or adjust with the weight and reps chosen here, or rate with how the
+    /// exercise felt (docs/decisions/watch-apps.md "Adjust and rate a set"). The phone checks every field.
+    func send(_ action: String, fields: [String: Any], click: Bool = true) {
+        if click { WKInterfaceDevice.current().play(.click) }
+        var m = fields
+        m["action"] = action
+        deliver(m)
     }
 
     private func deliver(_ message: [String: Any]) {
@@ -151,17 +172,35 @@ final class WatchModel: NSObject, ObservableObject {
 extension WatchModel: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         let json = session.receivedApplicationContext["json"] as? String
-        Task { @MainActor in self.apply(json) }
+        let today = session.receivedApplicationContext["today"] as? String
+        Task { @MainActor in
+            self.apply(json)
+            if let today { self.applyToday(today) }
+        }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
         let json = context["json"] as? String
-        Task { @MainActor in self.apply(json) }
+        let today = context["today"] as? String
+        Task { @MainActor in
+            self.apply(json)
+            if let today { self.applyToday(today) }
+        }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        // Today's call goes on its own, so it never touches the workout.
+        if let today = message["today"] as? String {
+            Task { @MainActor in self.applyToday(today) }
+        }
         guard let json = message["json"] as? String else { return }
         Task { @MainActor in self.apply(json) }
+    }
+
+    /// Today's call sent for the complication (transferCurrentComplicationUserInfo), which wakes the watch app for it.
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        guard let today = userInfo["today"] as? String else { return }
+        Task { @MainActor in self.applyToday(today) }
     }
 }
 

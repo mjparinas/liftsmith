@@ -244,7 +244,7 @@ export const tr: FeaturesText = {
     },
     stretching: {
       name: "Esneme",
-      body: "3D gösterimli 48 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini. Her esneme ve her taraf öncesinde pozisyon almak için birkaç saniye var ve ekran açık kalır.",
+      body: "3D gösterimli 61 esneme: isteğe bağlı bir ısınma öncesinde, soğuma sonrasında ya da herhangi bir gün esneme rutini. Her esneme ve her taraf öncesinde pozisyon almak için birkaç saniye var ve ekran açık kalır.",
     },
     "workout-parts": {
       name: "Bölümlü antrenmanlar",
@@ -626,6 +626,21 @@ export const tr: FeaturesText = {
       name: "Saat uygulamaları",
       body: "Wear OS ve Apple Watch'ta antrenman: set ya da dinlenme geri sayımı, saatten nabız, Seti kaydet ve +30 s, dinlenme bitince de bir titreşim.",
     },
+    "watch-today": {
+      name: "Bugünkü antrenman saatinde",
+      body: "Wear OS'ta bir kutucuk ve kadran komplikasyonu, Apple Watch'ta bir komplikasyon ve Garmin'de bir bakış; bugünkü öneriyi, süresini ve hazırlığını “Zorla · 45 dk · Hazırlık 82” gibi gösterir. Wear OS'ta Telefonda başlat onu telefonunda açar.",
+      note: "Apple Watch iPhone uygulamasını açamaz, bu yüzden komplikasyonu saat uygulamasını açar.",
+    },
+    "watch-adjust": {
+      name: "Saatte seti değiştir ve değerlendir",
+      body: "Kurmayı veya çerçeveyi çevir ya da − ve + düğmelerine bas; ağırlığı ve tekrarları bileğinden telefonla aynı adımlarla değiştir: plakaların, dambılların ya da makinenin ağırlık yığını. Bir hareketin son setinden sonra saat nasıl geçtiğini sorar ve cevabın bir sonraki ağırlığı belirler.",
+      note: "Wear OS, Apple Watch ve Garmin (UP ve DOWN düğmeleri).",
+    },
+    "machine-taken": {
+      name: "Makine dolu",
+      body: "Makinede biri mi var? Saatinde ya da Planı değiştir'de tek dokunuş, salonunda ona ihtiyaç duymayan en iyi hareketi ağırlığı ve nedeniyle getirir.",
+      note: "Wear OS, Apple Watch ve Garmin (UP düğmesi), telefonda ve web'de Planı değiştir.",
+    },
     widgets: {
       name: "Ana ekran widget'ları",
       body: "Üç widget: Bugün (günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet), Bu hafta (antrenman yaptığın günler, serin ve onu neyin sürdürdüğü) ve Toparlanma (hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı).",
@@ -767,6 +782,11 @@ export const tr: FeaturesText = {
     "lab-hands-free": {
       name: "Eller serbest setler",
       body: "Bir tekrar sayacı sayarken set, son tekrarından birkaç saniye sonra kendiliğinden kaydedilir.",
+    },
+    "lab-watch-auto": {
+      name: "Saatle eller serbest setler",
+      body: "Bir sonraki setine başla; saatin dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",
+      note: "Wear OS ve Apple Watch, saatle tekrar sayma açıkken.",
     },
     "lab-voice": {
       name: "Sesle set kaydı",

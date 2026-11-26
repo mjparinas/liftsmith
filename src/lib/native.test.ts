@@ -73,7 +73,16 @@ describe("rest time left on the Android Live Update", () => {
     const live = readFileSync(join(__dirname, "../../ios/App/LiftsmithWidgets/WorkoutLiveActivity.swift"), "utf8");
     expect(live).toContain("state.phase(at: now)");
     const watch = readFileSync(join(__dirname, "../../ios/App/LiftsmithWatch/WatchState.swift"), "utf8");
-    expect(watch).toContain("case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, timer");
+    expect(watch).toContain(
+      "case title, setLabel, next, plates, restUntil, hr, vibrate, warn, done, total, at, sessionId, motion, motionRest, cue, taken, why, timer",
+    );
+    // Machine taken (takenSwap.ts): every watch shows the phone's pick and sends "taken"; both phones let it through.
+    expect(watch).toContain('taken = (try? c.decode(String.self, forKey: .taken)) ?? ""');
+    expect(readFileSync(join(__dirname, "../../ios/App/App/WatchLink.swift"), "utf8")).toContain('a == "taken"');
+    expect(readFileSync(join(__dirname, "../../android/app/src/main/java/com/getliftsmith/app/WatchMessages.java"), "utf8")).toContain(
+      '"taken".equals(body)',
+    );
+    expect(readFileSync(join(__dirname, "../../garmin/source/WorkoutDelegate.mc"), "utf8")).toContain('_app.send({ "a" => "taken" });');
     const garmin = readFileSync(join(__dirname, "../../garmin/source/WorkoutState.mc"), "utf8");
     expect(garmin).toContain('var k = data.get("k");');
   });
@@ -100,8 +109,10 @@ describe("Log set on the notification with the app closed", () => {
   it("Android keeps the tap with its time and moves the notification on when no web app can hear it", () => {
     const service = java("WorkoutService.java");
     const tapped = service.slice(service.indexOf("private void tapped("));
-    expect(tapped).toMatch(/if \(WorkoutSessionPlugin\.isLive\(\)\) \{\s+sendBroadcast\([^;]*putExtra\("at", at\)\);\s+return;/);
-    expect(tapped).toContain("WorkoutTaps.add(this, action, at);");
+    expect(tapped).toMatch(
+      /if \(WorkoutSessionPlugin\.isLive\(\)\) \{\s+sendBroadcast\([^;]*putExtra\(EXTRA_DATA, data\)\.putExtra\("at", at\)\s*\);\s+return;/,
+    );
+    expect(tapped).toContain("WorkoutTaps.add(this, action, data, at);");
     expect(tapped).toContain("ahead.optJSONObject(aheadAt)");
     expect(tapped).toContain('putExtra("restUntil", rest > 0 ? at + rest * 1000L : 0L)');
     // A fresh update from the app starts the look-ahead again.
@@ -113,8 +124,8 @@ describe("Log set on the notification with the app closed", () => {
     expect(plugin).toMatch(/WorkoutTaps\.drain\(getContext\(\)\)[\s\S]*?notifyListeners\("action", data, true\);[\s\S]*?current = this;/);
     expect(plugin).toContain("if (current == this) current = null;");
     expect(plugin).toContain('i.putExtra("ahead"');
-    expect(java("WatchListenerService.java")).toContain("WorkoutService.tap(this, action);");
-    expect(java("GarminLink.java")).toContain("WorkoutService.tap(context, action);");
+    expect(java("WatchListenerService.java")).toContain("WorkoutService.tap(this, tap.action, tap.data);");
+    expect(java("GarminLink.java")).toContain("WorkoutService.tap(context, tap.action, tap.data);");
   });
 
   it("iOS catches the rest-over alert's buttons from launch and hands them over when the app comes back", () => {

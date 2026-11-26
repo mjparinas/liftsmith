@@ -8,6 +8,7 @@
 // School teams (SchoolTeams.tsx) sit at the bottom; a team link is #/trainer/team.<code>.
 import { useEffect, useState } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { savePendingCoach } from "@/lib/coachInvite";
@@ -52,12 +53,13 @@ import type { Routine } from "@/lib/types";
 import { fmtNum, fmtWeight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
+import { Avatar } from "./AvatarFace";
 import { ClientProgramDays } from "./ClientProgramDays";
 import { ClientBody } from "./CoachBody";
 import { CalendarAccessScreen, TrainingActivityScreen } from "./CoachCalendar";
 import { backToCoaching, ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen } from "./CoachCheckins";
-import { CoachHome, NoteCard } from "./CoachHome";
+import { CoachHome } from "./CoachHome";
 import { ClientPayments } from "./CoachPay";
 import { ClientPain, PerWeekPicker, PlanPhase, protocolRoutine, RehabPrograms } from "./CoachRehab";
 import { ClientSessions, SessionToday } from "./CoachSessions";
@@ -164,16 +166,40 @@ export function CoachNoteToday() {
   );
 }
 
+/**
+ * The coach's note as one card, the note and what to do with it together (Melvin, 2026-11-26: the buttons sat under
+ * the card and didn't read as part of it): who it's from with their initial, the words, then Open coaching and Got it
+ * on a footer inside the same card.
+ */
 function NoteToday({ n }: { n: ShownNote }) {
+  const name = n.coach || t("trn.noName");
   return (
-    <Section title={n.role === "trainer" ? t("trn.fromTrainer") : t("trn.fromCoach")} icon="chat">
-      <NoteCard note={n} coach={n.coach} />
-      <div className="flex flex-wrap gap-2">
-        <Button kind="ghost" className="flex-1" onClick={() => go("trainer")}>
+    <section
+      className="card card-tint mt-4 p-4"
+      style={{ ["--tint" as string]: "var(--color-violet)" }}
+      aria-labelledby="coach-note-title"
+      data-testid="coach-note-today"
+    >
+      <div className="flex items-center gap-3">
+        <Avatar name={name} size={40} />
+        <div className="min-w-0 flex-1">
+          <h2 id="coach-note-title" className={SECTION_LABEL}>
+            {n.role === "trainer" ? t("trn.fromTrainer") : t("trn.fromCoach")}
+          </h2>
+          <p className="mt-0.5 truncate text-sm">
+            <span className="font-semibold">{name}</span>
+            <span className="text-muted"> · {date(n.at, { month: "short", day: "numeric" })}</span>
+          </p>
+        </div>
+      </div>
+      <p className="mt-3 text-[1.0625rem] leading-relaxed whitespace-pre-line break-words">{n.text}</p>
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3">
+        <Button kind="ghost" icon="chat" className="flex-1" onClick={() => go("trainer")}>
           {t("trn.noteOpen")}
         </Button>
         <Button
           kind="quiet"
+          icon="check"
           onClick={() => {
             haptic("tick");
             dismissNote(n);
@@ -182,7 +208,7 @@ function NoteToday({ n }: { n: ShownNote }) {
           {t("coach.gotIt")}
         </Button>
       </div>
-    </Section>
+    </section>
   );
 }
 

@@ -153,7 +153,7 @@ export const emails: Record<string, Words> = {
     intro: "Dobra rozgrzewka to cięższe i bezpieczniejsze serie robocze. Aplikacja zaplanuje ją za ciebie.",
     points: [
       "Serie rozgrzewkowe są wyliczane dla każdego ciężkiego ćwiczenia.",
-      "48 ćwiczeń rozciągających z pokazami 3D: rozgrzewka przed, wyciszenie po albo rozciąganie w dowolny dzień.",
+      "61 ćwiczeń rozciągających z pokazami 3D: rozgrzewka przed, wyciszenie po albo rozciąganie w dowolny dzień.",
       "Trening może prowadzić przez rozgrzewkę, część siłową i wyciszenie po kolei, z przyciskiem Pomiń pomiędzy.",
       "Dni rozciągania trwające 10 minut lub dłużej podtrzymują passę.",
     ],
@@ -365,7 +365,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Aplikacje na Wear OS i Apple Watch pokazują serię lub odliczanie przerwy.",
       "Tętno pochodzi z czujnika samego zegarka.",
-      "Zapisz serię i +30 s prosto z nadgarstka, z wibracją na koniec przerwy.",
+      "Zapisz serię i +30 s prosto z nadgarstka, z wibracją na koniec przerwy. Maszyna zajęta? Jedno dotknięcie wstawia najlepsze ćwiczenie dla twojej siłowni, z ciężarem.",
+      "Zmieniaj ciężar i powtórzenia koronką albo − i +, i powiedz, jak poszło ćwiczenie.",
       "Aplikacja na zegarki Garmin już wkrótce.",
     ],
     dyk: "Ekran blokady też pokazuje odliczanie przerwy, następną serię i jej talerze.",
@@ -613,6 +614,7 @@ export const emails: Record<string, Words> = {
       "Głos: powiedz „100 na 8” albo „za lekko”, rozpoznawane na twoim telefonie.",
       "Przycisk głośności w telefonie lub słuchawkach zapisuje serię.",
       "Zegarek albo czujniki ruchu w telefonie mogą liczyć powtórzenia.",
+      "Serie bez rąk z zegarkiem: zacznij kolejną serię, a zegarek sam zakończy przerwę, policzy ją i zapisze.",
       "Trener tempa odlicza opuszczanie, zatrzymanie i podnoszenie w każdym powtórzeniu.",
     ],
     dyk: "Przy zapisywaniu głosem żaden dźwięk nigdy nie opuszcza twojego telefonu.",
@@ -1093,5 +1095,16 @@ export const emails: Record<string, Words> = {
       "Zawodnicy realizujący program widzą go na ekranie Dziś z tym, co następne, a ich miesiąc jest w Mojej drużynie.",
     ],
     dyk: "Linki do drużyny działają teraz także wtedy, gdy zawodnik zaloguje się po ich otwarciu, więc nikt nie wypada ze składu.",
+  },
+  "watch-today": {
+    title: "Dzisiejszy trening na tarczy zegarka",
+    intro: "Zegarek pokazuje teraz, co czeka cię dziś, bez otwierania czegokolwiek: trening, ile trwa i jaka jest twoja gotowość.",
+    points: [
+      "Na Wear OS dodaj kafelek Dzisiejszy trening lub komplikację. Zacznij na telefonie otwiera trening na telefonie.",
+      "Na Apple Watch dodaj komplikację Liftsmith. Dotknięcie otwiera aplikację na zegarku z dzisiejszą propozycją.",
+      "Na Garminie podgląd Liftsmith pokazuje tę samą linię, gdy raz otworzysz aplikację na zegarku.",
+      "To ta sama propozycja i ten sam powód co w Dziś na telefonie, a zmienia się razem z planem.",
+    ],
+    dyk: "Wczorajszy plan nigdy nie pokaże się jako dzisiejszy: po północy zegarek czeka na nowy plan z telefonu.",
   },
 };

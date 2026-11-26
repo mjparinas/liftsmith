@@ -87,6 +87,14 @@ final class WatchHub {
             items.release();
             set(app, found);
         });
+        // Today's call too, in case it came while the app wasn't installed or the listener missed it.
+        Uri today = new Uri.Builder().scheme("wear").path(TodayStore.PATH_TODAY).build();
+        Wearable.getDataClient(app).getDataItems(today).addOnSuccessListener((DataItemBuffer items) -> {
+            String json = null;
+            for (DataItem item : items) json = DataMapItem.fromDataItem(item).getDataMap().getString("json");
+            items.release();
+            if (json != null && !json.equals(TodayStore.raw(app))) TodayStore.save(app, json);
+        });
         findPhones(app);
     }
 
@@ -94,9 +102,11 @@ final class WatchHub {
     static void set(Context context, WorkoutState next) {
         Context app = context.getApplicationContext();
         main.post(() -> {
+            WorkoutState prev = state;
             state = next;
             if (next == null) bpm = 0;
             appContext = app;
+            if (next != null && next.vibrate && next.newCue(prev)) cueBuzz(app);
             scheduleBuzz(app, next);
             for (Listener l : listeners) l.changed();
         });
@@ -117,6 +127,20 @@ final class WatchHub {
     /** Log set or +30 s, done on the phone exactly like the notification's buttons. */
     static void action(Context context, String action) {
         send(context.getApplicationContext(), PATH_ACTION, action);
+    }
+
+    /**
+     * A tap with what goes with it: Log set or adjust with the weight and reps chosen on the watch, or rate with how
+     * the exercise felt. The phone checks the fields (WatchMessages.tap) and the web app the set (watchAdjust.ts).
+     */
+    static void action(Context context, String action, org.json.JSONObject fields) {
+        try {
+            fields.put("a", action);
+        } catch (org.json.JSONException e) {
+            action(context, action);
+            return;
+        }
+        send(context.getApplicationContext(), PATH_ACTION, fields.toString());
     }
 
     /** A batch of wrist motion (MotionStream), counted into reps on the phone. */
@@ -163,6 +187,12 @@ final class WatchHub {
             });
             then.run();
         });
+    }
+
+    /** Hands-free watch sets (Labs): one short tap when the set started or logged itself, so the lifter knows without looking. */
+    private static void cueBuzz(Context app) {
+        Vibrator v = app.getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createOneShot(120, VibrationEffect.DEFAULT_AMPLITUDE));
     }
 
     /** A buzz on the wrist when rest ends, if the lifter's rest-over alert vibrates (Workout preferences). */

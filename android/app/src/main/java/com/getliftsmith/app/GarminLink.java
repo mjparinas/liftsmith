@@ -102,9 +102,9 @@ final class GarminLink {
     /** Log set, +30 s and heart rate from the watch, handled exactly like the Wear OS app's. */
     private static final ConnectIQ.IQApplicationEventListener incoming = (device, app, message, status) -> {
         if (status != ConnectIQ.IQMessageStatus.SUCCESS || context == null) return;
-        String action = GarminMessages.action(message);
-        if (action != null) {
-            WorkoutService.tap(context, action);
+        WatchMessages.Tap tap = GarminMessages.tap(message);
+        if (tap != null) {
+            WorkoutService.tap(context, tap.action, tap.data);
         }
         int bpm = GarminMessages.bpm(message);
         if (bpm > 0) {
@@ -172,6 +172,21 @@ final class GarminLink {
                     }
                 }
             }
+        });
+    }
+
+    /** Today's call last sent, so an unchanged snapshot doesn't cross Bluetooth again. */
+    private static String lastToday;
+
+    /** Today's call for the Garmin glance, from the widget's snapshot. Nothing without Garmin Connect. */
+    static void today(Context ctx, String snapshot) {
+        if (ciq == null && !garminConnectInstalled(ctx)) return;
+        JSONObject t = WatchMessages.today(snapshot);
+        String key = t == null ? "" : t.toString();
+        start(ctx, () -> {
+            if (!ready || key.equals(lastToday)) return;
+            lastToday = key;
+            send(GarminMessages.today(t));
         });
     }
 

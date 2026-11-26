@@ -1051,6 +1051,292 @@ function openBook(): Motion {
   };
 }
 
+// ---------- added 2026-11-26 (Melvin picked them from a gap review of the library) ----------
+/** 90/90 hip switches: sitting with both knees bent and the feet wide, the knees sweep from one side to the other together. */
+function hip9090(): Motion {
+  return {
+    phases: swingPh(1.3),
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = seatedFloor(B, -14);
+      // Both knees fall the same way, so both poles point the same way (as in the lying twist).
+      const z = lerp(-1, 1, d);
+      const pole = V(0.25, 0.25 + 0.6 * (1 - Math.abs(z)), z);
+      const ankle = (sgn: number) => leg(B, hip, sgn, V(0.36, ANKLE_H + 0.01, sgn * 0.3));
+      const hand = (sgn: number) => arm(B, hip, sh, sgn, V(hip[0] - 0.24, 0.04, sgn * 0.24), 0.99);
+      return {
+        hip,
+        sh,
+        ankle: per(ankle(-1), ankle(1)),
+        foot: 10,
+        kneePole: per(pole, pole),
+        hand: per(hand(-1), hand(1)),
+        elbowPole: V(-1, 0, 0.3),
+        headBlend: 0.9,
+      };
+    },
+  };
+}
+
+/** Standing hip circles: the right knee lifts in front, opens out to the side and comes back down. */
+function hipCircles(): Motion {
+  return {
+    phases: loop(2.6),
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = upright(B, 4);
+      const hj = hipJ(B, hip, 1);
+      const th = d * Math.PI * 2;
+      const up = 0.5 - 0.5 * Math.cos(th); // 0 down, 1 at the top of the circle
+      const out = Math.max(0, Math.sin(th * 0.5)) ** 2; // opens out to the side through the second half
+      const ankleR = leg(B, hip, 1, add(hj, V(lerp(0.02, 0.24, up) - 0.12 * out * up, lerp(-0.86, -0.4, up), 0.02 + 0.22 * out * up)));
+      const pole = lerpV(V(1, 0.2, 0.1), V(0.2, 0.2, 1), out);
+      return {
+        hip,
+        sh,
+        ankle: per(V(0.02, ANKLE_H, -0.1), ankleR),
+        foot: { L: 0, R: 20 * up },
+        kneePole: per(V(1, 0, -0.2), pole),
+        hand: per(onHips(B, hip, -1), onHips(B, hip, 1)),
+        elbowPole: per(V(-0.6, 0.4, -1), V(-0.6, 0.4, 1)),
+        headBlend: 1,
+      };
+    },
+  };
+}
+
+/** Band pass-throughs: straight arms, a wide grip on a band, from in front of the hips over the head to behind. */
+function passThroughs(): Motion {
+  return {
+    phases: swingPh(1.6, 1.4),
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = upright(B);
+      const a = lerp(12, 300, d);
+      const r = reach(B) * 0.9;
+      const hand = (sgn: number) => {
+        const j = shJ(B, hip, sh, sgn);
+        return arm(B, hip, sh, sgn, add(j, V(Math.sin(rad(a)) * r, -Math.cos(rad(a)) * r, sgn * 0.34)));
+      };
+      return {
+        hip,
+        sh,
+        ankle: feet(),
+        hand: per(hand(-1), hand(1)),
+        elbowPole: V(-0.3, -1, 0.8),
+        headBlend: 1,
+      };
+    },
+    props: () => [{ kind: "cable", from: "handL", to: "handR" }],
+  };
+}
+
+/** Chin tucks: standing tall, the head glides straight back (a double chin), two fingers on the chin. */
+function chinTucks(): Motion {
+  return {
+    phases: [
+      [0.8, 0, 1, "", 0.6],
+      [1, 1, 1, "", 0.6],
+      [0.8, 1, 0, "", 0.5],
+    ],
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = upright(B);
+      const back = -0.035 * d;
+      const chin = V(sh[0] + 0.1 + back, sh[1] + B.neck + 0.06, 0.02);
+      return {
+        hip,
+        sh,
+        ankle: feet(),
+        hand: per(hangL(B, hip, sh, -1), arm(B, hip, sh, 1, chin)),
+        elbowPole: per(V(-1, 0, -0.4), V(0, -1, 0.6)),
+        headBlend: 1,
+        headBack: back,
+      };
+    },
+  };
+}
+
+/** Couch stretch: the left knee down by a wall with the shin up it, the right foot forward, hips pushing forward. */
+function couchStretch(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    pose(B, d) {
+      const knee = V(-0.2, 0.06, -0.11);
+      const hip0 = kneelHip(B, V(knee[0], knee[1]), lerp(-8, -20, d));
+      const hip = V(hip0[0], hip0[1]);
+      const sh = torsoAt(B, hip, lerp(10, -2, d));
+      const ankleL = V(knee[0] - 0.07, knee[1] + B.shin * 0.94, -0.11);
+      const ankleR = V(0.42, ANKLE_H, 0.12);
+      const kneeR = kneeOf(B, hip, 1, ankleR, V(1, 0.3, 0.15));
+      const onKnee = (sgn: number) => arm(B, hip, sh, sgn, add(kneeR, V(0.02, 0.05, sgn * 0.05 - 0.02)));
+      return {
+        hip,
+        sh,
+        ankle: per(leg(B, hip, -1, ankleL), ankleR),
+        foot: { L: -95, R: 0 },
+        kneePole: per(V(0.2, -1, -0.1), V(1, 0.3, 0.15)),
+        hand: per(onKnee(-1), onKnee(1)),
+        elbowPole: per(V(-0.4, -0.6, -1), V(-0.4, -0.6, 1)),
+        headBlend: 1,
+      };
+    },
+    props: () => [{ kind: "box", at: V(-0.33, 1, 0), size: V(0.06, 2, 1.2) }],
+  };
+}
+
+/** Frog stretch: on the forearms, knees wide, shins behind the knees, the hips easing back. */
+function frog(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    pose(B, d) {
+      const kz = B.hipW + B.thigh * 0.86;
+      const hipY = 0.06 + Math.sqrt(Math.max(0.01, B.thigh ** 2 - (kz - B.hipW) ** 2)) * 0.98;
+      const hip = V(lerp(0.02, -0.06, d), hipY);
+      const shY = B.upper + 0.06;
+      const pitch = Math.asin(clamp((hip[1] - shY) / B.torso, -1, 1)) * (180 / Math.PI);
+      const sh = torsoAt(B, hip, 90 + pitch);
+      const ankle = (sgn: number) => leg(B, hip, sgn, V(hip[0] - B.shin * 0.9, ANKLE_H + 0.01, sgn * kz));
+      const hand = (sgn: number) => arm(B, hip, sh, sgn, V(sh[0] + B.fore * 0.95, 0.04, sgn * 0.16), 0.99);
+      return {
+        hip,
+        sh,
+        ankle: per(ankle(-1), ankle(1)),
+        foot: 75,
+        kneePole: per(V(0.1, -0.4, -1), V(0.1, -0.4, 1)),
+        hand: per(hand(-1), hand(1)),
+        elbowPole: V(0, -1, 0.3),
+        headBlend: 0,
+      };
+    },
+  };
+}
+
+/** Sleeper stretch: lying on the left side (built standing and rolled), the left arm out in front with the elbow bent,
+ * the right hand easing the left forearm down toward the floor. */
+function sleeper(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    stance: 0.06,
+    pose(B, d) {
+      const hip = V(0, 1);
+      const sh = torsoAt(B, hip, 0);
+      const knees = (sgn: number) => leg(B, hip, sgn, add(hipJ(B, hip, sgn), V(0.34, -0.38, -sgn * 0.02 + 0.02)));
+      const jL = shJ(B, hip, sh, -1);
+      const elbow = add(jL, V(B.upper * 0.98, 0, 0));
+      const phi = rad(lerp(5, 55, d));
+      const handL = add(elbow, V(0, -Math.sin(phi) * B.fore * 0.98, Math.cos(phi) * B.fore * 0.98));
+      const handR = arm(B, hip, sh, 1, add(handL, V(-0.02, 0.03, 0.06)), 0.98);
+      return {
+        hip,
+        sh,
+        ankle: per(knees(-1), knees(1)),
+        kneePole: V(1, 0.2, 0.05),
+        hand: per(handL, handR),
+        elbowPole: per(V(1, 0, -0.2), V(0.2, -1, 0.3)),
+        headBlend: 1,
+      };
+    },
+    roll: () => -90,
+  };
+}
+
+/** Standing side bend: the right arm reaches up and over, the body bends to the left, the left hand on the hip. */
+function sideBendStretch(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    stance: 0.14,
+    pose(B, d) {
+      const b = rad(-lerp(4, 22, d));
+      const hip = V(0.02, standY(B, 0.03, 0.99), -Math.sin(b) * 0.05);
+      const sh = add(hip, V(0, Math.cos(b) * B.torso, Math.sin(b) * B.torso));
+      const b2 = b * 1.7;
+      const jR = add(sh, V(0, 0, B.shW));
+      const handR = arm(B, hip, sh, 1, add(jR, V(0.02, Math.cos(b2) * reach(B), Math.sin(b2) * reach(B))), 0.95);
+      return {
+        hip,
+        sh,
+        ankle: per(V(0.03, ANKLE_H, -0.14), V(0.03, ANKLE_H, 0.14)),
+        kneePole: V(1, 0, 0.4),
+        hand: per(onHips(B, hip, -1), handR),
+        elbowPole: per(V(-0.6, 0.4, -1), V(-0.2, 0.3, 1)),
+        headBlend: 0.6,
+      };
+    },
+  };
+}
+
+/** Chin-to-armpit neck stretch: the head turns and drops toward the left armpit, the left hand resting on the back of the head. */
+function neckLevator(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = upright(B);
+      const jR = shJ(B, hip, sh, 1);
+      const handR = add(jR, V(0.02, -reach(B) * 0.97, 0.06 + 0.02 * d));
+      const handL = arm(B, hip, sh, -1, V(sh[0] - 0.02 + 0.04 * d, sh[1] + B.neck + 0.16 - 0.03 * d, -0.04));
+      return {
+        hip,
+        sh,
+        shrug: -0.02 * d,
+        ankle: feet(),
+        hand: per(handL, handR),
+        elbowPole: per(V(0.4, 0.4, -1), V(-1, 0, 0.4)),
+        headBlend: 1,
+        headTilt: -0.035 * d,
+        headBack: 0.05 * d,
+      };
+    },
+  };
+}
+
+/** Wrist extensor stretch: the right arm straight out, palm down, the left hand easing the back of the hand down. */
+function wristExtensor(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = upright(B);
+      const jR = shJ(B, hip, sh, 1);
+      const handR = add(jR, V(reach(B) * 0.9, -0.02, -0.08));
+      const handL = arm(B, hip, sh, -1, add(handR, V(0.06, -0.03 - 0.02 * d, -0.04)), 0.98);
+      return { hip, sh, ankle: feet(), hand: per(handL, handR), elbowPole: per(V(0, -1, -0.5), V(0, -1, 0.3)), headBlend: 1 };
+    },
+  };
+}
+
+/** Bent-knee calf stretch (the soleus): like the wall calf stretch with the feet closer and the back knee bending toward the floor. */
+function soleus(): Motion {
+  return {
+    phases: HOLD,
+    load: "none",
+    pose(B, d) {
+      const rear = V(-0.18, ANKLE_H, -0.1);
+      const hx = lerp(-0.07, -0.03, d);
+      const hy = ANKLE_H + Math.sqrt(Math.max(0.01, (legMax(B) * lerp(0.93, 0.8, d)) ** 2 - (hx - rear[0]) ** 2));
+      const hip = V(hx, hy);
+      const sh = torsoAt(B, hip, lerp(10, 16, d));
+      const wallX = 0.7;
+      const hand = (sgn: number) => arm(B, hip, sh, sgn, V(wallX - 0.04, sh[1] + 0.02, sgn * 0.22), 0.97);
+      return {
+        hip,
+        sh,
+        ankle: per(rear, V(0.3, ANKLE_H, 0.11)),
+        kneePole: per(V(1, 0, -0.1), V(1, 0, 0.2)),
+        hand: per(hand(-1), hand(1)),
+        elbowPole: V(0, -1, 0.6),
+        headBlend: 0.9,
+      };
+    },
+    props: () => [{ kind: "box", at: V(0.72, 1, 0), size: V(0.06, 2, 1.2) }],
+  };
+}
+
 // ---------- the library ----------
 /** Ids are the stretch ids (src/lib/stretches.ts). An exercise id in `REUSE` borrows that exercise's motion. */
 const MOTIONS: Record<string, () => Motion> = {
@@ -1105,6 +1391,17 @@ const MOTIONS: Record<string, () => Motion> = {
   straddle,
   "wall-calf": wallCalf,
   "down-dog": () => downDog(false),
+  "hip-90-90": hip9090,
+  "hip-circles": hipCircles,
+  "pass-throughs": passThroughs,
+  "chin-tucks": chinTucks,
+  "couch-stretch": couchStretch,
+  frog,
+  sleeper,
+  "side-bend": sideBendStretch,
+  "neck-levator": neckLevator,
+  "wrist-extensor": wristExtensor,
+  soleus,
 };
 
 /** Warm-up drills that are the same movement as an exercise in the library. */
@@ -1115,6 +1412,8 @@ const REUSE: Record<string, string> = {
   "glute-bridge": "glute-bridge",
   "dead-bug": "dead-bug",
   "lateral-lunge": "cossack-squat",
+  "wall-slides": "wall-slide",
+  "deep-squat": "deep-squat-hold",
 };
 
 const PREFIX = "stretch:";
@@ -1123,10 +1422,10 @@ const cache = new Map<string, Motion>();
 /**
  * The side each one-side stretch's motion is drawn on: the side being stretched or worked (the right arm across
  * the chest, the right leg in pigeon, the knees falling to the right in the lying twist). Most are drawn on the
- * right; these two on the left. The player mirrors the motion for the other side, so "Left side" shows the left
+ * right; these on the left. The player mirrors the motion for the other side, so "Left side" shows the left
  * (Melvin, 2026-11-17). Borrowed exercise motions (dead bug, the lateral lunge) already go both ways in one rep.
  */
-const DRAWN_LEFT = new Set(["wall-calf", "kneeling-hip-flexor"]);
+const DRAWN_LEFT = new Set(["wall-calf", "kneeling-hip-flexor", "couch-stretch", "sleeper", "soleus"]);
 export const drawnSide = (id: string): Side => (DRAWN_LEFT.has(id) ? "L" : "R");
 
 const flipZ = (v: Vec): Vec => V(v[0], v[1], -v[2]);
@@ -1220,6 +1519,9 @@ const SIDE_ON = new Set([
   "seated-fold",
   "forward-fold",
   "kneeling-hip-flexor",
+  "couch-stretch",
+  "frog",
+  "soleus",
 ]);
 /** The camera view for a stretch's demo: "side" for moves that read best in profile. */
 export const stretchView = (id: string): "side" | undefined => (SIDE_ON.has(id) ? "side" : undefined);

@@ -6,6 +6,7 @@
     <string name="none_title">No workout running</string>
     <string name="none_body">Start one on your phone and it shows here.</string>
     <string name="log_set">Log set</string>
+    <string name="machine_taken">Machine taken</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Next: %1$s</string>
     <string name="rest_left">Rest, %1$s left</string>
@@ -19,4 +20,15 @@
     <string name="check_phone">Check your phone</string>
     <string name="open_failed">Open Liftsmith on your phone.</string>
     <string name="install_failed">Get Liftsmith from Google Play on your phone.</string>
+    <string name="tile_label">Today\'s workout</string>
+    <string name="open_app">Open</string>
+    <string name="no_today">Open Liftsmith on your phone to see today\'s plan here.</string>
+    <string name="lighter">Lighter</string>
+    <string name="heavier">Heavier</string>
+    <string name="fewer_reps">Fewer reps</string>
+    <string name="more_reps">More reps</string>
+    <string name="weight_value">Weight %1$s, turn the crown to change</string>
+    <string name="reps_value">%1$s, turn the crown to change</string>
+    <string name="minus" translatable="false">−</string>
+    <string name="plus" translatable="false">+</string>
 </resources>

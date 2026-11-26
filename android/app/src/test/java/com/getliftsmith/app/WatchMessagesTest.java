@@ -9,9 +9,10 @@ import org.junit.Test;
 public class WatchMessagesTest {
 
     @Test
-    public void onlyLogAndAdd30AreActions() {
+    public void onlyLogAdd30AndTakenAreActions() {
         assertEquals("log", WatchMessages.action("log"));
         assertEquals("add30", WatchMessages.action("add30"));
+        assertEquals("taken", WatchMessages.action("taken"));
         assertNull(WatchMessages.action("start"));
         assertNull(WatchMessages.action(""));
         assertNull(WatchMessages.action("log; drop"));
@@ -45,5 +46,62 @@ public class WatchMessagesTest {
         StringBuilder big = new StringBuilder("{\"t\":1,\"s\":[0");
         for (int i = 1; i < (WatchMessages.MAX_MOTION + 1) * 3; i++) big.append(",0");
         assertNull(WatchMessages.motion(big.append("]}").toString()));
+    }
+
+    @Test
+    public void todayKeepsOnlyWhatTheWatchShows() throws Exception {
+        org.json.JSONObject t = WatchMessages.today(
+            "{\"v\":1,\"day\":\"2026-11-26\",\"kind\":\"push\",\"title\":\"Push · 45 min\",\"why\":\"Slept well\",\"note\":\"x\","
+                + "\"stale\":\"Open Liftsmith\",\"watch\":{\"call\":\"Push\",\"mins\":\"45 min\",\"ready\":\"Readiness 82\"}}"
+        );
+        assertNotNull(t);
+        assertEquals("Push", t.getString("call"));
+        assertEquals("45 min", t.getString("mins"));
+        assertEquals("Readiness 82", t.getString("ready"));
+        assertEquals("2026-11-26", t.getString("day"));
+        assertEquals(false, t.has("note"));
+    }
+
+    @Test
+    public void todayFromAnOlderSnapshotOrNone() throws Exception {
+        org.json.JSONObject t = WatchMessages.today("{\"v\":1,\"day\":\"d\",\"kind\":\"rest\",\"title\":\"Rest day\"}");
+        assertNotNull(t);
+        assertEquals("Rest day", t.getString("call"));
+        assertEquals("", t.getString("ready"));
+        assertNull(WatchMessages.today("{}"));
+        assertNull(WatchMessages.today("junk"));
+        assertNull(WatchMessages.today(null));
+    }
+
+    @Test
+    public void plainTapsCarryNothing() {
+        WatchMessages.Tap t = WatchMessages.tap("log");
+        assertNotNull(t);
+        assertEquals("log", t.action);
+        assertNull(t.data);
+        assertNull(WatchMessages.tap("start"));
+    }
+
+    @Test
+    public void logCarriesTheWatchsWeightAndReps() throws Exception {
+        WatchMessages.Tap t = WatchMessages.tap("{\"a\":\"log\",\"key\":\"s:1:0:0:\",\"kg\":102.5,\"reps\":6,\"junk\":\"x\"}");
+        assertNotNull(t);
+        assertEquals("log", t.action);
+        org.json.JSONObject d = new org.json.JSONObject(t.data);
+        assertEquals(102.5, d.getDouble("kg"), 1e-9);
+        assertEquals(6, d.getInt("reps"));
+        assertEquals("s:1:0:0:", d.getString("key"));
+        assertEquals(false, d.has("junk"));
+    }
+
+    @Test
+    public void adjustAndRateNeedTheirFields() {
+        assertNull(WatchMessages.tap("{\"a\":\"adjust\",\"kg\":100}"));
+        assertNotNull(WatchMessages.tap("{\"a\":\"adjust\",\"key\":\"k\",\"reps\":8}"));
+        assertNull(WatchMessages.tap("{\"a\":\"rate\",\"v\":1}"));
+        assertNull(WatchMessages.tap("{\"a\":\"rate\",\"ex\":\"row\",\"v\":3}"));
+        assertNotNull(WatchMessages.tap("{\"a\":\"rate\",\"ex\":\"row\",\"v\":-1}"));
+        assertNull(WatchMessages.tap("{\"a\":\"start\"}"));
+        assertNull(WatchMessages.tap("{nope"));
     }
 }

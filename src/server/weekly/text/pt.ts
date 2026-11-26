@@ -155,7 +155,7 @@ export const emails: Record<string, Words> = {
     intro: "Um bom aquecimento significa séries de trabalho mais pesadas e mais seguras. O app planeja isso para você.",
     points: [
       "As séries de aproximação são calculadas para cada exercício pesado.",
-      "48 alongamentos com demonstrações em 3D: um aquecimento antes, um desaquecimento depois ou uma rotina de alongamento em qualquer dia.",
+      "61 alongamentos com demonstrações em 3D: um aquecimento antes, um desaquecimento depois ou uma rotina de alongamento em qualquer dia.",
       "Um treino pode ter aquecimento, musculação e desaquecimento em sequência, com Pular entre eles.",
       "Dias de alongamento de 10 minutos ou mais mantêm sua sequência.",
     ],
@@ -367,7 +367,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Os apps para Wear OS e Apple Watch mostram a série ou a contagem do descanso.",
       "A frequência cardíaca vem do sensor do próprio relógio.",
-      "Registrar série e +30 s pelo pulso, com uma vibração quando o descanso acaba.",
+      "Registrar série e +30 s pelo pulso, com uma vibração quando o descanso acaba. Aparelho ocupado? Um toque coloca o melhor exercício para a sua academia, com a carga.",
+      "Mude o peso e as repetições com a coroa ou − e +, e diga como foi um exercício.",
       "Um app para relógios Garmin está chegando.",
     ],
     dyk: "A tela de bloqueio também mostra a contagem do descanso, a próxima série e as anilhas dela.",
@@ -615,6 +616,7 @@ export const emails: Record<string, Words> = {
       "Voz: diga “100 por 8” ou “fácil demais”, reconhecido no seu celular.",
       "O botão de volume do celular ou dos fones registra a série.",
       "Seu relógio, ou os próprios sensores de movimento do celular, podem contar as reps.",
+      "Séries sem as mãos com o relógio: comece a próxima série e o relógio encerra o descanso, conta e registra sozinho.",
       "O coach de cadência conta a descida, a pausa e a subida de cada rep.",
     ],
     dyk: "Nenhum áudio sai do seu celular no registro por voz.",
@@ -1097,5 +1099,16 @@ export const emails: Record<string, Words> = {
       "Atletas que seguem um programa o veem em Hoje com o próximo dia, e o mês deles fica em Meu time.",
     ],
     dyk: "Os links do time agora funcionam mesmo se o atleta entrar depois de abri-los, então ninguém fica de fora da lista.",
+  },
+  "watch-today": {
+    title: "O treino de hoje no mostrador",
+    intro: "Seu relógio agora mostra o que espera por você hoje sem abrir nada: o treino, quanto dura e como está sua prontidão.",
+    points: [
+      "No Wear OS, adicione o bloco Treino de hoje ou uma complicação. Começar no celular abre o treino no seu celular.",
+      "No Apple Watch, adicione a complicação do Liftsmith. Um toque abre o app do relógio com a indicação de hoje.",
+      "No Garmin, o resumo do Liftsmith mostra a mesma linha depois que você abrir o app no relógio.",
+      "É a mesma indicação e o mesmo motivo de Hoje no celular, e muda quando seu plano muda.",
+    ],
+    dyk: "Um plano de ontem nunca aparece como o de hoje: depois da meia-noite, o relógio espera o novo plano do celular.",
   },
 };

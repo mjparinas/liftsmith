@@ -9,9 +9,92 @@ final class WatchMessages {
 
     private WatchMessages() {}
 
-    /** "log" or "add30", or null. */
+    /** The pieces of the home-screen widget's snapshot (src/lib/widget.ts) the watches show. */
+    private static final String[] TODAY_KEYS = { "day", "kind", "title", "why", "stale" };
+    private static final String[] TODAY_WATCH_KEYS = { "call", "mins", "ready" };
+
+    /**
+     * Today's call for the watch tile, complication and glance, from the widget's snapshot: {day, kind, title, why,
+     * stale, call, mins, ready}, all strings. Null for an empty snapshot (signed out, device erased), which clears the
+     * watch. An app from before the watch part (no "watch") still gives the title as the call.
+     */
+    static JSONObject today(String snapshot) {
+        try {
+            JSONObject s = new JSONObject(snapshot);
+            if (s.optInt("v", 0) != 1) return null;
+            JSONObject out = new JSONObject();
+            for (String k : TODAY_KEYS) out.put(k, s.optString(k, ""));
+            JSONObject w = s.optJSONObject("watch");
+            for (String k : TODAY_WATCH_KEYS) out.put(k, w == null ? "" : w.optString(k, ""));
+            if (out.optString("call").isEmpty()) out.put("call", out.optString("title"));
+            return out;
+        } catch (JSONException | NullPointerException e) {
+            return null;
+        }
+    }
+
+    /** "log", "add30" or "taken" (Machine taken, src/lib/takenSwap.ts), or null. */
     static String action(String body) {
-        return "log".equals(body) || "add30".equals(body) ? body : null;
+        return "log".equals(body) || "add30".equals(body) || "taken".equals(body) ? body : null;
+    }
+
+    /**
+     * A tap from a watch and what came with it (docs/decisions/watch-apps.md "Adjust and rate a set"): Log set and
+     * adjust may carry the weight and reps the watch settled on, rate carries how the exercise felt. `data` is clean
+     * JSON for the web app (which checks it against the set again, watchAdjust.ts), or null for a plain tap.
+     */
+    static final class Tap {
+
+        final String action;
+        final String data;
+
+        Tap(String action, String data) {
+            this.action = action;
+            this.data = data;
+        }
+    }
+
+    /** Reads a field the way both a JSON message (Wear OS) and a Connect IQ dictionary (Garmin) hold it. */
+    interface Fields {
+        Object get(String key);
+    }
+
+    /** A plain "log" or "add30", or {"a": "log" | "add30" | "adjust" | "rate", ...}; null for anything else. */
+    static Tap tap(String body) {
+        if (body == null || body.length() > 1000) return null;
+        String plain = action(body);
+        if (plain != null) return new Tap(plain, null);
+        try {
+            JSONObject o = new JSONObject(body);
+            return tap(o::opt);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    /** The same from any message's fields. */
+    static Tap tap(Fields f) {
+        Object a = f.get("a");
+        if (!("log".equals(a) || "add30".equals(a) || "adjust".equals(a) || "rate".equals(a))) return null;
+        String action = (String) a;
+        JSONObject d = new JSONObject();
+        try {
+            Object key = f.get("key");
+            if (key instanceof String && ((String) key).length() <= 120) d.put("key", key);
+            Object kg = f.get("kg");
+            if (kg instanceof Number && Double.isFinite(((Number) kg).doubleValue())) d.put("kg", ((Number) kg).doubleValue());
+            Object reps = f.get("reps");
+            if (reps instanceof Number) d.put("reps", ((Number) reps).intValue());
+            Object ex = f.get("ex");
+            if (ex instanceof String && ((String) ex).length() <= 120) d.put("ex", ex);
+            Object v = f.get("v");
+            if (v instanceof Number && Math.abs(((Number) v).intValue()) <= 1) d.put("v", ((Number) v).intValue());
+        } catch (JSONException e) {
+            return null;
+        }
+        if ("rate".equals(action) && (!d.has("ex") || !d.has("v"))) return null;
+        if ("adjust".equals(action) && (!d.has("key") || !d.has("reps"))) return null;
+        return new Tap(action, d.length() == 0 ? null : d.toString());
     }
 
     /** A heart rate in beats per minute, or 0 when it isn't a believable one (30 to 240). */

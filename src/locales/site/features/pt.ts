@@ -244,7 +244,7 @@ export const pt: FeaturesText = {
     },
     stretching: {
       name: "Alongamento",
-      body: "48 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",
+      body: "61 alongamentos com demonstrações em 3D: um aquecimento opcional antes, uma volta à calma depois ou uma rotina de alongamento em qualquer dia. Alguns segundos para se posicionar antes de cada alongamento e de cada lado, e a tela fica ligada.",
     },
     "workout-parts": {
       name: "Treinos em partes",
@@ -626,6 +626,21 @@ export const pt: FeaturesText = {
       name: "Apps para relógio",
       body: "O treino no Wear OS e no Apple Watch: a série ou a contagem do descanso, a frequência cardíaca do relógio, Registrar série e +30 s, e uma vibração quando o descanso acaba.",
     },
+    "watch-today": {
+      name: "O treino de hoje no seu relógio",
+      body: "Um bloco e uma complicação de mostrador no Wear OS, uma complicação no Apple Watch e um glance no Garmin mostram a indicação de hoje, quanto dura e como está sua prontidão, como “Forçar · 45 min · Prontidão 82”. No Wear OS, Começar no celular abre o treino no seu celular.",
+      note: "O Apple Watch não consegue abrir o app do iPhone, então a complicação abre o app do relógio.",
+    },
+    "watch-adjust": {
+      name: "Mude e avalie uma série no relógio",
+      body: "Gire a coroa ou o aro, ou toque em − e +, para mudar o peso e as repetições pelo pulso, nos mesmos passos do celular: suas anilhas, halteres ou a pilha de pesos da máquina. Depois da última série de um exercício, o relógio pergunta como foi, e sua resposta define o próximo peso.",
+      note: "Wear OS, Apple Watch e Garmin (botões UP e DOWN).",
+    },
+    "machine-taken": {
+      name: "Aparelho ocupado",
+      body: "Alguém no aparelho? Um toque no relógio ou em Mudar o plano coloca o melhor exercício da sua academia que não precisa dele, com a carga e o porquê.",
+      note: "Wear OS, Apple Watch e Garmin (o botão UP), e Mudar o plano no celular e na web.",
+    },
     widgets: {
       name: "Widgets na tela inicial",
       body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",
@@ -767,6 +782,11 @@ export const pt: FeaturesText = {
     "lab-hands-free": {
       name: "Séries sem as mãos",
       body: "Enquanto um contador de reps está contando, a série se registra sozinha alguns segundos depois da sua última rep.",
+    },
+    "lab-watch-auto": {
+      name: "Séries sem as mãos com o relógio",
+      body: "Comece a próxima série e seu relógio encerra o descanso, conta as repetições e registra a série sozinho, com uma vibração a cada etapa.",
+      note: "Wear OS e Apple Watch, com a contagem de repetições pelo relógio ligada.",
     },
     "lab-voice": {
       name: "Registro de série por voz",

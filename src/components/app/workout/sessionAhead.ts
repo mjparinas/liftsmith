@@ -1,10 +1,11 @@
 import { exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
-import { chipText, type AheadStep, type SessionState } from "@/lib/sessionNotify";
-import { afterLog, warmingUp, type Active } from "@/lib/store/workout";
-import type { AppEvent, Gym, Unit } from "@/lib/types";
+import { chipText, type AheadStep, type SessionState, type TakenAheadStep } from "@/lib/sessionNotify";
+import { afterLog, swappedActive, warmingUp, type Active } from "@/lib/store/workout";
+import type { AppEvent, Gym, Profile, Unit } from "@/lib/types";
 
 import { plateText, setText } from "../format";
+import { watchAdj } from "./watchAdjust";
 
 // What the live workout notification says about the set on screen, and the sets after it. The notification's Log set
 // works with the app closed (WorkoutService.java, WorkoutSessionPlugin.swift): the phone can't run the training engine
@@ -13,6 +14,9 @@ import { plateText, setText } from "../format";
 
 /** How many sets ahead the notification knows: more than any planned workout has, warm-ups included. */
 export const AHEAD_MAX = 60;
+/** How many of those steps carry the watches' weight ladder (watchAdjust.ts): a gym session's worth with the app
+ *  closed, without working out dozens of ladders on every Log set. */
+export const ADJ_AHEAD = 12;
 
 type Fields = Pick<SessionState, "setLabel" | "next" | "plates" | "chip"> & { name: string; done: number; total: number };
 
@@ -78,7 +82,41 @@ export function aheadSteps(a: Active, events: readonly AppEvent[], unit: Unit, g
     }
     const rest = cur.restUntil ? cur.restTotal : 0;
     const { name, ...fields } = f;
-    steps.push({ ...fields, title: rest > 0 ? t("workout.restTitle", { name }) : name, rest });
+    steps.push({
+      ...fields,
+      title: rest > 0 ? t("workout.restTitle", { name }) : name,
+      rest,
+      adj: k < ADJ_AHEAD ? watchAdj(cur, evs, unit, gym) : undefined,
+    });
   }
   return steps;
+}
+
+/**
+ * The workout after swapping to `toId` for taken equipment, worked out ahead like `aheadSteps`: with the phone app asleep
+ * (iOS in the background, Android closed) the watches' Machine taken tap steps to it, and the app makes the same swap
+ * when it wakes and replays the tap. Rest carries on as it was.
+ */
+export function takenStep(
+  a: Active,
+  events: AppEvent[],
+  profile: Profile,
+  gym: Gym,
+  toId: string,
+  autoRest: boolean,
+): TakenAheadStep | null {
+  const item = a.plan.items[a.index];
+  if (!item) return null;
+  const now = Date.now();
+  const next = swappedActive(a, events, profile, gym, toId, true, now);
+  const f = sessionFields(next, events, profile.unit, gym);
+  if (!f) return null;
+  const { name, ...fields } = f;
+  return {
+    ...fields,
+    title: a.restUntil && a.restUntil > now ? t("workout.restTitle", { name }) : name,
+    why: t("why.taken", { name: exercise(item.exerciseId).name }),
+    adj: watchAdj(next, events, profile.unit, gym),
+    ahead: aheadSteps(next, events, profile.unit, gym, autoRest),
+  };
 }

@@ -5,3 +5,9 @@
 "Heart rate %lld beats per minute" = "심박수 분당 %lld회";
 "Log set" = "세트 기록";
 "+30 s" = "+30초";
+"Lighter" = "더 가볍게";
+"Heavier" = "더 무겁게";
+"Fewer reps" = "횟수 줄이기";
+"More reps" = "횟수 늘리기";
+"Turn the crown to change" = "크라운을 돌려 변경";
+"Machine taken" = "기구 사용 중";

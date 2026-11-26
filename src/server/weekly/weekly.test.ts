@@ -108,14 +108,14 @@ describe("the weekly tips' words", () => {
 
 describe("who gets which", () => {
   setFreshAside();
-  const coach = { roles: ["coach" as const], flags: { coachPlans: false } };
+  const coach = { roles: ["coach" as const], flags: { coachPlans: false, wearOnPlay: false } };
   it("sends role emails only to that role, keeps lifter emails from roles they'd repeat, and waits for flags", () => {
     expect(forAccount(byId("coach-clients"), NO_FACTS)).toBe(false);
     expect(forAccount(byId("coach-clients"), coach)).toBe(true);
     expect(forAccount(byId("find-coach"), NO_FACTS)).toBe(true);
     expect(forAccount(byId("find-coach"), coach)).toBe(false);
     expect(forAccount(byId("coach-plans"), coach)).toBe(false);
-    expect(forAccount(byId("coach-plans"), { ...coach, flags: { coachPlans: true } })).toBe(true);
+    expect(forAccount(byId("coach-plans"), { ...coach, flags: { coachPlans: true, wearOnPlay: false } })).toBe(true);
     expect(queue(new Set(), NO_FACTS).some((e) => e.audience !== "lifter")).toBe(false);
   });
 
@@ -257,7 +257,7 @@ describe("through the daily job", () => {
     await subscribe(body(p), store, f.mail, env, joined, { accountId: "acct", email: "lifter@example.com" });
     const sub = await store.get(ID);
     if (sub?.status === "pending") await confirm(ID, /t=([0-9a-f]{64})/.exec(f.sent[0]!.text)![1]!, store, f.mail, env, joined);
-    store.facts.set("acct", { roles, flags: { coachPlans: false } });
+    store.facts.set("acct", { roles, flags: { coachPlans: false, wearOnPlay: false } });
     await runDaily(store, f.mail, env, TUE + 3600_000);
     return f.sent.filter((m) => m.idempotencyKey.includes("weekly:"));
   }
@@ -279,9 +279,9 @@ describe("through the daily job", () => {
     expect(store.facts.size).toBe(0);
     // New feature emails go first (tested above), so count them as already sent here.
     const sent = new Set(["weekly:gym-setup", "weekly:import", ...WEEKLY.filter((w) => w.fresh).map((w) => `weekly:${w.id}`)]);
-    expect(queue(sent, { roles: ["coach"], flags: { coachPlans: false } })[0]!.id).toBe("coach-clients");
+    expect(queue(sent, { roles: ["coach"], flags: { coachPlans: false, wearOnPlay: false } })[0]!.id).toBe("coach-clients");
     expect((await run({}, ["gym"]))[0]!.html).toContain(
-      `/w/${queue(new Set(), { roles: ["gym"], flags: { coachPlans: false } })[0]!.id}.jpg`,
+      `/w/${queue(new Set(), { roles: ["gym"], flags: { coachPlans: false, wearOnPlay: false } })[0]!.id}.jpg`,
     );
   });
 });

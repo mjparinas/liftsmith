@@ -10,6 +10,7 @@ import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { estimate } from "@/lib/e1rm";
 import { endWorkout } from "@/lib/endWorkout";
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
@@ -23,25 +24,36 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
 import { meanFullSpeed } from "@/lib/partMetrics";
+import { pickWeights } from "@/lib/pickWeights";
 import { loadBar } from "@/lib/plates";
 import { bodyMode } from "@/lib/pregnancy";
-import { TIMED } from "@/lib/progression";
+import { target, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
-import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep } from "@/lib/sessionNotify";
+import {
+  notifyPermission,
+  onWatchHeartRate,
+  restOverAlert,
+  stopSession,
+  updateSession,
+  type AheadStep,
+  type TakenAheadStep,
+} from "@/lib/sessionNotify";
 import { timerLength, type TimerSpec } from "@/lib/setTimer";
 import { countedReps, implementsFor, perSide } from "@/lib/sides";
 import { followWorkout, sonosOn } from "@/lib/sonos";
-import { partNow, useApp, warmingUp } from "@/lib/store";
+import { partNow, useApp, warmingUp, type Active } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
+import { takenPick, takenTarget } from "@/lib/takenSwap";
 import { tempoOf } from "@/lib/tempo";
 import { REST_WARN_S, restAlertOf, restWarnOn } from "@/lib/training";
-import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Gym, type LoadKind, type Muscle, type Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { isVisible, useVisible } from "@/lib/visibility";
 import { prCue, say } from "@/lib/voice";
+import { cueId, startsEarly, watchingRest, withCarry, type Carry } from "@/lib/watchAuto";
 import { pickBpm, type WatchReading } from "@/lib/watchHr";
 
 import { AutoCount, AutoCountButton, countable, countSource, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
@@ -69,7 +81,7 @@ import { KeyboardLog } from "./workout/KeyboardLog";
 import { MachineCard } from "./workout/MachineCard";
 import { countdownTick, UndoChip, warnTick } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
-import { aheadSteps, sessionFields } from "./workout/sessionAhead";
+import { aheadSteps, sessionFields, takenStep } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
 import { sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
@@ -77,6 +89,7 @@ import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
 import { VoiceLog } from "./workout/VoiceLog";
 import { VolumeLog } from "./workout/VolumeLog";
+import { watchAdj, watchAsk } from "./workout/watchAdjust";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
@@ -296,26 +309,64 @@ export function Workout() {
       : item.setTargets?.[doneSets]?.amrap || (item.challenge && doneSets + 1 >= item.sets)
         ? undefined
         : (item.setTargets?.[doneSets]?.reps ?? item.target.reps);
-  const handsFree =
-    labOn("labHandsFree") && !!ex && !ex.cardio && !resting && !finished && !infoOpen && !swapOpen && !endOpen && !whyOpen && !planOpen;
-  const autoLeft = handsFree ? msLeft(counted, countKey, planReps, now) : null;
-
   // Watch rep counting (Labs): the watch streams its motion during a set, unless the phone (camera or motion) is already counting.
   const phoneCounting = !!ex && countPrefs.on && !!source && countable(ex.id, ex.pattern, countPrefs.source);
   const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !phoneCounting;
+  // Hands-free watch sets (Labs, watchAuto.ts): the watch also watches rest for the next set starting, and every set
+  // it counts logs itself, whether or not the hands-free sets lab is on.
+  const watchAuto = labOn("labWatchAuto") && !!ex && !ex.cardio && !phoneCounting && watchCountable(ex.id, ex.pattern);
+  const handsFree =
+    (labOn("labHandsFree") || (watchAuto && watchCountOn)) &&
+    !!ex &&
+    !ex.cardio &&
+    !resting &&
+    !finished &&
+    !infoOpen &&
+    !swapOpen &&
+    !endOpen &&
+    !whyOpen &&
+    !planOpen;
+  const autoLeft = handsFree ? msLeft(counted, countKey, planReps, now) : null;
+  // The watch buzzes once each time this changes: the set started by itself, or logged itself.
+  const [cue, setCue] = useState<string | undefined>(undefined);
+  const carry = useRef<Carry | null>(null);
+  const cues = useRef(0);
   const watchReps = useWatchReps({
     on: watchCountOn,
     exerciseId: ex?.id,
     pattern: ex?.pattern,
-    setKey: `${active?.index}:${doneSets}:${warmDone}:${active?.tag ?? ""}`,
-    onCount: (n) => {
+    setKey: countKey,
+    onCount: (raw) => {
+      const n = withCarry(carry.current, countKey, raw);
       const a = useApp.getState().active;
       // A counter sees both sides of a one-side move: the set's reps are per side.
       if (a && ex) s.adjust(a.weight, countedReps(ex.id, n));
       noteCount(n);
     },
   });
-  const watchMotion = watchCountOn && !!ex && watchCountable(ex.id, ex.pattern);
+  // During rest, after it has settled: three reps on the wrist mean the next set has started, so rest ends now and
+  // those reps carry into the set.
+  const restWatch = watchAuto && !!active && resting && !finished && !warming && !active.tag && watchingRest(active.restStart, now);
+  useWatchReps({
+    on: restWatch,
+    exerciseId: ex?.id,
+    pattern: ex?.pattern,
+    setKey: `rest:${active?.restStart ?? ""}`,
+    onCount: (n) => {
+      if (!startsEarly(n) || !useApp.getState().active?.restUntil) return;
+      carry.current = { key: countKey, n };
+      setCue(cueId("go", ++cues.current));
+      s.skipRest();
+      noteCount(n);
+      const a = useApp.getState().active;
+      if (a && ex) s.adjust(a.weight, countedReps(ex.id, n));
+    },
+  });
+  const watchMotion = (watchCountOn && !!ex && watchCountable(ex.id, ex.pattern)) || restWatch;
+  const logHandsFree = () => {
+    if (watchAuto && watchCountOn) setCue(cueId("logged", ++cues.current));
+    log();
+  };
 
   // Heart-rate rest timer (Labs, restReady.ts): once the heart rate is back down, the rest is cut to a few
   // seconds left (never under its floor), once per rest; the countdown above then ends it as usual.
@@ -335,9 +386,11 @@ export function Workout() {
   // The sets after this one, for Log set on the notification with the app closed (sessionAhead.ts). Worked out
   // again only when the workout moves, not on every heart rate reading.
   const ahead = useRef({ key: "", steps: [] as AheadStep[] });
+  // "Machine taken" on the watches (takenSwap.ts): what one tap would swap to, worked out again only when the workout moves on.
+  const takenOffer = useRef({ key: "", text: undefined as string | undefined, step: undefined as TakenAheadStep | undefined });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}:${cue ?? ""}:${active.askFeedback ?? ""}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -345,6 +398,10 @@ export function Workout() {
     if (!f) return;
     if (ahead.current.key !== key)
       ahead.current = { key, steps: aheadSteps(active, events, profile.unit, gym, profile.training?.autoRest !== false) };
+    // Not on every weight or reps bump: the swap and the sets after it only change when the workout moves on.
+    const takenKey = `${active.index}:${ex.id}:${active.restUntil}:${doneSets}:${warmDone}:${active.plan.items.length}`;
+    if (takenOffer.current.key !== takenKey)
+      takenOffer.current = { key: takenKey, text: undefined, step: undefined, ...watchTaken(active, events, profile, gym) };
     void updateSession({
       title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
       setLabel: f.setLabel,
@@ -365,12 +422,33 @@ export function Workout() {
       total: f.total,
       sessionId: active.sessionId,
       motion: watchMotion || undefined,
+      motionRest: (restWatch && watchMotion) || undefined,
+      cue,
+      taken: takenOffer.current.text,
+      takenStep: takenOffer.current.step,
+      why: item?.takenFrom ? t("why.taken", { name: exercise(item.takenFrom).name }) : undefined,
       ahead: ahead.current.steps,
       // The set timer (holds, carries, cardio): the lock screen and the watches count it down on their own clocks.
       timer: timerRun && !resting ? sessionTimer(timerRun) : undefined,
       timerOver: timerRun && !resting ? t("timer.over") : undefined,
+      // The watches change the weight and reps on the wrist, and answer "How did it feel?" (watchAdjust.ts).
+      adj: watchAdj(active, events, profile.unit, gym),
+      ask: watchAsk(active),
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion, timerRun?.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    active?.index,
+    active?.restUntil,
+    active?.weight,
+    active?.reps,
+    doneSets,
+    warmDone,
+    bpm,
+    watchMotion,
+    timerRun?.startAt,
+    cue,
+    active?.askFeedback,
+  ]);
 
   // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
   // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).
@@ -860,7 +938,7 @@ export function Workout() {
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
-          {autoLeft !== null && <HandsFree left={autoLeft} onLog={log} />}
+          {autoLeft !== null && <HandsFree left={autoLeft} onLog={logHandsFree} />}
           {!finished && !!ex && !ex.cardio && labOn("labVolumeLog") && (
             <VolumeLog
               setKey={`${active.index}:${doneSets}`}
@@ -1248,4 +1326,30 @@ function CustomExercise({
       </button>
     </form>
   );
+}
+
+/**
+ * The watches' "Machine taken" (takenSwap.ts): the line saying what one tap swaps to, with its weight and reps, and the
+ * state after it for a tap with the phone app asleep. None without Pro or a pick.
+ */
+function watchTaken(a: Active, events: AppEvent[], profile: Profile, gym: Gym): { text?: string; step?: TakenAheadStep } {
+  if (!can("replan")) return {};
+  const now = Date.now();
+  const hurt = activeInjuries(events);
+  const mode = bodyMode(profile, now);
+  const to = takenPick(
+    a.plan.items[a.index],
+    a.plan.items.map((i) => i.exerciseId),
+    gym,
+    hurt,
+    mode,
+    pickWeights(events, profile, now),
+  );
+  if (!to) return {};
+  const ex = exercise(to);
+  const tg = takenTarget(to, target(ex, events, profile, gym, now), hurt, gym, mode);
+  return {
+    text: t("coach.takenTo", { name: ex.name, set: setText(ex, tg.weight, tg.reps, profile.unit) }),
+    step: takenStep(a, events, profile, gym, to, profile.training?.autoRest !== false) ?? undefined,
+  };
 }

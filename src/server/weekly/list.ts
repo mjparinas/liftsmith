@@ -24,8 +24,12 @@ export interface WeeklyEmail {
   roundup?: boolean;
   /** Not sent to accounts in these roles (a lifter email that would only repeat what they already do). */
   notFor?: Role[];
-  /** Waits until this admin flag is on (coach plans aren't on sale yet). */
-  needsFlag?: "coachPlans";
+  /** Waits until this admin flag is on (coach plans aren't on sale yet; the Wear OS app waits for Google Play). */
+  needsFlag?: "coachPlans" | "wearOnPlay";
+  /** Skipped for anyone who got this Getting started email (its send key): it already told them. */
+  coveredBy?: string;
+  /** The picture isn't an app screen from weekly-email-shots.mjs but made by its own script (`watch`: email-watch.mjs). */
+  art?: "watch";
   /** A brand-new feature (the day it shipped, ISO): sent next to everyone already past Getting started. */
   fresh?: string;
   /** No Pro line at the end (coach plans, which have prices of their own). */
@@ -84,7 +88,9 @@ export const WEEKLY: WeeklyEmail[] = [
   L("routines", "free", "programs"),
   D("dyk-battery", "settings/look"),
   R("coach-nutrition", "coach", "pro", "trainer", { shot: false }),
-  L("watches", "free", "connections"),
+  // The Wear OS app on Google Play (Melvin, 2026-11-26): once the `wearOnPlay` flag is on, sent next to everyone past
+  // Getting started who didn't get its watch step, with the watch app's own screens (scripts/email-watch.mjs).
+  L("watches", "free", "connections", { fresh: "2026-11-26", needsFlag: "wearOnPlay", coveredBy: "tour:watch", art: "watch" }),
   L("challenges", "free", "friends", { shot: false }),
   L("labs-camera", "lab", "settings/labs"),
   L("calculators-body", "free", "tools/tdee"),
@@ -178,6 +184,9 @@ export const WEEKLY: WeeklyEmail[] = [
   R("coach-assign-program", "coach", "pro", "trainer/programs", { fresh: "2026-11-24", shot: false }),
   // New, 2026-11-25: My team for athletes, team chat and Add athletes on a team card (docs/decisions/school-teams.md "My team").
   R("my-team", "school", "free", "trainer", { fresh: "2026-11-25", shot: false }),
+  // New, 2026-11-26: today's workout on the watch face: Wear OS tile and complication, Apple Watch complication, Garmin
+  // glance (docs/decisions/watch-apps.md "Today on the watch face").
+  L("watch-today", "free", "today", { fresh: "2026-11-26" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

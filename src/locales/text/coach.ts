@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "coach.takenSwap": "Swap to {name}",
+  "coach.takenWhy": "Best pick: same muscles, nothing that's taken",
+  "coach.takenTo": "Swaps to {name}, {set}",
   "coach.why": "Why?",
   "coach.changePlan": "Change the plan",
   "coach.whyTitle": "Why this for {name}",
@@ -31,6 +34,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "Cambiar a {name}",
+  "coach.takenWhy": "La mejor opción: los mismos músculos, sin nada ocupado",
+  "coach.takenTo": "Cambia a {name}, {set}",
   "coach.why": "¿Por qué?",
   "coach.changePlan": "Cambiar el plan",
   "coach.whyTitle": "Por qué esto en {name}",
@@ -56,6 +62,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "Passer à {name}",
+  "coach.takenWhy": "Le meilleur choix : les mêmes muscles, rien d'occupé",
+  "coach.takenTo": "Passe à {name}, {set}",
   "coach.why": "Pourquoi ?",
   "coach.changePlan": "Modifier le plan",
   "coach.whyTitle": "Pourquoi ceci pour {name}",
@@ -81,6 +90,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "Zu {name} wechseln",
+  "coach.takenWhy": "Beste Wahl: dieselben Muskeln, nichts, was belegt ist",
+  "coach.takenTo": "Wechselt zu {name}, {set}",
   "coach.why": "Warum?",
   "coach.changePlan": "Plan ändern",
   "coach.whyTitle": "Warum das für {name}",
@@ -106,6 +118,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "Passa a {name}",
+  "coach.takenWhy": "La scelta migliore: stessi muscoli, niente di occupato",
+  "coach.takenTo": "Passa a {name}, {set}",
   "coach.why": "Perché?",
   "coach.changePlan": "Cambia il piano",
   "coach.whyTitle": "Perché questo per {name}",
@@ -131,6 +146,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "{name}に変更",
+  "coach.takenWhy": "おすすめ：同じ筋肉、使用中の器具なし",
+  "coach.takenTo": "{name}に変更、{set}",
   "coach.why": "なぜ？",
   "coach.changePlan": "プランを変更",
   "coach.whyTitle": "{name}をこうした理由",
@@ -156,6 +174,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "Trocar para {name}",
+  "coach.takenWhy": "Melhor escolha: os mesmos músculos, nada ocupado",
+  "coach.takenTo": "Troca para {name}, {set}",
   "coach.why": "Por quê?",
   "coach.changePlan": "Mudar o plano",
   "coach.whyTitle": "Por que isto em {name}",
@@ -184,6 +205,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "{name}(으)로 바꾸기",
+  "coach.takenWhy": "추천: 같은 근육, 사용 중인 기구 없음",
+  "coach.takenTo": "{name}(으)로 바꿈, {set}",
   "coach.why": "왜요?",
   "coach.changePlan": "계획 변경",
   "coach.whyTitle": "{name}을(를) 고른 이유",
@@ -211,6 +235,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "{name} ile değiştir",
+  "coach.takenWhy": "En iyi seçim: aynı kaslar, dolu ekipman yok",
+  "coach.takenTo": "{name} ile değişir, {set}",
   "coach.why": "Neden?",
   "coach.changePlan": "Planı değiştir",
   "coach.whyTitle": "{name} için neden bu",
@@ -239,6 +266,9 @@ export const tr: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "coach.takenSwap": "Zamień na {name}",
+  "coach.takenWhy": "Najlepszy wybór: te same mięśnie, nic zajętego",
+  "coach.takenTo": "Zamienia na {name}, {set}",
   "coach.why": "Dlaczego?",
   "coach.changePlan": "Zmień plan",
   "coach.whyTitle": "Dlaczego to: {name}",

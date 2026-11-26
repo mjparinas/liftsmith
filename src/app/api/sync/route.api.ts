@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     if (c.body.events.some((e) => (e as { type?: unknown }).type === "pain"))
       await alertPain(s.accountId, c.body.events as { type?: unknown; at?: unknown; score?: unknown }[]).catch(() => undefined);
     const a = await accountAccess(s.accountId);
-    return reply(req, 200, { ...out, pro: a.pro, proVia: a.proVia, sub: a.sub });
+    return reply(req, 200, { ...out, pro: a.pro, proVia: a.proVia, sub: a.sub, ...(a.staff ? { staff: true } : {}) });
   } catch (e) {
     // The client shows its own "storage full" line for this error (account.syncFull).
     if (e instanceof SyncFull) return reply(req, 413, { error: "full" });

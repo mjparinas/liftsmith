@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "Gutes Aufwärmen heißt schwerere und sicherere Arbeitssätze. Die App plant es für dich.",
     points: [
       "Aufwärmsätze werden für jede schwere Übung berechnet.",
-      "48 Dehnübungen mit 3D-Demos: Aufwärmen davor, Cool-down danach oder eine Dehnroutine an jedem Tag.",
+      "61 Dehnübungen mit 3D-Demos: Aufwärmen davor, Cool-down danach oder eine Dehnroutine an jedem Tag.",
       "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander abspielen, mit „Überspringen“ dazwischen.",
       "Dehntage ab 10 Minuten halten deine Serie.",
     ],
@@ -367,7 +367,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Die Apps für Wear OS und Apple Watch zeigen den Satz oder den Pausen-Countdown.",
       "Die Herzfrequenz kommt vom Sensor der Uhr.",
-      "„Satz eintragen“ und +30 s vom Handgelenk, mit Vibration am Pausenende.",
+      "„Satz eintragen“ und +30 s vom Handgelenk, mit Vibration am Pausenende. Gerät belegt? Ein Tipp setzt die beste Übung für dein Studio ein, mit Gewicht.",
+      "Ändere Gewicht und Wiederholungen mit der Krone oder − und +, und sag, wie sich eine Übung angefühlt hat.",
       "Eine App für Garmin-Uhren kommt bald.",
     ],
     dyk: "Der Sperrbildschirm zeigt auch den Pausen-Countdown, den nächsten Satz und seine Scheiben.",
@@ -615,6 +616,7 @@ export const emails: Record<string, Words> = {
       "Sprache: Sag „100 für 8“ oder „zu leicht“, erkannt auf deinem Handy.",
       "Die Lautstärketaste am Handy oder an den Kopfhörern trägt den Satz ein.",
       "Deine Uhr oder die Bewegungssensoren des Handys können die Wiederholungen zählen.",
+      "Freihändige Sätze mit der Uhr: Starte deinen nächsten Satz, und die Uhr beendet die Pause, zählt ihn und trägt ihn selbst ein.",
       "Der Tempo-Coach zählt bei jeder Wiederholung das Absenken, Halten und Heben.",
     ],
     dyk: "Beim Eintragen per Sprache verlässt nie ein Ton dein Handy.",
@@ -1096,5 +1098,17 @@ export const emails: Record<string, Words> = {
       "Wer einem Programm folgt, sieht es auf Heute mit dem, was als Nächstes kommt, und den Monat in Mein Team.",
     ],
     dyk: "Team-Links funktionieren jetzt auch, wenn sich ein Athlet erst nach dem Öffnen anmeldet, also fehlt niemand im Kader.",
+  },
+  "watch-today": {
+    title: "Das heutige Training auf dem Zifferblatt",
+    intro:
+      "Deine Uhr zeigt jetzt, was heute ansteht, ohne dass du etwas öffnest: das Training, wie lange es dauert und wie bereit du bist.",
+    points: [
+      "Auf Wear OS fügst du die Kachel „Heutiges Training“ oder eine Komplikation hinzu. „Am Handy starten“ öffnet das Training auf deinem Handy.",
+      "Auf der Apple Watch fügst du die Liftsmith-Komplikation hinzu. Ein Tipp öffnet die Uhr-App mit der heutigen Empfehlung.",
+      "Auf Garmin zeigt der Liftsmith-Glance dieselbe Zeile, sobald du die App einmal auf der Uhr geöffnet hast.",
+      "Es ist dieselbe Empfehlung mit demselben Grund wie unter Heute auf dem Handy, und sie ändert sich mit deinem Plan.",
+    ],
+    dyk: "Ein Plan von gestern erscheint nie als heutiger: Nach Mitternacht wartet die Uhr auf den neuen Plan von deinem Handy.",
   },
 };

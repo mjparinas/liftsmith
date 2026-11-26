@@ -155,7 +155,7 @@ export const emails: Record<string, Words> = {
     intro: "Bien s'échauffer, c'est des séries de travail plus lourdes et plus sûres. L'app le planifie pour vous.",
     points: [
       "Les séries de montée sont calculées pour chaque exercice lourd.",
-      "48 étirements avec démos en 3D : un échauffement avant, un retour au calme après, ou une routine d'étirements n'importe quel jour.",
+      "61 étirements avec démos en 3D : un échauffement avant, un retour au calme après, ou une routine d'étirements n'importe quel jour.",
       "Une séance peut enchaîner échauffement, musculation et retour au calme, avec Passer entre les parties.",
       "Les jours d'étirements de 10 minutes ou plus gardent votre série.",
     ],
@@ -367,7 +367,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Les apps Wear OS et Apple Watch affichent la série ou le compte à rebours du repos.",
       "La fréquence cardiaque vient du capteur de la montre.",
-      "Enregistrer la série et +30 s depuis le poignet, avec une vibration à la fin du repos.",
+      "Enregistrer la série et +30 s depuis le poignet, avec une vibration à la fin du repos. Machine occupée ? Une touche met le meilleur exercice pour ta salle, avec sa charge.",
+      "Change la charge et les répétitions avec la couronne ou − et +, et dis comment s'est passé un exercice.",
       "Une app pour montres Garmin arrive bientôt.",
     ],
     dyk: "L'écran verrouillé affiche aussi le compte à rebours, la série suivante et ses disques.",
@@ -616,6 +617,7 @@ export const emails: Record<string, Words> = {
       "Voix : dites « 100 pour 8 » ou « trop facile », reconnu sur votre téléphone.",
       "Le bouton de volume du téléphone ou des écouteurs enregistre la série.",
       "Votre montre, ou les capteurs de mouvement du téléphone, peuvent compter les répétitions.",
+      "Séries mains libres avec la montre : lance ta série suivante et la montre arrête le repos, la compte et l'enregistre seule.",
       "Le coach de tempo compte la descente, la pause et la montée de chaque répétition.",
     ],
     dyk: "Pour l'enregistrement vocal, aucun son ne quitte jamais votre téléphone.",
@@ -1100,5 +1102,16 @@ export const emails: Record<string, Words> = {
       "Les athlètes qui suivent un programme le voient sur Aujourd'hui avec la suite, et leur mois est dans Mon équipe.",
     ],
     dyk: "Les liens d'équipe fonctionnent maintenant même si l'athlète se connecte après les avoir ouverts, donc personne ne manque à la liste.",
+  },
+  "watch-today": {
+    title: "La séance du jour sur votre cadran",
+    intro: "Votre montre affiche maintenant ce qui vous attend aujourd’hui sans rien ouvrir : la séance, sa durée et votre forme.",
+    points: [
+      "Sur Wear OS, ajoutez la tuile Séance du jour ou une complication. Démarrer sur le téléphone ouvre la séance sur votre téléphone.",
+      "Sur l’Apple Watch, ajoutez la complication Liftsmith. Un appui ouvre l’app de la montre avec le choix du jour.",
+      "Sur Garmin, l’aperçu Liftsmith affiche la même ligne une fois l’app ouverte sur la montre.",
+      "C’est le même choix et la même raison qu’Aujourd’hui sur votre téléphone, mis à jour quand votre programme change.",
+    ],
+    dyk: "Un programme d’hier ne s’affiche jamais comme celui du jour : après minuit, la montre attend le nouveau programme de votre téléphone.",
   },
 };

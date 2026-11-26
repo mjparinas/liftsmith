@@ -36,6 +36,7 @@ import { BLOG_J } from "./blog/j";
 import { BLOG_K } from "./blog/k";
 import { BLOG_L } from "./blog/l";
 import { BLOG_M } from "./blog/m";
+import { BLOG_MACHINE_TAKEN } from "./blog/machineTaken";
 import { BLOG_MY_TEAM } from "./blog/myTeam";
 import { BLOG_N } from "./blog/n";
 import { BLOG_NEW_FEATURES } from "./blog/newFeatures";
@@ -59,6 +60,7 @@ import { BLOG_TEAM_SESSION } from "./blog/teamSession";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
+import { BLOG_WATCH_TODAY } from "./blog/watchToday";
 import { BLOG_WIDGETS } from "./blog/widgets";
 import { BLOG_X } from "./blog/x";
 import { BLOG_Y } from "./blog/y";
@@ -294,7 +296,9 @@ export const ARTICLES: Article[] = [
   ...BLOG_ROUTINE_LIBRARY,
   ...BLOG_TEAM_SESSION,
   ...BLOG_MY_TEAM,
+  ...BLOG_MACHINE_TAKEN,
   ...BLOG_PREGNANCY,
+  ...BLOG_WATCH_TODAY,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

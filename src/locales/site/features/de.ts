@@ -199,7 +199,7 @@ export const de: FeaturesText = {
     },
     stretching: {
       name: "Dehnen",
-      body: "48 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag. Ein paar Sekunden, um vor jeder Dehnung und jeder Seite in Position zu kommen, und der Bildschirm bleibt an.",
+      body: "61 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag. Ein paar Sekunden, um vor jeder Dehnung und jeder Seite in Position zu kommen, und der Bildschirm bleibt an.",
     },
     "workout-parts": {
       name: "Training in Teilen",
@@ -564,6 +564,21 @@ export const de: FeaturesText = {
       name: "Uhren-Apps",
       body: "Das Training auf Wear OS und der Apple Watch: der Satz oder der Pausen-Countdown, der Puls der Uhr, Satz eintragen und +30 s, und ein Vibrieren, wenn die Pause endet.",
     },
+    "watch-today": {
+      name: "Das heutige Training auf deiner Uhr",
+      body: "Eine Kachel und eine Zifferblatt-Komplikation auf Wear OS, eine Komplikation auf der Apple Watch und ein Glance auf Garmin zeigen die heutige Empfehlung, wie lange sie dauert und wie bereit du bist, etwa „Pushen · 45 Min. · Bereitschaft 82“. Auf Wear OS öffnet „Am Handy starten“ es auf deinem Handy.",
+      note: "Die Apple Watch kann die iPhone-App nicht öffnen, deshalb öffnet ihre Komplikation die Uhr-App.",
+    },
+    "watch-adjust": {
+      name: "Satz auf der Uhr ändern und bewerten",
+      body: "Dreh die Krone oder die Lünette oder tippe auf − und +, um Gewicht und Wiederholungen am Handgelenk zu ändern, in denselben Schritten wie am Handy: deine Scheiben, Kurzhanteln oder der Steckgewichtsblock. Nach dem letzten Satz einer Übung fragt die Uhr, wie es sich angefühlt hat, und deine Antwort bestimmt das nächste Gewicht.",
+      note: "Wear OS, Apple Watch und Garmin (Tasten UP und DOWN).",
+    },
+    "machine-taken": {
+      name: "Gerät belegt",
+      body: "Jemand am Gerät? Ein Tipp auf deiner Uhr oder in „Plan ändern“ setzt die beste Übung deines Studios ein, die es nicht braucht, mit Gewicht und Grund.",
+      note: "Wear OS, Apple Watch und Garmin (die UP-Taste), und „Plan ändern“ auf dem Handy und im Web.",
+    },
     widgets: {
       name: "Widgets für den Startbildschirm",
       body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",
@@ -705,6 +720,11 @@ export const de: FeaturesText = {
     "lab-hands-free": {
       name: "Freihändige Sätze",
       body: "Während ein Wiederholungszähler zählt, trägt sich der Satz ein paar Sekunden nach deiner letzten Wiederholung selbst ein.",
+    },
+    "lab-watch-auto": {
+      name: "Freihändige Sätze mit der Uhr",
+      body: "Starte deinen nächsten Satz, und deine Uhr beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
+      note: "Wear OS und Apple Watch, mit eingeschaltetem Zählen der Wiederholungen mit der Uhr.",
     },
     "lab-voice": {
       name: "Sätze per Sprache eintragen",

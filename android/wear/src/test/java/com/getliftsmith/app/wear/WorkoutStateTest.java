@@ -2,6 +2,7 @@ package com.getliftsmith.app.wear;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -72,6 +73,9 @@ public class WorkoutStateTest {
         assertFalse(WorkoutState.parse("{\"title\":\"Squat\"}").streamMotion(NOW));
         assertTrue(WorkoutState.parse("{\"motion\":true}").streamMotion(NOW));
         assertFalse(WorkoutState.parse("{\"motion\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
+        // Hands-free watch sets: the phone wants rest too, to see the next set start.
+        assertTrue(WorkoutState.parse("{\"motion\":true,\"motionRest\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
+        assertFalse(WorkoutState.parse("{\"motionRest\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
     }
 
     @Test
@@ -96,5 +100,62 @@ public class WorkoutStateTest {
             "{\"restUntil\":" + (NOW + 60_000) + ",\"timer\":[{\"from\":" + NOW + ",\"label\":\"x\"}]}"
         );
         assertNull(rest.phase(NOW + 1000));
+    }
+
+    @Test
+    public void buzzesOnANewCueOnly() {
+        WorkoutState a = WorkoutState.parse("{\"sessionId\":\"s1\",\"cue\":\"go:1\"}");
+        WorkoutState b = WorkoutState.parse("{\"sessionId\":\"s1\",\"cue\":\"logged:2\"}");
+        WorkoutState other = WorkoutState.parse("{\"sessionId\":\"s2\",\"cue\":\"logged:3\"}");
+        assertFalse(a.newCue(null));
+        assertFalse(a.newCue(a));
+        assertTrue(b.newCue(a));
+        assertFalse(other.newCue(b));
+        assertFalse(WorkoutState.parse("{\"sessionId\":\"s1\"}").newCue(a));
+    }
+
+    @Test
+    public void readsTheSetsLadderAndFindsTheNearestStep() {
+        WorkoutState s = WorkoutState.parse(
+            "{\"title\":\"Bench\",\"adj\":{\"key\":\"s:1:0:2:\",\"kg\":[97.5,100,102.5],\"w\":[\"97.5 kg\",\"100 kg\",\"102.5 kg\"],\"i\":1,\"reps\":8,\"rs\":\"reps\"}}"
+        );
+        assertNotNull(s.adj);
+        assertEquals("s:1:0:2:", s.adj.key);
+        assertEquals(8, s.adj.reps);
+        assertEquals(2, s.adj.nearest(102.4));
+        assertEquals(0, s.adj.nearest(50));
+        assertTrue(s.adj.hasWeight());
+    }
+
+    @Test
+    public void aBodyweightSetHasRepsOnlyAndBadLaddersAreDropped() {
+        WorkoutState bw = WorkoutState.parse("{\"adj\":{\"key\":\"k\",\"kg\":[],\"w\":[],\"i\":0,\"reps\":12}}");
+        assertNotNull(bw.adj);
+        assertEquals(false, bw.adj.hasWeight());
+        assertNull(WorkoutState.parse("{\"adj\":{\"key\":\"k\",\"kg\":[1,2],\"w\":[\"a\",\"b\"],\"i\":5,\"reps\":8}}").adj);
+        assertNull(WorkoutState.parse("{\"adj\":{\"kg\":[],\"w\":[],\"reps\":8}}").adj);
+        assertEquals(100, WorkoutState.Adj.clampReps(500));
+        assertEquals(1, WorkoutState.Adj.clampReps(0));
+    }
+
+    @Test
+    public void readsHowDidItFeel() {
+        WorkoutState s = WorkoutState.parse(
+            "{\"ask\":{\"ex\":\"bench-press\",\"q\":\"How did Bench press feel?\",\"o\":[\"Too easy\",\"About right\",\"Too hard\"],\"v\":[1,0,-1]}}"
+        );
+        assertNotNull(s.ask);
+        assertEquals(-1, s.ask.values[2]);
+        assertEquals("About right", s.ask.answers[1]);
+        assertNull(WorkoutState.parse("{\"ask\":{\"ex\":\"x\",\"o\":[\"a\"],\"v\":[1]}}").ask);
+    }
+
+    @Test
+    public void machineTakenComesWithItsPickAndWhy() {
+        WorkoutState none = WorkoutState.parse("{\"title\":\"Lat pulldown\"}");
+        assertEquals("", none.taken);
+        assertEquals("", none.why);
+        WorkoutState s = WorkoutState.parse("{\"taken\":\"Swaps to Dumbbell row, 30 kg × 10\",\"why\":\"In for Lat pulldown, which was taken\"}");
+        assertEquals("Swaps to Dumbbell row, 30 kg × 10", s.taken);
+        assertEquals("In for Lat pulldown, which was taken", s.why);
     }
 }

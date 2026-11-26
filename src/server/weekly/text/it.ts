@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "Scaldarsi bene significa serie allenanti più pesanti e più sicure. L'app lo pianifica per te.",
     points: [
       "Le serie di avvicinamento sono calcolate per ogni esercizio pesante.",
-      "48 allungamenti con demo in 3D: un riscaldamento prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno.",
+      "61 allungamenti con demo in 3D: un riscaldamento prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno.",
       "Un allenamento può fare riscaldamento, pesi e defaticamento in fila, con Salta tra una parte e l'altra.",
       "I giorni di stretching da 10 minuti in su mantengono la tua serie.",
     ],
@@ -367,7 +367,8 @@ export const emails: Record<string, Words> = {
     points: [
       "Le app per Wear OS e Apple Watch mostrano la serie o il conto alla rovescia del riposo.",
       "La frequenza cardiaca arriva dal sensore dell'orologio.",
-      "Registra serie e +30 s dal polso, con una vibrazione a fine riposo.",
+      "Registra serie e +30 s dal polso, con una vibrazione a fine riposo. Macchina occupata? Un tocco mette l'esercizio migliore per la tua palestra, con il peso.",
+      "Cambia peso e ripetizioni con la corona o − e +, e di' com'è andato un esercizio.",
       "Un'app per gli orologi Garmin arriverà presto.",
     ],
     dyk: "Anche la schermata di blocco mostra il conto alla rovescia, la serie successiva e i suoi dischi.",
@@ -615,6 +616,7 @@ export const emails: Record<string, Words> = {
       'Voce: di\' "100 per 8" o "troppo facile", riconosciuto sul telefono.',
       "Il tasto del volume del telefono o degli auricolari registra la serie.",
       "Il tuo orologio, o i sensori di movimento del telefono, possono contare le ripetizioni.",
+      "Serie a mani libere con l'orologio: inizia la serie successiva e l'orologio chiude il recupero, la conta e la registra da solo.",
       "Il coach del tempo conta discesa, pausa e salita di ogni ripetizione.",
     ],
     dyk: "Per la registrazione vocale nessun audio lascia mai il telefono.",
@@ -1096,5 +1098,16 @@ export const emails: Record<string, Words> = {
       "Gli atleti che seguono un programma lo vedono su Oggi con il prossimo giorno, e il loro mese è in La mia squadra.",
     ],
     dyk: "I link della squadra ora funzionano anche se l'atleta accede dopo averli aperti, quindi nessuno resta fuori dalla rosa.",
+  },
+  "watch-today": {
+    title: "L'allenamento di oggi sul quadrante",
+    intro: "L'orologio ora mostra cosa ti aspetta oggi senza aprire nulla: l'allenamento, quanto dura e quanto sei in forma.",
+    points: [
+      "Su Wear OS, aggiungi il riquadro Allenamento di oggi o una complicazione. Avvia sul telefono apre l'allenamento sul telefono.",
+      "Su Apple Watch, aggiungi la complicazione di Liftsmith. Un tocco apre l'app dell'orologio con la scelta di oggi.",
+      "Su Garmin, l'anteprima di Liftsmith mostra la stessa riga dopo che hai aperto l'app sull'orologio.",
+      "È la stessa scelta con lo stesso motivo di Oggi sul telefono, e si aggiorna quando cambia il piano.",
+    ],
+    dyk: "Un piano di ieri non appare mai come quello di oggi: dopo mezzanotte l'orologio aspetta il nuovo piano dal telefono.",
   },
 };

@@ -49,6 +49,12 @@ dependencies {
     // Start on phone and Install on phone: opens the phone app, or its Play page, from the watch (PhoneLink).
     implementation "androidx.wear:wear-remote-interactions:$wearRemoteInteractionsVersion"
     implementation "com.google.guava:listenablefuture:1.0"
+    // The Today tile (TodayTileService) and the watch face complication (TodayComplicationService): today's call.
+    implementation "androidx.wear.tiles:tiles:$wearTilesVersion"
+    implementation "androidx.wear.protolayout:protolayout:$wearProtolayoutVersion"
+    implementation "androidx.wear.protolayout:protolayout-material:$wearProtolayoutVersion"
+    implementation "androidx.wear.watchface:watchface-complications-data-source:$wearComplicationsVersion"
+    implementation "androidx.concurrent:concurrent-futures:$concurrentFuturesVersion"
     testImplementation "junit:junit:$junitVersion"
     // Android's own org.json is a stub in local unit tests.
     testImplementation "org.json:json:20250517"

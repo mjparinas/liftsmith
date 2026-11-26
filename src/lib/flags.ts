@@ -63,6 +63,14 @@ export const FLAGS = {
     label: "Labs: hands-free sets",
     description: "While a rep counter is counting, the set logs itself a few seconds after the last rep and rest starts.",
   },
+  /** Labs: the watch also sees the next set start during rest, and every watch-counted set logs itself (watchAuto.ts). */
+  labWatchAuto: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: hands-free watch sets",
+    description:
+      "With watch rep counting on: rest ends when the watch sees the next set start, the set logs itself after the last rep, and the watch buzzes at each step.",
+  },
   /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
   labHrRest: {
     default: false,
@@ -134,6 +142,17 @@ export const FLAGS = {
    * clients and no plan is shown. Turn on once the store products and Stripe prices exist; the grace for coaches who
    * already have more than Pro's limit starts then.
    */
+  /**
+   * The Wear OS app is live on Google Play (Melvin, 2026-11-26): Getting started's watch email (src/server/tour.ts) and
+   * the weekly "Your workout on your wrist" tip wait for it. Turn on once Google approves the Wear OS release.
+   */
+  wearOnPlay: {
+    default: false,
+    options: [false, true] as const,
+    label: "Wear OS app on Google Play",
+    description:
+      "Turns on the Wear OS email in Getting started and the weekly watch tip. Turn on once Google Play approves the Wear OS app.",
+  },
   coachPlans: {
     default: false,
     options: [false, true] as const,

@@ -4,17 +4,19 @@ Melvin asked on 2026-11-11: "add all kinds of different stretches, this should b
 
 ## The library
 
-- **48 stretches** in `src/lib/stretches.ts`, two kinds:
-  - *Warm-up moves* (`warm`, 25): dynamic stretches and drills for before lifting (marching, jumping jacks, arm circles, leg swings, lunge with a reach, toy soldiers, side lunges, downward dog pedal, …). Some raise the pulse (`pulse`); a warm-up starts with one.
-  - *Cool-down holds* (`cool`, 23): static stretches for after a workout or a rest day (doorway chest, cross-body shoulder, overhead triceps, child's pose, cobra, pigeon, figure-four, half-kneeling hip flexor, butterfly, wall calf, downward dog, …), 30 to 45 seconds, per side where it's one-sided.
+- **61 stretches** in `src/lib/stretches.ts`, two kinds:
+  - *Warm-up moves* (`warm`, 30): dynamic stretches and drills for before lifting (marching, jumping jacks, arm circles, leg swings, lunge with a reach, toy soldiers, side lunges, downward dog pedal, 90/90 hip switches, hip circles, band pass-throughs, wall slides, chin tucks, …). Some raise the pulse (`pulse`); a warm-up starts with one.
+  - *Cool-down holds* (`cool`, 31): static stretches for after a workout or a rest day (doorway chest, cross-body shoulder, overhead triceps, child's pose, cobra, pigeon, figure-four, half-kneeling hip flexor, butterfly, wall calf, downward dog, couch stretch, frog, deep squat hold, sleeper, standing side bend, chin-to-armpit neck stretch, wrist extensor, bent-knee calf, …), 30 to 45 seconds, per side where it's one-sided.
 - **Every app muscle has at least one of each kind** (a test checks), so a warm-up or cool-down can cover any day.
 - Each stretch has its muscles (`for`), a dose (hold seconds or reps, `eachSide`) and any kit it needs (`needs`: bands, a pull-up bar, a bench). Suggestions leave out what the gym can't do; the library shows everything.
 - The general warm-up's drills (the old `warmupRoutine.ts`) became the first 18 warm-up moves and kept their `warm.*` text. Everything else is `str.*` (`src/locales/text/str.ts`), in all six languages.
 - Stretches are **not** exercises: they aren't in `EXERCISES`, the generator or the exercise browser, so the two libraries grow without touching each other (agreed with the exercise-library thread, 2026-11-11).
 
+- **Gap review, 2026-11-26** (Melvin: "go through the stretching library, are we missing any other common stretches?"). Hips, shoulder mobility, the neck, wrists and the soleus were thin. Melvin picked 13 to add: 90/90 hip switches, standing hip circles, band pass-throughs (needs a band), wall slides and chin tucks as warm-up moves; couch stretch, frog, deep squat hold, sleeper, standing side bend, chin-to-armpit neck stretch, wrist extensor and bent-knee calf as holds. Two on the first list were already here under other names and were swapped for hip circles and chin tucks: open book (the warm-up's open-book rotations) and the Cossack squat (side lunges, which borrow its motion). Not added (offered, not picked): happy baby, lizard, puppy pose, wall biceps, heel drop off a step, kneeling shin stretch. The couch stretch, sleeper and bent-knee calf are drawn on the left (`DRAWN_LEFT`).
+
 ## 3D demos
 
-- Every stretch plays on the same 3D figure as the exercises (male or female from Settings, 2D canvas without WebGL). Motions are in `src/lib/demo/stretchMotions.ts`: 42 of their own, and six drills that are the same movement as an exercise borrow its motion (band pull-aparts, dead hang, bodyweight squat, glute bridge, dead bug, side lunge).
+- Every stretch plays on the same 3D figure as the exercises (male or female from Settings, 2D canvas without WebGL). Motions are in `src/lib/demo/stretchMotions.ts`: 53 of their own, and eight that are the same movement as an exercise borrow its motion (band pull-aparts, dead hang, bodyweight squat, glute bridge, dead bug, side lunge, wall slides, deep squat hold).
 - The demo is asked for `stretch:<id>` (`demoId`), so a stretch and an exercise with the same id ("glute-bridge") can't collide; the engine asks `stretchMotion` first. The stretch's muscles light up on the figure.
 - Floor and front-to-back stretches show side-on (`stretchView`); the rest keep the three-quarter view.
 - `stretchMotions.test.ts` checks every stretch on both bodies through its whole cycle: limbs keep their length, hands and feet reach their targets, nothing goes through the floor.

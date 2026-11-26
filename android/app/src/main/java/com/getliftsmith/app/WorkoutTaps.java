@@ -25,11 +25,18 @@ final class WorkoutTaps {
     private WorkoutTaps() {}
 
     static synchronized void add(Context context, String action, long at) {
+        add(context, action, null, at);
+    }
+
+    /** A tap with what a watch sent along (its weight and reps, or a rating), handed to the web app as `data`. */
+    static synchronized void add(Context context, String action, String data, long at) {
         SharedPreferences p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         JSONArray list = parse(p.getString(KEY, "[]"));
         if (list.length() >= MAX) return;
         try {
-            list.put(new JSONObject().put("action", action).put("at", at));
+            JSONObject tap = new JSONObject().put("action", action).put("at", at);
+            if (data != null) tap.put("data", data);
+            list.put(tap);
         } catch (JSONException ignored) {
             return;
         }
@@ -54,6 +61,16 @@ final class WorkoutTaps {
             return new JSONArray(json == null ? "[]" : json);
         } catch (JSONException e) {
             return new JSONArray();
+        }
+    }
+
+    /** A JSON object from an intent extra, or null when there isn't one. */
+    static JSONObject object(String json) {
+        if (json == null || json.isEmpty()) return null;
+        try {
+            return new JSONObject(json);
+        } catch (JSONException e) {
+            return null;
         }
     }
 }

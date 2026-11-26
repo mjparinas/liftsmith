@@ -3,6 +3,7 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 //! The one screen: the set, the exercise, the weight and reps (or the rest countdown), plates or what's next,
+//! the weight and reps picked with UP and DOWN,
 //! heart rate, and which button does what. Always dark, the app's own colours.
 class WorkoutView extends WatchUi.View {
     const BG = 0x0b1020;
@@ -27,6 +28,14 @@ class WorkoutView extends WatchUi.View {
         dc.clear();
 
         if (!_w.active()) {
+            // Today's call from the phone (the glance's), so the lifter knows what's waiting.
+            var t = TodayStore.load();
+            if (TodayStore.current(t)) {
+                line(dc, cx, h * 0.32, TodayStore.text(t as Dictionary, "t"), Graphics.FONT_SMALL, INK, w * 0.8, 2);
+                line(dc, cx, h * 0.5, TodayStore.detail(t as Dictionary), Graphics.FONT_XTINY, BLUE, w * 0.8, 1);
+                line(dc, cx, h * 0.68, WatchUi.loadResource(Rez.Strings.NoneBody) as String, Graphics.FONT_XTINY, MUTED, w * 0.75, 2);
+                return;
+            }
             line(dc, cx, h * 0.38, WatchUi.loadResource(Rez.Strings.NoneTitle) as String, Graphics.FONT_SMALL, INK, w * 0.8, 2);
             line(dc, cx, h * 0.62, WatchUi.loadResource(Rez.Strings.NoneBody) as String, Graphics.FONT_XTINY, MUTED, w * 0.75, 3);
             return;
@@ -45,16 +54,52 @@ class WorkoutView extends WatchUi.View {
             dc.setColor(CYAN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 0.47, Graphics.FONT_NUMBER_MEDIUM, clock(_w.restLeft()), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             line(dc, cx, h * 0.64, Lang.format(WatchUi.loadResource(Rez.Strings.Next) as String, [_w.next]), Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
+        } else if (_w.adjustable()) {
+            // The set's weight and reps as picked on the watch; the one UP and DOWN change is blue, with arrows.
+            var repsText = _w.repsWord.length() > 0 ? Lang.format("$1$ $2$", [_w.shownReps(), _w.repsWord]) : _w.shownReps().toString();
+            if (_w.hasWeight()) {
+                value(dc, cx, h * 0.42, _w.shownWeight(), Graphics.FONT_MEDIUM, !_w.onReps, w);
+                value(dc, cx, h * 0.55, repsText, Graphics.FONT_SMALL, _w.onReps, w);
+                if (_w.shownIndex() == _w.ladderI) {
+                    line(dc, cx, h * 0.65, _w.plates, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
+                }
+            } else {
+                value(dc, cx, h * 0.47, repsText, Graphics.FONT_MEDIUM, true, w);
+            }
         } else {
             line(dc, cx, h * 0.47, _w.next, Graphics.FONT_MEDIUM, INK, w * 0.9, 1);
-            line(dc, cx, h * 0.64, _w.plates, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
+            // After a Machine taken swap the new lift's plates matter most; with none, why it's there.
+            line(dc, cx, h * 0.64, _w.plates.length() > 0 ? _w.plates : _w.why, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
         }
         var bpm = _w.bpm();
         if (bpm > 0) {
             line(dc, cx, h * 0.75, Lang.format(WatchUi.loadResource(Rez.Strings.Bpm) as String, [bpm]), Graphics.FONT_XTINY, RED, w * 0.6, 1);
         }
-        var hint = resting ? Rez.Strings.HintAdd : Rez.Strings.HintLog;
+        // UP is Machine taken during rest, and on a set whose weight and reps can't be changed here.
+        var taken = _w.canTake() && (resting || !_w.adjustable());
+        var hint = resting
+            ? (_w.asking() ? Rez.Strings.HintRate : (taken ? Rez.Strings.HintAddTaken : Rez.Strings.HintAdd))
+            : (taken ? Rez.Strings.HintLogTaken : Rez.Strings.HintLog);
         line(dc, cx, h * 0.87, WatchUi.loadResource(hint) as String, Graphics.FONT_XTINY, MUTED, w * 0.6, 1);
+    }
+
+    //! A number UP and DOWN can change: blue with an arrow each side when they change it, white otherwise.
+    private function value(dc as Graphics.Dc, x as Numeric, y as Numeric, s as String, font as Graphics.FontType, focused as Boolean, width as Numeric) as Void {
+        line(dc, x, y, s, font, focused ? BLUE : INK, width * 0.7, 1);
+        if (!focused) {
+            return;
+        }
+        var half = dc.getTextWidthInPixels(s, font) / 2;
+        var max = width * 0.35;
+        if (half > max) {
+            half = max;
+        }
+        var a = 6;
+        var lx = x - half - 10;
+        var rx = x + half + 10;
+        dc.setColor(BLUE, Graphics.COLOR_TRANSPARENT);
+        dc.fillPolygon([[lx - a, y], [lx, y - a], [lx, y + a]]);
+        dc.fillPolygon([[rx + a, y], [rx, y - a], [rx, y + a]]);
     }
 
     //! Centred text that wraps to at most `lines` lines and is cut short with an ellipsis past that.

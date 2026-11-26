@@ -5,6 +5,7 @@
     <string name="none_title">Nenhum treino em andamento</string>
     <string name="none_body">Comece um no celular e ele aparece aqui.</string>
     <string name="log_set">Registrar série</string>
+    <string name="machine_taken">Aparelho ocupado</string>
     <string name="add_30">+30 s</string>
     <string name="up_next">Próxima: %1$s</string>
     <string name="rest_left">Descanso, faltam %1$s</string>
@@ -18,4 +19,13 @@
     <string name="check_phone">Olhe o celular</string>
     <string name="open_failed">Abra o Liftsmith no celular.</string>
     <string name="install_failed">Baixe o Liftsmith no Google Play do celular.</string>
+    <string name="tile_label">Treino de hoje</string>
+    <string name="open_app">Abrir</string>
+    <string name="no_today">Abra o Liftsmith no celular para ver o plano de hoje aqui.</string>
+    <string name="lighter">Mais leve</string>
+    <string name="heavier">Mais pesado</string>
+    <string name="fewer_reps">Menos repetições</string>
+    <string name="more_reps">Mais repetições</string>
+    <string name="weight_value">Peso %1$s, gire a coroa para mudar</string>
+    <string name="reps_value">%1$s, gire a coroa para mudar</string>
 </resources>

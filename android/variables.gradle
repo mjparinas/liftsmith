@@ -16,4 +16,8 @@ ext {
     playServicesWearableVersion = '20.0.1'
     wearOngoingVersion = '1.1.0'
     wearRemoteInteractionsVersion = '1.1.0'
+    wearTilesVersion = '1.5.0'
+    wearProtolayoutVersion = '1.3.0'
+    wearComplicationsVersion = '1.2.1'
+    concurrentFuturesVersion = '1.2.0'
 }

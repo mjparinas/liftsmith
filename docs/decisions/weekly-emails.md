@@ -109,7 +109,7 @@ Did you know? If your gym lacks something a program needs, the app puts in a sta
 Free · Lifters · Screen: the workout with warm-up sets shown, or the stretch part
 Warming up well means heavier, safer working sets. The app plans it for you.
 - Ramp-up sets worked out for each heavy lift.
-- 48 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.
+- 61 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.
 - A workout can run warm-up, lifting and cool-down in order, with Skip between them.
 - Stretch days of 10 minutes or more keep your streak.
 Did you know? Tools › Warm-up gives the warm-up sets for any weight, for lifts outside the app's plan.
@@ -908,3 +908,12 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-26.** The My team email gets a point on "From your coach" on Today, Up next and the month on My team.
 
 **New, 2026-11-26.** The "Share and sell your programs" email's Did you know line adds Run the days in order.
+
+**New, 2026-11-26.** "Your workout on your wrist" (`watches`) now waits for the `wearOnPlay` admin flag and goes out next (`fresh`) once it's on, with a new picture: the Wear OS app's own screens (`scripts/email-watch.mjs`, drawn from the watch's layout by `scripts/wear-shots/`) instead of Connected apps. Anyone who got Getting started's new watch step skips it (`coveredBy: "tour:watch"`). Melvin, 2026-11-26: "for the emails we send out for new users, can you add the fact that we now have support for wear os (android) smart watches, dont forget to add screen shots to those emails".
+
+**New, 2026-11-26.** "Labs: log sets without touching the screen" (`labs-hands-off`) gets a point for hands-free watch sets (`labWatchAuto`, [Watch apps](watch-apps.md) "Hands-free watch sets"), in every language. It extends that email rather than adding one, so the screenshot stays as it is.
+
+**New, 2026-11-26.** "Your workout on your wrist" (`watches`) gets a point for changing the weight and reps on the watch and answering how an exercise felt ([Watch apps](watch-apps.md) "Adjust and rate a set"), in every language. It extends that email rather than adding one, so its picture stays as it is.
+**New, 2026-11-26.** "Your workout on your wrist" (`watches`) adds Machine taken to its Log set point (the email already has five points) ([Watch apps](watch-apps.md) "Machine taken"), in every language. It extends that email rather than adding one, so the screenshot stays as it is.
+
+**New, 2026-11-26.** "Today's workout on your watch face" (`watch-today`): the Wear OS tile and complication, the Apple Watch complication and the Garmin glance with today's call ([Watch apps](watch-apps.md) "Today on the watch face"), with a screenshot of Today, in every language.
