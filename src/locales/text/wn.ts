@@ -158,6 +158,9 @@ export const en = {
   "wn.c.coachNoteTop.title": "Your coach's note is at the top of Today",
   "wn.c.coachNoteTop.body":
     "A note from your coach now sits at the very top of Today, above your workout, on your phone and on a computer.",
+  "wn.c.moreStretches.title": "13 new stretches",
+  "wn.c.moreStretches.body":
+    "Couch stretch, frog, 90/90 hip switches, band pass-throughs, sleeper stretch, chin tucks and more, each with its 3D demo, for hips, shoulders, neck, wrists and calves.",
 } as const;
 
 type Key = keyof typeof en;
@@ -327,6 +330,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.coachNoteTop.title": "La nota de tu entrenador, arriba en Hoy",
   "wn.c.coachNoteTop.body":
     "La nota de tu entrenador ahora aparece arriba del todo en Hoy, encima de tu entrenamiento, en el teléfono y en el ordenador.",
+  "wn.c.moreStretches.title": "13 estiramientos nuevos",
+  "wn.c.moreStretches.body":
+    "Estiramiento del sofá, rana, cambios de cadera 90/90, pasos de banda, estiramiento del durmiente, retracciones de barbilla y más, cada uno con su demo en 3D, para cadera, hombros, cuello, muñecas y gemelos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -498,6 +504,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.coachNoteTop.title": "La note de votre coach en haut d'Aujourd'hui",
   "wn.c.coachNoteTop.body":
     "La note de votre coach s'affiche maintenant tout en haut d'Aujourd'hui, au-dessus de votre séance, sur téléphone comme sur ordinateur.",
+  "wn.c.moreStretches.title": "13 nouveaux étirements",
+  "wn.c.moreStretches.body":
+    "Étirement du canapé, grenouille, bascules de hanches 90/90, passages d'élastique, étirement du dormeur, rentrés de menton et plus encore, chacun avec sa démo en 3D, pour les hanches, les épaules, le cou, les poignets et les mollets.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -664,6 +673,9 @@ export const de: Partial<Record<Key, Message>> = {
     "Schreib deinem Coach oder öffne den Teamchat, und der Chat öffnet sich direkt dort: am Computer im Nachrichtenfenster, am Handy über der Seite.",
   "wn.c.coachNoteTop.title": "Die Notiz deines Coaches oben auf Heute",
   "wn.c.coachNoteTop.body": "Eine Notiz deines Coaches steht jetzt ganz oben auf Heute, über deinem Training, am Handy und am Computer.",
+  "wn.c.moreStretches.title": "13 neue Dehnübungen",
+  "wn.c.moreStretches.body":
+    "Couch-Stretch, Frosch, 90/90-Hüftwechsel, Band-Durchzüge, Sleeper-Stretch, Kinn zurückziehen und mehr, jede mit 3D-Demo, für Hüfte, Schultern, Nacken, Handgelenke und Waden.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -831,6 +843,9 @@ export const it: Partial<Record<Key, Message>> = {
     "Scrivi al tuo coach o apri la chat della squadra e si apre lì: nel riquadro Messaggi sul computer o sopra la pagina sul telefono.",
   "wn.c.coachNoteTop.title": "La nota del coach in cima a Oggi",
   "wn.c.coachNoteTop.body": "La nota del tuo coach ora è in cima a Oggi, sopra l'allenamento, sul telefono e sul computer.",
+  "wn.c.moreStretches.title": "13 nuovi allungamenti",
+  "wn.c.moreStretches.body":
+    "Allungamento del divano, rana, cambi d'anca 90/90, passaggi con elastico, allungamento del dormiente, retrazioni del mento e altro, ognuno con la sua demo in 3D, per anche, spalle, collo, polsi e polpacci.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -987,6 +1002,9 @@ export const ja: Partial<Record<Key, Message>> = {
     "コーチへのメッセージやチームチャットは、その場で開きます。パソコンではメッセージ欄に、スマートフォンでは画面の上に表示されます。",
   "wn.c.coachNoteTop.title": "コーチのメモが今日のいちばん上に",
   "wn.c.coachNoteTop.body": "コーチからのメモが、スマートフォンでもパソコンでも、今日の画面のいちばん上、ワークアウトの上に表示されます。",
+  "wn.c.moreStretches.title": "新しいストレッチ13種",
+  "wn.c.moreStretches.body":
+    "カウチストレッチ、カエル、90/90ヒップスイッチ、バンドパススルー、スリーパーストレッチ、チンタックなど。どれも3Dデモ付きで、股関節・肩・首・手首・ふくらはぎに。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1149,6 +1167,9 @@ export const pt: Partial<Record<Key, Message>> = {
     "Mande mensagem ao seu treinador ou abra o chat da equipe e ele abre ali mesmo: na caixa de Mensagens no computador ou sobre a página no celular.",
   "wn.c.coachNoteTop.title": "O recado do treinador no topo de Hoje",
   "wn.c.coachNoteTop.body": "O recado do seu treinador agora fica no topo de Hoje, acima do seu treino, no celular e no computador.",
+  "wn.c.moreStretches.title": "13 alongamentos novos",
+  "wn.c.moreStretches.body":
+    "Alongamento do sofá, sapo, troca de quadril 90/90, passagem com elástico, alongamento do dorminhoco, retração do queixo e mais, cada um com sua demo em 3D, para quadril, ombros, pescoço, punhos e panturrilhas.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1299,6 +1320,9 @@ export const ko: Partial<Record<Key, Message>> = {
     "코치에게 메시지를 보내거나 팀 채팅을 열면 그 자리에서 열려요. 컴퓨터에서는 메시지 창에, 휴대폰에서는 화면 위에 열려요.",
   "wn.c.coachNoteTop.title": "코치 메모가 오늘 맨 위에",
   "wn.c.coachNoteTop.body": "코치가 남긴 메모가 이제 휴대폰과 컴퓨터 모두에서 오늘 화면 맨 위, 운동 위에 보여요.",
+  "wn.c.moreStretches.title": "새 스트레칭 13가지",
+  "wn.c.moreStretches.body":
+    "카우치 스트레칭, 개구리, 90/90 고관절 전환, 밴드 패스스루, 슬리퍼 스트레칭, 턱 당기기 등. 모두 3D 시연이 있고 고관절, 어깨, 목, 손목, 종아리를 위한 거예요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1460,6 +1484,9 @@ export const pl: Partial<Record<Key, Message>> = {
     "Napisz do trenera albo otwórz czat drużyny, a otworzy się od razu: w okienku Wiadomości na komputerze lub nad stroną na telefonie.",
   "wn.c.coachNoteTop.title": "Notatka trenera na górze Dzisiaj",
   "wn.c.coachNoteTop.body": "Notatka od trenera jest teraz na samej górze ekranu Dzisiaj, nad treningiem, na telefonie i na komputerze.",
+  "wn.c.moreStretches.title": "13 nowych ćwiczeń rozciągających",
+  "wn.c.moreStretches.body":
+    "Rozciąganie przy kanapie, żabka, przełożenia bioder 90/90, przekładanie gumy, rozciąganie śpiącego, cofanie brody i więcej, każde z demonstracją 3D, na biodra, barki, szyję, nadgarstki i łydki.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1623,4 +1650,7 @@ export const tr: Partial<Record<Key, Message>> = {
     "Koçuna yaz ya da takım sohbetini aç, sohbet hemen orada açılır: bilgisayarda Mesajlar kutusunda, telefonda sayfanın üstünde.",
   "wn.c.coachNoteTop.title": "Koçunun notu Bugün'ün en üstünde",
   "wn.c.coachNoteTop.body": "Koçundan gelen not artık telefonda ve bilgisayarda Bugün ekranının en üstünde, antrenmanının üzerinde.",
+  "wn.c.moreStretches.title": "13 yeni esneme",
+  "wn.c.moreStretches.body":
+    "Kanepe esnetmesi, kurbağa, 90/90 kalça geçişleri, bantla omuz geçişi, uyuyan esnetmesi, çene geri çekme ve daha fazlası; her biri 3D gösterimli, kalça, omuz, boyun, bilek ve baldırlar için.",
 };

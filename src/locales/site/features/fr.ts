@@ -200,7 +200,7 @@ export const fr: FeaturesText = {
     },
     stretching: {
       name: "Étirements",
-      body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour. Quelques secondes pour te mettre en position avant chaque étirement et chaque côté, et l’écran reste allumé.",
+      body: "61 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour. Quelques secondes pour te mettre en position avant chaque étirement et chaque côté, et l’écran reste allumé.",
     },
     "workout-parts": {
       name: "Séances en plusieurs parties",

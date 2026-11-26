@@ -155,7 +155,7 @@ export const emails: Record<string, Words> = {
     intro: "Bien s'échauffer, c'est des séries de travail plus lourdes et plus sûres. L'app le planifie pour vous.",
     points: [
       "Les séries de montée sont calculées pour chaque exercice lourd.",
-      "48 étirements avec démos en 3D : un échauffement avant, un retour au calme après, ou une routine d'étirements n'importe quel jour.",
+      "61 étirements avec démos en 3D : un échauffement avant, un retour au calme après, ou une routine d'étirements n'importe quel jour.",
       "Une séance peut enchaîner échauffement, musculation et retour au calme, avec Passer entre les parties.",
       "Les jours d'étirements de 10 minutes ou plus gardent votre série.",
     ],

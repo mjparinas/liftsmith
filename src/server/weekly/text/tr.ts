@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "İyi ısınmak daha ağır ve daha güvenli çalışma setleri demek. Uygulama bunu senin için planlar.",
     points: [
       "Her ağır hareket için kademeli ısınma setleri hesaplanır.",
-      "3B gösterimli 48 esneme: önce ısınma, sonra soğuma ya da herhangi bir gün bir esneme rutini.",
+      "3B gösterimli 61 esneme: önce ısınma, sonra soğuma ya da herhangi bir gün bir esneme rutini.",
       "Bir antrenman ısınma, ağırlık çalışması ve soğumayı sırayla yürütebilir; aralarında Atla düğmesi var.",
       "10 dakika ya da daha uzun esneme günleri serini korur.",
     ],

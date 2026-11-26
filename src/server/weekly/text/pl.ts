@@ -153,7 +153,7 @@ export const emails: Record<string, Words> = {
     intro: "Dobra rozgrzewka to cięższe i bezpieczniejsze serie robocze. Aplikacja zaplanuje ją za ciebie.",
     points: [
       "Serie rozgrzewkowe są wyliczane dla każdego ciężkiego ćwiczenia.",
-      "48 ćwiczeń rozciągających z pokazami 3D: rozgrzewka przed, wyciszenie po albo rozciąganie w dowolny dzień.",
+      "61 ćwiczeń rozciągających z pokazami 3D: rozgrzewka przed, wyciszenie po albo rozciąganie w dowolny dzień.",
       "Trening może prowadzić przez rozgrzewkę, część siłową i wyciszenie po kolei, z przyciskiem Pomiń pomiędzy.",
       "Dni rozciągania trwające 10 minut lub dłużej podtrzymują passę.",
     ],

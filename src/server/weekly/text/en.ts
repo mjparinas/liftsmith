@@ -175,7 +175,7 @@ export const emails: Record<string, Words> = {
     intro: "Warming up well means heavier, safer working sets. The app plans it for you.",
     points: [
       "Ramp-up sets are worked out for each heavy lift.",
-      "48 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.",
+      "61 stretches with 3D demos: a warm-up before, a cool-down after, or a stretch routine any day.",
       "A workout can run warm-up, lifting and cool-down in order, with Skip between them.",
       "Stretch days of 10 minutes or more keep your streak.",
     ],

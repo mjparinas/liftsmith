@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "Calentar bien significa series efectivas más pesadas y más seguras. La app lo planifica por ti.",
     points: [
       "Las series de aproximación se calculan para cada ejercicio pesado.",
-      "48 estiramientos con demos en 3D: un calentamiento antes, una vuelta a la calma después o una rutina de estiramientos cualquier día.",
+      "61 estiramientos con demos en 3D: un calentamiento antes, una vuelta a la calma después o una rutina de estiramientos cualquier día.",
       "Un entrenamiento puede encadenar calentamiento, pesas y vuelta a la calma, con Saltar entre ellos.",
       "Los días de estiramientos de 10 minutos o más mantienen tu racha.",
     ],

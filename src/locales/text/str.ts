@@ -67,6 +67,45 @@ export const en = {
   "str.wall-calf.how": "Hands on a wall, one foot back with the leg straight and the heel down. Lean in. Each side.",
   "str.down-dog": "Downward dog",
   "str.down-dog.how": "Hands and feet on the floor, hips high. Press the heels toward the floor and lengthen your back.",
+  "str.hip-90-90": "90/90 hip switches",
+  "str.hip-90-90.how":
+    "Sit with both knees bent to 90 degrees and the feet wide, hands behind you. Let both knees drop to one side, then sweep them over to the other.",
+  "str.hip-circles": "Standing hip circles",
+  "str.hip-circles.how":
+    "Hands on your hips. Lift one knee in front, open it out to the side and lower it, drawing a big slow circle. Each side.",
+  "str.pass-throughs": "Band pass-throughs",
+  "str.pass-throughs.how":
+    "Hold a band wide with straight arms in front of your hips. Lift it over your head and down behind you, then back. Widen the grip if it pinches.",
+  "str.wall-slides": "Wall slides",
+  "str.wall-slides.how":
+    "Back, head and arms against a wall, elbows bent like a goalpost. Slide the arms up as far as they stay on the wall, then back down.",
+  "str.chin-tucks": "Chin tucks",
+  "str.chin-tucks.how":
+    "Stand tall and glide your head straight back to make a double chin, without tipping it. Hold for a second, then let go.",
+  "str.couch-stretch": "Couch stretch",
+  "str.couch-stretch.how":
+    "Kneel with one knee by a wall or couch and that shin up against it, the other foot forward. Squeeze your glutes and bring your body tall. Each side.",
+  "str.frog": "Frog stretch",
+  "str.frog.how":
+    "On your forearms with the knees wide and the shins in line behind them. Ease the hips back until you feel the inner thighs.",
+  "str.deep-squat": "Deep squat hold",
+  "str.deep-squat.how":
+    "Feet a little wider than the hips. Sink as low as you can with the heels down and the chest up. Your elbows can press the knees out.",
+  "str.sleeper": "Sleeper stretch",
+  "str.sleeper.how":
+    "Lie on one side with that arm out in front at shoulder height and the elbow bent up. With the other hand, ease the forearm down toward the floor. Each side.",
+  "str.side-bend": "Standing side bend",
+  "str.side-bend.how":
+    "Feet hip-width apart. Reach one arm up and over your head and bend to the other side without leaning forward. Each side.",
+  "str.neck-levator": "Chin-to-armpit neck stretch",
+  "str.neck-levator.how":
+    "Turn your head toward one armpit and look down. Rest that hand on the back of your head and let its weight ease you down. Each side.",
+  "str.wrist-extensor": "Wrist extensor stretch",
+  "str.wrist-extensor.how":
+    "Arm straight out in front, palm down. With the other hand, ease the back of the hand down and toward you. Each side.",
+  "str.soleus": "Bent-knee calf stretch",
+  "str.soleus.how":
+    "Hands on a wall, one foot back. Keep the back heel down and bend that knee until you feel it low in the calf. Each side.",
 
   "str.title": "Stretching",
   "str.intro": "Warm-up moves get you ready to lift and cool-down holds help you wind down. Pick any, on any day.",
@@ -253,6 +292,44 @@ export const es: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Manos en la pared, un pie atrás con la pierna recta y el talón abajo. Inclínate hacia delante. Cada lado.",
   "str.down-dog": "Perro boca abajo",
   "str.down-dog.how": "Manos y pies en el suelo, cadera alta. Lleva los talones hacia el suelo y alarga la espalda.",
+  "str.hip-90-90": "Cambios de cadera 90/90",
+  "str.hip-90-90.how":
+    "Siéntate con las dos rodillas dobladas a 90 grados, los pies separados y las manos detrás. Deja caer las rodillas hacia un lado y llévalas al otro.",
+  "str.hip-circles": "Círculos de cadera de pie",
+  "str.hip-circles.how":
+    "Manos en la cadera. Sube una rodilla al frente, ábrela hacia el lado y bájala, dibujando un círculo grande y lento. Cada lado.",
+  "str.pass-throughs": "Pasos de banda por encima",
+  "str.pass-throughs.how":
+    "Sujeta una banda con agarre ancho y los brazos rectos delante de la cadera. Pásala por encima de la cabeza hasta detrás y vuelve. Abre más el agarre si molesta.",
+  "str.wall-slides": "Deslizamientos en la pared",
+  "str.wall-slides.how":
+    "Espalda, cabeza y brazos contra la pared, codos doblados como una portería. Sube los brazos mientras sigan tocando la pared y bájalos.",
+  "str.chin-tucks": "Retracciones de barbilla",
+  "str.chin-tucks.how": "De pie y erguido, lleva la cabeza recta hacia atrás haciendo papada, sin inclinarla. Mantén un segundo y suelta.",
+  "str.couch-stretch": "Estiramiento del sofá",
+  "str.couch-stretch.how":
+    "Arrodíllate con una rodilla junto a una pared o un sofá y esa espinilla apoyada en él, el otro pie delante. Aprieta los glúteos y yérguete. Cada lado.",
+  "str.frog": "Estiramiento de rana",
+  "str.frog.how":
+    "Apoyado en los antebrazos, con las rodillas muy abiertas y las espinillas alineadas detrás. Lleva la cadera hacia atrás hasta notar el interior de los muslos.",
+  "str.deep-squat": "Sentadilla profunda mantenida",
+  "str.deep-squat.how":
+    "Pies algo más abiertos que la cadera. Baja todo lo que puedas con los talones en el suelo y el pecho arriba. Los codos pueden empujar las rodillas hacia fuera.",
+  "str.sleeper": "Estiramiento del durmiente",
+  "str.sleeper.how":
+    "Túmbate de lado con ese brazo delante a la altura del hombro y el codo doblado hacia arriba. Con la otra mano, baja el antebrazo hacia el suelo. Cada lado.",
+  "str.side-bend": "Inclinación lateral de pie",
+  "str.side-bend.how":
+    "Pies al ancho de la cadera. Lleva un brazo por encima de la cabeza e inclínate hacia el otro lado sin irte hacia delante. Cada lado.",
+  "str.neck-levator": "Estiramiento de cuello hacia la axila",
+  "str.neck-levator.how":
+    "Gira la cabeza hacia una axila y mira abajo. Apoya esa mano en la nuca y deja que su peso te lleve hacia abajo. Cada lado.",
+  "str.wrist-extensor": "Estiramiento de extensores de muñeca",
+  "str.wrist-extensor.how":
+    "Brazo recto al frente, palma hacia abajo. Con la otra mano, lleva el dorso de la mano hacia abajo y hacia ti. Cada lado.",
+  "str.soleus": "Estiramiento de gemelo con rodilla doblada",
+  "str.soleus.how":
+    "Manos en la pared, un pie atrás. Mantén el talón de atrás abajo y dobla esa rodilla hasta notarlo en la parte baja del gemelo. Cada lado.",
 
   "str.title": "Estiramientos",
   "str.intro":
@@ -444,6 +521,45 @@ export const fr: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Mains au mur, un pied en arrière, jambe tendue et talon au sol. Penchez-vous. De chaque côté.",
   "str.down-dog": "Chien tête en bas",
   "str.down-dog.how": "Mains et pieds au sol, hanches hautes. Poussez les talons vers le sol et allongez le dos.",
+  "str.hip-90-90": "Bascules de hanches 90/90",
+  "str.hip-90-90.how":
+    "Asseyez-vous, genoux pliés à 90 degrés, pieds écartés, mains derrière vous. Laissez tomber les deux genoux d'un côté, puis basculez-les de l'autre.",
+  "str.hip-circles": "Cercles de hanche debout",
+  "str.hip-circles.how":
+    "Mains sur les hanches. Montez un genou devant, ouvrez-le sur le côté puis redescendez, en dessinant un grand cercle lent. De chaque côté.",
+  "str.pass-throughs": "Passages d'élastique",
+  "str.pass-throughs.how":
+    "Tenez un élastique en prise large, bras tendus devant les hanches. Passez-le au-dessus de la tête jusque derrière vous, puis revenez. Élargissez la prise si ça tire trop.",
+  "str.wall-slides": "Glissés au mur",
+  "str.wall-slides.how":
+    "Dos, tête et bras contre un mur, coudes pliés en forme de but. Montez les bras tant qu'ils restent au mur, puis redescendez.",
+  "str.chin-tucks": "Rentrés de menton",
+  "str.chin-tucks.how":
+    "Grandissez-vous et reculez la tête bien droite, comme pour faire un double menton, sans l'incliner. Tenez une seconde, puis relâchez.",
+  "str.couch-stretch": "Étirement du canapé",
+  "str.couch-stretch.how":
+    "À genou, un genou près d'un mur ou d'un canapé et ce tibia appuyé contre lui, l'autre pied devant. Serrez les fessiers et redressez-vous. De chaque côté.",
+  "str.frog": "Étirement de la grenouille",
+  "str.frog.how":
+    "Sur les avant-bras, genoux très écartés, tibias alignés derrière. Reculez doucement les hanches jusqu'à sentir l'intérieur des cuisses.",
+  "str.deep-squat": "Squat profond tenu",
+  "str.deep-squat.how":
+    "Pieds un peu plus écartés que les hanches. Descendez le plus bas possible, talons au sol et buste haut. Les coudes peuvent pousser les genoux vers l'extérieur.",
+  "str.sleeper": "Étirement du dormeur",
+  "str.sleeper.how":
+    "Allongé sur le côté, ce bras devant vous à hauteur d'épaule et le coude plié vers le haut. Avec l'autre main, descendez l'avant-bras vers le sol. De chaque côté.",
+  "str.side-bend": "Inclinaison latérale debout",
+  "str.side-bend.how":
+    "Pieds largeur de hanches. Montez un bras au-dessus de la tête et penchez-vous de l'autre côté sans basculer vers l'avant. De chaque côté.",
+  "str.neck-levator": "Étirement du cou vers l'aisselle",
+  "str.neck-levator.how":
+    "Tournez la tête vers une aisselle et regardez vers le bas. Posez cette main derrière la tête et laissez son poids vous descendre. De chaque côté.",
+  "str.wrist-extensor": "Étirement des extenseurs du poignet",
+  "str.wrist-extensor.how":
+    "Bras tendu devant, paume vers le bas. Avec l'autre main, descendez le dos de la main vers vous. De chaque côté.",
+  "str.soleus": "Étirement du mollet genou plié",
+  "str.soleus.how":
+    "Mains au mur, un pied en arrière. Gardez le talon arrière au sol et pliez ce genou jusqu'à sentir le bas du mollet. De chaque côté.",
 
   "str.title": "Étirements",
   "str.intro":
@@ -634,6 +750,45 @@ export const de: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Hände an die Wand, ein Fuß nach hinten, Bein gestreckt, Ferse unten. Lehn dich hinein. Jede Seite.",
   "str.down-dog": "Herabschauender Hund",
   "str.down-dog.how": "Hände und Füße am Boden, Hüfte hoch. Drück die Fersen Richtung Boden und mach den Rücken lang.",
+  "str.hip-90-90": "90/90-Hüftwechsel",
+  "str.hip-90-90.how":
+    "Setz dich hin, beide Knie 90 Grad gebeugt, Füße weit, Hände hinter dir. Lass beide Knie zu einer Seite fallen und schwenk sie dann zur anderen.",
+  "str.hip-circles": "Hüftkreisen im Stand",
+  "str.hip-circles.how":
+    "Hände an die Hüfte. Heb ein Knie nach vorn, öffne es zur Seite und senk es ab, in einem großen, langsamen Kreis. Jede Seite.",
+  "str.pass-throughs": "Band-Durchzüge",
+  "str.pass-throughs.how":
+    "Halt ein Band breit gegriffen mit gestreckten Armen vor der Hüfte. Führ es über den Kopf nach hinten und zurück. Greif breiter, wenn es zwickt.",
+  "str.wall-slides": "Wall Slides",
+  "str.wall-slides.how":
+    "Rücken, Kopf und Arme an die Wand, Ellbogen gebeugt wie ein Torpfosten. Schieb die Arme hoch, solange sie an der Wand bleiben, und wieder runter.",
+  "str.chin-tucks": "Kinn zurückziehen",
+  "str.chin-tucks.how":
+    "Steh aufrecht und schieb den Kopf gerade nach hinten, wie für ein Doppelkinn, ohne ihn zu neigen. Eine Sekunde halten, dann lösen.",
+  "str.couch-stretch": "Couch-Stretch",
+  "str.couch-stretch.how":
+    "Knie dich mit einem Knie an eine Wand oder ein Sofa, das Schienbein daran gelehnt, den anderen Fuß vorn. Spann den Po an und richte dich auf. Jede Seite.",
+  "str.frog": "Frosch-Dehnung",
+  "str.frog.how":
+    "Auf den Unterarmen, Knie weit auseinander, Schienbeine in einer Linie dahinter. Schieb die Hüfte langsam zurück, bis du die Innenseite der Oberschenkel spürst.",
+  "str.deep-squat": "Tiefe Hocke halten",
+  "str.deep-squat.how":
+    "Füße etwas weiter als hüftbreit. Geh so tief wie möglich, Fersen unten, Brust oben. Die Ellbogen dürfen die Knie nach außen drücken.",
+  "str.sleeper": "Sleeper-Stretch",
+  "str.sleeper.how":
+    "Leg dich auf die Seite, der untere Arm vorn auf Schulterhöhe, Ellbogen nach oben gebeugt. Drück den Unterarm mit der anderen Hand sanft Richtung Boden. Jede Seite.",
+  "str.side-bend": "Seitbeuge im Stand",
+  "str.side-bend.how":
+    "Füße hüftbreit. Streck einen Arm über den Kopf und neig dich zur anderen Seite, ohne nach vorn zu kippen. Jede Seite.",
+  "str.neck-levator": "Nackendehnung Richtung Achsel",
+  "str.neck-levator.how":
+    "Dreh den Kopf zu einer Achsel und schau nach unten. Leg diese Hand auf den Hinterkopf und lass ihr Gewicht dich sanft nach unten ziehen. Jede Seite.",
+  "str.wrist-extensor": "Handgelenkstrecker-Dehnung",
+  "str.wrist-extensor.how":
+    "Arm gerade nach vorn, Handfläche nach unten. Drück den Handrücken mit der anderen Hand sanft nach unten und zu dir. Jede Seite.",
+  "str.soleus": "Wadendehnung mit gebeugtem Knie",
+  "str.soleus.how":
+    "Hände an die Wand, ein Fuß nach hinten. Lass die hintere Ferse unten und beug das Knie, bis du es tief in der Wade spürst. Jede Seite.",
 
   "str.title": "Dehnen",
   "str.intro": "Aufwärmübungen machen dich bereit fürs Training, Dehnhalteübungen helfen beim Runterkommen. Wähl aus, an jedem Tag.",
@@ -820,6 +975,45 @@ export const it: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Mani al muro, un piede indietro con la gamba tesa e il tallone giù. Spingiti avanti. Ogni lato.",
   "str.down-dog": "Cane a testa in giù",
   "str.down-dog.how": "Mani e piedi a terra, anche in alto. Spingi i talloni verso il pavimento e allunga la schiena.",
+  "str.hip-90-90": "Cambi d'anca 90/90",
+  "str.hip-90-90.how":
+    "Siediti con entrambe le ginocchia piegate a 90 gradi, piedi larghi e mani dietro. Lascia cadere le ginocchia da un lato, poi portale dall'altro.",
+  "str.hip-circles": "Cerchi d'anca in piedi",
+  "str.hip-circles.how":
+    "Mani sui fianchi. Solleva un ginocchio davanti, aprilo di lato e abbassalo, disegnando un cerchio ampio e lento. Ogni lato.",
+  "str.pass-throughs": "Passaggi con elastico",
+  "str.pass-throughs.how":
+    "Tieni un elastico con presa larga e braccia tese davanti ai fianchi. Portalo sopra la testa fino a dietro, poi torna. Allarga la presa se tira troppo.",
+  "str.wall-slides": "Scivolamenti al muro",
+  "str.wall-slides.how":
+    "Schiena, testa e braccia contro il muro, gomiti piegati come una porta da calcio. Fai salire le braccia finché restano al muro, poi riscendi.",
+  "str.chin-tucks": "Retrazioni del mento",
+  "str.chin-tucks.how":
+    "In piedi e dritto, porta la testa indietro in linea retta come per fare il doppio mento, senza inclinarla. Tieni un secondo, poi rilascia.",
+  "str.couch-stretch": "Allungamento del divano",
+  "str.couch-stretch.how":
+    "In ginocchio, un ginocchio vicino a un muro o un divano con quella tibia appoggiata, l'altro piede avanti. Stringi i glutei e raddrizzati. Ogni lato.",
+  "str.frog": "Allungamento della rana",
+  "str.frog.how":
+    "Sugli avambracci con le ginocchia larghe e le tibie allineate dietro. Porta piano i fianchi indietro finché senti l'interno coscia.",
+  "str.deep-squat": "Squat profondo in tenuta",
+  "str.deep-squat.how":
+    "Piedi un po' più larghi dei fianchi. Scendi più in basso che puoi con i talloni giù e il petto alto. I gomiti possono spingere le ginocchia in fuori.",
+  "str.sleeper": "Allungamento del dormiente",
+  "str.sleeper.how":
+    "Sdraiati su un fianco con quel braccio davanti all'altezza della spalla e il gomito piegato in su. Con l'altra mano porta l'avambraccio verso il pavimento. Ogni lato.",
+  "str.side-bend": "Flessione laterale in piedi",
+  "str.side-bend.how":
+    "Piedi alla larghezza dei fianchi. Porta un braccio sopra la testa e piegati dall'altro lato senza sporgerti in avanti. Ogni lato.",
+  "str.neck-levator": "Allungamento del collo verso l'ascella",
+  "str.neck-levator.how":
+    "Gira la testa verso un'ascella e guarda in basso. Appoggia quella mano dietro la testa e lascia che il suo peso ti porti giù. Ogni lato.",
+  "str.wrist-extensor": "Allungamento degli estensori del polso",
+  "str.wrist-extensor.how":
+    "Braccio teso davanti, palmo in giù. Con l'altra mano porta il dorso della mano verso il basso e verso di te. Ogni lato.",
+  "str.soleus": "Allungamento del polpaccio a ginocchio piegato",
+  "str.soleus.how":
+    "Mani al muro, un piede indietro. Tieni giù il tallone dietro e piega quel ginocchio finché lo senti nella parte bassa del polpaccio. Ogni lato.",
 
   "str.title": "Stretching",
   "str.intro":
@@ -1002,6 +1196,35 @@ export const ja: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "壁に手をつき、片足を後ろに引いて脚を伸ばし、かかとを下ろします。体を前へ。左右それぞれ。",
   "str.down-dog": "ダウンドッグ",
   "str.down-dog.how": "手と足を床につけ、お尻を高く。かかとを床の方へ押し、背中を長く伸ばします。",
+  "str.hip-90-90": "90/90ヒップスイッチ",
+  "str.hip-90-90.how": "両ひざを90度に曲げ、足を広めにして座り、手は後ろにつきます。両ひざを片側に倒し、反対側へゆっくり倒します。",
+  "str.hip-circles": "立ってヒップサークル",
+  "str.hip-circles.how": "手を腰に。片ひざを前に上げ、横へ開いてから下ろし、大きくゆっくり円を描きます。左右それぞれ。",
+  "str.pass-throughs": "バンドパススルー",
+  "str.pass-throughs.how": "バンドを広く持ち、腕を伸ばして腰の前へ。頭の上を通して背中側まで回し、戻します。つらければ手幅を広げます。",
+  "str.wall-slides": "ウォールスライド",
+  "str.wall-slides.how": "背中・頭・腕を壁につけ、ひじをゴールポストの形に曲げます。腕が壁から離れない範囲で上へすべらせ、戻します。",
+  "str.chin-tucks": "チンタック",
+  "str.chin-tucks.how": "背すじを伸ばし、頭を傾けずにまっすぐ後ろへ引いて二重あごを作ります。1秒キープして戻します。",
+  "str.couch-stretch": "カウチストレッチ",
+  "str.couch-stretch.how":
+    "壁かソファのそばに片ひざをつき、そのすねを壁に沿わせ、反対の足は前へ。お尻を締めて上体を起こします。左右それぞれ。",
+  "str.frog": "カエルのストレッチ",
+  "str.frog.how": "前腕をつき、ひざを大きく開いて、すねをひざの後ろにそろえます。内ももが伸びるまでお尻をゆっくり後ろへ引きます。",
+  "str.deep-squat": "ディープスクワットキープ",
+  "str.deep-squat.how": "足は腰幅より少し広め。かかとをつけ、胸を張ったままできるだけ深く沈みます。ひじでひざを外へ押してもOK。",
+  "str.sleeper": "スリーパーストレッチ",
+  "str.sleeper.how":
+    "横向きに寝て、下の腕を肩の高さで前に出し、ひじを上に曲げます。反対の手で前腕を床の方へゆっくり倒します。左右それぞれ。",
+  "str.side-bend": "立って体側伸ばし",
+  "str.side-bend.how": "足は腰幅。片腕を頭の上へ伸ばし、前に倒れないように反対側へ体を倒します。左右それぞれ。",
+  "str.neck-levator": "わきの下を見る首のストレッチ",
+  "str.neck-levator.how": "顔を片方のわきの下に向けて下を見ます。その手を後頭部に置き、手の重みでゆっくり下げます。左右それぞれ。",
+  "str.wrist-extensor": "手首の伸筋ストレッチ",
+  "str.wrist-extensor.how": "腕を前にまっすぐ伸ばし、手のひらを下に。反対の手で手の甲を下へ、手前へゆっくり倒します。左右それぞれ。",
+  "str.soleus": "ひざを曲げたふくらはぎのストレッチ",
+  "str.soleus.how":
+    "壁に手をつき、片足を後ろへ。後ろのかかとを床につけたまま、ふくらはぎの下の方が伸びるまでひざを曲げます。左右それぞれ。",
 
   "str.title": "ストレッチ",
   "str.intro":
@@ -1186,6 +1409,44 @@ export const pt: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Mãos na parede, um pé atrás com a perna esticada e o calcanhar no chão. Incline-se. Cada lado.",
   "str.down-dog": "Cachorro olhando para baixo",
   "str.down-dog.how": "Mãos e pés no chão, quadril alto. Empurre os calcanhares em direção ao chão e alongue as costas.",
+  "str.hip-90-90": "Troca de quadril 90/90",
+  "str.hip-90-90.how":
+    "Sente com os dois joelhos dobrados a 90 graus, pés afastados e mãos atrás. Deixe os joelhos caírem para um lado e depois leve-os para o outro.",
+  "str.hip-circles": "Círculos de quadril em pé",
+  "str.hip-circles.how":
+    "Mãos na cintura. Suba um joelho à frente, abra para o lado e abaixe, desenhando um círculo grande e lento. Cada lado.",
+  "str.pass-throughs": "Passagem com elástico",
+  "str.pass-throughs.how":
+    "Segure um elástico com pegada larga e braços esticados na frente do quadril. Passe por cima da cabeça até atrás e volte. Abra mais a pegada se incomodar.",
+  "str.wall-slides": "Deslizamento na parede",
+  "str.wall-slides.how":
+    "Costas, cabeça e braços na parede, cotovelos dobrados como uma trave. Suba os braços enquanto ficarem encostados e desça.",
+  "str.chin-tucks": "Retração do queixo",
+  "str.chin-tucks.how": "Em pé e alinhado, leve a cabeça reto para trás, fazendo um queixo duplo, sem inclinar. Segure um segundo e solte.",
+  "str.couch-stretch": "Alongamento do sofá",
+  "str.couch-stretch.how":
+    "Ajoelhe com um joelho junto a uma parede ou sofá e essa canela apoiada nele, o outro pé à frente. Contraia os glúteos e endireite o corpo. Cada lado.",
+  "str.frog": "Alongamento do sapo",
+  "str.frog.how":
+    "Apoiado nos antebraços, joelhos bem afastados e canelas alinhadas atrás. Leve o quadril para trás devagar até sentir a parte interna das coxas.",
+  "str.deep-squat": "Agachamento profundo parado",
+  "str.deep-squat.how":
+    "Pés um pouco mais afastados que o quadril. Desça o máximo que puder com os calcanhares no chão e o peito aberto. Os cotovelos podem empurrar os joelhos para fora.",
+  "str.sleeper": "Alongamento do dorminhoco",
+  "str.sleeper.how":
+    "Deite de lado com esse braço à frente na altura do ombro e o cotovelo dobrado para cima. Com a outra mão, leve o antebraço em direção ao chão. Cada lado.",
+  "str.side-bend": "Inclinação lateral em pé",
+  "str.side-bend.how":
+    "Pés na largura do quadril. Leve um braço por cima da cabeça e incline para o outro lado sem ir para a frente. Cada lado.",
+  "str.neck-levator": "Alongamento do pescoço para a axila",
+  "str.neck-levator.how":
+    "Vire a cabeça para uma axila e olhe para baixo. Apoie essa mão atrás da cabeça e deixe o peso dela levar você para baixo. Cada lado.",
+  "str.wrist-extensor": "Alongamento dos extensores do punho",
+  "str.wrist-extensor.how":
+    "Braço esticado à frente, palma para baixo. Com a outra mão, leve o dorso da mão para baixo e na sua direção. Cada lado.",
+  "str.soleus": "Alongamento da panturrilha com joelho dobrado",
+  "str.soleus.how":
+    "Mãos na parede, um pé atrás. Mantenha o calcanhar de trás no chão e dobre esse joelho até sentir na parte baixa da panturrilha. Cada lado.",
   "str.title": "Alongamento",
   "str.intro":
     "Movimentos de aquecimento te preparam para treinar e alongamentos de volta à calma ajudam a desacelerar. Escolha qualquer um, em qualquer dia.",
@@ -1387,6 +1648,38 @@ export const ko: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "손을 벽에 대고 한 발을 뒤로 빼서 다리를 펴고 뒤꿈치를 바닥에 붙이세요. 몸을 기울이세요. 양쪽 각각.",
   "str.down-dog": "다운독",
   "str.down-dog.how": "손과 발을 바닥에 두고 엉덩이를 높이 드세요. 뒤꿈치를 바닥 쪽으로 누르고 등을 길게 펴세요.",
+  "str.hip-90-90": "90/90 고관절 전환",
+  "str.hip-90-90.how":
+    "양 무릎을 90도로 굽히고 발을 넓게 벌려 앉은 뒤 손은 뒤에 짚으세요. 두 무릎을 한쪽으로 넘겼다가 반대쪽으로 넘기세요.",
+  "str.hip-circles": "서서 고관절 돌리기",
+  "str.hip-circles.how": "손은 허리에 두세요. 한쪽 무릎을 앞으로 들어 옆으로 열었다가 내리며 크고 천천히 원을 그리세요. 양쪽 각각.",
+  "str.pass-throughs": "밴드 패스스루",
+  "str.pass-throughs.how":
+    "밴드를 넓게 잡고 팔을 펴서 엉덩이 앞에 두세요. 머리 위로 넘겨 등 뒤까지 보냈다가 되돌아오세요. 불편하면 손 간격을 넓히세요.",
+  "str.wall-slides": "월 슬라이드",
+  "str.wall-slides.how": "등, 머리, 팔을 벽에 붙이고 팔꿈치를 골대 모양으로 굽히세요. 팔이 벽에서 떨어지지 않는 만큼 올렸다가 내리세요.",
+  "str.chin-tucks": "턱 당기기",
+  "str.chin-tucks.how": "똑바로 서서 고개를 숙이지 말고 머리를 그대로 뒤로 당겨 이중 턱을 만드세요. 1초 버틴 뒤 푸세요.",
+  "str.couch-stretch": "카우치 스트레칭",
+  "str.couch-stretch.how":
+    "벽이나 소파 옆에 한쪽 무릎을 대고 그쪽 정강이를 기대세요. 다른 발은 앞에 두세요. 엉덩이에 힘을 주고 상체를 세우세요. 양쪽 각각.",
+  "str.frog": "개구리 스트레칭",
+  "str.frog.how":
+    "팔뚝을 바닥에 대고 무릎을 넓게 벌린 뒤 정강이를 무릎 뒤에 나란히 두세요. 허벅지 안쪽이 당길 때까지 엉덩이를 천천히 뒤로 빼세요.",
+  "str.deep-squat": "깊은 스쿼트 버티기",
+  "str.deep-squat.how":
+    "발은 골반보다 조금 넓게. 뒤꿈치를 붙이고 가슴을 편 채 최대한 낮게 앉으세요. 팔꿈치로 무릎을 바깥으로 밀어도 좋아요.",
+  "str.sleeper": "슬리퍼 스트레칭",
+  "str.sleeper.how":
+    "옆으로 누워 아래쪽 팔을 어깨 높이로 앞에 두고 팔꿈치를 위로 굽히세요. 다른 손으로 팔뚝을 바닥 쪽으로 천천히 눌러 주세요. 양쪽 각각.",
+  "str.side-bend": "서서 옆구리 늘리기",
+  "str.side-bend.how": "발은 골반 너비로. 한쪽 팔을 머리 위로 뻗고 앞으로 숙이지 말고 반대쪽으로 몸을 기울이세요. 양쪽 각각.",
+  "str.neck-levator": "겨드랑이 쪽 목 스트레칭",
+  "str.neck-levator.how": "고개를 한쪽 겨드랑이 쪽으로 돌려 아래를 보세요. 그쪽 손을 뒤통수에 얹고 손의 무게로 천천히 내리세요. 양쪽 각각.",
+  "str.wrist-extensor": "손목 신전근 스트레칭",
+  "str.wrist-extensor.how": "팔을 앞으로 곧게 뻗고 손바닥은 아래로. 다른 손으로 손등을 아래로, 몸 쪽으로 천천히 당기세요. 양쪽 각각.",
+  "str.soleus": "무릎 굽힌 종아리 스트레칭",
+  "str.soleus.how": "손을 벽에 대고 한 발을 뒤로 빼세요. 뒤꿈치를 붙인 채 종아리 아래쪽이 당길 때까지 그 무릎을 굽히세요. 양쪽 각각.",
   "str.title": "스트레칭",
   "str.intro": "워밍업 동작은 운동 준비를, 쿨다운 자세는 마무리를 도와줘요. 아무 날에나 골라서 하세요.",
   "str.kind.all": "전체",
@@ -1579,6 +1872,42 @@ export const tr: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Eller duvarda, bir ayak geride, bacak düz ve topuk yerde. Öne yaslan. Her iki taraf.",
   "str.down-dog": "Aşağı bakan köpek",
   "str.down-dog.how": "Eller ve ayaklar yerde, kalça yukarıda. Topukları yere doğru bastır ve sırtını uzat.",
+  "str.hip-90-90": "90/90 kalça geçişleri",
+  "str.hip-90-90.how":
+    "İki dizin 90 derece bükülü, ayakların geniş ve ellerin arkada otur. İki dizini bir yana düşür, sonra diğer yana süpür.",
+  "str.hip-circles": "Ayakta kalça daireleri",
+  "str.hip-circles.how": "Ellerin belde. Bir dizini öne kaldır, yana aç ve indir; büyük ve yavaş bir daire çiz. Her iki taraf.",
+  "str.pass-throughs": "Bantla omuz geçişi",
+  "str.pass-throughs.how":
+    "Bandı geniş tut, kollar düz ve kalçanın önünde. Başının üstünden arkana geçir, sonra geri getir. Sıkışırsa tutuşu genişlet.",
+  "str.wall-slides": "Duvar kaydırma",
+  "str.wall-slides.how":
+    "Sırtın, başın ve kolların duvarda, dirsekler kale direği gibi bükülü. Kolları duvardan ayrılmadan çıkabildiği kadar yukarı kaydır, sonra indir.",
+  "str.chin-tucks": "Çene geri çekme",
+  "str.chin-tucks.how": "Dik dur ve başını eğmeden düz geriye çekerek çift çene yap. Bir saniye tut, sonra bırak.",
+  "str.couch-stretch": "Kanepe esnetmesi",
+  "str.couch-stretch.how":
+    "Bir dizini duvarın ya da kanepenin dibine koy, o kaval kemiğini ona yasla, diğer ayak önde. Kalçanı sık ve gövdeni dikleştir. Her iki taraf.",
+  "str.frog": "Kurbağa esnetmesi",
+  "str.frog.how":
+    "Ön kolların yerde, dizler geniş açık, kaval kemikleri dizlerin arkasında hizalı. İç bacaklarında hissedene kadar kalçanı yavaşça geriye it.",
+  "str.deep-squat": "Derin çömelme tutuşu",
+  "str.deep-squat.how":
+    "Ayaklar kalçadan biraz geniş. Topuklar yerde ve göğüs dik, inebildiğin kadar aşağı in. Dirseklerinle dizleri dışa itebilirsin.",
+  "str.sleeper": "Uyuyan esnetmesi",
+  "str.sleeper.how":
+    "Yan yat, alttaki kolun omuz hizasında önde ve dirseğin yukarı bükülü olsun. Diğer elinle ön kolunu yavaşça yere doğru indir. Her iki taraf.",
+  "str.side-bend": "Ayakta yana eğilme",
+  "str.side-bend.how": "Ayaklar kalça genişliğinde. Bir kolunu başının üstünden uzat ve öne eğilmeden diğer yana eğil. Her iki taraf.",
+  "str.neck-levator": "Koltuk altına boyun esnetmesi",
+  "str.neck-levator.how":
+    "Başını bir koltuk altına doğru çevir ve aşağı bak. O elini başının arkasına koy ve ağırlığıyla seni yavaşça indirmesine izin ver. Her iki taraf.",
+  "str.wrist-extensor": "Bilek ekstansör esnetmesi",
+  "str.wrist-extensor.how":
+    "Kolun önde düz, avuç içi aşağıda. Diğer elinle elinin üstünü yavaşça aşağı ve kendine doğru bastır. Her iki taraf.",
+  "str.soleus": "Diz bükülü baldır esnetmesi",
+  "str.soleus.how":
+    "Ellerin duvarda, bir ayak geride. Arka topuğu yerde tut ve baldırın alt kısmında hissedene kadar o dizi bük. Her iki taraf.",
   "str.title": "Esneme",
   "str.intro": "Isınma hareketleri seni kaldırışa hazırlar, soğuma esnemeleri gevşemene yardım eder. İstediğini, istediğin gün seç.",
   "str.kind.all": "Tümü",
@@ -1780,6 +2109,43 @@ export const pl: Partial<Record<Key, Message>> = {
   "str.wall-calf.how": "Dłonie na ścianie, jedna noga z tyłu, prosta, pięta na ziemi. Pochyl się. Na każdą stronę.",
   "str.down-dog": "Pies z głową w dół",
   "str.down-dog.how": "Dłonie i stopy na podłodze, biodra wysoko. Dociskaj pięty do podłogi i wydłużaj plecy.",
+  "str.hip-90-90": "Przełożenia bioder 90/90",
+  "str.hip-90-90.how":
+    "Usiądź z kolanami zgiętymi pod kątem 90 stopni, stopami szeroko i dłońmi z tyłu. Opuść oba kolana na jedną stronę, potem przełóż je na drugą.",
+  "str.hip-circles": "Krążenia bioder na stojąco",
+  "str.hip-circles.how":
+    "Dłonie na biodrach. Unieś kolano przed siebie, otwórz je w bok i opuść, rysując duże, powolne koło. Na każdą stronę.",
+  "str.pass-throughs": "Przekładanie gumy",
+  "str.pass-throughs.how":
+    "Trzymaj gumę szerokim chwytem, proste ręce przed biodrami. Przenieś ją nad głową za plecy i z powrotem. Poszerz chwyt, jeśli coś ciągnie.",
+  "str.wall-slides": "Ślizgi przy ścianie",
+  "str.wall-slides.how":
+    "Plecy, głowa i ręce przy ścianie, łokcie zgięte jak bramka. Przesuwaj ręce w górę, dopóki dotykają ściany, i z powrotem w dół.",
+  "str.chin-tucks": "Cofanie brody",
+  "str.chin-tucks.how": "Stań prosto i cofnij głowę poziomo, robiąc podwójny podbródek, bez pochylania jej. Przytrzymaj sekundę i puść.",
+  "str.couch-stretch": "Rozciąganie przy kanapie",
+  "str.couch-stretch.how":
+    "Uklęknij jednym kolanem przy ścianie lub kanapie, opierając o nią tę goleń, drugą stopę postaw z przodu. Napnij pośladki i wyprostuj tułów. Na każdą stronę.",
+  "str.frog": "Żabka",
+  "str.frog.how": "Na przedramionach, kolana szeroko, golenie w linii za kolanami. Powoli cofaj biodra, aż poczujesz wewnętrzną stronę ud.",
+  "str.deep-squat": "Głęboki przysiad w utrzymaniu",
+  "str.deep-squat.how":
+    "Stopy trochę szerzej niż biodra. Zejdź jak najniżej, pięty na ziemi, klatka w górze. Łokcie mogą wypychać kolana na zewnątrz.",
+  "str.sleeper": "Rozciąganie śpiącego",
+  "str.sleeper.how":
+    "Połóż się na boku, ta ręka z przodu na wysokości barku, łokieć zgięty w górę. Drugą dłonią powoli opuszczaj przedramię w stronę podłogi. Na każdą stronę.",
+  "str.side-bend": "Skłon boczny na stojąco",
+  "str.side-bend.how":
+    "Stopy na szerokość bioder. Wyciągnij rękę nad głową i pochyl się na drugą stronę, nie wychylając się do przodu. Na każdą stronę.",
+  "str.neck-levator": "Rozciąganie szyi w stronę pachy",
+  "str.neck-levator.how":
+    "Obróć głowę w stronę pachy i spójrz w dół. Połóż tę dłoń z tyłu głowy i pozwól, by jej ciężar powoli cię opuszczał. Na każdą stronę.",
+  "str.wrist-extensor": "Rozciąganie prostowników nadgarstka",
+  "str.wrist-extensor.how":
+    "Ręka prosta przed sobą, dłoń w dół. Drugą dłonią powoli przyciągaj grzbiet dłoni w dół i do siebie. Na każdą stronę.",
+  "str.soleus": "Rozciąganie łydki ze zgiętym kolanem",
+  "str.soleus.how":
+    "Dłonie na ścianie, jedna stopa z tyłu. Trzymaj tylną piętę na ziemi i zginaj to kolano, aż poczujesz dół łydki. Na każdą stronę.",
   "str.title": "Rozciąganie",
   "str.intro":
     "Ruchy rozgrzewkowe przygotują cię do treningu, a statyczne rozciąganie pomoże się wyciszyć. Wybierz dowolne, w dowolny dzień.",

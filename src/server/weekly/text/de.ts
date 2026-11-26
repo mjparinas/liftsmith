@@ -154,7 +154,7 @@ export const emails: Record<string, Words> = {
     intro: "Gutes Aufwärmen heißt schwerere und sicherere Arbeitssätze. Die App plant es für dich.",
     points: [
       "Aufwärmsätze werden für jede schwere Übung berechnet.",
-      "48 Dehnübungen mit 3D-Demos: Aufwärmen davor, Cool-down danach oder eine Dehnroutine an jedem Tag.",
+      "61 Dehnübungen mit 3D-Demos: Aufwärmen davor, Cool-down danach oder eine Dehnroutine an jedem Tag.",
       "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander abspielen, mit „Überspringen“ dazwischen.",
       "Dehntage ab 10 Minuten halten deine Serie.",
     ],

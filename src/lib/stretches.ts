@@ -94,6 +94,20 @@ const ROWS: Row[] = [
   { id: "straddle", kind: "cool", seconds: 45, for: ["adductors", "hamstrings"] },
   { id: "wall-calf", kind: "cool", seconds: 30, eachSide: true, for: ["calves"] },
   { id: "down-dog", kind: "cool", seconds: 30, for: ["calves", "hamstrings", "lats"] },
+  // ---- Added 2026-11-26 from a gap review (Melvin picked them): hips, shoulders, neck, wrists and the soleus
+  { id: "hip-90-90", kind: "warm", seconds: 0, reps: 8, for: ["glutes", "adductors"] },
+  { id: "hip-circles", kind: "warm", seconds: 0, reps: 6, eachSide: true, for: ["glutes", "adductors", "abs"] },
+  { id: "pass-throughs", kind: "warm", seconds: 0, reps: 10, for: ["frontDelts", "chest", "upperBack"], needs: ["bands"] },
+  { id: "wall-slides", kind: "warm", seconds: 0, reps: 10, for: ["upperBack", "traps", "sideDelts"] },
+  { id: "chin-tucks", kind: "warm", seconds: 0, reps: 10, for: ["traps", "upperBack"] },
+  { id: "couch-stretch", kind: "cool", seconds: 45, eachSide: true, for: ["quads", "abs"] },
+  { id: "frog", kind: "cool", seconds: 45, for: ["adductors", "glutes"] },
+  { id: "deep-squat", kind: "cool", seconds: 45, for: ["adductors", "calves", "lowerBack", "glutes"] },
+  { id: "sleeper", kind: "cool", seconds: 30, eachSide: true, for: ["rearDelts", "sideDelts"] },
+  { id: "side-bend", kind: "cool", seconds: 30, eachSide: true, for: ["lats", "obliques"] },
+  { id: "neck-levator", kind: "cool", seconds: 30, eachSide: true, for: ["traps"] },
+  { id: "wrist-extensor", kind: "cool", seconds: 30, eachSide: true, for: ["forearms"] },
+  { id: "soleus", kind: "cool", seconds: 30, eachSide: true, for: ["calves"] },
 ];
 
 export const STRETCHES: Stretch[] = ROWS.map(({ text, ...r }) => {
