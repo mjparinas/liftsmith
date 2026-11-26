@@ -844,12 +844,12 @@ export const emails: Record<string, Words> = {
     intro: "Turn the programs you hand out again and again into something anyone can follow, free or for a price.",
     points: [
       "Under Coaching › Programs, put your routines on the days of a week with rest days in between (Auto-arrange can do it for you), check it on the month, then add a name, a level, a goal and how many weeks.",
-      "Leave the price empty for a free program, or set one once payments with Stripe are on.",
-      "Paid programs are bought on the website, and the money goes to your Stripe account.",
+      "Leave the price empty for a free program, or set one once payments with Stripe are on. Paid programs are bought on the website, and the money goes to your Stripe account.",
       "Share its link anywhere. People who have it keep it, even after you take it off the list.",
       "Each listed program gets its own page on the website, and lifters who've had it two weeks can rate it.",
+      "Run it in phases: Build weeks, a Deload week with fewer, lighter sets (one tap to add), and a Peak, and set reps for an exercise (say 8 to 12) or leave them on Auto.",
     ],
-    dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike.",
+    dyk: "There are no weights in a program: each lifter's own progression picks them, so one program fits beginners and veterans alike. Turn on Run the days in order and each lifter gets the next day whenever they train.",
   },
   "screenshot-share": {
     title: "Take a screenshot, get a card worth sharing",
@@ -1098,7 +1098,7 @@ export const emails: Record<string, Words> = {
       "Open the program calendar to see Done and Not yet for each day. School teams show first names only, never weights.",
       "Assign workouts or rest days on a month calendar. Athletes see the scheduled day on Today.",
     ],
-    dyk: "You can assign the same way from a school team card or a single client's report.",
+    dyk: "You can assign the same way from a school team card or a single client's report. You can also change a day for one client from their report, and program edits still reach every other day.",
   },
   "my-team": {
     title: "Your athletes get a My team dashboard",
@@ -1109,6 +1109,7 @@ export const emails: Record<string, Words> = {
       "Athletes no longer see Programs, Athletes or Setup. My team shows them only what they need.",
       "Team chat is for the whole team and you. You can delete any message, and athletes show by first name.",
       "Assigned programs sit on My team with Follow, and the week board shows who has trained.",
+      "Athletes following a program see it on Today with what's up next, and their month sits on My team.",
     ],
     dyk: "Team links now work when an athlete signs in after opening them, so nobody is left off the roster.",
   },

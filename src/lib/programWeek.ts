@@ -3,7 +3,7 @@
 // week and puts rest where the same big muscles would otherwise train two days running. Pure functions, no state.
 import { EXERCISE_BY_ID } from "./exercises";
 import { encodeRoutine } from "./routineShare";
-import { LARGE_MUSCLES, type Muscle, type Routine } from "./types";
+import { LARGE_MUSCLES, type Muscle, type PhaseKind, type ProgramPhase, type Routine } from "./types";
 
 /** One routine id (or null for rest) per weekday, indexed like JS getDay(): 0 = Sunday … 6 = Saturday. */
 export type Week = (string | null)[];
@@ -152,17 +152,103 @@ export interface MonthCell {
   week: number;
   routineId: string | null;
   inside: boolean;
+  /** Index of the program's phase this week falls in (0 without phases). */
+  phase: number;
 }
 
-export function monthCells(week: Week, start: number, weeks: number, firstDay: 0 | 1, count = 42): MonthCell[] {
+export function monthCells(
+  week: Week,
+  start: number,
+  weeks: number,
+  firstDay: 0 | 1,
+  count = 42,
+  phases?: readonly Pick<PhaseDraft, "weeks" | "week">[],
+): MonthCell[] {
   const s = new Date(start);
   s.setHours(0, 0, 0, 0);
   const back = (s.getDay() - firstDay + 7) % 7;
   const begin = new Date(s.getFullYear(), s.getMonth(), s.getDate() - back);
+  // With phases, each program week takes its phase's week; the program ends after the last phase.
+  const total = phases && phases.length > 1 ? phases.reduce((n, p) => n + p.weeks, 0) : weeks;
+  const phaseOf = (w: number): number => {
+    if (!phases || phases.length < 2) return 0;
+    let end = 0;
+    for (let i = 0; i < phases.length; i++) {
+      end += phases[i]!.weeks;
+      if (w <= end) return i;
+    }
+    return phases.length - 1;
+  };
   return Array.from({ length: count }, (_, i) => {
     const d = new Date(begin.getFullYear(), begin.getMonth(), begin.getDate() + i);
     const w = Math.floor(i / 7) + 1;
-    const inside = w <= weeks;
-    return { at: d.getTime(), week: w, routineId: inside ? (week[d.getDay()] ?? null) : null, inside };
+    const inside = w <= total;
+    const phase = phaseOf(w);
+    const days = phases && phases.length > 1 ? phases[phase]!.week : week;
+    return { at: d.getTime(), week: w, routineId: inside ? (days[d.getDay()] ?? null) : null, inside, phase };
   });
+}
+
+/** One phase as the builder edits it: a kind, how many weeks, and its week (stage 2, 2026-11-26). */
+export interface PhaseDraft {
+  kind: PhaseKind;
+  weeks: number;
+  week: Week;
+}
+
+/**
+ * What a builder with phases saves: every routine once, in the order it first runs (phase by phase, in calendar
+ * order), the first phase's weekdays as the days' own (so older apps and Assign still work), and the phases with
+ * their weekdays parallel to the routines when there is more than one.
+ */
+export function draftFromPhases(
+  phases: readonly PhaseDraft[],
+  firstDay: 0 | 1,
+): { routineIds: string[]; weekdays: number[][]; phases?: ProgramPhase[] } {
+  const routineIds: string[] = [];
+  for (const p of phases) for (const id of draftFromWeek(p.week, firstDay).routineIds) if (!routineIds.includes(id)) routineIds.push(id);
+  const weekdaysIn = (week: Week) => routineIds.map((id) => weekOrder(firstDay).filter((wd) => week[wd] === id));
+  const first = phases[0];
+  const weekdays = first ? weekdaysIn(first.week) : routineIds.map(() => []);
+  if (phases.length < 2) return { routineIds, weekdays };
+  return { routineIds, weekdays, phases: phases.map((p) => ({ kind: p.kind, weeks: p.weeks, weekdays: weekdaysIn(p.week) })) };
+}
+
+/** The builder's phases from a saved draft: one phase with the program's weeks, or its saved phases. */
+export function phasesFromDraft(
+  routineIds: readonly string[],
+  weekdays: readonly (readonly number[] | undefined)[] | undefined,
+  weeks: number,
+  phases?: readonly ProgramPhase[],
+): PhaseDraft[] {
+  if (!phases || phases.length < 2) return [{ kind: "build", weeks, week: weekFromDraft(routineIds, weekdays) }];
+  return phases.map((p) => {
+    const week = emptyWeek();
+    routineIds.forEach((id, i) => {
+      for (const wd of p.weekdays[i] ?? []) if (wd >= 0 && wd <= 6 && !week[wd]) week[wd] = id;
+    });
+    return { kind: p.kind, weeks: p.weeks, week };
+  });
+}
+
+/** Phases for a saved program when every day is one of the coach's routines unchanged; otherwise null (see weekFromProgram). */
+export function phasesFromProgram(
+  days: readonly { code?: string; weekdays?: number[] }[],
+  phases: readonly ProgramPhase[] | undefined,
+  weeks: number,
+  routines: readonly Routine[],
+): PhaseDraft[] | null {
+  if (!days.length) return null;
+  const ids: string[] = [];
+  for (const d of days) {
+    const r = routines.find((x) => encodeRoutine(x) === d.code);
+    if (!r) return null;
+    ids.push(r.id);
+  }
+  return phasesFromDraft(
+    ids,
+    days.map((d) => d.weekdays),
+    weeks,
+    phases,
+  );
 }

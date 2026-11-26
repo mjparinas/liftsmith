@@ -827,12 +827,12 @@ export const emails: Record<string, Words> = {
     intro: "Faites des programmes que vous donnez encore et encore quelque chose que tout le monde peut suivre, gratuit ou payant.",
     points: [
       "Dans Coaching › Programmes, placez vos routines sur les jours d'une semaine avec des repos entre elles (Organiser automatiquement le fait pour vous), vérifiez le mois, puis ajoutez un nom, un niveau, un objectif et le nombre de semaines.",
-      "Laissez le prix vide pour un programme gratuit, ou fixez-en un une fois les paiements Stripe activés.",
-      "Les programmes payants s'achètent sur le site, et l'argent va sur votre compte Stripe.",
+      "Laissez le prix vide pour un programme gratuit, ou fixez-en un une fois les paiements Stripe activés. Les programmes payants s'achètent sur le site, et l'argent va sur votre compte Stripe.",
       "Partagez son lien partout. Ceux qui l'ont le gardent, même après l'avoir retiré de la liste.",
       "Chaque programme publié a sa propre page sur le site, et les personnes qui l'ont depuis deux semaines peuvent le noter.",
+      "Faites-le en phases : des semaines de Construction, une semaine de Décharge avec moins de séries, plus légères (ajoutée en un toucher), et un Pic, et fixez les répétitions d'un exercice (par exemple 8 à 12) ou laissez-les sur Auto.",
     ],
-    dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés.",
+    dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés. Activez Faire les jours dans l'ordre et chacun fera le jour suivant dès qu'il s'entraîne.",
   },
   "screenshot-share": {
     title: "Une capture d’écran, une carte à partager",
@@ -1086,7 +1086,7 @@ export const emails: Record<string, Words> = {
       "Le calendrier du programme montre Fait et Pas encore. Les équipes scolaires : prénoms seulement, jamais de poids.",
       "Planifiez les entraînements et les jours de repos sur un calendrier mensuel. Les athlètes voient leur programme dans Aujourd’hui.",
     ],
-    dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client.",
+    dyk: "Vous pouvez aussi assigner depuis la fiche d’équipe scolaire ou le rapport d’un client. Vous pouvez aussi modifier un jour pour un client depuis son rapport, et les modifications du programme atteignent toujours les autres jours.",
   },
   "my-team": {
     title: "Vos athlètes ont un tableau de bord Mon équipe",
@@ -1097,6 +1097,7 @@ export const emails: Record<string, Words> = {
       "Les athlètes ne voient plus Programmes, Athlètes ni Configuration. Mon équipe ne montre que l'essentiel.",
       "Le chat d'équipe réunit toute l'équipe et vous. Vous pouvez supprimer n'importe quel message, et les athlètes apparaissent par leur prénom.",
       "Les programmes assignés sont sur Mon équipe avec Suivre, et le tableau de la semaine montre qui s'est entraîné.",
+      "Les athlètes qui suivent un programme le voient sur Aujourd'hui avec la suite, et leur mois est dans Mon équipe.",
     ],
     dyk: "Les liens d'équipe fonctionnent maintenant même si l'athlète se connecte après les avoir ouverts, donc personne ne manque à la liste.",
   },

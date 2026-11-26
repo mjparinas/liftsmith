@@ -1,8 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import { exerciseIdsFromCode, parseAssignDays } from "../server/coachProgramAssign";
-import { coachProgramDayIndex, coachProgramEndAt, coachProgramWeek, followAssign, type ProgramAssign } from "./coachProgramAssign";
+import {
+  catchUpAssign,
+  coachProgramDayIndex,
+  coachProgramEndAt,
+  coachProgramNext,
+  coachProgramToday,
+  coachProgramWeek,
+  followAssign,
+  type ProgramAssign,
+} from "./coachProgramAssign";
 import { PROGRAM_TEMPLATES, templateOk } from "./coachProgramTemplates";
+import type { AppEvent } from "./types";
 
 const assign = (over: Partial<ProgramAssign> = {}): ProgramAssign => ({
   id: "a1",
@@ -82,5 +92,90 @@ describe("followAssign and day index", () => {
     if (new Date(monday).getDay() === 2) expect(i).toBe(1);
     expect(coachProgramWeek(src, monday + 8 * 86_400_000)).toBe(2);
     expect(coachProgramEndAt(src)).toBe(src.startedAt + 4 * 7 * 86_400_000);
+  });
+});
+
+describe("catchUpAssign", () => {
+  it("rebuilds the followed days in place once the coach changes the program, keeping ids and the start day", () => {
+    const first = followAssign(assign({ status: "active", updatedAt: 5 }), 100);
+    const other = { id: "mine", name: "My own", items: [], createdAt: 1, updatedAt: 1 };
+    const routines = [...first.routines, other];
+    expect(catchUpAssign(routines, first.planSource, assign({ status: "active", updatedAt: 5 }), 200)).toBeNull();
+    const changed = assign({
+      status: "active",
+      updatedAt: 9,
+      weeks: 6,
+      tweaked: [1],
+      days: [
+        { name: "Upper A", code: "r1~VXBwZXI~bench-press.5~barbell-row.3", weekdays: [1] },
+        { name: "Lower A", code: "r1~TG93ZXI~leg-press.4~romanian-deadlift.3", weekdays: [3] },
+      ],
+    });
+    const next = catchUpAssign(routines, first.planSource, changed, 300)!;
+    expect(next.planSource).toMatchObject({ startedAt: 100, weeks: 6, syncedAt: 9, dayIds: first.planSource.dayIds, weekdays: [[1], [3]] });
+    expect(next.routines.map((r) => r.id)).toEqual([...first.planSource.dayIds, "mine"]);
+    expect(next.routines[1]!.items.map((i) => i.exerciseId)).toEqual(["leg-press", "romanian-deadlift"]);
+    expect(next.routines[0]!.createdAt).toBe(100);
+    // Once caught up, nothing more to do; another program or an ended one is left alone.
+    expect(catchUpAssign(next.routines, next.planSource, changed, 400)).toBeNull();
+    expect(catchUpAssign(routines, first.planSource, { ...changed, id: "other" }, 400)).toBeNull();
+    expect(catchUpAssign(routines, first.planSource, { ...changed, status: "ended" }, 400)).toBeNull();
+  });
+});
+
+describe("coachProgramNext", () => {
+  // Local dates, so the weekdays hold in any time zone: Monday 2024-01-01 at 9:00.
+  const monday = new Date(2024, 0, 1, 9).getTime();
+  const src = () => ({ ...followAssign(assign(), monday).planSource, startedAt: monday - 3_600_000 });
+
+  it("finds the next day after today, not today", () => {
+    // Today is Monday's Upper A; next is Tuesday's Lower A.
+    const next = coachProgramNext(src(), monday);
+    expect(next?.dayIndex).toBe(1);
+    expect(new Date(next!.at!).getDay()).toBe(2);
+    // From Tuesday it skips the rest of the week to next Monday.
+    const tue = new Date(2024, 0, 2, 9).getTime();
+    const after = coachProgramNext(src(), tue);
+    expect(after?.dayIndex).toBe(0);
+    expect(new Date(after!.at!).getDate()).toBe(8);
+  });
+
+  it("is null once no day is left before the end", () => {
+    const lastTue = new Date(2024, 0, 23, 9).getTime();
+    expect(coachProgramNext(src(), lastTue)).toBeNull();
+  });
+});
+
+describe("In order", () => {
+  const monday = new Date(2024, 0, 1, 9).getTime();
+  const day = 86_400_000;
+  const src = () => ({ ...followAssign({ ...assign(), inOrder: true }, monday).planSource, startedAt: monday - 3_600_000 });
+  const done = (sessionId: string, routine: string, at: number): AppEvent[] => [
+    { id: `${sessionId}-s`, type: "sessionStart", at, sessionId, gymId: "g", minutes: 45, routine },
+    { id: `${sessionId}-e`, type: "sessionEnd", at: at + 3_600_000, sessionId, seconds: 3600 },
+  ];
+
+  it("follows the plan source and starts on day 1 on any weekday", () => {
+    expect(src().inOrder).toBe(true);
+    // Thursday is no day's weekday, but In order runs Day 1 until it's done.
+    expect(coachProgramToday(src(), [], monday + 3 * day)).toBe(0);
+    expect(coachProgramNext(src(), monday + 3 * day)).toEqual({ dayIndex: 1, at: null });
+  });
+
+  it("moves on after each finished day, keeps today's while it's today, and wraps", () => {
+    const s = src();
+    const [d1, d2] = s.dayIds;
+    const events = done("w1", d1!, monday + 3 * day);
+    expect(coachProgramToday(s, events, monday + 3 * day + 2 * 3_600_000)).toBe(0);
+    expect(coachProgramToday(s, events, monday + 5 * day)).toBe(1);
+    const more = [...events, ...done("w2", d2!, monday + 5 * day)];
+    expect(coachProgramToday(s, more, monday + 6 * day)).toBe(0);
+    // A workout that isn't one of the program's days doesn't move it.
+    expect(coachProgramToday(s, [...events, ...done("w3", "other", monday + 5 * day)], monday + 6 * day)).toBe(1);
+  });
+
+  it("a weekday program still goes by weekday", () => {
+    const s = { ...src(), inOrder: false };
+    expect(coachProgramToday(s, [], monday + 3 * day)).toBeNull();
   });
 });

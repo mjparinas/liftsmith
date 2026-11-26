@@ -1,10 +1,20 @@
 import { available, EXERCISE_BY_ID } from "./exercises";
 import { planSeconds, restFor, type Plan, type PlanItem } from "./generator";
 import { t } from "./i18n";
-import { target } from "./progression";
+import { roundLoad } from "./loads";
+import { noteFor, target, TIMED } from "./progression";
 import { stretch } from "./stretches";
 import { linksOf, withLinks } from "./superset";
-import { BODY_PARTS, type AppEvent, type Gym, type Profile, type Routine, type RoutineItem, type RoutinePart } from "./types";
+import {
+  BODY_PARTS,
+  type AppEvent,
+  type Gym,
+  type PhaseKind,
+  type Profile,
+  type Routine,
+  type RoutineItem,
+  type RoutinePart,
+} from "./types";
 import { withWarmups } from "./warmup";
 
 // Saved routines (table stakes, Melvin, 2026-11-09): the lifter's own list of exercises and set
@@ -19,6 +29,18 @@ export const NAME_MAX = 40;
 export const clampSets = (n: number) => Math.min(10, Math.max(1, Math.round(n) || 1));
 /** A physio's prescribed reps or seconds (routine builder, 2026-11-22). */
 export const REPS_MAX = 120;
+/** A coach's rep range (program builder, 2026-11-26): 1 to 50 reps, at most 30 apart. */
+export const RANGE_MAX = 50;
+
+/** A coach's rep range as [lo, hi], or undefined when the item has none (or it makes no sense). */
+export function cleanRange(lo: unknown, hi: unknown): [number, number] | undefined {
+  if (typeof lo !== "number" || typeof hi !== "number" || !Number.isFinite(lo) || !Number.isFinite(hi)) return undefined;
+  const a = Math.round(lo);
+  const b = Math.round(hi);
+  if (a < 1 || b > RANGE_MAX || b < a || b - a > 30) return undefined;
+  return [a, b];
+}
+
 /** A physio's cue, kept short enough to sit under the target. */
 export const CUE_MAX = 80;
 
@@ -93,15 +115,17 @@ export function partDefaults(
 /** The routine's warm-up or cool-down part, if it has one. */
 export const routinePart = (r: Pick<Routine, "parts"> | undefined, kind: RoutinePart["kind"]) => r?.parts?.find((p) => p.kind === kind);
 
-/** One exercise row: sane sets, and a physio's reps and cue only on a rehab program. */
+/** One exercise row: sane sets, a physio's reps and cue only on a rehab program, and a coach's rep range otherwise. */
 function tidyItem(i: RoutineItem, rehab: boolean): RoutineItem {
   const reps = rehab ? cleanReps(i.reps) : undefined;
   const cue = rehab ? cleanCue(i.cue) : undefined;
+  const range = rehab ? undefined : cleanRange(i.reps, i.repsTo);
   return {
     exerciseId: i.exerciseId,
     sets: clampSets(i.sets),
     ...(i.group ? { group: i.group } : {}),
     ...(reps ? { reps } : {}),
+    ...(range ? { reps: range[0], repsTo: range[1] } : {}),
     ...(cue ? { cue } : {}),
   };
 }
@@ -178,9 +202,18 @@ export function doneItems(events: readonly AppEvent[], sessionId: string): Routi
   }));
 }
 
+/** Working sets in a coach program's phase: half on a deload, two thirds at a peak (never under one). */
+export function phaseSets(sets: number, phase: PhaseKind | undefined): number {
+  if (phase === "deload") return Math.max(1, Math.ceil(sets / 2));
+  if (phase === "peak") return Math.max(1, Math.round((sets * 2) / 3));
+  return sets;
+}
+
 /**
  * Today's plan from a routine at this gym: progression targets, warm-ups and supersets. Exercises
  * the gym can't do are left out (`dropped` names them). Null when nothing in it can be done here.
+ * A coach's rep range on an exercise becomes the lifter's range for it, so their own progression still picks the
+ * weight inside it; a coach program's phase (Deload, Peak) changes the sets and weight, with a note saying why.
  */
 export function planFromRoutine(
   base: Plan,
@@ -189,6 +222,7 @@ export function planFromRoutine(
   profile: Profile,
   gym: Gym,
   now: number,
+  phase?: PhaseKind,
 ): { plan: Plan; dropped: string[] } | null {
   const can = new Set(available(gym.equipment).map((e) => e.id));
   const kept = routine.items.filter((i) => can.has(i.exerciseId));
@@ -196,15 +230,31 @@ export function planFromRoutine(
   if (!kept.length) return null;
   const plain: PlanItem[] = kept.map((i) => {
     const ex = EXERCISE_BY_ID.get(i.exerciseId)!;
-    const base = target(ex, events, profile, gym, now);
+    const range = routine.rehab || ex.cardio || TIMED.has(ex.id) ? undefined : cleanRange(i.reps, i.repsTo);
+    const own = range
+      ? {
+          ...profile,
+          training: {
+            ...profile.training,
+            exercises: { ...profile.training?.exercises, [ex.id]: { ...profile.training?.exercises?.[ex.id], reps: range } },
+          },
+        }
+      : profile;
+    let goal = target(ex, events, own, gym, now);
+    if (phase === "deload" && !ex.cardio)
+      goal =
+        ex.load === "bodyweight" || goal.weight <= 0
+          ? { ...goal, note: noteFor(ex, "note.deloadEasy") }
+          : { ...goal, weight: roundLoad(goal.weight * 0.9, ex, gym).kg, note: t("note.deloadLighter") };
+    else if (phase === "peak" && !ex.cardio) goal = { ...goal, note: t("note.coachPeak") };
     const reps = routine.rehab ? cleanReps(i.reps) : undefined;
     const cue = routine.rehab ? cleanCue(i.cue) : undefined;
     return {
       exerciseId: ex.id,
-      sets: i.sets,
+      sets: ex.cardio ? i.sets : phaseSets(i.sets, phase),
       restSec: restFor(ex, profile.goal, profile.training),
       focus: ex.primary[0]!,
-      target: { ...base, ...(reps ? { reps } : {}), ...(cue ? { note: cue } : {}) },
+      target: { ...goal, ...(reps ? { reps } : {}), ...(cue ? { note: cue } : {}) },
     };
   });
   // A superset only holds where both exercises are still here and next to each other.

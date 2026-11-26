@@ -490,6 +490,25 @@ export const es: FeaturesText = {
       note: "Los programas de pago se compran en la web; las apps de Android e iPhone muestran los programas gratis y los que ya tienes.",
       proPart: "Conseguir programas es gratis; crearlos forma parte del coaching, que es Pro.",
     },
+    "program-phases": {
+      name: "Fases de programa y repeticiones del entrenador",
+      body: "El programa de un entrenador puede ir por fases, cada una repitiendo su propia semana: Construcción, una semana de Descarga con menos series y pesos más ligeros, y un Pico con menos series para llegar fresco. Añade una descarga con un toque, ve cada fase en el mes y fija las repeticiones de un ejercicio (por ejemplo, de 8 a 12) o déjalas en Auto para que el historial de cada persona las elija. Quien lo sigue ve en qué fase y semana está bajo el plan de Hoy.",
+      proPart: "Seguir un programa es gratis; crearlo forma parte del coaching, que es Pro.",
+    },
+    "client-program-copy": {
+      name: "Ajusta un programa para un cliente",
+      body: "Cambia un día del programa de un entrenador solo para un cliente, por ejemplo un ejercicio cambiado por una lesión. El día queda marcado como cambiado para esa persona y un toque recupera el día del programa. Lo que cambies en el programa sigue llegando a todos y a cada día que no cambiaste, y la app de cada persona lo recoge sola.",
+      proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
+    "coach-program-today": {
+      name: "De tu entrenador, en Hoy",
+      body: "Quien sigue el programa de un entrenador lo ve en Hoy: de quién es, el día de hoy, la semana y la fase, y lo siguiente con su día. Un deportista de un equipo escolar también ve el mes en Mi equipo, con los días hechos, perdidos y por venir.",
+    },
+    "program-in-order": {
+      name: "Programas que van en orden",
+      body: "Un entrenador puede hacer que un programa vaya en orden: cada persona hace el día siguiente cuando entrena, en lugar de en días fijos de la semana, y la semana queda como ritmo sugerido. Hoy dice lo que viene.",
+      proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
     "coach-pages": {
       name: "Una página para cada lado",
       body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",

@@ -823,12 +823,12 @@ export const emails: Record<string, Words> = {
     intro: "Tekrar tekrar verdiğin programları herkesin izleyebileceği bir şeye dönüştür, ücretsiz ya da ücretli.",
     points: [
       "Koçluk › Programlar'da rutinlerini haftanın günlerine, aralarına dinlenme koyarak yerleştir (Otomatik yerleştir bunu senin için yapar), ayı kontrol et, sonra ad, seviye, hedef ve hafta sayısı ekle.",
-      "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle.",
-      "Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
+      "Ücretsiz program için fiyatı boş bırak ya da Stripe ile ödemeler açıkken bir fiyat belirle. Ücretli programlar web sitesinden satın alınır ve para senin Stripe hesabına gider.",
       "Bağlantısını her yerde paylaş. Programa sahip olanlar, sen listeden kaldırsan bile onu tutar.",
       "Yayınlanan her programın web sitesinde kendi sayfası olur ve iki haftadır sahip olanlar onu puanlayabilir.",
+      "Evreler halinde ilerlet: Gelişim haftaları, daha az ve hafif setli bir Deload haftası (tek dokunuşla eklenir) ve bir Zirve; bir hareket için tekrarları belirle (örneğin 8-12) ya da Otomatik bırak.",
     ],
-    dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar.",
+    dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar. Günleri sırayla yap'ı açarsan herkes antrenman yaptığında sıradaki günü yapar.",
   },
   "screenshot-share": {
     title: "Ekran görüntüsü al, paylaşmaya değer bir kart al",
@@ -1078,7 +1078,7 @@ export const emails: Record<string, Words> = {
       "Program takvimi Yapıldı ve Henüz değil’i gösterir. Okul takımları: yalnızca adlar, asla ağırlık yok.",
       "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür.",
     ],
-    dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz.",
+    dyk: "Aynı atamayı okul takımı kartından veya bir danışanın raporundan da yapabilirsiniz. Bir danışanın raporundan yalnızca onun için bir günü de değiştirebilirsin; programdaki değişiklikler diğer günlere yine ulaşır.",
   },
   "my-team": {
     title: "Sporcularınıza Takımım paneli geldi",
@@ -1089,6 +1089,7 @@ export const emails: Record<string, Words> = {
       "Sporcular artık Programlar, Sporcular ve Kurulum'u görmüyor. Takımım yalnızca ihtiyaç duyduklarını gösteriyor.",
       "Takım sohbeti tüm takım ve sizin için. Her mesajı silebilirsiniz, sporcular adlarıyla görünür.",
       "Atanan programlar Takip et düğmesiyle Takımım'da durur ve haftalık tablo kimin antrenman yaptığını gösterir.",
+      "Program takip eden sporcular onu Bugün ekranında sıradakiyle birlikte görür; ayları Takımım'dadır.",
     ],
     dyk: "Takım bağlantıları artık sporcu bağlantıyı açtıktan sonra giriş yapsa da çalışıyor, böylece kimse kadrodan dışarıda kalmıyor.",
   },

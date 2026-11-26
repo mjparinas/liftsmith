@@ -826,12 +826,12 @@ export const emails: Record<string, Words> = {
     intro: "Transforme os programas que você passa repetidamente em algo que qualquer pessoa pode seguir, de graça ou pago.",
     points: [
       "Em Coaching › Programas, coloque suas rotinas nos dias de uma semana com descansos entre elas (Organizar sozinho faz isso por você), confira o mês e depois adicione um nome, um nível, um objetivo e quantas semanas.",
-      "Deixe o preço vazio para um programa gratuito, ou defina um quando os pagamentos com Stripe estiverem ativos.",
-      "Programas pagos são comprados no site, e o dinheiro vai para a sua conta Stripe.",
+      "Deixe o preço vazio para um programa gratuito, ou defina um quando os pagamentos com Stripe estiverem ativos. Programas pagos são comprados no site, e o dinheiro vai para a sua conta Stripe.",
       "Compartilhe o link em qualquer lugar. Quem tem o programa continua com ele, mesmo depois que você o tira da lista.",
       "Cada programa publicado ganha sua própria página no site, e quem o tem há duas semanas pode avaliá-lo.",
+      "Divida em fases: semanas de Construção, uma semana de Deload com séries menos numerosas e mais leves (adicionada com um toque) e um Pico, e defina as repetições de um exercício (por exemplo, de 8 a 12) ou deixe no Auto.",
     ],
-    dyk: "Um programa não tem pesos: a progressão de cada pessoa escolhe os pesos, então o mesmo programa serve para iniciantes e veteranos.",
+    dyk: "Um programa não tem pesos: a progressão de cada pessoa escolhe os pesos, então o mesmo programa serve para iniciantes e veteranos. Ative Fazer os dias em ordem e cada pessoa faz o próximo dia sempre que treinar.",
   },
   "screenshot-share": {
     title: "Tire uma captura de tela e ganhe um card que vale compartilhar",
@@ -1083,7 +1083,7 @@ export const emails: Record<string, Words> = {
       "O calendário do programa mostra Feito e Ainda não. Equipas escolares: só primeiros nomes, nunca pesos.",
       "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje.",
     ],
-    dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente.",
+    dyk: "Pode atribuir da mesma forma no cartão da equipa escolar ou no relatório de um cliente. Você também pode mudar um dia para um cliente no relatório dele, e as mudanças no programa continuam chegando aos outros dias.",
   },
   "my-team": {
     title: "Seus atletas ganham o painel Meu time",
@@ -1094,6 +1094,7 @@ export const emails: Record<string, Words> = {
       "Os atletas não veem mais Programas, Atletas nem Configuração. Meu time mostra só o que eles precisam.",
       "O chat do time é para o time todo e para você. Você pode apagar qualquer mensagem, e os atletas aparecem pelo primeiro nome.",
       "Os programas atribuídos ficam em Meu time com Seguir, e o quadro da semana mostra quem treinou.",
+      "Atletas que seguem um programa o veem em Hoje com o próximo dia, e o mês deles fica em Meu time.",
     ],
     dyk: "Os links do time agora funcionam mesmo se o atleta entrar depois de abri-los, então ninguém fica de fora da lista.",
   },

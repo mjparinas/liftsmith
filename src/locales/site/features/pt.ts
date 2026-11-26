@@ -565,6 +565,25 @@ export const pt: FeaturesText = {
       note: "Programas pagos são comprados no site; os apps de Android e iPhone mostram os programas grátis e os que você já tem.",
       proPart: "Pegar programas é grátis; criá-los faz parte do coaching, que é Pro.",
     },
+    "program-phases": {
+      name: "Fases do programa e repetições do treinador",
+      body: "O programa de um treinador pode seguir em fases, cada uma repetindo a própria semana: Construção, uma semana de Deload com menos séries e cargas mais leves, e um Pico com menos séries para chegar descansado. Adicione um deload com um toque, veja cada fase no mês e defina as repetições de um exercício (por exemplo, de 8 a 12) ou deixe no Auto para que o histórico de cada pessoa escolha. Quem segue vê em que fase e semana está abaixo do plano de Hoje.",
+      proPart: "Seguir um programa é grátis; criar um faz parte do coaching, que é Pro.",
+    },
+    "client-program-copy": {
+      name: "Ajuste um programa para um cliente",
+      body: "Mude um dia do programa de um treinador só para um cliente, por exemplo um exercício trocado por causa de uma lesão. O dia fica marcado como mudado para essa pessoa e um toque traz de volta o dia do programa. As mudanças no programa continuam chegando a todos e a cada dia que você não mudou, e o app de cada pessoa recebe sozinho.",
+      proPart: "Ser cliente é grátis; treinar clientes é Pro.",
+    },
+    "coach-program-today": {
+      name: "Do seu treinador, em Hoje",
+      body: "Quem segue o programa de um treinador o vê em Hoje: de quem é, o dia de hoje, a semana e a fase, e o próximo com o seu dia. Um atleta de um time escolar também vê o mês em Meu time, com os dias feitos, perdidos e que vêm aí.",
+    },
+    "program-in-order": {
+      name: "Programas que seguem em ordem",
+      body: "Um treinador pode fazer um programa seguir em ordem: cada pessoa faz o próximo dia sempre que treina, em vez de em dias fixos da semana, e a semana fica como ritmo sugerido. Hoje mostra o que vem a seguir.",
+      proPart: "Ser cliente é grátis; treinar clientes é Pro.",
+    },
     "coach-calendar": {
       name: "Calendário de treinos",
       body: "Atribua treinos ou dias de descanso no calendário mensal. Os atletas veem a programação do dia em Hoje. Convide treinadores assistentes para editar um calendário e confira a atividade dos atletas.",

@@ -823,12 +823,12 @@ export const emails: Record<string, Words> = {
     intro: "Zamień programy, które dajesz raz po raz, w coś, co każdy może realizować, za darmo lub za opłatą.",
     points: [
       "W Coaching › Programy rozłóż swoje rutyny na dni tygodnia z odpoczynkiem pomiędzy (Ułóż automatycznie zrobi to za ciebie), sprawdź miesiąc, a potem dodaj nazwę, poziom, cel i liczbę tygodni.",
-      "Zostaw cenę pustą dla darmowego programu albo ustaw ją, gdy płatności przez Stripe są włączone.",
-      "Płatne programy kupuje się na stronie, a pieniądze trafiają na Twoje konto Stripe.",
+      "Zostaw cenę pustą dla darmowego programu albo ustaw ją, gdy płatności przez Stripe są włączone. Płatne programy kupuje się na stronie, a pieniądze trafiają na Twoje konto Stripe.",
       "Udostępnij link gdziekolwiek. Kto ma program, zachowuje go, nawet gdy zdejmiesz go z listy.",
       "Każdy opublikowany program ma własną stronę w serwisie, a osoby, które mają go od dwóch tygodni, mogą go ocenić.",
+      "Prowadź go fazami: tygodnie Budowy, tydzień Odciążenia z mniejszą liczbą lżejszych serii (dodawany jednym dotknięciem) i Szczyt, a dla ćwiczenia ustal powtórzenia (np. 8–12) albo zostaw Auto.",
     ],
-    dyk: "Program nie ma ciężarów: dobiera je progresja każdej osoby, więc jeden program pasuje i początkującym, i weteranom.",
+    dyk: "Program nie ma ciężarów: dobiera je progresja każdej osoby, więc jeden program pasuje i początkującym, i weteranom. Włącz Dni po kolei, a każdy zrobi następny dzień, kiedy tylko będzie trenować.",
   },
   "screenshot-share": {
     title: "Zrób zrzut ekranu, dostań kartę wartą udostępnienia",
@@ -1079,7 +1079,7 @@ export const emails: Record<string, Words> = {
       "Kalendarz programu pokazuje Zrobione i Jeszcze nie. Drużyny szkolne: tylko imiona, nigdy ciężary.",
       "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj.",
     ],
-    dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta.",
+    dyk: "Możesz przypisać tak samo z karty drużyny szkolnej lub raportu klienta. Możesz też zmienić dzień dla jednego klienta w jego raporcie, a zmiany w programie nadal trafiają do pozostałych dni.",
   },
   "my-team": {
     title: "Twoi zawodnicy dostają panel Moja drużyna",
@@ -1090,6 +1090,7 @@ export const emails: Record<string, Words> = {
       "Zawodnicy nie widzą już Programów, Zawodników ani Konfiguracji. Moja drużyna pokazuje tylko to, czego potrzebują.",
       "Czat drużyny jest dla całej drużyny i dla Ciebie. Możesz usunąć każdą wiadomość, a zawodnicy są widoczni po imieniu.",
       "Przypisane programy są w Mojej drużynie z przyciskiem Obserwuj, a tablica tygodnia pokazuje, kto trenował.",
+      "Zawodnicy realizujący program widzą go na ekranie Dziś z tym, co następne, a ich miesiąc jest w Mojej drużynie.",
     ],
     dyk: "Linki do drużyny działają teraz także wtedy, gdy zawodnik zaloguje się po ich otwarciu, więc nikt nie wypada ze składu.",
   },

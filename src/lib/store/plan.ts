@@ -1,6 +1,6 @@
 import { track } from "../analytics";
 import { weekStart } from "../block";
-import { coachProgramDayIndex } from "../coachProgramAssign";
+import { coachProgramPhase, coachProgramToday } from "../coachProgramAssign";
 import { scheduledRoutine } from "../coachSchedule";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
@@ -212,11 +212,12 @@ export function planSlice(c: Ctx): PlanSlice {
       const trying = get().tryAdaptive && !can("adaptive") && freeAdaptiveLeft(events, now);
       const src = trying ? undefined : profile.planSource;
       // A saved routine replaces today's plan (adaptive or program), where this gym can do it.
-      // A season coach program (coachProgramAssign.ts) picks today's weekday-bound day when no one-day override is on.
+      // A season coach program (coachProgramAssign.ts) picks today's day (by weekday, or the next one In order) when no
+      // one-day override is on.
       const coachDay =
         !get().routineId && src?.kind === "coachProgram"
           ? (() => {
-              const i = coachProgramDayIndex(src, now);
+              const i = coachProgramToday(src, events, now);
               return i === null ? null : (profile.routines?.find((x) => x.id === src.dayIds[i]) ?? null);
             })()
           : null;
@@ -235,7 +236,9 @@ export function planSlice(c: Ctx): PlanSlice {
         ? { ...generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: false }), items: [], estMinutes: 0 }
         : (fromProgram ?? generate({ gym: g, profile, events, minutes: sized.minutes, now, call, challenge: r.challenge }));
       // It isn't a program day, so the program's next day stays next.
-      const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
+      // A coach program's Deload or Peak phase changes that day's sets and weights (routines.ts phaseSets).
+      const phase = coachDay && routine === coachDay && src?.kind === "coachProgram" ? coachProgramPhase(src, now).kind : undefined;
+      const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now, phase)?.plan : undefined;
       // A rehab routine from the lifter's physio stays as written: it's meant for the injured area (trainer-mode.md).
       if (fromRoutine)
         plan = routine?.rehab

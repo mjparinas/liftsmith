@@ -46,6 +46,18 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.24.0",
+    day: "2026-11-27",
+    headline:
+      "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, and a program can run in order",
+    changes: [
+      { id: "programPhases", kind: "new", icon: "layers" },
+      { id: "programTweaks", kind: "new", icon: "people" },
+      { id: "programAthlete", kind: "new", icon: "calendar" },
+      { id: "programInOrder", kind: "new", icon: "layers" },
+    ],
+  },
+  {
     version: "0.20.1",
     day: "2026-11-26",
     headline: "My team for school athletes, and coaches lay out programs on a week and a month with Auto-arrange",

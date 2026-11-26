@@ -565,6 +565,25 @@ export const tr: FeaturesText = {
       note: "Ücretli programlar web sitesinden satın alınır; Android ve iPhone uygulamaları ücretsiz programları ve sahip olduklarını gösterir.",
       proPart: "Program almak ücretsiz; program oluşturmak Pro olan koçluğun parçası.",
     },
+    "program-phases": {
+      name: "Program evreleri ve koçun tekrarları",
+      body: "Bir koçun programı evreler halinde ilerleyebilir; her evre kendi haftasını tekrarlar: Gelişim, daha az set ve daha hafif ağırlıklarla bir Deload haftası ve dinç kalmak için daha az setli bir Zirve. Tek dokunuşla deload ekle, her evreyi ayda gör ve bir hareket için tekrarları belirle (örneğin 8-12) ya da Otomatik bırak, her kişinin kendi geçmişi seçsin. Programı izleyenler Bugün planının altında hangi evrede ve haftada olduklarını görür.",
+      proPart: "Bir programı izlemek ücretsizdir; program oluşturmak Pro olan koçluğun parçasıdır.",
+    },
+    "client-program-copy": {
+      name: "Programı tek bir danışana göre ayarla",
+      body: "Bir koçun programındaki bir günü yalnızca bir danışan için değiştir, örneğin sakatlık nedeniyle değiştirilen bir hareket. O gün o kişi için değişti olarak işaretlenir ve tek dokunuş programdaki günü geri getirir. Programda yaptığın değişiklikler herkese ve değiştirmediğin her güne yine ulaşır; herkesin uygulaması bunu kendiliğinden alır.",
+      proPart: "Danışan olmak ücretsizdir; danışan çalıştırmak Pro'dur.",
+    },
+    "coach-program-today": {
+      name: "Bugün ekranında koçundan",
+      body: "Bir koçun programını takip eden kişi bunu Bugün ekranında görür: kimden geldiğini, bugünün gününü, haftayı ve aşamayı, sıradaki günü ve tarihini. Okul takımındaki bir sporcu Takımım'da yapılan, kaçırılan ve gelecek günleriyle ayı da görür.",
+    },
+    "program-in-order": {
+      name: "Sırayla ilerleyen programlar",
+      body: "Koç bir programın günlerini sırayla ilerletebilir: herkes sabit hafta günleri yerine ne zaman antrenman yaparsa sıradaki günü yapar ve hafta önerilen bir düzen olarak kalır. Bugün ekranı sıradakini gösterir.",
+      proPart: "Danışan olmak ücretsizdir; danışan çalıştırmak Pro'dur.",
+    },
     "coach-calendar": {
       name: "Antrenman takvimi",
       body: "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

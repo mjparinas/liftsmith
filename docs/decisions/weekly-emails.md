@@ -895,7 +895,16 @@ Athletes on your school team now open My team: their team, you as their coach, t
 - Athletes no longer see Programs, Athletes or Setup. My team shows them only what they need.
 - Team chat is for the whole team and you. You can delete any message, and athletes show by first name.
 - Assigned programs sit on My team with Follow, and the week board shows who has trained.
+- Athletes following a program see it on Today with what's up next, and their month sits on My team.
 Did you know? Team links now work when an athlete signs in after opening them, so nobody is left off the roster. ([School teams](school-teams.md))
 
 
 **New, 2026-11-25.** The coach assignment tip includes the month calendar for scheduling workouts and rest days.
+
+**New, 2026-11-26.** The "Share and sell your programs" email gets a point on phases (Build, a one-tap Deload week, Peak) and coach-set reps with Auto as the default.
+
+**New, 2026-11-26.** The "Assign a season program" email's Did you know line adds changing a day for one client from their report.
+
+**New, 2026-11-26.** The My team email gets a point on "From your coach" on Today, Up next and the month on My team.
+
+**New, 2026-11-26.** The "Share and sell your programs" email's Did you know line adds Run the days in order.

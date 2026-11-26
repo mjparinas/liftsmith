@@ -52,6 +52,7 @@ import type { Routine } from "@/lib/types";
 import { fmtNum, fmtWeight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
+import { ClientProgramDays } from "./ClientProgramDays";
 import { ClientBody } from "./CoachBody";
 import { CalendarAccessScreen, TrainingActivityScreen } from "./CoachCalendar";
 import { backToCoaching, ChatScreen } from "./CoachChat";
@@ -303,6 +304,7 @@ function ClientProgramAssign({
               {t("cpg.assignCalendar")}
             </Button>
           )}
+          <ClientProgramDays assign={active} athlete={athlete} onChange={onChange} />
         </div>
       )}
       {note && (

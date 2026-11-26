@@ -13,10 +13,13 @@
 // Teens: a coach under 18 can't list programs, and a lifter under 18 can get free programs but can't buy one.
 import { randomBytes } from "node:crypto";
 
+import { cleanPhases, phaseWeeks } from "@/lib/programPhases";
 import { SITE_URL } from "@/lib/site";
+import type { ProgramPhase } from "@/lib/types";
 
 import { isAccountId, isRoutineCode, nameOf, roleOf, teenProfile, type Role } from "./coach";
 import { accountRow, call, coachOfStripe, feeFor, minorUnits, payAccount, type ConnectEvent, type PayConfig } from "./coachPay";
+import { syncProgramAssigns } from "./coachProgramAssign";
 import { batch, query, run } from "./db";
 import { checkText, tidy } from "./moderation";
 import { notifyCoach } from "./push";
@@ -61,6 +64,10 @@ export interface CoachProgram {
   goal: Goal;
   weeks: number;
   days: ProgramDay[];
+  /** Phases (Build, Deload, Peak) when the program has more than one week laid out; weekdays parallel to days. */
+  phases?: ProgramPhase[];
+  /** The days run one after another whenever the lifter trains; the weekdays are then a suggested rhythm. */
+  inOrder?: true;
   /** 0 is free. In whole units of `currency`. */
   price: number;
   currency: string;
@@ -81,6 +88,8 @@ interface Row {
   goal: string;
   weeks: number;
   days: string;
+  phases?: string | null;
+  in_order?: number | null;
   price: number;
   currency: string;
   listed: number;
@@ -138,6 +147,17 @@ function readDays(raw: string): { name: string; code: string; weekdays?: number[
   }
 }
 
+/** A stored program's phases, when it has them and they still match its days. */
+export function readPhases(r: Pick<Row, "phases" | "days">): { phases?: ProgramPhase[] } {
+  if (!r.phases) return {};
+  try {
+    const phases = cleanPhases(JSON.parse(String(r.phases)), readDays(String(r.days)).length);
+    return phases ? { phases } : {};
+  } catch {
+    return {};
+  }
+}
+
 async function shape(r: Row, viewer: string | null, ownedIds: Set<string>, sales?: number): Promise<CoachProgram> {
   const mine = viewer === String(r.coach_id);
   const free = Number(r.price) === 0;
@@ -158,6 +178,8 @@ async function shape(r: Row, viewer: string | null, ownedIds: Set<string>, sales
       ...(d.weekdays ? { weekdays: d.weekdays } : {}),
       ...(owned || free ? { code: d.code } : {}),
     })),
+    ...readPhases(r),
+    ...(Number(r.in_order) === 1 ? { inOrder: true as const } : {}),
     price: Number(r.price),
     currency: String(r.currency),
     listed: Number(r.listed) === 1,
@@ -206,6 +228,10 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
       : [];
     clean.push({ name, code: d.code, ...(weekdays.length ? { weekdays } : {}) });
   }
+  // Phases (stage 2 of the builder): when there are any, the program's weeks are theirs added up.
+  const phases = p.phases === undefined || p.phases === null ? null : cleanPhases(p.phases, clean.length);
+  if (p.phases !== undefined && p.phases !== null && !phases) return { error: "bad" };
+  if (phases) p.weeks = phaseWeeks(phases);
   if (!inRange(p.weeks, PROGRAM_LIMITS.weeks)) return { error: "bad" };
   const price = p.price === 0 || p.price === undefined || p.price === null ? 0 : p.price;
   if (
@@ -227,11 +253,12 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
   }
   const amount = price ? Math.round(Number(price) * 100) / 100 : 0;
   await run(
-    `INSERT INTO coach_programs (id, coach_id, title, about, level, goal, weeks, days, price, currency, listed, hidden, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+    `INSERT INTO coach_programs
+       (id, coach_id, title, about, level, goal, weeks, days, phases, in_order, price, currency, listed, hidden, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
      ON CONFLICT (id) DO UPDATE SET title = excluded.title, about = excluded.about, level = excluded.level, goal = excluded.goal,
-       weeks = excluded.weeks, days = excluded.days, price = excluded.price, currency = excluded.currency, listed = excluded.listed,
-       updated_at = excluded.updated_at`,
+       weeks = excluded.weeks, days = excluded.days, phases = excluded.phases, in_order = excluded.in_order, price = excluded.price,
+       currency = excluded.currency, listed = excluded.listed, updated_at = excluded.updated_at`,
     [
       id,
       coachId,
@@ -241,6 +268,8 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
       pick(GOALS, p.goal, "strength"),
       p.weeks as number,
       JSON.stringify(clean),
+      phases ? JSON.stringify(phases) : "",
+      p.inOrder === true ? 1 : 0,
       amount,
       acc?.currency ?? (await payAccount(coachId))?.currency ?? "usd",
       p.listed === false ? 0 : 1,
@@ -248,6 +277,8 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
       now,
     ],
   );
+  // Everyone on this program gets the change, apart from the days changed for them alone (stage 3, 2026-11-26).
+  await syncProgramAssigns(coachId, id, now);
   return (await programFor(id, coachId))!;
 }
 

@@ -494,6 +494,25 @@ export const de: FeaturesText = {
       note: "Kostenpflichtige Programme werden auf der Website gekauft; die Android- und iPhone-Apps zeigen kostenlose Programme und die, die du hast.",
       proPart: "Programme zu bekommen ist kostenlos; sie zu erstellen gehört zum Coaching, das Pro ist.",
     },
+    "program-phases": {
+      name: "Programmphasen und Wiederholungen vom Coach",
+      body: "Das Programm eines Coaches kann in Phasen laufen, jede mit ihrer eigenen Woche: Aufbau, eine Deload-Woche mit weniger Sätzen und leichteren Gewichten und eine Peak-Phase mit weniger Sätzen, damit man frisch ist. Füge mit einem Tippen eine Deload-Woche hinzu, sieh jede Phase im Monat und lege Wiederholungen für eine Übung fest (etwa 8 bis 12) oder lass sie auf Auto, damit der eigene Verlauf jeder Person sie wählt. Wer trainiert, sieht unter dem Plan auf Heute, in welcher Phase und Woche er gerade ist.",
+      proPart: "Einem Programm zu folgen ist kostenlos; eines zu erstellen gehört zum Coaching, und das ist Pro.",
+    },
+    "client-program-copy": {
+      name: "Ein Programm für eine Person anpassen",
+      body: "Ändere einen Tag im Programm eines Coaches nur für eine Person, etwa eine Übung, die wegen einer Verletzung getauscht wird. Der Tag ist für sie als geändert markiert, und ein Tippen holt den Tag aus dem Programm zurück. Änderungen am Programm erreichen weiter alle und jeden Tag, den du nicht geändert hast, und die App übernimmt sie von selbst.",
+      proPart: "Kunde zu sein ist kostenlos; Kunden zu coachen ist Pro.",
+    },
+    "coach-program-today": {
+      name: "Von deinem Coach auf Heute",
+      body: "Wer dem Programm eines Coaches folgt, sieht es auf Heute: von wem es ist, den heutigen Tag, Woche und Phase, und was als Nächstes kommt, mit Tag. Wer in einem Schulteam ist, sieht in Mein Team auch den Monat mit erledigten, verpassten und kommenden Tagen.",
+    },
+    "program-in-order": {
+      name: "Programme, die der Reihe nach laufen",
+      body: "Ein Coach kann ein Programm der Reihe nach laufen lassen: Jede Person macht den nächsten Tag, wann immer sie trainiert, statt an festen Wochentagen, und die Woche bleibt ein vorgeschlagener Rhythmus. Heute zeigt, was als Nächstes kommt.",
+      proPart: "Kunde zu sein ist kostenlos; Kunden zu coachen ist Pro.",
+    },
     "coach-pages": {
       name: "Eine Seite für jede Seite",
       body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",

@@ -825,12 +825,12 @@ export const emails: Record<string, Words> = {
     intro: "Mach aus den Programmen, die du immer wieder ausgibst, etwas, dem jeder folgen kann, kostenlos oder mit Preis.",
     points: [
       "Unter Coaching › Programme legst du deine Routinen auf die Tage einer Woche, mit Ruhetagen dazwischen (Automatisch planen macht das für dich), prüfst den Monat und gibst dann Name, Level, Ziel und Anzahl Wochen an.",
-      "Lass den Preis leer für ein kostenloses Programm, oder leg einen fest, sobald Zahlungen mit Stripe eingerichtet sind.",
-      "Kostenpflichtige Programme werden auf der Website gekauft, und das Geld geht auf dein Stripe-Konto.",
+      "Lass den Preis leer für ein kostenloses Programm, oder leg einen fest, sobald Zahlungen mit Stripe eingerichtet sind. Kostenpflichtige Programme werden auf der Website gekauft, und das Geld geht auf dein Stripe-Konto.",
       "Teile den Link überall. Wer es hat, behält es, auch wenn du es von der Liste nimmst.",
       "Jedes veröffentlichte Programm bekommt eine eigene Seite auf der Website, und wer es seit zwei Wochen hat, kann es bewerten.",
+      "Lass es in Phasen laufen: Aufbauwochen, eine Deload-Woche mit weniger, leichteren Sätzen (mit einem Tippen hinzugefügt) und eine Peak-Phase, und lege Wiederholungen für eine Übung fest (etwa 8 bis 12) oder lass sie auf Auto.",
     ],
-    dyk: "Ein Programm enthält keine Gewichte: Die eigene Progression jedes Trainierenden wählt sie, also passt ein Programm für Anfänger und Erfahrene.",
+    dyk: "Ein Programm enthält keine Gewichte: Die eigene Progression jedes Trainierenden wählt sie, also passt ein Programm für Anfänger und Erfahrene. Schalte Tage der Reihe nach ein, und jede Person macht den nächsten Tag, wann immer sie trainiert.",
   },
   "screenshot-share": {
     title: "Screenshot machen, Karte zum Teilen bekommen",
@@ -1082,7 +1082,7 @@ export const emails: Record<string, Words> = {
       "Der Programmkalender zeigt Erledigt und Noch nicht. Schulteams: nur Vornamen, nie Gewichte.",
       "Plane Trainings und Ruhetage im Monatskalender. Athleten sehen den geplanten Tag unter Heute.",
     ],
-    dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten.",
+    dyk: "Gleicher Weg vom Schulteam-Karte oder dem Bericht eines Klienten. Du kannst auch einen Tag für eine Person in ihrem Bericht ändern, und Änderungen am Programm erreichen weiter alle anderen Tage.",
   },
   "my-team": {
     title: "Deine Athleten bekommen das Dashboard Mein Team",
@@ -1093,6 +1093,7 @@ export const emails: Record<string, Words> = {
       "Athleten sehen Programme, Athleten und Einrichtung nicht mehr. Mein Team zeigt nur, was sie brauchen.",
       "Der Team-Chat ist für das ganze Team und dich. Du kannst jede Nachricht löschen, Athleten erscheinen mit Vornamen.",
       "Zugewiesene Programme stehen mit Folgen auf Mein Team, und die Wochentafel zeigt, wer trainiert hat.",
+      "Wer einem Programm folgt, sieht es auf Heute mit dem, was als Nächstes kommt, und den Monat in Mein Team.",
     ],
     dyk: "Team-Links funktionieren jetzt auch, wenn sich ein Athlet erst nach dem Öffnen anmeldet, also fehlt niemand im Kader.",
   },

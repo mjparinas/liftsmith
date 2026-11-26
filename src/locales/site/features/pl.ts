@@ -565,6 +565,25 @@ export const pl: FeaturesText = {
       note: "Płatne programy kupuje się na stronie; aplikacje na Androida i iPhone'a pokazują programy darmowe i te, które już masz.",
       proPart: "Pobieranie programów jest darmowe; tworzenie ich to część coachingu, który jest w Pro.",
     },
+    "program-phases": {
+      name: "Fazy programu i powtórzenia od trenera",
+      body: "Program trenera może iść fazami, a każda powtarza własny tydzień: Budowa, tydzień Odciążenia z mniejszą liczbą serii i lżejszymi ciężarami oraz Szczyt z mniejszą liczbą serii, żeby być wypoczętym. Dodaj odciążenie jednym dotknięciem, zobacz każdą fazę w miesiącu i ustal powtórzenia dla ćwiczenia (np. 8–12) albo zostaw Auto, żeby wybrała je historia każdej osoby. Osoby, które go realizują, widzą pod planem na Dziś, w której fazie i tygodniu są.",
+      proPart: "Realizowanie programu jest bezpłatne; tworzenie go jest częścią coachingu, który jest w Pro.",
+    },
+    "client-program-copy": {
+      name: "Dopasuj program do jednego klienta",
+      body: "Zmień dzień w programie trenera tylko dla jednego klienta, np. ćwiczenie wymienione z powodu kontuzji. Dzień jest oznaczony jako zmieniony dla tej osoby, a jedno dotknięcie przywraca dzień z programu. Zmiany w programie nadal trafiają do wszystkich i do każdego dnia, którego nie zmieniłeś, a aplikacja każdej osoby pobiera je sama.",
+      proPart: "Bycie klientem jest bezpłatne; prowadzenie klientów jest w Pro.",
+    },
+    "coach-program-today": {
+      name: "Od trenera na ekranie Dziś",
+      body: "Kto realizuje program trenera, widzi go na ekranie Dziś: od kogo jest, dzisiejszy dzień, tydzień i fazę oraz to, co następne, z dniem. Zawodnik drużyny szkolnej widzi też miesiąc w Mojej drużynie, z dniami zrobionymi, pominiętymi i nadchodzącymi.",
+    },
+    "program-in-order": {
+      name: "Programy realizowane po kolei",
+      body: "Trener może ustawić program, by dni szły po kolei: każdy robi następny dzień, kiedy tylko trenuje, zamiast w stałe dni tygodnia, a tydzień zostaje jako sugerowany rytm. Ekran Dziś pokazuje, co następne.",
+      proPart: "Bycie klientem jest bezpłatne; prowadzenie klientów jest w Pro.",
+    },
     "coach-calendar": {
       name: "Kalendarz treningów",
       body: "Planuj treningi i dni odpoczynku w kalendarzu miesięcznym. Zawodnicy widzą plan dnia na ekranie Dzisiaj. Zaproś asystentów do edycji kalendarza i sprawdzaj aktywność zawodników.",

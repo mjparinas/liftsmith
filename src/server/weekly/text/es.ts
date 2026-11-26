@@ -824,12 +824,12 @@ export const emails: Record<string, Words> = {
     intro: "Convierte los programas que repites una y otra vez en algo que cualquiera pueda seguir, gratis o con precio.",
     points: [
       "En Coaching › Programas, pon tus rutinas en los días de una semana con descansos entre ellas (Organizar solo lo hace por ti), revísalo en el mes y luego añade un nombre, un nivel, un objetivo y cuántas semanas.",
-      "Deja el precio vacío para un programa gratis, o pon uno cuando tengas los pagos con Stripe activados.",
-      "Los programas de pago se compran en la web y el dinero va a tu cuenta de Stripe.",
+      "Deja el precio vacío para un programa gratis, o pon uno cuando tengas los pagos con Stripe activados. Los programas de pago se compran en la web y el dinero va a tu cuenta de Stripe.",
       "Comparte su enlace donde quieras. Quien ya lo tiene lo conserva, aunque lo quites de la lista.",
       "Cada programa publicado tiene su propia página en la web, y quienes lo tienen desde hace dos semanas pueden valorarlo.",
+      "Hazlo por fases: semanas de Construcción, una semana de Descarga con series menos y más ligeras (se añade con un toque) y un Pico, y fija las repeticiones de un ejercicio (por ejemplo, de 8 a 12) o déjalas en Auto.",
     ],
-    dyk: "Un programa no lleva pesos: la progresión de cada deportista los elige, así que un mismo programa sirve a principiantes y veteranos.",
+    dyk: "Un programa no lleva pesos: la progresión de cada deportista los elige, así que un mismo programa sirve a principiantes y veteranos. Activa Hacer los días en orden y cada persona hará el día siguiente cuando entrene.",
   },
   "screenshot-share": {
     title: "Haz una captura y llévate una tarjeta para compartir",
@@ -1081,7 +1081,7 @@ export const emails: Record<string, Words> = {
       "Abre el calendario del programa para ver Hecho y Aún no cada día. En equipos escolares solo nombres de pila, nunca pesos.",
       "Asigna entrenamientos o días de descanso en un calendario mensual. Los atletas ven lo programado en Hoy.",
     ],
-    dyk: "Puedes asignar igual desde la ficha del equipo escolar o el informe de un cliente.",
+    dyk: "Puedes asignar igual desde la ficha del equipo escolar o el informe de un cliente. También puedes cambiar un día para un cliente desde su informe, y lo que cambies en el programa sigue llegando a los demás días.",
   },
   "my-team": {
     title: "Tus atletas tienen el panel Mi equipo",
@@ -1092,6 +1092,7 @@ export const emails: Record<string, Words> = {
       "Los atletas ya no ven Programas, Atletas ni Configuración. Mi equipo les muestra solo lo que necesitan.",
       "El chat del equipo es para todo el equipo y para ti. Puedes borrar cualquier mensaje, y los atletas aparecen por su nombre.",
       "Los programas asignados están en Mi equipo con Seguir, y el tablero semanal muestra quién ha entrenado.",
+      "Los deportistas que siguen un programa lo ven en Hoy con lo siguiente, y su mes está en Mi equipo.",
     ],
     dyk: "Los enlaces del equipo ahora funcionan aunque el atleta inicie sesión después de abrirlos, así nadie se queda fuera de la lista.",
   },

@@ -488,6 +488,25 @@ export const it: FeaturesText = {
       note: "I programmi a pagamento si acquistano sul sito; le app per Android e iPhone mostrano quelli gratuiti e quelli che hai.",
       proPart: "Ottenere programmi è gratis; crearli fa parte del coaching, che è Pro.",
     },
+    "program-phases": {
+      name: "Fasi del programma e ripetizioni del coach",
+      body: "Il programma di un coach può andare per fasi, ognuna con la propria settimana: Costruzione, una settimana di Scarico con meno serie e carichi più leggeri, e un Picco con meno serie per arrivare freschi. Aggiungi uno scarico con un tocco, vedi ogni fase sul mese e imposta le ripetizioni di un esercizio (per esempio da 8 a 12) o lasciale su Auto perché le scelga lo storico di ciascuno. Chi lo segue vede fase e settimana sotto il piano di Oggi.",
+      proPart: "Seguire un programma è gratis; crearne uno fa parte del coaching, che è Pro.",
+    },
+    "client-program-copy": {
+      name: "Adatta un programma a un cliente",
+      body: "Cambia un giorno del programma di un coach solo per un cliente, per esempio un esercizio sostituito per un infortunio. Il giorno risulta cambiato per quella persona e un tocco riporta il giorno del programma. Le modifiche al programma arrivano comunque a tutti e a ogni giorno non cambiato, e l'app di ciascuno le riceve da sola.",
+      proPart: "Essere clienti è gratis; seguire clienti è Pro.",
+    },
+    "coach-program-today": {
+      name: "Dal tuo coach, su Oggi",
+      body: "Chi segue il programma di un coach lo vede su Oggi: da chi arriva, il giorno di oggi, la settimana e la fase, e il prossimo con il suo giorno. Un atleta di una squadra scolastica vede anche il mese in La mia squadra, con i giorni fatti, saltati e in arrivo.",
+    },
+    "program-in-order": {
+      name: "Programmi che vanno in ordine",
+      body: "Un coach può far andare un programma in ordine: ognuno fa il giorno successivo quando si allena, invece che in giorni fissi, e la settimana resta un ritmo consigliato. Oggi dice cosa viene dopo.",
+      proPart: "Essere clienti è gratis; seguire clienti è Pro.",
+    },
     "coach-pages": {
       name: "Una pagina per ogni lato",
       body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",

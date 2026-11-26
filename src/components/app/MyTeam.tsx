@@ -14,8 +14,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 
 import { track } from "@/lib/analytics";
-import { acceptProgramAssign, coachProgramWeek, followAssign, type ProgramAssign } from "@/lib/coachProgramAssign";
-import { t } from "@/lib/i18n";
+import { acceptProgramAssign, coachProgramNext, coachProgramWeek, followAssign, type ProgramAssign } from "@/lib/coachProgramAssign";
+import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { MAX_ROUTINES, upsertRoutine } from "@/lib/routines";
 import { useApp } from "@/lib/store";
@@ -30,8 +30,10 @@ import {
   type TeamsOverview,
 } from "@/lib/teams";
 import type { Overview, Person } from "@/lib/trainer";
+import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
+import { AthleteProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { JoinTeam } from "./SchoolTeams";
 import { Button, CountDot, Section } from "./ui";
@@ -227,14 +229,25 @@ function CoachCard({ coach, unread, assistants }: { coach: Person; unread: numbe
 
 /** Programs the coach assigned: Follow on a new one, how far along on the one being followed. */
 function Programs({ assigns, coach }: { assigns: ProgramAssign[]; coach: string }) {
+  const src = useApp((s) => s.profile.planSource);
+  const following = src?.kind === "coachProgram" && assigns.some((a) => a.id === src.assignId) ? src : null;
   return (
     <Section title={t("mt.programs")} icon="layers">
       {assigns.length ? (
-        <ul className="space-y-2">
-          {assigns.map((a) => (
-            <ProgramRow key={a.id} assign={a} />
-          ))}
-        </ul>
+        <div className="space-y-2">
+          <ul className="space-y-2">
+            {assigns.map((a) => (
+              <ProgramRow key={a.id} assign={a} />
+            ))}
+          </ul>
+          {/* The month of the program being followed (stage 4, 2026-11-26): done, missed and coming days. */}
+          {following && (
+            <div data-testid="my-team-month">
+              <p className="mt-3 mb-2 px-1 text-sm font-semibold">{t("mt.month")}</p>
+              <AthleteProgramCalendar src={following} />
+            </div>
+          )}
+        </div>
       ) : (
         <p className="card px-4 py-3 text-sm text-muted">{t("mt.programsNone", { coach: coach || t("trn.noName") })}</p>
       )}
@@ -243,10 +256,11 @@ function Programs({ assigns, coach }: { assigns: ProgramAssign[]; coach: string 
 }
 
 function ProgramRow({ assign }: { assign: ProgramAssign }) {
-  const { profile, setProfile, replan } = useApp();
+  const { profile, events, setProfile, replan } = useApp();
   const [busy, setBusy] = useState(false);
   const src = profile.planSource;
   const following = src?.kind === "coachProgram" && src.assignId === assign.id ? src : null;
+  const now = useNow(60_000);
   const routines = profile.routines ?? [];
   const room = routines.length + assign.days.length <= MAX_ROUTINES;
   const follow = async () => {
@@ -268,6 +282,7 @@ function ProgramRow({ assign }: { assign: ProgramAssign }) {
     }
   };
   const days = assign.days.length;
+  const next = following ? coachProgramNext(following, now, events) : null;
   return (
     <li className="card p-4">
       <p className="font-semibold break-words">{assign.title}</p>
@@ -277,7 +292,18 @@ function ProgramRow({ assign }: { assign: ProgramAssign }) {
           <Icon name="check" size={16} />
           {t("mt.following", { week: coachProgramWeek(following), weeks: following.weeks })}
         </p>
-      ) : (
+      ) : null}
+      {following && next ? (
+        <p className="mt-1 text-sm text-muted" data-testid="my-team-next">
+          {next.at === null
+            ? t("cpg.from.nextInOrder", { day: routines.find((r) => r.id === following.dayIds[next.dayIndex])?.name ?? assign.title })
+            : t("cpg.from.next", {
+                day: routines.find((r) => r.id === following.dayIds[next.dayIndex])?.name ?? assign.title,
+                when: date(new Date(next.at), { weekday: "long", day: "numeric", month: "short" }),
+              })}
+        </p>
+      ) : null}
+      {following ? null : (
         <>
           <Button className="mt-3 w-full" disabled={busy || !room} onClick={() => void follow()}>
             {t("cpg.assignToday.follow")}
