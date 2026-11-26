@@ -143,6 +143,8 @@ export const en = {
   "cpg.assignAll": "All clients ({count})",
   "cpg.assignPick": "Pick clients",
   "cpg.assignTeam": "Team: {name} ({count})",
+  "cpg.noAthletes":
+    "{team} has no athletes yet. Add one first: send the team's invite or add a client from the team's card, then assign the program.",
   "cpg.assignGo": "Assign program",
   "cpg.assignDone.ath": {
     one: "Assigned to {count} athlete. Skipped {skip}.",
@@ -371,6 +373,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Todos los clientes ({count})",
   "cpg.assignPick": "Elegir clientes",
   "cpg.assignTeam": "Equipo: {name} ({count})",
+  "cpg.noAthletes":
+    "{team} todavía no tiene atletas. Primero añade uno: envía la invitación del equipo o añade un cliente desde la tarjeta del equipo, y luego asigna el programa.",
   "cpg.assignGo": "Asignar programa",
   "cpg.assignDone.ath": { one: "Asignado a {count} atleta. Omitidos {skip}.", other: "Asignado a {count} atletas. Omitidos {skip}." },
   "cpg.assignDone": { one: "Asignado a {count} cliente. Omitidos {skip}.", other: "Asignado a {count} clientes. Omitidos {skip}." },
@@ -597,6 +601,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Tous les clients ({count})",
   "cpg.assignPick": "Choisir des clients",
   "cpg.assignTeam": "Équipe : {name} ({count})",
+  "cpg.noAthletes":
+    "{team} n’a pas encore d’athlète. Ajoutez-en un d’abord : envoyez l’invitation de l’équipe ou ajoutez un client depuis la carte de l’équipe, puis attribuez le programme.",
   "cpg.assignGo": "Assigner le programme",
   "cpg.assignDone.ath": { one: "Assigné à {count} athlète. Ignorés : {skip}.", other: "Assigné à {count} athlètes. Ignorés : {skip}." },
   "cpg.assignDone": { one: "Assigné à {count} client. Ignorés : {skip}.", other: "Assigné à {count} clients. Ignorés : {skip}." },
@@ -821,6 +827,8 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Alle Klienten ({count})",
   "cpg.assignPick": "Klienten wählen",
   "cpg.assignTeam": "Team: {name} ({count})",
+  "cpg.noAthletes":
+    "{team} hat noch keine Athleten. Füge zuerst einen hinzu: Schick die Team-Einladung oder füge auf der Teamkarte einen Kunden hinzu, dann weise das Programm zu.",
   "cpg.assignGo": "Programm zuweisen",
   "cpg.assignDone.ath": {
     one: "An {count} Athleten zugewiesen. Übersprungen: {skip}.",
@@ -1048,6 +1056,8 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Tutti i clienti ({count})",
   "cpg.assignPick": "Scegli clienti",
   "cpg.assignTeam": "Squadra: {name} ({count})",
+  "cpg.noAthletes":
+    "{team} non ha ancora atleti. Aggiungine prima uno: invia l’invito della squadra o aggiungi un cliente dalla scheda della squadra, poi assegna il programma.",
   "cpg.assignGo": "Assegna programma",
   "cpg.assignDone.ath": { one: "Assegnato a {count} atleta. Saltati: {skip}.", other: "Assegnato a {count} atleti. Saltati: {skip}." },
   "cpg.assignDone": { one: "Assegnato a {count} cliente. Saltati: {skip}.", other: "Assegnato a {count} clienti. Saltati: {skip}." },
@@ -1254,6 +1264,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "すべてのクライアント（{count}）",
   "cpg.assignPick": "クライアントを選ぶ",
   "cpg.assignTeam": "チーム：{name}（{count}）",
+  "cpg.noAthletes":
+    "{team} にはまだ選手がいません。先に1人追加してください。チームの招待を送るか、チームのカードからクライアントを追加してから、プログラムを割り当てましょう。",
   "cpg.assignGo": "プログラムを割り当て",
   "cpg.assignDone.ath": { other: "{count}人の選手に割り当てました。スキップ {skip}。" },
   "cpg.assignDone": { other: "{count}人のクライアントに割り当てました。スキップ {skip}。" },
@@ -1471,6 +1483,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Todos os clientes ({count})",
   "cpg.assignPick": "Escolher clientes",
   "cpg.assignTeam": "Equipe: {name} ({count})",
+  "cpg.noAthletes":
+    "{team} ainda não tem atletas. Adicione um primeiro: envie o convite do time ou adicione um cliente pelo cartão do time e depois atribua o programa.",
   "cpg.assignGo": "Atribuir programa",
   "cpg.assignDone.ath": { one: "Atribuído a {count} atleta. Ignorados: {skip}.", other: "Atribuído a {count} atletas. Ignorados: {skip}." },
   "cpg.assignDone": { one: "Atribuído a {count} aluno. Ignorados: {skip}.", other: "Atribuído a {count} alunos. Ignorados: {skip}." },
@@ -1676,6 +1690,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "모든 클라이언트 ({count})",
   "cpg.assignPick": "클라이언트 고르기",
   "cpg.assignTeam": "팀: {name} ({count})",
+  "cpg.noAthletes":
+    "{team}에 아직 선수가 없어요. 먼저 한 명을 추가하세요. 팀 초대를 보내거나 팀 카드에서 고객을 추가한 다음 프로그램을 배정하세요.",
   "cpg.assignGo": "프로그램 배정",
   "cpg.assignDone.ath": { other: "선수 {count}명에게 배정했어요. 건너뜀 {skip}." },
   "cpg.assignDone": { other: "회원 {count}명에게 배정했어요. 건너뜀 {skip}." },
@@ -1888,6 +1904,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Tüm danışanlar ({count})",
   "cpg.assignPick": "Danışan seç",
   "cpg.assignTeam": "Takım: {name} ({count})",
+  "cpg.noAthletes":
+    "{team} takımında henüz sporcu yok. Önce bir tane ekle: takım davetini gönder ya da takım kartından bir danışan ekle, sonra programı ata.",
   "cpg.assignGo": "Programı ata",
   "cpg.assignDone.ath": { one: "{count} sporcuya atandı. Atlanan: {skip}.", other: "{count} sporcuya atandı. Atlanan: {skip}." },
   "cpg.assignDone": { one: "{count} danışana atandı. Atlanan: {skip}.", other: "{count} danışana atandı. Atlanan: {skip}." },
@@ -2141,6 +2159,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.assignAll": "Wszyscy klienci ({count})",
   "cpg.assignPick": "Wybierz klientów",
   "cpg.assignTeam": "Drużyna: {name} ({count})",
+  "cpg.noAthletes":
+    "W drużynie {team} nie ma jeszcze zawodników. Najpierw dodaj jednego: wyślij zaproszenie do drużyny albo dodaj klienta z karty drużyny, a potem przypisz program.",
   "cpg.assignGo": "Przypisz program",
   "cpg.assignDone.ath": {
     one: "Przypisano do {count} zawodnika. Pominięto: {skip}.",

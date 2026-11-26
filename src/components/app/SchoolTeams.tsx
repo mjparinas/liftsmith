@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
-import { assignProgram, endProgramAssigns } from "@/lib/coachProgramAssign";
+import { assignProgram, endProgramAssigns, isNoTargets, noAthletes } from "@/lib/coachProgramAssign";
 import { loadMine, type CoachProgram } from "@/lib/coachPrograms";
 import { date, t, tFor } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
@@ -42,6 +42,7 @@ import { ageOf } from "@/lib/teen";
 import { showCode, trainerError } from "@/lib/trainer";
 import { useVisible } from "@/lib/visibility";
 
+import { MessageButton } from "./MessageButton";
 import { ProgramCalendar } from "./ProgramCalendar";
 import { go } from "./router";
 import { BoardList } from "./TeamBoardList";
@@ -448,13 +449,19 @@ function CoachTeam({
     try {
       const weekdays = p.days.map((d, i) => d.weekdays ?? [[1], [2], [4], [5], [3], [6]][i] ?? [1 + (i % 5)]);
       const r = await assignProgram(p.id, { type: "team", teamId: team.id }, weekdays);
+      setAssignOpen(false);
+      if (!r.assigned.length) {
+        oops();
+        setNote(noAthletes(team));
+        return;
+      }
       haptic("success");
       track("feature", { name: "trainer", detail: "assignProgram" });
       setNote(tFor(true, "cpg.assignDone", { count: r.assigned.length, skip: r.skipped.length }));
-      setAssignOpen(false);
     } catch (e) {
       oops();
-      setNote(trainerError(e));
+      setAssignOpen(false);
+      setNote(isNoTargets(e) ? noAthletes(team) : trainerError(e));
     }
   };
   return (
@@ -475,12 +482,12 @@ function CoachTeam({
       </div>
       {/* The team's chat (TeamChat.tsx): the coach and every athlete on the team. */}
       {members.length > 0 && (
-        <Button kind="ghost" icon="chat" className="mt-2 w-full" onClick={() => go("trainer", `tc.${team.id}`)}>
+        <MessageButton team id={team.id} name={team.name} kind="ghost" className="mt-2 w-full">
           <span className="inline-flex items-center gap-2">
             {t("mt.chat")}
             <CountDot n={unread} />
           </span>
-        </Button>
+        </MessageButton>
       )}
       {/* Team session (TeamSession.tsx): one workout for the whole team on one tablet. */}
       {members.length > 0 && (

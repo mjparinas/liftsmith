@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { exerciseIdsFromCode, parseAssignDays } from "../server/coachProgramAssign";
+import { AuthError } from "./auth";
 import {
   catchUpAssign,
   coachProgramDayIndex,
@@ -9,6 +10,8 @@ import {
   coachProgramToday,
   coachProgramWeek,
   followAssign,
+  isNoTargets,
+  noAthletes,
   type ProgramAssign,
 } from "./coachProgramAssign";
 import { PROGRAM_TEMPLATES, templateOk } from "./coachProgramTemplates";
@@ -177,5 +180,16 @@ describe("In order", () => {
   it("a weekday program still goes by weekday", () => {
     const s = { ...src(), inOrder: false };
     expect(coachProgramToday(s, [], monday + 3 * day)).toBeNull();
+  });
+});
+
+describe("assigning to a team with no athletes", () => {
+  it("says the team has no athletes and to add one, instead of a bare error", () => {
+    expect(isNoTargets(new AuthError("noTargets", 404))).toBe(true);
+    expect(isNoTargets(new AuthError("gone", 404))).toBe(false);
+    expect(isNoTargets(new Error("noTargets"))).toBe(false);
+    expect(noAthletes({ name: "Senior Girls Volleyball" })).toBe(
+      "Senior Girls Volleyball has no athletes yet. Add one first: send the team's invite or add a client from the team's card, then assign the program.",
+    );
   });
 });

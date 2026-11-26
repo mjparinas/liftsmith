@@ -36,7 +36,11 @@ export function mergeTeamMessages(old: readonly TeamMessage[], add: readonly Tea
   return fresh.length ? [...old, ...fresh].sort((a, b) => a.at - b.at) : [...old];
 }
 
-export function TeamChat({ id }: { id: string }) {
+/**
+ * `screen` is its own page; `dock` fills a chat dock window or a sheet (Melvin, 2026-11-26: "when the coach clicks on
+ * team chat, it opens it up in the messages"), whose header names the team.
+ */
+export function TeamChat({ id, mode = "screen" }: { id: string; mode?: "screen" | "dock" }) {
   const [list, setList] = useState<TeamMessage[] | null>(null);
   const [name, setName] = useState("");
   const [coach, setCoach] = useState(false);
@@ -51,7 +55,9 @@ export function TeamChat({ id }: { id: string }) {
   const end = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const desktop = useDesktop();
-  const pane = !desktop;
+  const dock = mode === "dock";
+  const pane = !desktop && !dock;
+  const inBox = pane || dock;
   useKeyboardViewport(pane);
 
   useEffect(() => {
@@ -113,9 +119,9 @@ export function TeamChat({ id }: { id: string }) {
   // The newest message stays in view.
   useEffect(() => {
     const el = box.current;
-    if (pane && el) el.scrollTop = el.scrollHeight;
+    if (inBox && el) el.scrollTop = el.scrollHeight;
     else end.current?.scrollIntoView?.({ block: "nearest" });
-  }, [list?.length, pane]);
+  }, [list?.length, inBox]);
 
   // The box grows with what's typed, up to its max height.
   useEffect(() => {
@@ -185,20 +191,27 @@ export function TeamChat({ id }: { id: string }) {
   if (gone)
     return (
       <div className="pb-2">
-        <ScreenHeader back={back} title={t("mt.chat")} />
+        {!dock && <ScreenHeader back={back} title={t("mt.chat")} />}
         <EmptyState
           icon="info"
           title={t("mt.chatGone")}
           body={t("mt.chatGoneBody")}
-          action={<Button onClick={() => backToCoaching()}>{t("trn.back")}</Button>}
+          action={dock ? undefined : <Button onClick={() => backToCoaching()}>{t("trn.back")}</Button>}
         />
       </div>
     );
   const who = (m: TeamMessage) => (m.mine ? t("crew.you") : m.name || t("trn.noName"));
   return (
-    <div className={pane ? "vv-pane max-w-lg px-5" : "flex min-h-[70dvh] flex-col pb-2"} data-testid="team-chat">
-      <ScreenHeader className="shrink-0" back={back} kicker={t("mt.chat")} title={name || t("mt.chat")} />
-      <p className="mt-1 shrink-0 text-sm text-muted">{coach ? t("mt.chatLeadCoach") : t("mt.chatLead")}</p>
+    <div
+      className={dock ? "flex h-full min-h-0 flex-col px-3 pb-3" : pane ? "vv-pane max-w-lg px-5" : "flex min-h-[70dvh] flex-col pb-2"}
+      data-testid="team-chat"
+    >
+      {!dock && (
+        <>
+          <ScreenHeader className="shrink-0" back={back} kicker={t("mt.chat")} title={name || t("mt.chat")} />
+          <p className="mt-1 shrink-0 text-sm text-muted">{coach ? t("mt.chatLeadCoach") : t("mt.chatLead")}</p>
+        </>
+      )}
       {more && (
         <Button kind="quiet" className="mt-2 shrink-0 self-center" onClick={() => void earlier()}>
           {t("crew.earlier")}
@@ -206,15 +219,15 @@ export function TeamChat({ id }: { id: string }) {
       )}
       <div
         ref={box}
-        className={`mt-3 flex-1 ${pane ? "min-h-0 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,transparent,black_1rem)]" : ""}`}
-        {...(pane ? { role: "region", tabIndex: 0, "aria-label": t("mt.chatOf", { team: name || t("mt.chat") }) } : {})}
+        className={`${dock ? "mt-1" : "mt-3"} flex-1 ${inBox ? "min-h-0 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,transparent,black_1rem)]" : ""}`}
+        {...(inBox ? { role: "region", tabIndex: 0, "aria-label": t("mt.chatOf", { team: name || t("mt.chat") }) } : {})}
       >
         {list === null ? (
           <p className="pt-3 text-sm text-muted">{t("trn.loading")}</p>
         ) : list.length === 0 ? (
           <EmptyState icon="chat" title={t("mt.chatNone")} body={coach ? t("mt.chatNoneCoach") : t("mt.chatNoneBody")} />
         ) : (
-          <ol className="space-y-2 pt-3" aria-live="polite" aria-label={pane ? undefined : t("mt.chat")}>
+          <ol className="space-y-2 pt-3" aria-live="polite" aria-label={inBox ? undefined : t("mt.chat")}>
             {list.map((m) => (
               <li key={m.id} className={`flex items-end gap-2 ${m.mine ? "flex-row-reverse" : ""}`}>
                 {!m.mine && <Avatar name={who(m)} avatar={m.avatar} size={32} />}
@@ -251,14 +264,23 @@ export function TeamChat({ id }: { id: string }) {
             ))}
           </ol>
         )}
-        {!pane && <div ref={end} />}
+        {!inBox && <div ref={end} />}
       </div>
       {error && (
         <p className="mt-2 shrink-0 text-sm text-warn" role="status">
           {error}
         </p>
       )}
-      <form onSubmit={(e) => void send(e)} className={pane ? "card mt-3 shrink-0 p-2" : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-2"}>
+      <form
+        onSubmit={(e) => void send(e)}
+        className={
+          dock
+            ? "mt-2 shrink-0 border-t border-line pt-2"
+            : pane
+              ? "card mt-3 shrink-0 p-2"
+              : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-2"
+        }
+      >
         <label htmlFor={`team-chat-${id}`} className="sr-only">
           {t("mt.write")}
         </label>
