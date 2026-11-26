@@ -527,6 +527,7 @@ export const emails: Record<string, Words> = {
       "Checagem de técnica: agachamentos acima da paralela, reps encurtadas e inclinação para um lado.",
       "Replay do trajeto da barra: uma rep com o trajeto da barra desenhado e uma dica.",
       "Máximo do dia pelo aquecimento: um ajuste no seu primeiro peso de trabalho.",
+      "Velocidade pelo pulso: sem câmera? Seu relógio mede a velocidade de cada repetição, vibra na hora de parar e alimenta o máximo de hoje.",
     ],
     dyk: "Um lab que depende de outro só aparece depois que esse outro está ativado.",
   },

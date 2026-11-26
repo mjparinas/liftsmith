@@ -547,6 +547,7 @@ export const emails: Record<string, Words> = {
       "Form check: squats above parallel, cut-short reps and leaning to one side.",
       "Bar path replay: a rep with the bar's path drawn and one cue.",
       "Today's max from warm-ups: a nudge to your first working weight.",
+      "Wrist bar speed: no camera? Your watch measures each rep's speed, buzzes when it's time to stop and feeds today's max.",
     ],
     dyk: "A lab that needs another one only shows once that one is on.",
   },

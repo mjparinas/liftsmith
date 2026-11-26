@@ -526,6 +526,7 @@ export const emails: Record<string, Words> = {
       "Control de la técnica: sentadillas por encima del paralelo, repeticiones cortas e inclinarse hacia un lado.",
       "Repetición de la trayectoria: una repetición con el camino de la barra dibujado y una indicación.",
       "El máximo de hoy desde el calentamiento: un ajuste a tu primer peso de trabajo.",
+      "Velocidad desde la muñeca: ¿sin cámara? Tu reloj mide la velocidad de cada repetición, vibra cuando toca parar y alimenta el máximo de hoy.",
     ],
     dyk: "Un experimento que necesita otro solo aparece cuando ese está activado.",
   },

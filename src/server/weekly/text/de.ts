@@ -527,6 +527,7 @@ export const emails: Record<string, Words> = {
       "Technik-Check: Kniebeugen über der Parallele, verkürzte Wiederholungen und seitliches Kippen.",
       "Hantelweg-Wiederholung: eine Wiederholung mit eingezeichnetem Weg der Stange und einem Hinweis.",
       "Heutiges Maximum aus dem Aufwärmen: ein Anstoß für dein erstes Arbeitsgewicht.",
+      "Hantelgeschwindigkeit am Handgelenk: keine Kamera? Deine Uhr misst das Tempo jeder Wiederholung, vibriert, wenn es Zeit zum Aufhören ist, und speist das heutige Maximum.",
     ],
     dyk: "Ein Experiment, das ein anderes braucht, erscheint erst, wenn dieses an ist.",
   },

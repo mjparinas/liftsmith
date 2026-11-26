@@ -71,6 +71,14 @@ export const FLAGS = {
     description:
       "With watch rep counting on: rest ends when the watch sees the next set start, the set logs itself after the last rep, and the watch buzzes at each step.",
   },
+  /** Labs: bar speed from the watch's wrist motion, and today's max from warm-ups without the camera (barSpeed.ts, speedMax.ts). */
+  labWatchSpeed: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: wrist bar speed",
+    description:
+      "With watch rep counting on: each rep's lifting speed from the watch, a buzz when the set has slowed enough to end, and warm-up speeds for today's max.",
+  },
   /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
   labHrRest: {
     default: false,

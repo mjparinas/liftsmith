@@ -525,6 +525,7 @@ export const emails: Record<string, Words> = {
       "Kontrola techniki: przysiady powyżej równoległej, skrócone powtórzenia i przechylanie na bok.",
       "Powtórka toru sztangi: powtórzenie z narysowanym torem sztangi i jedną wskazówką.",
       "Dzisiejsze maksimum z rozgrzewki: podpowiedź do pierwszego ciężaru roboczego.",
+      "Prędkość sztangi z nadgarstka: bez kamery? Zegarek mierzy prędkość każdego powtórzenia, wibruje, gdy czas skończyć, i zasila dzisiejsze maksimum.",
     ],
     dyk: "Eksperyment, który wymaga innego, pojawia się dopiero, gdy tamten jest włączony.",
   },

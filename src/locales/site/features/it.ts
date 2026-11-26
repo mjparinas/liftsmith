@@ -725,6 +725,11 @@ export const it: FeaturesText = {
       body: "Inizia la serie successiva e il tuo orologio chiude il recupero, conta le ripetizioni e registra la serie da solo, con una vibrazione a ogni passo.",
       note: "Wear OS e Apple Watch, con il conteggio delle ripetizioni con l'orologio attivo.",
     },
+    "lab-watch-speed": {
+      name: "Velocità dal polso",
+      body: "L'orologio misura quanto velocemente sollevi ogni ripetizione e vibra quando la serie è rallentata abbastanza da chiuderla. Le velocità del riscaldamento regolano il primo carico di lavoro, senza fotocamera.",
+      note: "Wear OS e Apple Watch, con il conteggio delle ripetizioni dell'orologio attivo.",
+    },
     "lab-voice": {
       name: "Registra le serie con la voce",
       body: "Di’ «100 per 8» o «troppo facile» per registrare una serie. Riconosciuto sul dispositivo; nessun audio ne esce.",

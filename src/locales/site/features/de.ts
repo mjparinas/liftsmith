@@ -731,6 +731,11 @@ export const de: FeaturesText = {
       body: "Starte deinen nächsten Satz, und deine Uhr beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
       note: "Wear OS und Apple Watch, mit eingeschaltetem Zählen der Wiederholungen mit der Uhr.",
     },
+    "lab-watch-speed": {
+      name: "Hantelgeschwindigkeit am Handgelenk",
+      body: "Deine Uhr misst, wie schnell du jede Wiederholung hebst, und vibriert, wenn der Satz langsam genug zum Beenden ist. Die Aufwärmgeschwindigkeiten passen dein erstes Arbeitsgewicht an, ohne Kamera.",
+      note: "Wear OS und Apple Watch, mit eingeschaltetem Wiederholungszählen der Uhr.",
+    },
     "lab-voice": {
       name: "Sätze per Sprache eintragen",
       body: "Sag „100 für 8“ oder „zu leicht“, um einen Satz einzutragen. Erkannt auf deinem Gerät; kein Ton verlässt es.",

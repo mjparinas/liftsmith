@@ -732,6 +732,11 @@ export const fr: FeaturesText = {
       body: "Lance ta série suivante et ta montre arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
       note: "Wear OS et Apple Watch, avec le comptage des répétitions par la montre activé.",
     },
+    "lab-watch-speed": {
+      name: "Vitesse au poignet",
+      body: "Ta montre mesure la vitesse de chaque répétition et vibre quand la série a assez ralenti pour l'arrêter. Les vitesses de l'échauffement ajustent ta première charge de travail, sans caméra.",
+      note: "Wear OS et Apple Watch, avec le comptage des répétitions par la montre activé.",
+    },
     "lab-voice": {
       name: "Valider une série à la voix",
       body: "Dites « 100 pour 8 » ou « trop facile » pour valider une série. Reconnu sur votre appareil ; aucun son n’en sort.",

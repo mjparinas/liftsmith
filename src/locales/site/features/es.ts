@@ -727,6 +727,11 @@ export const es: FeaturesText = {
       body: "Empieza tu siguiente serie y tu reloj termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
       note: "Wear OS y Apple Watch, con el conteo de repeticiones con el reloj activado.",
     },
+    "lab-watch-speed": {
+      name: "Velocidad desde la muñeca",
+      body: "Tu reloj mide lo rápido que levantas cada repetición y vibra cuando la serie se ha frenado lo suficiente para terminarla. Las velocidades del calentamiento ajustan tu primer peso de trabajo, sin cámara.",
+      note: "Wear OS y Apple Watch, con el conteo de repeticiones con el reloj activado.",
+    },
     "lab-voice": {
       name: "Registrar series por voz",
       body: "Di «100 por 8» o «demasiado fácil» para registrar una serie. Se reconoce en tu dispositivo; ningún audio sale de él.",

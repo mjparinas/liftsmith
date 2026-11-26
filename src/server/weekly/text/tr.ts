@@ -526,6 +526,7 @@ export const emails: Record<string, Words> = {
       "Form kontrolü: paralelin üstünde kalan squat'lar, yarım kalan tekrarlar ve bir yana yatma.",
       "Bar yolu tekrarı: barın yolu çizilmiş bir tekrar ve tek bir ipucu.",
       "Isınmalardan bugünün maksimumu: ilk çalışma ağırlığına küçük bir düzeltme.",
+      "Bilekten bar hızı: kamera yok mu? Saatin her tekrarın hızını ölçer, durma zamanı gelince titrer ve bugünün maksimumunu besler.",
     ],
     dyk: "Başka bir deneye ihtiyaç duyan bir deney, ancak o açıldığında görünür.",
   },
