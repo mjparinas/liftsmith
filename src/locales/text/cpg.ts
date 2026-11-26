@@ -221,6 +221,10 @@ export const en = {
   "cpg.tweak.reset": "Back to the program's day.",
   "cpg.from.kicker": "From your coach · {name}",
   "cpg.from.next": "Up next: {day}, {when}",
+  "cpg.inOrder.label": "Run the days in order",
+  "cpg.inOrder.hint":
+    "Each lifter gets the next day whenever they train, instead of on these weekdays. The week stays as a suggested rhythm.",
+  "cpg.from.nextInOrder": "Up next: {day}, the next time you train",
 } as const;
 
 type Key = keyof typeof en;
@@ -439,6 +443,10 @@ export const es: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "Vuelve el día del programa.",
   "cpg.from.kicker": "De tu entrenador · {name}",
   "cpg.from.next": "Lo siguiente: {day}, {when}",
+  "cpg.inOrder.label": "Hacer los días en orden",
+  "cpg.inOrder.hint":
+    "Cada persona hace el día siguiente cuando entrena, en lugar de en estos días de la semana. La semana queda como ritmo sugerido.",
+  "cpg.from.nextInOrder": "Lo siguiente: {day}, la próxima vez que entrenes",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -663,6 +671,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "Le jour du programme est de retour.",
   "cpg.from.kicker": "De ton coach · {name}",
   "cpg.from.next": "Ensuite : {day}, {when}",
+  "cpg.inOrder.label": "Faire les jours dans l'ordre",
+  "cpg.inOrder.hint":
+    "Chaque personne fait le jour suivant dès qu'elle s'entraîne, au lieu de ces jours de la semaine. La semaine reste un rythme suggéré.",
+  "cpg.from.nextInOrder": "Ensuite : {day}, la prochaine fois que tu t'entraînes",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -887,6 +899,10 @@ export const de: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "Wieder der Tag aus dem Programm.",
   "cpg.from.kicker": "Von deinem Coach · {name}",
   "cpg.from.next": "Als Nächstes: {day}, {when}",
+  "cpg.inOrder.label": "Tage der Reihe nach",
+  "cpg.inOrder.hint":
+    "Jede Person macht den nächsten Tag, wann immer sie trainiert, statt an diesen Wochentagen. Die Woche bleibt ein vorgeschlagener Rhythmus.",
+  "cpg.from.nextInOrder": "Als Nächstes: {day}, beim nächsten Training",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1105,6 +1121,10 @@ export const it: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "Torna il giorno del programma.",
   "cpg.from.kicker": "Dal tuo coach · {name}",
   "cpg.from.next": "Prossimo: {day}, {when}",
+  "cpg.inOrder.label": "Fai i giorni in ordine",
+  "cpg.inOrder.hint":
+    "Ognuno fa il giorno successivo quando si allena, invece che in questi giorni della settimana. La settimana resta un ritmo consigliato.",
+  "cpg.from.nextInOrder": "Prossimo: {day}, la prossima volta che ti alleni",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1303,6 +1323,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "プログラムの日に戻しました。",
   "cpg.from.kicker": "コーチから · {name}",
   "cpg.from.next": "次は：{day}（{when}）",
+  "cpg.inOrder.label": "日を順番に進める",
+  "cpg.inOrder.hint": "曜日に関係なく、トレーニングするたびに次の日のメニューに進みます。週の予定は目安として残ります。",
+  "cpg.from.nextInOrder": "次は：{day}（次のトレーニングで）",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1520,6 +1543,10 @@ export const pt: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "O dia do programa voltou.",
   "cpg.from.kicker": "Do seu treinador · {name}",
   "cpg.from.next": "A seguir: {day}, {when}",
+  "cpg.inOrder.label": "Fazer os dias em ordem",
+  "cpg.inOrder.hint":
+    "Cada pessoa faz o próximo dia sempre que treina, em vez de nestes dias da semana. A semana fica como ritmo sugerido.",
+  "cpg.from.nextInOrder": "A seguir: {day}, no seu próximo treino",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1718,6 +1745,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "프로그램의 날로 돌아갔어요.",
   "cpg.from.kicker": "코치가 보냄 · {name}",
   "cpg.from.next": "다음: {day}, {when}",
+  "cpg.inOrder.label": "순서대로 진행",
+  "cpg.inOrder.hint": "요일과 상관없이 운동할 때마다 다음 날로 넘어가요. 한 주 일정은 권장 리듬으로 남아요.",
+  "cpg.from.nextInOrder": "다음: {day}, 다음 운동 때",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1930,6 +1960,10 @@ export const tr: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "Programdaki gün geri geldi.",
   "cpg.from.kicker": "Koçundan · {name}",
   "cpg.from.next": "Sıradaki: {day}, {when}",
+  "cpg.inOrder.label": "Günleri sırayla yap",
+  "cpg.inOrder.hint":
+    "Herkes bu hafta günleri yerine, ne zaman antrenman yaparsa sıradaki günü yapar. Hafta önerilen bir düzen olarak kalır.",
+  "cpg.from.nextInOrder": "Sıradaki: {day}, bir sonraki antrenmanında",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -2201,4 +2235,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "cpg.tweak.reset": "Wrócił dzień z programu.",
   "cpg.from.kicker": "Od twojego trenera · {name}",
   "cpg.from.next": "Następnie: {day}, {when}",
+  "cpg.inOrder.label": "Dni po kolei",
+  "cpg.inOrder.hint": "Każdy robi następny dzień, kiedy tylko trenuje, zamiast w te dni tygodnia. Tydzień zostaje jako sugerowany rytm.",
+  "cpg.from.nextInOrder": "Następnie: {day}, na następnym treningu",
 };

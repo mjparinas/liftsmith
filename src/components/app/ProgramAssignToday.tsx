@@ -8,10 +8,10 @@ import { WEEKDAYS } from "@/lib/calendar";
 import {
   acceptProgramAssign,
   catchUpAssign,
-  coachProgramDayIndex,
   coachProgramEndAt,
   coachProgramNext,
   coachProgramPhase,
+  coachProgramToday,
   coachProgramWeek,
   endProgramAssign,
   followAssign,
@@ -99,7 +99,7 @@ export function ProgramAssignToday() {
 
 /** Chip / line under Today's plan while following a season program. */
 export function CoachProgramChip() {
-  const { profile, setProfile, replan } = useApp();
+  const { profile, events, setProfile, replan } = useApp();
   const [cal, setCal] = useState(false);
   const now = useNow(60_000);
   const src = profile.planSource;
@@ -120,7 +120,7 @@ export function CoachProgramChip() {
       </p>
     );
   }
-  const dayI = coachProgramDayIndex(src, now);
+  const dayI = coachProgramToday(src, events, now);
   const nameOf = (i: number) => profile.routines?.find((r) => r.id === src.dayIds[i])?.name ?? src.title;
   const week = coachProgramWeek(src, now);
   const line =
@@ -134,7 +134,7 @@ export function CoachProgramChip() {
           weekday: WEEKDAYS[new Date(now).getDay()] ?? "",
         });
   const phase = src.phases && src.phases.length > 1 ? coachProgramPhase(src, now) : null;
-  const next = coachProgramNext(src, now);
+  const next = coachProgramNext(src, now, events);
   const coach = followed?.coach || t("trn.noName");
   // "From your coach" (stage 4, 2026-11-26): whose plan this is, where in it today sits, and what's next.
   return (
@@ -155,10 +155,12 @@ export function CoachProgramChip() {
       )}
       {next && (
         <p className="mt-1 text-sm text-muted" data-testid="coach-program-next">
-          {t("cpg.from.next", {
-            day: nameOf(next.dayIndex),
-            when: date(new Date(next.at), { weekday: "long", day: "numeric", month: "short" }),
-          })}
+          {next.at === null
+            ? t("cpg.from.nextInOrder", { day: nameOf(next.dayIndex) })
+            : t("cpg.from.next", {
+                day: nameOf(next.dayIndex),
+                when: date(new Date(next.at), { weekday: "long", day: "numeric", month: "short" }),
+              })}
         </p>
       )}
       <Button kind="ghost" className="mt-1 !px-0" onClick={() => setCal(true)}>

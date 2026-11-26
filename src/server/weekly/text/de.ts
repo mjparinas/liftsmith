@@ -830,7 +830,7 @@ export const emails: Record<string, Words> = {
       "Jedes veröffentlichte Programm bekommt eine eigene Seite auf der Website, und wer es seit zwei Wochen hat, kann es bewerten.",
       "Lass es in Phasen laufen: Aufbauwochen, eine Deload-Woche mit weniger, leichteren Sätzen (mit einem Tippen hinzugefügt) und eine Peak-Phase, und lege Wiederholungen für eine Übung fest (etwa 8 bis 12) oder lass sie auf Auto.",
     ],
-    dyk: "Ein Programm enthält keine Gewichte: Die eigene Progression jedes Trainierenden wählt sie, also passt ein Programm für Anfänger und Erfahrene.",
+    dyk: "Ein Programm enthält keine Gewichte: Die eigene Progression jedes Trainierenden wählt sie, also passt ein Programm für Anfänger und Erfahrene. Schalte Tage der Reihe nach ein, und jede Person macht den nächsten Tag, wann immer sie trainiert.",
   },
   "screenshot-share": {
     title: "Screenshot machen, Karte zum Teilen bekommen",

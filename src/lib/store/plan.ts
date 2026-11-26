@@ -1,6 +1,6 @@
 import { track } from "../analytics";
 import { weekStart } from "../block";
-import { coachProgramDayIndex, coachProgramPhase } from "../coachProgramAssign";
+import { coachProgramPhase, coachProgramToday } from "../coachProgramAssign";
 import { scheduledRoutine } from "../coachSchedule";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
@@ -212,11 +212,12 @@ export function planSlice(c: Ctx): PlanSlice {
       const trying = get().tryAdaptive && !can("adaptive") && freeAdaptiveLeft(events, now);
       const src = trying ? undefined : profile.planSource;
       // A saved routine replaces today's plan (adaptive or program), where this gym can do it.
-      // A season coach program (coachProgramAssign.ts) picks today's weekday-bound day when no one-day override is on.
+      // A season coach program (coachProgramAssign.ts) picks today's day (by weekday, or the next one In order) when no
+      // one-day override is on.
       const coachDay =
         !get().routineId && src?.kind === "coachProgram"
           ? (() => {
-              const i = coachProgramDayIndex(src, now);
+              const i = coachProgramToday(src, events, now);
               return i === null ? null : (profile.routines?.find((x) => x.id === src.dayIds[i]) ?? null);
             })()
           : null;

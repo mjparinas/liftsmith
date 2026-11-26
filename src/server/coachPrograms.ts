@@ -66,6 +66,8 @@ export interface CoachProgram {
   days: ProgramDay[];
   /** Phases (Build, Deload, Peak) when the program has more than one week laid out; weekdays parallel to days. */
   phases?: ProgramPhase[];
+  /** The days run one after another whenever the lifter trains; the weekdays are then a suggested rhythm. */
+  inOrder?: true;
   /** 0 is free. In whole units of `currency`. */
   price: number;
   currency: string;
@@ -87,6 +89,7 @@ interface Row {
   weeks: number;
   days: string;
   phases?: string | null;
+  in_order?: number | null;
   price: number;
   currency: string;
   listed: number;
@@ -176,6 +179,7 @@ async function shape(r: Row, viewer: string | null, ownedIds: Set<string>, sales
       ...(owned || free ? { code: d.code } : {}),
     })),
     ...readPhases(r),
+    ...(Number(r.in_order) === 1 ? { inOrder: true as const } : {}),
     price: Number(r.price),
     currency: String(r.currency),
     listed: Number(r.listed) === 1,
@@ -249,11 +253,12 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
   }
   const amount = price ? Math.round(Number(price) * 100) / 100 : 0;
   await run(
-    `INSERT INTO coach_programs (id, coach_id, title, about, level, goal, weeks, days, phases, price, currency, listed, hidden, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+    `INSERT INTO coach_programs
+       (id, coach_id, title, about, level, goal, weeks, days, phases, in_order, price, currency, listed, hidden, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
      ON CONFLICT (id) DO UPDATE SET title = excluded.title, about = excluded.about, level = excluded.level, goal = excluded.goal,
-       weeks = excluded.weeks, days = excluded.days, phases = excluded.phases, price = excluded.price, currency = excluded.currency,
-       listed = excluded.listed, updated_at = excluded.updated_at`,
+       weeks = excluded.weeks, days = excluded.days, phases = excluded.phases, in_order = excluded.in_order, price = excluded.price,
+       currency = excluded.currency, listed = excluded.listed, updated_at = excluded.updated_at`,
     [
       id,
       coachId,
@@ -264,6 +269,7 @@ export async function saveProgram(coachId: string, raw: unknown, now = Date.now(
       p.weeks as number,
       JSON.stringify(clean),
       phases ? JSON.stringify(phases) : "",
+      p.inOrder === true ? 1 : 0,
       amount,
       acc?.currency ?? (await payAccount(coachId))?.currency ?? "usd",
       p.listed === false ? 0 : 1,

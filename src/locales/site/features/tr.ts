@@ -579,6 +579,11 @@ export const tr: FeaturesText = {
       name: "Bugün ekranında koçundan",
       body: "Bir koçun programını takip eden kişi bunu Bugün ekranında görür: kimden geldiğini, bugünün gününü, haftayı ve aşamayı, sıradaki günü ve tarihini. Okul takımındaki bir sporcu Takımım'da yapılan, kaçırılan ve gelecek günleriyle ayı da görür.",
     },
+    "program-in-order": {
+      name: "Sırayla ilerleyen programlar",
+      body: "Koç bir programın günlerini sırayla ilerletebilir: herkes sabit hafta günleri yerine ne zaman antrenman yaparsa sıradaki günü yapar ve hafta önerilen bir düzen olarak kalır. Bugün ekranı sıradakini gösterir.",
+      proPart: "Danışan olmak ücretsizdir; danışan çalıştırmak Pro'dur.",
+    },
     "coach-calendar": {
       name: "Antrenman takvimi",
       body: "Aylık takvimde antrenman veya dinlenme günleri belirle. Sporcular günlük planı Bugün ekranında görür. Yardımcı antrenörleri takvimi düzenlemeye davet et ve sporcuların antrenman etkinliğini incele.",

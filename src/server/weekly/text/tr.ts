@@ -828,7 +828,7 @@ export const emails: Record<string, Words> = {
       "Yayınlanan her programın web sitesinde kendi sayfası olur ve iki haftadır sahip olanlar onu puanlayabilir.",
       "Evreler halinde ilerlet: Gelişim haftaları, daha az ve hafif setli bir Deload haftası (tek dokunuşla eklenir) ve bir Zirve; bir hareket için tekrarları belirle (örneğin 8-12) ya da Otomatik bırak.",
     ],
-    dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar.",
+    dyk: "Bir programda ağırlık yoktur: her sporcunun kendi ilerlemesi ağırlıkları seçer, böylece tek program yeni başlayanlara da deneyimlilere de uyar. Günleri sırayla yap'ı açarsan herkes antrenman yaptığında sıradaki günü yapar.",
   },
   "screenshot-share": {
     title: "Ekran görüntüsü al, paylaşmaya değer bir kart al",

@@ -219,6 +219,7 @@ function toDraft(p: CoachProgram): ProgramDraft {
     routineIds: [],
     price: p.price,
     listed: p.listed,
+    ...(p.inOrder ? { inOrder: true } : {}),
   };
 }
 
@@ -404,6 +405,14 @@ function Editor({
             </div>
           )}
         </div>
+        {/* In order (stage 5): the days follow one another whenever the lifter trains; the week is then a rhythm. */}
+        <InlineSwitch
+          className="mt-3"
+          label={t("cpg.inOrder.label")}
+          hint={t("cpg.inOrder.hint")}
+          on={d.inOrder === true}
+          onChange={(v) => setD({ ...d, inOrder: v })}
+        />
       </div>
       <div>
         <p className="text-sm font-medium">{t("cpg.levelLabel")}</p>

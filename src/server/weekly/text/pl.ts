@@ -828,7 +828,7 @@ export const emails: Record<string, Words> = {
       "Każdy opublikowany program ma własną stronę w serwisie, a osoby, które mają go od dwóch tygodni, mogą go ocenić.",
       "Prowadź go fazami: tygodnie Budowy, tydzień Odciążenia z mniejszą liczbą lżejszych serii (dodawany jednym dotknięciem) i Szczyt, a dla ćwiczenia ustal powtórzenia (np. 8–12) albo zostaw Auto.",
     ],
-    dyk: "Program nie ma ciężarów: dobiera je progresja każdej osoby, więc jeden program pasuje i początkującym, i weteranom.",
+    dyk: "Program nie ma ciężarów: dobiera je progresja każdej osoby, więc jeden program pasuje i początkującym, i weteranom. Włącz Dni po kolei, a każdy zrobi następny dzień, kiedy tylko będzie trenować.",
   },
   "screenshot-share": {
     title: "Zrób zrzut ekranu, dostań kartę wartą udostępnienia",

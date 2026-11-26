@@ -1765,6 +1765,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // JSON, and the snapshot an assign takes of them. '' when the program is one week repeated.
   ["coach_programs", "phases", "TEXT NOT NULL DEFAULT ''"],
   ["coach_program_assigns", "phases", "TEXT NOT NULL DEFAULT ''"],
+  ["coach_programs", "in_order", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_program_assigns", "in_order", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_program_assigns", "tweaks", "TEXT NOT NULL DEFAULT ''"],
   ["coach_program_assigns", "own_weekdays", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_program_assigns", "updated_at", "INTEGER NOT NULL DEFAULT 0"],

@@ -498,6 +498,8 @@ export type PlanSource =
       phases?: ProgramPhase[];
       /** The assign's `updatedAt` these days came from, so a later change from the coach is picked up once. */
       syncedAt?: number;
+      /** In order (stage 5): the next day whenever the lifter trains, not by weekday; the weekdays are a rhythm. */
+      inOrder?: boolean;
     };
 /**
  * A phase of a coach's program (program builder stage 2, 2026-11-26): its own week repeated for a few weeks. Build runs

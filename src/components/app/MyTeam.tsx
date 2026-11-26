@@ -256,7 +256,7 @@ function Programs({ assigns, coach }: { assigns: ProgramAssign[]; coach: string 
 }
 
 function ProgramRow({ assign }: { assign: ProgramAssign }) {
-  const { profile, setProfile, replan } = useApp();
+  const { profile, events, setProfile, replan } = useApp();
   const [busy, setBusy] = useState(false);
   const src = profile.planSource;
   const following = src?.kind === "coachProgram" && src.assignId === assign.id ? src : null;
@@ -282,7 +282,7 @@ function ProgramRow({ assign }: { assign: ProgramAssign }) {
     }
   };
   const days = assign.days.length;
-  const next = following ? coachProgramNext(following, now) : null;
+  const next = following ? coachProgramNext(following, now, events) : null;
   return (
     <li className="card p-4">
       <p className="font-semibold break-words">{assign.title}</p>
@@ -295,10 +295,12 @@ function ProgramRow({ assign }: { assign: ProgramAssign }) {
       ) : null}
       {following && next ? (
         <p className="mt-1 text-sm text-muted" data-testid="my-team-next">
-          {t("cpg.from.next", {
-            day: routines.find((r) => r.id === following.dayIds[next.dayIndex])?.name ?? assign.title,
-            when: date(new Date(next.at), { weekday: "long", day: "numeric", month: "short" }),
-          })}
+          {next.at === null
+            ? t("cpg.from.nextInOrder", { day: routines.find((r) => r.id === following.dayIds[next.dayIndex])?.name ?? assign.title })
+            : t("cpg.from.next", {
+                day: routines.find((r) => r.id === following.dayIds[next.dayIndex])?.name ?? assign.title,
+                when: date(new Date(next.at), { weekday: "long", day: "numeric", month: "short" }),
+              })}
         </p>
       ) : null}
       {following ? null : (

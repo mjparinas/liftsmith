@@ -832,7 +832,7 @@ export const emails: Record<string, Words> = {
       "Chaque programme publié a sa propre page sur le site, et les personnes qui l'ont depuis deux semaines peuvent le noter.",
       "Faites-le en phases : des semaines de Construction, une semaine de Décharge avec moins de séries, plus légères (ajoutée en un toucher), et un Pic, et fixez les répétitions d'un exercice (par exemple 8 à 12) ou laissez-les sur Auto.",
     ],
-    dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés.",
+    dyk: "Un programme ne contient pas de charges : la progression de chaque sportif les choisit, alors un même programme convient aux débutants comme aux confirmés. Activez Faire les jours dans l'ordre et chacun fera le jour suivant dès qu'il s'entraîne.",
   },
   "screenshot-share": {
     title: "Une capture d’écran, une carte à partager",
