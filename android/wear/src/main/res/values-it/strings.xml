@@ -28,4 +28,9 @@
     <string name="more_reps">Più ripetizioni</string>
     <string name="weight_value">Peso %1$s, ruota la corona per cambiarlo</string>
     <string name="reps_value">%1$s, ruota la corona per cambiare</string>
+    <string name="start_on_watch">Inizia sull’orologio</string>
+    <string name="finish">Fine</string>
+    <string name="finish_again">Tocca di nuovo per finire</string>
+    <string name="on_watch">Senza telefono: salvato sull’orologio</string>
+    <string name="saved_for_phone">Salvato sull’orologio. Passerà al telefono quando saranno di nuovo vicini.</string>
 </resources>

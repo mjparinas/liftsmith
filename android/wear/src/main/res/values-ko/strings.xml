@@ -28,4 +28,9 @@
     <string name="more_reps">횟수 늘리기</string>
     <string name="weight_value">무게 %1$s, 크라운을 돌려 변경</string>
     <string name="reps_value">%1$s, 크라운을 돌려 변경</string>
+    <string name="start_on_watch">워치에서 시작</string>
+    <string name="finish">완료</string>
+    <string name="finish_again">한 번 더 탭하면 완료</string>
+    <string name="on_watch">휴대폰 없이: 워치에 저장</string>
+    <string name="saved_for_phone">워치에 저장했어요. 휴대폰이 가까이 오면 보내져요.</string>
 </resources>

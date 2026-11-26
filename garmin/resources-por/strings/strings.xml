@@ -10,4 +10,9 @@
     <string id="HintRate">MENU: Avaliar</string>
     <string id="HintLogTaken">START: registrar · UP: ocupado</string>
     <string id="HintAddTaken">DOWN: +30 s · UP: ocupado</string>
+    <string id="HintStartWatch">START: começar no relógio</string>
+    <string id="HintFinish">START: concluir</string>
+    <string id="OnWatch">Sem celular · BACK: concluir</string>
+    <string id="FinishAsk">Concluir e salvar para o celular?</string>
+    <string id="SavedForPhone">Salvo no relógio. Ele vai para o celular quando os dois estiverem juntos de novo.</string>
 </strings>

@@ -580,6 +580,11 @@ export const fr: FeaturesText = {
       body: "Quelqu'un sur la machine ? Une touche sur ta montre ou dans Modifier le plan met le meilleur exercice de ta salle qui n'en a pas besoin, avec sa charge et pourquoi.",
       note: "Wear OS, Apple Watch et Garmin (le bouton UP), et Modifier le plan sur le téléphone et le web.",
     },
+    "watch-alone": {
+      name: "Séances sur la montre, sans téléphone",
+      body: "Le plan du jour t'accompagne sur ta montre. Touche Démarrer sur la montre, note chaque série avec sa charge et ses répétitions au poignet, et la séance est enregistrée, records compris, quand ton téléphone est de nouveau près.",
+      note: "Wear OS, Apple Watch et Garmin.",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",

@@ -106,6 +106,25 @@ final class GarminLink {
         if (tap != null) {
             WorkoutService.tap(context, tap.action, tap.data);
         }
+        // A workout the watch ran with the phone away: kept for the web app, then the watch is told it arrived.
+        JSONObject done = GarminMessages.result(message);
+        if (done != null && WatchWorkouts.add(context, done.toString())) {
+            context.sendBroadcast(new Intent(WatchWorkouts.BROADCAST).setPackage(context.getPackageName()));
+            try {
+                ciq.sendMessage(device, new IQApp(APP_ID), GarminMessages.received(WatchWorkouts.idOf(done)), (dev, a, s) -> {});
+            } catch (Exception ignored) {
+                // The watch asks again next time it opens.
+            }
+        }
+        // The watch app opened and asks for today's plan again, in case it was closed when the plan last changed.
+        String carried = lastCarry;
+        if (GarminMessages.wantsCarry(message) && carried != null && !carried.isEmpty()) {
+            try {
+                send(GarminMessages.carry(new JSONObject(carried)));
+            } catch (Exception ignored) {
+                // Checked by WatchMessages.carry when it was kept.
+            }
+        }
         int bpm = GarminMessages.bpm(message);
         if (bpm > 0) {
             context.sendBroadcast(
@@ -187,6 +206,27 @@ final class GarminLink {
             if (!ready || key.equals(lastToday)) return;
             lastToday = key;
             send(GarminMessages.today(t));
+        });
+    }
+
+    /** Today's carried plan last sent, so an unchanged plan doesn't cross Bluetooth again. */
+    private static String lastCarry;
+
+    /** Today's plan worked out set by set, for a workout on the watch with the phone away. Nothing without Garmin Connect. */
+    static void carry(Context ctx, String json) {
+        if (ciq == null && !garminConnectInstalled(ctx)) return;
+        String c = WatchMessages.carry(json);
+        String key = c == null ? "" : c;
+        start(ctx, () -> {
+            if (!ready || key.equals(lastCarry)) return;
+            lastCarry = key;
+            JSONObject o = null;
+            try {
+                o = c == null ? null : new JSONObject(c);
+            } catch (Exception ignored) {
+                // Checked by WatchMessages.carry.
+            }
+            send(GarminMessages.carry(o));
         });
     }
 

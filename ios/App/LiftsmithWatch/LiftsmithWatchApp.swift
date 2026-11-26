@@ -42,11 +42,39 @@ struct WorkoutView: View {
     /// The exercise answered here, so its question goes until the phone moves on.
     @State private var answered: String?
     @State private var pendingAdjust: Task<Void, Never>?
+    /// Finish on a phone-free run takes a second tap within three seconds, unless every set is logged.
+    @State private var finishArmed: Date?
+
+    /// A phone-free workout finished here and still on its way to the phone.
+    @ViewBuilder
+    private var waitingNote: some View {
+        if model.waiting > 0 {
+            Text("Saved on the watch. It goes to your phone when they’re together again.")
+                .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 4)
+        }
+    }
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             if let s = model.current {
                 running(s, now: context.date)
+            } else if let c = model.carried {
+                // Today's plan is on the watch too, so it can run here with the phone away (watch-apps.md "Phone-free workouts").
+                ScrollView {
+                    VStack(spacing: 4) {
+                        Text(c.title).font(.headline).multilineTextAlignment(.center)
+                        if !c.why.isEmpty {
+                            Text(c.why).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        }
+                        Button("Start on watch") { model.startLocal() }
+                            .buttonStyle(.borderedProminent)
+                            .padding(.top, 4)
+                        Text("Start one on your phone and it shows here.")
+                            .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 4)
+                        waitingNote
+                    }
+                    .padding(.horizontal)
+                }
             } else if let t = model.today, t.current(at: context.date), !t.active {
                 // Today's call from the phone (the complication's), so the lifter knows what's waiting.
                 ScrollView {
@@ -60,6 +88,7 @@ struct WorkoutView: View {
                         }
                         Text("Start one on your phone and it shows here.")
                             .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 4)
+                        waitingNote
                     }
                     .padding(.horizontal)
                 }
@@ -68,6 +97,7 @@ struct WorkoutView: View {
                     Text("No workout running").font(.headline).multilineTextAlignment(.center)
                     Text("Start one on your phone and it shows here.")
                         .font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    waitingNote
                 }
                 .padding()
             }
@@ -119,9 +149,11 @@ struct WorkoutView: View {
                         .font(.footnote.bold().monospacedDigit()).foregroundStyle(.red)
                         .accessibilityLabel(Text("Heart rate \(bpm) beats per minute"))
                 }
-                Button("Log set") { logSet(s, now: now) }
-                    .buttonStyle(.borderedProminent)
-                    .padding(.top, 4)
+                if model.run?.finishedAll != true {
+                    Button("Log set") { logSet(s, now: now) }
+                        .buttonStyle(.borderedProminent)
+                        .padding(.top, 4)
+                }
                 if resting {
                     Button("+30 s") { model.send("add30") }
                 }
@@ -140,6 +172,25 @@ struct WorkoutView: View {
                             answered = ask.ex
                         }
                     }
+                }
+                if let r = model.run {
+                    // Phone-free: Finish saves what was logged here for the phone.
+                    let armed = finishArmed.map { now.timeIntervalSince($0) < 3 } ?? false
+                    let finish = Button(armed ? LocalizedStringKey("Tap again to finish") : LocalizedStringKey("Finish")) {
+                        if r.finishedAll || armed {
+                            finishArmed = nil
+                            model.finishLocal()
+                        } else {
+                            WKInterfaceDevice.current().play(.click)
+                            finishArmed = Date()
+                        }
+                    }
+                    if r.finishedAll {
+                        finish.buttonStyle(.borderedProminent).padding(.top, 4)
+                    } else {
+                        finish.padding(.top, 4)
+                    }
+                    Text("Phone-free: kept on the watch").font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 }
             }
         }

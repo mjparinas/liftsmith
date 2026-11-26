@@ -641,6 +641,11 @@ export const pl: FeaturesText = {
       body: "Ktoś na maszynie? Jedno dotknięcie na zegarku lub w Zmień plan wstawia najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
       note: "Wear OS, Apple Watch i Garmin (przycisk UP), a na telefonie i w sieci Zmień plan.",
     },
+    "watch-alone": {
+      name: "Trening na zegarku, bez telefonu",
+      body: "Dzisiejszy plan jest też na zegarku. Dotknij Zacznij na zegarku, zapisuj każdą serię z ciężarem i powtórzeniami na nadgarstku, a trening zapisze się razem z rekordami, gdy telefon znów będzie blisko.",
+      note: "Wear OS, Apple Watch i Garmin.",
+    },
     widgets: {
       name: "Widżety na ekranie głównym",
       body: "Trzy widżety: Dziś (decyzja na dziś, cel tygodniowy, notatka trenera oraz Start albo Zapisz serię), Ten tydzień (dni z treningiem, twoja passa i co ją podtrzyma) oraz Regeneracja (które mięśnie są gotowe do treningu i kiedy będą pozostałe).",

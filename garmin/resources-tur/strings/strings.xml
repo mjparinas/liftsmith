@@ -10,4 +10,9 @@
     <string id="HintRate">MENU: Değerlendir</string>
     <string id="HintLogTaken">START: Kaydet · UP: Dolu</string>
     <string id="HintAddTaken">DOWN: +30 sn · UP: Dolu</string>
+    <string id="HintStartWatch">START: Saatte başlat</string>
+    <string id="HintFinish">START: Bitir</string>
+    <string id="OnWatch">Telefonsuz · BACK: Bitir</string>
+    <string id="FinishAsk">Bitirip telefon için kaydedilsin mi?</string>
+    <string id="SavedForPhone">Saatte kaydedildi. Telefon yeniden yakına gelince ona gider.</string>
 </strings>

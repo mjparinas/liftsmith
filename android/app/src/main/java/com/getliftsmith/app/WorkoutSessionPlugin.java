@@ -35,6 +35,7 @@ public class WorkoutSessionPlugin extends Plugin {
     private BroadcastReceiver receiver;
     private BroadcastReceiver watchHr;
     private BroadcastReceiver watchMotion;
+    private BroadcastReceiver watchWorkout;
 
     /** Whether the web app is there to take a notification tap (WorkoutService.tapped). */
     static boolean isLive() {
@@ -87,6 +88,16 @@ public class WorkoutSessionPlugin extends Plugin {
             new IntentFilter(WatchListenerService.BROADCAST_MOTION),
             ContextCompat.RECEIVER_NOT_EXPORTED
         );
+        // A workout a watch ran with the phone away reached the phone (WatchWorkouts): the web app saves it.
+        watchWorkout = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                notifyListeners("watchWorkout", new JSObject(), true);
+            }
+        };
+        ContextCompat.registerReceiver(getContext(), watchWorkout, new IntentFilter(WatchWorkouts.BROADCAST), ContextCompat.RECEIVER_NOT_EXPORTED);
+        // Any still on the Data Layer (the listener service couldn't run when they came).
+        WatchLink.collect(getContext(), () -> {});
         // Notification taps made while the app was closed, oldest first, with the time of each (WorkoutTaps).
         // Kept until the web app listens, which logs each at its own time.
         for (org.json.JSONObject tap : WorkoutTaps.drain(getContext())) {
@@ -130,6 +141,7 @@ public class WorkoutSessionPlugin extends Plugin {
         if (receiver != null) getContext().unregisterReceiver(receiver);
         if (watchHr != null) getContext().unregisterReceiver(watchHr);
         if (watchMotion != null) getContext().unregisterReceiver(watchMotion);
+        if (watchWorkout != null) getContext().unregisterReceiver(watchWorkout);
     }
 
     @PluginMethod
@@ -204,6 +216,33 @@ public class WorkoutSessionPlugin extends Plugin {
             WatchLink.today(getContext(), json);
             GarminLink.today(getContext(), json);
         }
+        call.resolve();
+    }
+
+    /** Today's plan worked out set by set (src/lib/watchWorkout.ts Carry), for workouts on the watch with the phone away. */
+    @PluginMethod
+    public void setCarry(PluginCall call) {
+        String json = call.getString("json", "");
+        WatchLink.carry(getContext(), json);
+        GarminLink.carry(getContext(), json);
+        call.resolve();
+    }
+
+    /** The watch workouts waiting to be saved, as each watch sent them. */
+    @PluginMethod
+    public void watchWorkouts(PluginCall call) {
+        JSArray list = new JSArray();
+        for (org.json.JSONObject o : WatchWorkouts.all(getContext())) list.put(o);
+        JSObject r = new JSObject();
+        r.put("list", list);
+        call.resolve(r);
+    }
+
+    /** Saved by the web app (or one it can't save): forgotten here. */
+    @PluginMethod
+    public void doneWatchWorkout(PluginCall call) {
+        String id = call.getString("id", "");
+        if (!id.isEmpty()) WatchWorkouts.remove(getContext(), id);
         call.resolve();
     }
 

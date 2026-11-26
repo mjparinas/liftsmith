@@ -573,6 +573,11 @@ export const it: FeaturesText = {
       body: "Qualcuno sulla macchina? Un tocco sull'orologio o in Cambia il piano mette l'esercizio migliore della tua palestra che non la usa, con il peso e il perché.",
       note: "Wear OS, Apple Watch e Garmin (il tasto UP), e Cambia il piano sul telefono e sul web.",
     },
+    "watch-alone": {
+      name: "Allenamenti sull'orologio, senza telefono",
+      body: "Il piano di oggi viaggia sul tuo orologio. Tocca Inizia sull'orologio, registra ogni serie con peso e ripetizioni al polso, e l'allenamento viene salvato, record compresi, quando il telefono è di nuovo vicino.",
+      note: "Wear OS, Apple Watch e Garmin.",
+    },
     widgets: {
       name: "Widget della schermata Home",
       body: "Tre widget: Oggi (la scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie), Questa settimana (giorni di allenamento, la tua serie e cosa la mantiene) e Recupero (quali muscoli sono pronti e quando lo saranno gli altri).",

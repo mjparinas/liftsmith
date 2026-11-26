@@ -641,6 +641,11 @@ export const tr: FeaturesText = {
       body: "Makinede biri mi var? Saatinde ya da Planı değiştir'de tek dokunuş, salonunda ona ihtiyaç duymayan en iyi hareketi ağırlığı ve nedeniyle getirir.",
       note: "Wear OS, Apple Watch ve Garmin (UP düğmesi), telefonda ve web'de Planı değiştir.",
     },
+    "watch-alone": {
+      name: "Telefonsuz, saatte antrenman",
+      body: "Bugünün planı saatinde seninle. Saatte başlat'a dokun, her seti ağırlığı ve tekrarıyla bilekten kaydet; telefonun yeniden yakına gelince antrenman rekorlarıyla birlikte kaydedilir.",
+      note: "Wear OS, Apple Watch ve Garmin.",
+    },
     widgets: {
       name: "Ana ekran widget'ları",
       body: "Üç widget: Bugün (günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet), Bu hafta (antrenman yaptığın günler, serin ve onu neyin sürdürdüğü) ve Toparlanma (hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı).",

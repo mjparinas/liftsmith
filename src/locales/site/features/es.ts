@@ -575,6 +575,11 @@ export const es: FeaturesText = {
       body: "¿Alguien en la máquina? Un toque en tu reloj o en Cambiar el plan pone el mejor ejercicio de tu gimnasio que no la necesita, con su peso y por qué.",
       note: "Wear OS, Apple Watch y Garmin (el botón UP), y Cambiar el plan en el teléfono y la web.",
     },
+    "watch-alone": {
+      name: "Entrenos en el reloj, sin el móvil",
+      body: "El plan de hoy viaja en tu reloj. Toca Empezar en el reloj, registra cada serie con su peso y repeticiones en la muñeca, y el entreno se guarda, récords incluidos, cuando el móvil vuelve a estar cerca.",
+      note: "Wear OS, Apple Watch y Garmin.",
+    },
     widgets: {
       name: "Widgets en la pantalla de inicio",
       body: "Tres widgets: Hoy (la decisión del día, tu meta semanal, una nota del entrenador y Empezar o Registrar serie), Esta semana (días entrenados, tu racha y qué la mantiene) y Recuperación (qué músculos están listos para entrenar y cuándo lo estará el resto).",

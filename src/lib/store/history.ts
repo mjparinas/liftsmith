@@ -27,6 +27,11 @@ export interface HistorySlice {
   noteWorkout(sessionId: string, input: { name: string; text: string }): void;
   /** Today's plan becomes this past workout's exercises and set counts. False when nothing in it can be done here. */
   repeatWorkout(sessionId: string): boolean;
+  /**
+   * A workout run on a watch with the phone away, replayed into events (watchWorkout.ts): saved once, whatever order
+   * it arrives in. False when it was already saved (its session id is known) or has nothing in it.
+   */
+  addWatchWorkout(evs: AppEvent[]): boolean;
 }
 
 export function historySlice(c: Ctx): HistorySlice {
@@ -50,6 +55,17 @@ export function historySlice(c: Ctx): HistorySlice {
     return e?.type === "set" ? e.sessionId : undefined;
   };
   return {
+    addWatchWorkout(evs) {
+      const start = evs.find((e) => e.type === "sessionStart");
+      if (!start || start.type !== "sessionStart") return false;
+      const known = new Set(get().events.map((e) => e.id));
+      if (get().events.some((e) => e.type === "sessionStart" && e.sessionId === start.sessionId)) return false;
+      if (!apply({ add: evs.filter((e) => !known.has(e.id)), remove: [] })) return false;
+      track("feature", { name: "watch_workout" });
+      get().replan();
+      return true;
+    },
+
     editPastSet(setId, change) {
       const s = sessionOf(setId);
       if (!s || !finished(s)) return;

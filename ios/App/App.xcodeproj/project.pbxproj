@@ -45,6 +45,7 @@
 		E7A1C0DE0000000000000003 /* LiftsmithWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000004 /* LiftsmithWatchApp.swift */; };
 		E7A1C0DE0000000000000005 /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000006 /* WatchModel.swift */; };
 		E7A1C0DE0000000000000007 /* WatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000008 /* WatchState.swift */; };
+		E7A1C0DE0000000000000113 /* WatchRun.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000114 /* WatchRun.swift */; };
 		E7A1C0DE0000000000000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000A /* Assets.xcassets */; };
 		E7A1C0DE000000000000000B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000C /* Localizable.strings */; };
 		E7A1C0DE000000000000000D /* LiftsmithWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000E /* LiftsmithWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -168,6 +169,7 @@
 		E7A1C0DE0000000000000004 /* LiftsmithWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftsmithWatchApp.swift; sourceTree = "<group>"; };
 		E7A1C0DE0000000000000006 /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
 		E7A1C0DE0000000000000008 /* WatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchState.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000114 /* WatchRun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRun.swift; sourceTree = "<group>"; };
 		E7A1C0DE000000000000000A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E7A1C0DE0000000000000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E7A1C0DE0000000000000013 /* LiftsmithWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LiftsmithWatch.entitlements; sourceTree = "<group>"; };
@@ -360,6 +362,7 @@
 				E7A1C0DE0000000000000004 /* LiftsmithWatchApp.swift */,
 				E7A1C0DE0000000000000006 /* WatchModel.swift */,
 				E7A1C0DE0000000000000008 /* WatchState.swift */,
+				E7A1C0DE0000000000000114 /* WatchRun.swift */,
 				E7A1C0DE000000000000000A /* Assets.xcassets */,
 				E7A1C0DE000000000000000C /* Localizable.strings */,
 				E7A1C0DE0000000000000012 /* Info.plist */,
@@ -598,6 +601,7 @@
 				E7A1C0DE0000000000000003 /* LiftsmithWatchApp.swift in Sources */,
 				E7A1C0DE0000000000000005 /* WatchModel.swift in Sources */,
 				E7A1C0DE0000000000000007 /* WatchState.swift in Sources */,
+				E7A1C0DE0000000000000113 /* WatchRun.swift in Sources */,
 				E7A1C0DE0000000000000101 /* WatchToday.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -749,7 +753,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -883,8 +887,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
+				MARKETING_VERSION = 0.30.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -908,8 +912,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -932,8 +936,8 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -956,8 +960,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -981,8 +985,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1005,7 +1009,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1028,7 +1032,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.29.1;
+				MARKETING_VERSION = 0.30.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;

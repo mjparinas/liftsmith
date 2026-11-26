@@ -33,6 +33,21 @@ final class WatchMessages {
         }
     }
 
+    /** The most a carried plan may weigh (src/lib/watchWorkout.ts Carry): 80 steps of words with plenty to spare. */
+    static final int MAX_CARRY = 48_000;
+
+    /** Today's carried plan as the watch keeps it, or null to take it off (empty, "{}", too big or not a plan). */
+    static String carry(String json) {
+        if (json == null || json.length() > MAX_CARRY) return null;
+        try {
+            JSONObject o = new JSONObject(json);
+            if (o.optInt("v", 0) != 1 || o.optString("id", "").isEmpty() || o.optJSONArray("st") == null || o.optJSONArray("ex") == null) return null;
+            return o.toString();
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
     /** "log", "add30" or "taken" (Machine taken, src/lib/takenSwap.ts), or null. */
     static String action(String body) {
         return "log".equals(body) || "add30".equals(body) || "taken".equals(body) ? body : null;

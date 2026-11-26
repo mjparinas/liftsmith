@@ -17,7 +17,17 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     function onSelect() as Boolean {
         var w = _app.workout;
         if (!w.active()) {
+            // Today's plan is on the watch: START runs it here with the phone away.
+            if (_app.carried() != null) {
+                _app.startLocal();
+                return true;
+            }
             return false;
+        }
+        var run = _app.run as GarminRun?;
+        if (run != null && run.finishedAll()) {
+            _app.finishLocal();
+            return true;
         }
         var msg = { "a" => "log" } as Dictionary;
         if (w.adjustable() && w.edited()) {
@@ -73,6 +83,16 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
         return false;
     }
 
+    //! BACK on a phone-free run asks before finishing it; otherwise it leaves as usual.
+    function onBack() as Boolean {
+        if (_app.run == null) {
+            return false;
+        }
+        var ask = new WatchUi.Confirmation(WatchUi.loadResource(Rez.Strings.FinishAsk) as String);
+        WatchUi.pushView(ask, new FinishDelegate(_app), WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
     private function change(dir as Number) as Boolean {
         var w = _app.workout;
         if (!w.adjustable()) {
@@ -114,5 +134,22 @@ class RateDelegate extends WatchUi.Menu2InputDelegate {
         _app.send({ "a" => "rate", "ex" => _ex, "v" => v });
         _app.buzz(60);
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+//! "Finish and save it for your phone?" on a phone-free run.
+class FinishDelegate extends WatchUi.ConfirmationDelegate {
+    private var _app as LiftsmithApp;
+
+    function initialize(app as LiftsmithApp) {
+        ConfirmationDelegate.initialize();
+        _app = app;
+    }
+
+    function onResponse(response as WatchUi.Confirm) as Boolean {
+        if (response == WatchUi.CONFIRM_YES) {
+            _app.finishLocal();
+        }
+        return true;
     }
 }

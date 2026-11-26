@@ -11,7 +11,8 @@ logging; the watch only shows the state, sends taps back and adds its own heart 
   `GarminLink.swift`; `nativeStrings.test.ts` checks they match), the watches it supports, permissions
   (Communications, Sensor) and languages.
 - `source/`: `LiftsmithApp.mc` (phone messages, heart rate, the rest buzz), `WorkoutState.mc` (what the phone sent),
-  `WorkoutView.mc` (the one screen), `WorkoutDelegate.mc` (buttons).
+  `WorkoutView.mc` (the one screen), `WorkoutDelegate.mc` (buttons), `GarminRun.mc` (a workout run on the watch with
+  the phone away: START on the idle screen, BACK to finish, sent to the phone under `wd` until it answers `wk`).
 - `resources*/strings/strings.xml`: English plus Spanish, French, German, Italian and Japanese.
 
 ## Building and publishing (needs Melvin's Garmin account)

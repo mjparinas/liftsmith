@@ -3,6 +3,8 @@
 // change the weight or reps during a set, and MENU answers "How did it feel?" after an exercise's last set. The phone
 // sends the state (GarminLink.java on Android, GarminLink.swift on iOS) and does all the logging; the watch only
 // shows it, sends taps back and adds its own heart rate. Same job as the Wear OS and Apple Watch apps.
+// With today's plan carried to the watch ("wc"), START on the idle screen runs it here with the phone away
+// (GarminRun.mc, docs/decisions/watch-apps.md "Phone-free workouts").
 
 import Toybox.Application;
 import Toybox.Attention;
@@ -20,6 +22,9 @@ import Toybox.WatchUi;
 (:glance, :background)
 class LiftsmithApp extends Application.AppBase {
     var workout as WorkoutState;
+    //! A workout run here with the phone away (GarminRun.mc), or null. Left untyped because the glance and the background
+    //! service load this class without GarminRun.
+    var run = null;
     private var _timer as Timer.Timer?;
     private var _wasResting as Boolean = false;
     //! Seconds of rest left at the last tick, for the heads-up buzz at 10 (REST_WARN_S in the phone's training.ts).
@@ -53,6 +58,20 @@ class LiftsmithApp extends Application.AppBase {
         var timer = new Timer.Timer();
         timer.start(method(:onTick), 1000, true);
         _timer = timer;
+        // A phone-free run left open when the app closed carries on (or ends, if it was forgotten on the wrist).
+        var saved = Application.Storage.getValue(CarryStore.RUN);
+        if (saved instanceof Dictionary && saved.get("c") instanceof Dictionary) {
+            run = new GarminRun(saved.get("c") as Dictionary, Time.now().value(), saved);
+            if ((run as GarminRun).forgotten(Time.now().value())) {
+                finishLocal();
+            } else {
+                showRun();
+            }
+        }
+        // Ask the phone for today's plan again, in case the app was closed when it last changed, and hand over any
+        // phone-free workout still waiting.
+        send({ "wq" => 1 });
+        sendWaiting();
     }
 
     function onStop(state as Dictionary?) as Void {
@@ -60,6 +79,7 @@ class LiftsmithApp extends Application.AppBase {
             return;
         }
         flushAdjust();
+        saveRun();
         Sensor.enableSensorEvents(null);
         Sensor.setEnabledSensors([]);
         var timer = _timer;
@@ -70,7 +90,7 @@ class LiftsmithApp extends Application.AppBase {
 
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
         begin();
-        return [new WorkoutView(workout), new WorkoutDelegate(self)];
+        return [new WorkoutView(workout, self), new WorkoutDelegate(self)];
     }
 
     (:glance)
@@ -99,6 +119,22 @@ class LiftsmithApp extends Application.AppBase {
             WatchUi.requestUpdate();
             return;
         }
+        // Today's plan worked out set by set, for a workout here with the phone away.
+        if (data instanceof Dictionary && data.get("wc") != null) {
+            Application.Storage.setValue(CarryStore.KEY, data.get("wc") instanceof Dictionary ? data.get("wc") as Dictionary : {});
+            WatchUi.requestUpdate();
+            return;
+        }
+        // The phone kept a phone-free workout.
+        if (data instanceof Dictionary && data.get("wk") instanceof String) {
+            CarryStore.arrived(data.get("wk") as String);
+            WatchUi.requestUpdate();
+            return;
+        }
+        // A run here owns the screen; the phone's own workout waits until it's finished.
+        if (run != null) {
+            return;
+        }
         workout.apply(msg.data);
         _wasResting = workout.resting();
         var phase = workout.phase();
@@ -114,6 +150,11 @@ class LiftsmithApp extends Application.AppBase {
             return;
         }
         workout.watchHr = hr;
+        if (run != null) {
+            // With the phone away, the watch keeps the readings itself and hands back the average, high and low.
+            (run as GarminRun).heartRate(hr);
+            return;
+        }
         var now = Time.now().value();
         if (now - _hrSentAt >= 5) {
             _hrSentAt = now;
@@ -123,6 +164,9 @@ class LiftsmithApp extends Application.AppBase {
 
     //! Once a second: redraw the countdown, and buzz when rest ends if the lifter's rest-over alert vibrates.
     function onTick() as Void {
+        if (run != null) {
+            showRun();
+        }
         var resting = workout.resting();
         if (_wasResting && !resting && workout.active() && workout.vibrate) {
             buzz(400);
@@ -187,7 +231,96 @@ class LiftsmithApp extends Application.AppBase {
 
     //! Log set ({"a" => "log"}, with "key", "kg" and "reps" when changed on the watch), adjust, rate, +30 s ({"a" => "add30"}) or a heart rate reading ({"hr" => bpm}).
     function send(msg as Dictionary) as Void {
+        if (run != null && msg.get("a") != null) {
+            local(msg);
+            return;
+        }
         Communications.transmit(msg, null, new SendListener());
+    }
+
+    //! A tap on the run here instead of the phone: Log set, adjust, +30 s or rate.
+    private function local(msg as Dictionary) as Void {
+        var r = run as GarminRun;
+        var now = Time.now().value();
+        var a = msg.get("a");
+        var kg = msg.get("kg");
+        var want = kg instanceof Float || kg instanceof Number || kg instanceof Double ? kg.toFloat() : -1.0;
+        var reps = msg.get("reps") instanceof Number ? msg.get("reps") as Number : 0;
+        if ("log".equals(a)) {
+            r.log(now, want, reps);
+        } else if ("adjust".equals(a)) {
+            r.adjust(want, reps);
+        } else if ("add30".equals(a)) {
+            r.add30(now);
+        } else if ("rate".equals(a) && msg.get("v") instanceof Number) {
+            r.rate(msg.get("v") as Number);
+        } else {
+            return;
+        }
+        saveRun();
+        showRun();
+    }
+
+    //! Today's carried plan, when nothing runs and the watch could start it on its own.
+    function carried() as Dictionary? {
+        return run == null && !workout.active() ? CarryStore.load() : null;
+    }
+
+    //! Starts today's carried plan here, with the phone away.
+    function startLocal() as Void {
+        var c = carried();
+        if (c == null) {
+            return;
+        }
+        run = new GarminRun(c, Time.now().value(), null);
+        saveRun();
+        showRun();
+        buzz(120);
+    }
+
+    //! Ends the run here and keeps what was logged for the phone, which saves it whenever it's near again.
+    function finishLocal() as Void {
+        var r = run;
+        if (r == null) {
+            return;
+        }
+        var result = r.result(Time.now().value());
+        if (result != null) {
+            CarryStore.addWaiting(result);
+        }
+        run = null;
+        Application.Storage.deleteValue(CarryStore.RUN);
+        workout.apply(null);
+        _wasResting = false;
+        _timerPhase = null;
+        buzz(300);
+        sendWaiting();
+        WatchUi.requestUpdate();
+    }
+
+    //! Every phone-free workout still waiting goes to the phone; it answers {"wk" => id} once it has kept one.
+    function sendWaiting() as Void {
+        var q = CarryStore.waiting();
+        for (var i = 0; i < q.size(); i++) {
+            Communications.transmit({ "wd" => q[i] }, null, new SendListener());
+        }
+    }
+
+    private function saveRun() as Void {
+        var r = run;
+        if (r == null) {
+            return;
+        }
+        var o = r.save();
+        o.put("c", r.c);
+        Application.Storage.setValue(CarryStore.RUN, o);
+    }
+
+    private function showRun() as Void {
+        var r = run;
+        if (r != null) {
+            workout.apply(r.state(Time.now().value()));
+        }
     }
 
     function buzz(ms as Number) as Void {

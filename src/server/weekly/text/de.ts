@@ -1111,4 +1111,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Ein Plan von gestern erscheint nie als heutiger: Nach Mitternacht wartet die Uhr auf den neuen Plan von deinem Handy.",
   },
+  "watch-alone": {
+    title: "Lass dein Handy im Spind",
+    intro: "Der heutige Plan ist jetzt auch auf deiner Uhr, also trainierst du nur mit dem Handgelenk und speicherst alles später.",
+    points: [
+      "Läuft auf dem Handy kein Training, zeigt die Uhr das heutige mit „Auf der Uhr starten“ (START bei Garmin).",
+      "Satz eintragen, +30 s, die Vibration am Pausenende und Gewicht und Wiederholungen ändern gehen am Handgelenk, mit der Herzfrequenz der Uhr.",
+      "Tippe auf „Beenden“, wenn du fertig bist. Die Uhr behält das Training, bis dein Handy wieder in der Nähe ist, ob die App offen ist oder nicht.",
+      "Dein Handy speichert es dann, als hättest du dort eingetragen: jeden Satz, deine Bestwerte, die nächsten Gewichte und Health.",
+    ],
+    dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
+  },
 };

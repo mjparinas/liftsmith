@@ -187,6 +187,9 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-26: today's workout on the watch face: Wear OS tile and complication, Apple Watch complication, Garmin
   // glance (docs/decisions/watch-apps.md "Today on the watch face").
   L("watch-today", "free", "today", { fresh: "2026-11-26" }),
+  // New, 2026-11-26: phone-free workouts on the watch, waiting for Google Play's watch approval like the other watch emails
+  // (docs/decisions/watch-apps.md "Phone-free workouts").
+  L("watch-alone", "free", "today", { fresh: "2026-11-26", needsFlag: "wearOnPlay" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */
