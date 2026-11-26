@@ -6,13 +6,18 @@
 
 import Toybox.Application;
 import Toybox.Attention;
+import Toybox.Background;
 import Toybox.Communications;
 import Toybox.Lang;
 import Toybox.Sensor;
+import Toybox.System;
 import Toybox.Time;
 import Toybox.Timer;
 import Toybox.WatchUi;
 
+//! The glance and the background service (today's call, TodayGlance.mc) load this class too, so it does nothing
+//! of its own until getInitialView: the sensor, the timer and phone messages start only in the full app.
+(:glance, :background)
 class LiftsmithApp extends Application.AppBase {
     var workout as WorkoutState;
     private var _timer as Timer.Timer?;
@@ -22,6 +27,7 @@ class LiftsmithApp extends Application.AppBase {
     //! The set timer phase last seen (its label), to buzz when it moves on; null with no timer.
     private var _timerPhase as String? = null;
     private var _hrSentAt as Number = 0;
+    private var _running as Boolean = false;
     //! Waits a moment after the last UP or DOWN before the new weight and reps go to the phone, so a run of presses
     //! sends one adjust, not one each.
     private var _adjTimer as Timer.Timer?;
@@ -32,8 +38,16 @@ class LiftsmithApp extends Application.AppBase {
         workout = new WorkoutState();
     }
 
-    function onStart(state as Dictionary?) as Void {
+    function onStart(state as Dictionary?) as Void {}
+
+    //! The full app only (never the glance or the background service).
+    function begin() as Void {
+        _running = true;
         Communications.registerForPhoneAppMessages(method(:onPhone));
+        // Today's call for the glance, also while the app is closed (TodayService).
+        if (Background has :registerForPhoneAppMessageEvent) {
+            Background.registerForPhoneAppMessageEvent();
+        }
         Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
         Sensor.enableSensorEvents(method(:onSensor));
         var timer = new Timer.Timer();
@@ -42,6 +56,9 @@ class LiftsmithApp extends Application.AppBase {
     }
 
     function onStop(state as Dictionary?) as Void {
+        if (!_running) {
+            return;
+        }
         flushAdjust();
         Sensor.enableSensorEvents(null);
         Sensor.setEnabledSensors([]);
@@ -52,11 +69,36 @@ class LiftsmithApp extends Application.AppBase {
     }
 
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
+        begin();
         return [new WorkoutView(workout), new WorkoutDelegate(self)];
     }
 
-    //! A new state from the phone (or the end of the workout).
+    (:glance)
+    function getGlanceView() as [WatchUi.GlanceView] or [WatchUi.GlanceView, WatchUi.GlanceViewDelegate] or Null {
+        return [new TodayGlance()];
+    }
+
+    (:background)
+    function getServiceDelegate() as [System.ServiceDelegate] {
+        return [new TodayService()];
+    }
+
+    //! Today's call the background service picked up while the app was closed.
+    function onBackgroundData(data as Application.PersistableType) as Void {
+        if (data instanceof Dictionary) {
+            Application.Storage.setValue(TodayStore.KEY, data);
+            WatchUi.requestUpdate();
+        }
+    }
+
+    //! A new state from the phone (or the end of the workout), or today's call for the glance under "g".
     function onPhone(msg as Communications.PhoneAppMessage) as Void {
+        var data = msg.data;
+        if (data instanceof Dictionary && data.get("g") instanceof Dictionary) {
+            Application.Storage.setValue(TodayStore.KEY, data.get("g") as Dictionary);
+            WatchUi.requestUpdate();
+            return;
+        }
         workout.apply(msg.data);
         _wasResting = workout.resting();
         var phase = workout.phase();

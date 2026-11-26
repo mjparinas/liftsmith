@@ -87,6 +87,14 @@ final class WatchHub {
             items.release();
             set(app, found);
         });
+        // Today's call too, in case it came while the app wasn't installed or the listener missed it.
+        Uri today = new Uri.Builder().scheme("wear").path(TodayStore.PATH_TODAY).build();
+        Wearable.getDataClient(app).getDataItems(today).addOnSuccessListener((DataItemBuffer items) -> {
+            String json = null;
+            for (DataItem item : items) json = DataMapItem.fromDataItem(item).getDataMap().getString("json");
+            items.release();
+            if (json != null && !json.equals(TodayStore.raw(app))) TodayStore.save(app, json);
+        });
         findPhones(app);
     }
 

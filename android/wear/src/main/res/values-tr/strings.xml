@@ -19,6 +19,9 @@
     <string name="check_phone">Telefonuna bak</string>
     <string name="open_failed">Liftsmith\'i telefonunda aç.</string>
     <string name="install_failed">Liftsmith\'i telefonundaki Google Play\'den indir.</string>
+    <string name="tile_label">Bugünkü antrenman</string>
+    <string name="open_app">Aç</string>
+    <string name="no_today">Bugünkü planı burada görmek için telefonunda Liftsmith\'i aç.</string>
     <string name="lighter">Daha hafif</string>
     <string name="heavier">Daha ağır</string>
     <string name="fewer_reps">Daha az tekrar</string>

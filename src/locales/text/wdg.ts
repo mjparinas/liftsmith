@@ -5,6 +5,7 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "wdg.title": "{call} · {minutes} min",
+  "wdg.mins": "{minutes} min",
   "wdg.start": "Start",
   "wdg.resume": "Resume",
   "wdg.log": "Log set",
@@ -44,6 +45,7 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} min",
+  "wdg.mins": "{minutes} min",
   "wdg.start": "Empezar",
   "wdg.resume": "Seguir",
   "wdg.log": "Registrar serie",
@@ -81,6 +83,7 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} min",
+  "wdg.mins": "{minutes} min",
   "wdg.start": "Commencer",
   "wdg.resume": "Reprendre",
   "wdg.log": "Noter la série",
@@ -121,6 +124,7 @@ export const fr: Partial<Record<Key, Message>> = {
 
 export const de: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} Min.",
+  "wdg.mins": "{minutes} Min.",
   "wdg.start": "Start",
   "wdg.resume": "Fortsetzen",
   "wdg.log": "Satz eintragen",
@@ -158,6 +162,7 @@ export const de: Partial<Record<Key, Message>> = {
 
 export const it: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} min",
+  "wdg.mins": "{minutes} min",
   "wdg.start": "Inizia",
   "wdg.resume": "Riprendi",
   "wdg.log": "Registra serie",
@@ -195,6 +200,7 @@ export const it: Partial<Record<Key, Message>> = {
 
 export const ja: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes}分",
+  "wdg.mins": "{minutes}分",
   "wdg.start": "開始",
   "wdg.resume": "再開",
   "wdg.log": "セットを記録",
@@ -223,6 +229,7 @@ export const ja: Partial<Record<Key, Message>> = {
 
 export const pt: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} min",
+  "wdg.mins": "{minutes} min",
   "wdg.start": "Começar",
   "wdg.resume": "Retomar",
   "wdg.log": "Registrar série",
@@ -266,6 +273,7 @@ export const pt: Partial<Record<Key, Message>> = {
 
 export const ko: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes}분",
+  "wdg.mins": "{minutes}분",
   "wdg.start": "시작",
   "wdg.resume": "계속",
   "wdg.log": "세트 기록",
@@ -304,6 +312,7 @@ export const ko: Partial<Record<Key, Message>> = {
 
 export const tr: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} dk",
+  "wdg.mins": "{minutes} dk",
   "wdg.start": "Başla",
   "wdg.resume": "Devam et",
   "wdg.log": "Seti kaydet",
@@ -347,6 +356,7 @@ export const tr: Partial<Record<Key, Message>> = {
 
 export const pl: Partial<Record<Key, Message>> = {
   "wdg.title": "{call} · {minutes} min",
+  "wdg.mins": "{minutes} min",
   "wdg.start": "Start",
   "wdg.resume": "Wznów",
   "wdg.log": "Zapisz serię",

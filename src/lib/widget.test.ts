@@ -59,6 +59,21 @@ describe("widgetSnapshot", () => {
     expect(widgetSnapshot(input()).note).toBe("");
   });
 
+  // The watch tile, complication and glance (2026-11-26): the call, the length and readiness, each short.
+  it("gives the watches today's call, length and readiness in short pieces", () => {
+    const signals = { ...r, signals: [{ points: 10, text: "Slept well" }], score: 82 };
+    const s = widgetSnapshot(input({ readiness: signals }));
+    expect(s.watch).toEqual({ call: expect.any(String), mins: `${plan.estMinutes} min`, ready: "Readiness 82" });
+    expect(s.title).toBe(`${s.watch?.call} · ${s.watch?.mins}`);
+  });
+
+  it("leaves readiness off the watch while the score is only a placeholder, and on rest days and during a workout", () => {
+    expect(widgetSnapshot(input({ readiness: { ...r, signals: [{ points: 0, text: "First workout" }] } })).watch?.ready).toBe("");
+    expect(widgetSnapshot(input({ plan: { ...plan, items: [] } })).watch).toEqual({ call: "Rest day", mins: "", ready: "" });
+    const active = widgetSnapshot(input({ active: true }));
+    expect(active.watch).toEqual({ call: active.title, mins: "", ready: "" });
+  });
+
   it("says rest day and why when nothing is planned", () => {
     const s = widgetSnapshot(input({ plan: { ...plan, items: [] } }));
     expect(s.kind).toBe("rest");

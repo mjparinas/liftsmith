@@ -19,6 +19,9 @@
     <string name="check_phone">Mira tu móvil</string>
     <string name="open_failed">Abre Liftsmith en tu móvil.</string>
     <string name="install_failed">Instala Liftsmith desde Google Play en tu móvil.</string>
+    <string name="tile_label">Entrenamiento de hoy</string>
+    <string name="open_app">Abrir</string>
+    <string name="no_today">Abre Liftsmith en tu móvil para ver aquí el plan de hoy.</string>
     <string name="lighter">Menos peso</string>
     <string name="heavier">Más peso</string>
     <string name="fewer_reps">Menos repeticiones</string>

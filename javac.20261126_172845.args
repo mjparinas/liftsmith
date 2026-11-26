@@ -1,0 +1,7 @@
+-proc:none
+-d
+/tmp/claude-0/jc
+-Xlint:none
+-sourcepath
+/dev/null
+android/app/src/main/java/com/getliftsmith/app/WorkoutSessionPlugin.java

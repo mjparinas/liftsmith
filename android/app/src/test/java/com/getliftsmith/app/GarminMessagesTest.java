@@ -118,6 +118,20 @@ public class GarminMessagesTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void todayGoesUnderItsOwnKeySoItIsNeverTakenForAWorkout() throws Exception {
+        org.json.JSONObject t = new org.json.JSONObject().put("day", "2026-11-26").put("call", "Push").put("mins", "45 min").put("ready", "Readiness 82");
+        java.util.Map<String, Object> m = GarminMessages.today(t);
+        assertEquals(1, m.size());
+        java.util.Map<String, Object> g = (java.util.Map<String, Object>) m.get("g");
+        assertEquals("Push", g.get("c"));
+        assertEquals("45 min", g.get("m"));
+        assertEquals("Readiness 82", g.get("r"));
+        assertEquals("", g.get("y"));
+        assertEquals("", ((java.util.Map<String, Object>) GarminMessages.today(null).get("g")).get("c"));
+    }
+
+    @Test
     public void theLadderAndTheQuestionGoToTheWatch() throws Exception {
         JSONObject s = lifting()
             .put("adj", new JSONObject().put("key", "s1:2:0:2:").put("kg", new org.json.JSONArray("[97.5,100,102.5]")).put("w", new org.json.JSONArray("[\"97.5 kg\",\"100 kg\",\"102.5 kg\"]")).put("i", 1).put("reps", 5).put("rs", "reps"))

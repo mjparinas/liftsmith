@@ -9,6 +9,30 @@ final class WatchMessages {
 
     private WatchMessages() {}
 
+    /** The pieces of the home-screen widget's snapshot (src/lib/widget.ts) the watches show. */
+    private static final String[] TODAY_KEYS = { "day", "kind", "title", "why", "stale" };
+    private static final String[] TODAY_WATCH_KEYS = { "call", "mins", "ready" };
+
+    /**
+     * Today's call for the watch tile, complication and glance, from the widget's snapshot: {day, kind, title, why,
+     * stale, call, mins, ready}, all strings. Null for an empty snapshot (signed out, device erased), which clears the
+     * watch. An app from before the watch part (no "watch") still gives the title as the call.
+     */
+    static JSONObject today(String snapshot) {
+        try {
+            JSONObject s = new JSONObject(snapshot);
+            if (s.optInt("v", 0) != 1) return null;
+            JSONObject out = new JSONObject();
+            for (String k : TODAY_KEYS) out.put(k, s.optString(k, ""));
+            JSONObject w = s.optJSONObject("watch");
+            for (String k : TODAY_WATCH_KEYS) out.put(k, w == null ? "" : w.optString(k, ""));
+            if (out.optString("call").isEmpty()) out.put("call", out.optString("title"));
+            return out;
+        } catch (JSONException | NullPointerException e) {
+            return null;
+        }
+    }
+
     /** "log", "add30" or "taken" (Machine taken, src/lib/takenSwap.ts), or null. */
     static String action(String body) {
         return "log".equals(body) || "add30".equals(body) || "taken".equals(body) ? body : null;

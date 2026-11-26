@@ -626,6 +626,11 @@ export const tr: FeaturesText = {
       name: "Saat uygulamaları",
       body: "Wear OS ve Apple Watch'ta antrenman: set ya da dinlenme geri sayımı, saatten nabız, Seti kaydet ve +30 s, dinlenme bitince de bir titreşim.",
     },
+    "watch-today": {
+      name: "Bugünkü antrenman saatinde",
+      body: "Wear OS'ta bir kutucuk ve kadran komplikasyonu, Apple Watch'ta bir komplikasyon ve Garmin'de bir bakış; bugünkü öneriyi, süresini ve hazırlığını “Zorla · 45 dk · Hazırlık 82” gibi gösterir. Wear OS'ta Telefonda başlat onu telefonunda açar.",
+      note: "Apple Watch iPhone uygulamasını açamaz, bu yüzden komplikasyonu saat uygulamasını açar.",
+    },
     "watch-adjust": {
       name: "Saatte seti değiştir ve değerlendir",
       body: "Kurmayı veya çerçeveyi çevir ya da − ve + düğmelerine bas; ağırlığı ve tekrarları bileğinden telefonla aynı adımlarla değiştir: plakaların, dambılların ya da makinenin ağırlık yığını. Bir hareketin son setinden sonra saat nasıl geçtiğini sorar ve cevabın bir sonraki ağırlığı belirler.",

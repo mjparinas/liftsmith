@@ -1047,6 +1047,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "watch-today",
+        name: "Today's workout on your watch",
+        body: 'A Wear OS tile and watch face complication, an Apple Watch complication and a Garmin glance show today\'s call, how long it takes and how ready you are, like "Push · 45 min · Readiness 82". On Wear OS, Start on phone opens it on your phone.',
+        tier: "free",
+        where: "phones",
+        note: "Apple Watch can't open the iPhone app, so its complication opens the watch app instead.",
+        added: "2026-11-26",
+      },
+      {
         id: "watch-adjust",
         name: "Change and rate a set on the watch",
         body: "Turn the crown or bezel, or press − and +, to change the weight and reps from your wrist, in the same steps as the phone: your plates, dumbbells or the machine's stack. After an exercise's last set the watch asks how it felt, and your answer sets the next weight.",

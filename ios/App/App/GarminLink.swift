@@ -127,6 +127,18 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
         }
     }
 
+    /// Today's call last sent, so an unchanged snapshot doesn't cross Bluetooth again.
+    private var lastToday: String?
+
+    /// Today's call for the Garmin glance, from the widget's snapshot. Nothing until a watch has been picked.
+    func today(_ snapshot: String) {
+        guard started, !devices.isEmpty else { return }
+        let json = WatchMessages.today(snapshot) ?? ""
+        guard json != lastToday else { return }
+        lastToday = json
+        send(WatchMessages.garminToday(json))
+    }
+
     /// The workout ended: the watch goes back to "No workout running".
     func stop() {
         launchedFor = nil

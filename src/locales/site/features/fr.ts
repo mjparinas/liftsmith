@@ -565,6 +565,11 @@ export const fr: FeaturesText = {
       name: "Applis pour montres",
       body: "La séance sur Wear OS et Apple Watch : la série ou le décompte du repos, le pouls de la montre, Valider la série et +30 s, et une vibration à la fin du repos.",
     },
+    "watch-today": {
+      name: "La séance du jour sur ta montre",
+      body: "Une tuile et une complication de cadran sur Wear OS, une complication sur Apple Watch et un aperçu sur Garmin affichent le choix du jour, sa durée et ta forme, comme « Pousser · 45 min · Forme 82 ». Sur Wear OS, Démarrer sur le téléphone l'ouvre sur ton téléphone.",
+      note: "L'Apple Watch ne peut pas ouvrir l'app de l'iPhone, donc sa complication ouvre l'app de la montre.",
+    },
     "watch-adjust": {
       name: "Modifier et noter une série sur la montre",
       body: "Tournez la couronne ou la lunette, ou appuyez sur − et +, pour changer la charge et les répétitions depuis le poignet, par les mêmes paliers que sur le téléphone : vos disques, vos haltères ou la pile de la machine. Après la dernière série d’un exercice, la montre demande comment c’était, et votre réponse fixe la charge suivante.",

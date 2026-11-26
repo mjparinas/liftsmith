@@ -19,6 +19,9 @@
     <string name="check_phone">スマホを確認してください</string>
     <string name="open_failed">スマホでLiftsmithを開いてください。</string>
     <string name="install_failed">スマホのGoogle PlayからLiftsmithを入れてください。</string>
+    <string name="tile_label">今日のワークアウト</string>
+    <string name="open_app">開く</string>
+    <string name="no_today">スマートフォンでLiftsmithを開くと、今日のプランがここに表示されます。</string>
     <string name="lighter">軽くする</string>
     <string name="heavier">重くする</string>
     <string name="fewer_reps">回数を減らす</string>
