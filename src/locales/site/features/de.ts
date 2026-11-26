@@ -564,6 +564,11 @@ export const de: FeaturesText = {
       name: "Uhren-Apps",
       body: "Das Training auf Wear OS und der Apple Watch: der Satz oder der Pausen-Countdown, der Puls der Uhr, Satz eintragen und +30 s, und ein Vibrieren, wenn die Pause endet.",
     },
+    "watch-today": {
+      name: "Das heutige Training auf deiner Uhr",
+      body: "Eine Kachel und eine Zifferblatt-Komplikation auf Wear OS, eine Komplikation auf der Apple Watch und ein Glance auf Garmin zeigen die heutige Empfehlung, wie lange sie dauert und wie bereit du bist, etwa „Pushen · 45 Min. · Bereitschaft 82“. Auf Wear OS öffnet „Am Handy starten“ es auf deinem Handy.",
+      note: "Die Apple Watch kann die iPhone-App nicht öffnen, deshalb öffnet ihre Komplikation die Uhr-App.",
+    },
     "watch-adjust": {
       name: "Satz auf der Uhr ändern und bewerten",
       body: "Dreh die Krone oder die Lünette oder tippe auf − und +, um Gewicht und Wiederholungen am Handgelenk zu ändern, in denselben Schritten wie am Handy: deine Scheiben, Kurzhanteln oder der Steckgewichtsblock. Nach dem letzten Satz einer Übung fragt die Uhr, wie es sich angefühlt hat, und deine Antwort bestimmt das nächste Gewicht.",

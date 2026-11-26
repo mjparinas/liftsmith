@@ -6,5 +6,6 @@
     <string id="Bpm">$1$ bpm</string>
     <string id="HintLog">START : noter la série</string>
     <string id="HintAdd">DOWN : +30 s</string>
+    <string id="TodayNone" scope="glance">Ouvrez Liftsmith sur votre téléphone pour le programme du jour.</string>
     <string id="HintRate">MENU : Noter</string>
 </strings>

@@ -76,7 +76,7 @@ describe("Garmin watch app", () => {
     pl: "pol",
     tr: "tur",
   };
-  const ids = (path: string) => [...readFileSync(join(GARMIN, path), "utf8").matchAll(/<string id="(\w+)">/g)].map((m) => m[1]!);
+  const ids = (path: string) => [...readFileSync(join(GARMIN, path), "utf8").matchAll(/<string id="(\w+)"[^>]*>/g)].map((m) => m[1]!);
 
   it("has every app language, with every string", () => {
     expect(Object.keys(CODES).sort()).toEqual([...OTHERS].sort());

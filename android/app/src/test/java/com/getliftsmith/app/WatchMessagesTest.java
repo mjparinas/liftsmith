@@ -48,6 +48,31 @@ public class WatchMessagesTest {
     }
 
     @Test
+    public void todayKeepsOnlyWhatTheWatchShows() throws Exception {
+        org.json.JSONObject t = WatchMessages.today(
+            "{\"v\":1,\"day\":\"2026-11-26\",\"kind\":\"push\",\"title\":\"Push · 45 min\",\"why\":\"Slept well\",\"note\":\"x\","
+                + "\"stale\":\"Open Liftsmith\",\"watch\":{\"call\":\"Push\",\"mins\":\"45 min\",\"ready\":\"Readiness 82\"}}"
+        );
+        assertNotNull(t);
+        assertEquals("Push", t.getString("call"));
+        assertEquals("45 min", t.getString("mins"));
+        assertEquals("Readiness 82", t.getString("ready"));
+        assertEquals("2026-11-26", t.getString("day"));
+        assertEquals(false, t.has("note"));
+    }
+
+    @Test
+    public void todayFromAnOlderSnapshotOrNone() throws Exception {
+        org.json.JSONObject t = WatchMessages.today("{\"v\":1,\"day\":\"d\",\"kind\":\"rest\",\"title\":\"Rest day\"}");
+        assertNotNull(t);
+        assertEquals("Rest day", t.getString("call"));
+        assertEquals("", t.getString("ready"));
+        assertNull(WatchMessages.today("{}"));
+        assertNull(WatchMessages.today("junk"));
+        assertNull(WatchMessages.today(null));
+    }
+
+    @Test
     public void plainTapsCarryNothing() {
         WatchMessages.Tap t = WatchMessages.tap("log");
         assertNotNull(t);

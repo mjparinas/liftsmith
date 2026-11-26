@@ -184,6 +184,9 @@ export const WEEKLY: WeeklyEmail[] = [
   R("coach-assign-program", "coach", "pro", "trainer/programs", { fresh: "2026-11-24", shot: false }),
   // New, 2026-11-25: My team for athletes, team chat and Add athletes on a team card (docs/decisions/school-teams.md "My team").
   R("my-team", "school", "free", "trainer", { fresh: "2026-11-25", shot: false }),
+  // New, 2026-11-26: today's workout on the watch face: Wear OS tile and complication, Apple Watch complication, Garmin
+  // glance (docs/decisions/watch-apps.md "Today on the watch face").
+  L("watch-today", "free", "today", { fresh: "2026-11-26" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

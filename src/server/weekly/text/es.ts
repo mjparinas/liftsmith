@@ -1098,4 +1098,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Los enlaces del equipo ahora funcionan aunque el atleta inicie sesión después de abrirlos, así nadie se queda fuera de la lista.",
   },
+  "watch-today": {
+    title: "El entrenamiento de hoy en tu esfera",
+    intro: "Tu reloj ya muestra lo que te espera hoy sin abrir nada: el entrenamiento, cuánto dura y cómo estás de preparado.",
+    points: [
+      "En Wear OS, añade el mosaico Entrenamiento de hoy o una complicación. Empezar en el móvil abre el entrenamiento en tu móvil.",
+      "En el Apple Watch, añade la complicación de Liftsmith. Un toque abre la app del reloj con la propuesta de hoy.",
+      "En Garmin, el resumen de Liftsmith muestra la misma línea cuando hayas abierto la app en el reloj.",
+      "Es la misma propuesta y el mismo motivo que Hoy en tu móvil, y se actualiza cuando cambia tu plan.",
+    ],
+    dyk: "Un plan de ayer nunca aparece como el de hoy: pasada la medianoche, el reloj espera el nuevo plan de tu móvil.",
+  },
 };

@@ -18,6 +18,9 @@ final class WatchLink: NSObject, WCSessionDelegate {
     var onMotion: (([String: Any]) -> Void)?
 
     private var launchedFor: String?
+    /// The application context holds the live workout ("json") and today's call ("today") together, because each
+    /// update replaces the whole context: sending one alone would wipe the other.
+    private var context: [String: Any] = [:]
     private let health = HKHealthStore()
 
     func start() {
@@ -56,9 +59,25 @@ final class WatchLink: NSObject, WCSessionDelegate {
         send(["json": ""], on: s)
     }
 
-    private func send(_ context: [String: Any], on s: WCSession) {
+    /// Today's call for the complication and the watch's idle screen, from the home-screen widget's snapshot, which
+    /// the app sends only when a line changes (src/lib/widget.ts). An empty snapshot (signed out) clears it.
+    func today(_ snapshot: String) {
+        guard let s = session else { return }
+        let json = WatchMessages.today(snapshot) ?? ""
+        guard context["today"] as? String != json else { return }
+        send(["today": json], on: s)
+        // A complication on the watch face gets its own budgeted transfer, which wakes the watch app to redraw it.
+        if s.isComplicationEnabled, s.remainingComplicationUserInfoTransfers > 0 {
+            s.transferCurrentComplicationUserInfo(["today": json])
+        }
+    }
+
+    private func send(_ part: [String: Any], on s: WCSession) {
+        // After a relaunch, start from what the watch already has, so today's call never wipes a running workout.
+        if context.isEmpty { context = s.applicationContext }
+        context.merge(part) { _, new in new }
         try? s.updateApplicationContext(context)
-        if s.isReachable { s.sendMessage(context, replyHandler: nil, errorHandler: nil) }
+        if s.isReachable { s.sendMessage(part, replyHandler: nil, errorHandler: nil) }
     }
 
     private func receive(_ message: [String: Any]) {
@@ -83,6 +102,28 @@ final class WatchLink: NSObject, WCSessionDelegate {
 
 /// What the watch may send. Anything else is dropped, so a bad message can't reach the web app.
 enum WatchMessages {
+    /// Today's call for the watch, from the widget's snapshot: {day, kind, title, why, stale, call, mins, ready}, all
+    /// strings, as JSON; nil for an empty snapshot. Same as Android's WatchMessages.today.
+    static func today(_ snapshot: String) -> String? {
+        guard let data = snapshot.data(using: .utf8),
+              let s = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              (s["v"] as? NSNumber)?.intValue == 1 else { return nil }
+        var out: [String: String] = [:]
+        for k in ["day", "kind", "title", "why", "stale"] { out[k] = s[k] as? String ?? "" }
+        let w = s["watch"] as? [String: Any]
+        for k in ["call", "mins", "ready"] { out[k] = w?[k] as? String ?? "" }
+        if out["call"]?.isEmpty ?? true { out["call"] = out["title"] }
+        guard let json = try? JSONSerialization.data(withJSONObject: out, options: [.sortedKeys]) else { return nil }
+        return String(data: json, encoding: .utf8)
+    }
+
+    /// Today's call for the Garmin glance, under "g" so the watch never takes it for a workout (GarminMessages.today).
+    static func garminToday(_ json: String?) -> [String: Any] {
+        let t = json.flatMap { $0.data(using: .utf8) }.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: String] } ?? [:]
+        let keys = ["d": "day", "k": "kind", "t": "title", "y": "why", "c": "call", "m": "mins", "r": "ready", "x": "stale"]
+        return ["g": keys.mapValues { t[$0] ?? "" }]
+    }
+
     static func action(_ value: Any?) -> String? {
         guard let a = value as? String, a == "log" || a == "add30" else { return nil }
         return a

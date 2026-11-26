@@ -560,6 +560,11 @@ export const es: FeaturesText = {
       name: "Apps para reloj",
       body: "El entrenamiento en Wear OS y Apple Watch: la serie o la cuenta atrás del descanso, el pulso del reloj, Registrar serie y +30 s, y una vibración al terminar el descanso.",
     },
+    "watch-today": {
+      name: "El entrenamiento de hoy en tu reloj",
+      body: "Un mosaico y una complicación de esfera en Wear OS, una complicación en Apple Watch y un vistazo en Garmin muestran la propuesta de hoy, cuánto dura y cómo estás de preparado, como «Empuje · 45 min · Preparación 82». En Wear OS, Empezar en el móvil lo abre en tu teléfono.",
+      note: "El Apple Watch no puede abrir la app del iPhone, así que su complicación abre la app del reloj.",
+    },
     "watch-adjust": {
       name: "Cambia y valora una serie en el reloj",
       body: "Gira la corona o el bisel, o pulsa − y +, para cambiar el peso y las repeticiones desde la muñeca, con los mismos saltos que en el teléfono: tus discos, mancuernas o la pila de la máquina. Tras la última serie de un ejercicio, el reloj pregunta qué tal fue y tu respuesta fija el siguiente peso.",

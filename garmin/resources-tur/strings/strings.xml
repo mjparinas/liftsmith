@@ -6,5 +6,6 @@
     <string id="Bpm">$1$ bpm</string>
     <string id="HintLog">START: Seti kaydet</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="TodayNone" scope="glance">Bugünkü plan için telefonunda Liftsmith'i aç.</string>
     <string id="HintRate">MENU: Değerlendir</string>
 </strings>

@@ -13,6 +13,8 @@ final class WatchModel: NSObject, ObservableObject {
 
     @Published private(set) var state: WatchState?
     @Published private(set) var bpm: Int?
+    /// Today's call from the phone (the complication's), shown while no workout runs.
+    @Published private(set) var today: WatchToday? = WatchToday.load()
 
     private let health = HKHealthStore()
     private var session: HKWorkoutSession?
@@ -35,6 +37,14 @@ final class WatchModel: NSObject, ObservableObject {
     var current: WatchState? {
         guard let s = state, !s.stale(at: Date()) else { return nil }
         return s
+    }
+
+    /// Today's call for the complication and the idle screen; "" when the phone took it away (signed out).
+    fileprivate func applyToday(_ json: String) {
+        let next = WatchToday.parse(json)
+        guard next != today else { return }
+        today = next
+        WatchToday.save(next == nil ? nil : json)
     }
 
     fileprivate func apply(_ json: String?) {
@@ -162,17 +172,35 @@ final class WatchModel: NSObject, ObservableObject {
 extension WatchModel: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         let json = session.receivedApplicationContext["json"] as? String
-        Task { @MainActor in self.apply(json) }
+        let today = session.receivedApplicationContext["today"] as? String
+        Task { @MainActor in
+            self.apply(json)
+            if let today { self.applyToday(today) }
+        }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
         let json = context["json"] as? String
-        Task { @MainActor in self.apply(json) }
+        let today = context["today"] as? String
+        Task { @MainActor in
+            self.apply(json)
+            if let today { self.applyToday(today) }
+        }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        // Today's call goes on its own, so it never touches the workout.
+        if let today = message["today"] as? String {
+            Task { @MainActor in self.applyToday(today) }
+        }
         guard let json = message["json"] as? String else { return }
         Task { @MainActor in self.apply(json) }
+    }
+
+    /// Today's call sent for the complication (transferCurrentComplicationUserInfo), which wakes the watch app for it.
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        guard let today = userInfo["today"] as? String else { return }
+        Task { @MainActor in self.applyToday(today) }
     }
 }
 

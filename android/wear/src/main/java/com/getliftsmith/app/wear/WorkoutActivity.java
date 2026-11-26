@@ -26,6 +26,9 @@ import com.google.android.gms.wearable.Wearable;
 public class WorkoutActivity extends Activity implements WatchHub.Listener {
 
     private static final int ASK_HR = 1;
+    /** From the Today tile's Start on phone: open the phone app's start shortcut as soon as the phone is found. */
+    static final String EXTRA_START = "startOnPhone";
+    private boolean startWanted = false;
     private final Handler tick = new Handler(Looper.getMainLooper());
     private final Runnable everySecond = new Runnable() {
         @Override
@@ -117,6 +120,23 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         log.setOnClickListener((v) -> logSet(v));
         add.setOnClickListener((v) -> tap(v, "add30"));
         phone.setOnClickListener(this::openOnPhone);
+        startWanted = getIntent().getBooleanExtra(EXTRA_START, false);
+    }
+
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent.getBooleanExtra(EXTRA_START, false)) startWanted = true;
+    }
+
+    /** The tile's Start on phone, once the phone with Liftsmith is known; dropped when there's none, or a workout runs. */
+    private void startIfWanted() {
+        if (!startWanted) return;
+        PhoneLink.Status link = WatchHub.phone();
+        if (link == PhoneLink.Status.CHECKING) return;
+        startWanted = false;
+        if (link == PhoneLink.Status.READY && WatchHub.state() == null) openOnPhone(phone);
     }
 
     /** Start on phone (the app's start shortcut) or Install on phone (Play's page for the app), on the phone. */
@@ -292,6 +312,7 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
 
     @Override
     public void changed() {
+        startIfWanted();
         WorkoutState s = WatchHub.state();
         if (s != null) {
             // Asked once, the first time a workout shows; without it the watch still logs sets, just no heart rate.
@@ -339,12 +360,21 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
                     sub.setText(R.string.offline_body);
                     phone.setVisibility(View.GONE);
                     break;
-                case READY:
-                    title.setText(R.string.none_title);
-                    sub.setText(R.string.none_body);
+                case READY: {
+                    // Today's call from the phone (the tile's), so Start on phone says what it starts.
+                    TodayState today = TodayStore.load(this);
+                    if (today != null && today.current(now) && !today.active()) {
+                        title.setText(today.title);
+                        String detail = today.mins.isEmpty() ? "" : today.ready;
+                        sub.setText(detail.isEmpty() ? today.why : today.why.isEmpty() ? detail : detail + "\n" + today.why);
+                    } else {
+                        title.setText(R.string.none_title);
+                        sub.setText(R.string.none_body);
+                    }
                     phone.setText(R.string.start_on_phone);
                     phone.setVisibility(View.VISIBLE);
                     break;
+                }
                 case CHECKING:
                 default:
                     title.setText(R.string.none_title);

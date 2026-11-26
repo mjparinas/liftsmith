@@ -18,6 +18,9 @@
     <string name="check_phone">Regardez votre téléphone</string>
     <string name="open_failed">Ouvrez Liftsmith sur votre téléphone.</string>
     <string name="install_failed">Installez Liftsmith depuis Google Play sur votre téléphone.</string>
+    <string name="tile_label">Séance du jour</string>
+    <string name="open_app">Ouvrir</string>
+    <string name="no_today">Ouvrez Liftsmith sur votre téléphone pour voir ici le programme du jour.</string>
     <string name="lighter">Plus léger</string>
     <string name="heavier">Plus lourd</string>
     <string name="fewer_reps">Moins de répétitions</string>

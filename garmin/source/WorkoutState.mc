@@ -7,6 +7,7 @@ import Toybox.Time;
 //! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
 //! phone's never have to agree. "ay", "ak", "aw", "ai", "ar" and "ars" are the set to adjust and "qe", "q" and "qo" the
 //! "How did it feel?" question (GarminMessages.java, GarminLink.swift; watchAdjust.ts on the phone).
+(:glance, :background)
 class WorkoutState {
     //! A workout the phone stopped updating this long ago was forgotten (the phone ends those after 3 hours).
     const STALE_SEC = 10800;

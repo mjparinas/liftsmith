@@ -18,6 +18,9 @@
     <string name="check_phone">휴대폰을 확인하세요</string>
     <string name="open_failed">휴대폰에서 Liftsmith를 여세요.</string>
     <string name="install_failed">휴대폰의 Google Play에서 Liftsmith를 설치하세요.</string>
+    <string name="tile_label">오늘의 운동</string>
+    <string name="open_app">열기</string>
+    <string name="no_today">휴대폰에서 Liftsmith를 열면 오늘의 계획이 여기에 표시됩니다.</string>
     <string name="lighter">더 가볍게</string>
     <string name="heavier">더 무겁게</string>
     <string name="fewer_reps">횟수 줄이기</string>

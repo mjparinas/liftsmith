@@ -6,5 +6,6 @@
     <string id="Bpm">$1$ lpm</string>
     <string id="HintLog">START: registrar serie</string>
     <string id="HintAdd">DOWN: +30 s</string>
+    <string id="TodayNone" scope="glance">Abre Liftsmith en tu móvil para ver el plan de hoy.</string>
     <string id="HintRate">MENU: Valorar</string>
 </strings>

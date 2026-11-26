@@ -175,6 +175,21 @@ final class GarminLink {
         });
     }
 
+    /** Today's call last sent, so an unchanged snapshot doesn't cross Bluetooth again. */
+    private static String lastToday;
+
+    /** Today's call for the Garmin glance, from the widget's snapshot. Nothing without Garmin Connect. */
+    static void today(Context ctx, String snapshot) {
+        if (ciq == null && !garminConnectInstalled(ctx)) return;
+        JSONObject t = WatchMessages.today(snapshot);
+        String key = t == null ? "" : t.toString();
+        start(ctx, () -> {
+            if (!ready || key.equals(lastToday)) return;
+            lastToday = key;
+            send(GarminMessages.today(t));
+        });
+    }
+
     /** The workout ended. */
     static void stop(Context ctx) {
         launchedFor = null;

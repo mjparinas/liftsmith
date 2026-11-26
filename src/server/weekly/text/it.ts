@@ -1099,4 +1099,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "I link della squadra ora funzionano anche se l'atleta accede dopo averli aperti, quindi nessuno resta fuori dalla rosa.",
   },
+  "watch-today": {
+    title: "L'allenamento di oggi sul quadrante",
+    intro: "L'orologio ora mostra cosa ti aspetta oggi senza aprire nulla: l'allenamento, quanto dura e quanto sei in forma.",
+    points: [
+      "Su Wear OS, aggiungi il riquadro Allenamento di oggi o una complicazione. Avvia sul telefono apre l'allenamento sul telefono.",
+      "Su Apple Watch, aggiungi la complicazione di Liftsmith. Un tocco apre l'app dell'orologio con la scelta di oggi.",
+      "Su Garmin, l'anteprima di Liftsmith mostra la stessa riga dopo che hai aperto l'app sull'orologio.",
+      "È la stessa scelta con lo stesso motivo di Oggi sul telefono, e si aggiorna quando cambia il piano.",
+    ],
+    dyk: "Un piano di ieri non appare mai come quello di oggi: dopo mezzanotte l'orologio aspetta il nuovo piano dal telefono.",
+  },
 };
