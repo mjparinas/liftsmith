@@ -152,6 +152,9 @@ export const en = {
   "wn.c.programInOrder.title": "Programs that run in order",
   "wn.c.programInOrder.body":
     "A coach can now run a program's days in order: you get the next day whenever you train, not on set weekdays.",
+  "wn.c.chatInPlace.title": "Chats open where you are",
+  "wn.c.chatInPlace.body":
+    "Message your coach or open Team chat and the chat opens right there: in the Messages box on a computer, or over the page on your phone.",
 } as const;
 
 type Key = keyof typeof en;
@@ -315,6 +318,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Programas que van en orden",
   "wn.c.programInOrder.body":
     "Ahora un entrenador puede hacer que los días vayan en orden: haces el día siguiente cuando entrenas, no en días fijos.",
+  "wn.c.chatInPlace.title": "Los chats se abren donde estás",
+  "wn.c.chatInPlace.body":
+    "Escribe a tu entrenador o abre el chat del equipo y se abre ahí mismo: en el cuadro de Mensajes en el ordenador o sobre la página en el teléfono.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -480,6 +486,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Des programmes qui se suivent dans l'ordre",
   "wn.c.programInOrder.body":
     "Un coach peut maintenant faire suivre les jours dans l'ordre : tu fais le jour suivant dès que tu t'entraînes, pas à jours fixes.",
+  "wn.c.chatInPlace.title": "Les discussions s'ouvrent là où vous êtes",
+  "wn.c.chatInPlace.body":
+    "Écrivez à votre coach ou ouvrez la discussion d'équipe : elle s'ouvre sur place, dans la boîte Messages sur ordinateur ou par-dessus la page sur téléphone.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -641,6 +650,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Programme, die der Reihe nach laufen",
   "wn.c.programInOrder.body":
     "Ein Coach kann die Tage jetzt der Reihe nach laufen lassen: Du machst den nächsten Tag, wann immer du trainierst, nicht an festen Wochentagen.",
+  "wn.c.chatInPlace.title": "Chats öffnen sich dort, wo du bist",
+  "wn.c.chatInPlace.body":
+    "Schreib deinem Coach oder öffne den Teamchat, und der Chat öffnet sich direkt dort: am Computer im Nachrichtenfenster, am Handy über der Seite.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -803,6 +815,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Programmi che vanno in ordine",
   "wn.c.programInOrder.body":
     "Ora un coach può far andare i giorni in ordine: fai il giorno successivo quando ti alleni, non in giorni fissi.",
+  "wn.c.chatInPlace.title": "Le chat si aprono dove sei",
+  "wn.c.chatInPlace.body":
+    "Scrivi al tuo coach o apri la chat della squadra e si apre lì: nel riquadro Messaggi sul computer o sopra la pagina sul telefono.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -954,6 +969,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "順番に進むプログラム",
   "wn.c.programInOrder.body":
     "コーチがプログラムを順番に進めるよう設定できるようになりました。決まった曜日ではなく、トレーニングするたびに次の日に進みます。",
+  "wn.c.chatInPlace.title": "チャットがその場で開きます",
+  "wn.c.chatInPlace.body":
+    "コーチへのメッセージやチームチャットは、その場で開きます。パソコンではメッセージ欄に、スマートフォンでは画面の上に表示されます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1111,6 +1129,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Programas que seguem em ordem",
   "wn.c.programInOrder.body":
     "Agora um treinador pode fazer os dias seguirem em ordem: você faz o próximo dia sempre que treina, não em dias fixos.",
+  "wn.c.chatInPlace.title": "As conversas abrem onde você está",
+  "wn.c.chatInPlace.body":
+    "Mande mensagem ao seu treinador ou abra o chat da equipe e ele abre ali mesmo: na caixa de Mensagens no computador ou sobre a página no celular.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1256,6 +1277,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "순서대로 진행되는 프로그램",
   "wn.c.programInOrder.body":
     "이제 코치가 프로그램을 순서대로 진행하게 할 수 있어요. 정해진 요일이 아니라 운동할 때마다 다음 날로 넘어가요.",
+  "wn.c.chatInPlace.title": "채팅이 바로 그 자리에서 열려요",
+  "wn.c.chatInPlace.body":
+    "코치에게 메시지를 보내거나 팀 채팅을 열면 그 자리에서 열려요. 컴퓨터에서는 메시지 창에, 휴대폰에서는 화면 위에 열려요.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1412,6 +1436,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Programy realizowane po kolei",
   "wn.c.programInOrder.body":
     "Trener może teraz ustawić dni po kolei: robisz następny dzień, kiedy tylko trenujesz, a nie w stałe dni tygodnia.",
+  "wn.c.chatInPlace.title": "Czaty otwierają się tam, gdzie jesteś",
+  "wn.c.chatInPlace.body":
+    "Napisz do trenera albo otwórz czat drużyny, a otworzy się od razu: w okienku Wiadomości na komputerze lub nad stroną na telefonie.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1570,4 +1597,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.programInOrder.title": "Sırayla ilerleyen programlar",
   "wn.c.programInOrder.body":
     "Koç artık bir programın günlerini sırayla ilerletebilir: sabit günlerde değil, ne zaman antrenman yaparsan sıradaki günü yaparsın.",
+  "wn.c.chatInPlace.title": "Sohbetler olduğun yerde açılır",
+  "wn.c.chatInPlace.body":
+    "Koçuna yaz ya da takım sohbetini aç, sohbet hemen orada açılır: bilgisayarda Mesajlar kutusunda, telefonda sayfanın üstünde.",
 };

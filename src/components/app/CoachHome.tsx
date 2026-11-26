@@ -73,6 +73,7 @@ import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
 import { ClientVideos } from "./FormVideos";
 import { Icon, type IconName } from "./icons";
+import { MessageButton } from "./MessageButton";
 import { MyTeam } from "./MyTeam";
 import { go, replaceRoute } from "./router";
 import { AthleteTeams, CoachTeams, JoinTeam, useTeams } from "./SchoolTeams";
@@ -502,7 +503,7 @@ function CoachCard({ coach, unread }: { coach: Person; unread: number }) {
           </span>
         </span>
       </div>
-      <Button className="mt-3 w-full" icon="chat" onClick={() => go("trainer", `${CHAT}${coach.id}`)}>
+      <MessageButton id={coach.id} name={name} className="mt-3 w-full">
         {t("trn.messageNamed", { name })}
         {unread > 0 && (
           <span className="num ml-1.5 rounded-full bg-surface px-1.5 text-xs font-bold text-ink">
@@ -510,7 +511,7 @@ function CoachCard({ coach, unread }: { coach: Person; unread: number }) {
             <span className="sr-only">{t("trn.unread", { count: unread })}</span>
           </span>
         )}
-      </Button>
+      </MessageButton>
       <p className="mt-2 text-sm text-muted">{t("trn.reachHint", { name })}</p>
     </section>
   );

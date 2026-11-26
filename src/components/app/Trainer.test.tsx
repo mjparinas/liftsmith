@@ -947,6 +947,20 @@ describe("My team (school team athletes)", () => {
     expect(calls.find((c) => (c.body as { action?: string })?.action === "say")).toMatchObject({ body: { team: "t1", text: "On my way" } });
   });
 
+  it("on a phone, Team chat and Message open in a sheet over My team, not a new screen", async () => {
+    asClient();
+    teamsData = ATHLETE_TEAMS;
+    const u = userEvent.setup();
+    render(<Trainer arg="programs" />);
+    await u.click(await screen.findByRole("button", { name: "Team chat" }));
+    const sheet = await screen.findByRole("dialog", { name: "School squad" });
+    expect(await within(sheet).findByText("Lift at 4 tomorrow")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "My team" })).toBeInTheDocument();
+    await u.click(within(sheet).getByRole("button", { name: /Close/ }));
+    await u.click(screen.getByRole("button", { name: "Message Sam" }));
+    expect(await screen.findByRole("dialog", { name: "Sam" })).toBeInTheDocument();
+  });
+
   it("a team link opened signed out keeps the team code for after signing in", () => {
     useAccount.setState({ account: null });
     render(<Trainer arg="team.APRJKHTD" />);

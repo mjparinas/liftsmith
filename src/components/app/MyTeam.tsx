@@ -33,8 +33,8 @@ import type { Overview, Person } from "@/lib/trainer";
 import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
+import { MessageButton } from "./MessageButton";
 import { AthleteProgramCalendar } from "./ProgramCalendar";
-import { go } from "./router";
 import { JoinTeam } from "./SchoolTeams";
 import { Button, CountDot, Section } from "./ui";
 
@@ -160,12 +160,12 @@ function TeamCard({ team, unread }: { team: Team; unread: number }) {
         </div>
       </div>
       <p className="mt-3 text-sm text-good">{t("team.proFree")}</p>
-      <Button className="mt-4 w-full" icon="chat" onClick={() => go("trainer", `tc.${team.id}`)}>
+      <MessageButton team id={team.id} name={team.name} className="mt-4 w-full">
         <span className="inline-flex items-center gap-2">
           {t("mt.chat")}
           <CountDot n={unread} />
         </span>
-      </Button>
+      </MessageButton>
       {unread > 0 && <p className="sr-only">{t("trn.unread", { count: unread })}</p>}
     </section>
   );
@@ -216,12 +216,12 @@ function CoachCard({ coach, unread, assistants }: { coach: Person; unread: numbe
           </ul>
         </div>
       )}
-      <Button kind="ghost" className="mt-3 w-full" icon="chat" onClick={() => go("trainer", `m.${coach.id}`)}>
+      <MessageButton id={coach.id} name={name} kind="ghost" className="mt-3 w-full">
         <span className="inline-flex items-center gap-2">
           {t("trn.messageNamed", { name })}
           <CountDot n={unread} />
         </span>
-      </Button>
+      </MessageButton>
       {unread > 0 && <p className="sr-only">{t("trn.unread", { count: unread })}</p>}
     </section>
   );

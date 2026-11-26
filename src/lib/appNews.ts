@@ -46,7 +46,7 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.24.0",
+    version: "0.24.1",
     day: "2026-11-27",
     headline:
       "Coach programs run in phases with a one-tap deload, coaches can set reps and tweak a program for one client, lifters see it on Today, and a program can run in order",
@@ -55,6 +55,7 @@ export const RELEASES: readonly AppRelease[] = [
       { id: "programTweaks", kind: "new", icon: "people" },
       { id: "programAthlete", kind: "new", icon: "calendar" },
       { id: "programInOrder", kind: "new", icon: "layers" },
+      { id: "chatInPlace", kind: "better", icon: "chat" },
     ],
   },
   {
