@@ -201,6 +201,8 @@ export interface Message {
   body: string;
   /** Route to open on tap. */
   route: string;
+  /** Streak warnings and milestones: the weeks in a row and, for a warning, this week's workouts and goal (the email's streak card). */
+  streak?: { weeks: number; done?: number; goal?: number };
 }
 
 const DAY = 86_400_000;
@@ -340,17 +342,20 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
     const monday = weekStartIn(day + 12 * 3600_000, tz, first);
     const trainedToday = last >= day;
     const candidates: Message[] = [];
-    const add = (kind: MessageKind, at: number, title: string, body: string, route = "today", tag = "") => {
-      if (at >= from && at < to && on(kind)) candidates.push({ key: `${kind}:${key}${tag}`, kind, at, title, body, route });
+    const add = (kind: MessageKind, at: number, title: string, body: string, route = "today", tag = "", streak?: Message["streak"]) => {
+      if (at >= from && at < to && on(kind))
+        candidates.push({ key: `${kind}:${key}${tag}`, kind, at, title, body, route, ...(streak ? { streak } : {}) });
     };
 
     // Streak: this week's goal is reachable only if every day left has a workout.
     let streakLine: string | null = null;
+    let streakDone = 0;
     if (monday === weekStartIn(from, tz, first) && input.streakWeeks >= 1) {
       const done = input.weekStart === monday ? input.weekDays : 0;
       const needed = goal - done;
       const daysLeft = 7 - ((wd + 7 - first) % 7); // today included
       if (needed > 0 && needed === daysLeft && !trainedToday) {
+        streakDone = done;
         streakLine =
           needed === 1
             ? say(lang, "rmd.streakOne", { weeks: input.streakWeeks })
@@ -381,7 +386,12 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       );
     }
 
-    if (streakLine) add("streak", atTime(day, sendHour, tz), say(lang, "rmd.keepStreak"), streakLine);
+    if (streakLine)
+      add("streak", atTime(day, sendHour, tz), say(lang, "rmd.keepStreak"), streakLine, "today", "", {
+        weeks: input.streakWeeks,
+        done: streakDone,
+        goal,
+      });
 
     // Training seasons: the day one starts, the first day of its finale week (points count twice) and three days
     // before it ends. Not a nudge to train more: points stop at the lifter's own weekly goal.
@@ -564,7 +574,7 @@ export function milestone(
   prev: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks"> | null,
   next: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks" | "lang">,
   now: number,
-): { key: string; title: string; body: string } | null {
+): { key: string; title: string; body: string; streak?: Message["streak"] } | null {
   const { lang } = next;
   if (next.firstWorkoutAt && !prev?.firstWorkoutAt && now - next.firstWorkoutAt < 3 * DAY) {
     return {
@@ -579,6 +589,7 @@ export function milestone(
       key: `milestone:streak${w}`,
       title: say(lang, "rmd.streakWeeks", { weeks: w }),
       body: say(lang, "rmd.streakWeeksBody", { weeks: w }),
+      streak: { weeks: w },
     };
   return null;
 }

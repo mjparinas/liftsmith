@@ -463,7 +463,7 @@ export function capped(m: Pick<Message, "kind" | "at">, sends: readonly Send[], 
 
 async function deliver(
   sub: Sub,
-  m: Pick<Message, "key" | "kind" | "at" | "title" | "body" | "route">,
+  m: Pick<Message, "key" | "kind" | "at" | "title" | "body" | "route" | "streak">,
   store: Store,
   mail: Mailer,
   env: Env,
