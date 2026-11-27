@@ -1132,6 +1132,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Los widgets no llevan scripts, cookies ni seguimiento, y cada uno enlaza a la página de tu gimnasio para que los nuevos socios lo añadan con un toque.",
   },
+  "share-stats": {
+    title: "Comparte las cifras de las que estás más orgulloso",
+    intro: "Cada máximo estimado, serie más pesada y récord personal tiene ahora un pequeño botón de compartir al lado.",
+    points: [
+      "Está junto a tus máximos y récords nuevos en Progreso, y en la página de cada ejercicio.",
+      "En la página de un ejercicio, cada fila de la tabla de récords también tiene uno, desde tu serie más pesada hasta tu mejor marca para 15 repeticiones.",
+      "Un toque crea una tarjeta con esa cifra, el logotipo de Liftsmith y la web, con el aspecto de la app.",
+      "Publícala, envíala o guárdala. Puedes ocultar los pesos, y tu nombre no aparece salvo que lo añadas.",
+    ],
+    dyk: "Tu enlace de invitación puede ir en la tarjeta, así que quien se una con él te sigue de vuelta.",
+  },
   "workout-generator": {
     title: "Mándale un entrenamiento a un amigo, aunque no tenga la app",
     intro: "Nuestra web tiene ahora un generador de entrenamientos gratis que usa el mismo motor que tu pantalla Hoy.",

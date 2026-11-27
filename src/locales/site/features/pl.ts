@@ -486,6 +486,10 @@ export const pl: FeaturesText = {
       body: "Zrób zrzut ekranu, a wysunie się arkusz kart z twoim treningiem: ostatni miesiąc, trzy miesiące, sześć miesięcy, rok albo od początku, jako podsumowanie, podział serii albo najlepsze boje. Przesuwaj je, ukryj ciężary ikoną oka i udostępnij z linkiem z zaproszeniem na karcie. Te same karty są pod Udostępnij mój trening w Postępach. Każdy link, który udostępniasz, niesie teraz twoje zaproszenie, w linku, który o tym mówi.",
       note: "Zrzuty ekranu otwierają to na Androidzie 14 i nowszym oraz na iPhonie, i można to wyłączyć. Gdzie indziej otwórz to z Postępów. Osoby poniżej 18 lat udostępniają bez linku z zaproszeniem.",
     },
+    "share-stats": {
+      name: "Udostępnij każdy rekord i maks",
+      body: "Obok szacowanych maksów, najcięższej serii, każdego rekordu dla liczby powtórzeń i ostatnich rekordów życiowych jest mały przycisk udostępniania. Jedno dotknięcie tworzy kartę z tą liczbą, logo Liftsmith i stroną, w wyglądzie aplikacji, gotową do opublikowania lub zapisania.",
+    },
     coaching: {
       name: "Prowadź podopiecznych",
       body: "Połącz się z podopiecznymi, oglądaj ich wyniki i przydzielaj im rutyny, na telefonie albo dużym ekranie.",

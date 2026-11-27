@@ -764,6 +764,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         note: "Screenshots open it on Android 14 and up and on iPhone, and it can be turned off. Elsewhere, open it from Progress. Lifters under 18 share without an invite link.",
         added: "2026-11-16",
       },
+      {
+        id: "share-stats",
+        name: "Share any best or max",
+        body: "A small share button sits beside your estimated maxes, your heaviest set, each best for a rep count and your recent personal bests. One tap makes a card of that number with the Liftsmith logo and the website, in the app's look, ready to post or save.",
+        tier: "free",
+        added: "2026-11-27",
+      },
     ],
   },
   {

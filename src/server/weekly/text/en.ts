@@ -1150,6 +1150,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "The widgets carry no scripts, cookies or tracking, and each one links to your gym's page so new members can add your gym in one tap.",
   },
+  "share-stats": {
+    title: "Share the numbers you're proudest of",
+    intro: "Every estimated max, heaviest set and personal best now has a small share button beside it.",
+    points: [
+      "Find it beside your maxes and new bests on Progress, and on each exercise's page.",
+      "On an exercise's page, every row of the bests table has one too, from your heaviest set to your best for 15 reps.",
+      "One tap makes a card of that number with the Liftsmith logo and the website, in the app's look.",
+      "Post it, send it or save it. The eye hides the weights, and your name stays off unless you add it.",
+    ],
+    dyk: "Your invite link can ride along on the card, so a friend who joins with it follows you back.",
+  },
   "workout-generator": {
     title: "Send a friend a workout, even without the app",
     intro: "Our website now has a free workout generator that runs the same engine as your Today screen.",

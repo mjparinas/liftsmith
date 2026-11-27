@@ -486,6 +486,10 @@ export const pt: FeaturesText = {
       body: "Faça uma captura de tela e uma folha de cards do seu treino aparece: último mês, três meses, seis meses, ano ou desde o início, como totais, para onde foram suas séries ou seus melhores levantamentos. Deslize entre eles, oculte os pesos com o olho e compartilhe com seu link de convite impresso no card. Os mesmos cards estão em Compartilhar meu treino, no Progresso. Todo link que você compartilha agora leva seu convite, num link que diz isso.",
       note: "As capturas abrem isso no Android 14 ou mais recente e no iPhone, e dá para desativar. Em outros lugares, abra pelo Progresso. Quem tem menos de 18 anos compartilha sem link de convite.",
     },
+    "share-stats": {
+      name: "Compartilhe qualquer recorde ou máximo",
+      body: "Um pequeno botão de compartilhar fica ao lado dos seus máximos estimados, da sua série mais pesada, de cada recorde por número de repetições e dos seus recordes recentes. Um toque cria um cartão com esse número, o logotipo do Liftsmith e o site, no visual do app, pronto para postar ou salvar.",
+    },
     coaching: {
       name: "Treine alunos",
       body: "Vincule alunos, veja os resultados deles e passe rotinas, no celular ou numa tela grande.",

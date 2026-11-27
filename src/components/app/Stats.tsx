@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { num, t } from "@/lib/i18n";
+import { previousBest, prShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
@@ -21,6 +22,7 @@ import { CoachNotes } from "./Insights";
 import { OneRmSection } from "./OneRepMax";
 import { ProStats } from "./ProStats";
 import { go, useRoute } from "./router";
+import { ShareStat } from "./ShareStat";
 import { StatsShareSheet } from "./StatsShare";
 import { HUE } from "./theme";
 import { Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
@@ -154,11 +156,11 @@ export function Stats() {
       >
         <ul className="card divide-y divide-line">
           {stats.prs.slice(0, 8).map((p) => (
-            <li key={p.at + p.exerciseId}>
+            <li key={p.at + p.exerciseId} className="flex items-center pr-3">
               <button
                 type="button"
                 onClick={() => go("exercise", p.exerciseId)}
-                className="press flex w-full flex-wrap items-center justify-between gap-x-3 px-4 py-3 text-left"
+                className="press flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-3 py-3 pr-1 pl-4 text-left"
               >
                 <span className="flex items-center gap-2 font-medium">
                   <span className="text-gold">
@@ -173,6 +175,10 @@ export function Stats() {
                   </span>
                 </span>
               </button>
+              <ShareStat
+                label={t("card.pick.pr", { name: exercise(p.exerciseId).name })}
+                items={(ctx) => [prShare(p, previousBest(stats.prs, p), ctx)]}
+              />
             </li>
           ))}
           {!stats.prs.length && (

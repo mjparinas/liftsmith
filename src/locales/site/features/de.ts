@@ -424,6 +424,10 @@ export const de: FeaturesText = {
       body: "Mach einen Screenshot, und ein Blatt mit Trainingskarten fährt hoch: dein letzter Monat, drei Monate, sechs Monate, das Jahr oder alles, als Summen, als Aufteilung deiner Sätze oder als deine besten Lifts. Wisch durch, blende die Gewichte mit dem Auge aus und teile sie mit deinem Einladungslink auf der Karte. Dieselben Karten findest du unter Mein Training teilen im Fortschritt. Jeder Link, den du teilst, trägt jetzt deine Einladung, in einem Link, der das auch sagt.",
       note: "Screenshots öffnen es unter Android 14 und neuer und auf dem iPhone, und es lässt sich ausschalten. Sonst öffnest du es im Fortschritt. Unter 18-Jährige teilen ohne Einladungslink.",
     },
+    "share-stats": {
+      name: "Jede Bestleistung und jedes Maximum teilen",
+      body: "Neben deinen geschätzten Maxima, deinem schwersten Satz, jeder Bestleistung je Wiederholungszahl und deinen neuen Bestleistungen sitzt ein kleiner Teilen-Knopf. Ein Tippen macht daraus eine Karte mit dieser Zahl, dem Liftsmith-Logo und der Website im Look der App, bereit zum Posten oder Speichern.",
+    },
     coaching: {
       name: "Kunden coachen",
       body: "Verknüpfe Kunden, sieh ihre Ergebnisse und weise ihnen Routinen zu, am Handy oder auf einem großen Bildschirm.",

@@ -149,6 +149,9 @@ export const en = {
   "wn.c.watchToday.title": "Today's workout on your watch face",
   "wn.c.watchToday.body":
     "Add the Liftsmith tile or complication to see today's call, how long and how ready you are. On Wear OS, Start on phone opens it.",
+  "wn.c.shareStats.title": "Share any best or max",
+  "wn.c.shareStats.body":
+    "Tap the small share button beside an estimated max, your heaviest set, a best for a rep count or a recent personal best to post a card of it with the Liftsmith logo.",
   "wn.c.watchAlone.title": "Leave your phone in the locker",
   "wn.c.watchAlone.body":
     "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
@@ -351,6 +354,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "El entrenamiento de hoy en tu esfera",
   "wn.c.watchToday.body":
     "Añade el mosaico o la complicación de Liftsmith para ver la propuesta de hoy, cuánto dura y cómo estás de preparado. En Wear OS, Empezar en el móvil lo abre.",
+  "wn.c.shareStats.title": "Comparte cualquier récord o máximo",
+  "wn.c.shareStats.body":
+    "Toca el pequeño botón de compartir junto a un máximo estimado, tu serie más pesada, un récord por repeticiones o un récord reciente para publicar una tarjeta con el logotipo de Liftsmith.",
   "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
   "wn.c.watchAlone.body":
     "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
@@ -555,6 +561,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "La séance du jour sur ton cadran",
   "wn.c.watchToday.body":
     "Ajoute la tuile ou la complication Liftsmith pour voir le choix du jour, sa durée et ta forme. Sur Wear OS, Démarrer sur le téléphone l'ouvre.",
+  "wn.c.shareStats.title": "Partagez un record ou un max",
+  "wn.c.shareStats.body":
+    "Touchez le petit bouton de partage à côté d’un max estimé, de votre série la plus lourde, d’un record par répétitions ou d’un record récent pour publier une carte avec le logo Liftsmith.",
   "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
   "wn.c.watchAlone.body":
     "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
@@ -755,6 +764,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Das heutige Training auf dem Zifferblatt",
   "wn.c.watchToday.body":
     "Füge die Liftsmith-Kachel oder -Komplikation hinzu und sieh die heutige Empfehlung, die Dauer und deine Bereitschaft. Auf Wear OS öffnet „Am Handy starten“ es.",
+  "wn.c.shareStats.title": "Jede Bestleistung und jedes Maximum teilen",
+  "wn.c.shareStats.body":
+    "Tippe auf den kleinen Teilen-Knopf neben einem geschätzten Maximum, deinem schwersten Satz, einer Bestleistung je Wiederholungszahl oder einer neuen Bestleistung, um eine Karte mit dem Liftsmith-Logo zu posten.",
   "wn.c.watchAlone.title": "Lass dein Handy im Spind",
   "wn.c.watchAlone.body":
     "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
@@ -955,6 +967,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "L'allenamento di oggi sul quadrante",
   "wn.c.watchToday.body":
     "Aggiungi il riquadro o la complicazione di Liftsmith per vedere la scelta di oggi, quanto dura e quanto sei in forma. Su Wear OS, Avvia sul telefono lo apre.",
+  "wn.c.shareStats.title": "Condividi ogni record o massimale",
+  "wn.c.shareStats.body":
+    "Tocca il piccolo pulsante di condivisione accanto a un massimale stimato, alla serie più pesante, a un record per ripetizioni o a un record recente per pubblicare una scheda con il logo di Liftsmith.",
   "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
   "wn.c.watchAlone.body":
     "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
@@ -1144,6 +1159,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "今日のワークアウトをウォッチフェイスに",
   "wn.c.watchToday.body":
     "Liftsmithのタイルやコンプリケーションを追加すると、今日のおすすめ、時間、コンディションが見られます。Wear OSでは「スマホで開始」で開けます。",
+  "wn.c.shareStats.title": "自己ベストや最大重量をシェア",
+  "wn.c.shareStats.body":
+    "推定最大重量、最重量セット、回数ごとの自己ベスト、最近の自己ベストの横にある小さなシェアボタンをタップすると、Liftsmithのロゴ入りカードを投稿できます。",
   "wn.c.watchAlone.title": "スマホはロッカーに",
   "wn.c.watchAlone.body":
     "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
@@ -1339,6 +1357,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "O treino de hoje no mostrador",
   "wn.c.watchToday.body":
     "Adicione o bloco ou a complicação do Liftsmith para ver a indicação de hoje, quanto dura e como está sua prontidão. No Wear OS, Começar no celular abre o treino.",
+  "wn.c.shareStats.title": "Compartilhe qualquer recorde ou máximo",
+  "wn.c.shareStats.body":
+    "Toque no pequeno botão de compartilhar ao lado de um máximo estimado, da sua série mais pesada, de um recorde por repetições ou de um recorde recente para postar um cartão com o logotipo do Liftsmith.",
   "wn.c.watchAlone.title": "Deixe o celular no armário",
   "wn.c.watchAlone.body":
     "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
@@ -1522,6 +1543,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "오늘의 운동을 워치 페이스에",
   "wn.c.watchToday.body":
     "Liftsmith 타일이나 컴플리케이션을 추가하면 오늘의 추천, 운동 시간, 컨디션을 볼 수 있어요. Wear OS에서는 휴대폰에서 시작으로 열 수 있어요.",
+  "wn.c.shareStats.title": "최고 기록과 최대 중량 공유",
+  "wn.c.shareStats.body":
+    "추정 최대 중량, 최고 중량 세트, 반복 횟수별 최고 기록, 최근 개인 기록 옆의 작은 공유 버튼을 누르면 Liftsmith 로고가 담긴 카드를 올릴 수 있습니다.",
   "wn.c.watchAlone.title": "휴대폰은 사물함에",
   "wn.c.watchAlone.body":
     "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
@@ -1716,6 +1740,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Dzisiejszy trening na tarczy zegarka",
   "wn.c.watchToday.body":
     "Dodaj kafelek lub komplikację Liftsmith, aby widzieć dzisiejszą propozycję, czas i gotowość. Na Wear OS Zacznij na telefonie otwiera trening.",
+  "wn.c.shareStats.title": "Udostępnij każdy rekord i maks",
+  "wn.c.shareStats.body":
+    "Dotknij małego przycisku udostępniania obok szacowanego maksa, najcięższej serii, rekordu dla liczby powtórzeń albo ostatniego rekordu życiowego, by opublikować kartę z logo Liftsmith.",
   "wn.c.watchAlone.title": "Zostaw telefon w szafce",
   "wn.c.watchAlone.body":
     "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
@@ -1912,6 +1939,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Bugünkü antrenman saat kadranında",
   "wn.c.watchToday.body":
     "Liftsmith kutucuğunu veya komplikasyonunu ekle; bugünkü öneriyi, süresini ve hazırlığını gör. Wear OS'ta Telefonda başlat onu açar.",
+  "wn.c.shareStats.title": "Her rekoru ve maksimumu paylaş",
+  "wn.c.shareStats.body":
+    "Tahmini maksimumun, en ağır setinin, bir tekrar sayısındaki rekorun ya da son kişisel rekorunun yanındaki küçük paylaş düğmesine dokun; Liftsmith logolu bir kart paylaş.",
   "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
   "wn.c.watchAlone.body":
     "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",
