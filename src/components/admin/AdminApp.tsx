@@ -27,6 +27,7 @@ import { Installs } from "./Installs";
 import { Log } from "./Log";
 import { MaintenanceBanner, useMaintenance } from "./Maintenance";
 import { NeedsYou } from "./NeedsYou";
+import { Pins } from "./Pins";
 import { Reports } from "./Reports";
 import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
@@ -56,6 +57,7 @@ const WORK_WITHOUT_STATS = new Set<Tab>([
   "Reports",
   "Community",
   "Gyms",
+  "Pins",
   "Users",
   "Installs",
   "Flags",
@@ -718,6 +720,7 @@ export function AdminApp() {
       {tab === "Gyms" && <GymPlaces admin={isAdmin} />}
       {tab === "Flags" && <Flags admin={isAdmin} />}
       {tab === "Seasons" && <Seasons admin={isAdmin} />}
+      {tab === "Pins" && <Pins admin={isAdmin} />}
       {tab === "Automations" && <Automations admin={isAdmin} />}
       {tab === "System" && <System admin={isAdmin} maintenance={maintenance} />}
       {tab === "Log" && <Log />}
