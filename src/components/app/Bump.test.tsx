@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HOLD_DELAY } from "@/lib/holdRepeat";
 import * as juice from "@/lib/juice";
 
-import { BumpField } from "./ui";
+import { BumpField, Stepper } from "./ui";
 
 function Harness({ start = "50", max = 9999 }: { start?: string; max?: number }) {
   const [v, setV] = useState(start);
@@ -122,5 +122,37 @@ describe("hold-to-repeat bumps", () => {
     const v = Number(box().value);
     fireEvent.click(plus());
     expect(Number(box().value)).toBe(v + 1);
+  });
+});
+
+function Secs({ jump }: { jump?: boolean }) {
+  const [v, setV] = useState(30);
+  return <Stepper value={String(v)} label="Hold" jump={jump} onDown={(n = 1) => setV((x) => x - n)} onUp={(n = 1) => setV((x) => x + n)} />;
+}
+
+describe("the workout stepper for seconds", () => {
+  const more = () => screen.getByRole("button", { name: "More Hold" });
+  const shown = () => Number(screen.getByText(/^\d+$/).textContent);
+
+  it("moves 1 second for a tap (Melvin, 2026-11-27: not 5)", () => {
+    render(<Secs jump />);
+    fireEvent.pointerDown(more(), { button: 0 });
+    fireEvent.pointerUp(more());
+    expect(shown()).toBe(31);
+  });
+
+  it("speeds up on a long hold with jump, and stays one step per repeat without it", () => {
+    render(<Secs jump />);
+    fireEvent.pointerDown(more(), { button: 0 });
+    wait(6000);
+    fireEvent.pointerUp(more());
+    const jumped = shown() - 30;
+    cleanup();
+    render(<Secs />);
+    fireEvent.pointerDown(more(), { button: 0 });
+    wait(6000);
+    fireEvent.pointerUp(more());
+    const plain = shown() - 30;
+    expect(jumped).toBeGreaterThan(plain * 1.5);
   });
 });
