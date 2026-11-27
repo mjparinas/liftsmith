@@ -402,6 +402,21 @@ export const en = {
   "gym.cls.save": "Save class",
   "gym.cls.remove": "Remove class",
   "gym.cls.pickDays": "Pick at least one day.",
+  "gym.edit.widgets": "Widgets for your website",
+  "gym.edit.widgetsNote":
+    "Paste one line of code into your gym's website to show your class schedule, your equipment or a Find us on Liftsmith badge. They stay up to date on their own and link to your gym's page.",
+  "gym.edit.widget.schedule": "Class schedule",
+  "gym.edit.widget.equipment": "Equipment",
+  "gym.edit.widget.badge": "Badge",
+  "gym.edit.widgetLook": "Look",
+  "gym.edit.widgetLight": "Light",
+  "gym.edit.widgetDark": "Dark",
+  "gym.edit.widgetLang": "Language",
+  "gym.edit.widgetPreview": "Preview",
+  "gym.edit.widgetCode": "Code to paste",
+  "gym.edit.widgetCopy": "Copy code",
+  "gym.edit.widgetCopied": "Copied. Paste it into an HTML or embed block on your website.",
+  "gym.edit.widgetFailed": "Couldn't copy. Select the code and copy it yourself.",
 } as const;
 
 type Key = keyof typeof en;
@@ -816,6 +831,21 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Guardar clase",
   "gym.cls.remove": "Quitar clase",
   "gym.cls.pickDays": "Elige al menos un día.",
+  "gym.edit.widgets": "Widgets para tu web",
+  "gym.edit.widgetsNote":
+    "Pega una línea de código en la web de tu gimnasio para mostrar tu horario de clases, tu equipamiento o una insignia de Encuéntranos en Liftsmith. Se actualizan solos y enlazan a la página de tu gimnasio.",
+  "gym.edit.widget.schedule": "Horario de clases",
+  "gym.edit.widget.equipment": "Equipamiento",
+  "gym.edit.widget.badge": "Insignia",
+  "gym.edit.widgetLook": "Aspecto",
+  "gym.edit.widgetLight": "Claro",
+  "gym.edit.widgetDark": "Oscuro",
+  "gym.edit.widgetLang": "Idioma",
+  "gym.edit.widgetPreview": "Vista previa",
+  "gym.edit.widgetCode": "Código para pegar",
+  "gym.edit.widgetCopy": "Copiar código",
+  "gym.edit.widgetCopied": "Copiado. Pégalo en un bloque HTML o de inserción de tu web.",
+  "gym.edit.widgetFailed": "No se pudo copiar. Selecciona el código y cópialo tú.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -1241,6 +1271,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Enregistrer le cours",
   "gym.cls.remove": "Retirer le cours",
   "gym.cls.pickDays": "Choisissez au moins un jour.",
+  "gym.edit.widgets": "Widgets pour votre site",
+  "gym.edit.widgetsNote":
+    "Collez une ligne de code sur le site de votre salle pour afficher votre horaire des cours, votre équipement ou un badge Retrouvez-nous sur Liftsmith. Ils se mettent à jour tout seuls et mènent à la page de votre salle.",
+  "gym.edit.widget.schedule": "Horaire des cours",
+  "gym.edit.widget.equipment": "Équipement",
+  "gym.edit.widget.badge": "Badge",
+  "gym.edit.widgetLook": "Apparence",
+  "gym.edit.widgetLight": "Clair",
+  "gym.edit.widgetDark": "Sombre",
+  "gym.edit.widgetLang": "Langue",
+  "gym.edit.widgetPreview": "Aperçu",
+  "gym.edit.widgetCode": "Code à coller",
+  "gym.edit.widgetCopy": "Copier le code",
+  "gym.edit.widgetCopied": "Copié. Collez-le dans un bloc HTML ou d’intégration de votre site.",
+  "gym.edit.widgetFailed": "Copie impossible. Sélectionnez le code et copiez-le vous-même.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -1665,6 +1710,21 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Kurs speichern",
   "gym.cls.remove": "Kurs entfernen",
   "gym.cls.pickDays": "Wähle mindestens einen Tag.",
+  "gym.edit.widgets": "Widgets für deine Website",
+  "gym.edit.widgetsNote":
+    "Füge eine Zeile Code in die Website deines Studios ein, um deinen Kursplan, deine Geräte oder ein „Finde uns auf Liftsmith“-Abzeichen zu zeigen. Sie bleiben von selbst aktuell und verlinken auf die Seite deines Studios.",
+  "gym.edit.widget.schedule": "Kursplan",
+  "gym.edit.widget.equipment": "Geräte",
+  "gym.edit.widget.badge": "Abzeichen",
+  "gym.edit.widgetLook": "Aussehen",
+  "gym.edit.widgetLight": "Hell",
+  "gym.edit.widgetDark": "Dunkel",
+  "gym.edit.widgetLang": "Sprache",
+  "gym.edit.widgetPreview": "Vorschau",
+  "gym.edit.widgetCode": "Code zum Einfügen",
+  "gym.edit.widgetCopy": "Code kopieren",
+  "gym.edit.widgetCopied": "Kopiert. Füge ihn in einen HTML- oder Einbettungsblock deiner Website ein.",
+  "gym.edit.widgetFailed": "Kopieren ging nicht. Markiere den Code und kopiere ihn selbst.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -2080,6 +2140,21 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Salva corso",
   "gym.cls.remove": "Togli corso",
   "gym.cls.pickDays": "Scegli almeno un giorno.",
+  "gym.edit.widgets": "Widget per il tuo sito",
+  "gym.edit.widgetsNote":
+    "Incolla una riga di codice nel sito della tua palestra per mostrare l’orario dei corsi, l’attrezzatura o un badge Trovaci su Liftsmith. Si aggiornano da soli e portano alla pagina della tua palestra.",
+  "gym.edit.widget.schedule": "Orario dei corsi",
+  "gym.edit.widget.equipment": "Attrezzatura",
+  "gym.edit.widget.badge": "Badge",
+  "gym.edit.widgetLook": "Aspetto",
+  "gym.edit.widgetLight": "Chiaro",
+  "gym.edit.widgetDark": "Scuro",
+  "gym.edit.widgetLang": "Lingua",
+  "gym.edit.widgetPreview": "Anteprima",
+  "gym.edit.widgetCode": "Codice da incollare",
+  "gym.edit.widgetCopy": "Copia il codice",
+  "gym.edit.widgetCopied": "Copiato. Incollalo in un blocco HTML o di incorporamento del tuo sito.",
+  "gym.edit.widgetFailed": "Copia non riuscita. Seleziona il codice e copialo tu.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -2469,6 +2544,21 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.cls.save": "クラスを保存",
   "gym.cls.remove": "クラスを削除",
   "gym.cls.pickDays": "曜日を1つ以上選んでください。",
+  "gym.edit.widgets": "ウェブサイト用ウィジェット",
+  "gym.edit.widgetsNote":
+    "ジムのウェブサイトにコードを1行貼り付けるだけで、クラスのスケジュール、設備、または「Liftsmithで見る」バッジを表示できます。内容は自動で最新になり、ジムのページにリンクします。",
+  "gym.edit.widget.schedule": "クラスのスケジュール",
+  "gym.edit.widget.equipment": "設備",
+  "gym.edit.widget.badge": "バッジ",
+  "gym.edit.widgetLook": "表示",
+  "gym.edit.widgetLight": "ライト",
+  "gym.edit.widgetDark": "ダーク",
+  "gym.edit.widgetLang": "言語",
+  "gym.edit.widgetPreview": "プレビュー",
+  "gym.edit.widgetCode": "貼り付けるコード",
+  "gym.edit.widgetCopy": "コードをコピー",
+  "gym.edit.widgetCopied": "コピーしました。ウェブサイトのHTMLブロックや埋め込みブロックに貼り付けてください。",
+  "gym.edit.widgetFailed": "コピーできませんでした。コードを選択して手動でコピーしてください。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -2904,6 +2994,21 @@ export const pt: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Salvar aula",
   "gym.cls.remove": "Remover aula",
   "gym.cls.pickDays": "Escolha pelo menos um dia.",
+  "gym.edit.widgets": "Widgets para o seu site",
+  "gym.edit.widgetsNote":
+    "Cole uma linha de código no site da sua academia para mostrar a grade de aulas, os equipamentos ou um selo Encontre a gente no Liftsmith. Eles se atualizam sozinhos e levam para a página da sua academia.",
+  "gym.edit.widget.schedule": "Grade de aulas",
+  "gym.edit.widget.equipment": "Equipamentos",
+  "gym.edit.widget.badge": "Selo",
+  "gym.edit.widgetLook": "Aparência",
+  "gym.edit.widgetLight": "Claro",
+  "gym.edit.widgetDark": "Escuro",
+  "gym.edit.widgetLang": "Idioma",
+  "gym.edit.widgetPreview": "Prévia",
+  "gym.edit.widgetCode": "Código para colar",
+  "gym.edit.widgetCopy": "Copiar código",
+  "gym.edit.widgetCopied": "Copiado. Cole em um bloco de HTML ou de incorporação do seu site.",
+  "gym.edit.widgetFailed": "Não foi possível copiar. Selecione o código e copie você mesmo.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -3306,6 +3411,21 @@ export const ko: Partial<Record<Key, Message>> = {
   "gym.cls.save": "수업 저장",
   "gym.cls.remove": "수업 삭제",
   "gym.cls.pickDays": "요일을 하나 이상 고르세요.",
+  "gym.edit.widgets": "웹사이트용 위젯",
+  "gym.edit.widgetsNote":
+    "체육관 웹사이트에 코드 한 줄을 붙여 넣으면 수업 일정, 장비 또는 'Liftsmith에서 보기' 배지를 보여 줄 수 있습니다. 내용은 자동으로 최신 상태가 되고 체육관 페이지로 연결됩니다.",
+  "gym.edit.widget.schedule": "수업 일정",
+  "gym.edit.widget.equipment": "장비",
+  "gym.edit.widget.badge": "배지",
+  "gym.edit.widgetLook": "모양",
+  "gym.edit.widgetLight": "라이트",
+  "gym.edit.widgetDark": "다크",
+  "gym.edit.widgetLang": "언어",
+  "gym.edit.widgetPreview": "미리 보기",
+  "gym.edit.widgetCode": "붙여 넣을 코드",
+  "gym.edit.widgetCopy": "코드 복사",
+  "gym.edit.widgetCopied": "복사했습니다. 웹사이트의 HTML 또는 임베드 블록에 붙여 넣으세요.",
+  "gym.edit.widgetFailed": "복사하지 못했습니다. 코드를 선택해 직접 복사하세요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -3733,6 +3853,21 @@ export const tr: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Dersi kaydet",
   "gym.cls.remove": "Dersi kaldır",
   "gym.cls.pickDays": "En az bir gün seç.",
+  "gym.edit.widgets": "Web siteniz için widget'lar",
+  "gym.edit.widgetsNote":
+    "Salonunuzun web sitesine tek satır kod yapıştırarak ders programınızı, ekipmanınızı ya da Bizi Liftsmith'te bulun rozetini gösterin. Kendiliğinden güncel kalır ve salonunuzun sayfasına bağlanır.",
+  "gym.edit.widget.schedule": "Ders programı",
+  "gym.edit.widget.equipment": "Ekipman",
+  "gym.edit.widget.badge": "Rozet",
+  "gym.edit.widgetLook": "Görünüm",
+  "gym.edit.widgetLight": "Açık",
+  "gym.edit.widgetDark": "Koyu",
+  "gym.edit.widgetLang": "Dil",
+  "gym.edit.widgetPreview": "Önizleme",
+  "gym.edit.widgetCode": "Yapıştırılacak kod",
+  "gym.edit.widgetCopy": "Kodu kopyala",
+  "gym.edit.widgetCopied": "Kopyalandı. Web sitenizde bir HTML ya da yerleştirme bloğuna yapıştırın.",
+  "gym.edit.widgetFailed": "Kopyalanamadı. Kodu seçip kendiniz kopyalayın.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -4188,4 +4323,19 @@ export const pl: Partial<Record<Key, Message>> = {
   "gym.cls.save": "Zapisz zajęcia",
   "gym.cls.remove": "Usuń zajęcia",
   "gym.cls.pickDays": "Wybierz co najmniej jeden dzień.",
+  "gym.edit.widgets": "Widżety na Twoją stronę",
+  "gym.edit.widgetsNote":
+    "Wklej jedną linijkę kodu na stronę swojej siłowni, żeby pokazać grafik zajęć, sprzęt albo odznakę „Znajdź nas w Liftsmith”. Aktualizują się same i prowadzą do strony Twojej siłowni.",
+  "gym.edit.widget.schedule": "Grafik zajęć",
+  "gym.edit.widget.equipment": "Sprzęt",
+  "gym.edit.widget.badge": "Odznaka",
+  "gym.edit.widgetLook": "Wygląd",
+  "gym.edit.widgetLight": "Jasny",
+  "gym.edit.widgetDark": "Ciemny",
+  "gym.edit.widgetLang": "Język",
+  "gym.edit.widgetPreview": "Podgląd",
+  "gym.edit.widgetCode": "Kod do wklejenia",
+  "gym.edit.widgetCopy": "Kopiuj kod",
+  "gym.edit.widgetCopied": "Skopiowano. Wklej go w blok HTML lub osadzania na swojej stronie.",
+  "gym.edit.widgetFailed": "Nie udało się skopiować. Zaznacz kod i skopiuj go samodzielnie.",
 };
