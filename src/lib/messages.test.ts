@@ -124,6 +124,7 @@ describe("push plan", () => {
     expect(streak.length).toBeGreaterThanOrEqual(1);
     expect(streak[0].body).toBe("3 workouts left this week to keep your 5-week streak.");
     expect(parts(streak[0].at, TZ)).toMatchObject({ wd: 5, h: 9 });
+    expect(streak[0].streak).toEqual({ weeks: 5, done: 0, goal: 3 });
     expect(plan({ ...base, streakWeeks: 0 }, fri, addDays(MON, 7, TZ), "push").filter((m) => m.kind === "streak")).toEqual([]);
     // With plenty of days left there's nothing to say.
     expect(plan(base, MON, addDays(MON, 3, TZ), "push").filter((m) => m.kind === "streak")).toEqual([]);
