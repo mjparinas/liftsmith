@@ -295,7 +295,8 @@ export const pt: FeaturesText = {
     "exercise-stats": {
       name: "Estatísticas de cada exercício",
       body: "Toque em qualquer exercício da biblioteca para ver suas séries, o peso total levantado, o máximo estimado e como você se compara com praticantes treinados do seu peso, idade e sexo, segundo padrões de força publicados.",
-      proPart: "Gráficos de uma semana a um ano fazem parte das estatísticas avançadas do Pro.",
+      proPart:
+        "As estatísticas avançadas do Pro trazem os gráficos, de uma semana a todo o histórico: toque em qualquer sessão para ver o número, com os recordes marcados.",
     },
     "log-past": {
       name: "Registre um treino passado",

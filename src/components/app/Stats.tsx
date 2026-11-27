@@ -19,7 +19,7 @@ import { HistoryCalendar } from "./History";
 import { Icon, type IconName } from "./icons";
 import { CoachNotes } from "./Insights";
 import { OneRmSection } from "./OneRepMax";
-import { ProLocked } from "./ProLocked";
+import { ProStats } from "./ProStats";
 import { go, useRoute } from "./router";
 import { StatsShareSheet } from "./StatsShare";
 import { HUE } from "./theme";
@@ -102,7 +102,7 @@ export function Stats() {
       <Section title={t("progress.weekSets")} icon="target" info="weeklySets">
         {/* Advanced stats are Pro (Melvin, 2026-11-12): free lifters see the card, marked Pro. */}
         {!can("advancedStats") ? (
-          <ProLocked from="stats" title={t("pro.ft.advancedStats")} body={t("progress.weekSets.lock")} />
+          <ProStats from="stats" lines={[t("lift.pro.sets"), t("lift.pro.chart"), t("lift.pro.trend")]} />
         ) : (
           <div className="card p-4">
             <ul className="space-y-2">

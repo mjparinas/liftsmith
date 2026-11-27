@@ -11,6 +11,7 @@ import { t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import type { AppEvent } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
+import { makeWorkout } from "@/test/factories";
 
 import { App } from "./App";
 import { go } from "./router";
@@ -145,6 +146,19 @@ describe("Pro features without Pro", () => {
     const b = await screen.findByRole("button", { name: "Advanced stats, a Pro feature: see Pro" });
     await user.click(b);
     expect(location.hash).toBe("#/pro/stats");
+  });
+
+  it("shows a free lifter what Pro stats add on an exercise page instead of its chart", async () => {
+    const user = userEvent.setup();
+    await onboardFree(user);
+    useApp.getState().importWorkouts(makeWorkout("sq", Date.now() - 86_400_000, [{ exerciseId: "back-squat", weight: 100, reps: 5 }]));
+    go("exercise", "back-squat");
+    const card = await screen.findByTestId("pro-stats");
+    expect(card).toHaveTextContent("Unlock more stats with Pro");
+    expect(card).toHaveAccessibleDescription(/Charts for every lift, from a week to all time/);
+    expect(screen.queryByTestId("lift-chart")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Advanced stats, a Pro feature: see Pro" }));
+    expect(location.hash).toBe("#/pro/lift");
   });
 
   it("shows the goal planner on Progress, tagged Pro", async () => {
