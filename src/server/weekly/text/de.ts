@@ -1123,6 +1123,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
   },
+  "gym-widgets": {
+    title: "Dein Studio auf deiner eigenen Website",
+    intro: "Kursplan, Geräte und ein „Finde uns auf Liftsmith“-Abzeichen können jetzt auf deiner Website stehen, immer aktuell.",
+    points: [
+      "Öffne dein Studio in der App, tippe auf Seite des Studios verwalten und such Widgets für deine Website.",
+      "Wähle Kursplan, Geräte oder Abzeichen, eine helle oder dunkle Optik und eine von zehn Sprachen, und sieh sie dir so an, wie sie erscheinen.",
+      "Kopiere den Code und füge ihn in einen HTML- oder Einbettungsblock deiner Website ein. Squarespace, Wix und WordPress haben einen.",
+      "Änderst du einen Kurs oder deine Geräte in der App, ändert sich das Widget auf deiner Website mit.",
+    ],
+    dyk: "Die Widgets haben keine Skripte, Cookies oder Tracking, und jedes verlinkt auf die Seite deines Studios, damit neue Mitglieder es mit einem Tipp hinzufügen.",
+  },
   "thirty-day": {
     title: "Eine Übung am Tag, 30 Tage lang",
     intro: "Zwölf 30-Tage-Challenges sind da, von Kniebeugen und Liegestützen bis zu Plank und Klimmzügen, jede in drei Stufen.",

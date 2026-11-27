@@ -1119,6 +1119,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planowanie zostaje na telefonie, więc Maszyna zajęta i Zmień plan czekają, aż wróci.",
   },
+  "gym-widgets": {
+    title: "Twoja siłownia na Twojej stronie",
+    intro: "Grafik zajęć, sprzęt i odznaka „Znajdź nas w Liftsmith” mogą teraz być na Twojej stronie, zawsze aktualne.",
+    points: [
+      "Otwórz swoją siłownię w aplikacji, stuknij Zarządzaj stroną tej siłowni i znajdź Widżety na Twoją stronę.",
+      "Wybierz grafik, sprzęt albo odznakę, jasny lub ciemny wygląd i jeden z dziesięciu języków, i zobacz, jak będzie wyglądać.",
+      "Skopiuj kod i wklej go w blok HTML lub osadzania na swojej stronie. Squarespace, Wix i WordPress mają taki blok.",
+      "Zmień zajęcia albo sprzęt w aplikacji, a widżet na stronie też się zmieni.",
+    ],
+    dyk: "Widżety nie mają skryptów, plików cookie ani śledzenia, a każdy prowadzi do strony Twojej siłowni, więc nowi członkowie dodadzą ją jednym dotknięciem.",
+  },
   "thirty-day": {
     title: "Jedno ćwiczenie dziennie przez 30 dni",
     intro: "Jest dwanaście 30-dniowych wyzwań, od przysiadów i pompek po deskę i podciąganie, każde na trzech poziomach.",

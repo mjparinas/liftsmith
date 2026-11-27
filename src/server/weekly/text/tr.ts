@@ -1118,6 +1118,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planlama telefonda kalır; Makine dolu ve Planı değiştir telefon dönene kadar bekler.",
   },
+  "gym-widgets": {
+    title: "Salonunuzu kendi web sitenize koyun",
+    intro: "Ders programınız, ekipmanınız ve Bizi Liftsmith'te bulun rozeti artık kendi web sitenizde, hep güncel durabilir.",
+    points: [
+      "Uygulamada salonunuzu açın, Bu salonun sayfasını yönet'e dokunun ve Web siteniz için widget'lar bölümünü bulun.",
+      "Ders programını, ekipmanı ya da rozeti, açık ya da koyu görünümü ve on dilden birini seçin, nasıl görüneceğine bakın.",
+      "Kodu kopyalayıp sitenizdeki bir HTML ya da yerleştirme bloğuna yapıştırın. Squarespace, Wix ve WordPress'te bu blok var.",
+      "Uygulamada bir dersi ya da ekipmanı değiştirdiğinizde sitenizdeki widget da değişir.",
+    ],
+    dyk: "Widget'larda betik, çerez ya da izleme yok; her biri salonunuzun sayfasına bağlanır, böylece yeni üyeler salonu tek dokunuşla ekler.",
+  },
   "thirty-day": {
     title: "30 gün boyunca günde bir hareket",
     intro: "Squat ve şınavdan plank ve barfikse on iki 30 günlük meydan okuma geldi, her biri üç seviyede.",

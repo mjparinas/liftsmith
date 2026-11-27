@@ -1121,6 +1121,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La planificación sigue en el móvil, así que Máquina ocupada y Cambiar el plan esperan a que vuelva.",
   },
+  "gym-widgets": {
+    title: "Pon tu gimnasio en tu propia web",
+    intro: "El horario de clases, el equipamiento y una insignia de Encuéntranos en Liftsmith ya pueden estar en tu web, siempre al día.",
+    points: [
+      "Abre tu gimnasio en la app, toca Gestionar la página del gimnasio y busca Widgets para tu web.",
+      "Elige el horario, el equipamiento o la insignia, un aspecto claro u oscuro y uno de diez idiomas, y míralo tal como se verá.",
+      "Copia el código y pégalo en un bloque HTML o de inserción de tu web. Squarespace, Wix y WordPress tienen uno.",
+      "Cambia una clase o tu equipamiento en la app y el widget de tu web cambia también.",
+    ],
+    dyk: "Los widgets no llevan scripts, cookies ni seguimiento, y cada uno enlaza a la página de tu gimnasio para que los nuevos socios lo añadan con un toque.",
+  },
   "thirty-day": {
     title: "Un ejercicio al día durante 30 días",
     intro: "Ya tienes doce retos de 30 días, de sentadillas y flexiones a plancha y dominadas, cada uno en tres niveles.",

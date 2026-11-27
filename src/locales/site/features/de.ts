@@ -69,6 +69,11 @@ export const de: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widgets für die Website deines Studios",
+      body: "Offizielle Studios zeigen ihren Kursplan, ihre Geräte oder ein „Finde uns auf Liftsmith“-Abzeichen mit einer Zeile Code auf ihrer eigenen Website. Sie bleiben von selbst aktuell, in der gewählten Sprache und Optik, und verlinken auf die Seite des Studios.",
+      note: "Keine Skripte, Cookies oder Tracking auf der Website des Studios.",
+    },
     "gym-insights": {
       name: "Einblicke für Gym-Betreiber",
       body: "Betreiber und Team offizieller Gyms sehen, wie viele Sportler dort in den letzten vier Wochen trainiert haben, die vollen und ruhigen Stunden, die genutzten Geräte und offene Problemmeldungen, mit einem nächsten Schritt.",
