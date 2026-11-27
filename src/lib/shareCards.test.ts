@@ -6,9 +6,11 @@ import {
   badgeShare,
   figureFor,
   levelShare,
+  maxShare,
   musclesWorked,
   previousBest,
   prShare,
+  repBestShare,
   sessionShares,
   shareText,
   trendShare,
@@ -36,6 +38,8 @@ const session: SessionSummary = {
 const pr: Pr = { exerciseId: "bench-press", at: session.start + 600_000, e1rm: 116.7, weight: 100, reps: 5 };
 const older: Pr = { exerciseId: "bench-press", at: session.start - 7 * 86_400_000, e1rm: 110, weight: 95, reps: 5 };
 
+const max = { exerciseId: "bench-press", e1rm: 116.7, sessions: 14, basis: { weight: 100, reps: 5, at: pr.at } };
+
 const text = (c: CardData) => JSON.stringify(c);
 const all = (cards: CardData[]) => cards.map(text).join("\n");
 
@@ -47,6 +51,8 @@ describe("share cards", () => {
     prShare(pr, older, ctx).card(o),
     trendShare({ exerciseId: "back-squat", pct: 8.4, weeks: 6, from: 140, to: 151.8 }, ctx).card(o),
     levelShare({ level: ctx.game.level, streak: ctx.game.streak, xp: 4200, badges: { earned: 9, total: 130 } }, 40, ctx).card(o),
+    maxShare(max, { weight: 100 }, ctx).card(o),
+    repBestShare("bench-press", { reps: 5, weight: 100, at: pr.at }, ctx).card(o),
   ];
 
   it("shows weights only while the switch is on", () => {
@@ -84,6 +90,27 @@ describe("share cards", () => {
   it("lists the muscles worked and a compound lift to draw", () => {
     expect(musclesWorked(session.exercises).length).toBeGreaterThan(0);
     expect(figureFor(["plank", "back-squat"])).toBe("back-squat");
+  });
+
+  it("puts the estimated max, the set it came from and the heaviest set on the max card", () => {
+    const c = maxShare(max, { weight: 105 }, ctx).card(on);
+    expect(c.headline).toBe("Barbell bench press");
+    expect(c.big).toEqual({ value: "116.7 kg", label: "From 100 kg × 5" });
+    expect(c.tiles).toEqual([["Heaviest set", "105 kg"]]);
+    expect(maxShare(max, null, ctx).card(on).tiles).toEqual([]);
+    // Without weights it says how many workouts the lift has had instead of a number in kg.
+    expect(maxShare(max, { weight: 105 }, ctx).card(off).big).toEqual({ value: "14 workouts" });
+    expect(maxShare(max, null, ctx).id).toBe("max-bench-press");
+  });
+
+  it("calls a one-rep row the heaviest set, and other rows the heaviest for that many reps", () => {
+    const top = repBestShare("bench-press", { reps: 1, weight: 120, at: pr.at }, ctx);
+    expect(top.card(on).big).toEqual({ value: "120 kg", label: "Heaviest set" });
+    const five = repBestShare("bench-press", { reps: 5, weight: 100, at: pr.at }, ctx);
+    expect(five.card(on).big).toEqual({ value: "100 kg", label: "Heaviest for 5+ reps" });
+    expect(five.card(off).big).toEqual({ value: "5 reps", label: "Heaviest for 5+ reps" });
+    expect(five.kind).toBe("best");
+    expect(new Set([top.id, five.id]).size).toBe(2);
   });
 
   it("puts a badge's medal in its tier colour", () => {

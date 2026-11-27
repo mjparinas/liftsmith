@@ -768,6 +768,7 @@ export function StatTile({
   tint = "var(--color-accent)",
   className = "",
   info,
+  action,
 }: {
   label: string;
   value: ReactNode;
@@ -775,6 +776,8 @@ export function StatTile({
   tint?: string;
   className?: string;
   info?: Term;
+  /** A small button in the corner in place of the icon (a stat's share button, ShareStat.tsx). */
+  action?: ReactNode;
 }) {
   return (
     <div className={`card-tint p-4 ${className}`} style={{ "--tint": tint } as CSSProperties}>
@@ -783,11 +786,12 @@ export function StatTile({
           {label}
           {info && <Info term={info} />}
         </div>
-        {icon && (
-          <span style={{ color: tint }}>
-            <Icon name={icon} size={16} />
-          </span>
-        )}
+        {action ??
+          (icon && (
+            <span style={{ color: tint }}>
+              <Icon name={icon} size={16} />
+            </span>
+          ))}
       </div>
       <div className="display mt-2 text-[1.75rem]">{value}</div>
     </div>

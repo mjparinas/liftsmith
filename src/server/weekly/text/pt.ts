@@ -1134,4 +1134,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Os widgets não têm scripts, cookies nem rastreamento, e cada um leva para a página da sua academia, para novos alunos adicionarem com um toque.",
   },
+  "share-stats": {
+    title: "Compartilhe os números de que você mais se orgulha",
+    intro: "Cada máximo estimado, série mais pesada e recorde pessoal agora tem um pequeno botão de compartilhar ao lado.",
+    points: [
+      "Ele fica ao lado dos seus máximos e recordes novos em Progresso, e na página de cada exercício.",
+      "Na página de um exercício, cada linha da tabela de recordes também tem um, da sua série mais pesada ao seu melhor para 15 repetições.",
+      "Um toque cria um cartão com esse número, o logotipo do Liftsmith e o site, no visual do app.",
+      "Poste, envie ou salve. Dá para ocultar os pesos, e seu nome só aparece se você adicionar.",
+    ],
+    dyk: "Seu link de convite pode ir no cartão, e quem entrar com ele segue você de volta.",
+  },
 };

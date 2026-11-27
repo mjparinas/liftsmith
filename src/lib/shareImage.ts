@@ -53,7 +53,7 @@ const INK = "#e8edf3";
 const MUTED = "#8a97a8";
 const VIOLET = "#a78bfa";
 const PAD = 80;
-const SITE = "getliftsmith.com";
+const SITE = "www.getliftsmith.com";
 
 function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   c.beginPath();
@@ -186,11 +186,14 @@ export function drawCard(canvas: HTMLCanvasElement, d: CardData, o: DrawOptions 
   }
 
   // Brand, and the name when the lifter chose to show it.
+  // The app's mark (the anvil with a loaded bar, public/icon-mono.svg) before the wordmark, in the card's accent
+  // (2026-11-27: every card carries the logo as well as the name and the website).
+  const markW = drawMark(c, PAD, 76, 56, accent) ? 72 : 0;
   c.fillStyle = accent;
   c.font = font(40, 800);
-  c.fillText(BRAND.name.toUpperCase(), PAD, 120);
+  c.fillText(BRAND.name.toUpperCase(), PAD + markW, 120);
   if (o.pro) {
-    const x = PAD + c.measureText(BRAND.name.toUpperCase()).width + 18;
+    const x = PAD + markW + c.measureText(BRAND.name.toUpperCase()).width + 18;
     const label = "PRO"; // the plan's name, the same in every language
     c.font = font(26, 800);
     const w = c.measureText(label).width + 32;
@@ -328,6 +331,39 @@ function drawSplit(
     c.font = font(40, 600);
     c.fillText(`${s.percent}%`, x + 44 + Math.min(lw, colW - 200) + 18, y);
   });
+}
+
+/**
+ * The app mark, drawn from the same shapes as public/icon-mono.svg (a 1024 grid; the mark spans about 600 of it),
+ * filled with the accent and a size × size box at (x, y). False where the canvas has no Path2D (tests).
+ */
+function drawMark(c: CanvasRenderingContext2D, x: number, y: number, size: number, colour: string): boolean {
+  if (typeof Path2D === "undefined" || typeof c.roundRect !== "function") return false;
+  c.save();
+  c.translate(x, y);
+  const k = size / 600;
+  c.scale(k, k);
+  c.translate(-206, -196);
+  c.fillStyle = colour;
+  const rects: [number, number, number, number, number][] = [
+    [226, 302, 572, 36, 18],
+    [280, 196, 68, 248, 20],
+    [676, 196, 68, 248, 20],
+    [358, 236, 40, 168, 14],
+    [626, 236, 40, 168, 14],
+  ];
+  for (const [rx, ry, rw, rh, rr] of rects) {
+    c.beginPath();
+    c.roundRect(rx, ry, rw, rh, rr);
+    c.fill();
+  }
+  c.fill(
+    new Path2D(
+      "M206 478C206 470 214 466 224 466C300 466 340 458 372 458L788 458Q804 458 804 474L804 534Q804 550 788 550C724 550 676 572 652 612L644 646L712 680Q726 688 726 704L726 778Q726 794 710 794L314 794Q298 794 298 778L298 704Q298 688 312 680L380 646L372 612C356 580 320 560 276 546C232 532 206 506 206 478Z",
+    ),
+  );
+  c.restore();
+  return true;
 }
 
 /** The footer every card shares: the level and streak line, then the site, or the lifter's invite link on its own line. */

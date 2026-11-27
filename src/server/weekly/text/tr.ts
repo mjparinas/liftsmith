@@ -1129,4 +1129,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Widget'larda betik, çerez ya da izleme yok; her biri salonunuzun sayfasına bağlanır, böylece yeni üyeler salonu tek dokunuşla ekler.",
   },
+  "share-stats": {
+    title: "En gurur duyduğun sayıları paylaş",
+    intro: "Her tahmini maksimumun, en ağır setin ve kişisel rekorun yanında artık küçük bir paylaş düğmesi var.",
+    points: [
+      "İlerleme'de maksimumlarının ve yeni rekorlarının yanında, ayrıca her egzersizin sayfasında.",
+      "Bir egzersizin sayfasında rekor tablosunun her satırında da var: en ağır setinden 15 tekrardaki en iyine kadar.",
+      "Tek dokunuş, o sayıyla, Liftsmith logosu ve web sitesiyle uygulamanın görünümünde bir kart yapar.",
+      "Paylaş, gönder ya da kaydet. Ağırlıkları gizleyebilirsin; adın sen eklemedikçe görünmez.",
+    ],
+    dyk: "Davet bağlantın da kartta yer alabilir; onunla katılan arkadaşın seni geri takip eder.",
+  },
 };

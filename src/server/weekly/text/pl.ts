@@ -1130,4 +1130,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Widżety nie mają skryptów, plików cookie ani śledzenia, a każdy prowadzi do strony Twojej siłowni, więc nowi członkowie dodadzą ją jednym dotknięciem.",
   },
+  "share-stats": {
+    title: "Udostępnij liczby, z których jesteś najbardziej dumny",
+    intro: "Każdy szacowany maks, najcięższa seria i rekord życiowy ma teraz obok mały przycisk udostępniania.",
+    points: [
+      "Znajdziesz go obok maksów i nowych rekordów w Postępach oraz na stronie każdego ćwiczenia.",
+      "Na stronie ćwiczenia ma go też każdy wiersz tabeli rekordów, od najcięższej serii po najlepszy wynik na 15 powtórzeń.",
+      "Jedno dotknięcie tworzy kartę z tą liczbą, logo Liftsmith i stroną, w wyglądzie aplikacji.",
+      "Opublikuj ją, wyślij albo zapisz. Ciężary można ukryć, a imię pojawia się tylko, gdy je dodasz.",
+    ],
+    dyk: "Na karcie może być też Twój link z zaproszeniem, a znajomy, który z niego dołączy, zaobserwuje Cię w odpowiedzi.",
+  },
 };

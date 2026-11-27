@@ -1134,4 +1134,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Die Widgets haben keine Skripte, Cookies oder Tracking, und jedes verlinkt auf die Seite deines Studios, damit neue Mitglieder es mit einem Tipp hinzufügen.",
   },
+  "share-stats": {
+    title: "Teile die Zahlen, auf die du am stolzesten bist",
+    intro: "Jedes geschätzte Maximum, jeder schwerste Satz und jede Bestleistung hat jetzt einen kleinen Teilen-Knopf daneben.",
+    points: [
+      "Du findest ihn neben deinen Maxima und neuen Bestleistungen unter Fortschritt und auf der Seite jeder Übung.",
+      "Auf der Seite einer Übung hat auch jede Zeile der Bestwerte-Tabelle einen, von deinem schwersten Satz bis zu deinem Bestwert für 15 Wiederholungen.",
+      "Ein Tippen macht daraus eine Karte mit dieser Zahl, dem Liftsmith-Logo und der Website im Look der App.",
+      "Poste sie, schick sie oder speichere sie. Die Gewichte lassen sich ausblenden, und dein Name steht nur drauf, wenn du ihn hinzufügst.",
+    ],
+    dyk: "Dein Einladungslink kann mit auf die Karte, und wer damit beitritt, folgt dir zurück.",
+  },
 };
