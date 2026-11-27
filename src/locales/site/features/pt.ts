@@ -670,6 +670,11 @@ export const pt: FeaturesText = {
       body: "O plano de hoje vai junto no seu relógio. Toque em Começar no relógio, registre cada série com peso e repetições no pulso, e o treino é salvo, recordes incluídos, quando o celular estiver por perto de novo.",
       note: "Wear OS, Apple Watch e Garmin.",
     },
+    "watch-timer": {
+      name: "Timers de isometria no relógio",
+      body: "Em prancha, cadeirinha na parede ou suspensão na barra, Iniciar timer no seu pulso conta a isometria com toques aos 3, 2, 1 e na metade, e o celular inicia o mesmo timer. Parou antes? Os segundos que você aguentou são registrados.",
+      note: "Wear OS, Apple Watch e Garmin (START), também nos treinos sem celular.",
+    },
     widgets: {
       name: "Widgets na tela inicial",
       body: "Três widgets: Hoje (a decisão do dia, sua meta semanal, uma nota do coach e Iniciar ou Registrar série), Esta semana (dias treinados, sua sequência e o que a mantém) e Recuperação (quais músculos estão prontos para treinar e quando os outros vão estar).",

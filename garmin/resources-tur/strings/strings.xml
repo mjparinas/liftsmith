@@ -15,4 +15,5 @@
     <string id="OnWatch">Telefonsuz · BACK: Bitir</string>
     <string id="FinishAsk">Bitirip telefon için kaydedilsin mi?</string>
     <string id="SavedForPhone">Saatte kaydedildi. Telefon yeniden yakına gelince ona gider.</string>
+    <string id="HintTimer">START: $1$</string>
 </strings>

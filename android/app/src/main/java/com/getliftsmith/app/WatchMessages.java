@@ -74,7 +74,7 @@ final class WatchMessages {
         Object get(String key);
     }
 
-    /** A plain "log" or "add30", or {"a": "log" | "add30" | "adjust" | "rate", ...}; null for anything else. */
+    /** A plain "log" or "add30", or {"a": "log" | "add30" | "adjust" | "rate" | "timer", ...}; null for anything else. */
     static Tap tap(String body) {
         if (body == null || body.length() > 1000) return null;
         String plain = action(body);
@@ -90,7 +90,7 @@ final class WatchMessages {
     /** The same from any message's fields. */
     static Tap tap(Fields f) {
         Object a = f.get("a");
-        if (!("log".equals(a) || "add30".equals(a) || "adjust".equals(a) || "rate".equals(a))) return null;
+        if (!("log".equals(a) || "add30".equals(a) || "adjust".equals(a) || "rate".equals(a) || "timer".equals(a))) return null;
         String action = (String) a;
         JSONObject d = new JSONObject();
         try {
@@ -109,6 +109,8 @@ final class WatchMessages {
         }
         if ("rate".equals(action) && (!d.has("ex") || !d.has("v"))) return null;
         if ("adjust".equals(action) && (!d.has("key") || !d.has("reps"))) return null;
+        // Start timer names the set it's for, so a tap that arrives late can't start the next set's timer.
+        if ("timer".equals(action) && !d.has("key")) return null;
         return new Tap(action, d.length() == 0 ? null : d.toString());
     }
 

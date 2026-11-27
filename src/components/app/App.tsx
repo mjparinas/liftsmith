@@ -341,10 +341,11 @@ export function App() {
     return onSessionAction((a, at, data) => {
       // The watches' weight, reps and "How did it feel?" (workout/watchAdjust.ts); everything else is a shortcut.
       if (runWatchTap(a, at, data)) {
-        if (a === "log" && !isRoute(location.hash, "workout")) go("workout");
+        // Start timer from a watch opens the workout too, so its clock counts and logs the hold when it runs out.
+        if ((a === "log" || a === "timer") && !isRoute(location.hash, "workout")) go("workout");
         return;
       }
-      if (a !== "adjust" && a !== "rate") run(a, at);
+      if (a !== "adjust" && a !== "rate" && a !== "timer") run(a, at);
     });
   }, [ready]);
   // Android App Links (appLinks.ts): a tapped link to the app on our domain opens its screen here. Waits

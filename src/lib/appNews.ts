@@ -46,10 +46,10 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.37.2",
+    version: "0.38.0",
     day: "2026-11-28",
     headline:
-      "30-day challenges with the day's number on Today, a free workout generator on the website, share any best or max as a card, exercise charts with new bests in gold, website widgets for gym owners, and print any routine on one page",
+      "30-day challenges with the day's number on Today, a free workout generator on the website, share any best or max as a card, exercise charts with new bests in gold, website widgets for gym owners, print any routine on one page, and start hold timers on your watch",
     changes: [
       { id: "thirtyDay", kind: "new", icon: "calendar" },
       { id: "workoutGenerator", kind: "new", icon: "globe" },
@@ -57,6 +57,7 @@ export const RELEASES: readonly AppRelease[] = [
       { id: "liftCharts", kind: "better", icon: "chart" },
       { id: "gymWidgets", kind: "new", icon: "link" },
       { id: "printRoutine", kind: "new", icon: "print" },
+      { id: "watchHoldTimer", kind: "new", icon: "watch" },
     ],
   },
   {

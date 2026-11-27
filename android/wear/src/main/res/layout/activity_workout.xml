@@ -186,6 +186,20 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
+        <!-- Start timer on a timed hold, carry or cardio set: counted here, and on the phone from the same moment.
+             Its words ("Start timer · 0:40") come from the phone, already in the app's language. -->
+        <Button
+            android:id="@+id/timerStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button"
+            android:textAllCaps="false"
+            android:textColor="@color/ink"
+            android:textSize="15sp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/log"
             android:layout_width="match_parent"

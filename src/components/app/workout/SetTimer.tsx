@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
 
-import { track } from "@/lib/analytics";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import type { TimerSegment } from "@/lib/sessionNotify";
 import { cueKey, SWITCH_SEC, timerAt, timerHeld, timerPhases, type TimerSpec, type TimerState } from "@/lib/setTimer";
+import { cancelTimer, putTimer, startLabel, subscribeTimer, timerSnapshot, type Held, type TimerRun } from "@/lib/timerRun";
 import { restCue, say } from "@/lib/voice";
 
 import { clock } from "../format";
@@ -19,51 +19,13 @@ import { Icon } from "../icons";
 // Beeps on the last three seconds of the lead-in and of each side, a chime on go, the voice coach (when it's
 // on) says "Ten seconds" and "Switch sides". Pure web code, so Android, iOS and the web app get it together.
 
-export interface TimerRun {
-  key: string;
-  startAt: number;
-  spec: TimerSpec;
-}
+export type { Held, TimerRun } from "@/lib/timerRun";
+export { cancelTimer, startTimer, takeTimer } from "@/lib/timerRun";
 
-/** Seconds held so far, for Log set: null when no timer is running (or it's still in the lead-in). */
-export type Held = { reps: number; repsR?: number } | null;
-
-// The running timer lives outside the screen, so going to Today and back mid-hold doesn't lose the clock.
-// It belongs to one set (`key`): once that set is logged the key moves on and the timer is gone.
-let saved: TimerRun | null = null;
-const listeners = new Set<() => void>();
-const put = (r: TimerRun | null) => {
-  saved = r;
-  listeners.forEach((l) => l());
-};
-const subscribe = (l: () => void) => {
-  listeners.add(l);
-  return () => void listeners.delete(l);
-};
-const snapshot = () => saved;
-
-/** The timer running for this set, if any. */
+/** The timer running for this set, if any (timerRun.ts keeps it outside the screen). */
 export function useTimerRun(key: string): TimerRun | null {
-  const r = useSyncExternalStore(subscribe, snapshot, () => null);
+  const r = useSyncExternalStore(subscribeTimer, timerSnapshot, () => null);
   return r?.key === key ? r : null;
-}
-
-export function startTimer(key: string, spec: TimerSpec) {
-  put({ key, startAt: Date.now(), spec });
-  haptic("tick");
-  track("feature", { name: "set_timer", detail: spec.up ? "up" : spec.sides === 2 ? "sides" : "down" });
-}
-
-export function cancelTimer() {
-  put(null);
-}
-
-/** What Log set saves for this set now (null when no timer runs for it), and stops the timer. */
-export function takeTimer(key: string, at = Date.now()): Held {
-  if (saved?.key !== key) return null;
-  const r = saved;
-  put(null);
-  return timerHeld(r.spec, timerAt(r.spec, Math.max(0, at - r.startAt)));
 }
 
 /** Each beep and cue once; logs the set when a countdown runs out. Rendered only while a timer runs. */
@@ -78,7 +40,7 @@ function useCues(run: TimerRun, state: TimerState, now: number, onDone: (at: num
     cue.current = { key: k, at: now };
     if (state.phase === "done") {
       const held = timerHeld(run.spec, state);
-      put(null);
+      putTimer(null);
       onDone(run.startAt + state.at, held);
       return;
     }
@@ -136,7 +98,6 @@ export function sessionTimer(run: TimerRun): TimerSegment[] {
 
 /** The Start button above Log set. */
 export function SetTimerStart({ spec, onStart }: { spec: TimerSpec; onStart: () => void }) {
-  const time = clock(spec.target);
   return (
     <button
       type="button"
@@ -145,7 +106,7 @@ export function SetTimerStart({ spec, onStart }: { spec: TimerSpec; onStart: () 
       data-testid="set-timer-start"
     >
       <Icon name="play" size={16} className="text-accent" />
-      {spec.up ? t("timer.startUp") : spec.sides === 2 ? t("timer.startSides", { time }) : t("timer.start", { time })}
+      {startLabel(spec, clock)}
     </button>
   );
 }

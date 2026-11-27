@@ -1118,6 +1118,7 @@ export const emails: Record<string, Words> = {
       "Registrar serie, +30 s, la vibración al final del descanso y cambiar el peso y las repeticiones funcionan en la muñeca, con el pulso del reloj.",
       "Toca Terminar al acabar. El reloj guarda el entreno hasta que el móvil vuelve a estar cerca, con la app abierta o no.",
       "El móvil lo guarda como si lo hubieras registrado allí: cada serie, tus récords, los próximos pesos y Salud.",
+      "Las planchas, sentadillas en pared y colgarse de la barra tienen Iniciar temporizador en la muñeca, con toques a los 3, 2, 1 y a la mitad, y la serie se guarda sola al acabar el tiempo.",
     ],
     dyk: "La planificación sigue en el móvil, así que Máquina ocupada y Cambiar el plan esperan a que vuelva.",
   },

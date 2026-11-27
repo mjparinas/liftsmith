@@ -608,6 +608,11 @@ export const de: FeaturesText = {
       body: "Der heutige Plan reist auf deiner Uhr mit. Tippe auf „Auf der Uhr starten“, trag jeden Satz mit Gewicht und Wiederholungen am Handgelenk ein, und das Training wird samt Bestwerten gespeichert, sobald dein Handy wieder in der Nähe ist.",
       note: "Wear OS, Apple Watch und Garmin.",
     },
+    "watch-timer": {
+      name: "Halte-Timer auf der Uhr",
+      body: "Bei Unterarmstütz, Wandsitzen oder Hängen zählt „Timer starten“ am Handgelenk die Haltezeit, mit Tippen bei 3, 2, 1 und zur Hälfte, und dein Handy startet denselben Timer. Hörst du früher auf, werden die gehaltenen Sekunden eingetragen.",
+      note: "Wear OS, Apple Watch und Garmin (START), auch beim Training ohne Handy.",
+    },
     widgets: {
       name: "Widgets für den Startbildschirm",
       body: "Drei Widgets: Heute (die heutige Ansage, dein Wochenziel, eine Coach-Notiz und Starten oder Satz eintragen), Diese Woche (trainierte Tage, deine Serie und was sie hält) und Erholung (welche Muskeln bereit fürs Training sind und wann der Rest so weit ist).",

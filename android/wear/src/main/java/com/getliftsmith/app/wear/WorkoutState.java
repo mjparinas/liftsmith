@@ -43,6 +43,12 @@ final class WorkoutState {
     final String why;
     /** The set timer for holds, carries and cardio, phase by phase in wall-clock time (sessionNotify.ts TimerSegment). */
     final List<Phase> timer;
+    /** A timed set the watch can start itself (Start timer), or null (sessionNotify.ts TimerOffer). */
+    final Offer ts;
+    /** What the watch says once the timer's last phase has run out ("Time's up"). */
+    final String timerOver;
+    /** The timer started on this watch before the phone's phases arrive (or with the phone asleep), or empty. */
+    private List<Phase> started = Collections.emptyList();
     /** What the crown and − / + can change on this set, or null (watchAdjust.ts watchAdj). */
     final Adj adj;
     /** "How did it feel?" after an exercise's last set, or null (watchAdjust.ts watchAsk). */
@@ -138,6 +144,83 @@ final class WorkoutState {
         }
     }
 
+    /**
+     * A timed hold, carry or cardio set the watch can start with its own Start timer (docs/decisions/set-timer.md
+     * "Started from the watch"): the set's key, the seconds (each side), 2 for a hold done on each side, a count-up for
+     * cardio, the button's words, and the labels for getting set, the first (or only) side, switching and the second.
+     * The watch counts it with the phone's own rules (src/lib/setTimer.ts): a 5-second lead-in, and 5 s to switch.
+     */
+    static final class Offer {
+
+        static final long LEAD_MS = 5000;
+        static final long SWITCH_MS = 5000;
+        final String key;
+        final int secs;
+        final int sides;
+        final boolean up;
+        final String label;
+        final String[] labels;
+        final String over;
+
+        Offer(String key, int secs, int sides, boolean up, String label, String[] labels, String over) {
+            this.key = key;
+            this.secs = Math.max(1, secs);
+            this.sides = sides == 2 ? 2 : 1;
+            this.up = up;
+            this.label = label;
+            this.labels = labels;
+            this.over = over;
+        }
+
+        static Offer parse(JSONObject o) {
+            if (o == null || o.optString("key", "").isEmpty() || o.optInt("s", 0) < 1) return null;
+            JSONArray lb = o.optJSONArray("lb");
+            String[] labels = new String[4];
+            for (int i = 0; i < 4; i++) labels[i] = lb == null ? "" : lb.optString(i, "");
+            return new Offer(o.optString("key"), o.optInt("s"), o.optInt("d", 1), o.optInt("u", 0) == 1, o.optString("l", ""), labels, o.optString("o", ""));
+        }
+
+        /** The timer started at `start`, phase by phase, as the phone's timerPhases lays it out. */
+        List<Phase> phases(long start) {
+            List<Phase> out = new ArrayList<>();
+            long lead = start + LEAD_MS;
+            out.add(new Phase(start, lead, labels[0]));
+            if (up) {
+                out.add(new Phase(lead, 0, labels[1]));
+                return out;
+            }
+            long work = secs * 1000L;
+            out.add(new Phase(lead, lead + work, labels[1]));
+            if (sides == 2) {
+                long sw = lead + work + SWITCH_MS;
+                out.add(new Phase(lead + work, sw, labels[2]));
+                out.add(new Phase(sw, sw + work, labels[3]));
+            }
+            return out;
+        }
+
+        /** When a countdown started at `start` runs out (0 for a count-up, which runs until the set is logged). */
+        long end(long start) {
+            return up ? 0 : start + LEAD_MS + secs * 1000L * sides + (sides == 2 ? SWITCH_MS : 0);
+        }
+
+        /**
+         * What Log set saves at `at` for a timer started at `start`: the seconds held ([reps] or, stopped on the second
+         * side, [first side, second side]), or null during the lead-in (the set as planned). Like setTimer.ts timerHeld.
+         */
+        int[] held(long start, long at) {
+            long t = at - start - LEAD_MS;
+            if (t < 0) return null;
+            if (up) return new int[] { (int) Math.max(1, t / 1000) };
+            long work = secs * 1000L;
+            if (t < work) return new int[] { (int) Math.max(1, t / 1000) };
+            if (sides == 1 || t < work + SWITCH_MS) return new int[] { secs };
+            long t2 = t - work - SWITCH_MS;
+            if (t2 < work) return new int[] { secs, (int) Math.max(0, t2 / 1000) };
+            return new int[] { secs };
+        }
+    }
+
     /** One phase of the set timer: counts down to `to`, or up from `from` when `to` is 0. */
     static final class Phase {
         final long from;
@@ -175,6 +258,8 @@ final class WorkoutState {
         taken = o.optString("taken", "");
         why = o.optString("why", "");
         timer = phases(o.optJSONArray("timer"));
+        ts = Offer.parse(o.optJSONObject("ts"));
+        timerOver = o.optString("timerOver", ts == null ? "" : ts.over);
         adj = Adj.parse(o.optJSONObject("adj"));
         ask = Ask.parse(o.optJSONObject("ask"));
     }
@@ -193,11 +278,40 @@ final class WorkoutState {
         return out;
     }
 
+    /** The set timer's phases: the phone's, or the ones this watch started on its own until the phone's arrive. */
+    List<Phase> phases() {
+        return timer.isEmpty() ? started : timer;
+    }
+
     /** The set timer's phase at `now` (started, not ended), or null; never while resting. Same rule as the phone's. */
     Phase phase(long now) {
         if (resting(now)) return null;
-        for (Phase p : timer) if (p.from <= now && (p.to == 0 || now < p.to)) return p;
+        for (Phase p : phases()) if (p.from <= now && (p.to == 0 || now < p.to)) return p;
         return null;
+    }
+
+    /** A set timer is running or has run out on this set (its phases are known), so Start timer is gone. */
+    boolean timing() {
+        return !phases().isEmpty();
+    }
+
+    /** The countdown has run out and the phone hasn't moved on yet: "Time's up" until the set is logged. */
+    boolean timeUp(long now) {
+        List<Phase> p = phases();
+        if (p.isEmpty() || resting(now)) return false;
+        Phase last = p.get(p.size() - 1);
+        return last.to > 0 && now >= last.to;
+    }
+
+    /** Start timer shows: a timed set offered, lifting, and no timer known for it yet. */
+    boolean canStartTimer(long now) {
+        return ts != null && !resting(now) && !timing();
+    }
+
+    /** This watch's own Start timer for the set `key`, kept on this state while the phone's phases haven't come. */
+    WorkoutState withStarted(String key, long start) {
+        if (ts != null && ts.key.equals(key) && timer.isEmpty() && start > 0) started = ts.phases(start);
+        return this;
     }
 
     /** The state in a Data Layer item's "json", or null when there's none or it can't be read. */

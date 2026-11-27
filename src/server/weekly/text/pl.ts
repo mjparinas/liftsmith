@@ -1116,6 +1116,7 @@ export const emails: Record<string, Words> = {
       "Zapis serii, +30 s, wibracja na koniec przerwy i zmiana ciężaru i powtórzeń działają na nadgarstku, z tętnem z zegarka.",
       "Dotknij Zakończ, gdy skończysz. Zegarek trzyma trening, aż telefon znów będzie blisko, z otwartą aplikacją lub nie.",
       "Telefon zapisuje go tak, jakbyś zapisywał na nim: każdą serię, rekordy, kolejne ciężary i Zdrowie.",
+      "Deska, krzesełko przy ścianie i zwis mają Włącz minutnik na nadgarstku, z wibracjami przy 3, 2, 1 i w połowie, a seria zapisuje się sama, gdy czas minie.",
     ],
     dyk: "Planowanie zostaje na telefonie, więc Maszyna zajęta i Zmień plan czekają, aż wróci.",
   },

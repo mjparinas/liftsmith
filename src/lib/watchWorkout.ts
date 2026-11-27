@@ -39,6 +39,12 @@ export interface CarryStep {
   f?: 1;
   a?: 1;
   c?: 1;
+  /**
+   * A timed hold or carry (set-timer.md "Started from the watch"): 1, or 2 for a hold done on each side, with `tt` the
+   * Start timer button's words. The watch counts it on its own clock and logs the seconds held.
+   */
+  m?: 1 | 2;
+  tt?: string;
 }
 
 /** Today's plan as a watch carries it. Everything a lifter reads on it is already in the app's language. */
@@ -54,6 +60,8 @@ export interface Carry {
   o: string[];
   done: string;
   fin: string;
+  /** The set timer's words for timed steps: get set, time left, first side, switch sides, second side, time's up. */
+  tl?: [string, string, string, string, string, string];
   ex: CarryItem[];
   st: CarryStep[];
 }
@@ -74,8 +82,11 @@ export interface WatchResult {
   c: string;
   start: number;
   end: number;
-  /** Each Log set in order: its step, when it was logged, the kg (-1: as planned), the reps, when the set started. */
-  sets: { k: number; at: number; kg: number | null; reps: number; from: number }[];
+  /**
+   * Each Log set in order: its step, when it was logged, the kg (-1: as planned), the reps (seconds for a hold), when
+   * the set started, and a hold's second side when it was stopped short there (`repsR`, as on the phone).
+   */
+  sets: { k: number; at: number; kg: number | null; reps: number; from: number; repsR?: number }[];
   /** "How did it feel?" answers: the step logged just before, and the rating. */
   rates: { k: number; v: Rating }[];
   hr?: { avg: number; max: number; min: number };
@@ -115,7 +126,7 @@ export function parseWatchResult(raw: unknown, now = Date.now()): WatchResult | 
   let prev = start;
   for (const x of list) {
     if (!Array.isArray(x)) return null;
-    const [k, at, kg, reps, from] = x.map(num);
+    const [k, at, kg, reps, from, right] = x.map(num);
     if (k !== sets.length || at === null || at < prev || at > end + 1000) return null;
     if (reps === null || !Number.isInteger(reps) || reps < 1 || reps > 600) return null;
     const w = kg === null || kg < 0 ? null : kg <= 1000 ? Math.round(kg * 1000) / 1000 : undefined;
@@ -126,6 +137,7 @@ export function parseWatchResult(raw: unknown, now = Date.now()): WatchResult | 
       kg: w,
       reps,
       from: from !== null && from >= prev && from <= at ? Math.round(from) : Math.round(prev),
+      ...(right !== null && right !== undefined && Number.isInteger(right) && right >= 0 && right <= 600 ? { repsR: right } : {}),
     });
     prev = at;
   }
@@ -180,7 +192,14 @@ export function watchEvents(rec: CarryRecord, r: WatchResult): AppEvent[] | null
   const rated = new Map(r.rates.map((x) => [x.k, x.v]));
   for (const s of r.sets) {
     if (cur.index >= rec.plan.items.length) break;
-    const step: Active = { ...cur, askFeedback: null, weight: s.kg ?? cur.weight, reps: s.reps, setStart: s.from };
+    const step: Active = {
+      ...cur,
+      askFeedback: null,
+      weight: s.kg ?? cur.weight,
+      reps: s.reps,
+      setStart: s.from,
+      ...(s.repsR !== undefined ? { repsR: s.repsR } : {}),
+    };
     const done = afterLog(step, evs, true, s.at, () => `${sessionId}-${s.k}`);
     if (!done) break;
     evs = [...evs, ...done.evs];

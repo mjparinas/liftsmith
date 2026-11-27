@@ -1124,6 +1124,7 @@ export const emails: Record<string, Words> = {
       "Noter la série, +30 s, la vibration de fin de repos et le choix de la charge et des répétitions fonctionnent au poignet, avec la fréquence cardiaque de la montre.",
       "Terminez quand vous avez fini. La montre garde la séance jusqu’à ce que votre téléphone soit de nouveau près, app ouverte ou non.",
       "Votre téléphone l’enregistre alors comme si vous l’aviez notée dessus : chaque série, vos records, les prochaines charges et Santé.",
+      "Planches, chaises contre le mur et suspensions ont Lancer le minuteur au poignet, avec des vibrations à 3, 2, 1 et à mi-parcours, et la série se note toute seule quand le temps est écoulé.",
     ],
     dyk: "La planification reste sur le téléphone : Machine occupée et Modifier le plan attendent son retour.",
   },

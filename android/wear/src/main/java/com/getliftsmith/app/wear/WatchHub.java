@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import com.google.android.gms.wearable.DataItem;
@@ -42,11 +43,19 @@ final class WatchHub {
     private static long lastHrSent;
     private static Runnable restBuzz;
     private static Context appContext;
-    /** One buzz as a phase of the set timer ends (posted once per phase; removeCallbacks cancels them all). */
-    private static final Runnable timerBuzz = () -> {
-        Vibrator v = appContext == null ? null : appContext.getSystemService(Vibrator.class);
-        if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 200, 120, 200 }, -1));
-    };
+    /** One buzz as a phase of the set timer ends (go, switch sides, time's up). */
+    private static final Runnable timerBuzz = () -> buzz(new long[] { 0, 200, 120, 200 });
+    /** A light tick on each of a phase's last three seconds, like the phone's beeps. */
+    private static final Runnable timerTick = () -> buzz(new long[] { 0, 30 });
+    /** Halfway through a hold of 20 s or more: a soft double tap, so the lifter knows without looking. */
+    private static final Runnable timerHalf = () -> buzz(new long[] { 0, 60, 100, 60 });
+    /** Every timer buzz is posted with this token, so one call cancels them all when the timer changes. */
+    private static final Object TIMER = new Object();
+    /** Holds this long or longer get the halfway tap. */
+    static final long HALF_FROM_MS = 20_000L;
+    /** Start timer tapped on this watch during a phone workout: the set it was for and when, until the phone's phases come. */
+    private static String startedKey;
+    private static long startedAt;
     /** Seconds before rest ends for the heads-up tap; the same as REST_WARN_S in the phone's src/lib/training.ts. */
     private static final long REST_WARN_MS = 10_000L;
     /** The heads-up before rest ends: a gentle double tap on the wrist, softer than the rest-over buzz. */
@@ -67,9 +76,18 @@ final class WatchHub {
     static WorkoutState state() {
         WatchRun r = run;
         long now = System.currentTimeMillis();
-        if (r != null) return WorkoutState.parse(r.state(now));
+        if (r != null) {
+            // A hold run on the watch logs itself the moment its countdown runs out, as on the phone.
+            if (r.timerRanOut(now) && appContext != null) {
+                r.log(r.timerEnd(), null, null);
+                CarryStore.saveRun(appContext, r);
+                // The rest after it buzzes on time, and the screen moves on.
+                localChanged(appContext);
+            }
+            return WorkoutState.parse(r.state(now));
+        }
         WorkoutState s = state;
-        return s == null || s.stale(now) ? null : s;
+        return s == null || s.stale(now) ? null : s.withStarted(startedKey, startedAt);
     }
 
     /** Whether the workout on screen is the watch's own (no phone needed). */
@@ -164,6 +182,9 @@ final class WatchHub {
             case "rate":
                 if (fields != null) r.rate(fields.optInt("v", 9));
                 break;
+            case "timer":
+                r.startTimer(now);
+                break;
             default:
                 return;
         }
@@ -244,7 +265,8 @@ final class WatchHub {
             }
             if (next == null) bpm = 0;
             if (next != null && next.vibrate && next.newCue(prev)) cueBuzz(app);
-            scheduleBuzz(app, next);
+            // With this watch's own Start timer kept on it until the phone's phases come.
+            scheduleBuzz(app, state());
             for (Listener l : listeners) l.changed();
         });
     }
@@ -294,6 +316,35 @@ final class WatchHub {
         send(context.getApplicationContext(), PATH_ACTION, fields.toString());
     }
 
+    /**
+     * Start timer on a timed hold, carry or cardio set: the watch counts it at once on its own clock (and buzzes), and the
+     * phone starts the same timer from this moment (timerRun.ts startFromWatch). In the watch's own run it's kept there.
+     */
+    static void startTimer(Context context) {
+        Context app = context.getApplicationContext();
+        appContext = app;
+        long now = System.currentTimeMillis();
+        WorkoutState s = state();
+        if (s == null || !s.canStartTimer(now)) return;
+        if (run != null) {
+            localAction(app, "timer", null);
+            return;
+        }
+        startedKey = s.ts.key;
+        startedAt = now;
+        org.json.JSONObject f = new org.json.JSONObject();
+        try {
+            f.put("key", s.ts.key);
+        } catch (org.json.JSONException ignored) {
+            return;
+        }
+        action(app, "timer", f);
+        main.post(() -> {
+            scheduleBuzz(app, state());
+            for (Listener l : listeners) l.changed();
+        });
+    }
+
     /** A batch of wrist motion (MotionStream), counted into reps on the phone. */
     static void motion(Context context, String body) {
         if (run != null) return;
@@ -341,6 +392,11 @@ final class WatchHub {
         });
     }
 
+    private static void buzz(long[] pattern) {
+        Vibrator v = appContext == null ? null : appContext.getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createWaveform(pattern, -1));
+    }
+
     /** Hands-free watch sets (Labs): one short tap when the set started or logged itself, so the lifter knows without looking. */
     private static void cueBuzz(Context app) {
         Vibrator v = app.getSystemService(Vibrator.class);
@@ -351,12 +407,20 @@ final class WatchHub {
     private static void scheduleBuzz(Context app, WorkoutState s) {
         if (restBuzz != null) main.removeCallbacks(restBuzz);
         restBuzz = null;
-        main.removeCallbacks(timerBuzz);
+        main.removeCallbacksAndMessages(TIMER);
         main.removeCallbacks(warnBuzz);
         long now = System.currentTimeMillis();
-        // The set timer: a buzz as each phase ends (go, switch sides, time's up), felt with the phone in a bag.
+        // The set timer: a buzz as each phase ends (go, switch sides, time's up), a tick on its last three seconds and a
+        // soft tap halfway through a long hold, felt with the phone in a bag.
         if (s != null && s.vibrate && !s.resting(now)) {
-            for (WorkoutState.Phase p : s.timer) if (p.to > now) main.postDelayed(timerBuzz, p.to - now);
+            long up = SystemClock.uptimeMillis();
+            for (WorkoutState.Phase p : s.phases()) {
+                if (p.to <= now) continue;
+                main.postAtTime(timerBuzz, TIMER, up + p.to - now);
+                for (int k = 1; k <= 3; k++) if (p.to - k * 1000L > now && p.to - k * 1000L > p.from) main.postAtTime(timerTick, TIMER, up + p.to - k * 1000L - now);
+                long half = p.from + (p.to - p.from) / 2;
+                if (p.to - p.from >= HALF_FROM_MS && half > now) main.postAtTime(timerHalf, TIMER, up + half - now);
+            }
         }
         if (s == null || !s.vibrate || !s.resting(now)) return;
         restBuzz = () -> {

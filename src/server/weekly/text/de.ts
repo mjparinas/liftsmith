@@ -1120,6 +1120,7 @@ export const emails: Record<string, Words> = {
       "Satz eintragen, +30 s, die Vibration am Pausenende und Gewicht und Wiederholungen ändern gehen am Handgelenk, mit der Herzfrequenz der Uhr.",
       "Tippe auf „Beenden“, wenn du fertig bist. Die Uhr behält das Training, bis dein Handy wieder in der Nähe ist, ob die App offen ist oder nicht.",
       "Dein Handy speichert es dann, als hättest du dort eingetragen: jeden Satz, deine Bestwerte, die nächsten Gewichte und Health.",
+      "Unterarmstütz, Wandsitzen und Hängen bekommen „Timer starten“ am Handgelenk, mit Tippen bei 3, 2, 1 und zur Hälfte, und der Satz trägt sich selbst ein, wenn die Zeit um ist.",
     ],
     dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
   },

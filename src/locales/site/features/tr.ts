@@ -670,6 +670,11 @@ export const tr: FeaturesText = {
       body: "Bugünün planı saatinde seninle. Saatte başlat'a dokun, her seti ağırlığı ve tekrarıyla bilekten kaydet; telefonun yeniden yakına gelince antrenman rekorlarıyla birlikte kaydedilir.",
       note: "Wear OS, Apple Watch ve Garmin.",
     },
+    "watch-timer": {
+      name: "Saatte sabit tutuş zamanlayıcıları",
+      body: "Plank, duvar oturuşu veya barda asılmada bileğindeki Zamanlayıcıyı başlat tutuşu sayar; 3, 2, 1 ve yarıda titrer, telefonun da aynı zamanlayıcıyı başlatır. Erken bırakırsan tuttuğun saniyeler kaydedilir.",
+      note: "Wear OS, Apple Watch ve Garmin (START), telefonsuz antrenmanlarda da.",
+    },
     widgets: {
       name: "Ana ekran widget'ları",
       body: "Üç widget: Bugün (günün kararı, haftalık hedefin, bir koç notu ve Başla ya da Seti kaydet), Bu hafta (antrenman yaptığın günler, serin ve onu neyin sürdürdüğü) ve Toparlanma (hangi kasların antrenmana hazır olduğu ve geri kalanların ne zaman hazır olacağı).",

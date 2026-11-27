@@ -318,6 +318,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         if let why = call.getString("why"), !why.isEmpty { s["why"] = why }
         // The set timer (holds, carries, cardio): the watch counts its phases on its own clock (WatchState.timer).
         if let timer = call.getArray("timer"), !timer.isEmpty { s["timer"] = timer }
+        // A timed set the watch can start itself (sessionNotify.ts TimerOffer): Start timer on the wrist.
+        if let ts = call.getObject("ts") { s["ts"] = ts }
         // Adjust and rate a set on the watch (watchAdjust.ts): the weight ladder and reps, and "How did it feel?".
         if let adj = call.getObject("adj") { s["adj"] = adj }
         if let ask = call.getObject("ask") { s["ask"] = ask }
@@ -425,7 +427,9 @@ enum WorkoutTaps {
         var d = load()
         // Machine taken needs the swap the app worked out ahead; without a workout we know of there's none to make.
         if action == "taken", d["state"] == nil { return done() }
-        guard var state = d["state"] as? [String: Any], action != "rate" else {
+        // Start timer from the watch with the app asleep: the watch counts the hold itself, and the app starts the same
+        // timer from the tap's time when it wakes (and logs it at its end, or at a Log set tapped meanwhile).
+        guard var state = d["state"] as? [String: Any], action != "rate", action != "timer" else {
             // No workout we know of (the app was closed before it sent one), or a watch's "How did it feel?": keep
             // the tap; the app decides.
             keep(action, data: data, at: at, in: &d)
@@ -460,6 +464,8 @@ enum WorkoutTaps {
                 // The steps ahead don't know which of them a Machine taken swap stands in for.
                 w["why"] = nil
                 w["timer"] = nil
+                // The next set's own Start timer comes with the app's next update.
+                w["ts"] = nil
                 state["watch"] = w
                 WatchLink.shared.update(w)
             }
@@ -489,6 +495,7 @@ enum WorkoutTaps {
                 w["adj"] = step["adj"]
                 w["ask"] = nil
                 w["taken"] = nil
+                w["ts"] = nil
                 state["watch"] = w
                 WatchLink.shared.update(w)
                 GarminLink.shared.update(w)

@@ -65,6 +65,7 @@ import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
 import { BLOG_WATCH_ALONE } from "./blog/watchAlone";
+import { BLOG_WATCH_TIMER } from "./blog/watchTimer";
 import { BLOG_WATCH_TODAY } from "./blog/watchToday";
 import { BLOG_WIDGETS } from "./blog/widgets";
 import { BLOG_WORKOUT_GENERATOR } from "./blog/workoutGenerator";
@@ -315,6 +316,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_PREGNANCY,
   ...BLOG_WATCH_TODAY,
   ...BLOG_WATCH_ALONE,
+  ...BLOG_WATCH_TIMER,
   ...BLOG_GYM_WIDGETS,
   ...BLOG_WORKOUT_GENERATOR,
   ...BLOG_THIRTY_DAY,

@@ -1,6 +1,7 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
+//! On a timed hold, carry or cardio set START first starts the set timer (set-timer.md "Started from the watch").
 //! START (or a tap on touch watches) logs the set, with the weight and reps picked on the watch; during a set UP and
 //! DOWN (or swipes) step the weight or the reps along the phone's own steps and MENU (or a long press) switches
 //! which; during rest DOWN adds 30 s, UP is Machine taken when the phone has a pick (also on a set that can't be changed) and
@@ -27,6 +28,10 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
         var run = _app.run as GarminRun?;
         if (run != null && run.finishedAll()) {
             _app.finishLocal();
+            return true;
+        }
+        if (w.canStartTimer()) {
+            _app.startTimer();
             return true;
         }
         var msg = { "a" => "log" } as Dictionary;

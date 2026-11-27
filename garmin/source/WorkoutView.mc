@@ -67,6 +67,11 @@ class WorkoutView extends WatchUi.View {
             dc.setColor(CYAN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 0.47, Graphics.FONT_NUMBER_MEDIUM, clock(_w.phaseSeconds(phase as Array)), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             line(dc, cx, h * 0.64, (phase as Array)[2] as String, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
+        } else if (_w.timeUp()) {
+            // The countdown ran out: the set is logged as held.
+            dc.setColor(CYAN, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.47, Graphics.FONT_NUMBER_MEDIUM, clock(0), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            line(dc, cx, h * 0.64, _w.tsOver, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
         } else if (resting) {
             dc.setColor(CYAN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 0.47, Graphics.FONT_NUMBER_MEDIUM, clock(_w.restLeft()), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
@@ -105,7 +110,12 @@ class WorkoutView extends WatchUi.View {
                 hint = Rez.Strings.HintFinish;
             }
         }
-        line(dc, cx, h * 0.87, WatchUi.loadResource(hint) as String, Graphics.FONT_XTINY, MUTED, w * 0.6, 1);
+        var hintText = WatchUi.loadResource(hint) as String;
+        if (_w.canStartTimer() && (run == null || !(run as GarminRun).finishedAll())) {
+            // START starts the set timer first, with the phone's own words ("Start timer · 0:40").
+            hintText = Lang.format(WatchUi.loadResource(Rez.Strings.HintTimer) as String, [_w.tsLabel]);
+        }
+        line(dc, cx, h * 0.87, hintText, Graphics.FONT_XTINY, MUTED, w * 0.7, 1);
     }
 
     //! A number UP and DOWN can change: blue with an arrow each side when they change it, white otherwise.

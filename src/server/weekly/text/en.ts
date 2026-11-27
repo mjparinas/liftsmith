@@ -1135,6 +1135,7 @@ export const emails: Record<string, Words> = {
       "Log set, +30 s, the rest buzz and changing the weight and reps all work on the wrist, with heart rate from the watch.",
       "Finish when you're done. The watch keeps the workout until your phone is near again, app open or not.",
       "Your phone then saves it as if you'd logged it there: every set, your bests, the next weights and Health.",
+      "Planks, wall sits and hangs get Start timer on the wrist, with taps at 3, 2, 1 and halfway, and the hold logs itself when time's up.",
     ],
     dyk: "Planning stays on the phone, so Machine taken and Change the plan wait until your phone is back.",
   },
