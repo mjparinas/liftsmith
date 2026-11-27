@@ -55,9 +55,12 @@ export const RELEASES: readonly AppRelease[] = [
       { id: "workoutGenerator", kind: "new", icon: "globe" },
       { id: "shareStats", kind: "new", icon: "share" },
       { id: "liftCharts", kind: "better", icon: "chart" },
+      { id: "timerSeconds", kind: "better", icon: "hourglass" },
       { id: "gymWidgets", kind: "new", icon: "link" },
       { id: "printRoutine", kind: "new", icon: "print" },
       { id: "watchHoldTimer", kind: "new", icon: "watch" },
+      { id: "watchSecond", kind: "fixed", icon: "watch" },
+      { id: "smoothBar", kind: "better", icon: "hourglass" },
     ],
   },
   {

@@ -5,12 +5,13 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import type { TimerSegment } from "@/lib/sessionNotify";
-import { cueKey, SWITCH_SEC, timerAt, timerHeld, timerPhases, type TimerSpec, type TimerState } from "@/lib/setTimer";
+import { cueKey, sideSpan, SWITCH_SEC, timerAt, timerHeld, timerPhases, type TimerSpec, type TimerState } from "@/lib/setTimer";
 import { cancelTimer, putTimer, startLabel, subscribeTimer, timerSnapshot, type Held, type TimerRun } from "@/lib/timerRun";
 import { restCue, say } from "@/lib/voice";
 
 import { clock } from "../format";
 import { Icon } from "../icons";
+import { TimerBar } from "../TimerBar";
 
 // The set timer (setTimer.ts) on the workout screen, for holds, carries, hangs and cardio. Start sits above
 // Log set; once running, a big clock takes its place there. A countdown that runs out logs the set by itself
@@ -26,6 +27,11 @@ export { cancelTimer, startTimer, takeTimer } from "@/lib/timerRun";
 export function useTimerRun(key: string): TimerRun | null {
   const r = useSyncExternalStore(subscribeTimer, timerSnapshot, () => null);
   return r?.key === key ? r : null;
+}
+
+/** When the running set timer started (any set), or undefined: the workout's clock ticks on its seconds (useNow). */
+export function useTimerStartAt(): number | undefined {
+  return useSyncExternalStore(subscribeTimer, timerSnapshot, () => null)?.startAt;
 }
 
 /** Each beep and cue once; logs the set when a countdown runs out. Rendered only while a timer runs. */
@@ -129,8 +135,8 @@ export function SetTimerClock({ run, now, onDone }: { run: TimerRun; now: number
             ? t("timer.target", { time: clock(target) })
             : t("timer.left");
   const big = state.phase === "work" ? (spec.up ? clock(state.held) : clock(Math.max(0, state.left))) : String(state.left);
-  // How far through this side (or past the target, for a count-up).
-  const pct = state.phase === "work" ? Math.min(100, (state.held / target) * 100) : 0;
+  // How far through this side (or to the target, for a count-up), filling smoothly (TimerBar).
+  const span = state.phase === "work" ? sideSpan(spec, state.side) : null;
   const note = state.phase === "work" ? t("timer.logNote", { time: clock(state.held) }) : t("timer.logPlan");
   return (
     <div className="card w-full px-4 py-3 text-center" data-testid="set-timer">
@@ -144,12 +150,16 @@ export function SetTimerClock({ run, now, onDone }: { run: TimerRun; now: number
       >
         {big}
       </div>
-      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line" aria-hidden>
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-accent to-accent-2 transition-[width] duration-300"
-          style={{ width: `${pct}%` }}
+      {span ? (
+        <TimerBar
+          className="mt-2 h-1.5"
+          from={run.startAt + span.from}
+          to={run.startAt + span.to}
+          fill="bg-gradient-to-r from-accent to-accent-2"
         />
-      </div>
+      ) : (
+        <div className="mt-2 h-1.5 rounded-full bg-line" aria-hidden />
+      )}
       <div className="mt-1 flex items-center justify-between gap-2">
         <p className="min-w-0 text-left text-xs text-muted tabular-nums" data-testid="set-timer-note">
           {note}

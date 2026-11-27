@@ -274,25 +274,30 @@ export function Stepper({
   compact,
   display,
   big,
+  jump,
 }: {
   value: string;
-  onDown: () => void;
-  onUp: () => void;
+  /** `n` is how many steps at once: always 1 unless `jump` is set. */
+  onDown: (n?: number) => void;
+  onUp: (n?: number) => void;
   label: string;
   suffix?: string;
   compact?: boolean;
   display?: boolean;
   /** Big numbers (Settings › Workout): the number is much bigger, capped by the screen's width so it never scrolls sideways. */
   big?: boolean;
+  /** A long hold moves 2, then 5 steps at a time (`repeatSize`): for seconds, which step by 1. */
+  jump?: boolean;
 }) {
   // The number lifts for a moment when it changes.
   const [key, setKey] = useState(0);
   // The workout's own bumps already move by a plate or a rep, so a long hold speeds up but each
-  // step stays one step.
-  const step = (d: 1 | -1) => {
+  // step stays one step. Seconds (`jump`) step by 1, so a long hold moves several at a time.
+  const step = (d: 1 | -1, size: 1 | 2 | 5) => {
     setKey((k) => k + 1);
-    if (d > 0) onUp();
-    else onDown();
+    const n = jump ? size : 1;
+    if (d > 0) onUp(n);
+    else onDown(n);
   };
   if (compact) {
     return (

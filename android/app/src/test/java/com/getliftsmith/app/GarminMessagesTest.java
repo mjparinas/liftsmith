@@ -115,6 +115,20 @@ public class GarminMessagesTest {
         assertTrue(GarminMessages.worthSending(GarminMessages.state(lifting(), NOW), m, 500));
         assertFalse(GarminMessages.worthSending(m, GarminMessages.state(plank, NOW + 1000), 1000));
         assertEquals(java.util.Collections.emptyList(), GarminMessages.state(lifting(), NOW).get("k"));
+        // The same phases on the phone's clock, for a watch whose clock agrees (watch-apps.md "Same second as the phone").
+        long s = NOW / 1000;
+        assertEquals(
+            java.util.Arrays.asList(java.util.Arrays.asList((int) s - 2, (int) s + 3, "Get set"), java.util.Arrays.asList((int) s + 3, (int) s + 33, "Time left")),
+            m.get("ke")
+        );
+    }
+
+    @Test
+    public void restEndAndSentAtGoOnThePhonesClock() throws Exception {
+        Map<String, Object> m = GarminMessages.state(lifting().put("restUntil", NOW + 84_600), NOW + 200);
+        assertEquals((int) (NOW / 1000), m.get("z"));
+        assertEquals((int) (NOW / 1000) + 85, m.get("re"));
+        assertEquals(0, GarminMessages.state(lifting(), NOW).get("re"));
     }
 
     @Test

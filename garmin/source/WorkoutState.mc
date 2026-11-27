@@ -5,7 +5,8 @@ import Toybox.Time;
 //! reps), "p" plates, "r" seconds of rest left, "h" heart rate the phone has, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "x" what Machine taken swaps to, "y" why the exercise is there after one}, or
 //! {"end" => true} when it ended. "k" is the set timer for holds, carries and cardio: its phases as [seconds from now
 //! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
-//! phone's never have to agree. "ay", "ak", "aw", "ai", "ar" and "ars" are the set to adjust and "qe", "q" and "qo" the
+//! phone's never have to agree; "re" and "ke" are the same moments on the phone's clock (seconds since 1970) and "z" when it
+//! was sent, which a watch whose clock agrees counts to instead, so the message's trip adds no delay. "ay", "ak", "aw", "ai", "ar" and "ars" are the set to adjust and "qe", "q" and "qo" the
 //! "How did it feel?" question (GarminMessages.java, GarminLink.swift; watchAdjust.ts on the phone). "tk", "tn", "td",
 //! "tu", "tl", "tb" and "to" are the set timer START can start here: its set's key, seconds (each side), 2 for each side,
 //! a count-up, the words for START, the phase labels and what time's up says (timerRun.ts watchTimerOffer).
@@ -97,10 +98,24 @@ class WorkoutState {
         taken = text(data.get("x"));
         why = text(data.get("y"));
         var rest = whole(data.get("r"));
-        restEnds = rest > 0 ? now + rest : 0;
+        // A watch whose clock agrees with the phone's ("z", when this was sent) counts to the phone's own moments
+        // ("re", "ke"), so the trip through Garmin Connect adds no delay; otherwise it counts from now.
+        var z = whole(data.get("z"));
+        var same = z > 0 && now - z >= -2 && now - z <= 4;
+        var re = whole(data.get("re"));
+        restEnds = rest > 0 ? (same && re > 0 ? re : now + rest) : 0;
         timer = [];
         var k = data.get("k");
-        if (k instanceof Array) {
+        var ke = data.get("ke");
+        if (same && ke instanceof Array && ke.size() > 0) {
+            for (var i = 0; i < ke.size() && i < 8; i++) {
+                var p = ke[i];
+                if (p instanceof Array && p.size() == 3) {
+                    var end = whole(p[1]);
+                    timer.add([whole(p[0]), end < 0 ? -1 : end, text(p[2])]);
+                }
+            }
+        } else if (k instanceof Array) {
             for (var i = 0; i < k.size() && i < 8; i++) {
                 var p = k[i];
                 if (p instanceof Array && p.size() == 3) {
