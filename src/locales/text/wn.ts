@@ -173,6 +173,9 @@ export const en = {
   "wn.c.liftCharts.title": "Charts you can read",
   "wn.c.liftCharts.body":
     "Tap or drag any exercise's chart to see each session's number and date, new bests are marked gold, and there's an All time range. Charts are part of Pro.",
+  "wn.c.timerSeconds.title": "Holds by the second",
+  "wn.c.timerSeconds.body":
+    "The − and + on holds and timed sets, the interval timer and 30-day challenge holds now move 1 second at a time. Hold a button to speed up.",
   "wn.c.watchAdjust.title": "Change and rate a set on your watch",
   "wn.c.watchAdjust.body":
     "Turn the crown or press − and + to change the weight and reps on Wear OS, Apple Watch or Garmin, and after an exercise's last set, say how it felt right on your wrist.",
@@ -387,6 +390,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Gráficos que se leen solos",
   "wn.c.liftCharts.body":
     "Toca o arrastra el gráfico de cualquier ejercicio para ver el número y la fecha de cada sesión. Los nuevos récords se marcan en dorado y hay un periodo de todo el historial. Los gráficos son parte de Pro.",
+  "wn.c.timerSeconds.title": "Tiempos al segundo",
+  "wn.c.timerSeconds.body":
+    "Los − y + de las sujeciones y series cronometradas, el temporizador de intervalos y los retos de 30 días ahora cambian de 1 en 1 segundo. Mantén pulsado para ir más rápido.",
   "wn.c.watchAdjust.title": "Cambia y valora una serie en tu reloj",
   "wn.c.watchAdjust.body":
     "Gira la corona o pulsa − y + para cambiar el peso y las repeticiones en Wear OS, Apple Watch o Garmin, y tras la última serie de un ejercicio, di qué tal fue desde la muñeca.",
@@ -603,6 +609,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Des graphiques qui se lisent",
   "wn.c.liftCharts.body":
     "Touchez ou faites glisser le graphique d'un exercice pour voir le chiffre et la date de chaque séance. Les nouveaux records sont en or et une période couvre tout l'historique. Les graphiques font partie de Pro.",
+  "wn.c.timerSeconds.title": "Des durées à la seconde",
+  "wn.c.timerSeconds.body":
+    "Les − et + des gainages et séries chronométrées, du minuteur d'intervalles et des défis de 30 jours avancent maintenant d'une seconde à la fois. Maintenez le bouton pour accélérer.",
   "wn.c.watchAdjust.title": "Modifie et note une série sur ta montre",
   "wn.c.watchAdjust.body":
     "Tourne la couronne ou appuie sur − et + pour changer la charge et les répétitions sur Wear OS, Apple Watch ou Garmin, et après la dernière série d'un exercice, dis comment c'était depuis ton poignet.",
@@ -815,6 +824,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Diagramme, die du lesen kannst",
   "wn.c.liftCharts.body":
     "Tippe auf das Diagramm einer Übung oder zieh darüber und sieh Wert und Datum jeder Einheit. Neue Bestleistungen sind golden markiert, und es gibt einen Zeitraum für die gesamte Zeit. Diagramme gehören zu Pro.",
+  "wn.c.timerSeconds.title": "Zeiten auf die Sekunde",
+  "wn.c.timerSeconds.body":
+    "Die − und + bei Halteübungen und Zeitsätzen, beim Intervall-Timer und bei 30-Tage-Challenges gehen jetzt in 1-Sekunden-Schritten. Gedrückt halten, um schneller zu werden.",
   "wn.c.watchAdjust.title": "Satz auf deiner Uhr ändern und bewerten",
   "wn.c.watchAdjust.body":
     "Dreh die Krone oder tippe auf − und +, um Gewicht und Wiederholungen auf Wear OS, Apple Watch oder Garmin zu ändern, und sag nach dem letzten Satz einer Übung direkt am Handgelenk, wie es sich angefühlt hat.",
@@ -1027,6 +1039,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Grafici che si leggono",
   "wn.c.liftCharts.body":
     "Tocca o trascina il grafico di un esercizio per vedere valore e data di ogni sessione. I nuovi record sono segnati in oro e c'è un periodo per tutto lo storico. I grafici fanno parte di Pro.",
+  "wn.c.timerSeconds.title": "Tempi al secondo",
+  "wn.c.timerSeconds.body":
+    "I − e + delle tenute e delle serie a tempo, del timer a intervalli e delle sfide di 30 giorni ora si spostano di 1 secondo alla volta. Tieni premuto per andare più veloce.",
   "wn.c.watchAdjust.title": "Modifica e valuta una serie sull'orologio",
   "wn.c.watchAdjust.body":
     "Ruota la corona o premi − e + per cambiare peso e ripetizioni su Wear OS, Apple Watch o Garmin, e dopo l'ultima serie di un esercizio di' com'è andata direttamente dal polso.",
@@ -1228,6 +1243,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "読み取れるグラフ",
   "wn.c.liftCharts.body":
     "種目のグラフをタップまたはドラッグすると、各セッションの数値と日付が見られます。自己ベスト更新は金色で表示され、全期間も選べます。グラフは Pro の機能です。",
+  "wn.c.timerSeconds.title": "1秒単位で調整",
+  "wn.c.timerSeconds.body":
+    "ホールドや時間制セット、インターバルタイマー、30日チャレンジの − と + が1秒ずつ動くようになりました。長押しで速く進みます。",
   "wn.c.watchAdjust.title": "ウォッチでセットを変更・評価",
   "wn.c.watchAdjust.body":
     "Wear OS、Apple Watch、Garmin でリューズを回すか − と + を押して重量と回数を変更でき、種目の最後のセットのあとは手首からどうだったかを答えられます。",
@@ -1435,6 +1453,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Gráficos fáceis de ler",
   "wn.c.liftCharts.body":
     "Toque ou arraste o gráfico de qualquer exercício para ver o número e a data de cada sessão. Os novos recordes ficam em dourado e há um período com todo o histórico. Os gráficos fazem parte do Pro.",
+  "wn.c.timerSeconds.title": "Tempos no segundo",
+  "wn.c.timerSeconds.body":
+    "Os − e + das isometrias e séries cronometradas, do timer de intervalos e dos desafios de 30 dias agora mudam de 1 em 1 segundo. Segure o botão para acelerar.",
   "wn.c.watchAdjust.title": "Mude e avalie uma série no relógio",
   "wn.c.watchAdjust.body":
     "Gire a coroa ou toque em − e + para mudar o peso e as repetições no Wear OS, Apple Watch ou Garmin e, depois da última série de um exercício, diga como foi direto do pulso.",
@@ -1629,6 +1650,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "읽기 쉬운 그래프",
   "wn.c.liftCharts.body":
     "종목 그래프를 탭하거나 끌면 세션마다 수치와 날짜를 볼 수 있어요. 최고 기록 경신은 금색으로 표시되고 전체 기간도 고를 수 있어요. 그래프는 Pro 기능이에요.",
+  "wn.c.timerSeconds.title": "1초 단위 조정",
+  "wn.c.timerSeconds.body": "버티기와 시간 세트, 인터벌 타이머, 30일 챌린지의 − 와 + 가 이제 1초씩 움직입니다. 길게 누르면 빨라집니다.",
   "wn.c.watchAdjust.title": "워치에서 세트 변경과 평가",
   "wn.c.watchAdjust.body":
     "Wear OS, Apple Watch, Garmin에서 크라운을 돌리거나 − 와 + 를 눌러 무게와 횟수를 바꾸고, 운동의 마지막 세트 뒤에는 손목에서 바로 어땠는지 답하세요.",
@@ -1835,6 +1858,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Wykresy, które da się odczytać",
   "wn.c.liftCharts.body":
     "Dotknij wykresu ćwiczenia lub przeciągnij po nim, aby zobaczyć wynik i datę każdego treningu. Nowe rekordy są zaznaczone na złoto i jest zakres na cały czas. Wykresy są częścią Pro.",
+  "wn.c.timerSeconds.title": "Czas co do sekundy",
+  "wn.c.timerSeconds.body":
+    "Przyciski − i + przy utrzymaniach i seriach na czas, w timerze interwałowym i w 30-dniowych wyzwaniach zmieniają teraz czas o 1 sekundę. Przytrzymaj, aby przyspieszyć.",
   "wn.c.watchAdjust.title": "Zmień i oceń serię na zegarku",
   "wn.c.watchAdjust.body":
     "Obróć koronkę lub naciśnij − i +, aby zmienić ciężar i powtórzenia na Wear OS, Apple Watch lub Garminie, a po ostatniej serii ćwiczenia powiedz z nadgarstka, jak poszło.",
@@ -2043,6 +2069,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.liftCharts.title": "Okunabilen grafikler",
   "wn.c.liftCharts.body":
     "Her antrenmanın değerini ve tarihini görmek için bir hareketin grafiğine dokunun veya sürükleyin. Yeni rekorlar altın renkle işaretlenir ve tüm zamanlar aralığı var. Grafikler Pro'nun parçasıdır.",
+  "wn.c.timerSeconds.title": "Saniyesi saniyesine",
+  "wn.c.timerSeconds.body":
+    "Tutuşlarda ve süreli setlerde, aralık zamanlayıcısında ve 30 günlük meydan okumalarda − ve + artık 1'er saniye ilerliyor. Hızlanmak için basılı tutun.",
   "wn.c.watchAdjust.title": "Saatinde seti değiştir ve değerlendir",
   "wn.c.watchAdjust.body":
     "Wear OS, Apple Watch veya Garmin'de kurmayı çevir ya da − ve + düğmelerine basarak ağırlığı ve tekrarları değiştir; bir hareketin son setinden sonra nasıl geçtiğini bileğinden söyle.",

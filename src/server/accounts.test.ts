@@ -143,7 +143,11 @@ describe("accounts", () => {
       };
       expect((await sign("Owner@Example.com")).staff).toBe(true);
       expect((await sign("lifter@example.com")).staff).toBe(false);
+      // An inbox that gets the admin emails (DIGEST_TO) sees the row too (Melvin, 2026-11-27).
+      process.env.DIGEST_TO = "Me@Example.com";
+      expect((await sign("me@example.com")).staff).toBe(true);
     } finally {
+      delete process.env.DIGEST_TO;
       if (before === undefined) delete process.env.ADMIN_EMAILS;
       else process.env.ADMIN_EMAILS = before;
     }

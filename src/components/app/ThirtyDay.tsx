@@ -282,7 +282,7 @@ function ChallengeDetail({ c, pick }: { c: ThirtyChallenge; pick?: ThirtyLevel }
             <BumpField
               value={did}
               onChange={setDid}
-              step={c.unit === "seconds" ? 5 : 1}
+              step={1}
               start={today.amount}
               min={1}
               max={9999}

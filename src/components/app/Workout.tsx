@@ -631,8 +631,10 @@ export function Workout() {
                   ? t("workout.repsEachSide")
                   : t("workout.reps"),
             value: String(active.reps),
-            onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)),
-            onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)),
+            // Seconds step by 1 (Melvin, 2026-11-27); a long hold speeds up to 2 and 5 at a time.
+            jump: TIMED.has(ex.id),
+            onDown: (n = 1) => s.adjust(active.weight, active.reps - n),
+            onUp: (n = 1) => s.adjust(active.weight, active.reps + n),
           }
         : null;
   const rightStep =
