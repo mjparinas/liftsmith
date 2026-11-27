@@ -53,7 +53,7 @@ export interface Branded {
 }
 
 // The app's dark palette (globals.css), written out because mail apps don't read CSS variables.
-const C = {
+export const C = {
   bg: "#080b10",
   card: "#10151d",
   raised: "#151c26",
@@ -73,11 +73,11 @@ const C = {
   emberTint: "#1d1712",
   mint: "#34d399",
 } as const;
-const FONT = "Roboto,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+export const FONT = "Roboto,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 /** "1-week" never breaks after the hyphen: a number and its word stay on one line. */
 const keepTogether = (s: string) => s.replace(/(\d)-(?=\p{L})/gu, "$1\u2011");
 /** A solid colour Gmail's dark mode leaves alone: it inverts background colours but not background images. */
-const solid = (c: string) => `background-color:${c};background-image:linear-gradient(${c},${c})`;
+export const solid = (c: string) => `background-color:${c};background-image:linear-gradient(${c},${c})`;
 
 /** This week's workouts as dots: done ones filled mint with a tick, the rest ringed in ember. Outlook squares them. */
 function weekDots(lang: MsgLang | undefined, done: number, goal: number): string {
@@ -106,7 +106,7 @@ ${dots ? `<tr><td colspan="2" style="padding:0 18px 18px">${dots}</td></tr>` : "
 }
 
 /** The main button: the app's blue-to-violet primary with dark ink, full width like the app's. Outlook gets the flat blue. */
-function button(cta: { label: string; url: string }): string {
+export function button(cta: { label: string; url: string }): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 4px"><tr>
 <td align="center" bgcolor="${C.gradA}" style="border-radius:14px;background-color:${C.gradA};background-image:linear-gradient(90deg,${C.gradA},${C.gradB},${C.gradC})">
 <a href="${esc(cta.url)}" style="display:block;padding:15px 22px;font-family:${FONT};font-size:16px;font-weight:800;line-height:1.25;color:${C.btnInk};text-decoration:none;border-radius:14px">${esc(cta.label)}</a>

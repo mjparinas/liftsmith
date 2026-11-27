@@ -580,6 +580,8 @@ export const NOT_SETTINGS: string[] = [
   "VERCEL_GIT_REPO_SLUG",
   // Set by Vercel's builder to its own Next deployment adapter; next.config.ts wraps it (scripts/csp-adapter.mjs).
   "NEXT_ADAPTER_PATH",
+  // Added by Vercel with the private form-video Blob store (OIDC) for Blob webhooks, which we don't use.
+  "VIDEO_BLOB_WEBHOOK_PUBLIC_KEY",
 ];
 
 /**

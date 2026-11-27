@@ -12,6 +12,7 @@ import { coachTotals, type CoachTotals } from "./adminUsers";
 import { digestSummary } from "./aiHelpers";
 import { alertSettings, resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { query } from "./db";
+import { button, C, FONT, solid } from "./reminderEmails";
 import { claimSetting, getSetting, setSetting } from "./settings";
 import { runCheck } from "./systemHealth";
 
@@ -42,6 +43,12 @@ export interface Money {
   refunds: number;
   /** Cancellations and expiries because a payment failed. */
   failed: number;
+}
+
+export interface DigestSection {
+  title: string;
+  lines: string[];
+  bullets?: string[];
 }
 
 export interface DigestData {
@@ -138,7 +145,7 @@ export interface Digest {
   subject: string;
   /** The opening line: sign-ups, payments and cancellations, as in Gradelings. */
   headline: string;
-  sections: { title: string; lines: string[]; bullets?: string[] }[];
+  sections: DigestSection[];
   todoCount: number;
   problems: number;
   /** A two- or three-sentence summary by Claude (src/server/aiHelpers.ts digestSummary), when the AI helpers are on. */
@@ -254,31 +261,40 @@ export function digestMail(g: Digest, footer: DigestFooter, origin = siteOrigin(
     footer.postalAddress ? `Liftsmith · ${footer.postalAddress}` : "Liftsmith",
   ].join("\n");
 
-  const p = (s: string) => `<p style="font-size:15px;line-height:1.5;margin:0 0 6px">${esc(s)}</p>`;
-  const small = (s: string) => `<p style="font-size:12px;line-height:1.5;color:#808c9d;margin:0 0 6px">${s}</p>`;
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="color-scheme" content="dark light"></head>
-<body style="margin:0;background:#0a0d12;color:#e8edf4;font-family:Roboto,-apple-system,Segoe UI,Arial,sans-serif">
-<div style="max-width:560px;margin:0 auto;padding:28px 20px">
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px"><tr>
-<td style="padding-right:10px"><img src="${esc(origin)}/icon-192.png" width="40" height="40" alt="" style="display:block;border-radius:10px"></td>
-<td style="color:#4c8dff;font-weight:700;font-size:17px">Liftsmith</td></tr></table>
-<h1 style="font-size:22px;margin:0 0 8px">Your morning digest</h1>
-${g.summary ? `<p style="font-size:15px;line-height:1.5;margin:0 0 14px;padding:12px 14px;border-left:3px solid #4c8dff;background:#121821;border-radius:8px">${esc(g.summary)}</p>` : ""}
-<p style="font-size:16px;line-height:1.5;margin:0 0 20px">${esc(g.headline)}</p>
-${g.sections
-  .map(
-    (s) => `<div style="background:#121821;border:1px solid #222a35;border-radius:14px;padding:14px 16px;margin:0 0 12px">
-<p style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#9aa6b6;font-weight:700;margin:0 0 8px">${esc(s.title)}</p>
-${s.lines.map(p).join("\n")}${s.bullets?.length ? `<ul style="margin:6px 0 0;padding-left:20px">${s.bullets.map((b) => `<li style="font-size:15px;line-height:1.5">${esc(b)}</li>`).join("")}</ul>` : ""}
-</div>`,
-  )
-  .join("\n")}
-<p style="margin:22px 0"><a href="${esc(admin)}" style="display:inline-block;background:#4c8dff;color:#0a0d12;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px">Open the admin panel</a></p>
-<hr style="border:0;border-top:1px solid #222a35;margin:24px 0 14px">
+  // The lifter emails' layout (reminderEmails.ts): tables, bgcolor and colours Gmail's dark mode can't flip.
+  const site = esc(origin);
+  const p = (s: string) => `<p style="font-size:15px;line-height:1.55;margin:0 0 6px;color:${C.ink}">${esc(s)}</p>`;
+  const small = (s: string) => `<p style="font-size:12px;line-height:1.5;color:${C.faint};margin:0 0 6px">${s}</p>`;
+  const section = (
+    s: DigestSection,
+  ) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.raised}" style="${solid(C.raised)};border:1px solid ${C.line};border-radius:14px;margin:0 0 12px"><tr><td style="padding:14px 16px;font-family:${FONT}">
+<p style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:${C.muted};font-weight:700;margin:0 0 8px">${esc(s.title)}</p>
+${s.lines.map(p).join("\n")}${s.bullets?.length ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 0">${s.bullets.map((b) => `<tr><td width="18" valign="top" style="width:18px;color:${C.blue};font-size:15px;line-height:1.5;font-weight:800">&#8226;</td><td valign="top" style="padding:0 0 4px;font-size:15px;line-height:1.5;color:${C.ink}">${esc(b)}</td></tr>`).join("")}</table>` : ""}
+</td></tr></table>`;
+  const preview = g.summary ?? g.headline;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"><title>${esc(g.subject)}</title>
+<style>:root{color-scheme:dark}body{margin:0;padding:0}a{color:${C.blue}}@media (max-width:480px){.px{padding-left:18px!important;padding-right:18px!important}}</style></head>
+<body bgcolor="${C.bg}" style="margin:0;padding:0;${solid(C.bg)};color:${C.ink};font-family:${FONT};-webkit-text-size-adjust:100%">
+<div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.bg}">${esc(preview)}${"&#8199;&#65279;&#847; ".repeat(40)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.bg}" style="${solid(C.bg)}"><tr><td align="center" style="padding:28px 12px 36px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;width:100%">
+<tr><td style="padding:0 4px 18px"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+<td style="padding-right:10px"><a href="${site}"><img src="${site}/icon-192.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;border:0;border-radius:9px"></a></td>
+<td style="font-family:${FONT};font-size:19px;font-weight:800;letter-spacing:-.01em;color:${C.ink}">Liftsmith</td></tr></table></td></tr>
+<tr><td class="px" bgcolor="${C.card}" style="${solid(C.card)};background-image:linear-gradient(180deg,#152038 0,${C.card} 160px);border:1px solid ${C.line};border-radius:22px;padding:28px 24px 26px;font-family:${FONT};color:${C.ink}">
+<img src="${site}/email/icons/chart.png" width="56" height="56" alt="" style="display:block;width:56px;height:56px;border:0;margin:0 0 18px">
+<h1 style="font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-.01em;margin:0 0 14px;color:${C.ink}">Your morning digest</h1>
+${g.summary ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.raised}" style="${solid(C.raised)};border-left:3px solid ${C.violet};border-radius:12px;margin:0 0 14px"><tr><td style="padding:12px 14px;font-size:15px;line-height:1.55;color:${C.ink}">${esc(g.summary)}</td></tr></table>` : ""}
+<p style="font-size:16px;line-height:1.55;margin:0 0 18px;color:${C.ink}">${esc(g.headline)}</p>
+${g.sections.map(section).join("\n")}
+${button({ label: "Open the admin panel", url: admin })}
+</td></tr>
+<tr><td style="padding:22px 8px 0;font-family:${FONT}">
 ${small(esc(WHY))}
-${small(`${esc(NO_ADS)} <a href="${esc(privacy)}" style="color:#808c9d">Privacy</a> · Questions? <a href="mailto:${esc(footer.contact)}" style="color:#808c9d">${esc(footer.contact)}</a>`)}
+${small(`${esc(NO_ADS)} <a href="${esc(privacy)}" style="color:${C.faint}">Privacy</a> · Questions? <a href="mailto:${esc(footer.contact)}" style="color:${C.faint}">${esc(footer.contact)}</a>`)}
 ${small(esc(footer.postalAddress ? `Liftsmith · ${footer.postalAddress}` : "Liftsmith"))}
-</div></body></html>`;
+</td></tr>
+</table></td></tr></table></body></html>`;
   return { subject: g.subject, text, html };
 }
 
