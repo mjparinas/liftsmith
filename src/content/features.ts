@@ -645,6 +645,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-19",
       },
       {
+        id: "gym-widgets",
+        name: "Widgets for your gym's website",
+        body: "Official gyms put their class schedule, their equipment or a Find us on Liftsmith badge on their own website with one line of code. They update on their own, in the language and look the owner picks, and link to the gym's page.",
+        tier: "free",
+        note: "No scripts, cookies or tracking on the gym's site.",
+        added: "2026-11-27",
+      },
+      {
         id: "buy-next",
         name: "What to buy next",
         body: "For home gyms: the one piece of equipment that would open up the most exercises.",

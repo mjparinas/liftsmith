@@ -380,3 +380,46 @@ hours, which equipment gets used, open problem reports), aggregate only, no lift
   announcement, with the busiest beside it.
 - One answer per gym per server for ten minutes, and the visit queries use `gym_visits_place` (`dbIndexes.test.ts`).
 - Free, like everything else for gyms. Pure web code plus the server, so Android, iOS and the web app get it together.
+
+## Website widgets (2026-11-27)
+
+Melvin, 2026-11-27 (traffic idea 3 from "Find new ways to grow traffic": "do them all, put effort into them"): owners of
+official gyms put a class schedule, an equipment list or a "Find us on Liftsmith" badge on their own website with one
+pasted line of code. Each one links back to the gym's page here, which earns that page a link from a local business site.
+
+- **Three widgets** (`src/lib/gymWidgets.ts` builds the code, `src/server/gymWidgets.ts` draws them, route
+  `src/app/api/gyms/widget/route.api.ts`):
+  - **Class schedule** (`/embed/gym/<id>/schedule/`): the week Monday first, from the same rows and the same drawing as
+    the website gym page (`classDaysHtml`), times on the gym's own clock, "book with the gym directly", or "No classes
+    posted yet." when there are none.
+  - **Equipment** (`/embed/gym/<id>/equipment/`): the gym's equipment chips and dumbbell range (`equipmentHtml`), its
+    amenities and prices, and **Add this gym to your Liftsmith** (the app's gym page, where one tap adds it with its kit).
+  - **Badge** (`/embed/gym/<id>/badge.svg`): the app mark, "Find us on" and "Liftsmith" as an SVG image, wrapped in a link
+    to the gym's page. It names no gym, so it reads nothing and is cached a week.
+  Both framed widgets show the gym's name, logo and check mark and a footer link, "See <gym> on Liftsmith", opening the
+  gym's page in a new tab with `utm_source=gym_widget` (and the widget as `utm_campaign`) for the Traffic tab.
+- **The code is a frame plus a plain link outside it**, like the calculators' embeds ([Public pages and SEO](public-pages-and-seo.md)
+  "Embeddable calculators"), because only a link in the host page itself counts for search; the badge has no frame at
+  all, so its link is the host page's own. The code holds no words in any language (the gym's name and the brand only),
+  so the app can build it for any of the ten languages with only its own loaded; the badge's width per language is a
+  table (`BADGE_WIDTH`) that `gymWidgets.test.ts` checks against the words, so the host page never jumps.
+- **Choices**: light or dark, and any of the app's ten languages (`?lang=&theme=`, English and light left off), picked on
+  the owner's page. Not "match the visitor's language": the edge would have to keep a copy per Accept-Language.
+- **Safe to embed**: no scripts, cookies or tracking; styles inline; the frame is `sandbox="allow-popups
+  allow-popups-to-escape-sandbox"` (links open a normal new tab), `loading="lazy"` and `referrerpolicy`. The policy
+  (`WIDGET_CSP` in `securityHeaders.ts`, also set by `next.config.ts` for `/embed/gym/`) is `default-src 'none'`, images
+  only from this site, and `frame-ancestors http: https: capacitor://localhost 'self'`: unlike the calculators, **http
+  sites too**, because a small gym's site may not have moved to https and nothing on these pages is worth tricking a click
+  onto; `capacitor://localhost` is the iOS app's own preview. `noindex` and out of robots.txt (`/embed/gym/`), like the
+  poster and report pages.
+- **Fast**: one indexed row per widget (`widgetPlace`: no photos, news, problems or trainers; the classes only for the
+  schedule), 10 minutes in the browser and 15 at the edge, then the old copy for a day while a fresh one is drawn. A
+  change in the app shows within about a quarter of an hour. A database error answers "off for now" with `no-store`.
+- **Official gyms only**: a released or never-claimed gym's frame shows one quiet line and a link to the gym finder
+  instead of its details (never a broken box on the owner's site); a gone gym answers 404 with the same line.
+- **Where owners find it**: **Widgets for your website** on the owner's page (`GymEdit.tsx` › `WidgetsSection` in
+  `GymWidgets.tsx`, under the poster): pick a widget, a look and a language, see a live preview, then Copy code. Owners
+  and staff alike. Pure web code, so Android, iOS and the web app get it together. Text: `gp.w.*` (the widgets) and
+  `gym.edit.widget*` (the owner's section), ten languages.
+- Free, like everything else for gyms. Features page `gym-widgets`, weekly email `gym-widgets` (gym owners), What's new
+  `gymWidgets` (0.32.0) and the blog post `gym-website-widgets`.

@@ -27,6 +27,7 @@ import { BLOG_GYM_CHAINS } from "./blog/gymChains";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
 import { BLOG_GYM_INSIGHTS } from "./blog/gymInsights";
 import { BLOG_GYM_OPEN_NOW } from "./blog/gymOpenNow";
+import { BLOG_GYM_WIDGETS } from "./blog/gymWidgets";
 import { BLOG_H } from "./blog/h";
 import { BLOG_HEALTH_TRENDS } from "./blog/healthTrends";
 import { BLOG_I } from "./blog/i";
@@ -303,6 +304,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_PREGNANCY,
   ...BLOG_WATCH_TODAY,
   ...BLOG_WATCH_ALONE,
+  ...BLOG_GYM_WIDGETS,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

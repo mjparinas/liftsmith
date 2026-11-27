@@ -1127,6 +1127,18 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La planification reste sur le téléphone : Machine occupée et Modifier le plan attendent son retour.",
   },
+  "gym-widgets": {
+    title: "Votre salle sur votre propre site",
+    intro:
+      "L’horaire des cours, l’équipement et un badge Retrouvez-nous sur Liftsmith peuvent maintenant figurer sur votre site, toujours à jour.",
+    points: [
+      "Ouvrez votre salle dans l’app, touchez Gérer la page de la salle et trouvez Widgets pour votre site.",
+      "Choisissez l’horaire, l’équipement ou le badge, une apparence claire ou sombre et l’une des dix langues, et voyez le rendu.",
+      "Copiez le code et collez-le dans un bloc HTML ou d’intégration de votre site. Squarespace, Wix et WordPress en ont un.",
+      "Changez un cours ou votre équipement dans l’app et le widget de votre site change aussi.",
+    ],
+    dyk: "Les widgets n’ont ni script, ni cookie, ni suivi, et chacun mène à la page de votre salle pour que les nouveaux membres l’ajoutent en un geste.",
+  },
   "share-stats": {
     title: "Partagez les chiffres dont vous êtes le plus fier",
     intro: "Chaque max estimé, série la plus lourde et record personnel a maintenant un petit bouton de partage à côté.",

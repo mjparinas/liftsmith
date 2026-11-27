@@ -111,6 +111,11 @@ export const pl: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widżety na stronę Twojej siłowni",
+      body: "Oficjalne siłownie pokazują grafik zajęć, sprzęt albo odznakę „Znajdź nas w Liftsmith” na własnej stronie jedną linijką kodu. Aktualizują się same, w wybranym języku i wyglądzie, i prowadzą do strony siłowni.",
+      note: "Żadnych skryptów, plików cookie ani śledzenia na stronie siłowni.",
+    },
     "gym-insights": {
       name: "Statystyki dla właścicieli siłowni",
       body: "Właściciele i personel oficjalnych siłowni widzą, ile osób trenowało tam w ostatnich czterech tygodniach, godziny tłoku i spokoju, używany sprzęt i otwarte zgłoszenia, z jednym następnym krokiem.",

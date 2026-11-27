@@ -111,6 +111,11 @@ export const pt: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widgets para o site da sua academia",
+      body: "Academias oficiais colocam a grade de aulas, os equipamentos ou um selo Encontre a gente no Liftsmith no próprio site com uma linha de código. Eles se atualizam sozinhos, no idioma e na aparência escolhidos, e levam para a página da academia.",
+      note: "Sem scripts, cookies ou rastreamento no site da academia.",
+    },
     "gym-insights": {
       name: "Dados para donos de academia",
       body: "Donos e equipe de academias oficiais veem quantos atletas treinaram lá nas últimas quatro semanas, os horários cheios e tranquilos, os equipamentos usados e os problemas abertos, com um próximo passo.",

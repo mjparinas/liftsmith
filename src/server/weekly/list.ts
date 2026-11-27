@@ -190,6 +190,9 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-26: phone-free workouts on the watch, waiting for Google Play's watch approval like the other watch emails
   // (docs/decisions/watch-apps.md "Phone-free workouts").
   L("watch-alone", "free", "today", { fresh: "2026-11-26", needsFlag: "wearOnPlay" }),
+  // New, 2026-11-27: website widgets for official gyms: class schedule, equipment and a badge (docs/decisions/gyms.md
+  // "Website widgets").
+  R("gym-widgets", "gym", "free", "gym", { fresh: "2026-11-27", shot: false }),
   // New, 2026-11-27: a share button beside every max, heaviest set and best (docs/decisions/sharing.md "Share one stat").
   L("share-stats", "free", "stats", { fresh: "2026-11-27" }),
 ];
