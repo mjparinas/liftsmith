@@ -9,7 +9,6 @@ import com.google.android.gms.wearable.CapabilityClient;
 import com.google.android.gms.wearable.CapabilityInfo;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 import java.util.Set;
 import org.json.JSONObject;
@@ -29,21 +28,20 @@ final class WatchLink {
     /** Declared by the watch app (wear/src/main/res/values/wear.xml), so only watches with it are opened. */
     static final String CAPABILITY = "liftsmith_watch";
 
+    private static long lastUpdate;
     private static String launchedFor = null;
 
     private WatchLink() {}
 
     /** The workout as the watch shows it: the notification's own fields plus when it was sent. */
-    static void update(Context context, JSONObject state) {
+    static synchronized void update(Context context, JSONObject state) {
         try {
-            state.put("at", System.currentTimeMillis());
+            long at = nextUpdate();
+            state.put("at", at);
             // The steps after a Machine taken tap are for the phone's own service (WorkoutService), not the watch.
             JSONObject forWatch = new JSONObject(state.toString());
             forWatch.remove("takenStep");
-            PutDataMapRequest req = PutDataMapRequest.create(PATH_WORKOUT);
-            req.getDataMap().putString("json", forWatch.toString());
-            PutDataRequest put = req.asPutDataRequest().setUrgent();
-            Wearable.getDataClient(context).putDataItem(put);
+            publish(context, forWatch.toString(), at);
         } catch (Exception ignored) {
             // No Play services (some Android builds): the phone app works the same without a watch.
         }
@@ -54,12 +52,30 @@ final class WatchLink {
         }
     }
 
+    private static long nextUpdate() {
+        lastUpdate = Math.max(System.currentTimeMillis(), lastUpdate + 1);
+        return lastUpdate;
+    }
+
+    private static void publish(Context context, String json, long at) {
+        PutDataMapRequest req = PutDataMapRequest.create(PATH_WORKOUT);
+        req.getDataMap().putString("json", json);
+        req.getDataMap().putLong("at", at);
+        Wearable.getDataClient(context).putDataItem(req.asPutDataRequest().setUrgent());
+        byte[] bytes = req.getDataMap().toByteArray();
+        Wearable.getCapabilityClient(context).getCapability(CAPABILITY, CapabilityClient.FILTER_REACHABLE)
+            .addOnSuccessListener(info -> {
+                for (Node node : info.getNodes()) {
+                    Wearable.getMessageClient(context).sendMessage(node.getId(), PATH_WORKOUT, bytes);
+                }
+            });
+    }
+
     /** The workout ended: the watch goes back to its "start on your phone" screen. */
-    static void stop(Context context) {
+    static synchronized void stop(Context context) {
         launchedFor = null;
         try {
-            Uri uri = new Uri.Builder().scheme("wear").path(PATH_WORKOUT).build();
-            Wearable.getDataClient(context).deleteDataItems(uri);
+            publish(context, "", nextUpdate());
         } catch (Exception ignored) {
             // No Play services.
         }
