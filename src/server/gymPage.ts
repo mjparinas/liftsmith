@@ -157,7 +157,7 @@ export function hoursHtml(raw: string, lang: MsgLang): string {
 
 // --- One gym ---
 
-function equipmentHtml(p: Place, lang: MsgLang): string {
+export function equipmentHtml(p: Pick<Place, "code">, lang: MsgLang): string {
   const kit = p.code ? decodeGym(p.code) : null;
   if (!kit || !kit.equipment.length) return `<p class="muted">${esc(say(lang, "gp.equipmentNone"))}</p>`;
   const order = (e: Equipment) => EQUIPMENT.indexOf(e);
@@ -403,6 +403,11 @@ const classClock = (hhmm: string, lang: MsgLang) => {
 /** The gym's week of classes, Monday first; dates off show under the class until they're past. */
 export function classesHtml(classes: readonly GymClass[], lang: MsgLang): string {
   if (!classes.length) return "";
+  return `<section class="card" aria-labelledby="classes-h"><h2 id="classes-h">${icon("calendar", 16)}${esc(say(lang, "gp.classesTitle"))}</h2><p class="muted small">${esc(say(lang, "gp.classesLocal"))} ${esc(say(lang, "gp.classBook"))}</p>${classDaysHtml(classes, lang)}</section>`;
+}
+
+/** The week itself, one heading per day with classes (also the website widget's, gymWidgets.ts). */
+export function classDaysHtml(classes: readonly GymClass[], lang: MsgLang): string {
   const names = dayNames(lang);
   const days = timetable(classes)
     .map(({ weekday, classes: list }) => {
@@ -421,7 +426,7 @@ export function classesHtml(classes: readonly GymClass[], lang: MsgLang): string
       return `<div class="cl-day"><h3>${esc(names[(weekday + 6) % 7]!)}</h3><ul class="classes">${items}</ul></div>`;
     })
     .join("");
-  return `<section class="card" aria-labelledby="classes-h"><h2 id="classes-h">${icon("calendar", 16)}${esc(say(lang, "gp.classesTitle"))}</h2><p class="muted small">${esc(say(lang, "gp.classesLocal"))} ${esc(say(lang, "gp.classBook"))}</p>${days}</section>`;
+  return days;
 }
 
 const dayName = (at: number, lang: MsgLang) =>

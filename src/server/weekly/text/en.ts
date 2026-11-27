@@ -1138,4 +1138,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planning stays on the phone, so Machine taken and Change the plan wait until your phone is back.",
   },
+  "gym-widgets": {
+    title: "Put your gym on your own website",
+    intro:
+      "Your gym's class schedule, equipment and a Find us on Liftsmith badge can now sit on your own website, kept up to date for you.",
+    points: [
+      "Open your gym in the app, tap Manage this gym’s page and find Widgets for your website.",
+      "Pick the class schedule, the equipment or the badge, a light or dark look and one of ten languages, and see it as it'll show.",
+      "Copy the code and paste it into an HTML or embed block on your site. Squarespace, Wix and WordPress all have one.",
+      "Change a class or your equipment in the app and the widget on your site changes too.",
+    ],
+    dyk: "The widgets carry no scripts, cookies or tracking, and each one links to your gym's page so new members can add your gym in one tap.",
+  },
 };

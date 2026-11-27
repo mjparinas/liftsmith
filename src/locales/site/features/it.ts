@@ -66,6 +66,11 @@ export const it: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widget per il sito della tua palestra",
+      body: "Le palestre ufficiali mostrano l’orario dei corsi, l’attrezzatura o un badge Trovaci su Liftsmith sul proprio sito con una riga di codice. Si aggiornano da soli, nella lingua e nell’aspetto scelti, e portano alla pagina della palestra.",
+      note: "Nessuno script, cookie o tracciamento sul sito della palestra.",
+    },
     "gym-insights": {
       name: "Dati per i titolari di palestre",
       body: "Titolari e staff delle palestre ufficiali vedono quanti atleti si sono allenati lì nelle ultime quattro settimane, gli orari pieni e tranquilli, l'attrezzatura usata e i problemi aperti, con un passo successivo.",

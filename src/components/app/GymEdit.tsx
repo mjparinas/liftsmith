@@ -28,6 +28,7 @@ import { useApp } from "@/lib/store";
 import { AmenitiesSection, OwnerExtrasSections, priceDraft, pricesOf, type PriceDraft } from "./GymExtras";
 import { InsightsSection } from "./GymInsights";
 import { StaffSection, StarterSection } from "./GymStaff";
+import { WidgetsSection } from "./GymWidgets";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Skeleton, Switch, SwitchRow } from "./ui";
@@ -216,6 +217,7 @@ export function GymEdit({ id }: { id?: string }) {
       </Section>
 
       <PosterSection gym={gym} stand={stand} onAsked={setStand} />
+      <WidgetsSection gym={gym} />
       <StaffSection gym={gym} />
 
       <Section title={t("gym.edit.contact")}>

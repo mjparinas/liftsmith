@@ -182,6 +182,9 @@ export const en = {
   "wn.c.moreStretches.title": "13 new stretches",
   "wn.c.moreStretches.body":
     "Couch stretch, frog, 90/90 hip switches, band pass-throughs, sleeper stretch, chin tucks and more, each with its 3D demo, for hips, shoulders, neck, wrists and calves.",
+  "wn.c.gymWidgets.title": "Website widgets for gyms",
+  "wn.c.gymWidgets.body":
+    "Own a gym on Liftsmith? Put your class schedule, your equipment or a Find us on Liftsmith badge on your own website with one line of code, from your gym's page in the app. They update on their own.",
 } as const;
 
 type Key = keyof typeof en;
@@ -375,6 +378,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 estiramientos nuevos",
   "wn.c.moreStretches.body":
     "Estiramiento del sofá, rana, cambios de cadera 90/90, pasos de banda, estiramiento del durmiente, retracciones de barbilla y más, cada uno con su demo en 3D, para cadera, hombros, cuello, muñecas y gemelos.",
+  "wn.c.gymWidgets.title": "Widgets web para gimnasios",
+  "wn.c.gymWidgets.body":
+    "¿Tienes un gimnasio en Liftsmith? Pon tu horario de clases, tu equipamiento o una insignia de Encuéntranos en Liftsmith en tu propia web con una línea de código, desde la página de tu gimnasio en la app. Se actualizan solos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -570,6 +576,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 nouveaux étirements",
   "wn.c.moreStretches.body":
     "Étirement du canapé, grenouille, bascules de hanches 90/90, passages d'élastique, étirement du dormeur, rentrés de menton et plus encore, chacun avec sa démo en 3D, pour les hanches, les épaules, le cou, les poignets et les mollets.",
+  "wn.c.gymWidgets.title": "Des widgets web pour les salles",
+  "wn.c.gymWidgets.body":
+    "Vous gérez une salle sur Liftsmith ? Affichez votre horaire des cours, votre équipement ou un badge Retrouvez-nous sur Liftsmith sur votre propre site avec une ligne de code, depuis la page de votre salle dans l’app. Ils se mettent à jour tout seuls.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -760,6 +769,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 neue Dehnübungen",
   "wn.c.moreStretches.body":
     "Couch-Stretch, Frosch, 90/90-Hüftwechsel, Band-Durchzüge, Sleeper-Stretch, Kinn zurückziehen und mehr, jede mit 3D-Demo, für Hüfte, Schultern, Nacken, Handgelenke und Waden.",
+  "wn.c.gymWidgets.title": "Website-Widgets für Studios",
+  "wn.c.gymWidgets.body":
+    "Du betreibst ein Studio auf Liftsmith? Zeig deinen Kursplan, deine Geräte oder ein „Finde uns auf Liftsmith“-Abzeichen mit einer Zeile Code auf deiner eigenen Website, direkt von der Seite deines Studios in der App. Sie bleiben von selbst aktuell.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -951,6 +963,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 nuovi allungamenti",
   "wn.c.moreStretches.body":
     "Allungamento del divano, rana, cambi d'anca 90/90, passaggi con elastico, allungamento del dormiente, retrazioni del mento e altro, ognuno con la sua demo in 3D, per anche, spalle, collo, polsi e polpacci.",
+  "wn.c.gymWidgets.title": "Widget web per le palestre",
+  "wn.c.gymWidgets.body":
+    "Gestisci una palestra su Liftsmith? Metti l’orario dei corsi, l’attrezzatura o un badge Trovaci su Liftsmith sul tuo sito con una riga di codice, dalla pagina della palestra nell’app. Si aggiornano da soli.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1131,6 +1146,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "新しいストレッチ13種",
   "wn.c.moreStretches.body":
     "カウチストレッチ、カエル、90/90ヒップスイッチ、バンドパススルー、スリーパーストレッチ、チンタックなど。どれも3Dデモ付きで、股関節・肩・首・手首・ふくらはぎに。",
+  "wn.c.gymWidgets.title": "ジム向けウェブサイトウィジェット",
+  "wn.c.gymWidgets.body":
+    "Liftsmithにジムを登録していますか？アプリのジムのページから、クラスのスケジュール、設備、「Liftsmithで見る」バッジを、コード1行で自分のウェブサイトに表示できます。内容は自動で最新になります。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1317,6 +1335,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 alongamentos novos",
   "wn.c.moreStretches.body":
     "Alongamento do sofá, sapo, troca de quadril 90/90, passagem com elástico, alongamento do dorminhoco, retração do queixo e mais, cada um com sua demo em 3D, para quadril, ombros, pescoço, punhos e panturrilhas.",
+  "wn.c.gymWidgets.title": "Widgets de site para academias",
+  "wn.c.gymWidgets.body":
+    "Tem uma academia no Liftsmith? Coloque a grade de aulas, os equipamentos ou um selo Encontre a gente no Liftsmith no seu próprio site com uma linha de código, pela página da academia no app. Eles se atualizam sozinhos.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1491,6 +1512,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "새 스트레칭 13가지",
   "wn.c.moreStretches.body":
     "카우치 스트레칭, 개구리, 90/90 고관절 전환, 밴드 패스스루, 슬리퍼 스트레칭, 턱 당기기 등. 모두 3D 시연이 있고 고관절, 어깨, 목, 손목, 종아리를 위한 거예요.",
+  "wn.c.gymWidgets.title": "체육관용 웹사이트 위젯",
+  "wn.c.gymWidgets.body":
+    "Liftsmith에 체육관이 있나요? 앱의 체육관 페이지에서 코드 한 줄로 수업 일정, 장비 또는 'Liftsmith에서 보기' 배지를 내 웹사이트에 넣을 수 있습니다. 내용은 자동으로 최신 상태가 됩니다.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1676,6 +1700,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 nowych ćwiczeń rozciągających",
   "wn.c.moreStretches.body":
     "Rozciąganie przy kanapie, żabka, przełożenia bioder 90/90, przekładanie gumy, rozciąganie śpiącego, cofanie brody i więcej, każde z demonstracją 3D, na biodra, barki, szyję, nadgarstki i łydki.",
+  "wn.c.gymWidgets.title": "Widżety na stronę dla siłowni",
+  "wn.c.gymWidgets.body":
+    "Masz siłownię w Liftsmith? Umieść grafik zajęć, sprzęt albo odznakę „Znajdź nas w Liftsmith” na swojej stronie jedną linijką kodu, prosto ze strony siłowni w aplikacji. Aktualizują się same.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1863,4 +1890,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 yeni esneme",
   "wn.c.moreStretches.body":
     "Kanepe esnetmesi, kurbağa, 90/90 kalça geçişleri, bantla omuz geçişi, uyuyan esnetmesi, çene geri çekme ve daha fazlası; her biri 3D gösterimli, kalça, omuz, boyun, bilek ve baldırlar için.",
+  "wn.c.gymWidgets.title": "Salonlar için web sitesi widget'ları",
+  "wn.c.gymWidgets.body":
+    "Liftsmith'te bir salonunuz mu var? Uygulamadaki salon sayfanızdan tek satır kodla ders programınızı, ekipmanınızı ya da Bizi Liftsmith'te bulun rozetini kendi web sitenize koyun. Kendiliğinden güncel kalırlar.",
 };
