@@ -1162,4 +1162,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Meydan okuma günleri antrenman sayılmaz, bu yüzden planını, serini ya da haftalık hedefini asla değiştirmez.",
   },
+  "printable-plans": {
+    title: "Bir antrenmanı tek sayfada yazdırın",
+    intro: "Artık her program ve rutin, doldurulacak kutular ve uygulamaya dönen bir QR koduyla tek sayfada yazdırılabiliyor.",
+    points: [
+      "Rutinlerinizden birini açıp Rutini yazdır'a dokunun. Sayfada her egzersiz seti, tekrarı ve dinlenmesiyle, bir sonraki sefer için planlanan ağırlıkla birlikte yer alır.",
+      "Kaldırdıklarınızı her antrenman için bir tane olmak üzere dört seans sütununa yazın.",
+      "Sitedeki her program sayfasında on dilde indirilebilir ücretsiz bir PDF var.",
+      "Sayfadaki QR kodu, tarayan herkese aynı rutini ekler. Ağırlıklarınız ve notlarınız sizde kalır.",
+    ],
+    dyk: "Telefonda yazdırma penceresi sayfayı PDF olarak da kaydedebilir; bir arkadaşa göndermek için kullanışlı.",
+  },
 };

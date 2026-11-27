@@ -317,6 +317,11 @@ export const de: FeaturesText = {
       name: "30-Tage-Challenges",
       body: "Zwölf 30-Tage-Challenges, von Kniebeugen, Liegestützen und Plank bis zu Klimmzügen und Burpees, jede in drei Stufen: eine Übung am Tag, jeden Tag ein bisschen mehr, mit einem Ruhetag an jedem vierten Tag. Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft, und ein verpasster Tag wartet auf dich. Jede Challenge hat eine Seite auf der Website mit einem Kalender zum Ausdrucken.",
     },
+    "printable-plans": {
+      name: "Trainingspläne zum Ausdrucken",
+      body: "Drucke jedes Programm und jede Routine auf einer Seite: jedes Training mit Sätzen, Wiederholungen und Pausen, Kästchen für vier Einheiten zum Eintragen von Hand und ein QR-Code, der es in der App öffnet. Jede Programmseite auf der Website hat ein kostenloses PDF in zehn Sprachen, und Routine drucken in der App fügt die Gewichte hinzu, die sie fürs nächste Mal plant.",
+      note: "Auf dem Handy kann das Druckfenster es auch als PDF speichern.",
+    },
     library: {
       name: "1.000 Übungen",
       body: "Kraft, Körpergewicht, Maschinen, Bänder, Kettlebells und Cardio, mit Suche, Muskel-Filtern und einem Filter für dieses Studio. Cardio speichert Zeit und Strecke.",

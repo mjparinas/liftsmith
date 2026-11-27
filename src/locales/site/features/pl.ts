@@ -370,6 +370,11 @@ export const pl: FeaturesText = {
       name: "Wyzwania 30-dniowe",
       body: "Dwanaście 30-dniowych wyzwań, od przysiadów, pompek i deski po podciąganie i burpees, każde na trzech poziomach: jedno ćwiczenie dziennie, każdego dnia trochę więcej, z odpoczynkiem co czwarty dzień. Ekran Dziś pokazuje liczbę dnia z przyciskiem Zrobione, a opuszczony dzień na ciebie czeka. Każde wyzwanie ma stronę w serwisie z kalendarzem do druku.",
     },
+    "printable-plans": {
+      name: "Plany treningowe do druku",
+      body: "Wydrukuj dowolny program lub zestaw na jednej stronie: każdy trening z seriami, powtórzeniami i przerwami, pola na cztery treningi do wpisania ręcznie i kod QR, który otwiera go w aplikacji. Każda strona programu w serwisie ma darmowy PDF w dziesięciu językach, a Drukuj zestaw w aplikacji dodaje ciężary zaplanowane na następny raz.",
+      note: "Na telefonie okno drukowania może też zapisać go jako PDF.",
+    },
     library: {
       name: "1000 ćwiczeń",
       body: "Siłowe, z masą ciała, na maszynach, z gumami, z kettlebellami i cardio, z wyszukiwarką, filtrami mięśni i filtrem „ta siłownia”. Cardio zapisuje czas i dystans.",

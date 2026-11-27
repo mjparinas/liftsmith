@@ -310,6 +310,11 @@ export const es: FeaturesText = {
       name: "Retos de 30 días",
       body: "Doce retos de 30 días, de sentadillas, flexiones y plancha a dominadas y burpees, cada uno en tres niveles: un ejercicio al día, un poco más cada día, con un día de descanso cada cuatro. Hoy muestra la cifra del día con un Hecho de un toque, y un día perdido te espera. Cada reto tiene una página en la web con un calendario para imprimir.",
     },
+    "printable-plans": {
+      name: "Planes de entrenamiento para imprimir",
+      body: "Imprime cualquier programa o rutina en una página: cada entrenamiento con series, repeticiones y descanso, casillas para anotar cuatro sesiones a mano y un código QR que lo abre en la app. Cada página de programa del sitio tiene un PDF gratis en diez idiomas, e Imprimir rutina en la app añade los pesos que te planea para la próxima vez.",
+      note: "En el teléfono, la ventana de impresión también lo guarda como PDF.",
+    },
     library: {
       name: "1000 ejercicios",
       body: "Fuerza, peso corporal, máquinas, bandas, pesas rusas y cardio, con búsqueda, filtros por músculo y un filtro de este gimnasio. El cardio registra tiempo y distancia.",

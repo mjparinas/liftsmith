@@ -6,6 +6,7 @@ import {
   EMBED_HEADERS,
   GYMS_INDEX_CSP,
   NOT_EMBED,
+  PRINT_PAGE_CSP,
   REPORT_PAGE_CSP,
   SECURITY_HEADERS,
   SHARE_PAGE_CSP,
@@ -97,6 +98,7 @@ const nextConfig: NextConfig = {
           // The public routine library (src/server/libraryPage.ts); in the gym sitemap.
           { source: "/routines/", destination: "/api/library/page/" },
           { source: "/routines/:r/", destination: "/api/library/page/?r=:r" },
+          { source: "/routines/:r/print/", destination: "/api/library/page/?r=:r&print=1" },
           // The Liftsmith community: ideas, bugs, roadmap and changelog (src/server/communityPage.ts); in the gym sitemap.
           { source: "/community/", destination: "/api/community/page/" },
           { source: "/community/roadmap/", destination: "/api/community/page/?view=roadmap" },
@@ -125,6 +127,8 @@ const nextConfig: NextConfig = {
           { source: "/trainers/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/coach-programs/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/routines/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          // A routine's print page runs one script of ours, the Print button (public/print.js; printable-plans.md).
+          { source: "/routines/:r/print/", headers: [{ key: "Content-Security-Policy", value: PRINT_PAGE_CSP }] },
           { source: "/community/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           // Each translated page says its language (docs/decisions/seo.md "Page language"): the shared root layout
           // writes <html lang="en"> into every page and DocLang fixes it only once the page runs, so a crawler that

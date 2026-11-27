@@ -370,6 +370,11 @@ export const pt: FeaturesText = {
       name: "Desafios de 30 dias",
       body: "Doze desafios de 30 dias, de agachamento, flexão e prancha a barra fixa e burpee, cada um em três níveis: um exercício por dia, um pouco mais a cada dia, com um descanso a cada quatro dias. Hoje mostra o número do dia com um Feito de um toque, e um dia perdido espera por você. Cada desafio tem uma página no site com um calendário para imprimir.",
     },
+    "printable-plans": {
+      name: "Planos de treino para imprimir",
+      body: "Imprima qualquer programa ou rotina em uma página: cada treino com séries, repetições e descanso, espaços para anotar quatro sessões à mão e um código QR que abre no app. Cada página de programa do site tem um PDF grátis em dez idiomas, e Imprimir rotina no app inclui as cargas planejadas para a próxima vez.",
+      note: "No celular, a janela de impressão também salva como PDF.",
+    },
     library: {
       name: "1.000 exercícios",
       body: "Musculação, peso corporal, máquinas, elásticos, kettlebells e cardio, com busca, filtros por músculo e um filtro desta academia. O cardio registra tempo e distância.",

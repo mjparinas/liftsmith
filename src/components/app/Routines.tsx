@@ -5,16 +5,18 @@ import { useId, useMemo, useState } from "react";
 import { track } from "@/lib/analytics";
 import { readPicked } from "@/lib/coachMode";
 import { available, exercise } from "@/lib/exercises";
-import { t } from "@/lib/i18n";
+import { currentLang, t } from "@/lib/i18n";
 import { PART_LABEL } from "@/lib/injury";
-import { withInvite } from "@/lib/inviteLink";
-import { haptic, sound } from "@/lib/juice";
+import { invitePrinted, withInvite } from "@/lib/inviteLink";
+import { haptic, oops, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
+import { canPrint, printSheet } from "@/lib/print";
 import { TIMED } from "@/lib/progression";
 import { moveItem as moveTo } from "@/lib/reorder";
 import { CUE_MAX, MAX_ITEMS, moveItem, NAME_MAX, REPS_MAX, routineFrom } from "@/lib/routines";
 import { codeFromLink, encodeRoutine, routineUrl } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
+import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { linkedToNext, linksOf, toggleLink, withLinks } from "@/lib/superset";
 import { useCoachNotes } from "@/lib/trainer";
@@ -25,6 +27,7 @@ import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
 import { PublishRoutine } from "./PublishRoutine";
 import { go } from "./router";
+import { routinePrintSheet } from "./routinePrint";
 import { SendToFriend } from "./SendToFriend";
 import { RoutinePartsEditor, routinePartsLine } from "./Stretch";
 import { Bump, Button, Chip, EmptyState, InlineSwitch, LinkToggle, Sheet } from "./ui";
@@ -277,6 +280,41 @@ function ShareRoutine({ routine }: { routine: Routine }) {
       </Button>
       <p className="mt-1 text-xs text-faint" role="status">
         {note ?? t("rt.shareHint")}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * "Print routine" (docs/decisions/printable-plans.md): the routine on one page with the weights the app plans next,
+ * boxes to log four sessions and a QR code of its share link. The phone's print window also saves it as a PDF.
+ */
+function PrintRoutine({ routine }: { routine: Routine }) {
+  const { gyms, profile, events } = useApp();
+  const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
+  const invite = useShareInvite();
+  const [note, setNote] = useState<string | null>(null);
+  if (!canPrint()) return null;
+  const print = async () => {
+    haptic("tap");
+    const code = await invite.get();
+    const link = withInvite(routineUrl(encodeRoutine(routine)), code);
+    const shown = code ? invitePrinted(code) : SITE_URL.replace(/^https?:\/\//, "");
+    track("feature", { name: "routine_print", detail: "print" });
+    const sheet = routinePrintSheet({ routine, events, profile, gym, now: Date.now(), link, shown, lang: currentLang() });
+    if (await printSheet(sheet)) setNote(null);
+    else {
+      oops();
+      setNote(t("prt.failed"));
+    }
+  };
+  return (
+    <div>
+      <Button kind="ghost" icon="print" className="w-full" onClick={print}>
+        {t("prt.print")}
+      </Button>
+      <p className="mt-1 text-xs text-faint" role="status">
+        {note ?? t("prt.printHint")}
       </p>
     </div>
   );
@@ -613,6 +651,7 @@ export function RoutineEditor({
             {t("rt.save")}
           </Button>
           {shareable && <ShareRoutine routine={initial} />}
+          {shareable && <PrintRoutine routine={initial} />}
           {shareable && <PublishRoutine routine={initial} />}
           {shareable && <SendToFriend name={initial.name} items={initial.items} />}
           {onDelete && (

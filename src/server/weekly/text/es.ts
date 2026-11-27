@@ -1165,4 +1165,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Los días del reto no son entrenamientos, así que nunca cambian tu plan, tu racha ni tu objetivo semanal.",
   },
+  "printable-plans": {
+    title: "Imprime un entrenamiento en una página",
+    intro: "Cualquier programa o rutina se imprime ahora en una página, con casillas para rellenar y un código QR que vuelve a la app.",
+    points: [
+      "Abre una de tus rutinas y toca Imprimir rutina. La hoja trae cada ejercicio con sus series, repeticiones y descanso, y el peso que te toca la próxima vez.",
+      "Anota lo que levantas en las cuatro columnas de sesión, una por entrenamiento.",
+      "Cada página de programa del sitio tiene un PDF gratis para descargar, en diez idiomas.",
+      "El código QR de tu hoja añade la misma rutina a quien lo escanee. Tus pesos y notas se quedan contigo.",
+    ],
+    dyk: "En el móvil, la ventana de impresión también guarda la hoja como PDF, ideal para enviársela a un amigo.",
+  },
 };

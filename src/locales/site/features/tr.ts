@@ -370,6 +370,11 @@ export const tr: FeaturesText = {
       name: "30 günlük meydan okumalar",
       body: "Squat, şınav ve plank'tan barfiks ve burpee'ye on iki 30 günlük meydan okuma, her biri üç seviyede: günde bir hareket, her gün biraz daha fazla, her dördüncü gün dinlenme. Bugün ekranı günün sayısını tek dokunuşla Tamam ile gösterir, kaçırdığın gün de seni bekler. Her meydan okumanın sitede yazdırılabilir takvimli bir sayfası var.",
     },
+    "printable-plans": {
+      name: "Yazdırılabilir antrenman planları",
+      body: "Herhangi bir programı veya rutini tek sayfada yazdırın: set, tekrar ve dinlenmeleriyle her antrenman, dört seansı elle not edecek kutular ve uygulamada açan bir QR kodu. Sitedeki her program sayfasında on dilde ücretsiz bir PDF var; uygulamadaki Rutini yazdır ise sonraki sefer için planlanan ağırlıkları da ekler.",
+      note: "Telefonda yazdırma penceresi bunu PDF olarak da kaydedebilir.",
+    },
     library: {
       name: "1.000 egzersiz",
       body: "Serbest ağırlık, vücut ağırlığı, makineler, lastik bantlar, kettlebell ve kardiyo; arama, kas filtreleri ve bu salon filtresiyle. Kardiyo süre ve mesafe kaydeder.",

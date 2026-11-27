@@ -537,6 +537,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-27",
       },
       {
+        id: "printable-plans",
+        name: "Printable workout plans",
+        body: "Print any program or routine on one page: every workout with its sets, reps and rest, boxes to log four sessions by hand and a QR code that opens it in the app. Every program page on the website has a free PDF in ten languages, and Print routine in the app adds the weights it plans for you next.",
+        tier: "free",
+        note: "On the phone, the print window can also save it as a PDF.",
+        added: "2026-11-27",
+      },
+      {
         id: "library",
         name: "1,000 exercises",
         body: "Strength, bodyweight, machines, bands, kettlebells and cardio, with search, muscle chips and a this-gym filter. Cardio logs time and distance.",

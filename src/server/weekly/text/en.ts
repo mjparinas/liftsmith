@@ -1183,4 +1183,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Challenge days aren't workouts, so they never change your plan, your streak or your weekly goal.",
   },
+  "printable-plans": {
+    title: "Print a workout on one page",
+    intro: "Any program or routine now prints on one page, with boxes to fill in and a QR code back to the app.",
+    points: [
+      "Open one of your routines and tap Print routine. The sheet has each exercise with its sets, reps and rest, and the weight planned for you next.",
+      "Write what you lift in the four session columns, one per workout.",
+      "Every program page on the website has a free PDF to download, in ten languages.",
+      "The QR code on your sheet adds the same routine for whoever scans it. Your weights and notes stay with you.",
+    ],
+    dyk: "On a phone, the print window can also save the sheet as a PDF, handy for sending to a friend.",
+  },
 };

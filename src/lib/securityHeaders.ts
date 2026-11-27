@@ -36,6 +36,12 @@ export const SHARE_PAGE_CSP =
 export const REPORT_PAGE_CSP = SHARE_PAGE_CSP.replace("form-action 'none'", "form-action 'self'");
 
 /**
+ * A routine's print page (/routines/<slug>-<id>/print/, docs/decisions/printable-plans.md): the share pages' policy plus
+ * one script of ours, the Print button (public/print.js), and the QR code's inline SVG.
+ */
+export const PRINT_PAGE_CSP = SHARE_PAGE_CSP.replace("default-src 'none';", "default-src 'none'; script-src 'self';");
+
+/**
  * The website's /gyms/ page (src/server/gymsNear.ts): the gym pages' policy plus our own scripts (the map of the
  * closest gyms and Leaflet, both served from this site), Leaflet's sheet, and the gym API on this site.
  */
