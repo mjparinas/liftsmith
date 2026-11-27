@@ -10,7 +10,7 @@ import { landingPath, LANDINGS } from "@/content/landings";
 import { LOCAL_TOOL_PATHS } from "@/locales/site/tools/types";
 
 import { bestFor } from "./bestFor";
-import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { EXERCISE_BY_ID } from "./exercises";
 import { HELP, helpPath } from "./faqs";
 import { alternatives } from "./generator";
 import { COMMON, STAPLE } from "./pickWeights";
@@ -19,6 +19,7 @@ import { SITE_URL } from "./site";
 import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 import { vsPairs, vsPath } from "./versus";
+import { SITE_EXERCISES, WEB_TWIN } from "./webTwins";
 import { WHATS_NEW } from "./whatsNew";
 
 /** frontDelts → front-delts. */
@@ -29,6 +30,7 @@ export const equipmentSlug = (e: Equipment) => kebab(e);
 export const muscleBySlug = (s: string) => MUSCLES.find((m) => muscleSlug(m) === s) ?? null;
 export const equipmentBySlug = (s: string) => EQUIPMENT.find((e) => equipmentSlug(e) === s) ?? null;
 export const exerciseBySlug = (s: string) => EXERCISE_BY_ID.get(s) ?? null;
+export { exercisePagePath, SITE_EXERCISES, WEB_TWIN } from "./webTwins";
 
 // English labels for the public site (the app's MUSCLE_LABEL and EQUIPMENT_LABEL follow the phone's language,
 // but the site is English only for now).
@@ -133,11 +135,11 @@ export function exerciseName(id: string): string {
 }
 
 /** Exercises that train a muscle as a main mover. */
-export const exercisesFor = (m: Muscle): Exercise[] => EXERCISES.filter((e) => e.primary.includes(m));
+export const exercisesFor = (m: Muscle): Exercise[] => SITE_EXERCISES.filter((e) => e.primary.includes(m));
 /** Exercises that need a piece of equipment. */
-export const exercisesWith = (eq: Equipment): Exercise[] => EXERCISES.filter((e) => e.needs.includes(eq));
+export const exercisesWith = (eq: Equipment): Exercise[] => SITE_EXERCISES.filter((e) => e.needs.includes(eq));
 /** Bodyweight-only exercises: nothing needed. */
-export const noEquipment = (): Exercise[] => EXERCISES.filter((e) => e.needs.length === 0);
+export const noEquipment = (): Exercise[] => SITE_EXERCISES.filter((e) => e.needs.length === 0);
 
 /** Equipment with at least one exercise in the library. */
 export const equipmentWithPages = (): Equipment[] => EQUIPMENT.filter((eq) => exercisesWith(eq).length > 0);
@@ -158,7 +160,10 @@ export const pairsFor = (m: Muscle) => pairs().filter((p) => p.muscle === m);
 export const pairsWith = (eq: Equipment) => pairs().filter((p) => p.equipment === eq);
 
 /** Alternatives for any gym (the app's own swap ranking, without a gym's equipment limit). */
-export const alternativesTo = (id: string, n = 12): Exercise[] => alternatives(id, null).slice(0, n);
+export const alternativesTo = (id: string, n = 12): Exercise[] =>
+  alternatives(id, null)
+    .filter((e) => !(e.id in WEB_TWIN) && e.id !== WEB_TWIN[id])
+    .slice(0, n);
 
 /**
  * Whether an exercise's alternatives page is offered to search engines. On 2026-11-12 only the ~50 lifts with a full
@@ -169,7 +174,8 @@ export const alternativesTo = (id: string, n = 12): Exercise[] => alternatives(i
  * have at least three alternatives. The niche rest stay up for visitors, `noindex, follow`, out of the sitemap.
  */
 export const indexAlternatives = (id: string): boolean =>
-  (id in EXERCISE_GUIDES && alternativesTo(id).length > 0) || ((STAPLE.has(id) || COMMON.has(id)) && alternativesTo(id).length >= 3);
+  !(id in WEB_TWIN) &&
+  ((id in EXERCISE_GUIDES && alternativesTo(id).length > 0) || ((STAPLE.has(id) || COMMON.has(id)) && alternativesTo(id).length >= 3));
 
 /** "Barbell, flat bench and squat rack", or "No equipment". */
 export function needsText(e: Exercise): string {
@@ -307,7 +313,7 @@ export function siteRoutes(): Route[] {
       if (lang !== "en" && english) r.push({ path: localPath(lang, path), priority: english.priority, languages });
     }
   }
-  for (const e of EXERCISES) {
+  for (const e of SITE_EXERCISES) {
     if (e.id in EXERCISE_GUIDES) {
       // The guided lifts also have a page in every other site language (src/content/exerciseGuides/i18n.ts).
       const path = `/exercises/${e.id}/`;

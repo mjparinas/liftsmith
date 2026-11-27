@@ -26,6 +26,7 @@ export const tr: SiteText = {
       tools: "Araçlar",
       support: "Destek",
       company: "Şirket",
+      exercises: "Egzersiz rehberleri",
     },
     links: {
       openApp: "Uygulamayı aç",

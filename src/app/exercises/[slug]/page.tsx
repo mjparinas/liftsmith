@@ -23,6 +23,7 @@ import {
   MUSCLE_NAME,
   muscleSlug,
   needsText,
+  WEB_TWIN,
 } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { EXAMPLE, hasStartTable, startTable, type StartCell } from "@/lib/startTable";
@@ -51,7 +52,13 @@ function StartWeight({ c, unit }: { c: StartCell; unit: string }) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = exerciseBySlug((await params).slug);
   if (!e) return {};
-  return pageMeta({ ...exerciseMeta(e), path: `/exercises/${e.id}/`, translated: e.id in EXERCISE_GUIDES });
+  const twin = WEB_TWIN[e.id];
+  return pageMeta({
+    ...exerciseMeta(e),
+    path: `/exercises/${e.id}/`,
+    translated: e.id in EXERCISE_GUIDES,
+    ...(twin ? { canonical: `/exercises/${twin}/` } : {}),
+  });
 }
 
 export default async function ExercisePage({ params }: Props) {

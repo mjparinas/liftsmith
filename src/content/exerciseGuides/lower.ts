@@ -1,6 +1,6 @@
 import type { ExerciseGuide } from "../exerciseGuides";
 
-// Legs, hips and core: the 25 most searched lower-body and core exercises.
+// Legs, hips and core: the 30 most searched lower-body and core exercises (five added 2026-11-27 from Search Console, docs/decisions/seo.md).
 export const LOWER_GUIDES: Record<string, ExerciseGuide> = {
   "back-squat": {
     intro:
@@ -605,6 +605,181 @@ export const LOWER_GUIDES: Record<string, ExerciseGuide> = {
     faq: [
       ["How high should the box be?", "Knee height or lower. Higher boxes work the glutes more but are harder to control."],
       ["Step-ups or lunges?", "Both work the same muscles. Step-ups are easier to balance; lunges have a longer range."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "The power clean pulls a barbell from the floor and catches it on the front of your shoulders in one fast move. It builds explosive hip power for sport and jumping, and works the glutes, hamstrings, traps and upper back together.",
+    mistakes: [
+      [
+        "Pulling with your arms early",
+        "Keep your arms long, like ropes, until your hips and knees are straight. Then shrug and pull yourself under the bar.",
+      ],
+      ["Swinging the bar away from you", "Keep the bar close enough to brush your thighs. A bar that loops forward pulls you off balance."],
+      ["Catching with your elbows down", "Whip your elbows forward fast so the bar lands on your shoulders, not in your hands."],
+    ],
+    sets: [
+      "**Power:** 4 to 6 sets of 2 to 3, with full rest. End the set when the reps slow down.",
+      "**Learning it:** 5 sets of 2 with an empty bar or light plates, starting from the hang.",
+    ],
+    variations: [
+      ["hang-clean", "From the thighs: the easiest way to learn the catch."],
+      ["db-hang-clean", "With dumbbells, when there's no bar or bumper plates."],
+      ["clean-and-jerk", "Add a jerk overhead for the full Olympic lift."],
+    ],
+    faq: [
+      [
+        "Is the power clean good for beginners?",
+        "Yes, if you learn it light. Start from the hang with an empty bar, and add weight only while the bar stays close and the catch is clean. Sprints and [box jumps](/exercises/box-jump/) build power too while you learn.",
+      ],
+      [
+        "What's the difference between a power clean and a clean?",
+        "In a power clean you catch the bar above parallel, in a quarter squat. In a full clean you drop into a full front squat, which lets you lift more but needs more mobility.",
+      ],
+      [
+        "Can I do power cleans at home?",
+        "Only with a barbell, bumper plates and a floor that can take a dropped bar. Without them, try the [dumbbell hang clean](/exercises/db-hang-clean/) or the [kettlebell swing](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "The dumbbell Romanian deadlift hinges at the hips with a dumbbell in each hand, lowering them down your legs until your hamstrings stretch. It builds the hamstrings and glutes with less weight than a barbell, and works at home with one pair of dumbbells.",
+    mistakes: [
+      [
+        "Bending the knees into a squat",
+        "Keep a soft bend in the knees that stays the same all the way, and push your hips back toward the wall behind you.",
+      ],
+      [
+        "Rounding the back to go lower",
+        "Stop where your hamstrings are fully stretched, usually just below the knee. The range comes from the hips, not the spine.",
+      ],
+      [
+        "Letting the dumbbells drift forward",
+        "Keep them sliding along your thighs and shins. The farther they drift, the more your lower back works.",
+      ],
+    ],
+    sets: [
+      "**Muscle:** 3 to 4 sets of 8 to 12, lowering for about three seconds.",
+      "**At home with light dumbbells:** 3 sets of 15 to 20, or do them on one leg.",
+    ],
+    variations: [
+      ["romanian-deadlift", "A barbell, for heavier loads."],
+      ["db-single-leg-rdl", "One leg at a time, for balance and twice the load per leg."],
+      ["kb-romanian-deadlift", "One kettlebell held in both hands."],
+    ],
+    faq: [
+      [
+        "What muscles does the dumbbell Romanian deadlift work?",
+        "Mostly the hamstrings and glutes, with the lower back holding your spine still and the forearms holding the dumbbells. It loads the hamstrings while they're stretched, which is good for growth.",
+      ],
+      [
+        "Dumbbell or barbell Romanian deadlift?",
+        "Both train the same muscles. The barbell lets you go heavier; dumbbells are easier to set up, kinder to the wrists and work at home. Pick the one you can load enough for 8 to 12 hard reps.",
+      ],
+      [
+        "How heavy should the dumbbells be?",
+        "Heavy enough that the last two reps of each set are hard while your back stays flat. If your grip gives out first, use straps or switch to the [barbell version](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "The back extension lowers your upper body over a pad and lifts it back up until your body is straight. It strengthens the lower back, glutes and hamstrings with little load on the spine, so it pairs well with heavy squats and deadlifts.",
+    mistakes: [
+      [
+        "Arching hard at the top",
+        "Stop when your body is in a straight line. Going past it squeezes the lower back without working anything more.",
+      ],
+      ["Bouncing out of the bottom", "Lower slowly and rise smoothly. Momentum takes the work off the muscles."],
+      ["Setting the pad too high", "Set it just below your hip bones, so you can bend freely at the hips."],
+    ],
+    sets: [
+      "**Muscle and strength:** 3 sets of 10 to 15, holding a plate or dumbbell once 15 is easy.",
+      "**Back health:** 2 to 3 sets of 15 to 20 slow reps, or a [hold](/exercises/back-extension-hold/) of 20 to 30 seconds.",
+    ],
+    variations: [
+      ["weighted-back-extension", "Hold a weight against your chest to make it harder."],
+      ["back-extension-hold", "Hold the straight position instead of moving."],
+      ["reverse-hyper-bench", "Your legs move instead of your upper body."],
+    ],
+    faq: [
+      [
+        "Are back extensions good for the lower back?",
+        "Yes. Done slowly to a straight line, they build endurance in the muscles along the spine, which helps them hold up through long days and heavy lifts. Skip them while your back is in sharp pain, and see a professional if it doesn't settle.",
+      ],
+      [
+        "Do back extensions work the glutes?",
+        "Yes. Round your upper back slightly, turn your feet out and squeeze your glutes to lift, and the glutes do more of the work than the lower back.",
+      ],
+      [
+        "What can I do without a back extension bench?",
+        "A [hip thrust](/exercises/hip-thrust/) or a [Romanian deadlift](/exercises/romanian-deadlift/) trains the same muscles, and lying face down and lifting your chest works the lower back with no equipment.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "The cable pull-through faces away from a low cable, hinges back with a rope between your legs and drives the hips forward to stand. It teaches the hip hinge and trains the glutes and hamstrings without loading the spine, so it suits beginners and tired backs.",
+    mistakes: [
+      ["Squatting instead of hinging", "Push your hips straight back and keep your shins nearly vertical. The knees bend only a little."],
+      ["Pulling with your arms", "Your arms just hold the rope. Stand up by driving your hips forward."],
+      ["Leaning back at the top", "Finish tall with your glutes squeezed and your ribs down, not with an arched lower back."],
+    ],
+    sets: [
+      "**Muscle:** 3 sets of 12 to 15, with a one-second squeeze at the top.",
+      "**Learning the hinge:** 2 to 3 light sets of 10 before deadlifts or swings.",
+    ],
+    variations: [
+      ["band-pull-through", "A band anchored low, for home."],
+      ["kb-swing", "The same hip drive, fast, with a kettlebell."],
+      ["hip-thrust", "Heavier glute work with your back on a bench."],
+    ],
+    faq: [
+      [
+        "What muscles does the cable pull-through work?",
+        "The glutes and hamstrings. The cable pulls you backward, so the glutes have to work right to the top, where a deadlift gets easy.",
+      ],
+      [
+        "Cable pull-through or kettlebell swing?",
+        "The pull-through is slower and easier to learn; the swing is faster and adds conditioning. Learn the hinge on the pull-through, then add [swings](/exercises/kb-swing/).",
+      ],
+      ["How far should I stand from the cable?", "About two big steps, so the weight stays off the stack at the bottom of each rep."],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "The reverse crunch lies on your back and curls your hips off the floor toward your chest. It trains the abs, with the most work at the bottom of the stomach, and puts no strain on the neck. No equipment needed.",
+    mistakes: [
+      ["Swinging the legs", "Keep your knees bent at the same angle and lift your hips with your abs instead of throwing your legs."],
+      [
+        "Not lifting the hips",
+        "A rep counts when your tailbone leaves the floor. Bringing the knees in without that mostly works the hip flexors.",
+      ],
+      ["Dropping back down fast", "Lower for two to three seconds. The slow lowering does half the work."],
+    ],
+    sets: [
+      "**Abs:** 3 sets of 10 to 15 slow reps.",
+      "**Harder:** do them on a decline bench, or move on to [hanging leg raises](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "On a bench, holding the edge, for a longer range."],
+      ["cable-reverse-crunch", "A cable adds weight you can raise over time."],
+      ["hanging-leg-raise", "Hanging from a bar: the hardest version."],
+    ],
+    faq: [
+      [
+        "Do reverse crunches work the lower abs?",
+        "They work the whole six-pack muscle, which runs from the ribs to the pelvis. Curling the pelvis up stresses the lower part more, which is why you feel them low.",
+      ],
+      [
+        "Reverse crunch or regular crunch?",
+        "The reverse crunch is easier on the neck and harder to cheat with momentum. A reverse crunch and a [plank](/exercises/plank/) together cover the abs well.",
+      ],
+      [
+        "Will reverse crunches flatten my stomach?",
+        "They make the abs stronger, but losing fat comes from what you eat and how active you are overall, not from training one spot.",
+      ],
     ],
   },
 };

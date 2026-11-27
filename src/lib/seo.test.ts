@@ -27,6 +27,7 @@ import {
   TOOL_PAGES,
 } from "./seo";
 import { EQUIPMENT, MUSCLES } from "./types";
+import { WEB_TWIN } from "./webTwins";
 
 const paths = new Set(siteRoutes().map((r) => r.path));
 const text = (b: Block): string[] =>
@@ -34,7 +35,7 @@ const text = (b: Block): string[] =>
 
 describe("SEO routes", () => {
   it("has one page per exercise, muscle, equipment item with exercises, pair, article and tool", () => {
-    for (const e of EXERCISES) expect(paths.has(`/exercises/${e.id}/`)).toBe(true);
+    for (const e of EXERCISES) expect(paths.has(`/exercises/${e.id}/`), e.id).toBe(!(e.id in WEB_TWIN));
     for (const m of MUSCLES) expect(paths.has(`/muscles/${muscleSlug(m)}/`)).toBe(true);
     for (const eq of equipmentWithPages()) expect(paths.has(`/equipment/${equipmentSlug(eq)}/`)).toBe(true);
     for (const a of ARTICLES) expect(paths.has(articlePath(a))).toBe(true);

@@ -1002,7 +1002,7 @@ export const TR_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Kas:** Kol başına 8 ila 12 tekrardan 3 set."],
     variations: [
-      ["db-chest-supported-row", "İki kol, göğüs incline sehpada."],
+      ["chest-supported-row", "İki kol, göğüs incline sehpada."],
       ["kb-row", "Kettlebell ile."],
       ["seal-row", "Yüksek bir sehpada yüzüstü: çok sıkı form."],
     ],
@@ -1173,6 +1173,271 @@ export const TR_GUIDES: Record<string, ExerciseGuide> = {
     faq: [
       ["Preacher curl ayakta curl'den daha mı iyi?", "Formu daha sıkıdır ve esnemiş pozisyonu daha çok yükler. İkisi de pazu geliştirir."],
       ["Dipte neden ağrıyor?", "Daha hafif git ve yavaşla. Dirseklerin itiraz ederse tam kilitlemeden önce dur."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "Power clean'de barı yerden tek ve hızlı bir hareketle çekip omuzlarının önünde karşılarsın. Spor ve sıçramalar için patlayıcı kalça gücü kazandırır; kalçayı, arka bacağı, trapezi ve üst sırtı birlikte çalıştırır.",
+    mistakes: [
+      [
+        "Kollarla erken çekmek",
+        "Kalçan ve dizlerin tam açılana kadar kollarını halat gibi uzun tut. Sonra omuzlarını silkip barın altına gir.",
+      ],
+      ["Barı vücuttan uzaklaştırmak", "Barı uyluklarını sıyıracak kadar yakın tut. Öne doğru yay çizerse dengeni bozar."],
+      ["Dirsekler aşağıdayken karşılamak", "Dirseklerini hızla öne çıkar ki bar ellerine değil omuzlarına otursun."],
+    ],
+    sets: [
+      "**Güç:** 2 ila 3 tekrardan 4 ila 6 set, tam dinlenerek. Tekrarlar yavaşlayınca seti bitir.",
+      "**Öğrenirken:** boş bar ya da hafif plakalarla 2 tekrardan 5 set, önce asılı pozisyondan.",
+    ],
+    variations: [
+      ["hang-clean", "Uyluklardan başlar: karşılamayı öğrenmenin en kolay yolu."],
+      ["db-hang-clean", "Dambılla; bar ya da lastik plaka yoksa."],
+      ["clean-and-jerk", "Baş üstüne silkmeyi ekle: tam olimpik kaldırış."],
+    ],
+    faq: [
+      [
+        "Power clean yeni başlayanlar için uygun mu?",
+        "Hafif öğrenirsen evet. Boş barla asılı pozisyondan başla, bar yakın geçtiği ve karşılama temiz olduğu sürece ağırlık ekle. Öğrenirken sprintler ve [kutu sıçraması](/exercises/box-jump/) da güç kazandırır.",
+      ],
+      [
+        "Power clean ile clean arasındaki fark ne?",
+        "Power clean'de barı paralelin üstünde, çeyrek squatta karşılarsın. Tam clean'de derin bir ön squata inersin; daha fazla ağırlık kaldırırsın ama daha çok hareket açıklığı gerekir.",
+      ],
+      [
+        "Evde power clean yapabilir miyim?",
+        "Sadece bar, lastik plakalar ve düşen bara dayanacak bir zemin varsa. Yoksa [dambıl hang clean](/exercises/db-hang-clean/) ya da [kettlebell swing](/exercises/kb-swing/) dene.",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "Dambıl Romanian deadlift'te her elinde bir dambılla kalçadan katlanır, arka bacağın gerilene kadar dambılları bacaklarının önünden indirirsin. Bara göre daha az ağırlıkla arka bacağı ve kalçayı geliştirir, bir çift dambılla evde de yapılır.",
+    mistakes: [
+      ["Dizleri squat gibi bükmek", "Dizlerini hafif ve hep aynı açıda bükülü tut, kalçanı arkandaki duvara doğru it."],
+      [
+        "Daha aşağı inmek için sırtı yuvarlamak",
+        "Arka bacağın tamamen gerildiğinde dur; genelde dizin hemen altı. Hareket omurgadan değil kalçadan gelir.",
+      ],
+      [
+        "Dambılların öne kaymasına izin vermek",
+        "Onları uyluklarına ve kaval kemiğine yakın kaydır. Ne kadar uzaklaşırlarsa bel o kadar çok çalışır.",
+      ],
+    ],
+    sets: [
+      "**Kas:** 8 ila 12 tekrardan 3 ila 4 set, yaklaşık üç saniyede indirerek.",
+      "**Evde hafif dambıllarla:** 15 ila 20 tekrardan 3 set ya da tek bacakla.",
+    ],
+    variations: [
+      ["romanian-deadlift", "Barla, daha ağır yükler için."],
+      ["db-single-leg-rdl", "Tek bacakla; denge için ve bacak başına iki kat yük."],
+      ["kb-romanian-deadlift", "İki elle tutulan tek bir kettlebell."],
+    ],
+    faq: [
+      [
+        "Dambıl Romanian deadlift hangi kasları çalıştırır?",
+        "Başta arka bacağı ve kalçayı; bel kasları omurgayı sabit tutar, ön kollar dambılları taşır. Arka bacağı gerilmişken yüklediği için kas gelişimine çok iyi gelir.",
+      ],
+      [
+        "Dambıl mı bar mı?",
+        "İkisi de aynı kasları çalıştırır. Bar daha ağır kaldırmanı sağlar; dambıllar daha hızlı hazırlanır, bileklere daha nazik ve evde de olur. 8 ila 12 zorlu tekrar için yeterince yükleyebildiğini seç.",
+      ],
+      [
+        "Dambıllar ne kadar ağır olmalı?",
+        "Sırtın düz kalırken her setin son iki tekrarı zor gelecek kadar. Önce kavrayışın bırakıyorsa kayış kullan ya da [bar versiyonuna](/exercises/romanian-deadlift/) geç.",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "Back extension'da üst gövdeni bir pedin üzerinden indirir ve vücudun düz olana kadar geri kaldırırsın. Omurgaya az yük bindirerek beli, kalçayı ve arka bacağı güçlendirir; ağır squat ve deadlift'e iyi bir eştir.",
+    mistakes: [
+      [
+        "Tepede fazla geriye bükülmek",
+        "Vücudun düz bir çizgi olunca dur. Daha ileri gitmek bir şeyi daha fazla çalıştırmadan sadece beli sıkıştırır.",
+      ],
+      ["Altta sekmek", "Yavaş in, akıcı kalk. Momentum işi kaslardan alır."],
+      ["Pedi çok yüksek ayarlamak", "Pedi kalça kemiklerinin hemen altına koy ki kalçadan rahatça katlanabilesin."],
+    ],
+    sets: [
+      "**Kas ve güç:** 10 ila 15 tekrardan 3 set; 15 kolaylaşınca bir plaka ya da dambıl tut.",
+      "**Sırt sağlığı:** yavaş 15 ila 20 tekrardan 2 ila 3 set ya da 20 ila 30 saniyelik bir [tutuş](/exercises/back-extension-hold/).",
+    ],
+    variations: [
+      ["weighted-back-extension", "Zorlaştırmak için göğsüne bir ağırlık tut."],
+      ["back-extension-hold", "Hareket etmek yerine düz pozisyonda kal."],
+      ["reverse-hyper-bench", "Üst gövde yerine bacaklar hareket eder."],
+    ],
+    faq: [
+      [
+        "Back extension bel için iyi mi?",
+        "Evet. Düz çizgiye kadar yavaşça yapıldığında omurga boyunca uzanan kaslara dayanıklılık kazandırır, böylece uzun günlere ve ağır kaldırışlara daha iyi dayanırlar. Belinde keskin bir ağrı varken yapma, geçmezse bir uzmana danış.",
+      ],
+      [
+        "Back extension kalçayı çalıştırır mı?",
+        "Evet. Üst sırtını hafifçe yuvarla, ayak uçlarını dışa çevir ve kalkarken kalçanı sık; böylece kalça belden daha çok çalışır.",
+      ],
+      [
+        "Back extension sehpası yoksa ne yapabilirim?",
+        "[Hip thrust](/exercises/hip-thrust/) ya da [Romanian deadlift](/exercises/romanian-deadlift/) aynı kasları çalıştırır; yüzüstü yatıp göğsünü kaldırmak da ekipmansız beli çalıştırır.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "Kablo pull-through'da alçak bir kabloya sırtını dönersin, ip bacaklarının arasındayken kalçadan katlanır ve kalçanı öne iterek doğrulursun. Kalça menteşesini öğretir ve omurgaya yük bindirmeden kalçayı ve arka bacağı çalıştırır; yeni başlayanlara ve yorgun sırtlara uygundur.",
+    mistakes: [
+      ["Menteşe yerine çömelmek", "Kalçanı düz geriye it, kaval kemiklerin neredeyse dik kalsın. Dizler sadece biraz bükülür."],
+      ["Kollarla çekmek", "Kolların sadece ipi tutar. Kalçanı öne iterek doğrul."],
+      ["Tepede geriye yaslanmak", "Kalçan sıkılı, kaburgaların aşağıda dik bitir; beli bükerek değil."],
+    ],
+    sets: [
+      "**Kas:** 12 ila 15 tekrardan 3 set, tepede bir saniye sıkarak.",
+      "**Menteşeyi öğrenmek:** deadlift ya da swing öncesi 10 tekrardan 2 ila 3 hafif set.",
+    ],
+    variations: [
+      ["band-pull-through", "Alçağa bağlanmış bir bantla, ev için."],
+      ["kb-swing", "Aynı kalça itişi, hızlı ve kettlebell ile."],
+      ["hip-thrust", "Sırtın sehpadayken daha ağır kalça çalışması."],
+    ],
+    faq: [
+      [
+        "Kablo pull-through hangi kasları çalıştırır?",
+        "Kalçayı ve arka bacağı. Kablo seni geriye çektiği için kalça, deadlift'in kolaylaştığı en tepeye kadar çalışır.",
+      ],
+      [
+        "Pull-through mu kettlebell swing mi?",
+        "Pull-through daha yavaş ve öğrenmesi kolay; swing daha hızlı ve kondisyon da katar. Menteşeyi pull-through ile öğren, sonra [swing](/exercises/kb-swing/) ekle.",
+      ],
+      ["Kablodan ne kadar uzakta durmalıyım?", "Yaklaşık iki büyük adım; böylece her tekrarın altında ağırlık yığına değmez."],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "Reverse crunch'ta sırtüstü yatıp kalçanı yerden göğsüne doğru kıvırırsın. Karın kaslarını, en çok da alt karnı çalıştırır ve boynu zorlamaz. Ekipman gerekmez.",
+    mistakes: [
+      ["Bacakları sallamak", "Dizlerini aynı açıda bükülü tut ve bacaklarını fırlatmak yerine kalçanı karın kaslarınla kaldır."],
+      [
+        "Kalçayı kaldırmamak",
+        "Kuyruk sokumun yerden kalkınca tekrar sayılır. Sadece dizleri çekmek çoğunlukla kalça bükücüleri çalıştırır.",
+      ],
+      ["Hızla geri düşmek", "İki üç saniyede in. Yavaş iniş işin yarısını yapar."],
+    ],
+    sets: [
+      "**Karın:** yavaş 10 ila 15 tekrardan 3 set.",
+      "**Daha zor:** decline sehpada yap ya da [barfiks barında bacak kaldırmaya](/exercises/hanging-leg-raise/) geç.",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "Sehpada, kenarını tutarak, daha geniş hareket için."],
+      ["cable-reverse-crunch", "Kablo, zamanla artırabileceğin bir yük ekler."],
+      ["hanging-leg-raise", "Bardan asılarak: en zor versiyon."],
+    ],
+    faq: [
+      [
+        "Reverse crunch alt karnı çalıştırır mı?",
+        "Kaburgalardan leğene uzanan düz karın kasının tamamını çalıştırır. Leğeni kıvırmak alt kısma daha çok yük bindirir, bu yüzden aşağıda hissedersin.",
+      ],
+      [
+        "Reverse crunch mu normal crunch mı?",
+        "Reverse crunch boyna daha nazik ve momentumla hile yapmak daha zor. Reverse crunch ile [plank](/exercises/plank/) birlikte karnı iyi kapsar.",
+      ],
+      [
+        "Reverse crunch karnımı düzleştirir mi?",
+        "Karın kaslarını güçlendirir ama yağ kaybı tek bir bölgeyi çalıştırmaktan değil, ne yediğinden ve genel olarak ne kadar hareket ettiğinden gelir.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "Pec deck fly'da bir makineye oturur ve iki tutamağı göğsünün önünde bir yay çizerek birleştirirsin. Yolu makine belirlediği için ağırlıkları dengelemeden göğsü sıkı çalıştırabilirsin; preslerden sonra güvenli bir bitiriş.",
+    mistakes: [
+      ["Omuzların öne kayması", "Set boyunca göğsünü yukarıda, kürek kemiklerini pede doğru geride tut."],
+      ["Koltuk çok yüksek ya da alçak", "Tutamaklar göğüs hizasında, dirseklerin omuzlarının biraz altında olacak şekilde ayarla."],
+      ["Ağırlık yığınını çarptırmak", "Plakalar birbirine değmeden hemen önce dur ki göğüs tekrarlar arasında gergin kalsın."],
+    ],
+    sets: [
+      "**Kas:** 10 ila 15 tekrardan 3 set, eller buluşunca bir saniye sıkarak.",
+      "**Bitiriş:** preslerden sonra 15 ila 20 tekrardan 1 ila 2 set.",
+    ],
+    variations: [
+      ["cable-fly", "Kabloyla; serbest yol ve daha çok gerilme."],
+      ["db-fly", "Düz sehpada dambıllarla."],
+      ["single-arm-pec-deck", "Tek kolla; iki tarafı eşitlemek için."],
+    ],
+    faq: [
+      [
+        "Pec deck hangi kasları çalıştırır?",
+        "Başta göğsü. Kolları vücudun önüne getirme görevini çalıştırır; preslerin aksine arka kol neredeyse yardım etmez.",
+      ],
+      [
+        "Pec deck mi kablo fly mı?",
+        "İkisi de iyi. Pec deck daha kolay ayarlanır ve çok sabittir; kablo açıyı değiştirmeni sağlar. Salonunda hangisi boşsa onu kullan.",
+      ],
+      [
+        "Pec deck omuzlara zararlı mı?",
+        "Makul bir açıklıkla değil. Dirseklerin vücudunla aynı hizaya gelince gerilmeyi bitir, çok geriye götürme ve kürek kemiklerini geride tut.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "Makinede shoulder press'te sırtını bir pede dayayıp iki tutamağı sabit bir yolda başının üstüne itersin. Denge gerektirmeden ön omuzları ve arka kolu çalıştırır, böylece tükenişe güvenle yaklaşabilirsin.",
+    mistakes: [
+      ["Peden ayrılıp beli bükmek", "Sırtını ve başını pede dayalı tut. Tekrarı bitirmek için belini bükmen gerekiyorsa ağırlık fazla."],
+      [
+        "Koltuğu yanlış ayarlamak",
+        "Tutamaklar yaklaşık omuz hizasında başlayacak şekilde ayarla. Çok alçak altta omzu zorlar; çok yüksek hareketi kısaltır.",
+      ],
+      ["Tepede sekmek", "Kollar neredeyse düzleşene kadar akıcı it ve kontrollü indir."],
+    ],
+    sets: ["**Kas:** 8 ila 12 tekrardan 3 ila 4 set.", "**Serbest ağırlıkla presten sonra:** 12 ila 15 tekrardan 2 set."],
+    variations: [
+      ["db-shoulder-press", "Dambıllarla; her kol kendi başına."],
+      ["overhead-press", "Ayakta bar pres, güç hareketi."],
+      ["single-arm-shoulder-press-machine", "Aynı makinede tek kolla."],
+    ],
+    faq: [
+      [
+        "Makinede shoulder press hangi kasları çalıştırır?",
+        "Başta ön omuzları ve arka kolu; yan omuzlar da yardım eder. Daha geniş görünen omuzlar için [yana açış](/exercises/lateral-raise/) ekle.",
+      ],
+      [
+        "Makine mi dambıl mı?",
+        "Makine öğrenmesi ve güvenle zorlaması daha kolay; dambıllar dengeyi de çalıştırır ve her kolu serbest bırakır. İkisi de omuz geliştirir.",
+      ],
+      [
+        "Hangi tutamakları kullanmalıyım?",
+        "Avuçların birbirine baktığı nötr tutamaklar çoğu omza daha nazik. Düz tutamaklar rahat geliyorsa onları kullan.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "Düz kol pulldown'da yüksek bir kabloya dönük durur ve kolların neredeyse düzken barı uyluklarına kadar indirirsin. Pazu yardımı olmadan kanat kaslarını izole eder; barfiks öncesi iyi bir ısınma ve kanat kaslarının çalıştığını hissetmenin kolay bir yolu.",
+    mistakes: [
+      [
+        "Dirsekleri bükmek",
+        "Hafif ve değişmeyen bir büküm tut. Dirsekler her tekrarda daha çok bükülüyorsa hareket arka kol pushdown'una döner.",
+      ],
+      ["Tüm vücudu kullanmak", "Hafifçe öne eğil ve o pozisyonu koru. Kollar hareket eder, gövde etmez."],
+      ["Tepede hareketi kısaltmak", "Kanat kaslarının gerildiğini hissedene kadar kollarını kaldır, sonra aşağı indir."],
+    ],
+    sets: ["**Kas:** 12 ila 15 tekrardan 3 set.", "**Çekiş ısınması:** barfiks ya da kürek öncesi 15 tekrardan 2 hafif set."],
+    variations: [
+      ["rope-straight-arm-pulldown", "İple; ellerin kalçanı geçebilsin diye."],
+      ["db-pullover", "Sehpada yatarak bir dambılla."],
+      ["band-straight-arm-pulldown", "Yükseğe bağlanmış bir bantla, ev için."],
+    ],
+    faq: [
+      [
+        "Düz kol pulldown hangi kasları çalıştırır?",
+        "Başta kanat kaslarını; arka kolun uzun başı ve karın kasları kolları ve gövdeyi sabit tutar.",
+      ],
+      [
+        "Düz kol pulldown mu lat pulldown mı?",
+        "[Lat pulldown](/exercises/lat-pulldown/) daha ağır çalışma içindir ve pazuyu da çalıştırır; düz kol pulldown kanat kaslarını izole eder. Aynı antrenmanda iyi eşleşirler.",
+      ],
+      ["Bar mı ip mi?", "Düz bar daha sabittir. İp ellerinin açılıp kalçanı geçmesine izin verir, bu da hareketi biraz uzatır."],
     ],
   },
 };

@@ -1052,7 +1052,7 @@ export const IT_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Muscoli:** 3 serie da 8 a 12 per braccio."],
     variations: [
-      ["db-chest-supported-row", "Due braccia, petto su una panca inclinata."],
+      ["chest-supported-row", "Due braccia, petto su una panca inclinata."],
       ["kb-row", "Con un kettlebell."],
       ["seal-row", "Sdraiato su una panca alta: molto rigoroso."],
     ],
@@ -1226,6 +1226,286 @@ export const IT_GUIDES: Record<string, ExerciseGuide> = {
         "È più rigoroso e carica di più la posizione in allungamento. Entrambi costruiscono i bicipiti.",
       ],
       ["Perché fa male in basso?", "Usa meno peso e rallenta. Fermati prima della distensione completa se i gomiti protestano."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "Il power clean porta un bilanciere da terra alla parte anteriore delle spalle in un solo movimento veloce. Costruisce potenza esplosiva delle anche per lo sport e i salti, e allena insieme glutei, femorali, trapezi e parte alta della schiena.",
+    mistakes: [
+      [
+        "Tirare presto con le braccia",
+        "Tieni le braccia lunghe come corde finché anche e ginocchia sono distese. Poi alza le spalle e infilati sotto il bilanciere.",
+      ],
+      ["Allontanare il bilanciere dal corpo", "Tienilo così vicino da sfiorare le cosce. Se fa un arco in avanti, ti sbilancia."],
+      ["Ricevere con i gomiti bassi", "Porta in avanti i gomiti, veloce, così il bilanciere si appoggia sulle spalle e non nelle mani."],
+    ],
+    sets: [
+      "**Potenza:** da 4 a 6 serie da 2 a 3, con recupero completo. Chiudi la serie quando le ripetizioni rallentano.",
+      "**Per imparare:** 5 serie da 2 con il bilanciere scarico o dischi leggeri, partendo da sospeso.",
+    ],
+    variations: [
+      ["hang-clean", "Dalle cosce: il modo più semplice per imparare la ricezione."],
+      ["db-hang-clean", "Con i manubri, se non hai bilanciere né dischi in gomma."],
+      ["clean-and-jerk", "Aggiungi lo slancio sopra la testa: l’alzata olimpica completa."],
+    ],
+    faq: [
+      [
+        "Il power clean va bene per chi inizia?",
+        "Sì, se lo impari leggero. Comincia da sospeso con il bilanciere scarico e aggiungi peso solo finché il bilanciere resta vicino e la ricezione è pulita. Scatti e [box jump](/exercises/box-jump/) costruiscono potenza anche mentre impari.",
+      ],
+      [
+        "Che differenza c’è tra power clean e girata completa?",
+        "Nel power clean ricevi il bilanciere sopra il parallelo, in un quarto di squat. Nella girata completa scendi in uno squat frontale profondo, che permette più peso ma chiede più mobilità.",
+      ],
+      [
+        "Posso fare il power clean a casa?",
+        "Solo con bilanciere, dischi in gomma e un pavimento che regga un bilanciere lasciato cadere. Altrimenti prova l’[hang clean con manubri](/exercises/db-hang-clean/) o lo [swing con kettlebell](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "Lo stacco rumeno con manubri piega le anche con un manubrio in ogni mano e li fa scendere lungo le gambe finché senti tirare i femorali. Costruisce femorali e glutei con meno peso di un bilanciere, e si fa a casa con un paio di manubri.",
+    mistakes: [
+      [
+        "Piegare le ginocchia come in uno squat",
+        "Tieni una leggera flessione delle ginocchia che non cambia, e spingi le anche verso il muro dietro di te.",
+      ],
+      [
+        "Arrotondare la schiena per scendere di più",
+        "Fermati quando i femorali sono del tutto allungati, di solito appena sotto il ginocchio. Il movimento viene dalle anche, non dalla colonna.",
+      ],
+      ["Lasciare andare avanti i manubri", "Falli scorrere lungo cosce e tibie. Più si allontanano, più lavora la zona lombare."],
+    ],
+    sets: [
+      "**Muscoli:** da 3 a 4 serie da 8 a 12, scendendo in circa tre secondi.",
+      "**A casa con manubri leggeri:** 3 serie da 15 a 20, oppure su una gamba.",
+    ],
+    variations: [
+      ["romanian-deadlift", "Con il bilanciere, per carichi più pesanti."],
+      ["db-single-leg-rdl", "Su una gamba, per l’equilibrio e il doppio del carico per gamba."],
+      ["kb-romanian-deadlift", "Un kettlebell tenuto con due mani."],
+    ],
+    faq: [
+      [
+        "Quali muscoli allena lo stacco rumeno con manubri?",
+        "Soprattutto femorali e glutei, con la zona lombare che tiene ferma la colonna e gli avambracci che reggono i manubri. Carica i femorali mentre sono allungati, ottimo per la crescita.",
+      ],
+      [
+        "Stacco rumeno con manubri o con bilanciere?",
+        "Allenano gli stessi muscoli. Il bilanciere permette più peso; i manubri si preparano prima, sono più gentili con i polsi e vanno bene a casa. Scegli quello che puoi caricare abbastanza per 8-12 ripetizioni dure.",
+      ],
+      [
+        "Quanto devono pesare i manubri?",
+        "Abbastanza perché le ultime due ripetizioni di ogni serie siano dure a schiena piatta. Se la presa cede prima, usa le fasce o passa alla [versione con bilanciere](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "L’hyperextension abbassa il busto oltre un appoggio e lo risolleva finché il corpo è dritto. Rafforza zona lombare, glutei e femorali con poco carico sulla colonna, e si abbina bene a squat e stacchi pesanti.",
+    mistakes: [
+      [
+        "Inarcarsi molto in alto",
+        "Fermati quando il corpo è in linea retta. Andare oltre schiaccia la zona lombare senza allenare niente di più.",
+      ],
+      ["Rimbalzare in basso", "Scendi piano e risali in modo fluido. Lo slancio toglie lavoro ai muscoli."],
+      ["Appoggio troppo alto", "Mettilo appena sotto le ossa del bacino, così pieghi liberamente le anche."],
+    ],
+    sets: [
+      "**Muscoli e forza:** 3 serie da 10 a 15, con un disco o un manubrio quando 15 diventano facili.",
+      "**Salute della schiena:** da 2 a 3 serie da 15 a 20 ripetizioni lente, o una [tenuta](/exercises/back-extension-hold/) di 20-30 secondi.",
+    ],
+    variations: [
+      ["weighted-back-extension", "Tieni un peso contro il petto per renderla più dura."],
+      ["back-extension-hold", "Tieni la posizione dritta invece di muoverti."],
+      ["reverse-hyper-bench", "Si muovono le gambe invece del busto."],
+    ],
+    faq: [
+      [
+        "L’hyperextension fa bene alla zona lombare?",
+        "Sì. Fatta lentamente fino alla linea retta, dà resistenza ai muscoli lungo la colonna, che reggono meglio le giornate lunghe e le alzate pesanti. Evitala con un dolore acuto alla schiena e senti un professionista se non passa.",
+      ],
+      [
+        "L’hyperextension allena i glutei?",
+        "Sì. Arrotonda un poco la parte alta della schiena, apri le punte dei piedi e stringi i glutei per salire: così i glutei lavorano più della zona lombare.",
+      ],
+      [
+        "Cosa faccio senza panca per hyperextension?",
+        "L’[hip thrust](/exercises/hip-thrust/) o lo [stacco rumeno](/exercises/romanian-deadlift/) allenano gli stessi muscoli, e da prono sollevando il petto alleni la zona lombare senza attrezzi.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "Nel pull-through al cavo dai le spalle a un cavo basso, pieghi le anche con la corda tra le gambe e spingi le anche in avanti per tornare in piedi. Insegna il piegamento d’anca e allena glutei e femorali senza caricare la colonna, quindi va bene per chi inizia e per le schiene stanche.",
+    mistakes: [
+      [
+        "Accosciarsi invece di piegare le anche",
+        "Porta le anche dritte indietro con le tibie quasi verticali. Le ginocchia si piegano poco.",
+      ],
+      ["Tirare con le braccia", "Le braccia tengono solo la corda. Torna in piedi spingendo le anche in avanti."],
+      ["Inclinarsi indietro in alto", "Chiudi alto con i glutei stretti e le costole basse, non con la zona lombare inarcata."],
+    ],
+    sets: [
+      "**Muscoli:** 3 serie da 12 a 15, stringendo un secondo in alto.",
+      "**Per imparare il piegamento d’anca:** da 2 a 3 serie leggere da 10 prima di stacchi o swing.",
+    ],
+    variations: [
+      ["band-pull-through", "Con un elastico fissato in basso, per casa."],
+      ["kb-swing", "La stessa spinta d’anca, veloce, con un kettlebell."],
+      ["hip-thrust", "Lavoro più pesante per i glutei, con la schiena su una panca."],
+    ],
+    faq: [
+      [
+        "Quali muscoli allena il pull-through al cavo?",
+        "Glutei e femorali. Il cavo ti tira indietro, quindi i glutei lavorano fino in cima, proprio dove lo stacco diventa facile.",
+      ],
+      [
+        "Pull-through o swing con kettlebell?",
+        "Il pull-through è più lento e facile da imparare; lo swing è più veloce e aggiunge condizionamento. Impara il piegamento d’anca con il pull-through, poi aggiungi gli [swing](/exercises/kb-swing/).",
+      ],
+      ["A che distanza dal cavo mi metto?", "Circa due passi lunghi, così il peso non tocca la pila in basso a ogni ripetizione."],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "Il crunch inverso si fa sdraiati sulla schiena, portando il bacino da terra verso il petto. Allena gli addominali, con più lavoro nella parte bassa della pancia, e non affatica il collo. Non serve attrezzatura.",
+    mistakes: [
+      [
+        "Dondolare le gambe",
+        "Tieni le ginocchia piegate sempre allo stesso angolo e solleva il bacino con gli addominali invece di lanciare le gambe.",
+      ],
+      [
+        "Non sollevare il bacino",
+        "La ripetizione conta quando il coccige si stacca da terra. Avvicinare solo le ginocchia allena soprattutto i flessori dell’anca.",
+      ],
+      ["Ricadere giù di colpo", "Scendi in due o tre secondi. La discesa lenta fa metà del lavoro."],
+    ],
+    sets: [
+      "**Addominali:** 3 serie da 10 a 15 ripetizioni lente.",
+      "**Più difficile:** su una panca declinata, oppure passa alle [alzate gambe alla sbarra](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "Su una panca, tenendo il bordo, per più movimento."],
+      ["cable-reverse-crunch", "Un cavo aggiunge un peso da aumentare nel tempo."],
+      ["hanging-leg-raise", "Appeso a una sbarra: la versione più dura."],
+    ],
+    faq: [
+      [
+        "Il crunch inverso allena gli addominali bassi?",
+        "Allena tutto il retto dell’addome, che va dalle costole al bacino. Arrotolare il bacino carica di più la parte bassa, per questo lo senti in basso.",
+      ],
+      [
+        "Crunch inverso o crunch classico?",
+        "Il crunch inverso è più gentile con il collo ed è più difficile barare con lo slancio. Un crunch inverso e un [plank](/exercises/plank/) insieme coprono bene gli addominali.",
+      ],
+      [
+        "Il crunch inverso mi appiattirà la pancia?",
+        "Rende più forti gli addominali, ma perdere grasso dipende da cosa mangi e da quanto ti muovi in generale, non dall’allenare un punto.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "Il pec deck si fa seduti in una macchina, unendo due maniglie in un arco davanti al petto. La macchina guida il movimento, così puoi allenare forte il petto senza bilanciare pesi: un finale sicuro dopo le distensioni.",
+    mistakes: [
+      ["Spalle che vanno avanti", "Tieni il petto alto e le scapole indietro contro lo schienale per tutta la serie."],
+      [
+        "Sedile troppo alto o troppo basso",
+        "Regolalo in modo che le maniglie siano all’altezza del petto e i gomiti poco sotto le spalle.",
+      ],
+      [
+        "Lasciar sbattere il pacco pesi",
+        "Fermati appena prima che le piastre si tocchino, così il petto resta in tensione tra una ripetizione e l’altra.",
+      ],
+    ],
+    sets: [
+      "**Muscoli:** 3 serie da 10 a 15, stringendo un secondo quando le mani si incontrano.",
+      "**Per chiudere:** da 1 a 2 serie da 15 a 20 dopo le distensioni.",
+    ],
+    variations: [
+      ["cable-fly", "Ai cavi, per un movimento libero e più allungamento."],
+      ["db-fly", "Con i manubri su una panca piana."],
+      ["single-arm-pec-deck", "Un braccio alla volta, per pareggiare i lati."],
+    ],
+    faq: [
+      [
+        "Quali muscoli allena il pec deck?",
+        "Soprattutto il petto. Allena il compito dei pettorali di portare le braccia davanti al corpo, con poco aiuto dai tricipiti, a differenza di una distensione.",
+      ],
+      [
+        "Pec deck o croci ai cavi?",
+        "Funzionano bene entrambi. Il pec deck si regola prima ed è molto stabile; i cavi ti fanno cambiare angolo. Usa quello libero nella tua palestra.",
+      ],
+      [
+        "Il pec deck fa male alle spalle?",
+        "No, con un movimento sensato. Ferma l’allungamento quando i gomiti sono in linea con il corpo, non molto dietro, e tieni le scapole indietro.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "Lo shoulder press alla macchina ti fa sedere contro uno schienale e spingere due maniglie sopra la testa su un percorso fisso. Allena la parte anteriore delle spalle e i tricipiti senza dover bilanciare, così puoi avvicinarti al cedimento in sicurezza.",
+    mistakes: [
+      ["Staccarsi dallo schienale", "Tieni schiena e testa contro lo schienale. Se devi inarcarti per finire, il peso è troppo."],
+      [
+        "Sedile regolato male",
+        "Regolalo in modo che le maniglie partano all’altezza delle spalle. Troppo basso affatica la spalla in basso; troppo alto accorcia il movimento.",
+      ],
+      ["Rimbalzare in alto", "Spingi fluido fino a braccia quasi tese e scendi con controllo."],
+    ],
+    sets: ["**Muscoli:** da 3 a 4 serie da 8 a 12.", "**Dopo le distensioni con pesi liberi:** 2 serie da 12 a 15."],
+    variations: [
+      ["db-shoulder-press", "Con i manubri, ogni braccio per conto suo."],
+      ["overhead-press", "Lento avanti in piedi con bilanciere, l’esercizio di forza."],
+      ["single-arm-shoulder-press-machine", "Un braccio alla volta sulla stessa macchina."],
+    ],
+    faq: [
+      [
+        "Quali muscoli allena lo shoulder press alla macchina?",
+        "Soprattutto deltoidi anteriori e tricipiti, con l’aiuto dei deltoidi laterali. Per spalle più larghe aggiungi le [alzate laterali](/exercises/lateral-raise/).",
+      ],
+      [
+        "Shoulder press alla macchina o con manubri?",
+        "La macchina è più facile da imparare e da spingere forte in sicurezza; i manubri allenano l’equilibrio e lasciano libero ogni braccio. Entrambi costruiscono le spalle.",
+      ],
+      [
+        "Quali maniglie uso?",
+        "Quelle neutre (palmi uno verso l’altro) sono più gentili con la maggior parte delle spalle. Usa quelle prone se ti trovi bene.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "Il pulldown a braccia tese si fa davanti a un cavo alto, portando una barra fino alle cosce con le braccia quasi dritte. Isola i dorsali senza aiuto dei bicipiti: un buon riscaldamento per le trazioni e un modo facile per sentire lavorare i dorsali.",
+    mistakes: [
+      [
+        "Piegare i gomiti",
+        "Tieni una leggera flessione che non cambia. Se i gomiti si piegano di più a ogni ripetizione, diventa un pushdown per tricipiti.",
+      ],
+      ["Usare tutto il corpo", "Inclinati un poco e tieni la posizione. Si muovono le braccia, non il busto."],
+      ["Accorciare il movimento in alto", "Lascia salire le braccia finché senti allungarsi i dorsali, poi scendi."],
+    ],
+    sets: ["**Muscoli:** 3 serie da 12 a 15.", "**Riscaldamento per le tirate:** 2 serie leggere da 15 prima di trazioni o rematori."],
+    variations: [
+      ["rope-straight-arm-pulldown", "Con la corda, così le mani finiscono oltre le anche."],
+      ["db-pullover", "Sdraiato su una panca con un manubrio."],
+      ["band-straight-arm-pulldown", "Con un elastico fissato in alto, per casa."],
+    ],
+    faq: [
+      [
+        "Quali muscoli allena il pulldown a braccia tese?",
+        "Soprattutto i dorsali, con il capo lungo del tricipite e gli addominali che tengono fermi braccia e busto.",
+      ],
+      [
+        "Pulldown a braccia tese o lat machine?",
+        "La [lat machine](/exercises/lat-pulldown/) serve per il lavoro più pesante e allena anche i bicipiti; il pulldown a braccia tese isola i dorsali. Stanno bene nello stesso allenamento.",
+      ],
+      [
+        "Barra o corda?",
+        "La barra dritta è più stabile. La corda lascia allargare le mani e superare le anche, aggiungendo un po’ di movimento.",
+      ],
     ],
   },
 };
