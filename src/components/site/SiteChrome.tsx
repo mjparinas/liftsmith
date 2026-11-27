@@ -427,12 +427,13 @@ export function SitePage({
 }
 
 /** A grid of linked cards. */
-export function LinkGrid({ items }: { items: { href: string; title: string; body?: string; meta?: string }[] }) {
+export function LinkGrid({ items }: { items: { href: string; title: string; body?: string; meta?: string; image?: string }[] }) {
   return (
     <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((i) => (
         <li key={i.href}>
           <Link href={i.href} className="card press block h-full p-4 hover:border-accent/60">
+            {i.image && <Thumb src={i.image} />}
             <span className="font-semibold">{i.title}</span>
             {i.meta && <span className="mt-0.5 block text-xs text-muted">{i.meta}</span>}
             {i.body && <span className="mt-1.5 block text-sm text-muted">{i.body}</span>}
@@ -440,5 +441,21 @@ export function LinkGrid({ items }: { items: { href: string; title: string; body
         </li>
       ))}
     </ul>
+  );
+}
+
+/** A 1200×630 preview card on a list of pages. The page's title is beside it in the same link, so it's decorative. */
+export function Thumb({ src, eager }: { src: string; eager?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt=""
+      width={1200}
+      height={630}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      className="mb-4 aspect-[1200/630] w-full rounded-xl border border-line object-cover"
+    />
   );
 }

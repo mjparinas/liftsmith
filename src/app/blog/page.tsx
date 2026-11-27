@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PostThumb } from "@/components/site/ArticleImages";
 import { BlogTopicChips } from "@/components/site/BlogTopicChips";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { readMinutes } from "@/content/articles";
@@ -46,6 +47,7 @@ export default function BlogIndex() {
         {[first, ...rest].map((p, i) => (
           <li key={p.slug} className={i === 0 ? "md:col-span-2" : ""}>
             <Link href={articlePath(p)} className="card press block h-full p-5 hover:border-accent/60">
+              <PostThumb a={p} eager={i < 2} />
               <span className="text-xs font-semibold tracking-wide text-accent uppercase">{p.tag}</span>
               <span className={`mt-1 block font-bold tracking-tight ${i === 0 ? "text-2xl" : "text-lg"}`}>{p.title}</span>
               <span className="mt-2 block text-sm text-muted">{p.description}</span>

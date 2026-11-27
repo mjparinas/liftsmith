@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PostThumb } from "@/components/site/ArticleImages";
 import { BlogTopicChips } from "@/components/site/BlogTopicChips";
 import { Crumbs, CtaBanner, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { readMinutes } from "@/content/articles";
@@ -48,6 +49,7 @@ export default async function BlogTopicPage({ params }: Props) {
         {posts.map((p) => (
           <li key={p.slug}>
             <Link href={articlePath(p)} className="card press block h-full p-5 hover:border-accent/60">
+              <PostThumb a={p} />
               <span className="text-xs font-semibold tracking-wide text-accent uppercase">{p.tag}</span>
               <span className="mt-1 block text-lg font-bold tracking-tight">{p.title}</span>
               <span className="mt-2 block text-sm text-muted">{p.description}</span>
