@@ -26,6 +26,8 @@ class LiftsmithApp extends Application.AppBase {
     //! service load this class without GarminRun.
     var run = null;
     private var _timer as Timer.Timer?;
+    //! The second the last tick ran in, so a quarter-second tick does its work once a second.
+    private var _tickSec as Number = 0;
     private var _wasResting as Boolean = false;
     //! Seconds of rest left at the last tick, for the heads-up buzz at 10 (REST_WARN_S in the phone's training.ts).
     private var _lastLeft as Number = 0;
@@ -56,7 +58,9 @@ class LiftsmithApp extends Application.AppBase {
         Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
         Sensor.enableSensorEvents(method(:onSensor));
         var timer = new Timer.Timer();
-        timer.start(method(:onTick), 1000, true);
+        // Four times a second, so the countdown changes within a quarter second of the watch's clock (and the
+        // phone's) turning over, not up to a second later; the work below runs once per second.
+        timer.start(method(:onTick), 250, true);
         _timer = timer;
         // A phone-free run left open when the app closed carries on (or ends, if it was forgotten on the wrist).
         var saved = Application.Storage.getValue(CarryStore.RUN);
@@ -164,6 +168,11 @@ class LiftsmithApp extends Application.AppBase {
 
     //! Once a second: redraw the countdown, and buzz when rest ends if the lifter's rest-over alert vibrates.
     function onTick() as Void {
+        var sec = Time.now().value();
+        if (sec == _tickSec) {
+            return;
+        }
+        _tickSec = sec;
         if (run != null) {
             showRun();
         }

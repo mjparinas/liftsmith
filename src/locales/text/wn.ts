@@ -158,6 +158,9 @@ export const en = {
   "wn.c.watchAlone.title": "Leave your phone in the locker",
   "wn.c.watchAlone.body":
     "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
+  "wn.c.watchSecond.title": "Watch timers match your phone",
+  "wn.c.watchSecond.body":
+    "Rest and hold timers on Wear OS, Apple Watch and Garmin now turn over on the same second as your phone, instead of up to a second behind.",
   "wn.c.printRoutine.title": "Print a routine on one page",
   "wn.c.printRoutine.body":
     "Print routine in a routine's editor puts it on one page: sets and reps, your next weights, the rest, boxes for four sessions and a QR code so a friend can add it. Every program on the website has a free PDF too.",
@@ -369,6 +372,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
   "wn.c.watchAlone.body":
     "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
+  "wn.c.watchSecond.title": "Los temporizadores del reloj van con tu teléfono",
+  "wn.c.watchSecond.body":
+    "El descanso y los temporizadores de las isometrías en Wear OS, Apple Watch y Garmin cambian en el mismo segundo que tu teléfono, en vez de hasta un segundo después.",
   "wn.c.printRoutine.title": "Imprime una rutina en una página",
   "wn.c.printRoutine.body":
     "Imprimir rutina, en el editor de una rutina, la pone en una sola página: series y repeticiones, tus próximos pesos, el descanso, casillas para cuatro sesiones y un código QR para que un amigo la añada. Cada programa de la web también tiene un PDF gratis.",
@@ -582,6 +588,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
   "wn.c.watchAlone.body":
     "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
+  "wn.c.watchSecond.title": "Les minuteurs de la montre suivent ton téléphone",
+  "wn.c.watchSecond.body":
+    "Le repos et les minuteurs des gainages sur Wear OS, Apple Watch et Garmin changent à la même seconde que ton téléphone, au lieu d'avoir jusqu'à une seconde de retard.",
   "wn.c.printRoutine.title": "Imprime une routine sur une page",
   "wn.c.printRoutine.body":
     "Imprimer la routine, dans l'éditeur d'une routine, la met sur une seule page : séries et répétitions, tes prochaines charges, le repos, des cases pour quatre séances et un code QR pour qu'un ami l'ajoute. Chaque programme du site a aussi son PDF gratuit.",
@@ -791,6 +800,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Lass dein Handy im Spind",
   "wn.c.watchAlone.body":
     "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
+  "wn.c.watchSecond.title": "Die Timer der Uhr laufen mit dem Handy",
+  "wn.c.watchSecond.body":
+    "Pause und Halte-Timer auf Wear OS, Apple Watch und Garmin springen jetzt in derselben Sekunde wie dein Handy um, statt bis zu einer Sekunde später.",
   "wn.c.printRoutine.title": "Eine Routine auf einer Seite drucken",
   "wn.c.printRoutine.body":
     "Routine drucken im Editor einer Routine bringt sie auf eine Seite: Sätze und Wiederholungen, deine nächsten Gewichte, die Pause, Felder für vier Einheiten und ein QR-Code, mit dem ein Freund sie hinzufügt. Jedes Programm auf der Website gibt es auch als kostenloses PDF.",
@@ -1000,6 +1012,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
   "wn.c.watchAlone.body":
     "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
+  "wn.c.watchSecond.title": "I timer dell'orologio vanno col telefono",
+  "wn.c.watchSecond.body":
+    "Il recupero e i timer delle tenute su Wear OS, Apple Watch e Garmin cambiano nello stesso secondo del telefono, invece che fino a un secondo dopo.",
   "wn.c.printRoutine.title": "Stampa una routine su una pagina",
   "wn.c.printRoutine.body":
     "Stampa la routine, nell'editor di una routine, la mette su una sola pagina: serie e ripetizioni, i tuoi prossimi pesi, il recupero, caselle per quattro sessioni e un codice QR per farla aggiungere a un amico. Ogni programma del sito ha anche un PDF gratuito.",
@@ -1198,6 +1213,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "スマホはロッカーに",
   "wn.c.watchAlone.body":
     "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
+  "wn.c.watchSecond.title": "ウォッチのタイマーがスマホと一致",
+  "wn.c.watchSecond.body":
+    "Wear OS、Apple Watch、Garminの休憩タイマーとホールドのタイマーが、最大1秒遅れることなく、スマホと同じ瞬間に切り替わります。",
   "wn.c.printRoutine.title": "ルーティンを1ページで印刷",
   "wn.c.printRoutine.body":
     "ルーティンの編集画面で「ルーティンを印刷」を押すと1ページにまとまります。セットと回数、次の重量、休憩、4回分の記入欄、友達が追加できるQRコード付き。サイトの全プログラムに無料PDFもあります。",
@@ -1402,6 +1420,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Deixe o celular no armário",
   "wn.c.watchAlone.body":
     "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
+  "wn.c.watchSecond.title": "Os timers do relógio batem com o celular",
+  "wn.c.watchSecond.body":
+    "O descanso e os timers de isometria no Wear OS, Apple Watch e Garmin agora viram no mesmo segundo que o celular, em vez de até um segundo depois.",
   "wn.c.printRoutine.title": "Imprima uma rotina em uma página",
   "wn.c.printRoutine.body":
     "Imprimir rotina, no editor de uma rotina, coloca tudo em uma página: séries e repetições, seus próximos pesos, o descanso, espaços para quatro sessões e um QR code para um amigo adicionar. Todo programa do site também tem um PDF grátis.",
@@ -1594,6 +1615,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "휴대폰은 사물함에",
   "wn.c.watchAlone.body":
     "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
+  "wn.c.watchSecond.title": "워치 타이머가 휴대폰과 맞아요",
+  "wn.c.watchSecond.body": "Wear OS, Apple Watch, Garmin의 휴식 타이머와 버티기 타이머가 최대 1초 늦지 않고 휴대폰과 같은 순간에 넘어가요.",
   "wn.c.printRoutine.title": "루틴을 한 장으로 인쇄",
   "wn.c.printRoutine.body":
     "루틴 편집 화면에서 루틴 인쇄를 누르면 한 장에 담깁니다. 세트와 반복, 다음 무게, 휴식, 네 번의 기록 칸, 친구가 추가할 수 있는 QR 코드까지. 웹사이트의 모든 프로그램은 무료 PDF도 있어요.",
@@ -1797,6 +1820,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Zostaw telefon w szafce",
   "wn.c.watchAlone.body":
     "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
+  "wn.c.watchSecond.title": "Minutniki na zegarku zgadzają się z telefonem",
+  "wn.c.watchSecond.body":
+    "Przerwa i minutniki utrzymań na Wear OS, Apple Watch i Garminie zmieniają się w tej samej sekundzie co telefon, a nie do sekundy później.",
   "wn.c.printRoutine.title": "Wydrukuj zestaw na jednej stronie",
   "wn.c.printRoutine.body":
     "Drukuj zestaw w edytorze zestawu mieści go na jednej stronie: serie i powtórzenia, twoje kolejne ciężary, przerwy, pola na cztery treningi i kod QR, żeby znajomy mógł go dodać. Każdy program na stronie ma też darmowy PDF.",
@@ -2002,6 +2028,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
   "wn.c.watchAlone.body":
     "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",
+  "wn.c.watchSecond.title": "Saatteki zamanlayıcılar telefonla aynı",
+  "wn.c.watchSecond.body":
+    "Wear OS, Apple Watch ve Garmin'deki dinlenme ve tutma zamanlayıcıları artık bir saniyeye kadar geride kalmadan telefonunla aynı saniyede değişiyor.",
   "wn.c.printRoutine.title": "Bir rutini tek sayfaya yazdır",
   "wn.c.printRoutine.body":
     "Rutin düzenleyicideki Rutini yazdır onu tek sayfaya koyar: setler ve tekrarlar, sonraki ağırlıkların, dinlenme, dört antrenman için kutular ve bir arkadaşının ekleyebileceği QR kod. Sitedeki her programın ücretsiz PDF'i de var.",

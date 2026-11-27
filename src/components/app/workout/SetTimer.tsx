@@ -48,6 +48,11 @@ export function useTimerRun(key: string): TimerRun | null {
   return r?.key === key ? r : null;
 }
 
+/** When the running set timer started (any set), or undefined: the workout's clock ticks on its seconds (useNow). */
+export function useTimerStartAt(): number | undefined {
+  return useSyncExternalStore(subscribe, snapshot, () => null)?.startAt;
+}
+
 export function startTimer(key: string, spec: TimerSpec) {
   put({ key, startAt: Date.now(), spec });
   haptic("tick");

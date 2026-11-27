@@ -41,7 +41,10 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
                 WatchHub.findPhones(getApplicationContext(), () -> {});
             }
             render();
-            tick.postDelayed(this, 1000);
+            // On the second the countdown changes, not a second from whenever the screen opened (WatchClock).
+            WorkoutState s = WatchHub.state();
+            long now = System.currentTimeMillis();
+            tick.postDelayed(this, WatchClock.nextTick(now, s == null ? 0L : s.anchor(now)));
         }
     };
     private boolean asked = false;

@@ -38,6 +38,8 @@ final class WatchModel: NSObject, ObservableObject {
     private static let restWarn: TimeInterval = 10
     private var timerTaps: [Timer] = []
     private let motion = MotionStream()
+    /// How far this watch's clock is from the phone's, learnt from each state the phone sends.
+    private var clock = WatchClock()
 
     func start() {
         guard WCSession.isSupported() else { return }
@@ -148,7 +150,10 @@ final class WatchModel: NSObject, ObservableObject {
     }
 
     fileprivate func apply(_ json: String?) {
-        let next = WatchState.parse(json)
+        // The phone's times onto this watch's clock, so both count down to the same moment (WatchClock).
+        let parsed = WatchState.parse(json)
+        if let p = parsed { clock.heard(sentAt: p.at, now: Self.ms()) }
+        let next = parsed?.shifted(by: clock.offset)
         guard next != state else { return }
         // A run here owns the screen and the workout session; the phone's own workout waits until it's finished.
         if run != nil {

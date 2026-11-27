@@ -85,7 +85,16 @@ import { countdownTick, UndoChip, warnTick } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { aheadSteps, sessionFields, takenStep } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
-import { sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
+import {
+  sessionTimer,
+  SetTimerClock,
+  SetTimerStart,
+  startTimer,
+  takeTimer,
+  useTimerRun,
+  useTimerStartAt,
+  type Held,
+} from "./workout/SetTimer";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
 import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
@@ -116,7 +125,10 @@ export function Workout() {
   // While hidden the clock stops (the native notification counts the rest down itself); the web has no
   // native alert, so it asks for one tick when rest ends, for its rest-over notification.
   const restAt = useApp((st) => st.active?.restUntil);
-  const now = useNow(250, !isNative() && restAt ? restAt : undefined);
+  // Ticks on rest's (or the set timer's) own seconds too, so the countdown here turns over with the lock screen and
+  // the watches, which count to the same moment (watch-apps.md "Same second as the phone").
+  const timerStartAt = useTimerStartAt();
+  const now = useNow(250, !isNative() && restAt ? restAt : undefined, Math.max(restAt ?? 0, timerStartAt ?? 0) || undefined);
   const visible = useVisible();
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
