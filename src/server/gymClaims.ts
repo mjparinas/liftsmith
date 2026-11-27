@@ -18,6 +18,7 @@ import { classEnds } from "./gymClasses";
 import { isPlaceId } from "./gymPlaces";
 import { canManage, MANAGES, staffDeletes, staffEnds } from "./gymStaff";
 import { checkText } from "./moderation";
+import { codeMail } from "./reminderEmails";
 
 export const CLAIM_LIMITS = {
   /** Gyms one account can own. */
@@ -137,12 +138,19 @@ export async function startClaim(
     ],
   );
   if (!byEmail) return { ok: true, claim: id, method: "review" };
-  const text = `Your code to claim ${s(p.name)} on Liftsmith is ${code}\n\nType it in the app to make the gym official. It works for 30 minutes.\n\nIf you didn't ask for it, ignore this email: nobody can claim the gym without the code.\n\nLiftsmith · https://www.getliftsmith.com`;
+  const m = codeMail({
+    subject: `${code} is your code to claim ${s(p.name)}`,
+    title: `Claim ${s(p.name)}`,
+    intro: "Type this code in Liftsmith to make the gym official.",
+    code,
+    note: "It works for 30 minutes.",
+    ignore: "If you didn't ask for it, ignore this email: nobody can claim the gym without the code.",
+  });
   if (!mail) {
     if (process.env.NODE_ENV !== "production") return { ok: true, claim: id, method: "email", devCode: code };
     return { ok: false, error: "mail" };
   }
-  const sent = await mail(email, `${code} is your code to claim ${s(p.name)}`, text).catch(() => false);
+  const sent = await mail(email, m.subject, m.text, m.html).catch(() => false);
   if (!sent) return { ok: false, error: "mail" };
   return { ok: true, claim: id, method: "email" };
 }

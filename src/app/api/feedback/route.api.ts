@@ -3,6 +3,7 @@
 // (see pageExtensions in next.config.ts). Needs RESEND_API_KEY and FEEDBACK_TO; FEEDBACK_FROM is optional.
 import { checkFeedback, feedbackEmail, MAX_BODY, NATIVE_ORIGINS } from "@/lib/feedbackServer";
 import { rateLimit } from "@/server/db";
+import { plainMail } from "@/server/reminderEmails";
 
 const hits = new Map<string, number[]>();
 const LIMIT = 10; // reports per address per hour
@@ -69,6 +70,12 @@ export async function POST(req: Request) {
       reply_to: checked.item.email,
       subject: mail.subject,
       text: mail.text,
+      html: plainMail({
+        subject: mail.subject,
+        title: "New feedback",
+        lines: mail.text.split("\n"),
+        why: "Sent from the Liftsmith feedback form.",
+      }).html,
       attachments: mail.attachments,
     }),
   });

@@ -153,7 +153,8 @@ describe("admin inbox", () => {
       from: "Liftsmith <hello@getliftsmith.com>",
       headers: { "In-Reply-To": "<m1@example.com>" },
     });
-    expect(String(body.html)).toContain("<p>Thanks!</p><p>Melvin</p>");
+    expect(String(body.html)).toMatch(/>Thanks!<\/p>\n<p[^>]*>Melvin<\/p>/);
+    expect(String(body.html)).toContain("From the Liftsmith team");
     const [state] = await query<{ replied_by: string; handled_at: number }>(
       "SELECT replied_by, handled_at FROM inbox_state WHERE email_id = 'a1'",
     );

@@ -4,6 +4,8 @@
 // its API answer 404. Only hashes of links and session tokens are stored; every change is audited.
 import { createHash, randomBytes } from "node:crypto";
 
+import { plainMail } from "@/server/reminderEmails";
+
 import { query, rateLimit, run } from "./db";
 import { passedSecondStep } from "./twoFactor";
 
@@ -50,6 +52,22 @@ export function sameOrigin(req: Request): boolean {
   }
 }
 
+/** The sign-in link email, in the app's email layout. */
+function adminLinkMail(link: string) {
+  const m = plainMail({
+    subject: ADMIN_LINK_SUBJECT,
+    title: "Sign in to the admin panel",
+    lines: ["Tap the button to sign in to the Liftsmith admin panel. The link works once, for 15 minutes."],
+    cta: { label: "Sign in", url: link },
+    why: "If you didn't ask for it, ignore this email.",
+    icon: "lock",
+  });
+  return {
+    text: `Sign in to the Liftsmith admin panel:\n\n${link}\n\nThe link works once, for 15 minutes. If you didn't ask for it, ignore this email.`,
+    html: m.html,
+  };
+}
+
 /** Starts a sign-in: emails a link if the address is on a list. Always answers the same, so the list can't be probed. */
 export async function startSignIn(req: Request, email: string, send: typeof fetch = fetch, now = Date.now()): Promise<Response> {
   const e = email.trim().toLowerCase();
@@ -74,7 +92,7 @@ export async function startSignIn(req: Request, email: string, send: typeof fetc
       from: process.env.ADMIN_FROM ?? process.env.FEEDBACK_FROM ?? "Liftsmith admin <onboarding@resend.dev>",
       to: [e],
       subject: ADMIN_LINK_SUBJECT,
-      text: `Sign in to the Liftsmith admin panel:\n\n${link}\n\nThe link works once, for 15 minutes. If you didn't ask for it, ignore this email.`,
+      ...adminLinkMail(link),
     }),
   });
   if (!r.ok) return json(502, { error: "Couldn't send the email." });
