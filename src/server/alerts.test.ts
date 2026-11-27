@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 
 import * as automationsRoute from "@/app/api/admin/automations/route.api";
 import * as maintenanceRoute from "@/app/api/admin/maintenance/route.api";
 import * as systemRoute from "@/app/api/admin/system/route.api";
+import * as rcRoute from "@/app/api/billing/revenuecat/route.api";
 import { MAINTENANCE_CACHE_MS, openDuringMaintenance } from "@/lib/maintenance";
 import { daysUntilFull, restoreDrillState } from "@/lib/systemHealth";
 import { proxy } from "@/proxy.api";
@@ -12,7 +13,7 @@ import { ALERT_GAP, alertForStoreEvent, reportStaffFailure, saveAlertSettings, s
 import { dbSize, sampleDbSize, sizeSamples } from "./capacity";
 import { query, resetDb, run } from "./db";
 import { clearMaintenanceCache, maintenanceOn, setMaintenance } from "./maintenance";
-import { backupsCheck, clearSystemCache, securityCheck } from "./systemHealth";
+import { backupsCheck, billingCheck, clearSystemCache, securityCheck } from "./systemHealth";
 
 const NOW = Date.UTC(2026, 10, 10, 13);
 const DAY = 86_400_000;
@@ -248,5 +249,24 @@ describe("capacity and backups", () => {
     vi.stubEnv("DATABASE_URL", "libsql://example.turso.io");
     const card = await backupsCheck(Date.UTC(2026, 10, 10));
     expect(card.state).toBe("ok");
+  });
+
+  it("doesn't flag subscriptions before a real purchase, and goes green once the webhook delivers anything", async () => {
+    vi.stubEnv("REVENUECAT_WEBHOOK_SECRET", "rc-secret");
+    const quiet = await billingCheck(NOW);
+    expect(quiet.state).toBe("off");
+    expect(quiet.setup).toMatch(/Send test event/);
+    const r = await rcRoute.POST(
+      new Request(`${SITE}/api/billing/revenuecat/`, {
+        method: "POST",
+        headers: { authorization: "rc-secret" },
+        body: JSON.stringify({ event: { id: "t-1", type: "TEST", environment: "SANDBOX" } }),
+      }),
+    );
+    expect(r.status).toBe(200);
+    const card = await billingCheck(NOW);
+    expect(card.state).toBe("ok");
+    expect(card.summary).toMatch(/webhook works/);
+    expect(card.rows.find((x) => x.label === "Last webhook delivery")?.value).toBe("sandbox test");
   });
 });
