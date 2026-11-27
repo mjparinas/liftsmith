@@ -245,7 +245,8 @@ export const de: FeaturesText = {
     "exercise-stats": {
       name: "Werte für jede Übung",
       body: "Tippe in der Bibliothek auf eine Übung und sieh deine Sätze, das insgesamt bewegte Gewicht, dein geschätztes Maximum und deinen Vergleich mit Trainierten deines Gewichts, Alters und Geschlechts nach veröffentlichten Kraftstandards.",
-      proPart: "Die Diagramme von einer Woche bis zu einem Jahr gehören zu den erweiterten Statistiken von Pro.",
+      proPart:
+        "Die erweiterten Statistiken von Pro bringen die Diagramme, von einer Woche bis zur gesamten Zeit: Tippe auf eine Einheit für ihren Wert, neue Bestleistungen sind markiert.",
     },
     "log-past": {
       name: "Vergangenes Training eintragen",

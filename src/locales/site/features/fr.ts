@@ -246,7 +246,8 @@ export const fr: FeaturesText = {
     "exercise-stats": {
       name: "Statistiques de chaque exercice",
       body: "Touchez n’importe quel exercice de la bibliothèque pour voir vos séries, le poids total soulevé, votre max estimé et votre position face aux personnes entraînées de votre poids, âge et sexe, d’après des normes de force publiées.",
-      proPart: "Les graphiques d’une semaine à un an font partie des statistiques avancées de Pro.",
+      proPart:
+        "Les statistiques avancées de Pro ajoutent les graphiques, d'une semaine à tout l'historique : touchez une séance pour voir son chiffre, records marqués.",
     },
     "log-past": {
       name: "Saisir une séance passée",

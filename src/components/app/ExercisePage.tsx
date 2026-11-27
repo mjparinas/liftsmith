@@ -19,7 +19,7 @@ import { plateText, setText } from "./format";
 import { FaultList, faultsFor } from "./FormFaults";
 import { LiftChart, LiftCompareCard, LiftTotalsCard } from "./LiftStats";
 import { useMyShape } from "./myShape";
-import { ProLocked } from "./ProLocked";
+import { ProStats } from "./ProStats";
 import { goBack } from "./router";
 import { SetHints } from "./SetHints";
 import { ShareStat } from "./ShareStat";
@@ -125,7 +125,7 @@ export function ExercisePage({ id }: { id?: string }) {
 
       {sessions.length > 0 && !can("advancedStats") && (
         <Section title={t("lift.trendTitle")} icon="progress" info="e1rm">
-          <ProLocked from="lift" title={t("pro.ft.advancedStats")} body={t("lift.trend.lock")} />
+          <ProStats from="lift" lines={[t("lift.pro.chart"), t("lift.pro.points"), t("lift.pro.trend")]} />
         </Section>
       )}
       {sessions.length > 0 && can("advancedStats") && (

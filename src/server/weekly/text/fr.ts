@@ -515,7 +515,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Chaque exercice montre vos séries, le total soulevé et le maximum estimé.",
       "Comparez-vous à des pratiquants entraînés de votre poids, âge et sexe.",
-      "Pro : graphiques d'une semaine à un an, séries hebdomadaires par muscle face à l'objectif et tendances du maximum sur une répétition.",
+      "Pro : graphiques d'une semaine à tout l'historique (touchez une séance pour voir son chiffre, records marqués), séries hebdomadaires par muscle face à l'objectif et tendances du maximum sur une répétition.",
       "Les standards de force du site viennent de vrais pratiquants qui choisissent d'y contribuer.",
     ],
     dyk: "« Compter mes charges » dans Réglages › Vos données et confidentialité décide si les vôtres aident à bâtir ces standards.",

@@ -46,17 +46,15 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.33.0",
-    day: "2026-11-29",
-    headline:
-      "Share any best or max: a small button beside your estimated maxes, heaviest sets and personal bests makes a card in the app's look",
-    changes: [{ id: "shareStats", kind: "new", icon: "share" }],
-  },
-  {
-    version: "0.32.0",
+    version: "0.34.0",
     day: "2026-11-28",
-    headline: "Gym owners can put their class schedule, equipment or a Find us on Liftsmith badge on their own website",
-    changes: [{ id: "gymWidgets", kind: "new", icon: "link" }],
+    headline:
+      "Share any best or max as a card in the app's look, exercise charts you can read with new bests in gold, and gym owners can put their schedule or a Liftsmith badge on their own website",
+    changes: [
+      { id: "shareStats", kind: "new", icon: "share" },
+      { id: "liftCharts", kind: "better", icon: "chart" },
+      { id: "gymWidgets", kind: "new", icon: "link" },
+    ],
   },
   {
     version: "0.31.0",
