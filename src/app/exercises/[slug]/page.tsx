@@ -20,6 +20,7 @@ import {
   equipmentSlug,
   exerciseBySlug,
   exercisesFor,
+  indexAlternatives,
   MUSCLE_NAME,
   muscleSlug,
   needsText,
@@ -306,7 +307,11 @@ export default async function ExercisePage({ params }: Props) {
           <h2 className="text-2xl font-bold tracking-tight">Alternatives</h2>
           <p className="mt-2 text-muted">
             Exercises that train the same main muscles.{" "}
-            <Link href={`/exercises/${e.id}/alternatives/`} className="text-accent underline underline-offset-2">
+            <Link
+              href={`/exercises/${e.id}/alternatives/`}
+              rel={indexAlternatives(e.id) ? undefined : "nofollow"}
+              className="text-accent underline underline-offset-2"
+            >
               See all {e.name.toLowerCase()} alternatives
             </Link>
             .
