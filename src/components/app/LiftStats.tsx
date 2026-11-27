@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
 import { date, num, t } from "@/lib/i18n";
+import { haptic } from "@/lib/juice";
 import type { LiftSession } from "@/lib/liftPage";
 import {
   DEFAULT_RANGE,
   liftSeries,
   metricsFor,
+  rangeStart,
   seriesChange,
   STAT_RANGES,
   type LiftComparison,
@@ -91,6 +93,7 @@ const RANGE_LABEL: Record<StatRange, () => string> = {
   "3m": () => t("lift.range.3m"),
   "6m": () => t("lift.range.6m"),
   "1y": () => t("lift.range.1y"),
+  all: () => t("lift.range.all"),
 };
 
 const METRIC_LABEL: Record<StatMetric, () => string> = {
@@ -119,7 +122,16 @@ export function LiftChart({ ex, sessions, unit, now }: { ex: Exercise; sessions:
           ))}
         </div>
       )}
-      <Plot points={points} metric={metric} unit={unit} range={range} now={now} />
+      {/* Keyed on what it shows, so a picked point doesn't carry over to another metric or range. */}
+      <Plot
+        key={`${metric}:${range}`}
+        points={points}
+        metric={metric}
+        unit={unit}
+        range={range}
+        from={rangeStart(sessions, range, now)}
+        now={now}
+      />
       <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label={t("lift.range.group")}>
         {STAT_RANGES.map((r) => (
           <Chip key={r} active={range === r} onClick={() => setRange(r)}>
@@ -136,29 +148,47 @@ export function LiftChart({ ex, sessions, unit, now }: { ex: Exercise; sessions:
   );
 }
 
-const DAY = 86_400_000;
-const RANGE_MS: Record<StatRange, number> = { "1w": 7 * DAY, "1m": 30 * DAY, "3m": 91 * DAY, "6m": 182 * DAY, "1y": 365 * DAY };
+/** The point nearest to a spot on the x axis (0 to 100), for picking a session by touch, pen or mouse. */
+export function nearestPoint(points: readonly StatPoint[], xPct: number, x: (at: number) => number): number {
+  let best = 0;
+  let gap = Infinity;
+  points.forEach((p, i) => {
+    const d = Math.abs(x(p.at) - xPct);
+    if (d < gap) {
+      gap = d;
+      best = i;
+    }
+  });
+  return best;
+}
 
 /**
  * A line across the whole range (time to scale, so gaps between sessions show), filled below. The SVG
- * stretches to the card (non-scaling strokes), and the labels and the newest point are HTML on top, so text
- * stays sharp and round at any width.
+ * stretches to the card (non-scaling strokes), and the labels and the points are HTML on top, so text stays
+ * sharp and round at any width. New bests are gold. Touching, dragging or hovering over the chart (or the arrow
+ * keys) picks a session, and the line under the chart says its number and date (Melvin, 2026-11-26); a sideways
+ * drag scrubs, an up-and-down one still scrolls the page.
  */
 function Plot({
   points,
   metric,
   unit,
   range,
+  from,
   now,
 }: {
   points: readonly StatPoint[];
   metric: StatMetric;
   unit: Unit;
   range: StatRange;
+  from: number;
   now: number;
 }) {
-  const from = now - RANGE_MS[range];
-  const fmtDay = (ms: number) => date(ms, { month: "short", day: "numeric" });
+  const [picked, setPicked] = useState<number | null>(null);
+  const area = useRef<HTMLDivElement>(null);
+  const yearOf = (ms: number) => new Date(ms).getFullYear();
+  const withYear = yearOf(from) !== yearOf(now);
+  const fmtDay = (ms: number) => date(ms, { month: "short", day: "numeric", year: withYear ? "numeric" : undefined });
   if (!points.length) {
     return (
       <div className="mt-3 grid h-40 place-items-center rounded-xl border border-dashed border-line px-4 text-center text-sm text-muted">
@@ -174,13 +204,40 @@ function Plot({
   const hi = hi0 + pad;
   const W = 100;
   const H = 100;
-  const x = (at: number) => ((at - from) / (now - from)) * W;
+  const span = Math.max(1, now - from);
+  const x = (at: number) => ((at - from) / span) * W;
   const y = (v: number) => (1 - (v - lo) / (hi - lo)) * H;
   const line = points.map((p, i) => `${i ? "L" : "M"}${x(p.at).toFixed(2)},${y(p.value).toFixed(2)}`).join(" ");
   const first = points[0]!;
   const last = points[points.length - 1]!;
-  const area = `${line} L${x(last.at).toFixed(2)},${H} L${x(first.at).toFixed(2)},${H} Z`;
+  const fill = `${line} L${x(last.at).toFixed(2)},${H} L${x(first.at).toFixed(2)},${H} Z`;
   const label = t("lift.chart.label", { metric: METRIC_LABEL[metric](), range: RANGE_LABEL[range]() });
+  const shownAt = picked ?? points.length - 1;
+  const shown = points[shownAt]!;
+  const anyBest = points.some((p) => p.best);
+  const pointText = (p: StatPoint) =>
+    p.best
+      ? t("lift.chart.pointBest", { value: fmtValue(metric, p.value, unit), date: fmtDay(p.at) })
+      : t("lift.chart.point", { value: fmtValue(metric, p.value, unit), date: fmtDay(p.at) });
+  const pick = (i: number) => {
+    const next = Math.max(0, Math.min(points.length - 1, i));
+    if (next === picked) return;
+    setPicked(next);
+    haptic("select");
+  };
+  const pickAt = (e: PointerEvent<HTMLDivElement>) => {
+    const box = area.current?.getBoundingClientRect();
+    if (!box || box.width <= 0) return;
+    pick(nearestPoint(points, ((e.clientX - box.left) / box.width) * W, x));
+  };
+  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const step: Record<string, number> = { ArrowLeft: -1, ArrowDown: -1, ArrowRight: 1, ArrowUp: 1 };
+    if (e.key in step) pick(shownAt + step[e.key]!);
+    else if (e.key === "Home") pick(0);
+    else if (e.key === "End") pick(points.length - 1);
+    else return;
+    e.preventDefault();
+  };
   return (
     <figure className="mt-3">
       <div className="flex gap-2">
@@ -197,10 +254,37 @@ function Plot({
             </span>
           )}
         </div>
-        <div className="relative h-40 min-w-0 flex-1">
+        <div
+          ref={area}
+          role="slider"
+          tabIndex={0}
+          aria-label={t("lift.chart.pick", { metric: METRIC_LABEL[metric]() })}
+          aria-valuemin={1}
+          aria-valuemax={points.length}
+          aria-valuenow={shownAt + 1}
+          aria-valuetext={pointText(shown)}
+          data-no-swipe
+          data-testid="lift-plot"
+          onPointerDown={(e) => {
+            e.currentTarget.setPointerCapture?.(e.pointerId);
+            pickAt(e);
+          }}
+          onPointerMove={(e) => {
+            if (e.pointerType === "mouse" || e.buttons) pickAt(e);
+          }}
+          onKeyDown={onKey}
+          className="relative h-40 min-w-0 flex-1 cursor-crosshair rounded-md touch-pan-y"
+        >
           <div className="pointer-events-none absolute inset-x-0 top-0 border-t border-dashed border-line" aria-hidden />
           <div className="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-line/60" aria-hidden />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-line" aria-hidden />
+          {picked !== null && (
+            <div
+              className="pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-accent/50"
+              style={{ left: `${x(shown.at)}%` }}
+              aria-hidden
+            />
+          )}
           <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
             <defs>
               <linearGradient id="lift-fill" x1="0" y1="0" x2="0" y2="1">
@@ -208,7 +292,7 @@ function Plot({
                 <stop offset="1" style={{ stopColor: "var(--grad-a)", stopOpacity: 0 }} />
               </linearGradient>
             </defs>
-            {points.length > 1 && <path d={area} fill="url(#lift-fill)" stroke="none" />}
+            {points.length > 1 && <path d={fill} fill="url(#lift-fill)" stroke="none" />}
             {points.length > 1 && (
               <path
                 d={line}
@@ -221,30 +305,43 @@ function Plot({
               />
             )}
           </svg>
-          {points.length <= 40 &&
-            points
-              .slice(0, -1)
-              .map((p) => (
-                <span
-                  key={p.at}
-                  className="pointer-events-none absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/70"
-                  style={{ left: `${x(p.at)}%`, top: `${y(p.value)}%` }}
-                  aria-hidden
-                />
-              ))}
-          <span
-            className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-accent"
-            style={{ left: `${x(last.at)}%`, top: `${y(last.value)}%` }}
-            aria-hidden
-          />
+          {points.map((p, i) => {
+            const isShown = i === shownAt;
+            // Plain points only while there's room for them; bests and the shown point always.
+            if (!p.best && !isShown && points.length > 40) return null;
+            const size = isShown ? "h-3 w-3 border-2 border-surface" : p.best ? "h-2.5 w-2.5 border border-surface" : "h-1.5 w-1.5";
+            const colour = p.best ? "bg-gold" : isShown ? "bg-accent" : "bg-accent/70";
+            return (
+              <span
+                key={p.at}
+                data-best={p.best ? "" : undefined}
+                className={`pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full ${size} ${colour}`}
+                style={{ left: `${x(p.at)}%`, top: `${y(p.value)}%` }}
+                aria-hidden
+              />
+            );
+          })}
         </div>
       </div>
-      <div className="num mt-1 flex justify-between gap-2 text-xs text-faint" aria-hidden>
+      <div className="num mt-1 flex flex-wrap justify-between gap-x-2 text-xs text-faint" aria-hidden>
         <span>{fmtDay(from)}</span>
-        <span>{t("lift.chart.latest", { value: fmtValue(metric, last.value, unit), date: fmtDay(last.at) })}</span>
+        <span className={picked !== null ? "font-semibold text-ink" : undefined} data-testid="lift-point">
+          {picked !== null
+            ? pointText(shown)
+            : t("lift.chart.latest", { value: fmtValue(metric, last.value, unit), date: fmtDay(last.at) })}
+        </span>
       </div>
+      <p className="mt-1 flex flex-wrap items-center gap-x-3 text-xs text-faint" aria-hidden>
+        {anyBest && (
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-gold" />
+            {t("lift.chart.bestKey")}
+          </span>
+        )}
+        <span>{t("lift.chart.hint")}</span>
+      </p>
       <figcaption className="sr-only">
-        {label}: {points.map((p) => `${fmtDay(p.at)} ${fmtValue(metric, p.value, unit)}`).join(", ")}
+        {label}: {points.map(pointText).join(", ")}
       </figcaption>
     </figure>
   );

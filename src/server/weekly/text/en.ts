@@ -534,7 +534,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Every exercise shows your sets, total lifted and estimated max.",
       "See how you compare with trained lifters of your weight, age and sex.",
-      "Pro: charts from a week to a year, weekly sets per muscle against the target, and one-rep max trends.",
+      "Pro: charts from a week to all time (tap any session for its number, with new bests marked), weekly sets per muscle against the target, and one-rep max trends.",
       "The website's strength standards come from real lifters who choose to count.",
     ],
     dyk: '"Count my lifts" in Settings › Your data decides whether yours help build those standards.',

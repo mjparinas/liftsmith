@@ -512,7 +512,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Każde ćwiczenie pokazuje twoje serie, łączny podniesiony ciężar i szacowany 1RM.",
       "Zobacz, jak wypadasz na tle trenujących osób o twojej masie ciała, wieku i płci.",
-      "Pro: wykresy od tygodnia do roku, tygodniowe serie na mięsień względem celu i trendy 1RM.",
+      "Pro: wykresy od tygodnia po cały czas (dotknij treningu, aby zobaczyć wynik, rekordy zaznaczone), tygodniowe serie na mięsień względem celu i trendy 1RM.",
       "Normy siłowe na stronie internetowej pochodzą od prawdziwych osób, które zgodziły się na uwzględnienie swoich wyników.",
     ],
     dyk: "„Uwzględniaj moje wyniki” w Ustawienia › Twoje dane i prywatność decyduje, czy twoje wyniki pomagają budować te normy.",

@@ -513,7 +513,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Her egzersiz setlerini, kaldırılan toplam ağırlığı ve tahmini maksimumunu gösterir.",
       "Kilon, yaşın ve cinsiyetindeki antrenmanlı sporcularla nasıl kıyaslandığını gör.",
-      "Pro: bir haftadan bir yıla grafikler, hedefe karşı kas başına haftalık setler ve tek tekrar maksimum eğilimleri.",
+      "Pro: bir haftadan tüm zamanlara grafikler (değeri için bir antrenmana dokunun, rekorlar işaretli), hedefe karşı kas başına haftalık setler ve tek tekrar maksimum eğilimleri.",
       "Web sitesindeki güç standartları, sayılmayı seçen gerçek sporculardan gelir.",
     ],
     dyk: "Ayarlar › Verilerin ve gizlilik'teki “Kaldırışlarımı say”, seninkilerin bu standartlara katkı verip vermeyeceğini belirler.",

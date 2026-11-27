@@ -295,7 +295,8 @@ export const tr: FeaturesText = {
     "exercise-stats": {
       name: "Her egzersiz için istatistik",
       body: "Kütüphanede herhangi bir egzersize dokun: setlerin, kaldırdığın toplam ağırlık, tahmini maksimumun ve yayımlanmış güç standartlarına göre aynı kilo, yaş ve cinsiyetteki antrenmanlı sporcularla karşılaştırman.",
-      proPart: "Bir haftadan bir yıla kadar grafikler Pro'nun gelişmiş istatistiklerinin parçası.",
+      proPart:
+        "Pro'nun gelişmiş istatistikleri bir haftadan tüm zamanlara grafikler ekler: değerini görmek için bir antrenmana dokunun, yeni rekorlar işaretli.",
     },
     "log-past": {
       name: "Geçmiş bir antrenmanı kaydet",
