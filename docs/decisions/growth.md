@@ -144,7 +144,7 @@ One experiment at a time in Play Console, on the live listing:
 2. First screenshot.
 3. Short description.
 
-Spanish, French, German, Italian and Japanese are drafted in `docs/PLAY_LISTING_TRANSLATIONS.md` (paste those in, then experiment one language at a time). Still to write: Portuguese (Brazil), Korean, Polish and Turkish. The App Store listing and its experiments wait until iOS ships.
+The listing in all nine other languages is in `docs/PLAY_LISTING_TRANSLATIONS.md` (paste those in, then experiment one language at a time); Portuguese (Brazil), Korean, Polish and Turkish were added on 2026-11-15. Each training season also gets Google Play events, at its start and for its finale week ([Play promotional content](play-promotions.md), 2026-11-27). The App Store listing and its experiments wait until iOS ships.
 
 ### Partner directories (item 8)
 
