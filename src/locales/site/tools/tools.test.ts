@@ -13,6 +13,7 @@ import { siteRoutes } from "@/lib/seo";
 import { localPath } from "@/lib/siteLang";
 
 import { LOCAL_TOOLS } from ".";
+import { GEN_EN } from "./gen/en";
 import { LOCAL_TOOL_PATHS, LOCAL_TOOL_SLUGS, type ToolUi } from "./types";
 
 const EN: ToolUi = {
@@ -23,6 +24,7 @@ const EN: ToolUi = {
   "macro-calculator": MACRO_EN,
   "wilks-calculator": WILKS_EN,
   "dots-calculator": DOTS_EN,
+  "workout-generator": GEN_EN,
 };
 const LANGS = Object.keys(LOCAL_TOOLS) as (keyof typeof LOCAL_TOOLS)[];
 const holes = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();

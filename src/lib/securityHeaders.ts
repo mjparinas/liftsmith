@@ -3,6 +3,8 @@
 // The CSP here holds what can't break the app: no framing by other sites, no plugins, no <base> or form
 // hijacking. The script policy is per page (each page's own inline script hashes), so scripts/csp.mjs adds it
 // to the prerendered pages after the build as a <meta>; the browser enforces both.
+import { SITE_URL } from "./site";
+
 export const CSP = ["frame-ancestors 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'"].join("; ");
 
 export const SECURITY_HEADERS: { key: string; value: string }[] = [
@@ -57,6 +59,15 @@ export const EMBED_HEADERS: { key: string; value: string }[] = [
   ...SECURITY_HEADERS.filter((h) => h.key !== "X-Frame-Options" && h.key !== "Content-Security-Policy"),
   { key: "Content-Security-Policy", value: EMBED_CSP },
 ];
+
+/**
+ * The website widgets an official gym puts on its own site (/embed/gym/<id>/…, src/server/gymWidgets.ts). Framed by any
+ * site, http included (a small gym's site may not have moved to https, and nothing on these pages is worth tricking a
+ * click onto), and by the phone apps' own pages for the owner's preview (Android's https://localhost, iOS's
+ * capacitor://localhost). No scripts at all; images only from here (the gym's logo), named by full address too because a
+ * sandboxed frame has no origin of its own to be 'self'.
+ */
+export const WIDGET_CSP = `default-src 'none'; img-src 'self' ${new URL(SITE_URL).origin}; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors http: https: capacitor://localhost 'self'`;
 
 /** Every path except the embeds (path-to-regexp, as next.config.ts headers take it). */
 export const NOT_EMBED = "/:path((?!embed/).*)";

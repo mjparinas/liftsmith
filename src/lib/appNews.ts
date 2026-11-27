@@ -46,10 +46,17 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.32.0",
+    version: "0.36.0",
     day: "2026-11-28",
-    headline: "Print a routine on one page, with your next weights and a QR code, and a free PDF of every program",
-    changes: [{ id: "printRoutine", kind: "new", icon: "print" }],
+    headline:
+      "A free workout generator on the website, share any best or max as a card, exercise charts with new bests in gold, gym owners can put their schedule or a Liftsmith badge on their own website, and print any routine on one page",
+    changes: [
+      { id: "workoutGenerator", kind: "new", icon: "globe" },
+      { id: "shareStats", kind: "new", icon: "share" },
+      { id: "liftCharts", kind: "better", icon: "chart" },
+      { id: "gymWidgets", kind: "new", icon: "link" },
+      { id: "printRoutine", kind: "new", icon: "print" },
+    ],
   },
   {
     version: "0.31.0",

@@ -183,6 +183,11 @@ export const articlePath = (a: Article) => `/${a.kind === "guide" ? "guides" : "
 
 export const TOOL_PAGES = [
   {
+    path: "/tools/workout-generator/",
+    name: "Workout generator",
+    blurb: "A free workout for your equipment, your time and what you want to train, with sets, reps and why for each exercise.",
+  },
+  {
     path: "/tools/plate-calculator/",
     name: "Plate calculator",
     blurb: "Which plates go on each side of the bar for any weight, with the plates you own.",

@@ -45,6 +45,7 @@ export const ko: SiteText = {
       equipment: "장비별 운동",
       guides: "트레이닝 가이드",
       blog: "블로그",
+      generator: "운동 루틴 생성기",
       plates: "원판 계산기",
       oneRm: "1RM 계산기",
       warmUp: "워밍업 계산기",

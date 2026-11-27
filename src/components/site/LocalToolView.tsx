@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { DotsCalculator } from "@/components/site/DotsCalculator";
+import { generatorProps } from "@/components/site/generatorProps";
 import { MacroCalculator } from "@/components/site/MacroCalculator";
 import { OneRmCalculator } from "@/components/site/OneRmCalculator";
 import { PlateCalculator } from "@/components/site/PlateCalculator";
@@ -12,6 +13,7 @@ import { TdeeCalculator } from "@/components/site/TdeeCalculator";
 import { ToolPage } from "@/components/site/ToolPage";
 import { WarmupCalculator } from "@/components/site/WarmupCalculator";
 import { WilksCalculator } from "@/components/site/WilksCalculator";
+import { WorkoutGenerator } from "@/components/site/WorkoutGenerator";
 import { BRAND } from "@/lib/brand";
 import { pageMeta } from "@/lib/pageMeta";
 import { fill } from "@/lib/siteLang";
@@ -49,6 +51,8 @@ function calculator(lang: GuideLang, slug: LocalToolSlug) {
       return <WilksCalculator t={tools[slug].ui} />;
     case "dots-calculator":
       return <DotsCalculator t={tools[slug].ui} />;
+    case "workout-generator":
+      return <WorkoutGenerator {...generatorProps(lang)} />;
   }
 }
 

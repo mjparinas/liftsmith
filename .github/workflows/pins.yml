@@ -1,0 +1,44 @@
+# Pinterest pins and short clips from the 3D figures (scripts/pins.mjs, docs/decisions/pinterest.md). Every Monday it
+# makes the next exercises' pins and clips and hands them to the queue on the admin Pins tab, which posts them at its own
+# pace. It proves who it is with GitHub's OIDC token (id-token: write), so there's no secret to set. Run it by hand from
+# Actions › Pins › Run workflow for more (count = exercises; each makes one image pin and one clip).
+name: Pins
+
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "How many exercises to make (each makes a pin and a clip)"
+        default: "10"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: pins
+  cancel-in-progress: false
+
+jobs:
+  make:
+    name: Make pins and clips
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@v7
+      - name: ffmpeg and the pins' font
+        run: apt-get update -qq && apt-get install -y -qq ffmpeg fonts-inter > /dev/null
+      - uses: ./.github/actions/setup
+      - name: Build the studio page
+        run: npm run build:static
+        env:
+          STILLS: "1"
+      - name: Make and queue
+        run: node scripts/pins.mjs --upload --count "$COUNT"
+        env:
+          COUNT: ${{ github.event.inputs.count || '10' }}

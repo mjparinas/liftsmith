@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.workoutGenerator.title": "A free workout generator on the website",
+  "wn.c.workoutGenerator.body":
+    "Friends without the app can try getliftsmith.com/tools/workout-generator: pick equipment, minutes and what to train, and the same engine writes the workout, with why for each exercise. A generator link opens here as a routine.",
   "wn.c.machineTaken.title": "Machine taken? One tap",
   "wn.c.machineTaken.body":
     "Tap Machine taken on your Wear OS, Apple Watch or Garmin watch, or in Change the plan, and the best lift for your gym that doesn't need it takes its place, with its weight and why.",
@@ -146,6 +149,9 @@ export const en = {
   "wn.c.watchToday.title": "Today's workout on your watch face",
   "wn.c.watchToday.body":
     "Add the Liftsmith tile or complication to see today's call, how long and how ready you are. On Wear OS, Start on phone opens it.",
+  "wn.c.shareStats.title": "Share any best or max",
+  "wn.c.shareStats.body":
+    "Tap the small share button beside an estimated max, your heaviest set, a best for a rep count or a recent personal best to post a card of it with the Liftsmith logo.",
   "wn.c.watchAlone.title": "Leave your phone in the locker",
   "wn.c.watchAlone.body":
     "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
@@ -158,6 +164,9 @@ export const en = {
   "wn.c.watchSpeed.title": "Bar speed from your wrist",
   "wn.c.watchSpeed.body":
     "In Labs: your Wear OS watch or Apple Watch measures how fast you lift each rep, buzzes when the set has slowed enough to end, and tunes your first working weight from your warm-ups. No camera needed.",
+  "wn.c.liftCharts.title": "Charts you can read",
+  "wn.c.liftCharts.body":
+    "Tap or drag any exercise's chart to see each session's number and date, new bests are marked gold, and there's an All time range. Charts are part of Pro.",
   "wn.c.watchAdjust.title": "Change and rate a set on your watch",
   "wn.c.watchAdjust.body":
     "Turn the crown or press − and + to change the weight and reps on Wear OS, Apple Watch or Garmin, and after an exercise's last set, say how it felt right on your wrist.",
@@ -185,11 +194,17 @@ export const en = {
   "wn.c.moreStretches.title": "13 new stretches",
   "wn.c.moreStretches.body":
     "Couch stretch, frog, 90/90 hip switches, band pass-throughs, sleeper stretch, chin tucks and more, each with its 3D demo, for hips, shoulders, neck, wrists and calves.",
+  "wn.c.gymWidgets.title": "Website widgets for gyms",
+  "wn.c.gymWidgets.body":
+    "Own a gym on Liftsmith? Put your class schedule, your equipment or a Find us on Liftsmith badge on your own website with one line of code, from your gym's page in the app. They update on their own.",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Un generador de entrenamientos gratis en la web",
+  "wn.c.workoutGenerator.body":
+    "Tus amigos sin la app pueden probar getliftsmith.com/tools/workout-generator: eligen equipo, minutos y qué entrenar, y el mismo motor escribe el entrenamiento, con el porqué de cada ejercicio. Un enlace del generador se abre aquí como rutina.",
   "wn.c.machineTaken.title": "¿Máquina ocupada? Un toque",
   "wn.c.machineTaken.body":
     "Toca Máquina ocupada en tu reloj Wear OS, Apple Watch o Garmin, o en Cambiar el plan, y el mejor ejercicio de tu gimnasio que no la necesita ocupa su lugar, con su peso y por qué.",
@@ -342,6 +357,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "El entrenamiento de hoy en tu esfera",
   "wn.c.watchToday.body":
     "Añade el mosaico o la complicación de Liftsmith para ver la propuesta de hoy, cuánto dura y cómo estás de preparado. En Wear OS, Empezar en el móvil lo abre.",
+  "wn.c.shareStats.title": "Comparte cualquier récord o máximo",
+  "wn.c.shareStats.body":
+    "Toca el pequeño botón de compartir junto a un máximo estimado, tu serie más pesada, un récord por repeticiones o un récord reciente para publicar una tarjeta con el logotipo de Liftsmith.",
   "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
   "wn.c.watchAlone.body":
     "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
@@ -354,6 +372,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "Velocidad desde la muñeca",
   "wn.c.watchSpeed.body":
     "En Labs: tu reloj Wear OS o Apple Watch mide lo rápido que levantas cada repetición, vibra cuando la serie se ha frenado lo suficiente para terminarla y ajusta tu primer peso de trabajo con el calentamiento. Sin cámara.",
+  "wn.c.liftCharts.title": "Gráficos que se leen solos",
+  "wn.c.liftCharts.body":
+    "Toca o arrastra el gráfico de cualquier ejercicio para ver el número y la fecha de cada sesión. Los nuevos récords se marcan en dorado y hay un periodo de todo el historial. Los gráficos son parte de Pro.",
   "wn.c.watchAdjust.title": "Cambia y valora una serie en tu reloj",
   "wn.c.watchAdjust.body":
     "Gira la corona o pulsa − y + para cambiar el peso y las repeticiones en Wear OS, Apple Watch o Garmin, y tras la última serie de un ejercicio, di qué tal fue desde la muñeca.",
@@ -381,9 +402,15 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 estiramientos nuevos",
   "wn.c.moreStretches.body":
     "Estiramiento del sofá, rana, cambios de cadera 90/90, pasos de banda, estiramiento del durmiente, retracciones de barbilla y más, cada uno con su demo en 3D, para cadera, hombros, cuello, muñecas y gemelos.",
+  "wn.c.gymWidgets.title": "Widgets web para gimnasios",
+  "wn.c.gymWidgets.body":
+    "¿Tienes un gimnasio en Liftsmith? Pon tu horario de clases, tu equipamiento o una insignia de Encuéntranos en Liftsmith en tu propia web con una línea de código, desde la página de tu gimnasio en la app. Se actualizan solos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Un générateur d’entraînement gratuit sur le site",
+  "wn.c.workoutGenerator.body":
+    "Vos amis sans l’application peuvent essayer getliftsmith.com/tools/workout-generator : ils choisissent le matériel, les minutes et ce qu’ils veulent travailler, et le même moteur écrit la séance, avec la raison de chaque exercice. Un lien du générateur s’ouvre ici comme routine.",
   "wn.c.machineTaken.title": "Machine occupée ? Une touche",
   "wn.c.machineTaken.body":
     "Touche Machine occupée sur ta montre Wear OS, Apple Watch ou Garmin, ou dans Modifier le plan, et le meilleur exercice de ta salle qui n'en a pas besoin prend sa place, avec sa charge et pourquoi.",
@@ -540,6 +567,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "La séance du jour sur ton cadran",
   "wn.c.watchToday.body":
     "Ajoute la tuile ou la complication Liftsmith pour voir le choix du jour, sa durée et ta forme. Sur Wear OS, Démarrer sur le téléphone l'ouvre.",
+  "wn.c.shareStats.title": "Partagez un record ou un max",
+  "wn.c.shareStats.body":
+    "Touchez le petit bouton de partage à côté d’un max estimé, de votre série la plus lourde, d’un record par répétitions ou d’un record récent pour publier une carte avec le logo Liftsmith.",
   "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
   "wn.c.watchAlone.body":
     "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
@@ -552,6 +582,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "La vitesse au poignet",
   "wn.c.watchSpeed.body":
     "Dans Labs : ta montre Wear OS ou ton Apple Watch mesure la vitesse de chaque répétition, vibre quand la série a assez ralenti pour l'arrêter et ajuste ta première charge de travail d'après l'échauffement. Sans caméra.",
+  "wn.c.liftCharts.title": "Des graphiques qui se lisent",
+  "wn.c.liftCharts.body":
+    "Touchez ou faites glisser le graphique d'un exercice pour voir le chiffre et la date de chaque séance. Les nouveaux records sont en or et une période couvre tout l'historique. Les graphiques font partie de Pro.",
   "wn.c.watchAdjust.title": "Modifie et note une série sur ta montre",
   "wn.c.watchAdjust.body":
     "Tourne la couronne ou appuie sur − et + pour changer la charge et les répétitions sur Wear OS, Apple Watch ou Garmin, et après la dernière série d'un exercice, dis comment c'était depuis ton poignet.",
@@ -579,9 +612,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 nouveaux étirements",
   "wn.c.moreStretches.body":
     "Étirement du canapé, grenouille, bascules de hanches 90/90, passages d'élastique, étirement du dormeur, rentrés de menton et plus encore, chacun avec sa démo en 3D, pour les hanches, les épaules, le cou, les poignets et les mollets.",
+  "wn.c.gymWidgets.title": "Des widgets web pour les salles",
+  "wn.c.gymWidgets.body":
+    "Vous gérez une salle sur Liftsmith ? Affichez votre horaire des cours, votre équipement ou un badge Retrouvez-nous sur Liftsmith sur votre propre site avec une ligne de code, depuis la page de votre salle dans l’app. Ils se mettent à jour tout seuls.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Ein kostenloser Trainingsplan-Generator auf der Website",
+  "wn.c.workoutGenerator.body":
+    "Freunde ohne die App können getliftsmith.com/tools/workout-generator ausprobieren: Geräte, Minuten und Bereich wählen, und dieselbe Engine schreibt das Workout, mit dem Grund für jede Übung. Ein Link vom Generator öffnet sich hier als Routine.",
   "wn.c.machineTaken.title": "Gerät belegt? Ein Tipp",
   "wn.c.machineTaken.body":
     "Tippe auf deiner Wear-OS-, Apple- oder Garmin-Uhr oder in „Plan ändern“ auf „Gerät belegt“, und die beste Übung deines Studios, die es nicht braucht, kommt an seine Stelle, mit Gewicht und Grund.",
@@ -734,6 +773,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Das heutige Training auf dem Zifferblatt",
   "wn.c.watchToday.body":
     "Füge die Liftsmith-Kachel oder -Komplikation hinzu und sieh die heutige Empfehlung, die Dauer und deine Bereitschaft. Auf Wear OS öffnet „Am Handy starten“ es.",
+  "wn.c.shareStats.title": "Jede Bestleistung und jedes Maximum teilen",
+  "wn.c.shareStats.body":
+    "Tippe auf den kleinen Teilen-Knopf neben einem geschätzten Maximum, deinem schwersten Satz, einer Bestleistung je Wiederholungszahl oder einer neuen Bestleistung, um eine Karte mit dem Liftsmith-Logo zu posten.",
   "wn.c.watchAlone.title": "Lass dein Handy im Spind",
   "wn.c.watchAlone.body":
     "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
@@ -746,6 +788,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "Hantelgeschwindigkeit am Handgelenk",
   "wn.c.watchSpeed.body":
     "In Labs: Deine Wear-OS-Uhr oder Apple Watch misst, wie schnell du jede Wiederholung hebst, vibriert, wenn der Satz langsam genug zum Beenden ist, und passt dein erstes Arbeitsgewicht nach dem Aufwärmen an. Ganz ohne Kamera.",
+  "wn.c.liftCharts.title": "Diagramme, die du lesen kannst",
+  "wn.c.liftCharts.body":
+    "Tippe auf das Diagramm einer Übung oder zieh darüber und sieh Wert und Datum jeder Einheit. Neue Bestleistungen sind golden markiert, und es gibt einen Zeitraum für die gesamte Zeit. Diagramme gehören zu Pro.",
   "wn.c.watchAdjust.title": "Satz auf deiner Uhr ändern und bewerten",
   "wn.c.watchAdjust.body":
     "Dreh die Krone oder tippe auf − und +, um Gewicht und Wiederholungen auf Wear OS, Apple Watch oder Garmin zu ändern, und sag nach dem letzten Satz einer Übung direkt am Handgelenk, wie es sich angefühlt hat.",
@@ -772,9 +817,15 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 neue Dehnübungen",
   "wn.c.moreStretches.body":
     "Couch-Stretch, Frosch, 90/90-Hüftwechsel, Band-Durchzüge, Sleeper-Stretch, Kinn zurückziehen und mehr, jede mit 3D-Demo, für Hüfte, Schultern, Nacken, Handgelenke und Waden.",
+  "wn.c.gymWidgets.title": "Website-Widgets für Studios",
+  "wn.c.gymWidgets.body":
+    "Du betreibst ein Studio auf Liftsmith? Zeig deinen Kursplan, deine Geräte oder ein „Finde uns auf Liftsmith“-Abzeichen mit einer Zeile Code auf deiner eigenen Website, direkt von der Seite deines Studios in der App. Sie bleiben von selbst aktuell.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Un generatore di allenamenti gratis sul sito",
+  "wn.c.workoutGenerator.body":
+    "Gli amici senza l’app possono provare getliftsmith.com/tools/workout-generator: scelgono attrezzatura, minuti e cosa allenare, e lo stesso motore scrive l’allenamento, con il perché di ogni esercizio. Un link del generatore si apre qui come routine.",
   "wn.c.machineTaken.title": "Macchina occupata? Un tocco",
   "wn.c.machineTaken.body":
     "Tocca Macchina occupata sull'orologio Wear OS, Apple Watch o Garmin, o in Cambia il piano, e l'esercizio migliore della tua palestra che non la usa prende il suo posto, con il peso e il perché.",
@@ -928,6 +979,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "L'allenamento di oggi sul quadrante",
   "wn.c.watchToday.body":
     "Aggiungi il riquadro o la complicazione di Liftsmith per vedere la scelta di oggi, quanto dura e quanto sei in forma. Su Wear OS, Avvia sul telefono lo apre.",
+  "wn.c.shareStats.title": "Condividi ogni record o massimale",
+  "wn.c.shareStats.body":
+    "Tocca il piccolo pulsante di condivisione accanto a un massimale stimato, alla serie più pesante, a un record per ripetizioni o a un record recente per pubblicare una scheda con il logo di Liftsmith.",
   "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
   "wn.c.watchAlone.body":
     "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
@@ -940,6 +994,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "La velocità dal polso",
   "wn.c.watchSpeed.body":
     "In Labs: l'orologio Wear OS o l'Apple Watch misura quanto velocemente sollevi ogni ripetizione, vibra quando la serie è rallentata abbastanza da chiuderla e regola il primo carico di lavoro dal riscaldamento. Senza fotocamera.",
+  "wn.c.liftCharts.title": "Grafici che si leggono",
+  "wn.c.liftCharts.body":
+    "Tocca o trascina il grafico di un esercizio per vedere valore e data di ogni sessione. I nuovi record sono segnati in oro e c'è un periodo per tutto lo storico. I grafici fanno parte di Pro.",
   "wn.c.watchAdjust.title": "Modifica e valuta una serie sull'orologio",
   "wn.c.watchAdjust.body":
     "Ruota la corona o premi − e + per cambiare peso e ripetizioni su Wear OS, Apple Watch o Garmin, e dopo l'ultima serie di un esercizio di' com'è andata direttamente dal polso.",
@@ -966,9 +1023,15 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 nuovi allungamenti",
   "wn.c.moreStretches.body":
     "Allungamento del divano, rana, cambi d'anca 90/90, passaggi con elastico, allungamento del dormiente, retrazioni del mento e altro, ognuno con la sua demo in 3D, per anche, spalle, collo, polsi e polpacci.",
+  "wn.c.gymWidgets.title": "Widget web per le palestre",
+  "wn.c.gymWidgets.body":
+    "Gestisci una palestra su Liftsmith? Metti l’orario dei corsi, l’attrezzatura o un badge Trovaci su Liftsmith sul tuo sito con una riga di codice, dalla pagina della palestra nell’app. Si aggiornano da soli.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "ウェブ版の無料ワークアウトジェネレーター",
+  "wn.c.workoutGenerator.body":
+    "アプリを持っていない友だちも getliftsmith.com/tools/workout-generator で試せます。器具、時間、鍛える部位を選ぶと、同じエンジンが各種目の理由つきでワークアウトを作ります。ジェネレーターのリンクは、ここでルーティンとして開きます。",
   "wn.c.machineTaken.title": "マシン使用中？ワンタップで",
   "wn.c.machineTaken.body":
     "Wear OS、Apple Watch、Garminのウォッチか「プランを変更」で「マシン使用中」をタップすると、そのマシンを使わない、ジムで一番合う種目に重量と理由つきで入れ替わります。",
@@ -1111,6 +1174,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "今日のワークアウトをウォッチフェイスに",
   "wn.c.watchToday.body":
     "Liftsmithのタイルやコンプリケーションを追加すると、今日のおすすめ、時間、コンディションが見られます。Wear OSでは「スマホで開始」で開けます。",
+  "wn.c.shareStats.title": "自己ベストや最大重量をシェア",
+  "wn.c.shareStats.body":
+    "推定最大重量、最重量セット、回数ごとの自己ベスト、最近の自己ベストの横にある小さなシェアボタンをタップすると、Liftsmithのロゴ入りカードを投稿できます。",
   "wn.c.watchAlone.title": "スマホはロッカーに",
   "wn.c.watchAlone.body":
     "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
@@ -1123,6 +1189,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "手首でバースピード",
   "wn.c.watchSpeed.body":
     "Labs で：Wear OS ウォッチや Apple Watch が各レップの挙上速度を測り、セットを終えてよいほど遅くなると振動し、ウォームアップから最初のメイン重量を調整します。カメラは不要です。",
+  "wn.c.liftCharts.title": "読み取れるグラフ",
+  "wn.c.liftCharts.body":
+    "種目のグラフをタップまたはドラッグすると、各セッションの数値と日付が見られます。自己ベスト更新は金色で表示され、全期間も選べます。グラフは Pro の機能です。",
   "wn.c.watchAdjust.title": "ウォッチでセットを変更・評価",
   "wn.c.watchAdjust.body":
     "Wear OS、Apple Watch、Garmin でリューズを回すか − と + を押して重量と回数を変更でき、種目の最後のセットのあとは手首からどうだったかを答えられます。",
@@ -1149,9 +1218,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "新しいストレッチ13種",
   "wn.c.moreStretches.body":
     "カウチストレッチ、カエル、90/90ヒップスイッチ、バンドパススルー、スリーパーストレッチ、チンタックなど。どれも3Dデモ付きで、股関節・肩・首・手首・ふくらはぎに。",
+  "wn.c.gymWidgets.title": "ジム向けウェブサイトウィジェット",
+  "wn.c.gymWidgets.body":
+    "Liftsmithにジムを登録していますか？アプリのジムのページから、クラスのスケジュール、設備、「Liftsmithで見る」バッジを、コード1行で自分のウェブサイトに表示できます。内容は自動で最新になります。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Um gerador de treinos grátis no site",
+  "wn.c.workoutGenerator.body":
+    "Amigos sem o app podem testar getliftsmith.com/tools/workout-generator: escolhem equipamento, minutos e o que treinar, e o mesmo motor monta o treino, com o motivo de cada exercício. Um link do gerador abre aqui como rotina.",
   "wn.c.machineTaken.title": "Aparelho ocupado? Um toque",
   "wn.c.machineTaken.body":
     "Toque em Aparelho ocupado no seu relógio Wear OS, Apple Watch ou Garmin, ou em Mudar o plano, e o melhor exercício da sua academia que não precisa dele entra no lugar, com a carga e o porquê.",
@@ -1300,6 +1375,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "O treino de hoje no mostrador",
   "wn.c.watchToday.body":
     "Adicione o bloco ou a complicação do Liftsmith para ver a indicação de hoje, quanto dura e como está sua prontidão. No Wear OS, Começar no celular abre o treino.",
+  "wn.c.shareStats.title": "Compartilhe qualquer recorde ou máximo",
+  "wn.c.shareStats.body":
+    "Toque no pequeno botão de compartilhar ao lado de um máximo estimado, da sua série mais pesada, de um recorde por repetições ou de um recorde recente para postar um cartão com o logotipo do Liftsmith.",
   "wn.c.watchAlone.title": "Deixe o celular no armário",
   "wn.c.watchAlone.body":
     "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
@@ -1312,6 +1390,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "Velocidade pelo pulso",
   "wn.c.watchSpeed.body":
     "No Labs: seu relógio Wear OS ou Apple Watch mede a velocidade de cada repetição, vibra quando a série desacelerou o bastante para terminar e ajusta sua primeira carga de trabalho pelo aquecimento. Sem câmera.",
+  "wn.c.liftCharts.title": "Gráficos fáceis de ler",
+  "wn.c.liftCharts.body":
+    "Toque ou arraste o gráfico de qualquer exercício para ver o número e a data de cada sessão. Os novos recordes ficam em dourado e há um período com todo o histórico. Os gráficos fazem parte do Pro.",
   "wn.c.watchAdjust.title": "Mude e avalie uma série no relógio",
   "wn.c.watchAdjust.body":
     "Gire a coroa ou toque em − e + para mudar o peso e as repetições no Wear OS, Apple Watch ou Garmin e, depois da última série de um exercício, diga como foi direto do pulso.",
@@ -1338,9 +1419,15 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 alongamentos novos",
   "wn.c.moreStretches.body":
     "Alongamento do sofá, sapo, troca de quadril 90/90, passagem com elástico, alongamento do dorminhoco, retração do queixo e mais, cada um com sua demo em 3D, para quadril, ombros, pescoço, punhos e panturrilhas.",
+  "wn.c.gymWidgets.title": "Widgets de site para academias",
+  "wn.c.gymWidgets.body":
+    "Tem uma academia no Liftsmith? Coloque a grade de aulas, os equipamentos ou um selo Encontre a gente no Liftsmith no seu próprio site com uma linha de código, pela página da academia no app. Eles se atualizam sozinhos.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "웹사이트의 무료 운동 루틴 생성기",
+  "wn.c.workoutGenerator.body":
+    "앱이 없는 친구도 getliftsmith.com/tools/workout-generator에서 써 볼 수 있어요. 기구, 시간, 부위를 고르면 같은 엔진이 운동마다 이유를 담아 운동을 짜 줘요. 생성기 링크는 여기서 루틴으로 열려요.",
   "wn.c.machineTaken.title": "기구 사용 중? 한 번 탭",
   "wn.c.machineTaken.body":
     "Wear OS, Apple Watch, Garmin 워치나 '계획 변경'에서 '기구 사용 중'을 누르면 그 기구가 필요 없는 헬스장 최고의 운동이 무게와 이유와 함께 그 자리를 채웁니다.",
@@ -1477,6 +1564,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "오늘의 운동을 워치 페이스에",
   "wn.c.watchToday.body":
     "Liftsmith 타일이나 컴플리케이션을 추가하면 오늘의 추천, 운동 시간, 컨디션을 볼 수 있어요. Wear OS에서는 휴대폰에서 시작으로 열 수 있어요.",
+  "wn.c.shareStats.title": "최고 기록과 최대 중량 공유",
+  "wn.c.shareStats.body":
+    "추정 최대 중량, 최고 중량 세트, 반복 횟수별 최고 기록, 최근 개인 기록 옆의 작은 공유 버튼을 누르면 Liftsmith 로고가 담긴 카드를 올릴 수 있습니다.",
   "wn.c.watchAlone.title": "휴대폰은 사물함에",
   "wn.c.watchAlone.body":
     "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
@@ -1489,6 +1579,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "손목으로 바 속도",
   "wn.c.watchSpeed.body":
     "Labs에서: Wear OS 워치나 Apple Watch가 각 반복을 들어 올리는 속도를 재고, 세트를 끝내도 될 만큼 느려지면 진동하며, 워밍업으로 첫 본 세트 무게를 맞춥니다. 카메라는 필요 없습니다.",
+  "wn.c.liftCharts.title": "읽기 쉬운 그래프",
+  "wn.c.liftCharts.body":
+    "종목 그래프를 탭하거나 끌면 세션마다 수치와 날짜를 볼 수 있어요. 최고 기록 경신은 금색으로 표시되고 전체 기간도 고를 수 있어요. 그래프는 Pro 기능이에요.",
   "wn.c.watchAdjust.title": "워치에서 세트 변경과 평가",
   "wn.c.watchAdjust.body":
     "Wear OS, Apple Watch, Garmin에서 크라운을 돌리거나 − 와 + 를 눌러 무게와 횟수를 바꾸고, 운동의 마지막 세트 뒤에는 손목에서 바로 어땠는지 답하세요.",
@@ -1515,9 +1608,15 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "새 스트레칭 13가지",
   "wn.c.moreStretches.body":
     "카우치 스트레칭, 개구리, 90/90 고관절 전환, 밴드 패스스루, 슬리퍼 스트레칭, 턱 당기기 등. 모두 3D 시연이 있고 고관절, 어깨, 목, 손목, 종아리를 위한 거예요.",
+  "wn.c.gymWidgets.title": "체육관용 웹사이트 위젯",
+  "wn.c.gymWidgets.body":
+    "Liftsmith에 체육관이 있나요? 앱의 체육관 페이지에서 코드 한 줄로 수업 일정, 장비 또는 'Liftsmith에서 보기' 배지를 내 웹사이트에 넣을 수 있습니다. 내용은 자동으로 최신 상태가 됩니다.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Darmowy generator treningu na stronie",
+  "wn.c.workoutGenerator.body":
+    "Znajomi bez aplikacji mogą wypróbować getliftsmith.com/tools/workout-generator: wybierają sprzęt, minuty i co trenować, a ten sam silnik układa trening z powodem przy każdym ćwiczeniu. Link z generatora otwiera się tutaj jako rutyna.",
   "wn.c.machineTaken.title": "Maszyna zajęta? Jedno dotknięcie",
   "wn.c.machineTaken.body":
     "Dotknij Maszyna zajęta na zegarku Wear OS, Apple Watch lub Garmin albo w Zmień plan, a jej miejsce zajmie najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
@@ -1665,6 +1764,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Dzisiejszy trening na tarczy zegarka",
   "wn.c.watchToday.body":
     "Dodaj kafelek lub komplikację Liftsmith, aby widzieć dzisiejszą propozycję, czas i gotowość. Na Wear OS Zacznij na telefonie otwiera trening.",
+  "wn.c.shareStats.title": "Udostępnij każdy rekord i maks",
+  "wn.c.shareStats.body":
+    "Dotknij małego przycisku udostępniania obok szacowanego maksa, najcięższej serii, rekordu dla liczby powtórzeń albo ostatniego rekordu życiowego, by opublikować kartę z logo Liftsmith.",
   "wn.c.watchAlone.title": "Zostaw telefon w szafce",
   "wn.c.watchAlone.body":
     "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
@@ -1677,6 +1779,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "Prędkość sztangi z nadgarstka",
   "wn.c.watchSpeed.body":
     "W Labs: zegarek z Wear OS lub Apple Watch mierzy, jak szybko podnosisz każde powtórzenie, wibruje, gdy seria zwolniła na tyle, że można ją zakończyć, i dopasowuje pierwszy ciężar roboczy z rozgrzewki. Bez kamery.",
+  "wn.c.liftCharts.title": "Wykresy, które da się odczytać",
+  "wn.c.liftCharts.body":
+    "Dotknij wykresu ćwiczenia lub przeciągnij po nim, aby zobaczyć wynik i datę każdego treningu. Nowe rekordy są zaznaczone na złoto i jest zakres na cały czas. Wykresy są częścią Pro.",
   "wn.c.watchAdjust.title": "Zmień i oceń serię na zegarku",
   "wn.c.watchAdjust.body":
     "Obróć koronkę lub naciśnij − i +, aby zmienić ciężar i powtórzenia na Wear OS, Apple Watch lub Garminie, a po ostatniej serii ćwiczenia powiedz z nadgarstka, jak poszło.",
@@ -1703,9 +1808,15 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 nowych ćwiczeń rozciągających",
   "wn.c.moreStretches.body":
     "Rozciąganie przy kanapie, żabka, przełożenia bioder 90/90, przekładanie gumy, rozciąganie śpiącego, cofanie brody i więcej, każde z demonstracją 3D, na biodra, barki, szyję, nadgarstki i łydki.",
+  "wn.c.gymWidgets.title": "Widżety na stronę dla siłowni",
+  "wn.c.gymWidgets.body":
+    "Masz siłownię w Liftsmith? Umieść grafik zajęć, sprzęt albo odznakę „Znajdź nas w Liftsmith” na swojej stronie jedną linijką kodu, prosto ze strony siłowni w aplikacji. Aktualizują się same.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Web sitesinde ücretsiz antrenman oluşturucu",
+  "wn.c.workoutGenerator.body":
+    "Uygulaması olmayan arkadaşların getliftsmith.com/tools/workout-generator adresini deneyebilir: ekipmanı, dakikaları ve neyi çalıştıracağını seçer, aynı motor her egzersizin nedeniyle antrenmanı yazar. Oluşturucu bağlantısı burada rutin olarak açılır.",
   "wn.c.machineTaken.title": "Makine dolu mu? Tek dokunuş",
   "wn.c.machineTaken.body":
     "Wear OS, Apple Watch ya da Garmin saatinde veya Planı değiştir'de Makine dolu'ya dokun; salonunda ona ihtiyaç duymayan en iyi hareket, ağırlığı ve nedeniyle yerine geçer.",
@@ -1855,6 +1966,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Bugünkü antrenman saat kadranında",
   "wn.c.watchToday.body":
     "Liftsmith kutucuğunu veya komplikasyonunu ekle; bugünkü öneriyi, süresini ve hazırlığını gör. Wear OS'ta Telefonda başlat onu açar.",
+  "wn.c.shareStats.title": "Her rekoru ve maksimumu paylaş",
+  "wn.c.shareStats.body":
+    "Tahmini maksimumun, en ağır setinin, bir tekrar sayısındaki rekorun ya da son kişisel rekorunun yanındaki küçük paylaş düğmesine dokun; Liftsmith logolu bir kart paylaş.",
   "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
   "wn.c.watchAlone.body":
     "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",
@@ -1867,6 +1981,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchSpeed.title": "Bilekten bar hızı",
   "wn.c.watchSpeed.body":
     "Labs'te: Wear OS saatin ya da Apple Watch'un her tekrarı ne kadar hızlı kaldırdığını ölçer, set bitirecek kadar yavaşlayınca titrer ve ilk çalışma ağırlığını ısınmadan ayarlar. Kamera gerekmez.",
+  "wn.c.liftCharts.title": "Okunabilen grafikler",
+  "wn.c.liftCharts.body":
+    "Her antrenmanın değerini ve tarihini görmek için bir hareketin grafiğine dokunun veya sürükleyin. Yeni rekorlar altın renkle işaretlenir ve tüm zamanlar aralığı var. Grafikler Pro'nun parçasıdır.",
   "wn.c.watchAdjust.title": "Saatinde seti değiştir ve değerlendir",
   "wn.c.watchAdjust.body":
     "Wear OS, Apple Watch veya Garmin'de kurmayı çevir ya da − ve + düğmelerine basarak ağırlığı ve tekrarları değiştir; bir hareketin son setinden sonra nasıl geçtiğini bileğinden söyle.",
@@ -1893,4 +2010,7 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.moreStretches.title": "13 yeni esneme",
   "wn.c.moreStretches.body":
     "Kanepe esnetmesi, kurbağa, 90/90 kalça geçişleri, bantla omuz geçişi, uyuyan esnetmesi, çene geri çekme ve daha fazlası; her biri 3D gösterimli, kalça, omuz, boyun, bilek ve baldırlar için.",
+  "wn.c.gymWidgets.title": "Salonlar için web sitesi widget'ları",
+  "wn.c.gymWidgets.body":
+    "Liftsmith'te bir salonunuz mu var? Uygulamadaki salon sayfanızdan tek satır kodla ders programınızı, ekipmanınızı ya da Bizi Liftsmith'te bulun rozetini kendi web sitenize koyun. Kendiliğinden güncel kalırlar.",
 };

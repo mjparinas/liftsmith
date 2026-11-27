@@ -1,3 +1,4 @@
+import { GEN_TR } from "./gen/tr";
 import type { LocalTools } from "./types";
 
 // The calculators in Turkish (sen). Same parts as the English pages (src/app/tools/).
@@ -534,4 +535,5 @@ export const TR_TOOLS: LocalTools = {
       },
     },
   },
+  "workout-generator": GEN_TR,
 };

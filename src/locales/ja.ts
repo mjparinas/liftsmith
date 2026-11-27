@@ -56,6 +56,7 @@ import * as friends from "./text/friends";
 import * as ft from "./text/ft";
 import * as fv from "./text/fv";
 import * as game from "./text/game";
+import * as gen from "./text/gen";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
@@ -176,6 +177,7 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...calc.ja,
   ...card.ja,
   ...callText.ja,
+  ...gen.ja,
   ...category.ja,
   ...cause.ja,
   ...chk.ja,

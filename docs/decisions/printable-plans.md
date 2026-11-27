@@ -30,5 +30,5 @@ Melvin, 2026-11-27 (traffic idea 5: "do them all, put effort into them"): every 
 
 ## Also
 
-- Features page `printable-plans` (Free), blog post `printable-workout-plans`, weekly email `printable-plans` and What's new `printRoutine` (0.32.0).
+- Features page `printable-plans` (Free), blog post `printable-workout-plans`, weekly email `printable-plans` and What's new `printRoutine` (0.36.0).
 - Analytics: `routine_print` when a lifter prints from the app.

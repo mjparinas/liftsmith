@@ -1,3 +1,4 @@
+import { GEN_KO } from "./gen/ko";
 import type { LocalTools } from "./types";
 
 // The calculators in Korean (해요체). Same parts as the English pages (src/app/tools/).
@@ -526,4 +527,5 @@ export const KO_TOOLS: LocalTools = {
       },
     },
   },
+  "workout-generator": GEN_KO,
 };

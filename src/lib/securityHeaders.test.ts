@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
 
-import { CSP, EMBED_HEADERS, NOT_EMBED, SECURITY_HEADERS } from "./securityHeaders";
+import { CSP, EMBED_HEADERS, NOT_EMBED, SECURITY_HEADERS, WIDGET_CSP } from "./securityHeaders";
 
 // The matcher next.config.ts headers go through, so the test checks the very pattern Next will use.
 const { pathToRegexp } = createRequire(import.meta.url)("next/dist/compiled/path-to-regexp") as { pathToRegexp: (p: string) => RegExp };
@@ -28,5 +28,12 @@ describe("security headers", () => {
     const rest = pathToRegexp(NOT_EMBED);
     for (const p of ["/", "/tools/plate-calculator/", "/app/", "/admin/", "/api/sync/"]) expect(rest.test(p)).toBe(true);
     expect(rest.test("/embed/plate-calculator/")).toBe(false);
+  });
+  it("lets any site frame a gym's widgets, and runs nothing on them", () => {
+    expect(WIDGET_CSP).toContain("default-src 'none'");
+    expect(WIDGET_CSP).not.toContain("script-src");
+    expect(WIDGET_CSP).toMatch(/frame-ancestors http: https: capacitor:\/\/localhost 'self'/);
+    expect(WIDGET_CSP).toContain("form-action 'none'");
+    expect(pathToRegexp(NOT_EMBED).test("/embed/gym/0123456789abcdef/schedule/")).toBe(false);
   });
 });

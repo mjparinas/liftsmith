@@ -4,7 +4,8 @@
 // `fill()` (src/lib/siteLang.ts): {unit} kg or lb, {n} a count, {app} the app's name, and the ones named per line.
 
 /** The calculators that have a page in every language. The first three are also the ones other sites can embed;
- * TDEE, macros, Wilks and DOTS joined on 2026-11-15 (the traffic plan's calculator pages). */
+ * TDEE, macros, Wilks and DOTS joined on 2026-11-15 (the traffic plan's calculator pages), the workout generator on
+ * 2026-11-27 (docs/decisions/workout-generator.md). */
 export const LOCAL_TOOL_SLUGS = [
   "plate-calculator",
   "one-rep-max-calculator",
@@ -13,6 +14,7 @@ export const LOCAL_TOOL_SLUGS = [
   "macro-calculator",
   "wilks-calculator",
   "dots-calculator",
+  "workout-generator",
 ] as const;
 export type LocalToolSlug = (typeof LOCAL_TOOL_SLUGS)[number];
 
@@ -189,6 +191,79 @@ export interface DotsUi {
   levels: DotsLevels;
 }
 
+/**
+ * The workout generator (docs/decisions/workout-generator.md). Its chips, its result and the short reason on each
+ * exercise. The reasons are built from the same data the engine used (the muscle, compound or not, the goal's rep
+ * range, the set count, a superset partner), one whole line per reason, joined with " · ".
+ */
+export interface GenUi {
+  // The focus names and the workout's name are the app's own lines (gen.*, fromApp.ts `genWords`), so the routine
+  // the app opens has the same name.
+  equipment: string;
+  kits: { commercial: string; home: string; dumbbells: string; bodyweight: string };
+  /** Opens the list of single pieces of equipment. */
+  custom: string;
+  customHint: string;
+  minutes: string;
+  /** {n} minutes. */
+  minutesValue: string;
+  focus: string;
+  goal: string;
+  goals: { muscle: string; strength: string; general: string };
+  level: string;
+  levels: { new: string; intermediate: string; advanced: string };
+  pairs: string;
+  pairsHint: string;
+  make: string;
+  another: string;
+  working: string;
+  error: string;
+  nothing: string;
+  /** {n} minutes. */
+  about: string;
+  /** {n} minutes, when the workout is shorter than asked. */
+  short: string;
+  order: string;
+  /** {sets} and {reps}. */
+  setsReps: string;
+  /** {sets} and {secs}. */
+  setsSecs: string;
+  /** {time}: "2:00" or "45 s". */
+  rest: string;
+  /** {n} reps in reserve. */
+  tank: string;
+  holdForm: string;
+  /** {n} warm-up sets. */
+  warmups: string;
+  /** {letter} */
+  superset: string;
+  /** Why it's here: {muscle}. */
+  whyFirst: string;
+  whyCompound: string;
+  whyIsolation: string;
+  whyBodyweight: string;
+  whyHold: string;
+  /** Why these reps: {lo}, {hi} and {reps} (seconds for a hold). */
+  repsMuscle: string;
+  repsStrength: string;
+  repsGeneral: string;
+  repsBodyweight: string;
+  repsHold: string;
+  /** Why this many sets: {sets}. */
+  mainSets: string;
+  moreSets: string;
+  /** Why it's in a superset: {other}. */
+  pair: string;
+  share: string;
+  copied: string;
+  start: string;
+  /** {app} */
+  startHint: string;
+  example: string;
+  /** On a phone, jumps down to the workout after a change. */
+  see: string;
+}
+
 export interface ToolUi {
   "plate-calculator": PlateUi;
   "one-rep-max-calculator": OneRmUi;
@@ -197,6 +272,7 @@ export interface ToolUi {
   "macro-calculator": MacroUi;
   "wilks-calculator": WilksUi;
   "dots-calculator": DotsUi;
+  "workout-generator": GenUi;
 }
 
 /** The words of one tool page around its calculator. {app} is the app's name; the warm-up page also has {rest}. */
