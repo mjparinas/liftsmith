@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Crumbs, CtaBanner, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { heroSrc } from "@/lib/articleImages";
 import { BRAND } from "@/lib/brand";
 import { pageMeta } from "@/lib/pageMeta";
 import { articlePath, articlesOf } from "@/lib/seo";
@@ -20,12 +21,20 @@ export default function GuidesIndex() {
       <p className="mt-3 max-w-2xl text-lg text-muted">
         The few ideas that make strength training work, explained in plain words. {BRAND.name} runs all of them for you.
       </p>
-      <LinkGrid items={articlesOf("guide").map((g) => ({ href: articlePath(g), title: g.title, body: g.description, meta: g.tag }))} />
+      <LinkGrid
+        items={articlesOf("guide").map((g) => ({
+          href: articlePath(g),
+          title: g.title,
+          body: g.description,
+          meta: g.tag,
+          image: heroSrc(g),
+        }))}
+      />
       <h2 className="mt-12 text-2xl font-bold tracking-tight">From the blog</h2>
       <LinkGrid
         items={articlesOf("blog")
           .slice(0, 6)
-          .map((g) => ({ href: articlePath(g), title: g.title, meta: g.tag }))}
+          .map((g) => ({ href: articlePath(g), title: g.title, meta: g.tag, image: heroSrc(g) }))}
       />
       <CtaBanner
         cta="guide-index-end"

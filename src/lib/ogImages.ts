@@ -8,6 +8,7 @@ import { COMPETITORS } from "@/content/compare";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { LANDINGS } from "@/content/landings";
 
+import { articleFigures } from "./articleImages";
 import { BRAND } from "./brand";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { equipmentLabel, equipmentSlug, equipmentWithPages, exercisesFor, exercisesWith, MUSCLE_NAME, muscleSlug, TOOL_PAGES } from "./seo";
@@ -108,7 +109,8 @@ export function ogCards(): OgCard[] {
       file: `articles/${a.slug}.jpg`,
       kicker: a.kind === "guide" ? "Guide" : "Blog",
       title: a.title,
-      exercise: articleFigure(a.body),
+      // The post's first lift, else one from its subject (articleImages.ts), so the cards aren't all a back squat.
+      exercise: articleFigures(a)[0] ?? DEFAULT_FIGURE,
     });
   for (const t of BLOG_TOPICS) {
     const first = postsIn(t)[0];

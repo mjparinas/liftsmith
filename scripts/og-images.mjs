@@ -1,5 +1,6 @@
-// Social preview cards (public/og/**/*.jpg, 1200×630) and exercise stills (public/stills/<id>.webp) from the
-// app's own 3D figure. The card list comes from ogCards() in src/lib/ogImages.ts, read from the build-only
+// Social preview cards (public/og/**/*.jpg, 1200×630, plus a WebP of each article's for the top of the post),
+// exercise stills (public/stills/<id>.webp) and the figures inside guides and blog posts (public/articles/fig/) from
+// the app's own 3D figure. The card list comes from ogCards() in src/lib/ogImages.ts, read from the build-only
 // /stills/ page, so a new exercise, article or tool gets its card the next time this runs:
 //   STILLS=1 npm run build:static && PW_CHROMIUM=/opt/pw-browsers/chromium node scripts/og-images.mjs
 // After adding pages, add --missing to draw only the new ones (ogImages.test.ts fails when a page has no card). Run it
@@ -30,7 +31,16 @@ await page.goto(`${server.url}/stills/`);
 await page.waitForFunction(() => window.__still && window.__ogCards, null, { timeout: 30_000 });
 // --missing draws only cards and stills that don't exist yet (after adding pages), so the others stay as they are.
 const missing = process.argv.includes("--missing");
-const cards = (await page.evaluate(() => window.__ogCards)).filter((c) => !missing || !fs.existsSync(path.join(OG, c.file)));
+// An article's card is also its preview at the top of the post, as WebP beside the JPEG (src/lib/articleImages.ts).
+const webpTwin = (file) => (file.startsWith("articles/") ? file.replace(/\.jpg$/, ".webp") : null);
+const cards = (await page.evaluate(() => window.__ogCards)).filter(
+  (c) => !missing || !fs.existsSync(path.join(OG, c.file)) || (webpTwin(c.file) && !fs.existsSync(path.join(OG, webpTwin(c.file)))),
+);
+// The figures inside guides and blog posts: the lift alone on a transparent ground, 640 px.
+const FIGS = "public/articles/fig";
+const articleFigs = (await page.evaluate(() => window.__articleFigures)).filter(
+  (id) => !missing || !fs.existsSync(path.join(FIGS, `${id}.webp`)),
+);
 
 /** Each exercise's figure, drawn once: male and female in turn so both figures appear across the site. */
 const figures = new Map();
@@ -39,7 +49,7 @@ const exerciseIds = cards
   .filter((c) => c.file.startsWith("exercises/"))
   .map((c) => c.exercise)
   .filter((id) => !missing || !fs.existsSync(path.join(STILLS, `${id}.webp`)));
-for (const [i, id] of [...new Set([...exerciseIds, ...ids])].entries()) {
+for (const [i, id] of [...new Set([...exerciseIds, ...ids, ...articleFigs])].entries()) {
   const url = await page.evaluate(([id, body]) => window.__still(id, body, 900), [id, i % 2 ? "female" : "male"]);
   if (!url) throw new Error(`No figure for ${id}`);
   figures.set(id, Buffer.from(url.split(",")[1], "base64"));
@@ -108,13 +118,13 @@ for (const card of cards) {
   const meta = await sharp(figure).metadata();
   const out = path.join(OG, card.file);
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  await sharp(background(card))
-    .composite([
-      { input: logo, left: 72, top: 60 },
-      { input: figure, left: Math.round(910 - meta.width / 2), top: Math.round(H / 2 - meta.height / 2) },
-    ])
-    .jpeg({ quality: 72, mozjpeg: true })
-    .toFile(out);
+  const drawn = sharp(background(card)).composite([
+    { input: logo, left: 72, top: 60 },
+    { input: figure, left: Math.round(910 - meta.width / 2), top: Math.round(H / 2 - meta.height / 2) },
+  ]);
+  const twin = webpTwin(card.file);
+  if (twin) await drawn.clone().webp({ quality: 70 }).toFile(path.join(OG, twin));
+  await drawn.jpeg({ quality: 72, mozjpeg: true }).toFile(out);
   n++;
 }
 
@@ -126,6 +136,16 @@ for (const id of new Set(exerciseIds))
     .webp({ quality: 60, alphaQuality: 60 })
     .toFile(path.join(STILLS, `${id}.webp`));
 
+fs.mkdirSync(FIGS, { recursive: true });
+for (const id of articleFigs)
+  await sharp(await sharp(figures.get(id)).trim().toBuffer())
+    .resize(600, 600, { fit: "inside" })
+    .extend({ top: 20, bottom: 20, left: 20, right: 20, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize(640, 640, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .webp({ quality: 68, alphaQuality: 70 })
+    .toFile(path.join(FIGS, `${id}.webp`));
+
+console.log(`${articleFigs.length} article figures in ${FIGS}`);
 console.log(`${n} cards in ${OG}, ${new Set(exerciseIds).size} stills in ${STILLS}`);
 await browser.close();
 server.close();

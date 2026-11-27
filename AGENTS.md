@@ -23,7 +23,8 @@ node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
 node scripts/e2e-gaps.mjs    # no two cards touch, on every app screen and each kind of site page; no button stretches on desktop
 node scripts/site-screenshots.mjs # real app screenshots for the home page (public/screens/)
 node scripts/program-pdfs.mjs    # ready PDFs of every program's printable page (public/pdf/), after npm run build:static
-STILLS=1 npm run build:static && node scripts/og-images.mjs --missing # preview cards (public/og/) and exercise stills (public/stills/) for new pages
+STILLS=1 npm run build:static && node scripts/og-images.mjs --missing # preview cards (public/og/), exercise stills (public/stills/) and the 3D figures in guides and blog posts (public/articles/fig/) for new pages
+node scripts/article-screens.mjs # real app screenshots for guides and blog posts (public/articles/app/; ONLY=<id> for one; docs/decisions/public-pages-and-seo.md "Pictures")
 STILLS=1 npm run build:static && node scripts/pins.mjs bench-press # a Pinterest pin and 15 s clip in e2e-shots/pins/ (the weekly Pins workflow uploads them; docs/decisions/pinterest.md)
 node scripts/play-capture.mjs && node scripts/play-compose.mjs && node scripts/play-video.mjs # Google Play art (docs/PLAY_LISTING.md)
 node scripts/play-promotions.mjs # Google Play season events: docs/PLAY_PROMOTIONS.md and their images (--doc for the text only)

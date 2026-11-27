@@ -2,8 +2,10 @@
 // list of preview cards. The `.stills.tsx` extension keeps it out of every normal build (next.config.ts adds
 // that extension only when STILLS=1), so it never ships.
 import { StillsHarness } from "@/components/site/StillsHarness";
+import { ARTICLES } from "@/content/articles";
+import { articleFigureIds } from "@/lib/articleImages";
 import { ogCards } from "@/lib/ogImages";
 
 export default function Stills() {
-  return <StillsHarness cards={ogCards()} />;
+  return <StillsHarness cards={ogCards()} figures={articleFigureIds(ARTICLES)} />;
 }
