@@ -513,7 +513,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Cada ejercicio muestra tus series, el total levantado y el máximo estimado.",
       "Mira cómo te comparas con gente entrenada de tu peso, edad y sexo.",
-      "Pro: gráficos de una semana a un año, series semanales por músculo frente al objetivo y tendencias del máximo a una repetición.",
+      "Pro: gráficos de una semana a todo el historial (toca cualquier sesión para ver su número, con los récords marcados), series semanales por músculo frente al objetivo y tendencias del máximo a una repetición.",
       "Los estándares de fuerza de la web salen de personas reales que deciden participar.",
     ],
     dyk: '"Contar mis levantamientos" en Ajustes › Tus datos y privacidad decide si los tuyos ayudan a crear esos estándares.',

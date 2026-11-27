@@ -514,7 +514,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Ogni esercizio mostra le tue serie, il totale sollevato e il massimale stimato.",
       "Guarda come ti confronti con persone allenate del tuo peso, età e sesso.",
-      "Pro: grafici da una settimana a un anno, serie settimanali per muscolo rispetto all'obiettivo e andamento del massimale.",
+      "Pro: grafici da una settimana a tutto lo storico (tocca una sessione per il suo valore, con i record segnati), serie settimanali per muscolo rispetto all'obiettivo e andamento del massimale.",
       "Gli standard di forza del sito arrivano da persone reali che scelgono di contare.",
     ],
     dyk: '"Conta i miei carichi" in Impostazioni › I tuoi dati e la privacy decide se i tuoi aiutano a costruire quegli standard.',

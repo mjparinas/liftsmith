@@ -14,11 +14,23 @@ import type { AppEvent, Exercise, Profile } from "./types";
 
 const DAY = 86_400_000;
 
-/** The chart's time ranges, shortest first. Three months is the default. */
-export const STAT_RANGES = ["1w", "1m", "3m", "6m", "1y"] as const;
+/** The chart's time ranges, shortest first, then all time (Melvin, 2026-11-26). Three months is the default. */
+export const STAT_RANGES = ["1w", "1m", "3m", "6m", "1y", "all"] as const;
 export type StatRange = (typeof STAT_RANGES)[number];
 export const DEFAULT_RANGE: StatRange = "3m";
-export const RANGE_DAYS: Record<StatRange, number> = { "1w": 7, "1m": 30, "3m": 91, "6m": 182, "1y": 365 };
+/** Days each range covers. All time has no limit: it starts at the lifter's first session of the lift (`rangeStart`). */
+export const RANGE_DAYS: Record<StatRange, number> = { "1w": 7, "1m": 30, "3m": 91, "6m": 182, "1y": 365, all: Infinity };
+
+/**
+ * Where a range's x axis starts: `now` minus its days, or for all time the first session of the lift (a week back
+ * when there's none, or the only one is today, so a lone point doesn't sit on the axis's edge).
+ */
+export function rangeStart(sessions: readonly Pick<LiftSession, "at">[], range: StatRange, now: number): number {
+  if (range !== "all") return now - RANGE_DAYS[range] * DAY;
+  let first = Infinity;
+  for (const s of sessions) if (s.at <= now && s.at < first) first = s.at;
+  return Number.isFinite(first) ? Math.min(first, now - 7 * DAY) : now - 7 * DAY;
+}
 
 /**
  * What the chart can show for a lift: the estimated max, each session's volume and its heaviest set for loaded
@@ -79,6 +91,12 @@ export function liftTotals(sessions: readonly LiftSession[], ex: Pick<Exercise, 
 export interface StatPoint {
   at: number;
   value: number;
+  /**
+   * A new best for this metric at the time: higher than every earlier session of the lift, the ones before the
+   * range included. The very first session is never one (there was nothing to beat). Volume is a per-session
+   * number, so its bests are the biggest sessions so far.
+   */
+  best?: boolean;
 }
 
 /**
@@ -87,26 +105,35 @@ export interface StatPoint {
  * only the estimator's last 180 days.
  */
 export function liftSeries(sessions: readonly LiftSession[], metric: StatMetric, range: StatRange, now: number): StatPoint[] {
-  const from = now - RANGE_DAYS[range] * DAY;
+  const from = range === "all" ? -Infinity : now - RANGE_DAYS[range] * DAY;
   const out: StatPoint[] = [];
-  for (const s of sessions) {
-    if (s.at < from || s.at > now) continue;
-    if (metric === "e1rm") {
-      if (s.e1rm > 0) out.push({ at: s.at, value: s.e1rm });
-      continue;
-    }
-    let value = 0;
-    for (const x of s.sets) {
-      if (metric === "volume") value += x.weight > 0 ? setVolume(x) : 0;
-      else if (metric === "top") value = Math.max(value, x.weight);
-      else if (metric === "reps") value = Math.max(value, x.reps);
-      else value = Math.max(value, x.reps);
-    }
-    // Bodyweight lifts with no added load have no volume: show reps instead of a flat zero line.
-    if (metric === "volume" && value === 0) continue;
-    if (value > 0) out.push({ at: s.at, value });
+  // Oldest first over every session up to now, so a best inside the range is judged against the whole history.
+  const ordered = [...sessions].filter((s) => s.at <= now).sort((a, b) => a.at - b.at);
+  let top = 0;
+  let seen = false;
+  for (const s of ordered) {
+    const value = sessionValue(s, metric);
+    if (!(value > 0)) continue;
+    const best = seen && value > top + 1e-9;
+    if (value > top) top = value;
+    seen = true;
+    if (s.at < from) continue;
+    out.push(best ? { at: s.at, value, best } : { at: s.at, value });
   }
-  return out.sort((a, b) => a.at - b.at);
+  return out;
+}
+
+/** One session's number for a metric; 0 when it has none (no load for volume, no estimate for a bodyweight lift). */
+function sessionValue(s: LiftSession, metric: StatMetric): number {
+  if (metric === "e1rm") return s.e1rm;
+  let value = 0;
+  for (const x of s.sets) {
+    // Bodyweight lifts with no added load have no volume: they show reps instead of a flat zero line.
+    if (metric === "volume") value += x.weight > 0 ? setVolume(x) : 0;
+    else if (metric === "top") value = Math.max(value, x.weight);
+    else value = Math.max(value, x.reps);
+  }
+  return value;
 }
 
 /**

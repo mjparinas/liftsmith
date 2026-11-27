@@ -169,6 +169,23 @@ describe("exercise stats", () => {
     await user.click(within(chart).getByRole("button", { name: "Year" }));
     await user.click(within(chart).getByRole("button", { name: "Heaviest set" }));
     expect(within(chart).getByText(/Latest 102\.5 kg/)).toBeInTheDocument();
+    // Every session after the first was heavier, so each is a new best, marked gold with a key under the chart.
+    expect(chart.querySelectorAll("[data-best]")).toHaveLength(9);
+    expect(within(chart).getByText("New best")).toBeInTheDocument();
+
+    // Picking a session: the arrow keys (or a tap or drag) step through them and the line says which one.
+    const plot = within(chart).getByRole("slider", { name: "Heaviest set by session" });
+    expect(plot).toHaveAttribute("aria-valuenow", "10");
+    plot.focus();
+    await user.keyboard("{Home}");
+    expect(plot).toHaveAttribute("aria-valuenow", "1");
+    expect(within(chart).getByTestId("lift-point")).toHaveTextContent(/^80 kg · /);
+    await user.keyboard("{ArrowRight}");
+    expect(within(chart).getByTestId("lift-point")).toHaveTextContent(/^82\.5 kg · .* · new best$/);
+
+    // All time starts at the first session.
+    await user.click(within(chart).getByRole("button", { name: "All time" }));
+    expect(within(chart).getByRole("slider")).toHaveAttribute("aria-valuemax", "10");
 
     const compare = screen.getByTestId("lift-compare");
     expect(compare).toHaveTextContent("Trained men in their 30s who weigh about 80 kg.");

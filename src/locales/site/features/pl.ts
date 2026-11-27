@@ -290,7 +290,8 @@ export const pl: FeaturesText = {
     "exercise-stats": {
       name: "Statystyki każdego ćwiczenia",
       body: "Dotknij dowolnego ćwiczenia w bibliotece, żeby zobaczyć swoje serie, łączny podniesiony ciężar, szacowane maksimum i porównanie z trenującymi osobami o twojej wadze, wieku i płci, według opublikowanych norm siłowych.",
-      proPart: "Wykresy od tygodnia do roku są częścią zaawansowanych statystyk Pro.",
+      proPart:
+        "Zaawansowane statystyki Pro dodają wykresy, od tygodnia po cały czas: dotknij treningu, aby zobaczyć jego wynik, z zaznaczonymi rekordami.",
     },
     "log-past": {
       name: "Zapisz dawny trening",

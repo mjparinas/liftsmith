@@ -392,8 +392,8 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         name: "Stats for every exercise",
         body: "Tap any exercise in the library for your sets, total weight lifted, estimated max and how you compare with trained lifters of your weight, age and sex, from published strength standards.",
         tier: "both",
-        proPart: "Charts from a week to a year are part of Pro's advanced stats.",
-        added: "2026-11-13",
+        proPart: "Pro's advanced stats add the charts, from a week to all time: tap any session for its number, with new bests marked.",
+        added: "2026-11-27",
       },
       {
         id: "log-past",

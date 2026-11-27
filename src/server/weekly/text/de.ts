@@ -514,7 +514,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Jede Übung zeigt deine Sätze, das bewegte Gesamtgewicht und das geschätzte Maximum.",
       "Sieh, wo du im Vergleich zu trainierten Leuten mit deinem Gewicht, Alter und Geschlecht stehst.",
-      "Pro: Diagramme von einer Woche bis zu einem Jahr, Wochensätze pro Muskel im Vergleich zum Ziel und Verläufe der Maximalkraft.",
+      "Pro: Diagramme von einer Woche bis zur gesamten Zeit (tippe auf eine Einheit für ihren Wert, Bestleistungen sind markiert), Wochensätze pro Muskel im Vergleich zum Ziel und Verläufe der Maximalkraft.",
       "Die Kraftstandards auf der Website stammen von echten Sportlern, die sich zum Mitzählen entscheiden.",
     ],
     dyk: "„Meine Werte mitzählen“ unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob deine zu diesen Standards beitragen.",
