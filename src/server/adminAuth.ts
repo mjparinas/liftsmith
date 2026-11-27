@@ -31,6 +31,11 @@ export function supportEmails() {
 }
 export type Role = "admin" | "support";
 export const roleOf = (email: string): Role | null => (adminEmails().has(email) ? "admin" : supportEmails().has(email) ? "support" : null);
+/** `DIGEST_TO`: inboxes that get the admin emails without getting into the panel (Melvin, 2026-11-14: his own Gmail). */
+export const digestOnlyEmails = () => list(process.env.DIGEST_TO);
+/** Shows Settings › Admin panel in the app: staff, and anyone who gets the admin emails (Melvin, 2026-11-27: his app is
+ *  signed in with the Gmail on `DIGEST_TO`). The row only opens /admin/, which still asks for a staff sign-in. */
+export const seesAdminRow = (email: string) => roleOf(email) !== null || digestOnlyEmails().has(email);
 
 const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 const token = () => randomBytes(32).toString("base64url");

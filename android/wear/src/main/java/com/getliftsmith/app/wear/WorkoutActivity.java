@@ -41,12 +41,15 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
                 WatchHub.findPhones(getApplicationContext(), () -> {});
             }
             render();
-            tick.postDelayed(this, 1000);
+            // On the second the countdown changes, not a second from whenever the screen opened (WatchClock).
+            WorkoutState s = WatchHub.state();
+            long now = System.currentTimeMillis();
+            tick.postDelayed(this, WatchClock.nextTick(now, s == null ? 0L : s.anchor(now)));
         }
     };
     private boolean asked = false;
     private TextView set, title, why, big, sub, hr, note, takenTo, weight, reps, askQ;
-    private Button log, add, taken, phone, finish, watchStart;
+    private Button log, add, taken, phone, finish, watchStart, timerStart;
     /** Finish before every set is logged asks for a second tap within FINISH_CONFIRM_MS, so a stray tap ends nothing. */
     private long finishArmed = 0;
     private static final long FINISH_CONFIRM_MS = 3000;
@@ -104,6 +107,11 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         phone = findViewById(R.id.phone);
         finish = findViewById(R.id.finish);
         watchStart = findViewById(R.id.watchStart);
+        timerStart = findViewById(R.id.timerStart);
+        timerStart.setOnClickListener((v) -> {
+            v.performHapticFeedback(HapticFeedbackConstants.CONFIRM);
+            WatchHub.startTimer(this);
+        });
         note = findViewById(R.id.note);
         scroll = findViewById(R.id.scroll);
         adjust = findViewById(R.id.adjust);
@@ -381,6 +389,7 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             adjust.setVisibility(View.GONE);
             askBox.setVisibility(View.GONE);
             finish.setVisibility(View.GONE);
+            timerStart.setVisibility(View.GONE);
             // Today's plan carried from the phone: Start on watch runs it here, phone or no phone.
             org.json.JSONObject carried = WatchHub.carried(this);
             watchStart.setVisibility(carried != null ? View.VISIBLE : View.GONE);
@@ -459,6 +468,11 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             big.setText(clock);
             big.setContentDescription(phase.label + " " + clock);
             sub.setText(phase.label);
+        } else if (s.timeUp(now)) {
+            // The hold ran out: "Time's up" until the phone (or this watch's own run) logs it.
+            big.setText(WorkoutState.clock(0));
+            big.setContentDescription(s.timerOver);
+            sub.setText(s.timerOver);
         } else {
             big.setText(resting ? WorkoutState.clock(s.restLeft(now)) : s.next);
             big.setContentDescription(resting ? getString(R.string.rest_left, WorkoutState.clock(s.restLeft(now))) : s.next);
@@ -469,6 +483,10 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
         hr.setVisibility(bpm > 0 ? View.VISIBLE : View.GONE);
         hr.setText(getString(R.string.bpm, bpm));
         log.setVisibility(allDone ? View.GONE : View.VISIBLE);
+        // Start timer on a timed set, until a timer runs for it (here or on the phone).
+        boolean canTime = !allDone && s.canStartTimer(now);
+        timerStart.setVisibility(canTime ? View.VISIBLE : View.GONE);
+        if (canTime) timerStart.setText(s.ts.label);
         add.setVisibility(resting ? View.VISIBLE : View.GONE);
         why.setVisibility(s.why.isEmpty() ? View.GONE : View.VISIBLE);
         why.setText(s.why);

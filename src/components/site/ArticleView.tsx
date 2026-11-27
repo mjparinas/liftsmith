@@ -1,16 +1,18 @@
 // One guide or blog post: title, a call to action right under the intro, the body with its own calls to
 // action, related exercises, questions, related reading and the big banner at the end.
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 import { CTA_COPY, readMinutes, type Article, type Block } from "@/content/articles";
 import { topicOf, topicPath } from "@/content/blogTopics";
+import { articleImages, heroSrc } from "@/lib/articleImages";
 import { BRAND } from "@/lib/brand";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { ogImage } from "@/lib/ogImages";
 import { articlePath, MUSCLE_NAME } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
+import { ArticleHero, ImageGroup, placeImages } from "./ArticleImages";
 import { Crumbs, CtaBanner, CtaButton, CtaInline, JsonLd, LinkGrid } from "./SiteChrome";
 
 /** [label](/path/) and **bold** inside a line of text. */
@@ -94,6 +96,7 @@ const longDate = (d: string) =>
 
 export function ArticleView({ a, related }: { a: Article; related: Article[] }) {
   const url = `${SITE_URL}${articlePath(a)}`;
+  const pictures = articleImages(a);
   const topic = a.kind === "blog" ? topicOf(a) : undefined;
   const section = a.kind === "guide" ? { href: "/guides/", label: "Guides" } : { href: "/blog/", label: "Blog" };
   const top = CTA_COPY[a.cta];
@@ -107,7 +110,7 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
       dateModified: a.updated ?? a.date,
       mainEntityOfPage: url,
       url,
-      image: `${SITE_URL}${ogImage(articlePath(a))}`,
+      image: [`${SITE_URL}${ogImage(articlePath(a))}`, ...pictures.map((p) => `${SITE_URL}${p.src}`)],
       author: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
       publisher: {
         "@type": "Organization",
@@ -125,6 +128,7 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
     });
   let ctas = 0;
   const [intro, ...rest] = a.body;
+  const placed = placeImages(rest, pictures);
   return (
     <article>
       <JsonLd data={jsonLd} />
@@ -143,6 +147,7 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
         ) : null}{" "}
         · {readMinutes(a)} min read
       </p>
+      <ArticleHero a={a} />
       <div className="max-w-3xl">
         {intro && <BlockView b={intro} a={a} n={0} />}
         {/* Call to action at the top: for readers who already know what they want. */}
@@ -156,7 +161,13 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
         </div>
         {rest.map((b, i) => {
           const n = "cta" in b ? ctas++ : 0;
-          return <BlockView key={i} b={b} a={a} n={n} />;
+          const group = placed.get(i);
+          return (
+            <Fragment key={i}>
+              <BlockView b={b} a={a} n={n} />
+              {group && <ImageGroup images={group} />}
+            </Fragment>
+          );
         })}
         {a.faq?.length ? (
           <section className="mt-10">
@@ -179,7 +190,9 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
       {related.length > 0 && (
         <section className="mt-12">
           <h2 className="text-2xl font-bold tracking-tight">Keep reading</h2>
-          <LinkGrid items={related.map((r) => ({ href: articlePath(r), title: r.title, body: r.description, meta: r.tag }))} />
+          <LinkGrid
+            items={related.map((r) => ({ href: articlePath(r), title: r.title, body: r.description, meta: r.tag, image: heroSrc(r) }))}
+          />
         </section>
       )}
     </article>

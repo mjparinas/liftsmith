@@ -89,7 +89,7 @@ export function IntervalTimer() {
           label={mode === "emom" ? "Every (seconds)" : "Work (seconds)"}
           value={plan.work}
           onChange={(n) => set({ work: n })}
-          step={5}
+          step={1}
           min={5}
           max={600}
         />
@@ -100,7 +100,7 @@ export function IntervalTimer() {
             label="Rest (seconds)"
             value={plan.rest}
             onChange={(n) => set({ rest: n })}
-            step={5}
+            step={1}
             min={0}
             max={600}
           />

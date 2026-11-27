@@ -22,6 +22,11 @@ final class WatchModel: NSObject, ObservableObject {
     @Published private(set) var carryJson: String? = UserDefaults.standard.string(forKey: WatchModel.carryKey)
     /// Phone-free workouts finished here that haven't reached the phone yet.
     @Published private(set) var waiting = 0
+    /// Start timer tapped here on the phone's set `startedKey` at `startedAt` (ms): counted here at once, and the phone
+    /// starts the same timer from that moment (docs/decisions/set-timer.md "Started from the watch").
+    @Published private var startedKey = ""
+    @Published private var startedAt: Double = 0
+    private var timerLog: Timer?
 
     private static let runKey = "liftsmith.watchRun"
     private static let carryKey = "liftsmith.watchCarry"
@@ -37,13 +42,20 @@ final class WatchModel: NSObject, ObservableObject {
     /// Seconds before rest ends for the heads-up tap; the same as REST_WARN_S in the phone's src/lib/training.ts.
     private static let restWarn: TimeInterval = 10
     private var timerTaps: [Timer] = []
+    /// A timer phase this long or longer gets a nudge halfway (the same as Wear OS's HALF_FROM_MS).
+    private static let halfFrom: TimeInterval = 20
     private let motion = MotionStream()
+    /// How far this watch's clock is from the phone's, learnt from each state the phone sends.
+    private var clock = WatchClock()
 
     func start() {
         guard WCSession.isSupported() else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
-        if run != nil { beginWorkout() }
+        if run != nil {
+            logRanOut()
+            beginWorkout()
+        }
     }
 
     /// The workout to show: the one running here with the phone away first, then the phone's, unless the phone forgot
@@ -51,7 +63,7 @@ final class WatchModel: NSObject, ObservableObject {
     var current: WatchState? {
         if let r = run { return WatchState.parse(r.state(now: Self.ms())) }
         guard let s = state, !s.stale(at: Date()) else { return nil }
-        return s
+        return s.withStarted(startedKey, startedAt)
     }
 
     /// Today's carried plan, when nothing runs and the watch could start it on its own.
@@ -132,6 +144,7 @@ final class WatchModel: NSObject, ObservableObject {
         case "adjust": r.adjust(kg: kg, reps: reps)
         case "add30": r.add30(now: now)
         case "rate": r.rate((f["v"] as? NSNumber)?.intValue ?? 9)
+        case "timer": r.startTimer(now: now)
         default: return
         }
         run = r
@@ -148,7 +161,10 @@ final class WatchModel: NSObject, ObservableObject {
     }
 
     fileprivate func apply(_ json: String?) {
-        let next = WatchState.parse(json)
+        // The phone's times onto this watch's clock, so both count down to the same moment (WatchClock).
+        let parsed = WatchState.parse(json)
+        if let p = parsed { clock.heard(sentAt: p.at, now: Self.ms()) }
+        let next = parsed?.shifted(by: clock.offset)
         guard next != state else { return }
         // A run here owns the screen and the workout session; the phone's own workout waits until it's finished.
         if run != nil {
@@ -161,6 +177,27 @@ final class WatchModel: NSObject, ObservableObject {
         scheduleRestTap()
         if next == nil { endWorkout() } else { beginWorkout() }
         motion.set(current?.streamMotion(at: Date()) == true)
+    }
+
+    /// A hold timed here with the phone away logs itself when its countdown runs out, as on the phone.
+    private func logRanOut() {
+        guard var r = run, let end = r.timerEnd, Self.ms() >= end else { return }
+        r.log(now: end, kg: nil, reps: nil)
+        run = r
+        saveRun()
+        scheduleRestTap()
+    }
+
+    /// Start timer on a timed hold, carry or cardio set: counted here at once on the watch's own clock (with taps on
+    /// the wrist), and the phone starts the same timer from this moment (timerRun.ts startFromWatch).
+    func startTimer() {
+        guard let s = current, s.canStartTimer(at: Date()), let ts = s.ts else { return }
+        WKInterfaceDevice.current().play(.click)
+        if run != nil { return local("timer", [:]) }
+        startedKey = ts.key
+        startedAt = Self.ms()
+        deliver(["action": "timer", "key": ts.key])
+        scheduleRestTap()
     }
 
     // MARK: Taps, sent to the phone
@@ -201,15 +238,31 @@ final class WatchModel: NSObject, ObservableObject {
         warnTap?.invalidate()
         warnTap = nil
         timerTaps.forEach { $0.invalidate() }
-        // The set timer: a tap on the wrist as each phase ends (go, switch sides, time's up).
+        timerTaps = []
+        timerLog?.invalidate()
+        timerLog = nil
+        // The set timer: a tap as each phase ends (go, switch sides, time's up), a light tick at 3, 2 and 1 seconds
+        // left, and a nudge halfway through a phase of 20 seconds or more, so the wrist can stay down.
         if let s = current, s.vibrate, !s.resting(at: Date()) {
-            timerTaps = s.timer.compactMap(\.end).filter { $0 > Date() }.map { end in
-                Timer.scheduledTimer(withTimeInterval: end.timeIntervalSinceNow, repeats: false) { _ in
-                    WKInterfaceDevice.current().play(.notification)
-                }
+            let now = Date()
+            func at(_ d: Date, _ kind: WKHapticType) {
+                guard d > now else { return }
+                timerTaps.append(Timer.scheduledTimer(withTimeInterval: d.timeIntervalSince(now), repeats: false) { _ in
+                    WKInterfaceDevice.current().play(kind)
+                })
             }
-        } else {
-            timerTaps = []
+            for p in s.phases {
+                guard let end = p.end else { continue }
+                at(end, .notification)
+                for k in 1...3 where end.addingTimeInterval(-Double(k)) > p.start { at(end.addingTimeInterval(-Double(k)), .click) }
+                if end.timeIntervalSince(p.start) >= Self.halfFrom { at(p.start.addingTimeInterval(end.timeIntervalSince(p.start) / 2), .directionUp) }
+            }
+        }
+        // With the phone away, a hold that runs out logs itself.
+        if let end = run?.timerEnd {
+            timerLog = Timer.scheduledTimer(withTimeInterval: max(0, end / 1000 - Date().timeIntervalSince1970), repeats: false) { _ in
+                Task { @MainActor in WatchModel.shared.logRanOut() }
+            }
         }
         guard let s = current, s.vibrate, let end = s.restEnd, end > Date() else { return }
         restTap = Timer.scheduledTimer(withTimeInterval: end.timeIntervalSinceNow, repeats: false) { _ in

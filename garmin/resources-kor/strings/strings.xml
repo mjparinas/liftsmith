@@ -15,4 +15,5 @@
     <string id="OnWatch">휴대폰 없이 · BACK: 완료</string>
     <string id="FinishAsk">완료하고 휴대폰용으로 저장할까요?</string>
     <string id="SavedForPhone">워치에 저장했어요. 휴대폰이 가까이 오면 보내져요.</string>
+    <string id="HintTimer">START: $1$</string>
 </strings>

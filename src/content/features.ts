@@ -1120,6 +1120,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-26",
       },
       {
+        id: "watch-timer",
+        name: "Hold timers on the watch",
+        body: "On a plank, wall sit or dead hang, Start timer on your wrist counts the hold with taps at 3, 2, 1 and halfway, and your phone starts the same timer. Stop early and the seconds you held are logged.",
+        tier: "free",
+        note: "Wear OS, Apple Watch and Garmin (START), phone-free workouts too.",
+        added: "2026-11-27",
+      },
+      {
         id: "widgets",
         name: "Home-screen widgets",
         body: "Three widgets: Today (the day's call, your weekly goal, a coach's note and Start or Log set), This week (days trained, your streak and what keeps it going) and Recovery (which muscles are ready to train and when the rest will be).",

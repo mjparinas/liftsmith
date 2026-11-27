@@ -26,11 +26,17 @@ class LiftsmithApp extends Application.AppBase {
     //! service load this class without GarminRun.
     var run = null;
     private var _timer as Timer.Timer?;
+    //! The second the last tick ran in, so a quarter-second tick does its work once a second.
+    private var _tickSec as Number = 0;
     private var _wasResting as Boolean = false;
     //! Seconds of rest left at the last tick, for the heads-up buzz at 10 (REST_WARN_S in the phone's training.ts).
     private var _lastLeft as Number = 0;
     //! The set timer phase last seen (its label), to buzz when it moves on; null with no timer.
     private var _timerPhase as String? = null;
+    //! Seconds left in that phase at the last tick, for the ticks at 3, 2 and 1 and the nudge halfway.
+    private var _phaseLeft as Number = -1;
+    //! A timer phase this long or longer gets a nudge halfway (the same as Wear OS's HALF_FROM_MS).
+    const HALF_FROM_SEC = 20;
     private var _hrSentAt as Number = 0;
     private var _running as Boolean = false;
     //! Waits a moment after the last UP or DOWN before the new weight and reps go to the phone, so a run of presses
@@ -56,7 +62,9 @@ class LiftsmithApp extends Application.AppBase {
         Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
         Sensor.enableSensorEvents(method(:onSensor));
         var timer = new Timer.Timer();
-        timer.start(method(:onTick), 1000, true);
+        // Four times a second, so the countdown changes within a quarter second of the watch's clock (and the
+        // phone's) turning over, not up to a second later; the work below runs once per second.
+        timer.start(method(:onTick), 250, true);
         _timer = timer;
         // A phone-free run left open when the app closed carries on (or ends, if it was forgotten on the wrist).
         var saved = Application.Storage.getValue(CarryStore.RUN);
@@ -164,7 +172,18 @@ class LiftsmithApp extends Application.AppBase {
 
     //! Once a second: redraw the countdown, and buzz when rest ends if the lifter's rest-over alert vibrates.
     function onTick() as Void {
+        var sec = Time.now().value();
+        if (sec == _tickSec) {
+            return;
+        }
+        _tickSec = sec;
         if (run != null) {
+            // A hold timed here with the phone away logs itself when its countdown runs out, as on the phone.
+            var r = run as GarminRun;
+            if (r.timerRanOut(Time.now().value())) {
+                r.log(r.timerEnd(), -1.0, 0);
+                saveRun();
+            }
             showRun();
         }
         var resting = workout.resting();
@@ -187,6 +206,24 @@ class LiftsmithApp extends Application.AppBase {
             buzz(250);
         }
         _timerPhase = phase == null && workout.timer.size() == 0 ? null : label;
+        // A light tick at 3, 2 and 1 seconds left, and a nudge halfway through a long phase, so the wrist can stay down.
+        if (phase != null && ((phase as Array)[1] as Number) >= 0) {
+            var p = phase as Array;
+            var pl = workout.phaseSeconds(p);
+            var len = (p[1] as Number) - (p[0] as Number);
+            if (pl != _phaseLeft && workout.active() && workout.vibrate) {
+                if (pl >= 1 && pl <= 3) {
+                    buzz(30);
+                } else if (len >= HALF_FROM_SEC && pl == len - len / 2) {
+                    if (Attention has :vibrate) {
+                        Attention.vibrate([new Attention.VibeProfile(60, 60), new Attention.VibeProfile(0, 100), new Attention.VibeProfile(60, 60)]);
+                    }
+                }
+            }
+            _phaseLeft = pl;
+        } else {
+            _phaseLeft = -1;
+        }
         WatchUi.requestUpdate();
     }
 
@@ -254,11 +291,30 @@ class LiftsmithApp extends Application.AppBase {
             r.add30(now);
         } else if ("rate".equals(a) && msg.get("v") instanceof Number) {
             r.rate(msg.get("v") as Number);
+        } else if ("timer".equals(a)) {
+            r.startTimer(now);
         } else {
             return;
         }
         saveRun();
         showRun();
+    }
+
+    //! START on a timed hold, carry or cardio set: the timer counts here at once on the watch's own clock (with buzzes),
+    //! and the phone starts the same timer from this moment (timerRun.ts startFromWatch). On a run here it's kept here.
+    function startTimer() as Void {
+        if (!workout.canStartTimer()) {
+            return;
+        }
+        var key = workout.tsKey;
+        if (run == null) {
+            workout.startTimer(Time.now().value());
+        }
+        send({ "a" => "timer", "key" => key });
+        var phase = workout.phase();
+        _timerPhase = phase == null ? null : (phase as Array)[2] as String;
+        buzz(60);
+        WatchUi.requestUpdate();
     }
 
     //! Today's carried plan, when nothing runs and the watch could start it on its own.

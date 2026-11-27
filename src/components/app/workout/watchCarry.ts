@@ -7,12 +7,13 @@ import { dayKey } from "@/lib/random";
 import { CALL_TEXT, type Readiness } from "@/lib/readiness";
 import { perSide } from "@/lib/sides";
 import { afterLog, warmingUp, type Active } from "@/lib/store/workout";
+import { startLabel } from "@/lib/timerRun";
 import { restAlertOf, restWarnOn } from "@/lib/training";
 import type { AppEvent, Gym, Profile } from "@/lib/types";
 import { carryStart, type Carry, type CarryItem, type CarryRecord, type CarryStep } from "@/lib/watchWorkout";
 import { callWhy } from "@/lib/why";
 
-import { loadText } from "../format";
+import { clock, loadText } from "../format";
 import { sessionFields } from "./sessionAhead";
 import { ladder } from "./watchAdjust";
 
@@ -37,6 +38,16 @@ export function carryId(day: string, body: string): string {
   let h = 2166136261;
   for (let k = 0; k < body.length; k++) h = Math.imul(h ^ body.charCodeAt(k), 16777619);
   return `c${day.replaceAll("-", "")}${(h >>> 0).toString(36)}`;
+}
+
+/** A timed step's timer (watch-apps.md "Phone-free workouts"): its sides and the Start timer button's words. */
+function timedStep(secs: number, sides: 1 | 2): Pick<CarryStep, "m" | "tt"> {
+  return { m: sides, tt: startLabel({ target: secs, sides, up: false }, clock) };
+}
+
+/** The set timer's words for a phone-free hold, as the workout screen says them. */
+function timerWords(): NonNullable<Carry["tl"]> {
+  return [t("timer.getSet"), t("timer.left"), t("timer.side1"), t("timer.switch"), t("timer.side2"), t("timer.over")];
 }
 
 export interface CarryInput {
@@ -114,7 +125,7 @@ export function buildCarry({ plan, profile, gym, readiness, now }: CarryInput): 
       r: Math.max(1, Math.round(cur.reps)),
       s: done || !r.next.restUntil ? 0 : r.next.restTotal,
       ...(r.next.askFeedback ? { f: 1 as const } : {}),
-      ...(TIMED.has(ex.id) ? {} : { a: 1 as const }),
+      ...(TIMED.has(ex.id) ? timedStep(cur.reps, perSide(ex.id) ? 2 : 1) : { a: 1 as const }),
       ...(keeps ? { c: 1 as const } : {}),
     });
     evs = [...evs, ...r.evs];
@@ -148,6 +159,7 @@ export function buildCarry({ plan, profile, gym, readiness, now }: CarryInput): 
     o: [t("workout.tooEasy"), t("workout.aboutRight"), t("workout.tooHard")],
     done: t("workout.notify.allDone"),
     fin: t("wcarry.finishToSave"),
+    ...(steps.some((x) => x.m) ? { tl: timerWords() } : {}),
     ex,
     st: steps,
   };

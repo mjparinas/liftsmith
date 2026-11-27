@@ -11,11 +11,13 @@ import org.json.JSONObject;
 /**
  * What goes to and comes from the Garmin watch app (garmin/source). Plain data, so it's tested without a watch.
  * The phone sends short keys because Connect IQ messages are small and slow: "t" title, "s" set label, "n" the set,
- * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree), "h" heart rate from a
+ * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree; "re", "ke" and "z" are
+ * the same moments on the phone's clock for a watch whose clock agrees), "h" heart rate from a
  * Bluetooth monitor, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its
  * end or -1 for a count-up, label] and "ki" which timer that is, plus the set's weight ladder and "How did it feel?" (below).
  * "x" is what Machine taken swaps to (none: Machine taken is off) and "y" why the exercise is there after one.
- * The watch sends {"a": "log" | "add30" | "taken"}, {"a": "log" | "adjust", "key", "kg", "reps"}, {"a": "rate", "ex", "v"} or {"hr": bpm}.
+ * The watch sends {"a": "log" | "add30" | "taken"}, {"a": "log" | "adjust", "key", "kg", "reps"}, {"a": "rate", "ex", "v"},
+ * {"a": "timer", "key"} (Start timer on a timed set) or {"hr": bpm}.
  * iOS counterpart: GarminLink.swift (GarminMessages).
  */
 final class GarminMessages {
@@ -34,6 +36,11 @@ final class GarminMessages {
         m.put("p", s.optString("plates", ""));
         long restUntil = s.isNull("restUntil") ? 0L : s.optLong("restUntil", 0L);
         m.put("r", restUntil > now ? (int) ((restUntil - now + 999) / 1000) : 0);
+        // The same moments on the phone's clock, in whole seconds since 1970, plus when this was sent ("z"): a watch
+        // whose clock agrees with the phone's counts to these, so the trip through Garmin Connect adds no delay
+        // (watch-apps.md "Same second as the phone"). "r" and "k" stay for a watch whose clock doesn't.
+        m.put("z", (int) Math.round(now / 1000.0));
+        m.put("re", restUntil > now ? (int) Math.round(restUntil / 1000.0) : 0);
         m.put("h", s.optInt("hr", 0));
         m.put("v", s.optBoolean("vibrate", true));
         m.put("w", s.optBoolean("warn", false));
@@ -42,6 +49,7 @@ final class GarminMessages {
         m.put("y", s.optString("why", ""));
         // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
         List<Object> k = new ArrayList<>();
+        List<Object> ke = new ArrayList<>();
         JSONArray timer = restUntil > now ? null : s.optJSONArray("timer");
         long first = 0L;
         for (int i = 0; timer != null && i < timer.length() && i < 8; i++) {
@@ -53,11 +61,14 @@ final class GarminMessages {
             if (first == 0L) first = from;
             k.add(Arrays.asList(
                 (int) Math.floorDiv(from - now, 1000L),
-                to > 0 ? (int) ((to - now + 999) / 1000) : -1,
+                // A phase already over says 0, never a negative number, which the watch would read as a count-up.
+                to > 0 ? (int) Math.max(0L, (to - now + 999) / 1000) : -1,
                 p.optString("label", "")
             ));
+            ke.add(Arrays.asList((int) Math.round(from / 1000.0), to > 0 ? (int) Math.round(to / 1000.0) : -1, p.optString("label", "")));
         }
         m.put("k", k);
+        m.put("ke", ke);
         m.put("ki", first > 0 ? String.valueOf(first) : "");
         // Adjust and rate a set (watchAdjust.ts): "ay" the set's key, "ak" the weight ladder in kg, "aw" its words,
         // "ai" where the set's own weight is, "ar" the reps and "ars" the word after them; "qe" the exercise asked
@@ -70,6 +81,18 @@ final class GarminMessages {
             m.put("ai", adj.optInt("i", 0));
             m.put("ar", adj.optInt("reps", 0));
             m.put("ars", adj.optString("rs", ""));
+        }
+        // Start timer on the watch (sessionNotify.ts TimerOffer): "tk" the set's key, "tn" the seconds (each side), "td"
+        // 2 for each side, "tu" a count-up, "tl" the button's words, "tb" the phase labels and "to" what time's up says.
+        JSONObject ts = s.optJSONObject("ts");
+        if (ts != null && restUntil <= now && !ts.optString("key", "").isEmpty()) {
+            m.put("tk", ts.optString("key", ""));
+            m.put("tn", Math.max(1, ts.optInt("s", 1)));
+            m.put("td", ts.optInt("d", 1) == 2 ? 2 : 1);
+            m.put("tu", ts.optInt("u", 0) == 1);
+            m.put("tl", ts.optString("l", ""));
+            m.put("tb", strings(ts.optJSONArray("lb")));
+            m.put("to", ts.optString("o", ""));
         }
         JSONObject ask = s.optJSONObject("ask");
         if (ask != null) {
@@ -109,8 +132,9 @@ final class GarminMessages {
      * Today's carried plan (src/lib/watchWorkout.ts Carry) for a workout on the watch with the phone away, under "wc"
      * so an older watch app never takes it for a workout, with lists instead of named fields to stay small:
      * {"wc": {"id", "d" day, "t" title, "y" why, "v" vibrate, "w" heads-up, "o" answers, "dn" all logged, "fn" finish
-     * line, "ex": [[name, rest title, question, [kg], [words], reps word]], "st": [[exercise, label, set, ladder place,
-     * reps, rest, ask, adjustable, keeps the last set's weight and reps]]}}. An empty map under "wc" takes it off the watch.
+     * line, "tl" the set timer's words, "ex": [[name, rest title, question, [kg], [words], reps word]], "st": [[exercise,
+     * label, set, ladder place, reps, rest, ask, adjustable, keeps the last set's weight and reps, timed (0, or 1 or 2
+     * sides), Start timer's words]]}}. An empty map under "wc" takes it off the watch.
      */
     static Map<String, Object> carry(JSONObject c) {
         Map<String, Object> w = new HashMap<>();
@@ -124,6 +148,7 @@ final class GarminMessages {
             w.put("o", strings(c.optJSONArray("o")));
             w.put("dn", c.optString("done", ""));
             w.put("fn", c.optString("fin", ""));
+            w.put("tl", strings(c.optJSONArray("tl")));
             List<Object> ex = new ArrayList<>();
             JSONArray items = c.optJSONArray("ex");
             for (int i = 0; items != null && i < items.length() && i < 24; i++) {
@@ -153,7 +178,9 @@ final class GarminMessages {
                     x.optInt("s", 0),
                     x.optInt("f", 0) == 1,
                     x.optInt("a", 0) == 1,
-                    x.optInt("c", 0) == 1
+                    x.optInt("c", 0) == 1,
+                    x.optInt("m", 0) == 2 ? 2 : x.optInt("m", 0) == 1 ? 1 : 0,
+                    x.optString("tt", "")
                 ));
             }
             w.put("st", st);
@@ -166,7 +193,7 @@ final class GarminMessages {
     /**
      * A workout the Garmin watch ran with the phone away, as the web app reads it (src/lib/watchWorkout.ts
      * WatchResult), or null. The watch sends {"wd": {"id", "c", "s" start, "e" end, "sets": [[step, at, kg, reps,
-     * from]], "rates": [[step, rating]], "hr": [avg, max, min]}} with times in seconds, because Connect IQ numbers are
+     * from, and a hold's second side when it was stopped short there]], "rates": [[step, rating]], "hr": [avg, max, min]}} with times in seconds, because Connect IQ numbers are
      * 32-bit; they become milliseconds here.
      */
     static JSONObject result(List<Object> message) {
@@ -186,7 +213,9 @@ final class GarminMessages {
             for (Object x : list(r.get("sets"))) {
                 List<?> a = list(x);
                 if (a.size() < 5) return null;
-                sets.put(new JSONArray(Arrays.asList(number(a.get(0)), seconds(a.get(1)), number(a.get(2)), number(a.get(3)), seconds(a.get(4)))));
+                List<Object> set = new ArrayList<>(Arrays.asList(number(a.get(0)), seconds(a.get(1)), number(a.get(2)), number(a.get(3)), seconds(a.get(4))));
+                if (a.size() >= 6 && a.get(5) instanceof Number) set.add(number(a.get(5)));
+                sets.put(new JSONArray(set));
             }
             out.put("sets", sets);
             JSONArray rates = new JSONArray();
@@ -241,7 +270,7 @@ final class GarminMessages {
      */
     static boolean worthSending(Map<String, Object> last, Map<String, Object> next, long sinceLastMs) {
         if (last == null) return true;
-        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki", "x", "y", "ay", "ai", "ar", "qe" }) {
+        for (String k : new String[] { "t", "s", "n", "p", "v", "w", "ki", "x", "y", "ay", "ai", "ar", "qe", "tk" }) {
             Object a = last.get(k);
             if (a == null ? next.get(k) != null : !a.equals(next.get(k))) return true;
         }
@@ -253,7 +282,7 @@ final class GarminMessages {
         return !last.get("h").equals(next.get("h")) && sinceLastMs >= HR_ONLY_MS;
     }
 
-    /** "log", "add30" or "taken" from the watch, or null. */
+    /** "log", "add30" or "taken" from the watch, or null ("timer" carries the set's key, so it comes through tap). */
     static String action(List<Object> message) {
         Object a = field(message, "a");
         return a instanceof String ? WatchMessages.action((String) a) : null;

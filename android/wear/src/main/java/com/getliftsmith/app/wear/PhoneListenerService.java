@@ -38,7 +38,7 @@ public class PhoneListenerService extends WearableListenerService {
             if (e.getType() == DataEvent.TYPE_DELETED) {
                 WatchHub.set(this, null);
             } else {
-                WatchHub.set(this, WorkoutState.parse(DataMapItem.fromDataItem(e.getDataItem()).getDataMap().getString("json")));
+                WatchHub.set(this, WatchHub.fromPhone(DataMapItem.fromDataItem(e.getDataItem()).getDataMap().getString("json")));
             }
         }
     }

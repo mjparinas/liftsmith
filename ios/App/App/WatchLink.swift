@@ -196,9 +196,10 @@ enum WatchMessages {
         return a
     }
 
-    /// Log set and +30 s, plus adjust and rate from the watches (docs/decisions/watch-apps.md "Adjust and rate a set").
+    /// Log set and +30 s, plus adjust and rate from the watches (docs/decisions/watch-apps.md "Adjust and rate a set")
+    /// and timer, their Start timer on a timed set (set-timer.md "Started from the watch").
     static func tapAction(_ value: Any?) -> String? {
-        guard let a = value as? String, a == "log" || a == "add30" || a == "adjust" || a == "rate" else { return nil }
+        guard let a = value as? String, a == "log" || a == "add30" || a == "adjust" || a == "rate" || a == "timer" else { return nil }
         return a
     }
 
@@ -213,6 +214,8 @@ enum WatchMessages {
         if let v = (m["v"] as? NSNumber)?.intValue, abs(v) <= 1 { d["v"] = v }
         if action == "rate", d["ex"] == nil || d["v"] == nil { return nil }
         if action == "adjust", d["key"] == nil || d["reps"] == nil { return nil }
+        // Start timer names the set it's for, so a tap that arrives late can't start the next set's timer.
+        if action == "timer", d["key"] == nil { return nil }
         return d
     }
 

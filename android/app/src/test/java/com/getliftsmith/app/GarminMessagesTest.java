@@ -115,6 +115,20 @@ public class GarminMessagesTest {
         assertTrue(GarminMessages.worthSending(GarminMessages.state(lifting(), NOW), m, 500));
         assertFalse(GarminMessages.worthSending(m, GarminMessages.state(plank, NOW + 1000), 1000));
         assertEquals(java.util.Collections.emptyList(), GarminMessages.state(lifting(), NOW).get("k"));
+        // The same phases on the phone's clock, for a watch whose clock agrees (watch-apps.md "Same second as the phone").
+        long s = NOW / 1000;
+        assertEquals(
+            java.util.Arrays.asList(java.util.Arrays.asList((int) s - 2, (int) s + 3, "Get set"), java.util.Arrays.asList((int) s + 3, (int) s + 33, "Time left")),
+            m.get("ke")
+        );
+    }
+
+    @Test
+    public void restEndAndSentAtGoOnThePhonesClock() throws Exception {
+        Map<String, Object> m = GarminMessages.state(lifting().put("restUntil", NOW + 84_600), NOW + 200);
+        assertEquals((int) (NOW / 1000), m.get("z"));
+        assertEquals((int) (NOW / 1000) + 85, m.get("re"));
+        assertEquals(0, GarminMessages.state(lifting(), NOW).get("re"));
     }
 
     @Test
@@ -172,14 +186,83 @@ public class GarminMessagesTest {
         List<?> st = (List<?>) wc.get("st");
         assertEquals(2, st.size());
         List<?> second = (List<?>) st.get(1);
-        assertEquals(9, second.size());
+        assertEquals(11, second.size());
         assertEquals(true, second.get(6));
         assertEquals(true, second.get(8));
         assertEquals(false, ((List<?>) st.get(0)).get(8));
+        // Not a timed hold: no timer and no words for it.
+        assertEquals(0, second.get(9));
+        assertEquals("", second.get(10));
         List<?> ex = (List<?>) ((List<?>) wc.get("ex")).get(0);
         assertEquals("Bench press", ex.get(0));
         assertTrue(((Map<?, ?>) GarminMessages.carry(null).get("wc")).isEmpty());
         assertNull(WatchMessages.carry("{\"v\":2}"));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void aTimedHoldGoesWithItsSidesAndStartTimerWords() throws Exception {
+        String plank = CARRY.replace("\"st\":[{", "\"tl\":[\"Get set\",\"Time left\",\"First side\",\"Switch sides\",\"Second side\",\"Time’s up\"],\"st\":[{\"m\":2,\"tt\":\"Start timer · 0:20 a side\",");
+        Map<String, Object> wc = (Map<String, Object>) GarminMessages.carry(new JSONObject(WatchMessages.carry(plank))).get("wc");
+        List<?> first = (List<?>) ((List<?>) wc.get("st")).get(0);
+        assertEquals(2, first.get(9));
+        assertEquals("Start timer · 0:20 a side", first.get(10));
+        assertEquals(Arrays.asList("Get set", "Time left", "First side", "Switch sides", "Second side", "Time’s up"), wc.get("tl"));
+    }
+
+    @Test
+    public void startTimerGoesToTheWatchOnlyWhileLifting() throws Exception {
+        JSONObject ts = new JSONObject()
+            .put("key", "s1:0:0:")
+            .put("s", 40)
+            .put("d", 1)
+            .put("l", "Start timer · 0:40")
+            .put("lb", new org.json.JSONArray("[\"Get set\",\"Time left\",\"Switch sides\",\"Second side\"]"))
+            .put("o", "Time’s up");
+        Map<String, Object> m = GarminMessages.state(lifting().put("ts", ts), NOW);
+        assertEquals("s1:0:0:", m.get("tk"));
+        assertEquals(40, m.get("tn"));
+        assertEquals(1, m.get("td"));
+        assertEquals(false, m.get("tu"));
+        assertEquals("Start timer · 0:40", m.get("tl"));
+        assertEquals(Arrays.asList("Get set", "Time left", "Switch sides", "Second side"), m.get("tb"));
+        assertEquals("Time’s up", m.get("to"));
+        // A new offer is worth a message.
+        assertTrue(GarminMessages.worthSending(GarminMessages.state(lifting(), NOW), m, 500));
+        assertNull(GarminMessages.state(lifting().put("ts", ts).put("restUntil", NOW + 60_000), NOW).get("tk"));
+        // The tap names the set it's for.
+        WatchMessages.Tap t = WatchMessages.tap("{\"a\":\"timer\",\"key\":\"s1:0:0:\"}");
+        assertEquals("timer", t.action);
+        assertEquals("{\"key\":\"s1:0:0:\"}", t.data);
+        assertNull(WatchMessages.tap("{\"a\":\"timer\"}"));
+    }
+
+    @Test
+    public void aPhaseAlreadyOverIsNeverTakenForACountUp() throws Exception {
+        JSONObject plank = lifting().put(
+            "timer",
+            new org.json.JSONArray(
+                "[{\"from\":" + (NOW - 9000) + ",\"to\":" + (NOW - 4000) + ",\"label\":\"Get set\"},"
+                    + "{\"from\":" + (NOW - 4000) + ",\"to\":" + (NOW + 26_000) + ",\"label\":\"Time left\"},"
+                    + "{\"from\":" + (NOW + 26_000) + ",\"label\":\"Target 20:00\"}]"
+            )
+        );
+        assertEquals(
+            Arrays.asList(Arrays.asList(-9, 0, "Get set"), Arrays.asList(-4, 26, "Time left"), Arrays.asList(26, -1, "Target 20:00")),
+            GarminMessages.state(plank, NOW).get("k")
+        );
+    }
+
+    @Test
+    public void aHoldStoppedOnItsSecondSideKeepsThatSide() throws Exception {
+        Map<String, Object> wd = new HashMap<>();
+        wd.put("id", "g18000000001234");
+        wd.put("c", "c1");
+        wd.put("s", 1_800_000_000);
+        wd.put("e", 1_800_000_300);
+        wd.put("sets", Collections.singletonList(Arrays.asList(0, 1_800_000_100, -1, 20, 1_800_000_000, 12)));
+        JSONObject r = GarminMessages.result(Collections.<Object>singletonList(Collections.singletonMap("wd", wd)));
+        assertEquals(12, r.getJSONArray("sets").getJSONArray(0).getInt(5));
     }
 
     @Test

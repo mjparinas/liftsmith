@@ -15,4 +15,5 @@
     <string id="OnWatch">Sans téléphone · BACK : terminer</string>
     <string id="FinishAsk">Terminer et l’enregistrer pour le téléphone ?</string>
     <string id="SavedForPhone">Enregistré sur la montre. Il ira sur le téléphone quand ils seront de nouveau ensemble.</string>
+    <string id="HintTimer">START : $1$</string>
 </strings>

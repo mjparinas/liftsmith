@@ -49,6 +49,7 @@ import { partNow, useApp, warmingUp, type Active } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
 import { takenPick, takenTarget } from "@/lib/takenSwap";
 import { tempoOf } from "@/lib/tempo";
+import { timerOffer, watchTimerOffer } from "@/lib/timerRun";
 import { REST_WARN_S, restAlertOf, restWarnOn } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Gym, type LoadKind, type Muscle, type Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -85,7 +86,16 @@ import { countdownTick, UndoChip, warnTick } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { aheadSteps, sessionFields, takenStep } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
-import { sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
+import {
+  sessionTimer,
+  SetTimerClock,
+  SetTimerStart,
+  startTimer,
+  takeTimer,
+  useTimerRun,
+  useTimerStartAt,
+  type Held,
+} from "./workout/SetTimer";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
 import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
@@ -116,7 +126,10 @@ export function Workout() {
   // While hidden the clock stops (the native notification counts the rest down itself); the web has no
   // native alert, so it asks for one tick when rest ends, for its rest-over notification.
   const restAt = useApp((st) => st.active?.restUntil);
-  const now = useNow(250, !isNative() && restAt ? restAt : undefined);
+  // Ticks on rest's (or the set timer's) own seconds too, so the countdown here turns over with the lock screen and
+  // the watches, which count to the same moment (watch-apps.md "Same second as the phone").
+  const timerStartAt = useTimerStartAt();
+  const now = useNow(250, !isNative() && restAt ? restAt : undefined, Math.max(restAt ?? 0, timerStartAt ?? 0) || undefined);
   const visible = useVisible();
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -256,11 +269,10 @@ export function Workout() {
 
   // The set timer (SetTimer.tsx): holds, carries and hangs count down from the seconds dialled in (each side, one
   // after the other, for a hold done on each side) and log the set when they run out; cardio counts up.
-  const timerSpec: TimerSpec | null =
-    active && ex && !finished && !resting && !warming && TIMED.has(ex.id)
-      ? { target: active.reps, sides: perSide(ex.id) && !ex.cardio ? 2 : 1, up: !!ex.cardio }
-      : null;
-  const timerKey = `${active?.sessionId}:${active?.index}:${doneSets}:${active?.tag ?? ""}`;
+  // The same offer a watch's Start timer reads (timerRun.ts), so the phone and the wrist agree on the set and its key.
+  const offer = !finished ? timerOffer(active, events, now) : null;
+  const timerSpec: TimerSpec | null = offer?.spec ?? null;
+  const timerKey = offer?.key ?? `${active?.sessionId}:${active?.index}:${doneSets}:${active?.tag ?? ""}`;
   const timerRun = useTimerRun(timerKey);
   const timing = !!timerRun && (!!timerRun.spec.up || now - timerRun.startAt < timerLength(timerRun.spec)!);
 
@@ -467,6 +479,8 @@ export function Workout() {
       // The set timer (holds, carries, cardio): the lock screen and the watches count it down on their own clocks.
       timer: timerRun && !resting ? sessionTimer(timerRun) : undefined,
       timerOver: timerRun && !resting ? t("timer.over") : undefined,
+      // A timed set the watches can start themselves: Start timer on the wrist counts it there and tells the phone.
+      ts: offer && !resting ? watchTimerOffer(offer, clock) : undefined,
       // The watches change the weight and reps on the wrist, and answer "How did it feel?" (watchAdjust.ts).
       adj: watchAdj(active, events, profile.unit, gym),
       ask: watchAsk(active),
@@ -619,8 +633,10 @@ export function Workout() {
                   ? t("workout.repsEachSide")
                   : t("workout.reps"),
             value: String(active.reps),
-            onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)),
-            onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)),
+            // Seconds step by 1 (Melvin, 2026-11-27); a long hold speeds up to 2 and 5 at a time.
+            jump: TIMED.has(ex.id),
+            onDown: (n = 1) => s.adjust(active.weight, active.reps - n),
+            onUp: (n = 1) => s.adjust(active.weight, active.reps + n),
           }
         : null;
   const rightStep =

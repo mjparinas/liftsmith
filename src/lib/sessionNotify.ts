@@ -59,6 +59,11 @@ export interface SessionState {
   timer?: TimerSegment[];
   /** What the lock screen and watches say when the last phase runs out ("Time's up"). */
   timerOver?: string;
+  /**
+   * A timed set the watches can start themselves (a hold, carry or cardio set while lifting): Start timer on the wrist
+   * counts it there at once and sends the phone "timer" (timerRun.ts startFromWatch). Absent otherwise.
+   */
+  ts?: TimerOffer;
   /** What the watches can change on this set before Log set: a ladder of weights and the reps (workout/watchAdjust.ts). */
   adj?: WatchAdj;
   /** After an exercise's last set: how did it feel, answered on the watch (workout/watchAdjust.ts watchAsk). */
@@ -79,6 +84,22 @@ export interface WatchAdj {
   reps: number;
   /** The word after the reps: "reps" or "reps each side", in the app's language. */
   rs: string;
+}
+
+/**
+ * What a watch needs to run the set timer on its own clock from its own Start timer tap: the set's key, the seconds
+ * (each side), 2 for a hold done on each side, `u` for cardio's count-up, the button's words, the phase labels (get set,
+ * the first or only side, switch sides, the second side) and what it says when the time is up. The watches use the same
+ * 5-second lead-in and switch as setTimer.ts, so their clock and the phone's agree.
+ */
+export interface TimerOffer {
+  key: string;
+  s: number;
+  d: 1 | 2;
+  u?: 1;
+  l: string;
+  lb: [string, string, string, string];
+  o: string;
 }
 
 /** "How did Bench press feel?" with three answers (`o`) and the rating each one sends (`v`: 1 too easy, 0, -1 too hard). */
@@ -143,10 +164,10 @@ export function chipText(warming: boolean, n: number, total: number): string {
 
 /**
  * Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). The watches also
- * send adjust (a new weight or reps, a moment after the last turn of the crown), rate (how the exercise felt) and taken,
- * their Machine taken button (takenSwap.ts).
+ * send adjust (a new weight or reps, a moment after the last turn of the crown), rate (how the exercise felt), taken,
+ * their Machine taken button (takenSwap.ts), and timer, their Start timer on a timed set (timerRun.ts).
  */
-export type SessionAction = "log" | "add30" | "start" | "adjust" | "rate" | "taken";
+export type SessionAction = "log" | "add30" | "start" | "adjust" | "rate" | "taken" | "timer";
 type Handle = ListenerHandle;
 type Plugin = {
   update(s: SessionState): Promise<void>;

@@ -4,7 +4,7 @@ import { act, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AUTO_END_MS, type Active } from "./store/workout";
-import { useNow } from "./useNow";
+import { nextTickDelay, useNow } from "./useNow";
 import { watchWorkout } from "./workoutWatch";
 
 const stopSession = vi.hoisted(() => vi.fn(async () => {}));
@@ -31,6 +31,16 @@ function Clock({ ms, wakeAt, onTick }: { ms: number; wakeAt?: number; onTick: (n
 }
 
 describe("useNow", () => {
+  it("ticks on a countdown's own seconds, so it turns over with the lock screen and the watches", () => {
+    const now = 1_800_000_000_000;
+    expect(nextTickDelay(now, 250)).toBe(250);
+    // 90.1 s of rest left: the shown second changes in 100 ms, so the tick lands just after it.
+    expect(nextTickDelay(now, 250, now + 90_100)).toBe(105);
+    expect(nextTickDelay(now, 250, now + 90_000)).toBe(250);
+    // A timer that started 2.96 s ago shows its next second in 40 ms.
+    expect(nextTickDelay(now, 250, now - 2_960)).toBe(45);
+  });
+
   it("ticks while on screen, stops in the background and catches up on return", () => {
     const ticks: number[] = [];
     render(<Clock ms={1000} onTick={(n) => ticks.push(n)} />);

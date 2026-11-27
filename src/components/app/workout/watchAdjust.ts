@@ -6,6 +6,7 @@ import type { SessionPayload, WatchAdj, WatchAsk } from "@/lib/sessionNotify";
 import { perSide } from "@/lib/sides";
 import { useApp } from "@/lib/store";
 import type { Active } from "@/lib/store/workout";
+import { holdForLog, startFromWatch } from "@/lib/timerRun";
 import type { AppEvent, Gym, Rating, Unit } from "@/lib/types";
 
 import { loadText } from "../format";
@@ -110,6 +111,11 @@ export function watchRating(p: { ex?: unknown; v?: unknown } | undefined, asking
  */
 export function runWatchTap(action: string, at: number | undefined, data: SessionPayload | undefined): boolean {
   const s = useApp.getState();
+  if (action === "timer") {
+    // Start timer on the wrist: the watch counts it at once, and the phone starts the same timer from the tap's time.
+    if (s.ready && s.profile.onboarded) startFromWatch(s.active, s.events, data?.key, at);
+    return true;
+  }
   if (action !== "rate" && action !== "adjust" && !data) return false;
   if (!s.ready || !s.profile.onboarded) return true;
   if (action === "rate") {
@@ -123,6 +129,9 @@ export function runWatchTap(action: string, at: number | undefined, data: Sessio
   if (!a) return action === "adjust";
   const v = watchValues(data, setKey(a, s.events));
   if (v) s.adjust(v.kg ?? a.weight, v.reps);
-  if (action === "log") s.logSet(at);
+  if (action === "log") {
+    holdForLog(useApp.getState(), at);
+    useApp.getState().logSet(at);
+  }
   return true;
 }

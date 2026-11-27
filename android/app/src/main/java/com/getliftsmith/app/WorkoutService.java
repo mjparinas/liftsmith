@@ -143,7 +143,9 @@ public class WorkoutService extends Service {
         }
         // A watch's weight and reps on their own only matter while the app is open: Log set carries them anyway.
         if ("adjust".equals(action)) return;
-        if (last == null || "rate".equals(action)) {
+        // Start timer from a watch with the app closed: the watch counts the hold itself, and the app starts the same timer
+        // from the tap's time when it opens (and logs it at its end, or at a Log set tapped meanwhile, with the time held).
+        if (last == null || "rate".equals(action) || "timer".equals(action)) {
             WorkoutTaps.add(this, action, data, at);
             return;
         }
