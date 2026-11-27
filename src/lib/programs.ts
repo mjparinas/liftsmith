@@ -976,9 +976,9 @@ function nextStep(steps: string[], at: number, gym: Gym): number | null {
 // ---------------------------------------------------------------------------------------------
 // Splits
 
-const PUSH: Muscle[] = ["chest", "frontDelts", "sideDelts", "triceps"];
-const PULL: Muscle[] = ["lats", "upperBack", "rearDelts", "biceps", "forearms", "traps"];
-const LEGS: Muscle[] = ["quads", "hamstrings", "glutes", "calves", "adductors", "abs", "obliques", "lowerBack"];
+export const PUSH: Muscle[] = ["chest", "frontDelts", "sideDelts", "triceps"];
+export const PULL: Muscle[] = ["lats", "upperBack", "rearDelts", "biceps", "forearms", "traps"];
+export const LEGS: Muscle[] = ["quads", "hamstrings", "glutes", "calves", "adductors", "abs", "obliques", "lowerBack"];
 
 export const SPLITS: Record<"ppl" | "upper-lower", { name: string; muscles: Muscle[] }[]> = {
   ppl: [

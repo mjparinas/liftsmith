@@ -56,6 +56,7 @@ import * as friends from "./text/friends";
 import * as ft from "./text/ft";
 import * as fv from "./text/fv";
 import * as game from "./text/game";
+import * as gen from "./text/gen";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
@@ -175,6 +176,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...calc.ko,
   ...card.ko,
   ...callText.ko,
+  ...gen.ko,
   ...category.ko,
   ...cause.ko,
   ...chk.ko,

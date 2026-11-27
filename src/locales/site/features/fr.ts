@@ -298,6 +298,11 @@ export const fr: FeaturesText = {
       name: "Vos propres routines",
       body: "Créez des routines depuis le catalogue d’exercices, sans limite de nombre, et partagez-les par lien.",
     },
+    "workout-generator": {
+      name: "Générateur d’entraînement gratuit sur le site",
+      body: "Choisissez votre matériel, vos minutes et ce que vous voulez travailler, et le même moteur écrit une séance avec séries, répétitions, repos et la raison de chaque exercice. Chaque séance a son propre lien à partager, et Commencer dans l’application l’ouvre comme routine.",
+      note: "Commencer dans l’application ouvre l’application Android ; sur iPhone et ordinateur, elle ouvre l’application web.",
+    },
     "routine-library": {
       name: "Bibliothèque de routines",
       body: "Cherchez les routines publiées par d'autres selon l'objectif, des mots et ce que votre salle propose, enregistrez-en une d'un geste et notez-la avec des étoiles. Publiez la vôtre depuis son éditeur, avec ou sans votre nom, et elle a sa propre page sur le site. Seuls les exercices et les séries sont partagés, jamais vos charges ni vos notes.",

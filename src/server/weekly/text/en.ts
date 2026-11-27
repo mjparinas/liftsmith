@@ -1138,4 +1138,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planning stays on the phone, so Machine taken and Change the plan wait until your phone is back.",
   },
+  "workout-generator": {
+    title: "Send a friend a workout, even without the app",
+    intro: "Our website now has a free workout generator that runs the same engine as your Today screen.",
+    points: [
+      "At getliftsmith.com/tools/workout-generator, pick equipment, minutes and what to train: full body, a split or one area.",
+      "It writes sets, reps, rest and warm-ups, and says why each exercise is there.",
+      "Every workout has its own link. Share it with a friend, and the same link always gives the same workout.",
+      "Start this in the app opens it as a routine, ready to save or start, with your own weights filled in as you lift.",
+    ],
+    dyk: "Today does this for you every day, and it also knows what you lifted last time and which muscles are still recovering.",
+  },
 };

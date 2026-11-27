@@ -350,6 +350,11 @@ export const pt: FeaturesText = {
       name: "Suas próprias rotinas",
       body: "Monte rotinas a partir do catálogo de exercícios, sem limite de quantidade, e compartilhe como link.",
     },
+    "workout-generator": {
+      name: "Gerador de treinos grátis no site",
+      body: "Escolha o equipamento, os minutos e o que treinar, e o mesmo motor monta um treino com séries, repetições, descanso e o motivo de cada exercício. Cada treino tem o próprio link para compartilhar, e Começar no app abre o treino como rotina.",
+      note: "Começar no app abre o app de Android; no iPhone e no computador, abre o app web.",
+    },
     "routine-library": {
       name: "Biblioteca de rotinas",
       body: "Busque rotinas que outras pessoas publicaram por objetivo, palavras e o que a sua academia tem, salve uma com um toque e avalie com estrelas. Publique a sua pelo editor, com ou sem seu nome, e ela ganha uma página própria no site. Só os exercícios e as séries são publicados, nunca suas cargas ou anotações.",

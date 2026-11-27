@@ -290,6 +290,11 @@ export const es: FeaturesText = {
       name: "Tus propias rutinas",
       body: "Crea rutinas desde el buscador de ejercicios, sin límite de cantidad, y compártelas con un enlace.",
     },
+    "workout-generator": {
+      name: "Generador de entrenamientos gratis en la web",
+      body: "Elige tu equipo, tus minutos y qué entrenar, y el mismo motor escribe un entrenamiento con series, repeticiones, descanso y por qué está cada ejercicio. Cada entrenamiento tiene su propio enlace para compartir, y Empezar en la app lo abre como rutina.",
+      note: "Empezar en la app abre la app de Android; en iPhone y en el ordenador abre la app web.",
+    },
     "routine-library": {
       name: "Biblioteca de rutinas",
       body: "Busca rutinas que otros publicaron por objetivo, palabras y lo que tiene tu gimnasio, guarda una con un toque y puntúala con estrellas. Publica la tuya desde su editor, con o sin tu nombre, y tendrá su propia página en la web. Solo salen los ejercicios y las series, nunca tus pesos ni tus notas.",

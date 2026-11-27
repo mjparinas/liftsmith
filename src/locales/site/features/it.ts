@@ -291,6 +291,11 @@ export const it: FeaturesText = {
       name: "Le tue routine",
       body: "Crea routine dal catalogo esercizi, senza limiti di numero, e condividile con un link.",
     },
+    "workout-generator": {
+      name: "Generatore di allenamenti gratis sul sito",
+      body: "Scegli attrezzatura, minuti e cosa allenare, e lo stesso motore scrive un allenamento con serie, ripetizioni, recupero e il perché di ogni esercizio. Ogni allenamento ha un suo link da condividere, e Inizia nell’app lo apre come routine.",
+      note: "Inizia nell’app apre l’app Android; su iPhone e computer apre la web app.",
+    },
     "routine-library": {
       name: "Libreria di routine",
       body: "Cerca le routine pubblicate da altri per obiettivo, parole e attrezzatura della tua palestra, salvane una con un tocco e valutala con le stelle. Pubblica la tua dal suo editor, con o senza il tuo nome, e avrà una sua pagina sul sito. Escono solo esercizi e serie, mai i tuoi carichi o le tue note.",

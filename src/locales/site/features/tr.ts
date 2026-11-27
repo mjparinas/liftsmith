@@ -350,6 +350,11 @@ export const tr: FeaturesText = {
       name: "Kendi rutinlerin",
       body: "Egzersiz tarayıcısından sınırsız sayıda rutin oluştur ve link olarak paylaş.",
     },
+    "workout-generator": {
+      name: "Web sitesinde ücretsiz antrenman oluşturucu",
+      body: "Ekipmanını, dakikalarını ve neyi çalıştıracağını seç; aynı motor set, tekrar, dinlenme ve her egzersizin nedeniyle bir antrenman yazsın. Her antrenmanın paylaşılacak kendi bağlantısı var ve Uygulamada başla onu rutin olarak açar.",
+      note: "Uygulamada başla Android uygulamasını açar; iPhone ve bilgisayarda web uygulamasını açar.",
+    },
     "routine-library": {
       name: "Rutin kütüphanesi",
       body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
