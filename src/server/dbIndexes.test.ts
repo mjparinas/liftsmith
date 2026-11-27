@@ -550,6 +550,48 @@ const CASES: { name: string; sql: string; uses: string[]; noScan: string[] }[] =
     uses: ["team_session_sets_athlete"],
     noScan: ["team_session_sets"],
   },
+  {
+    name: "pins: sends cut short, every two hours (pins.ts postDue)",
+    sql: "UPDATE pins SET status = 'failed', error = '', updated_at = ? WHERE status = 'posting' AND updated_at < ?",
+    uses: ["pins_updated"],
+    noScan: ["pins"],
+  },
+  {
+    name: "pins: videos Pinterest is processing (pins.ts postDue)",
+    sql: "SELECT id FROM pins WHERE status = 'processing' ORDER BY created_at LIMIT 5",
+    uses: ["pins_status"],
+    noScan: ["pins"],
+  },
+  {
+    name: "pins: what went out in the last day (pins.ts postDue)",
+    sql: "SELECT kind, posted_at FROM pins WHERE posted_at > ? ORDER BY posted_at DESC",
+    uses: ["pins_posted"],
+    noScan: ["pins"],
+  },
+  {
+    name: "pins: the last pin posted (pins.ts postDue)",
+    sql: "SELECT kind FROM pins WHERE posted_at IS NOT NULL ORDER BY posted_at DESC LIMIT 1",
+    uses: ["pins_posted"],
+    noScan: ["pins"],
+  },
+  {
+    name: "pins: the queue, oldest first (pins.ts postDue)",
+    sql: "SELECT id FROM pins WHERE status = 'ready' ORDER BY created_at, id LIMIT 20",
+    uses: ["pins_status"],
+    noScan: ["pins"],
+  },
+  {
+    name: "pins: an exercise made again (pins.ts addMade)",
+    sql: "SELECT media_url, cover_url, status FROM pins WHERE exercise = ?",
+    uses: ["pins_exercise"],
+    noScan: ["pins"],
+  },
+  {
+    name: "pins: waiting to post (pins.ts queuedCount)",
+    sql: "SELECT COUNT(*) AS n FROM pins WHERE status IN ('review', 'ready')",
+    uses: ["USING COVERING INDEX pins_"],
+    noScan: ["pins"],
+  },
 ];
 
 describe("queries on growing tables use an index", () => {
