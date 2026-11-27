@@ -170,7 +170,7 @@ export function IntervalTool() {
                 label={t(mode === "emom" ? "calc.itv.every" : "calc.itv.work")}
                 value={plan.work}
                 onSet={(n) => setPlan({ work: n })}
-                step={5}
+                step={1}
                 min={5}
                 max={600}
               />
@@ -183,7 +183,7 @@ export function IntervalTool() {
                   label={t("calc.itv.rest")}
                   value={plan.rest}
                   onSet={(n) => setPlan({ rest: n })}
-                  step={5}
+                  step={1}
                   min={0}
                   max={600}
                 />
