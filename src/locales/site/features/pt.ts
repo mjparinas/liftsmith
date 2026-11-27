@@ -355,6 +355,10 @@ export const pt: FeaturesText = {
       body: "Busque rotinas que outras pessoas publicaram por objetivo, palavras e o que a sua academia tem, salve uma com um toque e avalie com estrelas. Publique a sua pelo editor, com ou sem seu nome, e ela ganha uma página própria no site. Só os exercícios e as séries são publicados, nunca suas cargas ou anotações.",
       note: "Publicar exige uma conta e 18 anos. Qualquer pessoa pode navegar.",
     },
+    "thirty-day": {
+      name: "Desafios de 30 dias",
+      body: "Doze desafios de 30 dias, de agachamento, flexão e prancha a barra fixa e burpee, cada um em três níveis: um exercício por dia, um pouco mais a cada dia, com um descanso a cada quatro dias. Hoje mostra o número do dia com um Feito de um toque, e um dia perdido espera por você. Cada desafio tem uma página no site com um calendário para imprimir.",
+    },
     library: {
       name: "1.000 exercícios",
       body: "Musculação, peso corporal, máquinas, elásticos, kettlebells e cardio, com busca, filtros por músculo e um filtro desta academia. O cardio registra tempo e distância.",

@@ -12,6 +12,7 @@ import { BRAND } from "./brand";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { equipmentLabel, equipmentSlug, equipmentWithPages, exercisesFor, exercisesWith, MUSCLE_NAME, muscleSlug, TOOL_PAGES } from "./seo";
 import { isSiteLang } from "./siteLang";
+import { THIRTY_BY_SLUG, THIRTY_CHALLENGES } from "./thirtyDay";
 import { MUSCLES } from "./types";
 import { vsBySlug } from "./versus";
 
@@ -58,6 +59,7 @@ export function ogFile(path: string): string {
   // A program shares the card of its first main lift; the splits, which have none, the site's own.
   if (kind === "programs") return PROGRAM_FIGURE[a] ? `exercises/${PROGRAM_FIGURE[a]}.jpg` : "default.jpg";
   if (kind === "equipment") return `equipment/${a}.jpg`;
+  if (kind === "challenges") return THIRTY_BY_SLUG.has(a) ? `challenges/${a}.jpg` : "default.jpg";
   if (kind === "blog" && a === "topic" && seg[2]) return `blog-topics/${seg[2]}.jpg`;
   if (kind === "blog" || kind === "guides") return `articles/${a}.jpg`;
   if (kind === "compare") return `compare/${a}.jpg`;
@@ -138,6 +140,17 @@ export function ogCards(): OgCard[] {
       kicker: "Free tool",
       title: t.name,
       exercise: t.path.includes("plate") ? "bench-press" : DEFAULT_FIGURE,
+    });
+  // 30-day challenges: the name is the page's address in words ("30-day push-up challenge").
+  for (const c of THIRTY_CHALLENGES)
+    cards.push({
+      file: `challenges/${c.slug}.jpg`,
+      kicker: "Free printable calendar",
+      title: c.slug
+        .replace(/-/g, " ")
+        .replace(/^30 day/, "30-day")
+        .replace(/\b(push|pull|sit) up\b/, "$1-up"),
+      exercise: c.levels.intermediate.exercise,
     });
   for (const l of LANDINGS)
     cards.push({

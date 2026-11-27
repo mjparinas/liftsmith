@@ -46,6 +46,12 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.32.0",
+    day: "2026-11-28",
+    headline: "30-day challenges: squats, push-ups, planks, pull-ups and eight more at three levels, with the day's number on Today",
+    changes: [{ id: "thirtyDay", kind: "new", icon: "calendar" }],
+  },
+  {
     version: "0.31.0",
     day: "2026-11-27",
     headline:

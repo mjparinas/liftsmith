@@ -9,6 +9,7 @@ import { ACTIVITIES, type Activity } from "@/lib/tdee";
 import type { Equipment, Exercise, Muscle } from "@/lib/types";
 import * as activity from "@/locales/text/activity";
 import * as bmi from "@/locales/text/bmi";
+import * as c30 from "@/locales/text/c30";
 import * as demo from "@/locales/text/demo";
 import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
@@ -136,3 +137,13 @@ export function programLine(lang: SiteLang, english: string): string | null {
 
 /** "Day {n}" as the app says it. */
 export const programDayN = (lang: SiteLang, n: number) => (line(pgm, lang, "pgm.day") ?? "Day {n}").replace("{n}", String(n));
+
+/** A 30-day challenge's name and its one line on what it does for you (thirtyDay.ts), as the app says them. */
+export function thirtyWords(lang: SiteLang, id: string): { name: string; why: string } {
+  return { name: line(c30, lang, `c30.${id}.name`) ?? id, why: line(c30, lang, `c30.${id}.why`) ?? "" };
+}
+
+/** The app's own level names for the 30-day challenges, so the website's chips match the app's. */
+export function thirtyLevelName(lang: SiteLang, level: string): string {
+  return line(c30, lang, `c30.level.${level}`) ?? level;
+}

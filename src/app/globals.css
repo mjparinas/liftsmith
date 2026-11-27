@@ -732,3 +732,50 @@ input, textarea { caret-color: var(--color-accent); }
 .count-dot::after {
   content: attr(data-label);
 }
+
+/* 30-day challenge calendars (ChallengeCalendar.tsx, docs/decisions/thirty-day-challenges.md): on screen the sheet's
+   name line, address and code stay hidden; printed, only the sheet shows, black on white on one page, whatever the
+   theme. Plain colour words, not tokens, because paper has no theme. */
+.print-only {
+  display: none;
+}
+@media print {
+  /* Everything that neither is the sheet nor holds it goes, so nothing else takes up paper. */
+  body:has(.print-sheet) *:not(:has(.print-sheet)):not(.print-sheet):not(.print-sheet *) {
+    display: none !important;
+  }
+  html:has(.print-sheet),
+  body:has(.print-sheet),
+  body:has(.print-sheet) *:has(.print-sheet) {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    min-height: 0 !important;
+  }
+  body:has(.print-sheet) .print-sheet,
+  body:has(.print-sheet) .print-sheet * {
+    color: black !important;
+    border-color: black !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  body:has(.print-sheet) .print-sheet {
+    margin: 0 !important;
+    break-inside: avoid;
+  }
+  .print-sheet .print-only.grid {
+    display: grid;
+  }
+  .print-sheet .print-only.flex {
+    display: flex;
+  }
+  .print-sheet ol {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  @page {
+    margin: 12mm;
+  }
+}

@@ -1122,4 +1122,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La pianificazione resta sul telefono, quindi Macchina occupata e Cambia il piano aspettano che torni.",
   },
+  "thirty-day": {
+    title: "Un esercizio al giorno per 30 giorni",
+    intro: "Sono arrivate dodici sfide di 30 giorni, da squat e piegamenti a plank e trazioni, ognuna su tre livelli.",
+    points: [
+      "Scegline una in Strumenti › Sfide di 30 giorni e poi Principiante, Intermedio o Avanzato.",
+      "Oggi mostra il numero del giorno con un Fatto a un tocco. Hai fatto di più o di meno? Cambialo prima con − e +.",
+      "Un giorno su quattro è di riposo, e un giorno saltato ti aspetta: non si ricomincia da capo.",
+      "Ogni sfida ha una pagina sul nostro sito con un calendario da stampare per il frigo.",
+    ],
+    dyk: "I giorni della sfida non sono allenamenti, quindi non cambiano mai il tuo piano, la tua serie o il tuo obiettivo settimanale.",
+  },
 };

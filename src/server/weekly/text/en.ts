@@ -1138,4 +1138,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planning stays on the phone, so Machine taken and Change the plan wait until your phone is back.",
   },
+  "thirty-day": {
+    title: "One move a day for 30 days",
+    intro: "Twelve 30-day challenges are here, from squats and push-ups to planks and pull-ups, each at three levels.",
+    points: [
+      "Pick one in Tools › 30-day challenges and choose Beginner, Intermediate or Advanced.",
+      "Today shows the day's number with a one-tap Done. Did more or less? Change it with − and + first.",
+      "Every fourth day is a rest day, and a missed day just waits for you: no starting over.",
+      "Each challenge has a page on our website with a calendar to print for the fridge.",
+    ],
+    dyk: "Challenge days aren't workouts, so they never change your plan, your streak or your weekly goal.",
+  },
 };

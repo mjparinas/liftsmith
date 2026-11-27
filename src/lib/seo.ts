@@ -17,6 +17,7 @@ import { COMMON, STAPLE } from "./pickWeights";
 import { PROGRAMS } from "./programs";
 import { SITE_URL } from "./site";
 import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
+import { THIRTY_CHALLENGES, thirtyPath } from "./thirtyDay";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 import { vsPairs, vsPath } from "./versus";
 import { WHATS_NEW } from "./whatsNew";
@@ -324,6 +325,11 @@ export function siteRoutes(): Route[] {
   for (const path of ["/exercises/vs/", ...vsPairs().map(vsPath)]) {
     const languages = languageAlternates(path);
     for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/exercises/vs/" ? 0.6 : 0.5, languages });
+  }
+  // 30-day challenge pages (src/lib/thirtyDay.ts): the index and every challenge, each in every site language.
+  for (const path of ["/challenges/", ...THIRTY_CHALLENGES.map(thirtyPath)]) {
+    const languages = languageAlternates(path);
+    for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/challenges/" ? 0.8 : 0.7, languages });
   }
   // Program pages (src/lib/programs.ts): the index and every program, each in every site language.
   for (const path of ["/programs/", ...PROGRAMS.map((p) => `/programs/${p.id}/`)]) {

@@ -19,6 +19,7 @@ import { injuriesSlice, type InjuriesSlice } from "./store/injuries";
 import { planSlice, type PlanSlice } from "./store/plan";
 import { routinesSlice, type RoutinesSlice } from "./store/routines";
 import { ACTIVE_KEY, persistActive, uid, type Ctx } from "./store/shared";
+import { thirtySlice, type ThirtySlice } from "./store/thirty";
 import { workoutSlice, type Active, type WorkoutSlice } from "./store/workout";
 import { lastWeighInKg } from "./tdee";
 import { minutesForToday } from "./training";
@@ -30,9 +31,9 @@ export { AUTO_END_MS, hrWindow, partNow, REST_PAUSE_SEC, stretching, swappedActi
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 // Each area's state and actions live in its own slice under src/lib/store/ (workout, plan, injuries,
-// health, routines, history); this file puts them together and keeps loading, sync, backup and erase.
+// health, routines, history, thirty); this file puts them together and keeps loading, sync, backup and erase.
 
-export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSlice, RoutinesSlice, HistorySlice {
+export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSlice, RoutinesSlice, HistorySlice, ThirtySlice {
   ready: boolean;
   events: AppEvent[];
   profile: Profile;
@@ -89,6 +90,7 @@ export const useApp = create<State>((set, get) => {
     ...healthSlice(c),
     ...routinesSlice(c),
     ...historySlice(c),
+    ...thirtySlice(c),
 
     ready: false,
     events: [],

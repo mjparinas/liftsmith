@@ -522,6 +522,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-19",
       },
       {
+        id: "thirty-day",
+        name: "30-day challenges",
+        body: "Twelve 30-day challenges, from squats, push-ups and planks to pull-ups and burpees, each at three levels: one move a day, a little more each day, with a rest day every fourth day. Today shows the day's number with a one-tap Done, and a missed day waits for you. Every challenge has a page on the website with a calendar to print.",
+        tier: "free",
+        added: "2026-11-27",
+      },
+      {
         id: "library",
         name: "1,000 exercises",
         body: "Strength, bodyweight, machines, bands, kettlebells and cardio, with search, muscle chips and a this-gym filter. Cardio logs time and distance.",

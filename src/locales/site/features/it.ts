@@ -296,6 +296,10 @@ export const it: FeaturesText = {
       body: "Cerca le routine pubblicate da altri per obiettivo, parole e attrezzatura della tua palestra, salvane una con un tocco e valutala con le stelle. Pubblica la tua dal suo editor, con o senza il tuo nome, e avrà una sua pagina sul sito. Escono solo esercizi e serie, mai i tuoi carichi o le tue note.",
       note: "Per pubblicare servono un account e 18 anni. Chiunque può sfogliare.",
     },
+    "thirty-day": {
+      name: "Sfide di 30 giorni",
+      body: "Dodici sfide di 30 giorni, da squat, piegamenti e plank a trazioni e burpee, ognuna su tre livelli: un esercizio al giorno, un po’ di più ogni giorno, con un giorno di riposo ogni quattro. Oggi mostra il numero del giorno con un Fatto a un tocco, e un giorno saltato ti aspetta. Ogni sfida ha una pagina sul sito con un calendario da stampare.",
+    },
     library: {
       name: "1.000 esercizi",
       body: "Forza, corpo libero, macchine, elastici, kettlebell e cardio, con ricerca, filtri per muscolo e un filtro per questa palestra. Il cardio registra tempo e distanza.",

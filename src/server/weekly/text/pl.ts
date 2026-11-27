@@ -1119,4 +1119,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planowanie zostaje na telefonie, więc Maszyna zajęta i Zmień plan czekają, aż wróci.",
   },
+  "thirty-day": {
+    title: "Jedno ćwiczenie dziennie przez 30 dni",
+    intro: "Jest dwanaście 30-dniowych wyzwań, od przysiadów i pompek po deskę i podciąganie, każde na trzech poziomach.",
+    points: [
+      "Wybierz jedno w Narzędzia › Wyzwania 30-dniowe, a potem poziom: początkujący, średniozaawansowany lub zaawansowany.",
+      "Ekran Dziś pokazuje liczbę dnia z przyciskiem Zrobione. Zrobiłeś więcej albo mniej? Najpierw zmień ją przyciskami − i +.",
+      "Co czwarty dzień to odpoczynek, a opuszczony dzień po prostu czeka: nie zaczynasz od nowa.",
+      "Każde wyzwanie ma stronę w naszym serwisie z kalendarzem do wydruku na lodówkę.",
+    ],
+    dyk: "Dni wyzwania to nie treningi, więc nigdy nie zmieniają twojego planu, serii ani celu tygodniowego.",
+  },
 };

@@ -1121,4 +1121,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La planificación sigue en el móvil, así que Máquina ocupada y Cambiar el plan esperan a que vuelva.",
   },
+  "thirty-day": {
+    title: "Un ejercicio al día durante 30 días",
+    intro: "Ya tienes doce retos de 30 días, de sentadillas y flexiones a plancha y dominadas, cada uno en tres niveles.",
+    points: [
+      "Elige uno en Herramientas › Retos de 30 días y escoge Principiante, Intermedio o Avanzado.",
+      "Hoy muestra la cifra del día con un Hecho de un toque. ¿Hiciste más o menos? Cámbiala antes con − y +.",
+      "Cada cuarto día es de descanso, y un día perdido simplemente te espera: no hay que empezar de nuevo.",
+      "Cada reto tiene una página en nuestra web con un calendario para imprimir y pegar en la nevera.",
+    ],
+    dyk: "Los días del reto no son entrenamientos, así que nunca cambian tu plan, tu racha ni tu objetivo semanal.",
+  },
 };

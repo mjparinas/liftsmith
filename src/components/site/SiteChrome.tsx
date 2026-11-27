@@ -12,6 +12,7 @@ import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { fill, localPath, SITE_LANG_NAME, SITE_LANGS, type SiteLang } from "@/lib/siteLang";
 import { siteText } from "@/locales/site";
+import { CHALLENGE_TEXT } from "@/locales/site/challenge";
 
 import { DocLang } from "./DocLang";
 import { navFor, type NavLink } from "./nav";
@@ -150,6 +151,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: "/exercises/", label: l.exercises },
           { href: localPath(lang, "/muscles/"), label: l.muscles },
           { href: localPath(lang, "/programs/"), label: l.programs },
+          { href: localPath(lang, "/challenges/"), label: CHALLENGE_TEXT[lang].challenges },
           { href: "/coach-programs/", label: l.coachPrograms },
           { href: "/routines/", label: l.routineLibrary },
           { href: "/equipment/", label: l.equipment },

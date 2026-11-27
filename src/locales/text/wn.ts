@@ -146,6 +146,9 @@ export const en = {
   "wn.c.watchToday.title": "Today's workout on your watch face",
   "wn.c.watchToday.body":
     "Add the Liftsmith tile or complication to see today's call, how long and how ready you are. On Wear OS, Start on phone opens it.",
+  "wn.c.thirtyDay.title": "30-day challenges",
+  "wn.c.thirtyDay.body":
+    "Squats, push-ups, planks, pull-ups and eight more, at three levels. Join one in Tools and Today shows the day's number with a one-tap Done; a missed day waits for you.",
   "wn.c.watchAlone.title": "Leave your phone in the locker",
   "wn.c.watchAlone.body":
     "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
@@ -339,6 +342,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "El entrenamiento de hoy en tu esfera",
   "wn.c.watchToday.body":
     "Añade el mosaico o la complicación de Liftsmith para ver la propuesta de hoy, cuánto dura y cómo estás de preparado. En Wear OS, Empezar en el móvil lo abre.",
+  "wn.c.thirtyDay.title": "Retos de 30 días",
+  "wn.c.thirtyDay.body":
+    "Sentadillas, flexiones, plancha, dominadas y ocho más, en tres niveles. Únete a uno en Herramientas y Hoy te muestra la cifra del día con un Hecho de un toque; un día perdido te espera.",
   "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
   "wn.c.watchAlone.body":
     "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
@@ -534,6 +540,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "La séance du jour sur ton cadran",
   "wn.c.watchToday.body":
     "Ajoute la tuile ou la complication Liftsmith pour voir le choix du jour, sa durée et ta forme. Sur Wear OS, Démarrer sur le téléphone l'ouvre.",
+  "wn.c.thirtyDay.title": "Défis de 30 jours",
+  "wn.c.thirtyDay.body":
+    "Squats, pompes, gainage, tractions et huit autres, sur trois niveaux. Rejoignez-en un dans Outils : Aujourd’hui affiche le chiffre du jour avec un bouton Fait, et un jour manqué vous attend.",
   "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
   "wn.c.watchAlone.body":
     "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
@@ -725,6 +734,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Das heutige Training auf dem Zifferblatt",
   "wn.c.watchToday.body":
     "Füge die Liftsmith-Kachel oder -Komplikation hinzu und sieh die heutige Empfehlung, die Dauer und deine Bereitschaft. Auf Wear OS öffnet „Am Handy starten“ es.",
+  "wn.c.thirtyDay.title": "30-Tage-Challenges",
+  "wn.c.thirtyDay.body":
+    "Kniebeugen, Liegestütze, Plank, Klimmzüge und acht weitere, in drei Stufen. Mach unter Tools bei einer mit, und Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft; ein verpasster Tag wartet auf dich.",
   "wn.c.watchAlone.title": "Lass dein Handy im Spind",
   "wn.c.watchAlone.body":
     "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
@@ -916,6 +928,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "L'allenamento di oggi sul quadrante",
   "wn.c.watchToday.body":
     "Aggiungi il riquadro o la complicazione di Liftsmith per vedere la scelta di oggi, quanto dura e quanto sei in forma. Su Wear OS, Avvia sul telefono lo apre.",
+  "wn.c.thirtyDay.title": "Sfide di 30 giorni",
+  "wn.c.thirtyDay.body":
+    "Squat, piegamenti, plank, trazioni e altre otto, su tre livelli. Partecipa a una da Strumenti e Oggi mostra il numero del giorno con un Fatto a un tocco; un giorno saltato ti aspetta.",
   "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
   "wn.c.watchAlone.body":
     "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
@@ -1096,6 +1111,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "今日のワークアウトをウォッチフェイスに",
   "wn.c.watchToday.body":
     "Liftsmithのタイルやコンプリケーションを追加すると、今日のおすすめ、時間、コンディションが見られます。Wear OSでは「スマホで開始」で開けます。",
+  "wn.c.thirtyDay.title": "30日チャレンジ",
+  "wn.c.thirtyDay.body":
+    "スクワット、腕立て伏せ、プランク、懸垂など12種類を3つのレベルで。ツールから参加すると、「今日」にその日の回数とワンタップの完了が表示され、できなかった日は待っていてくれます。",
   "wn.c.watchAlone.title": "スマホはロッカーに",
   "wn.c.watchAlone.body":
     "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
@@ -1282,6 +1300,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "O treino de hoje no mostrador",
   "wn.c.watchToday.body":
     "Adicione o bloco ou a complicação do Liftsmith para ver a indicação de hoje, quanto dura e como está sua prontidão. No Wear OS, Começar no celular abre o treino.",
+  "wn.c.thirtyDay.title": "Desafios de 30 dias",
+  "wn.c.thirtyDay.body":
+    "Agachamento, flexão, prancha, barra fixa e mais oito, em três níveis. Entre em um pelas Ferramentas e Hoje mostra o número do dia com um Feito de um toque; um dia perdido espera por você.",
   "wn.c.watchAlone.title": "Deixe o celular no armário",
   "wn.c.watchAlone.body":
     "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
@@ -1456,6 +1477,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "오늘의 운동을 워치 페이스에",
   "wn.c.watchToday.body":
     "Liftsmith 타일이나 컴플리케이션을 추가하면 오늘의 추천, 운동 시간, 컨디션을 볼 수 있어요. Wear OS에서는 휴대폰에서 시작으로 열 수 있어요.",
+  "wn.c.thirtyDay.title": "30일 챌린지",
+  "wn.c.thirtyDay.body":
+    "스쿼트, 푸시업, 플랭크, 턱걸이 등 12가지를 세 가지 레벨로. 도구에서 참여하면 오늘 화면에 그날의 숫자와 한 번에 누르는 완료가 나오고, 놓친 날은 기다려 줘요.",
   "wn.c.watchAlone.title": "휴대폰은 사물함에",
   "wn.c.watchAlone.body":
     "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
@@ -1641,6 +1665,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Dzisiejszy trening na tarczy zegarka",
   "wn.c.watchToday.body":
     "Dodaj kafelek lub komplikację Liftsmith, aby widzieć dzisiejszą propozycję, czas i gotowość. Na Wear OS Zacznij na telefonie otwiera trening.",
+  "wn.c.thirtyDay.title": "Wyzwania 30-dniowe",
+  "wn.c.thirtyDay.body":
+    "Przysiady, pompki, deska, podciąganie i osiem innych, na trzech poziomach. Dołącz do jednego w Narzędziach, a ekran Dziś pokaże liczbę dnia z przyciskiem Zrobione; opuszczony dzień poczeka.",
   "wn.c.watchAlone.title": "Zostaw telefon w szafce",
   "wn.c.watchAlone.body":
     "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
@@ -1828,6 +1855,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchToday.title": "Bugünkü antrenman saat kadranında",
   "wn.c.watchToday.body":
     "Liftsmith kutucuğunu veya komplikasyonunu ekle; bugünkü öneriyi, süresini ve hazırlığını gör. Wear OS'ta Telefonda başlat onu açar.",
+  "wn.c.thirtyDay.title": "30 günlük meydan okumalar",
+  "wn.c.thirtyDay.body":
+    "Squat, şınav, plank, barfiks ve sekiz tane daha, üç seviyede. Araçlar'dan birine katıl, Bugün ekranı günün sayısını tek dokunuşla Tamam ile göstersin; kaçırdığın gün seni bekler.",
   "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
   "wn.c.watchAlone.body":
     "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",

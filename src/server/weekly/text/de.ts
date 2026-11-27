@@ -1123,4 +1123,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
   },
+  "thirty-day": {
+    title: "Eine Übung am Tag, 30 Tage lang",
+    intro: "Zwölf 30-Tage-Challenges sind da, von Kniebeugen und Liegestützen bis zu Plank und Klimmzügen, jede in drei Stufen.",
+    points: [
+      "Such dir eine unter Tools › 30-Tage-Challenges aus und wähl Einsteiger, Fortgeschritten oder Profi.",
+      "Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft. Mehr oder weniger gemacht? Ändere sie vorher mit − und +.",
+      "Jeder vierte Tag ist ein Ruhetag, und ein verpasster Tag wartet einfach auf dich: Du fängst nie von vorn an.",
+      "Jede Challenge hat eine Seite auf unserer Website mit einem Kalender zum Ausdrucken für den Kühlschrank.",
+    ],
+    dyk: "Challenge-Tage sind keine Trainings, sie ändern also nie deinen Plan, deine Serie oder dein Wochenziel.",
+  },
 };
