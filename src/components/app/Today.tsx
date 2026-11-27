@@ -57,6 +57,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CoolDownCard, SplitBar, StretchLibraryCard, TodayParts } from "./Stretch";
 import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
+import { ThirtyTodayCards } from "./ThirtyDay";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
 import { Button, Chip, CountDot, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section } from "./ui";
@@ -257,6 +258,7 @@ export function Today() {
   );
   const extras = (
     <>
+      {!active && <ThirtyTodayCards />}
       {!active && <StretchLibraryCard />}
       {profile.quotes !== false && <DailyQuote now={now} />}
       {!active && <SaveNudge />}

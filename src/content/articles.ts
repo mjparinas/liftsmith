@@ -59,6 +59,7 @@ import { BLOG_SHARE_STATS } from "./blog/shareStats";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
 import { BLOG_TEAM_SESSION } from "./blog/teamSession";
+import { BLOG_THIRTY_DAY } from "./blog/thirtyDay";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
@@ -94,7 +95,8 @@ export type CtaTopic =
   | "measure"
   | "health"
   | "stretch"
-  | "coach";
+  | "coach"
+  | "challenge";
 
 export type Block =
   { h2: string } | { p: string } | { ul: string[] } | { ol: string[] } | { tip: string } | { cta: CtaTopic } | { exercises: string[] };
@@ -237,6 +239,13 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
     button: "See how coaching works",
     href: "/coaches/",
   },
+  // 30-day challenges: goes to the challenges with their printable calendars (/challenges/), each with Join in the app.
+  challenge: {
+    title: "Pick a 30-day challenge",
+    body: "Twelve challenges at three levels, each with a calendar to print. Join one in Liftsmith and Today shows the day's number with a one-tap Done.",
+    button: "See the challenges",
+    href: "/challenges/",
+  },
 };
 
 export const ARTICLES: Article[] = [
@@ -307,6 +316,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_WATCH_ALONE,
   ...BLOG_GYM_WIDGETS,
   ...BLOG_WORKOUT_GENERATOR,
+  ...BLOG_THIRTY_DAY,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

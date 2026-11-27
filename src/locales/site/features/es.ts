@@ -306,6 +306,10 @@ export const es: FeaturesText = {
       body: "Busca rutinas que otros publicaron por objetivo, palabras y lo que tiene tu gimnasio, guarda una con un toque y puntúala con estrellas. Publica la tuya desde su editor, con o sin tu nombre, y tendrá su propia página en la web. Solo salen los ejercicios y las series, nunca tus pesos ni tus notas.",
       note: "Para publicar necesitas una cuenta y tener 18 años. Cualquiera puede explorar.",
     },
+    "thirty-day": {
+      name: "Retos de 30 días",
+      body: "Doce retos de 30 días, de sentadillas, flexiones y plancha a dominadas y burpees, cada uno en tres niveles: un ejercicio al día, un poco más cada día, con un día de descanso cada cuatro. Hoy muestra la cifra del día con un Hecho de un toque, y un día perdido te espera. Cada reto tiene una página en la web con un calendario para imprimir.",
+    },
     library: {
       name: "1000 ejercicios",
       body: "Fuerza, peso corporal, máquinas, bandas, pesas rusas y cardio, con búsqueda, filtros por músculo y un filtro de este gimnasio. El cardio registra tiempo y distancia.",

@@ -1151,4 +1151,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Bugün ekranı bunu her gün senin için yapar; üstelik son seferde ne kaldırdığını ve hangi kasların hâlâ toparlandığını da bilir.",
   },
+  "thirty-day": {
+    title: "30 gün boyunca günde bir hareket",
+    intro: "Squat ve şınavdan plank ve barfikse on iki 30 günlük meydan okuma geldi, her biri üç seviyede.",
+    points: [
+      "Araçlar › 30 günlük meydan okumalar'dan birini seç, ardından Başlangıç, Orta ya da İleri'yi seç.",
+      "Bugün ekranı günün sayısını tek dokunuşla Tamam ile gösterir. Daha fazla ya da az mı yaptın? Önce − ve + ile değiştir.",
+      "Her dördüncü gün dinlenme günü ve kaçırdığın gün seni bekler: baştan başlamak yok.",
+      "Her meydan okumanın sitemizde buzdolabına asmak için yazdırılabilir takvimli bir sayfası var.",
+    ],
+    dyk: "Meydan okuma günleri antrenman sayılmaz, bu yüzden planını, serini ya da haftalık hedefini asla değiştirmez.",
+  },
 };

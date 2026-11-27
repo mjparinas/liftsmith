@@ -1161,4 +1161,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Aujourd’hui fait cela pour vous chaque jour, en sachant aussi ce que vous avez soulevé la dernière fois et quels muscles récupèrent encore.",
   },
+  "thirty-day": {
+    title: "Un mouvement par jour pendant 30 jours",
+    intro: "Douze défis de 30 jours sont arrivés, des squats et pompes au gainage et aux tractions, chacun sur trois niveaux.",
+    points: [
+      "Choisissez-en un dans Outils › Défis de 30 jours, puis Débutant, Intermédiaire ou Avancé.",
+      "Aujourd’hui affiche le chiffre du jour avec un bouton Fait. Vous avez fait plus ou moins ? Changez-le d’abord avec − et +.",
+      "Un jour sur quatre est un jour de repos, et un jour manqué vous attend : pas besoin de recommencer.",
+      "Chaque défi a sa page sur notre site avec un calendrier à imprimer pour le frigo.",
+    ],
+    dyk: "Les jours de défi ne sont pas des séances : ils ne changent jamais votre programme, votre série ni votre objectif de la semaine.",
+  },
 };

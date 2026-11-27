@@ -1156,4 +1156,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "A tela Hoje faz isso por você todo dia, e ainda sabe o que você levantou da última vez e quais músculos ainda se recuperam.",
   },
+  "thirty-day": {
+    title: "Um exercício por dia durante 30 dias",
+    intro: "Chegaram doze desafios de 30 dias, de agachamento e flexão a prancha e barra fixa, cada um em três níveis.",
+    points: [
+      "Escolha um em Ferramentas › Desafios de 30 dias e depois Iniciante, Intermediário ou Avançado.",
+      "Hoje mostra o número do dia com um Feito de um toque. Fez mais ou menos? Mude antes com − e +.",
+      "A cada quatro dias tem um descanso, e um dia perdido espera por você: nada de recomeçar.",
+      "Cada desafio tem uma página no nosso site com um calendário para imprimir e colar na geladeira.",
+    ],
+    dyk: "Os dias de desafio não são treinos, então nunca mudam seu plano, sua sequência nem sua meta semanal.",
+  },
 };

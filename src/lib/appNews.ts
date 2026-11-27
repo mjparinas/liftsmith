@@ -46,11 +46,12 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.35.0",
+    version: "0.36.0",
     day: "2026-11-28",
     headline:
-      "A free workout generator on the website, share any best or max as a card, exercise charts with new bests in gold, and gym owners can put their schedule or a Liftsmith badge on their own website",
+      "30-day challenges with the day's number on Today, a free workout generator on the website, share any best or max as a card, exercise charts with new bests in gold, and website widgets for gym owners",
     changes: [
+      { id: "thirtyDay", kind: "new", icon: "calendar" },
       { id: "workoutGenerator", kind: "new", icon: "globe" },
       { id: "shareStats", kind: "new", icon: "share" },
       { id: "liftCharts", kind: "better", icon: "chart" },

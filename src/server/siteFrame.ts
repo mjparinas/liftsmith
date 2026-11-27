@@ -13,6 +13,7 @@ import { popularLiftLinks } from "@/lib/popularLifts";
 import { APP_PATH, STORE_LINKS } from "@/lib/site";
 import { fill, localPath } from "@/lib/siteLang";
 import { siteText } from "@/locales/site";
+import { CHALLENGE_TEXT } from "@/locales/site/challenge";
 import * as pub from "@/locales/text/pub";
 
 /** Which page the frame is on, for the store links' referrer (the only links that carry a source). */
@@ -101,6 +102,7 @@ ${col(t.cols.learn, [
   ["/exercises/", l.exercises],
   [localPath(lang, "/muscles/"), l.muscles],
   [localPath(lang, "/programs/"), l.programs],
+  [localPath(lang, "/challenges/"), CHALLENGE_TEXT[lang].challenges],
   ["/equipment/", l.equipment],
   ["/guides/", l.guides],
   ["/blog/", l.blog],

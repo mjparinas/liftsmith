@@ -366,6 +366,10 @@ export const tr: FeaturesText = {
       body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
       note: "Yayımlamak için hesap ve 18 yaş gerekir. Herkes göz atabilir.",
     },
+    "thirty-day": {
+      name: "30 günlük meydan okumalar",
+      body: "Squat, şınav ve plank'tan barfiks ve burpee'ye on iki 30 günlük meydan okuma, her biri üç seviyede: günde bir hareket, her gün biraz daha fazla, her dördüncü gün dinlenme. Bugün ekranı günün sayısını tek dokunuşla Tamam ile gösterir, kaçırdığın gün de seni bekler. Her meydan okumanın sitede yazdırılabilir takvimli bir sayfası var.",
+    },
     library: {
       name: "1.000 egzersiz",
       body: "Serbest ağırlık, vücut ağırlığı, makineler, lastik bantlar, kettlebell ve kardiyo; arama, kas filtreleri ve bu salon filtresiyle. Kardiyo süre ve mesafe kaydeder.",
