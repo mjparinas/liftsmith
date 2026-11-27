@@ -5,7 +5,7 @@
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
 import { accessFor, type Access } from "./access";
-import { roleOf } from "./adminAuth";
+import { seesAdminRow } from "./adminAuth";
 import { coachCleanup } from "./coach";
 import { forgetCoachPay } from "./coachPay";
 import { programCleanup } from "./coachPrograms";
@@ -78,7 +78,7 @@ export async function accountInfo(id: string): Promise<AccountInfo | null> {
 
 async function access(id: string, email: string | null): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub" | "staff">> {
   const a = await accessFor(id, email);
-  return { pro: a.pro, proVia: a.via, sub: a.sub, staff: !!email && roleOf(email.trim().toLowerCase()) !== null };
+  return { pro: a.pro, proVia: a.via, sub: a.sub, staff: !!email && seesAdminRow(email.trim().toLowerCase()) };
 }
 
 /** The account's Pro and where it comes from (access.ts). Sync sends it on every round. */
