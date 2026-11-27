@@ -4,6 +4,8 @@
 //
 // One Resend account receives for several domains (Gradelings too), so only mail addressed to our own domain
 // (INBOX_DOMAINS, default getliftsmith.com) is listed or opened here.
+import { plainMail } from "@/server/reminderEmails";
+
 import { ADMIN_LINK_SUBJECT } from "./adminAuth";
 import { query, run } from "./db";
 import { hasRemoteImages } from "./emailHtml";
@@ -281,7 +283,12 @@ export async function replyToInbox(id: string, text: string, admin: string, f: t
       to: [m.replyTo],
       subject,
       text,
-      html: `<!doctype html><html><body style="font-family:system-ui,Segoe UI,Arial,sans-serif;color:#1d2233;line-height:1.55">${paras.map((p) => `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("")}</body></html>`,
+      html: plainMail({
+        subject,
+        title: "From the Liftsmith team",
+        lines: paras,
+        why: "You're getting this because you wrote to Liftsmith. Reply to this email to answer.",
+      }).html,
       ...(m.messageId ? { headers: { "In-Reply-To": m.messageId, References: m.messageId } } : {}),
     }),
   }).catch(() => null);

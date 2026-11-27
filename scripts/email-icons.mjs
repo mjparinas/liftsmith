@@ -28,6 +28,7 @@ const TILES = {
   heart: ["heart", "mint"],
   flag: ["flag", "ember"],
   bell: ["bellOn", "blue"],
+  lock: ["lock", "violet"],
 };
 
 const out = "public/email/icons";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { confirmMail, messageMail, welcomeMail } from "./reminderEmails";
+import { codeMail, confirmMail, messageMail, plainMail, welcomeMail } from "./reminderEmails";
 
 const footer = { unsubscribeUrl: "https://example.com/u", postalAddress: "1 Main St" };
 
@@ -50,5 +50,37 @@ describe("the branded layout", () => {
     const de = messageMail({ ...streak, streak: { weeks: 6, done: 3, goal: 5 } }, footer, "de");
     expect(de.html).toContain("Wochen-Serie");
     expect(de.html).toContain("3 von 5 Workouts diese Woche geschafft");
+  });
+});
+
+describe("codes, staff email and replies in the same layout", () => {
+  it("a code email shows the code big, keeps it in the text and has no unsubscribe", () => {
+    const m = codeMail({
+      subject: "123456 is your code",
+      title: "Your sign-in code",
+      intro: "Type it.",
+      code: "123456",
+      note: "10 minutes.",
+      ignore: "Ignore it.",
+    });
+    expect(m.subject).toBe("123456 is your code");
+    expect(m.text).toContain("123456");
+    expect(m.html).toContain(">123456</td>");
+    expect(m.html).toContain('bgcolor="#080b10"');
+    expect(m.html).not.toContain("Unsubscribe");
+  });
+
+  it("staff email links addresses, lists bullets and keeps its text as written", () => {
+    const m = plainMail({
+      subject: "Alert: x",
+      lines: ["See https://example.com/a?b=1&c=2.", "", "- one", "- two"],
+      cta: { label: "Open", url: "https://example.com/admin/" },
+      why: "Why.",
+    });
+    expect(m.html).toContain('<a href="https://example.com/a?b=1&amp;c=2"');
+    expect(m.html.match(/&#10003;<\/td>/g)).toHaveLength(2);
+    expect(m.text).toBe(
+      "See https://example.com/a?b=1&c=2.\n\n- one\n- two\n\nOpen: https://example.com/admin/\n\n--\nWhy.\nLiftsmith · www.getliftsmith.com",
+    );
   });
 });

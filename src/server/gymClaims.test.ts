@@ -25,12 +25,12 @@ import { countScan } from "./gymPosters";
 const NOW = 1_800_000_000_000;
 let gymId = "";
 let otherId = "";
-const sent: { to: string; text: string }[] = [];
-const mail = async (to: string, _subject: string, text: string) => {
-  sent.push({ to, text });
+const sent: { to: string; subject: string; text: string; html?: string }[] = [];
+const mail = async (to: string, subject: string, text: string, html?: string) => {
+  sent.push({ to, subject, text, html });
   return true;
 };
-const codeIn = () => /is (\d{6})/.exec(sent.at(-1)!.text)![1]!;
+const codeIn = () => /^(\d{6}) is/.exec(sent.at(-1)!.subject)![1]!;
 const ask = (account: string, over: Record<string, unknown> = {}) =>
   startClaim(account, { place: gymId, email: "maria@ironworks.ca", role: "owner", name: "Maria Lopez", ...over }, mail, NOW);
 
@@ -82,6 +82,9 @@ describe("claiming by email", () => {
     const r = await ask("acc-maria");
     expect(r).toMatchObject({ ok: true, method: "email" });
     expect(sent[0]!.to).toBe("maria@ironworks.ca");
+    // The code is in the text and, big, in the branded HTML.
+    expect(sent[0]!.text).toContain(codeIn());
+    expect(sent[0]!.html).toContain(`>${codeIn()}</td>`);
     const claim = (r as { claim: string }).claim;
     expect(await verifyClaim("acc-maria", claim, codeIn() === "111111" ? "222222" : "111111")).toEqual({ ok: false, error: "wrong" });
     expect(await verifyClaim("acc-other", claim, codeIn())).toEqual({ ok: false, error: "expired" });

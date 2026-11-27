@@ -22,6 +22,7 @@
 import { randomBytes } from "node:crypto";
 
 import { FLAGS } from "@/lib/flags";
+import { plainMail } from "@/server/reminderEmails";
 
 import { resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { COUNTRIES } from "./countries";
@@ -586,14 +587,16 @@ export async function emailDone(id: string, mail: Mailer | null): Promise<boolea
           ...(failed.length > 25 ? [`…and ${failed.length - 25} more.`] : []),
         ]
       : []),
-    "",
-    `Open Admin › Gyms: ${siteOrigin()}/admin/?tab=Gyms`,
   ];
-  const ok = await mail(
-    s.startedBy,
-    `Gym import done: ${s.label}, ${s.sums.added} new gyms${failed.length ? `, ${failed.length} areas failed` : ""}`,
-    lines.join("\n"),
-  ).catch(() => false);
+  const m = plainMail({
+    subject: `Gym import done: ${s.label}, ${s.sums.added} new gyms${failed.length ? `, ${failed.length} areas failed` : ""}`,
+    title: "Gym import done",
+    lines,
+    cta: { label: "Open Admin › Gyms", url: `${siteOrigin()}/admin/?tab=Gyms` },
+    why: "You asked to be told when this import finished.",
+    icon: "flag",
+  });
+  const ok = await mail(s.startedBy, m.subject, m.text, m.html).catch(() => false);
   if (!ok) await run("UPDATE gym_import_jobs SET emailed = 0 WHERE id = ?", [id]).catch(() => 0);
   return ok;
 }
