@@ -2,7 +2,15 @@ import { execSync } from "node:child_process";
 import { join } from "node:path";
 import type { NextConfig } from "next";
 
-import { EMBED_HEADERS, GYMS_INDEX_CSP, NOT_EMBED, REPORT_PAGE_CSP, SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
+import {
+  EMBED_HEADERS,
+  GYMS_INDEX_CSP,
+  NOT_EMBED,
+  REPORT_PAGE_CSP,
+  SECURITY_HEADERS,
+  SHARE_PAGE_CSP,
+  WIDGET_CSP,
+} from "./src/lib/securityHeaders";
 
 // Two builds from one codebase:
 // - STATIC_EXPORT=1 (npm run build:static): a static export to out/ for the Capacitor shells and the
@@ -67,6 +75,9 @@ const nextConfig: NextConfig = {
           { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
           { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
           { source: "/gyms/:city/:gym/report/", destination: "/api/gyms/page/?city=:city&gym=:gym&report=1" },
+          // Website widgets for official gyms (src/server/gymWidgets.ts, docs/decisions/gyms.md "Website widgets").
+          { source: "/embed/gym/:id/badge.svg", destination: "/api/gyms/widget/?id=:id&kind=badge" },
+          { source: "/embed/gym/:id/:kind/", destination: "/api/gyms/widget/?id=:id&kind=:kind" },
           // Gym chains and every branch of each (src/server/gymChainPage.ts); in the gym sitemap.
           { source: "/gym-chains/", destination: "/api/gyms/chain/" },
           { source: "/gym-chains/:chain/", destination: "/api/gyms/chain/?chain=:chain" },
@@ -100,6 +111,8 @@ const nextConfig: NextConfig = {
         headers: async () => [
           { source: NOT_EMBED, headers: SECURITY_HEADERS },
           { source: "/embed/:path*", headers: EMBED_HEADERS },
+          // Gym widgets: any site may frame them, and they run nothing (gymWidgets.ts).
+          { source: "/embed/gym/:path*", headers: [{ key: "Content-Security-Policy", value: WIDGET_CSP }] },
           { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/u/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           // /gyms/ itself runs its map script (src/server/gymsNear.ts); the pages under it run none.

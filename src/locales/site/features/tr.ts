@@ -111,6 +111,11 @@ export const tr: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Salonunuzun web sitesi için widget'lar",
+      body: "Resmi salonlar tek satır kodla ders programlarını, ekipmanlarını ya da Bizi Liftsmith'te bulun rozetini kendi web sitelerinde gösterir. Seçilen dil ve görünümde kendiliğinden güncel kalır ve salonun sayfasına bağlanır.",
+      note: "Salonun sitesinde betik, çerez ya da izleme yok.",
+    },
     "gym-insights": {
       name: "Salon sahipleri için içgörüler",
       body: "Resmî salonların sahipleri ve personeli, son dört haftada orada kaç sporcunun antrenman yaptığını, yoğun ve sakin saatleri, kullanılan ekipmanı ve açık sorun bildirimlerini bir sonraki adımla görür.",

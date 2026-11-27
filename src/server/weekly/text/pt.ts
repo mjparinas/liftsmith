@@ -1123,4 +1123,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "O planejamento continua no celular, então Aparelho ocupado e Mudar o plano esperam ele voltar.",
   },
+  "gym-widgets": {
+    title: "Coloque sua academia no seu próprio site",
+    intro: "A grade de aulas, os equipamentos e um selo Encontre a gente no Liftsmith agora podem ficar no seu site, sempre atualizados.",
+    points: [
+      "Abra sua academia no app, toque em Gerenciar a página desta academia e procure Widgets para o seu site.",
+      "Escolha a grade, os equipamentos ou o selo, uma aparência clara ou escura e um de dez idiomas, e veja como vai ficar.",
+      "Copie o código e cole em um bloco de HTML ou de incorporação do seu site. Squarespace, Wix e WordPress têm um.",
+      "Mude uma aula ou seus equipamentos no app e o widget do seu site muda também.",
+    ],
+    dyk: "Os widgets não têm scripts, cookies nem rastreamento, e cada um leva para a página da sua academia, para novos alunos adicionarem com um toque.",
+  },
 };

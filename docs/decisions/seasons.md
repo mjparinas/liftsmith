@@ -33,6 +33,9 @@ Six seasons, back to back, all built in (`DEFAULT_SEASONS`), so each starts and 
 - All ten new app icons were drawn with `ONLY=… node scripts/make-icons.mjs` from the same mark, with Android launcher aliases and iOS alternate icons.
 - A season after Obsidian needs a new kit in an app release, like before; plan it by autumn 2027.
 
+
+**Google Play events** (2026-11-27): each season's start and its finale week get a Play promotional event in all ten languages ([Play promotional content](play-promotions.md), `docs/PLAY_PROMOTIONS.md`). A new or moved built-in season updates them in the same change; `playPromotions.test.ts` fails otherwise.
+
 ## Rewards
 
 - A **kit** is a reward set that ships with the app (`KITS`), because its app icons are native files. Each kit is used by one season only.

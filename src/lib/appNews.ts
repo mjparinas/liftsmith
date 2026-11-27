@@ -46,10 +46,14 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
-    version: "0.32.0",
+    version: "0.33.0",
     day: "2026-11-28",
-    headline: "Exercise charts you can read: tap any session for its number, new bests in gold and an All time range",
-    changes: [{ id: "liftCharts", kind: "better", icon: "chart" }],
+    headline:
+      "Exercise charts you can read, with new bests in gold and an All time range, and gym owners can put their schedule or a Liftsmith badge on their own website",
+    changes: [
+      { id: "liftCharts", kind: "better", icon: "chart" },
+      { id: "gymWidgets", kind: "new", icon: "link" },
+    ],
   },
   {
     version: "0.31.0",
