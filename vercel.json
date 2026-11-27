@@ -7,6 +7,7 @@
     "digest-pst": { "path": "/api/cron/digest/", "schedule": "0 16 * * *", "requestMethod": "GET" },
     "gym-imports": { "path": "/api/cron/gym-imports/", "schedule": "*/5 * * * *", "requestMethod": "GET" },
     "gym-refresh": { "path": "/api/cron/gym-refresh/", "schedule": "0 10 * * *", "requestMethod": "GET" },
-    "crew": { "path": "/api/cron/crew/", "schedule": "*/15 * * * *", "requestMethod": "GET" }
+    "crew": { "path": "/api/cron/crew/", "schedule": "*/15 * * * *", "requestMethod": "GET" },
+    "pins": { "path": "/api/cron/pins/", "schedule": "20 */2 * * *", "requestMethod": "GET" }
   }
 }

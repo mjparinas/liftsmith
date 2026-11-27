@@ -111,6 +111,11 @@ export const pt: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widgets para o site da sua academia",
+      body: "Academias oficiais colocam a grade de aulas, os equipamentos ou um selo Encontre a gente no Liftsmith no próprio site com uma linha de código. Eles se atualizam sozinhos, no idioma e na aparência escolhidos, e levam para a página da academia.",
+      note: "Sem scripts, cookies ou rastreamento no site da academia.",
+    },
     "gym-insights": {
       name: "Dados para donos de academia",
       body: "Donos e equipe de academias oficiais veem quantos atletas treinaram lá nas últimas quatro semanas, os horários cheios e tranquilos, os equipamentos usados e os problemas abertos, com um próximo passo.",
@@ -290,7 +295,8 @@ export const pt: FeaturesText = {
     "exercise-stats": {
       name: "Estatísticas de cada exercício",
       body: "Toque em qualquer exercício da biblioteca para ver suas séries, o peso total levantado, o máximo estimado e como você se compara com praticantes treinados do seu peso, idade e sexo, segundo padrões de força publicados.",
-      proPart: "Gráficos de uma semana a um ano fazem parte das estatísticas avançadas do Pro.",
+      proPart:
+        "As estatísticas avançadas do Pro trazem os gráficos, de uma semana a todo o histórico: toque em qualquer sessão para ver o número, com os recordes marcados.",
     },
     "log-past": {
       name: "Registre um treino passado",
@@ -349,6 +355,11 @@ export const pt: FeaturesText = {
     routines: {
       name: "Suas próprias rotinas",
       body: "Monte rotinas a partir do catálogo de exercícios, sem limite de quantidade, e compartilhe como link.",
+    },
+    "workout-generator": {
+      name: "Gerador de treinos grátis no site",
+      body: "Escolha o equipamento, os minutos e o que treinar, e o mesmo motor monta um treino com séries, repetições, descanso e o motivo de cada exercício. Cada treino tem o próprio link para compartilhar, e Começar no app abre o treino como rotina.",
+      note: "Começar no app abre o app de Android; no iPhone e no computador, abre o app web.",
     },
     "routine-library": {
       name: "Biblioteca de rotinas",
@@ -474,6 +485,10 @@ export const pt: FeaturesText = {
       name: "Cards ao fazer uma captura de tela",
       body: "Faça uma captura de tela e uma folha de cards do seu treino aparece: último mês, três meses, seis meses, ano ou desde o início, como totais, para onde foram suas séries ou seus melhores levantamentos. Deslize entre eles, oculte os pesos com o olho e compartilhe com seu link de convite impresso no card. Os mesmos cards estão em Compartilhar meu treino, no Progresso. Todo link que você compartilha agora leva seu convite, num link que diz isso.",
       note: "As capturas abrem isso no Android 14 ou mais recente e no iPhone, e dá para desativar. Em outros lugares, abra pelo Progresso. Quem tem menos de 18 anos compartilha sem link de convite.",
+    },
+    "share-stats": {
+      name: "Compartilhe qualquer recorde ou máximo",
+      body: "Um pequeno botão de compartilhar fica ao lado dos seus máximos estimados, da sua série mais pesada, de cada recorde por número de repetições e dos seus recordes recentes. Um toque cria um cartão com esse número, o logotipo do Liftsmith e o site, no visual do app, pronto para postar ou salvar.",
     },
     coaching: {
       name: "Treine alunos",

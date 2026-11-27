@@ -1,3 +1,4 @@
+import { GEN_FR } from "./gen/fr";
 import { FR_MORE } from "./more/fr";
 import type { LocalTools } from "./types";
 
@@ -192,4 +193,5 @@ export const FR_TOOLS: LocalTools = {
     },
   },
   ...FR_MORE,
+  "workout-generator": GEN_FR,
 };

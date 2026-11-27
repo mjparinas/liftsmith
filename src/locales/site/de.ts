@@ -40,6 +40,7 @@ export const de: SiteText = {
       equipment: "Übungen nach Ausrüstung",
       guides: "Trainingsratgeber",
       blog: "Blog",
+      generator: "Trainingsplan-Generator",
       plates: "Hantelscheiben-Rechner",
       oneRm: "1RM-Rechner",
       warmUp: "Aufwärmrechner",

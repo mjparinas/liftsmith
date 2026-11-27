@@ -46,6 +46,7 @@ export const pl: SiteText = {
       equipment: "Ćwiczenia według sprzętu",
       guides: "Poradniki treningowe",
       blog: "Blog",
+      generator: "Generator treningu",
       plates: "Kalkulator talerzy",
       oneRm: "Kalkulator 1RM",
       warmUp: "Kalkulator rozgrzewki",

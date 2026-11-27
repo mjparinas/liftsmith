@@ -34,6 +34,7 @@ export const en: SiteText = {
       equipment: "Exercises by equipment",
       guides: "Training guides",
       blog: "Blog",
+      generator: "Workout generator",
       plates: "Plate calculator",
       oneRm: "One-rep max calculator",
       warmUp: "Warm-up calculator",

@@ -41,6 +41,7 @@ export const ja: SiteText = {
       equipment: "器具別の種目",
       guides: "トレーニングガイド",
       blog: "ブログ",
+      generator: "ワークアウトジェネレーター",
       plates: "プレート計算機",
       oneRm: "1RM 計算機",
       warmUp: "ウォームアップ計算機",

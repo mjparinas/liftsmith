@@ -1607,7 +1607,31 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS community_bans (
     account_id TEXT PRIMARY KEY,
     at INTEGER NOT NULL
+  )`, // Pinterest pins and clips made from the 3D figures (pins.ts, docs/decisions/pinterest.md): two rows per exercise.
+  `CREATE TABLE IF NOT EXISTS pins (
+    id TEXT PRIMARY KEY,
+    exercise TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    alt TEXT NOT NULL,
+    link TEXT NOT NULL,
+    board TEXT NOT NULL,
+    media_url TEXT NOT NULL,
+    cover_url TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    posted_at INTEGER,
+    pin_id TEXT,
+    media_id TEXT,
+    error TEXT NOT NULL DEFAULT '',
+    tries INTEGER NOT NULL DEFAULT 0
   )`,
+  "CREATE INDEX IF NOT EXISTS pins_status ON pins (status, created_at)",
+  "CREATE INDEX IF NOT EXISTS pins_exercise ON pins (exercise)",
+  "CREATE INDEX IF NOT EXISTS pins_posted ON pins (posted_at)",
+  "CREATE INDEX IF NOT EXISTS pins_updated ON pins (status, updated_at)",
 ];
 
 /**

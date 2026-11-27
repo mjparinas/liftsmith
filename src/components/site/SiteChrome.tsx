@@ -162,6 +162,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           popularLiftLinks(lang).map(([href, label]) => ({ href, label })),
         )}
         {col(t.cols.tools, [
+          { href: localPath(lang, "/tools/workout-generator/"), label: l.generator },
           { href: "/tools/plate-calculator/", label: l.plates },
           { href: "/tools/one-rep-max-calculator/", label: l.oneRm },
           { href: "/tools/warm-up-calculator/", label: l.warmUp },

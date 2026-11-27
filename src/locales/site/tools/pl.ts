@@ -1,3 +1,4 @@
+import { GEN_PL } from "./gen/pl";
 import type { LocalTools } from "./types";
 
 // The calculators in Polish (ty). Same parts as the English pages (src/app/tools/).
@@ -535,4 +536,5 @@ export const PL_TOOLS: LocalTools = {
       },
     },
   },
+  "workout-generator": GEN_PL,
 };

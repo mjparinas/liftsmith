@@ -9,6 +9,7 @@ import { date, list, num, t } from "@/lib/i18n";
 import { liftSessions, liftTrend, repBests, type LiftTrend } from "@/lib/liftPage";
 import { liftComparison, liftKind, liftMax, liftTotals } from "@/lib/liftStats";
 import { target } from "@/lib/progression";
+import { repBestShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -18,9 +19,10 @@ import { plateText, setText } from "./format";
 import { FaultList, faultsFor } from "./FormFaults";
 import { LiftChart, LiftCompareCard, LiftTotalsCard } from "./LiftStats";
 import { useMyShape } from "./myShape";
-import { ProLocked } from "./ProLocked";
+import { ProStats } from "./ProStats";
 import { goBack } from "./router";
 import { SetHints } from "./SetHints";
+import { ShareStat } from "./ShareStat";
 import { HUE } from "./theme";
 import { EmptyState, ScreenHeader, Section } from "./ui";
 
@@ -123,7 +125,7 @@ export function ExercisePage({ id }: { id?: string }) {
 
       {sessions.length > 0 && !can("advancedStats") && (
         <Section title={t("lift.trendTitle")} icon="progress" info="e1rm">
-          <ProLocked from="lift" title={t("pro.ft.advancedStats")} body={t("lift.trend.lock")} />
+          <ProStats from="lift" lines={[t("lift.pro.chart"), t("lift.pro.points"), t("lift.pro.trend")]} />
         </Section>
       )}
       {sessions.length > 0 && can("advancedStats") && (
@@ -149,7 +151,7 @@ export function ExercisePage({ id }: { id?: string }) {
         </Section>
       )}
 
-      <LiftTotalsCard totals={totals} max={max} unit={unit} kind={kind} />
+      <LiftTotalsCard totals={totals} max={max} unit={unit} kind={kind} name={ex.name} heaviestKg={bests[0]?.weight ?? 0} />
       {compare && <LiftCompareCard c={compare} unit={unit} />}
 
       {bests.length > 0 && (
@@ -167,6 +169,9 @@ export function ExercisePage({ id }: { id?: string }) {
                   <th scope="col" className="py-1 text-right font-medium">
                     {t("lift.head.when")}
                   </th>
+                  <th scope="col" className="w-11">
+                    <span className="sr-only">{t("card.share")}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -180,6 +185,13 @@ export function ExercisePage({ id }: { id?: string }) {
                     </td>
                     <td className="py-1.5 text-right text-muted">
                       {date(b.at, { month: "short", day: "numeric", year: sameYear(b.at, now) ? undefined : "numeric" })}
+                    </td>
+                    <td className="py-0.5 pl-1 text-right">
+                      <ShareStat
+                        className="ml-auto"
+                        label={`${t("card.pick.best", { name: ex.name })}, ${b.reps === 1 ? t("card.best.top") : t("card.best.reps", { count: b.reps, n: num(b.reps) })}`}
+                        items={(ctx) => [repBestShare(ex.id, b, ctx)]}
+                      />
                     </td>
                   </tr>
                 ))}

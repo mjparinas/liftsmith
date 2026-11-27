@@ -46,6 +46,7 @@ export const tr: SiteText = {
       equipment: "Ekipmana göre egzersizler",
       guides: "Antrenman rehberleri",
       blog: "Blog",
+      generator: "Antrenman oluşturucu",
       plates: "Plaka hesaplayıcısı",
       oneRm: "1RM hesaplayıcısı",
       warmUp: "Isınma hesaplayıcısı",

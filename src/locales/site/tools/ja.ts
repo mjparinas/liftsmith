@@ -1,3 +1,4 @@
+import { GEN_JA } from "./gen/ja";
 import { JA_MORE } from "./more/ja";
 import type { LocalTools } from "./types";
 
@@ -189,4 +190,5 @@ export const JA_TOOLS: LocalTools = {
     },
   },
   ...JA_MORE,
+  "workout-generator": GEN_JA,
 };

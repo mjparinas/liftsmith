@@ -377,6 +377,7 @@ export function HomeView({ lang }: { lang: SiteLang }) {
                 <h3 className="text-lg font-semibold">{h.learn.tools}</h3>
                 <ul className="mt-3 space-y-1">
                   {[
+                    { href: localPath(lang, "/tools/workout-generator/"), label: t.chrome.links.generator },
                     { href: localPath(lang, "/tools/plate-calculator/"), label: t.chrome.links.plates },
                     { href: localPath(lang, "/tools/one-rep-max-calculator/"), label: t.chrome.links.oneRm },
                     { href: localPath(lang, "/programs/"), label: t.chrome.links.programs },

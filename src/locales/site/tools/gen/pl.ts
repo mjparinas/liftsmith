@@ -1,0 +1,111 @@
+import type { GenUi, ToolPageText } from "../types";
+
+// The workout generator in Polish (ty). Same parts as the English page (./en.ts).
+export const GEN_PL: { page: ToolPageText; ui: GenUi } = {
+  page: {
+    title: "Generator treningu: darmowy trening pod twój sprzęt i czas",
+    description:
+      "Wybierz sprzęt, ile masz czasu i co chcesz trenować, a dostaniesz darmowy trening z seriami, powtórzeniami, przerwami i krótkim powodem przy każdym ćwiczeniu. Bez rejestracji, a każdy trening ma własny link.",
+    name: "Generator treningu",
+    intro:
+      "Powiedz, co masz i ile masz czasu, a on ułoży trening: ćwiczenia, na które pozwala twój sprzęt, najpierw te duże, z seriami, powtórzeniami, przerwami i powodem przy każdym.",
+    sticky: "Codziennie nowy trening, ułożony dla ciebie",
+    mid: {
+      title: "Jutrzejszy trening wynika z dzisiejszego",
+      body: "Tutaj każdy trening zaczyna się od zera. {app} pamięta, co podniosłeś, które mięśnie jeszcze się regenerują i ile serii każdy miał w tym tygodniu, więc każdy dzień wynika z poprzedniego, a ciężary rosną, gdy jesteś gotowy.",
+      button: "Zaplanuj moje treningi",
+    },
+    end: {
+      title: "Wchodź na siłownię z planem",
+      body: "{app} codziennie układa taki trening na podstawie twojej siłowni, regeneracji i bloku treningowego, a potem nie przeszkadza ci w ćwiczeniu.",
+    },
+    faq: [
+      [
+        "Jak działa generator treningu?",
+        "Korzysta z tego samego silnika, który planuje treningi w aplikacji {app}. Zostawia tylko ćwiczenia, na które pozwala twój sprzęt, kieruje je na to, co wybrałeś, stawia duże ćwiczenia wielostawowe na początku, póki masz siły, i mieści serie, przerwy oraz serie rozgrzewkowe w twoich minutach.",
+      ],
+      [
+        "Czy jest darmowy? Czy potrzebuję konta?",
+        "Jest darmowy, bez rejestracji. Twoje wybory (sprzęt, minuty, partia, cel i doświadczenie) są wysyłane, żeby ułożyć trening, i nic nie jest zapisywane. Wszystkie są w linku, więc ten sam link zawsze daje ten sam trening.",
+      ],
+      [
+        "Jaki ciężar wybrać?",
+        "Przy każdym ćwiczeniu jest napisane, ile powtórzeń zostawić w zapasie. Wybierz ciężar, z którym na koniec serii zrobiłbyś jeszcze tyle powtórzeń w dobrej technice. Jeśli ostatnie było łatwe, dołóż trochę w kolejnej serii. Aplikacja poznaje twoje prawdziwe liczby na pierwszym treningu i potem planuje każdy ciężar.",
+      ],
+      [
+        "Co znaczą powtórzenia w zapasie?",
+        "Ile jeszcze dobrych powtórzeń dałbyś radę zrobić, gdy kończysz serię. Nowy blok zaczyna kilka powtórzeń przed upadkiem mięśniowym, żebyś ćwiczył technikę i dobrze się regenerował, a w kolejnych tygodniach zbliża się do upadku.",
+      ],
+      [
+        "Dlaczego mój trening jest krótszy niż wybrany czas?",
+        "Przy małej ilości sprzętu i małej partii warto robić tylko kilka ćwiczeń. Zamiast dopychać trening, generator mówi o tym wprost. Dodaj sprzęt, wybierz większą partię albo zrób drugą rundę.",
+      ],
+      [
+        "Czy mogę zapisać trening albo zrobić go w aplikacji?",
+        "Tak. Udostępnij ten trening kopiuje jego link. Zacznij w aplikacji otwiera go w {app} jako rutynę: twoje ciężary uzupełniają się w trakcie, minutnik przerwy włącza się sam, a każda seria jest zapisywana.",
+      ],
+    ],
+    more: {
+      heading: "Jak powstaje trening",
+      paragraphs: [
+        "Generator zaczyna od wszystkich ćwiczeń z biblioteki {app}, na które pozwala twój sprzęt. Jeśli wybrałeś partię, zostają tylko ćwiczenia, których główne mięśnie w całości do niej należą. Duże mięśnie wybierają pierwsze, a pierwszym wyborem dla każdego jest ćwiczenie wielostawowe, które angażuje kilka mięśni naraz; mniejsze ćwiczenia dochodzą w drugiej rundzie, póki jest czas.",
+        "Serie i powtórzenia zależą od celu. Na masę ćwiczenia wielostawowe są w zakresie 6–10 powtórzeń, a mniejsze 10–15; na siłę powtórzeń jest mniej, a przerwy dłuższe; na kondycję wypada to pośrodku. Podpory i noszenie liczy się w sekundach. Główne ćwiczenia mają serie rozgrzewkowe, a zostały czas zamienia się w dodatkową serię w pierwszych ćwiczeniach.",
+        "Łącz ćwiczenia w superserie robi to samo co automatyczne superserie w aplikacji: dwa ćwiczenia na różne mięśnie, jedno po drugim, żeby każdy mięsień odpoczywał, gdy drugi pracuje, i żeby więcej zmieściło się w tym samym czasie.",
+      ],
+    },
+    reading: [
+      { href: "/blog/how-to-build-a-workout-routine/", label: "jak ułożyć plan treningowy" },
+      { href: "/blog/how-long-to-rest-between-sets/", label: "ile odpoczywać między seriami" },
+      { href: "/pl/tools/warm-up-calculator/", label: "kalkulator rozgrzewki" },
+    ],
+  },
+  ui: {
+    equipment: "Sprzęt",
+    kits: { commercial: "Pełna siłownia", home: "Siłownia w domu", dumbbells: "Tylko hantle", bodyweight: "Bez sprzętu" },
+    custom: "Wybierz sprzęt",
+    customHint: "Stuknij to, co masz. Trening użyje tylko tego.",
+    minutes: "Czas",
+    minutesValue: "{n} min",
+    focus: "Co trenować",
+    goal: "Cel",
+    goals: { muscle: "Budowa mięśni", strength: "Więcej siły", general: "Dobra forma" },
+    level: "Doświadczenie",
+    levels: { new: "Dopiero zaczynam", intermediate: "Trochę doświadczenia", advanced: "Doświadczony" },
+    pairs: "Łącz ćwiczenia w superserie",
+    pairsHint: "Dwa ćwiczenia na różne mięśnie jedno po drugim, z krótszą przerwą, żeby zmieściło się więcej.",
+    make: "Ułóż mój trening",
+    another: "Inny trening",
+    working: "Układam twój trening…",
+    error: "Nie udało się teraz ułożyć treningu. Sprawdź połączenie i spróbuj ponownie.",
+    nothing: "Nic nie pasuje do tego sprzętu i tej partii. Dodaj sprzęt albo wybierz inną partię.",
+    about: "Około {n} min",
+    short: "Około {n} min to wszystko, na co ten sprzęt pozwala przy tej partii. Dodaj sprzęt albo wybierz większą partię.",
+    order: "Najpierw duże ćwiczenia, póki masz siły, potem mniejsze. Przy każdym ćwiczeniu jest powód.",
+    setsReps: "{sets} × {reps}",
+    setsSecs: "{sets} × {secs} s",
+    rest: "Przerwa {time}",
+    tank: "Powtórzenia w zapasie: {n}",
+    holdForm: "Przerwij, gdy technika się psuje",
+    warmups: "Najpierw serie rozgrzewkowe: {n}",
+    superset: "Superseria {letter}",
+    whyFirst: "{muscle}: ćwiczenie wielostawowe na początek, póki masz siły",
+    whyCompound: "{muscle}: ćwiczenie wielostawowe na kilka mięśni naraz",
+    whyIsolation: "{muscle}: mniejsze ćwiczenie na dokończenie mięśnia",
+    whyBodyweight: "{muscle}: ćwiczenie wielostawowe z masą ciała, bez obciążenia",
+    whyHold: "{muscle}: utrzymanie pozycji lub noszenie, w sekundach",
+    repsMuscle: "Od {lo} do {hi} powtórzeń na masę: zacznij od {reps} i dokładaj, gdy robi się łatwo",
+    repsStrength: "Cięższe serie od {lo} do {hi} powtórzeń na siłę",
+    repsGeneral: "Od {lo} do {hi} powtórzeń, złoty środek dla kondycji",
+    repsBodyweight: "Od {lo} do {hi} powtórzeń: zacznij od {reps} i najpierw dokładaj powtórzenia",
+    repsHold: "Od {lo} do {hi} sekund: zacznij od {reps} i za każdym razem trzymaj trochę dłużej",
+    mainSets: "Serie: {sets}, bo to główne ćwiczenie i jest na nie czas",
+    moreSets: "Serie: {sets}, wykorzystując czas, który masz",
+    pair: "Zaraz po {other}: inne mięśnie, więc przerwa jest krótsza",
+    share: "Udostępnij ten trening",
+    copied: "Link skopiowany",
+    start: "Zacznij w aplikacji",
+    startHint: "Otwiera się w {app} jako rutyna. Twoje ciężary uzupełniają się w trakcie treningu.",
+    example: "Przykład na początek. Zmień dowolny wybór powyżej.",
+    see: "Zobacz swój trening",
+  },
+};

@@ -44,6 +44,7 @@ export interface SiteText {
       equipment: string;
       guides: string;
       blog: string;
+      generator: string;
       plates: string;
       oneRm: string;
       warmUp: string;
