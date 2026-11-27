@@ -1,5 +1,7 @@
 package com.getliftsmith.app.wear;
 
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMapItem;
@@ -10,6 +12,13 @@ import com.google.android.gms.wearable.WearableListenerService;
  * straight to WatchHub, whether or not the screen is open.
  */
 public class PhoneListenerService extends WearableListenerService {
+
+    @Override
+    public void onMessageReceived(MessageEvent message) {
+        if (WatchHub.PATH_WORKOUT.equals(message.getPath())) {
+            WatchHub.receive(this, DataMap.fromByteArray(message.getData()), true);
+        }
+    }
 
     @Override
     public void onDataChanged(DataEventBuffer events) {
@@ -36,9 +45,9 @@ public class PhoneListenerService extends WearableListenerService {
             }
             if (!WatchHub.PATH_WORKOUT.equals(e.getDataItem().getUri().getPath())) continue;
             if (e.getType() == DataEvent.TYPE_DELETED) {
-                WatchHub.set(this, null);
+                WatchHub.receive(this, null, false);
             } else {
-                WatchHub.set(this, WatchHub.fromPhone(DataMapItem.fromDataItem(e.getDataItem()).getDataMap().getString("json")));
+                WatchHub.receive(this, DataMapItem.fromDataItem(e.getDataItem()).getDataMap(), false);
             }
         }
     }

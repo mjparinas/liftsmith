@@ -34,6 +34,12 @@ final class WatchClock {
         if (count < SAMPLES) count++;
     }
 
+    /** A retained snapshot already uses phone time. Its age on disk cannot tell us the clock difference. */
+    synchronized long offsetFor(long sentAt, long arrivedAt, boolean live) {
+        if (live) heard(sentAt, arrivedAt);
+        return offset();
+    }
+
     /** How far this watch's clock is ahead of the phone's (negative: behind), in ms; add it to a phone time. */
     synchronized long offset() {
         if (count == 0) return 0;
