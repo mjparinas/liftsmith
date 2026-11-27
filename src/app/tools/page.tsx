@@ -7,7 +7,7 @@ import { TOOL_PAGES } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "Free tools for lifters",
-  description: `Free calculators from ${BRAND.name}: plates per side, warm-up sets, one-rep max, an RPE chart, strength standards, DOTS, Wilks, TDEE, macros, body fat, FFMI, heart rate zones, training max waves and an interval timer. No sign-up, nothing stored.`,
+  description: `Free tools from ${BRAND.name}: a workout generator, plates per side, warm-up sets, one-rep max, an RPE chart, strength standards, DOTS, Wilks, TDEE, macros, body fat, FFMI, heart rate zones, training max waves and an interval timer. No sign-up, nothing stored.`,
   path: "/tools/",
 });
 
@@ -17,7 +17,7 @@ export default function ToolsIndex() {
       <Crumbs items={[{ label: "Tools" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Free tools for lifters</h1>
       <p className="mt-3 max-w-2xl text-lg text-muted">
-        The same calculators the {BRAND.name} app runs on, free in your browser. No sign-up, and nothing you enter is stored or sent.
+        The same engine and calculators the {BRAND.name} app runs on, free in your browser. No sign-up, and nothing you enter is stored.
       </p>
       <LinkGrid items={TOOL_PAGES.map((t) => ({ href: t.path, title: t.name, body: t.blurb }))} />
       <CtaBanner

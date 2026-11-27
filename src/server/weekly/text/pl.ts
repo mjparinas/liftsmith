@@ -512,7 +512,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Każde ćwiczenie pokazuje twoje serie, łączny podniesiony ciężar i szacowany 1RM.",
       "Zobacz, jak wypadasz na tle trenujących osób o twojej masie ciała, wieku i płci.",
-      "Pro: wykresy od tygodnia do roku, tygodniowe serie na mięsień względem celu i trendy 1RM.",
+      "Pro: wykresy od tygodnia po cały czas (dotknij treningu, aby zobaczyć wynik, rekordy zaznaczone), tygodniowe serie na mięsień względem celu i trendy 1RM.",
       "Normy siłowe na stronie internetowej pochodzą od prawdziwych osób, które zgodziły się na uwzględnienie swoich wyników.",
     ],
     dyk: "„Uwzględniaj moje wyniki” w Ustawienia › Twoje dane i prywatność decyduje, czy twoje wyniki pomagają budować te normy.",
@@ -1129,6 +1129,28 @@ export const emails: Record<string, Words> = {
       "Zmień zajęcia albo sprzęt w aplikacji, a widżet na stronie też się zmieni.",
     ],
     dyk: "Widżety nie mają skryptów, plików cookie ani śledzenia, a każdy prowadzi do strony Twojej siłowni, więc nowi członkowie dodadzą ją jednym dotknięciem.",
+  },
+  "share-stats": {
+    title: "Udostępnij liczby, z których jesteś najbardziej dumny",
+    intro: "Każdy szacowany maks, najcięższa seria i rekord życiowy ma teraz obok mały przycisk udostępniania.",
+    points: [
+      "Znajdziesz go obok maksów i nowych rekordów w Postępach oraz na stronie każdego ćwiczenia.",
+      "Na stronie ćwiczenia ma go też każdy wiersz tabeli rekordów, od najcięższej serii po najlepszy wynik na 15 powtórzeń.",
+      "Jedno dotknięcie tworzy kartę z tą liczbą, logo Liftsmith i stroną, w wyglądzie aplikacji.",
+      "Opublikuj ją, wyślij albo zapisz. Ciężary można ukryć, a imię pojawia się tylko, gdy je dodasz.",
+    ],
+    dyk: "Na karcie może być też Twój link z zaproszeniem, a znajomy, który z niego dołączy, zaobserwuje Cię w odpowiedzi.",
+  },
+  "workout-generator": {
+    title: "Wyślij znajomemu trening, nawet bez aplikacji",
+    intro: "Na naszej stronie jest teraz darmowy generator treningu z tym samym silnikiem co twój ekran Dziś.",
+    points: [
+      "Na getliftsmith.com/tools/workout-generator wybierz sprzęt, minuty i co trenować: całe ciało, split albo jedną partię.",
+      "Układa serie, powtórzenia, przerwy i rozgrzewkę, a przy każdym ćwiczeniu podaje powód.",
+      "Każdy trening ma własny link. Udostępnij go znajomemu: ten sam link zawsze daje ten sam trening.",
+      "Zacznij w aplikacji otwiera go jako rutynę, gotową do zapisania lub startu, a twoje ciężary uzupełniają się w trakcie.",
+    ],
+    dyk: "Ekran Dziś robi to dla ciebie codziennie i wie też, co podniosłeś ostatnio i które mięśnie jeszcze się regenerują.",
   },
   "thirty-day": {
     title: "Jedno ćwiczenie dziennie przez 30 dni",

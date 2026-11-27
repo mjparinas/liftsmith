@@ -7,6 +7,7 @@ import { EQUIPMENT_NAME, MUSCLE_NAME } from "@/lib/seo";
 import type { SiteLang } from "@/lib/siteLang";
 import { ACTIVITIES, type Activity } from "@/lib/tdee";
 import type { Equipment, Exercise, Muscle } from "@/lib/types";
+import { GEN_FOCUS, type GenFocus } from "@/lib/webWorkout";
 import * as activity from "@/locales/text/activity";
 import * as bmi from "@/locales/text/bmi";
 import * as c30 from "@/locales/text/c30";
@@ -14,6 +15,7 @@ import * as demo from "@/locales/text/demo";
 import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
 import * as ff from "@/locales/text/ff";
+import * as gen from "@/locales/text/gen";
 import * as muscle from "@/locales/text/muscle";
 import * as pgm from "@/locales/text/pgm";
 import * as tdee from "@/locales/text/tdee";
@@ -57,6 +59,15 @@ export function equipmentLabels(lang: SiteLang): Record<Equipment, string> {
   const out = { ...EQUIPMENT_NAME };
   for (const q of Object.keys(out) as Equipment[]) out[q] = line(equipment, lang, `equipment.${q}`) ?? out[q];
   return out;
+}
+
+/** The equipment groups' titles (Free weights, Benches and racks, …) by the key after "equipment.group.". */
+export function equipmentGroupLabels(lang: SiteLang): Record<"free" | "benches" | "machines" | "small" | "cardio", string> {
+  const keys = ["free", "benches", "machines", "small", "cardio"] as const;
+  return Object.fromEntries(keys.map((k) => [k, line(equipment, lang, `equipment.group.${k}`) ?? k])) as Record<
+    (typeof keys)[number],
+    string
+  >;
 }
 
 /** A lift's name, setup line and cues as the app shows them in that language (English where a line is missing). */
@@ -137,6 +148,13 @@ export function programLine(lang: SiteLang, english: string): string | null {
 
 /** "Day {n}" as the app says it. */
 export const programDayN = (lang: SiteLang, n: number) => (line(pgm, lang, "pgm.day") ?? "Day {n}").replace("{n}", String(n));
+
+/** The workout generator's focus names and the workout's name (gen.*), as the app names the routine it opens. */
+export function genWords(lang: SiteLang): { title: string; focuses: Record<GenFocus, string> } {
+  const focuses = {} as Record<GenFocus, string>;
+  for (const f of GEN_FOCUS) focuses[f] = line(gen, lang, `gen.focus.${f}`) ?? f;
+  return { title: line(gen, lang, "gen.title") ?? "{focus} · {minutes} min", focuses };
+}
 
 /** A 30-day challenge's name and its one line on what it does for you (thirtyDay.ts), as the app says them. */
 export function thirtyWords(lang: SiteLang, id: string): { name: string; why: string } {

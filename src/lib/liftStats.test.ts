@@ -13,6 +13,7 @@ import {
   liftTotals,
   metricsFor,
   RANGE_DAYS,
+  rangeStart,
   seriesChange,
 } from "./liftStats";
 import type { AppEvent } from "./types";
@@ -97,6 +98,47 @@ describe("liftSeries", () => {
     const later = NOW + 200 * DAY;
     expect(liftMax(events, squat, later)).toBeNull();
     expect(liftSeries(sessions, "e1rm", "1y", later)).toHaveLength(20);
+  });
+});
+
+describe("all time and new bests", () => {
+  const now = NOW + DAY;
+  it("charts every session since the first for all time", () => {
+    // Two years of weekly squats: a year shows 52, all time shows all 104.
+    const sessions = liftSessions(squats(104), "back-squat");
+    expect(liftSeries(sessions, "top", "1y", now).length).toBeLessThan(104);
+    const all = liftSeries(sessions, "top", "all", now);
+    expect(all).toHaveLength(104);
+    expect(all[0]!.value).toBe(80);
+    expect(rangeStart(sessions, "all", now)).toBe(all[0]!.at);
+  });
+  it("starts all time a week back when there's one session today or none", () => {
+    expect(rangeStart([], "all", now)).toBe(now - 7 * DAY);
+    expect(rangeStart([{ at: now - DAY }], "all", now)).toBe(now - 7 * DAY);
+    expect(rangeStart([], "3m", now)).toBe(now - 91 * DAY);
+  });
+  it("marks a session heavier than every one before it, never the first", () => {
+    const sessions = liftSessions(squats(4), "back-squat");
+    expect(liftSeries(sessions, "top", "all", now).map((p) => !!p.best)).toEqual([false, true, true, true]);
+  });
+  it("judges a best against sessions before the range too", () => {
+    // 100 kg a year ago, then 90 and 95 inside the month: neither beats the old 100.
+    const old = makeWorkout("a", NOW - 300 * DAY, [{ exerciseId: "back-squat", weight: 100, reps: 5 }]);
+    const a = makeWorkout("b", NOW - 14 * DAY, [{ exerciseId: "back-squat", weight: 90, reps: 5 }]);
+    const b = makeWorkout("c", NOW - 7 * DAY, [{ exerciseId: "back-squat", weight: 95, reps: 5 }]);
+    const c = makeWorkout("d", NOW, [{ exerciseId: "back-squat", weight: 102.5, reps: 5 }]);
+    const sessions = liftSessions([...old, ...a, ...b, ...c], "back-squat");
+    expect(liftSeries(sessions, "top", "1m", now).map((p) => [p.value, !!p.best])).toEqual([
+      [90, false],
+      [95, false],
+      [102.5, true],
+    ]);
+  });
+  it("doesn't count a tie as a best", () => {
+    const a = makeWorkout("a", NOW - 7 * DAY, [{ exerciseId: "back-squat", weight: 100, reps: 5 }]);
+    const b = makeWorkout("b", NOW, [{ exerciseId: "back-squat", weight: 100, reps: 5 }]);
+    const pts = liftSeries(liftSessions([...a, ...b], "back-squat"), "top", "all", now);
+    expect(pts.map((p) => !!p.best)).toEqual([false, false]);
   });
 });
 

@@ -514,7 +514,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Cada exercício mostra suas séries, o total levantado e o máximo estimado.",
       "Veja como você se compara com pessoas treinadas do seu peso, idade e sexo.",
-      "Pro: gráficos de uma semana a um ano, séries semanais por músculo em relação à meta e tendências de 1RM.",
+      "Pro: gráficos de uma semana a todo o histórico (toque em uma sessão para ver o número, com os recordes marcados), séries semanais por músculo em relação à meta e tendências de 1RM.",
       "Os padrões de força do site vêm de pessoas reais que escolhem ser contadas.",
     ],
     dyk: "“Contar meus levantamentos” em Ajustes › Seus dados e privacidade decide se os seus ajudam a montar esses padrões.",
@@ -1133,6 +1133,28 @@ export const emails: Record<string, Words> = {
       "Mude uma aula ou seus equipamentos no app e o widget do seu site muda também.",
     ],
     dyk: "Os widgets não têm scripts, cookies nem rastreamento, e cada um leva para a página da sua academia, para novos alunos adicionarem com um toque.",
+  },
+  "share-stats": {
+    title: "Compartilhe os números de que você mais se orgulha",
+    intro: "Cada máximo estimado, série mais pesada e recorde pessoal agora tem um pequeno botão de compartilhar ao lado.",
+    points: [
+      "Ele fica ao lado dos seus máximos e recordes novos em Progresso, e na página de cada exercício.",
+      "Na página de um exercício, cada linha da tabela de recordes também tem um, da sua série mais pesada ao seu melhor para 15 repetições.",
+      "Um toque cria um cartão com esse número, o logotipo do Liftsmith e o site, no visual do app.",
+      "Poste, envie ou salve. Dá para ocultar os pesos, e seu nome só aparece se você adicionar.",
+    ],
+    dyk: "Seu link de convite pode ir no cartão, e quem entrar com ele segue você de volta.",
+  },
+  "workout-generator": {
+    title: "Mande um treino para um amigo, mesmo sem o app",
+    intro: "O nosso site agora tem um gerador de treinos grátis que usa o mesmo motor da sua tela Hoje.",
+    points: [
+      "Em getliftsmith.com/tools/workout-generator, escolha equipamento, minutos e o que treinar: corpo inteiro, uma divisão ou uma área.",
+      "Ele escreve séries, repetições, descanso e aquecimento, e diz por que cada exercício está ali.",
+      "Cada treino tem o próprio link. Compartilhe com um amigo: o mesmo link sempre mostra o mesmo treino.",
+      "Começar no app abre o treino como rotina, pronta para salvar ou começar, com as suas cargas preenchidas enquanto você treina.",
+    ],
+    dyk: "A tela Hoje faz isso por você todo dia, e ainda sabe o que você levantou da última vez e quais músculos ainda se recuperam.",
   },
   "thirty-day": {
     title: "Um exercício por dia durante 30 dias",

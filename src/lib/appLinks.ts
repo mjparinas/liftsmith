@@ -1,6 +1,7 @@
 "use client";
 
 import { isAdminLink, openAdmin } from "./adminLink";
+import { generatorHash } from "./genLink";
 import { inviteAppPath, inviteOfUrl, keepInviteFrom } from "./invite";
 import { APP_PATH } from "./site";
 import { SITE_LANGS } from "./siteLang";
@@ -106,6 +107,8 @@ function webScreen(parts: string[], u: URL): string | null {
     case "programs":
       return "#/programs";
     case "tools": {
+      // The website's workout generator: the workout in the link, as a routine to save or start (genLink.ts).
+      if (a === "workout-generator") return generatorHash(u.searchParams.get("w"));
       const arg = a ? TOOL_ARGS[a] : undefined;
       return arg ? `#/tools/${arg}` : "#/tools";
     }

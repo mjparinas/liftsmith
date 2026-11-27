@@ -8,7 +8,7 @@ export const BLOG_W: Article[] = [
     kind: "blog",
     title: "Every exercise now has its own stats",
     description:
-      "Tap any exercise for your sets, total weight lifted, estimated max, charts from a week to a year and how you compare with lifters like you.",
+      "Tap any exercise for your sets, total weight lifted, estimated max, charts from a week to all time and how you compare with lifters like you.",
     date: "2026-11-13",
     tag: "Training",
     cta: "onerm",
@@ -28,12 +28,15 @@ export const BLOG_W: Article[] = [
         p: "Bodyweight exercises show your total reps instead of weight, and holds, carries and cardio show the total time.",
       },
       { cta: "onerm" },
-      { h2: "Charts from a week to a year" },
+      { h2: "Charts from a week to all time" },
       {
-        p: "Under **Which way it's going**, a chart shows the lift over time. It opens on the last three months and switches to a week, a month, six months or a year in a tap. Choose what it draws: your estimated max, each workout's volume or your heaviest set (most reps for bodyweight exercises). The days are to scale, so a two-week break shows as a gap, and a line under the chart says how much it moved over that range.",
+        p: "Under **Which way it's going**, a chart shows the lift over time. It opens on the last three months and switches to a week, a month, six months, a year or all time in a tap. Choose what it draws: your estimated max, each workout's volume or your heaviest set (most reps for bodyweight exercises). The days are to scale, so a two-week break shows as a gap, and a line under the chart says how much it moved over that range.",
       },
       {
-        p: "A chart on its own doesn't tell you what to do, so it sits under the line that does: up and working, holding steady, stalled for a few weeks, or dropping, each with one thing to try next. The charts are part of Pro's advanced stats; free lifters see the card and what it would show.",
+        p: "Tap or drag across the chart to pick any session and read its number and date under it (on a computer, hover or use the arrow keys). Every session that beat all the ones before it is a gold dot, so you can see at a glance where your new bests came from.",
+      },
+      {
+        p: "A chart on its own doesn't tell you what to do, so it sits under the line that does: up and working, holding steady, stalled for a few weeks, or dropping, each with one thing to try next. The charts are part of Pro's advanced stats; free lifters see a preview card that says what Pro's stats add.",
       },
       { h2: "Lifters like you" },
       {

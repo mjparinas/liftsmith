@@ -1,0 +1,111 @@
+import type { GenUi, ToolPageText } from "../types";
+
+// The workout generator in Brazilian Portuguese (você). Same parts as the English page (./en.ts).
+export const GEN_PT: { page: ToolPageText; ui: GenUi } = {
+  page: {
+    title: "Gerador de treinos: um treino grátis para o seu equipamento e o seu tempo",
+    description:
+      "Escolha o equipamento, quanto tempo você tem e o que quer treinar, e receba um treino grátis com séries, repetições, descanso e um motivo curto para cada exercício. Sem cadastro, e cada treino tem o próprio link.",
+    name: "Gerador de treinos",
+    intro:
+      "Diga o que você tem e quanto tempo, e ele monta o treino: exercícios que o seu equipamento permite, os grandes primeiro, com séries, repetições, descanso e por que cada um está ali.",
+    sticky: "Um treino novo todo dia, feito para você",
+    mid: {
+      title: "O treino de amanhã continua o de hoje",
+      body: "Aqui, cada treino começa do zero. O {app} lembra o que você levantou, quais músculos ainda estão se recuperando e quantas séries cada um teve nesta semana, então cada dia continua o anterior e as cargas sobem quando você estiver pronto.",
+      button: "Planejar meus treinos",
+    },
+    end: {
+      title: "Chegue sabendo o que fazer",
+      body: "O {app} monta um treino como este todo dia com a sua academia, a sua recuperação e o seu bloco de treino, e depois deixa você treinar.",
+    },
+    faq: [
+      [
+        "Como funciona o gerador de treinos?",
+        "Ele usa o mesmo motor que planeja os treinos no app {app}. Mantém só os exercícios que o seu equipamento permite, direciona para o que você escolheu treinar, coloca primeiro os grandes exercícios compostos enquanto você está descansado e encaixa séries, descansos e séries de aquecimento nos minutos que você tem.",
+      ],
+      [
+        "É grátis? Preciso de conta?",
+        "É grátis, sem cadastro. As suas escolhas (equipamento, minutos, foco, objetivo e experiência) são enviadas para montar o treino e nada é guardado. Tudo vai no link, então o mesmo link sempre mostra o mesmo treino.",
+      ],
+      [
+        "Quanto peso devo usar?",
+        "Cada exercício diz quantas repetições deixar na reserva. Escolha uma carga com que você ainda faria esse tanto de repetições ao terminar a série, com boa técnica. Se a última foi fácil, suba um pouco na próxima série. O app aprende os seus números reais no primeiro treino e planeja cada carga depois disso.",
+      ],
+      [
+        "O que são repetições na reserva?",
+        "Quantas repetições boas a mais você conseguiria fazer quando para. Um bloco novo começa algumas repetições antes da falha, para você praticar os exercícios e se recuperar bem, e chega mais perto da falha nas semanas seguintes.",
+      ],
+      [
+        "Por que o meu treino ficou mais curto que o tempo escolhido?",
+        "Com pouco equipamento e uma área pequena, só alguns exercícios valem a pena. Em vez de encher o treino, o gerador avisa. Adicione equipamento, escolha uma área maior ou use o tempo para uma segunda volta.",
+      ],
+      [
+        "Posso salvar o treino ou fazer no app?",
+        "Sim. Compartilhar este treino copia o link. Começar no app abre o treino no {app} como rotina: as suas cargas são preenchidas enquanto você treina, o cronômetro de descanso roda sozinho e cada série fica salva.",
+      ],
+    ],
+    more: {
+      heading: "Como o treino é montado",
+      paragraphs: [
+        "O gerador começa com todos os exercícios da biblioteca do {app} que o seu equipamento permite. Se você escolheu uma área, ficam só os exercícios cujos músculos principais estão todos nela. Os músculos grandes escolhem primeiro, e a primeira escolha de cada um é um exercício composto, que trabalha vários músculos ao mesmo tempo; os menores vêm numa segunda volta enquanto sobrar tempo.",
+        "Séries e repetições seguem o seu objetivo. Para músculo, os compostos ficam entre 6 e 10 repetições e os menores entre 10 e 15; para força, menos repetições e descansos mais longos; para condicionamento, no meio. Pranchas e carregamentos contam em segundos. Os exercícios principais têm séries de aquecimento, e o tempo que sobra vira uma série extra nos primeiros exercícios.",
+        "Juntar exercícios em superséries faz o mesmo que as superséries automáticas do app: dois exercícios para músculos diferentes, um depois do outro, para que cada músculo descanse enquanto o outro trabalha e caiba mais no mesmo tempo.",
+      ],
+    },
+    reading: [
+      { href: "/blog/how-to-build-a-workout-routine/", label: "como montar uma rotina de treino" },
+      { href: "/blog/how-long-to-rest-between-sets/", label: "quanto descansar entre séries" },
+      { href: "/pt/tools/warm-up-calculator/", label: "a calculadora de aquecimento" },
+    ],
+  },
+  ui: {
+    equipment: "Equipamento",
+    kits: { commercial: "Academia completa", home: "Academia em casa", dumbbells: "Só halteres", bodyweight: "Sem equipamento" },
+    custom: "Escolher equipamento",
+    customHint: "Toque no que você tem. O treino usa só isso.",
+    minutes: "Tempo",
+    minutesValue: "{n} min",
+    focus: "O que treinar",
+    goal: "Objetivo",
+    goals: { muscle: "Ganhar músculo", strength: "Ficar mais forte", general: "Manter a forma" },
+    level: "Experiência",
+    levels: { new: "Começando agora", intermediate: "Alguma experiência", advanced: "Experiente" },
+    pairs: "Juntar exercícios em superséries",
+    pairsHint: "Dois exercícios para músculos diferentes em sequência, com menos descanso, para caber mais.",
+    make: "Montar meu treino",
+    another: "Outro treino",
+    working: "Montando o seu treino…",
+    error: "Não deu para montar o treino agora. Confira a sua conexão e tente de novo.",
+    nothing: "Nada combina com esse equipamento e essa área. Adicione equipamento ou escolha outra área.",
+    about: "Cerca de {n} min",
+    short: "Cerca de {n} minutos é tudo o que esse equipamento permite para essa área. Adicione equipamento ou escolha uma área maior.",
+    order: "Os grandes primeiro, enquanto você está descansado, e os menores depois. Cada exercício diz por que está ali.",
+    setsReps: "{sets} × {reps}",
+    setsSecs: "{sets} × {secs} s",
+    rest: "Descanso {time}",
+    tank: "Repetições na reserva: {n}",
+    holdForm: "Pare quando a técnica falhar",
+    warmups: "Antes, séries de aquecimento: {n}",
+    superset: "Supersérie {letter}",
+    whyFirst: "{muscle}: um composto primeiro, enquanto você está descansado",
+    whyCompound: "{muscle}: um composto que trabalha vários músculos ao mesmo tempo",
+    whyIsolation: "{muscle}: um exercício menor para finalizar o músculo",
+    whyBodyweight: "{muscle}: um composto com o peso do corpo, sem carga",
+    whyHold: "{muscle}: uma sustentação ou carregamento, em segundos",
+    repsMuscle: "De {lo} a {hi} repetições para ganhar músculo: comece com {reps} e aumente quando ficar fácil",
+    repsStrength: "Séries mais pesadas de {lo} a {hi} repetições para força",
+    repsGeneral: "De {lo} a {hi} repetições, o meio-termo para o condicionamento",
+    repsBodyweight: "De {lo} a {hi} repetições: comece com {reps} e aumente as repetições antes de tudo",
+    repsHold: "De {lo} a {hi} segundos: comece com {reps} e sustente um pouco mais a cada vez",
+    mainSets: "{sets} séries para um exercício principal, com tempo para fazê-las",
+    moreSets: "{sets} séries, aproveitando o tempo que você tem",
+    pair: "Em sequência com {other}: músculos diferentes, então o descanso é menor",
+    share: "Compartilhar este treino",
+    copied: "Link copiado",
+    start: "Começar no app",
+    startHint: "Abre no {app} como rotina. As suas cargas são preenchidas enquanto você treina.",
+    example: "Um exemplo para começar. Mude qualquer escolha acima.",
+    see: "Ver o seu treino",
+  },
+};

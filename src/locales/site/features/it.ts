@@ -239,7 +239,8 @@ export const it: FeaturesText = {
     "exercise-stats": {
       name: "Statistiche di ogni esercizio",
       body: "Tocca un esercizio della libreria per vedere le tue serie, il peso totale sollevato, il massimale stimato e il confronto con persone allenate del tuo peso, età e sesso secondo standard di forza pubblicati.",
-      proPart: "I grafici da una settimana a un anno fanno parte delle statistiche avanzate di Pro.",
+      proPart:
+        "Le statistiche avanzate di Pro aggiungono i grafici, da una settimana a tutto lo storico: tocca una sessione per il suo valore, con i record segnati.",
     },
     "log-past": {
       name: "Registra un allenamento passato",
@@ -295,6 +296,11 @@ export const it: FeaturesText = {
     routines: {
       name: "Le tue routine",
       body: "Crea routine dal catalogo esercizi, senza limiti di numero, e condividile con un link.",
+    },
+    "workout-generator": {
+      name: "Generatore di allenamenti gratis sul sito",
+      body: "Scegli attrezzatura, minuti e cosa allenare, e lo stesso motore scrive un allenamento con serie, ripetizioni, recupero e il perché di ogni esercizio. Ogni allenamento ha un suo link da condividere, e Inizia nell’app lo apre come routine.",
+      note: "Inizia nell’app apre l’app Android; su iPhone e computer apre la web app.",
     },
     "routine-library": {
       name: "Libreria di routine",
@@ -415,6 +421,10 @@ export const it: FeaturesText = {
       name: "Card quando fai uno screenshot",
       body: "Fai uno screenshot e compare un foglio con le card del tuo allenamento: l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre, come totali, come divisione delle serie o come migliori alzate. Scorrile, nascondi i pesi con l’occhio e condividile con il tuo link d’invito stampato sulla card. Le stesse card sono in Condividi il mio allenamento, in Progressi. Ogni link che condividi ora porta il tuo invito, in un link che lo dice.",
       note: "Gli screenshot lo aprono su Android 14 e successivi e su iPhone, e si può disattivare. Altrove, aprilo da Progressi. Chi ha meno di 18 anni condivide senza link d’invito.",
+    },
+    "share-stats": {
+      name: "Condividi ogni record o massimale",
+      body: "Un piccolo pulsante di condivisione è accanto ai tuoi massimali stimati, alla tua serie più pesante, a ogni record per numero di ripetizioni e ai tuoi record recenti. Un tocco crea una scheda con quel numero, il logo di Liftsmith e il sito, con lo stile dell’app, pronta da pubblicare o salvare.",
     },
     coaching: {
       name: "Segui i clienti",

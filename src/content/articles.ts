@@ -55,6 +55,7 @@ import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
 import { BLOG_SEASONS } from "./blog/seasons";
 import { BLOG_SETTINGS_SEARCH } from "./blog/settingsSearch";
+import { BLOG_SHARE_STATS } from "./blog/shareStats";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
 import { BLOG_TEAM_SESSION } from "./blog/teamSession";
@@ -65,6 +66,7 @@ import { BLOG_W } from "./blog/w";
 import { BLOG_WATCH_ALONE } from "./blog/watchAlone";
 import { BLOG_WATCH_TODAY } from "./blog/watchToday";
 import { BLOG_WIDGETS } from "./blog/widgets";
+import { BLOG_WORKOUT_GENERATOR } from "./blog/workoutGenerator";
 import { BLOG_X } from "./blog/x";
 import { BLOG_Y } from "./blog/y";
 import { BLOG_Z } from "./blog/z";
@@ -284,6 +286,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_REHAB_PHASES,
   ...BLOG_COACH_PROGRAMS,
   ...BLOG_SCREENSHOT_SHARE,
+  ...BLOG_SHARE_STATS,
   ...BLOG_FORM_CUES,
   ...BLOG_AUTO_SUPERSETS,
   ...BLOG_CLUB_CHAT,
@@ -312,6 +315,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_WATCH_TODAY,
   ...BLOG_WATCH_ALONE,
   ...BLOG_GYM_WIDGETS,
+  ...BLOG_WORKOUT_GENERATOR,
   ...BLOG_THIRTY_DAY,
 ];
 

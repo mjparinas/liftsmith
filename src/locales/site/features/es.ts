@@ -238,7 +238,8 @@ export const es: FeaturesText = {
     "exercise-stats": {
       name: "Estadísticas de cada ejercicio",
       body: "Toca cualquier ejercicio de la biblioteca para ver tus series, el peso total levantado, tu máximo estimado y cómo te comparas con personas entrenadas de tu peso, edad y sexo según estándares de fuerza publicados.",
-      proPart: "Los gráficos de una semana a un año son parte de las estadísticas avanzadas de Pro.",
+      proPart:
+        "Las estadísticas avanzadas de Pro añaden los gráficos, de una semana a todo el historial: toca cualquier sesión para ver su número, con los récords marcados.",
     },
     "log-past": {
       name: "Registrar un entrenamiento pasado",
@@ -294,6 +295,11 @@ export const es: FeaturesText = {
     routines: {
       name: "Tus propias rutinas",
       body: "Crea rutinas desde el buscador de ejercicios, sin límite de cantidad, y compártelas con un enlace.",
+    },
+    "workout-generator": {
+      name: "Generador de entrenamientos gratis en la web",
+      body: "Elige tu equipo, tus minutos y qué entrenar, y el mismo motor escribe un entrenamiento con series, repeticiones, descanso y por qué está cada ejercicio. Cada entrenamiento tiene su propio enlace para compartir, y Empezar en la app lo abre como rutina.",
+      note: "Empezar en la app abre la app de Android; en iPhone y en el ordenador abre la app web.",
     },
     "routine-library": {
       name: "Biblioteca de rutinas",
@@ -417,6 +423,10 @@ export const es: FeaturesText = {
       name: "Tarjetas al hacer una captura de pantalla",
       body: "Haz una captura y aparece una hoja con tarjetas de tu entrenamiento: el último mes, tres meses, seis meses, el año o desde siempre, como totales, en qué se fueron tus series o tus mejores levantamientos. Desliza entre ellas, oculta los pesos con el ojo y compártelas con tu enlace de invitación impreso en la tarjeta. Las mismas tarjetas están en Compartir mi entrenamiento, en Progreso. Cada enlace que compartes lleva ahora tu invitación, en un enlace que lo dice.",
       note: "Las capturas la abren en Android 14 o posterior y en iPhone, y se puede desactivar. En otros sitios, ábrela desde Progreso. Los menores de 18 años comparten sin enlace de invitación.",
+    },
+    "share-stats": {
+      name: "Comparte cualquier récord o máximo",
+      body: "Un pequeño botón de compartir está junto a tus máximos estimados, tu serie más pesada, cada récord por número de repeticiones y tus récords recientes. Un toque crea una tarjeta con esa cifra, el logotipo de Liftsmith y la web, con el aspecto de la app, lista para publicar o guardar.",
     },
     coaching: {
       name: "Entrena a clientes",

@@ -513,7 +513,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Her egzersiz setlerini, kaldırılan toplam ağırlığı ve tahmini maksimumunu gösterir.",
       "Kilon, yaşın ve cinsiyetindeki antrenmanlı sporcularla nasıl kıyaslandığını gör.",
-      "Pro: bir haftadan bir yıla grafikler, hedefe karşı kas başına haftalık setler ve tek tekrar maksimum eğilimleri.",
+      "Pro: bir haftadan tüm zamanlara grafikler (değeri için bir antrenmana dokunun, rekorlar işaretli), hedefe karşı kas başına haftalık setler ve tek tekrar maksimum eğilimleri.",
       "Web sitesindeki güç standartları, sayılmayı seçen gerçek sporculardan gelir.",
     ],
     dyk: "Ayarlar › Verilerin ve gizlilik'teki “Kaldırışlarımı say”, seninkilerin bu standartlara katkı verip vermeyeceğini belirler.",
@@ -1128,6 +1128,28 @@ export const emails: Record<string, Words> = {
       "Uygulamada bir dersi ya da ekipmanı değiştirdiğinizde sitenizdeki widget da değişir.",
     ],
     dyk: "Widget'larda betik, çerez ya da izleme yok; her biri salonunuzun sayfasına bağlanır, böylece yeni üyeler salonu tek dokunuşla ekler.",
+  },
+  "share-stats": {
+    title: "En gurur duyduğun sayıları paylaş",
+    intro: "Her tahmini maksimumun, en ağır setin ve kişisel rekorun yanında artık küçük bir paylaş düğmesi var.",
+    points: [
+      "İlerleme'de maksimumlarının ve yeni rekorlarının yanında, ayrıca her egzersizin sayfasında.",
+      "Bir egzersizin sayfasında rekor tablosunun her satırında da var: en ağır setinden 15 tekrardaki en iyine kadar.",
+      "Tek dokunuş, o sayıyla, Liftsmith logosu ve web sitesiyle uygulamanın görünümünde bir kart yapar.",
+      "Paylaş, gönder ya da kaydet. Ağırlıkları gizleyebilirsin; adın sen eklemedikçe görünmez.",
+    ],
+    dyk: "Davet bağlantın da kartta yer alabilir; onunla katılan arkadaşın seni geri takip eder.",
+  },
+  "workout-generator": {
+    title: "Uygulaması olmayan bir arkadaşına antrenman gönder",
+    intro: "Web sitemizde artık Bugün ekranınla aynı motoru kullanan ücretsiz bir antrenman oluşturucu var.",
+    points: [
+      "getliftsmith.com/tools/workout-generator adresinde ekipmanı, dakikaları ve neyi çalıştıracağını seç: tüm vücut, bir bölünme ya da tek bölge.",
+      "Setleri, tekrarları, dinlenmeyi ve ısınmayı yazar, her egzersizin neden orada olduğunu söyler.",
+      "Her antrenmanın kendi bağlantısı var. Bir arkadaşınla paylaş: aynı bağlantı her zaman aynı antrenmanı verir.",
+      "Uygulamada başla onu rutin olarak açar; kaydetmeye ya da başlamaya hazırdır ve sen kaldırdıkça kendi ağırlıkların dolar.",
+    ],
+    dyk: "Bugün ekranı bunu her gün senin için yapar; üstelik son seferde ne kaldırdığını ve hangi kasların hâlâ toparlandığını da bilir.",
   },
   "thirty-day": {
     title: "30 gün boyunca günde bir hareket",

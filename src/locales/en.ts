@@ -59,6 +59,7 @@ import * as friends from "./text/friends";
 import * as ft from "./text/ft";
 import * as fv from "./text/fv";
 import * as game from "./text/game";
+import * as gen from "./text/gen";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
@@ -178,6 +179,7 @@ export const en = {
   ...calc.en,
   ...card.en,
   ...callText.en,
+  ...gen.en,
   ...category.en,
   ...cause.en,
   ...chk.en,
