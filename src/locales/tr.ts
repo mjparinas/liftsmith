@@ -99,6 +99,7 @@ import * as preg from "./text/preg";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
+import * as prt from "./text/prt";
 import * as pub from "./text/pub";
 import * as push from "./text/push";
 import * as quest from "./text/quest";
@@ -242,6 +243,7 @@ export const tr: Partial<Record<MessageKey, Message>> = {
   ...pol.tr,
   ...pr.tr,
   ...pro.tr,
+  ...prt.tr,
   ...prog.tr,
   ...progress.tr,
   ...pub.tr,

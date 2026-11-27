@@ -1123,4 +1123,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
   },
+  "printable-plans": {
+    title: "Ein Training auf einer Seite drucken",
+    intro:
+      "Jedes Programm und jede Routine lässt sich jetzt auf einer Seite drucken, mit Kästchen zum Ausfüllen und einem QR-Code zurück in die App.",
+    points: [
+      "Öffne eine deiner Routinen und tippe auf „Routine drucken“. Das Blatt zeigt jede Übung mit Sätzen, Wiederholungen und Pause und dem Gewicht, das fürs nächste Mal geplant ist.",
+      "Trag ein, was du hebst, in die vier Spalten für die Einheiten, eine pro Training.",
+      "Jede Programmseite auf der Website hat ein kostenloses PDF zum Herunterladen, in zehn Sprachen.",
+      "Der QR-Code auf deinem Blatt fügt die gleiche Routine bei allen hinzu, die ihn scannen. Deine Gewichte und Notizen bleiben bei dir.",
+    ],
+    dyk: "Auf dem Handy kann das Druckfenster das Blatt auch als PDF speichern, praktisch zum Weiterschicken.",
+  },
 };

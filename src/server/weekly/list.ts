@@ -28,8 +28,11 @@ export interface WeeklyEmail {
   needsFlag?: "coachPlans" | "wearOnPlay";
   /** Skipped for anyone who got this Getting started email (its send key): it already told them. */
   coveredBy?: string;
-  /** The picture isn't an app screen from weekly-email-shots.mjs but made by its own script (`watch`: email-watch.mjs). */
-  art?: "watch";
+  /**
+   * The picture isn't an app screen from weekly-email-shots.mjs but made by its own script (`watch`: email-watch.mjs;
+   * `print`: a printed program sheet, program-pdfs.mjs --email).
+   */
+  art?: "watch" | "print";
   /** A brand-new feature (the day it shipped, ISO): sent next to everyone already past Getting started. */
   fresh?: string;
   /** No Pro line at the end (coach plans, which have prices of their own). */
@@ -190,6 +193,9 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-26: phone-free workouts on the watch, waiting for Google Play's watch approval like the other watch emails
   // (docs/decisions/watch-apps.md "Phone-free workouts").
   L("watch-alone", "free", "today", { fresh: "2026-11-26", needsFlag: "wearOnPlay" }),
+  // New, 2026-11-27: printable one-page plans, Print routine in the app and a PDF of every program
+  // (docs/decisions/printable-plans.md). Its picture is a printed sheet.
+  L("printable-plans", "free", "programs", { fresh: "2026-11-27", art: "print" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

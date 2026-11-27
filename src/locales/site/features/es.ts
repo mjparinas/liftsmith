@@ -295,6 +295,11 @@ export const es: FeaturesText = {
       body: "Busca rutinas que otros publicaron por objetivo, palabras y lo que tiene tu gimnasio, guarda una con un toque y puntúala con estrellas. Publica la tuya desde su editor, con o sin tu nombre, y tendrá su propia página en la web. Solo salen los ejercicios y las series, nunca tus pesos ni tus notas.",
       note: "Para publicar necesitas una cuenta y tener 18 años. Cualquiera puede explorar.",
     },
+    "printable-plans": {
+      name: "Planes de entrenamiento para imprimir",
+      body: "Imprime cualquier programa o rutina en una página: cada entrenamiento con series, repeticiones y descanso, casillas para anotar cuatro sesiones a mano y un código QR que lo abre en la app. Cada página de programa del sitio tiene un PDF gratis en diez idiomas, e Imprimir rutina en la app añade los pesos que te planea para la próxima vez.",
+      note: "En el teléfono, la ventana de impresión también lo guarda como PDF.",
+    },
     library: {
       name: "1000 ejercicios",
       body: "Fuerza, peso corporal, máquinas, bandas, pesas rusas y cardio, con búsqueda, filtros por músculo y un filtro de este gimnasio. El cardio registra tiempo y distancia.",

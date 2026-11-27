@@ -1122,4 +1122,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La pianificazione resta sul telefono, quindi Macchina occupata e Cambia il piano aspettano che torni.",
   },
+  "printable-plans": {
+    title: "Stampa un allenamento su una pagina",
+    intro: "Ogni programma o routine ora si stampa su una pagina, con caselle da compilare e un codice QR che riporta all'app.",
+    points: [
+      "Apri una delle tue routine e tocca Stampa la routine. Il foglio riporta ogni esercizio con serie, ripetizioni e recupero, e il carico previsto per la prossima volta.",
+      "Scrivi quello che sollevi nelle quattro colonne delle sedute, una per allenamento.",
+      "Ogni pagina programma del sito ha un PDF gratis da scaricare, in dieci lingue.",
+      "Il codice QR sul foglio aggiunge la stessa routine a chi lo inquadra. I tuoi carichi e le tue note restano a te.",
+    ],
+    dyk: "Sul telefono, la finestra di stampa può anche salvare il foglio in PDF, comodo da mandare a un amico.",
+  },
 };

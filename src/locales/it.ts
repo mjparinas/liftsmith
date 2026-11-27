@@ -99,6 +99,7 @@ import * as preg from "./text/preg";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
+import * as prt from "./text/prt";
 import * as pub from "./text/pub";
 import * as push from "./text/push";
 import * as quest from "./text/quest";
@@ -244,6 +245,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...pol.it,
   ...pr.it,
   ...pro.it,
+  ...prt.it,
   ...prog.it,
   ...progress.it,
   ...pub.it,

@@ -1127,4 +1127,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La planification reste sur le téléphone : Machine occupée et Modifier le plan attendent son retour.",
   },
+  "printable-plans": {
+    title: "Imprimez une séance sur une page",
+    intro: "Chaque programme ou routine s'imprime maintenant sur une page, avec des cases à remplir et un code QR qui ramène à l'app.",
+    points: [
+      "Ouvrez une de vos routines et touchez Imprimer la routine. La feuille donne chaque exercice avec ses séries, répétitions et repos, et la charge prévue pour la prochaine fois.",
+      "Notez ce que vous soulevez dans les quatre colonnes de séance, une par entraînement.",
+      "Chaque page de programme du site a un PDF gratuit à télécharger, en dix langues.",
+      "Le code QR de votre feuille ajoute la même routine à qui le scanne. Vos charges et vos notes restent chez vous.",
+    ],
+    dyk: "Sur le téléphone, la fenêtre d'impression peut aussi enregistrer la feuille en PDF, pratique pour l'envoyer à un ami.",
+  },
 };

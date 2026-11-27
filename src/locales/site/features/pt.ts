@@ -355,6 +355,11 @@ export const pt: FeaturesText = {
       body: "Busque rotinas que outras pessoas publicaram por objetivo, palavras e o que a sua academia tem, salve uma com um toque e avalie com estrelas. Publique a sua pelo editor, com ou sem seu nome, e ela ganha uma página própria no site. Só os exercícios e as séries são publicados, nunca suas cargas ou anotações.",
       note: "Publicar exige uma conta e 18 anos. Qualquer pessoa pode navegar.",
     },
+    "printable-plans": {
+      name: "Planos de treino para imprimir",
+      body: "Imprima qualquer programa ou rotina em uma página: cada treino com séries, repetições e descanso, espaços para anotar quatro sessões à mão e um código QR que abre no app. Cada página de programa do site tem um PDF grátis em dez idiomas, e Imprimir rotina no app inclui as cargas planejadas para a próxima vez.",
+      note: "No celular, a janela de impressão também salva como PDF.",
+    },
     library: {
       name: "1.000 exercícios",
       body: "Musculação, peso corporal, máquinas, elásticos, kettlebells e cardio, com busca, filtros por músculo e um filtro desta academia. O cardio registra tempo e distância.",

@@ -1119,4 +1119,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Planowanie zostaje na telefonie, więc Maszyna zajęta i Zmień plan czekają, aż wróci.",
   },
+  "printable-plans": {
+    title: "Wydrukuj trening na jednej stronie",
+    intro:
+      "Każdy program i zestaw da się teraz wydrukować na jednej stronie, z polami do wypełnienia i kodem QR, który prowadzi z powrotem do aplikacji.",
+    points: [
+      "Otwórz jeden ze swoich zestawów i stuknij Drukuj zestaw. Na kartce jest każde ćwiczenie z seriami, powtórzeniami i przerwą oraz ciężar zaplanowany na następny raz.",
+      "Wpisuj, co podnosisz, w cztery kolumny treningów, po jednej na trening.",
+      "Każda strona programu w serwisie ma darmowy PDF do pobrania, w dziesięciu językach.",
+      "Kod QR na kartce dodaje ten sam zestaw każdemu, kto go zeskanuje. Twoje ciężary i notatki zostają u ciebie.",
+    ],
+    dyk: "Na telefonie okno drukowania może też zapisać kartkę jako PDF, wygodne do wysłania znajomemu.",
+  },
 };

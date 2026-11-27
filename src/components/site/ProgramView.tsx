@@ -21,15 +21,16 @@ import { SITE_URL } from "@/lib/site";
 import { fill, localPath, type SiteLang } from "@/lib/siteLang";
 import type { Muscle } from "@/lib/types";
 import { equipmentLabels, exerciseWords, muscleLabels, programDayN, programLine, programWords } from "@/locales/site/fromApp";
+import { printLine } from "@/locales/site/print";
 import { PROGRAM_TEXT, type ProgramText } from "@/locales/site/program";
 
 /** The lifter the workouts are drawn for: a new lifter in a full commercial gym, on a fixed day. */
 const NOW = Date.UTC(2026, 0, 5);
-const CTX: Ctx = { profile: defaultProfile(NOW), gym: makeGym("commercial", "kg", "site"), events: [], now: NOW };
+export const PROGRAM_CTX: Ctx = { profile: defaultProfile(NOW), gym: makeGym("commercial", "kg", "site"), events: [], now: NOW };
 
 export const programPath = (id: string) => `/programs/${id}/`;
 export const programParams = () => PROGRAMS.map((p) => ({ program: p.id }));
-const byId = (id: string) => PROGRAMS.find((p) => p.id === id) ?? null;
+export const programById = (id: string) => PROGRAMS.find((p) => p.id === id) ?? null;
 
 /** A program's words in a language, from the app's catalogue. */
 export const programText = (lang: SiteLang, p: ProgramInfo) => programWords(lang, p.id, p.how.length);
@@ -54,7 +55,7 @@ export function scheme(lang: SiteLang, it: PlanItem): string {
   return runs.flatMap((r) => (r.n >= 3 ? [`${r.n} × ${r.label}`] : Array.from({ length: r.n }, () => r.label))).join(", ");
 }
 
-const rest = (t: ProgramText, sec: number) =>
+export const restText = (t: ProgramText, sec: number) =>
   sec >= 120 && sec % 60 === 0 ? fill(t.restMin, { n: sec / 60 }) : fill(t.restSec, { n: sec });
 
 /** A lift's own page from this language: its translated guide if it has one, else English. */
@@ -63,15 +64,35 @@ const liftHref = (lang: SiteLang, id: string) =>
 
 /** The muscles a program trains most in a typical week, most first. */
 export function trainsMost(p: ProgramInfo, n = 6): { m: Muscle; sets: number }[] {
-  return (Object.entries(weeklyPreview(p.id, CTX)) as [Muscle, number][])
+  return (Object.entries(weeklyPreview(p.id, PROGRAM_CTX)) as [Muscle, number][])
     .filter(([, v]) => v > 0)
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, n)
     .map(([m, sets]) => ({ m, sets }));
 }
 
+/** An exercise's name in this language. */
+export function programExName(lang: SiteLang, exId: string): string {
+  const e = EXERCISE_BY_ID.get(exId);
+  return e ? (lang === "en" ? e.name : exerciseWords(lang, e).name) : exId;
+}
+
+/** A program day's name ("Workout A") in this language, or "Day 2" when it has no translation. */
+export const programDayName = (lang: SiteLang, english: string, i: number) =>
+  lang === "en" ? english : (programLine(lang, english) ?? programDayN(lang, i + 1));
+
+/** A lift's tier or role ("T1", "Main lift") in this language. */
+export const programItemLabel = (lang: SiteLang, english?: string) =>
+  english ? (lang === "en" || /^T\d$/.test(english) ? english : programLine(lang, english)) : null;
+
+/** What a program needs, or "Whatever your gym has". */
+export function programEquipment(lang: SiteLang, p: ProgramInfo): string {
+  const gear = lang === "en" ? EQUIPMENT_NAME : equipmentLabels(lang);
+  return p.needs.length ? p.needs.map((q) => gear[q]).join(lang === "ja" ? "、" : ", ") : PROGRAM_TEXT[lang].anyGym;
+}
+
 export function programMeta(lang: SiteLang, id: string): Metadata {
-  const p = byId(id);
+  const p = programById(id);
   if (!p) return {};
   const t = PROGRAM_TEXT[lang];
   const w = programText(lang, p);
@@ -84,25 +105,21 @@ export function programMeta(lang: SiteLang, id: string): Metadata {
 }
 
 export function ProgramView({ lang, id }: { lang: SiteLang; id: string }) {
-  const p = byId(id);
+  const p = programById(id);
   if (!p) notFound();
   const t = PROGRAM_TEXT[lang];
   const w = programText(lang, p);
   const muscles = muscleLabels(lang);
-  const gear = lang === "en" ? EQUIPMENT_NAME : equipmentLabels(lang);
   const num = (n: number) => new Intl.NumberFormat(lang, { maximumFractionDigits: 1 }).format(n);
   const vars = { name: w.name, days: p.daysPerWeek, app: BRAND.name };
   const path = localPath(lang, programPath(p.id));
-  const days = programDays(p.id, CTX);
+  const days = programDays(p.id, PROGRAM_CTX);
   const split = p.kind === "split" ? SPLITS[p.id as keyof typeof SPLITS] : null;
   const trains = trainsMost(p);
-  const exName = (exId: string) => {
-    const e = EXERCISE_BY_ID.get(exId);
-    return e ? (lang === "en" ? e.name : exerciseWords(lang, e).name) : exId;
-  };
-  const dayName = (english: string, i: number) => (lang === "en" ? english : (programLine(lang, english) ?? programDayN(lang, i + 1)));
-  const label = (english?: string) => (english ? (lang === "en" || /^T\d$/.test(english) ? english : programLine(lang, english)) : null);
-  const equipment = p.needs.length ? p.needs.map((q) => gear[q]).join(lang === "ja" ? "、" : ", ") : t.anyGym;
+  const exName = (exId: string) => programExName(lang, exId);
+  const dayName = (english: string, i: number) => programDayName(lang, english, i);
+  const label = (english?: string) => programItemLabel(lang, english);
+  const equipment = programEquipment(lang, p);
   const facts: [string, string][] = [
     [t.days, String(p.daysPerWeek)],
     [t.level, t.levels[p.level]],
@@ -181,7 +198,7 @@ export function ProgramView({ lang, id }: { lang: SiteLang; id: string }) {
                       </Link>
                     </span>
                     <span className="tabular-nums">
-                      {scheme(lang, it)} <span className="text-muted">· {rest(t, it.restSec)}</span>
+                      {scheme(lang, it)} <span className="text-muted">· {restText(t, it.restSec)}</span>
                     </span>
                   </li>
                 ))}
@@ -195,6 +212,27 @@ export function ProgramView({ lang, id }: { lang: SiteLang; id: string }) {
             </section>
           ))}
         </div>
+        <p className="mt-4">
+          <Link
+            href={localPath(lang, `/programs/${p.id}/print/`)}
+            className="btn press inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 font-semibold hover:border-accent/60"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v7H6z" />
+            </svg>
+            {printLine(lang, "prt.page.link")}
+          </Link>
+        </p>
       </section>
       <CtaInline cta="program-mid" title={fill(t.mid.title, vars)} body={fill(t.mid.body, vars)} button={t.mid.button} />
       {trains.length > 0 && (

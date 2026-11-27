@@ -1123,4 +1123,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "O planejamento continua no celular, então Aparelho ocupado e Mudar o plano esperam ele voltar.",
   },
+  "printable-plans": {
+    title: "Imprima um treino em uma página",
+    intro: "Qualquer programa ou rotina agora imprime em uma página, com espaços para preencher e um código QR que volta para o app.",
+    points: [
+      "Abra uma das suas rotinas e toque em Imprimir rotina. A folha traz cada exercício com séries, repetições e descanso, e a carga planejada para a próxima vez.",
+      "Anote o que você levanta nas quatro colunas de sessão, uma por treino.",
+      "Cada página de programa do site tem um PDF grátis para baixar, em dez idiomas.",
+      "O código QR da folha adiciona a mesma rotina para quem escanear. Suas cargas e anotações ficam com você.",
+    ],
+    dyk: "No celular, a janela de impressão também salva a folha como PDF, prático para mandar a um amigo.",
+  },
 };

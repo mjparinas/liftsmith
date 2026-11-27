@@ -355,6 +355,11 @@ export const pl: FeaturesText = {
       body: "Szukaj rutyn opublikowanych przez innych według celu, słów i sprzętu na twojej siłowni, zapisz jedną jednym dotknięciem i oceń ją gwiazdkami. Opublikuj własną z jej edytora, z imieniem lub bez, a dostanie własną stronę w serwisie. Wychodzą tylko ćwiczenia i serie, nigdy twoje ciężary ani notatki.",
       note: "Publikowanie wymaga konta i ukończonych 18 lat. Przeglądać może każdy.",
     },
+    "printable-plans": {
+      name: "Plany treningowe do druku",
+      body: "Wydrukuj dowolny program lub zestaw na jednej stronie: każdy trening z seriami, powtórzeniami i przerwami, pola na cztery treningi do wpisania ręcznie i kod QR, który otwiera go w aplikacji. Każda strona programu w serwisie ma darmowy PDF w dziesięciu językach, a Drukuj zestaw w aplikacji dodaje ciężary zaplanowane na następny raz.",
+      note: "Na telefonie okno drukowania może też zapisać go jako PDF.",
+    },
     library: {
       name: "1000 ćwiczeń",
       body: "Siłowe, z masą ciała, na maszynach, z gumami, z kettlebellami i cardio, z wyszukiwarką, filtrami mięśni i filtrem „ta siłownia”. Cardio zapisuje czas i dystans.",

@@ -355,6 +355,11 @@ export const tr: FeaturesText = {
       body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
       note: "Yayımlamak için hesap ve 18 yaş gerekir. Herkes göz atabilir.",
     },
+    "printable-plans": {
+      name: "Yazdırılabilir antrenman planları",
+      body: "Herhangi bir programı veya rutini tek sayfada yazdırın: set, tekrar ve dinlenmeleriyle her antrenman, dört seansı elle not edecek kutular ve uygulamada açan bir QR kodu. Sitedeki her program sayfasında on dilde ücretsiz bir PDF var; uygulamadaki Rutini yazdır ise sonraki sefer için planlanan ağırlıkları da ekler.",
+      note: "Telefonda yazdırma penceresi bunu PDF olarak da kaydedebilir.",
+    },
     library: {
       name: "1.000 egzersiz",
       body: "Serbest ağırlık, vücut ağırlığı, makineler, lastik bantlar, kettlebell ve kardiyo; arama, kas filtreleri ve bu salon filtresiyle. Kardiyo süre ve mesafe kaydeder.",

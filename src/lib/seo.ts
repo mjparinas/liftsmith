@@ -330,6 +330,11 @@ export function siteRoutes(): Route[] {
     const languages = languageAlternates(path);
     for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: path === "/programs/" ? 0.8 : 0.7, languages });
   }
+  // Each program's printable page (docs/decisions/printable-plans.md), for "printable workout plan" searches.
+  for (const path of PROGRAMS.map((p) => `/programs/${p.id}/print/`)) {
+    const languages = languageAlternates(path);
+    for (const lang of SITE_LANGS) r.push({ path: localPath(lang, path), priority: 0.5, languages });
+  }
   // Muscle pages ("the best <muscle> exercises", src/lib/bestFor.ts): the index and every muscle a lift works as a main
   // mover, each in every site language.
   for (const path of ["/muscles/", ...MUSCLES.filter((m) => bestFor(m).length).map((m) => `/muscles/${muscleSlug(m)}/`)]) {
