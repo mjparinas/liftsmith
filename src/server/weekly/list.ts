@@ -195,6 +195,9 @@ export const WEEKLY: WeeklyEmail[] = [
   R("gym-widgets", "gym", "free", "gym", { fresh: "2026-11-27", shot: false }),
   // New, 2026-11-27: a share button beside every max, heaviest set and best (docs/decisions/sharing.md "Share one stat").
   L("share-stats", "free", "stats", { fresh: "2026-11-27" }),
+  // New, 2026-11-27: the free workout generator on the website, whose links open the app (docs/decisions/workout-generator.md).
+  // Its picture is the website's generator, not an app screen (scripts/generator-shots.mjs).
+  L("workout-generator", "free", "today", { fresh: "2026-11-27" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

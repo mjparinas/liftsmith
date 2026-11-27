@@ -71,6 +71,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "workout-generator",
+        name: "Free workout generator on the website",
+        body: "Pick your equipment, your minutes and what to train, and the same engine writes a workout with sets, reps, rest and why for each exercise. Every workout has its own link to share, and Start this in the app opens it as a routine.",
+        tier: "free",
+        note: "Start this in the app opens the Android app; on iPhone and computers it opens the web app.",
+        added: "2026-11-27",
+      },
+      {
         id: "pick-weights",
         name: "Learns the lifts you like",
         body: "Popular lifts are picked most often. Star an exercise and it comes up far more; swap one away and it comes up less, fading over a few months.",

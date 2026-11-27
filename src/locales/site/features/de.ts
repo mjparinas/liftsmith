@@ -303,6 +303,11 @@ export const de: FeaturesText = {
       name: "Eigene Routinen",
       body: "Baue Routinen aus dem Übungskatalog, so viele du willst, und teile sie als Link.",
     },
+    "workout-generator": {
+      name: "Kostenloser Trainingsplan-Generator auf der Website",
+      body: "Wähle deine Geräte, deine Minuten und was du trainieren willst, und dieselbe Engine schreibt ein Workout mit Sätzen, Wiederholungen, Pausen und dem Grund für jede Übung. Jedes Workout hat einen eigenen Link zum Teilen, und In der App starten öffnet es als Routine.",
+      note: "In der App starten öffnet die Android-App; auf dem iPhone und am Computer öffnet es die Web-App.",
+    },
     "routine-library": {
       name: "Routinen-Bibliothek",
       body: "Durchsuche Routinen, die andere veröffentlicht haben, nach Ziel, Stichwort und dem, was dein Studio hat, speichere eine mit einem Tippen und bewerte sie mit Sternen. Veröffentliche deine eigene aus ihrem Editor, mit oder ohne deinen Namen, und sie bekommt eine eigene Seite auf der Website. Nur Übungen und Sätze gehen raus, nie deine Gewichte oder Notizen.",

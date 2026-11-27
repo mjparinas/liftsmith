@@ -1141,4 +1141,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Na karcie może być też Twój link z zaproszeniem, a znajomy, który z niego dołączy, zaobserwuje Cię w odpowiedzi.",
   },
+  "workout-generator": {
+    title: "Wyślij znajomemu trening, nawet bez aplikacji",
+    intro: "Na naszej stronie jest teraz darmowy generator treningu z tym samym silnikiem co twój ekran Dziś.",
+    points: [
+      "Na getliftsmith.com/tools/workout-generator wybierz sprzęt, minuty i co trenować: całe ciało, split albo jedną partię.",
+      "Układa serie, powtórzenia, przerwy i rozgrzewkę, a przy każdym ćwiczeniu podaje powód.",
+      "Każdy trening ma własny link. Udostępnij go znajomemu: ten sam link zawsze daje ten sam trening.",
+      "Zacznij w aplikacji otwiera go jako rutynę, gotową do zapisania lub startu, a twoje ciężary uzupełniają się w trakcie.",
+    ],
+    dyk: "Ekran Dziś robi to dla ciebie codziennie i wie też, co podniosłeś ostatnio i które mięśnie jeszcze się regenerują.",
+  },
 };

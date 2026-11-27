@@ -1,0 +1,111 @@
+import type { GenUi, ToolPageText } from "../types";
+
+// The workout generator in Turkish (sen). Same parts as the English page (./en.ts).
+export const GEN_TR: { page: ToolPageText; ui: GenUi } = {
+  page: {
+    title: "Antrenman oluşturucu: ekipmanına ve zamanına göre ücretsiz antrenman",
+    description:
+      "Ekipmanını, ne kadar vaktin olduğunu ve neyi çalıştırmak istediğini seç; set, tekrar, dinlenme ve her egzersiz için kısa bir nedenle ücretsiz bir antrenman al. Kayıt yok ve her antrenmanın kendi bağlantısı var.",
+    name: "Antrenman oluşturucu",
+    intro:
+      "Elinde ne olduğunu ve ne kadar vaktin olduğunu söyle, antrenmanı o yazsın: ekipmanının izin verdiği egzersizler, büyükler önce, set, tekrar, dinlenme ve her birinin neden orada olduğuyla.",
+    sticky: "Her gün sana özel yeni bir antrenman",
+    mid: {
+      title: "Yarının antrenmanı bugününkünün devamı",
+      body: "Burada her antrenman sıfırdan başlar. {app} ne kaldırdığını, hangi kasların hâlâ toparlandığını ve bu hafta her kasın kaç set yaptığını hatırlar; böylece her gün bir öncekinin devamı olur ve hazır olduğunda ağırlıklar artar.",
+      button: "Antrenmanlarımı planla",
+    },
+    end: {
+      title: "Ne yapacağını bilerek gel",
+      body: "{app} salonuna, toparlanmana ve antrenman bloğuna göre her gün böyle bir antrenman yazar, sonra sen kaldırırken araya girmez.",
+    },
+    faq: [
+      [
+        "Antrenman oluşturucu nasıl çalışır?",
+        "{app} uygulamasında antrenmanları planlayan motorun aynısını kullanır. Yalnızca ekipmanının izin verdiği egzersizleri tutar, onları seçtiğin bölgeye yöneltir, sen dinçken büyük bileşik hareketleri başa koyar ve setleri, dinlenmeleri ve ısınma setlerini sahip olduğun dakikalara sığdırır.",
+      ],
+      [
+        "Ücretsiz mi? Hesap gerekiyor mu?",
+        "Ücretsiz ve kayıt gerektirmez. Seçimlerin (ekipman, dakika, bölge, hedef ve deneyim) antrenmanı oluşturmak için gönderilir ve hiçbir şey saklanmaz. Hepsi bağlantının içindedir, yani aynı bağlantı her zaman aynı antrenmanı verir.",
+      ],
+      [
+        "Ne kadar ağır gitmeliyim?",
+        "Her egzersizde yedekte kaç tekrar bırakacağın yazar. Set bittiğinde iyi formla o kadar tekrar daha yapabileceğin bir ağırlık seç. Son tekrar kolaysa bir sonraki sette biraz artır. Uygulama gerçek sayılarını ilk antrenmanında öğrenir ve sonra her ağırlığı planlar.",
+      ],
+      [
+        "Yedekteki tekrar ne demek?",
+        "Durduğunda iyi formla kaç tekrar daha yapabileceğin. Yeni bir blok, hareketleri öğrenip iyi toparlanman için tükenmeye birkaç tekrar kala başlar ve sonraki haftalarda tükenmeye yaklaşır.",
+      ],
+      [
+        "Antrenmanım neden seçtiğim süreden kısa?",
+        "Az ekipman ve küçük bir bölgeyle yapmaya değer egzersiz sayısı sınırlıdır. Oluşturucu antrenmanı şişirmek yerine bunu söyler. Ekipman ekle, daha geniş bir bölge seç ya da süreyi ikinci bir tur için kullan.",
+      ],
+      [
+        "Antrenmanı kaydedebilir veya uygulamada yapabilir miyim?",
+        "Evet. Bu antrenmanı paylaş, bağlantısını kopyalar. Uygulamada başla, onu {app} içinde rutin olarak açar: kendi ağırlıkların sen kaldırdıkça dolar, dinlenme sayacı kendiliğinden çalışır ve her set kaydedilir.",
+      ],
+    ],
+    more: {
+      heading: "Antrenman nasıl oluşturulur",
+      paragraphs: [
+        "Oluşturucu, {app} kütüphanesinde ekipmanının izin verdiği tüm egzersizlerle başlar. Bir bölge seçtiysen yalnızca ana kaslarının hepsi o bölgede olan egzersizler kalır. Büyük kaslar önce seçilir ve her biri için ilk seçim, birkaç kası birlikte çalıştıran bileşik bir harekettir; vakit kaldıkça küçük egzersizler ikinci turda gelir.",
+        "Setler ve tekrarlar hedefine göre belirlenir. Kas için bileşik hareketler 6–10, küçük egzersizler 10–15 tekrardır; güç için tekrarlar azalır ve dinlenmeler uzar; genel kondisyon için ikisinin arasındadır. Plank ve taşıma hareketleri saniyeyle sayılır. Ana egzersizlerde ısınma setleri vardır ve artan süre ilk egzersizlere fazladan bir set olarak eklenir.",
+        "Egzersizleri süper set yap, uygulamadaki otomatik süper setlerle aynı işi yapar: farklı kaslar için iki egzersiz art arda yapılır, böylece biri çalışırken diğeri dinlenir ve aynı sürede daha fazlası sığar.",
+      ],
+    },
+    reading: [
+      { href: "/blog/how-to-build-a-workout-routine/", label: "antrenman programı nasıl kurulur" },
+      { href: "/blog/how-long-to-rest-between-sets/", label: "setler arasında ne kadar dinlenmeli" },
+      { href: "/tr/tools/warm-up-calculator/", label: "ısınma hesaplayıcı" },
+    ],
+  },
+  ui: {
+    equipment: "Ekipman",
+    kits: { commercial: "Tam donanımlı salon", home: "Ev salonu", dumbbells: "Sadece dambıl", bodyweight: "Ekipmansız" },
+    custom: "Ekipman seç",
+    customHint: "Elinde olanlara dokun. Antrenman yalnızca bunları kullanır.",
+    minutes: "Süre",
+    minutesValue: "{n} dk",
+    focus: "Ne çalışılacak",
+    goal: "Hedef",
+    goals: { muscle: "Kas yapmak", strength: "Güçlenmek", general: "Formda kalmak" },
+    level: "Deneyim",
+    levels: { new: "Yeni başlıyorum", intermediate: "Biraz deneyimli", advanced: "Deneyimli" },
+    pairs: "Egzersizleri süper set yap",
+    pairsHint: "Farklı kaslar için iki egzersiz art arda, daha az dinlenmeyle; böylece daha fazlası sığar.",
+    make: "Antrenmanımı oluştur",
+    another: "Başka bir antrenman",
+    working: "Antrenmanın yazılıyor…",
+    error: "Antrenman şu an oluşturulamadı. Bağlantını kontrol edip tekrar dene.",
+    nothing: "Bu ekipmana ve bölgeye uyan bir şey yok. Ekipman ekle veya başka bir bölge seç.",
+    about: "Yaklaşık {n} dk",
+    short: "Bu ekipmanla bu bölge için en fazla yaklaşık {n} dakika çıkıyor. Ekipman ekle veya daha geniş bir bölge seç.",
+    order: "Dinçken büyük hareketler önce, küçükler sonra. Her egzersiz neden orada olduğunu söyler.",
+    setsReps: "{sets} × {reps}",
+    setsSecs: "{sets} × {secs} sn",
+    rest: "Dinlenme {time}",
+    tank: "Yedekteki tekrar: {n}",
+    holdForm: "Form bozulunca dur",
+    warmups: "Önce ısınma setleri: {n}",
+    superset: "Süper set {letter}",
+    whyFirst: "{muscle}: dinçken önce bileşik bir hareket",
+    whyCompound: "{muscle}: birkaç kası birlikte çalıştıran bileşik bir hareket",
+    whyIsolation: "{muscle}: kası bitirmek için küçük bir egzersiz",
+    whyBodyweight: "{muscle}: vücut ağırlığıyla bileşik bir hareket, yük gerekmez",
+    whyHold: "{muscle}: saniyeyle yapılan bir tutuş veya taşıma",
+    repsMuscle: "Kas için {lo}–{hi} tekrar: {reps} ile başla, kolaylaştıkça tekrar ekle",
+    repsStrength: "Güç için {lo}–{hi} tekrarlık daha ağır setler",
+    repsGeneral: "{lo}–{hi} tekrar, genel kondisyon için orta yol",
+    repsBodyweight: "{lo}–{hi} tekrar: {reps} ile başla ve önce tekrar ekle",
+    repsHold: "{lo}–{hi} saniye: {reps} ile başla ve her seferinde biraz daha uzun tut",
+    mainSets: "Ana egzersiz için {sets} set, yapacak vakit de var",
+    moreSets: "{sets} set, elindeki süreyi kullanarak",
+    pair: "{other} ile art arda: farklı kaslar, bu yüzden dinlenme daha kısa",
+    share: "Bu antrenmanı paylaş",
+    copied: "Bağlantı kopyalandı",
+    start: "Uygulamada başla",
+    startHint: "{app} içinde rutin olarak açılır. Kendi ağırlıkların sen kaldırdıkça dolar.",
+    example: "Başlamak için bir örnek. Yukarıdaki herhangi bir seçimi değiştir.",
+    see: "Antrenmanını gör",
+  },
+};

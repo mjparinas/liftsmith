@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // source, and the website's /whats-new/ page reads the English. `wn.c.<id>` is one change in a release.
 
 export const en = {
+  "wn.c.workoutGenerator.title": "A free workout generator on the website",
+  "wn.c.workoutGenerator.body":
+    "Friends without the app can try getliftsmith.com/tools/workout-generator: pick equipment, minutes and what to train, and the same engine writes the workout, with why for each exercise. A generator link opens here as a routine.",
   "wn.c.machineTaken.title": "Machine taken? One tap",
   "wn.c.machineTaken.body":
     "Tap Machine taken on your Wear OS, Apple Watch or Garmin watch, or in Change the plan, and the best lift for your gym that doesn't need it takes its place, with its weight and why.",
@@ -196,6 +199,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Un generador de entrenamientos gratis en la web",
+  "wn.c.workoutGenerator.body":
+    "Tus amigos sin la app pueden probar getliftsmith.com/tools/workout-generator: eligen equipo, minutos y qué entrenar, y el mismo motor escribe el entrenamiento, con el porqué de cada ejercicio. Un enlace del generador se abre aquí como rutina.",
   "wn.c.machineTaken.title": "¿Máquina ocupada? Un toque",
   "wn.c.machineTaken.body":
     "Toca Máquina ocupada en tu reloj Wear OS, Apple Watch o Garmin, o en Cambiar el plan, y el mejor ejercicio de tu gimnasio que no la necesita ocupa su lugar, con su peso y por qué.",
@@ -396,6 +402,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Un générateur d’entraînement gratuit sur le site",
+  "wn.c.workoutGenerator.body":
+    "Vos amis sans l’application peuvent essayer getliftsmith.com/tools/workout-generator : ils choisissent le matériel, les minutes et ce qu’ils veulent travailler, et le même moteur écrit la séance, avec la raison de chaque exercice. Un lien du générateur s’ouvre ici comme routine.",
   "wn.c.machineTaken.title": "Machine occupée ? Une touche",
   "wn.c.machineTaken.body":
     "Touche Machine occupée sur ta montre Wear OS, Apple Watch ou Garmin, ou dans Modifier le plan, et le meilleur exercice de ta salle qui n'en a pas besoin prend sa place, avec sa charge et pourquoi.",
@@ -600,6 +609,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Ein kostenloser Trainingsplan-Generator auf der Website",
+  "wn.c.workoutGenerator.body":
+    "Freunde ohne die App können getliftsmith.com/tools/workout-generator ausprobieren: Geräte, Minuten und Bereich wählen, und dieselbe Engine schreibt das Workout, mit dem Grund für jede Übung. Ein Link vom Generator öffnet sich hier als Routine.",
   "wn.c.machineTaken.title": "Gerät belegt? Ein Tipp",
   "wn.c.machineTaken.body":
     "Tippe auf deiner Wear-OS-, Apple- oder Garmin-Uhr oder in „Plan ändern“ auf „Gerät belegt“, und die beste Übung deines Studios, die es nicht braucht, kommt an seine Stelle, mit Gewicht und Grund.",
@@ -799,6 +811,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Un generatore di allenamenti gratis sul sito",
+  "wn.c.workoutGenerator.body":
+    "Gli amici senza l’app possono provare getliftsmith.com/tools/workout-generator: scelgono attrezzatura, minuti e cosa allenare, e lo stesso motore scrive l’allenamento, con il perché di ogni esercizio. Un link del generatore si apre qui come routine.",
   "wn.c.machineTaken.title": "Macchina occupata? Un tocco",
   "wn.c.machineTaken.body":
     "Tocca Macchina occupata sull'orologio Wear OS, Apple Watch o Garmin, o in Cambia il piano, e l'esercizio migliore della tua palestra che non la usa prende il suo posto, con il peso e il perché.",
@@ -999,6 +1014,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "ウェブ版の無料ワークアウトジェネレーター",
+  "wn.c.workoutGenerator.body":
+    "アプリを持っていない友だちも getliftsmith.com/tools/workout-generator で試せます。器具、時間、鍛える部位を選ぶと、同じエンジンが各種目の理由つきでワークアウトを作ります。ジェネレーターのリンクは、ここでルーティンとして開きます。",
   "wn.c.machineTaken.title": "マシン使用中？ワンタップで",
   "wn.c.machineTaken.body":
     "Wear OS、Apple Watch、Garminのウォッチか「プランを変更」で「マシン使用中」をタップすると、そのマシンを使わない、ジムで一番合う種目に重量と理由つきで入れ替わります。",
@@ -1188,6 +1206,9 @@ export const ja: Partial<Record<Key, Message>> = {
 };
 
 export const pt: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Um gerador de treinos grátis no site",
+  "wn.c.workoutGenerator.body":
+    "Amigos sem o app podem testar getliftsmith.com/tools/workout-generator: escolhem equipamento, minutos e o que treinar, e o mesmo motor monta o treino, com o motivo de cada exercício. Um link do gerador abre aqui como rotina.",
   "wn.c.machineTaken.title": "Aparelho ocupado? Um toque",
   "wn.c.machineTaken.body":
     "Toque em Aparelho ocupado no seu relógio Wear OS, Apple Watch ou Garmin, ou em Mudar o plano, e o melhor exercício da sua academia que não precisa dele entra no lugar, com a carga e o porquê.",
@@ -1383,6 +1404,9 @@ export const pt: Partial<Record<Key, Message>> = {
 };
 
 export const ko: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "웹사이트의 무료 운동 루틴 생성기",
+  "wn.c.workoutGenerator.body":
+    "앱이 없는 친구도 getliftsmith.com/tools/workout-generator에서 써 볼 수 있어요. 기구, 시간, 부위를 고르면 같은 엔진이 운동마다 이유를 담아 운동을 짜 줘요. 생성기 링크는 여기서 루틴으로 열려요.",
   "wn.c.machineTaken.title": "기구 사용 중? 한 번 탭",
   "wn.c.machineTaken.body":
     "Wear OS, Apple Watch, Garmin 워치나 '계획 변경'에서 '기구 사용 중'을 누르면 그 기구가 필요 없는 헬스장 최고의 운동이 무게와 이유와 함께 그 자리를 채웁니다.",
@@ -1566,6 +1590,9 @@ export const ko: Partial<Record<Key, Message>> = {
 };
 
 export const pl: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Darmowy generator treningu na stronie",
+  "wn.c.workoutGenerator.body":
+    "Znajomi bez aplikacji mogą wypróbować getliftsmith.com/tools/workout-generator: wybierają sprzęt, minuty i co trenować, a ten sam silnik układa trening z powodem przy każdym ćwiczeniu. Link z generatora otwiera się tutaj jako rutyna.",
   "wn.c.machineTaken.title": "Maszyna zajęta? Jedno dotknięcie",
   "wn.c.machineTaken.body":
     "Dotknij Maszyna zajęta na zegarku Wear OS, Apple Watch lub Garmin albo w Zmień plan, a jej miejsce zajmie najlepsze ćwiczenie w twojej siłowni, które jej nie potrzebuje, z ciężarem i powodem.",
@@ -1760,6 +1787,9 @@ export const pl: Partial<Record<Key, Message>> = {
 };
 
 export const tr: Partial<Record<Key, Message>> = {
+  "wn.c.workoutGenerator.title": "Web sitesinde ücretsiz antrenman oluşturucu",
+  "wn.c.workoutGenerator.body":
+    "Uygulaması olmayan arkadaşların getliftsmith.com/tools/workout-generator adresini deneyebilir: ekipmanı, dakikaları ve neyi çalıştıracağını seçer, aynı motor her egzersizin nedeniyle antrenmanı yazar. Oluşturucu bağlantısı burada rutin olarak açılır.",
   "wn.c.machineTaken.title": "Makine dolu mu? Tek dokunuş",
   "wn.c.machineTaken.body":
     "Wear OS, Apple Watch ya da Garmin saatinde veya Planı değiştir'de Makine dolu'ya dokun; salonunda ona ihtiyaç duymayan en iyi hareket, ağırlığı ve nedeniyle yerine geçer.",

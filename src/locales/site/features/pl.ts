@@ -356,6 +356,11 @@ export const pl: FeaturesText = {
       name: "Twoje własne rutyny",
       body: "Buduj rutyny z przeglądarki ćwiczeń, bez limitu liczby, i udostępniaj je jako link.",
     },
+    "workout-generator": {
+      name: "Darmowy generator treningu na stronie",
+      body: "Wybierz sprzęt, minuty i co chcesz trenować, a ten sam silnik ułoży trening z seriami, powtórzeniami, przerwami i powodem przy każdym ćwiczeniu. Każdy trening ma własny link do udostępnienia, a Zacznij w aplikacji otwiera go jako rutynę.",
+      note: "Zacznij w aplikacji otwiera aplikację na Androida; na iPhonie i komputerze otwiera aplikację webową.",
+    },
     "routine-library": {
       name: "Biblioteka rutyn",
       body: "Szukaj rutyn opublikowanych przez innych według celu, słów i sprzętu na twojej siłowni, zapisz jedną jednym dotknięciem i oceń ją gwiazdkami. Opublikuj własną z jej edytora, z imieniem lub bez, a dostanie własną stronę w serwisie. Wychodzą tylko ćwiczenia i serie, nigdy twoje ciężary ani notatki.",

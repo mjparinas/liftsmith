@@ -1145,4 +1145,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Dein Einladungslink kann mit auf die Karte, und wer damit beitritt, folgt dir zurück.",
   },
+  "workout-generator": {
+    title: "Schick einem Freund ein Workout, auch ohne App",
+    intro: "Unsere Website hat jetzt einen kostenlosen Trainingsplan-Generator mit derselben Engine wie dein Heute-Bildschirm.",
+    points: [
+      "Auf getliftsmith.com/tools/workout-generator wählst du Geräte, Minuten und was du trainieren willst: Ganzkörper, einen Split oder einen Bereich.",
+      "Er schreibt Sätze, Wiederholungen, Pausen und Aufwärmsätze und sagt, warum jede Übung dabei ist.",
+      "Jedes Workout hat einen eigenen Link. Teil ihn mit einem Freund: Derselbe Link ergibt immer dasselbe Workout.",
+      "In der App starten öffnet es als Routine, bereit zum Speichern oder Starten, mit deinen eigenen Gewichten beim Training.",
+    ],
+    dyk: "Heute macht das jeden Tag für dich und weiß außerdem, was du zuletzt gehoben hast und welche Muskeln sich noch erholen.",
+  },
 };

@@ -1140,4 +1140,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Davet bağlantın da kartta yer alabilir; onunla katılan arkadaşın seni geri takip eder.",
   },
+  "workout-generator": {
+    title: "Uygulaması olmayan bir arkadaşına antrenman gönder",
+    intro: "Web sitemizde artık Bugün ekranınla aynı motoru kullanan ücretsiz bir antrenman oluşturucu var.",
+    points: [
+      "getliftsmith.com/tools/workout-generator adresinde ekipmanı, dakikaları ve neyi çalıştıracağını seç: tüm vücut, bir bölünme ya da tek bölge.",
+      "Setleri, tekrarları, dinlenmeyi ve ısınmayı yazar, her egzersizin neden orada olduğunu söyler.",
+      "Her antrenmanın kendi bağlantısı var. Bir arkadaşınla paylaş: aynı bağlantı her zaman aynı antrenmanı verir.",
+      "Uygulamada başla onu rutin olarak açar; kaydetmeye ya da başlamaya hazırdır ve sen kaldırdıkça kendi ağırlıkların dolar.",
+    ],
+    dyk: "Bugün ekranı bunu her gün senin için yapar; üstelik son seferde ne kaldırdığını ve hangi kasların hâlâ toparlandığını da bilir.",
+  },
 };

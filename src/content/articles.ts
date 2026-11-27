@@ -65,6 +65,7 @@ import { BLOG_W } from "./blog/w";
 import { BLOG_WATCH_ALONE } from "./blog/watchAlone";
 import { BLOG_WATCH_TODAY } from "./blog/watchToday";
 import { BLOG_WIDGETS } from "./blog/widgets";
+import { BLOG_WORKOUT_GENERATOR } from "./blog/workoutGenerator";
 import { BLOG_X } from "./blog/x";
 import { BLOG_Y } from "./blog/y";
 import { BLOG_Z } from "./blog/z";
@@ -305,6 +306,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_WATCH_TODAY,
   ...BLOG_WATCH_ALONE,
   ...BLOG_GYM_WIDGETS,
+  ...BLOG_WORKOUT_GENERATOR,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

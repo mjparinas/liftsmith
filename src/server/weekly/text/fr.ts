@@ -1150,4 +1150,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Votre lien d’invitation peut figurer sur la carte : un ami qui s’inscrit avec lui vous suit en retour.",
   },
+  "workout-generator": {
+    title: "Envoyez une séance à un ami, même sans l’application",
+    intro: "Notre site a maintenant un générateur d’entraînement gratuit qui utilise le même moteur que votre écran Aujourd’hui.",
+    points: [
+      "Sur getliftsmith.com/tools/workout-generator, choisissez le matériel, les minutes et ce que vous voulez travailler : corps entier, un split ou une zone.",
+      "Il écrit les séries, les répétitions, le repos et l’échauffement, et dit pourquoi chaque exercice est là.",
+      "Chaque séance a son propre lien. Partagez-le avec un ami : le même lien donne toujours la même séance.",
+      "Commencer dans l’application l’ouvre comme routine, prête à enregistrer ou à lancer, avec vos propres charges au fil des séries.",
+    ],
+    dyk: "Aujourd’hui fait cela pour vous chaque jour, en sachant aussi ce que vous avez soulevé la dernière fois et quels muscles récupèrent encore.",
+  },
 };
