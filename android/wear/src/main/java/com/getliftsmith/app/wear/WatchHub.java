@@ -62,7 +62,22 @@ final class WatchHub {
     private static WatchRun run;
     private static boolean runLoaded;
 
+    /** How far this watch's clock is from the phone's, learnt from each state the phone sends. */
+    private static final WatchClock clock = new WatchClock();
+
     private WatchHub() {}
+
+    /**
+     * A state the phone sent, read onto this watch's clock: its "at" (when the phone sent it) teaches WatchClock the
+     * difference, and rest and the set timer move by it, so both count down to the same moment.
+     */
+    static WorkoutState fromPhone(String json) {
+        WorkoutState s = WorkoutState.parse(json);
+        if (s == null) return null;
+        clock.heard(s.at, System.currentTimeMillis());
+        long shift = clock.offset();
+        return shift == 0 ? s : WorkoutState.parse(json, shift);
+    }
 
     static WorkoutState state() {
         WatchRun r = run;
@@ -215,7 +230,7 @@ final class WatchHub {
         Uri uri = new Uri.Builder().scheme("wear").path(PATH_WORKOUT).build();
         Wearable.getDataClient(app).getDataItems(uri).addOnSuccessListener((DataItemBuffer items) -> {
             WorkoutState found = null;
-            for (DataItem item : items) found = WorkoutState.parse(DataMapItem.fromDataItem(item).getDataMap().getString("json"));
+            for (DataItem item : items) found = fromPhone(DataMapItem.fromDataItem(item).getDataMap().getString("json"));
             items.release();
             set(app, found);
         });

@@ -207,7 +207,8 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
 
 /// What goes to and comes from the Garmin watch (same keys as GarminMessages.java): "t" title, "s" set label, "n"
 /// the set, "p" plates, "r" seconds of rest left, "h" heart rate from a Bluetooth monitor, "v" vibrate when rest ends,
-/// "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its end or -1 for a count-up, label], "ki" which timer.
+/// "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its end or -1 for a count-up, label], "ki" which timer,
+/// and "re", "ke" and "z": rest's end, the phases and when this was sent, on the phone's clock in seconds since 1970.
 enum GarminMessages {
     static let hrOnly: TimeInterval = 10
 
@@ -216,6 +217,8 @@ enum GarminMessages {
         let left = restUntil - now.timeIntervalSince1970
         // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
         var k: [[Any]] = []
+        // The same phases on the phone's clock in whole seconds since 1970, for a watch whose clock agrees ("z").
+        var ke: [[Any]] = []
         var first = 0.0
         if left <= 0 {
             for case let p as [String: Any] in (s["timer"] as? [Any] ?? []).prefix(8) {
@@ -226,10 +229,15 @@ enum GarminMessages {
                 let start = Int(((from / 1000) - now.timeIntervalSince1970).rounded(.down))
                 let end = to.map { Int((($0 / 1000) - now.timeIntervalSince1970).rounded(.up)) } ?? -1
                 k.append([start, end, p["label"] as? String ?? ""])
+                ke.append([Int((from / 1000).rounded()), to.map { Int(($0 / 1000).rounded()) } ?? -1, p["label"] as? String ?? ""])
             }
         }
         let base: [String: Any] = [
             "k": k,
+            "ke": ke,
+            // When this was sent and when rest ends, on the phone's clock (watch-apps.md "Same second as the phone").
+            "z": Int(now.timeIntervalSince1970.rounded()),
+            "re": left > 0 ? Int(restUntil.rounded()) : 0,
             "ki": first > 0 ? String(Int64(first)) : "",
             "t": s["title"] as? String ?? "",
             "s": s["setLabel"] as? String ?? "",

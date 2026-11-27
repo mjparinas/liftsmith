@@ -11,7 +11,8 @@ import org.json.JSONObject;
 /**
  * What goes to and comes from the Garmin watch app (garmin/source). Plain data, so it's tested without a watch.
  * The phone sends short keys because Connect IQ messages are small and slow: "t" title, "s" set label, "n" the set,
- * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree), "h" heart rate from a
+ * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree; "re", "ke" and "z" are
+ * the same moments on the phone's clock for a watch whose clock agrees), "h" heart rate from a
  * Bluetooth monitor, "v" vibrate when rest ends, "w" a heads-up buzz 10 s before rest ends, "k" the set timer's phases as [seconds from now to its start, to its
  * end or -1 for a count-up, label] and "ki" which timer that is, plus the set's weight ladder and "How did it feel?" (below).
  * "x" is what Machine taken swaps to (none: Machine taken is off) and "y" why the exercise is there after one.
@@ -34,6 +35,11 @@ final class GarminMessages {
         m.put("p", s.optString("plates", ""));
         long restUntil = s.isNull("restUntil") ? 0L : s.optLong("restUntil", 0L);
         m.put("r", restUntil > now ? (int) ((restUntil - now + 999) / 1000) : 0);
+        // The same moments on the phone's clock, in whole seconds since 1970, plus when this was sent ("z"): a watch
+        // whose clock agrees with the phone's counts to these, so the trip through Garmin Connect adds no delay
+        // (watch-apps.md "Same second as the phone"). "r" and "k" stay for a watch whose clock doesn't.
+        m.put("z", (int) Math.round(now / 1000.0));
+        m.put("re", restUntil > now ? (int) Math.round(restUntil / 1000.0) : 0);
         m.put("h", s.optInt("hr", 0));
         m.put("v", s.optBoolean("vibrate", true));
         m.put("w", s.optBoolean("warn", false));
@@ -42,6 +48,7 @@ final class GarminMessages {
         m.put("y", s.optString("why", ""));
         // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
         List<Object> k = new ArrayList<>();
+        List<Object> ke = new ArrayList<>();
         JSONArray timer = restUntil > now ? null : s.optJSONArray("timer");
         long first = 0L;
         for (int i = 0; timer != null && i < timer.length() && i < 8; i++) {
@@ -56,8 +63,10 @@ final class GarminMessages {
                 to > 0 ? (int) ((to - now + 999) / 1000) : -1,
                 p.optString("label", "")
             ));
+            ke.add(Arrays.asList((int) Math.round(from / 1000.0), to > 0 ? (int) Math.round(to / 1000.0) : -1, p.optString("label", "")));
         }
         m.put("k", k);
+        m.put("ke", ke);
         m.put("ki", first > 0 ? String.valueOf(first) : "");
         // Adjust and rate a set (watchAdjust.ts): "ay" the set's key, "ak" the weight ladder in kg, "aw" its words,
         // "ai" where the set's own weight is, "ar" the reps and "ars" the word after them; "qe" the exercise asked

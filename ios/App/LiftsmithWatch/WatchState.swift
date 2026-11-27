@@ -154,4 +154,40 @@ struct WatchState: Decodable, Equatable {
     }
 
     func stale(at now: Date) -> Bool { at > 0 && now.timeIntervalSince1970 - at / 1000 > Self.staleAfter }
+
+    /// The phone's times moved `ms` onto this watch's clock (WatchClock.offset): rest and every set timer phase.
+    func shifted(by ms: Double) -> WatchState {
+        guard ms != 0 else { return self }
+        var s = self
+        s.restUntil = restUntil.map { $0 + ms }
+        s.timer = timer.map { p in Phase(from: p.from + ms, to: p.to.map { $0 + ms }, label: p.label) }
+        return s
+    }
+}
+
+/// Keeps the watch's countdowns on the phone's second (watch-apps.md "Same second as the phone"), like Android's
+/// WatchClock.java: the phone sends rest and the set timer as times on its own clock plus when it sent them ("at"),
+/// so the watch learns how far its clock is from the phone's and moves those times by it. An arrival earlier than
+/// "at" can only be the watch running behind; a later one is mostly the trip over, so the watch only counts itself
+/// ahead past 2 s.
+struct WatchClock {
+    static let samples = 16
+    static let maxGap: Double = 60_000
+    static let ahead: Double = 2_000
+    private var gaps: [Double] = []
+
+    mutating func heard(sentAt: Double, now: Double) {
+        guard sentAt > 0 else { return }
+        let gap = now - sentAt
+        guard abs(gap) <= Self.maxGap else { return }
+        gaps.append(gap)
+        if gaps.count > Self.samples { gaps.removeFirst(gaps.count - Self.samples) }
+    }
+
+    /// How far this watch's clock is ahead of the phone's (negative: behind), in ms.
+    var offset: Double {
+        guard let least = gaps.min() else { return 0 }
+        if least < 0 { return least }
+        return least > Self.ahead ? least : 0
+    }
 }

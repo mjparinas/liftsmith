@@ -156,12 +156,14 @@ final class WorkoutState {
         }
     }
 
-    private WorkoutState(JSONObject o) {
+    private WorkoutState(JSONObject o, long shift) {
         title = o.optString("title", "");
         setLabel = o.optString("setLabel", "");
         next = o.optString("next", "");
         plates = o.optString("plates", "");
-        restUntil = o.isNull("restUntil") ? 0L : o.optLong("restUntil", 0L);
+        long rest = o.isNull("restUntil") ? 0L : o.optLong("restUntil", 0L);
+        // Times from the phone are on its clock; `shift` moves them onto this watch's (WatchClock).
+        restUntil = rest > 0 ? rest + shift : 0L;
         hr = o.optInt("hr", 0);
         vibrate = o.optBoolean("vibrate", true);
         warn = o.optBoolean("warn", false);
@@ -174,12 +176,12 @@ final class WorkoutState {
         cue = o.optString("cue", "");
         taken = o.optString("taken", "");
         why = o.optString("why", "");
-        timer = phases(o.optJSONArray("timer"));
+        timer = phases(o.optJSONArray("timer"), shift);
         adj = Adj.parse(o.optJSONObject("adj"));
         ask = Ask.parse(o.optJSONObject("ask"));
     }
 
-    private static List<Phase> phases(JSONArray a) {
+    private static List<Phase> phases(JSONArray a, long shift) {
         if (a == null) return Collections.emptyList();
         List<Phase> out = new ArrayList<>();
         for (int i = 0; i < a.length() && i < 8; i++) {
@@ -188,7 +190,7 @@ final class WorkoutState {
             long from = p.optLong("from", 0L);
             long to = p.isNull("to") ? 0L : p.optLong("to", 0L);
             if (from <= 0 || (to > 0 && to <= from)) continue;
-            out.add(new Phase(from, to, p.optString("label", "")));
+            out.add(new Phase(from + shift, to > 0 ? to + shift : 0L, p.optString("label", "")));
         }
         return out;
     }
@@ -202,12 +204,28 @@ final class WorkoutState {
 
     /** The state in a Data Layer item's "json", or null when there's none or it can't be read. */
     static WorkoutState parse(String json) {
+        return parse(json, 0L);
+    }
+
+    /** The same, with the phone's times moved `shift` ms onto this watch's clock (WatchClock.offset). */
+    static WorkoutState parse(String json, long shift) {
         if (json == null || json.isEmpty()) return null;
         try {
-            return new WorkoutState(new JSONObject(json));
+            return new WorkoutState(new JSONObject(json), shift);
         } catch (JSONException e) {
             return null;
         }
+    }
+
+    /**
+     * What the countdown on screen counts to (rest's end, or the set timer phase's end, or its start for a count-up),
+     * so the screen can redraw on the second it changes (WatchClock.nextTick); 0 when nothing counts.
+     */
+    long anchor(long now) {
+        if (resting(now)) return restUntil;
+        Phase p = phase(now);
+        if (p == null) return 0L;
+        return p.to > 0 ? p.to : p.from;
     }
 
     boolean stale(long now) {
