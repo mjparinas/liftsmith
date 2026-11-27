@@ -47,6 +47,14 @@ export const en = {
   "gp.equipmentNone": "Nobody has set up this gym’s equipment yet.",
   "gp.dumbbells": "Dumbbells {from} to {to} {unit}",
   "gp.more": "More gyms in {city}",
+  "gp.sumIn": "{name} is a gym in {city}.",
+  "gp.sumAt": "{name} is a gym at {address}, {city}.",
+  "gp.sumChain": "It’s one of {count} {chain} locations.",
+  "gp.sumAllDay": "It’s open 24 hours a day, every day.",
+  "gp.sumEveryDay": "It’s open every day of the week.",
+  "gp.sumDays": "It’s open {count} days a week.",
+  "gp.sumNear": "The closest other gym is {gym}, {distance} away.",
+  "gp.away": "{distance} away",
   "gp.osm": "Gym details © OpenStreetMap contributors",
   "gp.cityTitle": "Gyms in {city}",
   "gp.cityDescription": "{count} gyms in {city} with addresses, opening hours and equipment. Official gyms are marked and listed first.",
@@ -257,6 +265,11 @@ export const en = {
   "gp.chainNearest": "Nearest first, from where you last looked for gyms.",
   "gp.chainMore": "Show more",
   "gp.chainElsewhere": "Elsewhere",
+  "gp.w.see": "See {name} on Liftsmith",
+  "gp.w.noClasses": "No classes posted yet.",
+  "gp.w.off": "This gym's widget isn't showing on Liftsmith right now.",
+  "gp.w.findUs": "Find us on",
+  "gp.w.badgeAlt": "Find us on Liftsmith",
 } as const;
 
 type Key = keyof typeof en;
@@ -305,6 +318,14 @@ export const es: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Nadie ha configurado aún el equipamiento de este gimnasio.",
   "gp.dumbbells": "Mancuernas de {from} a {to} {unit}",
   "gp.more": "Más gimnasios en {city}",
+  "gp.sumIn": "{name} es un gimnasio en {city}.",
+  "gp.sumAt": "{name} es un gimnasio en {address}, {city}.",
+  "gp.sumChain": "Es uno de los {count} locales de {chain}.",
+  "gp.sumAllDay": "Abre las 24 horas, todos los días.",
+  "gp.sumEveryDay": "Abre todos los días de la semana.",
+  "gp.sumDays": "Abre {count} días a la semana.",
+  "gp.sumNear": "El gimnasio más cercano es {gym}, a {distance}.",
+  "gp.away": "a {distance}",
   "gp.osm": "Datos de gimnasios © colaboradores de OpenStreetMap",
   "gp.cityTitle": "Gimnasios en {city}",
   "gp.cityDescription": "{count} gimnasios en {city} con dirección, horario y equipamiento. Los oficiales aparecen marcados y primero.",
@@ -520,6 +541,11 @@ export const es: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "Las más cercanas primero, según dónde buscaste gimnasios por última vez.",
   "gp.chainMore": "Ver más",
   "gp.chainElsewhere": "Otros lugares",
+  "gp.w.see": "Ver {name} en Liftsmith",
+  "gp.w.noClasses": "Todavía no hay clases publicadas.",
+  "gp.w.off": "El widget de este gimnasio no se muestra en Liftsmith ahora mismo.",
+  "gp.w.findUs": "Encuéntranos en",
+  "gp.w.badgeAlt": "Encuéntranos en Liftsmith",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -567,6 +593,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Personne n’a encore configuré l’équipement de cette salle.",
   "gp.dumbbells": "Haltères de {from} à {to} {unit}",
   "gp.more": "Autres salles à {city}",
+  "gp.sumIn": "{name} est une salle de sport à {city}.",
+  "gp.sumAt": "{name} est une salle de sport située à l’adresse {address}, {city}.",
+  "gp.sumChain": "C’est l’une des {count} salles {chain}.",
+  "gp.sumAllDay": "Elle est ouverte 24 h/24, tous les jours.",
+  "gp.sumEveryDay": "Elle est ouverte tous les jours de la semaine.",
+  "gp.sumDays": "Elle est ouverte {count} jours par semaine.",
+  "gp.sumNear": "La salle la plus proche est {gym}, à {distance}.",
+  "gp.away": "à {distance}",
   "gp.osm": "Données des salles © contributeurs OpenStreetMap",
   "gp.cityTitle": "Salles de sport à {city}",
   "gp.cityDescription":
@@ -784,6 +818,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "Les plus proches d'abord, d'après votre dernière recherche de salles.",
   "gp.chainMore": "Voir plus",
   "gp.chainElsewhere": "Ailleurs",
+  "gp.w.see": "Voir {name} sur Liftsmith",
+  "gp.w.noClasses": "Aucun cours publié pour l’instant.",
+  "gp.w.off": "Le widget de cette salle n’est pas affiché sur Liftsmith pour le moment.",
+  "gp.w.findUs": "Retrouvez-nous sur",
+  "gp.w.badgeAlt": "Retrouvez-nous sur Liftsmith",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -831,6 +870,14 @@ export const de: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Die Geräte dieses Studios hat noch niemand eingerichtet.",
   "gp.dumbbells": "Kurzhanteln von {from} bis {to} {unit}",
   "gp.more": "Weitere Studios in {city}",
+  "gp.sumIn": "{name} ist ein Fitnessstudio in {city}.",
+  "gp.sumAt": "{name} ist ein Fitnessstudio in {city}, Adresse: {address}.",
+  "gp.sumChain": "Es ist einer von {count} Standorten von {chain}.",
+  "gp.sumAllDay": "Es hat jeden Tag rund um die Uhr geöffnet.",
+  "gp.sumEveryDay": "Es hat an allen sieben Tagen der Woche geöffnet.",
+  "gp.sumDays": "Es hat an {count} Tagen pro Woche geöffnet.",
+  "gp.sumNear": "Das nächste andere Studio ist {gym}, {distance} entfernt.",
+  "gp.away": "{distance} entfernt",
   "gp.osm": "Studiodaten © OpenStreetMap-Mitwirkende",
   "gp.cityTitle": "Fitnessstudios in {city}",
   "gp.cityDescription":
@@ -1049,6 +1096,11 @@ export const de: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "Die nächsten zuerst, vom Ort deiner letzten Studiosuche aus.",
   "gp.chainMore": "Mehr anzeigen",
   "gp.chainElsewhere": "Anderswo",
+  "gp.w.see": "{name} auf Liftsmith ansehen",
+  "gp.w.noClasses": "Noch keine Kurse eingetragen.",
+  "gp.w.off": "Das Widget dieses Studios wird auf Liftsmith gerade nicht angezeigt.",
+  "gp.w.findUs": "Finde uns auf",
+  "gp.w.badgeAlt": "Finde uns auf Liftsmith",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1095,6 +1147,14 @@ export const it: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Nessuno ha ancora impostato gli attrezzi di questa palestra.",
   "gp.dumbbells": "Manubri da {from} a {to} {unit}",
   "gp.more": "Altre palestre a {city}",
+  "gp.sumIn": "{name} è una palestra a {city}.",
+  "gp.sumAt": "{name} è una palestra in {address}, {city}.",
+  "gp.sumChain": "È una delle {count} sedi di {chain}.",
+  "gp.sumAllDay": "È aperta 24 ore su 24, tutti i giorni.",
+  "gp.sumEveryDay": "È aperta tutti i giorni della settimana.",
+  "gp.sumDays": "È aperta {count} giorni a settimana.",
+  "gp.sumNear": "La palestra più vicina è {gym}, a {distance}.",
+  "gp.away": "a {distance}",
   "gp.osm": "Dati delle palestre © contributori di OpenStreetMap",
   "gp.cityTitle": "Palestre a {city}",
   "gp.cityDescription": "{count} palestre a {city} con indirizzo, orari e attrezzi. Quelle ufficiali sono segnate e mostrate per prime.",
@@ -1310,6 +1370,11 @@ export const it: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "Prima le più vicine, rispetto a dove hai cercato palestre l'ultima volta.",
   "gp.chainMore": "Mostra altro",
   "gp.chainElsewhere": "Altrove",
+  "gp.w.see": "Vedi {name} su Liftsmith",
+  "gp.w.noClasses": "Ancora nessun corso pubblicato.",
+  "gp.w.off": "Il widget di questa palestra al momento non è visibile su Liftsmith.",
+  "gp.w.findUs": "Trovaci su",
+  "gp.w.badgeAlt": "Trovaci su Liftsmith",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1356,6 +1421,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "このジムの器具はまだだれも設定していません。",
   "gp.dumbbells": "ダンベル {from}〜{to} {unit}",
   "gp.more": "{city}のほかのジム",
+  "gp.sumIn": "{name}は{city}にあるジムです。",
+  "gp.sumAt": "{name}は{city}の{address}にあるジムです。",
+  "gp.sumChain": "{chain}の{count}店舗のひとつです。",
+  "gp.sumAllDay": "毎日24時間営業しています。",
+  "gp.sumEveryDay": "毎日営業しています。",
+  "gp.sumDays": "週{count}日営業しています。",
+  "gp.sumNear": "いちばん近いほかのジムは{gym}で、距離は{distance}です。",
+  "gp.away": "距離 {distance}",
   "gp.osm": "ジム情報 © OpenStreetMap contributors",
   "gp.cityTitle": "{city}のジム",
   "gp.cityDescription": "{city}のジム {count} 件。住所、営業時間、器具つき。公式ジムはマーク付きで先頭に表示されます。",
@@ -1565,6 +1638,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "最後にジムを探した場所から近い順。",
   "gp.chainMore": "もっと見る",
   "gp.chainElsewhere": "その他の地域",
+  "gp.w.see": "Liftsmithで{name}を見る",
+  "gp.w.noClasses": "まだクラスは掲載されていません。",
+  "gp.w.off": "このジムのウィジェットは現在Liftsmithに表示されていません。",
+  "gp.w.findUs": "私たちのジムは",
+  "gp.w.badgeAlt": "Liftsmithで私たちのジムを見る",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -1611,6 +1689,14 @@ export const pt: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Ninguém configurou os equipamentos desta academia ainda.",
   "gp.dumbbells": "Halteres de {from} a {to} {unit}",
   "gp.more": "Mais academias em {city}",
+  "gp.sumIn": "{name} é uma academia em {city}.",
+  "gp.sumAt": "{name} é uma academia em {address}, {city}.",
+  "gp.sumChain": "É uma das {count} unidades da {chain}.",
+  "gp.sumAllDay": "Funciona 24 horas por dia, todos os dias.",
+  "gp.sumEveryDay": "Funciona todos os dias da semana.",
+  "gp.sumDays": "Funciona {count} dias por semana.",
+  "gp.sumNear": "A academia mais próxima é {gym}, a {distance}.",
+  "gp.away": "a {distance}",
   "gp.osm": "Dados da academia © colaboradores do OpenStreetMap",
   "gp.cityTitle": "Academias em {city}",
   "gp.cityDescription":
@@ -1826,6 +1912,11 @@ export const pt: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "As mais próximas primeiro, a partir de onde você procurou academias pela última vez.",
   "gp.chainMore": "Ver mais",
   "gp.chainElsewhere": "Outros lugares",
+  "gp.w.see": "Ver {name} no Liftsmith",
+  "gp.w.noClasses": "Nenhuma aula publicada ainda.",
+  "gp.w.off": "O widget desta academia não está aparecendo no Liftsmith agora.",
+  "gp.w.findUs": "Encontre a gente no",
+  "gp.w.badgeAlt": "Encontre a gente no Liftsmith",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1872,6 +1963,14 @@ export const ko: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "아직 아무도 이 헬스장의 장비를 설정하지 않았어요.",
   "gp.dumbbells": "덤벨 {from}~{to} {unit}",
   "gp.more": "{city}의 다른 헬스장",
+  "gp.sumIn": "{name}은(는) {city}에 있는 헬스장입니다.",
+  "gp.sumAt": "{name}은(는) {city} {address}에 있는 헬스장입니다.",
+  "gp.sumChain": "{chain}의 {count}개 지점 중 하나입니다.",
+  "gp.sumAllDay": "매일 24시간 운영합니다.",
+  "gp.sumEveryDay": "일주일 내내 운영합니다.",
+  "gp.sumDays": "일주일에 {count}일 운영합니다.",
+  "gp.sumNear": "가장 가까운 다른 헬스장은 {distance} 거리의 {gym}입니다.",
+  "gp.away": "{distance} 거리",
   "gp.osm": "헬스장 정보 © OpenStreetMap 기여자",
   "gp.cityTitle": "{city}의 헬스장",
   "gp.cityDescription": "{city}의 헬스장 {count}곳의 주소, 운영 시간, 장비. 공식 헬스장은 표시되어 먼저 나와요.",
@@ -2080,6 +2179,11 @@ export const ko: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "마지막으로 헬스장을 찾은 곳에서 가까운 순.",
   "gp.chainMore": "더 보기",
   "gp.chainElsewhere": "기타 지역",
+  "gp.w.see": "Liftsmith에서 {name} 보기",
+  "gp.w.noClasses": "아직 게시된 수업이 없습니다.",
+  "gp.w.off": "이 체육관의 위젯은 지금 Liftsmith에 표시되지 않습니다.",
+  "gp.w.findUs": "저희 체육관은",
+  "gp.w.badgeAlt": "Liftsmith에서 저희 체육관 보기",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -2126,6 +2230,14 @@ export const tr: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Bu salonun ekipmanını henüz kimse kurmadı.",
   "gp.dumbbells": "Dambıllar {from}–{to} {unit}",
   "gp.more": "{city} içindeki diğer salonlar",
+  "gp.sumIn": "{name}, {city} şehrinde bir spor salonudur.",
+  "gp.sumAt": "{name}, {address}, {city} adresinde bir spor salonudur.",
+  "gp.sumChain": "{count} {chain} şubesinden biridir.",
+  "gp.sumAllDay": "Her gün 24 saat açıktır.",
+  "gp.sumEveryDay": "Haftanın her günü açıktır.",
+  "gp.sumDays": "Haftada {count} gün açıktır.",
+  "gp.sumNear": "En yakın diğer salon {distance} uzaklıktaki {gym}.",
+  "gp.away": "{distance} uzaklıkta",
   "gp.osm": "Salon bilgileri © OpenStreetMap katkıda bulunanları",
   "gp.cityTitle": "{city} spor salonları",
   "gp.cityDescription":
@@ -2339,6 +2451,11 @@ export const tr: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "En son salon aradığın yere en yakın olanlar önce.",
   "gp.chainMore": "Daha fazla göster",
   "gp.chainElsewhere": "Diğer yerler",
+  "gp.w.see": "{name} salonunu Liftsmith'te gör",
+  "gp.w.noClasses": "Henüz ders eklenmedi.",
+  "gp.w.off": "Bu salonun widget'ı şu anda Liftsmith'te görünmüyor.",
+  "gp.w.findUs": "Bizi burada bulun",
+  "gp.w.badgeAlt": "Bizi Liftsmith'te bulun",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -2385,6 +2502,14 @@ export const pl: Partial<Record<Key, Message>> = {
   "gp.equipmentNone": "Nikt jeszcze nie ustawił sprzętu tej siłowni.",
   "gp.dumbbells": "Hantle od {from} do {to} {unit}",
   "gp.more": "Więcej siłowni: {city}",
+  "gp.sumIn": "{name} to siłownia w miejscowości {city}.",
+  "gp.sumAt": "{name} to siłownia pod adresem {address}, {city}.",
+  "gp.sumChain": "To jedna z {count} placówek sieci {chain}.",
+  "gp.sumAllDay": "Jest otwarta całą dobę, codziennie.",
+  "gp.sumEveryDay": "Jest otwarta codziennie.",
+  "gp.sumDays": "Jest otwarta przez {count} dni w tygodniu.",
+  "gp.sumNear": "Najbliższa inna siłownia to {gym}, {distance} stąd.",
+  "gp.away": "{distance} stąd",
   "gp.osm": "Dane siłowni © współtwórcy OpenStreetMap",
   "gp.cityTitle": "Siłownie: {city}",
   "gp.cityDescription":
@@ -2599,4 +2724,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "gp.chainNearest": "Najbliższe najpierw, licząc od miejsca ostatniego wyszukiwania siłowni.",
   "gp.chainMore": "Pokaż więcej",
   "gp.chainElsewhere": "Gdzie indziej",
+  "gp.w.see": "Zobacz {name} w Liftsmith",
+  "gp.w.noClasses": "Nie dodano jeszcze żadnych zajęć.",
+  "gp.w.off": "Widżet tej siłowni nie jest teraz wyświetlany w Liftsmith.",
+  "gp.w.findUs": "Znajdź nas w",
+  "gp.w.badgeAlt": "Znajdź nas w Liftsmith",
 };

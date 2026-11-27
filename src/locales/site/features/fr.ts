@@ -70,6 +70,11 @@ export const fr: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Des widgets pour le site de votre salle",
+      body: "Les salles officielles affichent leur horaire des cours, leur équipement ou un badge Retrouvez-nous sur Liftsmith sur leur propre site avec une ligne de code. Ils se mettent à jour tout seuls, dans la langue et l’apparence choisies, et mènent à la page de la salle.",
+      note: "Aucun script, cookie ni suivi sur le site de la salle.",
+    },
     "gym-insights": {
       name: "Statistiques pour les propriétaires de salle",
       body: "Les propriétaires et le personnel des salles officielles voient combien de sportifs s'y sont entraînés ces quatre dernières semaines, les heures pleines et calmes, le matériel utilisé et les problèmes signalés, avec une prochaine étape.",
@@ -241,7 +246,8 @@ export const fr: FeaturesText = {
     "exercise-stats": {
       name: "Statistiques de chaque exercice",
       body: "Touchez n’importe quel exercice de la bibliothèque pour voir vos séries, le poids total soulevé, votre max estimé et votre position face aux personnes entraînées de votre poids, âge et sexe, d’après des normes de force publiées.",
-      proPart: "Les graphiques d’une semaine à un an font partie des statistiques avancées de Pro.",
+      proPart:
+        "Les statistiques avancées de Pro ajoutent les graphiques, d'une semaine à tout l'historique : touchez une séance pour voir son chiffre, records marqués.",
     },
     "log-past": {
       name: "Saisir une séance passée",
@@ -298,10 +304,24 @@ export const fr: FeaturesText = {
       name: "Vos propres routines",
       body: "Créez des routines depuis le catalogue d’exercices, sans limite de nombre, et partagez-les par lien.",
     },
+    "workout-generator": {
+      name: "Générateur d’entraînement gratuit sur le site",
+      body: "Choisissez votre matériel, vos minutes et ce que vous voulez travailler, et le même moteur écrit une séance avec séries, répétitions, repos et la raison de chaque exercice. Chaque séance a son propre lien à partager, et Commencer dans l’application l’ouvre comme routine.",
+      note: "Commencer dans l’application ouvre l’application Android ; sur iPhone et ordinateur, elle ouvre l’application web.",
+    },
     "routine-library": {
       name: "Bibliothèque de routines",
       body: "Cherchez les routines publiées par d'autres selon l'objectif, des mots et ce que votre salle propose, enregistrez-en une d'un geste et notez-la avec des étoiles. Publiez la vôtre depuis son éditeur, avec ou sans votre nom, et elle a sa propre page sur le site. Seuls les exercices et les séries sont partagés, jamais vos charges ni vos notes.",
       note: "Publier demande un compte et 18 ans. Tout le monde peut parcourir.",
+    },
+    "thirty-day": {
+      name: "Défis de 30 jours",
+      body: "Douze défis de 30 jours, des squats, pompes et gainage aux tractions et burpees, chacun sur trois niveaux : un mouvement par jour, un peu plus chaque jour, avec un jour de repos tous les quatre jours. Aujourd’hui affiche le chiffre du jour avec un bouton Fait, et un jour manqué vous attend. Chaque défi a sa page sur le site avec un calendrier à imprimer.",
+    },
+    "printable-plans": {
+      name: "Programmes d'entraînement à imprimer",
+      body: "Imprimez n'importe quel programme ou routine sur une page : chaque séance avec ses séries, répétitions et repos, des cases pour noter quatre séances à la main et un code QR qui l'ouvre dans l'app. Chaque page de programme du site a un PDF gratuit en dix langues, et Imprimer la routine dans l'app ajoute les charges prévues pour la prochaine fois.",
+      note: "Sur le téléphone, la fenêtre d'impression peut aussi l'enregistrer en PDF.",
     },
     library: {
       name: "1 000 exercices",
@@ -413,6 +433,10 @@ export const fr: FeaturesText = {
       name: "Des cartes quand vous faites une capture d’écran",
       body: "Faites une capture d’écran et une feuille de cartes d’entraînement s’ouvre : votre dernier mois, trois mois, six mois, l’année ou depuis le début, en totaux, en répartition de vos séries ou en meilleures charges. Faites-les défiler, masquez les poids avec l’œil et partagez avec votre lien d’invitation imprimé sur la carte. Les mêmes cartes sont dans Partager mon entraînement, sur Progrès. Chaque lien que vous partagez porte désormais votre invitation, dans un lien qui le dit.",
       note: "Les captures l’ouvrent sur Android 14 et plus et sur iPhone, et on peut la désactiver. Ailleurs, ouvrez-la depuis Progrès. Les moins de 18 ans partagent sans lien d’invitation.",
+    },
+    "share-stats": {
+      name: "Partagez un record ou un max",
+      body: "Un petit bouton de partage se trouve à côté de vos max estimés, de votre série la plus lourde, de chaque record par nombre de répétitions et de vos records récents. Un toucher crée une carte avec ce chiffre, le logo Liftsmith et le site, au style de l’app, prête à publier ou à enregistrer.",
     },
     coaching: {
       name: "Coacher des clients",

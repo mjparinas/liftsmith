@@ -921,3 +921,10 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-26.** "Labs: the camera as a coach" (`labs-coach`) gets a fifth point for wrist bar speed (`labWatchSpeed`, [Watch apps](watch-apps.md) "Bar speed from the wrist"), in every language. It extends that email rather than adding one, so the screenshot stays as it is.
 
 **New, 2026-11-26.** "Leave your phone in the locker" (`watch-alone`): phone-free workouts on Wear OS, Apple Watch and Garmin, Start on watch, logging on the wrist and the phone saving it later ([Watch apps](watch-apps.md) "Phone-free workouts"), with a screenshot of Today, in every language. It waits for the `wearOnPlay` flag like the other watch emails.
+
+**New, 2026-11-27.** "Put your gym on your own website" (`gym-widgets`, gym owners): the class schedule, equipment and badge widgets for the gym's own site, where to find them and how to paste the code ([Gyms](gyms.md) "Website widgets"), in every language, without a screenshot like the other role emails.
+
+**New, 2026-11-27.** "Share the numbers you're proudest of" (`share-stats`): the small share button beside every estimated max, heaviest set, best for a rep count and recent personal best ([Sharing](sharing.md) "Share one stat"), with a screenshot of Progress at New bests, in every language.
+**New, 2026-11-27.** "One move a day for 30 days" (`thirty-day`): the twelve 30-day challenges, Tools › 30-day challenges, the one-tap Done on Today, a missed day that waits and the printable calendar on the website ([30-day challenges](thirty-day-challenges.md)), with a screenshot of the challenge list, in every language.
+
+**New, 2026-11-27.** "Print a workout on one page" (`printable-plans`): the printable page and free PDF of every program, public routines on one page and Print routine in the app with the next weights and a QR code ([Printable plans](printable-plans.md)). Its picture is the dumbbell full body's sheet as it prints (`art: "print"`, drawn by `node scripts/program-pdfs.mjs --email`), in every language.

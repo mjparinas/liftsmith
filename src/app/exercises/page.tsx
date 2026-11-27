@@ -4,9 +4,8 @@ import Link from "next/link";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { BRAND } from "@/lib/brand";
-import { EXERCISES } from "@/lib/exercises";
 import { pageMeta } from "@/lib/pageMeta";
-import { exercisesFor, MUSCLE_NAME, muscleSlug } from "@/lib/seo";
+import { SITE_EXERCISES as EXERCISES, exercisesFor, MUSCLE_NAME, muscleSlug } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { MUSCLES } from "@/lib/types";
 

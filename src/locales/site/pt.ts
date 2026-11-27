@@ -26,6 +26,7 @@ export const pt: SiteText = {
       tools: "Ferramentas",
       support: "Suporte",
       company: "Empresa",
+      exercises: "Guias de exercícios",
     },
     links: {
       openApp: "Abrir o app",
@@ -45,6 +46,7 @@ export const pt: SiteText = {
       equipment: "Exercícios por equipamento",
       guides: "Guias de treino",
       blog: "Blog",
+      generator: "Gerador de treinos",
       plates: "Calculadora de anilhas",
       oneRm: "Calculadora de 1RM",
       warmUp: "Calculadora de aquecimento",

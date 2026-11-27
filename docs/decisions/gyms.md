@@ -45,7 +45,7 @@ This builds on [Gym sharing](gym-sharing.md): lifters' own shared and listed **s
 - **On the website** (`src/server/gymPage.ts`, `/api/gyms/page/`, rewritten from `/gyms/…` in `next.config.ts`; server build only): `/gyms/` lists every city with gyms, `/gyms/<city>/` ("Gyms in Langley, BC") lists its gyms (official first, then the most lifters, then by name) with studios in their own section, and `/gyms/<city>/<gym>/` is one gym. Addresses use the city and region (`langley-bc`) and the gym's name, unique within its city, and never change on a re-import, so links and posters keep working.
 - **A gym's page** shows the facts first: name and check mark, address, Directions (Google Maps) and Open in OpenStreetMap links, the website and phone, opening hours by weekday (`src/lib/openingHours.ts` reads OSM's common forms; anything else is shown as written), the equipment its setup has, and "N Liftsmith lifters train here". Then **Add this gym to your Liftsmith**, which opens the app on the gym (`#/gymplace/<id>`), a "claim it" card on unofficial gyms (step 3), and up to eight more gyms in the city.
 - Like public profiles, they're **plain HTML with no scripts** in the site's header and footer (`siteFrame.ts`, store links tagged `gym_page`), under `SHARE_PAGE_CSP`, in the reader's language from Accept-Language (text in `gp.*`, six languages), cached for 1 minute in the browser and 2 at the edge (it was 5 and 15, which left /gyms/ empty for a while after the first import; 2026-11-12). **Linked from** the site footer (Product › Find a gym, both the Next pages and the server-drawn ones) and the home page's first How it works step; the app reaches gyms from Today's gym chip and Settings › Gyms and equipment. Each carries `ExerciseGym` (or `ItemList`) structured data. A studio's page and an unknown address are `noindex`.
-- **`/sitemap-gyms.xml`** (listed in `robots.ts`) has `/gyms/`, every city and every gym that isn't hidden or a studio. **Since 2026-11-16 only gyms with something of their own** (`gymIndexable` and `INDEXABLE_SQL` in `gymPlaces.ts`: an owner, a website, phone or opening hours, a lifter who added it, or an equipment setup). About half the imported gyms had only a name and an address; Search Console left thousands of those "Crawled" or "Discovered - currently not indexed". Their pages stay up, `noindex`, and join the sitemap by themselves once the gym gets any of those ([Public pages and SEO](public-pages-and-seo.md) "Search Console indexing").
+- **`/sitemap-gyms.xml`** (listed in `robots.ts`) has `/gyms/`, every city and every gym that isn't hidden or a studio. **Since 2026-11-16 only gyms with something of their own** (`gymIndexable` and `INDEXABLE_SQL` in `gymPlaces.ts`: an owner, a website, phone or opening hours, a lifter who added it, or an equipment setup). About half the imported gyms had only a name and an address; Search Console left thousands of those "Crawled" or "Discovered - currently not indexed". Their pages stay up, `noindex`, and join the sitemap by themselves once the gym gets any of those ([Public pages and SEO](public-pages-and-seo.md) "Search Console indexing"). **Since 2026-11-27** links to those pages carry `rel="nofollow"`, each gym page opens with a line built from its own facts (`gymSummary`, also its meta description), "More gyms" lists the closest gyms first with how far each is, and robots.txt keeps the poster and report pages out of crawling ([SEO](seo.md) "Indexing and the impressions swing").
 - **Map picture: Mapbox** (Melvin chose it, 2026-11-12). The gym page and the app's gym view show a static street map with a pin, from Mapbox's Static Images API (dark style, 640x320 at 2x). It goes through our own server (`/api/gyms/map/?place=<id>`, `mapImage` in `gymMedia.ts`, cached for a day), so the pages' CSP (images only from our site) holds and the token never reaches a browser. It's off until `MAPBOX_TOKEN` (a public token with the default scopes) is set in Vercel (Melvin set it on 2026-11-12); without it the page shows no map and still links out to directions. The picture keeps Mapbox's logo and the page credits Mapbox and OpenStreetMap, as their terms ask.
 - **Logo and photos** (Melvin, 2026-11-12). The owner adds a logo and up to six photos on the owner's page (Settings › Gyms and equipment › the gym). The app turns each into a JPEG first (a logo up to 512 px and 150 KB, a photo up to 1,600 px and 450 KB, on white) and the server checks it's a JPEG, keeps it in the database (`gym_photos`, like share cards) and serves it from `/api/gyms/photo/?id=`, cached for good (a new picture gets a new id). A new logo replaces the old one; 30 additions a day per account. They show on the gym page (logo in the header, photos above the club) and in the app. Staff can take all of a gym's pictures down with Remove pictures in Admin › Gyms; deleting a gym or the owner's account removes them too.
 - **In the app** (`GymPlace.tsx`, route `gymplace`): loads the gym (`GET /api/gyms/?place=<id>`) and shows the same preview as the finder, now with the lifters line, opening hours in the app's language and clock, and links to directions, the website and the gym's web page (`PlaceDetails.tsx`). A gym the lifter added from the finder has **See this gym's page** in Gyms. Pure web code, so Android, iOS and the web app get it together.
@@ -380,3 +380,46 @@ hours, which equipment gets used, open problem reports), aggregate only, no lift
   announcement, with the busiest beside it.
 - One answer per gym per server for ten minutes, and the visit queries use `gym_visits_place` (`dbIndexes.test.ts`).
 - Free, like everything else for gyms. Pure web code plus the server, so Android, iOS and the web app get it together.
+
+## Website widgets (2026-11-27)
+
+Melvin, 2026-11-27 (traffic idea 3 from "Find new ways to grow traffic": "do them all, put effort into them"): owners of
+official gyms put a class schedule, an equipment list or a "Find us on Liftsmith" badge on their own website with one
+pasted line of code. Each one links back to the gym's page here, which earns that page a link from a local business site.
+
+- **Three widgets** (`src/lib/gymWidgets.ts` builds the code, `src/server/gymWidgets.ts` draws them, route
+  `src/app/api/gyms/widget/route.api.ts`):
+  - **Class schedule** (`/embed/gym/<id>/schedule/`): the week Monday first, from the same rows and the same drawing as
+    the website gym page (`classDaysHtml`), times on the gym's own clock, "book with the gym directly", or "No classes
+    posted yet." when there are none.
+  - **Equipment** (`/embed/gym/<id>/equipment/`): the gym's equipment chips and dumbbell range (`equipmentHtml`), its
+    amenities and prices, and **Add this gym to your Liftsmith** (the app's gym page, where one tap adds it with its kit).
+  - **Badge** (`/embed/gym/<id>/badge.svg`): the app mark, "Find us on" and "Liftsmith" as an SVG image, wrapped in a link
+    to the gym's page. It names no gym, so it reads nothing and is cached a week.
+  Both framed widgets show the gym's name, logo and check mark and a footer link, "See <gym> on Liftsmith", opening the
+  gym's page in a new tab with `utm_source=gym_widget` (and the widget as `utm_campaign`) for the Traffic tab.
+- **The code is a frame plus a plain link outside it**, like the calculators' embeds ([Public pages and SEO](public-pages-and-seo.md)
+  "Embeddable calculators"), because only a link in the host page itself counts for search; the badge has no frame at
+  all, so its link is the host page's own. The code holds no words in any language (the gym's name and the brand only),
+  so the app can build it for any of the ten languages with only its own loaded; the badge's width per language is a
+  table (`BADGE_WIDTH`) that `gymWidgets.test.ts` checks against the words, so the host page never jumps.
+- **Choices**: light or dark, and any of the app's ten languages (`?lang=&theme=`, English and light left off), picked on
+  the owner's page. Not "match the visitor's language": the edge would have to keep a copy per Accept-Language.
+- **Safe to embed**: no scripts, cookies or tracking; styles inline; the frame is `sandbox="allow-popups
+  allow-popups-to-escape-sandbox"` (links open a normal new tab), `loading="lazy"` and `referrerpolicy`. The policy
+  (`WIDGET_CSP` in `securityHeaders.ts`, also set by `next.config.ts` for `/embed/gym/`) is `default-src 'none'`, images
+  only from this site, and `frame-ancestors http: https: capacitor://localhost 'self'`: unlike the calculators, **http
+  sites too**, because a small gym's site may not have moved to https and nothing on these pages is worth tricking a click
+  onto; `capacitor://localhost` is the iOS app's own preview. `noindex` and out of robots.txt (`/embed/gym/`), like the
+  poster and report pages.
+- **Fast**: one indexed row per widget (`widgetPlace`: no photos, news, problems or trainers; the classes only for the
+  schedule), 10 minutes in the browser and 15 at the edge, then the old copy for a day while a fresh one is drawn. A
+  change in the app shows within about a quarter of an hour. A database error answers "off for now" with `no-store`.
+- **Official gyms only**: a released or never-claimed gym's frame shows one quiet line and a link to the gym finder
+  instead of its details (never a broken box on the owner's site); a gone gym answers 404 with the same line.
+- **Where owners find it**: **Widgets for your website** on the owner's page (`GymEdit.tsx` › `WidgetsSection` in
+  `GymWidgets.tsx`, under the poster): pick a widget, a look and a language, see a live preview, then Copy code. Owners
+  and staff alike. Pure web code, so Android, iOS and the web app get it together. Text: `gp.w.*` (the widgets) and
+  `gym.edit.widget*` (the owner's section), ten languages.
+- Free, like everything else for gyms. Features page `gym-widgets`, weekly email `gym-widgets` (gym owners), What's new
+  `gymWidgets` (0.32.0) and the blog post `gym-website-widgets`.

@@ -4,6 +4,7 @@
 // out at most once every 6 hours, so a flapping service doesn't flood the inbox. Counts and ids only: never a
 // lifter's email, training or health data. Nothing here ever throws into the webhook or job that raised it.
 import { CHECKS, type CheckId } from "@/lib/systemHealth";
+import { plainMail } from "@/server/reminderEmails";
 
 import { adminEmails, supportEmails } from "./adminAuth";
 import { query, run } from "./db";
@@ -51,13 +52,15 @@ export function resendMailer(env: NodeJS.ProcessEnv = process.env, send: typeof 
   };
 }
 
-const body = (lines: string[], path?: string) =>
-  [
-    ...lines,
-    ...(path ? ["", `Open the admin panel: ${siteOrigin()}${path}`] : []),
-    "",
-    "Sent by the Liftsmith admin panel. Switch alerts off under Automations.",
-  ].join("\n");
+/** An alert in the app's email layout, with a button to the admin page it's about. */
+const alertMail = (subject: string, lines: string[], path?: string) =>
+  plainMail({
+    subject,
+    lines,
+    cta: path ? { label: "Open the admin panel", url: `${siteOrigin()}${path}` } : null,
+    why: "Sent by the Liftsmith admin panel. Switch alerts off under Automations.",
+    icon: "bell",
+  });
 
 /**
  * Sends an alert to every admin, unless alerts are off or the same alert (`key`) went out in the last 6 hours.
@@ -78,7 +81,8 @@ export async function sendAlert(
     if (last && now - last < ALERT_GAP) return false;
     await setSetting(`alert-sent:${key}`, String(now), now);
     let sent = false;
-    for (const t of to) sent = (await mail(t, a.news ? a.subject : `Alert: ${a.subject}`, body(a.lines, a.path))) || sent;
+    const m = alertMail(a.news ? a.subject : `Alert: ${a.subject}`, a.lines, a.path);
+    for (const t of to) sent = (await mail(t, m.subject, m.text, m.html)) || sent;
     return sent;
   } catch (e) {
     console.error("[alert] could not send", (e as Error).message);

@@ -1,9 +1,11 @@
 "use client";
 
 import { isAdminLink, openAdmin } from "./adminLink";
+import { generatorHash } from "./genLink";
 import { inviteAppPath, inviteOfUrl, keepInviteFrom } from "./invite";
 import { APP_PATH } from "./site";
 import { SITE_LANGS } from "./siteLang";
+import { THIRTY_BY_SLUG } from "./thirtyDay";
 
 // Android App Links (Melvin, 2026-11-11). Links to our own domain open the installed Android app when the domain is
 // verified: the manifest's autoVerify intent filter claims the paths in APP_LINK_PATHS on www.getliftsmith.com, and
@@ -23,7 +25,7 @@ import { SITE_LANGS } from "./siteLang";
 export const LINK_HOSTS = ["www.getliftsmith.com"] as const;
 
 /** Website sections that come in every site language (/de/exercises/…), besides the home page (/de/). */
-const TRANSLATED = ["exercises", "programs", "tools", "pricing"] as const;
+const TRANSLATED = ["exercises", "programs", "tools", "pricing", "challenges"] as const;
 
 /**
  * Every path the Android manifest claims, exactly as written there (`appLinks.test.ts` checks they match): `path`
@@ -105,11 +107,18 @@ function webScreen(parts: string[], u: URL): string | null {
     case "programs":
       return "#/programs";
     case "tools": {
+      // The website's workout generator: the workout in the link, as a routine to save or start (genLink.ts).
+      if (a === "workout-generator") return generatorHash(u.searchParams.get("w"));
       const arg = a ? TOOL_ARGS[a] : undefined;
       return arg ? `#/tools/${arg}` : "#/tools";
     }
     case "pricing":
       return "#/pro";
+    case "challenges": {
+      // A challenge page opens its challenge (thirtyDay.ts); the index and an unknown slug open the list.
+      const c = a ? THIRTY_BY_SLUG.get(a) : undefined;
+      return c ? `#/challenge/${c.id}` : "#/challenge";
+    }
     default:
       return null;
   }

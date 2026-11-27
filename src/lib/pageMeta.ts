@@ -28,6 +28,8 @@ export interface PageMetaInput {
   noindex?: boolean;
   /** An English page that also has a copy in every site language (an exercise guide): list them all in hreflang. */
   translated?: boolean;
+  /** Another page holds this one's search ranking (an exercise's twin, `WEB_TWIN` in seo.ts): its canonical path. */
+  canonical?: string;
 }
 
 /** Search results cut titles at about 60 characters, so " | Liftsmith" is added only when it fits and the title
@@ -43,7 +45,11 @@ export function pageMeta(o: PageMetaInput): Metadata {
     title: o.absoluteTitle || !withBrand(o.title) ? { absolute: o.title } : o.title,
     description: o.description,
     ...(o.noindex ? { robots: { index: false, follow: true } } : {}),
-    alternates: o.lang || o.translated ? { canonical: url, languages: languageAlternates(o.path) } : { canonical: url },
+    alternates: o.canonical
+      ? { canonical: o.canonical }
+      : o.lang || o.translated
+        ? { canonical: url, languages: languageAlternates(o.path) }
+        : { canonical: url },
     openGraph: {
       type: o.type ?? "website",
       siteName: BRAND.name,

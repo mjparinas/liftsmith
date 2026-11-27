@@ -21,7 +21,7 @@ export const de: SiteText = {
     startFree: "Starten",
     tagline: "Dein nächster Satz, schon geplant.",
     footerBlurb: "Adaptives Krafttraining für Android, iPhone und das Web. Keine Werbung, niemals.",
-    cols: { product: "Produkt", learn: "Lernen", tools: "Tools", support: "Hilfe", company: "Unternehmen" },
+    cols: { product: "Produkt", learn: "Lernen", tools: "Tools", support: "Hilfe", company: "Unternehmen", exercises: "Übungsanleitungen" },
     links: {
       openApp: "App öffnen",
       features: "Funktionen",
@@ -40,6 +40,7 @@ export const de: SiteText = {
       equipment: "Übungen nach Ausrüstung",
       guides: "Trainingsratgeber",
       blog: "Blog",
+      generator: "Trainingsplan-Generator",
       plates: "Hantelscheiben-Rechner",
       oneRm: "1RM-Rechner",
       warmUp: "Aufwärmrechner",

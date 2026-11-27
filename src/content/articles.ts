@@ -27,6 +27,7 @@ import { BLOG_GYM_CHAINS } from "./blog/gymChains";
 import { BLOG_GYM_CLASSES } from "./blog/gymClasses";
 import { BLOG_GYM_INSIGHTS } from "./blog/gymInsights";
 import { BLOG_GYM_OPEN_NOW } from "./blog/gymOpenNow";
+import { BLOG_GYM_WIDGETS } from "./blog/gymWidgets";
 import { BLOG_H } from "./blog/h";
 import { BLOG_HEALTH_TRENDS } from "./blog/healthTrends";
 import { BLOG_I } from "./blog/i";
@@ -44,6 +45,7 @@ import { BLOG_O } from "./blog/o";
 import { BLOG_OUTSIDE_WORKOUTS } from "./blog/outsideWorkouts";
 import { BLOG_P } from "./blog/p";
 import { BLOG_PREGNANCY } from "./blog/pregnancy";
+import { BLOG_PRINTABLE_PLANS } from "./blog/printablePlans";
 import { BLOG_Q } from "./blog/q";
 import { BLOG_R } from "./blog/r";
 import { BLOG_REHAB_DONE } from "./blog/rehabDone";
@@ -54,15 +56,18 @@ import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
 import { BLOG_SEASONS } from "./blog/seasons";
 import { BLOG_SETTINGS_SEARCH } from "./blog/settingsSearch";
+import { BLOG_SHARE_STATS } from "./blog/shareStats";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
 import { BLOG_TEAM_SESSION } from "./blog/teamSession";
+import { BLOG_THIRTY_DAY } from "./blog/thirtyDay";
 import { BLOG_U } from "./blog/u";
 import { BLOG_V } from "./blog/v";
 import { BLOG_W } from "./blog/w";
 import { BLOG_WATCH_ALONE } from "./blog/watchAlone";
 import { BLOG_WATCH_TODAY } from "./blog/watchToday";
 import { BLOG_WIDGETS } from "./blog/widgets";
+import { BLOG_WORKOUT_GENERATOR } from "./blog/workoutGenerator";
 import { BLOG_X } from "./blog/x";
 import { BLOG_Y } from "./blog/y";
 import { BLOG_Z } from "./blog/z";
@@ -91,7 +96,8 @@ export type CtaTopic =
   | "measure"
   | "health"
   | "stretch"
-  | "coach";
+  | "coach"
+  | "challenge";
 
 export type Block =
   { h2: string } | { p: string } | { ul: string[] } | { ol: string[] } | { tip: string } | { cta: CtaTopic } | { exercises: string[] };
@@ -234,6 +240,13 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
     button: "See how coaching works",
     href: "/coaches/",
   },
+  // 30-day challenges: goes to the challenges with their printable calendars (/challenges/), each with Join in the app.
+  challenge: {
+    title: "Pick a 30-day challenge",
+    body: "Twelve challenges at three levels, each with a calendar to print. Join one in Liftsmith and Today shows the day's number with a one-tap Done.",
+    button: "See the challenges",
+    href: "/challenges/",
+  },
 };
 
 export const ARTICLES: Article[] = [
@@ -274,6 +287,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_REHAB_PHASES,
   ...BLOG_COACH_PROGRAMS,
   ...BLOG_SCREENSHOT_SHARE,
+  ...BLOG_SHARE_STATS,
   ...BLOG_FORM_CUES,
   ...BLOG_AUTO_SUPERSETS,
   ...BLOG_CLUB_CHAT,
@@ -301,6 +315,10 @@ export const ARTICLES: Article[] = [
   ...BLOG_PREGNANCY,
   ...BLOG_WATCH_TODAY,
   ...BLOG_WATCH_ALONE,
+  ...BLOG_GYM_WIDGETS,
+  ...BLOG_WORKOUT_GENERATOR,
+  ...BLOG_THIRTY_DAY,
+  ...BLOG_PRINTABLE_PLANS,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

@@ -12,7 +12,7 @@ import { LOCAL_GUIDES } from "@/content/exerciseGuides/i18n";
 import { BRAND } from "@/lib/brand";
 import { ogImage } from "@/lib/ogImages";
 import { pageMeta } from "@/lib/pageMeta";
-import { EQUIPMENT_NAME, MUSCLE_NAME } from "@/lib/seo";
+import { EQUIPMENT_NAME, indexAlternatives, MUSCLE_NAME } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { fill, localPath, type SiteLang } from "@/lib/siteLang";
 import { EXAMPLE, hasStartTable, startTable, type StartCell } from "@/lib/startTable";
@@ -241,7 +241,11 @@ export function VsView({ lang, slug }: { lang: SiteLang; slug: string }) {
               <Link href={liftHref(lang, e.id)} className="text-accent underline underline-offset-2">
                 {fill(t.howTo, { name: lang === "en" ? w.low(w.name(e)) : w.name(e) })}
               </Link>
-              <Link href={`/exercises/${e.id}/alternatives/`} className="text-accent underline underline-offset-2">
+              <Link
+                href={`/exercises/${e.id}/alternatives/`}
+                rel={indexAlternatives(e.id) ? undefined : "nofollow"}
+                className="text-accent underline underline-offset-2"
+              >
                 {fill(t.alternatives, { name: lang === "en" ? w.low(w.name(e)) : w.name(e) })}
               </Link>
             </li>

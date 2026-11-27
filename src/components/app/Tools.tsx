@@ -166,6 +166,14 @@ const TOOLS: ToolEntry[] = [
     line: () => t("str.hubBody", { count: STRETCHES.length }),
     go: () => go("stretch"),
   },
+  {
+    arg: "challenge",
+    icon: "calendar",
+    tint: HUE.ember,
+    title: () => t("c30.title"),
+    line: () => t("c30.hub"),
+    go: () => go("challenge"),
+  },
 ];
 
 function ToolsHub() {

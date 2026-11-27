@@ -4,9 +4,9 @@
 // then whether it has a full guide. Each pick carries the reasons it ranked, so the page says why, not just what.
 import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 
-import { EXERCISES } from "./exercises";
 import { popularity, type Popularity } from "./pickWeights";
 import type { Equipment, Exercise, Muscle } from "./types";
+import { SITE_EXERCISES as EXERCISES } from "./webTwins";
 
 export interface BestPick {
   e: Exercise;

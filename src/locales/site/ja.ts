@@ -22,7 +22,7 @@ export const ja: SiteText = {
     startFree: "無料で始める",
     tagline: "次のセットは、もう決まっています。",
     footerBlurb: "Android、iPhone、Web で使えるアダプティブな筋力トレーニング。広告は一切ありません。",
-    cols: { product: "製品", learn: "学ぶ", tools: "ツール", support: "サポート", company: "会社情報" },
+    cols: { product: "製品", learn: "学ぶ", tools: "ツール", support: "サポート", company: "会社情報", exercises: "種目ガイド" },
     links: {
       openApp: "アプリを開く",
       features: "機能",
@@ -41,6 +41,7 @@ export const ja: SiteText = {
       equipment: "器具別の種目",
       guides: "トレーニングガイド",
       blog: "ブログ",
+      generator: "ワークアウトジェネレーター",
       plates: "プレート計算機",
       oneRm: "1RM 計算機",
       warmUp: "ウォームアップ計算機",

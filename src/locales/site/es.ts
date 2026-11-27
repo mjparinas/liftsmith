@@ -20,7 +20,14 @@ export const es: SiteText = {
     startFree: "Empezar",
     tagline: "Tu próxima serie, ya planificada.",
     footerBlurb: "Entrenamiento de fuerza adaptativo para Android, iPhone y la web. Sin anuncios, nunca.",
-    cols: { product: "Producto", learn: "Aprende", tools: "Herramientas", support: "Ayuda", company: "Empresa" },
+    cols: {
+      product: "Producto",
+      learn: "Aprende",
+      tools: "Herramientas",
+      support: "Ayuda",
+      company: "Empresa",
+      exercises: "Guías de ejercicios",
+    },
     links: {
       openApp: "Abrir la app",
       features: "Funciones",
@@ -39,6 +46,7 @@ export const es: SiteText = {
       equipment: "Ejercicios por equipo",
       guides: "Guías de entrenamiento",
       blog: "Blog",
+      generator: "Generador de entrenamientos",
       plates: "Calculadora de discos",
       oneRm: "Calculadora de 1RM",
       warmUp: "Calculadora de calentamiento",

@@ -513,7 +513,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Cada ejercicio muestra tus series, el total levantado y el máximo estimado.",
       "Mira cómo te comparas con gente entrenada de tu peso, edad y sexo.",
-      "Pro: gráficos de una semana a un año, series semanales por músculo frente al objetivo y tendencias del máximo a una repetición.",
+      "Pro: gráficos de una semana a todo el historial (toca cualquier sesión para ver su número, con los récords marcados), series semanales por músculo frente al objetivo y tendencias del máximo a una repetición.",
       "Los estándares de fuerza de la web salen de personas reales que deciden participar.",
     ],
     dyk: '"Contar mis levantamientos" en Ajustes › Tus datos y privacidad decide si los tuyos ayudan a crear esos estándares.',
@@ -1120,5 +1120,60 @@ export const emails: Record<string, Words> = {
       "El móvil lo guarda como si lo hubieras registrado allí: cada serie, tus récords, los próximos pesos y Salud.",
     ],
     dyk: "La planificación sigue en el móvil, así que Máquina ocupada y Cambiar el plan esperan a que vuelva.",
+  },
+  "gym-widgets": {
+    title: "Pon tu gimnasio en tu propia web",
+    intro: "El horario de clases, el equipamiento y una insignia de Encuéntranos en Liftsmith ya pueden estar en tu web, siempre al día.",
+    points: [
+      "Abre tu gimnasio en la app, toca Gestionar la página del gimnasio y busca Widgets para tu web.",
+      "Elige el horario, el equipamiento o la insignia, un aspecto claro u oscuro y uno de diez idiomas, y míralo tal como se verá.",
+      "Copia el código y pégalo en un bloque HTML o de inserción de tu web. Squarespace, Wix y WordPress tienen uno.",
+      "Cambia una clase o tu equipamiento en la app y el widget de tu web cambia también.",
+    ],
+    dyk: "Los widgets no llevan scripts, cookies ni seguimiento, y cada uno enlaza a la página de tu gimnasio para que los nuevos socios lo añadan con un toque.",
+  },
+  "share-stats": {
+    title: "Comparte las cifras de las que estás más orgulloso",
+    intro: "Cada máximo estimado, serie más pesada y récord personal tiene ahora un pequeño botón de compartir al lado.",
+    points: [
+      "Está junto a tus máximos y récords nuevos en Progreso, y en la página de cada ejercicio.",
+      "En la página de un ejercicio, cada fila de la tabla de récords también tiene uno, desde tu serie más pesada hasta tu mejor marca para 15 repeticiones.",
+      "Un toque crea una tarjeta con esa cifra, el logotipo de Liftsmith y la web, con el aspecto de la app.",
+      "Publícala, envíala o guárdala. Puedes ocultar los pesos, y tu nombre no aparece salvo que lo añadas.",
+    ],
+    dyk: "Tu enlace de invitación puede ir en la tarjeta, así que quien se una con él te sigue de vuelta.",
+  },
+  "workout-generator": {
+    title: "Mándale un entrenamiento a un amigo, aunque no tenga la app",
+    intro: "Nuestra web tiene ahora un generador de entrenamientos gratis que usa el mismo motor que tu pantalla Hoy.",
+    points: [
+      "En getliftsmith.com/tools/workout-generator elige equipo, minutos y qué entrenar: cuerpo completo, una división o una zona.",
+      "Escribe series, repeticiones, descanso y calentamiento, y dice por qué está cada ejercicio.",
+      "Cada entrenamiento tiene su propio enlace. Compártelo con un amigo: el mismo enlace siempre da el mismo entrenamiento.",
+      "Empezar en la app lo abre como rutina, lista para guardar o empezar, con tus propios pesos mientras levantas.",
+    ],
+    dyk: "Hoy hace esto por ti cada día, y además sabe lo que levantaste la última vez y qué músculos aún se recuperan.",
+  },
+  "thirty-day": {
+    title: "Un ejercicio al día durante 30 días",
+    intro: "Ya tienes doce retos de 30 días, de sentadillas y flexiones a plancha y dominadas, cada uno en tres niveles.",
+    points: [
+      "Elige uno en Herramientas › Retos de 30 días y escoge Principiante, Intermedio o Avanzado.",
+      "Hoy muestra la cifra del día con un Hecho de un toque. ¿Hiciste más o menos? Cámbiala antes con − y +.",
+      "Cada cuarto día es de descanso, y un día perdido simplemente te espera: no hay que empezar de nuevo.",
+      "Cada reto tiene una página en nuestra web con un calendario para imprimir y pegar en la nevera.",
+    ],
+    dyk: "Los días del reto no son entrenamientos, así que nunca cambian tu plan, tu racha ni tu objetivo semanal.",
+  },
+  "printable-plans": {
+    title: "Imprime un entrenamiento en una página",
+    intro: "Cualquier programa o rutina se imprime ahora en una página, con casillas para rellenar y un código QR que vuelve a la app.",
+    points: [
+      "Abre una de tus rutinas y toca Imprimir rutina. La hoja trae cada ejercicio con sus series, repeticiones y descanso, y el peso que te toca la próxima vez.",
+      "Anota lo que levantas en las cuatro columnas de sesión, una por entrenamiento.",
+      "Cada página de programa del sitio tiene un PDF gratis para descargar, en diez idiomas.",
+      "El código QR de tu hoja añade la misma rutina a quien lo escanee. Tus pesos y notas se quedan contigo.",
+    ],
+    dyk: "En el móvil, la ventana de impresión también guarda la hoja como PDF, ideal para enviársela a un amigo.",
   },
 };

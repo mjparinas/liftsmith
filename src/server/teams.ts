@@ -20,6 +20,7 @@ import { cleanCode, COACH_LIMITS, nameOf, newCode, unlink } from "./coach";
 import { batch, query, rateLimit, run } from "./db";
 import { dropPairVideos } from "./formVideos";
 import { notifyPlain } from "./push";
+import { codeMail } from "./reminderEmails";
 import { teamChatDeletes, teamChatUnread } from "./teamChat";
 
 const DAY = 86_400_000;
@@ -178,12 +179,19 @@ export async function startSchool(
        code_hash = excluded.code_hash, expires_at = excluded.expires_at, tries = 0`,
     [accountId, email, school, domain, hash(`${accountId}:${code}`), now + TEAM_LIMITS.codeMs, prev?.verified_at ?? null, now],
   );
-  const text = `Your Liftsmith code to confirm you coach at ${school} is ${code}\n\nType it in the app. It works for 30 minutes.\n\nIf you didn't ask for it, ignore this email: nothing happens without the code.\n\nLiftsmith · https://www.getliftsmith.com`;
+  const m = codeMail({
+    subject: `${code} is your Liftsmith school coach code`,
+    title: "Confirm your school",
+    intro: `Type this code in Liftsmith to confirm you coach at ${school}.`,
+    code,
+    note: "It works for 30 minutes.",
+    ignore: "If you didn't ask for it, ignore this email: nothing happens without the code.",
+  });
   if (!mail) {
     if (process.env.NODE_ENV !== "production") return { ok: true, devCode: code };
     return { ok: false, error: "mail" };
   }
-  const sent = await mail(email, `${code} is your Liftsmith school coach code`, text).catch(() => false);
+  const sent = await mail(email, m.subject, m.text, m.html).catch(() => false);
   return sent ? { ok: true } : { ok: false, error: "mail" };
 }
 

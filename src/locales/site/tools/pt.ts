@@ -1,3 +1,4 @@
+import { GEN_PT } from "./gen/pt";
 import type { LocalTools } from "./types";
 
 // The calculators in Brazilian Portuguese (você). Same parts as the English pages (src/app/tools/).
@@ -535,4 +536,5 @@ export const PT_TOOLS: LocalTools = {
       },
     },
   },
+  "workout-generator": GEN_PT,
 };

@@ -6,8 +6,10 @@
 // list. Structured data is an ExercisePlan with a breadcrumb; no AggregateRating, because Google shows review stars
 // only for its own list of types and an ExercisePlan isn't on it.
 import type { MsgLang } from "@/lib/messageText";
+import { esc as escSheet, PRINT_CSS, PRINT_PAGE_CSS, printPageHtml, type PrintSheet } from "@/lib/printSheet";
 import { SITE_URL } from "@/lib/site";
 import type { Equipment } from "@/lib/types";
+import { printLine, printWords } from "@/locales/site/print";
 import * as cpg from "@/locales/text/cpg";
 import * as rl from "@/locales/text/rl";
 import * as rt from "@/locales/text/rt";
@@ -82,6 +84,8 @@ export function routineSlug(title: string): string {
 }
 
 export const libraryPath = (r?: Pick<LibraryRoutine, "id" | "title">) => (r ? `/routines/${routineSlug(r.title)}-${r.id}/` : "/routines/");
+/** A listed routine's printable page (docs/decisions/printable-plans.md). */
+export const libraryPrintPath = (r: Pick<LibraryRoutine, "id" | "title">) => `${libraryPath(r)}print/`;
 
 /** The routine id at the end of a page address. */
 export function libraryIdOf(slug: string): string | null {
@@ -173,8 +177,50 @@ export function routineHtml(lang: MsgLang, r: LibraryRoutine, more: LibraryRouti
     )
     .join("")}</ol></section>
 ${moreSection}
+<p><a class="quiet" href="${esc(libraryPrintPath(r))}">${esc(printLine(lang, "prt.page.routineLink"))} ›</a></p>
 <p><a class="quiet" href="${esc(libraryPath())}">${esc(sayL(lang, "rl.page.all"))} ›</a></p></main>`;
   return framePage(lang, title, metaTags(title, desc, libraryPath(r), routineLd(r)), body, `${GYM_STYLE}${STYLE}`, "library");
+}
+
+/** One routine's one-page sheet: its exercises and sets, four sessions to log and a QR code back to its page. */
+export function routineSheet(lang: MsgLang, r: LibraryRoutine): PrintSheet {
+  const items = codeItems(r.code);
+  const url = `${SITE_URL}${libraryPath(r)}`;
+  const needs = r.equipment.length ? r.equipment.map((e) => equipName(lang, e as Equipment)).join(", ") : sayL(lang, "rl.bodyweight");
+  return {
+    lang,
+    title: r.title,
+    ...(r.about ? { summary: r.about } : {}),
+    facts: [
+      { label: sayL(lang, "rl.goal"), value: goalName(lang, r.goal) },
+      { label: sayL(lang, "rl.level"), value: levelName(lang, r.level) },
+      { label: printLine(lang, "prt.fact.time"), value: printLine(lang, "prt.minutes", { n: r.minutes }) },
+      { label: printLine(lang, "prt.fact.exercises"), value: String(items.length) },
+      { label: printLine(lang, "prt.fact.sets"), value: String(sets(r)) },
+      { label: printLine(lang, "prt.fact.equipment"), value: needs },
+    ],
+    days: [
+      {
+        name: "",
+        rows: items.map((x) => ({ name: exName(lang, x.id), scheme: line(lang, RT, "rt.sets", { count: x.sets }) })),
+      },
+    ],
+    qr: { url: `${url}?from=print`, shown: url.replace(/^https?:\/\//, "") },
+    words: printWords(lang, "routine"),
+  };
+}
+
+/** A listed routine's print page: the sheet on its own, kept out of search (the routine's own page is the one to find). */
+export function routinePrintHtml(lang: MsgLang, r: LibraryRoutine): string {
+  const sheet = routineSheet(lang, r);
+  const title = `${printLine(lang, "prt.page.routineTitle", { name: r.title })} | Liftsmith`;
+  const body = printPageHtml({
+    sheet,
+    back: { href: libraryPath(r), label: printLine(lang, "prt.page.back", { name: r.title }) },
+    printLabel: printLine(lang, "prt.page.print"),
+    hint: printLine(lang, "prt.page.hint"),
+  });
+  return `<!doctype html><html lang="${escSheet(lang)}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escSheet(title)}</title><meta name="robots" content="noindex,follow"><link rel="canonical" href="${escSheet(`${SITE_URL}${libraryPath(r)}`)}"><link rel="icon" href="/icon.svg" type="image/svg+xml"><style>${PRINT_CSS}\n${PRINT_PAGE_CSS}</style></head><body><div class="pp-desk">${body}</div><script src="/print.js" defer></script></body></html>`;
 }
 
 /** Every listed routine, grouped by goal. */

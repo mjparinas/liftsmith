@@ -38,6 +38,7 @@ import { dbSize, sizeSamples } from "./capacity";
 import { query } from "./db";
 import { inboxDomains, readKey } from "./inbox";
 import { recentJobRuns } from "./monitor";
+import { RC_LAST_DELIVERY } from "./revenuecat";
 import { getJson as getSettingJson } from "./settings";
 import { enrolledEmails, twoFactorMode } from "./twoFactor";
 
@@ -264,6 +265,7 @@ interface GhRun {
   head_branch?: string;
   event?: string;
   display_title?: string;
+  head_sha?: string;
 }
 
 /** The repository: GITHUB_REPOSITORY, else the one Vercel built from, else ours. */
@@ -285,6 +287,40 @@ const WORKFLOWS = [
   { file: "release.yml", branch: "", label: "Store release" },
 ] as const;
 
+/**
+ * Main moves by the nightly promotion, a merge pushed with GITHUB_TOKEN, which starts no workflows, so CI's latest run on
+ * main is often for an older commit (until 2026-11-27 a failed one from Nov 25 kept the card red for days). When main's
+ * head isn't the commit that run tested, the code on main is what passed CI on staging: the merge's parent carries the
+ * "CI passed tree" status ci.yml records, and the promotion only merges once "CI passed" is green there.
+ */
+async function promotedFromStaging(
+  repo: string,
+  runs: GhRun[] | Error | undefined,
+): Promise<{ title: string; at: number; href: string } | null> {
+  const head = await getJson<{ sha: string; parents?: { sha: string }[]; commit?: { message?: string; committer?: { date?: string } } }>(
+    "GitHub",
+    `https://api.github.com/repos/${repo}/commits/main`,
+    ghHeaders(),
+  );
+  const tested = Array.isArray(runs) ? runs.find((r) => r.status === "completed" && r.head_sha) : undefined;
+  if (tested?.head_sha === head.sha) return null;
+  for (const parent of head.parents ?? []) {
+    const statuses = await getJson<{ context: string; state: string }[]>(
+      "GitHub",
+      `https://api.github.com/repos/${repo}/commits/${parent.sha}/statuses?per_page=100`,
+      ghHeaders(),
+    );
+    const latest = statuses.find((x) => x.context === "CI passed tree");
+    if (latest?.state === "success")
+      return {
+        title: (head.commit?.message ?? "").split("\n")[0].slice(0, 90),
+        at: Date.parse(head.commit?.committer?.date ?? "") || Date.now(),
+        href: `https://github.com/${repo}/commit/${head.sha}`,
+      };
+  }
+  return null;
+}
+
 export async function buildsCheck(): Promise<HealthCheck> {
   const repo = githubRepo();
   const title = "Builds (GitHub Actions)";
@@ -300,6 +336,7 @@ export async function buildsCheck(): Promise<HealthCheck> {
         .catch((e: Error) => e),
     ),
   );
+  const promoted = await promotedFromStaging(repo, lists[WORKFLOWS.findIndex((w) => w.branch === "main")]).catch(() => null);
   const refused = lists.find((l): l is Error => l instanceof Error);
   if (refused && lists.every((l) => l instanceof Error)) {
     return {
@@ -332,6 +369,16 @@ export async function buildsCheck(): Promise<HealthCheck> {
         value: running ? "Running its first time" : "No runs yet",
         state: running ? "ok" : undefined,
         href: running?.html_url,
+      });
+      return;
+    }
+    if (w.branch === "main" && promoted) {
+      rows.push({
+        label: w.label,
+        value: `Passed on staging before promotion: ${promoted.title}`,
+        at: promoted.at,
+        state: "ok",
+        href: promoted.href,
       });
       return;
     }
@@ -658,14 +705,28 @@ export async function billingCheck(now = Date.now()): Promise<HealthCheck> {
     [now - 7 * DAY],
   );
   const at = last?.at == null ? null : Number(last.at);
+  // Sandbox purchases (license testers, store review) and RevenueCat's test events are kept out of the numbers, so
+  // before the first real purchase the table is empty even when the webhook works: the last delivery tells them apart.
+  const delivery = await getSettingJson<{ at?: number; type?: string; environment?: string } | null>(RC_LAST_DELIVERY, null).catch(
+    () => null,
+  );
+  const delivered = typeof delivery?.at === "number" ? delivery.at : null;
+  const kindOf = (d: typeof delivery) =>
+    [d?.environment === "SANDBOX" ? "sandbox" : "", (d?.type ?? "").toLowerCase().replace(/_/g, " ")].filter(Boolean).join(" ");
   return {
     id: "billing",
     title,
-    state: at == null ? "warn" : "ok",
+    // No real purchase yet isn't a fault: it's "off" until the first delivery, then fine.
+    state: at != null || delivered != null ? "ok" : "off",
     summary:
-      at == null ? "The webhook is set up, but no store event has arrived yet." : `${num(Number(week?.n ?? 0))} store events this week.`,
+      at != null
+        ? `${num(Number(week?.n ?? 0))} store events this week.`
+        : delivered != null
+          ? "The webhook works. No real store purchase has come through yet (test and sandbox events aren't counted)."
+          : "The webhook is set up, but nothing has arrived yet: there's been no real purchase.",
     rows: [
       ...(at ? [{ label: "Last store event", value: "", at }] : []),
+      ...(delivered ? [{ label: "Last webhook delivery", value: kindOf(delivery), at: delivered, state: "ok" as const }] : []),
       { label: "Store events, all time", value: num(Number(last?.n ?? 0)) },
       {
         label: "Payment failures, last 7 days",
@@ -673,6 +734,12 @@ export async function billingCheck(now = Date.now()): Promise<HealthCheck> {
         state: Number(week?.failures ?? 0) ? ("warn" as const) : ("ok" as const),
       },
     ],
+    ...(at == null && delivered == null
+      ? {
+          setup:
+            "To check it now: RevenueCat › Project settings › Integrations › Webhooks › Send test event. This card turns green when it lands.",
+        }
+      : {}),
     link,
   };
 }

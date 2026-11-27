@@ -3,6 +3,7 @@ import StoreKit
 import Capacitor
 import UIKit
 import UserNotifications
+import WebKit
 
 /// The voice coach (src/lib/voice.ts), iOS side (Android: VoiceCoachPlugin.java). Spoken cues through
 /// AVSpeechSynthesizer; other audio (music, podcasts) is ducked while it talks and restored after.
@@ -278,5 +279,71 @@ public class AppBadgePlugin: CAPPlugin, CAPBridgedPlugin {
                 call.resolve()
             }
         }
+    }
+}
+
+/// Prints a sheet the web layer drew (Print routine, src/lib/print.ts; docs/decisions/printable-plans.md). The app's
+/// web view doesn't answer window.print(), so the page's HTML is loaded into a web view of its own, off screen, and
+/// its print formatter goes to iOS's print sheet, which can also save or share it as a PDF. The web view is kept until
+/// the sheet closes, because the formatter draws from it. Android counterpart: PrintPlugin.java.
+@objc(PrintPlugin)
+public class PrintPlugin: CAPPlugin, CAPBridgedPlugin, WKNavigationDelegate {
+    public let identifier = "PrintPlugin"
+    public let jsName = "Print"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "print", returnType: CAPPluginReturnPromise),
+    ]
+
+    private var printing: WKWebView?
+    private var pending: CAPPluginCall?
+    private var jobName = "Liftsmith"
+
+    @objc func print(_ call: CAPPluginCall) {
+        guard let html = call.getString("html") else {
+            call.reject("Nothing to print")
+            return
+        }
+        jobName = call.getString("name") ?? "Liftsmith"
+        DispatchQueue.main.async {
+            guard UIPrintInteractionController.isPrintingAvailable else {
+                call.reject("Printing isn't available")
+                return
+            }
+            let config = WKWebViewConfiguration()
+            config.defaultWebpagePreferences.allowsContentJavaScript = false
+            let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 612, height: 792), configuration: config)
+            view.navigationDelegate = self
+            self.printing = view
+            self.pending = call
+            view.loadHTMLString(html, baseURL: URL(string: "https://www.getliftsmith.com/"))
+        }
+    }
+
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard let call = pending else { return }
+        pending = nil
+        let info = UIPrintInfo(dictionary: nil)
+        info.outputType = .general
+        info.jobName = jobName
+        let controller = UIPrintInteractionController.shared
+        controller.printInfo = info
+        controller.printFormatter = webView.viewPrintFormatter()
+        let done: UIPrintInteractionController.CompletionHandler = { [weak self] _, _, _ in
+            self?.printing = nil
+        }
+        // An iPad shows the print options in a popover, which needs a place to point from: the middle of the app.
+        if UIDevice.current.userInterfaceIdiom == .pad, let host = bridge?.viewController?.view {
+            let middle = CGRect(x: host.bounds.midX, y: host.bounds.midY, width: 1, height: 1)
+            controller.present(from: middle, in: host, animated: true, completionHandler: done)
+        } else {
+            controller.present(animated: true, completionHandler: done)
+        }
+        call.resolve()
+    }
+
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        pending?.reject("Couldn't draw the page")
+        pending = nil
+        printing = nil
     }
 }

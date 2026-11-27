@@ -21,6 +21,7 @@ import {
   type DotsLift,
   type OneRm,
 } from "@/lib/onerm";
+import { maxShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import type { Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
@@ -28,6 +29,7 @@ import { useNow } from "@/lib/useNow";
 
 import { StatsNeeded } from "./BodyStats";
 import { ago } from "./format";
+import { ShareStat } from "./ShareStat";
 import { HUE } from "./theme";
 import { Bump as BumpButton, Chip, EmptyState, Section, Sheet, type BumpStep } from "./ui";
 
@@ -78,12 +80,12 @@ export function OneRmSection() {
     >
       <ul className="card divide-y divide-line">
         {shown.map((r) => (
-          <li key={r.exerciseId}>
+          <li key={r.exerciseId} className="flex items-center pr-3">
             <button
               type="button"
               onClick={() => setOpen(r.exerciseId)}
               aria-haspopup="dialog"
-              className="press flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+              className="press flex min-w-0 flex-1 items-center justify-between gap-3 py-3 pr-1 pl-4 text-left"
             >
               <div className="min-w-0">
                 <div className="truncate font-medium">{exercise(r.exerciseId).name}</div>
@@ -94,6 +96,7 @@ export function OneRmSection() {
               {/* The trend line is an advanced stat (Pro); the estimate and its calculator stay free. */}
               {pro && <Trend points={r.trend.map((p) => p.e1rm)} />}
             </button>
+            <ShareStat label={t("card.pick.max", { name: exercise(r.exerciseId).name })} items={(ctx) => [maxShare(r, null, ctx)]} />
           </li>
         ))}
         {!list.length && (

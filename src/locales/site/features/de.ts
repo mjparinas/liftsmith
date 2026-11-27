@@ -69,6 +69,11 @@ export const de: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widgets für die Website deines Studios",
+      body: "Offizielle Studios zeigen ihren Kursplan, ihre Geräte oder ein „Finde uns auf Liftsmith“-Abzeichen mit einer Zeile Code auf ihrer eigenen Website. Sie bleiben von selbst aktuell, in der gewählten Sprache und Optik, und verlinken auf die Seite des Studios.",
+      note: "Keine Skripte, Cookies oder Tracking auf der Website des Studios.",
+    },
     "gym-insights": {
       name: "Einblicke für Gym-Betreiber",
       body: "Betreiber und Team offizieller Gyms sehen, wie viele Sportler dort in den letzten vier Wochen trainiert haben, die vollen und ruhigen Stunden, die genutzten Geräte und offene Problemmeldungen, mit einem nächsten Schritt.",
@@ -240,7 +245,8 @@ export const de: FeaturesText = {
     "exercise-stats": {
       name: "Werte für jede Übung",
       body: "Tippe in der Bibliothek auf eine Übung und sieh deine Sätze, das insgesamt bewegte Gewicht, dein geschätztes Maximum und deinen Vergleich mit Trainierten deines Gewichts, Alters und Geschlechts nach veröffentlichten Kraftstandards.",
-      proPart: "Die Diagramme von einer Woche bis zu einem Jahr gehören zu den erweiterten Statistiken von Pro.",
+      proPart:
+        "Die erweiterten Statistiken von Pro bringen die Diagramme, von einer Woche bis zur gesamten Zeit: Tippe auf eine Einheit für ihren Wert, neue Bestleistungen sind markiert.",
     },
     "log-past": {
       name: "Vergangenes Training eintragen",
@@ -297,10 +303,24 @@ export const de: FeaturesText = {
       name: "Eigene Routinen",
       body: "Baue Routinen aus dem Übungskatalog, so viele du willst, und teile sie als Link.",
     },
+    "workout-generator": {
+      name: "Kostenloser Trainingsplan-Generator auf der Website",
+      body: "Wähle deine Geräte, deine Minuten und was du trainieren willst, und dieselbe Engine schreibt ein Workout mit Sätzen, Wiederholungen, Pausen und dem Grund für jede Übung. Jedes Workout hat einen eigenen Link zum Teilen, und In der App starten öffnet es als Routine.",
+      note: "In der App starten öffnet die Android-App; auf dem iPhone und am Computer öffnet es die Web-App.",
+    },
     "routine-library": {
       name: "Routinen-Bibliothek",
       body: "Durchsuche Routinen, die andere veröffentlicht haben, nach Ziel, Stichwort und dem, was dein Studio hat, speichere eine mit einem Tippen und bewerte sie mit Sternen. Veröffentliche deine eigene aus ihrem Editor, mit oder ohne deinen Namen, und sie bekommt eine eigene Seite auf der Website. Nur Übungen und Sätze gehen raus, nie deine Gewichte oder Notizen.",
       note: "Zum Veröffentlichen brauchst du ein Konto und musst 18 sein. Stöbern kann jeder.",
+    },
+    "thirty-day": {
+      name: "30-Tage-Challenges",
+      body: "Zwölf 30-Tage-Challenges, von Kniebeugen, Liegestützen und Plank bis zu Klimmzügen und Burpees, jede in drei Stufen: eine Übung am Tag, jeden Tag ein bisschen mehr, mit einem Ruhetag an jedem vierten Tag. Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft, und ein verpasster Tag wartet auf dich. Jede Challenge hat eine Seite auf der Website mit einem Kalender zum Ausdrucken.",
+    },
+    "printable-plans": {
+      name: "Trainingspläne zum Ausdrucken",
+      body: "Drucke jedes Programm und jede Routine auf einer Seite: jedes Training mit Sätzen, Wiederholungen und Pausen, Kästchen für vier Einheiten zum Eintragen von Hand und ein QR-Code, der es in der App öffnet. Jede Programmseite auf der Website hat ein kostenloses PDF in zehn Sprachen, und Routine drucken in der App fügt die Gewichte hinzu, die sie fürs nächste Mal plant.",
+      note: "Auf dem Handy kann das Druckfenster es auch als PDF speichern.",
     },
     library: {
       name: "1.000 Übungen",
@@ -412,6 +432,10 @@ export const de: FeaturesText = {
       name: "Teilkarten beim Screenshot",
       body: "Mach einen Screenshot, und ein Blatt mit Trainingskarten fährt hoch: dein letzter Monat, drei Monate, sechs Monate, das Jahr oder alles, als Summen, als Aufteilung deiner Sätze oder als deine besten Lifts. Wisch durch, blende die Gewichte mit dem Auge aus und teile sie mit deinem Einladungslink auf der Karte. Dieselben Karten findest du unter Mein Training teilen im Fortschritt. Jeder Link, den du teilst, trägt jetzt deine Einladung, in einem Link, der das auch sagt.",
       note: "Screenshots öffnen es unter Android 14 und neuer und auf dem iPhone, und es lässt sich ausschalten. Sonst öffnest du es im Fortschritt. Unter 18-Jährige teilen ohne Einladungslink.",
+    },
+    "share-stats": {
+      name: "Jede Bestleistung und jedes Maximum teilen",
+      body: "Neben deinen geschätzten Maxima, deinem schwersten Satz, jeder Bestleistung je Wiederholungszahl und deinen neuen Bestleistungen sitzt ein kleiner Teilen-Knopf. Ein Tippen macht daraus eine Karte mit dieser Zahl, dem Liftsmith-Logo und der Website im Look der App, bereit zum Posten oder Speichern.",
     },
     coaching: {
       name: "Kunden coachen",

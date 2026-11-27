@@ -66,6 +66,11 @@ export const it: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widget per il sito della tua palestra",
+      body: "Le palestre ufficiali mostrano l’orario dei corsi, l’attrezzatura o un badge Trovaci su Liftsmith sul proprio sito con una riga di codice. Si aggiornano da soli, nella lingua e nell’aspetto scelti, e portano alla pagina della palestra.",
+      note: "Nessuno script, cookie o tracciamento sul sito della palestra.",
+    },
     "gym-insights": {
       name: "Dati per i titolari di palestre",
       body: "Titolari e staff delle palestre ufficiali vedono quanti atleti si sono allenati lì nelle ultime quattro settimane, gli orari pieni e tranquilli, l'attrezzatura usata e i problemi aperti, con un passo successivo.",
@@ -234,7 +239,8 @@ export const it: FeaturesText = {
     "exercise-stats": {
       name: "Statistiche di ogni esercizio",
       body: "Tocca un esercizio della libreria per vedere le tue serie, il peso totale sollevato, il massimale stimato e il confronto con persone allenate del tuo peso, età e sesso secondo standard di forza pubblicati.",
-      proPart: "I grafici da una settimana a un anno fanno parte delle statistiche avanzate di Pro.",
+      proPart:
+        "Le statistiche avanzate di Pro aggiungono i grafici, da una settimana a tutto lo storico: tocca una sessione per il suo valore, con i record segnati.",
     },
     "log-past": {
       name: "Registra un allenamento passato",
@@ -291,10 +297,24 @@ export const it: FeaturesText = {
       name: "Le tue routine",
       body: "Crea routine dal catalogo esercizi, senza limiti di numero, e condividile con un link.",
     },
+    "workout-generator": {
+      name: "Generatore di allenamenti gratis sul sito",
+      body: "Scegli attrezzatura, minuti e cosa allenare, e lo stesso motore scrive un allenamento con serie, ripetizioni, recupero e il perché di ogni esercizio. Ogni allenamento ha un suo link da condividere, e Inizia nell’app lo apre come routine.",
+      note: "Inizia nell’app apre l’app Android; su iPhone e computer apre la web app.",
+    },
     "routine-library": {
       name: "Libreria di routine",
       body: "Cerca le routine pubblicate da altri per obiettivo, parole e attrezzatura della tua palestra, salvane una con un tocco e valutala con le stelle. Pubblica la tua dal suo editor, con o senza il tuo nome, e avrà una sua pagina sul sito. Escono solo esercizi e serie, mai i tuoi carichi o le tue note.",
       note: "Per pubblicare servono un account e 18 anni. Chiunque può sfogliare.",
+    },
+    "thirty-day": {
+      name: "Sfide di 30 giorni",
+      body: "Dodici sfide di 30 giorni, da squat, piegamenti e plank a trazioni e burpee, ognuna su tre livelli: un esercizio al giorno, un po’ di più ogni giorno, con un giorno di riposo ogni quattro. Oggi mostra il numero del giorno con un Fatto a un tocco, e un giorno saltato ti aspetta. Ogni sfida ha una pagina sul sito con un calendario da stampare.",
+    },
+    "printable-plans": {
+      name: "Schede di allenamento da stampare",
+      body: "Stampa qualsiasi programma o routine su una pagina: ogni allenamento con serie, ripetizioni e recupero, caselle per segnare a mano quattro sedute e un codice QR che lo apre nell'app. Ogni pagina programma del sito ha un PDF gratis in dieci lingue, e Stampa la routine nell'app aggiunge i carichi previsti per la prossima volta.",
+      note: "Sul telefono, la finestra di stampa può anche salvarla in PDF.",
     },
     library: {
       name: "1.000 esercizi",
@@ -406,6 +426,10 @@ export const it: FeaturesText = {
       name: "Card quando fai uno screenshot",
       body: "Fai uno screenshot e compare un foglio con le card del tuo allenamento: l’ultimo mese, tre mesi, sei mesi, l’anno o da sempre, come totali, come divisione delle serie o come migliori alzate. Scorrile, nascondi i pesi con l’occhio e condividile con il tuo link d’invito stampato sulla card. Le stesse card sono in Condividi il mio allenamento, in Progressi. Ogni link che condividi ora porta il tuo invito, in un link che lo dice.",
       note: "Gli screenshot lo aprono su Android 14 e successivi e su iPhone, e si può disattivare. Altrove, aprilo da Progressi. Chi ha meno di 18 anni condivide senza link d’invito.",
+    },
+    "share-stats": {
+      name: "Condividi ogni record o massimale",
+      body: "Un piccolo pulsante di condivisione è accanto ai tuoi massimali stimati, alla tua serie più pesante, a ogni record per numero di ripetizioni e ai tuoi record recenti. Un tocco crea una scheda con quel numero, il logo di Liftsmith e il sito, con lo stile dell’app, pronta da pubblicare o salvare.",
     },
     coaching: {
       name: "Segui i clienti",

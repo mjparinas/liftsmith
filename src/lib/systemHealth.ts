@@ -497,6 +497,20 @@ export const SETTINGS: Setting[] = [
     what: "The API key from Bing Webmaster Tools (Settings › API access), for the Traffic tab's Bing part.",
   },
   {
+    names: ["PINTEREST_APP_ID"],
+    label: "Pinterest app id",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "The app made on developers.pinterest.com, for posting the pins and clips on the Pins tab (pins.ts). Without it the queue still fills but nothing posts.",
+  },
+  {
+    names: ["PINTEREST_APP_SECRET"],
+    label: "Pinterest app secret",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "That app's secret: signs in to Pinterest from the Pins tab and seals the Pinterest tokens kept in the database.",
+  },
+  {
     names: ["BING_SITE_URL"],
     label: "Bing site",
     group: "Search and monitoring",
@@ -566,6 +580,8 @@ export const NOT_SETTINGS: string[] = [
   "VERCEL_GIT_REPO_SLUG",
   // Set by Vercel's builder to its own Next deployment adapter; next.config.ts wraps it (scripts/csp-adapter.mjs).
   "NEXT_ADAPTER_PATH",
+  // Added by Vercel with the private form-video Blob store (OIDC) for Blob webhooks, which we don't use.
+  "VIDEO_BLOB_WEBHOOK_PUBLIC_KEY",
 ];
 
 /**

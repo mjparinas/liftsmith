@@ -24,6 +24,7 @@ import { placeDeletes } from "./gymPlaces";
 import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { programReviewCleanup } from "./programReviews";
+import { codeMail } from "./reminderEmails";
 import { isReviewEmail, reviewCodeMatches } from "./review";
 import { libraryCleanup } from "./routineLibrary";
 import { socialDeletes } from "./social";
@@ -176,17 +177,18 @@ export const cleanEmail = (v: unknown): string | null => {
   return e.length <= 254 && EMAIL_RE.test(e) ? e : null;
 };
 
-export type SendMail = (to: string, subject: string, text: string) => Promise<boolean>;
+/** Sends one email: the plain text, and its HTML twin in the app's email layout (reminderEmails.ts). */
+export type SendMail = (to: string, subject: string, text: string, html?: string) => Promise<boolean>;
 
 export function resendMail(): SendMail | null {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM || process.env.FEEDBACK_FROM;
   if (!key || !from) return null;
-  return async (to, subject, text) => {
+  return async (to, subject, text, html) => {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [to], subject, text }),
+      body: JSON.stringify({ from, to: [to], subject, text, ...(html ? { html } : {}) }),
     });
     return r.ok;
   };
@@ -207,13 +209,20 @@ export async function startEmail(email: string, mail: SendMail | null, now = Dat
      ON CONFLICT(email) DO UPDATE SET code_hash = excluded.code_hash, expires_at = excluded.expires_at, tries = 0, sent = excluded.sent, window_start = excluded.window_start`,
     [email, hash(`${email}:${code}`), now + CODE_MS, sent + 1, fresh ? now : Number(r!.window_start)],
   );
-  const text = `Your Liftsmith sign-in code is ${code}\n\nType it in the app to sign in. It works once, for 10 minutes.\n\nIf you didn't ask for it, ignore this email: nobody can sign in without the code.\n\nLiftsmith · https://www.getliftsmith.com`;
+  const m = codeMail({
+    subject: `${code} is your Liftsmith sign-in code`,
+    title: "Your sign-in code",
+    intro: "Type this code in Liftsmith to sign in.",
+    code,
+    note: "It works once, for 10 minutes.",
+    ignore: "If you didn't ask for it, ignore this email: nobody can sign in without the code.",
+  });
   if (!mail) {
     // Local development only: there's no email, so hand the code back.
     if (process.env.NODE_ENV !== "production") return { code: 200, body: { ok: true, devCode: code } };
     return { code: 503, body: { error: "Email sign-in isn't set up yet." } };
   }
-  const ok = await mail(email, `${code} is your Liftsmith sign-in code`, text).catch(() => false);
+  const ok = await mail(email, m.subject, m.text, m.html).catch(() => false);
   if (!ok) return { code: 502, body: { error: "Couldn't send the email. Try again in a minute." } };
   return { code: 200, body: { ok: true } };
 }

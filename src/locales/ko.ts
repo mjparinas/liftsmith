@@ -18,6 +18,7 @@ import * as bmi from "./text/bmi";
 import * as body from "./text/body";
 import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
+import * as c30 from "./text/c30";
 import * as cal from "./text/cal";
 import * as calc from "./text/calc";
 import * as callText from "./text/callText";
@@ -56,6 +57,7 @@ import * as friends from "./text/friends";
 import * as ft from "./text/ft";
 import * as fv from "./text/fv";
 import * as game from "./text/game";
+import * as gen from "./text/gen";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
@@ -99,6 +101,7 @@ import * as preg from "./text/preg";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
+import * as prt from "./text/prt";
 import * as pub from "./text/pub";
 import * as push from "./text/push";
 import * as quest from "./text/quest";
@@ -175,6 +178,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...calc.ko,
   ...card.ko,
   ...callText.ko,
+  ...gen.ko,
   ...category.ko,
   ...cause.ko,
   ...chk.ko,
@@ -223,6 +227,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...lvl.ko,
   ...map.ko,
   ...mom.ko,
+  ...c30.ko,
   ...month.ko,
   ...msg.ko,
   ...msgKind.ko,
@@ -242,6 +247,7 @@ export const ko: Partial<Record<MessageKey, Message>> = {
   ...pol.ko,
   ...pr.ko,
   ...pro.ko,
+  ...prt.ko,
   ...prog.ko,
   ...progress.ko,
   ...pub.ko,

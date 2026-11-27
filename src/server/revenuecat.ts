@@ -13,6 +13,9 @@ import { higherTier, tierFromStore, type CoachTier } from "@/lib/coachPlans";
 import { claimFromStore } from "./creators";
 import { batch } from "./db";
 
+/** The settings key holding the webhook's last delivery of any kind (time, type, environment). */
+export const RC_LAST_DELIVERY = "revenuecat-last-delivery";
+
 export interface RcEvent {
   id: string;
   type: string;

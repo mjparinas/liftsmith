@@ -22,7 +22,7 @@ export interface SiteText {
     startFree: string;
     tagline: string;
     footerBlurb: string;
-    cols: { product: string; learn: string; tools: string; support: string; company: string };
+    cols: { product: string; learn: string; tools: string; support: string; company: string; exercises: string };
     links: {
       openApp: string;
       features: string;
@@ -44,6 +44,7 @@ export interface SiteText {
       equipment: string;
       guides: string;
       blog: string;
+      generator: string;
       plates: string;
       oneRm: string;
       warmUp: string;

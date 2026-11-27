@@ -15,7 +15,7 @@ export const en: SiteText = {
     startFree: "Start free",
     tagline: "Your next set, already planned.",
     footerBlurb: "Adaptive strength training for Android, iPhone and the web. No ads, ever.",
-    cols: { product: "Product", learn: "Learn", tools: "Tools", support: "Support", company: "Company" },
+    cols: { product: "Product", learn: "Learn", tools: "Tools", support: "Support", company: "Company", exercises: "Exercise guides" },
     links: {
       openApp: "Open the app",
       features: "Features",
@@ -34,6 +34,7 @@ export const en: SiteText = {
       equipment: "Exercises by equipment",
       guides: "Training guides",
       blog: "Blog",
+      generator: "Workout generator",
       plates: "Plate calculator",
       oneRm: "One-rep max calculator",
       warmUp: "Warm-up calculator",

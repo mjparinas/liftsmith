@@ -20,9 +20,11 @@ import {
   equipmentSlug,
   exerciseBySlug,
   exercisesFor,
+  indexAlternatives,
   MUSCLE_NAME,
   muscleSlug,
   needsText,
+  WEB_TWIN,
 } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { EXAMPLE, hasStartTable, startTable, type StartCell } from "@/lib/startTable";
@@ -51,7 +53,13 @@ function StartWeight({ c, unit }: { c: StartCell; unit: string }) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = exerciseBySlug((await params).slug);
   if (!e) return {};
-  return pageMeta({ ...exerciseMeta(e), path: `/exercises/${e.id}/`, translated: e.id in EXERCISE_GUIDES });
+  const twin = WEB_TWIN[e.id];
+  return pageMeta({
+    ...exerciseMeta(e),
+    path: `/exercises/${e.id}/`,
+    translated: e.id in EXERCISE_GUIDES,
+    ...(twin ? { canonical: `/exercises/${twin}/` } : {}),
+  });
 }
 
 export default async function ExercisePage({ params }: Props) {
@@ -306,7 +314,11 @@ export default async function ExercisePage({ params }: Props) {
           <h2 className="text-2xl font-bold tracking-tight">Alternatives</h2>
           <p className="mt-2 text-muted">
             Exercises that train the same main muscles.{" "}
-            <Link href={`/exercises/${e.id}/alternatives/`} className="text-accent underline underline-offset-2">
+            <Link
+              href={`/exercises/${e.id}/alternatives/`}
+              rel={indexAlternatives(e.id) ? undefined : "nofollow"}
+              className="text-accent underline underline-offset-2"
+            >
               See all {e.name.toLowerCase()} alternatives
             </Link>
             .

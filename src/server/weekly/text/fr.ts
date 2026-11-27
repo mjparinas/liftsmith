@@ -515,7 +515,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Chaque exercice montre vos séries, le total soulevé et le maximum estimé.",
       "Comparez-vous à des pratiquants entraînés de votre poids, âge et sexe.",
-      "Pro : graphiques d'une semaine à un an, séries hebdomadaires par muscle face à l'objectif et tendances du maximum sur une répétition.",
+      "Pro : graphiques d'une semaine à tout l'historique (touchez une séance pour voir son chiffre, records marqués), séries hebdomadaires par muscle face à l'objectif et tendances du maximum sur une répétition.",
       "Les standards de force du site viennent de vrais pratiquants qui choisissent d'y contribuer.",
     ],
     dyk: "« Compter mes charges » dans Réglages › Vos données et confidentialité décide si les vôtres aident à bâtir ces standards.",
@@ -1126,5 +1126,61 @@ export const emails: Record<string, Words> = {
       "Votre téléphone l’enregistre alors comme si vous l’aviez notée dessus : chaque série, vos records, les prochaines charges et Santé.",
     ],
     dyk: "La planification reste sur le téléphone : Machine occupée et Modifier le plan attendent son retour.",
+  },
+  "gym-widgets": {
+    title: "Votre salle sur votre propre site",
+    intro:
+      "L’horaire des cours, l’équipement et un badge Retrouvez-nous sur Liftsmith peuvent maintenant figurer sur votre site, toujours à jour.",
+    points: [
+      "Ouvrez votre salle dans l’app, touchez Gérer la page de la salle et trouvez Widgets pour votre site.",
+      "Choisissez l’horaire, l’équipement ou le badge, une apparence claire ou sombre et l’une des dix langues, et voyez le rendu.",
+      "Copiez le code et collez-le dans un bloc HTML ou d’intégration de votre site. Squarespace, Wix et WordPress en ont un.",
+      "Changez un cours ou votre équipement dans l’app et le widget de votre site change aussi.",
+    ],
+    dyk: "Les widgets n’ont ni script, ni cookie, ni suivi, et chacun mène à la page de votre salle pour que les nouveaux membres l’ajoutent en un geste.",
+  },
+  "share-stats": {
+    title: "Partagez les chiffres dont vous êtes le plus fier",
+    intro: "Chaque max estimé, série la plus lourde et record personnel a maintenant un petit bouton de partage à côté.",
+    points: [
+      "Il est à côté de vos max et de vos nouveaux records dans Progrès, et sur la page de chaque exercice.",
+      "Sur la page d’un exercice, chaque ligne du tableau des records en a un aussi, de votre série la plus lourde à votre meilleur sur 15 répétitions.",
+      "Un toucher crée une carte avec ce chiffre, le logo Liftsmith et le site, au style de l’app.",
+      "Publiez-la, envoyez-la ou enregistrez-la. Vous pouvez masquer les poids, et votre nom n’apparaît que si vous l’ajoutez.",
+    ],
+    dyk: "Votre lien d’invitation peut figurer sur la carte : un ami qui s’inscrit avec lui vous suit en retour.",
+  },
+  "workout-generator": {
+    title: "Envoyez une séance à un ami, même sans l’application",
+    intro: "Notre site a maintenant un générateur d’entraînement gratuit qui utilise le même moteur que votre écran Aujourd’hui.",
+    points: [
+      "Sur getliftsmith.com/tools/workout-generator, choisissez le matériel, les minutes et ce que vous voulez travailler : corps entier, un split ou une zone.",
+      "Il écrit les séries, les répétitions, le repos et l’échauffement, et dit pourquoi chaque exercice est là.",
+      "Chaque séance a son propre lien. Partagez-le avec un ami : le même lien donne toujours la même séance.",
+      "Commencer dans l’application l’ouvre comme routine, prête à enregistrer ou à lancer, avec vos propres charges au fil des séries.",
+    ],
+    dyk: "Aujourd’hui fait cela pour vous chaque jour, en sachant aussi ce que vous avez soulevé la dernière fois et quels muscles récupèrent encore.",
+  },
+  "thirty-day": {
+    title: "Un mouvement par jour pendant 30 jours",
+    intro: "Douze défis de 30 jours sont arrivés, des squats et pompes au gainage et aux tractions, chacun sur trois niveaux.",
+    points: [
+      "Choisissez-en un dans Outils › Défis de 30 jours, puis Débutant, Intermédiaire ou Avancé.",
+      "Aujourd’hui affiche le chiffre du jour avec un bouton Fait. Vous avez fait plus ou moins ? Changez-le d’abord avec − et +.",
+      "Un jour sur quatre est un jour de repos, et un jour manqué vous attend : pas besoin de recommencer.",
+      "Chaque défi a sa page sur notre site avec un calendrier à imprimer pour le frigo.",
+    ],
+    dyk: "Les jours de défi ne sont pas des séances : ils ne changent jamais votre programme, votre série ni votre objectif de la semaine.",
+  },
+  "printable-plans": {
+    title: "Imprimez une séance sur une page",
+    intro: "Chaque programme ou routine s'imprime maintenant sur une page, avec des cases à remplir et un code QR qui ramène à l'app.",
+    points: [
+      "Ouvrez une de vos routines et touchez Imprimer la routine. La feuille donne chaque exercice avec ses séries, répétitions et repos, et la charge prévue pour la prochaine fois.",
+      "Notez ce que vous soulevez dans les quatre colonnes de séance, une par entraînement.",
+      "Chaque page de programme du site a un PDF gratuit à télécharger, en dix langues.",
+      "Le code QR de votre feuille ajoute la même routine à qui le scanne. Vos charges et vos notes restent chez vous.",
+    ],
+    dyk: "Sur le téléphone, la fenêtre d'impression peut aussi enregistrer la feuille en PDF, pratique pour l'envoyer à un ami.",
   },
 };

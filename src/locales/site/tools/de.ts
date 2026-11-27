@@ -1,3 +1,4 @@
+import { GEN_DE } from "./gen/de";
 import { DE_MORE } from "./more/de";
 import type { LocalTools } from "./types";
 
@@ -193,4 +194,5 @@ export const DE_TOOLS: LocalTools = {
     },
   },
   ...DE_MORE,
+  "workout-generator": GEN_DE,
 };

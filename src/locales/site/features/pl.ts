@@ -111,6 +111,11 @@ export const pl: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Widżety na stronę Twojej siłowni",
+      body: "Oficjalne siłownie pokazują grafik zajęć, sprzęt albo odznakę „Znajdź nas w Liftsmith” na własnej stronie jedną linijką kodu. Aktualizują się same, w wybranym języku i wyglądzie, i prowadzą do strony siłowni.",
+      note: "Żadnych skryptów, plików cookie ani śledzenia na stronie siłowni.",
+    },
     "gym-insights": {
       name: "Statystyki dla właścicieli siłowni",
       body: "Właściciele i personel oficjalnych siłowni widzą, ile osób trenowało tam w ostatnich czterech tygodniach, godziny tłoku i spokoju, używany sprzęt i otwarte zgłoszenia, z jednym następnym krokiem.",
@@ -290,7 +295,8 @@ export const pl: FeaturesText = {
     "exercise-stats": {
       name: "Statystyki każdego ćwiczenia",
       body: "Dotknij dowolnego ćwiczenia w bibliotece, żeby zobaczyć swoje serie, łączny podniesiony ciężar, szacowane maksimum i porównanie z trenującymi osobami o twojej wadze, wieku i płci, według opublikowanych norm siłowych.",
-      proPart: "Wykresy od tygodnia do roku są częścią zaawansowanych statystyk Pro.",
+      proPart:
+        "Zaawansowane statystyki Pro dodają wykresy, od tygodnia po cały czas: dotknij treningu, aby zobaczyć jego wynik, z zaznaczonymi rekordami.",
     },
     "log-past": {
       name: "Zapisz dawny trening",
@@ -350,10 +356,24 @@ export const pl: FeaturesText = {
       name: "Twoje własne rutyny",
       body: "Buduj rutyny z przeglądarki ćwiczeń, bez limitu liczby, i udostępniaj je jako link.",
     },
+    "workout-generator": {
+      name: "Darmowy generator treningu na stronie",
+      body: "Wybierz sprzęt, minuty i co chcesz trenować, a ten sam silnik ułoży trening z seriami, powtórzeniami, przerwami i powodem przy każdym ćwiczeniu. Każdy trening ma własny link do udostępnienia, a Zacznij w aplikacji otwiera go jako rutynę.",
+      note: "Zacznij w aplikacji otwiera aplikację na Androida; na iPhonie i komputerze otwiera aplikację webową.",
+    },
     "routine-library": {
       name: "Biblioteka rutyn",
       body: "Szukaj rutyn opublikowanych przez innych według celu, słów i sprzętu na twojej siłowni, zapisz jedną jednym dotknięciem i oceń ją gwiazdkami. Opublikuj własną z jej edytora, z imieniem lub bez, a dostanie własną stronę w serwisie. Wychodzą tylko ćwiczenia i serie, nigdy twoje ciężary ani notatki.",
       note: "Publikowanie wymaga konta i ukończonych 18 lat. Przeglądać może każdy.",
+    },
+    "thirty-day": {
+      name: "Wyzwania 30-dniowe",
+      body: "Dwanaście 30-dniowych wyzwań, od przysiadów, pompek i deski po podciąganie i burpees, każde na trzech poziomach: jedno ćwiczenie dziennie, każdego dnia trochę więcej, z odpoczynkiem co czwarty dzień. Ekran Dziś pokazuje liczbę dnia z przyciskiem Zrobione, a opuszczony dzień na ciebie czeka. Każde wyzwanie ma stronę w serwisie z kalendarzem do druku.",
+    },
+    "printable-plans": {
+      name: "Plany treningowe do druku",
+      body: "Wydrukuj dowolny program lub zestaw na jednej stronie: każdy trening z seriami, powtórzeniami i przerwami, pola na cztery treningi do wpisania ręcznie i kod QR, który otwiera go w aplikacji. Każda strona programu w serwisie ma darmowy PDF w dziesięciu językach, a Drukuj zestaw w aplikacji dodaje ciężary zaplanowane na następny raz.",
+      note: "Na telefonie okno drukowania może też zapisać go jako PDF.",
     },
     library: {
       name: "1000 ćwiczeń",
@@ -474,6 +494,10 @@ export const pl: FeaturesText = {
       name: "Karty po zrobieniu zrzutu ekranu",
       body: "Zrób zrzut ekranu, a wysunie się arkusz kart z twoim treningiem: ostatni miesiąc, trzy miesiące, sześć miesięcy, rok albo od początku, jako podsumowanie, podział serii albo najlepsze boje. Przesuwaj je, ukryj ciężary ikoną oka i udostępnij z linkiem z zaproszeniem na karcie. Te same karty są pod Udostępnij mój trening w Postępach. Każdy link, który udostępniasz, niesie teraz twoje zaproszenie, w linku, który o tym mówi.",
       note: "Zrzuty ekranu otwierają to na Androidzie 14 i nowszym oraz na iPhonie, i można to wyłączyć. Gdzie indziej otwórz to z Postępów. Osoby poniżej 18 lat udostępniają bez linku z zaproszeniem.",
+    },
+    "share-stats": {
+      name: "Udostępnij każdy rekord i maks",
+      body: "Obok szacowanych maksów, najcięższej serii, każdego rekordu dla liczby powtórzeń i ostatnich rekordów życiowych jest mały przycisk udostępniania. Jedno dotknięcie tworzy kartę z tą liczbą, logo Liftsmith i stroną, w wyglądzie aplikacji, gotową do opublikowania lub zapisania.",
     },
     coaching: {
       name: "Prowadź podopiecznych",

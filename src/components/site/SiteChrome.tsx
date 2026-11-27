@@ -9,9 +9,11 @@ import type { ReactNode } from "react";
 import { BuildStamp } from "@/components/BuildStamp";
 import { LangLink } from "@/components/site/LangLink";
 import { BRAND } from "@/lib/brand";
+import { popularLiftLinks } from "@/lib/popularLifts";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { fill, localPath, SITE_LANG_NAME, SITE_LANGS, type SiteLang } from "@/lib/siteLang";
 import { siteText } from "@/locales/site";
+import { CHALLENGE_TEXT } from "@/locales/site/challenge";
 
 import { DocLang } from "./DocLang";
 import { navFor, type NavLink } from "./nav";
@@ -127,7 +129,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
   );
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-[1.5fr_repeat(6,1fr)]">
         <div>
           <p className="text-lg font-bold">{BRAND.name}</p>
           <p className="mt-2 max-w-sm text-sm text-muted">
@@ -150,13 +152,19 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: "/exercises/", label: l.exercises },
           { href: localPath(lang, "/muscles/"), label: l.muscles },
           { href: localPath(lang, "/programs/"), label: l.programs },
+          { href: localPath(lang, "/challenges/"), label: CHALLENGE_TEXT[lang].challenges },
           { href: "/coach-programs/", label: l.coachPrograms },
           { href: "/routines/", label: l.routineLibrary },
           { href: "/equipment/", label: l.equipment },
           { href: "/guides/", label: l.guides },
           { href: "/blog/", label: l.blog },
         ])}
+        {col(
+          t.cols.exercises,
+          popularLiftLinks(lang).map(([href, label]) => ({ href, label })),
+        )}
         {col(t.cols.tools, [
+          { href: localPath(lang, "/tools/workout-generator/"), label: l.generator },
           { href: "/tools/plate-calculator/", label: l.plates },
           { href: "/tools/one-rep-max-calculator/", label: l.oneRm },
           { href: "/tools/warm-up-calculator/", label: l.warmUp },

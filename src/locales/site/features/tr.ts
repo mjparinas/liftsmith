@@ -111,6 +111,11 @@ export const tr: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Salonunuzun web sitesi için widget'lar",
+      body: "Resmi salonlar tek satır kodla ders programlarını, ekipmanlarını ya da Bizi Liftsmith'te bulun rozetini kendi web sitelerinde gösterir. Seçilen dil ve görünümde kendiliğinden güncel kalır ve salonun sayfasına bağlanır.",
+      note: "Salonun sitesinde betik, çerez ya da izleme yok.",
+    },
     "gym-insights": {
       name: "Salon sahipleri için içgörüler",
       body: "Resmî salonların sahipleri ve personeli, son dört haftada orada kaç sporcunun antrenman yaptığını, yoğun ve sakin saatleri, kullanılan ekipmanı ve açık sorun bildirimlerini bir sonraki adımla görür.",
@@ -290,7 +295,8 @@ export const tr: FeaturesText = {
     "exercise-stats": {
       name: "Her egzersiz için istatistik",
       body: "Kütüphanede herhangi bir egzersize dokun: setlerin, kaldırdığın toplam ağırlık, tahmini maksimumun ve yayımlanmış güç standartlarına göre aynı kilo, yaş ve cinsiyetteki antrenmanlı sporcularla karşılaştırman.",
-      proPart: "Bir haftadan bir yıla kadar grafikler Pro'nun gelişmiş istatistiklerinin parçası.",
+      proPart:
+        "Pro'nun gelişmiş istatistikleri bir haftadan tüm zamanlara grafikler ekler: değerini görmek için bir antrenmana dokunun, yeni rekorlar işaretli.",
     },
     "log-past": {
       name: "Geçmiş bir antrenmanı kaydet",
@@ -350,10 +356,24 @@ export const tr: FeaturesText = {
       name: "Kendi rutinlerin",
       body: "Egzersiz tarayıcısından sınırsız sayıda rutin oluştur ve link olarak paylaş.",
     },
+    "workout-generator": {
+      name: "Web sitesinde ücretsiz antrenman oluşturucu",
+      body: "Ekipmanını, dakikalarını ve neyi çalıştıracağını seç; aynı motor set, tekrar, dinlenme ve her egzersizin nedeniyle bir antrenman yazsın. Her antrenmanın paylaşılacak kendi bağlantısı var ve Uygulamada başla onu rutin olarak açar.",
+      note: "Uygulamada başla Android uygulamasını açar; iPhone ve bilgisayarda web uygulamasını açar.",
+    },
     "routine-library": {
       name: "Rutin kütüphanesi",
       body: "Başkalarının yayımladığı rutinleri hedefe, kelimelere ve salonundaki ekipmana göre ara, tek dokunuşla kaydet ve yıldızla puanla. Kendi rutinini düzenleyicisinden, adınla ya da adsız yayımla; web sitesinde kendi sayfası olur. Yalnızca hareketler ve setler paylaşılır, ağırlıkların ya da notların asla.",
       note: "Yayımlamak için hesap ve 18 yaş gerekir. Herkes göz atabilir.",
+    },
+    "thirty-day": {
+      name: "30 günlük meydan okumalar",
+      body: "Squat, şınav ve plank'tan barfiks ve burpee'ye on iki 30 günlük meydan okuma, her biri üç seviyede: günde bir hareket, her gün biraz daha fazla, her dördüncü gün dinlenme. Bugün ekranı günün sayısını tek dokunuşla Tamam ile gösterir, kaçırdığın gün de seni bekler. Her meydan okumanın sitede yazdırılabilir takvimli bir sayfası var.",
+    },
+    "printable-plans": {
+      name: "Yazdırılabilir antrenman planları",
+      body: "Herhangi bir programı veya rutini tek sayfada yazdırın: set, tekrar ve dinlenmeleriyle her antrenman, dört seansı elle not edecek kutular ve uygulamada açan bir QR kodu. Sitedeki her program sayfasında on dilde ücretsiz bir PDF var; uygulamadaki Rutini yazdır ise sonraki sefer için planlanan ağırlıkları da ekler.",
+      note: "Telefonda yazdırma penceresi bunu PDF olarak da kaydedebilir.",
     },
     library: {
       name: "1.000 egzersiz",
@@ -474,6 +494,10 @@ export const tr: FeaturesText = {
       name: "Ekran görüntüsü alınca paylaşım kartları",
       body: "Ekran görüntüsü al, antrenman kartlarından oluşan bir sayfa açılsın: son ay, üç ay, altı ay, yıl ya da tüm zamanlar; toplamlar, setlerin nereye gittiği veya en iyi kaldırışların olarak. Aralarında kaydır, gözle ağırlıkları gizle ve davet bağlantın kartın üstünde basılı olarak paylaş. Aynı kartlar İlerleme'deki Antrenmanımı paylaş altında. Paylaştığın her bağlantı artık davetini taşıyor, bunu söyleyen bir bağlantıyla.",
       note: "Ekran görüntüleri bunu Android 14 ve sonrasında ve iPhone'da açar, kapatılabilir. Başka yerlerde İlerleme'den aç. 18 yaş altı, davet bağlantısı olmadan paylaşır.",
+    },
+    "share-stats": {
+      name: "Her rekoru ve maksimumu paylaş",
+      body: "Tahmini maksimumlarının, en ağır setinin, her tekrar sayısındaki rekorunun ve son kişisel rekorlarının yanında küçük bir paylaş düğmesi var. Tek dokunuş, o sayıyla, Liftsmith logosu ve web sitesiyle uygulamanın görünümünde bir kart yapar; paylaşmaya ya da kaydetmeye hazır.",
     },
     coaching: {
       name: "Danışan çalıştır",

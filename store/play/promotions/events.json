@@ -1,0 +1,598 @@
+{
+  "events": [
+    {
+      "id": "s1-finale",
+      "season": "s1",
+      "kit": "ember",
+      "kind": "finale",
+      "type": "Time-limited event",
+      "start": "2027-01-25T12:00Z",
+      "end": "2027-02-01T00:00Z",
+      "submitBy": "2027-01-11",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/ember-finale.png",
+      "text": {
+        "en": {
+          "tagline": "Season 1: Ember — the finale counts double",
+          "description": "The season's last week counts double. Meet your own weekly goal and every training day earns twice the points, toward the last tiers of badges, avatars and a theme with its own app icon, yours to keep after the season ends. Days past your goal still add nothing, so rest stays in the plan. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 1: Brasa — la final cuenta doble",
+          "description": "La última semana de la temporada cuenta doble. Cumple tu propio objetivo semanal y cada día de entreno da el doble de puntos, hacia los últimos niveles de insignias, avatares y un tema con su propio icono de app, tuyos cuando la temporada termine. Los días de más siguen sin sumar, así que el descanso sigue en el plan. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 1 : Braise — la finale compte double",
+          "description": "La dernière semaine de la saison compte double. Atteignez votre objectif hebdomadaire et chaque jour d'entraînement rapporte deux fois plus de points, vers les derniers paliers de badges, d'avatars et d'un thème avec sa propre icône d'app, à garder après la saison. Les jours en plus ne rapportent toujours rien : le repos reste dans le plan. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 1: Glut — das Finale zählt doppelt",
+          "description": "Die letzte Woche der Saison zählt doppelt. Erreiche dein Wochenziel, und jeder Trainingstag bringt doppelt so viele Punkte, für die letzten Stufen mit Abzeichen, Avataren und einem Theme mit eigenem App-Symbol, die du nach der Saison behältst. Tage über dem Ziel bringen weiterhin nichts, also bleibt die Pause im Plan. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 1: Brace — la finale vale doppio",
+          "description": "L'ultima settimana della stagione vale doppio. Raggiungi il tuo obiettivo settimanale e ogni giorno di allenamento dà il doppio dei punti, verso gli ultimi livelli di badge, avatar e un tema con la sua icona dell'app, tuoi anche dopo la stagione. I giorni in più non danno punti, quindi il riposo resta nel piano. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン1:エンバー — 最終週2倍",
+          "description": "シーズン最後の1週間はポイントが2倍です。自分の週の目標を達成すると、トレーニングした日ごとのポイントが2倍になり、バッジ、アバター、専用アプリアイコン付きテーマの最後のティアに近づけます。獲得した報酬はシーズン終了後も残ります。目標を超えた日は引き続き加算されないので、休養も計画のうちです。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 1: Brasa — a final vale em dobro",
+          "description": "A última semana da temporada vale em dobro. Bata sua própria meta semanal e cada dia de treino dá o dobro de pontos, rumo aos últimos níveis de medalhas, avatares e um tema com o próprio ícone do app, que ficam com você depois da temporada. Dias além da meta continuam sem somar, então o descanso segue no plano. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 1: 엠버 — 마지막 주 두 배",
+          "description": "시즌의 마지막 주는 포인트가 두 배예요. 내 주간 목표를 달성하면 운동한 날마다 포인트를 두 배로 받아, 배지, 아바타, 전용 앱 아이콘이 있는 테마의 마지막 단계에 다가가요. 얻은 보상은 시즌이 끝나도 계속 내 거예요. 목표를 넘긴 날은 여전히 더해지지 않으니 휴식도 계획의 일부예요. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 1: Żar — finał liczy się podwójnie",
+          "description": "Ostatni tydzień sezonu liczy się podwójnie. Osiągnij własny cel tygodniowy, a każdy dzień treningu da dwa razy więcej punktów, w stronę ostatnich poziomów odznak, awatarów i motywu z własną ikoną aplikacji, które zostaną z tobą po sezonie. Dni ponad cel dalej nic nie dają, więc odpoczynek zostaje w planie. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 1: Kor — final haftası iki kat",
+          "description": "Sezonun son haftası iki kat sayılır. Kendi haftalık hedefini tutturduğunda her antrenman günü iki kat puan getirir ve sezon bitince de sende kalacak rozetlerin, avatarların ve kendi uygulama simgesi olan temanın son kademelerine yaklaşırsın. Hedefin üstündeki günler yine puan getirmez, yani dinlenmek planda kalır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s2-launch",
+      "season": "s2",
+      "kit": "tempest",
+      "kind": "launch",
+      "type": "Time-limited event",
+      "start": "2027-02-01T12:00Z",
+      "end": "2027-02-28T23:00Z",
+      "submitBy": "2027-01-18",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/tempest-launch.png",
+      "text": {
+        "en": {
+          "tagline": "Season 2: Tempest — ten weeks of new rewards",
+          "description": "Ten weeks, 20 tiers and rewards you can only earn this season: badges, avatars and a theme with its own app icon. Points come from training toward your own weekly goal, never past it. Challenges: Meet your weekly goal 4 weeks in a row. Set a new best on 4 different exercises. Finish 8 weekly quests. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 2: Tempestad — nuevas recompensas",
+          "description": "Diez semanas, 20 niveles y recompensas que solo puedes ganar esta temporada: insignias, avatares y un tema con su propio icono de app. Los puntos siguen tu objetivo semanal, nunca más allá. Retos: Cumple tu objetivo semanal 4 semanas seguidas. Logra una nueva marca en 4 ejercicios distintos. Completa 8 misiones semanales. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 2 : Tempête — nouvelles récompenses",
+          "description": "Dix semaines, 20 paliers et des récompenses à gagner seulement cette saison : badges, avatars et un thème avec sa propre icône d'app. Les points suivent votre objectif hebdomadaire, jamais au-delà. Défis : Atteignez votre objectif 4 semaines d'affilée. Battez un record sur 4 exercices différents. Terminez 8 quêtes de la semaine. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 2: Sturm — 10 Wochen neue Belohnungen",
+          "description": "Zehn Wochen, 20 Stufen und Belohnungen, die es nur in dieser Saison gibt: Abzeichen, Avatare und ein Theme mit eigenem App-Symbol. Punkte gibt es fürs Training bis zu deinem Wochenziel, nie darüber hinaus. Challenges: Erreiche dein Wochenziel 4 Wochen in Folge. Stell in 4 verschiedenen Übungen eine neue Bestleistung auf. Schließ 8 Wochenaufgaben ab. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 2: Tempesta — nuove ricompense",
+          "description": "Dieci settimane, 20 livelli e ricompense che puoi ottenere solo in questa stagione: badge, avatar e un tema con la sua icona dell'app. I punti seguono il tuo obiettivo settimanale, mai oltre. Sfide: Raggiungi l'obiettivo settimanale per 4 settimane di fila. Stabilisci un nuovo record in 4 esercizi diversi. Completa 8 missioni settimanali. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン2:テンペスト — 新しい報酬",
+          "description": "10週間・20ティアで、今シーズンだけの報酬が手に入ります。バッジ、アバター、専用アプリアイコン付きのテーマまで。ポイントは自分の週の目標に向けたトレーニングでたまり、目標を超えた日は加算されないので、週2日でも週5日と同じ速さで進めます。チャレンジ:週の目標を4週連続で達成する。4種目で自己ベストを更新する。週間クエストを8個クリアする。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 2: Tempestade — nuevas recompensas",
+          "description": "Dez semanas, 20 níveis e recompensas que você só ganha nesta temporada: medalhas, avatares e um tema com o próprio ícone do app. Os pontos seguem a sua meta semanal, nunca além dela. Desafios: Bata sua meta semanal 4 semanas seguidas. Faça um novo recorde em 4 exercícios diferentes. Conclua 8 missões semanais. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 2: 템페스트 — 새 보상",
+          "description": "10주, 20단계, 이번 시즌에만 받을 수 있는 보상이 있어요. 배지, 아바타, 전용 앱 아이콘이 있는 테마까지요. 포인트는 내 주간 목표를 향한 운동으로 쌓이고 목표를 넘긴 날은 더해지지 않아서, 주 2일도 주 5일만큼 빠르게 올라가요. 챌린지: 주간 목표를 4주 연속 달성하기. 서로 다른 운동 4개에서 개인 최고 기록 세우기. 주간 퀘스트 8개 완료하기. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 2: Burza — 10 tygodni nagród",
+          "description": "Dziesięć tygodni, 20 poziomów i nagrody do zdobycia tylko w tym sezonie: odznaki, awatary i motyw z własną ikoną aplikacji. Punkty dają treningi w stronę własnego celu tygodniowego, nigdy ponad niego. Wyzwania: Osiągnij cel tygodniowy 4 tygodnie z rzędu. Ustanów nowy rekord w 4 różnych ćwiczeniach. Ukończ 8 zadań tygodnia. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 2: Fırtına — 10 hafta yeni ödüller",
+          "description": "On hafta, 20 kademe ve yalnızca bu sezon kazanabileceğin ödüller: rozetler, avatarlar ve kendi uygulama simgesi olan bir tema. Puanlar haftalık hedefine kadar gelir, ötesinden asla. Meydan okumalar: Haftalık hedefini üst üste 4 hafta tuttur. 4 farklı egzersizde yeni rekor kır. 8 haftalık görevi tamamla. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s2-finale",
+      "season": "s2",
+      "kit": "tempest",
+      "kind": "finale",
+      "type": "Time-limited event",
+      "start": "2027-04-05T12:00Z",
+      "end": "2027-04-12T00:00Z",
+      "submitBy": "2027-03-22",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/tempest-finale.png",
+      "text": {
+        "en": {
+          "tagline": "Season 2: Tempest — the finale counts double",
+          "description": "The season's last week counts double. Meet your own weekly goal and every training day earns twice the points, toward the last tiers of badges, avatars and a theme with its own app icon, yours to keep after the season ends. Days past your goal still add nothing, so rest stays in the plan. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 2: Tempestad — la final cuenta doble",
+          "description": "La última semana de la temporada cuenta doble. Cumple tu propio objetivo semanal y cada día de entreno da el doble de puntos, hacia los últimos niveles de insignias, avatares y un tema con su propio icono de app, tuyos cuando la temporada termine. Los días de más siguen sin sumar, así que el descanso sigue en el plan. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 2 : Tempête — la finale compte double",
+          "description": "La dernière semaine de la saison compte double. Atteignez votre objectif hebdomadaire et chaque jour d'entraînement rapporte deux fois plus de points, vers les derniers paliers de badges, d'avatars et d'un thème avec sa propre icône d'app, à garder après la saison. Les jours en plus ne rapportent toujours rien : le repos reste dans le plan. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 2: Sturm — das Finale zählt doppelt",
+          "description": "Die letzte Woche der Saison zählt doppelt. Erreiche dein Wochenziel, und jeder Trainingstag bringt doppelt so viele Punkte, für die letzten Stufen mit Abzeichen, Avataren und einem Theme mit eigenem App-Symbol, die du nach der Saison behältst. Tage über dem Ziel bringen weiterhin nichts, also bleibt die Pause im Plan. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 2: Tempesta — la finale vale doppio",
+          "description": "L'ultima settimana della stagione vale doppio. Raggiungi il tuo obiettivo settimanale e ogni giorno di allenamento dà il doppio dei punti, verso gli ultimi livelli di badge, avatar e un tema con la sua icona dell'app, tuoi anche dopo la stagione. I giorni in più non danno punti, quindi il riposo resta nel piano. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン2:テンペスト — 最終週2倍",
+          "description": "シーズン最後の1週間はポイントが2倍です。自分の週の目標を達成すると、トレーニングした日ごとのポイントが2倍になり、バッジ、アバター、専用アプリアイコン付きテーマの最後のティアに近づけます。獲得した報酬はシーズン終了後も残ります。目標を超えた日は引き続き加算されないので、休養も計画のうちです。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 2: Tempestade — a final vale em dobro",
+          "description": "A última semana da temporada vale em dobro. Bata sua própria meta semanal e cada dia de treino dá o dobro de pontos, rumo aos últimos níveis de medalhas, avatares e um tema com o próprio ícone do app, que ficam com você depois da temporada. Dias além da meta continuam sem somar, então o descanso segue no plano. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 2: 템페스트 — 마지막 주 두 배",
+          "description": "시즌의 마지막 주는 포인트가 두 배예요. 내 주간 목표를 달성하면 운동한 날마다 포인트를 두 배로 받아, 배지, 아바타, 전용 앱 아이콘이 있는 테마의 마지막 단계에 다가가요. 얻은 보상은 시즌이 끝나도 계속 내 거예요. 목표를 넘긴 날은 여전히 더해지지 않으니 휴식도 계획의 일부예요. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 2: Burza — finał liczy się podwójnie",
+          "description": "Ostatni tydzień sezonu liczy się podwójnie. Osiągnij własny cel tygodniowy, a każdy dzień treningu da dwa razy więcej punktów, w stronę ostatnich poziomów odznak, awatarów i motywu z własną ikoną aplikacji, które zostaną z tobą po sezonie. Dni ponad cel dalej nic nie dają, więc odpoczynek zostaje w planie. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 2: Fırtına — final haftası iki kat",
+          "description": "Sezonun son haftası iki kat sayılır. Kendi haftalık hedefini tutturduğunda her antrenman günü iki kat puan getirir ve sezon bitince de sende kalacak rozetlerin, avatarların ve kendi uygulama simgesi olan temanın son kademelerine yaklaşırsın. Hedefin üstündeki günler yine puan getirmez, yani dinlenmek planda kalır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s3-launch",
+      "season": "s3",
+      "kit": "bloom",
+      "kind": "launch",
+      "type": "Time-limited event",
+      "start": "2027-04-12T12:00Z",
+      "end": "2027-05-09T23:00Z",
+      "submitBy": "2027-03-29",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/bloom-launch.png",
+      "text": {
+        "en": {
+          "tagline": "Season 3: Bloom — ten weeks of new rewards",
+          "description": "Ten weeks, 20 tiers and rewards you can only earn this season: badges, avatars and a theme with its own app icon. Points come from training toward your own weekly goal, never past it. Challenges: Try 10 exercises you've never done. Do 6 stretch routines of 10+ minutes on their own. Meet your weekly goal in the first and the last week. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 3: Floración — nuevas recompensas",
+          "description": "Diez semanas, 20 niveles y recompensas que solo puedes ganar esta temporada: insignias, avatares y un tema con su propio icono de app. Los puntos siguen tu objetivo semanal, nunca más allá. Retos: Prueba 10 ejercicios que nunca hayas hecho. Haz 6 rutinas de estiramientos de 10+ minutos por separado. Cumple tu objetivo semanal la primera y la última semana. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 3 : Floraison — nouvelles récompenses",
+          "description": "Dix semaines, 20 paliers et des récompenses à gagner seulement cette saison : badges, avatars et un thème avec sa propre icône d'app. Les points suivent votre objectif hebdomadaire, jamais au-delà. Défis : Essayez 10 exercices jamais faits. Faites 6 séances d'étirements de 10 min ou plus à part. Atteignez votre objectif la première et la dernière semaine. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 3: Blüte — 10 Wochen neue Belohnungen",
+          "description": "Zehn Wochen, 20 Stufen und Belohnungen, die es nur in dieser Saison gibt: Abzeichen, Avatare und ein Theme mit eigenem App-Symbol. Punkte gibt es fürs Training bis zu deinem Wochenziel, nie darüber hinaus. Challenges: Probier 10 Übungen, die du noch nie gemacht hast. Mach 6 eigene Dehnroutinen von 10+ Minuten. Erreiche dein Wochenziel in der ersten und der letzten Woche. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 3: Fioritura — nuove ricompense",
+          "description": "Dieci settimane, 20 livelli e ricompense che puoi ottenere solo in questa stagione: badge, avatar e un tema con la sua icona dell'app. I punti seguono il tuo obiettivo settimanale, mai oltre. Sfide: Prova 10 esercizi mai fatti. Fai 6 routine di stretching da 10+ minuti a parte. Raggiungi l'obiettivo settimanale nella prima e nell'ultima settimana. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン3:ブルーム — 新しい報酬",
+          "description": "10週間・20ティアで、今シーズンだけの報酬が手に入ります。バッジ、アバター、専用アプリアイコン付きのテーマまで。ポイントは自分の週の目標に向けたトレーニングでたまり、目標を超えた日は加算されないので、週2日でも週5日と同じ速さで進めます。チャレンジ:やったことのない種目を10個試す。10分以上のストレッチを単独で6回行う。最初の週と最後の週に週の目標を達成する。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 3: Florada — nuevas recompensas",
+          "description": "Dez semanas, 20 níveis e recompensas que você só ganha nesta temporada: medalhas, avatares e um tema com o próprio ícone do app. Os pontos seguem a sua meta semanal, nunca além dela. Desafios: Experimente 10 exercícios que você nunca fez. Faça 6 rotinas de alongamento de 10+ minutos à parte. Bata sua meta semanal na primeira e na última semana. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 3: 블룸 — 새 보상",
+          "description": "10주, 20단계, 이번 시즌에만 받을 수 있는 보상이 있어요. 배지, 아바타, 전용 앱 아이콘이 있는 테마까지요. 포인트는 내 주간 목표를 향한 운동으로 쌓이고 목표를 넘긴 날은 더해지지 않아서, 주 2일도 주 5일만큼 빠르게 올라가요. 챌린지: 해 본 적 없는 운동 10개 해 보기. 10분 이상 스트레칭을 따로 6번 하기. 첫 주와 마지막 주에 주간 목표 달성하기. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 3: Rozkwit — 10 tygodni nagród",
+          "description": "Dziesięć tygodni, 20 poziomów i nagrody do zdobycia tylko w tym sezonie: odznaki, awatary i motyw z własną ikoną aplikacji. Punkty dają treningi w stronę własnego celu tygodniowego, nigdy ponad niego. Wyzwania: Spróbuj 10 ćwiczeń, których nigdy nie robiłeś. Zrób 6 osobnych sesji rozciągania 10+ minut. Osiągnij cel tygodniowy w pierwszym i ostatnim tygodniu. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 3: Çiçek — 10 hafta yeni ödüller",
+          "description": "On hafta, 20 kademe ve yalnızca bu sezon kazanabileceğin ödüller: rozetler, avatarlar ve kendi uygulama simgesi olan bir tema. Puanlar haftalık hedefine kadar gelir, ötesinden asla. Meydan okumalar: Hiç yapmadığın 10 egzersizi dene. Tek başına 10+ dakikalık 6 esneme rutini yap. İlk ve son haftada haftalık hedefini tuttur. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s3-finale",
+      "season": "s3",
+      "kit": "bloom",
+      "kind": "finale",
+      "type": "Time-limited event",
+      "start": "2027-06-14T12:00Z",
+      "end": "2027-06-21T00:00Z",
+      "submitBy": "2027-05-31",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/bloom-finale.png",
+      "text": {
+        "en": {
+          "tagline": "Season 3: Bloom — the finale counts double",
+          "description": "The season's last week counts double. Meet your own weekly goal and every training day earns twice the points, toward the last tiers of badges, avatars and a theme with its own app icon, yours to keep after the season ends. Days past your goal still add nothing, so rest stays in the plan. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 3: Floración — la final cuenta doble",
+          "description": "La última semana de la temporada cuenta doble. Cumple tu propio objetivo semanal y cada día de entreno da el doble de puntos, hacia los últimos niveles de insignias, avatares y un tema con su propio icono de app, tuyos cuando la temporada termine. Los días de más siguen sin sumar, así que el descanso sigue en el plan. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 3 : Floraison — la finale compte double",
+          "description": "La dernière semaine de la saison compte double. Atteignez votre objectif hebdomadaire et chaque jour d'entraînement rapporte deux fois plus de points, vers les derniers paliers de badges, d'avatars et d'un thème avec sa propre icône d'app, à garder après la saison. Les jours en plus ne rapportent toujours rien : le repos reste dans le plan. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 3: Blüte — das Finale zählt doppelt",
+          "description": "Die letzte Woche der Saison zählt doppelt. Erreiche dein Wochenziel, und jeder Trainingstag bringt doppelt so viele Punkte, für die letzten Stufen mit Abzeichen, Avataren und einem Theme mit eigenem App-Symbol, die du nach der Saison behältst. Tage über dem Ziel bringen weiterhin nichts, also bleibt die Pause im Plan. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 3: Fioritura — la finale vale doppio",
+          "description": "L'ultima settimana della stagione vale doppio. Raggiungi il tuo obiettivo settimanale e ogni giorno di allenamento dà il doppio dei punti, verso gli ultimi livelli di badge, avatar e un tema con la sua icona dell'app, tuoi anche dopo la stagione. I giorni in più non danno punti, quindi il riposo resta nel piano. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン3:ブルーム — 最終週2倍",
+          "description": "シーズン最後の1週間はポイントが2倍です。自分の週の目標を達成すると、トレーニングした日ごとのポイントが2倍になり、バッジ、アバター、専用アプリアイコン付きテーマの最後のティアに近づけます。獲得した報酬はシーズン終了後も残ります。目標を超えた日は引き続き加算されないので、休養も計画のうちです。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 3: Florada — a final vale em dobro",
+          "description": "A última semana da temporada vale em dobro. Bata sua própria meta semanal e cada dia de treino dá o dobro de pontos, rumo aos últimos níveis de medalhas, avatares e um tema com o próprio ícone do app, que ficam com você depois da temporada. Dias além da meta continuam sem somar, então o descanso segue no plano. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 3: 블룸 — 마지막 주 두 배",
+          "description": "시즌의 마지막 주는 포인트가 두 배예요. 내 주간 목표를 달성하면 운동한 날마다 포인트를 두 배로 받아, 배지, 아바타, 전용 앱 아이콘이 있는 테마의 마지막 단계에 다가가요. 얻은 보상은 시즌이 끝나도 계속 내 거예요. 목표를 넘긴 날은 여전히 더해지지 않으니 휴식도 계획의 일부예요. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 3: Rozkwit — finał liczy się podwójnie",
+          "description": "Ostatni tydzień sezonu liczy się podwójnie. Osiągnij własny cel tygodniowy, a każdy dzień treningu da dwa razy więcej punktów, w stronę ostatnich poziomów odznak, awatarów i motywu z własną ikoną aplikacji, które zostaną z tobą po sezonie. Dni ponad cel dalej nic nie dają, więc odpoczynek zostaje w planie. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 3: Çiçek — final haftası iki kat",
+          "description": "Sezonun son haftası iki kat sayılır. Kendi haftalık hedefini tutturduğunda her antrenman günü iki kat puan getirir ve sezon bitince de sende kalacak rozetlerin, avatarların ve kendi uygulama simgesi olan temanın son kademelerine yaklaşırsın. Hedefin üstündeki günler yine puan getirmez, yani dinlenmek planda kalır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s4-launch",
+      "season": "s4",
+      "kit": "solstice",
+      "kind": "launch",
+      "type": "Time-limited event",
+      "start": "2027-06-21T12:00Z",
+      "end": "2027-07-18T23:00Z",
+      "submitBy": "2027-06-07",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/solstice-launch.png",
+      "text": {
+        "en": {
+          "tagline": "Season 4: Solstice — ten weeks of new rewards",
+          "description": "Ten weeks, 20 tiers and rewards you can only earn this season: badges, avatars and a theme with its own app icon. Points come from training toward your own weekly goal, never past it. Challenges: Meet your weekly goal in 7 weeks. Meet your weekly goal 3 weeks in a row. Set a new best on 5 different exercises. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 4: Solsticio — nuevas recompensas",
+          "description": "Diez semanas, 20 niveles y recompensas que solo puedes ganar esta temporada: insignias, avatares y un tema con su propio icono de app. Los puntos siguen tu objetivo semanal, nunca más allá. Retos: Cumple tu objetivo semanal 7 semanas. Cumple tu objetivo semanal 3 semanas seguidas. Logra una nueva marca en 5 ejercicios distintos. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 4 : Solstice — nouvelles récompenses",
+          "description": "Dix semaines, 20 paliers et des récompenses à gagner seulement cette saison : badges, avatars et un thème avec sa propre icône d'app. Les points suivent votre objectif hebdomadaire, jamais au-delà. Défis : Atteignez votre objectif 7 semaines. Atteignez votre objectif 3 semaines d'affilée. Battez un record sur 5 exercices différents. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 4: Sonnwende — 10 Wochen neue Belohnungen",
+          "description": "Zehn Wochen, 20 Stufen und Belohnungen, die es nur in dieser Saison gibt: Abzeichen, Avatare und ein Theme mit eigenem App-Symbol. Punkte gibt es fürs Training bis zu deinem Wochenziel, nie darüber hinaus. Challenges: Erreiche dein Wochenziel in 7 Wochen. Erreiche dein Wochenziel 3 Wochen in Folge. Stell in 5 verschiedenen Übungen eine neue Bestleistung auf. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 4: Solstizio — nuove ricompense",
+          "description": "Dieci settimane, 20 livelli e ricompense che puoi ottenere solo in questa stagione: badge, avatar e un tema con la sua icona dell'app. I punti seguono il tuo obiettivo settimanale, mai oltre. Sfide: Raggiungi l'obiettivo settimanale per 7 settimane. Raggiungi l'obiettivo settimanale per 3 settimane di fila. Stabilisci un nuovo record in 5 esercizi diversi. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン4:ソルスティス — 新しい報酬",
+          "description": "10週間・20ティアで、今シーズンだけの報酬が手に入ります。バッジ、アバター、専用アプリアイコン付きのテーマまで。ポイントは自分の週の目標に向けたトレーニングでたまり、目標を超えた日は加算されないので、週2日でも週5日と同じ速さで進めます。チャレンジ:週の目標を7週達成する。週の目標を3週連続で達成する。5種目で自己ベストを更新する。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 4: Solstício — nuevas recompensas",
+          "description": "Dez semanas, 20 níveis e recompensas que você só ganha nesta temporada: medalhas, avatares e um tema com o próprio ícone do app. Os pontos seguem a sua meta semanal, nunca além dela. Desafios: Bata sua meta semanal em 7 semanas. Bata sua meta semanal 3 semanas seguidas. Faça um novo recorde em 5 exercícios diferentes. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 4: 솔스티스 — 새 보상",
+          "description": "10주, 20단계, 이번 시즌에만 받을 수 있는 보상이 있어요. 배지, 아바타, 전용 앱 아이콘이 있는 테마까지요. 포인트는 내 주간 목표를 향한 운동으로 쌓이고 목표를 넘긴 날은 더해지지 않아서, 주 2일도 주 5일만큼 빠르게 올라가요. 챌린지: 주간 목표를 7주 달성하기. 주간 목표를 3주 연속 달성하기. 서로 다른 운동 5개에서 개인 최고 기록 세우기. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 4: Przesilenie — 10 tygodni nagród",
+          "description": "Dziesięć tygodni, 20 poziomów i nagrody do zdobycia tylko w tym sezonie: odznaki, awatary i motyw z własną ikoną aplikacji. Punkty dają treningi w stronę własnego celu tygodniowego, nigdy ponad niego. Wyzwania: Osiągnij cel tygodniowy w 7 tygodniach. Osiągnij cel tygodniowy 3 tygodnie z rzędu. Ustanów nowy rekord w 5 różnych ćwiczeniach. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 4: Gündönümü — 10 hafta yeni ödüller",
+          "description": "On hafta, 20 kademe ve yalnızca bu sezon kazanabileceğin ödüller: rozetler, avatarlar ve kendi uygulama simgesi olan bir tema. Puanlar haftalık hedefine kadar gelir, ötesinden asla. Meydan okumalar: Haftalık hedefini 7 hafta tuttur. Haftalık hedefini üst üste 3 hafta tuttur. 5 farklı egzersizde yeni rekor kır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s4-finale",
+      "season": "s4",
+      "kit": "solstice",
+      "kind": "finale",
+      "type": "Time-limited event",
+      "start": "2027-08-23T12:00Z",
+      "end": "2027-08-30T00:00Z",
+      "submitBy": "2027-08-09",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/solstice-finale.png",
+      "text": {
+        "en": {
+          "tagline": "Season 4: Solstice — the finale counts double",
+          "description": "The season's last week counts double. Meet your own weekly goal and every training day earns twice the points, toward the last tiers of badges, avatars and a theme with its own app icon, yours to keep after the season ends. Days past your goal still add nothing, so rest stays in the plan. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 4: Solsticio — la final cuenta doble",
+          "description": "La última semana de la temporada cuenta doble. Cumple tu propio objetivo semanal y cada día de entreno da el doble de puntos, hacia los últimos niveles de insignias, avatares y un tema con su propio icono de app, tuyos cuando la temporada termine. Los días de más siguen sin sumar, así que el descanso sigue en el plan. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 4 : Solstice — la finale compte double",
+          "description": "La dernière semaine de la saison compte double. Atteignez votre objectif hebdomadaire et chaque jour d'entraînement rapporte deux fois plus de points, vers les derniers paliers de badges, d'avatars et d'un thème avec sa propre icône d'app, à garder après la saison. Les jours en plus ne rapportent toujours rien : le repos reste dans le plan. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 4: Sonnwende — das Finale zählt doppelt",
+          "description": "Die letzte Woche der Saison zählt doppelt. Erreiche dein Wochenziel, und jeder Trainingstag bringt doppelt so viele Punkte, für die letzten Stufen mit Abzeichen, Avataren und einem Theme mit eigenem App-Symbol, die du nach der Saison behältst. Tage über dem Ziel bringen weiterhin nichts, also bleibt die Pause im Plan. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 4: Solstizio — la finale vale doppio",
+          "description": "L'ultima settimana della stagione vale doppio. Raggiungi il tuo obiettivo settimanale e ogni giorno di allenamento dà il doppio dei punti, verso gli ultimi livelli di badge, avatar e un tema con la sua icona dell'app, tuoi anche dopo la stagione. I giorni in più non danno punti, quindi il riposo resta nel piano. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン4:ソルスティス — 最終週2倍",
+          "description": "シーズン最後の1週間はポイントが2倍です。自分の週の目標を達成すると、トレーニングした日ごとのポイントが2倍になり、バッジ、アバター、専用アプリアイコン付きテーマの最後のティアに近づけます。獲得した報酬はシーズン終了後も残ります。目標を超えた日は引き続き加算されないので、休養も計画のうちです。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 4: Solstício — a final vale em dobro",
+          "description": "A última semana da temporada vale em dobro. Bata sua própria meta semanal e cada dia de treino dá o dobro de pontos, rumo aos últimos níveis de medalhas, avatares e um tema com o próprio ícone do app, que ficam com você depois da temporada. Dias além da meta continuam sem somar, então o descanso segue no plano. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 4: 솔스티스 — 마지막 주 두 배",
+          "description": "시즌의 마지막 주는 포인트가 두 배예요. 내 주간 목표를 달성하면 운동한 날마다 포인트를 두 배로 받아, 배지, 아바타, 전용 앱 아이콘이 있는 테마의 마지막 단계에 다가가요. 얻은 보상은 시즌이 끝나도 계속 내 거예요. 목표를 넘긴 날은 여전히 더해지지 않으니 휴식도 계획의 일부예요. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 4: Przesilenie — finał liczy się podwójnie",
+          "description": "Ostatni tydzień sezonu liczy się podwójnie. Osiągnij własny cel tygodniowy, a każdy dzień treningu da dwa razy więcej punktów, w stronę ostatnich poziomów odznak, awatarów i motywu z własną ikoną aplikacji, które zostaną z tobą po sezonie. Dni ponad cel dalej nic nie dają, więc odpoczynek zostaje w planie. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 4: Gündönümü — final haftası iki kat",
+          "description": "Sezonun son haftası iki kat sayılır. Kendi haftalık hedefini tutturduğunda her antrenman günü iki kat puan getirir ve sezon bitince de sende kalacak rozetlerin, avatarların ve kendi uygulama simgesi olan temanın son kademelerine yaklaşırsın. Hedefin üstündeki günler yine puan getirmez, yani dinlenmek planda kalır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s5-launch",
+      "season": "s5",
+      "kit": "maple",
+      "kind": "launch",
+      "type": "Time-limited event",
+      "start": "2027-08-30T12:00Z",
+      "end": "2027-09-26T23:00Z",
+      "submitBy": "2027-08-16",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/maple-launch.png",
+      "text": {
+        "en": {
+          "tagline": "Season 5: Maple — ten weeks of new rewards",
+          "description": "Ten weeks, 20 tiers and rewards you can only earn this season: badges, avatars and a theme with its own app icon. Points come from training toward your own weekly goal, never past it. Challenges: Meet your weekly goal in the first and the last week. Set 4 new bests. Finish 12 weekly quests. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 5: Arce — nuevas recompensas",
+          "description": "Diez semanas, 20 niveles y recompensas que solo puedes ganar esta temporada: insignias, avatares y un tema con su propio icono de app. Los puntos siguen tu objetivo semanal, nunca más allá. Retos: Cumple tu objetivo semanal la primera y la última semana. Logra 4 nuevas marcas. Completa 12 misiones semanales. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 5 : Érable — nouvelles récompenses",
+          "description": "Dix semaines, 20 paliers et des récompenses à gagner seulement cette saison : badges, avatars et un thème avec sa propre icône d'app. Les points suivent votre objectif hebdomadaire, jamais au-delà. Défis : Atteignez votre objectif la première et la dernière semaine. Battez 4 records. Terminez 12 quêtes de la semaine. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 5: Ahorn — 10 Wochen neue Belohnungen",
+          "description": "Zehn Wochen, 20 Stufen und Belohnungen, die es nur in dieser Saison gibt: Abzeichen, Avatare und ein Theme mit eigenem App-Symbol. Punkte gibt es fürs Training bis zu deinem Wochenziel, nie darüber hinaus. Challenges: Erreiche dein Wochenziel in der ersten und der letzten Woche. Stell 4 neue Bestleistungen auf. Schließ 12 Wochenaufgaben ab. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 5: Acero — nuove ricompense",
+          "description": "Dieci settimane, 20 livelli e ricompense che puoi ottenere solo in questa stagione: badge, avatar e un tema con la sua icona dell'app. I punti seguono il tuo obiettivo settimanale, mai oltre. Sfide: Raggiungi l'obiettivo settimanale nella prima e nell'ultima settimana. Stabilisci 4 nuovi record. Completa 12 missioni settimanali. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン5:メープル — 新しい報酬",
+          "description": "10週間・20ティアで、今シーズンだけの報酬が手に入ります。バッジ、アバター、専用アプリアイコン付きのテーマまで。ポイントは自分の週の目標に向けたトレーニングでたまり、目標を超えた日は加算されないので、週2日でも週5日と同じ速さで進めます。チャレンジ:最初の週と最後の週に週の目標を達成する。自己ベストを4回更新する。週間クエストを12個クリアする。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 5: Bordo — nuevas recompensas",
+          "description": "Dez semanas, 20 níveis e recompensas que você só ganha nesta temporada: medalhas, avatares e um tema com o próprio ícone do app. Os pontos seguem a sua meta semanal, nunca além dela. Desafios: Bata sua meta semanal na primeira e na última semana. Faça 4 novos recordes. Conclua 12 missões semanais. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 5: 메이플 — 새 보상",
+          "description": "10주, 20단계, 이번 시즌에만 받을 수 있는 보상이 있어요. 배지, 아바타, 전용 앱 아이콘이 있는 테마까지요. 포인트는 내 주간 목표를 향한 운동으로 쌓이고 목표를 넘긴 날은 더해지지 않아서, 주 2일도 주 5일만큼 빠르게 올라가요. 챌린지: 첫 주와 마지막 주에 주간 목표 달성하기. 개인 최고 기록 4번 세우기. 주간 퀘스트 12개 완료하기. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 5: Klon — 10 tygodni nagród",
+          "description": "Dziesięć tygodni, 20 poziomów i nagrody do zdobycia tylko w tym sezonie: odznaki, awatary i motyw z własną ikoną aplikacji. Punkty dają treningi w stronę własnego celu tygodniowego, nigdy ponad niego. Wyzwania: Osiągnij cel tygodniowy w pierwszym i ostatnim tygodniu. Ustanów 4 nowe rekordy. Ukończ 12 zadań tygodnia. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 5: Akçaağaç — 10 hafta yeni ödüller",
+          "description": "On hafta, 20 kademe ve yalnızca bu sezon kazanabileceğin ödüller: rozetler, avatarlar ve kendi uygulama simgesi olan bir tema. Puanlar haftalık hedefine kadar gelir, ötesinden asla. Meydan okumalar: İlk ve son haftada haftalık hedefini tuttur. 4 yeni rekor kır. 12 haftalık görevi tamamla. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s5-finale",
+      "season": "s5",
+      "kit": "maple",
+      "kind": "finale",
+      "type": "Time-limited event",
+      "start": "2027-11-01T12:00Z",
+      "end": "2027-11-08T00:00Z",
+      "submitBy": "2027-10-18",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/maple-finale.png",
+      "text": {
+        "en": {
+          "tagline": "Season 5: Maple — the finale counts double",
+          "description": "The season's last week counts double. Meet your own weekly goal and every training day earns twice the points, toward the last tiers of badges, avatars and a theme with its own app icon, yours to keep after the season ends. Days past your goal still add nothing, so rest stays in the plan. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 5: Arce — la final cuenta doble",
+          "description": "La última semana de la temporada cuenta doble. Cumple tu propio objetivo semanal y cada día de entreno da el doble de puntos, hacia los últimos niveles de insignias, avatares y un tema con su propio icono de app, tuyos cuando la temporada termine. Los días de más siguen sin sumar, así que el descanso sigue en el plan. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 5 : Érable — la finale compte double",
+          "description": "La dernière semaine de la saison compte double. Atteignez votre objectif hebdomadaire et chaque jour d'entraînement rapporte deux fois plus de points, vers les derniers paliers de badges, d'avatars et d'un thème avec sa propre icône d'app, à garder après la saison. Les jours en plus ne rapportent toujours rien : le repos reste dans le plan. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 5: Ahorn — das Finale zählt doppelt",
+          "description": "Die letzte Woche der Saison zählt doppelt. Erreiche dein Wochenziel, und jeder Trainingstag bringt doppelt so viele Punkte, für die letzten Stufen mit Abzeichen, Avataren und einem Theme mit eigenem App-Symbol, die du nach der Saison behältst. Tage über dem Ziel bringen weiterhin nichts, also bleibt die Pause im Plan. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 5: Acero — la finale vale doppio",
+          "description": "L'ultima settimana della stagione vale doppio. Raggiungi il tuo obiettivo settimanale e ogni giorno di allenamento dà il doppio dei punti, verso gli ultimi livelli di badge, avatar e un tema con la sua icona dell'app, tuoi anche dopo la stagione. I giorni in più non danno punti, quindi il riposo resta nel piano. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン5:メープル — 最終週2倍",
+          "description": "シーズン最後の1週間はポイントが2倍です。自分の週の目標を達成すると、トレーニングした日ごとのポイントが2倍になり、バッジ、アバター、専用アプリアイコン付きテーマの最後のティアに近づけます。獲得した報酬はシーズン終了後も残ります。目標を超えた日は引き続き加算されないので、休養も計画のうちです。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 5: Bordo — a final vale em dobro",
+          "description": "A última semana da temporada vale em dobro. Bata sua própria meta semanal e cada dia de treino dá o dobro de pontos, rumo aos últimos níveis de medalhas, avatares e um tema com o próprio ícone do app, que ficam com você depois da temporada. Dias além da meta continuam sem somar, então o descanso segue no plano. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 5: 메이플 — 마지막 주 두 배",
+          "description": "시즌의 마지막 주는 포인트가 두 배예요. 내 주간 목표를 달성하면 운동한 날마다 포인트를 두 배로 받아, 배지, 아바타, 전용 앱 아이콘이 있는 테마의 마지막 단계에 다가가요. 얻은 보상은 시즌이 끝나도 계속 내 거예요. 목표를 넘긴 날은 여전히 더해지지 않으니 휴식도 계획의 일부예요. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 5: Klon — finał liczy się podwójnie",
+          "description": "Ostatni tydzień sezonu liczy się podwójnie. Osiągnij własny cel tygodniowy, a każdy dzień treningu da dwa razy więcej punktów, w stronę ostatnich poziomów odznak, awatarów i motywu z własną ikoną aplikacji, które zostaną z tobą po sezonie. Dni ponad cel dalej nic nie dają, więc odpoczynek zostaje w planie. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 5: Akçaağaç — final haftası iki kat",
+          "description": "Sezonun son haftası iki kat sayılır. Kendi haftalık hedefini tutturduğunda her antrenman günü iki kat puan getirir ve sezon bitince de sende kalacak rozetlerin, avatarların ve kendi uygulama simgesi olan temanın son kademelerine yaklaşırsın. Hedefin üstündeki günler yine puan getirmez, yani dinlenmek planda kalır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s6-launch",
+      "season": "s6",
+      "kit": "obsidian",
+      "kind": "launch",
+      "type": "Time-limited event",
+      "start": "2027-11-08T12:00Z",
+      "end": "2027-12-05T23:00Z",
+      "submitBy": "2027-10-25",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/obsidian-launch.png",
+      "text": {
+        "en": {
+          "tagline": "Season 6: Obsidian — ten weeks of new rewards",
+          "description": "Ten weeks, 20 tiers and rewards you can only earn this season: badges, avatars and a theme with its own app icon. Points come from training toward your own weekly goal, never past it. Challenges: Meet your weekly goal 5 weeks in a row. Do 5 stretch routines of 10+ minutes on their own. Try 6 exercises you've never done. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 6: Obsidiana — nuevas recompensas",
+          "description": "Diez semanas, 20 niveles y recompensas que solo puedes ganar esta temporada: insignias, avatares y un tema con su propio icono de app. Los puntos siguen tu objetivo semanal, nunca más allá. Retos: Cumple tu objetivo semanal 5 semanas seguidas. Haz 5 rutinas de estiramientos de 10+ minutos por separado. Prueba 6 ejercicios que nunca hayas hecho. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 6 : Obsidienne — nouvelles récompenses",
+          "description": "Dix semaines, 20 paliers et des récompenses à gagner seulement cette saison : badges, avatars et un thème avec sa propre icône d'app. Les points suivent votre objectif hebdomadaire, jamais au-delà. Défis : Atteignez votre objectif 5 semaines d'affilée. Faites 5 séances d'étirements de 10 min ou plus à part. Essayez 6 exercices jamais faits. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 6: Obsidian — 10 Wochen neue Belohnungen",
+          "description": "Zehn Wochen, 20 Stufen und Belohnungen, die es nur in dieser Saison gibt: Abzeichen, Avatare und ein Theme mit eigenem App-Symbol. Punkte gibt es fürs Training bis zu deinem Wochenziel, nie darüber hinaus. Challenges: Erreiche dein Wochenziel 5 Wochen in Folge. Mach 5 eigene Dehnroutinen von 10+ Minuten. Probier 6 Übungen, die du noch nie gemacht hast. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 6: Ossidiana — nuove ricompense",
+          "description": "Dieci settimane, 20 livelli e ricompense che puoi ottenere solo in questa stagione: badge, avatar e un tema con la sua icona dell'app. I punti seguono il tuo obiettivo settimanale, mai oltre. Sfide: Raggiungi l'obiettivo settimanale per 5 settimane di fila. Fai 5 routine di stretching da 10+ minuti a parte. Prova 6 esercizi mai fatti. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン6:オブシディアン — 新しい報酬",
+          "description": "10週間・20ティアで、今シーズンだけの報酬が手に入ります。バッジ、アバター、専用アプリアイコン付きのテーマまで。ポイントは自分の週の目標に向けたトレーニングでたまり、目標を超えた日は加算されないので、週2日でも週5日と同じ速さで進めます。チャレンジ:週の目標を5週連続で達成する。10分以上のストレッチを単独で5回行う。やったことのない種目を6個試す。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 6: Obsidiana — nuevas recompensas",
+          "description": "Dez semanas, 20 níveis e recompensas que você só ganha nesta temporada: medalhas, avatares e um tema com o próprio ícone do app. Os pontos seguem a sua meta semanal, nunca além dela. Desafios: Bata sua meta semanal 5 semanas seguidas. Faça 5 rotinas de alongamento de 10+ minutos à parte. Experimente 6 exercícios que você nunca fez. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 6: 옵시디언 — 새 보상",
+          "description": "10주, 20단계, 이번 시즌에만 받을 수 있는 보상이 있어요. 배지, 아바타, 전용 앱 아이콘이 있는 테마까지요. 포인트는 내 주간 목표를 향한 운동으로 쌓이고 목표를 넘긴 날은 더해지지 않아서, 주 2일도 주 5일만큼 빠르게 올라가요. 챌린지: 주간 목표를 5주 연속 달성하기. 10분 이상 스트레칭을 따로 5번 하기. 해 본 적 없는 운동 6개 해 보기. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 6: Obsydian — 10 tygodni nagród",
+          "description": "Dziesięć tygodni, 20 poziomów i nagrody do zdobycia tylko w tym sezonie: odznaki, awatary i motyw z własną ikoną aplikacji. Punkty dają treningi w stronę własnego celu tygodniowego, nigdy ponad niego. Wyzwania: Osiągnij cel tygodniowy 5 tygodni z rzędu. Zrób 5 osobnych sesji rozciągania 10+ minut. Spróbuj 6 ćwiczeń, których nigdy nie robiłeś. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 6: Obsidyen — 10 hafta yeni ödüller",
+          "description": "On hafta, 20 kademe ve yalnızca bu sezon kazanabileceğin ödüller: rozetler, avatarlar ve kendi uygulama simgesi olan bir tema. Puanlar haftalık hedefine kadar gelir, ötesinden asla. Meydan okumalar: Haftalık hedefini üst üste 5 hafta tuttur. Tek başına 10+ dakikalık 5 esneme rutini yap. Hiç yapmadığın 6 egzersizi dene. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    },
+    {
+      "id": "s6-finale",
+      "season": "s6",
+      "kit": "obsidian",
+      "kind": "finale",
+      "type": "Time-limited event",
+      "start": "2028-01-10T12:00Z",
+      "end": "2028-01-17T00:00Z",
+      "submitBy": "2027-12-27",
+      "deepLink": "https://www.getliftsmith.com/app/#/season",
+      "image": "store/play/promotions/obsidian-finale.png",
+      "text": {
+        "en": {
+          "tagline": "Season 6: Obsidian — the finale counts double",
+          "description": "The season's last week counts double. Meet your own weekly goal and every training day earns twice the points, toward the last tiers of badges, avatars and a theme with its own app icon, yours to keep after the season ends. Days past your goal still add nothing, so rest stays in the plan. Every tier is free, and Pro adds a bonus row. Seasons open after your fifth workout."
+        },
+        "es": {
+          "tagline": "Temporada 6: Obsidiana — la final cuenta doble",
+          "description": "La última semana de la temporada cuenta doble. Cumple tu propio objetivo semanal y cada día de entreno da el doble de puntos, hacia los últimos niveles de insignias, avatares y un tema con su propio icono de app, tuyos cuando la temporada termine. Los días de más siguen sin sumar, así que el descanso sigue en el plan. Todos los niveles son gratis y Pro añade una fila extra. Las temporadas se abren tras tu quinto entreno."
+        },
+        "fr": {
+          "tagline": "Saison 6 : Obsidienne — la finale compte double",
+          "description": "La dernière semaine de la saison compte double. Atteignez votre objectif hebdomadaire et chaque jour d'entraînement rapporte deux fois plus de points, vers les derniers paliers de badges, d'avatars et d'un thème avec sa propre icône d'app, à garder après la saison. Les jours en plus ne rapportent toujours rien : le repos reste dans le plan. Tous les paliers sont gratuits, et Pro ajoute une rangée bonus. Les saisons s'ouvrent après votre cinquième séance."
+        },
+        "de": {
+          "tagline": "Saison 6: Obsidian — das Finale zählt doppelt",
+          "description": "Die letzte Woche der Saison zählt doppelt. Erreiche dein Wochenziel, und jeder Trainingstag bringt doppelt so viele Punkte, für die letzten Stufen mit Abzeichen, Avataren und einem Theme mit eigenem App-Symbol, die du nach der Saison behältst. Tage über dem Ziel bringen weiterhin nichts, also bleibt die Pause im Plan. Alle Stufen sind kostenlos, Pro bringt eine Bonusreihe dazu. Saisons öffnen sich nach deinem fünften Training."
+        },
+        "it": {
+          "tagline": "Stagione 6: Ossidiana — la finale vale doppio",
+          "description": "L'ultima settimana della stagione vale doppio. Raggiungi il tuo obiettivo settimanale e ogni giorno di allenamento dà il doppio dei punti, verso gli ultimi livelli di badge, avatar e un tema con la sua icona dell'app, tuoi anche dopo la stagione. I giorni in più non danno punti, quindi il riposo resta nel piano. Tutti i livelli sono gratuiti e Pro aggiunge una fila bonus. Le stagioni si aprono dopo il quinto allenamento."
+        },
+        "ja": {
+          "tagline": "シーズン6:オブシディアン — 最終週2倍",
+          "description": "シーズン最後の1週間はポイントが2倍です。自分の週の目標を達成すると、トレーニングした日ごとのポイントが2倍になり、バッジ、アバター、専用アプリアイコン付きテーマの最後のティアに近づけます。獲得した報酬はシーズン終了後も残ります。目標を超えた日は引き続き加算されないので、休養も計画のうちです。すべてのティアは無料で、Proならボーナス列も追加されます。シーズンは5回目のワークアウトのあとに開きます。"
+        },
+        "pt": {
+          "tagline": "Temporada 6: Obsidiana — a final vale em dobro",
+          "description": "A última semana da temporada vale em dobro. Bata sua própria meta semanal e cada dia de treino dá o dobro de pontos, rumo aos últimos níveis de medalhas, avatares e um tema com o próprio ícone do app, que ficam com você depois da temporada. Dias além da meta continuam sem somar, então o descanso segue no plano. Todos os níveis são grátis, e o Pro adiciona uma fileira bônus. As temporadas abrem depois do seu quinto treino."
+        },
+        "ko": {
+          "tagline": "시즌 6: 옵시디언 — 마지막 주 두 배",
+          "description": "시즌의 마지막 주는 포인트가 두 배예요. 내 주간 목표를 달성하면 운동한 날마다 포인트를 두 배로 받아, 배지, 아바타, 전용 앱 아이콘이 있는 테마의 마지막 단계에 다가가요. 얻은 보상은 시즌이 끝나도 계속 내 거예요. 목표를 넘긴 날은 여전히 더해지지 않으니 휴식도 계획의 일부예요. 모든 단계는 무료이고, Pro는 보너스 줄을 더해요. 시즌은 다섯 번째 운동 후에 열려요."
+        },
+        "pl": {
+          "tagline": "Sezon 6: Obsydian — finał liczy się podwójnie",
+          "description": "Ostatni tydzień sezonu liczy się podwójnie. Osiągnij własny cel tygodniowy, a każdy dzień treningu da dwa razy więcej punktów, w stronę ostatnich poziomów odznak, awatarów i motywu z własną ikoną aplikacji, które zostaną z tobą po sezonie. Dni ponad cel dalej nic nie dają, więc odpoczynek zostaje w planie. Wszystkie poziomy są darmowe, a Pro dodaje rząd bonusów. Sezony otwierają się po piątym treningu."
+        },
+        "tr": {
+          "tagline": "Sezon 6: Obsidyen — final haftası iki kat",
+          "description": "Sezonun son haftası iki kat sayılır. Kendi haftalık hedefini tutturduğunda her antrenman günü iki kat puan getirir ve sezon bitince de sende kalacak rozetlerin, avatarların ve kendi uygulama simgesi olan temanın son kademelerine yaklaşırsın. Hedefin üstündeki günler yine puan getirmez, yani dinlenmek planda kalır. Tüm kademeler ücretsiz, Pro ise bir bonus sırası ekler. Sezonlar beşinci antrenmanından sonra açılır."
+        }
+      }
+    }
+  ]
+}

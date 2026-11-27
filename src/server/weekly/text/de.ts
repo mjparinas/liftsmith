@@ -514,7 +514,7 @@ export const emails: Record<string, Words> = {
     points: [
       "Jede Übung zeigt deine Sätze, das bewegte Gesamtgewicht und das geschätzte Maximum.",
       "Sieh, wo du im Vergleich zu trainierten Leuten mit deinem Gewicht, Alter und Geschlecht stehst.",
-      "Pro: Diagramme von einer Woche bis zu einem Jahr, Wochensätze pro Muskel im Vergleich zum Ziel und Verläufe der Maximalkraft.",
+      "Pro: Diagramme von einer Woche bis zur gesamten Zeit (tippe auf eine Einheit für ihren Wert, Bestleistungen sind markiert), Wochensätze pro Muskel im Vergleich zum Ziel und Verläufe der Maximalkraft.",
       "Die Kraftstandards auf der Website stammen von echten Sportlern, die sich zum Mitzählen entscheiden.",
     ],
     dyk: "„Meine Werte mitzählen“ unter Einstellungen › Deine Daten und Datenschutz entscheidet, ob deine zu diesen Standards beitragen.",
@@ -1122,5 +1122,61 @@ export const emails: Record<string, Words> = {
       "Dein Handy speichert es dann, als hättest du dort eingetragen: jeden Satz, deine Bestwerte, die nächsten Gewichte und Health.",
     ],
     dyk: "Geplant wird weiter auf dem Handy, daher warten „Gerät belegt“ und „Plan ändern“, bis es zurück ist.",
+  },
+  "gym-widgets": {
+    title: "Dein Studio auf deiner eigenen Website",
+    intro: "Kursplan, Geräte und ein „Finde uns auf Liftsmith“-Abzeichen können jetzt auf deiner Website stehen, immer aktuell.",
+    points: [
+      "Öffne dein Studio in der App, tippe auf Seite des Studios verwalten und such Widgets für deine Website.",
+      "Wähle Kursplan, Geräte oder Abzeichen, eine helle oder dunkle Optik und eine von zehn Sprachen, und sieh sie dir so an, wie sie erscheinen.",
+      "Kopiere den Code und füge ihn in einen HTML- oder Einbettungsblock deiner Website ein. Squarespace, Wix und WordPress haben einen.",
+      "Änderst du einen Kurs oder deine Geräte in der App, ändert sich das Widget auf deiner Website mit.",
+    ],
+    dyk: "Die Widgets haben keine Skripte, Cookies oder Tracking, und jedes verlinkt auf die Seite deines Studios, damit neue Mitglieder es mit einem Tipp hinzufügen.",
+  },
+  "share-stats": {
+    title: "Teile die Zahlen, auf die du am stolzesten bist",
+    intro: "Jedes geschätzte Maximum, jeder schwerste Satz und jede Bestleistung hat jetzt einen kleinen Teilen-Knopf daneben.",
+    points: [
+      "Du findest ihn neben deinen Maxima und neuen Bestleistungen unter Fortschritt und auf der Seite jeder Übung.",
+      "Auf der Seite einer Übung hat auch jede Zeile der Bestwerte-Tabelle einen, von deinem schwersten Satz bis zu deinem Bestwert für 15 Wiederholungen.",
+      "Ein Tippen macht daraus eine Karte mit dieser Zahl, dem Liftsmith-Logo und der Website im Look der App.",
+      "Poste sie, schick sie oder speichere sie. Die Gewichte lassen sich ausblenden, und dein Name steht nur drauf, wenn du ihn hinzufügst.",
+    ],
+    dyk: "Dein Einladungslink kann mit auf die Karte, und wer damit beitritt, folgt dir zurück.",
+  },
+  "workout-generator": {
+    title: "Schick einem Freund ein Workout, auch ohne App",
+    intro: "Unsere Website hat jetzt einen kostenlosen Trainingsplan-Generator mit derselben Engine wie dein Heute-Bildschirm.",
+    points: [
+      "Auf getliftsmith.com/tools/workout-generator wählst du Geräte, Minuten und was du trainieren willst: Ganzkörper, einen Split oder einen Bereich.",
+      "Er schreibt Sätze, Wiederholungen, Pausen und Aufwärmsätze und sagt, warum jede Übung dabei ist.",
+      "Jedes Workout hat einen eigenen Link. Teil ihn mit einem Freund: Derselbe Link ergibt immer dasselbe Workout.",
+      "In der App starten öffnet es als Routine, bereit zum Speichern oder Starten, mit deinen eigenen Gewichten beim Training.",
+    ],
+    dyk: "Heute macht das jeden Tag für dich und weiß außerdem, was du zuletzt gehoben hast und welche Muskeln sich noch erholen.",
+  },
+  "thirty-day": {
+    title: "Eine Übung am Tag, 30 Tage lang",
+    intro: "Zwölf 30-Tage-Challenges sind da, von Kniebeugen und Liegestützen bis zu Plank und Klimmzügen, jede in drei Stufen.",
+    points: [
+      "Such dir eine unter Tools › 30-Tage-Challenges aus und wähl Einsteiger, Fortgeschritten oder Profi.",
+      "Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft. Mehr oder weniger gemacht? Ändere sie vorher mit − und +.",
+      "Jeder vierte Tag ist ein Ruhetag, und ein verpasster Tag wartet einfach auf dich: Du fängst nie von vorn an.",
+      "Jede Challenge hat eine Seite auf unserer Website mit einem Kalender zum Ausdrucken für den Kühlschrank.",
+    ],
+    dyk: "Challenge-Tage sind keine Trainings, sie ändern also nie deinen Plan, deine Serie oder dein Wochenziel.",
+  },
+  "printable-plans": {
+    title: "Ein Training auf einer Seite drucken",
+    intro:
+      "Jedes Programm und jede Routine lässt sich jetzt auf einer Seite drucken, mit Kästchen zum Ausfüllen und einem QR-Code zurück in die App.",
+    points: [
+      "Öffne eine deiner Routinen und tippe auf „Routine drucken“. Das Blatt zeigt jede Übung mit Sätzen, Wiederholungen und Pause und dem Gewicht, das fürs nächste Mal geplant ist.",
+      "Trag ein, was du hebst, in die vier Spalten für die Einheiten, eine pro Training.",
+      "Jede Programmseite auf der Website hat ein kostenloses PDF zum Herunterladen, in zehn Sprachen.",
+      "Der QR-Code auf deinem Blatt fügt die gleiche Routine bei allen hinzu, die ihn scannen. Deine Gewichte und Notizen bleiben bei dir.",
+    ],
+    dyk: "Auf dem Handy kann das Druckfenster das Blatt auch als PDF speichern, praktisch zum Weiterschicken.",
   },
 };

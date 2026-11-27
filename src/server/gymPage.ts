@@ -18,6 +18,7 @@ import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
 import * as gp from "@/locales/text/gp";
 
+import { km } from "./gymAddress";
 import { AREA_PINS, areaMapPath } from "./gymMedia";
 import { gymIndexable, type City, type Place } from "./gymPlaces";
 import { NEAR_HEAD, NEAR_STYLE, nearSection } from "./gymsNear";
@@ -156,7 +157,7 @@ export function hoursHtml(raw: string, lang: MsgLang): string {
 
 // --- One gym ---
 
-function equipmentHtml(p: Place, lang: MsgLang): string {
+export function equipmentHtml(p: Pick<Place, "code">, lang: MsgLang): string {
   const kit = p.code ? decodeGym(p.code) : null;
   if (!kit || !kit.equipment.length) return `<p class="muted">${esc(say(lang, "gp.equipmentNone"))}</p>`;
   const order = (e: Equipment) => EQUIPMENT.indexOf(e);
@@ -181,10 +182,71 @@ function chainLine(p: Place, lang: MsgLang): string {
   return `<p class="people">${icon("gym", 18)}<span>${esc(say(lang, "gp.chainPart", { chain: p.chain.name }))} · <a href="/gym-chains/${esc(p.chain.slug)}/">${esc(all)}</a></span></p>`;
 }
 
+/** Countries that give road distances in miles. */
+const MILES = new Set(["US", "GB", "LR", "MM"]);
+
+/** "1.2 km" or "0.8 mi", in the reader's language and the gym's country's unit. */
+export function distanceText(kmAway: number, country: string, lang: MsgLang): string {
+  const miles = MILES.has(country.toUpperCase());
+  const value = miles ? kmAway / 1.609344 : kmAway;
+  return new Intl.NumberFormat(lang, {
+    style: "unit",
+    unit: miles ? "mile" : "kilometer",
+    maximumFractionDigits: value < 10 ? 1 : 0,
+  }).format(value);
+}
+
+/** The other gyms in the city, closest to this one first, each with how far it is. */
+export function closestOthers(p: Place, nearby: Place[], count = 8): { place: Place; km: number }[] {
+  return nearby
+    .filter((x) => x.id !== p.id && x.kind === "gym")
+    .map((x) => ({ place: x, km: km(p, x) }))
+    .sort((a, b) => a.km - b.km || a.place.name.localeCompare(b.place.name))
+    .slice(0, count);
+}
+
+/**
+ * A few plain sentences about this gym built only from its own facts: where it is, the chain it belongs to, when it's
+ * open and the closest other gym (Search Console, 2026-11-27: gym pages were mostly the same template words, so Google
+ * left many in "Crawled - currently not indexed"). Each is a whole catalogue line (gp.sum*); the first is also the page's
+ * meta description, so a search result says something true about this gym rather than the same line for every gym.
+ */
+export function gymSummary(p: Place, others: { place: Place; km: number }[], lang: MsgLang): string[] {
+  const city = p.city || cityName(p);
+  const n = new Intl.NumberFormat(lang);
+  const out = [
+    p.address ? say(lang, "gp.sumAt", { name: p.name, address: p.address, city }) : say(lang, "gp.sumIn", { name: p.name, city }),
+  ];
+  if (p.chain && p.chain.places > 1) out.push(say(lang, "gp.sumChain", { count: n.format(p.chain.places), chain: p.chain.name }));
+  const week = parseHours(p.hours);
+  if (week) {
+    const open = week.filter((d) => d.length).length;
+    if (allDay(week)) out.push(say(lang, "gp.sumAllDay"));
+    else if (open === 7) out.push(say(lang, "gp.sumEveryDay"));
+    else if (open > 1) out.push(say(lang, "gp.sumDays", { count: n.format(open) }));
+  }
+  const near = others[0];
+  if (near && near.km <= 50) out.push(say(lang, "gp.sumNear", { gym: near.place.name, distance: distanceText(near.km, p.country, lang) }));
+  return out;
+}
+
+/** As many of the summary's sentences as fit a search result's description (158 characters), '' when none does. */
+export function fitDescription(sentences: string[], max = 158): string {
+  let out = "";
+  for (const x of sentences) {
+    const next = out ? `${out} ${x}` : x;
+    if (next.length > max) break;
+    out = next;
+  }
+  return out;
+}
+
 export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
   const city = cityName(p);
   const title = `${say(lang, "gp.title", { name: p.name, city: p.city || city })} | Liftsmith`;
-  const desc = say(lang, "gp.description", { name: p.name, city: p.city || city });
+  const closest = closestOthers(p, nearby);
+  const summary = gymSummary(p, closest, lang);
+  const desc = fitDescription(summary) || say(lang, "gp.description", { name: p.name, city: p.city || city });
   const path = gymPath(p);
   const week = parseHours(p.hours);
   const ld = {
@@ -243,6 +305,7 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
 ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="${esc(say(lang, "gp.logoAlt", { name: p.name }))}" width="64" height="64">` : ""}<p class="kicker">${esc(say(lang, "gp.kicker"))}</p>
 <h1 id="gym-h"><span>${esc(p.name)}</span>${p.official ? officialMark(lang) : ""}</h1>
 <p class="muted where">${icon("pin", 18)}<span>${esc([p.address, city].filter(Boolean).join(", "))}</span></p>
+<p class="about">${esc(summary.join(" "))}</p>
 <p class="status ${p.official ? "on" : ""}">${esc(p.official ? say(lang, "gp.officialNote") : say(lang, "gp.unofficial"))}</p>
 <p class="people">${icon("people", 18)}<span>${esc(liftersLine(p, lang))}</span></p>${chainLine(p, lang)}
 <a class="btn btn-primary wide" href="${esc(appGymPath(p.id))}">${icon("plus", 18)}${esc(say(lang, "gp.add"))}</a>
@@ -302,10 +365,9 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
         .map((x) => `<li>${esc(say(lang, `gp.issue.${x.kind}`, { item: equipName(lang, x.equipment) }))}</li>`)
         .join("")}</ul><p class="muted small">${esc(say(lang, "gp.issuesNote"))}</p></section>`
     : "";
-  const others = nearby.filter((x) => x.id !== p.id && x.kind === "gym").slice(0, 8);
-  const more = others.length
+  const more = closest.length
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
-<ul class="list">${others.map((x) => listItem(x, lang)).join("")}</ul><a class="quiet" href="${esc(cityPath(p.citySlug))}">${esc(say(lang, "gp.cityTitle", { city }))} ›</a></section>`
+<ul class="list">${closest.map((x) => listItem(x.place, lang, undefined, say(lang, "gp.away", { distance: distanceText(x.km, p.country, lang) }))).join("")}</ul><a class="quiet" href="${esc(cityPath(p.citySlug))}">${esc(say(lang, "gp.cityTitle", { city }))} ›</a></section>`
     : "";
   // Anyone can say the page is wrong, closed, listed twice or not a gym (gymReportPage.ts, gymPlaceReports.ts).
   const reportLink = `<p class="report-link"><a class="quiet" href="${esc(`${gymPath(p)}report/`)}" rel="nofollow">${icon("flag", 16)}${esc(say(lang, "gp.reportLink"))}</a></p>`;
@@ -341,6 +403,11 @@ const classClock = (hhmm: string, lang: MsgLang) => {
 /** The gym's week of classes, Monday first; dates off show under the class until they're past. */
 export function classesHtml(classes: readonly GymClass[], lang: MsgLang): string {
   if (!classes.length) return "";
+  return `<section class="card" aria-labelledby="classes-h"><h2 id="classes-h">${icon("calendar", 16)}${esc(say(lang, "gp.classesTitle"))}</h2><p class="muted small">${esc(say(lang, "gp.classesLocal"))} ${esc(say(lang, "gp.classBook"))}</p>${classDaysHtml(classes, lang)}</section>`;
+}
+
+/** The week itself, one heading per day with classes (also the website widget's, gymWidgets.ts). */
+export function classDaysHtml(classes: readonly GymClass[], lang: MsgLang): string {
   const names = dayNames(lang);
   const days = timetable(classes)
     .map(({ weekday, classes: list }) => {
@@ -359,16 +426,19 @@ export function classesHtml(classes: readonly GymClass[], lang: MsgLang): string
       return `<div class="cl-day"><h3>${esc(names[(weekday + 6) % 7]!)}</h3><ul class="classes">${items}</ul></div>`;
     })
     .join("");
-  return `<section class="card" aria-labelledby="classes-h"><h2 id="classes-h">${icon("calendar", 16)}${esc(say(lang, "gp.classesTitle"))}</h2><p class="muted small">${esc(say(lang, "gp.classesLocal"))} ${esc(say(lang, "gp.classBook"))}</p>${days}</section>`;
+  return days;
 }
 
 const dayName = (at: number, lang: MsgLang) =>
   new Intl.DateTimeFormat(lang, { month: "short", day: "numeric", timeZone: "UTC" }).format(at);
 
-function listItem(p: Place, lang: MsgLang, pin?: number): string {
-  const sub = [p.address, p.lifters > 0 ? liftersLine(p, lang) : ""].filter(Boolean).join(" · ");
+/** `away`: how far it is from the gym whose page this is ("1.2 km"). A gym page that isn't offered to search engines
+ * (gymIndexable) is linked with `nofollow`, so crawlers spend their visits on the pages that are (Search Console,
+ * 2026-11-27: thousands of linked noindex gym pages sat in "Excluded by noindex"). */
+function listItem(p: Place, lang: MsgLang, pin?: number, away = ""): string {
+  const sub = [away, p.address, p.lifters > 0 ? liftersLine(p, lang) : ""].filter(Boolean).join(" · ");
   const badge = pin ? `<span class="pin" aria-hidden="true">${pin}</span>` : "";
-  return `<li><a href="${esc(gymPath(p))}"><span class="li-name">${badge}${esc(p.name)}${p.official ? officialMark(lang) : ""}</span>${sub ? `<span class="muted small">${esc(sub)}</span>` : ""}</a></li>`;
+  return `<li><a href="${esc(gymPath(p))}"${gymIndexable(p) ? "" : ' rel="nofollow"'}><span class="li-name">${badge}${esc(p.name)}${p.official ? officialMark(lang) : ""}</span>${sub ? `<span class="muted small">${esc(sub)}</span>` : ""}</a></li>`;
 }
 
 // --- A city ---
@@ -496,6 +566,7 @@ export const GYM_STYLE = `
 @media (min-width:960px){.grid{grid-template-columns:400px minmax(0,1fr);gap:28px}.grid>.col:first-child{position:sticky;top:88px}}
 .hero h1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:1.75rem;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin:6px 0 8px;overflow-wrap:anywhere}
 .tick{display:inline-flex;color:var(--accent);flex:none}
+.about{margin-top:12px}
 .where,.people{display:flex;gap:8px;align-items:flex-start;margin-top:8px}.where svg,.people svg{flex:none;margin-top:2px}
 .status{margin-top:12px;font-size:.875rem;color:var(--muted)}.status.on{color:var(--accent);font-weight:600}
 .wide{width:100%;margin-top:18px}.add-note{margin-top:10px}
