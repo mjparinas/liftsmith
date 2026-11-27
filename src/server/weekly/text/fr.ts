@@ -1127,4 +1127,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "La planification reste sur le téléphone : Machine occupée et Modifier le plan attendent son retour.",
   },
+  "share-stats": {
+    title: "Partagez les chiffres dont vous êtes le plus fier",
+    intro: "Chaque max estimé, série la plus lourde et record personnel a maintenant un petit bouton de partage à côté.",
+    points: [
+      "Il est à côté de vos max et de vos nouveaux records dans Progrès, et sur la page de chaque exercice.",
+      "Sur la page d’un exercice, chaque ligne du tableau des records en a un aussi, de votre série la plus lourde à votre meilleur sur 15 répétitions.",
+      "Un toucher crée une carte avec ce chiffre, le logo Liftsmith et le site, au style de l’app.",
+      "Publiez-la, envoyez-la ou enregistrez-la. Vous pouvez masquer les poids, et votre nom n’apparaît que si vous l’ajoutez.",
+    ],
+    dyk: "Votre lien d’invitation peut figurer sur la carte : un ami qui s’inscrit avec lui vous suit en retour.",
+  },
 };

@@ -475,6 +475,10 @@ export const tr: FeaturesText = {
       body: "Ekran görüntüsü al, antrenman kartlarından oluşan bir sayfa açılsın: son ay, üç ay, altı ay, yıl ya da tüm zamanlar; toplamlar, setlerin nereye gittiği veya en iyi kaldırışların olarak. Aralarında kaydır, gözle ağırlıkları gizle ve davet bağlantın kartın üstünde basılı olarak paylaş. Aynı kartlar İlerleme'deki Antrenmanımı paylaş altında. Paylaştığın her bağlantı artık davetini taşıyor, bunu söyleyen bir bağlantıyla.",
       note: "Ekran görüntüleri bunu Android 14 ve sonrasında ve iPhone'da açar, kapatılabilir. Başka yerlerde İlerleme'den aç. 18 yaş altı, davet bağlantısı olmadan paylaşır.",
     },
+    "share-stats": {
+      name: "Her rekoru ve maksimumu paylaş",
+      body: "Tahmini maksimumlarının, en ağır setinin, her tekrar sayısındaki rekorunun ve son kişisel rekorlarının yanında küçük bir paylaş düğmesi var. Tek dokunuş, o sayıyla, Liftsmith logosu ve web sitesiyle uygulamanın görünümünde bir kart yapar; paylaşmaya ya da kaydetmeye hazır.",
+    },
     coaching: {
       name: "Danışan çalıştır",
       body: "Danışanlarını bağla, sonuçlarını gör ve onlara rutin ata; telefonda ya da geniş ekranda.",

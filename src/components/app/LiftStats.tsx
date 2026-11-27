@@ -18,11 +18,13 @@ import {
 } from "@/lib/liftStats";
 import { fmtTonnage, tonnage } from "@/lib/moments";
 import type { OneRm } from "@/lib/onerm";
+import { maxShare } from "@/lib/shareCards";
 import type { Exercise, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 
 import { StatsNeeded } from "./BodyStats";
 import { clock } from "./format";
+import { ShareStat } from "./ShareStat";
 import { HUE } from "./theme";
 import { Chip, Section, StatTile } from "./ui";
 
@@ -55,11 +57,17 @@ export function LiftTotalsCard({
   max,
   unit,
   kind,
+  name,
+  heaviestKg = 0,
 }: {
   totals: LiftTotals;
   max: OneRm | null;
   unit: Unit;
   kind: "loaded" | "bodyweight" | "timed";
+  /** The exercise's name, for the share button's spoken label. */
+  name?: string;
+  /** The heaviest set's weight (kg), shown on the max's share card. */
+  heaviestKg?: number;
 }) {
   if (!totals.sets) return null;
   const ton = kind !== "timed" && totals.volumeKg > 0 ? tonnage(totals.volumeKg).last : null;
@@ -75,7 +83,22 @@ export function LiftTotalsCard({
         {kind !== "timed" && (kind === "bodyweight" || !max) && (
           <StatTile label={t("lift.tile.reps")} value={num(totals.reps)} icon="repeat" tint={HUE.mint} />
         )}
-        {max && <StatTile label={t("lift.tile.e1rm")} value={kg(max.e1rm, unit)} icon="target" tint={HUE.violet} info="e1rm" />}
+        {max && (
+          <StatTile
+            label={t("lift.tile.e1rm")}
+            value={kg(max.e1rm, unit)}
+            icon="target"
+            tint={HUE.violet}
+            info="e1rm"
+            action={
+              <ShareStat
+                className="-my-3 -mr-3"
+                label={t("card.pick.max", { name: name ?? "" })}
+                items={(ctx) => [maxShare(max, heaviestKg > 0 ? { weight: heaviestKg } : null, ctx)]}
+              />
+            }
+          />
+        )}
       </div>
       <p className="mt-2 text-sm text-muted">
         {totals.firstAt !== null && t("lift.since", { date: date(totals.firstAt, { month: "long", year: "numeric" }) })}

@@ -414,6 +414,10 @@ export const fr: FeaturesText = {
       body: "Faites une capture d’écran et une feuille de cartes d’entraînement s’ouvre : votre dernier mois, trois mois, six mois, l’année ou depuis le début, en totaux, en répartition de vos séries ou en meilleures charges. Faites-les défiler, masquez les poids avec l’œil et partagez avec votre lien d’invitation imprimé sur la carte. Les mêmes cartes sont dans Partager mon entraînement, sur Progrès. Chaque lien que vous partagez porte désormais votre invitation, dans un lien qui le dit.",
       note: "Les captures l’ouvrent sur Android 14 et plus et sur iPhone, et on peut la désactiver. Ailleurs, ouvrez-la depuis Progrès. Les moins de 18 ans partagent sans lien d’invitation.",
     },
+    "share-stats": {
+      name: "Partagez un record ou un max",
+      body: "Un petit bouton de partage se trouve à côté de vos max estimés, de votre série la plus lourde, de chaque record par nombre de répétitions et de vos records récents. Un toucher crée une carte avec ce chiffre, le logo Liftsmith et le site, au style de l’app, prête à publier ou à enregistrer.",
+    },
     coaching: {
       name: "Coacher des clients",
       body: "Associez des clients, voyez leurs résultats et attribuez-leur des routines, sur le téléphone ou sur grand écran.",

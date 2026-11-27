@@ -46,6 +46,13 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.32.0",
+    day: "2026-11-28",
+    headline:
+      "Share any best or max: a small button beside your estimated maxes, heaviest sets and personal bests makes a card in the app's look",
+    changes: [{ id: "shareStats", kind: "new", icon: "share" }],
+  },
+  {
     version: "0.31.0",
     day: "2026-11-27",
     headline:

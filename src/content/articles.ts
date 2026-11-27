@@ -54,6 +54,7 @@ import { BLOG_SCREENSHOT_SHARE } from "./blog/screenshotShare";
 import { BLOG_SEARCH_TOPICS } from "./blog/searchTopics";
 import { BLOG_SEASONS } from "./blog/seasons";
 import { BLOG_SETTINGS_SEARCH } from "./blog/settingsSearch";
+import { BLOG_SHARE_STATS } from "./blog/shareStats";
 import { BLOG_SITE_PAGES } from "./blog/sitePages";
 import { BLOG_T } from "./blog/t";
 import { BLOG_TEAM_SESSION } from "./blog/teamSession";
@@ -274,6 +275,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_REHAB_PHASES,
   ...BLOG_COACH_PROGRAMS,
   ...BLOG_SCREENSHOT_SHARE,
+  ...BLOG_SHARE_STATS,
   ...BLOG_FORM_CUES,
   ...BLOG_AUTO_SUPERSETS,
   ...BLOG_CLUB_CHAT,

@@ -17,7 +17,7 @@ import { fmtNum, fromKg } from "./units";
 // - weights (kg or lb) appear only while the lifter leaves "Show weights" on;
 // - the name appears only when they turn "Show my name" on (off by default).
 
-export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge" | "anniversary" | "stats";
+export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge" | "anniversary" | "stats" | "max" | "best";
 
 export interface ShareOptions {
   /** Show weights lifted (kg or lb). On by default. */
@@ -136,6 +136,67 @@ export function prShare(p: Pr, previous: Pr | null, ctx: ShareContext): Shareabl
         name: o.name,
       };
     },
+  };
+}
+
+/**
+ * A lift's estimated one-rep max, from the exercise page and Progress (Melvin, 2026-11-27: "a subtle share button"
+ * on each stat). The number is the one the screen shows (oneRm, built on estimate()), and the heaviest set rides
+ * along as a tile when there is one. Without weights the card says how many workouts the lift has had instead.
+ */
+export function maxShare(
+  m: { exerciseId: string; e1rm: number; sessions: number; basis?: { weight: number; reps: number; at: number } },
+  heaviest: { weight: number } | null,
+  ctx: ShareContext,
+): Shareable {
+  const ex = exercise(m.exerciseId);
+  return {
+    id: `max-${m.exerciseId}`,
+    kind: "max",
+    label: t("card.pick.max", { name: ex.name }),
+    figure: m.exerciseId,
+    file: `liftsmith-max-${m.exerciseId}`,
+    card: (o) => ({
+      kicker: m.basis ? `${t("card.kicker.max")} · ${date(m.basis.at, { month: "long", day: "numeric" })}` : t("card.kicker.max"),
+      headline: ex.name,
+      big: o.weights
+        ? {
+            value: w(m.e1rm, ctx.unit),
+            label: m.basis ? t("card.max.basis", { weight: w(m.basis.weight, ctx.unit), reps: m.basis.reps }) : undefined,
+          }
+        : { value: t("card.shot.workouts", { count: m.sessions, n: fmtNum(m.sessions) }) },
+      tiles: o.weights && heaviest && heaviest.weight > 0 ? [[t("card.best.top"), w(heaviest.weight, ctx.unit)]] : [],
+      lines: [],
+      footer: footer(ctx.game),
+      accent: ctx.accent,
+      name: o.name,
+    }),
+  };
+}
+
+/**
+ * The heaviest weight lifted for at least `reps` reps (one row of the exercise page's bests; reps 1 is the
+ * heaviest set of all). Without weights it says the rep count and that it's a best.
+ */
+export function repBestShare(exerciseId: string, b: { reps: number; weight: number; at: number }, ctx: ShareContext): Shareable {
+  const ex = exercise(exerciseId);
+  const label = b.reps <= 1 ? t("card.best.top") : t("card.best.reps", { count: b.reps, n: fmtNum(b.reps) });
+  return {
+    id: `best-${exerciseId}-${b.reps}`,
+    kind: "best",
+    label: `${t("card.pick.best", { name: ex.name })} · ${label}`,
+    figure: exerciseId,
+    file: `liftsmith-best-${exerciseId}-${b.reps}`,
+    card: (o) => ({
+      kicker: `${t("card.kicker.best")} · ${date(b.at, { month: "long", day: "numeric", year: "numeric" })}`,
+      headline: ex.name,
+      big: o.weights ? { value: w(b.weight, ctx.unit), label } : { value: t("card.reps", { count: b.reps, n: fmtNum(b.reps) }), label },
+      tiles: [],
+      lines: [],
+      footer: footer(ctx.game),
+      accent: ctx.accent,
+      name: o.name,
+    }),
   };
 }
 
