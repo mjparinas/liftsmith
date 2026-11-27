@@ -20,7 +20,14 @@ export const es: SiteText = {
     startFree: "Empezar",
     tagline: "Tu próxima serie, ya planificada.",
     footerBlurb: "Entrenamiento de fuerza adaptativo para Android, iPhone y la web. Sin anuncios, nunca.",
-    cols: { product: "Producto", learn: "Aprende", tools: "Herramientas", support: "Ayuda", company: "Empresa" },
+    cols: {
+      product: "Producto",
+      learn: "Aprende",
+      tools: "Herramientas",
+      support: "Ayuda",
+      company: "Empresa",
+      exercises: "Guías de ejercicios",
+    },
     links: {
       openApp: "Abrir la app",
       features: "Funciones",

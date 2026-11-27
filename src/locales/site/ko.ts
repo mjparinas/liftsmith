@@ -26,6 +26,7 @@ export const ko: SiteText = {
       tools: "도구",
       support: "지원",
       company: "회사",
+      exercises: "운동 가이드",
     },
     links: {
       openApp: "앱 열기",

@@ -1056,7 +1056,7 @@ export const PT_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Hipertrofia:** 3 séries de 8 a 12 por braço."],
     variations: [
-      ["db-chest-supported-row", "Os dois braços, com o peito num banco inclinado."],
+      ["chest-supported-row", "Os dois braços, com o peito num banco inclinado."],
       ["kb-row", "Com um kettlebell."],
       ["seal-row", "Deitado num banco alto: bem estrita."],
     ],
@@ -1227,6 +1227,280 @@ export const PT_GUIDES: Record<string, ExerciseGuide> = {
     faq: [
       ["A rosca Scott é melhor que a rosca em pé?", "Ela é mais estrita e carrega mais a posição alongada. As duas desenvolvem o bíceps."],
       ["Por que dói lá embaixo?", "Use menos peso e vá mais devagar. Pare antes de estender tudo se os cotovelos reclamarem."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "No power clean, você puxa uma barra do chão e a recebe na frente dos ombros num só movimento rápido. Ele desenvolve potência explosiva do quadril para o esporte e os saltos, e trabalha juntos glúteos, posteriores de coxa, trapézio e parte de cima das costas.",
+    mistakes: [
+      [
+        "Puxar com os braços cedo demais",
+        "Mantenha os braços longos, como cordas, até quadril e joelhos estenderem. Depois encolha os ombros e entre embaixo da barra.",
+      ],
+      [
+        "Deixar a barra se afastar do corpo",
+        "Mantenha a barra perto a ponto de raspar nas coxas. Se ela faz um arco para a frente, tira seu equilíbrio.",
+      ],
+      ["Receber com os cotovelos baixos", "Jogue os cotovelos para a frente, rápido, para a barra cair nos ombros e não nas mãos."],
+    ],
+    sets: [
+      "**Potência:** 4 a 6 séries de 2 a 3, com descanso completo. Encerre a série quando as repetições ficarem lentas.",
+      "**Para aprender:** 5 séries de 2 com a barra vazia ou anilhas leves, começando suspenso.",
+    ],
+    variations: [
+      ["hang-clean", "A partir das coxas: o jeito mais fácil de aprender a recepção."],
+      ["db-hang-clean", "Com halteres, quando não há barra nem anilhas de borracha."],
+      ["clean-and-jerk", "Some o arremesso acima da cabeça: o levantamento olímpico completo."],
+    ],
+    faq: [
+      [
+        "O power clean é bom para iniciantes?",
+        "Sim, se você aprender leve. Comece suspenso com a barra vazia e só aumente o peso enquanto a barra passar perto e a recepção for limpa. Tiros e [saltos na caixa](/exercises/box-jump/) também desenvolvem potência enquanto você aprende.",
+      ],
+      [
+        "Qual a diferença entre power clean e clean?",
+        "No power clean você recebe a barra acima da paralela, num quarto de agachamento. No clean completo você desce num agachamento frontal fundo, que permite mais peso mas exige mais mobilidade.",
+      ],
+      [
+        "Dá para fazer power clean em casa?",
+        "Só com barra, anilhas de borracha e um piso que aguente a barra caindo. Sem isso, tente o [hang clean com halteres](/exercises/db-hang-clean/) ou o [swing com kettlebell](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "No levantamento terra romeno com halteres, você dobra o quadril com um halter em cada mão e desce os pesos pelas pernas até sentir alongar os posteriores de coxa. Ele constrói posteriores e glúteos com menos peso que a barra, e dá para fazer em casa com um par de halteres.",
+    mistakes: [
+      [
+        "Dobrar os joelhos como num agachamento",
+        "Mantenha uma leve flexão dos joelhos que não muda, e empurre o quadril em direção à parede atrás de você.",
+      ],
+      [
+        "Arredondar as costas para descer mais",
+        "Pare onde os posteriores estiverem totalmente alongados, em geral logo abaixo do joelho. A amplitude vem do quadril, não da coluna.",
+      ],
+      ["Deixar os halteres irem para a frente", "Deslize-os rente às coxas e às canelas. Quanto mais longe, mais a lombar trabalha."],
+    ],
+    sets: [
+      "**Hipertrofia:** 3 a 4 séries de 8 a 12, descendo em uns três segundos.",
+      "**Em casa com halteres leves:** 3 séries de 15 a 20, ou numa perna só.",
+    ],
+    variations: [
+      ["romanian-deadlift", "Com barra, para cargas maiores."],
+      ["db-single-leg-rdl", "Uma perna por vez, para o equilíbrio e o dobro da carga por perna."],
+      ["kb-romanian-deadlift", "Um kettlebell segurado com as duas mãos."],
+    ],
+    faq: [
+      [
+        "Quais músculos o terra romeno com halteres trabalha?",
+        "Principalmente posteriores de coxa e glúteos, com a lombar segurando a coluna e os antebraços segurando os halteres. Ele carrega os posteriores enquanto estão alongados, o que é ótimo para crescer.",
+      ],
+      [
+        "Terra romeno com halteres ou com barra?",
+        "Os dois trabalham os mesmos músculos. A barra permite mais peso; os halteres são mais rápidos de montar, poupam os punhos e servem em casa. Escolha o que você consegue carregar o bastante para 8 a 12 repetições pesadas.",
+      ],
+      [
+        "Qual deve ser o peso dos halteres?",
+        "Pesado o bastante para as duas últimas repetições de cada série serem difíceis com as costas retas. Se a pegada falhar antes, use straps ou passe para a [versão com barra](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "Na extensão lombar, você desce o tronco sobre um apoio e sobe de novo até o corpo ficar reto. Ela fortalece lombar, glúteos e posteriores de coxa com pouca carga na coluna, e combina bem com agachamentos e levantamentos terra pesados.",
+    mistakes: [
+      ["Arquear muito em cima", "Pare quando o corpo formar uma linha reta. Passar disso aperta a lombar sem trabalhar nada a mais."],
+      ["Quicar embaixo", "Desça devagar e suba sem tranco. O embalo tira o trabalho dos músculos."],
+      ["Apoio alto demais", "Ajuste logo abaixo dos ossos do quadril, para dobrar o quadril livremente."],
+    ],
+    sets: [
+      "**Músculo e força:** 3 séries de 10 a 15, segurando uma anilha ou halter quando 15 ficar fácil.",
+      "**Saúde das costas:** 2 a 3 séries de 15 a 20 repetições lentas, ou uma [isometria](/exercises/back-extension-hold/) de 20 a 30 segundos.",
+    ],
+    variations: [
+      ["weighted-back-extension", "Segure um peso contra o peito para ficar mais difícil."],
+      ["back-extension-hold", "Segure a posição reta em vez de se mover."],
+      ["reverse-hyper-bench", "As pernas se movem em vez do tronco."],
+    ],
+    faq: [
+      [
+        "A extensão lombar faz bem para a lombar?",
+        "Sim. Feita devagar até a linha reta, dá resistência aos músculos ao longo da coluna, que aguentam melhor dias longos e levantamentos pesados. Evite durante uma dor forte nas costas e procure um profissional se não passar.",
+      ],
+      [
+        "A extensão lombar trabalha os glúteos?",
+        "Sim. Arredonde um pouco a parte de cima das costas, vire as pontas dos pés para fora e contraia os glúteos para subir: assim os glúteos trabalham mais que a lombar.",
+      ],
+      [
+        "O que fazer sem o banco de extensão?",
+        "O [hip thrust](/exercises/hip-thrust/) ou o [terra romeno](/exercises/romanian-deadlift/) trabalham os mesmos músculos, e deitado de bruços levantando o peito você trabalha a lombar sem equipamento.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "No pull-through no cabo, você fica de costas para uma polia baixa, dobra o quadril com a corda entre as pernas e empurra o quadril para a frente para ficar de pé. Ele ensina a dobrar o quadril e trabalha glúteos e posteriores sem carregar a coluna, ótimo para iniciantes e costas cansadas.",
+    mistakes: [
+      [
+        "Agachar em vez de dobrar o quadril",
+        "Leve o quadril reto para trás com as canelas quase na vertical. Os joelhos dobram só um pouco.",
+      ],
+      ["Puxar com os braços", "Os braços só seguram a corda. Fique de pé empurrando o quadril para a frente."],
+      ["Inclinar para trás em cima", "Termine alto, com glúteos contraídos e costelas baixas, não com a lombar arqueada."],
+    ],
+    sets: [
+      "**Hipertrofia:** 3 séries de 12 a 15, contraindo um segundo em cima.",
+      "**Para aprender a dobrar o quadril:** 2 a 3 séries leves de 10 antes do terra ou dos swings.",
+    ],
+    variations: [
+      ["band-pull-through", "Com um elástico preso embaixo, para casa."],
+      ["kb-swing", "O mesmo empurrão do quadril, rápido, com kettlebell."],
+      ["hip-thrust", "Mais carga para os glúteos, com as costas num banco."],
+    ],
+    faq: [
+      [
+        "Quais músculos o pull-through no cabo trabalha?",
+        "Glúteos e posteriores de coxa. O cabo puxa você para trás, então os glúteos trabalham até o topo, onde o terra fica fácil.",
+      ],
+      [
+        "Pull-through ou swing com kettlebell?",
+        "O pull-through é mais lento e fácil de aprender; o swing é mais rápido e soma condicionamento. Aprenda a dobrar o quadril no pull-through e depois some os [swings](/exercises/kb-swing/).",
+      ],
+      ["A que distância do cabo devo ficar?", "Uns dois passos grandes, para o peso não encostar na pilha embaixo a cada repetição."],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "No abdominal infra, você deita de costas e enrola o quadril do chão em direção ao peito. Ele trabalha o abdômen, com mais trabalho na parte de baixo da barriga, sem forçar o pescoço. Não precisa de equipamento.",
+    mistakes: [
+      ["Balançar as pernas", "Mantenha os joelhos dobrados no mesmo ângulo e levante o quadril com o abdômen em vez de jogar as pernas."],
+      [
+        "Não tirar o quadril do chão",
+        "A repetição conta quando o cóccix sai do chão. Só trazer os joelhos trabalha mais os flexores do quadril.",
+      ],
+      ["Descer de uma vez", "Desça em dois a três segundos. A descida lenta faz metade do trabalho."],
+    ],
+    sets: [
+      "**Abdômen:** 3 séries de 10 a 15 repetições lentas.",
+      "**Mais difícil:** num banco declinado, ou avance para a [elevação de pernas na barra](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "Num banco, segurando a borda, para mais amplitude."],
+      ["cable-reverse-crunch", "Um cabo acrescenta peso que você pode aumentar."],
+      ["hanging-leg-raise", "Pendurado numa barra: a versão mais difícil."],
+    ],
+    faq: [
+      [
+        "O abdominal infra trabalha o abdômen inferior?",
+        "Ele trabalha o reto abdominal inteiro, que vai das costelas à pelve. Enrolar a pelve exige mais da parte de baixo, por isso você sente embaixo.",
+      ],
+      [
+        "Abdominal infra ou abdominal comum?",
+        "O infra poupa o pescoço e é mais difícil de roubar no embalo. Um abdominal infra e uma [prancha](/exercises/plank/) juntos cobrem bem o abdômen.",
+      ],
+      [
+        "O abdominal infra vai deixar minha barriga chapada?",
+        "Ele fortalece o abdômen, mas perder gordura depende do que você come e de quanto se mexe no geral, não de treinar um ponto.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "No voador, você senta numa máquina e junta duas alças num arco na frente do peito. A máquina guia o caminho, então você pode trabalhar forte o peitoral sem equilibrar pesos: um final seguro depois dos supinos.",
+    mistakes: [
+      ["Ombros indo para a frente", "Mantenha o peito alto e as escápulas para trás, contra o encosto, a série toda."],
+      ["Banco alto ou baixo demais", "Ajuste para as alças ficarem na altura do peito e os cotovelos um pouco abaixo dos ombros."],
+      ["Deixar a pilha bater", "Pare logo antes de as placas se tocarem, para o peito ficar sob tensão entre as repetições."],
+    ],
+    sets: [
+      "**Hipertrofia:** 3 séries de 10 a 15, contraindo um segundo quando as mãos se encontram.",
+      "**Finalização:** 1 a 2 séries de 15 a 20 depois dos supinos.",
+    ],
+    variations: [
+      ["cable-fly", "No cabo, para um caminho livre e mais alongamento."],
+      ["db-fly", "Com halteres num banco reto."],
+      ["single-arm-pec-deck", "Um braço por vez, para igualar os lados."],
+    ],
+    faq: [
+      [
+        "Quais músculos o voador trabalha?",
+        "Principalmente o peitoral. Ele treina a função do peitoral de trazer os braços para a frente do corpo, com pouca ajuda do tríceps, ao contrário de um supino.",
+      ],
+      [
+        "Voador ou crucifixo no cabo?",
+        "Os dois funcionam bem. O voador é mais fácil de ajustar e muito estável; o cabo deixa mudar o ângulo. Use o que estiver livre na sua academia.",
+      ],
+      [
+        "O voador faz mal para os ombros?",
+        "Não, com uma amplitude sensata. Pare o alongamento quando os cotovelos ficarem alinhados com o corpo, não muito atrás, e mantenha as escápulas para trás.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "No desenvolvimento na máquina, você senta contra um encosto e empurra duas alças acima da cabeça num caminho fixo. Ele trabalha a frente dos ombros e o tríceps sem precisar de equilíbrio, então dá para chegar perto da falha com segurança.",
+    mistakes: [
+      ["Desgrudar do encosto", "Mantenha costas e cabeça no encosto. Se precisar arquear para terminar, o peso está alto demais."],
+      [
+        "Banco mal ajustado",
+        "Ajuste para as alças começarem na altura dos ombros. Baixo demais força o ombro embaixo; alto demais corta a amplitude.",
+      ],
+      ["Quicar em cima", "Empurre sem tranco até os braços quase estenderem e desça com controle."],
+    ],
+    sets: ["**Hipertrofia:** 3 a 4 séries de 8 a 12.", "**Depois do desenvolvimento com pesos livres:** 2 séries de 12 a 15."],
+    variations: [
+      ["db-shoulder-press", "Com halteres, cada braço por conta própria."],
+      ["overhead-press", "O desenvolvimento em pé com barra, o exercício de força."],
+      ["single-arm-shoulder-press-machine", "Um braço por vez na mesma máquina."],
+    ],
+    faq: [
+      [
+        "Quais músculos o desenvolvimento na máquina trabalha?",
+        "Principalmente o deltoide anterior e o tríceps, com ajuda do deltoide lateral. Para ombros mais largos, some a [elevação lateral](/exercises/lateral-raise/).",
+      ],
+      [
+        "Desenvolvimento na máquina ou com halteres?",
+        "A máquina é mais fácil de aprender e de forçar com segurança; os halteres treinam o equilíbrio e deixam cada braço livre. Os dois constroem ombros.",
+      ],
+      [
+        "Que pegada devo usar?",
+        "A neutra (palmas uma para a outra) é mais gentil com a maioria dos ombros. Use a pronada se ela for confortável.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "No pulldown com braços estendidos, você fica de frente para uma polia alta e leva uma barra até as coxas com os braços quase retos. Ele isola as dorsais sem ajuda do bíceps: um bom aquecimento para a barra fixa e um jeito fácil de sentir as dorsais trabalhando.",
+    mistakes: [
+      [
+        "Dobrar os cotovelos",
+        "Mantenha uma leve flexão que não muda. Se os cotovelos dobram mais a cada repetição, vira um tríceps na polia.",
+      ],
+      ["Usar o corpo todo", "Incline um pouco e segure essa posição. Os braços se movem; o tronco não."],
+      ["Cortar a amplitude em cima", "Deixe os braços subirem até sentir as dorsais alongarem, depois desça."],
+    ],
+    sets: [
+      "**Hipertrofia:** 3 séries de 12 a 15.",
+      "**Aquecimento para puxadas:** 2 séries leves de 15 antes da barra fixa ou das remadas.",
+    ],
+    variations: [
+      ["rope-straight-arm-pulldown", "Com corda, para as mãos passarem do quadril."],
+      ["db-pullover", "Deitado num banco com um halter."],
+      ["band-straight-arm-pulldown", "Com um elástico preso no alto, para casa."],
+    ],
+    faq: [
+      [
+        "Quais músculos o pulldown com braços estendidos trabalha?",
+        "Principalmente as dorsais, com a cabeça longa do tríceps e o abdômen segurando braços e tronco parados.",
+      ],
+      [
+        "Pulldown com braços estendidos ou puxada frontal?",
+        "A [puxada frontal](/exercises/lat-pulldown/) é para trabalho mais pesado e treina também o bíceps; o pulldown com braços estendidos isola as dorsais. Os dois combinam bem no mesmo treino.",
+      ],
+      [
+        "Barra ou corda?",
+        "A barra reta é mais estável. A corda deixa as mãos se afastarem e passarem do quadril, o que dá um pouco mais de amplitude.",
+      ],
     ],
   },
 };

@@ -26,6 +26,7 @@ export const pt: SiteText = {
       tools: "Ferramentas",
       support: "Suporte",
       company: "Empresa",
+      exercises: "Guias de exercícios",
     },
     links: {
       openApp: "Abrir o app",

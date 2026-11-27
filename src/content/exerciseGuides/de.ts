@@ -1089,7 +1089,7 @@ export const DE_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Muskelaufbau:** 3 Sätze mit 8 bis 12 pro Arm."],
     variations: [
-      ["db-chest-supported-row", "Beide Arme, Brust auf einer Schrägbank."],
+      ["chest-supported-row", "Beide Arme, Brust auf einer Schrägbank."],
       ["kb-row", "Mit einer Kettlebell."],
       ["seal-row", "Bäuchlings auf einer hohen Bank: sehr sauber."],
     ],
@@ -1274,6 +1274,298 @@ export const DE_GUIDES: Record<string, ExerciseGuide> = {
       [
         "Warum tut es unten weh?",
         "Nimm weniger Gewicht und werd langsamer. Hör vor dem vollen Durchstrecken auf, wenn sich die Ellbogen melden.",
+      ],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "Beim Power Clean ziehst du eine Langhantel vom Boden und fängst sie in einer schnellen Bewegung vorn auf den Schultern. Die Übung baut explosive Hüftkraft für Sport und Sprünge auf und trainiert Gesäß, hintere Oberschenkel, Trapez und oberen Rücken zusammen.",
+    mistakes: [
+      [
+        "Zu früh mit den Armen ziehen",
+        "Halt die Arme lang wie Seile, bis Hüfte und Knie gestreckt sind. Dann zieh die Schultern hoch und tauch unter die Stange.",
+      ],
+      [
+        "Die Stange vom Körper wegschwingen",
+        "Halt die Stange so nah, dass sie die Oberschenkel streift. Schwingt sie nach vorn, bringt sie dich aus dem Gleichgewicht.",
+      ],
+      [
+        "Mit tiefen Ellbogen fangen",
+        "Bring die Ellbogen schnell nach vorn, damit die Stange auf den Schultern landet und nicht in den Händen.",
+      ],
+    ],
+    sets: [
+      "**Schnellkraft:** 4 bis 6 Sätze mit 2 bis 3 Wiederholungen und voller Pause. Beende den Satz, wenn die Wiederholungen langsamer werden.",
+      "**Zum Lernen:** 5 Sätze mit 2 Wiederholungen mit leerer Stange oder leichten Scheiben, zuerst aus dem Hang.",
+    ],
+    variations: [
+      ["hang-clean", "Von den Oberschenkeln aus: so lernst du das Fangen am leichtesten."],
+      ["db-hang-clean", "Mit Kurzhanteln, wenn es keine Stange oder Gummischeiben gibt."],
+      ["clean-and-jerk", "Mit dem Ausstoßen über Kopf: die ganze olympische Übung."],
+    ],
+    faq: [
+      [
+        "Ist der Power Clean etwas für Anfänger?",
+        "Ja, wenn du ihn leicht lernst. Fang aus dem Hang mit leerer Stange an und leg nur Gewicht auf, solange die Stange nah bleibt und das Fangen sauber ist. Sprints und [Box Jumps](/exercises/box-jump/) bauen beim Lernen ebenfalls Schnellkraft auf.",
+      ],
+      [
+        "Was ist der Unterschied zwischen Power Clean und Clean?",
+        "Beim Power Clean fängst du die Stange über der Parallelen, in einer Viertelkniebeuge. Beim vollen Clean gehst du in eine tiefe Frontkniebeuge, was mehr Gewicht erlaubt, aber mehr Beweglichkeit braucht.",
+      ],
+      [
+        "Kann ich Power Cleans zu Hause machen?",
+        "Nur mit Langhantel, Gummischeiben und einem Boden, der eine fallen gelassene Stange aushält. Sonst probier den [Hang Clean mit Kurzhanteln](/exercises/db-hang-clean/) oder den [Kettlebell Swing](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "Beim rumänischen Kreuzheben mit Kurzhanteln klappst du mit einer Hantel in jeder Hand in der Hüfte ab und führst sie an den Beinen hinunter, bis die hinteren Oberschenkel dehnen. Es baut hintere Oberschenkel und Gesäß mit weniger Gewicht als eine Langhantel auf und klappt zu Hause mit einem Paar Kurzhanteln.",
+    mistakes: [
+      [
+        "Die Knie wie bei einer Kniebeuge beugen",
+        "Halt eine leichte Kniebeugung, die gleich bleibt, und schieb die Hüfte zur Wand hinter dir.",
+      ],
+      [
+        "Den Rücken rund machen, um tiefer zu kommen",
+        "Stopp, wenn die hinteren Oberschenkel voll gedehnt sind, meist knapp unter dem Knie. Die Bewegung kommt aus der Hüfte, nicht aus der Wirbelsäule.",
+      ],
+      [
+        "Die Hanteln nach vorn wandern lassen",
+        "Lass sie an Oberschenkeln und Schienbeinen entlanggleiten. Je weiter sie weg sind, desto mehr arbeitet der untere Rücken.",
+      ],
+    ],
+    sets: [
+      "**Muskelaufbau:** 3 bis 4 Sätze mit 8 bis 12, etwa drei Sekunden absenken.",
+      "**Zu Hause mit leichten Hanteln:** 3 Sätze mit 15 bis 20, oder einbeinig.",
+    ],
+    variations: [
+      ["romanian-deadlift", "Mit Langhantel, für schwerere Lasten."],
+      ["db-single-leg-rdl", "Einbeinig, für Gleichgewicht und doppelte Last pro Bein."],
+      ["kb-romanian-deadlift", "Eine Kettlebell in beiden Händen."],
+    ],
+    faq: [
+      [
+        "Welche Muskeln trainiert rumänisches Kreuzheben mit Kurzhanteln?",
+        "Vor allem hintere Oberschenkel und Gesäß; der untere Rücken hält die Wirbelsäule still und die Unterarme halten die Hanteln. Es belastet die hinteren Oberschenkel in der Dehnung, was gut für den Muskelaufbau ist.",
+      ],
+      [
+        "Rumänisches Kreuzheben mit Kurz- oder Langhantel?",
+        "Beide trainieren dieselben Muskeln. Mit der Langhantel geht mehr Gewicht; Kurzhanteln sind schneller bereit, schonen die Handgelenke und gehen zu Hause. Nimm das, womit du genug Gewicht für 8 bis 12 harte Wiederholungen hast.",
+      ],
+      [
+        "Wie schwer sollten die Hanteln sein?",
+        "So schwer, dass die letzten zwei Wiederholungen jedes Satzes hart sind, während der Rücken gerade bleibt. Gibt der Griff zuerst nach, nimm Zughilfen oder wechsle zur [Langhantel](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "Beim Rückenstrecker senkst du den Oberkörper über ein Polster ab und hebst ihn wieder, bis der Körper gerade ist. Die Übung stärkt unteren Rücken, Gesäß und hintere Oberschenkel bei wenig Last auf der Wirbelsäule und passt gut zu schweren Kniebeugen und Kreuzheben.",
+    mistakes: [
+      [
+        "Oben stark ins Hohlkreuz gehen",
+        "Stopp, wenn dein Körper eine gerade Linie bildet. Weiter staucht nur den unteren Rücken, ohne mehr zu trainieren.",
+      ],
+      ["Unten federn", "Senk langsam ab und komm gleichmäßig hoch. Schwung nimmt den Muskeln die Arbeit ab."],
+      ["Polster zu hoch eingestellt", "Stell es knapp unter die Hüftknochen, damit du frei in der Hüfte abklappen kannst."],
+    ],
+    sets: [
+      "**Muskeln und Kraft:** 3 Sätze mit 10 bis 15, mit Scheibe oder Kurzhantel, sobald 15 leicht sind.",
+      "**Gesunder Rücken:** 2 bis 3 Sätze mit 15 bis 20 langsamen Wiederholungen, oder 20 bis 30 Sekunden [Halten](/exercises/back-extension-hold/).",
+    ],
+    variations: [
+      ["weighted-back-extension", "Halt ein Gewicht vor der Brust, um es schwerer zu machen."],
+      ["back-extension-hold", "Halt die gerade Position, statt dich zu bewegen."],
+      ["reverse-hyper-bench", "Die Beine bewegen sich statt des Oberkörpers."],
+    ],
+    faq: [
+      [
+        "Ist der Rückenstrecker gut für den unteren Rücken?",
+        "Ja. Langsam bis zur geraden Linie gemacht, gibt er den Muskeln entlang der Wirbelsäule Ausdauer, damit sie lange Tage und schwere Übungen besser halten. Lass ihn bei akuten Rückenschmerzen weg und geh zu Fachleuten, wenn es nicht besser wird.",
+      ],
+      [
+        "Trainiert der Rückenstrecker das Gesäß?",
+        "Ja. Mach den oberen Rücken leicht rund, dreh die Füße nach außen und spann beim Hochkommen das Gesäß an, dann arbeitet das Gesäß mehr als der untere Rücken.",
+      ],
+      [
+        "Was mache ich ohne Rückenstreckerbank?",
+        "[Hip Thrust](/exercises/hip-thrust/) und [rumänisches Kreuzheben](/exercises/romanian-deadlift/) trainieren dieselben Muskeln, und in Bauchlage die Brust anheben trainiert den unteren Rücken ohne Geräte.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "Beim Pull-through am Kabelzug stehst du mit dem Rücken zu einem tiefen Kabel, klappst mit dem Seil zwischen den Beinen in der Hüfte ab und schiebst die Hüfte nach vorn, um aufzustehen. Die Übung lehrt das Abklappen in der Hüfte und trainiert Gesäß und hintere Oberschenkel ohne Last auf der Wirbelsäule, gut für Anfänger und müde Rücken.",
+    mistakes: [
+      [
+        "In die Hocke gehen statt abzuklappen",
+        "Schieb die Hüfte gerade nach hinten und halt die Schienbeine fast senkrecht. Die Knie beugen sich nur wenig.",
+      ],
+      ["Mit den Armen ziehen", "Die Arme halten nur das Seil. Steh auf, indem du die Hüfte nach vorn schiebst."],
+      ["Oben nach hinten lehnen", "Ende aufrecht mit angespanntem Gesäß und gesenkten Rippen, nicht im Hohlkreuz."],
+    ],
+    sets: [
+      "**Muskelaufbau:** 3 Sätze mit 12 bis 15, oben eine Sekunde anspannen.",
+      "**Abklappen lernen:** 2 bis 3 leichte Sätze mit 10 vor Kreuzheben oder Swings.",
+    ],
+    variations: [
+      ["band-pull-through", "Mit einem tief befestigten Band, für zu Hause."],
+      ["kb-swing", "Der gleiche Hüftstoß, schnell, mit Kettlebell."],
+      ["hip-thrust", "Schwereres Gesäßtraining mit dem Rücken auf einer Bank."],
+    ],
+    faq: [
+      [
+        "Welche Muskeln trainiert der Pull-through am Kabelzug?",
+        "Gesäß und hintere Oberschenkel. Das Kabel zieht dich nach hinten, also arbeitet das Gesäß bis ganz oben, wo Kreuzheben leicht wird.",
+      ],
+      [
+        "Pull-through oder Kettlebell Swing?",
+        "Der Pull-through ist langsamer und leichter zu lernen; der Swing ist schneller und bringt Kondition. Lern das Abklappen beim Pull-through und nimm dann [Swings](/exercises/kb-swing/) dazu.",
+      ],
+      [
+        "Wie weit sollte ich vom Kabel weg stehen?",
+        "Etwa zwei große Schritte, damit das Gewicht unten bei jeder Wiederholung nicht auf dem Stapel aufsetzt.",
+      ],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "Beim umgekehrten Crunch liegst du auf dem Rücken und rollst die Hüfte vom Boden zur Brust. Er trainiert die Bauchmuskeln, am meisten unten am Bauch, und belastet den Nacken nicht. Du brauchst keine Geräte.",
+    mistakes: [
+      [
+        "Mit den Beinen schwingen",
+        "Halt die Knie im gleichen Winkel gebeugt und heb die Hüfte mit dem Bauch an, statt die Beine zu werfen.",
+      ],
+      [
+        "Die Hüfte nicht anheben",
+        "Eine Wiederholung zählt, wenn das Steißbein vom Boden abhebt. Nur die Knie heranzuziehen trainiert vor allem die Hüftbeuger.",
+      ],
+      ["Schnell zurückfallen", "Senk in zwei bis drei Sekunden ab. Das langsame Absenken macht die Hälfte der Arbeit."],
+    ],
+    sets: [
+      "**Bauch:** 3 Sätze mit 10 bis 15 langsamen Wiederholungen.",
+      "**Schwerer:** auf einer Schrägbank, oder weiter zum [Beinheben im Hang](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "Auf einer Bank, die Kante festhalten, für mehr Bewegung."],
+      ["cable-reverse-crunch", "Ein Kabel bringt Gewicht, das du steigern kannst."],
+      ["hanging-leg-raise", "An einer Stange hängend: die schwerste Variante."],
+    ],
+    faq: [
+      [
+        "Trainiert der umgekehrte Crunch den unteren Bauch?",
+        "Er trainiert den ganzen geraden Bauchmuskel, der von den Rippen bis zum Becken reicht. Das Einrollen des Beckens belastet den unteren Teil stärker, deshalb spürst du ihn unten.",
+      ],
+      [
+        "Umgekehrter oder normaler Crunch?",
+        "Der umgekehrte Crunch schont den Nacken und lässt sich schwerer mit Schwung schummeln. Ein umgekehrter Crunch und ein [Unterarmstütz](/exercises/plank/) decken den Bauch gut ab.",
+      ],
+      [
+        "Macht der umgekehrte Crunch den Bauch flach?",
+        "Er macht die Bauchmuskeln stärker, aber Fett verlierst du über das Essen und wie aktiv du insgesamt bist, nicht durch Training an einer Stelle.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "Beim Butterfly an der Maschine sitzt du und führst zwei Griffe in einem Bogen vor der Brust zusammen. Die Maschine führt die Bahn, sodass du die Brust hart trainieren kannst, ohne Gewichte auszubalancieren: ein sicherer Abschluss nach dem Drücken.",
+    mistakes: [
+      ["Schultern rollen nach vorn", "Halt die Brust hoch und die Schulterblätter den ganzen Satz hinten am Polster."],
+      ["Sitz zu hoch oder zu tief", "Stell ihn so ein, dass die Griffe auf Brusthöhe sind und die Ellbogen etwas unter den Schultern."],
+      [
+        "Den Stapel aufschlagen lassen",
+        "Stopp kurz bevor die Platten sich berühren, damit die Brust zwischen den Wiederholungen unter Spannung bleibt.",
+      ],
+    ],
+    sets: [
+      "**Muskelaufbau:** 3 Sätze mit 10 bis 15, eine Sekunde anspannen, wenn die Hände sich treffen.",
+      "**Zum Abschluss:** 1 bis 2 Sätze mit 15 bis 20 nach dem Drücken.",
+    ],
+    variations: [
+      ["cable-fly", "Am Kabelzug, für eine freie Bahn und mehr Dehnung."],
+      ["db-fly", "Mit Kurzhanteln auf einer Flachbank."],
+      ["single-arm-pec-deck", "Ein Arm nach dem anderen, um die Seiten auszugleichen."],
+    ],
+    faq: [
+      [
+        "Welche Muskeln trainiert der Butterfly an der Maschine?",
+        "Vor allem die Brust. Er trainiert ihre Aufgabe, die Arme vor den Körper zu führen, mit wenig Hilfe vom Trizeps, anders als beim Drücken.",
+      ],
+      [
+        "Butterfly-Maschine oder Kabelzug-Flys?",
+        "Beides funktioniert gut. Die Maschine ist schneller eingestellt und sehr stabil; am Kabelzug kannst du den Winkel ändern. Nimm, was in deinem Studio frei ist.",
+      ],
+      [
+        "Ist der Butterfly schlecht für die Schultern?",
+        "Nicht mit vernünftigem Bewegungsweg. Beende die Dehnung, wenn die Ellbogen auf einer Linie mit dem Körper sind, nicht weit dahinter, und halt die Schulterblätter hinten.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "Bei der Schulterpresse an der Maschine sitzt du an einem Rückenpolster und drückst zwei Griffe auf einer festen Bahn über den Kopf. Sie trainiert die vorderen Schultern und den Trizeps ohne Balancieren, sodass du sicher nah ans Muskelversagen gehen kannst.",
+    mistakes: [
+      [
+        "Vom Polster weg ins Hohlkreuz",
+        "Halt Rücken und Kopf am Polster. Musst du für die Wiederholung ins Hohlkreuz, ist das Gewicht zu schwer.",
+      ],
+      [
+        "Sitz falsch eingestellt",
+        "Stell ihn so ein, dass die Griffe etwa auf Schulterhöhe starten. Zu tief belastet die Schulter unten; zu hoch verkürzt den Weg.",
+      ],
+      ["Oben federn", "Drück gleichmäßig bis zu fast gestreckten Armen und senk kontrolliert ab."],
+    ],
+    sets: ["**Muskelaufbau:** 3 bis 4 Sätze mit 8 bis 12.", "**Nach freiem Drücken:** 2 Sätze mit 12 bis 15."],
+    variations: [
+      ["db-shoulder-press", "Mit Kurzhanteln, jeder Arm für sich."],
+      ["overhead-press", "Stehendes Drücken mit der Langhantel, die Kraftübung."],
+      ["single-arm-shoulder-press-machine", "Ein Arm nach dem anderen an derselben Maschine."],
+    ],
+    faq: [
+      [
+        "Welche Muskeln trainiert die Schulterpresse an der Maschine?",
+        "Vor allem die vorderen Schultern und den Trizeps, unterstützt von den seitlichen Schultern. Für breiter wirkende Schultern nimm [Seitheben](/exercises/lateral-raise/) dazu.",
+      ],
+      [
+        "Schulterpresse an der Maschine oder mit Kurzhanteln?",
+        "Die Maschine ist leichter zu lernen und sicher hart zu fahren; Kurzhanteln trainieren das Gleichgewicht und lassen jeden Arm frei. Beide bauen die Schultern auf.",
+      ],
+      [
+        "Welche Griffe soll ich nehmen?",
+        "Die neutralen (Handflächen zueinander) schonen die meisten Schultern. Nimm die Obergriffe, wenn sie sich gut anfühlen.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "Beim Überzug mit gestreckten Armen am Kabelzug stehst du vor einem hohen Kabel und führst eine Stange mit fast gestreckten Armen zu den Oberschenkeln. Er isoliert den Latissimus ohne Hilfe vom Bizeps: gut zum Aufwärmen für Klimmzüge und ein einfacher Weg, den Latissimus arbeiten zu spüren.",
+    mistakes: [
+      [
+        "Die Ellbogen beugen",
+        "Halt eine leichte Beugung, die gleich bleibt. Beugen sich die Ellbogen jede Wiederholung mehr, wird daraus Trizepsdrücken.",
+      ],
+      ["Den ganzen Körper einsetzen", "Klapp leicht ab und halt die Position. Die Arme bewegen sich, der Oberkörper nicht."],
+      ["Oben den Weg abkürzen", "Lass die Arme hochgehen, bis du den Latissimus dehnen spürst, dann führ sie nach unten."],
+    ],
+    sets: ["**Muskelaufbau:** 3 Sätze mit 12 bis 15.", "**Aufwärmen fürs Ziehen:** 2 leichte Sätze mit 15 vor Klimmzügen oder Rudern."],
+    variations: [
+      ["rope-straight-arm-pulldown", "Mit Seil, damit die Hände an den Hüften vorbei enden können."],
+      ["db-pullover", "Auf einer Bank liegend mit einer Kurzhantel."],
+      ["band-straight-arm-pulldown", "Mit einem hoch befestigten Band, für zu Hause."],
+    ],
+    faq: [
+      [
+        "Welche Muskeln trainiert der Überzug mit gestreckten Armen?",
+        "Vor allem den Latissimus; der lange Trizepskopf und der Bauch halten Arme und Oberkörper still.",
+      ],
+      [
+        "Überzug mit gestreckten Armen oder Latziehen?",
+        "[Latziehen](/exercises/lat-pulldown/) ist für schwerere Arbeit, die auch den Bizeps trainiert; der Überzug isoliert den Latissimus. Beide passen gut in ein Training.",
+      ],
+      [
+        "Stange oder Seil?",
+        "Eine gerade Stange ist stabiler. Mit dem Seil gehen die Hände auseinander und an den Hüften vorbei, was etwas mehr Weg bringt.",
       ],
     ],
   },
