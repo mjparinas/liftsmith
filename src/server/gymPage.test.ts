@@ -6,6 +6,7 @@ import { makeTestGym } from "@/test/factories";
 import { resetDb, run } from "./db";
 import {
   cityHtml,
+  distanceText,
   goneHtml,
   gymHtml,
   gymSitemapIndexXml,
@@ -126,6 +127,49 @@ describe("a gym's page", () => {
     expect(html).toContain('<dt>Saturday</dt><dd><span class="muted">Closed</span></dd>');
     expect(hoursHtml("by appointment", "en")).toBe("<p>by appointment</p>");
     expect(hoursHtml("", "en")).toContain("Hours not listed yet.");
+  });
+});
+
+describe("what a gym's page says of its own (Search Console, 2026-11-27)", () => {
+  it("opens with sentences built from the gym's own facts, also its search description", async () => {
+    const p = (await placeBySlug("langley-bc", "steve-nash-fitness-world"))!;
+    const html = gymHtml(p, await cityPlaces("langley-bc"), "en");
+    const about =
+      "Steve Nash &#60;Fitness&#62; World is a gym at 19925 Willowbrook Drive, Langley. It’s open every day of the week. The closest other gym is Planet Fitness, 1.9 km away.";
+    expect(html).toContain(`<p class="about">${about}</p>`);
+    // The search description takes as many of those sentences as fit in 158 characters.
+    expect(html).toContain(
+      '<meta name="description" content="Steve Nash &#60;Fitness&#62; World is a gym at 19925 Willowbrook Drive, Langley. It’s open every day of the week.">',
+    );
+    // The other gyms come closest first, each with how far it is.
+    expect(html).toContain("1.9 km away</span>");
+  });
+
+  it("says a chain's size and round-the-clock hours, in the reader's language", async () => {
+    const p = (await placeBySlug("langley-bc", "planet-fitness"))!;
+    const html = gymHtml({ ...p, chain: { slug: "planet-fitness", name: "Planet Fitness", places: 2431 } }, [], "fr");
+    expect(html).toMatch(/C’est l’une des 2\s431 salles Planet Fitness\./);
+    expect(html).toContain("Elle est ouverte 24 h/24, tous les jours.");
+  });
+
+  it("gives distances in miles where the country uses them", () => {
+    expect(distanceText(1.609344, "US", "en")).toBe("1 mi");
+    expect(distanceText(12.34, "CA", "en")).toBe("12 km");
+    expect(distanceText(0.45, "de", "de")).toBe("0,5 km");
+  });
+
+  it("links gym pages that aren't offered to search engines with nofollow", async () => {
+    await savePlaces(
+      placesFromOsm([{ type: "node", id: 9, lat: 49.11, lon: -122.66, tags: { leisure: "fitness_centre", name: "Bare Gym" } }], {
+        city: "Langley",
+        region: "BC",
+        country: "CA",
+      }),
+      NOW,
+    );
+    const html = cityHtml("langley-bc", await cityPlaces("langley-bc"), "en");
+    expect(html).toContain('href="/gyms/langley-bc/bare-gym/" rel="nofollow"');
+    expect(html).toContain('href="/gyms/langley-bc/planet-fitness/"><span');
   });
 });
 
