@@ -49,6 +49,7 @@ import { Icon } from "./icons";
 import { useMyShape } from "./myShape";
 import { go, goBack } from "./router";
 import { muscleHue } from "./theme";
+import { TimerBar } from "./TimerBar";
 import { Button, Chip, EmptyState, InlineSwitch, ScreenHeader, Sheet, SwitchRow } from "./ui";
 
 type Mode = "warmup" | "cooldown" | "rest" | "picked";
@@ -596,12 +597,14 @@ function Player({
           <span className="ml-1 text-base font-semibold tracking-normal text-muted">s</span>
         </div>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-line" aria-hidden>
-        <div
-          className={`h-full rounded-full transition-[width] duration-200 ${ready ? "bg-cyan" : "bg-accent"}`}
-          style={{ width: `${100 - (left / segMs) * 100}%` }}
-        />
-      </div>
+      <TimerBar
+        className="mt-3 h-2"
+        from={endsAt - segMs}
+        to={endsAt}
+        paused={paused}
+        at={paused ? endsAt - left : undefined}
+        fill={ready ? "bg-cyan" : "bg-accent"}
+      />
       {ready && (
         <Button className="mt-4 w-full" onClick={startHold}>
           {t("str.startNow")}

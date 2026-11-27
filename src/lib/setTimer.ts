@@ -52,6 +52,16 @@ export function timerAt(spec: TimerSpec, ms: number): TimerState {
   return { phase: "done", at: lead + 2 * work + sw };
 }
 
+/**
+ * When the clock on `side` starts and reaches the target, as ms after the timer's start, so the bar under the clock
+ * fills smoothly between the two instead of once a second.
+ */
+export function sideSpan(spec: TimerSpec, side: 1 | 2): { from: number; to: number } {
+  const work = Math.max(1, Math.round(spec.target)) * SEC;
+  const from = LEAD_SEC * SEC + (side === 2 ? work + SWITCH_SEC * SEC : 0);
+  return { from, to: from + work };
+}
+
 /** How long a timer takes to run out (null for a count-up, which runs until the set is logged). */
 export function timerLength(spec: TimerSpec): number | null {
   if (spec.up) return null;

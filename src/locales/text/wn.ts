@@ -158,6 +158,8 @@ export const en = {
   "wn.c.watchAlone.title": "Leave your phone in the locker",
   "wn.c.watchAlone.body":
     "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
+  "wn.c.smoothBar.title": "Timer bars fill smoothly",
+  "wn.c.smoothBar.body": "The bar under a hold or stretch timer now fills smoothly instead of jumping once a second.",
   "wn.c.watchSecond.title": "Watch timers match your phone",
   "wn.c.watchSecond.body":
     "Rest and hold timers on Wear OS, Apple Watch and Garmin now turn over on the same second as your phone, instead of up to a second behind.",
@@ -375,6 +377,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
   "wn.c.watchAlone.body":
     "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
+  "wn.c.smoothBar.title": "Las barras del temporizador avanzan suaves",
+  "wn.c.smoothBar.body":
+    "La barra bajo el temporizador de una retención o un estiramiento ahora se llena de forma continua, sin saltos cada segundo.",
   "wn.c.watchSecond.title": "Los temporizadores del reloj van con tu teléfono",
   "wn.c.watchSecond.body":
     "El descanso y los temporizadores de las isometrías en Wear OS, Apple Watch y Garmin cambian en el mismo segundo que tu teléfono, en vez de hasta un segundo después.",
@@ -594,6 +599,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
   "wn.c.watchAlone.body":
     "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
+  "wn.c.smoothBar.title": "Les barres de minuteur avancent en douceur",
+  "wn.c.smoothBar.body":
+    "La barre sous le minuteur d’un maintien ou d’un étirement se remplit maintenant en continu, sans sauter chaque seconde.",
   "wn.c.watchSecond.title": "Les minuteurs de la montre suivent ton téléphone",
   "wn.c.watchSecond.body":
     "Le repos et les minuteurs des gainages sur Wear OS, Apple Watch et Garmin changent à la même seconde que ton téléphone, au lieu d'avoir jusqu'à une seconde de retard.",
@@ -809,6 +817,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Lass dein Handy im Spind",
   "wn.c.watchAlone.body":
     "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
+  "wn.c.smoothBar.title": "Timer-Balken laufen flüssig",
+  "wn.c.smoothBar.body":
+    "Der Balken unter dem Timer für Halteübungen und Dehnungen füllt sich jetzt flüssig, statt jede Sekunde zu springen.",
   "wn.c.watchSecond.title": "Die Timer der Uhr laufen mit dem Handy",
   "wn.c.watchSecond.body":
     "Pause und Halte-Timer auf Wear OS, Apple Watch und Garmin springen jetzt in derselben Sekunde wie dein Handy um, statt bis zu einer Sekunde später.",
@@ -1024,6 +1035,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
   "wn.c.watchAlone.body":
     "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
+  "wn.c.smoothBar.title": "Le barre del timer scorrono fluide",
+  "wn.c.smoothBar.body":
+    "La barra sotto il timer di una tenuta o di un allungamento ora si riempie in modo continuo, senza scatti ogni secondo.",
   "wn.c.watchSecond.title": "I timer dell'orologio vanno col telefono",
   "wn.c.watchSecond.body":
     "Il recupero e i timer delle tenute su Wear OS, Apple Watch e Garmin cambiano nello stesso secondo del telefono, invece che fino a un secondo dopo.",
@@ -1228,6 +1242,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "スマホはロッカーに",
   "wn.c.watchAlone.body":
     "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
+  "wn.c.smoothBar.title": "タイマーのバーがなめらかに",
+  "wn.c.smoothBar.body": "キープやストレッチのタイマーの下のバーが、1秒ごとに跳ばずになめらかに進むようになりました。",
   "wn.c.watchSecond.title": "ウォッチのタイマーがスマホと一致",
   "wn.c.watchSecond.body":
     "Wear OS、Apple Watch、Garminの休憩タイマーとホールドのタイマーが、最大1秒遅れることなく、スマホと同じ瞬間に切り替わります。",
@@ -1438,6 +1454,8 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Deixe o celular no armário",
   "wn.c.watchAlone.body":
     "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
+  "wn.c.smoothBar.title": "As barras do timer andam suave",
+  "wn.c.smoothBar.body": "A barra embaixo do timer de isometria ou alongamento agora enche de forma contínua, sem pular a cada segundo.",
   "wn.c.watchSecond.title": "Os timers do relógio batem com o celular",
   "wn.c.watchSecond.body":
     "O descanso e os timers de isometria no Wear OS, Apple Watch e Garmin agora viram no mesmo segundo que o celular, em vez de até um segundo depois.",
@@ -1636,6 +1654,8 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "휴대폰은 사물함에",
   "wn.c.watchAlone.body":
     "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
+  "wn.c.smoothBar.title": "타이머 막대가 부드럽게 차요",
+  "wn.c.smoothBar.body": "버티기와 스트레칭 타이머 아래 막대가 1초마다 뛰지 않고 부드럽게 차올라요.",
   "wn.c.watchSecond.title": "워치 타이머가 휴대폰과 맞아요",
   "wn.c.watchSecond.body": "Wear OS, Apple Watch, Garmin의 휴식 타이머와 버티기 타이머가 최대 1초 늦지 않고 휴대폰과 같은 순간에 넘어가요.",
   "wn.c.printRoutine.title": "루틴을 한 장으로 인쇄",
@@ -1843,6 +1863,8 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Zostaw telefon w szafce",
   "wn.c.watchAlone.body":
     "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
+  "wn.c.smoothBar.title": "Paski minutnika płyną płynnie",
+  "wn.c.smoothBar.body": "Pasek pod minutnikiem przytrzymania lub rozciągania wypełnia się teraz płynnie, bez skoków co sekundę.",
   "wn.c.watchSecond.title": "Minutniki na zegarku zgadzają się z telefonem",
   "wn.c.watchSecond.body":
     "Przerwa i minutniki utrzymań na Wear OS, Apple Watch i Garminie zmieniają się w tej samej sekundzie co telefon, a nie do sekundy później.",
@@ -2054,6 +2076,8 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
   "wn.c.watchAlone.body":
     "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",
+  "wn.c.smoothBar.title": "Zamanlayıcı çubukları akıcı doluyor",
+  "wn.c.smoothBar.body": "Tutuş ve esneme zamanlayıcısının altındaki çubuk artık her saniye zıplamadan akıcı şekilde doluyor.",
   "wn.c.watchSecond.title": "Saatteki zamanlayıcılar telefonla aynı",
   "wn.c.watchSecond.body":
     "Wear OS, Apple Watch ve Garmin'deki dinlenme ve tutma zamanlayıcıları artık bir saniyeye kadar geride kalmadan telefonunla aynı saniyede değişiyor.",

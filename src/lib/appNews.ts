@@ -59,6 +59,7 @@ export const RELEASES: readonly AppRelease[] = [
       { id: "gymWidgets", kind: "new", icon: "link" },
       { id: "printRoutine", kind: "new", icon: "print" },
       { id: "watchSecond", kind: "fixed", icon: "watch" },
+      { id: "smoothBar", kind: "better", icon: "hourglass" },
     ],
   },
   {
