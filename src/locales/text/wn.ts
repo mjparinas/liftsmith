@@ -152,6 +152,9 @@ export const en = {
   "wn.c.shareStats.title": "Share any best or max",
   "wn.c.shareStats.body":
     "Tap the small share button beside an estimated max, your heaviest set, a best for a rep count or a recent personal best to post a card of it with the Liftsmith logo.",
+  "wn.c.thirtyDay.title": "30-day challenges",
+  "wn.c.thirtyDay.body":
+    "Squats, push-ups, planks, pull-ups and eight more, at three levels. Join one in Tools and Today shows the day's number with a one-tap Done; a missed day waits for you.",
   "wn.c.watchAlone.title": "Leave your phone in the locker",
   "wn.c.watchAlone.body":
     "Today's plan is already on your Wear OS, Apple Watch or Garmin watch. Tap Start on watch, log every set on the wrist, and it's saved when your phone is near again.",
@@ -360,6 +363,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Comparte cualquier récord o máximo",
   "wn.c.shareStats.body":
     "Toca el pequeño botón de compartir junto a un máximo estimado, tu serie más pesada, un récord por repeticiones o un récord reciente para publicar una tarjeta con el logotipo de Liftsmith.",
+  "wn.c.thirtyDay.title": "Retos de 30 días",
+  "wn.c.thirtyDay.body":
+    "Sentadillas, flexiones, plancha, dominadas y ocho más, en tres niveles. Únete a uno en Herramientas y Hoy te muestra la cifra del día con un Hecho de un toque; un día perdido te espera.",
   "wn.c.watchAlone.title": "Deja el móvil en la taquilla",
   "wn.c.watchAlone.body":
     "El plan de hoy ya está en tu reloj Wear OS, Apple Watch o Garmin. Toca Empezar en el reloj, registra cada serie en la muñeca y se guarda cuando el móvil vuelve a estar cerca.",
@@ -570,6 +576,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Partagez un record ou un max",
   "wn.c.shareStats.body":
     "Touchez le petit bouton de partage à côté d’un max estimé, de votre série la plus lourde, d’un record par répétitions ou d’un record récent pour publier une carte avec le logo Liftsmith.",
+  "wn.c.thirtyDay.title": "Défis de 30 jours",
+  "wn.c.thirtyDay.body":
+    "Squats, pompes, gainage, tractions et huit autres, sur trois niveaux. Rejoignez-en un dans Outils : Aujourd’hui affiche le chiffre du jour avec un bouton Fait, et un jour manqué vous attend.",
   "wn.c.watchAlone.title": "Laisse ton téléphone au casier",
   "wn.c.watchAlone.body":
     "Le plan du jour est déjà sur ta montre Wear OS, Apple Watch ou Garmin. Touche Démarrer sur la montre, note chaque série au poignet, et tout est enregistré quand ton téléphone est de nouveau près.",
@@ -776,6 +785,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Jede Bestleistung und jedes Maximum teilen",
   "wn.c.shareStats.body":
     "Tippe auf den kleinen Teilen-Knopf neben einem geschätzten Maximum, deinem schwersten Satz, einer Bestleistung je Wiederholungszahl oder einer neuen Bestleistung, um eine Karte mit dem Liftsmith-Logo zu posten.",
+  "wn.c.thirtyDay.title": "30-Tage-Challenges",
+  "wn.c.thirtyDay.body":
+    "Kniebeugen, Liegestütze, Plank, Klimmzüge und acht weitere, in drei Stufen. Mach unter Tools bei einer mit, und Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft; ein verpasster Tag wartet auf dich.",
   "wn.c.watchAlone.title": "Lass dein Handy im Spind",
   "wn.c.watchAlone.body":
     "Der heutige Plan ist schon auf deiner Wear OS-, Apple Watch- oder Garmin-Uhr. Tippe auf „Auf der Uhr starten“, trag jeden Satz am Handgelenk ein, und alles wird gespeichert, sobald dein Handy wieder in der Nähe ist.",
@@ -982,6 +994,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Condividi ogni record o massimale",
   "wn.c.shareStats.body":
     "Tocca il piccolo pulsante di condivisione accanto a un massimale stimato, alla serie più pesante, a un record per ripetizioni o a un record recente per pubblicare una scheda con il logo di Liftsmith.",
+  "wn.c.thirtyDay.title": "Sfide di 30 giorni",
+  "wn.c.thirtyDay.body":
+    "Squat, piegamenti, plank, trazioni e altre otto, su tre livelli. Partecipa a una da Strumenti e Oggi mostra il numero del giorno con un Fatto a un tocco; un giorno saltato ti aspetta.",
   "wn.c.watchAlone.title": "Lascia il telefono nell'armadietto",
   "wn.c.watchAlone.body":
     "Il piano di oggi è già sul tuo orologio Wear OS, Apple Watch o Garmin. Tocca Inizia sull'orologio, registra ogni serie al polso e tutto viene salvato quando il telefono è di nuovo vicino.",
@@ -1177,6 +1192,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "自己ベストや最大重量をシェア",
   "wn.c.shareStats.body":
     "推定最大重量、最重量セット、回数ごとの自己ベスト、最近の自己ベストの横にある小さなシェアボタンをタップすると、Liftsmithのロゴ入りカードを投稿できます。",
+  "wn.c.thirtyDay.title": "30日チャレンジ",
+  "wn.c.thirtyDay.body":
+    "スクワット、腕立て伏せ、プランク、懸垂など12種類を3つのレベルで。ツールから参加すると、「今日」にその日の回数とワンタップの完了が表示され、できなかった日は待っていてくれます。",
   "wn.c.watchAlone.title": "スマホはロッカーに",
   "wn.c.watchAlone.body":
     "今日のプランはWear OS、Apple Watch、Garminのウォッチにもう入っています。「ウォッチで開始」をタップし、セットを手首で記録すれば、スマホが近くに戻ったときに保存されます。",
@@ -1378,6 +1396,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Compartilhe qualquer recorde ou máximo",
   "wn.c.shareStats.body":
     "Toque no pequeno botão de compartilhar ao lado de um máximo estimado, da sua série mais pesada, de um recorde por repetições ou de um recorde recente para postar um cartão com o logotipo do Liftsmith.",
+  "wn.c.thirtyDay.title": "Desafios de 30 dias",
+  "wn.c.thirtyDay.body":
+    "Agachamento, flexão, prancha, barra fixa e mais oito, em três níveis. Entre em um pelas Ferramentas e Hoje mostra o número do dia com um Feito de um toque; um dia perdido espera por você.",
   "wn.c.watchAlone.title": "Deixe o celular no armário",
   "wn.c.watchAlone.body":
     "O plano de hoje já está no seu relógio Wear OS, Apple Watch ou Garmin. Toque em Começar no relógio, registre cada série no pulso, e tudo é salvo quando o celular estiver por perto de novo.",
@@ -1567,6 +1588,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "최고 기록과 최대 중량 공유",
   "wn.c.shareStats.body":
     "추정 최대 중량, 최고 중량 세트, 반복 횟수별 최고 기록, 최근 개인 기록 옆의 작은 공유 버튼을 누르면 Liftsmith 로고가 담긴 카드를 올릴 수 있습니다.",
+  "wn.c.thirtyDay.title": "30일 챌린지",
+  "wn.c.thirtyDay.body":
+    "스쿼트, 푸시업, 플랭크, 턱걸이 등 12가지를 세 가지 레벨로. 도구에서 참여하면 오늘 화면에 그날의 숫자와 한 번에 누르는 완료가 나오고, 놓친 날은 기다려 줘요.",
   "wn.c.watchAlone.title": "휴대폰은 사물함에",
   "wn.c.watchAlone.body":
     "오늘의 계획이 이미 Wear OS, Apple Watch, Garmin 워치에 있어요. 워치에서 시작을 탭하고 손목에서 세트를 기록하면, 휴대폰이 다시 가까이 올 때 저장돼요.",
@@ -1767,6 +1791,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Udostępnij każdy rekord i maks",
   "wn.c.shareStats.body":
     "Dotknij małego przycisku udostępniania obok szacowanego maksa, najcięższej serii, rekordu dla liczby powtórzeń albo ostatniego rekordu życiowego, by opublikować kartę z logo Liftsmith.",
+  "wn.c.thirtyDay.title": "Wyzwania 30-dniowe",
+  "wn.c.thirtyDay.body":
+    "Przysiady, pompki, deska, podciąganie i osiem innych, na trzech poziomach. Dołącz do jednego w Narzędziach, a ekran Dziś pokaże liczbę dnia z przyciskiem Zrobione; opuszczony dzień poczeka.",
   "wn.c.watchAlone.title": "Zostaw telefon w szafce",
   "wn.c.watchAlone.body":
     "Dzisiejszy plan jest już na zegarku Wear OS, Apple Watch lub Garmin. Dotknij Zacznij na zegarku, zapisuj każdą serię na nadgarstku, a wszystko zapisze się, gdy telefon znów będzie blisko.",
@@ -1969,6 +1996,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.shareStats.title": "Her rekoru ve maksimumu paylaş",
   "wn.c.shareStats.body":
     "Tahmini maksimumun, en ağır setinin, bir tekrar sayısındaki rekorun ya da son kişisel rekorunun yanındaki küçük paylaş düğmesine dokun; Liftsmith logolu bir kart paylaş.",
+  "wn.c.thirtyDay.title": "30 günlük meydan okumalar",
+  "wn.c.thirtyDay.body":
+    "Squat, şınav, plank, barfiks ve sekiz tane daha, üç seviyede. Araçlar'dan birine katıl, Bugün ekranı günün sayısını tek dokunuşla Tamam ile göstersin; kaçırdığın gün seni bekler.",
   "wn.c.watchAlone.title": "Telefonunu dolapta bırak",
   "wn.c.watchAlone.body":
     "Bugünün planı Wear OS, Apple Watch veya Garmin saatinde zaten hazır. Saatte başlat'a dokun, her seti bilekten kaydet; telefonun yeniden yakına gelince kaydedilir.",

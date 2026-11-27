@@ -1156,6 +1156,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Heute macht das jeden Tag für dich und weiß außerdem, was du zuletzt gehoben hast und welche Muskeln sich noch erholen.",
   },
+  "thirty-day": {
+    title: "Eine Übung am Tag, 30 Tage lang",
+    intro: "Zwölf 30-Tage-Challenges sind da, von Kniebeugen und Liegestützen bis zu Plank und Klimmzügen, jede in drei Stufen.",
+    points: [
+      "Such dir eine unter Tools › 30-Tage-Challenges aus und wähl Einsteiger, Fortgeschritten oder Profi.",
+      "Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft. Mehr oder weniger gemacht? Ändere sie vorher mit − und +.",
+      "Jeder vierte Tag ist ein Ruhetag, und ein verpasster Tag wartet einfach auf dich: Du fängst nie von vorn an.",
+      "Jede Challenge hat eine Seite auf unserer Website mit einem Kalender zum Ausdrucken für den Kühlschrank.",
+    ],
+    dyk: "Challenge-Tage sind keine Trainings, sie ändern also nie deinen Plan, deine Serie oder dein Wochenziel.",
+  },
   "printable-plans": {
     title: "Ein Training auf einer Seite drucken",
     intro:

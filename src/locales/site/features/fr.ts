@@ -314,6 +314,10 @@ export const fr: FeaturesText = {
       body: "Cherchez les routines publiées par d'autres selon l'objectif, des mots et ce que votre salle propose, enregistrez-en une d'un geste et notez-la avec des étoiles. Publiez la vôtre depuis son éditeur, avec ou sans votre nom, et elle a sa propre page sur le site. Seuls les exercices et les séries sont partagés, jamais vos charges ni vos notes.",
       note: "Publier demande un compte et 18 ans. Tout le monde peut parcourir.",
     },
+    "thirty-day": {
+      name: "Défis de 30 jours",
+      body: "Douze défis de 30 jours, des squats, pompes et gainage aux tractions et burpees, chacun sur trois niveaux : un mouvement par jour, un peu plus chaque jour, avec un jour de repos tous les quatre jours. Aujourd’hui affiche le chiffre du jour avec un bouton Fait, et un jour manqué vous attend. Chaque défi a sa page sur le site avec un calendrier à imprimer.",
+    },
     "printable-plans": {
       name: "Programmes d'entraînement à imprimer",
       body: "Imprimez n'importe quel programme ou routine sur une page : chaque séance avec ses séries, répétitions et repos, des cases pour noter quatre séances à la main et un code QR qui l'ouvre dans l'app. Chaque page de programme du site a un PDF gratuit en dix langues, et Imprimer la routine dans l'app ajoute les charges prévues pour la prochaine fois.",

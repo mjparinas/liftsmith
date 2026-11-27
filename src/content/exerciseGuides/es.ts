@@ -1011,7 +1011,7 @@ export const ES_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Músculo:** 3 series de 8 a 12 por brazo."],
     variations: [
-      ["db-chest-supported-row", "Los dos brazos, con el pecho en un banco inclinado."],
+      ["chest-supported-row", "Los dos brazos, con el pecho en un banco inclinado."],
       ["kb-row", "Con una pesa rusa."],
       ["seal-row", "Tumbado en un banco alto: muy estricto."],
     ],
@@ -1185,6 +1185,283 @@ export const ES_GUIDES: Record<string, ExerciseGuide> = {
         "Es más estricto y carga más la posición de estiramiento. Los dos construyen bíceps.",
       ],
       ["¿Por qué me duele abajo?", "Baja el peso y ve más despacio. No estires del todo si los codos se quejan."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "La cargada de potencia levanta una barra desde el suelo y la recibe sobre la parte delantera de los hombros en un solo movimiento rápido. Desarrolla potencia de cadera para el deporte y los saltos, y trabaja a la vez glúteos, isquiotibiales, trapecios y espalda alta.",
+    mistakes: [
+      [
+        "Tirar con los brazos antes de tiempo",
+        "Mantén los brazos largos, como cuerdas, hasta estirar caderas y rodillas. Luego encoge los hombros y métete bajo la barra.",
+      ],
+      ["Alejar la barra del cuerpo", "Mantén la barra tan cerca que roce los muslos. Si hace un arco hacia delante, te desequilibra."],
+      ["Recibir con los codos abajo", "Lleva los codos hacia delante rápido para que la barra caiga sobre los hombros y no en las manos."],
+    ],
+    sets: [
+      "**Potencia:** 4 a 6 series de 2 a 3, con descanso completo. Termina la serie cuando las repeticiones se vuelvan lentas.",
+      "**Para aprender:** 5 series de 2 con la barra vacía o discos ligeros, empezando desde colgado.",
+    ],
+    variations: [
+      ["hang-clean", "Desde los muslos: la forma más fácil de aprender la recepción."],
+      ["db-hang-clean", "Con mancuernas, si no hay barra ni discos de goma."],
+      ["clean-and-jerk", "Añade el envión por encima de la cabeza: el levantamiento olímpico completo."],
+    ],
+    faq: [
+      [
+        "¿La cargada de potencia es buena para principiantes?",
+        "Sí, si la aprendes con poco peso. Empieza desde colgado con la barra vacía y sube el peso solo mientras la barra vaya cerca y la recepción sea limpia. Los sprints y los [saltos al cajón](/exercises/box-jump/) también desarrollan potencia mientras aprendes.",
+      ],
+      [
+        "¿Qué diferencia hay entre la cargada de potencia y la cargada?",
+        "En la cargada de potencia recibes la barra por encima de la paralela, en un cuarto de sentadilla. En la cargada completa bajas a una sentadilla frontal profunda, que permite más peso pero pide más movilidad.",
+      ],
+      [
+        "¿Puedo hacer cargadas en casa?",
+        "Solo con barra, discos de goma y un suelo que aguante que la sueltes. Si no, prueba la [cargada colgante con mancuernas](/exercises/db-hang-clean/) o el [swing con kettlebell](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "El peso muerto rumano con mancuernas bisagra la cadera con una mancuerna en cada mano y las baja por las piernas hasta notar el estiramiento de los isquiotibiales. Construye isquiotibiales y glúteos con menos peso que una barra, y se hace en casa con un par de mancuernas.",
+    mistakes: [
+      [
+        "Doblar las rodillas como en una sentadilla",
+        "Mantén una flexión suave de rodillas que no cambie y lleva la cadera hacia la pared de detrás.",
+      ],
+      [
+        "Redondear la espalda para bajar más",
+        "Para donde los isquiotibiales estén estirados del todo, normalmente justo bajo la rodilla. El recorrido sale de la cadera, no de la columna.",
+      ],
+      ["Dejar que las mancuernas se alejen", "Deslízalas pegadas a muslos y espinillas. Cuanto más se alejan, más trabaja la zona lumbar."],
+    ],
+    sets: [
+      "**Músculo:** 3 a 4 series de 8 a 12, bajando en unos tres segundos.",
+      "**En casa con mancuernas ligeras:** 3 series de 15 a 20, o hazlo a una pierna.",
+    ],
+    variations: [
+      ["romanian-deadlift", "Con barra, para cargas más pesadas."],
+      ["db-single-leg-rdl", "A una pierna, para el equilibrio y el doble de carga por pierna."],
+      ["kb-romanian-deadlift", "Una kettlebell sujeta con las dos manos."],
+    ],
+    faq: [
+      [
+        "¿Qué músculos trabaja el peso muerto rumano con mancuernas?",
+        "Sobre todo isquiotibiales y glúteos, con la zona lumbar sujetando la columna y los antebrazos sujetando las mancuernas. Carga los isquiotibiales mientras están estirados, algo muy bueno para que crezcan.",
+      ],
+      [
+        "¿Peso muerto rumano con mancuernas o con barra?",
+        "Los dos trabajan los mismos músculos. La barra permite más peso; las mancuernas se preparan antes, cuidan más las muñecas y sirven en casa. Elige el que puedas cargar lo bastante para 8 a 12 repeticiones duras.",
+      ],
+      [
+        "¿Cuánto deben pesar las mancuernas?",
+        "Lo suficiente para que las dos últimas repeticiones de cada serie cuesten con la espalda recta. Si el agarre falla antes, usa straps o pasa a la [versión con barra](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "Las extensiones lumbares bajan el tronco sobre un apoyo y lo suben hasta que el cuerpo queda recto. Fortalecen la zona lumbar, los glúteos y los isquiotibiales con poca carga en la columna, así que combinan bien con sentadillas y pesos muertos pesados.",
+    mistakes: [
+      ["Arquear mucho arriba", "Para cuando el cuerpo quede en línea recta. Pasar de ahí aprieta la zona lumbar sin trabajar nada más."],
+      ["Rebotar abajo", "Baja despacio y sube con fluidez. La inercia quita trabajo a los músculos."],
+      ["Apoyo demasiado alto", "Colócalo justo bajo los huesos de la cadera para poder flexionar la cadera con libertad."],
+    ],
+    sets: [
+      "**Músculo y fuerza:** 3 series de 10 a 15, con un disco o una mancuerna cuando 15 sea fácil.",
+      "**Salud de la espalda:** 2 a 3 series de 15 a 20 repeticiones lentas, o un [isométrico](/exercises/back-extension-hold/) de 20 a 30 segundos.",
+    ],
+    variations: [
+      ["weighted-back-extension", "Sujeta un peso contra el pecho para hacerlo más difícil."],
+      ["back-extension-hold", "Mantén la posición recta en lugar de moverte."],
+      ["reverse-hyper-bench", "Se mueven las piernas en lugar del tronco."],
+    ],
+    faq: [
+      [
+        "¿Las extensiones lumbares son buenas para la zona lumbar?",
+        "Sí. Hechas despacio hasta la línea recta, dan resistencia a los músculos de la columna, que así aguantan mejor los días largos y los levantamientos pesados. Sáltatelas si tienes un dolor agudo de espalda y consulta a un profesional si no mejora.",
+      ],
+      [
+        "¿Las extensiones lumbares trabajan los glúteos?",
+        "Sí. Redondea un poco la espalda alta, abre las puntas de los pies y aprieta los glúteos para subir: así los glúteos hacen más trabajo que la zona lumbar.",
+      ],
+      [
+        "¿Qué hago si no tengo banco de extensiones?",
+        "El [hip thrust](/exercises/hip-thrust/) o el [peso muerto rumano](/exercises/romanian-deadlift/) trabajan los mismos músculos, y tumbado boca abajo elevando el pecho trabajas la zona lumbar sin material.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "En el pull-through en polea te pones de espaldas a una polea baja, flexionas la cadera con la cuerda entre las piernas y la empujas hacia delante para ponerte de pie. Enseña la bisagra de cadera y trabaja glúteos e isquiotibiales sin cargar la columna, así que va bien para principiantes y espaldas cansadas.",
+    mistakes: [
+      [
+        "Hacer sentadilla en vez de bisagra",
+        "Lleva la cadera recta hacia atrás con las espinillas casi verticales. Las rodillas se doblan solo un poco.",
+      ],
+      ["Tirar con los brazos", "Los brazos solo sujetan la cuerda. Ponte de pie empujando la cadera hacia delante."],
+      ["Echarse atrás arriba", "Termina erguido con los glúteos apretados y las costillas abajo, no con la zona lumbar arqueada."],
+    ],
+    sets: [
+      "**Músculo:** 3 series de 12 a 15, apretando un segundo arriba.",
+      "**Para aprender la bisagra:** 2 a 3 series ligeras de 10 antes del peso muerto o los swings.",
+    ],
+    variations: [
+      ["band-pull-through", "Con una banda anclada abajo, para casa."],
+      ["kb-swing", "El mismo empuje de cadera, rápido y con kettlebell."],
+      ["hip-thrust", "Más carga para los glúteos, con la espalda en un banco."],
+    ],
+    faq: [
+      [
+        "¿Qué músculos trabaja el pull-through en polea?",
+        "Glúteos e isquiotibiales. El cable tira de ti hacia atrás, así que los glúteos trabajan hasta arriba del todo, justo donde el peso muerto se vuelve fácil.",
+      ],
+      [
+        "¿Pull-through o swing con kettlebell?",
+        "El pull-through es más lento y fácil de aprender; el swing es más rápido y suma acondicionamiento. Aprende la bisagra con el pull-through y luego añade [swings](/exercises/kb-swing/).",
+      ],
+      ["¿A qué distancia de la polea me pongo?", "A unos dos pasos largos, para que el peso no toque la pila abajo en cada repetición."],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "El crunch inverso se hace tumbado boca arriba, llevando la cadera del suelo hacia el pecho. Trabaja el abdomen, con más trabajo en la parte baja, y no carga el cuello. No necesitas material.",
+    mistakes: [
+      [
+        "Balancear las piernas",
+        "Mantén las rodillas dobladas en el mismo ángulo y sube la cadera con el abdomen en vez de lanzar las piernas.",
+      ],
+      [
+        "No despegar la cadera",
+        "La repetición cuenta cuando el coxis se despega del suelo. Si solo acercas las rodillas, trabajan sobre todo los flexores de cadera.",
+      ],
+      ["Bajar de golpe", "Baja en dos o tres segundos. La bajada lenta hace la mitad del trabajo."],
+    ],
+    sets: [
+      "**Abdomen:** 3 series de 10 a 15 repeticiones lentas.",
+      "**Más difícil:** hazlo en un banco declinado o pasa a las [elevaciones de piernas colgado](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "En un banco, sujetando el borde, para más recorrido."],
+      ["cable-reverse-crunch", "Una polea añade un peso que puedes ir subiendo."],
+      ["hanging-leg-raise", "Colgado de una barra: la versión más difícil."],
+    ],
+    faq: [
+      [
+        "¿El crunch inverso trabaja el abdomen bajo?",
+        "Trabaja todo el recto abdominal, que va de las costillas a la pelvis. Al subir la pelvis se carga más la parte baja, por eso lo notas abajo.",
+      ],
+      [
+        "¿Crunch inverso o crunch normal?",
+        "El crunch inverso cuida más el cuello y cuesta más hacer trampa con la inercia. Un crunch inverso y una [plancha](/exercises/plank/) juntos cubren bien el abdomen.",
+      ],
+      [
+        "¿El crunch inverso me aplanará el abdomen?",
+        "Fortalece el abdomen, pero perder grasa depende de lo que comes y de cuánto te mueves en general, no de entrenar una zona.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "Las aperturas en contractora se hacen sentado en una máquina, juntando dos asas en arco delante del pecho. La máquina guía el recorrido, así que puedes trabajar fuerte el pecho sin equilibrar pesos, y es un buen final seguro tras los presses.",
+    mistakes: [
+      ["Hombros hacia delante", "Mantén el pecho arriba y las escápulas atrás contra el respaldo toda la serie."],
+      [
+        "Asiento muy alto o muy bajo",
+        "Ajústalo para que las asas queden a la altura del pecho y los codos un poco por debajo de los hombros.",
+      ],
+      ["Dejar que la pila golpee", "Para justo antes de que se toquen las placas, así el pecho no pierde tensión entre repeticiones."],
+    ],
+    sets: [
+      "**Músculo:** 3 series de 10 a 15, apretando un segundo cuando se juntan las manos.",
+      "**Para terminar:** 1 a 2 series de 15 a 20 después de los presses.",
+    ],
+    variations: [
+      ["cable-fly", "Con poleas, para un recorrido libre y más estiramiento."],
+      ["db-fly", "Con mancuernas en un banco plano."],
+      ["single-arm-pec-deck", "Un brazo cada vez, para igualar los lados."],
+    ],
+    faq: [
+      [
+        "¿Qué músculos trabaja la contractora?",
+        "Sobre todo el pecho. Trabaja la función del pectoral de cruzar los brazos por delante del cuerpo, con poca ayuda del tríceps, a diferencia de un press.",
+      ],
+      [
+        "¿Contractora o aperturas en polea?",
+        "Las dos funcionan. La contractora es más fácil de ajustar y muy estable; las poleas te dejan cambiar el ángulo. Usa la que esté libre en tu gimnasio.",
+      ],
+      [
+        "¿La contractora es mala para los hombros?",
+        "No con un recorrido razonable. Para el estiramiento cuando los codos queden en línea con el cuerpo, no muy por detrás, y mantén las escápulas atrás.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "El press de hombros en máquina te sienta contra un respaldo y empuja dos asas por encima de la cabeza siguiendo un recorrido fijo. Trabaja la parte delantera del hombro y el tríceps sin tener que equilibrar, así que puedes acercarte al fallo con seguridad.",
+    mistakes: [
+      [
+        "Despegarse del respaldo",
+        "Mantén la espalda y la cabeza contra el respaldo. Si tienes que arquearte para terminar, pesa demasiado.",
+      ],
+      [
+        "Asiento mal ajustado",
+        "Ajústalo para que las asas empiecen a la altura de los hombros. Muy bajo carga el hombro abajo; muy alto acorta el recorrido.",
+      ],
+      ["Rebotar arriba", "Empuja con fluidez hasta casi estirar los brazos y baja con control."],
+    ],
+    sets: ["**Músculo:** 3 a 4 series de 8 a 12.", "**Después del press con peso libre:** 2 series de 12 a 15."],
+    variations: [
+      ["db-shoulder-press", "Con mancuernas, cada brazo por su cuenta."],
+      ["overhead-press", "Press de pie con barra, el ejercicio de fuerza."],
+      ["single-arm-shoulder-press-machine", "Un brazo cada vez en la misma máquina."],
+    ],
+    faq: [
+      [
+        "¿Qué músculos trabaja el press de hombros en máquina?",
+        "Sobre todo el deltoides anterior y el tríceps, con ayuda del deltoides lateral. Para unos hombros más anchos, añade [elevaciones laterales](/exercises/lateral-raise/).",
+      ],
+      [
+        "¿Press de hombros en máquina o con mancuernas?",
+        "La máquina es más fácil de aprender y de exigir con seguridad; las mancuernas trabajan el equilibrio y dejan moverse a cada brazo. Las dos construyen hombro.",
+      ],
+      [
+        "¿Qué asas uso?",
+        "Las neutras (palmas hacia dentro) cuidan más la mayoría de los hombros. Usa las de agarre prono si te sientan bien.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "El jalón con brazos rectos se hace de cara a una polea alta, llevando una barra hasta los muslos con los brazos casi estirados. Aísla los dorsales sin ayuda del bíceps, así que es un buen calentamiento para las dominadas y una forma fácil de sentir trabajar los dorsales.",
+    mistakes: [
+      [
+        "Doblar los codos",
+        "Mantén una ligera flexión que no cambie. Si los codos se doblan más en cada repetición, se convierte en un jalón de tríceps.",
+      ],
+      ["Usar todo el cuerpo", "Inclínate un poco y mantén esa postura. Se mueven los brazos, no el tronco."],
+      ["Recortar el recorrido arriba", "Deja subir los brazos hasta notar el estiramiento de los dorsales y luego baja."],
+    ],
+    sets: ["**Músculo:** 3 series de 12 a 15.", "**Calentamiento para tirones:** 2 series ligeras de 15 antes de dominadas o remos."],
+    variations: [
+      ["rope-straight-arm-pulldown", "Con cuerda, para que las manos pasen más allá de la cadera."],
+      ["db-pullover", "Tumbado en un banco con una mancuerna."],
+      ["band-straight-arm-pulldown", "Con una banda anclada arriba, para casa."],
+    ],
+    faq: [
+      [
+        "¿Qué músculos trabaja el jalón con brazos rectos?",
+        "Sobre todo los dorsales, con la cabeza larga del tríceps y el abdomen manteniendo quietos los brazos y el tronco.",
+      ],
+      [
+        "¿Jalón con brazos rectos o jalón al pecho?",
+        "El [jalón al pecho](/exercises/lat-pulldown/) sirve para trabajar con más peso y también el bíceps; el de brazos rectos aísla los dorsales. Combinan bien en un mismo entrenamiento.",
+      ],
+      [
+        "¿Barra o cuerda?",
+        "La barra recta es más estable. La cuerda deja separar las manos y pasar la cadera, lo que añade algo de recorrido.",
+      ],
     ],
   },
 };

@@ -530,6 +530,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-19",
       },
       {
+        id: "thirty-day",
+        name: "30-day challenges",
+        body: "Twelve 30-day challenges, from squats, push-ups and planks to pull-ups and burpees, each at three levels: one move a day, a little more each day, with a rest day every fourth day. Today shows the day's number with a one-tap Done, and a missed day waits for you. Every challenge has a page on the website with a calendar to print.",
+        tier: "free",
+        added: "2026-11-27",
+      },
+      {
         id: "printable-plans",
         name: "Printable workout plans",
         body: "Print any program or routine on one page: every workout with its sets, reps and rest, boxes to log four sessions by hand and a QR code that opens it in the app. Every program page on the website has a free PDF in ten languages, and Print routine in the app adds the weights it plans for you next.",

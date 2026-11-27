@@ -201,6 +201,8 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-27: the free workout generator on the website, whose links open the app (docs/decisions/workout-generator.md).
   // Its picture is the website's generator, not an app screen (scripts/generator-shots.mjs).
   L("workout-generator", "free", "today", { fresh: "2026-11-27" }),
+  // New, 2026-11-27: 30-day challenges with a printable calendar on the website (docs/decisions/thirty-day-challenges.md).
+  L("thirty-day", "free", "challenge", { fresh: "2026-11-27" }),
   // New, 2026-11-27: printable one-page plans, Print routine in the app and a PDF of every program
   // (docs/decisions/printable-plans.md). Its picture is a printed sheet.
   L("printable-plans", "free", "programs", { fresh: "2026-11-27", art: "print" }),

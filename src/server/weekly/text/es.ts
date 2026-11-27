@@ -1154,6 +1154,17 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Hoy hace esto por ti cada día, y además sabe lo que levantaste la última vez y qué músculos aún se recuperan.",
   },
+  "thirty-day": {
+    title: "Un ejercicio al día durante 30 días",
+    intro: "Ya tienes doce retos de 30 días, de sentadillas y flexiones a plancha y dominadas, cada uno en tres niveles.",
+    points: [
+      "Elige uno en Herramientas › Retos de 30 días y escoge Principiante, Intermedio o Avanzado.",
+      "Hoy muestra la cifra del día con un Hecho de un toque. ¿Hiciste más o menos? Cámbiala antes con − y +.",
+      "Cada cuarto día es de descanso, y un día perdido simplemente te espera: no hay que empezar de nuevo.",
+      "Cada reto tiene una página en nuestra web con un calendario para imprimir y pegar en la nevera.",
+    ],
+    dyk: "Los días del reto no son entrenamientos, así que nunca cambian tu plan, tu racha ni tu objetivo semanal.",
+  },
   "printable-plans": {
     title: "Imprime un entrenamiento en una página",
     intro: "Cualquier programa o rutina se imprime ahora en una página, con casillas para rellenar y un código QR que vuelve a la app.",

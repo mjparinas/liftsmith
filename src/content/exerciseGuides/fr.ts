@@ -1062,7 +1062,7 @@ export const FR_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Muscle :** 3 séries de 8 à 12 par bras."],
     variations: [
-      ["db-chest-supported-row", "Les deux bras, poitrine sur un banc incliné."],
+      ["chest-supported-row", "Les deux bras, poitrine sur un banc incliné."],
       ["kb-row", "Avec un kettlebell."],
       ["seal-row", "Allongé sur un banc haut : très strict."],
     ],
@@ -1242,6 +1242,286 @@ export const FR_GUIDES: Record<string, ExerciseGuide> = {
         "Il est plus strict et charge davantage la position étirée. Les deux construisent les biceps.",
       ],
       ["Pourquoi ça fait mal en bas ?", "Allégez et ralentissez. Ne verrouillez pas complètement si les coudes protestent."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "L’épaulé en puissance arrache une barre du sol et la reçoit sur l’avant des épaules en un seul mouvement rapide. Il développe la puissance des hanches pour le sport et les sauts, et travaille ensemble fessiers, ischio-jambiers, trapèzes et haut du dos.",
+    mistakes: [
+      [
+        "Tirer trop tôt avec les bras",
+        "Gardez les bras longs, comme des cordes, jusqu’à ce que hanches et genoux soient tendus. Puis haussez les épaules et passez sous la barre.",
+      ],
+      ["Éloigner la barre du corps", "Gardez la barre assez près pour frôler les cuisses. Une barre qui part en avant vous déséquilibre."],
+      ["Recevoir les coudes bas", "Lancez les coudes vers l’avant, vite, pour que la barre se pose sur les épaules et pas dans les mains."],
+    ],
+    sets: [
+      "**Puissance :** 4 à 6 séries de 2 à 3, avec un repos complet. Arrêtez la série quand les répétitions ralentissent.",
+      "**Pour apprendre :** 5 séries de 2 avec la barre seule ou des disques légers, en partant de la position suspendue.",
+    ],
+    variations: [
+      ["hang-clean", "Depuis les cuisses : le plus simple pour apprendre la réception."],
+      ["db-hang-clean", "Aux haltères, sans barre ni disques en caoutchouc."],
+      ["clean-and-jerk", "Ajoutez le jeté au-dessus de la tête : le mouvement olympique complet."],
+    ],
+    faq: [
+      [
+        "L’épaulé en puissance convient-il aux débutants ?",
+        "Oui, si vous l’apprenez léger. Commencez en suspension avec la barre seule, et n’ajoutez du poids que tant que la barre reste proche et la réception propre. Les sprints et les [sauts sur box](/exercises/box-jump/) développent aussi la puissance pendant l’apprentissage.",
+      ],
+      [
+        "Quelle différence entre l’épaulé en puissance et l’épaulé ?",
+        "En puissance, vous recevez la barre au-dessus de la parallèle, en quart de squat. Dans l’épaulé complet, vous descendez en squat avant profond, ce qui permet plus de charge mais demande plus de mobilité.",
+      ],
+      [
+        "Peut-on faire des épaulés à la maison ?",
+        "Seulement avec une barre, des disques en caoutchouc et un sol qui supporte une barre lâchée. Sinon, essayez l’[épaulé suspendu aux haltères](/exercises/db-hang-clean/) ou le [kettlebell swing](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "Le soulevé de terre roumain aux haltères plie les hanches avec un haltère dans chaque main et les fait descendre le long des jambes jusqu’à étirer les ischio-jambiers. Il développe ischio-jambiers et fessiers avec moins de charge qu’une barre, et se fait à la maison avec une paire d’haltères.",
+    mistakes: [
+      [
+        "Plier les genoux comme en squat",
+        "Gardez une légère flexion des genoux qui ne change pas, et poussez les hanches vers le mur derrière vous.",
+      ],
+      [
+        "Arrondir le dos pour descendre plus",
+        "Arrêtez-vous quand les ischio-jambiers sont bien étirés, souvent juste sous le genou. L’amplitude vient des hanches, pas de la colonne.",
+      ],
+      [
+        "Laisser partir les haltères en avant",
+        "Faites-les glisser le long des cuisses et des tibias. Plus ils s’éloignent, plus le bas du dos travaille.",
+      ],
+    ],
+    sets: [
+      "**Muscle :** 3 à 4 séries de 8 à 12, en descendant en trois secondes environ.",
+      "**À la maison avec des haltères légers :** 3 séries de 15 à 20, ou sur une jambe.",
+    ],
+    variations: [
+      ["romanian-deadlift", "À la barre, pour des charges plus lourdes."],
+      ["db-single-leg-rdl", "Sur une jambe, pour l’équilibre et deux fois plus de charge par jambe."],
+      ["kb-romanian-deadlift", "Un kettlebell tenu à deux mains."],
+    ],
+    faq: [
+      [
+        "Quels muscles travaille le soulevé de terre roumain aux haltères ?",
+        "Surtout les ischio-jambiers et les fessiers ; le bas du dos maintient la colonne et les avant-bras tiennent les haltères. Il charge les ischio-jambiers en étirement, ce qui est bon pour la prise de muscle.",
+      ],
+      [
+        "Roumain aux haltères ou à la barre ?",
+        "Les deux travaillent les mêmes muscles. La barre permet plus de charge ; les haltères s’installent plus vite, ménagent les poignets et fonctionnent à la maison. Prenez celui que vous pouvez charger assez pour 8 à 12 répétitions dures.",
+      ],
+      [
+        "Quel poids d’haltères choisir ?",
+        "Assez pour que les deux dernières répétitions de chaque série soient dures, dos plat. Si la prise lâche avant, utilisez des sangles ou passez à la [version à la barre](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "L’extension lombaire fait descendre le buste au-dessus d’un appui puis le remonte jusqu’à ce que le corps soit droit. Elle renforce le bas du dos, les fessiers et les ischio-jambiers en chargeant peu la colonne, et complète bien les squats et soulevés de terre lourds.",
+    mistakes: [
+      [
+        "Se cambrer fort en haut",
+        "Arrêtez-vous quand le corps forme une ligne droite. Aller plus loin écrase le bas du dos sans rien travailler de plus.",
+      ],
+      ["Rebondir en bas", "Descendez lentement et remontez sans à-coup. L’élan retire le travail aux muscles."],
+      ["Appui trop haut", "Placez-le juste sous les os du bassin pour plier librement aux hanches."],
+    ],
+    sets: [
+      "**Muscle et force :** 3 séries de 10 à 15, avec un disque ou un haltère quand 15 devient facile.",
+      "**Santé du dos :** 2 à 3 séries de 15 à 20 répétitions lentes, ou un [maintien](/exercises/back-extension-hold/) de 20 à 30 secondes.",
+    ],
+    variations: [
+      ["weighted-back-extension", "Tenez une charge contre la poitrine pour corser l’exercice."],
+      ["back-extension-hold", "Tenez la position droite au lieu de bouger."],
+      ["reverse-hyper-bench", "Ce sont les jambes qui bougent, pas le buste."],
+    ],
+    faq: [
+      [
+        "Les extensions lombaires sont-elles bonnes pour le bas du dos ?",
+        "Oui. Faites lentement jusqu’à la ligne droite, elles donnent de l’endurance aux muscles le long de la colonne, qui tiennent ainsi mieux les longues journées et les charges lourdes. Évitez-les pendant une douleur vive, et consultez un professionnel si elle ne passe pas.",
+      ],
+      [
+        "Les extensions lombaires travaillent-elles les fessiers ?",
+        "Oui. Arrondissez un peu le haut du dos, ouvrez les pieds et serrez les fessiers pour remonter : les fessiers font alors plus de travail que le bas du dos.",
+      ],
+      [
+        "Que faire sans banc à lombaires ?",
+        "Le [hip thrust](/exercises/hip-thrust/) ou le [soulevé de terre roumain](/exercises/romanian-deadlift/) travaillent les mêmes muscles, et allongé sur le ventre en levant la poitrine, vous travaillez le bas du dos sans matériel.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "Pour le pull-through à la poulie, vous tournez le dos à une poulie basse, pliez les hanches avec la corde entre les jambes, puis poussez les hanches en avant pour vous redresser. Il apprend la charnière de hanche et travaille fessiers et ischio-jambiers sans charger la colonne : idéal pour débuter ou ménager un dos fatigué.",
+    mistakes: [
+      [
+        "Squatter au lieu de plier les hanches",
+        "Poussez les hanches droit en arrière, tibias presque verticaux. Les genoux se plient à peine.",
+      ],
+      ["Tirer avec les bras", "Les bras ne font que tenir la corde. Redressez-vous en poussant les hanches en avant."],
+      ["Se pencher en arrière en haut", "Finissez grand, fessiers serrés et côtes basses, pas le bas du dos cambré."],
+    ],
+    sets: [
+      "**Muscle :** 3 séries de 12 à 15, en serrant une seconde en haut.",
+      "**Pour apprendre la charnière :** 2 à 3 séries légères de 10 avant le soulevé de terre ou les swings.",
+    ],
+    variations: [
+      ["band-pull-through", "Avec un élastique fixé en bas, à la maison."],
+      ["kb-swing", "La même poussée de hanches, rapide, avec un kettlebell."],
+      ["hip-thrust", "Plus de charge pour les fessiers, le dos sur un banc."],
+    ],
+    faq: [
+      [
+        "Quels muscles travaille le pull-through à la poulie ?",
+        "Les fessiers et les ischio-jambiers. Le câble vous tire en arrière, donc les fessiers travaillent jusqu’en haut, là où le soulevé de terre devient facile.",
+      ],
+      [
+        "Pull-through ou kettlebell swing ?",
+        "Le pull-through est plus lent et plus facile à apprendre ; le swing est plus rapide et ajoute du cardio. Apprenez la charnière au pull-through, puis ajoutez des [swings](/exercises/kb-swing/).",
+      ],
+      [
+        "À quelle distance de la poulie se placer ?",
+        "À deux grands pas environ, pour que la charge ne touche pas la pile en bas de chaque répétition.",
+      ],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "Le crunch inversé se fait sur le dos, en enroulant le bassin du sol vers la poitrine. Il travaille les abdominaux, surtout le bas du ventre, sans tirer sur la nuque. Aucun matériel nécessaire.",
+    mistakes: [
+      ["Balancer les jambes", "Gardez les genoux pliés au même angle et levez le bassin avec les abdos au lieu de lancer les jambes."],
+      [
+        "Ne pas décoller le bassin",
+        "Une répétition compte quand le coccyx quitte le sol. Ramener seulement les genoux fait surtout travailler les fléchisseurs de hanche.",
+      ],
+      ["Redescendre d’un coup", "Descendez en deux à trois secondes. La descente lente fait la moitié du travail."],
+    ],
+    sets: [
+      "**Abdos :** 3 séries de 10 à 15 répétitions lentes.",
+      "**Plus dur :** sur un banc décliné, ou passez aux [relevés de jambes suspendu](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "Sur un banc, en tenant le bord, pour plus d’amplitude."],
+      ["cable-reverse-crunch", "Une poulie ajoute une charge à augmenter peu à peu."],
+      ["hanging-leg-raise", "Suspendu à une barre : la version la plus dure."],
+    ],
+    faq: [
+      [
+        "Le crunch inversé travaille-t-il le bas des abdos ?",
+        "Il travaille tout le grand droit, qui va des côtes au bassin. Enrouler le bassin sollicite davantage la partie basse, d’où la sensation en bas.",
+      ],
+      [
+        "Crunch inversé ou crunch classique ?",
+        "Le crunch inversé ménage la nuque et se triche moins avec l’élan. Un crunch inversé et une [planche](/exercises/plank/) couvrent bien les abdos.",
+      ],
+      [
+        "Le crunch inversé va-t-il aplatir mon ventre ?",
+        "Il renforce les abdos, mais perdre du gras dépend de ce que vous mangez et de votre activité globale, pas du travail d’une zone.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "Le pec deck se fait assis dans une machine, en rapprochant deux poignées en arc devant la poitrine. La machine guide le trajet, vous pouvez donc travailler fort les pectoraux sans équilibrer de charges : une finition sûre après les développés.",
+    mistakes: [
+      ["Épaules qui roulent en avant", "Gardez la poitrine haute et les omoplates serrées contre le dossier toute la série."],
+      ["Siège trop haut ou trop bas", "Réglez-le pour avoir les poignées à hauteur de poitrine et les coudes un peu sous les épaules."],
+      ["Laisser claquer la pile", "Arrêtez juste avant que les plaques se touchent, pour garder la tension entre les répétitions."],
+    ],
+    sets: [
+      "**Muscle :** 3 séries de 10 à 15, en serrant une seconde quand les mains se rejoignent.",
+      "**Finition :** 1 à 2 séries de 15 à 20 après vos développés.",
+    ],
+    variations: [
+      ["cable-fly", "Aux poulies, pour un trajet libre et plus d’étirement."],
+      ["db-fly", "Aux haltères sur un banc plat."],
+      ["single-arm-pec-deck", "Un bras à la fois, pour équilibrer les côtés."],
+    ],
+    faq: [
+      [
+        "Quels muscles travaille le pec deck ?",
+        "Surtout les pectoraux. Il travaille leur rôle de ramener les bras devant le corps, avec peu d’aide des triceps, contrairement à un développé.",
+      ],
+      [
+        "Pec deck ou écartés à la poulie ?",
+        "Les deux marchent bien. Le pec deck se règle plus vite et reste très stable ; les poulies permettent de changer d’angle. Prenez ce qui est libre dans votre salle.",
+      ],
+      [
+        "Le pec deck abîme-t-il les épaules ?",
+        "Pas avec une amplitude raisonnable. Arrêtez l’étirement quand les coudes sont dans l’alignement du corps, pas loin derrière, et gardez les omoplates serrées.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "Le développé épaules à la machine vous assoit contre un dossier et pousse deux poignées au-dessus de la tête sur un trajet fixe. Il travaille l’avant des épaules et les triceps sans équilibre à gérer, donc vous pouvez aller près de l’échec en sécurité.",
+    mistakes: [
+      ["Décoller du dossier", "Gardez le dos et la tête contre le dossier. Si vous devez vous cambrer pour finir, c’est trop lourd."],
+      [
+        "Siège mal réglé",
+        "Réglez-le pour que les poignées partent à hauteur d’épaules. Trop bas, l’épaule force en bas ; trop haut, l’amplitude diminue.",
+      ],
+      ["Rebondir en haut", "Poussez sans à-coup jusqu’aux bras presque tendus et redescendez sous contrôle."],
+    ],
+    sets: ["**Muscle :** 3 à 4 séries de 8 à 12.", "**Après les développés en charges libres :** 2 séries de 12 à 15."],
+    variations: [
+      ["db-shoulder-press", "Aux haltères, chaque bras indépendant."],
+      ["overhead-press", "Le développé debout à la barre, le mouvement de force."],
+      ["single-arm-shoulder-press-machine", "Un bras à la fois sur la même machine."],
+    ],
+    faq: [
+      [
+        "Quels muscles travaille le développé épaules à la machine ?",
+        "Surtout les deltoïdes antérieurs et les triceps, aidés des deltoïdes moyens. Pour des épaules plus larges, ajoutez des [élévations latérales](/exercises/lateral-raise/).",
+      ],
+      [
+        "Développé épaules à la machine ou aux haltères ?",
+        "La machine s’apprend plus vite et se pousse fort en sécurité ; les haltères travaillent l’équilibre et laissent chaque bras libre. Les deux développent les épaules.",
+      ],
+      [
+        "Quelles poignées utiliser ?",
+        "Les poignées neutres (paumes face à face) ménagent la plupart des épaules. Prenez la prise en pronation si elle vous convient.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "Le pull-over à la poulie haute se fait face à la poulie, en ramenant une barre jusqu’aux cuisses bras presque tendus. Il isole les dorsaux sans aide des biceps : un bon échauffement avant les tractions et un moyen simple de sentir vos dorsaux travailler.",
+    mistakes: [
+      [
+        "Plier les coudes",
+        "Gardez une légère flexion qui ne change pas. Si les coudes se plient davantage à chaque répétition, ça devient une extension des triceps à la poulie.",
+      ],
+      ["Utiliser tout le corps", "Penchez-vous un peu et gardez cette position. Les bras bougent, pas le buste."],
+      ["Couper l’amplitude en haut", "Laissez remonter les bras jusqu’à sentir l’étirement des dorsaux, puis redescendez."],
+    ],
+    sets: [
+      "**Muscle :** 3 séries de 12 à 15.",
+      "**Échauffement des tirages :** 2 séries légères de 15 avant les tractions ou les rowings.",
+    ],
+    variations: [
+      ["rope-straight-arm-pulldown", "À la corde, pour finir les mains au-delà des hanches."],
+      ["db-pullover", "Allongé sur un banc avec un haltère."],
+      ["band-straight-arm-pulldown", "Avec un élastique fixé en hauteur, à la maison."],
+    ],
+    faq: [
+      [
+        "Quels muscles travaille le pull-over à la poulie haute ?",
+        "Surtout les dorsaux ; la longue portion du triceps et les abdos gardent les bras et le buste immobiles.",
+      ],
+      [
+        "Pull-over à la poulie ou tirage vertical ?",
+        "Le [tirage vertical](/exercises/lat-pulldown/) sert au travail plus lourd et sollicite aussi les biceps ; le pull-over isole les dorsaux. Ils vont bien ensemble dans une séance.",
+      ],
+      [
+        "Barre ou corde ?",
+        "La barre droite est plus stable. La corde laisse les mains s’écarter et passer les hanches, pour un peu plus d’amplitude.",
+      ],
     ],
   },
 };

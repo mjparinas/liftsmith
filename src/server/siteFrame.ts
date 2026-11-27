@@ -9,9 +9,11 @@ import { navFor } from "@/components/site/nav";
 import { COMMIT } from "@/lib/build";
 import { cleanInvite, INVITE_PARAM } from "@/lib/inviteLink";
 import type { MsgLang } from "@/lib/messageText";
+import { popularLiftLinks } from "@/lib/popularLifts";
 import { APP_PATH, STORE_LINKS } from "@/lib/site";
 import { fill, localPath } from "@/lib/siteLang";
 import { siteText } from "@/locales/site";
+import { CHALLENGE_TEXT } from "@/locales/site/challenge";
 import * as pub from "@/locales/text/pub";
 
 /** Which page the frame is on, for the store links' referrer (the only links that carry a source). */
@@ -100,10 +102,12 @@ ${col(t.cols.learn, [
   ["/exercises/", l.exercises],
   [localPath(lang, "/muscles/"), l.muscles],
   [localPath(lang, "/programs/"), l.programs],
+  [localPath(lang, "/challenges/"), CHALLENGE_TEXT[lang].challenges],
   ["/equipment/", l.equipment],
   ["/guides/", l.guides],
   ["/blog/", l.blog],
 ])}
+${col(t.cols.exercises, popularLiftLinks(lang))}
 ${col(t.cols.tools, [
   ["/tools/plate-calculator/", l.plates],
   ["/tools/one-rep-max-calculator/", l.oneRm],
@@ -223,7 +227,7 @@ background:radial-gradient(80% 120% at 0 0,rgb(91 156 255/.22),transparent 60%),
 /* Footer */
 .site-f{border-top:1px solid var(--line)}
 .foot-grid{display:grid;gap:32px;padding-top:40px;padding-bottom:40px}
-@media (min-width:640px){.foot-grid{grid-template-columns:1fr 1fr}}@media (min-width:1024px){.foot-grid{grid-template-columns:1.5fr 1fr 1fr 1fr 1fr 1fr}}
+@media (min-width:640px){.foot-grid{grid-template-columns:1fr 1fr}}@media (min-width:768px){.foot-grid{grid-template-columns:repeat(4,1fr)}}@media (min-width:1024px){.foot-grid{grid-template-columns:1.5fr repeat(6,1fr)}}
 .foot-brand{font-size:1.125rem;font-weight:700}.foot-grid .small{margin:8px 0 16px;max-width:24rem}
 .col-h{font-weight:600}.site-f ul{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px;font-size:.875rem}
 .site-f nav a{color:var(--muted);text-decoration:none}.site-f nav a:hover{color:var(--ink)}

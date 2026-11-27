@@ -1088,6 +1088,28 @@ export interface InjuryReturnEvent extends EventBase {
   ack: true;
 }
 
+/** Joined a 30-day challenge (thirtyDay.ts), or changed its level when it's already running. */
+export interface ThirtyJoinEvent extends EventBase {
+  type: "thirtyJoin";
+  /** A challenge id (THIRTY_CHALLENGES). */
+  challenge: string;
+  level: "beginner" | "intermediate" | "advanced";
+}
+
+/** One day of a 30-day challenge done: the reps or seconds actually done. `joinId` is the join event's id. */
+export interface ThirtyDayEvent extends EventBase {
+  type: "thirtyDay";
+  joinId: string;
+  day: number;
+  amount: number;
+}
+
+/** Left a 30-day challenge before the end. */
+export interface ThirtyLeaveEvent extends EventBase {
+  type: "thirtyLeave";
+  joinId: string;
+}
+
 // Every event kind, one per line so two changes adding an event don't touch the same line.
 export type AppEvent =
   | ProEvent
@@ -1117,4 +1139,7 @@ export type AppEvent =
   | InjuryHealedEvent
   | PainEvent
   | InjuryReturnEvent
-  | OutsideEvent;
+  | OutsideEvent
+  | ThirtyJoinEvent
+  | ThirtyDayEvent
+  | ThirtyLeaveEvent;

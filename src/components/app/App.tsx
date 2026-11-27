@@ -94,6 +94,7 @@ import { ScreenshotShare } from "./StatsShare";
 import { StretchScreen } from "./Stretch";
 import { SyncSpinner } from "./SyncSpinner";
 import TeamSession from "./TeamSession";
+import { ThirtyDayScreen } from "./ThirtyDay";
 import { Toaster } from "./Toaster";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
@@ -531,6 +532,7 @@ export function App() {
     season: <SeasonScreen />,
     library: <Library key={arg ?? ""} arg={arg} />,
     teamsession: <TeamSession key={arg ?? ""} arg={arg} />,
+    challenge: <ThirtyDayScreen key={arg ?? ""} arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

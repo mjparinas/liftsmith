@@ -18,6 +18,7 @@ import * as bmi from "./text/bmi";
 import * as body from "./text/body";
 import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
+import * as c30 from "./text/c30";
 import * as cal from "./text/cal";
 import * as calc from "./text/calc";
 import * as callText from "./text/callText";
@@ -226,6 +227,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...lvl.fr,
   ...map.fr,
   ...mom.fr,
+  ...c30.fr,
   ...month.fr,
   ...msg.fr,
   ...msgKind.fr,

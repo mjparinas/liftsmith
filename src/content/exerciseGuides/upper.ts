@@ -1,6 +1,6 @@
 import type { ExerciseGuide } from "../exerciseGuides";
 
-// Chest, shoulders, back and arms: the 25 most searched upper-body exercises.
+// Chest, shoulders, back and arms: the 28 most searched upper-body exercises (three added 2026-11-27 from Search Console, docs/decisions/seo.md).
 export const UPPER_GUIDES: Record<string, ExerciseGuide> = {
   "bench-press": {
     intro:
@@ -355,7 +355,7 @@ export const UPPER_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Muscle:** 3 sets of 8 to 12 per arm."],
     variations: [
-      ["db-chest-supported-row", "Both arms, chest on an incline bench."],
+      ["chest-supported-row", "Both arms, chest on an incline bench."],
       ["kb-row", "With a kettlebell."],
       ["seal-row", "Lying on a high bench: very strict."],
     ],
@@ -523,6 +523,99 @@ export const UPPER_GUIDES: Record<string, ExerciseGuide> = {
     faq: [
       ["Is the preacher curl better than a standing curl?", "It's stricter and loads the stretched position more. Both build the biceps."],
       ["Why does it hurt at the bottom?", "Go lighter and slow down. Stop short of full lockout if your elbows complain."],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "The pec deck fly sits you in a machine and brings two handles together in an arc in front of your chest. The machine guides the path, so you can work the chest hard without balancing weights, which makes it a safe finisher after presses.",
+    mistakes: [
+      ["Shoulders rolling forward", "Keep your chest up and your shoulder blades pulled back against the pad for the whole set."],
+      ["Seat too high or too low", "Set it so the handles are at chest height and your elbows sit a little below your shoulders."],
+      ["Letting the stack slam", "Stop just before the plates touch, so the chest stays under tension between reps."],
+    ],
+    sets: [
+      "**Muscle:** 3 sets of 10 to 15, with a one-second squeeze when the hands meet.",
+      "**Finisher:** 1 to 2 sets of 15 to 20 after your pressing.",
+    ],
+    variations: [
+      ["cable-fly", "Cables, for a free path and more stretch."],
+      ["db-fly", "Dumbbells on a flat bench."],
+      ["single-arm-pec-deck", "One arm at a time, to even out the sides."],
+    ],
+    faq: [
+      [
+        "What muscles does the pec deck work?",
+        "The chest, mainly. It trains the job the pecs do of bringing your arms across your body, with little help from the triceps, unlike a press.",
+      ],
+      [
+        "Pec deck or cable fly?",
+        "Both work well. The pec deck is easier to set up and very steady; cables let you change the angle. Use whichever your gym has free.",
+      ],
+      [
+        "Is the pec deck bad for your shoulders?",
+        "Not with a sensible range. Stop the stretch where your elbows are in line with your body, not far behind it, and keep your shoulder blades back.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "The machine shoulder press sits you against a back pad and presses two handles overhead along a fixed path. It trains the front of the shoulders and the triceps without any balancing, so you can push close to failure safely.",
+    mistakes: [
+      [
+        "Arching away from the pad",
+        "Keep your back and head against the pad. If you have to arch to finish a rep, the weight is too heavy.",
+      ],
+      [
+        "Seat set wrong",
+        "Set it so the handles start at about shoulder height. Too low strains the shoulder at the bottom; too high cuts the range.",
+      ],
+      ["Bouncing at the top", "Press smoothly to nearly straight arms and lower under control."],
+    ],
+    sets: ["**Muscle:** 3 to 4 sets of 8 to 12.", "**After free-weight pressing:** 2 sets of 12 to 15."],
+    variations: [
+      ["db-shoulder-press", "Dumbbells, each arm on its own."],
+      ["overhead-press", "A standing barbell press, the strength lift."],
+      ["single-arm-shoulder-press-machine", "One arm at a time on the same machine."],
+    ],
+    faq: [
+      [
+        "What muscles does the machine shoulder press work?",
+        "Mostly the front delts and triceps, with the side delts helping. For wider-looking shoulders, add [lateral raises](/exercises/lateral-raise/).",
+      ],
+      [
+        "Machine or dumbbell shoulder press?",
+        "The machine is easier to learn and to push hard safely; dumbbells train balance and let each arm move freely. Both build the shoulders.",
+      ],
+      [
+        "Which handles should I use?",
+        "The neutral ones (palms facing in) are kinder to most shoulders. Use the overhand handles if they feel fine.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "The straight-arm pulldown faces a high cable and sweeps a bar down to your thighs with your arms nearly straight. It isolates the lats with no help from the biceps, which makes it a good warm-up for pull-ups and an easy way to feel your lats work.",
+    mistakes: [
+      ["Bending the elbows", "Keep a slight bend that doesn't change. If the elbows bend more each rep, it turns into a triceps pushdown."],
+      ["Using the whole body", "Hinge slightly and hold that position. The arms move; the torso doesn't."],
+      ["Cutting the range at the top", "Let your arms rise until you feel the lats stretch, then sweep down."],
+    ],
+    sets: ["**Muscle:** 3 sets of 12 to 15.", "**Warm-up for pulling:** 2 light sets of 15 before pull-ups or rows."],
+    variations: [
+      ["rope-straight-arm-pulldown", "A rope, so your hands can finish past your hips."],
+      ["db-pullover", "Lying on a bench with a dumbbell."],
+      ["band-straight-arm-pulldown", "A band anchored high, for home."],
+    ],
+    faq: [
+      [
+        "What muscles does the straight-arm pulldown work?",
+        "Mostly the lats, with the long head of the triceps and the abs keeping your arms and torso still.",
+      ],
+      [
+        "Straight-arm pulldown or lat pulldown?",
+        "The [lat pulldown](/exercises/lat-pulldown/) is for heavier work that also trains the biceps; the straight-arm pulldown isolates the lats. They pair well in one workout.",
+      ],
+      ["Bar or rope?", "A straight bar is steadier. A rope lets your hands move apart and pass your hips, which adds a little range."],
     ],
   },
 };

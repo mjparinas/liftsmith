@@ -307,6 +307,10 @@ export const it: FeaturesText = {
       body: "Cerca le routine pubblicate da altri per obiettivo, parole e attrezzatura della tua palestra, salvane una con un tocco e valutala con le stelle. Pubblica la tua dal suo editor, con o senza il tuo nome, e avrà una sua pagina sul sito. Escono solo esercizi e serie, mai i tuoi carichi o le tue note.",
       note: "Per pubblicare servono un account e 18 anni. Chiunque può sfogliare.",
     },
+    "thirty-day": {
+      name: "Sfide di 30 giorni",
+      body: "Dodici sfide di 30 giorni, da squat, piegamenti e plank a trazioni e burpee, ognuna su tre livelli: un esercizio al giorno, un po’ di più ogni giorno, con un giorno di riposo ogni quattro. Oggi mostra il numero del giorno con un Fatto a un tocco, e un giorno saltato ti aspetta. Ogni sfida ha una pagina sul sito con un calendario da stampare.",
+    },
     "printable-plans": {
       name: "Schede di allenamento da stampare",
       body: "Stampa qualsiasi programma o routine su una pagina: ogni allenamento con serie, ripetizioni e recupero, caselle per segnare a mano quattro sedute e un codice QR che lo apre nell'app. Ogni pagina programma del sito ha un PDF gratis in dieci lingue, e Stampa la routine nell'app aggiunge i carichi previsti per la prossima volta.",

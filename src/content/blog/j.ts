@@ -498,7 +498,7 @@ export const BLOG_J: Article[] = [
           "db-bench-press",
           "db-row",
           "db-shoulder-press",
-          "db-chest-supported-row",
+          "chest-supported-row",
           "lateral-raise",
           "db-curl",
           "db-overhead-extension",

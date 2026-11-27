@@ -313,6 +313,10 @@ export const de: FeaturesText = {
       body: "Durchsuche Routinen, die andere veröffentlicht haben, nach Ziel, Stichwort und dem, was dein Studio hat, speichere eine mit einem Tippen und bewerte sie mit Sternen. Veröffentliche deine eigene aus ihrem Editor, mit oder ohne deinen Namen, und sie bekommt eine eigene Seite auf der Website. Nur Übungen und Sätze gehen raus, nie deine Gewichte oder Notizen.",
       note: "Zum Veröffentlichen brauchst du ein Konto und musst 18 sein. Stöbern kann jeder.",
     },
+    "thirty-day": {
+      name: "30-Tage-Challenges",
+      body: "Zwölf 30-Tage-Challenges, von Kniebeugen, Liegestützen und Plank bis zu Klimmzügen und Burpees, jede in drei Stufen: eine Übung am Tag, jeden Tag ein bisschen mehr, mit einem Ruhetag an jedem vierten Tag. Heute zeigt die Zahl des Tages mit einem Tipp auf Geschafft, und ein verpasster Tag wartet auf dich. Jede Challenge hat eine Seite auf der Website mit einem Kalender zum Ausdrucken.",
+    },
     "printable-plans": {
       name: "Trainingspläne zum Ausdrucken",
       body: "Drucke jedes Programm und jede Routine auf einer Seite: jedes Training mit Sätzen, Wiederholungen und Pausen, Kästchen für vier Einheiten zum Eintragen von Hand und ein QR-Code, der es in der App öffnet. Jede Programmseite auf der Website hat ein kostenloses PDF in zehn Sprachen, und Routine drucken in der App fügt die Gewichte hinzu, die sie fürs nächste Mal plant.",

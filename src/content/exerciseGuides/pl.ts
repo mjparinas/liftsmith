@@ -1053,7 +1053,7 @@ export const PL_GUIDES: Record<string, ExerciseGuide> = {
     ],
     sets: ["**Masa mięśniowa:** 3 serie po 8 do 12 powtórzeń na rękę."],
     variations: [
-      ["db-chest-supported-row", "Obie ręce, klatka na ławce skośnej."],
+      ["chest-supported-row", "Obie ręce, klatka na ławce skośnej."],
       ["kb-row", "Z kettlebellem."],
       ["seal-row", "Leżąc na wysokiej ławce: bardzo czysta technika."],
     ],
@@ -1230,6 +1230,274 @@ export const PL_GUIDES: Record<string, ExerciseGuide> = {
         "Wymusza czystszą technikę i mocniej obciąża pozycję rozciągnięcia. Oba budują bicepsy.",
       ],
       ["Dlaczego boli na dole?", "Zmniejsz ciężar i zwolnij. Jeśli łokcie protestują, zatrzymaj się przed pełnym wyprostem."],
+    ],
+  },
+  "power-clean": {
+    intro:
+      "W zarzucie siłowym podrywasz sztangę z podłogi i łapiesz ją na przodzie barków w jednym szybkim ruchu. Buduje wybuchową siłę bioder do sportu i skoków, a przy okazji trenuje razem pośladki, tył uda, czworoboczne i górę pleców.",
+    mistakes: [
+      [
+        "Za wczesne ciągnięcie rękami",
+        "Trzymaj ręce długie jak liny, aż biodra i kolana się wyprostują. Potem unieś barki i wejdź pod sztangę.",
+      ],
+      ["Sztanga odjeżdża od ciała", "Prowadź sztangę tak blisko, żeby muskała uda. Jeśli zatoczy łuk do przodu, wytrąci cię z równowagi."],
+      ["Łapanie z nisko opuszczonymi łokciami", "Szybko wyrzuć łokcie do przodu, żeby sztanga wylądowała na barkach, a nie w dłoniach."],
+    ],
+    sets: [
+      "**Moc:** 4 do 6 serii po 2 do 3 powtórzenia, z pełnym odpoczynkiem. Kończ serię, gdy powtórzenia zwalniają.",
+      "**Nauka:** 5 serii po 2 z pustą sztangą lub lekkimi talerzami, zaczynając z zawisu.",
+    ],
+    variations: [
+      ["hang-clean", "Z wysokości ud: najłatwiej nauczyć się łapania."],
+      ["db-hang-clean", "Z hantlami, gdy nie ma sztangi ani talerzy gumowych."],
+      ["clean-and-jerk", "Dodaj podrzut nad głowę: pełny bój olimpijski."],
+    ],
+    faq: [
+      [
+        "Czy zarzut siłowy jest dla początkujących?",
+        "Tak, jeśli uczysz się go z lekkim ciężarem. Zacznij z zawisu z pustą sztangą i dokładaj ciężar tylko wtedy, gdy sztanga idzie blisko, a łapanie jest czyste. Sprinty i [skoki na skrzynię](/exercises/box-jump/) też budują moc, gdy się uczysz.",
+      ],
+      [
+        "Czym różni się zarzut siłowy od pełnego zarzutu?",
+        "W zarzucie siłowym łapiesz sztangę powyżej równoległej, w ćwierćprzysiadzie. W pełnym zarzucie schodzisz do głębokiego przysiadu przedniego, co pozwala podnieść więcej, ale wymaga większej mobilności.",
+      ],
+      [
+        "Czy mogę robić zarzuty w domu?",
+        "Tylko ze sztangą, talerzami gumowymi i podłogą, która wytrzyma upuszczoną sztangę. Inaczej spróbuj [zarzutu z zawisu z hantlami](/exercises/db-hang-clean/) albo [swingu z kettlebell](/exercises/kb-swing/).",
+      ],
+    ],
+  },
+  "db-rdl": {
+    intro:
+      "W rumuńskim martwym ciągu z hantlami zginasz się w biodrach z hantlem w każdej ręce i prowadzisz je w dół wzdłuż nóg, aż poczujesz rozciąganie tyłu uda. Buduje tył uda i pośladki z mniejszym ciężarem niż sztanga i da się go robić w domu z parą hantli.",
+    mistakes: [
+      ["Uginanie kolan jak w przysiadzie", "Trzymaj lekko ugięte kolana pod stałym kątem i cofaj biodra w stronę ściany za tobą."],
+      [
+        "Zaokrąglanie pleców, by zejść niżej",
+        "Zatrzymaj się, gdy tył uda jest w pełni rozciągnięty, zwykle tuż pod kolanem. Zakres bierze się z bioder, nie z kręgosłupa.",
+      ],
+      ["Hantle odjeżdżają do przodu", "Prowadź je wzdłuż ud i goleni. Im dalej odjadą, tym więcej pracuje dolny odcinek pleców."],
+    ],
+    sets: [
+      "**Masa mięśniowa:** 3 do 4 serii po 8 do 12 powtórzeń, opuszczając przez około trzy sekundy.",
+      "**W domu z lekkimi hantlami:** 3 serie po 15 do 20 powtórzeń albo na jednej nodze.",
+    ],
+    variations: [
+      ["romanian-deadlift", "Ze sztangą, do większych ciężarów."],
+      ["db-single-leg-rdl", "Na jednej nodze, dla równowagi i podwójnego obciążenia na nogę."],
+      ["kb-romanian-deadlift", "Jeden kettlebell trzymany oburącz."],
+    ],
+    faq: [
+      [
+        "Jakie mięśnie trenuje rumuński martwy ciąg z hantlami?",
+        "Głównie tył uda i pośladki; dolny odcinek pleców trzyma kręgosłup, a przedramiona trzymają hantle. Obciąża tył uda w rozciągnięciu, co dobrze służy wzrostowi mięśni.",
+      ],
+      [
+        "Rumuński martwy ciąg z hantlami czy ze sztangą?",
+        "Oba trenują te same mięśnie. Sztanga pozwala na więcej; hantle szybciej przygotujesz, są łagodniejsze dla nadgarstków i nadają się do domu. Wybierz to, czym obciążysz się na 8 do 12 ciężkich powtórzeń.",
+      ],
+      [
+        "Jak ciężkie powinny być hantle?",
+        "Tak ciężkie, żeby dwa ostatnie powtórzenia każdej serii były trudne przy prostych plecach. Jeśli chwyt puszcza pierwszy, użyj pasków albo przejdź na [wersję ze sztangą](/exercises/romanian-deadlift/).",
+      ],
+    ],
+  },
+  "back-extension": {
+    intro:
+      "Przy wyprostach tułowia opuszczasz tułów nad podpórką i unosisz go, aż ciało będzie proste. Wzmacniają dolny odcinek pleców, pośladki i tył uda przy małym obciążeniu kręgosłupa, więc dobrze uzupełniają ciężkie przysiady i martwe ciągi.",
+    mistakes: [
+      [
+        "Mocne przeprostowanie na górze",
+        "Zatrzymaj się, gdy ciało tworzy prostą linię. Dalej tylko ściskasz dolny odcinek pleców, niczego więcej nie trenując.",
+      ],
+      ["Odbijanie się na dole", "Opuszczaj powoli i unoś płynnie. Rozpęd zabiera pracę mięśniom."],
+      ["Za wysoko ustawiona podpórka", "Ustaw ją tuż pod kośćmi biodrowymi, żeby swobodnie zginać się w biodrach."],
+    ],
+    sets: [
+      "**Mięśnie i siła:** 3 serie po 10 do 15 powtórzeń, z talerzem lub hantlem, gdy 15 jest łatwe.",
+      "**Zdrowe plecy:** 2 do 3 serii po 15 do 20 powolnych powtórzeń albo [utrzymanie](/exercises/back-extension-hold/) przez 20 do 30 sekund.",
+    ],
+    variations: [
+      ["weighted-back-extension", "Trzymaj ciężar przy klatce, żeby było trudniej."],
+      ["back-extension-hold", "Utrzymuj prostą pozycję zamiast się ruszać."],
+      ["reverse-hyper-bench", "Ruszają się nogi zamiast tułowia."],
+    ],
+    faq: [
+      [
+        "Czy wyprosty tułowia są dobre na dolny odcinek pleców?",
+        "Tak. Robione powoli do prostej linii budują wytrzymałość mięśni wzdłuż kręgosłupa, dzięki czemu lepiej znoszą długie dni i ciężkie boje. Odpuść je przy ostrym bólu pleców i skonsultuj się ze specjalistą, jeśli nie mija.",
+      ],
+      [
+        "Czy wyprosty tułowia trenują pośladki?",
+        "Tak. Lekko zaokrąglij górę pleców, obróć stopy na zewnątrz i napinaj pośladki przy unoszeniu: wtedy pośladki pracują więcej niż dolny odcinek pleców.",
+      ],
+      [
+        "Co robić bez ławki do wyprostów?",
+        "[Hip thrust](/exercises/hip-thrust/) albo [rumuński martwy ciąg](/exercises/romanian-deadlift/) trenują te same mięśnie, a unoszenie klatki w leżeniu na brzuchu trenuje dolny odcinek pleców bez sprzętu.",
+      ],
+    ],
+  },
+  "cable-pull-through": {
+    intro:
+      "W przeciąganiu liny wyciągu między nogami stajesz tyłem do dolnego wyciągu, zginasz się w biodrach z liną między nogami i wypychasz biodra do przodu, żeby wstać. Uczy zgięcia w biodrach i trenuje pośladki oraz tył uda bez obciążania kręgosłupa, więc pasuje początkującym i zmęczonym plecom.",
+    mistakes: [
+      ["Przysiad zamiast zgięcia w biodrach", "Cofaj biodra prosto do tyłu, z goleniami prawie pionowo. Kolana zginają się tylko trochę."],
+      ["Ciągnięcie rękami", "Ręce tylko trzymają linę. Wstawaj, wypychając biodra do przodu."],
+      [
+        "Odchylanie się na górze",
+        "Kończ wyprostowany, z napiętymi pośladkami i opuszczonymi żebrami, a nie z wygiętym dolnym odcinkiem pleców.",
+      ],
+    ],
+    sets: [
+      "**Masa mięśniowa:** 3 serie po 12 do 15 powtórzeń, z sekundowym napięciem na górze.",
+      "**Nauka zgięcia w biodrach:** 2 do 3 lekkich serii po 10 przed martwym ciągiem lub swingami.",
+    ],
+    variations: [
+      ["band-pull-through", "Z gumą zaczepioną nisko, do domu."],
+      ["kb-swing", "To samo wypchnięcie bioder, szybko, z kettlebell."],
+      ["hip-thrust", "Cięższa praca pośladków z plecami na ławce."],
+    ],
+    faq: [
+      [
+        "Jakie mięśnie trenuje przeciąganie liny wyciągu między nogami?",
+        "Pośladki i tył uda. Linka ciągnie cię do tyłu, więc pośladki pracują aż do samej góry, gdzie martwy ciąg robi się łatwy.",
+      ],
+      [
+        "Przeciąganie liny czy swing z kettlebell?",
+        "Przeciąganie jest wolniejsze i łatwiejsze do nauki; swing jest szybszy i dodaje kondycji. Naucz się zgięcia w biodrach na wyciągu, potem dodaj [swingi](/exercises/kb-swing/).",
+      ],
+      ["Jak daleko od wyciągu stanąć?", "Około dwa duże kroki, żeby ciężar nie opadał na stos na dole każdego powtórzenia."],
+    ],
+  },
+  "reverse-crunch": {
+    intro:
+      "Odwrotne brzuszki robisz na plecach, podwijając biodra od podłogi w stronę klatki. Trenują brzuch, najmocniej jego dolną część, i nie obciążają karku. Nie potrzebujesz sprzętu.",
+    mistakes: [
+      ["Machanie nogami", "Trzymaj kolana ugięte pod tym samym kątem i unoś biodra brzuchem, zamiast rzucać nogami."],
+      [
+        "Biodra nie odrywają się od podłogi",
+        "Powtórzenie liczy się, gdy kość ogonowa odrywa się od podłogi. Samo przyciąganie kolan trenuje głównie zginacze bioder.",
+      ],
+      ["Szybkie opadanie", "Opuszczaj przez dwie do trzech sekund. Powolne opuszczanie robi połowę roboty."],
+    ],
+    sets: [
+      "**Brzuch:** 3 serie po 10 do 15 powolnych powtórzeń.",
+      "**Trudniej:** na ławce skośnej albo przejdź do [unoszenia nóg w zwisie](/exercises/hanging-leg-raise/).",
+    ],
+    variations: [
+      ["bench-reverse-crunch", "Na ławce, trzymając jej brzeg, dla większego zakresu."],
+      ["cable-reverse-crunch", "Wyciąg dodaje ciężar, który możesz zwiększać."],
+      ["hanging-leg-raise", "W zwisie na drążku: najtrudniejsza wersja."],
+    ],
+    faq: [
+      [
+        "Czy odwrotne brzuszki trenują dolny brzuch?",
+        "Trenują cały mięsień prosty brzucha, który biegnie od żeber do miednicy. Podwijanie miednicy mocniej obciąża dolną część, dlatego czujesz je nisko.",
+      ],
+      [
+        "Odwrotne czy zwykłe brzuszki?",
+        "Odwrotne są łagodniejsze dla karku i trudniej w nich oszukiwać rozpędem. Odwrotne brzuszki i [deska](/exercises/plank/) razem dobrze pokrywają brzuch.",
+      ],
+      [
+        "Czy odwrotne brzuszki spłaszczą mi brzuch?",
+        "Wzmocnią mięśnie brzucha, ale utrata tłuszczu zależy od tego, co jesz i jak dużo się ruszasz, a nie od trenowania jednego miejsca.",
+      ],
+    ],
+  },
+  "pec-deck": {
+    intro:
+      "Rozpiętki na maszynie (butterfly) robisz na siedząco, łącząc dwa uchwyty łukiem przed klatką. Maszyna prowadzi tor ruchu, więc możesz mocno pracować klatką bez balansowania ciężarem: bezpieczne zakończenie po wyciskaniach.",
+    mistakes: [
+      ["Barki uciekają do przodu", "Trzymaj klatkę wysoko, a łopatki ściągnięte i oparte o oparcie przez całą serię."],
+      ["Siedzisko za wysoko lub za nisko", "Ustaw je tak, żeby uchwyty były na wysokości klatki, a łokcie trochę poniżej barków."],
+      ["Uderzanie stosem ciężarów", "Zatrzymaj się tuż przed zetknięciem płyt, żeby klatka była napięta między powtórzeniami."],
+    ],
+    sets: [
+      "**Masa mięśniowa:** 3 serie po 10 do 15 powtórzeń, z sekundowym napięciem, gdy dłonie się spotykają.",
+      "**Na koniec:** 1 do 2 serii po 15 do 20 po wyciskaniach.",
+    ],
+    variations: [
+      ["cable-fly", "Na wyciągach, dla swobodnego toru i większego rozciągnięcia."],
+      ["db-fly", "Z hantlami na ławce płaskiej."],
+      ["single-arm-pec-deck", "Jedną ręką naraz, żeby wyrównać strony."],
+    ],
+    faq: [
+      [
+        "Jakie mięśnie trenują rozpiętki na maszynie?",
+        "Głównie klatkę. Trenują jej zadanie sprowadzania ramion przed ciało, z małą pomocą tricepsów, inaczej niż wyciskanie.",
+      ],
+      [
+        "Butterfly czy rozpiętki na wyciągach?",
+        "Oba działają dobrze. Butterfly szybciej ustawisz i jest bardzo stabilny; wyciągi pozwalają zmieniać kąt. Wybierz to, co jest wolne na twojej siłowni.",
+      ],
+      [
+        "Czy butterfly szkodzi barkom?",
+        "Nie przy rozsądnym zakresie. Kończ rozciąganie, gdy łokcie są w linii z ciałem, nie daleko za nim, i trzymaj łopatki ściągnięte.",
+      ],
+    ],
+  },
+  "machine-shoulder-press": {
+    intro:
+      "W wyciskaniu nad głowę na maszynie siedzisz przy oparciu i wypychasz dwa uchwyty nad głowę po stałym torze. Trenuje przód barków i tricepsy bez balansowania, więc możesz bezpiecznie dojść blisko upadku mięśniowego.",
+    mistakes: [
+      ["Odrywanie się od oparcia", "Trzymaj plecy i głowę przy oparciu. Jeśli musisz się wygiąć, żeby skończyć, ciężar jest za duży."],
+      [
+        "Źle ustawione siedzisko",
+        "Ustaw je tak, żeby uchwyty startowały mniej więcej na wysokości barków. Za nisko obciąża bark na dole; za wysoko skraca zakres.",
+      ],
+      ["Odbijanie na górze", "Wyciskaj płynnie do prawie prostych rąk i opuszczaj pod kontrolą."],
+    ],
+    sets: ["**Masa mięśniowa:** 3 do 4 serii po 8 do 12 powtórzeń.", "**Po wyciskaniu wolnymi ciężarami:** 2 serie po 12 do 15."],
+    variations: [
+      ["db-shoulder-press", "Z hantlami, każda ręka osobno."],
+      ["overhead-press", "Wyciskanie sztangi stojąc, bój siłowy."],
+      ["single-arm-shoulder-press-machine", "Jedną ręką naraz na tej samej maszynie."],
+    ],
+    faq: [
+      [
+        "Jakie mięśnie trenuje wyciskanie nad głowę na maszynie?",
+        "Głównie przednie aktony barków i tricepsy, z pomocą bocznych aktonów. Dla szerszych barków dodaj [unoszenie ramion bokiem](/exercises/lateral-raise/).",
+      ],
+      [
+        "Wyciskanie na maszynie czy z hantlami?",
+        "Maszyna jest łatwiejsza do nauki i do bezpiecznego cisnięcia; hantle trenują równowagę i dają każdej ręce swobodę. Oba budują barki.",
+      ],
+      [
+        "Których uchwytów używać?",
+        "Neutralne (dłonie zwrócone do siebie) są łagodniejsze dla większości barków. Nachwytu używaj, jeśli dobrze się z nim czujesz.",
+      ],
+    ],
+  },
+  "straight-arm-pulldown": {
+    intro:
+      "Przy ściąganiu drążka prostymi rękami stajesz przodem do górnego wyciągu i prowadzisz drążek do ud prawie prostymi rękami. Izoluje mięśnie najszersze grzbietu bez pomocy bicepsów: dobra rozgrzewka przed podciąganiem i prosty sposób, żeby poczuć ich pracę.",
+    mistakes: [
+      [
+        "Uginanie łokci",
+        "Trzymaj lekkie, stałe ugięcie. Jeśli łokcie zginają się bardziej z każdym powtórzeniem, robi się z tego prostowanie ramion na wyciągu.",
+      ],
+      ["Praca całym ciałem", "Lekko się pochyl i utrzymaj tę pozycję. Ruszają się ręce, nie tułów."],
+      ["Skracanie zakresu na górze", "Pozwól rękom unieść się, aż poczujesz rozciąganie najszerszych, potem prowadź w dół."],
+    ],
+    sets: [
+      "**Masa mięśniowa:** 3 serie po 12 do 15 powtórzeń.",
+      "**Rozgrzewka przed ciągnięciem:** 2 lekkie serie po 15 przed podciąganiem lub wiosłowaniem.",
+    ],
+    variations: [
+      ["rope-straight-arm-pulldown", "Z liną, żeby dłonie mogły minąć biodra."],
+      ["db-pullover", "Leżąc na ławce z hantlem."],
+      ["band-straight-arm-pulldown", "Z gumą zaczepioną wysoko, do domu."],
+    ],
+    faq: [
+      [
+        "Jakie mięśnie trenuje ściąganie drążka prostymi rękami?",
+        "Głównie najszersze grzbietu; głowa długa tricepsa i brzuch trzymają ręce i tułów nieruchomo.",
+      ],
+      [
+        "Ściąganie prostymi rękami czy zwykłe ściąganie drążka?",
+        "[Ściąganie drążka wyciągu](/exercises/lat-pulldown/) służy do cięższej pracy i angażuje też bicepsy; wersja prostymi rękami izoluje najszersze. Dobrze łączą się w jednym treningu.",
+      ],
+      ["Drążek czy lina?", "Prosty drążek jest stabilniejszy. Lina pozwala rozsunąć dłonie i minąć biodra, co daje trochę większy zakres."],
     ],
   },
 };
