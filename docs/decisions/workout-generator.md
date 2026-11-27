@@ -26,4 +26,4 @@
 
 ## Also shipped with it
 
-Features page entry (`workout-generator`, Free), a blog post (`/blog/free-workout-generator/`), a What's new release (0.32.0), a weekly tips email with a screenshot of the workout card in each language (`node scripts/generator-shots.mjs` against a running dev server, `PW_CHROMIUM` in cloud sessions) and preview cards.
+Features page entry (`workout-generator`, Free), a blog post (`/blog/free-workout-generator/`), a What's new release (0.33.0), a weekly tips email with a screenshot of the workout card in each language (`node scripts/generator-shots.mjs` against a running dev server, `PW_CHROMIUM` in cloud sessions) and preview cards.

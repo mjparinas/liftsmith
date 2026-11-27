@@ -32,8 +32,8 @@ jobs:
   #     all recognised as already tested and finish in seconds.
   #  2. Only the gate, when every changed file is Markdown (docs, AGENTS.md, READMEs), whatever the commit before did
   #     (Melvin, 2026-11-17: "we only made md changes, dont run ci if that is the case"): Markdown can't break the
-  #     build, and the base branch's own run reports its own failures. docs/PLAY_LISTING.md and
-  #     docs/PLAY_LISTING_TRANSLATIONS.md are the exception: a unit test reads them. Locale text (src/locales/) is not "copy" here:
+  #     build, and the base branch's own run reports its own failures. docs/PLAY_LISTING.md,
+  #     docs/PLAY_LISTING_TRANSLATIONS.md and docs/PLAY_PROMOTIONS.md are the exception: a unit test reads them. Locale text (src/locales/) is not "copy" here:
   #     it is app code, the tests check every key in every language, and longer text can break layouts.
   #  3. The web jobs, plus both native builds when native code, Capacitor or dependencies changed.
   # On a pull request the checkout is GitHub's merge commit: HEAD^1 is the base branch tip and HEAD^2 the pull
@@ -100,7 +100,7 @@ jobs:
 
           # Here-strings rather than pipes: with pipefail, a pipe into grep -q can fail on SIGPIPE.
           not_md=$(grep -vE '\.md$' <<< "$files" || true)
-          if [ -z "$not_md" ] && ! grep -qxE 'docs/PLAY_LISTING(_TRANSLATIONS)?\.md' <<< "$files"; then
+          if [ -z "$not_md" ] && ! grep -qxE 'docs/PLAY_(LISTING(_TRANSLATIONS)?|PROMOTIONS)\.md' <<< "$files"; then
             echo "web=false" >> "$GITHUB_OUTPUT"; echo "native=false" >> "$GITHUB_OUTPUT"
             echo "::notice::Only Markdown changed, so the tests and builds are skipped."
             exit 0

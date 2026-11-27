@@ -65,6 +65,11 @@ export const es: FeaturesText = {
     labs: { title: "Labs", intro: "Experimentos que quien tiene Pro puede activar en Ajustes › Labs. Pueden cambiar o desaparecer." },
   },
   features: {
+    "gym-widgets": {
+      name: "Widgets para la web de tu gimnasio",
+      body: "Los gimnasios oficiales ponen su horario de clases, su equipamiento o una insignia de Encuéntranos en Liftsmith en su propia web con una línea de código. Se actualizan solos, en el idioma y el aspecto que elijas, y enlazan a la página del gimnasio.",
+      note: "Sin scripts, cookies ni seguimiento en la web del gimnasio.",
+    },
     "gym-insights": {
       name: "Datos para dueños de gimnasios",
       body: "Los dueños y el personal de gimnasios oficiales ven cuántos atletas entrenaron allí en las últimas cuatro semanas, las horas llenas y tranquilas, el equipo usado y los problemas abiertos, con un siguiente paso.",

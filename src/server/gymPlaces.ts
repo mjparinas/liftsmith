@@ -868,6 +868,19 @@ export async function placeById(id: unknown): Promise<Place | null> {
   return r ? withPhotos(toPlace(r, 0)) : null;
 }
 
+/**
+ * One gym for a website widget (gymWidgets.ts): its row alone, plus the week of classes when `classes` is asked for. A
+ * widget sits on the gym's own site and every visitor there loads it, so it reads one row (two for a schedule), not the
+ * photos, news, problems and trainers a gym page reads.
+ */
+export async function widgetPlace(id: unknown, classes = false): Promise<Place | null> {
+  if (!isPlaceId(id)) return null;
+  const [r] = await query(`SELECT ${PLACE_COLUMNS} FROM gym_places p WHERE p.id = ? AND p.hidden = 0`, [id]);
+  if (!r) return null;
+  const p = toPlace(r, 0);
+  return classes && p.official ? { ...p, classes: await classesOf(p.id) } : p;
+}
+
 // --- Gym pages (gymPage.ts): /gyms/, /gyms/<city>/, /gyms/<city>/<gym>/ ---
 
 const isSlug = (x: unknown): x is string => typeof x === "string" && /^[a-z0-9-]{1,90}$/.test(x);

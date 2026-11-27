@@ -70,6 +70,11 @@ export const fr: FeaturesText = {
     },
   },
   features: {
+    "gym-widgets": {
+      name: "Des widgets pour le site de votre salle",
+      body: "Les salles officielles affichent leur horaire des cours, leur équipement ou un badge Retrouvez-nous sur Liftsmith sur leur propre site avec une ligne de code. Ils se mettent à jour tout seuls, dans la langue et l’apparence choisies, et mènent à la page de la salle.",
+      note: "Aucun script, cookie ni suivi sur le site de la salle.",
+    },
     "gym-insights": {
       name: "Statistiques pour les propriétaires de salle",
       body: "Les propriétaires et le personnel des salles officielles voient combien de sportifs s'y sont entraînés ces quatre dernières semaines, les heures pleines et calmes, le matériel utilisé et les problèmes signalés, avec une prochaine étape.",
