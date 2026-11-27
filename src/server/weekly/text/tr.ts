@@ -1115,6 +1115,7 @@ export const emails: Record<string, Words> = {
       "Set kaydetme, +30 sn, dinlenme sonu titreşimi, ağırlık ve tekrar değiştirme bilekte çalışır; nabız saatin sensöründen gelir.",
       "Bitince Bitir'e dokun. Uygulama açık olsun olmasın, telefonun yeniden yakına gelene kadar saat antrenmanı saklar.",
       "Telefonun onu orada kaydetmişsin gibi saklar: her set, rekorların, sonraki ağırlıklar ve Sağlık.",
+      "Plank, duvar oturuşu ve asılma bilekte Zamanlayıcıyı başlat ile gelir; 3, 2, 1 ve yarıda titrer, süre dolunca set kendiliğinden kaydedilir.",
     ],
     dyk: "Planlama telefonda kalır; Makine dolu ve Planı değiştir telefon dönene kadar bekler.",
   },

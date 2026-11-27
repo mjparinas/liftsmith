@@ -227,7 +227,8 @@ enum GarminMessages {
                 if let to, to <= from { continue }
                 if first == 0 { first = from }
                 let start = Int(((from / 1000) - now.timeIntervalSince1970).rounded(.down))
-                let end = to.map { Int((($0 / 1000) - now.timeIntervalSince1970).rounded(.up)) } ?? -1
+                // A phase already over says 0, never a negative number, which the watch would read as a count-up.
+                let end = to.map { max(0, Int((($0 / 1000) - now.timeIntervalSince1970).rounded(.up))) } ?? -1
                 k.append([start, end, p["label"] as? String ?? ""])
                 ke.append([Int((from / 1000).rounded()), to.map { Int(($0 / 1000).rounded()) } ?? -1, p["label"] as? String ?? ""])
             }
@@ -251,7 +252,18 @@ enum GarminMessages {
             "x": s["taken"] as? String ?? "",
             "y": s["why"] as? String ?? "",
         ]
-        return base.merging(adjust(s, resting: left > 0)) { a, _ in a }
+        return base.merging(adjust(s, resting: left > 0)) { a, _ in a }.merging(timerOffer(s, resting: left > 0)) { a, _ in a }
+    }
+
+    /// Start timer on the watch (sessionNotify.ts TimerOffer), in Android's keys: "tk" the set's key, "tn" the seconds
+    /// (each side), "td" 2 for each side, "tu" a count-up, "tl" the button's words, "tb" the phase labels, "to" time's up.
+    static func timerOffer(_ s: [String: Any], resting: Bool) -> [String: Any] {
+        guard !resting, let ts = s["ts"] as? [String: Any], let key = ts["key"] as? String, !key.isEmpty else { return [:] }
+        let n = { (k: String) in (ts[k] as? NSNumber)?.intValue ?? 0 }
+        return [
+            "tk": key, "tn": max(1, n("s")), "td": n("d") == 2 ? 2 : 1, "tu": n("u") == 1, "tl": ts["l"] as? String ?? "",
+            "tb": ((ts["lb"] as? [Any]) ?? []).prefix(4).map { $0 as? String ?? "" }, "to": ts["o"] as? String ?? "",
+        ]
     }
 
     /// Adjust and rate a set (watchAdjust.ts), in the same short keys as Android's GarminMessages: "ay" the set's key,
@@ -277,7 +289,7 @@ enum GarminMessages {
 
     static func worthSending(_ last: [String: Any]?, _ next: [String: Any], since: TimeInterval) -> Bool {
         guard let last else { return true }
-        for k in ["t", "s", "n", "p", "ki", "x", "y", "ay", "qe"] where last[k] as? String != next[k] as? String { return true }
+        for k in ["t", "s", "n", "p", "ki", "x", "y", "ay", "qe", "tk"] where last[k] as? String != next[k] as? String { return true }
         if last["ai"] as? Int != next["ai"] as? Int || last["ar"] as? Int != next["ar"] as? Int { return true }
         if last["v"] as? Bool != next["v"] as? Bool || last["w"] as? Bool != next["w"] as? Bool { return true }
         let a = last["r"] as? Int ?? 0, b = next["r"] as? Int ?? 0
@@ -301,12 +313,14 @@ enum GarminMessages {
         }
         let st: [[Any]] = ((c["st"] as? [[String: Any]]) ?? []).prefix(80).map { x in
             let n = { (k: String, d: Int) in (x[k] as? NSNumber)?.intValue ?? d }
-            return [n("e", 0), x["l"] as? String ?? "", x["t"] as? String ?? "", n("i", 0), n("r", 1), n("s", 0), n("f", 0) == 1, n("a", 0) == 1, n("c", 0) == 1]
+            // Then whether it's a timed hold (0, or 1 or 2 sides) and Start timer's words (set-timer.md).
+            return [n("e", 0), x["l"] as? String ?? "", x["t"] as? String ?? "", n("i", 0), n("r", 1), n("s", 0), n("f", 0) == 1, n("a", 0) == 1, n("c", 0) == 1,
+                    n("m", 0) == 2 ? 2 : n("m", 0) == 1 ? 1 : 0, x["tt"] as? String ?? ""]
         }
         let w: [String: Any] = [
             "id": str("id"), "d": str("day"), "t": str("title"), "y": str("why"),
             "v": (c["vib"] as? Bool) ?? true, "w": (c["warn"] as? Bool) ?? false,
-            "o": (c["o"] as? [String]) ?? [], "dn": str("done"), "fn": str("fin"), "ex": ex, "st": st,
+            "o": (c["o"] as? [String]) ?? [], "dn": str("done"), "fn": str("fin"), "tl": (c["tl"] as? [String]) ?? [], "ex": ex, "st": st,
         ]
         return ["wc": w]
     }
@@ -320,7 +334,10 @@ enum GarminMessages {
         var sets: [[Double]] = []
         for x in (r["sets"] as? [[Any]]) ?? [] {
             guard x.count >= 5 else { return nil }
-            sets.append([num(x[0]), ms(x[1]), num(x[2]), num(x[3]), ms(x[4])])
+            var set = [num(x[0]), ms(x[1]), num(x[2]), num(x[3]), ms(x[4])]
+            // A hold stopped short on its second side: that side's seconds.
+            if x.count >= 6, let right = x[5] as? NSNumber { set.append(right.doubleValue) }
+            sets.append(set)
         }
         let rates: [[Double]] = ((r["rates"] as? [[Any]]) ?? []).compactMap { $0.count >= 2 ? [num($0[0]), num($0[1])] : nil }
         let hr: [Double] = ((r["hr"] as? [Any]) ?? []).map(num)

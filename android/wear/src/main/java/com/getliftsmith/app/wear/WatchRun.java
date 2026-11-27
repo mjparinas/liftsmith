@@ -31,6 +31,8 @@ final class WatchRun {
     long restUntil;
     /** When the set on screen started: the end of the rest before it, or the last Log set. */
     long setFrom;
+    /** When Start timer was tapped on the timed hold on screen, or 0 (set-timer.md "Started from the watch"). */
+    long timerAt;
     /** The step whose exercise "How did it feel?" asks about, or -1. */
     int ask = -1;
     final JSONArray sets;
@@ -128,16 +130,59 @@ final class WatchRun {
         return s != null && s.optInt("a", 0) == 1;
     }
 
+    // ---------- The set timer on a timed hold (the phone's rules: 5 s to get set, then the hold, each side in turn)
+
+    /** The timer for the hold on screen, or null when it isn't one. */
+    WorkoutState.Offer offer() {
+        JSONObject s = step(k);
+        int sides = s == null ? 0 : s.optInt("m", 0);
+        if (sides != 1 && sides != 2) return null;
+        JSONArray tl = carry.optJSONArray("tl");
+        String w = tl == null ? "" : tl.optString(sides == 2 ? 2 : 1, "");
+        String[] labels = {
+            tl == null ? "" : tl.optString(0, ""),
+            w,
+            tl == null ? "" : tl.optString(3, ""),
+            tl == null ? "" : tl.optString(4, ""),
+        };
+        return new WorkoutState.Offer(id + ":" + k, Math.max(1, s.optInt("r", 1)), sides, false, s.optString("tt", ""), labels, tl == null ? "" : tl.optString(5, ""));
+    }
+
+    /** Start timer on the hold on screen, at `now` (once; not during rest). */
+    void startTimer(long now) {
+        if (offer() == null || restUntil > now || timerAt > 0) return;
+        timerAt = now;
+    }
+
+    /** When the running hold's countdown ends, or 0. */
+    long timerEnd() {
+        WorkoutState.Offer o = offer();
+        return o == null || timerAt <= 0 ? 0 : o.end(timerAt);
+    }
+
+    /** The running hold has run out: it logs itself at its end, as on the phone. */
+    boolean timerRanOut(long now) {
+        long end = timerEnd();
+        return end > 0 && now >= end;
+    }
+
     /** Log set: the set on screen with `kg` and `reps` when the watch changed them, at `now`, then rest. */
     void log(long now, Double withKg, Integer withReps) {
         JSONObject s = step(k);
         if (s == null || sets.length() >= MAX_SETS) return;
         if (adjustable()) adjust(withKg, withReps);
+        // A hold timed here saves the seconds held (as planned when stopped while getting set).
+        WorkoutState.Offer o = offer();
+        int[] held = o != null && timerAt > 0 ? o.held(timerAt, now) : null;
+        if (held != null) reps = held[0];
         try {
-            sets.put(new JSONArray().put(k).put(now).put(kg < 0 ? -1 : kg).put(reps).put(Math.max(start, Math.min(setFrom, now))));
+            JSONArray set = new JSONArray().put(k).put(now).put(kg < 0 ? -1 : kg).put(reps).put(Math.max(start, Math.min(setFrom, now)));
+            if (held != null && held.length > 1) set.put(held[1]);
+            sets.put(set);
         } catch (JSONException ignored) {
             return;
         }
+        timerAt = 0;
         double keptKg = kg;
         int keptReps = reps;
         ask = s.optInt("f", 0) == 1 ? k : ask;
@@ -231,6 +276,25 @@ final class WatchRun {
             o.put("setLabel", s.optString("l", ""));
             o.put("next", text(s, item));
             if (resting) o.put("restUntil", restUntil);
+            WorkoutState.Offer offer = resting ? null : offer();
+            if (offer != null) {
+                o.put(
+                    "ts",
+                    new JSONObject()
+                        .put("key", offer.key)
+                        .put("s", offer.secs)
+                        .put("d", offer.sides)
+                        .put("l", offer.label)
+                        .put("lb", new JSONArray().put(offer.labels[0]).put(offer.labels[1]).put(offer.labels[2]).put(offer.labels[3]))
+                        .put("o", offer.over)
+                );
+                if (timerAt > 0) {
+                    JSONArray ph = new JSONArray();
+                    for (WorkoutState.Phase p : offer.phases(timerAt)) ph.put(new JSONObject().put("from", p.from).put("to", p.to).put("label", p.label));
+                    o.put("timer", ph);
+                    o.put("timerOver", offer.over);
+                }
+            }
             if (adjustable() && item != null) {
                 double[] l = ladder(item);
                 int at = 0;
@@ -292,7 +356,7 @@ final class WatchRun {
         JSONObject o = new JSONObject();
         try {
             o.put("carry", carry).put("id", id).put("start", start).put("k", k).put("kg", kg).put("reps", reps);
-            o.put("restUntil", restUntil).put("setFrom", setFrom).put("ask", ask).put("sets", sets).put("rates", rates);
+            o.put("restUntil", restUntil).put("setFrom", setFrom).put("timerAt", timerAt).put("ask", ask).put("sets", sets).put("rates", rates);
             o.put("hr", new JSONArray().put(hrSum).put(hrCount).put(hrMax).put(hrMin));
         } catch (JSONException e) {
             return null;
@@ -311,6 +375,7 @@ final class WatchRun {
             r.reps = o.optInt("reps", 1);
             r.restUntil = o.optLong("restUntil", 0);
             r.setFrom = o.optLong("setFrom", r.start);
+            r.timerAt = o.optLong("timerAt", 0);
             r.ask = o.optInt("ask", -1);
             JSONArray hr = o.optJSONArray("hr");
             if (hr != null && hr.length() == 4) {

@@ -609,6 +609,11 @@ export const fr: FeaturesText = {
       body: "Le plan du jour t'accompagne sur ta montre. Touche Démarrer sur la montre, note chaque série avec sa charge et ses répétitions au poignet, et la séance est enregistrée, records compris, quand ton téléphone est de nouveau près.",
       note: "Wear OS, Apple Watch et Garmin.",
     },
+    "watch-timer": {
+      name: "Minuteurs de gainage sur la montre",
+      body: "Sur une planche, une chaise contre le mur ou une suspension, Lancer le minuteur à ton poignet compte le maintien avec des vibrations à 3, 2, 1 et à mi-parcours, et ton téléphone lance le même minuteur. Arrête plus tôt et les secondes tenues sont notées.",
+      note: "Wear OS, Apple Watch et Garmin (START), même sans téléphone.",
+    },
     widgets: {
       name: "Widgets d’écran d’accueil",
       body: "Trois widgets : Aujourd’hui (la décision du jour, votre objectif de la semaine, une note du coach et Démarrer ou Valider la série), Cette semaine (jours entraînés, votre série et ce qui la garde) et Récupération (les muscles prêts à travailler et quand les autres le seront).",

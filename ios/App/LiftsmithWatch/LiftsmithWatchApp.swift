@@ -129,6 +129,10 @@ struct WorkoutView: View {
                         }
                     }
                     .font(.system(.largeTitle, design: .rounded, weight: .heavy).monospacedDigit())
+                } else if s.timeUp(at: now) {
+                    // The countdown ran out: the phone logs the hold as held.
+                    Text(s.timerOver).font(.footnote).foregroundStyle(.secondary)
+                    Text(verbatim: "0:00").font(.system(.largeTitle, design: .rounded, weight: .heavy).monospacedDigit())
                 } else if resting, let end = s.restEnd {
                     Text(timerInterval: now...end, countsDown: true)
                         .font(.system(.largeTitle, design: .rounded, weight: .heavy).monospacedDigit())
@@ -148,6 +152,11 @@ struct WorkoutView: View {
                     Label("\(bpm) bpm", systemImage: "heart.fill")
                         .font(.footnote.bold().monospacedDigit()).foregroundStyle(.red)
                         .accessibilityLabel(Text("Heart rate \(bpm) beats per minute"))
+                }
+                if model.run?.finishedAll != true, s.canStartTimer(at: now), let ts = s.ts {
+                    // A timed hold, carry or cardio set: the timer starts here and on the phone at the same moment.
+                    Button(ts.l) { model.startTimer() }
+                        .padding(.top, 4)
                 }
                 if model.run?.finishedAll != true {
                     Button("Log set") { logSet(s, now: now) }

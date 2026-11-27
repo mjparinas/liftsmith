@@ -928,3 +928,5 @@ Did you know? Team links now work when an athlete signs in after opening them, s
 **New, 2026-11-27.** "One move a day for 30 days" (`thirty-day`): the twelve 30-day challenges, Tools › 30-day challenges, the one-tap Done on Today, a missed day that waits and the printable calendar on the website ([30-day challenges](thirty-day-challenges.md)), with a screenshot of the challenge list, in every language.
 
 **New, 2026-11-27.** "Print a workout on one page" (`printable-plans`): the printable page and free PDF of every program, public routines on one page and Print routine in the app with the next weights and a QR code ([Printable plans](printable-plans.md)). Its picture is the dumbbell full body's sheet as it prints (`art: "print"`, drawn by `node scripts/program-pdfs.mjs --email`), in every language.
+
+**Extended, 2026-11-27.** "Leave your phone in the locker" (`watch-alone`) gets a fifth point: Start timer on the wrist for planks, wall sits and hangs, with taps at 3, 2, 1 and halfway ([Set timer](set-timer.md) "Started from the watch"), in every language. It extends the watch email rather than adding one, and still waits for the `wearOnPlay` flag.

@@ -7,7 +7,9 @@ import Toybox.Time;
 //! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
 //! phone's never have to agree; "re" and "ke" are the same moments on the phone's clock (seconds since 1970) and "z" when it
 //! was sent, which a watch whose clock agrees counts to instead, so the message's trip adds no delay. "ay", "ak", "aw", "ai", "ar" and "ars" are the set to adjust and "qe", "q" and "qo" the
-//! "How did it feel?" question (GarminMessages.java, GarminLink.swift; watchAdjust.ts on the phone).
+//! "How did it feel?" question (GarminMessages.java, GarminLink.swift; watchAdjust.ts on the phone). "tk", "tn", "td",
+//! "tu", "tl", "tb" and "to" are the set timer START can start here: its set's key, seconds (each side), 2 for each side,
+//! a count-up, the words for START, the phase labels and what time's up says (timerRun.ts watchTimerOffer).
 (:glance, :background)
 class WorkoutState {
     //! A workout the phone stopped updating this long ago was forgotten (the phone ends those after 3 hours).
@@ -31,6 +33,21 @@ class WorkoutState {
     var at as Number = 0;
     //! The set timer's phases on the watch's clock: [start, end or -1, label], oldest first.
     var timer as Array = [];
+
+    //! Start timer on a timed hold, carry or cardio set (an empty key: none). The same rules as the phone's
+    //! src/lib/setTimer.ts: 5 s to get set, then the hold, 5 s to switch and the other side.
+    const LEAD_SEC = 5;
+    const SWITCH_SEC = 5;
+    var tsKey as String = "";
+    var tsSecs as Number = 0;
+    var tsSides as Number = 1;
+    var tsUp as Boolean = false;
+    var tsLabel as String = "";
+    var tsLabels as Array = [];
+    var tsOver as String = "";
+    //! The timer started here with START, counted on the watch's own clock until the phone's phases arrive.
+    var startedKey as String = "";
+    var startedAt as Number = 0;
 
     //! Adjust a set (watchAdjust.ts): the set's key, the weight ladder in kg and its words, where the set's own
     //! weight is, the reps and the word after them. An empty key means the set can't be changed on the wrist.
@@ -67,6 +84,7 @@ class WorkoutState {
             timer = [];
             adjKey = "";
             askEx = "";
+            tsKey = "";
             return;
         }
         var now = Time.now().value();
@@ -105,6 +123,23 @@ class WorkoutState {
                     timer.add([now + whole(p[0]), end < 0 ? -1 : now + end, text(p[2])]);
                 }
             }
+        }
+        tsKey = text(data.get("tk"));
+        tsSecs = whole(data.get("tn"));
+        tsSides = whole(data.get("td")) == 2 ? 2 : 1;
+        tsUp = data.get("tu") == true;
+        tsLabel = text(data.get("tl"));
+        tsLabels = [];
+        var tb = data.get("tb");
+        for (var i = 0; i < 4; i++) {
+            tsLabels.add(tb instanceof Array && i < tb.size() ? text(tb[i]) : "");
+        }
+        tsOver = text(data.get("to"));
+        if (tsSecs < 1) {
+            tsKey = "";
+        }
+        if (timer.size() == 0 && tsKey.length() > 0 && tsKey.equals(startedKey) && startedAt > 0) {
+            timer = phasesFrom(startedAt);
         }
         adjKey = text(data.get("ay"));
         ladderKg = [];
@@ -150,6 +185,44 @@ class WorkoutState {
             answered = "";
         }
         at = now;
+    }
+
+    //! The timer started at `start` (seconds), phase by phase, as the phone's timerPhases lays it out.
+    function phasesFrom(start as Number) as Array {
+        var lead = start + LEAD_SEC;
+        var out = [[start, lead, tsLabels[0]]];
+        if (tsUp) {
+            out.add([lead, -1, tsLabels[1]]);
+            return out;
+        }
+        out.add([lead, lead + tsSecs, tsLabels[1]]);
+        if (tsSides == 2) {
+            var sw = lead + tsSecs + SWITCH_SEC;
+            out.add([lead + tsSecs, sw, tsLabels[2]]);
+            out.add([sw, sw + tsSecs, tsLabels[3]]);
+        }
+        return out;
+    }
+
+    //! START starts the set timer: a timed set is on, not resting, and no timer runs yet.
+    function canStartTimer() as Boolean {
+        return active() && tsKey.length() > 0 && !resting() && timer.size() == 0;
+    }
+
+    //! Starts the timer here at `now`, before the phone's phases arrive.
+    function startTimer(now as Number) as Void {
+        startedKey = tsKey;
+        startedAt = now;
+        timer = phasesFrom(now);
+    }
+
+    //! A countdown that has run out and waits for the set to be logged.
+    function timeUp() as Boolean {
+        if (timer.size() == 0 || resting()) {
+            return false;
+        }
+        var end = (timer[timer.size() - 1] as Array)[1] as Number;
+        return end >= 0 && Time.now().value() >= end;
     }
 
     //! The set can be changed now: a set is on (not rest, not a set timer) and the phone sent what to change.

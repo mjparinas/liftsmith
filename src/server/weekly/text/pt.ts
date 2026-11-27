@@ -1120,6 +1120,7 @@ export const emails: Record<string, Words> = {
       "Registrar série, +30 s, a vibração no fim do descanso e mudar peso e repetições funcionam no pulso, com a frequência cardíaca do relógio.",
       "Toque em Concluir quando terminar. O relógio guarda o treino até o celular estar por perto de novo, com o app aberto ou não.",
       "O celular salva tudo como se você tivesse registrado nele: cada série, seus recordes, os próximos pesos e o Saúde.",
+      "Prancha, cadeirinha na parede e suspensão ganham Iniciar timer no pulso, com toques aos 3, 2, 1 e na metade, e a série é registrada sozinha quando o tempo acaba.",
     ],
     dyk: "O planejamento continua no celular, então Aparelho ocupado e Mudar o plano esperam ele voltar.",
   },

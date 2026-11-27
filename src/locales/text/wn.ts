@@ -166,6 +166,9 @@ export const en = {
   "wn.c.printRoutine.title": "Print a routine on one page",
   "wn.c.printRoutine.body":
     "Print routine in a routine's editor puts it on one page: sets and reps, your next weights, the rest, boxes for four sessions and a QR code so a friend can add it. Every program on the website has a free PDF too.",
+  "wn.c.watchHoldTimer.title": "Start hold timers on your watch",
+  "wn.c.watchHoldTimer.body":
+    "On a plank, wall sit or dead hang, Start timer on Wear OS, Apple Watch or Garmin counts it on your wrist with taps at 3, 2, 1 and halfway, and your phone starts the same timer. Stop early and the seconds you held are logged, phone-free workouts too.",
   "wn.c.watchAuto.title": "Hands-free sets on your watch",
   "wn.c.watchAuto.body":
     "In Labs: start your next set and your Wear OS watch or Apple Watch ends rest, counts the reps and logs the set by itself, with a buzz at each step.",
@@ -386,6 +389,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Imprime una rutina en una página",
   "wn.c.printRoutine.body":
     "Imprimir rutina, en el editor de una rutina, la pone en una sola página: series y repeticiones, tus próximos pesos, el descanso, casillas para cuatro sesiones y un código QR para que un amigo la añada. Cada programa de la web también tiene un PDF gratis.",
+  "wn.c.watchHoldTimer.title": "Inicia temporizadores de isometría en tu reloj",
+  "wn.c.watchHoldTimer.body":
+    "En una plancha, sentadilla en pared o colgarse de la barra, Iniciar temporizador en Wear OS, Apple Watch o Garmin cuenta en tu muñeca con toques a los 3, 2, 1 y a la mitad, y tu teléfono inicia el mismo temporizador. Si paras antes, se guardan los segundos que aguantaste, también en entrenamientos sin teléfono.",
   "wn.c.watchAuto.title": "Series sin manos en tu reloj",
   "wn.c.watchAuto.body":
     "En Labs: empieza tu siguiente serie y tu reloj Wear OS o Apple Watch termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
@@ -608,6 +614,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Imprime une routine sur une page",
   "wn.c.printRoutine.body":
     "Imprimer la routine, dans l'éditeur d'une routine, la met sur une seule page : séries et répétitions, tes prochaines charges, le repos, des cases pour quatre séances et un code QR pour qu'un ami l'ajoute. Chaque programme du site a aussi son PDF gratuit.",
+  "wn.c.watchHoldTimer.title": "Lance les minuteurs de gainage sur ta montre",
+  "wn.c.watchHoldTimer.body":
+    "Sur une planche, une chaise contre le mur ou une suspension, Lancer le minuteur sur Wear OS, Apple Watch ou Garmin compte à ton poignet avec des vibrations à 3, 2, 1 et à mi-parcours, et ton téléphone lance le même minuteur. Arrête plus tôt et les secondes tenues sont notées, même sans téléphone.",
   "wn.c.watchAuto.title": "Séries mains libres sur ta montre",
   "wn.c.watchAuto.body":
     "Dans Labs : lance ta série suivante et ta montre Wear OS ou ton Apple Watch arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
@@ -826,6 +835,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Eine Routine auf einer Seite drucken",
   "wn.c.printRoutine.body":
     "Routine drucken im Editor einer Routine bringt sie auf eine Seite: Sätze und Wiederholungen, deine nächsten Gewichte, die Pause, Felder für vier Einheiten und ein QR-Code, mit dem ein Freund sie hinzufügt. Jedes Programm auf der Website gibt es auch als kostenloses PDF.",
+  "wn.c.watchHoldTimer.title": "Halte-Timer auf deiner Uhr starten",
+  "wn.c.watchHoldTimer.body":
+    "Bei Unterarmstütz, Wandsitzen oder Hängen startet Timer starten auf Wear OS, Apple Watch oder Garmin die Zeit am Handgelenk, mit Tippen bei 3, 2, 1 und zur Hälfte, und dein Handy startet denselben Timer. Hörst du früher auf, werden die gehaltenen Sekunden eingetragen, auch beim Training ohne Handy.",
   "wn.c.watchAuto.title": "Freihändige Sätze auf deiner Uhr",
   "wn.c.watchAuto.body":
     "In Labs: Starte deinen nächsten Satz, und deine Wear-OS-Uhr oder Apple Watch beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
@@ -1044,6 +1056,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Stampa una routine su una pagina",
   "wn.c.printRoutine.body":
     "Stampa la routine, nell'editor di una routine, la mette su una sola pagina: serie e ripetizioni, i tuoi prossimi pesi, il recupero, caselle per quattro sessioni e un codice QR per farla aggiungere a un amico. Ogni programma del sito ha anche un PDF gratuito.",
+  "wn.c.watchHoldTimer.title": "Avvia i timer delle tenute sull'orologio",
+  "wn.c.watchHoldTimer.body":
+    "Su plank, wall sit o sospensione alla sbarra, Avvia il timer su Wear OS, Apple Watch o Garmin conta al polso con tocchi a 3, 2, 1 e a metà, e il telefono avvia lo stesso timer. Se ti fermi prima vengono registrati i secondi tenuti, anche negli allenamenti senza telefono.",
   "wn.c.watchAuto.title": "Serie a mani libere sull'orologio",
   "wn.c.watchAuto.body":
     "In Labs: inizia la serie successiva e il tuo orologio Wear OS o Apple Watch chiude il recupero, conta le ripetizioni e registra la serie da solo, con una vibrazione a ogni passo.",
@@ -1250,6 +1265,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "ルーティンを1ページで印刷",
   "wn.c.printRoutine.body":
     "ルーティンの編集画面で「ルーティンを印刷」を押すと1ページにまとまります。セットと回数、次の重量、休憩、4回分の記入欄、友達が追加できるQRコード付き。サイトの全プログラムに無料PDFもあります。",
+  "wn.c.watchHoldTimer.title": "キープ種目のタイマーをウォッチで開始",
+  "wn.c.watchHoldTimer.body":
+    "プランク、壁スクワット、ぶら下がりでは、Wear OS・Apple Watch・Garminの「タイマー開始」で手首でカウント。残り3・2・1秒と半分で振動し、スマホも同じタイマーを開始します。途中で止めればキープした秒数を記録。スマホなしのワークアウトでも使えます。",
   "wn.c.watchAuto.title": "ウォッチでハンズフリーセット",
   "wn.c.watchAuto.body":
     "Labsに追加：次のセットを始めるだけで、Wear OSウォッチやApple Watchが休憩を終え、レップを数え、セットを自動で記録します。各ステップで振動します。",
@@ -1462,6 +1480,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Imprima uma rotina em uma página",
   "wn.c.printRoutine.body":
     "Imprimir rotina, no editor de uma rotina, coloca tudo em uma página: séries e repetições, seus próximos pesos, o descanso, espaços para quatro sessões e um QR code para um amigo adicionar. Todo programa do site também tem um PDF grátis.",
+  "wn.c.watchHoldTimer.title": "Inicie timers de isometria no seu relógio",
+  "wn.c.watchHoldTimer.body":
+    "Em prancha, cadeirinha na parede ou suspensão na barra, Iniciar timer no Wear OS, Apple Watch ou Garmin conta no seu pulso com toques aos 3, 2, 1 e na metade, e o celular inicia o mesmo timer. Parou antes? Os segundos que você aguentou são registrados, também nos treinos sem celular.",
   "wn.c.watchAuto.title": "Séries sem as mãos no seu relógio",
   "wn.c.watchAuto.body":
     "No Labs: comece a próxima série e seu relógio Wear OS ou Apple Watch encerra o descanso, conta as repetições e registra a série sozinho, com uma vibração a cada etapa.",
@@ -1661,6 +1682,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "루틴을 한 장으로 인쇄",
   "wn.c.printRoutine.body":
     "루틴 편집 화면에서 루틴 인쇄를 누르면 한 장에 담깁니다. 세트와 반복, 다음 무게, 휴식, 네 번의 기록 칸, 친구가 추가할 수 있는 QR 코드까지. 웹사이트의 모든 프로그램은 무료 PDF도 있어요.",
+  "wn.c.watchHoldTimer.title": "워치에서 버티기 타이머 시작",
+  "wn.c.watchHoldTimer.body":
+    "플랭크, 월 싯, 매달리기에서 Wear OS, Apple Watch, Garmin의 타이머 시작을 누르면 손목에서 시간을 재고 3, 2, 1초와 절반에 진동이 옵니다. 휴대폰도 같은 타이머를 시작해요. 일찍 멈추면 버틴 시간이 기록되고, 휴대폰 없는 운동에서도 됩니다.",
   "wn.c.watchAuto.title": "워치로 손 안 대는 세트",
   "wn.c.watchAuto.body":
     "Labs에서: 다음 세트를 시작하면 Wear OS 워치나 Apple Watch가 휴식을 끝내고, 반복 횟수를 세고, 세트를 저절로 기록해요. 단계마다 진동해요.",
@@ -1871,6 +1895,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Wydrukuj zestaw na jednej stronie",
   "wn.c.printRoutine.body":
     "Drukuj zestaw w edytorze zestawu mieści go na jednej stronie: serie i powtórzenia, twoje kolejne ciężary, przerwy, pola na cztery treningi i kod QR, żeby znajomy mógł go dodać. Każdy program na stronie ma też darmowy PDF.",
+  "wn.c.watchHoldTimer.title": "Włączaj minutniki ćwiczeń statycznych na zegarku",
+  "wn.c.watchHoldTimer.body":
+    "Przy desce, krzesełku przy ścianie czy zwisie Włącz minutnik na Wear OS, Apple Watch lub Garmin odlicza na nadgarstku z wibracjami przy 3, 2, 1 i w połowie, a telefon włącza ten sam minutnik. Przerwiesz wcześniej? Zapisze się tyle sekund, ile wytrzymałeś, także w treningach bez telefonu.",
   "wn.c.watchAuto.title": "Serie bez rąk na zegarku",
   "wn.c.watchAuto.body":
     "W Labs: zacznij kolejną serię, a zegarek z Wear OS lub Apple Watch sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
@@ -2084,6 +2111,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.printRoutine.title": "Bir rutini tek sayfaya yazdır",
   "wn.c.printRoutine.body":
     "Rutin düzenleyicideki Rutini yazdır onu tek sayfaya koyar: setler ve tekrarlar, sonraki ağırlıkların, dinlenme, dört antrenman için kutular ve bir arkadaşının ekleyebileceği QR kod. Sitedeki her programın ücretsiz PDF'i de var.",
+  "wn.c.watchHoldTimer.title": "Sabit tutuş zamanlayıcılarını saatinden başlat",
+  "wn.c.watchHoldTimer.body":
+    "Plank, duvar oturuşu veya barda asılmada Wear OS, Apple Watch ya da Garmin'deki Zamanlayıcıyı başlat bileğinde sayar; 3, 2, 1 ve yarıda titrer, telefonun da aynı zamanlayıcıyı başlatır. Erken bırakırsan tuttuğun saniyeler kaydedilir, telefonsuz antrenmanlarda da.",
   "wn.c.watchAuto.title": "Saatinde eller serbest setler",
   "wn.c.watchAuto.body":
     "Labs'ta: bir sonraki setine başla; Wear OS saatin ya da Apple Watch dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",

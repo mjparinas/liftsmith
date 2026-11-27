@@ -22,6 +22,10 @@ struct Carry: Codable, Equatable {
         var f: Int?
         var a: Int?
         var c: Int?
+        /// A timed hold: 1, or 2 for one side then the other; nil for reps. `r` is then the seconds.
+        var m: Int?
+        /// Its Start timer button's words.
+        var tt: String?
     }
 
     var v: Int
@@ -36,6 +40,8 @@ struct Carry: Codable, Equatable {
     var fin: String
     var ex: [Item]
     var st: [Step]
+    /// The timer's words when a step is a hold: get set, time left, side 1, switch sides, side 2, time's up.
+    var tl: [String]?
 
     /// The watch's own date, like the phone's dayKey (src/lib/random.ts: "2026-11-5", no leading zeros).
     static func today(_ now: Date = Date()) -> String {
@@ -72,7 +78,9 @@ struct WatchRun: Codable, Equatable {
     var restUntil: Double = 0
     var setFrom: Double
     var ask = -1
-    /// Each Log set: [step, at, kg (-1: none), reps, set start].
+    /// When Start timer was tapped on the hold on screen (ms), or nil.
+    var timerAt: Double?
+    /// Each Log set: [step, at, kg (-1: none), reps, set start] and, for a hold stopped on its second side, its seconds.
     var sets: [[Double]] = []
     var rates: [[Int]] = []
     var hrSum = 0
@@ -117,11 +125,39 @@ struct WatchRun: Codable, Equatable {
         if let r { reps = min(100, max(1, r)) }
     }
 
+    // MARK: The set timer on a timed hold (the phone's rules: 5 s to get set, then the hold, each side in turn)
+
+    /// The timer for the hold on screen, or nil when it isn't one.
+    func offer() -> WatchState.Offer? {
+        guard let s = step(k), let m = s.m, m == 1 || m == 2 else { return nil }
+        let tl = carry.tl ?? []
+        let w = { (i: Int) in tl.indices.contains(i) ? tl[i] : "" }
+        return WatchState.Offer(key: "\(id):\(k)", s: s.r, d: m, up: false, l: s.tt ?? "", lb: [w(0), w(m == 2 ? 2 : 1), w(3), w(4)], o: w(5))
+    }
+
+    /// Start timer on the hold on screen at `now` (once; not during rest).
+    mutating func startTimer(now: Double) {
+        guard offer() != nil, restUntil <= now, timerAt == nil else { return }
+        timerAt = now
+    }
+
+    /// When the running hold's countdown ends, or nil.
+    var timerEnd: Double? {
+        guard let o = offer(), let at = timerAt else { return nil }
+        return o.end(at)
+    }
+
     /// Log set at `now` with the weight and reps chosen on the watch, then the rest after it.
     mutating func log(now: Double, kg want: Double?, reps r: Int?) {
         guard let s = step(k), sets.count < Self.maxSets else { return }
         adjust(kg: want, reps: r)
-        sets.append([Double(k), now, kg < 0 ? -1 : kg, Double(reps), max(start, min(setFrom, now))])
+        // A hold timed here saves the seconds held (as planned when stopped while getting set).
+        let held = timerAt.flatMap { offer()?.held($0, now) }
+        if let held { reps = held[0] }
+        var set = [Double(k), now, kg < 0 ? -1 : kg, Double(reps), max(start, min(setFrom, now))]
+        if let held, held.count > 1 { set.append(Double(held[1])) }
+        sets.append(set)
+        timerAt = nil
         let kept = (kg, reps)
         if s.f == 1 { ask = k }
         load(k + 1)
@@ -168,6 +204,17 @@ struct WatchRun: Codable, Equatable {
             o["setLabel"] = s.l
             o["next"] = text(s, it)
             if resting { o["restUntil"] = restUntil }
+            if !resting, let t = offer() {
+                o["ts"] = ["key": t.key, "s": t.s, "d": t.d, "l": t.l, "lb": t.lb, "o": t.o] as [String: Any]
+                if let at = timerAt {
+                    o["timer"] = t.phases(at).map { p -> [String: Any] in
+                        var ph: [String: Any] = ["from": p.from, "label": p.label]
+                        if let to = p.to { ph["to"] = to }
+                        return ph
+                    }
+                    o["timerOver"] = t.o
+                }
+            }
             if adjustable {
                 o["adj"] = ["key": "\(id):\(k)", "kg": it.kg, "w": it.w, "i": it.kg.isEmpty ? 0 : Self.nearest(it.kg, kg), "reps": reps, "rs": it.rs] as [String: Any]
             }

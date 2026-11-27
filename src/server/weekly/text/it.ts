@@ -1119,6 +1119,7 @@ export const emails: Record<string, Words> = {
       "Registra serie, +30 s, la vibrazione a fine recupero e il cambio di peso e ripetizioni funzionano al polso, con il battito dell'orologio.",
       "Tocca Fine quando hai finito. L'orologio tiene l'allenamento finché il telefono non è di nuovo vicino, con l'app aperta o no.",
       "Il telefono lo salva come se l'avessi registrato lì: ogni serie, i tuoi record, i prossimi pesi e Salute.",
+      "Plank, wall sit e sospensioni hanno Avvia il timer al polso, con tocchi a 3, 2, 1 e a metà, e la serie si registra da sola allo scadere del tempo.",
     ],
     dyk: "La pianificazione resta sul telefono, quindi Macchina occupata e Cambia il piano aspettano che torni.",
   },

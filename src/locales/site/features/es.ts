@@ -604,6 +604,11 @@ export const es: FeaturesText = {
       body: "El plan de hoy viaja en tu reloj. Toca Empezar en el reloj, registra cada serie con su peso y repeticiones en la muñeca, y el entreno se guarda, récords incluidos, cuando el móvil vuelve a estar cerca.",
       note: "Wear OS, Apple Watch y Garmin.",
     },
+    "watch-timer": {
+      name: "Temporizadores de isometría en el reloj",
+      body: "En una plancha, sentadilla en pared o colgarse de la barra, Iniciar temporizador en tu muñeca cuenta la isometría con toques a los 3, 2, 1 y a la mitad, y tu teléfono inicia el mismo temporizador. Si paras antes, se guardan los segundos que aguantaste.",
+      note: "Wear OS, Apple Watch y Garmin (START), también en entrenamientos sin teléfono.",
+    },
     widgets: {
       name: "Widgets en la pantalla de inicio",
       body: "Tres widgets: Hoy (la decisión del día, tu meta semanal, una nota del entrenador y Empezar o Registrar serie), Esta semana (días entrenados, tu racha y qué la mantiene) y Recuperación (qué músculos están listos para entrenar y cuándo lo estará el resto).",

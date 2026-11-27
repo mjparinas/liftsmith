@@ -1,6 +1,7 @@
 "use client";
 
 import { useApp } from "./store";
+import { holdForLog } from "./timerRun";
 
 // Voice and system shortcuts (Melvin, 2026-11-09). Every entry point lands here with one of three
 // actions, so they all behave the same:
@@ -35,8 +36,11 @@ export function runShortcut(action: ShortcutAction, at?: number): "workout" | "t
     return useApp.getState().active ? "workout" : "today";
   }
   if (!s.active) return "today";
-  if (action === "log") s.logSet(at);
-  else if (action === "taken") s.takenSwap();
+  if (action === "log") {
+    // A hold timed on the phone: Log set from the lock screen saves the seconds held, as on the workout screen.
+    holdForLog(s, at);
+    useApp.getState().logSet(at);
+  } else if (action === "taken") s.takenSwap();
   else s.addRest(30);
   return "workout";
 }

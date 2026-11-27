@@ -15,4 +15,5 @@
     <string id="OnWatch">スマホなし · BACK：終了</string>
     <string id="FinishAsk">終了してスマホ用に保存しますか？</string>
     <string id="SavedForPhone">ウォッチに保存しました。スマホが近くに戻ると送られます。</string>
+    <string id="HintTimer">START：$1$</string>
 </strings>

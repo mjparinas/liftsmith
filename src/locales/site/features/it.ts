@@ -602,6 +602,11 @@ export const it: FeaturesText = {
       body: "Il piano di oggi viaggia sul tuo orologio. Tocca Inizia sull'orologio, registra ogni serie con peso e ripetizioni al polso, e l'allenamento viene salvato, record compresi, quando il telefono è di nuovo vicino.",
       note: "Wear OS, Apple Watch e Garmin.",
     },
+    "watch-timer": {
+      name: "Timer delle tenute sull'orologio",
+      body: "Su plank, wall sit o sospensione alla sbarra, Avvia il timer al polso conta la tenuta con tocchi a 3, 2, 1 e a metà, e il telefono avvia lo stesso timer. Se ti fermi prima vengono registrati i secondi tenuti.",
+      note: "Wear OS, Apple Watch e Garmin (START), anche negli allenamenti senza telefono.",
+    },
     widgets: {
       name: "Widget della schermata Home",
       body: "Tre widget: Oggi (la scelta di oggi, il tuo obiettivo settimanale, una nota del coach e Inizia o Registra serie), Questa settimana (giorni di allenamento, la tua serie e cosa la mantiene) e Recupero (quali muscoli sono pronti e quando lo saranno gli altri).",

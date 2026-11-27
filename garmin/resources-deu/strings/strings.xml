@@ -15,4 +15,5 @@
     <string id="OnWatch">Ohne Handy · BACK: Beenden</string>
     <string id="FinishAsk">Beenden und fürs Handy speichern?</string>
     <string id="SavedForPhone">Auf der Uhr gespeichert. Es geht aufs Handy, sobald beide wieder beisammen sind.</string>
+    <string id="HintTimer">START: $1$</string>
 </strings>

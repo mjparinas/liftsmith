@@ -16,4 +16,5 @@
     <string id="OnWatch">No phone · BACK: Finish</string>
     <string id="FinishAsk">Finish and save it for your phone?</string>
     <string id="SavedForPhone">Saved on the watch. It goes to your phone when they’re together again.</string>
+    <string id="HintTimer">START: $1$</string>
 </strings>
