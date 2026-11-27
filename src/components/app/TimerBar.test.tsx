@@ -27,7 +27,9 @@ describe("timer bar", () => {
     const { container } = render(<TimerBar from={NOW} to={NOW + 10_000} fill="bg-accent" />);
     const fill = container.firstElementChild!.firstElementChild as HTMLElement;
     expect(fill.style.transform).toBe("translateX(-100%)");
-    act(() => vi.advanceTimersByTime(1_250));
+    act(() => {
+      vi.advanceTimersByTime(1_250);
+    });
     // 1.25 s into 10 s, not 1 s: the bar moved past the last whole second.
     const at = Number(/translateX\((-?[\d.]+)%\)/.exec(fill.style.transform)![1]);
     expect(at).toBeGreaterThan(-90);
