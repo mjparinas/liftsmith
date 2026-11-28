@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataItemBuffer;
 import com.google.android.gms.wearable.DataMapItem;
@@ -76,16 +77,22 @@ final class WatchHub {
 
     private WatchHub() {}
 
-    /**
-     * A state the phone sent, read onto this watch's clock: its "at" (when the phone sent it) teaches WatchClock the
-     * difference, and rest and the set timer move by it, so both count down to the same moment.
-     */
-    static WorkoutState fromPhone(String json) {
-        WorkoutState s = WorkoutState.parse(json);
-        if (s == null) return null;
-        clock.heard(s.at, System.currentTimeMillis());
-        long shift = clock.offset();
-        return shift == 0 ? s : WorkoutState.parse(json, shift);
+    private static long latestUpdate;
+
+    static void receive(Context context, DataMap map, boolean live) {
+        String json = map == null ? null : map.getString("json");
+        WorkoutState parsed = WorkoutState.parse(json);
+        long at = map == null ? 0 : map.getLong("at", parsed == null ? 0 : parsed.at);
+        long arrived = System.currentTimeMillis();
+        main.post(() -> {
+            if (at > 0 && at < latestUpdate) return;
+            // A retained item may have spent seconds in transit or minutes on the watch before refresh().
+            // Only the direct message gives us a fresh clock sample.
+            if (at > 0 && at == latestUpdate && !live) return;
+            latestUpdate = at;
+            long shift = clock.offsetFor(at, arrived, live && parsed != null);
+            set(context, shift == 0 ? parsed : WorkoutState.parse(json, shift));
+        });
     }
 
     static WorkoutState state() {
@@ -250,10 +257,10 @@ final class WatchHub {
         });
         Uri uri = new Uri.Builder().scheme("wear").path(PATH_WORKOUT).build();
         Wearable.getDataClient(app).getDataItems(uri).addOnSuccessListener((DataItemBuffer items) -> {
-            WorkoutState found = null;
-            for (DataItem item : items) found = fromPhone(DataMapItem.fromDataItem(item).getDataMap().getString("json"));
+            DataMap found = null;
+            for (DataItem item : items) found = DataMapItem.fromDataItem(item).getDataMap();
             items.release();
-            set(app, found);
+            if (found != null) receive(app, found, false);
         });
         // Today's call too, in case it came while the app wasn't installed or the listener missed it.
         Uri today = new Uri.Builder().scheme("wear").path(TodayStore.PATH_TODAY).build();
@@ -267,23 +274,21 @@ final class WatchHub {
     }
 
     /** A new workout state from the phone, or null when it ended. */
-    static void set(Context context, WorkoutState next) {
+    private static void set(Context context, WorkoutState next) {
         Context app = context.getApplicationContext();
-        main.post(() -> {
-            WorkoutState prev = state;
-            state = next;
-            appContext = app;
-            // The watch's own run stays on screen; the phone's workout shows once it's finished.
-            if (run != null) {
-                for (Listener l : listeners) l.changed();
-                return;
-            }
-            if (next == null) bpm = 0;
-            if (next != null && next.vibrate && next.newCue(prev)) cueBuzz(app);
-            // With this watch's own Start timer kept on it until the phone's phases come.
-            scheduleBuzz(app, state());
+        WorkoutState prev = state;
+        state = next;
+        appContext = app;
+        // The watch's own run stays on screen; the phone's workout shows once it's finished.
+        if (run != null) {
             for (Listener l : listeners) l.changed();
-        });
+            return;
+        }
+        if (next == null) bpm = 0;
+        if (next != null && next.vibrate && next.newCue(prev)) cueBuzz(app);
+        // With this watch's own Start timer kept on it until the phone's phases come.
+        scheduleBuzz(app, state());
+        for (Listener l : listeners) l.changed();
     }
 
     /** A reading from the watch's heart rate sensor (WorkoutService). */
