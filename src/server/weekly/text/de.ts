@@ -1180,4 +1180,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Auf dem Handy kann das Druckfenster das Blatt auch als PDF speichern, praktisch zum Weiterschicken.",
   },
+  "lift-mastery": {
+    title: "Sterne für jede Übung, zu der du immer wieder zurückkehrst",
+    intro: "Jede Übung bringt jetzt bis zu vier Meisterschaftssterne für die Sätze, die du einträgst, und sie schalten Neues frei.",
+    points: [
+      "Der erste Stern kommt bei 25 Sätzen einer Übung, dann bei 100, 300 und 1.000. Jeder Arbeitssatz zählt einmal.",
+      "Die Übungsseite zeigt deine Sterne und die Sätze bis zum nächsten, und der Trainingsbildschirm zeigt sie neben dem Namen der Übung.",
+      "Sterne und die Sätze jeder Muskelgruppe schalten Farben für die 3D-Figur frei.",
+      "Titel mit dem Namen deiner Übung stehen unter deinem Namen in deinem Freunde-Profil. Bestleistungen und Scheibenclubs schalten Rahmen für deine Karten frei.",
+    ],
+    dyk: "Nichts davon kommt aus einer Kiste, also hat jede Farbe, jeder Rahmen und jeder Titel einen sicheren Weg: die Sätze, die du einträgst.",
+  },
 };

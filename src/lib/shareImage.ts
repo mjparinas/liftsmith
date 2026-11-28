@@ -47,6 +47,40 @@ export interface DrawOptions {
    * site name (2026-11-15: every share carries the invite, docs/decisions/growth.md "An invite in every link").
    */
   invite?: string | null;
+  /** A frame's colours ("#a,#b", a `frame` locker item's value); missing uses the one picked in the Locker (setCardFrame). */
+  frame?: string;
+}
+
+let pickedFrame = "";
+/**
+ * The share card frame picked in the Locker (lift mastery, 2026-11-27), set by the app from the profile, so every
+ * card the lifter makes carries it: Done, Share my training, one stat, a badge. "" draws none.
+ */
+export function setCardFrame(value: string | undefined) {
+  pickedFrame = value ?? "";
+}
+
+/** A frame's colour stops, or none for "" or anything that isn't a list of hex colours. */
+export function frameStops(value: string): string[] {
+  const stops = value.split(",").filter((c) => /^#[0-9a-f]{6}$/i.test(c));
+  return stops.length >= 2 ? stops : [];
+}
+
+function drawFrame(c: CanvasRenderingContext2D, value: string, W: number, H: number) {
+  const stops = frameStops(value);
+  if (!stops.length) return;
+  const g = c.createLinearGradient(0, 0, W, H);
+  stops.forEach((col, i) => g.addColorStop(i / (stops.length - 1), col));
+  c.save();
+  c.strokeStyle = g;
+  c.lineWidth = 14;
+  roundRect(c, 26, 26, W - 52, H - 52, 52);
+  c.stroke();
+  c.globalAlpha = 0.45;
+  c.lineWidth = 3;
+  roundRect(c, 50, 50, W - 100, H - 100, 34);
+  c.stroke();
+  c.restore();
 }
 
 const INK = "#e8edf3";
@@ -287,6 +321,7 @@ export function drawCard(canvas: HTMLCanvasElement, d: CardData, o: DrawOptions 
   });
 
   drawFooter(c, d.footer, accent, W, H, o.invite);
+  drawFrame(c, o.frame ?? pickedFrame, W, H);
 }
 
 /** A half ring, each share its own arc in its colour, with a two-column legend under it. */

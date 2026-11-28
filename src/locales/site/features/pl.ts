@@ -641,6 +641,10 @@ export const pl: FeaturesText = {
       proPart: "Wszystkie poziomy i nagrody są darmowe; Pro dodaje nagrodę bonusową na trzech poziomach.",
       note: "Ikony sezonu są na Androidzie i iPhonie; w przeglądarce jest motyw. Sezony można wyłączyć w Ustawieniach.",
     },
+    "lift-mastery": {
+      name: "Opanowanie ćwiczeń i odblokowania",
+      body: "Każde ćwiczenie zdobywa do czterech gwiazdek opanowania za zapisane serie: 25, 100, 300 i 1000. Strona ćwiczenia i ekran treningu pokazują twoje gwiazdki i serie do następnej. Gwiazdki i serie dla każdej grupy mięśni odblokowują kolory figury 3D i tytuły do profilu w Znajomych z nazwą twojego ćwiczenia. Rekordy osobiste i kluby talerzy odblokowują ramki kart do udostępniania.",
+    },
     locker: {
       name: "Motywy, akcenty i ikony aplikacji",
       body: "Zdobywaj motywy i kolory akcentu, a na telefonach ikonę aplikacji w kolorach twojego motywu.",

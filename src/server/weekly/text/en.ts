@@ -1195,4 +1195,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "On a phone, the print window can also save the sheet as a PDF, handy for sending to a friend.",
   },
+  "lift-mastery": {
+    title: "Stars for every lift you keep coming back to",
+    intro: "Every exercise now earns up to four mastery stars from the sets you log, and they unlock new things.",
+    points: [
+      "The first star comes at 25 sets of an exercise, then 100, 300 and 1,000. Every working set counts once.",
+      "The exercise page shows your stars and the sets to the next one, and the workout screen shows them by the exercise's name.",
+      "Stars and the sets you do for each muscle family unlock colours for the 3D figure.",
+      "Titles that name your lift, like Deadlift devotee, show under your name on your Friends profile. Bests and plate clubs unlock share card frames.",
+    ],
+    dyk: "Nothing here comes from a crate, so every colour, frame and title has a sure path: the sets you log.",
+  },
 };

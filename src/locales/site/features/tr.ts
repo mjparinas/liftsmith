@@ -641,6 +641,10 @@ export const tr: FeaturesText = {
       proPart: "Tüm kademeler ve ödülleri ücretsiz; Pro üç kademeye bonus ödül ekler.",
       note: "Sezon uygulama simgeleri Android ve iPhone'da; web'de tema var. Sezonlar Ayarlar'dan kapatılabilir.",
     },
+    "lift-mastery": {
+      name: "Hareket ustalığı ve kilit açmalar",
+      body: "Kaydettiğin setlerle her hareket dört ustalık yıldızına kadar kazanır: 25, 100, 300 ve 1.000. Hareket sayfası ve antrenman ekranı yıldızlarını ve bir sonrakine kalan setleri gösterir. Yıldızlar ve her kas grubu için yaptığın setler 3B figür renklerini ve hareketinin adını taşıyan Arkadaşlar profili unvanlarını açar. Kişisel rekorlar ve plaka kulüpleri paylaşım kartları için çerçeveleri açar.",
+    },
     locker: {
       name: "Temalar, vurgu renkleri ve uygulama simgeleri",
       body: "Tema ve vurgu renkleri kazan; telefonlarda da temanın renklerinde bir uygulama simgesi.",

@@ -575,6 +575,10 @@ export const es: FeaturesText = {
       proPart: "Todos los niveles y sus premios son gratis; Pro añade un premio extra en tres niveles.",
       note: "Los iconos de temporada están en Android y iPhone; la web recibe el tema. Las temporadas se pueden desactivar en Ajustes.",
     },
+    "lift-mastery": {
+      name: "Dominio del ejercicio y desbloqueos",
+      body: "Cada ejercicio gana hasta cuatro estrellas de dominio con las series que registras: 25, 100, 300 y 1000. La página del ejercicio y la pantalla del entrenamiento muestran tus estrellas y las series que faltan para la siguiente. Las estrellas y las series de cada grupo muscular desbloquean colores para la figura 3D y títulos para tu perfil de Amigos que nombran tu ejercicio. Los récords personales y los clubes de discos desbloquean marcos para tus tarjetas para compartir.",
+    },
     locker: {
       name: "Temas, colores e iconos de la app",
       body: "Gana temas y colores de acento y, en los teléfonos, un icono de la app con los colores de tu tema.",

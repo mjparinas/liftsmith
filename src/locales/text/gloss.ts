@@ -136,6 +136,9 @@ export const en = {
   "gloss.strengthStandards.title": "Strength standards",
   "gloss.strengthStandards.body":
     "Typical estimated one-rep maxes for trained lifters, scaled to body weight and adjusted for age and sex when you've added them, from the shape of published strength standards and masters coefficients.\nThe percentage is a rough share of trained lifters your estimate beats, not a ranking of real Liftsmith users. Height and BMI aren't used.",
+  "gloss.mastery.title": "What is lift mastery?",
+  "gloss.mastery.body":
+    "Every exercise earns up to four stars from the sets you log of it: at 25, 100, 300 and 1,000 sets.\nStars unlock figure colours, share card frames and profile titles in the Locker. A lift you keep coming back to is one you're getting good at.",
 } as const;
 
 type Key = keyof typeof en;
@@ -273,6 +276,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Estándares de fuerza",
   "gloss.strengthStandards.body":
     "Máximos estimados típicos de personas entrenadas, según el peso corporal y ajustados por edad y sexo si los has añadido, a partir de estándares de fuerza publicados y coeficientes de veteranos.\nEl porcentaje es una idea aproximada de a cuántas personas entrenadas superas, no una clasificación de usuarios reales de Liftsmith. No se usan la altura ni el IMC.",
+  "gloss.mastery.title": "¿Qué es el dominio del ejercicio?",
+  "gloss.mastery.body":
+    "Cada ejercicio gana hasta cuatro estrellas por las series que registras: a las 25, 100, 300 y 1000 series.\nLas estrellas desbloquean colores de figura, marcos de tarjeta y títulos de perfil en la Taquilla. Un ejercicio al que vuelves es uno que dominas cada vez más.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -408,6 +414,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Normes de force",
   "gloss.strengthStandards.body":
     "Maxima estimés typiques de personnes entraînées, selon le poids de corps et ajustés pour l'âge et le sexe si tu les as ajoutés, d'après des normes de force publiées et des coefficients masters.\nLe pourcentage est une part approximative des personnes entraînées que tu dépasses, pas un classement de vrais utilisateurs de Liftsmith. La taille et l'IMC ne sont pas utilisés.",
+  "gloss.mastery.title": "Qu'est-ce que la maîtrise des exercices ?",
+  "gloss.mastery.body":
+    "Chaque exercice gagne jusqu'à quatre étoiles grâce aux séries enregistrées : à 25, 100, 300 et 1 000 séries.\nLes étoiles débloquent des couleurs de silhouette, des cadres de carte et des titres de profil dans le Vestiaire. Un exercice que vous refaites souvent est un exercice que vous maîtrisez de mieux en mieux.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -543,6 +552,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Kraftstandards",
   "gloss.strengthStandards.body":
     "Typische geschätzte Maxima trainierter Menschen, nach Körpergewicht skaliert und nach Alter und Geschlecht angepasst, wenn du sie eingetragen hast, nach veröffentlichten Kraftstandards und Masters-Koeffizienten.\nDie Prozentzahl ist ein grober Anteil der Trainierten, die du übertriffst, keine Rangliste echter Liftsmith-Nutzer. Größe und BMI werden nicht verwendet.",
+  "gloss.mastery.title": "Was ist Übungs-Meisterschaft?",
+  "gloss.mastery.body":
+    "Jede Übung bekommt bis zu vier Sterne für die Sätze, die du von ihr loggst: bei 25, 100, 300 und 1.000 Sätzen.\nSterne schalten Figurfarben, Kartenrahmen und Profiltitel im Spind frei. Eine Übung, zu der du immer wieder zurückkehrst, beherrschst du immer besser.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -678,6 +690,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "Standard di forza",
   "gloss.strengthStandards.body":
     "Massimali stimati tipici di persone allenate, in base al peso corporeo e corretti per età e sesso se li hai inseriti, secondo standard di forza pubblicati e coefficienti master.\nLa percentuale è una quota approssimativa di persone allenate che superi, non una classifica di veri utenti di Liftsmith. Altezza e IMC non vengono usati.",
+  "gloss.mastery.title": "Cos'è la padronanza degli esercizi?",
+  "gloss.mastery.body":
+    "Ogni esercizio guadagna fino a quattro stelle dalle serie che registri: a 25, 100, 300 e 1.000 serie.\nLe stelle sbloccano colori della figura, cornici delle card e titoli del profilo nell'Armadietto. Un esercizio che ripeti spesso è uno che padroneggi sempre di più.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -813,6 +828,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.strengthStandards.title": "筋力基準",
   "gloss.strengthStandards.body":
     "トレーニング経験者の典型的な推定最大重量を体重に合わせ、年齢と性別を入力していればそれも補正したもので、公表された筋力基準とマスターズ係数に基づきます。\nパーセンテージは、あなたの推定値が上回るトレーニング経験者のおおよその割合で、実際のLiftsmithユーザーの順位ではありません。身長とBMIは使いません。",
+  "gloss.mastery.title": "種目マスタリーとは？",
+  "gloss.mastery.body":
+    "どの種目も記録したセット数で最大4つの星がもらえます：25、100、300、1,000セット。\n星を集めるとロッカーでフィギュアの色、シェアカードのフレーム、プロフィールの称号が解放されます。何度も続ける種目ほど上達していきます。",
 };
 
 export const pt: Partial<Record<Key, Message>> = {
@@ -948,6 +966,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "gloss.coachPrograms.title": "Programas de treinadores",
   "gloss.coachPrograms.body":
     "Um programa é um conjunto de rotinas que um treinador ou personal trainer montou, com quantas semanas seguir. Os dias dele vão para as suas rotinas, e a sua própria progressão escolhe cargas e repetições.\nProgramas grátis funcionam em todos os apps. Os pagos são comprados no site do Liftsmith, e o dinheiro vai para o treinador, que cuida de recibos e reembolsos pela Stripe. Depois que você tem um, ele é seu em todo aparelho em que você entrar.",
+  "gloss.mastery.title": "O que é o domínio do exercício?",
+  "gloss.mastery.body":
+    "Cada exercício ganha até quatro estrelas pelas séries que você registra: com 25, 100, 300 e 1.000 séries.\nAs estrelas liberam cores da figura, molduras de cartão e títulos de perfil no Armário. Um exercício que você repete sempre é um que você domina cada vez mais.",
 };
 
 export const ko: Partial<Record<Key, Message>> = {
@@ -1082,6 +1103,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "gloss.coachPrograms.title": "코치 프로그램",
   "gloss.coachPrograms.body":
     "프로그램은 코치나 퍼스널 트레이너가 엮은 루틴 몇 개와 진행할 주 수예요. 운동일은 내 루틴에 저장되고, 무게와 횟수는 내 진행 상황에 맞춰 정해져요.\n무료 프로그램은 모든 앱에서 쓸 수 있어요. 유료 프로그램은 Liftsmith 웹사이트에서 구매하고, 돈은 코치에게 가며 영수증과 환불은 코치가 Stripe로 처리해요. 한 번 가지면 로그인한 모든 기기에서 내 것이에요.",
+  "gloss.mastery.title": "종목 마스터리란?",
+  "gloss.mastery.body":
+    "모든 종목은 기록한 세트 수에 따라 별을 최대 4개 받아요: 25, 100, 300, 1,000세트.\n별을 모으면 보관함에서 피규어 색상, 공유 카드 프레임, 프로필 칭호가 열려요. 꾸준히 하는 종목일수록 실력이 늘어요.",
 };
 
 export const tr: Partial<Record<Key, Message>> = {
@@ -1216,6 +1240,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "gloss.coachPrograms.title": "Koç programları",
   "gloss.coachPrograms.body":
     "Program, bir koçun ya da kişisel antrenörün bir araya getirdiği birkaç rutin ve kaç hafta uygulanacağıdır. Günleri rutinlerine kaydedilir, ağırlık ve tekrarları kendi ilerlemen belirler.\nÜcretsiz programlar her uygulamada çalışır. Ücretli olanlar Liftsmith web sitesinden satın alınır; para koça gider, makbuz ve iadeleri koç Stripe üzerinden yönetir. Bir kez sahip olunca, giriş yaptığın her cihazda senindir.",
+  "gloss.mastery.title": "Hareket ustalığı nedir?",
+  "gloss.mastery.body":
+    "Her hareket, kaydettiğin setlerden en fazla dört yıldız kazanır: 25, 100, 300 ve 1.000 sette.\nYıldızlar, Dolap'ta figür renklerinin, kart çerçevelerinin ve profil unvanlarının kilidini açar. Sürekli döndüğün bir hareket, giderek daha iyi olduğun bir harekettir.",
 };
 
 export const pl: Partial<Record<Key, Message>> = {
@@ -1351,4 +1378,7 @@ export const pl: Partial<Record<Key, Message>> = {
   "gloss.coachPrograms.title": "Programy trenerów",
   "gloss.coachPrograms.body":
     "Program to kilka rutyn ułożonych przez trenera lub trenera personalnego, z liczbą tygodni na jego wykonanie. Jego dni trafiają do twoich rutyn, a ciężary i powtórzenia dobiera twój własny postęp.\nDarmowe programy działają w każdej aplikacji. Płatne kupuje się na stronie Liftsmith, a pieniądze trafiają do trenera, który obsługuje potwierdzenia i zwroty przez Stripe. Gdy już go masz, jest twój na każdym urządzeniu, na którym się zalogujesz.",
+  "gloss.mastery.title": "Czym jest opanowanie ćwiczeń?",
+  "gloss.mastery.body":
+    "Każde ćwiczenie zdobywa do czterech gwiazdek za zapisane serie: przy 25, 100, 300 i 1000 seriach.\nGwiazdki odblokowują kolory sylwetki, ramki kart i tytuły profilu w Szafce. Ćwiczenie, do którego wracasz, idzie ci coraz lepiej.",
 };

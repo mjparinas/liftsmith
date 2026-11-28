@@ -12,7 +12,7 @@ import { SITE_URL } from "@/lib/site";
 import { AVATAR_IDS, cleanHandle, HANDLE_RE, SOCIAL_LIMITS, type HomeGym, type PostBody, type ShowcaseLift } from "@/lib/socialTypes";
 
 import { query } from "./db";
-import { homeGymOf, parseLifts } from "./social";
+import { homeGymOf, parseLifts, titleOf } from "./social";
 import { isMinor } from "./teams";
 
 const DAY = 86_400_000;
@@ -62,6 +62,8 @@ export interface PublicProfile {
   streak: number;
   /** A short line under the name, or "". */
   tagline: string;
+  /** The profile title from the locker (titles.ts), or "". */
+  title: string;
   /** Their home gym (a real gym, linked to its page), never for someone under 18. */
   homeGym: HomeGym | null;
   /** The best lifts, only while the lifter shows them and shows weights (the same rule as the app's person page). */
@@ -89,8 +91,9 @@ export async function publicProfile(handle: string, now = Date.now()): Promise<P
     lifts: string;
     tagline: string;
     home_gym: string;
+    title: string;
   }>(
-    `SELECT account_id, handle, name, avatar, level, streak, show_lifts, weights, lifts, tagline, home_gym FROM social_profiles
+    `SELECT account_id, handle, name, avatar, level, streak, show_lifts, weights, lifts, tagline, home_gym, title FROM social_profiles
      WHERE handle = ? AND public = 1 AND suspended = 0`,
     [h],
   );
@@ -183,6 +186,7 @@ export async function publicProfile(handle: string, now = Date.now()): Promise<P
     handle: String(p.handle),
     name: String(p.name),
     tagline: String(p.tagline ?? ""),
+    title: titleOf(p.title),
     homeGym,
     followers: Number(c?.followers ?? 0),
     following: Number(c?.following ?? 0),

@@ -1694,6 +1694,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // A tagline and a home gym (a gym_places id) on the profile (Melvin, 2026-11-14).
   ["social_profiles", "tagline", "TEXT NOT NULL DEFAULT ''"],
   ["social_profiles", "home_gym", "TEXT NOT NULL DEFAULT ''"],
+  // A profile title from the locker (lift mastery, 2026-11-27; titles.ts), '' for none.
+  ["social_profiles", "title", "TEXT NOT NULL DEFAULT ''"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],

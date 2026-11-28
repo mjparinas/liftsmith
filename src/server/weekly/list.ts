@@ -206,6 +206,9 @@ export const WEEKLY: WeeklyEmail[] = [
   // New, 2026-11-27: printable one-page plans, Print routine in the app and a PDF of every program
   // (docs/decisions/printable-plans.md). Its picture is a printed sheet.
   L("printable-plans", "free", "programs", { fresh: "2026-11-27", art: "print" }),
+  // New, 2026-11-27: lift mastery stars and the figure colours, share card frames and profile titles they unlock
+  // (docs/decisions/lift-mastery.md).
+  L("lift-mastery", "free", "achievements", { fresh: "2026-11-27" }),
 ];
 
 /** Pro's prices, as the emails say them (docs/decisions/money.md). */

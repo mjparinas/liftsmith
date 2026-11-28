@@ -46,6 +46,12 @@ export const KINDS: readonly NewsKind[] = ["new", "better", "fixed"];
  */
 export const RELEASES: readonly AppRelease[] = [
   {
+    version: "0.39.0",
+    day: "2026-11-29",
+    headline: "Lift mastery stars for every exercise, with figure colours, share card frames and profile titles to unlock",
+    changes: [{ id: "mastery", kind: "new", icon: "star" }],
+  },
+  {
     version: "0.38.0",
     day: "2026-11-28",
     headline:
