@@ -184,10 +184,45 @@ function order(a: Exercise, b: Exercise): number {
   return orderRank(a) - orderRank(b);
 }
 
+/** How many recent lifting sessions `directGap` looks back when boosting neglected muscles. */
+export const GAP_CAP = 4;
+/** Score boost per missed lifting session without direct work for a muscle (up to GAP_CAP). */
+export const GAP_STEP = 0.12;
+
+/**
+ * How many recent lifting days have passed since each muscle last had a direct (primary) set,
+ * from 0 (trained on the most recent lifting day, or no history yet) up to GAP_CAP. Ignores cardio
+ * and rehab parts. Keeps muscles like chest, biceps and triceps from staying buried across weeks or
+ * spaced-out sessions when weekly sets reset and recovery is back near 100%.
+ */
+export function directGap(events: readonly AppEvent[], now: number): Record<Muscle, number> {
+  const seen = new Map<string, { at: number; muscles: Set<Muscle> }>();
+  for (const e of events) {
+    if (e.type !== "set" || e.at > now || e.partId === "rehab") continue;
+    const ex = EXERCISE_BY_ID.get(e.exerciseId);
+    if (!ex || ex.pattern === "cardio") continue;
+    const key = dayKey(e.at);
+    let s = seen.get(key);
+    if (!s) {
+      s = { at: e.at, muscles: new Set() };
+      seen.set(key, s);
+    }
+    if (e.at > s.at) s.at = e.at;
+    for (const m of ex.primary) s.muscles.add(m);
+  }
+  const sessions = [...seen.values()].sort((a, b) => b.at - a.at).slice(0, GAP_CAP);
+  const out = Object.fromEntries(MUSCLES.map((m) => [m, sessions.length])) as Record<Muscle, number>;
+  for (let i = 0; i < sessions.length; i++) {
+    for (const m of sessions[i]!.muscles) if (out[m] > i) out[m] = i;
+  }
+  return out;
+}
+
 /**
  * Muscles worth training today, best first: recovered enough (55%, or 40% on a split day, where only the
- * day's muscles count), then scored by recovery, how much of this week's set target is left, size and
- * priority, plus a little seeded noise so ties don't always break the same way.
+ * day's muscles count), then scored by recovery, how much of this week's set target is left, muscle tier,
+ * how many recent sessions went by without direct work, and priority, plus a little seeded noise so ties
+ * don't always break the same way.
  */
 export function rankMuscles(
   rec: Record<Muscle, number>,
@@ -196,14 +231,16 @@ export function rankMuscles(
   prio: ReadonlySet<Muscle>,
   day: ReadonlySet<Muscle> | null,
   random: () => number,
+  gap?: Readonly<Record<Muscle, number>>,
 ): Muscle[] {
   return MUSCLES.filter((m) => (day ? day.has(m) && rec[m] >= 40 : rec[m] >= 55))
     .map((m) => {
       // Priority muscles (Settings) aim for a third more sets this week and rank ahead.
       const goal = setsPerMuscle * (prio.has(m) ? PRIORITY_VOLUME : 1);
       const left = Math.max(0, goal - done[m]) / setsPerMuscle;
-      const big = BIG_MUSCLES.has(m) ? 1.25 : m === "forearms" || m === "adductors" ? 0.6 : 1;
-      return { m, score: (rec[m] / 100) * (0.25 + left) * big * (prio.has(m) ? 1.5 : 1) + random() * 0.05 };
+      const tier = BIG_MUSCLES.has(m) ? 1.25 : MINOR_MUSCLES.has(m) ? 0.6 : SUPPORTING_MUSCLES.has(m) ? 0.75 : 1;
+      const stale = 1 + GAP_STEP * Math.min(GAP_CAP, Math.max(0, gap?.[m] ?? 0));
+      return { m, score: (rec[m] / 100) * (0.25 + left) * tier * stale * (prio.has(m) ? 1.5 : 1) + random() * 0.05 };
     })
     .sort((a, b) => b.score - a.score)
     .map((x) => x.m);
@@ -231,6 +268,8 @@ export function preferLoaded(cands: readonly Exercise[], keep: (id: string) => b
 }
 
 const BIG_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"]);
+const SUPPORTING_MUSCLES: ReadonlySet<Muscle> = new Set(["abs", "obliques", "calves", "traps", "lowerBack"]);
+const MINOR_MUSCLES: ReadonlySet<Muscle> = new Set(["forearms", "adductors"]);
 
 /**
  * How strongly the day's draw leans to one candidate: big compounds first in round one (barbell most),
@@ -324,9 +363,10 @@ export function generate({
   const warmups = warmupsOn(profile);
   const room = pairs ? Math.round(budget * SUPERSET_ROOM) : budget;
 
-  // Muscles ranked by how ready they are and how much of this week's target is left.
-  // A split day trains its muscles unless they're actually fatigued (40%), not only when fresh.
-  const ranked = rankMuscles(rec, done, week.setsPerMuscle, prio, day, random);
+  // Muscles ranked by how ready they are, how much of this week's target is left, and how long since
+  // they last had direct work. A split day trains its muscles unless they're actually fatigued (40%),
+  // not only when fresh.
+  const ranked = rankMuscles(rec, done, week.setsPerMuscle, prio, day, random, directGap(events, now));
 
   const items: PlanItem[] = [];
   const used = new Set<string>();
@@ -359,19 +399,30 @@ export function generate({
     // The lifter's set count (for this exercise, then for every exercise) replaces the automatic one.
     const chosen = training?.exercises?.[ex.id]?.sets ?? training?.sets;
     const baseSets = chosen ?? (ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3);
-    const sets = Math.min(mode?.maxSets ?? Infinity, week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets);
+    let sets = Math.min(mode?.maxSets ?? Infinity, week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets);
     const warmup = warmups ? warmupFor(ex, t.target.weight, gym, warmed) : [];
-    const item: PlanItem = {
+    const restSec = restFor(ex, profile.goal, training);
+    const build = (n: number): PlanItem => ({
       exerciseId: ex.id,
-      sets,
-      restSec: restFor(ex, profile.goal, training),
+      sets: n,
+      restSec,
       focus: m,
       target: t.target,
       injuryPct: t.injuryPct,
       ...(t.mode ? { mode: t.mode } : {}),
       warmup: warmup.length ? warmup : undefined,
-    };
-    const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
+    });
+    let item = build(sets);
+    let cost = itemSeconds(item) + (items.length ? restSec : 0);
+    // When a high-ranked isolation muscle (arms, shoulders, calves) barely misses the time left,
+    // fit 2 sets instead of skipping it and filling the remaining minutes with quick bodyweight core work.
+    if (total + cost > room && chosen === undefined && !ex.compound && ex.pattern !== "core" && ex.pattern !== "carry" && sets > 2) {
+      while (sets > 2 && total + cost > room) {
+        sets -= 1;
+        item = build(sets);
+        cost = itemSeconds(item) + (items.length ? restSec : 0);
+      }
+    }
     if (total + cost > room) return;
     total += cost;
     for (const p of ex.primary) warmed.add(p);
