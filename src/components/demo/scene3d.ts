@@ -42,7 +42,7 @@ import {
   type Vec,
 } from "@/lib/demo/rig";
 
-import { DEMO_COLOURS } from "./colours";
+import { DEMO_COLOURS, figureColour } from "./colours";
 import type { Frame, Scene } from "./engine";
 
 // The hologram in WebGL: a rim-glow shell plus additive wireframe per body part, target muscles
@@ -53,7 +53,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   renderer.setClearColor(0x000000, 0);
   const scene = new T3Scene();
   const camera = new PerspectiveCamera(32, 1, 0.1, 40);
-  const cHolo = new Color(DEMO_COLOURS.holo),
+  const cHolo = new Color(figureColour()),
     cEmber = new Color(DEMO_COLOURS.ember).multiplyScalar(1.35);
   // on the recovery map, the parts that aren't a muscle are a dim neutral, so no band (Fresh green, the
   // colour-blind set's blue) can be mistaken for the hologram's own cyan

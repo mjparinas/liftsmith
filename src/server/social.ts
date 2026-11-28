@@ -53,6 +53,7 @@ import {
   type SuggestReason,
   type TrainingNow,
 } from "@/lib/socialTypes";
+import { parseTitle, titleCode } from "@/lib/titles";
 
 import {
   chatDeletes,
@@ -176,10 +177,16 @@ interface ProfileRow extends Row {
   streak: number;
   tagline: string;
   home_gym: string;
+  title: string;
 }
 
 const AVATAR_SET = new Set<string>(AVATAR_IDS);
 const avatarOf = (v: unknown) => (AVATAR_SET.has(s(v)) ? s(v) : "");
+/** A saved title in its one shape, or "" for none or anything that isn't a title. */
+export const titleOf = (v: unknown) => {
+  const x = parseTitle(v);
+  return x ? titleCode(x) : "";
+};
 const audienceOf = (v: unknown): Audience => AUDIENCES.find((a) => a === v) ?? "all";
 
 /** Checks the best lifts the app sends for the showcase: up to three, each a known shape, kilograms and reps. */
@@ -210,6 +217,7 @@ const toProfile = (r: ProfileRow, homeGym: HomeGym | null): SocialProfile => ({
   handle: s(r.handle),
   name: s(r.name),
   tagline: s(r.tagline),
+  title: titleOf(r.title),
   homeGym,
   open: !!n(r.open),
   autoPost: !!n(r.auto_post),
@@ -421,7 +429,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
          push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
          suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?, cheers = ?, push_checkins = ?,
-         tagline = ?, home_gym = ?
+         tagline = ?, home_gym = ?, title = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -448,6 +456,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         flag(push.checkins, p.push_checkins ?? 1),
         tagline,
         homeGym,
+        b.title === undefined ? titleOf(p.title) : titleOf(b.title),
         accountId,
       ],
     );
@@ -568,6 +577,7 @@ async function card(viewer: string, p: ProfileRow, now = Date.now()): Promise<Pe
     handle: s(p.handle),
     name: s(p.name),
     tagline: s(p.tagline),
+    title: titleOf(p.title),
     homeGym: canSeePosts ? await shownGym(p, now) : null,
     followers: n(c?.followers),
     following: n(c?.following),

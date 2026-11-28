@@ -579,6 +579,10 @@ export const de: FeaturesText = {
       proPart: "Alle Stufen und ihre Belohnungen sind kostenlos; Pro legt auf drei Stufen eine Bonus-Belohnung dazu.",
       note: "Saison-App-Symbole gibt es auf Android und iPhone; im Web gibt es das Design. Saisons lassen sich in den Einstellungen ausschalten.",
     },
+    "lift-mastery": {
+      name: "Übungs-Meisterschaft und Freischaltungen",
+      body: "Jede Übung bringt bis zu vier Meisterschaftssterne für die Sätze, die du einträgst: 25, 100, 300 und 1.000. Die Übungsseite und der Trainingsbildschirm zeigen deine Sterne und die Sätze bis zum nächsten. Sterne und die Sätze jeder Muskelgruppe schalten Farben für die 3D-Figur frei und Titel für dein Freunde-Profil, die deine Übung nennen. Bestleistungen und Scheibenclubs schalten Rahmen für deine Teilen-Karten frei.",
+    },
     locker: {
       name: "Designs, Akzentfarben und App-Symbole",
       body: "Verdiene Designs und Akzentfarben und auf den Handys ein App-Symbol in den Farben deines Designs.",

@@ -79,6 +79,7 @@ describe("joining", () => {
       handle: "alex",
       name: "ALEX",
       tagline: "",
+      title: "",
       homeGym: null,
       open: false,
       autoPost: false,

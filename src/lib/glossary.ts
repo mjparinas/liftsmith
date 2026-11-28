@@ -46,6 +46,7 @@ const TERMS = [
   "setTypes",
   "stretching",
   "crate",
+  "mastery",
   "badges",
   "monthly",
   "schoolTeams",

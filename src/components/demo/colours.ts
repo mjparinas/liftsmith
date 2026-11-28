@@ -8,6 +8,18 @@ export const DEMO_COLOURS = {
   heart: "#f0605d",
 } as const;
 
+let holo: string = DEMO_COLOURS.holo;
+/**
+ * The figure colour picked in the Locker (a `figure` item, lift mastery 2026-11-27), set by the app from the profile.
+ * Every figure drawn after it takes it; a figure already on screen keeps its colour until it's drawn again. The
+ * website never sets it, so its figures keep the hologram's own cyan.
+ */
+export function setFigureColour(hex: string | undefined) {
+  holo = hex && /^#[0-9a-f]{6}$/i.test(hex) ? hex : DEMO_COLOURS.holo;
+}
+/** The hologram's colour for the next figure drawn. */
+export const figureColour = () => holo;
+
 /**
  * Recovery band colours on the dark stage (the recovery map in 3D). They are the dark theme's
  * `--band-*-std` and `--band-*-cvd` tokens from globals.css, kept in step by a test, and used whatever

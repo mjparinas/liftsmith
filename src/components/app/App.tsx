@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 
+import { setFigureColour } from "@/components/demo/colours";
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
@@ -38,6 +39,7 @@ import { startFlags } from "@/lib/remoteFlags";
 import { startSeasons } from "@/lib/remoteSeasons";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
+import { setCardFrame } from "@/lib/shareImage";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { refreshSocial, socialOn } from "@/lib/social";
 import { startLive } from "@/lib/socialLive";
@@ -157,6 +159,15 @@ export function App() {
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     if (accent) applyAccent(accent, light);
   }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The figure colour and share card frame picked in the Locker (lift mastery, mastery.ts), while they're still owned.
+  const figure = profile.cosmetics?.figure;
+  const frame = profile.cosmetics?.frame;
+  const owned = played.owned;
+  useEffect(() => {
+    const pick = (id: string | undefined) => (id && owned.has(id) ? COSMETICS.find((c) => c.id === id)?.value : undefined);
+    setFigureColour(pick(figure));
+    setCardFrame(pick(frame));
+  }, [figure, frame, owned]);
   // Language (i18n.ts): the phone's language, read again on return in case it changed, or the
   // one picked in Settings. useLang re-renders the whole app when it changes.
   useLang();

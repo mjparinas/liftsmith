@@ -80,6 +80,7 @@ import * as mom from "./text/mom";
 import * as month from "./text/month";
 import * as msg from "./text/msg";
 import * as msgKind from "./text/msgKind";
+import * as mst from "./text/mst";
 import * as mt from "./text/mt";
 import * as muscle from "./text/muscle";
 import * as nav from "./text/nav";
@@ -231,6 +232,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...month.fr,
   ...msg.fr,
   ...msgKind.fr,
+  ...mst.fr,
   ...muscle.fr,
   ...nav.fr,
   ...note.fr,

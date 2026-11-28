@@ -1184,4 +1184,16 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Sur le téléphone, la fenêtre d'impression peut aussi enregistrer la feuille en PDF, pratique pour l'envoyer à un ami.",
   },
+  "lift-mastery": {
+    title: "Des étoiles pour chaque exercice auquel vous revenez",
+    intro:
+      "Chaque exercice gagne désormais jusqu'à quatre étoiles de maîtrise grâce aux séries enregistrées, et elles débloquent du nouveau.",
+    points: [
+      "La première étoile arrive à 25 séries d'un exercice, puis à 100, 300 et 1 000. Chaque série de travail compte une fois.",
+      "La page de l'exercice montre vos étoiles et les séries qui restent avant la suivante, et l'écran d'entraînement les affiche à côté du nom de l'exercice.",
+      "Les étoiles et les séries de chaque famille de muscles débloquent des couleurs pour la figurine 3D.",
+      "Les titres qui nomment votre exercice s'affichent sous votre nom sur votre profil Amis. Les records et les clubs de disques débloquent des cadres pour vos cartes.",
+    ],
+    dyk: "Rien de tout cela ne vient d'un coffre : chaque couleur, cadre et titre a un chemin sûr, les séries que vous enregistrez.",
+  },
 };

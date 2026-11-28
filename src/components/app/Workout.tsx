@@ -66,6 +66,7 @@ import { ExerciseBrowser } from "./ExerciseBrowser";
 import { clock, loadText, repsText, setText } from "./format";
 import { FaultList, faultsFor } from "./FormFaults";
 import { Icon } from "./icons";
+import { LiftStars } from "./MasteryStars";
 import { useMyShape } from "./myShape";
 import { NowPlayingBar } from "./NowPlaying";
 import { type PlateFinish } from "./Plates";
@@ -785,6 +786,7 @@ export function Workout() {
                   {item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}
                 </p>
                 <h1 className={`mt-0.5 ${SCREEN_TITLE}`}>{ex.name}</h1>
+                <LiftStars exerciseId={ex.id} />
                 <SetHints ex={ex} className="mt-1" />
                 {note && (
                   <p className="mt-1 text-sm text-muted">

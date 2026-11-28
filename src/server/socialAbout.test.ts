@@ -134,3 +134,23 @@ describe("the public page", () => {
     expect(html).toContain(String.raw`"description":"Squats \u003c3 & deadlifts"`);
   });
 });
+
+describe("profile title", () => {
+  it("keeps only a real title in its one shape, shows it to anyone who sees the profile, and on the public page", async () => {
+    await call("acc-a", "update", { title: "title-master:back-squat" });
+    expect((await mine("acc-a")).title).toBe("title-master:back-squat");
+    expect((await person("acc-c", "alex")).title).toBe("title-master:back-squat");
+    // Anything that isn't a title clears it; the app never sends one, but the server doesn't trust it.
+    for (const bad of ["Supreme leader", "title-master", "title-early:back-squat", "title-master:nope"]) {
+      await call("acc-a", "update", { title: bad });
+      expect((await mine("acc-a")).title).toBe("");
+    }
+    await call("acc-a", "update", { title: "title-early", public: true, open: true });
+    // Leaving it out keeps it.
+    await call("acc-a", "update", { tagline: "Hi" });
+    expect((await mine("acc-a")).title).toBe("title-early");
+    const p = await publicProfile("alex", NOW);
+    expect(p?.title).toBe("title-early");
+    expect(profileHtml(p!, "en", "kg", NOW)).toContain("Early bird");
+  });
+});

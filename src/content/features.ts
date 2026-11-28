@@ -1068,6 +1068,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         note: "Season app icons are on Android and iPhone; the web gets the theme. Seasons can be turned off in Settings.",
         added: "2026-11-17",
       },
+      {
+        id: "lift-mastery",
+        name: "Lift mastery and unlocks",
+        body: "Every exercise earns up to four mastery stars from the sets you log: 25, 100, 300 and 1,000. The exercise page and the workout screen show your stars and the sets to the next one. Stars and the sets you do for each muscle family unlock colours for the 3D figure, and titles for your Friends profile that name your lift, like Back squat devotee. Personal bests and plate clubs unlock frames for your share cards.",
+        tier: "free",
+        added: "2026-11-27",
+      },
     ],
   },
   {

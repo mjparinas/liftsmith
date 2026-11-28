@@ -48,6 +48,7 @@ const SCROLL = {
   "auto-supersets": ["train.adapt"],
   pregnancy: ["preg.title"],
   "share-stats": ["progress.prs"],
+  "lift-mastery": ["mst.locker.figure"],
 };
 /**
  * What to tap before the picture (a catalogue key): the button that opens a sheet, or a switch that shows more, turned
