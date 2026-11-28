@@ -1178,4 +1178,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Sul telefono, la finestra di stampa può anche salvare il foglio in PDF, comodo da mandare a un amico.",
   },
+  "lift-mastery": {
+    title: "Stelle per ogni esercizio a cui torni sempre",
+    intro: "Ogni esercizio ora guadagna fino a quattro stelle di padronanza con le serie che registri, e sbloccano novità.",
+    points: [
+      "La prima stella arriva a 25 serie di un esercizio, poi a 100, 300 e 1.000. Ogni serie allenante conta una volta.",
+      "La pagina dell'esercizio mostra le tue stelle e le serie che mancano alla prossima, e la schermata dell'allenamento le mostra accanto al nome dell'esercizio.",
+      "Le stelle e le serie di ogni gruppo muscolare sbloccano colori per la figura 3D.",
+      "I titoli con il nome del tuo esercizio compaiono sotto il tuo nome nel profilo Amici. Record e club dei dischi sbloccano cornici per le tue card.",
+    ],
+    dyk: "Niente di tutto questo esce da una cassa, quindi ogni colore, cornice e titolo ha una strada sicura: le serie che registri.",
+  },
 };

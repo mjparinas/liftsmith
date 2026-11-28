@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/app/icons";
+import type { Family } from "@/components/app/theme";
 import type { MessageKey } from "@/locales/en";
 
 import { achievements, achievementXp, context, nearest, tierNames, type Achievement, type Tier } from "./achievements";
@@ -6,6 +7,7 @@ import { weekOf, type Stats } from "./derive";
 import { estimate, repsToBeat } from "./e1rm";
 import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
+import { familySets, liftsWith, setCounts } from "./mastery";
 import { gradedSet, TIMED } from "./progression";
 import { hash, rng } from "./random";
 import { seasonOwned } from "./seasons";
@@ -435,12 +437,22 @@ export function league(events: readonly AppEvent[], stats: Stats, profile: Profi
 // ---------- Crates: one per finished workout, its prize picked from the session id so every device agrees.
 
 export type Rarity = "common" | "rare" | "epic" | "legendary";
+/**
+ * What a locker item changes. Figure colours (the 3D figures), share card frames and profile titles came with lift
+ * mastery (2026-11-27, mastery.ts); they never come from a crate, so every crate already opened still holds what it held.
+ */
+export type CosmeticKind = "accent" | "sound" | "plates" | "avatar" | "figure" | "frame" | "title";
+/** The kinds a workout crate can hold. */
+export const CRATE_KINDS: readonly CosmeticKind[] = ["accent", "sound", "plates"];
 export interface Cosmetic {
   id: string;
-  kind: "accent" | "sound" | "plates" | "avatar";
+  kind: CosmeticKind;
   name: string;
   rarity: Rarity;
-  /** Colour for accents, a sound id for timer sounds, a finish for plates, the avatar id for avatars. */
+  /**
+   * Colour for accents, a sound id for timer sounds, a finish for plates, the avatar id for avatars, the hologram colour
+   * for figures, the frame's colours for frames ("" for none), and the title's own id for titles.
+   */
   value: string;
   /** From a training season (seasons.ts), never from a crate or a level. */
   season?: true;
@@ -510,6 +522,35 @@ const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
   { id: "plates-obsidian", kind: "plates", rarity: "legendary", value: "obsidian", season: true },
   { id: "av-obsidian-pro", kind: "avatar", rarity: "epic", value: "av-obsidian-pro", season: true },
   { id: "accent-obsidian-pro", kind: "accent", rarity: "legendary", value: "#a8f0ff", season: true },
+  // Lift mastery (2026-11-27, mastery.ts): figure colours from stars and sets per muscle family, frames and titles from
+  // badges and stars (BADGE_ITEMS, MASTERY_ITEMS). The figure's own colour, no frame and no title are everyone's.
+  { id: "fig-holo", kind: "figure", rarity: "common", value: "#5cc8ff" },
+  { id: "fig-cobalt", kind: "figure", rarity: "rare", value: "#7d97ff" },
+  { id: "fig-aqua", kind: "figure", rarity: "rare", value: "#3ee6c4" },
+  { id: "fig-violet", kind: "figure", rarity: "rare", value: "#b794ff" },
+  { id: "fig-rose", kind: "figure", rarity: "rare", value: "#ff8fd1" },
+  { id: "fig-mint", kind: "figure", rarity: "epic", value: "#7cf2a2" },
+  { id: "fig-gold", kind: "figure", rarity: "epic", value: "#ffd166" },
+  { id: "fig-platinum", kind: "figure", rarity: "legendary", value: "#eef3f8" },
+  { id: "frame-none", kind: "frame", rarity: "common", value: "" },
+  { id: "frame-iron", kind: "frame", rarity: "common", value: "#6b7686,#c3ccd8" },
+  { id: "frame-silver", kind: "frame", rarity: "rare", value: "#9aa6b6,#f4f7fb" },
+  { id: "frame-chrome", kind: "frame", rarity: "rare", value: "#5cc8ff,#f4f7fb,#7d97ff" },
+  { id: "frame-gold", kind: "frame", rarity: "epic", value: "#c98a1b,#ffe08a" },
+  { id: "frame-ember", kind: "frame", rarity: "epic", value: "#ff5b3a,#ffb02e" },
+  { id: "frame-platinum", kind: "frame", rarity: "legendary", value: "#a78bfa,#eef3f8,#5cc8ff" },
+  { id: "title-none", kind: "title", rarity: "common", value: "" },
+  { id: "title-early", kind: "title", rarity: "common", value: "title-early" },
+  { id: "title-regular", kind: "title", rarity: "common", value: "title-regular" },
+  { id: "title-weekend", kind: "title", rarity: "rare", value: "title-weekend" },
+  { id: "title-comeback", kind: "title", rarity: "rare", value: "title-comeback" },
+  { id: "title-explorer", kind: "title", rarity: "rare", value: "title-explorer" },
+  { id: "title-devotee", kind: "title", rarity: "rare", value: "title-devotee" },
+  { id: "title-centurion", kind: "title", rarity: "epic", value: "title-centurion" },
+  { id: "title-streak", kind: "title", rarity: "epic", value: "title-streak" },
+  { id: "title-records", kind: "title", rarity: "epic", value: "title-records" },
+  { id: "title-specialist", kind: "title", rarity: "epic", value: "title-specialist" },
+  { id: "title-master", kind: "title", rarity: "legendary", value: "title-master" },
 ];
 /** Cosmetics with their names in the current language (getters, so a language change shows at once). */
 export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
@@ -518,7 +559,18 @@ export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
     return t(`cos.${c.id}` as MessageKey);
   },
 }));
-export const STARTER = ["accent-blue", "sound-classic", "plates-classic", "av-dumbbell", "av-bolt", "av-leaf", "av-moon"];
+export const STARTER = [
+  "accent-blue",
+  "sound-classic",
+  "plates-classic",
+  "av-dumbbell",
+  "av-bolt",
+  "av-leaf",
+  "av-moon",
+  "fig-holo",
+  "frame-none",
+  "title-none",
+];
 
 /**
  * Locker items a badge brings instead of a crate (Melvin, 2026-11-11: Pro "should unlock some kind of badge or
@@ -528,10 +580,57 @@ export const BADGE_ITEMS: readonly { id: string; badge: string; tier: Tier }[] =
   { id: "accent-pro", badge: "pro", tier: "silver" },
   { id: "av-pro", badge: "pro", tier: "silver" },
   { id: "av-flame", badge: "goal-streak", tier: "silver" },
+  // Share card frames from personal bests and the plate clubs, and profile titles from badges (lift mastery, 2026-11-27).
+  { id: "frame-iron", badge: "bench-plates", tier: "bronze" },
+  { id: "frame-silver", badge: "prs", tier: "silver" },
+  { id: "frame-chrome", badge: "squat-plates", tier: "silver" },
+  { id: "frame-gold", badge: "prs", tier: "gold" },
+  { id: "frame-ember", badge: "dead-plates", tier: "gold" },
+  { id: "frame-platinum", badge: "prs", tier: "platinum" },
+  { id: "title-early", badge: "early", tier: "bronze" },
+  { id: "title-regular", badge: "workouts", tier: "silver" },
+  { id: "title-weekend", badge: "weekend", tier: "silver" },
+  { id: "title-comeback", badge: "comeback", tier: "bronze" },
+  { id: "title-explorer", badge: "exercises", tier: "silver" },
+  { id: "title-centurion", badge: "workouts", tier: "gold" },
+  { id: "title-streak", badge: "goal-streak", tier: "gold" },
+  { id: "title-records", badge: "prs", tier: "gold" },
 ];
 export const badgeForItem = (id: string) => BADGE_ITEMS.find((b) => b.id === id) ?? null;
 /** What crates can hold: everything but the starter set and the badge items. */
-const cratePool = () => COSMETICS.filter((c) => c.kind !== "avatar" && !c.season && !STARTER.includes(c.id) && !badgeForItem(c.id));
+const cratePool = () =>
+  COSMETICS.filter((c) => CRATE_KINDS.includes(c.kind) && !c.season && !STARTER.includes(c.id) && !badgeForItem(c.id));
+
+/** How a mastery item is earned: stars on some number of lifts, or sets for one muscle family. */
+export type MasteryRule = { stars: number; lifts: number } | { family: Family; sets: number };
+/** Locker items lift mastery brings (mastery.ts), never from a crate. */
+export const MASTERY_ITEMS: readonly { id: string; rule: MasteryRule }[] = [
+  { id: "fig-cobalt", rule: { family: "push", sets: 500 } },
+  { id: "fig-aqua", rule: { family: "pull", sets: 500 } },
+  { id: "fig-violet", rule: { family: "legs", sets: 500 } },
+  { id: "fig-rose", rule: { family: "core", sets: 300 } },
+  { id: "fig-mint", rule: { stars: 2, lifts: 3 } },
+  { id: "fig-gold", rule: { stars: 3, lifts: 1 } },
+  { id: "fig-platinum", rule: { stars: 4, lifts: 1 } },
+  // Titles that name the lifter's lift ("Squat devotee"): one per lift with that many stars (titles.ts LIFT_TITLES).
+  { id: "title-devotee", rule: { stars: 2, lifts: 1 } },
+  { id: "title-specialist", rule: { stars: 3, lifts: 1 } },
+  { id: "title-master", rule: { stars: 4, lifts: 1 } },
+];
+export const masteryRuleFor = (id: string): MasteryRule | null => MASTERY_ITEMS.find((m) => m.id === id)?.rule ?? null;
+/** Mastery items these set counts have earned. */
+export function masteryItems(counts: ReadonlyMap<string, number>): string[] {
+  const fam = familySets(counts);
+  return MASTERY_ITEMS.filter(({ rule }) =>
+    "family" in rule ? fam[rule.family] >= rule.sets : liftsWith(counts, rule.stars) >= rule.lifts,
+  ).map((m) => m.id);
+}
+/** How far along a mastery rule is: [have, need]. */
+export function masteryProgress(rule: MasteryRule, counts: ReadonlyMap<string, number>): [number, number] {
+  return "family" in rule
+    ? [Math.min(familySets(counts)[rule.family], rule.sets), rule.sets]
+    : [Math.min(liftsWith(counts, rule.stars), rule.lifts), rule.lifts];
+}
 /** Badge items the lifter's achievements have earned. */
 export function badgeItems(list: readonly Achievement[]): string[] {
   const level = new Map(list.map((a) => [a.id, a.level]));
@@ -679,6 +778,8 @@ export interface Game {
   /** Level rewards earned so far. */
   rewards: LevelReward[];
   next: LevelReward | null;
+  /** Sets logged per exercise, for lift mastery (mastery.ts). */
+  mastery: ReadonlyMap<string, number>;
 }
 
 export function questXp(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): number {
@@ -690,6 +791,7 @@ export function questXp(events: readonly AppEvent[], stats: Stats, profile: Prof
 }
 
 export function game(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): Game {
+  const counts = setCounts(events);
   const streak = goalStreak(stats, profile, now);
   const list = achievements(context(events, stats, profile, streak.best));
   const base = xpTotal(stats) + questXp(events, stats, profile, now) + achievementXp(list);
@@ -721,7 +823,9 @@ export function game(events: readonly AppEvent[], stats: Stats, profile: Profile
       ...rewards.map((r) => r.item.id),
       ...badgeItems(list),
       ...seasonOwned(events, stats, profile, now).items,
+      ...masteryItems(counts),
     ]),
+    mastery: counts,
     rewards,
     next: nextReward(level.level),
   };

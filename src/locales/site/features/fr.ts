@@ -580,6 +580,10 @@ export const fr: FeaturesText = {
       proPart: "Tous les paliers et leurs récompenses sont gratuits ; Pro ajoute une récompense bonus sur trois paliers.",
       note: "Les icônes de saison sont sur Android et iPhone ; le web reçoit le thème. Les saisons peuvent être désactivées dans les Réglages.",
     },
+    "lift-mastery": {
+      name: "Maîtrise des exercices et déblocages",
+      body: "Chaque exercice gagne jusqu'à quatre étoiles de maîtrise grâce aux séries enregistrées : 25, 100, 300 et 1 000. La page de l'exercice et l'écran d'entraînement montrent vos étoiles et les séries qui restent avant la suivante. Les étoiles et les séries de chaque famille de muscles débloquent des couleurs pour la figurine 3D et des titres pour votre profil Amis qui nomment votre exercice. Les records personnels et les clubs de disques débloquent des cadres pour vos cartes à partager.",
+    },
     locker: {
       name: "Thèmes, couleurs et icônes d’appli",
       body: "Gagnez des thèmes et des couleurs d’accent et, sur les téléphones, une icône d’appli aux couleurs de votre thème.",

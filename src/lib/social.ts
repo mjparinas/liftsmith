@@ -279,9 +279,11 @@ export function profileChanges(
   avatar: string,
   lifts: readonly ShowcaseLift[],
   stats: { level: number; streak: number } | null = null,
+  title: string | null = null,
 ): Record<string, unknown> | null {
   const out: Record<string, unknown> = {};
   if ((avatar || "") !== (p.avatar || "")) out.avatar = avatar;
+  if (title !== null && title !== (p.title || "")) out.title = title;
   if (!sameLifts(p.lifts, lifts)) out.lifts = lifts;
   if (stats && stats.level !== (p.level ?? 0)) out.level = stats.level;
   if (stats && stats.streak !== (p.streak ?? 0)) out.streak = stats.streak;

@@ -57,6 +57,8 @@ export interface SocialProfile {
   name: string;
   /** A short line under the name (up to SOCIAL_LIMITS.tagline characters, through the word filter), or "". */
   tagline: string;
+  /** A profile title from the locker ("title-early", "title-master:back-squat"; titles.ts), or "". */
+  title?: string;
   /**
    * The lifter's home gym, picked from their gyms that are linked to a real gym, or null. Never for someone under
    * 18 (school teams, docs/decisions/school-teams.md). Shown to the same people who see the posts.
@@ -165,6 +167,8 @@ export interface PersonCard {
   name: string;
   /** Their tagline, or "". */
   tagline: string;
+  /** Their profile title (titles.ts), or "". */
+  title?: string;
   /** Their home gym, only to people who can see their posts, and never for someone under 18. */
   homeGym: HomeGym | null;
   followers: number;

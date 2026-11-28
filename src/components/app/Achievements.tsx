@@ -11,18 +11,25 @@ import {
   LEAGUE_LABEL,
   LEAGUES,
   levelForItem,
+  masteryProgress,
+  masteryRuleFor,
   RARITY_LABEL,
   rarityOdds,
   type Cosmetic,
   type Game,
   type LevelReward,
+  type MasteryRule,
 } from "@/lib/game";
 import { currentLang, t } from "@/lib/i18n";
 import { applyAccent, calm, sound, type TimerSound } from "@/lib/juice";
+import { mastered } from "@/lib/mastery";
 import { DROP_ODDS, kitName, kitOfReward, seasonsOn, stillOpen } from "@/lib/seasons";
 import { badgeShare, levelShare } from "@/lib/shareCards";
+import { frameStops } from "@/lib/shareImage";
 import { useApp } from "@/lib/store";
 import { themesForBadge } from "@/lib/themes";
+import { LIFT_TITLES, type TitleId } from "@/lib/titles";
+import { titleLine } from "@/lib/titleText";
 import type { AppEvent, Profile } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -30,6 +37,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { Avatar } from "./AvatarFace";
 import { Icon, type IconName } from "./icons";
+import { MasteryList } from "./Mastery";
 import { MonthCard } from "./MonthChallenge";
 import { go, useRoute } from "./router";
 import { SeasonCard } from "./SeasonCard";
@@ -292,12 +300,46 @@ export function rewardText(r: LevelReward): string {
   return t("awards.reward.item", { name: r.item.name, rarity: RARITY_LABEL[r.item.rarity] });
 }
 
+/** A frame's colours as a CSS gradient, for its swatch. */
+const frameFill = (value: string) => {
+  const stops = frameStops(value);
+  return stops.length ? `linear-gradient(135deg, ${stops.join(", ")})` : undefined;
+};
+
+/** How a locked mastery item is earned, with how far along the lifter is. */
+function masteryHint(name: string, rule: MasteryRule, counts: ReadonlyMap<string, number>): string {
+  const [have] = masteryProgress(rule, counts);
+  return "family" in rule
+    ? t("mst.how.family", { name, sets: fmtNum(rule.sets), family: t(`mst.fam.${rule.family}`), have: fmtNum(have) })
+    : t("mst.how.stars", { name, count: rule.lifts, stars: rule.stars, have });
+}
+
+/** One chip per locker item, and for a title that names a lift, one per lift with the stars it needs. */
+function lockerChips(
+  kind: Cosmetic["kind"],
+  shown: readonly Cosmetic[],
+  g: Game,
+): { key: string; item: Cosmetic; label: string; value: string }[] {
+  const out: { key: string; item: Cosmetic; label: string; value: string }[] = [];
+  for (const c of shown) {
+    if (c.kind !== kind) continue;
+    const stars = LIFT_TITLES[c.id as TitleId];
+    if (stars !== undefined && g.owned.has(c.id)) {
+      for (const m of mastered(g.mastery).filter((x) => x.stars >= stars)) {
+        const code = `${c.id}:${m.exerciseId}`;
+        out.push({ key: code, item: c, label: titleLine(code), value: code });
+      }
+    } else out.push({ key: c.id, item: c, label: c.name, value: c.id });
+  }
+  return out;
+}
+
 function Locker({ g }: { g: Game }) {
   const { profile, setProfile } = useApp();
   const [hint, setHint] = useState<string | null>(null);
   const eq = profile.cosmetics ?? {};
-  const equip = (c: Cosmetic) => {
-    const next = { ...eq, [c.kind]: c.id };
+  const equip = (c: Cosmetic, value: string) => {
+    const next = { ...eq, [c.kind]: value };
     setProfile({ cosmetics: next });
     if (c.kind === "accent") applyAccent(c.value);
     if (c.kind === "sound") sound.preview(c.value as TimerSound);
@@ -307,6 +349,9 @@ function Locker({ g }: { g: Game }) {
     ["sound", t("awards.locker.sound"), "sound-classic"],
     ["plates", t("awards.locker.plates"), "plates-classic"],
     ["avatar", t("awards.locker.avatar"), ""],
+    ["figure", t("mst.locker.figure"), "fig-holo"],
+    ["frame", t("mst.locker.frame"), "frame-none"],
+    ["title", t("mst.locker.title"), "title-none"],
   ];
   const now = useNow(3600_000);
   // A season's items show while that season can still be earned, or once owned (seasons.ts); seasons turned off hides the unowned ones.
@@ -323,38 +368,47 @@ function Locker({ g }: { g: Game }) {
         const viaSeason = picked?.season ? kitOfReward(picked.id) : null;
         const at = picked ? levelForItem(picked.id) : null;
         const viaBadge = picked ? badgeForItem(picked.id) : null;
+        const viaMastery = picked ? masteryRuleFor(picked.id) : null;
         return (
           <div key={kind}>
             <p className="mb-2 text-sm text-muted">{label}</p>
             <div className="flex flex-wrap gap-2">
-              {shown
-                .filter((c) => c.kind === kind)
-                .map((c) => {
-                  const mine = g.owned.has(c.id);
-                  const on = (eq[kind] || def) === c.id;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      aria-pressed={mine ? on : undefined}
-                      aria-expanded={mine ? undefined : hint === c.id}
-                      onClick={() => (mine ? equip(c) : setHint(hint === c.id ? null : c.id))}
-                      className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface"} ${mine ? "" : "text-muted"}`}
-                    >
-                      {kind === "accent" && (
-                        <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
-                      )}
-                      {kind === "avatar" && <Avatar name={c.name} avatar={c.id} size={24} dim={!mine} />}
-                      {!mine && <Icon name="lock" size={14} />}
-                      {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
-                      <span>{c.name}</span>
-                      <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
-                        {RARITY_LABEL[c.rarity]}
+              {lockerChips(kind, shown, g).map(({ key, item: c, label: name, value }) => {
+                const mine = g.owned.has(c.id);
+                const on = (eq[kind] || def) === value;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={mine ? on : undefined}
+                    aria-expanded={mine ? undefined : hint === c.id}
+                    onClick={() => (mine ? equip(c, value) : setHint(hint === c.id ? null : c.id))}
+                    className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface"} ${mine ? "" : "text-muted"}`}
+                  >
+                    {(kind === "accent" || kind === "figure") && (
+                      <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
+                    )}
+                    {kind === "frame" && c.value && (
+                      <span
+                        aria-hidden
+                        className={`grid h-4 w-4 rounded-[5px] p-[3px] ${mine ? "" : "opacity-45"}`}
+                        style={{ background: frameFill(c.value) }}
+                      >
+                        <span className="rounded-[2px] bg-surface" />
                       </span>
-                    </button>
-                  );
-                })}
+                    )}
+                    {kind === "avatar" && <Avatar name={c.name} avatar={c.id} size={24} dim={!mine} />}
+                    {!mine && <Icon name="lock" size={14} />}
+                    {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
+                    <span>{name}</span>
+                    <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
+                      {RARITY_LABEL[c.rarity]}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            {kind === "title" && <p className="mt-2 text-xs text-faint">{t("mst.locker.titleNote")}</p>}
             <p aria-live="polite" className="text-sm text-muted">
               {picked && (
                 <span className="mt-2 block">
@@ -364,9 +418,11 @@ function Locker({ g }: { g: Game }) {
                       : t("ssn.dropHint", { name: kitName(viaSeason.kit.id), n: Math.round(1 / DROP_ODDS) })
                     : viaBadge
                       ? t("awards.locker.badge", { name: picked.name, badge: achName(viaBadge.badge), tier: TIER_LABEL[viaBadge.tier] })
-                      : rarityOdds(picked.id) > 0
-                        ? `${t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}${at !== null ? ` ${t("awards.locker.atLevel", { level: at })}` : ""}`
-                        : at !== null && t("awards.locker.levelOnly", { name: picked.name, level: at })}
+                      : viaMastery
+                        ? masteryHint(picked.name, viaMastery, g.mastery)
+                        : rarityOdds(picked.id) > 0
+                          ? `${t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}${at !== null ? ` ${t("awards.locker.atLevel", { level: at })}` : ""}`
+                          : at !== null && t("awards.locker.levelOnly", { name: picked.name, level: at })}
                 </span>
               )}
             </p>
@@ -560,6 +616,7 @@ export function Achievements() {
           {!sorted.length && <li className="px-4 py-3 text-muted">{t("awards.none")}</li>}
         </ul>
       </Section>
+      <MasteryList />
       {seasons && (
         <Section title={t("awards.locker")} info="crate">
           <Locker g={g} />

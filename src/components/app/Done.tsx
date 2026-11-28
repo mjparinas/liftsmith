@@ -12,12 +12,15 @@ import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@
 import { date, inSentence, num, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, calm, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { mastered, starsGained } from "@/lib/mastery";
 import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
 import { currentSeason, rewardLabel, seasonGain, seasonsOn, seasonState, TIERS, type SeasonGain, type SeasonState } from "@/lib/seasons";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { socialOn, useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
+import { LIFT_TITLES, type TitleId } from "@/lib/titles";
+import { titleLine } from "@/lib/titleText";
 import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { isUnlocked, justUnlocked, unlockCount, type UnlockId } from "@/lib/unlocks";
 import { useNow } from "@/lib/useNow";
@@ -34,6 +37,7 @@ import { Icon, type IconName } from "./icons";
 import { PainSelect } from "./Injuries";
 import { DoneInvite } from "./Invites";
 import { Mascot } from "./Mascot";
+import { MasteryDone } from "./Mastery";
 import { NextUpCard } from "./NextUp";
 import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
@@ -65,11 +69,39 @@ function useCountUp(to: number, ms = 900) {
 }
 
 /** The post-workout crate: shakes until tapped (never during a set), then shows its prize. */
-function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean; label?: string }) {
+/** Locker kinds lift mastery brought (2026-11-27), shown on Done when a workout unlocks one. */
+const NEW_KINDS: readonly Cosmetic["kind"][] = ["figure", "frame", "title"];
+
+/** What the crate's opened card says the item is. */
+const KIND_LINE: Record<Cosmetic["kind"], MessageKey> = {
+  accent: "done.crate.accent",
+  sound: "done.crate.sound",
+  plates: "done.crate.plate",
+  avatar: "done.crate.plate",
+  figure: "mst.crate.figure",
+  frame: "mst.crate.frame",
+  title: "mst.crate.title",
+};
+
+function Crate({
+  item,
+  duplicate,
+  label,
+  tap,
+  value = item.id,
+}: {
+  item: Cosmetic;
+  duplicate: boolean;
+  label?: string;
+  /** The closed card's second line (default: tap to open the crate). */
+  tap?: string;
+  /** What equipping saves: the item's id, or a title with its lift ("title-master:squat"). */
+  value?: string;
+}) {
   const { profile, setProfile } = useApp();
   const [open, setOpen] = useState(juice.lean);
   const rare = item.rarity === "epic" || item.rarity === "legendary";
-  const equipped = profile.cosmetics?.[item.kind] === item.id;
+  const equipped = profile.cosmetics?.[item.kind] === value;
   const reveal = (e: { currentTarget: Element }) => {
     burst(e.currentTarget, { count: rare ? 22 : 14, reach: rare ? 120 : 90 });
     setOpen(true);
@@ -90,7 +122,7 @@ function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean;
         </span>
         <span>
           <span className="block font-semibold">{label ?? t("done.crate")}</span>
-          <span className="text-sm text-muted">{t("done.crateTap")}</span>
+          <span className="text-sm text-muted">{tap ?? t("done.crateTap")}</span>
         </span>
       </button>
     );
@@ -98,14 +130,14 @@ function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean;
   return (
     <div className="card animate-pop mt-4 p-4 text-left" style={{ boxShadow: `inset 0 0 0 2px ${RARITY_COLOUR[item.rarity]}` }}>
       <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: RARITY_COLOUR[item.rarity] }}>
-        {t(item.kind === "accent" ? "done.crate.accent" : item.kind === "sound" ? "done.crate.sound" : "done.crate.plate", {
-          rarity: RARITY_LABEL[item.rarity],
-        })}
+        {t(KIND_LINE[item.kind], { rarity: RARITY_LABEL[item.rarity] })}
       </p>
       <div className="mt-1 flex items-center justify-between gap-3">
         <span className="flex items-center gap-2 text-lg font-semibold">
-          {item.kind === "accent" && <span aria-hidden className="h-5 w-5 rounded-full" style={{ background: item.value }} />}
-          {item.name}
+          {(item.kind === "accent" || item.kind === "figure") && (
+            <span aria-hidden className="h-5 w-5 rounded-full" style={{ background: item.value }} />
+          )}
+          {value === item.id ? item.name : titleLine(value)}
         </span>
         {duplicate ? (
           <span className="text-sm text-muted">{t("done.crateDup")}</span>
@@ -115,7 +147,7 @@ function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean;
             className="py-2"
             disabled={equipped}
             onClick={() => {
-              setProfile({ cosmetics: { ...profile.cosmetics, [item.kind]: item.id } });
+              setProfile({ cosmetics: { ...profile.cosmetics, [item.kind]: value } });
               if (item.kind === "accent") applyAccent(item.value);
               if (item.kind === "sound") sound.preview(item.value as TimerSound);
             }}
@@ -216,6 +248,17 @@ export function Done() {
       return { ...p, duplicate };
     });
   }, [s?.sessionId, after, before]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Lift mastery (mastery.ts): stars this workout added, and figure colours, frames and titles it unlocked.
+  const starsUp = useMemo(() => starsGained(before.mastery, after.mastery), [before, after]);
+  const unlockedItems = useMemo(
+    () =>
+      COSMETICS.filter((c) => NEW_KINDS.includes(c.kind) && after.owned.has(c.id) && !before.owned.has(c.id)).map((c) => {
+        const stars = LIFT_TITLES[c.id as TitleId];
+        const lift = stars === undefined ? undefined : mastered(after.mastery).find((m) => m.stars >= stars)?.exerciseId;
+        return { item: c, value: lift ? `${c.id}:${lift}` : c.id };
+      }),
+    [before, after],
+  );
   const xp = useCountUp(gained);
   // Counts up in kg and reads like the volume everywhere else (fmtVolume: "2.9k kg").
   const vol = useCountUp(s ? Math.round(s.volume) : 0);
@@ -395,6 +438,11 @@ export function Done() {
 
       {season && <SeasonDone s={season.s} gain={season.gain} />}
       {seasons && prizes.map((p) => <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />)}
+      <MasteryDone gained={starsUp} />
+      {seasons &&
+        unlockedItems.map((p) => (
+          <Crate key={`new:${p.item.id}`} item={p.item} value={p.value} duplicate={false} label={t("mst.prize")} tap={t("mst.prizeTap")} />
+        ))}
 
       {/* The streak only once there is one; the weekly league lives on Today and Awards. */}
       {after.streak.weeks > 0 && (

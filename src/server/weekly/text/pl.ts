@@ -1176,4 +1176,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Na telefonie okno drukowania może też zapisać kartkę jako PDF, wygodne do wysłania znajomemu.",
   },
+  "lift-mastery": {
+    title: "Gwiazdki za każde ćwiczenie, do którego wracasz",
+    intro: "Każde ćwiczenie zdobywa teraz do czterech gwiazdek opanowania za zapisane serie, a one odblokowują nowe rzeczy.",
+    points: [
+      "Pierwsza gwiazdka przychodzi po 25 seriach ćwiczenia, potem po 100, 300 i 1000. Każda seria robocza liczy się raz.",
+      "Strona ćwiczenia pokazuje twoje gwiazdki i serie do następnej, a ekran treningu pokazuje je przy nazwie ćwiczenia.",
+      "Gwiazdki i serie dla każdej grupy mięśni odblokowują kolory figury 3D.",
+      "Tytuły z nazwą twojego ćwiczenia pojawiają się pod twoim imieniem w profilu w Znajomych. Rekordy i kluby talerzy odblokowują ramki kart.",
+    ],
+    dyk: "Nic z tego nie pochodzi ze skrzynki, więc każdy kolor, ramka i tytuł ma pewną drogę: serie, które zapisujesz.",
+  },
 };

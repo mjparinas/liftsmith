@@ -2,7 +2,7 @@ import { barDiscs, poleDiscs, trapDiscs } from "@/lib/demo/barPlates";
 import { partIndices, placeVec } from "@/lib/demo/mesh";
 import { anchorAt, feetLoad, poleSegments, ropePoints, type Joints, type Prop, type Vec } from "@/lib/demo/rig";
 
-import { DEMO_COLOURS } from "./colours";
+import { DEMO_COLOURS, figureColour } from "./colours";
 import type { Scene } from "./engine";
 
 // The same hologram drawn with the 2D canvas, for phones without WebGL (Melvin, 2026-11-09: 3D
@@ -10,12 +10,11 @@ import type { Scene } from "./engine";
 // draws its rings and lines additively, so it looks like the 3D figure without the glowing shell.
 
 const hex = (h: string) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-const HOLO = hex(DEMO_COLOURS.holo),
-  EMBER = hex(DEMO_COLOURS.ember);
+const EMBER = hex(DEMO_COLOURS.ember);
 const BINS = 5;
 const binColour = (b: number, a: number) => {
   const w = b / (BINS - 1);
-  const c = HOLO.map((v, i) => Math.round(v + (EMBER[i] - v) * w));
+  const c = hex(figureColour()).map((v, i) => Math.round(v + (EMBER[i] - v) * w));
   return `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 };
 

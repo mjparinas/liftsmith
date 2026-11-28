@@ -18,6 +18,7 @@ import { useNow } from "@/lib/useNow";
 import { plateText, setText } from "./format";
 import { FaultList, faultsFor } from "./FormFaults";
 import { LiftChart, LiftCompareCard, LiftTotalsCard } from "./LiftStats";
+import { MasteryCard } from "./Mastery";
 import { useMyShape } from "./myShape";
 import { ProStats } from "./ProStats";
 import { goBack } from "./router";
@@ -102,6 +103,8 @@ export function ExercisePage({ id }: { id?: string }) {
           {next.note && <p className="mt-2 text-sm text-muted">{next.note}</p>}
         </section>
       )}
+
+      <MasteryCard exerciseId={ex.id} />
 
       {!ex.custom && (
         <Section title={t("ff.howTo")} icon="dumbbell">

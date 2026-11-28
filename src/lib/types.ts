@@ -276,7 +276,18 @@ export interface Profile {
   /** Battery saver for the 3D figures: lower resolution and frame rate (Settings, src/lib/liteDemos.ts). */
   liteDemos?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
-  cosmetics?: { accent?: string; sound?: string; plates?: string; avatar?: string };
+  cosmetics?: {
+    accent?: string;
+    sound?: string;
+    plates?: string;
+    avatar?: string;
+    /** The 3D figures' colour (a `figure` item, lift mastery 2026-11-27). Missing: the hologram's own cyan. */
+    figure?: string;
+    /** The frame drawn round share cards (a `frame` item). Missing: none. */
+    frame?: string;
+    /** The title on the Friends profile: a `title` item's id, with ":<exercise id>" for one naming a lift. Missing: none. */
+    title?: string;
+  };
   /**
    * Your stats (Settings › Body and units, BodyStats.tsx): the one place for age, sex and height, which
    * TDEE, fitness age, DOTS, strength scores and starting weights all read. Also asked in setup. Apple Health

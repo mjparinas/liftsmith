@@ -22,6 +22,7 @@ import {
   levelForItem,
   levelOf,
   levelRewards,
+  masteryRuleFor,
   MAX_FREEZES,
   nextReward,
   owned,
@@ -322,9 +323,9 @@ describe("level rewards", () => {
     expect(levelForItem("accent-gold")).toBe(25);
     expect(levelForItem("accent-teal")).toBeNull();
     expect(levelRewards(50)).toHaveLength(LEVEL_ITEMS.length + TITLE_LEVELS.length);
-    // Every legendary has a sure path: a level, a badge, or a season's track or drop (seasons.ts).
+    // Every legendary has a sure path: a level, a badge, lift mastery, or a season's track or drop (seasons.ts).
     for (const c of COSMETICS.filter((c) => c.rarity === "legendary"))
-      expect(levelForItem(c.id) ?? badgeForItem(c.id) ?? kitOfReward(c.id)).not.toBeNull();
+      expect(levelForItem(c.id) ?? badgeForItem(c.id) ?? masteryRuleFor(c.id) ?? kitOfReward(c.id)).not.toBeNull();
     expect(nextReward(4)).toMatchObject({ level: 5, source: "item" });
     expect(nextReward(50)).toBeNull();
   });

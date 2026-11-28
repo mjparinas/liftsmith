@@ -36,6 +36,7 @@ import { BLOG_INVITES } from "./blog/invites";
 import { BLOG_J } from "./blog/j";
 import { BLOG_K } from "./blog/k";
 import { BLOG_L } from "./blog/l";
+import { BLOG_LIFT_MASTERY } from "./blog/liftMastery";
 import { BLOG_M } from "./blog/m";
 import { BLOG_MACHINE_TAKEN } from "./blog/machineTaken";
 import { BLOG_MY_TEAM } from "./blog/myTeam";
@@ -317,6 +318,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_WATCH_TODAY,
   ...BLOG_WATCH_ALONE,
   ...BLOG_WATCH_TIMER,
+  ...BLOG_LIFT_MASTERY,
   ...BLOG_GYM_WIDGETS,
   ...BLOG_WORKOUT_GENERATOR,
   ...BLOG_THIRTY_DAY,

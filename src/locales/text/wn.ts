@@ -169,6 +169,9 @@ export const en = {
   "wn.c.watchHoldTimer.title": "Start hold timers on your watch",
   "wn.c.watchHoldTimer.body":
     "On a plank, wall sit or dead hang, Start timer on Wear OS, Apple Watch or Garmin counts it on your wrist with taps at 3, 2, 1 and halfway, and your phone starts the same timer. Stop early and the seconds you held are logged, phone-free workouts too.",
+  "wn.c.mastery.title": "Lift mastery and new unlocks",
+  "wn.c.mastery.body":
+    "Every exercise earns up to four mastery stars as you log sets: 25, 100, 300 and 1,000. Stars and sets unlock colours for the 3D figure, frames for share cards from your bests, and titles for your Friends profile, like Back squat devotee.",
   "wn.c.watchAuto.title": "Hands-free sets on your watch",
   "wn.c.watchAuto.body":
     "In Labs: start your next set and your Wear OS watch or Apple Watch ends rest, counts the reps and logs the set by itself, with a buzz at each step.",
@@ -392,6 +395,9 @@ export const es: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Inicia temporizadores de isometría en tu reloj",
   "wn.c.watchHoldTimer.body":
     "En una plancha, sentadilla en pared o colgarse de la barra, Iniciar temporizador en Wear OS, Apple Watch o Garmin cuenta en tu muñeca con toques a los 3, 2, 1 y a la mitad, y tu teléfono inicia el mismo temporizador. Si paras antes, se guardan los segundos que aguantaste, también en entrenamientos sin teléfono.",
+  "wn.c.mastery.title": "Dominio del ejercicio y nuevos desbloqueos",
+  "wn.c.mastery.body":
+    "Cada ejercicio gana hasta cuatro estrellas de dominio a medida que registras series: 25, 100, 300 y 1000. Las estrellas y las series desbloquean colores para la figura 3D, marcos para las tarjetas de tus récords y títulos para tu perfil de Amigos.",
   "wn.c.watchAuto.title": "Series sin manos en tu reloj",
   "wn.c.watchAuto.body":
     "En Labs: empieza tu siguiente serie y tu reloj Wear OS o Apple Watch termina el descanso, cuenta las repeticiones y registra la serie solo, con una vibración en cada paso.",
@@ -617,6 +623,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Lance les minuteurs de gainage sur ta montre",
   "wn.c.watchHoldTimer.body":
     "Sur une planche, une chaise contre le mur ou une suspension, Lancer le minuteur sur Wear OS, Apple Watch ou Garmin compte à ton poignet avec des vibrations à 3, 2, 1 et à mi-parcours, et ton téléphone lance le même minuteur. Arrête plus tôt et les secondes tenues sont notées, même sans téléphone.",
+  "wn.c.mastery.title": "Maîtrise des exercices et nouveaux déblocages",
+  "wn.c.mastery.body":
+    "Chaque exercice gagne jusqu'à quatre étoiles de maîtrise au fil des séries enregistrées : 25, 100, 300 et 1 000. Les étoiles et les séries débloquent des couleurs pour la figurine 3D, des cadres pour les cartes de vos records et des titres pour votre profil Amis.",
   "wn.c.watchAuto.title": "Séries mains libres sur ta montre",
   "wn.c.watchAuto.body":
     "Dans Labs : lance ta série suivante et ta montre Wear OS ou ton Apple Watch arrête le repos, compte les répétitions et enregistre la série toute seule, avec une vibration à chaque étape.",
@@ -838,6 +847,9 @@ export const de: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Halte-Timer auf deiner Uhr starten",
   "wn.c.watchHoldTimer.body":
     "Bei Unterarmstütz, Wandsitzen oder Hängen startet Timer starten auf Wear OS, Apple Watch oder Garmin die Zeit am Handgelenk, mit Tippen bei 3, 2, 1 und zur Hälfte, und dein Handy startet denselben Timer. Hörst du früher auf, werden die gehaltenen Sekunden eingetragen, auch beim Training ohne Handy.",
+  "wn.c.mastery.title": "Übungs-Meisterschaft und neue Freischaltungen",
+  "wn.c.mastery.body":
+    "Jede Übung bringt bis zu vier Meisterschaftssterne, während du Sätze einträgst: 25, 100, 300 und 1.000. Sterne und Sätze schalten Farben für die 3D-Figur, Rahmen für die Teilen-Karten deiner Bestleistungen und Titel für dein Freunde-Profil frei.",
   "wn.c.watchAuto.title": "Freihändige Sätze auf deiner Uhr",
   "wn.c.watchAuto.body":
     "In Labs: Starte deinen nächsten Satz, und deine Wear-OS-Uhr oder Apple Watch beendet die Pause, zählt die Wiederholungen und trägt den Satz selbst ein, mit einer Vibration bei jedem Schritt.",
@@ -1059,6 +1071,9 @@ export const it: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Avvia i timer delle tenute sull'orologio",
   "wn.c.watchHoldTimer.body":
     "Su plank, wall sit o sospensione alla sbarra, Avvia il timer su Wear OS, Apple Watch o Garmin conta al polso con tocchi a 3, 2, 1 e a metà, e il telefono avvia lo stesso timer. Se ti fermi prima vengono registrati i secondi tenuti, anche negli allenamenti senza telefono.",
+  "wn.c.mastery.title": "Padronanza degli esercizi e nuovi sblocchi",
+  "wn.c.mastery.body":
+    "Ogni esercizio guadagna fino a quattro stelle di padronanza man mano che registri serie: 25, 100, 300 e 1.000. Stelle e serie sbloccano colori per la figura 3D, cornici per le card dei tuoi record e titoli per il tuo profilo Amici.",
   "wn.c.watchAuto.title": "Serie a mani libere sull'orologio",
   "wn.c.watchAuto.body":
     "In Labs: inizia la serie successiva e il tuo orologio Wear OS o Apple Watch chiude il recupero, conta le ripetizioni e registra la serie da solo, con una vibrazione a ogni passo.",
@@ -1268,6 +1283,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "キープ種目のタイマーをウォッチで開始",
   "wn.c.watchHoldTimer.body":
     "プランク、壁スクワット、ぶら下がりでは、Wear OS・Apple Watch・Garminの「タイマー開始」で手首でカウント。残り3・2・1秒と半分で振動し、スマホも同じタイマーを開始します。途中で止めればキープした秒数を記録。スマホなしのワークアウトでも使えます。",
+  "wn.c.mastery.title": "種目マスタリーと新しいアンロック",
+  "wn.c.mastery.body":
+    "セットを記録するたびに、各種目で最大4つのマスタリースターを獲得できます（25、100、300、1,000セット）。スターとセット数で、3Dフィギュアの色、自己ベストのシェアカード用フレーム、フレンドのプロフィールに表示する称号がアンロックされます。",
   "wn.c.watchAuto.title": "ウォッチでハンズフリーセット",
   "wn.c.watchAuto.body":
     "Labsに追加：次のセットを始めるだけで、Wear OSウォッチやApple Watchが休憩を終え、レップを数え、セットを自動で記録します。各ステップで振動します。",
@@ -1483,6 +1501,9 @@ export const pt: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Inicie timers de isometria no seu relógio",
   "wn.c.watchHoldTimer.body":
     "Em prancha, cadeirinha na parede ou suspensão na barra, Iniciar timer no Wear OS, Apple Watch ou Garmin conta no seu pulso com toques aos 3, 2, 1 e na metade, e o celular inicia o mesmo timer. Parou antes? Os segundos que você aguentou são registrados, também nos treinos sem celular.",
+  "wn.c.mastery.title": "Domínio do exercício e novos desbloqueios",
+  "wn.c.mastery.body":
+    "Cada exercício ganha até quatro estrelas de domínio conforme você registra séries: 25, 100, 300 e 1.000. Estrelas e séries desbloqueiam cores para a figura 3D, molduras para os cards dos seus recordes e títulos para o seu perfil de Amigos.",
   "wn.c.watchAuto.title": "Séries sem as mãos no seu relógio",
   "wn.c.watchAuto.body":
     "No Labs: comece a próxima série e seu relógio Wear OS ou Apple Watch encerra o descanso, conta as repetições e registra a série sozinho, com uma vibração a cada etapa.",
@@ -1685,6 +1706,9 @@ export const ko: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "워치에서 버티기 타이머 시작",
   "wn.c.watchHoldTimer.body":
     "플랭크, 월 싯, 매달리기에서 Wear OS, Apple Watch, Garmin의 타이머 시작을 누르면 손목에서 시간을 재고 3, 2, 1초와 절반에 진동이 옵니다. 휴대폰도 같은 타이머를 시작해요. 일찍 멈추면 버틴 시간이 기록되고, 휴대폰 없는 운동에서도 됩니다.",
+  "wn.c.mastery.title": "종목 마스터리와 새로운 잠금 해제",
+  "wn.c.mastery.body":
+    "세트를 기록할수록 운동마다 최대 4개의 마스터리 별을 얻습니다(25, 100, 300, 1,000세트). 별과 세트 수로 3D 피규어 색상, 개인 기록 공유 카드 프레임, 친구 프로필 칭호가 잠금 해제됩니다.",
   "wn.c.watchAuto.title": "워치로 손 안 대는 세트",
   "wn.c.watchAuto.body":
     "Labs에서: 다음 세트를 시작하면 Wear OS 워치나 Apple Watch가 휴식을 끝내고, 반복 횟수를 세고, 세트를 저절로 기록해요. 단계마다 진동해요.",
@@ -1898,6 +1922,9 @@ export const pl: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Włączaj minutniki ćwiczeń statycznych na zegarku",
   "wn.c.watchHoldTimer.body":
     "Przy desce, krzesełku przy ścianie czy zwisie Włącz minutnik na Wear OS, Apple Watch lub Garmin odlicza na nadgarstku z wibracjami przy 3, 2, 1 i w połowie, a telefon włącza ten sam minutnik. Przerwiesz wcześniej? Zapisze się tyle sekund, ile wytrzymałeś, także w treningach bez telefonu.",
+  "wn.c.mastery.title": "Opanowanie ćwiczeń i nowe odblokowania",
+  "wn.c.mastery.body":
+    "Każde ćwiczenie zdobywa do czterech gwiazdek opanowania w miarę zapisywania serii: 25, 100, 300 i 1000. Gwiazdki i serie odblokowują kolory figury 3D, ramki kart z rekordami i tytuły do profilu w Znajomych.",
   "wn.c.watchAuto.title": "Serie bez rąk na zegarku",
   "wn.c.watchAuto.body":
     "W Labs: zacznij kolejną serię, a zegarek z Wear OS lub Apple Watch sam zakończy przerwę, policzy powtórzenia i zapisze serię, wibrując przy każdym kroku.",
@@ -2114,6 +2141,9 @@ export const tr: Partial<Record<Key, Message>> = {
   "wn.c.watchHoldTimer.title": "Sabit tutuş zamanlayıcılarını saatinden başlat",
   "wn.c.watchHoldTimer.body":
     "Plank, duvar oturuşu veya barda asılmada Wear OS, Apple Watch ya da Garmin'deki Zamanlayıcıyı başlat bileğinde sayar; 3, 2, 1 ve yarıda titrer, telefonun da aynı zamanlayıcıyı başlatır. Erken bırakırsan tuttuğun saniyeler kaydedilir, telefonsuz antrenmanlarda da.",
+  "wn.c.mastery.title": "Hareket ustalığı ve yeni kilit açmalar",
+  "wn.c.mastery.body":
+    "Set kaydettikçe her hareket dört ustalık yıldızına kadar kazanır: 25, 100, 300 ve 1.000. Yıldızlar ve setler 3B figür renklerini, rekor paylaşım kartları için çerçeveleri ve Arkadaşlar profilin için unvanları açar.",
   "wn.c.watchAuto.title": "Saatinde eller serbest setler",
   "wn.c.watchAuto.body":
     "Labs'ta: bir sonraki setine başla; Wear OS saatin ya da Apple Watch dinlenmeyi bitirir, tekrarları sayar ve seti kendiliğinden kaydeder, her adımda titreşimle.",

@@ -1174,4 +1174,15 @@ export const emails: Record<string, Words> = {
     ],
     dyk: "Telefonda yazdırma penceresi sayfayı PDF olarak da kaydedebilir; bir arkadaşa göndermek için kullanışlı.",
   },
+  "lift-mastery": {
+    title: "Hep döndüğün her hareket için yıldızlar",
+    intro: "Artık her hareket kaydettiğin setlerle dört ustalık yıldızına kadar kazanıyor ve bunlar yeni şeylerin kilidini açıyor.",
+    points: [
+      "İlk yıldız bir hareketin 25. setinde, sonra 100, 300 ve 1.000'de gelir. Her çalışma seti bir kez sayılır.",
+      "Hareket sayfası yıldızlarını ve bir sonrakine kalan setleri gösterir, antrenman ekranı da onları hareketin adının yanında gösterir.",
+      "Yıldızlar ve her kas grubu için yaptığın setler 3B figür renklerini açar.",
+      "Hareketinin adını taşıyan unvanlar Arkadaşlar profilinde adının altında görünür. Rekorlar ve plaka kulüpleri kart çerçevelerini açar.",
+    ],
+    dyk: "Bunların hiçbiri sandıktan çıkmaz, yani her rengin, çerçevenin ve unvanın kesin bir yolu var: kaydettiğin setler.",
+  },
 };

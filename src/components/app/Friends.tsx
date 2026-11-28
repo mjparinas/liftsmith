@@ -86,6 +86,8 @@ import {
 } from "@/lib/socialTypes";
 import { useApp } from "@/lib/store";
 import { isTeen } from "@/lib/teen";
+import { parseTitle } from "@/lib/titles";
+import { titleLine } from "@/lib/titleText";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -1099,11 +1101,18 @@ function HomeGymPicker({
 }
 
 /** The tagline and home gym under a profile's name, when there are any. */
-function AboutLine({ person }: { person: Pick<PersonCard, "tagline" | "homeGym"> }) {
+function AboutLine({ person }: { person: Pick<PersonCard, "tagline" | "homeGym" | "title"> }) {
   const g = person.homeGym;
-  if (!person.tagline && !g) return null;
+  const title = person.title ? titleLine(person.title) : "";
+  if (!person.tagline && !g && !title) return null;
   return (
     <div className="mt-2 space-y-1 px-1">
+      {title && (
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-gold">
+          <Icon name="star" size={14} className="shrink-0" />
+          {title}
+        </p>
+      )}
       {person.tagline && <p className="text-sm [overflow-wrap:anywhere]">{person.tagline}</p>}
       {g && (
         <button
@@ -2998,6 +3007,8 @@ function useProfileSync() {
   const { events, profile } = useApp();
   const p = me?.profile;
   const avatar = profile.cosmetics?.avatar ?? "";
+  const picked = profile.cosmetics?.title;
+  const title = !picked || picked === "title-none" ? "" : parseTitle(picked) ? picked : "";
   const lifts = useMemo(() => bestLifts(events), [events]);
   const suspended = !!me?.suspended;
   const joinedNow = !!p;
@@ -3008,14 +3019,14 @@ function useProfileSync() {
   }, [joinedNow, suspended]);
   useEffect(() => {
     if (!p || suspended) return;
-    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : [], stats);
+    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : [], stats, title);
     const key = JSON.stringify(change);
     if (!change || key === lastSent) return;
     lastSent = key;
     social<SocialMe>("update", change)
       .then((m) => m.profile && useSocial.setState({ me: m }))
       .catch(() => undefined);
-  }, [p, avatar, lifts, suspended, stats]);
+  }, [p, avatar, lifts, suspended, stats, title]);
 }
 
 /**
