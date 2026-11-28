@@ -6,7 +6,9 @@ import { EXERCISE_BY_ID, LADDER_ONLY } from "./exercises";
 import {
   addLeftoverSets,
   applyCall,
+  directGap,
   drawWeight,
+  GAP_CAP,
   generate,
   LOADED_TWINS,
   orderRank,
@@ -79,11 +81,27 @@ describe("rankMuscles", () => {
     expect(split.sort()).toEqual(["lats", "quads"]);
   });
 
-  it("puts big muscles ahead of the rest, and forearms and adductors behind", () => {
+  it("puts big muscles ahead of arms and shoulders, then core/calves/traps/lower back, and forearms and adductors behind", () => {
     const order = rankMuscles(all(100), all(0), 10, new Set(), null, zero);
     expect(order.slice(0, 6).sort()).toEqual(["chest", "glutes", "hamstrings", "lats", "quads", "upperBack"]);
+    expect(order.slice(6, 11).sort()).toEqual(["biceps", "frontDelts", "rearDelts", "sideDelts", "triceps"]);
+    expect(order.slice(11, 16).sort()).toEqual(["abs", "calves", "lowerBack", "obliques", "traps"]);
     expect(order.slice(-2).sort()).toEqual(["adductors", "forearms"]);
+    expect(order.indexOf("biceps")).toBeLessThan(order.indexOf("obliques"));
+    expect(order.indexOf("triceps")).toBeLessThan(order.indexOf("calves"));
     expect(order.indexOf("biceps")).toBeLessThan(order.indexOf("forearms"));
+  });
+
+  it("boosts muscles that went recent sessions without direct work, capped at GAP_CAP", () => {
+    const gap = { ...all(0), chest: 2, biceps: 3, triceps: 3 };
+    const bigDay = new Set<Muscle>(["quads", "chest"]);
+    expect(rankMuscles(all(100), all(0), 10, new Set(), bigDay, zero, gap)).toEqual(["chest", "quads"]);
+    // Neglected biceps beat recently-trained quads even after recovery and weekly sets reset.
+    const mix = new Set<Muscle>(["quads", "biceps"]);
+    expect(rankMuscles(all(100), all(0), 10, new Set(), mix, zero, gap)).toEqual(["biceps", "quads"]);
+    // The boost caps at GAP_CAP, so a huge gap never lifts a minor muscle past a fresh big muscle.
+    const huge = { ...all(0), forearms: GAP_CAP + 20 };
+    expect(rankMuscles(all(100), all(0), 10, new Set(), new Set<Muscle>(["chest", "forearms"]), zero, huge)).toEqual(["chest", "forearms"]);
   });
 
   it("ranks the muscle with more of this week's sets left first", () => {
@@ -292,6 +310,50 @@ describe("applyCall on a push day", () => {
   });
 });
 
+describe("directGap", () => {
+  it("is 0 for every muscle with no lifting history", () => {
+    expect(directGap([], NOW)).toEqual(all(0));
+  });
+
+  it("counts sessions since each muscle's last direct (primary) set, capped at GAP_CAP", () => {
+    const events: AppEvent[] = [
+      // Oldest of 5 sessions: trained chest (falls past GAP_CAP = 4)
+      makeSet({ sessionId: "s0", exerciseId: "bench-press", at: NOW - 10 * DAY }),
+      // 4 sessions ago (index 3): trained biceps
+      makeSet({ sessionId: "s1", exerciseId: "barbell-curl", at: NOW - 8 * DAY }),
+      // 3 sessions ago (index 2): trained quads + glutes
+      makeSet({ sessionId: "s2", exerciseId: "back-squat", at: NOW - 6 * DAY }),
+      // 2 sessions ago (index 1): trained upperBack + lats (biceps is only secondary)
+      makeSet({ sessionId: "s3", exerciseId: "barbell-row", at: NOW - 4 * DAY }),
+      // Most recent (index 0): trained hamstrings + glutes
+      makeSet({ sessionId: "s4", exerciseId: "romanian-deadlift", at: NOW - 2 * DAY }),
+      // Ignored: rehab part, cardio, warm-up, and future set
+      makeSet({ sessionId: "s5", exerciseId: "triceps-pushdown", at: NOW - DAY, partId: "rehab" }),
+      makeSet({ sessionId: "s6", exerciseId: "cable-pushdown", at: NOW - DAY, partId: "rehab" }),
+      makeSet({ sessionId: "s7", exerciseId: "treadmill-run", at: NOW - DAY }),
+      makeSet({ sessionId: "s8", exerciseId: "bench-press", at: NOW + DAY }),
+      {
+        type: "warmup",
+        id: "w-gap",
+        at: NOW - DAY,
+        sessionId: "s9",
+        exerciseId: "bench-press",
+        weight: 20,
+        reps: 10,
+      } satisfies WarmupEvent,
+    ];
+    const gap = directGap(events, NOW);
+    expect(gap.hamstrings).toBe(0);
+    expect(gap.glutes).toBe(0);
+    expect(gap.upperBack).toBe(1);
+    expect(gap.lats).toBe(1);
+    expect(gap.quads).toBe(2);
+    expect(gap.biceps).toBe(3); // secondary work on barbell-row does not reset direct gap
+    expect(gap.chest).toBe(GAP_CAP); // s0 is older than the last GAP_CAP sessions
+    expect(gap.triceps).toBe(GAP_CAP); // rehab set ignored
+  });
+});
+
 describe("the whole plan", () => {
   const profile = makeProfile();
   const days = Array.from({ length: 14 }, (_, d) => NOW + d * DAY);
@@ -341,6 +403,29 @@ describe("the whole plan", () => {
     const tired = makeSets(6, { exerciseId: "back-squat", at: NOW - 16 * 3600_000 });
     expect(recovery(tired, NOW).quads).toBe(53);
     expect(generate({ gym, profile, events: tired, minutes: 90, now: NOW }).items.map((i) => i.focus)).not.toContain("quads");
+  });
+
+  it("includes direct chest, biceps and triceps work across several spaced-out workouts", () => {
+    for (const [minutes, gapDays, sessions] of [
+      [45, 2, 4],
+      [45, 3, 5],
+      [30, 2, 5],
+    ] as const) {
+      const seen = new Set<Muscle>();
+      const evs: AppEvent[] = [];
+      for (let i = 0; i < sessions; i++) {
+        const now = NOW + i * gapDays * DAY;
+        const plan = generate({ gym, profile: makeProfile({ minutes }), events: evs, minutes, now });
+        const sessionId = `sim-${minutes}-${gapDays}-${i}`;
+        for (const it of plan.items) {
+          for (const m of ex(it.exerciseId).primary) seen.add(m);
+          evs.push(...makeSets(it.sets, { sessionId, exerciseId: it.exerciseId, at: now + 60_000 }));
+        }
+      }
+      expect(seen.has("chest"), `${minutes}m every ${gapDays}d should train chest`).toBe(true);
+      expect(seen.has("biceps"), `${minutes}m every ${gapDays}d should train biceps`).toBe(true);
+      expect(seen.has("triceps"), `${minutes}m every ${gapDays}d should train triceps`).toBe(true);
+    }
   });
 });
 

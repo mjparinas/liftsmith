@@ -160,10 +160,11 @@ final class WatchModel: NSObject, ObservableObject {
         WatchToday.save(next == nil ? nil : json)
     }
 
-    fileprivate func apply(_ json: String?) {
+    fileprivate func apply(_ json: String?, live: Bool = false) {
         // The phone's times onto this watch's clock, so both count down to the same moment (WatchClock).
         let parsed = WatchState.parse(json)
-        if let p = parsed { clock.heard(sentAt: p.at, now: Self.ms()) }
+        if let p = parsed, let current = state, p.at > 0, p.at < current.at { return }
+        if live, let p = parsed { clock.heard(sentAt: p.at, now: Self.ms()) }
         let next = parsed?.shifted(by: clock.offset)
         guard next != state else { return }
         // A run here owns the screen and the workout session; the phone's own workout waits until it's finished.
@@ -371,7 +372,7 @@ extension WatchModel: WCSessionDelegate {
             Task { @MainActor in self.applyCarry(carry) }
         }
         guard let json = message["json"] as? String else { return }
-        Task { @MainActor in self.apply(json) }
+        Task { @MainActor in self.apply(json, live: true) }
     }
 
     /// A phone-free workout reached the phone.

@@ -9,6 +9,33 @@ public class WatchClockTest {
     private static final long NOW = 1_800_000_000_000L;
 
     @Test
+    public void onePhoneUpdateRunsThroughReadyAndHoldWhileDisconnected() {
+        String phases = "{'timer':[{'from':%d,'to':%d,'label':'Get set'},{'from':%d,'to':%d,'label':'Plank'}]}";
+        WorkoutState watch = WorkoutState.parse(String.format(java.util.Locale.ROOT, phases, NOW, NOW + 5000, NOW + 5000, NOW + 35000));
+        assertEquals(5, watch.phase(NOW).seconds(NOW));
+        assertEquals("Plank", watch.phase(NOW + 5000).label);
+        assertEquals(18, watch.phase(NOW + 17000).seconds(NOW + 17000));
+        assertEquals(null, watch.phase(NOW + 35000));
+
+        // The phone starts rest offline. When the watch receives it 12 seconds later, only 48 seconds remain.
+        WorkoutState reconnected = WorkoutState.parse("{'restUntil':" + (NOW + 95000) + "}");
+        assertEquals(48, reconnected.restLeft(NOW + 47000));
+    }
+
+    @Test
+    public void openingSnapshotTenSecondsLaterKeepsOriginalRestAndHoldDeadlines() {
+        WatchClock clock = new WatchClock();
+        long now = NOW + 10_000;
+        long shift = clock.offsetFor(NOW, now, false);
+        String phases = "{'timer':[{'from':%d,'to':%d,'label':'Get set'},{'from':%d,'to':%d,'label':'Plank'}]}";
+        WorkoutState hold = WorkoutState.parse(String.format(java.util.Locale.ROOT, phases, NOW, NOW + 5000, NOW + 5000, NOW + 35000), shift);
+        assertEquals("Plank", hold.phase(now).label);
+        assertEquals(25, hold.phase(now).seconds(now));
+        WorkoutState rest = WorkoutState.parse("{'restUntil':" + (NOW + 60000) + "}", shift);
+        assertEquals(50, rest.restLeft(now));
+    }
+
+    @Test
     public void noOffset_untilTheWatchIsClearlyAheadOrBehind() {
         WatchClock c = new WatchClock();
         assertEquals(0, c.offset());
